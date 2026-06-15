@@ -38,3 +38,10 @@ opencode debug agent improver
 
 Treat a missing `context_*` tool, unexpected `oc_learning_*` exposure, or
 missing command template as a compatibility failure.
+
+The default repository verifier checks static template structure. The runtime
+verifier checks the effective installed profile:
+
+```sh
+npm run verify:runtime
+```

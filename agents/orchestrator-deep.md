@@ -9,6 +9,10 @@ steps: 240
 color: warning
 permission:
   question: allow
+  context_outline: allow
+  context_files: allow
+  context_read: allow
+  context_search: allow
   bash:
     "*": ask
     "git status": allow

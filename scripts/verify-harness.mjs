@@ -5,14 +5,14 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const failures = [];
 
-function fail(message) {
-  failures.push(message);
+function fail(code, message, fix) {
+  failures.push({ code, message, fix });
 }
 
 function read(relativePath) {
   const fullPath = path.join(root, relativePath);
   if (!fs.existsSync(fullPath)) {
-    fail(`required file missing: ${relativePath}`);
+    fail("HARNESS-S001", `required file missing: ${relativePath}`, "Restore the required harness file or remove the invariant that references it.");
     return "";
   }
   return fs.readFileSync(fullPath, "utf8").replace(/^\uFEFF/, "");
@@ -37,15 +37,101 @@ function listFiles(dir, out = []) {
   return out;
 }
 
-function assertIncludes(text, needle, label) {
+function assertIncludes(text, needle, label, code = "HARNESS-S002", fix = "Restore the expected invariant.") {
   if (!text.includes(needle)) {
-    fail(`${label} missing ${needle}`);
+    fail(code, `${label} missing ${needle}`, fix);
   }
 }
 
-function assertNotIncludes(text, needle, label) {
+function assertNotIncludes(text, needle, label, code = "HARNESS-S003", fix = "Remove stale or forbidden content.") {
   if (text.includes(needle)) {
-    fail(`${label} still references ${needle}`);
+    fail(code, `${label} still references ${needle}`, fix);
+  }
+}
+
+function unquote(value) {
+  const trimmed = value.trim();
+  if ((trimmed.startsWith('"') && trimmed.endsWith('"')) || (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
+    return trimmed.slice(1, -1);
+  }
+  return trimmed;
+}
+
+function parseScalar(value) {
+  const unquoted = unquote(value);
+  if (unquoted === "true") return true;
+  if (unquoted === "false") return false;
+  if (/^-?\d+$/.test(unquoted)) return Number(unquoted);
+  return unquoted;
+}
+
+function findYamlSeparator(line) {
+  let quote = null;
+  for (let index = 0; index < line.length; index += 1) {
+    const char = line[index];
+    if ((char === '"' || char === "'") && line[index - 1] !== "\\") {
+      quote = quote === char ? null : quote ?? char;
+      continue;
+    }
+    if (char === ":" && quote === null) {
+      return index;
+    }
+  }
+  return -1;
+}
+
+function parseYamlSubset(yaml, label) {
+  const rootObject = {};
+  const stack = [{ indent: -1, value: rootObject }];
+
+  for (const rawLine of yaml.split(/\r?\n/)) {
+    if (!rawLine.trim() || rawLine.trimStart().startsWith("#")) {
+      continue;
+    }
+    const indent = rawLine.match(/^ */)?.[0].length ?? 0;
+    const line = rawLine.trim();
+    const separator = findYamlSeparator(line);
+    if (separator === -1) {
+      fail("HARNESS-S004", `${label} contains unsupported frontmatter line: ${rawLine}`, "Keep agent frontmatter in the simple key/value format used by this template.");
+      continue;
+    }
+
+    const key = unquote(line.slice(0, separator));
+    const value = line.slice(separator + 1).trim();
+    while (stack.length > 1 && indent <= stack.at(-1).indent) {
+      stack.pop();
+    }
+    const parent = stack.at(-1).value;
+    if (value === "") {
+      const child = {};
+      parent[key] = child;
+      stack.push({ indent, value: child });
+    } else {
+      parent[key] = parseScalar(value);
+    }
+  }
+
+  return rootObject;
+}
+
+function frontmatterFor(file) {
+  const text = read(file);
+  if (!text.startsWith("---\n")) {
+    fail("HARNESS-S005", `${file} must start with frontmatter`, "Add OpenCode frontmatter at the top of the agent file.");
+    return {};
+  }
+  const end = text.indexOf("\n---", 4);
+  if (end === -1) {
+    fail("HARNESS-S006", `${file} frontmatter is not closed`, "Close the frontmatter block with ---.");
+    return {};
+  }
+  return parseYamlSubset(text.slice(4, end), file);
+}
+
+function assertPermission(agent, permission, key, expected, code, fix) {
+  const actual = permission?.[key];
+  if (actual !== expected) {
+    fail(code, `agents/${agent}.md permission ${key} expected ${expected}, got ${actual ?? "<missing>"}`, fix);
   }
 }
 
@@ -70,6 +156,7 @@ const requiredFiles = [
   "agents/verifier.md",
   "agents/improver.md",
   "skills/global-review-ledger/SKILL.md",
+  "skills/global-harness-release-review/SKILL.md",
   "skills/global-memory/SKILL.md",
   "skills/global-self-improvement/SKILL.md",
   "docs/recursive-context-mode.md",
@@ -77,68 +164,107 @@ const requiredFiles = [
   "docs/adoption.md",
   "docs/compatibility.md",
   "docs/evaluation.md",
+  "docs/harness-map.md",
+  "docs/harnessability.md",
   "docs/release.md",
   "examples/minimal-opencode.json",
   "examples/agent-tool-permissions.md",
   "examples/project-workflow/WORKFLOW.md",
   "examples/project-workflow/project-skill/SKILL.md",
   "fixtures/sample-project/WORKFLOW.md",
+  "fixtures/runtime-debug/debug-config.txt",
+  "fixtures/runtime-debug/debug-agent-orchestrator.txt",
+  "fixtures/runtime-debug/debug-agent-orchestrator-deep.txt",
+  "fixtures/runtime-debug/debug-agent-explore.txt",
+  "fixtures/runtime-debug/debug-agent-architect.txt",
+  "fixtures/runtime-debug/debug-agent-reviewer.txt",
+  "fixtures/runtime-debug/debug-agent-diagnose.txt",
+  "fixtures/runtime-debug/debug-agent-verifier.txt",
+  "fixtures/runtime-debug/debug-agent-researcher.txt",
+  "fixtures/runtime-debug/debug-agent-improver.txt",
   "scripts/evaluate-harness.mjs",
+  "scripts/verify-drift.mjs",
+  "scripts/verify-runtime-fixtures.mjs",
+  "scripts/verify-runtime.mjs",
 ];
 
 for (const file of requiredFiles) {
   if (!exists(file)) {
-    fail(`required file missing: ${file}`);
+    fail("HARNESS-S001", `required file missing: ${file}`, "Restore the required harness file.");
   }
 }
 
 const packageJson = JSON.parse(read("package.json"));
 if (packageJson.version !== "0.2.0") {
-  fail("package.json version must match the latest release plan");
+  fail("HARNESS-S007", "package.json version must match the latest release plan", "Update docs, changelog, and release metadata together with the version.");
 }
-if (packageJson.scripts?.verify !== "npm run verify:static && npm run eval") {
-  fail("package.json must run static verification and eval from npm run verify");
+if (packageJson.scripts?.verify !== "npm run verify:static && npm run eval && npm run verify:drift && npm run verify:runtime:fixture") {
+  fail("HARNESS-S008", "package.json must run static verification, eval, drift, and runtime fixture checks from npm run verify", "Keep fast deterministic sensors in the default verify command.");
 }
 if (packageJson.scripts?.eval !== "node scripts/evaluate-harness.mjs") {
-  fail("package.json must expose npm run eval");
+  fail("HARNESS-S009", "package.json must expose npm run eval", "Restore the evaluation script entry.");
 }
 if (packageJson.scripts?.["verify:static"] !== "node scripts/verify-harness.mjs") {
-  fail("package.json must expose npm run verify:static");
+  fail("HARNESS-S010", "package.json must expose npm run verify:static", "Restore the static verifier entry.");
+}
+if (packageJson.scripts?.["verify:drift"] !== "node scripts/verify-drift.mjs") {
+  fail("HARNESS-S011", "package.json must expose npm run verify:drift", "Restore the drift verifier entry.");
+}
+if (packageJson.scripts?.["verify:runtime"] !== "node scripts/verify-runtime.mjs") {
+  fail("HARNESS-S012", "package.json must expose npm run verify:runtime", "Restore the runtime verifier entry.");
+}
+if (packageJson.scripts?.["verify:runtime:fixture"] !== "node scripts/verify-runtime-fixtures.mjs") {
+  fail("HARNESS-S012", "package.json must expose npm run verify:runtime:fixture", "Restore the deterministic runtime fixture verifier entry.");
 }
 if (packageJson.repository?.url !== "git+https://github.com/Tah10n/opencode-harness.git") {
-  fail("package.json must point repository.url at Tah10n/opencode-harness");
+  fail("HARNESS-S013", "package.json must point repository.url at Tah10n/opencode-harness", "Keep published package metadata aligned with GitHub.");
 }
 if (packageJson.homepage !== "https://github.com/Tah10n/opencode-harness#readme") {
-  fail("package.json must expose the GitHub README as homepage");
+  fail("HARNESS-S014", "package.json must expose the GitHub README as homepage", "Keep the homepage pointing at the public README.");
 }
 if (packageJson.dependencies?.["@opencode-ai/plugin"]) {
-  fail("opencode-harness must not depend on plugin packages; capabilities live in sibling packages");
+  fail("HARNESS-S015", "opencode-harness must not depend on plugin packages", "Capabilities live in sibling packages; keep this repo as a behavior profile.");
 }
 
 const config = JSON.parse(read("opencode.json"));
 if (config.default_agent !== "orchestrator") {
-  fail("opencode.json default_agent must be orchestrator");
+  fail("HARNESS-S016", "opencode.json default_agent must be orchestrator", "Restore the primary harness orchestrator.");
 }
-for (const commandName of ["review-diff", "diagnose", "workflow"]) {
+for (const commandName of ["review-diff", "diagnose", "workflow", "harness-release-review"]) {
   if (!config.command?.[commandName]) {
-    fail(`opencode.json missing command: ${commandName}`);
+    fail("HARNESS-S017", `opencode.json missing command: ${commandName}`, "Restore the command entry or update docs and tests.");
   }
 }
 if (!config.watcher?.ignore?.includes(".oc_learning/**")) {
-  fail("opencode.json watcher must ignore .oc_learning/**");
+  fail("HARNESS-S018", "opencode.json watcher must ignore .oc_learning/**", "Prevent memory backups from becoming noisy watched changes.");
 }
 if (config.permission?.external_directory !== "ask") {
-  fail("opencode.json must ask before external directory access");
+  fail("HARNESS-S019", "opencode.json must ask before external directory access", "Keep cross-directory access explicit.");
 }
 if (config.permission?.["oc_learning_*"] !== "deny") {
-  fail("root permissions must deny oc_learning_* by default");
+  fail("HARNESS-S020", "root permissions must deny oc_learning_* by default", "Route persistent writes through improver only.");
 }
 
-const readOnlyAgents = ["explore", "architect", "reviewer", "diagnose", "verifier", "researcher", "improver"];
-const contextAgents = ["explore", "architect", "reviewer", "diagnose", "verifier"];
-const contextTools = ["context_outline", "context_files", "context_read", "context_search"];
+const rootDangerousPatterns = [
+  "rm *",
+  "Remove-Item *",
+  "git clean*",
+  "git reset*",
+  "git rebase*",
+  "git push --force*",
+  "git push --delete*",
+  "npm publish*",
+  "docker system prune*",
+  "kubectl delete*",
+];
 
-for (const agent of [
+for (const pattern of rootDangerousPatterns) {
+  if (config.permission?.bash?.[pattern] !== "ask") {
+    fail("HARNESS-S021", `root bash permission ${pattern} must ask`, "Dangerous commands should require explicit approval.");
+  }
+}
+
+const agentNames = [
   "orchestrator",
   "orchestrator-deep",
   "explore",
@@ -149,36 +275,65 @@ for (const agent of [
   "researcher",
   "verifier",
   "improver",
-]) {
+];
+const readOnlyAgents = ["explore", "architect", "reviewer", "diagnose", "verifier", "researcher", "improver"];
+const contextAgents = ["orchestrator", "orchestrator-deep", "explore", "architect", "reviewer", "diagnose", "verifier"];
+const contextTools = ["context_outline", "context_files", "context_read", "context_search"];
+const frontmatters = new Map();
+
+for (const agent of agentNames) {
   const file = `agents/${agent}.md`;
-  const text = read(file);
-  if (!text.startsWith("---\n")) {
-    fail(`${file} must start with frontmatter`);
+  const frontmatter = frontmatterFor(file);
+  frontmatters.set(agent, frontmatter);
+  if (!frontmatter.description) {
+    fail("HARNESS-S022", `${file} missing description`, "Add a concise agent description.");
   }
-  assertIncludes(text, "description:", file);
-  assertIncludes(text, "mode:", file);
-  assertIncludes(text, "permission:", file);
+  if (!frontmatter.mode) {
+    fail("HARNESS-S023", `${file} missing mode`, "Declare primary or subagent mode.");
+  }
+  if (!frontmatter.permission || typeof frontmatter.permission !== "object") {
+    fail("HARNESS-S024", `${file} missing permission block`, "Declare the agent permission surface explicitly.");
+  }
+
+  const permission = frontmatter.permission ?? {};
   if (readOnlyAgents.includes(agent)) {
-    assertIncludes(text, "edit: deny", file);
+    assertPermission(agent, permission, "edit", "deny", "HARNESS-S025", "Read-only subagents must deny edits structurally.");
   }
   if (contextAgents.includes(agent)) {
     for (const tool of contextTools) {
-      assertIncludes(text, `${tool}: allow`, file);
+      assertPermission(agent, permission, tool, "allow", "HARNESS-S026", "Agents that participate in broad context work need safe context tools.");
+    }
+  }
+  if (agent === "researcher") {
+    assertPermission(agent, permission, "webfetch", "allow", "HARNESS-S027", "Researcher should be the web-capable agent.");
+    assertPermission(agent, permission, "websearch", "allow", "HARNESS-S028", "Researcher should be the web-capable agent.");
+  } else if (permission.webfetch === "allow" || permission.websearch === "allow") {
+    fail("HARNESS-S029", `${file} should not allow web tools`, "Keep web research isolated in the researcher agent.");
+  }
+  if (agent === "improver") {
+    assertPermission(agent, permission, "oc_learning_*", "ask", "HARNESS-S030", "Improver is the only bounded learning write path.");
+  } else if (permission["oc_learning_*"] && permission["oc_learning_*"] !== "deny") {
+    fail("HARNESS-S031", `${file} must not request oc_learning_* writes`, "Route persistent writes through improver only.");
+  }
+}
+
+for (const agent of ["orchestrator", "orchestrator-deep"]) {
+  const taskPermissions = frontmatters.get(agent)?.permission?.task ?? {};
+  for (const delegatedAgent of ["explore", "architect", "general", "reviewer", "diagnose", "researcher", "improver", "verifier"]) {
+    if (taskPermissions[delegatedAgent] !== "allow") {
+      fail("HARNESS-S032", `${agent} cannot delegate to ${delegatedAgent}`, "Primary orchestrators should be able to route focused work.");
     }
   }
 }
 
-const researcher = read("agents/researcher.md");
-assertIncludes(researcher, "webfetch: allow", "agents/researcher.md");
-assertIncludes(researcher, "websearch: allow", "agents/researcher.md");
-
-const improver = read("agents/improver.md");
-assertIncludes(improver, '"oc_learning_*": ask', "agents/improver.md");
-assertIncludes(improver, "Do not edit `AGENTS.md`, `opencode.json`, agent definitions", "agents/improver.md");
-
 const reviewLedger = read("skills/global-review-ledger/SKILL.md");
 for (const section of ["## Review baseline", "## Finding ledger", "## Fix pass", "## Re-review", "## Stop conditions"]) {
   assertIncludes(reviewLedger, section, "skills/global-review-ledger/SKILL.md");
+}
+
+const releaseReviewSkill = read("skills/global-harness-release-review/SKILL.md");
+for (const section of ["## Purpose", "## Rules", "## Review Scope", "## Questions", "## Output"]) {
+  assertIncludes(releaseReviewSkill, section, "skills/global-harness-release-review/SKILL.md");
 }
 
 const recursiveDocs = read("docs/recursive-context-mode.md");
@@ -186,24 +341,30 @@ assertIncludes(recursiveDocs, "opencode-recursive-context", "docs/recursive-cont
 assertNotIncludes(recursiveDocs, "plugins/recursive-context.ts", "docs/recursive-context-mode.md");
 
 const readme = read("README.md");
-assertIncludes(readme, "It is intentionally separate from plugin capabilities", "README.md");
-assertIncludes(readme, "actions/workflows/verify.yml/badge.svg", "README.md");
-assertIncludes(readme, "## Adoption", "README.md");
-assertIncludes(readme, "npm run verify", "README.md");
-assertIncludes(readme, "docs/adoption.md", "README.md");
-assertIncludes(readme, "docs/evaluation.md", "README.md");
-assertIncludes(readme, "docs/compatibility.md", "README.md");
-assertIncludes(readme, "docs/release.md", "README.md");
-assertIncludes(readme, "https://github.com/Tah10n/opencode-recursive-context", "README.md");
-assertIncludes(readme, "https://github.com/Tah10n/opencode-learning", "README.md");
-assertIncludes(readme, "https://martinfowler.com/articles/harness-engineering.html", "README.md");
-assertIncludes(readme, "https://github.com/DenisSergeevitch/agents-best-practices", "README.md");
+for (const needle of [
+  "It is intentionally separate from plugin capabilities",
+  "actions/workflows/verify.yml/badge.svg",
+  "## Adoption",
+  "npm run verify",
+  "docs/adoption.md",
+  "docs/evaluation.md",
+  "docs/compatibility.md",
+  "docs/release.md",
+  "docs/harness-map.md",
+  "docs/harnessability.md",
+  "https://github.com/Tah10n/opencode-recursive-context",
+  "https://github.com/Tah10n/opencode-learning",
+  "https://martinfowler.com/articles/harness-engineering.html",
+  "https://github.com/DenisSergeevitch/agents-best-practices",
+  "harness-release-review",
+]) {
+  assertIncludes(readme, needle, "README.md");
+}
 
 const workflow = read(".github/workflows/verify.yml");
-assertIncludes(workflow, "pull_request:", ".github/workflows/verify.yml");
-assertIncludes(workflow, "workflow_dispatch:", ".github/workflows/verify.yml");
-assertIncludes(workflow, "npm run verify", ".github/workflows/verify.yml");
-assertIncludes(workflow, "actions/setup-node@v4", ".github/workflows/verify.yml");
+for (const needle of ["pull_request:", "workflow_dispatch:", "npm run verify", "actions/setup-node@v4", "Harness verification"]) {
+  assertIncludes(workflow, needle, ".github/workflows/verify.yml");
+}
 
 const repositoriesDoc = read("docs/repositories.md");
 assertIncludes(repositoriesDoc, "https://github.com/Tah10n/opencode-recursive-context", "docs/repositories.md");
@@ -214,10 +375,24 @@ assertIncludes(memoryDocs, "opencode-learning", "docs/memory-and-self-improvemen
 assertNotIncludes(memoryDocs, "learning-guard", "docs/memory-and-self-improvement.md");
 
 const compatibilityDoc = read("docs/compatibility.md");
-assertIncludes(compatibilityDoc, "v0.2.0", "docs/compatibility.md");
-assertIncludes(compatibilityDoc, "opencode-recursive-context", "docs/compatibility.md");
-assertIncludes(compatibilityDoc, "opencode-learning", "docs/compatibility.md");
-assertIncludes(compatibilityDoc, "opencode-learning-guard", "docs/compatibility.md");
+for (const needle of ["v0.2.0", "opencode-recursive-context", "opencode-learning", "opencode-learning-guard"]) {
+  assertIncludes(compatibilityDoc, needle, "docs/compatibility.md");
+}
+
+const evaluationDoc = read("docs/evaluation.md");
+for (const needle of ["verify:drift", "verify:runtime", "verify:runtime:fixture", "Behaviour contract", "Harness Control Map"]) {
+  assertIncludes(evaluationDoc, needle, "docs/evaluation.md");
+}
+
+const releaseDoc = read("docs/release.md");
+for (const needle of ["harness-release-review", "guide/sensor coherence", "permission safety"]) {
+  assertIncludes(releaseDoc, needle, "docs/release.md");
+}
+
+const adoptionDoc = read("docs/adoption.md");
+for (const needle of ["docs/harnessability.md", "npm run verify:runtime", "Harnessability"]) {
+  assertIncludes(adoptionDoc, needle, "docs/adoption.md");
+}
 
 const changelog = read("CHANGELOG.md");
 assertIncludes(changelog, "## 0.2.0 - 2026-06-15", "CHANGELOG.md");
@@ -248,7 +423,7 @@ for (const file of listFiles(".")) {
   const text = fs.readFileSync(fullPath, "utf8").replace(/^\uFEFF/, "");
   for (const marker of privateMarkers) {
     if (text.includes(marker)) {
-      fail(`${file} contains project-specific marker ${marker}`);
+      fail("HARNESS-S033", `${file} contains project-specific marker ${marker}`, "Remove private or project-specific facts from the public harness template.");
     }
   }
 }
@@ -269,14 +444,17 @@ const forbiddenSecretPaths = [
 
 for (const file of listFiles(".")) {
   if (forbiddenSecretPaths.some((pattern) => pattern.test(file))) {
-    fail(`secret-like file must not be committed: ${file}`);
+    fail("HARNESS-S034", `secret-like file must not be committed: ${file}`, "Remove secret-like files from the reusable template.");
   }
 }
 
 if (failures.length > 0) {
   console.error("Harness verification failed:");
   for (const failure of failures) {
-    console.error(`- ${failure}`);
+    console.error(`- ${failure.code}: ${failure.message}`);
+    if (failure.fix) {
+      console.error(`  fix: ${failure.fix}`);
+    }
   }
   process.exit(1);
 }

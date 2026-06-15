@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- Added a harness control map and harnessability checklist.
+- Added deterministic drift, runtime, and positive/negative runtime-fixture
+  verification scripts.
+- Expanded behaviour contract evaluation and structural permission checks.
+- Allowed primary orchestrators to use safe `context_*` tools directly.
+- Added a read-only semantic harness release review command and skill.
+
 ## 0.2.0 - 2026-06-15
 
 - Added fixture-backed static harness evaluation checks.

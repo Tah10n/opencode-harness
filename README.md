@@ -12,7 +12,10 @@ This repository contains a reusable OpenCode behavior profile:
 - review and re-review ledger workflow;
 - recursive-context operating rules;
 - controlled memory and self-improvement policy;
-- commands such as `learn`, `curate-learning`, `review-diff`, and `workflow`.
+- commands such as `learn`, `curate-learning`, `review-diff`, `workflow`, and
+  `harness-release-review`.
+- deterministic verification for static structure, behaviour contracts, drift,
+  and installed runtime checks.
 
 It is intentionally separate from plugin capabilities:
 
@@ -34,7 +37,9 @@ Copy or adapt the profile files into an OpenCode configuration:
 Keep personal memory entries, machine-specific plugin paths, local automation,
 and project-specific workflow facts outside this repository.
 
-Detailed adoption steps live in [docs/adoption.md](docs/adoption.md).
+Detailed adoption steps live in [docs/adoption.md](docs/adoption.md). The
+control matrix lives in [docs/harness-map.md](docs/harness-map.md), and project
+readiness guidance lives in [docs/harnessability.md](docs/harnessability.md).
 
 ## Adoption
 
@@ -54,8 +59,15 @@ Detailed adoption steps live in [docs/adoption.md](docs/adoption.md).
 5. In the live OpenCode configuration, confirm the effective runtime surface:
 
    ```powershell
+   npm run verify:runtime
+   ```
+
+   Or run the underlying OpenCode checks manually:
+
+   ```powershell
    opencode debug config
    opencode debug agent orchestrator
+   opencode debug agent orchestrator-deep
    opencode debug agent reviewer
    opencode debug agent improver
    ```
@@ -76,6 +88,13 @@ Run the local harness checks before copying or publishing template changes:
 
 ```powershell
 npm run verify
+```
+
+Run the installed-profile runtime sensor after copying the profile into a live
+OpenCode configuration:
+
+```powershell
+npm run verify:runtime
 ```
 
 For local private-name checks, keep the marker list outside the repository

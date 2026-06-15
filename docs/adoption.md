@@ -3,6 +3,12 @@
 Use this guide when copying or adapting `opencode-harness` into an OpenCode
 configuration.
 
+## Harnessability
+
+Before adoption, use [docs/harnessability.md](harnessability.md) to check
+whether the target project has enough local workflow, verification, and
+boundary information for the harness to regulate agent work effectively.
+
 ## Prerequisites
 
 - OpenCode installed in the target environment.
@@ -51,15 +57,22 @@ After installing into a live OpenCode configuration, verify the effective
 runtime surface:
 
 ```sh
+npm run verify:runtime
+```
+
+If you prefer to run the underlying OpenCode checks manually:
+
+```sh
 opencode debug config
 opencode debug agent orchestrator
+opencode debug agent orchestrator-deep
 opencode debug agent reviewer
 opencode debug agent improver
 ```
 
 Expected result:
 
-- orchestrator/reviewer/explore/architect/diagnose/verifier expose
+- orchestrator/orchestrator-deep/reviewer/explore/architect/diagnose/verifier expose
   `context_outline`, `context_files`, `context_search`, and `context_read`;
 - root config denies `oc_learning_*`;
 - only `improver` has bounded `oc_learning_*` write tools;

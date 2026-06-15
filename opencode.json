@@ -126,6 +126,11 @@
       "description": "Draft a project WORKFLOW.md from repository evidence",
       "agent": "orchestrator",
       "template": "Load the global-project-skills skill and draft a compact project-specific WORKFLOW.md from repository evidence. Do not edit files unless explicitly asked."
+    },
+    "harness-release-review": {
+      "description": "Read-only semantic release review for harness coherence",
+      "agent": "orchestrator",
+      "template": "Load the `global-harness-release-review` skill. Review the current harness branch read-only before release: do not edit files, stage changes, commit, tag, or push.\n\nCheck whether guides and sensors remain coherent as a system: AGENTS.md, opencode.json, agents/, commands/, skills/, docs/harness-map.md, docs/evaluation.md, docs/compatibility.md, docs/release.md, scripts/, examples/, and fixtures/.\n\nUse focused `@reviewer` subagents only when distinct semantic scopes are useful, such as guide/sensor consistency, permission safety, behaviour-contract coverage, runtime/drift coverage, release/adoption docs, and public/private boundary. Return release blockers first, then non-blocking risks, then verification evidence and gaps."
     }
   },
   "watcher": {

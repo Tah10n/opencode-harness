@@ -1,0 +1,7 @@
+agent: reviewer
+permission:
+  edit: deny
+  context_outline: allow
+  context_files: allow
+  context_search: allow
+  context_read: allow

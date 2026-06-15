@@ -1,0 +1,4 @@
+default_agent: orchestrator
+permission:
+  external_directory: ask
+  "oc_learning_*": deny
