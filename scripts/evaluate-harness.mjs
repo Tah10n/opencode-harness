@@ -97,8 +97,7 @@ const scenarios = [
       includes("opencode.json", "\"oc_learning_*\": \"deny\"", "Root access to learning writes should stay denied.");
       includes("agents/improver.md", "\"oc_learning_*\": ask", "Only the bounded improver should request learning writes.");
       includes("agents/improver.md", "Do not edit `AGENTS.md`, `opencode.json`, agent definitions", "Self-improvement should not rewrite the harness core.");
-      includes("docs/memory-and-self-improvement.md", "opencode-learning", "Memory docs should point at the current capability repository.");
-      excludes("docs/memory-and-self-improvement.md", "learning-guard", "Docs should not use the old package name as the capability name.");
+      includes("docs/memory-and-self-improvement.md", "opencode-learning-guard", "Memory docs should point at the current capability repository.");
     },
   },
   {

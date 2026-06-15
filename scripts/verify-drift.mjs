@@ -34,7 +34,7 @@ const requiredLinks = [
   "https://martinfowler.com/articles/harness-engineering.html",
   "https://github.com/DenisSergeevitch/agents-best-practices",
   "https://github.com/Tah10n/opencode-recursive-context",
-  "https://github.com/Tah10n/opencode-learning",
+  "https://github.com/Tah10n/opencode-learning-guard",
 ];
 
 for (const link of requiredLinks) {

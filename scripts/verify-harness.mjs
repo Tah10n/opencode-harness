@@ -353,7 +353,7 @@ for (const needle of [
   "docs/harness-map.md",
   "docs/harnessability.md",
   "https://github.com/Tah10n/opencode-recursive-context",
-  "https://github.com/Tah10n/opencode-learning",
+  "https://github.com/Tah10n/opencode-learning-guard",
   "https://martinfowler.com/articles/harness-engineering.html",
   "https://github.com/DenisSergeevitch/agents-best-practices",
   "harness-release-review",
@@ -368,14 +368,53 @@ for (const needle of ["pull_request:", "workflow_dispatch:", "npm run verify", "
 
 const repositoriesDoc = read("docs/repositories.md");
 assertIncludes(repositoriesDoc, "https://github.com/Tah10n/opencode-recursive-context", "docs/repositories.md");
-assertIncludes(repositoriesDoc, "https://github.com/Tah10n/opencode-learning", "docs/repositories.md");
+assertIncludes(repositoriesDoc, "https://github.com/Tah10n/opencode-learning-guard", "docs/repositories.md");
 
 const memoryDocs = read("docs/memory-and-self-improvement.md");
-assertIncludes(memoryDocs, "opencode-learning", "docs/memory-and-self-improvement.md");
-assertNotIncludes(memoryDocs, "learning-guard", "docs/memory-and-self-improvement.md");
+assertIncludes(memoryDocs, "opencode-learning-guard", "docs/memory-and-self-improvement.md");
+for (const needle of [
+  "Memory is not an always-on epilogue",
+  "toolset",
+  "enabledTools",
+  "Memory cleanup is audit-first",
+  "oc_learning_memory_audit",
+  "tools/oc_learning.js",
+]) {
+  assertIncludes(memoryDocs, needle, "docs/memory-and-self-improvement.md");
+}
+
+const agentsPolicy = read("AGENTS.md");
+assertIncludes(agentsPolicy, "skip it for simple, self-contained, or directly answerable tasks", "AGENTS.md");
+assertIncludes(agentsPolicy, "Do not invoke self-improvement just because a task completed", "AGENTS.md");
+assertIncludes(agentsPolicy, "Keep `oc_learning_*` write tools out of the root profile and ordinary agents", "AGENTS.md");
+
+const orchestratorAgent = read("agents/orchestrator.md");
+assertIncludes(orchestratorAgent, "Do not call `@improver` just because a task completed", "agents/orchestrator.md");
+assertIncludes(orchestratorAgent, "ordinary agents must not use `oc_learning_*` directly", "agents/orchestrator.md");
+
+const improverAgent = read("agents/improver.md");
+assertIncludes(improverAgent, "Skip low-signal candidate lessons", "agents/improver.md");
+assertIncludes(improverAgent, "Avoid `oc_learning_memory_list` or broad skill inspection when no concrete candidate lesson exists", "agents/improver.md");
+assertIncludes(improverAgent, "run `oc_learning_memory_audit` first when available", "agents/improver.md");
+
+const selfImprovementSkill = read("skills/global-self-improvement/SKILL.md");
+for (const needle of [
+  "Do not run the write path just because a task completed",
+  "## Token and tool budget",
+  "Avoid broad `oc_learning_memory_list` or managed-skill scans until a concrete candidate lesson exists",
+  "prefer read-only `oc_learning_memory_audit` before any remove or replace operation",
+]) {
+  assertIncludes(selfImprovementSkill, needle, "skills/global-self-improvement/SKILL.md");
+}
+
+const agentToolPermissions = read("examples/agent-tool-permissions.md");
+assertIncludes(agentToolPermissions, 'toolset: "memory-read"', "examples/agent-tool-permissions.md");
+assertIncludes(agentToolPermissions, 'toolset: "improver"', "examples/agent-tool-permissions.md");
+assertIncludes(agentToolPermissions, "enabledTools", "examples/agent-tool-permissions.md");
+assertIncludes(agentToolPermissions, "oc_learning_memory_audit", "examples/agent-tool-permissions.md");
 
 const compatibilityDoc = read("docs/compatibility.md");
-for (const needle of ["v0.2.0", "opencode-recursive-context", "opencode-learning", "opencode-learning-guard"]) {
+for (const needle of ["v0.2.0", "opencode-recursive-context", "opencode-learning-guard"]) {
   assertIncludes(compatibilityDoc, needle, "docs/compatibility.md");
 }
 

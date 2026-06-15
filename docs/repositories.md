@@ -7,15 +7,16 @@
 Capability package for safe broad context inspection. It should remain
 read-only and path-confined.
 
-## opencode-learning
+## opencode-learning-guard
 
-[GitHub: Tah10n/opencode-learning](https://github.com/Tah10n/opencode-learning)
+[GitHub: Tah10n/opencode-learning-guard](https://github.com/Tah10n/opencode-learning-guard)
 
 Capability package for bounded writes to memory and managed skills. It should
 remain a validator and writer, not a decision-making agent.
 
-The repository/capability family is `opencode-learning`; the current plugin
-package name is `opencode-learning-guard`.
+The repository and plugin package are `opencode-learning-guard`. The tool ids
+keep the stable `oc_learning_*` prefix for existing harness permissions and
+installed profiles.
 
 ## opencode-harness
 

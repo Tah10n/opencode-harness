@@ -15,7 +15,7 @@ boundary information for the harness to regulate agent work effectively.
 - Node.js available for local verification.
 - Capability packages configured where the host profile can load them:
   - [`opencode-recursive-context`](https://github.com/Tah10n/opencode-recursive-context)
-  - [`opencode-learning`](https://github.com/Tah10n/opencode-learning)
+  - [`opencode-learning-guard`](https://github.com/Tah10n/opencode-learning-guard)
 
 ## Files To Copy
 

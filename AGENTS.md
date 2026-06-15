@@ -52,12 +52,12 @@ Also supported (agent-compatible):
 
 ## Controlled Self-Improvement
 
-- Load `global-memory` near the start of non-trivial work when durable preferences, project conventions, or previous workflow lessons may matter.
-- After verified non-trivial work, user corrections, repeated tool failures, or newly discovered reusable workflows, consider `/learn` or `@improver`.
+- Treat `global-memory` as a gated context source, not always-on prompt ballast. Load it near the start of non-trivial work only when durable preferences, project conventions, or previous workflow lessons may plausibly affect decisions; skip it for simple, self-contained, or directly answerable tasks.
+- After verified non-trivial work, user corrections, repeated tool failures, or newly discovered reusable workflows, consider `/learn` or `@improver` only when there is a durable lesson to evaluate. Do not invoke self-improvement just because a task completed.
 - Save only compact, verified, non-sensitive learning. Do not persist secrets, raw logs, large code blocks, temporary task facts, or unverified guesses.
 - Raw logs are valid transient diagnostic evidence. Do not treat raw logs as a cross-project defect or something to "fix" unless a project-local policy, exposed secret/PII, excessive verbosity, or production behavior makes them unsafe.
 - Prefer patching an existing focused skill over creating a near-duplicate.
-- Self-improvement must use `oc_learning_*` tools so validation, path confinement, and backups apply.
+- Keep `oc_learning_*` write tools out of the root profile and ordinary agents. Self-improvement must route through `improver` and use `oc_learning_*` tools so validation, path confinement, and backups apply.
 - Do not let the self-improvement loop modify product code, `AGENTS.md`, `opencode.json`, agent definitions, or plugins unless the user explicitly requests a configuration change.
 - See `docs/memory-and-self-improvement.md` for the current memory/self-improvement architecture, scope boundaries, basis, and verification commands.
 

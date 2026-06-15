@@ -6,10 +6,10 @@
 | --- | --- | --- | --- |
 | `opencode-harness` | <https://github.com/Tah10n/opencode-harness> | `v0.2.0` | Agent orchestration profile, rules, docs, and verifier. |
 | `opencode-recursive-context` | <https://github.com/Tah10n/opencode-recursive-context> | `0.1.x` | Safe read-only `context_*` tools. |
-| `opencode-learning` | <https://github.com/Tah10n/opencode-learning> | `0.1.x` | Bounded `oc_learning_*` memory and managed-skill write tools. |
+| `opencode-learning-guard` | <https://github.com/Tah10n/opencode-learning-guard> | `0.1.x` | Bounded `oc_learning_*` memory and managed-skill write tools. |
 
-Note: the `opencode-learning` repository currently exposes the plugin package
-under the package name `opencode-learning-guard`.
+Note: `oc_learning_*` remains the stable OpenCode tool prefix even though the
+repository and package are named `opencode-learning-guard`.
 
 ## Runtime Expectations
 
@@ -17,7 +17,7 @@ under the package name `opencode-learning-guard`.
   surfaces used by this profile.
 - Node.js 24 is used by CI for the template verifier.
 - `opencode-recursive-context` defines its own Node.js support policy.
-- `opencode-learning` defines its own Node.js support policy.
+- `opencode-learning-guard` defines its own Node.js support policy.
 
 ## Compatibility Checks
 

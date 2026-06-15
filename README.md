@@ -20,7 +20,7 @@ This repository contains a reusable OpenCode behavior profile:
 It is intentionally separate from plugin capabilities:
 
 - [`opencode-recursive-context`](https://github.com/Tah10n/opencode-recursive-context) provides safe read-only `context_*` tools.
-- [`opencode-learning`](https://github.com/Tah10n/opencode-learning) provides bounded `oc_learning_*` write tools.
+- [`opencode-learning-guard`](https://github.com/Tah10n/opencode-learning-guard) provides bounded `oc_learning_*` write tools.
 - `opencode-harness` decides when and how agents should use those tools.
 
 ## Usage
@@ -45,7 +45,7 @@ readiness guidance lives in [docs/harnessability.md](docs/harnessability.md).
 
 1. Install or configure the capability packages:
    - [`opencode-recursive-context`](https://github.com/Tah10n/opencode-recursive-context)
-   - [`opencode-learning`](https://github.com/Tah10n/opencode-learning)
+   - [`opencode-learning-guard`](https://github.com/Tah10n/opencode-learning-guard)
 2. Copy or adapt this profile's `AGENTS.md`, `opencode.json`, `agents/`,
    `commands/`, `skills/`, and `docs/` into the target OpenCode configuration.
 3. Keep machine-local plugin paths, personal memory entries, and project-specific

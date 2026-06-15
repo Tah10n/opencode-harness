@@ -187,11 +187,12 @@ Verification protocol:
 - If verification is infeasible, state exactly what was not verified and why.
 
 Self-improvement protocol:
-- Load `global-memory` when starting non-trivial work and persistent preferences or prior lessons may affect decisions.
-- After a verified complex task, a user correction, a repeated failure, or a non-obvious reusable workflow discovery, use `@improver` or `/learn` to decide whether to persist learning.
+- Load `global-memory` as a gated context source when starting non-trivial work and persistent preferences or prior lessons may affect decisions; skip it for simple, self-contained, or directly answerable tasks.
+- After a verified complex task, a user correction, a repeated failure, or a non-obvious reusable workflow discovery, use `@improver` or `/learn` only when there is a durable lesson to evaluate. Do not call `@improver` just because a task completed.
 - Persist only durable, verified, non-sensitive learning. Skip task-local facts, secrets, raw logs, long code blocks, and unverified hypotheses.
+- Keep project-specific facts in project-local `WORKFLOW.md` or project skills unless they are explicitly scoped and useful across related work.
 - Treat raw logs as acceptable transient diagnostic evidence. Do not flag raw logs as a project-wide problem by default; object only when the current project policy, exposed secret/PII, excessive verbosity, or production behavior makes them unsafe.
-- Treat self-improvement as advisory and bounded: it may update `global-memory` or managed skills through `oc_learning_*` tools, but it must not change product code or core OpenCode configuration unless explicitly requested.
+- Treat self-improvement as advisory and bounded: ordinary agents must not use `oc_learning_*` directly; route persistent writes through `improver`, which may update `global-memory` or managed skills through `oc_learning_*` tools, but must not change product code or core OpenCode configuration unless explicitly requested.
 
 Communication:
 - Respond in the user's language.

@@ -15,8 +15,8 @@
 - Added installation, compatibility, release, and evaluation documentation.
 - Added examples for minimal OpenCode config, agent tool grants, and project
   workflow guidance.
-- Documented the `opencode-learning` repository versus
-  `opencode-learning-guard` package-name boundary.
+- Documented the `opencode-learning-guard` capability package and stable
+  `oc_learning_*` tool-prefix boundary.
 - Added repository governance files: `CONTRIBUTING.md`, `SECURITY.md`, and
   `CODEOWNERS`.
 - Expanded CI verification to cover docs, examples, compatibility links, and
@@ -28,4 +28,4 @@
 - Added local deterministic verification.
 - Added GitHub Actions verification workflow.
 - Documented the relationship between `opencode-harness`,
-  `opencode-recursive-context`, and `opencode-learning`.
+  `opencode-recursive-context`, and `opencode-learning-guard`.
