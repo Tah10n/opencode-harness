@@ -5,6 +5,14 @@
   "type": "module",
   "private": true,
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tah10n/opencode-harness.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Tah10n/opencode-harness/issues"
+  },
+  "homepage": "https://github.com/Tah10n/opencode-harness#readme",
   "scripts": {
     "verify": "node scripts/verify-harness.mjs"
   }

@@ -52,6 +52,7 @@ function assertNotIncludes(text, needle, label) {
 const requiredFiles = [
   "AGENTS.md",
   ".gitattributes",
+  ".github/workflows/verify.yml",
   "README.md",
   "opencode.json",
   "agents/orchestrator.md",
@@ -80,6 +81,12 @@ for (const file of requiredFiles) {
 const packageJson = JSON.parse(read("package.json"));
 if (packageJson.scripts?.verify !== "node scripts/verify-harness.mjs") {
   fail("package.json must expose npm run verify");
+}
+if (packageJson.repository?.url !== "git+https://github.com/Tah10n/opencode-harness.git") {
+  fail("package.json must point repository.url at Tah10n/opencode-harness");
+}
+if (packageJson.homepage !== "https://github.com/Tah10n/opencode-harness#readme") {
+  fail("package.json must expose the GitHub README as homepage");
 }
 if (packageJson.dependencies?.["@opencode-ai/plugin"]) {
   fail("opencode-harness must not depend on plugin packages; capabilities live in sibling packages");
@@ -157,11 +164,19 @@ assertNotIncludes(recursiveDocs, "plugins/recursive-context.ts", "docs/recursive
 
 const readme = read("README.md");
 assertIncludes(readme, "It is intentionally separate from plugin capabilities", "README.md");
+assertIncludes(readme, "actions/workflows/verify.yml/badge.svg", "README.md");
+assertIncludes(readme, "## Adoption", "README.md");
 assertIncludes(readme, "npm run verify", "README.md");
 assertIncludes(readme, "https://github.com/Tah10n/opencode-recursive-context", "README.md");
 assertIncludes(readme, "https://github.com/Tah10n/opencode-learning", "README.md");
 assertIncludes(readme, "https://martinfowler.com/articles/harness-engineering.html", "README.md");
 assertIncludes(readme, "https://github.com/DenisSergeevitch/agents-best-practices", "README.md");
+
+const workflow = read(".github/workflows/verify.yml");
+assertIncludes(workflow, "pull_request:", ".github/workflows/verify.yml");
+assertIncludes(workflow, "workflow_dispatch:", ".github/workflows/verify.yml");
+assertIncludes(workflow, "npm run verify", ".github/workflows/verify.yml");
+assertIncludes(workflow, "actions/setup-node@v4", ".github/workflows/verify.yml");
 
 const repositoriesDoc = read("docs/repositories.md");
 assertIncludes(repositoriesDoc, "https://github.com/Tah10n/opencode-recursive-context", "docs/repositories.md");

@@ -1,5 +1,7 @@
 ﻿# opencode-harness
 
+[![Verify](https://github.com/Tah10n/opencode-harness/actions/workflows/verify.yml/badge.svg)](https://github.com/Tah10n/opencode-harness/actions/workflows/verify.yml)
+
 Reproducible OpenCode orchestration profile.
 
 This repository contains a reusable OpenCode behavior profile:
@@ -31,6 +33,34 @@ Copy or adapt the profile files into an OpenCode configuration:
 
 Keep personal memory entries, machine-specific plugin paths, local automation,
 and project-specific workflow facts outside this repository.
+
+## Adoption
+
+1. Install or configure the capability packages:
+   - [`opencode-recursive-context`](https://github.com/Tah10n/opencode-recursive-context)
+   - [`opencode-learning`](https://github.com/Tah10n/opencode-learning)
+2. Copy or adapt this profile's `AGENTS.md`, `opencode.json`, `agents/`,
+   `commands/`, `skills/`, and `docs/` into the target OpenCode configuration.
+3. Keep machine-local plugin paths, personal memory entries, and project-specific
+   workflow facts out of this template.
+4. Run the local verifier:
+
+   ```powershell
+   npm run verify
+   ```
+
+5. In the live OpenCode configuration, confirm the effective runtime surface:
+
+   ```powershell
+   opencode debug config
+   opencode debug agent orchestrator
+   opencode debug agent reviewer
+   opencode debug agent improver
+   ```
+
+Expected runtime result: the orchestrator and read-only agents expose the
+`context_*` tools, while `oc_learning_*` write tools are available only through
+the bounded self-improvement path.
 
 ## Local State Boundary
 
