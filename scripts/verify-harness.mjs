@@ -158,6 +158,18 @@ assertNotIncludes(recursiveDocs, "plugins/recursive-context.ts", "docs/recursive
 const readme = read("README.md");
 assertIncludes(readme, "It is intentionally separate from plugin capabilities", "README.md");
 assertIncludes(readme, "npm run verify", "README.md");
+assertIncludes(readme, "https://github.com/Tah10n/opencode-recursive-context", "README.md");
+assertIncludes(readme, "https://github.com/Tah10n/opencode-learning", "README.md");
+assertIncludes(readme, "https://martinfowler.com/articles/harness-engineering.html", "README.md");
+assertIncludes(readme, "https://github.com/DenisSergeevitch/agents-best-practices", "README.md");
+
+const repositoriesDoc = read("docs/repositories.md");
+assertIncludes(repositoriesDoc, "https://github.com/Tah10n/opencode-recursive-context", "docs/repositories.md");
+assertIncludes(repositoriesDoc, "https://github.com/Tah10n/opencode-learning", "docs/repositories.md");
+
+const memoryDocs = read("docs/memory-and-self-improvement.md");
+assertIncludes(memoryDocs, "opencode-learning", "docs/memory-and-self-improvement.md");
+assertNotIncludes(memoryDocs, "learning-guard", "docs/memory-and-self-improvement.md");
 
 const privateMarkers = (process.env.HARNESS_FORBIDDEN_MARKERS ?? "")
   .split(",")

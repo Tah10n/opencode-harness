@@ -14,8 +14,8 @@ This repository contains a reusable OpenCode behavior profile:
 
 It is intentionally separate from plugin capabilities:
 
-- `opencode-recursive-context` provides safe read-only `context_*` tools.
-- `opencode-learning-guard` provides bounded `oc_learning_*` write tools.
+- [`opencode-recursive-context`](https://github.com/Tah10n/opencode-recursive-context) provides safe read-only `context_*` tools.
+- [`opencode-learning`](https://github.com/Tah10n/opencode-learning) provides bounded `oc_learning_*` write tools.
 - `opencode-harness` decides when and how agents should use those tools.
 
 ## Usage
@@ -46,11 +46,11 @@ Run the local harness checks before copying or publishing template changes:
 npm run verify
 ```
 
-For local private-name checks, pass comma-separated markers without committing
-them into the template:
+For local private-name checks, keep the marker list outside the repository
+and pass it through the environment:
 
 ```powershell
-$env:HARNESS_FORBIDDEN_MARKERS="internal-repo,internal-service"
+$env:HARNESS_FORBIDDEN_MARKERS=$env:HARNESS_PRIVATE_MARKERS
 npm run verify
 ```
 
@@ -75,3 +75,8 @@ scripts/               local deterministic harness checks
 Plugins add tools. A harness defines the agent runtime behavior around those
 tools: orchestration, safety, delegation, context gathering, review loops, and
 verification discipline.
+
+The design is informed by Martin Fowler's
+[harness engineering for coding agents](https://martinfowler.com/articles/harness-engineering.html)
+framing and by runtime practices from
+[DenisSergeevitch/agents-best-practices](https://github.com/DenisSergeevitch/agents-best-practices).

@@ -6,7 +6,7 @@ This note documents the global OpenCode memory and self-improvement system: what
 
 Global durable memory is intentionally small and generic. It lives in `skills/global-memory/SKILL.md` and stores only compact, verified, non-sensitive lessons that are useful across projects.
 
-Controlled self-improvement is a bounded maintenance workflow. It lives in `skills/global-self-improvement/SKILL.md`, is executed by `agents/improver.md`, and must write persistent changes through `oc_learning_*` tools supplied by a learning-guard plugin or equivalent host integration.
+Controlled self-improvement is a bounded maintenance workflow. It lives in `skills/global-self-improvement/SKILL.md`, is executed by `agents/improver.md`, and must write persistent changes through `oc_learning_*` tools supplied by `opencode-learning` or an equivalent host integration.
 
 Project-specific workflow knowledge belongs in the project, not in the global config. Use project-local `WORKFLOW.md`, `.opencode/skills/*`, or `.agents/skills/*` for repo-specific build commands, test commands, product behavior, architecture notes, and domain gotchas.
 
@@ -15,8 +15,8 @@ Project-specific workflow knowledge belongs in the project, not in the global co
 - `skills/global-memory/SKILL.md` is a clean template, not a store for private memory entries.
 - Project-specific build commands, test commands, product facts, and domain rules stay in project-local workflow docs or skills.
 - Scope rules in `skills/global-memory/SKILL.md` keep project-prefixed entries as scoped hints, not global policy.
-- The learning-guard integration should regenerate `global-memory` with the same storage and scope rules.
-- The learning-guard implementation is the authoritative place for managed-memory capacity limits.
+- The `opencode-learning` integration should regenerate `global-memory` with the same storage and scope rules.
+- The `opencode-learning` implementation is the authoritative place for managed-memory capacity limits.
 - The raw-log boundary is explicit across `AGENTS.md`, `agents/orchestrator.md`, `agents/improver.md`, `skills/global-memory/SKILL.md`, and `skills/global-self-improvement/SKILL.md`.
 
 ## Why this design
@@ -27,7 +27,7 @@ Memory and self-improvement are separated by responsibility:
 
 - `global-memory` answers "what durable fact should future runs remember?"
 - `global-self-improvement` answers "should this verified experience become memory or a reusable skill?"
-- the learning-guard implementation enforces validation, capacity, path confinement, backups, and managed-skill boundaries.
+- the `opencode-learning` implementation enforces validation, capacity, path confinement, backups, and managed-skill boundaries.
 - `agents/improver.md` is allowed to curate memory and managed skills, but not product code or core OpenCode config unless the user explicitly requests a config change.
 
 This keeps the feedback loop useful without letting the agent rewrite its operating environment opportunistically.
@@ -74,7 +74,7 @@ Self-improvement must not mutate product code, `AGENTS.md`, `opencode.json`, age
 - `agents/improver.md`: the controlled self-improvement agent contract and hard boundaries.
 - `skills/global-memory/SKILL.md`: durable memory content and scope rules.
 - `skills/global-self-improvement/SKILL.md`: decision workflow for memory versus skill updates.
-- learning-guard plugin or equivalent host integration: authoritative implementation for memory capacity, entry size, validation, backups, and managed-skill write paths.
+- `opencode-learning` or equivalent host integration: authoritative implementation for memory capacity, entry size, validation, backups, and managed-skill write paths.
 - Project-local `.opencode/skills/*`: the right place for repo-specific procedures.
 
 ## Verification
@@ -97,7 +97,7 @@ opencode debug agent reviewer
 opencode debug agent verifier
 ```
 
-Before approving memory changes, check both the file diff and the rendered managed-memory size against the configured capacity limit in the learning-guard implementation.
+Before approving memory changes, check both the file diff and the rendered managed-memory size against the configured capacity limit in the `opencode-learning` implementation.
 
 To confirm global memory is still project-neutral, search for known private project names and project-specific commands in the global config:
 
@@ -117,7 +117,7 @@ This design follows these principles from `DenisSergeevitch/agents-best-practice
 - Skills should use progressive disclosure: expose name and description first, load focused instructions only when relevant.
 - Durable knowledge should live in agent-readable artifacts rather than only in chat history.
 - Repeated failures should become tools, validators, docs, evals, or policies instead of repeated prompt advice.
-- Documentation alone is weaker than mechanical enforcement; keep capacity limits, validation, backups, and path boundaries in the learning-guard implementation.
+- Documentation alone is weaker than mechanical enforcement; keep capacity limits, validation, backups, and path boundaries in the `opencode-learning` implementation.
 
 Relevant upstream references:
 
