@@ -104,7 +104,80 @@ function escapeRegex(value) {
 function permissionValues(output, key) {
   const escapedKey = escapeRegex(key);
   const pattern = new RegExp(`^\\s*["']?${escapedKey}["']?\\s*[:=]\\s*["']?([^"',#}\\s]+)`, "gim");
-  return [...output.matchAll(pattern)].map((match) => match[1].toLowerCase());
+  const direct = [...output.matchAll(pattern)].map((match) => normalizePermissionValue(match[1]));
+  const structured = structuredPermissionValues(output, key);
+  return [...direct, ...structured];
+}
+
+function structuredPermissionValues(output, key) {
+  const values = [];
+  collectJsonPermissionValues(output, key, values);
+
+  for (const block of output.match(/\{[^{}]*\}/g) ?? []) {
+    const permission = objectFieldValue(block, "permission");
+    const action = objectFieldValue(block, "action");
+    if (permission === key && action !== null) {
+      values.push(normalizePermissionValue(action));
+    }
+  }
+
+  return values;
+}
+
+function collectJsonPermissionValues(output, key, values) {
+  try {
+    walkJsonPermissions(JSON.parse(output), key, values);
+  } catch {
+    // Debug output is often text. Fall back to object-block scanning.
+  }
+}
+
+function walkJsonPermissions(value, key, values) {
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      walkJsonPermissions(item, key, values);
+    }
+    return;
+  }
+  if (!value || typeof value !== "object") {
+    return;
+  }
+
+  const permission = scalarToString(value.permission);
+  const action = scalarToString(value.action);
+  if (permission === key && action !== null) {
+    values.push(normalizePermissionValue(action));
+  }
+
+  for (const child of Object.values(value)) {
+    walkJsonPermissions(child, key, values);
+  }
+}
+
+function objectFieldValue(block, field) {
+  const fieldPattern = new RegExp(
+    `["']?${escapeRegex(field)}["']?\\s*[:=]\\s*(?:"([^"]*)"|'([^']*)'|([^"',}\\s]+))`,
+    "i",
+  );
+  const match = block.match(fieldPattern);
+  return match ? scalarToString(match[1] ?? match[2] ?? match[3]) : null;
+}
+
+function scalarToString(value) {
+  if (typeof value === "string") {
+    return value;
+  }
+  if (typeof value === "boolean") {
+    return String(value);
+  }
+  return null;
+}
+
+function normalizePermissionValue(value) {
+  const normalized = value.toLowerCase();
+  if (normalized === "true") return "allow";
+  if (normalized === "false") return "deny";
+  return normalized;
 }
 
 function assertPermission(output, key, expected, label, code, fix) {
