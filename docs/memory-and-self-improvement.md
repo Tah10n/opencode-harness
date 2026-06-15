@@ -84,6 +84,7 @@ smallest useful surface:
 
 - `toolset: "memory-read"` for profiles that only need bounded memory lookup and cleanup audit;
 - `toolset: "memory-write"` for curated memory audit/add/replace/remove without skill writes;
+- `toolset: "skills-write"` for managed-skill create/patch/archive without memory writes;
 - `toolset: "improver"` for the controlled self-improvement profile;
 - `toolset: "none"` for projects that want the package installed but disabled;
 - `enabledTools` for an explicit allow-list when a host needs a narrower mix.

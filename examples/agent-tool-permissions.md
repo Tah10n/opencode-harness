@@ -42,6 +42,20 @@ export default async function learningPlugin({ client, $ }) {
 }
 ```
 
+For managed-skill maintenance without memory writes, expose only skill tools:
+
+```js
+export default async function learningPlugin({ client, $ }) {
+  const mod = await import("opencode-learning-guard");
+
+  return mod.default({
+    client,
+    $,
+    toolset: "skills-write",
+  });
+}
+```
+
 When a host needs an even narrower mix, prefer an explicit allow-list:
 
 ```js

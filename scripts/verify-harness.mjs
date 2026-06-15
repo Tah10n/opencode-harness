@@ -378,6 +378,7 @@ for (const needle of [
   "enabledTools",
   "Memory cleanup is audit-first",
   "oc_learning_memory_audit",
+  'toolset: "skills-write"',
   "tools/oc_learning.js",
 ]) {
   assertIncludes(memoryDocs, needle, "docs/memory-and-self-improvement.md");
@@ -409,6 +410,7 @@ for (const needle of [
 
 const agentToolPermissions = read("examples/agent-tool-permissions.md");
 assertIncludes(agentToolPermissions, 'toolset: "memory-read"', "examples/agent-tool-permissions.md");
+assertIncludes(agentToolPermissions, 'toolset: "skills-write"', "examples/agent-tool-permissions.md");
 assertIncludes(agentToolPermissions, 'toolset: "improver"', "examples/agent-tool-permissions.md");
 assertIncludes(agentToolPermissions, "enabledTools", "examples/agent-tool-permissions.md");
 assertIncludes(agentToolPermissions, "oc_learning_memory_audit", "examples/agent-tool-permissions.md");
