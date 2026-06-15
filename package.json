@@ -1,0 +1,11 @@
+﻿{
+  "name": "opencode-harness",
+  "version": "0.1.0",
+  "description": "A reproducible OpenCode orchestration profile.",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "dependencies": {
+    "@opencode-ai/plugin": "1.4.7"
+  }
+}

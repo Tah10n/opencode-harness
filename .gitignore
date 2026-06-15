@@ -1,0 +1,9 @@
+﻿node_modules/
+dist/
+.cache/
+.oc_learning/
+local/
+*.log
+*.tmp
+*.local.*
+.DS_Store
