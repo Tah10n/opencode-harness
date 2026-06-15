@@ -1,0 +1,211 @@
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const failures = [];
+
+function fail(message) {
+  failures.push(message);
+}
+
+function read(relativePath) {
+  const fullPath = path.join(root, relativePath);
+  if (!fs.existsSync(fullPath)) {
+    fail(`required file missing: ${relativePath}`);
+    return "";
+  }
+  return fs.readFileSync(fullPath, "utf8").replace(/^\uFEFF/, "");
+}
+
+function exists(relativePath) {
+  return fs.existsSync(path.join(root, relativePath));
+}
+
+function listFiles(dir, out = []) {
+  for (const entry of fs.readdirSync(path.join(root, dir), { withFileTypes: true })) {
+    const relativePath = path.join(dir, entry.name).replaceAll("\\", "/");
+    if ([".git", "node_modules", "dist", ".cache", ".oc_learning", "local"].includes(entry.name)) {
+      continue;
+    }
+    if (entry.isDirectory()) {
+      listFiles(relativePath, out);
+    } else {
+      out.push(relativePath);
+    }
+  }
+  return out;
+}
+
+function assertIncludes(text, needle, label) {
+  if (!text.includes(needle)) {
+    fail(`${label} missing ${needle}`);
+  }
+}
+
+function assertNotIncludes(text, needle, label) {
+  if (text.includes(needle)) {
+    fail(`${label} still references ${needle}`);
+  }
+}
+
+const requiredFiles = [
+  "AGENTS.md",
+  ".gitattributes",
+  "README.md",
+  "opencode.json",
+  "agents/orchestrator.md",
+  "agents/orchestrator-deep.md",
+  "agents/explore.md",
+  "agents/architect.md",
+  "agents/general.md",
+  "agents/reviewer.md",
+  "agents/diagnose.md",
+  "agents/researcher.md",
+  "agents/verifier.md",
+  "agents/improver.md",
+  "skills/global-review-ledger/SKILL.md",
+  "skills/global-memory/SKILL.md",
+  "skills/global-self-improvement/SKILL.md",
+  "docs/recursive-context-mode.md",
+  "docs/memory-and-self-improvement.md",
+];
+
+for (const file of requiredFiles) {
+  if (!exists(file)) {
+    fail(`required file missing: ${file}`);
+  }
+}
+
+const packageJson = JSON.parse(read("package.json"));
+if (packageJson.scripts?.verify !== "node scripts/verify-harness.mjs") {
+  fail("package.json must expose npm run verify");
+}
+if (packageJson.dependencies?.["@opencode-ai/plugin"]) {
+  fail("opencode-harness must not depend on plugin packages; capabilities live in sibling packages");
+}
+
+const config = JSON.parse(read("opencode.json"));
+if (config.default_agent !== "orchestrator") {
+  fail("opencode.json default_agent must be orchestrator");
+}
+for (const commandName of ["review-diff", "diagnose", "workflow"]) {
+  if (!config.command?.[commandName]) {
+    fail(`opencode.json missing command: ${commandName}`);
+  }
+}
+if (!config.watcher?.ignore?.includes(".oc_learning/**")) {
+  fail("opencode.json watcher must ignore .oc_learning/**");
+}
+if (config.permission?.external_directory !== "ask") {
+  fail("opencode.json must ask before external directory access");
+}
+if (config.permission?.["oc_learning_*"] !== "deny") {
+  fail("root permissions must deny oc_learning_* by default");
+}
+
+const readOnlyAgents = ["explore", "architect", "reviewer", "diagnose", "verifier", "researcher", "improver"];
+const contextAgents = ["explore", "architect", "reviewer", "diagnose", "verifier"];
+const contextTools = ["context_outline", "context_files", "context_read", "context_search"];
+
+for (const agent of [
+  "orchestrator",
+  "orchestrator-deep",
+  "explore",
+  "architect",
+  "general",
+  "reviewer",
+  "diagnose",
+  "researcher",
+  "verifier",
+  "improver",
+]) {
+  const file = `agents/${agent}.md`;
+  const text = read(file);
+  if (!text.startsWith("---\n")) {
+    fail(`${file} must start with frontmatter`);
+  }
+  assertIncludes(text, "description:", file);
+  assertIncludes(text, "mode:", file);
+  assertIncludes(text, "permission:", file);
+  if (readOnlyAgents.includes(agent)) {
+    assertIncludes(text, "edit: deny", file);
+  }
+  if (contextAgents.includes(agent)) {
+    for (const tool of contextTools) {
+      assertIncludes(text, `${tool}: allow`, file);
+    }
+  }
+}
+
+const researcher = read("agents/researcher.md");
+assertIncludes(researcher, "webfetch: allow", "agents/researcher.md");
+assertIncludes(researcher, "websearch: allow", "agents/researcher.md");
+
+const improver = read("agents/improver.md");
+assertIncludes(improver, '"oc_learning_*": ask', "agents/improver.md");
+assertIncludes(improver, "Do not edit `AGENTS.md`, `opencode.json`, agent definitions", "agents/improver.md");
+
+const reviewLedger = read("skills/global-review-ledger/SKILL.md");
+for (const section of ["## Review baseline", "## Finding ledger", "## Fix pass", "## Re-review", "## Stop conditions"]) {
+  assertIncludes(reviewLedger, section, "skills/global-review-ledger/SKILL.md");
+}
+
+const recursiveDocs = read("docs/recursive-context-mode.md");
+assertIncludes(recursiveDocs, "opencode-recursive-context", "docs/recursive-context-mode.md");
+assertNotIncludes(recursiveDocs, "plugins/recursive-context.ts", "docs/recursive-context-mode.md");
+
+const readme = read("README.md");
+assertIncludes(readme, "It is intentionally separate from plugin capabilities", "README.md");
+assertIncludes(readme, "npm run verify", "README.md");
+
+const privateMarkers = (process.env.HARNESS_FORBIDDEN_MARKERS ?? "")
+  .split(",")
+  .map((value) => value.trim())
+  .filter(Boolean);
+
+for (const file of listFiles(".")) {
+  if (file.startsWith(".git/")) {
+    continue;
+  }
+  const fullPath = path.join(root, file);
+  if (!fs.statSync(fullPath).isFile()) {
+    continue;
+  }
+  const text = fs.readFileSync(fullPath, "utf8").replace(/^\uFEFF/, "");
+  for (const marker of privateMarkers) {
+    if (text.includes(marker)) {
+      fail(`${file} contains project-specific marker ${marker}`);
+    }
+  }
+}
+
+const forbiddenSecretPaths = [
+  /^\.env(\.|$)/,
+  /\.pem$/i,
+  /\.key$/i,
+  /\.p12$/i,
+  /\.pfx$/i,
+  /(^|\/)\.npmrc$/i,
+  /(^|\/)\.netrc$/i,
+  /(^|\/)\.git-credentials$/i,
+  /(^|\/)settings\.xml$/i,
+  /(^|\/)gradle\.properties$/i,
+  /(^|\/)local\.properties$/i,
+];
+
+for (const file of listFiles(".")) {
+  if (forbiddenSecretPaths.some((pattern) => pattern.test(file))) {
+    fail(`secret-like file must not be committed: ${file}`);
+  }
+}
+
+if (failures.length > 0) {
+  console.error("Harness verification failed:");
+  for (const failure of failures) {
+    console.error(`- ${failure}`);
+  }
+  process.exit(1);
+}
+
+console.log("Harness verification passed.");

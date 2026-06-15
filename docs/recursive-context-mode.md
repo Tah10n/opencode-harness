@@ -12,7 +12,7 @@ This is not a new slash command. The mode is selected automatically by the orche
 
 - `AGENTS.md` now tells the orchestrator to automatically enter recursive-context mode for broad audits and to skip it for small local tasks.
 - `agents/orchestrator.md` and `agents/orchestrator-deep.md` define the automatic trigger, sequencing, and safety rules.
-- `plugins/recursive-context.ts` adds four safe read-only tools:
+- The separate `opencode-recursive-context` capability package provides four safe read-only tools:
   - `context_outline`: returns a compact worktree map and detected workflow/skill guidance.
   - `context_files`: returns a scoped file inventory.
   - `context_search`: performs literal text search inside the current worktree.
@@ -72,4 +72,7 @@ The expected validation commands are:
 - `opencode debug agent explore`
 - `opencode debug agent reviewer`
 
-The key expected result is that the effective config lists `plugins/recursive-context.ts`, and the relevant agents show `context_outline`, `context_files`, `context_read`, and `context_search` as enabled tools.
+The key expected result is that the live OpenCode config includes the external
+recursive-context capability configured by the host, and the relevant agents
+show `context_outline`, `context_files`, `context_read`, and `context_search`
+as enabled tools.

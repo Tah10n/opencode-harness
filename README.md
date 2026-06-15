@@ -38,6 +38,26 @@ and project-specific workflow facts outside this repository.
 defines the memory shape and policy, but it should not contain private durable
 memory entries.
 
+## Verification
+
+Run the local harness checks before copying or publishing template changes:
+
+```powershell
+npm run verify
+```
+
+For local private-name checks, pass comma-separated markers without committing
+them into the template:
+
+```powershell
+$env:HARNESS_FORBIDDEN_MARKERS="internal-repo,internal-service"
+npm run verify
+```
+
+After copying the profile into a live OpenCode configuration, also run the
+runtime checks documented in `docs/recursive-context-mode.md` and
+`docs/memory-and-self-improvement.md`.
+
 ## Repository layout
 
 ```text
@@ -47,6 +67,7 @@ agents/                primary and subagent prompts
 skills/                reusable global skills and templates
 commands/              command prompt files
 docs/                  design notes and verification guidance
+scripts/               local deterministic harness checks
 ```
 
 ## Why this is a harness
