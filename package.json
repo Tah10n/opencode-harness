@@ -1,6 +1,6 @@
 ﻿{
   "name": "opencode-harness",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A reproducible OpenCode orchestration profile.",
   "type": "module",
   "private": true,
@@ -14,6 +14,8 @@
   },
   "homepage": "https://github.com/Tah10n/opencode-harness#readme",
   "scripts": {
-    "verify": "node scripts/verify-harness.mjs"
+    "eval": "node scripts/evaluate-harness.mjs",
+    "verify": "npm run verify:static && npm run eval",
+    "verify:static": "node scripts/verify-harness.mjs"
   }
 }

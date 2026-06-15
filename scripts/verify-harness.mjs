@@ -53,7 +53,11 @@ const requiredFiles = [
   "AGENTS.md",
   ".gitattributes",
   ".github/workflows/verify.yml",
+  "CHANGELOG.md",
+  "CODEOWNERS",
+  "CONTRIBUTING.md",
   "README.md",
+  "SECURITY.md",
   "opencode.json",
   "agents/orchestrator.md",
   "agents/orchestrator-deep.md",
@@ -70,6 +74,16 @@ const requiredFiles = [
   "skills/global-self-improvement/SKILL.md",
   "docs/recursive-context-mode.md",
   "docs/memory-and-self-improvement.md",
+  "docs/adoption.md",
+  "docs/compatibility.md",
+  "docs/evaluation.md",
+  "docs/release.md",
+  "examples/minimal-opencode.json",
+  "examples/agent-tool-permissions.md",
+  "examples/project-workflow/WORKFLOW.md",
+  "examples/project-workflow/project-skill/SKILL.md",
+  "fixtures/sample-project/WORKFLOW.md",
+  "scripts/evaluate-harness.mjs",
 ];
 
 for (const file of requiredFiles) {
@@ -79,8 +93,17 @@ for (const file of requiredFiles) {
 }
 
 const packageJson = JSON.parse(read("package.json"));
-if (packageJson.scripts?.verify !== "node scripts/verify-harness.mjs") {
-  fail("package.json must expose npm run verify");
+if (packageJson.version !== "0.2.0") {
+  fail("package.json version must match the latest release plan");
+}
+if (packageJson.scripts?.verify !== "npm run verify:static && npm run eval") {
+  fail("package.json must run static verification and eval from npm run verify");
+}
+if (packageJson.scripts?.eval !== "node scripts/evaluate-harness.mjs") {
+  fail("package.json must expose npm run eval");
+}
+if (packageJson.scripts?.["verify:static"] !== "node scripts/verify-harness.mjs") {
+  fail("package.json must expose npm run verify:static");
 }
 if (packageJson.repository?.url !== "git+https://github.com/Tah10n/opencode-harness.git") {
   fail("package.json must point repository.url at Tah10n/opencode-harness");
@@ -167,6 +190,10 @@ assertIncludes(readme, "It is intentionally separate from plugin capabilities", 
 assertIncludes(readme, "actions/workflows/verify.yml/badge.svg", "README.md");
 assertIncludes(readme, "## Adoption", "README.md");
 assertIncludes(readme, "npm run verify", "README.md");
+assertIncludes(readme, "docs/adoption.md", "README.md");
+assertIncludes(readme, "docs/evaluation.md", "README.md");
+assertIncludes(readme, "docs/compatibility.md", "README.md");
+assertIncludes(readme, "docs/release.md", "README.md");
 assertIncludes(readme, "https://github.com/Tah10n/opencode-recursive-context", "README.md");
 assertIncludes(readme, "https://github.com/Tah10n/opencode-learning", "README.md");
 assertIncludes(readme, "https://martinfowler.com/articles/harness-engineering.html", "README.md");
@@ -185,6 +212,25 @@ assertIncludes(repositoriesDoc, "https://github.com/Tah10n/opencode-learning", "
 const memoryDocs = read("docs/memory-and-self-improvement.md");
 assertIncludes(memoryDocs, "opencode-learning", "docs/memory-and-self-improvement.md");
 assertNotIncludes(memoryDocs, "learning-guard", "docs/memory-and-self-improvement.md");
+
+const compatibilityDoc = read("docs/compatibility.md");
+assertIncludes(compatibilityDoc, "v0.2.0", "docs/compatibility.md");
+assertIncludes(compatibilityDoc, "opencode-recursive-context", "docs/compatibility.md");
+assertIncludes(compatibilityDoc, "opencode-learning", "docs/compatibility.md");
+assertIncludes(compatibilityDoc, "opencode-learning-guard", "docs/compatibility.md");
+
+const changelog = read("CHANGELOG.md");
+assertIncludes(changelog, "## 0.2.0 - 2026-06-15", "CHANGELOG.md");
+assertIncludes(changelog, "## 0.1.0 - 2026-06-15", "CHANGELOG.md");
+
+const codeowners = read("CODEOWNERS");
+assertIncludes(codeowners, "@Tah10n", "CODEOWNERS");
+
+const security = read("SECURITY.md");
+assertIncludes(security, "Reporting a Vulnerability", "SECURITY.md");
+
+const contributing = read("CONTRIBUTING.md");
+assertIncludes(contributing, "npm run verify", "CONTRIBUTING.md");
 
 const privateMarkers = (process.env.HARNESS_FORBIDDEN_MARKERS ?? "")
   .split(",")

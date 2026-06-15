@@ -14,6 +14,9 @@ read-only and path-confined.
 Capability package for bounded writes to memory and managed skills. It should
 remain a validator and writer, not a decision-making agent.
 
+The repository/capability family is `opencode-learning`; the current plugin
+package name is `opencode-learning-guard`.
+
 ## opencode-harness
 
 Behavior profile. This repo wires the capabilities into OpenCode agents,

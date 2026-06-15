@@ -34,6 +34,8 @@ Copy or adapt the profile files into an OpenCode configuration:
 Keep personal memory entries, machine-specific plugin paths, local automation,
 and project-specific workflow facts outside this repository.
 
+Detailed adoption steps live in [docs/adoption.md](docs/adoption.md).
+
 ## Adoption
 
 1. Install or configure the capability packages:
@@ -88,6 +90,11 @@ After copying the profile into a live OpenCode configuration, also run the
 runtime checks documented in `docs/recursive-context-mode.md` and
 `docs/memory-and-self-improvement.md`.
 
+The static evaluation scenarios are documented in
+[docs/evaluation.md](docs/evaluation.md). Compatibility and release guidance
+live in [docs/compatibility.md](docs/compatibility.md) and
+[docs/release.md](docs/release.md).
+
 ## Repository layout
 
 ```text
@@ -97,6 +104,8 @@ agents/                primary and subagent prompts
 skills/                reusable global skills and templates
 commands/              command prompt files
 docs/                  design notes and verification guidance
+examples/              copyable examples for host profiles and projects
+fixtures/              static evaluation fixtures
 scripts/               local deterministic harness checks
 ```
 
