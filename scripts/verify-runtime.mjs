@@ -102,6 +102,11 @@ function escapeRegex(value) {
 }
 
 function permissionValues(output, key) {
+  const jsonValues = jsonPermissionValues(output, key);
+  if (jsonValues !== null) {
+    return jsonValues;
+  }
+
   const escapedKey = escapeRegex(key);
   const pattern = new RegExp(`^\\s*["']?${escapedKey}["']?\\s*[:=]\\s*["']?([^"',#}\\s]+)`, "gim");
   const direct = [...output.matchAll(pattern)].map((match) => normalizePermissionValue(match[1]));
@@ -109,10 +114,43 @@ function permissionValues(output, key) {
   return [...direct, ...structured];
 }
 
+function jsonPermissionValues(output, key) {
+  let parsed;
+  try {
+    parsed = JSON.parse(output);
+  } catch {
+    return null;
+  }
+
+  const values = [];
+  const direct = scalarToString(parsed?.[key]);
+  if (direct !== null) {
+    values.push(normalizePermissionValue(direct));
+  }
+
+  const permissions = parsed?.permission;
+  if (Array.isArray(permissions)) {
+    for (const item of permissions) {
+      if (!item || typeof item !== "object") continue;
+
+      const permission = scalarToString(item.permission);
+      const action = scalarToString(item.action);
+      if (permission === key && action !== null) {
+        values.push(normalizePermissionValue(action));
+      }
+    }
+  } else if (permissions && typeof permissions === "object") {
+    const action = scalarToString(permissions[key]);
+    if (action !== null) {
+      values.push(normalizePermissionValue(action));
+    }
+  }
+
+  return values;
+}
+
 function structuredPermissionValues(output, key) {
   const values = [];
-  collectJsonPermissionValues(output, key, values);
-
   for (const block of output.match(/\{[^{}]*\}/g) ?? []) {
     const permission = objectFieldValue(block, "permission");
     const action = objectFieldValue(block, "action");
@@ -122,36 +160,6 @@ function structuredPermissionValues(output, key) {
   }
 
   return values;
-}
-
-function collectJsonPermissionValues(output, key, values) {
-  try {
-    walkJsonPermissions(JSON.parse(output), key, values);
-  } catch {
-    // Debug output is often text. Fall back to object-block scanning.
-  }
-}
-
-function walkJsonPermissions(value, key, values) {
-  if (Array.isArray(value)) {
-    for (const item of value) {
-      walkJsonPermissions(item, key, values);
-    }
-    return;
-  }
-  if (!value || typeof value !== "object") {
-    return;
-  }
-
-  const permission = scalarToString(value.permission);
-  const action = scalarToString(value.action);
-  if (permission === key && action !== null) {
-    values.push(normalizePermissionValue(action));
-  }
-
-  for (const child of Object.values(value)) {
-    walkJsonPermissions(child, key, values);
-  }
 }
 
 function objectFieldValue(block, field) {
@@ -188,19 +196,23 @@ function formatValues(values) {
   return values.length > 0 ? uniqueValues(values).join(", ") : "<missing>";
 }
 
+function effectivePermissionValue(values) {
+  return values.length > 0 ? values[values.length - 1] : null;
+}
+
 function assertOnlyPermission(output, key, expected, label, code, fix) {
   const values = permissionValues(output, key);
-  const unexpected = values.filter((value) => value !== expected);
-  if (values.length === 0 || unexpected.length > 0) {
+  const effective = effectivePermissionValue(values);
+  if (effective !== expected) {
     fail(code, `${label} expected only ${key}: ${expected}, got ${formatValues(values)}`, fix);
   }
 }
 
 function assertNoPermission(output, key, forbiddenValues, label, code, fix) {
   const values = permissionValues(output, key);
-  const forbidden = uniqueValues(values.filter((value) => forbiddenValues.includes(value)));
-  if (forbidden.length > 0) {
-    fail(code, `${label} unexpectedly exposes ${key}: ${forbidden.join(", ")}`, fix);
+  const effective = effectivePermissionValue(values);
+  if (effective !== null && forbiddenValues.includes(effective)) {
+    fail(code, `${label} unexpectedly exposes ${key}: ${effective}`, fix);
   }
 }
 

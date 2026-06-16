@@ -11,6 +11,7 @@ const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-harness-runtime-
 const unsafeFixture = path.join(tempDir, "runtime-debug-unsafe");
 const structuredSafeFixture = path.join(tempDir, "runtime-debug-structured-safe");
 const structuredUnsafeFixture = path.join(tempDir, "runtime-debug-structured-unsafe");
+const jsonSafeFixture = path.join(tempDir, "runtime-debug-json-safe");
 const failures = [];
 const expectedUnsafeCodes = [
   "HARNESS-R004",
@@ -41,8 +42,12 @@ function outputOf(result) {
   return `${result.stdout || ""}\n${result.stderr || ""}`;
 }
 
+function permissionEntry(permission, action) {
+  return { permission, action };
+}
+
 function permissionLine(permission, action) {
-  return JSON.stringify({ permission, action });
+  return JSON.stringify(permissionEntry(permission, action));
 }
 
 function writeStructuredFixture(dir, options = {}) {
@@ -123,6 +128,78 @@ function writeStructuredFixture(dir, options = {}) {
   }
 }
 
+function writeJsonSafeFixture(dir) {
+  fs.mkdirSync(dir, { recursive: true });
+
+  const contextPermissions = [
+    permissionEntry("context_outline", "allow"),
+    permissionEntry("context_files", "allow"),
+    permissionEntry("context_search", "allow"),
+    permissionEntry("context_read", "allow"),
+  ];
+  const inheritedWebThenDeny = [
+    permissionEntry("websearch", "allow"),
+    permissionEntry("webfetch", "allow"),
+    permissionEntry("websearch", "deny"),
+    permissionEntry("webfetch", "deny"),
+  ];
+  const nestedDecoys = {
+    nested: {
+      permission: [
+        permissionEntry("websearch", "allow"),
+        permissionEntry("webfetch", "allow"),
+        permissionEntry("oc_learning_*", "ask"),
+        permissionEntry("edit", "allow"),
+      ],
+    },
+  };
+  const writeJson = (name, permissions, extra = {}) => {
+    fs.writeFileSync(
+      path.join(dir, `${name}.txt`),
+      `${JSON.stringify({ ...extra, permission: permissions, ...nestedDecoys }, null, 2)}\n`,
+    );
+  };
+
+  fs.writeFileSync(
+    path.join(dir, "debug-config.txt"),
+    `${JSON.stringify(
+      {
+        default_agent: "orchestrator",
+        permission: { "oc_learning_*": "deny" },
+        ...nestedDecoys,
+      },
+      null,
+      2,
+    )}\n`,
+  );
+
+  for (const agent of ["orchestrator", "orchestrator-deep"]) {
+    writeJson(`debug-agent-${agent}`, [...contextPermissions, ...inheritedWebThenDeny]);
+  }
+  for (const agent of ["explore", "architect", "reviewer", "diagnose", "verifier"]) {
+    writeJson(`debug-agent-${agent}`, [permissionEntry("edit", "deny"), ...contextPermissions, ...inheritedWebThenDeny]);
+  }
+
+  writeJson("debug-agent-general", [
+    permissionEntry("oc_learning_*", "deny"),
+    permissionEntry("edit", "deny"),
+    permissionEntry("edit", "allow"),
+    ...inheritedWebThenDeny,
+  ]);
+  writeJson("debug-agent-researcher", [
+    permissionEntry("oc_learning_*", "deny"),
+    permissionEntry("edit", "deny"),
+    permissionEntry("websearch", "allow"),
+    permissionEntry("webfetch", "allow"),
+  ]);
+  writeJson("debug-agent-improver", [
+    permissionEntry("oc_learning_*", "deny"),
+    permissionEntry("edit", "deny"),
+    ...inheritedWebThenDeny,
+    permissionEntry("oc_learning_*", "ask"),
+  ]);
+}
+
 try {
   const safe = runFixture(safeFixture);
   if (safe.status !== 0) {
@@ -133,6 +210,12 @@ try {
   const structuredSafe = runFixture(structuredSafeFixture);
   if (structuredSafe.status !== 0) {
     fail(`structured safe runtime fixture should pass, exited ${structuredSafe.status}\n${outputOf(structuredSafe)}`);
+  }
+
+  writeJsonSafeFixture(jsonSafeFixture);
+  const jsonSafe = runFixture(jsonSafeFixture);
+  if (jsonSafe.status !== 0) {
+    fail(`JSON safe runtime fixture should pass, exited ${jsonSafe.status}\n${outputOf(jsonSafe)}`);
   }
 
   fs.cpSync(safeFixture, unsafeFixture, { recursive: true });
