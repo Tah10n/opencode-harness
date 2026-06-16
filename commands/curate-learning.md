@@ -11,6 +11,7 @@ Scope:
 - Inspect `skills/global-memory/SKILL.md`.
 - Inspect skills with `metadata.managed_by: oc_learning`.
 - Do not mutate hand-authored skills, project-local skills, bundled skills, or unrelated configuration.
+- Use only `oc_learning_*` tools for persistent writes.
 
 Decision policy:
 - Keep useful, current, non-duplicative skills.

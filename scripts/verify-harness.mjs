@@ -145,6 +145,8 @@ const requiredFiles = [
   "README.md",
   "SECURITY.md",
   "opencode.json",
+  "commands/learn.md",
+  "commands/curate-learning.md",
   "agents/orchestrator.md",
   "agents/orchestrator-deep.md",
   "agents/explore.md",
@@ -175,6 +177,7 @@ const requiredFiles = [
   "fixtures/runtime-debug/debug-config.txt",
   "fixtures/runtime-debug/debug-agent-orchestrator.txt",
   "fixtures/runtime-debug/debug-agent-orchestrator-deep.txt",
+  "fixtures/runtime-debug/debug-agent-general.txt",
   "fixtures/runtime-debug/debug-agent-explore.txt",
   "fixtures/runtime-debug/debug-agent-architect.txt",
   "fixtures/runtime-debug/debug-agent-reviewer.txt",
@@ -315,6 +318,9 @@ for (const agent of agentNames) {
   } else if (permission["oc_learning_*"] && permission["oc_learning_*"] !== "deny") {
     fail("HARNESS-S031", `${file} must not request oc_learning_* writes`, "Route persistent writes through improver only.");
   }
+  if (agent === "general") {
+    assertPermission(agent, permission, "edit", "allow", "HARNESS-S035", "Implementation workers should declare write access explicitly.");
+  }
 }
 
 for (const agent of ["orchestrator", "orchestrator-deep"]) {
@@ -338,6 +344,8 @@ for (const section of ["## Purpose", "## Rules", "## Review Scope", "## Question
 
 const recursiveDocs = read("docs/recursive-context-mode.md");
 assertIncludes(recursiveDocs, "opencode-recursive-context", "docs/recursive-context-mode.md");
+assertIncludes(recursiveDocs, "minimal safe harness surface", "docs/recursive-context-mode.md");
+assertIncludes(recursiveDocs, "advanced tools are opt-in", "docs/recursive-context-mode.md");
 assertNotIncludes(recursiveDocs, "plugins/recursive-context.ts", "docs/recursive-context-mode.md");
 
 const readme = read("README.md");
@@ -412,8 +420,26 @@ const agentToolPermissions = read("examples/agent-tool-permissions.md");
 assertIncludes(agentToolPermissions, 'toolset: "memory-read"', "examples/agent-tool-permissions.md");
 assertIncludes(agentToolPermissions, 'toolset: "skills-write"', "examples/agent-tool-permissions.md");
 assertIncludes(agentToolPermissions, 'toolset: "improver"', "examples/agent-tool-permissions.md");
+assertIncludes(agentToolPermissions, "OPENCODE_CONFIG_ROOT", "examples/agent-tool-permissions.md");
+assertIncludes(agentToolPermissions, "configRoot", "examples/agent-tool-permissions.md");
 assertIncludes(agentToolPermissions, "enabledTools", "examples/agent-tool-permissions.md");
 assertIncludes(agentToolPermissions, "oc_learning_memory_audit", "examples/agent-tool-permissions.md");
+if ((agentToolPermissions.match(/configRoot,/g) ?? []).length < 5) {
+  fail("HARNESS-S036", "examples/agent-tool-permissions.md must pass configRoot in every opencode-learning-guard example", "Pass an explicit configRoot or document OPENCODE_CONFIG_ROOT for each copyable snippet.");
+}
+
+for (const commandFile of ["commands/learn.md", "commands/curate-learning.md"]) {
+  const commandFrontmatter = frontmatterFor(commandFile);
+  if (commandFrontmatter.agent !== "improver") {
+    fail("HARNESS-S037", `${commandFile} must route through improver`, "Self-improvement command templates must use the bounded improver agent.");
+  }
+  if (commandFrontmatter.subtask !== true) {
+    fail("HARNESS-S038", `${commandFile} must run as subtask`, "Self-improvement command templates should not replace the primary orchestrator.");
+  }
+  const commandText = read(commandFile);
+  assertIncludes(commandText, "Load the `global-self-improvement` skill", commandFile);
+  assertIncludes(commandText, "Use only `oc_learning_*` tools for persistent writes", commandFile);
+}
 
 const compatibilityDoc = read("docs/compatibility.md");
 for (const needle of ["v0.2.0", "opencode-recursive-context", "opencode-learning-guard"]) {

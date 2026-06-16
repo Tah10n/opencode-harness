@@ -73,8 +73,10 @@ readiness guidance lives in [docs/harnessability.md](docs/harnessability.md).
    ```
 
 Expected runtime result: the orchestrator and read-only agents expose the
-`context_*` tools, while `oc_learning_*` write tools are available only through
-the bounded self-improvement path.
+minimal safe `context_*` surface (`context_outline`, `context_files`,
+`context_search`, and `context_read`), while `oc_learning_*` write tools are
+available only through the bounded self-improvement path. Advanced
+recursive-context tools are host opt-ins.
 
 ## Local State Boundary
 

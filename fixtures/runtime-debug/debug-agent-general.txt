@@ -1,0 +1,5 @@
+agent: general
+permission:
+  edit: allow
+  websearch: deny
+  webfetch: deny

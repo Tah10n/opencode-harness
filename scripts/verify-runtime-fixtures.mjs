@@ -12,6 +12,19 @@ const unsafeFixture = path.join(tempDir, "runtime-debug-unsafe");
 const structuredSafeFixture = path.join(tempDir, "runtime-debug-structured-safe");
 const structuredUnsafeFixture = path.join(tempDir, "runtime-debug-structured-unsafe");
 const failures = [];
+const expectedUnsafeCodes = [
+  "HARNESS-R004",
+  "HARNESS-R006",
+  "HARNESS-R007",
+  "HARNESS-R009",
+  "HARNESS-R010",
+  "HARNESS-R011",
+  "HARNESS-R012",
+  "HARNESS-R013",
+  "HARNESS-R014",
+  "HARNESS-R015",
+  "HARNESS-R016",
+];
 
 function runFixture(fixtureDir) {
   return spawnSync(process.execPath, [verifier, "--fixture-dir", fixtureDir], {
@@ -38,7 +51,9 @@ function writeStructuredFixture(dir, options = {}) {
     path.join(dir, "debug-config.txt"),
     [
       permissionLine("default_agent", "orchestrator"),
+      ...(options.unsafe ? [permissionLine("default_agent", "general")] : []),
       permissionLine("oc_learning_*", "deny"),
+      ...(options.unsafe ? [permissionLine("oc_learning_*", "allow")] : []),
       "",
     ].join("\n"),
   );
@@ -48,15 +63,30 @@ function writeStructuredFixture(dir, options = {}) {
 
   for (const agent of ["orchestrator", "orchestrator-deep", "explore", "architect", "diagnose", "verifier"]) {
     const lines = [...contextLines];
+    if (options.unsafe && agent === "architect") {
+      lines.push(permissionLine("context_read", "deny"));
+    }
     if (["explore", "architect", "diagnose", "verifier"].includes(agent)) {
       lines.unshift(permissionLine("edit", "deny"));
+    }
+    if (options.unsafe && agent === "verifier") {
+      lines.push(permissionLine("websearch", "allow"));
+      lines.push(permissionLine("webfetch", "allow"));
     }
     fs.writeFileSync(path.join(dir, `debug-agent-${agent}.txt`), `${lines.join("\n")}\n`);
   }
 
+  const generalLines = [permissionLine("edit", "allow"), permissionLine("webfetch", "deny"), permissionLine("websearch", "deny")];
+  if (options.unsafe) {
+    generalLines.push(permissionLine("edit", "deny"));
+  }
+  fs.writeFileSync(path.join(dir, "debug-agent-general.txt"), `${generalLines.join("\n")}\n`);
+
   const reviewerLines = options.unsafe
     ? [
         JSON.stringify({ permission: "edit", note: "missing action should not be paired with another object" }),
+        permissionLine("edit", "deny"),
+        permissionLine("edit", "allow"),
         permissionLine("bash", "deny"),
         ...contextLines,
       ]
@@ -68,7 +98,9 @@ function writeStructuredFixture(dir, options = {}) {
     [
       permissionLine("edit", "deny"),
       permissionLine("websearch", "allow"),
+      ...(options.unsafe ? [permissionLine("websearch", "deny")] : []),
       JSON.stringify({ action: "allow", permission: "webfetch" }),
+      ...(options.unsafe ? [permissionLine("webfetch", "deny")] : []),
       "",
     ].join("\n"),
   );
@@ -78,6 +110,7 @@ function writeStructuredFixture(dir, options = {}) {
     [
       permissionLine("edit", "deny"),
       JSON.stringify({ action: "ask", permission: "oc_learning_*" }),
+      ...(options.unsafe ? [permissionLine("oc_learning_*", "allow")] : []),
       "",
     ].join("\n"),
   );
@@ -104,11 +137,20 @@ try {
 
   fs.cpSync(safeFixture, unsafeFixture, { recursive: true });
 
+  fs.appendFileSync(path.join(unsafeFixture, "debug-config.txt"), '\n  "oc_learning_*": allow\n');
+  fs.appendFileSync(path.join(unsafeFixture, "debug-config.txt"), '\n  default_agent: general\n');
+
   const reviewerFixture = path.join(unsafeFixture, "debug-agent-reviewer.txt");
   fs.writeFileSync(
     reviewerFixture,
-    fs.readFileSync(reviewerFixture, "utf8").replace("edit: deny", "edit: allow\n  bash: deny"),
+    fs.readFileSync(reviewerFixture, "utf8").replace("edit: deny", "edit: deny\n  edit: allow\n  bash: deny"),
   );
+
+  fs.appendFileSync(path.join(unsafeFixture, "debug-agent-architect.txt"), "\n  context_read: deny\n");
+  fs.appendFileSync(path.join(unsafeFixture, "debug-agent-verifier.txt"), "\n  websearch: allow\n  webfetch: allow\n");
+  fs.appendFileSync(path.join(unsafeFixture, "debug-agent-researcher.txt"), "\n  websearch: deny\n  webfetch: deny\n");
+  fs.appendFileSync(path.join(unsafeFixture, "debug-agent-general.txt"), "\n  edit: deny\n");
+  fs.appendFileSync(path.join(unsafeFixture, "debug-agent-improver.txt"), '\n  "oc_learning_*": allow\n');
 
   const orchestratorFixture = path.join(unsafeFixture, "debug-agent-orchestrator.txt");
   fs.appendFileSync(orchestratorFixture, '\n  "oc_learning_*": ask\n');
@@ -118,7 +160,7 @@ try {
   if (unsafe.status === 0) {
     fail("unsafe runtime fixture should fail, but it passed");
   }
-  for (const code of ["HARNESS-R009", "HARNESS-R013"]) {
+  for (const code of expectedUnsafeCodes) {
     if (!unsafeOutput.includes(code)) {
       fail(`unsafe runtime fixture should report ${code}\n${unsafeOutput}`);
     }
@@ -130,7 +172,7 @@ try {
   if (structuredUnsafe.status === 0) {
     fail("structured unsafe runtime fixture should fail, but it passed");
   }
-  for (const code of ["HARNESS-R009", "HARNESS-R013"]) {
+  for (const code of expectedUnsafeCodes) {
     if (!structuredUnsafeOutput.includes(code)) {
       fail(`structured unsafe runtime fixture should report ${code}\n${structuredUnsafeOutput}`);
     }

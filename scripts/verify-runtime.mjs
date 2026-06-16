@@ -180,16 +180,25 @@ function normalizePermissionValue(value) {
   return normalized;
 }
 
-function assertPermission(output, key, expected, label, code, fix) {
+function uniqueValues(values) {
+  return [...new Set(values)];
+}
+
+function formatValues(values) {
+  return values.length > 0 ? uniqueValues(values).join(", ") : "<missing>";
+}
+
+function assertOnlyPermission(output, key, expected, label, code, fix) {
   const values = permissionValues(output, key);
-  if (!values.includes(expected)) {
-    fail(code, `${label} expected ${key}: ${expected}, got ${values.length > 0 ? values.join(", ") : "<missing>"}`, fix);
+  const unexpected = values.filter((value) => value !== expected);
+  if (values.length === 0 || unexpected.length > 0) {
+    fail(code, `${label} expected only ${key}: ${expected}, got ${formatValues(values)}`, fix);
   }
 }
 
 function assertNoPermission(output, key, forbiddenValues, label, code, fix) {
   const values = permissionValues(output, key);
-  const forbidden = values.filter((value) => forbiddenValues.includes(value));
+  const forbidden = uniqueValues(values.filter((value) => forbiddenValues.includes(value)));
   if (forbidden.length > 0) {
     fail(code, `${label} unexpectedly exposes ${key}: ${forbidden.join(", ")}`, fix);
   }
@@ -197,30 +206,38 @@ function assertNoPermission(output, key, forbiddenValues, label, code, fix) {
 
 const configOutput = runOpenCode("debug-config", ["debug", "config"]);
 const agentOutputs = new Map();
+const agentNames = ["orchestrator", "orchestrator-deep", "explore", "architect", "general", "reviewer", "diagnose", "verifier", "researcher", "improver"];
 
-for (const agent of ["orchestrator", "orchestrator-deep", "explore", "architect", "reviewer", "diagnose", "verifier", "researcher", "improver"]) {
+for (const agent of agentNames) {
   agentOutputs.set(agent, runOpenCode(`debug-agent-${agent}`, ["debug", "agent", agent]));
 }
 
-assertPermission(configOutput, "default_agent", "orchestrator", "opencode debug config", "HARNESS-R004", "The installed profile should use the harness orchestrator as default.");
-assertPermission(configOutput, "oc_learning_*", "deny", "opencode debug config", "HARNESS-R006", "Root oc_learning tools should be denied outside the bounded improver path.");
+assertOnlyPermission(configOutput, "default_agent", "orchestrator", "opencode debug config", "HARNESS-R004", "The installed profile should use the harness orchestrator as default.");
+assertOnlyPermission(configOutput, "oc_learning_*", "deny", "opencode debug config", "HARNESS-R006", "Root oc_learning tools should be denied outside the bounded improver path.");
 
 for (const agent of ["orchestrator", "orchestrator-deep", "explore", "architect", "reviewer", "diagnose", "verifier"]) {
   const output = agentOutputs.get(agent) ?? "";
   for (const tool of ["context_outline", "context_files", "context_search", "context_read"]) {
-    assertPermission(output, tool, "allow", `opencode debug agent ${agent}`, "HARNESS-R007", "Install or enable opencode-recursive-context for broad read-only context.");
+    assertOnlyPermission(output, tool, "allow", `opencode debug agent ${agent}`, "HARNESS-R007", "Install or enable opencode-recursive-context for broad read-only context.");
   }
 }
 
 for (const agent of ["explore", "architect", "reviewer", "diagnose", "verifier", "researcher", "improver"]) {
-  assertPermission(agentOutputs.get(agent) ?? "", "edit", "deny", `opencode debug agent ${agent}`, "HARNESS-R009", "Read-only subagents should deny edits.");
+  assertOnlyPermission(agentOutputs.get(agent) ?? "", "edit", "deny", `opencode debug agent ${agent}`, "HARNESS-R009", "Read-only subagents should deny edits.");
 }
 
-assertPermission(agentOutputs.get("researcher") ?? "", "websearch", "allow", "opencode debug agent researcher", "HARNESS-R010", "Researcher should retain web research tools.");
-assertPermission(agentOutputs.get("researcher") ?? "", "webfetch", "allow", "opencode debug agent researcher", "HARNESS-R011", "Researcher should retain web research tools.");
-assertPermission(agentOutputs.get("improver") ?? "", "oc_learning_*", "ask", "opencode debug agent improver", "HARNESS-R012", "Improver should be the bounded self-improvement write path.");
+assertOnlyPermission(agentOutputs.get("general") ?? "", "edit", "allow", "opencode debug agent general", "HARNESS-R016", "Implementation worker should declare edit access explicitly.");
+assertOnlyPermission(agentOutputs.get("researcher") ?? "", "websearch", "allow", "opencode debug agent researcher", "HARNESS-R010", "Researcher should retain web research tools.");
+assertOnlyPermission(agentOutputs.get("researcher") ?? "", "webfetch", "allow", "opencode debug agent researcher", "HARNESS-R011", "Researcher should retain web research tools.");
+assertOnlyPermission(agentOutputs.get("improver") ?? "", "oc_learning_*", "ask", "opencode debug agent improver", "HARNESS-R012", "Improver should be the bounded self-improvement write path.");
 
-for (const agent of ["orchestrator", "orchestrator-deep", "explore", "architect", "reviewer", "diagnose", "verifier", "researcher"]) {
+for (const agent of agentNames.filter((name) => name !== "researcher")) {
+  const output = agentOutputs.get(agent) ?? "";
+  assertNoPermission(output, "websearch", ["ask", "allow"], `opencode debug agent ${agent}`, "HARNESS-R014", "Only researcher should expose web search.");
+  assertNoPermission(output, "webfetch", ["ask", "allow"], `opencode debug agent ${agent}`, "HARNESS-R015", "Only researcher should expose web fetch.");
+}
+
+for (const agent of agentNames.filter((name) => name !== "improver")) {
   assertNoPermission(agentOutputs.get(agent) ?? "", "oc_learning_*", ["ask", "allow"], `opencode debug agent ${agent}`, "HARNESS-R013", "Only improver should ask for oc_learning writes.");
 }
 

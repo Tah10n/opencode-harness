@@ -74,6 +74,8 @@ Expected result:
 
 - orchestrator/orchestrator-deep/reviewer/explore/architect/diagnose/verifier expose
   `context_outline`, `context_files`, `context_search`, and `context_read`;
+- additional recursive-context tools are treated as host opt-ins, not required
+  harness defaults;
 - root config denies `oc_learning_*`;
 - only `improver` has bounded `oc_learning_*` write tools;
 - review requests remain read-only unless fixes are explicitly requested.

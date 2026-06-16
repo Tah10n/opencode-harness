@@ -13,7 +13,7 @@ maintainability, architecture fitness, and behaviour dimensions.
 | Primary orchestrators | Feedforward | Inferential | Maintainability, architecture | Before and during implementation | `agents/orchestrator.md`, `agents/orchestrator-deep.md` |
 | Context inventory gate | Feedforward | Inferential | Maintainability, behaviour | Before edits | `AGENTS.md`, `agents/orchestrator.md` |
 | Safe command permissions | Feedforward | Computational | Maintainability, safety | Before command execution | `opencode.json`, agent frontmatter |
-| Recursive context tools | Feedforward and feedback | Computational | Architecture, maintainability | Broad audits and large reviews | `context_outline`, `context_files`, `context_search`, `context_read` |
+| Recursive context tools | Feedforward and feedback | Computational | Architecture, maintainability | Broad audits and large reviews | Minimal safe surface: `context_outline`, `context_files`, `context_search`, `context_read`; advanced package tools are opt-in |
 | Project workflow discovery | Feedforward | Inferential | Behaviour, architecture | Before repo work | `WORKFLOW.md`, `.opencode/skills/*`, `.agents/skills/*` |
 | Review ledger | Feedback | Inferential | Maintainability, behaviour | Review/fix/re-review loop | `skills/global-review-ledger/SKILL.md`, `review-diff` command |
 | Verifier agent | Feedback | Computational and inferential | Maintainability, behaviour | After integration | `agents/verifier.md` |

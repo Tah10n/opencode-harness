@@ -11,6 +11,12 @@
 Note: `oc_learning_*` remains the stable OpenCode tool prefix even though the
 repository and package are named `opencode-learning-guard`.
 
+`opencode-recursive-context` may expose more read-only tools than this harness
+grants. The default harness contract is the minimal safe surface:
+`context_outline`, `context_files`, `context_search`, and `context_read`.
+Advanced tools such as `context_map`, `context_batch_read`, `context_symbols`,
+and `context_related` are host opt-ins.
+
 ## Runtime Expectations
 
 - OpenCode must support the configured agent, command, skill, and plugin

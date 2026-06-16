@@ -7,6 +7,7 @@ textVerbosity: low
 temperature: 0.2
 steps: 240
 permission:
+  edit: allow
   task:
     "*": deny
   skill:
