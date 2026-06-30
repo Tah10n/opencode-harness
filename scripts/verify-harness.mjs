@@ -960,13 +960,13 @@ assertIncludes(liveEvalReadme, "`hidden_check_files`", "evals/README.md", "HARNE
 assertIncludes(liveEvalReadme, "rejects unsupported manifest fields", "evals/README.md", "HARNESS-S061", "Live-eval README should document unsupported-field rejection.");
 assertIncludes(liveEvalReadme, "Adapters must return explicit success", "evals/README.md", "HARNESS-S061", "Live-eval README should document explicit adapter success.");
 assertIncludes(liveEvalReadme, "separate isolated repo copies", "evals/README.md", "HARNESS-S061", "Live-eval README should document baseline/harness isolation.");
-assertIncludes(liveEvalReadme, "command status/exit metadata and an allowlisted adapter", "evals/README.md", "HARNESS-S061", "Live-eval README should document report sanitization.");
+assertIncludes(liveEvalReadme, "command status/exit metadata and an allowlisted, redacted adapter summary", "evals/README.md", "HARNESS-S061", "Live-eval README should document report sanitization.");
 assertIncludes(liveEvalReadme, "raw command stdout/stderr", "evals/README.md", "HARNESS-S061", "Live-eval README should document command output sanitization.");
 assertIncludes(liveEvalReadme, "relative allowlisted project fixture", "evals/README.md", "HARNESS-S061", "Live-eval README should document narrow fixture scope.");
 assertIncludes(liveEvalReadme, "must not point at the repository root", "evals/README.md", "HARNESS-S061", "Live-eval README should document unsafe fixture scopes.");
 assertIncludes(liveEvalReadme, "trace/report directories", "evals/README.md", "HARNESS-S061", "Live-eval README should document runner-owned directory exclusions.");
 assertIncludes(liveEvalReadme, "staged only into absent target paths", "evals/README.md", "HARNESS-S061", "Live-eval README should document hidden check target collision prevention.");
-assertIncludes(liveEvalReadme, "redacted summary", "evals/README.md", "HARNESS-S061", "Live-eval README should document adapter report redaction.");
+assertIncludes(liveEvalReadme, "allowlisted, redacted adapter summary", "evals/README.md", "HARNESS-S061", "Live-eval README should document adapter report redaction.");
 assertIncludes(liveEvalReadme, "transcripts, prompts", "evals/README.md", "HARNESS-S061", "Live-eval README should document transcript and prompt exclusion.");
 assertNotIncludes(liveEvalReadme, "setup source", "evals/README.md", "HARNESS-S061", "Do not document setup source until the runner supports it.");
 

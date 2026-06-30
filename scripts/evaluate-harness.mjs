@@ -202,7 +202,7 @@ const scenarios = [
       includes("scripts/evaluate-live.mjs", "[redacted]", "Live-eval should replace sensitive report strings with a redacted placeholder.");
       includes("scripts/evaluate-live.mjs", "BEGIN PRIVATE KEY", "Live-eval redaction should cover private-key markers.");
       includes("docs/live-evaluation.md", "allowlisted, redacted adapter summary", "Live-eval docs should document redacted adapter summaries.");
-      includes("evals/README.md", "redacted summary", "Live-eval README should document adapter report redaction.");
+      includes("evals/README.md", "allowlisted, redacted adapter summary", "Live-eval README should document adapter report redaction.");
     },
   },
   {
@@ -215,9 +215,9 @@ const scenarios = [
       includes("scripts/evaluate-live.mjs", "runScenarioProfile", "Live-eval should run each profile in its own isolated repo copy.");
       includes("scripts/evaluate-live.mjs", "profileRole", "Live-eval reports should distinguish baseline and harness roles.");
       includes("scripts/evaluate-live.mjs", "stageHiddenCheckFiles", "Live-eval should copy hidden artifacts only after adapter execution.");
-      includes("scripts/evaluate-live.mjs", "adapterReportSummary", "Live-eval reports should persist only an allowlisted adapter summary.");
+      includes("scripts/evaluate-live.mjs", "adapterReportSummary", "Live-eval reports should persist an allowlisted, redacted adapter summary.");
       includes("evals/README.md", "separate isolated repo copies", "Live-eval docs should document profile isolation.");
-      includes("evals/README.md", "Reports persist command status/exit metadata and an allowlisted adapter", "Live-eval docs should document report sanitization.");
+      includes("evals/README.md", "Reports persist command status/exit metadata and an allowlisted, redacted adapter summary", "Live-eval docs should document report sanitization.");
     },
   },
   {

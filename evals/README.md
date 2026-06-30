@@ -41,9 +41,9 @@ success checks fail or time out. Reports are still written when the run
 produces evidence.
 Adapters must return explicit success, such as `true`, `passed: true`,
 `ok: true`, `success: true`, `status: "passed"`, or `exitCode: 0`.
-Reports persist command status/exit metadata and an allowlisted adapter
-redacted summary, not raw command stdout/stderr, transcripts, prompts,
-completions, secrets, or arbitrary adapter output.
+Reports persist command status/exit metadata and an allowlisted, redacted adapter summary,
+not raw command stdout/stderr, transcripts, prompts, completions, secrets, or
+arbitrary adapter output.
 
 ## Scenario Contract
 
