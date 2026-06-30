@@ -20,6 +20,13 @@ These rules apply to all projects.
 - Parallelize implementation only after `@architect` has produced explicit disjoint write ownership.
 - If slices share files, shared contracts, generated outputs, lockfiles, migrations, package metadata, snapshots, or formatter output, serialize them.
 - The orchestrator remains the sole integrator of worker results.
+- Delegated agents must return or map onto the shared result schema in
+  `docs/subagent-result-schema.md`, including evidence, uncertainty,
+  `decision_unblocked`, `files_changed`, verification, residual risks, and
+  `termination_reason`.
+- The orchestrator must aggregate subagent results by evidence, uncertainty,
+  termination reason, and decision unblocked. Do not paste raw subagent output
+  as the final answer.
 - For broad audits, production-readiness checks, repo/article study, long logs, large diffs, or multi-module bug sweeps, automatically use recursive-context mode: keep the root context small, use safe read-only context tools when available (`context_outline`, `context_files`, `context_search`, `context_read`), fan out focused `@explore`/`@researcher`/`@reviewer` tasks, and aggregate compact evidence before deciding or editing.
 - Do not use recursive-context mode for small, local, single-file, or directly answerable tasks.
 - See `docs/recursive-context-mode.md` for the rationale, safety model, tool behavior, and validation commands.
@@ -28,6 +35,36 @@ These rules apply to all projects.
 - For review requests, use up to ten `@reviewer` subagents only when distinct scopes are useful enough to justify fan-out. Pick scopes based on the repository and diff, and prefer separating correctness, tests/coverage, API/contracts, security/privacy, performance/concurrency/resource lifecycle, and UX/i18n/docs/build-release concerns when applicable.
 - Each `@reviewer` must stay read-only and return concrete findings with severity, file/line evidence, impact, and recommended fix. Avoid duplicate scopes; if the change is small, use fewer reviewers with clearly distinct scopes.
 - Follow the skill's finding ledger, re-review, and stop-condition rules before fixing or re-reviewing findings.
+
+## High-Assurance Quality Gates
+
+- For broad, high-risk, production-readiness, migration, security/privacy,
+  persistence, concurrency, public-contract, or multi-module implementation,
+  load `global-quality-gates` before edits.
+- Before code changes in high/critical work, classify risk and record the
+  behavior contract, compatibility requirements, pre-change baseline, edge and
+  failure-mode matrix, and test obligations.
+- Tests and verification are part of implementation, not an optional follow-up.
+- High/critical work cannot be reported as `complete` when mandatory
+  verification gates are missing, failed, timed out, or not permitted.
+- Final results for high/critical work must include verification evidence,
+  baseline comparison, unresolved gaps, residual risks, and completion status.
+
+## Budgets, Termination, And Traces
+
+- Follow `docs/budgets-and-termination.md` for task classes, delegation
+  budgets, stop conditions, and termination reasons.
+- Stop or hand off partial results when the next action requires destructive or
+  high-side-effect permission, required context or external state is missing,
+  the verification boundary has been reached, the re-review ledger is resolved,
+  or worker output remains weak after one narrowing pass.
+- Use stable termination reasons such as `verified`, `partially_verified`,
+  `blocked_missing_context`, `blocked_permission`, `unsafe_without_permission`,
+  `conflicting_write_scope`, `budget_exhausted`, `verification_failed`, and
+  `not_reproducible`.
+- Treat `docs/trace-contract.md` as the portable trace shape for future runs.
+  Traces are machine-local artifacts; do not persist secrets, raw private logs,
+  credentials, `.env` values, private memory entries, or full source dumps.
 
 ## Safety (Dangerous Commands)
 

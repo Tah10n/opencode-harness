@@ -10,12 +10,19 @@ This repository contains a reusable OpenCode behavior profile:
 - focused subagents;
 - global safety rules;
 - review and re-review ledger workflow;
+- high-assurance quality gates for baseline, behavior contracts, edge/failure
+  matrices, verification ladders, and final adversarial audit;
+- trace, budget/termination, and shared subagent result-schema contracts;
+- a strict read-only primary review orchestrator for diff and release review;
 - recursive-context operating rules;
+- static adversarial fixtures for prompt-injection, command-injection,
+  secret-bait, and review-only traps;
 - controlled memory and self-improvement policy;
 - commands such as `learn`, `curate-learning`, `review-diff`, `workflow`, and
   `harness-release-review`.
-- deterministic verification for static structure, behaviour contracts, drift,
-  and installed runtime checks.
+- deterministic verification for static structure, contract/config scenarios,
+  drift, and runtime parser fixtures;
+- optional installed runtime permission checks and live A/B evaluation.
 
 It is intentionally separate from plugin capabilities:
 
@@ -40,6 +47,10 @@ and project-specific workflow facts outside this repository.
 Detailed adoption steps live in [docs/adoption.md](docs/adoption.md). The
 control matrix lives in [docs/harness-map.md](docs/harness-map.md), and project
 readiness guidance lives in [docs/harnessability.md](docs/harnessability.md).
+Trace, budget, and subagent handoff contracts live in
+[docs/trace-contract.md](docs/trace-contract.md),
+[docs/budgets-and-termination.md](docs/budgets-and-termination.md), and
+[docs/subagent-result-schema.md](docs/subagent-result-schema.md).
 
 ## Adoption
 
@@ -68,6 +79,7 @@ readiness guidance lives in [docs/harnessability.md](docs/harnessability.md).
    opencode debug config
    opencode debug agent orchestrator
    opencode debug agent orchestrator-deep
+   opencode debug agent review-orchestrator
    opencode debug agent reviewer
    opencode debug agent improver
    ```
@@ -114,7 +126,14 @@ runtime checks documented in `docs/recursive-context-mode.md` and
 The static evaluation scenarios are documented in
 [docs/evaluation.md](docs/evaluation.md). Compatibility and release guidance
 live in [docs/compatibility.md](docs/compatibility.md) and
-[docs/release.md](docs/release.md).
+[docs/release.md](docs/release.md). Optional live A/B evaluation is documented
+in [docs/live-evaluation.md](docs/live-evaluation.md). Static adversarial
+fixtures live under [fixtures/adversarial/](fixtures/adversarial/).
+
+`npm run verify` is deterministic repository-side assurance. It does not prove
+actual model behaviour. Use `npm run verify:runtime` for installed permission
+exposure and optional live A/B evaluation scenarios when prompt or
+orchestration changes need behavioural evidence.
 
 ## Repository layout
 

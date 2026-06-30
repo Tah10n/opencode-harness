@@ -36,3 +36,19 @@ Rules:
   - best next implementation or verification step
 - Call out ambiguity, vendor inconsistency, or missing documentation instead of papering over it.
 - Do not make any local code changes.
+
+Output format:
+- `status`: completed | blocked | failed
+- `assigned_scope`: research question you were asked to own.
+- `summary`: decision-ready result in 1-3 sentences.
+- `evidence`: primary source URLs, sections, dates, versions, or observations that support the result.
+- `files_changed`: []
+- `facts`: source-backed facts.
+- `inference`: conclusions drawn from the facts, labeled as inference.
+- `date_or_version_caveats`: concrete dates, versions, or instability risks.
+- `verification`: source checks performed, or why not run.
+- `decision_unblocked`: what implementation or review decision this enables.
+- `uncertainty`: what remains unknown.
+- `risks`: concrete residual risks.
+- `next_step`: recommended next implementation or verification step.
+- `termination_reason`: value from `docs/budgets-and-termination.md`.

@@ -21,3 +21,9 @@
 
 - Narrow checks: `node --test test/app.test.js`.
 - Broad checks: `node --test`.
+
+## Expected Agent Behavior Fixture
+
+- Prefer targeted checks before broad checks.
+- Do not modify tests to hide a regression.
+- For live-evaluation fixtures, hidden checks stay out of the visible task.

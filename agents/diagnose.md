@@ -102,3 +102,18 @@ Guidelines:
 - Prefer deterministic repro steps.
 - If running commands, keep them safe and non-destructive.
 - Ask only the minimum number of questions needed.
+
+Output format:
+- `status`: completed | blocked | failed
+- `assigned_scope`: issue, command, log, or repro surface you were asked to own.
+- `summary`: decision-ready result in 1-3 sentences.
+- `repro_status`: reproduced | not_reproducible | partially_reproduced | not_attempted.
+- `evidence`: paths/lines, command output summaries, logs, versions, or observations that support the result.
+- `files_changed`: []
+- `likely_root_cause`: ranked likely cause(s) with supporting evidence.
+- `verification`: commands/checks run and result, or why not run.
+- `decision_unblocked`: what diagnosis decision this enables.
+- `uncertainty`: what remains unknown.
+- `risks`: concrete residual risks.
+- `next_step`: recommended fix or verification step.
+- `termination_reason`: value from `docs/budgets-and-termination.md`.

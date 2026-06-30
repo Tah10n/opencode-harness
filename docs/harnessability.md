@@ -14,6 +14,8 @@ with useful confidence.
 | Safe context access | Path-confined read-only tools or clear repository boundaries | Allows broad audits without dumping private or irrelevant files. |
 | Local state boundary | Secrets, private memory, logs, caches, and machine paths are excluded | Keeps reusable harness files publishable and portable. |
 | Review workflow | A defined review/fix/re-review loop | Prevents fresh open-ended reviews after each fix pass. |
+| Verification ladder | Targeted, affected-module, full-suite, typecheck, lint, build, and specialized commands where applicable | Lets high/critical work produce reproducible evidence instead of vague confidence. |
+| Trace boundary | Policy for local traces, logs, and transcripts | Keeps trace evidence useful without committing private machine-local artifacts. |
 
 ## Strong Harnessability
 
@@ -26,6 +28,11 @@ A project is strongly harnessable when it also has:
 - project-local skills for recurring domain workflows;
 - documented release and rollback steps;
 - a clear policy for what agents may learn, persist, or ignore.
+- static adversarial fixtures for prompt-injection, command-injection,
+  secret-bait, and review-only traps that are safe and non-executable;
+- evaluation corpus readiness: representative tasks, expected delegation
+  behaviour, review examples, hidden checks, forbidden behaviours, scoring
+  criteria, and acceptance thresholds for optional live A/B evaluation.
 
 ## Adoption Path
 

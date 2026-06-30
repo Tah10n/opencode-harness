@@ -25,6 +25,24 @@ const expectedUnsafeCodes = [
   "HARNESS-R014",
   "HARNESS-R015",
   "HARNESS-R016",
+  "HARNESS-R017",
+  "HARNESS-R018",
+];
+const expectedReviewOrchestratorUnsafeEvidence = [
+  "opencode debug agent review-orchestrator expected only context_read: allow",
+  "opencode debug agent review-orchestrator expected only edit: deny",
+  "opencode debug agent review-orchestrator unexpectedly exposes websearch: allow",
+  "opencode debug agent review-orchestrator unexpectedly exposes webfetch: allow",
+  "opencode debug agent review-orchestrator unexpectedly exposes oc_learning_*: ask",
+  "opencode debug agent review-orchestrator expected only task.*: deny",
+  "opencode debug agent review-orchestrator expected only task.explore: allow",
+  "opencode debug agent review-orchestrator expected only task.reviewer: allow",
+  "opencode debug agent review-orchestrator expected only task.researcher: allow",
+  "opencode debug agent review-orchestrator expected only task.verifier: allow",
+  "opencode debug agent review-orchestrator unexpectedly exposes task.general: allow",
+  "opencode debug agent review-orchestrator unexpectedly exposes task.architect: allow",
+  "opencode debug agent review-orchestrator unexpectedly exposes task.diagnose: allow",
+  "opencode debug agent review-orchestrator unexpectedly exposes task.improver: allow",
 ];
 
 function runFixture(fixtureDir) {
@@ -80,6 +98,32 @@ function writeStructuredFixture(dir, options = {}) {
     }
     fs.writeFileSync(path.join(dir, `debug-agent-${agent}.txt`), `${lines.join("\n")}\n`);
   }
+
+  const reviewTaskLines = [
+    permissionLine("task.*", "deny"),
+    permissionLine("task.explore", "allow"),
+    permissionLine("task.reviewer", "allow"),
+    permissionLine("task.researcher", "allow"),
+    permissionLine("task.verifier", "allow"),
+  ];
+  const reviewOrchestratorLines = [permissionLine("edit", "deny"), ...contextLines, ...reviewTaskLines];
+  if (options.unsafe) {
+    reviewOrchestratorLines.push(permissionLine("context_read", "deny"));
+    reviewOrchestratorLines.push(permissionLine("edit", "allow"));
+    reviewOrchestratorLines.push(permissionLine("websearch", "allow"));
+    reviewOrchestratorLines.push(permissionLine("webfetch", "allow"));
+    reviewOrchestratorLines.push(permissionLine("oc_learning_*", "ask"));
+    reviewOrchestratorLines.push(permissionLine("task.*", "allow"));
+    reviewOrchestratorLines.push(permissionLine("task.explore", "deny"));
+    reviewOrchestratorLines.push(permissionLine("task.reviewer", "deny"));
+    reviewOrchestratorLines.push(permissionLine("task.researcher", "deny"));
+    reviewOrchestratorLines.push(permissionLine("task.verifier", "deny"));
+    reviewOrchestratorLines.push(permissionLine("task.general", "allow"));
+    reviewOrchestratorLines.push(permissionLine("task.architect", "allow"));
+    reviewOrchestratorLines.push(permissionLine("task.diagnose", "allow"));
+    reviewOrchestratorLines.push(permissionLine("task.improver", "allow"));
+  }
+  fs.writeFileSync(path.join(dir, "debug-agent-review-orchestrator.txt"), `${reviewOrchestratorLines.join("\n")}\n`);
 
   const generalLines = [permissionLine("edit", "allow"), permissionLine("webfetch", "deny"), permissionLine("websearch", "deny")];
   if (options.unsafe) {
@@ -176,6 +220,17 @@ function writeJsonSafeFixture(dir) {
   for (const agent of ["orchestrator", "orchestrator-deep"]) {
     writeJson(`debug-agent-${agent}`, [...contextPermissions, ...inheritedWebThenDeny]);
   }
+  writeJson("debug-agent-review-orchestrator", [
+    permissionEntry("edit", "deny"),
+    ...contextPermissions,
+    ...inheritedWebThenDeny,
+    permissionEntry("oc_learning_*", "deny"),
+    permissionEntry("task.*", "deny"),
+    permissionEntry("task.explore", "allow"),
+    permissionEntry("task.reviewer", "allow"),
+    permissionEntry("task.researcher", "allow"),
+    permissionEntry("task.verifier", "allow"),
+  ]);
   for (const agent of ["explore", "architect", "reviewer", "diagnose", "verifier"]) {
     writeJson(`debug-agent-${agent}`, [permissionEntry("edit", "deny"), ...contextPermissions, ...inheritedWebThenDeny]);
   }
@@ -230,6 +285,10 @@ try {
   );
 
   fs.appendFileSync(path.join(unsafeFixture, "debug-agent-architect.txt"), "\n  context_read: deny\n");
+  fs.appendFileSync(
+    path.join(unsafeFixture, "debug-agent-review-orchestrator.txt"),
+    "\n  context_read: deny\n  edit: allow\n  websearch: allow\n  webfetch: allow\n  \"oc_learning_*\": ask\n  task:\n    \"*\": allow\n    explore: deny\n    reviewer: deny\n    researcher: deny\n    verifier: deny\n    general: allow\n    architect: allow\n    diagnose: allow\n    improver: allow\n",
+  );
   fs.appendFileSync(path.join(unsafeFixture, "debug-agent-verifier.txt"), "\n  websearch: allow\n  webfetch: allow\n");
   fs.appendFileSync(path.join(unsafeFixture, "debug-agent-researcher.txt"), "\n  websearch: deny\n  webfetch: deny\n");
   fs.appendFileSync(path.join(unsafeFixture, "debug-agent-general.txt"), "\n  edit: deny\n");
@@ -248,6 +307,11 @@ try {
       fail(`unsafe runtime fixture should report ${code}\n${unsafeOutput}`);
     }
   }
+  for (const evidence of expectedReviewOrchestratorUnsafeEvidence) {
+    if (!unsafeOutput.includes(evidence)) {
+      fail(`unsafe runtime fixture should prove review-orchestrator boundary: ${evidence}\n${unsafeOutput}`);
+    }
+  }
 
   writeStructuredFixture(structuredUnsafeFixture, { unsafe: true });
   const structuredUnsafe = runFixture(structuredUnsafeFixture);
@@ -258,6 +322,11 @@ try {
   for (const code of expectedUnsafeCodes) {
     if (!structuredUnsafeOutput.includes(code)) {
       fail(`structured unsafe runtime fixture should report ${code}\n${structuredUnsafeOutput}`);
+    }
+  }
+  for (const evidence of expectedReviewOrchestratorUnsafeEvidence) {
+    if (!structuredUnsafeOutput.includes(evidence)) {
+      fail(`structured unsafe fixture should prove review-orchestrator boundary: ${evidence}\n${structuredUnsafeOutput}`);
     }
   }
 } finally {

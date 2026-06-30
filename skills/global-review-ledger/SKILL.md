@@ -24,6 +24,13 @@ Aggregate reviewer results into one ledger:
 - Preserve file/line references.
 - Include impact and resolution criteria.
 - Include scope coverage and verification gaps.
+- Include finding source:
+  - initial review;
+  - plan challenge;
+  - final adversarial audit;
+  - regression introduced by fix.
+- Link each finding to the violated contract, trigger condition, expected test
+  or verification evidence, and resolution evidence.
 - Separate confirmed issues from questions and low-priority notes.
 
 Use these statuses:
@@ -41,6 +48,9 @@ Preserve the ledger in every review or fix response.
 - Avoid opportunistic refactors, style cleanup, or unrelated behavior changes unless required to resolve a ledger item.
 - Keep fixes scoped to the ledger resolution criteria.
 - Run the narrowest relevant verification when feasible.
+- Tests or verification must prove the resolution when the project has an
+  applicable test layer. Do not close a finding only because the implementer
+  explains why it should be fixed.
 
 ## Re-review
 
@@ -48,6 +58,11 @@ Preserve the ledger in every review or fix response.
 - Use at most ten `@reviewer` subagents only when unresolved ledger items or latest-fix risks split into independent scopes; otherwise use fewer.
 - Re-reviewers must verify whether each ledger item is resolved, whether the latest fix introduced new high/medium regressions, and whether targeted tests or checks cover the changed behavior.
 - Treat unrelated pre-existing findings as `backlog` unless they are high severity and directly affect the changed lines or call path.
+- For findings from final adversarial audit, re-review only the final-audit IDs
+  and any confirmed regressions introduced by the fix. Do not run another fresh
+  open-ended final audit.
+- Do not close a finding without resolution evidence from code, tests,
+  verifier output, or direct artifact inspection.
 
 ## Stop conditions
 
@@ -64,3 +79,6 @@ Also stop when:
 - only low-priority notes or unrelated backlog items remain.
 
 When stopping for low-priority or backlog-only items, ask the user whether to continue.
+
+Do not restart fresh open-ended reviews indefinitely. A new broad review is a
+new task unless the user explicitly asks for it.

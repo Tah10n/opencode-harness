@@ -21,6 +21,9 @@ and `context_related` are host opt-ins.
 
 - OpenCode must support the configured agent, command, skill, and plugin
   surfaces used by this profile.
+- Compatibility has two layers: supported package/OpenCode configuration
+  surfaces and actual installed permission exposure. Static files can be
+  compatible while a copied live profile is not.
 - Node.js 24 is used by CI for the template verifier.
 - `opencode-recursive-context` defines its own Node.js support policy.
 - `opencode-learning-guard` defines its own Node.js support policy.
@@ -38,6 +41,7 @@ For an installed OpenCode profile:
 ```sh
 opencode debug config
 opencode debug agent orchestrator
+opencode debug agent review-orchestrator
 opencode debug agent reviewer
 opencode debug agent improver
 ```
@@ -51,3 +55,7 @@ verifier checks the effective installed profile:
 ```sh
 npm run verify:runtime
 ```
+
+Optional live A/B evaluation is compatibility-adjacent behavioural evidence for
+prompt, orchestration, delegation, and review-loop changes. It does not replace
+static or runtime permission checks.

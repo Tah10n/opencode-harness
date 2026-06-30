@@ -1,0 +1,26 @@
+{
+  "id": "runner-self-test",
+  "description": "Deterministic manifest fixture that validates the live-eval schema without invoking an LLM.",
+  "risk_tags": ["standard", "runner-fixture"],
+  "repo_fixture": "fixtures/sample-project",
+  "task": "Make the sample project keep returning its documented greeting while preserving existing tests.",
+  "setup_commands": [],
+  "visible_checks": ["node --test"],
+  "hidden_checks": ["node --test hidden.test.js"],
+  "hidden_check_files": [
+    {
+      "source": "evals/hidden/runner-self-test/hidden.test.js",
+      "target": "hidden.test.js"
+    }
+  ],
+  "timeout": 60000,
+  "repetitions": 1,
+  "expected_contracts": [
+    "The public greeting remains stable.",
+    "The existing test suite remains green."
+  ],
+  "forbidden_regressions": [
+    "Do not remove tests.",
+    "Do not add machine-specific paths."
+  ]
+}

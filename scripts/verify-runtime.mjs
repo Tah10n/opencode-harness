@@ -111,7 +111,8 @@ function permissionValues(output, key) {
   const pattern = new RegExp(`^\\s*["']?${escapedKey}["']?\\s*[:=]\\s*["']?([^"',#}\\s]+)`, "gim");
   const direct = [...output.matchAll(pattern)].map((match) => normalizePermissionValue(match[1]));
   const structured = structuredPermissionValues(output, key);
-  return [...direct, ...structured];
+  const yamlNested = yamlPathValues(output, key);
+  return [...direct, ...structured, ...yamlNested];
 }
 
 function jsonPermissionValues(output, key) {
@@ -123,7 +124,7 @@ function jsonPermissionValues(output, key) {
   }
 
   const values = [];
-  const direct = scalarToString(parsed?.[key]);
+  const direct = scalarToString(parsed?.[key]) ?? valueAtPath(parsed, key);
   if (direct !== null) {
     values.push(normalizePermissionValue(direct));
   }
@@ -140,13 +141,27 @@ function jsonPermissionValues(output, key) {
       }
     }
   } else if (permissions && typeof permissions === "object") {
-    const action = scalarToString(permissions[key]);
+    const action = scalarToString(permissions[key]) ?? valueAtPath(permissions, key);
     if (action !== null) {
       values.push(normalizePermissionValue(action));
     }
   }
 
   return values;
+}
+
+function valueAtPath(object, key) {
+  if (!object || typeof object !== "object") {
+    return null;
+  }
+  let current = object;
+  for (const segment of key.split(".")) {
+    if (!current || typeof current !== "object" || !(segment in current)) {
+      return null;
+    }
+    current = current[segment];
+  }
+  return scalarToString(current);
 }
 
 function structuredPermissionValues(output, key) {
@@ -159,6 +174,35 @@ function structuredPermissionValues(output, key) {
     }
   }
 
+  return values;
+}
+
+function yamlPathValues(output, key) {
+  const values = [];
+  const stack = [];
+  for (const rawLine of output.split(/\r?\n/)) {
+    if (!rawLine.trim() || rawLine.trimStart().startsWith("#")) {
+      continue;
+    }
+    const match = rawLine.match(/^(\s*)(["']?[^:"']+["']?)\s*:\s*(?:"([^"]*)"|'([^']*)'|([^#\s]+))?\s*$/);
+    if (!match) {
+      continue;
+    }
+    const indent = match[1].length;
+    const name = match[2].replace(/^["']|["']$/g, "");
+    const value = match[3] ?? match[4] ?? match[5] ?? "";
+    while (stack.length > 0 && indent <= stack.at(-1).indent) {
+      stack.pop();
+    }
+    const currentPath = [...stack.map((entry) => entry.name), name].join(".");
+    if (value === "") {
+      stack.push({ indent, name });
+      continue;
+    }
+    if (currentPath === key || currentPath.endsWith(`.${key}`)) {
+      values.push(normalizePermissionValue(value));
+    }
+  }
   return values;
 }
 
@@ -218,7 +262,7 @@ function assertNoPermission(output, key, forbiddenValues, label, code, fix) {
 
 const configOutput = runOpenCode("debug-config", ["debug", "config"]);
 const agentOutputs = new Map();
-const agentNames = ["orchestrator", "orchestrator-deep", "explore", "architect", "general", "reviewer", "diagnose", "verifier", "researcher", "improver"];
+const agentNames = ["orchestrator", "orchestrator-deep", "review-orchestrator", "explore", "architect", "general", "reviewer", "diagnose", "verifier", "researcher", "improver"];
 
 for (const agent of agentNames) {
   agentOutputs.set(agent, runOpenCode(`debug-agent-${agent}`, ["debug", "agent", agent]));
@@ -227,14 +271,14 @@ for (const agent of agentNames) {
 assertOnlyPermission(configOutput, "default_agent", "orchestrator", "opencode debug config", "HARNESS-R004", "The installed profile should use the harness orchestrator as default.");
 assertOnlyPermission(configOutput, "oc_learning_*", "deny", "opencode debug config", "HARNESS-R006", "Root oc_learning tools should be denied outside the bounded improver path.");
 
-for (const agent of ["orchestrator", "orchestrator-deep", "explore", "architect", "reviewer", "diagnose", "verifier"]) {
+for (const agent of ["orchestrator", "orchestrator-deep", "review-orchestrator", "explore", "architect", "reviewer", "diagnose", "verifier"]) {
   const output = agentOutputs.get(agent) ?? "";
   for (const tool of ["context_outline", "context_files", "context_search", "context_read"]) {
     assertOnlyPermission(output, tool, "allow", `opencode debug agent ${agent}`, "HARNESS-R007", "Install or enable opencode-recursive-context for broad read-only context.");
   }
 }
 
-for (const agent of ["explore", "architect", "reviewer", "diagnose", "verifier", "researcher", "improver"]) {
+for (const agent of ["review-orchestrator", "explore", "architect", "reviewer", "diagnose", "verifier", "researcher", "improver"]) {
   assertOnlyPermission(agentOutputs.get(agent) ?? "", "edit", "deny", `opencode debug agent ${agent}`, "HARNESS-R009", "Read-only subagents should deny edits.");
 }
 
@@ -242,6 +286,15 @@ assertOnlyPermission(agentOutputs.get("general") ?? "", "edit", "allow", "openco
 assertOnlyPermission(agentOutputs.get("researcher") ?? "", "websearch", "allow", "opencode debug agent researcher", "HARNESS-R010", "Researcher should retain web research tools.");
 assertOnlyPermission(agentOutputs.get("researcher") ?? "", "webfetch", "allow", "opencode debug agent researcher", "HARNESS-R011", "Researcher should retain web research tools.");
 assertOnlyPermission(agentOutputs.get("improver") ?? "", "oc_learning_*", "ask", "opencode debug agent improver", "HARNESS-R012", "Improver should be the bounded self-improvement write path.");
+
+const reviewOrchestratorOutput = agentOutputs.get("review-orchestrator") ?? "";
+assertOnlyPermission(reviewOrchestratorOutput, "task.*", "deny", "opencode debug agent review-orchestrator", "HARNESS-R017", "Review primary should default-deny task delegation.");
+for (const agent of ["explore", "reviewer", "researcher", "verifier"]) {
+  assertOnlyPermission(reviewOrchestratorOutput, `task.${agent}`, "allow", "opencode debug agent review-orchestrator", "HARNESS-R017", "Review primary should allow only read-only support delegates.");
+}
+for (const agent of ["general", "architect", "diagnose", "improver"]) {
+  assertNoPermission(reviewOrchestratorOutput, `task.${agent}`, ["ask", "allow"], "opencode debug agent review-orchestrator", "HARNESS-R018", "Review primary must not delegate to implementation, write planning, diagnosis, or self-improvement agents.");
+}
 
 for (const agent of agentNames.filter((name) => name !== "researcher")) {
   const output = agentOutputs.get(agent) ?? "";

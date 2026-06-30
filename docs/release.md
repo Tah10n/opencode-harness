@@ -32,15 +32,42 @@
    behaviour-contract coverage, runtime/drift coverage, release/adoption docs,
    and public/private boundaries.
 
-6. Optional network drift check before publishing:
+6. For material prompt, orchestration, delegation, review-loop, trace,
+   budget/termination, or subagent handoff changes, confirm that
+   `docs/trace-contract.md`, `docs/budgets-and-termination.md`,
+   `docs/subagent-result-schema.md`, `docs/harness-map.md`,
+   `docs/evaluation.md`, `scripts/verify-harness.mjs`, and
+   `scripts/evaluate-harness.mjs` agree.
+
+7. Confirm adversarial fixtures remain static and non-executable, with no real
+   `.env`, `.npmrc`, private keys, credentials, tokens, destructive scripts, or
+   private logs.
+
+8. For material prompt, orchestration, delegation, review-loop, or
+   high-assurance workflow changes, optionally run live A/B evaluation with a
+   fixed scenario corpus:
+
+   ```sh
+   npm run verify:live-eval
+   OPENCODE_BASELINE_PROFILE=baseline-profile \
+   OPENCODE_HARNESS_PROFILE=harness-profile \
+   OPENCODE_LIVE_EVAL_ADAPTER=path/to/adapter.mjs npm run eval:live
+   ```
+
+   Use a baseline profile, candidate harness profile, fixed task corpus,
+   hidden checks, transcript/evidence capture, pass/fail rubric, and defect
+   escape-rate reporting. Do not block patch releases on live A/B unless the
+   behaviour risk is material.
+
+9. Optional network drift check before publishing:
 
    ```sh
    HARNESS_CHECK_LINKS=1 npm run verify:drift
    ```
 
-7. Confirm GitHub Actions is green after pushing.
-8. Confirm the compatibility table is current.
-9. Update `CHANGELOG.md`.
+10. Confirm GitHub Actions is green after pushing.
+11. Confirm the compatibility table is current.
+12. Update `CHANGELOG.md`.
 
 ## Tagging
 

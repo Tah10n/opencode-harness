@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "OpenCode harness live-evaluation scenario",
+  "type": "object",
+  "required": [
+    "id",
+    "description",
+    "risk_tags",
+    "repo_fixture",
+    "task",
+    "setup_commands",
+    "visible_checks",
+    "hidden_checks",
+    "timeout",
+    "repetitions",
+    "expected_contracts",
+    "forbidden_regressions"
+  ],
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$" },
+    "description": { "type": "string" },
+    "risk_tags": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "repo_fixture": { "type": "string" },
+    "task": { "type": "string" },
+    "setup_commands": { "type": "array", "items": { "type": "string" } },
+    "visible_checks": { "type": "array", "items": { "type": "string" } },
+    "hidden_checks": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "hidden_check_files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["source", "target"],
+        "properties": {
+          "source": { "type": "string" },
+          "target": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "timeout": { "type": "integer", "minimum": 1000 },
+    "repetitions": { "type": "integer", "minimum": 1 },
+    "expected_contracts": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "forbidden_regressions": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+  },
+  "additionalProperties": false
+}

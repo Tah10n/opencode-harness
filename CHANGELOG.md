@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+- Added `global-quality-gates` for high/critical risk classification,
+  behavior contracts, quality ledgers, baselines, verification ladders,
+  specialized checks, final adversarial audit, and strict completion status.
+- Added a strict read-only `review-orchestrator` primary and routed review
+  commands through it.
+- Added optional live A/B evaluation manifests, validator, docs, npm scripts,
+  isolated profile repo copies, adapter timeouts, hidden file staging, and
+  sanitized reports outside the default deterministic verification gate.
+- Added trace contract, budget/termination policy, shared subagent result
+  schema, static adversarial fixtures, and deterministic scenario coverage for
+  those controls.
+- Expanded static, evaluation, runtime-fixture, docs, and examples coverage for
+  high-assurance workflows and permission boundaries.
 - Added a harness control map and harnessability checklist.
 - Added deterministic drift, runtime, and positive/negative runtime-fixture
   verification scripts.

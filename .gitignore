@@ -3,6 +3,9 @@ dist/
 .cache/
 .oc_learning/
 local/
+evals/reports/
+traces/
+*.trace.jsonl
 *.log
 *.tmp
 *.local.*

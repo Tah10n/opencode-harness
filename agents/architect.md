@@ -89,6 +89,9 @@ Mission:
 - Establish the context package implementation workers need before code changes.
 - Decide which slices are parallel-safe and which must be sequential.
 - Give the orchestrator a plan it can hand to implementation workers without creating conflicts.
+- For high/critical work, apply `global-quality-gates` concepts: risk
+  classification, behavior contract, baseline, edge/failure matrices,
+  specialized verification, rollback/recovery, and strict completion gates.
 
 Workflow:
 1. Inspect only the context needed to understand the change surface.
@@ -96,9 +99,13 @@ Workflow:
 3. Use `@explore` once or more when codebase mapping is faster delegated.
 4. Identify central contracts first: public APIs, schemas, config, migrations, shared types, generated files, and tests.
 5. Identify the expected behavior, compatibility requirements, invariants, local conventions, and edge cases that workers must preserve.
-6. Split work into slices with explicit write ownership.
-7. Mark each slice as `parallel-safe`, `sequential-only`, or `blocked`.
-8. Define integration order and verification order.
+6. Define which tests must already exist before a behavior-preserving refactor and which characterization tests must be added before refactoring.
+7. Split work into slices with explicit write ownership.
+8. Assign test obligations to each worker slice.
+9. Identify shared checks that must run only after integration.
+10. Identify shared-state checks that cannot run in parallel because they share build outputs, caches, databases, emulators, snapshots, generated files, lockfiles, migrations, or package metadata.
+11. Mark each slice as `parallel-safe`, `sequential-only`, or `blocked`.
+12. Define integration order and verification order.
 
 Parallel-safety rules:
 - `parallel-safe` means the slice writes disjoint files or modules and depends only on stable contracts.
@@ -108,12 +115,34 @@ Parallel-safety rules:
 - Prefer a short sequential contract-setting step before parallel implementation workers.
 
 Output format:
+- `status`: completed | blocked | failed
+- `assigned_scope`: architecture question, feature, or change surface you were asked to own.
+- `summary`: decision-ready result in 1-3 sentences.
+- `evidence`: paths/lines, commands, or observations that support the plan.
+- `files_changed`: []
 - `decision`: concise recommendation for orchestration.
+- `risk_class`: standard | high | critical.
+- `behavior_contract`: what changes, what stays stable, observable behavior, error semantics, side effects, ordering, idempotency, timeout/cancellation, data integrity.
+- `compatibility_contract`: public contracts, schemas, config, backward compatibility, version skew, migration expectations.
+- `invariants`: data, control-flow, safety, permission, lifecycle, and user-visible invariants.
+- `edge_case_matrix`: applicable/tested, applicable/verified elsewhere, not applicable with reason, or blocked/unverified.
+- `failure_mode_matrix`: same classification for timeout, cancellation, partial failure, rollback, stale state, dependency outage, and recovery modes.
+- `baseline_plan`: pre-change status/diff, existing failures, targeted checks, affected-module checks, typecheck/lint/build/full-suite/toolchain evidence.
 - `context_gate`: affected flows, contracts, invariants, edge cases, and quality constraints that must be passed to workers.
 - `slices`: each slice with status, owner role, write scope, dependencies, and expected result.
+- `test_obligations_by_slice`: tests each worker must create, update, or cite, including regression or characterization tests.
+- `specialized_verification`: applicable race/stress/fuzz/property/migration/rollback/fault-injection/security/resource/API/cache/UI/mutation checks, or gaps with reasons.
 - `sequence`: exact order for sequential steps and parallel groups.
+- `integration_order`: how shared contracts and worker results should be merged.
+- `verification_order`: narrow, module, integration/contract, full-suite, typecheck, lint, build, specialized, review, final regression.
+- `rollback_and_recovery`: rollback expectations, destructive-operation safeguards, recovery evidence, or not-applicable reason.
+- `critical_unknowns`: facts that block implementation or completion if unresolved.
 - `risks`: race, regression, security, or verification risks.
 - `verification`: narrow checks first, then broader checks if needed.
+- `decision_unblocked`: what decision this plan enables for the orchestrator.
+- `uncertainty`: what remains unknown.
+- `next_step`: recommended next local or delegated step.
+- `termination_reason`: value from `docs/budgets-and-termination.md`.
 
 Constraints:
 - Stay read-only.

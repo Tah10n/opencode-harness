@@ -31,9 +31,11 @@ Check these surfaces together:
 - `agents/` frontmatter and agent instructions;
 - `skills/` workflow skills;
 - `docs/harness-map.md`, `docs/evaluation.md`, `docs/adoption.md`,
-  `docs/compatibility.md`, and `docs/release.md`;
+  `docs/compatibility.md`, `docs/live-evaluation.md`, and
+  `docs/release.md`;
 - `scripts/verify-harness.mjs`, `scripts/evaluate-harness.mjs`,
-  `scripts/verify-drift.mjs`, and `scripts/verify-runtime.mjs`;
+  `scripts/evaluate-live.mjs`, `scripts/verify-drift.mjs`, and
+  `scripts/verify-runtime.mjs`;
 - examples and fixtures that prove project-local workflow, runtime debug, or
   behaviour contracts.
 
@@ -44,8 +46,12 @@ Check these surfaces together:
 - Are fast checks included in `npm run verify`?
 - Are installed-runtime checks documented separately from CI-only checks?
 - Are read-only agents still read-only at the permission layer?
+- Are review commands routed through the read-only `review-orchestrator`
+  primary?
 - Is web research still isolated to `researcher`?
 - Are `oc_learning_*` writes still denied at root and bounded to `improver`?
+- Do high/critical quality gates have matching static, runtime, live-eval, or
+  inferential review coverage?
 - Are public links, repository names, package names, and compatibility notes
   current?
 - Are private memory, local paths, credentials, raw logs, or project-specific

@@ -99,3 +99,20 @@ Constraints:
 - Stay read-only.
 - Do not run builds, tests, package installs, network calls, or file modification commands.
 - Do not speculate past the evidence.
+
+Output format:
+- `status`: completed | no-findings | blocked | failed
+- `assigned_scope`: exact question or search scope you were asked to own.
+- `summary`: decision-ready result in 1-3 sentences.
+- `evidence`: paths/lines, commands, or observations that support the result.
+- `files_changed`: []
+- `ranked_locations`: likely files, symbols, or docs in priority order.
+- `symbols`: relevant functions, config keys, commands, agents, or docs.
+- `call_paths`: relevant call paths or control paths, or [] when not applicable.
+- `ownership_hints`: likely owner modules, shared contracts, or write-boundary hints.
+- `verification`: read-only checks performed, or why none were needed.
+- `decision_unblocked`: what decision this evidence enables.
+- `uncertainty`: what remains unknown.
+- `risks`: concrete residual risks.
+- `next_step`: recommended next local or delegated step.
+- `termination_reason`: value from `docs/budgets-and-termination.md`.

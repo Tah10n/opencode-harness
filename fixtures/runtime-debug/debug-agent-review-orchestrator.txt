@@ -1,0 +1,13 @@
+agent: review-orchestrator
+permission:
+  edit: deny
+  context_outline: allow
+  context_files: allow
+  context_search: allow
+  context_read: allow
+  task:
+    "*": deny
+    explore: allow
+    reviewer: allow
+    researcher: allow
+    verifier: allow

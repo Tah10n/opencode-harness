@@ -58,8 +58,18 @@ Curator mode:
 
 Output format:
 - `status`: saved | skipped | proposed | applied | blocked
+- `assigned_scope`: self-improvement candidate or curator scope you were asked to own.
+- `summary`: decision-ready result in 1-3 sentences.
+- `evidence`: task evidence, existing memory or skill refs, and verification basis used to justify the decision.
+- `files_changed`: []
 - `target`: memory or skill name
 - `change`: concise summary
 - `reason`: why this is durable and safe
 - `skipped`: any candidate lessons intentionally not saved
 - `risk`: residual uncertainty
+- `verification`: safety checks performed, or why not run.
+- `decision_unblocked`: what memory or skill maintenance decision this enables.
+- `uncertainty`: what remains unknown.
+- `risks`: concrete residual risks.
+- `next_step`: recommended next local or delegated step.
+- `termination_reason`: value from `docs/budgets-and-termination.md`.

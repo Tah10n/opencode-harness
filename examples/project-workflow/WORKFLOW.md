@@ -18,6 +18,16 @@
 
 - Narrow checks: use the closest test or typecheck for the changed path.
 - Broad checks: run the full suite when the blast radius justifies it.
+- High-assurance checks: document targeted tests, affected-module tests,
+  full-suite, typecheck, lint, build, integration/E2E, race/stress,
+  fuzz/property, mutation, migration, rollback/recovery, and fault-injection
+  commands when the project has them.
+- Shared mutable state: list checks that cannot run in parallel because they
+  share build outputs, caches, databases, emulators, snapshots, generated
+  files, package metadata, or lockfiles.
+- Optional live-agent scenarios: record representative tasks, hidden checks,
+  expected contracts, forbidden regressions, and acceptance criteria when the
+  project uses live A/B evaluation.
 
 ## Definition of Done
 

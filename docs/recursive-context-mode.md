@@ -53,6 +53,12 @@ They refuse secret-like files and paths, including `.env`, `.env.*` except `.env
 
 They do not provide shell execution, write access, package installation, network access, or permission escalation.
 
+The `context_*` tools are the preferred bounded read path for broad audits, but
+they are not an absolute security boundary when a profile also grants native
+read or shell tools. This harness therefore verifies both guidance and
+effective permissions where possible, and documents native shell/read exposure
+as part of the agent permission surface.
+
 ## Operating Rules
 
 Use recursive-context mode automatically when a task is broad enough that direct reading would pollute the root context or miss important surfaces.
@@ -74,6 +80,7 @@ The expected validation commands are:
 
 - `opencode debug config`
 - `opencode debug agent orchestrator`
+- `opencode debug agent review-orchestrator`
 - `opencode debug agent explore`
 - `opencode debug agent reviewer`
 
@@ -82,3 +89,7 @@ recursive-context capability configured by the host, and the relevant agents
 show `context_outline`, `context_files`, `context_read`, and `context_search`
 as enabled tools. Additional `context_*` tools may be installed, but this
 profile does not require or grant them unless the host opts in.
+
+For prompt-level behaviour changes, optional live validation can run the same
+broad-audit prompt against baseline and candidate profiles, then score bounded
+context-tool use, subagent fan-out, evidence quality, and no-write behaviour.

@@ -15,8 +15,12 @@
   "homepage": "https://github.com/Tah10n/opencode-harness#readme",
   "scripts": {
     "eval": "node scripts/evaluate-harness.mjs",
-    "verify": "npm run verify:static && npm run eval && npm run verify:drift && npm run verify:runtime:fixture",
+    "eval:live": "node scripts/evaluate-live.mjs",
+    "eval:live:self-test": "node scripts/evaluate-live.mjs --self-test",
+    "eval:live:validate": "node scripts/evaluate-live.mjs --validate",
+    "verify": "npm run verify:static && npm run eval && npm run verify:drift && npm run verify:runtime:fixture && npm run verify:live-eval",
     "verify:drift": "node scripts/verify-drift.mjs",
+    "verify:live-eval": "npm run eval:live:validate && npm run eval:live:self-test",
     "verify:runtime": "node scripts/verify-runtime.mjs",
     "verify:runtime:fixture": "node scripts/verify-runtime-fixtures.mjs",
     "verify:static": "node scripts/verify-harness.mjs"
