@@ -42,8 +42,8 @@ produces evidence.
 Adapters must return explicit success, such as `true`, `passed: true`,
 `ok: true`, `success: true`, `status: "passed"`, or `exitCode: 0`.
 Reports persist command status/exit metadata and an allowlisted adapter
-summary, not raw command stdout/stderr, transcripts, or arbitrary adapter
-output.
+redacted summary, not raw command stdout/stderr, transcripts, prompts,
+completions, secrets, or arbitrary adapter output.
 
 ## Scenario Contract
 
@@ -62,6 +62,15 @@ Each scenario manifest includes:
 - `repetitions`;
 - `expected_contracts`;
 - `forbidden_regressions`.
+
+`repo_fixture` must point at a relative allowlisted project fixture. The
+current allowlist is `fixtures/sample-project`; future live project fixtures
+should use `fixtures/live/<name>`. It must not point at the repository root,
+eval runner directories, trace/report directories, `.git`, `node_modules`,
+adversarial fixtures, runtime-debug fixtures, or hidden-check directories.
+`hidden_check_files` are staged only into absent target paths inside the
+isolated repo copy. They must not overwrite normal repo files, visible tests,
+configuration, generated agent files, or merge into an existing directory.
 
 Live reports should capture task success, hidden-test pass rate, introduced
 regressions, unresolved defects, build/typecheck/lint results, patch size,

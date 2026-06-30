@@ -170,6 +170,42 @@ const scenarios = [
     },
   },
   {
+    id: "live-eval-fixture-scope-is-narrow",
+    category: "safety",
+    checks: () => {
+      includes("scripts/evaluate-live.mjs", "HARNESS-L031", "Live-eval self-tests should cover unsafe repo fixture scopes.");
+      includes("scripts/evaluate-live.mjs", "allowedRepoFixtureRoots", "Live-eval should use a narrow project-fixture allowlist.");
+      includes("scripts/evaluate-live.mjs", "repo_fixture: \".\"", "Live-eval self-tests should reject the repository root.");
+      includes("scripts/evaluate-live.mjs", "repo_fixture: \"evals\"", "Live-eval self-tests should reject eval runner directories.");
+      includes("scripts/evaluate-live.mjs", "repo_fixture: \"fixtures/adversarial\"", "Live-eval self-tests should reject adversarial fixtures.");
+      includes("docs/live-evaluation.md", "relative allowlisted project fixture", "Live-eval docs should document narrow fixture scope.");
+      includes("evals/README.md", "must not point at the repository root", "Live-eval README should document forbidden fixture scopes.");
+    },
+  },
+  {
+    id: "live-eval-hidden-files-do-not-overwrite",
+    category: "safety",
+    checks: () => {
+      includes("scripts/evaluate-live.mjs", "HARNESS-L032", "Live-eval self-tests should cover hidden check target collisions.");
+      includes("scripts/evaluate-live.mjs", "hidden_check_files target collision", "Hidden check staging should fail on existing targets.");
+      includes("scripts/evaluate-live.mjs", "fs.existsSync(target)", "Hidden check staging should check the resolved target before copying.");
+      includes("docs/live-evaluation.md", "must be absent before staging", "Live-eval docs should document absent-only hidden file staging.");
+      includes("evals/README.md", "staged only into absent target paths", "Live-eval README should document hidden target collision prevention.");
+    },
+  },
+  {
+    id: "live-eval-reports-are-redacted",
+    category: "safety",
+    checks: () => {
+      includes("scripts/evaluate-live.mjs", "HARNESS-L033", "Live-eval self-tests should cover adapter report string redaction.");
+      includes("scripts/evaluate-live.mjs", "redactReportString", "Live-eval report strings should pass through a redaction step.");
+      includes("scripts/evaluate-live.mjs", "[redacted]", "Live-eval should replace sensitive report strings with a redacted placeholder.");
+      includes("scripts/evaluate-live.mjs", "BEGIN PRIVATE KEY", "Live-eval redaction should cover private-key markers.");
+      includes("docs/live-evaluation.md", "allowlisted, redacted adapter summary", "Live-eval docs should document redacted adapter summaries.");
+      includes("evals/README.md", "redacted summary", "Live-eval README should document adapter report redaction.");
+    },
+  },
+  {
     id: "live-eval-profiles-are-isolated-and-reports-sanitized",
     category: "safety",
     checks: () => {

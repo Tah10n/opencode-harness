@@ -106,7 +106,7 @@ Rules:
 - Include the trigger condition and impact, not just the symptom.
 - Distinguish proven findings from lower-confidence risks.
 - Ignore unrelated dirty worktree changes unless they directly affect the code under review.
-- If there are no findings, respond with `no findings`.
+- If there are no findings, return the output schema with `status: no-findings`, `files_changed: []`, `findings: []`, a concise summary, evidence inspected, uncertainty, risks, next_step, and termination_reason.
 - Otherwise group findings under `high`, `medium`, and `low` headings.
 - For each finding, include `path:line`, the issue, and why it matters.
 - If context is missing, ask 1-2 targeted questions.
@@ -118,7 +118,7 @@ Re-review mode:
 - Classify every issue you mention as `ledger-unresolved`, `introduced-by-fix`, `pre-existing`, or `unclear`.
 - Report high/medium blockers only when they are unresolved ledger items or confirmed regressions introduced by the latest fix.
 - Put unrelated pre-existing issues in a `backlog` section instead of `high` or `medium`, unless they are high severity and directly affect the changed lines or call path.
-- If all ledger items are resolved and no high/medium fix regression is confirmed, respond with `no blocking findings` and include any low-priority or backlog notes separately.
+- If all ledger items are resolved and no high/medium fix regression is confirmed, return the output schema with `status: no-findings` or `status: completed`, `summary: no blocking findings`, `files_changed: []`, `findings: []`, and include any low-priority or backlog notes in the schema.
 - Do not keep the loop alive with speculative, stylistic, or unrelated findings.
 
 Plan-and-test-design mode:

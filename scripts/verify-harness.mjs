@@ -477,9 +477,15 @@ for (const needle of [
   "OPENCODE_HARNESS_PROFILE",
   "separate isolated repository copies",
   "AbortSignal",
-  "allowlisted adapter summary",
+  "allowlisted, redacted adapter summary",
   "raw command stdout/stderr",
   "Unsupported fields are rejected",
+  "relative allowlisted project fixture",
+  "must not point at the repository root",
+  "trace/report directories",
+  "must be absent before staging",
+  "must not overwrite or merge",
+  "transcripts, prompts, completions, secrets",
 ]) {
   assertIncludes(liveEvaluationDocs, needle, "docs/live-evaluation.md", "HARNESS-S057", "Document live A/B evaluation without making it a default CI dependency.");
 }
@@ -647,6 +653,13 @@ for (const agent of ["review-orchestrator", "explore", "architect", "reviewer", 
   assertIncludes(read(`agents/${agent}.md`), "`files_changed`: []", `agents/${agent}.md`, "HARNESS-S070", "Read-only agents must explicitly report files_changed: [].");
 }
 assertIncludes(read("agents/general.md"), "`files_changed`: exact changed paths", "agents/general.md", "HARNESS-S071", "Implementation workers must report exact changed paths.");
+
+const reviewerSchemaAgent = read("agents/reviewer.md");
+assertNotIncludes(reviewerSchemaAgent, "respond with `no findings`", "agents/reviewer.md", "HARNESS-S074", "Reviewer no-finding results must use the shared output schema.");
+assertNotIncludes(reviewerSchemaAgent, "respond with `no blocking findings`", "agents/reviewer.md", "HARNESS-S074", "Reviewer re-review results must use the shared output schema.");
+for (const needle of ["`status: no-findings`", "`files_changed: []`", "`findings: []`", "`summary: no blocking findings`"]) {
+  assertIncludes(reviewerSchemaAgent, needle, "agents/reviewer.md", "HARNESS-S075", "Reviewer no-finding output must map onto the shared schema.");
+}
 
 for (const agent of ["orchestrator", "orchestrator-deep"]) {
   const agentText = read(`agents/${agent}.md`);
@@ -903,6 +916,23 @@ for (const needle of [
   "HARNESS-L024",
   "HARNESS-L025",
   "HARNESS-L030",
+  "HARNESS-L031",
+  "unsafe repo_fixture scope",
+  "repo_fixture: \".\"",
+  "repo_fixture: \"evals\"",
+  "repo_fixture: \"fixtures/adversarial\"",
+  "fixtures/runtime-debug",
+  "fixtures/sample-project",
+  "allowedRepoFixtureRoots",
+  "allowedRepoFixturePrefixes",
+  "HARNESS-L032",
+  "hidden_check_files target collision",
+  "fs.existsSync(target)",
+  "HARNESS-L033",
+  "redactReportString",
+  "[redacted]",
+  "FAKE_TOKEN=example-token-do-not-use",
+  "BEGIN PRIVATE KEY",
   "adapter did not return explicit success",
   "--validate",
   "--self-test",
@@ -912,6 +942,7 @@ for (const needle of [
   assertIncludes(liveEvalScript, needle, "scripts/evaluate-live.mjs");
 }
 assertNotIncludes(liveEvalScript, "setup_source", "scripts/evaluate-live.mjs", "HARNESS-S058", "Keep live-eval validation aligned with the implemented repo_fixture runner.");
+assertNotIncludes(liveEvalScript, "fake live success", "scripts/evaluate-live.mjs", "HARNESS-S058", "Do not add fake live success support to the live-eval runner.");
 
 const runtimeVerifier = read("scripts/verify-runtime.mjs");
 for (const needle of ["task.*", "`task.${agent}`", "\"general\"", "HARNESS-R017", "HARNESS-R018"]) {
@@ -931,6 +962,12 @@ assertIncludes(liveEvalReadme, "Adapters must return explicit success", "evals/R
 assertIncludes(liveEvalReadme, "separate isolated repo copies", "evals/README.md", "HARNESS-S061", "Live-eval README should document baseline/harness isolation.");
 assertIncludes(liveEvalReadme, "command status/exit metadata and an allowlisted adapter", "evals/README.md", "HARNESS-S061", "Live-eval README should document report sanitization.");
 assertIncludes(liveEvalReadme, "raw command stdout/stderr", "evals/README.md", "HARNESS-S061", "Live-eval README should document command output sanitization.");
+assertIncludes(liveEvalReadme, "relative allowlisted project fixture", "evals/README.md", "HARNESS-S061", "Live-eval README should document narrow fixture scope.");
+assertIncludes(liveEvalReadme, "must not point at the repository root", "evals/README.md", "HARNESS-S061", "Live-eval README should document unsafe fixture scopes.");
+assertIncludes(liveEvalReadme, "trace/report directories", "evals/README.md", "HARNESS-S061", "Live-eval README should document runner-owned directory exclusions.");
+assertIncludes(liveEvalReadme, "staged only into absent target paths", "evals/README.md", "HARNESS-S061", "Live-eval README should document hidden check target collision prevention.");
+assertIncludes(liveEvalReadme, "redacted summary", "evals/README.md", "HARNESS-S061", "Live-eval README should document adapter report redaction.");
+assertIncludes(liveEvalReadme, "transcripts, prompts", "evals/README.md", "HARNESS-S061", "Live-eval README should document transcript and prompt exclusion.");
 assertNotIncludes(liveEvalReadme, "setup source", "evals/README.md", "HARNESS-S061", "Do not document setup source until the runner supports it.");
 
 const liveEvalSchema = read("evals/scenario.schema.json");

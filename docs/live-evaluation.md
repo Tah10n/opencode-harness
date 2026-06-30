@@ -44,8 +44,8 @@ AbortSignal as `context.signal` for cooperative cancellation.
 `npm run eval:live` exits nonzero when setup, visible, hidden, or adapter
 success checks fail or time out. It still writes the latest report when a live
 run produces evidence. Reports store command status/exit metadata and an
-allowlisted adapter summary, not raw command stdout/stderr, transcripts, or
-arbitrary adapter fields.
+allowlisted, redacted adapter summary, not raw command stdout/stderr,
+transcripts, prompts, completions, secrets, or arbitrary adapter fields.
 
 ## A/B Protocol
 
@@ -57,7 +57,8 @@ Live A/B evaluation should:
 - support multiple repetitions;
 - hide `hidden_checks`, `hidden_check_files`, and unsupported manifest fields
   from the agent;
-- copy `hidden_check_files` into the profile repo only after adapter execution;
+- copy `hidden_check_files` into the profile repo only after adapter execution
+  and only into absent target paths;
 - run visible and hidden checks after the agent finishes;
 - collect task success, hidden-test pass rate, introduced regressions,
   unresolved defects, build/typecheck/lint results, patch size, duration,
@@ -89,8 +90,14 @@ Required fields:
 
 Unsupported fields are rejected. Add a new field only after updating the schema,
 runner validator, adapter public-field allowlist, and self-tests together.
+`repo_fixture` must be a relative allowlisted project fixture. The current
+allowlist is `fixtures/sample-project`; future project fixtures should live
+under `fixtures/live/<name>`. It must not point at the repository root, eval
+runner directories, trace/report directories, `.git`, `node_modules`,
+adversarial fixtures, runtime-debug fixtures, or hidden-check directories.
 `hidden_check_files` sources must be checked in outside `repo_fixture`; targets
-must stay inside the isolated repo copy.
+must stay inside the isolated repo copy, must be absent before staging, and
+must not overwrite or merge with existing repository files.
 
 ## Relationship To Other Checks
 

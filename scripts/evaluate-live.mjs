@@ -38,6 +38,23 @@ const adapterReportFields = [
   "cost",
   "metrics",
 ];
+const allowedRepoFixtureRoots = new Set(["fixtures/sample-project"]);
+const allowedRepoFixturePrefixes = ["fixtures/live/"];
+const secretAssignmentPattern = /\b[A-Za-z0-9_]*(?:API_KEY|TOKEN|SECRET|PRIVATE_KEY|PASSWORD)[A-Za-z0-9_]*\s*=\s*[^\s"'`]+/i;
+const sensitiveReportStringPatterns = [
+  /\bapi[_\s-]?key\b/i,
+  /\btoken\b/i,
+  /\bsecret\b/i,
+  /\bcredential\b/i,
+  /\bprivate[_\s-]?key\b/i,
+  /BEGIN (?:RSA |OPENSSH |)?PRIVATE KEY/i,
+  /\btranscript\b/i,
+  /\braw[-\s]?log\b/i,
+  /\bstdout\b/i,
+  /\bstderr\b/i,
+  /\bprompt\b/i,
+  /\bcompletion\b/i,
+];
 
 class AdapterTimeoutError extends Error {
   constructor(timeout) {
@@ -96,7 +113,35 @@ function isInsideRoot(targetPath) {
   return isInside(root, targetPath);
 }
 
+function relativeToRoot(targetPath) {
+  return path.relative(root, targetPath).replaceAll("\\", "/");
+}
+
+function repoFixtureScopeError(repoFixture) {
+  if (!isNonEmptyString(repoFixture)) {
+    return "repo_fixture must be a non-empty allowlisted project fixture path";
+  }
+  if (path.isAbsolute(repoFixture)) {
+    return "repo_fixture must be a relative checked-in project fixture path";
+  }
+  const fixturePath = path.resolve(root, repoFixture);
+  if (!isInsideRoot(fixturePath)) {
+    return "repo_fixture must resolve inside the repository root";
+  }
+  const relativePath = relativeToRoot(fixturePath);
+  if (relativePath === "" || relativePath === ".") {
+    return "repo_fixture must not point at the repository root";
+  }
+  if (allowedRepoFixtureRoots.has(relativePath) || allowedRepoFixturePrefixes.some((prefix) => relativePath.startsWith(prefix))) {
+    return null;
+  }
+  return "repo_fixture must point to an allowlisted project fixture such as fixtures/sample-project or fixtures/live/<name>";
+}
+
 function resolveRepoFixturePath(repoFixture) {
+  if (repoFixtureScopeError(repoFixture)) {
+    return null;
+  }
   const fixturePath = path.resolve(root, repoFixture);
   return isInsideRoot(fixturePath) ? fixturePath : null;
 }
@@ -216,12 +261,20 @@ function isSensitiveReportKey(key) {
   return /transcript|stdout|stderr|prompt|completion|message|raw|secret|path|log/i.test(key);
 }
 
+function redactReportString(value) {
+  const truncated = value.slice(0, 1000);
+  if (secretAssignmentPattern.test(truncated) || sensitiveReportStringPatterns.some((pattern) => pattern.test(truncated))) {
+    return "[redacted]";
+  }
+  return truncated;
+}
+
 function sanitizeReportValue(value, depth = 0) {
   if (value === null || typeof value === "number" || typeof value === "boolean") {
     return value;
   }
   if (typeof value === "string") {
-    return value.slice(0, 1000);
+    return redactReportString(value);
   }
   if (Array.isArray(value)) {
     return value
@@ -309,6 +362,27 @@ async function runSelfTests() {
       fail("HARNESS-L015", `live-eval path boundary self-test accepted an escaped path: ${candidate}`, "Reject sibling or parent paths even when their string prefix matches the repository root.");
     }
   }
+  const unsafeRepoFixtureSelfTests = [
+    { repo_fixture: "" },
+    { repo_fixture: "." },
+    { repo_fixture: "evals" },
+    { repo_fixture: "traces" },
+    { repo_fixture: ".git" },
+    { repo_fixture: "node_modules" },
+    { repo_fixture: "fixtures/adversarial" },
+    { repo_fixture: "fixtures/runtime-debug" },
+    { repo_fixture: "evals/hidden" },
+  ];
+  for (const candidate of unsafeRepoFixtureSelfTests) {
+    if (!repoFixtureScopeError(candidate.repo_fixture)) {
+      fail("HARNESS-L031", `unsafe repo_fixture scope self-test accepted repo_fixture: "${candidate.repo_fixture}"`, "Allow only narrow checked-in project fixtures.");
+    }
+  }
+  for (const candidate of ["fixtures/sample-project", "fixtures/live/project-a"]) {
+    if (repoFixtureScopeError(candidate)) {
+      fail("HARNESS-L031", `unsafe repo_fixture scope self-test rejected repo_fixture: "${candidate}"`, "Keep allowlisted project fixtures usable.");
+    }
+  }
 
   const publicScenario = publicScenarioForAdapter(selfTestScenario({ hidden_notes: "runner-only note" }));
   if ("hidden_checks" in publicScenario || "hidden_check_files" in publicScenario || "hidden_notes" in publicScenario) {
@@ -383,6 +457,35 @@ async function runSelfTests() {
   } finally {
     fs.rmSync(tempRepo, { recursive: true, force: true });
   }
+  const collisionRepo = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-live-hidden-collision-"));
+  try {
+    fs.cpSync(path.join(root, "fixtures", "sample-project"), collisionRepo, { recursive: true });
+    fs.writeFileSync(path.join(collisionRepo, "hidden.test.js"), "already exists\n", "utf8");
+    try {
+      stageHiddenCheckFiles(selfTestScenario(), collisionRepo);
+      fail("HARNESS-L032", "hidden_check_files target collision self-test overwrote hidden.test.js", "Hidden check staging must fail when the target path already exists.");
+    } catch (error) {
+      if (!(error instanceof Error) || !error.message.includes("HARNESS-L032")) {
+        fail("HARNESS-L032", `hidden_check_files target collision self-test returned wrong error: ${error.message}`, "Use a stable hidden target collision error.");
+      }
+    }
+  } finally {
+    fs.rmSync(collisionRepo, { recursive: true, force: true });
+  }
+  const repoFileCollisionRepo = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-live-hidden-repo-file-collision-"));
+  try {
+    fs.cpSync(path.join(root, "fixtures", "sample-project"), repoFileCollisionRepo, { recursive: true });
+    try {
+      stageHiddenCheckFiles(selfTestScenario({ hidden_check_files: [{ source: "evals/hidden/runner-self-test/hidden.test.js", target: "README.md" }] }), repoFileCollisionRepo);
+      fail("HARNESS-L032", "hidden_check_files target collision self-test overwrote README.md", "Hidden check staging must not overwrite normal repo files.");
+    } catch (error) {
+      if (!(error instanceof Error) || !error.message.includes("HARNESS-L032")) {
+        fail("HARNESS-L032", `hidden_check_files repo file collision self-test returned wrong error: ${error.message}`, "Use a stable hidden target collision error.");
+      }
+    }
+  } finally {
+    fs.rmSync(repoFileCollisionRepo, { recursive: true, force: true });
+  }
 
   const adapterReport = adapterReportSummary({
     passed: true,
@@ -392,6 +495,14 @@ async function runSelfTests() {
   });
   if ("transcript" in adapterReport || "stdout" in adapterReport || "hidden" in adapterReport || adapterReport.metrics?.transcript || adapterReport.summary !== "safe") {
     fail("HARNESS-L025", "live-eval adapter report self-test persisted unsafe adapter fields", "Persist only allowlisted adapter report summary fields.");
+  }
+  const tokenReport = adapterReportSummary({ passed: true, summary: "FAKE_TOKEN=example-token-do-not-use" });
+  if (tokenReport.summary !== "[redacted]" || JSON.stringify(tokenReport).includes("example-token-do-not-use")) {
+    fail("HARNESS-L033", "live-eval adapter report redaction self-test persisted token-like summary content", "Redact secret-like strings in allowlisted adapter report fields.");
+  }
+  const privateKeyReport = adapterReportSummary({ passed: true, report: { summary: "BEGIN PRIVATE KEY fake" } });
+  if (privateKeyReport.summary !== "[redacted]" || JSON.stringify(privateKeyReport).includes("BEGIN PRIVATE KEY")) {
+    fail("HARNESS-L033", "live-eval adapter report redaction self-test persisted private key marker", "Redact private-key markers in allowlisted adapter report fields.");
   }
   if (adapterErrorSummary("secret path C:/tmp/raw.log", false) !== "adapter failed" || adapterErrorSummary("adapter timed out after 5ms", true) !== "adapter timed out") {
     fail("HARNESS-L025", "live-eval adapter error self-test persisted raw adapter error text", "Persist adapter error classification instead of raw exception text.");
@@ -453,9 +564,14 @@ function validateScenario(scenario, file) {
   if (scenario.repo_fixture) {
     assertString(scenario.repo_fixture, `${label}.repo_fixture`);
     if (isNonEmptyString(scenario.repo_fixture)) {
-      const fixturePath = resolveRepoFixturePath(scenario.repo_fixture);
-      if (!fixturePath || !fs.existsSync(fixturePath)) {
-        fail("HARNESS-L007", `${label}.repo_fixture does not resolve inside the repository: ${scenario.repo_fixture}`, "Use a checked-in fixture path.");
+      const fixtureScopeError = repoFixtureScopeError(scenario.repo_fixture);
+      if (fixtureScopeError) {
+        fail("HARNESS-L031", `${label}.repo_fixture has unsafe scope: ${scenario.repo_fixture} (${fixtureScopeError})`, "Use an allowlisted project fixture such as fixtures/sample-project or fixtures/live/<name>.");
+      } else {
+        const fixturePath = resolveRepoFixturePath(scenario.repo_fixture);
+        if (!fixturePath || !fs.existsSync(fixturePath)) {
+          fail("HARNESS-L007", `${label}.repo_fixture does not resolve inside the repository: ${scenario.repo_fixture}`, "Use a checked-in fixture path.");
+        }
       }
     }
   }
@@ -543,7 +659,7 @@ function prepareFixture(scenario, profileRole) {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), `opencode-live-eval-${scenario.id}-${profileRole}-`));
   const source = resolveRepoFixturePath(scenario.repo_fixture);
   if (!source) {
-    throw new Error(`repo_fixture escapes repository root: ${scenario.repo_fixture}`);
+    throw new Error(`HARNESS-L031 unsafe repo_fixture scope: ${scenario.repo_fixture} (${repoFixtureScopeError(scenario.repo_fixture)})`);
   }
   const target = path.join(tmp, "repo");
   fs.cpSync(source, target, { recursive: true });
@@ -557,6 +673,9 @@ function stageHiddenCheckFiles(scenario, repo) {
       throw new Error(`hidden_check_files source is missing: ${entry.source}`);
     }
     const target = resolveRepoTarget(repo, entry.target);
+    if (fs.existsSync(target)) {
+      throw new Error(`HARNESS-L032 hidden_check_files target collision: ${entry.target}`);
+    }
     fs.mkdirSync(path.dirname(target), { recursive: true });
     fs.cpSync(source, target, { recursive: true });
   }
