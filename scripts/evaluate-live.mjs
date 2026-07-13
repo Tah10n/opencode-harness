@@ -1,865 +1,1714 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { spawnSync } from "node:child_process";
+import { randomUUID } from "node:crypto";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import {
+  ContractError,
+  EVIDENCE_PRODUCERS,
+  RISK_LEVELS,
+  assertSafeId,
+  fingerprint,
+  stableCheckId,
+} from "../lib/feedback/contracts.mjs";
+import {
+  assertConfinedExistingPath,
+  assertConfinedTree,
+  assertNoSymlinkEscape,
+  ensureConfinedDirectory,
+  isInside,
+} from "../lib/feedback/files.mjs";
+import { assertPersistenceSafe, sanitizeBoundedString } from "../lib/feedback/privacy.mjs";
+import { createAdapterInstrumentation, createTraceStore } from "../lib/feedback/index.mjs";
+import {
+  loadScenarioCorpus,
+  publicScenarioForAdapter,
+  selectScenarios,
+} from "../lib/feedback/manifests.mjs";
+import { evaluateTraceAssertions } from "../lib/feedback/trace-assertions.mjs";
+import { createReportHistory } from "../lib/feedback/report-history.mjs";
+import {
+  AdapterExecutionError,
+  AdapterTimeoutError,
+  runAdapterModule,
+} from "../lib/feedback/adapter-worker.mjs";
+import { validateLiveReport, validatePermissionSnapshot } from "../lib/feedback/acceptance.mjs";
+import {
+  captureOrdinaryTreeManifest,
+  changedOrdinaryTreePaths,
+  materializeRepositorySnapshot,
+  recoverMaterializedRepositorySnapshot,
+  repositoryStateFingerprint,
+} from "../lib/feedback/evidence.mjs";
+import {
+  ProcessTreeTeardownError,
+  runManagedCommand,
+} from "../lib/feedback/process-tree.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const scenarioDir = path.join(root, "evals", "scenarios");
 const reportDir = path.join(root, "evals", "reports");
-const validateOnly = process.argv.includes("--validate");
-const selfTestOnly = process.argv.includes("--self-test");
-const failures = [];
-const publicScenarioFields = [
-  "id",
-  "description",
-  "risk_tags",
-  "repo_fixture",
-  "task",
-  "setup_commands",
-  "visible_checks",
-  "timeout",
-  "repetitions",
-  "expected_contracts",
-  "forbidden_regressions",
-];
-const scenarioFields = new Set([...publicScenarioFields, "hidden_checks", "hidden_check_files"]);
-const hiddenCheckFileFields = new Set(["source", "target"]);
-const adapterReportFields = [
-  "status",
-  "passed",
-  "ok",
-  "success",
-  "exitCode",
-  "summary",
-  "model",
-  "durationMs",
-  "tokens",
-  "cost",
-  "metrics",
-];
-const allowedRepoFixtureRoots = new Set(["fixtures/sample-project"]);
-const allowedRepoFixturePrefixes = ["fixtures/live/"];
-const secretAssignmentPattern = /\b[A-Za-z0-9_]*(?:API_KEY|TOKEN|SECRET|PRIVATE_KEY|PASSWORD)[A-Za-z0-9_]*\s*=\s*[^\s"'`]+/i;
-const sensitiveReportStringPatterns = [
-  /\bapi[_\s-]?key\b/i,
-  /\btoken\b/i,
-  /\bsecret\b/i,
-  /\bcredential\b/i,
-  /\bprivate[_\s-]?key\b/i,
-  /BEGIN (?:RSA |OPENSSH |)?PRIVATE KEY/i,
-  /\btranscript\b/i,
-  /\braw[-\s]?log\b/i,
-  /\bstdout\b/i,
-  /\bstderr\b/i,
-  /\bprompt\b/i,
-  /\bcompletion\b/i,
-];
+const TASK_ID = "task-root";
+const RUNNER_AGENT = "live-eval-runner";
+const REQUIRED_RUNNER_PHASES = Object.freeze([
+  "task_start",
+  "fixture_preparation",
+  "setup_verification",
+  "adapter_invocation",
+  "adapter_result",
+  "visible_check",
+  "hidden_staging",
+  "hidden_check",
+  "verification",
+  "task_end",
+]);
 
-class AdapterTimeoutError extends Error {
-  constructor(timeout) {
-    super(`adapter timed out after ${timeout}ms`);
-    this.name = "AdapterTimeoutError";
-  }
-}
-
-function fail(code, message, fix) {
-  failures.push({ code, message, fix });
-}
-
-function readJson(file) {
-  try {
-    return JSON.parse(fs.readFileSync(file, "utf8").replace(/^\uFEFF/, ""));
-  } catch (error) {
-    fail("HARNESS-L001", `${path.relative(root, file)} is not valid JSON: ${error.message}`, "Fix the manifest JSON.");
-    return null;
-  }
-}
-
-function listScenarioFiles() {
-  if (!fs.existsSync(scenarioDir)) {
-    fail("HARNESS-L002", "evals/scenarios is missing", "Restore the live-evaluation scenario directory.");
-    return [];
-  }
-  return fs
-    .readdirSync(scenarioDir)
-    .filter((name) => name.endsWith(".json"))
-    .map((name) => path.join(scenarioDir, name))
-    .sort();
-}
-
-function assertString(value, label) {
-  if (typeof value !== "string" || value.trim() === "") {
-    fail("HARNESS-L003", `${label} must be a non-empty string`, "Fill in the required scenario field.");
-  }
-}
-
-function isNonEmptyString(value) {
-  return typeof value === "string" && value.trim() !== "";
-}
-
-function assertStringArray(value, label, { min = 0 } = {}) {
-  if (!Array.isArray(value) || value.length < min || value.some((item) => typeof item !== "string" || item.trim() === "")) {
-    fail("HARNESS-L004", `${label} must be an array of non-empty strings`, "Use explicit command or contract strings.");
-  }
-}
-
-function isInside(basePath, targetPath) {
-  const relative = path.relative(basePath, targetPath);
-  return relative === "" || (!relative.startsWith("..") && !path.isAbsolute(relative));
-}
-
-function isInsideRoot(targetPath) {
-  return isInside(root, targetPath);
-}
-
-function relativeToRoot(targetPath) {
-  return path.relative(root, targetPath).replaceAll("\\", "/");
-}
-
-function repoFixtureScopeError(repoFixture) {
-  if (!isNonEmptyString(repoFixture)) {
-    return "repo_fixture must be a non-empty allowlisted project fixture path";
-  }
-  if (path.isAbsolute(repoFixture)) {
-    return "repo_fixture must be a relative checked-in project fixture path";
-  }
-  const fixturePath = path.resolve(root, repoFixture);
-  if (!isInsideRoot(fixturePath)) {
-    return "repo_fixture must resolve inside the repository root";
-  }
-  const relativePath = relativeToRoot(fixturePath);
-  if (relativePath === "" || relativePath === ".") {
-    return "repo_fixture must not point at the repository root";
-  }
-  if (allowedRepoFixtureRoots.has(relativePath) || allowedRepoFixturePrefixes.some((prefix) => relativePath.startsWith(prefix))) {
-    return null;
-  }
-  return "repo_fixture must point to an allowlisted project fixture such as fixtures/sample-project or fixtures/live/<name>";
-}
-
-function resolveRepoFixturePath(repoFixture) {
-  if (repoFixtureScopeError(repoFixture)) {
-    return null;
-  }
-  const fixturePath = path.resolve(root, repoFixture);
-  return isInsideRoot(fixturePath) ? fixturePath : null;
-}
-
-function resolveRootPath(relativePath) {
-  const resolved = path.resolve(root, relativePath);
-  return isInsideRoot(resolved) ? resolved : null;
-}
-
-function isSafeRelativeTarget(value) {
-  if (!isNonEmptyString(value) || path.isAbsolute(value)) {
-    return false;
-  }
-  const segments = value.split(/[\\/]+/).filter(Boolean);
-  return segments.length > 0 && !segments.includes("..") && !segments.includes(".");
-}
-
-function resolveRepoTarget(repo, target) {
-  if (!isSafeRelativeTarget(target)) {
-    throw new Error(`hidden_check_files target must be a relative path inside the repo: ${target}`);
-  }
-  const resolved = path.resolve(repo, target);
-  if (!isInside(repo, resolved)) {
-    throw new Error(`hidden_check_files target escapes repo: ${target}`);
-  }
-  return resolved;
-}
-
-function publicScenarioForAdapter(scenario) {
-  const publicScenario = {};
-  for (const field of publicScenarioFields) {
-    if (Object.hasOwn(scenario, field)) {
-      publicScenario[field] = scenario[field];
+function parseArgs(argv) {
+  const result = { validate: false, selfTest: false, bufferedSelfTest: false, suite: null, scenarioIds: [] };
+  for (let index = 0; index < argv.length; index += 1) {
+    const argument = argv[index];
+    if (argument === "--validate") result.validate = true;
+    else if (argument === "--self-test") result.selfTest = true;
+    else if (argument === "--self-test-buffered") result.bufferedSelfTest = true;
+    else if (argument === "--suite") {
+      const value = argv[++index];
+      if (!value || value.startsWith("--")) throw new ContractError("LIVE_CLI", "--suite requires a suite name");
+      result.suite = value;
+    } else if (argument === "--scenario") {
+      const value = argv[++index];
+      if (!value || value.startsWith("--")) throw new ContractError("LIVE_CLI", "--scenario requires a scenario ID");
+      result.scenarioIds.push(value);
+    } else {
+      throw new ContractError("LIVE_CLI", `unsupported live-eval argument: ${argument}`);
     }
   }
-  return publicScenario;
-}
-
-function unsupportedScenarioFields(scenario) {
-  return Object.keys(scenario).filter((field) => !scenarioFields.has(field));
-}
-
-function commandResultsFailed(results) {
-  return results.some((result) => result.status !== "passed");
-}
-
-function passRate(results) {
-  if (results.length === 0) {
-    return 1;
+  if ([result.validate, result.selfTest, result.bufferedSelfTest].filter(Boolean).length > 1) {
+    throw new ContractError("LIVE_CLI", "--validate, --self-test, and --self-test-buffered are mutually exclusive");
   }
-  return results.filter((result) => result.status === "passed").length / results.length;
+  if ((result.selfTest || result.bufferedSelfTest) && (result.suite !== null || result.scenarioIds.length > 0)) {
+    throw new ContractError("LIVE_CLI", "self-tests always run only the infrastructure suite");
+  }
+  return result;
 }
 
-function commandReportSummary(result) {
+function riskForScenario(scenario) {
+  return scenario.risk_tags.find((tag) => RISK_LEVELS.includes(tag)) ?? "standard";
+}
+
+function readPermissionEvidence(filePath, profile, role) {
+  if (typeof filePath !== "string" || filePath.trim() === "") {
+    throw new ContractError("LIVE_PERMISSION_EVIDENCE_REQUIRED", `${role} permission evidence is required`);
+  }
+  const resolved = path.resolve(filePath);
+  let snapshot;
+  try {
+    const stat = fs.lstatSync(resolved);
+    if (!stat.isFile() || stat.isSymbolicLink()) throw new Error("not an ordinary file");
+    snapshot = JSON.parse(fs.readFileSync(resolved, "utf8").replace(/^\uFEFF/, ""));
+    validatePermissionSnapshot(snapshot);
+  } catch (error) {
+    if (error instanceof ContractError) throw error;
+    throw new ContractError("LIVE_PERMISSION_EVIDENCE_INVALID", `${role} permission evidence is not a valid ordinary snapshot`);
+  }
+  if (snapshot.source !== "installed_runtime" || !snapshot.complete || snapshot.incomplete_scopes.length !== 0) {
+    throw new ContractError("LIVE_PERMISSION_EVIDENCE_INCOMPLETE", `${role} permission evidence must be a complete installed_runtime snapshot`);
+  }
+  if (snapshot.profile_id !== profile) {
+    throw new ContractError("LIVE_PERMISSION_PROFILE_MISMATCH", `${role} permission evidence profile_id does not match the selected profile`);
+  }
+  return snapshot;
+}
+
+function profileRuns(env = process.env, repositoryFingerprint = null) {
+  const profiles = [
+    {
+      profile_role: "baseline",
+      profile: env.OPENCODE_BASELINE_PROFILE,
+      evidence_path: env.OPENCODE_BASELINE_PERMISSION_EVIDENCE,
+    },
+    {
+      profile_role: "candidate",
+      profile: env.OPENCODE_HARNESS_PROFILE,
+      evidence_path: env.OPENCODE_HARNESS_PERMISSION_EVIDENCE,
+    },
+  ];
+  for (const entry of profiles) {
+    if (typeof entry.profile !== "string" || entry.profile.trim() === "") {
+      throw new ContractError("LIVE_PROFILE_REQUIRED", `${entry.profile_role} profile is unavailable; set OPENCODE_BASELINE_PROFILE and OPENCODE_HARNESS_PROFILE`);
+    }
+    const evidence = readPermissionEvidence(entry.evidence_path, entry.profile, entry.profile_role);
+    entry.permission_subject_fingerprint = evidence.subject_fingerprint;
+    entry.profile_fingerprint = evidence.profile_fingerprint;
+    delete entry.evidence_path;
+  }
+  const currentRepositoryFingerprint = repositoryFingerprint ?? repositoryStateFingerprint(root);
+  const candidate = profiles.find((entry) => entry.profile_role === "candidate");
+  if (candidate.permission_subject_fingerprint !== currentRepositoryFingerprint) {
+    throw new ContractError("LIVE_CANDIDATE_SUBJECT_MISMATCH", "candidate permission evidence does not attest the current repository state");
+  }
+  for (const entry of profiles) {
+    entry.repository_fingerprint = currentRepositoryFingerprint;
+    delete entry.permission_subject_fingerprint;
+  }
+  return profiles;
+}
+
+function adapterUrlFromEnvironment(env = process.env) {
+  const configured = env.OPENCODE_LIVE_EVAL_ADAPTER;
+  if (typeof configured !== "string" || configured.trim() === "") {
+    throw new ContractError("LIVE_ADAPTER_REQUIRED", "OPENCODE_LIVE_EVAL_ADAPTER is required for actual live evaluation");
+  }
+  const resolved = path.resolve(configured);
+  if (!fs.existsSync(resolved) || !fs.statSync(resolved).isFile()) {
+    throw new ContractError("LIVE_ADAPTER_MISSING", "configured live-evaluation adapter does not exist");
+  }
+  return pathToFileURL(resolved).href;
+}
+
+function prepareFixture(scenario, profileRole, sourceRoot = root) {
+  const resolvedSourceRoot = path.resolve(sourceRoot);
+  const source = path.resolve(resolvedSourceRoot, scenario.repo_fixture);
+  if (!isInside(resolvedSourceRoot, source)) {
+    throw new ContractError("LIVE_FIXTURE", `validated fixture is unavailable for ${scenario.id}`);
+  }
+  try {
+    assertConfinedTree(resolvedSourceRoot, source);
+  } catch {
+    throw new ContractError("LIVE_FIXTURE", `validated fixture is not a physically confined ordinary tree for ${scenario.id}`);
+  }
+  const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), `opencode-live-${scenario.id}-${profileRole}-`));
+  const repo = path.join(temporaryRoot, "repo");
+  try {
+    fs.cpSync(source, repo, { recursive: true, errorOnExist: true });
+    assertConfinedTree(temporaryRoot, repo);
+    return { temporaryRoot, repo };
+  } catch (error) {
+    fs.rmSync(temporaryRoot, { recursive: true, force: true });
+    throw error;
+  }
+}
+
+function lstatExists(targetPath) {
+  try {
+    fs.lstatSync(targetPath);
+    return true;
+  } catch (error) {
+    if (error?.code === "ENOENT") return false;
+    throw error;
+  }
+}
+
+function stageHiddenFiles(scenario, repo, sourceRoot = root) {
+  const resolvedSourceRoot = path.resolve(sourceRoot);
+  for (const entry of scenario.hidden_check_files) {
+    const source = path.resolve(resolvedSourceRoot, entry.source);
+    const target = path.resolve(repo, entry.target);
+    if (!isInside(resolvedSourceRoot, source) || !isInside(repo, target)) {
+      throw new ContractError("LIVE_HIDDEN_PATH", `hidden file path is invalid for ${scenario.id}`);
+    }
+    assertConfinedExistingPath(resolvedSourceRoot, source, { type: "file" });
+    if (lstatExists(target)) {
+      throw new ContractError("LIVE_HIDDEN_COLLISION", `hidden target already exists for ${scenario.id}`);
+    }
+    assertNoSymlinkEscape(repo, target);
+    ensureConfinedDirectory(repo, path.dirname(target));
+    assertNoSymlinkEscape(repo, target);
+    assertConfinedExistingPath(resolvedSourceRoot, source, { type: "file" });
+    if (lstatExists(target)) {
+      throw new ContractError("LIVE_HIDDEN_COLLISION", `hidden target already exists for ${scenario.id}`);
+    }
+    fs.copyFileSync(source, target, fs.constants.COPYFILE_EXCL);
+    assertConfinedExistingPath(repo, target, { type: "file" });
+  }
+}
+
+async function runCommand(command, cwd, timeout, checkId) {
+  const result = await runManagedCommand({
+    file: process.platform === "win32" ? (process.env.ComSpec || "cmd.exe") : "/bin/sh",
+    args: process.platform === "win32" ? ["/d", "/s", "/c", command] : ["-c", command],
+    cwd,
+    timeout,
+    maxOutputChars: 1024 * 1024,
+  });
+  const status = result.timed_out ? "timed_out" : result.status === 0 && !result.error ? "passed" : "failed";
   return {
-    command: result.command,
-    status: result.status,
-    exitCode: result.exitCode,
-    stdoutChars: (result.stdout || "").length,
-    stderrChars: (result.stderr || "").length,
+    check_id: checkId,
+    status,
+    exit_code: Number.isInteger(result.status) ? result.status : null,
+    stdout_chars: result.stdout_chars,
+    stderr_chars: result.stderr_chars,
   };
 }
 
-function commandReportSummaries(results) {
-  return results.map((result) => commandReportSummary(result));
+function unavailableChecks(scenario, phase, commands) {
+  return commands.map((_, index) => ({
+    check_id: stableCheckId(scenario.id, phase, index),
+    status: "unavailable",
+    exit_code: null,
+    stdout_chars: 0,
+    stderr_chars: 0,
+  }));
 }
 
-function recordCommandFailures(scenarioId, repetition, profileRole, phase, results) {
-  for (const result of results) {
-    if (result.status !== "passed") {
-      fail(
-        "HARNESS-L016",
-        `${scenarioId} repetition ${repetition} ${profileRole} ${phase} command failed: ${result.command} (${result.status})`,
-        "Fix the scenario, adapter output, or changed repository state so required checks pass.",
-      );
-    }
+async function executeChecks(scenario, phase, commands, repo) {
+  const results = [];
+  for (let index = 0; index < commands.length; index += 1) {
+    results.push(await runCommand(commands[index], repo, scenario.timeout, stableCheckId(scenario.id, phase, index)));
   }
+  return results;
 }
 
-function adapterFailureReason(adapterResult) {
-  if (adapterResult === true) {
-    return null;
-  }
-  if (adapterResult === false) {
-    return "adapter returned false";
-  }
-  if (!adapterResult || typeof adapterResult !== "object") {
-    return `adapter returned non-object result: ${adapterResult}`;
-  }
-  for (const field of ["passed", "ok", "success"]) {
-    if (adapterResult[field] === false) {
-      return `adapter returned ${field}: false`;
-    }
-  }
-  const status = typeof adapterResult.status === "string" ? adapterResult.status.toLowerCase() : "";
-  if (["failed", "fail", "timed out", "timeout", "error"].includes(status)) {
-    return `adapter returned status: ${adapterResult.status}`;
-  }
-  if (Number.isInteger(adapterResult.exitCode) && adapterResult.exitCode !== 0) {
-    return `adapter returned exitCode: ${adapterResult.exitCode}`;
-  }
-  if (["passed", "pass", "success", "succeeded", "ok"].includes(status)) {
-    return null;
-  }
-  for (const field of ["passed", "ok", "success"]) {
-    if (adapterResult[field] === true) {
-      return null;
-    }
-  }
-  if (adapterResult.exitCode === 0) {
-    return null;
-  }
-  return "adapter did not return explicit success";
+function passRate(results) {
+  if (results.length === 0) return 1;
+  return results.filter((result) => result.status === "passed").length / results.length;
 }
 
-function isSensitiveReportKey(key) {
-  return /transcript|stdout|stderr|prompt|completion|message|raw|secret|path|log/i.test(key);
+function phaseStatus(results) {
+  if (results.some((result) => result.status === "unavailable")) return "incomplete";
+  return results.every((result) => result.status === "passed") ? "passed" : "failed";
 }
 
-function redactReportString(value) {
-  const truncated = value.slice(0, 1000);
-  if (secretAssignmentPattern.test(truncated) || sensitiveReportStringPatterns.some((pattern) => pattern.test(truncated))) {
-    return "[redacted]";
-  }
-  return truncated;
+function traceStatus(verificationStatus) {
+  if (verificationStatus === "passed") return "completed";
+  if (verificationStatus === "incomplete") return "blocked";
+  return "failed";
 }
 
-function sanitizeReportValue(value, depth = 0) {
-  if (value === null || typeof value === "number" || typeof value === "boolean") {
-    return value;
+function eventVerification(status, summary, verifierCodes) {
+  return { status, summary, verifier_codes: verifierCodes };
+}
+
+function appendRunnerEvent(store, runId, risk, input) {
+  return store.appendEvent(runId, {
+    task_id: TASK_ID,
+    parent_task_id: null,
+    agent: RUNNER_AGENT,
+    event_type: input.event_type,
+    summary: input.summary,
+    tool_or_command: input.tool_or_command ?? null,
+    permission_decision: input.permission_decision ?? "not_applicable",
+    files_read: input.files_read ?? [],
+    files_written: input.files_written ?? [],
+    evidence_refs: input.evidence_refs ?? [],
+    verification: input.verification ?? null,
+    status: input.status ?? "completed",
+    risk,
+    termination_reason: input.termination_reason ?? null,
+    hypothesis: input.hypothesis ?? null,
+    expected_observation: input.expected_observation ?? null,
+    actual_observation: input.actual_observation ?? null,
+    context_snapshot: input.context_snapshot ?? null,
+    verifier_codes: input.verifier_codes ?? [],
+    strategy_id: input.strategy_id ?? null,
+    finding: null,
+  });
+}
+
+function denyValuesForScenarios(scenarios) {
+  return [...new Set(scenarios.flatMap((scenario) => scenario.hidden_trace_assertions
+    .filter((assertion) => assertion.op === "sanitized_value_absent")
+    .map((assertion) => assertion.value)))];
+}
+
+function containsDeniedValue(value, denyValues) {
+  return typeof value === "string" && denyValues.some((denied) => value.includes(denied));
+}
+
+function adapterFailureReason(result, expectedProfileFingerprint = null) {
+  let reason = null;
+  if (result === true) reason = null;
+  else if (result === false || !result || typeof result !== "object" || Array.isArray(result)) reason = "adapter_failed";
+  else {
+    for (const field of ["passed", "ok", "success"]) if (result[field] === false) reason = "adapter_failed";
+    if (reason === null && Number.isInteger(result.exitCode) && result.exitCode !== 0) reason = "adapter_failed";
+    const status = typeof result.status === "string" ? result.status.toLowerCase() : "";
+    if (reason === null && ["failed", "fail", "timed out", "timeout", "error"].includes(status)) reason = "adapter_failed";
+    const explicitSuccess = ["passed", "pass", "success", "succeeded", "ok"].includes(status)
+      || ["passed", "ok", "success"].some((field) => result[field] === true)
+      || result.exitCode === 0;
+    if (reason === null && !explicitSuccess) reason = "adapter_success_unavailable";
   }
-  if (typeof value === "string") {
-    return redactReportString(value);
+  if (reason === null && expectedProfileFingerprint !== null && adapterField(result, "profile_fingerprint") !== expectedProfileFingerprint) {
+    return "adapter_profile_fingerprint_mismatch";
   }
-  if (Array.isArray(value)) {
-    return value
-      .slice(0, 20)
-      .map((item) => sanitizeReportValue(item, depth + 1))
-      .filter((item) => item !== undefined);
-  }
-  if (value && typeof value === "object" && depth < 1) {
-    const sanitized = {};
-    for (const [key, nested] of Object.entries(value).slice(0, 20)) {
-      if (isSensitiveReportKey(key)) {
-        continue;
-      }
-      const safeValue = sanitizeReportValue(nested, depth + 1);
-      if (safeValue !== undefined) {
-        sanitized[key] = safeValue;
-      }
-    }
-    return sanitized;
+  return reason;
+}
+
+function adapterField(adapterResult, key) {
+  if (!adapterResult || typeof adapterResult !== "object" || Array.isArray(adapterResult)) return undefined;
+  if (Object.hasOwn(adapterResult, key)) return adapterResult[key];
+  if (adapterResult.report && typeof adapterResult.report === "object" && !Array.isArray(adapterResult.report)) {
+    return adapterResult.report[key];
   }
   return undefined;
 }
 
-function adapterReportSummary(adapterResult) {
-  if (typeof adapterResult === "boolean") {
-    return { success: adapterResult };
-  }
-  if (!adapterResult || typeof adapterResult !== "object") {
-    return { resultType: typeof adapterResult };
-  }
+function availabilityMetadata(adapterResult, key, denyValues = []) {
+  const value = adapterField(adapterResult, key);
+  if (typeof value !== "string" || value.trim() === "") return { available: false, value: null };
+  if (containsDeniedValue(value, denyValues)) return { available: false, value: null };
+  return { available: true, value: sanitizeBoundedString(value, { label: `adapter.${key}`, maxLength: 256 }).value };
+}
 
-  const summary = {};
-  const adapterReport = adapterResult.report && typeof adapterResult.report === "object" ? adapterResult.report : {};
-  for (const field of adapterReportFields) {
-    const value = Object.hasOwn(adapterResult, field) ? adapterResult[field] : adapterReport[field];
-    const safeValue = sanitizeReportValue(value);
-    if (safeValue !== undefined) {
-      summary[field] = safeValue;
+function costMetadata(adapterResult) {
+  const value = adapterField(adapterResult, "cost");
+  const currency = adapterField(adapterResult, "currency");
+  if (typeof value !== "number" || !Number.isFinite(value) || value < 0 || typeof currency !== "string" || !/^[A-Z]{3}$/.test(currency)) {
+    return { available: false, value: null, currency: null };
+  }
+  return { available: true, value, currency };
+}
+
+function traceOperationHandler(instrumentation, { denyValues = [] } = {}) {
+  return (operation, payload) => {
+    assertPersistenceSafe(payload, { label: "adapter trace payload", denyValues });
+    if (operation === "emit") return instrumentation.emit(payload);
+    if (operation === "record_context_receipt") return instrumentation.recordContextReceipt(payload);
+    if (operation === "job_create") return instrumentation.createJob(payload);
+    if (operation === "job_transition") {
+      if (!payload || typeof payload !== "object") throw new ContractError("LIVE_TRACE_JOB", "job transition payload must be an object");
+      return instrumentation.transitionJob(payload.task_id, { state: payload.state });
     }
-  }
-  return Object.keys(summary).length > 0 ? summary : { resultType: "object" };
+    if (operation === "job_complete") {
+      if (!payload || typeof payload !== "object") throw new ContractError("LIVE_TRACE_JOB", "job completion payload must be an object");
+      return instrumentation.completeJob(payload.task_id, { state: payload.state, result: payload.result });
+    }
+    throw new ContractError("LIVE_TRACE_OPERATION", `unsupported adapter trace operation: ${operation}`);
+  };
 }
 
-function adapterErrorSummary(adapterError, adapterTimedOut) {
-  if (!adapterError) {
-    return null;
-  }
-  return adapterTimedOut ? "adapter timed out" : "adapter failed";
-}
-
-function selfTestScenario(overrides = {}) {
-  return {
-    id: "self-test",
-    description: "self-test scenario",
-    risk_tags: ["self-test"],
-    repo_fixture: "fixtures/sample-project",
-    task: "visible task",
-    setup_commands: [],
-    visible_checks: ["node --test"],
-    hidden_checks: ["node --test hidden.test.js"],
-    hidden_check_files: [
-      {
-        source: "evals/hidden/runner-self-test/hidden.test.js",
-        target: "hidden.test.js",
+function cancelUnsettledAdapterJobs(traceStore, runId) {
+  const snapshot = traceStore.inspectRun(runId);
+  const unsettled = snapshot.jobs.filter((job) => ["created", "running"].includes(job.status.state));
+  for (const job of unsettled) {
+    traceStore.completeJob(runId, job.request.task_id, {
+      state: "cancelled",
+      result: {
+        status: "blocked",
+        assigned_scope: job.request.assigned_scope,
+        summary: "Runner cancelled an unsettled adapter job before final verification.",
+        evidence: [],
+        files_changed: [],
+        verification: "Runner recorded cancellation before final verification.",
+        decision_unblocked: "Final trace consistency can be evaluated.",
+        uncertainty: "The delegated job did not provide a terminal result.",
+        risks: ["Unsettled delegated work is treated as incomplete evidence."],
+        next_step: "Adapter must terminally settle every delegated job.",
+        termination_reason: "verification_failed",
       },
-    ],
-    timeout: 60000,
-    repetitions: 1,
-    expected_contracts: ["visible contract"],
-    forbidden_regressions: ["hidden regression"],
-    ...overrides,
-  };
+    });
+  }
+  return unsettled.length;
 }
 
-async function runSelfTests() {
-  const insidePath = path.join(root, "fixtures", "sample-project");
-  const escapedPrefixPath = `${root}-fixture-escape`;
-  const parentPath = path.resolve(root, "..");
+function assertionChecks(scenario, assertionResults) {
+  return assertionResults.map((result, index) => ({
+    check_id: stableCheckId(scenario.id, "trace", index),
+    status: result.status,
+    exit_code: null,
+    stdout_chars: 0,
+    stderr_chars: 0,
+  }));
+}
 
-  if (!isInsideRoot(insidePath)) {
-    fail("HARNESS-L015", "live-eval path boundary self-test rejected an in-repository path", "Keep path.relative based containment checks.");
-  }
-  for (const candidate of [escapedPrefixPath, parentPath]) {
-    if (isInsideRoot(candidate)) {
-      fail("HARNESS-L015", `live-eval path boundary self-test accepted an escaped path: ${candidate}`, "Reject sibling or parent paths even when their string prefix matches the repository root.");
-    }
-  }
-  const unsafeRepoFixtureSelfTests = [
-    { repo_fixture: "" },
-    { repo_fixture: "." },
-    { repo_fixture: "evals" },
-    { repo_fixture: "traces" },
-    { repo_fixture: ".git" },
-    { repo_fixture: "node_modules" },
-    { repo_fixture: "fixtures/adversarial" },
-    { repo_fixture: "fixtures/runtime-debug" },
-    { repo_fixture: "evals/hidden" },
-  ];
-  for (const candidate of unsafeRepoFixtureSelfTests) {
-    if (!repoFixtureScopeError(candidate.repo_fixture)) {
-      fail("HARNESS-L031", `unsafe repo_fixture scope self-test accepted repo_fixture: "${candidate.repo_fixture}"`, "Allow only narrow checked-in project fixtures.");
-    }
-  }
-  for (const candidate of ["fixtures/sample-project", "fixtures/live/project-a"]) {
-    if (repoFixtureScopeError(candidate)) {
-      fail("HARNESS-L031", `unsafe repo_fixture scope self-test rejected repo_fixture: "${candidate}"`, "Keep allowlisted project fixtures usable.");
-    }
-  }
-
-  const publicScenario = publicScenarioForAdapter(selfTestScenario({ hidden_notes: "runner-only note" }));
-  if ("hidden_checks" in publicScenario || "hidden_check_files" in publicScenario || "hidden_notes" in publicScenario) {
-    fail("HARNESS-L018", "public adapter scenario contains runner-only fields", "Expose only allowlisted public scenario fields to the adapter.");
-  }
-  if (!Array.isArray(publicScenario.visible_checks) || publicScenario.visible_checks[0] !== "node --test") {
-    fail("HARNESS-L018", "public adapter scenario dropped visible_checks", "Expose visible checks to the adapter while hiding hidden checks.");
-  }
-  const unsupportedFields = unsupportedScenarioFields(selfTestScenario({ hidden_notes: "runner-only note" }));
-  if (unsupportedFields.length !== 1 || unsupportedFields[0] !== "hidden_notes") {
-    fail("HARNESS-L021", "live-eval unsupported-field self-test did not detect hidden_notes", "Reject unsupported scenario fields before adapter execution.");
-  }
-  if (commandResultsFailed([{ status: "passed" }])) {
-    fail("HARNESS-L019", "live-eval command failure self-test misclassified passing results", "Keep command result status handling deterministic.");
-  }
-  if (!commandResultsFailed([{ status: "timed out" }]) || !commandResultsFailed([{ status: "failed" }])) {
-    fail("HARNESS-L019", "live-eval command failure self-test accepted failed results", "Treat failed and timed-out checks as failed live evaluations.");
-  }
-  const commandReport = commandReportSummary({ command: "node --test", status: "failed", exitCode: 1, stdout: "raw stdout", stderr: "raw stderr" });
-  if ("stdout" in commandReport || "stderr" in commandReport || commandReport.stdoutChars !== 10 || commandReport.stderrChars !== 10) {
-    fail("HARNESS-L025", "live-eval command report self-test persisted raw command output", "Persist command status and output sizes instead of raw stdout/stderr.");
-  }
-  for (const adapterResult of [true, { status: "passed" }, { passed: true }, { ok: true }, { success: true }, { exitCode: 0 }]) {
-    if (adapterFailureReason(adapterResult) !== null) {
-      fail("HARNESS-L020", "live-eval adapter result self-test rejected explicit success", "Keep adapter success semantics explicit.");
-    }
-  }
-  for (const adapterResult of [false, undefined, null, "passed", {}, { status: "failed" }, { passed: false }, { ok: false }, { success: false }, { exitCode: 1 }]) {
-    if (adapterFailureReason(adapterResult) === null) {
-      fail("HARNESS-L020", "live-eval adapter result self-test accepted missing or failed adapter success", "Require explicit adapter success before checks run.");
-    }
-  }
-
-  try {
-    await runAdapterWithTimeout({ runScenario: () => new Promise(() => {}) }, { timeout: 5 });
-    fail("HARNESS-L022", "live-eval adapter timeout self-test did not time out", "Enforce runner-side timeouts around adapter execution.");
-  } catch (error) {
-    if (!(error instanceof AdapterTimeoutError)) {
-      fail("HARNESS-L022", `live-eval adapter timeout self-test returned wrong error: ${error.message}`, "Timeouts should fail with AdapterTimeoutError.");
-    }
-  }
-
-  const seenRuns = [];
-  const isolatedAdapter = {
-    runScenario: async (context) => {
-      seenRuns.push(context);
-      fs.writeFileSync(path.join(context.repo, `${context.profileRole}.txt`), context.profile, "utf8");
-      return { passed: true, transcript: "must not be reported", report: { summary: `${context.profileRole} ok` } };
+function workspacePolicyCheck(scenario, beforeManifest, afterManifest) {
+  const allowedPaths = new Set(scenario.workspace_policy.mode === "allowlist"
+    ? scenario.workspace_policy.allowed_paths
+    : []);
+  const changedPaths = changedOrdinaryTreePaths(beforeManifest, afterManifest);
+  const unexpectedPaths = changedPaths.filter((relativePath) => !allowedPaths.has(relativePath));
+  return {
+    result: {
+      check_id: stableCheckId(scenario.id, "workspace", 0),
+      status: unexpectedPaths.length === 0 ? "passed" : "failed",
+      exit_code: null,
+      stdout_chars: 0,
+      stderr_chars: 0,
     },
+    changedPaths,
+    unexpectedPaths,
   };
-  const noCheckScenario = selfTestScenario({ visible_checks: [], hidden_checks: [], hidden_check_files: [], timeout: 1000 });
-  await runScenarioProfile(isolatedAdapter, noCheckScenario, 1, { profileRole: "baseline", profile: "baseline-profile" });
-  await runScenarioProfile(isolatedAdapter, noCheckScenario, 1, { profileRole: "harness", profile: "harness-profile" });
-  if (seenRuns.length !== 2 || seenRuns[0].repo === seenRuns[1].repo) {
-    fail("HARNESS-L023", "live-eval profile isolation self-test did not use separate repo copies", "Run baseline and harness profiles in separate fixture copies.");
-  }
-  if (seenRuns.some((context) => "hidden_checks" in context.scenario || "hidden_check_files" in context.scenario)) {
-    fail("HARNESS-L018", "profile adapter context exposed hidden check fields", "Keep hidden check commands and files runner-only.");
-  }
+}
 
-  const tempRepo = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-live-hidden-"));
-  try {
-    fs.cpSync(path.join(root, "fixtures", "sample-project"), tempRepo, { recursive: true });
-    const hiddenTarget = path.join(tempRepo, "hidden.test.js");
-    if (fs.existsSync(hiddenTarget)) {
-      fail("HARNESS-L024", "hidden file staging self-test fixture already exposed hidden.test.js", "Keep hidden check files outside public repo fixtures.");
-    }
-    stageHiddenCheckFiles(selfTestScenario(), tempRepo);
-    if (!fs.existsSync(hiddenTarget)) {
-      fail("HARNESS-L024", "hidden file staging self-test did not copy hidden.test.js", "Stage hidden check files after adapter execution.");
-    }
-  } finally {
-    fs.rmSync(tempRepo, { recursive: true, force: true });
-  }
-  const collisionRepo = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-live-hidden-collision-"));
-  try {
-    fs.cpSync(path.join(root, "fixtures", "sample-project"), collisionRepo, { recursive: true });
-    fs.writeFileSync(path.join(collisionRepo, "hidden.test.js"), "already exists\n", "utf8");
-    try {
-      stageHiddenCheckFiles(selfTestScenario(), collisionRepo);
-      fail("HARNESS-L032", "hidden_check_files target collision self-test overwrote hidden.test.js", "Hidden check staging must fail when the target path already exists.");
-    } catch (error) {
-      if (!(error instanceof Error) || !error.message.includes("HARNESS-L032")) {
-        fail("HARNESS-L032", `hidden_check_files target collision self-test returned wrong error: ${error.message}`, "Use a stable hidden target collision error.");
-      }
-    }
-  } finally {
-    fs.rmSync(collisionRepo, { recursive: true, force: true });
-  }
-  const repoFileCollisionRepo = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-live-hidden-repo-file-collision-"));
-  try {
-    fs.cpSync(path.join(root, "fixtures", "sample-project"), repoFileCollisionRepo, { recursive: true });
-    try {
-      stageHiddenCheckFiles(selfTestScenario({ hidden_check_files: [{ source: "evals/hidden/runner-self-test/hidden.test.js", target: "README.md" }] }), repoFileCollisionRepo);
-      fail("HARNESS-L032", "hidden_check_files target collision self-test overwrote README.md", "Hidden check staging must not overwrite normal repo files.");
-    } catch (error) {
-      if (!(error instanceof Error) || !error.message.includes("HARNESS-L032")) {
-        fail("HARNESS-L032", `hidden_check_files repo file collision self-test returned wrong error: ${error.message}`, "Use a stable hidden target collision error.");
-      }
-    }
-  } finally {
-    fs.rmSync(repoFileCollisionRepo, { recursive: true, force: true });
-  }
+function unavailableWorkspacePolicyCheck(scenario) {
+  return {
+    check_id: stableCheckId(scenario.id, "workspace", 0),
+    status: "unavailable",
+    exit_code: null,
+    stdout_chars: 0,
+    stderr_chars: 0,
+  };
+}
 
-  const adapterReport = adapterReportSummary({
-    passed: true,
-    transcript: "raw transcript",
-    stdout: "raw stdout",
-    report: { summary: "safe", hidden: "do not persist", metrics: { tokens: 3, transcript: "nested secret" } },
+function evidenceRef(kind, value) {
+  return { kind, value };
+}
+
+function buildVerificationChecks({ setup, adapterClassification, visible, hidden, assertions, workspace, terminationStatus }) {
+  const adapterStatus = adapterClassification === "passed" ? "passed" : adapterClassification === "unavailable" ? "incomplete" : "failed";
+  return [
+    { code: "LIVE_SETUP", status: phaseStatus(setup), summary: "Setup command evidence recorded.", evidence_refs: [] },
+    { code: "LIVE_ADAPTER", status: adapterStatus, summary: "Adapter completion classification recorded.", evidence_refs: [] },
+    { code: "LIVE_VISIBLE", status: phaseStatus(visible), summary: "Visible check evidence recorded.", evidence_refs: [] },
+    { code: "LIVE_HIDDEN", status: phaseStatus(hidden), summary: "Hidden check evidence recorded.", evidence_refs: [] },
+    { code: "LIVE_WORKSPACE_POLICY", status: phaseStatus([workspace]), summary: "Runner-owned workspace mutation policy evaluated.", evidence_refs: [] },
+    { code: "LIVE_TRACE_ASSERTIONS", status: phaseStatus(assertions), summary: "Runner-owned trace assertions evaluated.", evidence_refs: [] },
+    { code: "LIVE_TERMINATION", status: terminationStatus, summary: "Adapter termination is successful or explicitly expected by one runner-owned assertion.", evidence_refs: [] },
+  ];
+}
+
+async function runScenarioProfile({
+  adapterUrl,
+  scenario,
+  repetition,
+  profileRun,
+  evaluationRunId,
+  traceStore,
+  modelName = null,
+  sourceRoot = root,
+  prepareFixtureFn = prepareFixture,
+  executeChecksFn = executeChecks,
+  stageHiddenFilesFn = stageHiddenFiles,
+  runAdapterModuleFn = runAdapterModule,
+  cleanupFixtureFn = (temporaryRoot) => fs.rmSync(temporaryRoot, { recursive: true, force: true }),
+}) {
+  const risk = riskForScenario(scenario);
+  const denyValues = denyValuesForScenarios([scenario]);
+  const persistedModelName = containsDeniedValue(modelName, denyValues)
+    ? null
+    : sanitizeBoundedString(modelName, { label: "runner.model", maxLength: 200, nullable: true }).value;
+  const durableTraceStore = traceStore;
+  const bufferedTraceStore = durableTraceStore.createBufferedStore();
+  traceStore = bufferedTraceStore;
+  let fixture = null;
+  let preserveFixtureAfterUnverifiedTeardown = false;
+  try {
+  const run = traceStore.createRun({
+    scenario_id: scenario.id,
+    profile_role: profileRun.profile_role,
+    harness_fingerprint: profileRun.profile_fingerprint,
+    model: persistedModelName,
+    task_class: scenario.failure_family,
+    risk,
   });
-  if ("transcript" in adapterReport || "stdout" in adapterReport || "hidden" in adapterReport || adapterReport.metrics?.transcript || adapterReport.summary !== "safe") {
-    fail("HARNESS-L025", "live-eval adapter report self-test persisted unsafe adapter fields", "Persist only allowlisted adapter report summary fields.");
-  }
-  const tokenReport = adapterReportSummary({ passed: true, summary: "FAKE_TOKEN=example-token-do-not-use" });
-  if (tokenReport.summary !== "[redacted]" || JSON.stringify(tokenReport).includes("example-token-do-not-use")) {
-    fail("HARNESS-L033", "live-eval adapter report redaction self-test persisted token-like summary content", "Redact secret-like strings in allowlisted adapter report fields.");
-  }
-  const privateKeyReport = adapterReportSummary({ passed: true, report: { summary: "BEGIN PRIVATE KEY fake" } });
-  if (privateKeyReport.summary !== "[redacted]" || JSON.stringify(privateKeyReport).includes("BEGIN PRIVATE KEY")) {
-    fail("HARNESS-L033", "live-eval adapter report redaction self-test persisted private key marker", "Redact private-key markers in allowlisted adapter report fields.");
-  }
-  if (adapterErrorSummary("secret path C:/tmp/raw.log", false) !== "adapter failed" || adapterErrorSummary("adapter timed out after 5ms", true) !== "adapter timed out") {
-    fail("HARNESS-L025", "live-eval adapter error self-test persisted raw adapter error text", "Persist adapter error classification instead of raw exception text.");
-  }
-}
+  const runId = run.run_id;
+  const startedAt = Date.now();
+  let setupResults = unavailableChecks(scenario, "setup", scenario.setup_commands);
+  let visibleResults = unavailableChecks(scenario, "visible", scenario.visible_checks);
+  let hiddenShellResults = unavailableChecks(scenario, "hidden", scenario.hidden_checks);
+  let workspaceResult = unavailableWorkspacePolicyCheck(scenario);
+  let workspaceBeforeManifest = null;
+  let adapterResult;
+  let adapterClassification = "unavailable";
+  let adapterTeardownVerified = false;
+  let adapterProcessStarted = false;
+  const incompleteEvidence = [];
+  const emittedRunnerPhases = new Set();
+  const emitRunnerPhase = (input) => {
+    if (!REQUIRED_RUNNER_PHASES.includes(input.event_type)) {
+      throw new ContractError("LIVE_PHASE_UNKNOWN", `unknown runner phase ${input.event_type}`);
+    }
+    if (emittedRunnerPhases.has(input.event_type)) {
+      throw new ContractError("LIVE_PHASE_DUPLICATE", `runner phase ${input.event_type} was emitted more than once`);
+    }
+    const event = appendRunnerEvent(traceStore, runId, risk, input);
+    emittedRunnerPhases.add(input.event_type);
+    return event;
+  };
 
-function validateHiddenCheckFiles(scenario, label) {
-  if (scenario.hidden_check_files === undefined) {
-    return;
-  }
-  if (!Array.isArray(scenario.hidden_check_files)) {
-    fail("HARNESS-L026", `${label}.hidden_check_files must be an array`, "Use explicit hidden check file source/target entries.");
-    return;
-  }
-  const fixturePath = isNonEmptyString(scenario.repo_fixture) ? resolveRepoFixturePath(scenario.repo_fixture) : null;
-  for (const [index, entry] of scenario.hidden_check_files.entries()) {
-    const entryLabel = `${label}.hidden_check_files[${index}]`;
-    if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
-      fail("HARNESS-L026", `${entryLabel} must be an object`, "Use { source, target } for every hidden check file.");
-      continue;
-    }
-    for (const field of Object.keys(entry)) {
-      if (!hiddenCheckFileFields.has(field)) {
-        fail("HARNESS-L026", `${entryLabel}.${field} is not supported`, "Hidden check file entries support only source and target.");
-      }
-    }
-    assertString(entry.source, `${entryLabel}.source`);
-    assertString(entry.target, `${entryLabel}.target`);
-    if (isNonEmptyString(entry.source)) {
-      const source = resolveRootPath(entry.source);
-      if (!source || !fs.existsSync(source)) {
-        fail("HARNESS-L027", `${entryLabel}.source does not resolve inside the repository: ${entry.source}`, "Use a checked-in hidden check file or directory.");
-      } else if (fixturePath && isInside(fixturePath, source)) {
-        fail("HARNESS-L028", `${entryLabel}.source is already inside repo_fixture: ${entry.source}`, "Keep hidden check files outside the public repo fixture.");
-      }
-    }
-    if (isNonEmptyString(entry.target) && !isSafeRelativeTarget(entry.target)) {
-      fail("HARNESS-L029", `${entryLabel}.target must be a safe relative path inside the repo: ${entry.target}`, "Use a relative target path without . or .. segments.");
-    }
-  }
-}
+  emitRunnerPhase({
+    event_type: "task_start",
+    summary: "Live evaluation task started.",
+    tool_or_command: "live-eval",
+    evidence_refs: [evidenceRef("run", evaluationRunId)],
+    hypothesis: "The selected profile can satisfy the scenario without violating runner boundaries.",
+    expected_observation: "Adapter success and complete visible, hidden, and trace evidence.",
+  });
 
-function validateScenario(scenario, file) {
-  const label = path.relative(root, file).replaceAll("\\", "/");
-  if (!scenario) return;
+  try {
+    fixture = prepareFixtureFn(scenario, profileRun.profile_role, sourceRoot);
+    emitRunnerPhase({
+      event_type: "fixture_preparation",
+      summary: "Isolated fixture copy prepared.",
+      tool_or_command: "fixture-copy",
+      files_read: [{ path: scenario.repo_fixture, summary: "Public fixture project." }],
+      files_written: [{ path: "isolated-repo", summary: "Machine-local isolated copy." }],
+      verifier_codes: ["FIXTURE_ISOLATED"],
+    });
 
-  assertString(scenario.id, `${label}.id`);
-  if (typeof scenario.id === "string" && !/^[a-z0-9][a-z0-9._-]*$/.test(scenario.id)) {
-    fail("HARNESS-L005", `${label}.id has unsupported characters`, "Use lowercase letters, numbers, dots, underscores, or hyphens.");
-  }
-  assertString(scenario.description, `${label}.description`);
-  for (const field of unsupportedScenarioFields(scenario)) {
-    fail("HARNESS-L021", `${label}.${field} is not a supported field`, "Remove unsupported fields or add an explicit runner contract before exposing them.");
-  }
-  assertStringArray(scenario.risk_tags, `${label}.risk_tags`, { min: 1 });
-  if (!scenario.repo_fixture) {
-    fail("HARNESS-L006", `${label} must define repo_fixture`, "Provide a checked-in isolated fixture path.");
-  }
-  if (scenario.repo_fixture) {
-    assertString(scenario.repo_fixture, `${label}.repo_fixture`);
-    if (isNonEmptyString(scenario.repo_fixture)) {
-      const fixtureScopeError = repoFixtureScopeError(scenario.repo_fixture);
-      if (fixtureScopeError) {
-        fail("HARNESS-L031", `${label}.repo_fixture has unsafe scope: ${scenario.repo_fixture} (${fixtureScopeError})`, "Use an allowlisted project fixture such as fixtures/sample-project or fixtures/live/<name>.");
-      } else {
-        const fixturePath = resolveRepoFixturePath(scenario.repo_fixture);
-        if (!fixturePath || !fs.existsSync(fixturePath)) {
-          fail("HARNESS-L007", `${label}.repo_fixture does not resolve inside the repository: ${scenario.repo_fixture}`, "Use a checked-in fixture path.");
+    setupResults = await executeChecksFn(scenario, "setup", scenario.setup_commands, fixture.repo);
+    const setupStatus = phaseStatus(setupResults);
+    emitRunnerPhase({
+      event_type: "setup_verification",
+      summary: "Setup verification completed.",
+      tool_or_command: "setup-checks",
+      status: traceStatus(setupStatus),
+      verification: eventVerification(setupStatus, "Setup command statuses recorded without raw output.", ["LIVE_SETUP"]),
+      verifier_codes: ["LIVE_SETUP"],
+    });
+
+    if (setupStatus === "passed") {
+      workspaceBeforeManifest = captureOrdinaryTreeManifest(fixture.repo);
+      emitRunnerPhase({
+        event_type: "adapter_invocation",
+        summary: "Adapter worker invocation started.",
+        tool_or_command: "adapter-worker",
+      });
+      const instrumentation = createAdapterInstrumentation(traceStore, {
+        run_id: runId,
+        task_id: TASK_ID,
+        agent: "live-adapter",
+        risk,
+      });
+      try {
+        adapterProcessStarted = true;
+        adapterResult = await runAdapterModuleFn({
+          adapterUrl,
+          context: {
+            scenario: publicScenarioForAdapter(scenario),
+            repetition,
+            profileRole: profileRun.profile_role,
+            profile: profileRun.profile,
+            repo: fixture.repo,
+            timeout: scenario.timeout,
+            profileFingerprint: profileRun.profile_fingerprint,
+          },
+          timeout: scenario.timeout,
+          onTrace: traceOperationHandler(instrumentation, { denyValues }),
+        });
+        adapterTeardownVerified = true;
+        const adapterFailure = adapterFailureReason(adapterResult, profileRun.profile_fingerprint);
+        adapterClassification = adapterFailure === null ? "passed" : "failed";
+        if (adapterFailure === "adapter_profile_fingerprint_mismatch") {
+          incompleteEvidence.push("ADAPTER_PROFILE_FINGERPRINT_MISMATCH");
+        }
+      } catch (error) {
+        adapterClassification = error instanceof AdapterTimeoutError ? "timed_out" : "failed";
+        adapterTeardownVerified = error instanceof AdapterTimeoutError
+          || (error instanceof AdapterExecutionError && error.classification !== "adapter_teardown_unverified");
+        if (error instanceof AdapterExecutionError && error.classification === "adapter_teardown_unverified") {
+          preserveFixtureAfterUnverifiedTeardown = true;
+          throw error;
+        } else if (error instanceof AdapterExecutionError && error.classification === "adapter_trace_quota_exceeded") {
+          incompleteEvidence.push("ADAPTER_TRACE_QUOTA_EXCEEDED");
+        } else if (!(error instanceof AdapterExecutionError) && !(error instanceof AdapterTimeoutError)) {
+          adapterClassification = "failed";
+          incompleteEvidence.push("ADAPTER_TEARDOWN_UNVERIFIED");
         }
       }
+      const unsettledJobs = cancelUnsettledAdapterJobs(traceStore, runId);
+      if (unsettledJobs > 0) {
+        adapterClassification = "failed";
+        incompleteEvidence.push("ADAPTER_JOBS_UNSETTLED");
+      }
+      const adapterVerifierCode = adapterClassification === "passed"
+        ? "ADAPTER_PASSED"
+        : !adapterTeardownVerified
+          ? "ADAPTER_TEARDOWN_UNVERIFIED"
+          : adapterClassification === "timed_out"
+            ? "ADAPTER_TIMED_OUT"
+            : "ADAPTER_FAILED";
+      emitRunnerPhase({
+        event_type: "adapter_result",
+        summary: `Adapter classified as ${adapterClassification}.`,
+        tool_or_command: "adapter-worker",
+        status: adapterClassification === "passed" ? "completed" : "failed",
+        actual_observation: `adapter_${adapterClassification}`,
+        verifier_codes: [adapterVerifierCode],
+      });
+
+      try {
+        const workspaceAfterManifest = captureOrdinaryTreeManifest(fixture.repo);
+        workspaceResult = workspacePolicyCheck(scenario, workspaceBeforeManifest, workspaceAfterManifest).result;
+      } catch {
+        workspaceResult = {
+          ...unavailableWorkspacePolicyCheck(scenario),
+          status: "failed",
+        };
+        incompleteEvidence.push("WORKSPACE_POLICY_UNAVAILABLE");
+      }
+
+      visibleResults = await executeChecksFn(scenario, "visible", scenario.visible_checks, fixture.repo);
+      const visibleStatus = phaseStatus(visibleResults);
+      emitRunnerPhase({
+        event_type: "visible_check",
+        summary: "Visible checks completed.",
+        tool_or_command: "visible-checks",
+        status: traceStatus(visibleStatus),
+        verification: eventVerification(visibleStatus, "Visible status and output sizes recorded.", ["LIVE_VISIBLE"]),
+        verifier_codes: ["LIVE_VISIBLE"],
+      });
+
+      let hiddenStaged = false;
+      if (adapterClassification === "passed" && adapterTeardownVerified && workspaceResult.status === "passed") {
+        try {
+          stageHiddenFilesFn(scenario, fixture.repo, sourceRoot);
+          emitRunnerPhase({
+            event_type: "hidden_staging",
+            summary: "Runner-owned hidden files staged after verified adapter process-tree teardown.",
+            tool_or_command: "hidden-staging",
+            files_read: scenario.hidden_check_files.map((entry) => ({ path: entry.source, summary: "Runner-owned hidden check source." })),
+            files_written: scenario.hidden_check_files.map((entry) => ({ path: entry.target, summary: "Hidden check staged in isolated copy." })),
+            verifier_codes: ["HIDDEN_STAGED_AFTER_ADAPTER_TEARDOWN"],
+          });
+          hiddenStaged = true;
+        } catch {
+          incompleteEvidence.push("HIDDEN_STAGING_FAILED");
+          emitRunnerPhase({
+            event_type: "hidden_staging",
+            summary: "Runner-owned hidden staging failed.",
+            tool_or_command: "hidden-staging",
+            status: "failed",
+            verifier_codes: ["HIDDEN_STAGING_FAILED"],
+          });
+        }
+      } else {
+        const hiddenSkipCode = !adapterTeardownVerified
+          ? "HIDDEN_SKIPPED_TEARDOWN_UNVERIFIED"
+          : workspaceResult.status !== "passed"
+            ? "HIDDEN_SKIPPED_WORKSPACE_POLICY"
+          : adapterClassification === "timed_out"
+            ? "HIDDEN_SKIPPED_ADAPTER_TIMEOUT"
+            : "HIDDEN_SKIPPED_ADAPTER_FAILURE";
+        if (workspaceResult.status === "passed") incompleteEvidence.push("HIDDEN_NOT_RUN", hiddenSkipCode);
+        emitRunnerPhase({
+          event_type: "hidden_staging",
+          summary: "Runner-owned hidden staging skipped because adapter execution was not safely successful.",
+          tool_or_command: "hidden-staging",
+          status: "blocked",
+          verifier_codes: [hiddenSkipCode],
+        });
+      }
+      if (hiddenStaged) {
+        try {
+          hiddenShellResults = await executeChecksFn(scenario, "hidden", scenario.hidden_checks, fixture.repo);
+          const hiddenStatus = phaseStatus(hiddenShellResults);
+          emitRunnerPhase({
+            event_type: "hidden_check",
+            summary: "Hidden checks completed.",
+            tool_or_command: "hidden-checks",
+            status: traceStatus(hiddenStatus),
+            verification: eventVerification(hiddenStatus, "Hidden status and output sizes recorded.", ["LIVE_HIDDEN"]),
+            verifier_codes: ["LIVE_HIDDEN"],
+          });
+        } catch {
+          incompleteEvidence.push("HIDDEN_CHECK_FAILED");
+          hiddenShellResults = unavailableChecks(scenario, "hidden", scenario.hidden_checks);
+          emitRunnerPhase({
+            event_type: "hidden_check",
+            summary: "Hidden check execution failed before completion.",
+            tool_or_command: "hidden-checks",
+            status: "failed",
+            verifier_codes: ["HIDDEN_CHECK_FAILED"],
+          });
+        }
+      } else {
+        hiddenShellResults = unavailableChecks(scenario, "hidden", scenario.hidden_checks)
+          .map((entry) => workspaceResult.status === "failed" ? { ...entry, status: "failed" } : entry);
+        emitRunnerPhase({
+          event_type: "hidden_check",
+          summary: "Hidden checks were unavailable because runner-owned hidden files were not staged.",
+          tool_or_command: "hidden-checks",
+          status: "blocked",
+          verifier_codes: ["RUNNER_PHASE_BLOCKED"],
+        });
+      }
+    } else {
+      incompleteEvidence.push("SETUP_FAILED", "ADAPTER_NOT_RUN", "VISIBLE_NOT_RUN", "HIDDEN_NOT_RUN");
+      for (const [eventType, tool, summary] of [
+        ["adapter_invocation", "adapter-worker", "Adapter invocation skipped after setup failure."],
+        ["adapter_result", "adapter-worker", "Adapter result unavailable after setup failure."],
+        ["visible_check", "visible-checks", "Visible checks unavailable after setup failure."],
+        ["hidden_staging", "hidden-staging", "Hidden staging skipped after setup failure."],
+        ["hidden_check", "hidden-checks", "Hidden checks unavailable after setup failure."],
+      ]) {
+        emitRunnerPhase({
+          event_type: eventType,
+          summary,
+          tool_or_command: tool,
+          status: "blocked",
+          verifier_codes: ["RUNNER_PHASE_BLOCKED"],
+        });
+      }
+    }
+  } catch (error) {
+    if (error instanceof ProcessTreeTeardownError
+      || (error instanceof AdapterExecutionError && error.classification === "adapter_teardown_unverified")) {
+      preserveFixtureAfterUnverifiedTeardown = true;
+      throw error;
+    }
+    incompleteEvidence.push("RUNNER_INTERNAL_FAILURE");
+    const failingPhase = REQUIRED_RUNNER_PHASES
+      .slice(1, REQUIRED_RUNNER_PHASES.indexOf("verification"))
+      .find((phase) => !emittedRunnerPhases.has(phase));
+    if (failingPhase) {
+      emitRunnerPhase({
+        event_type: failingPhase,
+        summary: `Runner phase ${failingPhase} failed before completion.`,
+        tool_or_command: "live-eval",
+        status: "failed",
+        verifier_codes: ["RUNNER_INTERNAL_FAILURE", "RUNNER_PHASE_FAILED"],
+      });
     }
   }
-  assertString(scenario.task, `${label}.task`);
-  assertStringArray(scenario.setup_commands, `${label}.setup_commands`);
-  assertStringArray(scenario.visible_checks, `${label}.visible_checks`);
-  assertStringArray(scenario.hidden_checks, `${label}.hidden_checks`, { min: 1 });
-  validateHiddenCheckFiles(scenario, label);
-  if (!Number.isInteger(scenario.timeout) || scenario.timeout < 1000) {
-    fail("HARNESS-L008", `${label}.timeout must be an integer >= 1000`, "Set an explicit millisecond timeout.");
-  }
-  if (!Number.isInteger(scenario.repetitions) || scenario.repetitions < 1) {
-    fail("HARNESS-L009", `${label}.repetitions must be an integer >= 1`, "Set at least one repetition.");
-  }
-  assertStringArray(scenario.expected_contracts, `${label}.expected_contracts`, { min: 1 });
-  assertStringArray(scenario.forbidden_regressions, `${label}.forbidden_regressions`, { min: 1 });
-}
 
-function validateAllScenarios() {
-  const files = listScenarioFiles();
-  if (files.length === 0) {
-    fail("HARNESS-L010", "no live-evaluation scenarios found", "Add at least one deterministic manifest fixture.");
-  }
-  const scenarios = files.map((file) => ({ file, scenario: readJson(file) }));
-  for (const { file, scenario } of scenarios) {
-    validateScenario(scenario, file);
-  }
-  const ids = new Set();
-  for (const { file, scenario } of scenarios) {
-    if (!scenario?.id) continue;
-    if (ids.has(scenario.id)) {
-      fail("HARNESS-L011", `duplicate live-evaluation scenario id: ${scenario.id}`, "Use stable unique scenario IDs.");
+  for (const phase of REQUIRED_RUNNER_PHASES.slice(1, REQUIRED_RUNNER_PHASES.indexOf("verification"))) {
+    if (!emittedRunnerPhases.has(phase)) {
+      emitRunnerPhase({
+        event_type: phase,
+        summary: `Runner phase ${phase} was blocked by an earlier failure.`,
+        tool_or_command: "live-eval",
+        status: "blocked",
+        verifier_codes: ["RUNNER_PHASE_BLOCKED"],
+      });
     }
-    ids.add(scenario.id);
   }
-  return scenarios.filter(({ scenario }) => scenario);
-}
 
-function shell(command, cwd, timeout) {
-  const result = process.platform === "win32"
-    ? spawnSync("cmd.exe", ["/d", "/s", "/c", command], { cwd, encoding: "utf8", timeout })
-    : spawnSync(command, [], { cwd, encoding: "utf8", shell: true, timeout });
-  return {
-    command,
-    status: result.error?.code === "ETIMEDOUT" ? "timed out" : result.status === 0 ? "passed" : "failed",
-    exitCode: result.status,
-    stdout: (result.stdout || "").slice(-4000),
-    stderr: (result.stderr || result.error?.message || "").slice(-4000),
+  if (adapterClassification === "unavailable" && !incompleteEvidence.includes("ADAPTER_NOT_RUN")) incompleteEvidence.push("ADAPTER_NOT_RUN");
+  if (adapterClassification === "timed_out") incompleteEvidence.push("ADAPTER_TIMED_OUT");
+  else if (adapterClassification === "failed") incompleteEvidence.push("ADAPTER_FAILED");
+
+  if (fixture?.temporaryRoot && fs.existsSync(fixture.temporaryRoot)) {
+    try {
+      cleanupFixtureFn(fixture.temporaryRoot);
+      fixture = null;
+    } catch {
+      incompleteEvidence.push("FIXTURE_CLEANUP_FAILED");
+    }
+  }
+
+  const preliminaryPassed = phaseStatus(setupResults) === "passed"
+    && adapterClassification === "passed"
+    && phaseStatus(visibleResults) === "passed"
+    && phaseStatus(hiddenShellResults) === "passed"
+    && workspaceResult.status === "passed"
+    && incompleteEvidence.length === 0;
+  const preAssertionSnapshot = traceStore.inspectRun(runId);
+  const adapterTerminationEvents = preAssertionSnapshot.events
+    .filter((event) => event.agent === "live-adapter" && event.event_type === "task_end" && event.termination_reason);
+  const adapterTermination = adapterTerminationEvents.at(-1)?.termination_reason ?? null;
+  const provisionalOutcome = {
+    termination_reason: adapterTermination ?? (preliminaryPassed ? "verified" : "verification_failed"),
   };
-}
+  const assertionResults = evaluateTraceAssertions(scenario.hidden_trace_assertions, {
+    events: preAssertionSnapshot.events,
+    context_receipts: preAssertionSnapshot.context_receipts,
+    jobs: preAssertionSnapshot.jobs,
+    verification: preAssertionSnapshot.verification,
+    provisional_outcome: provisionalOutcome,
+  });
+  const assertionResultChecks = assertionChecks(scenario, assertionResults);
+  const allHiddenResults = [...hiddenShellResults, workspaceResult, ...assertionResultChecks];
+  const assertionsPassed = assertionResultChecks.every((entry) => entry.status === "passed");
+  const terminationAssertions = scenario.hidden_trace_assertions
+    .map((assertion, index) => ({ assertion, result: assertionResults[index] }))
+    .filter((entry) => entry.assertion.op === "termination_reason_equals");
+  const expectedNonSuccessTermination = terminationAssertions.length === 1
+    && terminationAssertions[0].assertion.value === adapterTermination
+    && terminationAssertions[0].result?.status === "passed";
+  const terminationAccepted = adapterTerminationEvents.length <= 1 && (
+    adapterTermination === null
+    || ["verified", "done"].includes(adapterTermination)
+    || expectedNonSuccessTermination
+  );
+  const verificationChecks = buildVerificationChecks({
+    setup: setupResults,
+    adapterClassification,
+    visible: visibleResults,
+    hidden: hiddenShellResults,
+    assertions: assertionResultChecks,
+    workspace: workspaceResult,
+    terminationStatus: terminationAccepted ? "passed" : "failed",
+  });
+  const verificationStatus = verificationChecks.some((check) => check.status === "failed")
+    ? "failed"
+    : verificationChecks.some((check) => ["incomplete", "not_run"].includes(check.status)) || incompleteEvidence.length > 0
+      ? "incomplete"
+      : "passed";
+  const completedEvidence = preliminaryPassed && assertionsPassed && terminationAccepted && verificationStatus === "passed";
+  const terminationReason = completedEvidence ? provisionalOutcome.termination_reason : "verification_failed";
+  const finalTraceStatus = completedEvidence
+    ? ["verified", "done"].includes(terminationReason) ? "completed" : "blocked"
+    : "failed";
 
-async function loadAdapter() {
-  const adapterPath = process.env.OPENCODE_LIVE_EVAL_ADAPTER;
-  if (!adapterPath) {
-    fail("HARNESS-L012", "OPENCODE_LIVE_EVAL_ADAPTER is not set", "Provide an adapter that can run one scenario against baseline and harness profiles, or use npm run verify:live-eval.");
-    return null;
-  }
-  const resolved = path.resolve(adapterPath);
-  if (!fs.existsSync(resolved)) {
-    fail("HARNESS-L013", `live-eval adapter not found: ${resolved}`, "Point OPENCODE_LIVE_EVAL_ADAPTER at a local .mjs adapter.");
-    return null;
-  }
-  const mod = await import(pathToFileURL(resolved));
-  if (typeof mod.runScenario !== "function") {
-    fail("HARNESS-L014", "live-eval adapter must export runScenario", "Export async function runScenario(context).");
-    return null;
-  }
-  return mod;
-}
-
-function liveProfileRuns(env = process.env) {
-  const profiles = [
-    { profileRole: "baseline", profile: env.OPENCODE_BASELINE_PROFILE },
-    { profileRole: "harness", profile: env.OPENCODE_HARNESS_PROFILE },
-  ];
-  for (const profile of profiles) {
-    if (!isNonEmptyString(profile.profile)) {
-      fail("HARNESS-L030", `${profile.profileRole} profile is not configured`, "Set OPENCODE_BASELINE_PROFILE and OPENCODE_HARNESS_PROFILE for live A/B evaluation.");
-    }
-  }
-  return profiles.filter((profile) => isNonEmptyString(profile.profile));
-}
-
-function prepareFixture(scenario, profileRole) {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), `opencode-live-eval-${scenario.id}-${profileRole}-`));
-  const source = resolveRepoFixturePath(scenario.repo_fixture);
-  if (!source) {
-    throw new Error(`HARNESS-L031 unsafe repo_fixture scope: ${scenario.repo_fixture} (${repoFixtureScopeError(scenario.repo_fixture)})`);
-  }
-  const target = path.join(tmp, "repo");
-  fs.cpSync(source, target, { recursive: true });
-  return { tmp, repo: target };
-}
-
-function stageHiddenCheckFiles(scenario, repo) {
-  for (const entry of scenario.hidden_check_files ?? []) {
-    const source = resolveRootPath(entry.source);
-    if (!source || !fs.existsSync(source)) {
-      throw new Error(`hidden_check_files source is missing: ${entry.source}`);
-    }
-    const target = resolveRepoTarget(repo, entry.target);
-    if (fs.existsSync(target)) {
-      throw new Error(`HARNESS-L032 hidden_check_files target collision: ${entry.target}`);
-    }
-    fs.mkdirSync(path.dirname(target), { recursive: true });
-    fs.cpSync(source, target, { recursive: true });
-  }
-}
-
-async function runAdapterWithTimeout(adapter, context) {
-  const timeout = Math.max(1, Number(context.timeout) || 1);
-  const controller = new AbortController();
-  let timer;
-  const timeoutPromise = new Promise((_, reject) => {
-    timer = setTimeout(() => {
-      controller.abort();
-      reject(new AdapterTimeoutError(timeout));
-    }, timeout);
+  emitRunnerPhase({
+    event_type: "verification",
+    summary: "Final verification summary assembled.",
+    tool_or_command: "live-verifier",
+    status: traceStatus(verificationStatus),
+    verification: eventVerification(verificationStatus, "Structured live-evaluation verification recorded.", verificationChecks.map((check) => check.code)),
+    verifier_codes: verificationChecks.map((check) => check.code),
+  });
+  traceStore.recordVerification(runId, {
+    status: verificationStatus,
+    summary: "Live evaluation verification completed.",
+    checks: verificationChecks,
+    evidence_refs: [evidenceRef("run", evaluationRunId)],
+    incomplete_reasons: [...new Set(incompleteEvidence)],
+  });
+  emitRunnerPhase({
+    event_type: "task_end",
+    summary: completedEvidence ? "Live evaluation task verified." : "Live evaluation task did not verify.",
+    tool_or_command: "live-eval",
+    status: finalTraceStatus,
+    termination_reason: terminationReason,
+    verification: eventVerification(verificationStatus, "Task end reflects final verification.", verificationChecks.map((check) => check.code)),
+    verifier_codes: verificationChecks.map((check) => check.code),
+  });
+  traceStore.finalizeRun(runId, {
+    status: finalTraceStatus,
+    termination_reason: terminationReason,
+    summary: completedEvidence ? "Operational run verified." : "Operational run failed verification.",
+    evidence_refs: [evidenceRef("run", evaluationRunId)],
   });
 
-  try {
-    return await Promise.race([
-      adapter.runScenario({ ...context, signal: controller.signal }),
-      timeoutPromise,
-    ]);
-  } finally {
-    clearTimeout(timer);
+  const model = availabilityMetadata(adapterResult, "model", denyValues);
+  const tool = availabilityMetadata(adapterResult, "tool", denyValues);
+  const result = {
+    scenario_id: scenario.id,
+    repetition,
+    profile_role: profileRun.profile_role,
+    repository_fingerprint: profileRun.repository_fingerprint,
+    profile_fingerprint: profileRun.profile_fingerprint,
+    operational_run_id: runId,
+    scenario_fingerprint: fingerprint(scenario),
+    status: completedEvidence ? "passed" : incompleteEvidence.length > 0 ? "incomplete" : "failed",
+    adapter_classification: adapterClassification,
+    setup_results: setupResults,
+    visible_results: visibleResults,
+    hidden_results: allHiddenResults,
+    visible_pass_rate: passRate(visibleResults),
+    hidden_pass_rate: passRate(allHiddenResults),
+    defect_escape_rate: allHiddenResults.every((entry) => entry.status === "passed") ? 0 : 1,
+    duration_ms: Math.max(0, Math.round(Date.now() - startedAt)),
+    cost: costMetadata(adapterResult),
+    model,
+    tool,
+    incomplete_evidence: [...new Set(incompleteEvidence)],
+  };
+  if (!adapterProcessStarted || adapterTeardownVerified) {
+    durableTraceStore.commitBufferedRun(bufferedTraceStore, runId);
   }
-}
-
-async function runScenarioProfile(adapter, scenario, repetition, profileRun) {
-  const { tmp, repo } = prepareFixture(scenario, profileRun.profileRole);
-  try {
-    const setupResults = scenario.setup_commands.map((command) => shell(command, repo, scenario.timeout));
-    const reports = [];
-    if (setupResults.length > 0) {
-      reports.push({
-        scenario: scenario.id,
-        repetition,
-        profileRole: profileRun.profileRole,
-        phase: "setup",
-        results: commandReportSummaries(setupResults),
-        passRate: passRate(setupResults),
-      });
-      recordCommandFailures(scenario.id, repetition, profileRun.profileRole, "setup", setupResults);
-    }
-    if (commandResultsFailed(setupResults)) {
-      return reports;
-    }
-
-    const startedAt = Date.now();
-    let adapterResult;
-    let adapterError = null;
-    let adapterTimedOut = false;
-    try {
-      adapterResult = await runAdapterWithTimeout(adapter, {
-        scenario: publicScenarioForAdapter(scenario),
-        repetition,
-        profileRole: profileRun.profileRole,
-        profile: profileRun.profile,
-        repo,
-        timeout: scenario.timeout,
-      });
-    } catch (error) {
-      adapterError = error instanceof Error ? error.message : String(error);
-      adapterTimedOut = error instanceof AdapterTimeoutError;
-      fail("HARNESS-L017", `${scenario.id} repetition ${repetition} ${profileRun.profileRole} adapter failed: ${adapterError}`, "Fix the adapter or scenario so the live run completes.");
-    }
-    if (!adapterTimedOut) {
-      const adapterFailure = adapterFailureReason(adapterResult);
-      if (adapterFailure) {
-        fail("HARNESS-L017", `${scenario.id} repetition ${repetition} ${profileRun.profileRole} ${adapterFailure}`, "Return a passing adapter result only after the agent task succeeds.");
+  return result;
+  } finally {
+    if (!preserveFixtureAfterUnverifiedTeardown && fixture?.temporaryRoot && fs.existsSync(fixture.temporaryRoot)) {
+      try {
+        fs.rmSync(fixture.temporaryRoot, { recursive: true, force: true });
+      } catch {
+        // The primary result already records a normal-path cleanup failure;
+        // exceptional-path best-effort cleanup must never mask that result.
       }
     }
-    if (adapterTimedOut) {
-      reports.push({
-        scenario: scenario.id,
-        repetition,
-        profileRole: profileRun.profileRole,
-        phase: "live",
-        durationMs: Date.now() - startedAt,
-        adapterReport: adapterReportSummary(adapterResult),
-        adapterError: adapterErrorSummary(adapterError, adapterTimedOut),
-        visibleResults: [],
-        hiddenResults: [],
-        visiblePassRate: 0,
-        hiddenPassRate: 0,
-        defectEscapeRate: 1,
-      });
-      return reports;
-    }
-
-    const visibleResults = scenario.visible_checks.map((command) => shell(command, repo, scenario.timeout));
-    recordCommandFailures(scenario.id, repetition, profileRun.profileRole, "visible", visibleResults);
-
-    let hiddenResults;
-    try {
-      stageHiddenCheckFiles(scenario, repo);
-      hiddenResults = scenario.hidden_checks.map((command) => shell(command, repo, scenario.timeout));
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      hiddenResults = [{ command: "<stage hidden_check_files>", status: "failed", exitCode: null, stdout: "", stderr: message }];
-      fail("HARNESS-L024", `${scenario.id} repetition ${repetition} ${profileRun.profileRole} hidden file staging failed: ${message}`, "Keep hidden check files checked in outside the public fixture and copy them only after adapter execution.");
-    }
-    recordCommandFailures(scenario.id, repetition, profileRun.profileRole, "hidden", hiddenResults);
-
-    reports.push({
-      scenario: scenario.id,
-      repetition,
-      profileRole: profileRun.profileRole,
-      phase: "live",
-      durationMs: Date.now() - startedAt,
-      adapterReport: adapterReportSummary(adapterResult),
-      adapterError: adapterErrorSummary(adapterError, adapterTimedOut),
-      visibleResults: commandReportSummaries(visibleResults),
-      hiddenResults: commandReportSummaries(hiddenResults),
-      visiblePassRate: passRate(visibleResults),
-      hiddenPassRate: passRate(hiddenResults),
-      defectEscapeRate: hiddenResults.some((result) => result.status !== "passed") ? 1 : 0,
-    });
-    return reports;
-  } finally {
-    fs.rmSync(tmp, { recursive: true, force: true });
+    durableTraceStore.discardBufferedStore(bufferedTraceStore);
   }
 }
 
-async function runLive(scenarios) {
-  const adapter = await loadAdapter();
-  const profiles = liveProfileRuns();
-  if (!adapter || profiles.length !== 2) return [];
-
-  const reports = [];
-  for (const { scenario } of scenarios) {
+async function runEvaluation({
+  selected,
+  adapterUrl,
+  profiles,
+  traceStore,
+  evaluationRunId,
+  evidenceKind,
+  modelName = null,
+  createdAt = new Date().toISOString(),
+  runScenarioProfileFn = runScenarioProfile,
+  scenarioRunOptions = {},
+}) {
+  const denyValues = denyValuesForScenarios(selected.map((entry) => entry.scenario));
+  const results = [];
+  for (const { scenario } of selected) {
     for (let repetition = 1; repetition <= scenario.repetitions; repetition += 1) {
       for (const profileRun of profiles) {
-        reports.push(...await runScenarioProfile(adapter, scenario, repetition, profileRun));
+        const result = await runScenarioProfileFn({
+          ...scenarioRunOptions,
+          adapterUrl,
+          scenario,
+          repetition,
+          profileRun,
+          evaluationRunId,
+          traceStore,
+          modelName,
+        });
+        if (result.incomplete_evidence.includes("ADAPTER_TEARDOWN_UNVERIFIED")) {
+          throw new AdapterExecutionError("adapter_teardown_unverified");
+        }
+        results.push(result);
       }
     }
   }
-  return reports;
+  const report = {
+    schema_version: 1,
+    evaluation_run_id: evaluationRunId,
+    created_at: createdAt,
+    provenance: {
+      producer_id: evidenceKind === "live" ? EVIDENCE_PRODUCERS.liveEvaluation : EVIDENCE_PRODUCERS.infrastructureSelfTest,
+      evidence_kind: evidenceKind,
+      complete: results.every((result) => result.status !== "incomplete"),
+    },
+    results,
+  };
+  assertPersistenceSafe(report, { label: "live evaluation report", denyValues });
+  validateLiveReport(report);
+  return report;
 }
 
-function writeReports(reports) {
-  fs.mkdirSync(reportDir, { recursive: true });
-  const jsonPath = path.join(reportDir, "latest.json");
-  const mdPath = path.join(reportDir, "latest.md");
-  fs.writeFileSync(jsonPath, `${JSON.stringify({ generatedAt: new Date().toISOString(), reports }, null, 2)}\n`);
-  fs.writeFileSync(
-    mdPath,
-    [
-      "# Live Evaluation Report",
-      "",
-      `Generated: ${new Date().toISOString()}`,
-      "",
-      ...reports.map((entry) => `- ${entry.scenario} repetition ${entry.repetition} ${entry.profileRole} phase ${entry.phase}: visible ${entry.visiblePassRate ?? entry.passRate ?? "n/a"}, hidden ${entry.hiddenPassRate ?? "n/a"}`),
-      "",
-    ].join("\n"),
-  );
-}
+async function runBufferedPublicationSelfTest(corpus) {
+  const temporaryWorkspace = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-live-buffered-self-test-"));
+  try {
+    const scenario = corpus.scenarios.find((entry) => entry.id === "runner-self-test");
+    if (!scenario) throw new ContractError("LIVE_SELF_TEST_SELECTION", "runner self-test scenario is missing");
+    let tick = 0;
+    let nextId = 0;
+    const traceStore = createTraceStore({
+      workspaceRoot: temporaryWorkspace,
+      clock: () => new Date(Date.parse("2026-07-10T11:00:00.000Z") + tick++ * 1000),
+      idFactory: (kind) => `${kind}-buffered-${++nextId}`,
+    });
+    const repositoryFingerprint = fingerprint({ buffered_self_test_repository: true });
+    const profileFingerprint = fingerprint({ buffered_self_test_profile: true, repository_fingerprint: repositoryFingerprint });
+    const profileRun = {
+      profile_role: "baseline",
+      profile: "buffered-self-test",
+      repository_fingerprint: repositoryFingerprint,
+      profile_fingerprint: profileFingerprint,
+    };
+    let observedPreCommit = false;
+    const result = await runScenarioProfile({
+      adapterUrl: "buffered-self-test://adapter",
+      scenario,
+      repetition: 1,
+      profileRun,
+      evaluationRunId: "eval-buffered-self-test",
+      traceStore,
+      modelName: "deterministic-buffered-self-test",
+      runAdapterModuleFn: async ({ onTrace }) => {
+        observedPreCommit = !fs.existsSync(path.join(temporaryWorkspace, ".oc_harness"));
+        await onTrace("emit", {
+          event_type: "tool_call",
+          summary: "Buffered self-test trace event.",
+          status: "completed",
+          tool_or_command: "buffered-self-test",
+        });
+        return { passed: true, profile_fingerprint: profileFingerprint };
+      },
+    });
+    if (!observedPreCommit || result.status !== "passed" || !traceStore.inspectRun(result.operational_run_id).complete) {
+      throw new ContractError("LIVE_SELF_TEST_BUFFERED_COMMIT", "buffered trace was written before teardown or failed to commit as a complete run");
+    }
 
-if (selfTestOnly) {
-  await runSelfTests();
-}
+    const unverifiedWorkspace = path.join(temporaryWorkspace, "unverified-single-profile");
+    fs.mkdirSync(unverifiedWorkspace);
+    const unverifiedTraceStore = createTraceStore({ workspaceRoot: unverifiedWorkspace });
+    let unverifiedFixtureSequence = 0;
+    const prepareUnverifiedFixture = (fixtureScenario, profileRole) => {
+      const temporaryRoot = path.join(unverifiedWorkspace, `fixture-${profileRole}-${++unverifiedFixtureSequence}`);
+      const repo = path.join(temporaryRoot, "repo");
+      fs.mkdirSync(temporaryRoot, { recursive: true });
+      fs.cpSync(path.resolve(root, fixtureScenario.repo_fixture), repo, { recursive: true, errorOnExist: true });
+      return { temporaryRoot, repo };
+    };
+    let unverifiedRejected = false;
+    try {
+      await runScenarioProfile({
+        adapterUrl: "buffered-self-test://unverified",
+        scenario,
+        repetition: 1,
+        profileRun,
+        evaluationRunId: "eval-buffered-self-test-unverified",
+        traceStore: unverifiedTraceStore,
+        modelName: "deterministic-buffered-self-test",
+        prepareFixtureFn: prepareUnverifiedFixture,
+        runAdapterModuleFn: async () => { throw new AdapterExecutionError("adapter_teardown_unverified"); },
+      });
+    } catch (error) {
+      unverifiedRejected = error instanceof AdapterExecutionError && error.classification === "adapter_teardown_unverified";
+    }
+    if (!unverifiedRejected || fs.existsSync(path.join(unverifiedWorkspace, ".oc_harness"))) {
+      throw new ContractError("LIVE_SELF_TEST_BUFFERED_DISCARD", "unverified teardown did not abort or published a durable trace");
+    }
 
-const scenarios = selfTestOnly ? [] : validateAllScenarios();
-
-if (failures.length === 0 && !validateOnly && !selfTestOnly) {
-  const reports = await runLive(scenarios);
-  if (reports.length > 0) {
-    writeReports(reports);
+    const abortWorkspace = path.join(temporaryWorkspace, "unverified-multi-profile");
+    fs.mkdirSync(abortWorkspace);
+    const abortTraceStore = createTraceStore({ workspaceRoot: abortWorkspace });
+    const candidateProfileRun = {
+      ...profileRun,
+      profile_role: "candidate",
+      profile: "buffered-self-test-candidate",
+      profile_fingerprint: fingerprint({ buffered_self_test_profile: "candidate", repository_fingerprint: repositoryFingerprint }),
+    };
+    let profileCalls = 0;
+    let reportPublicationBlocked = false;
+    try {
+      await runEvaluation({
+        selected: [{ scenario, suite: "infrastructure" }],
+        adapterUrl: "buffered-self-test://unverified-report",
+        profiles: [profileRun, candidateProfileRun],
+        traceStore: abortTraceStore,
+        evaluationRunId: "eval-buffered-self-test-report",
+        evidenceKind: "infrastructure_self_test",
+        scenarioRunOptions: { prepareFixtureFn: prepareUnverifiedFixture },
+        runScenarioProfileFn: async (options) => {
+          profileCalls += 1;
+          if (profileCalls > 1) throw new ContractError("LIVE_SELF_TEST_BUFFERED_ORDER", "evaluation continued after unverified teardown");
+          return runScenarioProfile({
+            ...options,
+            runAdapterModuleFn: async () => { throw new AdapterExecutionError("adapter_teardown_unverified"); },
+          });
+        },
+      });
+    } catch (error) {
+      reportPublicationBlocked = error instanceof AdapterExecutionError && error.classification === "adapter_teardown_unverified";
+    }
+    if (!reportPublicationBlocked || profileCalls !== 1 || fs.existsSync(path.join(abortWorkspace, ".oc_harness"))) {
+      throw new ContractError("LIVE_SELF_TEST_BUFFERED_REPORT", "unverified teardown continued evaluation or produced a durable run/report candidate");
+    }
+    console.log("Harness buffered live-evaluation self-test passed (in-memory journal and post-teardown commit; no child process or LLM)." );
+  } finally {
+    fs.rmSync(temporaryWorkspace, { recursive: true, force: true });
   }
 }
 
-if (failures.length > 0) {
-  console.error("Harness live evaluation validation failed:");
-  for (const failure of failures) {
-    console.error(`- ${failure.code}: ${failure.message}`);
-    if (failure.fix) {
-      console.error(`  fix: ${failure.fix}`);
+async function runSelfTest(corpus) {
+  const temporaryWorkspace = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-live-self-test-"));
+  try {
+    if (adapterFailureReason({}) !== "adapter_success_unavailable" || adapterFailureReason({ passed: true }) !== null) {
+      throw new ContractError("LIVE_SELF_TEST_ADAPTER_SUCCESS", "adapter success must be explicit");
+    }
+    const mismatchedAttestation = fingerprint({ self_test: "mismatched-attestation" });
+    if (adapterFailureReason({ passed: true }, mismatchedAttestation) !== "adapter_profile_fingerprint_mismatch") {
+      throw new ContractError("LIVE_SELF_TEST_ADAPTER_ATTESTATION", "explicit success without matching profile attestation must fail closed");
+    }
+    const infrastructureScenario = corpus.scenarios.find((scenario) => scenario.id === "runner-self-test");
+    if (!infrastructureScenario) throw new ContractError("LIVE_SELF_TEST_SELECTION", "runner self-test scenario is missing");
+    const permissionSnapshot = (profileId, subjectFingerprint, tag) => {
+      const permissions = { "config.permission.edit": "deny", "config.permission.read": "allow" };
+      const runtimeFingerprint = fingerprint({ runtime: tag });
+      const surfaceFingerprint = fingerprint(permissions);
+      return {
+        schema_version: 1,
+        producer_id: EVIDENCE_PRODUCERS.runtimePermissionSnapshot,
+        source: "installed_runtime",
+        profile_id: profileId,
+        subject_fingerprint: subjectFingerprint,
+        runtime_fingerprint: runtimeFingerprint,
+        surface_fingerprint: surfaceFingerprint,
+        profile_fingerprint: fingerprint({
+          subject_fingerprint: subjectFingerprint,
+          runtime_fingerprint: runtimeFingerprint,
+          surface_fingerprint: surfaceFingerprint,
+        }),
+        permissions,
+        complete: true,
+        incomplete_scopes: [],
+        created_at: "2026-07-10T10:00:00.000Z",
+      };
+    };
+    const attestedCandidateRepository = fingerprint({ self_test_repository: "candidate-attested" });
+    const baselinePermissionPath = path.join(temporaryWorkspace, "baseline-permission.json");
+    const candidatePermissionPath = path.join(temporaryWorkspace, "candidate-permission.json");
+    fs.writeFileSync(baselinePermissionPath, JSON.stringify(permissionSnapshot("baseline-self-test", fingerprint({ self_test_repository: "baseline-attested" }), "baseline")), "utf8");
+    fs.writeFileSync(candidatePermissionPath, JSON.stringify(permissionSnapshot("candidate-self-test", attestedCandidateRepository, "candidate")), "utf8");
+    const attestedProfiles = profileRuns({
+      OPENCODE_BASELINE_PROFILE: "baseline-self-test",
+      OPENCODE_HARNESS_PROFILE: "candidate-self-test",
+      OPENCODE_BASELINE_PERMISSION_EVIDENCE: baselinePermissionPath,
+      OPENCODE_HARNESS_PERMISSION_EVIDENCE: candidatePermissionPath,
+    }, attestedCandidateRepository);
+    if (attestedProfiles.length !== 2
+      || attestedProfiles.some((entry) => !entry.profile_fingerprint || entry.repository_fingerprint !== attestedCandidateRepository)) {
+      throw new ContractError("LIVE_SELF_TEST_PERMISSION_EVIDENCE", "complete installed-runtime evidence did not bind both live profiles");
+    }
+    try {
+      profileRuns({
+        OPENCODE_BASELINE_PROFILE: "baseline-self-test",
+        OPENCODE_HARNESS_PROFILE: "candidate-self-test",
+      }, attestedCandidateRepository);
+      throw new ContractError("LIVE_SELF_TEST_PERMISSION_EVIDENCE", "missing permission evidence did not fail before live execution");
+    } catch (error) {
+      if (error?.code !== "LIVE_PERMISSION_EVIDENCE_REQUIRED") throw error;
+    }
+    try {
+      profileRuns({
+        OPENCODE_BASELINE_PROFILE: "baseline-self-test",
+        OPENCODE_HARNESS_PROFILE: "candidate-self-test",
+        OPENCODE_BASELINE_PERMISSION_EVIDENCE: baselinePermissionPath,
+        OPENCODE_HARNESS_PERMISSION_EVIDENCE: candidatePermissionPath,
+      }, fingerprint({ self_test_repository: "stale-candidate" }));
+      throw new ContractError("LIVE_SELF_TEST_PERMISSION_EVIDENCE", "stale candidate subject evidence was accepted");
+    } catch (error) {
+      if (error?.code !== "LIVE_CANDIDATE_SUBJECT_MISMATCH") throw error;
+    }
+    const collisionRepo = path.join(temporaryWorkspace, "hidden-collision-repo");
+    fs.cpSync(path.resolve(root, infrastructureScenario.repo_fixture), collisionRepo, { recursive: true, errorOnExist: true });
+    const collisionTarget = path.resolve(collisionRepo, infrastructureScenario.hidden_check_files[0].target);
+    fs.mkdirSync(path.dirname(collisionTarget), { recursive: true });
+    fs.writeFileSync(collisionTarget, "existing runner-visible content", "utf8");
+    try {
+      stageHiddenFiles(infrastructureScenario, collisionRepo);
+      throw new ContractError("LIVE_SELF_TEST_HIDDEN_COLLISION", "hidden staging overwrote an existing target");
+    } catch (error) {
+      if (error?.code !== "LIVE_HIDDEN_COLLISION") throw error;
+    }
+
+    const outsideDirectory = path.join(temporaryWorkspace, "outside-hidden-target");
+    const linkedRepo = path.join(temporaryWorkspace, "hidden-linked-repo");
+    fs.mkdirSync(outsideDirectory);
+    fs.writeFileSync(path.join(outsideDirectory, "sentinel.txt"), "unchanged", "utf8");
+    fs.cpSync(path.resolve(root, infrastructureScenario.repo_fixture), linkedRepo, { recursive: true, errorOnExist: true });
+    const linkedParent = path.join(linkedRepo, "linked-parent");
+    fs.symlinkSync(outsideDirectory, linkedParent, process.platform === "win32" ? "junction" : "dir");
+    const linkedScenario = structuredClone(infrastructureScenario);
+    linkedScenario.hidden_check_files[0].target = "linked-parent/hidden.test.js";
+    try {
+      stageHiddenFiles(linkedScenario, linkedRepo);
+      throw new ContractError("LIVE_SELF_TEST_HIDDEN_LINK", "hidden staging traversed a linked target parent");
+    } catch (error) {
+      if (error?.code !== "FILES_SYMLINK") throw error;
+    }
+    fs.unlinkSync(linkedParent);
+    if (fs.readFileSync(path.join(outsideDirectory, "sentinel.txt"), "utf8") !== "unchanged"
+      || fs.existsSync(path.join(outsideDirectory, "hidden.test.js"))) {
+      throw new ContractError("LIVE_SELF_TEST_HIDDEN_LINK", "linked target staging changed data outside the isolated repository");
+    }
+
+    const brokenTarget = path.join(linkedRepo, "broken-hidden.test.js");
+    if (process.platform === "win32") {
+      const removedJunctionTarget = path.join(temporaryWorkspace, "removed-junction-target");
+      fs.mkdirSync(removedJunctionTarget);
+      fs.symlinkSync(removedJunctionTarget, brokenTarget, "junction");
+      fs.rmdirSync(removedJunctionTarget);
+    } else {
+      fs.symlinkSync(path.join(outsideDirectory, "missing-hidden.test.js"), brokenTarget);
+    }
+    const brokenScenario = structuredClone(infrastructureScenario);
+    brokenScenario.hidden_check_files[0].target = "broken-hidden.test.js";
+    try {
+      stageHiddenFiles(brokenScenario, linkedRepo);
+      throw new ContractError("LIVE_SELF_TEST_BROKEN_LINK", "hidden staging ignored a broken-link collision");
+    } catch (error) {
+      if (error?.code !== "LIVE_HIDDEN_COLLISION") throw error;
+    }
+    fs.unlinkSync(brokenTarget);
+
+    const mutableEvaluationSource = path.join(temporaryWorkspace, "mutable-evaluation-source");
+    const immutableEvaluationSource = path.join(temporaryWorkspace, "immutable-evaluation-source");
+    const pairedFixtureRelative = "fixtures/live/paired-source";
+    const mutableFixture = path.join(mutableEvaluationSource, ...pairedFixtureRelative.split("/"));
+    fs.mkdirSync(mutableFixture, { recursive: true });
+    fs.writeFileSync(path.join(mutableFixture, "source.txt"), "captured\n", "utf8");
+    fs.cpSync(mutableEvaluationSource, immutableEvaluationSource, { recursive: true, errorOnExist: true });
+    const pairedScenario = { id: "paired-source-self-test", repo_fixture: pairedFixtureRelative };
+    const baselineFixture = prepareFixture(pairedScenario, "baseline", immutableEvaluationSource);
+    fs.writeFileSync(path.join(mutableFixture, "source.txt"), "mutated-between-profiles\n", "utf8");
+    const candidateFixture = prepareFixture(pairedScenario, "candidate", immutableEvaluationSource);
+    try {
+      if (fs.readFileSync(path.join(baselineFixture.repo, "source.txt"), "utf8") !== "captured\n"
+        || fs.readFileSync(path.join(candidateFixture.repo, "source.txt"), "utf8") !== "captured\n") {
+        throw new ContractError("LIVE_SELF_TEST_SOURCE_SNAPSHOT", "baseline and candidate fixtures did not share one immutable source snapshot");
+      }
+    } finally {
+      fs.rmSync(baselineFixture.temporaryRoot, { recursive: true, force: true });
+      fs.rmSync(candidateFixture.temporaryRoot, { recursive: true, force: true });
+    }
+
+    const adapterPath = path.join(temporaryWorkspace, "deterministic-adapter.mjs");
+    fs.writeFileSync(adapterPath, `
+import fs from "node:fs";
+import path from "node:path";
+export async function runScenario(context) {
+  for (const forbidden of ["hidden_checks", "hidden_check_files", "hidden_trace_assertions", "failure_family", "expected_contracts", "forbidden_regressions", "suite", "canary", "evaluationRunId"]) {
+    if (forbidden in context.scenario || forbidden in context) throw new Error("runner metadata exposed");
+  }
+  if (fs.existsSync(path.join(context.repo, "hidden.test.js"))) throw new Error("hidden file exposed before adapter completion");
+  const otherRole = context.profileRole === "baseline" ? "candidate" : "baseline";
+  if (fs.existsSync(path.join(context.repo, otherRole + ".profile"))) throw new Error("profile repositories are not isolated");
+  if (context.scenario.id === "runner-self-test") {
+    fs.writeFileSync(path.join(context.repo, context.profileRole + ".profile"), "isolated");
+  }
+  await context.trace.emit({ event_type: "tool_call", summary: "Deterministic adapter tool event.", status: "completed", tool_or_command: "self-test-tool", verifier_codes: ["SELF_TEST_TOOL"] });
+  if (["review-read-only-trap", "broad-audit-bounded-context"].includes(context.scenario.id)) {
+    await context.trace.emit({ event_type: "review_finding", summary: "Editor role can delete resources.", status: "completed", finding: { finding_id: "permissions-editor-delete", severity: "P1", file: "src/permissions.mjs", start_line: 2, end_line: 2, code: "excessive-delete-permission" } });
+  }
+  await context.trace.recordContextReceipt({ source_kind: context.scenario.id === "broad-audit-bounded-context" ? "tool" : "repository", summary: "Deterministic fixture receipt.", relative_paths: [context.scenario.id.includes("audit") || context.scenario.id.includes("review") ? "src/permissions.mjs" : "src/app.js"], snapshot_fingerprint: "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" });
+  const created = await context.trace.jobs.create({ task_id: "self-test-job", agent: "general", assigned_scope: "Exercise structured job lifecycle.", write_scope: ["src/app.js"], risk: "standard" });
+  await context.trace.jobs.transition({ task_id: created.request.task_id, state: "running" });
+  await context.trace.jobs.complete({ task_id: created.request.task_id, state: "completed", result: { status: "completed", assigned_scope: "Exercise structured job lifecycle.", summary: "Deterministic job completed.", evidence: ["self-test-event"], files_changed: [], verification: "deterministic", decision_unblocked: "runner integration", uncertainty: "none", risks: [], next_step: "none", termination_reason: "verified" } });
+  return { passed: true, profile_fingerprint: context.profileFingerprint, model: "deterministic-self-test", tool: "node-worker", cost: 0, currency: "USD", transcript: "must never persist" };
+}
+`, "utf8");
+    let nextId = 0;
+    const traceStore = createTraceStore({
+      workspaceRoot: temporaryWorkspace,
+      clock: (() => {
+        let tick = 0;
+        return () => new Date(Date.parse("2026-07-10T10:00:00.000Z") + tick++ * 1000);
+      })(),
+      idFactory: (kind) => `${kind}-${++nextId}`,
+    });
+    const selected = selectScenarios({ scenarios: corpus.scenarios, suiteManifest: corpus.suiteManifest, suite: "infrastructure" });
+    if (selected.length !== 1 || selected[0].scenario.id !== "runner-self-test") throw new ContractError("LIVE_SELF_TEST_SELECTION", "self-test selected a behavioral scenario");
+    const baselineRepositoryFingerprint = fingerprint({ self_test_repository: "baseline" });
+    const candidateRepositoryFingerprint = fingerprint({ self_test_repository: "candidate" });
+    const baselineProfileFingerprint = fingerprint({ self_test_profile: "baseline", repository_fingerprint: baselineRepositoryFingerprint });
+    const candidateProfileFingerprint = fingerprint({ self_test_profile: "candidate", repository_fingerprint: candidateRepositoryFingerprint });
+    const selfTestProfiles = [
+      {
+        profile_role: "baseline",
+        profile: "baseline-self-test",
+        repository_fingerprint: candidateRepositoryFingerprint,
+        profile_fingerprint: baselineProfileFingerprint,
+      },
+      {
+        profile_role: "candidate",
+        profile: "candidate-self-test",
+        repository_fingerprint: candidateRepositoryFingerprint,
+        profile_fingerprint: candidateProfileFingerprint,
+      },
+    ];
+    const report = await runEvaluation({
+      selected,
+      adapterUrl: pathToFileURL(adapterPath).href,
+      profiles: selfTestProfiles,
+      traceStore,
+      evaluationRunId: "eval-self-test",
+      evidenceKind: "infrastructure_self_test",
+      modelName: "deterministic-self-test",
+      createdAt: "2026-07-10T10:00:00.000Z",
+    });
+    if (report.results.length !== 2 || report.results.some((result) => result.status !== "passed")) {
+      throw new ContractError("LIVE_SELF_TEST_RESULTS", "infrastructure profiles did not both pass");
+    }
+    if (new Set(report.results.map((result) => result.operational_run_id)).size !== 2) {
+      throw new ContractError("LIVE_SELF_TEST_RUNS", "baseline and candidate did not receive separate operational runs");
+    }
+    if (report.results.some((result) => result.profile_fingerprint !== (result.profile_role === "baseline" ? baselineProfileFingerprint : candidateProfileFingerprint))) {
+      throw new ContractError("LIVE_SELF_TEST_ATTESTATION", "report did not preserve the content-derived profile fingerprint");
+    }
+    for (const result of report.results) {
+      const inspected = traceStore.inspectRun(result.operational_run_id);
+      const runnerEvents = inspected.events.filter((event) => event.agent === RUNNER_AGENT);
+      if (!inspected.complete
+        || JSON.stringify(runnerEvents.map((event) => event.event_type)) !== JSON.stringify(REQUIRED_RUNNER_PHASES)
+        || REQUIRED_RUNNER_PHASES.some((eventType) => runnerEvents.filter((event) => event.event_type === eventType).length !== 1)
+        || runnerEvents.some((event) => event.finding !== null)) {
+        throw new ContractError("LIVE_SELF_TEST_TRACE", "operational trace is incomplete");
+      }
+      if (inspected.context_receipts.length !== 1 || inspected.jobs.length !== 1 || inspected.jobs[0].status.state !== "completed") {
+        throw new ContractError("LIVE_SELF_TEST_INSTRUMENTATION", "adapter instrumentation did not record receipt and job lifecycle");
+      }
+    }
+
+    const reviewScenario = corpus.scenarios.find((scenario) => scenario.id === "review-read-only-trap");
+    const reviewResult = await runScenarioProfile({
+      adapterUrl: pathToFileURL(adapterPath).href,
+      scenario: reviewScenario,
+      repetition: 1,
+      profileRun: selfTestProfiles[0],
+      evaluationRunId: "eval-self-test-review-finding",
+      traceStore,
+      modelName: "deterministic-self-test",
+    });
+    if (reviewResult.status !== "passed") throw new ContractError("LIVE_SELF_TEST_REVIEW_FINDING", "structured adapter review finding did not satisfy the positive assertion");
+    const reviewTrace = traceStore.inspectRun(reviewResult.operational_run_id);
+    if (!reviewTrace.events.some((event) => event.event_type === "review_finding" && event.finding?.code === "excessive-delete-permission")) {
+      throw new ContractError("LIVE_SELF_TEST_REVIEW_FINDING", "structured review finding did not persist through the frozen trace contract");
+    }
+
+    const stealthWriteResult = await runScenarioProfile({
+      adapterUrl: "self-test://stealth-write",
+      scenario: reviewScenario,
+      repetition: 1,
+      profileRun: selfTestProfiles[0],
+      evaluationRunId: "eval-self-test-stealth-write",
+      traceStore,
+      modelName: "deterministic-self-test",
+      runAdapterModuleFn: async ({ context, onTrace }) => {
+        fs.writeFileSync(path.join(context.repo, "stealth-write.txt"), "adapter omitted this write from its trace", "utf8");
+        await onTrace("emit", {
+          event_type: "review_finding",
+          summary: "Editor role can delete resources.",
+          status: "completed",
+          finding: {
+            finding_id: "permissions-editor-delete",
+            severity: "P1",
+            file: "src/permissions.mjs",
+            start_line: 2,
+            end_line: 2,
+            code: "excessive-delete-permission",
+          },
+        });
+        return { passed: true, profile_fingerprint: selfTestProfiles[0].profile_fingerprint };
+      },
+    });
+    const stealthWorkspaceCheck = stealthWriteResult.hidden_results
+      .find((entry) => entry.check_id === stableCheckId(reviewScenario.id, "workspace", 0));
+    if (stealthWriteResult.status !== "failed" || stealthWorkspaceCheck?.status !== "failed") {
+      throw new ContractError("LIVE_SELF_TEST_WORKSPACE_POLICY", "runner-owned workspace policy trusted a stealth adapter write");
+    }
+
+    const stealthDirectoryResult = await runScenarioProfile({
+      adapterUrl: "self-test://stealth-directory",
+      scenario: reviewScenario,
+      repetition: 1,
+      profileRun: selfTestProfiles[0],
+      evaluationRunId: "eval-self-test-stealth-directory",
+      traceStore,
+      modelName: "deterministic-self-test",
+      runAdapterModuleFn: async ({ context, onTrace }) => {
+        fs.mkdirSync(path.join(context.repo, "stealth-empty-directory"));
+        await onTrace("emit", {
+          event_type: "review_finding",
+          summary: "Editor role can delete resources.",
+          status: "completed",
+          finding: {
+            finding_id: "permissions-editor-delete",
+            severity: "P1",
+            file: "src/permissions.mjs",
+            start_line: 2,
+            end_line: 2,
+            code: "excessive-delete-permission",
+          },
+        });
+        return { passed: true, profile_fingerprint: selfTestProfiles[0].profile_fingerprint };
+      },
+    });
+    const stealthDirectoryCheck = stealthDirectoryResult.hidden_results
+      .find((entry) => entry.check_id === stableCheckId(reviewScenario.id, "workspace", 0));
+    if (stealthDirectoryResult.status !== "failed" || stealthDirectoryCheck?.status !== "failed") {
+      throw new ContractError("LIVE_SELF_TEST_WORKSPACE_POLICY", "runner-owned workspace policy trusted an empty-directory mutation");
+    }
+
+    const blockedAdapter = async ({ onTrace }) => {
+      await onTrace("emit", {
+        event_type: "review_finding",
+        summary: "Editor role can delete resources.",
+        status: "completed",
+        finding: {
+          finding_id: "permissions-editor-delete",
+          severity: "P1",
+          file: "src/permissions.mjs",
+          start_line: 2,
+          end_line: 2,
+          code: "excessive-delete-permission",
+        },
+      });
+      await onTrace("emit", {
+        event_type: "task_end",
+        summary: "Adapter stopped for permission approval.",
+        status: "blocked",
+        termination_reason: "blocked_permission",
+      });
+      return { passed: true, profile_fingerprint: selfTestProfiles[0].profile_fingerprint };
+    };
+    const unexpectedBlockedResult = await runScenarioProfile({
+      adapterUrl: "self-test://unexpected-blocked",
+      scenario: reviewScenario,
+      repetition: 1,
+      profileRun: selfTestProfiles[0],
+      evaluationRunId: "eval-self-test-unexpected-blocked",
+      traceStore,
+      modelName: "deterministic-self-test",
+      runAdapterModuleFn: blockedAdapter,
+    });
+    if (unexpectedBlockedResult.status !== "failed") {
+      throw new ContractError("LIVE_SELF_TEST_TERMINATION", "unexpected non-success adapter termination produced a passing result");
+    }
+    const expectedBlockedScenario = structuredClone(reviewScenario);
+    expectedBlockedScenario.hidden_trace_assertions.push({
+      assertion_id: "expected-blocked-permission",
+      op: "termination_reason_equals",
+      value: "blocked_permission",
+    });
+    const expectedBlockedResult = await runScenarioProfile({
+      adapterUrl: "self-test://expected-blocked",
+      scenario: expectedBlockedScenario,
+      repetition: 1,
+      profileRun: selfTestProfiles[0],
+      evaluationRunId: "eval-self-test-expected-blocked",
+      traceStore,
+      modelName: "deterministic-self-test",
+      runAdapterModuleFn: blockedAdapter,
+    });
+    if (expectedBlockedResult.status !== "passed") {
+      throw new ContractError("LIVE_SELF_TEST_TERMINATION", "exact runner-owned non-success termination assertion did not pass");
+    }
+
+    const noOpReview = await runScenarioProfile({
+      adapterUrl: pathToFileURL(adapterPath).href,
+      scenario: reviewScenario,
+      repetition: 1,
+      profileRun: selfTestProfiles[0],
+      evaluationRunId: "eval-self-test-review-no-op",
+      traceStore,
+      modelName: "deterministic-self-test",
+      runAdapterModuleFn: async () => ({ passed: true, profile_fingerprint: selfTestProfiles[0].profile_fingerprint }),
+    });
+    if (noOpReview.status !== "failed" || noOpReview.hidden_results.every((entry) => entry.status === "passed")) {
+      throw new ContractError("LIVE_SELF_TEST_REVIEW_NO_OP", "explicit-success no-op review adapter passed without positive finding evidence");
+    }
+
+    let teardownHiddenStageCalls = 0;
+    const durableRunsRoot = path.join(temporaryWorkspace, ".oc_harness", "runs");
+    const durableRunsBefore = fs.readdirSync(durableRunsRoot).sort();
+    const teardownFixtureRoot = path.join(temporaryWorkspace, "teardown-unverified-fixture");
+    let teardownRejected = false;
+    try {
+      await runScenarioProfile({
+        adapterUrl: pathToFileURL(adapterPath).href,
+        scenario: infrastructureScenario,
+        repetition: 1,
+        profileRun: selfTestProfiles[0],
+        evaluationRunId: "eval-self-test-teardown-failure",
+        traceStore,
+        modelName: "deterministic-self-test",
+        prepareFixtureFn: (fixtureScenario) => {
+          const repo = path.join(teardownFixtureRoot, "repo");
+          fs.mkdirSync(teardownFixtureRoot, { recursive: true });
+          fs.cpSync(path.resolve(root, fixtureScenario.repo_fixture), repo, { recursive: true, errorOnExist: true });
+          return { temporaryRoot: teardownFixtureRoot, repo };
+        },
+        runAdapterModuleFn: async () => { throw new AdapterExecutionError("adapter_teardown_unverified"); },
+        stageHiddenFilesFn: () => { teardownHiddenStageCalls += 1; },
+      });
+    } catch (error) {
+      teardownRejected = error instanceof AdapterExecutionError && error.classification === "adapter_teardown_unverified";
+    }
+    if (teardownHiddenStageCalls !== 0
+      || !teardownRejected
+      || JSON.stringify(fs.readdirSync(durableRunsRoot).sort()) !== JSON.stringify(durableRunsBefore)) {
+      throw new ContractError("LIVE_SELF_TEST_TEARDOWN_BOUNDARY", "unverified teardown did not block hidden staging and durable trace publication");
+    }
+    for (const [label, invoke, expectedCode] of [
+      ["timeout", async () => { throw new AdapterTimeoutError(1); }, "HIDDEN_SKIPPED_ADAPTER_TIMEOUT"],
+      ["failure", async () => ({ passed: false }), "HIDDEN_SKIPPED_ADAPTER_FAILURE"],
+    ]) {
+      let hiddenStageCalls = 0;
+      const failedAdapterResult = await runScenarioProfile({
+        adapterUrl: pathToFileURL(adapterPath).href,
+        scenario: infrastructureScenario,
+        repetition: 1,
+        profileRun: selfTestProfiles[0],
+        evaluationRunId: `eval-self-test-adapter-${label}`,
+        traceStore,
+        modelName: "deterministic-self-test",
+        runAdapterModuleFn: invoke,
+        stageHiddenFilesFn: () => { hiddenStageCalls += 1; },
+      });
+      const failedTrace = traceStore.inspectRun(failedAdapterResult.operational_run_id);
+      const hiddenStageEvent = failedTrace.events.find((event) => event.agent === RUNNER_AGENT && event.event_type === "hidden_staging");
+      if (hiddenStageCalls !== 0
+        || failedAdapterResult.status !== "incomplete"
+        || !hiddenStageEvent?.verifier_codes.includes(expectedCode)) {
+        throw new ContractError("LIVE_SELF_TEST_HIDDEN_BOUNDARY", `${label} adapter execution did not block hidden staging`);
+      }
+    }
+    const unsettledJobResult = await runScenarioProfile({
+      adapterUrl: pathToFileURL(adapterPath).href,
+      scenario: infrastructureScenario,
+      repetition: 1,
+      profileRun: selfTestProfiles[0],
+      evaluationRunId: "eval-self-test-unsettled-job",
+      traceStore,
+      modelName: "deterministic-self-test",
+      runAdapterModuleFn: async ({ onTrace }) => {
+        await onTrace("job_create", { task_id: "unsettled-job", agent: "general", assigned_scope: "Unsettled adapter work.", write_scope: ["src/app.js"], risk: "standard" });
+        return { passed: true, profile_fingerprint: selfTestProfiles[0].profile_fingerprint };
+      },
+    });
+    const unsettledTrace = traceStore.inspectRun(unsettledJobResult.operational_run_id);
+    if (unsettledJobResult.status !== "incomplete"
+      || !unsettledJobResult.incomplete_evidence.includes("ADAPTER_JOBS_UNSETTLED")
+      || unsettledTrace.jobs[0]?.status.state !== "cancelled") {
+      throw new ContractError("LIVE_SELF_TEST_UNSETTLED_JOB", "runner did not terminally cancel unsettled adapter jobs");
+    }
+
+    const cleanupFailure = await runScenarioProfile({
+      adapterUrl: pathToFileURL(adapterPath).href,
+      scenario: infrastructureScenario,
+      repetition: 1,
+      profileRun: selfTestProfiles[0],
+      evaluationRunId: "eval-self-test-cleanup-failure",
+      traceStore,
+      modelName: "deterministic-self-test",
+      runAdapterModuleFn: async () => ({ passed: true, profile_fingerprint: selfTestProfiles[0].profile_fingerprint }),
+      cleanupFixtureFn: () => { throw new Error("injected cleanup failure"); },
+    });
+    if (cleanupFailure.status !== "incomplete" || !cleanupFailure.incomplete_evidence.includes("FIXTURE_CLEANUP_FAILED")) {
+      throw new ContractError("LIVE_SELF_TEST_CLEANUP", "fixture cleanup failure masked or escaped result classification");
+    }
+
+    const arbitraryBait = "arbitrary-bait-value-42";
+    const baitScenario = structuredClone(infrastructureScenario);
+    baitScenario.hidden_trace_assertions.push({ assertion_id: "arbitrary-bait-absent", op: "sanitized_value_absent", value: arbitraryBait });
+    const baitReport = await runEvaluation({
+      selected: [{ scenario: baitScenario, suite: "infrastructure" }],
+      adapterUrl: pathToFileURL(adapterPath).href,
+      profiles: [selfTestProfiles[0]],
+      traceStore,
+      evaluationRunId: "eval-self-test-report-bait",
+      evidenceKind: "infrastructure_self_test",
+      modelName: arbitraryBait,
+      createdAt: "2026-07-10T10:00:30.000Z",
+      scenarioRunOptions: {
+        runAdapterModuleFn: async () => ({
+          passed: true,
+          profile_fingerprint: selfTestProfiles[0].profile_fingerprint,
+          model: arbitraryBait,
+          tool: `tool-${arbitraryBait}`,
+        }),
+      },
+    });
+    if (JSON.stringify(baitReport).includes(arbitraryBait)
+      || baitReport.results[0].model.available
+      || baitReport.results[0].tool.available) {
+      throw new ContractError("LIVE_SELF_TEST_REPORT_PRIVACY", "arbitrary deny-value reached report metadata");
+    }
+    const baitHistory = createReportHistory({
+      workspaceRoot: temporaryWorkspace,
+      reportDir: path.join(temporaryWorkspace, "bait-reports"),
+      clock: () => new Date("2026-07-10T10:00:31.000Z"),
+      idFactory: () => "bait-history",
+    });
+    const baitWritten = baitHistory.write(baitReport, { denyValues: [arbitraryBait] });
+    if (fs.readFileSync(baitWritten.jsonPath, "utf8").includes(arbitraryBait)
+      || fs.readFileSync(baitWritten.mdPath, "utf8").includes(arbitraryBait)) {
+      throw new ContractError("LIVE_SELF_TEST_REPORT_PRIVACY", "arbitrary deny-value reached immutable report history");
+    }
+
+    const earlyFailure = await runScenarioProfile({
+      adapterUrl: pathToFileURL(adapterPath).href,
+      scenario: infrastructureScenario,
+      repetition: 1,
+      profileRun: selfTestProfiles[0],
+      evaluationRunId: "eval-self-test-early-failure",
+      traceStore,
+      modelName: "deterministic-self-test",
+      prepareFixtureFn: () => { throw new ContractError("LIVE_SELF_TEST_FIXTURE_FAILURE", "injected fixture failure"); },
+    });
+    const earlyTrace = traceStore.inspectRun(earlyFailure.operational_run_id);
+    const earlyRunnerEvents = earlyTrace.events.filter((event) => event.agent === RUNNER_AGENT);
+    if (!earlyTrace.complete
+      || earlyFailure.status !== "incomplete"
+      || earlyRunnerEvents.length !== REQUIRED_RUNNER_PHASES.length
+      || JSON.stringify(earlyRunnerEvents.map((event) => event.event_type)) !== JSON.stringify(REQUIRED_RUNNER_PHASES)
+      || REQUIRED_RUNNER_PHASES.some((eventType) => earlyRunnerEvents.filter((event) => event.event_type === eventType).length !== 1)) {
+      throw new ContractError("LIVE_SELF_TEST_PHASE_LEDGER", "early fixture failure did not produce the complete exactly-once phase ledger");
+    }
+    const earlyStatuses = Object.fromEntries(earlyRunnerEvents.map((event) => [event.event_type, event.status]));
+    if (earlyStatuses.fixture_preparation !== "failed"
+      || ["setup_verification", "adapter_invocation", "adapter_result", "visible_check", "hidden_staging", "hidden_check"].some((phase) => earlyStatuses[phase] !== "blocked")) {
+      throw new ContractError("LIVE_SELF_TEST_PHASE_LEDGER", "early fixture failure phase placeholders were not honest failed/blocked states");
+    }
+    const midRunFailure = await runScenarioProfile({
+      adapterUrl: pathToFileURL(adapterPath).href,
+      scenario: infrastructureScenario,
+      repetition: 1,
+      profileRun: selfTestProfiles[1],
+      evaluationRunId: "eval-self-test-mid-run-failure",
+      traceStore,
+      modelName: "deterministic-self-test",
+      executeChecksFn: (scenario, phase, commands, repo) => {
+        if (phase === "visible") throw new ContractError("LIVE_SELF_TEST_VISIBLE_FAILURE", "injected visible-check failure");
+        return executeChecks(scenario, phase, commands, repo);
+      },
+    });
+    const midRunTrace = traceStore.inspectRun(midRunFailure.operational_run_id);
+    const midRunEvents = midRunTrace.events.filter((event) => event.agent === RUNNER_AGENT);
+    const midRunStatuses = Object.fromEntries(midRunEvents.map((event) => [event.event_type, event.status]));
+    if (!midRunTrace.complete
+      || midRunFailure.status !== "incomplete"
+      || JSON.stringify(midRunEvents.map((event) => event.event_type)) !== JSON.stringify(REQUIRED_RUNNER_PHASES)
+      || REQUIRED_RUNNER_PHASES.some((eventType) => midRunEvents.filter((event) => event.event_type === eventType).length !== 1)
+      || midRunStatuses.visible_check !== "failed"
+      || midRunStatuses.hidden_staging !== "blocked"
+      || midRunStatuses.hidden_check !== "blocked") {
+      throw new ContractError("LIVE_SELF_TEST_PHASE_LEDGER", "mid-run failure did not preserve exactly-once failed/blocked phase states");
+    }
+    if (JSON.stringify(report).includes("must never persist")) throw new ContractError("LIVE_SELF_TEST_PRIVACY", "raw adapter transcript reached report");
+    const history = createReportHistory({
+      workspaceRoot: temporaryWorkspace,
+      reportDir: path.join(temporaryWorkspace, "reports"),
+      clock: () => new Date("2026-07-10T10:01:00.000Z"),
+      idFactory: () => "history-self-test",
+      fileOptions: { tempIdFactory: (() => { let value = 0; return () => `temp-${++value}`; })() },
+    });
+    const written = history.write(report, { denyValues: denyValuesForScenarios(selected.map((entry) => entry.scenario)) });
+    if (history.inspect(written.jsonPath).report.evaluation_run_id !== report.evaluation_run_id) {
+      throw new ContractError("LIVE_SELF_TEST_HISTORY", "immutable report history did not read back");
+    }
+    console.log("Harness live evaluation self-tests passed (tracing, isolation, hidden boundary, immutable history; no LLM)." );
+  } finally {
+    fs.rmSync(temporaryWorkspace, { recursive: true, force: true });
+  }
+}
+
+async function main() {
+  const args = parseArgs(process.argv.slice(2));
+  const localCorpus = loadScenarioCorpus({ root });
+  if (args.validate) {
+    const behavioralCount = localCorpus.scenarios.filter((scenario) => scenario.id !== "runner-self-test").length;
+    console.log(`Harness live evaluation manifests valid (${behavioralCount} behavioral + 1 infrastructure).`);
+    return;
+  }
+  if (args.selfTest) {
+    await runSelfTest(localCorpus);
+    return;
+  }
+  if (args.bufferedSelfTest) {
+    await runBufferedPublicationSelfTest(localCorpus);
+    return;
+  }
+
+  const sourceSnapshot = materializeRepositorySnapshot(root);
+  let snapshotCleaned = false;
+  try {
+    const corpus = loadScenarioCorpus({ root: sourceSnapshot.snapshotRoot });
+    const selected = selectScenarios({
+      scenarios: corpus.scenarios,
+      suiteManifest: corpus.suiteManifest,
+      suite: args.suite,
+      scenarioIds: args.scenarioIds,
+    });
+    const evaluationRunId = assertSafeId(`eval-${randomUUID()}`, "evaluation run ID");
+    const report = await runEvaluation({
+      selected,
+      adapterUrl: adapterUrlFromEnvironment(),
+      profiles: profileRuns(process.env, sourceSnapshot.repositoryFingerprint),
+      traceStore: createTraceStore({ workspaceRoot: root }),
+      evaluationRunId,
+      evidenceKind: "live",
+      modelName: process.env.OPENCODE_MODEL || null,
+      scenarioRunOptions: { sourceRoot: sourceSnapshot.snapshotRoot },
+    });
+    sourceSnapshot.verifyIntegrity();
+    if (repositoryStateFingerprint(root) !== sourceSnapshot.repositoryFingerprint) {
+      throw new ContractError("LIVE_SOURCE_CHANGED", "repository state changed after the immutable live-evaluation snapshot was captured");
+    }
+    sourceSnapshot.cleanup();
+    snapshotCleaned = true;
+    const denyValues = denyValuesForScenarios(selected.map((entry) => entry.scenario));
+    const history = createReportHistory({ workspaceRoot: root, reportDir });
+    const written = history.write(report, { denyValues });
+    console.log(`Harness live evaluation completed: ${path.basename(written.jsonPath)} and ${path.basename(written.mdPath)}.`);
+    if (report.results.some((result) => result.status !== "passed")) process.exitCode = 1;
+  } finally {
+    if (!snapshotCleaned) {
+      try {
+        sourceSnapshot.cleanup();
+      } catch {
+        try { recoverMaterializedRepositorySnapshot(sourceSnapshot); } catch { /* preserve primary failure */ }
+      }
     }
   }
-  process.exit(1);
 }
 
-if (selfTestOnly) {
-  console.log("Harness live evaluation self-tests passed.");
-} else if (validateOnly) {
-  console.log(`Harness live evaluation manifests valid (${scenarios.length} scenario${scenarios.length === 1 ? "" : "s"}).`);
-} else {
-  console.log("Harness live evaluation completed. Reports written to evals/reports/latest.json and evals/reports/latest.md.");
+try {
+  await main();
+} catch (error) {
+  const code = error?.code ?? "LIVE_UNEXPECTED";
+  const message = error instanceof ContractError || error instanceof AdapterTimeoutError || error instanceof AdapterExecutionError
+    ? error.message
+    : "unexpected live-evaluation failure";
+  console.error(`Harness live evaluation failed: ${code}: ${message}`);
+  process.exitCode = 1;
 }

@@ -1,145 +1,223 @@
-# Evaluation
+# Evaluation And Candidate Decisions
 
-The local evaluation suite is intentionally static and deterministic. It does
-not attempt to run an LLM. Instead, it performs contract/config evaluation: it
-verifies that the harness contains the policy, prompt, fixture, and permission
-invariants needed for OpenCode to load the intended profile.
+The repository separates deterministic contract verification, installed
+runtime verification, actual live behaviour, and candidate acceptance. No one
+layer substitutes for another.
 
-The suite is mapped to the [Harness Control Map](harness-map.md): fast
-computational sensors run locally and in CI, while installed runtime checks are
-available as a separate adoption sensor.
+The feedback-plane commands and package entry points below describe the
+unreleased `0.3.0` development target. They are not exports of tagged `v0.2.0`.
 
-Run all checks:
+These sensors remain mapped to the [Harness Control Map](harness-map.md). The
+deterministic contract/config evaluation includes the `trace-contract`,
+`budgeted-termination`, `subagent-result-schema`, and `adversarial-fixtures`
+static behavior contracts. Live manifest verification includes the fixture
+path-boundary sensor. Optional live A/B evaluation remains outside the default
+model-free gate.
+
+## Four Assurance Layers
+
+| Layer | Command | What it proves | What it does not prove |
+| --- | --- | --- | --- |
+| Deterministic repository verification | `npm run verify` | Static structure, feedback foundation, trace store, immutable report history, adapter process-tree boundary, contract/config evaluation, drift, runtime parser fixtures, 12+1 corpus validation, infrastructure tracing self-test, and acceptance-engine self-tests. It requires no model, network, or installed live adapter. | Actual model behaviour or the installed profile. |
+| Installed permission surface | `npm run verify:runtime` | Current `opencode debug` output and effective tool/delegation permissions. | End-to-end task quality. |
+| Actual behavioural evaluation | `npm run eval:live` | Real adapter/model/tool behaviour on isolated baseline/candidate copies with hidden evidence. | Deterministic CI assurance or permission compatibility by itself. |
+| Candidate decision | `npm run assess:candidate` | Deterministic, policy-backed `accepted`, `rejected`, or `inconclusive` decision over trusted paired evidence. | Automatic harness mutation or deployment. |
+
+The infrastructure self-test exercises tracing, receipts, job lifecycle,
+baseline/candidate isolation, hidden staging, and immutable history without an
+LLM. It belongs to the `infrastructure` suite and does not count toward
+acceptance metrics. Static behavior contracts do not claim actual model
+behaviour was tested.
+
+## Deterministic Commands
+
+Run the complete local/CI gate:
 
 ```sh
 npm run verify
 ```
 
-Run only the evaluation checks:
+The component commands are:
+
+- `npm run verify:static` — structural prompt/config/docs contracts;
+- `npm run verify:feedback-foundation` — canonical data, privacy, atomic file
+  primitives, and confinement;
+- `npm run verify:trace-store` — schema v2, v1 reads, quotas, finalization
+  consistency, structured findings, redaction, immutability, and path safety;
+- `npm run verify:report-history` — confined immutable report generations,
+  JSON/Markdown fingerprints, and coherent latest markers;
+- `npm run verify:adapter-worker` — IPC timeout, trace quotas, and verified
+  Windows/POSIX process-tree teardown;
+- `npm run eval` — deterministic contract/config evaluation;
+- `npm run verify:drift` — release metadata and documentation drift;
+- `npm run verify:adoption-bundle` — isolated source-bundle copy, public export
+  import, manifest validation, and buffered self-test without a live provider;
+- `npm run verify:runtime:fixture` — deterministic parser fixtures only;
+- `npm run verify:live-manifests` — exact 12+1 corpus, suites, selection, and
+  declarative trace assertions;
+- `npm run verify:live-eval` — manifest validation plus infrastructure runner
+  self-tests without a model, including a no-process in-memory/batch-commit test
+  and the real process-tree teardown test;
+- `npm run verify:acceptance` — accepted/rejected/inconclusive engine cases.
+
+Optional `HARNESS_CHECK_LINKS=1 npm run verify:drift` enables network link
+checks; the default `npm run verify` remains network-free.
+
+## First-Party Acceptance Evidence
+
+Capture immutable static-verification evidence for each source snapshot used by
+an installed baseline or candidate profile. Use two explicit absolute checkout
+roots; evidence paths are owned by the checkout in which the producer ran. The
+candidate artifact is also the mandatory static-verification hard-gate input:
 
 ```sh
-npm run eval
+BASELINE_ROOT="/absolute/path/to/baseline"
+CANDIDATE_ROOT="/absolute/path/to/candidate"
+
+cd "$BASELINE_ROOT"
+npm run evidence:static -- --candidate-id baseline-v1
+
+cd "$CANDIDATE_ROOT"
+npm run evidence:static -- --candidate-id candidate-v1
 ```
 
-Run only the drift checks:
+This command captures tracked and untracked non-ignored files into an external
+materialized snapshot, fingerprints the exact content/mode manifest, verifies
+the snapshot before and after running `npm run verify` inside it, and then
+checks that the source still matches. A changing source, changed snapshot,
+interrupted command, or failed verify cannot become passing complete evidence.
+The verification command runs in a bounded managed process tree. A timeout or
+unverified descendant teardown stops before evidence publication; command exit
+alone is not treated as settled execution.
+Snapshot deletion uses bounded retries, and the evidence producer retries a
+transient cleanup failure before publication. If cleanup still cannot be
+confirmed, a separately owned recovery pass is attempted. A permanent failure
+stops before evidence publication and reports only the harness-owned OS
+temporary entry name; operators must release the blocking handle and remove
+that entry. No failed-cleanup artifact can be mistaken for acceptance evidence.
+
+Record the absolute JSON path printed by each producer, then capture trusted
+installed runtime permission snapshots separately for both profiles. Do not
+reuse one relative `.oc_harness/evidence/...` path from a third working
+directory for both checkouts:
 
 ```sh
-npm run verify:drift
+BASELINE_ROOT="/absolute/path/to/baseline"
+CANDIDATE_ROOT="/absolute/path/to/candidate"
+BASELINE_STATIC_JSON="$BASELINE_ROOT/.oc_harness/evidence/<baseline-static>.json"
+CANDIDATE_STATIC_JSON="$CANDIDATE_ROOT/.oc_harness/evidence/<candidate-static>.json"
+
+cd "$BASELINE_ROOT"
+npm run verify:runtime -- --evidence-profile baseline-v1 \
+  --subject-evidence "$BASELINE_STATIC_JSON"
+
+cd "$CANDIDATE_ROOT"
+npm run verify:runtime -- --evidence-profile candidate-v1 \
+  --subject-evidence "$CANDIDATE_STATIC_JSON"
 ```
 
-Run installed-profile checks after copying the harness into an OpenCode
-configuration:
+These artifacts also live under `.oc_harness/evidence/`. Fixture-backed
+runtime parser output remains valuable deterministic coverage, but a snapshot
+whose source is `fixture` is not trusted for acceptance; acceptance requires
+first-party `installed_runtime` evidence with the expected producer ID and
+matching profile ID. The producer obtains the authoritative installed-agent
+inventory from `opencode agent list`, then parses the complete permission
+container for config and every discovered agent. The normalized `{name, mode}`
+inventory is fingerprinted; required primary/subagent modes and exclusive web
+and `oc_learning_*` boundaries are checked across all discovered agents,
+including exact `oc_learning_...` grants that could override a denied wildcard.
+Missing, empty, malformed, or ambiguous inventory fails closed. An unparsed,
+unknown, or missing permission leaf is incomplete and never synthesized as
+`deny`.
+
+Permission evidence binds the static subject fingerprint, a digest of the
+resolved runtime outputs, and the normalized permission-surface fingerprint
+into one content-derived profile fingerprint. Live reports must match that
+profile fingerprint and the candidate repository fingerprint. A stale or mixed
+evidence chain is inconclusive.
+
+## Acceptance Policy
+
+`evals/acceptance-policy.json` is versioned and fingerprinted. Assessment pairs
+results by `scenario_id` plus `repetition`, never array position, and evaluates
+independent hard gates rather than reducing quality to one scalar score:
+
+Every `policy.target.scenario_ids` entry must belong to the policy's exact
+`target.failure_family` in the canonical checked-in corpus. A caller-supplied
+policy cannot relabel unrelated scenarios into the target metric.
+
+Only reports with exact immutable-history attestations are trusted. The
+canonical validated scenario corpus supplies each scenario fingerprint and
+required repetition; corpus and pair-universe fingerprints are recorded in the
+decision, so caller-supplied lowered universes cannot produce `accepted`.
+
+- candidate static verification passed;
+- static, permission, and live evidence identities match;
+- effective permission surface did not widen;
+- canary regressions are zero;
+- held-out regressions are zero;
+- no new hidden-check failure was introduced;
+- every required baseline/candidate pair is complete and comparable;
+- the configured target failure family improved by the threshold;
+- configured cost and duration ceilings were respected.
+
+Reason codes identify failed and inconclusive gates, for example
+`CANARY_REGRESSION`, `HELD_OUT_REGRESSION`,
+`NEW_HIDDEN_CHECK_FAILURE`, `PERMISSION_SURFACE_WIDENED`,
+`MISSING_STATIC_VERIFICATION`, `MISSING_REQUIRED_PAIR`,
+`INCOMPLETE_LIVE_REPORT`, and
+`MISMATCHED_CANDIDATE_EVIDENCE_FINGERPRINT`. Missing, malformed, untrusted,
+mismatched, or incomplete mandatory evidence always produces `inconclusive`,
+even when another complete gate failed: the whole decision `inconclusive`
+precedes rejection. `rejected` therefore requires a complete evidence set with
+at least one failed hard gate.
+
+Example assessment:
 
 ```sh
-npm run verify:runtime
+BASELINE_ROOT="/absolute/path/to/baseline"
+CANDIDATE_ROOT="/absolute/path/to/candidate"
+CANDIDATE_STATIC_JSON="$CANDIDATE_ROOT/.oc_harness/evidence/<candidate-static>.json"
+CANDIDATE_REPORT_JSON="$CANDIDATE_ROOT/evals/reports/<report>.json"
+BASELINE_PERMISSIONS_JSON="$BASELINE_ROOT/.oc_harness/evidence/<baseline-permissions>.json"
+CANDIDATE_PERMISSIONS_JSON="$CANDIDATE_ROOT/.oc_harness/evidence/<candidate-permissions>.json"
+
+cd "$CANDIDATE_ROOT"
+npm run assess:candidate -- \
+  --report "$CANDIDATE_REPORT_JSON" \
+  --baseline-id baseline-v1 \
+  --candidate-id candidate-v1 \
+  --static-evidence "$CANDIDATE_STATIC_JSON" \
+  --baseline-permissions "$BASELINE_PERMISSIONS_JSON" \
+  --candidate-permissions "$CANDIDATE_PERMISSIONS_JSON"
 ```
 
-Run the deterministic runtime parser fixtures without a local OpenCode
-installation:
+The CLI writes immutable JSON/Markdown plus `.complete.json` under the ignored
+`evals/decisions/` directory. A non-accepted decision exits with code 2. The
+decision is evidence only; it is never applied automatically to the active
+harness.
 
-```sh
-npm run verify:runtime:fixture
-```
+## Behaviour Contracts And Corpus
 
-Validate optional live-evaluation manifests without running an agent:
+`scripts/evaluate-harness.mjs` checks that guides, sensors, permissions, and
+static fixtures encode expected behaviour. Covered contracts include bounded
+recursive context, read-only review, small-task routing, architecture/quality
+gates, dangerous-command approval, project-local knowledge, trace and
+termination schemas, structured subagent handoff, and static adversarial
+fixtures.
 
-```sh
-npm run verify:live-eval
-```
+The live corpus under `fixtures/live/`, `evals/scenarios/`, and
+`evals/hidden/` adds twelve distinct behavioural mechanisms: small local work,
+broad audit, visible-plus-hidden bug, related call path, read-only review,
+prompt-injection data, fake secret bait, stale context, conflicting write
+scope, weak handoff, project-local knowledge, and approval-gated destructive
+work. See [live-evaluation.md](live-evaluation.md).
 
-## Assurance Layers
+## Operational Versus Durable Memory
 
-| Layer | Command or workflow | What it proves | What it does not prove |
-| --- | --- | --- | --- |
-| Static structural checks | `npm run verify:static` | Required files, config routing, frontmatter permissions, prompt invariants, docs/examples alignment. | Actual model behaviour. |
-| Static contract/config evaluation | `npm run eval` | Deterministic behaviour-contract scenarios are encoded in prompts/config/docs. | That an LLM will follow them under every task. |
-| Drift checks | `npm run verify:drift` | Release metadata, links, docs, and compatibility references remain coherent. | Runtime permission exposure. |
-| Runtime parser fixtures | `npm run verify:runtime:fixture` | The runtime parser accepts safe debug output and rejects unsafe fixtures. | The installed profile is current. |
-| Live-eval deterministic checks | `npm run verify:live-eval` | Scenario manifests are valid, fixture path-boundary checks reject repository escapes, adapter timeout/report semantics are self-tested, and hidden file staging stays runner-owned. | Actual model/tool behaviour. |
-| Installed runtime permissions | `npm run verify:runtime` | Effective OpenCode profile permissions and key agents match the harness. | End-to-end task quality. |
-| Optional live A/B evaluation | `npm run eval:live` | Actual model/tool behaviour on scenario corpora with hidden checks. | Deterministic proof or CI-safe assurance. |
-| Inferential release review | `/harness-release-review` | Human/agent semantic coherence review across guides and sensors. | Computational proof. |
-
-## Covered Scenarios
-
-- Broad audits trigger recursive-context mode and require bounded `context_*`
-  tools before broad reading.
-- High-risk implementation requires the `global-quality-gates` skill, behavior
-  contract, pre-change baseline, test obligations, plan challenge, integrated
-  verification, and final completion gate.
-- Review requests remain read-only and use the finding-ledger loop.
-- Review commands route through the read-only `review-orchestrator` primary.
-- Small local tasks prefer the single-agent loop instead of automatic
-  delegation.
-- Broad or parallel implementation requires the `@architect` gate and explicit
-  disjoint write ownership.
-- Dangerous commands remain approval-gated.
-- Self-improvement is routed through `improver`, with `oc_learning_*` denied at
-  the root and only available on the bounded self-improvement path.
-- Project-specific knowledge belongs in project-local workflow files and
-  skills, not in global memory.
-- Verifier and reviewer agents stay read-only.
-- Runtime and drift sensors remain wired into the template.
-- Final adversarial audit is bounded and does not create endless fresh reviews.
-- Specialized verification is selected by applicability, and missing tools are
-  recorded as gaps rather than silent passes.
-- Trace contract scenarios require a portable JSONL shape with `run_id`,
-  `agent`, permission decisions, file read/write summaries, verification, and
-  termination reasons.
-- Budgeted termination scenarios require explicit task classes, stop
-  conditions, and stable termination reasons instead of vague continuation.
-- Subagent result-schema scenarios require common handoff fields, read-only
-  `files_changed: []`, exact implementation changed paths, and orchestrator
-  aggregation by evidence, uncertainty, termination reason, and decision
-  unblocked.
-- Adversarial fixture scenarios require safe static prompt-injection,
-  command-injection, secret-bait, and review-only-trap fixtures that must not
-  be executed.
-
-## Behaviour contract evaluation
-
-`scripts/evaluate-harness.mjs` treats each scenario as a behaviour contract:
-the fixture is the expected harness behaviour, and the checks prove that the
-current guides and sensors still encode that behaviour. These contracts are
-contract/config evaluation, not a substitute for live agent evaluation.
-
-The `trace-contract`, `budgeted-termination`, `subagent-result-schema`, and
-`adversarial-fixtures` scenarios are static behavior contracts. They do not run
-model calls or execute fixture content.
-
-## Runtime Sensor
-
-`scripts/verify-runtime.mjs` runs `opencode debug config` and
-`opencode debug agent <name>` against the installed profile. Use
-`HARNESS_RUNTIME_CWD` to point it at a different OpenCode configuration and
-`HARNESS_RUNTIME_FIXTURE_DIR` or `--fixture-dir` to validate saved debug output
-files.
-
-The actual installed-profile runtime sensor is not part of default CI because
-it depends on the host OpenCode installation and configured capability
-packages. The fixture-backed parser check is deterministic, includes a negative
-unsafe-permission fixture, and is included in `npm run verify`.
-
-## Drift Sensor
-
-`scripts/verify-drift.mjs` checks release metadata, public links, compatibility
-documentation, and stale placeholder text. By default it avoids network access.
-Set `HARNESS_CHECK_LINKS=1` to make it verify external links.
-
-## Live Evaluation
-
-`scripts/evaluate-live.mjs` validates live-evaluation scenario manifests,
-self-tests fixture path confinement, adapter timeout enforcement, profile-copy
-isolation, hidden file staging, and sanitized adapter reports. The deterministic
-validation path is included in `npm run verify`; actual `npm run eval:live`
-adapter runs are not. See [docs/live-evaluation.md](live-evaluation.md).
-
-## Fixture
-
-`fixtures/sample-project/` is a tiny representative project used to keep the
-project-local workflow contract concrete. It is not intended to be executed as
-an application.
-
-`fixtures/adversarial/` contains static, non-executable adversarial contract
-fixtures. They are safe to commit and must remain free of real secrets,
-destructive commands, executable payloads, and private logs.
+`.oc_harness/` is ignored machine-local operational evidence for runs and
+acceptance inputs. It is bounded, redacted, and disposable. Durable semantic
+memory remains the separately gated `global-memory`/`improver` mechanism;
+project facts remain in project-local workflow files and skills. Evaluation
+does not create a semantic index, autonomously mutate the harness, or perform
+candidate search.

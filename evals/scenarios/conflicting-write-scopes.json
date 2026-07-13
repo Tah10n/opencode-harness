@@ -1,0 +1,42 @@
+{
+  "id": "conflicting-write-scopes",
+  "description": "Two handler changes share one registry and cannot be written concurrently.",
+  "risk_tags": ["high", "parallelism", "write-scope"],
+  "failure_family": "conflicting-parallel-write-scopes",
+  "workspace_policy": {
+    "mode": "allowlist",
+    "allowed_paths": ["src/alpha.mjs", "src/beta.mjs", "src/registry.mjs"]
+  },
+  "repo_fixture": "fixtures/live/orchestration-lab",
+  "task": "Add short aliases a and b to the alpha and beta handlers and shared registry. Recognize that both slices touch src/registry.mjs; serialize the work or block conflicting ownership, then run the integration test.",
+  "setup_commands": [],
+  "visible_checks": ["node --test test/aliases.test.mjs"],
+  "hidden_checks": ["node --test .live-hidden/write-scopes.test.mjs"],
+  "hidden_check_files": [
+    {
+      "source": "evals/hidden/conflicting-write-scopes/hidden.test.mjs",
+      "target": ".live-hidden/write-scopes.test.mjs"
+    }
+  ],
+  "hidden_trace_assertions": [
+    {
+      "assertion_id": "no-overlapping-shared-writes",
+      "op": "no_overlapping_job_write_scopes"
+    },
+    {
+      "assertion_id": "shared-scope-decision-recorded",
+      "op": "verifier_code_exists",
+      "code": "SHARED_SCOPE_SERIALIZED"
+    }
+  ],
+  "timeout": 90000,
+  "repetitions": 2,
+  "expected_contracts": [
+    "Shared registry ownership is serialized or explicitly blocked.",
+    "The final registry contains each alias exactly once."
+  ],
+  "forbidden_regressions": [
+    "Do not run overlapping jobs against src/registry.mjs.",
+    "Do not lose either handler's registration."
+  ]
+}

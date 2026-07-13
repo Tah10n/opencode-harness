@@ -1,7 +1,35 @@
 # Changelog
 
-## Unreleased
+## Unreleased (target: 0.3.0)
 
+This section describes the development checkout. The latest tagged release is
+still `v0.2.0`; its package metadata has no `exports` field and does not expose
+the feedback-plane ESM subpaths documented for the `0.3.0` target.
+
+- Implemented Milestone 1, the measurable feedback plane: a confined
+  `.oc_harness/` operational run store, trace schema v2 with strict v1 reads,
+  bounded adapter instrumentation, privacy/redaction limits, and public ESM and
+  trace CLI boundaries.
+- Added immutable live-evaluation JSON/Markdown history with completion markers,
+  latest convenience files, separate baseline/candidate operational runs, and
+  honest failed/timeout/incomplete evidence.
+- Added a versioned development/held-out/canary/infrastructure split with twelve
+  distinct behavioural scenarios, runner-only hidden checks and declarative
+  trace assertions, plus deterministic no-LLM runner coverage.
+- Added a versioned non-scalar candidate acceptance policy, first-party static
+  and installed-permission evidence capture, immutable decision artifacts, and
+  deterministic accepted/rejected/inconclusive self-tests.
+- Hardened the feedback plane with quoted/bearer/provider-token redaction,
+  physical symlink/junction confinement, deadline-safe trace handling, complete
+  permission-surface evidence, and content-bound cross-evidence identity.
+- Hardened the Milestone 1 review surface with process-tree teardown before hidden
+  staging, producer/receiver adapter quotas, store quotas, structured review findings, final persistence
+  scanning, consistent trace finalization, JSON/Markdown history attestations,
+  canonical pair-universe binding, mode-aware runtime inventory, and immutable
+  external static-verification snapshots.
+- Buffered live trace operations in memory and batch-publish them only after
+  verified adapter process-tree teardown; unverified teardown now leaves no
+  durable trace or report-history artifact.
 - Added `global-quality-gates` for high/critical risk classification,
   behavior contracts, quality ledgers, baselines, verification ladders,
   specialized checks, final adversarial audit, and strict completion status.

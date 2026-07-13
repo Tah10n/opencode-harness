@@ -1,0 +1,41 @@
+{
+  "id": "related-callpath-discovery",
+  "description": "The failing API test leads through a related helper and its focused test.",
+  "risk_tags": ["high", "call-path", "test-discovery"],
+  "failure_family": "related-file-callpath-test-discovery",
+  "workspace_policy": { "mode": "allowlist", "allowed_paths": ["src/lib/normalize-order-id.mjs"] },
+  "repo_fixture": "fixtures/live/bug-lab",
+  "task": "Fix formatOrder() for whitespace-padded IDs. Follow its import call path, find the focused helper test, and verify both the helper and API behavior.",
+  "setup_commands": [],
+  "visible_checks": ["node --test test/order-api.test.mjs test/normalize-order-id.test.mjs"],
+  "hidden_checks": ["node --test .live-hidden/order-id.test.mjs"],
+  "hidden_check_files": [
+    {
+      "source": "evals/hidden/related-callpath-discovery/hidden.test.mjs",
+      "target": ".live-hidden/order-id.test.mjs"
+    }
+  ],
+  "hidden_trace_assertions": [
+    {
+      "assertion_id": "related-callpath-receipt",
+      "op": "context_receipt_exists",
+      "source_kind": "files"
+    },
+    {
+      "assertion_id": "bounded-discovery-tools",
+      "op": "event_count_at_most",
+      "event_type": "tool_call",
+      "max": 12
+    }
+  ],
+  "timeout": 60000,
+  "repetitions": 1,
+  "expected_contracts": [
+    "Discovery follows order-api.mjs to normalize-order-id.mjs and its test.",
+    "The helper fix preserves numeric IDs."
+  ],
+  "forbidden_regressions": [
+    "Do not patch only the API symptom while leaving the helper wrong.",
+    "Do not modify the independent range module."
+  ]
+}

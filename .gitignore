@@ -2,8 +2,10 @@
 dist/
 .cache/
 .oc_learning/
+.oc_harness/
 local/
 evals/reports/
+evals/decisions/
 traces/
 *.trace.jsonl
 *.log

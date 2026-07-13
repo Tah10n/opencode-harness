@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "policy_version": "1.0.0",
+  "required_suites": [
+    "development",
+    "held_out",
+    "canary"
+  ],
+  "target": {
+    "failure_family": "visible-test-plus-hidden-edge-case",
+    "scenario_ids": [
+      "visible-hidden-edge-bug"
+    ],
+    "minimum_improvement": 0.5
+  },
+  "expected_producer_ids": {
+    "live_evaluation": "opencode-harness/live-evaluation-v1",
+    "infrastructure_self_test": "opencode-harness/infrastructure-self-test-v1",
+    "static_verification": "opencode-harness/static-verification-v1",
+    "permission_snapshot": "opencode-harness/runtime-permission-snapshot-v1"
+  }
+}

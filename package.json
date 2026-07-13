@@ -1,9 +1,16 @@
 ﻿{
   "name": "opencode-harness",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A reproducible OpenCode orchestration profile.",
   "type": "module",
   "private": true,
+  "engines": {
+    "node": ">=24"
+  },
+  "exports": {
+    "./feedback": "./lib/feedback/index.mjs",
+    "./trace-store": "./lib/feedback/index.mjs"
+  },
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -14,15 +21,26 @@
   },
   "homepage": "https://github.com/Tah10n/opencode-harness#readme",
   "scripts": {
+    "assess:candidate": "node scripts/assess-candidate.mjs",
+    "evidence:static": "node scripts/capture-static-evidence.mjs",
     "eval": "node scripts/evaluate-harness.mjs",
     "eval:live": "node scripts/evaluate-live.mjs",
+    "eval:live:buffered-self-test": "node scripts/evaluate-live.mjs --self-test-buffered",
     "eval:live:self-test": "node scripts/evaluate-live.mjs --self-test",
     "eval:live:validate": "node scripts/evaluate-live.mjs --validate",
-    "verify": "npm run verify:static && npm run eval && npm run verify:drift && npm run verify:runtime:fixture && npm run verify:live-eval",
+    "trace": "node scripts/trace-run.mjs",
+    "verify": "npm run verify:static && npm run verify:feedback-foundation && npm run verify:trace-store && npm run verify:report-history && npm run verify:adapter-worker && npm run eval && npm run verify:drift && npm run verify:adoption-bundle && npm run verify:runtime:fixture && npm run verify:live-eval && npm run verify:acceptance",
+    "verify:acceptance": "node scripts/verify-candidate-assessment.mjs",
+    "verify:adoption-bundle": "node scripts/verify-adoption-bundle.mjs",
+    "verify:adapter-worker": "node scripts/verify-adapter-worker.mjs",
     "verify:drift": "node scripts/verify-drift.mjs",
-    "verify:live-eval": "npm run eval:live:validate && npm run eval:live:self-test",
+    "verify:feedback-foundation": "node scripts/verify-feedback-foundation.mjs",
+    "verify:live-eval": "npm run verify:live-manifests && npm run eval:live:validate && npm run eval:live:buffered-self-test && npm run eval:live:self-test",
+    "verify:live-manifests": "node scripts/verify-live-manifests.mjs",
+    "verify:report-history": "node scripts/verify-report-history.mjs",
     "verify:runtime": "node scripts/verify-runtime.mjs",
     "verify:runtime:fixture": "node scripts/verify-runtime-fixtures.mjs",
-    "verify:static": "node scripts/verify-harness.mjs"
+    "verify:static": "node scripts/verify-harness.mjs",
+    "verify:trace-store": "node scripts/verify-trace-store.mjs"
   }
 }

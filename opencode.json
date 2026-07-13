@@ -142,6 +142,7 @@
       "target/**",
       ".gradle/**",
       ".oc_learning/**",
+      ".oc_harness/**",
       ".next/**",
       ".nuxt/**",
       ".turbo/**",

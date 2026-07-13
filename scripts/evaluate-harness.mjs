@@ -150,21 +150,27 @@ const scenarios = [
     id: "live-eval-adapter-success-is-explicit",
     category: "behaviour",
     checks: () => {
-      includes("scripts/evaluate-live.mjs", "adapter did not return explicit success", "Live-eval adapters should not pass without an explicit success signal.");
-      includes("scripts/evaluate-live.mjs", "runAdapterWithTimeout", "Live-eval runner should enforce adapter timeouts itself.");
-      includes("scripts/evaluate-live.mjs", "adapter timed out after", "Live-eval self-tests should cover adapter timeout semantics.");
-      includes("scripts/evaluate-live.mjs", "HARNESS-L020", "Live-eval self-tests should cover adapter success semantics.");
-      includes("scripts/evaluate-live.mjs", "HARNESS-L022", "Live-eval self-tests should cover adapter timeout semantics.");
-      includes("evals/README.md", "Adapters must return explicit success", "Live-eval docs should document explicit adapter success.");
+      includes("scripts/evaluate-live.mjs", "adapterFailureReason", "Live-eval adapters should not pass without an explicit success signal.");
+      includes("scripts/evaluate-live.mjs", "LIVE_SELF_TEST_ADAPTER_SUCCESS", "Live-eval self-tests should cover adapter success semantics.");
+      includes("lib/feedback/adapter-worker.mjs", "runAdapterModule", "Live-eval runner should enforce adapter timeouts in an isolated process host.");
+      includes("lib/feedback/adapter-worker.mjs", "terminateProcessTree", "Adapters should use the shared verified process-tree boundary.");
+      includes("lib/feedback/process-tree.mjs", "taskkill.exe", "Windows adapters and commands should tear down the complete ordinary descendant tree.");
+      includes("lib/feedback/process-tree.mjs", "process.kill(-pid", "POSIX adapters and commands should use a dedicated process group.");
+      includes("lib/feedback/process-tree.mjs", "runManagedCommand", "Shell verification should share the bounded process-tree runner.");
+      includes("lib/feedback/adapter-worker.mjs", "adapter_teardown_unverified", "Unverified teardown must fail closed.");
+      includes("scripts/verify-adapter-worker.mjs", "late-marker.txt", "Adapter timeout tests should prove process-tree termination prevents late writes.");
+      includes("evals/README.md", "Adapters must return", "Live-eval docs should document explicit adapter success.");
+      includes("evals/README.md", "explicit success", "Live-eval docs should document explicit adapter success.");
     },
   },
   {
     id: "live-eval-public-scenario-is-allowlisted",
     category: "safety",
     checks: () => {
-      includes("scripts/evaluate-live.mjs", "publicScenarioFields", "Live-eval should expose only an allowlisted public scenario to adapters.");
-      includes("scripts/evaluate-live.mjs", "unsupportedScenarioFields", "Live-eval should reject unsupported manifest fields.");
-      includes("scripts/evaluate-live.mjs", "HARNESS-L021", "Live-eval self-tests should cover unsupported-field rejection.");
+      includes("lib/feedback/manifests.mjs", "PUBLIC_SCENARIO_FIELDS", "Live-eval should expose only an allowlisted public scenario to adapters.");
+      includes("scripts/verify-live-manifests.mjs", "CONTRACT_UNKNOWN_FIELD", "Live-eval self-tests should cover unsupported-field rejection.");
+      includes("scripts/verify-live-manifests.mjs", "failure_family", "Manifest tests should prove runner-only failure metadata stays private.");
+      includes("scripts/verify-live-manifests.mjs", "expectationSentinels", "Manifest tests should prove expected and forbidden strings stay runner-only.");
       includes("scripts/evaluate-live.mjs", "hidden_check_files", "Live-eval should keep hidden check files runner-only.");
       includes("evals/scenario.schema.json", "\"additionalProperties\": false", "Live-eval schema should reject unsupported manifest fields.");
     },
@@ -173,22 +179,21 @@ const scenarios = [
     id: "live-eval-fixture-scope-is-narrow",
     category: "safety",
     checks: () => {
-      includes("scripts/evaluate-live.mjs", "HARNESS-L031", "Live-eval self-tests should cover unsafe repo fixture scopes.");
-      includes("scripts/evaluate-live.mjs", "allowedRepoFixtureRoots", "Live-eval should use a narrow project-fixture allowlist.");
-      includes("scripts/evaluate-live.mjs", "repo_fixture: \".\"", "Live-eval self-tests should reject the repository root.");
-      includes("scripts/evaluate-live.mjs", "repo_fixture: \"evals\"", "Live-eval self-tests should reject eval runner directories.");
-      includes("scripts/evaluate-live.mjs", "repo_fixture: \"fixtures/adversarial\"", "Live-eval self-tests should reject adversarial fixtures.");
+      includes("lib/feedback/manifests.mjs", "MANIFEST_FIXTURE_SCOPE", "Live-eval should use a narrow project-fixture allowlist.");
+      includes("scripts/verify-live-manifests.mjs", "repo_fixture: \".\"", "Live-eval self-tests should reject the repository root.");
+      includes("scripts/verify-live-manifests.mjs", "repo_fixture: \"evals\"", "Live-eval self-tests should reject eval runner directories.");
+      includes("scripts/verify-live-manifests.mjs", "repo_fixture: \"fixtures/adversarial\"", "Live-eval self-tests should reject adversarial fixtures.");
       includes("docs/live-evaluation.md", "relative allowlisted project fixture", "Live-eval docs should document narrow fixture scope.");
-      includes("evals/README.md", "must not point at the repository root", "Live-eval README should document forbidden fixture scopes.");
+      includes("evals/README.md", "repository root", "Live-eval README should document forbidden fixture scopes.");
     },
   },
   {
     id: "live-eval-hidden-files-do-not-overwrite",
     category: "safety",
     checks: () => {
-      includes("scripts/evaluate-live.mjs", "HARNESS-L032", "Live-eval self-tests should cover hidden check target collisions.");
-      includes("scripts/evaluate-live.mjs", "hidden_check_files target collision", "Hidden check staging should fail on existing targets.");
-      includes("scripts/evaluate-live.mjs", "fs.existsSync(target)", "Hidden check staging should check the resolved target before copying.");
+      includes("scripts/evaluate-live.mjs", "LIVE_SELF_TEST_HIDDEN_COLLISION", "Live-eval self-tests should cover hidden check target collisions.");
+      includes("scripts/evaluate-live.mjs", "LIVE_HIDDEN_COLLISION", "Hidden check staging should fail on existing targets.");
+      includes("scripts/evaluate-live.mjs", "lstatExists(target)", "Hidden check staging should detect ordinary and dangling-link collisions before copying.");
       includes("docs/live-evaluation.md", "must be absent before staging", "Live-eval docs should document absent-only hidden file staging.");
       includes("evals/README.md", "staged only into absent target paths", "Live-eval README should document hidden target collision prevention.");
     },
@@ -197,27 +202,29 @@ const scenarios = [
     id: "live-eval-reports-are-redacted",
     category: "safety",
     checks: () => {
-      includes("scripts/evaluate-live.mjs", "HARNESS-L033", "Live-eval self-tests should cover adapter report string redaction.");
-      includes("scripts/evaluate-live.mjs", "redactReportString", "Live-eval report strings should pass through a redaction step.");
-      includes("scripts/evaluate-live.mjs", "[redacted]", "Live-eval should replace sensitive report strings with a redacted placeholder.");
-      includes("scripts/evaluate-live.mjs", "BEGIN PRIVATE KEY", "Live-eval redaction should cover private-key markers.");
-      includes("docs/live-evaluation.md", "allowlisted, redacted adapter summary", "Live-eval docs should document redacted adapter summaries.");
-      includes("evals/README.md", "allowlisted, redacted adapter summary", "Live-eval README should document adapter report redaction.");
+      includes("scripts/evaluate-live.mjs", "sanitizeBoundedString", "Live-eval report strings should pass through centralized sanitization.");
+      includes("lib/feedback/privacy.mjs", "[redacted]", "Sensitive strings should be replaced with a redacted placeholder.");
+      includes("scripts/verify-feedback-foundation.mjs", "BEGIN PRIVATE KEY", "Privacy self-tests should cover private-key markers.");
+      includes("scripts/evaluate-live.mjs", "LIVE_SELF_TEST_PRIVACY", "Live-eval self-tests should prove arbitrary adapter output stays out of reports.");
+      includes("docs/live-evaluation.md", "allowlisted sanitized model/tool/cost", "Live-eval docs should document the implemented adapter metadata allowlist.");
+      includes("evals/README.md", "allowlisted sanitized model/tool/cost", "Live-eval README should document the implemented adapter metadata allowlist.");
     },
   },
   {
     id: "live-eval-profiles-are-isolated-and-reports-sanitized",
     category: "safety",
     checks: () => {
-      includes("scripts/evaluate-live.mjs", "liveProfileRuns", "Live-eval should require explicit baseline and harness profiles.");
+      includes("scripts/evaluate-live.mjs", "profileRuns", "Live-eval should require explicit baseline and harness profiles.");
       includes("scripts/evaluate-live.mjs", "OPENCODE_BASELINE_PROFILE", "Live-eval should require a baseline profile.");
       includes("scripts/evaluate-live.mjs", "OPENCODE_HARNESS_PROFILE", "Live-eval should require a harness profile.");
+      includes("scripts/evaluate-live.mjs", "OPENCODE_BASELINE_PERMISSION_EVIDENCE", "Live-eval should bind baseline behavior to installed permission evidence.");
+      includes("scripts/evaluate-live.mjs", "OPENCODE_HARNESS_PERMISSION_EVIDENCE", "Live-eval should bind candidate behavior to installed permission evidence.");
       includes("scripts/evaluate-live.mjs", "runScenarioProfile", "Live-eval should run each profile in its own isolated repo copy.");
       includes("scripts/evaluate-live.mjs", "profileRole", "Live-eval reports should distinguish baseline and harness roles.");
-      includes("scripts/evaluate-live.mjs", "stageHiddenCheckFiles", "Live-eval should copy hidden artifacts only after adapter execution.");
-      includes("scripts/evaluate-live.mjs", "adapterReportSummary", "Live-eval reports should persist an allowlisted, redacted adapter summary.");
+      includes("scripts/evaluate-live.mjs", "stageHiddenFiles", "Live-eval should copy hidden artifacts only after adapter execution.");
+      includes("scripts/evaluate-live.mjs", "availabilityMetadata", "Live-eval reports should persist only allowlisted, sanitized adapter metadata.");
       includes("evals/README.md", "separate isolated repo copies", "Live-eval docs should document profile isolation.");
-      includes("evals/README.md", "Reports persist command status/exit metadata and an allowlisted, redacted adapter summary", "Live-eval docs should document report sanitization.");
+      includes("evals/README.md", "Reports persist command status/exit metadata", "Live-eval docs should document report sanitization.");
     },
   },
   {
@@ -308,12 +315,15 @@ const scenarios = [
       exists("scripts/verify-runtime-fixtures.mjs", "Runtime fixture verification should cover parser regressions.");
       exists("scripts/verify-drift.mjs", "Drift verification should be available for docs/release health.");
       exists("fixtures/runtime-debug/debug-config.txt", "Runtime parser should have deterministic fixture coverage.");
+      exists("fixtures/runtime-debug/agent-list.txt", "Runtime parser fixtures should carry an authoritative installed-agent inventory.");
       includes("docs/harness-map.md", "Runtime verifier", "The control map should include runtime verification.");
       includes("docs/harnessability.md", "Strong Harnessability", "Adopters should have a checklist for harness readiness.");
       includes("package.json", "\"verify:runtime\": \"node scripts/verify-runtime.mjs\"", "Runtime verifier should be runnable through npm.");
       includes("package.json", "\"verify:runtime:fixture\": \"node scripts/verify-runtime-fixtures.mjs\"", "Runtime fixture verifier should be runnable through npm.");
       includes("scripts/verify-runtime-fixtures.mjs", "HARNESS-R009", "Runtime fixture verifier should prove unsafe edit permissions fail.");
       includes("scripts/verify-runtime-fixtures.mjs", "HARNESS-R013", "Runtime fixture verifier should prove unsafe oc_learning permissions fail.");
+      includes("scripts/verify-runtime-fixtures.mjs", "unexpected-agent", "Runtime fixture verifier should prove additional installed agents are discovered and captured.");
+      includes("scripts/verify-runtime-fixtures.mjs", "HARNESS-R022", "Runtime fixture verifier should prove malformed or missing installed-agent inventory fails closed.");
     },
   },
   {
@@ -331,14 +341,60 @@ const scenarios = [
     id: "trace-contract",
     category: "maintainability",
     checks: () => {
-      exists("docs/trace-contract.md", "Trace contract should be documented as a portable artifact shape.");
-      includes("docs/trace-contract.md", "not a tracing implementation", "Trace control should stay a contract layer, not a runtime dependency.");
+      exists("docs/trace-contract.md", "Trace contract should document the executable operational store.");
+      exists("lib/feedback/trace-store.mjs", "Operational trace storage must be implemented, not only documented.");
+      exists("scripts/verify-trace-store.mjs", "Trace persistence needs deterministic lifecycle and privacy tests.");
+      includes("docs/trace-contract.md", "schema version `2`", "Trace writers should use the current executable schema.");
+      includes("docs/trace-contract.md", "schema-v1", "Trace readers should document explicit legacy compatibility.");
       includes("docs/trace-contract.md", "machine-local artifacts", "Real traces should stay local and out of the reusable template.");
-      for (const field of ["`run_id`", "`agent`", "`permission_decision`", "`files_read`", "`files_written`", "`verification`", "`termination_reason`"]) {
+      for (const field of ["`run_id`", "`event_id`", "`sequence`", "`agent`", "`permission_decision`", "`files_read`", "`files_written`", "`verification`", "`termination_reason`", "`hypothesis`", "`actual_observation`", "`strategy_id`"]) {
         includes("docs/trace-contract.md", field, "Trace events should include the core aggregation and audit fields.");
       }
-      includes("docs/trace-contract.md", "must not persist secrets", "Trace contract should explicitly protect secrets and private logs.");
-      includes("docs/harness-map.md", "Trace contract", "The trace contract should be represented in the control map.");
+      includes("docs/trace-contract.md", "must not persist secrets, raw prompts", "Trace contract should explicitly protect secrets and private logs.");
+      includes("docs/harness-map.md", "Trace contract and operational run store (schema v2)", "The executable trace control should be represented in the control map.");
+    },
+  },
+  {
+    id: "operational-feedback-plane",
+    category: "architecture-fitness",
+    checks: () => {
+      includes(".gitignore", ".oc_harness/", "Operational artifacts must remain machine-local.");
+      includes("opencode.json", ".oc_harness/**", "OpenCode watcher must ignore operational artifacts.");
+      includes("package.json", "verify:trace-store", "Trace-store tests must be available from package scripts.");
+      includes("scripts/evaluate-live.mjs", "createTraceStore", "Live evaluation should create operational runs.");
+      includes("scripts/evaluate-live.mjs", "createReportHistory", "Live evaluation should write immutable history.");
+      includes("scripts/evaluate-live.mjs", "runAdapterModule", "Adapters should run behind the terminable worker boundary.");
+      includes("scripts/evaluate-live.mjs", "infrastructure_self_test", "Deterministic tracing evidence must be labeled as infrastructure only.");
+    },
+  },
+  {
+    id: "representative-live-corpus-and-suites",
+    category: "behaviour",
+    checks: () => {
+      exists("evals/suites.json", "Live scenarios need a versioned suite split.");
+      exists("scripts/verify-live-manifests.mjs", "Suite and corpus validation must be deterministic.");
+      includes("lib/feedback/manifests.mjs", "SUITE_DUPLICATE_MEMBERSHIP", "Duplicate suite membership must fail closed.");
+      includes("lib/feedback/manifests.mjs", "SUITE_MISSING_MEMBERSHIP", "Missing suite membership must fail closed.");
+      includes("lib/feedback/trace-assertions.mjs", "no_overlapping_job_write_scopes", "Trace assertions should cover non-shell behavioral contracts.");
+      includes("docs/live-evaluation.md", "development", "Suite semantics must be documented.");
+      includes("docs/live-evaluation.md", "held_out", "Held-out suite semantics must be documented.");
+      includes("docs/live-evaluation.md", "canary", "Canary suite semantics must be documented.");
+    },
+  },
+  {
+    id: "candidate-acceptance-hard-gates",
+    category: "safety",
+    checks: () => {
+      exists("evals/acceptance-policy.json", "Candidate acceptance needs a versioned policy.");
+      exists("lib/feedback/acceptance.mjs", "Candidate decisions need a strict deterministic engine.");
+      exists("scripts/verify-candidate-assessment.mjs", "Accepted, rejected, and inconclusive decisions need deterministic tests.");
+      includes("lib/feedback/acceptance.mjs", "inconclusive", "Missing mandatory evidence must not become acceptance.");
+      includes("lib/feedback/acceptance.mjs", "CANARY_REGRESSION", "Canary regressions must be a hard gate.");
+      includes("lib/feedback/acceptance.mjs", "HELD_OUT_REGRESSION", "Held-out regressions must be a hard gate.");
+      includes("lib/feedback/acceptance.mjs", "NEW_HIDDEN_CHECK_FAILURE", "Introduced hidden failures must be a hard gate.");
+      includes("lib/feedback/acceptance.mjs", "evidence_identity", "Static, permission, and live evidence must be content-bound.");
+      includes("docs/evaluation.md", "whole decision `inconclusive`", "Missing mandatory evidence must take precedence over rejection.");
+      includes("docs/evaluation.md", "candidate acceptance", "Evaluation docs should distinguish evidence collection from candidate decisions.");
     },
   },
   {

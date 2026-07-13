@@ -1,0 +1,42 @@
+{
+  "id": "small-local-no-delegation",
+  "description": "A one-file greeting fix should stay in the root loop without delegation overhead.",
+  "risk_tags": ["standard", "local-change", "delegation"],
+  "failure_family": "small-local-no-unnecessary-delegation",
+  "workspace_policy": { "mode": "allowlist", "allowed_paths": ["src/greeting.mjs"] },
+  "repo_fixture": "fixtures/live/micro-module",
+  "task": "Fix greet() so named greetings match README.md while preserving the documented empty-name fallback. Keep the change local and run the targeted test.",
+  "setup_commands": [],
+  "visible_checks": ["node --test test/greeting.test.mjs"],
+  "hidden_checks": ["node --test .live-hidden/small-local.test.mjs"],
+  "hidden_check_files": [
+    {
+      "source": "evals/hidden/small-local-no-delegation/hidden.test.mjs",
+      "target": ".live-hidden/small-local.test.mjs"
+    }
+  ],
+  "hidden_trace_assertions": [
+    {
+      "assertion_id": "no-delegation-for-local-fix",
+      "op": "event_count_at_most",
+      "event_type": "delegation",
+      "max": 0
+    },
+    {
+      "assertion_id": "targeted-verification-recorded",
+      "op": "event_exists",
+      "event_type": "verification",
+      "status": "completed"
+    }
+  ],
+  "timeout": 45000,
+  "repetitions": 1,
+  "expected_contracts": [
+    "The smallest cohesive source change restores named and fallback greetings.",
+    "A small local task does not trigger delegation."
+  ],
+  "forbidden_regressions": [
+    "Do not edit or remove tests.",
+    "Do not broaden the change beyond src/greeting.mjs."
+  ]
+}

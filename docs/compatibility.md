@@ -1,12 +1,17 @@
 # Compatibility
 
-## Current Release Set
+## Development And Tagged Release Set
 
-| Component | Repository | Compatible version | Role |
-| --- | --- | --- | --- |
-| `opencode-harness` | <https://github.com/Tah10n/opencode-harness> | `v0.2.0` | Agent orchestration profile, rules, docs, and verifier. |
-| `opencode-recursive-context` | <https://github.com/Tah10n/opencode-recursive-context> | `0.1.x` | Safe read-only `context_*` tools. |
-| `opencode-learning-guard` | <https://github.com/Tah10n/opencode-learning-guard> | `0.1.x` | Bounded `oc_learning_*` memory and managed-skill write tools. |
+| Component | Repository | Version | Status | Role |
+| --- | --- | --- | --- | --- |
+| `opencode-harness` | <https://github.com/Tah10n/opencode-harness> | `0.3.0` | Unreleased target | Development orchestration profile with feedback APIs, live evaluation, candidate assessment, docs, and verifiers. |
+| `opencode-harness` | <https://github.com/Tah10n/opencode-harness/tree/v0.2.0> | `v0.2.0` | Latest tagged release | Tagged orchestration profile, rules, docs, and verifier; its package has no package exports and does not expose feedback API subpaths. |
+| `opencode-recursive-context` | <https://github.com/Tah10n/opencode-recursive-context> | `0.1.x` | Compatible capability | Safe read-only `context_*` tools. |
+| `opencode-learning-guard` | <https://github.com/Tah10n/opencode-learning-guard> | `0.1.x` | Compatible capability | Bounded `oc_learning_*` memory and managed-skill write tools. |
+
+Do not read development-checkout documentation as a claim about `v0.2.0`.
+The public `opencode-harness/feedback` and `opencode-harness/trace-store`
+subpaths belong to the unreleased `0.3.0` target until that version is tagged.
 
 Note: `oc_learning_*` remains the stable OpenCode tool prefix even though the
 repository and package are named `opencode-learning-guard`.
@@ -24,7 +29,14 @@ and `context_related` are host opt-ins.
 - Compatibility has two layers: supported package/OpenCode configuration
   surfaces and actual installed permission exposure. Static files can be
   compatible while a copied live profile is not.
-- Node.js 24 is used by CI for the template verifier.
+- Node.js 24 or newer is required by package metadata and used by CI.
+- The feedback plane is Node ESM. Public imports are
+  `opencode-harness/feedback` and the compatibility alias
+  `opencode-harness/trace-store`; private `lib/feedback/*` paths are not a
+  compatibility contract.
+- Trace writers emit schema version 2. Readers accept the exact documented
+  schema-v1 event shape when safe, but do not reinterpret malformed legacy
+  artifacts or append v2 events to a v1 stream.
 - `opencode-recursive-context` defines its own Node.js support policy.
 - `opencode-learning-guard` defines its own Node.js support policy.
 
@@ -39,6 +51,7 @@ npm run verify
 For an installed OpenCode profile:
 
 ```sh
+opencode agent list
 opencode debug config
 opencode debug agent orchestrator
 opencode debug agent review-orchestrator
@@ -47,10 +60,13 @@ opencode debug agent improver
 ```
 
 Treat a missing `context_*` tool, unexpected `oc_learning_*` exposure, or
-missing command template as a compatibility failure.
+missing command template as a compatibility failure. Required harness agents
+must also retain their declared `primary`/`subagent` modes; the normalized
+inventory is part of runtime evidence.
 
 The default repository verifier checks static template structure. The runtime
-verifier checks the effective installed profile:
+verifier first obtains the authoritative installed-agent inventory, then checks
+the effective config and every discovered agent profile:
 
 ```sh
 npm run verify:runtime
@@ -59,3 +75,21 @@ npm run verify:runtime
 Optional live A/B evaluation is compatibility-adjacent behavioural evidence for
 prompt, orchestration, delegation, and review-loop changes. It does not replace
 static or runtime permission checks.
+
+The live runner requires an explicit host adapter module, baseline/candidate
+profiles, and content-bound installed permission evidence for both. A missing
+adapter/profile/evidence input fails honestly; arbitrary OpenCode sessions are
+not automatically traced without a host runtime hook. Suite labels,
+held-out/canary metadata, hidden checks/assertions, and acceptance thresholds
+remain runner-only. `expected_contracts` and `forbidden_regressions` are also
+runner-only and never enter adapter context.
+
+Candidate acceptance requires trusted first-party evidence producers. Static
+evidence comes from `npm run evidence:static`; permission evidence comes from
+`npm run verify:runtime -- --evidence-profile <id> --subject-evidence
+<static.json>` against an installed profile. Runtime fixture snapshots remain
+compatible parser tests but are not trusted acceptance inputs. Missing or
+malformed agent inventory fails closed; unsupported permission output is
+incomplete rather than default-deny. Acceptance trusts only intact report
+history generations and derives the required pair universe from the canonical
+validated workspace corpus.

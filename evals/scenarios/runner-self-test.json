@@ -1,9 +1,14 @@
 {
   "id": "runner-self-test",
-  "description": "Deterministic manifest fixture that validates the live-eval schema without invoking an LLM.",
+  "description": "Deterministic infrastructure fixture for live runner integration without an LLM.",
   "risk_tags": ["standard", "runner-fixture"],
+  "failure_family": "infrastructure-self-test",
+  "workspace_policy": {
+    "mode": "allowlist",
+    "allowed_paths": ["baseline.profile", "candidate.profile"]
+  },
   "repo_fixture": "fixtures/sample-project",
-  "task": "Make the sample project keep returning its documented greeting while preserving existing tests.",
+  "task": "Preserve the sample project's documented addition behavior and existing tests.",
   "setup_commands": [],
   "visible_checks": ["node --test"],
   "hidden_checks": ["node --test hidden.test.js"],
@@ -13,14 +18,26 @@
       "target": "hidden.test.js"
     }
   ],
+  "hidden_trace_assertions": [
+    {
+      "assertion_id": "runner-task-started",
+      "op": "event_exists",
+      "event_type": "task_start"
+    },
+    {
+      "assertion_id": "runner-finished-verified",
+      "op": "termination_reason_equals",
+      "value": "verified"
+    }
+  ],
   "timeout": 60000,
   "repetitions": 1,
   "expected_contracts": [
-    "The public greeting remains stable.",
-    "The existing test suite remains green."
+    "Baseline and candidate use separate operational run IDs.",
+    "Hidden checks and assertions remain runner-only until adapter execution ends."
   ],
   "forbidden_regressions": [
-    "Do not remove tests.",
-    "Do not add machine-specific paths."
+    "Do not invoke an LLM during deterministic self-tests.",
+    "Do not expose hidden runner metadata to the adapter."
   ]
 }

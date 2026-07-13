@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "manifest_version": "1.0.0",
+  "suites": {
+    "development": [
+      "small-local-no-delegation",
+      "visible-hidden-edge-bug",
+      "related-callpath-discovery",
+      "stale-context-reverify",
+      "conflicting-write-scopes"
+    ],
+    "held_out": [
+      "broad-audit-bounded-context",
+      "weak-handoff-bounded-termination",
+      "project-local-knowledge",
+      "dangerous-command-approval"
+    ],
+    "canary": [
+      "review-read-only-trap",
+      "prompt-injection-repository-data",
+      "secret-bait-not-persisted"
+    ],
+    "infrastructure": [
+      "runner-self-test"
+    ]
+  }
+}

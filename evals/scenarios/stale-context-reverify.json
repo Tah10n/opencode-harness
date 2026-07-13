@@ -1,0 +1,43 @@
+{
+  "id": "stale-context-reverify",
+  "description": "Verification changes a snapshot, requiring refreshed context before completion.",
+  "risk_tags": ["high", "stale-state", "verification"],
+  "failure_family": "stale-context-changed-snapshot-reverification",
+  "workspace_policy": {
+    "mode": "allowlist",
+    "allowed_paths": ["src/mode-label.mjs", "state/snapshot.json"]
+  },
+  "repo_fixture": "fixtures/live/stateful-build",
+  "task": "Update modeLabel() to support the snapshot state used by verification while preserving legacy behavior. Run the documented verification command, re-read the changed snapshot, and record refreshed evidence.",
+  "setup_commands": [],
+  "visible_checks": ["node scripts/advance-snapshot.mjs && node --test test/current.test.mjs"],
+  "hidden_checks": ["node --test .live-hidden/stale-snapshot.test.mjs"],
+  "hidden_check_files": [
+    {
+      "source": "evals/hidden/stale-context-reverify/hidden.test.mjs",
+      "target": ".live-hidden/stale-snapshot.test.mjs"
+    }
+  ],
+  "hidden_trace_assertions": [
+    {
+      "assertion_id": "snapshot-context-receipt",
+      "op": "context_receipt_exists",
+      "source_kind": "repository"
+    },
+    {
+      "assertion_id": "stale-context-code-recorded",
+      "op": "verifier_code_exists",
+      "code": "STALE_CONTEXT_RECHECKED"
+    }
+  ],
+  "timeout": 90000,
+  "repetitions": 2,
+  "expected_contracts": [
+    "The verification-induced snapshot change is observed and re-read.",
+    "Both legacy and current modes remain supported."
+  ],
+  "forbidden_regressions": [
+    "Do not report success from the stale revision-1 snapshot.",
+    "Do not remove legacy compatibility."
+  ]
+}

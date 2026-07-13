@@ -1,5 +1,9 @@
 # Release Process
 
+The current development target is unreleased `0.3.0`; the latest tagged
+release remains `v0.2.0`. Do not describe the feedback package exports as a
+tagged capability until a `v0.3.0` release completes these gates.
+
 ## Pre-Release Checks
 
 1. Ensure the worktree is clean or contains only release-intended changes.
@@ -9,11 +13,49 @@
    npm run verify
    ```
 
+   For package, fixture, or adoption-boundary changes, the default gate includes
+   `npm run verify:adoption-bundle`; it must pass from its isolated temporary
+   copy without a live provider.
+
 3. For installed-profile changes, also run:
 
    ```sh
    npm run verify:runtime
    ```
+
+   If a candidate decision will be produced, first capture static evidence by
+   verifying the external materialized snapshot in each compared source tree,
+   then bind first-party installed permission evidence to those exact artifacts:
+
+   ```sh
+   BASELINE_ROOT="/absolute/path/to/baseline"
+   CANDIDATE_ROOT="/absolute/path/to/candidate"
+   BASELINE_STATIC_JSON="$BASELINE_ROOT/.oc_harness/evidence/<baseline-static>.json"
+   CANDIDATE_STATIC_JSON="$CANDIDATE_ROOT/.oc_harness/evidence/<candidate-static>.json"
+
+   cd "$BASELINE_ROOT"
+   npm run evidence:static -- --candidate-id baseline-v1
+
+   cd "$CANDIDATE_ROOT"
+   npm run evidence:static -- --candidate-id candidate-v1
+
+   cd "$BASELINE_ROOT"
+   npm run verify:runtime -- --evidence-profile baseline-v1 \
+     --subject-evidence "$BASELINE_STATIC_JSON"
+
+   cd "$CANDIDATE_ROOT"
+   npm run verify:runtime -- --evidence-profile candidate-v1 \
+     --subject-evidence "$CANDIDATE_STATIC_JSON"
+   ```
+
+   Use the absolute artifact path printed by each producer. A relative
+   `.oc_harness/evidence/...` path resolves against only the current checkout;
+   it cannot identify evidence from both source trees.
+
+   Fixture-backed permission evidence is parser coverage only and is not
+   trusted for acceptance. Candidate assessment also requires intact immutable
+   report generations; its pair universe comes from the canonical checked-in
+   manifests rather than caller overrides.
 
 4. Confirm the fixture-backed runtime parser checks are covered by `npm run
    verify`, or run it directly:
@@ -44,30 +86,81 @@
    private logs.
 
 8. For material prompt, orchestration, delegation, review-loop, or
-   high-assurance workflow changes, optionally run live A/B evaluation with a
-   fixed scenario corpus:
+   high-assurance workflow changes, optionally run live baseline/candidate
+   evaluation with a fixed scenario suite:
 
    ```sh
+   BASELINE_ROOT="/absolute/path/to/baseline"
+   CANDIDATE_ROOT="/absolute/path/to/candidate"
+   BASELINE_PERMISSIONS_JSON="$BASELINE_ROOT/.oc_harness/evidence/<baseline-permissions>.json"
+   CANDIDATE_PERMISSIONS_JSON="$CANDIDATE_ROOT/.oc_harness/evidence/<candidate-permissions>.json"
+   ADAPTER_PATH="/absolute/path/to/adapter.mjs"
+
+   cd "$CANDIDATE_ROOT"
    npm run verify:live-eval
    OPENCODE_BASELINE_PROFILE=baseline-profile \
-   OPENCODE_HARNESS_PROFILE=harness-profile \
-   OPENCODE_LIVE_EVAL_ADAPTER=path/to/adapter.mjs npm run eval:live
+   OPENCODE_HARNESS_PROFILE=candidate-profile \
+   OPENCODE_BASELINE_PERMISSION_EVIDENCE="$BASELINE_PERMISSIONS_JSON" \
+   OPENCODE_HARNESS_PERMISSION_EVIDENCE="$CANDIDATE_PERMISSIONS_JSON" \
+   OPENCODE_LIVE_EVAL_ADAPTER="$ADAPTER_PATH" \
+   npm run eval:live -- --suite development
    ```
 
-   Use a baseline profile, candidate harness profile, fixed task corpus,
-   hidden checks, transcript/evidence capture, pass/fail rubric, and defect
-   escape-rate reporting. Do not block patch releases on live A/B unless the
-   behaviour risk is material.
+   Baseline and candidate use separate isolated copies and operational run IDs.
+   Hidden checks/assertions remain runner-only. Reports persist sanitized
+   status/exit/size metadata, never raw transcripts or command output. Review
+   visible and hidden pass rates together with defect escape rate. The
+   deterministic infrastructure self-test does not count toward acceptance.
+   Do not block patch releases on live evaluation unless behaviour risk is
+   material.
 
-9. Optional network drift check before publishing:
+9. When making a candidate decision, confirm the first-party candidate static
+   evidence captured above still fingerprints the stable candidate tree. If the
+   tree changed, capture it again:
+
+   ```sh
+   CANDIDATE_ROOT="/absolute/path/to/candidate"
+   cd "$CANDIDATE_ROOT"
+   npm run evidence:static -- --candidate-id candidate-v1
+   ```
+
+   Then assess the immutable live report pair with the static and installed
+   permission evidence:
+
+   ```sh
+   BASELINE_ROOT="/absolute/path/to/baseline"
+   CANDIDATE_ROOT="/absolute/path/to/candidate"
+   CANDIDATE_STATIC_JSON="$CANDIDATE_ROOT/.oc_harness/evidence/<candidate-static>.json"
+   BASELINE_PERMISSIONS_JSON="$BASELINE_ROOT/.oc_harness/evidence/<baseline-permissions>.json"
+   CANDIDATE_PERMISSIONS_JSON="$CANDIDATE_ROOT/.oc_harness/evidence/<candidate-permissions>.json"
+   CANDIDATE_REPORT_JSON="$CANDIDATE_ROOT/evals/reports/<report>.json"
+
+   cd "$CANDIDATE_ROOT"
+   npm run assess:candidate -- \
+     --report "$CANDIDATE_REPORT_JSON" \
+     --baseline-id baseline-v1 \
+     --candidate-id candidate-v1 \
+     --static-evidence "$CANDIDATE_STATIC_JSON" \
+     --baseline-permissions "$BASELINE_PERMISSIONS_JSON" \
+     --candidate-permissions "$CANDIDATE_PERMISSIONS_JSON"
+   ```
+
+   Treat `accepted`, `rejected`, and `inconclusive` as evidence-backed decision
+   states. Missing, incomplete, or mismatched mandatory evidence makes the
+   whole decision inconclusive, including when another gate failed. Decisions
+   are immutable artifacts and are never auto-applied to the active harness.
+
+10. Optional network drift check before publishing:
 
    ```sh
    HARNESS_CHECK_LINKS=1 npm run verify:drift
    ```
 
-10. Confirm GitHub Actions is green after pushing.
-11. Confirm the compatibility table is current.
-12. Update `CHANGELOG.md`.
+11. Confirm `.oc_harness/`, `evals/reports/`, and `evals/decisions/` remain
+    ignored and no operational artifacts or private data are staged.
+12. Confirm GitHub Actions is green after pushing.
+13. Confirm the compatibility table is current.
+14. Update `CHANGELOG.md`.
 
 ## Tagging
 

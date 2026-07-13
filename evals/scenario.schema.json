@@ -6,41 +6,466 @@
     "id",
     "description",
     "risk_tags",
+    "failure_family",
+    "workspace_policy",
     "repo_fixture",
     "task",
     "setup_commands",
     "visible_checks",
     "hidden_checks",
+    "hidden_check_files",
+    "hidden_trace_assertions",
     "timeout",
     "repetitions",
     "expected_contracts",
     "forbidden_regressions"
   ],
   "properties": {
-    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$" },
-    "description": { "type": "string" },
-    "risk_tags": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
-    "repo_fixture": { "type": "string" },
-    "task": { "type": "string" },
-    "setup_commands": { "type": "array", "items": { "type": "string" } },
-    "visible_checks": { "type": "array", "items": { "type": "string" } },
-    "hidden_checks": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
-    "hidden_check_files": {
+    "id": {
+      "$ref": "#/$defs/id"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "risk_tags": {
       "type": "array",
       "items": {
+        "$ref": "#/$defs/nonEmptyString"
+      },
+      "minItems": 2,
+      "maxItems": 10,
+      "uniqueItems": true,
+      "contains": {
+        "enum": [
+          "standard",
+          "high",
+          "critical"
+        ]
+      },
+      "minContains": 1,
+      "maxContains": 1
+    },
+    "failure_family": {
+      "$ref": "#/$defs/id"
+    },
+    "workspace_policy": {
+      "$ref": "#/$defs/workspacePolicy"
+    },
+    "repo_fixture": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/portableRelativePath"
+        },
+        {
+          "type": "string",
+          "pattern": "^(?:fixtures/sample-project|fixtures/live/[^/]+(?:/[^/]+)*)$"
+        }
+      ]
+    },
+    "task": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000
+    },
+    "setup_commands": {
+      "$ref": "#/$defs/stringArray",
+      "maxItems": 10
+    },
+    "visible_checks": {
+      "$ref": "#/$defs/stringArray",
+      "maxItems": 20
+    },
+    "hidden_checks": {
+      "$ref": "#/$defs/stringArray",
+      "minItems": 1,
+      "maxItems": 20
+    },
+    "hidden_check_files": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 20,
+      "uniqueItems": true,
+      "items": {
         "type": "object",
-        "required": ["source", "target"],
+        "required": [
+          "source",
+          "target"
+        ],
         "properties": {
-          "source": { "type": "string" },
-          "target": { "type": "string" }
+          "source": {
+            "$ref": "#/$defs/portableRelativePath"
+          },
+          "target": {
+            "$ref": "#/$defs/portableRelativePath"
+          }
         },
         "additionalProperties": false
       }
     },
-    "timeout": { "type": "integer", "minimum": 1000 },
-    "repetitions": { "type": "integer", "minimum": 1 },
-    "expected_contracts": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
-    "forbidden_regressions": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+    "hidden_trace_assertions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 50,
+      "items": {
+        "$ref": "#/$defs/traceAssertion"
+      }
+    },
+    "timeout": {
+      "type": "integer",
+      "minimum": 1000,
+      "maximum": 300000
+    },
+    "repetitions": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "expected_contracts": {
+      "$ref": "#/$defs/stringArray",
+      "minItems": 1,
+      "maxItems": 20
+    },
+    "forbidden_regressions": {
+      "$ref": "#/$defs/stringArray",
+      "minItems": 1,
+      "maxItems": 20
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^(?!(?:con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\\.|$))(?!.*\\.$)[a-z0-9][a-z0-9._-]{0,127}$"
+    },
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000
+    },
+    "assertionString": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "portableRelativePath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000,
+      "pattern": "^(?![/.])(?!.*//)(?!.*(?:^|/)(?:\\.|\\.\\.)(?:/|$))(?!.*(?:^|/)(?:[Cc][Oo][Nn]|[Pp][Rr][Nn]|[Aa][Uu][Xx]|[Nn][Uu][Ll]|[Cc][Oo][Mm][1-9]|[Ll][Pp][Tt][1-9])(?:\\.[^/]*)?(?:/|$))(?!.*[. ](?:/|$))(?!.*:)[^\\\\]+$"
+    },
+    "stringArray": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/nonEmptyString"
+      },
+      "maxItems": 50,
+      "uniqueItems": true
+    },
+    "workspacePolicy": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "mode"
+          ],
+          "properties": {
+            "mode": {
+              "const": "read_only"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "mode",
+            "allowed_paths"
+          ],
+          "properties": {
+            "mode": {
+              "const": "allowlist"
+            },
+            "allowed_paths": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 50,
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/portableRelativePath"
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "eventAssertion": {
+      "type": "object",
+      "required": [
+        "assertion_id",
+        "op"
+      ],
+      "properties": {
+        "assertion_id": {
+          "$ref": "#/$defs/id"
+        },
+        "op": {
+          "enum": [
+            "event_exists",
+            "event_absent"
+          ]
+        },
+        "event_type": {
+          "$ref": "#/$defs/assertionString"
+        },
+        "tool_or_command": {
+          "$ref": "#/$defs/assertionString"
+        },
+        "permission_decision": {
+          "enum": [
+            "allowed",
+            "asked",
+            "denied",
+            "not_applicable"
+          ]
+        },
+        "status": {
+          "enum": [
+            "completed",
+            "changed",
+            "no-op",
+            "no-findings",
+            "blocked",
+            "failed",
+            "unsafe"
+          ]
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "event_type"
+          ]
+        },
+        {
+          "required": [
+            "tool_or_command"
+          ]
+        },
+        {
+          "required": [
+            "permission_decision"
+          ]
+        },
+        {
+          "required": [
+            "status"
+          ]
+        }
+      ],
+      "additionalProperties": false
+    },
+    "traceAssertion": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/eventAssertion"
+        },
+        {
+          "type": "object",
+          "required": [
+            "assertion_id",
+            "op",
+            "event_type",
+            "max"
+          ],
+          "properties": {
+            "assertion_id": {
+              "$ref": "#/$defs/id"
+            },
+            "op": {
+              "const": "event_count_at_most"
+            },
+            "event_type": {
+              "$ref": "#/$defs/assertionString"
+            },
+            "max": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "assertion_id",
+            "op",
+            "source_kind"
+          ],
+          "properties": {
+            "assertion_id": {
+              "$ref": "#/$defs/id"
+            },
+            "op": {
+              "const": "context_receipt_exists"
+            },
+            "source_kind": {
+              "enum": [
+                "file",
+                "files",
+                "repository",
+                "tool",
+                "other"
+              ]
+            },
+            "relative_path": {
+              "$ref": "#/$defs/portableRelativePath"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "assertion_id",
+            "op",
+            "code"
+          ],
+          "properties": {
+            "assertion_id": {
+              "$ref": "#/$defs/id"
+            },
+            "op": {
+              "const": "verifier_code_exists"
+            },
+            "code": {
+              "$ref": "#/$defs/id"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "assertion_id",
+            "op",
+            "value"
+          ],
+          "properties": {
+            "assertion_id": {
+              "$ref": "#/$defs/id"
+            },
+            "op": {
+              "const": "termination_reason_equals"
+            },
+            "value": {
+              "enum": [
+                "done",
+                "verified",
+                "partially_verified",
+                "blocked_missing_context",
+                "blocked_user_decision",
+                "blocked_permission",
+                "blocked_external_state",
+                "unsafe_without_permission",
+                "conflicting_write_scope",
+                "budget_exhausted",
+                "verification_failed",
+                "not_reproducible"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "assertion_id",
+            "op"
+          ],
+          "properties": {
+            "assertion_id": {
+              "$ref": "#/$defs/id"
+            },
+            "op": {
+              "const": "no_overlapping_job_write_scopes"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "assertion_id",
+            "op",
+            "finding_id",
+            "severity",
+            "file",
+            "start_line",
+            "end_line",
+            "code"
+          ],
+          "properties": {
+            "assertion_id": {
+              "$ref": "#/$defs/id"
+            },
+            "op": {
+              "const": "review_finding_exists"
+            },
+            "finding_id": {
+              "$ref": "#/$defs/id"
+            },
+            "severity": {
+              "enum": [
+                "P0",
+                "P1",
+                "P2",
+                "P3"
+              ]
+            },
+            "file": {
+              "$ref": "#/$defs/portableRelativePath"
+            },
+            "start_line": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "end_line": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "code": {
+              "$ref": "#/$defs/id"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "assertion_id",
+            "op",
+            "value"
+          ],
+          "properties": {
+            "assertion_id": {
+              "$ref": "#/$defs/id"
+            },
+            "op": {
+              "const": "sanitized_value_absent"
+            },
+            "value": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    }
   },
   "additionalProperties": false
 }

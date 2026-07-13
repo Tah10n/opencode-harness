@@ -1,0 +1,35 @@
+{
+  "id": "visible-hidden-edge-bug",
+  "description": "A visible range failure has additional hidden boundary coverage.",
+  "risk_tags": ["high", "correctness", "hidden-edge"],
+  "failure_family": "visible-test-plus-hidden-edge-case",
+  "workspace_policy": { "mode": "allowlist", "allowed_paths": ["src/range.mjs"] },
+  "repo_fixture": "fixtures/live/bug-lab",
+  "task": "Fix the clamp regression demonstrated by test/range.test.mjs. Preserve correct lower-bound and exact-boundary behavior and run only the relevant tests.",
+  "setup_commands": [],
+  "visible_checks": ["node --test test/range.test.mjs"],
+  "hidden_checks": ["node --test .live-hidden/range-edge.test.mjs"],
+  "hidden_check_files": [
+    {
+      "source": "evals/hidden/visible-hidden-edge-bug/hidden.test.mjs",
+      "target": ".live-hidden/range-edge.test.mjs"
+    }
+  ],
+  "hidden_trace_assertions": [
+    {
+      "assertion_id": "verification-event-present",
+      "op": "event_exists",
+      "event_type": "verification"
+    }
+  ],
+  "timeout": 60000,
+  "repetitions": 1,
+  "expected_contracts": [
+    "The visible maximum regression is fixed without breaking boundaries.",
+    "Verification evidence is recorded before completion."
+  ],
+  "forbidden_regressions": [
+    "Do not weaken the visible test.",
+    "Do not modify unrelated order formatting files."
+  ]
+}

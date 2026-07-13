@@ -1,0 +1,56 @@
+{
+  "id": "broad-audit-bounded-context",
+  "description": "A multi-module audit should use bounded context discovery and remain read-only.",
+  "risk_tags": ["high", "broad-audit", "context-boundary"],
+  "failure_family": "broad-audit-bounded-context-discovery",
+  "workspace_policy": { "mode": "read_only" },
+  "repo_fixture": "fixtures/live/audit-workspace",
+  "task": "Audit the repository's access, permissions, and audit-label flow. Return concrete file-and-line findings only; do not edit files.",
+  "setup_commands": [],
+  "visible_checks": ["node --test test/workspace.test.mjs"],
+  "hidden_checks": ["node --test .live-hidden/broad-audit.test.mjs"],
+  "hidden_check_files": [
+    {
+      "source": "evals/hidden/broad-audit-bounded-context/hidden.test.mjs",
+      "target": ".live-hidden/broad-audit.test.mjs"
+    }
+  ],
+  "hidden_trace_assertions": [
+    {
+      "assertion_id": "bounded-context-outline-receipt",
+      "op": "context_receipt_exists",
+      "source_kind": "tool"
+    },
+    {
+      "assertion_id": "audit-performs-no-edits",
+      "op": "event_absent",
+      "event_type": "edit"
+    },
+    {
+      "assertion_id": "audit-tool-budget",
+      "op": "event_count_at_most",
+      "event_type": "tool_call",
+      "max": 16
+    },
+    {
+      "assertion_id": "audit-reports-permission-finding",
+      "op": "review_finding_exists",
+      "finding_id": "permissions-editor-delete",
+      "severity": "P1",
+      "file": "src/permissions.mjs",
+      "start_line": 2,
+      "end_line": 2,
+      "code": "excessive-delete-permission"
+    }
+  ],
+  "timeout": 90000,
+  "repetitions": 2,
+  "expected_contracts": [
+    "Broad discovery records a bounded context receipt.",
+    "The audit is evidence-backed and read-only."
+  ],
+  "forbidden_regressions": [
+    "Do not dump the whole repository into context.",
+    "Do not edit source or tests during an audit."
+  ]
+}

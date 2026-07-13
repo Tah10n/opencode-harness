@@ -32,8 +32,37 @@ Do not copy repo-local development files such as `.github/`, `fixtures/`, or
 `scripts/` into a personal OpenCode config unless you intentionally want the
 template development checks there.
 
-Do not copy machine-local traces into the template. `docs/trace-contract.md`
-defines a portable event shape, but real trace files remain local artifacts.
+To adopt the measurable feedback plane and its repository-side evaluation,
+copy a complete source bundle rather than selecting only the public library:
+
+- root package/profile metadata and governance files, including `package.json`,
+  `opencode.json`, `.gitignore`, `AGENTS.md`, `README.md`, and `LICENSE`;
+- `agents/`, `commands/`, `skills/`, `docs/`, `examples/`, and `.github/`;
+- all of `lib/` and `scripts/`;
+- all checked-in `evals/` policies, schemas, suites, scenarios, and hidden
+  checks;
+- `fixtures/sample-project/` and `fixtures/live/`, as well as the static and
+  runtime parser fixtures used by the deterministic verifier.
+
+The fixtures are executable inputs to manifest validation and infrastructure
+self-tests; omitting them creates a structurally incomplete bundle. Do not copy
+ignored `evals/reports/`, `evals/decisions/`, or `.oc_harness/` state. Before
+adopting or publishing, prove the bundle from an isolated temporary copy:
+
+```sh
+npm run verify:adoption-bundle
+```
+
+That smoke check copies the declared source bundle, imports
+`opencode-harness/feedback` through package exports, runs static and manifest
+validation, and runs the buffered infrastructure self-test without a model,
+network, or live provider. The public ESM boundary belongs to the unreleased
+`0.3.0` target; do not couple adapters to private `lib/feedback/*` files or
+assume the tagged `v0.2.0` package exports it.
+
+Do not copy machine-local operational artifacts into the template.
+`.oc_harness/`, `evals/reports/`, and `evals/decisions/` remain ignored local
+state.
 
 ## Local State Boundary
 
@@ -44,10 +73,16 @@ Keep these outside this template:
 - project-specific build, test, product, or architecture facts;
 - raw logs and credentials;
 - real traces or task transcripts that contain private context;
+- live reports, acceptance evidence, and decision artifacts;
 - local automation that only applies to one machine.
 
 Use project-local `WORKFLOW.md`, `.opencode/skills/*`, or `.agents/skills/*`
 for repository-specific operating rules.
+
+Operational memory and durable semantic memory are separate. `.oc_harness/`
+stores bounded, redacted run/evidence artifacts for audit and assessment. It
+must not become a semantic index. Durable reusable lessons remain gated through
+the `improver`/`global-memory` path.
 
 ## Verification
 
@@ -93,15 +128,41 @@ Expected result:
 
 Use these layers in order:
 
-1. Deterministic repository checks: `npm run verify`, including live-eval
-   manifest validation and runner self-tests when those files are present.
+1. Deterministic repository checks: `npm run verify`, including feedback
+   persistence, corpus validation, infrastructure tracing without an LLM, and
+   acceptance-engine self-tests. This layer needs no model, network, or live
+   adapter.
 2. Installed runtime permission checks: `npm run verify:runtime` against the
-   copied profile.
-3. Optional live smoke or A/B tasks in the host profile for orchestration,
-   delegation, review-loop, or high-assurance behavior changes.
+   copied profile. For acceptance evidence, bind each profile to its static
+   source snapshot with `npm run verify:runtime -- --evidence-profile <id>
+   --subject-evidence <static.json>`; fixture permission evidence is not
+   trusted for acceptance.
+3. Actual behavioural evidence: `npm run eval:live` with explicit
+   baseline/candidate profiles, their installed permission artifacts, and a host
+   adapter. Baseline/candidate copies are isolated and hidden checks/assertions
+   remain runner-only.
+4. Candidate assessment: `npm run assess:candidate` over immutable reports,
+   first-party static evidence from `npm run evidence:static`, and installed
+   permission snapshots. Only fully attested report generations participate;
+   the canonical workspace corpus supplies required repetitions and scenario
+   fingerprints.
 
-Live A/B evaluation is behavioural evidence, not a replacement for runtime
-permission checks.
+Live evaluation is behavioural evidence, not a replacement for runtime
+permission checks. Candidate assessment does not apply changes automatically.
+Missing, incomplete, or content-mismatched mandatory evidence makes the whole
+decision `inconclusive`.
+
+## Host Adapter Boundary
+
+The live runner executes `OPENCODE_LIVE_EVAL_ADAPTER` in a bounded Node IPC
+process and passes a validated, quota-limited trace facade. The adapter is
+responsible for invoking the host OpenCode profile and returning its content
+attestation. The parent verifies ordinary process-tree teardown before hidden
+staging; this boundary is not a full hostile-code OS sandbox. If the host has no
+reliable adapter/runtime hook, stop at deterministic and installed-runtime
+verification and document the gap. Do not
+claim arbitrary OpenCode sessions are traced automatically or fabricate a live
+success.
 
 Adversarial fixtures under `fixtures/adversarial/` are repository-side static
 contracts. Do not execute them or copy them into host projects as runtime

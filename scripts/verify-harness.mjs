@@ -199,11 +199,37 @@ const requiredFiles = [
   "fixtures/adversarial/secret-bait/README.md",
   "fixtures/adversarial/review-only-trap/README.md",
   "evals/README.md",
+  "evals/acceptance-policy.json",
   "evals/hidden/runner-self-test/hidden.test.js",
   "evals/scenario.schema.json",
+  "evals/suite.schema.json",
+  "evals/suites.json",
   "evals/scenarios/runner-self-test.json",
+  "lib/feedback/acceptance.mjs",
+  "lib/feedback/adapter-worker.mjs",
+  "lib/feedback/contracts.mjs",
+  "lib/feedback/evidence.mjs",
+  "lib/feedback/files.mjs",
+  "lib/feedback/index.mjs",
+  "lib/feedback/manifests.mjs",
+  "lib/feedback/privacy.mjs",
+  "lib/feedback/process-tree.mjs",
+  "lib/feedback/permission-surface.mjs",
+  "lib/feedback/report-history.mjs",
+  "lib/feedback/trace-assertions.mjs",
+  "lib/feedback/trace-store.mjs",
+  "scripts/assess-candidate.mjs",
+  "scripts/capture-static-evidence.mjs",
   "scripts/evaluate-live.mjs",
   "scripts/evaluate-harness.mjs",
+  "scripts/trace-run.mjs",
+  "scripts/verify-adoption-bundle.mjs",
+  "scripts/verify-adapter-worker.mjs",
+  "scripts/verify-candidate-assessment.mjs",
+  "scripts/verify-feedback-foundation.mjs",
+  "scripts/verify-live-manifests.mjs",
+  "scripts/verify-report-history.mjs",
+  "scripts/verify-trace-store.mjs",
   "scripts/verify-drift.mjs",
   "scripts/verify-runtime-fixtures.mjs",
   "scripts/verify-runtime.mjs",
@@ -216,11 +242,14 @@ for (const file of requiredFiles) {
 }
 
 const packageJson = JSON.parse(read("package.json"));
-if (packageJson.version !== "0.2.0") {
-  fail("HARNESS-S007", "package.json version must match the latest release plan", "Update docs, changelog, and release metadata together with the version.");
+if (packageJson.version !== "0.3.0") {
+  fail("HARNESS-S007", "package.json version must match the unreleased 0.3.0 target", "Update docs, changelog, and release metadata together with the version.");
 }
-if (packageJson.scripts?.verify !== "npm run verify:static && npm run eval && npm run verify:drift && npm run verify:runtime:fixture && npm run verify:live-eval") {
-  fail("HARNESS-S008", "package.json must run static verification, eval, drift, runtime fixture checks, and live-eval deterministic checks from npm run verify", "Keep fast deterministic sensors in the default verify command.");
+if (packageJson.engines?.node !== ">=24") {
+  fail("HARNESS-S007", "package.json engines.node must match the Node 24 CI/runtime contract", "Declare engines.node as >=24 and keep CI aligned.");
+}
+if (packageJson.scripts?.verify !== "npm run verify:static && npm run verify:feedback-foundation && npm run verify:trace-store && npm run verify:report-history && npm run verify:adapter-worker && npm run eval && npm run verify:drift && npm run verify:adoption-bundle && npm run verify:runtime:fixture && npm run verify:live-eval && npm run verify:acceptance") {
+  fail("HARNESS-S008", "package.json must run every deterministic feedback-plane and existing repository sensor from npm run verify", "Keep fast model-free sensors in the default verify command.");
 }
 if (packageJson.scripts?.eval !== "node scripts/evaluate-harness.mjs") {
   fail("HARNESS-S009", "package.json must expose npm run eval", "Restore the evaluation script entry.");
@@ -234,8 +263,27 @@ if (packageJson.scripts?.["eval:live:validate"] !== "node scripts/evaluate-live.
 if (packageJson.scripts?.["eval:live:self-test"] !== "node scripts/evaluate-live.mjs --self-test") {
   fail("HARNESS-S009", "package.json must expose npm run eval:live:self-test", "Restore the deterministic live-evaluation runner self-test entry.");
 }
-if (packageJson.scripts?.["verify:live-eval"] !== "npm run eval:live:validate && npm run eval:live:self-test") {
+if (packageJson.scripts?.["eval:live:buffered-self-test"] !== "node scripts/evaluate-live.mjs --self-test-buffered") {
+  fail("HARNESS-S009", "package.json must expose npm run eval:live:buffered-self-test", "Restore the no-process buffered live-evaluation self-test entry.");
+}
+if (packageJson.scripts?.["verify:live-eval"] !== "npm run verify:live-manifests && npm run eval:live:validate && npm run eval:live:buffered-self-test && npm run eval:live:self-test") {
   fail("HARNESS-S009", "package.json must expose npm run verify:live-eval", "Keep live-eval deterministic checks in the default verification gate.");
+}
+for (const [name, command] of Object.entries({
+  "verify:feedback-foundation": "node scripts/verify-feedback-foundation.mjs",
+  "verify:trace-store": "node scripts/verify-trace-store.mjs",
+  "verify:report-history": "node scripts/verify-report-history.mjs",
+  "verify:adapter-worker": "node scripts/verify-adapter-worker.mjs",
+  "verify:adoption-bundle": "node scripts/verify-adoption-bundle.mjs",
+  "verify:live-manifests": "node scripts/verify-live-manifests.mjs",
+  "verify:acceptance": "node scripts/verify-candidate-assessment.mjs",
+  "assess:candidate": "node scripts/assess-candidate.mjs",
+  "evidence:static": "node scripts/capture-static-evidence.mjs",
+  trace: "node scripts/trace-run.mjs",
+})) {
+  if (packageJson.scripts?.[name] !== command) {
+    fail("HARNESS-S009", `package.json must expose ${name}`, `Set ${name} to ${command}.`);
+  }
 }
 if (packageJson.scripts?.["verify:static"] !== "node scripts/verify-harness.mjs") {
   fail("HARNESS-S010", "package.json must expose npm run verify:static", "Restore the static verifier entry.");
@@ -258,6 +306,13 @@ if (packageJson.homepage !== "https://github.com/Tah10n/opencode-harness#readme"
 if (packageJson.dependencies?.["@opencode-ai/plugin"]) {
   fail("HARNESS-S015", "opencode-harness must not depend on plugin packages", "Capabilities live in sibling packages; keep this repo as a behavior profile.");
 }
+if (packageJson.exports?.["./feedback"] !== "./lib/feedback/index.mjs" || packageJson.exports?.["./trace-store"] !== "./lib/feedback/index.mjs") {
+  fail("HARNESS-S015", "package.json must expose the stable feedback/trace integration boundary", "Export lib/feedback/index.mjs without exposing private implementation modules.");
+}
+const gitignore = read(".gitignore");
+for (const ignored of [".oc_harness/", "evals/reports/", "evals/decisions/"]) {
+  assertIncludes(gitignore, ignored, ".gitignore", "HARNESS-S018", "Keep operational, report, and decision artifacts out of Git.");
+}
 
 const config = JSON.parse(read("opencode.json"));
 if (config.default_agent !== "orchestrator") {
@@ -279,6 +334,9 @@ if (config.command?.diagnose?.agent !== "diagnose") {
 }
 if (!config.watcher?.ignore?.includes(".oc_learning/**")) {
   fail("HARNESS-S018", "opencode.json watcher must ignore .oc_learning/**", "Prevent memory backups from becoming noisy watched changes.");
+}
+if (!config.watcher?.ignore?.includes(".oc_harness/**")) {
+  fail("HARNESS-S018", "opencode.json watcher must ignore .oc_harness/**", "Keep machine-local operational runs out of watcher noise.");
 }
 if (config.permission?.external_directory !== "ask") {
   fail("HARNESS-S019", "opencode.json must ask before external directory access", "Keep cross-directory access explicit.");
@@ -471,21 +529,33 @@ for (const needle of [
   "hidden_check_files",
   "defect escape rate",
   "Do not fake a model run",
-  "allowlisted public fields",
+  "only allowlisted",
+  "public fields",
   "Adapters must return explicit success",
   "OPENCODE_BASELINE_PROFILE",
   "OPENCODE_HARNESS_PROFILE",
+  "OPENCODE_BASELINE_PERMISSION_EVIDENCE",
+  "OPENCODE_HARNESS_PERMISSION_EVIDENCE",
   "separate isolated repository copies",
   "AbortSignal",
-  "allowlisted, redacted adapter summary",
-  "raw command stdout/stderr",
+  "allowlisted sanitized model/tool/cost",
+  "content-derived `profile_fingerprint`",
+  "Symlinks",
+  "junctions",
+  "never raw command",
+  "stdout/stderr",
   "Unsupported fields are rejected",
   "relative allowlisted project fixture",
-  "must not point at the repository root",
+  "repository root",
   "trace/report directories",
   "must be absent before staging",
   "must not overwrite or merge",
   "transcripts, prompts, completions, secrets",
+  "`workspace_policy`",
+  "`read_only`",
+  "`allowlist`",
+  "even when the adapter emitted no `edit` event",
+  "bounded managed-command",
 ]) {
   assertIncludes(liveEvaluationDocs, needle, "docs/live-evaluation.md", "HARNESS-S057", "Document live A/B evaluation without making it a default CI dependency.");
 }
@@ -497,8 +567,9 @@ for (const needle of [
   "actions/workflows/verify.yml/badge.svg",
   "## Adoption",
   "npm run verify",
+  "npm run verify:adoption-bundle",
   "npm run verify:runtime",
-  "optional live A/B evaluation",
+  "live A/B evaluation",
   "docs/adoption.md",
   "docs/evaluation.md",
   "docs/live-evaluation.md",
@@ -515,6 +586,8 @@ for (const needle of [
   "https://martinfowler.com/articles/harness-engineering.html",
   "https://github.com/DenisSergeevitch/agents-best-practices",
   "harness-release-review",
+  "unreleased `0.3.0`",
+  "tagged release is `v0.2.0`",
 ]) {
   assertIncludes(readme, needle, "README.md");
 }
@@ -522,8 +595,17 @@ for (const needle of [
 const traceContractDoc = read("docs/trace-contract.md");
 for (const needle of [
   "machine-local artifacts",
-  "not a tracing implementation",
+  "`.oc_harness/`",
+  "Trace Schema Version 2",
+  "Version 1 Read Compatibility",
+  "`run.json`",
+  "events.jsonl",
+  "context-receipts.jsonl",
+  "verification.json",
+  "outcome.json",
   "`run_id`",
+  "`event_id`",
+  "`sequence`",
   "`agent`",
   "`permission_decision`",
   "`files_read`",
@@ -538,14 +620,24 @@ for (const needle of [
   "`edit`",
   "`review_finding`",
   "`task_end`",
+  "`hypothesis`",
+  "`expected_observation`",
+  "`actual_observation`",
+  "`context_snapshot`",
+  "`verifier_codes`",
+  "`strategy_id`",
   "must not persist secrets",
   "raw private logs",
   ".env",
   "full source dumps",
+  "host adapter",
+  "`NUL.txt`",
+  "stale `.tmp` remnants",
   "```jsonl",
 ]) {
   assertIncludes(traceContractDoc, needle, "docs/trace-contract.md", "HARNESS-S065", "Keep the trace contract portable, safe, and aligned with termination policy.");
 }
+assertNotIncludes(traceContractDoc, "C:/work/example", "docs/trace-contract.md", "HARNESS-S065", "Fake traces should model relative paths rather than normalize private absolute paths.");
 
 const budgetDoc = read("docs/budgets-and-termination.md");
 for (const needle of [
@@ -619,7 +711,7 @@ for (const needle of [
 
 const harnessMapDoc = read("docs/harness-map.md");
 for (const needle of [
-  "Trace contract",
+  "Trace contract and operational run store (schema v2)",
   "Budget and termination policy",
   "Subagent result schema",
   "Adversarial fixtures",
@@ -847,23 +939,39 @@ for (const commandFile of ["commands/learn.md", "commands/curate-learning.md"]) 
 }
 
 const compatibilityDoc = read("docs/compatibility.md");
-for (const needle of ["v0.2.0", "opencode-recursive-context", "opencode-learning-guard"]) {
+for (const needle of ["`0.3.0`", "Unreleased target", "`v0.2.0`", "Latest tagged release", "no package exports", "opencode-recursive-context", "opencode-learning-guard"]) {
   assertIncludes(compatibilityDoc, needle, "docs/compatibility.md");
 }
 
 const evaluationDoc = read("docs/evaluation.md");
-for (const needle of ["verify:drift", "verify:runtime", "verify:runtime:fixture", "verify:live-eval", "contract/config evaluation", "Optional live A/B evaluation", "Harness Control Map", "fixture path-boundary", "trace-contract", "budgeted-termination", "subagent-result-schema", "adversarial-fixtures", "static behavior contracts"]) {
+for (const needle of ["verify:drift", "verify:runtime", "verify:runtime:fixture", "verify:live-eval", "contract/config evaluation", "Optional live A/B evaluation", "Harness Control Map", "path-boundary sensor", "trace-contract", "budgeted-termination", "subagent-result-schema", "adversarial-fixtures", "static behavior contracts", 'BASELINE_ROOT="/absolute/path/to/baseline"', 'CANDIDATE_ROOT="/absolute/path/to/candidate"', "absolute JSON path"]) {
   assertIncludes(evaluationDoc, needle, "docs/evaluation.md");
 }
 
 const releaseDoc = read("docs/release.md");
-for (const needle of ["harness-release-review", "guide/sensor coherence", "permission safety", "verify:live-eval", "OPENCODE_BASELINE_PROFILE", "OPENCODE_HARNESS_PROFILE", "defect"]) {
+for (const needle of ["harness-release-review", "guide/sensor coherence", "permission safety", "verify:live-eval", "OPENCODE_BASELINE_PROFILE", "OPENCODE_HARNESS_PROFILE", "defect", 'BASELINE_ROOT="/absolute/path/to/baseline"', 'CANDIDATE_ROOT="/absolute/path/to/candidate"', "absolute artifact path"]) {
   assertIncludes(releaseDoc, needle, "docs/release.md");
 }
 
 const adoptionDoc = read("docs/adoption.md");
-for (const needle of ["docs/harnessability.md", "npm run verify:runtime", "Harnessability", "Post-Adoption Confidence Levels", "fault injection"]) {
+for (const needle of ["docs/harnessability.md", "npm run verify:runtime", "npm run verify:adoption-bundle", "fixtures/sample-project/", "fixtures/live/", "Harnessability", "Post-Adoption Confidence Levels", "fault injection"]) {
   assertIncludes(adoptionDoc, needle, "docs/adoption.md");
+}
+
+const adoptionBundleVerifier = read("scripts/verify-adoption-bundle.mjs");
+for (const needle of [
+  '"evals"',
+  '"fixtures"',
+  '"lib"',
+  '"package.json"',
+  '"scripts"',
+  '"fixtures/live"',
+  '"fixtures/sample-project"',
+  '"opencode-harness/feedback"',
+  '"scripts/evaluate-live.mjs", "--self-test-buffered"',
+  "runManagedCommand",
+]) {
+  assertIncludes(adoptionBundleVerifier, needle, "scripts/verify-adoption-bundle.mjs", "HARNESS-S082", "Keep the portable adoption bundle and its no-provider temp-copy smoke complete.");
 }
 
 const harnessabilityDoc = read("docs/harnessability.md");
@@ -878,66 +986,54 @@ for (const needle of ["Targeted tests", "Shared Mutable State", "High/Critical O
 
 const liveEvalScript = read("scripts/evaluate-live.mjs");
 for (const needle of [
-  "HARNESS-L006",
-  "must define repo_fixture",
-  "HARNESS-L012",
   "OPENCODE_LIVE_EVAL_ADAPTER",
   "OPENCODE_BASELINE_PROFILE",
   "OPENCODE_HARNESS_PROFILE",
   "publicScenarioForAdapter",
-  "publicScenarioFields",
-  "unsupportedScenarioFields",
-  "liveProfileRuns",
+  "loadScenarioCorpus",
+  "selectScenarios",
   "runScenarioProfile",
-  "profileRole",
-  "runAdapterWithTimeout",
+  "profile_role",
+  "profile_fingerprint",
+  "runAdapterModule",
   "AdapterTimeoutError",
-  "adapter timed out after",
-  "isSensitiveReportKey",
-  "commandReportSummary",
-  "adapterErrorSummary",
-  "stageHiddenCheckFiles",
+  "createTraceStore",
+  "createBufferedStore",
+  "commitBufferedRun",
+  "createAdapterInstrumentation",
+  "createReportHistory",
+  "validateLiveReport",
+  "evaluateTraceAssertions",
+  "stageHiddenFiles",
   "hidden_check_files",
-  "adapterReportSummary",
-  "adapterReport",
-  "visibleResults",
-  "visiblePassRate",
-  "hiddenPassRate",
-  "defectEscapeRate",
-  "recordCommandFailures",
-  "HARNESS-L016",
+  "hidden_trace_assertions",
+  "setup_results",
+  "visible_results",
+  "hidden_results",
+  "visible_pass_rate",
+  "hidden_pass_rate",
+  "defect_escape_rate",
+  "stdout_chars",
+  "stderr_chars",
   "adapterFailureReason",
-  "HARNESS-L017",
-  "HARNESS-L018",
-  "HARNESS-L020",
-  "HARNESS-L021",
-  "HARNESS-L022",
-  "HARNESS-L023",
-  "HARNESS-L024",
-  "HARNESS-L025",
-  "HARNESS-L030",
-  "HARNESS-L031",
-  "unsafe repo_fixture scope",
-  "repo_fixture: \".\"",
-  "repo_fixture: \"evals\"",
-  "repo_fixture: \"fixtures/adversarial\"",
-  "fixtures/runtime-debug",
-  "fixtures/sample-project",
-  "allowedRepoFixtureRoots",
-  "allowedRepoFixturePrefixes",
-  "HARNESS-L032",
-  "hidden_check_files target collision",
-  "fs.existsSync(target)",
-  "HARNESS-L033",
-  "redactReportString",
-  "[redacted]",
-  "FAKE_TOKEN=example-token-do-not-use",
-  "BEGIN PRIVATE KEY",
-  "adapter did not return explicit success",
+  "adapter_success_unavailable",
+  "infrastructure_self_test",
+  "HIDDEN_STAGED_AFTER_ADAPTER",
+  "LIVE_TRACE_ASSERTIONS",
+  "task_start",
+  "fixture_preparation",
+  "setup_verification",
+  "adapter_invocation",
+  "adapter_result",
+  "visible_check",
+  "hidden_staging",
+  "hidden_check",
+  "task_end",
   "--validate",
   "--self-test",
-  "HARNESS-L015",
-  "path.relative(basePath, targetPath)",
+  "--self-test-buffered",
+  "--suite",
+  "--scenario",
 ]) {
   assertIncludes(liveEvalScript, needle, "scripts/evaluate-live.mjs");
 }
@@ -948,37 +1044,157 @@ const runtimeVerifier = read("scripts/verify-runtime.mjs");
 for (const needle of ["task.*", "`task.${agent}`", "\"general\"", "HARNESS-R017", "HARNESS-R018"]) {
   assertIncludes(runtimeVerifier, needle, "scripts/verify-runtime.mjs", "HARNESS-S059", "Runtime verification must prove review-orchestrator task delegation boundaries.");
 }
+for (const needle of ["--evidence-profile", "--subject-evidence", "runtimePermissionSnapshot", "subject_fingerprint", "runtime_fingerprint", "surface_fingerprint", "profile_fingerprint", "incomplete_scopes", "collectResolvedPermissionSurface", "installed_runtime", "fixture", "Permission evidence written"]) {
+  assertIncludes(runtimeVerifier, needle, "scripts/verify-runtime.mjs", "HARNESS-S059", "Runtime verification should optionally emit strict permission evidence without raw debug output.");
+}
+for (const needle of ['["agent", "list"]', "parseAgentInventory", "installedAgentInventory", "requiredAgentModes", "agentInventory", "HARNESS-R022", "HARNESS-R023", "HARNESS-R024"]) {
+  assertIncludes(runtimeVerifier, needle, "scripts/verify-runtime.mjs", "HARNESS-S059", "Runtime verification must inventory every installed agent and fail closed on incomplete inventory.");
+}
 
 const runtimeFixtureVerifier = read("scripts/verify-runtime-fixtures.mjs");
 for (const needle of ["HARNESS-R017", "HARNESS-R018", "task.*", "task.explore", "task.reviewer", "task.researcher", "task.verifier", "task.general", "task.architect", "task.diagnose", "task.improver"]) {
   assertIncludes(runtimeFixtureVerifier, needle, "scripts/verify-runtime-fixtures.mjs", "HARNESS-S060", "Runtime fixtures must cover review-orchestrator task delegation boundaries.");
 }
+for (const needle of ["external_directory", "config.bash.", "unknown permission actions", "incomplete_scopes", "--subject-evidence"]) {
+  assertIncludes(runtimeFixtureVerifier, needle, "scripts/verify-runtime-fixtures.mjs", "HARNESS-S060", "Runtime fixtures must prove complete permission extraction and explicit incomplete evidence.");
+}
+for (const needle of ["agent-list.txt", "unexpected-agent", "wrongRequiredModeFixture", "extraDangerousAgentFixture", "HARNESS-R022", "HARNESS-R023", "HARNESS-R024"]) {
+  assertIncludes(runtimeFixtureVerifier, needle, "scripts/verify-runtime-fixtures.mjs", "HARNESS-S060", "Runtime fixtures must prove authoritative installed-agent discovery, extra-agent capture, and fail-closed inventory handling.");
+}
 
 const liveEvalReadme = read("evals/README.md");
+assertIncludes(liveEvalReadme, 'BASELINE_ROOT="/absolute/path/to/baseline"', "evals/README.md", "HARNESS-S061", "Live-eval examples must identify the baseline evidence root explicitly.");
+assertIncludes(liveEvalReadme, 'CANDIDATE_ROOT="/absolute/path/to/candidate"', "evals/README.md", "HARNESS-S061", "Live-eval examples must identify the candidate evidence root explicitly.");
+assertIncludes(liveEvalReadme, "runner-only `workspace_policy`", "evals/README.md", "HARNESS-S061", "Live-eval README must document runner-owned mutation enforcement.");
+assertIncludes(liveEvalReadme, "exact `relative_path`", "evals/README.md", "HARNESS-S061", "Live-eval README must document path-specific handoff receipts.");
+assertIncludes(liveEvalReadme, "unexpected blocked or failed reason", "evals/README.md", "HARNESS-S061", "Live-eval README must document non-success termination semantics.");
 assertIncludes(liveEvalReadme, "`repo_fixture`", "evals/README.md", "HARNESS-S061", "Live-eval README should document the implemented fixture source.");
 assertIncludes(liveEvalReadme, "`hidden_check_files`", "evals/README.md", "HARNESS-S061", "Live-eval README should document runner-owned hidden check files.");
 assertIncludes(liveEvalReadme, "rejects unsupported manifest fields", "evals/README.md", "HARNESS-S061", "Live-eval README should document unsupported-field rejection.");
-assertIncludes(liveEvalReadme, "Adapters must return explicit success", "evals/README.md", "HARNESS-S061", "Live-eval README should document explicit adapter success.");
+assertIncludes(liveEvalReadme, "Adapters must return", "evals/README.md", "HARNESS-S061", "Live-eval README should document explicit adapter success.");
+assertIncludes(liveEvalReadme, "explicit success", "evals/README.md", "HARNESS-S061", "Live-eval README should document explicit adapter success.");
 assertIncludes(liveEvalReadme, "separate isolated repo copies", "evals/README.md", "HARNESS-S061", "Live-eval README should document baseline/harness isolation.");
-assertIncludes(liveEvalReadme, "command status/exit metadata and an allowlisted, redacted adapter summary", "evals/README.md", "HARNESS-S061", "Live-eval README should document report sanitization.");
+assertIncludes(liveEvalReadme, "command status/exit metadata", "evals/README.md", "HARNESS-S061", "Live-eval README should document report sanitization.");
 assertIncludes(liveEvalReadme, "raw command stdout/stderr", "evals/README.md", "HARNESS-S061", "Live-eval README should document command output sanitization.");
-assertIncludes(liveEvalReadme, "relative allowlisted project fixture", "evals/README.md", "HARNESS-S061", "Live-eval README should document narrow fixture scope.");
-assertIncludes(liveEvalReadme, "must not point at the repository root", "evals/README.md", "HARNESS-S061", "Live-eval README should document unsafe fixture scopes.");
+assertIncludes(liveEvalReadme, "relative allowlisted", "evals/README.md", "HARNESS-S061", "Live-eval README should document narrow fixture scope.");
+assertIncludes(liveEvalReadme, "repository root", "evals/README.md", "HARNESS-S061", "Live-eval README should document unsafe fixture scopes.");
 assertIncludes(liveEvalReadme, "trace/report directories", "evals/README.md", "HARNESS-S061", "Live-eval README should document runner-owned directory exclusions.");
 assertIncludes(liveEvalReadme, "staged only into absent target paths", "evals/README.md", "HARNESS-S061", "Live-eval README should document hidden check target collision prevention.");
-assertIncludes(liveEvalReadme, "allowlisted, redacted adapter summary", "evals/README.md", "HARNESS-S061", "Live-eval README should document adapter report redaction.");
+assertIncludes(liveEvalReadme, "allowlisted sanitized model/tool/cost", "evals/README.md", "HARNESS-S061", "Live-eval README should document the implemented adapter metadata allowlist.");
+assertIncludes(liveEvalReadme, "OPENCODE_BASELINE_PERMISSION_EVIDENCE", "evals/README.md", "HARNESS-S061", "Live-eval README should document content-bound profile evidence.");
+assertIncludes(liveEvalReadme, "symlinks, junctions", "evals/README.md", "HARNESS-S061", "Live-eval README should document physical path confinement.");
 assertIncludes(liveEvalReadme, "transcripts, prompts", "evals/README.md", "HARNESS-S061", "Live-eval README should document transcript and prompt exclusion.");
 assertNotIncludes(liveEvalReadme, "setup source", "evals/README.md", "HARNESS-S061", "Do not document setup source until the runner supports it.");
 
 const liveEvalSchema = read("evals/scenario.schema.json");
 assertIncludes(liveEvalSchema, "\"additionalProperties\": false", "evals/scenario.schema.json", "HARNESS-S063", "Live-eval schema should reject unsupported manifest fields.");
 assertIncludes(liveEvalSchema, "\"hidden_check_files\"", "evals/scenario.schema.json", "HARNESS-S063", "Live-eval schema should support runner-owned hidden check files.");
+assertIncludes(liveEvalSchema, "\"hidden_trace_assertions\"", "evals/scenario.schema.json", "HARNESS-S063", "Live-eval schema should support runner-owned trace assertions.");
+assertIncludes(liveEvalSchema, "\"review_finding_exists\"", "evals/scenario.schema.json", "HARNESS-S063", "Review and audit scenarios should require structured positive finding evidence.");
+assertIncludes(liveEvalSchema, "\"failure_family\"", "evals/scenario.schema.json", "HARNESS-S063", "Behavioral scenarios should identify their distinct failure family.");
+
+const liveEvalSuites = read("evals/suites.json");
+for (const needle of ["\"development\"", "\"held_out\"", "\"canary\"", "\"infrastructure\"", "runner-self-test"]) {
+  assertIncludes(liveEvalSuites, needle, "evals/suites.json", "HARNESS-S063", "Keep the versioned live-evaluation split complete.");
+}
+const acceptancePolicy = read("evals/acceptance-policy.json");
+for (const needle of ["policy_version", "required_suites", "minimum_improvement", "expected_producer_ids"]) {
+  assertIncludes(acceptancePolicy, needle, "evals/acceptance-policy.json", "HARNESS-S063", "Keep candidate acceptance policy explicit and versioned.");
+}
 
 const liveEvalSelfTestScenario = read("evals/scenarios/runner-self-test.json");
 assertIncludes(liveEvalSelfTestScenario, "\"hidden_check_files\"", "evals/scenarios/runner-self-test.json", "HARNESS-S064", "Live-eval self-test scenario should exercise hidden file staging.");
 assertIncludes(liveEvalSelfTestScenario, "evals/hidden/runner-self-test/hidden.test.js", "evals/scenarios/runner-self-test.json", "HARNESS-S064", "Hidden check fixture should live outside the public repo fixture.");
+assertIncludes(liveEvalSelfTestScenario, "\"hidden_trace_assertions\"", "evals/scenarios/runner-self-test.json", "HARNESS-S064", "Infrastructure self-test should exercise trace assertions without an LLM.");
+
+const traceStore = read("lib/feedback/trace-store.mjs");
+for (const needle of [
+  "TRACE_SCHEMA_VERSION",
+  "events.jsonl",
+  "context-receipts.jsonl",
+  "verification.json",
+  "outcome.json",
+  "createRun",
+  "appendEvent",
+  "recordContextReceipt",
+  "createJob",
+  "completeJob",
+  "recordVerification",
+  "finalizeRun",
+  "inspectRun",
+  "legacy_events_present",
+  "TRACE_SEQUENCE",
+  "TRACE_FINALIZED",
+  "DEFAULT_TRACE_STORE_LIMITS",
+  "TRACE_QUOTA_TOTAL_BYTES",
+  "TRACE_TASK_END_REQUIRED",
+  "finding_id",
+  "createBufferedTraceStore",
+  "commitBufferedRun",
+  "materializeBufferedSnapshot",
+]) {
+  assertIncludes(traceStore, needle, "lib/feedback/trace-store.mjs", "HARNESS-S076", "Keep the operational trace store complete and fail-closed.");
+}
+
+const privacyModule = read("lib/feedback/privacy.mjs");
+for (const needle of ["secretAssignmentPattern", "providerTokenPattern", "github_pat_", "path.win32.isAbsolute", "path.posix.isAbsolute", "assertSafePersistenceId", "assertPersistenceSafe", "PRIVACY_FORBIDDEN_FIELD", "original_length", "stored_length"]) {
+  assertIncludes(privacyModule, needle, "lib/feedback/privacy.mjs", "HARNESS-S077", "Keep redaction, cross-platform paths, strict fields, and truncation metadata centralized.");
+}
+
+const reportHistory = read("lib/feedback/report-history.mjs");
+for (const needle of ["workspaceRoot", "publishImmutableSet", "complete.json", "latest.json", "latest.md", "latest.complete.json", "report_fingerprint", "json_text_fingerprint", "markdown_fingerprint", "inspectLatest"]) {
+  assertIncludes(reportHistory, needle, "lib/feedback/report-history.mjs", "HARNESS-S078", "Immutable report history needs authoritative completion markers and convenience latest files.");
+}
+
+const adapterWorker = read("lib/feedback/adapter-worker.mjs");
+for (const needle of ["spawn", "./process-tree.mjs", "terminateProcessTree", "releaseUnverifiedChild", "adapter_teardown_unverified", "traceLimits", "trace_request", "payload_json", "result_json", "encodePlainJson", "AdapterTimeoutError"]) {
+  assertIncludes(adapterWorker, needle, "lib/feedback/adapter-worker.mjs", "HARNESS-S079", "Live adapters must use bounded trace RPC and verified process-tree teardown.");
+}
+
+const processTree = read("lib/feedback/process-tree.mjs");
+for (const needle of ["taskkill.exe", "process.kill(-pid", "terminateProcessTree", "releaseUnverifiedChild", "runManagedCommand", "ProcessTreeTeardownError"]) {
+  assertIncludes(processTree, needle, "lib/feedback/process-tree.mjs", "HARNESS-S079", "Keep Windows/POSIX process-tree teardown and managed command settlement centralized.");
+}
+
+const acceptanceEngine = read("lib/feedback/acceptance.mjs");
+for (const needle of [
+  "accepted",
+  "rejected",
+  "inconclusive",
+  "STATIC_VERIFICATION_FAILED",
+  "PERMISSION_SURFACE_WIDENED",
+  "CANARY_REGRESSION",
+  "HELD_OUT_REGRESSION",
+  "NEW_HIDDEN_CHECK_FAILURE",
+  "TARGET_IMPROVEMENT_BELOW_THRESHOLD",
+  "COST_CEILING_EXCEEDED",
+  "DURATION_CEILING_EXCEEDED",
+  "evidence_identity",
+  "repository_fingerprint",
+  "profile_fingerprint",
+  "MISMATCHED_BASELINE_EVIDENCE_FINGERPRINT",
+  "MISMATCHED_CANDIDATE_EVIDENCE_FINGERPRINT",
+  "scenarioRepetitionKey",
+  "UNTRUSTED_LIVE_REPORT",
+  "scenario_corpus_fingerprint",
+  "pair_universe_fingerprint",
+  "artifact_attestation_fingerprint",
+  "canonicalScenarios",
+]) {
+  assertIncludes(acceptanceEngine, needle, "lib/feedback/acceptance.mjs", "HARNESS-S080", "Candidate decisions must preserve strict non-scalar hard gates and stable pairing.");
+}
+
+const evidenceModule = read("lib/feedback/evidence.mjs");
+for (const needle of ["repositoryStateFingerprint", "materializeRepositorySnapshot", "verifyIntegrity", "runtimeOutputsFingerprint", "agentInventory", "permissionProfileFingerprint"]) {
+  assertIncludes(evidenceModule, needle, "lib/feedback/evidence.mjs", "HARNESS-S081", "Evidence identity must use shared content-derived fingerprints.");
+}
+const permissionSurfaceModule = read("lib/feedback/permission-surface.mjs");
+for (const needle of ["new Map", "extractPermissionSurface", "collectResolvedPermissionSurface", "unknown_action", "incomplete_scopes"]) {
+  assertIncludes(permissionSurfaceModule, needle, "lib/feedback/permission-surface.mjs", "HARNESS-S081", "Permission evidence must parse the complete surface or remain explicitly incomplete.");
+}
 
 const changelog = read("CHANGELOG.md");
+assertIncludes(changelog, "## Unreleased (target: 0.3.0)", "CHANGELOG.md");
 assertIncludes(changelog, "## 0.2.0 - 2026-06-15", "CHANGELOG.md");
 assertIncludes(changelog, "## 0.1.0 - 2026-06-15", "CHANGELOG.md");
 

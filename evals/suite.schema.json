@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "OpenCode harness live-evaluation suite manifest",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "manifest_version",
+    "suites"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "manifest_version": {
+      "$ref": "#/$defs/id",
+      "maxLength": 32
+    },
+    "suites": {
+      "type": "object",
+      "required": [
+        "development",
+        "held_out",
+        "canary",
+        "infrastructure"
+      ],
+      "properties": {
+        "development": {
+          "$ref": "#/$defs/scenarioIds"
+        },
+        "held_out": {
+          "$ref": "#/$defs/scenarioIds"
+        },
+        "canary": {
+          "$ref": "#/$defs/scenarioIds"
+        },
+        "infrastructure": {
+          "$ref": "#/$defs/scenarioIds"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^(?!(?:con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\\.|$))(?!.*\\.$)[a-z0-9][a-z0-9._-]{0,127}$"
+    },
+    "scenarioIds": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/id"
+      },
+      "minItems": 1,
+      "maxItems": 100,
+      "uniqueItems": true
+    }
+  },
+  "additionalProperties": false
+}
