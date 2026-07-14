@@ -9,6 +9,7 @@ const temporaryRoot = fs.realpathSync(os.tmpdir());
 const bundleRoot = fs.mkdtempSync(path.join(temporaryRoot, "opencode-harness-adoption-"));
 
 const adoptionEntries = [
+  ".opencode/plugins/engineering-dossier.mjs",
   ".gitattributes",
   ".github",
   ".gitignore",
@@ -25,7 +26,8 @@ const adoptionEntries = [
   "evals",
   "examples",
   "fixtures",
-  "lib",
+  "lib/feedback",
+  "lib/quality",
   "opencode.json",
   "package.json",
   "quality",
@@ -34,12 +36,12 @@ const adoptionEntries = [
 ];
 
 const requiredQualityDirectories = Object.freeze([
+  ".opencode/plugins",
   "lib/quality",
   "quality",
   "quality/acceptance",
   "quality/live-scenarios",
   "quality/live-scenarios/artifacts",
-  "quality/model-profiles",
   "quality/prompt-inventory",
   "quality/schemas",
 ]);
@@ -47,7 +49,13 @@ const requiredQualityDirectories = Object.freeze([
 const requiredQualityFiles = Object.freeze([
   "lib/quality/index.mjs",
   "lib/quality/milestone-dod.mjs",
-  "lib/quality/runtime-execution.mjs",
+  "lib/quality/normal-session-bridge.mjs",
+  "lib/quality/normal-session-plugin.mjs",
+  "lib/quality/normal-session-workspace.mjs",
+  "lib/quality/runtime-hook-verification.mjs",
+  "lib/quality/verification-targets.mjs",
+  "lib/quality/whitespace.mjs",
+  ".opencode/plugins/engineering-dossier.mjs",
   "quality/acceptance/acceptance-policy.v2.json",
   "quality/live-scenarios/quality-architecture-boundary.v1.json",
   "quality/live-scenarios/quality-concurrency-cancellation.v1.json",
@@ -62,11 +70,8 @@ const requiredQualityFiles = Object.freeze([
   "quality/live-scenarios/quality-small-local-control.v1.json",
   "quality/live-scenarios/quality-stale-cache-version-skew.v1.json",
   "quality/milestone-2-dod.v1.json",
-  "quality/model-profiles/catalog.v1.json",
-  "quality/model-profiles/experiment.v1.json",
-  "quality/model-profiles/runtime-fixture-evidence.v1.json",
-  "quality/prompt-inventory/baseline.v1.json",
-  "quality/prompt-inventory/declared-changes.v1.json",
+  "quality/prompt-inventory/baseline.v2.json",
+  "quality/prompt-inventory/declared-changes.v2.json",
   "quality/schemas/architecture-evaluation.schema.json",
   "quality/schemas/architecture-policy.example.json",
   "quality/schemas/architecture-policy.schema.json",
@@ -79,28 +84,37 @@ const requiredQualityFiles = Object.freeze([
   "scripts/verify-milestone-2-dod.mjs",
   "scripts/verify-all.mjs",
   "scripts/verify-quality-contracts.mjs",
+  "scripts/verify-quality-live-runner.mjs",
   "scripts/verify-quality-live-manifests.mjs",
+  "scripts/verify-normal-session-quality-bridge.mjs",
+  "scripts/verify-normal-session-runtime.mjs",
+  "scripts/verify-normal-session-runtime-fixtures.mjs",
+  "scripts/verify-quality-verification-targets.mjs",
+  "scripts/verify-committed-whitespace.mjs",
+  "scripts/verify-committed-whitespace-fixtures.mjs",
 ]);
 
 const requiredQualityExports = Object.freeze([
-  "createRuntimeExecutionBinding",
-  "runtimeExecutionFingerprint",
+  "assessQualityCandidate",
+  "createNormalSessionQualityBridge",
+  "createQualityOutcomes",
   "validateArchitecturePolicy",
   "validateEngineeringDossier",
-  "validateEngineeringExperimentManifest",
   "validateEngineeringGateDecision",
   "validateEngineeringImpactGraph",
   "validateIntegratedVerificationEvidence",
-  "validateModelProfileCatalog",
   "validatePromptInventory",
   "validateQualityAcceptancePolicy",
-  "validateRuntimeModelEvidence",
-  "validateRuntimeExecutionBinding",
+  "requiredEngineeringVerificationTargets",
+  "verifyCommittedWhitespace",
 ]);
 
 const excludedOperationalPrefixes = [
   ".git",
   ".oc_harness",
+  ".opencode/node_modules",
+  ".opencode/package-lock.json",
+  ".opencode/package.json",
   "evals/decisions",
   "evals/reports",
   "local",
@@ -109,6 +123,54 @@ const excludedOperationalPrefixes = [
 
 function normalize(relativePath) {
   return relativePath.replaceAll("\\", "/").replace(/^\.\//, "");
+}
+
+function documentedAdoptionEntries(relativePath) {
+  const text = fs.readFileSync(path.join(sourceRoot, relativePath), "utf8");
+  const startMarker = "<!-- portable-adoption-bundle:start -->";
+  const endMarker = "<!-- portable-adoption-bundle:end -->";
+  const start = text.indexOf(startMarker);
+  const end = text.indexOf(endMarker, start + startMarker.length);
+  if (start === -1 || end === -1 || text.indexOf(startMarker, start + startMarker.length) !== -1) {
+    throw new Error(`${relativePath} must contain exactly one portable adoption bundle contract`);
+  }
+  const body = text.slice(start + startMarker.length, end);
+  const match = body.match(/```text\s*\r?\n([\s\S]*?)\r?\n```/u);
+  if (!match) {
+    throw new Error(`${relativePath} portable adoption bundle contract must be a text code block`);
+  }
+  return match[1].split(/\r?\n/u).map((entry) => normalize(entry.trim())).filter(Boolean);
+}
+
+function assertPortableAdoptionDeclaration(entries) {
+  if (new Set(entries).size !== entries.length) {
+    throw new Error("portable adoption bundle entries must be unique");
+  }
+  for (const requiredEntry of [
+    ".opencode/plugins/engineering-dossier.mjs",
+    "lib/feedback",
+    "lib/quality",
+    "quality",
+    "scripts",
+    "evals",
+  ]) {
+    if (!entries.includes(requiredEntry)) {
+      throw new Error(`portable adoption bundle is missing ${requiredEntry}`);
+    }
+  }
+  for (const forbiddenEntry of [
+    ".opencode",
+    ".opencode/node_modules",
+    ".opencode/package-lock.json",
+    ".opencode/package.json",
+    ".oc_harness",
+    "evals/decisions",
+    "evals/reports",
+  ]) {
+    if (entries.includes(forbiddenEntry)) {
+      throw new Error(`portable adoption bundle must not declare ${forbiddenEntry}`);
+    }
+  }
 }
 
 function isExcluded(relativePath) {
@@ -210,6 +272,14 @@ async function runNode(label, args) {
 
 let verificationError;
 try {
+  assertPortableAdoptionDeclaration(adoptionEntries);
+  for (const documentationPath of ["README.md", "docs/adoption.md"]) {
+    const documentedEntries = documentedAdoptionEntries(documentationPath);
+    if (JSON.stringify(documentedEntries) !== JSON.stringify(adoptionEntries)) {
+      throw new Error(`${documentationPath} portable adoption list drifted from adoptionEntries`);
+    }
+  }
+
   const completeDeclaration = {
     entries: adoptionEntries,
     hasPath: () => true,
@@ -224,13 +294,13 @@ try {
     ...completeDeclaration,
     hasPath: (relativePath) => relativePath !== "quality/schemas",
   });
-  expectQualityContractFailure("quality manifest omission sensor", {
+  expectQualityContractFailure("quality bridge omission sensor", {
     ...completeDeclaration,
-    hasPath: (relativePath) => relativePath !== "quality/model-profiles/catalog.v1.json",
+    hasPath: (relativePath) => relativePath !== ".opencode/plugins/engineering-dossier.mjs",
   });
   expectQualityContractFailure("quality export omission sensor", {
     ...completeDeclaration,
-    exportNames: requiredQualityExports.filter((name) => name !== "validateModelProfileCatalog"),
+    exportNames: requiredQualityExports.filter((name) => name !== "requiredEngineeringVerificationTargets"),
   });
 
   for (const entry of adoptionEntries) {
@@ -268,7 +338,14 @@ try {
   ]) {
     assertBundlePath(requiredFile);
   }
-  for (const forbiddenPath of [".oc_harness", "evals/decisions", "evals/reports"]) {
+  for (const forbiddenPath of [
+    ".oc_harness",
+    ".opencode/node_modules",
+    ".opencode/package-lock.json",
+    ".opencode/package.json",
+    "evals/decisions",
+    "evals/reports",
+  ]) {
     if (fs.existsSync(path.join(bundleRoot, forbiddenPath))) {
       throw new Error(`adoption bundle copied operational state: ${forbiddenPath}`);
     }
@@ -291,18 +368,10 @@ try {
       'if (!missingExportRejected) throw new Error("quality export omission sensor did not fail closed");',
       'assertQualityExports(quality);',
       'const readJson = (relativePath) => JSON.parse(fs.readFileSync(relativePath, "utf8"));',
-      'const catalog = readJson("quality/model-profiles/catalog.v1.json");',
-      'const experiment = readJson("quality/model-profiles/experiment.v1.json");',
-      'const runtimeFixture = readJson("quality/model-profiles/runtime-fixture-evidence.v1.json");',
-      'quality.validateModelProfileCatalog(catalog);',
-      'quality.validateEngineeringExperimentManifest(experiment, { catalog });',
-      'quality.validateRuntimeModelEvidence(runtimeFixture, { catalog });',
-      'const fp = "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";',
-      'const bindingInput = { repository_fingerprint: fp, host_profile_id: "candidate-v1", experiment_id: experiment.experiment_id, experiment_fingerprint: experiment.content_fingerprint, comparison_id: experiment.comparisons[0].comparison_id, variant_id: experiment.comparisons[0].variant_id, harness_role: experiment.comparisons[0].role, scenario_id: experiment.comparisons[0].scenario_id, scenario_fingerprint: fp, repetition: experiment.comparisons[0].repetition, profile_role: "candidate", profile_fingerprint: fp, model_profile_id: experiment.comparisons[0].candidate_invocation.profile_id, model_profile_fingerprint: fp, model_id: experiment.comparisons[0].candidate_invocation.model_id, reasoning_effort: experiment.comparisons[0].candidate_invocation.reasoning_effort, text_verbosity: experiment.comparisons[0].candidate_invocation.text_verbosity, mode: experiment.comparisons[0].candidate_invocation.mode, prompt_profile_id: "baseline-engineering-prompts-v1", prompt_profile_fingerprint: fp, runtime_model_evidence_fingerprint: runtimeFixture.content_fingerprint, permission_snapshot_fingerprint: fp, permission_profile_fingerprint: fp };',
-      'const runtimeBinding = quality.createRuntimeExecutionBinding(bindingInput);',
-      'quality.validateRuntimeExecutionBinding(runtimeBinding);',
-      'if (quality.runtimeExecutionFingerprint(bindingInput) !== runtimeBinding.runtime_execution_fingerprint) throw new Error("runtime execution fingerprint export mismatch");',
-      'quality.validatePromptInventory(readJson("quality/prompt-inventory/baseline.v1.json"));',
+      'if (typeof quality.requiredEngineeringVerificationTargets !== "function") throw new Error("missing canonical target function");',
+      'if (typeof quality.createNormalSessionQualityBridge !== "function") throw new Error("missing normal-session bridge");',
+      'if (typeof quality.verifyCommittedWhitespace !== "function") throw new Error("missing committed-whitespace verifier");',
+      'quality.validatePromptInventory(readJson("quality/prompt-inventory/baseline.v2.json"));',
       'quality.validateArchitecturePolicy(readJson("quality/schemas/architecture-policy.example.json"));',
       'quality.validateQualityAcceptancePolicy(readJson("quality/acceptance/acceptance-policy.v2.json"));',
     ].join("\n"),

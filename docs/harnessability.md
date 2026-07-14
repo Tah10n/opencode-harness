@@ -32,7 +32,8 @@ A project is strongly harnessable when it also has:
   secret-bait, and review-only traps that are safe and non-executable;
 - evaluation corpus readiness: representative tasks, expected delegation
   behaviour, review examples, hidden checks, forbidden behaviours, scoring
-  criteria, and acceptance thresholds for optional live A/B evaluation.
+  criteria, and acceptance thresholds for optional general live regression
+  evaluation.
 
 ## Adoption Path
 

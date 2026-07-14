@@ -10,12 +10,16 @@ import {
   sealVerificationReceipt,
 } from "../lib/quality/milestone-dod.mjs";
 import { fingerprint } from "../lib/quality/validation.mjs";
+import {
+  committedWhitespaceRequestFromEnvironment,
+  verifyCommittedWhitespace,
+} from "../lib/quality/whitespace.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const deterministicProducer = VERIFICATION_RECEIPT_PRODUCERS.deterministic;
 
 export const DETERMINISTIC_STAGE_REGISTRY = Object.freeze([
-  { command_id: "verify-static", npm_script: "verify:static", check_ids: ["documentation-attribution-boundary", "tracked-artifact-boundary"] },
+  { command_id: "verify-static", npm_script: "verify:static", check_ids: ["documentation-attribution-boundary", "tracked-artifact-boundary", "model-frontmatter-documentation"] },
   { command_id: "verify-feedback-foundation", npm_script: "verify:feedback-foundation", check_ids: [] },
   { command_id: "verify-trace-store", npm_script: "verify:trace-store", check_ids: [] },
   { command_id: "verify-report-history", npm_script: "verify:report-history", check_ids: [] },
@@ -24,18 +28,21 @@ export const DETERMINISTIC_STAGE_REGISTRY = Object.freeze([
   { command_id: "verify-drift", npm_script: "verify:drift", check_ids: [] },
   { command_id: "verify-adoption-bundle", npm_script: "verify:adoption-bundle", check_ids: [] },
   { command_id: "verify-runtime-fixture", npm_script: "verify:runtime:fixture", check_ids: [] },
+  { command_id: "verify-runtime-quality-hooks-fixture", npm_script: "verify:runtime:quality-hooks:fixture", check_ids: ["runtime-quality-hooks-fixtures"] },
   { command_id: "verify-live-eval", npm_script: "verify:live-eval", check_ids: [] },
   { command_id: "verify-acceptance", npm_script: "verify:acceptance", check_ids: [] },
   { command_id: "verify-quality-contracts", npm_script: "verify:quality-contracts", check_ids: [] },
   { command_id: "verify-engineering-dossier", npm_script: "verify:engineering-dossier", check_ids: ["engineering-dossier-lifecycle", "engineering-dossier-negative-matrix", "engineering-mapping-gate"] },
   { command_id: "verify-architecture-policy", npm_script: "verify:architecture-policy", check_ids: ["engineering-architecture-policy"] },
   { command_id: "verify-impact-graph", npm_script: "verify:impact-graph", check_ids: ["engineering-impact-graph"] },
-  { command_id: "verify-model-profiles", npm_script: "verify:model-profiles", check_ids: ["model-profile-catalog"] },
   { command_id: "verify-prompt-inventory", npm_script: "verify:prompt-inventory", check_ids: ["prompt-inventory-drift"] },
   { command_id: "verify-quality-live-coordinator", npm_script: "verify:quality-live-coordinator", check_ids: ["engineering-pre-gate-latch"] },
-  { command_id: "verify-quality-live-runner", npm_script: "verify:quality-live-runner", check_ids: [] },
+  { command_id: "verify-quality-live-runner", npm_script: "verify:quality-live-runner", check_ids: ["quality-live-runner-integration"] },
+  { command_id: "verify-quality-verification-targets", npm_script: "verify:quality-verification-targets", check_ids: ["canonical-verification-targets"] },
+  { command_id: "verify-normal-session-quality-bridge", npm_script: "verify:normal-session-quality-bridge", check_ids: ["normal-session-quality-bridge"] },
   { command_id: "verify-quality-live-manifests", npm_script: "verify:quality-live-manifests", check_ids: ["quality-live-corpus"] },
   { command_id: "verify-quality-acceptance", npm_script: "verify:quality-acceptance", check_ids: ["quality-acceptance-negative-matrix"] },
+  { command_id: "verify-committed-whitespace-fixtures", npm_script: "verify:whitespace:fixture", check_ids: ["committed-whitespace-fixtures"] },
   { command_id: "verify-milestone-2-dod-contract", npm_script: "verify:milestone-2-dod-contract", check_ids: ["external-gap-classification"] },
 ]);
 
@@ -44,8 +51,8 @@ const syntheticChecks = Object.freeze([
   { check_id: "npm-run-verify", command_id: "verify-all-composite" },
 ]);
 const gitCheck = Object.freeze({
-  command_id: "git-diff-check",
-  check_ids: Object.freeze(["git-diff-check"]),
+  command_id: "verify-committed-whitespace",
+  check_ids: Object.freeze(["committed-whitespace"]),
 });
 
 export function deterministicExpectedChecks() {
@@ -143,6 +150,39 @@ function syntheticReceipt(entry, startedAt, completedAt, evidence) {
   });
 }
 
+function committedWhitespaceReceipt(startedAt) {
+  const whitespace = verifyCommittedWhitespace({
+    cwd: root,
+    ...committedWhitespaceRequestFromEnvironment(),
+  });
+  const completedAt = new Date().toISOString();
+  console.log(JSON.stringify(whitespace, null, 2));
+  const receipt = sealVerificationReceipt({
+    schema_version: 1,
+    check_id: gitCheck.check_ids[0],
+    producer_id: deterministicProducer,
+    command_id: gitCheck.command_id,
+    started_at: startedAt,
+    completed_at: completedAt,
+    status: whitespace.status === "passed" ? "passed" : "failed",
+    evidence_fingerprint: whitespace.evidence_fingerprint,
+    evidence_scope: {
+      kind: "committed_whitespace",
+      mode: whitespace.mode,
+      head_sha: whitespace.head_sha,
+      range: whitespace.range,
+      resolved_range: whitespace.resolved_range,
+      working_tree_state: whitespace.working_tree_state,
+      command_statuses: whitespace.commands.map((entry) => ({
+        argv_fingerprint: fingerprint(entry.argv),
+        status: entry.status,
+        error_code: entry.error_code,
+      })),
+    },
+  });
+  return { whitespace, receipt, completedAt };
+}
+
 async function main() {
   const document = JSON.parse(fs.readFileSync(path.join(root, "quality", "milestone-2-dod.v1.json"), "utf8"));
   const receipts = [];
@@ -163,11 +203,12 @@ async function main() {
   }
 
   if (passedCommands.length === DETERMINISTIC_STAGE_REGISTRY.length) {
-    console.log("Deterministic stage: git diff --check");
-    const gitOutcome = await runCommand(gitCheck.command_id, { file: "git", args: ["diff", "--check"] }, gitCheck.check_ids);
-    receipts.push(...gitOutcome.receipts);
-    if (gitOutcome.result.status === 0 && !gitOutcome.result.timed_out && !gitOutcome.result.error) {
-      const completedAt = new Date().toISOString();
+    console.log("Deterministic stage: committed whitespace verification");
+    const whitespaceStartedAt = new Date().toISOString();
+    const whitespaceOutcome = committedWhitespaceReceipt(whitespaceStartedAt);
+    receipts.push(whitespaceOutcome.receipt);
+    if (whitespaceOutcome.whitespace.status === "passed") {
+      const completedAt = whitespaceOutcome.completedAt;
       const registryFingerprint = fingerprint({
         passed_commands: passedCommands,
         receipt_fingerprints: receipts.map((receipt) => receipt.fingerprint),

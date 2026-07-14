@@ -66,8 +66,8 @@ const schemas = [
       "schema_version", "run_id", "task_id", "dossier_id", "dossier_schema_version", "dossier_fingerprint",
       "gate_id", "gate_status", "gate_fingerprint", "gate_trace_sequence", "first_implementation_sequence",
       "last_implementation_action_sequence", "last_workspace_mutation_sequence", "integrated_verification_sequence",
-      "integrated_verification_evidence_fingerprint", "runtime_execution_fingerprint", "workspace_at_gate_fingerprint",
-      "final_workspace_fingerprint", "model_profile_id", "model_profile_fingerprint", "prompt_profile_id",
+      "integrated_verification_evidence_fingerprint", "workspace_at_gate_fingerprint",
+      "final_workspace_fingerprint", "prompt_profile_id",
       "prompt_profile_fingerprint", "post_architecture_evaluation_fingerprint", "artifact_refs",
       "teardown_verified", "attested_at", "fingerprint",
     ],
@@ -98,19 +98,14 @@ assert.equal(ACCEPTANCE_POLICY_SCHEMA_VERSION, 2);
 assert.equal(quality.createEngineeringDossierDraft, directCreateDossier, "quality package must preserve dossier implementation identity");
 assert.equal(quality.evaluateEngineeringGate, directEvaluateGate, "quality package must preserve gate implementation identity");
 
-const catalog = readJson("quality/model-profiles/catalog.v1.json");
-const experiment = readJson("quality/model-profiles/experiment.v1.json");
-const runtimeFixture = readJson("quality/model-profiles/runtime-fixture-evidence.v1.json");
-const promptInventory = readJson("quality/prompt-inventory/baseline.v1.json");
+const promptInventory = readJson("quality/prompt-inventory/baseline.v2.json");
 const acceptancePolicy = readJson("quality/acceptance/acceptance-policy.v2.json");
-quality.validateModelProfileCatalog(catalog);
-quality.validateEngineeringExperimentManifest(experiment, { catalog });
-quality.validateRuntimeModelEvidence(runtimeFixture, { catalog });
 quality.validatePromptInventory(promptInventory);
 quality.validateQualityAcceptancePolicy(acceptancePolicy);
+assert.equal(
+  quality.requiredEngineeringVerificationTargets,
+  (await import("../lib/quality/verification-targets.mjs")).requiredEngineeringVerificationTargets,
+  "quality package must preserve canonical verification-target implementation identity",
+);
 
-assert.equal(runtimeFixture.evidence_kind, "fixture_parser");
-assert.equal(quality.evaluateRuntimeModelEvidence(runtimeFixture, catalog).eligible, false, "fixture evidence must not authorize execution");
-assert(quality.evaluateRuntimeModelEvidence(runtimeFixture, catalog).reason_codes.includes("RUNTIME_MODEL_INSTALLED_EVIDENCE_REQUIRED"));
-
-console.log("Quality contract verification passed (closed checked schemas, v1/v2 dispatch, public API identity, and fail-closed runtime evidence).");
+console.log("Quality contract verification passed (closed schemas, model-neutral attestation and acceptance, and public API identity).");

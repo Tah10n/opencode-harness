@@ -16,7 +16,7 @@ behaviour dimensions.
 | Quality gates | Feedforward and feedback | Inferential plus computational evidence | Behaviour, architecture, safety | Before edits through final handoff | `skills/global-quality-gates/SKILL.md`, `AGENTS.md`, orchestrators, verifier |
 | Quality ledger | Feedforward and feedback | Inferential | Behaviour, compatibility, verification | High/critical task context | `skills/global-quality-gates/SKILL.md`, `agents/orchestrator.md` |
 | Engineering Dossier | Feedforward and feedback | Computational | Behaviour, compatibility, maintainability | Before instrumented implementation through immutable attestation | `lib/quality/dossier.mjs`, `quality/schemas/engineering-dossier.schema.json`, `scripts/verify-engineering-quality.mjs` |
-| Pre-implementation quality gate | Feedforward | Computational over persisted runner receipts | Behaviour, architecture, safety | Before high/critical edits or writable delegation | `lib/quality/gate.mjs`, `lib/quality/session.mjs`, `lib/quality/live-coordinator.mjs`, `quality/schemas/preimplementation-evidence.schema.json` |
+| Normal-session quality bridge and pre-implementation gate | Feedforward | Computational over runner-owned state and the native pre-tool hook | Behaviour, architecture, safety | Before native edits or writable delegation | `.opencode/plugins/engineering-dossier.mjs`, `lib/quality/normal-session-bridge.mjs`, `lib/quality/gate.mjs` |
 | Bounded engineering impact graph | Feedforward and feedback | Computational evidence over bounded discovery | Architecture, compatibility, regression control | Dossier construction and gate evaluation | `lib/quality/impact-graph.mjs`, `quality/schemas/engineering-impact-graph.schema.json` |
 | Optional project architecture policy | Feedforward and feedback | Computational when configured with trusted graph evidence | Architecture fitness | Baseline dossier gate, post-edit candidate audit, and final acceptance | `lib/quality/architecture.mjs`, `lib/quality/live-coordinator.mjs`, `quality/schemas/architecture-policy.schema.json` |
 | Engineering quality run bundle | Feedback | Computational | Causality, integrity, auditability | After verified teardown and integrated verification | `lib/quality/attestation.mjs`, `lib/quality/run-bundle.mjs`, `.oc_harness/runs/<run>/quality/` |
@@ -44,15 +44,16 @@ behaviour dimensions.
 | Live-eval manifest verifier and suites | Feedback | Computational | Live-eval fixture safety and corpus integrity | Pre-commit and CI | `scripts/verify-live-manifests.mjs`, `evals/suites.json`, `evals/scenarios/` |
 | Infrastructure tracing self-test | Feedback | Computational | Runner isolation, process-tree teardown, in-memory trace journal, post-teardown batch commit, hidden boundary, immutable reports | Pre-commit and CI without an LLM | `scripts/evaluate-live.mjs --self-test` |
 | Immutable evaluation history | Feedback | Computational | Confined JSON/Markdown/marker integrity and coherent latest generation | After every live evaluation | `lib/feedback/report-history.mjs`, `evals/reports/` |
-| First-party acceptance evidence | Feedback | Computational | Immutable source-snapshot verification, separate static-subject/runtime-profile identity, mode-aware installed permission surface, and content attestation | Before candidate assessment | `scripts/capture-static-evidence.mjs`, `scripts/verify-runtime.mjs --evidence-profile --subject-id --subject-evidence`, `.oc_harness/evidence/` |
+| First-party acceptance evidence | Feedback | Computational | Immutable source-snapshot verification, installed permission surface, and content attestation | Before candidate assessment | `scripts/capture-static-evidence.mjs`, `scripts/verify-runtime.mjs --evidence-profile --subject-evidence`, `.oc_harness/evidence/` |
 | Candidate acceptance engine | Feedback | Computational | Attested reports, canonical pair universe, baseline/candidate regressions, target improvement, and evidence completeness | After paired reports and first-party evidence | `lib/feedback/acceptance.mjs`, `evals/acceptance-policy.json`, `scripts/assess-candidate.mjs` |
-| Quality acceptance v2 | Feedback | Computational and non-scalar | Dossier/gate completeness, architecture, invariants, mappings, test quality, permissions, and regressions | After paired quality reports and installed model evidence | `lib/quality/acceptance-engine.mjs`, `quality/acceptance/acceptance-policy.v2.json`, `scripts/verify-quality-acceptance.mjs` |
+| Quality acceptance v2 | Feedback | Computational and non-scalar | Canonical verification coverage, architecture, invariants, permissions, and regressions | After baseline/candidate quality outcomes | `lib/quality/acceptance-engine.mjs`, `quality/acceptance/acceptance-policy.v2.json`, `scripts/verify-quality-acceptance.mjs` |
 | Immutable decision history | Feedback | Computational | Decision provenance and auditability | After every assessment | `evals/decisions/` |
 | Runtime verifier | Feedback | Computational | Installed profile correctness, modes, exclusive permissions, and complete installed-agent inventory | After adoption or upgrade | `opencode agent list`, `scripts/verify-runtime.mjs` |
-| Model-profile catalog and experiment | Feedforward and feedback | Computational manifest plus live evidence | Role/model fit, reasoning, verbosity, reproducibility | Deterministic validation, installed-runtime probe, then optional live A/B | `quality/model-profiles/`, `scripts/verify-model-profiles.mjs`, `docs/model-profiles.md` |
-| Agent/skill prompt inventory | Feedforward and feedback | Computational | Maintainability, safety, comparison identity | Before prompt changes and model comparisons | 11 agent prompts plus eight skill entrypoints in `quality/prompt-inventory/`; `scripts/verify-prompt-inventory.mjs` |
+| Installed quality-hook verifier | Feedback | Computational | Local plugin API/factory compatibility only; host discovery, callback invocation, child-task causality, effective adopted permissions, and shell-write interception remain separately incomplete until observed end to end | After adoption or OpenCode upgrade | `scripts/verify-normal-session-runtime.mjs`, `lib/quality/runtime-hook-verification.mjs` |
+| Agent model frontmatter | Feedforward | Host configuration | User-selected model preference | Host configuration changes | `agents/*.md`, `docs/model-profiles.md` |
+| Agent/skill prompt inventory | Feedforward and feedback | Computational | Maintainability, safety, prompt and permission drift | Before prompt or permission changes | 11 agent prompts plus eight skill entrypoints in `quality/prompt-inventory/`; model metadata is informational |
 | Harness release review | Feedback | Inferential | Harness coherence | Before minor or major release | `harness-release-review`, `skills/global-harness-release-review/SKILL.md` |
-| Optional live A/B evaluation (baseline/candidate) | Feedback | Live computational plus inferential scoring | Actual agent behaviour | Optional release or material prompt changes | `docs/live-evaluation.md`, `evals/`, `scripts/evaluate-live.mjs` |
+| Optional general live regression evaluation (baseline/candidate) | Feedback | Live computational plus inferential scoring | Actual agent behaviour | Optional release or material prompt changes | `docs/live-evaluation.md`, `evals/`, `scripts/evaluate-live.mjs` |
 | Controlled self-improvement | Feedback to feedforward | Inferential plus bounded writes | Maintainability | After verified lessons | `agents/improver.md`, `skills/global-self-improvement/SKILL.md` |
 
 ## Coverage Rules
@@ -63,12 +64,12 @@ behaviour dimensions.
 - Fast deterministic sensors belong in `npm run verify`.
 - Runtime sensors that require installed OpenCode belong in `npm run
   verify:runtime`, not in the default CI gate.
-- Optional live A/B evaluation belongs outside `npm run verify` because it
+- Optional general live evaluation belongs outside `npm run verify` because it
   depends on model access, installed profiles, isolated repos, and hidden test
   execution.
 - Deterministic live-eval manifest validation and runner self-tests belong in
   `npm run verify` because they are fast and do not run a model.
-- Dossier, gate, impact-graph, architecture-policy, model-profile,
+- Dossier, gate, impact-graph, architecture-policy, canonical targets,
   prompt-inventory, quality-corpus, and acceptance negative tests belong in
   `npm run verify`; installed option evidence and actual model runs do not.
 - For instrumented high/critical work, a passed gate event must causally precede
@@ -95,18 +96,22 @@ behaviour dimensions.
   It is intentionally separate from the static repository verifier.
 - Fixture runtime snapshots prove parser behaviour but are not trusted
   permission-surface evidence for candidate acceptance.
-- Arbitrary OpenCode sessions require a host adapter/runtime hook for tracing;
-  the harness does not claim universal automatic interception.
+- The normal-session plugin computationally gates native edits and writable
+  delegation in `tool.execute.before` when that callback is host-active. The
+  declared `permission.ask` hook is not the enforcement source in OpenCode
+  1.17.20. The installed API neither correlates child creation with an exact
+  task call, independently classifies pre-dossier session risk, nor structurally
+  classifies arbitrary shell commands as repository mutations, so those
+  surfaces remain explicitly incomplete and prompt-guided.
 - Inferential checks can find contradictions and overengineering, but they
   remain probabilistic. Use them for release reviews and broad audits rather
   than as the only confidence signal.
 - Static structural checks and contract/config evaluation do not prove actual
-  LLM behaviour. Use optional live A/B evaluation when prompt, orchestration,
+  LLM behaviour. Use optional general live evaluation when prompt, orchestration,
   delegation, or review-loop changes need behavioural evidence.
-- GPT-5.6 Sol is active for nine decision/execution roles and Terra for
-  exploration/research; Luna remains evaluation-only. GPT-5.5 is retained for
-  optional comparison. Paired live evidence is needed only for a behavioural
-  superiority claim, not for activation or deterministic verification.
+- Active model selection lives only in `agents/*.md` frontmatter and is not a
+  quality theorem. Host-supplied model metadata never authorizes mutation or
+  passes acceptance.
 - The evaluation and acceptance plane does not autonomously edit the active
   harness. Permissions, security rules, hidden checks, and acceptance policy
   stay outside any future proposal loop; rejected candidates never mutate the

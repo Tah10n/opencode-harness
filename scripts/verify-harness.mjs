@@ -147,6 +147,7 @@ const requiredFiles = [
   "README.md",
   "SECURITY.md",
   "opencode.json",
+  ".opencode/plugins/engineering-dossier.mjs",
   "commands/learn.md",
   "commands/curate-learning.md",
   "agents/orchestrator.md",
@@ -212,6 +213,11 @@ const requiredFiles = [
   "lib/feedback/contracts.mjs",
   "lib/feedback/evidence.mjs",
   "lib/quality/milestone-dod.mjs",
+  "lib/quality/normal-session-bridge.mjs",
+  "lib/quality/normal-session-plugin.mjs",
+  "lib/quality/runtime-hook-verification.mjs",
+  "lib/quality/verification-targets.mjs",
+  "lib/quality/whitespace.mjs",
   "lib/feedback/files.mjs",
   "lib/feedback/index.mjs",
   "lib/feedback/manifests.mjs",
@@ -236,12 +242,33 @@ const requiredFiles = [
   "scripts/verify-drift.mjs",
   "scripts/verify-runtime-fixtures.mjs",
   "scripts/verify-runtime.mjs",
+  "scripts/verify-normal-session-quality-bridge.mjs",
+  "scripts/verify-normal-session-runtime.mjs",
+  "scripts/verify-normal-session-runtime-fixtures.mjs",
+  "scripts/verify-quality-live-runner.mjs",
+  "scripts/verify-quality-verification-targets.mjs",
+  "scripts/verify-committed-whitespace.mjs",
+  "scripts/verify-committed-whitespace-fixtures.mjs",
   "scripts/verify-all.mjs",
 ];
 
 for (const file of requiredFiles) {
   if (!exists(file)) {
     fail("HARNESS-S001", `required file missing: ${file}`, "Restore the required harness file.");
+  }
+}
+
+for (const forbiddenFile of [
+  "lib/quality/model-profiles.mjs",
+  "lib/quality/runtime-execution.mjs",
+  "quality/model-profiles/catalog.v1.json",
+  "quality/model-profiles/experiment.v1.json",
+  "quality/model-profiles/runtime-fixture-evidence.v1.json",
+  "scripts/assess-quality-candidate.mjs",
+  "scripts/verify-model-profiles.mjs",
+]) {
+  if (exists(forbiddenFile)) {
+    fail("HARNESS-S001", `removed model-comparison artifact returned: ${forbiddenFile}`, "Keep model selection in active agent frontmatter only.");
   }
 }
 
@@ -255,12 +282,19 @@ if (packageJson.engines?.node !== ">=24") {
 if (packageJson.scripts?.verify !== "node scripts/verify-all.mjs") {
   fail("HARNESS-S008", "package.json must route npm run verify through the bounded runner-owned receipt aggregator", "Set verify to node scripts/verify-all.mjs.");
 }
+for (const forbiddenScript of ["assess:quality-candidate", "verify:model-profiles"]) {
+  if (packageJson.scripts?.[forbiddenScript]) {
+    fail("HARNESS-S008", `removed model-comparison command returned: ${forbiddenScript}`, "Keep general live evaluation model-neutral and outside deterministic acceptance.");
+  }
+}
 const expectedDeterministicStages = [
   "verify:static", "verify:feedback-foundation", "verify:trace-store", "verify:report-history", "verify:adapter-worker",
-  "eval", "verify:drift", "verify:adoption-bundle", "verify:runtime:fixture", "verify:live-eval", "verify:acceptance",
+  "eval", "verify:drift", "verify:adoption-bundle", "verify:runtime:fixture", "verify:runtime:quality-hooks:fixture",
+  "verify:live-eval", "verify:acceptance",
   "verify:quality-contracts", "verify:engineering-dossier", "verify:architecture-policy", "verify:impact-graph",
-  "verify:model-profiles", "verify:prompt-inventory", "verify:quality-live-coordinator", "verify:quality-live-runner",
-  "verify:quality-live-manifests", "verify:quality-acceptance", "verify:milestone-2-dod-contract",
+  "verify:prompt-inventory", "verify:quality-live-coordinator", "verify:quality-live-runner", "verify:quality-verification-targets",
+  "verify:normal-session-quality-bridge", "verify:quality-live-manifests", "verify:quality-acceptance",
+  "verify:whitespace:fixture", "verify:milestone-2-dod-contract",
 ];
 if (JSON.stringify(DETERMINISTIC_STAGE_REGISTRY.map((stage) => stage.npm_script)) !== JSON.stringify(expectedDeterministicStages)) {
   fail("HARNESS-S008", "verify-all deterministic stage registry drifted from the reviewed sequential npm stage contract", "Restore the exact model/network-free stage order.");
@@ -304,7 +338,6 @@ if (packageJson.scripts?.["verify:live-eval"] !== "npm run verify:live-manifests
   fail("HARNESS-S009", "package.json must expose npm run verify:live-eval", "Keep live-eval deterministic checks in the default verification gate.");
 }
 for (const [name, command] of Object.entries({
-  "assess:quality-candidate": "node scripts/assess-quality-candidate.mjs",
   "verify:feedback-foundation": "node scripts/verify-feedback-foundation.mjs",
   "verify:trace-store": "node scripts/verify-trace-store.mjs",
   "verify:report-history": "node scripts/verify-report-history.mjs",
@@ -315,14 +348,19 @@ for (const [name, command] of Object.entries({
   "verify:engineering-dossier": "node scripts/verify-engineering-quality.mjs",
   "verify:architecture-policy": "node scripts/verify-quality-architecture.mjs",
   "verify:impact-graph": "node scripts/verify-quality-architecture.mjs",
-  "verify:model-profiles": "node scripts/verify-model-profiles.mjs",
   "verify:prompt-inventory": "node scripts/verify-prompt-inventory.mjs",
   "verify:quality-live-coordinator": "node scripts/verify-quality-live-coordinator.mjs",
   "verify:quality-live-runner": "node scripts/verify-quality-live-runner.mjs",
+  "verify:quality-verification-targets": "node scripts/verify-quality-verification-targets.mjs",
+  "verify:normal-session-quality-bridge": "node scripts/verify-normal-session-quality-bridge.mjs",
+  "verify:runtime:quality-hooks": "node scripts/verify-normal-session-runtime.mjs",
+  "verify:runtime:quality-hooks:fixture": "node scripts/verify-normal-session-runtime-fixtures.mjs",
   "verify:quality-live-manifests": "node scripts/verify-quality-live-manifests.mjs",
   "verify:quality-acceptance": "node scripts/verify-quality-acceptance.mjs",
   "verify:milestone-2-dod-contract": "node scripts/verify-milestone-2-dod.mjs",
   "verify:acceptance": "node scripts/verify-candidate-assessment.mjs",
+  "verify:whitespace": "node scripts/verify-committed-whitespace.mjs",
+  "verify:whitespace:fixture": "node scripts/verify-committed-whitespace-fixtures.mjs",
   "assess:candidate": "node scripts/assess-candidate.mjs",
   "evidence:static": "node scripts/capture-static-evidence.mjs",
   trace: "node scripts/trace-run.mjs",
@@ -348,7 +386,9 @@ for (const needle of [
   "DETERMINISTIC_STAGE_REGISTRY",
   "sealVerificationReceipt",
   "assessMilestone2Receipts",
-  "git\", args: [\"diff\", \"--check\"]",
+  "committedWhitespaceReceipt",
+  "evidence_scope",
+  "resolved_range",
   "decision.status !== \"verified\"",
   "optional external evidence is not requested",
 ]) {
@@ -459,6 +499,9 @@ for (const agent of agentNames) {
   if (!frontmatter.permission || typeof frontmatter.permission !== "object") {
     fail("HARNESS-S024", `${file} missing permission block`, "Declare the agent permission surface explicitly.");
   }
+  if (typeof frontmatter.model !== "string" || frontmatter.model.length === 0) {
+    fail("HARNESS-S024", `${file} must declare a non-empty model preference`, "Keep the user-configurable model choice in active agent frontmatter.");
+  }
 
   const permission = frontmatter.permission ?? {};
   if (readOnlyAgents.includes(agent)) {
@@ -481,14 +524,48 @@ for (const agent of agentNames) {
     fail("HARNESS-S031", `${file} must not request oc_learning_* writes`, "Route persistent writes through improver only.");
   }
   if (agent === "general") {
-    assertPermission(agent, permission, "edit", "allow", "HARNESS-S035", "Implementation workers should declare write access explicitly.");
+    assertPermission(agent, permission, "edit", "ask", "HARNESS-S035", "Implementation workers must route native edits through the quality permission hook.");
+  }
+}
+
+if (config.permission?.["quality_*"] !== "deny") {
+  fail("HARNESS-S084", "root quality_* permission must deny by default", "Expose only the bounded quality tools on explicitly authorized agent profiles.");
+}
+const qualityToolIds = [
+  "quality_dossier_create",
+  "quality_dossier_update",
+  "quality_dossier_inspect",
+  "quality_architecture_evaluate",
+  "quality_dossier_finalize",
+  "quality_action_authorize",
+  "quality_verification_record",
+  "quality_session_finalize",
+];
+const qualityPermissions = new Map([
+  ["orchestrator", ["quality_dossier_create", "quality_dossier_update", "quality_dossier_inspect", "quality_dossier_finalize", "quality_action_authorize", "quality_session_finalize"]],
+  ["orchestrator-deep", ["quality_dossier_create", "quality_dossier_update", "quality_dossier_inspect", "quality_dossier_finalize", "quality_action_authorize", "quality_session_finalize"]],
+  ["architect", ["quality_dossier_inspect", "quality_architecture_evaluate"]],
+  ["reviewer", ["quality_dossier_inspect", "quality_architecture_evaluate"]],
+  ["verifier", ["quality_dossier_inspect", "quality_verification_record"]],
+]);
+for (const agent of agentNames) {
+  const permission = frontmatters.get(agent)?.permission ?? {};
+  const allowed = new Set(qualityPermissions.get(agent) ?? []);
+  for (const toolId of qualityToolIds) {
+    if (allowed.has(toolId) && permission[toolId] !== "allow") {
+      fail("HARNESS-S084", `${agent} must allow ${toolId}`, "Restore the reviewed normal-session quality-tool permission matrix.");
+    }
+    if (!allowed.has(toolId) && Object.hasOwn(permission, toolId)) {
+      fail("HARNESS-S084", `${agent} must inherit root deny for ${toolId}`, "Remove quality-tool exposure outside the reviewed role boundary.");
+    }
   }
 }
 
 for (const agent of ["orchestrator", "orchestrator-deep"]) {
   const taskPermissions = frontmatters.get(agent)?.permission?.task ?? {};
   for (const delegatedAgent of ["explore", "architect", "general", "reviewer", "diagnose", "researcher", "improver", "verifier"]) {
-    if (taskPermissions[delegatedAgent] !== "allow") {
+    const expected = delegatedAgent === "general" ? "ask" : "allow";
+    if (taskPermissions[delegatedAgent] !== expected) {
       fail("HARNESS-S032", `${agent} cannot delegate to ${delegatedAgent}`, "Primary orchestrators should be able to route focused work.");
     }
   }
@@ -574,6 +651,32 @@ for (const needle of [
 ]) {
   assertIncludes(qualityGatesSkill, needle, "skills/global-quality-gates/SKILL.md", "HARNESS-S049", "Quality gates must preserve required ledger and verification concepts.");
 }
+const dossierRiskClasses = ["standard-lite", "high", "critical"];
+const dossierSchema = JSON.parse(read("quality/schemas/engineering-dossier.schema.json"));
+const constantsSource = read("lib/quality/constants.mjs");
+const constantsRiskMatch = constantsSource.match(/QUALITY_RISK_CLASSES\s*=\s*Object\.freeze\((\[[^\]]+\])\)/u);
+let constantsRiskClasses = [];
+try {
+  constantsRiskClasses = constantsRiskMatch ? JSON.parse(constantsRiskMatch[1]) : [];
+} catch {
+  constantsRiskClasses = [];
+}
+for (const [label, actual] of [
+  ["quality/schemas/engineering-dossier.schema.json", dossierSchema?.properties?.risk_class?.enum],
+  ["lib/quality/constants.mjs", constantsRiskClasses],
+]) {
+  if (JSON.stringify(actual) !== JSON.stringify(dossierRiskClasses)) {
+    fail("HARNESS-S049", `${label} dossier risk classes drifted from standard-lite | high | critical`, "Keep the computational Engineering Dossier risk classes aligned across schema, constants, prompts, and quality gates.");
+  }
+}
+for (const [label, text] of [
+  ["agents/architect.md", read("agents/architect.md")],
+  ["skills/global-quality-gates/SKILL.md", qualityGatesSkill],
+]) {
+  for (const needle of ["`standard-lite`", "`high`", "`critical`", "operational trace", "legacy `standard`"]) {
+    assertIncludes(text, needle, label, "HARNESS-S049", "Distinguish dossier standard-lite from the legacy operational trace standard label.");
+  }
+}
 
 const recursiveDocs = read("docs/recursive-context-mode.md");
 assertIncludes(recursiveDocs, "opencode-recursive-context", "docs/recursive-context-mode.md");
@@ -620,44 +723,28 @@ for (const needle of [
   "`allowlist`",
   "even when the adapter emitted no `edit` event",
   "bounded managed-command",
+  "validated quality sidecar",
+  "canonical runner-integrated verification",
+  "runner/session",
+  "artifact bundle",
+  "self-described quality outcome",
 ]) {
-  assertIncludes(liveEvaluationDocs, needle, "docs/live-evaluation.md", "HARNESS-S057", "Document live A/B evaluation without making it a default CI dependency.");
+  assertIncludes(liveEvaluationDocs, needle, "docs/live-evaluation.md", "HARNESS-S057", "Document general live evaluation without making it a default CI dependency.");
 }
 assertNotIncludes(liveEvaluationDocs, "setup_source", "docs/live-evaluation.md", "HARNESS-S057", "Do not document live-eval setup sources until the runner implements them.");
-const completeRecipeMatch = liveEvaluationDocs.match(/<!-- complete-quality-evidence-recipe:start -->([\s\S]*?)<!-- complete-quality-evidence-recipe:end -->/u);
-if (!completeRecipeMatch) {
-  fail("HARNESS-S057", "docs/live-evaluation.md is missing the fenced complete quality evidence recipe", "Restore the sensor-owned production recipe markers.");
-} else {
-  const completeRecipe = completeRecipeMatch[1];
-  for (const needle of [
-    'HARNESS_RUNTIME_CWD="$BASELINE_RUNTIME_ROOT"',
-    'HARNESS_RUNTIME_CWD="$CANDIDATE_RUNTIME_ROOT"',
-    'HARNESS_EVIDENCE_WORKSPACE="$CANDIDATE_REPO"',
-    '--evidence-profile baseline-v1 --subject-id experiment-subject --subject-evidence "$SUBJECT_STATIC_JSON"',
-    '--evidence-profile candidate-v1 --subject-id experiment-subject --subject-evidence "$SUBJECT_STATIC_JSON"',
-    '--all-experiment-models --profile-role baseline',
-    '--all-experiment-models --profile-role candidate',
-    'OPENCODE_MODEL_RUNTIME_EVIDENCE_PATH="$RUNTIME_EVIDENCE_DIR"',
-    '--runtime-evidence "$RUNTIME_EVIDENCE_DIR"',
-    "npm run eval:live",
-  ]) {
-    assertIncludes(completeRecipe, needle, "complete quality evidence recipe", "HARNESS-S057", "Keep capture, live evaluation, and assessment on one complete evidence directory and one static subject.");
-  }
-  assertNotIncludes(completeRecipe, "--suite", "complete quality evidence recipe", "HARNESS-S057", "The release recipe must execute all 96 canonical pairs without a suite selector.");
-}
 for (const [label, text] of [["README.md", read("README.md")], ["docs/evaluation.md", read("docs/evaluation.md")], ["docs/release.md", read("docs/release.md")]]) {
   assertNotIncludes(text, "npm run verify:milestone-2-dod\n", label, "HARNESS-S057", "Use the honest verify:milestone-2-dod-contract command name.");
 }
 
 const readme = read("README.md");
 for (const needle of [
-  "It is intentionally separate from plugin capabilities",
+  "Its policy layer is intentionally separate from optional capability packages",
   "actions/workflows/verify.yml/badge.svg",
   "## Adoption",
   "npm run verify",
   "npm run verify:adoption-bundle",
   "npm run verify:runtime",
-  "live A/B evaluation",
+  "general live regression evaluation",
   "docs/adoption.md",
   "docs/evaluation.md",
   "docs/live-evaluation.md",
@@ -676,8 +763,38 @@ for (const needle of [
   "harness-release-review",
   "unreleased `0.3.0`",
   "tagged release is `v0.2.0`",
+  "portable-adoption-bundle:start",
+  ".opencode/plugins/engineering-dossier.mjs",
+  "lib/feedback",
+  "lib/quality",
+  "never copy the whole `.opencode/`",
 ]) {
   assertIncludes(readme, needle, "README.md");
+}
+const modelsSection = readme.split("## Models", 2)[1]?.split(/^## /mu, 1)[0] ?? "";
+for (const agent of agentNames) {
+  const file = `agents/${agent}.md`;
+  const row = modelsSection.split(/\r?\n/u).find((line) => line.includes(`\`${file}\``)) ?? "";
+  const model = frontmatters.get(agent)?.model;
+  assertIncludes(row, `\`${model}\``, `README.md Models row for ${file}`, "HARNESS-S083", "Keep each README model-table row synchronized with its active agent frontmatter.");
+}
+for (const needle of [
+  "## Models",
+  "The active agent frontmatter is the authoritative model configuration.",
+  "When changing only the model, preserve the role prompt and permissions.",
+  "`reasoningEffort` and `textVerbosity` are separate optional frontmatter",
+]) {
+  assertIncludes(readme, needle, "README.md Models instructions", "HARNESS-S083", "Preserve the exact direct model-replacement instructions.");
+}
+const normalizedReadme = readme.replace(/\s+/gu, " ");
+for (const needle of [
+  "To change a model, edit the `model:` field in the YAML frontmatter of the relevant `agents/<name>.md` file.",
+  "No generated catalog or fingerprint must be updated for a model-only change.",
+]) {
+  assertIncludes(normalizedReadme, needle, "README.md Models instructions", "HARNESS-S083", "Preserve the exact direct model-replacement instructions independent of Markdown line wrapping.");
+}
+for (const forbidden of ["quality/model-profiles", "GPT-5.5", "Luna", "96-comparison", "model A/B"]) {
+  assertNotIncludes(readme, forbidden, "README.md Models instructions", "HARNESS-S083", "Keep model selection direct and free of removed comparison infrastructure.");
 }
 
 const traceContractDoc = read("docs/trace-contract.md");
@@ -809,6 +926,18 @@ for (const needle of [
   "`fixtures/adversarial/`",
 ]) {
   assertIncludes(harnessMapDoc, needle, "docs/harness-map.md", "HARNESS-S068", "Represent new P0 controls in the harness control map.");
+}
+for (const needle of [
+  "Installed quality-hook verifier",
+  "Local plugin API/factory compatibility only",
+  "host discovery",
+  "callback invocation",
+  "child-task causality",
+  "effective adopted permissions",
+  "shell-write interception",
+  "remain separately incomplete",
+]) {
+  assertIncludes(harnessMapDoc, needle, "docs/harness-map.md", "HARNESS-S068", "Keep installed quality-hook claims within the model-free API/factory evidence boundary.");
 }
 
 const subagentResultAgents = [
@@ -947,6 +1076,8 @@ for (const needle of [
 ]) {
   assertIncludes(architectAgent, needle, "agents/architect.md", "HARNESS-S053", "Architect output must include high-assurance planning fields.");
 }
+assertIncludes(architectAgent, "`risk_class`: `standard-lite` | `high` | `critical`", "agents/architect.md", "HARNESS-S053", "Keep architect output aligned with the computational dossier schema.");
+assertNotIncludes(architectAgent, "`risk_class`: standard | high | critical", "agents/architect.md", "HARNESS-S053", "Do not reuse the legacy operational trace standard label for the dossier.");
 
 const generalAgent = read("agents/general.md");
 for (const needle of [
@@ -1032,17 +1163,28 @@ for (const needle of ["`0.3.0`", "Unreleased target", "`v0.2.0`", "Latest tagged
 }
 
 const evaluationDoc = read("docs/evaluation.md");
-for (const needle of ["verify:drift", "verify:runtime", "verify:runtime:fixture", "verify:live-eval", "contract/config evaluation", "Optional live A/B evaluation", "Harness Control Map", "path-boundary sensor", "trace-contract", "budgeted-termination", "subagent-result-schema", "adversarial-fixtures", "static behavior contracts", 'BASELINE_ROOT="/absolute/path/to/baseline"', 'CANDIDATE_ROOT="/absolute/path/to/candidate"', "absolute JSON path"]) {
+for (const needle of ["verify:drift", "verify:runtime", "verify:runtime:fixture", "verify:live-eval", "contract/config evaluation", "Optional general live regression evaluation", "Harness Control Map", "path-boundary sensor", "trace-contract", "budgeted-termination", "subagent-result-schema", "adversarial-fixtures", "static behavior contracts", 'BASELINE_ROOT="/absolute/path/to/baseline"', 'CANDIDATE_ROOT="/absolute/path/to/candidate"', "absolute JSON path", "explicit, validated", "model-neutral runner/session artifact bundle", "standalone self-described outcome or report is never", "production `eval:live` entrypoint keeps the generic", "canonical", "runner-integrated verification"]) {
   assertIncludes(evaluationDoc, needle, "docs/evaluation.md");
 }
 
 const releaseDoc = read("docs/release.md");
-for (const needle of ["harness-release-review", "guide/sensor coherence", "permission safety", "verify:live-eval", "OPENCODE_BASELINE_PROFILE", "OPENCODE_HARNESS_PROFILE", "defect", 'BASELINE_ROOT="/absolute/path/to/baseline"', 'CANDIDATE_ROOT="/absolute/path/to/candidate"', "absolute artifact path"]) {
+for (const needle of ["harness-release-review", "guide/sensor coherence", "permission safety", "verify:live-eval", "OPENCODE_BASELINE_PROFILE", "OPENCODE_HARNESS_PROFILE", "defect", 'BASELINE_ROOT="/absolute/path/to/baseline"', 'CANDIDATE_ROOT="/absolute/path/to/candidate"', "absolute artifact path", "only a partial smoke", "must not be passed to `npm run assess:candidate`", "selector-free full run", "`development`, `held_out`, and `canary`"]) {
   assertIncludes(releaseDoc, needle, "docs/release.md");
+}
+const partialLiveRunIndex = releaseDoc.indexOf("npm run eval:live -- --suite development");
+const fullLiveRunMatch = partialLiveRunIndex === -1
+  ? null
+  : /npm run eval:live\r?\n/u.exec(releaseDoc.slice(partialLiveRunIndex + 1));
+const fullLiveRunIndex = fullLiveRunMatch
+  ? partialLiveRunIndex + 1 + fullLiveRunMatch.index
+  : -1;
+const candidateAssessmentIndex = releaseDoc.indexOf("npm run assess:candidate", fullLiveRunIndex + 1);
+if (partialLiveRunIndex === -1 || fullLiveRunIndex === -1 || candidateAssessmentIndex === -1) {
+  fail("HARNESS-S057", "release decision recipe must run a selector-free full live evaluation after the development smoke and before candidate assessment", "Keep partial smoke evidence out of the development + held_out + canary acceptance decision.");
 }
 
 const adoptionDoc = read("docs/adoption.md");
-for (const needle of ["docs/harnessability.md", "npm run verify:runtime", "npm run verify:adoption-bundle", "fixtures/sample-project/", "fixtures/live/", "Harnessability", "Post-Adoption Confidence Levels", "fault injection"]) {
+for (const needle of ["docs/harnessability.md", "npm run verify:runtime", "npm run verify:adoption-bundle", "fixtures/sample-project/", "fixtures/live/", "Harnessability", "Post-Adoption Confidence Levels", "fault injection", "portable-adoption-bundle:start", ".opencode/plugins/engineering-dossier.mjs", "lib/feedback", "lib/quality", "opencode-harness/feedback", "opencode-harness/quality", "Do not copy the whole `.opencode/` directory"]) {
   assertIncludes(adoptionDoc, needle, "docs/adoption.md");
 }
 
@@ -1050,12 +1192,18 @@ const adoptionBundleVerifier = read("scripts/verify-adoption-bundle.mjs");
 for (const needle of [
   '"evals"',
   '"fixtures"',
-  '"lib"',
+  '"lib/feedback"',
+  '"lib/quality"',
   '"package.json"',
   '"scripts"',
   '"fixtures/live"',
   '"fixtures/sample-project"',
   '"opencode-harness/feedback"',
+  '"opencode-harness/quality"',
+  "documentedAdoptionEntries",
+  "assertPortableAdoptionDeclaration",
+  '".opencode/node_modules"',
+  '".opencode/package.json"',
   '"scripts/evaluate-live.mjs", "--self-test-buffered"',
   "runManagedCommand",
 ]) {
@@ -1132,35 +1280,15 @@ const runtimeVerifier = read("scripts/verify-runtime.mjs");
 for (const needle of ["task.*", "`task.${agent}`", "\"general\"", "HARNESS-R017", "HARNESS-R018"]) {
   assertIncludes(runtimeVerifier, needle, "scripts/verify-runtime.mjs", "HARNESS-S059", "Runtime verification must prove review-orchestrator task delegation boundaries.");
 }
-for (const needle of ["--evidence-profile", "--subject-id", "--subject-evidence", "runtimePermissionSnapshot", "subject_fingerprint", "runtime_fingerprint", "surface_fingerprint", "profile_fingerprint", "incomplete_scopes", "collectResolvedPermissionSurface", "installed_runtime", "fixture", "Permission evidence written"]) {
+for (const needle of ["--evidence-profile", "--subject-evidence", "runtimePermissionSnapshot", "subject_fingerprint", "runtime_fingerprint", "surface_fingerprint", "profile_fingerprint", "incomplete_scopes", "collectResolvedPermissionSurface", "installed_runtime", "fixture", "Permission evidence written"]) {
   assertIncludes(runtimeVerifier, needle, "scripts/verify-runtime.mjs", "HARNESS-S059", "Runtime verification should optionally emit strict permission evidence without raw debug output.");
 }
 for (const needle of ['["agent", "list"]', "parseAgentInventory", "installedAgentInventory", "requiredAgentModes", "agentInventory", "HARNESS-R022", "HARNESS-R023", "HARNESS-R024"]) {
   assertIncludes(runtimeVerifier, needle, "scripts/verify-runtime.mjs", "HARNESS-S059", "Runtime verification must inventory every installed agent and fail closed on incomplete inventory.");
 }
-for (const needle of [
-  "--all-experiment-models",
-  "invocationIdentity",
-  "runtime-model-batches",
-  "persistRuntimeModelBatch",
-  "OPENCODE_CONFIG_CONTENT",
-  "duplicate exact invocations",
-  "if (failures.length > 0) reportAndExit();\n  const persisted = persistRuntimeModelBatch",
-]) {
-  assertIncludes(runtimeVerifier, needle, "scripts/verify-runtime.mjs", "HARNESS-S059", "Runtime verification must fail closed before publishing a complete deduplicated experiment evidence bundle.");
-}
-
-const qualityAssessmentCli = read("scripts/assess-quality-candidate.mjs");
-for (const needle of [
-  "readCompleteRuntimeBatchDirectory",
-  "assertNoSymlinkEscape",
-  "runtime batch directory contains unknown artifacts",
-  "duplicate exact invocations",
-  "model_files",
-  "batch_fingerprint",
-  "exactly cover all canonical experiment invocations",
-]) {
-  assertIncludes(qualityAssessmentCli, needle, "scripts/assess-quality-candidate.mjs", "HARNESS-S059", "Quality assessment must validate the entire ordinary runtime batch bundle without ambiguous files.");
+const qualityRuntimeVerifier = read("scripts/verify-normal-session-runtime.mjs");
+for (const needle of ["@opencode-ai", "permission.ask", "pre_gate_edit_denied", "pre_gate_writable_task_denied", "host_plugin_discovered", "host_hooks_invoked", "effective_permissions_verified", "permission_only_unclassified"]) {
+  assertIncludes(qualityRuntimeVerifier, needle, "scripts/verify-normal-session-runtime.mjs", "HARNESS-S059", "Installed-runtime verification must prove supported hooks and classify shell mutation honestly.");
 }
 
 const runtimeFixtureVerifier = read("scripts/verify-runtime-fixtures.mjs");
@@ -1170,15 +1298,9 @@ for (const needle of ["HARNESS-R017", "HARNESS-R018", "task.*", "task.explore", 
 for (const needle of ["external_directory", "config.bash.", "unknown permission actions", "incomplete_scopes", "--subject-evidence"]) {
   assertIncludes(runtimeFixtureVerifier, needle, "scripts/verify-runtime-fixtures.mjs", "HARNESS-S060", "Runtime fixtures must prove complete permission extraction and explicit incomplete evidence.");
 }
-for (const needle of [
-  "--all-experiment-models",
-  "non-authorizing fixture batches must not publish",
-  "unsupported batch must not publish",
-  "ignored batch must not publish",
-  "RUNTIME_MODEL_OPTION_MODE_UNSUPPORTED",
-  "RUNTIME_MODEL_OPTION_REASONING_EFFORT_IGNORED",
-]) {
-  assertIncludes(runtimeFixtureVerifier, needle, "scripts/verify-runtime-fixtures.mjs", "HARNESS-S060", "Runtime fixtures must prove complete-batch fail-closed publication behavior.");
+const qualityRuntimeFixtures = read("scripts/verify-normal-session-runtime-fixtures.mjs");
+for (const needle of ["QUALITY_PLUGIN_API_UNPARSEABLE", "QUALITY_PLUGIN_TOOL_SURFACE_MISSING", "QUALITY_PLUGIN_EDIT_NOT_DENIED", "QUALITY_PLUGIN_HOST_DISCOVERY_UNVERIFIED", "QUALITY_PLUGIN_HOST_HOOK_INVOCATION_UNVERIFIED", "QUALITY_PLUGIN_EFFECTIVE_PERMISSIONS_UNVERIFIED", "QUALITY_PLUGIN_PERMISSION_HOOK_NOT_HOST_WIRED", "QUALITY_PLUGIN_TASK_CHILD_CAUSAL_BINDING_INCOMPLETE", "QUALITY_PLUGIN_SESSION_RISK_CLASSIFICATION_INCOMPLETE", "QUALITY_PLUGIN_SHELL_MUTATION_INCOMPLETE"]) {
+  assertIncludes(qualityRuntimeFixtures, needle, "scripts/verify-normal-session-runtime-fixtures.mjs", "HARNESS-S060", "Runtime hook fixtures must cover supported, missing, unsafe, and incomplete surfaces.");
 }
 for (const needle of ["agent-list.txt", "unexpected-agent", "wrongRequiredModeFixture", "extraDangerousAgentFixture", "HARNESS-R022", "HARNESS-R023", "HARNESS-R024"]) {
   assertIncludes(runtimeFixtureVerifier, needle, "scripts/verify-runtime-fixtures.mjs", "HARNESS-S060", "Runtime fixtures must prove authoritative installed-agent discovery, extra-agent capture, and fail-closed inventory handling.");

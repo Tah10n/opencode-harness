@@ -23,7 +23,6 @@
   "homepage": "https://github.com/Tah10n/opencode-harness#readme",
   "scripts": {
     "assess:candidate": "node scripts/assess-candidate.mjs",
-    "assess:quality-candidate": "node scripts/assess-quality-candidate.mjs",
     "evidence:static": "node scripts/capture-static-evidence.mjs",
     "eval": "node scripts/evaluate-harness.mjs",
     "eval:live": "node scripts/evaluate-live.mjs",
@@ -42,18 +41,23 @@
     "verify:live-eval": "npm run verify:live-manifests && npm run eval:live:validate && npm run eval:live:buffered-self-test && npm run eval:live:self-test",
     "verify:live-manifests": "node scripts/verify-live-manifests.mjs",
     "verify:impact-graph": "node scripts/verify-quality-architecture.mjs",
-    "verify:model-profiles": "node scripts/verify-model-profiles.mjs",
+    "verify:normal-session-quality-bridge": "node scripts/verify-normal-session-quality-bridge.mjs",
     "verify:milestone-2-dod-contract": "node scripts/verify-milestone-2-dod.mjs",
     "verify:prompt-inventory": "node scripts/verify-prompt-inventory.mjs",
     "verify:quality-acceptance": "node scripts/verify-quality-acceptance.mjs",
     "verify:quality-contracts": "node scripts/verify-quality-contracts.mjs",
     "verify:quality-live-coordinator": "node scripts/verify-quality-live-coordinator.mjs",
     "verify:quality-live-runner": "node scripts/verify-quality-live-runner.mjs",
+    "verify:quality-verification-targets": "node scripts/verify-quality-verification-targets.mjs",
     "verify:quality-live-manifests": "node scripts/verify-quality-live-manifests.mjs",
     "verify:report-history": "node scripts/verify-report-history.mjs",
     "verify:runtime": "node scripts/verify-runtime.mjs",
     "verify:runtime:fixture": "node scripts/verify-runtime-fixtures.mjs",
+    "verify:runtime:quality-hooks": "node scripts/verify-normal-session-runtime.mjs",
+    "verify:runtime:quality-hooks:fixture": "node scripts/verify-normal-session-runtime-fixtures.mjs",
     "verify:static": "node scripts/verify-harness.mjs",
-    "verify:trace-store": "node scripts/verify-trace-store.mjs"
+    "verify:trace-store": "node scripts/verify-trace-store.mjs",
+    "verify:whitespace": "node scripts/verify-committed-whitespace.mjs",
+    "verify:whitespace:fixture": "node scripts/verify-committed-whitespace-fixtures.mjs"
   }
 }

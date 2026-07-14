@@ -2,24 +2,17 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { createTraceStore } from "../lib/feedback/index.mjs";
-import {
-  QUALITY_ACCEPTANCE_PRODUCERS,
-  createQualityLiveReport,
-} from "../lib/quality/acceptance-contracts.mjs";
-import { sealRuntimeModelEvidence } from "../lib/quality/model-profiles.mjs";
-import { validateEngineeringQualityRunBundle } from "../lib/quality/run-bundle.mjs";
-import { runtimeExecutionFingerprint } from "../lib/quality/runtime-execution.mjs";
-import { fingerprint } from "../lib/quality/validation.mjs";
-import {
-  loadQualityExperimentContext,
-  runnerPreimplementationEvidence,
-  runScenarioProfile,
-} from "./evaluate-live.mjs";
 import { loadScenarioCorpus } from "../lib/feedback/manifests.mjs";
+import { createQualityOutcomes } from "../lib/quality/acceptance-contracts.mjs";
+import { qualityLiveCheckCatalog } from "../lib/quality/live-scenarios.mjs";
+import { validateEngineeringQualityRunBundle } from "../lib/quality/run-bundle.mjs";
+import { fingerprint } from "../lib/quality/validation.mjs";
+import { runScenarioProfile } from "./evaluate-live.mjs";
 
-const root = path.resolve(import.meta.dirname, "..");
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const START_COMMIT = "0a1d56605b9b8923ac27c3b3b405b38177ca7741";
 
 function mapping(classification, overrides = {}) {
@@ -35,10 +28,31 @@ function mapping(classification, overrides = {}) {
   };
 }
 
-function dossierPatch(scenarioId) {
+function dossierPatch(scenarioId, { narrowed = false } = {}) {
+  const baseline = `${scenarioId}-baseline`;
   const visible = `${scenarioId}-visible`;
   const integration = `${scenarioId}-integration`;
   const hidden = `${scenarioId}-hidden-evaluation`;
+  const integrationObligations = [{
+    id: "TEST-integration",
+    check_id: integration,
+    kind: "command",
+    phase: "integration",
+    scope_ids: ["AREA-label"],
+    command_or_mechanism: "runner-hidden-integration",
+    required: true,
+    trusted_producer: "opencode-harness-quality-runner",
+  }];
+  const baselineObligations = narrowed ? [] : [{
+    id: "TEST-baseline",
+    check_id: baseline,
+    kind: "command",
+    phase: "preimplementation",
+    scope_ids: ["AREA-label"],
+    command_or_mechanism: "runner-setup-verification",
+    required: true,
+    trusted_producer: "opencode-harness-quality-runner",
+  }];
   return {
     task_shape: {
       summary: "bounded-one-file-label-fix",
@@ -62,9 +76,28 @@ function dossierPatch(scenarioId) {
       security_requirements: ["bounded-write-scope"],
       completion_requirements: ["visible-and-hidden-verification"],
     },
-    compatibility_contract: { status: "defined", default_decision: "preserve", rationale: "public formatter signature and coercion remain stable", evidence_refs: [{ kind: "file", value: "src/label.mjs" }] },
-    public_contracts: [{ id: "CONTRACT-label", kind: "public_api", path: "src/label.mjs", owner: "fixture", compatibility_decision: "preserve", evidence_refs: [{ kind: "file", value: "src/label.mjs" }] }],
-    system_boundaries: [{ id: "SYSBOUNDARY-caller", category: "caller", path: "src/label.mjs", status: "resolved", rationale: "export is the bounded entry", evidence_refs: [{ kind: "file", value: "src/label.mjs" }] }],
+    compatibility_contract: {
+      status: "defined",
+      default_decision: "preserve",
+      rationale: "public formatter signature and coercion remain stable",
+      evidence_refs: [{ kind: "file", value: "src/label.mjs" }],
+    },
+    public_contracts: [{
+      id: "CONTRACT-label",
+      kind: "public_api",
+      path: "src/label.mjs",
+      owner: "fixture",
+      compatibility_decision: "preserve",
+      evidence_refs: [{ kind: "file", value: "src/label.mjs" }],
+    }],
+    system_boundaries: [{
+      id: "SYSBOUNDARY-caller",
+      category: "caller",
+      path: "src/label.mjs",
+      status: "resolved",
+      rationale: "export is the bounded entry",
+      evidence_refs: [{ kind: "file", value: "src/label.mjs" }],
+    }],
     affected_areas: [{
       id: "AREA-label",
       path: "src/label.mjs",
@@ -106,11 +139,22 @@ function dossierPatch(scenarioId) {
       mapping: mapping("applicable_directly_tested", { check_ids: [integration] }),
     }],
     premortem_matrix: [
-      { id: "PREMORTEM-input", category: "null_absent_empty_malformed_unsupported", subject_ids: ["EDGE-empty-fallback"], mapping: mapping("applicable_verified_by_other_mechanism", { mechanism_ids: [hidden] }) },
-      { id: "PREMORTEM-state", category: "unexpected_valid_state", subject_ids: ["FAIL-lowercase-regression"], mapping: mapping("applicable_directly_tested", { check_ids: [integration] }) },
+      {
+        id: "PREMORTEM-input",
+        category: "null_absent_empty_malformed_unsupported",
+        subject_ids: ["EDGE-empty-fallback"],
+        mapping: mapping("applicable_verified_by_other_mechanism", { mechanism_ids: [hidden] }),
+      },
+      {
+        id: "PREMORTEM-state",
+        category: "unexpected_valid_state",
+        subject_ids: ["FAIL-lowercase-regression"],
+        mapping: mapping("applicable_directly_tested", { check_ids: [integration] }),
+      },
     ],
     counterexamples: [],
     test_obligations: [
+      ...baselineObligations,
       {
         id: "TEST-visible",
         check_id: visible,
@@ -121,22 +165,22 @@ function dossierPatch(scenarioId) {
         required: true,
         trusted_producer: "opencode-harness-quality-runner",
       },
-      {
-        id: "TEST-integration",
-        check_id: integration,
-        kind: "command",
-        phase: "integration",
-        scope_ids: ["AREA-label"],
-        command_or_mechanism: "runner-hidden-integration",
-        required: true,
-        trusted_producer: "opencode-harness-quality-runner",
-      },
+      ...integrationObligations,
     ],
     specialized_checks: [],
     assumptions: [],
     unknowns: [],
     subagent_handoffs: [],
-    implementation_slices: [{ id: "SLICE-label", owner: "fixture-adapter", intent: "implementation", write_scope: ["src/label.mjs"], concurrent_group: null, depends_on_slice_ids: [], invariant_ids: ["INV-string-coercion"], verification_check_ids: [visible, integration] }],
+    implementation_slices: [{
+      id: "SLICE-label",
+      owner: "fixture-adapter",
+      intent: "implementation",
+      write_scope: ["src/label.mjs"],
+      concurrent_group: null,
+      depends_on_slice_ids: [],
+      invariant_ids: ["INV-string-coercion"],
+      verification_check_ids: [visible, integration],
+    }],
     impact_graph: null,
     architecture_assessment: {
       policy_id: null,
@@ -145,13 +189,38 @@ function dossierPatch(scenarioId) {
       violation_ids: [],
       notes: null,
     },
-    context_coverage: { status: "complete", affected_area_ids: ["AREA-label"], covered_area_ids: ["AREA-label"], truncated_area_ids: [], accepted_gap_ids: [], evidence_refs: [{ kind: "file", value: "src/label.mjs" }] },
-    verification_plan: { baseline_check_ids: [], slice_check_ids: [visible], integration_check_ids: [integration], architecture_check_ids: [], regression_check_ids: [integration], hidden_check_ids: [], truncated_check_ids: [], evidence_refs: [{ kind: "check", value: integration }] },
-    rollback_recovery: { rollback_expectation: "no persistent state changes", recovery_expectation: "retry reads the same input", mapping: mapping("not_applicable", { rationale: "pure formatter has no persistence" }) },
-    plan_challenge: { architect_result_id: null, reviewer_result_id: null, blockers: [], evidence_refs: [] },
+    context_coverage: {
+      status: "complete",
+      affected_area_ids: ["AREA-label"],
+      covered_area_ids: ["AREA-label"],
+      truncated_area_ids: [],
+      accepted_gap_ids: [],
+      evidence_refs: [{ kind: "file", value: "src/label.mjs" }],
+    },
+    verification_plan: {
+      baseline_check_ids: narrowed ? [] : [baseline],
+      slice_check_ids: [visible],
+      integration_check_ids: [integration],
+      architecture_check_ids: [],
+      regression_check_ids: [integration],
+      hidden_check_ids: [],
+      truncated_check_ids: [],
+      evidence_refs: [{ kind: "check", value: visible }],
+    },
+    rollback_recovery: {
+      rollback_expectation: "no persistent state changes",
+      recovery_expectation: "retry reads the same input",
+      mapping: mapping("not_applicable", { rationale: "pure formatter has no persistence" }),
+    },
+    plan_challenge: {
+      architect_result_id: null,
+      reviewer_result_id: null,
+      blockers: [],
+      evidence_refs: [],
+    },
     gate_state: { status: "not_evaluated", gate_id: null, reason_codes: [] },
     verification_boundary: {
-      check_ids: [visible, integration],
+      check_ids: narrowed ? [visible, integration] : [baseline, visible, integration],
       mechanism_ids: [hidden],
       ownership_paths: ["src/label.mjs"],
       integration_check_ids: [integration],
@@ -159,318 +228,197 @@ function dossierPatch(scenarioId) {
   };
 }
 
-function fixtureRuntimeEvidence(catalog, binding, evidenceKind = "installed_runtime") {
-  const expected = binding.candidate;
-  return sealRuntimeModelEvidence({
-    schema_version: 1,
-    evidence_id: "fixture-quality-live-runner",
-    evidence_kind: evidenceKind,
-    runtime_name: "deterministic-live-runner-fixture",
-    runtime_version: "1.0.0",
-    captured_at: "2026-07-13T12:00:00.000Z",
-    catalog_id: catalog.catalog_id,
-    catalog_fingerprint: catalog.content_fingerprint,
-    requested_profile_id: expected.model_profile_id,
-    requested_model_id: expected.model_id,
-    effective_model_id: expected.model_id,
-    option_results: Object.entries({
-      model: expected.model_id,
-      reasoning_effort: expected.reasoning_effort,
-      text_verbosity: expected.text_verbosity,
-      mode: expected.mode,
-    }).map(([option_id, value]) => ({
-      option_id,
-      requested_value: value,
-      effective_value: value,
-      status: "accepted",
-    })),
-    complete: true,
-    source_command_id: "deterministic-quality-live-runner-self-test",
-  });
-}
-
-const receiptDossierFingerprint = fingerprint({ dossier: "runner-preimplementation-receipts" });
-const receiptDossier = {
-  dossier_id: "dossier-runner-receipts",
-  fingerprint: receiptDossierFingerprint,
-  test_obligations: [{
-    check_id: "quality-receipt-scenario-baseline",
-    command_or_mechanism: "runner-setup-checks",
-  }],
-  verification_plan: { baseline_check_ids: ["quality-receipt-scenario-baseline"] },
-  plan_challenge: {
-    architect_result_id: "architect-plan-result",
-    reviewer_result_id: "reviewer-plan-result",
-  },
-};
-const receiptJobs = ["architect", "reviewer"].map((role) => ({
-  request: {
-    task_id: `${role}-plan-result`,
-    agent: role,
-    assigned_scope: `${role} plan challenge`,
-    write_scope: [],
-  },
-  status: { state: "completed", updated_at: "2026-07-13T11:59:30.000Z" },
-  result: {
-    status: role === "reviewer" ? "no-findings" : "completed",
-    termination_reason: "verified",
-    completed_at: "2026-07-13T11:59:30.000Z",
-  },
-}));
-const runnerReceipts = runnerPreimplementationEvidence({
-  dossier: receiptDossier,
-  scenarioId: "quality-receipt-scenario",
-  setupResults: [{ status: "passed" }],
-  traceSnapshot: {
-    events: [{ agent: "live-eval-runner", event_type: "setup_verification", timestamp: "2026-07-13T11:59:00.000Z" }],
-    jobs: receiptJobs,
-  },
-  evaluatedAt: "2026-07-13T12:00:00.000Z",
-});
-assert.equal(runnerReceipts.baseline_receipts[0].status, "passed");
-assert.deepEqual(runnerReceipts.plan_challenge_receipts.map((entry) => entry.role), ["architect", "reviewer"]);
-
-const workspaceRoot = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-quality-live-runner-"));
-try {
-  const { scenarios } = loadScenarioCorpus({ root });
-  const scenario = scenarios.find((entry) => entry.id === "quality-small-local-control");
+export async function createDeterministicQualityRun({
+  profileRole,
+  narrowed = false,
+  runIdentity = null,
+} = {}) {
+  assert(["baseline", "candidate"].includes(profileRole), "profileRole must be baseline or candidate");
+  const workspaceRoot = fs.mkdtempSync(path.join(os.tmpdir(), `opencode-quality-live-runner-${profileRole}-`));
+  const scenario = loadScenarioCorpus({ root }).scenarios
+    .find((entry) => entry.id === "quality-small-local-control");
   assert(scenario, "quality-small-local-control scenario missing");
-  const experimentContext = loadQualityExperimentContext(root);
-  const binding = experimentContext.bindings.find((entry) => (
-    entry.scenario_id === scenario.id && entry.repetition === 1 && entry.variant_id === "same-low"
-  ));
-  assert(binding, "canonical same-low quality comparison missing");
-  const permissionFingerprint = fingerprint({ permission_profile: "quality-live-runner-fixture" });
   const repositoryFingerprint = fingerprint({ repository: "quality-live-runner-fixture" });
-  const profileRun = {
-    profile_role: "candidate",
-    profile: "quality-live-runner-fixture",
-    repository_fingerprint: repositoryFingerprint,
-    permission_profile_fingerprint: permissionFingerprint,
-    permission_snapshot_fingerprint: fingerprint({ permission_snapshot: "quality-live-runner-fixture" }),
-    profile_fingerprint: binding.candidate.profile_fingerprint,
-  };
-  const runtimeEvidence = fixtureRuntimeEvidence(experimentContext.catalog, binding);
-  const runtimeBindingInput = {
-    repository_fingerprint: profileRun.repository_fingerprint,
-    host_profile_id: profileRun.profile,
-    experiment_id: binding.experiment_id,
-    experiment_fingerprint: binding.experiment_fingerprint,
-    comparison_id: binding.comparison_id,
-    variant_id: binding.variant_id,
-    harness_role: binding.harness_role,
-    scenario_id: scenario.id,
-    scenario_fingerprint: fingerprint(scenario),
-    repetition: binding.repetition,
-    profile_role: profileRun.profile_role,
-    profile_fingerprint: profileRun.profile_fingerprint,
-    model_profile_id: binding.candidate.model_profile_id,
-    model_profile_fingerprint: binding.candidate.model_profile_fingerprint,
-    model_id: binding.candidate.model_id,
-    reasoning_effort: binding.candidate.reasoning_effort,
-    text_verbosity: binding.candidate.text_verbosity,
-    mode: binding.candidate.mode,
-    prompt_profile_id: binding.candidate.prompt_profile_id,
-    prompt_profile_fingerprint: binding.candidate.prompt_profile_fingerprint,
-    runtime_model_evidence_fingerprint: runtimeEvidence.content_fingerprint,
-    permission_snapshot_fingerprint: profileRun.permission_snapshot_fingerprint,
-    permission_profile_fingerprint: profileRun.permission_profile_fingerprint,
-  };
-  const exactRuntimeFingerprint = runtimeExecutionFingerprint(runtimeBindingInput);
-  for (const mutation of [
-    { reasoning_effort: binding.candidate.reasoning_effort === "high" ? "medium" : "high" },
-    { text_verbosity: binding.candidate.text_verbosity === "high" ? "medium" : "high" },
-    { mode: binding.candidate.mode === "pro" ? "standard" : "pro" },
-    { runtime_model_evidence_fingerprint: fingerprint({ runtime: "other" }) },
-    { permission_snapshot_fingerprint: fingerprint({ permission: "other" }) },
-    { repository_fingerprint: fingerprint({ repository: "other" }) },
-    { host_profile_id: "other-host-profile" },
-  ]) {
-    assert.notEqual(runtimeExecutionFingerprint({ ...runtimeBindingInput, ...mutation }), exactRuntimeFingerprint);
-  }
-  const traceStore = createTraceStore({ workspaceRoot });
-  const qualityAdapter = (echoMode) => async ({ context, onTrace, workingDirectory }) => {
-      assert.equal(workingDirectory, context.repo, "runner did not bind adapter cwd to the isolated fixture repository");
-      const inspected = await onTrace("quality_inspect", {});
-      assert.deepEqual(inspected.ownership_paths, ["src/label.mjs"]);
-      const created = await onTrace("quality_create_dossier", {
-        dossier_id: "dossier-quality-live-runner",
-        task_id: "task-root",
-        risk_class: "standard-lite",
-        mode: "standard-lite",
-        task_type: "maintenance",
-        user_visible_goal: "Correct the bounded label formatter.",
-        starting_commit: START_COMMIT,
-        created_at: "2026-07-13T12:00:00.000Z",
-      });
-      const updated = await onTrace("quality_update_dossier", {
-        expected_revision: created.revision,
-        updated_at: "2026-07-13T12:01:00.000Z",
-        patch: dossierPatch(scenario.id),
-      });
-      await onTrace("quality_finalize_dossier", { finalized_at: "2026-07-13T12:02:00.000Z" });
-      await onTrace("quality_authorize_action", {
-        kind: "edit",
-        intent: "implementation",
-        writable: true,
-        write_scope: ["src/label.mjs"],
-      });
-      await onTrace("emit", {
-        event_type: "edit",
-        summary: "Implement the bounded label contract.",
-        status: "completed",
-        files_written: [{ path: "src/label.mjs", summary: "Uppercase output and empty fallback." }],
-      });
-      fs.writeFileSync(
-        path.join(context.repo, "src", "label.mjs"),
-        "export function label(value) {\n  const normalized = String(value).trim();\n  return normalized ? normalized.toUpperCase() : \"UNTITLED\";\n}\n",
-        "utf8",
-      );
-      assert.equal(updated.revision, 2);
-      return {
-        passed: true,
-        profile_fingerprint: context.profileFingerprint,
-        ...(echoMode === "missing" ? {} : {
-          execution_binding_fingerprint: echoMode === "wrong"
-            ? fingerprint({ wrong_execution_binding: true })
-            : context.executionBindingFingerprint,
-        }),
-        model: binding.candidate.model_id,
-        tool: "deterministic-fixture-adapter",
-        token_usage: { input_tokens: 10, output_tokens: 5, total_tokens: 15 },
-      };
-  };
-  const result = await runScenarioProfile({
-    adapterUrl: "fixture://quality-live-runner",
-    scenario,
-    repetition: binding.repetition,
-    profileRun,
-    evaluationRunId: "quality-live-runner-self-test",
-    traceStore,
-    modelName: binding.candidate.model_id,
-    qualityBinding: binding,
-    runtimeModelEvidence: runtimeEvidence,
-    sourceRoot: root,
-    runAdapterModuleFn: qualityAdapter("matching"),
-  });
-  assert.equal(result.status, "passed", JSON.stringify({
-    incomplete_evidence: result.incomplete_evidence,
-    adapter_classification: result.adapter_classification,
-    visible_results: result.visible_results,
-    hidden_results: result.hidden_results,
-    quality_outcomes: result.quality_outcomes,
-  }));
-  assert.deepEqual(result.incomplete_evidence, []);
-  assert(result.quality_attestation, "runner did not produce post-teardown quality attestation");
-  assert.equal(result.host_profile_id, "quality-live-runner-fixture");
-  assert.equal(result.runtime_execution_fingerprint, exactRuntimeFingerprint);
-  assert.equal(result.runtime_execution_fingerprint, result.quality_attestation.runtime_execution_fingerprint);
-  assert.equal(result.quality_outcomes.complete, true);
-  assert.equal(result.quality_outcomes.integrated_verification_complete, true);
-  assert(result.hidden_results.every((entry) => entry.status === "passed"));
-  const report = createQualityLiveReport({
-    evaluation_run_id: "quality-live-runner-self-test",
-    created_at: "2026-07-13T12:05:00.000Z",
-    provenance: {
-      producer_id: QUALITY_ACCEPTANCE_PRODUCERS.liveReport,
-      evidence_kind: "infrastructure_self_test",
-      complete: true,
-    },
-    results: [result],
-  });
-  assert.equal(report.results[0].comparison_id, binding.comparison_id);
-  const bundle = validateEngineeringQualityRunBundle(
-    path.join(workspaceRoot, ".oc_harness", "runs", result.operational_run_id),
-  );
-  assert.equal(bundle.gate.status, "passed");
-  assert.equal(bundle.attestation.model_profile_id, binding.candidate.model_profile_id);
-  for (const [echoMode, reason] of [
-    ["missing", "ADAPTER_EXECUTION_BINDING_MISSING"],
-    ["wrong", "ADAPTER_EXECUTION_BINDING_MISMATCH"],
-  ]) {
-    const rejected = await runScenarioProfile({
-      adapterUrl: `fixture://quality-live-runner-${echoMode}`,
-      scenario,
-      repetition: binding.repetition,
-      profileRun,
-      evaluationRunId: `quality-live-runner-${echoMode}`,
-      traceStore,
-      modelName: binding.candidate.model_id,
-      qualityBinding: binding,
-      runtimeModelEvidence: runtimeEvidence,
-      sourceRoot: root,
-      runAdapterModuleFn: qualityAdapter(echoMode),
-    });
-    assert.equal(rejected.status, "incomplete");
-    assert(rejected.incomplete_evidence.includes(reason));
-    assert.equal(rejected.runtime_execution_fingerprint, null);
-    assert.equal(rejected.quality_attestation, null);
-    assert.equal(
-      fs.existsSync(path.join(workspaceRoot, ".oc_harness", "runs", rejected.operational_run_id, "quality")),
-      false,
-      `${echoMode} execution binding published a quality bundle`,
-    );
-  }
-  const nonAuthorizingRuntime = await runScenarioProfile({
-    adapterUrl: "fixture://quality-live-runner-non-authorizing-runtime",
-    scenario,
-    repetition: binding.repetition,
-    profileRun,
-    evaluationRunId: "quality-live-runner-non-authorizing-runtime",
-    traceStore,
-    modelName: binding.candidate.model_id,
-    qualityBinding: binding,
-    runtimeModelEvidence: fixtureRuntimeEvidence(experimentContext.catalog, binding, "fixture_parser"),
-    sourceRoot: root,
-    runAdapterModuleFn: qualityAdapter("matching"),
-  });
-  assert.equal(nonAuthorizingRuntime.status, "incomplete");
-  assert(nonAuthorizingRuntime.incomplete_evidence.includes("RUNTIME_MODEL_INSTALLED_EVIDENCE_REQUIRED"));
-  assert.equal(nonAuthorizingRuntime.quality_attestation, null);
-  assert.equal(nonAuthorizingRuntime.quality_outcomes.complete, false);
-  assert.equal(
-    fs.existsSync(path.join(workspaceRoot, ".oc_harness", "runs", nonAuthorizingRuntime.operational_run_id, "quality")),
-    false,
-  );
-  let cleanupAttemptedRunId = null;
-  let failCleanupOnce = true;
-  const cleanupFailingTraceStore = {
-    ...traceStore,
-    createStagedRunFromBuffered(buffered, runId) {
-      cleanupAttemptedRunId = runId;
-      return traceStore.createStagedRunFromBuffered(buffered, runId);
-    },
-    discardStagingStore(staged) {
-      if (failCleanupOnce) {
-        failCleanupOnce = false;
-        throw new Error("injected-quality-staging-cleanup-failure");
-      }
-      return traceStore.discardStagingStore(staged);
-    },
-  };
-  await assert.rejects(
-    () => runScenarioProfile({
-      adapterUrl: "fixture://quality-live-runner-cleanup-failure",
-      scenario,
-      repetition: binding.repetition,
-      profileRun,
-      evaluationRunId: "quality-live-runner-cleanup-failure",
-      traceStore: cleanupFailingTraceStore,
-      modelName: binding.candidate.model_id,
-      qualityBinding: binding,
-      runtimeModelEvidence: runtimeEvidence,
-      sourceRoot: root,
-      runAdapterModuleFn: qualityAdapter("matching"),
+  const profileFingerprint = fingerprint({ profile: profileRole, narrowed, repositoryFingerprint });
+  let generatedId = 0;
+  const traceStore = createTraceStore({
+    workspaceRoot,
+    ...(runIdentity === null ? {} : {
+      idFactory: (kind) => kind === "run"
+        ? runIdentity
+        : `${kind}-${profileRole}-${++generatedId}`,
     }),
-    /injected-quality-staging-cleanup-failure/,
-  );
-  assert(cleanupAttemptedRunId, "cleanup failure was not injected at the publication boundary");
-  assert.equal(
-    fs.existsSync(path.join(workspaceRoot, ".oc_harness", "runs", cleanupAttemptedRunId)),
-    false,
-    "pre-rename staging cleanup failure left a durable quality run",
-  );
-  console.log("Quality live runner integration passed (exact runtime binding, runner receipts, and atomic publication)." );
-} finally {
-  fs.rmSync(workspaceRoot, { recursive: true, force: true });
+  });
+  const checkCatalog = qualityLiveCheckCatalog(scenario.id, "standard-lite");
+  const executeFixtureChecks = async (_scenario, phase, commands, repo) => {
+    if (phase === "setup") return [];
+    const moduleUrl = `${pathToFileURL(path.join(repo, "src", "label.mjs")).href}?phase=${phase}&v=${Date.now()}`;
+    const { label } = await import(moduleUrl);
+    const passed = phase === "visible"
+      ? label("hello") === "HELLO"
+      : label("") === "UNTITLED" && fs.existsSync(path.join(repo, ".live-hidden", "quality-small-local-control.test.mjs"));
+    return commands.map((command, index) => ({
+      check_id: `${phase}-fixture-${index}`,
+      status: passed ? "passed" : "failed",
+      exit_code: passed ? 0 : 1,
+      stdout_chars: 0,
+      stderr_chars: 0,
+    }));
+  };
+  const qualityAdapter = async ({ context, onTrace, workingDirectory }) => {
+    assert.equal(workingDirectory, context.repo, "adapter cwd is not bound to the isolated fixture");
+    const inspected = await onTrace("quality_inspect", {});
+    assert.deepEqual(inspected.ownership_paths, ["src/label.mjs"]);
+    const created = await onTrace("quality_create_dossier", {
+      dossier_id: `dossier-quality-live-${profileRole}-${narrowed ? "narrow" : "full"}`,
+      task_id: "task-root",
+      risk_class: "standard-lite",
+      mode: "standard-lite",
+      task_type: "maintenance",
+      user_visible_goal: "Correct the bounded label formatter.",
+      starting_commit: START_COMMIT,
+      created_at: "2026-07-13T12:00:00.000Z",
+    });
+    await onTrace("quality_update_dossier", {
+      expected_revision: created.revision,
+      updated_at: "2026-07-13T12:01:00.000Z",
+      patch: dossierPatch(scenario.id, { narrowed }),
+    });
+    await onTrace("quality_finalize_dossier", { finalized_at: "2026-07-13T12:02:00.000Z" });
+    await onTrace("quality_authorize_action", {
+      kind: "edit",
+      intent: "implementation",
+      writable: true,
+      write_scope: ["src/label.mjs"],
+    });
+    await onTrace("emit", {
+      event_type: "edit",
+      summary: "Implement the bounded label contract.",
+      status: "completed",
+      files_written: [{ path: "src/label.mjs", summary: "Uppercase output and empty fallback." }],
+    });
+    fs.writeFileSync(
+      path.join(context.repo, "src", "label.mjs"),
+      "export function label(value) {\n  const normalized = String(value).trim();\n  return normalized ? normalized.toUpperCase() : \"UNTITLED\";\n}\n",
+      "utf8",
+    );
+    return { passed: true, profile_fingerprint: profileFingerprint, tool: "deterministic-fixture-adapter" };
+  };
+  try {
+    const result = await runScenarioProfile({
+      adapterUrl: "fixture://quality-live-runner",
+      scenario,
+      repetition: 1,
+      profileRun: {
+        profile_role: profileRole,
+        profile: `quality-live-${profileRole}`,
+        repository_fingerprint: repositoryFingerprint,
+        profile_fingerprint: profileFingerprint,
+      },
+      evaluationRunId: `quality-live-runner-${profileRole}-${narrowed ? "narrow" : "full"}`,
+      traceStore,
+      sourceRoot: root,
+      runAdapterModuleFn: qualityAdapter,
+      executeChecksFn: executeFixtureChecks,
+    });
+    const runDir = path.join(workspaceRoot, ".oc_harness", "runs", result.operational_run_id);
+    assert(fs.existsSync(runDir), `deterministic quality run was not published: ${JSON.stringify(result)}`);
+    const bundle = validateEngineeringQualityRunBundle(runDir);
+    return {
+      workspaceRoot,
+      runDir,
+      result,
+      bundle,
+      checkCatalog,
+      cleanup: () => fs.rmSync(workspaceRoot, { recursive: true, force: true }),
+    };
+  } catch (error) {
+    if (narrowed && error?.code === "QUALITY_ACCEPTANCE_TARGET_UNIVERSE") {
+      const runsRoot = path.join(workspaceRoot, ".oc_harness", "runs");
+      const runDirs = fs.existsSync(runsRoot)
+        ? fs.readdirSync(runsRoot, { withFileTypes: true })
+          .filter((entry) => entry.isDirectory())
+          .map((entry) => path.join(runsRoot, entry.name))
+        : [];
+      assert.equal(runDirs.length, 1, "narrowed production run did not leave exactly one atomically published bundle");
+      return {
+        workspaceRoot,
+        runDir: runDirs[0],
+        result: null,
+        bundle: validateEngineeringQualityRunBundle(runDirs[0]),
+        checkCatalog,
+        expectedFailure: error.code,
+        cleanup: () => fs.rmSync(workspaceRoot, { recursive: true, force: true }),
+      };
+    }
+    fs.rmSync(workspaceRoot, { recursive: true, force: true });
+    throw error;
+  }
 }
+
+async function main() {
+  const run = await createDeterministicQualityRun({ profileRole: "candidate" });
+  try {
+    assert.equal(run.result.status, "passed", JSON.stringify(run.result.incomplete_evidence));
+    assert(run.result.quality_outcomes?.complete, "runner did not derive complete quality outcomes");
+    assert.equal(run.bundle.gate.status, "passed");
+    const targets = [
+      ...run.result.quality_outcomes.required_check_ids,
+      ...run.result.quality_outcomes.required_mechanism_ids,
+    ];
+    assert.equal(new Set(targets).size, targets.length, "canonical runner target IDs are not unique");
+    assert(targets.includes("quality-small-local-control-integration"));
+    assert(targets.includes("quality-small-local-control-hidden-evaluation"));
+    assert.equal(run.bundle.manifest.scenario_id, run.bundle.run.scenario_id);
+    assert.equal(run.bundle.manifest.profile_role, run.bundle.run.profile_role);
+    assert.equal(run.bundle.manifest.risk, run.bundle.run.risk);
+    assert.equal(run.bundle.manifest.harness_fingerprint, run.bundle.run.harness_fingerprint);
+    assert.equal(run.bundle.manifest.run_fingerprint, fingerprint(run.bundle.run));
+    const tampered = structuredClone(run.bundle);
+    assert.throws(
+      () => createQualityOutcomes({ run_bundle: tampered, check_catalog: run.checkCatalog }),
+      /QUALITY_BUNDLE_VALIDATION_REQUIRED/u,
+      "unvalidated evidence clone was accepted",
+    );
+
+    const runPath = path.join(run.runDir, "run.json");
+    const manifestPath = path.join(run.runDir, "quality", "manifest.json");
+    const originalRunText = fs.readFileSync(runPath, "utf8");
+    const originalManifestText = fs.readFileSync(manifestPath, "utf8");
+    try {
+      const profileMutatedRun = JSON.parse(originalRunText);
+      profileMutatedRun.profile_role = "baseline";
+      fs.writeFileSync(runPath, `${JSON.stringify(profileMutatedRun, null, 2)}\n`, "utf8");
+      assert.throws(
+        () => validateEngineeringQualityRunBundle(run.runDir),
+        /QUALITY_BUNDLE_RUN_FINGERPRINT/u,
+        "post-publication run.json profile_role mutation was accepted",
+      );
+
+      fs.writeFileSync(runPath, originalRunText, "utf8");
+      const riskMutatedRun = JSON.parse(originalRunText);
+      riskMutatedRun.risk = "high";
+      const riskMutatedManifest = JSON.parse(originalManifestText);
+      riskMutatedManifest.risk = "high";
+      riskMutatedManifest.run_fingerprint = fingerprint(riskMutatedRun);
+      const manifestFingerprintInput = { ...riskMutatedManifest };
+      delete manifestFingerprintInput.fingerprint;
+      riskMutatedManifest.fingerprint = fingerprint(manifestFingerprintInput);
+      fs.writeFileSync(runPath, `${JSON.stringify(riskMutatedRun, null, 2)}\n`, "utf8");
+      fs.writeFileSync(manifestPath, `${JSON.stringify(riskMutatedManifest, null, 2)}\n`, "utf8");
+      assert.throws(
+        () => validateEngineeringQualityRunBundle(run.runDir),
+        /QUALITY_BUNDLE_RISK/u,
+        "runner risk downgrade or dossier-risk mismatch was accepted",
+      );
+    } finally {
+      fs.writeFileSync(runPath, originalRunText, "utf8");
+      fs.writeFileSync(manifestPath, originalManifestText, "utf8");
+    }
+    console.log("Model-neutral quality live-runner integration checks passed (real sidecar/coordinator/runner path; no LLM or network).");
+  } finally {
+    run.cleanup();
+  }
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await main();

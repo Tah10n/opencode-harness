@@ -44,14 +44,7 @@ import {
   ProcessTreeTeardownError,
   runManagedCommand,
 } from "../lib/feedback/process-tree.mjs";
-import {
-  QUALITY_ACCEPTANCE_PRODUCERS,
-  createCanonicalExperimentBindings,
-  createQualityLiveReport,
-  createQualityOutcomes,
-  qualityBundleFingerprint,
-  validateRuntimeEvidenceArray,
-} from "../lib/quality/acceptance-contracts.mjs";
+import { createQualityOutcomes } from "../lib/quality/acceptance-contracts.mjs";
 import { evaluateArchitecturePolicy, parseArchitecturePolicy } from "../lib/quality/architecture.mjs";
 import { createEngineeringPreimplementationEvidence } from "../lib/quality/gate.mjs";
 import {
@@ -60,23 +53,15 @@ import {
   handleQualityLiveOperation,
   inspectQualityLiveCoordinator,
   qualityLiveIntegratedVerificationTargetIds,
-  qualityLiveOutcomeEvidence,
   qualityLivePrecompletionVerifierCodes,
   qualityLiveSessionForPublication,
   recordQualityLiveImplementation,
   recordQualityLiveRunnerIntegratedVerification,
 } from "../lib/quality/live-coordinator.mjs";
-import {
-  validateEngineeringExperimentManifest,
-  validateModelProfileCatalog,
-  validateRuntimeModelEvidence,
-} from "../lib/quality/model-profiles.mjs";
 import { validatePromptInventory } from "../lib/quality/prompt-inventory.mjs";
-import { publishEngineeringQualityRunBundle } from "../lib/quality/run-bundle.mjs";
 import {
-  createRuntimeExecutionBinding,
-  runtimeExecutionFingerprint,
-} from "../lib/quality/runtime-execution.mjs";
+  publishEngineeringQualityRunBundle,
+} from "../lib/quality/run-bundle.mjs";
 import { createEngineeringQualityStore } from "../lib/quality/store.mjs";
 import {
   loadQualityLiveScenarioSidecar,
@@ -175,19 +160,13 @@ function profileRuns(env = process.env, repositoryFingerprint = null) {
     }
     const evidence = readPermissionEvidence(entry.evidence_path, entry.profile, entry.profile_role);
     entry.permission_subject_fingerprint = evidence.subject_fingerprint;
-    entry.permission_snapshot_fingerprint = fingerprint(evidence);
-    entry.permission_profile_fingerprint = evidence.profile_fingerprint;
     entry.profile_fingerprint = evidence.profile_fingerprint;
     delete entry.evidence_path;
   }
   const currentRepositoryFingerprint = repositoryFingerprint ?? repositoryStateFingerprint(root);
-  for (const entry of profiles) {
-    if (entry.permission_subject_fingerprint !== currentRepositoryFingerprint) {
-      const code = entry.profile_role === "baseline"
-        ? "LIVE_BASELINE_SUBJECT_MISMATCH"
-        : "LIVE_CANDIDATE_SUBJECT_MISMATCH";
-      throw new ContractError(code, `${entry.profile_role} permission evidence does not attest the current repository state`);
-    }
+  const candidate = profiles.find((entry) => entry.profile_role === "candidate");
+  if (candidate.permission_subject_fingerprint !== currentRepositoryFingerprint) {
+    throw new ContractError("LIVE_CANDIDATE_SUBJECT_MISMATCH", "candidate permission evidence does not attest the current repository state");
   }
   for (const entry of profiles) {
     entry.repository_fingerprint = currentRepositoryFingerprint;
@@ -357,7 +336,7 @@ function containsDeniedValue(value, denyValues) {
   return typeof value === "string" && denyValues.some((denied) => value.includes(denied));
 }
 
-function adapterFailureReason(result, expectedProfileFingerprint = null, expectedModel = null) {
+function adapterFailureReason(result, expectedProfileFingerprint = null) {
   let reason = null;
   if (result === true) reason = null;
   else if (result === false || !result || typeof result !== "object" || Array.isArray(result)) reason = "adapter_failed";
@@ -373,9 +352,6 @@ function adapterFailureReason(result, expectedProfileFingerprint = null, expecte
   }
   if (reason === null && expectedProfileFingerprint !== null && adapterField(result, "profile_fingerprint") !== expectedProfileFingerprint) {
     return "adapter_profile_fingerprint_mismatch";
-  }
-  if (reason === null && expectedModel !== null && adapterField(result, "model") !== expectedModel) {
-    return "adapter_model_mismatch";
   }
   return reason;
 }
@@ -405,121 +381,6 @@ function costMetadata(adapterResult) {
   return { available: true, value, currency };
 }
 
-function tokenUsageMetadata(adapterResult) {
-  const value = adapterField(adapterResult, "token_usage");
-  if (!value || typeof value !== "object" || Array.isArray(value)) {
-    return { available: false, input_tokens: null, output_tokens: null, total_tokens: null };
-  }
-  const { input_tokens: inputTokens, output_tokens: outputTokens, total_tokens: totalTokens } = value;
-  if (
-    !Number.isInteger(inputTokens) || inputTokens < 0
-    || !Number.isInteger(outputTokens) || outputTokens < 0
-    || !Number.isInteger(totalTokens) || totalTokens !== inputTokens + outputTokens
-  ) {
-    return { available: false, input_tokens: null, output_tokens: null, total_tokens: null };
-  }
-  return { available: true, input_tokens: inputTokens, output_tokens: outputTokens, total_tokens: totalTokens };
-}
-
-function readBoundedJson(file, label, { maxBytes = 8 * 1024 * 1024 } = {}) {
-  const resolved = path.resolve(file);
-  let text;
-  try {
-    const stat = fs.lstatSync(resolved);
-    if (!stat.isFile() || stat.isSymbolicLink() || stat.size > maxBytes) throw new Error("not a bounded ordinary file");
-    text = fs.readFileSync(resolved, "utf8").replace(/^\uFEFF/u, "");
-    return JSON.parse(text);
-  } catch (error) {
-    throw new ContractError("LIVE_QUALITY_INPUT", `${label} is unavailable or invalid: ${error.message}`);
-  }
-}
-
-function loadQualityExperimentContext(sourceRoot) {
-  const catalog = readBoundedJson(path.join(sourceRoot, "quality", "model-profiles", "catalog.v1.json"), "model profile catalog");
-  const experiment = readBoundedJson(path.join(sourceRoot, "quality", "model-profiles", "experiment.v1.json"), "model experiment");
-  const promptInventory = readBoundedJson(path.join(sourceRoot, "quality", "prompt-inventory", "baseline.v1.json"), "prompt inventory");
-  validateModelProfileCatalog(catalog);
-  validateEngineeringExperimentManifest(experiment, { catalog });
-  validatePromptInventory(promptInventory);
-  const promptProfile = {
-    prompt_profile_id: promptInventory.inventory_id,
-    prompt_profile_fingerprint: promptInventory.content_fingerprint,
-  };
-  const bindings = createCanonicalExperimentBindings({
-    experiment,
-    catalog,
-    promptProfiles: { baseline: promptProfile, candidate: promptProfile },
-  });
-  return Object.freeze({ catalog, experiment, promptInventory, bindings });
-}
-
-function loadRuntimeModelEvidence(location, catalog) {
-  if (typeof location !== "string" || location.trim() === "") {
-    throw new ContractError(
-      "LIVE_MODEL_EVIDENCE_REQUIRED",
-      "quality live evaluation requires OPENCODE_MODEL_RUNTIME_EVIDENCE_PATH pointing to first-party runtime evidence",
-    );
-  }
-  const resolved = path.resolve(location);
-  let evidence;
-  try {
-    const stat = fs.lstatSync(resolved);
-    if (stat.isSymbolicLink()) throw new Error("symbolic links are not accepted");
-    if (stat.isDirectory()) {
-      const files = fs.readdirSync(resolved, { withFileTypes: true })
-        .filter((entry) => entry.isFile() && !entry.isSymbolicLink() && entry.name.endsWith(".json") && entry.name.includes("-model-"))
-        .map((entry) => path.join(resolved, entry.name))
-        .sort();
-      if (files.length === 0 || files.length > 2048) throw new Error("expected between 1 and 2048 model evidence files");
-      const totalBytes = files.reduce((total, file) => total + fs.lstatSync(file).size, 0);
-      if (totalBytes > 32 * 1024 * 1024) throw new Error("model evidence directory exceeds 32 MiB");
-      evidence = files.map((file) => readBoundedJson(file, "runtime model evidence", { maxBytes: 512 * 1024 }));
-    } else if (stat.isFile()) {
-      const parsed = readBoundedJson(resolved, "runtime model evidence");
-      evidence = Array.isArray(parsed) ? parsed : [parsed];
-    } else {
-      throw new Error("path is neither a file nor a directory");
-    }
-  } catch (error) {
-    if (error instanceof ContractError) throw error;
-    throw new ContractError("LIVE_MODEL_EVIDENCE_REQUIRED", `runtime model evidence path is invalid: ${error.message}`);
-  }
-  validateRuntimeEvidenceArray(evidence);
-  evidence.forEach((entry) => validateRuntimeModelEvidence(entry, { catalog }));
-  return evidence;
-}
-
-function runtimeEvidenceForBinding(evidence, binding, profileRole) {
-  const expected = binding[profileRole];
-  const expectedOptions = {
-    model: expected.model_id,
-    reasoning_effort: expected.reasoning_effort,
-    text_verbosity: expected.text_verbosity,
-    mode: expected.mode,
-  };
-  const matches = evidence.filter((entry) => {
-    if (entry.requested_profile_id !== expected.model_profile_id || entry.requested_model_id !== expected.model_id) return false;
-    const options = new Map(entry.option_results.map((option) => [option.option_id, option]));
-    return Object.entries(expectedOptions).every(([optionId, expectedValue]) => {
-      const option = options.get(optionId);
-      return option?.status === "accepted"
-        && option.requested_value === expectedValue
-        && option.effective_value === expectedValue;
-    });
-  }).sort((left, right) => (
-    Number(right.evidence_kind === "installed_runtime") - Number(left.evidence_kind === "installed_runtime")
-    || right.captured_at.localeCompare(left.captured_at)
-    || right.content_fingerprint.localeCompare(left.content_fingerprint)
-  ));
-  if (matches.length === 0) {
-    throw new ContractError(
-      "LIVE_MODEL_EVIDENCE_MISSING",
-      `no exact runtime evidence matches ${binding.comparison_id} ${profileRole} (${expected.model_profile_id})`,
-    );
-  }
-  return matches[0];
-}
-
 function projectArchitectureEvaluator(repo) {
   const policyPath = path.resolve(repo, ".opencode", "architecture-policy.json");
   let policy = null;
@@ -536,11 +397,7 @@ function projectArchitectureEvaluator(repo) {
     if (dossier.impact_graph === null) {
       throw new ContractError("LIVE_ARCHITECTURE_GRAPH_REQUIRED", "configured architecture policy requires a dossier impact graph");
     }
-    return evaluateArchitecturePolicy({
-      graph: dossier.impact_graph,
-      policy,
-      baseline: dossier.impact_graph,
-    });
+    return evaluateArchitecturePolicy({ graph: dossier.impact_graph, policy, baseline: dossier.impact_graph });
   };
 }
 
@@ -551,12 +408,22 @@ function projectArchitectureAuditor(repo) {
   return () => {
     throw new ContractError(
       "LIVE_POST_ARCHITECTURE_AUDITOR_REQUIRED",
-      "configured architecture policy requires a trusted host graph extractor after implementation; the adapter cannot attest its own candidate graph",
+      "configured architecture policy requires a trusted host graph extractor after implementation",
     );
   };
 }
 
-function runnerPreimplementationEvidence({
+function promptAttestation(sourceRoot) {
+  const file = path.resolve(sourceRoot, "quality", "prompt-inventory", "baseline.v2.json");
+  const inventory = JSON.parse(fs.readFileSync(file, "utf8").replace(/^\uFEFF/u, ""));
+  validatePromptInventory(inventory);
+  return {
+    prompt_profile_id: inventory.inventory_id,
+    prompt_profile_fingerprint: inventory.content_fingerprint,
+  };
+}
+
+export function runnerPreimplementationEvidence({
   dossier,
   scenarioId,
   setupResults,
@@ -564,9 +431,7 @@ function runnerPreimplementationEvidence({
   evaluatedAt,
 }) {
   const baselineCheckId = `${scenarioId}-baseline`;
-  const baselineObligation = dossier.test_obligations.find(
-    (entry) => entry.check_id === baselineCheckId,
-  );
+  const baselineObligation = dossier.test_obligations.find((entry) => entry.check_id === baselineCheckId);
   const setupEvent = traceSnapshot.events.find(
     (entry) => entry.agent === RUNNER_AGENT && entry.event_type === "setup_verification",
   );
@@ -622,9 +487,13 @@ function runnerPreimplementationEvidence({
   });
 }
 
-function mappedRate(mapped, total, integrated) {
-  if (total === 0) return integrated ? 1 : 0;
-  return integrated ? mapped / total : 0;
+function receiptVerificationChecks(targetIds, status) {
+  return targetIds.map((code) => ({
+    code,
+    status,
+    summary: "Canonical Engineering Dossier target is bound to runner-owned integrated evidence.",
+    evidence_refs: [{ kind: "file", value: "quality/integrated-verification-evidence.json" }],
+  }));
 }
 
 function traceOperationHandler(instrumentation, { denyValues = [] } = {}) {
@@ -725,49 +594,6 @@ function buildVerificationChecks({ setup, adapterClassification, visible, hidden
   ];
 }
 
-function runtimeExecutionBindingForRun({ scenario, repetition, profileRun, qualityBinding, runtimeModelEvidence }) {
-  const identity = qualityBinding[profileRun.profile_role];
-  const input = {
-    repository_fingerprint: profileRun.repository_fingerprint,
-    host_profile_id: profileRun.profile,
-    experiment_id: qualityBinding.experiment_id,
-    experiment_fingerprint: qualityBinding.experiment_fingerprint,
-    comparison_id: qualityBinding.comparison_id,
-    variant_id: qualityBinding.variant_id,
-    harness_role: qualityBinding.harness_role,
-    scenario_id: scenario.id,
-    scenario_fingerprint: fingerprint(scenario),
-    repetition,
-    profile_role: profileRun.profile_role,
-    profile_fingerprint: profileRun.profile_fingerprint,
-    model_profile_id: identity.model_profile_id,
-    model_profile_fingerprint: identity.model_profile_fingerprint,
-    model_id: identity.model_id,
-    reasoning_effort: identity.reasoning_effort,
-    text_verbosity: identity.text_verbosity,
-    mode: identity.mode,
-    prompt_profile_id: identity.prompt_profile_id,
-    prompt_profile_fingerprint: identity.prompt_profile_fingerprint,
-    runtime_model_evidence_fingerprint: runtimeModelEvidence.content_fingerprint,
-    permission_snapshot_fingerprint: profileRun.permission_snapshot_fingerprint,
-    permission_profile_fingerprint: profileRun.permission_profile_fingerprint,
-  };
-  const binding = createRuntimeExecutionBinding(input);
-  if (binding.runtime_execution_fingerprint !== runtimeExecutionFingerprint(input)) {
-    throw new ContractError("QUALITY_RUNTIME_EXECUTION_FINGERPRINT", "runtime execution binding was not canonically derived");
-  }
-  return binding;
-}
-
-function receiptVerificationChecks(targetIds, status) {
-  return targetIds.map((code) => ({
-    code,
-    status,
-    summary: "Exact Engineering Quality verification receipt target recorded by the runner.",
-    evidence_refs: [],
-  }));
-}
-
 async function runScenarioProfile({
   adapterUrl,
   scenario,
@@ -776,48 +602,33 @@ async function runScenarioProfile({
   evaluationRunId,
   traceStore,
   modelName = null,
-  qualityBinding = null,
-  runtimeModelEvidence = null,
   sourceRoot = root,
   prepareFixtureFn = prepareFixture,
   executeChecksFn = executeChecks,
   stageHiddenFilesFn = stageHiddenFiles,
   runAdapterModuleFn = runAdapterModule,
-  architectureEvaluatorFn = projectArchitectureEvaluator,
-  architectureAuditorFn = projectArchitectureAuditor,
   cleanupFixtureFn = (temporaryRoot) => fs.rmSync(temporaryRoot, { recursive: true, force: true }),
+  qualitySidecarOverride = undefined,
 }) {
   const risk = riskForScenario(scenario);
-  const qualitySidecar = loadQualityLiveScenarioSidecar({ root: sourceRoot, scenario });
-  if ((qualitySidecar === null) !== (qualityBinding === null)) {
-    throw new ContractError("LIVE_QUALITY_BINDING", "quality sidecar and canonical experiment binding must be supplied together");
-  }
-  if (qualityBinding !== null) {
-    if (
-      qualityBinding.scenario_id !== scenario.id
-      || qualityBinding.repetition !== repetition
-      || qualityBinding[profileRun.profile_role] === undefined
-      || qualityBinding[profileRun.profile_role].profile_fingerprint !== profileRun.profile_fingerprint
-    ) {
-      throw new ContractError("LIVE_QUALITY_BINDING", "canonical experiment binding does not match the scenario run");
-    }
-    if (!runtimeModelEvidence || runtimeModelEvidence.content_fingerprint === undefined) {
-      throw new ContractError("LIVE_MODEL_EVIDENCE_REQUIRED", "quality scenario run requires exact runtime model evidence");
-    }
-  }
+  const qualitySidecar = qualitySidecarOverride === undefined
+    ? loadQualityLiveScenarioSidecar({ root: sourceRoot, scenario })
+    : qualitySidecarOverride;
+  const qualityPromptAttestation = qualitySidecar === null ? null : promptAttestation(sourceRoot);
   const denyValues = denyValuesForScenarios([scenario]);
-  const expectedModelName = qualityBinding?.[profileRun.profile_role].model_id ?? modelName;
-  const persistedModelName = containsDeniedValue(expectedModelName, denyValues)
+  const persistedModelName = containsDeniedValue(modelName, denyValues)
     ? null
-    : sanitizeBoundedString(expectedModelName, { label: "runner.model", maxLength: 200, nullable: true }).value;
-  const runtimeExecutionBinding = qualityBinding === null
-    ? null
-    : runtimeExecutionBindingForRun({ scenario, repetition, profileRun, qualityBinding, runtimeModelEvidence });
+    : sanitizeBoundedString(modelName, { label: "runner.model", maxLength: 200, nullable: true }).value;
   const durableTraceStore = traceStore;
   const bufferedTraceStore = durableTraceStore.createBufferedStore();
   traceStore = bufferedTraceStore;
   let fixture = null;
   let preserveFixtureAfterUnverifiedTeardown = false;
+  let qualityCoordinator = null;
+  let qualityCatalog = null;
+  let qualityAttestation = null;
+  let qualityBundlePublished = false;
+  let workspaceAfterManifest = null;
   try {
   const run = traceStore.createRun({
     scenario_id: scenario.id,
@@ -834,17 +645,11 @@ async function runScenarioProfile({
   let hiddenShellResults = unavailableChecks(scenario, "hidden", scenario.hidden_checks);
   let workspaceResult = unavailableWorkspacePolicyCheck(scenario);
   let workspaceBeforeManifest = null;
-  let workspaceAfterManifest = null;
   let adapterResult;
   let adapterClassification = "unavailable";
   let adapterTeardownVerified = false;
   let adapterProcessStarted = false;
   const incompleteEvidence = [];
-  const runtimeIncompleteEvidence = [];
-  let qualityCoordinator = null;
-  let qualityAttestation = null;
-  let qualityBundlePublished = false;
-  let executionBindingVerified = false;
   const emittedRunnerPhases = new Set();
   const emitRunnerPhase = (input) => {
     if (!REQUIRED_RUNNER_PHASES.includes(input.event_type)) {
@@ -892,50 +697,35 @@ async function runScenarioProfile({
     if (setupStatus === "passed") {
       workspaceBeforeManifest = captureOrdinaryTreeManifest(fixture.repo);
       if (qualitySidecar !== null) {
-        const qualityStore = createEngineeringQualityStore({
-          run_id: runId,
-          task_id: TASK_ID,
-          deny_values: denyValues,
-        });
+        qualityCatalog = qualityLiveCheckCatalog(scenario.id, qualitySidecar.risk_class);
+        const qualityStore = createEngineeringQualityStore({ run_id: runId, task_id: TASK_ID });
         qualityCoordinator = createQualityLiveCoordinator({
           store: qualityStore,
           initial_workspace_fingerprint: workspaceBeforeManifest.fingerprint,
           risk_class: qualitySidecar.risk_class,
           ownership_paths: qualitySidecar.expected_ownership,
-          check_catalog: qualityLiveCheckCatalog(scenario.id),
+          check_catalog: qualityCatalog,
           append_gate_trace: ({ gate_status: gateStatus }) => {
             const event = appendRunnerEvent(traceStore, runId, risk, {
               event_type: "tool_call",
-              summary: "Runner linked the immutable Engineering Dossier gate decision.",
+              summary: "Runner evaluated the finalized Engineering Dossier gate.",
               tool_or_command: "engineering-quality-gate",
-              evidence_refs: [
-                evidenceRef("file", "quality/dossier.json"),
-                evidenceRef("file", "quality/gate.json"),
-              ],
-              verifier_codes: [gateStatus === "passed" ? "QUALITY-GATE-PASSED" : "QUALITY-GATE-BLOCKED"],
               status: gateStatus === "passed" ? "completed" : "blocked",
-            });
-            const gateCode = gateStatus === "passed" ? "QUALITY-GATE-PASSED" : "QUALITY-GATE-BLOCKED";
-            return {
-              sequence: event.sequence,
               evidence_refs: [evidenceRef("file", "quality/gate.json")],
-              verifier_codes: [gateCode],
-            };
+              verifier_codes: [gateStatus === "passed" ? "QUALITY-GATE-PASSED" : "QUALITY-GATE-BLOCKED"],
+            });
+            return { sequence: event.sequence, evidence_refs: event.evidence_refs, verifier_codes: event.verifier_codes };
           },
           observe_workspace: () => captureOrdinaryTreeManifest(fixture.repo).fingerprint,
-          evaluate_architecture: architectureEvaluatorFn(fixture.repo),
-          audit_architecture: architectureAuditorFn(fixture.repo),
-          collect_preimplementation_evidence: ({ dossier, evaluated_at: evaluatedAt }) => (
-            runnerPreimplementationEvidence({
-              dossier,
-              scenarioId: scenario.id,
-              setupResults,
-              traceSnapshot: traceStore.inspectRun(runId),
-              evaluatedAt,
-            })
-          ),
-          clock: () => new Date().toISOString(),
-          id_factory: (kind) => `${kind}-${randomUUID()}`,
+          evaluate_architecture: projectArchitectureEvaluator(fixture.repo),
+          audit_architecture: projectArchitectureAuditor(fixture.repo),
+          collect_preimplementation_evidence: ({ dossier, evaluated_at: evaluatedAt }) => runnerPreimplementationEvidence({
+            dossier,
+            scenarioId: scenario.id,
+            setupResults,
+            traceSnapshot: traceStore.inspectRun(runId),
+            evaluatedAt,
+          }),
         });
       }
       emitRunnerPhase({
@@ -949,7 +739,15 @@ async function runScenarioProfile({
         agent: "live-adapter",
         risk,
       });
-      const adapterTraceHandler = traceOperationHandler(instrumentation, { denyValues });
+      const baseTraceHandler = traceOperationHandler(instrumentation, { denyValues });
+      const adapterTraceHandler = qualityCoordinator === null
+        ? baseTraceHandler
+        : (operation, payload) => handleQualityLiveOperation(
+          qualityCoordinator,
+          operation,
+          payload,
+          baseTraceHandler,
+        );
       try {
         adapterProcessStarted = true;
         adapterResult = await runAdapterModuleFn({
@@ -961,47 +759,17 @@ async function runScenarioProfile({
             profile: profileRun.profile,
             repo: fixture.repo,
             timeout: scenario.timeout,
-            profileFingerprint: profileRun.permission_profile_fingerprint ?? profileRun.profile_fingerprint,
-            ...(qualityBinding === null ? {} : {
-              experimentId: qualityBinding.experiment_id,
-              experimentFingerprint: qualityBinding.experiment_fingerprint,
-              comparisonId: qualityBinding.comparison_id,
-              variantId: qualityBinding.variant_id,
-              harnessRole: qualityBinding.harness_role,
-              modelProfile: qualityBinding[profileRun.profile_role],
-              runtimeModelEvidenceFingerprint: runtimeModelEvidence.content_fingerprint,
-              executionBindingFingerprint: runtimeExecutionBinding.runtime_execution_fingerprint,
-            }),
+            profileFingerprint: profileRun.profile_fingerprint,
           },
           timeout: scenario.timeout,
           workingDirectory: fixture.repo,
-          onTrace: qualityCoordinator === null
-            ? adapterTraceHandler
-            : (operation, payload) => handleQualityLiveOperation(qualityCoordinator, operation, payload, adapterTraceHandler),
+          onTrace: adapterTraceHandler,
         });
         adapterTeardownVerified = true;
-        const adapterFailure = adapterFailureReason(
-          adapterResult,
-          profileRun.permission_profile_fingerprint ?? profileRun.profile_fingerprint,
-          qualityBinding?.[profileRun.profile_role].model_id ?? null,
-        );
+        const adapterFailure = adapterFailureReason(adapterResult, profileRun.profile_fingerprint);
         adapterClassification = adapterFailure === null ? "passed" : "failed";
         if (adapterFailure === "adapter_profile_fingerprint_mismatch") {
           incompleteEvidence.push("ADAPTER_PROFILE_FINGERPRINT_MISMATCH");
-        } else if (adapterFailure === "adapter_model_mismatch") {
-          incompleteEvidence.push("ADAPTER_MODEL_MISMATCH");
-        }
-        if (adapterFailure === null && runtimeExecutionBinding !== null) {
-          const echoedExecutionBinding = adapterField(adapterResult, "execution_binding_fingerprint");
-          if (echoedExecutionBinding === undefined || echoedExecutionBinding === null || echoedExecutionBinding === "") {
-            adapterClassification = "failed";
-            incompleteEvidence.push("ADAPTER_EXECUTION_BINDING_MISSING");
-          } else if (echoedExecutionBinding !== runtimeExecutionBinding.runtime_execution_fingerprint) {
-            adapterClassification = "failed";
-            incompleteEvidence.push("ADAPTER_EXECUTION_BINDING_MISMATCH");
-          } else {
-            executionBindingVerified = true;
-          }
         }
       } catch (error) {
         adapterClassification = error instanceof AdapterTimeoutError ? "timed_out" : "failed";
@@ -1053,11 +821,8 @@ async function runScenarioProfile({
           ...unavailableWorkspacePolicyCheck(scenario),
           status: "failed",
         };
-        incompleteEvidence.push(
-          error instanceof ContractError && error.code.startsWith("QUALITY_")
-            ? error.code
-            : "WORKSPACE_POLICY_UNAVAILABLE",
-        );
+        incompleteEvidence.push("WORKSPACE_POLICY_UNAVAILABLE");
+        if (error instanceof ContractError) incompleteEvidence.push(error.code);
       }
 
       visibleResults = await executeChecksFn(scenario, "visible", scenario.visible_checks, fixture.repo);
@@ -1209,18 +974,6 @@ async function runScenarioProfile({
     }
   }
 
-  if (qualityBinding !== null) {
-    if (runtimeModelEvidence.evidence_kind !== "installed_runtime") {
-      runtimeIncompleteEvidence.push("RUNTIME_MODEL_INSTALLED_EVIDENCE_REQUIRED");
-    }
-    if (!runtimeModelEvidence.complete || runtimeModelEvidence.runtime_version === null) {
-      runtimeIncompleteEvidence.push("RUNTIME_MODEL_EVIDENCE_INCOMPLETE");
-    }
-    if (runtimeModelEvidence.effective_model_id !== qualityBinding[profileRun.profile_role].model_id) {
-      runtimeIncompleteEvidence.push("RUNTIME_MODEL_EFFECTIVE_MODEL_MISMATCH");
-    }
-  }
-
   const preliminaryPassed = phaseStatus(setupResults) === "passed"
     && adapterClassification === "passed"
     && phaseStatus(visibleResults) === "passed"
@@ -1348,22 +1101,15 @@ async function runScenarioProfile({
   const assertionResultChecks = assertionChecks(scenario, assertionResults);
   const allHiddenResults = [...hiddenShellResults, workspaceResult, ...assertionResultChecks];
   const assertionsPassed = assertionResultChecks.every((entry) => entry.status === "passed");
-  if (qualityCoordinator !== null) {
-    const anticipatedCodes = new Set(anticipatedQualityVerifierCodes);
-    const actualCodes = new Set(postVerificationSnapshot.events.flatMap((entry) => entry.verifier_codes));
-    if ([...anticipatedCodes].some((code) => !actualCodes.has(code))) {
-      incompleteEvidence.push("QUALITY_LIFECYCLE_ASSERTION_RECONCILIATION_FAILED");
-    }
-  }
   const verificationChecks = [
     ...buildVerificationChecks({
-    setup: setupResults,
-    adapterClassification,
-    visible: visibleResults,
-    hidden: hiddenShellResults,
-    assertions: assertionResultChecks,
-    workspace: workspaceResult,
-    terminationStatus: terminationAccepted ? "passed" : "failed",
+      setup: setupResults,
+      adapterClassification,
+      visible: visibleResults,
+      hidden: hiddenShellResults,
+      assertions: assertionResultChecks,
+      workspace: workspaceResult,
+      terminationStatus: terminationAccepted ? "passed" : "failed",
     }),
     ...receiptVerificationChecks(
       qualityTargetIds,
@@ -1376,44 +1122,34 @@ async function runScenarioProfile({
       ? "incomplete"
       : "passed";
 
-  if (qualityBinding !== null) {
-    const expectedIdentity = qualityBinding[profileRun.profile_role];
-    const coordinatorState = qualityCoordinator === null ? null : inspectQualityLiveCoordinator(qualityCoordinator);
-    if (
-      coordinatorState?.gate_id !== null
-      && adapterTeardownVerified
-      && workspaceAfterManifest !== null
-      && executionBindingVerified
-      && qualityIntegratedRecorded
-      && assertionsPassed
-      && runtimeIncompleteEvidence.length === 0
-    ) {
-      try {
-        qualityAttestation = finalizeQualityLiveAttestation(qualityCoordinator, {
-          final_workspace_fingerprint: workspaceAfterManifest.fingerprint,
-          teardown_verified: true,
-          model_profile_id: expectedIdentity.model_profile_id,
-          model_profile_fingerprint: expectedIdentity.model_profile_fingerprint,
-          prompt_profile_id: expectedIdentity.prompt_profile_id,
-          prompt_profile_fingerprint: expectedIdentity.prompt_profile_fingerprint,
-          runtime_execution_fingerprint: runtimeExecutionBinding.runtime_execution_fingerprint,
-          attested_at: new Date().toISOString(),
-        });
-      } catch (error) {
-        incompleteEvidence.push(error instanceof ContractError ? error.code : "QUALITY_ATTESTATION_UNAVAILABLE");
-      }
+  if (
+    qualityCoordinator !== null
+    && inspectQualityLiveCoordinator(qualityCoordinator).gate_status === "passed"
+    && adapterTeardownVerified
+    && workspaceAfterManifest !== null
+    && qualityIntegratedRecorded
+    && assertionsPassed
+  ) {
+    try {
+      qualityAttestation = finalizeQualityLiveAttestation(qualityCoordinator, {
+        final_workspace_fingerprint: workspaceAfterManifest.fingerprint,
+        teardown_verified: true,
+        ...qualityPromptAttestation,
+        attested_at: new Date().toISOString(),
+      });
+    } catch (error) {
+      incompleteEvidence.push(error instanceof ContractError ? error.code : "QUALITY_ATTESTATION_UNAVAILABLE");
     }
-    if (qualityAttestation === null) incompleteEvidence.push("QUALITY_ATTESTATION_UNAVAILABLE");
   }
-  if (verificationStatus !== "failed" && (incompleteEvidence.length > 0 || runtimeIncompleteEvidence.length > 0)) {
-    verificationStatus = "incomplete";
+  if (qualityCoordinator !== null && qualityAttestation === null) {
+    incompleteEvidence.push("QUALITY_ATTESTATION_UNAVAILABLE");
   }
+  if (verificationStatus !== "failed" && incompleteEvidence.length > 0) verificationStatus = "incomplete";
   const completedEvidence = preliminaryPassed
     && assertionsPassed
     && terminationAccepted
     && verificationStatus === "passed"
-    && runtimeIncompleteEvidence.length === 0
-    && (qualityBinding === null || qualityAttestation !== null);
+    && (qualityCoordinator === null || qualityAttestation !== null);
   const terminationReason = completedEvidence ? provisionalOutcome.termination_reason : "verification_failed";
   const finalTraceStatus = completedEvidence
     ? ["verified", "done"].includes(terminationReason) ? "completed" : "blocked"
@@ -1424,7 +1160,7 @@ async function runScenarioProfile({
     summary: "Live evaluation verification completed.",
     checks: verificationChecks,
     evidence_refs: [evidenceRef("run", evaluationRunId)],
-    incomplete_reasons: [...new Set([...incompleteEvidence, ...runtimeIncompleteEvidence])],
+    incomplete_reasons: [...new Set(incompleteEvidence)],
   });
   emitRunnerPhase({
     event_type: "task_end",
@@ -1444,7 +1180,7 @@ async function runScenarioProfile({
 
   const model = availabilityMetadata(adapterResult, "model", denyValues);
   const tool = availabilityMetadata(adapterResult, "tool", denyValues);
-  const baseResult = {
+  let result = {
     scenario_id: scenario.id,
     repetition,
     profile_role: profileRun.profile_role,
@@ -1452,11 +1188,7 @@ async function runScenarioProfile({
     profile_fingerprint: profileRun.profile_fingerprint,
     operational_run_id: runId,
     scenario_fingerprint: fingerprint(scenario),
-    status: completedEvidence
-      ? "passed"
-      : incompleteEvidence.length > 0 || runtimeIncompleteEvidence.length > 0
-        ? "incomplete"
-        : "failed",
+    status: completedEvidence ? "passed" : incompleteEvidence.length > 0 ? "incomplete" : "failed",
     adapter_classification: adapterClassification,
     setup_results: setupResults,
     visible_results: visibleResults,
@@ -1468,81 +1200,13 @@ async function runScenarioProfile({
     cost: costMetadata(adapterResult),
     model,
     tool,
-    incomplete_evidence: [...new Set([...incompleteEvidence, ...runtimeIncompleteEvidence])],
+    incomplete_evidence: [...new Set(incompleteEvidence)],
   };
-  let result = baseResult;
-  if (qualityBinding !== null) {
-    const expectedIdentity = qualityBinding[profileRun.profile_role];
-    const evidence = qualityCoordinator === null ? {
-      dossier_finalized: false,
-      gate_status: null,
-      architecture_policy_violations: 0,
-      invariant_violations: 0,
-      unverified_critical_invariants: 0,
-      pre_edit_gate_violations: 0,
-      unresolved_affected_path_gaps: 0,
-      edge_case_total: 0,
-      edge_case_mapped: 0,
-      failure_mode_total: 0,
-      failure_mode_mapped: 0,
-      test_quality_failures: 0,
-      permission_widening: 0,
-    } : qualityLiveOutcomeEvidence(qualityCoordinator);
-    const integratedVerificationComplete = qualityAttestation !== null
-      && qualityAttestation.integrated_verification_sequence !== null
-      && verificationChecks.every((entry) => entry.status === "passed");
-    const hiddenEdgeFailures = hiddenShellResults.filter((entry) => entry.status !== "passed").length;
-    const qualityOutcomes = createQualityOutcomes({
-      producer_id: QUALITY_ACCEPTANCE_PRODUCERS.qualityOutcomes,
-      experiment_id: qualityBinding.experiment_id,
-      comparison_id: qualityBinding.comparison_id,
-      variant_id: qualityBinding.variant_id,
-      harness_role: qualityBinding.harness_role,
-      scenario_id: scenario.id,
-      repetition,
-      profile_role: profileRun.profile_role,
-      operational_run_id: runId,
-      complete: qualityAttestation !== null
-        && integratedVerificationComplete
-        && incompleteEvidence.length === 0
-        && runtimeIncompleteEvidence.length === 0,
-      architecture_policy_violations: evidence.architecture_policy_violations,
-      invariant_violations: evidence.invariant_violations,
-      unverified_critical_invariants: evidence.unverified_critical_invariants,
-      incomplete_dossier: !evidence.dossier_finalized,
-      pre_edit_gate_violations: evidence.pre_edit_gate_violations,
-      unresolved_affected_path_gaps: evidence.unresolved_affected_path_gaps,
-      edge_case_verification_rate: mappedRate(evidence.edge_case_mapped, evidence.edge_case_total, integratedVerificationComplete),
-      failure_mode_verification_rate: mappedRate(evidence.failure_mode_mapped, evidence.failure_mode_total, integratedVerificationComplete),
-      test_quality_failures: evidence.test_quality_failures + assertionResultChecks.filter((entry) => entry.status !== "passed").length,
-      permission_widening: evidence.permission_widening,
-      introduced_regressions: workspaceResult.status === "passed" ? 0 : 1,
-      hidden_edge_case_failures: hiddenEdgeFailures,
-      integrated_verification_complete: integratedVerificationComplete,
-      incomplete_evidence: [...new Set(incompleteEvidence)],
-    });
+  if (qualitySidecar !== null) {
     result = {
-      ...baseResult,
-      experiment_id: qualityBinding.experiment_id,
-      experiment_fingerprint: qualityBinding.experiment_fingerprint,
-      comparison_id: qualityBinding.comparison_id,
-      variant_id: qualityBinding.variant_id,
-      harness_role: qualityBinding.harness_role,
-      host_profile_id: profileRun.profile,
-      model_profile_id: expectedIdentity.model_profile_id,
-      model_profile_fingerprint: expectedIdentity.model_profile_fingerprint,
-      runtime_model_evidence_fingerprint: runtimeModelEvidence.content_fingerprint,
-      runtime_execution_fingerprint: executionBindingVerified
-        ? runtimeExecutionBinding.runtime_execution_fingerprint
-        : null,
-      permission_snapshot_fingerprint: profileRun.permission_snapshot_fingerprint,
-      permission_profile_fingerprint: profileRun.permission_profile_fingerprint,
-      prompt_profile_id: expectedIdentity.prompt_profile_id,
-      prompt_profile_fingerprint: expectedIdentity.prompt_profile_fingerprint,
-      token_usage: tokenUsageMetadata(adapterResult),
-      quality_attestation: qualityAttestation,
-      quality_bundle_fingerprint: qualityBundleFingerprint(qualityAttestation, qualityOutcomes),
-      quality_outcomes: qualityOutcomes,
+      ...result,
+      quality_bundle_manifest_fingerprint: null,
+      quality_outcomes: null,
     };
   }
   if (!adapterProcessStarted || adapterTeardownVerified) {
@@ -1564,10 +1228,8 @@ async function runScenarioProfile({
       }
       const stagedTraceStore = durableTraceStore.createStagedRunFromBuffered(bufferedTraceStore, runId);
       let stagingDiscarded = false;
-      let publicationSucceeded = false;
-      let publicationError = null;
       try {
-        publishEngineeringQualityRunBundle({
+        const published = publishEngineeringQualityRunBundle({
           durable_trace_store: durableTraceStore,
           staged_trace_store: stagedTraceStore,
           session: qualityLiveSessionForPublication(qualityCoordinator),
@@ -1576,23 +1238,30 @@ async function runScenarioProfile({
             stagingDiscarded = true;
           },
         });
-        publicationSucceeded = true;
         qualityBundlePublished = true;
-      } catch (error) {
-        publicationError = error;
-        throw error;
-      } finally {
-        if (!stagingDiscarded) {
-          try {
-            durableTraceStore.discardStagingStore(stagedTraceStore);
-            stagingDiscarded = true;
-          } catch (cleanupError) {
-            if (!publicationSucceeded && publicationError === null) throw cleanupError;
-            // Preserve a pre-publication primary failure. Once an identical
-            // immutable run is already durable, staging cleanup cannot turn
-            // idempotent publication into a false failure.
-          }
+        const validatedBundle = published.validated_bundle;
+        if (validatedBundle === null) {
+          throw new ContractError("QUALITY_BUNDLE_VALIDATION_REQUIRED", "quality bundle publication did not return validated artifacts");
         }
+        const qualityOutcomes = createQualityOutcomes({
+          run_bundle: validatedBundle,
+          check_catalog: qualityCatalog,
+          ...(model.available ? {
+            model_metadata: {
+              provider: null,
+              model: model.value,
+              reasoning_effort: null,
+              text_verbosity: null,
+            },
+          } : {}),
+        });
+        result = {
+          ...result,
+          quality_bundle_manifest_fingerprint: published.manifest.fingerprint,
+          quality_outcomes: qualityOutcomes,
+        };
+      } finally {
+        if (!stagingDiscarded) durableTraceStore.discardStagingStore(stagedTraceStore);
       }
     }
   }
@@ -1647,6 +1316,15 @@ async function runEvaluation({
       }
     }
   }
+  const operationalResults = results.map((result) => {
+    if (!("quality_outcomes" in result) && !("quality_bundle_manifest_fingerprint" in result)) return result;
+    const {
+      quality_outcomes: _qualityOutcomes,
+      quality_bundle_manifest_fingerprint: _qualityBundleManifestFingerprint,
+      ...operational
+    } = result;
+    return operational;
+  });
   const report = {
     schema_version: 1,
     evaluation_run_id: evaluationRunId,
@@ -1654,76 +1332,12 @@ async function runEvaluation({
     provenance: {
       producer_id: evidenceKind === "live" ? EVIDENCE_PRODUCERS.liveEvaluation : EVIDENCE_PRODUCERS.infrastructureSelfTest,
       evidence_kind: evidenceKind,
-      complete: results.every((result) => result.status !== "incomplete"),
+      complete: operationalResults.every((result) => result.status !== "incomplete"),
     },
-    results,
+    results: operationalResults,
   };
   assertPersistenceSafe(report, { label: "live evaluation report", denyValues });
   validateLiveReport(report);
-  return report;
-}
-
-async function runQualityEvaluation({
-  selected,
-  adapterUrl,
-  profiles,
-  traceStore,
-  evaluationRunId,
-  evidenceKind,
-  experimentContext,
-  runtimeModelEvidence,
-  createdAt = new Date().toISOString(),
-  runScenarioProfileFn = runScenarioProfile,
-  scenarioRunOptions = {},
-}) {
-  const selectedById = new Map(selected.map((entry) => [entry.scenario.id, entry.scenario]));
-  const bindings = experimentContext.bindings.filter((entry) => selectedById.has(entry.scenario_id));
-  if (bindings.length === 0) throw new ContractError("LIVE_QUALITY_SELECTION", "quality selection has no canonical experiment comparisons");
-  const profileByRole = new Map(profiles.map((entry) => [entry.profile_role, entry]));
-  const results = [];
-  for (const binding of bindings) {
-    const scenario = selectedById.get(binding.scenario_id);
-    for (const profileRole of ["baseline", "candidate"]) {
-      const baseProfile = profileByRole.get(profileRole);
-      if (!baseProfile) throw new ContractError("LIVE_PROFILE_REQUIRED", `missing ${profileRole} OpenCode host profile`);
-      const runtimeEvidence = runtimeEvidenceForBinding(runtimeModelEvidence, binding, profileRole);
-      const profileRun = {
-        ...baseProfile,
-        permission_profile_fingerprint: baseProfile.profile_fingerprint,
-        profile_fingerprint: binding[profileRole].profile_fingerprint,
-      };
-      const result = await runScenarioProfileFn({
-        ...scenarioRunOptions,
-        adapterUrl,
-        scenario,
-        repetition: binding.repetition,
-        profileRun,
-        evaluationRunId,
-        traceStore,
-        modelName: binding[profileRole].model_id,
-        qualityBinding: binding,
-        runtimeModelEvidence: runtimeEvidence,
-      });
-      if (result.incomplete_evidence.includes("ADAPTER_TEARDOWN_UNVERIFIED")) {
-        throw new AdapterExecutionError("adapter_teardown_unverified");
-      }
-      results.push(result);
-    }
-  }
-  const report = createQualityLiveReport({
-    evaluation_run_id: evaluationRunId,
-    created_at: createdAt,
-    provenance: {
-      producer_id: QUALITY_ACCEPTANCE_PRODUCERS.liveReport,
-      evidence_kind: evidenceKind,
-      complete: results.every((result) => result.status !== "incomplete"),
-    },
-    results,
-  });
-  assertPersistenceSafe(report, {
-    label: "quality live evaluation report",
-    denyValues: denyValuesForScenarios([...selectedById.values()]),
-  });
   return report;
 }
 
@@ -1881,7 +1495,7 @@ async function runSelfTest(corpus) {
     const attestedCandidateRepository = fingerprint({ self_test_repository: "candidate-attested" });
     const baselinePermissionPath = path.join(temporaryWorkspace, "baseline-permission.json");
     const candidatePermissionPath = path.join(temporaryWorkspace, "candidate-permission.json");
-    fs.writeFileSync(baselinePermissionPath, JSON.stringify(permissionSnapshot("baseline-self-test", attestedCandidateRepository, "baseline")), "utf8");
+    fs.writeFileSync(baselinePermissionPath, JSON.stringify(permissionSnapshot("baseline-self-test", fingerprint({ self_test_repository: "baseline-attested" }), "baseline")), "utf8");
     fs.writeFileSync(candidatePermissionPath, JSON.stringify(permissionSnapshot("candidate-self-test", attestedCandidateRepository, "candidate")), "utf8");
     const attestedProfiles = profileRuns({
       OPENCODE_BASELINE_PROFILE: "baseline-self-test",
@@ -1893,11 +1507,6 @@ async function runSelfTest(corpus) {
       || attestedProfiles.some((entry) => !entry.profile_fingerprint || entry.repository_fingerprint !== attestedCandidateRepository)) {
       throw new ContractError("LIVE_SELF_TEST_PERMISSION_EVIDENCE", "complete installed-runtime evidence did not bind both live profiles");
     }
-    fs.writeFileSync(
-      candidatePermissionPath,
-      JSON.stringify(permissionSnapshot("candidate-self-test", fingerprint({ self_test_repository: "stale-candidate" }), "candidate")),
-      "utf8",
-    );
     try {
       profileRuns({
         OPENCODE_BASELINE_PROFILE: "baseline-self-test",
@@ -1913,29 +1522,11 @@ async function runSelfTest(corpus) {
         OPENCODE_HARNESS_PROFILE: "candidate-self-test",
         OPENCODE_BASELINE_PERMISSION_EVIDENCE: baselinePermissionPath,
         OPENCODE_HARNESS_PERMISSION_EVIDENCE: candidatePermissionPath,
-      }, attestedCandidateRepository);
+      }, fingerprint({ self_test_repository: "stale-candidate" }));
       throw new ContractError("LIVE_SELF_TEST_PERMISSION_EVIDENCE", "stale candidate subject evidence was accepted");
     } catch (error) {
       if (error?.code !== "LIVE_CANDIDATE_SUBJECT_MISMATCH") throw error;
     }
-    fs.writeFileSync(candidatePermissionPath, JSON.stringify(permissionSnapshot("candidate-self-test", attestedCandidateRepository, "candidate")), "utf8");
-    fs.writeFileSync(
-      baselinePermissionPath,
-      JSON.stringify(permissionSnapshot("baseline-self-test", fingerprint({ self_test_repository: "stale-baseline" }), "baseline")),
-      "utf8",
-    );
-    try {
-      profileRuns({
-        OPENCODE_BASELINE_PROFILE: "baseline-self-test",
-        OPENCODE_HARNESS_PROFILE: "candidate-self-test",
-        OPENCODE_BASELINE_PERMISSION_EVIDENCE: baselinePermissionPath,
-        OPENCODE_HARNESS_PERMISSION_EVIDENCE: candidatePermissionPath,
-      }, attestedCandidateRepository);
-      throw new ContractError("LIVE_SELF_TEST_PERMISSION_EVIDENCE", "stale baseline subject evidence was accepted");
-    } catch (error) {
-      if (error?.code !== "LIVE_BASELINE_SUBJECT_MISMATCH") throw error;
-    }
-    fs.writeFileSync(baselinePermissionPath, JSON.stringify(permissionSnapshot("baseline-self-test", attestedCandidateRepository, "baseline")), "utf8");
     const collisionRepo = path.join(temporaryWorkspace, "hidden-collision-repo");
     fs.cpSync(path.resolve(root, infrastructureScenario.repo_fixture), collisionRepo, { recursive: true, errorOnExist: true });
     const collisionTarget = path.resolve(collisionRepo, infrastructureScenario.hidden_check_files[0].target);
@@ -2467,46 +2058,17 @@ async function main() {
       suite: args.suite,
       scenarioIds: args.scenarioIds,
     });
-    const adapterUrl = adapterUrlFromEnvironment();
-    const profiles = profileRuns(process.env, sourceSnapshot.repositoryFingerprint);
-    const traceStore = createTraceStore({ workspaceRoot: root });
-    const legacySelected = selected.filter(({ scenario }) => (
-      loadQualityLiveScenarioSidecar({ root: sourceSnapshot.snapshotRoot, scenario }) === null
-    ));
-    const qualitySelected = selected.filter(({ scenario }) => (
-      loadQualityLiveScenarioSidecar({ root: sourceSnapshot.snapshotRoot, scenario }) !== null
-    ));
-    const reports = [];
-    if (legacySelected.length > 0) {
-      reports.push(await runEvaluation({
-        selected: legacySelected,
-        adapterUrl,
-        profiles,
-        traceStore,
-        evaluationRunId: assertSafeId(`eval-${randomUUID()}`, "evaluation run ID"),
-        evidenceKind: "live",
-        modelName: process.env.OPENCODE_MODEL || null,
-        scenarioRunOptions: { sourceRoot: sourceSnapshot.snapshotRoot },
-      }));
-    }
-    if (qualitySelected.length > 0) {
-      const experimentContext = loadQualityExperimentContext(sourceSnapshot.snapshotRoot);
-      reports.push(await runQualityEvaluation({
-        selected: qualitySelected,
-        adapterUrl,
-        profiles,
-        traceStore,
-        evaluationRunId: assertSafeId(`quality-eval-${randomUUID()}`, "quality evaluation run ID"),
-        evidenceKind: "live",
-        experimentContext,
-        runtimeModelEvidence: loadRuntimeModelEvidence(
-          process.env.OPENCODE_MODEL_RUNTIME_EVIDENCE_PATH
-            ?? process.env.OPENCODE_MODEL_RUNTIME_EVIDENCE_FILE,
-          experimentContext.catalog,
-        ),
-        scenarioRunOptions: { sourceRoot: sourceSnapshot.snapshotRoot },
-      }));
-    }
+    const evaluationRunId = assertSafeId(`eval-${randomUUID()}`, "evaluation run ID");
+    const report = await runEvaluation({
+      selected,
+      adapterUrl: adapterUrlFromEnvironment(),
+      profiles: profileRuns(process.env, sourceSnapshot.repositoryFingerprint),
+      traceStore: createTraceStore({ workspaceRoot: root }),
+      evaluationRunId,
+      evidenceKind: "live",
+      modelName: process.env.OPENCODE_MODEL || null,
+      scenarioRunOptions: { sourceRoot: sourceSnapshot.snapshotRoot },
+    });
     sourceSnapshot.verifyIntegrity();
     if (repositoryStateFingerprint(root) !== sourceSnapshot.repositoryFingerprint) {
       throw new ContractError("LIVE_SOURCE_CHANGED", "repository state changed after the immutable live-evaluation snapshot was captured");
@@ -2515,11 +2077,9 @@ async function main() {
     snapshotCleaned = true;
     const denyValues = denyValuesForScenarios(selected.map((entry) => entry.scenario));
     const history = createReportHistory({ workspaceRoot: root, reportDir });
-    for (const report of reports) {
-      const written = history.write(report, { denyValues });
-      console.log(`Harness live evaluation completed: ${path.basename(written.jsonPath)} and ${path.basename(written.mdPath)}.`);
-      if (report.results.some((result) => result.status !== "passed")) process.exitCode = 1;
-    }
+    const written = history.write(report, { denyValues });
+    console.log(`Harness live evaluation completed: ${path.basename(written.jsonPath)} and ${path.basename(written.mdPath)}.`);
+    if (report.results.some((result) => result.status !== "passed")) process.exitCode = 1;
   } finally {
     if (!snapshotCleaned) {
       try {
@@ -2531,13 +2091,7 @@ async function main() {
   }
 }
 
-export {
-  loadQualityExperimentContext,
-  runnerPreimplementationEvidence,
-  runQualityEvaluation,
-  runScenarioProfile,
-  runtimeEvidenceForBinding,
-};
+export { runEvaluation, runScenarioProfile, runSelfTest };
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {

@@ -475,11 +475,8 @@ function recordLiveEdit(current, workspaceFingerprint, summary = "bounded-live-e
     const attestation = finalizeQualityLiveAttestation(current.coordinator, {
       final_workspace_fingerprint: FP_B,
       teardown_verified: true,
-      model_profile_id: "candidate-sol-general",
-      model_profile_fingerprint: FP_C,
       prompt_profile_id: "baseline-engineering-prompts-v1",
       prompt_profile_fingerprint: FP_D,
-      runtime_execution_fingerprint: FP_E,
       attested_at: "2026-07-13T00:03:00Z",
     });
     assert.equal(attestation.first_implementation_sequence, edit.sequence);
@@ -556,11 +553,8 @@ function recordLiveEdit(current, workspaceFingerprint, summary = "bounded-live-e
     const attestation = finalizeQualityLiveAttestation(current.coordinator, {
       final_workspace_fingerprint: FP_B,
       teardown_verified: true,
-      model_profile_id: "candidate-sol-general",
-      model_profile_fingerprint: FP_C,
       prompt_profile_id: "baseline-engineering-prompts-v1",
       prompt_profile_fingerprint: FP_D,
-      runtime_execution_fingerprint: FP_E,
       attested_at: "2026-07-13T01:03:00Z",
     });
     assert.equal(attestation.post_architecture_evaluation_fingerprint, postEvaluation.fingerprint);
@@ -714,11 +708,8 @@ for (const [name, mutateInput, code] of [
     const attestation = finalizeQualityLiveAttestation(current.coordinator, {
       final_workspace_fingerprint: FP_C,
       teardown_verified: true,
-      model_profile_id: "candidate-sol-general",
-      model_profile_fingerprint: FP_C,
       prompt_profile_id: "baseline-engineering-prompts-v1",
       prompt_profile_fingerprint: FP_D,
-      runtime_execution_fingerprint: FP_E,
       attested_at: "2026-07-13T03:09:00Z",
     });
     assert.equal(attestation.integrated_verification_sequence, finalVerification.sequence);
@@ -762,11 +753,8 @@ for (const [name, mutateInput, code] of [
     const attestation = finalizeQualityLiveAttestation(current.coordinator, {
       final_workspace_fingerprint: FP_B,
       teardown_verified: true,
-      model_profile_id: "candidate-sol-general",
-      model_profile_fingerprint: FP_C,
       prompt_profile_id: "baseline-engineering-prompts-v1",
       prompt_profile_fingerprint: FP_D,
-      runtime_execution_fingerprint: FP_E,
       attested_at: "2026-07-13T03:10:00Z",
     });
     assert.equal(attestation.first_implementation_sequence, firstEdit.sequence);
@@ -811,11 +799,8 @@ for (const [name, mutateInput, code] of [
     const attestation = finalizeQualityLiveAttestation(current.coordinator, {
       final_workspace_fingerprint: FP_B,
       teardown_verified: true,
-      model_profile_id: "candidate-sol-general",
-      model_profile_fingerprint: FP_C,
       prompt_profile_id: "baseline-engineering-prompts-v1",
       prompt_profile_fingerprint: FP_D,
-      runtime_execution_fingerprint: FP_E,
       attested_at: "2026-07-13T03:10:00Z",
     });
     assert.equal(attestation.first_implementation_sequence, edit.sequence);

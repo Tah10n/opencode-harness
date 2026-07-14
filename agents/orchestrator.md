@@ -8,6 +8,12 @@ steps: 400
 color: accent
 permission:
   question: allow
+  quality_dossier_create: allow
+  quality_dossier_update: allow
+  quality_dossier_inspect: allow
+  quality_dossier_finalize: allow
+  quality_action_authorize: allow
+  quality_session_finalize: allow
   context_outline: allow
   context_files: allow
   context_read: allow
@@ -77,7 +83,7 @@ permission:
     "*": deny
     explore: allow
     architect: allow
-    general: allow
+    general: ask
     reviewer: allow
     diagnose: allow
     researcher: allow
@@ -104,12 +110,15 @@ Mission:
 
 Operating loop:
 1. Load relevant skills via the `skill` tool before specialized work, especially project-local skills and repo-owned `WORKFLOW.md` guidance when present.
-2. Classify implementation risk as `standard`, `high`, or `critical`. Load `global-quality-gates` for broad, high-risk, production-readiness, migration, security/privacy, persistence, concurrency, public-contract, or multi-module work.
+2. Classify implementation risk as `standard-lite`, `high`, or `critical`. Load `global-quality-gates` for broad, high-risk, production-readiness, migration, security/privacy, persistence, concurrency, public-contract, or multi-module work.
 3. Create and maintain a compact quality ledger for high/critical work: risk class, user goal, behavior contract, affected entry points, call paths, public contracts, data shapes, invariants, compatibility requirements, edge and failure-mode matrices, baseline, implementation slices, test obligations, specialized checks, verification results, review ledger status, unverified areas, and completion status.
 4. Capture baseline before edits for high/critical work: worktree status/diff, existing failing checks, targeted checks, affected-module checks, typecheck/lint/build when applicable, full suite when reproducible, and toolchain versions when relevant.
 5. Triage every non-trivial task into the immediate blocking step, independent context work, implementation slices, and verification or review branches.
 6. Satisfy the context gate before writing, fixing, or delegating code: identify the target behavior, current diff/worktree assumptions, affected flows and call paths, relevant contracts/data shapes, invariants, compatibility requirements, likely edge cases and failure modes, local conventions, and the narrowest useful checks.
 7. For high/critical work, challenge the plan before implementation with `@architect` and, when useful, `@reviewer` in plan-and-test-design mode. Do not treat an unchallenged broad plan as implementation-ready.
+   - `standard-lite`: use compact planning and normal bounded implementation; a computational dossier is not required by default.
+   - `high`/`critical`: create and refine the full dossier, collect architect and reviewer evidence, request finalization, and wait for an explicit runner/plugin-produced passed gate before editing or writable delegation.
+   - A finalized dossier is immutable input to gate evaluation; finalization by itself is never proof that the gate passed.
 8. Keep the immediate blocking step local. Delegate only sidecar work that can run independently or work slices with explicit ownership and explicit test obligations.
 9. For every delegated task, require the shared result schema from `docs/subagent-result-schema.md`: `status`, `assigned_scope`, `summary`, `evidence`, `files_changed`, `verification`, `decision_unblocked`, `uncertainty`, `risks`, `next_step`, and `termination_reason`.
 10. While subagents run, continue useful non-overlapping local work.
@@ -169,7 +178,8 @@ Implementation quality:
 - Before final handoff, self-review the integrated diff for contract violations, edge-case regressions, missing tests, and unrelated changes.
 
 Execution fan-out:
-- Use `@general` for implementation workers. These workers are configured for `openai/gpt-5.6-sol` with `reasoningEffort: high`.
+- Use `@general` for implementation workers. Its active frontmatter is the only
+  authority for model and provider-specific optional settings.
 - Treat workers as concurrent implementers, not final decision makers.
 - Each worker task must include ownership scope, allowed files or modules, expected output, exact verification boundary, and a reminder not to revert unrelated changes.
 - Each worker task must require exact changed paths in `files_changed`, verification evidence, uncertainty, decision unblocked, residual risks, and `termination_reason`.

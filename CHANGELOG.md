@@ -21,21 +21,33 @@ the feedback-plane ESM subpaths documented for the `0.3.0` target.
   migration, lifecycle, concurrency, retry/idempotency, parser, cache/version,
   dependency-failure, and architecture/invariant regressions.
 - Added a versioned non-scalar quality acceptance contract with per-result
-  dossier, model, prompt, runtime, and quality-attestation identities. Missing
+  dossier, prompt, verification, and quality-attestation identities. Missing
   or mismatched evidence is inconclusive; rejected candidates never mutate the
   active harness.
 - Activated GPT-5.6 Sol for nine decision/execution roles and GPT-5.6 Terra for
-  exploration and research, preserving reasoning effort and omitting
-  unsupported `temperature`. GPT-5.5 remains a fingerprinted optional
-  comparison baseline, Luna remains evaluation-only, and the planned
-  96-comparison matrix no longer gates activation or deterministic completion.
+  exploration and research. Active `agents/*.md` frontmatter is the sole model
+  authority; model metadata is visible but never a dossier, verification,
+  acceptance, or release gate.
 - Restored Milestone 1 permission-surface comparison in quality acceptance v2:
   reports and decisions bind exact permission snapshot/profile fingerprints,
   key-set drift is inconclusive, and effective widening is rejected.
 - Added deterministic Milestone 2 schema, dossier, architecture, impact,
-  model-profile, prompt-inventory, live-coordinator, quality-corpus,
-  acceptance, and definition-of-done checks to `npm run verify`; runtime and
-  actual model A/B evidence remain separate.
+  prompt-inventory, live-coordinator, quality-corpus, acceptance, canonical
+  verification-target, normal-session bridge, committed-range whitespace, and
+  definition-of-done checks to `npm run verify`; installed runtime and general
+  live behavior remain separate evidence classes.
+- Connected the dossier to ordinary OpenCode sessions through the installed
+  pre-tool API: native edit/write/apply-patch and writable delegation consume
+  runner-owned capabilities, child roles use minimal parent-bound links,
+  repeated dirty-file edits are content-hashed, configured architecture policy
+  is evaluated at finalization, and failed tools reconcile durable pending state.
+- Removed the model-profile catalog, 96-cell model-comparison manifests,
+  model-specific runtime evidence, paired-model promotion scripts, and their
+  release gates. General baseline/candidate live regression evaluation remains
+  model-neutral; agent frontmatter is the only active model source.
+- Replaced worktree-only whitespace checking with a sealed verifier for local
+  unstaged/staged state, pull-request merge-base ranges, push ranges, initial
+  pushes, and clean-checkout current-commit fallback.
 - Corrected the harness-engineering attribution to Birgitta Böckeler's article
   published on Martin Fowler's site and documented the non-autonomous
   propose/evaluate/accept boundary influenced by Lilian Weng's July 4, 2026
@@ -69,9 +81,9 @@ the feedback-plane ESM subpaths documented for the `0.3.0` target.
   specialized checks, final adversarial audit, and strict completion status.
 - Added a strict read-only `review-orchestrator` primary and routed review
   commands through it.
-- Added optional live A/B evaluation manifests, validator, docs, npm scripts,
-  isolated profile repo copies, adapter timeouts, hidden file staging, and
-  sanitized reports outside the default deterministic verification gate.
+- Added optional general live-evaluation manifests, validator, docs, npm
+  scripts, isolated profile repo copies, adapter timeouts, hidden file staging,
+  and sanitized reports outside the default deterministic verification gate.
 - Added trace contract, budget/termination policy, shared subagent result
   schema, static adversarial fixtures, and deterministic scenario coverage for
   those controls.

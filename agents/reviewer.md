@@ -8,6 +8,8 @@ textVerbosity: low
 steps: 120
 permission:
   edit: deny
+  quality_dossier_inspect: allow
+  quality_architecture_evaluate: allow
   context_outline: allow
   context_files: allow
   context_read: allow

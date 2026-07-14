@@ -27,7 +27,7 @@
   files, package metadata, or lockfiles.
 - Optional live-agent scenarios: record representative tasks, hidden checks,
   expected contracts, forbidden regressions, and acceptance criteria when the
-  project uses live A/B evaluation.
+  project uses live regression evaluation.
 
 ## Definition of Done
 

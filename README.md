@@ -18,9 +18,10 @@ This repository contains a reusable OpenCode behavior profile:
   explicit invariant/edge/failure/test mappings;
 - an executable feedback plane: schema-v2 operational traces, immutable live
   reports, paired baseline/candidate assessment, and explicit decisions;
-- active GPT-5.6 Sol/Terra role profiles, a retained fingerprinted GPT-5.5
-  comparison baseline, and evaluation-only Luna, with prompt-inventory and
-  runtime-evidence boundaries;
+- an OpenCode-native quality bridge with bounded dossier tools and runner-owned
+  `tool.execute.before` decisions for native edits and writable delegation;
+- direct, user-editable model configuration in active `agents/*.md`
+  frontmatter;
 - trace, budget/termination, and shared subagent result-schema contracts;
 - a strict read-only primary review orchestrator for diff and release review;
 - recursive-context operating rules;
@@ -31,13 +32,13 @@ This repository contains a reusable OpenCode behavior profile:
   `harness-release-review`;
 - deterministic verification for static structure, contract/config scenarios,
   drift, feedback persistence, live manifests, and runtime parser fixtures;
-- optional installed runtime permission checks and live A/B evaluation.
+- optional installed-runtime hook checks and general live regression evaluation.
 
 Development status: this checkout targets unreleased `0.3.0`. The latest
 tagged release is `v0.2.0`, whose package metadata has no `exports` field and
 therefore does not expose the feedback API subpaths described below.
 
-It is intentionally separate from plugin capabilities:
+Its policy layer is intentionally separate from optional capability packages:
 
 - [`opencode-recursive-context`](https://github.com/Tah10n/opencode-recursive-context) provides safe read-only `context_*` tools.
 - [`opencode-learning-guard`](https://github.com/Tah10n/opencode-learning-guard) provides bounded `oc_learning_*` write tools.
@@ -45,14 +46,45 @@ It is intentionally separate from plugin capabilities:
 
 ## Usage
 
-Copy or adapt the profile files into an OpenCode configuration:
+For the complete executable profile, copy the exact portable source-bundle
+contract below. Directory entries are written without a trailing slash so the
+same list can be checked mechanically against the isolated adoption smoke.
 
-- `AGENTS.md`
-- `opencode.json`
-- `agents/`
-- `commands/`
-- `skills/`
-- `docs/`
+<!-- portable-adoption-bundle:start -->
+```text
+.opencode/plugins/engineering-dossier.mjs
+.gitattributes
+.github
+.gitignore
+AGENTS.md
+CHANGELOG.md
+CODEOWNERS
+CONTRIBUTING.md
+LICENSE
+README.md
+SECURITY.md
+agents
+commands
+docs
+evals
+examples
+fixtures
+lib/feedback
+lib/quality
+opencode.json
+package.json
+quality
+scripts
+skills
+```
+<!-- portable-adoption-bundle:end -->
+
+The plugin is not a standalone file: it imports the `lib/quality/` boundary,
+and the package smoke imports both `opencode-harness/feedback` and
+`opencode-harness/quality`. Do not replace the explicit plugin path with all of
+`.opencode/`, and do not copy `.opencode/node_modules`,
+`.opencode/package.json`, `.opencode/package-lock.json`, runtime state, or
+generated evidence.
 
 Keep personal memory entries, machine-specific plugin paths, local automation,
 and project-specific workflow facts outside this repository.
@@ -63,8 +95,8 @@ readiness guidance lives in [docs/harnessability.md](docs/harnessability.md).
 Trace, budget, and subagent handoff contracts live in
 [docs/trace-contract.md](docs/trace-contract.md),
 [docs/budgets-and-termination.md](docs/budgets-and-termination.md), and
-[docs/subagent-result-schema.md](docs/subagent-result-schema.md). The model
-matrix and evidence protocol live in
+[docs/subagent-result-schema.md](docs/subagent-result-schema.md). Model
+configuration guidance lives in
 [docs/model-profiles.md](docs/model-profiles.md).
 
 ## Adoption
@@ -72,8 +104,10 @@ matrix and evidence protocol live in
 1. Install or configure the capability packages:
    - [`opencode-recursive-context`](https://github.com/Tah10n/opencode-recursive-context)
    - [`opencode-learning-guard`](https://github.com/Tah10n/opencode-learning-guard)
-2. Copy or adapt this profile's `AGENTS.md`, `opencode.json`, `agents/`,
-   `commands/`, `skills/`, and `docs/` into the target OpenCode configuration.
+2. Copy or adapt the exact portable source-bundle contract under [Usage](#usage).
+   Keep `.opencode/plugins/engineering-dossier.mjs` together with its
+   `lib/quality/` and `quality/` contracts; never copy the whole `.opencode/`
+   directory.
 3. Keep machine-local plugin paths, personal memory entries, and project-specific
    workflow facts out of this template.
 4. Run the local verifier:
@@ -86,6 +120,7 @@ matrix and evidence protocol live in
 
    ```powershell
    npm run verify:runtime
+   npm run verify:runtime:quality-hooks
    ```
 
    Or run the underlying OpenCode checks manually:
@@ -169,12 +204,14 @@ npm run verify:quality-contracts
 npm run verify:engineering-dossier
 npm run verify:architecture-policy
 npm run verify:impact-graph
-npm run verify:model-profiles
 npm run verify:prompt-inventory
 npm run verify:quality-live-coordinator
-npm run verify:quality-live-runner
+npm run verify:quality-verification-targets
+npm run verify:normal-session-quality-bridge
+npm run verify:runtime:quality-hooks:fixture
 npm run verify:quality-live-manifests
 npm run verify:quality-acceptance
+npm run verify:whitespace:fixture
 npm run verify:milestone-2-dod-contract
 ```
 
@@ -182,17 +219,18 @@ The DoD contract command validates only the manifest and status policy: it
 consumes no execution receipts and asserts no milestone completion status.
 `npm run verify` is the runner-owned sequential aggregator. It emits bounded
 in-memory receipts for every deterministic DoD check and exits as `verified`
-when those mandatory checks pass. Installed-runtime evidence and live A/B
+when those mandatory checks pass. Installed-runtime evidence and general live
 evidence are optional external inputs. These commands validate contracts, schemas, failure
 cases, corpus structure, and evaluation logic. The prompt inventory covers 11 agent prompts and eight
 skill entrypoints. These checks do not prove an installed model profile or
-actual GPT-5.6 quality.
+actual model behaviour.
 
 Run the installed-profile runtime sensor after copying the profile into a live
 OpenCode configuration:
 
 ```powershell
 npm run verify:runtime
+npm run verify:runtime:quality-hooks
 ```
 
 For local private-name checks, keep the marker list outside the repository
@@ -210,34 +248,49 @@ runtime checks documented in `docs/recursive-context-mode.md` and
 The static evaluation scenarios are documented in
 [docs/evaluation.md](docs/evaluation.md). Compatibility and release guidance
 live in [docs/compatibility.md](docs/compatibility.md) and
-[docs/release.md](docs/release.md). Optional live A/B evaluation is documented
+[docs/release.md](docs/release.md). Optional general live evaluation is documented
 in [docs/live-evaluation.md](docs/live-evaluation.md). Static adversarial
 fixtures live under [fixtures/adversarial/](fixtures/adversarial/).
 
-`npm run verify` is deterministic repository-side assurance. It does not prove
-actual model behaviour, requires no model/network/live adapter, and includes
-the infrastructure tracing self-test without an LLM. Keep these layers
-separate:
+`npm run verify` is deterministic repository-side assurance. It requires no
+model, credentials, network, live adapter, or installed OpenCode runtime.
 
-1. `npm run verify` — deterministic repository, feedback-plane, and portable
-   adoption-bundle contracts, including the model-free Engineering Dossier,
-   gate, impact, model-profile, prompt, quality-corpus, and acceptance checks.
-2. `npm run verify:runtime` — effective installed permission surface; use
-   `-- --all-experiment-models --profile-role baseline|candidate` to capture
-   every distinct planned model-option invocation into the same dedicated
-   runtime-evidence directory.
-3. `npm run eval:live` — actual adapter/model/tool behaviour.
-4. `npm run assess:candidate` — policy-backed accepted/rejected/inconclusive
-   decision over trusted legacy evidence; schema-v2 quality evidence uses
-   `npm run assess:quality-candidate -- ...`.
+Profile-only mode
+  Prompt-level quality workflow.
+
+Instrumented quality mode
+  Dossier, gate, workspace binding, verification evidence, and mutation
+  enforcement through the installed quality bridge.
+
+Live-evaluation mode
+  Isolated scenarios, hidden checks, immutable reports, and runner-owned
+  assertions.
+
+Instrumented quality is computationally enforced only when the normal-session
+bridge and relevant hooks are active and runtime-verified. If a host cannot
+intercept a mutation surface, that surface is prompt-guided. Live-eval
+enforcement applies only inside the adapter runner. The model-free installed
+probe proves API/factory compatibility, not host discovery or callback
+invocation. Native `edit`, `write`, `apply_patch`, and writable `task.general`
+are checked in the supported pre-tool callback; `permission.ask` is a secondary
+compatibility callback and is not the enforcement source in OpenCode 1.17.20.
+Workspace receipts hash the content and index identity of every Git-changed
+path, including repeated edits to an already-dirty file.
+
+Two host boundaries remain explicit: `session.created` carries a parent ID but
+not the originating task call ID, so serialized child binding cannot prove
+causal identity; the hook has no independent high/critical risk label before a
+dossier exists, so uninstrumented sessions remain usable for `standard-lite`
+work; and the installed API does not structurally classify arbitrary shell
+commands as repository writes. `verify:runtime:quality-hooks` therefore keeps
+those surfaces incomplete instead of claiming universal interception. Prompt
+rules remain the trigger that requires high/critical work to create the durable
+quality session before mutation.
 
 Capture first-party static evidence with
 `npm run evidence:static -- --candidate-id <id>`. Capture installed permission
 evidence for that exact source snapshot with
-`npm run verify:runtime -- --evidence-profile <runtime-profile-id> --subject-id <static-candidate-id> --subject-evidence <static.json>`.
-`--subject-id` keeps the shared repository subject identity separate from the
-baseline/candidate runtime-profile labels; when omitted it defaults to the
-evidence profile for backward compatibility.
+`npm run verify:runtime -- --evidence-profile <runtime-profile-id> --subject-evidence <static.json>`.
 The runtime producer inventories installed agents with `opencode agent list`,
 records each `{name, mode}` and every discovered permission surface, and binds
 them to a content attestation. Required modes and exclusive web/learning
@@ -269,40 +322,39 @@ examples/              copyable examples for host profiles and projects
 fixtures/              static evaluation fixtures
 evals/                 policies, suites, scenarios, and hidden checks
 lib/feedback/          operational trace, reports, and acceptance APIs
-lib/quality/           dossier, gate, impact, model, prompt, and quality APIs
-quality/               checked schemas, policies, profiles, and live sidecars
+lib/quality/           dossier, gate, bridge, verification, and quality APIs
+quality/               checked schemas, policies, prompt inventory, and live sidecars
 scripts/               local deterministic harness checks
 .oc_harness/           ignored machine-local runs and evidence
 ```
 
-## Active GPT-5.6 Profiles
+## Models
 
-The checked-in agents now use explicit GPT-5.6 IDs directly:
-`openai/gpt-5.6-sol` for primary
-implementation, architecture, review, diagnosis, decisions, and integration;
-`openai/gpt-5.6-terra` for bounded read-heavy exploration and research; and
-`openai/gpt-5.6-luna` only for evaluation-only, high-volume, low-risk
-`standard-lite` experiments. Luna is not an active agent and is prohibited for
-critical canaries. The fingerprinted GPT-5.5 profiles remain only as an
-optional comparison baseline.
+The active agent frontmatter is the authoritative model configuration. Model
+selection is not hard-coded into dossier, gate, verification, or acceptance
+logic, and no model comparison is a deterministic or release gate.
 
-The active profiles preserve each role's existing reasoning effort and low text
-verbosity while omitting `temperature`. The optional comparison plan also compares
-the same and one-lower effort, and evaluates low/medium verbosity where complete
-dossiers or reports matter. `max`, API pro
-mode, persisted reasoning, and other nested provider features remain disabled
-until the installed OpenCode runtime proves their exact supported surface.
+| Roles | Current model | Files |
+| --- | --- | --- |
+| Orchestrators, architect, implementation, review, verifier, diagnose, improver | `openai/gpt-5.6-sol` | `agents/orchestrator.md`, `agents/orchestrator-deep.md`, `agents/review-orchestrator.md`, `agents/architect.md`, `agents/general.md`, `agents/reviewer.md`, `agents/verifier.md`, `agents/diagnose.md`, `agents/improver.md` |
+| Explore and researcher | `openai/gpt-5.6-terra` | `agents/explore.md`, `agents/researcher.md` |
 
-The direct model switch does not claim measured superiority and does not depend
-on A/B execution. If comparative evidence is wanted later, runtime compatibility
-can be captured with both
-`npm run verify:runtime -- --all-experiment-models --profile-role baseline`
-and the matching `candidate` command against their installed runtime roots.
-The producer publishes a completion marker only after every exact invocation
-is eligible, and a comparative quality claim requires paired live evidence from
-a compatible adapter. Without those optional inputs, behavioural superiority
-is explicitly unverified while GPT-5.6 Sol/Terra remain active. See
-[docs/model-profiles.md](docs/model-profiles.md).
+To change a model, edit the `model:` field in the YAML frontmatter of the
+relevant `agents/<name>.md` file.
+
+Example:
+
+```yaml
+model: openai/your-model-id
+```
+
+When changing only the model, preserve the role prompt and permissions.
+`reasoningEffort` and `textVerbosity` are separate optional frontmatter
+settings; adjust them only when appropriate for the replacement model. Not all
+providers support the same settings. No generated catalog or fingerprint must
+be updated for a model-only change. See
+[docs/model-profiles.md](docs/model-profiles.md) for the compact configuration
+reference.
 
 ## Why This Is A Harness
 

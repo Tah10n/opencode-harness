@@ -1354,11 +1354,8 @@ test("late edit and delegation invalidate evidence until a later trusted verific
   const attestation = sessionFinalizeAttestation(prepared.session, {
     final_workspace_fingerprint: FP_C,
     teardown_verified: true,
-    model_profile_id: "candidate-sol-general",
-    model_profile_fingerprint: FP_C,
     prompt_profile_id: "baseline-engineering-prompts-v1",
     prompt_profile_fingerprint: FP_D,
-    runtime_execution_fingerprint: FP_E,
     attested_at: "2026-07-13T00:09:00Z",
   });
   assert.equal(attestation.last_implementation_action_sequence, 7);
@@ -1444,11 +1441,8 @@ test("high session cannot attest completion after a failed trusted post-architec
   assertContractError(() => sessionFinalizeAttestation(session, {
     final_workspace_fingerprint: FP_B,
     teardown_verified: true,
-    model_profile_id: "candidate-sol-general",
-    model_profile_fingerprint: FP_C,
     prompt_profile_id: "baseline-engineering-prompts-v1",
     prompt_profile_fingerprint: FP_D,
-    runtime_execution_fingerprint: FP_E,
     attested_at: "2026-07-13T00:05:00Z",
   }), "QUALITY_POST_ARCHITECTURE_AUDIT_FAILED");
 });
@@ -1468,7 +1462,7 @@ test("quality bundle is runner-bound, post-teardown, atomic, and restart-idempot
       model_parameters: { reasoning_effort: "medium" },
       task_class: "implementation",
       strategy_id: "strategy-quality",
-      risk: "high",
+      risk: "standard",
     });
     staged.appendEvent(runId, traceEvent());
 
@@ -1563,11 +1557,8 @@ test("quality bundle is runner-bound, post-teardown, atomic, and restart-idempot
     sessionFinalizeAttestation(session, {
       final_workspace_fingerprint: FP_B,
       teardown_verified: true,
-      model_profile_id: "profile-sol-medium",
-      model_profile_fingerprint: FP_C,
       prompt_profile_id: "prompt-candidate",
       prompt_profile_fingerprint: FP_D,
-      runtime_execution_fingerprint: FP_E,
       attested_at: "2026-07-13T00:05:00Z",
     });
     completeTrace(
@@ -1676,11 +1667,8 @@ test("attestation rejects inverted ordering, false teardown, and fingerprint tam
     last_workspace_mutation_sequence: 4,
     integrated_verification_sequence: 5,
     integrated_verification_evidence_fingerprint: FP_E,
-    runtime_execution_fingerprint: FP_E,
     workspace_at_gate_fingerprint: FP_A,
     final_workspace_fingerprint: FP_B,
-    model_profile_id: "profile-sol",
-    model_profile_fingerprint: FP_C,
     prompt_profile_id: "prompt-main",
     prompt_profile_fingerprint: FP_D,
     post_architecture_evaluation_fingerprint: null,
@@ -1695,10 +1683,7 @@ test("attestation rejects inverted ordering, false teardown, and fingerprint tam
   const valid = createQualityAttestation(base);
   validateQualityAttestation(valid);
   assertContractError(() => createQualityAttestation({ ...base, first_implementation_sequence: 2 }), "QUALITY_ATTESTATION_ORDER");
-  assertContractError(() => createQualityAttestation({
-    ...base,
-    runtime_execution_fingerprint: null,
-  }), "QUALITY_ATTESTATION_INTEGRATED_EVIDENCE");
+  assertContractError(() => createQualityAttestation({ ...base, model_profile_id: "not-a-gate" }), "CONTRACT_UNKNOWN_FIELD");
   assertContractError(() => createQualityAttestation({ ...base, teardown_verified: false }), "QUALITY_TEARDOWN_UNVERIFIED");
   const tampered = JSON.parse(JSON.stringify(valid));
   tampered.final_workspace_fingerprint = FP_C;

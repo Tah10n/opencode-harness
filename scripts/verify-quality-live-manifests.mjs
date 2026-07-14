@@ -352,7 +352,6 @@ for (const scenarioId of qualityIds) {
 
   if (suite === "canary") {
     assert.equal(sidecar.risk_class, "critical", `${scenarioId} canary must remain critical`);
-    assert(!/luna/iu.test(JSON.stringify({ scenario, sidecar })), `${scenarioId} must not imply Luna eligibility`);
   }
   if (scenarioId === "quality-small-local-control") {
     exactKeys(sidecar.anti_overengineering, ["max_delegations", "max_changed_files", "new_dependency_allowed", "broad_rewrite_allowed"], `${scenarioId}.anti_overengineering`);

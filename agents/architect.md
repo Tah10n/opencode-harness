@@ -8,6 +8,8 @@ textVerbosity: low
 steps: 150
 permission:
   edit: deny
+  quality_dossier_inspect: allow
+  quality_architecture_evaluate: allow
   context_outline: allow
   context_files: allow
   context_read: allow
@@ -120,7 +122,9 @@ Output format:
 - `evidence`: paths/lines, commands, or observations that support the plan.
 - `files_changed`: []
 - `decision`: concise recommendation for orchestration.
-- `risk_class`: standard | high | critical.
+- `risk_class`: `standard-lite` | `high` | `critical` for the computational
+  Engineering Dossier. Do not substitute the operational trace contract's
+  legacy `standard` risk label for `standard-lite`.
 - `behavior_contract`: what changes, what stays stable, observable behavior, error semantics, side effects, ordering, idempotency, timeout/cancellation, data integrity.
 - `compatibility_contract`: public contracts, schemas, config, backward compatibility, version skew, migration expectations.
 - `invariants`: data, control-flow, safety, permission, lifecycle, and user-visible invariants.

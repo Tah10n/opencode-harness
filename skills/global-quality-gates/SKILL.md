@@ -33,7 +33,12 @@ orchestrator still owns ordinary tests and self-review.
 
 Classify the task before implementation.
 
-`standard`:
+The computational Engineering Dossier risk classes are exactly
+`standard-lite`, `high`, and `critical`. They are separate from the operational trace
+contract's legacy `standard` risk label; trace compatibility does not change
+the dossier schema.
+
+`standard-lite`:
 
 - local, low-blast-radius changes;
 - no public contract, persistence, security, concurrency, or compatibility
@@ -185,7 +190,7 @@ reason for every skipped applicable category.
 
 ## Verification ladder
 
-For `standard`:
+For `standard-lite`:
 
 1. Targeted tests.
 2. Affected module or package tests.

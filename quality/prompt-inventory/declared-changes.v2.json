@@ -1,0 +1,66 @@
+{
+  "schema_version": 2,
+  "baseline_commit": "0a1d56605b9b8923ac27c3b3b405b38177ca7741",
+  "changes": [
+    {
+      "path": "agents/architect.md",
+      "aspects": ["content", "options", "tool_surface", "permission_surface"],
+      "rationale": "Keep architecture review concise and expose only the bounded quality evidence tools required by the normal-session bridge."
+    },
+    {
+      "path": "agents/diagnose.md",
+      "aspects": ["content", "options"],
+      "rationale": "Preserve the established diagnosis prompt while provider options remain informational model configuration."
+    },
+    {
+      "path": "agents/explore.md",
+      "aspects": ["content", "options"],
+      "rationale": "Preserve bounded exploration guidance while provider options remain informational model configuration."
+    },
+    {
+      "path": "agents/general.md",
+      "aspects": ["content", "options", "permission_surface"],
+      "rationale": "Require native edit permission mediation so writable implementation cannot bypass the runner-owned quality gate."
+    },
+    {
+      "path": "agents/improver.md",
+      "aspects": ["content", "options"],
+      "rationale": "Preserve the gated learning workflow while provider options remain informational model configuration."
+    },
+    {
+      "path": "agents/orchestrator-deep.md",
+      "aspects": ["content", "options", "tool_surface", "permission_surface"],
+      "rationale": "Align high-assurance orchestration with the bounded dossier tools and runner-owned edit and delegation authorization."
+    },
+    {
+      "path": "agents/orchestrator.md",
+      "aspects": ["content", "options", "tool_surface", "permission_surface"],
+      "rationale": "Align ordinary orchestration with standard-lite versus high or critical dossier handling and runner-owned authorization."
+    },
+    {
+      "path": "agents/researcher.md",
+      "aspects": ["content", "options"],
+      "rationale": "Preserve read-only research guidance while provider options remain informational model configuration."
+    },
+    {
+      "path": "agents/review-orchestrator.md",
+      "aspects": ["content", "options"],
+      "rationale": "Preserve the read-only review workflow while provider options remain informational model configuration."
+    },
+    {
+      "path": "agents/reviewer.md",
+      "aspects": ["content", "options", "tool_surface", "permission_surface"],
+      "rationale": "Allow bounded read-only dossier challenge evidence without granting mutation capabilities."
+    },
+    {
+      "path": "agents/verifier.md",
+      "aspects": ["content", "options", "tool_surface", "permission_surface"],
+      "rationale": "Allow trusted verification recording while preserving the verifier read-only boundary."
+    },
+    {
+      "path": "skills/global-quality-gates/SKILL.md",
+      "aspects": ["content"],
+      "rationale": "Align computational Engineering Dossier risk classes with schema and constants while preserving the legacy operational trace label."
+    }
+  ]
+}

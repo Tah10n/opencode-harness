@@ -14,8 +14,8 @@ import {
 import { ContractError, canonicalJson } from "../lib/quality/validation.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const baselinePath = path.join(root, "quality", "prompt-inventory", "baseline.v1.json");
-const declarationsPath = path.join(root, "quality", "prompt-inventory", "declared-changes.v1.json");
+const baselinePath = path.join(root, "quality", "prompt-inventory", "baseline.v2.json");
+const declarationsPath = path.join(root, "quality", "prompt-inventory", "declared-changes.v2.json");
 const baselineCommit = "0a1d56605b9b8923ac27c3b3b405b38177ca7741";
 const DEFAULT_DISCOVERY_LIMITS = Object.freeze({
   maxDirectories: 512,
@@ -218,15 +218,15 @@ validatePromptInventory(baseline);
 check(
   declarations
   && Object.keys(declarations).sort().join(",") === "baseline_commit,changes,schema_version"
-  && declarations.schema_version === 1
+  && declarations.schema_version === 2
   && declarations.baseline_commit === baselineCommit
   && Array.isArray(declarations.changes),
-  "declared prompt changes must be a strict version-1 manifest bound to the starting commit",
+  "declared prompt changes must be a strict version-2 manifest bound to the starting commit",
 );
 recursivelyRejectRawPromptFields(baseline);
 
 const regeneratedBaseline = buildInventory({
-  inventoryId: "baseline-engineering-prompts-v1",
+  inventoryId: "baseline-engineering-prompts-v2",
   sourceKind: "git_commit",
   sourceRevision: baselineCommit,
   sources: baselineSources(),
@@ -411,7 +411,7 @@ check(
 const modelDriftSources = mutateSource(
   baselineWorktreeSources,
   "agents/general.md",
-  (text) => text.replace("model: openai/gpt-5.5", "model: openai/gpt-5.6-sol"),
+  (text) => text.replace(/^model:\s*.+$/mu, "model: example/model-only-change"),
 );
 const modelDrift = buildInventory({
   inventoryId: "test-model-drift-v1",
@@ -419,19 +419,13 @@ const modelDrift = buildInventory({
   sourceRevision: null,
   sources: modelDriftSources,
 });
-const undeclaredModelComparison = comparePromptInventories(baseline, modelDrift);
+const modelMetadataComparison = comparePromptInventories(baseline, modelDrift);
 check(
-  undeclaredModelComparison.findings.some((entry) => entry.code === "PROMPT_MODEL_DRIFT"),
-  "undeclared model drift must fail",
+  modelMetadataComparison.status === "passed"
+  && modelMetadataComparison.changes.some((entry) => entry.code === "PROMPT_MODEL_METADATA_CHANGED")
+  && modelMetadataComparison.changes.some((entry) => entry.code === "PROMPT_CONFIG_METADATA_ONLY"),
+  "model-only frontmatter drift must remain visible but must not become a quality gate",
 );
-const declaredModelComparison = comparePromptInventories(baseline, modelDrift, {
-  declaredChanges: [{
-    path: "agents/general.md",
-    aspects: ["content", "model"],
-    rationale: "Test-only declared migration delta.",
-  }],
-});
-check(declaredModelComparison.status === "passed", "explicitly declared model/content drift should be reviewable");
 
 const toolDriftSources = mutateSource(
   baselineWorktreeSources,
@@ -625,7 +619,7 @@ expectContractError("CONTRACT_UNKNOWN_FIELD", () => validatePromptInventory({ ..
 check(
   comparePromptInventories(baseline, current, {
     declaredChanges: [{
-      path: "agents/general.md",
+      path: "agents/diagnose.md",
       aspects: ["permission_surface"],
       rationale: "Test-only stale declaration.",
     }],

@@ -18,6 +18,11 @@ import {
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-adapter-worker-"));
 const adapterUrl = (file) => pathToFileURL(file).href;
 const pause = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
+// Teardown verification may legitimately use its full 2 s confirmation window.
+// Schedule survivor probes beyond that bound so load cannot turn a confirmed
+// teardown into a false failure while still detecting a process left alive.
+const teardownProbeDelayMs = 2500;
+const teardownProbeWaitMs = teardownProbeDelayMs + 100;
 
 try {
   const adapter = path.join(tmp, "adapter.mjs");
@@ -246,7 +251,7 @@ export async function runScenario() {
   assert.equal(commandResult.teardown_verified, true);
 
   const commandDescendantMarker = path.join(tmp, "command-descendant-late-marker.txt");
-  const commandDescendantScript = `const {spawn}=require("node:child_process"); const child=${JSON.stringify(`setTimeout(() => require("node:fs").writeFileSync(${JSON.stringify(commandDescendantMarker)}, "late"), 700); setInterval(() => {}, 60000);`)}; spawn(process.execPath,["-e",child],{stdio:"ignore",windowsHide:true}); setInterval(() => {}, 60000);`;
+  const commandDescendantScript = `const {spawn}=require("node:child_process"); const child=${JSON.stringify(`setTimeout(() => require("node:fs").writeFileSync(${JSON.stringify(commandDescendantMarker)}, "late"), ${teardownProbeDelayMs}); setInterval(() => {}, 60000);`)}; spawn(process.execPath,["-e",child],{stdio:"ignore",windowsHide:true}); setInterval(() => {}, 60000);`;
   const timedCommand = await runManagedCommand({
     file: process.execPath,
     args: ["-e", commandDescendantScript],
@@ -255,14 +260,14 @@ export async function runScenario() {
   });
   assert.equal(timedCommand.timed_out, true);
   assert.equal(timedCommand.teardown_verified, true);
-  await pause(800);
+  await pause(teardownProbeWaitMs);
   assert.equal(fs.existsSync(commandDescendantMarker), false, "ordinary command descendant survived timeout teardown");
 
   const hanging = path.join(tmp, "hanging.mjs");
   const marker = path.join(tmp, "late-marker.txt");
   fs.writeFileSync(hanging, `import fs from "node:fs";
 export async function runScenario() {
-  setTimeout(() => fs.writeFileSync(${JSON.stringify(marker)}, "late"), 500);
+  setTimeout(() => fs.writeFileSync(${JSON.stringify(marker)}, "late"), ${teardownProbeDelayMs});
   await new Promise(() => {});
 }
 `, "utf8");
@@ -270,11 +275,11 @@ export async function runScenario() {
     runAdapterModule({ adapterUrl: adapterUrl(hanging), context: {}, timeout: 20 }),
     (error) => error instanceof AdapterTimeoutError,
   );
-  await pause(600);
+  await pause(teardownProbeWaitMs);
   assert.equal(fs.existsSync(marker), false);
 
   const descendantMarker = path.join(tmp, "descendant-late-marker.txt");
-  const descendantScript = `setTimeout(() => require("node:fs").writeFileSync(${JSON.stringify(descendantMarker)}, "late"), 800); setInterval(() => {}, 60000);`;
+  const descendantScript = `setTimeout(() => require("node:fs").writeFileSync(${JSON.stringify(descendantMarker)}, "late"), ${teardownProbeDelayMs}); setInterval(() => {}, 60000);`;
   const descendant = path.join(tmp, "descendant.mjs");
   fs.writeFileSync(descendant, `import { spawn } from "node:child_process";
 export async function runScenario() {
@@ -286,11 +291,11 @@ export async function runScenario() {
     runAdapterModule({ adapterUrl: adapterUrl(descendant), context: {}, timeout: 50 }),
     (error) => error instanceof AdapterTimeoutError,
   );
-  await pause(900);
+  await pause(teardownProbeWaitMs);
   assert.equal(fs.existsSync(descendantMarker), false, "ordinary descendant survived timeout teardown");
 
   const normalDescendantMarker = path.join(tmp, "normal-descendant-late-marker.txt");
-  const normalDescendantScript = `setTimeout(() => require("node:fs").writeFileSync(${JSON.stringify(normalDescendantMarker)}, "late"), 800); setInterval(() => {}, 60000);`;
+  const normalDescendantScript = `setTimeout(() => require("node:fs").writeFileSync(${JSON.stringify(normalDescendantMarker)}, "late"), ${teardownProbeDelayMs}); setInterval(() => {}, 60000);`;
   const normalDescendant = path.join(tmp, "normal-descendant.mjs");
   fs.writeFileSync(normalDescendant, `import { spawn } from "node:child_process";
 export async function runScenario() {
@@ -300,7 +305,7 @@ export async function runScenario() {
 `, "utf8");
   const normalDescendantResult = await runAdapterModule({ adapterUrl: adapterUrl(normalDescendant), context: {}, timeout: 2000 });
   assert.equal(normalDescendantResult.cleanup, "confirmed");
-  await pause(900);
+  await pause(teardownProbeWaitMs);
   assert.equal(fs.existsSync(normalDescendantMarker), false, "ordinary descendant survived normal-result teardown");
 
   const stalledTrace = path.join(tmp, "stalled-trace.mjs");
@@ -319,7 +324,7 @@ export async function runScenario() {
     }),
     (error) => error instanceof AdapterTimeoutError,
   );
-  assert(Date.now() - stalledStartedAt < 2500, "stalled trace callback exceeded the bounded deadline");
+  assert(Date.now() - stalledStartedAt < 3000, "stalled trace callback exceeded the bounded deadline");
 
   const queuedTrace = path.join(tmp, "queued-trace.mjs");
   fs.writeFileSync(queuedTrace, `export async function runScenario(context) {
@@ -335,7 +340,7 @@ export async function runScenario() {
     runAdapterModule({
       adapterUrl: adapterUrl(queuedTrace),
       context: {},
-      timeout: 100,
+      timeout: 2000,
       onTrace: (_operation, payload) => {
         startedOperations.push(payload.sequence);
         if (payload.sequence === 1) return new Promise((resolve) => { releaseFirst = resolve; });

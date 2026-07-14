@@ -4,6 +4,8 @@
   "permission": {
     "external_directory": "ask",
     "oc_learning_*": "deny",
+    "quality_*": "deny",
+    "edit": "ask",
     "bash": {
       "*": "ask",
       "rm *": "ask",

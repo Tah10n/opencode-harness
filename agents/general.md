@@ -6,7 +6,7 @@ reasoningEffort: high
 textVerbosity: low
 steps: 240
 permission:
-  edit: allow
+  edit: ask
   task:
     "*": deny
   skill:

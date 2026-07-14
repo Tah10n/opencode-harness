@@ -1,6 +1,6 @@
 {
   "baseline_commit": "0a1d56605b9b8923ac27c3b3b405b38177ca7741",
-  "content_fingerprint": "sha256:6e7436ba10cafed147135172bdf7461bc2947530e4cad95548bf772aa4bc6554",
+  "content_fingerprint": "sha256:705e2f8208b4ea8598ffa505c39d21c04b7ddd6c7cad559074c0df07b09e2c93",
   "duplicate_groups": [
     {
       "group_id": "dup-exact-97823bdf4701",
@@ -57,9 +57,9 @@
     {
       "content_fingerprint": "sha256:d303c2f36b3a821e96b11b821a7a1fb56c28647831870ed7db9156a68242f99f",
       "git_blob_oid": "713cad5c8adb3747b09cdb57251f0625874ad38c",
-      "line_count": 151,
+      "line_count": 148,
       "model": "openai/gpt-5.5",
-      "normalized_fingerprint": "sha256:d303c2f36b3a821e96b11b821a7a1fb56c28647831870ed7db9156a68242f99f",
+      "normalized_fingerprint": "sha256:febfe442ccbb51ec23a86847d1cb29202114337a71a1ec37f34daf6cd3444ba4",
       "options": {
         "reasoningEffort": "high",
         "steps": 150,
@@ -87,14 +87,14 @@
         "webfetch",
         "websearch"
       ],
-      "utf8_bytes": 7220
+      "utf8_bytes": 7157
     },
     {
       "content_fingerprint": "sha256:725b4422bd3a925c700f81f8b74d549c9a49dd23517fa1edba9e4ebb3420c020",
       "git_blob_oid": "c2864f778c016f5580dee853c80c25afcbc04fe5",
-      "line_count": 119,
+      "line_count": 116,
       "model": "openai/gpt-5.5",
-      "normalized_fingerprint": "sha256:725b4422bd3a925c700f81f8b74d549c9a49dd23517fa1edba9e4ebb3420c020",
+      "normalized_fingerprint": "sha256:21395e63399e411c63ca8b49ecca169a3e984a5aa28611d876b58f590de46b46",
       "options": {
         "reasoningEffort": "high",
         "steps": 180,
@@ -122,14 +122,14 @@
         "webfetch",
         "websearch"
       ],
-      "utf8_bytes": 4080
+      "utf8_bytes": 4017
     },
     {
       "content_fingerprint": "sha256:40695d84091ba40b826a63cf0355e1c738b6059cfd53228d8aabe4c00691d70b",
       "git_blob_oid": "98d50076cdde794e31d5d95a2f5ff7d9cd99fe7a",
-      "line_count": 118,
+      "line_count": 115,
       "model": "openai/gpt-5.4-mini-fast",
-      "normalized_fingerprint": "sha256:40695d84091ba40b826a63cf0355e1c738b6059cfd53228d8aabe4c00691d70b",
+      "normalized_fingerprint": "sha256:7534a4f1f0733f6ed70bb86c42977be9eb22bf7501bc80673bcf17e462b8e533",
       "options": {
         "reasoningEffort": "low",
         "steps": 80,
@@ -171,14 +171,14 @@
         "webfetch",
         "websearch"
       ],
-      "utf8_bytes": 3786
+      "utf8_bytes": 3714
     },
     {
       "content_fingerprint": "sha256:eff8cd8f1c9210f50a9ec7f9de0439f257473d65f22c0c9867947c07a915eb17",
       "git_blob_oid": "fb806594d976ea34bd77de3a24cb64df8fdafd11",
-      "line_count": 137,
+      "line_count": 134,
       "model": "openai/gpt-5.5",
-      "normalized_fingerprint": "sha256:eff8cd8f1c9210f50a9ec7f9de0439f257473d65f22c0c9867947c07a915eb17",
+      "normalized_fingerprint": "sha256:2436da8bff2cffb8c510eca67aeef165b024cd2a214e8d9c3d8b5423c8b7a088",
       "options": {
         "reasoningEffort": "high",
         "steps": 240,
@@ -216,14 +216,14 @@
         "webfetch",
         "websearch"
       ],
-      "utf8_bytes": 6749
+      "utf8_bytes": 6686
     },
     {
       "content_fingerprint": "sha256:7c89455f3f2846c4bbfb977dd4afc26554f11fd17b034c1b0c875447336d1cb1",
       "git_blob_oid": "8e7444181afaae464229d80b9a93061d440f6094",
-      "line_count": 75,
+      "line_count": 72,
       "model": "openai/gpt-5.5",
-      "normalized_fingerprint": "sha256:7c89455f3f2846c4bbfb977dd4afc26554f11fd17b034c1b0c875447336d1cb1",
+      "normalized_fingerprint": "sha256:669f17a5c909df3414fa26d368779d57baa66f798049f76696a9eea14977396f",
       "options": {
         "reasoningEffort": "high",
         "steps": 150,
@@ -266,14 +266,14 @@
         "webfetch",
         "websearch"
       ],
-      "utf8_bytes": 3786
+      "utf8_bytes": 3723
     },
     {
       "content_fingerprint": "sha256:64f89b3504e0f3d84c7247ccfb77fbbd71b0889b1a3f400939a718eb2f091756",
       "git_blob_oid": "efc37fba9c5282552c972efeacf945c05983855c",
-      "line_count": 132,
+      "line_count": 129,
       "model": "openai/gpt-5.5",
-      "normalized_fingerprint": "sha256:64f89b3504e0f3d84c7247ccfb77fbbd71b0889b1a3f400939a718eb2f091756",
+      "normalized_fingerprint": "sha256:bd7d91be2b2e81e7bd53aefa864ff1676d50ad0eae1ae4c877da6cf500cfd906",
       "options": {
         "reasoningEffort": "xhigh",
         "steps": 240,
@@ -310,14 +310,14 @@
         "skill",
         "task"
       ],
-      "utf8_bytes": 6939
+      "utf8_bytes": 6875
     },
     {
       "content_fingerprint": "sha256:810e4c7b9eed1859485ab4fc93db27844848839999748f14fa96b48a2382abeb",
       "git_blob_oid": "e474d1c36130fa945814ee7eabdb5bfcf133434e",
-      "line_count": 223,
+      "line_count": 220,
       "model": "openai/gpt-5.5",
-      "normalized_fingerprint": "sha256:810e4c7b9eed1859485ab4fc93db27844848839999748f14fa96b48a2382abeb",
+      "normalized_fingerprint": "sha256:86f36f2a1a1fe44c25ca7bccf89b9ff82c65c9304c35b3df64c94825ca3a46d0",
       "options": {
         "reasoningEffort": "xhigh",
         "steps": 400,
@@ -354,14 +354,14 @@
         "skill",
         "task"
       ],
-      "utf8_bytes": 18478
+      "utf8_bytes": 18414
     },
     {
       "content_fingerprint": "sha256:92aaca05f7389fb8b1fcba961d3d243e3d8787bb6394b09553ef035a0cb5faee",
       "git_blob_oid": "4b1dfdeb6e2cb16076c074d821108ac59fee1704",
-      "line_count": 54,
+      "line_count": 51,
       "model": "openai/gpt-5.5",
-      "normalized_fingerprint": "sha256:92aaca05f7389fb8b1fcba961d3d243e3d8787bb6394b09553ef035a0cb5faee",
+      "normalized_fingerprint": "sha256:2cd85d263a40b544a6696eb9239c4e0534ffcba35009804458a0c2300b6d155c",
       "options": {
         "reasoningEffort": "medium",
         "steps": 150,
@@ -384,14 +384,14 @@
         "webfetch",
         "websearch"
       ],
-      "utf8_bytes": 2399
+      "utf8_bytes": 2334
     },
     {
       "content_fingerprint": "sha256:cb79d3f9c3dc1b1083e879de5fca02e83d08dbed8c98781d603c2e72132660a0",
       "git_blob_oid": "2fd9d8821975bad3792bd9f36813c667accba012",
-      "line_count": 125,
+      "line_count": 122,
       "model": "openai/gpt-5.5",
-      "normalized_fingerprint": "sha256:cb79d3f9c3dc1b1083e879de5fca02e83d08dbed8c98781d603c2e72132660a0",
+      "normalized_fingerprint": "sha256:d9dc6319315622e051731689866b4b8e92f5d7e60ccfc08a4587880e58b272e0",
       "options": {
         "reasoningEffort": "xhigh",
         "steps": 260,
@@ -435,14 +435,14 @@
         "webfetch",
         "websearch"
       ],
-      "utf8_bytes": 4709
+      "utf8_bytes": 4645
     },
     {
       "content_fingerprint": "sha256:d3113c1046ff5f584ce5e0e4eee3791275794ffe68032e193a779daf7ec76fba",
       "git_blob_oid": "8bc292ff42f2c72e2658606fece466b2737a6220",
-      "line_count": 164,
+      "line_count": 161,
       "model": "openai/gpt-5.5",
-      "normalized_fingerprint": "sha256:d3113c1046ff5f584ce5e0e4eee3791275794ffe68032e193a779daf7ec76fba",
+      "normalized_fingerprint": "sha256:d383efa00e177cbd2f40b3cb3ed293446e20f0646bf197f815976ac790341e39",
       "options": {
         "reasoningEffort": "high",
         "steps": 120,
@@ -487,14 +487,14 @@
         "webfetch",
         "websearch"
       ],
-      "utf8_bytes": 7096
+      "utf8_bytes": 7033
     },
     {
       "content_fingerprint": "sha256:bf46d325c08b35171dd2997df427ba39d2afc17a5262510456895c22e9123106",
       "git_blob_oid": "5cec9c16828da5e7a7c1ca5432fb4873679d6434",
-      "line_count": 138,
+      "line_count": 135,
       "model": "openai/gpt-5.5",
-      "normalized_fingerprint": "sha256:bf46d325c08b35171dd2997df427ba39d2afc17a5262510456895c22e9123106",
+      "normalized_fingerprint": "sha256:46101ad181057d11286dfe7d8c4a606c009828e329e90264c17086b2d5d7769b",
       "options": {
         "reasoningEffort": "medium",
         "steps": 120,
@@ -524,7 +524,7 @@
         "webfetch",
         "websearch"
       ],
-      "utf8_bytes": 5022
+      "utf8_bytes": 4957
     },
     {
       "content_fingerprint": "sha256:60e0420dfc1fa2e08ba8b9c2803cfd39ac9b421b4f8e0e71076f1a64c9a294c9",
@@ -608,7 +608,7 @@
       "source_type": "skill",
       "task_surface": [],
       "tool_surface": [],
-      "utf8_bytes": 1420
+      "utf8_bytes": 1417
     },
     {
       "content_fingerprint": "sha256:0db1718cb31d0e8d2bf849e4292db2cdd6bb75f682ddcda2b93946c18f0d2e09",
@@ -726,8 +726,8 @@
       "rationale": "Starting-profile role boundary is intentionally repeated; any changed or additional copy requires explicit review."
     }
   ],
-  "inventory_id": "baseline-engineering-prompts-v1",
-  "schema_version": 1,
+  "inventory_id": "baseline-engineering-prompts-v2",
+  "schema_version": 2,
   "sentinel_definitions": [
     {
       "regex_families": [

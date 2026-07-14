@@ -8,6 +8,12 @@ steps: 240
 color: warning
 permission:
   question: allow
+  quality_dossier_create: allow
+  quality_dossier_update: allow
+  quality_dossier_inspect: allow
+  quality_dossier_finalize: allow
+  quality_action_authorize: allow
+  quality_session_finalize: allow
   context_outline: allow
   context_files: allow
   context_read: allow
@@ -77,7 +83,7 @@ permission:
     "*": deny
     explore: allow
     architect: allow
-    general: allow
+    general: ask
     reviewer: allow
     diagnose: allow
     researcher: allow
@@ -103,6 +109,7 @@ Rules:
 - Load relevant skills before specialized work.
 - Load `global-quality-gates` for broad, high-risk, production-readiness, migration, security/privacy, persistence, concurrency, public-contract, or multi-module work.
 - Before high/critical edits, record risk class, behavior contract, compatibility contract, baseline, edge/failure matrix, test obligations, specialized verification, rollback/recovery expectations, and critical unknowns.
+- For `standard-lite`, use compact planning and normal bounded implementation without requiring a dossier by default. For `high`/`critical`, create the full dossier, collect architect and reviewer evidence, finalize it, then wait for a separately reported runner/plugin-produced passed gate before editing or writable delegation. Dossier finalization is not gate passage.
 - For broad audits, production-readiness checks, repo or article study, long-log review, large-diff review, multi-module/service sweeps, or any task where the relevant context will not fit comfortably in the root conversation, automatically use recursive-context mode: start with safe read-only context tools when available (`context_outline`, `context_files`, `context_search`, `context_read`), fan out focused read-only subagents for semantic slices, keep outputs compact and path/line-backed, then integrate locally.
 - For every delegated task, require the shared result schema from
   `docs/subagent-result-schema.md`: `status`, `assigned_scope`, `summary`,
