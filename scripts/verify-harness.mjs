@@ -2,6 +2,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { DETERMINISTIC_STAGE_REGISTRY, deterministicExpectedChecks } from "./verify-all.mjs";
+
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const failures = [];
 
@@ -209,6 +211,7 @@ const requiredFiles = [
   "lib/feedback/adapter-worker.mjs",
   "lib/feedback/contracts.mjs",
   "lib/feedback/evidence.mjs",
+  "lib/quality/milestone-dod.mjs",
   "lib/feedback/files.mjs",
   "lib/feedback/index.mjs",
   "lib/feedback/manifests.mjs",
@@ -233,6 +236,7 @@ const requiredFiles = [
   "scripts/verify-drift.mjs",
   "scripts/verify-runtime-fixtures.mjs",
   "scripts/verify-runtime.mjs",
+  "scripts/verify-all.mjs",
 ];
 
 for (const file of requiredFiles) {
@@ -248,8 +252,38 @@ if (packageJson.version !== "0.3.0") {
 if (packageJson.engines?.node !== ">=24") {
   fail("HARNESS-S007", "package.json engines.node must match the Node 24 CI/runtime contract", "Declare engines.node as >=24 and keep CI aligned.");
 }
-if (packageJson.scripts?.verify !== "npm run verify:static && npm run verify:feedback-foundation && npm run verify:trace-store && npm run verify:report-history && npm run verify:adapter-worker && npm run eval && npm run verify:drift && npm run verify:adoption-bundle && npm run verify:runtime:fixture && npm run verify:live-eval && npm run verify:acceptance") {
-  fail("HARNESS-S008", "package.json must run every deterministic feedback-plane and existing repository sensor from npm run verify", "Keep fast model-free sensors in the default verify command.");
+if (packageJson.scripts?.verify !== "node scripts/verify-all.mjs") {
+  fail("HARNESS-S008", "package.json must route npm run verify through the bounded runner-owned receipt aggregator", "Set verify to node scripts/verify-all.mjs.");
+}
+const expectedDeterministicStages = [
+  "verify:static", "verify:feedback-foundation", "verify:trace-store", "verify:report-history", "verify:adapter-worker",
+  "eval", "verify:drift", "verify:adoption-bundle", "verify:runtime:fixture", "verify:live-eval", "verify:acceptance",
+  "verify:quality-contracts", "verify:engineering-dossier", "verify:architecture-policy", "verify:impact-graph",
+  "verify:model-profiles", "verify:prompt-inventory", "verify:quality-live-coordinator", "verify:quality-live-runner",
+  "verify:quality-live-manifests", "verify:quality-acceptance", "verify:milestone-2-dod-contract",
+];
+if (JSON.stringify(DETERMINISTIC_STAGE_REGISTRY.map((stage) => stage.npm_script)) !== JSON.stringify(expectedDeterministicStages)) {
+  fail("HARNESS-S008", "verify-all deterministic stage registry drifted from the reviewed sequential npm stage contract", "Restore the exact model/network-free stage order.");
+}
+if (new Set(DETERMINISTIC_STAGE_REGISTRY.map((stage) => stage.command_id)).size !== DETERMINISTIC_STAGE_REGISTRY.length) {
+  fail("HARNESS-S008", "verify-all command IDs must be unique", "Give each deterministic stage one stable command_id.");
+}
+for (const stage of DETERMINISTIC_STAGE_REGISTRY) {
+  if (!packageJson.scripts?.[stage.npm_script] || stage.npm_script === "verify") {
+    fail("HARNESS-S008", `verify-all references missing or recursive npm stage ${stage.npm_script}`, "Keep the registry and package scripts coherent and non-recursive.");
+  }
+}
+const dodDocument = JSON.parse(read("quality/milestone-2-dod.v1.json"));
+const deterministicDodChecks = dodDocument.items
+  .filter((item) => item.execution_class === "deterministic")
+  .flatMap((item) => item.check_ids)
+  .sort();
+const registeredDodChecks = deterministicExpectedChecks().map((entry) => entry.check_id).sort();
+if (JSON.stringify(registeredDodChecks) !== JSON.stringify(deterministicDodChecks)) {
+  fail("HARNESS-S008", "verify-all receipt registry must map every deterministic DoD check exactly once", "Synchronize the runner registry with quality/milestone-2-dod.v1.json.");
+}
+if (Object.hasOwn(packageJson.scripts ?? {}, "verify:milestone-2-dod")) {
+  fail("HARNESS-S008", "the misleading verify:milestone-2-dod command must not remain exposed", "Use verify:milestone-2-dod-contract for manifest-only validation.");
 }
 if (packageJson.scripts?.eval !== "node scripts/evaluate-harness.mjs") {
   fail("HARNESS-S009", "package.json must expose npm run eval", "Restore the evaluation script entry.");
@@ -270,12 +304,24 @@ if (packageJson.scripts?.["verify:live-eval"] !== "npm run verify:live-manifests
   fail("HARNESS-S009", "package.json must expose npm run verify:live-eval", "Keep live-eval deterministic checks in the default verification gate.");
 }
 for (const [name, command] of Object.entries({
+  "assess:quality-candidate": "node scripts/assess-quality-candidate.mjs",
   "verify:feedback-foundation": "node scripts/verify-feedback-foundation.mjs",
   "verify:trace-store": "node scripts/verify-trace-store.mjs",
   "verify:report-history": "node scripts/verify-report-history.mjs",
   "verify:adapter-worker": "node scripts/verify-adapter-worker.mjs",
   "verify:adoption-bundle": "node scripts/verify-adoption-bundle.mjs",
   "verify:live-manifests": "node scripts/verify-live-manifests.mjs",
+  "verify:quality-contracts": "node scripts/verify-quality-contracts.mjs",
+  "verify:engineering-dossier": "node scripts/verify-engineering-quality.mjs",
+  "verify:architecture-policy": "node scripts/verify-quality-architecture.mjs",
+  "verify:impact-graph": "node scripts/verify-quality-architecture.mjs",
+  "verify:model-profiles": "node scripts/verify-model-profiles.mjs",
+  "verify:prompt-inventory": "node scripts/verify-prompt-inventory.mjs",
+  "verify:quality-live-coordinator": "node scripts/verify-quality-live-coordinator.mjs",
+  "verify:quality-live-runner": "node scripts/verify-quality-live-runner.mjs",
+  "verify:quality-live-manifests": "node scripts/verify-quality-live-manifests.mjs",
+  "verify:quality-acceptance": "node scripts/verify-quality-acceptance.mjs",
+  "verify:milestone-2-dod-contract": "node scripts/verify-milestone-2-dod.mjs",
   "verify:acceptance": "node scripts/verify-candidate-assessment.mjs",
   "assess:candidate": "node scripts/assess-candidate.mjs",
   "evidence:static": "node scripts/capture-static-evidence.mjs",
@@ -296,6 +342,24 @@ if (packageJson.scripts?.["verify:runtime"] !== "node scripts/verify-runtime.mjs
 }
 if (packageJson.scripts?.["verify:runtime:fixture"] !== "node scripts/verify-runtime-fixtures.mjs") {
   fail("HARNESS-S012", "package.json must expose npm run verify:runtime:fixture", "Restore the deterministic runtime fixture verifier entry.");
+}
+const verifyAllScript = read("scripts/verify-all.mjs");
+for (const needle of [
+  "DETERMINISTIC_STAGE_REGISTRY",
+  "sealVerificationReceipt",
+  "assessMilestone2Receipts",
+  "git\", args: [\"diff\", \"--check\"]",
+  "decision.status !== \"verified\"",
+  "optional external evidence is not requested",
+]) {
+  assertIncludes(verifyAllScript, needle, "scripts/verify-all.mjs", "HARNESS-S008", "The default verifier must remain a runner-owned bounded receipt aggregator.");
+}
+for (const forbidden of ["OPENCODE_MODEL_RUNTIME_EVIDENCE_PATH", "OPENCODE_LIVE_EVAL_ADAPTER", "runtime_optional\": \"passed", "live_external\": \"passed"]) {
+  assertNotIncludes(verifyAllScript, forbidden, "scripts/verify-all.mjs", "HARNESS-S008", "The deterministic runner must not self-declare external runtime or live success.");
+}
+const milestoneDodVerifier = read("scripts/verify-milestone-2-dod.mjs");
+for (const needle of ["consumes no execution receipts", "asserts no milestone completion status", "duplicate verification receipt", "untrusted producer", "substituted command"]) {
+  assertIncludes(milestoneDodVerifier, needle, "scripts/verify-milestone-2-dod.mjs", "HARNESS-S008", "The DoD command must be honest and exercise the receipt rejection matrix.");
 }
 if (packageJson.repository?.url !== "git+https://github.com/Tah10n/opencode-harness.git") {
   fail("HARNESS-S013", "package.json must point repository.url at Tah10n/opencode-harness", "Keep published package metadata aligned with GitHub.");
@@ -560,6 +624,30 @@ for (const needle of [
   assertIncludes(liveEvaluationDocs, needle, "docs/live-evaluation.md", "HARNESS-S057", "Document live A/B evaluation without making it a default CI dependency.");
 }
 assertNotIncludes(liveEvaluationDocs, "setup_source", "docs/live-evaluation.md", "HARNESS-S057", "Do not document live-eval setup sources until the runner implements them.");
+const completeRecipeMatch = liveEvaluationDocs.match(/<!-- complete-quality-evidence-recipe:start -->([\s\S]*?)<!-- complete-quality-evidence-recipe:end -->/u);
+if (!completeRecipeMatch) {
+  fail("HARNESS-S057", "docs/live-evaluation.md is missing the fenced complete quality evidence recipe", "Restore the sensor-owned production recipe markers.");
+} else {
+  const completeRecipe = completeRecipeMatch[1];
+  for (const needle of [
+    'HARNESS_RUNTIME_CWD="$BASELINE_RUNTIME_ROOT"',
+    'HARNESS_RUNTIME_CWD="$CANDIDATE_RUNTIME_ROOT"',
+    'HARNESS_EVIDENCE_WORKSPACE="$CANDIDATE_REPO"',
+    '--evidence-profile baseline-v1 --subject-id experiment-subject --subject-evidence "$SUBJECT_STATIC_JSON"',
+    '--evidence-profile candidate-v1 --subject-id experiment-subject --subject-evidence "$SUBJECT_STATIC_JSON"',
+    '--all-experiment-models --profile-role baseline',
+    '--all-experiment-models --profile-role candidate',
+    'OPENCODE_MODEL_RUNTIME_EVIDENCE_PATH="$RUNTIME_EVIDENCE_DIR"',
+    '--runtime-evidence "$RUNTIME_EVIDENCE_DIR"',
+    "npm run eval:live",
+  ]) {
+    assertIncludes(completeRecipe, needle, "complete quality evidence recipe", "HARNESS-S057", "Keep capture, live evaluation, and assessment on one complete evidence directory and one static subject.");
+  }
+  assertNotIncludes(completeRecipe, "--suite", "complete quality evidence recipe", "HARNESS-S057", "The release recipe must execute all 96 canonical pairs without a suite selector.");
+}
+for (const [label, text] of [["README.md", read("README.md")], ["docs/evaluation.md", read("docs/evaluation.md")], ["docs/release.md", read("docs/release.md")]]) {
+  assertNotIncludes(text, "npm run verify:milestone-2-dod\n", label, "HARNESS-S057", "Use the honest verify:milestone-2-dod-contract command name.");
+}
 
 const readme = read("README.md");
 for (const needle of [
@@ -1044,11 +1132,35 @@ const runtimeVerifier = read("scripts/verify-runtime.mjs");
 for (const needle of ["task.*", "`task.${agent}`", "\"general\"", "HARNESS-R017", "HARNESS-R018"]) {
   assertIncludes(runtimeVerifier, needle, "scripts/verify-runtime.mjs", "HARNESS-S059", "Runtime verification must prove review-orchestrator task delegation boundaries.");
 }
-for (const needle of ["--evidence-profile", "--subject-evidence", "runtimePermissionSnapshot", "subject_fingerprint", "runtime_fingerprint", "surface_fingerprint", "profile_fingerprint", "incomplete_scopes", "collectResolvedPermissionSurface", "installed_runtime", "fixture", "Permission evidence written"]) {
+for (const needle of ["--evidence-profile", "--subject-id", "--subject-evidence", "runtimePermissionSnapshot", "subject_fingerprint", "runtime_fingerprint", "surface_fingerprint", "profile_fingerprint", "incomplete_scopes", "collectResolvedPermissionSurface", "installed_runtime", "fixture", "Permission evidence written"]) {
   assertIncludes(runtimeVerifier, needle, "scripts/verify-runtime.mjs", "HARNESS-S059", "Runtime verification should optionally emit strict permission evidence without raw debug output.");
 }
 for (const needle of ['["agent", "list"]', "parseAgentInventory", "installedAgentInventory", "requiredAgentModes", "agentInventory", "HARNESS-R022", "HARNESS-R023", "HARNESS-R024"]) {
   assertIncludes(runtimeVerifier, needle, "scripts/verify-runtime.mjs", "HARNESS-S059", "Runtime verification must inventory every installed agent and fail closed on incomplete inventory.");
+}
+for (const needle of [
+  "--all-experiment-models",
+  "invocationIdentity",
+  "runtime-model-batches",
+  "persistRuntimeModelBatch",
+  "OPENCODE_CONFIG_CONTENT",
+  "duplicate exact invocations",
+  "if (failures.length > 0) reportAndExit();\n  const persisted = persistRuntimeModelBatch",
+]) {
+  assertIncludes(runtimeVerifier, needle, "scripts/verify-runtime.mjs", "HARNESS-S059", "Runtime verification must fail closed before publishing a complete deduplicated experiment evidence bundle.");
+}
+
+const qualityAssessmentCli = read("scripts/assess-quality-candidate.mjs");
+for (const needle of [
+  "readCompleteRuntimeBatchDirectory",
+  "assertNoSymlinkEscape",
+  "runtime batch directory contains unknown artifacts",
+  "duplicate exact invocations",
+  "model_files",
+  "batch_fingerprint",
+  "exactly cover all canonical experiment invocations",
+]) {
+  assertIncludes(qualityAssessmentCli, needle, "scripts/assess-quality-candidate.mjs", "HARNESS-S059", "Quality assessment must validate the entire ordinary runtime batch bundle without ambiguous files.");
 }
 
 const runtimeFixtureVerifier = read("scripts/verify-runtime-fixtures.mjs");
@@ -1057,6 +1169,16 @@ for (const needle of ["HARNESS-R017", "HARNESS-R018", "task.*", "task.explore", 
 }
 for (const needle of ["external_directory", "config.bash.", "unknown permission actions", "incomplete_scopes", "--subject-evidence"]) {
   assertIncludes(runtimeFixtureVerifier, needle, "scripts/verify-runtime-fixtures.mjs", "HARNESS-S060", "Runtime fixtures must prove complete permission extraction and explicit incomplete evidence.");
+}
+for (const needle of [
+  "--all-experiment-models",
+  "non-authorizing fixture batches must not publish",
+  "unsupported batch must not publish",
+  "ignored batch must not publish",
+  "RUNTIME_MODEL_OPTION_MODE_UNSUPPORTED",
+  "RUNTIME_MODEL_OPTION_REASONING_EFFORT_IGNORED",
+]) {
+  assertIncludes(runtimeFixtureVerifier, needle, "scripts/verify-runtime-fixtures.mjs", "HARNESS-S060", "Runtime fixtures must prove complete-batch fail-closed publication behavior.");
 }
 for (const needle of ["agent-list.txt", "unexpected-agent", "wrongRequiredModeFixture", "extraDangerousAgentFixture", "HARNESS-R022", "HARNESS-R023", "HARNESS-R024"]) {
   assertIncludes(runtimeFixtureVerifier, needle, "scripts/verify-runtime-fixtures.mjs", "HARNESS-S060", "Runtime fixtures must prove authoritative installed-agent discovery, extra-agent capture, and fail-closed inventory handling.");

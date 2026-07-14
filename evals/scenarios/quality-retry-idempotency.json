@@ -1,0 +1,28 @@
+{
+  "id": "quality-retry-idempotency",
+  "description": "Repeated delivery must not duplicate an externally visible side effect.",
+  "risk_tags": ["high", "retry", "idempotency"],
+  "failure_family": "retry-duplicate-side-effect",
+  "workspace_policy": { "mode": "allowlist", "allowed_paths": ["src/events.mjs"] },
+  "repo_fixture": "fixtures/live/quality-retry-idempotency",
+  "task": "Implement idempotent event delivery keyed by event ID. The first delivery records one effect and every retry is a no-op without disrupting out-of-order distinct IDs. Run the targeted test.",
+  "setup_commands": [],
+  "visible_checks": ["node --test test/visible.test.mjs"],
+  "hidden_checks": ["node --test .live-hidden/quality-retry-idempotency.test.mjs"],
+  "hidden_check_files": [{ "source": "evals/hidden/quality-retry-idempotency/hidden.test.mjs", "target": ".live-hidden/quality-retry-idempotency.test.mjs" }],
+  "hidden_trace_assertions": [
+    { "assertion_id": "quality-retry-idempotency-dossier-before-edit", "op": "verifier_code_exists", "code": "ENGINEERING_DOSSIER_BEFORE_IMPLEMENTATION" },
+    { "assertion_id": "quality-retry-idempotency-gate-before-edit", "op": "verifier_code_exists", "code": "ENGINEERING_GATE_PASSED_BEFORE_IMPLEMENTATION" },
+    { "assertion_id": "quality-retry-idempotency-coverage-recorded", "op": "verifier_code_exists", "code": "ENGINEERING_AFFECTED_SYSTEM_COVERAGE_RECORDED" },
+    { "assertion_id": "quality-retry-idempotency-unknowns-resolved", "op": "verifier_code_exists", "code": "ENGINEERING_RELEVANT_UNKNOWNS_RESOLVED" },
+    { "assertion_id": "quality-retry-idempotency-mapping-verified", "op": "verifier_code_exists", "code": "ENGINEERING_EDGE_FAILURE_MAPPING_VERIFIED" },
+    { "assertion_id": "quality-retry-idempotency-architecture-respected", "op": "verifier_code_exists", "code": "ENGINEERING_ARCHITECTURE_RESPECTED" },
+    { "assertion_id": "quality-retry-idempotency-ownership-respected", "op": "verifier_code_exists", "code": "ENGINEERING_IMPLEMENTATION_WITHIN_OWNERSHIP" },
+    { "assertion_id": "quality-retry-idempotency-integrated-verification", "op": "event_exists", "event_type": "verification", "status": "completed" },
+    { "assertion_id": "quality-retry-idempotency-valid-completion", "op": "termination_reason_equals", "value": "verified" }
+  ],
+  "timeout": 90000,
+  "repetitions": 2,
+  "expected_contracts": ["Each event ID produces at most one effect.", "Distinct out-of-order events remain processable."],
+  "forbidden_regressions": ["Do not deduplicate by payload value.", "Do not report a duplicate as newly applied."]
+}

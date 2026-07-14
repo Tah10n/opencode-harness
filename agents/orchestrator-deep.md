@@ -1,10 +1,9 @@
 ---
 description: Deliberate deep primary orchestrator for rare high-complexity planning, review, and integration tasks
 mode: primary
-model: openai/gpt-5.5
+model: openai/gpt-5.6-sol
 reasoningEffort: xhigh
 textVerbosity: low
-temperature: 0.1
 steps: 240
 color: warning
 permission:

@@ -1,0 +1,28 @@
+{
+  "id": "quality-migration-compatibility",
+  "description": "Schema-v2 writes must remain old-reader compatible and support rollback.",
+  "risk_tags": ["critical", "migration", "backward-compatibility"],
+  "failure_family": "migration-old-reader-rollback",
+  "workspace_policy": { "mode": "allowlist", "allowed_paths": ["src/migration.mjs"] },
+  "repo_fixture": "fixtures/live/quality-migration-compatibility",
+  "task": "Normalize schema-v2 display names while preserving schema-v1 reader compatibility and lossless rollback. Keep mixed-version reads working and run the targeted test.",
+  "setup_commands": [],
+  "visible_checks": ["node --test test/visible.test.mjs"],
+  "hidden_checks": ["node --test .live-hidden/quality-migration-compatibility.test.mjs"],
+  "hidden_check_files": [{ "source": "evals/hidden/quality-migration-compatibility/hidden.test.mjs", "target": ".live-hidden/quality-migration-compatibility.test.mjs" }],
+  "hidden_trace_assertions": [
+    { "assertion_id": "quality-migration-compatibility-dossier-before-edit", "op": "verifier_code_exists", "code": "ENGINEERING_DOSSIER_BEFORE_IMPLEMENTATION" },
+    { "assertion_id": "quality-migration-compatibility-gate-before-edit", "op": "verifier_code_exists", "code": "ENGINEERING_GATE_PASSED_BEFORE_IMPLEMENTATION" },
+    { "assertion_id": "quality-migration-compatibility-coverage-recorded", "op": "verifier_code_exists", "code": "ENGINEERING_AFFECTED_SYSTEM_COVERAGE_RECORDED" },
+    { "assertion_id": "quality-migration-compatibility-unknowns-resolved", "op": "verifier_code_exists", "code": "ENGINEERING_RELEVANT_UNKNOWNS_RESOLVED" },
+    { "assertion_id": "quality-migration-compatibility-mapping-verified", "op": "verifier_code_exists", "code": "ENGINEERING_EDGE_FAILURE_MAPPING_VERIFIED" },
+    { "assertion_id": "quality-migration-compatibility-architecture-respected", "op": "verifier_code_exists", "code": "ENGINEERING_ARCHITECTURE_RESPECTED" },
+    { "assertion_id": "quality-migration-compatibility-ownership-respected", "op": "verifier_code_exists", "code": "ENGINEERING_IMPLEMENTATION_WITHIN_OWNERSHIP" },
+    { "assertion_id": "quality-migration-compatibility-integrated-verification", "op": "event_exists", "event_type": "verification", "status": "completed" },
+    { "assertion_id": "quality-migration-compatibility-valid-completion", "op": "termination_reason_equals", "value": "verified" }
+  ],
+  "timeout": 120000,
+  "repetitions": 2,
+  "expected_contracts": ["Schema-v2 records expose normalized displayName.", "Old readers and rollback retain normalized legacy name data."],
+  "forbidden_regressions": ["Do not emit a v2-only shape unreadable by old readers.", "Do not make rollback depend on a field absent from compatible writes."]
+}

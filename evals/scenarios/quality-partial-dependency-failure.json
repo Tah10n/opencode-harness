@@ -1,0 +1,28 @@
+{
+  "id": "quality-partial-dependency-failure",
+  "description": "Availability failures use degraded mode without masking invalid dependency responses.",
+  "risk_tags": ["high", "dependency-outage", "degraded-mode"],
+  "failure_family": "partial-dependency-degraded-mode",
+  "workspace_policy": { "mode": "allowlist", "allowed_paths": ["src/profile.mjs"] },
+  "repo_fixture": "fixtures/live/quality-partial-dependency-failure",
+  "task": "Preserve primary profile results, degrade to fallback for timeout or unavailability, and propagate invalid-response failures. Run the targeted test.",
+  "setup_commands": [],
+  "visible_checks": ["node --test test/visible.test.mjs"],
+  "hidden_checks": ["node --test .live-hidden/quality-partial-dependency-failure.test.mjs"],
+  "hidden_check_files": [{ "source": "evals/hidden/quality-partial-dependency-failure/hidden.test.mjs", "target": ".live-hidden/quality-partial-dependency-failure.test.mjs" }],
+  "hidden_trace_assertions": [
+    { "assertion_id": "quality-partial-dependency-failure-dossier-before-edit", "op": "verifier_code_exists", "code": "ENGINEERING_DOSSIER_BEFORE_IMPLEMENTATION" },
+    { "assertion_id": "quality-partial-dependency-failure-gate-before-edit", "op": "verifier_code_exists", "code": "ENGINEERING_GATE_PASSED_BEFORE_IMPLEMENTATION" },
+    { "assertion_id": "quality-partial-dependency-failure-coverage-recorded", "op": "verifier_code_exists", "code": "ENGINEERING_AFFECTED_SYSTEM_COVERAGE_RECORDED" },
+    { "assertion_id": "quality-partial-dependency-failure-unknowns-resolved", "op": "verifier_code_exists", "code": "ENGINEERING_RELEVANT_UNKNOWNS_RESOLVED" },
+    { "assertion_id": "quality-partial-dependency-failure-mapping-verified", "op": "verifier_code_exists", "code": "ENGINEERING_EDGE_FAILURE_MAPPING_VERIFIED" },
+    { "assertion_id": "quality-partial-dependency-failure-architecture-respected", "op": "verifier_code_exists", "code": "ENGINEERING_ARCHITECTURE_RESPECTED" },
+    { "assertion_id": "quality-partial-dependency-failure-ownership-respected", "op": "verifier_code_exists", "code": "ENGINEERING_IMPLEMENTATION_WITHIN_OWNERSHIP" },
+    { "assertion_id": "quality-partial-dependency-failure-integrated-verification", "op": "event_exists", "event_type": "verification", "status": "completed" },
+    { "assertion_id": "quality-partial-dependency-failure-valid-completion", "op": "termination_reason_equals", "value": "verified" }
+  ],
+  "timeout": 90000,
+  "repetitions": 2,
+  "expected_contracts": ["Healthy primary results are returned unchanged.", "Only availability-class failures use fallback; contract failures propagate."],
+  "forbidden_regressions": ["Do not mask invalid-response failures.", "Do not call fallback on a successful primary response."]
+}

@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "sidecar_version": "1.0.0",
+  "scenario_id": "quality-retry-idempotency",
+  "seeded_defect": "The delivery function records no side effect, so first-delivery behavior fails before implementation.",
+  "visible_oracle": { "command": "node --test test/visible.test.mjs", "seeded_status": "failed" },
+  "bad_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-retry-idempotency/bad/events.mjs", "target": "src/events.mjs", "sha256": "e7340a3fabb5c3847c47f9a0447041dd37ab848ff10be410fdcc9474ca355d6c" }
+  ] },
+  "compliant_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-retry-idempotency/good/events.mjs", "target": "src/events.mjs", "sha256": "63318ddc6fb2b1e113f352b32928ebe84848e15a29c9a620158088f72cc6466d" }
+  ] },
+  "hidden_counterexample": "A duplicate event ID followed by an older distinct ID separates idempotency from payload-based or ordering-based suppression.",
+  "forbidden_regression": "Do not report a duplicate as newly applied.",
+  "risk_class": "high",
+  "workload_class": "retry-and-idempotency",
+  "expected_ownership": ["src/events.mjs"],
+  "required_quality_assertion_ids": [
+    "quality-retry-idempotency-dossier-before-edit",
+    "quality-retry-idempotency-gate-before-edit",
+    "quality-retry-idempotency-coverage-recorded",
+    "quality-retry-idempotency-unknowns-resolved",
+    "quality-retry-idempotency-mapping-verified",
+    "quality-retry-idempotency-architecture-respected",
+    "quality-retry-idempotency-ownership-respected",
+    "quality-retry-idempotency-integrated-verification",
+    "quality-retry-idempotency-valid-completion"
+  ],
+  "suite": "held_out",
+  "fixture_fingerprint": "d1dd7a871cfab5052c44775e6b9419fb6541109edef77c5daa76a0650131dc3a"
+}

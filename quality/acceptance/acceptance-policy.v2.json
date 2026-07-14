@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "policy_version": "2.0.0",
+  "required_suites": [
+    "development",
+    "held_out",
+    "canary"
+  ],
+  "targets": [
+    {
+      "target_id": "cross-module-invariant-quality",
+      "failure_family": "transitive-consumer-invariant-regression",
+      "thresholds": {
+        "task_success_rate": {
+          "minimum_candidate": 0.5,
+          "minimum_delta": 0
+        },
+        "visible_pass_rate": {
+          "minimum_candidate": 1,
+          "minimum_delta": 0
+        },
+        "hidden_pass_rate": {
+          "minimum_candidate": 1,
+          "minimum_delta": 0
+        },
+        "defect_escape_rate": {
+          "maximum_candidate": 0,
+          "maximum_delta": 0
+        }
+      }
+    },
+    {
+      "target_id": "public-api-compatibility-quality",
+      "failure_family": "public-api-shape-error-semantics-regression",
+      "thresholds": {
+        "task_success_rate": {
+          "minimum_candidate": 0.5,
+          "minimum_delta": 0
+        },
+        "visible_pass_rate": {
+          "minimum_candidate": 1,
+          "minimum_delta": 0
+        },
+        "hidden_pass_rate": {
+          "minimum_candidate": 1,
+          "minimum_delta": 0
+        },
+        "defect_escape_rate": {
+          "maximum_candidate": 0,
+          "maximum_delta": 0
+        }
+      }
+    }
+  ],
+  "protected_failure_families": [
+    {
+      "failure_family": "transaction-rollback-data-loss",
+      "criticality": "critical",
+      "thresholds": {
+        "task_success_rate_minimum_delta": 0,
+        "visible_pass_rate_minimum_delta": 0,
+        "hidden_pass_rate_minimum_delta": 0,
+        "defect_escape_rate_maximum_delta": 0
+      }
+    },
+    {
+      "failure_family": "resource-lifecycle-leak",
+      "criticality": "critical",
+      "thresholds": {
+        "task_success_rate_minimum_delta": 0,
+        "visible_pass_rate_minimum_delta": 0,
+        "hidden_pass_rate_minimum_delta": 0,
+        "defect_escape_rate_maximum_delta": 0
+      }
+    },
+    {
+      "failure_family": "migration-old-reader-rollback",
+      "criticality": "critical",
+      "thresholds": {
+        "task_success_rate_minimum_delta": 0,
+        "visible_pass_rate_minimum_delta": 0,
+        "hidden_pass_rate_minimum_delta": 0,
+        "defect_escape_rate_maximum_delta": 0
+      }
+    }
+  ],
+  "quality_requirements": {
+    "require_complete_attestation": true,
+    "require_complete_quality_outcomes": true,
+    "require_integrated_verification": true,
+    "maximum_architecture_policy_violations": 0,
+    "maximum_invariant_violations": 0,
+    "maximum_unverified_critical_invariants": 0,
+    "maximum_incomplete_dossiers": 0,
+    "maximum_pre_edit_gate_violations": 0,
+    "maximum_unresolved_affected_path_gaps": 0,
+    "minimum_edge_case_verification_rate": 1,
+    "minimum_failure_mode_verification_rate": 1,
+    "maximum_test_quality_failures": 0,
+    "maximum_permission_widening": 0,
+    "maximum_introduced_regressions": 0,
+    "maximum_hidden_edge_case_failures": 0
+  },
+  "profile_requirements": {
+    "experiment_id": "gpt56-role-ab-v1",
+    "experiment_fingerprint": "sha256:888506d0a3b17f3b99cf37f2fd49bf710403f133f5dc2cb244c116404f9abb2f",
+    "pair_universe_fingerprint": "sha256:80ee95e09e286794df0b2b636a77944373551aaa682cf4d6faad8634e2607f54",
+    "require_distinct_model_profiles_within_pair": true,
+    "require_installed_runtime_evidence": true
+  },
+  "cost_ceiling": null,
+  "duration_ceiling": null,
+  "token_ceiling": null,
+  "expected_producers": {
+    "live_report": "opencode-harness/live-evaluation-v2",
+    "quality_outcomes": "opencode-harness/quality-outcomes-v1"
+  }
+}

@@ -12,6 +12,13 @@ import {
 } from "../lib/feedback/evidence.mjs";
 import { collectResolvedPermissionSurface, extractPermissionSurface } from "../lib/feedback/permission-surface.mjs";
 import { assertPersistenceSafe, assertSafePersistenceId } from "../lib/feedback/privacy.mjs";
+import {
+  evaluateRuntimeModelEvidence,
+  sealRuntimeModelEvidence,
+  validateEngineeringExperimentManifest,
+  validateModelProfileCatalog,
+  validateRuntimeModelEvidence,
+} from "../lib/quality/model-profiles.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const runtimeCwd = process.env.HARNESS_RUNTIME_CWD
@@ -25,8 +32,17 @@ const fixtureDir = fixtureSource
   : null;
 const evidenceProfileArgIndex = process.argv.indexOf("--evidence-profile");
 const evidenceProfile = evidenceProfileArgIndex === -1 ? null : process.argv[evidenceProfileArgIndex + 1];
+const subjectIdArgIndex = process.argv.indexOf("--subject-id");
+const subjectId = subjectIdArgIndex === -1 ? null : process.argv[subjectIdArgIndex + 1];
 const subjectEvidenceArgIndex = process.argv.indexOf("--subject-evidence");
 const subjectEvidencePath = subjectEvidenceArgIndex === -1 ? null : process.argv[subjectEvidenceArgIndex + 1];
+const modelProfileArgIndex = process.argv.indexOf("--model-profile");
+const modelProfileId = modelProfileArgIndex === -1 ? null : process.argv[modelProfileArgIndex + 1];
+const comparisonArgIndex = process.argv.indexOf("--comparison");
+const comparisonId = comparisonArgIndex === -1 ? null : process.argv[comparisonArgIndex + 1];
+const experimentRoleArgIndex = process.argv.indexOf("--profile-role");
+const experimentProfileRole = experimentRoleArgIndex === -1 ? null : process.argv[experimentRoleArgIndex + 1];
+const allExperimentModels = process.argv.includes("--all-experiment-models");
 const requiredAgentNames = ["orchestrator", "orchestrator-deep", "review-orchestrator", "explore", "architect", "general", "reviewer", "diagnose", "verifier", "researcher", "improver"];
 const requiredAgentModes = new Map(requiredAgentNames.map((name) => [
   name,
@@ -35,6 +51,7 @@ const requiredAgentModes = new Map(requiredAgentNames.map((name) => [
 const MAX_AGENT_INVENTORY_BYTES = 2 * 1024 * 1024;
 const MAX_AGENT_COUNT = 128;
 const failures = [];
+let installedRuntimeVersion = null;
 
 function fail(code, message, fix) {
   failures.push({ code, message, fix });
@@ -56,16 +73,24 @@ function readFixture(name) {
   return fs.readFileSync(file, "utf8");
 }
 
-function spawnOpenCode(args) {
+function readOptionalFixture(name) {
+  if (!fixtureDir) return null;
+  const file = path.join(fixtureDir, `${name}.txt`);
+  return fs.existsSync(file) ? fs.readFileSync(file, "utf8") : null;
+}
+
+function spawnOpenCode(args, { env = process.env } = {}) {
   if (process.platform === "win32") {
     return spawnSync("cmd.exe", ["/d", "/s", "/c", ["opencode", ...args].join(" ")], {
       cwd: runtimeCwd,
       encoding: "utf8",
+      env,
     });
   }
   return spawnSync("opencode", args, {
     cwd: runtimeCwd,
     encoding: "utf8",
+    env,
   });
 }
 
@@ -83,8 +108,8 @@ function reportAndExit() {
 
 function loadSubjectEvidence() {
   if (evidenceProfileArgIndex === -1) {
-    if (subjectEvidenceArgIndex !== -1) {
-      fail("HARNESS-R019", "--subject-evidence requires --evidence-profile", "Pass both evidence arguments together.");
+    if (subjectEvidenceArgIndex !== -1 || subjectIdArgIndex !== -1) {
+      fail("HARNESS-R019", "--subject-id and --subject-evidence require --evidence-profile", "Pass the permission profile and subject arguments together.");
     }
     return null;
   }
@@ -98,6 +123,20 @@ function loadSubjectEvidence() {
     fail("HARNESS-R019", error instanceof Error ? error.message : String(error), "Pass a filename-safe evidence profile identifier.");
     return null;
   }
+  const expectedSubjectId = subjectIdArgIndex === -1 ? evidenceProfile : subjectId;
+  if (
+    !expectedSubjectId
+    || (subjectIdArgIndex !== -1 && process.argv[subjectIdArgIndex + 1]?.startsWith("--"))
+  ) {
+    fail("HARNESS-R019", "--subject-id requires a filename-safe static subject identifier", "Pass the candidate_id used by evidence:static.");
+    return null;
+  }
+  try {
+    assertSafePersistenceId(expectedSubjectId, "subject ID");
+  } catch (error) {
+    fail("HARNESS-R019", error instanceof Error ? error.message : String(error), "Pass the candidate_id used by evidence:static.");
+    return null;
+  }
   if (!subjectEvidencePath || process.argv[subjectEvidenceArgIndex + 1]?.startsWith("--")) {
     fail("HARNESS-R020", "--evidence-profile requires --subject-evidence <static-evidence.json>", "Capture first-party static evidence for the same profile first.");
     return null;
@@ -109,8 +148,8 @@ function loadSubjectEvidence() {
       fail("HARNESS-R020", "subject static evidence must be passed and complete", "Run the first-party static evidence producer successfully.");
       return null;
     }
-    if (parsed.candidate_id !== evidenceProfile) {
-      fail("HARNESS-R020", "subject static evidence candidate_id must match --evidence-profile", "Use evidence captured for this exact profile identifier.");
+    if (parsed.candidate_id !== expectedSubjectId) {
+      fail("HARNESS-R020", "subject static evidence candidate_id must match --subject-id (or --evidence-profile when omitted)", "Use evidence captured for the declared static subject identifier.");
       return null;
     }
     return parsed;
@@ -133,15 +172,16 @@ if (!fixtureDir) {
     fail("HARNESS-R002", `opencode --version exited with ${versionCheck.status}`, stripAnsi(`${versionCheck.stderr || versionCheck.stdout}`).trim());
     reportAndExit();
   }
+  installedRuntimeVersion = stripAnsi(`${versionCheck.stdout || versionCheck.stderr || ""}`).trim().split(/\r?\n/u)[0]?.slice(0, 128) || null;
 }
 
-function runOpenCode(name, args) {
+function runOpenCode(name, args, options = {}) {
   const fixture = readFixture(name);
   if (fixture !== null) {
     return stripAnsi(fixture);
   }
 
-  const result = spawnOpenCode(args);
+  const result = spawnOpenCode(args, options);
 
   if (result.error) {
     fail("HARNESS-R002", `failed to run opencode ${args.join(" ")}: ${result.error.message}`, "Install OpenCode or set HARNESS_RUNTIME_FIXTURE_DIR to saved debug outputs.");
@@ -443,6 +483,359 @@ function effectivePermissionValue(values) {
   return values.length > 0 ? values[values.length - 1] : null;
 }
 
+function resolvedConfigValue(output, keys) {
+  for (const key of keys) {
+    const values = uniqueValues(permissionValues(output, key));
+    if (values.length > 0) return { value: values.at(-1), values };
+  }
+  return { value: null, values: [] };
+}
+
+function optionResult(optionId, requestedValue, resolved, { unsupportedWhenAbsent = false, allowAlias = false } = {}) {
+  let status;
+  if (resolved.value === null) status = unsupportedWhenAbsent ? "unsupported" : "absent";
+  else if (resolved.value === requestedValue) status = "accepted";
+  else if (allowAlias && resolved.value.replace(/^openai\//u, "") === requestedValue.replace(/^openai\//u, "")) status = "alias";
+  else if (resolved.values.includes(requestedValue)) status = "ignored";
+  else status = "conflicting";
+  return {
+    option_id: optionId,
+    requested_value: requestedValue,
+    effective_value: resolved.value,
+    status,
+  };
+}
+
+function loadRequestedModelProfile() {
+  if (allExperimentModels) return null;
+  if (modelProfileArgIndex === -1 && comparisonArgIndex === -1 && experimentRoleArgIndex === -1) return null;
+  if (comparisonArgIndex !== -1 || experimentRoleArgIndex !== -1) {
+    if (
+      !comparisonId || process.argv[comparisonArgIndex + 1]?.startsWith("--")
+      || !["baseline", "candidate"].includes(experimentProfileRole)
+    ) {
+      fail(
+        "HARNESS-R025",
+        "--comparison <comparison-id> and --profile-role baseline|candidate must be supplied together",
+        "Choose a comparison_id from quality/model-profiles/experiment.v1.json.",
+      );
+      return null;
+    }
+  }
+  if (modelProfileArgIndex !== -1 && (!modelProfileId || process.argv[modelProfileArgIndex + 1]?.startsWith("--"))) {
+    fail("HARNESS-R025", "--model-profile requires a checked model profile identifier", "Choose a profile_id from quality/model-profiles/catalog.v1.json.");
+    return null;
+  }
+  const catalogPath = path.join(root, "quality", "model-profiles", "catalog.v1.json");
+  try {
+    const catalog = JSON.parse(fs.readFileSync(catalogPath, "utf8").replace(/^\uFEFF/u, ""));
+    validateModelProfileCatalog(catalog);
+    let invocation = null;
+    if (comparisonId !== null) {
+      assertSafeId(comparisonId, "comparison ID");
+      const experiment = JSON.parse(fs.readFileSync(path.join(root, "quality", "model-profiles", "experiment.v1.json"), "utf8").replace(/^\uFEFF/u, ""));
+      validateEngineeringExperimentManifest(experiment, { catalog });
+      const comparison = experiment.comparisons.find((entry) => entry.comparison_id === comparisonId);
+      if (!comparison) {
+        fail("HARNESS-R025", `unknown --comparison ${comparisonId}`, "Choose a checked comparison_id from the experiment manifest.");
+        return null;
+      }
+      invocation = comparison[`${experimentProfileRole}_invocation`];
+      if (modelProfileId !== null && modelProfileId !== invocation.profile_id) {
+        fail("HARNESS-R025", "--model-profile does not match the selected experiment invocation", "Omit --model-profile or pass the invocation profile_id.");
+        return null;
+      }
+    }
+    const requestedProfileId = invocation?.profile_id ?? modelProfileId;
+    const profile = catalog.profiles.find((entry) => entry.profile_id === requestedProfileId);
+    if (!profile) {
+      fail("HARNESS-R025", `unknown --model-profile ${requestedProfileId}`, "Choose a checked profile_id from the model catalog.");
+      return null;
+    }
+    invocation ??= {
+      role: profile.role,
+      profile_id: profile.profile_id,
+      model_id: profile.model_id,
+      reasoning_effort: profile.default_reasoning_effort,
+      text_verbosity: profile.default_text_verbosity,
+      mode: profile.mode,
+    };
+    return { catalog, profile, invocation, comparisonId, experimentProfileRole };
+  } catch (error) {
+    fail("HARNESS-R025", `model profile catalog is invalid: ${error instanceof Error ? error.message : String(error)}`, "Restore and verify the checked model profile catalog.");
+    return null;
+  }
+}
+
+function invocationIdentity(invocation) {
+  return JSON.stringify({
+    role: invocation.role,
+    profile_id: invocation.profile_id,
+    model_id: invocation.model_id,
+    reasoning_effort: invocation.reasoning_effort,
+    text_verbosity: invocation.text_verbosity,
+    mode: invocation.mode,
+  });
+}
+
+function loadAllRequestedModelProfiles() {
+  if (!allExperimentModels) return null;
+  if (
+    modelProfileArgIndex !== -1
+    || comparisonArgIndex !== -1
+    || !["baseline", "candidate"].includes(experimentProfileRole)
+  ) {
+    fail(
+      "HARNESS-R025",
+      "--all-experiment-models requires exactly --profile-role baseline|candidate and cannot be combined with --model-profile or --comparison",
+      "Run one complete batch per profile role against its installed runtime root.",
+    );
+    return null;
+  }
+  try {
+    const catalog = JSON.parse(fs.readFileSync(path.join(root, "quality", "model-profiles", "catalog.v1.json"), "utf8").replace(/^\uFEFF/u, ""));
+    const experiment = JSON.parse(fs.readFileSync(path.join(root, "quality", "model-profiles", "experiment.v1.json"), "utf8").replace(/^\uFEFF/u, ""));
+    validateModelProfileCatalog(catalog);
+    validateEngineeringExperimentManifest(experiment, { catalog });
+    const requestsByIdentity = new Map();
+    for (const comparison of experiment.comparisons) {
+      const invocation = comparison[`${experimentProfileRole}_invocation`];
+      const identity = invocationIdentity(invocation);
+      if (!requestsByIdentity.has(identity)) {
+        const profile = catalog.profiles.find((entry) => entry.profile_id === invocation.profile_id);
+        if (!profile) throw new Error(`missing catalog profile ${invocation.profile_id}`);
+        requestsByIdentity.set(identity, {
+          catalog,
+          profile,
+          invocation,
+          comparisonId: null,
+          experimentProfileRole,
+        });
+      }
+    }
+    const requests = [...requestsByIdentity.values()].sort((left, right) => (
+      invocationIdentity(left.invocation).localeCompare(invocationIdentity(right.invocation))
+    ));
+    if (requests.length === 0 || requests.length > 128) {
+      throw new Error(`expected 1..128 distinct invocations, got ${requests.length}`);
+    }
+    return { catalog, experiment, profileRole: experimentProfileRole, requests };
+  } catch (error) {
+    fail(
+      "HARNESS-R025",
+      `complete experiment model batch is invalid: ${error instanceof Error ? error.message : String(error)}`,
+      "Restore and verify the checked model catalog and experiment manifest.",
+    );
+    return null;
+  }
+}
+
+function batchModelOutput(requested) {
+  const { invocation, profile } = requested;
+  if (fixtureDir) {
+    const fixtureMode = (readOptionalFixture("model-batch-mode") ?? "unsupported").trim();
+    const base = agentOutputs.get(profile.role) ?? "";
+    const acceptedLines = [
+      `model: ${invocation.model_id}`,
+      `reasoningEffort: ${invocation.reasoning_effort}`,
+      `textVerbosity: ${invocation.text_verbosity}`,
+    ];
+    if (fixtureMode === "accepted") acceptedLines.push(`model_mode: ${invocation.mode}`);
+    else if (fixtureMode === "ignored") {
+      acceptedLines.push(`model_mode: ${invocation.mode}`);
+      acceptedLines.push("reasoningEffort: fixture-conflict");
+    } else if (fixtureMode !== "unsupported") {
+      fail("HARNESS-R025", `unsupported model-batch fixture mode ${fixtureMode}`, "Use accepted, ignored, or unsupported.");
+    }
+    return `${base}\n${acceptedLines.join("\n")}\n`;
+  }
+
+  let configContent = {};
+  if (process.env.OPENCODE_CONFIG_CONTENT) {
+    try {
+      configContent = JSON.parse(process.env.OPENCODE_CONFIG_CONTENT);
+      if (!configContent || typeof configContent !== "object" || Array.isArray(configContent)) {
+        throw new Error("must be a JSON object");
+      }
+    } catch (error) {
+      fail("HARNESS-R025", `OPENCODE_CONFIG_CONTENT is invalid: ${error.message}`, "Pass a JSON object or unset the variable.");
+      return "";
+    }
+  }
+  const existingAgent = configContent.agent?.[profile.role];
+  const agentOverride = existingAgent && typeof existingAgent === "object" && !Array.isArray(existingAgent)
+    ? existingAgent
+    : {};
+  const existingOptions = agentOverride.options && typeof agentOverride.options === "object" && !Array.isArray(agentOverride.options)
+    ? agentOverride.options
+    : {};
+  const override = {
+    ...configContent,
+    agent: {
+      ...(configContent.agent ?? {}),
+      [profile.role]: {
+        ...agentOverride,
+        model: invocation.model_id,
+        reasoningEffort: invocation.reasoning_effort,
+        textVerbosity: invocation.text_verbosity,
+        options: {
+          ...existingOptions,
+          reasoningEffort: invocation.reasoning_effort,
+          textVerbosity: invocation.text_verbosity,
+          model_mode: invocation.mode,
+        },
+      },
+    },
+  };
+  return runOpenCode(
+    `model-batch-${profile.role}`,
+    ["debug", "agent", profile.role],
+    { env: { ...process.env, OPENCODE_CONFIG_CONTENT: JSON.stringify(override) } },
+  );
+}
+
+function captureRuntimeModelEvidence(requested, { output = null, batch = false, createdAt = null } = {}) {
+  if (requested === null) return null;
+  const { catalog, profile, invocation } = requested;
+  const resolvedOutput = output ?? agentOutputs.get(profile.role) ?? "";
+  const model = optionResult("model", invocation.model_id, resolvedConfigValue(resolvedOutput, ["model", "options.model"]), { allowAlias: true });
+  const reasoning = optionResult(
+    "reasoning_effort",
+    invocation.reasoning_effort,
+    resolvedConfigValue(resolvedOutput, ["reasoningEffort", "options.reasoningEffort", "reasoning_effort", "options.reasoning_effort"]),
+  );
+  const verbosity = optionResult(
+    "text_verbosity",
+    invocation.text_verbosity,
+    resolvedConfigValue(resolvedOutput, ["textVerbosity", "options.textVerbosity", "text_verbosity", "options.text_verbosity"]),
+  );
+  // OpenCode documentation does not currently establish the API-level standard/pro
+  // mode as a resolved agent-config key. Only an explicit runtime-specific key can
+  // prove it; the ordinary agent `mode` field is primary/subagent and is unrelated.
+  const mode = optionResult(
+    "mode",
+    invocation.mode,
+    resolvedConfigValue(resolvedOutput, ["model_mode", "options.model_mode", "provider.mode"]),
+    { unsupportedWhenAbsent: true },
+  );
+  const optionResults = [model, reasoning, verbosity, mode];
+  const requestedCapabilityIds = [
+    ...(invocation.reasoning_effort === "xhigh" ? ["reasoning_effort_xhigh"] : []),
+    ...(invocation.reasoning_effort === "max" ? ["reasoning_effort_max"] : []),
+    ...(invocation.mode === "pro" ? ["mode_pro"] : []),
+  ];
+  for (const capabilityId of requestedCapabilityIds) {
+    let source = { value: null, values: [] };
+    let requestedValue = null;
+    if (capabilityId === "reasoning_effort_xhigh") {
+      source = reasoning;
+      requestedValue = "xhigh";
+    } else if (capabilityId === "reasoning_effort_max") {
+      source = reasoning;
+      requestedValue = "max";
+    } else if (capabilityId === "mode_pro") {
+      source = mode;
+      requestedValue = "pro";
+    }
+    optionResults.push({
+      option_id: capabilityId,
+      requested_value: requestedValue,
+      effective_value: source.effective_value ?? source.value ?? null,
+      status: source.status ?? "unsupported",
+    });
+  }
+  const capturedAt = createdAt ?? process.env.HARNESS_EVIDENCE_TIMESTAMP ?? new Date().toISOString();
+  assertIsoTimestamp(capturedAt, "HARNESS_EVIDENCE_TIMESTAMP");
+  const invocationFingerprint = fingerprint(JSON.parse(invocationIdentity(invocation))).slice(7, 23);
+  const evidence = sealRuntimeModelEvidence({
+    schema_version: 1,
+    evidence_id: batch
+      ? `runtime-model-${profile.profile_id}-${invocationFingerprint}`
+      : `runtime-model-${profile.profile_id}${requested.comparisonId ? `-${requested.comparisonId}-${requested.experimentProfileRole}` : ""}`,
+    evidence_kind: fixtureDir ? "fixture_parser" : "installed_runtime",
+    runtime_name: "opencode",
+    runtime_version: fixtureDir ? null : installedRuntimeVersion,
+    captured_at: capturedAt,
+    catalog_id: catalog.catalog_id,
+    catalog_fingerprint: catalog.content_fingerprint,
+    requested_profile_id: profile.profile_id,
+    requested_model_id: profile.model_id,
+    effective_model_id: model.effective_value,
+    option_results: optionResults,
+    complete: optionResults.every((entry) => entry.status === "accepted"),
+    source_command_id: batch
+      ? `opencode-debug-agent-${profile.role}-batch-${invocationFingerprint}`
+      : `opencode-debug-agent-${profile.role}`,
+  });
+  return { catalog, evidence, createdAt: capturedAt, invocation };
+}
+
+function persistEvidenceDocument(document, createdAt, label) {
+  assertPersistenceSafe(document, { label: `${label} evidence` });
+  const evidenceWorkspace = path.resolve(process.env.HARNESS_EVIDENCE_WORKSPACE || root);
+  const harnessRoot = resolveHarnessRoot(evidenceWorkspace);
+  const evidenceDir = path.join(harnessRoot, "evidence");
+  ensureConfinedDirectory(harnessRoot, evidenceDir);
+  const timestamp = createdAt.replace(/[-:.]/g, "").replace(/[+]/g, "p");
+  const evidencePath = path.join(evidenceDir, `${timestamp}-${label}-${randomUUID()}.json`);
+  atomicWriteJson(evidencePath, document, { immutable: true, basePath: harnessRoot });
+  return path.relative(evidenceWorkspace, evidencePath).replaceAll("\\", "/");
+}
+
+function persistRuntimeModelBatch(evidence, createdAt, profileRole) {
+  if (!Array.isArray(evidence) || evidence.length === 0 || evidence.length > 128) {
+    throw new Error("runtime model batch must contain 1..128 entries");
+  }
+  const identities = evidence.map((entry) => {
+    const options = new Map(entry.option_results.map((option) => [option.option_id, option.requested_value]));
+    return JSON.stringify({
+      requested_profile_id: entry.requested_profile_id,
+      requested_model_id: entry.requested_model_id,
+      reasoning_effort: options.get("reasoning_effort"),
+      text_verbosity: options.get("text_verbosity"),
+      mode: options.get("mode"),
+    });
+  });
+  if (new Set(identities).size !== identities.length) {
+    throw new Error("runtime model batch contains duplicate exact invocations");
+  }
+  const evidenceWorkspace = path.resolve(process.env.HARNESS_EVIDENCE_WORKSPACE || root);
+  const harnessRoot = resolveHarnessRoot(evidenceWorkspace);
+  const evidenceDir = path.join(harnessRoot, "evidence", "runtime-model-batches");
+  ensureConfinedDirectory(harnessRoot, evidenceDir);
+  const timestamp = createdAt.replace(/[-:.]/g, "").replace(/[+]/g, "p");
+  const batchId = `runtime-batch-${profileRole}-${randomUUID()}`;
+  const batchFile = `${timestamp}-runtime-batch-${profileRole}-${batchId}.json`;
+  const modelFiles = evidence.map((entry, index) => (
+    `${timestamp}-model-${profileRole}-${String(index + 1).padStart(3, "0")}-${entry.evidence_id}-${batchId}.json`
+  ));
+  const markerFile = `${timestamp}-runtime-batch-${profileRole}-${batchId}.complete.json`;
+  const batchFingerprint = fingerprint(evidence.map((entry) => entry.content_fingerprint));
+  const marker = {
+    schema_version: 1,
+    batch_id: batchId,
+    profile_role: profileRole,
+    created_at: createdAt,
+    entry_count: evidence.length,
+    batch_file: batchFile,
+    batch_fingerprint: batchFingerprint,
+    model_files: modelFiles,
+    model_fingerprints: evidence.map((entry) => entry.content_fingerprint),
+  };
+  assertPersistenceSafe(evidence, { label: "runtime model batch" });
+  assertPersistenceSafe(marker, { label: "runtime model batch marker" });
+  atomicWriteJson(path.join(evidenceDir, batchFile), evidence, { immutable: true, basePath: harnessRoot });
+  evidence.forEach((entry, index) => {
+    atomicWriteJson(path.join(evidenceDir, modelFiles[index]), entry, { immutable: true, basePath: harnessRoot });
+  });
+  atomicWriteJson(path.join(evidenceDir, markerFile), marker, { immutable: true, basePath: harnessRoot });
+  return {
+    directory: path.relative(evidenceWorkspace, evidenceDir).replaceAll("\\", "/"),
+    batchFile,
+    markerFile,
+  };
+}
+
 function assertOnlyPermission(output, key, expected, label, code, fix) {
   const values = permissionValues(output, key);
   const effective = effectivePermissionValue(values);
@@ -563,6 +956,59 @@ if (evidenceProfileArgIndex !== -1) {
       "HARNESS-R021",
       `permission evidence is incomplete for scopes: ${surface.incomplete_scopes.join(", ")}`,
       "Use complete supported debug output with only allow, ask, or deny actions.",
+    );
+    reportAndExit();
+  }
+}
+
+const requestedModelBatch = loadAllRequestedModelProfiles();
+if (failures.length > 0) reportAndExit();
+if (requestedModelBatch !== null) {
+  const createdAt = process.env.HARNESS_EVIDENCE_TIMESTAMP || new Date().toISOString();
+  assertIsoTimestamp(createdAt, "HARNESS_EVIDENCE_TIMESTAMP");
+  const captured = requestedModelBatch.requests.map((requested) => captureRuntimeModelEvidence(requested, {
+    output: batchModelOutput(requested),
+    batch: true,
+    createdAt,
+  }));
+  const evidence = captured.map((entry) => entry.evidence);
+  evidence.forEach((entry) => validateRuntimeModelEvidence(entry, { catalog: requestedModelBatch.catalog }));
+  const decisions = captured.map((entry) => evaluateRuntimeModelEvidence(
+    entry.evidence,
+    entry.catalog,
+    { expectedInvocation: entry.invocation },
+  ));
+  const ineligible = decisions.filter((decision) => !decision.eligible);
+  if (ineligible.length > 0) {
+    const reasonCodes = [...new Set(ineligible.flatMap((decision) => decision.reason_codes))].sort();
+    fail(
+      "HARNESS-R025",
+      `${ineligible.length}/${decisions.length} distinct ${requestedModelBatch.profileRole} invocations are not runtime-eligible: ${reasonCodes.join(", ")}`,
+      "Use installed-runtime output that accepts every exact model, effort, verbosity, and mode override; fixture, unsupported, ignored, alias, and conflicting values never authorize execution.",
+    );
+  }
+  if (failures.length > 0) reportAndExit();
+  const persisted = persistRuntimeModelBatch(evidence, createdAt, requestedModelBatch.profileRole);
+  console.log(`Complete runtime model batch written: ${persisted.directory}/${persisted.batchFile}`);
+  console.log(`Runtime model batch completion marker: ${persisted.directory}/${persisted.markerFile}`);
+}
+
+const requestedModelProfile = loadRequestedModelProfile();
+if (failures.length > 0) reportAndExit();
+if (requestedModelProfile !== null) {
+  const captured = captureRuntimeModelEvidence(requestedModelProfile);
+  const relativeEvidencePath = persistEvidenceDocument(
+    captured.evidence,
+    captured.createdAt,
+    `model-${captured.evidence.requested_profile_id}`,
+  );
+  console.log(`Model evidence written: ${relativeEvidencePath}`);
+  const decision = evaluateRuntimeModelEvidence(captured.evidence, captured.catalog, { expectedInvocation: captured.invocation });
+  if (!decision.eligible) {
+    fail(
+      "HARNESS-R025",
+      `model profile ${captured.evidence.requested_profile_id} is not runtime-eligible: ${decision.reason_codes.join(", ")}`,
+      "Use installed-runtime output that proves every requested option exactly; do not promote fixture, absent, ignored, alias, conflicting, or unsupported options.",
     );
     reportAndExit();
   }

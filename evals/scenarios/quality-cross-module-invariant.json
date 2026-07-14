@@ -1,0 +1,28 @@
+{
+  "id": "quality-cross-module-invariant",
+  "description": "A display normalization change must preserve a transitive inventory-key invariant.",
+  "risk_tags": ["high", "cross-module", "compatibility"],
+  "failure_family": "transitive-consumer-invariant-regression",
+  "workspace_policy": { "mode": "allowlist", "allowed_paths": ["src/sku.mjs", "src/inventory.mjs"] },
+  "repo_fixture": "fixtures/live/quality-cross-module-invariant",
+  "task": "Change display SKU normalization to lowercase while preserving the documented uppercase inventory-key contract for downstream consumers. Inspect both affected modules and run the targeted test.",
+  "setup_commands": [],
+  "visible_checks": ["node --test test/visible.test.mjs"],
+  "hidden_checks": ["node --test .live-hidden/quality-cross-module-invariant.test.mjs"],
+  "hidden_check_files": [{ "source": "evals/hidden/quality-cross-module-invariant/hidden.test.mjs", "target": ".live-hidden/quality-cross-module-invariant.test.mjs" }],
+  "hidden_trace_assertions": [
+    { "assertion_id": "quality-cross-module-invariant-dossier-before-edit", "op": "verifier_code_exists", "code": "ENGINEERING_DOSSIER_BEFORE_IMPLEMENTATION" },
+    { "assertion_id": "quality-cross-module-invariant-gate-before-edit", "op": "verifier_code_exists", "code": "ENGINEERING_GATE_PASSED_BEFORE_IMPLEMENTATION" },
+    { "assertion_id": "quality-cross-module-invariant-coverage-recorded", "op": "verifier_code_exists", "code": "ENGINEERING_AFFECTED_SYSTEM_COVERAGE_RECORDED" },
+    { "assertion_id": "quality-cross-module-invariant-unknowns-resolved", "op": "verifier_code_exists", "code": "ENGINEERING_RELEVANT_UNKNOWNS_RESOLVED" },
+    { "assertion_id": "quality-cross-module-invariant-mapping-verified", "op": "verifier_code_exists", "code": "ENGINEERING_EDGE_FAILURE_MAPPING_VERIFIED" },
+    { "assertion_id": "quality-cross-module-invariant-architecture-respected", "op": "verifier_code_exists", "code": "ENGINEERING_ARCHITECTURE_RESPECTED" },
+    { "assertion_id": "quality-cross-module-invariant-ownership-respected", "op": "verifier_code_exists", "code": "ENGINEERING_IMPLEMENTATION_WITHIN_OWNERSHIP" },
+    { "assertion_id": "quality-cross-module-invariant-integrated-verification", "op": "event_exists", "event_type": "verification", "status": "completed" },
+    { "assertion_id": "quality-cross-module-invariant-valid-completion", "op": "termination_reason_equals", "value": "verified" }
+  ],
+  "timeout": 90000,
+  "repetitions": 2,
+  "expected_contracts": ["Display SKUs are lowercase.", "Inventory keys remain uppercase for transitive legacy consumers."],
+  "forbidden_regressions": ["Do not weaken the visible check.", "Do not change the inventory-key serialized contract."]
+}

@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "sidecar_version": "1.0.0",
+  "scenario_id": "quality-concurrency-cancellation",
+  "seeded_defect": "Normal execution returns an off-by-one result before the cancellation cleanup behavior can be trusted.",
+  "visible_oracle": { "command": "node --test test/visible.test.mjs", "seeded_status": "failed" },
+  "bad_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-concurrency-cancellation/bad/pool.mjs", "target": "src/pool.mjs", "sha256": "0d5f3ab6f56d084d6275dbadda6041c5ac7b6a7b87a670f90fbb520f7c3eb478" }
+  ] },
+  "compliant_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-concurrency-cancellation/good/pool.mjs", "target": "src/pool.mjs", "sha256": "ec4db798003fa21849e41aea19593889e2136986d5735ec59c16347e4ce8c79a" }
+  ] },
+  "hidden_counterexample": "A pre-aborted signal and a rejected task prove that every termination path releases the active slot.",
+  "forbidden_regression": "Do not leave tracker.active incremented after termination.",
+  "risk_class": "high",
+  "workload_class": "concurrency-and-cancellation",
+  "expected_ownership": ["src/pool.mjs"],
+  "required_quality_assertion_ids": [
+    "quality-concurrency-cancellation-dossier-before-edit",
+    "quality-concurrency-cancellation-gate-before-edit",
+    "quality-concurrency-cancellation-coverage-recorded",
+    "quality-concurrency-cancellation-unknowns-resolved",
+    "quality-concurrency-cancellation-mapping-verified",
+    "quality-concurrency-cancellation-architecture-respected",
+    "quality-concurrency-cancellation-ownership-respected",
+    "quality-concurrency-cancellation-integrated-verification",
+    "quality-concurrency-cancellation-valid-completion"
+  ],
+  "suite": "development",
+  "fixture_fingerprint": "baeb367e4a8997a9e0369688f6e4134c4de711db10b58def5a54ac50073672d4"
+}

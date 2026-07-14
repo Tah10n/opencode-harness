@@ -30,17 +30,29 @@ const expectedSuites = Object.freeze({
     "related-callpath-discovery",
     "stale-context-reverify",
     "conflicting-write-scopes",
+    "quality-cross-module-invariant",
+    "quality-public-api-compatibility",
+    "quality-architecture-boundary",
+    "quality-concurrency-cancellation",
+    "quality-parser-boundaries",
+    "quality-small-local-control",
   ],
   held_out: [
     "broad-audit-bounded-context",
     "weak-handoff-bounded-termination",
     "project-local-knowledge",
     "dangerous-command-approval",
+    "quality-persistence-rollback",
+    "quality-retry-idempotency",
+    "quality-stale-cache-version-skew",
+    "quality-partial-dependency-failure",
   ],
   canary: [
     "review-read-only-trap",
     "prompt-injection-repository-data",
     "secret-bait-not-persisted",
+    "quality-resource-lifecycle",
+    "quality-migration-compatibility",
   ],
   infrastructure: ["runner-self-test"],
 });
@@ -74,9 +86,9 @@ function schemaStringAccepts(schema, value) {
 
 const { scenarios, suiteManifest } = loadScenarioCorpus({ root });
 const behavioral = scenarios.filter((scenario) => scenario.id !== "runner-self-test");
-assert.equal(scenarios.length, 13, "corpus must contain 12 behavioral scenarios plus runner self-test");
-assert.equal(behavioral.length, 12);
-assert.equal(new Set(behavioral.map((scenario) => scenario.failure_family)).size, 12, "failure families must be distinct");
+assert.equal(scenarios.length, 25, "corpus must contain 24 behavioral scenarios plus runner self-test");
+assert.equal(behavioral.length, 24);
+assert.equal(new Set(behavioral.map((scenario) => scenario.failure_family)).size, 24, "failure families must be distinct");
 assert(new Set(behavioral.map((scenario) => scenario.repo_fixture)).size >= 8, "corpus must use at least eight mechanism-specific fixtures");
 for (const scenario of behavioral) {
   assert.equal(schemaStringAccepts(scenarioSchema.properties.repo_fixture, scenario.repo_fixture), true, `${scenario.id} fixture must satisfy the public schema`);
@@ -93,7 +105,7 @@ assert.deepEqual(Object.keys(suiteManifest.suites), SUITE_NAMES);
 assert.deepEqual(BEHAVIORAL_SUITE_NAMES, ["development", "held_out", "canary"]);
 
 const defaultSelection = selectScenarios({ scenarios, suiteManifest });
-assert.equal(defaultSelection.length, 12);
+assert.equal(defaultSelection.length, 24);
 assert(defaultSelection.every((entry) => entry.suite !== "infrastructure"));
 assert.deepEqual(selectScenarios({ scenarios, suiteManifest, suite: "canary" }).map((entry) => entry.scenario.id), expectedSuites.canary);
 assert.equal(selectScenarios({ scenarios, suiteManifest, scenarioIds: "runner-self-test" })[0].suite, "infrastructure");
@@ -338,4 +350,4 @@ for (const relativePath of ["handoffs/initial.json", "handoffs/redirected.json"]
   assert(weakHandoff.hidden_trace_assertions.some((entry) => entry.op === "context_receipt_exists" && entry.relative_path === relativePath));
 }
 
-console.log("Live manifest, suite, corpus, and trace assertion self-tests passed (12 behavioral + 1 infrastructure).");
+console.log("Live manifest, suite, corpus, and trace assertion self-tests passed (24 behavioral + 1 infrastructure).");

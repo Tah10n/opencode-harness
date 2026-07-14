@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Tah10n/opencode-harness/quality/schemas/architecture-policy.schema.json",
+  "title": "Project-local architecture policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "policy_id",
+    "enforce_existing",
+    "required_evaluator_ids",
+    "rules",
+    "fingerprint"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "policy_id": { "type": "string", "pattern": "^ARCHPOLICY-[A-Za-z0-9._-]{1,116}$" },
+    "enforce_existing": { "type": "boolean" },
+    "required_evaluator_ids": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/safe_id" }
+    },
+    "rules": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 128,
+      "items": {
+        "oneOf": [
+          { "$ref": "#/$defs/deny_dependency" },
+          { "$ref": "#/$defs/allow_dependency" },
+          { "$ref": "#/$defs/require_test_coverage" },
+          { "$ref": "#/$defs/deny_cycle" }
+        ]
+      }
+    },
+    "fingerprint": { "$ref": "#/$defs/fingerprint" }
+  },
+  "$defs": {
+    "safe_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+    },
+    "rule_id": {
+      "type": "string",
+      "pattern": "^ARCHRULE-[A-Za-z0-9._-]{1,119}$"
+    },
+    "fingerprint": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "selector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "value"],
+      "properties": {
+        "type": { "enum": ["exact_path", "path_prefix"] },
+        "value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048,
+          "pattern": "^(?!/)(?![A-Za-z]:)(?!.*\\\\)(?!.*(?:^|/)\\.\\.?(?:/|$))(?!.*//)[^:]+$"
+        }
+      }
+    },
+    "relationships": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 23,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "imports",
+          "calls",
+          "reads",
+          "writes",
+          "defines",
+          "tests",
+          "documents",
+          "configures",
+          "depends_on",
+          "emits",
+          "implements",
+          "serializes",
+          "deserializes",
+          "validates",
+          "publishes",
+          "consumes",
+          "persists",
+          "invalidates",
+          "migrates",
+          "generates",
+          "verifies",
+          "schedules",
+          "owns"
+        ]
+      }
+    },
+    "dependency_rule_shape": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "source", "target", "relationship_kinds", "evaluator_id", "rationale"],
+      "properties": {
+        "id": { "$ref": "#/$defs/rule_id" },
+        "kind": { "enum": ["deny_dependency", "allow_dependency"] },
+        "source": { "$ref": "#/$defs/selector" },
+        "target": { "$ref": "#/$defs/selector" },
+        "relationship_kinds": { "$ref": "#/$defs/relationships" },
+        "evaluator_id": { "$ref": "#/$defs/safe_id" },
+        "rationale": { "type": "string", "minLength": 1, "maxLength": 2048 }
+      }
+    },
+    "deny_dependency": {
+      "allOf": [
+        { "$ref": "#/$defs/dependency_rule_shape" },
+        { "properties": { "kind": { "const": "deny_dependency" } } }
+      ]
+    },
+    "allow_dependency": {
+      "allOf": [
+        { "$ref": "#/$defs/dependency_rule_shape" },
+        { "properties": { "kind": { "const": "allow_dependency" } } }
+      ]
+    },
+    "require_test_coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "subject", "minimum_tests", "evaluator_id", "rationale"],
+      "properties": {
+        "id": { "$ref": "#/$defs/rule_id" },
+        "kind": { "const": "require_test_coverage" },
+        "subject": { "$ref": "#/$defs/selector" },
+        "minimum_tests": { "type": "integer", "minimum": 1, "maximum": 128 },
+        "evaluator_id": { "$ref": "#/$defs/safe_id" },
+        "rationale": { "type": "string", "minLength": 1, "maxLength": 2048 }
+      }
+    },
+    "deny_cycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "scope", "relationship_kinds", "evaluator_id", "rationale"],
+      "properties": {
+        "id": { "$ref": "#/$defs/rule_id" },
+        "kind": { "const": "deny_cycle" },
+        "scope": { "$ref": "#/$defs/selector" },
+        "relationship_kinds": { "$ref": "#/$defs/relationships" },
+        "evaluator_id": { "$ref": "#/$defs/safe_id" },
+        "rationale": { "type": "string", "minLength": 1, "maxLength": 2048 }
+      }
+    }
+  }
+}

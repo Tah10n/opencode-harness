@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "sidecar_version": "1.0.0",
+  "scenario_id": "quality-resource-lifecycle",
+  "seeded_defect": "Normal start discards the resource value, so the public lifecycle contract fails before implementation.",
+  "visible_oracle": { "command": "node --test test/visible.test.mjs", "seeded_status": "failed" },
+  "bad_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-resource-lifecycle/bad/client.mjs", "target": "src/client.mjs", "sha256": "021079478b70917ffe5ef89ec153d370dff46eff59c6ae30f8bcdc07da9d15bd" }
+  ] },
+  "compliant_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-resource-lifecycle/good/client.mjs", "target": "src/client.mjs", "sha256": "18fc3220b2857a5bc7d8ea3c3f8ecd627e11d8bd9fb04a6fcaa07327632f576a" }
+  ] },
+  "hidden_counterexample": "Repeated shutdown and a failed open exercise double-close prevention and cleanup of partial acquisition.",
+  "forbidden_regression": "Do not leak after initialization failure.",
+  "risk_class": "critical",
+  "workload_class": "resource-lifecycle",
+  "expected_ownership": ["src/client.mjs"],
+  "required_quality_assertion_ids": [
+    "quality-resource-lifecycle-dossier-before-edit",
+    "quality-resource-lifecycle-gate-before-edit",
+    "quality-resource-lifecycle-coverage-recorded",
+    "quality-resource-lifecycle-unknowns-resolved",
+    "quality-resource-lifecycle-mapping-verified",
+    "quality-resource-lifecycle-architecture-respected",
+    "quality-resource-lifecycle-ownership-respected",
+    "quality-resource-lifecycle-integrated-verification",
+    "quality-resource-lifecycle-valid-completion"
+  ],
+  "suite": "canary",
+  "fixture_fingerprint": "12552537e1fdbed89ffefdfe7c7bf66ce1134326b238d2a7d6808264010f36e5"
+}

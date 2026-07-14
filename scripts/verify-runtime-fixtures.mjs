@@ -6,9 +6,11 @@ import { fileURLToPath } from "node:url";
 import { EVIDENCE_PRODUCERS, fingerprint } from "../lib/feedback/contracts.mjs";
 import { permissionProfileFingerprint, runtimeOutputsFingerprint } from "../lib/feedback/evidence.mjs";
 import { collectResolvedPermissionSurface, extractPermissionSurface } from "../lib/feedback/permission-surface.mjs";
+import { sealRuntimeModelEvidence } from "../lib/quality/model-profiles.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const verifier = path.join(root, "scripts", "verify-runtime.mjs");
+const qualityAssessment = path.join(root, "scripts", "assess-quality-candidate.mjs");
 const safeFixture = path.join(root, "fixtures", "runtime-debug");
 const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-harness-runtime-"));
 const unsafeFixture = path.join(tempDir, "runtime-debug-unsafe");
@@ -329,10 +331,223 @@ function onlyEvidenceSnapshot(evidenceWorkspace) {
   return JSON.parse(fs.readFileSync(path.join(evidenceDir, evidenceFiles[0]), "utf8"));
 }
 
+function writeCompleteRuntimeBundle(directory, { duplicateCandidate = false } = {}) {
+  fs.mkdirSync(directory, { recursive: true });
+  const catalog = JSON.parse(fs.readFileSync(path.join(root, "quality", "model-profiles", "catalog.v1.json"), "utf8"));
+  const experiment = JSON.parse(fs.readFileSync(path.join(root, "quality", "model-profiles", "experiment.v1.json"), "utf8"));
+  for (const role of ["baseline", "candidate"]) {
+    const requests = [...new Map(experiment.comparisons.map((comparison) => {
+      const invocation = comparison[`${role}_invocation`];
+      return [JSON.stringify(invocation), invocation];
+    })).values()].sort((left, right) => JSON.stringify(left).localeCompare(JSON.stringify(right)));
+    if (duplicateCandidate && role === "candidate") requests[requests.length - 1] = requests[0];
+    const evidence = requests.map((invocation, index) => sealRuntimeModelEvidence({
+      schema_version: 1,
+      evidence_id: `fixture-installed-${role}-${String(index + 1).padStart(3, "0")}`,
+      evidence_kind: "installed_runtime",
+      runtime_name: "opencode",
+      runtime_version: "fixture-contract-test",
+      captured_at: "2026-07-10T10:10:00.000Z",
+      catalog_id: catalog.catalog_id,
+      catalog_fingerprint: catalog.content_fingerprint,
+      requested_profile_id: invocation.profile_id,
+      requested_model_id: invocation.model_id,
+      effective_model_id: invocation.model_id,
+      option_results: [
+        { option_id: "model", requested_value: invocation.model_id, effective_value: invocation.model_id, status: "accepted" },
+        { option_id: "reasoning_effort", requested_value: invocation.reasoning_effort, effective_value: invocation.reasoning_effort, status: "accepted" },
+        { option_id: "text_verbosity", requested_value: invocation.text_verbosity, effective_value: invocation.text_verbosity, status: "accepted" },
+        { option_id: "mode", requested_value: invocation.mode, effective_value: invocation.mode, status: "accepted" },
+      ],
+      complete: true,
+      source_command_id: `fixture-installed-${role}-${String(index + 1).padStart(3, "0")}`,
+    }));
+    const batchId = `fixture-batch-${role}`;
+    const batchFile = `${role}-runtime-batch.json`;
+    const modelFiles = evidence.map((entry, index) => `${role}-model-${String(index + 1).padStart(3, "0")}-${entry.evidence_id}.json`);
+    const marker = {
+      schema_version: 1,
+      batch_id: batchId,
+      profile_role: role,
+      created_at: "2026-07-10T10:10:00.000Z",
+      entry_count: evidence.length,
+      batch_file: batchFile,
+      batch_fingerprint: fingerprint(evidence.map((entry) => entry.content_fingerprint)),
+      model_files: modelFiles,
+      model_fingerprints: evidence.map((entry) => entry.content_fingerprint),
+    };
+    fs.writeFileSync(path.join(directory, batchFile), `${JSON.stringify(evidence)}\n`, "utf8");
+    evidence.forEach((entry, index) => fs.writeFileSync(path.join(directory, modelFiles[index]), `${JSON.stringify(entry)}\n`, "utf8"));
+    fs.writeFileSync(path.join(directory, `${role}-runtime-batch-${batchId}.complete.json`), `${JSON.stringify(marker)}\n`, "utf8");
+  }
+}
+
+function runAssessmentBundle(directory) {
+  const dummy = path.join(tempDir, "dummy-assessment-input.json");
+  fs.writeFileSync(dummy, "{}\n", "utf8");
+  return spawnSync(process.execPath, [
+    qualityAssessment,
+    "--report", dummy,
+    "--runtime-evidence", directory,
+    "--baseline-permission-evidence", dummy,
+    "--candidate-permission-evidence", dummy,
+    "--baseline-id", "baseline-v1",
+    "--candidate-id", "candidate-v1",
+  ], { cwd: root, encoding: "utf8" });
+}
+
 try {
   const safe = runFixture(safeFixture);
   if (safe.status !== 0) {
     fail(`safe runtime fixture should pass, exited ${safe.status}\n${outputOf(safe)}`);
+  }
+
+  const absentModelEvidenceWorkspace = path.join(tempDir, "absent-model-evidence-workspace");
+  fs.mkdirSync(absentModelEvidenceWorkspace);
+  const absentModel = runFixture(safeFixture, {
+    args: ["--model-profile", "candidate-sol-general"],
+    env: {
+      HARNESS_EVIDENCE_WORKSPACE: absentModelEvidenceWorkspace,
+      HARNESS_EVIDENCE_TIMESTAMP: "2026-07-10T09:59:00.000Z",
+    },
+  });
+  expectFailure(absentModel, "HARNESS-R025", "absent runtime model options");
+  for (const reason of [
+    "RUNTIME_MODEL_INSTALLED_EVIDENCE_REQUIRED",
+    "RUNTIME_MODEL_OPTION_MODEL_ABSENT",
+    "RUNTIME_MODEL_OPTION_REASONING_EFFORT_ABSENT",
+    "RUNTIME_MODEL_OPTION_TEXT_VERBOSITY_ABSENT",
+    "RUNTIME_MODEL_OPTION_MODE_UNSUPPORTED",
+  ]) {
+    if (!outputOf(absentModel).includes(reason)) fail(`runtime model verifier did not report ${reason}`);
+  }
+  const absentSnapshot = onlyEvidenceSnapshot(absentModelEvidenceWorkspace);
+  if (absentSnapshot?.evidence_kind !== "fixture_parser" || absentSnapshot?.complete !== false) {
+    fail("fixture parser model evidence must remain explicit non-authorizing evidence");
+  }
+
+  const comparisonModelFixture = path.join(tempDir, "runtime-debug-comparison-model-option");
+  fs.cpSync(safeFixture, comparisonModelFixture, { recursive: true });
+  fs.appendFileSync(
+    path.join(comparisonModelFixture, "debug-agent-general.txt"),
+    "\nmodel: openai/gpt-5.6-luna\nreasoningEffort: high\ntextVerbosity: low\nmodel_mode: standard\n",
+    "utf8",
+  );
+  const comparisonEvidenceWorkspace = path.join(tempDir, "comparison-model-evidence-workspace");
+  fs.mkdirSync(comparisonEvidenceWorkspace);
+  const comparisonModel = runFixture(comparisonModelFixture, {
+    args: ["--comparison", "quality-small-local-control-r1-same-low", "--profile-role", "candidate"],
+    env: {
+      HARNESS_EVIDENCE_WORKSPACE: comparisonEvidenceWorkspace,
+      HARNESS_EVIDENCE_TIMESTAMP: "2026-07-10T09:59:15.000Z",
+    },
+  });
+  expectFailure(comparisonModel, "HARNESS-R025", "fixture experiment invocation remains non-authorizing");
+  const comparisonSnapshot = onlyEvidenceSnapshot(comparisonEvidenceWorkspace);
+  if (
+    comparisonSnapshot?.requested_profile_id !== "candidate-luna-general-high-volume"
+    || comparisonSnapshot?.requested_model_id !== "openai/gpt-5.6-luna"
+    || comparisonSnapshot?.complete !== true
+    || !comparisonSnapshot?.evidence_id.includes("quality-small-local-control-r1-same-low-candidate")
+  ) {
+    fail(`runtime comparison evidence did not bind the exact planned invocation identity: ${JSON.stringify(comparisonSnapshot)}`);
+  }
+
+  const ignoredModelFixture = path.join(tempDir, "runtime-debug-ignored-model-option");
+  fs.cpSync(safeFixture, ignoredModelFixture, { recursive: true });
+  fs.appendFileSync(
+    path.join(ignoredModelFixture, "debug-agent-general.txt"),
+    "\nmodel: openai/gpt-5.6-sol\nreasoningEffort: high\nreasoningEffort: low\ntextVerbosity: low\nmodel_mode: standard\n",
+    "utf8",
+  );
+  const ignoredModelEvidenceWorkspace = path.join(tempDir, "ignored-model-evidence-workspace");
+  fs.mkdirSync(ignoredModelEvidenceWorkspace);
+  const ignoredModel = runFixture(ignoredModelFixture, {
+    args: ["--model-profile", "candidate-sol-general"],
+    env: {
+      HARNESS_EVIDENCE_WORKSPACE: ignoredModelEvidenceWorkspace,
+      HARNESS_EVIDENCE_TIMESTAMP: "2026-07-10T09:59:30.000Z",
+    },
+  });
+  expectFailure(ignoredModel, "HARNESS-R025", "silently ignored runtime model option");
+  if (!outputOf(ignoredModel).includes("RUNTIME_MODEL_OPTION_REASONING_EFFORT_IGNORED")) {
+    fail("runtime model verifier must distinguish a silently ignored option from absence");
+  }
+
+  const completeBatchFixture = path.join(tempDir, "runtime-debug-complete-model-batch");
+  fs.cpSync(safeFixture, completeBatchFixture, { recursive: true });
+  fs.writeFileSync(path.join(completeBatchFixture, "model-batch-mode.txt"), "accepted\n", "utf8");
+  const completeBatchWorkspace = path.join(tempDir, "complete-model-batch-workspace");
+  fs.mkdirSync(completeBatchWorkspace);
+  for (const [role, timestamp] of [["baseline", "2026-07-10T09:59:40.000Z"], ["candidate", "2026-07-10T09:59:50.000Z"]]) {
+    const result = runFixture(completeBatchFixture, {
+      args: ["--all-experiment-models", "--profile-role", role],
+      env: { HARNESS_EVIDENCE_WORKSPACE: completeBatchWorkspace, HARNESS_EVIDENCE_TIMESTAMP: timestamp },
+    });
+    expectFailure(result, "HARNESS-R025", `${role} fixture batch remains non-authorizing`);
+    if (!outputOf(result).includes("RUNTIME_MODEL_INSTALLED_EVIDENCE_REQUIRED")) {
+      fail(`${role} fixture batch must fail only after producing explicit non-authorizing parser evidence`);
+    }
+  }
+  if (fs.existsSync(path.join(completeBatchWorkspace, ".oc_harness", "evidence", "runtime-model-batches"))) {
+    fail("non-authorizing fixture batches must not publish a completion marker or complete runtime model bundle");
+  }
+
+  const unsupportedBatchWorkspace = path.join(tempDir, "unsupported-model-batch-workspace");
+  fs.mkdirSync(unsupportedBatchWorkspace);
+  const unsupportedBatch = runFixture(safeFixture, {
+    args: ["--all-experiment-models", "--profile-role", "baseline"],
+    env: { HARNESS_EVIDENCE_WORKSPACE: unsupportedBatchWorkspace, HARNESS_EVIDENCE_TIMESTAMP: "2026-07-10T09:59:55.000Z" },
+  });
+  expectFailure(unsupportedBatch, "HARNESS-R025", "unsupported batch model mode");
+  if (!outputOf(unsupportedBatch).includes("RUNTIME_MODEL_OPTION_MODE_UNSUPPORTED")) {
+    fail("complete runtime batch must fail when any requested option is unsupported");
+  }
+  if (fs.existsSync(path.join(unsupportedBatchWorkspace, ".oc_harness", "evidence", "runtime-model-batches"))) {
+    fail("unsupported batch must not publish a completion marker or complete runtime model bundle");
+  }
+
+  const ignoredBatchFixture = path.join(tempDir, "runtime-debug-ignored-model-batch");
+  fs.cpSync(safeFixture, ignoredBatchFixture, { recursive: true });
+  fs.writeFileSync(path.join(ignoredBatchFixture, "model-batch-mode.txt"), "ignored\n", "utf8");
+  const ignoredBatchWorkspace = path.join(tempDir, "ignored-model-batch-workspace");
+  fs.mkdirSync(ignoredBatchWorkspace);
+  const ignoredBatch = runFixture(ignoredBatchFixture, {
+    args: ["--all-experiment-models", "--profile-role", "candidate"],
+    env: { HARNESS_EVIDENCE_WORKSPACE: ignoredBatchWorkspace, HARNESS_EVIDENCE_TIMESTAMP: "2026-07-10T09:59:58.000Z" },
+  });
+  expectFailure(ignoredBatch, "HARNESS-R025", "ignored batch model option");
+  if (!outputOf(ignoredBatch).includes("RUNTIME_MODEL_OPTION_REASONING_EFFORT_IGNORED")) {
+    fail("complete runtime batch must fail when an exact requested option is ignored");
+  }
+  if (fs.existsSync(path.join(ignoredBatchWorkspace, ".oc_harness", "evidence", "runtime-model-batches"))) {
+    fail("ignored batch must not publish a completion marker or complete runtime model bundle");
+  }
+
+  const assessmentBundle = path.join(tempDir, "assessment-runtime-bundle");
+  writeCompleteRuntimeBundle(assessmentBundle);
+  const coherentBundle = runAssessmentBundle(assessmentBundle);
+  if (
+    coherentBundle.status === 0
+    || !outputOf(coherentBundle).includes("QUALITY_ACCEPTANCE_CLI_REPORT_HISTORY")
+    || outputOf(coherentBundle).includes("QUALITY_ACCEPTANCE_CLI_RUNTIME_BUNDLE")
+  ) {
+    fail(`coherent runtime bundle must pass directory validation before the dummy report fails\n${outputOf(coherentBundle)}`);
+  }
+
+  const unrelatedBundle = path.join(tempDir, "assessment-runtime-bundle-unrelated");
+  fs.cpSync(assessmentBundle, unrelatedBundle, { recursive: true });
+  fs.writeFileSync(path.join(unrelatedBundle, "unrelated.json"), "{}\n", "utf8");
+  const unrelatedResult = runAssessmentBundle(unrelatedBundle);
+  if (!outputOf(unrelatedResult).includes("runtime batch directory contains unknown artifacts")) {
+    fail(`runtime bundle must reject every unrelated artifact\n${outputOf(unrelatedResult)}`);
+  }
+
+  const duplicateBundle = path.join(tempDir, "assessment-runtime-bundle-duplicate");
+  writeCompleteRuntimeBundle(duplicateBundle, { duplicateCandidate: true });
+  const duplicateResult = runAssessmentBundle(duplicateBundle);
+  if (!outputOf(duplicateResult).includes("duplicate exact invocations")) {
+    fail(`runtime bundle must reject duplicate exact invocations\n${outputOf(duplicateResult)}`);
   }
 
   fs.cpSync(safeFixture, missingInventoryFixture, { recursive: true });
@@ -423,6 +638,45 @@ try {
   });
   if (mismatchedSubject.status === 0 || !outputOf(mismatchedSubject).includes("HARNESS-R020")) {
     fail(`runtime evidence must reject a label-only subject mismatch\n${outputOf(mismatchedSubject)}`);
+  }
+
+  const sharedSubjectEvidencePath = path.join(tempDir, "experiment-subject-static-evidence.json");
+  writeSubjectEvidence(sharedSubjectEvidencePath, "experiment-subject", subjectFingerprint);
+  for (const profileId of ["baseline-v1", "candidate-v1"]) {
+    const sharedWorkspace = path.join(tempDir, `${profileId}-shared-subject-workspace`);
+    fs.mkdirSync(sharedWorkspace);
+    const sharedSubjectRun = runFixture(safeFixture, {
+      args: [
+        "--evidence-profile", profileId,
+        "--subject-id", "experiment-subject",
+        "--subject-evidence", sharedSubjectEvidencePath,
+      ],
+      env: {
+        HARNESS_EVIDENCE_WORKSPACE: sharedWorkspace,
+        HARNESS_EVIDENCE_TIMESTAMP: profileId === "baseline-v1"
+          ? "2026-07-10T09:59:59.000Z"
+          : "2026-07-10T09:59:59.500Z",
+      },
+    });
+    if (sharedSubjectRun.status !== 0) {
+      fail(`${profileId} permission evidence must accept the shared static subject identity\n${outputOf(sharedSubjectRun)}`);
+      continue;
+    }
+    const sharedSnapshot = onlyEvidenceSnapshot(sharedWorkspace);
+    if (sharedSnapshot?.profile_id !== profileId || sharedSnapshot?.subject_fingerprint !== subjectFingerprint) {
+      fail(`${profileId} permission evidence did not preserve separate profile and shared subject identities`);
+    }
+  }
+  const wrongDeclaredSubject = runFixture(safeFixture, {
+    args: [
+      "--evidence-profile", "baseline-v1",
+      "--subject-id", "different-subject",
+      "--subject-evidence", sharedSubjectEvidencePath,
+    ],
+    env: { HARNESS_EVIDENCE_WORKSPACE: evidenceWorkspace },
+  });
+  if (wrongDeclaredSubject.status === 0 || !outputOf(wrongDeclaredSubject).includes("HARNESS-R020")) {
+    fail(`runtime evidence must reject a mismatched explicit --subject-id\n${outputOf(wrongDeclaredSubject)}`);
   }
 
   let baselineSnapshot = null;

@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "sidecar_version": "1.0.0",
+  "scenario_id": "quality-migration-compatibility",
+  "seeded_defect": "The schema-v2 writer preserves surrounding whitespace, so the new normalized behavior fails before implementation.",
+  "visible_oracle": { "command": "node --test test/visible.test.mjs", "seeded_status": "failed" },
+  "bad_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-migration-compatibility/bad/migration.mjs", "target": "src/migration.mjs", "sha256": "eef50202a017de5f8f0ee3cb8e7663f1470462d236a8b7838ae9733cf2ad4536" }
+  ] },
+  "compliant_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-migration-compatibility/good/migration.mjs", "target": "src/migration.mjs", "sha256": "40872365f7e6aad4819d0a3d63724a8600e549205bbc5bdfb0abd6cbf3e31b31" }
+  ] },
+  "hidden_counterexample": "A schema-v1 reader and v2-to-v1 rollback prove that normalized legacy data remains available during mixed-version operation.",
+  "forbidden_regression": "Do not emit a v2-only shape unreadable by old readers.",
+  "risk_class": "critical",
+  "workload_class": "migration-compatibility",
+  "expected_ownership": ["src/migration.mjs"],
+  "required_quality_assertion_ids": [
+    "quality-migration-compatibility-dossier-before-edit",
+    "quality-migration-compatibility-gate-before-edit",
+    "quality-migration-compatibility-coverage-recorded",
+    "quality-migration-compatibility-unknowns-resolved",
+    "quality-migration-compatibility-mapping-verified",
+    "quality-migration-compatibility-architecture-respected",
+    "quality-migration-compatibility-ownership-respected",
+    "quality-migration-compatibility-integrated-verification",
+    "quality-migration-compatibility-valid-completion"
+  ],
+  "suite": "canary",
+  "fixture_fingerprint": "804c1f6290be6a15c11329e6f2618549935e40bd4c406612ae9e344e64148ff1"
+}

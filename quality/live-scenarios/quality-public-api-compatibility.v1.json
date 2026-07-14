@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "sidecar_version": "1.0.0",
+  "scenario_id": "quality-public-api-compatibility",
+  "seeded_defect": "The public record lacks displayName, so the requested additive API behavior fails before implementation.",
+  "visible_oracle": { "command": "node --test test/visible.test.mjs", "seeded_status": "failed" },
+  "bad_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-public-api-compatibility/bad/api.mjs", "target": "src/api.mjs", "sha256": "b3c2f323d4327c2150a8ccc0ad0199a67283065d4cdebf531e1342a6222b5d24" }
+  ] },
+  "compliant_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-public-api-compatibility/good/api.mjs", "target": "src/api.mjs", "sha256": "05ece10ebdf58c07c23588355e893dd4fe292292cee2ff1a0830cd96321685f5" }
+  ] },
+  "hidden_counterexample": "A legacy caller reads name and an invalid input checks the documented typed error code and message.",
+  "forbidden_regression": "Do not remove or rename legacy fields.",
+  "risk_class": "high",
+  "workload_class": "public-api-backward-compatibility",
+  "expected_ownership": ["src/api.mjs"],
+  "required_quality_assertion_ids": [
+    "quality-public-api-compatibility-dossier-before-edit",
+    "quality-public-api-compatibility-gate-before-edit",
+    "quality-public-api-compatibility-coverage-recorded",
+    "quality-public-api-compatibility-unknowns-resolved",
+    "quality-public-api-compatibility-mapping-verified",
+    "quality-public-api-compatibility-architecture-respected",
+    "quality-public-api-compatibility-ownership-respected",
+    "quality-public-api-compatibility-integrated-verification",
+    "quality-public-api-compatibility-valid-completion"
+  ],
+  "suite": "development",
+  "fixture_fingerprint": "e185e75801ef8c66aa2d8a3cea65b3b20ffa5f87573fd0fe69ce00ce3288c910"
+}

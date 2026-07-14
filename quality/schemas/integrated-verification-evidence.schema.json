@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Trace-event, catalog, dossier, gate, workspace, receipt, timestamp, uniqueness, and fingerprint constraints are canonical in lib/quality/verification-evidence.mjs and lib/quality/session.mjs.",
+  "title": "OpenCode Harness Integrated Verification Evidence v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "evidence_id",
+    "run_id",
+    "task_id",
+    "dossier_id",
+    "dossier_fingerprint",
+    "gate_id",
+    "gate_fingerprint",
+    "check_catalog_fingerprint",
+    "workspace_fingerprint",
+    "trace_event_id",
+    "trace_event_sequence",
+    "trace_event_timestamp",
+    "trace_event_fingerprint",
+    "check_receipts",
+    "mechanism_receipts",
+    "completed_at",
+    "fingerprint"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "evidence_id": { "$ref": "#/$defs/id" },
+    "run_id": { "$ref": "#/$defs/id" },
+    "task_id": { "$ref": "#/$defs/id" },
+    "dossier_id": { "$ref": "#/$defs/id" },
+    "dossier_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "gate_id": { "$ref": "#/$defs/id" },
+    "gate_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "check_catalog_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "workspace_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "trace_event_id": { "$ref": "#/$defs/id" },
+    "trace_event_sequence": { "type": "integer", "minimum": 1 },
+    "trace_event_timestamp": { "type": "string", "format": "date-time" },
+    "trace_event_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "check_receipts": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 128,
+      "items": { "$ref": "#/$defs/checkReceipt" }
+    },
+    "mechanism_receipts": {
+      "type": "array",
+      "maxItems": 128,
+      "items": { "$ref": "#/$defs/mechanismReceipt" }
+    },
+    "completed_at": { "type": "string", "format": "date-time" },
+    "fingerprint": { "$ref": "#/$defs/fingerprint" }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$" },
+    "fingerprint": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "phase": { "enum": ["preimplementation", "slice", "integration", "live"] },
+    "status": { "enum": ["passed", "failed", "incomplete"] },
+    "checkReceipt": {
+      "type": "object",
+      "required": [
+        "receipt_id",
+        "check_id",
+        "trusted_producer",
+        "phase",
+        "status",
+        "command_or_mechanism",
+        "evidence_fingerprint",
+        "completed_at"
+      ],
+      "properties": {
+        "receipt_id": { "$ref": "#/$defs/id" },
+        "check_id": { "$ref": "#/$defs/id" },
+        "trusted_producer": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "phase": { "$ref": "#/$defs/phase" },
+        "status": { "$ref": "#/$defs/status" },
+        "command_or_mechanism": { "type": "string", "minLength": 1, "maxLength": 1024 },
+        "evidence_fingerprint": { "$ref": "#/$defs/fingerprint" },
+        "completed_at": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": false
+    },
+    "mechanismReceipt": {
+      "type": "object",
+      "required": [
+        "receipt_id",
+        "mechanism_id",
+        "trusted_producer",
+        "phase",
+        "status",
+        "evidence_fingerprint",
+        "completed_at"
+      ],
+      "properties": {
+        "receipt_id": { "$ref": "#/$defs/id" },
+        "mechanism_id": { "$ref": "#/$defs/id" },
+        "trusted_producer": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "phase": { "$ref": "#/$defs/phase" },
+        "status": { "$ref": "#/$defs/status" },
+        "evidence_fingerprint": { "$ref": "#/$defs/fingerprint" },
+        "completed_at": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

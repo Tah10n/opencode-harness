@@ -1,10 +1,9 @@
 ---
 description: Fast read-only codebase cartographer for search, tracing, file discovery, and evidence gathering
 mode: subagent
-model: openai/gpt-5.4-mini-fast
+model: openai/gpt-5.6-terra
 reasoningEffort: low
 textVerbosity: low
-temperature: 0.1
 steps: 80
 permission:
   edit: deny

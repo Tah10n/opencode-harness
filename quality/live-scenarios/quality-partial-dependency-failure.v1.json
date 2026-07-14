@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "sidecar_version": "1.0.0",
+  "scenario_id": "quality-partial-dependency-failure",
+  "seeded_defect": "The primary result is rewritten with an unknown name, so healthy dependency behavior fails before implementation.",
+  "visible_oracle": { "command": "node --test test/visible.test.mjs", "seeded_status": "failed" },
+  "bad_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-partial-dependency-failure/bad/profile.mjs", "target": "src/profile.mjs", "sha256": "2832d54eca9ac770a54105084b90c90446392348413bc77119060fc4e96e9a06" }
+  ] },
+  "compliant_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-partial-dependency-failure/good/profile.mjs", "target": "src/profile.mjs", "sha256": "8d1103a347c4cf6d6140ee096e3d17f7ac1b357b6ce660520a5237f8a338f14b" }
+  ] },
+  "hidden_counterexample": "An availability failure must use fallback, while a structurally invalid response error must propagate unchanged.",
+  "forbidden_regression": "Do not mask invalid-response failures.",
+  "risk_class": "high",
+  "workload_class": "partial-external-dependency-failure",
+  "expected_ownership": ["src/profile.mjs"],
+  "required_quality_assertion_ids": [
+    "quality-partial-dependency-failure-dossier-before-edit",
+    "quality-partial-dependency-failure-gate-before-edit",
+    "quality-partial-dependency-failure-coverage-recorded",
+    "quality-partial-dependency-failure-unknowns-resolved",
+    "quality-partial-dependency-failure-mapping-verified",
+    "quality-partial-dependency-failure-architecture-respected",
+    "quality-partial-dependency-failure-ownership-respected",
+    "quality-partial-dependency-failure-integrated-verification",
+    "quality-partial-dependency-failure-valid-completion"
+  ],
+  "suite": "held_out",
+  "fixture_fingerprint": "c321238173e3dcec0fe3df4c6c8d998cfc61cbc47731f0c06592f10622e37bd2"
+}

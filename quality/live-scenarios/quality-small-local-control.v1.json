@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "sidecar_version": "1.0.0",
+  "scenario_id": "quality-small-local-control",
+  "seeded_defect": "The one-file formatter emits lowercase labels instead of the documented uppercase display text.",
+  "visible_oracle": { "command": "node --test test/visible.test.mjs", "seeded_status": "failed" },
+  "bad_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-small-local-control/bad/label.mjs", "target": "src/label.mjs", "sha256": "9b5682eafe3fb0d4998ea0c3d81f9c8e643d16f9daf705244768fd430e65a156" },
+    { "source": "quality/live-scenarios/artifacts/quality-small-local-control/bad/package.json", "target": "package.json", "sha256": "f49c4a66261380ccb0b5e9e4011ff8a4217eb9c8ee78fee735f2dc4a8b76a952" }
+  ] },
+  "compliant_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-small-local-control/good/label.mjs", "target": "src/label.mjs", "sha256": "9b5682eafe3fb0d4998ea0c3d81f9c8e643d16f9daf705244768fd430e65a156" }
+  ] },
+  "hidden_counterexample": "The empty fallback and workspace shape prove the fix stayed one-file, dependency-free, and locally owned.",
+  "forbidden_regression": "Do not add a dependency, package manifest, helper layer, or extra source file.",
+  "risk_class": "standard-lite",
+  "workload_class": "small-local-anti-overengineering",
+  "expected_ownership": ["src/label.mjs"],
+  "required_quality_assertion_ids": [
+    "quality-small-local-control-dossier-before-edit",
+    "quality-small-local-control-gate-before-edit",
+    "quality-small-local-control-coverage-recorded",
+    "quality-small-local-control-unknowns-resolved",
+    "quality-small-local-control-mapping-verified",
+    "quality-small-local-control-architecture-respected",
+    "quality-small-local-control-ownership-respected",
+    "quality-small-local-control-no-delegation",
+    "quality-small-local-control-single-edit",
+    "quality-small-local-control-integrated-verification",
+    "quality-small-local-control-valid-completion"
+  ],
+  "suite": "development",
+  "fixture_fingerprint": "3a3861cbc5df9f21cb45237b08d5c1a381b7a120448447645801dd8d638d3336",
+  "anti_overengineering": {
+    "max_delegations": 0,
+    "max_changed_files": 1,
+    "new_dependency_allowed": false,
+    "broad_rewrite_allowed": false
+  }
+}

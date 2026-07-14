@@ -6,6 +6,7 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 import { ContractError, createAdapterInstrumentation, createTraceStore } from "../lib/feedback/index.mjs";
+import { materializeStagedRunArtifacts } from "../lib/feedback/trace-store.mjs";
 import { evaluateTraceAssertions } from "../lib/feedback/trace-assertions.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -91,6 +92,19 @@ function taskEndEvent(overrides = {}) {
     verification: { status: "passed", summary: "Final checks passed.", verifier_codes: ["TRACE-CHECK-1"] },
     verifier_codes: ["TRACE-CHECK-1"],
     ...overrides,
+  });
+}
+
+function finalizeMinimalRun(store, runId) {
+  store.createRun({ run_id: runId, strategy_id: "strategy-main" });
+  store.appendEvent(runId, baseEvent());
+  store.recordVerification(runId, verificationInput());
+  store.appendEvent(runId, taskEndEvent());
+  store.finalizeRun(runId, {
+    status: "completed",
+    termination_reason: "verified",
+    summary: "Staged bundle verified.",
+    evidence_refs: [],
   });
 }
 
@@ -764,8 +778,8 @@ test("buffered trace journal performs no workspace writes before finalized batch
 
 test("staging cleanup failure occurs before durable buffered publication", () => {
   const ws = workspace();
-  const stagesBefore = new Set(fs.readdirSync(os.tmpdir()).filter((name) => name.startsWith("opencode-harness-trace-stage-")));
   const originalRmSync = fs.rmSync;
+  let injectedPath = null;
   try {
     const durable = deterministicStore(ws);
     const buffered = durable.createBufferedStore();
@@ -783,6 +797,7 @@ test("staging cleanup failure occurs before durable buffered publication", () =>
     fs.rmSync = (targetPath, options) => {
       if (!injected && path.basename(String(targetPath)).startsWith("opencode-harness-trace-stage-")) {
         injected = true;
+        injectedPath = String(targetPath);
         throw new Error("injected staging cleanup failure");
       }
       return originalRmSync(targetPath, options);
@@ -794,8 +809,140 @@ test("staging cleanup failure occurs before durable buffered publication", () =>
     fs.rmSync = originalRmSync;
     originalRmSync(ws, { recursive: true, force: true });
   }
-  const stagesAfter = new Set(fs.readdirSync(os.tmpdir()).filter((name) => name.startsWith("opencode-harness-trace-stage-")));
-  assert.deepEqual(stagesAfter, stagesBefore);
+  assert.equal(injectedPath === null || fs.existsSync(injectedPath), false);
+});
+
+test("idempotent buffered publication is not masked by staging cleanup failure", () => {
+  const ws = workspace();
+  const originalRmSync = fs.rmSync;
+  let injectedPath = null;
+  try {
+    const durable = deterministicStore(ws);
+    const buffered = durable.createBufferedStore();
+    finalizeMinimalRun(buffered, "run-idempotent-cleanup");
+    const first = durable.commitBufferedRun(buffered, "run-idempotent-cleanup");
+    assert.equal(first.complete, true);
+
+    let injected = false;
+    fs.rmSync = (targetPath, options) => {
+      if (!injected && path.basename(String(targetPath)).startsWith("opencode-harness-trace-stage-")) {
+        injected = true;
+        injectedPath = String(targetPath);
+        throw new Error("injected idempotent staging cleanup failure");
+      }
+      return originalRmSync(targetPath, options);
+    };
+    const second = durable.commitBufferedRun(buffered, "run-idempotent-cleanup");
+    assert.equal(injected, true);
+    assert.equal(second.complete, true);
+    assert.equal(durable.inspectRun("run-idempotent-cleanup").complete, true);
+    durable.discardBufferedStore(buffered);
+  } finally {
+    fs.rmSync = originalRmSync;
+    originalRmSync(ws, { recursive: true, force: true });
+    if (injectedPath !== null) originalRmSync(injectedPath, { recursive: true, force: true });
+  }
+});
+
+test("completed buffered run can be materialized into a private staging store without durable publication", () => {
+  const ws = workspace();
+  try {
+    const durable = deterministicStore(ws);
+    const buffered = durable.createBufferedStore();
+    finalizeMinimalRun(buffered, "run-buffered-stage");
+    const staged = durable.createStagedRunFromBuffered(buffered, "run-buffered-stage");
+    assert.equal(staged.inspectRun("run-buffered-stage").complete, true);
+    assertContractError(() => durable.inspectRun("run-buffered-stage"), "TRACE_RUN_MISSING");
+    durable.discardStagingStore(staged);
+    durable.discardBufferedStore(buffered);
+
+    const incomplete = durable.createBufferedStore();
+    incomplete.createRun({ run_id: "run-buffered-incomplete" });
+    assertContractError(
+      () => durable.createStagedRunFromBuffered(incomplete, "run-buffered-incomplete"),
+      "TRACE_STAGING_INCOMPLETE",
+    );
+    durable.discardBufferedStore(incomplete);
+  } finally {
+    fs.rmSync(ws, { recursive: true, force: true });
+  }
+});
+
+test("private staging seam publishes trace and quality artifacts as one idempotent bundle", () => {
+  const ws = workspace();
+  try {
+    const durable = deterministicStore(ws);
+    const staged = durable.createStagingStore();
+    finalizeMinimalRun(staged, "run-quality-bundle");
+    const gate = {
+      schema_version: 1,
+      gate_id: "gate-quality-bundle",
+      run_id: "run-quality-bundle",
+      status: "passed",
+      verifier_code: "QUALITY-GATE-PASSED",
+    };
+    const materialized = materializeStagedRunArtifacts(staged, "run-quality-bundle", [
+      { relative_path: "quality/gate.json", value: gate },
+    ]);
+    assert.equal(materialized[0].relative_path, "quality/gate.json");
+    assert.equal(fs.existsSync(runPath(ws, "run-quality-bundle")), false);
+
+    let validatedImport = false;
+    assert.throws(() => durable.commitStagedRun(staged, "run-quality-bundle", {
+      validateImport: ({ run_dir: runDir }) => {
+        assert.deepEqual(JSON.parse(fs.readFileSync(path.join(runDir, "quality", "gate.json"), "utf8")), gate);
+        validatedImport = true;
+      },
+      afterPublish: () => {
+        throw new Error("injected acknowledgement failure");
+      },
+    }), /injected acknowledgement failure/);
+    assert.equal(validatedImport, true);
+    assert.equal(durable.inspectRun("run-quality-bundle").complete, true);
+    assert.deepEqual(JSON.parse(fs.readFileSync(runPath(ws, "run-quality-bundle", "quality", "gate.json"), "utf8")), gate);
+
+    const retry = durable.commitStagedRun(staged, "run-quality-bundle");
+    assert.equal(retry.complete, true);
+    assert.deepEqual(materializeStagedRunArtifacts(staged, "run-quality-bundle", [
+      { relative_path: "quality/gate.json", value: gate },
+    ]), materialized);
+    assertContractError(() => materializeStagedRunArtifacts(staged, "run-quality-bundle", [
+      { relative_path: "quality/gate.json", value: { ...gate, status: "blocked" } },
+    ]), "TRACE_STAGING_ARTIFACT_CONFLICT");
+    durable.discardStagingStore(staged);
+  } finally {
+    fs.rmSync(ws, { recursive: true, force: true });
+  }
+});
+
+test("private staging seam rejects unsafe paths, unsafe values, and conflicting run contents", () => {
+  const ws = workspace();
+  try {
+    const durable = deterministicStore(ws);
+    const first = durable.createStagingStore();
+    finalizeMinimalRun(first, "run-quality-conflict");
+    materializeStagedRunArtifacts(first, "run-quality-conflict", [
+      { relative_path: "quality/gate.json", value: { gate_id: "gate-first", status: "passed" } },
+    ]);
+    durable.commitStagedRun(first, "run-quality-conflict");
+
+    const second = durable.createStagingStore();
+    finalizeMinimalRun(second, "run-quality-conflict");
+    materializeStagedRunArtifacts(second, "run-quality-conflict", [
+      { relative_path: "quality/gate.json", value: { gate_id: "gate-second", status: "passed" } },
+    ]);
+    assertContractError(() => durable.commitStagedRun(second, "run-quality-conflict"), "TRACE_STAGING_CONFLICT");
+    assertContractError(() => materializeStagedRunArtifacts(second, "run-quality-conflict", [
+      { relative_path: "../gate.json", value: { status: "passed" } },
+    ]), "PRIVACY_PATH");
+    assertContractError(() => materializeStagedRunArtifacts(second, "run-quality-conflict", [
+      { relative_path: "quality/unsafe.json", value: { raw_prompt: "do-not-persist" } },
+    ]), "PRIVACY_FORBIDDEN_FIELD");
+    durable.discardStagingStore(first);
+    durable.discardStagingStore(second);
+  } finally {
+    fs.rmSync(ws, { recursive: true, force: true });
+  }
 });
 
 test("exclusive run lock rejects concurrent mutation and inspect does not mutate", () => {

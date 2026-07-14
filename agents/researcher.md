@@ -2,10 +2,9 @@
 description: Operational researcher for primary-source web research, version deltas, and decision-ready guidance (no edits)
 mode: subagent
 hidden: true
-model: openai/gpt-5.5
+model: openai/gpt-5.6-terra
 reasoningEffort: medium
 textVerbosity: low
-temperature: 0.1
 steps: 150
 permission:
   edit: deny

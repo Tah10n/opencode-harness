@@ -23,6 +23,9 @@ This is not a new slash command. The mode is selected automatically by the orche
   those advanced tools are opt-in for host profiles. This template intentionally
   grants only the four-tool minimal safe harness surface by default.
 - Read-only and diagnostic agents can use those tools: `explore`, `reviewer`, `architect`, `diagnose`, and `verifier`.
+- Milestone 2 turns bounded discovery evidence into an Engineering Dossier
+  impact graph for instrumented high/critical work. The tools still do not
+  authorize edits or declare the quality gate passed.
 
 ## Basis
 
@@ -73,6 +76,34 @@ Recommended sequence:
 6. Only then decide whether to implement, review, diagnose, or verify.
 
 Skip this mode for direct, small, single-file, or obviously local tasks.
+
+## Relationship To The Engineering Gate
+
+Recursive context supplies bounded evidence; it is not the gate itself. For a
+high or critical instrumented task, discovery should identify direct and
+transitive entry points, consumers, contracts, schemas/configuration,
+tests/fixtures, public compatibility surfaces, persistence/lifecycle edges,
+excluded siblings, and relevant unknown paths. Those facts are recorded as
+stable nodes, edges, paths, evidence references, exclusions, and
+unknown-resolution plans in the Engineering Dossier impact graph.
+
+When semantic `context_*` tools are unavailable, the dossier records that fact,
+the bounded fallback tools used, and reduced semantic coverage. It must not
+pretend that literal search proved semantic completeness. For high/critical
+work, skipping semantic discovery without that explicit fallback blocks the
+gate.
+
+This is also the prompt-maintainability boundary: context and evidence belong
+in structured artifacts and inspectable subagent jobs, not in ever-growing
+copies of global policy inside each role prompt. The plan/execute/observe/improve
+workflow and explicit job/evidence shape are informed by Lilian Weng's
+[Harness Engineering for Self-Improvement](https://lilianweng.github.io/posts/2026-07-04-harness/),
+but this repository does not implement every system described there and does
+not add an autonomous prompt-mutation loop.
+
+Read-only discovery before a high/critical gate remains allowed. An edit or
+writable delegated job is not: only the parent runner can validate the
+finalized dossier, append the causal gate event, and enable implementation.
 
 ## Verification
 

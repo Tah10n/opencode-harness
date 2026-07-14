@@ -2,10 +2,9 @@
 description: High-signal reviewer for bugs, regressions, contracts, and missing tests (read-only)
 mode: subagent
 hidden: true
-model: openai/gpt-5.5
+model: openai/gpt-5.6-sol
 reasoningEffort: high
 textVerbosity: low
-temperature: 0.1
 steps: 120
 permission:
   edit: deny

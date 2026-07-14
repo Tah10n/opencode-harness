@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "sidecar_version": "1.0.0",
+  "scenario_id": "quality-persistence-rollback",
+  "seeded_defect": "The transfer loses one unit during a normal write and therefore fails the visible conservation contract.",
+  "visible_oracle": { "command": "node --test test/visible.test.mjs", "seeded_status": "failed" },
+  "bad_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-persistence-rollback/bad/store.mjs", "target": "src/store.mjs", "sha256": "a96fc2589b2eb9d0d79aa418ad3faff88731875a9ed88056e5447ca6fba38e29" }
+  ] },
+  "compliant_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-persistence-rollback/good/store.mjs", "target": "src/store.mjs", "sha256": "92395aff9a79177dfc01f9f9c32be91a29c4262bc0daf0736255c548ec5875f0" }
+  ] },
+  "hidden_counterexample": "An injected failure immediately after debit proves rollback, while insufficient funds prove validation occurs before mutation.",
+  "forbidden_regression": "Do not leave a debit committed after failure.",
+  "risk_class": "critical",
+  "workload_class": "persistence-and-rollback",
+  "expected_ownership": ["src/store.mjs"],
+  "required_quality_assertion_ids": [
+    "quality-persistence-rollback-dossier-before-edit",
+    "quality-persistence-rollback-gate-before-edit",
+    "quality-persistence-rollback-coverage-recorded",
+    "quality-persistence-rollback-unknowns-resolved",
+    "quality-persistence-rollback-mapping-verified",
+    "quality-persistence-rollback-architecture-respected",
+    "quality-persistence-rollback-ownership-respected",
+    "quality-persistence-rollback-integrated-verification",
+    "quality-persistence-rollback-valid-completion"
+  ],
+  "suite": "held_out",
+  "fixture_fingerprint": "9c8bd8483ae77979c1842f7cd02eea2477bbd2f8f84408472dbc097bb68c0cec"
+}

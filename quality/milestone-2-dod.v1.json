@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "dod_id": "milestone-2-executable-engineering-gate",
+  "baseline_commit": "0a1d56605b9b8923ac27c3b3b405b38177ca7741",
+  "items": [
+    {
+      "item_id": "DOD-01",
+      "requirement": "Milestone 1 deterministic verification remains green.",
+      "execution_class": "deterministic",
+      "check_ids": ["npm-run-verify-m1"],
+      "evidence_refs": ["package.json", "scripts/verify-feedback-foundation.mjs"],
+      "mandatory": true
+    },
+    {
+      "item_id": "DOD-02",
+      "requirement": "A dossier can be created, validated, finalized, persisted, inspected, and fingerprinted.",
+      "execution_class": "deterministic",
+      "check_ids": ["engineering-dossier-lifecycle"],
+      "evidence_refs": ["lib/quality/dossier.mjs", "scripts/verify-engineering-quality.mjs"],
+      "mandatory": true
+    },
+    {
+      "item_id": "DOD-03",
+      "requirement": "Unsafe, incomplete, oversized, traversing, or post-finalization dossier mutations are rejected.",
+      "execution_class": "deterministic",
+      "check_ids": ["engineering-dossier-negative-matrix"],
+      "evidence_refs": ["lib/quality/validation.mjs", "scripts/verify-engineering-quality.mjs"],
+      "mandatory": true
+    },
+    {
+      "item_id": "DOD-04",
+      "requirement": "High and critical edits or writable delegation before the gate fail closed.",
+      "execution_class": "deterministic",
+      "check_ids": ["engineering-pre-gate-latch"],
+      "evidence_refs": ["lib/quality/live-coordinator.mjs", "scripts/verify-quality-live-coordinator.mjs"],
+      "mandatory": true
+    },
+    {
+      "item_id": "DOD-05",
+      "requirement": "Relevant invariants, edge cases, failure modes, and tests require valid mappings.",
+      "execution_class": "deterministic",
+      "check_ids": ["engineering-mapping-gate"],
+      "evidence_refs": ["lib/quality/gate.mjs", "scripts/verify-engineering-quality.mjs"],
+      "mandatory": true
+    },
+    {
+      "item_id": "DOD-06",
+      "requirement": "The bounded impact graph records direct and transitive paths, evidence, exclusions, and unknowns.",
+      "execution_class": "deterministic",
+      "check_ids": ["engineering-impact-graph"],
+      "evidence_refs": ["lib/quality/impact-graph.mjs", "scripts/verify-quality-architecture.mjs"],
+      "mandatory": true
+    },
+    {
+      "item_id": "DOD-07",
+      "requirement": "Optional project architecture policies are strict, compare a trusted post-edit candidate graph to the dossier baseline, and never use guessed defaults.",
+      "execution_class": "deterministic",
+      "check_ids": ["engineering-architecture-policy"],
+      "evidence_refs": ["lib/quality/architecture.mjs", "lib/quality/live-coordinator.mjs", "scripts/verify-quality-live-coordinator.mjs"],
+      "mandatory": true
+    },
+    {
+      "item_id": "DOD-08",
+      "requirement": "At least ten non-cosmetic quality scenarios cover development, held-out, and canary suites.",
+      "execution_class": "deterministic",
+      "check_ids": ["quality-live-corpus"],
+      "evidence_refs": ["evals/suites.json", "scripts/verify-quality-live-manifests.mjs"],
+      "mandatory": true
+    },
+    {
+      "item_id": "DOD-09",
+      "requirement": "Acceptance rejects every named quality regression independently.",
+      "execution_class": "deterministic",
+      "check_ids": ["quality-acceptance-negative-matrix"],
+      "evidence_refs": ["lib/quality/acceptance-engine.mjs", "scripts/verify-quality-acceptance.mjs"],
+      "mandatory": true
+    },
+    {
+      "item_id": "DOD-10",
+      "requirement": "The retained GPT-5.5 comparison baseline and active GPT-5.6 role profiles are explicit and fingerprinted.",
+      "execution_class": "deterministic",
+      "check_ids": ["model-profile-catalog"],
+      "evidence_refs": ["quality/model-profiles/catalog.v1.json", "scripts/verify-model-profiles.mjs"],
+      "mandatory": true
+    },
+    {
+      "item_id": "DOD-11",
+      "requirement": "The installed-runtime probe detects missing, unsupported, ignored, alias, and conflicting model options.",
+      "execution_class": "runtime_optional",
+      "check_ids": ["installed-runtime-model-options"],
+      "evidence_refs": ["scripts/verify-runtime.mjs", "scripts/verify-runtime-fixtures.mjs"],
+      "mandatory": false
+    },
+    {
+      "item_id": "DOD-12",
+      "requirement": "Agent and skill prompt changes do not add undeclared growth or duplicate policy text and do not remove safety sentinels.",
+      "execution_class": "deterministic",
+      "check_ids": ["prompt-inventory-drift"],
+      "evidence_refs": ["quality/prompt-inventory/baseline.v1.json", "scripts/verify-prompt-inventory.mjs"],
+      "mandatory": true
+    },
+    {
+      "item_id": "DOD-13",
+      "requirement": "README attribution is accurate and the proposal loop remains non-autonomous.",
+      "execution_class": "deterministic",
+      "check_ids": ["documentation-attribution-boundary"],
+      "evidence_refs": ["README.md", "docs/evaluation.md"],
+      "mandatory": true
+    },
+    {
+      "item_id": "DOD-14",
+      "requirement": "The complete deterministic npm verification chain passes from the repository root.",
+      "execution_class": "deterministic",
+      "check_ids": ["npm-run-verify"],
+      "evidence_refs": ["package.json"],
+      "mandatory": true
+    },
+    {
+      "item_id": "DOD-15",
+      "requirement": "Git whitespace validation passes.",
+      "execution_class": "deterministic",
+      "check_ids": ["git-diff-check"],
+      "evidence_refs": ["AGENTS.md"],
+      "mandatory": true
+    },
+    {
+      "item_id": "DOD-16",
+      "requirement": "No machine-local runtime artifact class is tracked.",
+      "execution_class": "deterministic",
+      "check_ids": ["tracked-artifact-boundary"],
+      "evidence_refs": [".gitignore", "scripts/verify-harness.mjs"],
+      "mandatory": true
+    },
+    {
+      "item_id": "DOD-17",
+      "requirement": "GPT-5.5 versus GPT-5.6 live evidence is optional and supports comparative claims without gating the active profile.",
+      "execution_class": "live_external",
+      "check_ids": ["paired-live-model-evaluation"],
+      "evidence_refs": ["quality/model-profiles/experiment.v1.json", "scripts/evaluate-live.mjs"],
+      "mandatory": false
+    },
+    {
+      "item_id": "DOD-18",
+      "requirement": "Unavailable optional live execution is recorded honestly and never converted into a behavioural-superiority claim.",
+      "execution_class": "deterministic",
+      "check_ids": ["external-gap-classification"],
+      "evidence_refs": ["docs/live-evaluation.md", "scripts/verify-milestone-2-dod.mjs"],
+      "mandatory": true
+    }
+  ],
+  "completion_policy": {
+    "verified": "All mandatory deterministic checks pass; optional installed-runtime and live A/B evidence may be absent or complete.",
+    "partially_verified": "All mandatory deterministic checks pass while only part of the optional external evidence set is supplied.",
+    "verification_failed": "A required available deterministic, runtime, or live check fails.",
+    "blocked_external_state": "Required external state prevents the deterministic boundary itself from being established."
+  },
+  "fingerprint": "sha256:e1935726f0b78e832c2b889933c3bcc02139d5b464a952b491b3de199c2c773a"
+}

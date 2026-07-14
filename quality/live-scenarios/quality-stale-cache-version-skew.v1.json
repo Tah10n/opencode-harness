@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "sidecar_version": "1.0.0",
+  "scenario_id": "quality-stale-cache-version-skew",
+  "seeded_defect": "An empty cache returns null and never consults the dependency, failing the fresh-state contract.",
+  "visible_oracle": { "command": "node --test test/visible.test.mjs", "seeded_status": "failed" },
+  "bad_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-stale-cache-version-skew/bad/cache.mjs", "target": "src/cache.mjs", "sha256": "81adb2a4f1ab1dbe4fd530b4c3ec90a52fa1ec1fe726c4638ebc587465dba4cf" }
+  ] },
+  "compliant_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-stale-cache-version-skew/good/cache.mjs", "target": "src/cache.mjs", "sha256": "839edf92b01218c81ccb425527c413d8bab39bf1aab691e021339a78acff499c" }
+  ] },
+  "hidden_counterexample": "A populated schema-v1 entry looks like a cache hit but must be refreshed before schema-v2 consumption.",
+  "forbidden_regression": "Do not treat any cache presence as freshness.",
+  "risk_class": "high",
+  "workload_class": "stale-cache-and-version-skew",
+  "expected_ownership": ["src/cache.mjs"],
+  "required_quality_assertion_ids": [
+    "quality-stale-cache-version-skew-dossier-before-edit",
+    "quality-stale-cache-version-skew-gate-before-edit",
+    "quality-stale-cache-version-skew-coverage-recorded",
+    "quality-stale-cache-version-skew-unknowns-resolved",
+    "quality-stale-cache-version-skew-mapping-verified",
+    "quality-stale-cache-version-skew-architecture-respected",
+    "quality-stale-cache-version-skew-ownership-respected",
+    "quality-stale-cache-version-skew-integrated-verification",
+    "quality-stale-cache-version-skew-valid-completion"
+  ],
+  "suite": "held_out",
+  "fixture_fingerprint": "f5874fc3e8f014f343007cf78758a8b0eef146a267ad2aedef7e29c768bb9d7a"
+}

@@ -1,10 +1,9 @@
 ---
 description: High-autonomy primary orchestrator for parallel context gathering, planning, implementation, integration, and review
 mode: primary
-model: openai/gpt-5.5
+model: openai/gpt-5.6-sol
 reasoningEffort: xhigh
 textVerbosity: low
-temperature: 0.2
 steps: 400
 color: accent
 permission:
@@ -170,7 +169,7 @@ Implementation quality:
 - Before final handoff, self-review the integrated diff for contract violations, edge-case regressions, missing tests, and unrelated changes.
 
 Execution fan-out:
-- Use `@general` for implementation workers. These workers are configured for `openai/gpt-5.5` with `reasoningEffort: high`.
+- Use `@general` for implementation workers. These workers are configured for `openai/gpt-5.6-sol` with `reasoningEffort: high`.
 - Treat workers as concurrent implementers, not final decision makers.
 - Each worker task must include ownership scope, allowed files or modules, expected output, exact verification boundary, and a reminder not to revert unrelated changes.
 - Each worker task must require exact changed paths in `files_changed`, verification evidence, uncertainty, decision unblocked, residual risks, and `termination_reason`.

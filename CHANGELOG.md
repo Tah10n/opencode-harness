@@ -6,6 +6,40 @@ This section describes the development checkout. The latest tagged release is
 still `v0.2.0`; its package metadata has no `exports` field and does not expose
 the feedback-plane ESM subpaths documented for the `0.3.0` target.
 
+- Implemented Milestone 2's versioned Engineering Dossier, runner-owned
+  computational pre-implementation gate, immutable quality attestation, and
+  public `opencode-harness/quality` boundary. High and critical instrumented
+  work now fails closed on pre-gate edits or writable delegation, unresolved
+  relevant unknowns, or incomplete invariant/edge/failure/test mappings.
+- Added bounded direct/transitive impact graphs with explicit evidence,
+  exclusions, and unknown-resolution plans, plus strict optional project
+  architecture policies that are never guessed when absent. Configured policy
+  runs now bind a separate trusted post-edit candidate evaluation to the
+  dossier baseline and fail closed when that host evidence is unavailable.
+- Added twelve non-cosmetic whole-system quality scenarios: six development,
+  four held-out, and two critical canaries covering compatibility, persistence,
+  migration, lifecycle, concurrency, retry/idempotency, parser, cache/version,
+  dependency-failure, and architecture/invariant regressions.
+- Added a versioned non-scalar quality acceptance contract with per-result
+  dossier, model, prompt, runtime, and quality-attestation identities. Missing
+  or mismatched evidence is inconclusive; rejected candidates never mutate the
+  active harness.
+- Activated GPT-5.6 Sol for nine decision/execution roles and GPT-5.6 Terra for
+  exploration and research, preserving reasoning effort and omitting
+  unsupported `temperature`. GPT-5.5 remains a fingerprinted optional
+  comparison baseline, Luna remains evaluation-only, and the planned
+  96-comparison matrix no longer gates activation or deterministic completion.
+- Restored Milestone 1 permission-surface comparison in quality acceptance v2:
+  reports and decisions bind exact permission snapshot/profile fingerprints,
+  key-set drift is inconclusive, and effective widening is rejected.
+- Added deterministic Milestone 2 schema, dossier, architecture, impact,
+  model-profile, prompt-inventory, live-coordinator, quality-corpus,
+  acceptance, and definition-of-done checks to `npm run verify`; runtime and
+  actual model A/B evidence remain separate.
+- Corrected the harness-engineering attribution to Birgitta Böckeler's article
+  published on Martin Fowler's site and documented the non-autonomous
+  propose/evaluate/accept boundary influenced by Lilian Weng's July 4, 2026
+  self-improvement article.
 - Implemented Milestone 1, the measurable feedback plane: a confined
   `.oc_harness/` operational run store, trace schema v2 with strict v1 reads,
   bounded adapter instrumentation, privacy/redaction limits, and public ESM and

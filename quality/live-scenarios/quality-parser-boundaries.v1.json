@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "sidecar_version": "1.0.0",
+  "scenario_id": "quality-parser-boundaries",
+  "seeded_defect": "The parser returns its input string instead of a validated numeric port.",
+  "visible_oracle": { "command": "node --test test/visible.test.mjs", "seeded_status": "failed" },
+  "bad_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-parser-boundaries/bad/port.mjs", "target": "src/port.mjs", "sha256": "a29be3522d5ca9383f2e2b199db83e5d54f059a967db46ddf510adf2e008b5db" }
+  ] },
+  "compliant_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-parser-boundaries/good/port.mjs", "target": "src/port.mjs", "sha256": "f051447d7ac31f6144085293aba299d0e0b3567f82c974368e61a1e9287bc3f5" }
+  ] },
+  "hidden_counterexample": "Exact bounds plus empty, exponent, whitespace, alternate-numeral, null, and overflow inputs reject permissive coercion.",
+  "forbidden_regression": "Do not rely on permissive numeric coercion.",
+  "risk_class": "high",
+  "workload_class": "parser-transformation-boundaries",
+  "expected_ownership": ["src/port.mjs"],
+  "required_quality_assertion_ids": [
+    "quality-parser-boundaries-dossier-before-edit",
+    "quality-parser-boundaries-gate-before-edit",
+    "quality-parser-boundaries-coverage-recorded",
+    "quality-parser-boundaries-unknowns-resolved",
+    "quality-parser-boundaries-mapping-verified",
+    "quality-parser-boundaries-architecture-respected",
+    "quality-parser-boundaries-ownership-respected",
+    "quality-parser-boundaries-integrated-verification",
+    "quality-parser-boundaries-valid-completion"
+  ],
+  "suite": "development",
+  "fixture_fingerprint": "f84f91ba26ad7f9bc69ab1f0792d5e8db68bf0c653a889952f0ee05006a60718"
+}

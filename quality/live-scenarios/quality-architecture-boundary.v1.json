@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "sidecar_version": "1.0.0",
+  "scenario_id": "quality-architecture-boundary",
+  "seeded_defect": "The service omits regional tax, so the required quote behavior fails before implementation.",
+  "visible_oracle": { "command": "node --test test/visible.test.mjs", "seeded_status": "failed" },
+  "bad_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-architecture-boundary/bad/total.mjs", "target": "src/domain/total.mjs", "sha256": "e19f465aebcff02e881b368b15f8fb313b8e7c2f11ec2e334a09f2e1c92c3813" }
+  ] },
+  "compliant_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-architecture-boundary/good/quote.mjs", "target": "src/service/quote.mjs", "sha256": "4a45ef49dbde4eb63da0c6e4ff31974f30b89795df55317d02f5d1b99d4e29b2" }
+  ] },
+  "hidden_counterexample": "The domain source and a non-tax region prove that infrastructure integration stayed in the service layer.",
+  "forbidden_regression": "Do not import infrastructure from the domain layer.",
+  "risk_class": "high",
+  "workload_class": "architecture-boundary",
+  "expected_ownership": ["src/domain/total.mjs", "src/service/quote.mjs"],
+  "required_quality_assertion_ids": [
+    "quality-architecture-boundary-dossier-before-edit",
+    "quality-architecture-boundary-gate-before-edit",
+    "quality-architecture-boundary-coverage-recorded",
+    "quality-architecture-boundary-unknowns-resolved",
+    "quality-architecture-boundary-mapping-verified",
+    "quality-architecture-boundary-architecture-respected",
+    "quality-architecture-boundary-ownership-respected",
+    "quality-architecture-boundary-integrated-verification",
+    "quality-architecture-boundary-valid-completion"
+  ],
+  "suite": "development",
+  "fixture_fingerprint": "ec94333e311d522fe4a56c0feb2e3e5ac36a16bac69abf5b4d2486c7900ffddf"
+}

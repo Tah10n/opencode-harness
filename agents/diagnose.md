@@ -2,10 +2,9 @@
 description: High-autonomy debugger for reproduction, evidence gathering, and root-cause isolation (no edits)
 mode: subagent
 hidden: true
-model: openai/gpt-5.5
+model: openai/gpt-5.6-sol
 reasoningEffort: high
 textVerbosity: low
-temperature: 0.1
 steps: 180
 permission:
   edit: deny

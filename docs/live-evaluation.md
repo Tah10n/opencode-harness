@@ -14,13 +14,16 @@ Validate the versioned scenario and suite corpus without running an agent:
 
 ```sh
 npm run verify:live-manifests
+npm run verify:quality-live-manifests
+npm run verify:quality-live-coordinator
 npm run eval:live:buffered-self-test
 npm run verify:live-eval
 ```
 
-Run actual behavioural evaluation only with an adapter, both profiles, and the
-corresponding installed-runtime permission evidence. Run from the candidate
-checkout and pass absolute evidence paths from their owning source roots:
+For development-only iteration, run actual behavioural evaluation only with an
+adapter, both profiles, and the corresponding installed-runtime permission
+evidence. This selected-suite example is incomplete and cannot support a
+release or acceptance claim. The complete 96-pair recipe appears below.
 
 ```sh
 BASELINE_ROOT="/absolute/path/to/baseline"
@@ -57,7 +60,7 @@ The configured module runs in a dedicated Node IPC child process and exports:
 ```js
 export async function runScenario(context) {
   // context: scenario, repetition, profileRole, profile, repo, timeout,
-  //          profileFingerprint, signal, trace
+  //          profileFingerprint, signal, trace, quality
   await context.trace.emit({
     event_type: "tool_call",
     summary: "Recorded a bounded tool event.",
@@ -157,6 +160,44 @@ repository root, trace/report directories, `.git`, `node_modules`, static
 adversarial fixtures, runtime fixtures, or hidden-check directories.
 Unsupported fields are rejected.
 
+### Engineering Quality Handshake
+
+Milestone 2 quality scenarios also receive a quota-limited `context.quality`
+facade with `createDossier`, `updateDossier`, `finalizeDossier`, `inspect`, and
+`authorizeAction`. The adapter proposes dossier content, but the parent runner
+owns validation, persistence, workspace observations, architecture evaluation,
+gate computation, and the causal gate trace event.
+
+For high/critical scenarios, the runner derives baseline evidence from its own
+completed setup checks and derives architect/reviewer challenge receipts only
+from terminal traced jobs whose role, result ID, status, and termination reason
+match the finalized dossier. Those receipts are sealed and published as
+`quality/preimplementation-evidence.json`; adapter-authored result IDs without
+matching runner observations cannot satisfy the gate.
+
+For a configured architecture policy, the dossier graph is the pre-edit
+baseline. After teardown and workspace reconciliation, a trusted host graph
+extractor must return the candidate graph; the runner computes and persists a
+separate `post-architecture-evaluation.json`. Adapter-authored graphs cannot
+serve as this evidence. Without a trusted extractor the run remains incomplete;
+an introduced violation is preserved as failed post-edit evidence. For
+high/critical work it also blocks the completion attestation, so the candidate
+cannot reach acceptance.
+
+For high and critical scenarios, an edit, write-capable action, implementation
+event, or writable delegated job before that trusted passed gate fails closed
+and latches the run invalid. Read-only discovery can occur before the gate.
+The runner also compares the ordinary workspace to its pre-adapter snapshot;
+an untraced mutation cannot be legitimized by a later trace or dossier.
+
+After verified process-tree teardown and integrated verification, the runner
+creates a quality attestation that binds the dossier and gate fingerprints,
+pre-edit and post-edit architecture evaluations when configured,
+gate/edit/verification ordering, workspace fingerprints, model and prompt
+profile identities, and operational run. The quality artifacts and finalized
+trace publish as one validated run bundle or not at all. Adapter-authored
+claims cannot substitute for this attestation.
+
 Every scenario also declares a runner-only `workspace_policy`. `read_only`
 permits no adapter change; `allowlist` permits only the listed exact portable
 relative paths. The runner fingerprints the ordinary fixture tree immediately
@@ -173,7 +214,7 @@ behavioural scenario belongs exactly once to `development`, `held_out`, or
 `infrastructure`, creates separate baseline/candidate operational runs without
 an LLM, and never contributes to candidate acceptance metrics.
 
-The twelve behavioural scenarios cover:
+The original Milestone 1 twelve behavioural scenarios cover:
 
 1. small local change without unnecessary delegation;
 2. broad audit with bounded context discovery;
@@ -187,6 +228,26 @@ The twelve behavioural scenarios cover:
 10. incomplete handoff with bounded redirection/termination;
 11. project-local knowledge that must not become global memory;
 12. destructive action that remains approval-gated.
+
+Milestone 2 adds twelve non-cosmetic whole-system quality scenarios. Their
+suite allocation is fixed and runner-owned:
+
+| Suite | Added scenarios | Purpose |
+| --- | --- | --- |
+| `development` (6) | `quality-cross-module-invariant`, `quality-public-api-compatibility`, `quality-architecture-boundary`, `quality-concurrency-cancellation`, `quality-parser-boundaries`, `quality-small-local-control` | Iteration on transitive invariants, public contracts, architecture, cancellation, parser edges, and overengineering control |
+| `held_out` (4) | `quality-persistence-rollback`, `quality-retry-idempotency`, `quality-stale-cache-version-skew`, `quality-partial-dependency-failure` | Regression protection for persistence, retries, mixed versions, and degraded dependencies |
+| `canary` (2) | `quality-resource-lifecycle`, `quality-migration-compatibility` | Critical lifecycle and migration/rollback compatibility protection |
+
+Each quality scenario has a deliberately bad artifact, a good oracle, visible
+checks, hidden checks, an explicit workspace allowlist, dossier/gate trace
+assertions, expected contracts, and forbidden regressions. The sidecars under
+`quality/live-scenarios/` are runner-only. They do not enter adapter context.
+
+The GPT-5.6 experiment maps Sol to primary quality work, Terra to the two
+read-heavy held-out discovery/research cells, and Luna only to the
+`quality-small-local-control` `standard-lite` development cell. Luna is never
+eligible for either critical canary. Suite membership, model role assignment,
+and comparison variants are checked deterministically before live execution.
 
 ## Reports And Privacy
 
@@ -214,6 +275,12 @@ Reports include evaluation/operational run IDs, scenario/repetition/profile,
 content and repository fingerprints, adapter classification, visible/hidden
 rates, defect escape rate, duration, sanitized model/tool/cost availability,
 and incomplete-evidence markers.
+Milestone 2 schema-v2 quality results additionally bind the prescribed
+comparison ID, exact model-profile and prompt-profile IDs/fingerprints,
+installed-runtime model evidence, effective model/effort/verbosity/mode,
+permission-snapshot and permission-profile fingerprints, quality attestation,
+and structured quality outcomes. A runtime parser fixture or an adapter's
+free-form model label cannot satisfy that identity.
 Command results contain only stable check ID, status, exit code, and
 `stdout_chars`/`stderr_chars` sizes. Reports persist command status/exit
 metadata, adapter classification, and allowlisted sanitized model/tool/cost
@@ -223,8 +290,14 @@ absolute private paths, or arbitrary adapter output.
 
 ## Relationship To Acceptance
 
-Live reports are evidence, not an automatic rollout. `npm run assess:candidate`
-compares paired baseline/candidate reports under the versioned acceptance
+Live reports are evidence, not an automatic rollout. Legacy reports remain
+available to `npm run assess:candidate`; schema-v2 quality reports use
+`npm run assess:quality-candidate -- ...` together with the checked model
+experiment, one complete dedicated runtime-evidence directory (legacy explicit
+files remain readable), and required
+`--baseline-permission-evidence`/`--candidate-permission-evidence` snapshots.
+The command compares all
+prescribed baseline/candidate pairs under the versioned non-scalar acceptance
 policy and writes a separate immutable decision. Missing, malformed, untrusted,
 or incomplete mandatory evidence yields `inconclusive`, even when another gate
 has a proven failure. A complete evidence set may be `accepted` or `rejected`.
@@ -233,3 +306,98 @@ labels alone never bind a candidate. Assessment trusts a report only after
 strict history inspection of JSON, Markdown, and marker; it derives the
 repetition universe and scenario fingerprints from the canonical validated
 workspace corpus and fingerprints both into the decision.
+
+Quality acceptance remains non-scalar: architecture-policy and invariant
+violations, dossier or gate gaps, affected-path gaps, edge/failure coverage,
+test-quality failures, permission widening, hidden failures, and introduced
+regressions are independent hard gates. Cost, duration, and token metrics do
+not cancel a quality regression. Missing installed-runtime model evidence or a
+missing/mismatched quality attestation makes the comparison inconclusive.
+
+An acceptance decision never edits the active profile. Permissions, security
+rules, hidden checks, and the acceptance policy stay outside any future
+proposal loop, and a rejected candidate cannot mutate the harness.
+
+## GPT-5.6 External Evidence Boundary
+
+The checked GPT-5.5/GPT-5.6 experiment is a plan, not a fabricated run. Actual
+paired evidence requires all of the following external state at the same time:
+
+- installed OpenCode profiles for the exact baseline and candidate role IDs;
+- complete installed-runtime model-option evidence for each role under test;
+- model/provider access;
+- a compatible host adapter that invokes and attests the requested profile;
+- isolated repositories and content-bound permission evidence for both sides.
+
+Use the same fresh candidate-owned runtime-evidence directory for capture,
+`OPENCODE_MODEL_RUNTIME_EVIDENCE_PATH`, and quality assessment. The producer
+publishes baseline/candidate completion markers only after every exact distinct
+invocation is complete installed-runtime evidence. The live runner consumes
+the individual `*-model-*.json` files; assessment validates the batch arrays,
+individual files, and completion markers as one coherent bundle and rejects
+symlinks, duplicates, missing files, or unrelated artifacts.
+
+The production/release recipe below evaluates the complete canonical 96-pair
+universe. Both permission snapshots bind the same candidate repository static
+subject while their effective permission surfaces are captured from separate
+installed runtime roots. This keeps the static subject constant across the A/B
+comparison without pretending the two runtime profiles are the same.
+
+<!-- complete-quality-evidence-recipe:start -->
+```sh
+CANDIDATE_REPO="/absolute/path/to/candidate-repository"
+BASELINE_RUNTIME_ROOT="/absolute/path/to/installed-baseline-runtime"
+CANDIDATE_RUNTIME_ROOT="/absolute/path/to/installed-candidate-runtime"
+ADAPTER_PATH="/absolute/path/to/adapter.mjs"
+
+cd "$CANDIDATE_REPO"
+npm run evidence:static -- --candidate-id experiment-subject
+SUBJECT_STATIC_JSON="$CANDIDATE_REPO/.oc_harness/evidence/<experiment-subject-static>.json"
+RUNTIME_EVIDENCE_DIR="$CANDIDATE_REPO/.oc_harness/evidence/runtime-model-batches"
+BASELINE_PERMISSIONS_JSON="$CANDIDATE_REPO/.oc_harness/evidence/<baseline-permission>.json"
+CANDIDATE_PERMISSIONS_JSON="$CANDIDATE_REPO/.oc_harness/evidence/<candidate-permission>.json"
+QUALITY_REPORT_JSON="$CANDIDATE_REPO/evals/reports/<quality-report>.json"
+
+HARNESS_RUNTIME_CWD="$BASELINE_RUNTIME_ROOT" \
+HARNESS_EVIDENCE_WORKSPACE="$CANDIDATE_REPO" \
+npm run verify:runtime -- --evidence-profile baseline-v1 --subject-id experiment-subject --subject-evidence "$SUBJECT_STATIC_JSON"
+
+HARNESS_RUNTIME_CWD="$CANDIDATE_RUNTIME_ROOT" \
+HARNESS_EVIDENCE_WORKSPACE="$CANDIDATE_REPO" \
+npm run verify:runtime -- --evidence-profile candidate-v1 --subject-id experiment-subject --subject-evidence "$SUBJECT_STATIC_JSON"
+
+HARNESS_RUNTIME_CWD="$BASELINE_RUNTIME_ROOT" \
+HARNESS_EVIDENCE_WORKSPACE="$CANDIDATE_REPO" \
+npm run verify:runtime -- --all-experiment-models --profile-role baseline
+
+HARNESS_RUNTIME_CWD="$CANDIDATE_RUNTIME_ROOT" \
+HARNESS_EVIDENCE_WORKSPACE="$CANDIDATE_REPO" \
+npm run verify:runtime -- --all-experiment-models --profile-role candidate
+
+OPENCODE_MODEL_RUNTIME_EVIDENCE_PATH="$RUNTIME_EVIDENCE_DIR" \
+OPENCODE_BASELINE_PROFILE=baseline-v1 \
+OPENCODE_HARNESS_PROFILE=candidate-v1 \
+OPENCODE_BASELINE_PERMISSION_EVIDENCE="$BASELINE_PERMISSIONS_JSON" \
+OPENCODE_HARNESS_PERMISSION_EVIDENCE="$CANDIDATE_PERMISSIONS_JSON" \
+OPENCODE_LIVE_EVAL_ADAPTER="$ADAPTER_PATH" \
+npm run eval:live
+
+npm run assess:quality-candidate -- \
+  --report "$QUALITY_REPORT_JSON" \
+  --runtime-evidence "$RUNTIME_EVIDENCE_DIR" \
+  --baseline-permission-evidence "$BASELINE_PERMISSIONS_JSON" \
+  --candidate-permission-evidence "$CANDIDATE_PERMISSIONS_JSON" \
+  --baseline-id baseline-v1 \
+  --candidate-id candidate-v1
+```
+<!-- complete-quality-evidence-recipe:end -->
+
+`npm run eval:live -- --suite development` is useful only for incomplete local
+iteration. It does not cover the 96-pair universe and cannot support a release,
+rollout, or accepted quality claim. Omit `--suite` for complete evidence.
+
+When any of those inputs is unavailable, complete the deterministic checks and
+report the live portion as unavailable/partially verified. Do not turn runtime
+fixtures, config parsing, or the infrastructure self-test into behavioural
+evidence. See [model-profiles.md](model-profiles.md) for the profile matrix and
+runtime probe.

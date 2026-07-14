@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Cross-field producer, phase, command, dossier, status, and fingerprint checks are canonical in lib/quality/gate.mjs.",
+  "title": "OpenCode Harness Preimplementation Evidence v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "evidence_id",
+    "dossier_id",
+    "dossier_fingerprint",
+    "baseline_receipts",
+    "plan_challenge_receipts",
+    "fingerprint"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "evidence_id": { "$ref": "#/$defs/id" },
+    "dossier_id": { "$ref": "#/$defs/id" },
+    "dossier_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "baseline_receipts": {
+      "type": "array",
+      "maxItems": 128,
+      "items": { "$ref": "#/$defs/baselineReceipt" }
+    },
+    "plan_challenge_receipts": {
+      "type": "array",
+      "maxItems": 16,
+      "items": { "$ref": "#/$defs/challengeReceipt" }
+    },
+    "fingerprint": { "$ref": "#/$defs/fingerprint" }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$" },
+    "fingerprint": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "baselineReceipt": {
+      "type": "object",
+      "required": ["receipt_id", "check_id", "trusted_producer", "phase", "status", "command_or_mechanism", "evidence_fingerprint", "completed_at"],
+      "properties": {
+        "receipt_id": { "$ref": "#/$defs/id" },
+        "check_id": { "$ref": "#/$defs/id" },
+        "trusted_producer": { "type": "string", "minLength": 1 },
+        "phase": { "const": "preimplementation" },
+        "status": { "enum": ["passed", "failed", "blocked"] },
+        "command_or_mechanism": { "type": "string", "minLength": 1 },
+        "evidence_fingerprint": { "$ref": "#/$defs/fingerprint" },
+        "completed_at": { "$ref": "#/$defs/timestamp" }
+      },
+      "additionalProperties": false
+    },
+    "challengeReceipt": {
+      "type": "object",
+      "required": ["receipt_id", "result_id", "role", "mechanism_id", "trusted_producer", "phase", "status", "evidence_fingerprint", "completed_at"],
+      "properties": {
+        "receipt_id": { "$ref": "#/$defs/id" },
+        "result_id": { "$ref": "#/$defs/id" },
+        "role": { "enum": ["architect", "reviewer"] },
+        "mechanism_id": { "$ref": "#/$defs/id" },
+        "trusted_producer": { "type": "string", "minLength": 1 },
+        "phase": { "const": "preimplementation" },
+        "status": { "enum": ["passed", "failed", "blocked"] },
+        "evidence_fingerprint": { "$ref": "#/$defs/fingerprint" },
+        "completed_at": { "$ref": "#/$defs/timestamp" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

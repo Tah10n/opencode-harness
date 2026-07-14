@@ -1,0 +1,28 @@
+{
+  "id": "quality-persistence-rollback",
+  "description": "A transfer must roll back both balances after a partial persistence failure.",
+  "risk_tags": ["critical", "persistence", "rollback"],
+  "failure_family": "transaction-rollback-data-loss",
+  "workspace_policy": { "mode": "allowlist", "allowed_paths": ["src/store.mjs"] },
+  "repo_fixture": "fixtures/live/quality-persistence-rollback",
+  "task": "Make transfer() preserve total value and atomicity. A failure after debit or an invalid amount must leave both balances unchanged. Run the targeted test.",
+  "setup_commands": [],
+  "visible_checks": ["node --test test/visible.test.mjs"],
+  "hidden_checks": ["node --test .live-hidden/quality-persistence-rollback.test.mjs"],
+  "hidden_check_files": [{ "source": "evals/hidden/quality-persistence-rollback/hidden.test.mjs", "target": ".live-hidden/quality-persistence-rollback.test.mjs" }],
+  "hidden_trace_assertions": [
+    { "assertion_id": "quality-persistence-rollback-dossier-before-edit", "op": "verifier_code_exists", "code": "ENGINEERING_DOSSIER_BEFORE_IMPLEMENTATION" },
+    { "assertion_id": "quality-persistence-rollback-gate-before-edit", "op": "verifier_code_exists", "code": "ENGINEERING_GATE_PASSED_BEFORE_IMPLEMENTATION" },
+    { "assertion_id": "quality-persistence-rollback-coverage-recorded", "op": "verifier_code_exists", "code": "ENGINEERING_AFFECTED_SYSTEM_COVERAGE_RECORDED" },
+    { "assertion_id": "quality-persistence-rollback-unknowns-resolved", "op": "verifier_code_exists", "code": "ENGINEERING_RELEVANT_UNKNOWNS_RESOLVED" },
+    { "assertion_id": "quality-persistence-rollback-mapping-verified", "op": "verifier_code_exists", "code": "ENGINEERING_EDGE_FAILURE_MAPPING_VERIFIED" },
+    { "assertion_id": "quality-persistence-rollback-architecture-respected", "op": "verifier_code_exists", "code": "ENGINEERING_ARCHITECTURE_RESPECTED" },
+    { "assertion_id": "quality-persistence-rollback-ownership-respected", "op": "verifier_code_exists", "code": "ENGINEERING_IMPLEMENTATION_WITHIN_OWNERSHIP" },
+    { "assertion_id": "quality-persistence-rollback-integrated-verification", "op": "event_exists", "event_type": "verification", "status": "completed" },
+    { "assertion_id": "quality-persistence-rollback-valid-completion", "op": "termination_reason_equals", "value": "verified" }
+  ],
+  "timeout": 120000,
+  "repetitions": 2,
+  "expected_contracts": ["Successful transfers preserve total value.", "Partial failures and rejected transfers restore the exact prior state."],
+  "forbidden_regressions": ["Do not leave a debit committed after failure.", "Do not mutate balances before validating funds and amount."]
+}

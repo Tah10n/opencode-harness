@@ -2,10 +2,9 @@
 description: Controlled self-improvement agent for persistent memory and agent-created skill maintenance; no product-code edits
 mode: subagent
 hidden: true
-model: openai/gpt-5.5
+model: openai/gpt-5.6-sol
 reasoningEffort: high
 textVerbosity: low
-temperature: 0.1
 steps: 150
 permission:
   edit: deny

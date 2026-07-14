@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "sidecar_version": "1.0.0",
+  "scenario_id": "quality-cross-module-invariant",
+  "seeded_defect": "The display normalizer still emits uppercase, so the requested display contract fails before implementation.",
+  "visible_oracle": { "command": "node --test test/visible.test.mjs", "seeded_status": "failed" },
+  "bad_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-cross-module-invariant/bad/sku.mjs", "target": "src/sku.mjs", "sha256": "42025ffe8f4894bcf14342b5e6a5cdf04c3ddf5b9e20f1434709d7eeb4b1f7ba" }
+  ] },
+  "compliant_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-cross-module-invariant/good/sku.mjs", "target": "src/sku.mjs", "sha256": "42025ffe8f4894bcf14342b5e6a5cdf04c3ddf5b9e20f1434709d7eeb4b1f7ba" },
+    { "source": "quality/live-scenarios/artifacts/quality-cross-module-invariant/good/inventory.mjs", "target": "src/inventory.mjs", "sha256": "206672af25afc8efec4ba913c327ba33715cdc8df0887a70062a5be31b3ac0f0" }
+  ] },
+  "hidden_counterexample": "A second SKU exercises the transitive inventory serializer whose uppercase wire key must remain stable.",
+  "forbidden_regression": "Do not change the inventory-key serialized contract.",
+  "risk_class": "high",
+  "workload_class": "cross-module-invariant",
+  "expected_ownership": ["src/sku.mjs", "src/inventory.mjs"],
+  "required_quality_assertion_ids": [
+    "quality-cross-module-invariant-dossier-before-edit",
+    "quality-cross-module-invariant-gate-before-edit",
+    "quality-cross-module-invariant-coverage-recorded",
+    "quality-cross-module-invariant-unknowns-resolved",
+    "quality-cross-module-invariant-mapping-verified",
+    "quality-cross-module-invariant-architecture-respected",
+    "quality-cross-module-invariant-ownership-respected",
+    "quality-cross-module-invariant-integrated-verification",
+    "quality-cross-module-invariant-valid-completion"
+  ],
+  "suite": "development",
+  "fixture_fingerprint": "2f76965c01210109a8e937acf354cd319978650e03cc170c32af5da20939983f"
+}

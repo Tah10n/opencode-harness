@@ -1,0 +1,2866 @@
+{
+  "catalog_fingerprint": "sha256:b247257bb06cede46b9f1fbf5b5d1224c7b0eaa459290a41c9a1f24f5579d08a",
+  "catalog_id": "gpt56-role-catalog-v1",
+  "comparisons": [
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-orchestrator",
+        "reasoning_effort": "xhigh",
+        "role": "orchestrator",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-orchestrator",
+        "reasoning_effort": "xhigh",
+        "role": "orchestrator",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-cross-module-invariant-r1",
+      "comparison_id": "quality-cross-module-invariant-r1-same-low",
+      "corpus_fingerprint": "sha256:1ed87ded32205d10742b7ea476c71dbebc016afd10927b9c599829b58a965927",
+      "fixture_id": "fixture-quality-cross-module-invariant-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "orchestrator",
+      "scenario_id": "quality-cross-module-invariant",
+      "status": "planned",
+      "variant_id": "same-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-orchestrator",
+        "reasoning_effort": "xhigh",
+        "role": "orchestrator",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-orchestrator",
+        "reasoning_effort": "xhigh",
+        "role": "orchestrator",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-cross-module-invariant-r1",
+      "comparison_id": "quality-cross-module-invariant-r1-same-medium",
+      "corpus_fingerprint": "sha256:1ed87ded32205d10742b7ea476c71dbebc016afd10927b9c599829b58a965927",
+      "fixture_id": "fixture-quality-cross-module-invariant-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "orchestrator",
+      "scenario_id": "quality-cross-module-invariant",
+      "status": "planned",
+      "variant_id": "same-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-orchestrator",
+        "reasoning_effort": "xhigh",
+        "role": "orchestrator",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-orchestrator",
+        "reasoning_effort": "high",
+        "role": "orchestrator",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-cross-module-invariant-r1",
+      "comparison_id": "quality-cross-module-invariant-r1-lower-low",
+      "corpus_fingerprint": "sha256:1ed87ded32205d10742b7ea476c71dbebc016afd10927b9c599829b58a965927",
+      "fixture_id": "fixture-quality-cross-module-invariant-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "orchestrator",
+      "scenario_id": "quality-cross-module-invariant",
+      "status": "planned",
+      "variant_id": "lower-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-orchestrator",
+        "reasoning_effort": "xhigh",
+        "role": "orchestrator",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-orchestrator",
+        "reasoning_effort": "high",
+        "role": "orchestrator",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-cross-module-invariant-r1",
+      "comparison_id": "quality-cross-module-invariant-r1-lower-medium",
+      "corpus_fingerprint": "sha256:1ed87ded32205d10742b7ea476c71dbebc016afd10927b9c599829b58a965927",
+      "fixture_id": "fixture-quality-cross-module-invariant-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "orchestrator",
+      "scenario_id": "quality-cross-module-invariant",
+      "status": "planned",
+      "variant_id": "lower-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-orchestrator",
+        "reasoning_effort": "xhigh",
+        "role": "orchestrator",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-orchestrator",
+        "reasoning_effort": "xhigh",
+        "role": "orchestrator",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-cross-module-invariant-r2",
+      "comparison_id": "quality-cross-module-invariant-r2-same-low",
+      "corpus_fingerprint": "sha256:1ed87ded32205d10742b7ea476c71dbebc016afd10927b9c599829b58a965927",
+      "fixture_id": "fixture-quality-cross-module-invariant-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "orchestrator",
+      "scenario_id": "quality-cross-module-invariant",
+      "status": "planned",
+      "variant_id": "same-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-orchestrator",
+        "reasoning_effort": "xhigh",
+        "role": "orchestrator",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-orchestrator",
+        "reasoning_effort": "xhigh",
+        "role": "orchestrator",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-cross-module-invariant-r2",
+      "comparison_id": "quality-cross-module-invariant-r2-same-medium",
+      "corpus_fingerprint": "sha256:1ed87ded32205d10742b7ea476c71dbebc016afd10927b9c599829b58a965927",
+      "fixture_id": "fixture-quality-cross-module-invariant-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "orchestrator",
+      "scenario_id": "quality-cross-module-invariant",
+      "status": "planned",
+      "variant_id": "same-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-orchestrator",
+        "reasoning_effort": "xhigh",
+        "role": "orchestrator",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-orchestrator",
+        "reasoning_effort": "high",
+        "role": "orchestrator",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-cross-module-invariant-r2",
+      "comparison_id": "quality-cross-module-invariant-r2-lower-low",
+      "corpus_fingerprint": "sha256:1ed87ded32205d10742b7ea476c71dbebc016afd10927b9c599829b58a965927",
+      "fixture_id": "fixture-quality-cross-module-invariant-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "orchestrator",
+      "scenario_id": "quality-cross-module-invariant",
+      "status": "planned",
+      "variant_id": "lower-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-orchestrator",
+        "reasoning_effort": "xhigh",
+        "role": "orchestrator",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-orchestrator",
+        "reasoning_effort": "high",
+        "role": "orchestrator",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-cross-module-invariant-r2",
+      "comparison_id": "quality-cross-module-invariant-r2-lower-medium",
+      "corpus_fingerprint": "sha256:1ed87ded32205d10742b7ea476c71dbebc016afd10927b9c599829b58a965927",
+      "fixture_id": "fixture-quality-cross-module-invariant-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "orchestrator",
+      "scenario_id": "quality-cross-module-invariant",
+      "status": "planned",
+      "variant_id": "lower-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-architect",
+        "reasoning_effort": "high",
+        "role": "architect",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-architect",
+        "reasoning_effort": "high",
+        "role": "architect",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-public-api-compatibility-r1",
+      "comparison_id": "quality-public-api-compatibility-r1-same-low",
+      "corpus_fingerprint": "sha256:7776f3f821d0314af840fd0ee039b67ca17f3da82d2595249d811fa8895f1b85",
+      "fixture_id": "fixture-quality-public-api-compatibility-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "architect",
+      "scenario_id": "quality-public-api-compatibility",
+      "status": "planned",
+      "variant_id": "same-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-architect",
+        "reasoning_effort": "high",
+        "role": "architect",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-architect",
+        "reasoning_effort": "high",
+        "role": "architect",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-public-api-compatibility-r1",
+      "comparison_id": "quality-public-api-compatibility-r1-same-medium",
+      "corpus_fingerprint": "sha256:7776f3f821d0314af840fd0ee039b67ca17f3da82d2595249d811fa8895f1b85",
+      "fixture_id": "fixture-quality-public-api-compatibility-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "architect",
+      "scenario_id": "quality-public-api-compatibility",
+      "status": "planned",
+      "variant_id": "same-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-architect",
+        "reasoning_effort": "high",
+        "role": "architect",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-architect",
+        "reasoning_effort": "medium",
+        "role": "architect",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-public-api-compatibility-r1",
+      "comparison_id": "quality-public-api-compatibility-r1-lower-low",
+      "corpus_fingerprint": "sha256:7776f3f821d0314af840fd0ee039b67ca17f3da82d2595249d811fa8895f1b85",
+      "fixture_id": "fixture-quality-public-api-compatibility-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "architect",
+      "scenario_id": "quality-public-api-compatibility",
+      "status": "planned",
+      "variant_id": "lower-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-architect",
+        "reasoning_effort": "high",
+        "role": "architect",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-architect",
+        "reasoning_effort": "medium",
+        "role": "architect",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-public-api-compatibility-r1",
+      "comparison_id": "quality-public-api-compatibility-r1-lower-medium",
+      "corpus_fingerprint": "sha256:7776f3f821d0314af840fd0ee039b67ca17f3da82d2595249d811fa8895f1b85",
+      "fixture_id": "fixture-quality-public-api-compatibility-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "architect",
+      "scenario_id": "quality-public-api-compatibility",
+      "status": "planned",
+      "variant_id": "lower-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-architect",
+        "reasoning_effort": "high",
+        "role": "architect",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-architect",
+        "reasoning_effort": "high",
+        "role": "architect",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-public-api-compatibility-r2",
+      "comparison_id": "quality-public-api-compatibility-r2-same-low",
+      "corpus_fingerprint": "sha256:7776f3f821d0314af840fd0ee039b67ca17f3da82d2595249d811fa8895f1b85",
+      "fixture_id": "fixture-quality-public-api-compatibility-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "architect",
+      "scenario_id": "quality-public-api-compatibility",
+      "status": "planned",
+      "variant_id": "same-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-architect",
+        "reasoning_effort": "high",
+        "role": "architect",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-architect",
+        "reasoning_effort": "high",
+        "role": "architect",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-public-api-compatibility-r2",
+      "comparison_id": "quality-public-api-compatibility-r2-same-medium",
+      "corpus_fingerprint": "sha256:7776f3f821d0314af840fd0ee039b67ca17f3da82d2595249d811fa8895f1b85",
+      "fixture_id": "fixture-quality-public-api-compatibility-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "architect",
+      "scenario_id": "quality-public-api-compatibility",
+      "status": "planned",
+      "variant_id": "same-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-architect",
+        "reasoning_effort": "high",
+        "role": "architect",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-architect",
+        "reasoning_effort": "medium",
+        "role": "architect",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-public-api-compatibility-r2",
+      "comparison_id": "quality-public-api-compatibility-r2-lower-low",
+      "corpus_fingerprint": "sha256:7776f3f821d0314af840fd0ee039b67ca17f3da82d2595249d811fa8895f1b85",
+      "fixture_id": "fixture-quality-public-api-compatibility-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "architect",
+      "scenario_id": "quality-public-api-compatibility",
+      "status": "planned",
+      "variant_id": "lower-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-architect",
+        "reasoning_effort": "high",
+        "role": "architect",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-architect",
+        "reasoning_effort": "medium",
+        "role": "architect",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-public-api-compatibility-r2",
+      "comparison_id": "quality-public-api-compatibility-r2-lower-medium",
+      "corpus_fingerprint": "sha256:7776f3f821d0314af840fd0ee039b67ca17f3da82d2595249d811fa8895f1b85",
+      "fixture_id": "fixture-quality-public-api-compatibility-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "architect",
+      "scenario_id": "quality-public-api-compatibility",
+      "status": "planned",
+      "variant_id": "lower-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-orchestrator-deep",
+        "reasoning_effort": "xhigh",
+        "role": "orchestrator-deep",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-orchestrator-deep",
+        "reasoning_effort": "xhigh",
+        "role": "orchestrator-deep",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-architecture-boundary-r1",
+      "comparison_id": "quality-architecture-boundary-r1-same-low",
+      "corpus_fingerprint": "sha256:e73091764a449658242fbcc52f565bf1df273afa50ecbe1064ab61ebdb79b3ff",
+      "fixture_id": "fixture-quality-architecture-boundary-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "orchestrator-deep",
+      "scenario_id": "quality-architecture-boundary",
+      "status": "planned",
+      "variant_id": "same-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-orchestrator-deep",
+        "reasoning_effort": "xhigh",
+        "role": "orchestrator-deep",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-orchestrator-deep",
+        "reasoning_effort": "xhigh",
+        "role": "orchestrator-deep",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-architecture-boundary-r1",
+      "comparison_id": "quality-architecture-boundary-r1-same-medium",
+      "corpus_fingerprint": "sha256:e73091764a449658242fbcc52f565bf1df273afa50ecbe1064ab61ebdb79b3ff",
+      "fixture_id": "fixture-quality-architecture-boundary-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "orchestrator-deep",
+      "scenario_id": "quality-architecture-boundary",
+      "status": "planned",
+      "variant_id": "same-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-orchestrator-deep",
+        "reasoning_effort": "xhigh",
+        "role": "orchestrator-deep",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-orchestrator-deep",
+        "reasoning_effort": "high",
+        "role": "orchestrator-deep",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-architecture-boundary-r1",
+      "comparison_id": "quality-architecture-boundary-r1-lower-low",
+      "corpus_fingerprint": "sha256:e73091764a449658242fbcc52f565bf1df273afa50ecbe1064ab61ebdb79b3ff",
+      "fixture_id": "fixture-quality-architecture-boundary-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "orchestrator-deep",
+      "scenario_id": "quality-architecture-boundary",
+      "status": "planned",
+      "variant_id": "lower-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-orchestrator-deep",
+        "reasoning_effort": "xhigh",
+        "role": "orchestrator-deep",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-orchestrator-deep",
+        "reasoning_effort": "high",
+        "role": "orchestrator-deep",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-architecture-boundary-r1",
+      "comparison_id": "quality-architecture-boundary-r1-lower-medium",
+      "corpus_fingerprint": "sha256:e73091764a449658242fbcc52f565bf1df273afa50ecbe1064ab61ebdb79b3ff",
+      "fixture_id": "fixture-quality-architecture-boundary-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "orchestrator-deep",
+      "scenario_id": "quality-architecture-boundary",
+      "status": "planned",
+      "variant_id": "lower-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-orchestrator-deep",
+        "reasoning_effort": "xhigh",
+        "role": "orchestrator-deep",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-orchestrator-deep",
+        "reasoning_effort": "xhigh",
+        "role": "orchestrator-deep",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-architecture-boundary-r2",
+      "comparison_id": "quality-architecture-boundary-r2-same-low",
+      "corpus_fingerprint": "sha256:e73091764a449658242fbcc52f565bf1df273afa50ecbe1064ab61ebdb79b3ff",
+      "fixture_id": "fixture-quality-architecture-boundary-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "orchestrator-deep",
+      "scenario_id": "quality-architecture-boundary",
+      "status": "planned",
+      "variant_id": "same-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-orchestrator-deep",
+        "reasoning_effort": "xhigh",
+        "role": "orchestrator-deep",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-orchestrator-deep",
+        "reasoning_effort": "xhigh",
+        "role": "orchestrator-deep",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-architecture-boundary-r2",
+      "comparison_id": "quality-architecture-boundary-r2-same-medium",
+      "corpus_fingerprint": "sha256:e73091764a449658242fbcc52f565bf1df273afa50ecbe1064ab61ebdb79b3ff",
+      "fixture_id": "fixture-quality-architecture-boundary-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "orchestrator-deep",
+      "scenario_id": "quality-architecture-boundary",
+      "status": "planned",
+      "variant_id": "same-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-orchestrator-deep",
+        "reasoning_effort": "xhigh",
+        "role": "orchestrator-deep",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-orchestrator-deep",
+        "reasoning_effort": "high",
+        "role": "orchestrator-deep",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-architecture-boundary-r2",
+      "comparison_id": "quality-architecture-boundary-r2-lower-low",
+      "corpus_fingerprint": "sha256:e73091764a449658242fbcc52f565bf1df273afa50ecbe1064ab61ebdb79b3ff",
+      "fixture_id": "fixture-quality-architecture-boundary-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "orchestrator-deep",
+      "scenario_id": "quality-architecture-boundary",
+      "status": "planned",
+      "variant_id": "lower-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-orchestrator-deep",
+        "reasoning_effort": "xhigh",
+        "role": "orchestrator-deep",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-orchestrator-deep",
+        "reasoning_effort": "high",
+        "role": "orchestrator-deep",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-architecture-boundary-r2",
+      "comparison_id": "quality-architecture-boundary-r2-lower-medium",
+      "corpus_fingerprint": "sha256:e73091764a449658242fbcc52f565bf1df273afa50ecbe1064ab61ebdb79b3ff",
+      "fixture_id": "fixture-quality-architecture-boundary-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "orchestrator-deep",
+      "scenario_id": "quality-architecture-boundary",
+      "status": "planned",
+      "variant_id": "lower-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-general",
+        "reasoning_effort": "high",
+        "role": "general",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-general",
+        "reasoning_effort": "high",
+        "role": "general",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-concurrency-cancellation-r1",
+      "comparison_id": "quality-concurrency-cancellation-r1-same-low",
+      "corpus_fingerprint": "sha256:25a0c327aaaddf64f470e60a9502e41f7d58d97f8392a82f85930b7f2c3f6b26",
+      "fixture_id": "fixture-quality-concurrency-cancellation-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "general",
+      "scenario_id": "quality-concurrency-cancellation",
+      "status": "planned",
+      "variant_id": "same-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-general",
+        "reasoning_effort": "high",
+        "role": "general",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-general",
+        "reasoning_effort": "high",
+        "role": "general",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-concurrency-cancellation-r1",
+      "comparison_id": "quality-concurrency-cancellation-r1-same-medium",
+      "corpus_fingerprint": "sha256:25a0c327aaaddf64f470e60a9502e41f7d58d97f8392a82f85930b7f2c3f6b26",
+      "fixture_id": "fixture-quality-concurrency-cancellation-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "general",
+      "scenario_id": "quality-concurrency-cancellation",
+      "status": "planned",
+      "variant_id": "same-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-general",
+        "reasoning_effort": "high",
+        "role": "general",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-general",
+        "reasoning_effort": "medium",
+        "role": "general",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-concurrency-cancellation-r1",
+      "comparison_id": "quality-concurrency-cancellation-r1-lower-low",
+      "corpus_fingerprint": "sha256:25a0c327aaaddf64f470e60a9502e41f7d58d97f8392a82f85930b7f2c3f6b26",
+      "fixture_id": "fixture-quality-concurrency-cancellation-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "general",
+      "scenario_id": "quality-concurrency-cancellation",
+      "status": "planned",
+      "variant_id": "lower-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-general",
+        "reasoning_effort": "high",
+        "role": "general",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-general",
+        "reasoning_effort": "medium",
+        "role": "general",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-concurrency-cancellation-r1",
+      "comparison_id": "quality-concurrency-cancellation-r1-lower-medium",
+      "corpus_fingerprint": "sha256:25a0c327aaaddf64f470e60a9502e41f7d58d97f8392a82f85930b7f2c3f6b26",
+      "fixture_id": "fixture-quality-concurrency-cancellation-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "general",
+      "scenario_id": "quality-concurrency-cancellation",
+      "status": "planned",
+      "variant_id": "lower-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-general",
+        "reasoning_effort": "high",
+        "role": "general",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-general",
+        "reasoning_effort": "high",
+        "role": "general",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-concurrency-cancellation-r2",
+      "comparison_id": "quality-concurrency-cancellation-r2-same-low",
+      "corpus_fingerprint": "sha256:25a0c327aaaddf64f470e60a9502e41f7d58d97f8392a82f85930b7f2c3f6b26",
+      "fixture_id": "fixture-quality-concurrency-cancellation-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "general",
+      "scenario_id": "quality-concurrency-cancellation",
+      "status": "planned",
+      "variant_id": "same-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-general",
+        "reasoning_effort": "high",
+        "role": "general",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-general",
+        "reasoning_effort": "high",
+        "role": "general",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-concurrency-cancellation-r2",
+      "comparison_id": "quality-concurrency-cancellation-r2-same-medium",
+      "corpus_fingerprint": "sha256:25a0c327aaaddf64f470e60a9502e41f7d58d97f8392a82f85930b7f2c3f6b26",
+      "fixture_id": "fixture-quality-concurrency-cancellation-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "general",
+      "scenario_id": "quality-concurrency-cancellation",
+      "status": "planned",
+      "variant_id": "same-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-general",
+        "reasoning_effort": "high",
+        "role": "general",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-general",
+        "reasoning_effort": "medium",
+        "role": "general",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-concurrency-cancellation-r2",
+      "comparison_id": "quality-concurrency-cancellation-r2-lower-low",
+      "corpus_fingerprint": "sha256:25a0c327aaaddf64f470e60a9502e41f7d58d97f8392a82f85930b7f2c3f6b26",
+      "fixture_id": "fixture-quality-concurrency-cancellation-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "general",
+      "scenario_id": "quality-concurrency-cancellation",
+      "status": "planned",
+      "variant_id": "lower-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-general",
+        "reasoning_effort": "high",
+        "role": "general",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-general",
+        "reasoning_effort": "medium",
+        "role": "general",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-concurrency-cancellation-r2",
+      "comparison_id": "quality-concurrency-cancellation-r2-lower-medium",
+      "corpus_fingerprint": "sha256:25a0c327aaaddf64f470e60a9502e41f7d58d97f8392a82f85930b7f2c3f6b26",
+      "fixture_id": "fixture-quality-concurrency-cancellation-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "general",
+      "scenario_id": "quality-concurrency-cancellation",
+      "status": "planned",
+      "variant_id": "lower-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-diagnose",
+        "reasoning_effort": "high",
+        "role": "diagnose",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-diagnose",
+        "reasoning_effort": "high",
+        "role": "diagnose",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-parser-boundaries-r1",
+      "comparison_id": "quality-parser-boundaries-r1-same-low",
+      "corpus_fingerprint": "sha256:85569a11ad5b0172711f6ee6a37ccc77a1b9f9f6662dcc371e8e62fdf7b0c777",
+      "fixture_id": "fixture-quality-parser-boundaries-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "diagnose",
+      "scenario_id": "quality-parser-boundaries",
+      "status": "planned",
+      "variant_id": "same-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-diagnose",
+        "reasoning_effort": "high",
+        "role": "diagnose",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-diagnose",
+        "reasoning_effort": "high",
+        "role": "diagnose",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-parser-boundaries-r1",
+      "comparison_id": "quality-parser-boundaries-r1-same-medium",
+      "corpus_fingerprint": "sha256:85569a11ad5b0172711f6ee6a37ccc77a1b9f9f6662dcc371e8e62fdf7b0c777",
+      "fixture_id": "fixture-quality-parser-boundaries-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "diagnose",
+      "scenario_id": "quality-parser-boundaries",
+      "status": "planned",
+      "variant_id": "same-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-diagnose",
+        "reasoning_effort": "high",
+        "role": "diagnose",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-diagnose",
+        "reasoning_effort": "medium",
+        "role": "diagnose",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-parser-boundaries-r1",
+      "comparison_id": "quality-parser-boundaries-r1-lower-low",
+      "corpus_fingerprint": "sha256:85569a11ad5b0172711f6ee6a37ccc77a1b9f9f6662dcc371e8e62fdf7b0c777",
+      "fixture_id": "fixture-quality-parser-boundaries-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "diagnose",
+      "scenario_id": "quality-parser-boundaries",
+      "status": "planned",
+      "variant_id": "lower-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-diagnose",
+        "reasoning_effort": "high",
+        "role": "diagnose",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-diagnose",
+        "reasoning_effort": "medium",
+        "role": "diagnose",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-parser-boundaries-r1",
+      "comparison_id": "quality-parser-boundaries-r1-lower-medium",
+      "corpus_fingerprint": "sha256:85569a11ad5b0172711f6ee6a37ccc77a1b9f9f6662dcc371e8e62fdf7b0c777",
+      "fixture_id": "fixture-quality-parser-boundaries-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "diagnose",
+      "scenario_id": "quality-parser-boundaries",
+      "status": "planned",
+      "variant_id": "lower-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-diagnose",
+        "reasoning_effort": "high",
+        "role": "diagnose",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-diagnose",
+        "reasoning_effort": "high",
+        "role": "diagnose",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-parser-boundaries-r2",
+      "comparison_id": "quality-parser-boundaries-r2-same-low",
+      "corpus_fingerprint": "sha256:85569a11ad5b0172711f6ee6a37ccc77a1b9f9f6662dcc371e8e62fdf7b0c777",
+      "fixture_id": "fixture-quality-parser-boundaries-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "diagnose",
+      "scenario_id": "quality-parser-boundaries",
+      "status": "planned",
+      "variant_id": "same-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-diagnose",
+        "reasoning_effort": "high",
+        "role": "diagnose",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-diagnose",
+        "reasoning_effort": "high",
+        "role": "diagnose",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-parser-boundaries-r2",
+      "comparison_id": "quality-parser-boundaries-r2-same-medium",
+      "corpus_fingerprint": "sha256:85569a11ad5b0172711f6ee6a37ccc77a1b9f9f6662dcc371e8e62fdf7b0c777",
+      "fixture_id": "fixture-quality-parser-boundaries-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "diagnose",
+      "scenario_id": "quality-parser-boundaries",
+      "status": "planned",
+      "variant_id": "same-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-diagnose",
+        "reasoning_effort": "high",
+        "role": "diagnose",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-diagnose",
+        "reasoning_effort": "medium",
+        "role": "diagnose",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-parser-boundaries-r2",
+      "comparison_id": "quality-parser-boundaries-r2-lower-low",
+      "corpus_fingerprint": "sha256:85569a11ad5b0172711f6ee6a37ccc77a1b9f9f6662dcc371e8e62fdf7b0c777",
+      "fixture_id": "fixture-quality-parser-boundaries-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "diagnose",
+      "scenario_id": "quality-parser-boundaries",
+      "status": "planned",
+      "variant_id": "lower-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-diagnose",
+        "reasoning_effort": "high",
+        "role": "diagnose",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-diagnose",
+        "reasoning_effort": "medium",
+        "role": "diagnose",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-parser-boundaries-r2",
+      "comparison_id": "quality-parser-boundaries-r2-lower-medium",
+      "corpus_fingerprint": "sha256:85569a11ad5b0172711f6ee6a37ccc77a1b9f9f6662dcc371e8e62fdf7b0c777",
+      "fixture_id": "fixture-quality-parser-boundaries-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "diagnose",
+      "scenario_id": "quality-parser-boundaries",
+      "status": "planned",
+      "variant_id": "lower-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-general",
+        "reasoning_effort": "high",
+        "role": "general",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-luna",
+        "profile_id": "candidate-luna-general-high-volume",
+        "reasoning_effort": "high",
+        "role": "general",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-small-local-control-r1",
+      "comparison_id": "quality-small-local-control-r1-same-low",
+      "corpus_fingerprint": "sha256:d0222788d4c6d65362850b6fc873e5aa2e144172c407144c2be3d84ddaf0814d",
+      "fixture_id": "fixture-quality-small-local-control-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "general",
+      "scenario_id": "quality-small-local-control",
+      "status": "planned",
+      "variant_id": "same-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-general",
+        "reasoning_effort": "high",
+        "role": "general",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-luna",
+        "profile_id": "candidate-luna-general-high-volume",
+        "reasoning_effort": "high",
+        "role": "general",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-small-local-control-r1",
+      "comparison_id": "quality-small-local-control-r1-same-medium",
+      "corpus_fingerprint": "sha256:d0222788d4c6d65362850b6fc873e5aa2e144172c407144c2be3d84ddaf0814d",
+      "fixture_id": "fixture-quality-small-local-control-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "general",
+      "scenario_id": "quality-small-local-control",
+      "status": "planned",
+      "variant_id": "same-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-general",
+        "reasoning_effort": "high",
+        "role": "general",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-luna",
+        "profile_id": "candidate-luna-general-high-volume",
+        "reasoning_effort": "medium",
+        "role": "general",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-small-local-control-r1",
+      "comparison_id": "quality-small-local-control-r1-lower-low",
+      "corpus_fingerprint": "sha256:d0222788d4c6d65362850b6fc873e5aa2e144172c407144c2be3d84ddaf0814d",
+      "fixture_id": "fixture-quality-small-local-control-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "general",
+      "scenario_id": "quality-small-local-control",
+      "status": "planned",
+      "variant_id": "lower-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-general",
+        "reasoning_effort": "high",
+        "role": "general",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-luna",
+        "profile_id": "candidate-luna-general-high-volume",
+        "reasoning_effort": "medium",
+        "role": "general",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-small-local-control-r1",
+      "comparison_id": "quality-small-local-control-r1-lower-medium",
+      "corpus_fingerprint": "sha256:d0222788d4c6d65362850b6fc873e5aa2e144172c407144c2be3d84ddaf0814d",
+      "fixture_id": "fixture-quality-small-local-control-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "general",
+      "scenario_id": "quality-small-local-control",
+      "status": "planned",
+      "variant_id": "lower-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-general",
+        "reasoning_effort": "high",
+        "role": "general",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-luna",
+        "profile_id": "candidate-luna-general-high-volume",
+        "reasoning_effort": "high",
+        "role": "general",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-small-local-control-r2",
+      "comparison_id": "quality-small-local-control-r2-same-low",
+      "corpus_fingerprint": "sha256:d0222788d4c6d65362850b6fc873e5aa2e144172c407144c2be3d84ddaf0814d",
+      "fixture_id": "fixture-quality-small-local-control-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "general",
+      "scenario_id": "quality-small-local-control",
+      "status": "planned",
+      "variant_id": "same-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-general",
+        "reasoning_effort": "high",
+        "role": "general",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-luna",
+        "profile_id": "candidate-luna-general-high-volume",
+        "reasoning_effort": "high",
+        "role": "general",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-small-local-control-r2",
+      "comparison_id": "quality-small-local-control-r2-same-medium",
+      "corpus_fingerprint": "sha256:d0222788d4c6d65362850b6fc873e5aa2e144172c407144c2be3d84ddaf0814d",
+      "fixture_id": "fixture-quality-small-local-control-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "general",
+      "scenario_id": "quality-small-local-control",
+      "status": "planned",
+      "variant_id": "same-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-general",
+        "reasoning_effort": "high",
+        "role": "general",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-luna",
+        "profile_id": "candidate-luna-general-high-volume",
+        "reasoning_effort": "medium",
+        "role": "general",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-small-local-control-r2",
+      "comparison_id": "quality-small-local-control-r2-lower-low",
+      "corpus_fingerprint": "sha256:d0222788d4c6d65362850b6fc873e5aa2e144172c407144c2be3d84ddaf0814d",
+      "fixture_id": "fixture-quality-small-local-control-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "general",
+      "scenario_id": "quality-small-local-control",
+      "status": "planned",
+      "variant_id": "lower-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-general",
+        "reasoning_effort": "high",
+        "role": "general",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-luna",
+        "profile_id": "candidate-luna-general-high-volume",
+        "reasoning_effort": "medium",
+        "role": "general",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-small-local-control-r2",
+      "comparison_id": "quality-small-local-control-r2-lower-medium",
+      "corpus_fingerprint": "sha256:d0222788d4c6d65362850b6fc873e5aa2e144172c407144c2be3d84ddaf0814d",
+      "fixture_id": "fixture-quality-small-local-control-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "general",
+      "scenario_id": "quality-small-local-control",
+      "status": "planned",
+      "variant_id": "lower-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-improver",
+        "reasoning_effort": "high",
+        "role": "improver",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-improver",
+        "reasoning_effort": "high",
+        "role": "improver",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-persistence-rollback-r1",
+      "comparison_id": "quality-persistence-rollback-r1-same-low",
+      "corpus_fingerprint": "sha256:94400b8b6e906006358509cf8a30fe50a3d7517c7f153f24e4912c9a05bb6662",
+      "fixture_id": "fixture-quality-persistence-rollback-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "improver",
+      "scenario_id": "quality-persistence-rollback",
+      "status": "planned",
+      "variant_id": "same-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-improver",
+        "reasoning_effort": "high",
+        "role": "improver",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-improver",
+        "reasoning_effort": "high",
+        "role": "improver",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-persistence-rollback-r1",
+      "comparison_id": "quality-persistence-rollback-r1-same-medium",
+      "corpus_fingerprint": "sha256:94400b8b6e906006358509cf8a30fe50a3d7517c7f153f24e4912c9a05bb6662",
+      "fixture_id": "fixture-quality-persistence-rollback-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "improver",
+      "scenario_id": "quality-persistence-rollback",
+      "status": "planned",
+      "variant_id": "same-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-improver",
+        "reasoning_effort": "high",
+        "role": "improver",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-improver",
+        "reasoning_effort": "medium",
+        "role": "improver",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-persistence-rollback-r1",
+      "comparison_id": "quality-persistence-rollback-r1-lower-low",
+      "corpus_fingerprint": "sha256:94400b8b6e906006358509cf8a30fe50a3d7517c7f153f24e4912c9a05bb6662",
+      "fixture_id": "fixture-quality-persistence-rollback-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "improver",
+      "scenario_id": "quality-persistence-rollback",
+      "status": "planned",
+      "variant_id": "lower-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-improver",
+        "reasoning_effort": "high",
+        "role": "improver",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-improver",
+        "reasoning_effort": "medium",
+        "role": "improver",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-persistence-rollback-r1",
+      "comparison_id": "quality-persistence-rollback-r1-lower-medium",
+      "corpus_fingerprint": "sha256:94400b8b6e906006358509cf8a30fe50a3d7517c7f153f24e4912c9a05bb6662",
+      "fixture_id": "fixture-quality-persistence-rollback-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "improver",
+      "scenario_id": "quality-persistence-rollback",
+      "status": "planned",
+      "variant_id": "lower-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-improver",
+        "reasoning_effort": "high",
+        "role": "improver",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-improver",
+        "reasoning_effort": "high",
+        "role": "improver",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-persistence-rollback-r2",
+      "comparison_id": "quality-persistence-rollback-r2-same-low",
+      "corpus_fingerprint": "sha256:94400b8b6e906006358509cf8a30fe50a3d7517c7f153f24e4912c9a05bb6662",
+      "fixture_id": "fixture-quality-persistence-rollback-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "improver",
+      "scenario_id": "quality-persistence-rollback",
+      "status": "planned",
+      "variant_id": "same-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-improver",
+        "reasoning_effort": "high",
+        "role": "improver",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-improver",
+        "reasoning_effort": "high",
+        "role": "improver",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-persistence-rollback-r2",
+      "comparison_id": "quality-persistence-rollback-r2-same-medium",
+      "corpus_fingerprint": "sha256:94400b8b6e906006358509cf8a30fe50a3d7517c7f153f24e4912c9a05bb6662",
+      "fixture_id": "fixture-quality-persistence-rollback-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "improver",
+      "scenario_id": "quality-persistence-rollback",
+      "status": "planned",
+      "variant_id": "same-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-improver",
+        "reasoning_effort": "high",
+        "role": "improver",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-improver",
+        "reasoning_effort": "medium",
+        "role": "improver",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-persistence-rollback-r2",
+      "comparison_id": "quality-persistence-rollback-r2-lower-low",
+      "corpus_fingerprint": "sha256:94400b8b6e906006358509cf8a30fe50a3d7517c7f153f24e4912c9a05bb6662",
+      "fixture_id": "fixture-quality-persistence-rollback-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "improver",
+      "scenario_id": "quality-persistence-rollback",
+      "status": "planned",
+      "variant_id": "lower-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-improver",
+        "reasoning_effort": "high",
+        "role": "improver",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-improver",
+        "reasoning_effort": "medium",
+        "role": "improver",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-persistence-rollback-r2",
+      "comparison_id": "quality-persistence-rollback-r2-lower-medium",
+      "corpus_fingerprint": "sha256:94400b8b6e906006358509cf8a30fe50a3d7517c7f153f24e4912c9a05bb6662",
+      "fixture_id": "fixture-quality-persistence-rollback-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "improver",
+      "scenario_id": "quality-persistence-rollback",
+      "status": "planned",
+      "variant_id": "lower-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-reviewer",
+        "reasoning_effort": "high",
+        "role": "reviewer",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-reviewer",
+        "reasoning_effort": "high",
+        "role": "reviewer",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-retry-idempotency-r1",
+      "comparison_id": "quality-retry-idempotency-r1-same-low",
+      "corpus_fingerprint": "sha256:afffe45fb149ebdbc19275fdbc4b68a5f81b4aae424db5b9b0592861603b56a5",
+      "fixture_id": "fixture-quality-retry-idempotency-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "reviewer",
+      "scenario_id": "quality-retry-idempotency",
+      "status": "planned",
+      "variant_id": "same-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-reviewer",
+        "reasoning_effort": "high",
+        "role": "reviewer",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-reviewer",
+        "reasoning_effort": "high",
+        "role": "reviewer",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-retry-idempotency-r1",
+      "comparison_id": "quality-retry-idempotency-r1-same-medium",
+      "corpus_fingerprint": "sha256:afffe45fb149ebdbc19275fdbc4b68a5f81b4aae424db5b9b0592861603b56a5",
+      "fixture_id": "fixture-quality-retry-idempotency-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "reviewer",
+      "scenario_id": "quality-retry-idempotency",
+      "status": "planned",
+      "variant_id": "same-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-reviewer",
+        "reasoning_effort": "high",
+        "role": "reviewer",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-reviewer",
+        "reasoning_effort": "medium",
+        "role": "reviewer",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-retry-idempotency-r1",
+      "comparison_id": "quality-retry-idempotency-r1-lower-low",
+      "corpus_fingerprint": "sha256:afffe45fb149ebdbc19275fdbc4b68a5f81b4aae424db5b9b0592861603b56a5",
+      "fixture_id": "fixture-quality-retry-idempotency-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "reviewer",
+      "scenario_id": "quality-retry-idempotency",
+      "status": "planned",
+      "variant_id": "lower-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-reviewer",
+        "reasoning_effort": "high",
+        "role": "reviewer",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-reviewer",
+        "reasoning_effort": "medium",
+        "role": "reviewer",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-retry-idempotency-r1",
+      "comparison_id": "quality-retry-idempotency-r1-lower-medium",
+      "corpus_fingerprint": "sha256:afffe45fb149ebdbc19275fdbc4b68a5f81b4aae424db5b9b0592861603b56a5",
+      "fixture_id": "fixture-quality-retry-idempotency-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "reviewer",
+      "scenario_id": "quality-retry-idempotency",
+      "status": "planned",
+      "variant_id": "lower-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-reviewer",
+        "reasoning_effort": "high",
+        "role": "reviewer",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-reviewer",
+        "reasoning_effort": "high",
+        "role": "reviewer",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-retry-idempotency-r2",
+      "comparison_id": "quality-retry-idempotency-r2-same-low",
+      "corpus_fingerprint": "sha256:afffe45fb149ebdbc19275fdbc4b68a5f81b4aae424db5b9b0592861603b56a5",
+      "fixture_id": "fixture-quality-retry-idempotency-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "reviewer",
+      "scenario_id": "quality-retry-idempotency",
+      "status": "planned",
+      "variant_id": "same-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-reviewer",
+        "reasoning_effort": "high",
+        "role": "reviewer",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-reviewer",
+        "reasoning_effort": "high",
+        "role": "reviewer",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-retry-idempotency-r2",
+      "comparison_id": "quality-retry-idempotency-r2-same-medium",
+      "corpus_fingerprint": "sha256:afffe45fb149ebdbc19275fdbc4b68a5f81b4aae424db5b9b0592861603b56a5",
+      "fixture_id": "fixture-quality-retry-idempotency-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "reviewer",
+      "scenario_id": "quality-retry-idempotency",
+      "status": "planned",
+      "variant_id": "same-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-reviewer",
+        "reasoning_effort": "high",
+        "role": "reviewer",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-reviewer",
+        "reasoning_effort": "medium",
+        "role": "reviewer",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-retry-idempotency-r2",
+      "comparison_id": "quality-retry-idempotency-r2-lower-low",
+      "corpus_fingerprint": "sha256:afffe45fb149ebdbc19275fdbc4b68a5f81b4aae424db5b9b0592861603b56a5",
+      "fixture_id": "fixture-quality-retry-idempotency-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "reviewer",
+      "scenario_id": "quality-retry-idempotency",
+      "status": "planned",
+      "variant_id": "lower-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-reviewer",
+        "reasoning_effort": "high",
+        "role": "reviewer",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-reviewer",
+        "reasoning_effort": "medium",
+        "role": "reviewer",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-retry-idempotency-r2",
+      "comparison_id": "quality-retry-idempotency-r2-lower-medium",
+      "corpus_fingerprint": "sha256:afffe45fb149ebdbc19275fdbc4b68a5f81b4aae424db5b9b0592861603b56a5",
+      "fixture_id": "fixture-quality-retry-idempotency-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "reviewer",
+      "scenario_id": "quality-retry-idempotency",
+      "status": "planned",
+      "variant_id": "lower-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.4-mini-fast",
+        "profile_id": "baseline-explore",
+        "reasoning_effort": "low",
+        "role": "explore",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-terra",
+        "profile_id": "candidate-terra-explore",
+        "reasoning_effort": "low",
+        "role": "explore",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-stale-cache-version-skew-r1",
+      "comparison_id": "quality-stale-cache-version-skew-r1-same-low",
+      "corpus_fingerprint": "sha256:00f10fa5b5750106b19aee782b56b8d7323ef15a760c8dff657afc0697b25f25",
+      "fixture_id": "fixture-quality-stale-cache-version-skew-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "explore",
+      "scenario_id": "quality-stale-cache-version-skew",
+      "status": "planned",
+      "variant_id": "same-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.4-mini-fast",
+        "profile_id": "baseline-explore",
+        "reasoning_effort": "low",
+        "role": "explore",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-terra",
+        "profile_id": "candidate-terra-explore",
+        "reasoning_effort": "low",
+        "role": "explore",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-stale-cache-version-skew-r1",
+      "comparison_id": "quality-stale-cache-version-skew-r1-same-medium",
+      "corpus_fingerprint": "sha256:00f10fa5b5750106b19aee782b56b8d7323ef15a760c8dff657afc0697b25f25",
+      "fixture_id": "fixture-quality-stale-cache-version-skew-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "explore",
+      "scenario_id": "quality-stale-cache-version-skew",
+      "status": "planned",
+      "variant_id": "same-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.4-mini-fast",
+        "profile_id": "baseline-explore",
+        "reasoning_effort": "low",
+        "role": "explore",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-terra",
+        "profile_id": "candidate-terra-explore",
+        "reasoning_effort": "none",
+        "role": "explore",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-stale-cache-version-skew-r1",
+      "comparison_id": "quality-stale-cache-version-skew-r1-lower-low",
+      "corpus_fingerprint": "sha256:00f10fa5b5750106b19aee782b56b8d7323ef15a760c8dff657afc0697b25f25",
+      "fixture_id": "fixture-quality-stale-cache-version-skew-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "explore",
+      "scenario_id": "quality-stale-cache-version-skew",
+      "status": "planned",
+      "variant_id": "lower-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.4-mini-fast",
+        "profile_id": "baseline-explore",
+        "reasoning_effort": "low",
+        "role": "explore",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-terra",
+        "profile_id": "candidate-terra-explore",
+        "reasoning_effort": "none",
+        "role": "explore",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-stale-cache-version-skew-r1",
+      "comparison_id": "quality-stale-cache-version-skew-r1-lower-medium",
+      "corpus_fingerprint": "sha256:00f10fa5b5750106b19aee782b56b8d7323ef15a760c8dff657afc0697b25f25",
+      "fixture_id": "fixture-quality-stale-cache-version-skew-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "explore",
+      "scenario_id": "quality-stale-cache-version-skew",
+      "status": "planned",
+      "variant_id": "lower-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.4-mini-fast",
+        "profile_id": "baseline-explore",
+        "reasoning_effort": "low",
+        "role": "explore",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-terra",
+        "profile_id": "candidate-terra-explore",
+        "reasoning_effort": "low",
+        "role": "explore",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-stale-cache-version-skew-r2",
+      "comparison_id": "quality-stale-cache-version-skew-r2-same-low",
+      "corpus_fingerprint": "sha256:00f10fa5b5750106b19aee782b56b8d7323ef15a760c8dff657afc0697b25f25",
+      "fixture_id": "fixture-quality-stale-cache-version-skew-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "explore",
+      "scenario_id": "quality-stale-cache-version-skew",
+      "status": "planned",
+      "variant_id": "same-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.4-mini-fast",
+        "profile_id": "baseline-explore",
+        "reasoning_effort": "low",
+        "role": "explore",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-terra",
+        "profile_id": "candidate-terra-explore",
+        "reasoning_effort": "low",
+        "role": "explore",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-stale-cache-version-skew-r2",
+      "comparison_id": "quality-stale-cache-version-skew-r2-same-medium",
+      "corpus_fingerprint": "sha256:00f10fa5b5750106b19aee782b56b8d7323ef15a760c8dff657afc0697b25f25",
+      "fixture_id": "fixture-quality-stale-cache-version-skew-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "explore",
+      "scenario_id": "quality-stale-cache-version-skew",
+      "status": "planned",
+      "variant_id": "same-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.4-mini-fast",
+        "profile_id": "baseline-explore",
+        "reasoning_effort": "low",
+        "role": "explore",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-terra",
+        "profile_id": "candidate-terra-explore",
+        "reasoning_effort": "none",
+        "role": "explore",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-stale-cache-version-skew-r2",
+      "comparison_id": "quality-stale-cache-version-skew-r2-lower-low",
+      "corpus_fingerprint": "sha256:00f10fa5b5750106b19aee782b56b8d7323ef15a760c8dff657afc0697b25f25",
+      "fixture_id": "fixture-quality-stale-cache-version-skew-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "explore",
+      "scenario_id": "quality-stale-cache-version-skew",
+      "status": "planned",
+      "variant_id": "lower-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.4-mini-fast",
+        "profile_id": "baseline-explore",
+        "reasoning_effort": "low",
+        "role": "explore",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-terra",
+        "profile_id": "candidate-terra-explore",
+        "reasoning_effort": "none",
+        "role": "explore",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-stale-cache-version-skew-r2",
+      "comparison_id": "quality-stale-cache-version-skew-r2-lower-medium",
+      "corpus_fingerprint": "sha256:00f10fa5b5750106b19aee782b56b8d7323ef15a760c8dff657afc0697b25f25",
+      "fixture_id": "fixture-quality-stale-cache-version-skew-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "explore",
+      "scenario_id": "quality-stale-cache-version-skew",
+      "status": "planned",
+      "variant_id": "lower-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-researcher",
+        "reasoning_effort": "medium",
+        "role": "researcher",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-terra",
+        "profile_id": "candidate-terra-researcher",
+        "reasoning_effort": "medium",
+        "role": "researcher",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-partial-dependency-failure-r1",
+      "comparison_id": "quality-partial-dependency-failure-r1-same-low",
+      "corpus_fingerprint": "sha256:4279a393ea191ac230ee4e87068282263c62db71bd9edbdb6e3f9d0275efe656",
+      "fixture_id": "fixture-quality-partial-dependency-failure-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "researcher",
+      "scenario_id": "quality-partial-dependency-failure",
+      "status": "planned",
+      "variant_id": "same-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-researcher",
+        "reasoning_effort": "medium",
+        "role": "researcher",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-terra",
+        "profile_id": "candidate-terra-researcher",
+        "reasoning_effort": "medium",
+        "role": "researcher",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-partial-dependency-failure-r1",
+      "comparison_id": "quality-partial-dependency-failure-r1-same-medium",
+      "corpus_fingerprint": "sha256:4279a393ea191ac230ee4e87068282263c62db71bd9edbdb6e3f9d0275efe656",
+      "fixture_id": "fixture-quality-partial-dependency-failure-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "researcher",
+      "scenario_id": "quality-partial-dependency-failure",
+      "status": "planned",
+      "variant_id": "same-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-researcher",
+        "reasoning_effort": "medium",
+        "role": "researcher",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-terra",
+        "profile_id": "candidate-terra-researcher",
+        "reasoning_effort": "low",
+        "role": "researcher",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-partial-dependency-failure-r1",
+      "comparison_id": "quality-partial-dependency-failure-r1-lower-low",
+      "corpus_fingerprint": "sha256:4279a393ea191ac230ee4e87068282263c62db71bd9edbdb6e3f9d0275efe656",
+      "fixture_id": "fixture-quality-partial-dependency-failure-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "researcher",
+      "scenario_id": "quality-partial-dependency-failure",
+      "status": "planned",
+      "variant_id": "lower-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-researcher",
+        "reasoning_effort": "medium",
+        "role": "researcher",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-terra",
+        "profile_id": "candidate-terra-researcher",
+        "reasoning_effort": "low",
+        "role": "researcher",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-partial-dependency-failure-r1",
+      "comparison_id": "quality-partial-dependency-failure-r1-lower-medium",
+      "corpus_fingerprint": "sha256:4279a393ea191ac230ee4e87068282263c62db71bd9edbdb6e3f9d0275efe656",
+      "fixture_id": "fixture-quality-partial-dependency-failure-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "researcher",
+      "scenario_id": "quality-partial-dependency-failure",
+      "status": "planned",
+      "variant_id": "lower-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-researcher",
+        "reasoning_effort": "medium",
+        "role": "researcher",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-terra",
+        "profile_id": "candidate-terra-researcher",
+        "reasoning_effort": "medium",
+        "role": "researcher",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-partial-dependency-failure-r2",
+      "comparison_id": "quality-partial-dependency-failure-r2-same-low",
+      "corpus_fingerprint": "sha256:4279a393ea191ac230ee4e87068282263c62db71bd9edbdb6e3f9d0275efe656",
+      "fixture_id": "fixture-quality-partial-dependency-failure-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "researcher",
+      "scenario_id": "quality-partial-dependency-failure",
+      "status": "planned",
+      "variant_id": "same-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-researcher",
+        "reasoning_effort": "medium",
+        "role": "researcher",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-terra",
+        "profile_id": "candidate-terra-researcher",
+        "reasoning_effort": "medium",
+        "role": "researcher",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-partial-dependency-failure-r2",
+      "comparison_id": "quality-partial-dependency-failure-r2-same-medium",
+      "corpus_fingerprint": "sha256:4279a393ea191ac230ee4e87068282263c62db71bd9edbdb6e3f9d0275efe656",
+      "fixture_id": "fixture-quality-partial-dependency-failure-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "researcher",
+      "scenario_id": "quality-partial-dependency-failure",
+      "status": "planned",
+      "variant_id": "same-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-researcher",
+        "reasoning_effort": "medium",
+        "role": "researcher",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-terra",
+        "profile_id": "candidate-terra-researcher",
+        "reasoning_effort": "low",
+        "role": "researcher",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-partial-dependency-failure-r2",
+      "comparison_id": "quality-partial-dependency-failure-r2-lower-low",
+      "corpus_fingerprint": "sha256:4279a393ea191ac230ee4e87068282263c62db71bd9edbdb6e3f9d0275efe656",
+      "fixture_id": "fixture-quality-partial-dependency-failure-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "researcher",
+      "scenario_id": "quality-partial-dependency-failure",
+      "status": "planned",
+      "variant_id": "lower-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-researcher",
+        "reasoning_effort": "medium",
+        "role": "researcher",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-terra",
+        "profile_id": "candidate-terra-researcher",
+        "reasoning_effort": "low",
+        "role": "researcher",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-partial-dependency-failure-r2",
+      "comparison_id": "quality-partial-dependency-failure-r2-lower-medium",
+      "corpus_fingerprint": "sha256:4279a393ea191ac230ee4e87068282263c62db71bd9edbdb6e3f9d0275efe656",
+      "fixture_id": "fixture-quality-partial-dependency-failure-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "researcher",
+      "scenario_id": "quality-partial-dependency-failure",
+      "status": "planned",
+      "variant_id": "lower-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-verifier",
+        "reasoning_effort": "medium",
+        "role": "verifier",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-verifier",
+        "reasoning_effort": "medium",
+        "role": "verifier",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-resource-lifecycle-r1",
+      "comparison_id": "quality-resource-lifecycle-r1-same-low",
+      "corpus_fingerprint": "sha256:cdc2340dd4072088ef04e08d2da927eae666a2aefe350aff5c0db4a2e6d7db5b",
+      "fixture_id": "fixture-quality-resource-lifecycle-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "verifier",
+      "scenario_id": "quality-resource-lifecycle",
+      "status": "planned",
+      "variant_id": "same-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-verifier",
+        "reasoning_effort": "medium",
+        "role": "verifier",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-verifier",
+        "reasoning_effort": "medium",
+        "role": "verifier",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-resource-lifecycle-r1",
+      "comparison_id": "quality-resource-lifecycle-r1-same-medium",
+      "corpus_fingerprint": "sha256:cdc2340dd4072088ef04e08d2da927eae666a2aefe350aff5c0db4a2e6d7db5b",
+      "fixture_id": "fixture-quality-resource-lifecycle-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "verifier",
+      "scenario_id": "quality-resource-lifecycle",
+      "status": "planned",
+      "variant_id": "same-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-verifier",
+        "reasoning_effort": "medium",
+        "role": "verifier",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-verifier",
+        "reasoning_effort": "low",
+        "role": "verifier",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-resource-lifecycle-r1",
+      "comparison_id": "quality-resource-lifecycle-r1-lower-low",
+      "corpus_fingerprint": "sha256:cdc2340dd4072088ef04e08d2da927eae666a2aefe350aff5c0db4a2e6d7db5b",
+      "fixture_id": "fixture-quality-resource-lifecycle-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "verifier",
+      "scenario_id": "quality-resource-lifecycle",
+      "status": "planned",
+      "variant_id": "lower-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-verifier",
+        "reasoning_effort": "medium",
+        "role": "verifier",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-verifier",
+        "reasoning_effort": "low",
+        "role": "verifier",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-resource-lifecycle-r1",
+      "comparison_id": "quality-resource-lifecycle-r1-lower-medium",
+      "corpus_fingerprint": "sha256:cdc2340dd4072088ef04e08d2da927eae666a2aefe350aff5c0db4a2e6d7db5b",
+      "fixture_id": "fixture-quality-resource-lifecycle-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "verifier",
+      "scenario_id": "quality-resource-lifecycle",
+      "status": "planned",
+      "variant_id": "lower-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-verifier",
+        "reasoning_effort": "medium",
+        "role": "verifier",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-verifier",
+        "reasoning_effort": "medium",
+        "role": "verifier",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-resource-lifecycle-r2",
+      "comparison_id": "quality-resource-lifecycle-r2-same-low",
+      "corpus_fingerprint": "sha256:cdc2340dd4072088ef04e08d2da927eae666a2aefe350aff5c0db4a2e6d7db5b",
+      "fixture_id": "fixture-quality-resource-lifecycle-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "verifier",
+      "scenario_id": "quality-resource-lifecycle",
+      "status": "planned",
+      "variant_id": "same-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-verifier",
+        "reasoning_effort": "medium",
+        "role": "verifier",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-verifier",
+        "reasoning_effort": "medium",
+        "role": "verifier",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-resource-lifecycle-r2",
+      "comparison_id": "quality-resource-lifecycle-r2-same-medium",
+      "corpus_fingerprint": "sha256:cdc2340dd4072088ef04e08d2da927eae666a2aefe350aff5c0db4a2e6d7db5b",
+      "fixture_id": "fixture-quality-resource-lifecycle-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "verifier",
+      "scenario_id": "quality-resource-lifecycle",
+      "status": "planned",
+      "variant_id": "same-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-verifier",
+        "reasoning_effort": "medium",
+        "role": "verifier",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-verifier",
+        "reasoning_effort": "low",
+        "role": "verifier",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-resource-lifecycle-r2",
+      "comparison_id": "quality-resource-lifecycle-r2-lower-low",
+      "corpus_fingerprint": "sha256:cdc2340dd4072088ef04e08d2da927eae666a2aefe350aff5c0db4a2e6d7db5b",
+      "fixture_id": "fixture-quality-resource-lifecycle-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "verifier",
+      "scenario_id": "quality-resource-lifecycle",
+      "status": "planned",
+      "variant_id": "lower-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-verifier",
+        "reasoning_effort": "medium",
+        "role": "verifier",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-verifier",
+        "reasoning_effort": "low",
+        "role": "verifier",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-resource-lifecycle-r2",
+      "comparison_id": "quality-resource-lifecycle-r2-lower-medium",
+      "corpus_fingerprint": "sha256:cdc2340dd4072088ef04e08d2da927eae666a2aefe350aff5c0db4a2e6d7db5b",
+      "fixture_id": "fixture-quality-resource-lifecycle-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "verifier",
+      "scenario_id": "quality-resource-lifecycle",
+      "status": "planned",
+      "variant_id": "lower-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-review-orchestrator",
+        "reasoning_effort": "xhigh",
+        "role": "review-orchestrator",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-review-orchestrator",
+        "reasoning_effort": "xhigh",
+        "role": "review-orchestrator",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-migration-compatibility-r1",
+      "comparison_id": "quality-migration-compatibility-r1-same-low",
+      "corpus_fingerprint": "sha256:7f0892f76c6ae0033cf30168c7cf456cc10865e2aec361c387eda768600f6fed",
+      "fixture_id": "fixture-quality-migration-compatibility-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "review-orchestrator",
+      "scenario_id": "quality-migration-compatibility",
+      "status": "planned",
+      "variant_id": "same-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-review-orchestrator",
+        "reasoning_effort": "xhigh",
+        "role": "review-orchestrator",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-review-orchestrator",
+        "reasoning_effort": "xhigh",
+        "role": "review-orchestrator",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-migration-compatibility-r1",
+      "comparison_id": "quality-migration-compatibility-r1-same-medium",
+      "corpus_fingerprint": "sha256:7f0892f76c6ae0033cf30168c7cf456cc10865e2aec361c387eda768600f6fed",
+      "fixture_id": "fixture-quality-migration-compatibility-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "review-orchestrator",
+      "scenario_id": "quality-migration-compatibility",
+      "status": "planned",
+      "variant_id": "same-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-review-orchestrator",
+        "reasoning_effort": "xhigh",
+        "role": "review-orchestrator",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-review-orchestrator",
+        "reasoning_effort": "high",
+        "role": "review-orchestrator",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-migration-compatibility-r1",
+      "comparison_id": "quality-migration-compatibility-r1-lower-low",
+      "corpus_fingerprint": "sha256:7f0892f76c6ae0033cf30168c7cf456cc10865e2aec361c387eda768600f6fed",
+      "fixture_id": "fixture-quality-migration-compatibility-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "review-orchestrator",
+      "scenario_id": "quality-migration-compatibility",
+      "status": "planned",
+      "variant_id": "lower-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-review-orchestrator",
+        "reasoning_effort": "xhigh",
+        "role": "review-orchestrator",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-review-orchestrator",
+        "reasoning_effort": "high",
+        "role": "review-orchestrator",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-migration-compatibility-r1",
+      "comparison_id": "quality-migration-compatibility-r1-lower-medium",
+      "corpus_fingerprint": "sha256:7f0892f76c6ae0033cf30168c7cf456cc10865e2aec361c387eda768600f6fed",
+      "fixture_id": "fixture-quality-migration-compatibility-v1",
+      "repetition": 1,
+      "report_id": null,
+      "role": "review-orchestrator",
+      "scenario_id": "quality-migration-compatibility",
+      "status": "planned",
+      "variant_id": "lower-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-review-orchestrator",
+        "reasoning_effort": "xhigh",
+        "role": "review-orchestrator",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-review-orchestrator",
+        "reasoning_effort": "xhigh",
+        "role": "review-orchestrator",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-migration-compatibility-r2",
+      "comparison_id": "quality-migration-compatibility-r2-same-low",
+      "corpus_fingerprint": "sha256:7f0892f76c6ae0033cf30168c7cf456cc10865e2aec361c387eda768600f6fed",
+      "fixture_id": "fixture-quality-migration-compatibility-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "review-orchestrator",
+      "scenario_id": "quality-migration-compatibility",
+      "status": "planned",
+      "variant_id": "same-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-review-orchestrator",
+        "reasoning_effort": "xhigh",
+        "role": "review-orchestrator",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-review-orchestrator",
+        "reasoning_effort": "xhigh",
+        "role": "review-orchestrator",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-migration-compatibility-r2",
+      "comparison_id": "quality-migration-compatibility-r2-same-medium",
+      "corpus_fingerprint": "sha256:7f0892f76c6ae0033cf30168c7cf456cc10865e2aec361c387eda768600f6fed",
+      "fixture_id": "fixture-quality-migration-compatibility-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "review-orchestrator",
+      "scenario_id": "quality-migration-compatibility",
+      "status": "planned",
+      "variant_id": "same-medium"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-review-orchestrator",
+        "reasoning_effort": "xhigh",
+        "role": "review-orchestrator",
+        "text_verbosity": "low"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-review-orchestrator",
+        "reasoning_effort": "high",
+        "role": "review-orchestrator",
+        "text_verbosity": "low"
+      },
+      "comparison_group_id": "quality-migration-compatibility-r2",
+      "comparison_id": "quality-migration-compatibility-r2-lower-low",
+      "corpus_fingerprint": "sha256:7f0892f76c6ae0033cf30168c7cf456cc10865e2aec361c387eda768600f6fed",
+      "fixture_id": "fixture-quality-migration-compatibility-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "review-orchestrator",
+      "scenario_id": "quality-migration-compatibility",
+      "status": "planned",
+      "variant_id": "lower-low"
+    },
+    {
+      "baseline_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.5",
+        "profile_id": "baseline-review-orchestrator",
+        "reasoning_effort": "xhigh",
+        "role": "review-orchestrator",
+        "text_verbosity": "medium"
+      },
+      "candidate_invocation": {
+        "mode": "standard",
+        "model_id": "openai/gpt-5.6-sol",
+        "profile_id": "candidate-sol-review-orchestrator",
+        "reasoning_effort": "high",
+        "role": "review-orchestrator",
+        "text_verbosity": "medium"
+      },
+      "comparison_group_id": "quality-migration-compatibility-r2",
+      "comparison_id": "quality-migration-compatibility-r2-lower-medium",
+      "corpus_fingerprint": "sha256:7f0892f76c6ae0033cf30168c7cf456cc10865e2aec361c387eda768600f6fed",
+      "fixture_id": "fixture-quality-migration-compatibility-v1",
+      "repetition": 2,
+      "report_id": null,
+      "role": "review-orchestrator",
+      "scenario_id": "quality-migration-compatibility",
+      "status": "planned",
+      "variant_id": "lower-medium"
+    }
+  ],
+  "content_fingerprint": "sha256:888506d0a3b17f3b99cf37f2fd49bf710403f133f5dc2cb244c116404f9abb2f",
+  "execution_state": "planned_unexecuted",
+  "experiment_id": "gpt56-role-ab-v1",
+  "repetitions": [
+    1,
+    2
+  ],
+  "scenario_cells": [
+    {
+      "baseline_profile_id": "baseline-orchestrator",
+      "candidate_profile_id": "candidate-sol-orchestrator",
+      "corpus_fingerprint": "sha256:1ed87ded32205d10742b7ea476c71dbebc016afd10927b9c599829b58a965927",
+      "fixture_id": "fixture-quality-cross-module-invariant-v1",
+      "quality_focus": "Whole-system mapping, invariant coverage, and compatibility completeness.",
+      "risk_class": "high",
+      "role": "orchestrator",
+      "scenario_family": "cross-module-invariant",
+      "scenario_id": "quality-cross-module-invariant",
+      "suite": "development",
+      "workload_class": "general"
+    },
+    {
+      "baseline_profile_id": "baseline-architect",
+      "candidate_profile_id": "candidate-sol-architect",
+      "corpus_fingerprint": "sha256:7776f3f821d0314af840fd0ee039b67ca17f3da82d2595249d811fa8895f1b85",
+      "fixture_id": "fixture-quality-public-api-compatibility-v1",
+      "quality_focus": "Public API behavior, ownership, and version compatibility.",
+      "risk_class": "high",
+      "role": "architect",
+      "scenario_family": "public-api-compatibility",
+      "scenario_id": "quality-public-api-compatibility",
+      "suite": "development",
+      "workload_class": "general"
+    },
+    {
+      "baseline_profile_id": "baseline-orchestrator-deep",
+      "candidate_profile_id": "candidate-sol-orchestrator-deep",
+      "corpus_fingerprint": "sha256:e73091764a449658242fbcc52f565bf1df273afa50ecbe1064ab61ebdb79b3ff",
+      "fixture_id": "fixture-quality-architecture-boundary-v1",
+      "quality_focus": "Architecture boundaries, dependency direction, and cross-module contracts.",
+      "risk_class": "critical",
+      "role": "orchestrator-deep",
+      "scenario_family": "architecture-boundary",
+      "scenario_id": "quality-architecture-boundary",
+      "suite": "development",
+      "workload_class": "general"
+    },
+    {
+      "baseline_profile_id": "baseline-general",
+      "candidate_profile_id": "candidate-sol-general",
+      "corpus_fingerprint": "sha256:25a0c327aaaddf64f470e60a9502e41f7d58d97f8392a82f85930b7f2c3f6b26",
+      "fixture_id": "fixture-quality-concurrency-cancellation-v1",
+      "quality_focus": "Cancellation, race, cleanup, and lifecycle-safe implementation.",
+      "risk_class": "high",
+      "role": "general",
+      "scenario_family": "concurrency-cancellation",
+      "scenario_id": "quality-concurrency-cancellation",
+      "suite": "development",
+      "workload_class": "general"
+    },
+    {
+      "baseline_profile_id": "baseline-diagnose",
+      "candidate_profile_id": "candidate-sol-diagnose",
+      "corpus_fingerprint": "sha256:85569a11ad5b0172711f6ee6a37ccc77a1b9f9f6662dcc371e8e62fdf7b0c777",
+      "fixture_id": "fixture-quality-parser-boundaries-v1",
+      "quality_focus": "Malformed, unsupported, boundary, and version-skew diagnosis.",
+      "risk_class": "high",
+      "role": "diagnose",
+      "scenario_family": "parser-boundaries",
+      "scenario_id": "quality-parser-boundaries",
+      "suite": "development",
+      "workload_class": "general"
+    },
+    {
+      "baseline_profile_id": "baseline-general",
+      "candidate_profile_id": "candidate-luna-general-high-volume",
+      "corpus_fingerprint": "sha256:d0222788d4c6d65362850b6fc873e5aa2e144172c407144c2be3d84ddaf0814d",
+      "fixture_id": "fixture-quality-small-local-control-v1",
+      "quality_focus": "Bounded low-risk work without overengineering or hidden-quality regression.",
+      "risk_class": "standard-lite",
+      "role": "general",
+      "scenario_family": "small-local-control",
+      "scenario_id": "quality-small-local-control",
+      "suite": "development",
+      "workload_class": "high-volume"
+    },
+    {
+      "baseline_profile_id": "baseline-improver",
+      "candidate_profile_id": "candidate-sol-improver",
+      "corpus_fingerprint": "sha256:94400b8b6e906006358509cf8a30fe50a3d7517c7f153f24e4912c9a05bb6662",
+      "fixture_id": "fixture-quality-persistence-rollback-v1",
+      "quality_focus": "Persistence ownership, rollback safety, recovery, and write-boundary discipline.",
+      "risk_class": "critical",
+      "role": "improver",
+      "scenario_family": "persistence-rollback",
+      "scenario_id": "quality-persistence-rollback",
+      "suite": "held_out",
+      "workload_class": "general"
+    },
+    {
+      "baseline_profile_id": "baseline-reviewer",
+      "candidate_profile_id": "candidate-sol-reviewer",
+      "corpus_fingerprint": "sha256:afffe45fb149ebdbc19275fdbc4b68a5f81b4aae424db5b9b0592861603b56a5",
+      "fixture_id": "fixture-quality-retry-idempotency-v1",
+      "quality_focus": "Retry, duplicate delivery, idempotency, and partial-success regressions.",
+      "risk_class": "high",
+      "role": "reviewer",
+      "scenario_family": "retry-idempotency",
+      "scenario_id": "quality-retry-idempotency",
+      "suite": "held_out",
+      "workload_class": "general"
+    },
+    {
+      "baseline_profile_id": "baseline-explore",
+      "candidate_profile_id": "candidate-terra-explore",
+      "corpus_fingerprint": "sha256:00f10fa5b5750106b19aee782b56b8d7323ef15a760c8dff657afc0697b25f25",
+      "fixture_id": "fixture-quality-stale-cache-version-skew-v1",
+      "quality_focus": "Bounded discovery of stale state, invalidation, and mixed-version paths.",
+      "risk_class": "high",
+      "role": "explore",
+      "scenario_family": "stale-cache-version-skew",
+      "scenario_id": "quality-stale-cache-version-skew",
+      "suite": "held_out",
+      "workload_class": "bounded-exploration"
+    },
+    {
+      "baseline_profile_id": "baseline-researcher",
+      "candidate_profile_id": "candidate-terra-researcher",
+      "corpus_fingerprint": "sha256:4279a393ea191ac230ee4e87068282263c62db71bd9edbdb6e3f9d0275efe656",
+      "fixture_id": "fixture-quality-partial-dependency-failure-v1",
+      "quality_focus": "Primary-source evidence for degraded mode and dependency-failure semantics.",
+      "risk_class": "high",
+      "role": "researcher",
+      "scenario_family": "partial-dependency-failure",
+      "scenario_id": "quality-partial-dependency-failure",
+      "suite": "held_out",
+      "workload_class": "research-sidecar"
+    },
+    {
+      "baseline_profile_id": "baseline-verifier",
+      "candidate_profile_id": "candidate-sol-verifier",
+      "corpus_fingerprint": "sha256:cdc2340dd4072088ef04e08d2da927eae666a2aefe350aff5c0db4a2e6d7db5b",
+      "fixture_id": "fixture-quality-resource-lifecycle-v1",
+      "quality_focus": "Resource acquisition, teardown, cancellation, leaks, and process lifecycle.",
+      "risk_class": "critical",
+      "role": "verifier",
+      "scenario_family": "resource-lifecycle",
+      "scenario_id": "quality-resource-lifecycle",
+      "suite": "canary",
+      "workload_class": "general"
+    },
+    {
+      "baseline_profile_id": "baseline-review-orchestrator",
+      "candidate_profile_id": "candidate-sol-review-orchestrator",
+      "corpus_fingerprint": "sha256:7f0892f76c6ae0033cf30168c7cf456cc10865e2aec361c387eda768600f6fed",
+      "fixture_id": "fixture-quality-migration-compatibility-v1",
+      "quality_focus": "Migration compatibility, downgrade, rollback, and final evidence integration.",
+      "risk_class": "critical",
+      "role": "review-orchestrator",
+      "scenario_family": "migration",
+      "scenario_id": "quality-migration-compatibility",
+      "suite": "canary",
+      "workload_class": "general"
+    }
+  ],
+  "schema_version": 1,
+  "variants": [
+    "same-low",
+    "same-medium",
+    "lower-low",
+    "lower-medium"
+  ]
+}

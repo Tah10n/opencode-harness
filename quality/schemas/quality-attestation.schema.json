@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Ordering, teardown, identity, artifact, and fingerprint constraints are canonical in lib/quality/attestation.mjs.",
+  "title": "OpenCode Harness Quality Attestation v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "run_id",
+    "task_id",
+    "dossier_id",
+    "dossier_schema_version",
+    "dossier_fingerprint",
+    "gate_id",
+    "gate_status",
+    "gate_fingerprint",
+    "gate_trace_sequence",
+    "first_implementation_sequence",
+    "last_implementation_action_sequence",
+    "last_workspace_mutation_sequence",
+    "integrated_verification_sequence",
+    "integrated_verification_evidence_fingerprint",
+    "runtime_execution_fingerprint",
+    "workspace_at_gate_fingerprint",
+    "final_workspace_fingerprint",
+    "model_profile_id",
+    "model_profile_fingerprint",
+    "prompt_profile_id",
+    "prompt_profile_fingerprint",
+    "post_architecture_evaluation_fingerprint",
+    "artifact_refs",
+    "teardown_verified",
+    "attested_at",
+    "fingerprint"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "run_id": { "$ref": "#/$defs/id" },
+    "task_id": { "$ref": "#/$defs/id" },
+    "dossier_id": { "$ref": "#/$defs/id" },
+    "dossier_schema_version": { "type": "integer", "minimum": 1 },
+    "dossier_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "gate_id": { "$ref": "#/$defs/id" },
+    "gate_status": { "enum": ["passed", "blocked"] },
+    "gate_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "gate_trace_sequence": { "type": "integer", "minimum": 1 },
+    "first_implementation_sequence": { "type": ["integer", "null"], "minimum": 1 },
+    "last_implementation_action_sequence": { "type": ["integer", "null"], "minimum": 1 },
+    "last_workspace_mutation_sequence": { "type": ["integer", "null"], "minimum": 1 },
+    "integrated_verification_sequence": { "type": ["integer", "null"], "minimum": 1 },
+    "integrated_verification_evidence_fingerprint": {
+      "anyOf": [
+        { "$ref": "#/$defs/fingerprint" },
+        { "type": "null" }
+      ]
+    },
+    "runtime_execution_fingerprint": {
+      "anyOf": [
+        { "$ref": "#/$defs/fingerprint" },
+        { "type": "null" }
+      ]
+    },
+    "workspace_at_gate_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "final_workspace_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "model_profile_id": { "$ref": "#/$defs/id" },
+    "model_profile_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "prompt_profile_id": { "$ref": "#/$defs/id" },
+    "prompt_profile_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "post_architecture_evaluation_fingerprint": {
+      "anyOf": [
+        { "$ref": "#/$defs/fingerprint" },
+        { "type": "null" }
+      ]
+    },
+    "artifact_refs": { "type": "array", "minItems": 2, "maxItems": 32 },
+    "teardown_verified": { "const": true },
+    "attested_at": { "type": "string", "format": "date-time" },
+    "fingerprint": { "$ref": "#/$defs/fingerprint" }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$" },
+    "fingerprint": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  },
+  "additionalProperties": false
+}

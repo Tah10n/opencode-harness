@@ -1,0 +1,30 @@
+{
+  "id": "quality-small-local-control",
+  "description": "A one-file standard-lite fix must not trigger dependencies, abstractions, or delegation.",
+  "risk_tags": ["standard", "small-local", "anti-overengineering"],
+  "failure_family": "small-local-overengineering",
+  "workspace_policy": { "mode": "allowlist", "allowed_paths": ["src/label.mjs"] },
+  "repo_fixture": "fixtures/live/quality-small-local-control",
+  "task": "Fix the one-file label formatter, including its documented empty fallback. Keep the solution in src/label.mjs, add no dependency or helper layer, do not delegate, and run the targeted test.",
+  "setup_commands": [],
+  "visible_checks": ["node --test test/visible.test.mjs"],
+  "hidden_checks": ["node --test .live-hidden/quality-small-local-control.test.mjs"],
+  "hidden_check_files": [{ "source": "evals/hidden/quality-small-local-control/hidden.test.mjs", "target": ".live-hidden/quality-small-local-control.test.mjs" }],
+  "hidden_trace_assertions": [
+    { "assertion_id": "quality-small-local-control-dossier-before-edit", "op": "verifier_code_exists", "code": "ENGINEERING_DOSSIER_BEFORE_IMPLEMENTATION" },
+    { "assertion_id": "quality-small-local-control-gate-before-edit", "op": "verifier_code_exists", "code": "ENGINEERING_GATE_PASSED_BEFORE_IMPLEMENTATION" },
+    { "assertion_id": "quality-small-local-control-coverage-recorded", "op": "verifier_code_exists", "code": "ENGINEERING_AFFECTED_SYSTEM_COVERAGE_RECORDED" },
+    { "assertion_id": "quality-small-local-control-unknowns-resolved", "op": "verifier_code_exists", "code": "ENGINEERING_RELEVANT_UNKNOWNS_RESOLVED" },
+    { "assertion_id": "quality-small-local-control-mapping-verified", "op": "verifier_code_exists", "code": "ENGINEERING_EDGE_FAILURE_MAPPING_VERIFIED" },
+    { "assertion_id": "quality-small-local-control-architecture-respected", "op": "verifier_code_exists", "code": "ENGINEERING_ARCHITECTURE_RESPECTED" },
+    { "assertion_id": "quality-small-local-control-ownership-respected", "op": "verifier_code_exists", "code": "ENGINEERING_IMPLEMENTATION_WITHIN_OWNERSHIP" },
+    { "assertion_id": "quality-small-local-control-no-delegation", "op": "event_count_at_most", "event_type": "delegation", "max": 0 },
+    { "assertion_id": "quality-small-local-control-single-edit", "op": "event_count_at_most", "event_type": "edit", "max": 1 },
+    { "assertion_id": "quality-small-local-control-integrated-verification", "op": "event_exists", "event_type": "verification", "status": "completed" },
+    { "assertion_id": "quality-small-local-control-valid-completion", "op": "termination_reason_equals", "value": "verified" }
+  ],
+  "timeout": 60000,
+  "repetitions": 2,
+  "expected_contracts": ["Labels are uppercase with UNTITLED fallback.", "The standard-lite solution is one dependency-free source edit with no delegation."],
+  "forbidden_regressions": ["Do not add a dependency, package manifest, helper layer, or extra source file.", "Do not delegate this bounded local fix."]
+}

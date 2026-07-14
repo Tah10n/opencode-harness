@@ -1,0 +1,254 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Tah10n/opencode-harness/quality/schemas/engineering-impact-graph.schema.json",
+  "title": "Engineering affected-system impact graph",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "graph_id",
+    "risk_class",
+    "nodes",
+    "edges",
+    "affected_paths",
+    "excluded_siblings",
+    "unknowns",
+    "coverage",
+    "fingerprint"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "graph_id": { "type": "string", "pattern": "^GRAPH-[A-Za-z0-9._-]{1,120}$" },
+    "risk_class": { "enum": ["standard-lite", "high", "critical"] },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 512,
+      "items": { "$ref": "#/$defs/node" }
+    },
+    "edges": {
+      "type": "array",
+      "maxItems": 2048,
+      "items": { "$ref": "#/$defs/edge" }
+    },
+    "affected_paths": {
+      "type": "array",
+      "maxItems": 128,
+      "items": { "$ref": "#/$defs/affected_path" }
+    },
+    "excluded_siblings": {
+      "type": "array",
+      "maxItems": 128,
+      "items": { "$ref": "#/$defs/excluded_sibling" }
+    },
+    "unknowns": {
+      "type": "array",
+      "maxItems": 128,
+      "items": { "$ref": "#/$defs/unknown" }
+    },
+    "coverage": { "$ref": "#/$defs/coverage" },
+    "fingerprint": { "$ref": "#/$defs/fingerprint" }
+  },
+  "$defs": {
+    "fingerprint": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "typed_id": { "type": "string", "pattern": "^[A-Z]+-[A-Za-z0-9._-]{1,120}$" },
+    "safe_id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$" },
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048,
+      "pattern": "^(?!/)(?![A-Za-z]:)(?!.*\\\\)(?!.*(?:^|/)\\.\\.?(?:/|$))(?!.*//)[^:]+$"
+    },
+    "evidence_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "value"],
+      "properties": {
+        "kind": { "enum": ["file", "symbol", "command", "event", "check", "run", "job", "doc", "runtime"] },
+        "value": { "type": "string", "minLength": 1, "maxLength": 512 }
+      }
+    },
+    "evidence_refs": {
+      "type": "array",
+      "maxItems": 64,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/evidence_ref" }
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "path", "symbol", "label", "boundary", "confidence", "coverage", "evidence_refs"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^NODE-[A-Za-z0-9._-]{1,121}$" },
+        "kind": {
+          "enum": [
+            "repository",
+            "module",
+            "file",
+            "symbol",
+            "public_api",
+            "contract",
+            "data_shape",
+            "data_store",
+            "cache",
+            "external_dependency",
+            "background_job",
+            "event_producer",
+            "event_consumer",
+            "migration",
+            "generated_artifact",
+            "serialization_boundary",
+            "test",
+            "doc",
+            "config",
+            "command"
+          ]
+        },
+        "path": { "anyOf": [{ "$ref": "#/$defs/path" }, { "type": "null" }] },
+        "symbol": { "type": ["string", "null"], "maxLength": 512 },
+        "label": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "boundary": { "enum": ["entry_point", "module", "package", "process", "service", "persistence", "external", "operational", "none"] },
+        "confidence": { "enum": ["observed", "inferred", "unknown"] },
+        "coverage": { "enum": ["complete", "partial", "unknown"] },
+        "evidence_refs": { "$ref": "#/$defs/evidence_refs" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "confidence": { "enum": ["observed", "inferred"] } } },
+          "then": { "properties": { "evidence_refs": { "minItems": 1 } } }
+        },
+        {
+          "if": { "properties": { "confidence": { "const": "unknown" } } },
+          "then": { "properties": { "coverage": { "const": "unknown" } } }
+        }
+      ]
+    },
+    "edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "from", "to", "relationship", "confidence", "coverage", "evidence_refs"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^EDGE-[A-Za-z0-9._-]{1,121}$" },
+        "from": { "type": "string", "pattern": "^NODE-[A-Za-z0-9._-]{1,121}$" },
+        "to": { "type": "string", "pattern": "^NODE-[A-Za-z0-9._-]{1,121}$" },
+        "relationship": {
+          "enum": [
+            "imports", "calls", "reads", "writes", "defines", "tests", "documents", "configures", "depends_on", "emits", "implements", "serializes", "deserializes", "validates", "publishes", "consumes", "persists", "invalidates", "migrates", "generates", "verifies", "schedules", "owns"
+          ]
+        },
+        "confidence": { "enum": ["observed", "inferred", "unknown"] },
+        "coverage": { "enum": ["complete", "partial", "unknown"] },
+        "evidence_refs": { "$ref": "#/$defs/evidence_refs" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "confidence": { "enum": ["observed", "inferred"] } } },
+          "then": { "properties": { "evidence_refs": { "minItems": 1 } } }
+        },
+        {
+          "if": { "properties": { "confidence": { "const": "unknown" } } },
+          "then": { "properties": { "coverage": { "const": "unknown" } } }
+        }
+      ]
+    },
+    "affected_path": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "node_ids", "edge_ids", "critical", "verification_node_ids", "confidence", "evidence_refs"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^BLAST-[A-Za-z0-9._-]{1,120}$" },
+        "kind": { "enum": ["direct", "transitive"] },
+        "node_ids": { "type": "array", "minItems": 2, "maxItems": 128, "uniqueItems": true, "items": { "type": "string", "pattern": "^NODE-" } },
+        "edge_ids": { "type": "array", "minItems": 1, "maxItems": 127, "uniqueItems": true, "items": { "type": "string", "pattern": "^EDGE-" } },
+        "critical": { "type": "boolean" },
+        "verification_node_ids": { "type": "array", "maxItems": 64, "uniqueItems": true, "items": { "type": "string", "pattern": "^NODE-" } },
+        "confidence": { "enum": ["observed", "inferred", "unknown"] },
+        "evidence_refs": { "$ref": "#/$defs/evidence_refs" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "kind": { "const": "direct" } } },
+          "then": { "properties": { "node_ids": { "maxItems": 2 }, "edge_ids": { "maxItems": 1 } } }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "transitive" } } },
+          "then": { "properties": { "node_ids": { "minItems": 3 }, "edge_ids": { "minItems": 2 } } }
+        },
+        {
+          "if": { "properties": { "confidence": { "enum": ["observed", "inferred"] } } },
+          "then": { "properties": { "evidence_refs": { "minItems": 1 } } }
+        }
+      ]
+    },
+    "excluded_sibling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "path", "reason", "confidence", "evidence_refs"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^EXCLUDED-[A-Za-z0-9._-]{1,117}$" },
+        "path": { "$ref": "#/$defs/path" },
+        "reason": { "type": "string", "minLength": 1, "maxLength": 2048 },
+        "confidence": { "enum": ["observed", "inferred"] },
+        "evidence_refs": { "allOf": [{ "$ref": "#/$defs/evidence_refs" }, { "minItems": 1 }] }
+      }
+    },
+    "unknown": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "statement", "scope_ids", "impact", "resolution_plan", "owner", "blocking", "evidence_refs"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^GRAPHUNKNOWN-[A-Za-z0-9._-]{1,114}$" },
+        "statement": { "type": "string", "minLength": 1, "maxLength": 2048 },
+        "scope_ids": { "type": "array", "minItems": 1, "maxItems": 128, "uniqueItems": true, "items": { "$ref": "#/$defs/safe_id" } },
+        "impact": { "type": "string", "minLength": 1, "maxLength": 2048 },
+        "resolution_plan": { "type": "string", "minLength": 1, "maxLength": 2048 },
+        "owner": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "blocking": { "type": "boolean" },
+        "evidence_refs": { "$ref": "#/$defs/evidence_refs" }
+      }
+    },
+    "boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "category", "classification", "node_ids", "edge_ids", "path_ids", "unknown_ids", "excluded_sibling_ids", "rationale", "evidence_refs"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^BOUNDARY-[A-Za-z0-9._-]{1,117}$" },
+        "category": {
+          "enum": ["direct_affected_paths", "transitive_affected_paths", "externally_reachable_entry_points", "downstream_state_or_side_effects", "cross_boundary_contracts", "critical_path_tests", "relevant_unknown_paths", "excluded_sibling_paths"]
+        },
+        "classification": { "enum": ["represented", "reasoned_excluded"] },
+        "node_ids": { "$ref": "#/$defs/id_array" },
+        "edge_ids": { "$ref": "#/$defs/id_array" },
+        "path_ids": { "$ref": "#/$defs/id_array" },
+        "unknown_ids": { "$ref": "#/$defs/id_array" },
+        "excluded_sibling_ids": { "$ref": "#/$defs/id_array" },
+        "rationale": { "type": ["string", "null"], "maxLength": 2048 },
+        "evidence_refs": { "allOf": [{ "$ref": "#/$defs/evidence_refs" }, { "minItems": 1 }] }
+      }
+    },
+    "id_array": {
+      "type": "array",
+      "maxItems": 128,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/safe_id" }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["completeness", "semantic_tool_status", "semantic_tools", "fallback_tools", "reduced_semantic_coverage", "truncated", "truncation_reason", "available_evaluator_ids", "unavailable_evaluator_ids", "boundaries", "evidence_refs"],
+      "properties": {
+        "completeness": { "enum": ["complete", "partial", "unknown"] },
+        "semantic_tool_status": { "enum": ["available", "unavailable", "not_requested"] },
+        "semantic_tools": { "$ref": "#/$defs/id_array" },
+        "fallback_tools": { "$ref": "#/$defs/id_array" },
+        "reduced_semantic_coverage": { "type": "boolean" },
+        "truncated": { "type": "boolean" },
+        "truncation_reason": { "type": ["string", "null"], "maxLength": 2048 },
+        "available_evaluator_ids": { "$ref": "#/$defs/id_array" },
+        "unavailable_evaluator_ids": { "$ref": "#/$defs/id_array" },
+        "boundaries": { "type": "array", "minItems": 3, "maxItems": 8, "items": { "$ref": "#/$defs/boundary" } },
+        "evidence_refs": { "allOf": [{ "$ref": "#/$defs/evidence_refs" }, { "minItems": 1 }] }
+      }
+    }
+  }
+}

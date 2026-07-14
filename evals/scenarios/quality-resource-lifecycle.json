@@ -1,0 +1,28 @@
+{
+  "id": "quality-resource-lifecycle",
+  "description": "Repeated shutdown and failed initialization must close a managed resource exactly once.",
+  "risk_tags": ["critical", "resource-lifecycle", "cleanup"],
+  "failure_family": "resource-lifecycle-leak",
+  "workspace_policy": { "mode": "allowlist", "allowed_paths": ["src/client.mjs"] },
+  "repo_fixture": "fixtures/live/quality-resource-lifecycle",
+  "task": "Make the managed client return its resource value and close exactly once across normal shutdown, repeated shutdown, and initialization failure. Run the targeted test.",
+  "setup_commands": [],
+  "visible_checks": ["node --test test/visible.test.mjs"],
+  "hidden_checks": ["node --test .live-hidden/quality-resource-lifecycle.test.mjs"],
+  "hidden_check_files": [{ "source": "evals/hidden/quality-resource-lifecycle/hidden.test.mjs", "target": ".live-hidden/quality-resource-lifecycle.test.mjs" }],
+  "hidden_trace_assertions": [
+    { "assertion_id": "quality-resource-lifecycle-dossier-before-edit", "op": "verifier_code_exists", "code": "ENGINEERING_DOSSIER_BEFORE_IMPLEMENTATION" },
+    { "assertion_id": "quality-resource-lifecycle-gate-before-edit", "op": "verifier_code_exists", "code": "ENGINEERING_GATE_PASSED_BEFORE_IMPLEMENTATION" },
+    { "assertion_id": "quality-resource-lifecycle-coverage-recorded", "op": "verifier_code_exists", "code": "ENGINEERING_AFFECTED_SYSTEM_COVERAGE_RECORDED" },
+    { "assertion_id": "quality-resource-lifecycle-unknowns-resolved", "op": "verifier_code_exists", "code": "ENGINEERING_RELEVANT_UNKNOWNS_RESOLVED" },
+    { "assertion_id": "quality-resource-lifecycle-mapping-verified", "op": "verifier_code_exists", "code": "ENGINEERING_EDGE_FAILURE_MAPPING_VERIFIED" },
+    { "assertion_id": "quality-resource-lifecycle-architecture-respected", "op": "verifier_code_exists", "code": "ENGINEERING_ARCHITECTURE_RESPECTED" },
+    { "assertion_id": "quality-resource-lifecycle-ownership-respected", "op": "verifier_code_exists", "code": "ENGINEERING_IMPLEMENTATION_WITHIN_OWNERSHIP" },
+    { "assertion_id": "quality-resource-lifecycle-integrated-verification", "op": "event_exists", "event_type": "verification", "status": "completed" },
+    { "assertion_id": "quality-resource-lifecycle-valid-completion", "op": "termination_reason_equals", "value": "verified" }
+  ],
+  "timeout": 120000,
+  "repetitions": 2,
+  "expected_contracts": ["Normal start returns the resource value.", "Every acquired or partially initialized resource closes exactly once."],
+  "forbidden_regressions": ["Do not leak after initialization failure.", "Do not close the same resource twice."]
+}

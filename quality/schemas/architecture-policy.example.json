@@ -1,0 +1,43 @@
+{
+  "enforce_existing": false,
+  "fingerprint": "sha256:04410c2a10631aeb299bb481b30037aad7ff8e09ad02e28bcf17b90816bf1a67",
+  "policy_id": "ARCHPOLICY-example",
+  "required_evaluator_ids": [
+    "dependency-graph-v1",
+    "cycle-v1"
+  ],
+  "rules": [
+    {
+      "evaluator_id": "dependency-graph-v1",
+      "id": "ARCHRULE-domain-storage",
+      "kind": "deny_dependency",
+      "rationale": "domain code cannot depend directly on storage ownership",
+      "relationship_kinds": [
+        "imports",
+        "depends_on"
+      ],
+      "source": {
+        "type": "path_prefix",
+        "value": "src/domain"
+      },
+      "target": {
+        "type": "path_prefix",
+        "value": "src/storage"
+      }
+    },
+    {
+      "evaluator_id": "cycle-v1",
+      "id": "ARCHRULE-source-cycles",
+      "kind": "deny_cycle",
+      "rationale": "source dependency graph remains acyclic",
+      "relationship_kinds": [
+        "imports"
+      ],
+      "scope": {
+        "type": "path_prefix",
+        "value": "src"
+      }
+    }
+  ],
+  "schema_version": 1
+}

@@ -1,0 +1,1796 @@
+{
+  "baseline_commit": "0a1d56605b9b8923ac27c3b3b405b38177ca7741",
+  "catalog_id": "gpt56-role-catalog-v1",
+  "content_fingerprint": "sha256:b247257bb06cede46b9f1fbf5b5d1224c7b0eaa459290a41c9a1f24f5579d08a",
+  "default_profile_policy": {
+    "active_family": "gpt-5.6-candidate",
+    "behavioral_superiority": "unverified",
+    "candidate_family": "gpt-5.6-candidate",
+    "installed_runtime_evidence_id": null,
+    "reason": "GPT-5.6 Sol/Terra are active by explicit configuration policy; optional A/B evidence may measure behavior but does not gate activation or claim superiority.",
+    "state": "directly_activated"
+  },
+  "profiles": [
+    {
+      "allowed_reasoning_efforts": [
+        "xhigh",
+        "high"
+      ],
+      "capabilities": [
+        {
+          "capability_id": "reasoning_effort_xhigh",
+          "classification": "required",
+          "installed_runtime_evidence_id": null,
+          "rationale": "The exact xhigh option needs installed-runtime evidence before this profile can execute."
+        },
+        {
+          "capability_id": "reasoning_effort_max",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Max remains out of the comparison until installed-runtime evidence proves the option surface."
+        },
+        {
+          "capability_id": "mode_pro",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Pro mode remains out of the comparison because no installed OpenCode option key is proven."
+        },
+        {
+          "capability_id": "persisted_reasoning",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Persisted reasoning remains out of scope because no safe installed host integration is proven."
+        },
+        {
+          "capability_id": "temperature",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "The baseline preserves the starting temperature as evidence, not as a GPT-5.6 capability claim."
+        }
+      ],
+      "default_reasoning_effort": "xhigh",
+      "default_text_verbosity": "low",
+      "eligibility": {
+        "prohibited_scenario_families": [],
+        "risk_classes": [
+          "standard-lite",
+          "high",
+          "critical"
+        ],
+        "workload_classes": [
+          "general",
+          "bounded-exploration",
+          "research-sidecar",
+          "high-volume"
+        ]
+      },
+      "family": "gpt-5.5-baseline",
+      "lower_reasoning_effort": "high",
+      "mode": "standard",
+      "model_id": "openai/gpt-5.5",
+      "profile_id": "baseline-orchestrator",
+      "promotion_state": "retained_baseline",
+      "provenance": {
+        "kind": "starting_commit",
+        "note": "Exact role model and options preserved from the starting commit.",
+        "reference": "0a1d56605b9b8923ac27c3b3b405b38177ca7741"
+      },
+      "rationale": "Immutable paired-evaluation baseline; retaining it prevents configuration parsing from being mistaken for GPT-5.6 acceptance.",
+      "role": "orchestrator",
+      "temperature": 0.2,
+      "text_verbosity_options": [
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "allowed_reasoning_efforts": [
+        "xhigh",
+        "high"
+      ],
+      "capabilities": [
+        {
+          "capability_id": "reasoning_effort_xhigh",
+          "classification": "required",
+          "installed_runtime_evidence_id": null,
+          "rationale": "The exact xhigh option needs installed-runtime evidence before this profile can execute."
+        },
+        {
+          "capability_id": "reasoning_effort_max",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Max remains out of the comparison until installed-runtime evidence proves the option surface."
+        },
+        {
+          "capability_id": "mode_pro",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Pro mode remains out of the comparison because no installed OpenCode option key is proven."
+        },
+        {
+          "capability_id": "persisted_reasoning",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Persisted reasoning remains out of scope because no safe installed host integration is proven."
+        },
+        {
+          "capability_id": "temperature",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "The baseline preserves the starting temperature as evidence, not as a GPT-5.6 capability claim."
+        }
+      ],
+      "default_reasoning_effort": "xhigh",
+      "default_text_verbosity": "low",
+      "eligibility": {
+        "prohibited_scenario_families": [],
+        "risk_classes": [
+          "standard-lite",
+          "high",
+          "critical"
+        ],
+        "workload_classes": [
+          "general",
+          "bounded-exploration",
+          "research-sidecar",
+          "high-volume"
+        ]
+      },
+      "family": "gpt-5.5-baseline",
+      "lower_reasoning_effort": "high",
+      "mode": "standard",
+      "model_id": "openai/gpt-5.5",
+      "profile_id": "baseline-orchestrator-deep",
+      "promotion_state": "retained_baseline",
+      "provenance": {
+        "kind": "starting_commit",
+        "note": "Exact role model and options preserved from the starting commit.",
+        "reference": "0a1d56605b9b8923ac27c3b3b405b38177ca7741"
+      },
+      "rationale": "Immutable paired-evaluation baseline; retaining it prevents configuration parsing from being mistaken for GPT-5.6 acceptance.",
+      "role": "orchestrator-deep",
+      "temperature": 0.1,
+      "text_verbosity_options": [
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "allowed_reasoning_efforts": [
+        "high",
+        "medium"
+      ],
+      "capabilities": [
+        {
+          "capability_id": "reasoning_effort_xhigh",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "This capability is outside the bounded Milestone 2 comparison."
+        },
+        {
+          "capability_id": "reasoning_effort_max",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Max remains out of the comparison until installed-runtime evidence proves the option surface."
+        },
+        {
+          "capability_id": "mode_pro",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Pro mode remains out of the comparison because no installed OpenCode option key is proven."
+        },
+        {
+          "capability_id": "persisted_reasoning",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Persisted reasoning remains out of scope because no safe installed host integration is proven."
+        },
+        {
+          "capability_id": "temperature",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "The baseline preserves the starting temperature as evidence, not as a GPT-5.6 capability claim."
+        }
+      ],
+      "default_reasoning_effort": "high",
+      "default_text_verbosity": "low",
+      "eligibility": {
+        "prohibited_scenario_families": [],
+        "risk_classes": [
+          "standard-lite",
+          "high",
+          "critical"
+        ],
+        "workload_classes": [
+          "general",
+          "bounded-exploration",
+          "research-sidecar",
+          "high-volume"
+        ]
+      },
+      "family": "gpt-5.5-baseline",
+      "lower_reasoning_effort": "medium",
+      "mode": "standard",
+      "model_id": "openai/gpt-5.5",
+      "profile_id": "baseline-architect",
+      "promotion_state": "retained_baseline",
+      "provenance": {
+        "kind": "starting_commit",
+        "note": "Exact role model and options preserved from the starting commit.",
+        "reference": "0a1d56605b9b8923ac27c3b3b405b38177ca7741"
+      },
+      "rationale": "Immutable paired-evaluation baseline; retaining it prevents configuration parsing from being mistaken for GPT-5.6 acceptance.",
+      "role": "architect",
+      "temperature": 0.1,
+      "text_verbosity_options": [
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "allowed_reasoning_efforts": [
+        "high",
+        "medium"
+      ],
+      "capabilities": [
+        {
+          "capability_id": "reasoning_effort_xhigh",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "This capability is outside the bounded Milestone 2 comparison."
+        },
+        {
+          "capability_id": "reasoning_effort_max",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Max remains out of the comparison until installed-runtime evidence proves the option surface."
+        },
+        {
+          "capability_id": "mode_pro",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Pro mode remains out of the comparison because no installed OpenCode option key is proven."
+        },
+        {
+          "capability_id": "persisted_reasoning",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Persisted reasoning remains out of scope because no safe installed host integration is proven."
+        },
+        {
+          "capability_id": "temperature",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "The baseline preserves the starting temperature as evidence, not as a GPT-5.6 capability claim."
+        }
+      ],
+      "default_reasoning_effort": "high",
+      "default_text_verbosity": "low",
+      "eligibility": {
+        "prohibited_scenario_families": [],
+        "risk_classes": [
+          "standard-lite",
+          "high",
+          "critical"
+        ],
+        "workload_classes": [
+          "general",
+          "bounded-exploration",
+          "research-sidecar",
+          "high-volume"
+        ]
+      },
+      "family": "gpt-5.5-baseline",
+      "lower_reasoning_effort": "medium",
+      "mode": "standard",
+      "model_id": "openai/gpt-5.5",
+      "profile_id": "baseline-general",
+      "promotion_state": "retained_baseline",
+      "provenance": {
+        "kind": "starting_commit",
+        "note": "Exact role model and options preserved from the starting commit.",
+        "reference": "0a1d56605b9b8923ac27c3b3b405b38177ca7741"
+      },
+      "rationale": "Immutable paired-evaluation baseline; retaining it prevents configuration parsing from being mistaken for GPT-5.6 acceptance.",
+      "role": "general",
+      "temperature": 0.2,
+      "text_verbosity_options": [
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "allowed_reasoning_efforts": [
+        "high",
+        "medium"
+      ],
+      "capabilities": [
+        {
+          "capability_id": "reasoning_effort_xhigh",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "This capability is outside the bounded Milestone 2 comparison."
+        },
+        {
+          "capability_id": "reasoning_effort_max",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Max remains out of the comparison until installed-runtime evidence proves the option surface."
+        },
+        {
+          "capability_id": "mode_pro",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Pro mode remains out of the comparison because no installed OpenCode option key is proven."
+        },
+        {
+          "capability_id": "persisted_reasoning",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Persisted reasoning remains out of scope because no safe installed host integration is proven."
+        },
+        {
+          "capability_id": "temperature",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "The baseline preserves the starting temperature as evidence, not as a GPT-5.6 capability claim."
+        }
+      ],
+      "default_reasoning_effort": "high",
+      "default_text_verbosity": "low",
+      "eligibility": {
+        "prohibited_scenario_families": [],
+        "risk_classes": [
+          "standard-lite",
+          "high",
+          "critical"
+        ],
+        "workload_classes": [
+          "general",
+          "bounded-exploration",
+          "research-sidecar",
+          "high-volume"
+        ]
+      },
+      "family": "gpt-5.5-baseline",
+      "lower_reasoning_effort": "medium",
+      "mode": "standard",
+      "model_id": "openai/gpt-5.5",
+      "profile_id": "baseline-reviewer",
+      "promotion_state": "retained_baseline",
+      "provenance": {
+        "kind": "starting_commit",
+        "note": "Exact role model and options preserved from the starting commit.",
+        "reference": "0a1d56605b9b8923ac27c3b3b405b38177ca7741"
+      },
+      "rationale": "Immutable paired-evaluation baseline; retaining it prevents configuration parsing from being mistaken for GPT-5.6 acceptance.",
+      "role": "reviewer",
+      "temperature": 0.1,
+      "text_verbosity_options": [
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "allowed_reasoning_efforts": [
+        "xhigh",
+        "high"
+      ],
+      "capabilities": [
+        {
+          "capability_id": "reasoning_effort_xhigh",
+          "classification": "required",
+          "installed_runtime_evidence_id": null,
+          "rationale": "The exact xhigh option needs installed-runtime evidence before this profile can execute."
+        },
+        {
+          "capability_id": "reasoning_effort_max",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Max remains out of the comparison until installed-runtime evidence proves the option surface."
+        },
+        {
+          "capability_id": "mode_pro",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Pro mode remains out of the comparison because no installed OpenCode option key is proven."
+        },
+        {
+          "capability_id": "persisted_reasoning",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Persisted reasoning remains out of scope because no safe installed host integration is proven."
+        },
+        {
+          "capability_id": "temperature",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "The baseline preserves the starting temperature as evidence, not as a GPT-5.6 capability claim."
+        }
+      ],
+      "default_reasoning_effort": "xhigh",
+      "default_text_verbosity": "low",
+      "eligibility": {
+        "prohibited_scenario_families": [],
+        "risk_classes": [
+          "standard-lite",
+          "high",
+          "critical"
+        ],
+        "workload_classes": [
+          "general",
+          "bounded-exploration",
+          "research-sidecar",
+          "high-volume"
+        ]
+      },
+      "family": "gpt-5.5-baseline",
+      "lower_reasoning_effort": "high",
+      "mode": "standard",
+      "model_id": "openai/gpt-5.5",
+      "profile_id": "baseline-review-orchestrator",
+      "promotion_state": "retained_baseline",
+      "provenance": {
+        "kind": "starting_commit",
+        "note": "Exact role model and options preserved from the starting commit.",
+        "reference": "0a1d56605b9b8923ac27c3b3b405b38177ca7741"
+      },
+      "rationale": "Immutable paired-evaluation baseline; retaining it prevents configuration parsing from being mistaken for GPT-5.6 acceptance.",
+      "role": "review-orchestrator",
+      "temperature": 0.1,
+      "text_verbosity_options": [
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "allowed_reasoning_efforts": [
+        "medium",
+        "low"
+      ],
+      "capabilities": [
+        {
+          "capability_id": "reasoning_effort_xhigh",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "This capability is outside the bounded Milestone 2 comparison."
+        },
+        {
+          "capability_id": "reasoning_effort_max",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Max remains out of the comparison until installed-runtime evidence proves the option surface."
+        },
+        {
+          "capability_id": "mode_pro",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Pro mode remains out of the comparison because no installed OpenCode option key is proven."
+        },
+        {
+          "capability_id": "persisted_reasoning",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Persisted reasoning remains out of scope because no safe installed host integration is proven."
+        },
+        {
+          "capability_id": "temperature",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "The baseline preserves the starting temperature as evidence, not as a GPT-5.6 capability claim."
+        }
+      ],
+      "default_reasoning_effort": "medium",
+      "default_text_verbosity": "low",
+      "eligibility": {
+        "prohibited_scenario_families": [],
+        "risk_classes": [
+          "standard-lite",
+          "high",
+          "critical"
+        ],
+        "workload_classes": [
+          "general",
+          "bounded-exploration",
+          "research-sidecar",
+          "high-volume"
+        ]
+      },
+      "family": "gpt-5.5-baseline",
+      "lower_reasoning_effort": "low",
+      "mode": "standard",
+      "model_id": "openai/gpt-5.5",
+      "profile_id": "baseline-verifier",
+      "promotion_state": "retained_baseline",
+      "provenance": {
+        "kind": "starting_commit",
+        "note": "Exact role model and options preserved from the starting commit.",
+        "reference": "0a1d56605b9b8923ac27c3b3b405b38177ca7741"
+      },
+      "rationale": "Immutable paired-evaluation baseline; retaining it prevents configuration parsing from being mistaken for GPT-5.6 acceptance.",
+      "role": "verifier",
+      "temperature": 0.1,
+      "text_verbosity_options": [
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "allowed_reasoning_efforts": [
+        "high",
+        "medium"
+      ],
+      "capabilities": [
+        {
+          "capability_id": "reasoning_effort_xhigh",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "This capability is outside the bounded Milestone 2 comparison."
+        },
+        {
+          "capability_id": "reasoning_effort_max",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Max remains out of the comparison until installed-runtime evidence proves the option surface."
+        },
+        {
+          "capability_id": "mode_pro",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Pro mode remains out of the comparison because no installed OpenCode option key is proven."
+        },
+        {
+          "capability_id": "persisted_reasoning",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Persisted reasoning remains out of scope because no safe installed host integration is proven."
+        },
+        {
+          "capability_id": "temperature",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "The baseline preserves the starting temperature as evidence, not as a GPT-5.6 capability claim."
+        }
+      ],
+      "default_reasoning_effort": "high",
+      "default_text_verbosity": "low",
+      "eligibility": {
+        "prohibited_scenario_families": [],
+        "risk_classes": [
+          "standard-lite",
+          "high",
+          "critical"
+        ],
+        "workload_classes": [
+          "general",
+          "bounded-exploration",
+          "research-sidecar",
+          "high-volume"
+        ]
+      },
+      "family": "gpt-5.5-baseline",
+      "lower_reasoning_effort": "medium",
+      "mode": "standard",
+      "model_id": "openai/gpt-5.5",
+      "profile_id": "baseline-diagnose",
+      "promotion_state": "retained_baseline",
+      "provenance": {
+        "kind": "starting_commit",
+        "note": "Exact role model and options preserved from the starting commit.",
+        "reference": "0a1d56605b9b8923ac27c3b3b405b38177ca7741"
+      },
+      "rationale": "Immutable paired-evaluation baseline; retaining it prevents configuration parsing from being mistaken for GPT-5.6 acceptance.",
+      "role": "diagnose",
+      "temperature": 0.1,
+      "text_verbosity_options": [
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "allowed_reasoning_efforts": [
+        "low",
+        "none"
+      ],
+      "capabilities": [
+        {
+          "capability_id": "reasoning_effort_xhigh",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "This capability is outside the bounded Milestone 2 comparison."
+        },
+        {
+          "capability_id": "reasoning_effort_max",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Max remains out of the comparison until installed-runtime evidence proves the option surface."
+        },
+        {
+          "capability_id": "mode_pro",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Pro mode remains out of the comparison because no installed OpenCode option key is proven."
+        },
+        {
+          "capability_id": "persisted_reasoning",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Persisted reasoning remains out of scope because no safe installed host integration is proven."
+        },
+        {
+          "capability_id": "temperature",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "The baseline preserves the starting temperature as evidence, not as a GPT-5.6 capability claim."
+        }
+      ],
+      "default_reasoning_effort": "low",
+      "default_text_verbosity": "low",
+      "eligibility": {
+        "prohibited_scenario_families": [],
+        "risk_classes": [
+          "standard-lite",
+          "high",
+          "critical"
+        ],
+        "workload_classes": [
+          "general",
+          "bounded-exploration",
+          "research-sidecar",
+          "high-volume"
+        ]
+      },
+      "family": "gpt-5.5-baseline",
+      "lower_reasoning_effort": "none",
+      "mode": "standard",
+      "model_id": "openai/gpt-5.4-mini-fast",
+      "profile_id": "baseline-explore",
+      "promotion_state": "retained_baseline",
+      "provenance": {
+        "kind": "starting_commit",
+        "note": "Explicit legacy-model exception preserved from the starting commit; it is not silently normalized to GPT-5.5.",
+        "reference": "0a1d56605b9b8923ac27c3b3b405b38177ca7741"
+      },
+      "rationale": "Immutable paired-evaluation baseline; retaining it prevents configuration parsing from being mistaken for GPT-5.6 acceptance.",
+      "role": "explore",
+      "temperature": 0.1,
+      "text_verbosity_options": [
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "allowed_reasoning_efforts": [
+        "medium",
+        "low"
+      ],
+      "capabilities": [
+        {
+          "capability_id": "reasoning_effort_xhigh",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "This capability is outside the bounded Milestone 2 comparison."
+        },
+        {
+          "capability_id": "reasoning_effort_max",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Max remains out of the comparison until installed-runtime evidence proves the option surface."
+        },
+        {
+          "capability_id": "mode_pro",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Pro mode remains out of the comparison because no installed OpenCode option key is proven."
+        },
+        {
+          "capability_id": "persisted_reasoning",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Persisted reasoning remains out of scope because no safe installed host integration is proven."
+        },
+        {
+          "capability_id": "temperature",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "The baseline preserves the starting temperature as evidence, not as a GPT-5.6 capability claim."
+        }
+      ],
+      "default_reasoning_effort": "medium",
+      "default_text_verbosity": "low",
+      "eligibility": {
+        "prohibited_scenario_families": [],
+        "risk_classes": [
+          "standard-lite",
+          "high",
+          "critical"
+        ],
+        "workload_classes": [
+          "general",
+          "bounded-exploration",
+          "research-sidecar",
+          "high-volume"
+        ]
+      },
+      "family": "gpt-5.5-baseline",
+      "lower_reasoning_effort": "low",
+      "mode": "standard",
+      "model_id": "openai/gpt-5.5",
+      "profile_id": "baseline-researcher",
+      "promotion_state": "retained_baseline",
+      "provenance": {
+        "kind": "starting_commit",
+        "note": "Exact role model and options preserved from the starting commit.",
+        "reference": "0a1d56605b9b8923ac27c3b3b405b38177ca7741"
+      },
+      "rationale": "Immutable paired-evaluation baseline; retaining it prevents configuration parsing from being mistaken for GPT-5.6 acceptance.",
+      "role": "researcher",
+      "temperature": 0.1,
+      "text_verbosity_options": [
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "allowed_reasoning_efforts": [
+        "high",
+        "medium"
+      ],
+      "capabilities": [
+        {
+          "capability_id": "reasoning_effort_xhigh",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "This capability is outside the bounded Milestone 2 comparison."
+        },
+        {
+          "capability_id": "reasoning_effort_max",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Max remains out of the comparison until installed-runtime evidence proves the option surface."
+        },
+        {
+          "capability_id": "mode_pro",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Pro mode remains out of the comparison because no installed OpenCode option key is proven."
+        },
+        {
+          "capability_id": "persisted_reasoning",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Persisted reasoning remains out of scope because no safe installed host integration is proven."
+        },
+        {
+          "capability_id": "temperature",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "The baseline preserves the starting temperature as evidence, not as a GPT-5.6 capability claim."
+        }
+      ],
+      "default_reasoning_effort": "high",
+      "default_text_verbosity": "low",
+      "eligibility": {
+        "prohibited_scenario_families": [],
+        "risk_classes": [
+          "standard-lite",
+          "high",
+          "critical"
+        ],
+        "workload_classes": [
+          "general",
+          "bounded-exploration",
+          "research-sidecar",
+          "high-volume"
+        ]
+      },
+      "family": "gpt-5.5-baseline",
+      "lower_reasoning_effort": "medium",
+      "mode": "standard",
+      "model_id": "openai/gpt-5.5",
+      "profile_id": "baseline-improver",
+      "promotion_state": "retained_baseline",
+      "provenance": {
+        "kind": "starting_commit",
+        "note": "Exact role model and options preserved from the starting commit.",
+        "reference": "0a1d56605b9b8923ac27c3b3b405b38177ca7741"
+      },
+      "rationale": "Immutable paired-evaluation baseline; retaining it prevents configuration parsing from being mistaken for GPT-5.6 acceptance.",
+      "role": "improver",
+      "temperature": 0.1,
+      "text_verbosity_options": [
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "allowed_reasoning_efforts": [
+        "xhigh",
+        "high"
+      ],
+      "capabilities": [
+        {
+          "capability_id": "reasoning_effort_xhigh",
+          "classification": "required",
+          "installed_runtime_evidence_id": null,
+          "rationale": "The exact xhigh option needs installed-runtime evidence before this profile can execute."
+        },
+        {
+          "capability_id": "reasoning_effort_max",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Max remains out of the comparison until installed-runtime evidence proves the option surface."
+        },
+        {
+          "capability_id": "mode_pro",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Pro mode remains out of the comparison because no installed OpenCode option key is proven."
+        },
+        {
+          "capability_id": "persisted_reasoning",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Persisted reasoning remains out of scope because no safe installed host integration is proven."
+        },
+        {
+          "capability_id": "temperature",
+          "classification": "unsupported",
+          "installed_runtime_evidence_id": null,
+          "rationale": "GPT-5.6 candidate profiles omit temperature; provider metadata marks it unsupported."
+        }
+      ],
+      "default_reasoning_effort": "xhigh",
+      "default_text_verbosity": "low",
+      "eligibility": {
+        "prohibited_scenario_families": [],
+        "risk_classes": [
+          "standard-lite",
+          "high",
+          "critical"
+        ],
+        "workload_classes": [
+          "general",
+          "bounded-exploration",
+          "research-sidecar",
+          "high-volume"
+        ]
+      },
+      "family": "gpt-5.6-candidate",
+      "lower_reasoning_effort": "high",
+      "mode": "standard",
+      "model_id": "openai/gpt-5.6-sol",
+      "profile_id": "candidate-sol-orchestrator",
+      "promotion_state": "active_default",
+      "provenance": {
+        "kind": "official_guidance",
+        "note": "Exact model identity is a quality-first hypothesis; installed runtime support and behavioral superiority remain unverified.",
+        "reference": "https://developers.openai.com/api/docs/guides/latest-model?model=gpt-5.6"
+      },
+      "rationale": "Evaluate Sol for decision, architecture, implementation, review, diagnosis, verification, or integration work.",
+      "role": "orchestrator",
+      "text_verbosity_options": [
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "allowed_reasoning_efforts": [
+        "xhigh",
+        "high"
+      ],
+      "capabilities": [
+        {
+          "capability_id": "reasoning_effort_xhigh",
+          "classification": "required",
+          "installed_runtime_evidence_id": null,
+          "rationale": "The exact xhigh option needs installed-runtime evidence before this profile can execute."
+        },
+        {
+          "capability_id": "reasoning_effort_max",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Max remains out of the comparison until installed-runtime evidence proves the option surface."
+        },
+        {
+          "capability_id": "mode_pro",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Pro mode remains out of the comparison because no installed OpenCode option key is proven."
+        },
+        {
+          "capability_id": "persisted_reasoning",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Persisted reasoning remains out of scope because no safe installed host integration is proven."
+        },
+        {
+          "capability_id": "temperature",
+          "classification": "unsupported",
+          "installed_runtime_evidence_id": null,
+          "rationale": "GPT-5.6 candidate profiles omit temperature; provider metadata marks it unsupported."
+        }
+      ],
+      "default_reasoning_effort": "xhigh",
+      "default_text_verbosity": "low",
+      "eligibility": {
+        "prohibited_scenario_families": [],
+        "risk_classes": [
+          "standard-lite",
+          "high",
+          "critical"
+        ],
+        "workload_classes": [
+          "general",
+          "bounded-exploration",
+          "research-sidecar",
+          "high-volume"
+        ]
+      },
+      "family": "gpt-5.6-candidate",
+      "lower_reasoning_effort": "high",
+      "mode": "standard",
+      "model_id": "openai/gpt-5.6-sol",
+      "profile_id": "candidate-sol-orchestrator-deep",
+      "promotion_state": "active_default",
+      "provenance": {
+        "kind": "official_guidance",
+        "note": "Exact model identity is a quality-first hypothesis; installed runtime support and behavioral superiority remain unverified.",
+        "reference": "https://developers.openai.com/api/docs/guides/latest-model?model=gpt-5.6"
+      },
+      "rationale": "Evaluate Sol for decision, architecture, implementation, review, diagnosis, verification, or integration work.",
+      "role": "orchestrator-deep",
+      "text_verbosity_options": [
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "allowed_reasoning_efforts": [
+        "high",
+        "medium"
+      ],
+      "capabilities": [
+        {
+          "capability_id": "reasoning_effort_xhigh",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "This capability is outside the bounded Milestone 2 comparison."
+        },
+        {
+          "capability_id": "reasoning_effort_max",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Max remains out of the comparison until installed-runtime evidence proves the option surface."
+        },
+        {
+          "capability_id": "mode_pro",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Pro mode remains out of the comparison because no installed OpenCode option key is proven."
+        },
+        {
+          "capability_id": "persisted_reasoning",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Persisted reasoning remains out of scope because no safe installed host integration is proven."
+        },
+        {
+          "capability_id": "temperature",
+          "classification": "unsupported",
+          "installed_runtime_evidence_id": null,
+          "rationale": "GPT-5.6 candidate profiles omit temperature; provider metadata marks it unsupported."
+        }
+      ],
+      "default_reasoning_effort": "high",
+      "default_text_verbosity": "low",
+      "eligibility": {
+        "prohibited_scenario_families": [],
+        "risk_classes": [
+          "standard-lite",
+          "high",
+          "critical"
+        ],
+        "workload_classes": [
+          "general",
+          "bounded-exploration",
+          "research-sidecar",
+          "high-volume"
+        ]
+      },
+      "family": "gpt-5.6-candidate",
+      "lower_reasoning_effort": "medium",
+      "mode": "standard",
+      "model_id": "openai/gpt-5.6-sol",
+      "profile_id": "candidate-sol-architect",
+      "promotion_state": "active_default",
+      "provenance": {
+        "kind": "official_guidance",
+        "note": "Exact model identity is a quality-first hypothesis; installed runtime support and behavioral superiority remain unverified.",
+        "reference": "https://developers.openai.com/api/docs/guides/latest-model?model=gpt-5.6"
+      },
+      "rationale": "Evaluate Sol for decision, architecture, implementation, review, diagnosis, verification, or integration work.",
+      "role": "architect",
+      "text_verbosity_options": [
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "allowed_reasoning_efforts": [
+        "high",
+        "medium"
+      ],
+      "capabilities": [
+        {
+          "capability_id": "reasoning_effort_xhigh",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "This capability is outside the bounded Milestone 2 comparison."
+        },
+        {
+          "capability_id": "reasoning_effort_max",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Max remains out of the comparison until installed-runtime evidence proves the option surface."
+        },
+        {
+          "capability_id": "mode_pro",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Pro mode remains out of the comparison because no installed OpenCode option key is proven."
+        },
+        {
+          "capability_id": "persisted_reasoning",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Persisted reasoning remains out of scope because no safe installed host integration is proven."
+        },
+        {
+          "capability_id": "temperature",
+          "classification": "unsupported",
+          "installed_runtime_evidence_id": null,
+          "rationale": "GPT-5.6 candidate profiles omit temperature; provider metadata marks it unsupported."
+        }
+      ],
+      "default_reasoning_effort": "high",
+      "default_text_verbosity": "low",
+      "eligibility": {
+        "prohibited_scenario_families": [],
+        "risk_classes": [
+          "standard-lite",
+          "high",
+          "critical"
+        ],
+        "workload_classes": [
+          "general",
+          "bounded-exploration",
+          "research-sidecar",
+          "high-volume"
+        ]
+      },
+      "family": "gpt-5.6-candidate",
+      "lower_reasoning_effort": "medium",
+      "mode": "standard",
+      "model_id": "openai/gpt-5.6-sol",
+      "profile_id": "candidate-sol-general",
+      "promotion_state": "active_default",
+      "provenance": {
+        "kind": "official_guidance",
+        "note": "Exact model identity is a quality-first hypothesis; installed runtime support and behavioral superiority remain unverified.",
+        "reference": "https://developers.openai.com/api/docs/guides/latest-model?model=gpt-5.6"
+      },
+      "rationale": "Evaluate Sol for decision, architecture, implementation, review, diagnosis, verification, or integration work.",
+      "role": "general",
+      "text_verbosity_options": [
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "allowed_reasoning_efforts": [
+        "high",
+        "medium"
+      ],
+      "capabilities": [
+        {
+          "capability_id": "reasoning_effort_xhigh",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "This capability is outside the bounded Milestone 2 comparison."
+        },
+        {
+          "capability_id": "reasoning_effort_max",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Max remains out of the comparison until installed-runtime evidence proves the option surface."
+        },
+        {
+          "capability_id": "mode_pro",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Pro mode remains out of the comparison because no installed OpenCode option key is proven."
+        },
+        {
+          "capability_id": "persisted_reasoning",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Persisted reasoning remains out of scope because no safe installed host integration is proven."
+        },
+        {
+          "capability_id": "temperature",
+          "classification": "unsupported",
+          "installed_runtime_evidence_id": null,
+          "rationale": "GPT-5.6 candidate profiles omit temperature; provider metadata marks it unsupported."
+        }
+      ],
+      "default_reasoning_effort": "high",
+      "default_text_verbosity": "low",
+      "eligibility": {
+        "prohibited_scenario_families": [],
+        "risk_classes": [
+          "standard-lite",
+          "high",
+          "critical"
+        ],
+        "workload_classes": [
+          "general",
+          "bounded-exploration",
+          "research-sidecar",
+          "high-volume"
+        ]
+      },
+      "family": "gpt-5.6-candidate",
+      "lower_reasoning_effort": "medium",
+      "mode": "standard",
+      "model_id": "openai/gpt-5.6-sol",
+      "profile_id": "candidate-sol-reviewer",
+      "promotion_state": "active_default",
+      "provenance": {
+        "kind": "official_guidance",
+        "note": "Exact model identity is a quality-first hypothesis; installed runtime support and behavioral superiority remain unverified.",
+        "reference": "https://developers.openai.com/api/docs/guides/latest-model?model=gpt-5.6"
+      },
+      "rationale": "Evaluate Sol for decision, architecture, implementation, review, diagnosis, verification, or integration work.",
+      "role": "reviewer",
+      "text_verbosity_options": [
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "allowed_reasoning_efforts": [
+        "xhigh",
+        "high"
+      ],
+      "capabilities": [
+        {
+          "capability_id": "reasoning_effort_xhigh",
+          "classification": "required",
+          "installed_runtime_evidence_id": null,
+          "rationale": "The exact xhigh option needs installed-runtime evidence before this profile can execute."
+        },
+        {
+          "capability_id": "reasoning_effort_max",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Max remains out of the comparison until installed-runtime evidence proves the option surface."
+        },
+        {
+          "capability_id": "mode_pro",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Pro mode remains out of the comparison because no installed OpenCode option key is proven."
+        },
+        {
+          "capability_id": "persisted_reasoning",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Persisted reasoning remains out of scope because no safe installed host integration is proven."
+        },
+        {
+          "capability_id": "temperature",
+          "classification": "unsupported",
+          "installed_runtime_evidence_id": null,
+          "rationale": "GPT-5.6 candidate profiles omit temperature; provider metadata marks it unsupported."
+        }
+      ],
+      "default_reasoning_effort": "xhigh",
+      "default_text_verbosity": "low",
+      "eligibility": {
+        "prohibited_scenario_families": [],
+        "risk_classes": [
+          "standard-lite",
+          "high",
+          "critical"
+        ],
+        "workload_classes": [
+          "general",
+          "bounded-exploration",
+          "research-sidecar",
+          "high-volume"
+        ]
+      },
+      "family": "gpt-5.6-candidate",
+      "lower_reasoning_effort": "high",
+      "mode": "standard",
+      "model_id": "openai/gpt-5.6-sol",
+      "profile_id": "candidate-sol-review-orchestrator",
+      "promotion_state": "active_default",
+      "provenance": {
+        "kind": "official_guidance",
+        "note": "Exact model identity is a quality-first hypothesis; installed runtime support and behavioral superiority remain unverified.",
+        "reference": "https://developers.openai.com/api/docs/guides/latest-model?model=gpt-5.6"
+      },
+      "rationale": "Evaluate Sol for decision, architecture, implementation, review, diagnosis, verification, or integration work.",
+      "role": "review-orchestrator",
+      "text_verbosity_options": [
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "allowed_reasoning_efforts": [
+        "medium",
+        "low"
+      ],
+      "capabilities": [
+        {
+          "capability_id": "reasoning_effort_xhigh",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "This capability is outside the bounded Milestone 2 comparison."
+        },
+        {
+          "capability_id": "reasoning_effort_max",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Max remains out of the comparison until installed-runtime evidence proves the option surface."
+        },
+        {
+          "capability_id": "mode_pro",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Pro mode remains out of the comparison because no installed OpenCode option key is proven."
+        },
+        {
+          "capability_id": "persisted_reasoning",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Persisted reasoning remains out of scope because no safe installed host integration is proven."
+        },
+        {
+          "capability_id": "temperature",
+          "classification": "unsupported",
+          "installed_runtime_evidence_id": null,
+          "rationale": "GPT-5.6 candidate profiles omit temperature; provider metadata marks it unsupported."
+        }
+      ],
+      "default_reasoning_effort": "medium",
+      "default_text_verbosity": "low",
+      "eligibility": {
+        "prohibited_scenario_families": [],
+        "risk_classes": [
+          "standard-lite",
+          "high",
+          "critical"
+        ],
+        "workload_classes": [
+          "general",
+          "bounded-exploration",
+          "research-sidecar",
+          "high-volume"
+        ]
+      },
+      "family": "gpt-5.6-candidate",
+      "lower_reasoning_effort": "low",
+      "mode": "standard",
+      "model_id": "openai/gpt-5.6-sol",
+      "profile_id": "candidate-sol-verifier",
+      "promotion_state": "active_default",
+      "provenance": {
+        "kind": "official_guidance",
+        "note": "Exact model identity is a quality-first hypothesis; installed runtime support and behavioral superiority remain unverified.",
+        "reference": "https://developers.openai.com/api/docs/guides/latest-model?model=gpt-5.6"
+      },
+      "rationale": "Evaluate Sol for decision, architecture, implementation, review, diagnosis, verification, or integration work.",
+      "role": "verifier",
+      "text_verbosity_options": [
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "allowed_reasoning_efforts": [
+        "high",
+        "medium"
+      ],
+      "capabilities": [
+        {
+          "capability_id": "reasoning_effort_xhigh",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "This capability is outside the bounded Milestone 2 comparison."
+        },
+        {
+          "capability_id": "reasoning_effort_max",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Max remains out of the comparison until installed-runtime evidence proves the option surface."
+        },
+        {
+          "capability_id": "mode_pro",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Pro mode remains out of the comparison because no installed OpenCode option key is proven."
+        },
+        {
+          "capability_id": "persisted_reasoning",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Persisted reasoning remains out of scope because no safe installed host integration is proven."
+        },
+        {
+          "capability_id": "temperature",
+          "classification": "unsupported",
+          "installed_runtime_evidence_id": null,
+          "rationale": "GPT-5.6 candidate profiles omit temperature; provider metadata marks it unsupported."
+        }
+      ],
+      "default_reasoning_effort": "high",
+      "default_text_verbosity": "low",
+      "eligibility": {
+        "prohibited_scenario_families": [],
+        "risk_classes": [
+          "standard-lite",
+          "high",
+          "critical"
+        ],
+        "workload_classes": [
+          "general",
+          "bounded-exploration",
+          "research-sidecar",
+          "high-volume"
+        ]
+      },
+      "family": "gpt-5.6-candidate",
+      "lower_reasoning_effort": "medium",
+      "mode": "standard",
+      "model_id": "openai/gpt-5.6-sol",
+      "profile_id": "candidate-sol-diagnose",
+      "promotion_state": "active_default",
+      "provenance": {
+        "kind": "official_guidance",
+        "note": "Exact model identity is a quality-first hypothesis; installed runtime support and behavioral superiority remain unverified.",
+        "reference": "https://developers.openai.com/api/docs/guides/latest-model?model=gpt-5.6"
+      },
+      "rationale": "Evaluate Sol for decision, architecture, implementation, review, diagnosis, verification, or integration work.",
+      "role": "diagnose",
+      "text_verbosity_options": [
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "allowed_reasoning_efforts": [
+        "low",
+        "none"
+      ],
+      "capabilities": [
+        {
+          "capability_id": "reasoning_effort_xhigh",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "This capability is outside the bounded Milestone 2 comparison."
+        },
+        {
+          "capability_id": "reasoning_effort_max",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Max remains out of the comparison until installed-runtime evidence proves the option surface."
+        },
+        {
+          "capability_id": "mode_pro",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Pro mode remains out of the comparison because no installed OpenCode option key is proven."
+        },
+        {
+          "capability_id": "persisted_reasoning",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Persisted reasoning remains out of scope because no safe installed host integration is proven."
+        },
+        {
+          "capability_id": "temperature",
+          "classification": "unsupported",
+          "installed_runtime_evidence_id": null,
+          "rationale": "GPT-5.6 candidate profiles omit temperature; provider metadata marks it unsupported."
+        }
+      ],
+      "default_reasoning_effort": "low",
+      "default_text_verbosity": "low",
+      "eligibility": {
+        "prohibited_scenario_families": [
+          "resource-lifecycle",
+          "migration"
+        ],
+        "risk_classes": [
+          "standard-lite",
+          "high"
+        ],
+        "workload_classes": [
+          "bounded-exploration",
+          "research-sidecar"
+        ]
+      },
+      "family": "gpt-5.6-candidate",
+      "lower_reasoning_effort": "none",
+      "mode": "standard",
+      "model_id": "openai/gpt-5.6-terra",
+      "profile_id": "candidate-terra-explore",
+      "promotion_state": "active_default",
+      "provenance": {
+        "kind": "official_guidance",
+        "note": "Exact model identity is a quality-first hypothesis; installed runtime support and behavioral superiority remain unverified.",
+        "reference": "https://models.dev/models/openai/gpt-5.6-terra/"
+      },
+      "rationale": "Evaluate Terra only for bounded exploration or research sidecars where completeness does not regress.",
+      "role": "explore",
+      "text_verbosity_options": [
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "allowed_reasoning_efforts": [
+        "medium",
+        "low"
+      ],
+      "capabilities": [
+        {
+          "capability_id": "reasoning_effort_xhigh",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "This capability is outside the bounded Milestone 2 comparison."
+        },
+        {
+          "capability_id": "reasoning_effort_max",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Max remains out of the comparison until installed-runtime evidence proves the option surface."
+        },
+        {
+          "capability_id": "mode_pro",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Pro mode remains out of the comparison because no installed OpenCode option key is proven."
+        },
+        {
+          "capability_id": "persisted_reasoning",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Persisted reasoning remains out of scope because no safe installed host integration is proven."
+        },
+        {
+          "capability_id": "temperature",
+          "classification": "unsupported",
+          "installed_runtime_evidence_id": null,
+          "rationale": "GPT-5.6 candidate profiles omit temperature; provider metadata marks it unsupported."
+        }
+      ],
+      "default_reasoning_effort": "medium",
+      "default_text_verbosity": "low",
+      "eligibility": {
+        "prohibited_scenario_families": [
+          "resource-lifecycle",
+          "migration"
+        ],
+        "risk_classes": [
+          "standard-lite",
+          "high"
+        ],
+        "workload_classes": [
+          "bounded-exploration",
+          "research-sidecar"
+        ]
+      },
+      "family": "gpt-5.6-candidate",
+      "lower_reasoning_effort": "low",
+      "mode": "standard",
+      "model_id": "openai/gpt-5.6-terra",
+      "profile_id": "candidate-terra-researcher",
+      "promotion_state": "active_default",
+      "provenance": {
+        "kind": "official_guidance",
+        "note": "Exact model identity is a quality-first hypothesis; installed runtime support and behavioral superiority remain unverified.",
+        "reference": "https://models.dev/models/openai/gpt-5.6-terra/"
+      },
+      "rationale": "Evaluate Terra only for bounded exploration or research sidecars where completeness does not regress.",
+      "role": "researcher",
+      "text_verbosity_options": [
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "allowed_reasoning_efforts": [
+        "high",
+        "medium"
+      ],
+      "capabilities": [
+        {
+          "capability_id": "reasoning_effort_xhigh",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "This capability is outside the bounded Milestone 2 comparison."
+        },
+        {
+          "capability_id": "reasoning_effort_max",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Max remains out of the comparison until installed-runtime evidence proves the option surface."
+        },
+        {
+          "capability_id": "mode_pro",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Pro mode remains out of the comparison because no installed OpenCode option key is proven."
+        },
+        {
+          "capability_id": "persisted_reasoning",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Persisted reasoning remains out of scope because no safe installed host integration is proven."
+        },
+        {
+          "capability_id": "temperature",
+          "classification": "unsupported",
+          "installed_runtime_evidence_id": null,
+          "rationale": "GPT-5.6 candidate profiles omit temperature; provider metadata marks it unsupported."
+        }
+      ],
+      "default_reasoning_effort": "high",
+      "default_text_verbosity": "low",
+      "eligibility": {
+        "prohibited_scenario_families": [],
+        "risk_classes": [
+          "standard-lite",
+          "high",
+          "critical"
+        ],
+        "workload_classes": [
+          "general",
+          "bounded-exploration",
+          "research-sidecar",
+          "high-volume"
+        ]
+      },
+      "family": "gpt-5.6-candidate",
+      "lower_reasoning_effort": "medium",
+      "mode": "standard",
+      "model_id": "openai/gpt-5.6-sol",
+      "profile_id": "candidate-sol-improver",
+      "promotion_state": "active_default",
+      "provenance": {
+        "kind": "official_guidance",
+        "note": "Exact model identity is a quality-first hypothesis; installed runtime support and behavioral superiority remain unverified.",
+        "reference": "https://developers.openai.com/api/docs/guides/latest-model?model=gpt-5.6"
+      },
+      "rationale": "Evaluate Sol for decision, architecture, implementation, review, diagnosis, verification, or integration work.",
+      "role": "improver",
+      "text_verbosity_options": [
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "allowed_reasoning_efforts": [
+        "high",
+        "medium"
+      ],
+      "capabilities": [
+        {
+          "capability_id": "reasoning_effort_xhigh",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "This capability is outside the bounded Milestone 2 comparison."
+        },
+        {
+          "capability_id": "reasoning_effort_max",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Max remains out of the comparison until installed-runtime evidence proves the option surface."
+        },
+        {
+          "capability_id": "mode_pro",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Pro mode remains out of the comparison because no installed OpenCode option key is proven."
+        },
+        {
+          "capability_id": "persisted_reasoning",
+          "classification": "not_applicable",
+          "installed_runtime_evidence_id": null,
+          "rationale": "Persisted reasoning remains out of scope because no safe installed host integration is proven."
+        },
+        {
+          "capability_id": "temperature",
+          "classification": "unsupported",
+          "installed_runtime_evidence_id": null,
+          "rationale": "GPT-5.6 candidate profiles omit temperature; provider metadata marks it unsupported."
+        }
+      ],
+      "default_reasoning_effort": "high",
+      "default_text_verbosity": "low",
+      "eligibility": {
+        "prohibited_scenario_families": [
+          "resource-lifecycle",
+          "migration"
+        ],
+        "risk_classes": [
+          "standard-lite"
+        ],
+        "workload_classes": [
+          "high-volume"
+        ]
+      },
+      "family": "gpt-5.6-candidate",
+      "lower_reasoning_effort": "medium",
+      "mode": "standard",
+      "model_id": "openai/gpt-5.6-luna",
+      "profile_id": "candidate-luna-general-high-volume",
+      "promotion_state": "evaluation_only",
+      "provenance": {
+        "kind": "official_guidance",
+        "note": "Evaluation-only exact model identity; no runtime or quality acceptance is claimed.",
+        "reference": "https://models.dev/models/openai/gpt-5.6-luna/"
+      },
+      "rationale": "Evaluate only for high-volume, low-risk implementation work and reject any hidden-quality regression.",
+      "role": "general",
+      "text_verbosity_options": [
+        "low",
+        "medium"
+      ]
+    }
+  ],
+  "role_mappings": [
+    {
+      "baseline_profile_id": "baseline-orchestrator",
+      "candidate_profile_id": "candidate-sol-orchestrator",
+      "hypothesis": "Sol may improve quality for this decision or execution role; paired hidden-quality evidence decides.",
+      "mapping_id": "map-orchestrator-primary",
+      "role": "orchestrator"
+    },
+    {
+      "baseline_profile_id": "baseline-orchestrator-deep",
+      "candidate_profile_id": "candidate-sol-orchestrator-deep",
+      "hypothesis": "Sol may improve quality for this decision or execution role; paired hidden-quality evidence decides.",
+      "mapping_id": "map-orchestrator-deep-primary",
+      "role": "orchestrator-deep"
+    },
+    {
+      "baseline_profile_id": "baseline-architect",
+      "candidate_profile_id": "candidate-sol-architect",
+      "hypothesis": "Sol may improve quality for this decision or execution role; paired hidden-quality evidence decides.",
+      "mapping_id": "map-architect-primary",
+      "role": "architect"
+    },
+    {
+      "baseline_profile_id": "baseline-general",
+      "candidate_profile_id": "candidate-sol-general",
+      "hypothesis": "Sol may improve quality for this decision or execution role; paired hidden-quality evidence decides.",
+      "mapping_id": "map-general-primary",
+      "role": "general"
+    },
+    {
+      "baseline_profile_id": "baseline-reviewer",
+      "candidate_profile_id": "candidate-sol-reviewer",
+      "hypothesis": "Sol may improve quality for this decision or execution role; paired hidden-quality evidence decides.",
+      "mapping_id": "map-reviewer-primary",
+      "role": "reviewer"
+    },
+    {
+      "baseline_profile_id": "baseline-review-orchestrator",
+      "candidate_profile_id": "candidate-sol-review-orchestrator",
+      "hypothesis": "Sol may improve quality for this decision or execution role; paired hidden-quality evidence decides.",
+      "mapping_id": "map-review-orchestrator-primary",
+      "role": "review-orchestrator"
+    },
+    {
+      "baseline_profile_id": "baseline-verifier",
+      "candidate_profile_id": "candidate-sol-verifier",
+      "hypothesis": "Sol may improve quality for this decision or execution role; paired hidden-quality evidence decides.",
+      "mapping_id": "map-verifier-primary",
+      "role": "verifier"
+    },
+    {
+      "baseline_profile_id": "baseline-diagnose",
+      "candidate_profile_id": "candidate-sol-diagnose",
+      "hypothesis": "Sol may improve quality for this decision or execution role; paired hidden-quality evidence decides.",
+      "mapping_id": "map-diagnose-primary",
+      "role": "diagnose"
+    },
+    {
+      "baseline_profile_id": "baseline-explore",
+      "candidate_profile_id": "candidate-terra-explore",
+      "hypothesis": "Terra may preserve bounded discovery completeness at lower cost; hidden completeness metrics decide.",
+      "mapping_id": "map-explore-primary",
+      "role": "explore"
+    },
+    {
+      "baseline_profile_id": "baseline-researcher",
+      "candidate_profile_id": "candidate-terra-researcher",
+      "hypothesis": "Terra may preserve bounded discovery completeness at lower cost; hidden completeness metrics decide.",
+      "mapping_id": "map-researcher-primary",
+      "role": "researcher"
+    },
+    {
+      "baseline_profile_id": "baseline-improver",
+      "candidate_profile_id": "candidate-sol-improver",
+      "hypothesis": "Sol may improve quality for this decision or execution role; paired hidden-quality evidence decides.",
+      "mapping_id": "map-improver-primary",
+      "role": "improver"
+    },
+    {
+      "baseline_profile_id": "baseline-general",
+      "candidate_profile_id": "candidate-luna-general-high-volume",
+      "hypothesis": "Luna may be useful only for standard-lite high-volume work when hidden quality does not regress.",
+      "mapping_id": "map-general-luna-evaluation",
+      "role": "general"
+    }
+  ],
+  "runtime_capability_requirements": [
+    {
+      "capability_id": "reasoning_effort_xhigh",
+      "classification": "required",
+      "installed_runtime_evidence_id": null,
+      "rationale": "Hard architecture and review candidates need installed evidence that xhigh is effective, not ignored."
+    },
+    {
+      "capability_id": "reasoning_effort_max",
+      "classification": "not_applicable",
+      "installed_runtime_evidence_id": null,
+      "rationale": "Max comparisons are excluded until the installed runtime proves an exact supported option."
+    },
+    {
+      "capability_id": "mode_pro",
+      "classification": "not_applicable",
+      "installed_runtime_evidence_id": null,
+      "rationale": "Pro comparisons are excluded because no OpenCode configuration key has installed-runtime proof."
+    }
+  ],
+  "schema_version": 1,
+  "sources": [
+    {
+      "claim_scope": "Exact GPT-5.6 model identities and migration guidance.",
+      "id": "openai-latest-model-guide",
+      "url": "https://developers.openai.com/api/docs/guides/latest-model?model=gpt-5.6"
+    },
+    {
+      "claim_scope": "Reasoning effort and API-level reasoning capabilities; not proof of OpenCode option keys.",
+      "id": "openai-reasoning-guide",
+      "url": "https://developers.openai.com/api/docs/guides/reasoning"
+    },
+    {
+      "claim_scope": "Documented OpenCode agent model and camelCase option surface.",
+      "id": "opencode-agent-docs",
+      "url": "https://opencode.ai/docs/agents/"
+    },
+    {
+      "claim_scope": "Provider model identity and temperature capability metadata.",
+      "id": "models-dev-sol",
+      "url": "https://models.dev/models/openai/gpt-5.6-sol/"
+    },
+    {
+      "claim_scope": "Provider model identity for the bounded exploration hypothesis.",
+      "id": "models-dev-terra",
+      "url": "https://models.dev/models/openai/gpt-5.6-terra/"
+    },
+    {
+      "claim_scope": "Provider model identity for the evaluation-only high-volume hypothesis.",
+      "id": "models-dev-luna",
+      "url": "https://models.dev/models/openai/gpt-5.6-luna/"
+    }
+  ]
+}

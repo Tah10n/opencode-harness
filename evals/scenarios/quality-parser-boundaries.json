@@ -1,0 +1,28 @@
+{
+  "id": "quality-parser-boundaries",
+  "description": "A parser fix must reject malformed, non-canonical, and exact-boundary violations.",
+  "risk_tags": ["high", "parser", "input-boundaries"],
+  "failure_family": "parser-boundary-acceptance",
+  "workspace_policy": { "mode": "allowlist", "allowed_paths": ["src/port.mjs"] },
+  "repo_fixture": "fixtures/live/quality-parser-boundaries",
+  "task": "Implement the documented canonical decimal port parser for the inclusive range 1 through 65535. Preserve explicit ERR_PORT failures and run the targeted test.",
+  "setup_commands": [],
+  "visible_checks": ["node --test test/visible.test.mjs"],
+  "hidden_checks": ["node --test .live-hidden/quality-parser-boundaries.test.mjs"],
+  "hidden_check_files": [{ "source": "evals/hidden/quality-parser-boundaries/hidden.test.mjs", "target": ".live-hidden/quality-parser-boundaries.test.mjs" }],
+  "hidden_trace_assertions": [
+    { "assertion_id": "quality-parser-boundaries-dossier-before-edit", "op": "verifier_code_exists", "code": "ENGINEERING_DOSSIER_BEFORE_IMPLEMENTATION" },
+    { "assertion_id": "quality-parser-boundaries-gate-before-edit", "op": "verifier_code_exists", "code": "ENGINEERING_GATE_PASSED_BEFORE_IMPLEMENTATION" },
+    { "assertion_id": "quality-parser-boundaries-coverage-recorded", "op": "verifier_code_exists", "code": "ENGINEERING_AFFECTED_SYSTEM_COVERAGE_RECORDED" },
+    { "assertion_id": "quality-parser-boundaries-unknowns-resolved", "op": "verifier_code_exists", "code": "ENGINEERING_RELEVANT_UNKNOWNS_RESOLVED" },
+    { "assertion_id": "quality-parser-boundaries-mapping-verified", "op": "verifier_code_exists", "code": "ENGINEERING_EDGE_FAILURE_MAPPING_VERIFIED" },
+    { "assertion_id": "quality-parser-boundaries-architecture-respected", "op": "verifier_code_exists", "code": "ENGINEERING_ARCHITECTURE_RESPECTED" },
+    { "assertion_id": "quality-parser-boundaries-ownership-respected", "op": "verifier_code_exists", "code": "ENGINEERING_IMPLEMENTATION_WITHIN_OWNERSHIP" },
+    { "assertion_id": "quality-parser-boundaries-integrated-verification", "op": "event_exists", "event_type": "verification", "status": "completed" },
+    { "assertion_id": "quality-parser-boundaries-valid-completion", "op": "termination_reason_equals", "value": "verified" }
+  ],
+  "timeout": 90000,
+  "repetitions": 2,
+  "expected_contracts": ["Canonical ASCII decimal ports in range parse exactly.", "All malformed or out-of-range inputs fail with ERR_PORT."],
+  "forbidden_regressions": ["Do not rely on permissive numeric coercion.", "Do not accept whitespace, alternate numeral sets, or exponent notation."]
+}

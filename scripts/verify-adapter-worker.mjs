@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { EventEmitter } from "node:events";
 import { pathToFileURL } from "node:url";
 
 import {
@@ -34,6 +35,205 @@ try {
   });
   assert.equal(result.passed, true);
   assert.deepEqual(operations, [{ operation: "emit", payload: { summary: "safe" } }]);
+
+  const workingDirectoryFixture = path.join(tmp, "working-directory-fixture");
+  const nestedWorkingDirectory = path.join(workingDirectoryFixture, "nested");
+  fs.mkdirSync(nestedWorkingDirectory, { recursive: true });
+  fs.writeFileSync(path.join(tmp, "relative-sentinel.txt"), "parent", "utf8");
+  fs.writeFileSync(path.join(tmp, "parent-only-sentinel.txt"), "parent-only", "utf8");
+  fs.writeFileSync(path.join(workingDirectoryFixture, "relative-sentinel.txt"), "fixture", "utf8");
+  const cwdAdapter = path.join(tmp, "working-directory-adapter.mjs");
+  fs.writeFileSync(cwdAdapter, `import fs from "node:fs";
+export async function runScenario() {
+  const sentinel = fs.readFileSync("relative-sentinel.txt", "utf8");
+  const parentOnlyVisible = fs.existsSync("parent-only-sentinel.txt");
+  fs.writeFileSync("relative-output.txt", "fixture-output", "utf8");
+  return { cwd: process.cwd(), sentinel, parent_only_visible: parentOnlyVisible };
+}
+`, "utf8");
+  const cwdResult = await runAdapterModule({
+    adapterUrl: adapterUrl(cwdAdapter),
+    context: {},
+    timeout: 2000,
+    workingDirectory: workingDirectoryFixture,
+  });
+  assert.equal(cwdResult.cwd, workingDirectoryFixture);
+  assert.equal(cwdResult.sentinel, "fixture");
+  assert.equal(cwdResult.parent_only_visible, false);
+  assert.equal(fs.readFileSync(path.join(workingDirectoryFixture, "relative-output.txt"), "utf8"), "fixture-output");
+  assert.equal(fs.existsSync(path.join(tmp, "relative-output.txt")), false);
+
+  let processFactoryInput = null;
+  const factoryResult = await runAdapterModule({
+    adapterUrl: adapterUrl(adapter),
+    context: {},
+    timeout: 2000,
+    workingDirectory: workingDirectoryFixture,
+    processFactory: (input) => {
+      processFactoryInput = input;
+      const child = new EventEmitter();
+      child.pid = 4242;
+      child.connected = true;
+      child.send = (message) => {
+        if (message?.type === "initialize") {
+          queueMicrotask(() => child.emit("message", { type: "result", result_json: "{\"passed\":true}" }));
+        }
+      };
+      return child;
+    },
+    treeTeardown: async () => true,
+  });
+  assert.equal(factoryResult.passed, true);
+  assert.equal(processFactoryInput.cwd, workingDirectoryFixture);
+
+  const workingDirectoryFile = path.join(tmp, "working-directory-file.txt");
+  fs.writeFileSync(workingDirectoryFile, "not-a-directory", "utf8");
+  const linkedWorkingDirectory = path.join(tmp, "working-directory-link");
+  fs.symlinkSync(
+    workingDirectoryFixture,
+    linkedWorkingDirectory,
+    process.platform === "win32" ? "junction" : "dir",
+  );
+  let invalidSpawnAttempts = 0;
+  for (const invalidWorkingDirectory of [
+    "relative-working-directory",
+    path.join(tmp, "missing-working-directory"),
+    workingDirectoryFile,
+    `${workingDirectoryFixture}${path.sep}..${path.sep}${path.basename(workingDirectoryFixture)}`,
+    path.join(linkedWorkingDirectory, "nested"),
+  ]) {
+    await assert.rejects(runAdapterModule({
+      adapterUrl: adapterUrl(adapter),
+      context: {},
+      timeout: 2000,
+      workingDirectory: invalidWorkingDirectory,
+      processFactory: () => {
+        invalidSpawnAttempts += 1;
+        throw new Error("invalid working directory reached spawn");
+      },
+    }), (error) => (
+      error instanceof AdapterExecutionError
+      && error.classification === "adapter_working_directory_invalid"
+    ));
+  }
+  assert.equal(invalidSpawnAttempts, 0, "invalid working directory reached processFactory");
+
+  await assert.rejects(runAdapterModule({
+    adapterUrl: adapterUrl(adapter),
+    context: {},
+    timeout: 2000,
+    workingDirectory: workingDirectoryFixture,
+    processFactory: () => { throw new Error("synchronous spawn failure"); },
+  }), (error) => (
+    error instanceof AdapterExecutionError
+    && error.classification === "adapter_process_spawn_failed"
+  ));
+
+  await assert.rejects(runAdapterModule({
+    adapterUrl: adapterUrl(adapter),
+    context: {},
+    timeout: 2000,
+    workingDirectory: workingDirectoryFixture,
+    processFactory: () => {
+      const child = new EventEmitter();
+      child.connected = false;
+      child.send = () => {};
+      queueMicrotask(() => child.emit("error", new Error("asynchronous spawn failure")));
+      return child;
+    },
+  }), (error) => (
+    error instanceof AdapterExecutionError
+    && error.classification === "adapter_process_spawn_failed"
+  ));
+
+  const qualityAdapter = path.join(tmp, "quality-facade.mjs");
+  fs.writeFileSync(qualityAdapter, `export async function runScenario(context) {
+  const created = await context.quality.createDossier({ dossier_id: "dossier-one" });
+  const updated = await context.quality.updateDossier({ expected_revision: created.revision, patch: { summary: "bounded" } });
+  const architecture = await context.quality.evaluateArchitecture({ expected_revision: updated.revision });
+  const finalized = await context.quality.finalizeDossier({ expected_revision: updated.revision });
+  const inspected = await context.quality.inspect();
+  const authorized = await context.quality.authorizeAction({ kind: "edit", intent: "implementation", writable: true, write_scope: ["src/app.mjs"] });
+  return { passed: architecture.status === "not_configured" && finalized.status === "passed" && inspected.ready && authorized.authorized };
+}
+`, "utf8");
+  const qualityOperations = [];
+  const qualityResult = await runAdapterModule({
+    adapterUrl: adapterUrl(qualityAdapter),
+    context: {},
+    timeout: 2000,
+    onTrace: (operation, payload) => {
+      qualityOperations.push({ operation, payload });
+      if (operation === "quality_create_dossier") return { revision: 1 };
+      if (operation === "quality_update_dossier") return { revision: 2 };
+      if (operation === "quality_evaluate_architecture") return { status: "not_configured" };
+      if (operation === "quality_finalize_dossier") return { status: "passed" };
+      if (operation === "quality_inspect") return { ready: true };
+      if (operation === "quality_authorize_action") return { authorized: true };
+      throw new Error("unexpected operation");
+    },
+  });
+  assert.equal(qualityResult.passed, true);
+  assert.deepEqual(qualityOperations.map((entry) => entry.operation), [
+    "quality_create_dossier",
+    "quality_update_dossier",
+    "quality_evaluate_architecture",
+    "quality_finalize_dossier",
+    "quality_inspect",
+    "quality_authorize_action",
+  ]);
+
+  const responseQuotaAdapter = path.join(tmp, "response-quota.mjs");
+  fs.writeFileSync(responseQuotaAdapter, `export async function runScenario(context) {
+  await context.quality.inspect();
+  return { passed: true };
+}
+`, "utf8");
+  const unicodeResponse = { accepted: "é😀" };
+  const unicodeResponseBytes = Buffer.byteLength(JSON.stringify(unicodeResponse), "utf8");
+  const exactResponseResult = await runAdapterModule({
+    adapterUrl: adapterUrl(responseQuotaAdapter),
+    context: {},
+    timeout: 2000,
+    traceLimits: {
+      responseBytes: unicodeResponseBytes,
+      totalResponseBytes: unicodeResponseBytes,
+      totalBidirectionalBytes: 1024,
+    },
+    onTrace: () => unicodeResponse,
+  });
+  assert.equal(exactResponseResult.passed, true);
+  await assert.rejects(runAdapterModule({
+    adapterUrl: adapterUrl(responseQuotaAdapter),
+    context: {},
+    timeout: 2000,
+    traceLimits: { responseBytes: unicodeResponseBytes - 1 },
+    onTrace: () => unicodeResponse,
+  }), (error) => error instanceof AdapterExecutionError && error.classification === "adapter_trace_quota_exceeded");
+
+  const repeatedResponseAdapter = path.join(tmp, "repeated-response-quota.mjs");
+  fs.writeFileSync(repeatedResponseAdapter, `export async function runScenario(context) {
+  await context.quality.inspect({ sequence: 1 });
+  await context.quality.inspect({ sequence: 2 });
+  return { passed: true };
+}
+`, "utf8");
+  const compactResponse = { ready: true };
+  const compactResponseBytes = Buffer.byteLength(JSON.stringify(compactResponse), "utf8");
+  await assert.rejects(runAdapterModule({
+    adapterUrl: adapterUrl(repeatedResponseAdapter),
+    context: {},
+    timeout: 2000,
+    traceLimits: { totalResponseBytes: compactResponseBytes * 2 - 1 },
+    onTrace: () => compactResponse,
+  }), (error) => error instanceof AdapterExecutionError && error.classification === "adapter_trace_quota_exceeded");
+
+  await assert.rejects(runAdapterModule({
+    adapterUrl: adapterUrl(responseQuotaAdapter),
+    context: {},
+    timeout: 2000,
+    onTrace: () => new Map([["ready", true]]),
+  }), (error) => error instanceof AdapterExecutionError && error.classification === "adapter_trace_quota_exceeded");
 
   const commandResult = await runManagedCommand({
     file: process.execPath,
@@ -303,7 +503,7 @@ export async function runScenario() {
     treeTeardown: async () => false,
   }), (error) => error instanceof ProcessTreeTeardownError);
 
-  console.log("Adapter process self-tests passed (managed commands, tree teardown, timeout, trace quotas, queued trace, and teardown failure)." );
+  console.log("Adapter process self-tests passed (working-directory confinement, managed commands, tree teardown, timeout, trace quotas, queued trace, and teardown failure)." );
 } finally {
   fs.rmSync(tmp, { recursive: true, force: true });
 }

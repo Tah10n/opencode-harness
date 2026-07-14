@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Cross-field reason, catalog, architecture, and fingerprint rules are canonical in lib/quality/gate.mjs.",
+  "title": "OpenCode Harness Engineering Gate Decision v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "gate_id",
+    "dossier_id",
+    "dossier_fingerprint",
+    "task_id",
+    "risk_class",
+    "status",
+    "reasons",
+    "check_catalog_fingerprint",
+    "preimplementation_evidence_fingerprint",
+    "architecture_evaluation_fingerprint",
+    "evaluated_at",
+    "fingerprint"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "gate_id": { "$ref": "#/$defs/id" },
+    "dossier_id": { "$ref": "#/$defs/id" },
+    "dossier_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "task_id": { "$ref": "#/$defs/id" },
+    "risk_class": { "enum": ["standard-lite", "high", "critical"] },
+    "status": { "enum": ["passed", "blocked"] },
+    "reasons": { "type": "array", "maxItems": 128 },
+    "check_catalog_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "preimplementation_evidence_fingerprint": {
+      "oneOf": [
+        { "type": "null" },
+        { "$ref": "#/$defs/fingerprint" }
+      ]
+    },
+    "architecture_evaluation_fingerprint": {
+      "oneOf": [
+        { "type": "null" },
+        { "$ref": "#/$defs/fingerprint" }
+      ]
+    },
+    "evaluated_at": { "type": "string", "format": "date-time" },
+    "fingerprint": { "$ref": "#/$defs/fingerprint" }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$" },
+    "fingerprint": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  },
+  "additionalProperties": false
+}

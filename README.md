@@ -12,8 +12,15 @@ This repository contains a reusable OpenCode behavior profile:
 - review and re-review ledger workflow;
 - high-assurance quality gates for baseline, behavior contracts, edge/failure
   matrices, verification ladders, and final adversarial audit;
+- a runner-owned, versioned Engineering Dossier and computational
+  pre-implementation gate with persisted baseline/plan-challenge execution
+  receipts, bounded impact graphs, optional project architecture policies, and
+  explicit invariant/edge/failure/test mappings;
 - an executable feedback plane: schema-v2 operational traces, immutable live
   reports, paired baseline/candidate assessment, and explicit decisions;
+- active GPT-5.6 Sol/Terra role profiles, a retained fingerprinted GPT-5.5
+  comparison baseline, and evaluation-only Luna, with prompt-inventory and
+  runtime-evidence boundaries;
 - trace, budget/termination, and shared subagent result-schema contracts;
 - a strict read-only primary review orchestrator for diff and release review;
 - recursive-context operating rules;
@@ -56,7 +63,9 @@ readiness guidance lives in [docs/harnessability.md](docs/harnessability.md).
 Trace, budget, and subagent handoff contracts live in
 [docs/trace-contract.md](docs/trace-contract.md),
 [docs/budgets-and-termination.md](docs/budgets-and-termination.md), and
-[docs/subagent-result-schema.md](docs/subagent-result-schema.md).
+[docs/subagent-result-schema.md](docs/subagent-result-schema.md). The model
+matrix and evidence protocol live in
+[docs/model-profiles.md](docs/model-profiles.md).
 
 ## Adoption
 
@@ -123,6 +132,7 @@ Node ESM integrations import the public package boundary:
 
 ```js
 import { createAdapterInstrumentation, createTraceStore } from "opencode-harness/feedback";
+import { createEngineeringDossierDraft, evaluateEngineeringGate } from "opencode-harness/quality";
 ```
 
 `opencode-harness/trace-store` is a compatibility export. The trace CLI exposes
@@ -151,6 +161,32 @@ when changing adoption contents or package boundaries:
 ```powershell
 npm run verify:adoption-bundle
 ```
+
+Milestone 2's model-free quality checks are also available individually:
+
+```powershell
+npm run verify:quality-contracts
+npm run verify:engineering-dossier
+npm run verify:architecture-policy
+npm run verify:impact-graph
+npm run verify:model-profiles
+npm run verify:prompt-inventory
+npm run verify:quality-live-coordinator
+npm run verify:quality-live-runner
+npm run verify:quality-live-manifests
+npm run verify:quality-acceptance
+npm run verify:milestone-2-dod-contract
+```
+
+The DoD contract command validates only the manifest and status policy: it
+consumes no execution receipts and asserts no milestone completion status.
+`npm run verify` is the runner-owned sequential aggregator. It emits bounded
+in-memory receipts for every deterministic DoD check and exits as `verified`
+when those mandatory checks pass. Installed-runtime evidence and live A/B
+evidence are optional external inputs. These commands validate contracts, schemas, failure
+cases, corpus structure, and evaluation logic. The prompt inventory covers 11 agent prompts and eight
+skill entrypoints. These checks do not prove an installed model profile or
+actual GPT-5.6 quality.
 
 Run the installed-profile runtime sensor after copying the profile into a live
 OpenCode configuration:
@@ -184,16 +220,24 @@ the infrastructure tracing self-test without an LLM. Keep these layers
 separate:
 
 1. `npm run verify` — deterministic repository, feedback-plane, and portable
-   adoption-bundle contracts.
-2. `npm run verify:runtime` — effective installed permission surface.
+   adoption-bundle contracts, including the model-free Engineering Dossier,
+   gate, impact, model-profile, prompt, quality-corpus, and acceptance checks.
+2. `npm run verify:runtime` — effective installed permission surface; use
+   `-- --all-experiment-models --profile-role baseline|candidate` to capture
+   every distinct planned model-option invocation into the same dedicated
+   runtime-evidence directory.
 3. `npm run eval:live` — actual adapter/model/tool behaviour.
 4. `npm run assess:candidate` — policy-backed accepted/rejected/inconclusive
-   decision over trusted baseline/candidate evidence.
+   decision over trusted legacy evidence; schema-v2 quality evidence uses
+   `npm run assess:quality-candidate -- ...`.
 
 Capture first-party static evidence with
 `npm run evidence:static -- --candidate-id <id>`. Capture installed permission
 evidence for that exact source snapshot with
-`npm run verify:runtime -- --evidence-profile <id> --subject-evidence <static.json>`.
+`npm run verify:runtime -- --evidence-profile <runtime-profile-id> --subject-id <static-candidate-id> --subject-evidence <static.json>`.
+`--subject-id` keeps the shared repository subject identity separate from the
+baseline/candidate runtime-profile labels; when omitted it defaults to the
+evidence profile for backward compatibility.
 The runtime producer inventories installed agents with `opencode agent list`,
 records each `{name, mode}` and every discovered permission surface, and binds
 them to a content attestation. Required modes and exclusive web/learning
@@ -225,17 +269,68 @@ examples/              copyable examples for host profiles and projects
 fixtures/              static evaluation fixtures
 evals/                 policies, suites, scenarios, and hidden checks
 lib/feedback/          operational trace, reports, and acceptance APIs
+lib/quality/           dossier, gate, impact, model, prompt, and quality APIs
+quality/               checked schemas, policies, profiles, and live sidecars
 scripts/               local deterministic harness checks
 .oc_harness/           ignored machine-local runs and evidence
 ```
 
-## Why this is a harness
+## Active GPT-5.6 Profiles
+
+The checked-in agents now use explicit GPT-5.6 IDs directly:
+`openai/gpt-5.6-sol` for primary
+implementation, architecture, review, diagnosis, decisions, and integration;
+`openai/gpt-5.6-terra` for bounded read-heavy exploration and research; and
+`openai/gpt-5.6-luna` only for evaluation-only, high-volume, low-risk
+`standard-lite` experiments. Luna is not an active agent and is prohibited for
+critical canaries. The fingerprinted GPT-5.5 profiles remain only as an
+optional comparison baseline.
+
+The active profiles preserve each role's existing reasoning effort and low text
+verbosity while omitting `temperature`. The optional comparison plan also compares
+the same and one-lower effort, and evaluates low/medium verbosity where complete
+dossiers or reports matter. `max`, API pro
+mode, persisted reasoning, and other nested provider features remain disabled
+until the installed OpenCode runtime proves their exact supported surface.
+
+The direct model switch does not claim measured superiority and does not depend
+on A/B execution. If comparative evidence is wanted later, runtime compatibility
+can be captured with both
+`npm run verify:runtime -- --all-experiment-models --profile-role baseline`
+and the matching `candidate` command against their installed runtime roots.
+The producer publishes a completion marker only after every exact invocation
+is eligible, and a comparative quality claim requires paired live evidence from
+a compatible adapter. Without those optional inputs, behavioural superiority
+is explicitly unverified while GPT-5.6 Sol/Terra remain active. See
+[docs/model-profiles.md](docs/model-profiles.md).
+
+## Why This Is A Harness
 
 Plugins add tools. A harness defines the agent runtime behavior around those
 tools: orchestration, safety, delegation, context gathering, review loops, and
 verification discipline.
 
-The design is informed by Martin Fowler's
-[harness engineering for coding agents](https://martinfowler.com/articles/harness-engineering.html)
-framing and by runtime practices from
+## Design Influences
+
+The feedforward/feedback and computational/inferential framing is adapted from
+Birgitta Böckeler's
+[Harness engineering](https://martinfowler.com/articles/harness-engineering.html)
+article, published on Martin Fowler's site. Operational role and workflow
+practices are also informed by
 [DenisSergeevitch/agents-best-practices](https://github.com/DenisSergeevitch/agents-best-practices).
+
+From Lilian Weng's July 4, 2026 article,
+[Harness Engineering for Self-Improvement](https://lilianweng.github.io/posts/2026-07-04-harness/),
+this repository adapts workflow automation around plan/execute/observe/improve,
+filesystem artifacts as bounded operational memory, explicit and inspectable
+subagent jobs, structured context engineering instead of prompt growth,
+verifier-grounded evaluation, and propose/evaluate/accept separation with
+held-out regression protection.
+
+These are design influences, not a claim that this repository implements every
+system or paper discussed by those sources. The harness has an evaluation and
+acceptance plane, but it does not autonomously apply candidate edits to the
+active profile. Permissions, security controls, hidden checks, and the
+acceptance policy remain outside any future proposal loop. Rejected candidates
+never mutate the active harness, and an accepted decision is still evidence for
+a separate human-reviewed change.

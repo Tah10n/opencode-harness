@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Tah10n/opencode-harness/quality/schemas/architecture-evaluation.schema.json",
+  "title": "Architecture policy evaluation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "evaluation_id",
+    "status",
+    "computational",
+    "policy_id",
+    "policy_fingerprint",
+    "graph_id",
+    "graph_fingerprint",
+    "baseline_graph_id",
+    "baseline_graph_fingerprint",
+    "evaluators",
+    "violations",
+    "summary",
+    "fingerprint"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "evaluation_id": { "type": "string", "pattern": "^ARCHEVAL-[A-Za-z0-9._-]{1,118}$" },
+    "status": { "enum": ["passed", "failed", "blocked", "not_configured"] },
+    "computational": { "type": "boolean" },
+    "policy_id": { "type": ["string", "null"], "pattern": "^ARCHPOLICY-" },
+    "policy_fingerprint": { "$ref": "#/$defs/nullable_fingerprint" },
+    "graph_id": { "type": "string", "pattern": "^GRAPH-" },
+    "graph_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "baseline_graph_id": { "type": ["string", "null"], "pattern": "^GRAPH-" },
+    "baseline_graph_fingerprint": { "$ref": "#/$defs/nullable_fingerprint" },
+    "evaluators": {
+      "type": "array",
+      "maxItems": 64,
+      "items": { "$ref": "#/$defs/evaluator" }
+    },
+    "violations": {
+      "type": "array",
+      "maxItems": 128,
+      "items": { "$ref": "#/$defs/violation" }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["introduced_count", "unchanged_count", "blocking_count"],
+      "properties": {
+        "introduced_count": { "type": "integer", "minimum": 0, "maximum": 128 },
+        "unchanged_count": { "type": "integer", "minimum": 0, "maximum": 128 },
+        "blocking_count": { "type": "integer", "minimum": 0, "maximum": 128 }
+      }
+    },
+    "fingerprint": { "$ref": "#/$defs/fingerprint" }
+  },
+  "$defs": {
+    "fingerprint": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "nullable_fingerprint": {
+      "anyOf": [
+        { "$ref": "#/$defs/fingerprint" },
+        { "type": "null" }
+      ]
+    },
+    "safe_id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$" },
+    "evidence_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "value"],
+      "properties": {
+        "kind": { "enum": ["file", "symbol", "command", "event", "check", "run", "job", "doc", "runtime"] },
+        "value": { "type": "string", "minLength": 1, "maxLength": 512 }
+      }
+    },
+    "evaluator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "candidate_status", "baseline_status"],
+      "properties": {
+        "id": { "$ref": "#/$defs/safe_id" },
+        "candidate_status": { "enum": ["available", "unavailable", "unsupported"] },
+        "baseline_status": { "enum": ["available", "unavailable", "unsupported", "not_applicable"] }
+      }
+    },
+    "violation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["violation_id", "rule_ids", "kind", "subject_ids", "message", "evidence_refs", "disposition", "blocking"],
+      "properties": {
+        "violation_id": { "type": "string", "pattern": "^ARCHV-" },
+        "rule_ids": { "type": "array", "minItems": 1, "maxItems": 64, "uniqueItems": true, "items": { "type": "string", "pattern": "^ARCHRULE-" } },
+        "kind": { "enum": ["dependency_denied", "dependency_not_allowed", "test_coverage_missing", "cycle_detected"] },
+        "subject_ids": { "type": "array", "minItems": 1, "maxItems": 128, "uniqueItems": true, "items": { "$ref": "#/$defs/safe_id" } },
+        "message": { "type": "string", "minLength": 1, "maxLength": 2048 },
+        "evidence_refs": { "type": "array", "minItems": 1, "maxItems": 64, "uniqueItems": true, "items": { "$ref": "#/$defs/evidence_ref" } },
+        "disposition": { "enum": ["introduced", "unchanged"] },
+        "blocking": { "type": "boolean" }
+      }
+    }
+  }
+}
