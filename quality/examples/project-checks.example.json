@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "catalog_id": "project-checks-v1",
+  "standard_lite_policy": {
+    "allowed_ownership_prefixes": ["src", "test"],
+    "protected_paths": ["src/auth", "src/security"]
+  },
+  "checks": [
+    {
+      "check_id": "unit-orders",
+      "argv": ["npm", "test", "--", "test/orders.test.ts"],
+      "cwd": ".",
+      "phases": ["preimplementation", "slice", "integration"],
+      "timeout_ms": 120000,
+      "max_output_chars": 1048576
+    },
+    {
+      "check_id": "typecheck",
+      "argv": ["npm", "run", "typecheck"],
+      "cwd": ".",
+      "phases": ["integration"],
+      "timeout_ms": 120000,
+      "max_output_chars": 1048576
+    }
+  ]
+}

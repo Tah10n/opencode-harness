@@ -53,6 +53,7 @@ same list can be checked mechanically against the isolated adoption smoke.
 <!-- portable-adoption-bundle:start -->
 ```text
 .opencode/plugins/engineering-dossier.mjs
+.opencode/quality/checks.json
 .gitattributes
 .github
 .gitignore
@@ -140,6 +141,87 @@ minimal safe `context_*` surface (`context_outline`, `context_files`,
 available only through the bounded self-improvement path. Advanced
 recursive-context tools are host opt-ins.
 
+## Как работает quality gate
+
+1. `chat.message` регистрирует каждую primary development session как
+   `unclassified`.
+2. До записи orchestrator вызывает `quality_session_start` и указывает риск,
+   цель, ownership и trusted project checks.
+3. Маленькая локальная задача проходит компактный `standard-lite`: behavior
+   expectation, preserved behavior, локальные edge cases и bounded scope. Полный
+   impact graph для неё не нужен. Dossier синтезирует runner; агент не вызывает
+   для него `quality_dossier_create` или `quality_dossier_update`.
+4. `high` и `critical` требуют полный Engineering Dossier, impact graph,
+   invariants, edge/failure mappings, baseline evidence и независимые
+   contributions от architect и reviewer.
+5. Gate оценивает plugin/runner, а не агент. До runner-owned `passed` edit,
+   write, patch и writable `task.general` запрещены. Native `bash` остаётся
+   запрещённым и после gate, потому что host hook не доказывает teardown всех
+   detached descendants.
+6. После gate выдаётся одноразовое разрешение на точные файлы для bounded edit
+   или writable task. Tests, lint, typecheck и build запускаются только как
+   runner-owned project checks.
+7. Plugin сравнивает workspace до и после изменения и блокирует выход за
+   ownership. Изменение `.oc_harness` также обнаруживается отдельным control-state
+   guard. Если host аварийно завершился во время project check, durable guard
+   остаётся fail-closed до подтверждённого восстановления control state.
+8. Project checks запускаются только из `.opencode/quality/checks.json` через
+   argv и `shell: false`. Любое новое изменение делает старую verification stale.
+9. Финальная attestation возможна только для текущего workspace после всех
+   обязательных trusted checks.
+
+Native `bash` не имеет allowlist ни до, ни после классификации;
+`quality_command_authorize` возвращает `QUALITY_NATIVE_BASH_DISABLED`.
+Внутренние read-only Git
+наблюдения runner выполняет только через абсолютный executable из фиксированного
+system install location и с минимальным очищенным environment.
+
+## Что нужно настроить в проекте
+
+- `.opencode/quality/checks.json` с реальными unit, lint, typecheck, build или
+  integration commands;
+- опциональный `quality/architecture-policy.json`;
+- `WORKFLOW.md` с порядком локальной проверки и operational boundaries;
+- project-local skills для специализированных workflows.
+
+Project-local режим использует `.opencode/plugins/engineering-dossier.mjs` в
+полном source bundle. Global режим устанавливает пакет, кладёт минимальный
+wrapper из `quality/examples/global-quality-plugin.mjs` в global OpenCode plugin
+directory и всё равно читает project-local checks и architecture policy. Для
+runtime-only adoption не нужны eval corpus, harness fixtures, release docs и
+весь `scripts/`; полный bundle остаётся путём разработки самого harness.
+
+## Что computationally enforced
+
+- регистрация и lifecycle session;
+- запрет mutation до classification и gate;
+- bounded ownership, one-shot edit/task capabilities и replay denial;
+- immutable architecture-policy/catalog fingerprints и drift detection;
+- runner-owned check execution, before/after workspace binding, receipt limits
+  и отсутствие raw stdout/stderr в state. Durable receipt хранит только status,
+  exit code, signal, duration, stdout/stderr byte counts и command/evidence
+  fingerprints;
+- invalidation verification после любого изменения и runner-owned attestation.
+
+Реальное host wiring нельзя доказать одним factory import. Команда
+`probe:runtime:quality-plugin-api` проверяет только API/factory. Отдельная
+`verify:runtime:quality-hooks` требует явно выбранный доверенный host adapter.
+Verifier сам создаёт временный Git workspace и nonce, независимо наблюдает
+разрешённый file effect и повторно связывает transitive source fingerprint.
+Standalone evidence-файл проверяется только как недоверенный parser input и не
+может дать `passed`. Успех требует полной цепочки standard-lite → one-shot
+capability → authorized mutation → after-hook reconciliation → project check →
+final attestation. Если host/model/provider или adapter недоступен, команда
+честно возвращает `blocked_external_state`.
+`tool.execute.before` остаётся authoritative mutation boundary;
+`permission.ask` только сверяет host permission и никогда не повышает `ask` или
+`deny`. Это не OS sandbox: project checks выполняются с правами текущего
+пользователя. На Windows runner помещает worker и всех descendants в Job Object
+с `KILL_ON_JOB_CLOSE`; без доказуемого controller (включая текущий POSIX path)
+execution fail-closed с `QUALITY_CHECK_CONTAINMENT_UNAVAILABLE`. Даже Windows
+containment не является изоляцией hostile code от сети или доступных пользователю
+файлов, поэтому catalog должен содержать только доверенные project-owned checks.
+
 ## Local State Boundary
 
 `skills/global-memory/SKILL.md` in this repository is a clean template. It
@@ -208,6 +290,11 @@ npm run verify:prompt-inventory
 npm run verify:quality-live-coordinator
 npm run verify:quality-verification-targets
 npm run verify:normal-session-quality-bridge
+npm run verify:session-classification
+npm run verify:project-check-catalog
+npm run verify:trusted-project-runner
+npm run verify:bash-boundary
+npm run verify:global-quality-plugin-export
 npm run verify:runtime:quality-hooks:fixture
 npm run verify:quality-live-manifests
 npm run verify:quality-acceptance
@@ -220,7 +307,10 @@ consumes no execution receipts and asserts no milestone completion status.
 `npm run verify` is the runner-owned sequential aggregator. It emits bounded
 in-memory receipts for every deterministic DoD check and exits as `verified`
 when those mandatory checks pass. Installed-runtime evidence and general live
-evidence are optional external inputs. These commands validate contracts, schemas, failure
+evidence are optional external inputs. In particular,
+`probe:runtime:quality-plugin-api` is intentionally excluded from this default
+chain because it resolves a machine-local `@opencode-ai/plugin` installation.
+These commands validate contracts, schemas, failure
 cases, corpus structure, and evaluation logic. The prompt inventory covers 11 agent prompts and eight
 skill entrypoints. These checks do not prove an installed model profile or
 actual model behaviour.
@@ -230,6 +320,7 @@ OpenCode configuration:
 
 ```powershell
 npm run verify:runtime
+npm run probe:runtime:quality-plugin-api
 npm run verify:runtime:quality-hooks
 ```
 
@@ -253,39 +344,17 @@ in [docs/live-evaluation.md](docs/live-evaluation.md). Static adversarial
 fixtures live under [fixtures/adversarial/](fixtures/adversarial/).
 
 `npm run verify` is deterministic repository-side assurance. It requires no
-model, credentials, network, live adapter, or installed OpenCode runtime.
+model, credentials, network, live adapter, installed OpenCode runtime, or
+machine-local plugin API package. Run `npm run probe:runtime:quality-plugin-api`
+separately only in the installed target environment.
 
-Profile-only mode
-  Prompt-level quality workflow.
-
-Instrumented quality mode
-  Dossier, gate, workspace binding, verification evidence, and mutation
-  enforcement through the installed quality bridge.
-
-Live-evaluation mode
-  Isolated scenarios, hidden checks, immutable reports, and runner-owned
-  assertions.
-
-Instrumented quality is computationally enforced only when the normal-session
-bridge and relevant hooks are active and runtime-verified. If a host cannot
-intercept a mutation surface, that surface is prompt-guided. Live-eval
-enforcement applies only inside the adapter runner. The model-free installed
-probe proves API/factory compatibility, not host discovery or callback
-invocation. Native `edit`, `write`, `apply_patch`, and writable `task.general`
-are checked in the supported pre-tool callback; `permission.ask` is a secondary
-compatibility callback and is not the enforcement source in OpenCode 1.17.20.
-Workspace receipts hash the content and index identity of every Git-changed
-path, including repeated edits to an already-dirty file.
-
-Two host boundaries remain explicit: `session.created` carries a parent ID but
-not the originating task call ID, so serialized child binding cannot prove
-causal identity; the hook has no independent high/critical risk label before a
-dossier exists, so uninstrumented sessions remain usable for `standard-lite`
-work; and the installed API does not structurally classify arbitrary shell
-commands as repository writes. `verify:runtime:quality-hooks` therefore keeps
-those surfaces incomplete instead of claiming universal interception. Prompt
-rules remain the trigger that requires high/critical work to create the durable
-quality session before mutation.
+Profile-only mode is prompt guidance. Instrumented quality mode adds the
+session registry, dossier/gate, workspace binding and mutation hooks described
+above. Live-evaluation mode remains a separate isolated scenario runner.
+`session.created` still lacks the originating task call ID, so child binding is
+serialized and cardinality-checked rather than claimed as cryptographically
+causal. Actual host discovery and hook invocation remain external evidence;
+the deterministic repository suite never fabricates them.
 
 Capture first-party static evidence with
 `npm run evidence:static -- --candidate-id <id>`. Capture installed permission

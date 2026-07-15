@@ -49,14 +49,19 @@
       "check_ids": [
         "engineering-pre-gate-latch",
         "normal-session-quality-bridge",
-        "runtime-quality-hooks-fixtures"
+        "runtime-quality-hooks-fixtures",
+        "session-classification-lifecycle",
+        "bash-mutation-boundary",
+        "global-quality-plugin-export"
       ],
       "evidence_refs": [
         "lib/quality/normal-session-bridge.mjs",
         "lib/quality/live-coordinator.mjs",
-        "lib/quality/runtime-hook-verification.mjs",
         "scripts/verify-normal-session-quality-bridge.mjs",
-        "scripts/verify-normal-session-runtime-fixtures.mjs"
+        "scripts/verify-normal-session-runtime-fixtures.mjs",
+        "scripts/verify-session-classification.mjs",
+        "scripts/verify-bash-boundary.mjs",
+        "scripts/verify-global-quality-plugin-export.mjs"
       ],
       "mandatory": true
     },
@@ -67,14 +72,18 @@
       "check_ids": [
         "engineering-mapping-gate",
         "canonical-verification-targets",
-        "quality-live-runner-integration"
+        "quality-live-runner-integration",
+        "project-check-catalog",
+        "trusted-project-runner"
       ],
       "evidence_refs": [
         "lib/quality/verification-targets.mjs",
         "lib/quality/session.mjs",
         "scripts/evaluate-live.mjs",
         "scripts/verify-quality-live-runner.mjs",
-        "scripts/verify-quality-verification-targets.mjs"
+        "scripts/verify-quality-verification-targets.mjs",
+        "scripts/verify-project-check-catalog.mjs",
+        "scripts/verify-trusted-project-runner.mjs"
       ],
       "mandatory": true
     },
@@ -147,14 +156,16 @@
     },
     {
       "item_id": "DOD-11",
-      "requirement": "Installed-runtime verification classifies the supported quality hook surface as passed, failed, or explicitly incomplete.",
+      "requirement": "Installed-runtime verification classifies the locally installed plugin API/factory and supported quality hook surface as passed, failed, or explicitly incomplete.",
       "execution_class": "runtime_optional",
       "check_ids": [
-        "installed-runtime-quality-hooks"
+        "installed-runtime-quality-hooks",
+        "normal-session-plugin-api-probe"
       ],
       "evidence_refs": [
         ".opencode/plugins/engineering-dossier.mjs",
-        "scripts/verify-runtime.mjs"
+        "scripts/verify-runtime.mjs",
+        "scripts/probe-normal-session-plugin-api.mjs"
       ],
       "mandatory": false
     },
@@ -258,5 +269,5 @@
     "verification_failed": "A required available deterministic, runtime, or live check fails.",
     "blocked_external_state": "Required external state prevents the requested verification boundary from being established."
   },
-  "fingerprint": "sha256:f02768274f25c3e274d65eaa206b893c5ae80e1b20f9f301e3ade4427cad73b4"
+  "fingerprint": "sha256:2eb4af9cbd9f70788114c236d3b0d250315b74c2d13700a61f5a3930247f23b9"
 }

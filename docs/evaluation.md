@@ -264,9 +264,10 @@ The installed API exports `permission.ask`, `tool.execute.before`,
 pre/post tool callbacks around native tool execution, but its permission service
 does not invoke the declared `permission.ask` plugin callback. The bridge uses
 the pre-tool callback as its hard boundary and keeps permission handling only as
-compatibility defense. The model-free probe imports that API and checks the
-local plugin factory, but it cannot prove that the host discovered the project
-plugin, invoked the callbacks, or applied the adopted agent permissions.
+compatibility defense. `npm run probe:runtime:quality-plugin-api` is the separate
+optional installed-API/factory probe; it accepts the expected pre-gate denial
+only when the plugin throws the exact `ContractError`. It does not prove host
+plugin discovery, callback invocation, or effective adopted permissions.
 
 The `session.created` event identifies the parent session but not the task call
 that created it. One-at-a-time task serialization makes child binding
@@ -274,16 +275,19 @@ deterministic by cardinality, but not cryptographically causal. The API also
 does not independently label a session high/critical before the dossier is
 created; leaving uninstrumented sessions open is what keeps `standard-lite`
 work lightweight, so the prompt workflow remains the classification trigger.
-Nor does the API structurally identify whether an arbitrary shell command
-writes the repository. Therefore
-`npm run verify:runtime:quality-hooks` records factory compatibility separately
-and classifies host discovery, callback invocation, child causality, permission
-hook wiring, and shell mutation coverage independently. Profile-only prompts
-remain defense in depth for those boundaries.
+Native Bash is disabled for instrumented quality sessions, including after the
+gate; repository commands run only through fingerprint-bound project-catalog
+checks. On Windows those checks and adapter workers are placed in a Job Object
+before initialization. The current POSIX trusted-check production path fails
+closed because an equivalent containment controller is not yet provided.
+`npm run verify:runtime:quality-hooks` classifies host discovery, callback
+invocation, child causality, and permission-hook wiring independently from the
+installed API/factory probe. Profile prompts remain defense in depth.
 
 All dossier consumers import
 `requiredEngineeringVerificationTargets(dossier)`. It includes boundary
-checks, integration checks, boundary mechanisms, required obligations, every
+checks, every explicit verification-plan/slice/handoff check, integration
+checks, boundary mechanisms, required obligations, every
 applicable mapping from invariants, edge cases, failure modes, premortem rows,
 counterexamples and specialized checks, plus rollback/recovery. Missing trusted
 evidence is never converted into a pass.
@@ -313,13 +317,28 @@ npm run verify
 ```
 
 It requires no model, credentials, network, live adapter, or installed OpenCode
-runtime. Separate checks are:
+runtime. The normal-session bridge, classification, catalog, trusted runner,
+native-Bash denial, public plugin export, canonical-target, and deterministic
+runtime-fixture checks are stages inside that aggregate. Useful focused reruns
+include:
 
 ```powershell
 npm run verify:normal-session-quality-bridge
+npm run verify:session-classification
+npm run verify:project-check-catalog
+npm run verify:trusted-project-runner
+npm run verify:bash-boundary
+npm run verify:global-quality-plugin-export
 npm run verify:quality-verification-targets
 npm run verify:quality-acceptance
 npm run verify:whitespace:fixture
+```
+
+Installed-host and live-model checks remain explicit and outside the default
+aggregate:
+
+```powershell
+npm run probe:runtime:quality-plugin-api
 npm run verify:runtime:quality-hooks
 npm run eval:live
 ```

@@ -49,7 +49,7 @@ behaviour dimensions.
 | Quality acceptance v2 | Feedback | Computational and non-scalar | Canonical verification coverage, architecture, invariants, permissions, and regressions | After baseline/candidate quality outcomes | `lib/quality/acceptance-engine.mjs`, `quality/acceptance/acceptance-policy.v2.json`, `scripts/verify-quality-acceptance.mjs` |
 | Immutable decision history | Feedback | Computational | Decision provenance and auditability | After every assessment | `evals/decisions/` |
 | Runtime verifier | Feedback | Computational | Installed profile correctness, modes, exclusive permissions, and complete installed-agent inventory | After adoption or upgrade | `opencode agent list`, `scripts/verify-runtime.mjs` |
-| Installed quality-hook verifier | Feedback | Computational | Local plugin API/factory compatibility only; host discovery, callback invocation, child-task causality, effective adopted permissions, and shell-write interception remain separately incomplete until observed end to end | After adoption or OpenCode upgrade | `scripts/verify-normal-session-runtime.mjs`, `lib/quality/runtime-hook-verification.mjs` |
+| Installed quality surfaces | Feedback | Computational | The explicit API probe checks installed plugin API/factory compatibility; the runtime-hook verifier separately classifies host discovery, callback invocation, child-task causality, and effective adopted permissions. Native Bash is disabled in quality sessions. | After adoption or OpenCode upgrade | `scripts/probe-normal-session-plugin-api.mjs`, `scripts/verify-normal-session-runtime.mjs`, `lib/quality/runtime-hook-verification.mjs` |
 | Agent model frontmatter | Feedforward | Host configuration | User-selected model preference | Host configuration changes | `agents/*.md`, `docs/model-profiles.md` |
 | Agent/skill prompt inventory | Feedforward and feedback | Computational | Maintainability, safety, prompt and permission drift | Before prompt or permission changes | 11 agent prompts plus eight skill entrypoints in `quality/prompt-inventory/`; model metadata is informational |
 | Harness release review | Feedback | Inferential | Harness coherence | Before minor or major release | `harness-release-review`, `skills/global-harness-release-review/SKILL.md` |
@@ -97,12 +97,14 @@ behaviour dimensions.
 - Fixture runtime snapshots prove parser behaviour but are not trusted
   permission-surface evidence for candidate acceptance.
 - The normal-session plugin computationally gates native edits and writable
-  delegation in `tool.execute.before` when that callback is host-active. The
-  declared `permission.ask` hook is not the enforcement source in OpenCode
-  1.17.20. The installed API neither correlates child creation with an exact
-  task call, independently classifies pre-dossier session risk, nor structurally
-  classifies arbitrary shell commands as repository mutations, so those
-  surfaces remain explicitly incomplete and prompt-guided.
+  delegation in `tool.execute.before` when that callback is host-active. Native
+  Bash is denied rather than heuristically classified; project commands use the
+  trusted catalog runner. Windows uses Job Object containment and the current
+  POSIX trusted-check path fails closed. The declared `permission.ask` hook is
+  not the enforcement source in OpenCode 1.17.20, and the installed API still
+  does not correlate child creation with an exact task call or independently
+  classify pre-dossier session risk. Processes started outside the plugin are
+  outside this application boundary; the harness is not a host-wide OS sandbox.
 - Inferential checks can find contradictions and overengineering, but they
   remain probabilistic. Use them for release reviews and broad audits rather
   than as the only confidence signal.

@@ -217,17 +217,21 @@ When an installed OpenCode environment is part of the release claim, also run:
 
 ```powershell
 npm run verify:runtime
+npm run probe:runtime:quality-plugin-api
 npm run verify:runtime:quality-hooks
 ```
 
 A `failed` runtime hook receipt blocks the claim. An `incomplete` receipt
 allows only a partial claim that names the uncovered surface. The current
-model-free probe proves that the installed API can construct the bounded tool
-surface and that direct `tool.execute.before` factory callbacks deny pre-gate
-native edit and writable delegation. It does not prove host plugin discovery,
+explicit API probe proves that the installed API can construct the bounded tool
+surface and recognizes only the exact expected `ContractError` denial. The
+runtime-hook verifier is a separate host-evidence surface. Neither proves every
 host callback invocation, effective adopted permissions, exact task-to-child
-causality, pre-dossier risk classification, or universal shell-write
-interception. The declared
+causality, or pre-dossier risk classification. Native Bash is disabled in an
+instrumented quality session; commands use trusted project-catalog checks, with
+Windows Job Object containment and fail-closed behavior when the production
+containment controller is unavailable. Processes outside the plugin are not
+claimed as intercepted. The declared
 `permission.ask` callback is reported separately because OpenCode 1.17.20 does
 not wire it into the permission service.
 

@@ -72,8 +72,9 @@ export async function runScenario(context) {
 ```
 
 The child receives an `AbortSignal`. The parent settles the adapter call only
-after ordinary descendants are gone: Windows uses `taskkill /T /F`; POSIX uses
-a dedicated process group with TERM/KILL and an absence check. A timeout,
+after verified teardown: Windows assigns the uninitialized worker to a Job
+Object with `KILL_ON_JOB_CLOSE`; POSIX uses a dedicated process group with
+TERM/KILL and an absence check for ordinary descendants. A timeout,
 failed tree teardown, or stalled trace request fails closed before hidden data
 can be staged. Adapters must return explicit success, such as
 `passed: true`, `ok: true`,
@@ -253,7 +254,11 @@ an acceptance gate.
 
 The normal-session Engineering Dossier bridge is a separate product path. Its
 computational mutation gate applies only when the installed plugin and relevant
-pre-tool hooks are runtime-verified. The live adapter runner enforces its own
-isolated workspace policy, hidden checks, teardown, and report assertions only
-inside live-evaluation runs. Neither mode implies universal interception of
-host shell writes.
+pre-tool hooks are runtime-verified. Native Bash is disabled inside an
+instrumented quality session; repository commands use catalog-backed trusted
+checks. Windows workers use Job Object containment before initialization, while
+the current POSIX trusted-check production path fails closed. The live adapter
+runner enforces its own isolated workspace policy, hidden checks, teardown, and
+report assertions only inside live-evaluation runs. Processes started outside
+these application boundaries are not intercepted; neither mode is a host-wide
+OS sandbox.

@@ -56,6 +56,8 @@ import {
   recordGateDecision,
 } from "../lib/quality/store.mjs";
 import { createIntegratedVerificationEvidence } from "../lib/quality/verification-evidence.mjs";
+import { standardLiteDossierRequest } from "../lib/quality/standard-lite.mjs";
+import { requiredEngineeringVerificationTargets } from "../lib/quality/verification-targets.mjs";
 
 const START_COMMIT = "0a1d56605b9b8923ac27c3b3b405b38177ca7741";
 const FP_A = `sha256:${"a".repeat(64)}`;
@@ -304,6 +306,38 @@ function finalizedDossier(overrides = {}) {
   return finalizeEngineeringDossier(updated, { finalized_at: "2026-07-13T00:02:00Z" });
 }
 
+function finalizedStandardLiteDossier(taskType) {
+  const registration = {
+    risk_class: "standard-lite",
+    lifecycle: "standard_lite",
+    task_type: taskType,
+    required_check_ids: ["quality-integration"],
+    ownership_paths: ["lib/app.mjs"],
+    agent_name: "orchestrator",
+    run_id: `run-standard-lite-${taskType}`,
+    task_id: `task-standard-lite-${taskType}`,
+    user_visible_goal: `Complete bounded ${taskType} work.`,
+    classification_rationale: "single bounded local ownership with trusted integration verification",
+    behavior_expectation: "the bounded behavior remains correct",
+    expected_preserved_behavior: ["unrelated behavior remains unchanged"],
+    known_local_edge_cases: ["stale or failed verification remains blocked"],
+    initial_workspace: { entries: [] },
+    classification_workspace: { head_sha: START_COMMIT },
+  };
+  const content = standardLiteDossierRequest(registration, {
+    trustedProducer: "opencode-harness-quality-verifier",
+  });
+  const draft = createEngineeringDossierDraft({
+    dossier_id: `dossier-standard-lite-${taskType}`,
+    run_id: registration.run_id,
+    task_id: registration.task_id,
+    starting_commit: START_COMMIT,
+    created_at: "2026-07-13T00:00:00Z",
+    ...content,
+  });
+  return finalizeEngineeringDossier(draft, { finalized_at: "2026-07-13T00:02:00Z" });
+}
+
 function impactBoundary(category, references = {}, rationale = null) {
   return {
     id: `BOUNDARY-${category}`,
@@ -546,7 +580,7 @@ function catalog(overrides = {}) {
 
 function preimplementationEvidence(dossier, overrides = {}) {
   const obligations = new Map(dossier.test_obligations.map((entry) => [entry.check_id, entry]));
-  const baselineReceipts = dossier.verification_plan.baseline_check_ids.map((checkId, index) => {
+  const baselineReceipts = requiredEngineeringVerificationTargets(dossier).preimplementationCheckIds.map((checkId, index) => {
     const obligation = obligations.get(checkId);
     return {
       receipt_id: `baseline-receipt-${index + 1}`,
@@ -596,7 +630,7 @@ function preimplementationEvidence(dossier, overrides = {}) {
 
 function passedGate(dossier, overrides = {}) {
   const requiresPreimplementationEvidence = ["high", "critical"].includes(dossier.risk_class)
-    || ["bug_fix", "behavior_preserving_refactor"].includes(dossier.task_type);
+    || requiredEngineeringVerificationTargets(dossier).preimplementationCheckIds.length > 0;
   return evaluateEngineeringGate({
     gate_id: overrides.gate_id ?? "gate-quality",
     dossier,
@@ -798,6 +832,76 @@ test("dossier lifecycle is immutable, CAS-versioned, strict, and fingerprinted",
   assertContractError(() => validateEngineeringDossier(tampered), "QUALITY_DOSSIER_FINGERPRINT");
 });
 
+test("standard-lite supports every bounded task type with one operational check binding", () => {
+  const expectedKinds = new Map([
+    ["maintenance", ["unit"]],
+    ["bug_fix", ["reproducer", "unit"]],
+    ["behavior_preserving_refactor", ["characterization", "unit"]],
+    ["new_feature", ["contract", "negative_path"]],
+  ]);
+  for (const [taskType, kinds] of expectedKinds) {
+    const dossier = finalizedStandardLiteDossier(taskType);
+    assert.equal(dossier.task_type, taskType);
+    assert.deepEqual(dossier.test_obligations.map((entry) => entry.kind), kinds);
+    assert.equal(new Set(dossier.test_obligations.map((entry) => entry.check_id)).size, 1);
+    assert.equal(passedGate(dossier, { gate_id: `gate-standard-lite-${taskType}` }).status, "passed");
+  }
+
+  for (const taskType of ["migration", "security"]) {
+    assertContractError(() => standardLiteDossierRequest({
+      risk_class: "standard-lite",
+      lifecycle: "standard_lite",
+      task_type: taskType,
+    }, { trustedProducer: "opencode-harness-quality-verifier" }), "QUALITY_STANDARD_LITE_SCOPE_EXCEEDED");
+  }
+});
+
+test("multi-obligation checks require unique semantic kinds and one immutable operational binding", () => {
+  const compatible = dossierContent();
+  compatible.test_obligations = [
+    ...compatible.test_obligations,
+    {
+      ...compatible.test_obligations[0],
+      id: "TEST-unit-second-kind",
+      kind: "unit",
+    },
+  ];
+  const accepted = finalizedDossier({
+    dossier_id: "dossier-compatible-multi-obligation",
+    content: compatible,
+  });
+  assert.equal(accepted.test_obligations.filter((entry) => entry.check_id === "quality-unit").length, 2);
+  assert.equal(requiredEngineeringVerificationTargets(accepted).checkIds.filter((entry) => entry === "quality-unit").length, 1);
+
+  const conflicting = dossierContent();
+  conflicting.test_obligations = [
+    ...conflicting.test_obligations,
+    {
+      ...conflicting.test_obligations[0],
+      id: "TEST-unit-conflicting-binding",
+      kind: "unit",
+      command_or_mechanism: "substituted-command",
+    },
+  ];
+  assertContractError(() => finalizedDossier({
+    dossier_id: "dossier-conflicting-multi-obligation",
+    content: conflicting,
+  }), "QUALITY_CHECK_BINDING_CONFLICT");
+
+  const duplicateKind = dossierContent();
+  duplicateKind.test_obligations = [
+    ...duplicateKind.test_obligations,
+    {
+      ...duplicateKind.test_obligations[0],
+      id: "TEST-unit-duplicate-kind",
+    },
+  ];
+  assertContractError(() => finalizedDossier({
+    dossier_id: "dossier-duplicate-obligation-kind",
+    content: duplicateKind,
+  }), "QUALITY_DUPLICATE_CHECK_KIND");
+});
+
 test("dossier rejects dangling mappings, contradictory classifications, unsafe content, and path drift", () => {
   assertContractError(() => finalizedDossier({ content: {
     invariants: [{
@@ -952,6 +1056,148 @@ test("high gate requires runner-owned baseline and independent plan challenge re
   assert(failed.reasons.some((entry) => entry.code === "QUALITY_BASELINE_EVIDENCE_MISSING"));
 });
 
+test("gate requires every canonical preimplementation target, not only baseline plan IDs", () => {
+  const content = fullDossierContent("high");
+  content.test_obligations = [
+    ...content.test_obligations,
+    {
+      id: "TEST-extra-preimplementation",
+      check_id: "quality-extra-preimplementation",
+      kind: "contract",
+      phase: "preimplementation",
+      scope_ids: ["AREA-main"],
+      command_or_mechanism: "quality-extra-preimplementation-command",
+      required: false,
+      trusted_producer: "opencode-harness-quality-verifier",
+    },
+    {
+      id: "TEST-plan-preimplementation",
+      check_id: "quality-plan-preimplementation",
+      kind: "contract",
+      phase: "preimplementation",
+      scope_ids: ["AREA-main"],
+      command_or_mechanism: "quality-plan-preimplementation-command",
+      required: false,
+      trusted_producer: "opencode-harness-quality-verifier",
+    },
+  ];
+  content.verification_plan = {
+    ...content.verification_plan,
+    baseline_check_ids: [
+      ...content.verification_plan.baseline_check_ids,
+      "quality-plan-preimplementation",
+    ],
+  };
+  content.invariants = [
+    ...content.invariants,
+    {
+      id: "INV-extra-preimplementation",
+      statement: "the extra mapped preimplementation contract is checked before mutation",
+      scope_ids: ["AREA-main"],
+      mapping: mapping("applicable_directly_tested", { check_ids: ["quality-extra-preimplementation"] }),
+    },
+  ];
+  const dossier = finalizedDossier({
+    dossier_id: "dossier-canonical-preimplementation",
+    run_id: "run-canonical-preimplementation",
+    risk_class: "high",
+    mode: "full",
+    content,
+  });
+  assert.deepEqual(requiredEngineeringVerificationTargets(dossier).preimplementationCheckIds, [
+    "quality-baseline",
+    "quality-extra-preimplementation",
+    "quality-plan-preimplementation",
+  ]);
+  assert.deepEqual(dossier.verification_plan.baseline_check_ids, [
+    "quality-baseline",
+    "quality-plan-preimplementation",
+  ]);
+
+  const baseCatalog = catalog();
+  const checkCatalog = catalog({
+    checks: [
+      ...baseCatalog.checks.map(({ check_id, trusted_producer, phases, available }) => ({
+        check_id,
+        trusted_producer,
+        phases: [...phases],
+        available,
+      })),
+      {
+        check_id: "quality-extra-preimplementation",
+        trusted_producer: "opencode-harness-quality-verifier",
+        phases: ["preimplementation"],
+        available: true,
+      },
+      {
+        check_id: "quality-plan-preimplementation",
+        trusted_producer: "opencode-harness-quality-verifier",
+        phases: ["preimplementation"],
+        available: true,
+      },
+    ],
+  });
+  const good = preimplementationEvidence(dossier);
+  assert.equal(passedGate(dossier, {
+    gate_id: "gate-canonical-preimplementation-good",
+    check_catalog: checkCatalog,
+    preimplementation_evidence: good,
+  }).status, "passed");
+
+  const evidenceWith = (suffix, receipts, dossierFingerprint = dossier.fingerprint) => createEngineeringPreimplementationEvidence({
+    evidence_id: `preimplementation-canonical-${suffix}`,
+    dossier_id: dossier.dossier_id,
+    dossier_fingerprint: dossierFingerprint,
+    baseline_receipts: receipts,
+    plan_challenge_receipts: good.plan_challenge_receipts,
+  });
+  const extraReceipt = good.baseline_receipts.find((entry) => entry.check_id === "quality-plan-preimplementation");
+  const negativeCases = [
+    ["missing", good.baseline_receipts.filter((entry) => entry.check_id !== "quality-extra-preimplementation"), "quality-extra-preimplementation"],
+    ["failed", good.baseline_receipts.map((entry) => entry === extraReceipt ? { ...entry, status: "failed" } : entry), "quality-plan-preimplementation"],
+    ["stale", good.baseline_receipts.map((entry) => entry === extraReceipt ? { ...entry, completed_at: "2026-07-13T00:00:30Z" } : entry), "quality-plan-preimplementation"],
+    ["producer", good.baseline_receipts.map((entry) => entry === extraReceipt ? { ...entry, trusted_producer: "substituted-producer" } : entry), "quality-plan-preimplementation"],
+    ["binding", good.baseline_receipts.map((entry) => entry === extraReceipt ? { ...entry, command_or_mechanism: "substituted-command" } : entry), "quality-plan-preimplementation"],
+  ];
+  for (const [suffix, receipts, expectedSubjectId] of negativeCases) {
+    const decision = passedGate(dossier, {
+      gate_id: `gate-canonical-preimplementation-${suffix}`,
+      check_catalog: checkCatalog,
+      preimplementation_evidence: evidenceWith(suffix, receipts),
+    });
+    assert.equal(decision.status, "blocked", `${suffix} canonical pre-check unexpectedly passed`);
+    assert(decision.reasons.some((entry) => (
+      entry.code === "QUALITY_BASELINE_EVIDENCE_MISSING"
+      && entry.subject_id === expectedSubjectId
+    )));
+  }
+
+  const unavailableCatalog = catalog({
+    checks: checkCatalog.checks.map(({ check_id, trusted_producer, phases, available }) => ({
+      check_id,
+      trusted_producer,
+      phases: [...phases],
+      available: check_id === "quality-plan-preimplementation" ? false : available,
+    })),
+  });
+  const unavailable = passedGate(dossier, {
+    gate_id: "gate-canonical-preimplementation-unavailable",
+    check_catalog: unavailableCatalog,
+    preimplementation_evidence: good,
+  });
+  assert.equal(unavailable.status, "blocked");
+  assert(unavailable.reasons.some((entry) => entry.code === "QUALITY_CHECK_UNKNOWN"));
+
+  assertContractError(() => evidenceWith("wrong-phase", good.baseline_receipts.map((entry) => (
+    entry === extraReceipt ? { ...entry, phase: "integration" } : entry
+  ))), "CONTRACT_ENUM");
+  assertContractError(() => passedGate(dossier, {
+    gate_id: "gate-canonical-preimplementation-wrong-dossier",
+    check_catalog: checkCatalog,
+    preimplementation_evidence: evidenceWith("wrong-dossier", good.baseline_receipts, FP_A),
+  }), "QUALITY_PREIMPLEMENTATION_EVIDENCE_BINDING");
+});
+
 test("task-specific evidence ignores optional obligations and requires explicit behavior fields", () => {
   const content = fullDossierContent("high");
   content.task_type = "new_feature";
@@ -987,7 +1233,6 @@ test("high and critical gate rejects ambiguity, unresolved coverage, ownership, 
         { ...content.implementation_slices[0], id: "SLICE-overlap", owner: "worker-two", concurrent_group: "parallel" },
       ],
     })],
-    ["baseline", "QUALITY_BASELINE_EVIDENCE_MISSING", (content) => ({ ...content, verification_plan: { ...content.verification_plan, baseline_check_ids: [] } })],
     ["plan", "QUALITY_PLAN_CHALLENGE_UNRESOLVED", (content) => ({
       ...content,
       plan_challenge: {

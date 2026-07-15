@@ -148,6 +148,10 @@ const requiredFiles = [
   "SECURITY.md",
   "opencode.json",
   ".opencode/plugins/engineering-dossier.mjs",
+  ".opencode/quality/checks.json",
+  "quality/schemas/project-check-catalog.schema.json",
+  "quality/examples/project-checks.example.json",
+  "quality/examples/global-quality-plugin.mjs",
   "commands/learn.md",
   "commands/curate-learning.md",
   "agents/orchestrator.md",
@@ -215,12 +219,18 @@ const requiredFiles = [
   "lib/quality/milestone-dod.mjs",
   "lib/quality/normal-session-bridge.mjs",
   "lib/quality/normal-session-plugin.mjs",
+  "lib/quality/project-check-catalog.mjs",
+  "lib/quality/quality-plugin.mjs",
   "lib/quality/runtime-hook-verification.mjs",
+  "lib/quality/session-classification.mjs",
+  "lib/quality/standard-lite.mjs",
+  "lib/quality/trusted-project-runner.mjs",
   "lib/quality/verification-targets.mjs",
   "lib/quality/whitespace.mjs",
   "lib/feedback/files.mjs",
   "lib/feedback/index.mjs",
   "lib/feedback/manifests.mjs",
+  "lib/feedback/managed-command-sync-worker.mjs",
   "lib/feedback/privacy.mjs",
   "lib/feedback/process-tree.mjs",
   "lib/feedback/permission-surface.mjs",
@@ -245,6 +255,12 @@ const requiredFiles = [
   "scripts/verify-normal-session-quality-bridge.mjs",
   "scripts/verify-normal-session-runtime.mjs",
   "scripts/verify-normal-session-runtime-fixtures.mjs",
+  "scripts/probe-normal-session-plugin-api.mjs",
+  "scripts/verify-session-classification.mjs",
+  "scripts/verify-project-check-catalog.mjs",
+  "scripts/verify-trusted-project-runner.mjs",
+  "scripts/verify-bash-boundary.mjs",
+  "scripts/verify-global-quality-plugin-export.mjs",
   "scripts/verify-quality-live-runner.mjs",
   "scripts/verify-quality-verification-targets.mjs",
   "scripts/verify-committed-whitespace.mjs",
@@ -293,11 +309,16 @@ const expectedDeterministicStages = [
   "verify:live-eval", "verify:acceptance",
   "verify:quality-contracts", "verify:engineering-dossier", "verify:architecture-policy", "verify:impact-graph",
   "verify:prompt-inventory", "verify:quality-live-coordinator", "verify:quality-live-runner", "verify:quality-verification-targets",
-  "verify:normal-session-quality-bridge", "verify:quality-live-manifests", "verify:quality-acceptance",
+  "verify:normal-session-quality-bridge", "verify:session-classification", "verify:project-check-catalog",
+  "verify:trusted-project-runner", "verify:bash-boundary", "verify:global-quality-plugin-export",
+  "verify:quality-live-manifests", "verify:quality-acceptance",
   "verify:whitespace:fixture", "verify:milestone-2-dod-contract",
 ];
 if (JSON.stringify(DETERMINISTIC_STAGE_REGISTRY.map((stage) => stage.npm_script)) !== JSON.stringify(expectedDeterministicStages)) {
   fail("HARNESS-S008", "verify-all deterministic stage registry drifted from the reviewed sequential npm stage contract", "Restore the exact model/network-free stage order.");
+}
+if (DETERMINISTIC_STAGE_REGISTRY.some((stage) => stage.npm_script === "probe:runtime:quality-plugin-api")) {
+  fail("HARNESS-S008", "the machine-local installed API probe must not run inside npm run verify", "Keep the API probe as an explicit installed-runtime smoke only.");
 }
 if (new Set(DETERMINISTIC_STAGE_REGISTRY.map((stage) => stage.command_id)).size !== DETERMINISTIC_STAGE_REGISTRY.length) {
   fail("HARNESS-S008", "verify-all command IDs must be unique", "Give each deterministic stage one stable command_id.");
@@ -308,6 +329,10 @@ for (const stage of DETERMINISTIC_STAGE_REGISTRY) {
   }
 }
 const dodDocument = JSON.parse(read("quality/milestone-2-dod.v1.json"));
+const apiProbeDodItem = dodDocument.items.find((item) => item.check_ids.includes("normal-session-plugin-api-probe"));
+if (apiProbeDodItem?.execution_class !== "runtime_optional" || apiProbeDodItem.mandatory !== false) {
+  fail("HARNESS-S008", "the installed API probe must be optional runtime evidence in the Milestone 2 DoD", "Classify normal-session-plugin-api-probe as runtime_optional and non-mandatory.");
+}
 const deterministicDodChecks = dodDocument.items
   .filter((item) => item.execution_class === "deterministic")
   .flatMap((item) => item.check_ids)
@@ -353,6 +378,12 @@ for (const [name, command] of Object.entries({
   "verify:quality-live-runner": "node scripts/verify-quality-live-runner.mjs",
   "verify:quality-verification-targets": "node scripts/verify-quality-verification-targets.mjs",
   "verify:normal-session-quality-bridge": "node scripts/verify-normal-session-quality-bridge.mjs",
+  "verify:session-classification": "node scripts/verify-session-classification.mjs",
+  "verify:project-check-catalog": "node scripts/verify-project-check-catalog.mjs",
+  "verify:trusted-project-runner": "node scripts/verify-trusted-project-runner.mjs",
+  "verify:bash-boundary": "node scripts/verify-bash-boundary.mjs",
+  "verify:global-quality-plugin-export": "node scripts/verify-global-quality-plugin-export.mjs",
+  "probe:runtime:quality-plugin-api": "node scripts/probe-normal-session-plugin-api.mjs",
   "verify:runtime:quality-hooks": "node scripts/verify-normal-session-runtime.mjs",
   "verify:runtime:quality-hooks:fixture": "node scripts/verify-normal-session-runtime-fixtures.mjs",
   "verify:quality-live-manifests": "node scripts/verify-quality-live-manifests.mjs",
@@ -532,18 +563,20 @@ if (config.permission?.["quality_*"] !== "deny") {
   fail("HARNESS-S084", "root quality_* permission must deny by default", "Expose only the bounded quality tools on explicitly authorized agent profiles.");
 }
 const qualityToolIds = [
+  "quality_session_start",
   "quality_dossier_create",
   "quality_dossier_update",
   "quality_dossier_inspect",
   "quality_architecture_evaluate",
   "quality_dossier_finalize",
   "quality_action_authorize",
+  "quality_command_authorize",
   "quality_verification_record",
   "quality_session_finalize",
 ];
 const qualityPermissions = new Map([
-  ["orchestrator", ["quality_dossier_create", "quality_dossier_update", "quality_dossier_inspect", "quality_dossier_finalize", "quality_action_authorize", "quality_session_finalize"]],
-  ["orchestrator-deep", ["quality_dossier_create", "quality_dossier_update", "quality_dossier_inspect", "quality_dossier_finalize", "quality_action_authorize", "quality_session_finalize"]],
+  ["orchestrator", ["quality_session_start", "quality_dossier_create", "quality_dossier_update", "quality_dossier_inspect", "quality_dossier_finalize", "quality_action_authorize", "quality_session_finalize"]],
+  ["orchestrator-deep", ["quality_session_start", "quality_dossier_create", "quality_dossier_update", "quality_dossier_inspect", "quality_dossier_finalize", "quality_action_authorize", "quality_session_finalize"]],
   ["architect", ["quality_dossier_inspect", "quality_architecture_evaluate"]],
   ["reviewer", ["quality_dossier_inspect", "quality_architecture_evaluate"]],
   ["verifier", ["quality_dossier_inspect", "quality_verification_record"]],
@@ -765,6 +798,7 @@ for (const needle of [
   "tagged release is `v0.2.0`",
   "portable-adoption-bundle:start",
   ".opencode/plugins/engineering-dossier.mjs",
+  ".opencode/quality/checks.json",
   "lib/feedback",
   "lib/quality",
   "never copy the whole `.opencode/`",
@@ -928,16 +962,17 @@ for (const needle of [
   assertIncludes(harnessMapDoc, needle, "docs/harness-map.md", "HARNESS-S068", "Represent new P0 controls in the harness control map.");
 }
 for (const needle of [
-  "Installed quality-hook verifier",
-  "Local plugin API/factory compatibility only",
+  "Installed quality surfaces",
+  "explicit API probe",
+  "runtime-hook verifier",
   "host discovery",
   "callback invocation",
   "child-task causality",
   "effective adopted permissions",
-  "shell-write interception",
-  "remain separately incomplete",
+  "Native Bash is disabled",
+  "host-wide OS sandbox",
 ]) {
-  assertIncludes(harnessMapDoc, needle, "docs/harness-map.md", "HARNESS-S068", "Keep installed quality-hook claims within the model-free API/factory evidence boundary.");
+  assertIncludes(harnessMapDoc, needle, "docs/harness-map.md", "HARNESS-S068", "Keep installed API, runtime-hook, Bash, and OS-sandbox claims within their exact evidence boundaries.");
 }
 
 const subagentResultAgents = [
@@ -1184,7 +1219,7 @@ if (partialLiveRunIndex === -1 || fullLiveRunIndex === -1 || candidateAssessment
 }
 
 const adoptionDoc = read("docs/adoption.md");
-for (const needle of ["docs/harnessability.md", "npm run verify:runtime", "npm run verify:adoption-bundle", "fixtures/sample-project/", "fixtures/live/", "Harnessability", "Post-Adoption Confidence Levels", "fault injection", "portable-adoption-bundle:start", ".opencode/plugins/engineering-dossier.mjs", "lib/feedback", "lib/quality", "opencode-harness/feedback", "opencode-harness/quality", "Do not copy the whole `.opencode/` directory"]) {
+for (const needle of ["docs/harnessability.md", "npm run verify:runtime", "npm run verify:adoption-bundle", "fixtures/sample-project/", "fixtures/live/", "Harnessability", "Post-Adoption Confidence Levels", "fault injection", "portable-adoption-bundle:start", ".opencode/plugins/engineering-dossier.mjs", ".opencode/quality/checks.json", "lib/feedback", "lib/quality", "opencode-harness/feedback", "opencode-harness/quality", "opencode-harness/quality-plugin", "Do not copy the whole `.opencode/` directory"]) {
   assertIncludes(adoptionDoc, needle, "docs/adoption.md");
 }
 
@@ -1200,6 +1235,8 @@ for (const needle of [
   '"fixtures/sample-project"',
   '"opencode-harness/feedback"',
   '"opencode-harness/quality"',
+  '"opencode-harness/quality-plugin"',
+  '".opencode/quality/checks.json"',
   "documentedAdoptionEntries",
   "assertPortableAdoptionDeclaration",
   '".opencode/node_modules"',
@@ -1287,8 +1324,12 @@ for (const needle of ['["agent", "list"]', "parseAgentInventory", "installedAgen
   assertIncludes(runtimeVerifier, needle, "scripts/verify-runtime.mjs", "HARNESS-S059", "Runtime verification must inventory every installed agent and fail closed on incomplete inventory.");
 }
 const qualityRuntimeVerifier = read("scripts/verify-normal-session-runtime.mjs");
-for (const needle of ["@opencode-ai", "permission.ask", "pre_gate_edit_denied", "pre_gate_writable_task_denied", "host_plugin_discovered", "host_hooks_invoked", "effective_permissions_verified", "permission_only_unclassified"]) {
-  assertIncludes(qualityRuntimeVerifier, needle, "scripts/verify-normal-session-runtime.mjs", "HARNESS-S059", "Installed-runtime verification must prove supported hooks and classify shell mutation honestly.");
+for (const needle of ["--adapter", "--evidence", "QUALITY_HOST_EVIDENCE_TRUST_REQUIRED", "createProbeWorkspace", "randomBytes", "expectedFinalWorkspaceFingerprint", "diffContentBoundWorkspaces", "QUALITY_HOST_UNEXPECTED_WORKSPACE_EFFECT", "normalSessionRuntimeSourceFingerprint(root)", "trusted_adapter", "blocked_external_state"]) {
+  assertIncludes(qualityRuntimeVerifier, needle, "scripts/verify-normal-session-runtime.mjs", "HARNESS-S059", "Real host verification must use a trusted adapter, fresh nonce, independently observed workspace effects, and honest external-state classification.");
+}
+const qualityApiProbe = read("scripts/probe-normal-session-plugin-api.mjs");
+for (const needle of ["@opencode-ai", "chat.message", "tool.execute.before", "unclassified_edit_denied", "unclassified_mutating_bash_denied", "classifyQualityPluginApiProbe"]) {
+  assertIncludes(qualityApiProbe, needle, "scripts/probe-normal-session-plugin-api.mjs", "HARNESS-S059", "Factory/API compatibility must remain separate from real host E2E evidence.");
 }
 
 const runtimeFixtureVerifier = read("scripts/verify-runtime-fixtures.mjs");
@@ -1299,8 +1340,8 @@ for (const needle of ["external_directory", "config.bash.", "unknown permission 
   assertIncludes(runtimeFixtureVerifier, needle, "scripts/verify-runtime-fixtures.mjs", "HARNESS-S060", "Runtime fixtures must prove complete permission extraction and explicit incomplete evidence.");
 }
 const qualityRuntimeFixtures = read("scripts/verify-normal-session-runtime-fixtures.mjs");
-for (const needle of ["QUALITY_PLUGIN_API_UNPARSEABLE", "QUALITY_PLUGIN_TOOL_SURFACE_MISSING", "QUALITY_PLUGIN_EDIT_NOT_DENIED", "QUALITY_PLUGIN_HOST_DISCOVERY_UNVERIFIED", "QUALITY_PLUGIN_HOST_HOOK_INVOCATION_UNVERIFIED", "QUALITY_PLUGIN_EFFECTIVE_PERMISSIONS_UNVERIFIED", "QUALITY_PLUGIN_PERMISSION_HOOK_NOT_HOST_WIRED", "QUALITY_PLUGIN_TASK_CHILD_CAUSAL_BINDING_INCOMPLETE", "QUALITY_PLUGIN_SESSION_RISK_CLASSIFICATION_INCOMPLETE", "QUALITY_PLUGIN_SHELL_MUTATION_INCOMPLETE"]) {
-  assertIncludes(qualityRuntimeFixtures, needle, "scripts/verify-normal-session-runtime-fixtures.mjs", "HARNESS-S060", "Runtime hook fixtures must cover supported, missing, unsafe, and incomplete surfaces.");
+for (const needle of ["QUALITY_HOST_PLUGIN_NOT_DISCOVERED", "QUALITY_HOST_HOOK_MISSING_CHAT_MESSAGE", "QUALITY_HOST_HOOK_NOT_INVOKED_TOOL_EXECUTE_BEFORE", "QUALITY_HOST_PRE_GATE_EDIT_NOT_BLOCKED", "QUALITY_HOST_PROBE_FILE_CHANGED", "QUALITY_HOST_PERMISSION_MISMATCH", "QUALITY_HOST_STANDARD_LITE_NOT_STARTED", "QUALITY_HOST_CAPABILITY_NOT_AUTHORIZED", "QUALITY_HOST_AFTER_HOOK_NOT_RECONCILED", "QUALITY_HOST_PROJECT_CHECK_NOT_PASSED", "QUALITY_HOST_FINAL_ATTESTATION_MISSING", "QUALITY_HOST_EVIDENCE_STALE", "QUALITY_HOST_EVIDENCE_SOURCE_MISMATCH", "QUALITY_HOST_EVIDENCE_WORKSPACE_MISMATCH", "QUALITY_HOST_EVIDENCE_FINAL_WORKSPACE_MISMATCH", "QUALITY_HOST_EVIDENCE_FINGERPRINT", "QUALITY_HOST_EVIDENCE_TRUST_REQUIRED", "transitive runtime dependencies", "trusted_adapter"]) {
+  assertIncludes(qualityRuntimeFixtures, needle, "scripts/verify-normal-session-runtime-fixtures.mjs", "HARNESS-S060", "Runtime host-evidence fixtures must cover missing, unsafe, stale, mismatched, and forged evidence.");
 }
 for (const needle of ["agent-list.txt", "unexpected-agent", "wrongRequiredModeFixture", "extraDangerousAgentFixture", "HARNESS-R022", "HARNESS-R023", "HARNESS-R024"]) {
   assertIncludes(runtimeFixtureVerifier, needle, "scripts/verify-runtime-fixtures.mjs", "HARNESS-S060", "Runtime fixtures must prove authoritative installed-agent discovery, extra-agent capture, and fail-closed inventory handling.");
@@ -1391,7 +1432,7 @@ for (const needle of ["workspaceRoot", "publishImmutableSet", "complete.json", "
 }
 
 const adapterWorker = read("lib/feedback/adapter-worker.mjs");
-for (const needle of ["spawn", "./process-tree.mjs", "terminateProcessTree", "releaseUnverifiedChild", "adapter_teardown_unverified", "traceLimits", "trace_request", "payload_json", "result_json", "encodePlainJson", "AdapterTimeoutError"]) {
+for (const needle of ["spawn", "./process-tree.mjs", "prepareProcessContainment", "terminateProcessTree", "releaseUnverifiedChild", "adapter_teardown_unverified", "traceLimits", "trace_request", "payload_json", "result_json", "encodePlainJson", "AdapterTimeoutError"]) {
   assertIncludes(adapterWorker, needle, "lib/feedback/adapter-worker.mjs", "HARNESS-S079", "Live adapters must use bounded trace RPC and verified process-tree teardown.");
 }
 

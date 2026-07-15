@@ -10,6 +10,7 @@
   "exports": {
     "./feedback": "./lib/feedback/index.mjs",
     "./quality": "./lib/quality/index.mjs",
+    "./quality-plugin": "./lib/quality/quality-plugin.mjs",
     "./trace-store": "./lib/feedback/index.mjs"
   },
   "license": "MIT",
@@ -29,6 +30,7 @@
     "eval:live:buffered-self-test": "node scripts/evaluate-live.mjs --self-test-buffered",
     "eval:live:self-test": "node scripts/evaluate-live.mjs --self-test",
     "eval:live:validate": "node scripts/evaluate-live.mjs --validate",
+    "probe:runtime:quality-plugin-api": "node scripts/probe-normal-session-plugin-api.mjs",
     "trace": "node scripts/trace-run.mjs",
     "verify": "node scripts/verify-all.mjs",
     "verify:acceptance": "node scripts/verify-candidate-assessment.mjs",
@@ -42,6 +44,11 @@
     "verify:live-manifests": "node scripts/verify-live-manifests.mjs",
     "verify:impact-graph": "node scripts/verify-quality-architecture.mjs",
     "verify:normal-session-quality-bridge": "node scripts/verify-normal-session-quality-bridge.mjs",
+    "verify:session-classification": "node scripts/verify-session-classification.mjs",
+    "verify:project-check-catalog": "node scripts/verify-project-check-catalog.mjs",
+    "verify:trusted-project-runner": "node scripts/verify-trusted-project-runner.mjs",
+    "verify:bash-boundary": "node scripts/verify-bash-boundary.mjs",
+    "verify:global-quality-plugin-export": "node scripts/verify-global-quality-plugin-export.mjs",
     "verify:milestone-2-dod-contract": "node scripts/verify-milestone-2-dod.mjs",
     "verify:prompt-inventory": "node scripts/verify-prompt-inventory.mjs",
     "verify:quality-acceptance": "node scripts/verify-quality-acceptance.mjs",

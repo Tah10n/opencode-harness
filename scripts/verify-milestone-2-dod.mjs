@@ -59,6 +59,7 @@ const allReceipts = expectedChecks.map((entry) => receiptFor(entry));
 const deterministicIds = new Set(document.items
   .filter((item) => item.execution_class === "deterministic")
   .flatMap((item) => item.check_ids));
+assert.equal(deterministicIds.has("normal-session-plugin-api-probe"), false, "installed API probe must not be deterministic default evidence");
 const deterministicReceipts = allReceipts.filter((receipt) => deterministicIds.has(receipt.check_id));
 
 assert.equal(assessMilestone2Receipts({ document, receipts: allReceipts, expectedChecks }).status, "verified");
@@ -66,6 +67,7 @@ assert.equal(assessMilestone2Receipts({ document, receipts: deterministicReceipt
 const runtimeCheckIds = new Set(document.items
   .filter((item) => item.execution_class === "runtime_optional")
   .flatMap((item) => item.check_ids));
+assert(runtimeCheckIds.has("normal-session-plugin-api-probe"), "installed API probe must remain explicit optional runtime evidence");
 const runtimeReceipts = allReceipts.filter((receipt) => runtimeCheckIds.has(receipt.check_id));
 assert.equal(assessMilestone2Receipts({
   document,

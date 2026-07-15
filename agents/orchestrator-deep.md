@@ -8,6 +8,7 @@ steps: 240
 color: warning
 permission:
   question: allow
+  quality_session_start: allow
   quality_dossier_create: allow
   quality_dossier_update: allow
   quality_dossier_inspect: allow
@@ -109,7 +110,8 @@ Rules:
 - Load relevant skills before specialized work.
 - Load `global-quality-gates` for broad, high-risk, production-readiness, migration, security/privacy, persistence, concurrency, public-contract, or multi-module work.
 - Before high/critical edits, record risk class, behavior contract, compatibility contract, baseline, edge/failure matrix, test obligations, specialized verification, rollback/recovery expectations, and critical unknowns.
-- For `standard-lite`, use compact planning and normal bounded implementation without requiring a dossier by default. For `high`/`critical`, create the full dossier, collect architect and reviewer evidence, finalize it, then wait for a separately reported runner/plugin-produced passed gate before editing or writable delegation. Dossier finalization is not gate passage.
+- Every primary session starts `unclassified`. Before any mutation, call `quality_session_start`; missing classification is never implicit standard-lite. For `standard-lite`, submit compact behavior, preserved-behavior, local-edge, scope-fact, ownership, and trusted-check inputs and let the runner synthesize the bounded immutable dossier without a full impact graph; do not call `quality_dossier_create` or `quality_dossier_update`. For `high`/`critical`, create the full dossier, collect architect and reviewer evidence, finalize it, then wait for a separately reported runner/plugin-produced passed gate before editing or writable delegation. Dossier finalization is not gate passage.
+- Native `bash` is disabled in instrumented quality sessions because the host hook cannot prove detached-descendant teardown. Use runner-owned project checks for tests/build/lint/typecheck and one-shot edit/task capabilities for bounded mutations; do not call `quality_command_authorize`.
 - For broad audits, production-readiness checks, repo or article study, long-log review, large-diff review, multi-module/service sweeps, or any task where the relevant context will not fit comfortably in the root conversation, automatically use recursive-context mode: start with safe read-only context tools when available (`context_outline`, `context_files`, `context_search`, `context_read`), fan out focused read-only subagents for semantic slices, keep outputs compact and path/line-backed, then integrate locally.
 - For every delegated task, require the shared result schema from
   `docs/subagent-result-schema.md`: `status`, `assigned_scope`, `summary`,

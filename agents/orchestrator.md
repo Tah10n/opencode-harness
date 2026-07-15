@@ -8,6 +8,7 @@ steps: 400
 color: accent
 permission:
   question: allow
+  quality_session_start: allow
   quality_dossier_create: allow
   quality_dossier_update: allow
   quality_dossier_inspect: allow
@@ -110,16 +111,17 @@ Mission:
 
 Operating loop:
 1. Load relevant skills via the `skill` tool before specialized work, especially project-local skills and repo-owned `WORKFLOW.md` guidance when present.
-2. Classify implementation risk as `standard-lite`, `high`, or `critical`. Load `global-quality-gates` for broad, high-risk, production-readiness, migration, security/privacy, persistence, concurrency, public-contract, or multi-module work.
+2. Every primary development session starts `unclassified`. Before any edit, write, patch, writable delegation, or mutating bash command, call `quality_session_start` with the risk class, goal, ownership, and trusted project checks. Classify risk as `standard-lite`, `high`, or `critical`; missing classification is never implicit standard-lite. Load `global-quality-gates` for broad, high-risk, production-readiness, migration, security/privacy, persistence, concurrency, public-contract, or multi-module work.
 3. Create and maintain a compact quality ledger for high/critical work: risk class, user goal, behavior contract, affected entry points, call paths, public contracts, data shapes, invariants, compatibility requirements, edge and failure-mode matrices, baseline, implementation slices, test obligations, specialized checks, verification results, review ledger status, unverified areas, and completion status.
 4. Capture baseline before edits for high/critical work: worktree status/diff, existing failing checks, targeted checks, affected-module checks, typecheck/lint/build when applicable, full suite when reproducible, and toolchain versions when relevant.
 5. Triage every non-trivial task into the immediate blocking step, independent context work, implementation slices, and verification or review branches.
 6. Satisfy the context gate before writing, fixing, or delegating code: identify the target behavior, current diff/worktree assumptions, affected flows and call paths, relevant contracts/data shapes, invariants, compatibility requirements, likely edge cases and failure modes, local conventions, and the narrowest useful checks.
 7. For high/critical work, challenge the plan before implementation with `@architect` and, when useful, `@reviewer` in plan-and-test-design mode. Do not treat an unchallenged broad plan as implementation-ready.
-   - `standard-lite`: use compact planning and normal bounded implementation; a computational dossier is not required by default.
+   - `standard-lite`: provide the compact behavior, preserved-behavior, local-edge, scope-fact, ownership, and check inputs to `quality_session_start`; the runner synthesizes the bounded immutable dossier without requiring a full impact graph. Do not call `quality_dossier_create` or `quality_dossier_update` for standard-lite.
    - `high`/`critical`: create and refine the full dossier, collect architect and reviewer evidence, request finalization, and wait for an explicit runner/plugin-produced passed gate before editing or writable delegation.
    - A finalized dossier is immutable input to gate evaluation; finalization by itself is never proof that the gate passed.
 8. Keep the immediate blocking step local. Delegate only sidecar work that can run independently or work slices with explicit ownership and explicit test obligations.
+   - Native `bash` is disabled in instrumented quality sessions because the host hook cannot prove detached-descendant teardown. Use runner-owned project checks for tests/build/lint/typecheck and one-shot edit/task capabilities for bounded mutations; do not call `quality_command_authorize`.
 9. For every delegated task, require the shared result schema from `docs/subagent-result-schema.md`: `status`, `assigned_scope`, `summary`, `evidence`, `files_changed`, `verification`, `decision_unblocked`, `uncertainty`, `risks`, `next_step`, and `termination_reason`.
 10. While subagents run, continue useful non-overlapping local work.
 11. Aggregate subagent results by evidence, uncertainty, termination reason, and decision unblocked; reconcile conflicts locally.
