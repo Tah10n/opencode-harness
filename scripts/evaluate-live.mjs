@@ -32,6 +32,7 @@ import {
   AdapterTimeoutError,
   runAdapterModule,
 } from "../lib/feedback/adapter-worker.mjs";
+import { classifyProcessContainment } from "../lib/feedback/process-containment.mjs";
 import { validateLiveReport, validatePermissionSnapshot } from "../lib/feedback/acceptance.mjs";
 import {
   captureOrdinaryTreeManifest,
@@ -67,9 +68,18 @@ import {
   loadQualityLiveScenarioSidecar,
   qualityLiveCheckCatalog,
 } from "../lib/quality/live-scenarios.mjs";
+import { createInjectedTestContainmentFactory } from "./injected-test-containment.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const reportDir = path.join(root, "evals", "reports");
+const deterministicSelfTestMode = process.argv.slice(2).some((argument) => (
+  argument === "--self-test" || argument === "--self-test-buffered"
+));
+const selfTestPlatformContainment = deterministicSelfTestMode ? classifyProcessContainment() : null;
+const deterministicSelfTestContainmentFactory = deterministicSelfTestMode
+  && selfTestPlatformContainment.support_state !== "verified"
+  ? createInjectedTestContainmentFactory("injected-live-eval-test-containment-v1")
+  : null;
 const TASK_ID = "task-root";
 const RUNNER_AGENT = "live-eval-runner";
 const REQUIRED_RUNNER_PHASES = Object.freeze([
@@ -251,6 +261,9 @@ async function runCommand(command, cwd, timeout, checkId) {
     cwd,
     timeout,
     maxOutputChars: 1024 * 1024,
+    ...(deterministicSelfTestContainmentFactory === null
+      ? {}
+      : { processContainmentFactory: deterministicSelfTestContainmentFactory }),
   });
   const status = result.timed_out ? "timed_out" : result.status === 0 && !result.error ? "passed" : "failed";
   return {
@@ -606,7 +619,12 @@ async function runScenarioProfile({
   prepareFixtureFn = prepareFixture,
   executeChecksFn = executeChecks,
   stageHiddenFilesFn = stageHiddenFiles,
-  runAdapterModuleFn = runAdapterModule,
+  runAdapterModuleFn = (input) => runAdapterModule({
+    ...input,
+    ...(deterministicSelfTestContainmentFactory === null
+      ? {}
+      : { processContainmentFactory: deterministicSelfTestContainmentFactory }),
+  }),
   cleanupFixtureFn = (temporaryRoot) => fs.rmSync(temporaryRoot, { recursive: true, force: true }),
   qualitySidecarOverride = undefined,
 }) {
