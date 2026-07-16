@@ -13,6 +13,8 @@ import {
   TRUSTED_TOOLCHAIN_LIMITS,
   TRUSTED_TOOLCHAIN_MAP_PATH,
   TRUSTED_TOOLCHAIN_RESOLVERS,
+  TRUSTED_MACOS_NPM_SCRIPT_SHELL_PATH,
+  assertProtectedMacosFixedExecutable,
   assertTrustedToolchainCommandBinding,
   assertTrustedToolchainInvocationCurrent,
   loadTrustedToolchainMap,
@@ -33,6 +35,7 @@ const trustedToolchainsSource = fs.readFileSync(
 const fixedMacosGitCandidate = trustedToolchainsSource.indexOf(
   'return ["/usr/local/libexec/opencode-quality-git/bin/git"];',
 );
+const protectedMacosToolStart = trustedToolchainsSource.indexOf("function assertProtectedMacosFixedExecutable");
 const resolveFixedGitStart = trustedToolchainsSource.indexOf("function resolveFixedGit");
 const resolveFixedGitEnd = trustedToolchainsSource.indexOf("function validatedLease", resolveFixedGitStart);
 const resolveFixedGitSource = trustedToolchainsSource.slice(resolveFixedGitStart, resolveFixedGitEnd);
@@ -42,6 +45,30 @@ assert(fixedMacosGitCandidate >= 0
   && !resolveFixedGitSource.includes("QUALITY_TOOLCHAIN_ALIAS")
   && resolveFixedGitSource.includes('process.platform !== "darwin"'),
 "macOS fixed Git must use the exact protected path and must not hide alias drift with a fallback");
+const protectedMacosToolSource = trustedToolchainsSource.slice(protectedMacosToolStart, resolveFixedGitStart);
+assert(protectedMacosToolStart >= 0
+  && resolveFixedGitStart > protectedMacosToolStart
+  && protectedMacosToolSource.includes("stat.uid !== 0n")
+  && protectedMacosToolSource.includes("stat.nlink !== 1n")
+  && protectedMacosToolSource.includes("0o7777n) !== 0o555n")
+  && protectedMacosToolSource.includes("0o022n) !== 0n")
+  && protectedMacosToolSource.includes("operations.writable")
+  && resolveFixedGitSource.includes('assertProtectedMacosFixedExecutable(candidate, "trusted fixed auxiliary Git")'),
+"macOS fixed host executables must fail closed on wrong ownership, mode, links, or writable ancestry");
+assert.equal(
+  TRUSTED_MACOS_NPM_SCRIPT_SHELL_PATH,
+  "/usr/local/libexec/opencode-quality-shell/bin/sh",
+  "macOS npm must use the exact protected fixed script shell",
+);
+const resolveFixedNpmShellStart = trustedToolchainsSource.indexOf("function resolveFixedNpmScriptShell");
+const resolveFixedNpmShellEnd = trustedToolchainsSource.indexOf("function validatedLease", resolveFixedNpmShellStart);
+const resolveFixedNpmShellSource = trustedToolchainsSource.slice(resolveFixedNpmShellStart, resolveFixedNpmShellEnd);
+assert(resolveFixedNpmShellStart >= 0
+  && resolveFixedNpmShellEnd > resolveFixedNpmShellStart
+  && resolveFixedNpmShellSource.includes("TRUSTED_MACOS_NPM_SCRIPT_SHELL_PATH")
+  && resolveFixedNpmShellSource.includes("assertProtectedMacosFixedExecutable")
+  && resolveFixedNpmShellSource.includes('rolePrefix: "npm_script_shell_"'),
+"macOS npm script shell must be direct and identity-bound");
 const mavenResolverOwnedProperties = Object.freeze([
   "classworlds.conf",
   "maven.ext.class.path",
@@ -67,6 +94,69 @@ const mavenResolverOwnedProperties = Object.freeze([
 
 function expectCode(callback, code) {
   assert.throws(callback, (error) => error instanceof ContractError && error.code === code, `expected ${code}`);
+}
+
+function protectedMacosFixture({
+  leafOwner = 0n,
+  leafMode = 0o555n,
+  leafLinks = 1n,
+  parentOwner = 0n,
+  parentMode = 0o755n,
+  writable = null,
+  alias = null,
+  realpathAlias = false,
+} = {}) {
+  const leaf = path.join(path.parse(repositoryRoot).root, "opencode-protected-fixture", "bin", "sh");
+  const parent = path.dirname(leaf);
+  const comparable = (value) => process.platform === "win32" ? value.toLowerCase() : value;
+  const same = (left, right) => left !== null && right !== null && comparable(left) === comparable(right);
+  return {
+    leaf,
+    parent,
+    operations: {
+      platform: "darwin",
+      realpathSync: (candidate) => realpathAlias && same(candidate, leaf)
+        ? path.join(parent, "aliased-sh")
+        : candidate,
+      lstatSync: (candidate) => {
+        const isLeaf = same(candidate, leaf);
+        const isParent = same(candidate, parent);
+        return {
+          uid: isLeaf ? leafOwner : isParent ? parentOwner : 0n,
+          nlink: isLeaf ? leafLinks : 1n,
+          mode: isLeaf ? leafMode : isParent ? parentMode : 0o755n,
+          isFile: () => isLeaf,
+          isDirectory: () => !isLeaf,
+          isSymbolicLink: () => same(candidate, alias),
+        };
+      },
+      writable: (candidate) => same(candidate, writable),
+    },
+  };
+}
+
+const protectedFixture = protectedMacosFixture();
+assert.doesNotThrow(() => assertProtectedMacosFixedExecutable(
+  protectedFixture.leaf,
+  "protected fixture",
+  protectedFixture.operations,
+));
+for (const [overrides, code] of [
+  [{ leafOwner: 501n }, "QUALITY_TOOLCHAIN_UNTRUSTED_ROOT"],
+  [{ leafMode: 0o755n }, "QUALITY_TOOLCHAIN_UNTRUSTED_ROOT"],
+  [{ leafLinks: 2n }, "QUALITY_TOOLCHAIN_UNTRUSTED_ROOT"],
+  [{ writable: protectedFixture.leaf }, "QUALITY_TOOLCHAIN_UNTRUSTED_ROOT"],
+  [{ parentOwner: 501n }, "QUALITY_TOOLCHAIN_UNTRUSTED_ROOT"],
+  [{ parentMode: 0o777n }, "QUALITY_TOOLCHAIN_UNTRUSTED_ROOT"],
+  [{ writable: protectedFixture.parent }, "QUALITY_TOOLCHAIN_UNTRUSTED_ROOT"],
+  [{ alias: protectedFixture.parent }, "QUALITY_TOOLCHAIN_ALIAS"],
+  [{ realpathAlias: true }, "QUALITY_TOOLCHAIN_ALIAS"],
+]) {
+  const fixture = protectedMacosFixture(overrides);
+  expectCode(
+    () => assertProtectedMacosFixedExecutable(fixture.leaf, "protected fixture", fixture.operations),
+    code,
+  );
 }
 
 function map(toolchains = [
@@ -193,6 +283,13 @@ expectCode(() => validateTrustedToolchainMap(map([{ executable_id: "../node", re
 
 assert.doesNotThrow(() => validateTrustedToolchainArguments("node", ["--version"]));
 assert.doesNotThrow(() => validateTrustedToolchainArguments("npm", ["run", "verify"]));
+assert.doesNotThrow(() => validateTrustedToolchainArguments("npm", ["run", "verify", "--", "--script-shell=fixture"]));
+for (const option of ["--script-shell=/tmp/poison", "--script_shell=/tmp/poison", "--scriptshell=/tmp/poison"]) {
+  expectCode(
+    () => validateTrustedToolchainArguments("npm", ["run", option, "verify"]),
+    "QUALITY_TOOLCHAIN_ARGUMENT",
+  );
+}
 assert.doesNotThrow(() => validateTrustedToolchainArguments("pytest", ["-c", "pytest.ini"]),
   "pytest -c is a configuration option, not Python source text");
 assert.doesNotThrow(() => validateTrustedToolchainArguments("go", ["test", "./...", "literal&|^!%PATH%"]));
@@ -315,6 +412,19 @@ try {
   assert(npmInvocation.argv_prefix[0].endsWith("npm-cli.js"));
   assert.notEqual(npmInvocation.runtime_metadata.git, null);
   assert(npmInvocation.identities.some((entry) => entry.role === "auxiliary_git_executable"));
+  if (process.platform === "darwin") {
+    assert.equal(npmInvocation.runtime_metadata.npm_script_shell.executable_path,
+      TRUSTED_MACOS_NPM_SCRIPT_SHELL_PATH);
+    assert.equal(npmInvocation.environment_profile.variables.NPM_CONFIG_SCRIPT_SHELL,
+      TRUSTED_MACOS_NPM_SCRIPT_SHELL_PATH);
+    assert(npmInvocation.identities.some((entry) => entry.role === "npm_script_shell_executable"));
+    assert(npmInvocation.environment_profile.path_entries.includes(
+      path.dirname(TRUSTED_MACOS_NPM_SCRIPT_SHELL_PATH),
+    ));
+  } else {
+    assert.equal(npmInvocation.runtime_metadata.npm_script_shell, null);
+    assert.equal(npmInvocation.environment_profile.variables.NPM_CONFIG_SCRIPT_SHELL, undefined);
+  }
   assert.doesNotThrow(() => assertTrustedToolchainInvocationCurrent(npmInvocation));
   expectCode(() => assertTrustedToolchainCommandBinding(
     npmInvocation,

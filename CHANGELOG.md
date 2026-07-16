@@ -26,7 +26,10 @@ the feedback-plane ESM subpaths documented for the `0.3.0` target.
   and `macos-latest` is a mandatory receipt producer in CI.
 - Made the macOS operational toolchain path independent of system/Homebrew Git
   symlink shims by provisioning a protected fixed auxiliary Git copy, and
-  isolated Darwin synthetic marker tests from ambient production configuration.
+  made npm script execution independent of incidental Git PATH contents by
+  provisioning and identity-binding a separate protected fixed `sh` copy.
+  Darwin synthetic marker tests remain isolated from ambient production
+  configuration.
 - Bound cross-job evidence to a metadata-independent portable source attestation,
   re-observed source state before receipt sealing, and required successful CI
   producer results before aggregation. Separated containment-setup and execution
@@ -35,8 +38,9 @@ the feedback-plane ESM subpaths documented for the `0.3.0` target.
   resolver-property, implicit-config, and writable Gradle init-script bypasses.
   Late containment results are now closed, partial pre-READY Linux leaves are
   root-cleaned, and trusted command cwd identity is bound through the contained
-  spawn without reopening the checked cwd path. Toolchain policy v4 also binds
-  the configured Node runtime used by the internal sync worker, so bundled
+  spawn without reopening the checked cwd path. Toolchain policy v5 binds the
+  macOS npm script shell and retains v4's configured Node runtime binding for
+  the internal sync worker, so bundled
   Bun/OpenCode hosts and non-Node project checks do not inherit ambient
   `process.execPath`. It retains sealed
   Maven settings/toolchains, Maven extension denial, Maven 4 property-file and

@@ -245,7 +245,7 @@ identity проверяется до sync worker, после containment и в c
 это сохраняет тот же containment contract внутри bundled Bun/OpenCode host и
 для non-Node project checks. Receipt отдельно связывает host-config, resolution-policy,
 runtime-metadata/config-inventory и sanitized-environment fingerprints; policy
-`trusted-toolchain-resolution-v4` не принимает старые v3 receipts.
+`trusted-toolchain-resolution-v5` не принимает старые v4 receipts.
 
 ## Что computationally enforced
 
@@ -321,7 +321,10 @@ boundary, сохраняя только identity-bound ancestors и текущи
 setuid или иной путь смены UID. Поскольку trusted-toolchain contract не следует
 за symlink/shim Git, host также устанавливает singly linked root-owned копию
 реального Git binary в `/usr/local/libexec/opencode-quality-git/bin/git`; канонический
-CI provisioning проверяет её от workload UID.
+CI provisioning проверяет её от workload UID. npm запускает project scripts через
+`sh`, поэтому macOS host отдельно устанавливает identity-bound root-owned shell в
+`/usr/local/libexec/opencode-quality-shell/bin/sh`; resolver фиксирует его через
+`NPM_CONFIG_SCRIPT_SHELL` и добавляет в PATH только для npm invocation.
 
 Binary root-owned, но не setuid: watchdog выполняется как workload UID. Поэтому
 это полная lifecycle-поддержка для доверенных project-owned checks, а не защита

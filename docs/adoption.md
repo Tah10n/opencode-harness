@@ -346,6 +346,13 @@ Git launch paths can be symlinked shims; the trusted-toolchain resolver does
 not follow those aliases. The CI job resolves a Git source only from bounded
 system/Homebrew/Xcode roots, installs the protected copy, and executes it as
 the workload account before accepting the boundary.
+Also install a singly linked root-owned mode-`0555` copy of the canonical
+system `sh` binary at `/usr/local/libexec/opencode-quality-shell/bin/sh`.
+The npm resolver identity-binds this executable, sets
+`NPM_CONFIG_SCRIPT_SHELL` to its fixed path, and adds only its directory to the
+npm PATH. This avoids relying on an unrelated Git directory to happen to
+contain `sh`; the canonical CI job provisions and executes the fixed shell as
+the workload account before producing receipts.
 The binary is root-owned but not privileged at runtime: its process uses the
 workload UID. Only trusted project-owned checks are admissible; deliberate
 same-UID signalling of the watchdog or privilege-changing code is outside this

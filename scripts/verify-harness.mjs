@@ -1104,6 +1104,10 @@ for (const needle of [
   "opencode-quality-exclusive-uid-v1", 'lease="$marker.lease"',
   "OPENCODE_QUALITY_MACOS_FIXED_GIT_ROOT", "/usr/local/libexec/opencode-quality-git/bin/git",
   "trusted macOS Git source resolved outside fixed installation roots",
+  "OPENCODE_QUALITY_MACOS_FIXED_SHELL_ROOT", "/usr/local/libexec/opencode-quality-shell/bin/sh",
+  "trusted macOS shell source resolved outside fixed system roots",
+  "dedicated macOS workload account can modify fixed npm script shell",
+  "assert_protected_tool_path", "path is writable by the workload account",
   "sudo dscl . -create", "ambient sudo authorization",
   '${OPENCODE_QUALITY_RUN_USER:-}',
   "Require successful receipt producers", "needs.verify.result", "needs.linux-containment.result",
@@ -1737,10 +1741,10 @@ for (const needle of [
 }
 assertIncludes(
   read("lib/quality/trusted-toolchain-host-config.mjs"),
-  'TRUSTED_TOOLCHAIN_RESOLUTION_POLICY_VERSION = "trusted-toolchain-resolution-v4"',
+  'TRUSTED_TOOLCHAIN_RESOLUTION_POLICY_VERSION = "trusted-toolchain-resolution-v5"',
   "lib/quality/trusted-toolchain-host-config.mjs",
   "HARNESS-S079",
-  "Semantic toolchain-resolution changes must invalidate v3 receipts.",
+  "Semantic toolchain-resolution changes must invalidate v4 receipts.",
 );
 const trustedProjectRunner = read("lib/quality/trusted-project-runner.mjs");
 for (const needle of [

@@ -25,6 +25,7 @@ import {
   trustedProjectCommandFingerprint,
 } from "../lib/quality/trusted-project-runner.mjs";
 import {
+  TRUSTED_MACOS_NPM_SCRIPT_SHELL_PATH,
   trustedToolchainMapFingerprint,
   validateTrustedToolchainArguments,
   validateTrustedToolchainMap,
@@ -1030,7 +1031,11 @@ child.unref();
 setInterval(() => {}, 60_000);
 `, "utf8");
 fs.writeFileSync(path.join(realProject, "npm-known-fixture.mjs"), `import fs from "node:fs";
-fs.writeFileSync("npm-known-marker.txt", "real", "utf8");
+fs.writeFileSync("npm-known-marker.txt", JSON.stringify({
+  marker: "real",
+  script_shell: process.env.NPM_CONFIG_SCRIPT_SHELL ?? null,
+  path: process.env.PATH ?? null,
+}), "utf8");
 `, "utf8");
 const poisonMarker = path.join(realProject, "poison-marker.txt");
 const poisonedNpmCli = path.join(realProject, "poisoned-npm-cli.mjs");
@@ -1273,7 +1278,16 @@ if (shouldRunReal) {
         ? null
         : boundedNpmFailureDiagnostic(npmStateDirectoriesBefore),
     }));
-    assert.equal(fs.readFileSync(path.join(realProject, "npm-known-marker.txt"), "utf8"), "real");
+    const npmMarker = JSON.parse(fs.readFileSync(path.join(realProject, "npm-known-marker.txt"), "utf8"));
+    assert.equal(npmMarker.marker, "real");
+    if (process.platform === "darwin") {
+      assert.equal(npmMarker.script_shell, TRUSTED_MACOS_NPM_SCRIPT_SHELL_PATH);
+      assert.equal(npmMarker.path.split(path.delimiter).includes(
+        path.dirname(TRUSTED_MACOS_NPM_SCRIPT_SHELL_PATH),
+      ), true, "macOS npm script did not receive the fixed shell directory");
+    } else {
+      assert.equal(npmMarker.script_shell, null);
+    }
     assert.equal(fs.existsSync(poisonMarker), false, "ambient npm_execpath was executed");
 
     const directReceipt = runRealCheck("direct-exit");

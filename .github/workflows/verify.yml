@@ -397,6 +397,21 @@ jobs:
           sudo install -o root -g wheel -m 0555 "$git_source" "$fixed_git"
           echo "OPENCODE_QUALITY_MACOS_FIXED_GIT_ROOT=$fixed_git_root" >> "$GITHUB_ENV"
 
+          shell_source="$(SHELL_CANDIDATE=/bin/sh node -e \
+            'const fs = require("node:fs"); process.stdout.write(fs.realpathSync.native(process.env.SHELL_CANDIDATE))')"
+          case "$shell_source" in
+            /bin/sh|/bin/bash|/bin/zsh|/usr/bin/sh|/usr/bin/bash|/usr/bin/zsh) ;;
+            *)
+              echo "trusted macOS shell source resolved outside fixed system roots: $shell_source" >&2
+              exit 1
+              ;;
+          esac
+          fixed_shell_root="/usr/local/libexec/opencode-quality-shell"
+          fixed_shell="/usr/local/libexec/opencode-quality-shell/bin/sh"
+          sudo install -d -o root -g wheel -m 0755 "$fixed_shell_root" "$fixed_shell_root/bin"
+          sudo install -o root -g wheel -m 0555 "$shell_source" "$fixed_shell"
+          echo "OPENCODE_QUALITY_MACOS_FIXED_SHELL_ROOT=$fixed_shell_root" >> "$GITHUB_ENV"
+
           user="opencodequality"
           home="/Users/$user"
           if dscl . -read "/Users/$user" >/dev/null 2>&1; then
@@ -456,6 +471,43 @@ jobs:
             echo "dedicated macOS workload account can modify fixed auxiliary Git" >&2
             exit 1
           fi
+          sudo -u "$user" /usr/bin/env PATH="$(dirname "$fixed_shell")" sh -c 'exit 0'
+          if sudo -u "$user" test -w "$fixed_shell"; then
+            echo "dedicated macOS workload account can modify fixed npm script shell" >&2
+            exit 1
+          fi
+          assert_protected_tool_path() {
+            local tool="$1"
+            local label="$2"
+            local guard="$tool"
+            local leaf=true
+            while true; do
+              if [[ -L "$guard" || "$(stat -f '%u' "$guard")" != "0" ]]; then
+                echo "$label path is aliased or not root-owned: $guard" >&2
+                exit 1
+              fi
+              local mode
+              mode="$(stat -f '%Lp' "$guard")"
+              if [[ "$leaf" = true ]]; then
+                if [[ ! -f "$guard" || "$mode" != "555" || "$(stat -f '%l' "$guard")" != "1" ]]; then
+                  echo "$label leaf is not a singly linked mode-0555 file" >&2
+                  exit 1
+                fi
+                leaf=false
+              elif [[ ! -d "$guard" ]] || (( (8#$mode & 8#22) != 0 )); then
+                echo "$label ancestry is not a protected directory: $guard" >&2
+                exit 1
+              fi
+              if sudo -u "$user" test -w "$guard"; then
+                echo "$label path is writable by the workload account: $guard" >&2
+                exit 1
+              fi
+              [[ "$guard" = "/" ]] && break
+              guard="$(dirname "$guard")"
+            done
+          }
+          assert_protected_tool_path "$fixed_git" "fixed auxiliary Git"
+          assert_protected_tool_path "$fixed_shell" "fixed npm script shell"
           if sudo -u "$user" test -w "$marker"; then
             echo "dedicated macOS workload account can modify the UID marker" >&2
             exit 1
@@ -530,6 +582,11 @@ jobs:
             sudo rm -f "$OPENCODE_QUALITY_MACOS_FIXED_GIT_ROOT/bin/git"
             sudo rmdir "$OPENCODE_QUALITY_MACOS_FIXED_GIT_ROOT/bin"
             sudo rmdir "$OPENCODE_QUALITY_MACOS_FIXED_GIT_ROOT"
+          fi
+          if [[ -n "${OPENCODE_QUALITY_MACOS_FIXED_SHELL_ROOT:-}" && -d "$OPENCODE_QUALITY_MACOS_FIXED_SHELL_ROOT" ]]; then
+            sudo rm -f "$OPENCODE_QUALITY_MACOS_FIXED_SHELL_ROOT/bin/sh"
+            sudo rmdir "$OPENCODE_QUALITY_MACOS_FIXED_SHELL_ROOT/bin"
+            sudo rmdir "$OPENCODE_QUALITY_MACOS_FIXED_SHELL_ROOT"
           fi
           if [[ -n "${OPENCODE_QUALITY_MACOS_UID_LEASE:-}" && -f "$OPENCODE_QUALITY_MACOS_UID_LEASE" ]]; then
             sudo rm -f "$OPENCODE_QUALITY_MACOS_UID_LEASE"

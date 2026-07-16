@@ -270,9 +270,10 @@ settings-security, and local-repository chains—are resolver-owned. Maven proje
 configuration, every applicable Gradle project/ancestor property file, Gradle
 user/installation properties, and installation init scripts are bounded or
 distribution-manifest identity-bound through the contained spawn boundary;
-writable Gradle user init scripts are unsupported. Toolchain policy v4 and the
-receipt bind the complete runtime config inventory plus the configured Node
-identity used to start the internal sync worker. The managed worker opens the
+writable Gradle user init scripts are unsupported. Toolchain policy v5 and the
+receipt bind the complete runtime config inventory, the configured Node
+identity used to start the internal sync worker, and the fixed macOS npm script
+shell. The managed worker opens the
 trusted cwd after parent-side revalidation; the contained child rechecks that
 inherited directory object last and the command does not reopen the cwd path.
 Containment setup and
