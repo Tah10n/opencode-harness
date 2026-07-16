@@ -23,6 +23,7 @@ import { sealMilestone2OperationalReport } from "../lib/quality/milestone-operat
 import {
   assertMilestone2BundleMatchesRunContext,
   milestone2SharedRunFingerprint,
+  milestone2SourceStabilityFingerprint,
 } from "../lib/quality/milestone-run-context.mjs";
 import { ContractError, fingerprint } from "../lib/quality/validation.mjs";
 
@@ -376,6 +377,22 @@ const aggregateRunContext = {
     job_id: "milestone-2-status-fixture-job",
   },
 };
+const metadataOnlyContext = {
+  ...structuredClone(windowsBundle),
+  workspace_fingerprint: fingerprint({ workspace: "same-source-different-local-index-identity" }),
+};
+assert.equal(
+  milestone2SourceStabilityFingerprint(windowsBundle),
+  milestone2SourceStabilityFingerprint(metadataOnlyContext),
+  "machine-local workspace identity drift must not impersonate a portable source change",
+);
+const changedPortableSourceContext = structuredClone(metadataOnlyContext);
+changedPortableSourceContext.run_binding.source_attestation_fingerprint = fingerprint({ source: "changed-portable-source" });
+assert.notEqual(
+  milestone2SourceStabilityFingerprint(windowsBundle),
+  milestone2SourceStabilityFingerprint(changedPortableSourceContext),
+  "portable source attestation drift must fail the source-stability comparison",
+);
 assert.equal(
   milestone2SharedRunFingerprint(windowsBundle),
   milestone2SharedRunFingerprint(aggregateRunContext),

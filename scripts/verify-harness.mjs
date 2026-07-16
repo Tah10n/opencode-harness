@@ -1754,10 +1754,18 @@ for (const needle of [
   "source_attestation_fingerprint",
   "assertMilestone2RunContextStable",
   "MILESTONE_SOURCE_CHANGED_DURING_RUN",
+  "milestone2SourceStabilityFingerprint",
   "milestone2SharedRunFingerprint",
 ]) {
   assertIncludes(milestoneRunContext, needle, "lib/quality/milestone-run-context.mjs", "HARNESS-S079", "Milestone receipt provenance must bind portable source state and re-observe before sealing.");
 }
+assertNotIncludes(
+  milestoneRunContext,
+  "expected.workspace_fingerprint !== current.workspace_fingerprint",
+  "lib/quality/milestone-run-context.mjs",
+  "HARNESS-S079",
+  "Do not treat machine-local Git index identity refresh as a portable source mutation.",
+);
 for (const file of [
   "scripts/verify-all.mjs",
   "scripts/run-milestone-2-operational.mjs",

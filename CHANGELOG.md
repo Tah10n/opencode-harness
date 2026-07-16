@@ -50,6 +50,8 @@ the feedback-plane ESM subpaths documented for the `0.3.0` target.
   now waits for process `close`, not merely `exit`, before releasing cwd/IPC
   resources or returning control. Linux cleanup also tolerates setup failure
   before workload identity export without hiding the producer failure.
+  Milestone source-stability checks bind `HEAD` and the portable content
+  attestation rather than failing on a read-only Git index stat-cache refresh.
 - Hardened Milestone 2 completion evidence so deterministic fixtures cannot mint
   operational or installed-host success. CI now uploads sealed deterministic,
   Windows Job Object, and guarded Linux cgroup-v2 bundles, aggregates only
