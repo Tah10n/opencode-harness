@@ -123,8 +123,11 @@ function containedExecution(execution = {}, {
       worker_start_identity: { seconds: 10, microseconds: 20 },
       controller_start_identity: { seconds: 30, microseconds: 40 },
       preserved_ancestor_count: 2,
+      preparation_scan_count: 3,
       controller_executable: { canonical_path: "/usr/local/libexec/opencode-quality-macos-controller", fixture: true },
-      controller_protocol_version: 1,
+      uid_marker: { canonical_path: "/var/db/opencode-quality/uid-501.marker", fixture: true },
+      lease_file: { canonical_path: "/var/db/opencode-quality/uid-501.marker.lease", fixture: true },
+      controller_protocol_version: 2,
       controller_protocol_fingerprint: fingerprint({ controller: "fixture-macos" }),
     };
   } else {
@@ -480,7 +483,15 @@ const macosContainmentDescriptor = containmentDescriptor({
       fixture: true,
     },
     workload_uid: 501,
-    controller_protocol_version: 1,
+    uid_marker: {
+      canonical_path: "/var/db/opencode-quality/uid-501.marker",
+      fixture: true,
+    },
+    lease_file: {
+      canonical_path: "/var/db/opencode-quality/uid-501.marker.lease",
+      fixture: true,
+    },
+    controller_protocol_version: 2,
     controller_protocol_fingerprint: fingerprint({ controller: "fixture-macos" }),
   },
 });
@@ -1106,7 +1117,8 @@ const platformClassification = classifyProcessContainment();
 let runtimeResult;
 const operationalReceipts = [];
 const configuredMacos = process.env.OPENCODE_QUALITY_MACOS_CONTROLLER !== undefined
-  && process.env.OPENCODE_QUALITY_MACOS_WORKLOAD_UID !== undefined;
+  && process.env.OPENCODE_QUALITY_MACOS_WORKLOAD_UID !== undefined
+  && process.env.OPENCODE_QUALITY_MACOS_UID_MARKER !== undefined;
 const shouldRunReal = process.platform === "win32"
   || (process.platform === "linux" && process.env.OPENCODE_QUALITY_CGROUP_ROOT !== undefined)
   || (process.platform === "darwin" && configuredMacos);
@@ -1215,7 +1227,7 @@ if (shouldRunReal) {
     }
   }
 } else if (process.platform === "darwin") {
-  runtimeResult = "macos-exclusive-uid-v1: unavailable without a dedicated configured UID (not counted as runtime coverage)";
+  runtimeResult = "macos-exclusive-uid-v1: unavailable without a dedicated configured UID marker/lease (not counted as runtime coverage)";
 } else if (process.platform === "linux") {
   runtimeResult = "linux-cgroup-v2: unavailable without OPENCODE_QUALITY_CGROUP_ROOT (not counted as runtime coverage)";
 } else {

@@ -404,6 +404,19 @@ jobs:
           sudo dscl . -create "/Users/$user" NFSHomeDirectory "$home"
           sudo dscl . -create "/Users/$user" IsHidden 1
           sudo install -d -o "$user" -g staff -m 0700 "$home"
+
+          boundary_root="/private/var/db/opencode-quality"
+          marker="$boundary_root/uid-$uid.marker"
+          lease="$marker.lease"
+          marker_source="$build_parent/opencode-quality-uid-$uid.marker"
+          printf 'opencode-quality-exclusive-uid-v1:%s\n' "$uid" > "$marker_source"
+          sudo install -d -o root -g wheel -m 0755 "$boundary_root"
+          sudo install -o root -g wheel -m 0444 "$marker_source" "$marker"
+          sudo install -o "$user" -g staff -m 0600 /dev/null "$lease"
+          rm -f "$marker_source"
+          echo "OPENCODE_QUALITY_MACOS_UID_MARKER=$marker" >> "$GITHUB_ENV"
+          echo "OPENCODE_QUALITY_MACOS_UID_LEASE=$lease" >> "$GITHUB_ENV"
+
           if sudo dseditgroup -o checkmember -m "$user" admin | grep -q 'yes'; then
             echo "dedicated macOS workload account is unexpectedly an administrator" >&2
             exit 1
@@ -419,6 +432,11 @@ jobs:
             echo "dedicated macOS workload account can modify the controller" >&2
             exit 1
           fi
+          if sudo -u "$user" test -w "$marker"; then
+            echo "dedicated macOS workload account can modify the UID marker" >&2
+            exit 1
+          fi
+          sudo -u "$user" test -w "$lease"
           guard="$(dirname "$controller")"
           while true; do
             if sudo -u "$user" test -w "$guard"; then
@@ -448,6 +466,7 @@ jobs:
             GITHUB_REPOSITORY="$GITHUB_REPOSITORY" \
             OPENCODE_QUALITY_MACOS_CONTROLLER="$OPENCODE_QUALITY_MACOS_CONTROLLER" \
             OPENCODE_QUALITY_MACOS_WORKLOAD_UID="$OPENCODE_QUALITY_RUN_UID" \
+            OPENCODE_QUALITY_MACOS_UID_MARKER="$OPENCODE_QUALITY_MACOS_UID_MARKER" \
             npm run milestone:2:operational -- --dimension macos_runtime --out "$out"
           status=$?
           set -e
@@ -482,6 +501,14 @@ jobs:
           sudo chown -R "$(id -u):$(id -g)" "$GITHUB_WORKSPACE"
           if [[ -n "${OPENCODE_QUALITY_MACOS_CONTROLLER:-}" && -f "$OPENCODE_QUALITY_MACOS_CONTROLLER" ]]; then
             sudo rm -f "$OPENCODE_QUALITY_MACOS_CONTROLLER"
+          fi
+          if [[ -n "${OPENCODE_QUALITY_MACOS_UID_LEASE:-}" && -f "$OPENCODE_QUALITY_MACOS_UID_LEASE" ]]; then
+            sudo rm -f "$OPENCODE_QUALITY_MACOS_UID_LEASE"
+          fi
+          if [[ -n "${OPENCODE_QUALITY_MACOS_UID_MARKER:-}" && -f "$OPENCODE_QUALITY_MACOS_UID_MARKER" ]]; then
+            boundary_root="$(dirname "$OPENCODE_QUALITY_MACOS_UID_MARKER")"
+            sudo rm -f "$OPENCODE_QUALITY_MACOS_UID_MARKER"
+            sudo rmdir "$boundary_root" 2>/dev/null || true
           fi
           if [[ -n "${OPENCODE_QUALITY_RUN_USER:-}" ]] && dscl . -read "/Users/$OPENCODE_QUALITY_RUN_USER" >/dev/null 2>&1; then
             sudo dscl . -delete "/Users/$OPENCODE_QUALITY_RUN_USER"

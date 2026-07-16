@@ -262,8 +262,11 @@ checks. Windows workers use Job Object containment before initialization, while
 Linux workers require a delegated writable cgroup v2 and verified hierarchical
 `cgroup.events: populated 0` followed by postorder subtree removal. macOS
 workers require the root-owned native controller and a dedicated, non-admin,
-exclusive real UID; teardown is accepted only after fixed-point stop/kill and
-two empty same-UID scans. A missing/non-exclusive macOS boundary fails closed.
+exclusive real UID authorized by a protected root-owned marker and serialized
+by its workload-owned mode-`0600` lease. Readiness and teardown are accepted
+only after fixed-point stop/kill and two empty same-UID scans; receipts bind the
+controller, marker, lease, protocol, and preparation census. A missing marker,
+busy lease, or identity drift fails closed.
 The live adapter
 runner enforces its own isolated workspace policy, hidden checks, teardown, and
 report assertions only inside live-evaluation runs. Processes started outside

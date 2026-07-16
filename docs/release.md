@@ -248,7 +248,9 @@ causality, or pre-dossier risk classification. Native Bash is disabled in an
 instrumented quality session; commands use trusted project-catalog checks, with
 Windows Job Object containment, delegated Linux cgroup-v2 containment, and
 macOS exclusive-UID containment through a root-owned native controller and a
-dedicated non-admin account. macOS release evidence must include both the
+dedicated non-admin account authorized by a protected UID marker and serialized
+by a paired workload-owned lease. The v2 receipt identity binds controller,
+marker, lease, and pre-readiness fixed-point census. macOS release evidence must include both the
 trusted-check and descendant-teardown receipts; `unsupported` cannot satisfy
 Milestone 2 DoD v3. Any unavailable production controller still fails closed.
 Logical project toolchain IDs never carry host

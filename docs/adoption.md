@@ -317,17 +317,28 @@ install that binary outside the project as a root-owned, singly linked,
 non-group/world-writable executable whose complete canonical path ancestry is
 also root-owned, non-group/world-writable, and not writable by the workload via
 effective ACLs. Run the entire harness coordinator under a
-dedicated non-root, non-admin account that has no other processes and no sudo,
-setuid, or other UID-changing path. Set
+dedicated non-root, non-admin account with no sudo, setuid, or other
+UID-changing path. Under a canonical root-owned/non-writable directory, create
+a singly linked root-owned marker containing exactly
+`opencode-quality-exclusive-uid-v1:<uid>\n` and a neighbouring
+`<marker>.lease` owned by the workload UID with exact mode `0600`. The marker
+is the host authorization that this UID is dedicated to harness lifecycle
+cleanup; the lease serializes probe and watch scopes. Set
 `OPENCODE_QUALITY_MACOS_CONTROLLER` to the installed binary and
-`OPENCODE_QUALITY_MACOS_WORKLOAD_UID` to that account's real UID. The
-controller preserves only identity-bound coordinator ancestors; every other
-same-UID process is workload, so fork/exec, `setsid`, double-fork, and reparenting
-remain inside the boundary. It performs fixed-point `SIGSTOP`, `SIGKILL`, and
-two zero-member scans; stdin EOF also tears down an orphaned workload and a
-concurrent scope is rejected. A normal logged-in account with background
-same-UID processes is intentionally unavailable. The `macos-containment` GitHub
-Actions job is the canonical provisioning and receipt example.
+`OPENCODE_QUALITY_MACOS_WORKLOAD_UID` to that account's real UID, and
+`OPENCODE_QUALITY_MACOS_UID_MARKER` to the marker; the lease path is derived as
+`<marker>.lease`. After acquiring the lease, the controller preserves only
+identity-bound coordinator ancestors (and the current worker during
+preparation), then stops and kills every other same-UID process to a proven
+zero-member fixed point before `READY`. This safely handles macOS per-user
+agents that can appear when the dedicated account is first used without a
+process-name allowlist. Fork/exec, `setsid`, double-fork, and reparenting remain
+inside the boundary. Final teardown repeats fixed-point `SIGSTOP`, `SIGKILL`,
+and two zero-member scans; stdin EOF also tears down an orphaned workload and a
+concurrent scope is rejected by the held lease. A normal logged-in account
+without the protected host marker is intentionally unavailable. The
+`macos-containment` GitHub Actions job is the canonical provisioning and
+receipt example.
 The binary is root-owned but not privileged at runtime: its process uses the
 workload UID. Only trusted project-owned checks are admissible; deliberate
 same-UID signalling of the watchdog or privilege-changing code is outside this

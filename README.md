@@ -299,20 +299,26 @@ containment.
 
 macOS не является Linux и не предоставляет cgroup/Job Object API. На macOS
 harness использует `macos-exclusive-uid-v1`: весь coordinator запускается под
-отдельным non-root/non-admin real UID, которому не принадлежат никакие другие
-процессы, а root-owned controller устанавливается вне workspace с mode `0555`
-под полностью root-owned/non-writable canonical path ancestry.
+отдельным non-root/non-admin real UID, а root-owned controller устанавливается
+вне workspace с mode `0555` под полностью root-owned/non-writable canonical
+path ancestry. Host дополнительно создаёт root-owned marker с точным содержимым
+`opencode-quality-exclusive-uid-v1:<uid>\n` и соседний `<marker>.lease`, который
+принадлежит workload UID и имеет точный mode `0600`. Marker явно подтверждает,
+что UID выделен для harness; controller берёт inode lease до любых сигналов.
 Controller связывает coordinator ancestors по PID + start time; каждый другой
 живой процесс с этим real UID входит в workload boundary даже после
 fork/exec/`setsid`/reparenting. Teardown сначала останавливает boundary до fixed
 point, затем посылает `SIGKILL` и требует два пустых UID-scan без zombies.
 Закрытие stdin после смерти coordinator запускает тот же teardown; concurrent
-scope под этим UID отклоняется. Нужны
+scope отклоняется занятым lease. Перед `READY` controller под тем же lease
+удаляет автоматически запущенные macOS per-user agents и доказывает пустой
+boundary, сохраняя только identity-bound ancestors и текущий worker. Нужны
 `OPENCODE_QUALITY_MACOS_CONTROLLER` и
-`OPENCODE_QUALITY_MACOS_WORKLOAD_UID`. Обычный login account с фоновыми
-процессами даёт fail-closed `QUALITY_CHECK_CONTAINMENT_UNAVAILABLE`, а не
-ослабленное доказательство. Workload principal не должен иметь `sudo`, setuid
-или иной путь смены UID.
+`OPENCODE_QUALITY_MACOS_WORKLOAD_UID`, а также
+`OPENCODE_QUALITY_MACOS_UID_MARKER`; путь lease выводится как
+`<marker>.lease`. Обычный login account без host marker не принимается даже
+если в момент проверки он пуст. Workload principal не должен иметь `sudo`,
+setuid или иной путь смены UID.
 
 Binary root-owned, но не setuid: watchdog выполняется как workload UID. Поэтому
 это полная lifecycle-поддержка для доверенных project-owned checks, а не защита
@@ -444,8 +450,9 @@ npm run milestone:2:assess -- --bundle-dir C:\absolute\bundles --out C:\absolute
 
 Use `linux_runtime` on a guarded Linux cgroup-v2 host. Use `macos_runtime` only
 inside a dedicated macOS workload account after building and root-installing
-`native/macos-exclusive-uid-controller.c`; the required environment variables
-are shown above and the complete provisioning reference is the
+`native/macos-exclusive-uid-controller.c`, provisioning its protected UID
+marker and paired lease; the required environment variables are shown above
+and the complete provisioning reference is the
 `macos-containment` CI job. The installed-host path
 can write its own `host_hook_e2e` bundle with
 `npm run verify:runtime:quality-hooks -- --adapter <host-owned-adapter> --milestone-out <absolute-json>`.

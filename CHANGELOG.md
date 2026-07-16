@@ -15,10 +15,13 @@ the feedback-plane ESM subpaths documented for the `0.3.0` target.
   outcomes; ten-scenario disabled-Bash host-flow fixtures; trusted post-edit
   architecture evidence; and receipt-driven partial/blocked completion states.
 - Added required macOS operational containment. A root-owned native watchdog
-  runs with a dedicated non-root/non-admin exclusive real UID, binds coordinator
-  ancestors by PID/start time, rejects concurrent scopes, tears down detached
-  and reparented descendants after coordinator death, and proves two empty
-  same-UID scans. Milestone 2 DoD v3 now requires both macOS trusted-check and
+  runs with a dedicated non-root/non-admin real UID authorized by a protected
+  root-owned marker and serialized by a paired workload-owned lease. Protocol
+  v2 clears automatically spawned macOS per-user agents to a fixed point before
+  readiness without name allowlists, binds controller/marker/lease identities
+  and preparation census in receipts, rejects concurrent scopes, tears down
+  detached and reparented descendants after coordinator death, and proves two
+  empty same-UID scans. Milestone 2 DoD v3 now requires both macOS trusted-check and
   descendant-teardown receipts; `unsupported` no longer satisfies completion,
   and `macos-latest` is a mandatory receipt producer in CI.
 - Bound cross-job evidence to a metadata-independent portable source attestation,

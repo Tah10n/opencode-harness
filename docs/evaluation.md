@@ -296,22 +296,27 @@ never containment proof.
 
 macOS uses a different verified boundary because it has no public cgroup or Job
 Object equivalent. `macos-exclusive-uid-v1` requires the complete coordinator
-chain to run under one dedicated, non-root, non-admin real UID with no unrelated
-same-UID processes. A root-owned, singly linked, mode-`0555` native controller
-under canonical root-owned ancestry that is also non-writable under effective
-ACLs binds preserved coordinator ancestors by PID and start
-time. Every other process with that real UID is stopped to a fixed point and
-killed, including detached, reparented, and double-fork descendants. Successful
-teardown requires two empty UID scans with no zombies. EOF after coordinator
-death invokes the same cleanup, and a second concurrent scope is rejected.
+chain to run under one dedicated, non-root, non-admin real UID. A root-owned,
+singly linked, mode-`0555` native controller under canonical root-owned
+ancestry that is also non-writable under effective ACLs binds preserved
+coordinator ancestors by PID and start time. A protected root-owned UID marker
+authorizes cleanup for that dedicated account; its paired workload-owned
+mode-`0600` lease is acquired before any process signal and held through the
+scope. The controller first removes all other same-UID processes—including
+macOS per-user agents created on first account use—to two empty scans before
+emitting `READY`, without process-name exemptions. Final teardown applies the
+same fixed-point stop/kill proof to the worker plus detached, reparented, and
+double-fork descendants. EOF after coordinator death invokes the same cleanup,
+and a second concurrent scope is rejected by the lease.
 The controller's ten-second teardown bound is paired with a longer parent-side
 close-confirmation window, so the parent cannot declare failure and return while
 the native teardown is still within its own advertised deadline.
-Ordinary interactive accounts, UID mismatch, controller identity drift, a
-non-exclusive UID, or missing controller configuration all fail closed as
-unavailable. This mechanism assumes the workload account has no sudo, setuid,
-or other privilege-changing path; it is process-lifecycle containment, not a
-privilege-escalation, filesystem, or network sandbox.
+Ordinary interactive accounts without the host marker, UID mismatch,
+controller/marker/lease identity drift, a busy lease, or missing configuration
+all fail closed. Receipts bind the three file identities, protocol v2, and the
+preparation scan count. This mechanism assumes the workload account has no
+sudo, setuid, or other privilege-changing path; it is process-lifecycle
+containment, not a privilege-escalation, filesystem, or network sandbox.
 The root-owned executable is not setuid and the watchdog runs as the workload
 UID. Deliberate same-UID attacks on the watchdog are outside the trusted-check
 threat model; unexpected controller exit still fails the receipt closed, but is

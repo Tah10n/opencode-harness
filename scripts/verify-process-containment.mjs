@@ -43,6 +43,29 @@ const processTreeSource = fs.readFileSync(
   fileURLToPath(new URL("../lib/feedback/process-tree.mjs", import.meta.url)),
   "utf8",
 );
+const macosControllerSource = fs.readFileSync(
+  fileURLToPath(new URL("../native/macos-exclusive-uid-controller.c", import.meta.url)),
+  "utf8",
+);
+const macosMarkerValidation = macosControllerSource.indexOf("validate_uid_marker(marker_path, workload_uid)");
+const macosLeaseAcquisition = macosControllerSource.indexOf("acquire_uid_lease(lease_path, workload_uid)");
+const macosScopeCapture = macosControllerSource.indexOf("capture_scope(coordinator_pid, worker_pid, probe, &scope)");
+const macosPreparation = macosControllerSource.indexOf("if (terminate_scope(", macosScopeCapture);
+const macosReady = macosControllerSource.indexOf('"READY:%d:', macosPreparation);
+const macosFinalTeardown = macosControllerSource.indexOf(
+  "terminate_scope(&scope, timeout_milliseconds, false",
+  macosReady,
+);
+assert(macosControllerSource.includes("#define CONTROLLER_PROTOCOL_VERSION 2")
+  && macosControllerSource.includes("lease_matches_marker(marker_path, lease_path)")
+  && macosControllerSource.includes("uid_preparation_timeout")
+  && macosMarkerValidation >= 0
+  && macosLeaseAcquisition > macosMarkerValidation
+  && macosScopeCapture > macosLeaseAcquisition
+  && macosPreparation > macosScopeCapture
+  && macosReady > macosPreparation
+  && macosFinalTeardown > macosReady,
+"native macOS protocol must validate marker/lease, prepare the UID before READY, and tear down without preserving the worker");
 const currentIdentityAssertion = processTreeSource.indexOf(
   "assertTrustedToolchainInvocationCurrent(input.expected_invocation);",
 );
@@ -360,7 +383,7 @@ function createFakeMacosController({
       if (exited) return;
       if (value === "CLOSE\n" && close === "success") {
         queueMicrotask(() => {
-          const emitClosed = () => stdout.emit("data", "CLOSED:1:4:0\n");
+          const emitClosed = () => stdout.emit("data", "CLOSED:2:4:0\n");
           if (exitBeforeClosed) emitExit(0, emitClosed);
           else {
             emitClosed();
@@ -380,7 +403,7 @@ function createFakeMacosController({
     return true;
   };
   queueMicrotask(() => {
-    const ready = initial ?? `READY:1:${workloadUid}:${workerPid}:10:20:${controllerPid}:30:40:2\n`;
+    const ready = initial ?? `READY:2:${workloadUid}:${workerPid}:10:20:${controllerPid}:30:40:2:3\n`;
     const chunks = Array.isArray(ready) ? ready : [ready];
     for (const chunk of chunks) {
       if (chunk.length > 0) stdout.emit("data", chunk);
@@ -484,11 +507,21 @@ function createFakeLinuxWatchdog(fake, {
 }
 
 const fakeMacosControllerPath = path.join(canonicalTempBase, "opencode-quality-macos-controller");
+const fakeMacosMarkerPath = path.join(canonicalTempBase, "opencode-quality-macos-uid.marker");
+const fakeMacosLeasePath = `${fakeMacosMarkerPath}.lease`;
 const macosIdentity = fakeMacosControllerIdentity(fakeMacosControllerPath);
+const fakeMacosLeaseIdentity = Object.freeze({
+  uid_marker: fakeMacosControllerIdentity(fakeMacosMarkerPath, "2"),
+  lease_file: Object.freeze({
+    ...fakeMacosControllerIdentity(fakeMacosLeasePath, "3"),
+    mode: "33152",
+    owner_uid: "501",
+  }),
+});
 const validMacosProbe = () => Object.freeze({
   status: 0,
   signal: null,
-  stdout: "PROBE:1:501:6262:10:20:2\n",
+  stdout: "PROBE:2:501:6262:10:20:2:3\n",
   stderr: "",
 });
 assert.equal(classifyProcessContainment({ platform: "darwin", env: {} }).support_state, "unavailable");
@@ -497,16 +530,20 @@ assert.equal(classifyProcessContainment({
   platform: "darwin",
   macosController: fakeMacosControllerPath,
   macosWorkloadUid: 501,
+  macosUidMarker: fakeMacosMarkerPath,
   currentUid: 501,
   macosControllerIdentity: macosIdentity,
+  macosUidLeaseIdentity: fakeMacosLeaseIdentity,
   spawnMacosProbe: validMacosProbe,
 }).support_state, "verified");
 assert.equal(classifyProcessContainment({
   platform: "darwin",
   macosController: fakeMacosControllerPath,
   macosWorkloadUid: 501,
+  macosUidMarker: fakeMacosMarkerPath,
   currentUid: 502,
   macosControllerIdentity: macosIdentity,
+  macosUidLeaseIdentity: fakeMacosLeaseIdentity,
   spawnMacosProbe: validMacosProbe,
 }).reason, "exclusive_uid_mismatch");
 assert.equal(classifyProcessContainment({
@@ -515,14 +552,35 @@ assert.equal(classifyProcessContainment({
   macosWorkloadUid: 501,
   currentUid: 501,
   macosControllerIdentity: macosIdentity,
-  spawnMacosProbe: () => ({ ...validMacosProbe(), stdout: "PROBE:0:501:6262:10:20:2\n" }),
+  spawnMacosProbe: validMacosProbe,
+}).reason, "uid_marker_missing");
+assert.equal(classifyProcessContainment({
+  platform: "darwin",
+  macosController: fakeMacosControllerPath,
+  macosWorkloadUid: 501,
+  macosUidMarker: fakeMacosMarkerPath,
+  currentUid: 501,
+  macosControllerIdentity: macosIdentity,
+  spawnMacosProbe: validMacosProbe,
+}).reason, "uid_marker_untrusted");
+assert.equal(classifyProcessContainment({
+  platform: "darwin",
+  macosController: fakeMacosControllerPath,
+  macosWorkloadUid: 501,
+  macosUidMarker: fakeMacosMarkerPath,
+  currentUid: 501,
+  macosControllerIdentity: macosIdentity,
+  macosUidLeaseIdentity: fakeMacosLeaseIdentity,
+  spawnMacosProbe: () => ({ ...validMacosProbe(), stdout: "PROBE:1:501:6262:10:20:2:3\n" }),
 }).reason, "controller_protocol_failed");
 assert.equal(classifyProcessContainment({
   platform: "darwin",
   macosController: fakeMacosControllerPath,
   macosWorkloadUid: 501,
+  macosUidMarker: fakeMacosMarkerPath,
   currentUid: 501,
   macosControllerIdentity: macosIdentity,
+  macosUidLeaseIdentity: fakeMacosLeaseIdentity,
   spawnMacosProbe: () => ({
     status: 77,
     signal: null,
@@ -542,12 +600,15 @@ assert.throws(() => normalizeProcessContainmentOptions({ cgroupAttachMode: "ambi
 assert.deepEqual(normalizeProcessContainmentOptions({
   macosController: fakeMacosControllerPath,
   macosWorkloadUid: 501,
+  macosUidMarker: fakeMacosMarkerPath,
 }), {
   macosController: fakeMacosControllerPath,
   macosWorkloadUid: 501,
+  macosUidMarker: fakeMacosMarkerPath,
 });
 assert.throws(() => normalizeProcessContainmentOptions({ macosController: "relative" }), TypeError);
 assert.throws(() => normalizeProcessContainmentOptions({ macosWorkloadUid: 0 }), TypeError);
+assert.throws(() => normalizeProcessContainmentOptions({ macosUidMarker: "relative" }), TypeError);
 
 const partialLeafRoot = temporaryDirectory("opencode-cgroup-partial-leaf-");
 try {
@@ -665,8 +726,10 @@ const macosOptions = Object.freeze({
   platform: "darwin",
   macosController: fakeMacosControllerPath,
   macosWorkloadUid: 501,
+  macosUidMarker: fakeMacosMarkerPath,
   currentUid: 501,
   macosControllerIdentity: macosIdentity,
+  macosUidLeaseIdentity: fakeMacosLeaseIdentity,
 });
 const validMacos = await preparePlatformProcessContainment({ pid: 4242 }, 100, {
   ...macosOptions,
@@ -676,6 +739,9 @@ const validMacos = await preparePlatformProcessContainment({ pid: 4242 }, 100, {
 assert.equal(validMacos.kind, "macos-exclusive-uid-v1");
 assert.equal(validMacos.identity.workload_uid, 501);
 assert.equal(validMacos.identity.preserved_ancestor_count, 2);
+assert.equal(validMacos.identity.preparation_scan_count, 3);
+assert.deepEqual(validMacos.identity.uid_marker, fakeMacosLeaseIdentity.uid_marker);
+assert.deepEqual(validMacos.identity.lease_file, fakeMacosLeaseIdentity.lease_file);
 assert.equal(await validMacos.terminateAndVerify(100), true);
 assert.equal(validMacos.status().teardown_verified, true);
 
@@ -688,9 +754,10 @@ assert.equal(await reorderedMacos.terminateAndVerify(100), true);
 assert.equal(reorderedMacos.status().controller_streams_closed, true);
 
 for (const [label, fixture] of [
-  ["wrong worker", { initial: "READY:1:501:4243:10:20:6262:30:40:2\n" }],
-  ["wrong UID", { initial: "READY:1:502:4242:10:20:6262:30:40:2\n" }],
-  ["wrong controller", { initial: "READY:1:501:4242:10:20:6263:30:40:2\n" }],
+  ["wrong worker", { initial: "READY:2:501:4243:10:20:6262:30:40:2:3\n" }],
+  ["wrong UID", { initial: "READY:2:502:4242:10:20:6262:30:40:2:3\n" }],
+  ["wrong controller", { initial: "READY:2:501:4242:10:20:6263:30:40:2:3\n" }],
+  ["missing preparation evidence", { initial: "READY:2:501:4242:10:20:6262:30:40:2:2\n" }],
   ["protocol garbage", { initial: "GARBAGE\n" }],
   ["early exit", { initial: "", exitOnStart: 1 }],
 ]) {
@@ -726,7 +793,9 @@ const driftingMacosOptions = {
   platform: "darwin",
   macosController: fakeMacosControllerPath,
   macosWorkloadUid: 501,
+  macosUidMarker: fakeMacosMarkerPath,
   currentUid: 501,
+  macosUidLeaseIdentity: fakeMacosLeaseIdentity,
   spawnMacosController: () => createFakeMacosController(),
   scopeIdFactory: () => "macos-exclusive-uid-identity-drift",
 };
@@ -740,6 +809,37 @@ Object.defineProperty(driftingMacosOptions, "macosControllerIdentity", {
 const macosIdentityDrift = await preparePlatformProcessContainment({ pid: 4242 }, 100, driftingMacosOptions);
 assert.equal(await macosIdentityDrift.terminateAndVerify(100), false);
 assert.equal(macosIdentityDrift.status().failure, "macos_uid_controller_identity_drift");
+
+let macosLeaseIdentityReads = 0;
+const driftingMacosLeaseOptions = {
+  platform: "darwin",
+  macosController: fakeMacosControllerPath,
+  macosWorkloadUid: 501,
+  macosUidMarker: fakeMacosMarkerPath,
+  currentUid: 501,
+  macosControllerIdentity: macosIdentity,
+  spawnMacosController: () => createFakeMacosController(),
+  scopeIdFactory: () => "macos-exclusive-uid-host-identity-drift",
+};
+Object.defineProperty(driftingMacosLeaseOptions, "macosUidLeaseIdentity", {
+  enumerable: true,
+  get() {
+    macosLeaseIdentityReads += 1;
+    return macosLeaseIdentityReads === 1
+      ? fakeMacosLeaseIdentity
+      : Object.freeze({
+        ...fakeMacosLeaseIdentity,
+        lease_file: Object.freeze({ ...fakeMacosLeaseIdentity.lease_file, inode: "4" }),
+      });
+  },
+});
+const macosLeaseIdentityDrift = await preparePlatformProcessContainment(
+  { pid: 4242 },
+  100,
+  driftingMacosLeaseOptions,
+);
+assert.equal(await macosLeaseIdentityDrift.terminateAndVerify(100), false);
+assert.equal(macosLeaseIdentityDrift.status().failure, "macos_uid_host_identity_drift");
 
 const syncInput = {
   file: process.execPath,
@@ -759,6 +859,16 @@ const invalidSync = spawnSync(process.execPath, [syncWorker], {
 });
 assert.equal(invalidSync.status, 0);
 assert.equal(JSON.parse(invalidSync.stdout).error_code, "MANAGED_COMMAND_INPUT_INVALID");
+const invalidMacosMarkerSync = spawnSync(process.execPath, [syncWorker], {
+  cwd: process.cwd(),
+  shell: false,
+  windowsHide: true,
+  encoding: "utf8",
+  input: JSON.stringify({ ...syncInput, containment_options: { macos_uid_marker: "relative" } }),
+  maxBuffer: 64 * 1024,
+});
+assert.equal(invalidMacosMarkerSync.status, 0);
+assert.equal(JSON.parse(invalidMacosMarkerSync.stdout).error_code, "MANAGED_COMMAND_INPUT_INVALID");
 
 const successfulFake = createFakeLinuxController();
 const fakeClassification = classifyProcessContainment({
@@ -1191,15 +1301,18 @@ try {
 const delegatedRoot = process.env.OPENCODE_QUALITY_CGROUP_ROOT;
 const configuredMacosController = process.env.OPENCODE_QUALITY_MACOS_CONTROLLER;
 const configuredMacosUid = process.env.OPENCODE_QUALITY_MACOS_WORKLOAD_UID;
+const configuredMacosUidMarker = process.env.OPENCODE_QUALITY_MACOS_UID_MARKER;
 const operationalContainmentOptions = {
   ...(delegatedRoot === undefined ? {} : { cgroupRoot: delegatedRoot }),
   ...(configuredMacosController === undefined ? {} : { macosController: configuredMacosController }),
   ...(configuredMacosUid === undefined ? {} : { macosWorkloadUid: Number(configuredMacosUid) }),
+  ...(configuredMacosUidMarker === undefined ? {} : { macosUidMarker: configuredMacosUidMarker }),
 };
 const syncContainmentOptions = {
   ...(delegatedRoot === undefined ? {} : { cgroup_root: delegatedRoot }),
   ...(configuredMacosController === undefined ? {} : { macos_controller: configuredMacosController }),
   ...(configuredMacosUid === undefined ? {} : { macos_workload_uid: Number(configuredMacosUid) }),
+  ...(configuredMacosUidMarker === undefined ? {} : { macos_uid_marker: configuredMacosUidMarker }),
 };
 const operationalContainmentFingerprints = [];
 const currentClassification = classifyProcessContainment(operationalContainmentOptions);
@@ -1210,7 +1323,7 @@ if (process.platform === "win32") {
 } else if (process.platform === "linux") {
   assert.equal(currentClassification.support_state, "unavailable");
 } else if (process.platform === "darwin" && configuredMacosController !== undefined
-  && configuredMacosUid !== undefined) {
+  && configuredMacosUid !== undefined && configuredMacosUidMarker !== undefined) {
   assert.equal(
     currentClassification.support_state,
     "verified",

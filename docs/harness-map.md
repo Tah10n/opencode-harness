@@ -106,10 +106,12 @@ behaviour dimensions.
   an exclusive delegated cgroup-v2 root with an external coordinator/watchdog,
   a narrow fixed-leaf attach helper, root-level kill, hierarchical
   `cgroup.events: populated 0` teardown proof, and postorder descendant removal.
-  macOS uses a root-owned native watchdog plus a dedicated exclusive non-root
-  real UID; PID/start-bound coordinator ancestors are preserved, while every
-  other same-UID process is stopped and killed to a proven zero-member state.
-  Concurrent scopes and ordinary non-exclusive login accounts fail closed. The
+  macOS uses a root-owned native watchdog plus a protected host UID marker and
+  inode lease for a dedicated non-root real UID; PID/start-bound coordinator
+  ancestors are preserved, while every other same-UID process (including
+  automatically spawned per-user agents) is stopped and killed to a proven
+  zero-member state before readiness and at teardown. Concurrent scopes and
+  ordinary login accounts without the host marker fail closed. The
   declared `permission.ask` hook is
   not the enforcement source in OpenCode 1.17.20, and the installed API still
   does not correlate child creation with an exact task call or independently

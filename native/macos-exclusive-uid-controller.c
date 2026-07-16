@@ -13,7 +13,9 @@
  * The executable is intentionally not privileged: the controller process runs
  * as the workload UID. This boundary is therefore for trusted project-owned
  * checks and lifecycle cleanup, not for adversarial same-UID code that attacks
- * the controller or attempts privilege/UID changes.
+ * the controller or attempts privilege/UID changes. A root-owned UID marker
+ * explicitly authorizes preparation of the dedicated account, while a paired
+ * workload-owned lease serializes probe/watch scopes for that UID.
  */
 
 #ifndef __APPLE__
@@ -21,6 +23,7 @@
 #endif
 
 #include <errno.h>
+#include <fcntl.h>
 #include <inttypes.h>
 #include <signal.h>
 #include <stdbool.h>
@@ -28,18 +31,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/file.h>
 #include <sys/proc.h>
+#include <sys/stat.h>
 #include <sys/sysctl.h>
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
 
-#define CONTROLLER_PROTOCOL_VERSION 1
+#define CONTROLLER_PROTOCOL_VERSION 2
 #define MAX_PROCESSES 4096U
 #define MAX_ANCESTORS 64U
 #define MAX_SCAN_BYTES (8U * 1024U * 1024U)
 #define CONTROL_BYTES 16U
 #define SETTLE_INTERVAL_NS 10000000L
+#define MAX_CONFIG_PATH_BYTES 4096U
 
 struct process_identity {
   pid_t pid;
@@ -198,6 +204,15 @@ static bool is_preserved(const struct controller_scope *scope, const struct proc
   return false;
 }
 
+static bool is_excluded(
+  const struct controller_scope *scope,
+  const struct process_identity *candidate,
+  bool preserve_worker
+) {
+  return is_preserved(scope, candidate)
+    || (preserve_worker && same_process(&scope->worker, candidate));
+}
+
 static int capture_scope(pid_t coordinator_pid, pid_t worker_pid, bool probe, struct controller_scope *scope) {
   if (getuid() == 0 || geteuid() != getuid() || getppid() != coordinator_pid) {
     errno = EPERM;
@@ -245,17 +260,43 @@ static int capture_scope(pid_t coordinator_pid, pid_t worker_pid, bool probe, st
     }
     scope->worker = *worker;
   }
-  for (size_t index = 0; index < list.count; index += 1U) {
-    const struct process_identity *candidate = &list.items[index];
-    if (is_preserved(scope, candidate)) {
-      continue;
-    }
-    if (!probe && same_process(&scope->worker, candidate)) {
-      continue;
-    }
-    free_process_list(&list);
-    errno = EBUSY;
+  free_process_list(&list);
+  return 0;
+}
+
+static int assert_exclusive_scope(const struct controller_scope *scope, bool preserve_worker) {
+  struct process_list list = { 0 };
+  if (load_processes_for_uid(scope->uid, &list) != 0) {
     return -1;
+  }
+  const struct process_identity *self = find_process(&list, scope->self.pid);
+  if (self == NULL || !same_process(self, &scope->self)) {
+    free_process_list(&list);
+    errno = ESRCH;
+    return -1;
+  }
+  for (size_t index = 0; index < scope->ancestor_count; index += 1U) {
+    const struct process_identity *ancestor = find_process(&list, scope->ancestors[index].pid);
+    if (ancestor == NULL || !same_process(ancestor, &scope->ancestors[index])) {
+      free_process_list(&list);
+      errno = ESRCH;
+      return -1;
+    }
+  }
+  if (preserve_worker) {
+    const struct process_identity *worker = find_process(&list, scope->worker.pid);
+    if (worker == NULL || !same_process(worker, &scope->worker)) {
+      free_process_list(&list);
+      errno = ESRCH;
+      return -1;
+    }
+  }
+  for (size_t index = 0; index < list.count; index += 1U) {
+    if (!is_excluded(scope, &list.items[index], preserve_worker)) {
+      free_process_list(&list);
+      errno = EBUSY;
+      return -1;
+    }
   }
   free_process_list(&list);
   return 0;
@@ -271,6 +312,7 @@ static int signal_process(pid_t pid, int signal_number) {
 static int terminate_scope(
   const struct controller_scope *scope,
   uint64_t timeout_milliseconds,
+  bool preserve_worker,
   uint64_t *scan_count,
   size_t *remaining_zombies
 ) {
@@ -291,7 +333,7 @@ static int terminate_scope(
     bool all_stopped = true;
     for (size_t index = 0; index < list.count; index += 1U) {
       const struct process_identity *candidate = &list.items[index];
-      if (is_preserved(scope, candidate) || candidate->status == SZOMB) {
+      if (is_excluded(scope, candidate, preserve_worker) || candidate->status == SZOMB) {
         continue;
       }
       live_targets += 1U;
@@ -326,7 +368,7 @@ static int terminate_scope(
     size_t zombies = 0;
     for (size_t index = 0; index < list.count; index += 1U) {
       const struct process_identity *candidate = &list.items[index];
-      if (is_preserved(scope, candidate)) {
+      if (is_excluded(scope, candidate, preserve_worker)) {
         continue;
       }
       if (candidate->status == SZOMB) {
@@ -386,6 +428,106 @@ static void print_error(const char *code) {
   (void)fflush(stdout);
 }
 
+static bool bounded_path(const char *candidate) {
+  if (candidate == NULL || candidate[0] != '/') {
+    return false;
+  }
+  const size_t length = strnlen(candidate, MAX_CONFIG_PATH_BYTES + 1U);
+  return length > 0U && length <= MAX_CONFIG_PATH_BYTES;
+}
+
+static int validate_uid_marker(const char *candidate, uid_t uid) {
+  if (!bounded_path(candidate)) {
+    errno = EINVAL;
+    return -1;
+  }
+  const int descriptor = open(candidate, O_RDONLY | O_CLOEXEC | O_NOFOLLOW);
+  if (descriptor < 0) {
+    return -1;
+  }
+  struct stat metadata;
+  if (fstat(descriptor, &metadata) != 0) {
+    const int saved_errno = errno;
+    (void)close(descriptor);
+    errno = saved_errno;
+    return -1;
+  }
+  if (!S_ISREG(metadata.st_mode) || metadata.st_uid != 0 || metadata.st_nlink != 1
+      || (metadata.st_mode & (S_IWGRP | S_IWOTH)) != 0) {
+    (void)close(descriptor);
+    errno = EPERM;
+    return -1;
+  }
+  char expected[96];
+  const int expected_length = snprintf(
+    expected,
+    sizeof(expected),
+    "opencode-quality-exclusive-uid-v1:%u\n",
+    (unsigned int)uid
+  );
+  if (expected_length < 1 || (size_t)expected_length >= sizeof(expected)
+      || metadata.st_size != (off_t)expected_length) {
+    (void)close(descriptor);
+    errno = EINVAL;
+    return -1;
+  }
+  char observed[96];
+  const ssize_t received = read(descriptor, observed, sizeof(observed));
+  const int saved_errno = errno;
+  (void)close(descriptor);
+  if (received != expected_length || memcmp(observed, expected, (size_t)expected_length) != 0) {
+    errno = received < 0 ? saved_errno : EINVAL;
+    return -1;
+  }
+  return 0;
+}
+
+static int acquire_uid_lease(const char *candidate, uid_t uid) {
+  if (!bounded_path(candidate)) {
+    errno = EINVAL;
+    return -1;
+  }
+  const int descriptor = open(candidate, O_RDWR | O_CLOEXEC | O_NOFOLLOW);
+  if (descriptor < 0) {
+    return -1;
+  }
+  struct stat metadata;
+  if (fstat(descriptor, &metadata) != 0) {
+    const int saved_errno = errno;
+    (void)close(descriptor);
+    errno = saved_errno;
+    return -1;
+  }
+  const mode_t lease_permissions = metadata.st_mode
+    & (S_ISUID | S_ISGID | S_ISVTX | S_IRWXU | S_IRWXG | S_IRWXO);
+  if (!S_ISREG(metadata.st_mode) || metadata.st_uid != uid || metadata.st_nlink != 1
+      || lease_permissions != (S_IRUSR | S_IWUSR)) {
+    (void)close(descriptor);
+    errno = EPERM;
+    return -1;
+  }
+  if (flock(descriptor, LOCK_EX | LOCK_NB) != 0) {
+    const int saved_errno = (errno == EWOULDBLOCK || errno == EAGAIN) ? EBUSY : errno;
+    (void)close(descriptor);
+    errno = saved_errno;
+    return -1;
+  }
+  return descriptor;
+}
+
+static bool lease_matches_marker(const char *marker_path, const char *lease_path) {
+  if (!bounded_path(marker_path) || !bounded_path(lease_path)) {
+    return false;
+  }
+  const size_t marker_length = strnlen(marker_path, MAX_CONFIG_PATH_BYTES + 1U);
+  static const char suffix[] = ".lease";
+  const size_t suffix_length = sizeof(suffix) - 1U;
+  const size_t lease_length = strnlen(lease_path, MAX_CONFIG_PATH_BYTES + 1U);
+  return marker_length + suffix_length == lease_length
+    && memcmp(marker_path, lease_path, marker_length) == 0
+    && memcmp(&lease_path[marker_length], suffix, suffix_length) == 0;
+}
+
 static const char *scope_error_code(int error_number) {
   switch (error_number) {
     case EBUSY:
@@ -427,8 +569,10 @@ int main(int argc, char **argv) {
   pid_t worker_pid = 0;
   pid_t coordinator_pid = 0;
   uint64_t timeout_milliseconds = 0;
+  const char *marker_path = NULL;
+  const char *lease_path = NULL;
   int64_t parsed = 0;
-  if (argc == 4 && strcmp(argv[1], "probe") == 0
+  if (argc == 6 && strcmp(argv[1], "probe") == 0
       && parse_positive_integer(argv[2], INT32_MAX, &parsed)) {
     probe = true;
     coordinator_pid = (pid_t)parsed;
@@ -437,7 +581,9 @@ int main(int argc, char **argv) {
       return 64;
     }
     timeout_milliseconds = (uint64_t)parsed;
-  } else if (argc == 5 && strcmp(argv[1], "watch") == 0
+    marker_path = argv[4];
+    lease_path = argv[5];
+  } else if (argc == 7 && strcmp(argv[1], "watch") == 0
       && parse_positive_integer(argv[2], INT32_MAX, &parsed)) {
     worker_pid = (pid_t)parsed;
     if (!parse_positive_integer(argv[3], INT32_MAX, &parsed)) {
@@ -450,35 +596,82 @@ int main(int argc, char **argv) {
       return 64;
     }
     timeout_milliseconds = (uint64_t)parsed;
+    marker_path = argv[5];
+    lease_path = argv[6];
   } else {
     print_error("arguments_invalid");
     return 64;
   }
 
+  const uid_t workload_uid = getuid();
+  if (!lease_matches_marker(marker_path, lease_path)) {
+    print_error("uid_lease_invalid");
+    return 77;
+  }
+  if (validate_uid_marker(marker_path, workload_uid) != 0) {
+    print_error("uid_marker_invalid");
+    return 77;
+  }
+  const int lease_descriptor = acquire_uid_lease(lease_path, workload_uid);
+  if (lease_descriptor < 0) {
+    print_error(errno == EBUSY ? "exclusive_uid_not_available" : "uid_lease_invalid");
+    return 77;
+  }
+
   struct controller_scope scope;
   memset(&scope, 0, sizeof(scope));
   if (capture_scope(coordinator_pid, worker_pid, probe, &scope) != 0) {
+    const int saved_errno = errno;
+    (void)close(lease_descriptor);
+    errno = saved_errno;
     print_error(scope_error_code(errno));
+    return 77;
+  }
+  uint64_t preparation_scans = 0;
+  size_t preparation_zombies = 0;
+  if (terminate_scope(
+      &scope,
+      timeout_milliseconds,
+      !probe,
+      &preparation_scans,
+      &preparation_zombies
+    ) != 0) {
+    const int saved_errno = errno;
+    (void)close(lease_descriptor);
+    print_error(saved_errno == ETIMEDOUT ? "uid_preparation_timeout" : "uid_preparation_failed");
+    return 77;
+  }
+  if (preparation_zombies != 0U) {
+    (void)close(lease_descriptor);
+    print_error("uid_preparation_failed");
+    return 77;
+  }
+  if (assert_exclusive_scope(&scope, !probe) != 0) {
+    const int saved_errno = errno;
+    (void)close(lease_descriptor);
+    print_error(saved_errno == EBUSY ? "uid_preparation_failed" : scope_error_code(saved_errno));
     return 77;
   }
   if (probe) {
     (void)fprintf(
       stdout,
-      "PROBE:%d:%u:%d:%" PRId64 ":%d:%zu\n",
+      "PROBE:%d:%u:%d:%" PRId64 ":%d:%zu:%" PRIu64 "\n",
       CONTROLLER_PROTOCOL_VERSION,
       (unsigned int)scope.uid,
       scope.self.pid,
       scope.self.start_seconds,
       scope.self.start_microseconds,
-      scope.ancestor_count
+      scope.ancestor_count,
+      preparation_scans
     );
     (void)fflush(stdout);
+    (void)close(lease_descriptor);
     return 0;
   }
 
   (void)fprintf(
     stdout,
-    "READY:%d:%u:%d:%" PRId64 ":%d:%d:%" PRId64 ":%d:%zu\n",
+    "READY:%d:%u:%d:%" PRId64 ":%d:%d:%" PRId64 ":%d:%zu:%" PRIu64 "\n",
     CONTROLLER_PROTOCOL_VERSION,
     (unsigned int)scope.uid,
     scope.worker.pid,
@@ -487,18 +680,22 @@ int main(int argc, char **argv) {
     scope.self.pid,
     scope.self.start_seconds,
     scope.self.start_microseconds,
-    scope.ancestor_count
+    scope.ancestor_count,
+    preparation_scans
   );
   (void)fflush(stdout);
 
   const bool valid_close = read_close_request();
   uint64_t scans = 0;
   size_t zombies = 0;
-  if (terminate_scope(&scope, timeout_milliseconds, &scans, &zombies) != 0) {
-    print_error(errno == ETIMEDOUT ? "uid_teardown_timeout" : "uid_teardown_failed");
+  if (terminate_scope(&scope, timeout_milliseconds, false, &scans, &zombies) != 0) {
+    const int saved_errno = errno;
+    (void)close(lease_descriptor);
+    print_error(saved_errno == ETIMEDOUT ? "uid_teardown_timeout" : "uid_teardown_failed");
     return 1;
   }
   if (!valid_close) {
+    (void)close(lease_descriptor);
     print_error("control_protocol_failed");
     return 1;
   }
@@ -510,5 +707,6 @@ int main(int argc, char **argv) {
     zombies
   );
   (void)fflush(stdout);
+  (void)close(lease_descriptor);
   return 0;
 }
