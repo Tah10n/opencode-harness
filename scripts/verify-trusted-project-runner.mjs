@@ -1218,7 +1218,15 @@ if (shouldRunReal) {
 
     const npmReceipt = runRealCheck("npm-known");
     operationalReceipts.push(npmReceipt);
-    assert.equal(npmReceipt.status, "passed");
+    assert.equal(npmReceipt.status, "passed", JSON.stringify({
+      observed_outcome: npmReceipt.observed_outcome,
+      exit_code: npmReceipt.exit_code,
+      signal: npmReceipt.signal,
+      stdout_bytes: npmReceipt.stdout_bytes,
+      stderr_bytes: npmReceipt.stderr_bytes,
+      containment_state: npmReceipt.containment_state,
+      output_workspace_post_entries: npmReceipt.output_workspace_post_entries,
+    }));
     assert.equal(fs.readFileSync(path.join(realProject, "npm-known-marker.txt"), "utf8"), "real");
     assert.equal(fs.existsSync(poisonMarker), false, "ambient npm_execpath was executed");
 
