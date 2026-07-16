@@ -318,7 +318,10 @@ boundary, сохраняя только identity-bound ancestors и текущи
 `OPENCODE_QUALITY_MACOS_UID_MARKER`; путь lease выводится как
 `<marker>.lease`. Обычный login account без host marker не принимается даже
 если в момент проверки он пуст. Workload principal не должен иметь `sudo`,
-setuid или иной путь смены UID.
+setuid или иной путь смены UID. Поскольку trusted-toolchain contract не следует
+за symlink/shim Git, host также устанавливает singly linked root-owned копию
+реального Git binary в `/usr/local/libexec/opencode-quality-git/bin/git`; канонический
+CI provisioning проверяет её от workload UID.
 
 Binary root-owned, но не setuid: watchdog выполняется как workload UID. Поэтому
 это полная lifecycle-поддержка для доверенных project-owned checks, а не защита

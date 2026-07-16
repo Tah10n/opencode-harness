@@ -26,6 +26,22 @@ import {
 import { ContractError } from "../lib/quality/validation.mjs";
 
 const repositoryRoot = fs.realpathSync(new URL("..", import.meta.url));
+const trustedToolchainsSource = fs.readFileSync(
+  new URL("../lib/quality/trusted-toolchains.mjs", import.meta.url),
+  "utf8",
+);
+const fixedMacosGitCandidate = trustedToolchainsSource.indexOf(
+  'return ["/usr/local/libexec/opencode-quality-git/bin/git"];',
+);
+const resolveFixedGitStart = trustedToolchainsSource.indexOf("function resolveFixedGit");
+const resolveFixedGitEnd = trustedToolchainsSource.indexOf("function validatedLease", resolveFixedGitStart);
+const resolveFixedGitSource = trustedToolchainsSource.slice(resolveFixedGitStart, resolveFixedGitEnd);
+assert(fixedMacosGitCandidate >= 0
+  && resolveFixedGitStart > fixedMacosGitCandidate
+  && resolveFixedGitEnd > resolveFixedGitStart
+  && !resolveFixedGitSource.includes("QUALITY_TOOLCHAIN_ALIAS")
+  && resolveFixedGitSource.includes('process.platform !== "darwin"'),
+"macOS fixed Git must use the exact protected path and must not hide alias drift with a fallback");
 const mavenResolverOwnedProperties = Object.freeze([
   "classworlds.conf",
   "maven.ext.class.path",

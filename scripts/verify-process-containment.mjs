@@ -528,6 +528,7 @@ assert.equal(classifyProcessContainment({ platform: "darwin", env: {} }).support
 assert.equal(classifyProcessContainment({ platform: "darwin", env: {} }).kind, "macos-exclusive-uid-v1");
 assert.equal(classifyProcessContainment({
   platform: "darwin",
+  env: {},
   macosController: fakeMacosControllerPath,
   macosWorkloadUid: 501,
   macosUidMarker: fakeMacosMarkerPath,
@@ -548,6 +549,7 @@ assert.equal(classifyProcessContainment({
 }).reason, "exclusive_uid_mismatch");
 assert.equal(classifyProcessContainment({
   platform: "darwin",
+  env: {},
   macosController: fakeMacosControllerPath,
   macosWorkloadUid: 501,
   currentUid: 501,

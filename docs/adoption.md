@@ -339,6 +339,13 @@ concurrent scope is rejected by the held lease. A normal logged-in account
 without the protected host marker is intentionally unavailable. The
 `macos-containment` GitHub Actions job is the canonical provisioning and
 receipt example.
+For built-in Node/npm checks, install a singly linked root-owned mode-`0555`
+copy of the canonical host Git binary at
+`/usr/local/libexec/opencode-quality-git/bin/git`. macOS developer-tool and Homebrew
+Git launch paths can be symlinked shims; the trusted-toolchain resolver does
+not follow those aliases. The CI job resolves a Git source only from bounded
+system/Homebrew/Xcode roots, installs the protected copy, and executes it as
+the workload account before accepting the boundary.
 The binary is root-owned but not privileged at runtime: its process uses the
 workload UID. Only trusted project-owned checks are admissible; deliberate
 same-UID signalling of the watchdog or privilege-changing code is outside this

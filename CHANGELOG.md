@@ -24,6 +24,9 @@ the feedback-plane ESM subpaths documented for the `0.3.0` target.
   empty same-UID scans. Milestone 2 DoD v3 now requires both macOS trusted-check and
   descendant-teardown receipts; `unsupported` no longer satisfies completion,
   and `macos-latest` is a mandatory receipt producer in CI.
+- Made the macOS operational toolchain path independent of system/Homebrew Git
+  symlink shims by provisioning a protected fixed auxiliary Git copy, and
+  isolated Darwin synthetic marker tests from ambient production configuration.
 - Bound cross-job evidence to a metadata-independent portable source attestation,
   re-observed source state before receipt sealing, and required successful CI
   producer results before aggregation. Separated containment-setup and execution

@@ -1102,6 +1102,8 @@ for (const needle of [
   "npm run build:macos-containment", "OPENCODE_QUALITY_MACOS_CONTROLLER",
   "OPENCODE_QUALITY_MACOS_WORKLOAD_UID", "OPENCODE_QUALITY_MACOS_UID_MARKER",
   "opencode-quality-exclusive-uid-v1", 'lease="$marker.lease"',
+  "OPENCODE_QUALITY_MACOS_FIXED_GIT_ROOT", "/usr/local/libexec/opencode-quality-git/bin/git",
+  "trusted macOS Git source resolved outside fixed installation roots",
   "sudo dscl . -create", "ambient sudo authorization",
   '${OPENCODE_QUALITY_RUN_USER:-}',
   "Require successful receipt producers", "needs.verify.result", "needs.linux-containment.result",

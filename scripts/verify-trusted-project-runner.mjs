@@ -936,8 +936,18 @@ fs.mkdirSync(path.join(realRoot, ".opencode", "quality"), { recursive: true });
 fs.mkdirSync(realProject, { recursive: true });
 fs.writeFileSync(path.join(realRoot, ".gitignore"), "node_modules/\n.env\ncoverage/\nbuild/\n", "utf8");
 fs.writeFileSync(path.join(realProject, "environment-fixture.mjs"), `import fs from "node:fs";
-const names = ["NODE_OPTIONS", "NODE_PATH", "npm_execpath", "npm_config_registry", "AWS_SECRET_ACCESS_KEY", "GH_TOKEN", "PATH", "Path"];
-fs.writeFileSync(process.argv[2], JSON.stringify(Object.fromEntries(names.map((name) => [name, process.env[name] ?? null]))), "utf8");
+import { spawnSync } from "node:child_process";
+const names = ["NODE_OPTIONS", "NODE_PATH", "npm_execpath", "npm_config_registry", "AWS_SECRET_ACCESS_KEY", "GH_TOKEN", "PATH", "Path", "OPENCODE_QUALITY_GIT_EXECUTABLE"];
+const observed = Object.fromEntries(names.map((name) => [name, process.env[name] ?? null]));
+const git = spawnSync("git", ["--version"], { encoding: "utf8", env: process.env, shell: false, windowsHide: true });
+observed.git_by_name = {
+  status: git.status,
+  signal: git.signal,
+  error_code: git.error?.code ?? null,
+  stdout: typeof git.stdout === "string" ? git.stdout.trim() : null,
+  stderr: typeof git.stderr === "string" ? git.stderr.trim() : null,
+};
+fs.writeFileSync(process.argv[2], JSON.stringify(observed), "utf8");
 `, "utf8");
 fs.writeFileSync(path.join(realProject, "ignored-output-fixture.mjs"), `import fs from "node:fs";
 for (const file of ["coverage/result.txt", "build/result.txt"]) {
@@ -1174,6 +1184,18 @@ if (shouldRunReal) {
       if (observedEnvironment[key] !== null) {
         assert.equal(observedEnvironment[key].includes(fakeBin), false, "ambient PATH crossed the trusted runner boundary");
       }
+    }
+    assert.equal(observedEnvironment.git_by_name.status, 0);
+    assert.equal(observedEnvironment.git_by_name.signal, null);
+    assert.equal(observedEnvironment.git_by_name.error_code, null);
+    assert.equal(observedEnvironment.git_by_name.stderr, "");
+    assert.match(observedEnvironment.git_by_name.stdout, /^git version /u);
+    if (process.platform === "darwin") {
+      assert.equal(
+        observedEnvironment.OPENCODE_QUALITY_GIT_EXECUTABLE,
+        "/usr/local/libexec/opencode-quality-git/bin/git",
+        "macOS trusted checks did not select the protected fixed Git executable",
+      );
     }
 
     const ignoredReceipt = runRealCheck("ignored-output");

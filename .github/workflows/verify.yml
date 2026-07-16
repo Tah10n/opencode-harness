@@ -378,6 +378,25 @@ jobs:
           rm -f "$built_controller"
           echo "OPENCODE_QUALITY_MACOS_CONTROLLER=$controller" >> "$GITHUB_ENV"
 
+          git_candidate="/opt/homebrew/bin/git"
+          if [[ ! -x "$git_candidate" ]]; then
+            git_candidate="/usr/bin/git"
+          fi
+          git_source="$(GIT_CANDIDATE="$git_candidate" node -e \
+            'const fs = require("node:fs"); process.stdout.write(fs.realpathSync.native(process.env.GIT_CANDIDATE))')"
+          case "$git_source" in
+            /opt/homebrew/Cellar/git/*/bin/git|/usr/bin/git|/Library/Developer/CommandLineTools/usr/bin/git|/Applications/Xcode*.app/Contents/Developer/usr/bin/git) ;;
+            *)
+              echo "trusted macOS Git source resolved outside fixed installation roots: $git_source" >&2
+              exit 1
+              ;;
+          esac
+          fixed_git_root="/usr/local/libexec/opencode-quality-git"
+          fixed_git="/usr/local/libexec/opencode-quality-git/bin/git"
+          sudo install -d -o root -g wheel -m 0755 "$fixed_git_root" "$fixed_git_root/bin"
+          sudo install -o root -g wheel -m 0555 "$git_source" "$fixed_git"
+          echo "OPENCODE_QUALITY_MACOS_FIXED_GIT_ROOT=$fixed_git_root" >> "$GITHUB_ENV"
+
           user="opencodequality"
           home="/Users/$user"
           if dscl . -read "/Users/$user" >/dev/null 2>&1; then
@@ -430,6 +449,11 @@ jobs:
           sudo -u "$user" test -r "$controller"
           if sudo -u "$user" test -w "$controller"; then
             echo "dedicated macOS workload account can modify the controller" >&2
+            exit 1
+          fi
+          sudo -u "$user" /usr/bin/env PATH="$(dirname "$fixed_git")" git --version
+          if sudo -u "$user" test -w "$fixed_git"; then
+            echo "dedicated macOS workload account can modify fixed auxiliary Git" >&2
             exit 1
           fi
           if sudo -u "$user" test -w "$marker"; then
@@ -501,6 +525,11 @@ jobs:
           sudo chown -R "$(id -u):$(id -g)" "$GITHUB_WORKSPACE"
           if [[ -n "${OPENCODE_QUALITY_MACOS_CONTROLLER:-}" && -f "$OPENCODE_QUALITY_MACOS_CONTROLLER" ]]; then
             sudo rm -f "$OPENCODE_QUALITY_MACOS_CONTROLLER"
+          fi
+          if [[ -n "${OPENCODE_QUALITY_MACOS_FIXED_GIT_ROOT:-}" && -d "$OPENCODE_QUALITY_MACOS_FIXED_GIT_ROOT" ]]; then
+            sudo rm -f "$OPENCODE_QUALITY_MACOS_FIXED_GIT_ROOT/bin/git"
+            sudo rmdir "$OPENCODE_QUALITY_MACOS_FIXED_GIT_ROOT/bin"
+            sudo rmdir "$OPENCODE_QUALITY_MACOS_FIXED_GIT_ROOT"
           fi
           if [[ -n "${OPENCODE_QUALITY_MACOS_UID_LEASE:-}" && -f "$OPENCODE_QUALITY_MACOS_UID_LEASE" ]]; then
             sudo rm -f "$OPENCODE_QUALITY_MACOS_UID_LEASE"
