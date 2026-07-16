@@ -1118,7 +1118,11 @@ if (process.platform === "win32") {
   assert.equal(platformClassification.support_state, "unavailable");
   assert.equal(platformClassification.reason, "delegated_root_missing");
 } else if (process.platform === "darwin" && shouldRunReal) {
-  assert.equal(platformClassification.support_state, "verified", "configured macOS exclusive-UID runtime must be usable");
+  assert.equal(
+    platformClassification.support_state,
+    "verified",
+    `configured macOS exclusive-UID runtime must be usable: ${JSON.stringify(platformClassification)}`,
+  );
 } else if (process.platform === "darwin") {
   assert.equal(platformClassification.support_state, "unavailable");
 } else {

@@ -386,6 +386,23 @@ static void print_error(const char *code) {
   (void)fflush(stdout);
 }
 
+static const char *scope_error_code(int error_number) {
+  switch (error_number) {
+    case EBUSY:
+      return "exclusive_uid_not_available";
+    case EPERM:
+      return "scope_permission_failed";
+    case ESRCH:
+      return "scope_identity_failed";
+    case E2BIG:
+      return "scope_bound_exceeded";
+    case ELOOP:
+      return "scope_ancestry_invalid";
+    default:
+      return "scope_census_failed";
+  }
+}
+
 static int install_signal_handlers(void) {
   struct sigaction action;
   memset(&action, 0, sizeof(action));
@@ -441,7 +458,7 @@ int main(int argc, char **argv) {
   struct controller_scope scope;
   memset(&scope, 0, sizeof(scope));
   if (capture_scope(coordinator_pid, worker_pid, probe, &scope) != 0) {
-    print_error(errno == EBUSY ? "exclusive_uid_not_available" : "scope_validation_failed");
+    print_error(scope_error_code(errno));
     return 77;
   }
   if (probe) {

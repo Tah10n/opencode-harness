@@ -517,6 +517,19 @@ assert.equal(classifyProcessContainment({
   macosControllerIdentity: macosIdentity,
   spawnMacosProbe: () => ({ ...validMacosProbe(), stdout: "PROBE:0:501:6262:10:20:2\n" }),
 }).reason, "controller_protocol_failed");
+assert.equal(classifyProcessContainment({
+  platform: "darwin",
+  macosController: fakeMacosControllerPath,
+  macosWorkloadUid: 501,
+  currentUid: 501,
+  macosControllerIdentity: macosIdentity,
+  spawnMacosProbe: () => ({
+    status: 77,
+    signal: null,
+    stdout: "ERROR:scope_identity_failed\n",
+    stderr: "",
+  }),
+}).reason, "scope_identity_failed");
 assert.equal(classifyProcessContainment({ platform: "freebsd" }).support_state, "unavailable");
 assert.equal(classifyProcessContainment({ platform: "linux", env: {} }).support_state, "unavailable");
 assert.throws(() => normalizeProcessContainmentOptions({ fallbackToProcessGroup: true }), TypeError);
@@ -1198,7 +1211,11 @@ if (process.platform === "win32") {
   assert.equal(currentClassification.support_state, "unavailable");
 } else if (process.platform === "darwin" && configuredMacosController !== undefined
   && configuredMacosUid !== undefined) {
-  assert.equal(currentClassification.support_state, "verified", "configured macOS exclusive-UID runtime must be usable");
+  assert.equal(
+    currentClassification.support_state,
+    "verified",
+    `configured macOS exclusive-UID runtime must be usable: ${JSON.stringify(currentClassification)}`,
+  );
 } else if (process.platform === "darwin") {
   assert.equal(currentClassification.support_state, "unavailable");
 }
