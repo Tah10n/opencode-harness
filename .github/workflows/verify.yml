@@ -35,6 +35,11 @@ jobs:
           root="/sys/fs/cgroup/opencode-harness-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${GITHUB_JOB}"
           home="/home/$user"
           sudo useradd --create-home --home-dir "$home" --shell /usr/sbin/nologin "$user"
+          workspace_parent="$(dirname "$GITHUB_WORKSPACE")"
+          while [[ "$workspace_parent" != "/home" && "$workspace_parent" != "/" ]]; do
+            sudo setfacl -m "u:$user:--x" "$workspace_parent"
+            workspace_parent="$(dirname "$workspace_parent")"
+          done
           sudo chown -R "$user:$user" "$GITHUB_WORKSPACE"
           sudo mkdir "$root"
           sudo chown -R "$user:$user" "$root"
@@ -131,6 +136,11 @@ jobs:
           set -euo pipefail
           sudo chown -R "$(id -u):$(id -g)" "$GITHUB_WORKSPACE"
           cleanup_status=0
+          workspace_parent="$(dirname "$GITHUB_WORKSPACE")"
+          while [[ "$workspace_parent" != "/home" && "$workspace_parent" != "/" ]]; do
+            sudo setfacl -x "u:$OPENCODE_QUALITY_RUN_USER" "$workspace_parent" || cleanup_status=$?
+            workspace_parent="$(dirname "$workspace_parent")"
+          done
           if [[ -n "${OPENCODE_QUALITY_CGROUP_ROOT:-}" && -d "$OPENCODE_QUALITY_CGROUP_ROOT" ]]; then
             sudo rmdir "$OPENCODE_QUALITY_CGROUP_ROOT" || cleanup_status=$?
           fi
@@ -164,6 +174,11 @@ jobs:
           root="/sys/fs/cgroup/opencode-harness-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${GITHUB_JOB}"
           home="/home/$user"
           sudo useradd --create-home --home-dir "$home" --shell /usr/sbin/nologin "$user"
+          workspace_parent="$(dirname "$GITHUB_WORKSPACE")"
+          while [[ "$workspace_parent" != "/home" && "$workspace_parent" != "/" ]]; do
+            sudo setfacl -m "u:$user:--x" "$workspace_parent"
+            workspace_parent="$(dirname "$workspace_parent")"
+          done
           sudo chown -R "$user:$user" "$GITHUB_WORKSPACE"
           sudo mkdir "$root"
           sudo chown -R "$user:$user" "$root"
@@ -254,6 +269,11 @@ jobs:
           set -euo pipefail
           sudo chown -R "$(id -u):$(id -g)" "$GITHUB_WORKSPACE"
           cleanup_status=0
+          workspace_parent="$(dirname "$GITHUB_WORKSPACE")"
+          while [[ "$workspace_parent" != "/home" && "$workspace_parent" != "/" ]]; do
+            sudo setfacl -x "u:$OPENCODE_QUALITY_RUN_USER" "$workspace_parent" || cleanup_status=$?
+            workspace_parent="$(dirname "$workspace_parent")"
+          done
           if [[ -n "${OPENCODE_QUALITY_CGROUP_ROOT:-}" && -d "$OPENCODE_QUALITY_CGROUP_ROOT" ]]; then
             sudo rmdir "$OPENCODE_QUALITY_CGROUP_ROOT" || cleanup_status=$?
           fi

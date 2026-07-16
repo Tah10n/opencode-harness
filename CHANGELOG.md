@@ -31,7 +31,10 @@ the feedback-plane ESM subpaths documented for the `0.3.0` target.
   coverage, installation init-script manifests, and receipt-bound runtime-metadata
   inventory. Installed-host adapters have a bounded five-minute execution
   budget and retry transient Windows probe cleanup without upgrading a failed
-  cleanup to verified evidence.
+  cleanup to verified evidence. GitHub Linux jobs grant and later remove only
+  checkout-parent traversal ACLs for the isolated workload user; Windows
+  operational fixtures canonicalize the runner's 8.3 `TEMP` path instead of
+  weakening filesystem-alias rejection.
 - Hardened Milestone 2 completion evidence so deterministic fixtures cannot mint
   operational or installed-host success. CI now uploads sealed deterministic,
   Windows Job Object, and guarded Linux cgroup-v2 bundles, aggregates only

@@ -25,6 +25,10 @@ import {
 } from "../lib/quality/milestone-operational-report.mjs";
 
 const pause = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
+const canonicalTempBase = fs.realpathSync.native(os.tmpdir());
+function temporaryDirectory(prefix) {
+  return fs.realpathSync.native(fs.mkdtempSync(path.join(canonicalTempBase, prefix)));
+}
 async function waitUntil(predicate, timeoutMs, label) {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
@@ -33,7 +37,7 @@ async function waitUntil(predicate, timeoutMs, label) {
   }
   assert.fail(`timed out waiting for ${label}`);
 }
-const fakeRoot = path.join(path.resolve(os.tmpdir()), "opencode-quality-fake-cgroup");
+const fakeRoot = path.join(canonicalTempBase, "opencode-quality-fake-cgroup");
 const syncWorker = fileURLToPath(new URL("../lib/feedback/managed-command-sync-worker.mjs", import.meta.url));
 const processTreeSource = fs.readFileSync(
   fileURLToPath(new URL("../lib/feedback/process-tree.mjs", import.meta.url)),
@@ -412,7 +416,7 @@ assert.deepEqual(
 );
 assert.throws(() => normalizeProcessContainmentOptions({ cgroupAttachMode: "ambient-sudo" }), TypeError);
 
-const partialLeafRoot = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-cgroup-partial-leaf-"));
+const partialLeafRoot = temporaryDirectory("opencode-cgroup-partial-leaf-");
 try {
   const partialLeaf = path.join(partialLeafRoot, "opencode-quality-workload");
   assert.throws(
@@ -427,7 +431,7 @@ try {
 }
 
 if (process.platform === "linux") {
-  const directChildBoundRoot = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-cgroup-child-bound-"));
+  const directChildBoundRoot = temporaryDirectory("opencode-cgroup-child-bound-");
   try {
     for (let index = 0; index < 1024; index += 1) {
       fs.mkdirSync(path.join(directChildBoundRoot, `child-${String(index).padStart(4, "0")}`));
@@ -885,7 +889,7 @@ assert.equal(managedResult.teardown_verified, true);
 assert.deepEqual(managedResult.containment_identity, managedIdentity);
 assert.equal(managedResult.containment_state.teardown_verified, true);
 
-const inheritedCwdRoot = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-inherited-cwd-"));
+const inheritedCwdRoot = temporaryDirectory("opencode-inherited-cwd-");
 try {
   const activeCwd = path.join(inheritedCwdRoot, "active");
   const retainedCwd = path.join(inheritedCwdRoot, "retained");
@@ -1018,7 +1022,7 @@ if (currentClassification.support_state === "verified") {
   operationalContainmentFingerprints.push(actual.containment_fingerprint);
 
   if (process.platform === "linux") {
-    const linuxTmp = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-linux-watchdog-"));
+    const linuxTmp = temporaryDirectory("opencode-linux-watchdog-");
     try {
       const processTreeModule = new URL("../lib/feedback/process-tree.mjs", import.meta.url).href;
       const nestedReceipt = path.join(linuxTmp, "nested-receipt.json");
@@ -1238,7 +1242,7 @@ if (currentClassification.support_state === "verified") {
     }
   }
 
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-process-containment-"));
+  const tmp = temporaryDirectory("opencode-process-containment-");
   try {
     const startedMarker = path.join(tmp, "double-fork-started.txt");
     const escapedMarker = path.join(tmp, "double-fork-escaped.txt");

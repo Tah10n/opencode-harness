@@ -176,7 +176,11 @@ function containedExecution(execution = {}, {
   };
 }
 
-const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-harness-runner-v3-"));
+const tempRoot = fs.realpathSync.native(fs.mkdtempSync(path.join(
+  fs.realpathSync.native(os.tmpdir()),
+  "opencode-harness-runner-v3-",
+)));
+assert.equal(fs.realpathSync.native(tempRoot), tempRoot, "runner fixture temp root must be physically canonical");
 fs.mkdirSync(path.join(tempRoot, "project"), { recursive: true });
 
 const catalog = validateProjectCheckCatalog({

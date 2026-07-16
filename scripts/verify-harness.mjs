@@ -1089,10 +1089,20 @@ for (const needle of [
   "expected_uid", "SUDO_UID", "npm run milestone:2:operational",
   "npm run milestone:2:assess", "--host-unavailable", "actions/upload-artifact@v4",
   "actions/download-artifact@v4", "sudo useradd", "attach helper can write the guard cgroup",
+  "sudo setfacl -m", "sudo setfacl -x",
   "Require successful receipt producers", "needs.verify.result", "needs.linux-containment.result",
   "needs.windows-containment.result", '[[ "$result" != "success" ]]',
 ]) {
   assertIncludes(workflow, needle, ".github/workflows/verify.yml");
+}
+for (const [needle, expected] of [["sudo setfacl -m", 2], ["sudo setfacl -x", 2]]) {
+  if (workflow.split(needle).length - 1 !== expected) {
+    fail(
+      "HARNESS-S002",
+      `.github/workflows/verify.yml must contain exactly ${expected} ${needle} operations`,
+      "Grant and remove checkout-parent traversal ACLs once in each unprivileged Linux producer job.",
+    );
+  }
 }
 const aggregateJob = workflowJobBlock("milestone-2-status");
 const aggregateStepNames = [...aggregateJob.matchAll(/^      - name:\s*(.+?)\s*$/gmu)].map((match) => match[1]);
