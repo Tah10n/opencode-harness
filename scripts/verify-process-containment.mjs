@@ -282,6 +282,7 @@ function createFakeWindowsController({
   close = "success",
   exitOnStart = null,
   exitBeforeClosed = false,
+  stdinErrorOnEnd = null,
 } = {}) {
   const stdout = new EventEmitter();
   const stderr = new EventEmitter();
@@ -302,24 +303,31 @@ function createFakeWindowsController({
   };
   controller.stdout = stdout;
   controller.stderr = stderr;
-  controller.stdin = {
-    end(value) {
-      if (value === "CLOSE\n" && close === "success") {
-        queueMicrotask(() => {
-          if (exitBeforeClosed) emitExit(0, () => stdout.emit("data", "CLOSED\n"));
-          else {
-            stdout.emit("data", "CLOSED\n");
-            emitExit(0);
-          }
-        });
-      } else if (value === "CLOSE\n" && close === "error") {
-        queueMicrotask(() => {
-          stdout.emit("data", "ERROR:fake close failure\n");
-          emitExit(1);
-        });
-      }
-    },
+  const stdin = new EventEmitter();
+  let stdinErrorEmitted = false;
+  stdin.end = (value) => {
+    if (stdinErrorOnEnd !== null && !stdinErrorEmitted) {
+      stdinErrorEmitted = true;
+      queueMicrotask(() => stdin.emit("error", Object.assign(new Error(stdinErrorOnEnd), {
+        code: stdinErrorOnEnd,
+      })));
+    }
+    if (value === "CLOSE\n" && close === "success") {
+      queueMicrotask(() => {
+        if (exitBeforeClosed) emitExit(0, () => stdout.emit("data", "CLOSED\n"));
+        else {
+          stdout.emit("data", "CLOSED\n");
+          emitExit(0);
+        }
+      });
+    } else if (value === "CLOSE\n" && close === "error") {
+      queueMicrotask(() => {
+        stdout.emit("data", "ERROR:fake close failure\n");
+        emitExit(1);
+      });
+    }
   };
+  controller.stdin = stdin;
   controller.kill = () => {
     emitExit(1);
     return true;
@@ -357,6 +365,7 @@ function createFakeMacosController({
   close = "success",
   exitOnStart = null,
   exitBeforeClosed = false,
+  stdinErrorOnEnd = null,
 } = {}) {
   const stdout = new EventEmitter();
   const stderr = new EventEmitter();
@@ -378,26 +387,33 @@ function createFakeMacosController({
   controller.pid = controllerPid;
   controller.stdout = stdout;
   controller.stderr = stderr;
-  controller.stdin = {
-    end(value) {
-      if (exited) return;
-      if (value === "CLOSE\n" && close === "success") {
-        queueMicrotask(() => {
-          const emitClosed = () => stdout.emit("data", "CLOSED:2:4:0\n");
-          if (exitBeforeClosed) emitExit(0, emitClosed);
-          else {
-            emitClosed();
-            emitExit(0);
-          }
-        });
-      } else if (value === "CLOSE\n" && close === "error") {
-        queueMicrotask(() => {
-          stdout.emit("data", "ERROR:uid_teardown_failed\n");
-          emitExit(1);
-        });
-      }
-    },
+  const stdin = new EventEmitter();
+  let stdinErrorEmitted = false;
+  stdin.end = (value) => {
+    if (stdinErrorOnEnd !== null && !stdinErrorEmitted) {
+      stdinErrorEmitted = true;
+      queueMicrotask(() => stdin.emit("error", Object.assign(new Error(stdinErrorOnEnd), {
+        code: stdinErrorOnEnd,
+      })));
+    }
+    if (exited) return;
+    if (value === "CLOSE\n" && close === "success") {
+      queueMicrotask(() => {
+        const emitClosed = () => stdout.emit("data", "CLOSED:2:4:0\n");
+        if (exitBeforeClosed) emitExit(0, emitClosed);
+        else {
+          emitClosed();
+          emitExit(0);
+        }
+      });
+    } else if (value === "CLOSE\n" && close === "error") {
+      queueMicrotask(() => {
+        stdout.emit("data", "ERROR:uid_teardown_failed\n");
+        emitExit(1);
+      });
+    }
   };
+  controller.stdin = stdin;
   controller.kill = () => {
     emitExit(1);
     return true;
@@ -697,6 +713,17 @@ await assert.rejects(preparePlatformProcessContainment({ pid: 4242 }, 20, {
   scopeIdFactory: () => "windows-job-early-exit",
 }), (error) => error instanceof ProcessContainmentError && error.classification === "process_containment_failed");
 
+await assert.rejects(preparePlatformProcessContainment({ pid: 4242 }, 20, {
+  platform: "win32",
+  windowsPowerShellIdentity: windowsIdentity,
+  spawnController: () => createFakeWindowsController({
+    initial: "ERROR:injected\n",
+    exitOnStart: 1,
+    stdinErrorOnEnd: "EPIPE",
+  }),
+  scopeIdFactory: () => "windows-job-pre-ready-input-close-race",
+}), (error) => error instanceof ProcessContainmentError && error.classification === "process_containment_failed");
+
 const closeTimeout = await preparePlatformProcessContainment({ pid: 4242 }, 100, {
   platform: "win32",
   windowsPowerShellIdentity: windowsIdentity,
@@ -705,6 +732,15 @@ const closeTimeout = await preparePlatformProcessContainment({ pid: 4242 }, 100,
 });
 assert.equal(await closeTimeout.terminateAndVerify(5), false);
 assert.equal(closeTimeout.status().teardown_verified, false);
+
+const windowsUnexpectedInputError = await preparePlatformProcessContainment({ pid: 4242 }, 100, {
+  platform: "win32",
+  windowsPowerShellIdentity: windowsIdentity,
+  spawnController: () => createFakeWindowsController({ stdinErrorOnEnd: "EIO" }),
+  scopeIdFactory: () => "windows-job-unexpected-input-error",
+});
+assert.equal(await windowsUnexpectedInputError.terminateAndVerify(100), false);
+assert.equal(windowsUnexpectedInputError.status().failure, "process_containment_failed");
 
 let identityReads = 0;
 const driftingOptions = {
@@ -776,6 +812,7 @@ await assert.rejects(preparePlatformProcessContainment({ pid: 4242 }, 20, {
   spawnMacosController: () => createFakeMacosController({
     initial: "ERROR:exclusive_uid_not_available\n",
     exitOnStart: 77,
+    stdinErrorOnEnd: "EPIPE",
   }),
   scopeIdFactory: () => "macos-exclusive-uid-pre-ready-collision",
 }), (error) => error instanceof ProcessContainmentError
@@ -789,6 +826,14 @@ const macosCloseError = await preparePlatformProcessContainment({ pid: 4242 }, 1
 });
 assert.equal(await macosCloseError.terminateAndVerify(100), false);
 assert.equal(macosCloseError.status().teardown_verified, false);
+
+const macosUnexpectedInputError = await preparePlatformProcessContainment({ pid: 4242 }, 100, {
+  ...macosOptions,
+  spawnMacosController: () => createFakeMacosController({ stdinErrorOnEnd: "EIO" }),
+  scopeIdFactory: () => "macos-exclusive-uid-unexpected-input-error",
+});
+assert.equal(await macosUnexpectedInputError.terminateAndVerify(100), false);
+assert.equal(macosUnexpectedInputError.status().failure, "process_containment_failed");
 
 let macosIdentityReads = 0;
 const driftingMacosOptions = {
