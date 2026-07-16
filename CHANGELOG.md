@@ -39,9 +39,10 @@ the feedback-plane ESM subpaths documented for the `0.3.0` target.
   remove group/world write access from regular files/directories in the
   ephemeral setup-node distribution before trusting it (symlink permission
   bits are not treated as mutable target permissions), while deterministic
-  adapter tests use an explicit
-  injected test boundary and reserve detached-descendant claims for verified
-  platform containment. Managed commands retain the already-open verified cwd
+  adapter and adoption-bundle smoke tests use an explicit shared injected test
+  boundary when operational containment is unavailable. Detached-descendant
+  claims remain reserved for verified platform containment. Managed commands
+  retain the already-open verified cwd
   across pathname replacement, and cold Job Object startup has a separate
   bounded 30-second readiness budget. Verified and failed worker settlement
   now waits for process `close`, not merely `exit`, before releasing cwd/IPC

@@ -2,11 +2,17 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { classifyProcessContainment } from "../lib/feedback/process-containment.mjs";
 import { runManagedCommand } from "../lib/feedback/process-tree.mjs";
+import { createInjectedTestContainmentFactory } from "./injected-test-containment.mjs";
 
 const sourceRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const temporaryRoot = fs.realpathSync(os.tmpdir());
 const bundleRoot = fs.mkdtempSync(path.join(temporaryRoot, "opencode-harness-adoption-"));
+const platformContainment = classifyProcessContainment();
+const deterministicContainmentFactory = platformContainment.support_state === "verified"
+  ? null
+  : createInjectedTestContainmentFactory("injected-adoption-test-containment-v1");
 
 const adoptionEntries = [
   ".opencode/plugins/engineering-dossier.mjs",
@@ -293,6 +299,9 @@ async function runNode(label, args) {
     cwd: bundleRoot,
     timeout: 120_000,
     maxOutputChars: 2 * 1024 * 1024,
+    ...(deterministicContainmentFactory === null
+      ? {}
+      : { processContainmentFactory: deterministicContainmentFactory }),
   });
   if (result.timed_out) {
     throw new Error(`${label} timed out after verified process-tree teardown`);
@@ -441,4 +450,6 @@ if (verificationError) {
   process.exit(1);
 }
 
-console.log("Adoption bundle verification passed (isolated temp copy, no live provider).");
+console.log(
+  `Adoption bundle verification passed (isolated temp copy, no live provider; child containment: ${deterministicContainmentFactory === null ? `${platformContainment.kind}/verified` : "injected-test-only"}).`,
+);

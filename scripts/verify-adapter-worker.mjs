@@ -19,6 +19,7 @@ import {
   runManagedCommand as runManagedCommandProduction,
   sanitizedNodeBootstrapEnvironment,
 } from "../lib/feedback/process-tree.mjs";
+import { createInjectedTestContainmentFactory } from "./injected-test-containment.mjs";
 
 const canonicalTempBase = fs.realpathSync.native(os.tmpdir());
 const tmp = fs.realpathSync.native(fs.mkdtempSync(path.join(canonicalTempBase, "opencode-adapter-worker-")));
@@ -33,38 +34,9 @@ const containedExecutionTimeoutMs = 5000;
 const survivorDetectionWaitMs = 750;
 const platformContainment = classifyProcessContainment();
 const operationalContainmentAvailable = platformContainment.support_state === "verified";
-
-async function injectedTestContainmentFactory(worker) {
-  let closed = false;
-  const identity = Object.freeze({
-    schema_version: 1,
-    support_state: "verified",
-    kind: "injected-adapter-test-containment-v1",
-    scope_id: `adapter-test-${worker.pid}`,
-    worker_pid: worker.pid,
-  });
-  const close = async () => {
-    if (closed) return true;
-    closed = true;
-    try { worker.kill?.(); } catch { /* exit confirmation remains authoritative */ }
-    return true;
-  };
-  return Object.freeze({
-    support_state: "verified",
-    kind: identity.kind,
-    scope_id: identity.scope_id,
-    identity,
-    fingerprint: `sha256:${"d".repeat(64)}`,
-    status: () => Object.freeze({
-      support_state: "verified",
-      kind: identity.kind,
-      scope_id: identity.scope_id,
-      teardown_verified: closed,
-    }),
-    terminateAndVerify: close,
-    close,
-  });
-}
+const injectedTestContainmentFactory = createInjectedTestContainmentFactory(
+  "injected-adapter-test-containment-v1",
+);
 
 function withInjectedTestContainment(options) {
   return Object.hasOwn(options, "processContainmentFactory")

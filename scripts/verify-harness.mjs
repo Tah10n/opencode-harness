@@ -250,6 +250,7 @@ const requiredFiles = [
   "scripts/capture-static-evidence.mjs",
   "scripts/evaluate-live.mjs",
   "scripts/evaluate-harness.mjs",
+  "scripts/injected-test-containment.mjs",
   "scripts/trace-run.mjs",
   "scripts/verify-adoption-bundle.mjs",
   "scripts/verify-adapter-worker.mjs",
@@ -1378,8 +1379,18 @@ for (const needle of [
   '".opencode/package.json"',
   '"scripts/evaluate-live.mjs", "--self-test-buffered"',
   "runManagedCommand",
+  "deterministicContainmentFactory",
+  "injected-test-only",
 ]) {
   assertIncludes(adoptionBundleVerifier, needle, "scripts/verify-adoption-bundle.mjs", "HARNESS-S082", "Keep the portable adoption bundle and its no-provider temp-copy smoke complete.");
+}
+const injectedTestContainment = read("scripts/injected-test-containment.mjs");
+for (const needle of [
+  "createInjectedTestContainmentFactory",
+  "injected test containment kind is invalid",
+  "process close confirmation remains authoritative",
+]) {
+  assertIncludes(injectedTestContainment, needle, "scripts/injected-test-containment.mjs", "HARNESS-S082", "Injected deterministic containment must remain explicitly test-only and wait for the production close confirmation path.");
 }
 
 const harnessabilityDoc = read("docs/harnessability.md");
