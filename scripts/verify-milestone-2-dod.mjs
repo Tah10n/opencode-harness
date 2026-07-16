@@ -4,96 +4,495 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
-  VERIFICATION_RECEIPT_PRODUCERS,
+  MILESTONE_DOD_DESCENDANT_SCENARIO_IDS,
+  MILESTONE_DOD_DIMENSIONS,
+  MILESTONE_DOD_HOST_SCENARIO_IDS,
   assessMilestone2Receipts,
   assessMilestone2Status,
+  deriveMilestone2StatusFacts,
+  milestone2ExpectedChecks,
+  sealMilestone2ReceiptBundle,
+  sealMilestone2StatusFacts,
+  sealOperationalVerificationReceipt,
   sealVerificationReceipt,
   validateMilestone2DodDocument,
+  validateMilestone2ReceiptBundle,
+  validateMilestone2StatusFacts,
 } from "../lib/quality/milestone-dod.mjs";
+import { sealMilestone2OperationalReport } from "../lib/quality/milestone-operational-report.mjs";
+import {
+  assertMilestone2BundleMatchesRunContext,
+  milestone2SharedRunFingerprint,
+} from "../lib/quality/milestone-run-context.mjs";
 import { ContractError, fingerprint } from "../lib/quality/validation.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const document = JSON.parse(fs.readFileSync(path.join(root, "quality", "milestone-2-dod.v1.json"), "utf8"));
+const document = JSON.parse(fs.readFileSync(path.join(root, "quality", "milestone-2-dod.v2.json"), "utf8"));
+const staleV1Document = JSON.parse(fs.readFileSync(path.join(root, "quality", "milestone-2-dod.v1.json"), "utf8"));
 
 validateMilestone2DodDocument(document);
-for (const item of document.items) {
-  for (const relativePath of item.evidence_refs) {
+assert.deepEqual(
+  document.dimensions.map((dimension) => dimension.dimension_id),
+  MILESTONE_DOD_DIMENSIONS,
+  "Milestone 2 dimensions must stay explicit and canonically ordered",
+);
+for (const dimension of document.dimensions) {
+  for (const relativePath of dimension.evidence_refs) {
     const resolved = path.resolve(root, ...relativePath.split("/"));
-    assert(resolved.startsWith(`${root}${path.sep}`) && fs.existsSync(resolved), `${item.item_id} evidence is missing: ${relativePath}`);
+    assert(
+      resolved.startsWith(`${root}${path.sep}`) && fs.existsSync(resolved),
+      `${dimension.dimension_id} evidence location is missing: ${relativePath}`,
+    );
   }
 }
 
-assert.equal(assessMilestone2Status({ deterministic: "passed", runtime: "available_passed", live: "available_passed", external_blocking_context: false }), "verified");
-assert.equal(assessMilestone2Status({ deterministic: "passed", runtime: "unavailable", live: "unavailable", external_blocking_context: false }), "verified");
-assert.equal(assessMilestone2Status({ deterministic: "passed", runtime: "available_passed", live: "unavailable", external_blocking_context: false }), "partially_verified");
-assert.equal(assessMilestone2Status({ deterministic: "passed", runtime: "available_failed", live: "unavailable", external_blocking_context: false }), "verification_failed");
-assert.equal(assessMilestone2Status({ deterministic: "missing", runtime: "unavailable", live: "unavailable", external_blocking_context: true }), "blocked_external_state");
-
-for (const field of ["deterministic", "runtime", "live", "external_blocking_context"]) {
-  const incomplete = { deterministic: "passed", runtime: "unavailable", live: "unavailable", external_blocking_context: false };
+assert.throws(() => validateMilestone2DodDocument(staleV1Document), ContractError, "stale v1 DoD must be rejected");
+assert.throws(() => validateMilestone2DodDocument({ ...document, schema_version: 1 }), /schema_version must be 2/u);
+assert.throws(() => validateMilestone2DodDocument({ ...document, unexpected: true }), ContractError);
+for (const field of Object.keys(document)) {
+  const incomplete = structuredClone(document);
   delete incomplete[field];
-  assert.throws(() => assessMilestone2Status(incomplete), ContractError, `one-fact removal must fail: ${field}`);
+  assert.throws(() => validateMilestone2DodDocument(incomplete), ContractError, `one-document-field removal must fail: ${field}`);
+}
+assert.throws(() => validateMilestone2DodDocument({
+  ...document,
+  dod_id: "tampered-dod-id",
+}), /fingerprint mismatch/u);
+assert.throws(() => validateMilestone2DodDocument({
+  ...document,
+  dimensions: document.dimensions.map((dimension, index) => index === 0 ? {
+    ...dimension,
+    allowed_states: ["failed", "verified", "unavailable"],
+  } : dimension),
+}), /canonical ordered values/u);
+const swappedOperationalBody = structuredClone(document);
+delete swappedOperationalBody.fingerprint;
+const windowsChecks = swappedOperationalBody.dimensions[1].check_ids;
+swappedOperationalBody.dimensions[1].check_ids = swappedOperationalBody.dimensions[2].check_ids;
+swappedOperationalBody.dimensions[2].check_ids = windowsChecks;
+assert.throws(() => validateMilestone2DodDocument({
+  ...swappedOperationalBody,
+  fingerprint: fingerprint(swappedOperationalBody),
+}), /canonical ordered values/u, "operational check IDs cannot acquire another dimension's producer");
+
+const completeFactBody = Object.freeze({
+  deterministic_contracts: "verified",
+  windows_runtime: "verified",
+  linux_runtime: "verified",
+  macos_runtime: "unsupported",
+  host_hook_e2e: "verified",
+  general_live_evaluation: "not_requested",
+  external_blocking_context: [],
+});
+
+function facts(overrides = {}) {
+  return sealMilestone2StatusFacts({ ...completeFactBody, ...overrides });
 }
 
-const classProducer = new Map([
-  ["deterministic", VERIFICATION_RECEIPT_PRODUCERS.deterministic],
-  ["runtime_optional", VERIFICATION_RECEIPT_PRODUCERS.runtime],
-  ["live_external", VERIFICATION_RECEIPT_PRODUCERS.live],
-]);
-const expectedChecks = document.items.flatMap((item) => item.check_ids.map((checkId) => ({
-  check_id: checkId,
-  producer_id: classProducer.get(item.execution_class),
-  command_id: `contract-${checkId}`,
-})));
-const receiptFor = (expected, status = "passed") => sealVerificationReceipt({
-  schema_version: 1,
-  check_id: expected.check_id,
-  producer_id: expected.producer_id,
-  command_id: expected.command_id,
-  started_at: "2026-07-10T09:00:00.000Z",
-  completed_at: "2026-07-10T09:00:01.000Z",
-  status,
-  evidence_fingerprint: fingerprint({ check_id: expected.check_id, status }),
-});
-const allReceipts = expectedChecks.map((entry) => receiptFor(entry));
-const deterministicIds = new Set(document.items
-  .filter((item) => item.execution_class === "deterministic")
-  .flatMap((item) => item.check_ids));
-assert.equal(deterministicIds.has("normal-session-plugin-api-probe"), false, "installed API probe must not be deterministic default evidence");
-const deterministicReceipts = allReceipts.filter((receipt) => deterministicIds.has(receipt.check_id));
+function blocker(dimensionId, suffix = dimensionId) {
+  return {
+    dimension_id: dimensionId,
+    reason_code: `external-${suffix}`,
+    reason: `External state prevents ${dimensionId} verification in this run.`,
+    external_dependency: `host/${suffix}`,
+  };
+}
 
-assert.equal(assessMilestone2Receipts({ document, receipts: allReceipts, expectedChecks }).status, "verified");
-assert.equal(assessMilestone2Receipts({ document, receipts: deterministicReceipts, expectedChecks }).status, "verified");
-const runtimeCheckIds = new Set(document.items
-  .filter((item) => item.execution_class === "runtime_optional")
-  .flatMap((item) => item.check_ids));
-assert(runtimeCheckIds.has("normal-session-plugin-api-probe"), "installed API probe must remain explicit optional runtime evidence");
-const runtimeReceipts = allReceipts.filter((receipt) => runtimeCheckIds.has(receipt.check_id));
+const fullyVerified = facts({ macos_runtime: "verified", general_live_evaluation: "verified" });
+const fullyVerifiedReport = assessMilestone2Status(fullyVerified);
+assert.equal(fullyVerifiedReport.status, "verified");
+assert.equal(fullyVerifiedReport.facts_fingerprint, fullyVerified.fingerprint);
+assert.deepEqual(fullyVerifiedReport.missing_facts, []);
+assert.deepEqual(fullyVerifiedReport.failed_facts, []);
+assert.match(fullyVerifiedReport.status_rationale, /mandatory operational evidence is verified/u);
+
+const macUnsupportedLiveNotRequestedReport = assessMilestone2Status(facts());
+assert.equal(macUnsupportedLiveNotRequestedReport.status, "verified");
+assert.deepEqual(macUnsupportedLiveNotRequestedReport.missing_facts, []);
+
+const deterministicOnlyFacts = facts({
+  windows_runtime: "unavailable",
+  linux_runtime: "unavailable",
+  host_hook_e2e: "unavailable",
+});
+const deterministicOnlyReport = assessMilestone2Status(deterministicOnlyFacts);
+assert.equal(deterministicOnlyReport.status, "partially_verified", "deterministic-only evidence must never be verified");
+assert.deepEqual(
+  deterministicOnlyReport.missing_facts,
+  [
+    { dimension_id: "windows_runtime", state: "unavailable", externally_blocked: false },
+    { dimension_id: "linux_runtime", state: "unavailable", externally_blocked: false },
+    { dimension_id: "host_hook_e2e", state: "unavailable", externally_blocked: false },
+  ],
+  "missing facts must be exact and canonically ordered",
+);
+
+for (const dimensionId of MILESTONE_DOD_DIMENSIONS) {
+  const report = assessMilestone2Status(facts({ [dimensionId]: "failed" }));
+  assert.equal(report.status, "verification_failed", `${dimensionId}=failed must fail verification`);
+  assert.deepEqual(report.failed_facts, [
+    { dimension_id: dimensionId, state: "failed", externally_blocked: false },
+  ]);
+}
+
+for (const dimensionId of MILESTONE_DOD_DIMENSIONS) {
+  const report = assessMilestone2Status(facts({ [dimensionId]: "unavailable" }));
+  assert.equal(
+    report.status,
+    dimensionId === "deterministic_contracts" ? "verification_failed" : "partially_verified",
+    `${dimensionId}=unavailable must use its dimension-specific completion semantics`,
+  );
+}
+
+for (const dimensionId of MILESTONE_DOD_DIMENSIONS.filter((entry) => entry !== "general_live_evaluation")) {
+  assert.throws(() => facts({ [dimensionId]: "not_requested" }), /is unsupported/u);
+}
+for (const dimensionId of MILESTONE_DOD_DIMENSIONS.filter((entry) => entry !== "macos_runtime")) {
+  assert.throws(() => facts({ [dimensionId]: "unsupported" }), /is unsupported/u);
+}
+
+const oneBlockedFacts = facts({
+  windows_runtime: "unavailable",
+  external_blocking_context: [blocker("windows_runtime")],
+});
+const oneBlockedReport = assessMilestone2Status(oneBlockedFacts);
+assert.equal(oneBlockedReport.status, "blocked_external_state");
+assert.deepEqual(oneBlockedReport.missing_facts, [
+  { dimension_id: "windows_runtime", state: "unavailable", externally_blocked: true },
+]);
+assert.match(oneBlockedReport.status_rationale, /explicit bounded external blocking context/u);
+
+const allOperationalBlockedReport = assessMilestone2Status(facts({
+  windows_runtime: "unavailable",
+  linux_runtime: "unavailable",
+  macos_runtime: "unavailable",
+  host_hook_e2e: "unavailable",
+  external_blocking_context: [
+    blocker("windows_runtime"),
+    blocker("linux_runtime"),
+    blocker("macos_runtime"),
+    blocker("host_hook_e2e"),
+  ],
+}));
+assert.equal(allOperationalBlockedReport.status, "blocked_external_state");
+
+assert.equal(assessMilestone2Status(facts({ windows_runtime: "unavailable" })).status, "partially_verified");
+assert.equal(assessMilestone2Status(facts({
+  windows_runtime: "unavailable",
+  linux_runtime: "unavailable",
+  external_blocking_context: [blocker("windows_runtime")],
+})).status, "partially_verified", "a mixed blocked/unexplained gap must remain partial");
+assert.equal(assessMilestone2Status(facts({
+  windows_runtime: "unavailable",
+  general_live_evaluation: "unavailable",
+  external_blocking_context: [blocker("windows_runtime")],
+})).status, "partially_verified", "requested live evidence unavailable without eligible blocking context must remain partial");
+assert.equal(assessMilestone2Status(facts({
+  deterministic_contracts: "unavailable",
+  windows_runtime: "unavailable",
+  external_blocking_context: [blocker("windows_runtime")],
+})).status, "verification_failed", "external state cannot replace missing deterministic evidence");
+
+assert.throws(() => facts({
+  external_blocking_context: [blocker("windows_runtime")],
+}), /requires windows_runtime=unavailable/u);
+assert.throws(() => facts({
+  windows_runtime: "unavailable",
+  external_blocking_context: [blocker("windows_runtime", "first"), blocker("windows_runtime", "second")],
+}), /duplicates windows_runtime/u);
+assert.throws(() => facts({
+  general_live_evaluation: "unavailable",
+  external_blocking_context: [blocker("general_live_evaluation")],
+}), /not eligible/u);
+assert.throws(() => facts({
+  windows_runtime: "unavailable",
+  linux_runtime: "unavailable",
+  external_blocking_context: [blocker("linux_runtime"), blocker("windows_runtime")],
+}), /canonical operational dimension order/u);
+assert.throws(() => facts({
+  windows_runtime: "unavailable",
+  external_blocking_context: Array.from({ length: 5 }, (_, index) => blocker("windows_runtime", `overflow-${index}`)),
+}), ContractError, "external blocking context must remain bounded");
+
+const validFacts = facts();
+for (const field of Object.keys(validFacts)) {
+  const incomplete = structuredClone(validFacts);
+  delete incomplete[field];
+  assert.throws(() => validateMilestone2StatusFacts(incomplete), ContractError, `one-fact removal must fail: ${field}`);
+}
+assert.throws(() => validateMilestone2StatusFacts({ ...validFacts, unexpected: true }), ContractError);
+assert.throws(() => validateMilestone2StatusFacts({ ...validFacts, schema_version: 1 }), /schema_version must be 2/u);
+assert.throws(() => validateMilestone2StatusFacts({
+  ...validFacts,
+  fingerprint: "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+}), /fingerprint mismatch/u);
+assert.throws(() => sealMilestone2StatusFacts({
+  ...completeFactBody,
+  external_blocking_context: [{
+    ...blocker("windows_runtime"),
+    reason: "",
+  }],
+  windows_runtime: "unavailable",
+}), ContractError);
+
+const expectedChecks = milestone2ExpectedChecks(document);
+const expectedByCheckId = new Map(expectedChecks.map((entry) => [entry.check_id, entry]));
+const operationalHead = "e".repeat(40);
+const operationalRun = Object.freeze({
+  provider: "github_actions",
+  run_id: "milestone-dod-fixture-run",
+  run_attempt: 1,
+  job_id: null,
+  repository: "fixture/opencode-harness",
+  source_attestation_fingerprint: fingerprint({ source: "portable-fixture-source" }),
+});
+
+function operationalDimension(checkId) {
+  if (checkId.startsWith("windows-")) return { dimension: "windows_runtime", platform: "win32" };
+  if (checkId.startsWith("linux-")) return { dimension: "linux_runtime", platform: "linux" };
+  if (checkId.startsWith("macos-")) return { dimension: "macos_runtime", platform: "darwin" };
+  if (checkId === "normal-session-host-hook-e2e") return { dimension: "host_hook_e2e", platform: "linux" };
+  return null;
+}
+
+function operationalResult(checkId, platform) {
+  const reportFingerprint = fingerprint({ check_id: checkId, report: "fixture" });
+  if (checkId === "normal-session-host-hook-e2e") {
+    return {
+      kind: "installed_host",
+      verification_mode: "trusted_adapter",
+      report_fingerprint: reportFingerprint,
+      containment_kind: null,
+      containment_identity_fingerprints: [],
+      teardown_verified: null,
+      scenario_ids: [...MILESTONE_DOD_HOST_SCENARIO_IDS],
+      trusted_check_receipt_fingerprints: [fingerprint({ host_check: checkId })],
+      scenario_contract_fingerprint: fingerprint({ host_scenarios: MILESTONE_DOD_HOST_SCENARIO_IDS }),
+      attestation_fingerprint: fingerprint({ host_attestation: checkId }),
+      host_evidence_fingerprint: fingerprint({ host_evidence: checkId }),
+    };
+  }
+  const descendant = checkId.endsWith("descendant-teardown");
+  return {
+    kind: descendant ? "descendant_teardown" : "trusted_project_check",
+    verification_mode: null,
+    report_fingerprint: reportFingerprint,
+    containment_kind: platform === "win32"
+      ? "windows-job-object-v1"
+      : platform === "linux" ? "linux-cgroup-v2" : "macos-fixture-controller",
+    containment_identity_fingerprints: [fingerprint({ containment: checkId })],
+    teardown_verified: true,
+    scenario_ids: descendant
+      ? [...MILESTONE_DOD_DESCENDANT_SCENARIO_IDS[platform]]
+      : ["trusted_project_check"],
+    trusted_check_receipt_fingerprints: descendant ? [] : [fingerprint({ trusted_check: checkId })],
+    scenario_contract_fingerprint: null,
+    attestation_fingerprint: null,
+    host_evidence_fingerprint: null,
+  };
+}
+
+function receiptFor(expected, status = "passed", scopeOverrides = {}) {
+  const operational = operationalDimension(expected.check_id);
+  if (operational === null) {
+    return sealVerificationReceipt({
+      schema_version: 1,
+      check_id: expected.check_id,
+      producer_id: expected.producer_id,
+      command_id: expected.command_id,
+      started_at: "2026-07-15T09:00:00.000Z",
+      completed_at: "2026-07-15T09:00:01.000Z",
+      status,
+      evidence_fingerprint: fingerprint({ check_id: expected.check_id, status }),
+    });
+  }
+  const evidenceScope = {
+    kind: "milestone_operational",
+    dimension_id: operational.dimension,
+    platform: operational.platform,
+    head_sha: operationalHead,
+    workspace_fingerprint: fingerprint({ workspace: operational.dimension }),
+    run_binding: {
+      ...operationalRun,
+      job_id: `${operational.dimension}-fixture-job`,
+    },
+    result: operationalResult(expected.check_id, operational.platform),
+    ...scopeOverrides,
+  };
+  return sealOperationalVerificationReceipt({
+    check_id: expected.check_id,
+    started_at: "2026-07-15T09:00:00.000Z",
+    completed_at: "2026-07-15T09:00:01.000Z",
+    status,
+    evidence_scope: evidenceScope,
+  });
+}
+
+const allReceipts = expectedChecks
+  .filter((entry) => !["general-live-evaluation", "macos-trusted-project-check"].includes(entry.check_id))
+  .map((entry) => receiptFor(entry));
+const receiptVerifiedFacts = deriveMilestone2StatusFacts({ document, receipts: allReceipts });
+assert.equal(receiptVerifiedFacts.deterministic_contracts, "verified");
+assert.equal(receiptVerifiedFacts.windows_runtime, "verified");
+assert.equal(receiptVerifiedFacts.linux_runtime, "verified");
+assert.equal(receiptVerifiedFacts.macos_runtime, "unsupported");
+assert.equal(receiptVerifiedFacts.host_hook_e2e, "verified");
+assert.equal(receiptVerifiedFacts.general_live_evaluation, "not_requested");
 assert.equal(assessMilestone2Receipts({
   document,
-  receipts: [...deterministicReceipts, ...runtimeReceipts],
-  expectedChecks,
-}).status, "partially_verified");
-assert.equal(assessMilestone2Receipts({ document, receipts: deterministicReceipts.slice(1), expectedChecks }).status, "verification_failed");
+  receipts: allReceipts,
+  facts: receiptVerifiedFacts,
+}).status, "verified");
+
+const deterministicBundle = sealMilestone2ReceiptBundle({
+  dimension_id: "deterministic_contracts",
+  head_sha: operationalHead,
+  workspace_fingerprint: fingerprint({ workspace: "deterministic-contracts" }),
+  run_binding: {
+    ...operationalRun,
+    job_id: "deterministic-fixture-job",
+  },
+  receipts: allReceipts.filter((receipt) => receipt.schema_version === 1),
+});
+assert.equal(validateMilestone2ReceiptBundle(deterministicBundle), deterministicBundle);
+
+const windowsReceipts = allReceipts.filter((receipt) => (
+  receipt.evidence_scope?.dimension_id === "windows_runtime"
+));
+const windowsScope = windowsReceipts[0].evidence_scope;
+const windowsBundle = sealMilestone2ReceiptBundle({
+  dimension_id: "windows_runtime",
+  head_sha: windowsScope.head_sha,
+  workspace_fingerprint: windowsScope.workspace_fingerprint,
+  run_binding: windowsScope.run_binding,
+  receipts: windowsReceipts,
+});
+assert.equal(validateMilestone2ReceiptBundle(windowsBundle), windowsBundle);
+const aggregateRunContext = {
+  head_sha: windowsBundle.head_sha,
+  workspace_fingerprint: fingerprint({ workspace: "aggregate-checkout-can-differ" }),
+  run_binding: {
+    ...windowsBundle.run_binding,
+    job_id: "milestone-2-status-fixture-job",
+  },
+};
+assert.equal(
+  milestone2SharedRunFingerprint(windowsBundle),
+  milestone2SharedRunFingerprint(aggregateRunContext),
+  "portable source attestation must allow the aggregate job to use a separate checkout identity",
+);
+assert.equal(assertMilestone2BundleMatchesRunContext(windowsBundle, aggregateRunContext), windowsBundle);
+const mismatchedAggregateContext = structuredClone(aggregateRunContext);
+mismatchedAggregateContext.run_binding.source_attestation_fingerprint = fingerprint({ source: "different-current-source" });
+assert.notEqual(
+  milestone2SharedRunFingerprint(windowsBundle),
+  milestone2SharedRunFingerprint(mismatchedAggregateContext),
+  "portable source mismatch must affect the current-to-bundle comparison",
+);
+assert.throws(
+  () => assertMilestone2BundleMatchesRunContext(windowsBundle, mismatchedAggregateContext),
+  (error) => error?.code === "MILESTONE_BUNDLE_RUN_CONTEXT_MISMATCH",
+  "the aggregate assessor must reject a bundle from a different portable source attestation",
+);
+assert.throws(() => sealMilestone2ReceiptBundle({
+  dimension_id: "windows_runtime",
+  head_sha: windowsScope.head_sha,
+  workspace_fingerprint: fingerprint({ workspace: "wrong-bundle" }),
+  run_binding: windowsScope.run_binding,
+  receipts: windowsReceipts,
+}), /provenance does not match its bundle/u);
+assert.throws(() => sealMilestone2ReceiptBundle({
+  dimension_id: "linux_runtime",
+  head_sha: windowsScope.head_sha,
+  workspace_fingerprint: windowsScope.workspace_fingerprint,
+  run_binding: windowsScope.run_binding,
+  receipts: windowsReceipts,
+}), /does not belong to linux_runtime/u);
+const tamperedBundle = structuredClone(windowsBundle);
+tamperedBundle.fingerprint = fingerprint({ tampered: true });
+assert.throws(() => validateMilestone2ReceiptBundle(tamperedBundle), /fingerprint mismatch/u);
+
+const descendantReport = sealMilestone2OperationalReport({
+  report_kind: "descendant_teardown",
+  platform: "win32",
+  containment_kind: "windows-job-object-v1",
+  containment_identity_fingerprints: [fingerprint({ containment: "fixture" })],
+  teardown_verified: true,
+  scenario_ids: [...MILESTONE_DOD_DESCENDANT_SCENARIO_IDS.win32],
+  trusted_check_receipt_fingerprints: [],
+});
+assert.equal(descendantReport.report_kind, "descendant_teardown");
+assert.throws(() => sealMilestone2OperationalReport({
+  report_kind: "descendant_teardown",
+  platform: "win32",
+  containment_kind: "windows-job-object-v1",
+  containment_identity_fingerprints: [fingerprint({ containment: "fixture" })],
+  teardown_verified: true,
+  scenario_ids: ["direct_child"],
+  trusted_check_receipt_fingerprints: [],
+}), /scenario contract is incomplete/u);
+
+const deterministicCheckIds = document.dimensions
+  .find((dimension) => dimension.dimension_id === "deterministic_contracts")
+  .check_ids;
+const deterministicExpectedChecks = expectedChecks.filter((entry) => deterministicCheckIds.includes(entry.check_id));
+const deterministicReceipts = deterministicExpectedChecks.map((entry) => receiptFor(entry));
+const derivedDeterministicFacts = deriveMilestone2StatusFacts({ document, receipts: deterministicReceipts });
+assert.equal(derivedDeterministicFacts.deterministic_contracts, "verified");
+assert.equal(derivedDeterministicFacts.windows_runtime, "unavailable");
+assert.equal(derivedDeterministicFacts.linux_runtime, "unavailable");
+assert.equal(derivedDeterministicFacts.host_hook_e2e, "unavailable");
 assert.equal(assessMilestone2Receipts({
   document,
-  receipts: deterministicReceipts.map((receipt, index) => index === 0 ? receiptFor(expectedChecks.find((entry) => entry.check_id === receipt.check_id), "failed") : receipt),
-  expectedChecks,
-}).status, "verification_failed");
+  receipts: deterministicReceipts,
+  facts: derivedDeterministicFacts,
+}).status, "partially_verified", "receipt aggregation must not upgrade deterministic-only evidence");
+
+const firstDeterministicCheck = deterministicExpectedChecks[0];
+const missingDeterministicDecision = assessMilestone2Receipts({
+  document,
+  receipts: deterministicReceipts.slice(1),
+  facts: facts({
+    deterministic_contracts: "unavailable",
+    windows_runtime: "unavailable",
+    linux_runtime: "unavailable",
+    host_hook_e2e: "unavailable",
+  }),
+});
+assert.equal(missingDeterministicDecision.status, "verification_failed");
+assert.deepEqual(missingDeterministicDecision.deterministic_missing, [firstDeterministicCheck.check_id]);
+
+const failedDeterministicReceipts = deterministicReceipts.map((receipt, index) => (
+  index === 0 ? receiptFor(firstDeterministicCheck, "failed") : receipt
+));
+const failedDeterministicDecision = assessMilestone2Receipts({
+  document,
+  receipts: failedDeterministicReceipts,
+  facts: facts({
+    deterministic_contracts: "failed",
+    windows_runtime: "unavailable",
+    linux_runtime: "unavailable",
+    host_hook_e2e: "unavailable",
+  }),
+});
+assert.equal(failedDeterministicDecision.status, "verification_failed");
+assert.deepEqual(failedDeterministicDecision.deterministic_failed, [firstDeterministicCheck.check_id]);
+
+assert.throws(() => assessMilestone2Receipts({
+  document,
+  receipts: deterministicReceipts.slice(1),
+  facts: deterministicOnlyFacts,
+}), /requires every declared check receipt to pass/u);
 assert.throws(() => assessMilestone2Receipts({
   document,
   receipts: [...deterministicReceipts, deterministicReceipts[0]],
-  expectedChecks,
+  facts: deterministicOnlyFacts,
 }), /duplicate verification receipt/u);
-assert.throws(() => assessMilestone2Receipts({
-  document,
-  receipts: [sealVerificationReceipt({
-    ...deterministicReceipts[0],
-    producer_id: "untrusted/producer",
-    fingerprint: undefined,
-  })],
-  expectedChecks,
-}), /untrusted producer/u);
+assert.throws(() => sealVerificationReceipt({
+  ...deterministicReceipts[0],
+  producer_id: "untrusted/producer",
+  fingerprint: undefined,
+}), /generic receipt sealing is restricted to the deterministic runner/u);
 assert.throws(() => assessMilestone2Receipts({
   document,
   receipts: [sealVerificationReceipt({
@@ -101,7 +500,130 @@ assert.throws(() => assessMilestone2Receipts({
     command_id: "substituted-command",
     fingerprint: undefined,
   })],
-  expectedChecks,
+  facts: facts({
+    deterministic_contracts: "unavailable",
+    windows_runtime: "unavailable",
+    linux_runtime: "unavailable",
+    host_hook_e2e: "unavailable",
+  }),
 }), /substituted command/u);
 
-console.log("Milestone 2 DoD contract passed (manifest and policy only). This command consumes no execution receipts and asserts no milestone completion status.");
+const windowsTrustedCheck = expectedByCheckId.get("windows-trusted-project-check");
+const windowsDescendantCheck = expectedByCheckId.get("windows-descendant-teardown");
+const linuxTrustedCheck = expectedByCheckId.get("linux-trusted-project-check");
+const hostHookCheck = expectedByCheckId.get("normal-session-host-hook-e2e");
+
+assert.throws(() => sealVerificationReceipt({
+  schema_version: 1,
+  check_id: windowsTrustedCheck.check_id,
+  producer_id: windowsTrustedCheck.producer_id,
+  command_id: windowsTrustedCheck.command_id,
+  started_at: "2026-07-15T09:00:00.000Z",
+  completed_at: "2026-07-15T09:00:01.000Z",
+  status: "passed",
+  evidence_fingerprint: fingerprint({ fixture: "generic-operational-sealer" }),
+}), /generic receipt sealing is restricted to the deterministic runner/u,
+"generic sealing must not mint operational evidence");
+
+assert.throws(() => sealOperationalVerificationReceipt({
+  check_id: windowsTrustedCheck.check_id,
+  started_at: "2026-07-15T09:00:00.000Z",
+  completed_at: "2026-07-15T09:00:01.000Z",
+  status: "passed",
+  evidence_scope: null,
+}), ContractError, "operational evidence requires the runner-owned typed scope");
+
+assert.throws(() => receiptFor(hostHookCheck, "passed", {
+  result: {
+    ...operationalResult(hostHookCheck.check_id, "linux"),
+    verification_mode: "deterministic_fixture",
+  },
+}), /not installed-host evidence/u,
+"deterministic host fixtures must never satisfy installed-host evidence");
+
+const macosExpectedCheck = expectedByCheckId.get("macos-trusted-project-check");
+assert.throws(() => receiptFor(macosExpectedCheck), /no registered verified containment mechanism/u,
+"unsupported macOS containment must not be upgraded by a synthetic kind string");
+
+assert.throws(() => assessMilestone2Receipts({
+  document,
+  receipts: [
+    receiptFor(windowsTrustedCheck),
+    receiptFor(windowsDescendantCheck, "passed", { head_sha: "f".repeat(40) }),
+  ],
+  facts: deterministicOnlyFacts,
+}), /do not share one HEAD, workspace, job, and run binding/u);
+
+assert.throws(() => assessMilestone2Receipts({
+  document,
+  receipts: [
+    receiptFor(windowsTrustedCheck),
+    receiptFor(linuxTrustedCheck, "passed", {
+      run_binding: {
+        ...operationalRun,
+        run_id: "another-verification-run",
+        job_id: "linux_runtime-fixture-job",
+      },
+    }),
+  ],
+  facts: deterministicOnlyFacts,
+}), /one repository HEAD and verification run/u);
+
+assert.throws(() => assessMilestone2Receipts({
+  document,
+  receipts: [
+    receiptFor(windowsTrustedCheck),
+    receiptFor(linuxTrustedCheck, "passed", {
+      run_binding: {
+        ...operationalRun,
+        job_id: "linux_runtime-fixture-job",
+        source_attestation_fingerprint: fingerprint({ source: "different-portable-source" }),
+      },
+    }),
+  ],
+  facts: deterministicOnlyFacts,
+}), /one repository HEAD and verification run/u,
+"cross-dimension receipts must share one portable source attestation");
+
+const receiptsMissingLinuxTeardown = allReceipts.filter((receipt) => (
+  receipt.check_id !== "linux-descendant-teardown"
+));
+const missingOperationalFacts = deriveMilestone2StatusFacts({
+  document,
+  receipts: receiptsMissingLinuxTeardown,
+});
+assert.equal(missingOperationalFacts.linux_runtime, "unavailable");
+assert.notEqual(assessMilestone2Receipts({
+  document,
+  receipts: receiptsMissingLinuxTeardown,
+  facts: missingOperationalFacts,
+}).status, "verified", "missing operational artifacts must never upgrade the milestone");
+
+const failedLinuxReceipts = allReceipts.map((receipt) => (
+  receipt.check_id === "linux-descendant-teardown"
+    ? receiptFor(expectedByCheckId.get(receipt.check_id), "failed")
+    : receipt
+));
+const failedOperationalFacts = deriveMilestone2StatusFacts({ document, receipts: failedLinuxReceipts });
+assert.equal(failedOperationalFacts.linux_runtime, "failed");
+assert.equal(assessMilestone2Receipts({
+  document,
+  receipts: failedLinuxReceipts,
+  facts: failedOperationalFacts,
+}).status, "verification_failed");
+
+const macosCheckId = document.dimensions.find((dimension) => dimension.dimension_id === "macos_runtime").check_ids[0];
+assert.throws(() => assessMilestone2Receipts({
+  document,
+  receipts: [...deterministicReceipts, receiptFor(expectedByCheckId.get(macosCheckId), "failed")],
+  facts: deterministicOnlyFacts,
+}), /macos_runtime=unsupported cannot register execution receipts/u);
+
+assert.throws(() => assessMilestone2Receipts({
+  document,
+  receipts: deterministicReceipts,
+  expectedChecks: deterministicExpectedChecks,
+  facts: deterministicOnlyFacts,
+}), /expectedChecks is not supported/u, "callers must not supply their own receipt authority");
+
+console.log("Milestone 2 DoD v2 contract passed. This command consumes no execution receipts from real runs and asserts no milestone completion status for the current workspace.");

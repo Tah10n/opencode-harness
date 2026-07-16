@@ -2,20 +2,39 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import process from "node:process";
+import { spawnSync } from "node:child_process";
 
+import { classifyProcessContainment } from "../lib/feedback/process-containment.mjs";
 import {
+  PROJECT_CHECK_CATALOG_SCHEMA_VERSION,
   projectCheckCatalogFingerprint,
   validateProjectCheckCatalog,
 } from "../lib/quality/project-check-catalog.mjs";
 import {
+  WORKSPACE_SNAPSHOT_SCHEMA_VERSION,
+  observeContentBoundWorkspace,
+} from "../lib/quality/normal-session-workspace.mjs";
+import {
+  TRUSTED_PROJECT_CHECK_RECEIPT_SCHEMA_VERSION,
   TRUSTED_PROJECT_EXECUTION_POLICY_VERSION,
-  assertTrustedProjectInvocationCurrent,
   runTrustedProjectCheck,
   runTrustedProjectChecks,
-  trustedProjectCommandFingerprint,
+  managedCommandSpawnSync,
   trustedProjectCheckResult,
+  trustedProjectCommandFingerprint,
 } from "../lib/quality/trusted-project-runner.mjs";
+import {
+  trustedToolchainMapFingerprint,
+  validateTrustedToolchainArguments,
+  validateTrustedToolchainMap,
+} from "../lib/quality/trusted-toolchains.mjs";
+import { TRUSTED_TOOLCHAIN_RESOLUTION_POLICY_VERSION } from "../lib/quality/trusted-toolchain-host-config.mjs";
 import { ContractError, fingerprint } from "../lib/quality/validation.mjs";
+import {
+  sealMilestone2OperationalReport,
+  writeMilestone2OperationalReportFromEnvironment,
+} from "../lib/quality/milestone-operational-report.mjs";
 
 function expectCode(callback, code) {
   assert.throws(callback, (error) => error instanceof ContractError && error.code === code);
@@ -25,157 +44,788 @@ function pause(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
-const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-harness-runner-"));
-fs.mkdirSync(path.join(tempRoot, "project"));
+function clone(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
+function workspaceSnapshot({ sourceEntries = [], outputEntries = [], dirty = false } = {}) {
+  const body = {
+    schema_version: WORKSPACE_SNAPSHOT_SCHEMA_VERSION,
+    head_sha: "d".repeat(40),
+    index_entry_count: 0,
+    index_fingerprint: fingerprint({ index: "stable" }),
+    entries: sourceEntries,
+    dirty,
+  };
+  const sourceFingerprint = fingerprint(body);
+  const outputFingerprint = fingerprint({
+    schema_version: WORKSPACE_SNAPSHOT_SCHEMA_VERSION,
+    entries: outputEntries,
+  });
+  return {
+    ...body,
+    declared_output_entries: outputEntries,
+    source_fingerprint: sourceFingerprint,
+    declared_outputs_fingerprint: outputFingerprint,
+    fingerprint: fingerprint({
+      schema_version: WORKSPACE_SNAPSHOT_SCHEMA_VERSION,
+      source_fingerprint: sourceFingerprint,
+      declared_outputs_fingerprint: outputFingerprint,
+    }),
+  };
+}
+
+function containmentDescriptor({
+  supportState = "verified",
+  kind = "windows-job-object-v1",
+  reason = null,
+  mechanism = { fixture_controller: "stable" },
+} = {}) {
+  const identity = {
+    schema_version: 1,
+    support_state: supportState,
+    kind,
+    scope_id: null,
+    reason,
+    mechanism,
+  };
+  return { ...identity, identity, fingerprint: fingerprint(identity) };
+}
+
+function containedExecution(execution = {}, {
+  kind = "windows-job-object-v1",
+  scopeId = "windows-job-fixture-scope",
+} = {}) {
+  const linuxParentIdentity = { canonical_path: "/fixture/cgroup/parent", fixture: true };
+  const linuxHelperExecutable = {
+    canonical_path: "/usr/local/libexec/opencode-quality-cgroup-attach",
+    fixture: true,
+  };
+  const common = {
+    schema_version: 1,
+    support_state: "verified",
+    kind,
+    scope_id: scopeId,
+    worker_pid: 4242,
+  };
+  const identity = kind === "windows-job-object-v1"
+    ? {
+      ...common,
+      controller_executable: { canonical_path: process.execPath, fixture: true },
+      controller_source_fingerprint: fingerprint({ controller: "fixture" }),
+    }
+    : {
+      ...common,
+      watchdog_pid: 4343,
+      delegated_root_identity: { canonical_path: "/fixture/cgroup", fixture: true },
+      current_parent_identity: linuxParentIdentity,
+      guard_identity: linuxParentIdentity,
+      leaf_identity: { canonical_path: `/fixture/cgroup/${scopeId}`, fixture: true },
+      mount_point: "/sys/fs/cgroup",
+      controller_executable: { canonical_path: process.execPath, fixture: true },
+      controller_module: { canonical_path: "/fixture/process-containment.mjs", fixture: true },
+      controller_source_fingerprint: fingerprint({ controller: "fixture-linux" }),
+      attach_helper: {
+        mode: "sudo-helper-v1",
+        sudo: { canonical_path: "/usr/bin/sudo", fixture: true },
+        executable: linuxHelperExecutable,
+        policy_probe_executable: linuxHelperExecutable,
+        guard_policy_fingerprint: fingerprint({ guard: linuxParentIdentity }),
+      },
+    };
+  const identityFingerprint = fingerprint(identity);
+  const state = kind === "windows-job-object-v1"
+    ? {
+      support_state: "verified",
+      kind,
+      scope_id: scopeId,
+      identity_fingerprint: identityFingerprint,
+      attached: true,
+      closed: true,
+      controller_exited: true,
+      controller_streams_closed: true,
+      controller_exit_code: 0,
+      teardown_verified: true,
+      preparation_aborted: false,
+      failure: null,
+    }
+    : {
+      support_state: "verified",
+      kind,
+      scope_id: scopeId,
+      identity_fingerprint: identityFingerprint,
+      attached: true,
+      closed: true,
+      watchdog_exited: true,
+      watchdog_streams_closed: true,
+      watchdog_exit_code: 0,
+      teardown_verified: true,
+      failure: null,
+    };
+  return {
+    status: 0,
+    signal: null,
+    stdout: Buffer.alloc(0),
+    stderr: Buffer.alloc(0),
+    error: undefined,
+    ...execution,
+    teardown_verified: true,
+    containment_identity: identity,
+    containment_fingerprint: identityFingerprint,
+    containment_state: state,
+  };
+}
+
+const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-harness-runner-v3-"));
+fs.mkdirSync(path.join(tempRoot, "project"), { recursive: true });
 
 const catalog = validateProjectCheckCatalog({
-  schema_version: 1,
-  catalog_id: "runner-fixture-v1",
+  schema_version: PROJECT_CHECK_CATALOG_SCHEMA_VERSION,
+  catalog_id: "runner-fixture-v2",
   checks: [
     {
       check_id: "pass",
-      argv: ["node", "fixture.mjs", "literal && argument"],
+      executable_id: "fixture-node",
+      argv: ["fixture.mjs", "literal && argument"],
       cwd: "project",
       phases: ["preimplementation", "integration"],
+      purpose: "verification",
       timeout_ms: 2500,
       max_output_chars: 32,
     },
     {
       check_id: "other",
-      argv: ["node", "other.mjs"],
+      executable_id: "fixture-node",
+      argv: ["other.mjs"],
       cwd: ".",
       phases: ["integration"],
+      purpose: "verification",
+      timeout_ms: 1000,
+      max_output_chars: 32,
+    },
+    {
+      check_id: "declared-output",
+      executable_id: "fixture-node",
+      argv: ["output.mjs"],
+      cwd: "project",
+      phases: ["integration"],
+      purpose: "verification",
+      generated_output_paths: ["project/generated.json"],
+      timeout_ms: 1000,
+      max_output_chars: 32,
+    },
+    {
+      check_id: "reproducer",
+      executable_id: "fixture-node",
+      argv: ["reproducer.mjs"],
+      cwd: "project",
+      phases: ["preimplementation", "integration"],
+      purpose: "bug_reproducer",
+      outcome_protocol: {
+        kind: "exit_code",
+        exit_codes: {
+          failing_reproducer: [10],
+          passing_regression: [0],
+          unrelated_failure: [20],
+          unavailable: [30],
+        },
+      },
       timeout_ms: 1000,
       max_output_chars: 32,
     },
   ],
 }, { workspaceRoot: tempRoot });
 const catalogFingerprint = projectCheckCatalogFingerprint(catalog);
-const stableWorkspaceBody = { head_sha: "d".repeat(40), entries: [] };
-const stableWorkspace = { ...stableWorkspaceBody, fingerprint: fingerprint(stableWorkspaceBody) };
-const workspaceFingerprint = stableWorkspace.fingerprint;
-const observeWorkspace = () => ({ ...stableWorkspace, entries: [] });
+const toolchainMap = validateTrustedToolchainMap({
+  schema_version: 1,
+  map_id: "runner-tools-v1",
+  toolchains: [{ executable_id: "fixture-node", resolver: "node" }],
+});
+const mapFingerprint = trustedToolchainMapFingerprint(toolchainMap);
+const stableWorkspace = workspaceSnapshot();
 
-function execute(checkId, result, capture = null) {
+function fixtureInvocation(overrides = {}) {
+  const identities = [{
+    role: "executable",
+    canonical_path: process.execPath,
+    device: "1",
+    inode: "2",
+    size: "3",
+    mode: "4",
+    modified_ns: "5",
+    changed_ns: "6",
+    content_fingerprint: fingerprint({ executable: "fixture" }),
+  }, {
+    role: "auxiliary_git_executable",
+    canonical_path: process.execPath,
+    device: "1",
+    inode: "2",
+    size: "3",
+    mode: "4",
+    modified_ns: "5",
+    changed_ns: "6",
+    content_fingerprint: fingerprint({ executable: "fixture" }),
+  }, {
+    role: "managed_worker_executable",
+    canonical_path: process.execPath,
+    device: "1",
+    inode: "2",
+    size: "3",
+    mode: "4",
+    modified_ns: "5",
+    changed_ns: "6",
+    content_fingerprint: fingerprint({ executable: "fixture" }),
+  }];
+  const managedWorkerIdentities = identities.filter((entry) => entry.role.startsWith("managed_worker_"));
+  const managedWorkerIdentityFingerprint = fingerprint(managedWorkerIdentities);
+  const hostContentFingerprint = fingerprint({ built_in: true, content: null });
+  const hostNormalizedFingerprint = fingerprint({ built_in: true, configuration: null });
+  const hostFingerprint = fingerprint({
+    source_kind: "built_in",
+    source_path: null,
+    source_identity: null,
+    content_fingerprint: hostContentFingerprint,
+    configuration_fingerprint: hostNormalizedFingerprint,
+    resolution_policy_version: TRUSTED_TOOLCHAIN_RESOLUTION_POLICY_VERSION,
+  });
+  const environmentBody = {
+    schema_version: 1,
+    profile_id: "trusted-node-environment-v2",
+    variables: {},
+    removed_variables: ["NODE_OPTIONS", "NODE_PATH"],
+    path_entries: [path.dirname(process.execPath)],
+    state_root: null,
+  };
+  const environmentProfile = { ...environmentBody, fingerprint: fingerprint(environmentBody) };
+  const runtimeMetadata = {
+    shell: false,
+    strategy: "direct",
+    project_root: path.join(tempRoot, "project"),
+    state_root: null,
+    state_root_boundary: null,
+    java_home: null,
+    distribution_root: null,
+    distribution_identity_roles: [],
+    distribution_manifest_fingerprint: null,
+    distribution_manifest_spec: null,
+    implicit_configuration: [],
+    managed_worker_executable_path: process.execPath,
+    managed_worker_identity_fingerprint: managedWorkerIdentityFingerprint,
+    git: {
+      executable_path: process.execPath,
+      argv_prefix: [],
+      directory: path.dirname(process.execPath),
+      identity_fingerprint: fingerprint(identities.filter((entry) => entry.role.startsWith("auxiliary_git_"))),
+    },
+  };
+  return {
+    executable_id: "fixture-node",
+    resolver: "node",
+    strategy: "direct",
+    executable_path: process.execPath,
+    argv_prefix: [],
+    identities,
+    identity_fingerprint: fingerprint(identities),
+    managed_worker_executable_path: process.execPath,
+    managed_worker_identity_fingerprint: managedWorkerIdentityFingerprint,
+    map_fingerprint: mapFingerprint,
+    toolchain_host_configuration_source_kind: "built_in",
+    toolchain_host_configuration_source_path: null,
+    toolchain_host_configuration_content_fingerprint: hostContentFingerprint,
+    toolchain_host_configuration_normalized_fingerprint: hostNormalizedFingerprint,
+    toolchain_host_configuration_fingerprint: hostFingerprint,
+    toolchain_host_configuration_source_identity: null,
+    toolchain_resolution_policy_version: TRUSTED_TOOLCHAIN_RESOLUTION_POLICY_VERSION,
+    environment_profile: environmentProfile,
+    environment_fingerprint: environmentProfile.fingerprint,
+    runtime_metadata: runtimeMetadata,
+    runtime_metadata_fingerprint: fingerprint(runtimeMetadata),
+    ...overrides,
+  };
+}
+
+function runSynthetic({
+  checkId = "pass",
+  phase = "integration",
+  execution = {},
+  capture = null,
+  ...overrides
+} = {}) {
   let tick = 100;
   return runTrustedProjectCheck({
     catalog,
     checkId,
-    phase: "integration",
+    phase,
     workspaceRoot: tempRoot,
     catalogFingerprint,
-    expectedWorkspaceFingerprint: workspaceFingerprint,
-    observeWorkspace,
+    expectedSourceWorkspaceFingerprint: stableWorkspace.source_fingerprint,
+    observeWorkspace: () => clone(stableWorkspace),
+    catalogLoader: () => ({ catalog, fingerprint: catalogFingerprint }),
+    toolchainMapLoader: () => ({ map: toolchainMap, fingerprint: mapFingerprint }),
+    toolchainResolver: () => fixtureInvocation(),
+    toolchainIdentityAsserter: () => {},
+    containmentClassifier: () => containmentDescriptor(),
     now: () => (tick += 5),
     spawn: (file, args, options) => {
-      if (capture) capture({ file, args, options });
-      return { teardown_verified: true, ...result };
+      capture?.({ file, args, options });
+      return containedExecution(execution);
     },
+    ...overrides,
   });
 }
 
 let invocation;
-const passed = execute("pass", {
-  status: 0,
-  signal: null,
-  stdout: Buffer.from("private stdout"),
-  stderr: Buffer.from("private stderr"),
-  error: undefined,
-}, (value) => { invocation = value; });
+const passed = runSynthetic({
+  execution: {
+    status: 0,
+    stdout: Buffer.from("private stdout"),
+    stderr: Buffer.from("private stderr"),
+  },
+  capture: (value) => { invocation = value; },
+});
+assert.equal(passed.schema_version, TRUSTED_PROJECT_CHECK_RECEIPT_SCHEMA_VERSION);
 assert.equal(passed.status, "passed");
+assert.equal(passed.observed_outcome, "passed");
 assert.equal(passed.exit_code, 0);
 assert.equal(passed.duration_ms, 5);
 assert.equal(passed.stdout_bytes, 14);
 assert.equal(passed.stderr_bytes, 14);
+assert.equal(passed.source_workspace_fingerprint, passed.source_workspace_post_fingerprint);
+assert.equal(passed.toolchain_host_configuration_fingerprint, fixtureInvocation().toolchain_host_configuration_fingerprint);
+assert.equal(passed.toolchain_resolution_policy_version, TRUSTED_TOOLCHAIN_RESOLUTION_POLICY_VERSION);
+assert.equal(passed.toolchain_environment_fingerprint, fixtureInvocation().environment_fingerprint);
+assert.equal(passed.toolchain_runtime_metadata_fingerprint, fixtureInvocation().runtime_metadata_fingerprint);
 assert.equal(invocation.file, process.execPath);
 assert.deepEqual(invocation.args, ["fixture.mjs", "literal && argument"]);
 assert.equal(invocation.options.shell, false);
 assert.equal(invocation.options.cwd, fs.realpathSync(path.join(tempRoot, "project")));
 assert.equal(invocation.options.timeout, 2500);
-assert.equal(JSON.stringify(passed).includes("private stdout"), false, "receipts must not persist stdout");
-assert.equal(JSON.stringify(passed).includes("private stderr"), false, "receipts must not persist stderr");
+assert.equal(invocation.options.expectedInvocation.identity_fingerprint, fixtureInvocation().identity_fingerprint);
+assert.equal(invocation.options.expectedInvocation.managed_worker_executable_path, process.execPath);
+assert.equal(
+  invocation.options.expectedInvocation.managed_worker_identity_fingerprint,
+  fixtureInvocation().managed_worker_identity_fingerprint,
+);
+assert.match(invocation.options.expectedWorkingDirectoryIdentity.inode, /^[0-9]+$/u);
+assert.equal(invocation.options.env.NODE_OPTIONS, undefined);
+const syntheticPathEntries = (invocation.options.env.PATH ?? invocation.options.env.Path).split(path.delimiter);
+assert.equal(syntheticPathEntries[0], path.dirname(process.execPath));
+assert.equal(syntheticPathEntries.length, process.platform === "win32" ? 2 : 1);
+if (process.platform === "win32") assert.equal(path.basename(syntheticPathEntries[1]).toLowerCase(), "system32");
+assert.equal(JSON.stringify(passed).includes("private stdout"), false);
+assert.equal(JSON.stringify(passed).includes("private stderr"), false);
 assert.equal(trustedProjectCheckResult(passed).status, "passed");
-assert.equal(trustedProjectCheckResult(passed).command_id, "trusted-project-check:pass");
-assert.equal(trustedProjectCheckResult(passed).receipt.command_fingerprint, passed.command_fingerprint);
-expectCode(() => trustedProjectCheckResult({ schema_version: 1, status: "passed", check_id: "forged" }), "QUALITY_CHECK_RECEIPT");
-expectCode(() => trustedProjectCheckResult({ ...passed, workspace_fingerprint: fingerprint({ forged: true }) }), "QUALITY_CHECK_RECEIPT");
-expectCode(() => trustedProjectCheckResult({ ...passed, status: "failed" }), "QUALITY_CHECK_RECEIPT");
+assert.equal(trustedProjectCheckResult(passed).command_id, "trusted-project-check:pass:integration");
+assert.equal(trustedProjectCheckResult(passed).observed_outcome, "passed");
 
-assert.equal(execute("pass", { status: 7, signal: null, stdout: Buffer.alloc(0), stderr: Buffer.alloc(0) }).status, "failed");
-const windowsStyleFailure = execute("pass", {
-  status: 0xC0000005, signal: null, stdout: Buffer.alloc(0), stderr: Buffer.alloc(0),
+const syntheticProject = path.join(tempRoot, "project");
+const syntheticProjectOriginal = path.join(tempRoot, "project-before-cwd-swap");
+const syntheticSwapMarker = path.join(tempRoot, "cwd-swap-command-side-effect.txt");
+expectCode(() => runSynthetic({
+  spawn: (file, args, options) => {
+    fs.renameSync(syntheticProject, syntheticProjectOriginal);
+    fs.mkdirSync(syntheticProject);
+    fs.writeFileSync(path.join(syntheticProject, "fixture.mjs"), `import fs from "node:fs"; fs.writeFileSync(${JSON.stringify(syntheticSwapMarker)}, "executed", "utf8");\n`, "utf8");
+    try {
+      return managedCommandSpawnSync(file, args, options);
+    } finally {
+      fs.rmSync(syntheticProject, { recursive: true, force: true });
+      fs.renameSync(syntheticProjectOriginal, syntheticProject);
+    }
+  },
+}), "QUALITY_CHECK_TEARDOWN_UNVERIFIED");
+assert.equal(fs.existsSync(syntheticSwapMarker), false, "replacement cwd command produced a side effect");
+
+const linuxContainmentDescriptor = containmentDescriptor({
+  kind: "linux-cgroup-v2",
+  mechanism: {
+    root_identity: { canonical_path: "/fixture/cgroup", fixture: true },
+    current_parent_identity: { canonical_path: "/fixture/cgroup/parent", fixture: true },
+    guard_identity: { canonical_path: "/fixture/cgroup/parent", fixture: true },
+    mount_point: "/sys/fs/cgroup",
+    attach_helper: { mode: "sudo-helper-v1" },
+  },
 });
-assert.equal(windowsStyleFailure.status, "failed");
-assert.equal(trustedProjectCheckResult(windowsStyleFailure).exit_code, 0xC0000005);
-assert.equal(execute("pass", {
-  status: null, signal: "SIGTERM", stdout: Buffer.alloc(0), stderr: Buffer.alloc(0), error: Object.assign(new Error("timeout"), { code: "ETIMEDOUT" }),
-}).status, "timed_out");
-assert.equal(execute("pass", {
-  status: null, signal: null, stdout: Buffer.alloc(0), stderr: Buffer.alloc(0), error: Object.assign(new Error("missing"), { code: "ENOENT" }),
-}).status, "unavailable");
-assert.equal(execute("pass", {
-  status: null, signal: null, stdout: Buffer.alloc(33), stderr: Buffer.alloc(0), error: Object.assign(new Error("buffer"), { code: "ENOBUFS" }),
-}).status, "oversized");
-assert.equal(execute("pass", {
-  status: null, signal: null, stdout: Buffer.alloc(0), stderr: Buffer.alloc(0), error: new Error("unexpected"),
-}).status, "malformed");
+const linuxPassed = runSynthetic({
+  containmentClassifier: () => linuxContainmentDescriptor,
+  spawn: () => containedExecution({}, { kind: "linux-cgroup-v2", scopeId: "linux-cgroup-fixture-scope" }),
+});
+assert.equal(linuxPassed.status, "passed");
+assert.equal(linuxPassed.containment_kind, "linux-cgroup-v2");
 
-expectCode(() => runTrustedProjectCheck({
-  catalog,
-  checkId: "missing",
-  phase: "integration",
-  workspaceRoot: tempRoot,
-  catalogFingerprint,
-  expectedWorkspaceFingerprint: workspaceFingerprint,
-  observeWorkspace,
-}), "QUALITY_CHECK_UNKNOWN");
-expectCode(() => runTrustedProjectCheck({
-  catalog,
-  checkId: "other",
-  phase: "slice",
-  workspaceRoot: tempRoot,
-  catalogFingerprint,
-  expectedWorkspaceFingerprint: workspaceFingerprint,
-  observeWorkspace,
-}), "QUALITY_CHECK_PHASE");
-expectCode(() => runTrustedProjectCheck({
-  catalog,
-  checkId: "pass",
-  phase: "integration",
-  workspaceRoot: tempRoot,
-  catalogFingerprint: fingerprint({ stale: true }),
-  expectedWorkspaceFingerprint: workspaceFingerprint,
-  observeWorkspace,
+const mismatchedLinuxExecution = structuredClone(containedExecution({}, {
+  kind: "linux-cgroup-v2",
+  scopeId: "linux-cgroup-mismatched-guard",
+}));
+mismatchedLinuxExecution.containment_identity.guard_identity = {
+  canonical_path: "/fixture/cgroup/different-parent",
+  fixture: true,
+};
+mismatchedLinuxExecution.containment_fingerprint = fingerprint(mismatchedLinuxExecution.containment_identity);
+mismatchedLinuxExecution.containment_state.identity_fingerprint = mismatchedLinuxExecution.containment_fingerprint;
+expectCode(() => runSynthetic({
+  containmentClassifier: () => linuxContainmentDescriptor,
+  spawn: () => mismatchedLinuxExecution,
+}), "QUALITY_CHECK_TEARDOWN_UNVERIFIED");
+
+expectCode(
+  () => trustedProjectCheckResult({ ...passed, schema_version: 1 }),
+  "QUALITY_CHECK_RECEIPT",
+);
+expectCode(
+  () => trustedProjectCheckResult({
+    ...passed,
+    schema_version: 2,
+    producer: "opencode-harness/trusted-project-runner-v2",
+    toolchain_resolution_policy_version: "trusted-toolchain-resolution-v2",
+  }),
+  "QUALITY_CHECK_RECEIPT",
+);
+expectCode(
+  () => trustedProjectCheckResult({ ...passed, source_workspace_post_fingerprint: fingerprint({ forged: true }) }),
+  "QUALITY_CHECK_RECEIPT",
+);
+expectCode(
+  () => trustedProjectCheckResult({ ...passed, status: "failed" }),
+  "QUALITY_CHECK_RECEIPT",
+);
+expectCode(
+  () => trustedProjectCheckResult({
+    ...passed,
+    output_workspace_post_entries: [{ path: "forged.json", fingerprint: fingerprint({ forged: true }) }],
+  }),
+  "QUALITY_CHECK_RECEIPT",
+);
+expectCode(
+  () => trustedProjectCheckResult({
+    ...passed,
+    toolchain_environment_fingerprint: fingerprint({ forged: "environment" }),
+  }),
+  "QUALITY_CHECK_RECEIPT",
+);
+expectCode(
+  () => trustedProjectCheckResult({
+    ...passed,
+    toolchain_runtime_metadata_fingerprint: fingerprint({ forged: "runtime-metadata" }),
+  }),
+  "QUALITY_CHECK_RECEIPT",
+);
+expectCode(
+  () => trustedProjectCheckResult({
+    ...passed,
+    toolchain_resolution_policy_version: "forged-policy",
+  }),
+  "QUALITY_CHECK_RECEIPT",
+);
+
+for (const [execution, expectedStatus, expectedOutcome] of [
+  [{ status: 7 }, "failed", "failed"],
+  [{ status: 0xC0000005 }, "failed", "failed"],
+  [{ status: null, signal: "SIGTERM", error: Object.assign(new Error("timeout"), { code: "ETIMEDOUT" }) }, "blocked", "timed_out"],
+  [{ status: null, error: Object.assign(new Error("missing"), { code: "ENOENT" }) }, "blocked", "unavailable"],
+  [{ status: null, stdout: Buffer.alloc(33), error: Object.assign(new Error("buffer"), { code: "ENOBUFS" }) }, "blocked", "oversized"],
+  [{ status: null, error: new Error("unexpected") }, "blocked", "malformed"],
+]) {
+  const receipt = runSynthetic({ execution });
+  assert.equal(receipt.status, expectedStatus);
+  assert.equal(receipt.observed_outcome, expectedOutcome);
+  assert.equal(trustedProjectCheckResult(receipt).status, expectedStatus);
+}
+
+for (const [phase, exitCode, expectedStatus, expectedOutcome] of [
+  ["preimplementation", 10, "passed", "failing_reproducer"],
+  ["preimplementation", 0, "failed", "passing_regression"],
+  ["preimplementation", 20, "failed", "unrelated_failure"],
+  ["preimplementation", 30, "blocked", "unavailable"],
+  ["integration", 0, "passed", "passing_regression"],
+  ["integration", 10, "failed", "failing_reproducer"],
+  ["integration", 20, "failed", "unrelated_failure"],
+  ["integration", 30, "blocked", "unavailable"],
+  ["integration", 99, "blocked", "malformed"],
+]) {
+  const receipt = runSynthetic({ checkId: "reproducer", phase, execution: { status: exitCode } });
+  assert.equal(receipt.status, expectedStatus, `${phase}:${exitCode}`);
+  assert.equal(receipt.observed_outcome, expectedOutcome, `${phase}:${exitCode}`);
+}
+
+expectCode(() => validateProjectCheckCatalog({
+  schema_version: PROJECT_CHECK_CATALOG_SCHEMA_VERSION,
+  catalog_id: "dishonest-reproducer-v2",
+  checks: [{
+    check_id: "integration-only",
+    executable_id: "fixture-node",
+    argv: ["reproducer.mjs"],
+    cwd: "project",
+    phases: ["integration"],
+    purpose: "bug_reproducer",
+    outcome_protocol: {
+      kind: "exit_code",
+      exit_codes: {
+        failing_reproducer: [10],
+        passing_regression: [0],
+        unrelated_failure: [20],
+        unavailable: [30],
+      },
+    },
+    timeout_ms: 1000,
+    max_output_chars: 32,
+  }],
+}, { workspaceRoot: tempRoot }), "QUALITY_CHECK_REPRODUCER");
+
+expectCode(() => runSynthetic({ checkId: "missing" }), "QUALITY_CHECK_UNKNOWN");
+expectCode(() => runSynthetic({ checkId: "other", phase: "slice" }), "QUALITY_CHECK_PHASE");
+expectCode(() => runSynthetic({ catalogFingerprint: fingerprint({ stale: true }) }), "QUALITY_CHECK_CATALOG_DRIFT");
+expectCode(
+  () => runSynthetic({ expectedToolchainMapFingerprint: fingerprint({ stale: "toolchain-map" }) }),
+  "QUALITY_TOOLCHAIN_MAP_DRIFT",
+);
+
+for (const [family, argv] of [
+  ["maven", ["-Dmaven.repo.local=.m2/repository", "verify"]],
+  ["maven", ["--settings", ".m2/settings.xml", "verify"]],
+  ["gradle", ["--gradle-user-home", ".gradle", "check"]],
+  ["gradle", ["-I.gradle/init.gradle", "check"]],
+]) {
+  const unsafeCatalog = validateProjectCheckCatalog({
+    schema_version: PROJECT_CHECK_CATALOG_SCHEMA_VERSION,
+    catalog_id: `unsafe-${family}-state-override-v1`,
+    checks: [{
+      check_id: "unsafe-state-override",
+      executable_id: family,
+      argv,
+      cwd: "project",
+      phases: ["integration"],
+      purpose: "verification",
+      timeout_ms: 1000,
+      max_output_chars: 32,
+    }],
+  }, { workspaceRoot: tempRoot });
+  const unsafeCatalogFingerprint = projectCheckCatalogFingerprint(unsafeCatalog);
+  const unsafeMap = validateTrustedToolchainMap({
+    schema_version: 1,
+    map_id: `unsafe-${family}-map-v1`,
+    toolchains: [{ executable_id: family, resolver: family }],
+  });
+  const unsafeMapFingerprint = trustedToolchainMapFingerprint(unsafeMap);
+  let spawnCalled = false;
+  expectCode(() => runTrustedProjectCheck({
+    catalog: unsafeCatalog,
+    checkId: "unsafe-state-override",
+    phase: "integration",
+    workspaceRoot: tempRoot,
+    catalogFingerprint: unsafeCatalogFingerprint,
+    catalogLoader: () => ({ catalog: unsafeCatalog, fingerprint: unsafeCatalogFingerprint }),
+    toolchainMapLoader: () => ({ map: unsafeMap, fingerprint: unsafeMapFingerprint }),
+    toolchainResolver: (input) => {
+      validateTrustedToolchainArguments(family, input.argv);
+      return fixtureInvocation({ resolver: family, map_fingerprint: unsafeMapFingerprint });
+    },
+    spawn: () => {
+      spawnCalled = true;
+      return containedExecution();
+    },
+  }), "QUALITY_TOOLCHAIN_ARGUMENT");
+  assert.equal(spawnCalled, false, `${family} state override reached the process boundary`);
+}
+expectCode(
+  () => runSynthetic({ expectedSourceWorkspaceFingerprint: fingerprint({ stale: true }) }),
+  "QUALITY_CHECK_WORKSPACE_DRIFT",
+);
+
+const sourceChanged = workspaceSnapshot({
+  sourceEntries: [{ path: "project/source.mjs", fingerprint: fingerprint({ source: "changed" }) }],
+  dirty: true,
+});
+let sourceObservations = 0;
+expectCode(() => runSynthetic({
+  observeWorkspace: () => clone(sourceObservations++ === 0 ? stableWorkspace : sourceChanged),
+}), "QUALITY_CHECK_WORKSPACE_MUTATED");
+
+const declaredEntry = { path: "project/generated.json", fingerprint: fingerprint({ output: "new" }) };
+const outputChanged = workspaceSnapshot({ outputEntries: [declaredEntry] });
+let outputObservations = 0;
+let observedOptions;
+const outputReceipt = runSynthetic({
+  checkId: "declared-output",
+  observeWorkspace: (_root, _salt, options) => {
+    observedOptions = options;
+    return clone(outputObservations++ === 0 ? stableWorkspace : outputChanged);
+  },
+});
+assert.equal(outputReceipt.status, "passed");
+assert.notEqual(outputReceipt.output_workspace_fingerprint, outputReceipt.output_workspace_post_fingerprint);
+assert.deepEqual(outputReceipt.output_workspace_post_entries, [declaredEntry]);
+assert.deepEqual(observedOptions, {
+  ownershipPaths: [],
+  generatedOutputPaths: ["project/generated.json"],
+});
+assert.equal(trustedProjectCheckResult(outputReceipt).status, "passed");
+
+const otherOutput = { path: "project/other.json", fingerprint: fingerprint({ output: "other" }) };
+const globalBefore = workspaceSnapshot({ outputEntries: [otherOutput] });
+const globalAfter = workspaceSnapshot({ outputEntries: [declaredEntry, otherOutput] });
+let globalObservations = 0;
+let globalOptions;
+let globalSalt;
+const globalOutputReceipt = runSynthetic({
+  checkId: "declared-output",
+  expectedSourceWorkspaceFingerprint: globalBefore.source_fingerprint,
+  workspaceObservationSalt: "session-specific-workspace-salt",
+  workspaceGeneratedOutputPaths: ["project/other.json"],
+  observeWorkspace: (_root, salt, options) => {
+    globalSalt = salt;
+    globalOptions = options;
+    return clone(globalObservations++ === 0 ? globalBefore : globalAfter);
+  },
+});
+assert.equal(globalSalt, "session-specific-workspace-salt");
+assert.deepEqual(globalOptions.generatedOutputPaths, ["project/generated.json", "project/other.json"]);
+assert.deepEqual(globalOutputReceipt.output_workspace_post_entries, [declaredEntry]);
+assert.equal(globalOutputReceipt.output_workspace_post_fingerprint, outputChanged.declared_outputs_fingerprint);
+
+const otherOutputChanged = { path: "project/other.json", fingerprint: fingerprint({ output: "other-changed" }) };
+let unauthorizedOutputObservations = 0;
+expectCode(() => runSynthetic({
+  checkId: "declared-output",
+  expectedSourceWorkspaceFingerprint: globalBefore.source_fingerprint,
+  workspaceGeneratedOutputPaths: ["project/other.json"],
+  observeWorkspace: () => clone(unauthorizedOutputObservations++ === 0
+    ? globalBefore
+    : workspaceSnapshot({ outputEntries: [otherOutputChanged] })),
+}), "QUALITY_CHECK_WORKSPACE_MUTATED");
+
+expectCode(() => runSynthetic({
+  observeWorkspace: () => ({ ...clone(stableWorkspace), schema_version: 1 }),
+}), "QUALITY_WORKSPACE_SCHEMA");
+expectCode(() => runSynthetic({
+  spawn: () => ({ status: 0, teardown_verified: false }),
+}), "QUALITY_CHECK_TEARDOWN_UNVERIFIED");
+expectCode(() => runSynthetic({
+  spawn: () => {
+    const forged = containedExecution();
+    forged.containment_fingerprint = fingerprint({ forged: true });
+    return forged;
+  },
+}), "QUALITY_CHECK_TEARDOWN_UNVERIFIED");
+
+expectCode(() => runSynthetic({
+  containmentClassifier: () => containmentDescriptor({
+    supportState: "unsupported",
+    kind: "macos-unsupported-v1",
+    reason: "no_verified_descendant_controller",
+    mechanism: null,
+  }),
+}), "QUALITY_CHECK_CONTAINMENT_UNSUPPORTED");
+expectCode(() => runSynthetic({
+  containmentClassifier: () => containmentDescriptor({
+    supportState: "unavailable",
+    kind: "linux-cgroup-v2",
+    reason: "delegated_root_missing",
+    mechanism: null,
+  }),
+}), "QUALITY_CHECK_CONTAINMENT_UNAVAILABLE");
+
+let catalogLoads = 0;
+const changedCatalog = validateProjectCheckCatalog({
+  ...clone(catalog),
+  catalog_id: "runner-fixture-drift-v2",
+}, { workspaceRoot: tempRoot });
+expectCode(() => runSynthetic({
+  catalogLoader: () => {
+    const current = catalogLoads++ === 0 ? catalog : changedCatalog;
+    return { catalog: current, fingerprint: projectCheckCatalogFingerprint(current) };
+  },
 }), "QUALITY_CHECK_CATALOG_DRIFT");
 
-expectCode(() => runTrustedProjectCheck({
-  catalog,
-  checkId: "pass",
-  phase: "integration",
-  workspaceRoot: tempRoot,
-  catalogFingerprint,
-  expectedWorkspaceFingerprint: fingerprint({ stale: true }),
-  observeWorkspace,
-}), "QUALITY_CHECK_WORKSPACE_DRIFT");
+let mapLoads = 0;
+const changedMap = validateTrustedToolchainMap({ ...clone(toolchainMap), map_id: "runner-tools-drift-v1" });
+expectCode(() => runSynthetic({
+  toolchainMapLoader: () => {
+    const current = mapLoads++ === 0 ? toolchainMap : changedMap;
+    return { map: current, fingerprint: trustedToolchainMapFingerprint(current) };
+  },
+}), "QUALITY_TOOLCHAIN_MAP_DRIFT");
 
-let observations = 0;
-const changedWorkspaceBody = {
-  head_sha: "d".repeat(40),
-  entries: [{ path: "changed.txt", fingerprint: fingerprint({ changed: true }) }],
-};
-const changedWorkspaceSnapshot = { ...changedWorkspaceBody, fingerprint: fingerprint(changedWorkspaceBody) };
-const changedWorkspace = runTrustedProjectCheck({
-  catalog,
+let containmentLoads = 0;
+expectCode(() => runSynthetic({
+  containmentClassifier: () => containmentDescriptor({
+    mechanism: { fixture_controller: containmentLoads++ === 0 ? "before" : "after" },
+  }),
+}), "QUALITY_CHECK_CONTAINMENT_DRIFT");
+
+expectCode(() => runSynthetic({
+  toolchainIdentityAsserter: () => {
+    throw new ContractError("QUALITY_TOOLCHAIN_IDENTITY_CHANGED", "fixture drift");
+  },
+}), "QUALITY_TOOLCHAIN_IDENTITY_CHANGED");
+let identityChecks = 0;
+expectCode(() => runSynthetic({
+  toolchainIdentityAsserter: () => {
+    identityChecks += 1;
+    if (identityChecks === 2) throw new ContractError("QUALITY_TOOLCHAIN_IDENTITY_CHANGED", "fixture drift");
+  },
+}), "QUALITY_TOOLCHAIN_IDENTITY_CHANGED");
+
+const fingerprintInput = {
   checkId: "pass",
   phase: "integration",
-  workspaceRoot: tempRoot,
+  purpose: "verification",
+  argv: ["fixture.mjs"],
+  cwd: "project",
   catalogFingerprint,
-  expectedWorkspaceFingerprint: workspaceFingerprint,
-  observeWorkspace: () => (observations++ === 0 ? { ...stableWorkspace, entries: [] } : changedWorkspaceSnapshot),
-  spawn: () => ({ status: 0, signal: null, stdout: Buffer.alloc(0), stderr: Buffer.alloc(0), teardown_verified: true }),
-});
-assert.equal(changedWorkspace.status, "workspace_changed");
-assert.notEqual(changedWorkspace.workspace_fingerprint, changedWorkspace.post_workspace_fingerprint);
+  toolchainMapFingerprint: mapFingerprint,
+  executableIdentityFingerprint: fixtureInvocation().identity_fingerprint,
+  toolchainHostConfigurationFingerprint: fixtureInvocation().toolchain_host_configuration_fingerprint,
+  toolchainResolutionPolicyVersion: TRUSTED_TOOLCHAIN_RESOLUTION_POLICY_VERSION,
+  toolchainEnvironmentFingerprint: fixtureInvocation().environment_fingerprint,
+  toolchainRuntimeMetadataFingerprint: fixtureInvocation().runtime_metadata_fingerprint,
+  environmentIdentity: {
+    policy_version: TRUSTED_PROJECT_EXECUTION_POLICY_VERSION,
+    fingerprint: fingerprint({ PATH: "trusted" }),
+  },
+  containmentKind: "windows-job-object-v1",
+  containmentIdentityFingerprint: fingerprint({ containment: "one" }),
+  sourceWorkspaceFingerprint: stableWorkspace.source_fingerprint,
+  outputWorkspaceFingerprint: stableWorkspace.declared_outputs_fingerprint,
+  workingDirectoryIdentityFingerprint: fingerprint({ cwd: "one" }),
+};
+assert.notEqual(
+  trustedProjectCommandFingerprint(fingerprintInput),
+  trustedProjectCommandFingerprint({
+    ...fingerprintInput,
+    executableIdentityFingerprint: fingerprint({ executable: "changed" }),
+  }),
+  "command fingerprint did not bind toolchain identity",
+);
+assert.notEqual(
+  trustedProjectCommandFingerprint(fingerprintInput),
+  trustedProjectCommandFingerprint({
+    ...fingerprintInput,
+    containmentIdentityFingerprint: fingerprint({ containment: "two" }),
+  }),
+  "command fingerprint did not bind containment identity",
+);
+assert.notEqual(
+  trustedProjectCommandFingerprint(fingerprintInput),
+  trustedProjectCommandFingerprint({ ...fingerprintInput, outputWorkspaceFingerprint: fingerprint({ output: "changed" }) }),
+  "command fingerprint did not bind declared-output state",
+);
+assert.notEqual(
+  trustedProjectCommandFingerprint(fingerprintInput),
+  trustedProjectCommandFingerprint({
+    ...fingerprintInput,
+    workingDirectoryIdentityFingerprint: fingerprint({ cwd: "two" }),
+  }),
+  "command fingerprint did not bind working-directory identity",
+);
+assert.notEqual(
+  trustedProjectCommandFingerprint(fingerprintInput),
+  trustedProjectCommandFingerprint({
+    ...fingerprintInput,
+    toolchainRuntimeMetadataFingerprint: fingerprint({ runtime_metadata: "changed" }),
+  }),
+  "command fingerprint did not bind toolchain runtime metadata",
+);
 
 const batch = runTrustedProjectChecks({
   catalog,
@@ -183,9 +833,14 @@ const batch = runTrustedProjectChecks({
   phase: "integration",
   workspaceRoot: tempRoot,
   catalogFingerprint,
-  expectedWorkspaceFingerprint: workspaceFingerprint,
-  observeWorkspace,
-  spawn: () => ({ status: 0, signal: null, stdout: Buffer.alloc(0), stderr: Buffer.alloc(0), teardown_verified: true }),
+  expectedSourceWorkspaceFingerprint: stableWorkspace.source_fingerprint,
+  observeWorkspace: () => clone(stableWorkspace),
+  catalogLoader: () => ({ catalog, fingerprint: catalogFingerprint }),
+  toolchainMapLoader: () => ({ map: toolchainMap, fingerprint: mapFingerprint }),
+  toolchainResolver: () => fixtureInvocation(),
+  toolchainIdentityAsserter: () => {},
+  containmentClassifier: () => containmentDescriptor(),
+  spawn: () => containedExecution(),
   now: () => 1,
 });
 assert.equal(batch.complete, true);
@@ -196,290 +851,345 @@ expectCode(() => runTrustedProjectChecks({
   checkIds: ["pass", "pass"],
   phase: "integration",
   workspaceRoot: tempRoot,
-  expectedWorkspaceFingerprint: workspaceFingerprint,
-  observeWorkspace,
 }), "QUALITY_CHECK_RUN_LIMIT");
 expectCode(() => runTrustedProjectChecks({
   catalog,
   checkIds: ["pass"],
   phase: "integration",
   workspaceRoot: tempRoot,
-  expectedWorkspaceFingerprint: workspaceFingerprint,
-  observeWorkspace,
+  catalogFingerprint,
+  observeWorkspace: () => clone(stableWorkspace),
+  catalogLoader: () => ({ catalog, fingerprint: catalogFingerprint }),
+  toolchainMapLoader: () => ({ map: toolchainMap, fingerprint: mapFingerprint }),
+  toolchainResolver: () => fixtureInvocation(),
+  toolchainIdentityAsserter: () => {},
+  containmentClassifier: () => containmentDescriptor(),
+  spawn: () => containedExecution(),
   maxReceiptBytes: 1,
-  spawn: () => ({ status: 0, signal: null, stdout: Buffer.alloc(0), stderr: Buffer.alloc(0), teardown_verified: true }),
 }), "QUALITY_CHECK_RECEIPT_LIMIT");
 
-expectCode(() => runTrustedProjectCheck({
-  catalog,
-  checkId: "pass",
-  phase: "integration",
-  workspaceRoot: tempRoot,
-  catalogFingerprint,
-  expectedWorkspaceFingerprint: workspaceFingerprint,
-  observeWorkspace,
-  spawn: () => ({
-    status: 0,
-    signal: null,
-    stdout: Buffer.alloc(0),
-    stderr: Buffer.alloc(0),
-    teardown_verified: false,
-  }),
-}), "QUALITY_CHECK_TEARDOWN_UNVERIFIED");
+function writeJson(file, value) {
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`, "utf8");
+}
 
-const mutableExecutable = path.join(tempRoot, process.platform === "win32" ? "mutable-check.exe" : "mutable-check");
-fs.writeFileSync(mutableExecutable, "original executable identity\n", "utf8");
-const mutableCanonicalPath = fs.realpathSync(mutableExecutable);
-const mutableIdentity = fs.statSync(mutableCanonicalPath);
-const resolvedMutableInvocation = {
-  unavailable: false,
-  identities: [{
-    kind: "catalog_absolute",
-    canonical_path: mutableCanonicalPath,
-    device: Number(mutableIdentity.dev),
-    inode: Number(mutableIdentity.ino),
-    mode: Number(mutableIdentity.mode),
-    size: Number(mutableIdentity.size),
-    modified_ms: Number(mutableIdentity.mtimeMs),
-    changed_ms: Number(mutableIdentity.ctimeMs),
-  }],
-};
-fs.writeFileSync(mutableExecutable, "replacement executable identity with different bytes\n", "utf8");
-expectCode(
-  () => assertTrustedProjectInvocationCurrent(resolvedMutableInvocation),
-  "QUALITY_CHECK_EXECUTABLE_DRIFT",
-);
+function git(cwd, args) {
+  const result = spawnSync("git", args, { cwd, encoding: "utf8", shell: false, windowsHide: true });
+  assert.equal(result.status, 0, `git ${args.join(" ")} failed: ${result.stderr || result.stdout}`);
+}
 
-const fingerprintInput = {
-  argv: ["node", "fixture.mjs"],
-  cwd: ".",
-  executableIdentity: [{ kind: "node", canonical_path: process.execPath, inode: 1 }],
-  environmentIdentity: {
-    policy_version: TRUSTED_PROJECT_EXECUTION_POLICY_VERSION,
-    containment: "windows-job-object-v1",
-    fingerprint: fingerprint({ PATH: "trusted" }),
-  },
-};
-assert.notEqual(
-  trustedProjectCommandFingerprint(fingerprintInput),
-  trustedProjectCommandFingerprint({
-    ...fingerprintInput,
-    executableIdentity: [{ ...fingerprintInput.executableIdentity[0], inode: 2 }],
-  }),
-  "command fingerprint did not bind executable provenance",
-);
-assert.notEqual(
-  trustedProjectCommandFingerprint(fingerprintInput),
-  trustedProjectCommandFingerprint({
-    ...fingerprintInput,
-    environmentIdentity: { ...fingerprintInput.environmentIdentity, policy_version: "future-policy" },
-  }),
-  "command fingerprint did not bind the effective environment policy",
-);
-assert.notEqual(
-  trustedProjectCommandFingerprint(fingerprintInput),
-  trustedProjectCommandFingerprint({
-    ...fingerprintInput,
-    environmentIdentity: { ...fingerprintInput.environmentIdentity, containment: "different-containment" },
-  }),
-  "command fingerprint did not bind process-containment provenance",
-);
-
-const realProject = path.join(tempRoot, "project");
-const environmentMarker = path.join(realProject, "environment-marker.json");
-const descendantMarker = path.join(realProject, "descendant-marker.txt");
-const timeoutDescendantMarker = path.join(realProject, "timeout-descendant-marker.txt");
-const timeoutStartedMarker = path.join(realProject, "timeout-started-marker.txt");
-const poisonMarker = path.join(realProject, "poison-marker.txt");
-const npmKnownMarker = path.join(realProject, "npm-known-marker.txt");
-const realNodeMarker = path.join(realProject, "real-node-marker.txt");
-const fakeNodeMarker = path.join(realProject, "fake-node-marker.txt");
-const childWriter = path.join(realProject, "delayed-writer.mjs");
-const survivorMonitor = path.join(realProject, "survivor-monitor.mjs");
-fs.writeFileSync(childWriter, `import fs from "node:fs";
-const [marker, delay] = process.argv.slice(2);
-setTimeout(() => fs.writeFileSync(marker, "late", "utf8"), Number(delay));
-setInterval(() => {}, 60_000);
-`, "utf8");
-fs.writeFileSync(survivorMonitor, `import fs from "node:fs";
-const [parentPid, marker] = process.argv.slice(2);
-setInterval(() => {
-  try {
-    process.kill(Number(parentPid), 0);
-  } catch {
-    fs.writeFileSync(marker, "survived", "utf8");
-    process.exit(0);
-  }
-}, 50);
-`, "utf8");
+const realRoot = path.join(tempRoot, "real-project");
+const realProject = path.join(realRoot, "project");
+fs.mkdirSync(path.join(realRoot, ".opencode", "quality"), { recursive: true });
+fs.mkdirSync(realProject, { recursive: true });
+fs.writeFileSync(path.join(realRoot, ".gitignore"), "node_modules/\n.env\ncoverage/\nbuild/\n", "utf8");
 fs.writeFileSync(path.join(realProject, "environment-fixture.mjs"), `import fs from "node:fs";
 const names = ["NODE_OPTIONS", "NODE_PATH", "npm_execpath", "npm_config_registry", "AWS_SECRET_ACCESS_KEY", "GH_TOKEN", "PATH", "Path"];
 fs.writeFileSync(process.argv[2], JSON.stringify(Object.fromEntries(names.map((name) => [name, process.env[name] ?? null]))), "utf8");
 `, "utf8");
+fs.writeFileSync(path.join(realProject, "ignored-output-fixture.mjs"), `import fs from "node:fs";
+for (const file of ["coverage/result.txt", "build/result.txt"]) {
+  fs.mkdirSync(file.split("/").slice(0, -1).join("/"), { recursive: true });
+  fs.writeFileSync(file, "ignored", "utf8");
+}
+fs.writeFileSync(".env", "IGNORED_SECRET=changed", "utf8");
+`, "utf8");
+fs.writeFileSync(path.join(realProject, "architecture-fixture.mjs"), `import fs from "node:fs";
+fs.mkdirSync("artifacts", { recursive: true });
+fs.writeFileSync(process.argv[2], JSON.stringify({ nodes: ["entry"], edges: [] }), "utf8");
+`, "utf8");
+fs.writeFileSync(path.join(realProject, "delayed-writer.mjs"), `import fs from "node:fs";
+const [marker, delay] = process.argv.slice(2);
+setTimeout(() => fs.writeFileSync(marker, "late", "utf8"), Number(delay));
+setInterval(() => {}, 60_000);
+`, "utf8");
 fs.writeFileSync(path.join(realProject, "direct-exit-parent.mjs"), `import { spawn } from "node:child_process";
-const child = spawn(process.execPath, [${JSON.stringify(childWriter)}, process.argv[2], "700"], { detached: process.platform === "win32", stdio: "ignore", windowsHide: true });
+const child = spawn(process.execPath, ["delayed-writer.mjs", process.argv[2], "700"], {
+  detached: process.platform === "win32", stdio: "ignore", windowsHide: true,
+});
 child.unref();
+`, "utf8");
+fs.writeFileSync(path.join(realProject, "survivor-monitor.mjs"), `import fs from "node:fs";
+const [parentPid, marker] = process.argv.slice(2);
+setInterval(() => {
+  try { process.kill(Number(parentPid), 0); }
+  catch { fs.writeFileSync(marker, "survived", "utf8"); process.exit(0); }
+}, 50);
 `, "utf8");
 fs.writeFileSync(path.join(realProject, "timeout-parent.mjs"), `import fs from "node:fs";
 import { spawn } from "node:child_process";
 fs.writeFileSync(process.argv[3], "started", "utf8");
-const child = spawn(process.execPath, [${JSON.stringify(survivorMonitor)}, String(process.pid), process.argv[2]], { detached: process.platform === "win32", stdio: "ignore", windowsHide: true });
+const child = spawn(process.execPath, ["survivor-monitor.mjs", String(process.pid), process.argv[2]], {
+  detached: process.platform === "win32", stdio: "ignore", windowsHide: true,
+});
 child.unref();
 setInterval(() => {}, 60_000);
 `, "utf8");
-fs.writeFileSync(path.join(realProject, "real-node-fixture.mjs"), `import fs from "node:fs";
-fs.writeFileSync(process.argv[2], "real", "utf8");
+fs.writeFileSync(path.join(realProject, "npm-known-fixture.mjs"), `import fs from "node:fs";
+fs.writeFileSync("npm-known-marker.txt", "real", "utf8");
 `, "utf8");
+const poisonMarker = path.join(realProject, "poison-marker.txt");
 const poisonedNpmCli = path.join(realProject, "poisoned-npm-cli.mjs");
 fs.writeFileSync(poisonedNpmCli, `import fs from "node:fs";
 fs.writeFileSync(${JSON.stringify(poisonMarker)}, "poisoned", "utf8");
 `, "utf8");
-fs.writeFileSync(path.join(realProject, "package.json"), JSON.stringify({
-  name: "trusted-runner-fixture",
+writeJson(path.join(realProject, "package.json"), {
+  name: "trusted-runner-v2-fixture",
   private: true,
-  scripts: { known: "node real-node-fixture.mjs npm-known-marker.txt" },
-}), "utf8");
+  scripts: { known: "node npm-known-fixture.mjs" },
+});
 
-const realCatalog = validateProjectCheckCatalog({
-  schema_version: 1,
-  catalog_id: "runner-adversarial-fixture-v1",
+const realCatalogValue = {
+  schema_version: PROJECT_CHECK_CATALOG_SCHEMA_VERSION,
+  catalog_id: "runner-real-v2",
   checks: [
     {
       check_id: "environment",
-      argv: ["node", "environment-fixture.mjs", path.basename(environmentMarker)],
+      executable_id: "node",
+      argv: ["environment-fixture.mjs", "environment-marker.json"],
       cwd: "project",
       phases: ["integration"],
-      timeout_ms: 2500,
+      purpose: "verification",
+      generated_output_paths: ["project/environment-marker.json"],
+      timeout_ms: 5000,
+      max_output_chars: 4096,
+    },
+    {
+      check_id: "ignored-output",
+      executable_id: "node",
+      argv: ["ignored-output-fixture.mjs"],
+      cwd: "project",
+      phases: ["integration"],
+      purpose: "verification",
+      timeout_ms: 5000,
+      max_output_chars: 4096,
+    },
+    {
+      check_id: "architecture-output",
+      executable_id: "node",
+      argv: ["architecture-fixture.mjs", "artifacts/graph.json"],
+      cwd: "project",
+      phases: ["integration"],
+      purpose: "architecture_graph",
+      generated_output_paths: ["project/artifacts/graph.json"],
+      timeout_ms: 5000,
       max_output_chars: 4096,
     },
     {
       check_id: "direct-exit",
-      argv: ["node", "direct-exit-parent.mjs", path.basename(descendantMarker)],
+      executable_id: "node",
+      argv: ["direct-exit-parent.mjs", "descendant-marker.txt"],
       cwd: "project",
       phases: ["integration"],
-      timeout_ms: 2500,
+      purpose: "verification",
+      generated_output_paths: ["project/descendant-marker.txt"],
+      timeout_ms: 5000,
       max_output_chars: 4096,
     },
     {
       check_id: "timeout-descendant",
-      argv: ["node", "timeout-parent.mjs", path.basename(timeoutDescendantMarker), path.basename(timeoutStartedMarker)],
+      executable_id: "node",
+      argv: ["timeout-parent.mjs", "timeout-descendant-marker.txt", "timeout-started-marker.txt"],
       cwd: "project",
       phases: ["integration"],
-      timeout_ms: 5000,
+      purpose: "verification",
+      generated_output_paths: [
+        "project/timeout-descendant-marker.txt",
+        "project/timeout-started-marker.txt",
+      ],
+      timeout_ms: 3000,
       max_output_chars: 4096,
-    },
-    {
-      check_id: "npm-poison",
-      argv: ["npm", "run", "definitely-missing-script"],
-      cwd: "project",
-      phases: ["integration"],
-      timeout_ms: 5000,
-      max_output_chars: 32 * 1024,
     },
     {
       check_id: "npm-known",
-      argv: ["npm", "run", "known"],
+      executable_id: "npm",
+      argv: ["run", "known"],
       cwd: "project",
       phases: ["integration"],
-      timeout_ms: 5000,
+      purpose: "verification",
+      generated_output_paths: ["project/npm-known-marker.txt"],
+      timeout_ms: 10000,
       max_output_chars: 32 * 1024,
     },
-    {
-      check_id: "path-poison",
-      argv: ["node", "real-node-fixture.mjs", path.basename(realNodeMarker)],
-      cwd: "project",
-      phases: ["integration"],
-      timeout_ms: 2500,
-      max_output_chars: 4096,
-    },
   ],
-}, { workspaceRoot: tempRoot });
-const realCatalogFingerprint = projectCheckCatalogFingerprint(realCatalog);
-const runRealCheck = (checkId) => runTrustedProjectCheck({
-  catalog: realCatalog,
-  checkId,
-  phase: "integration",
-  workspaceRoot: tempRoot,
-  catalogFingerprint: realCatalogFingerprint,
-  expectedWorkspaceFingerprint: workspaceFingerprint,
-  observeWorkspace,
-});
+};
+const realToolchainValue = {
+  schema_version: 1,
+  map_id: "runner-real-toolchains-v1",
+  toolchains: [
+    { executable_id: "node", resolver: "node" },
+    { executable_id: "npm", resolver: "npm" },
+  ],
+};
+writeJson(path.join(realRoot, ".opencode", "quality", "checks.json"), realCatalogValue);
+writeJson(path.join(realRoot, ".opencode", "quality", "toolchains.json"), realToolchainValue);
+git(realRoot, ["init", "-q"]);
+git(realRoot, ["config", "user.email", "runner@example.invalid"]);
+git(realRoot, ["config", "user.name", "Runner Fixture"]);
+git(realRoot, ["config", "commit.gpgsign", "false"]);
+git(realRoot, ["add", "."]);
+git(realRoot, ["commit", "-q", "-m", "fixture"]);
 
-const environmentBackup = new Map([
-  ["NODE_OPTIONS", process.env.NODE_OPTIONS],
-  ["NODE_PATH", process.env.NODE_PATH],
-  ["npm_execpath", process.env.npm_execpath],
-  ["npm_config_registry", process.env.npm_config_registry],
-  ["AWS_SECRET_ACCESS_KEY", process.env.AWS_SECRET_ACCESS_KEY],
-  ["GH_TOKEN", process.env.GH_TOKEN],
-  ["PATH", process.env.PATH],
-]);
-try {
-  process.env.NODE_OPTIONS = "--require=definitely-missing-sensitive-preload.cjs";
-  process.env.NODE_PATH = path.join(realProject, "poisoned-node-path");
-  process.env.npm_execpath = poisonedNpmCli;
-  process.env.npm_config_registry = "https://credentials.invalid/secret";
-  process.env.AWS_SECRET_ACCESS_KEY = "must-not-cross-boundary";
-  process.env.GH_TOKEN = "must-not-cross-boundary";
-  if (process.platform !== "win32") {
-    expectCode(() => runRealCheck("environment"), "QUALITY_CHECK_CONTAINMENT_UNAVAILABLE");
-  } else {
+const ignoredModules = path.join(realProject, "node_modules", "large-tree");
+fs.mkdirSync(ignoredModules, { recursive: true });
+for (let index = 0; index < 4105; index += 1) {
+  fs.writeFileSync(path.join(ignoredModules, `file-${index}.txt`), "ignored", "utf8");
+}
+fs.writeFileSync(path.join(realProject, ".env"), "IGNORED_SECRET=before", "utf8");
+const ignoredBaseline = observeContentBoundWorkspace(realRoot);
+assert.equal(ignoredBaseline.entries.some((entry) => entry.path.includes("node_modules")), false);
+assert.equal(ignoredBaseline.entries.some((entry) => entry.path.endsWith(".env")), false);
+
+const realCatalog = validateProjectCheckCatalog(realCatalogValue, { workspaceRoot: realRoot });
+const realCatalogFingerprint = projectCheckCatalogFingerprint(realCatalog);
+function realCheckSnapshot(checkId) {
+  const check = realCatalog.checks.find((entry) => entry.check_id === checkId);
+  return observeContentBoundWorkspace(realRoot, "normal-session-workspace-v3", {
+    ownershipPaths: [],
+    generatedOutputPaths: check.generated_output_paths,
+  });
+}
+function runRealCheck(checkId) {
+  const before = realCheckSnapshot(checkId);
+  return runTrustedProjectCheck({
+    catalog: realCatalog,
+    checkId,
+    phase: "integration",
+    workspaceRoot: realRoot,
+    catalogFingerprint: realCatalogFingerprint,
+    expectedSourceWorkspaceFingerprint: before.source_fingerprint,
+  });
+}
+
+const platformClassification = classifyProcessContainment();
+let runtimeResult;
+const operationalReceipts = [];
+const shouldRunReal = process.platform === "win32"
+  || (process.platform === "linux" && process.env.OPENCODE_QUALITY_CGROUP_ROOT !== undefined);
+if (process.platform === "win32") {
+  assert.equal(platformClassification.support_state, "verified", "Windows Job Object runtime is mandatory on Windows");
+} else if (process.platform === "linux" && shouldRunReal) {
+  assert.equal(platformClassification.support_state, "verified", "configured Linux cgroup-v2 runtime must be usable");
+} else if (process.platform === "linux") {
+  assert.equal(platformClassification.support_state, "unavailable");
+  assert.equal(platformClassification.reason, "delegated_root_missing");
+} else if (process.platform === "darwin") {
+  assert.equal(platformClassification.support_state, "unsupported");
+} else {
+  assert.equal(platformClassification.support_state, "unavailable");
+}
+
+if (shouldRunReal) {
+  const environmentBackup = new Map([
+    ["NODE_OPTIONS", process.env.NODE_OPTIONS],
+    ["NODE_PATH", process.env.NODE_PATH],
+    ["npm_execpath", process.env.npm_execpath],
+    ["npm_config_registry", process.env.npm_config_registry],
+    ["AWS_SECRET_ACCESS_KEY", process.env.AWS_SECRET_ACCESS_KEY],
+    ["GH_TOKEN", process.env.GH_TOKEN],
+    ["PATH", process.env.PATH],
+  ]);
+  try {
+    process.env.NODE_OPTIONS = "--require=definitely-missing-sensitive-preload.cjs";
+    process.env.NODE_PATH = path.join(realProject, "node_modules", "poisoned-node-path");
+    process.env.npm_execpath = poisonedNpmCli;
+    process.env.npm_config_registry = "https://credentials.invalid/secret";
+    process.env.AWS_SECRET_ACCESS_KEY = "must-not-cross-boundary";
+    process.env.GH_TOKEN = "must-not-cross-boundary";
+    const fakeBin = path.join(realProject, "node_modules", "fake-bin");
+    fs.mkdirSync(fakeBin, { recursive: true });
+    fs.writeFileSync(path.join(fakeBin, process.platform === "win32" ? "node.exe" : "node"), "poison", "utf8");
+    process.env.PATH = fakeBin;
+
     const environmentReceipt = runRealCheck("environment");
+    operationalReceipts.push(environmentReceipt);
     assert.equal(environmentReceipt.status, "passed");
-    const observedEnvironment = JSON.parse(fs.readFileSync(environmentMarker, "utf8"));
+    const observedEnvironment = JSON.parse(fs.readFileSync(path.join(realProject, "environment-marker.json"), "utf8"));
     for (const key of ["NODE_OPTIONS", "NODE_PATH", "npm_execpath", "npm_config_registry", "AWS_SECRET_ACCESS_KEY", "GH_TOKEN"]) {
       assert.equal(observedEnvironment[key], null, `${key} crossed the trusted runner environment boundary`);
     }
+    for (const key of ["PATH", "Path"]) {
+      if (observedEnvironment[key] !== null) {
+        assert.equal(observedEnvironment[key].includes(fakeBin), false, "ambient PATH crossed the trusted runner boundary");
+      }
+    }
 
-    const poisonedNpmReceipt = runRealCheck("npm-poison");
-    assert.equal(poisonedNpmReceipt.status, "failed", "ambient npm_execpath replaced the canonical npm CLI");
-    assert.equal(fs.existsSync(poisonMarker), false, "poisoned npm_execpath was executed");
-    const knownNpmReceipt = runRealCheck("npm-known");
-    assert.equal(knownNpmReceipt.status, "passed", "canonical npm CLI did not execute a repository-owned script");
-    assert.equal(fs.readFileSync(npmKnownMarker, "utf8"), "real");
+    const ignoredReceipt = runRealCheck("ignored-output");
+    operationalReceipts.push(ignoredReceipt);
+    assert.equal(ignoredReceipt.status, "passed");
+    assert.equal(ignoredReceipt.source_workspace_fingerprint, ignoredReceipt.source_workspace_post_fingerprint);
+    assert.deepEqual(ignoredReceipt.output_workspace_post_entries, []);
 
-    const fakeBin = path.join(realProject, "fake-bin");
-    fs.mkdirSync(fakeBin);
-    fs.writeFileSync(path.join(fakeBin, "node.exe"), "not-an-executable", "utf8");
-    process.env.PATH = fakeBin;
-    const pathPoisonReceipt = runRealCheck("path-poison");
-    assert.equal(pathPoisonReceipt.status, "passed", "ambient PATH replaced the canonical Node executable");
-    assert.equal(fs.readFileSync(realNodeMarker, "utf8"), "real");
-    assert.equal(fs.existsSync(fakeNodeMarker), false, "fake PATH executable was used");
+    const architectureReceipt = runRealCheck("architecture-output");
+    operationalReceipts.push(architectureReceipt);
+    assert.equal(architectureReceipt.status, "passed");
+    assert.equal(architectureReceipt.output_workspace_post_entries.length, 1);
+    assert.equal(architectureReceipt.output_workspace_post_entries[0].path, "project/artifacts/graph.json");
+    trustedProjectCheckResult(architectureReceipt);
+    fs.writeFileSync(path.join(realProject, "architecture-fixture.mjs"), "process.exitCode = 0;\n", "utf8");
+    expectCode(
+      () => runRealCheck("architecture-output"),
+      "QUALITY_CHECK_ARCHITECTURE_OUTPUT_STALE",
+    );
 
-    const directExitReceipt = runRealCheck("direct-exit");
-    assert.equal(directExitReceipt.status, "passed");
+    const npmReceipt = runRealCheck("npm-known");
+    operationalReceipts.push(npmReceipt);
+    assert.equal(npmReceipt.status, "passed");
+    assert.equal(fs.readFileSync(path.join(realProject, "npm-known-marker.txt"), "utf8"), "real");
+    assert.equal(fs.existsSync(poisonMarker), false, "ambient npm_execpath was executed");
+
+    const directReceipt = runRealCheck("direct-exit");
+    operationalReceipts.push(directReceipt);
+    assert.equal(directReceipt.status, "passed");
     const timeoutReceipt = runRealCheck("timeout-descendant");
-    assert.equal(timeoutReceipt.status, "timed_out");
-    assert.equal(fs.readFileSync(timeoutStartedMarker, "utf8"), "started", "trusted timeout fixture never started after containment readiness");
-    await pause(750);
-    assert.equal(fs.existsSync(descendantMarker), false, "descendant survived a normally completed trusted check");
-    assert.equal(fs.existsSync(timeoutDescendantMarker), false, "descendant survived a timed-out trusted check");
+    operationalReceipts.push(timeoutReceipt);
+    assert.equal(timeoutReceipt.status, "blocked");
+    assert.equal(timeoutReceipt.observed_outcome, "timed_out");
+    assert.equal(
+      fs.readFileSync(path.join(realProject, "timeout-started-marker.txt"), "utf8"),
+      "started",
+      "timeout fixture never started after containment readiness",
+    );
+    await pause(900);
+    assert.equal(fs.existsSync(path.join(realProject, "descendant-marker.txt")), false, "detached descendant survived normal completion");
+    assert.equal(
+      fs.existsSync(path.join(realProject, "timeout-descendant-marker.txt")),
+      false,
+      "detached descendant survived timeout teardown",
+    );
+    runtimeResult = `${platformClassification.kind}: verified`;
+  } finally {
+    for (const [key, value] of environmentBackup) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
   }
-} finally {
-  for (const [key, value] of environmentBackup) {
-    if (value === undefined) delete process.env[key];
-    else process.env[key] = value;
-  }
+} else if (process.platform === "darwin") {
+  runtimeResult = "macos: explicitly unsupported";
+} else if (process.platform === "linux") {
+  runtimeResult = "linux-cgroup-v2: unavailable without OPENCODE_QUALITY_CGROUP_ROOT (not counted as runtime coverage)";
+} else {
+  runtimeResult = `${process.platform}: containment unavailable (not counted as runtime coverage)`;
 }
 
-fs.mkdirSync(path.join(tempRoot, "project-retarget"));
-fs.renameSync(path.join(tempRoot, "project"), path.join(tempRoot, "project-original"));
-fs.symlinkSync(
-  path.join(tempRoot, "project-retarget"),
-  path.join(tempRoot, "project"),
-  process.platform === "win32" ? "junction" : "dir",
-);
-expectCode(() => runTrustedProjectCheck({
-  catalog,
-  checkId: "pass",
-  phase: "integration",
-  workspaceRoot: tempRoot,
-  catalogFingerprint,
-  expectedWorkspaceFingerprint: workspaceFingerprint,
-  observeWorkspace,
-  spawn: () => ({ status: 0, signal: null, stdout: Buffer.alloc(0), stderr: Buffer.alloc(0) }),
-}), "QUALITY_CHECK_CWD_SYMLINK");
+if (process.env.OPENCODE_MILESTONE_OPERATIONAL_REPORT !== undefined) {
+  if (!shouldRunReal || operationalReceipts.length === 0) {
+    throw new Error("trusted-project operational report requires verified platform containment");
+  }
+  writeMilestone2OperationalReportFromEnvironment(sealMilestone2OperationalReport({
+    report_kind: "trusted_project_check",
+    platform: process.platform,
+    containment_kind: platformClassification.kind,
+    containment_identity_fingerprints: operationalReceipts.map((receipt) => (
+      receipt.containment_identity_fingerprint
+    )),
+    teardown_verified: operationalReceipts.every((receipt) => (
+      receipt.containment_state?.teardown_verified === true
+    )),
+    scenario_ids: ["trusted_project_check"],
+    trusted_check_receipt_fingerprints: operationalReceipts.map((receipt) => receipt.evidence_fingerprint),
+  }));
+}
 
 fs.rmSync(tempRoot, { recursive: true, force: true });
-console.log("Trusted project runner checks passed.");
+console.log(`Trusted project runner v3 checks passed (${runtimeResult}).`);

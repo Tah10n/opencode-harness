@@ -18,7 +18,9 @@ behaviour dimensions.
 | Engineering Dossier | Feedforward and feedback | Computational | Behaviour, compatibility, maintainability | Before instrumented implementation through immutable attestation | `lib/quality/dossier.mjs`, `quality/schemas/engineering-dossier.schema.json`, `scripts/verify-engineering-quality.mjs` |
 | Normal-session quality bridge and pre-implementation gate | Feedforward | Computational over runner-owned state and the native pre-tool hook | Behaviour, architecture, safety | Before native edits or writable delegation | `.opencode/plugins/engineering-dossier.mjs`, `lib/quality/normal-session-bridge.mjs`, `lib/quality/gate.mjs` |
 | Bounded engineering impact graph | Feedforward and feedback | Computational evidence over bounded discovery | Architecture, compatibility, regression control | Dossier construction and gate evaluation | `lib/quality/impact-graph.mjs`, `quality/schemas/engineering-impact-graph.schema.json` |
-| Optional project architecture policy | Feedforward and feedback | Computational when configured with trusted graph evidence | Architecture fitness | Baseline dossier gate, post-edit candidate audit, and final acceptance | `lib/quality/architecture.mjs`, `lib/quality/live-coordinator.mjs`, `quality/schemas/architecture-policy.schema.json` |
+| Optional project architecture policy | Feedforward and feedback | Computational when configured with trusted final-graph evidence | Architecture fitness | Baseline dossier gate, post-edit evaluation, and final acceptance | `lib/quality/architecture.mjs`, `lib/quality/post-architecture-evidence.mjs`, `quality/schemas/architecture-policy.schema.json`, `quality/schemas/post-edit-architecture-evidence.schema.json` |
+| Bounded source/output workspace observation | Feedback | Computational | Mutation scope, freshness, ignored-tree safety | Before and after mutation/checks | `lib/quality/normal-session-workspace.mjs`, `scripts/verify-workspace-observation.mjs` |
+| Trusted project toolchains and containment | Feedforward and feedback | Computational | Command identity, lifecycle, portability | Plugin startup through immediately-before-spawn revalidation and verified teardown | `.opencode/quality/toolchains.json`, host-owned `quality-toolchains.host.v1.json`, `quality/schemas/toolchain-host-configuration.schema.json`, `lib/quality/trusted-toolchain-host-config.mjs`, `lib/quality/trusted-toolchains.mjs`, `lib/feedback/process-containment.mjs`, `lib/quality/trusted-project-runner.mjs` |
 | Engineering quality run bundle | Feedback | Computational | Causality, integrity, auditability | After verified teardown and integrated verification | `lib/quality/attestation.mjs`, `lib/quality/run-bundle.mjs`, `.oc_harness/runs/<run>/quality/` |
 | Pre-change baseline | Feedback | Computational and inferential | Behaviour, regression control | Before high/critical edits | `skills/global-quality-gates/SKILL.md`, `agents/orchestrator.md`, `agents/verifier.md` |
 | Plan-and-test-design review | Feedback | Inferential | Architecture, behaviour, test quality | Before high/critical implementation | `agents/reviewer.md`, `agents/orchestrator.md` |
@@ -77,7 +79,8 @@ behaviour dimensions.
   invalid rather than becoming valid after a later dossier.
 - Architecture policy is computational only when a host project supplies a
   validated policy. Absence is explicit `not_configured`, never an inferred
-  pass or a guessed project boundary.
+  pass or a guessed project boundary. Configured high/critical policy requires
+  trusted, fresh post-edit graph evaluation before attestation.
 - The infrastructure self-test never contributes to behavioural acceptance.
 - Missing, untrusted, mismatched, or incomplete mandatory evidence makes the
   whole decision `inconclusive`, even when another hard gate failed.
@@ -99,8 +102,13 @@ behaviour dimensions.
 - The normal-session plugin computationally gates native edits and writable
   delegation in `tool.execute.before` when that callback is host-active. Native
   Bash is denied rather than heuristically classified; project commands use the
-  trusted catalog runner. Windows uses Job Object containment and the current
-  POSIX trusted-check path fails closed. The declared `permission.ask` hook is
+  trusted catalog runner. Windows uses Job Object containment, Linux uses only
+  an exclusive delegated cgroup-v2 root with an external coordinator/watchdog,
+  a narrow fixed-leaf attach helper, root-level kill, hierarchical
+  `cgroup.events: populated 0` teardown proof, and postorder descendant removal,
+  and
+  macOS is explicitly unsupported. Unavailable controllers fail closed. The
+  declared `permission.ask` hook is
   not the enforcement source in OpenCode 1.17.20, and the installed API still
   does not correlate child creation with an exact task call or independently
   classify pre-dossier session risk. Processes started outside the plugin are

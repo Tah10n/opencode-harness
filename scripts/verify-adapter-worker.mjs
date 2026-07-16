@@ -12,6 +12,8 @@ import {
   runAdapterModule,
 } from "../lib/feedback/adapter-worker.mjs";
 import {
+  captureManagedCommandWorkingDirectoryIdentity,
+  ProcessTreeError,
   ProcessTreeTeardownError,
   runManagedCommand,
 } from "../lib/feedback/process-tree.mjs";
@@ -26,6 +28,16 @@ const teardownProbeDelayMs = 2500;
 const teardownProbeWaitMs = teardownProbeDelayMs + 100;
 const containedExecutionTimeoutMs = 5000;
 const survivorDetectionWaitMs = 750;
+
+function fakeIpcWorker(onInitialize = () => {}) {
+  const child = new EventEmitter();
+  child.pid = 4242;
+  child.connected = true;
+  child.send = (message) => {
+    if (message?.type === "initialize") onInitialize(child, message);
+  };
+  return child;
+}
 
 try {
   const adapter = path.join(tmp, "adapter.mjs");
@@ -93,6 +105,173 @@ export async function runScenario() {
   });
   assert.equal(factoryResult.passed, true);
   assert.equal(processFactoryInput.cwd, workingDirectoryFixture);
+  assert.equal(typeof processFactoryInput.workingDirectoryIdentity?.inode, "string");
+
+  const delayedContainmentResult = await runAdapterModule({
+    adapterUrl: adapterUrl(adapter),
+    context: {},
+    timeout: 20,
+    containmentSetupTimeoutMs: 500,
+    processFactory: () => fakeIpcWorker((child) => {
+      queueMicrotask(() => child.emit("message", { type: "result", result_json: "{\"passed\":true}" }));
+    }),
+    processContainmentFactory: async () => {
+      await pause(75);
+      return null;
+    },
+    treeTeardown: async () => true,
+  });
+  assert.equal(
+    delayedContainmentResult.passed,
+    true,
+    "adapter execution timeout must not elapse while containment is still becoming ready",
+  );
+
+  let hungAdapterInitialized = false;
+  await assert.rejects(runAdapterModule({
+    adapterUrl: adapterUrl(adapter),
+    context: {},
+    timeout: 1000,
+    containmentSetupTimeoutMs: 25,
+    processFactory: () => fakeIpcWorker(() => { hungAdapterInitialized = true; }),
+    processContainmentFactory: () => new Promise(() => {}),
+    treeTeardown: async () => true,
+  }), (error) => (
+    error instanceof AdapterExecutionError
+    && error.classification === "adapter_process_containment_timeout"
+  ));
+  assert.equal(hungAdapterInitialized, false, "hung containment must never release adapter initialization");
+
+  let lateAdapterContainmentCloseCount = 0;
+  await assert.rejects(runAdapterModule({
+    adapterUrl: adapterUrl(adapter),
+    context: {},
+    timeout: 1000,
+    containmentSetupTimeoutMs: 10,
+    processFactory: () => fakeIpcWorker(() => { throw new Error("late setup released initialization"); }),
+    processContainmentFactory: async () => {
+      await pause(50);
+      return Object.freeze({
+        close: async () => { lateAdapterContainmentCloseCount += 1; return true; },
+      });
+    },
+    treeTeardown: async () => true,
+  }), (error) => (
+    error instanceof AdapterExecutionError
+    && error.classification === "adapter_process_containment_timeout"
+  ));
+  await pause(75);
+  assert.equal(lateAdapterContainmentCloseCount, 1, "late adapter containment must close exactly once");
+
+  const swappedWorkingDirectory = path.join(tmp, "working-directory-swap");
+  const swappedWorkingDirectoryOriginal = path.join(tmp, "working-directory-swap-original");
+  fs.mkdirSync(swappedWorkingDirectory);
+  fs.writeFileSync(path.join(swappedWorkingDirectory, "identity.txt"), "original", "utf8");
+  let swappedDirectoryInitialized = false;
+  await assert.rejects(runAdapterModule({
+    adapterUrl: adapterUrl(adapter),
+    context: {},
+    timeout: 1000,
+    workingDirectory: swappedWorkingDirectory,
+    processFactory: () => {
+      fs.renameSync(swappedWorkingDirectory, swappedWorkingDirectoryOriginal);
+      fs.mkdirSync(swappedWorkingDirectory);
+      return fakeIpcWorker(() => { swappedDirectoryInitialized = true; });
+    },
+    treeTeardown: async () => true,
+  }), (error) => (
+    error instanceof AdapterExecutionError
+    && error.classification === "adapter_working_directory_changed"
+  ));
+  assert.equal(swappedDirectoryInitialized, false, "replaced cwd must be rejected before adapter initialization");
+
+  const delayedManagedResult = await runManagedCommand({
+    file: process.execPath,
+    args: ["-e", ""],
+    cwd: tmp,
+    timeout: 20,
+    containmentSetupTimeoutMs: 500,
+    processFactory: () => fakeIpcWorker((child) => {
+      queueMicrotask(() => child.emit("message", {
+        type: "result",
+        result: {
+          exit_code: 0,
+          signal: null,
+          stdout_chars: 0,
+          stderr_chars: 0,
+          stdout_bytes: 0,
+          stderr_bytes: 0,
+          error_code: null,
+        },
+      }));
+    }),
+    processContainmentFactory: async () => {
+      await pause(75);
+      return null;
+    },
+    treeTeardown: async () => true,
+  });
+  assert.equal(delayedManagedResult.status, 0);
+
+  let hungManagedInitialized = false;
+  await assert.rejects(runManagedCommand({
+    file: process.execPath,
+    args: ["-e", ""],
+    cwd: tmp,
+    timeout: 1000,
+    containmentSetupTimeoutMs: 25,
+    processFactory: () => fakeIpcWorker(() => { hungManagedInitialized = true; }),
+    processContainmentFactory: () => new Promise(() => {}),
+    treeTeardown: async () => true,
+  }), (error) => (
+    error instanceof ProcessTreeError
+    && error.classification === "process_containment_setup_timeout"
+  ));
+  assert.equal(hungManagedInitialized, false, "hung containment must never release managed command initialization");
+
+  let lateManagedContainmentCloseCount = 0;
+  await assert.rejects(runManagedCommand({
+    file: process.execPath,
+    args: ["-e", ""],
+    cwd: tmp,
+    timeout: 1000,
+    containmentSetupTimeoutMs: 10,
+    processFactory: () => fakeIpcWorker(() => { throw new Error("late setup released initialization"); }),
+    processContainmentFactory: async () => {
+      await pause(50);
+      return Object.freeze({
+        close: async () => { lateManagedContainmentCloseCount += 1; return true; },
+      });
+    },
+    treeTeardown: async () => true,
+  }), (error) => (
+    error instanceof ProcessTreeError
+    && error.classification === "process_containment_setup_timeout"
+  ));
+  await pause(75);
+  assert.equal(lateManagedContainmentCloseCount, 1, "late managed containment must close exactly once");
+
+  const managedCwd = path.join(tmp, "managed-working-directory-swap");
+  const managedCwdOriginal = path.join(tmp, "managed-working-directory-swap-original");
+  fs.mkdirSync(managedCwd);
+  const managedCwdIdentity = captureManagedCommandWorkingDirectoryIdentity(managedCwd);
+  let swappedManagedInitialized = false;
+  const swappedManagedResult = await runManagedCommand({
+    file: process.execPath,
+    args: ["-e", ""],
+    cwd: managedCwd,
+    timeout: 1000,
+    expectedWorkingDirectoryIdentity: managedCwdIdentity,
+    processFactory: () => fakeIpcWorker(() => { swappedManagedInitialized = true; }),
+    processContainmentFactory: async () => null,
+    beforeCommandStart: () => {
+      fs.renameSync(managedCwd, managedCwdOriginal);
+      fs.mkdirSync(managedCwd);
+    },
+    treeTeardown: async () => true,
+  });
+  assert.equal(swappedManagedResult.error?.code, "PROCESS_WORKING_DIRECTORY_CHANGED");
+  assert.equal(swappedManagedInitialized, false, "replaced managed cwd must be rejected before initialization");
 
   const workingDirectoryFile = path.join(tmp, "working-directory-file.txt");
   fs.writeFileSync(workingDirectoryFile, "not-a-directory", "utf8");
@@ -252,11 +431,14 @@ export async function runScenario() {
   assert.equal(commandResult.status, 0);
   assert.equal(commandResult.stdout_chars, 7);
   assert.equal(commandResult.teardown_verified, true);
+  assert.equal(commandResult.containment_identity?.support_state, "verified");
+  assert.match(commandResult.containment_fingerprint, /^sha256:[0-9a-f]{64}$/u);
+  assert.equal(commandResult.containment_state?.teardown_verified, true);
 
   const commandDescendantMarker = path.join(tmp, "command-descendant-late-marker.txt");
   const commandStartedMarker = path.join(tmp, "command-descendant-started.txt");
   const survivorMonitorSource = `const fs=require("node:fs"); const parentPid=Number(process.argv[1]); const marker=process.argv[2]; setInterval(() => { try { process.kill(parentPid, 0); } catch { fs.writeFileSync(marker, "survived"); process.exit(0); } }, 50);`;
-  const commandDescendantScript = `const fs=require("node:fs"); const {spawn}=require("node:child_process"); fs.writeFileSync(${JSON.stringify(commandStartedMarker)}, "started"); const child=spawn(process.execPath,["-e",${JSON.stringify(survivorMonitorSource)},String(process.pid),${JSON.stringify(commandDescendantMarker)}],{detached:process.platform==="win32",stdio:"ignore",windowsHide:true}); child.unref(); setInterval(() => {}, 60000);`;
+  const commandDescendantScript = `const fs=require("node:fs"); const {spawn}=require("node:child_process"); fs.writeFileSync(${JSON.stringify(commandStartedMarker)}, "started"); const child=spawn(process.execPath,["-e",${JSON.stringify(survivorMonitorSource)},String(process.pid),${JSON.stringify(commandDescendantMarker)}],{detached:true,stdio:"ignore",windowsHide:true}); child.unref(); setInterval(() => {}, 60000);`;
   const timedCommand = await runManagedCommand({
     file: process.execPath,
     args: ["-e", commandDescendantScript],
@@ -265,6 +447,7 @@ export async function runScenario() {
   });
   assert.equal(timedCommand.timed_out, true);
   assert.equal(timedCommand.teardown_verified, true);
+  assert.equal(timedCommand.containment_state?.teardown_verified, true);
   assert.equal(fs.readFileSync(commandStartedMarker, "utf8"), "started", "managed timeout fixture never started after containment readiness");
   await pause(survivorDetectionWaitMs);
   assert.equal(fs.existsSync(commandDescendantMarker), false, "ordinary command descendant survived timeout teardown");
@@ -335,7 +518,7 @@ export async function runScenario() {
 import { spawn } from "node:child_process";
 export async function runScenario() {
   fs.writeFileSync(${JSON.stringify(descendantStartedMarker)}, "started");
-  const child = spawn(process.execPath, ["-e", ${JSON.stringify(descendantScript)}, String(process.pid), ${JSON.stringify(descendantMarker)}], { detached: process.platform === "win32", stdio: "ignore", windowsHide: true });
+  const child = spawn(process.execPath, ["-e", ${JSON.stringify(descendantScript)}, String(process.pid), ${JSON.stringify(descendantMarker)}], { detached: true, stdio: "ignore", windowsHide: true });
   child.unref();
   await new Promise(() => {});
 }
@@ -353,7 +536,7 @@ export async function runScenario() {
   const normalDescendant = path.join(tmp, "normal-descendant.mjs");
   fs.writeFileSync(normalDescendant, `import { spawn } from "node:child_process";
 export async function runScenario() {
-  spawn(process.execPath, ["-e", ${JSON.stringify(normalDescendantScript)}], { stdio: "ignore", windowsHide: true });
+  spawn(process.execPath, ["-e", ${JSON.stringify(normalDescendantScript)}], { detached: true, stdio: "ignore", windowsHide: true }).unref();
   return { passed: true, cleanup: "confirmed" };
 }
 `, "utf8");
@@ -548,6 +731,11 @@ export async function runScenario() {
     context: {},
     timeout: 20,
     onTrace: () => ({ accepted: true }),
+    processContainmentFactory: async () => Object.freeze({
+      support_state: "verified",
+      status: () => Object.freeze({ teardown_verified: true }),
+      close: async () => true,
+    }),
     treeTeardown: async () => false,
   }), (error) => error instanceof AdapterExecutionError && error.classification === "adapter_teardown_unverified");
   assert(Date.now() - unverifiedStartedAt < 1000, "unverified adapter teardown did not reject within the bounded deadline");

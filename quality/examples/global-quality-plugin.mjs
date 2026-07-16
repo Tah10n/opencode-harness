@@ -4,4 +4,5 @@ import { createNormalSessionQualityPlugin } from "opencode-harness/quality-plugi
 export const EngineeringDossierPlugin = async ({ directory, worktree }) => createNormalSessionQualityPlugin({
   toolFactory: tool,
   workspaceRoot: worktree ?? directory,
+  hostToolchainAnchorUrl: import.meta.url,
 });

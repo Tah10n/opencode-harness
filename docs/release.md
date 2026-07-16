@@ -213,6 +213,18 @@ The second prints the local committed-whitespace receipt directly. In CI the
 same verifier consumes pull-request base or push before metadata and binds the
 exact range and HEAD.
 
+GitHub Actions additionally runs the Windows and Linux production verifiers
+through `npm run milestone:2:operational`, uploads their sealed receipt bundles,
+and aggregates them with the deterministic bundle through `npm run
+milestone:2:assess`. The aggregate is `blocked_external_state`, not `verified`,
+when the GitHub-hosted run has no installed host adapter. Do not promote that
+bounded blocker into installed-host evidence.
+
+Each producer binds the same portable source attestation and re-observes it
+before sealing. The aggregate job first requires `success` from deterministic,
+Windows, and Linux producers; diagnostic artifacts from a failed producer are
+never accepted as release evidence.
+
 When an installed OpenCode environment is part of the release claim, also run:
 
 ```powershell
@@ -220,6 +232,11 @@ npm run verify:runtime
 npm run probe:runtime:quality-plugin-api
 npm run verify:runtime:quality-hooks
 ```
+
+To include installed-host evidence in a Milestone 2 aggregate, run the last
+command with `--adapter <host-owned-adapter> --milestone-out <absolute-json>`
+and aggregate that bundle only with artifacts from the same repository HEAD and
+run binding. Fixture-contract mode cannot emit a host milestone bundle.
 
 A `failed` runtime hook receipt blocks the claim. An `incomplete` receipt
 allows only a partial claim that names the uncovered surface. The current
@@ -229,11 +246,33 @@ runtime-hook verifier is a separate host-evidence surface. Neither proves every
 host callback invocation, effective adopted permissions, exact task-to-child
 causality, or pre-dossier risk classification. Native Bash is disabled in an
 instrumented quality session; commands use trusted project-catalog checks, with
-Windows Job Object containment and fail-closed behavior when the production
-containment controller is unavailable. Processes outside the plugin are not
+Windows Job Object containment, delegated Linux cgroup-v2 containment, explicit
+macOS unsupported status, and fail-closed behavior whenever the production
+controller is unavailable. Logical project toolchain IDs never carry host
+paths; non-Node resolvers require the fixed-source
+`quality-toolchains.host.v1.json` beside the global wrapper, with disjoint
+trusted-code and mutable-state roots. Processes outside the plugin are not
 claimed as intercepted. The declared
 `permission.ask` callback is reported separately because OpenCode 1.17.20 does
 not wire it into the permission service.
+
+Java/Maven/Gradle response files and resolver-owned Maven/Gradle overrides are
+rejected. Maven receives sealed user/global settings and toolchains while
+automatic writable-user configuration and extensions fail closed. Maven 4
+user/project property files fail closed, and its extension/config routing
+properties—including installation/project/user settings and toolchains,
+settings-security, and local-repository chains—are resolver-owned. Maven project
+configuration, every applicable Gradle project/ancestor property file, Gradle
+user/installation properties, and installation init scripts are bounded or
+distribution-manifest identity-bound through the contained spawn boundary;
+writable Gradle user init scripts are unsupported. Toolchain policy v4 and the
+receipt bind the complete runtime config inventory plus the configured Node
+identity used to start the internal sync worker. The managed worker opens the
+trusted cwd after parent-side revalidation; the contained child rechecks that
+inherited directory object last and the command does not reopen the cwd path.
+Containment setup and
+execution use separate deadlines, and execution time starts only after controller
+readiness.
 
 General live regression evaluation remains optional:
 

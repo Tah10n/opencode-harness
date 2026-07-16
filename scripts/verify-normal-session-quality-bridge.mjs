@@ -6,6 +6,7 @@ import process from "node:process";
 import { spawnSync } from "node:child_process";
 
 import {
+  bindArchitectureEvaluatorImplementationFingerprint,
   createDefaultNormalSessionCheckCatalog,
   createNormalSessionQualityBridge,
   executeNormalSessionQualityTool as executeRawNormalSessionQualityTool,
@@ -19,8 +20,10 @@ import {
 } from "../lib/quality/normal-session-bridge.mjs";
 import { createNormalSessionQualityPlugin } from "../lib/quality/normal-session-plugin.mjs";
 import { PREMORTEM_CATEGORIES } from "../lib/quality/constants.mjs";
+import { createEngineeringCheckCatalog } from "../lib/quality/gate.mjs";
 import { buildEngineeringImpactGraph } from "../lib/quality/impact-graph.mjs";
 import {
+  WORKSPACE_SNAPSHOT_SCHEMA_VERSION,
   diffContentBoundWorkspaces,
   normalizeNormalSessionOwnedPath,
   observeContentBoundWorkspace,
@@ -37,12 +40,49 @@ const currentPathVersions = new Map();
 const headSha = "a".repeat(40);
 const clock = () => new Date(Date.UTC(2026, 6, 14, 10, 0, clockTick++)).toISOString();
 const idFactory = (prefix) => `${prefix}-${String(++idTick).padStart(4, "0")}`;
-const observeWorkspace = () => {
+function fixtureWorkspaceSnapshot(entries, outputEntries = []) {
+  const sourceBody = {
+    schema_version: WORKSPACE_SNAPSHOT_SCHEMA_VERSION,
+    head_sha: headSha,
+    index_entry_count: 0,
+    index_fingerprint: fingerprint({ fixture: "index" }),
+    entries,
+    dirty: false,
+  };
+  const sourceFingerprint = fingerprint(sourceBody);
+  const declaredOutputsFingerprint = fingerprint({
+    schema_version: WORKSPACE_SNAPSHOT_SCHEMA_VERSION,
+    entries: outputEntries,
+  });
+  return {
+    ...sourceBody,
+    declared_output_entries: outputEntries,
+    source_fingerprint: sourceFingerprint,
+    declared_outputs_fingerprint: declaredOutputsFingerprint,
+    fingerprint: fingerprint({
+      schema_version: WORKSPACE_SNAPSHOT_SCHEMA_VERSION,
+      source_fingerprint: sourceFingerprint,
+      declared_outputs_fingerprint: declaredOutputsFingerprint,
+    }),
+  };
+}
+
+const observeWorkspace = (workspaceRoot, _salt, pathsOrOptions = []) => {
   const entries = [...currentPathVersions.entries()].sort(([left], [right]) => left.localeCompare(right)).map(([file, version]) => ({
     path: file,
     fingerprint: fingerprint({ path: file, version }),
   }));
-  return { head_sha: headSha, entries, fingerprint: fingerprint({ head_sha: headSha, entries }) };
+  const generatedOutputPaths = Array.isArray(pathsOrOptions) ? [] : (pathsOrOptions.generatedOutputPaths ?? []);
+  const outputEntries = generatedOutputPaths.map((file) => {
+    const target = path.join(workspaceRoot, ...file.split("/"));
+    return {
+      path: file,
+      fingerprint: fs.existsSync(target)
+        ? fingerprint({ path: file, content: fs.readFileSync(target, "utf8") })
+        : fingerprint({ path: file, absent: true }),
+    };
+  }).sort((left, right) => left.path.localeCompare(right.path));
+  return fixtureWorkspaceSnapshot(entries, outputEntries);
 };
 
 function mapping(classification, overrides = {}) {
@@ -359,6 +399,59 @@ function configuredPolicyGraph(riskClass = "standard-lite") {
   });
 }
 
+function forbiddenPolicyGraph() {
+  const baseline = configuredPolicyGraph("high");
+  const evidence = [{ kind: "file", value: "src/file.mjs" }];
+  const input = structuredClone(baseline);
+  delete input.schema_version;
+  delete input.fingerprint;
+  input.graph_id = "GRAPH-normal-policy-forbidden";
+  input.nodes.push(
+    {
+      id: "NODE-domain-service",
+      kind: "module",
+      path: "src/domain/service.mjs",
+      symbol: null,
+      label: "domain service",
+      boundary: "module",
+      confidence: "observed",
+      coverage: "complete",
+      evidence_refs: evidence,
+    },
+    {
+      id: "NODE-storage-repository",
+      kind: "module",
+      path: "src/storage/repository.mjs",
+      symbol: null,
+      label: "storage repository",
+      boundary: "persistence",
+      confidence: "observed",
+      coverage: "complete",
+      evidence_refs: evidence,
+    },
+  );
+  input.edges.push({
+    id: "EDGE-domain-storage-forbidden",
+    from: "NODE-domain-service",
+    to: "NODE-storage-repository",
+    relationship: "depends_on",
+    confidence: "observed",
+    coverage: "complete",
+    evidence_refs: evidence,
+  });
+  input.affected_paths.push({
+    id: "BLAST-domain-storage-forbidden",
+    kind: "direct",
+    node_ids: ["NODE-domain-service", "NODE-storage-repository"],
+    edge_ids: ["EDGE-domain-storage-forbidden"],
+    critical: true,
+    verification_node_ids: ["NODE-normal-test"],
+    confidence: "observed",
+    evidence_refs: evidence,
+  });
+  return buildEngineeringImpactGraph(input);
+}
+
 function passedGate(input) {
   const source = {
     schema_version: 1,
@@ -379,10 +472,33 @@ function passedGate(input) {
 
 const trustedTargetCalls = [];
 let trustedTargetResultOverride = null;
-const runTrustedTarget = ({ targetId, phase, sessionKey }) => {
+let architectureGraphOverride = null;
+const runTrustedTarget = ({ targetId, phase, sessionKey, dossier, workspaceRoot, workspaceObserver }) => {
   trustedTargetCalls.push({ targetId, phase, sessionKey });
+  let outputEvidence = {};
+  if (targetId === "normal-architecture-graph") {
+    const outputPath = "artifacts/architecture/post-edit-graph.json";
+    const outputFile = path.join(workspaceRoot, ...outputPath.split("/"));
+    fs.mkdirSync(path.dirname(outputFile), { recursive: true });
+    fs.writeFileSync(outputFile, `${JSON.stringify(architectureGraphOverride ?? dossier.impact_graph)}\n`, "utf8");
+    const outputWorkspace = workspaceObserver(workspaceRoot, "fixture", {
+      ownershipPaths: [],
+      generatedOutputPaths: [outputPath],
+    });
+    outputEvidence = {
+      output_workspace_fingerprint: fingerprint({
+        schema_version: WORKSPACE_SNAPSHOT_SCHEMA_VERSION,
+        entries: [],
+      }),
+      output_workspace_post_fingerprint: outputWorkspace.declared_outputs_fingerprint,
+      output_workspace_post_entries: outputWorkspace.declared_output_entries,
+    };
+  }
   return {
   status: trustedTargetResultOverride?.status ?? "passed",
+  ...(trustedTargetResultOverride?.observed_outcome === undefined
+    ? {}
+    : { observed_outcome: trustedTargetResultOverride.observed_outcome }),
   command_id: `trusted-project-check:${targetId}`,
   exit_code: trustedTargetResultOverride === null ? 0 : trustedTargetResultOverride.exit_code,
   signal: null,
@@ -392,6 +508,7 @@ const runTrustedTarget = ({ targetId, phase, sessionKey }) => {
   command_fingerprint: fingerprint({ targetId, fixture: true }),
   stdout: "RAW_STDOUT_CANARY",
   stderr: "RAW_STDERR_CANARY",
+  ...outputEvidence,
   };
 };
 
@@ -409,6 +526,31 @@ const options = {
     protected_paths: ["src/auth", "src/security.mjs"],
   },
 };
+const evaluatorFactory = (dependency) => function sameSourceArchitectureEvaluator(input) {
+  return dependency(input);
+};
+const sameSourceEvaluatorA = evaluatorFactory((input) => input);
+const sameSourceEvaluatorB = evaluatorFactory((input) => ({ ...input }));
+assert.equal(
+  Function.prototype.toString.call(sameSourceEvaluatorA),
+  Function.prototype.toString.call(sameSourceEvaluatorB),
+  "regression fixture must use identical wrapper source",
+);
+assert.notEqual(
+  bindArchitectureEvaluatorImplementationFingerprint(
+    sameSourceEvaluatorA,
+    fingerprint({ transitive_implementation: "A" }),
+  ),
+  bindArchitectureEvaluatorImplementationFingerprint(
+    sameSourceEvaluatorB,
+    fingerprint({ transitive_implementation: "B" }),
+  ),
+  "architecture evaluator identity must include trusted transitive implementation identity",
+);
+assertContractError(() => createNormalSessionQualityBridge({
+  ...options,
+  evaluateArchitecture: sameSourceEvaluatorA,
+}), "QUALITY_POST_ARCHITECTURE_IDENTITY");
 const bridge = createNormalSessionQualityBridge(options);
 const orchestrator = { sessionID: "session/root", agent: "orchestrator" };
 const architect = { ...orchestrator, agent: "architect" };
@@ -740,6 +882,16 @@ phaseRequest.test_obligations.push(
     required: true,
     trusted_producer: "opencode-harness-normal-quality-runner",
   },
+  {
+    id: "TEST-integration-phase",
+    check_id: "normal-committed-whitespace",
+    kind: "integration",
+    phase: "integration",
+    scope_ids: ["AREA-src"],
+    command_or_mechanism: "trusted-project-check:normal-committed-whitespace",
+    required: true,
+    trusted_producer: "opencode-harness-normal-quality-runner",
+  },
 );
 phaseRequest.verification_plan.baseline_check_ids = ["normal-engineering-quality"];
 phaseRequest.verification_boundary.check_ids.push("normal-engineering-quality", "normal-committed-whitespace");
@@ -761,11 +913,147 @@ assert.equal(phaseVerification.complete, true);
 assert.deepEqual(trustedTargetCalls.map(({ targetId, phase }) => ({ targetId, phase })), [
   { targetId: "normal-engineering-quality", phase: "preimplementation" },
   { targetId: "normal-committed-whitespace", phase: "slice" },
+  { targetId: "normal-committed-whitespace", phase: "integration" },
   { targetId: "normal-harness-static", phase: "integration" },
 ]);
 const phaseState = inspectNormalSessionQualityState(bridge, phaseContext.sessionID);
 assert.equal(phaseState.preimplementation_check_receipts[0].duration_ms, 17);
 assert.deepEqual(phaseState.verification.target_check_ids, ["normal-committed-whitespace", "normal-harness-static"]);
+assert.deepEqual(
+  phaseState.verification.receipts
+    .filter((entry) => entry.kind === "check" && entry.check_id === "normal-committed-whitespace")
+    .map((entry) => entry.phase),
+  ["slice", "integration"],
+  "one logical check ID must retain both required phase receipts",
+);
+assertPersistedTamperRejected(bridge, phaseContext, (state) => {
+  state.verification.target_check_ids.splice(1, 0, state.verification.target_check_ids[0]);
+}, "QUALITY_STATE_BINDING");
+
+const bugEngineeringCatalog = createEngineeringCheckCatalog({
+  catalog_id: "normal-session-bug-reproducer-v2",
+  checks: [{
+    check_id: "normal-bug-reproducer",
+    trusted_producer: "opencode-harness-normal-quality-runner",
+    phases: ["preimplementation", "integration"],
+    available: true,
+  }],
+  mechanisms: [],
+});
+const bugProjectCatalog = {
+  schema_version: 2,
+  catalog_id: "normal-session-bug-project-v2",
+  standard_lite_policy: options.standardLitePolicy,
+  checks: [{
+    check_id: "normal-bug-reproducer",
+    executable_id: "node",
+    argv: ["scripts/fixture-check.mjs"],
+    cwd: ".",
+    phases: ["preimplementation", "integration"],
+    purpose: "bug_reproducer",
+    outcome_protocol: {
+      kind: "exit_code",
+      exit_codes: {
+        failing_reproducer: [10],
+        passing_regression: [0],
+        unrelated_failure: [20],
+        unavailable: [30],
+      },
+    },
+    generated_output_paths: [],
+    timeout_ms: 120000,
+    max_output_chars: 1048576,
+  }],
+};
+function bugStartRequest(expectedPreFix = "failing_reproducer") {
+  return {
+    ...startRequestFromDossier(dossierRequest()),
+    task_type: "bug_fix",
+    required_check_ids: ["normal-bug-reproducer"],
+    reproduction_contract: {
+      check_id: "normal-bug-reproducer",
+      expected_pre_fix: expectedPreFix,
+      expected_post_fix: "passing_regression",
+      unavailable_reason: expectedPreFix === "unavailable" ? "external fixture dependency is absent" : null,
+      uncertainty_material: false,
+    },
+  };
+}
+function createBugBridge(preOutcome, postOutcome = "passing_regression") {
+  return createNormalSessionQualityBridge({
+    ...options,
+    checkCatalog: bugEngineeringCatalog,
+    projectCatalog: bugProjectCatalog,
+    evaluateGate: undefined,
+    runTrustedTarget: ({ phase }) => {
+      const observedOutcome = phase === "preimplementation" ? preOutcome : postOutcome;
+      return {
+        status: ["unavailable", "timed_out", "oversized", "malformed"].includes(observedOutcome) ? "blocked" : "passed",
+        observed_outcome: observedOutcome,
+        exit_code: observedOutcome === "passing_regression" ? 0
+          : observedOutcome === "failing_reproducer" ? 10
+            : observedOutcome === "unrelated_failure" ? 20 : null,
+        duration_ms: 1,
+        stdout_bytes: 0,
+        stderr_bytes: 0,
+        command_fingerprint: fingerprint({ phase, observedOutcome }),
+      };
+    },
+  });
+}
+function startBugSession(targetBridge, sessionID, expectedPreFix = "failing_reproducer") {
+  const context = { sessionID, agent: "orchestrator" };
+  currentPathVersions.clear();
+  handleNormalSessionChatMessage(targetBridge, context);
+  executeRawNormalSessionQualityTool(targetBridge, "quality_session_start", {
+    request: JSON.stringify(bugStartRequest(expectedPreFix)),
+  }, context);
+  return context;
+}
+
+const honestBugBridge = createBugBridge("failing_reproducer");
+const honestBugContext = startBugSession(honestBugBridge, "session/bug-reproducer-honest");
+const honestBugGate = executeRawNormalSessionQualityTool(honestBugBridge, "quality_dossier_finalize", {
+  request: JSON.stringify({ expected_revision: 1 }),
+}, honestBugContext);
+assert.equal(honestBugGate.gate_status, "passed");
+const honestPreReceipt = inspectNormalSessionQualityState(honestBugBridge, honestBugContext.sessionID)
+  .preimplementation_check_receipts[0];
+assert.equal(honestPreReceipt.observed_outcome, "failing_reproducer");
+executeRawNormalSessionQualityTool(honestBugBridge, "quality_action_authorize", {
+  request: JSON.stringify({ expected_revision: 1, kind: "edit", paths: ["src/file.mjs"] }),
+}, honestBugContext);
+handleNormalSessionToolBefore(honestBugBridge, {
+  tool: "write", sessionID: honestBugContext.sessionID, callID: "bug-fix-write",
+}, { args: { filePath: "src/file.mjs", content: "export const value = 2;\n" } });
+currentPathVersions.set("src/file.mjs", 2);
+handleNormalSessionToolAfter(honestBugBridge, {
+  tool: "write", sessionID: honestBugContext.sessionID, callID: "bug-fix-write",
+});
+const honestBugPreVerification = inspectNormalSessionQualityState(honestBugBridge, honestBugContext.sessionID);
+assert.deepEqual(honestBugPreVerification.incomplete_reasons, []);
+assert.equal(honestBugPreVerification.pending_mutations.length, 0);
+assert.equal(honestBugPreVerification.active_task_launch, null);
+const honestBugVerification = executeRawNormalSessionQualityTool(honestBugBridge, "quality_verification_record", {
+  request: JSON.stringify({ expected_revision: 1 }),
+}, { ...honestBugContext, agent: "verifier" });
+assert.equal(honestBugVerification.complete, true);
+assert.equal(honestBugVerification.receipts[0].observed_outcome, "passing_regression");
+
+for (const [sessionID, preOutcome, expectedPreFix, expectedGate] of [
+  ["session/bug-reproducer-unrelated", "unrelated_failure", "failing_reproducer", "blocked"],
+  ["session/bug-reproducer-unexpected-pass", "passing_regression", "failing_reproducer", "blocked"],
+  ["session/bug-reproducer-unavailable", "unavailable", "unavailable", "passed"],
+]) {
+  const targetBridge = createBugBridge(preOutcome);
+  const context = startBugSession(targetBridge, sessionID, expectedPreFix);
+  const gate = executeRawNormalSessionQualityTool(targetBridge, "quality_dossier_finalize", {
+    request: JSON.stringify({ expected_revision: 1 }),
+  }, context);
+  assert.equal(gate.gate_status, expectedGate);
+  const receipt = inspectNormalSessionQualityState(targetBridge, sessionID).preimplementation_check_receipts[0];
+  assert.equal(receipt.observed_outcome, preOutcome);
+}
 
 const windowsExitContext = { sessionID: "session/windows-exit-code", agent: "orchestrator" };
 executeNormalSessionQualityTool(bridge, "quality_dossier_create", {
@@ -780,13 +1068,13 @@ const windowsExitReviewer = executeNormalSessionQualityTool(bridge, "quality_arc
 executeNormalSessionQualityTool(bridge, "quality_dossier_finalize", {
   request: JSON.stringify({ expected_revision: windowsExitReviewer.dossier_revision }),
 }, windowsExitContext);
-for (const [status, exitCode] of [
-  ["failed", 0xC0000005],
-  ["timed_out", null],
-  ["unavailable", null],
-  ["malformed", null],
+for (const [runnerStatus, observedOutcome, expectedStatus, exitCode] of [
+  ["failed", "failed", "failed", 0xC0000005],
+  ["blocked", "timed_out", "blocked", null],
+  ["blocked", "unavailable", "blocked", null],
+  ["blocked", "malformed", "blocked", null],
 ]) {
-  trustedTargetResultOverride = { status, exit_code: exitCode };
+  trustedTargetResultOverride = { status: runnerStatus, observed_outcome: observedOutcome, exit_code: exitCode };
   let blockedVerification;
   try {
     blockedVerification = executeNormalSessionQualityTool(bridge, "quality_verification_record", {
@@ -797,7 +1085,8 @@ for (const [status, exitCode] of [
   }
   assert.equal(blockedVerification.complete, false);
   const blockedCheck = blockedVerification.receipts.find((entry) => entry.kind === "check");
-  assert.equal(blockedCheck.status, status);
+  assert.equal(blockedCheck.status, expectedStatus);
+  assert.equal(blockedCheck.observed_outcome, observedOutcome);
   assert.equal(blockedCheck.exit_code, exitCode);
 }
 assertContractError(() => executeNormalSessionQualityTool(bridge, "quality_session_finalize", {
@@ -1178,13 +1467,13 @@ assert.match(persistedCheckReceipt.command_fingerprint, /^sha256:[a-f0-9]{64}$/u
 assert.match(persistedCheckReceipt.evidence_fingerprint, /^sha256:[a-f0-9]{64}$/u);
 assertPersistedTamperRejected(bridge, orchestrator, (state) => {
   state.verification.receipts.find((entry) => entry.kind === "check").stdout_bytes += 1;
-}, "QUALITY_STATE_FINGERPRINT");
+}, "QUALITY_CHECK_RECEIPT");
 
 function createScopeLimitFixture(initialAffectedPaths = []) {
   let scopeEntries = [];
   const scopeObserver = () => {
     const entries = scopeEntries.map((entry) => ({ ...entry })).sort((left, right) => left.path.localeCompare(right.path));
-    return { head_sha: headSha, entries, dirty: false, fingerprint: fingerprint({ head_sha: headSha, entries }) };
+    return fixtureWorkspaceSnapshot(entries);
   };
   const scopeBridge = createNormalSessionQualityBridge({
     workspaceRoot: tempRoot,
@@ -1284,11 +1573,67 @@ try {
   const policyExample = new URL("../quality/schemas/architecture-policy.example.json", import.meta.url);
   const policyFile = path.join(policyRoot, "quality", "architecture-policy.json");
   fs.copyFileSync(policyExample, policyFile);
-  const policyBridge = createNormalSessionQualityBridge({ ...options, workspaceRoot: policyRoot });
+  const defaultEngineeringCatalog = createDefaultNormalSessionCheckCatalog();
+  const policyEngineeringCatalog = createEngineeringCheckCatalog({
+    catalog_id: "normal-session-policy-catalog-v2",
+    checks: [
+      ...defaultEngineeringCatalog.checks,
+      {
+        check_id: "normal-architecture-graph",
+        trusted_producer: "opencode-harness-normal-quality-runner",
+        phases: ["integration"],
+        available: true,
+      },
+    ],
+    mechanisms: defaultEngineeringCatalog.mechanisms,
+  });
+  const projectCheck = (checkId, phases, purpose = "verification", generatedOutputPaths = []) => ({
+    check_id: checkId,
+    executable_id: "node",
+    argv: ["scripts/fixture-check.mjs"],
+    cwd: ".",
+    phases,
+    purpose,
+    generated_output_paths: generatedOutputPaths,
+    timeout_ms: 120000,
+    max_output_chars: 1048576,
+  });
+  const policyProjectCatalog = {
+    schema_version: 2,
+    catalog_id: "normal-session-policy-project-catalog-v2",
+    checks: [
+      ...defaultEngineeringCatalog.checks.map((entry) => projectCheck(entry.check_id, entry.phases)),
+      projectCheck(
+        "normal-architecture-graph",
+        ["integration"],
+        "architecture_graph",
+        ["artifacts/architecture/post-edit-graph.json"],
+      ),
+    ],
+  };
+  const policyBridge = createNormalSessionQualityBridge({
+    ...options,
+    workspaceRoot: policyRoot,
+    checkCatalog: policyEngineeringCatalog,
+    projectCatalog: policyProjectCatalog,
+  });
   const policyContext = { sessionID: "session/policy", agent: "orchestrator" };
   const configuredPolicyRequest = () => {
     const request = fullDossierRequest();
     request.verification_boundary.ownership_paths = ["quality", "src"];
+    request.test_obligations.push({
+      id: "TEST-architecture-post",
+      check_id: "normal-architecture-graph",
+      kind: "integration",
+      phase: "integration",
+      scope_ids: ["AREA-src"],
+      command_or_mechanism: "trusted-project-check:normal-architecture-graph",
+      required: true,
+      trusted_producer: "opencode-harness-normal-quality-runner",
+    });
+    request.verification_plan.architecture_check_ids = ["normal-architecture-graph"];
+    request.verification_boundary.check_ids.push("normal-architecture-graph");
+    request.verification_boundary.integration_check_ids.push("normal-architecture-graph");
     return request;
   };
   const challengeConfiguredPolicy = (context) => {
@@ -1335,6 +1680,38 @@ try {
     request: JSON.stringify({ expected_revision: policyState.dossier.revision }),
   }, { ...policyContext, agent: "verifier" });
   assert.equal(policyVerification.complete, true);
+  const verifiedPolicyState = inspectNormalSessionQualityState(policyBridge, policyContext.sessionID);
+  assert.equal(verifiedPolicyState.post_architecture_evidence.architecture_evaluation.status, "passed");
+  assert.equal(
+    policyVerification.post_architecture_evidence_fingerprint,
+    verifiedPolicyState.post_architecture_evidence.fingerprint,
+  );
+
+  const forbiddenContext = { sessionID: "session/policy-forbidden-post-edit", agent: "orchestrator" };
+  executeNormalSessionQualityTool(policyBridge, "quality_dossier_create", {
+    request: JSON.stringify(configuredPolicyRequest()),
+  }, forbiddenContext);
+  const forbiddenRevision = challengeConfiguredPolicy(forbiddenContext);
+  const forbiddenFinalized = executeNormalSessionQualityTool(policyBridge, "quality_dossier_finalize", {
+    request: JSON.stringify({ expected_revision: forbiddenRevision }),
+  }, forbiddenContext);
+  architectureGraphOverride = forbiddenPolicyGraph();
+  let forbiddenVerification;
+  try {
+    forbiddenVerification = executeNormalSessionQualityTool(policyBridge, "quality_verification_record", {
+      request: JSON.stringify({ expected_revision: forbiddenFinalized.dossier_revision }),
+    }, { ...forbiddenContext, agent: "verifier" });
+  } finally {
+    architectureGraphOverride = null;
+  }
+  assert.equal(forbiddenVerification.receipts.every((entry) => entry.status === "passed"), true);
+  assert.equal(forbiddenVerification.complete, false);
+  const forbiddenState = inspectNormalSessionQualityState(policyBridge, forbiddenContext.sessionID);
+  assert.equal(forbiddenState.post_architecture_evidence.architecture_evaluation.status, "failed");
+  assert.equal(forbiddenState.post_architecture_evidence.architecture_evaluation.summary.introduced_count, 1);
+  assertContractError(() => executeNormalSessionQualityTool(policyBridge, "quality_session_finalize", {
+    request: JSON.stringify({ expected_revision: forbiddenFinalized.dossier_revision }),
+  }, forbiddenContext), "QUALITY_SESSION_FINALIZE");
 
   const changedPolicy = JSON.parse(fs.readFileSync(policyExample, "utf8"));
   changedPolicy.policy_id = "ARCHPOLICY-example-drifted";
@@ -1396,16 +1773,25 @@ try {
 
 const driftCatalogDirectory = path.join(tempRoot, ".opencode", "quality");
 const driftCatalogPath = path.join(driftCatalogDirectory, "checks.json");
+const driftToolchainPath = path.join(driftCatalogDirectory, "toolchains.json");
 fs.mkdirSync(driftCatalogDirectory, { recursive: true });
-const driftCatalog = {
+fs.writeFileSync(driftToolchainPath, `${JSON.stringify({
   schema_version: 1,
-  catalog_id: "normal-session-quality-catalog-v1",
+  map_id: "normal-session-quality-toolchains-v1",
+  toolchains: [{ executable_id: "node", resolver: "node" }],
+})}\n`, "utf8");
+const driftCatalog = {
+  schema_version: 2,
+  catalog_id: "normal-session-quality-catalog-v2",
   standard_lite_policy: options.standardLitePolicy,
   checks: ["normal-harness-static", "normal-engineering-quality", "normal-committed-whitespace"].map((checkId) => ({
     check_id: checkId,
-    argv: ["node", "--version"],
+    executable_id: "node",
+    argv: ["--version"],
     cwd: ".",
     phases: ["preimplementation", "slice", "integration"],
+    purpose: "verification",
+    generated_output_paths: [],
     timeout_ms: 1000,
     max_output_chars: 4096,
   })),
@@ -1455,6 +1841,38 @@ for (const driftKind of ["malformed", "missing"]) {
   }, { sessionID: childSessionID, agent: "verifier" });
   assert.equal(failedInspection.lifecycle, "failed");
   assert(failedInspection.incomplete_reasons.includes("QUALITY_CHECK_CATALOG_DRIFT"));
+}
+
+const nonNodeHostBoundaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-harness-non-node-host-boundary-"));
+try {
+  const nonNodeQualityRoot = path.join(nonNodeHostBoundaryRoot, ".opencode", "quality");
+  fs.mkdirSync(nonNodeQualityRoot, { recursive: true });
+  fs.writeFileSync(path.join(nonNodeQualityRoot, "checks.json"), `${JSON.stringify({
+    schema_version: 2,
+    catalog_id: "non-node-host-boundary-v2",
+    standard_lite_policy: options.standardLitePolicy,
+    checks: [{
+      check_id: "python-check",
+      executable_id: "python",
+      argv: ["tests/test_example.py"],
+      cwd: ".",
+      phases: ["preimplementation", "integration"],
+      purpose: "verification",
+      generated_output_paths: [],
+      timeout_ms: 1000,
+      max_output_chars: 4096,
+    }],
+  })}\n`, "utf8");
+  fs.writeFileSync(path.join(nonNodeQualityRoot, "toolchains.json"), `${JSON.stringify({
+    schema_version: 1,
+    map_id: "non-node-host-boundary-toolchains-v1",
+    toolchains: [{ executable_id: "python", resolver: "python" }],
+  })}\n`, "utf8");
+  assertContractError(() => createNormalSessionQualityBridge({
+    workspaceRoot: nonNodeHostBoundaryRoot,
+  }), "QUALITY_TOOLCHAIN_HOST_CONFIG_REQUIRED");
+} finally {
+  fs.rmSync(nonNodeHostBoundaryRoot, { recursive: true, force: true });
 }
 
 function runControlStateRestoreScenario(kind) {
@@ -1587,7 +2005,10 @@ try {
   assert.deepEqual(diffContentBoundWorkspaces(firstDirty, secondDirty), ["owned.txt"]);
   spawnSync("git", ["add", "owned.txt"], { cwd: gitFixture, encoding: "utf8", shell: false, windowsHide: true });
   const staged = observeContentBoundWorkspace(gitFixture, "fixture-salt");
-  assert.deepEqual(diffContentBoundWorkspaces(secondDirty, staged), ["owned.txt"], "index-only changes must remain content-bound");
+  assertContractError(
+    () => diffContentBoundWorkspaces(secondDirty, staged),
+    "QUALITY_WORKSPACE_INDEX_CHANGED",
+  );
   fs.writeFileSync(path.join(gitFixture, "owned.txt"), "index-a\n", "utf8");
   assert.equal(spawnSync("git", ["add", "owned.txt"], { cwd: gitFixture, shell: false, windowsHide: true }).status, 0);
   fs.writeFileSync(path.join(gitFixture, "owned.txt"), "constant-worktree\n", "utf8");
@@ -1596,10 +2017,9 @@ try {
   assert.equal(spawnSync("git", ["add", "owned.txt"], { cwd: gitFixture, shell: false, windowsHide: true }).status, 0);
   fs.writeFileSync(path.join(gitFixture, "owned.txt"), "constant-worktree\n", "utf8");
   const secondIndexIdentity = observeContentBoundWorkspace(gitFixture, "fixture-salt");
-  assert.deepEqual(
-    diffContentBoundWorkspaces(firstIndexIdentity, secondIndexIdentity),
-    ["owned.txt"],
-    "a staged-blob replacement must remain observable when status and worktree bytes are unchanged",
+  assertContractError(
+    () => diffContentBoundWorkspaces(firstIndexIdentity, secondIndexIdentity),
+    "QUALITY_WORKSPACE_INDEX_CHANGED",
   );
 
   const protectedDirectory = path.join(gitFixture, "src", "security");
@@ -1636,13 +2056,10 @@ try {
 
   const hiddenIgnoredBefore = observeContentBoundWorkspace(gitFixture, "fixture-salt", ["owned.txt"]);
   assert.equal(JSON.stringify(hiddenIgnoredBefore).includes("ignored/cache.txt"), false, "hidden ignored raw paths must not enter the serialized snapshot");
-  assert.match(hiddenIgnoredBefore.inventory_fingerprint, /^sha256:[a-f0-9]{64}$/u);
+  assert.match(hiddenIgnoredBefore.source_fingerprint, /^sha256:[a-f0-9]{64}$/u);
   fs.writeFileSync(ignoredFile, "three\n", "utf8");
   const hiddenIgnoredAfter = observeContentBoundWorkspace(gitFixture, "fixture-salt", ["owned.txt"]);
-  assertContractError(
-    () => diffContentBoundWorkspaces(hiddenIgnoredBefore, hiddenIgnoredAfter),
-    "QUALITY_WORKSPACE_INVENTORY_CHANGED",
-  );
+  assert.deepEqual(diffContentBoundWorkspaces(hiddenIgnoredBefore, hiddenIgnoredAfter), []);
 
   const infoExclude = path.join(gitFixture, ".git", "info", "exclude");
   fs.appendFileSync(infoExclude, "\ninfo-hidden/\n", "utf8");
@@ -1652,14 +2069,14 @@ try {
   const infoHiddenBefore = observeContentBoundWorkspace(gitFixture, "fixture-salt", ["owned.txt"]);
   fs.writeFileSync(infoHiddenFile, "two\n", "utf8");
   const infoHiddenAfter = observeContentBoundWorkspace(gitFixture, "fixture-salt", ["owned.txt"]);
-  assertContractError(() => diffContentBoundWorkspaces(infoHiddenBefore, infoHiddenAfter), "QUALITY_WORKSPACE_INVENTORY_CHANGED");
+  assert.deepEqual(diffContentBoundWorkspaces(infoHiddenBefore, infoHiddenAfter), []);
 
   fs.writeFileSync(path.join(gitFixture, "outside.txt"), "one\n", "utf8");
   assert.equal(spawnSync("git", ["update-index", "--skip-worktree", "outside.txt"], { cwd: gitFixture, shell: false, windowsHide: true }).status, 0);
   const skipBefore = observeContentBoundWorkspace(gitFixture, "fixture-salt", ["owned.txt"]);
   fs.writeFileSync(path.join(gitFixture, "outside.txt"), "skip-hidden\n", "utf8");
   const skipAfter = observeContentBoundWorkspace(gitFixture, "fixture-salt", ["owned.txt"]);
-  assertContractError(() => diffContentBoundWorkspaces(skipBefore, skipAfter), "QUALITY_WORKSPACE_INVENTORY_CHANGED");
+  assert.deepEqual(diffContentBoundWorkspaces(skipBefore, skipAfter), ["outside.txt"]);
   fs.writeFileSync(path.join(gitFixture, "outside.txt"), "one\n", "utf8");
   assert.equal(spawnSync("git", ["update-index", "--no-skip-worktree", "outside.txt"], { cwd: gitFixture, shell: false, windowsHide: true }).status, 0);
 
@@ -1667,7 +2084,7 @@ try {
   const assumeBefore = observeContentBoundWorkspace(gitFixture, "fixture-salt", ["owned.txt"]);
   fs.writeFileSync(path.join(gitFixture, "outside.txt"), "assume-hidden\n", "utf8");
   const assumeAfter = observeContentBoundWorkspace(gitFixture, "fixture-salt", ["owned.txt"]);
-  assertContractError(() => diffContentBoundWorkspaces(assumeBefore, assumeAfter), "QUALITY_WORKSPACE_INVENTORY_CHANGED");
+  assert.deepEqual(diffContentBoundWorkspaces(assumeBefore, assumeAfter), ["outside.txt"]);
   fs.writeFileSync(path.join(gitFixture, "outside.txt"), "one\n", "utf8");
   assert.equal(spawnSync("git", ["update-index", "--no-assume-unchanged", "outside.txt"], { cwd: gitFixture, shell: false, windowsHide: true }).status, 0);
   fs.writeFileSync(ignoredFile, "two\n", "utf8");

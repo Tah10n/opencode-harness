@@ -1,6 +1,6 @@
 {
-  "schema_version": 1,
-  "catalog_id": "project-checks-v1",
+  "schema_version": 2,
+  "catalog_id": "project-checks-v2",
   "standard_lite_policy": {
     "allowed_ownership_prefixes": ["src", "test"],
     "protected_paths": ["src/auth", "src/security"]
@@ -8,17 +8,31 @@
   "checks": [
     {
       "check_id": "unit-orders",
-      "argv": ["npm", "test", "--", "test/orders.test.ts"],
+      "executable_id": "npm",
+      "argv": ["test", "--", "test/orders.test.ts"],
       "cwd": ".",
       "phases": ["preimplementation", "slice", "integration"],
+      "purpose": "bug_reproducer",
+      "outcome_protocol": {
+        "kind": "exit_code",
+        "exit_codes": {
+          "failing_reproducer": [1],
+          "passing_regression": [0],
+          "unrelated_failure": [2],
+          "unavailable": [125]
+        }
+      },
+      "generated_output_paths": ["coverage/orders"],
       "timeout_ms": 120000,
       "max_output_chars": 1048576
     },
     {
       "check_id": "typecheck",
-      "argv": ["npm", "run", "typecheck"],
+      "executable_id": "npm",
+      "argv": ["run", "typecheck"],
       "cwd": ".",
       "phases": ["integration"],
+      "purpose": "verification",
       "timeout_ms": 120000,
       "max_output_chars": 1048576
     }

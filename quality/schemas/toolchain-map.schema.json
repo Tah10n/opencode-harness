@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Tah10n/opencode-harness/quality/schemas/toolchain-map.schema.json",
+  "title": "OpenCode Harness Trusted Toolchain Map",
+  "$comment": "Project-owned maps contain logical IDs and approved resolver families only. Absolute candidates and trusted roots are host configuration and are intentionally excluded from this schema.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "map_id", "toolchains"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "map_id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$" },
+    "toolchains": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "$comment": "executable_id uniqueness is enforced by the normative runtime validator.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["executable_id", "resolver"],
+        "properties": {
+          "executable_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$" },
+          "resolver": { "enum": ["node", "npm", "python", "pytest", "go", "cargo", "java", "maven", "gradle"] }
+        }
+      }
+    }
+  }
+}

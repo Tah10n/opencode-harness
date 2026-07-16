@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { DETERMINISTIC_STAGE_REGISTRY, deterministicExpectedChecks } from "./verify-all.mjs";
+import { milestone2ExpectedChecks } from "../lib/quality/milestone-dod.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const failures = [];
@@ -149,7 +150,11 @@ const requiredFiles = [
   "opencode.json",
   ".opencode/plugins/engineering-dossier.mjs",
   ".opencode/quality/checks.json",
+  ".opencode/quality/toolchains.json",
   "quality/schemas/project-check-catalog.schema.json",
+  "quality/schemas/post-edit-architecture-evidence.schema.json",
+  "quality/schemas/toolchain-host-configuration.schema.json",
+  "quality/schemas/toolchain-map.schema.json",
   "quality/examples/project-checks.example.json",
   "quality/examples/global-quality-plugin.mjs",
   "commands/learn.md",
@@ -220,11 +225,14 @@ const requiredFiles = [
   "lib/quality/normal-session-bridge.mjs",
   "lib/quality/normal-session-plugin.mjs",
   "lib/quality/project-check-catalog.mjs",
+  "lib/quality/post-architecture-evidence.mjs",
   "lib/quality/quality-plugin.mjs",
   "lib/quality/runtime-hook-verification.mjs",
   "lib/quality/session-classification.mjs",
   "lib/quality/standard-lite.mjs",
   "lib/quality/trusted-project-runner.mjs",
+  "lib/quality/trusted-toolchain-host-config.mjs",
+  "lib/quality/trusted-toolchains.mjs",
   "lib/quality/verification-targets.mjs",
   "lib/quality/whitespace.mjs",
   "lib/feedback/files.mjs",
@@ -233,6 +241,7 @@ const requiredFiles = [
   "lib/feedback/managed-command-sync-worker.mjs",
   "lib/feedback/privacy.mjs",
   "lib/feedback/process-tree.mjs",
+  "lib/feedback/process-containment.mjs",
   "lib/feedback/permission-surface.mjs",
   "lib/feedback/report-history.mjs",
   "lib/feedback/trace-assertions.mjs",
@@ -258,6 +267,10 @@ const requiredFiles = [
   "scripts/probe-normal-session-plugin-api.mjs",
   "scripts/verify-session-classification.mjs",
   "scripts/verify-project-check-catalog.mjs",
+  "scripts/verify-workspace-observation.mjs",
+  "scripts/verify-trusted-toolchain-host-config.mjs",
+  "scripts/verify-trusted-toolchains.mjs",
+  "scripts/verify-process-containment.mjs",
   "scripts/verify-trusted-project-runner.mjs",
   "scripts/verify-bash-boundary.mjs",
   "scripts/verify-global-quality-plugin-export.mjs",
@@ -310,6 +323,7 @@ const expectedDeterministicStages = [
   "verify:quality-contracts", "verify:engineering-dossier", "verify:architecture-policy", "verify:impact-graph",
   "verify:prompt-inventory", "verify:quality-live-coordinator", "verify:quality-live-runner", "verify:quality-verification-targets",
   "verify:normal-session-quality-bridge", "verify:session-classification", "verify:project-check-catalog",
+  "verify:workspace-observation", "verify:trusted-toolchain-host-config", "verify:trusted-toolchains", "verify:process-containment",
   "verify:trusted-project-runner", "verify:bash-boundary", "verify:global-quality-plugin-export",
   "verify:quality-live-manifests", "verify:quality-acceptance",
   "verify:whitespace:fixture", "verify:milestone-2-dod-contract",
@@ -328,18 +342,25 @@ for (const stage of DETERMINISTIC_STAGE_REGISTRY) {
     fail("HARNESS-S008", `verify-all references missing or recursive npm stage ${stage.npm_script}`, "Keep the registry and package scripts coherent and non-recursive.");
   }
 }
-const dodDocument = JSON.parse(read("quality/milestone-2-dod.v1.json"));
-const apiProbeDodItem = dodDocument.items.find((item) => item.check_ids.includes("normal-session-plugin-api-probe"));
-if (apiProbeDodItem?.execution_class !== "runtime_optional" || apiProbeDodItem.mandatory !== false) {
-  fail("HARNESS-S008", "the installed API probe must be optional runtime evidence in the Milestone 2 DoD", "Classify normal-session-plugin-api-probe as runtime_optional and non-mandatory.");
+const dodDocument = JSON.parse(read("quality/milestone-2-dod.v2.json"));
+const deterministicDimension = dodDocument.dimensions.find((item) => item.dimension_id === "deterministic_contracts");
+const hostHookDimension = dodDocument.dimensions.find((item) => item.dimension_id === "host_hook_e2e");
+if (dodDocument.schema_version !== 2 || !deterministicDimension || !hostHookDimension?.mandatory_for_verified) {
+  fail("HARNESS-S008", "Milestone 2 DoD must retain explicit deterministic and mandatory host-hook dimensions", "Restore the v2 operational dimension contract.");
 }
-const deterministicDodChecks = dodDocument.items
-  .filter((item) => item.execution_class === "deterministic")
-  .flatMap((item) => item.check_ids)
-  .sort();
-const registeredDodChecks = deterministicExpectedChecks().map((entry) => entry.check_id).sort();
+const deterministicDodChecks = [...deterministicDimension.check_ids].sort();
+const operationalDeterministicChecks = deterministicExpectedChecks();
+const registeredDodChecks = operationalDeterministicChecks.map((entry) => entry.check_id).sort();
 if (JSON.stringify(registeredDodChecks) !== JSON.stringify(deterministicDodChecks)) {
-  fail("HARNESS-S008", "verify-all receipt registry must map every deterministic DoD check exactly once", "Synchronize the runner registry with quality/milestone-2-dod.v1.json.");
+  fail("HARNESS-S008", "verify-all receipt registry must map every deterministic DoD check exactly once", "Synchronize the runner registry with quality/milestone-2-dod.v2.json.");
+}
+const canonicalDeterministicChecks = milestone2ExpectedChecks(dodDocument)
+  .filter((entry) => deterministicDimension.check_ids.includes(entry.check_id))
+  .sort((left, right) => left.check_id.localeCompare(right.check_id));
+const sortedOperationalChecks = [...operationalDeterministicChecks]
+  .sort((left, right) => left.check_id.localeCompare(right.check_id));
+if (JSON.stringify(sortedOperationalChecks) !== JSON.stringify(canonicalDeterministicChecks)) {
+  fail("HARNESS-S008", "verify-all receipt producers or command IDs drifted from the canonical DoD authority", "Keep operational receipt identities identical to lib/quality/milestone-dod.mjs.");
 }
 if (Object.hasOwn(packageJson.scripts ?? {}, "verify:milestone-2-dod")) {
   fail("HARNESS-S008", "the misleading verify:milestone-2-dod command must not remain exposed", "Use verify:milestone-2-dod-contract for manifest-only validation.");
@@ -380,6 +401,10 @@ for (const [name, command] of Object.entries({
   "verify:normal-session-quality-bridge": "node scripts/verify-normal-session-quality-bridge.mjs",
   "verify:session-classification": "node scripts/verify-session-classification.mjs",
   "verify:project-check-catalog": "node scripts/verify-project-check-catalog.mjs",
+  "verify:workspace-observation": "node scripts/verify-workspace-observation.mjs",
+  "verify:trusted-toolchain-host-config": "node scripts/verify-trusted-toolchain-host-config.mjs",
+  "verify:trusted-toolchains": "node scripts/verify-trusted-toolchains.mjs",
+  "verify:process-containment": "node scripts/verify-process-containment.mjs",
   "verify:trusted-project-runner": "node scripts/verify-trusted-project-runner.mjs",
   "verify:bash-boundary": "node scripts/verify-bash-boundary.mjs",
   "verify:global-quality-plugin-export": "node scripts/verify-global-quality-plugin-export.mjs",
@@ -389,6 +414,8 @@ for (const [name, command] of Object.entries({
   "verify:quality-live-manifests": "node scripts/verify-quality-live-manifests.mjs",
   "verify:quality-acceptance": "node scripts/verify-quality-acceptance.mjs",
   "verify:milestone-2-dod-contract": "node scripts/verify-milestone-2-dod.mjs",
+  "milestone:2:operational": "node scripts/run-milestone-2-operational.mjs",
+  "milestone:2:assess": "node scripts/assess-milestone-2-receipts.mjs",
   "verify:acceptance": "node scripts/verify-candidate-assessment.mjs",
   "verify:whitespace": "node scripts/verify-committed-whitespace.mjs",
   "verify:whitespace:fixture": "node scripts/verify-committed-whitespace-fixtures.mjs",
@@ -420,8 +447,11 @@ for (const needle of [
   "committedWhitespaceReceipt",
   "evidence_scope",
   "resolved_range",
-  "decision.status !== \"verified\"",
-  "optional external evidence is not requested",
+  "deriveMilestone2StatusFacts",
+  "sealMilestone2ReceiptBundle",
+  "OPENCODE_MILESTONE_RECEIPTS_OUT",
+  "deterministic_contracts",
+  "Operational runtime and installed-host evidence are reported separately",
 ]) {
   assertIncludes(verifyAllScript, needle, "scripts/verify-all.mjs", "HARNESS-S008", "The default verifier must remain a runner-owned bounded receipt aggregator.");
 }
@@ -429,7 +459,15 @@ for (const forbidden of ["OPENCODE_MODEL_RUNTIME_EVIDENCE_PATH", "OPENCODE_LIVE_
   assertNotIncludes(verifyAllScript, forbidden, "scripts/verify-all.mjs", "HARNESS-S008", "The deterministic runner must not self-declare external runtime or live success.");
 }
 const milestoneDodVerifier = read("scripts/verify-milestone-2-dod.mjs");
-for (const needle of ["consumes no execution receipts", "asserts no milestone completion status", "duplicate verification receipt", "untrusted producer", "substituted command"]) {
+for (const needle of [
+  "consumes no execution receipts",
+  "asserts no milestone completion status",
+  "duplicate verification receipt",
+  "generic receipt sealing is restricted to the deterministic runner",
+  "substituted command",
+  "missing operational artifacts must never upgrade the milestone",
+  "deterministic host fixtures must never satisfy installed-host evidence",
+]) {
   assertIncludes(milestoneDodVerifier, needle, "scripts/verify-milestone-2-dod.mjs", "HARNESS-S008", "The DoD command must be honest and exercise the receipt rejection matrix.");
 }
 if (packageJson.repository?.url !== "git+https://github.com/Tah10n/opencode-harness.git") {
@@ -1025,8 +1063,87 @@ for (const file of [
 }
 
 const workflow = read(".github/workflows/verify.yml");
-for (const needle of ["pull_request:", "workflow_dispatch:", "npm run verify", "actions/setup-node@v4", "Harness verification"]) {
+function workflowJobBlock(jobId) {
+  const lines = workflow.split(/\r?\n/u);
+  const escapedJobId = jobId.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
+  const start = lines.findIndex((line) => new RegExp(`^  ${escapedJobId}:\\s*$`, "u").test(line));
+  if (start < 0) {
+    fail("HARNESS-S002", `.github/workflows/verify.yml is missing the ${jobId} job`, "Restore the required workflow job.");
+    return "";
+  }
+  let end = lines.length;
+  for (let index = start + 1; index < lines.length; index += 1) {
+    if (/^  [A-Za-z0-9_-]+:\s*$/u.test(lines[index])) {
+      end = index;
+      break;
+    }
+  }
+  return lines.slice(start, end).join("\n");
+}
+
+for (const needle of [
+  "pull_request:", "workflow_dispatch:", "npm run verify", "actions/setup-node@v4", "Harness verification",
+  "linux-containment:", "windows-containment:", "ubuntu-latest", "windows-latest",
+  "OPENCODE_QUALITY_CGROUP_ROOT", "OPENCODE_QUALITY_CGROUP_ATTACH_MODE=sudo-helper-v1",
+  "OPENCODE_QUALITY_CGROUP_ATTACH_HELPER", "opencode-quality-workload/cgroup.procs",
+  "expected_uid", "SUDO_UID", "npm run milestone:2:operational",
+  "npm run milestone:2:assess", "--host-unavailable", "actions/upload-artifact@v4",
+  "actions/download-artifact@v4", "sudo useradd", "attach helper can write the guard cgroup",
+  "Require successful receipt producers", "needs.verify.result", "needs.linux-containment.result",
+  "needs.windows-containment.result", '[[ "$result" != "success" ]]',
+]) {
   assertIncludes(workflow, needle, ".github/workflows/verify.yml");
+}
+const aggregateJob = workflowJobBlock("milestone-2-status");
+const aggregateStepNames = [...aggregateJob.matchAll(/^      - name:\s*(.+?)\s*$/gmu)].map((match) => match[1]);
+const producerResultGate = aggregateJob.indexOf("Require successful receipt producers");
+const receiptDownload = aggregateJob.indexOf("Download milestone receipt bundles");
+const receiptAggregation = aggregateJob.indexOf("Aggregate real execution receipts");
+if (aggregateStepNames[0] !== "Require successful receipt producers"
+  || producerResultGate < 0 || receiptDownload <= producerResultGate || receiptAggregation <= receiptDownload) {
+  fail(
+    "HARNESS-S002",
+    ".github/workflows/verify.yml milestone-2-status must reject failed receipt-producing jobs before any artifact handling",
+    "Keep the needs.*.result gate as the first milestone-2-status step, ahead of checkout, download, and aggregation.",
+  );
+}
+for (const needle of [
+  "VERIFY_RESULT: ${{ needs.verify.result }}",
+  "LINUX_RESULT: ${{ needs.linux-containment.result }}",
+  "WINDOWS_RESULT: ${{ needs.windows-containment.result }}",
+  '[[ "$result" != "success" ]]',
+]) {
+  assertIncludes(
+    aggregateJob,
+    needle,
+    ".github/workflows/verify.yml milestone-2-status job",
+    "HARNESS-S002",
+    "Keep the producer-conclusion gate scoped to the aggregate job.",
+  );
+}
+for (const producerJobId of ["verify", "linux-containment", "windows-containment"]) {
+  assertNotIncludes(
+    workflowJobBlock(producerJobId),
+    "Require successful receipt producers",
+    `.github/workflows/verify.yml ${producerJobId} job`,
+    "HARNESS-S003",
+    "Producer jobs cannot read their own needs result; keep the gate in milestone-2-status.",
+  );
+}
+const cgroupShellMigration = 'echo "$$" | sudo tee "$OPENCODE_QUALITY_CGROUP_ROOT/cgroup.procs" > /dev/null';
+if (workflow.includes(cgroupShellMigration)) {
+  fail(
+    "HARNESS-S002",
+    ".github/workflows/verify.yml must keep coordinators outside the exclusive delegated cgroup root",
+    "Attach only idle managed workers through the fixed narrow helper; never move the workflow shell into the kill boundary.",
+  );
+}
+if (workflow.split("npm run milestone:2:operational").length - 1 !== 2) {
+  fail(
+    "HARNESS-S002",
+    ".github/workflows/verify.yml must produce exactly one Windows and one Linux operational receipt bundle",
+    "Keep platform execution in the runner-owned operational wrapper and aggregate both artifacts.",
+  );
 }
 
 const repositoriesDoc = read("docs/repositories.md");
@@ -1340,8 +1457,22 @@ for (const needle of ["external_directory", "config.bash.", "unknown permission 
   assertIncludes(runtimeFixtureVerifier, needle, "scripts/verify-runtime-fixtures.mjs", "HARNESS-S060", "Runtime fixtures must prove complete permission extraction and explicit incomplete evidence.");
 }
 const qualityRuntimeFixtures = read("scripts/verify-normal-session-runtime-fixtures.mjs");
-for (const needle of ["QUALITY_HOST_PLUGIN_NOT_DISCOVERED", "QUALITY_HOST_HOOK_MISSING_CHAT_MESSAGE", "QUALITY_HOST_HOOK_NOT_INVOKED_TOOL_EXECUTE_BEFORE", "QUALITY_HOST_PRE_GATE_EDIT_NOT_BLOCKED", "QUALITY_HOST_PROBE_FILE_CHANGED", "QUALITY_HOST_PERMISSION_MISMATCH", "QUALITY_HOST_STANDARD_LITE_NOT_STARTED", "QUALITY_HOST_CAPABILITY_NOT_AUTHORIZED", "QUALITY_HOST_AFTER_HOOK_NOT_RECONCILED", "QUALITY_HOST_PROJECT_CHECK_NOT_PASSED", "QUALITY_HOST_FINAL_ATTESTATION_MISSING", "QUALITY_HOST_EVIDENCE_STALE", "QUALITY_HOST_EVIDENCE_SOURCE_MISMATCH", "QUALITY_HOST_EVIDENCE_WORKSPACE_MISMATCH", "QUALITY_HOST_EVIDENCE_FINAL_WORKSPACE_MISMATCH", "QUALITY_HOST_EVIDENCE_FINGERPRINT", "QUALITY_HOST_EVIDENCE_TRUST_REQUIRED", "transitive runtime dependencies", "trusted_adapter"]) {
-  assertIncludes(qualityRuntimeFixtures, needle, "scripts/verify-normal-session-runtime-fixtures.mjs", "HARNESS-S060", "Runtime host-evidence fixtures must cover missing, unsafe, stale, mismatched, and forged evidence.");
+for (const needle of [
+  "QUALITY_HOST_PLUGIN_NOT_DISCOVERED", "QUALITY_HOST_HOOK_MISSING_CHAT_MESSAGE",
+  "QUALITY_HOST_HOOK_NOT_INVOKED_TOOL_EXECUTE_AFTER", "QUALITY_HOST_PROBE_FILE_CHANGED",
+  "QUALITY_HOST_PERMISSION_MISMATCH", "QUALITY_HOST_RAW_OUTPUT_PERSISTED",
+  "QUALITY_HOST_SCENARIO_CONTRACT_MISMATCH", "QUALITY_HOST_SCENARIO_ORDER_MISMATCH",
+  "QUALITY_HOST_SCENARIO_CODE_MISMATCH", "QUALITY_HOST_SCENARIO_STATUS_MISMATCH",
+  "QUALITY_HOST_SCENARIO_PATH_MISMATCH", "QUALITY_HOST_SCENARIO_CAPABILITY_MISMATCH",
+  "QUALITY_HOST_SCENARIO_CALL_MISMATCH", "QUALITY_HOST_SCENARIO_WORKSPACE_MISMATCH",
+  "QUALITY_HOST_SCENARIO_RECEIPT_MISMATCH", "QUALITY_HOST_SCENARIO_ATTESTATION_MISMATCH",
+  "QUALITY_HOST_SCENARIO_RUN_BINDING_MISMATCH", "QUALITY_HOST_SCENARIO_PREVIOUS_MISMATCH",
+  "QUALITY_HOST_EVIDENCE_STALE", "QUALITY_HOST_EVIDENCE_SOURCE_MISMATCH",
+  "QUALITY_HOST_EVIDENCE_WORKSPACE_MISMATCH", "QUALITY_HOST_EVIDENCE_FINAL_WORKSPACE_MISMATCH",
+  "QUALITY_HOST_EVIDENCE_FINGERPRINT", "QUALITY_HOST_EVIDENCE_TRUST_REQUIRED",
+  "scenario_contract", "observed_scenarios", "run_binding_fingerprint",
+]) {
+  assertIncludes(qualityRuntimeFixtures, needle, "scripts/verify-normal-session-runtime-fixtures.mjs", "HARNESS-S060", "Runtime v2 fixtures must cover all ten ordered scenarios plus missing, unsafe, stale, mismatched, and forged evidence.");
 }
 for (const needle of ["agent-list.txt", "unexpected-agent", "wrongRequiredModeFixture", "extraDangerousAgentFixture", "HARNESS-R022", "HARNESS-R023", "HARNESS-R024"]) {
   assertIncludes(runtimeFixtureVerifier, needle, "scripts/verify-runtime-fixtures.mjs", "HARNESS-S060", "Runtime fixtures must prove authoritative installed-agent discovery, extra-agent capture, and fail-closed inventory handling.");
@@ -1432,13 +1563,149 @@ for (const needle of ["workspaceRoot", "publishImmutableSet", "complete.json", "
 }
 
 const adapterWorker = read("lib/feedback/adapter-worker.mjs");
-for (const needle of ["spawn", "./process-tree.mjs", "prepareProcessContainment", "terminateProcessTree", "releaseUnverifiedChild", "adapter_teardown_unverified", "traceLimits", "trace_request", "payload_json", "result_json", "encodePlainJson", "AdapterTimeoutError"]) {
+for (const needle of ["spawn", "./process-tree.mjs", "prepareProcessContainment", "terminateProcessTree", "releaseUnverifiedChild", "adapter_teardown_unverified", "traceLimits", "trace_request", "payload_json", "result_json", "encodePlainJson", "AdapterTimeoutError", "containmentSetupTimeoutMs", "adapter_process_containment_timeout", "adapter_working_directory_changed", "workingDirectoryIdentity", "currentWorkingDirectoryIdentity"]) {
   assertIncludes(adapterWorker, needle, "lib/feedback/adapter-worker.mjs", "HARNESS-S079", "Live adapters must use bounded trace RPC and verified process-tree teardown.");
 }
 
 const processTree = read("lib/feedback/process-tree.mjs");
-for (const needle of ["taskkill.exe", "process.kill(-pid", "terminateProcessTree", "releaseUnverifiedChild", "runManagedCommand", "ProcessTreeTeardownError"]) {
+for (const needle of ["taskkill.exe", "process.kill(-pid", "terminateProcessTree", "releaseUnverifiedChild", "runManagedCommand", "ProcessTreeTeardownError", "containmentSetupTimeoutMs", "process_containment_setup_timeout", "observeLateProcessContainment", "expected_working_directory_identity", "assertManagedCommandWorkingDirectoryIdentityCurrent", "assertInheritedManagedCommandWorkingDirectoryIdentityCurrent", "PROCESS_WORKING_DIRECTORY_CHANGED"]) {
   assertIncludes(processTree, needle, "lib/feedback/process-tree.mjs", "HARNESS-S079", "Keep Windows/POSIX process-tree teardown and managed command settlement centralized.");
+}
+const containedWorkerStart = processTree.indexOf("const COMMAND_WORKER_SOURCE");
+const containedToolchainCheck = processTree.indexOf(
+  "assertTrustedToolchainInvocationCurrent(input.expected_invocation);",
+  containedWorkerStart,
+);
+const containedCommandBinding = processTree.indexOf(
+  "assertTrustedToolchainCommandBinding(input.expected_invocation, input.file, input.args);",
+  containedToolchainCheck,
+);
+const finalCwdIdentityCheck = processTree.indexOf(
+  "assertInheritedManagedCommandWorkingDirectoryIdentityCurrent(",
+  containedCommandBinding,
+);
+const containedCommandSpawn = processTree.indexOf("commandChild = spawn(input.file", finalCwdIdentityCheck);
+const containedCommandSpawnEnd = processTree.indexOf('send({ type: "spawned"', containedCommandSpawn);
+if (containedToolchainCheck < 0
+  || containedCommandBinding <= containedToolchainCheck
+  || finalCwdIdentityCheck <= containedCommandBinding
+  || containedCommandSpawn <= finalCwdIdentityCheck
+  || containedCommandSpawnEnd <= containedCommandSpawn
+  || processTree.slice(containedCommandSpawn, containedCommandSpawnEnd).includes("cwd: input.cwd")) {
+  fail(
+    "HARNESS-S079",
+    "contained managed commands must revalidate toolchain identity, then inherited cwd identity, without reopening cwd at spawn",
+    "Keep the inherited cwd assertion last and omit cwd from the contained command spawn.",
+  );
+}
+const defaultCommandFactory = processTree.indexOf("function defaultCommandProcessFactory(input)");
+const defaultFactoryCwdCheck = processTree.indexOf(
+  "assertManagedCommandWorkingDirectoryIdentityCurrent(",
+  defaultCommandFactory,
+);
+const defaultFactorySpawn = processTree.indexOf("return spawn(process.execPath", defaultFactoryCwdCheck);
+const defaultFactoryCwdOpen = processTree.indexOf("cwd: input.cwd", defaultFactorySpawn);
+if (defaultCommandFactory < 0
+  || defaultFactoryCwdCheck <= defaultCommandFactory
+  || defaultFactorySpawn <= defaultFactoryCwdCheck
+  || defaultFactoryCwdOpen <= defaultFactorySpawn) {
+  fail(
+    "HARNESS-S079",
+    "managed command worker must open the freshly revalidated cwd before containment setup",
+    "Bind default worker creation to input.cwd immediately after the parent-side identity check.",
+  );
+}
+
+const trustedToolchains = read("lib/quality/trusted-toolchains.mjs");
+for (const needle of [
+  "org.gradle.projectcachedir",
+  "org.gradle.jvmargs",
+  "cannot use Java argument files",
+  "mavenControlPlan",
+  "maven_control_user_settings",
+  "maven_project_extensions",
+  "maven_user_extensions",
+  "maven_project_config",
+  "maven_project_system_properties",
+  "maven_user_system_properties",
+  "maven-system.properties",
+  "maven-user.properties",
+  "maven.user.extensions",
+  "maven.user.settings",
+  "maven.user.toolchains",
+  "maven.project.extensions",
+  "maven.project.conf",
+  "maven.project.settings",
+  "maven.user.conf",
+  "maven.installation.conf",
+  "maven.installation.extensions",
+  "maven.installation.settings",
+  "maven.installation.toolchains",
+  "maven.settings.security",
+  "maven.repo.local.head",
+  "maven.repo.local.tail",
+  "projectConfigurationAncestors",
+  "gradle_project_properties_",
+  "gradle_user_properties",
+  "gradle_user_init_directory",
+  "gradle_installation_properties",
+  'subdirectories: ["lib", "init.d"]',
+  "runtime_metadata_fingerprint",
+  "managed_worker_executable_path",
+  "managed_worker_identity_fingerprint",
+  "implicit_configuration",
+]) {
+  assertIncludes(trustedToolchains, needle, "lib/quality/trusted-toolchains.mjs", "HARNESS-S079", "Trusted Maven and Gradle launches must close direct and implicit resolver-override channels.");
+}
+assertIncludes(
+  read("lib/quality/trusted-toolchain-host-config.mjs"),
+  'TRUSTED_TOOLCHAIN_RESOLUTION_POLICY_VERSION = "trusted-toolchain-resolution-v4"',
+  "lib/quality/trusted-toolchain-host-config.mjs",
+  "HARNESS-S079",
+  "Semantic toolchain-resolution changes must invalidate v3 receipts.",
+);
+const trustedProjectRunner = read("lib/quality/trusted-project-runner.mjs");
+for (const needle of [
+  "TRUSTED_PROJECT_CHECK_RECEIPT_SCHEMA_VERSION = 3",
+  'TRUSTED_PROJECT_CHECK_PRODUCER = "opencode-harness/trusted-project-runner-v3"',
+  'TRUSTED_PROJECT_EXECUTION_POLICY_VERSION = "trusted-project-execution-v5"',
+  "managed_worker_executable_path",
+  "toolchain_runtime_metadata_fingerprint",
+  "workingDirectoryIdentityFingerprint",
+  "expectedWorkingDirectoryIdentity",
+]) {
+  assertIncludes(
+    trustedProjectRunner,
+    needle,
+    "lib/quality/trusted-project-runner.mjs",
+    "HARNESS-S079",
+    "Trusted receipts must bind policy-v4 runtime metadata, the managed worker, and cwd identity.",
+  );
+}
+assertIncludes(
+  read("lib/quality/normal-session-bridge.mjs"),
+  "toolchain_runtime_metadata_fingerprint",
+  "lib/quality/normal-session-bridge.mjs",
+  "HARNESS-S079",
+  "Normal-session receipt persistence must retain toolchain runtime metadata identity.",
+);
+
+const milestoneRunContext = read("lib/quality/milestone-run-context.mjs");
+for (const needle of [
+  "observeContentBoundWorkspaceWithSourceAttestation",
+  "source_attestation_fingerprint",
+  "assertMilestone2RunContextStable",
+  "MILESTONE_SOURCE_CHANGED_DURING_RUN",
+  "milestone2SharedRunFingerprint",
+]) {
+  assertIncludes(milestoneRunContext, needle, "lib/quality/milestone-run-context.mjs", "HARNESS-S079", "Milestone receipt provenance must bind portable source state and re-observe before sealing.");
+}
+for (const file of [
+  "scripts/verify-all.mjs",
+  "scripts/run-milestone-2-operational.mjs",
+  "scripts/verify-normal-session-runtime.mjs",
+]) {
+  assertIncludes(read(file), "assertMilestone2RunContextStable", file, "HARNESS-S079", "Every Milestone 2 producer must re-observe source state before sealing evidence.");
 }
 
 const acceptanceEngine = read("lib/feedback/acceptance.mjs");

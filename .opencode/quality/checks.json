@@ -1,6 +1,6 @@
 {
-  "schema_version": 1,
-  "catalog_id": "opencode-harness-project-checks-v1",
+  "schema_version": 2,
+  "catalog_id": "opencode-harness-project-checks-v2",
   "standard_lite_policy": {
     "allowed_ownership_prefixes": ["src", "tests", "docs"],
     "protected_paths": ["src/auth", "src/authentication", "src/security"]
@@ -8,105 +8,131 @@
   "checks": [
     {
       "check_id": "verify-static",
-      "argv": ["npm", "run", "verify:static"],
+      "executable_id": "npm",
+      "argv": ["run", "verify:static"],
       "cwd": ".",
       "phases": ["preimplementation", "slice", "integration"],
+      "purpose": "verification",
       "timeout_ms": 120000,
       "max_output_chars": 1048576
     },
     {
       "check_id": "verify-engineering-dossier",
-      "argv": ["npm", "run", "verify:engineering-dossier"],
+      "executable_id": "npm",
+      "argv": ["run", "verify:engineering-dossier"],
       "cwd": ".",
       "phases": ["preimplementation", "slice", "integration"],
+      "purpose": "verification",
       "timeout_ms": 120000,
       "max_output_chars": 1048576
     },
     {
       "check_id": "verify-quality-verification-targets",
-      "argv": ["npm", "run", "verify:quality-verification-targets"],
+      "executable_id": "npm",
+      "argv": ["run", "verify:quality-verification-targets"],
       "cwd": ".",
       "phases": ["slice", "integration"],
+      "purpose": "verification",
       "timeout_ms": 120000,
       "max_output_chars": 1048576
     },
     {
       "check_id": "verify-normal-session-quality-bridge",
-      "argv": ["npm", "run", "verify:normal-session-quality-bridge"],
+      "executable_id": "npm",
+      "argv": ["run", "verify:normal-session-quality-bridge"],
       "cwd": ".",
       "phases": ["slice", "integration"],
+      "purpose": "verification",
       "timeout_ms": 180000,
       "max_output_chars": 2097152
     },
     {
       "check_id": "verify-quality-acceptance",
-      "argv": ["npm", "run", "verify:quality-acceptance"],
+      "executable_id": "npm",
+      "argv": ["run", "verify:quality-acceptance"],
       "cwd": ".",
       "phases": ["integration"],
+      "purpose": "verification",
       "timeout_ms": 180000,
       "max_output_chars": 2097152
     },
     {
       "check_id": "verify-session-classification",
-      "argv": ["npm", "run", "verify:session-classification"],
+      "executable_id": "npm",
+      "argv": ["run", "verify:session-classification"],
       "cwd": ".",
       "phases": ["preimplementation", "slice", "integration"],
+      "purpose": "verification",
       "timeout_ms": 120000,
       "max_output_chars": 1048576
     },
     {
       "check_id": "verify-project-check-catalog",
-      "argv": ["npm", "run", "verify:project-check-catalog"],
+      "executable_id": "npm",
+      "argv": ["run", "verify:project-check-catalog"],
       "cwd": ".",
       "phases": ["preimplementation", "slice", "integration"],
+      "purpose": "verification",
       "timeout_ms": 120000,
       "max_output_chars": 1048576
     },
     {
       "check_id": "verify-trusted-project-runner",
-      "argv": ["npm", "run", "verify:trusted-project-runner"],
+      "executable_id": "npm",
+      "argv": ["run", "verify:trusted-project-runner"],
       "cwd": ".",
       "phases": ["preimplementation", "slice", "integration"],
+      "purpose": "verification",
       "timeout_ms": 120000,
       "max_output_chars": 1048576
     },
     {
       "check_id": "verify-bash-boundary",
-      "argv": ["npm", "run", "verify:bash-boundary"],
+      "executable_id": "npm",
+      "argv": ["run", "verify:bash-boundary"],
       "cwd": ".",
       "phases": ["slice", "integration"],
+      "purpose": "verification",
       "timeout_ms": 120000,
       "max_output_chars": 1048576
     },
     {
       "check_id": "verify-global-quality-plugin-export",
-      "argv": ["npm", "run", "verify:global-quality-plugin-export"],
+      "executable_id": "npm",
+      "argv": ["run", "verify:global-quality-plugin-export"],
       "cwd": ".",
       "phases": ["slice", "integration"],
+      "purpose": "verification",
       "timeout_ms": 120000,
       "max_output_chars": 1048576
     },
     {
       "check_id": "verify-runtime-quality-hooks-fixture",
-      "argv": ["npm", "run", "verify:runtime:quality-hooks:fixture"],
+      "executable_id": "npm",
+      "argv": ["run", "verify:runtime:quality-hooks:fixture"],
       "cwd": ".",
       "phases": ["slice", "integration"],
+      "purpose": "verification",
       "timeout_ms": 120000,
       "max_output_chars": 1048576
     },
     {
       "check_id": "verify-whitespace",
-      "argv": ["npm", "run", "verify:whitespace"],
+      "executable_id": "npm",
+      "argv": ["run", "verify:whitespace"],
       "cwd": ".",
       "phases": ["integration"],
+      "purpose": "verification",
       "timeout_ms": 120000,
       "max_output_chars": 1048576
     },
     {
       "check_id": "verify-all",
-      "argv": ["npm", "run", "verify"],
+      "executable_id": "npm",
+      "argv": ["run", "verify"],
       "cwd": ".",
       "phases": ["integration"],
+      "purpose": "verification",
       "timeout_ms": 600000,
       "max_output_chars": 4194304
     }

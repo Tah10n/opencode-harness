@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "map_id": "opencode-harness-toolchains-v1",
+  "toolchains": [
+    {
+      "executable_id": "node",
+      "resolver": "node"
+    },
+    {
+      "executable_id": "npm",
+      "resolver": "npm"
+    }
+  ]
+}

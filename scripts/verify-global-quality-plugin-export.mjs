@@ -24,17 +24,50 @@ for (const relative of [
   assert(source.includes('from "opencode-harness/quality-plugin"'));
   assert.equal(source.includes("../../lib/quality"), false, `${relative} must use the public package export`);
 }
+const localWrapperSource = fs.readFileSync(path.join(root, ".opencode/plugins/engineering-dossier.mjs"), "utf8");
+const globalWrapperSource = fs.readFileSync(path.join(root, "quality/examples/global-quality-plugin.mjs"), "utf8");
+assert.equal(localWrapperSource.includes("hostToolchainAnchorUrl"), false, "project-local wrapper cannot claim a host-owned anchor");
+assert(globalWrapperSource.includes("hostToolchainAnchorUrl: import.meta.url"), "global wrapper must bind host configuration beside itself");
 
 const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-harness-plugin-export-"));
 fs.mkdirSync(path.join(tempRoot, "src"));
 fs.writeFileSync(path.join(tempRoot, "src", "file.mjs"), "export const value = 1;\n", "utf8");
 const headSha = "e".repeat(40);
 const observeWorkspace = () => {
-  const body = { head_sha: headSha, entries: [] };
-  return { ...body, fingerprint: fingerprint(body) };
+  const source = {
+    schema_version: 3,
+    head_sha: headSha,
+    index_entry_count: 0,
+    index_fingerprint: fingerprint({ index: "global-plugin-export-fixture" }),
+    entries: [],
+    dirty: false,
+  };
+  const sourceFingerprint = fingerprint(source);
+  const declaredOutputEntries = [];
+  const declaredOutputsFingerprint = fingerprint({ schema_version: 3, entries: declaredOutputEntries });
+  return {
+    ...source,
+    declared_output_entries: declaredOutputEntries,
+    source_fingerprint: sourceFingerprint,
+    declared_outputs_fingerprint: declaredOutputsFingerprint,
+    fingerprint: fingerprint({
+      schema_version: 3,
+      source_fingerprint: sourceFingerprint,
+      declared_outputs_fingerprint: declaredOutputsFingerprint,
+    }),
+  };
 };
 const toolFactory = (definition) => definition;
 toolFactory.schema = { string: () => ({ describe: () => ({ type: "string" }) }) };
+assert.throws(() => createNormalSessionQualityPlugin({
+  toolFactory,
+  workspaceRoot: tempRoot,
+  bridgeOptions: {
+    checkCatalog: createDefaultNormalSessionCheckCatalog(),
+    observeWorkspace,
+    hostToolchainAnchorUrl: import.meta.url,
+  },
+}), (error) => error instanceof ContractError && error.code === "QUALITY_TOOLCHAIN_HOST_CONFIG_BOUNDARY");
 const plugin = createNormalSessionQualityPlugin({
   toolFactory,
   workspaceRoot: tempRoot,

@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Tah10n/opencode-harness/quality/schemas/post-edit-architecture-evidence.schema.json",
+  "title": "Trusted post-edit architecture evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "evidence_id",
+    "producer",
+    "mechanism_kind",
+    "extractor_identity",
+    "evaluator_identity",
+    "command_receipt_fingerprint",
+    "extractor_output_fingerprint",
+    "policy_fingerprint",
+    "final_workspace_fingerprint",
+    "extracted_graph_fingerprint",
+    "architecture_evaluation",
+    "completed_at",
+    "fingerprint"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "evidence_id": { "$ref": "#/$defs/safe_id" },
+    "producer": { "const": "opencode-harness/post-edit-architecture-v1" },
+    "mechanism_kind": { "enum": ["project_check", "runner_owned_extractor"] },
+    "extractor_identity": { "$ref": "#/$defs/extractor_identity" },
+    "evaluator_identity": { "$ref": "#/$defs/evaluator_identity" },
+    "command_receipt_fingerprint": {
+      "anyOf": [{ "$ref": "#/$defs/fingerprint" }, { "type": "null" }]
+    },
+    "extractor_output_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "policy_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "final_workspace_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "extracted_graph_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "architecture_evaluation": { "$ref": "architecture-evaluation.schema.json" },
+    "completed_at": { "type": "string", "format": "date-time" },
+    "fingerprint": { "$ref": "#/$defs/fingerprint" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "mechanism_kind": { "const": "project_check" } } },
+      "then": { "properties": { "command_receipt_fingerprint": { "$ref": "#/$defs/fingerprint" } } },
+      "else": { "properties": { "command_receipt_fingerprint": { "type": "null" } } }
+    }
+  ],
+  "$defs": {
+    "fingerprint": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "safe_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+    },
+    "extractor_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["producer", "mechanism_id", "implementation_fingerprint"],
+      "properties": {
+        "producer": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "mechanism_id": { "$ref": "#/$defs/safe_id" },
+        "implementation_fingerprint": { "$ref": "#/$defs/fingerprint" }
+      }
+    },
+    "evaluator_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["producer", "algorithm_ids", "implementation_fingerprint"],
+      "properties": {
+        "producer": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "algorithm_ids": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/safe_id" }
+        },
+        "implementation_fingerprint": { "$ref": "#/$defs/fingerprint" }
+      }
+    }
+  }
+}

@@ -6,6 +6,39 @@ This section describes the development checkout. The latest tagged release is
 still `v0.2.0`; its package metadata has no `exports` field and does not expose
 the feedback-plane ESM subpaths documented for the `0.3.0` target.
 
+- Implemented Milestone 2's operational hardening code and deterministic contract: bounded
+  ignored-aware source/output observation; logical trusted toolchains with
+  fixed-source host configuration, all nine resolver families, sanitized
+  environment receipts, and immediately-before-spawn identity revalidation;
+  Windows Job Object and delegated Linux
+  cgroup-v2 descendant containment; honest standard-lite reproduction
+  outcomes; ten-scenario disabled-Bash host-flow fixtures; trusted post-edit
+  architecture evidence; and receipt-driven partial/blocked completion states.
+- Bound cross-job evidence to a metadata-independent portable source attestation,
+  re-observed source state before receipt sealing, and required successful CI
+  producer results before aggregation. Separated containment-setup and execution
+  deadlines, bound adapter cwd through child import, aligned Linux guard identity,
+  bounded direct cgroup descendants, and closed Java/Maven/Gradle response-file,
+  resolver-property, implicit-config, and writable Gradle init-script bypasses.
+  Late containment results are now closed, partial pre-READY Linux leaves are
+  root-cleaned, and trusted command cwd identity is bound through the contained
+  spawn without reopening the checked cwd path. Toolchain policy v4 also binds
+  the configured Node runtime used by the internal sync worker, so bundled
+  Bun/OpenCode hosts and non-Node project checks do not inherit ambient
+  `process.execPath`. It retains sealed
+  Maven settings/toolchains, Maven extension denial, Maven 4 property-file and
+  routing-property denial, Gradle ancestor/user/installation configuration
+  coverage, installation init-script manifests, and receipt-bound runtime-metadata
+  inventory. Installed-host adapters have a bounded five-minute execution
+  budget and retry transient Windows probe cleanup without upgrading a failed
+  cleanup to verified evidence.
+- Hardened Milestone 2 completion evidence so deterministic fixtures cannot mint
+  operational or installed-host success. CI now uploads sealed deterministic,
+  Windows Job Object, and guarded Linux cgroup-v2 bundles, aggregates only
+  same-HEAD/run provenance, and reports an absent installed adapter as bounded
+  external state. Linux containment keeps coordinators outside an exclusive
+  root, uses a narrow fixed-leaf attach helper, and kills root/sibling migrations
+  through the root boundary before confirming an empty retained delegation.
 - Implemented Milestone 2's versioned Engineering Dossier, runner-owned
   computational pre-implementation gate, immutable quality attestation, and
   public `opencode-harness/quality` boundary. High and critical instrumented

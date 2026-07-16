@@ -22,15 +22,19 @@ const dossier = {
   implementation_slices: [],
   subagent_handoffs: [],
   verification_boundary: {
-    check_ids: ["check-boundary", "check-boundary"],
+    check_ids: ["check-boundary", "check-boundary", "check-reproducer"],
     mechanism_ids: ["mechanism-boundary", "mechanism-boundary"],
     integration_check_ids: ["check-integration"],
   },
   test_obligations: [
     { check_id: "check-boundary", phase: "integration", required: false },
     { check_id: "check-integration", phase: "integration", required: false },
+    { check_id: "check-dual-phase", phase: "slice", required: true },
+    { check_id: "check-dual-phase", phase: "integration", required: true },
     { check_id: "check-required-obligation", phase: "slice", required: true },
     { check_id: "check-required-obligation", phase: "slice", required: true },
+    { check_id: "check-reproducer", phase: "preimplementation", required: true },
+    { check_id: "check-reproducer", phase: "integration", required: true },
     { check_id: "check-optional-obligation", phase: "live", required: false },
     { check_id: "check-invariant", phase: "preimplementation", required: false },
     { check_id: "check-failure", phase: "slice", required: false },
@@ -68,10 +72,12 @@ const targets = requiredEngineeringVerificationTargets(dossier);
 assert.deepEqual(targets.checkIds, [
   "check-boundary",
   "check-counterexample",
+  "check-dual-phase",
   "check-failure",
   "check-integration",
   "check-invariant",
   "check-premortem",
+  "check-reproducer",
   "check-required-obligation",
 ]);
 assert.deepEqual(targets.mechanismIds, [
@@ -83,28 +89,37 @@ assert.deepEqual(targets.mechanismIds, [
 assert.deepEqual(targets.checkTargets, [
   { checkId: "check-boundary", phase: "integration" },
   { checkId: "check-counterexample", phase: "live" },
+  { checkId: "check-dual-phase", phase: "slice" },
+  { checkId: "check-dual-phase", phase: "integration" },
   { checkId: "check-failure", phase: "slice" },
   { checkId: "check-integration", phase: "integration" },
   { checkId: "check-invariant", phase: "preimplementation" },
   { checkId: "check-premortem", phase: "integration" },
+  { checkId: "check-reproducer", phase: "preimplementation" },
+  { checkId: "check-reproducer", phase: "integration" },
   { checkId: "check-required-obligation", phase: "slice" },
 ]);
-assert.deepEqual(targets.preimplementationCheckIds, ["check-invariant"]);
-assert.deepEqual(targets.sliceCheckIds, ["check-failure", "check-required-obligation"]);
-assert.deepEqual(targets.integrationCheckIds, ["check-boundary", "check-integration", "check-premortem"]);
+assert.deepEqual(targets.preimplementationCheckIds, ["check-invariant", "check-reproducer"]);
+assert.deepEqual(targets.sliceCheckIds, ["check-dual-phase", "check-failure", "check-required-obligation"]);
+assert.deepEqual(targets.integrationCheckIds, ["check-boundary", "check-dual-phase", "check-integration", "check-premortem", "check-reproducer"]);
 assert.deepEqual(targets.liveCheckIds, ["check-counterexample"]);
 assert.deepEqual(targets.postMutationCheckIds, [
   "check-boundary",
+  "check-dual-phase",
   "check-failure",
   "check-integration",
   "check-premortem",
+  "check-reproducer",
   "check-required-obligation",
 ]);
 assert.deepEqual(targets.postMutationCheckTargets, [
   { checkId: "check-boundary", phase: "integration" },
+  { checkId: "check-dual-phase", phase: "slice" },
+  { checkId: "check-dual-phase", phase: "integration" },
   { checkId: "check-failure", phase: "slice" },
   { checkId: "check-integration", phase: "integration" },
   { checkId: "check-premortem", phase: "integration" },
+  { checkId: "check-reproducer", phase: "integration" },
   { checkId: "check-required-obligation", phase: "slice" },
 ]);
 
@@ -116,6 +131,7 @@ assert(Object.isFrozen(targets), "target result must be immutable");
 assert(Object.isFrozen(targets.checkIds), "check IDs must be immutable");
 assert(Object.isFrozen(targets.checkTargets), "check targets must be immutable");
 assert(targets.checkTargets.every(Object.isFrozen), "each check target must be immutable");
+assert(Object.isFrozen(targets.postMutationCheckIds), "post-mutation check IDs must be immutable");
 assert(Object.isFrozen(targets.postMutationCheckTargets), "post-mutation targets must be immutable");
 assert(Object.isFrozen(targets.mechanismIds), "mechanism IDs must be immutable");
 assert.throws(() => targets.checkIds.push("check-injected"), TypeError);

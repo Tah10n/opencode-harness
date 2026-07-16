@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Tah10n/opencode-harness/quality/schemas/toolchain-host-configuration.schema.json",
+  "title": "OpenCode Harness Host-Owned Toolchain Configuration",
+  "$comment": "This fixed-location host file is never project input. Launcher strategies, environment profiles, and Java entry points are resolver-owned; arbitrary argv, environment variables, shells, and PATH discovery are forbidden.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "configuration_id", "trusted_roots", "state_roots", "candidates"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "configuration_id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$" },
+    "trusted_roots": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/absolutePath" }
+    },
+    "state_roots": {
+      "type": "object",
+      "additionalProperties": false,
+      "maxProperties": 16,
+      "properties": {
+        "npm": { "$ref": "#/$defs/absolutePath" },
+        "python": { "$ref": "#/$defs/absolutePath" },
+        "go": { "$ref": "#/$defs/absolutePath" },
+        "cargo": { "$ref": "#/$defs/absolutePath" },
+        "maven": { "$ref": "#/$defs/absolutePath" },
+        "gradle": { "$ref": "#/$defs/absolutePath" }
+      }
+    },
+    "candidates": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "node": { "$ref": "#/$defs/directCandidates" },
+        "npm": {
+          "type": "array",
+          "maxItems": 8,
+          "items": { "$ref": "#/$defs/npmCandidate" }
+        },
+        "python": { "$ref": "#/$defs/directCandidates" },
+        "pytest": {
+          "type": "array",
+          "maxItems": 8,
+          "items": { "$ref": "#/$defs/pytestCandidate" }
+        },
+        "go": {
+          "type": "array",
+          "maxItems": 8,
+          "items": { "$ref": "#/$defs/goCandidate" }
+        },
+        "cargo": {
+          "type": "array",
+          "maxItems": 8,
+          "items": { "$ref": "#/$defs/cargoCandidate" }
+        },
+        "java": {
+          "type": "array",
+          "maxItems": 8,
+          "items": { "$ref": "#/$defs/javaCandidate" }
+        },
+        "maven": {
+          "type": "array",
+          "maxItems": 8,
+          "items": { "$ref": "#/$defs/mavenCandidate" }
+        },
+        "gradle": {
+          "type": "array",
+          "maxItems": 8,
+          "items": { "$ref": "#/$defs/gradleCandidate" }
+        }
+      }
+    },
+    "auxiliary": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "git": { "$ref": "#/$defs/directCandidate" }
+      }
+    }
+  },
+  "$defs": {
+    "absolutePath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096,
+      "$comment": "Absolute, lexical-canonical, non-aliased path validation is normative in the runtime loader."
+    },
+    "directCandidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "executable_path"],
+      "properties": {
+        "kind": { "const": "direct" },
+        "executable_path": { "$ref": "#/$defs/absolutePath" }
+      }
+    },
+    "directCandidates": {
+      "type": "array",
+      "maxItems": 8,
+      "items": { "$ref": "#/$defs/directCandidate" }
+    },
+    "goCandidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "executable_path", "state_root"],
+      "properties": {
+        "kind": { "const": "direct" },
+        "executable_path": { "$ref": "#/$defs/absolutePath" },
+        "state_root": { "const": "go" }
+      }
+    },
+    "cargoCandidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "executable_path", "state_root"],
+      "properties": {
+        "kind": { "const": "direct" },
+        "executable_path": { "$ref": "#/$defs/absolutePath" },
+        "state_root": { "const": "cargo" }
+      }
+    },
+    "npmCandidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "node_executable_path", "npm_cli_path", "state_root"],
+      "properties": {
+        "kind": { "const": "npm_cli" },
+        "node_executable_path": { "$ref": "#/$defs/absolutePath" },
+        "npm_cli_path": { "$ref": "#/$defs/absolutePath" },
+        "state_root": { "const": "npm" }
+      }
+    },
+    "pytestCandidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "python_executable_path", "state_root"],
+      "properties": {
+        "kind": { "const": "python_module" },
+        "python_executable_path": { "$ref": "#/$defs/absolutePath" },
+        "state_root": { "const": "python" }
+      }
+    },
+    "javaCandidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "java_home"],
+      "properties": {
+        "kind": { "const": "direct" },
+        "java_home": { "$ref": "#/$defs/absolutePath" }
+      }
+    },
+    "mavenCandidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "java_home", "distribution_root", "state_root"],
+      "properties": {
+        "kind": { "const": "maven_java_v3" },
+        "java_home": { "$ref": "#/$defs/absolutePath" },
+        "distribution_root": { "$ref": "#/$defs/absolutePath" },
+        "state_root": { "const": "maven" }
+      }
+    },
+    "gradleCandidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "layout", "java_home", "distribution_root", "state_root"],
+      "properties": {
+        "kind": { "const": "gradle_java" },
+        "layout": { "enum": ["legacy_launcher", "instrumented_launcher"] },
+        "java_home": { "$ref": "#/$defs/absolutePath" },
+        "distribution_root": { "$ref": "#/$defs/absolutePath" },
+        "state_root": { "const": "gradle" }
+      }
+    }
+  }
+}

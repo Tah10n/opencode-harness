@@ -2,12 +2,12 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Tah10n/opencode-harness/quality/schemas/project-check-catalog.schema.json",
   "title": "OpenCode Harness Project Check Catalog",
-  "$comment": "Structural JSON Schema plus the normative runtime validator in lib/quality/project-check-catalog.mjs. The runtime additionally enforces UTF-8 byte and NUL limits, unique check_id values, executable basename restrictions, and interpreter eval denial that JSON Schema cannot express portably.",
+  "$comment": "Structural schema. lib/quality/project-check-catalog.mjs is normative and additionally enforces bounded UTF-8, canonical paths, disjoint exit-code classifications, and honest bug-reproducer phases.",
   "type": "object",
   "additionalProperties": false,
   "required": ["schema_version", "catalog_id", "checks"],
   "properties": {
-    "schema_version": { "const": 1 },
+    "schema_version": { "const": 2 },
     "catalog_id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$" },
     "standard_lite_policy": {
       "type": "object",
@@ -19,48 +19,37 @@
           "minItems": 1,
           "maxItems": 128,
           "uniqueItems": true,
-          "items": { "type": "string", "minLength": 1, "maxLength": 1000 }
+          "items": { "$ref": "#/$defs/relativePath" }
         },
         "protected_paths": {
           "type": "array",
           "maxItems": 128,
           "uniqueItems": true,
-          "items": { "type": "string", "minLength": 1, "maxLength": 1000 }
+          "items": { "$ref": "#/$defs/relativePath" }
         }
       }
     },
     "checks": {
       "type": "array",
-      "$comment": "check_id uniqueness is enforced by the normative runtime validator.",
       "minItems": 1,
       "maxItems": 64,
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["check_id", "argv", "cwd", "phases", "timeout_ms", "max_output_chars"],
+        "required": ["check_id", "executable_id", "argv", "cwd", "phases", "purpose", "timeout_ms", "max_output_chars"],
         "properties": {
-          "check_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$" },
+          "check_id": { "$ref": "#/$defs/logicalId" },
+          "executable_id": {
+            "$comment": "A logical ID resolved by the trusted toolchain map; never an executable path.",
+            "$ref": "#/$defs/logicalId"
+          },
           "argv": {
+            "$comment": "Arguments only. The executable is not stored in argv and shell parsing is never requested.",
             "type": "array",
-            "$comment": "The runtime validator rejects shell interpreters, npx/npm exec, and source-text eval flags before execution.",
-            "minItems": 1,
             "maxItems": 64,
-            "prefixItems": [
-              {
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 4096,
-                "pattern": "^(?!\\s*$)(?!.*\\u0000).+$"
-              }
-            ],
             "items": { "type": "string", "maxLength": 4096, "pattern": "^(?!.*\\u0000).*$" }
           },
-          "cwd": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 1000,
-            "pattern": "^(?![A-Za-z]:)(?![/\\\\])(?!.*(?:^|[/\\\\])\\.\\.(?:[/\\\\]|$))(?!.*\\u0000).+$"
-          },
+          "cwd": { "$ref": "#/$defs/cwd" },
           "phases": {
             "type": "array",
             "minItems": 1,
@@ -68,8 +57,88 @@
             "uniqueItems": true,
             "items": { "enum": ["preimplementation", "slice", "integration"] }
           },
+          "purpose": { "enum": ["verification", "architecture_graph", "bug_reproducer"] },
+          "outcome_protocol": { "$ref": "#/$defs/outcomeProtocol" },
+          "generated_output_paths": {
+            "type": "array",
+            "maxItems": 32,
+            "uniqueItems": true,
+            "items": { "$ref": "#/$defs/relativePath" }
+          },
           "timeout_ms": { "type": "integer", "minimum": 1, "maximum": 600000 },
           "max_output_chars": { "type": "integer", "minimum": 1, "maximum": 4194304 }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "purpose": { "const": "bug_reproducer" } }, "required": ["purpose"] },
+            "then": {
+              "required": ["outcome_protocol"],
+              "properties": {
+                "phases": {
+                  "allOf": [
+                    { "contains": { "const": "preimplementation" } },
+                    { "contains": { "const": "integration" } }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "if": { "properties": { "purpose": { "const": "architecture_graph" } }, "required": ["purpose"] },
+            "then": {
+              "required": ["generated_output_paths"],
+              "properties": {
+                "phases": { "contains": { "const": "integration" } },
+                "generated_output_paths": {
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": { "type": "string", "pattern": "\\.json$" }
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "logicalId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$" },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000,
+      "pattern": "^(?!\\.\\.?$)(?![A-Za-z]:)(?![/\\\\])(?!.*(?:^|[/\\\\])\\.\\.(?:[/\\\\]|$))(?!.*\\u0000).+$"
+    },
+    "cwd": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000,
+      "pattern": "^(?![A-Za-z]:)(?![/\\\\])(?!.*(?:^|[/\\\\])\\.\\.(?:[/\\\\]|$))(?!.*\\u0000).+$"
+    },
+    "exitCodeSet": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16,
+      "uniqueItems": true,
+      "items": { "type": "integer", "minimum": 0, "maximum": 4294967295 }
+    },
+    "outcomeProtocol": {
+      "$comment": "Cross-classification exit-code uniqueness is enforced by the normative runtime validator.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "exit_codes"],
+      "properties": {
+        "kind": { "const": "exit_code" },
+        "exit_codes": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["failing_reproducer", "passing_regression", "unrelated_failure", "unavailable"],
+          "properties": {
+            "failing_reproducer": { "$ref": "#/$defs/exitCodeSet" },
+            "passing_regression": { "$ref": "#/$defs/exitCodeSet" },
+            "unrelated_failure": { "$ref": "#/$defs/exitCodeSet" },
+            "unavailable": { "$ref": "#/$defs/exitCodeSet" }
+          }
         }
       }
     }

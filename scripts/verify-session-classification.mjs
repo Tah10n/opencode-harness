@@ -33,7 +33,19 @@ let catalogBinding = {
   catalog: {
     catalog_id: checkCatalog.catalog_id,
     standard_lite_policy: standardLitePolicy,
-    checks: checkCatalog.checks.map((entry) => ({ check_id: entry.check_id, phases: [...entry.phases] })),
+    checks: [
+      ...checkCatalog.checks.map((entry) => ({ check_id: entry.check_id, phases: [...entry.phases], purpose: "verification" })),
+      {
+        check_id: "normal-bug-reproducer",
+        phases: ["preimplementation", "integration"],
+        purpose: "bug_reproducer",
+      },
+      {
+        check_id: "normal-integration-only",
+        phases: ["integration"],
+        purpose: "verification",
+      },
+    ],
   },
   fingerprint: checkCatalog.fingerprint,
 };
@@ -43,13 +55,34 @@ let affectedFiles = ["src/file.mjs"];
 let id = 0;
 let time = 0;
 const headSha = "b".repeat(40);
+const indexFingerprint = fingerprint({ index: "fixture-index" });
+function workspaceSnapshot(entries) {
+  const source = {
+    schema_version: 3,
+    head_sha: headSha,
+    index_entry_count: 1,
+    index_fingerprint: indexFingerprint,
+    entries: entries.map((entry) => ({ ...entry })),
+    dirty: entries.length > 0,
+  };
+  const sourceFingerprint = fingerprint(source);
+  const declaredOutputEntries = [];
+  const declaredOutputsFingerprint = fingerprint({ schema_version: 3, entries: declaredOutputEntries });
+  return {
+    ...source,
+    declared_output_entries: declaredOutputEntries,
+    source_fingerprint: sourceFingerprint,
+    declared_outputs_fingerprint: declaredOutputsFingerprint,
+    fingerprint: fingerprint({
+      schema_version: 3,
+      source_fingerprint: sourceFingerprint,
+      declared_outputs_fingerprint: declaredOutputsFingerprint,
+    }),
+  };
+}
 const observeWorkspace = () => {
   const entries = workspaceEntries.map((entry) => ({ ...entry }));
-  return {
-    head_sha: headSha,
-    entries,
-    fingerprint: fingerprint({ head_sha: headSha, entries }),
-  };
+  return workspaceSnapshot(entries);
 };
 const bridge = createNormalSessionQualityBridge({
   workspaceRoot: tempRoot,
@@ -98,6 +131,21 @@ function standardStart(overrides = {}) {
     },
     ...overrides,
   };
+}
+
+function bugStart(overrides = {}) {
+  return standardStart({
+    task_type: "bug_fix",
+    required_check_ids: ["normal-bug-reproducer"],
+    reproduction_contract: {
+      check_id: "normal-bug-reproducer",
+      expected_pre_fix: "failing_reproducer",
+      expected_post_fix: "passing_regression",
+      unavailable_reason: null,
+      uncertainty_material: false,
+    },
+    ...overrides,
+  });
 }
 
 expectCode(
@@ -206,6 +254,65 @@ for (const [suffix, request, code] of [
   assert.equal(inspectNormalSessionRegistration(bridge, candidate).lifecycle, "unclassified");
 }
 
+const bugSession = "session/standard-bug-reproduction";
+handleNormalSessionChatMessage(bridge, { sessionID: bugSession, agent: "orchestrator" });
+const bugStarted = call(bugSession, "orchestrator", "quality_session_start", bugStart());
+const bugRegistration = inspectNormalSessionRegistration(bridge, bugSession);
+assert.deepEqual(bugRegistration.reproduction_contract, bugStart().reproduction_contract);
+assert.deepEqual(
+  call(bugSession, "orchestrator", "quality_session_start", bugStart()),
+  bugStarted,
+  "an exact standard-lite bug-fix retry must preserve the reproduction contract",
+);
+assert.deepEqual(
+  inspectNormalSessionQualityState(bridge, bugSession).dossier.test_obligations.map(({ check_id, kind, phase }) => ({ check_id, kind, phase })),
+  [
+    { check_id: "normal-bug-reproducer", kind: "reproducer", phase: "preimplementation" },
+    { check_id: "normal-bug-reproducer", kind: "unit", phase: "integration" },
+  ],
+);
+
+for (const [suffix, request, code] of [
+  ["bug-missing-contract", standardStart({ task_type: "bug_fix" }), "QUALITY_REPRODUCTION_CONTRACT"],
+  ["bug-integration-only", bugStart({
+    required_check_ids: ["normal-integration-only"],
+    reproduction_contract: { ...bugStart().reproduction_contract, check_id: "normal-integration-only" },
+  }), "QUALITY_REPRODUCTION_CHECK_MISSING"],
+  ["bug-unavailable-no-reason", bugStart({
+    reproduction_contract: {
+      ...bugStart().reproduction_contract,
+      expected_pre_fix: "unavailable",
+      unavailable_reason: "",
+    },
+  }), "QUALITY_STRING_BOUNDS"],
+  ["bug-material-uncertainty", bugStart({
+    reproduction_contract: {
+      ...bugStart().reproduction_contract,
+      expected_pre_fix: "unavailable",
+      unavailable_reason: "requires an unavailable external service",
+      uncertainty_material: true,
+    },
+  }), "QUALITY_RISK_ESCALATION_REQUIRED"],
+]) {
+  const candidate = `session/${suffix}`;
+  handleNormalSessionChatMessage(bridge, { sessionID: candidate, agent: "orchestrator" });
+  expectCode(() => call(candidate, "orchestrator", "quality_session_start", request), code);
+}
+
+const unavailableBugSession = "session/bug-unavailable-bounded";
+handleNormalSessionChatMessage(bridge, { sessionID: unavailableBugSession, agent: "orchestrator" });
+call(unavailableBugSession, "orchestrator", "quality_session_start", bugStart({
+  reproduction_contract: {
+    ...bugStart().reproduction_contract,
+    expected_pre_fix: "unavailable",
+    unavailable_reason: "the bounded fixture dependency is unavailable on this host",
+  },
+}));
+assert.equal(
+  inspectNormalSessionRegistration(bridge, unavailableBugSession).reproduction_contract.expected_pre_fix,
+  "unavailable",
+);
+
 handleNormalSessionChatMessage(bridge, { sessionID: "session/project-protected", agent: "orchestrator" });
 expectCode(
   () => call("session/project-protected", "orchestrator", "quality_session_start", standardStart({ ownership_paths: ["src/security.mjs"] })),
@@ -278,6 +385,27 @@ const recoveredStart = executeNormalSessionQualityTool(faultBridge, "quality_ses
 }, { sessionID: faultSession, agent: "orchestrator" });
 assert.equal(recoveredStart.lifecycle, "dossier_draft");
 
+injectedFailure = "after_registry_classification";
+let bugFaultBridge = createNormalSessionQualityBridge(faultOptions);
+const bugFaultSession = "session/bug-lifecycle-fault-recovery";
+handleNormalSessionChatMessage(bugFaultBridge, { sessionID: bugFaultSession, agent: "orchestrator" });
+assert.throws(() => executeNormalSessionQualityTool(
+  bugFaultBridge,
+  "quality_session_start",
+  { request: JSON.stringify(bugStart()) },
+  { sessionID: bugFaultSession, agent: "orchestrator" },
+), /injected:after_registry_classification/u);
+injectedFailure = null;
+bugFaultBridge = createNormalSessionQualityBridge(faultOptions);
+const recoveredBugStart = executeNormalSessionQualityTool(bugFaultBridge, "quality_session_start", {
+  request: JSON.stringify(bugStart()),
+}, { sessionID: bugFaultSession, agent: "orchestrator" });
+assert.equal(recoveredBugStart.lifecycle, "dossier_draft");
+assert.deepEqual(
+  inspectNormalSessionRegistration(bugFaultBridge, bugFaultSession).reproduction_contract,
+  bugStart().reproduction_contract,
+);
+
 for (const [stage, toolId, agent] of [
   ["after_owner_gate", "quality_dossier_finalize", "orchestrator"],
   ["after_owner_verification", "quality_verification_record", "verifier"],
@@ -342,7 +470,7 @@ const raceBridge = createNormalSessionQualityBridge({
     const raceEntries = raceObservation >= 3
       ? [{ path: "src/file.mjs", fingerprint: fingerprint({ raced: true }) }]
       : [];
-    return { head_sha: headSha, entries: raceEntries, fingerprint: fingerprint({ head_sha: headSha, entries: raceEntries }) };
+    return workspaceSnapshot(raceEntries);
   },
   affectedFileInspector: () => ["src/file.mjs"],
   runTrustedTarget: () => ({ status: "passed", command_id: "fixture", exit_code: 0 }),
@@ -365,7 +493,7 @@ const dossierRaceBridge = createNormalSessionQualityBridge({
     const raceEntries = dossierRaceObservation >= 6
       ? [{ path: "src/file.mjs", fingerprint: fingerprint({ dossier_raced: true }) }]
       : [];
-    return { head_sha: headSha, entries: raceEntries, fingerprint: fingerprint({ head_sha: headSha, entries: raceEntries }) };
+    return workspaceSnapshot(raceEntries);
   },
   affectedFileInspector: () => ["src/file.mjs"],
   runTrustedTarget: () => ({ status: "passed", command_id: "fixture", exit_code: 0 }),

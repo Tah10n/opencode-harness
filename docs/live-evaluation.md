@@ -71,12 +71,14 @@ export async function runScenario(context) {
 }
 ```
 
-The child receives an `AbortSignal`. The parent settles the adapter call only
-after verified teardown: Windows assigns the uninitialized worker to a Job
-Object with `KILL_ON_JOB_CLOSE`; POSIX uses a dedicated process group with
-TERM/KILL and an absence check for ordinary descendants. A timeout,
-failed tree teardown, or stalled trace request fails closed before hidden data
-can be staged. Adapters must return explicit success, such as
+The child receives an `AbortSignal`. This legacy live-evaluation adapter path
+uses bounded cleanup only: Windows invokes `taskkill`, while POSIX sends
+TERM/KILL to a dedicated process group. Neither path is verified containment
+for reparented or detached descendants. A timeout, failed cleanup, or stalled
+trace request fails closed before hidden data can be staged; it cannot produce
+Milestone 2 containment evidence. Trusted project checks use the separate
+Windows Job Object or delegated Linux cgroup-v2 boundary described below.
+Adapters must return explicit success, such as
 `passed: true`, `ok: true`,
 `success: true`, `status: "passed"`, or `exitCode: 0`; returning an object alone
 is not success. The adapter must also attest the invoked profile with the
@@ -257,7 +259,10 @@ computational mutation gate applies only when the installed plugin and relevant
 pre-tool hooks are runtime-verified. Native Bash is disabled inside an
 instrumented quality session; repository commands use catalog-backed trusted
 checks. Windows workers use Job Object containment before initialization, while
-the current POSIX trusted-check production path fails closed. The live adapter
+Linux workers require a delegated writable cgroup v2 and verified hierarchical
+`cgroup.events: populated 0` followed by postorder subtree removal. macOS is
+explicitly unsupported; any unavailable
+production controller fails closed. The live adapter
 runner enforces its own isolated workspace policy, hidden checks, teardown, and
 report assertions only inside live-evaluation runs. Processes started outside
 these application boundaries are not intercepted; neither mode is a host-wide

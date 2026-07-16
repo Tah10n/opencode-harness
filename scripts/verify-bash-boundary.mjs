@@ -24,12 +24,30 @@ fs.writeFileSync(path.join(tempRoot, "src", "file.mjs"), "export const value = 1
 const entries = [];
 let id = 0;
 const headSha = "c".repeat(40);
+const indexFingerprint = fingerprint({ index: "bash-boundary-fixture" });
 const observeWorkspace = () => {
   const normalizedEntries = entries.map((entry) => ({ ...entry })).sort((left, right) => left.path.localeCompare(right.path));
-  return {
+  const source = {
+    schema_version: 3,
     head_sha: headSha,
+    index_entry_count: 0,
+    index_fingerprint: indexFingerprint,
     entries: normalizedEntries,
-    fingerprint: fingerprint({ head_sha: headSha, entries: normalizedEntries }),
+    dirty: normalizedEntries.length > 0,
+  };
+  const sourceFingerprint = fingerprint(source);
+  const declaredOutputEntries = [];
+  const declaredOutputsFingerprint = fingerprint({ schema_version: 3, entries: declaredOutputEntries });
+  return {
+    ...source,
+    declared_output_entries: declaredOutputEntries,
+    source_fingerprint: sourceFingerprint,
+    declared_outputs_fingerprint: declaredOutputsFingerprint,
+    fingerprint: fingerprint({
+      schema_version: 3,
+      source_fingerprint: sourceFingerprint,
+      declared_outputs_fingerprint: declaredOutputsFingerprint,
+    }),
   };
 };
 const bridge = createNormalSessionQualityBridge({

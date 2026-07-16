@@ -27,6 +27,7 @@ against `scripts/verify-adoption-bundle.mjs`.
 ```text
 .opencode/plugins/engineering-dossier.mjs
 .opencode/quality/checks.json
+.opencode/quality/toolchains.json
 .gitattributes
 .github
 .gitignore
@@ -219,8 +220,8 @@ Project-local:
 - keep `.opencode/plugins/engineering-dossier.mjs` in the project;
 - install or materialize the `opencode-harness` package so the wrapper can use
   `opencode-harness/quality-plugin`;
-- keep `.opencode/quality/checks.json` and any
-  `quality/architecture-policy.json` project-local.
+- keep `.opencode/quality/checks.json`, `.opencode/quality/toolchains.json`, and
+  any `quality/architecture-policy.json` project-local.
 
 Global:
 
@@ -228,7 +229,19 @@ Global:
 - copy the minimal wrapper from
   `quality/examples/global-quality-plugin.mjs` into the global OpenCode plugin
   directory;
-- keep the check catalog and optional architecture policy in each project.
+- keep the check catalog, trusted toolchain map, and optional architecture
+  policy in each project.
+
+The project map is deliberately machine-neutral: it may contain only logical
+executable IDs and resolver families, never absolute paths or environment
+overrides. Built-in `node`/`npm` resolution uses the canonical Node
+installation and a fixed-location identity-bound Git executable. Every other
+family requires a host-owned `quality-toolchains.host.v1.json` beside the
+global wrapper. The example wrapper passes `import.meta.url` as the fixed
+anchor; a project-local wrapper cannot nominate a project file as host
+configuration. The file follows
+`quality/schemas/toolchain-host-configuration.schema.json` and declares trusted
+code roots, disjoint writable state roots, fixed candidates, and auxiliary Git.
 
 Runtime-only adoption does not require the evaluation corpus, harness
 development fixtures, release documentation, or the complete `scripts/`
@@ -270,26 +283,85 @@ fingerprints, IDs, verification, attestation, or trusted timestamps.
 ## Что нужно настроить в проекте
 
 - `.opencode/quality/checks.json` with argv-only real project commands;
+- `.opencode/quality/toolchains.json` with logical executable IDs mapped to
+  approved resolver families (`node`, `npm`, `python`, `pytest`, `go`, `cargo`,
+  `java`, `maven`, or `gradle`);
 - optional `quality/architecture-policy.json`;
 - `WORKFLOW.md` for verification order and repository boundaries;
 - project-local skills for specialized workflows.
 
 The check runner uses argv-only execution with `shell: false`, bounded
-time/output/run budgets, runner-owned before/after workspace observations, and
-receipts without raw stdout or stderr. On Windows the command worker enters a
-Job Object before it receives permission to spawn the check, and closing the job
-kills detached descendants. Platforms without a proven containment controller
-fail closed with `QUALITY_CHECK_CONTAINMENT_UNAVAILABLE`; the current POSIX path
-does not execute trusted project checks. Durable receipts retain only status,
-exit code, signal, duration, stdout/stderr byte counts, and command/evidence
-fingerprints. Catalog drift fails the session closed.
+time/output/run budgets, a sanitized environment, and runner-owned before/after
+source and generated-output workspace observations. It tracks changed files,
+untracked non-ignored files, explicit ownership/output paths, the Git index and
+`HEAD`, while ordinary ignored dependency/cache/build trees remain outside the
+source walk. On Windows the worker enters a Job Object before initialization;
+on Linux the coordinator and watchdog remain outside an exclusive delegated
+cgroup-v2 root. The host must set `OPENCODE_QUALITY_CGROUP_ROOT` and
+`OPENCODE_QUALITY_CGROUP_ATTACH_MODE=sudo-helper-v1`, point
+`OPENCODE_QUALITY_CGROUP_ATTACH_HELPER` at a protected host-owned executable,
+and grant the dedicated workload principal permission to invoke only that
+helper. The root-owned helper must
+accept only PIDs owned by the dedicated workload UID and must embed the fixed
+`<root>/opencode-quality-workload/cgroup.procs` destination; callers never pass
+the destination. The guard controls and every broader privilege path must
+remain non-writable. Root-level `cgroup.kill`
+covers root/sibling migration; cleanup proves hierarchical
+`cgroup.events: populated 0`, removes descendants postorder, and retains the
+delegated root.
+Process groups are not accepted as containment proof.
+macOS is explicitly unsupported until a defensible controller exists. Any
+unavailable controller fails closed with
+`QUALITY_CHECK_CONTAINMENT_UNAVAILABLE`. Durable receipts retain bounded
+outcome/status metadata and fingerprints, never raw stdout or stderr.
+
+The resolver supports `node`, `npm`, `python`, `pytest`, `go`, `cargo`, `java`,
+`maven`, and `gradle`. It uses fixed direct launch strategies: pytest is
+`python -I -m pytest`; Maven and Gradle use direct Java entry points plus a bounded
+distribution manifest instead of project wrappers. Maven receives an isolated
+JVM `user.home`, while Gradle has resolver-owned user-home, project-cache, JVM,
+and `--no-daemon` arguments so project input cannot redirect mutable state or
+escape into an existing external daemon. Java/Maven/Gradle response files are
+rejected. Maven uses resolver-created, identity-bound empty user/global settings
+and toolchains; automatic writable-user settings/toolchains/extensions and
+project extensions are unsupported. Maven 4 user/project
+`maven-system.properties` and `maven-user.properties` files fail closed, and
+project input cannot redirect Maven installation/project/user configuration,
+extensions, settings, toolchains, settings-security, or local-repository chains
+through Maven properties. `.mvn/maven.config`, every
+`gradle.properties` candidate from the actual check cwd through the workspace
+root, user properties, and installation properties are bounded, validated,
+identity-bound, and rechecked in the contained worker. Gradle installation
+`init.d` is distribution-manifest evidence; automatic Gradle init scripts under
+the writable state root are unsupported. POSIX scripts require one
+absolute shebang interpreter, while Windows command scripts and unknown Java
+distribution layouts are rejected. Canonical launcher/interpreter/distribution
+identities are rechecked in the already-contained worker. The worker opens the
+validated cwd once; its inherited directory-object identity is checked last and
+the project command inherits that cwd without resolving the mutable path again.
+The sync worker itself runs through the identity-bound Node candidate from the
+fixed host configuration, not the embedding host's ambient `process.execPath`,
+so bundled Bun/OpenCode hosts and non-Node project checks keep the same boundary.
+Mutable cache and state roots are isolated from
+trusted code and the workspace and are not code evidence; host-config,
+resolver-policy-v4, runtime-metadata/config-inventory, executable, environment,
+and containment fingerprints remain receipt evidence.
+
+Containment setup uses a separate deadline from command execution. The execution
+timer begins only after readiness. Adapter cwd identity is checked on both sides
+of spawn; trusted project-command cwd is also checked before the sync worker,
+after containment readiness, and in the contained child before project code can
+load.
 
 ## Что computationally enforced
 
 The plugin enforces registration, classification, gate state, exact ownership,
 one-shot edit/task capabilities, catalog and architecture drift, control
 state tamper detection, post-mutation reconciliation, stale-verification
-invalidation, trusted check receipts, and final attestation. Native Bash is
+invalidation, trusted check receipts, and final attestation. It binds the
+toolchain map, resolves only fixed host candidates/trusted roots without
+ambient `PATH`, fingerprints launcher and executable identities, and revalidates
+them immediately before spawn. Native Bash is
 denied before and after classification because the host hook cannot prove
 detached-descendant teardown; `quality_command_authorize` returns
 `QUALITY_NATIVE_BASH_DISABLED`. Tests/build/lint/typecheck use trusted project
@@ -299,8 +371,21 @@ executable with a minimal environment, disabled hooks/fsmonitor, and no inherite
 `PATH` executable resolution.
 
 The plugin binds the project-check catalog when it starts. After intentionally
-editing `.opencode/quality/checks.json`, restart/reload the plugin before
-classifying a new session; in-process catalog drift fails closed.
+editing `.opencode/quality/checks.json` or `.opencode/quality/toolchains.json`,
+restart/reload the plugin before classifying a new session; in-process catalog
+or toolchain-map drift fails closed.
+
+For a standard-lite bug fix, declare one catalog check as the pre-fix
+reproducer and integration regression. The runner records expected pre-fix
+failure, post-fix pass, unrelated outcome, or bounded unavailability with an
+explicit reason. Unexpected pass/unrelated evidence and material uncertainty
+block the compact route. For configured high/critical architecture policy, an
+integration-only architecture check must produce the one bounded final graph.
+The check must freshly create or rewrite the graph in that contained run; an
+unchanged pre-existing artifact is not post-edit evidence. The runner
+re-evaluates that graph against the bound policy and baseline; no
+attestation is emitted when the evidence is missing, stale, unavailable,
+failed, or violates policy.
 
 This remains process-level enforcement, not an OS sandbox. Project checks run as
 the current user and must be trusted project-owned commands. `session.created` does not expose the
@@ -313,6 +398,10 @@ Run the model-free checks first:
 npm run verify
 npm run verify:session-classification
 npm run verify:project-check-catalog
+npm run verify:workspace-observation
+npm run verify:trusted-toolchain-host-config
+npm run verify:trusted-toolchains
+npm run verify:process-containment
 npm run verify:trusted-project-runner
 npm run verify:bash-boundary
 npm run verify:normal-session-quality-bridge

@@ -257,7 +257,14 @@ minimal child links rather than cloned parent state. Read-only contributions and
 trusted verification update the parent owner record; a writable general child
 is confined to the one serialized delegated path set. When
 `quality/architecture-policy.json` exists, its validated identity is bound at
-dossier creation, evaluated runner-side at finalization, and bound into the gate.
+dossier creation. High/critical sessions require one integration-only
+architecture graph check. The runner binds its final generated output to the
+trusted receipt and requires the check to create or rewrite that output during
+the current contained run; an unchanged pre-existing graph is rejected as
+stale. It then extracts and evaluates the final graph against the policy and
+baseline and repeats that evaluation during finalization. Missing, stale,
+unavailable, failed, or violating post-edit evidence prevents attestation even
+when ordinary tests pass.
 
 The installed API exports `permission.ask`, `tool.execute.before`,
 `tool.execute.after`, and `event` hook types. OpenCode 1.17.20 executes the
@@ -278,8 +285,21 @@ work lightweight, so the prompt workflow remains the classification trigger.
 Native Bash is disabled for instrumented quality sessions, including after the
 gate; repository commands run only through fingerprint-bound project-catalog
 checks. On Windows those checks and adapter workers are placed in a Job Object
-before initialization. The current POSIX trusted-check production path fails
-closed because an equivalent containment controller is not yet provided.
+before initialization. On Linux they enter only a pre-delegated writable cgroup
+v2 root through a fixed narrow attach helper while the coordinator/watchdog stay
+outside. The guard cgroup and its migration controls must be non-writable by the
+workload principal. Root-level `cgroup.kill` therefore still covers a workload
+that moves from the initial leaf into the root or a sibling. Teardown is
+accepted only after hierarchical `cgroup.events` reports `populated 0` and all
+descendants are removed while the delegated root remains; a process
+group is never containment proof. macOS remains explicitly unsupported. An
+unavailable or unprovable controller fails closed.
+
+Containment readiness has its own bounded setup deadline; the check/adapter
+execution timeout starts only after readiness. Adapter working directories are
+identity-bound before and after spawn, after containment, and again inside the
+worker before project code import.
+
 `npm run verify:runtime:quality-hooks` classifies host discovery, callback
 invocation, child causality, and permission-hook wiring independently from the
 installed API/factory probe. Profile prompts remain defense in depth.
@@ -318,14 +338,21 @@ npm run verify
 
 It requires no model, credentials, network, live adapter, or installed OpenCode
 runtime. The normal-session bridge, classification, catalog, trusted runner,
-native-Bash denial, public plugin export, canonical-target, and deterministic
-runtime-fixture checks are stages inside that aggregate. Useful focused reruns
+bounded workspace observer, trusted toolchain resolver, process-containment
+contract, native-Bash denial, public plugin export, canonical-target, and
+deterministic runtime-fixture checks are stages inside that aggregate. The
+fixture executes ten structured edit-flow scenarios through real plugin hooks
+and tools but does not claim installed-host verification. Useful focused reruns
 include:
 
 ```powershell
 npm run verify:normal-session-quality-bridge
 npm run verify:session-classification
 npm run verify:project-check-catalog
+npm run verify:workspace-observation
+npm run verify:trusted-toolchain-host-config
+npm run verify:trusted-toolchains
+npm run verify:process-containment
 npm run verify:trusted-project-runner
 npm run verify:bash-boundary
 npm run verify:global-quality-plugin-export
@@ -333,6 +360,21 @@ npm run verify:quality-verification-targets
 npm run verify:quality-acceptance
 npm run verify:whitespace:fixture
 ```
+
+CI turns execution into sealed artifacts rather than inferring operational
+success from this deterministic suite. `npm run milestone:2:operational`
+executes the registered Windows or Linux production verifiers and accepts a
+passed receipt only when their typed report binds containment identities,
+teardown, scenarios, HEAD, local workspace identity, portable source
+attestation, and GitHub/local run. Producers re-observe that source immediately
+before sealing. `npm run
+milestone:2:assess` validates deterministic/platform/optional installed-host
+bundles, derives status facts from their receipts, and rejects mixed HEAD/run
+or source-attestation provenance. The CI aggregate also requires every receipt
+producer job result to be `success`; an artifact uploaded during failed cleanup
+cannot satisfy the gate. A missing GitHub-hosted installed adapter may be reported only as
+explicit bounded external state; a deterministic host fixture never satisfies
+`host_hook_e2e`.
 
 Installed-host and live-model checks remain explicit and outside the default
 aggregate:

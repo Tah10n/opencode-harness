@@ -321,6 +321,15 @@ function finalizedStandardLiteDossier(taskType) {
     behavior_expectation: "the bounded behavior remains correct",
     expected_preserved_behavior: ["unrelated behavior remains unchanged"],
     known_local_edge_cases: ["stale or failed verification remains blocked"],
+    ...(taskType === "bug_fix" ? {
+      reproduction_contract: {
+        check_id: "quality-integration",
+        expected_pre_fix: "failing_reproducer",
+        expected_post_fix: "passing_regression",
+        unavailable_reason: null,
+        uncertainty_material: false,
+      },
+    } : {}),
     initial_workspace: { entries: [] },
     classification_workspace: { head_sha: START_COMMIT },
   };
@@ -566,7 +575,7 @@ function catalog(overrides = {}) {
     catalog_id: "catalog-quality",
     checks: [
       { check_id: "quality-unit", trusted_producer: "opencode-harness-quality-verifier", phases: ["slice"], available: true },
-      { check_id: "quality-integration", trusted_producer: "opencode-harness-quality-verifier", phases: ["integration"], available: true },
+      { check_id: "quality-integration", trusted_producer: "opencode-harness-quality-verifier", phases: ["preimplementation", "integration"], available: true },
       { check_id: "quality-baseline", trusted_producer: "opencode-harness-quality-verifier", phases: ["preimplementation"], available: true },
       { check_id: "quality-negative", trusted_producer: "opencode-harness-quality-verifier", phases: ["integration"], available: true },
       { check_id: "quality-rollback", trusted_producer: "opencode-harness-quality-verifier", phases: ["integration"], available: true },
@@ -579,7 +588,9 @@ function catalog(overrides = {}) {
 }
 
 function preimplementationEvidence(dossier, overrides = {}) {
-  const obligations = new Map(dossier.test_obligations.map((entry) => [entry.check_id, entry]));
+  const obligations = new Map(dossier.test_obligations
+    .filter((entry) => entry.phase === "preimplementation")
+    .map((entry) => [entry.check_id, entry]));
   const baselineReceipts = requiredEngineeringVerificationTargets(dossier).preimplementationCheckIds.map((checkId, index) => {
     const obligation = obligations.get(checkId);
     return {
@@ -844,6 +855,14 @@ test("standard-lite supports every bounded task type with one operational check 
     assert.equal(dossier.task_type, taskType);
     assert.deepEqual(dossier.test_obligations.map((entry) => entry.kind), kinds);
     assert.equal(new Set(dossier.test_obligations.map((entry) => entry.check_id)).size, 1);
+    if (taskType === "bug_fix") {
+      assert.deepEqual(dossier.test_obligations.map((entry) => entry.phase), ["preimplementation", "integration"]);
+      assert.deepEqual(dossier.verification_plan.baseline_check_ids, ["quality-integration"]);
+      assert.deepEqual(requiredEngineeringVerificationTargets(dossier).checkTargets, [
+        { checkId: "quality-integration", phase: "preimplementation" },
+        { checkId: "quality-integration", phase: "integration" },
+      ]);
+    }
     assert.equal(passedGate(dossier, { gate_id: `gate-standard-lite-${taskType}` }).status, "passed");
   }
 

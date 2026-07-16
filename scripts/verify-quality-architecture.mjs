@@ -13,12 +13,17 @@ import {
   buildEngineeringImpactGraph,
   validateEngineeringImpactGraph,
 } from "../lib/quality/impact-graph.mjs";
+import {
+  createPostEditArchitectureEvidence,
+  validatePostEditArchitectureEvidence,
+} from "../lib/quality/post-architecture-evidence.mjs";
 
 const fileEvidence = (value) => [{ kind: "file", value }];
 
 const impactSchema = JSON.parse(fs.readFileSync(new URL("../quality/schemas/engineering-impact-graph.schema.json", import.meta.url), "utf8"));
 const policySchema = JSON.parse(fs.readFileSync(new URL("../quality/schemas/architecture-policy.schema.json", import.meta.url), "utf8"));
 const evaluationSchema = JSON.parse(fs.readFileSync(new URL("../quality/schemas/architecture-evaluation.schema.json", import.meta.url), "utf8"));
+const postEvidenceSchema = JSON.parse(fs.readFileSync(new URL("../quality/schemas/post-edit-architecture-evidence.schema.json", import.meta.url), "utf8"));
 const policyExample = JSON.parse(fs.readFileSync(new URL("../quality/schemas/architecture-policy.example.json", import.meta.url), "utf8"));
 
 function rejects(fn, code) {
@@ -268,7 +273,7 @@ function addCycle(input) {
 }
 
 const baseGraph = buildEngineeringImpactGraph(baseGraphInput());
-for (const schema of [impactSchema, policySchema, evaluationSchema]) {
+for (const schema of [impactSchema, policySchema, evaluationSchema, postEvidenceSchema]) {
   assert.equal(schema.$schema, "https://json-schema.org/draft/2020-12/schema");
   assert.equal(schema.additionalProperties, false);
   assert.equal(schema.properties.schema_version.const, 1);
@@ -360,6 +365,60 @@ assert.equal(cleanEvaluation.status, "passed");
 assert.equal(cleanEvaluation.computational, true);
 assert.equal(validateArchitectureEvaluation(cleanEvaluation), cleanEvaluation);
 assert(Object.isFrozen(cleanEvaluation));
+
+const postEvidence = createPostEditArchitectureEvidence({
+  evidence_id: "post-architecture-clean",
+  mechanism_kind: "project_check",
+  extractor_identity: {
+    producer: "fixture/project-architecture-check-v1",
+    mechanism_id: "architecture-graph",
+    implementation_fingerprint: `sha256:${"1".repeat(64)}`,
+  },
+  evaluator_identity: {
+    producer: "opencode-harness/architecture-policy-v1",
+    algorithm_ids: ["test-coverage-v1"],
+    implementation_fingerprint: `sha256:${"2".repeat(64)}`,
+  },
+  command_receipt_fingerprint: `sha256:${"3".repeat(64)}`,
+  extractor_output_fingerprint: `sha256:${"5".repeat(64)}`,
+  policy: cleanPolicy,
+  final_workspace_fingerprint: `sha256:${"4".repeat(64)}`,
+  extracted_graph: baseGraph,
+  architecture_evaluation: cleanEvaluation,
+  completed_at: "2026-07-15T12:00:00.000Z",
+});
+assert.equal(validatePostEditArchitectureEvidence(postEvidence), postEvidence);
+assert.deepEqual(postEvidence.architecture_evaluation.violations, cleanEvaluation.violations);
+assert(Object.isFrozen(postEvidence.architecture_evaluation));
+rejects(() => createPostEditArchitectureEvidence({
+  evidence_id: "post-architecture-unbound",
+  mechanism_kind: "project_check",
+  extractor_identity: postEvidence.extractor_identity,
+  evaluator_identity: postEvidence.evaluator_identity,
+  command_receipt_fingerprint: postEvidence.command_receipt_fingerprint,
+  extractor_output_fingerprint: postEvidence.extractor_output_fingerprint,
+  policy: cleanPolicy,
+  final_workspace_fingerprint: postEvidence.final_workspace_fingerprint,
+  extracted_graph: graphWith({ id: "GRAPH-post-unbound" }),
+  architecture_evaluation: cleanEvaluation,
+  completed_at: "2026-07-15T12:00:00.000Z",
+}), "QUALITY_POST_ARCHITECTURE_BINDING");
+const wrongEvaluatorIdentity = clone(postEvidence);
+wrongEvaluatorIdentity.evaluator_identity.algorithm_ids = ["dependency-graph-v1"];
+rejects(() => validatePostEditArchitectureEvidence(wrongEvaluatorIdentity), "QUALITY_POST_ARCHITECTURE_IDENTITY");
+rejects(() => createPostEditArchitectureEvidence({
+  evidence_id: "post-architecture-missing-receipt",
+  mechanism_kind: "project_check",
+  extractor_identity: postEvidence.extractor_identity,
+  evaluator_identity: postEvidence.evaluator_identity,
+  command_receipt_fingerprint: null,
+  extractor_output_fingerprint: postEvidence.extractor_output_fingerprint,
+  policy: cleanPolicy,
+  final_workspace_fingerprint: postEvidence.final_workspace_fingerprint,
+  extracted_graph: baseGraph,
+  architecture_evaluation: cleanEvaluation,
+  completed_at: "2026-07-15T12:00:00.000Z",
+}), "QUALITY_POST_ARCHITECTURE_RECEIPT");
 
 const notConfigured = evaluateArchitecturePolicy({ graph: baseGraph, policy: null, baseline: null });
 assert.equal(notConfigured.status, "not_configured");

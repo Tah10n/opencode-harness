@@ -7,8 +7,14 @@ import { runManagedCommand } from "../lib/feedback/process-tree.mjs";
 import {
   VERIFICATION_RECEIPT_PRODUCERS,
   assessMilestone2Receipts,
+  deriveMilestone2StatusFacts,
+  sealMilestone2ReceiptBundle,
   sealVerificationReceipt,
 } from "../lib/quality/milestone-dod.mjs";
+import {
+  assertMilestone2RunContextStable,
+  captureMilestone2RunContext,
+} from "../lib/quality/milestone-run-context.mjs";
 import { fingerprint } from "../lib/quality/validation.mjs";
 import {
   committedWhitespaceRequestFromEnvironment,
@@ -42,6 +48,10 @@ export const DETERMINISTIC_STAGE_REGISTRY = Object.freeze([
   { command_id: "verify-normal-session-quality-bridge", npm_script: "verify:normal-session-quality-bridge", check_ids: ["normal-session-quality-bridge"] },
   { command_id: "verify-session-classification", npm_script: "verify:session-classification", check_ids: ["session-classification-lifecycle"] },
   { command_id: "verify-project-check-catalog", npm_script: "verify:project-check-catalog", check_ids: ["project-check-catalog"] },
+  { command_id: "verify-workspace-observation", npm_script: "verify:workspace-observation", check_ids: ["workspace-observation-boundary"] },
+  { command_id: "verify-trusted-toolchain-host-config", npm_script: "verify:trusted-toolchain-host-config", check_ids: [] },
+  { command_id: "verify-trusted-toolchains", npm_script: "verify:trusted-toolchains", check_ids: ["trusted-toolchain-resolution"] },
+  { command_id: "verify-process-containment", npm_script: "verify:process-containment", check_ids: ["process-containment-contract"] },
   { command_id: "verify-trusted-project-runner", npm_script: "verify:trusted-project-runner", check_ids: ["trusted-project-runner"] },
   { command_id: "verify-bash-boundary", npm_script: "verify:bash-boundary", check_ids: ["bash-mutation-boundary"] },
   { command_id: "verify-global-quality-plugin-export", npm_script: "verify:global-quality-plugin-export", check_ids: ["global-quality-plugin-export"] },
@@ -118,6 +128,13 @@ async function runCommand(commandId, command, checkIds) {
     result = await runManagedCommand({
       ...command,
       cwd: root,
+      env: Object.fromEntries(Object.entries(process.env).filter(([key]) => (
+        ![
+          "OPENCODE_QUALITY_CGROUP_ROOT",
+          "OPENCODE_QUALITY_CGROUP_ATTACH_MODE",
+          "OPENCODE_QUALITY_CGROUP_ATTACH_HELPER",
+        ].includes(key)
+      ))),
       timeout: 10 * 60 * 1000,
       maxOutputChars: 4 * 1024 * 1024,
     });
@@ -140,6 +157,36 @@ async function runCommand(commandId, command, checkIds) {
     result,
   }));
   return { result, receipts, startedAt, completedAt };
+}
+
+function writeDeterministicReceiptBundle(output, context, receipts) {
+  if (output === undefined) return;
+  if (typeof output !== "string" || !path.isAbsolute(output) || path.resolve(output) !== output
+    || path.normalize(output) !== output || output.includes("\0") || Buffer.byteLength(output, "utf8") > 4096) {
+    throw new Error("OPENCODE_MILESTONE_RECEIPTS_OUT must be a canonical absolute path");
+  }
+  if (fs.existsSync(output)) throw new Error("deterministic receipt bundle output already exists");
+  const parent = path.dirname(output);
+  fs.mkdirSync(parent, { recursive: true });
+  const canonicalParent = fs.realpathSync.native(parent);
+  const comparable = process.platform === "win32"
+    ? (value) => value.toLowerCase()
+    : (value) => value;
+  if (comparable(canonicalParent) !== comparable(parent)) {
+    throw new Error("deterministic receipt bundle output parent is not canonical");
+  }
+  const bundle = sealMilestone2ReceiptBundle({
+    dimension_id: "deterministic_contracts",
+    head_sha: context.head_sha,
+    workspace_fingerprint: context.workspace_fingerprint,
+    run_binding: context.run_binding,
+    receipts,
+  });
+  fs.writeFileSync(output, `${JSON.stringify(bundle, null, 2)}\n`, {
+    encoding: "utf8",
+    flag: "wx",
+    mode: 0o600,
+  });
 }
 
 function syntheticReceipt(entry, startedAt, completedAt, evidence) {
@@ -189,10 +236,13 @@ function committedWhitespaceReceipt(startedAt) {
 }
 
 async function main() {
-  const document = JSON.parse(fs.readFileSync(path.join(root, "quality", "milestone-2-dod.v1.json"), "utf8"));
+  const document = JSON.parse(fs.readFileSync(path.join(root, "quality", "milestone-2-dod.v2.json"), "utf8"));
+  const runContext = captureMilestone2RunContext({ workspaceRoot: root, localJobId: "deterministic-contracts" });
   const receipts = [];
   const runStartedAt = new Date().toISOString();
   const passedCommands = [];
+
+  try {
 
   for (const stage of DETERMINISTIC_STAGE_REGISTRY) {
     console.log(`Deterministic stage: npm run ${stage.npm_script}`);
@@ -229,18 +279,38 @@ async function main() {
     }
   }
 
+  const expectedChecks = deterministicExpectedChecks();
+  const expectedIds = new Set(expectedChecks.map((entry) => entry.check_id));
+  const selectedReceipts = receipts.filter((entry) => expectedIds.has(entry.check_id));
+  const deterministicState = selectedReceipts.length === expectedChecks.length
+    && selectedReceipts.every((entry) => entry.status === "passed")
+    ? "verified"
+    : selectedReceipts.some((entry) => entry.status === "failed") ? "failed" : "unavailable";
+  const facts = deriveMilestone2StatusFacts({ document, receipts });
+  if (facts.deterministic_contracts !== deterministicState) {
+    throw new Error("deterministic receipt state derivation diverged from the runner registry");
+  }
   const decision = assessMilestone2Receipts({
     document,
     receipts,
-    expectedChecks: deterministicExpectedChecks(),
+    facts,
   });
   console.log(`Milestone 2 verification status: ${decision.status}`);
+  console.log(`Milestone 2 deterministic contracts: ${facts.deterministic_contracts}`);
+  console.log("Operational runtime and installed-host evidence are reported separately; deterministic verification does not synthesize them.");
   if (decision.status === "verification_failed") {
     console.error(`Failed deterministic checks: ${decision.deterministic_failed.join(", ") || "none"}`);
     console.error(`Missing deterministic checks: ${decision.deterministic_missing.join(", ") || "none"}`);
     process.exitCode = 1;
-  } else if (decision.status !== "verified") {
-    throw new Error(`deterministic verify-all must finish verified when optional external evidence is not requested, got ${decision.status}`);
+  } else if (facts.deterministic_contracts !== "verified") {
+    throw new Error(`deterministic verify-all did not complete its declared contract suite, got ${facts.deterministic_contracts}`);
+  }
+  } finally {
+    assertMilestone2RunContextStable(runContext, {
+      workspaceRoot: root,
+      localJobId: "deterministic-contracts",
+    });
+    writeDeterministicReceiptBundle(process.env.OPENCODE_MILESTONE_RECEIPTS_OUT, runContext, receipts);
   }
 }
 

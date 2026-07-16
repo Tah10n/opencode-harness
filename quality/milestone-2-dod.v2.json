@@ -1,0 +1,172 @@
+{
+  "schema_version": 2,
+  "dod_id": "milestone-2-operational-completion-gate",
+  "baseline_commit": "dff323eb5c6379c668839f9502cc41b83801db7a",
+  "dimensions": [
+    {
+      "dimension_id": "deterministic_contracts",
+      "requirement": "The complete model-free deterministic repository contract suite passes.",
+      "mandatory_for_verified": true,
+      "allowed_states": [
+        "verified",
+        "failed",
+        "unavailable"
+      ],
+      "check_ids": [
+        "npm-run-verify-m1",
+        "engineering-dossier-lifecycle",
+        "engineering-dossier-negative-matrix",
+        "engineering-pre-gate-latch",
+        "normal-session-quality-bridge",
+        "runtime-quality-hooks-fixtures",
+        "session-classification-lifecycle",
+        "bash-mutation-boundary",
+        "global-quality-plugin-export",
+        "engineering-mapping-gate",
+        "canonical-verification-targets",
+        "quality-live-runner-integration",
+        "project-check-catalog",
+        "workspace-observation-boundary",
+        "trusted-toolchain-resolution",
+        "process-containment-contract",
+        "trusted-project-runner",
+        "engineering-impact-graph",
+        "engineering-architecture-policy",
+        "quality-live-corpus",
+        "quality-acceptance-negative-matrix",
+        "model-frontmatter-documentation",
+        "prompt-inventory-drift",
+        "documentation-attribution-boundary",
+        "npm-run-verify",
+        "committed-whitespace",
+        "committed-whitespace-fixtures",
+        "tracked-artifact-boundary",
+        "external-gap-classification"
+      ],
+      "evidence_refs": [
+        "package.json",
+        "scripts/verify-all.mjs",
+        "scripts/verify-harness.mjs",
+        "scripts/verify-milestone-2-dod.mjs",
+        "scripts/assess-milestone-2-receipts.mjs",
+        ".github/workflows/verify.yml"
+      ]
+    },
+    {
+      "dimension_id": "windows_runtime",
+      "requirement": "A real trusted project check runs under Windows Job Object containment and descendant teardown is verified.",
+      "mandatory_for_verified": true,
+      "allowed_states": [
+        "verified",
+        "failed",
+        "unavailable"
+      ],
+      "check_ids": [
+        "windows-trusted-project-check",
+        "windows-descendant-teardown"
+      ],
+      "evidence_refs": [
+        "lib/feedback/process-containment.mjs",
+        "lib/feedback/process-tree.mjs",
+        "scripts/verify-process-containment.mjs",
+        "scripts/verify-trusted-project-runner.mjs",
+        "scripts/run-milestone-2-operational.mjs",
+        ".github/workflows/verify.yml"
+      ]
+    },
+    {
+      "dimension_id": "linux_runtime",
+      "requirement": "A real trusted project check runs under delegated Linux cgroup-v2 containment and descendant teardown is verified.",
+      "mandatory_for_verified": true,
+      "allowed_states": [
+        "verified",
+        "failed",
+        "unavailable"
+      ],
+      "check_ids": [
+        "linux-trusted-project-check",
+        "linux-descendant-teardown"
+      ],
+      "evidence_refs": [
+        "lib/feedback/process-containment.mjs",
+        "lib/feedback/process-tree.mjs",
+        "scripts/verify-process-containment.mjs",
+        "scripts/verify-trusted-project-runner.mjs",
+        "scripts/run-milestone-2-operational.mjs",
+        ".github/workflows/verify.yml"
+      ]
+    },
+    {
+      "dimension_id": "macos_runtime",
+      "requirement": "macOS process containment is either verified by a defensible controller or reported explicitly as unsupported.",
+      "mandatory_for_verified": true,
+      "allowed_states": [
+        "verified",
+        "failed",
+        "unavailable",
+        "unsupported"
+      ],
+      "check_ids": [
+        "macos-trusted-project-check"
+      ],
+      "evidence_refs": [
+        "lib/feedback/process-containment.mjs",
+        "docs/evaluation.md"
+      ]
+    },
+    {
+      "dimension_id": "host_hook_e2e",
+      "requirement": "The real host hook path proves disabled-Bash enforcement, one-shot edit authorization and replay blocking, reconciliation, project verification, and final attestation.",
+      "mandatory_for_verified": true,
+      "allowed_states": [
+        "verified",
+        "failed",
+        "unavailable"
+      ],
+      "check_ids": [
+        "normal-session-host-hook-e2e"
+      ],
+      "evidence_refs": [
+        ".opencode/plugins/engineering-dossier.mjs",
+        "lib/quality/normal-session-plugin.mjs",
+        "scripts/verify-normal-session-runtime.mjs",
+        "scripts/assess-milestone-2-receipts.mjs"
+      ]
+    },
+    {
+      "dimension_id": "general_live_evaluation",
+      "requirement": "General model-neutral live regression evaluation is recorded as verified, failed, unavailable after request, or explicitly not requested.",
+      "mandatory_for_verified": false,
+      "allowed_states": [
+        "verified",
+        "failed",
+        "unavailable",
+        "not_requested"
+      ],
+      "check_ids": [
+        "general-live-evaluation"
+      ],
+      "evidence_refs": [
+        "scripts/evaluate-live.mjs",
+        "docs/live-evaluation.md"
+      ]
+    }
+  ],
+  "external_blocking_context": {
+    "eligible_dimensions": [
+      "windows_runtime",
+      "linux_runtime",
+      "macos_runtime",
+      "host_hook_e2e"
+    ],
+    "max_entries": 4,
+    "require_unavailable_state": true
+  },
+  "completion_policy": {
+    "verified": "Deterministic contracts, Windows runtime, Linux runtime, and host-hook E2E are verified; macOS runtime is verified or explicitly unsupported; general live evaluation is verified or not requested.",
+    "partially_verified": "No dimension failed and deterministic contracts are verified, but operational or requested live evidence is unavailable without complete external blocking context.",
+    "verification_failed": "A dimension failed, or deterministic contracts are unavailable.",
+    "blocked_external_state": "Deterministic contracts are verified and every unavailable mandatory operational dimension has explicit bounded external blocking context."
+  },
+  "fingerprint": "sha256:b2a3792e83d92a90a63268fb8385a9c323bac2ca2a09a2b067c760fca4990a85"
+}
