@@ -114,6 +114,8 @@ const requiredQualityFiles = Object.freeze([
   "scripts/verify-milestone-2-dod.mjs",
   "scripts/build-macos-containment.mjs",
   "native/macos-exclusive-uid-controller.c",
+  "scripts/build-linux-cgroup-attach-helper.mjs",
+  "native/linux-cgroup-attach-helper.c",
   "scripts/verify-all.mjs",
   "scripts/verify-quality-contracts.mjs",
   "scripts/verify-quality-live-runner.mjs",

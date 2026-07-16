@@ -14,6 +14,10 @@ import {
   validateProjectCheckCatalog,
 } from "../lib/quality/project-check-catalog.mjs";
 import { ContractError } from "../lib/quality/validation.mjs";
+import {
+  DETERMINISTIC_STAGE_REGISTRY,
+  deterministicStageEnvironment,
+} from "./verify-all.mjs";
 
 const workspaceRoot = fs.realpathSync(new URL("..", import.meta.url));
 
@@ -84,6 +88,43 @@ assert(Object.isFrozen(validatedExample));
 assert.match(projectCheckCatalogFingerprint(validatedExample), /^sha256:[a-f0-9]{64}$/u);
 const engineering = projectCatalogToEngineeringCatalog(validatedExample, "trusted-fixture");
 assert.deepEqual(Object.keys(engineering.checks[0]).sort(), ["available", "check_id", "phases", "trusted_producer"]);
+
+const productionCatalog = loadProjectCheckCatalog(workspaceRoot).catalog;
+const recursiveCheckIds = new Set(["verify-all", "verify-trusted-project-runner"]);
+const recursiveNpmScripts = new Set(["verify", "verify:trusted-project-runner"]);
+const recursiveProductionChecks = productionCatalog.checks.filter((entry) => (
+  recursiveCheckIds.has(entry.check_id)
+  || (entry.executable_id === "npm"
+    && ["run", "run-script"].includes(entry.argv[0])
+    && recursiveNpmScripts.has(entry.argv[1]))
+));
+assert.deepEqual(
+  recursiveProductionChecks,
+  [],
+  "production trusted checks must not recursively invoke verify-all or the trusted-runner verifier",
+);
+assert(
+  DETERMINISTIC_STAGE_REGISTRY.some((entry) => entry.npm_script === "verify:trusted-project-runner"),
+  "top-level verify-all must retain trusted-runner verification outside the production catalog",
+);
+
+const stageEnvironment = deterministicStageEnvironment({
+  SAFE_VALUE: "preserved",
+  OPENCODE_QUALITY_CGROUP_ROOT: "/poison/cgroup",
+  OPENCODE_QUALITY_CGROUP_ATTACH_MODE: "poison-mode",
+  OPENCODE_QUALITY_CGROUP_ATTACH_HELPER: "/poison/helper",
+  OPENCODE_QUALITY_CGROUP_FUTURE_COORDINATOR: "poison-future-linux",
+  OPENCODE_QUALITY_MACOS_CONTROLLER: "/poison/controller",
+  OPENCODE_QUALITY_MACOS_WORKLOAD_UID: "501",
+  OPENCODE_QUALITY_MACOS_UID_MARKER: "/poison/marker",
+  OPENCODE_QUALITY_MACOS_UID_LEASE: "/poison/lease",
+  OPENCODE_QUALITY_MACOS_FUTURE_COORDINATOR: "poison-future-macos",
+  OPENCODE_QUALITY_WINDOWS_SENTINEL: "preserved-windows",
+});
+assert.deepEqual(stageEnvironment, {
+  SAFE_VALUE: "preserved",
+  OPENCODE_QUALITY_WINDOWS_SENTINEL: "preserved-windows",
+}, "top-level verify-all must strip every Linux/macOS coordination variable without changing Windows variables");
 
 expectCode(() => parseProjectCheckCatalog("{"), "QUALITY_CHECK_CATALOG_JSON");
 expectCode(() => validateProjectCheckCatalog({ ...catalog(), extra: true }), "CONTRACT_UNKNOWN_FIELD");

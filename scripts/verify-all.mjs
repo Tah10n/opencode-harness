@@ -69,6 +69,16 @@ const gitCheck = Object.freeze({
   command_id: "verify-committed-whitespace",
   check_ids: Object.freeze(["committed-whitespace"]),
 });
+const CONTAINMENT_COORDINATION_ENV_PREFIXES = Object.freeze([
+  "OPENCODE_QUALITY_CGROUP_",
+  "OPENCODE_QUALITY_MACOS_",
+]);
+
+export function deterministicStageEnvironment(environment = process.env) {
+  return Object.fromEntries(Object.entries(environment).filter(([key]) => (
+    !CONTAINMENT_COORDINATION_ENV_PREFIXES.some((prefix) => key.startsWith(prefix))
+  )));
+}
 
 export function deterministicExpectedChecks() {
   return [
@@ -128,13 +138,7 @@ async function runCommand(commandId, command, checkIds) {
     result = await runManagedCommand({
       ...command,
       cwd: root,
-      env: Object.fromEntries(Object.entries(process.env).filter(([key]) => (
-        ![
-          "OPENCODE_QUALITY_CGROUP_ROOT",
-          "OPENCODE_QUALITY_CGROUP_ATTACH_MODE",
-          "OPENCODE_QUALITY_CGROUP_ATTACH_HELPER",
-        ].includes(key)
-      ))),
+      env: deterministicStageEnvironment(),
       timeout: 10 * 60 * 1000,
       maxOutputChars: 4 * 1024 * 1024,
     });

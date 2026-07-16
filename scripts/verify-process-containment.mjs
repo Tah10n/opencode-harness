@@ -47,6 +47,22 @@ const macosControllerSource = fs.readFileSync(
   fileURLToPath(new URL("../native/macos-exclusive-uid-controller.c", import.meta.url)),
   "utf8",
 );
+const linuxAttachHelperSource = fs.readFileSync(
+  fileURLToPath(new URL("../native/linux-cgroup-attach-helper.c", import.meta.url)),
+  "utf8",
+);
+for (const required of [
+  "pidfd_open_bound(pid)",
+  "pidfd_signal(pidfd, SIGSTOP)",
+  "identity_matches(&identity, expected_start_ticks)",
+  "control_contains_pid(pid)",
+  "if (stopped) (void)pidfd_signal(pidfd, SIGCONT)",
+]) {
+  assert(linuxAttachHelperSource.includes(required), `native Linux helper is missing ${required}`);
+}
+assert(linuxAttachHelperSource.indexOf("pidfd_signal(pidfd, SIGSTOP)")
+  < linuxAttachHelperSource.lastIndexOf("identity_matches(&identity, expected_start_ticks)"),
+"native Linux helper must revalidate worker identity after SIGSTOP");
 const macosMarkerValidation = macosControllerSource.indexOf("validate_uid_marker(marker_path, workload_uid)");
 const macosLeaseAcquisition = macosControllerSource.indexOf("acquire_uid_lease(lease_path, workload_uid)");
 const macosScopeCapture = macosControllerSource.indexOf("capture_scope(coordinator_pid, worker_pid, probe, &scope)");
@@ -69,6 +85,7 @@ assert(macosControllerSource.includes("#define CONTROLLER_PROTOCOL_VERSION 2")
 const currentIdentityAssertion = processTreeSource.indexOf(
   "assertTrustedToolchainInvocationCurrent(input.expected_invocation);",
 );
+const commandChallengeHandler = processTreeSource.indexOf('message?.type === "containment_challenge"');
 const commandBindingAssertion = processTreeSource.indexOf(
   "assertTrustedToolchainCommandBinding(input.expected_invocation, input.file, input.args);",
 );
@@ -79,6 +96,8 @@ const inheritedCwdAssertion = processTreeSource.indexOf(
 const containedSpawn = processTreeSource.indexOf("commandChild = spawn(input.file, input.args", inheritedCwdAssertion);
 const containedSpawnEnd = processTreeSource.indexOf('send({ type: "spawned"', containedSpawn);
 assert(currentIdentityAssertion >= 0
+  && commandChallengeHandler >= 0
+  && commandChallengeHandler < currentIdentityAssertion
   && commandBindingAssertion > currentIdentityAssertion
   && inheritedCwdAssertion > commandBindingAssertion
   && containedSpawn > inheritedCwdAssertion
@@ -277,13 +296,43 @@ function fakeWindowsIdentity(inode = "1") {
   });
 }
 
+function createFakeChallengeWorker({ pid = 4242, response = "match", duplicate = false } = {}) {
+  const worker = new EventEmitter();
+  worker.pid = pid;
+  worker.send = (message, callback) => {
+    if (response === "exit") {
+      callback?.(new Error("worker exited"));
+      return false;
+    }
+    callback?.(null);
+    if (response === "silent") return true;
+    queueMicrotask(() => {
+      if (response === "reject") worker.emit("message", { type: "containment_challenge_rejected" });
+      else worker.emit("message", {
+        type: "containment_challenge_response",
+        challenge: response === "mismatch" ? "B".repeat(43) : message.challenge,
+      });
+      if (duplicate) worker.emit("message", {
+        type: "containment_challenge_response",
+        challenge: message.challenge,
+      });
+    });
+    return true;
+  };
+  return worker;
+}
+
 function createFakeWindowsController({
-  initial = "READY\n",
+  initial = null,
   close = "success",
   exitOnStart = null,
   exitBeforeClosed = false,
   stdinErrorOnEnd = null,
+  postReady = null,
+  readyCreationFiletime = null,
 } = {}) {
+  const challenge = "A".repeat(43);
+  const creationFiletime = "123456789";
   const stdout = new EventEmitter();
   const stderr = new EventEmitter();
   stdout.setEncoding = () => stdout;
@@ -305,6 +354,17 @@ function createFakeWindowsController({
   controller.stderr = stderr;
   const stdin = new EventEmitter();
   let stdinErrorEmitted = false;
+  stdin.write = (value) => {
+    if (value === `ASSIGN:${challenge}\n`) {
+      queueMicrotask(() => {
+        stdout.emit("data", `READY:${readyCreationFiletime ?? creationFiletime}\n`);
+        if (postReady !== null) stdout.emit("data", postReady);
+      });
+      return true;
+    }
+    queueMicrotask(() => stdout.emit("data", "ERROR:fake assignment failure\n"));
+    return false;
+  };
   stdin.end = (value) => {
     if (stdinErrorOnEnd !== null && !stdinErrorEmitted) {
       stdinErrorEmitted = true;
@@ -333,7 +393,8 @@ function createFakeWindowsController({
     return true;
   };
   queueMicrotask(() => {
-    const chunks = Array.isArray(initial) ? initial : [initial];
+    const opening = initial ?? `OPEN:${creationFiletime}:${challenge}\n`;
+    const chunks = Array.isArray(opening) ? opening : [opening];
     for (const chunk of chunks) {
       if (chunk.length > 0) stdout.emit("data", chunk);
     }
@@ -611,8 +672,8 @@ assert.equal(classifyProcessContainment({ platform: "linux", env: {} }).support_
 assert.throws(() => normalizeProcessContainmentOptions({ fallbackToProcessGroup: true }), TypeError);
 assert.throws(() => normalizeProcessContainmentOptions({ cgroupRoot: "relative" }), TypeError);
 assert.deepEqual(
-  normalizeProcessContainmentOptions({ cgroupAttachMode: "sudo-helper-v1" }),
-  { cgroupAttachMode: "sudo-helper-v1" },
+  normalizeProcessContainmentOptions({ cgroupAttachMode: "sudo-helper-v2" }),
+  { cgroupAttachMode: "sudo-helper-v2" },
 );
 assert.throws(() => normalizeProcessContainmentOptions({ cgroupAttachMode: "ambient-sudo" }), TypeError);
 assert.deepEqual(normalizeProcessContainmentOptions({
@@ -669,14 +730,37 @@ if (process.platform === "linux") {
 }
 
 const windowsIdentity = fakeWindowsIdentity();
-const validWindows = await preparePlatformProcessContainment({ pid: 4242 }, 100, {
+const validWindows = await preparePlatformProcessContainment(createFakeChallengeWorker(), 100, {
   platform: "win32",
   windowsPowerShellIdentity: windowsIdentity,
   spawnController: () => createFakeWindowsController(),
   scopeIdFactory: () => "windows-job-valid-protocol",
 });
+assert.equal(validWindows.identity.schema_version, 2);
+assert.equal(validWindows.identity.worker_creation_filetime, "123456789");
+assert.match(validWindows.identity.worker_challenge_fingerprint, /^sha256:[0-9a-f]{64}$/u);
+assert.equal(JSON.stringify(validWindows.identity).includes("A".repeat(43)), false, "raw worker challenge entered durable identity");
 assert.equal(await validWindows.terminateAndVerify(100), true);
 assert.equal(validWindows.status().teardown_verified, true);
+
+for (const [label, worker, controllerOptions] of [
+  ["mismatched response", createFakeChallengeWorker({ response: "mismatch" }), {}],
+  ["worker exit", createFakeChallengeWorker({ response: "exit" }), {}],
+  ["challenge timeout", createFakeChallengeWorker({ response: "silent" }), {}],
+  ["stale creation identity", createFakeChallengeWorker(), { readyCreationFiletime: "987654321" }],
+  ["duplicate open", createFakeChallengeWorker({ duplicate: true }), {
+    initial: [`OPEN:123456789:${"A".repeat(43)}\n`, `OPEN:123456789:${"A".repeat(43)}\n`],
+  }],
+]) {
+  await assert.rejects(preparePlatformProcessContainment(worker, 20, {
+    platform: "win32",
+    windowsPowerShellIdentity: windowsIdentity,
+    spawnController: () => createFakeWindowsController(controllerOptions),
+    scopeIdFactory: () => `windows-job-${label.replaceAll(" ", "-")}`,
+    workerChallengeTimeoutMs: 5,
+  }), (error) => error instanceof ProcessContainmentError
+    && error.classification === "process_containment_failed", `${label} challenge was accepted`);
+}
 
 const reorderedWindows = await preparePlatformProcessContainment({ pid: 4242 }, 100, {
   platform: "win32",
@@ -689,10 +773,10 @@ assert.equal(reorderedWindows.status().controller_streams_closed, true);
 assert.equal(reorderedWindows.status().teardown_verified, true);
 
 for (const [label, fixture] of [
-  ["post-ready garbage", { initial: "READY\nGARBAGE\n" }],
-  ["post-ready error", { initial: "READY\nERROR:injected\n" }],
-  ["premature close", { initial: "READY\nCLOSED\n" }],
-  ["bounded flood", { initial: ["READY\n", "x".repeat(5000)] }],
+  ["post-ready garbage", { postReady: "GARBAGE\n" }],
+  ["post-ready error", { postReady: "ERROR:injected\n" }],
+  ["premature close", { postReady: "CLOSED\n" }],
+  ["bounded flood", { postReady: "x".repeat(5000) }],
 ]) {
   const containment = await preparePlatformProcessContainment({ pid: 4242 }, 100, {
     platform: "win32",
@@ -931,11 +1015,16 @@ const fakeContainment = await preparePlatformProcessContainment({ pid: 4242 }, 1
   cgroupRoot: fakeRoot,
   linuxController: successfulFake.controller,
   scopeIdFactory: () => "linux-cgroup-fixture-one",
+  workerChallengeFactory: () => "C".repeat(43),
   delay: async () => {},
 });
 assert.equal(fakeContainment.support_state, "verified");
 assert.equal(fakeContainment.scope_id, "linux-cgroup-fixture-one");
 assert.match(fakeContainment.fingerprint, /^sha256:[0-9a-f]{64}$/u);
+assert.equal(fakeContainment.identity.schema_version, 2);
+assert.equal(fakeContainment.identity.worker_start_ticks, "1");
+assert.match(fakeContainment.identity.worker_challenge_fingerprint, /^sha256:[0-9a-f]{64}$/u);
+assert.equal(JSON.stringify(fakeContainment.identity).includes("C".repeat(43)), false, "raw Linux challenge entered durable identity");
 assert(successfulFake.events.indexOf("attach:4242") > successfulFake.events.indexOf("create:linux-cgroup-fixture-one"));
 assert.equal(fakeContainment.status().teardown_verified, false);
 
@@ -1318,9 +1407,17 @@ try {
       }
     },
   });
-  assert.equal(inheritedCwdResult.status, 0);
   assert.equal(inheritedCwdResult.teardown_verified, true);
-  if (swapped) {
+  if (swapped && inheritedCwdResult.status === null) {
+    assert.equal(
+      inheritedCwdResult.error?.code,
+      "PROCESS_WORKING_DIRECTORY_CHANGED",
+      JSON.stringify(inheritedCwdResult),
+    );
+  } else {
+    assert.equal(inheritedCwdResult.status, 0, JSON.stringify(inheritedCwdResult));
+  }
+  if (swapped && inheritedCwdResult.status === 0) {
     assert.equal(
       fs.readFileSync(path.join(retainedCwd, "executed.txt"), "utf8"),
       "original",

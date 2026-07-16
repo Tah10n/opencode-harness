@@ -25,6 +25,7 @@
   "scripts": {
     "assess:candidate": "node scripts/assess-candidate.mjs",
     "build:macos-containment": "node scripts/build-macos-containment.mjs",
+    "build:linux-cgroup-attach": "node scripts/build-linux-cgroup-attach-helper.mjs",
     "evidence:static": "node scripts/capture-static-evidence.mjs",
     "eval": "node scripts/evaluate-harness.mjs",
     "eval:live": "node scripts/evaluate-live.mjs",

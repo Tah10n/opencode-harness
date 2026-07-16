@@ -6,6 +6,12 @@ This section describes the development checkout. The latest tagged release is
 still `v0.2.0`; its package metadata has no `exports` field and does not expose
 the feedback-plane ESM subpaths documented for the `0.3.0` target.
 
+- Closed the final Milestone 2 review gaps: deterministic stages now own one
+  containment scope without recursive catalog meta-checks; bootstrap workers
+  and controllers use a minimal injection-resistant environment; Windows and
+  Linux bind the original idle worker before attachment; Linux uses the native
+  fixed-destination `sudo-helper-v2`; configured macOS runs the full verifier;
+  and conclusive installed-host failures seal failed same-run receipts.
 - Implemented Milestone 2's operational hardening code and deterministic contract: bounded
   ignored-aware source/output observation; logical trusted toolchains with
   fixed-source host configuration, all nine resolver families, sanitized

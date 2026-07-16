@@ -213,7 +213,7 @@ The second prints the local committed-whitespace receipt directly. In CI the
 same verifier consumes pull-request base or push before metadata and binds the
 exact range and HEAD.
 
-GitHub Actions additionally runs the Windows and Linux production verifiers
+GitHub Actions additionally runs the Windows, Linux, and macOS production verifiers
 through `npm run milestone:2:operational`, uploads their sealed receipt bundles,
 and aggregates them with the deterministic bundle through `npm run
 milestone:2:assess`. The aggregate is `blocked_external_state`, not `verified`,
@@ -222,7 +222,7 @@ bounded blocker into installed-host evidence.
 
 Each producer binds the same portable source attestation and re-observes it
 before sealing. The aggregate job first requires `success` from deterministic,
-Windows, and Linux producers; diagnostic artifacts from a failed producer are
+Windows, Linux, and macOS producers; diagnostic artifacts from a failed producer are
 never accepted as release evidence.
 
 When an installed OpenCode environment is part of the release claim, also run:
@@ -236,9 +236,18 @@ npm run verify:runtime:quality-hooks
 To include installed-host evidence in a Milestone 2 aggregate, run the last
 command with `--adapter <host-owned-adapter> --milestone-out <absolute-json>`
 and aggregate that bundle only with artifacts from the same repository HEAD and
-run binding. Fixture-contract mode cannot emit a host milestone bundle.
+run binding. That binding includes provider, run ID, attempt, repository, HEAD,
+and portable source attestation. A local `installed_host` bundle therefore
+cannot be mixed with `github_actions` artifacts. Either run the adapter in an
+installed/self-hosted job inside the same GitHub workflow run, or produce all
+platform and host bundles as one coordinated local run using the same
+`OPENCODE_MILESTONE_*` values. Fixture-contract mode cannot emit an
+installed-host milestone bundle.
 
-A `failed` runtime hook receipt blocks the claim. An `incomplete` receipt
+A conclusive adapter, evidence, workspace-effect, or cleanup failure writes a
+sealed `failed` host receipt to the requested milestone bundle and blocks the
+claim. A genuinely unavailable runtime remains bounded external state and does
+not mint a failed execution receipt. An `incomplete` receipt
 allows only a partial claim that names the uncovered surface. The current
 explicit API probe proves that the installed API can construct the bounded tool
 surface and recognizes only the exact expected `ContractError` denial. The
@@ -246,13 +255,18 @@ runtime-hook verifier is a separate host-evidence surface. Neither proves every
 host callback invocation, effective adopted permissions, exact task-to-child
 causality, or pre-dossier risk classification. Native Bash is disabled in an
 instrumented quality session; commands use trusted project-catalog checks, with
-Windows Job Object containment, delegated Linux cgroup-v2 containment, and
+Windows Job Object containment bound by a retained handle, creation time, and
+pre-assignment IPC challenge; delegated Linux cgroup-v2 containment through a
+fixed-destination `sudo-helper-v2` bound to pidfd, start time, and the original
+worker's one-shot IPC challenge; and
 macOS exclusive-UID containment through a root-owned native controller and a
 dedicated non-admin account authorized by a protected UID marker and serialized
 by a paired workload-owned lease. The v2 receipt identity binds controller,
 marker, lease, and pre-readiness fixed-point census. macOS release evidence must include both the
 trusted-check and descendant-teardown receipts; `unsupported` cannot satisfy
-Milestone 2 DoD v3. Any unavailable production controller still fails closed.
+Milestone 2 DoD v3. Bootstrap processes receive a minimal runner-owned
+environment rather than ambient loader/profiler variables. Any unavailable
+production controller still fails closed.
 Logical project toolchain IDs never carry host
 paths; non-Node resolvers require the fixed-source
 `quality-toolchains.host.v1.json` beside the global wrapper, with disjoint

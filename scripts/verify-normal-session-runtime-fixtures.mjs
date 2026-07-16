@@ -7,6 +7,7 @@ import { spawnSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
 
 import { createNormalSessionQualityPlugin } from "../lib/quality/quality-plugin.mjs";
+import { validateMilestone2ReceiptBundle } from "../lib/quality/milestone-dod.mjs";
 import { NORMAL_SESSION_QUALITY_TOOL_IDS } from "../lib/quality/normal-session-bridge.mjs";
 import { observeContentBoundWorkspace } from "../lib/quality/normal-session-workspace.mjs";
 import {
@@ -815,16 +816,59 @@ async function runFixtureSuite() {
 
   const adapterFixture = fs.mkdtempSync(path.join(os.tmpdir(), "quality-runtime-v2-adapter-"));
   try {
+    const failedMilestoneOutput = path.join(adapterFixture, "failed-host-milestone-bundle.json");
+    const failedMilestoneStartedAt = Date.now();
     const projectLocalHostAttempt = runVerifier([
       "--adapter",
       path.join(root, "scripts", "verify-normal-session-runtime-fixtures.mjs"),
+      "--milestone-out",
+      failedMilestoneOutput,
     ]);
+    const failedMilestoneCompletedAt = Date.now();
     assert.equal(projectLocalHostAttempt.status, 1, projectLocalHostAttempt.stdout);
+    const projectLocalFailureReceipt = JSON.parse(projectLocalHostAttempt.stdout);
     assert.deepEqual(
-      JSON.parse(projectLocalHostAttempt.stdout).reason_codes,
+      projectLocalFailureReceipt.reason_codes,
       ["QUALITY_HOST_ADAPTER_NOT_HOST_OWNED"],
       "a project-local deterministic adapter must be rejected before host runtime availability is considered",
     );
+    assert.equal(fs.existsSync(failedMilestoneOutput), true,
+      "a conclusive installed-host verification failure did not create its milestone bundle");
+    const failedMilestoneBundle = validateMilestone2ReceiptBundle(
+      JSON.parse(fs.readFileSync(failedMilestoneOutput, "utf8")),
+    );
+    assert.equal(failedMilestoneBundle.dimension_id, "host_hook_e2e");
+    assert.equal(failedMilestoneBundle.receipts.length, 1);
+    const failedOperationalReceipt = failedMilestoneBundle.receipts[0];
+    assert.equal(failedOperationalReceipt.check_id, "normal-session-host-hook-e2e");
+    assert.equal(failedOperationalReceipt.status, "failed");
+    assert.equal(failedOperationalReceipt.evidence_scope.result.kind, "installed_host");
+    assert.equal(failedOperationalReceipt.evidence_scope.result.verification_mode, null);
+    assert.equal(
+      failedOperationalReceipt.evidence_scope.result.report_fingerprint,
+      projectLocalFailureReceipt.evidence_fingerprint,
+    );
+    assert.deepEqual(failedOperationalReceipt.evidence_scope.result.scenario_ids, []);
+    assert(
+      Date.parse(failedOperationalReceipt.started_at) >= failedMilestoneStartedAt
+      && Date.parse(failedOperationalReceipt.started_at) <= failedMilestoneCompletedAt,
+      "failed host milestone receipt start timestamp does not bracket the verification attempt",
+    );
+    assert(
+      Date.parse(failedOperationalReceipt.completed_at) >= Date.parse(failedOperationalReceipt.started_at)
+      && Date.parse(failedOperationalReceipt.completed_at) <= failedMilestoneCompletedAt,
+      "failed host milestone receipt completion timestamp does not bracket the verification attempt",
+    );
+
+    const blockedMilestoneOutput = path.join(adapterFixture, "blocked-host-milestone-bundle.json");
+    const blockedMilestoneRun = runVerifier([
+      "--evidence", "untrusted.json",
+      "--milestone-out", blockedMilestoneOutput,
+    ]);
+    assert.equal(blockedMilestoneRun.status, 2, blockedMilestoneRun.stderr);
+    assert.equal(JSON.parse(blockedMilestoneRun.stdout).status, "blocked_external_state");
+    assert.equal(fs.existsSync(blockedMilestoneOutput), false,
+      "genuinely unavailable installed-host evidence created a conclusive milestone bundle");
 
     const adapterPath = path.join(adapterFixture, "fixture-adapter.mjs");
     const adapterErrorPath = path.join(adapterFixture, "adapter-error.log");
@@ -874,9 +918,16 @@ async function runFixtureSuite() {
       'process.stdout.write(`${JSON.stringify(evidence)}\\n`);',
       "",
     ].join("\n"), "utf8");
-    const escapedRun = runVerifier(["--adapter", escapedPath, "--fixture-contract"]);
+    const failedFixtureMilestoneOutput = path.join(adapterFixture, "failed-fixture-milestone-bundle.json");
+    const escapedRun = runVerifier([
+      "--adapter", escapedPath,
+      "--fixture-contract",
+      "--milestone-out", failedFixtureMilestoneOutput,
+    ]);
     assert.equal(escapedRun.status, 1, `${escapedRun.stdout}\n${escapedRun.stderr}`);
     assert.deepEqual(JSON.parse(escapedRun.stdout).reason_codes, ["QUALITY_HOST_UNEXPECTED_WORKSPACE_EFFECT"]);
+    assert.equal(fs.existsSync(failedFixtureMilestoneOutput), false,
+      "a failed deterministic fixture created an installed-host milestone bundle");
   } finally {
     fs.rmSync(adapterFixture, { recursive: true, force: true });
   }

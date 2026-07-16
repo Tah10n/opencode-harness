@@ -145,7 +145,7 @@ function containedExecution(execution = {}, {
     fixture: true,
   };
   const common = {
-    schema_version: 1,
+    schema_version: kind === "macos-exclusive-uid-v1" ? 1 : 2,
     support_state: "verified",
     kind,
     scope_id: scopeId,
@@ -155,6 +155,8 @@ function containedExecution(execution = {}, {
   if (kind === "windows-job-object-v1") {
     identity = {
       ...common,
+      worker_creation_filetime: "123456789",
+      worker_challenge_fingerprint: fingerprint("fixture-windows-worker-challenge"),
       controller_executable: { canonical_path: process.execPath, fixture: true },
       controller_source_fingerprint: fingerprint({ controller: "fixture" }),
     };
@@ -176,6 +178,8 @@ function containedExecution(execution = {}, {
   } else {
     identity = {
       ...common,
+      worker_start_ticks: "123456",
+      worker_challenge_fingerprint: fingerprint("fixture-linux-worker-challenge"),
       watchdog_pid: 4343,
       delegated_root_identity: { canonical_path: "/fixture/cgroup", fixture: true },
       current_parent_identity: linuxParentIdentity,
@@ -186,7 +190,7 @@ function containedExecution(execution = {}, {
       controller_module: { canonical_path: "/fixture/process-containment.mjs", fixture: true },
       controller_source_fingerprint: fingerprint({ controller: "fixture-linux" }),
       attach_helper: {
-        mode: "sudo-helper-v1",
+        mode: "sudo-helper-v2",
         sudo: { canonical_path: "/usr/bin/sudo", fixture: true },
         executable: linuxHelperExecutable,
         policy_probe_executable: linuxHelperExecutable,
@@ -473,6 +477,14 @@ assert.equal(
 );
 assert.match(invocation.options.expectedWorkingDirectoryIdentity.inode, /^[0-9]+$/u);
 assert.equal(invocation.options.env.NODE_OPTIONS, undefined);
+for (const key of [
+  "OPENCODE_QUALITY_CGROUP_ROOT",
+  "OPENCODE_QUALITY_CGROUP_ATTACH_MODE",
+  "OPENCODE_QUALITY_CGROUP_ATTACH_HELPER",
+  "OPENCODE_QUALITY_MACOS_CONTROLLER",
+  "OPENCODE_QUALITY_MACOS_WORKLOAD_UID",
+  "OPENCODE_QUALITY_MACOS_UID_MARKER",
+]) assert.equal(invocation.options.env[key], undefined, `${key} crossed into a trusted project command`);
 const syntheticPathEntries = (invocation.options.env.PATH ?? invocation.options.env.Path).split(path.delimiter);
 assert.equal(syntheticPathEntries[0], path.dirname(process.execPath));
 assert.equal(syntheticPathEntries.length, process.platform === "win32" ? 2 : 1);
@@ -508,7 +520,7 @@ const linuxContainmentDescriptor = containmentDescriptor({
     current_parent_identity: { canonical_path: "/fixture/cgroup/parent", fixture: true },
     guard_identity: { canonical_path: "/fixture/cgroup/parent", fixture: true },
     mount_point: "/sys/fs/cgroup",
-    attach_helper: { mode: "sudo-helper-v1" },
+    attach_helper: { mode: "sudo-helper-v2" },
   },
 });
 const linuxPassed = runSynthetic({
@@ -980,7 +992,7 @@ fs.mkdirSync(realProject, { recursive: true });
 fs.writeFileSync(path.join(realRoot, ".gitignore"), "node_modules/\n.env\ncoverage/\nbuild/\n", "utf8");
 fs.writeFileSync(path.join(realProject, "environment-fixture.mjs"), `import fs from "node:fs";
 import { spawnSync } from "node:child_process";
-const names = ["NODE_OPTIONS", "NODE_PATH", "npm_execpath", "npm_config_registry", "AWS_SECRET_ACCESS_KEY", "GH_TOKEN", "PATH", "Path", "OPENCODE_QUALITY_GIT_EXECUTABLE"];
+const names = ["NODE_OPTIONS", "NODE_PATH", "npm_execpath", "npm_config_registry", "AWS_SECRET_ACCESS_KEY", "GH_TOKEN", "PATH", "Path", "OPENCODE_QUALITY_GIT_EXECUTABLE", "OPENCODE_QUALITY_CGROUP_ROOT", "OPENCODE_QUALITY_CGROUP_ATTACH_MODE", "OPENCODE_QUALITY_CGROUP_ATTACH_HELPER", "OPENCODE_QUALITY_MACOS_CONTROLLER", "OPENCODE_QUALITY_MACOS_WORKLOAD_UID", "OPENCODE_QUALITY_MACOS_UID_MARKER"];
 const observed = Object.fromEntries(names.map((name) => [name, process.env[name] ?? null]));
 const git = spawnSync("git", ["--version"], { encoding: "utf8", env: process.env, shell: false, windowsHide: true });
 observed.git_by_name = {
@@ -1224,7 +1236,7 @@ if (shouldRunReal) {
     operationalReceipts.push(environmentReceipt);
     assert.equal(environmentReceipt.status, "passed");
     const observedEnvironment = JSON.parse(fs.readFileSync(path.join(realProject, "environment-marker.json"), "utf8"));
-    for (const key of ["NODE_OPTIONS", "NODE_PATH", "npm_execpath", "npm_config_registry", "AWS_SECRET_ACCESS_KEY", "GH_TOKEN"]) {
+    for (const key of ["NODE_OPTIONS", "NODE_PATH", "npm_execpath", "npm_config_registry", "AWS_SECRET_ACCESS_KEY", "GH_TOKEN", "OPENCODE_QUALITY_CGROUP_ROOT", "OPENCODE_QUALITY_CGROUP_ATTACH_MODE", "OPENCODE_QUALITY_CGROUP_ATTACH_HELPER", "OPENCODE_QUALITY_MACOS_CONTROLLER", "OPENCODE_QUALITY_MACOS_WORKLOAD_UID", "OPENCODE_QUALITY_MACOS_UID_MARKER"]) {
       assert.equal(observedEnvironment[key], null, `${key} crossed the trusted runner environment boundary`);
     }
     for (const key of ["PATH", "Path"]) {

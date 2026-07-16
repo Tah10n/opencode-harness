@@ -662,6 +662,41 @@ assert.equal(assessMilestone2Receipts({
   facts: failedOperationalFacts,
 }).status, "verification_failed");
 
+const failedHostResult = {
+  kind: "installed_host",
+  verification_mode: null,
+  report_fingerprint: fingerprint({ host_failure: "adapter_rejected" }),
+  containment_kind: null,
+  containment_identity_fingerprints: [],
+  teardown_verified: null,
+  scenario_ids: [],
+  trusted_check_receipt_fingerprints: [],
+  scenario_contract_fingerprint: null,
+  attestation_fingerprint: null,
+  host_evidence_fingerprint: null,
+};
+const failedHostReceipts = allReceipts.map((receipt) => (
+  receipt.check_id === hostHookCheck.check_id
+    ? receiptFor(hostHookCheck, "failed", { result: failedHostResult })
+    : receipt
+));
+const failedHostFacts = deriveMilestone2StatusFacts({ document, receipts: failedHostReceipts });
+assert.equal(failedHostFacts.host_hook_e2e, "failed");
+const failedHostDecision = assessMilestone2Receipts({
+  document,
+  receipts: failedHostReceipts,
+  facts: failedHostFacts,
+});
+assert.equal(failedHostDecision.status, "verification_failed");
+assert(failedHostDecision.receipt_failed.includes(hostHookCheck.check_id),
+  "a conclusive installed-host failure must remain a failed milestone receipt");
+assert.throws(() => deriveMilestone2StatusFacts({
+  document,
+  receipts: failedHostReceipts,
+  external_blocking_context: [blocker("host_hook_e2e")],
+}), /requires host_hook_e2e=unavailable/u,
+"external-unavailability context must not downgrade a conclusive installed-host failure");
+
 const macosCheckId = document.dimensions.find((dimension) => dimension.dimension_id === "macos_runtime").check_ids[0];
 const failedMacosReceipts = [...deterministicReceipts, receiptFor(expectedByCheckId.get(macosCheckId), "failed")];
 const failedMacosFacts = deriveMilestone2StatusFacts({ document, receipts: failedMacosReceipts });

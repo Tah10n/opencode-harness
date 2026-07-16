@@ -64,23 +64,11 @@ jobs:
           fi
           uid="$(id -u "$user")"
           helper="/usr/local/libexec/opencode-cgroup-attach-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${GITHUB_JOB}"
-          helper_source="$(mktemp)"
-          cat > "$helper_source" <<EOF
-          #!/bin/sh
-          set -eu
-          expected_uid="$uid"
-          control="$root/opencode-quality-workload/cgroup.procs"
-          [ "\${SUDO_UID:-}" = "\$expected_uid" ] || exit 77
-          [ "\$#" -eq 1 ] || exit 64
-          pid="\$1"
-          case "\$pid" in *[!0-9]*|'') exit 64 ;; esac
-          [ "\$pid" -gt 0 ] || exit 64
-          target_uid="\$(/usr/bin/awk '\$1 == "Uid:" { print \$2; exit }' "/proc/\$pid/status")"
-          [ "\$target_uid" = "\$expected_uid" ] || exit 77
-          printf '%s\n' "\$pid" > "\$control"
-          /usr/bin/grep -qx "\$pid" "\$control"
-          printf 'ATTACHED:%s\n' "\$pid"
-          EOF
+          helper_source="$(cd "$RUNNER_TEMP" && pwd -P)/opencode-cgroup-attach-build-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${GITHUB_JOB}"
+          npm run build:linux-cgroup-attach -- \
+            --out "$helper_source" \
+            --uid "$uid" \
+            --control "$root/opencode-quality-workload/cgroup.procs"
           sudo install -d -o root -g root -m 0755 /usr/local/libexec
           sudo install -o root -g root -m 0555 "$helper_source" "$helper"
           rm -f "$helper_source"
@@ -95,7 +83,7 @@ jobs:
           echo "OPENCODE_QUALITY_RUN_USER=$user" >> "$GITHUB_ENV"
           echo "OPENCODE_QUALITY_RUN_HOME=$home" >> "$GITHUB_ENV"
           echo "OPENCODE_QUALITY_CGROUP_ROOT=$root" >> "$GITHUB_ENV"
-          echo "OPENCODE_QUALITY_CGROUP_ATTACH_MODE=sudo-helper-v1" >> "$GITHUB_ENV"
+          echo "OPENCODE_QUALITY_CGROUP_ATTACH_MODE=sudo-helper-v2" >> "$GITHUB_ENV"
           echo "OPENCODE_QUALITY_CGROUP_ATTACH_HELPER=$helper" >> "$GITHUB_ENV"
           echo "OPENCODE_QUALITY_SUDOERS=$sudoers" >> "$GITHUB_ENV"
 
@@ -217,23 +205,11 @@ jobs:
           fi
           uid="$(id -u "$user")"
           helper="/usr/local/libexec/opencode-cgroup-attach-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${GITHUB_JOB}"
-          helper_source="$(mktemp)"
-          cat > "$helper_source" <<EOF
-          #!/bin/sh
-          set -eu
-          expected_uid="$uid"
-          control="$root/opencode-quality-workload/cgroup.procs"
-          [ "\${SUDO_UID:-}" = "\$expected_uid" ] || exit 77
-          [ "\$#" -eq 1 ] || exit 64
-          pid="\$1"
-          case "\$pid" in *[!0-9]*|'') exit 64 ;; esac
-          [ "\$pid" -gt 0 ] || exit 64
-          target_uid="\$(/usr/bin/awk '\$1 == "Uid:" { print \$2; exit }' "/proc/\$pid/status")"
-          [ "\$target_uid" = "\$expected_uid" ] || exit 77
-          printf '%s\n' "\$pid" > "\$control"
-          /usr/bin/grep -qx "\$pid" "\$control"
-          printf 'ATTACHED:%s\n' "\$pid"
-          EOF
+          helper_source="$(cd "$RUNNER_TEMP" && pwd -P)/opencode-cgroup-attach-build-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${GITHUB_JOB}"
+          npm run build:linux-cgroup-attach -- \
+            --out "$helper_source" \
+            --uid "$uid" \
+            --control "$root/opencode-quality-workload/cgroup.procs"
           sudo install -d -o root -g root -m 0755 /usr/local/libexec
           sudo install -o root -g root -m 0555 "$helper_source" "$helper"
           rm -f "$helper_source"
@@ -248,9 +224,72 @@ jobs:
           echo "OPENCODE_QUALITY_RUN_USER=$user" >> "$GITHUB_ENV"
           echo "OPENCODE_QUALITY_RUN_HOME=$home" >> "$GITHUB_ENV"
           echo "OPENCODE_QUALITY_CGROUP_ROOT=$root" >> "$GITHUB_ENV"
-          echo "OPENCODE_QUALITY_CGROUP_ATTACH_MODE=sudo-helper-v1" >> "$GITHUB_ENV"
+          echo "OPENCODE_QUALITY_CGROUP_ATTACH_MODE=sudo-helper-v2" >> "$GITHUB_ENV"
           echo "OPENCODE_QUALITY_CGROUP_ATTACH_HELPER=$helper" >> "$GITHUB_ENV"
           echo "OPENCODE_QUALITY_SUDOERS=$sudoers" >> "$GITHUB_ENV"
+
+      - name: Reject stale Linux worker identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          leaf="$OPENCODE_QUALITY_CGROUP_ROOT/opencode-quality-workload"
+          pid_file="$RUNNER_TEMP/linux-helper-negative-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${GITHUB_JOB}.pid"
+          probe_stdout="$RUNNER_TEMP/linux-helper-negative-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${GITHUB_JOB}.stdout"
+          probe_stderr="$RUNNER_TEMP/linux-helper-negative-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${GITHUB_JOB}.stderr"
+          worker_pid=""
+          launcher_pid=""
+          cleanup_probe() {
+            if [[ -n "$worker_pid" ]]; then
+              sudo kill -CONT "$worker_pid" 2> /dev/null || true
+              sudo kill -KILL "$worker_pid" 2> /dev/null || true
+            fi
+            if [[ -n "$launcher_pid" ]]; then
+              wait "$launcher_pid" 2> /dev/null || true
+            fi
+            if [[ -d "$leaf" ]]; then
+              sudo -u "$OPENCODE_QUALITY_RUN_USER" rmdir "$leaf" 2> /dev/null || true
+            fi
+            rm -f "$pid_file" "$probe_stdout" "$probe_stderr"
+          }
+          trap cleanup_probe EXIT
+          sudo -u "$OPENCODE_QUALITY_RUN_USER" mkdir "$leaf"
+          sudo install -o "$OPENCODE_QUALITY_RUN_USER" -g "$OPENCODE_QUALITY_RUN_USER" -m 0600 /dev/null "$pid_file"
+          sudo -u "$OPENCODE_QUALITY_RUN_USER" -- /bin/sh -c \
+            'printf "%s\n" "$$" > "$1"; exec /bin/sleep 60' sh "$pid_file" &
+          launcher_pid=$!
+          for _ in {1..100}; do
+            [[ -s "$pid_file" ]] && break
+            sleep 0.05
+          done
+          worker_pid="$(cat "$pid_file")"
+          [[ "$worker_pid" =~ ^[1-9][0-9]*$ ]]
+          start_ticks="$(awk '{ print $22 }' "/proc/$worker_pid/stat")"
+          [[ "$start_ticks" =~ ^[1-9][0-9]*$ ]]
+          wrong_ticks="$((start_ticks + 1))"
+          challenge="$(node -p 'require("node:crypto").randomBytes(32).toString("base64url")')"
+          [[ "$challenge" =~ ^[A-Za-z0-9_-]{43}$ ]]
+          set +e
+          sudo -u "$OPENCODE_QUALITY_RUN_USER" -- sudo -n -- \
+            "$OPENCODE_QUALITY_CGROUP_ATTACH_HELPER" \
+            "$worker_pid" "$wrong_ticks" "$challenge" > "$probe_stdout" 2> "$probe_stderr"
+          helper_status=$?
+          set -e
+          worker_state="$(awk '{ print $3 }' "/proc/$worker_pid/stat")"
+          attached=0
+          grep -qx "$worker_pid" "$leaf/cgroup.procs" && attached=1
+          alive=0
+          sudo kill -0 "$worker_pid" 2> /dev/null && alive=1
+          protocol_output=0
+          [[ ! -s "$probe_stdout" && ! -s "$probe_stderr" ]] || protocol_output=1
+          if [[ "$helper_status" -ne 77 || "$alive" -ne 1 || "$attached" -ne 0
+            || "$protocol_output" -ne 0 || "$worker_state" == "T" || "$worker_state" == "t"
+            || "$worker_state" == "Z" ]]; then
+            echo "native Linux helper did not reject a stale worker identity without side effects" >&2
+            exit 1
+          fi
+          trap - EXIT
+          cleanup_probe
+          [[ ! -d "$leaf" ]]
 
       - name: Run Linux operational verifier
         shell: bash
@@ -523,6 +562,25 @@ jobs:
             guard="$(dirname "$guard")"
           done
           sudo -u "$user" /usr/bin/env PATH="$PATH" node --version
+
+      - name: Run configured macOS full verifier
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo -u "$OPENCODE_QUALITY_RUN_USER" -- /usr/bin/env \
+            HOME="$OPENCODE_QUALITY_RUN_HOME" \
+            PATH="$PATH" \
+            CI=true \
+            GITHUB_ACTIONS=true \
+            GITHUB_SHA="$GITHUB_SHA" \
+            GITHUB_RUN_ID="$GITHUB_RUN_ID" \
+            GITHUB_RUN_ATTEMPT="$GITHUB_RUN_ATTEMPT" \
+            GITHUB_JOB="$GITHUB_JOB" \
+            GITHUB_REPOSITORY="$GITHUB_REPOSITORY" \
+            OPENCODE_QUALITY_MACOS_CONTROLLER="$OPENCODE_QUALITY_MACOS_CONTROLLER" \
+            OPENCODE_QUALITY_MACOS_WORKLOAD_UID="$OPENCODE_QUALITY_RUN_UID" \
+            OPENCODE_QUALITY_MACOS_UID_MARKER="$OPENCODE_QUALITY_MACOS_UID_MARKER" \
+            npm run verify
 
       - name: Run macOS operational verifier
         shell: bash

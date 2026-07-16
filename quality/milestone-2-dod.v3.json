@@ -66,6 +66,8 @@
         "windows-descendant-teardown"
       ],
       "evidence_refs": [
+        "native/linux-cgroup-attach-helper.c",
+        "scripts/build-linux-cgroup-attach-helper.mjs",
         "lib/feedback/process-containment.mjs",
         "lib/feedback/process-tree.mjs",
         "scripts/verify-process-containment.mjs",
@@ -175,5 +177,5 @@
     "verification_failed": "A dimension failed, or deterministic contracts are unavailable.",
     "blocked_external_state": "Deterministic contracts are verified and every unavailable mandatory operational dimension has explicit bounded external blocking context."
   },
-  "fingerprint": "sha256:62a5a5a1fe9039c01c6e0cd43d1481e0db18940f1c8e85b79805935c3f40511c"
+  "fingerprint": "sha256:6d1b8fe73c0be3fa410424039fdbc4eec8e43679123193125cd75c2503fe6d59"
 }
