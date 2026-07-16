@@ -45,8 +45,9 @@ the feedback-plane ESM subpaths documented for the `0.3.0` target.
   containment, and real live-eval mode never selects the injected boundary.
   Managed commands
   retain the already-open verified cwd
-  across pathname replacement, and cold Job Object startup has a separate
-  bounded 30-second readiness budget. Verified and failed worker settlement
+  across pathname replacement. Cold Job Object startup has a bounded one-minute
+  controller window inside a 75-second caller allowance (hard max 90 seconds),
+  separate from command execution. Verified and failed worker settlement
   now waits for process `close`, not merely `exit`, before releasing cwd/IPC
   resources or returning control. Linux cleanup also tolerates setup failure
   before workload identity export without hiding the producer failure.

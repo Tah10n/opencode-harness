@@ -1598,7 +1598,7 @@ const adapterWorker = read("lib/feedback/adapter-worker.mjs");
 for (const needle of ["spawn", "./process-tree.mjs", "prepareProcessContainment", "terminateProcessTree", "releaseUnverifiedChild", "adapter_teardown_unverified", "traceLimits", "trace_request", "payload_json", "result_json", "encodePlainJson", "AdapterTimeoutError", "containmentSetupTimeoutMs", "adapter_process_containment_timeout", "adapter_working_directory_changed", "workingDirectoryIdentity", "currentWorkingDirectoryIdentity"]) {
   assertIncludes(adapterWorker, needle, "lib/feedback/adapter-worker.mjs", "HARNESS-S079", "Live adapters must use bounded trace RPC and verified process-tree teardown.");
 }
-assertIncludes(adapterWorker, "containmentSetupTimeoutMs = 30_000", "lib/feedback/adapter-worker.mjs", "HARNESS-S079", "Cold Windows Job Object startup must remain bounded without using the command deadline.");
+assertIncludes(adapterWorker, "containmentSetupTimeoutMs = DEFAULT_CONTAINMENT_SETUP_TIMEOUT_MS", "lib/feedback/adapter-worker.mjs", "HARNESS-S079", "Cold Windows Job Object startup must remain bounded without using the command deadline.");
 
 const adapterWorkerVerifier = read("scripts/verify-adapter-worker.mjs");
 for (const needle of [
@@ -1614,9 +1614,15 @@ const processTree = read("lib/feedback/process-tree.mjs");
 for (const needle of ["taskkill.exe", "process.kill(-pid", "terminateProcessTree", "releaseUnverifiedChild", "runManagedCommand", "ProcessTreeTeardownError", "containmentSetupTimeoutMs", "process_containment_setup_timeout", "observeLateProcessContainment", "expected_working_directory_identity", "assertManagedCommandWorkingDirectoryIdentityCurrent", "assertInheritedManagedCommandWorkingDirectoryIdentityCurrent", "PROCESS_WORKING_DIRECTORY_CHANGED"]) {
   assertIncludes(processTree, needle, "lib/feedback/process-tree.mjs", "HARNESS-S079", "Keep Windows/POSIX process-tree teardown and managed command settlement centralized.");
 }
-assertIncludes(processTree, "containmentSetupTimeoutMs = 30_000", "lib/feedback/process-tree.mjs", "HARNESS-S079", "Cold containment startup must remain separately bounded from command execution.");
+for (const needle of [
+  "DEFAULT_CONTAINMENT_SETUP_TIMEOUT_MS = 75_000",
+  "MAX_CONTAINMENT_SETUP_TIMEOUT_MS = 90_000",
+  "containmentSetupTimeoutMs = DEFAULT_CONTAINMENT_SETUP_TIMEOUT_MS",
+]) {
+  assertIncludes(processTree, needle, "lib/feedback/process-tree.mjs", "HARNESS-S079", "Cold containment startup must remain separately and finitely bounded from command execution.");
+}
 const processContainment = read("lib/feedback/process-containment.mjs");
-assertIncludes(processContainment, "Math.max(timeoutMs, 30_000)", "lib/feedback/process-containment.mjs", "HARNESS-S079", "The Windows Job Object controller must share the bounded cold-start allowance instead of failing at the former ten-second floor.");
+assertIncludes(processContainment, "WINDOWS_JOB_READY_TIMEOUT_MS = 60_000", "lib/feedback/process-containment.mjs", "HARNESS-S079", "The Windows Job Object controller must retain a bounded one-minute cold-start allowance.");
 const containedWorkerStart = processTree.indexOf("const COMMAND_WORKER_SOURCE");
 const containedToolchainCheck = processTree.indexOf(
   "assertTrustedToolchainInvocationCurrent(input.expected_invocation);",
@@ -1731,6 +1737,7 @@ for (const needle of [
   "toolchain_runtime_metadata_fingerprint",
   "workingDirectoryIdentityFingerprint",
   "expectedWorkingDirectoryIdentity",
+  "MANAGED_SYNC_WORKER_TIMEOUT_OVERHEAD_MS",
 ]) {
   assertIncludes(
     trustedProjectRunner,
