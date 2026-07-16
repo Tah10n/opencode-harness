@@ -24,6 +24,7 @@ import {
   trustedToolchainMapFingerprint,
   validateTrustedToolchainArguments,
   validateTrustedToolchainMap,
+  writableByCurrentPrincipal,
 } from "../lib/quality/trusted-toolchains.mjs";
 import { ContractError } from "../lib/quality/validation.mjs";
 
@@ -95,6 +96,16 @@ const mavenResolverOwnedProperties = Object.freeze([
 function expectCode(callback, code) {
   assert.throws(callback, (error) => error instanceof ContractError && error.code === code, `expected ${code}`);
 }
+
+for (const code of ["EACCES", "EPERM", "EROFS"]) {
+  assert.equal(writableByCurrentPrincipal("fixture", "protected fixture", () => {
+    throw Object.assign(new Error(code), { code });
+  }), false, `${code} must prove that the protected path is not writable`);
+}
+assert.equal(writableByCurrentPrincipal("fixture", "protected fixture", () => {}), true);
+expectCode(() => writableByCurrentPrincipal("fixture", "protected fixture", () => {
+  throw Object.assign(new Error("ENOENT"), { code: "ENOENT" });
+}), "QUALITY_TOOLCHAIN_PATH");
 
 function protectedMacosFixture({
   leafOwner = 0n,
