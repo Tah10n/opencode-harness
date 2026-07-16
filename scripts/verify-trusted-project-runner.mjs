@@ -1224,7 +1224,15 @@ if (shouldRunReal) {
 
     const directReceipt = runRealCheck("direct-exit");
     operationalReceipts.push(directReceipt);
-    assert.equal(directReceipt.status, "passed");
+    assert.equal(directReceipt.status, "passed", JSON.stringify({
+      observed_outcome: directReceipt.observed_outcome,
+      exit_code: directReceipt.exit_code,
+      signal: directReceipt.signal,
+      stdout_bytes: directReceipt.stdout_bytes,
+      stderr_bytes: directReceipt.stderr_bytes,
+      containment_state: directReceipt.containment_state,
+      output_workspace_post_entries: directReceipt.output_workspace_post_entries,
+    }));
     const timeoutReceipt = runRealCheck("timeout-descendant");
     operationalReceipts.push(timeoutReceipt);
     assert.equal(timeoutReceipt.status, "blocked");
