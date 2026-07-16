@@ -27,6 +27,18 @@ jobs:
         with:
           node-version: "24"
 
+      - name: Harden trusted Node distribution permissions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node_executable="$(node -p 'process.execPath')"
+          node_root="$(dirname "$(dirname "$node_executable")")"
+          sudo chmod -R go-w "$node_root"
+          if sudo find "$node_root" -xdev -perm /022 -print -quit | grep -q .; then
+            echo "trusted Node distribution remains group- or world-writable" >&2
+            exit 1
+          fi
+
       - name: Prepare guarded cgroup-v2 delegation
         shell: bash
         run: |
@@ -165,6 +177,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "24"
+
+      - name: Harden trusted Node distribution permissions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node_executable="$(node -p 'process.execPath')"
+          node_root="$(dirname "$(dirname "$node_executable")")"
+          sudo chmod -R go-w "$node_root"
+          if sudo find "$node_root" -xdev -perm /022 -print -quit | grep -q .; then
+            echo "trusted Node distribution remains group- or world-writable" >&2
+            exit 1
+          fi
 
       - name: Prepare guarded cgroup-v2 delegation
         shell: bash

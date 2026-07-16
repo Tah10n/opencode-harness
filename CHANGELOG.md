@@ -34,7 +34,16 @@ the feedback-plane ESM subpaths documented for the `0.3.0` target.
   cleanup to verified evidence. GitHub Linux jobs grant and later remove only
   checkout-parent traversal ACLs for the isolated workload user; Windows
   operational fixtures canonicalize the runner's 8.3 `TEMP` path instead of
-  weakening filesystem-alias rejection.
+  weakening filesystem-alias rejection. The operational runner now creates its
+  per-check reports beneath that canonical temp root as well. Linux producers
+  remove group/world write access from the ephemeral setup-node distribution
+  before trusting it, while deterministic adapter tests use an explicit
+  injected test boundary and reserve detached-descendant claims for verified
+  platform containment. Managed commands retain the already-open verified cwd
+  across pathname replacement, and cold Job Object startup has a separate
+  bounded 30-second readiness budget. Verified and failed worker settlement
+  now waits for process `close`, not merely `exit`, before releasing cwd/IPC
+  resources or returning control.
 - Hardened Milestone 2 completion evidence so deterministic fixtures cannot mint
   operational or installed-host success. CI now uploads sealed deterministic,
   Windows Job Object, and guarded Linux cgroup-v2 bundles, aggregates only

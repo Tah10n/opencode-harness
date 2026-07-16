@@ -1090,12 +1090,17 @@ for (const needle of [
   "npm run milestone:2:assess", "--host-unavailable", "actions/upload-artifact@v4",
   "actions/download-artifact@v4", "sudo useradd", "attach helper can write the guard cgroup",
   "sudo setfacl -m", "sudo setfacl -x",
+  "Harden trusted Node distribution permissions", "sudo chmod -R go-w", "-perm /022",
   "Require successful receipt producers", "needs.verify.result", "needs.linux-containment.result",
   "needs.windows-containment.result", '[[ "$result" != "success" ]]',
 ]) {
   assertIncludes(workflow, needle, ".github/workflows/verify.yml");
 }
-for (const [needle, expected] of [["sudo setfacl -m", 2], ["sudo setfacl -x", 2]]) {
+for (const [needle, expected] of [
+  ["sudo setfacl -m", 2],
+  ["sudo setfacl -x", 2],
+  ["Harden trusted Node distribution permissions", 2],
+]) {
   if (workflow.split(needle).length - 1 !== expected) {
     fail(
       "HARNESS-S002",
@@ -1576,11 +1581,25 @@ const adapterWorker = read("lib/feedback/adapter-worker.mjs");
 for (const needle of ["spawn", "./process-tree.mjs", "prepareProcessContainment", "terminateProcessTree", "releaseUnverifiedChild", "adapter_teardown_unverified", "traceLimits", "trace_request", "payload_json", "result_json", "encodePlainJson", "AdapterTimeoutError", "containmentSetupTimeoutMs", "adapter_process_containment_timeout", "adapter_working_directory_changed", "workingDirectoryIdentity", "currentWorkingDirectoryIdentity"]) {
   assertIncludes(adapterWorker, needle, "lib/feedback/adapter-worker.mjs", "HARNESS-S079", "Live adapters must use bounded trace RPC and verified process-tree teardown.");
 }
+assertIncludes(adapterWorker, "containmentSetupTimeoutMs = 30_000", "lib/feedback/adapter-worker.mjs", "HARNESS-S079", "Cold Windows Job Object startup must remain bounded without using the command deadline.");
+
+const adapterWorkerVerifier = read("scripts/verify-adapter-worker.mjs");
+for (const needle of [
+  "injectedTestContainmentFactory",
+  "operationalContainmentAvailable",
+  "runAdapterModuleProduction",
+  "runManagedCommandProduction",
+]) {
+  assertIncludes(adapterWorkerVerifier, needle, "scripts/verify-adapter-worker.mjs", "HARNESS-S079", "Deterministic adapter checks must not synthesize platform evidence while operational descendant checks keep the production boundary.");
+}
 
 const processTree = read("lib/feedback/process-tree.mjs");
 for (const needle of ["taskkill.exe", "process.kill(-pid", "terminateProcessTree", "releaseUnverifiedChild", "runManagedCommand", "ProcessTreeTeardownError", "containmentSetupTimeoutMs", "process_containment_setup_timeout", "observeLateProcessContainment", "expected_working_directory_identity", "assertManagedCommandWorkingDirectoryIdentityCurrent", "assertInheritedManagedCommandWorkingDirectoryIdentityCurrent", "PROCESS_WORKING_DIRECTORY_CHANGED"]) {
   assertIncludes(processTree, needle, "lib/feedback/process-tree.mjs", "HARNESS-S079", "Keep Windows/POSIX process-tree teardown and managed command settlement centralized.");
 }
+assertIncludes(processTree, "containmentSetupTimeoutMs = 30_000", "lib/feedback/process-tree.mjs", "HARNESS-S079", "Cold containment startup must remain separately bounded from command execution.");
+const processContainment = read("lib/feedback/process-containment.mjs");
+assertIncludes(processContainment, "Math.max(timeoutMs, 30_000)", "lib/feedback/process-containment.mjs", "HARNESS-S079", "The Windows Job Object controller must share the bounded cold-start allowance instead of failing at the former ten-second floor.");
 const containedWorkerStart = processTree.indexOf("const COMMAND_WORKER_SOURCE");
 const containedToolchainCheck = processTree.indexOf(
   "assertTrustedToolchainInvocationCurrent(input.expected_invocation);",
@@ -1623,6 +1642,18 @@ if (defaultCommandFactory < 0
     "HARNESS-S079",
     "managed command worker must open the freshly revalidated cwd before containment setup",
     "Bind default worker creation to input.cwd immediately after the parent-side identity check.",
+  );
+}
+const beforeCommandStartHook = processTree.indexOf("beforeCommandStart?.();", defaultFactoryCwdOpen);
+const managedWorkerInitialize = processTree.indexOf('type: "initialize"', beforeCommandStartHook);
+if (beforeCommandStartHook < 0
+  || managedWorkerInitialize <= beforeCommandStartHook
+  || processTree.slice(beforeCommandStartHook, managedWorkerInitialize)
+    .includes("assertManagedCommandWorkingDirectoryIdentityCurrent(cwd")) {
+  fail(
+    "HARNESS-S079",
+    "managed command initialization must not reopen a pathname after the worker inherited the verified cwd",
+    "Keep pathname validation before worker spawn and the final directory-object validation inside the contained worker.",
   );
 }
 
@@ -1716,6 +1747,10 @@ for (const file of [
   "scripts/verify-normal-session-runtime.mjs",
 ]) {
   assertIncludes(read(file), "assertMilestone2RunContextStable", file, "HARNESS-S079", "Every Milestone 2 producer must re-observe source state before sealing evidence.");
+}
+const operationalRunner = read("scripts/run-milestone-2-operational.mjs");
+for (const needle of ["canonicalTempBase", "fs.realpathSync.native(os.tmpdir())", "fs.realpathSync.native(fs.mkdtempSync("]) {
+  assertIncludes(operationalRunner, needle, "scripts/run-milestone-2-operational.mjs", "HARNESS-S079", "Operational child reports must use a canonical temp directory on hosts that expose an aliased TEMP path.");
 }
 
 const acceptanceEngine = read("lib/feedback/acceptance.mjs");

@@ -192,7 +192,10 @@ function main() {
     workspaceRoot: root,
     localJobId: `${options.dimension}-operational`,
   });
-  const reportDirectory = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-milestone-2-operational-"));
+  const canonicalTempBase = fs.realpathSync.native(os.tmpdir());
+  const reportDirectory = fs.realpathSync.native(fs.mkdtempSync(
+    path.join(canonicalTempBase, "opencode-milestone-2-operational-"),
+  ));
   let receipts;
   try {
     receipts = CHECKS[options.dimension].map((specification) => (

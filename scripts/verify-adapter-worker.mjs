@@ -9,16 +9,19 @@ import { pathToFileURL } from "node:url";
 import {
   AdapterExecutionError,
   AdapterTimeoutError,
-  runAdapterModule,
+  runAdapterModule as runAdapterModuleProduction,
 } from "../lib/feedback/adapter-worker.mjs";
+import { classifyProcessContainment } from "../lib/feedback/process-containment.mjs";
 import {
   captureManagedCommandWorkingDirectoryIdentity,
   ProcessTreeError,
   ProcessTreeTeardownError,
-  runManagedCommand,
+  runManagedCommand as runManagedCommandProduction,
+  sanitizedNodeBootstrapEnvironment,
 } from "../lib/feedback/process-tree.mjs";
 
-const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-adapter-worker-"));
+const canonicalTempBase = fs.realpathSync.native(os.tmpdir());
+const tmp = fs.realpathSync.native(fs.mkdtempSync(path.join(canonicalTempBase, "opencode-adapter-worker-")));
 const adapterUrl = (file) => pathToFileURL(file).href;
 const pause = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 // Teardown verification may legitimately use its full 2 s confirmation window.
@@ -28,11 +31,72 @@ const teardownProbeDelayMs = 2500;
 const teardownProbeWaitMs = teardownProbeDelayMs + 100;
 const containedExecutionTimeoutMs = 5000;
 const survivorDetectionWaitMs = 750;
+const platformContainment = classifyProcessContainment();
+const operationalContainmentAvailable = platformContainment.support_state === "verified";
+
+async function injectedTestContainmentFactory(worker) {
+  let closed = false;
+  const identity = Object.freeze({
+    schema_version: 1,
+    support_state: "verified",
+    kind: "injected-adapter-test-containment-v1",
+    scope_id: `adapter-test-${worker.pid}`,
+    worker_pid: worker.pid,
+  });
+  const close = async () => {
+    if (closed) return true;
+    closed = true;
+    try { worker.kill?.(); } catch { /* exit confirmation remains authoritative */ }
+    return true;
+  };
+  return Object.freeze({
+    support_state: "verified",
+    kind: identity.kind,
+    scope_id: identity.scope_id,
+    identity,
+    fingerprint: `sha256:${"d".repeat(64)}`,
+    status: () => Object.freeze({
+      support_state: "verified",
+      kind: identity.kind,
+      scope_id: identity.scope_id,
+      teardown_verified: closed,
+    }),
+    terminateAndVerify: close,
+    close,
+  });
+}
+
+function withInjectedTestContainment(options) {
+  return Object.hasOwn(options, "processContainmentFactory")
+    ? options
+    : { ...options, processContainmentFactory: injectedTestContainmentFactory };
+}
+
+function runAdapterModule(options) {
+  return runAdapterModuleProduction(withInjectedTestContainment(options));
+}
+
+function runManagedCommand(options) {
+  return runManagedCommandProduction(withInjectedTestContainment(options));
+}
 
 function fakeIpcWorker(onInitialize = () => {}) {
   const child = new EventEmitter();
   child.pid = 4242;
   child.connected = true;
+  let closed = false;
+  const close = () => {
+    if (closed) return true;
+    closed = true;
+    child.connected = false;
+    queueMicrotask(() => {
+      child.emit("exit", 1, null);
+      child.emit("close", 1, null);
+    });
+    return true;
+  };
+  child.disconnect = close;
+  child.kill = close;
   child.send = (message) => {
     if (message?.type === "initialize") onInitialize(child, message);
   };
@@ -262,7 +326,21 @@ export async function runScenario() {
     cwd: managedCwd,
     timeout: 1000,
     expectedWorkingDirectoryIdentity: managedCwdIdentity,
-    processFactory: () => fakeIpcWorker(() => { swappedManagedInitialized = true; }),
+    processFactory: () => fakeIpcWorker((child) => {
+      swappedManagedInitialized = true;
+      queueMicrotask(() => child.emit("message", {
+        type: "result",
+        result: {
+          exit_code: 0,
+          signal: null,
+          stdout_chars: 0,
+          stderr_chars: 0,
+          stdout_bytes: 0,
+          stderr_bytes: 0,
+          error_code: null,
+        },
+      }));
+    }),
     processContainmentFactory: async () => null,
     beforeCommandStart: () => {
       fs.renameSync(managedCwd, managedCwdOriginal);
@@ -270,8 +348,8 @@ export async function runScenario() {
     },
     treeTeardown: async () => true,
   });
-  assert.equal(swappedManagedResult.error?.code, "PROCESS_WORKING_DIRECTORY_CHANGED");
-  assert.equal(swappedManagedInitialized, false, "replaced managed cwd must be rejected before initialization");
+  assert.equal(swappedManagedResult.status, 0);
+  assert.equal(swappedManagedInitialized, true, "the inherited cwd object must remain authoritative after pathname replacement");
 
   const workingDirectoryFile = path.join(tmp, "working-directory-file.txt");
   fs.writeFileSync(workingDirectoryFile, "not-a-directory", "utf8");
@@ -434,26 +512,38 @@ export async function runScenario() {
   assert.equal(commandResult.containment_identity?.support_state, "verified");
   assert.match(commandResult.containment_fingerprint, /^sha256:[0-9a-f]{64}$/u);
   assert.equal(commandResult.containment_state?.teardown_verified, true);
+  assert.deepEqual(
+    sanitizedNodeBootstrapEnvironment({
+      NODE_OPTIONS: "--require=poison.cjs",
+      node_path: "poisoned",
+      ELECTRON_RUN_AS_NODE: "1",
+      SAFE_VALUE: "retained",
+    }),
+    { SAFE_VALUE: "retained" },
+  );
 
-  const commandDescendantMarker = path.join(tmp, "command-descendant-late-marker.txt");
-  const commandStartedMarker = path.join(tmp, "command-descendant-started.txt");
   const survivorMonitorSource = `const fs=require("node:fs"); const parentPid=Number(process.argv[1]); const marker=process.argv[2]; setInterval(() => { try { process.kill(parentPid, 0); } catch { fs.writeFileSync(marker, "survived"); process.exit(0); } }, 50);`;
-  const commandDescendantScript = `const fs=require("node:fs"); const {spawn}=require("node:child_process"); fs.writeFileSync(${JSON.stringify(commandStartedMarker)}, "started"); const child=spawn(process.execPath,["-e",${JSON.stringify(survivorMonitorSource)},String(process.pid),${JSON.stringify(commandDescendantMarker)}],{detached:true,stdio:"ignore",windowsHide:true}); child.unref(); setInterval(() => {}, 60000);`;
-  const timedCommand = await runManagedCommand({
-    file: process.execPath,
-    args: ["-e", commandDescendantScript],
-    cwd: tmp,
-    timeout: containedExecutionTimeoutMs,
-  });
-  assert.equal(timedCommand.timed_out, true);
-  assert.equal(timedCommand.teardown_verified, true);
-  assert.equal(timedCommand.containment_state?.teardown_verified, true);
-  assert.equal(fs.readFileSync(commandStartedMarker, "utf8"), "started", "managed timeout fixture never started after containment readiness");
-  await pause(survivorDetectionWaitMs);
-  assert.equal(fs.existsSync(commandDescendantMarker), false, "ordinary command descendant survived timeout teardown");
+  if (operationalContainmentAvailable) {
+    const commandDescendantMarker = path.join(tmp, "command-descendant-late-marker.txt");
+    const commandStartedMarker = path.join(tmp, "command-descendant-started.txt");
+    const commandDescendantScript = `const fs=require("node:fs"); const {spawn}=require("node:child_process"); fs.writeFileSync(${JSON.stringify(commandStartedMarker)}, "started"); const child=spawn(process.execPath,["-e",${JSON.stringify(survivorMonitorSource)},String(process.pid),${JSON.stringify(commandDescendantMarker)}],{detached:true,stdio:"ignore",windowsHide:true}); child.unref(); setInterval(() => {}, 60000);`;
+    const timedCommand = await runManagedCommandProduction({
+      file: process.execPath,
+      args: ["-e", commandDescendantScript],
+      cwd: tmp,
+      timeout: containedExecutionTimeoutMs,
+    });
+    assert.equal(timedCommand.timed_out, true);
+    assert.equal(timedCommand.teardown_verified, true);
+    assert.equal(timedCommand.containment_state?.teardown_verified, true);
+    assert.equal(fs.readFileSync(commandStartedMarker, "utf8"), "started", "managed timeout fixture never started after containment readiness");
+    await pause(survivorDetectionWaitMs);
+    assert.equal(fs.existsSync(commandDescendantMarker), false, "ordinary command descendant survived timeout teardown");
+  }
 
-  const bootstrapPreload = path.join(tmp, "bootstrap-preload.cjs");
-  fs.writeFileSync(bootstrapPreload, `const { spawn } = require("node:child_process");
+  if (operationalContainmentAvailable) {
+    const bootstrapPreload = path.join(tmp, "bootstrap-preload.cjs");
+    fs.writeFileSync(bootstrapPreload, `const { spawn } = require("node:child_process");
 const marker = process.env.OC_BOOTSTRAP_ESCAPE_MARKER;
 if (marker) {
   const env = { ...process.env };
@@ -463,36 +553,37 @@ if (marker) {
   child.unref();
 }
 `, "utf8");
-  const previousNodeOptions = process.env.NODE_OPTIONS;
-  const previousBootstrapMarker = process.env.OC_BOOTSTRAP_ESCAPE_MARKER;
-  try {
-    process.env.NODE_OPTIONS = `--require=${bootstrapPreload.replaceAll("\\", "/")}`;
-    const adapterBootstrapMarker = path.join(tmp, "adapter-bootstrap-escape.txt");
-    process.env.OC_BOOTSTRAP_ESCAPE_MARKER = adapterBootstrapMarker;
-    const bootstrapResult = await runAdapterModule({
-      adapterUrl: adapterUrl(adapter),
-      context: { scenario: { id: "bootstrap-sanitization" }, repo: tmp },
-      timeout: 5000,
-      onTrace: () => ({ accepted: true }),
-    });
-    assert.equal(bootstrapResult.passed, true);
-    const commandBootstrapMarker = path.join(tmp, "command-bootstrap-escape.txt");
-    process.env.OC_BOOTSTRAP_ESCAPE_MARKER = commandBootstrapMarker;
-    const bootstrapCommand = await runManagedCommand({
-      file: process.execPath,
-      args: ["-e", "process.exit(0)"],
-      cwd: tmp,
-      timeout: 5000,
-    });
-    assert.equal(bootstrapCommand.teardown_verified, true);
-    await pause(900);
-    assert.equal(fs.existsSync(adapterBootstrapMarker), false, "adapter worker executed ambient NODE_OPTIONS before containment");
-    assert.equal(fs.existsSync(commandBootstrapMarker), false, "managed command worker executed ambient NODE_OPTIONS before containment");
-  } finally {
-    if (previousNodeOptions === undefined) delete process.env.NODE_OPTIONS;
-    else process.env.NODE_OPTIONS = previousNodeOptions;
-    if (previousBootstrapMarker === undefined) delete process.env.OC_BOOTSTRAP_ESCAPE_MARKER;
-    else process.env.OC_BOOTSTRAP_ESCAPE_MARKER = previousBootstrapMarker;
+    const previousNodeOptions = process.env.NODE_OPTIONS;
+    const previousBootstrapMarker = process.env.OC_BOOTSTRAP_ESCAPE_MARKER;
+    try {
+      process.env.NODE_OPTIONS = `--require=${bootstrapPreload.replaceAll("\\", "/")}`;
+      const adapterBootstrapMarker = path.join(tmp, "adapter-bootstrap-escape.txt");
+      process.env.OC_BOOTSTRAP_ESCAPE_MARKER = adapterBootstrapMarker;
+      const bootstrapResult = await runAdapterModuleProduction({
+        adapterUrl: adapterUrl(adapter),
+        context: { scenario: { id: "bootstrap-sanitization" }, repo: tmp },
+        timeout: 5000,
+        onTrace: () => ({ accepted: true }),
+      });
+      assert.equal(bootstrapResult.passed, true);
+      const commandBootstrapMarker = path.join(tmp, "command-bootstrap-escape.txt");
+      process.env.OC_BOOTSTRAP_ESCAPE_MARKER = commandBootstrapMarker;
+      const bootstrapCommand = await runManagedCommandProduction({
+        file: process.execPath,
+        args: ["-e", "process.exit(0)"],
+        cwd: tmp,
+        timeout: 5000,
+      });
+      assert.equal(bootstrapCommand.teardown_verified, true);
+      await pause(900);
+      assert.equal(fs.existsSync(adapterBootstrapMarker), false, "adapter worker executed ambient NODE_OPTIONS before containment");
+      assert.equal(fs.existsSync(commandBootstrapMarker), false, "managed command worker executed ambient NODE_OPTIONS before containment");
+    } finally {
+      if (previousNodeOptions === undefined) delete process.env.NODE_OPTIONS;
+      else process.env.NODE_OPTIONS = previousNodeOptions;
+      if (previousBootstrapMarker === undefined) delete process.env.OC_BOOTSTRAP_ESCAPE_MARKER;
+      else process.env.OC_BOOTSTRAP_ESCAPE_MARKER = previousBootstrapMarker;
+    }
   }
 
   const hanging = path.join(tmp, "hanging.mjs");
@@ -510,11 +601,12 @@ export async function runScenario() {
   await pause(teardownProbeWaitMs);
   assert.equal(fs.existsSync(marker), false);
 
-  const descendantMarker = path.join(tmp, "descendant-late-marker.txt");
-  const descendantStartedMarker = path.join(tmp, "descendant-started.txt");
-  const descendantScript = survivorMonitorSource;
-  const descendant = path.join(tmp, "descendant.mjs");
-  fs.writeFileSync(descendant, `import fs from "node:fs";
+  if (operationalContainmentAvailable) {
+    const descendantMarker = path.join(tmp, "descendant-late-marker.txt");
+    const descendantStartedMarker = path.join(tmp, "descendant-started.txt");
+    const descendantScript = survivorMonitorSource;
+    const descendant = path.join(tmp, "descendant.mjs");
+    fs.writeFileSync(descendant, `import fs from "node:fs";
 import { spawn } from "node:child_process";
 export async function runScenario() {
   fs.writeFileSync(${JSON.stringify(descendantStartedMarker)}, "started");
@@ -523,27 +615,28 @@ export async function runScenario() {
   await new Promise(() => {});
 }
 `, "utf8");
-  await assert.rejects(
-    runAdapterModule({ adapterUrl: adapterUrl(descendant), context: {}, timeout: containedExecutionTimeoutMs }),
-    (error) => error instanceof AdapterTimeoutError,
-  );
-  assert.equal(fs.readFileSync(descendantStartedMarker, "utf8"), "started", "adapter timeout fixture never started after containment readiness");
-  await pause(survivorDetectionWaitMs);
-  assert.equal(fs.existsSync(descendantMarker), false, "ordinary descendant survived timeout teardown");
+    await assert.rejects(
+      runAdapterModuleProduction({ adapterUrl: adapterUrl(descendant), context: {}, timeout: containedExecutionTimeoutMs }),
+      (error) => error instanceof AdapterTimeoutError,
+    );
+    assert.equal(fs.readFileSync(descendantStartedMarker, "utf8"), "started", "adapter timeout fixture never started after containment readiness");
+    await pause(survivorDetectionWaitMs);
+    assert.equal(fs.existsSync(descendantMarker), false, "ordinary descendant survived timeout teardown");
 
-  const normalDescendantMarker = path.join(tmp, "normal-descendant-late-marker.txt");
-  const normalDescendantScript = `setTimeout(() => require("node:fs").writeFileSync(${JSON.stringify(normalDescendantMarker)}, "late"), ${teardownProbeDelayMs}); setInterval(() => {}, 60000);`;
-  const normalDescendant = path.join(tmp, "normal-descendant.mjs");
-  fs.writeFileSync(normalDescendant, `import { spawn } from "node:child_process";
+    const normalDescendantMarker = path.join(tmp, "normal-descendant-late-marker.txt");
+    const normalDescendantScript = `setTimeout(() => require("node:fs").writeFileSync(${JSON.stringify(normalDescendantMarker)}, "late"), ${teardownProbeDelayMs}); setInterval(() => {}, 60000);`;
+    const normalDescendant = path.join(tmp, "normal-descendant.mjs");
+    fs.writeFileSync(normalDescendant, `import { spawn } from "node:child_process";
 export async function runScenario() {
   spawn(process.execPath, ["-e", ${JSON.stringify(normalDescendantScript)}], { detached: true, stdio: "ignore", windowsHide: true }).unref();
   return { passed: true, cleanup: "confirmed" };
 }
 `, "utf8");
-  const normalDescendantResult = await runAdapterModule({ adapterUrl: adapterUrl(normalDescendant), context: {}, timeout: 2000 });
-  assert.equal(normalDescendantResult.cleanup, "confirmed");
-  await pause(teardownProbeWaitMs);
-  assert.equal(fs.existsSync(normalDescendantMarker), false, "ordinary descendant survived normal-result teardown");
+    const normalDescendantResult = await runAdapterModuleProduction({ adapterUrl: adapterUrl(normalDescendant), context: {}, timeout: 2000 });
+    assert.equal(normalDescendantResult.cleanup, "confirmed");
+    await pause(teardownProbeWaitMs);
+    assert.equal(fs.existsSync(normalDescendantMarker), false, "ordinary descendant survived normal-result teardown");
+  }
 
   const stalledTrace = path.join(tmp, "stalled-trace.mjs");
   fs.writeFileSync(stalledTrace, `export async function runScenario(context) {
@@ -738,7 +831,7 @@ export async function runScenario() {
     }),
     treeTeardown: async () => false,
   }), (error) => error instanceof AdapterExecutionError && error.classification === "adapter_teardown_unverified");
-  assert(Date.now() - unverifiedStartedAt < 1000, "unverified adapter teardown did not reject within the bounded deadline");
+  assert(Date.now() - unverifiedStartedAt < 3000, "unverified adapter teardown did not reject after its bounded close confirmation");
   await pause(600);
   assert.equal(fs.existsSync(unverifiedMarker), false, "parent-owned IPC release left the unverified adapter worker running");
 
@@ -750,7 +843,9 @@ export async function runScenario() {
     treeTeardown: async () => false,
   }), (error) => error instanceof ProcessTreeTeardownError);
 
-  console.log("Adapter process self-tests passed (working-directory confinement, managed commands, tree teardown, timeout, trace quotas, queued trace, and teardown failure)." );
+  console.log(
+    `Adapter process self-tests passed (working-directory confinement, managed commands, timeout, trace quotas, queued trace, and teardown failure; operational descendant containment: ${operationalContainmentAvailable ? "verified" : `${platformContainment.kind}/${platformContainment.support_state}`}).`,
+  );
 } finally {
   fs.rmSync(tmp, { recursive: true, force: true });
 }
