@@ -1090,7 +1090,8 @@ for (const needle of [
   "npm run milestone:2:assess", "--host-unavailable", "actions/upload-artifact@v4",
   "actions/download-artifact@v4", "sudo useradd", "attach helper can write the guard cgroup",
   "sudo setfacl -m", "sudo setfacl -x",
-  "Harden trusted Node distribution permissions", "sudo chmod -R go-w", "-perm /022",
+  "Harden trusted Node distribution permissions", "-exec chmod go-w {} +", "-perm /022",
+  '${OPENCODE_QUALITY_RUN_USER:-}',
   "Require successful receipt producers", "needs.verify.result", "needs.linux-containment.result",
   "needs.windows-containment.result", '[[ "$result" != "success" ]]',
 ]) {
@@ -1100,6 +1101,8 @@ for (const [needle, expected] of [
   ["sudo setfacl -m", 2],
   ["sudo setfacl -x", 2],
   ["Harden trusted Node distribution permissions", 2],
+  ["-exec chmod go-w {} +", 2],
+  ['if [[ -n "${OPENCODE_QUALITY_RUN_USER:-}" ]]', 2],
 ]) {
   if (workflow.split(needle).length - 1 !== expected) {
     fail(

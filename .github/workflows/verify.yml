@@ -33,8 +33,8 @@ jobs:
           set -euo pipefail
           node_executable="$(node -p 'process.execPath')"
           node_root="$(dirname "$(dirname "$node_executable")")"
-          sudo chmod -R go-w "$node_root"
-          if sudo find "$node_root" -xdev -perm /022 -print -quit | grep -q .; then
+          sudo find "$node_root" -xdev \( -type f -o -type d \) -perm /022 -exec chmod go-w {} +
+          if sudo find "$node_root" -xdev \( -type f -o -type d \) -perm /022 -print -quit | grep -q .; then
             echo "trusted Node distribution remains group- or world-writable" >&2
             exit 1
           fi
@@ -148,11 +148,13 @@ jobs:
           set -euo pipefail
           sudo chown -R "$(id -u):$(id -g)" "$GITHUB_WORKSPACE"
           cleanup_status=0
-          workspace_parent="$(dirname "$GITHUB_WORKSPACE")"
-          while [[ "$workspace_parent" != "/home" && "$workspace_parent" != "/" ]]; do
-            sudo setfacl -x "u:$OPENCODE_QUALITY_RUN_USER" "$workspace_parent" || cleanup_status=$?
-            workspace_parent="$(dirname "$workspace_parent")"
-          done
+          if [[ -n "${OPENCODE_QUALITY_RUN_USER:-}" ]]; then
+            workspace_parent="$(dirname "$GITHUB_WORKSPACE")"
+            while [[ "$workspace_parent" != "/home" && "$workspace_parent" != "/" ]]; do
+              sudo setfacl -x "u:$OPENCODE_QUALITY_RUN_USER" "$workspace_parent" || cleanup_status=$?
+              workspace_parent="$(dirname "$workspace_parent")"
+            done
+          fi
           if [[ -n "${OPENCODE_QUALITY_CGROUP_ROOT:-}" && -d "$OPENCODE_QUALITY_CGROUP_ROOT" ]]; then
             sudo rmdir "$OPENCODE_QUALITY_CGROUP_ROOT" || cleanup_status=$?
           fi
@@ -184,8 +186,8 @@ jobs:
           set -euo pipefail
           node_executable="$(node -p 'process.execPath')"
           node_root="$(dirname "$(dirname "$node_executable")")"
-          sudo chmod -R go-w "$node_root"
-          if sudo find "$node_root" -xdev -perm /022 -print -quit | grep -q .; then
+          sudo find "$node_root" -xdev \( -type f -o -type d \) -perm /022 -exec chmod go-w {} +
+          if sudo find "$node_root" -xdev \( -type f -o -type d \) -perm /022 -print -quit | grep -q .; then
             echo "trusted Node distribution remains group- or world-writable" >&2
             exit 1
           fi
@@ -293,11 +295,13 @@ jobs:
           set -euo pipefail
           sudo chown -R "$(id -u):$(id -g)" "$GITHUB_WORKSPACE"
           cleanup_status=0
-          workspace_parent="$(dirname "$GITHUB_WORKSPACE")"
-          while [[ "$workspace_parent" != "/home" && "$workspace_parent" != "/" ]]; do
-            sudo setfacl -x "u:$OPENCODE_QUALITY_RUN_USER" "$workspace_parent" || cleanup_status=$?
-            workspace_parent="$(dirname "$workspace_parent")"
-          done
+          if [[ -n "${OPENCODE_QUALITY_RUN_USER:-}" ]]; then
+            workspace_parent="$(dirname "$GITHUB_WORKSPACE")"
+            while [[ "$workspace_parent" != "/home" && "$workspace_parent" != "/" ]]; do
+              sudo setfacl -x "u:$OPENCODE_QUALITY_RUN_USER" "$workspace_parent" || cleanup_status=$?
+              workspace_parent="$(dirname "$workspace_parent")"
+            done
+          fi
           if [[ -n "${OPENCODE_QUALITY_CGROUP_ROOT:-}" && -d "$OPENCODE_QUALITY_CGROUP_ROOT" ]]; then
             sudo rmdir "$OPENCODE_QUALITY_CGROUP_ROOT" || cleanup_status=$?
           fi
