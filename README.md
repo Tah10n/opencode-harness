@@ -73,6 +73,7 @@ examples
 fixtures
 lib/feedback
 lib/quality
+native
 opencode.json
 package.json
 quality
@@ -293,12 +294,35 @@ helper, а запись в guard отдельно проверяется как 
 root-level `cgroup.kill` всё равно охватывает их; teardown требует
 `cgroup.events: populated 0` и удаления всех descendants с сохранением самого
 делегированного root. Linux workload principal не должен иметь более широких
-`sudo`/root capabilities. Process group никогда не
-считается доказательством containment. macOS пока явно `unsupported`; любой
-недоступный production controller даёт fail-closed
-`QUALITY_CHECK_CONTAINMENT_UNAVAILABLE`. Такая изоляция не защищает от сети или
-других доступных пользователю файлов, поэтому catalog должен содержать только
-доверенные project-owned checks.
+`sudo`/root capabilities. Process group никогда не считается доказательством
+containment.
+
+macOS не является Linux и не предоставляет cgroup/Job Object API. На macOS
+harness использует `macos-exclusive-uid-v1`: весь coordinator запускается под
+отдельным non-root/non-admin real UID, которому не принадлежат никакие другие
+процессы, а root-owned controller устанавливается вне workspace с mode `0555`
+под полностью root-owned/non-writable canonical path ancestry.
+Controller связывает coordinator ancestors по PID + start time; каждый другой
+живой процесс с этим real UID входит в workload boundary даже после
+fork/exec/`setsid`/reparenting. Teardown сначала останавливает boundary до fixed
+point, затем посылает `SIGKILL` и требует два пустых UID-scan без zombies.
+Закрытие stdin после смерти coordinator запускает тот же teardown; concurrent
+scope под этим UID отклоняется. Нужны
+`OPENCODE_QUALITY_MACOS_CONTROLLER` и
+`OPENCODE_QUALITY_MACOS_WORKLOAD_UID`. Обычный login account с фоновыми
+процессами даёт fail-closed `QUALITY_CHECK_CONTAINMENT_UNAVAILABLE`, а не
+ослабленное доказательство. Workload principal не должен иметь `sudo`, setuid
+или иной путь смены UID.
+
+Binary root-owned, но не setuid: watchdog выполняется как workload UID. Поэтому
+это полная lifecycle-поддержка для доверенных project-owned checks, а не защита
+от намеренного same-UID кода, который атакует сам watchdog. Неожиданный выход
+controller всегда делает receipt failed/unverified, но не превращает механизм в
+adversarial sandbox.
+
+Такая изоляция не защищает от privilege escalation, сети или других доступных
+пользователю файлов, поэтому catalog должен содержать только доверенные
+project-owned checks.
 
 Containment setup имеет отдельный bounded deadline; execution timeout начинается
 только после readiness. Adapter cwd повторно identity-checkится до/после spawn,
@@ -395,9 +419,10 @@ receipts for the deterministic DoD dimension. When
 `OPENCODE_MILESTONE_RECEIPTS_OUT` names a new absolute file, it also writes the
 sealed deterministic bundle consumed by CI. A deterministic-only
 result is `partially_verified`, never milestone-wide `verified`: real Windows
-Job Object, Linux cgroup-v2, and installed host-hook evidence are separate
-operational dimensions; macOS may be explicitly `unsupported`, and general live
-evaluation may be `not_requested`. In particular,
+Job Object, Linux cgroup-v2, macOS exclusive-UID, and installed host-hook
+evidence are separate operational dimensions. macOS cannot be replaced by an
+`unsupported` status; general live evaluation may be `not_requested`. In
+particular,
 `probe:runtime:quality-plugin-api` is intentionally excluded from this default
 chain because it resolves a machine-local `@opencode-ai/plugin` installation.
 These commands validate contracts, schemas, failure
@@ -417,11 +442,15 @@ npm run milestone:2:operational -- --dimension windows_runtime --out C:\absolute
 npm run milestone:2:assess -- --bundle-dir C:\absolute\bundles --out C:\absolute\aggregate.json --host-unavailable
 ```
 
-Use `linux_runtime` on a guarded Linux cgroup-v2 host. The installed-host path
+Use `linux_runtime` on a guarded Linux cgroup-v2 host. Use `macos_runtime` only
+inside a dedicated macOS workload account after building and root-installing
+`native/macos-exclusive-uid-controller.c`; the required environment variables
+are shown above and the complete provisioning reference is the
+`macos-containment` CI job. The installed-host path
 can write its own `host_hook_e2e` bundle with
 `npm run verify:runtime:quality-hooks -- --adapter <host-owned-adapter> --milestone-out <absolute-json>`.
 `--fixture-contract` is explicitly unable to create that bundle. GitHub Actions
-uploads deterministic, Windows, and Linux bundles and reports the absent
+uploads deterministic, Windows, Linux, and macOS bundles and reports the absent
 installed adapter as bounded external state; it cannot claim milestone-wide
 `verified` until a `trusted_adapter` host bundle from the same HEAD/run exists.
 

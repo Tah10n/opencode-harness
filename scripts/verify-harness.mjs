@@ -343,17 +343,23 @@ for (const stage of DETERMINISTIC_STAGE_REGISTRY) {
     fail("HARNESS-S008", `verify-all references missing or recursive npm stage ${stage.npm_script}`, "Keep the registry and package scripts coherent and non-recursive.");
   }
 }
-const dodDocument = JSON.parse(read("quality/milestone-2-dod.v2.json"));
+const dodDocument = JSON.parse(read("quality/milestone-2-dod.v3.json"));
 const deterministicDimension = dodDocument.dimensions.find((item) => item.dimension_id === "deterministic_contracts");
 const hostHookDimension = dodDocument.dimensions.find((item) => item.dimension_id === "host_hook_e2e");
-if (dodDocument.schema_version !== 2 || !deterministicDimension || !hostHookDimension?.mandatory_for_verified) {
-  fail("HARNESS-S008", "Milestone 2 DoD must retain explicit deterministic and mandatory host-hook dimensions", "Restore the v2 operational dimension contract.");
+const macosDimension = dodDocument.dimensions.find((item) => item.dimension_id === "macos_runtime");
+if (dodDocument.schema_version !== 3 || !deterministicDimension || !hostHookDimension?.mandatory_for_verified
+  || !macosDimension?.mandatory_for_verified
+  || JSON.stringify(macosDimension.check_ids) !== JSON.stringify([
+    "macos-trusted-project-check",
+    "macos-descendant-teardown",
+  ])) {
+  fail("HARNESS-S008", "Milestone 2 DoD must retain explicit deterministic, macOS, and mandatory host-hook dimensions", "Restore the v3 operational dimension contract.");
 }
 const deterministicDodChecks = [...deterministicDimension.check_ids].sort();
 const operationalDeterministicChecks = deterministicExpectedChecks();
 const registeredDodChecks = operationalDeterministicChecks.map((entry) => entry.check_id).sort();
 if (JSON.stringify(registeredDodChecks) !== JSON.stringify(deterministicDodChecks)) {
-  fail("HARNESS-S008", "verify-all receipt registry must map every deterministic DoD check exactly once", "Synchronize the runner registry with quality/milestone-2-dod.v2.json.");
+  fail("HARNESS-S008", "verify-all receipt registry must map every deterministic DoD check exactly once", "Synchronize the runner registry with quality/milestone-2-dod.v3.json.");
 }
 const canonicalDeterministicChecks = milestone2ExpectedChecks(dodDocument)
   .filter((entry) => deterministicDimension.check_ids.includes(entry.check_id))
@@ -1084,7 +1090,8 @@ function workflowJobBlock(jobId) {
 
 for (const needle of [
   "pull_request:", "workflow_dispatch:", "npm run verify", "actions/setup-node@v4", "Harness verification",
-  "linux-containment:", "windows-containment:", "ubuntu-latest", "windows-latest",
+  "linux-containment:", "windows-containment:", "macos-containment:",
+  "ubuntu-latest", "windows-latest", "macos-latest",
   "OPENCODE_QUALITY_CGROUP_ROOT", "OPENCODE_QUALITY_CGROUP_ATTACH_MODE=sudo-helper-v1",
   "OPENCODE_QUALITY_CGROUP_ATTACH_HELPER", "opencode-quality-workload/cgroup.procs",
   "expected_uid", "SUDO_UID", "npm run milestone:2:operational",
@@ -1092,9 +1099,11 @@ for (const needle of [
   "actions/download-artifact@v4", "sudo useradd", "attach helper can write the guard cgroup",
   "sudo setfacl -m", "sudo setfacl -x",
   "Harden trusted Node distribution permissions", "-exec chmod go-w {} +", "-perm /022",
+  "npm run build:macos-containment", "OPENCODE_QUALITY_MACOS_CONTROLLER",
+  "OPENCODE_QUALITY_MACOS_WORKLOAD_UID", "sudo dscl . -create", "ambient sudo authorization",
   '${OPENCODE_QUALITY_RUN_USER:-}',
   "Require successful receipt producers", "needs.verify.result", "needs.linux-containment.result",
-  "needs.windows-containment.result", '[[ "$result" != "success" ]]',
+  "needs.windows-containment.result", "needs.macos-containment.result", '[[ "$result" != "success" ]]',
 ]) {
   assertIncludes(workflow, needle, ".github/workflows/verify.yml");
 }
@@ -1102,8 +1111,8 @@ for (const [needle, expected] of [
   ["sudo setfacl -m", 2],
   ["sudo setfacl -x", 2],
   ["Harden trusted Node distribution permissions", 2],
-  ["-exec chmod go-w {} +", 2],
-  ['if [[ -n "${OPENCODE_QUALITY_RUN_USER:-}" ]]', 2],
+  ["-exec chmod go-w {} +", 3],
+  ['if [[ -n "${OPENCODE_QUALITY_RUN_USER:-}" ]]', 3],
 ]) {
   if (workflow.split(needle).length - 1 !== expected) {
     fail(
@@ -1130,6 +1139,7 @@ for (const needle of [
   "VERIFY_RESULT: ${{ needs.verify.result }}",
   "LINUX_RESULT: ${{ needs.linux-containment.result }}",
   "WINDOWS_RESULT: ${{ needs.windows-containment.result }}",
+  "MACOS_RESULT: ${{ needs.macos-containment.result }}",
   '[[ "$result" != "success" ]]',
 ]) {
   assertIncludes(
@@ -1140,7 +1150,7 @@ for (const needle of [
     "Keep the producer-conclusion gate scoped to the aggregate job.",
   );
 }
-for (const producerJobId of ["verify", "linux-containment", "windows-containment"]) {
+for (const producerJobId of ["verify", "linux-containment", "windows-containment", "macos-containment"]) {
   assertNotIncludes(
     workflowJobBlock(producerJobId),
     "Require successful receipt producers",
@@ -1157,11 +1167,11 @@ if (workflow.includes(cgroupShellMigration)) {
     "Attach only idle managed workers through the fixed narrow helper; never move the workflow shell into the kill boundary.",
   );
 }
-if (workflow.split("npm run milestone:2:operational").length - 1 !== 2) {
+if (workflow.split("npm run milestone:2:operational").length - 1 !== 3) {
   fail(
     "HARNESS-S002",
-    ".github/workflows/verify.yml must produce exactly one Windows and one Linux operational receipt bundle",
-    "Keep platform execution in the runner-owned operational wrapper and aggregate both artifacts.",
+    ".github/workflows/verify.yml must produce exactly one Windows, one Linux, and one macOS operational receipt bundle",
+    "Keep platform execution in the runner-owned operational wrapper and aggregate all three artifacts.",
   );
 }
 

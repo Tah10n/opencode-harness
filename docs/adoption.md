@@ -46,6 +46,7 @@ examples
 fixtures
 lib/feedback
 lib/quality
+native
 opencode.json
 package.json
 quality
@@ -310,8 +311,29 @@ covers root/sibling migration; cleanup proves hierarchical
 `cgroup.events: populated 0`, removes descendants postorder, and retains the
 delegated root.
 Process groups are not accepted as containment proof.
-macOS is explicitly unsupported until a defensible controller exists. Any
-unavailable controller fails closed with
+On macOS, build `native/macos-exclusive-uid-controller.c` with
+`npm run build:macos-containment -- --out <canonical-absolute-output>`, then
+install that binary outside the project as a root-owned, singly linked,
+non-group/world-writable executable whose complete canonical path ancestry is
+also root-owned, non-group/world-writable, and not writable by the workload via
+effective ACLs. Run the entire harness coordinator under a
+dedicated non-root, non-admin account that has no other processes and no sudo,
+setuid, or other UID-changing path. Set
+`OPENCODE_QUALITY_MACOS_CONTROLLER` to the installed binary and
+`OPENCODE_QUALITY_MACOS_WORKLOAD_UID` to that account's real UID. The
+controller preserves only identity-bound coordinator ancestors; every other
+same-UID process is workload, so fork/exec, `setsid`, double-fork, and reparenting
+remain inside the boundary. It performs fixed-point `SIGSTOP`, `SIGKILL`, and
+two zero-member scans; stdin EOF also tears down an orphaned workload and a
+concurrent scope is rejected. A normal logged-in account with background
+same-UID processes is intentionally unavailable. The `macos-containment` GitHub
+Actions job is the canonical provisioning and receipt example.
+The binary is root-owned but not privileged at runtime: its process uses the
+workload UID. Only trusted project-owned checks are admissible; deliberate
+same-UID signalling of the watchdog or privilege-changing code is outside this
+lifecycle-containment threat model and makes evidence unverified.
+
+Any unavailable controller fails closed with
 `QUALITY_CHECK_CONTAINMENT_UNAVAILABLE`. Durable receipts retain bounded
 outcome/status metadata and fingerprints, never raw stdout or stderr.
 

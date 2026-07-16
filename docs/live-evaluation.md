@@ -260,9 +260,11 @@ pre-tool hooks are runtime-verified. Native Bash is disabled inside an
 instrumented quality session; repository commands use catalog-backed trusted
 checks. Windows workers use Job Object containment before initialization, while
 Linux workers require a delegated writable cgroup v2 and verified hierarchical
-`cgroup.events: populated 0` followed by postorder subtree removal. macOS is
-explicitly unsupported; any unavailable
-production controller fails closed. The live adapter
+`cgroup.events: populated 0` followed by postorder subtree removal. macOS
+workers require the root-owned native controller and a dedicated, non-admin,
+exclusive real UID; teardown is accepted only after fixed-point stop/kill and
+two empty same-UID scans. A missing/non-exclusive macOS boundary fails closed.
+The live adapter
 runner enforces its own isolated workspace policy, hidden checks, teardown, and
 report assertions only inside live-evaluation runs. Processes started outside
 these application boundaries are not intercepted; neither mode is a host-wide

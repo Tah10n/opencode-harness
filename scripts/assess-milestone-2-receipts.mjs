@@ -89,7 +89,7 @@ function main() {
     dimensions.add(bundle.dimension_id);
     assertMilestone2BundleMatchesRunContext(bundle, runContext);
   }
-  const document = JSON.parse(fs.readFileSync(path.join(root, "quality", "milestone-2-dod.v2.json"), "utf8"));
+  const document = JSON.parse(fs.readFileSync(path.join(root, "quality", "milestone-2-dod.v3.json"), "utf8"));
   const receipts = bundles.flatMap((bundle) => bundle.receipts);
   const hasHostReceipt = receipts.some((receipt) => receipt.check_id === "normal-session-host-hook-e2e");
   if (options.hostUnavailable && hasHostReceipt) {

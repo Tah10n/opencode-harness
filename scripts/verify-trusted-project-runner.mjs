@@ -108,13 +108,27 @@ function containedExecution(execution = {}, {
     scope_id: scopeId,
     worker_pid: 4242,
   };
-  const identity = kind === "windows-job-object-v1"
-    ? {
+  let identity;
+  if (kind === "windows-job-object-v1") {
+    identity = {
       ...common,
       controller_executable: { canonical_path: process.execPath, fixture: true },
       controller_source_fingerprint: fingerprint({ controller: "fixture" }),
-    }
-    : {
+    };
+  } else if (kind === "macos-exclusive-uid-v1") {
+    identity = {
+      ...common,
+      controller_pid: 4343,
+      workload_uid: 501,
+      worker_start_identity: { seconds: 10, microseconds: 20 },
+      controller_start_identity: { seconds: 30, microseconds: 40 },
+      preserved_ancestor_count: 2,
+      controller_executable: { canonical_path: "/usr/local/libexec/opencode-quality-macos-controller", fixture: true },
+      controller_protocol_version: 1,
+      controller_protocol_fingerprint: fingerprint({ controller: "fixture-macos" }),
+    };
+  } else {
+    identity = {
       ...common,
       watchdog_pid: 4343,
       delegated_root_identity: { canonical_path: "/fixture/cgroup", fixture: true },
@@ -133,8 +147,9 @@ function containedExecution(execution = {}, {
         guard_policy_fingerprint: fingerprint({ guard: linuxParentIdentity }),
       },
     };
+  }
   const identityFingerprint = fingerprint(identity);
-  const state = kind === "windows-job-object-v1"
+  const state = ["windows-job-object-v1", "macos-exclusive-uid-v1"].includes(kind)
     ? {
       support_state: "verified",
       kind,
@@ -456,6 +471,28 @@ const linuxPassed = runSynthetic({
 });
 assert.equal(linuxPassed.status, "passed");
 assert.equal(linuxPassed.containment_kind, "linux-cgroup-v2");
+
+const macosContainmentDescriptor = containmentDescriptor({
+  kind: "macos-exclusive-uid-v1",
+  mechanism: {
+    controller_executable: {
+      canonical_path: "/usr/local/libexec/opencode-quality-macos-controller",
+      fixture: true,
+    },
+    workload_uid: 501,
+    controller_protocol_version: 1,
+    controller_protocol_fingerprint: fingerprint({ controller: "fixture-macos" }),
+  },
+});
+const macosPassed = runSynthetic({
+  containmentClassifier: () => macosContainmentDescriptor,
+  spawn: () => containedExecution({}, {
+    kind: "macos-exclusive-uid-v1",
+    scopeId: "macos-exclusive-uid-fixture-scope",
+  }),
+});
+assert.equal(macosPassed.status, "passed");
+assert.equal(macosPassed.containment_kind, "macos-exclusive-uid-v1");
 
 const mismatchedLinuxExecution = structuredClone(containedExecution({}, {
   kind: "linux-cgroup-v2",
@@ -1068,8 +1105,11 @@ function runRealCheck(checkId) {
 const platformClassification = classifyProcessContainment();
 let runtimeResult;
 const operationalReceipts = [];
+const configuredMacos = process.env.OPENCODE_QUALITY_MACOS_CONTROLLER !== undefined
+  && process.env.OPENCODE_QUALITY_MACOS_WORKLOAD_UID !== undefined;
 const shouldRunReal = process.platform === "win32"
-  || (process.platform === "linux" && process.env.OPENCODE_QUALITY_CGROUP_ROOT !== undefined);
+  || (process.platform === "linux" && process.env.OPENCODE_QUALITY_CGROUP_ROOT !== undefined)
+  || (process.platform === "darwin" && configuredMacos);
 if (process.platform === "win32") {
   assert.equal(platformClassification.support_state, "verified", "Windows Job Object runtime is mandatory on Windows");
 } else if (process.platform === "linux" && shouldRunReal) {
@@ -1077,8 +1117,10 @@ if (process.platform === "win32") {
 } else if (process.platform === "linux") {
   assert.equal(platformClassification.support_state, "unavailable");
   assert.equal(platformClassification.reason, "delegated_root_missing");
+} else if (process.platform === "darwin" && shouldRunReal) {
+  assert.equal(platformClassification.support_state, "verified", "configured macOS exclusive-UID runtime must be usable");
 } else if (process.platform === "darwin") {
-  assert.equal(platformClassification.support_state, "unsupported");
+  assert.equal(platformClassification.support_state, "unavailable");
 } else {
   assert.equal(platformClassification.support_state, "unavailable");
 }
@@ -1169,7 +1211,7 @@ if (shouldRunReal) {
     }
   }
 } else if (process.platform === "darwin") {
-  runtimeResult = "macos: explicitly unsupported";
+  runtimeResult = "macos-exclusive-uid-v1: unavailable without a dedicated configured UID (not counted as runtime coverage)";
 } else if (process.platform === "linux") {
   runtimeResult = "linux-cgroup-v2: unavailable without OPENCODE_QUALITY_CGROUP_ROOT (not counted as runtime coverage)";
 } else {

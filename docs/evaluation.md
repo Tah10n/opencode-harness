@@ -291,9 +291,31 @@ outside. The guard cgroup and its migration controls must be non-writable by the
 workload principal. Root-level `cgroup.kill` therefore still covers a workload
 that moves from the initial leaf into the root or a sibling. Teardown is
 accepted only after hierarchical `cgroup.events` reports `populated 0` and all
-descendants are removed while the delegated root remains; a process
-group is never containment proof. macOS remains explicitly unsupported. An
-unavailable or unprovable controller fails closed.
+descendants are removed while the delegated root remains; a process group is
+never containment proof.
+
+macOS uses a different verified boundary because it has no public cgroup or Job
+Object equivalent. `macos-exclusive-uid-v1` requires the complete coordinator
+chain to run under one dedicated, non-root, non-admin real UID with no unrelated
+same-UID processes. A root-owned, singly linked, mode-`0555` native controller
+under canonical root-owned ancestry that is also non-writable under effective
+ACLs binds preserved coordinator ancestors by PID and start
+time. Every other process with that real UID is stopped to a fixed point and
+killed, including detached, reparented, and double-fork descendants. Successful
+teardown requires two empty UID scans with no zombies. EOF after coordinator
+death invokes the same cleanup, and a second concurrent scope is rejected.
+The controller's ten-second teardown bound is paired with a longer parent-side
+close-confirmation window, so the parent cannot declare failure and return while
+the native teardown is still within its own advertised deadline.
+Ordinary interactive accounts, UID mismatch, controller identity drift, a
+non-exclusive UID, or missing controller configuration all fail closed as
+unavailable. This mechanism assumes the workload account has no sudo, setuid,
+or other privilege-changing path; it is process-lifecycle containment, not a
+privilege-escalation, filesystem, or network sandbox.
+The root-owned executable is not setuid and the watchdog runs as the workload
+UID. Deliberate same-UID attacks on the watchdog are outside the trusted-check
+threat model; unexpected controller exit still fails the receipt closed, but is
+not represented as adversarial sandbox enforcement.
 
 Containment readiness has its own bounded setup deadline; the check/adapter
 execution timeout starts only after readiness. Adapter working directories are

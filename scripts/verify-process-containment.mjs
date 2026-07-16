@@ -311,6 +311,85 @@ function createFakeWindowsController({
   return controller;
 }
 
+function fakeMacosControllerIdentity(candidate, inode = "1") {
+  return Object.freeze({
+    canonical_path: candidate,
+    device: "1",
+    inode,
+    mode: "33005",
+    size: "1",
+    modified_ns: "1",
+    changed_ns: "1",
+    owner_uid: "0",
+    owner_gid: "0",
+    links: "1",
+  });
+}
+
+function createFakeMacosController({
+  workerPid = 4242,
+  controllerPid = 6262,
+  workloadUid = 501,
+  initial,
+  close = "success",
+  exitOnStart = null,
+  exitBeforeClosed = false,
+} = {}) {
+  const stdout = new EventEmitter();
+  const stderr = new EventEmitter();
+  stdout.setEncoding = () => stdout;
+  stderr.setEncoding = () => stderr;
+  let exited = false;
+  const controller = new EventEmitter();
+  const emitExit = (code, betweenExitAndClose = null) => {
+    if (exited) return;
+    exited = true;
+    queueMicrotask(() => {
+      controller.emit("exit", code);
+      queueMicrotask(() => {
+        betweenExitAndClose?.();
+        controller.emit("close", code, null);
+      });
+    });
+  };
+  controller.pid = controllerPid;
+  controller.stdout = stdout;
+  controller.stderr = stderr;
+  controller.stdin = {
+    end(value) {
+      if (exited) return;
+      if (value === "CLOSE\n" && close === "success") {
+        queueMicrotask(() => {
+          const emitClosed = () => stdout.emit("data", "CLOSED:1:4:0\n");
+          if (exitBeforeClosed) emitExit(0, emitClosed);
+          else {
+            emitClosed();
+            emitExit(0);
+          }
+        });
+      } else if (value === "CLOSE\n" && close === "error") {
+        queueMicrotask(() => {
+          stdout.emit("data", "ERROR:uid_teardown_failed\n");
+          emitExit(1);
+        });
+      }
+    },
+  };
+  controller.kill = () => {
+    emitExit(1);
+    return true;
+  };
+  queueMicrotask(() => {
+    const ready = initial ?? `READY:1:${workloadUid}:${workerPid}:10:20:${controllerPid}:30:40:2\n`;
+    const chunks = Array.isArray(ready) ? ready : [ready];
+    for (const chunk of chunks) {
+      if (chunk.length > 0) stdout.emit("data", chunk);
+    }
+    if (exitOnStart !== null) emitExit(exitOnStart);
+  });
+  return controller;
+}
+
 function createFakeLinuxWatchdog(fake, {
   initial = "READY\n",
   close = "success",
@@ -404,8 +483,40 @@ function createFakeLinuxWatchdog(fake, {
   return watchdog;
 }
 
-assert.equal(classifyProcessContainment({ platform: "darwin" }).support_state, "unsupported");
-assert.equal(classifyProcessContainment({ platform: "darwin" }).kind, "macos-process-containment-unsupported");
+const fakeMacosControllerPath = path.join(canonicalTempBase, "opencode-quality-macos-controller");
+const macosIdentity = fakeMacosControllerIdentity(fakeMacosControllerPath);
+const validMacosProbe = () => Object.freeze({
+  status: 0,
+  signal: null,
+  stdout: "PROBE:1:501:6262:10:20:2\n",
+  stderr: "",
+});
+assert.equal(classifyProcessContainment({ platform: "darwin", env: {} }).support_state, "unavailable");
+assert.equal(classifyProcessContainment({ platform: "darwin", env: {} }).kind, "macos-exclusive-uid-v1");
+assert.equal(classifyProcessContainment({
+  platform: "darwin",
+  macosController: fakeMacosControllerPath,
+  macosWorkloadUid: 501,
+  currentUid: 501,
+  macosControllerIdentity: macosIdentity,
+  spawnMacosProbe: validMacosProbe,
+}).support_state, "verified");
+assert.equal(classifyProcessContainment({
+  platform: "darwin",
+  macosController: fakeMacosControllerPath,
+  macosWorkloadUid: 501,
+  currentUid: 502,
+  macosControllerIdentity: macosIdentity,
+  spawnMacosProbe: validMacosProbe,
+}).reason, "exclusive_uid_mismatch");
+assert.equal(classifyProcessContainment({
+  platform: "darwin",
+  macosController: fakeMacosControllerPath,
+  macosWorkloadUid: 501,
+  currentUid: 501,
+  macosControllerIdentity: macosIdentity,
+  spawnMacosProbe: () => ({ ...validMacosProbe(), stdout: "PROBE:0:501:6262:10:20:2\n" }),
+}).reason, "controller_protocol_failed");
 assert.equal(classifyProcessContainment({ platform: "freebsd" }).support_state, "unavailable");
 assert.equal(classifyProcessContainment({ platform: "linux", env: {} }).support_state, "unavailable");
 assert.throws(() => normalizeProcessContainmentOptions({ fallbackToProcessGroup: true }), TypeError);
@@ -415,6 +526,15 @@ assert.deepEqual(
   { cgroupAttachMode: "sudo-helper-v1" },
 );
 assert.throws(() => normalizeProcessContainmentOptions({ cgroupAttachMode: "ambient-sudo" }), TypeError);
+assert.deepEqual(normalizeProcessContainmentOptions({
+  macosController: fakeMacosControllerPath,
+  macosWorkloadUid: 501,
+}), {
+  macosController: fakeMacosControllerPath,
+  macosWorkloadUid: 501,
+});
+assert.throws(() => normalizeProcessContainmentOptions({ macosController: "relative" }), TypeError);
+assert.throws(() => normalizeProcessContainmentOptions({ macosWorkloadUid: 0 }), TypeError);
 
 const partialLeafRoot = temporaryDirectory("opencode-cgroup-partial-leaf-");
 try {
@@ -527,6 +647,86 @@ const identityDrift = await preparePlatformProcessContainment({ pid: 4242 }, 100
 assert.equal(await identityDrift.terminateAndVerify(100), false);
 assert.equal(identityDrift.status().teardown_verified, false);
 assert.equal(identityDrift.status().failure, "windows_job_controller_identity_drift");
+
+const macosOptions = Object.freeze({
+  platform: "darwin",
+  macosController: fakeMacosControllerPath,
+  macosWorkloadUid: 501,
+  currentUid: 501,
+  macosControllerIdentity: macosIdentity,
+});
+const validMacos = await preparePlatformProcessContainment({ pid: 4242 }, 100, {
+  ...macosOptions,
+  spawnMacosController: () => createFakeMacosController(),
+  scopeIdFactory: () => "macos-exclusive-uid-valid-protocol",
+});
+assert.equal(validMacos.kind, "macos-exclusive-uid-v1");
+assert.equal(validMacos.identity.workload_uid, 501);
+assert.equal(validMacos.identity.preserved_ancestor_count, 2);
+assert.equal(await validMacos.terminateAndVerify(100), true);
+assert.equal(validMacos.status().teardown_verified, true);
+
+const reorderedMacos = await preparePlatformProcessContainment({ pid: 4242 }, 100, {
+  ...macosOptions,
+  spawnMacosController: () => createFakeMacosController({ exitBeforeClosed: true }),
+  scopeIdFactory: () => "macos-exclusive-uid-exit-before-final-stdout",
+});
+assert.equal(await reorderedMacos.terminateAndVerify(100), true);
+assert.equal(reorderedMacos.status().controller_streams_closed, true);
+
+for (const [label, fixture] of [
+  ["wrong worker", { initial: "READY:1:501:4243:10:20:6262:30:40:2\n" }],
+  ["wrong UID", { initial: "READY:1:502:4242:10:20:6262:30:40:2\n" }],
+  ["wrong controller", { initial: "READY:1:501:4242:10:20:6263:30:40:2\n" }],
+  ["protocol garbage", { initial: "GARBAGE\n" }],
+  ["early exit", { initial: "", exitOnStart: 1 }],
+]) {
+  await assert.rejects(preparePlatformProcessContainment({ pid: 4242 }, 20, {
+    ...macosOptions,
+    spawnMacosController: () => createFakeMacosController(fixture),
+    scopeIdFactory: () => `macos-exclusive-uid-${label.replaceAll(" ", "-")}`,
+  }), (error) => error instanceof ProcessContainmentError
+    && error.classification === "process_containment_failed", `${label} was accepted by the macOS controller protocol`);
+}
+
+await assert.rejects(preparePlatformProcessContainment({ pid: 4242 }, 20, {
+  ...macosOptions,
+  spawnMacosController: () => createFakeMacosController({
+    initial: "ERROR:exclusive_uid_not_available\n",
+    exitOnStart: 77,
+  }),
+  scopeIdFactory: () => "macos-exclusive-uid-pre-ready-collision",
+}), (error) => error instanceof ProcessContainmentError
+  && error.classification === "process_containment_failed"
+  && error.containment_state.reason === "exclusive_uid_not_available");
+
+const macosCloseError = await preparePlatformProcessContainment({ pid: 4242 }, 100, {
+  ...macosOptions,
+  spawnMacosController: () => createFakeMacosController({ close: "error" }),
+  scopeIdFactory: () => "macos-exclusive-uid-close-error",
+});
+assert.equal(await macosCloseError.terminateAndVerify(100), false);
+assert.equal(macosCloseError.status().teardown_verified, false);
+
+let macosIdentityReads = 0;
+const driftingMacosOptions = {
+  platform: "darwin",
+  macosController: fakeMacosControllerPath,
+  macosWorkloadUid: 501,
+  currentUid: 501,
+  spawnMacosController: () => createFakeMacosController(),
+  scopeIdFactory: () => "macos-exclusive-uid-identity-drift",
+};
+Object.defineProperty(driftingMacosOptions, "macosControllerIdentity", {
+  enumerable: true,
+  get() {
+    macosIdentityReads += 1;
+    return fakeMacosControllerIdentity(fakeMacosControllerPath, macosIdentityReads === 1 ? "1" : "2");
+  },
+});
+const macosIdentityDrift = await preparePlatformProcessContainment({ pid: 4242 }, 100, driftingMacosOptions);
+assert.equal(await macosIdentityDrift.terminateAndVerify(100), false);
+assert.equal(macosIdentityDrift.status().failure, "macos_uid_controller_identity_drift");
 
 const syncInput = {
   file: process.execPath,
@@ -976,18 +1176,31 @@ try {
 }
 
 const delegatedRoot = process.env.OPENCODE_QUALITY_CGROUP_ROOT;
-const operationalContainmentFingerprints = [];
-const currentClassification = classifyProcessContainment({
+const configuredMacosController = process.env.OPENCODE_QUALITY_MACOS_CONTROLLER;
+const configuredMacosUid = process.env.OPENCODE_QUALITY_MACOS_WORKLOAD_UID;
+const operationalContainmentOptions = {
   ...(delegatedRoot === undefined ? {} : { cgroupRoot: delegatedRoot }),
-});
+  ...(configuredMacosController === undefined ? {} : { macosController: configuredMacosController }),
+  ...(configuredMacosUid === undefined ? {} : { macosWorkloadUid: Number(configuredMacosUid) }),
+};
+const syncContainmentOptions = {
+  ...(delegatedRoot === undefined ? {} : { cgroup_root: delegatedRoot }),
+  ...(configuredMacosController === undefined ? {} : { macos_controller: configuredMacosController }),
+  ...(configuredMacosUid === undefined ? {} : { macos_workload_uid: Number(configuredMacosUid) }),
+};
+const operationalContainmentFingerprints = [];
+const currentClassification = classifyProcessContainment(operationalContainmentOptions);
 if (process.platform === "win32") {
   assert.equal(currentClassification.support_state, "verified", "Windows Job Object containment must be available");
 } else if (process.platform === "linux" && delegatedRoot !== undefined) {
   assert.equal(currentClassification.support_state, "verified", "explicit Linux cgroup root must be usable, not skipped");
 } else if (process.platform === "linux") {
   assert.equal(currentClassification.support_state, "unavailable");
+} else if (process.platform === "darwin" && configuredMacosController !== undefined
+  && configuredMacosUid !== undefined) {
+  assert.equal(currentClassification.support_state, "verified", "configured macOS exclusive-UID runtime must be usable");
 } else if (process.platform === "darwin") {
-  assert.equal(currentClassification.support_state, "unsupported");
+  assert.equal(currentClassification.support_state, "unavailable");
 }
 
 if (currentClassification.support_state === "verified") {
@@ -998,7 +1211,7 @@ if (currentClassification.support_state === "verified") {
     encoding: "utf8",
     input: JSON.stringify({
       ...syncInput,
-      containment_options: delegatedRoot === undefined ? {} : { cgroup_root: delegatedRoot },
+      containment_options: syncContainmentOptions,
     }),
     maxBuffer: 64 * 1024,
   });
@@ -1239,6 +1452,128 @@ if (currentClassification.support_state === "verified") {
       }
     } finally {
       fs.rmSync(linuxTmp, { recursive: true, force: true });
+    }
+  }
+
+  if (process.platform === "darwin") {
+    const macosTmp = temporaryDirectory("opencode-macos-watchdog-");
+    try {
+      const concurrentFirstStarted = path.join(macosTmp, "concurrent-first-started.txt");
+      const concurrentSecondStarted = path.join(macosTmp, "concurrent-second-started.txt");
+      const firstConcurrent = runManagedCommand({
+        file: process.execPath,
+        args: [
+          "-e",
+          "require('node:fs').writeFileSync(process.argv[1], 'started'); setInterval(() => {}, 60000);",
+          concurrentFirstStarted,
+        ],
+        cwd: macosTmp,
+        timeout: 2500,
+      });
+      await waitUntil(() => fs.existsSync(concurrentFirstStarted), 10_000, "first macOS exclusive-UID command startup");
+      await assert.rejects(runManagedCommand({
+        file: process.execPath,
+        args: [
+          "-e",
+          "require('node:fs').writeFileSync(process.argv[1], 'started');",
+          concurrentSecondStarted,
+        ],
+        cwd: macosTmp,
+        timeout: 5000,
+      }), (error) => error instanceof ProcessContainmentError
+        && error.classification === "process_containment_failed"
+        && error.containment_state.reason === "exclusive_uid_not_available");
+      assert.equal(fs.existsSync(concurrentSecondStarted), false, "concurrent macOS command started outside the exclusive UID lease");
+      const firstConcurrentResult = await firstConcurrent;
+      assert.equal(firstConcurrentResult.timed_out, true);
+      assert.equal(firstConcurrentResult.teardown_verified, true);
+      operationalContainmentFingerprints.push(firstConcurrentResult.containment_fingerprint);
+
+      const processTreeModule = new URL("../lib/feedback/process-tree.mjs", import.meta.url).href;
+      const startedMarker = path.join(macosTmp, "coordinator-death-started.json");
+      const escapedMarker = path.join(macosTmp, "coordinator-death-escaped.txt");
+      const descendantSource = `
+        const fs = require("node:fs");
+        const coordinatorPid = Number(process.argv[1]);
+        const started = process.argv[2];
+        const escaped = process.argv[3];
+        fs.writeFileSync(started, JSON.stringify({ pid: process.pid }));
+        let goneSince = null;
+        setInterval(() => {
+          try {
+            process.kill(coordinatorPid, 0);
+            goneSince = null;
+          } catch {
+            goneSince ??= Date.now();
+            if (Date.now() - goneSince >= 750) {
+              fs.writeFileSync(escaped, "escaped");
+              process.exit(0);
+            }
+          }
+        }, 25);
+      `;
+      const commandSource = `
+        const { spawn } = require("node:child_process");
+        const child = spawn(process.execPath, [
+          "-e", process.argv[1], process.argv[2], process.argv[3], process.argv[4],
+        ], { detached: true, stdio: "ignore" });
+        child.unref();
+        setInterval(() => {}, 60_000);
+      `;
+      const coordinatorSource = `
+        import process from "node:process";
+        import { runManagedCommand } from ${JSON.stringify(processTreeModule)};
+        await runManagedCommand({
+          file: process.execPath,
+          args: [
+            "-e", ${JSON.stringify(commandSource)}, ${JSON.stringify(descendantSource)},
+            String(process.pid), process.argv[1], process.argv[2],
+          ],
+          cwd: process.cwd(),
+          timeout: 60_000,
+        });
+      `;
+      const coordinator = spawn(process.execPath, [
+        "--input-type=module", "--eval", coordinatorSource, startedMarker, escapedMarker,
+      ], {
+        cwd: macosTmp,
+        shell: false,
+        windowsHide: true,
+        stdio: ["ignore", "ignore", "pipe"],
+        env: process.env,
+      });
+      let coordinatorStderr = "";
+      coordinator.stderr.setEncoding("utf8");
+      coordinator.stderr.on("data", (chunk) => {
+        if (coordinatorStderr.length < 4096) {
+          coordinatorStderr += String(chunk).slice(0, 4096 - coordinatorStderr.length);
+        }
+      });
+      try {
+        await waitUntil(() => fs.existsSync(startedMarker), 10_000, "detached macOS descendant startup");
+        const descendantPid = JSON.parse(fs.readFileSync(startedMarker, "utf8")).pid;
+        const coordinatorExit = new Promise((resolve) => coordinator.once("exit", resolve));
+        coordinator.kill("SIGKILL");
+        await coordinatorExit;
+        await waitUntil(() => {
+          try {
+            process.kill(descendantPid, 0);
+            return false;
+          } catch (error) {
+            return error?.code === "ESRCH";
+          }
+        }, 15_000, "orphan macOS watchdog UID cleanup");
+        await pause(1000);
+        assert.equal(
+          fs.existsSync(escapedMarker),
+          false,
+          `detached descendant survived macOS coordinator SIGKILL: ${coordinatorStderr}`,
+        );
+      } finally {
+        try { coordinator.kill("SIGKILL"); } catch { /* watchdog cleanup is asserted above */ }
+      }
+    } finally {
+      fs.rmSync(macosTmp, { recursive: true, force: true });
     }
   }
 

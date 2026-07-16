@@ -236,7 +236,7 @@ function committedWhitespaceReceipt(startedAt) {
 }
 
 async function main() {
-  const document = JSON.parse(fs.readFileSync(path.join(root, "quality", "milestone-2-dod.v2.json"), "utf8"));
+  const document = JSON.parse(fs.readFileSync(path.join(root, "quality", "milestone-2-dod.v3.json"), "utf8"));
   const runContext = captureMilestone2RunContext({ workspaceRoot: root, localJobId: "deterministic-contracts" });
   const receipts = [];
   const runStartedAt = new Date().toISOString();

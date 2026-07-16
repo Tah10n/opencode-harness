@@ -14,6 +14,13 @@ the feedback-plane ESM subpaths documented for the `0.3.0` target.
   cgroup-v2 descendant containment; honest standard-lite reproduction
   outcomes; ten-scenario disabled-Bash host-flow fixtures; trusted post-edit
   architecture evidence; and receipt-driven partial/blocked completion states.
+- Added required macOS operational containment. A root-owned native watchdog
+  runs with a dedicated non-root/non-admin exclusive real UID, binds coordinator
+  ancestors by PID/start time, rejects concurrent scopes, tears down detached
+  and reparented descendants after coordinator death, and proves two empty
+  same-UID scans. Milestone 2 DoD v3 now requires both macOS trusted-check and
+  descendant-teardown receipts; `unsupported` no longer satisfies completion,
+  and `macos-latest` is a mandatory receipt producer in CI.
 - Bound cross-job evidence to a metadata-independent portable source attestation,
   re-observed source state before receipt sealing, and required successful CI
   producer results before aggregation. Separated containment-setup and execution

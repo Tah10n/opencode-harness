@@ -246,9 +246,12 @@ runtime-hook verifier is a separate host-evidence surface. Neither proves every
 host callback invocation, effective adopted permissions, exact task-to-child
 causality, or pre-dossier risk classification. Native Bash is disabled in an
 instrumented quality session; commands use trusted project-catalog checks, with
-Windows Job Object containment, delegated Linux cgroup-v2 containment, explicit
-macOS unsupported status, and fail-closed behavior whenever the production
-controller is unavailable. Logical project toolchain IDs never carry host
+Windows Job Object containment, delegated Linux cgroup-v2 containment, and
+macOS exclusive-UID containment through a root-owned native controller and a
+dedicated non-admin account. macOS release evidence must include both the
+trusted-check and descendant-teardown receipts; `unsupported` cannot satisfy
+Milestone 2 DoD v3. Any unavailable production controller still fails closed.
+Logical project toolchain IDs never carry host
 paths; non-Node resolvers require the fixed-source
 `quality-toolchains.host.v1.json` beside the global wrapper, with disjoint
 trusted-code and mutable-state roots. Processes outside the plugin are not

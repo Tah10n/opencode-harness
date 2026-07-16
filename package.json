@@ -24,6 +24,7 @@
   "homepage": "https://github.com/Tah10n/opencode-harness#readme",
   "scripts": {
     "assess:candidate": "node scripts/assess-candidate.mjs",
+    "build:macos-containment": "node scripts/build-macos-containment.mjs",
     "evidence:static": "node scripts/capture-static-evidence.mjs",
     "eval": "node scripts/evaluate-harness.mjs",
     "eval:live": "node scripts/evaluate-live.mjs",

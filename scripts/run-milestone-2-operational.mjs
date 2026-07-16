@@ -20,6 +20,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const PLATFORM_DIMENSION = Object.freeze({
   win32: "windows_runtime",
   linux: "linux_runtime",
+  darwin: "macos_runtime",
 });
 const CHECKS = Object.freeze({
   windows_runtime: Object.freeze([
@@ -50,6 +51,20 @@ const CHECKS = Object.freeze({
       script: "verify-process-containment.mjs",
     }),
   ]),
+  macos_runtime: Object.freeze([
+    Object.freeze({
+      check_id: "macos-trusted-project-check",
+      report_kind: "trusted_project_check",
+      result_kind: "trusted_project_check",
+      script: "verify-trusted-project-runner.mjs",
+    }),
+    Object.freeze({
+      check_id: "macos-descendant-teardown",
+      report_kind: "descendant_teardown",
+      result_kind: "descendant_teardown",
+      script: "verify-process-containment.mjs",
+    }),
+  ]),
 });
 
 function parseArguments(argv) {
@@ -61,7 +76,9 @@ function parseArguments(argv) {
     else if (argument === "--out" && output === null) output = argv[++index] ?? null;
     else throw new Error(`unsupported operational runner argument: ${argument}`);
   }
-  if (!Object.hasOwn(CHECKS, dimension)) throw new Error("--dimension must be windows_runtime or linux_runtime");
+  if (!Object.hasOwn(CHECKS, dimension)) {
+    throw new Error("--dimension must be windows_runtime, linux_runtime, or macos_runtime");
+  }
   if (typeof output !== "string" || !path.isAbsolute(output) || path.resolve(output) !== output
     || path.normalize(output) !== output || output.includes("\0") || Buffer.byteLength(output, "utf8") > 4096) {
     throw new Error("--out must be a canonical absolute path");
@@ -87,7 +104,9 @@ function failedResult(specification, platform, commandEvidence) {
     kind: specification.result_kind,
     verification_mode: null,
     report_fingerprint: fingerprint(commandEvidence),
-    containment_kind: platform === "win32" ? "windows-job-object-v1" : "linux-cgroup-v2",
+    containment_kind: platform === "win32"
+      ? "windows-job-object-v1"
+      : platform === "linux" ? "linux-cgroup-v2" : "macos-exclusive-uid-v1",
     containment_identity_fingerprints: [],
     teardown_verified: false,
     scenario_ids: [],
