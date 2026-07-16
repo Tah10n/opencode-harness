@@ -44,6 +44,48 @@ function pause(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
+const BUILT_IN_TOOLCHAIN_STATE_PREFIX = "opencode-quality-toolchain-state-v2-";
+
+function builtInToolchainStateDirectories() {
+  return new Set(fs.readdirSync(os.tmpdir(), { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && entry.name.startsWith(BUILT_IN_TOOLCHAIN_STATE_PREFIX))
+    .slice(0, 32)
+    .map((entry) => entry.name));
+}
+
+function boundedNpmFailureDiagnostic(previousDirectories) {
+  const currentDirectories = [...builtInToolchainStateDirectories()]
+    .filter((entry) => !previousDirectories.has(entry))
+    .slice(0, 4);
+  for (const directory of currentDirectories) {
+    const logDirectory = path.join(os.tmpdir(), directory, "npm", "cache", "_logs");
+    let logFiles;
+    try {
+      logFiles = fs.readdirSync(logDirectory, { withFileTypes: true })
+        .filter((entry) => entry.isFile() && entry.name.endsWith("-debug-0.log"))
+        .slice(0, 8);
+    } catch {
+      continue;
+    }
+    for (const entry of logFiles) {
+      const logPath = path.join(logDirectory, entry.name);
+      const stats = fs.statSync(logPath);
+      if (stats.size < 1 || stats.size > 256 * 1024) continue;
+      const log = fs.readFileSync(logPath, "utf8");
+      const errorCode = log.match(/^\d+ error code ([A-Z][A-Z0-9_]*)$/mu)?.[1] ?? null;
+      const syscall = log.match(/^\d+ error syscall ([A-Za-z0-9_./ -]{1,128})$/mu)?.[1] ?? null;
+      const errnoText = log.match(/^\d+ error errno (-?\d{1,10})$/mu)?.[1] ?? null;
+      return {
+        log_found: true,
+        error_code: errorCode,
+        syscall,
+        errno: errnoText === null ? null : Number(errnoText),
+      };
+    }
+  }
+  return { log_found: false, error_code: null, syscall: null, errno: null };
+}
+
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
 }
@@ -1216,6 +1258,7 @@ if (shouldRunReal) {
       "QUALITY_CHECK_ARCHITECTURE_OUTPUT_STALE",
     );
 
+    const npmStateDirectoriesBefore = builtInToolchainStateDirectories();
     const npmReceipt = runRealCheck("npm-known");
     operationalReceipts.push(npmReceipt);
     assert.equal(npmReceipt.status, "passed", JSON.stringify({
@@ -1226,6 +1269,9 @@ if (shouldRunReal) {
       stderr_bytes: npmReceipt.stderr_bytes,
       containment_state: npmReceipt.containment_state,
       output_workspace_post_entries: npmReceipt.output_workspace_post_entries,
+      npm_failure: npmReceipt.status === "passed"
+        ? null
+        : boundedNpmFailureDiagnostic(npmStateDirectoriesBefore),
     }));
     assert.equal(fs.readFileSync(path.join(realProject, "npm-known-marker.txt"), "utf8"), "real");
     assert.equal(fs.existsSync(poisonMarker), false, "ambient npm_execpath was executed");
