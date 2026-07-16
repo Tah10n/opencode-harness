@@ -435,6 +435,7 @@ jobs:
         run: |
           set -euo pipefail
           out="$GITHUB_WORKSPACE/.oc_harness/milestone-2/macos-runtime.json"
+          set +e
           sudo -u "$OPENCODE_QUALITY_RUN_USER" -- /usr/bin/env \
             HOME="$OPENCODE_QUALITY_RUN_HOME" \
             PATH="$PATH" \
@@ -448,6 +449,14 @@ jobs:
             OPENCODE_QUALITY_MACOS_CONTROLLER="$OPENCODE_QUALITY_MACOS_CONTROLLER" \
             OPENCODE_QUALITY_MACOS_WORKLOAD_UID="$OPENCODE_QUALITY_RUN_UID" \
             npm run milestone:2:operational -- --dimension macos_runtime --out "$out"
+          status=$?
+          set -e
+          if [[ "$status" -ne 0 ]]; then
+            echo "Bounded macOS workload-UID census after operational failure:" >&2
+            /bin/ps -axo pid=,ppid=,ruid=,stat=,comm= \
+              | /usr/bin/awk -v uid="$OPENCODE_QUALITY_RUN_UID" '$3 == uid { print }' >&2
+          fi
+          exit "$status"
 
       - name: Upload macOS operational receipt bundle
         if: always()
