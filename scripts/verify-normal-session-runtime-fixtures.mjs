@@ -35,6 +35,7 @@ import {
 } from "../lib/quality/validation.mjs";
 
 const root = fs.realpathSync(new URL("..", import.meta.url));
+const canonicalTemporaryRoot = fs.realpathSync.native(path.resolve(os.tmpdir()));
 const hookKeys = ["chat_message", "permission_ask", "tool_execute_before", "tool_execute_after", "event"];
 const hookSurfaceCases = [
   ["chat_message", "QUALITY_HOST_HOOK_MISSING_CHAT_MESSAGE"],
@@ -84,8 +85,12 @@ function writeJson(target, value) {
   fs.writeFileSync(target, `${JSON.stringify(value, null, 2)}\n`, "utf8");
 }
 
+function createTemporaryFixtureDirectory(prefix) {
+  return fs.mkdtempSync(path.join(canonicalTemporaryRoot, prefix));
+}
+
 function createProbeWorkspace(prefix = "quality-runtime-v2-fixture-") {
-  const probeRoot = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  const probeRoot = createTemporaryFixtureDirectory(prefix);
   fs.mkdirSync(path.join(probeRoot, ".opencode", "plugins"), { recursive: true });
   fs.mkdirSync(path.join(probeRoot, ".opencode", "quality"), { recursive: true });
   fs.mkdirSync(path.join(probeRoot, "scripts"));
@@ -790,7 +795,7 @@ async function runFixtureSuite() {
   assert.equal(apiMissing.status, "incomplete");
   assert.equal(blockedNormalSessionHostReceipt("QUALITY_HOST_RUNTIME_UNAVAILABLE", apiSourceFingerprint).status, "blocked_external_state");
 
-  const sourceFixture = fs.mkdtempSync(path.join(os.tmpdir(), "quality-runtime-source-fixture-"));
+  const sourceFixture = createTemporaryFixtureDirectory("quality-runtime-source-fixture-");
   try {
     for (const directory of [".opencode/plugins", "lib/quality", "scripts"]) {
       fs.mkdirSync(path.join(sourceFixture, ...directory.split("/")), { recursive: true });
@@ -814,7 +819,7 @@ async function runFixtureSuite() {
   assert.equal(standaloneReceipt.status, "blocked_external_state");
   assert.deepEqual(standaloneReceipt.reason_codes, ["QUALITY_HOST_EVIDENCE_TRUST_REQUIRED"]);
 
-  const adapterFixture = fs.mkdtempSync(path.join(os.tmpdir(), "quality-runtime-v2-adapter-"));
+  const adapterFixture = createTemporaryFixtureDirectory("quality-runtime-v2-adapter-");
   try {
     const failedMilestoneOutput = path.join(adapterFixture, "failed-host-milestone-bundle.json");
     const failedMilestoneStartedAt = Date.now();

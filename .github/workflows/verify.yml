@@ -261,7 +261,7 @@ jobs:
             [[ -s "$pid_file" ]] && break
             sleep 0.05
           done
-          worker_pid="$(cat "$pid_file")"
+          worker_pid="$(sudo -u "$OPENCODE_QUALITY_RUN_USER" cat "$pid_file")"
           [[ "$worker_pid" =~ ^[1-9][0-9]*$ ]]
           start_ticks="$(awk '{ print $22 }' "/proc/$worker_pid/stat")"
           [[ "$start_ticks" =~ ^[1-9][0-9]*$ ]]
