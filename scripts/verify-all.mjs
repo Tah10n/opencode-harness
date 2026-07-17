@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -74,10 +75,32 @@ const CONTAINMENT_COORDINATION_ENV_PREFIXES = Object.freeze([
   "OPENCODE_QUALITY_MACOS_",
 ]);
 
+export function canonicalStageTemporaryRoot(environment = process.env) {
+  const candidate = process.platform === "win32"
+    ? environment.TEMP ?? environment.TMP ?? os.tmpdir()
+    : environment.TMPDIR ?? environment.TMP ?? environment.TEMP ?? os.tmpdir();
+  if (typeof candidate !== "string" || candidate.length === 0 || candidate.includes("\0")) {
+    throw new TypeError("deterministic stage temporary root must be a non-empty path");
+  }
+  const canonical = fs.realpathSync.native(path.resolve(candidate));
+  if (!fs.statSync(canonical).isDirectory()) {
+    throw new TypeError("deterministic stage temporary root must be an existing directory");
+  }
+  return canonical;
+}
+
 export function deterministicStageEnvironment(environment = process.env) {
-  return Object.fromEntries(Object.entries(environment).filter(([key]) => (
+  const result = Object.fromEntries(Object.entries(environment).filter(([key]) => (
     !CONTAINMENT_COORDINATION_ENV_PREFIXES.some((prefix) => key.startsWith(prefix))
   )));
+  const canonicalTemporaryRoot = canonicalStageTemporaryRoot(environment);
+  if (process.platform === "win32") {
+    result.TEMP = canonicalTemporaryRoot;
+    result.TMP = canonicalTemporaryRoot;
+  } else {
+    result.TMPDIR = canonicalTemporaryRoot;
+  }
+  return result;
 }
 
 export function deterministicExpectedChecks() {

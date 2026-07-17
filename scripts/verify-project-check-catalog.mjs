@@ -108,6 +108,7 @@ assert(
   "top-level verify-all must retain trusted-runner verification outside the production catalog",
 );
 
+const stageTemporaryKey = process.platform === "win32" ? "TEMP" : "TMPDIR";
 const stageEnvironment = deterministicStageEnvironment({
   SAFE_VALUE: "preserved",
   OPENCODE_QUALITY_CGROUP_ROOT: "/poison/cgroup",
@@ -120,11 +121,15 @@ const stageEnvironment = deterministicStageEnvironment({
   OPENCODE_QUALITY_MACOS_UID_LEASE: "/poison/lease",
   OPENCODE_QUALITY_MACOS_FUTURE_COORDINATOR: "poison-future-macos",
   OPENCODE_QUALITY_WINDOWS_SENTINEL: "preserved-windows",
+  [stageTemporaryKey]: workspaceRoot,
 });
 assert.deepEqual(stageEnvironment, {
   SAFE_VALUE: "preserved",
   OPENCODE_QUALITY_WINDOWS_SENTINEL: "preserved-windows",
-}, "top-level verify-all must strip every Linux/macOS coordination variable without changing Windows variables");
+  ...(process.platform === "win32"
+    ? { TEMP: workspaceRoot, TMP: workspaceRoot }
+    : { TMPDIR: workspaceRoot }),
+}, "top-level verify-all must strip Linux/macOS coordination and publish a canonical stage temp root");
 
 expectCode(() => parseProjectCheckCatalog("{"), "QUALITY_CHECK_CATALOG_JSON");
 expectCode(() => validateProjectCheckCatalog({ ...catalog(), extra: true }), "CONTRACT_UNKNOWN_FIELD");

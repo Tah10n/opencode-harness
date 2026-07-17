@@ -2,11 +2,42 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { DETERMINISTIC_STAGE_REGISTRY, deterministicExpectedChecks } from "./verify-all.mjs";
+import {
+  DETERMINISTIC_STAGE_REGISTRY,
+  canonicalStageTemporaryRoot,
+  deterministicExpectedChecks,
+  deterministicStageEnvironment,
+} from "./verify-all.mjs";
 import { milestone2ExpectedChecks } from "../lib/quality/milestone-dod.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const failures = [];
+
+const deterministicTemporaryKey = process.platform === "win32" ? "TEMP" : "TMPDIR";
+const deterministicEnvironmentFixture = deterministicStageEnvironment({
+  KEEP_ME: "kept",
+  OPENCODE_QUALITY_MACOS_CONTROLLER: "/poison/controller",
+  OPENCODE_QUALITY_CGROUP_ROOT: "/poison/cgroup",
+  [deterministicTemporaryKey]: root,
+});
+if (deterministicEnvironmentFixture.KEEP_ME !== "kept"
+  || Object.keys(deterministicEnvironmentFixture).some((key) => key.startsWith("OPENCODE_QUALITY_MACOS_")
+    || key.startsWith("OPENCODE_QUALITY_CGROUP_"))) {
+  failures.push({
+    code: "HARNESS-S084",
+    message: "deterministic stage environment did not preserve ordinary values while removing containment coordination",
+    fix: "Keep deterministic child stages isolated from platform containment coordination variables.",
+  });
+}
+const expectedDeterministicTemporaryRoot = fs.realpathSync.native(root);
+if (canonicalStageTemporaryRoot({ [deterministicTemporaryKey]: root }) !== expectedDeterministicTemporaryRoot
+  || deterministicEnvironmentFixture[deterministicTemporaryKey] !== expectedDeterministicTemporaryRoot) {
+  failures.push({
+    code: "HARNESS-S084",
+    message: "deterministic stage environment did not publish a physically canonical temporary root",
+    fix: "Canonicalize the platform temporary root before launching deterministic child stages.",
+  });
+}
 
 function fail(code, message, fix) {
   failures.push({ code, message, fix });
