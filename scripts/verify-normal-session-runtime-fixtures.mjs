@@ -86,7 +86,10 @@ function writeJson(target, value) {
 }
 
 function createTemporaryFixtureDirectory(prefix) {
-  return fs.mkdtempSync(path.join(canonicalTemporaryRoot, prefix));
+  const temporaryRoot = fs.mkdtempSync(path.join(canonicalTemporaryRoot, prefix));
+  assert.equal(fs.realpathSync.native(temporaryRoot), temporaryRoot,
+    "runtime fixture temporary root must be physically canonical");
+  return temporaryRoot;
 }
 
 function createProbeWorkspace(prefix = "quality-runtime-v2-fixture-") {
