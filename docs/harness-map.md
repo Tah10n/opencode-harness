@@ -102,9 +102,13 @@ behaviour dimensions.
 - The normal-session plugin computationally gates native edits and writable
   delegation in `tool.execute.before` when that callback is host-active. Native
   Bash is denied rather than heuristically classified; project commands use the
-  trusted catalog runner. Windows uses Job Object containment, Linux uses only
-  an exclusive delegated cgroup-v2 root with an external coordinator/watchdog,
-  a narrow fixed-leaf attach helper, root-level kill, hierarchical
+  trusted catalog runner. Pre-containment workers/controllers use a minimal
+  runner-owned environment without ambient loader injection. Windows uses Job
+  Object containment after retained-handle creation-time and original-worker
+  IPC challenge binding. Linux uses only an exclusive delegated cgroup-v2 root
+  with an external coordinator/watchdog, a fixed-destination `sudo-helper-v2`
+  that binds pidfd plus PID/starttime and the original-worker IPC challenge,
+  root-level kill, hierarchical
   `cgroup.events: populated 0` teardown proof, and postorder descendant removal.
   macOS uses a root-owned native watchdog plus a protected host UID marker and
   inode lease for a dedicated non-root real UID; PID/start-bound coordinator

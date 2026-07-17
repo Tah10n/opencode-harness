@@ -2,11 +2,42 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { DETERMINISTIC_STAGE_REGISTRY, deterministicExpectedChecks } from "./verify-all.mjs";
+import {
+  DETERMINISTIC_STAGE_REGISTRY,
+  canonicalStageTemporaryRoot,
+  deterministicExpectedChecks,
+  deterministicStageEnvironment,
+} from "./verify-all.mjs";
 import { milestone2ExpectedChecks } from "../lib/quality/milestone-dod.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const failures = [];
+
+const deterministicTemporaryKey = process.platform === "win32" ? "TEMP" : "TMPDIR";
+const deterministicEnvironmentFixture = deterministicStageEnvironment({
+  KEEP_ME: "kept",
+  OPENCODE_QUALITY_MACOS_CONTROLLER: "/poison/controller",
+  OPENCODE_QUALITY_CGROUP_ROOT: "/poison/cgroup",
+  [deterministicTemporaryKey]: root,
+});
+if (deterministicEnvironmentFixture.KEEP_ME !== "kept"
+  || Object.keys(deterministicEnvironmentFixture).some((key) => key.startsWith("OPENCODE_QUALITY_MACOS_")
+    || key.startsWith("OPENCODE_QUALITY_CGROUP_"))) {
+  failures.push({
+    code: "HARNESS-S084",
+    message: "deterministic stage environment did not preserve ordinary values while removing containment coordination",
+    fix: "Keep deterministic child stages isolated from platform containment coordination variables.",
+  });
+}
+const expectedDeterministicTemporaryRoot = fs.realpathSync.native(root);
+if (canonicalStageTemporaryRoot({ [deterministicTemporaryKey]: root }) !== expectedDeterministicTemporaryRoot
+  || deterministicEnvironmentFixture[deterministicTemporaryKey] !== expectedDeterministicTemporaryRoot) {
+  failures.push({
+    code: "HARNESS-S084",
+    message: "deterministic stage environment did not publish a physically canonical temporary root",
+    fix: "Canonicalize the platform temporary root before launching deterministic child stages.",
+  });
+}
 
 function fail(code, message, fix) {
   failures.push({ code, message, fix });
@@ -242,6 +273,7 @@ const requiredFiles = [
   "lib/feedback/privacy.mjs",
   "lib/feedback/process-tree.mjs",
   "lib/feedback/process-containment.mjs",
+  "native/linux-cgroup-attach-helper.c",
   "lib/feedback/permission-surface.mjs",
   "lib/feedback/report-history.mjs",
   "lib/feedback/trace-assertions.mjs",
@@ -254,6 +286,7 @@ const requiredFiles = [
   "scripts/trace-run.mjs",
   "scripts/verify-adoption-bundle.mjs",
   "scripts/verify-adapter-worker.mjs",
+  "scripts/build-linux-cgroup-attach-helper.mjs",
   "scripts/verify-candidate-assessment.mjs",
   "scripts/verify-feedback-foundation.mjs",
   "scripts/verify-live-manifests.mjs",
@@ -391,6 +424,8 @@ if (packageJson.scripts?.["verify:live-eval"] !== "npm run verify:live-manifests
   fail("HARNESS-S009", "package.json must expose npm run verify:live-eval", "Keep live-eval deterministic checks in the default verification gate.");
 }
 for (const [name, command] of Object.entries({
+  "build:macos-containment": "node scripts/build-macos-containment.mjs",
+  "build:linux-cgroup-attach": "node scripts/build-linux-cgroup-attach-helper.mjs",
   "verify:feedback-foundation": "node scripts/verify-feedback-foundation.mjs",
   "verify:trace-store": "node scripts/verify-trace-store.mjs",
   "verify:report-history": "node scripts/verify-report-history.mjs",
@@ -850,6 +885,16 @@ for (const needle of [
 ]) {
   assertIncludes(readme, needle, "README.md");
 }
+for (const needle of [
+  "`sudo-helper-v2`",
+  "AssignProcessToJobObject",
+  "Each deterministic stage owns exactly one outer containment scope",
+  "conclusive adapter, evidence,",
+  '"Same run" includes provider, run ID, attempt, repository, HEAD',
+  "installed-host milestone bundle at all",
+]) {
+  assertIncludes(readme, needle, "README.md", "HARNESS-S008", "Keep platform and installed-host completion semantics explicit and synchronized.");
+}
 const modelsSection = readme.split("## Models", 2)[1]?.split(/^## /mu, 1)[0] ?? "";
 for (const agent of agentNames) {
   const file = `agents/${agent}.md`;
@@ -1016,6 +1061,9 @@ for (const needle of [
   "effective adopted permissions",
   "Native Bash is disabled",
   "host-wide OS sandbox",
+  "minimal",
+  "IPC challenge",
+  "`sudo-helper-v2`",
 ]) {
   assertIncludes(harnessMapDoc, needle, "docs/harness-map.md", "HARNESS-S068", "Keep installed API, runtime-hook, Bash, and OS-sandbox claims within their exact evidence boundaries.");
 }
@@ -1092,14 +1140,17 @@ for (const needle of [
   "pull_request:", "workflow_dispatch:", "npm run verify", "actions/setup-node@v4", "Harness verification",
   "linux-containment:", "windows-containment:", "macos-containment:",
   "ubuntu-latest", "windows-latest", "macos-latest",
-  "OPENCODE_QUALITY_CGROUP_ROOT", "OPENCODE_QUALITY_CGROUP_ATTACH_MODE=sudo-helper-v1",
+  "OPENCODE_QUALITY_CGROUP_ROOT", "OPENCODE_QUALITY_CGROUP_ATTACH_MODE=sudo-helper-v2",
   "OPENCODE_QUALITY_CGROUP_ATTACH_HELPER", "opencode-quality-workload/cgroup.procs",
-  "expected_uid", "SUDO_UID", "npm run milestone:2:operational",
+  "npm run build:linux-cgroup-attach", "Reject stale Linux worker identity",
+  "native Linux helper did not reject a stale worker identity without side effects",
+  "npm run milestone:2:operational",
   "npm run milestone:2:assess", "--host-unavailable", "actions/upload-artifact@v4",
   "actions/download-artifact@v4", "sudo useradd", "attach helper can write the guard cgroup",
   "sudo setfacl -m", "sudo setfacl -x",
   "Harden trusted Node distribution permissions", "-exec chmod go-w {} +", "-perm /022",
   "npm run build:macos-containment", "OPENCODE_QUALITY_MACOS_CONTROLLER",
+  "Run configured macOS full verifier",
   "OPENCODE_QUALITY_MACOS_WORKLOAD_UID", "OPENCODE_QUALITY_MACOS_UID_MARKER",
   "opencode-quality-exclusive-uid-v1", 'lease="$marker.lease"',
   "OPENCODE_QUALITY_MACOS_FIXED_GIT_ROOT", "/usr/local/libexec/opencode-quality-git/bin/git",
@@ -1116,6 +1167,10 @@ for (const needle of [
   assertIncludes(workflow, needle, ".github/workflows/verify.yml");
 }
 for (const [needle, expected] of [
+  ["npm run build:linux-cgroup-attach", 2],
+  ["OPENCODE_QUALITY_CGROUP_ATTACH_MODE=sudo-helper-v2", 2],
+  ["Reject stale Linux worker identity", 1],
+  ["Run configured macOS full verifier", 1],
   ["sudo setfacl -m", 2],
   ["sudo setfacl -x", 2],
   ["Harden trusted Node distribution permissions", 2],
@@ -1352,12 +1407,12 @@ for (const needle of ["`0.3.0`", "Unreleased target", "`v0.2.0`", "Latest tagged
 }
 
 const evaluationDoc = read("docs/evaluation.md");
-for (const needle of ["verify:drift", "verify:runtime", "verify:runtime:fixture", "verify:live-eval", "contract/config evaluation", "Optional general live regression evaluation", "Harness Control Map", "path-boundary sensor", "trace-contract", "budgeted-termination", "subagent-result-schema", "adversarial-fixtures", "static behavior contracts", 'BASELINE_ROOT="/absolute/path/to/baseline"', 'CANDIDATE_ROOT="/absolute/path/to/candidate"', "absolute JSON path", "explicit, validated", "model-neutral runner/session artifact bundle", "standalone self-described outcome or report is never", "production `eval:live` entrypoint keeps the generic", "canonical", "runner-integrated verification"]) {
+for (const needle of ["verify:drift", "verify:runtime", "verify:runtime:fixture", "verify:live-eval", "contract/config evaluation", "Optional general live regression evaluation", "Harness Control Map", "path-boundary sensor", "trace-contract", "budgeted-termination", "subagent-result-schema", "adversarial-fixtures", "static behavior contracts", 'BASELINE_ROOT="/absolute/path/to/baseline"', 'CANDIDATE_ROOT="/absolute/path/to/candidate"', "absolute JSON path", "explicit, validated", "model-neutral runner/session artifact bundle", "standalone self-described outcome or report is never", "production `eval:live` entrypoint keeps the generic", "canonical", "runner-integrated verification", "Windows, Linux, or macOS production verifiers", "host_hook_e2e=failed", "cannot emit an installed-host milestone bundle"]) {
   assertIncludes(evaluationDoc, needle, "docs/evaluation.md");
 }
 
 const releaseDoc = read("docs/release.md");
-for (const needle of ["harness-release-review", "guide/sensor coherence", "permission safety", "verify:live-eval", "OPENCODE_BASELINE_PROFILE", "OPENCODE_HARNESS_PROFILE", "defect", 'BASELINE_ROOT="/absolute/path/to/baseline"', 'CANDIDATE_ROOT="/absolute/path/to/candidate"', "absolute artifact path", "only a partial smoke", "must not be passed to `npm run assess:candidate`", "selector-free full run", "`development`, `held_out`, and `canary`"]) {
+for (const needle of ["harness-release-review", "guide/sensor coherence", "permission safety", "verify:live-eval", "OPENCODE_BASELINE_PROFILE", "OPENCODE_HARNESS_PROFILE", "defect", 'BASELINE_ROOT="/absolute/path/to/baseline"', 'CANDIDATE_ROOT="/absolute/path/to/candidate"', "absolute artifact path", "only a partial smoke", "must not be passed to `npm run assess:candidate`", "selector-free full run", "`development`, `held_out`, and `canary`", "Windows, Linux, and macOS production verifiers", "Windows, Linux, and macOS producers", "installed/self-hosted job", "sealed `failed` host receipt", "`sudo-helper-v2`", "cannot emit an", "installed-host milestone bundle"]) {
   assertIncludes(releaseDoc, needle, "docs/release.md");
 }
 const partialLiveRunIndex = releaseDoc.indexOf("npm run eval:live -- --suite development");
@@ -1373,7 +1428,7 @@ if (partialLiveRunIndex === -1 || fullLiveRunIndex === -1 || candidateAssessment
 }
 
 const adoptionDoc = read("docs/adoption.md");
-for (const needle of ["docs/harnessability.md", "npm run verify:runtime", "npm run verify:adoption-bundle", "fixtures/sample-project/", "fixtures/live/", "Harnessability", "Post-Adoption Confidence Levels", "fault injection", "portable-adoption-bundle:start", ".opencode/plugins/engineering-dossier.mjs", ".opencode/quality/checks.json", "lib/feedback", "lib/quality", "opencode-harness/feedback", "opencode-harness/quality", "opencode-harness/quality-plugin", "Do not copy the whole `.opencode/` directory"]) {
+for (const needle of ["docs/harnessability.md", "npm run verify:runtime", "npm run verify:adoption-bundle", "fixtures/sample-project/", "fixtures/live/", "Harnessability", "Post-Adoption Confidence Levels", "fault injection", "portable-adoption-bundle:start", ".opencode/plugins/engineering-dossier.mjs", ".opencode/quality/checks.json", "lib/feedback", "lib/quality", "opencode-harness/feedback", "opencode-harness/quality", "opencode-harness/quality-plugin", "Do not copy the whole `.opencode/` directory", "sudo-helper-v2", "pidfd", "trusted-toolchain-resolution-v5"]) {
   assertIncludes(adoptionDoc, needle, "docs/adoption.md");
 }
 

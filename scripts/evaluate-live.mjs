@@ -72,6 +72,7 @@ import { createInjectedTestContainmentFactory } from "./injected-test-containmen
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const reportDir = path.join(root, "evals", "reports");
+const canonicalTemporaryRoot = fs.realpathSync.native(path.resolve(os.tmpdir()));
 const deterministicSelfTestMode = process.argv.slice(2).some((argument) => (
   argument === "--self-test" || argument === "--self-test-buffered"
 ));
@@ -94,6 +95,15 @@ const REQUIRED_RUNNER_PHASES = Object.freeze([
   "verification",
   "task_end",
 ]);
+
+function createCanonicalTemporaryDirectory(prefix) {
+  const temporaryRoot = fs.mkdtempSync(path.join(canonicalTemporaryRoot, prefix));
+  if (fs.realpathSync.native(temporaryRoot) !== temporaryRoot) {
+    fs.rmSync(temporaryRoot, { recursive: true, force: true });
+    throw new ContractError("LIVE_TEMP_ROOT", "live-evaluation temporary root must be physically canonical");
+  }
+  return temporaryRoot;
+}
 
 function parseArgs(argv) {
   const result = { validate: false, selfTest: false, bufferedSelfTest: false, suite: null, scenarioIds: [] };
@@ -208,7 +218,7 @@ function prepareFixture(scenario, profileRole, sourceRoot = root) {
   } catch {
     throw new ContractError("LIVE_FIXTURE", `validated fixture is not a physically confined ordinary tree for ${scenario.id}`);
   }
-  const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), `opencode-live-${scenario.id}-${profileRole}-`));
+  const temporaryRoot = createCanonicalTemporaryDirectory(`opencode-live-${scenario.id}-${profileRole}-`);
   const repo = path.join(temporaryRoot, "repo");
   try {
     fs.cpSync(source, repo, { recursive: true, errorOnExist: true });
@@ -1360,7 +1370,7 @@ async function runEvaluation({
 }
 
 async function runBufferedPublicationSelfTest(corpus) {
-  const temporaryWorkspace = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-live-buffered-self-test-"));
+  const temporaryWorkspace = createCanonicalTemporaryDirectory("opencode-live-buffered-self-test-");
   try {
     const scenario = corpus.scenarios.find((entry) => entry.id === "runner-self-test");
     if (!scenario) throw new ContractError("LIVE_SELF_TEST_SELECTION", "runner self-test scenario is missing");
@@ -1476,7 +1486,7 @@ async function runBufferedPublicationSelfTest(corpus) {
 }
 
 async function runSelfTest(corpus) {
-  const temporaryWorkspace = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-live-self-test-"));
+  const temporaryWorkspace = createCanonicalTemporaryDirectory("opencode-live-self-test-");
   try {
     if (adapterFailureReason({}) !== "adapter_success_unavailable" || adapterFailureReason({ passed: true }) !== null) {
       throw new ContractError("LIVE_SELF_TEST_ADAPTER_SUCCESS", "adapter success must be explicit");

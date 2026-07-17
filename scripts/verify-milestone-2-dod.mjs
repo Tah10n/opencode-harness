@@ -48,6 +48,92 @@ for (const dimension of document.dimensions) {
   }
 }
 
+const dimensionEvidence = new Map(document.dimensions
+  .map((dimension) => [dimension.dimension_id, new Set(dimension.evidence_refs)]));
+const windowsEvidence = dimensionEvidence.get("windows_runtime");
+const linuxEvidence = dimensionEvidence.get("linux_runtime");
+const macosEvidence = dimensionEvidence.get("macos_runtime");
+const linuxImplementation = [
+  "native/linux-cgroup-attach-helper.c",
+  "scripts/build-linux-cgroup-attach-helper.mjs",
+];
+const macosImplementation = [
+  "native/macos-exclusive-uid-controller.c",
+  "scripts/build-macos-containment.mjs",
+];
+for (const relativePath of linuxImplementation) {
+  assert(!windowsEvidence.has(relativePath), `Windows runtime evidence must not include ${relativePath}`);
+  assert(linuxEvidence.has(relativePath), `Linux runtime evidence must include ${relativePath}`);
+}
+for (const relativePath of macosImplementation) {
+  assert(macosEvidence.has(relativePath), `macOS runtime evidence must include ${relativePath}`);
+}
+const platformVerifierEvidence = [
+  "scripts/verify-process-containment.mjs",
+  "scripts/verify-trusted-project-runner.mjs",
+];
+const platformProducerEvidence = [
+  "scripts/run-milestone-2-operational.mjs",
+  ".github/workflows/verify.yml",
+];
+const dimensionEvidenceContracts = {
+  deterministic_contracts: {
+    implementation: ["scripts/verify-all.mjs", "scripts/assess-milestone-2-receipts.mjs"],
+    verifier: ["scripts/verify-harness.mjs", "scripts/verify-milestone-2-dod.mjs"],
+    producer: ["scripts/verify-all.mjs", ".github/workflows/verify.yml"],
+  },
+  windows_runtime: {
+    implementation: [
+      "lib/feedback/process-containment.mjs",
+      "lib/feedback/process-tree.mjs",
+    ],
+    verifier: platformVerifierEvidence,
+    producer: platformProducerEvidence,
+    foreignImplementation: [...linuxImplementation, ...macosImplementation],
+  },
+  linux_runtime: {
+    implementation: [
+      "native/linux-cgroup-attach-helper.c",
+      "lib/feedback/process-containment.mjs",
+    ],
+    verifier: platformVerifierEvidence,
+    producer: platformProducerEvidence,
+    foreignImplementation: macosImplementation,
+  },
+  macos_runtime: {
+    implementation: [
+      "native/macos-exclusive-uid-controller.c",
+      "lib/feedback/process-containment.mjs",
+    ],
+    verifier: platformVerifierEvidence,
+    producer: platformProducerEvidence,
+    foreignImplementation: linuxImplementation,
+  },
+  host_hook_e2e: {
+    implementation: [".opencode/plugins/engineering-dossier.mjs", "lib/quality/normal-session-plugin.mjs"],
+    verifier: ["scripts/verify-normal-session-runtime.mjs"],
+    producer: ["scripts/verify-normal-session-runtime.mjs"],
+  },
+  general_live_evaluation: {
+    implementation: ["scripts/evaluate-live.mjs"],
+    verifier: ["scripts/evaluate-live.mjs"],
+    producer: ["scripts/evaluate-live.mjs"],
+  },
+};
+for (const dimensionId of MILESTONE_DOD_DIMENSIONS) {
+  const contract = dimensionEvidenceContracts[dimensionId];
+  const evidence = dimensionEvidence.get(dimensionId);
+  assert(contract !== undefined, `${dimensionId} evidence role contract is missing`);
+  assert(contract.implementation.some((relativePath) => evidence.has(relativePath)),
+    `${dimensionId} must reference an implementation file`);
+  assert(contract.verifier.some((relativePath) => evidence.has(relativePath)),
+    `${dimensionId} must reference a verifier`);
+  assert(contract.producer.some((relativePath) => evidence.has(relativePath)),
+    `${dimensionId} must reference its workflow or operational runner`);
+  assert((contract.foreignImplementation ?? []).every((relativePath) => !evidence.has(relativePath)),
+    `${dimensionId} must not reference another platform's implementation`);
+}
+
 assert.throws(() => validateMilestone2DodDocument(staleV1Document), ContractError, "stale v1 DoD must be rejected");
 assert.throws(() => validateMilestone2DodDocument(staleV2Document), ContractError, "stale v2 DoD must be rejected");
 assert.throws(() => validateMilestone2DodDocument({ ...document, schema_version: 2 }), /schema_version must be 3/u);
@@ -661,6 +747,41 @@ assert.equal(assessMilestone2Receipts({
   receipts: failedLinuxReceipts,
   facts: failedOperationalFacts,
 }).status, "verification_failed");
+
+const failedHostResult = {
+  kind: "installed_host",
+  verification_mode: null,
+  report_fingerprint: fingerprint({ host_failure: "adapter_rejected" }),
+  containment_kind: null,
+  containment_identity_fingerprints: [],
+  teardown_verified: null,
+  scenario_ids: [],
+  trusted_check_receipt_fingerprints: [],
+  scenario_contract_fingerprint: null,
+  attestation_fingerprint: null,
+  host_evidence_fingerprint: null,
+};
+const failedHostReceipts = allReceipts.map((receipt) => (
+  receipt.check_id === hostHookCheck.check_id
+    ? receiptFor(hostHookCheck, "failed", { result: failedHostResult })
+    : receipt
+));
+const failedHostFacts = deriveMilestone2StatusFacts({ document, receipts: failedHostReceipts });
+assert.equal(failedHostFacts.host_hook_e2e, "failed");
+const failedHostDecision = assessMilestone2Receipts({
+  document,
+  receipts: failedHostReceipts,
+  facts: failedHostFacts,
+});
+assert.equal(failedHostDecision.status, "verification_failed");
+assert(failedHostDecision.receipt_failed.includes(hostHookCheck.check_id),
+  "a conclusive installed-host failure must remain a failed milestone receipt");
+assert.throws(() => deriveMilestone2StatusFacts({
+  document,
+  receipts: failedHostReceipts,
+  external_blocking_context: [blocker("host_hook_e2e")],
+}), /requires host_hook_e2e=unavailable/u,
+"external-unavailability context must not downgrade a conclusive installed-host failure");
 
 const macosCheckId = document.dimensions.find((dimension) => dimension.dimension_id === "macos_runtime").check_ids[0];
 const failedMacosReceipts = [...deterministicReceipts, receiptFor(expectedByCheckId.get(macosCheckId), "failed")];

@@ -270,13 +270,81 @@ function sealAdapterReceipt(parsed, adapterFingerprint, verificationContext) {
   return { ...body, evidence_fingerprint: fingerprint(body) };
 }
 
+function milestoneHostResult(receipt, passed) {
+  return {
+    kind: "installed_host",
+    verification_mode: passed
+      ? "trusted_adapter"
+      : receipt.verification_mode === "trusted_adapter" ? "trusted_adapter" : null,
+    report_fingerprint: receipt.evidence_fingerprint,
+    containment_kind: null,
+    containment_identity_fingerprints: [],
+    teardown_verified: null,
+    scenario_ids: passed ? [...MILESTONE_DOD_HOST_SCENARIO_IDS] : [],
+    trusted_check_receipt_fingerprints: receipt.trusted_check_receipt_fingerprint === undefined
+      ? []
+      : [receipt.trusted_check_receipt_fingerprint],
+    scenario_contract_fingerprint: receipt.scenario_contract_fingerprint ?? null,
+    attestation_fingerprint: receipt.attestation_fingerprint ?? null,
+    host_evidence_fingerprint: receipt.host_evidence_fingerprint ?? null,
+  };
+}
+
+function sealMilestoneHostReceipt(receipt, context, startedAt, completedAt) {
+  const passed = receipt.status === "passed";
+  if (!passed && receipt.status !== "verification_failed") {
+    throw new Error("milestone host receipt requires a conclusive installed-host result");
+  }
+  return sealOperationalVerificationReceipt({
+    check_id: "normal-session-host-hook-e2e",
+    started_at: startedAt,
+    completed_at: completedAt,
+    status: passed ? "passed" : "failed",
+    evidence_scope: {
+      kind: "milestone_operational",
+      dimension_id: "host_hook_e2e",
+      platform: process.platform,
+      head_sha: context.head_sha,
+      workspace_fingerprint: context.workspace_fingerprint,
+      run_binding: context.run_binding,
+      result: milestoneHostResult(receipt, passed),
+    },
+  });
+}
+
+function writeMilestoneHostBundle(output, context, operationalReceipt) {
+  const bundle = sealMilestone2ReceiptBundle({
+    dimension_id: "host_hook_e2e",
+    head_sha: context.head_sha,
+    workspace_fingerprint: context.workspace_fingerprint,
+    run_binding: context.run_binding,
+    receipts: [operationalReceipt],
+  });
+  const parent = path.dirname(output);
+  fs.mkdirSync(parent, { recursive: true });
+  const canonicalParent = fs.realpathSync.native(parent);
+  const comparable = process.platform === "win32"
+    ? (value) => value.toLowerCase()
+    : (value) => value;
+  if (fs.existsSync(output) || comparable(canonicalParent) !== comparable(parent)) {
+    throw new Error("milestone host receipt output is not a new file in a canonical directory");
+  }
+  fs.writeFileSync(output, `${JSON.stringify(bundle, null, 2)}\n`, {
+    encoding: "utf8",
+    flag: "wx",
+    mode: 0o600,
+  });
+}
+
 let receipt;
 let options;
 let milestoneContext = null;
+let milestoneStartedAt = null;
 let temporaryProbe = null;
 try {
   options = parseArgs(process.argv.slice(2));
   if (options.milestoneOut !== null) {
+    milestoneStartedAt = new Date().toISOString();
     milestoneContext = captureMilestone2RunContext({ workspaceRoot: root, localJobId: "host-hook-e2e" });
   }
   if (options.evidence) {
@@ -356,60 +424,28 @@ if (milestoneContext !== null) {
   });
 }
 
-if (options?.milestoneOut !== null && ["passed", "fixture_contract_passed"].includes(receipt.status)) {
-  if (receipt.verification_mode !== "trusted_adapter") {
-    receipt = sealFailure("QUALITY_HOST_MILESTONE_REQUIRES_INSTALLED_ADAPTER");
-  } else {
-    const operationalReceipt = sealOperationalVerificationReceipt({
-    check_id: "normal-session-host-hook-e2e",
-    started_at: new Date().toISOString(),
-    completed_at: new Date().toISOString(),
-    status: "passed",
-    evidence_scope: {
-      kind: "milestone_operational",
-      dimension_id: "host_hook_e2e",
-      platform: process.platform,
-      head_sha: milestoneContext.head_sha,
-      workspace_fingerprint: milestoneContext.workspace_fingerprint,
-      run_binding: milestoneContext.run_binding,
-      result: {
-        kind: "installed_host",
-        verification_mode: receipt.verification_mode,
-        report_fingerprint: receipt.evidence_fingerprint,
-        containment_kind: null,
-        containment_identity_fingerprints: [],
-        teardown_verified: null,
-        scenario_ids: [...MILESTONE_DOD_HOST_SCENARIO_IDS],
-        trusted_check_receipt_fingerprints: [receipt.trusted_check_receipt_fingerprint],
-        scenario_contract_fingerprint: receipt.scenario_contract_fingerprint,
-        attestation_fingerprint: receipt.attestation_fingerprint,
-        host_evidence_fingerprint: receipt.host_evidence_fingerprint,
-      },
-    },
-  });
-    const bundle = sealMilestone2ReceiptBundle({
-      dimension_id: "host_hook_e2e",
-      head_sha: milestoneContext.head_sha,
-      workspace_fingerprint: milestoneContext.workspace_fingerprint,
-      run_binding: milestoneContext.run_binding,
-      receipts: [operationalReceipt],
-    });
-    const parent = path.dirname(options.milestoneOut);
-    fs.mkdirSync(parent, { recursive: true });
-    const canonicalParent = fs.realpathSync.native(parent);
-    const comparable = process.platform === "win32"
-      ? (value) => value.toLowerCase()
-      : (value) => value;
-    if (fs.existsSync(options.milestoneOut)
-      || comparable(canonicalParent) !== comparable(parent)) {
-      throw new Error("milestone host receipt output is not a new file in a canonical directory");
-    }
-    fs.writeFileSync(options.milestoneOut, `${JSON.stringify(bundle, null, 2)}\n`, {
-      encoding: "utf8",
-      flag: "wx",
-      mode: 0o600,
-    });
+if (options?.milestoneOut !== null && options?.fixtureContract === true
+  && receipt.status === "fixture_contract_passed") {
+  receipt = sealFailure("QUALITY_HOST_MILESTONE_REQUIRES_INSTALLED_ADAPTER");
+}
+
+if (options?.milestoneOut !== null && options?.fixtureContract === false && receipt.status === "passed"
+  && receipt.verification_mode !== "trusted_adapter") {
+  receipt = sealFailure("QUALITY_HOST_MILESTONE_REQUIRES_INSTALLED_ADAPTER");
+}
+
+if (options?.milestoneOut !== null && options?.fixtureContract === false
+  && ["passed", "verification_failed"].includes(receipt.status)) {
+  if (milestoneContext === null || milestoneStartedAt === null) {
+    throw new Error("milestone host receipt context is unavailable");
   }
+  const operationalReceipt = sealMilestoneHostReceipt(
+    receipt,
+    milestoneContext,
+    milestoneStartedAt,
+    new Date().toISOString(),
+  );
+  writeMilestoneHostBundle(options.milestoneOut, milestoneContext, operationalReceipt);
 }
 
 process.stdout.write(`${JSON.stringify(receipt, null, 2)}\n`);

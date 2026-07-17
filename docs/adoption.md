@@ -296,16 +296,32 @@ time/output/run budgets, a sanitized environment, and runner-owned before/after
 source and generated-output workspace observations. It tracks changed files,
 untracked non-ignored files, explicit ownership/output paths, the Git index and
 `HEAD`, while ordinary ignored dependency/cache/build trees remain outside the
-source walk. On Windows the worker enters a Job Object before initialization;
+source walk. Bootstrap workers and native controllers receive only a minimal
+runner-owned environment; ambient `NODE_*`, `LD_*`, `DYLD_*`, and profiler
+injection variables do not cross the pre-containment boundary. On Windows the
+controller opens and retains the worker handle, records creation time, and
+requires a fresh response over the original IPC channel before Job assignment;
 on Linux the coordinator and watchdog remain outside an exclusive delegated
 cgroup-v2 root. The host must set `OPENCODE_QUALITY_CGROUP_ROOT` and
-`OPENCODE_QUALITY_CGROUP_ATTACH_MODE=sudo-helper-v1`, point
+`OPENCODE_QUALITY_CGROUP_ATTACH_MODE=sudo-helper-v2`, point
 `OPENCODE_QUALITY_CGROUP_ATTACH_HELPER` at a protected host-owned executable,
 and grant the dedicated workload principal permission to invoke only that
-helper. The root-owned helper must
-accept only PIDs owned by the dedicated workload UID and must embed the fixed
-`<root>/opencode-quality-workload/cgroup.procs` destination; callers never pass
-the destination. The guard controls and every broader privilege path must
+helper. Build `native/linux-cgroup-attach-helper.c` for the host with
+`npm run build:linux-cgroup-attach -- --out <canonical-absolute-output> --uid <dedicated-uid> --control <canonical-absolute-cgroup.procs>`.
+Both path arguments reject every ASCII control character (`U+0000` through
+`U+001F` and `U+007F`) before compiler selection. The command embeds the
+dedicated workload UID and `<root>/opencode-quality-workload/cgroup.procs`
+destination, then
+install it root-owned, singly linked, executable, and non-group/world-writable
+outside the delegated root. The parent first proves the original idle worker
+through a one-shot IPC challenge. The v2 helper accepts only that bounded PID,
+start ticks, and challenge; verifies UID/starttime through `/proc`; uses pidfd to
+stop and retain the live task identity; revalidates before and after the fixed
+cgroup write; proves membership; and resumes only on success. The raw challenge
+is transient protocol data, while durable identity stores only its fingerprint.
+Callers
+never pass the destination. Linux therefore requires cgroup v2 plus pidfd
+support and a dedicated workload principal. The guard controls and every broader privilege path must
 remain non-writable. Root-level `cgroup.kill`
 covers root/sibling migration; cleanup proves hierarchical
 `cgroup.events: populated 0`, removes descendants postorder, and retains the
@@ -391,7 +407,7 @@ fixed host configuration, not the embedding host's ambient `process.execPath`,
 so bundled Bun/OpenCode hosts and non-Node project checks keep the same boundary.
 Mutable cache and state roots are isolated from
 trusted code and the workspace and are not code evidence; host-config,
-resolver-policy-v4, runtime-metadata/config-inventory, executable, environment,
+trusted-toolchain-resolution-v5, runtime-metadata/config-inventory, executable, environment,
 and containment fingerprints remain receipt evidence.
 
 Containment setup uses a separate deadline from command execution. The execution

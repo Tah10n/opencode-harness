@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -34,6 +35,11 @@ const containedExecutionTimeoutMs = 5000;
 const survivorDetectionWaitMs = 750;
 const platformContainment = classifyProcessContainment();
 const operationalContainmentAvailable = platformContainment.support_state === "verified";
+const adapterWorkerSource = fs.readFileSync(new URL("../lib/feedback/adapter-worker.mjs", import.meta.url), "utf8");
+const adapterChallengeHandler = adapterWorkerSource.indexOf('message?.type === "containment_challenge"');
+const adapterImport = adapterWorkerSource.indexOf("await import(input.adapterUrl)");
+assert(adapterChallengeHandler >= 0 && adapterImport > adapterChallengeHandler,
+  "adapter worker must answer the containment challenge before importing adapter code");
 const injectedTestContainmentFactory = createInjectedTestContainmentFactory(
   "injected-adapter-test-containment-v1",
 );
@@ -485,13 +491,18 @@ export async function runScenario() {
   assert.match(commandResult.containment_fingerprint, /^sha256:[0-9a-f]{64}$/u);
   assert.equal(commandResult.containment_state?.teardown_verified, true);
   assert.deepEqual(
-    sanitizedNodeBootstrapEnvironment({
+    { ...sanitizedNodeBootstrapEnvironment({
       NODE_OPTIONS: "--require=poison.cjs",
       node_path: "poisoned",
       ELECTRON_RUN_AS_NODE: "1",
+      LD_PRELOAD: "/tmp/poison.so",
+      DYLD_INSERT_LIBRARIES: "/tmp/poison.dylib",
+      COMPlus_Profiler: "poison",
+      HOME: "/safe/home",
+      LANG: "C",
       SAFE_VALUE: "retained",
-    }),
-    { SAFE_VALUE: "retained" },
+    }, "linux") },
+    { HOME: "/safe/home", LANG: "C" },
   );
 
   const survivorMonitorSource = `const fs=require("node:fs"); const parentPid=Number(process.argv[1]); const marker=process.argv[2]; setInterval(() => { try { process.kill(parentPid, 0); } catch { fs.writeFileSync(marker, "survived"); process.exit(0); } }, 50);`;
@@ -514,36 +525,65 @@ export async function runScenario() {
   }
 
   if (operationalContainmentAvailable) {
-    const bootstrapPreload = path.join(tmp, "bootstrap-preload.cjs");
-    fs.writeFileSync(bootstrapPreload, `const { spawn } = require("node:child_process");
-const marker = process.env.OC_BOOTSTRAP_ESCAPE_MARKER;
-if (marker) {
+    const adapterBootstrapMarker = path.join(tmp, "adapter-bootstrap-escape.txt");
+    const commandBootstrapMarker = path.join(tmp, "command-bootstrap-escape.txt");
+    const adapterBootstrapPreload = path.join(tmp, "adapter-bootstrap-preload.cjs");
+    const commandBootstrapPreload = path.join(tmp, "command-bootstrap-preload.cjs");
+    const loaderObservationAdapter = path.join(tmp, "loader-observation-adapter.mjs");
+    fs.writeFileSync(loaderObservationAdapter, `export async function runScenario() {
+  return {
+    passed: true,
+    loader_values: [
+      process.env.LD_PRELOAD ?? null,
+      process.env.DYLD_INSERT_LIBRARIES ?? null,
+      process.env.COMPlus_Profiler ?? null,
+    ],
+  };
+}
+`, "utf8");
+    const writeBootstrapPreload = (file, marker) => {
+      const childSource = `setTimeout(() => require('node:fs').writeFileSync(${JSON.stringify(marker)}, 'escaped'), 700); setInterval(() => {}, 60000);`;
+      fs.writeFileSync(file, `const { spawn } = require("node:child_process");
+{
   const env = { ...process.env };
   delete env.NODE_OPTIONS;
-  const source = "setTimeout(() => require('node:fs').writeFileSync(process.env.OC_BOOTSTRAP_ESCAPE_MARKER, 'escaped'), 700); setInterval(() => {}, 60000);";
+  const source = ${JSON.stringify(childSource)};
   const child = spawn(process.execPath, ["-e", source], { detached: true, stdio: "ignore", windowsHide: true, env });
   child.unref();
 }
 `, "utf8");
+    };
+    writeBootstrapPreload(adapterBootstrapPreload, adapterBootstrapMarker);
+    writeBootstrapPreload(commandBootstrapPreload, commandBootstrapMarker);
+    for (const preload of [adapterBootstrapPreload, commandBootstrapPreload]) {
+      const syntax = spawnSync(process.execPath, ["--check", preload], { encoding: "utf8", shell: false });
+      assert.equal(syntax.status, 0, syntax.stderr);
+    }
     const previousNodeOptions = process.env.NODE_OPTIONS;
-    const previousBootstrapMarker = process.env.OC_BOOTSTRAP_ESCAPE_MARKER;
+    const loaderPoison = new Map([
+      ["LD_PRELOAD", process.env.LD_PRELOAD],
+      ["DYLD_INSERT_LIBRARIES", process.env.DYLD_INSERT_LIBRARIES],
+      ["COMPlus_Profiler", process.env.COMPlus_Profiler],
+    ]);
     try {
-      process.env.NODE_OPTIONS = `--require=${bootstrapPreload.replaceAll("\\", "/")}`;
-      const adapterBootstrapMarker = path.join(tmp, "adapter-bootstrap-escape.txt");
-      process.env.OC_BOOTSTRAP_ESCAPE_MARKER = adapterBootstrapMarker;
+      process.env.NODE_OPTIONS = `--require=${adapterBootstrapPreload.replaceAll("\\", "/")}`;
+      process.env.LD_PRELOAD = path.join(tmp, "missing-loader-poison.so");
+      process.env.DYLD_INSERT_LIBRARIES = path.join(tmp, "missing-loader-poison.dylib");
+      process.env.COMPlus_Profiler = "{00000000-0000-0000-0000-000000000001}";
       const bootstrapResult = await runAdapterModuleProduction({
-        adapterUrl: adapterUrl(adapter),
+        adapterUrl: adapterUrl(loaderObservationAdapter),
         context: { scenario: { id: "bootstrap-sanitization" }, repo: tmp },
         timeout: 5000,
         onTrace: () => ({ accepted: true }),
       });
       assert.equal(bootstrapResult.passed, true);
-      const commandBootstrapMarker = path.join(tmp, "command-bootstrap-escape.txt");
-      process.env.OC_BOOTSTRAP_ESCAPE_MARKER = commandBootstrapMarker;
+      assert.deepEqual(bootstrapResult.loader_values, [null, null, null]);
+      process.env.NODE_OPTIONS = `--require=${commandBootstrapPreload.replaceAll("\\", "/")}`;
       const bootstrapCommand = await runManagedCommandProduction({
         file: process.execPath,
         args: ["-e", "process.exit(0)"],
         cwd: tmp,
+        env: {},
         timeout: 5000,
       });
       assert.equal(bootstrapCommand.teardown_verified, true);
@@ -553,8 +593,10 @@ if (marker) {
     } finally {
       if (previousNodeOptions === undefined) delete process.env.NODE_OPTIONS;
       else process.env.NODE_OPTIONS = previousNodeOptions;
-      if (previousBootstrapMarker === undefined) delete process.env.OC_BOOTSTRAP_ESCAPE_MARKER;
-      else process.env.OC_BOOTSTRAP_ESCAPE_MARKER = previousBootstrapMarker;
+      for (const [key, value] of loaderPoison) {
+        if (value === undefined) delete process.env[key];
+        else process.env[key] = value;
+      }
     }
   }
 

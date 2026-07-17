@@ -284,9 +284,16 @@ created; leaving uninstrumented sessions open is what keeps `standard-lite`
 work lightweight, so the prompt workflow remains the classification trigger.
 Native Bash is disabled for instrumented quality sessions, including after the
 gate; repository commands run only through fingerprint-bound project-catalog
-checks. On Windows those checks and adapter workers are placed in a Job Object
-before initialization. On Linux they enter only a pre-delegated writable cgroup
-v2 root through a fixed narrow attach helper while the coordinator/watchdog stay
+checks. Before containment readiness, workers/controllers receive a minimal
+runner-owned environment that excludes ambient Node, dynamic-loader, and
+profiler injection variables. On Windows those checks and adapter workers are
+placed in a Job Object before initialization only after the controller retains
+the opened handle, records creation time, and a fresh challenge succeeds over
+the original worker IPC channel. On Linux they enter only a pre-delegated writable cgroup
+v2 root through fixed-destination `sudo-helper-v2`; the parent first proves a
+one-shot challenge over the original worker IPC channel, then the helper binds
+that PID/start identity, stops through pidfd, revalidates before and after
+attach, and resumes only after membership is proven. The coordinator/watchdog stay
 outside. The guard cgroup and its migration controls must be non-writable by the
 workload principal. Root-level `cgroup.kill` therefore still covers a workload
 that moves from the initial leaf into the root or a sibling. Teardown is
@@ -390,7 +397,7 @@ npm run verify:whitespace:fixture
 
 CI turns execution into sealed artifacts rather than inferring operational
 success from this deterministic suite. `npm run milestone:2:operational`
-executes the registered Windows or Linux production verifiers and accepts a
+executes the registered Windows, Linux, or macOS production verifiers and accepts a
 passed receipt only when their typed report binds containment identities,
 teardown, scenarios, HEAD, local workspace identity, portable source
 attestation, and GitHub/local run. Producers re-observe that source immediately
@@ -401,7 +408,14 @@ or source-attestation provenance. The CI aggregate also requires every receipt
 producer job result to be `success`; an artifact uploaded during failed cleanup
 cannot satisfy the gate. A missing GitHub-hosted installed adapter may be reported only as
 explicit bounded external state; a deterministic host fixture never satisfies
-`host_hook_e2e`.
+`host_hook_e2e` and cannot emit an installed-host milestone bundle.
+
+A conclusive installed-host failure is itself operational evidence: when
+`--milestone-out` was requested, the verifier seals a failed host bundle and the
+aggregate derives `host_hook_e2e=failed` plus `verification_failed`. Missing
+runtime/adapter state remains unavailable. Host bundles must share provider,
+run ID, attempt, repository, HEAD, and source attestation with every platform
+bundle; a local bundle cannot be appended to an unrelated GitHub Actions run.
 
 Installed-host and live-model checks remain explicit and outside the default
 aggregate:

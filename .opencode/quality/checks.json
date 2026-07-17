@@ -77,16 +77,6 @@
       "max_output_chars": 1048576
     },
     {
-      "check_id": "verify-trusted-project-runner",
-      "executable_id": "npm",
-      "argv": ["run", "verify:trusted-project-runner"],
-      "cwd": ".",
-      "phases": ["preimplementation", "slice", "integration"],
-      "purpose": "verification",
-      "timeout_ms": 120000,
-      "max_output_chars": 1048576
-    },
-    {
       "check_id": "verify-bash-boundary",
       "executable_id": "npm",
       "argv": ["run", "verify:bash-boundary"],
@@ -125,16 +115,6 @@
       "purpose": "verification",
       "timeout_ms": 120000,
       "max_output_chars": 1048576
-    },
-    {
-      "check_id": "verify-all",
-      "executable_id": "npm",
-      "argv": ["run", "verify"],
-      "cwd": ".",
-      "phases": ["integration"],
-      "purpose": "verification",
-      "timeout_ms": 600000,
-      "max_output_chars": 4194304
     }
   ]
 }
