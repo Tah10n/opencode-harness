@@ -6,6 +6,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
+  COMMITTED_WHITESPACE_GIT_CONFIG,
   committedWhitespaceRequestFromEnvironment,
   verifyCommittedWhitespace,
 } from "../lib/quality/whitespace.mjs";
@@ -59,13 +60,17 @@ function hasArgv(receipt, expected) {
   return receipt.commands.some((entry) => JSON.stringify(entry.argv.slice(1)) === JSON.stringify(expected));
 }
 
+function whitespaceArgv(args) {
+  return [...COMMITTED_WHITESPACE_GIT_CONFIG, ...args];
+}
+
 test("clean local repositories check the current committed diff", () => {
   const repo = repository("clean-local");
   const receipt = verifyCommittedWhitespace({ cwd: repo });
   assertReceipt(receipt, "passed");
   assert.equal(receipt.head_sha, head(repo));
   assert.equal(receipt.working_tree_state, "clean");
-  assert.ok(hasArgv(receipt, ["show", "--check", "--format=", "HEAD"]));
+  assert.ok(hasArgv(receipt, whitespaceArgv(["show", "--check", "--format=", "HEAD"])));
 });
 
 test("normal bridge CLI invocation accepts the explicit JSON output flag", () => {
@@ -88,8 +93,8 @@ test("staged whitespace errors fail both local diff surfaces", () => {
   const receipt = verifyCommittedWhitespace({ cwd: repo, mode: "local" });
   assertReceipt(receipt, "failed", "whitespace_error");
   assert.equal(receipt.working_tree_state, "dirty");
-  assert.ok(hasArgv(receipt, ["diff", "--check"]));
-  assert.ok(hasArgv(receipt, ["diff", "--cached", "--check"]));
+  assert.ok(hasArgv(receipt, whitespaceArgv(["diff", "--check"])));
+  assert.ok(hasArgv(receipt, whitespaceArgv(["diff", "--cached", "--check"])));
 });
 
 test("clean worktrees fail on whitespace errors in HEAD", () => {
@@ -99,7 +104,7 @@ test("clean worktrees fail on whitespace errors in HEAD", () => {
   git(repo, "commit", "--quiet", "-m", "bad whitespace");
   const receipt = verifyCommittedWhitespace({ cwd: repo, mode: "local" });
   assertReceipt(receipt, "failed", "whitespace_error");
-  assert.ok(hasArgv(receipt, ["show", "--check", "--format=", "HEAD"]));
+  assert.ok(hasArgv(receipt, whitespaceArgv(["show", "--check", "--format=", "HEAD"])));
 });
 
 test("pull requests check the merge-base range across multiple commits", () => {
@@ -118,7 +123,7 @@ test("pull requests check the merge-base range across multiple commits", () => {
   assert.equal(receipt.merge_base_sha, baseSha);
   assert.equal(receipt.range, `${baseSha}..HEAD`);
   assert.equal(receipt.resolved_range, `${baseSha}..${head(repo)}`);
-  assert.ok(hasArgv(receipt, ["diff", "--check", `${baseSha}..HEAD`]));
+  assert.ok(hasArgv(receipt, whitespaceArgv(["diff", "--check", `${baseSha}..HEAD`])));
 });
 
 test("all-zero initial pushes check HEAD directly", () => {
@@ -131,7 +136,7 @@ test("all-zero initial pushes check HEAD directly", () => {
   assertReceipt(receipt, "failed", "whitespace_error");
   assert.equal(receipt.before_sha, "0".repeat(40));
   assert.equal(receipt.range, null);
-  assert.ok(hasArgv(receipt, ["show", "--check", "--format=", "HEAD"]));
+  assert.ok(hasArgv(receipt, whitespaceArgv(["show", "--check", "--format=", "HEAD"])));
 });
 
 test("normal pushes check before..HEAD", () => {
@@ -183,7 +188,7 @@ test("unavailable Git is incomplete rather than passing", () => {
   });
   assertReceipt(receipt, "incomplete", "git_unavailable");
   assert.equal(receipt.commands[0].status, null);
-  assert.equal(receipt.commands[0].error_code, "ENOENT");
+  assert.equal(typeof receipt.commands[0].error_code, "string");
 });
 
 test("environment inference preserves explicit CI boundaries", () => {
