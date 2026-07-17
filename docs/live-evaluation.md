@@ -3,7 +3,8 @@
 Optional live evaluation measures actual adapter/model/tool behaviour. The
 deterministic manifest and infrastructure self-tests run in `npm run verify`,
 but an actual live run requires installed profiles, model access, and an
-explicit host adapter. Do not fake a model run.
+explicit host adapter inside verified production process containment. Do not
+fake a model run or substitute cleanup-only process handling for containment.
 
 This runner is part of the unreleased `0.3.0` development target, not the
 tagged `v0.2.0` package surface.
@@ -18,9 +19,18 @@ npm run eval:live:buffered-self-test
 npm run verify:live-eval
 ```
 
-Run actual behavioural evaluation only with an adapter, both profiles, and the
-corresponding installed-runtime permission evidence. Run from the candidate
-checkout and pass absolute evidence paths from their owning source roots:
+Run actual behavioural evaluation only with an adapter, both profiles, the
+corresponding installed-runtime permission evidence, and the production
+containment contract for the current OS. Windows uses the built-in Job Object
+controller. Linux requires the guarded cgroup-v2 delegation and
+`OPENCODE_QUALITY_CGROUP_*` configuration; macOS requires the exclusive-UID
+controller, marker, lease, and `OPENCODE_QUALITY_MACOS_*` configuration. The
+canonical provisioning examples are the `linux-containment` and
+`macos-containment` jobs in `.github/workflows/verify.yml` and the detailed
+contract in [adoption.md](adoption.md#project-configuration).
+
+Run from the candidate checkout and pass absolute evidence paths from their
+owning source roots:
 
 ```sh
 BASELINE_ROOT="/absolute/path/to/baseline"
@@ -71,13 +81,15 @@ export async function runScenario(context) {
 }
 ```
 
-The child receives an `AbortSignal`. This legacy live-evaluation adapter path
-uses bounded cleanup only: Windows invokes `taskkill`, while POSIX sends
-TERM/KILL to a dedicated process group. Neither path is verified containment
-for reparented or detached descendants. A timeout, failed cleanup, or stalled
-trace request fails closed before hidden data can be staged; it cannot produce
-Milestone 2 containment evidence. Trusted project checks use the separate
-Windows Job Object or delegated Linux cgroup-v2 boundary described below.
+The child receives an `AbortSignal` and runs inside the same production
+containment abstraction used by managed project commands: Windows Job Object,
+Linux delegated cgroup v2, or macOS exclusive UID. The runner must prove
+readiness before adapter code starts and must prove descendant teardown before
+hidden data or durable evidence can be published. `taskkill` on Windows and
+TERM/KILL against a POSIX process group are cleanup fallbacks after failed
+containment setup; they never count as verified teardown and cannot publish a
+passing report. A timeout, failed cleanup, unavailable controller, or stalled
+trace request fails closed.
 Adapters must return explicit success, such as
 `passed: true`, `ok: true`,
 `success: true`, `status: "passed"`, or `exitCode: 0`; returning an object alone
@@ -176,7 +188,8 @@ behavioural scenario belongs exactly once to `development`, `held_out`, or
 `infrastructure`, creates separate baseline/candidate operational runs without
 an LLM, and never contributes to candidate acceptance metrics.
 
-The twelve behavioural scenarios cover:
+The corpus contains 24 behavioural scenarios plus 1 infrastructure self-test.
+The first twelve cover orchestration and safety:
 
 1. small local change without unnecessary delegation;
 2. broad audit with bounded context discovery;
@@ -190,6 +203,12 @@ The twelve behavioural scenarios cover:
 10. incomplete handoff with bounded redirection/termination;
 11. project-local knowledge that must not become global memory;
 12. destructive action that remains approval-gated.
+
+The other twelve are engineering-quality scenarios covering small local
+controls, public API compatibility, persistence/rollback, migration
+compatibility, resource lifecycle, concurrency/cancellation,
+retry/idempotency, parser boundaries, stale cache/version skew, partial
+dependency failure, architecture boundaries, and cross-module invariants.
 
 ## Reports And Privacy
 

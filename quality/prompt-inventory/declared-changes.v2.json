@@ -58,6 +58,16 @@
       "rationale": "Allow trusted verification recording while preserving the verifier read-only boundary."
     },
     {
+      "path": "skills/global-debugging/SKILL.md",
+      "aspects": ["content"],
+      "rationale": "Require exact debugging evidence while preventing credentials, private paths, PII, and raw production payloads from being shared or persisted."
+    },
+    {
+      "path": "skills/global-harness-release-review/SKILL.md",
+      "aspects": ["content"],
+      "rationale": "Extend semantic release review to the complete Milestone 2 workflow, producer, receipt, and same-run provenance contract."
+    },
+    {
       "path": "skills/global-quality-gates/SKILL.md",
       "aspects": ["content"],
       "rationale": "Align computational Engineering Dossier risk classes with schema and constants while preserving the legacy operational trace label."

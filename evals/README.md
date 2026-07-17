@@ -30,7 +30,8 @@ separate baseline/candidate operational runs, and does not affect acceptance.
 
 Every behavioral scenario belongs exactly once to the first three suites.
 Unknown, duplicate, or missing membership fails validation. Suite membership
-is runner metadata and never enters adapter context.
+is runner metadata and never enters adapter context. The current corpus has 24
+behavioral scenarios plus 1 infrastructure self-test.
 
 ```sh
 npm run eval:live -- --suite development
@@ -90,7 +91,17 @@ report.
 
 ## Live Adapter Boundary
 
-Actual live evaluation requires:
+Actual live evaluation requires production process containment in addition to
+the adapter, profiles, and evidence below. Windows uses the built-in Job Object
+controller. Linux requires the guarded cgroup-v2 delegation and
+`OPENCODE_QUALITY_CGROUP_*` configuration; macOS requires the exclusive-UID
+controller, protected marker, workload-owned lease, and
+`OPENCODE_QUALITY_MACOS_*` configuration. See
+[the adoption guide](../docs/adoption.md#project-configuration) and the
+`linux-containment`/`macos-containment` workflow jobs. Cleanup-only process
+groups or `taskkill` cannot publish verified evidence.
+
+With that host boundary provisioned, run:
 
 ```sh
 BASELINE_ROOT="/absolute/path/to/baseline"

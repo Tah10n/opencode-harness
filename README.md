@@ -104,7 +104,7 @@ configuration guidance lives in
 
 ## Adoption
 
-1. Install or configure the capability packages:
+1. Use Node.js 24 or newer and install or configure the capability packages:
    - [`opencode-recursive-context`](https://github.com/Tah10n/opencode-recursive-context)
    - [`opencode-learning-guard`](https://github.com/Tah10n/opencode-learning-guard)
 2. Copy or adapt the exact portable source-bundle contract under [Usage](#usage).
@@ -137,219 +137,118 @@ configuration guidance lives in
    opencode debug agent improver
    ```
 
-Expected runtime result: the orchestrator and read-only agents expose the
-minimal safe `context_*` surface (`context_outline`, `context_files`,
+Expected runtime result: the orchestrator and designated repository-reading
+agents expose the minimal safe `context_*` surface (`context_outline`, `context_files`,
 `context_search`, and `context_read`), while `oc_learning_*` write tools are
 available only through the bounded self-improvement path. Advanced
 recursive-context tools are host opt-ins.
 
-## Как работает quality gate
+## How The Quality Gate Works
 
-1. `chat.message` регистрирует каждую primary development session как
+1. `chat.message` registers each primary development session as
    `unclassified`.
-2. До записи orchestrator вызывает `quality_session_start` и указывает риск,
-   цель, ownership и trusted project checks.
-3. Маленькая локальная задача проходит компактный `standard-lite`: behavior
-   expectation, preserved behavior, локальные edge cases и bounded scope. Полный
-   impact graph для неё не нужен. Dossier синтезирует runner; агент не вызывает
-   для него `quality_dossier_create` или `quality_dossier_update`.
-4. `high` и `critical` требуют полный Engineering Dossier, impact graph,
-   invariants, edge/failure mappings, baseline evidence и независимые
-   contributions от architect и reviewer.
-5. Gate оценивает plugin/runner, а не агент. До runner-owned `passed` edit,
-   write, patch и writable `task.general` запрещены. Native `bash` остаётся
-   запрещённым и после gate, потому что host hook не доказывает teardown всех
-   detached descendants.
-6. После gate выдаётся одноразовое разрешение на точные файлы для bounded edit
-   или writable task. Tests, lint, typecheck и build запускаются только как
-   runner-owned project checks.
-7. Plugin сравнивает bounded source workspace до и после изменения: tracked
-   changes, untracked non-ignored files, explicit ownership, explicit generated
-   outputs, Git index и `HEAD`. Обычные ignored trees (`node_modules`, `.env`,
-   coverage/build output и подобные) не обходятся целиком. Generated outputs
-   наблюдаются отдельно и не маскируют изменения source workspace. Изменение
-   `.oc_harness` также обнаруживается отдельным control-state guard.
-8. Project checks объявляют логический `executable_id` в
-   `.opencode/quality/checks.json`. `.opencode/quality/toolchains.json` связывает
-   его с разрешённым resolver family; runner не ищет executable через ambient
-   `PATH`, повторно проверяет identity непосредственно перед spawn, передаёт
-   очищенный environment и всегда использует `shell: false`.
-9. Для bug-fix в `standard-lite` один reproducer запускается до изменения и как
-   integration regression после него. Runner различает ожидаемое падение,
-   последующий pass, unrelated result и bounded unavailable с явной причиной;
-   существенная неопределённость блокирует компактный путь.
-10. При настроенной architecture policy high/critical session принимает только
-    freshly created или rewritten runner-owned final graph из выделенного
-    integration check (не ранее существовавший неизменённый артефакт), заново оценивает
-    итоговую архитектуру и не выдаёт attestation при отсутствующем, stale,
-    unavailable или failed evidence. Любое новое source-изменение делает старую
-    verification stale.
-11. Финальная attestation возможна только для текущего source workspace после
-    всех обязательных trusted checks и, когда требуется, post-edit architecture
-    evaluation.
+2. Before mutation, the orchestrator calls `quality_session_start` with the
+   risk class, goal, exact ownership, and trusted project checks.
+3. A clean, bounded local task may use `standard-lite`: declared behavior,
+   preserved behavior, local edge cases, ownership, and trusted checks. The
+   runner synthesizes this compact dossier; callers do not replace or update it
+   with `quality_dossier_create` or `quality_dossier_update`.
+4. `high` and `critical` require the full Engineering Dossier, impact graph,
+   invariants, edge/failure mappings, baseline evidence, and independent
+   architect and reviewer contributions.
+5. The plugin and runner compute the gate. Native edit, write, patch, and
+   writable `task.general` calls remain denied until the runner records a
+   passed gate. Native `bash` remains disabled in an instrumented quality
+   session.
+6. A passed gate issues one-shot authority for exact owned paths. Tests, lint,
+   typecheck, and builds run only as runner-owned trusted project checks.
+7. The runner compares the bounded source workspace before and after mutation:
+   tracked changes, untracked non-ignored files, exact ownership, declared
+   generated outputs, the Git index, and `HEAD`. Ordinary ignored dependency,
+   cache, and build trees stay outside the source walk; `.oc_harness` has a
+   separate control-state guard.
+8. Project checks declare a logical `executable_id` in
+   `.opencode/quality/checks.json`. `.opencode/quality/toolchains.json` maps it
+   to an approved resolver family. The runner avoids ambient `PATH`, rechecks
+   identity immediately before spawn, sanitizes the environment, and uses
+   `shell: false`.
+9. A `standard-lite` bug fix binds one catalog check as both the pre-fix
+   reproducer and the integration regression. The runner records expected
+   pre-fix failure, post-fix pass, unrelated outcome, or bounded unavailability
+   with an explicit reason. Unexpected pass, unrelated evidence, and material
+   uncertainty block the compact path.
+10. A configured high/critical architecture policy accepts only a freshly
+    created or rewritten runner-owned final graph from its integration check.
+    Missing, stale, unavailable, failed, or policy-violating evidence cannot
+    produce attestation.
+11. Final attestation is valid only for the current source workspace after all
+    mandatory trusted checks and any required post-edit architecture review.
 
-Native `bash` не имеет allowlist ни до, ни после классификации;
-`quality_command_authorize` возвращает `QUALITY_NATIVE_BASH_DISABLED`.
-Внутренние read-only Git
-наблюдения runner выполняет только через абсолютный executable из фиксированного
-system install location и с минимальным очищенным environment.
+`quality_command_authorize` returns `QUALITY_NATIVE_BASH_DISABLED` for native
+Bash before and after classification. Runner-owned read-only Git observations
+use an absolute fixed-install executable with a minimal sanitized environment.
 
-## Что нужно настроить в проекте
+## Project Configuration
 
-- `.opencode/quality/checks.json` с реальными unit, lint, typecheck, build или
+Use Node.js 24 or newer, matching the package engine and CI runtime. Each
+adopted project also needs:
+
+- `.opencode/quality/checks.json` with real unit, lint, typecheck, build, or
   integration commands;
-- `.opencode/quality/toolchains.json` с логическими executable IDs и только
-  реально используемыми resolver families;
-- опциональный `quality/architecture-policy.json`;
-- `WORKFLOW.md` с порядком локальной проверки и operational boundaries;
-- project-local skills для специализированных workflows.
+- `.opencode/quality/toolchains.json` with logical executable IDs and only the
+  resolver families the project uses;
+- an optional `quality/architecture-policy.json`;
+- `WORKFLOW.md` with verification order and repository boundaries;
+- project-local skills for specialized workflows.
 
-Project-local режим использует `.opencode/plugins/engineering-dossier.mjs` в
-полном source bundle. Global режим устанавливает пакет, кладёт минимальный
-wrapper из `quality/examples/global-quality-plugin.mjs` в global OpenCode plugin
-directory и всё равно читает project-local checks и architecture policy. Для
-runtime-only adoption не нужны eval corpus, harness fixtures, release docs и
-весь `scripts/`; полный bundle остаётся путём разработки самого harness.
+The project-local wrapper is `.opencode/plugins/engineering-dossier.mjs`. A
+global installation uses the minimal wrapper from
+`quality/examples/global-quality-plugin.mjs`; checks, toolchain mappings, and
+optional architecture policy remain project-local. Project toolchain maps are
+machine-neutral and never contain host paths. Non-built-in resolver families
+use the host-owned `quality-toolchains.host.v1.json` contract, and receipts bind
+`trusted-toolchain-resolution-v5` evidence.
 
-Project-local `toolchains.json` содержит только logical IDs и resolver families,
-никогда host paths. `node` и `npm` по умолчанию разрешаются из canonical Node
-installation вместе с fixed-location identity-bound Git. Для `python`,
-`pytest`, `go`, `cargo`, `java`, `maven` и `gradle` host должен положить
-`quality-toolchains.host.v1.json` рядом с global wrapper; wrapper передаёт свой
-`import.meta.url` как host-owned anchor. Файл валидируется по
-`quality/schemas/toolchain-host-configuration.schema.json`, должен находиться
-вне workspace и задаёт trusted code roots, отдельные writable state roots,
-fixed candidates и auxiliary Git. Project-local wrapper намеренно не может
-выдать project-файл за host configuration.
+[The adoption guide](docs/adoption.md#normal-session-quality-bridge) is the
+canonical source for detailed wrapper, resolver, Linux, Windows, and macOS
+provisioning instructions. The README intentionally keeps only this operational
+summary so those security-sensitive details have one authoritative narrative.
 
-Resolver запускает Python/Go/Cargo/Java напрямую, pytest как fixed
-`python -I -m pytest`, npm через identity-bound CLI, а Maven/Gradle через прямые
-Java entry points с fingerprint-bound distribution manifest. Maven получает
-изолированный JVM `user.home`; Gradle получает fixed
-`--gradle-user-home`, `--project-cache-dir`, JVM/state properties и
-`--no-daemon`, поэтому project argv не может переназначить resolver-owned state.
-Java/Maven/Gradle `@argfile` запрещён. Maven запускается с четырьмя
-identity-bound empty settings/toolchains controls; автоматические user settings,
-toolchains и extensions в writable state root, а также project extensions fail
-closed. `.mvn/maven.config`, все `gradle.properties` от фактического check cwd
-до workspace root, user properties и installation properties проходят bounded
-validation и identity binding. Gradle installation `init.d` входит в distribution
-manifest, а автоматические init scripts в writable state root fail closed. Shell scripts на
-POSIX допускаются только с одним absolute shebang interpreter; Windows
-`.cmd`/`.bat` launchers, symlinks, hard links, неизвестные distribution layouts
-и project-local substitutions fail closed. Mutable cache/state roots отделены
-от trusted code и workspace и не считаются code evidence. Фактический cwd
-identity проверяется до sync worker, после containment и в contained child прямо
-перед spawn. Внутренний sync worker запускается не через ambient host
-`process.execPath`, а через отдельный identity-bound Node из fixed host config;
-это сохраняет тот же containment contract внутри bundled Bun/OpenCode host и
-для non-Node project checks. Receipt отдельно связывает host-config, resolution-policy,
-runtime-metadata/config-inventory и sanitized-environment fingerprints; policy
-`trusted-toolchain-resolution-v5` не принимает старые v4 receipts.
+## Computational Enforcement Boundary
 
-## Что computationally enforced
+The plugin enforces session registration and classification, gate state, exact
+ownership, one-shot mutation capabilities, catalog/toolchain/architecture
+drift, bounded workspace reconciliation, stale-verification invalidation,
+trusted check receipts, and final attestation. Durable receipts store bounded
+status metadata and fingerprints, never raw command stdout or stderr.
 
-- регистрация и lifecycle session;
-- запрет mutation до classification и gate;
-- bounded ownership, one-shot edit/task capabilities и replay denial;
-- immutable architecture-policy/catalog/toolchain-map fingerprints и drift
-  detection;
-- bounded source/output workspace observation, ignored-tree exclusion и
-  index/`HEAD` binding; меж-job receipt provenance использует отдельный
-  portable source attestation без inode/mtime, тогда как local snapshot сохраняет
-  строгую filesystem identity;
-- runner-owned check execution, pre-spawn executable identity revalidation,
-  before/after workspace binding, containment receipts, receipt limits
-  и отсутствие raw stdout/stderr в state. Durable receipt хранит только status,
-  exit code, signal, duration, stdout/stderr byte counts и command/evidence
-  fingerprints;
-- honest standard-lite pre-fix/integration reproducer outcomes;
-- runner-owned post-edit architecture evidence для configured high/critical
-  policy;
-- invalidation verification после любого изменения и runner-owned attestation.
+An API/factory import is not installed-host evidence.
+`probe:runtime:quality-plugin-api` checks API construction only;
+`verify:runtime:quality-hooks` requires an explicitly selected trusted host
+adapter and independently observes the authorized workspace effect. A
+standalone evidence file remains untrusted parser input. Missing host, provider,
+or adapter state returns `blocked_external_state`; deterministic fixtures never
+claim host-active callbacks.
 
-Реальное host wiring нельзя доказать одним factory import. Команда
-`probe:runtime:quality-plugin-api` проверяет только API/factory. Отдельная
-`verify:runtime:quality-hooks` требует явно выбранный доверенный host adapter.
-Verifier сам создаёт временный Git workspace и nonce, независимо наблюдает
-разрешённый file effect и повторно связывает transitive source fingerprint.
-Standalone evidence-файл проверяется только как недоверенный parser input и не
-может дать `passed`. Детерминированный fixture проверяет десять структурированных
-сценариев, включая disabled Bash, one-shot capability/replay denial, forbidden
-mutation, reconciliation, trusted check и final attestation, но не выдаёт себя
-за установленный host. Реальный успех требует той же полной цепочки через
-host-active callbacks. Если host/model/provider или adapter недоступен, команда
-честно возвращает `blocked_external_state`.
-`tool.execute.before` остаётся authoritative mutation boundary;
-`permission.ask` только сверяет host permission и никогда не повышает `ask` или
-`deny`. Это не OS sandbox: project checks выполняются с правами текущего
-пользователя. До подтверждения containment command/adapter worker и native
-controller получают только минимальный runner-owned bootstrap environment;
-ambient `NODE_*`, `LD_*`, `DYLD_*` и profiler/injection variables туда не
-передаются. На Windows controller открывает и удерживает process handle,
-связывает creation time и до `AssignProcessToJobObject` требует ответ исходного
-worker через уже существующий IPC channel. Только после этой проверки runner
-помещает worker и всех descendants в Job Object с `KILL_ON_JOB_CLOSE`.
+Production command and adapter children require verified platform containment:
 
-На Linux harness использует только заранее делегированный writable cgroup v2
-root. Coordinator и watchdog остаются за пределами root; idle worker первично
-присоединяется к фиксированному leaf через root-owned `sudo-helper-v2`. Parent
-сначала доказывает исходный worker одноразовым IPC challenge; helper принимает
-только его PID, start ticks и challenge для отдельного workload UID, открывает
-pidfd, останавливает именно этот процесс, повторно проверяет UID и start time,
-пишет PID только во встроенный fixed destination, проверяет membership и затем
-продолжает worker. В durable identity попадает только fingerprint challenge.
-Sudo policy разрешает только этот helper,
-а запись в guard отдельно проверяется как запрещённая. Workload может
-перемещаться между root и своими sibling-cgroups, но
-root-level `cgroup.kill` всё равно охватывает их; teardown требует
-`cgroup.events: populated 0` и удаления всех descendants с сохранением самого
-делегированного root. Linux workload principal не должен иметь более широких
-`sudo`/root capabilities. Process group никогда не считается доказательством
-containment.
+- Windows binds a retained worker handle, creation time, and a fresh IPC
+  response before `AssignProcessToJobObject`; closing the Job Object kills its
+  descendants.
+- Linux uses an exclusive delegated cgroup-v2 root, an external coordinator
+  and watchdog, the fixed-destination `sudo-helper-v2`, pidfd/start-time
+  identity, root-level `cgroup.kill`, and hierarchical `populated 0` teardown.
+- macOS uses `macos-exclusive-uid-v1`: a protected root-owned controller and
+  marker plus a workload-owned lease for a dedicated non-admin UID, with
+  fixed-point cleanup and two empty same-UID scans.
 
-macOS не является Linux и не предоставляет cgroup/Job Object API. На macOS
-harness использует `macos-exclusive-uid-v1`: весь coordinator запускается под
-отдельным non-root/non-admin real UID, а root-owned controller устанавливается
-вне workspace с mode `0555` под полностью root-owned/non-writable canonical
-path ancestry. Host дополнительно создаёт root-owned marker с точным содержимым
-`opencode-quality-exclusive-uid-v1:<uid>\n` и соседний `<marker>.lease`, который
-принадлежит workload UID и имеет точный mode `0600`. Marker явно подтверждает,
-что UID выделен для harness; controller берёт inode lease до любых сигналов.
-Controller связывает coordinator ancestors по PID + start time; каждый другой
-живой процесс с этим real UID входит в workload boundary даже после
-fork/exec/`setsid`/reparenting. Teardown сначала останавливает boundary до fixed
-point, затем посылает `SIGKILL` и требует два пустых UID-scan без zombies.
-Закрытие stdin после смерти coordinator запускает тот же teardown; concurrent
-scope отклоняется занятым lease. Перед `READY` controller под тем же lease
-удаляет автоматически запущенные macOS per-user agents и доказывает пустой
-boundary, сохраняя только identity-bound ancestors и текущий worker. Нужны
-`OPENCODE_QUALITY_MACOS_CONTROLLER` и
-`OPENCODE_QUALITY_MACOS_WORKLOAD_UID`, а также
-`OPENCODE_QUALITY_MACOS_UID_MARKER`; путь lease выводится как
-`<marker>.lease`. Обычный login account без host marker не принимается даже
-если в момент проверки он пуст. Workload principal не должен иметь `sudo`,
-setuid или иной путь смены UID. Поскольку trusted-toolchain contract не следует
-за symlink/shim Git, host также устанавливает singly linked root-owned копию
-реального Git binary в `/usr/local/libexec/opencode-quality-git/bin/git`; канонический
-CI provisioning проверяет её от workload UID. npm запускает project scripts через
-`sh`, поэтому macOS host отдельно устанавливает identity-bound root-owned shell в
-`/usr/local/libexec/opencode-quality-shell/bin/sh`; resolver фиксирует его через
-`NPM_CONFIG_SCRIPT_SHELL` и добавляет в PATH только для npm invocation.
-
-Binary root-owned, но не setuid: watchdog выполняется как workload UID. Поэтому
-это полная lifecycle-поддержка для доверенных project-owned checks, а не защита
-от намеренного same-UID кода, который атакует сам watchdog. Неожиданный выход
-controller всегда делает receipt failed/unverified, но не превращает механизм в
-adversarial sandbox.
-
-Такая изоляция не защищает от privilege escalation, сети или других доступных
-пользователю файлов, поэтому catalog должен содержать только доверенные
-project-owned checks.
-
-Containment setup имеет отдельный bounded deadline; execution timeout начинается
-только после readiness. Adapter cwd повторно identity-checkится до/после spawn,
-после containment и внутри worker перед импортом project module.
+These are lifecycle boundaries for trusted project-owned checks, not hostile
+code sandboxes. They do not prevent privilege escalation, network access, or
+access to other files available to the workload user. Any unavailable
+production controller fails closed with
+`QUALITY_CHECK_CONTAINMENT_UNAVAILABLE`. Containment setup has a separate
+deadline from command execution, and cwd identity is rechecked across spawn and
+inside the contained worker before project code loads.
 
 ## Local State Boundary
 

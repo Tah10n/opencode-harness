@@ -20,9 +20,16 @@ usually involve:
 
 - command permissions;
 - read/write tool exposure;
+- trusted toolchain identity and host-owned configuration;
+- Windows, Linux, and macOS process-containment boundaries;
+- host adapter and runtime-hook verification;
+- same-run receipt provenance and aggregate status derivation;
 - self-improvement boundaries;
 - memory persistence rules;
 - examples that could encourage unsafe configuration.
 
-Before merging such changes, run `npm run verify` and inspect the effective
-OpenCode config in the target host environment.
+Before merging such changes, run `npm run verify`, inspect the effective
+OpenCode config with `npm run verify:runtime`, and require the cross-platform
+`Milestone 2 receipt aggregation` check when containment or receipt provenance
+is affected. Redact credentials, private paths, PII, and raw production output
+from review comments and durable evidence.

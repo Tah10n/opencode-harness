@@ -12,8 +12,10 @@ import {
   observeContentBoundWorkspace,
   observeContentBoundWorkspaceWithSourceAttestation,
   resolveTrustedGitExecutable,
+  trustedGitCandidatesForPlatform,
   validateContentBoundWorkspace,
 } from "../lib/quality/normal-session-workspace.mjs";
+import { TRUSTED_MACOS_FIXED_GIT_PATH } from "../lib/quality/trusted-toolchains.mjs";
 import {
   assertMilestone2RunContextStable,
   captureMilestone2RunContext,
@@ -23,6 +25,30 @@ import { ContractError } from "../lib/quality/validation.mjs";
 function expectCode(callback, code) {
   assert.throws(callback, (error) => error instanceof ContractError && error.code === code, `expected ${code}`);
 }
+
+assert.deepEqual(
+  trustedGitCandidatesForPlatform("darwin"),
+  [TRUSTED_MACOS_FIXED_GIT_PATH],
+  "macOS workspace observation must use only the protected fixed Git executable",
+);
+assert.equal(
+  trustedGitCandidatesForPlatform("darwin").includes("/usr/bin/git"),
+  false,
+  "macOS workspace observation must not fall back to the ambient developer-tool shim",
+);
+const workspaceObservationSource = fs.readFileSync(
+  new URL("../lib/quality/normal-session-workspace.mjs", import.meta.url),
+  "utf8",
+);
+const trustedGitResolverStart = workspaceObservationSource.indexOf("export function resolveTrustedGitExecutable");
+const trustedGitResolverEnd = workspaceObservationSource.indexOf("function safeGitEnvironment", trustedGitResolverStart);
+const trustedGitResolverSource = workspaceObservationSource.slice(trustedGitResolverStart, trustedGitResolverEnd);
+assert(
+  trustedGitResolverStart >= 0
+    && trustedGitResolverEnd > trustedGitResolverStart
+    && trustedGitResolverSource.includes('assertProtectedMacosFixedExecutable(candidate, "trusted fixed workspace Git")'),
+  "macOS workspace Git resolution must enforce the protected executable contract",
+);
 
 function runGit(root, args) {
   const result = spawnSync(resolveTrustedGitExecutable(), args, {

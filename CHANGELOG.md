@@ -6,6 +6,13 @@ This section describes the development checkout. The latest tagged release is
 still `v0.2.0`; its package metadata has no `exports` field and does not expose
 the feedback-plane ESM subpaths documented for the `0.3.0` target.
 
+- Removed macOS runner-image drift from workspace observation by reusing the
+  protected fixed Git executable and verifying a sanitized `rev-parse` under
+  the dedicated workload UID before the full verifier starts.
+- Standardized public documentation on English, made the adoption guide the
+  canonical detailed containment reference, synchronized the 24+1 live corpus,
+  current capability versions, installed-runtime prerequisites, and release
+  check names, and added deterministic language/contract drift coverage.
 - Closed the final Milestone 2 review gaps: deterministic stages now own one
   containment scope without recursive catalog meta-checks; bootstrap workers
   and controllers use a minimal injection-resistant environment; Windows and
@@ -78,9 +85,9 @@ the feedback-plane ESM subpaths documented for the `0.3.0` target.
   attestation rather than failing on a read-only Git index stat-cache refresh.
 - Hardened Milestone 2 completion evidence so deterministic fixtures cannot mint
   operational or installed-host success. CI now uploads sealed deterministic,
-  Windows Job Object, and guarded Linux cgroup-v2 bundles, aggregates only
-  same-HEAD/run provenance, and reports an absent installed adapter as bounded
-  external state. Linux containment keeps coordinators outside an exclusive
+  Windows Job Object, guarded Linux cgroup-v2, and macOS exclusive-UID bundles,
+  aggregates only same-HEAD/run provenance, and reports an absent installed
+  adapter as bounded external state. Linux containment keeps coordinators outside an exclusive
   root, uses a narrow fixed-leaf attach helper, and kills root/sibling migrations
   through the root boundary before confirming an empty retained delegation.
 - Implemented Milestone 2's versioned Engineering Dossier, runner-owned

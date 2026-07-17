@@ -60,18 +60,16 @@ Do not run these in parallel when they share outputs or state:
 This workflow describes commands and order. It does not grant permissions.
 Allowlists and approval rules belong in OpenCode config.
 
-## Example Safe Allowlist
+## Trusted Project Checks
 
-```json
-{
-  "permission": {
-    "bash": {
-      "npm test": "allow",
-      "npm test *": "allow",
-      "npm run typecheck": "allow",
-      "npm run lint": "allow",
-      "npm run build": "allow"
-    }
-  }
-}
-```
+In an instrumented quality session, native Bash remains disabled and
+`quality_command_authorize` returns `QUALITY_NATIVE_BASH_DISABLED`. The commands
+above are human-facing workflow mappings; the agent executes them only through
+runner-owned entries in `.opencode/quality/checks.json` with logical executable
+IDs from `.opencode/quality/toolchains.json`.
+
+Use the versioned catalog shape in
+[project-checks.example.json](../../quality/examples/project-checks.example.json)
+instead of adding a native Bash allowlist. A profile-only host that is not using
+the quality bridge may define its own permission policy, but that policy is not
+instrumented quality evidence.

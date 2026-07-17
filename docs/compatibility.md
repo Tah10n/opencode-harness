@@ -6,8 +6,8 @@
 | --- | --- | --- | --- | --- |
 | `opencode-harness` | <https://github.com/Tah10n/opencode-harness> | `0.3.0` | Unreleased target | Development orchestration profile with feedback APIs, live evaluation, candidate assessment, docs, and verifiers. |
 | `opencode-harness` | <https://github.com/Tah10n/opencode-harness/tree/v0.2.0> | `v0.2.0` | Latest tagged release | Tagged orchestration profile, rules, docs, and verifier; its package has no package exports and does not expose feedback API subpaths. |
-| `opencode-recursive-context` | <https://github.com/Tah10n/opencode-recursive-context> | `0.1.x` | Compatible capability | Safe read-only `context_*` tools. |
-| `opencode-learning-guard` | <https://github.com/Tah10n/opencode-learning-guard> | `0.1.x` | Compatible capability | Bounded `oc_learning_*` memory and managed-skill write tools. |
+| `opencode-recursive-context` | <https://github.com/Tah10n/opencode-recursive-context> | `0.1.0` | Compatible capability | Safe read-only `context_*` tools. |
+| `opencode-learning-guard` | <https://github.com/Tah10n/opencode-learning-guard> | `0.2.0` | Compatible capability | Bounded `oc_learning_*` memory and managed-skill write tools. |
 
 Do not read development-checkout documentation as a claim about `v0.2.0`.
 The public `opencode-harness/feedback` and `opencode-harness/trace-store`

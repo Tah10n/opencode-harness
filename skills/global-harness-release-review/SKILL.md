@@ -33,9 +33,14 @@ Check these surfaces together:
 - `docs/harness-map.md`, `docs/evaluation.md`, `docs/adoption.md`,
   `docs/compatibility.md`, `docs/live-evaluation.md`, and
   `docs/release.md`;
+- `.github/workflows/verify.yml`, `quality/milestone-2-dod.v3.json`, receipt
+  schemas under `quality/`, `lib/quality/milestone-dod.mjs`, and
+  `lib/quality/milestone-run-context.mjs`;
 - `scripts/verify-harness.mjs`, `scripts/evaluate-harness.mjs`,
   `scripts/evaluate-live.mjs`, `scripts/verify-drift.mjs`, and
   `scripts/verify-runtime.mjs`;
+- `scripts/verify-all.mjs`, `scripts/run-milestone-2-operational.mjs`, and
+  `scripts/assess-milestone-2-receipts.mjs` as one producer/aggregate contract;
 - examples and fixtures that prove project-local workflow, runtime debug, or
   behaviour contracts.
 
@@ -45,6 +50,10 @@ Check these surfaces together:
 - Does every sensor point back to a real guide or contract?
 - Are fast checks included in `npm run verify`?
 - Are installed-runtime checks documented separately from CI-only checks?
+- Do deterministic, Linux, Windows, and macOS producers remain mandatory inputs
+  to the final `Milestone 2 receipt aggregation` check?
+- Do all receipt bundles and optional installed-host evidence enforce the same
+  provider, run ID, attempt, repository, HEAD, and source attestation?
 - Are read-only agents still read-only at the permission layer?
 - Are review commands routed through the read-only `review-orchestrator`
   primary?

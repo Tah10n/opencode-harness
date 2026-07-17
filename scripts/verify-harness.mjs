@@ -201,6 +201,7 @@ const requiredFiles = [
   "agents/researcher.md",
   "agents/verifier.md",
   "agents/improver.md",
+  "skills/global-debugging/SKILL.md",
   "skills/global-review-ledger/SKILL.md",
   "skills/global-harness-release-review/SKILL.md",
   "skills/global-quality-gates/SKILL.md",
@@ -320,6 +321,46 @@ for (const file of requiredFiles) {
     fail("HARNESS-S001", `required file missing: ${file}`, "Restore the required harness file.");
   }
 }
+
+const unicodeLetterPattern = /\p{Letter}/u;
+const latinScriptPattern = /\p{Script=Latin}/u;
+function containsNonLatinLetter(value) {
+  return [...value].some((character) => unicodeLetterPattern.test(character) && !latinScriptPattern.test(character));
+}
+if (!containsNonLatinLetter("\u042f")
+  || !containsNonLatinLetter("\u4e2d")
+  || containsNonLatinLetter("English")
+  || containsNonLatinLetter("B\u00f6ckeler")) {
+  fail("HARNESS-S085", "non-Latin documentation sensor is not classifying its control cases", "Keep the Unicode script check deterministic.");
+}
+const documentationFiles = [...new Set([
+  "AGENTS.md",
+  "CHANGELOG.md",
+  "CONTRIBUTING.md",
+  "README.md",
+  "SECURITY.md",
+  "evals/README.md",
+  ...["agents", "commands", "docs", "examples", "fixtures", "skills"]
+    .flatMap((directory) => listFiles(directory))
+    .filter((file) => file.endsWith(".md")),
+])].sort();
+for (const file of documentationFiles) {
+  const lines = read(file).split(/\r?\n/u);
+  const index = lines.findIndex((line) => containsNonLatinLetter(line));
+  if (index !== -1) {
+    fail("HARNESS-S085", `${file}:${index + 1} contains a non-Latin-script letter`, "Keep English public documentation and reusable Markdown fixtures free of non-Latin-script prose.");
+  }
+}
+
+const liveEvalSuiteManifest = JSON.parse(read("evals/suites.json"));
+const infrastructureScenarioCount = liveEvalSuiteManifest.suites.infrastructure.length;
+const behavioralScenarioCount = Object.entries(liveEvalSuiteManifest.suites)
+  .filter(([suite]) => suite !== "infrastructure")
+  .reduce((total, [, scenarios]) => total + scenarios.length, 0);
+const infrastructureSelfTestLabel = `${infrastructureScenarioCount} infrastructure self-test${infrastructureScenarioCount === 1 ? "" : "s"}`;
+const documentedCorpusSize = `${behavioralScenarioCount}+${infrastructureScenarioCount} corpus`;
+const documentedBritishCorpusDetail = `${behavioralScenarioCount} behavioural scenarios plus ${infrastructureSelfTestLabel}`;
+const documentedAmericanCorpusDetail = `${behavioralScenarioCount} behavioral scenarios plus ${infrastructureSelfTestLabel}`;
 
 for (const forbiddenFile of [
   "lib/quality/model-profiles.mjs",
@@ -736,6 +777,23 @@ const releaseReviewSkill = read("skills/global-harness-release-review/SKILL.md")
 for (const section of ["## Purpose", "## Rules", "## Review Scope", "## Questions", "## Output"]) {
   assertIncludes(releaseReviewSkill, section, "skills/global-harness-release-review/SKILL.md");
 }
+for (const needle of [
+  ".github/workflows/verify.yml",
+  "quality/milestone-2-dod.v3.json",
+  "scripts/run-milestone-2-operational.mjs",
+  "scripts/assess-milestone-2-receipts.mjs",
+  "lib/quality/milestone-dod.mjs",
+  "lib/quality/milestone-run-context.mjs",
+  "provider, run ID, attempt, repository, HEAD, and source attestation",
+]) {
+  assertIncludes(releaseReviewSkill, needle, "skills/global-harness-release-review/SKILL.md", "HARNESS-S085", "Keep semantic release review aligned with the complete Milestone 2 producer and aggregate contract.");
+}
+
+const debuggingSkill = read("skills/global-debugging/SKILL.md");
+const normalizedDebuggingSkill = debuggingSkill.replace(/\s+/gu, " ");
+for (const needle of ["captured locally", "redacted", "credentials", "PII", "raw production payloads"]) {
+  assertIncludes(normalizedDebuggingSkill, needle, "skills/global-debugging/SKILL.md", "HARNESS-S085", "Keep debugging evidence exact without publishing sensitive raw output.");
+}
 
 const qualityGatesSkill = read("skills/global-quality-gates/SKILL.md");
 for (const section of [
@@ -800,6 +858,7 @@ assertIncludes(recursiveDocs, "optional live validation", "docs/recursive-contex
 assertNotIncludes(recursiveDocs, "plugins/recursive-context.ts", "docs/recursive-context-mode.md");
 
 const liveEvaluationDocs = read("docs/live-evaluation.md");
+const normalizedLiveEvaluationDocs = liveEvaluationDocs.replace(/\s+/gu, " ");
 for (const needle of [
   "OPENCODE_LIVE_EVAL_ADAPTER",
   "baseline profile",
@@ -841,10 +900,18 @@ for (const needle of [
   "runner/session",
   "artifact bundle",
   "self-described quality outcome",
+  "OPENCODE_QUALITY_CGROUP_*",
+  "OPENCODE_QUALITY_MACOS_*",
+  "production containment abstraction",
+  "cleanup fallbacks",
+  documentedBritishCorpusDetail,
 ]) {
-  assertIncludes(liveEvaluationDocs, needle, "docs/live-evaluation.md", "HARNESS-S057", "Document general live evaluation without making it a default CI dependency.");
+  assertIncludes(normalizedLiveEvaluationDocs, needle, "docs/live-evaluation.md", "HARNESS-S057", "Document general live evaluation without making it a default CI dependency.");
 }
 assertNotIncludes(liveEvaluationDocs, "setup_source", "docs/live-evaluation.md", "HARNESS-S057", "Do not document live-eval setup sources until the runner implements them.");
+for (const stale of ["uses bounded cleanup only", "Neither path is verified containment", "The twelve behavioural scenarios cover"]) {
+  assertNotIncludes(normalizedLiveEvaluationDocs, stale, "docs/live-evaluation.md", "HARNESS-S085", "Remove the pre-containment live-evaluation contract and stale corpus count.");
+}
 for (const [label, text] of [["README.md", read("README.md")], ["docs/evaluation.md", read("docs/evaluation.md")], ["docs/release.md", read("docs/release.md")]]) {
   assertNotIncludes(text, "npm run verify:milestone-2-dod\n", label, "HARNESS-S057", "Use the honest verify:milestone-2-dod-contract command name.");
 }
@@ -857,6 +924,9 @@ for (const needle of [
   "npm run verify",
   "npm run verify:adoption-bundle",
   "npm run verify:runtime",
+  "Node.js 24 or newer",
+  "designated repository-reading",
+  "docs/adoption.md#normal-session-quality-bridge",
   "general live regression evaluation",
   "docs/adoption.md",
   "docs/evaluation.md",
@@ -1151,6 +1221,8 @@ for (const needle of [
   "Harden trusted Node distribution permissions", "-exec chmod go-w {} +", "-perm /022",
   "npm run build:macos-containment", "OPENCODE_QUALITY_MACOS_CONTROLLER",
   "Run configured macOS full verifier",
+  "Verify dedicated macOS workspace Git", "EXPECTED_WORKSPACE_GIT",
+  "runSafeGitObservation(process.cwd(), [\"rev-parse\", \"HEAD\"])",
   "OPENCODE_QUALITY_MACOS_WORKLOAD_UID", "OPENCODE_QUALITY_MACOS_UID_MARKER",
   "opencode-quality-exclusive-uid-v1", 'lease="$marker.lease"',
   "OPENCODE_QUALITY_MACOS_FIXED_GIT_ROOT", "/usr/local/libexec/opencode-quality-git/bin/git",
@@ -1171,6 +1243,7 @@ for (const [needle, expected] of [
   ["OPENCODE_QUALITY_CGROUP_ATTACH_MODE=sudo-helper-v2", 2],
   ["Reject stale Linux worker identity", 1],
   ["Run configured macOS full verifier", 1],
+  ["Verify dedicated macOS workspace Git", 1],
   ["sudo setfacl -m", 2],
   ["sudo setfacl -x", 2],
   ["Harden trusted Node distribution permissions", 2],
@@ -1186,6 +1259,11 @@ for (const [needle, expected] of [
   }
 }
 const aggregateJob = workflowJobBlock("milestone-2-status");
+const aggregateJobDisplayName = /^    name:\s*(.+?)\s*$/mu.exec(aggregateJob)?.[1];
+if (!aggregateJobDisplayName) {
+  fail("HARNESS-S002", ".github/workflows/verify.yml milestone-2-status must have a display name", "Keep the aggregate check name available to release documentation sensors.");
+}
+assertIncludes(releaseReviewSkill, aggregateJobDisplayName, "skills/global-harness-release-review/SKILL.md", "HARNESS-S085", "Keep semantic release review aligned with the workflow-owned aggregate check name.");
 const aggregateStepNames = [...aggregateJob.matchAll(/^      - name:\s*(.+?)\s*$/gmu)].map((match) => match[1]);
 const producerResultGate = aggregateJob.indexOf("Require successful receipt producers");
 const receiptDownload = aggregateJob.indexOf("Download milestone receipt bundles");
@@ -1402,17 +1480,21 @@ for (const commandFile of ["commands/learn.md", "commands/curate-learning.md"]) 
 }
 
 const compatibilityDoc = read("docs/compatibility.md");
-for (const needle of ["`0.3.0`", "Unreleased target", "`v0.2.0`", "Latest tagged release", "no package exports", "opencode-recursive-context", "opencode-learning-guard"]) {
+for (const needle of ["`0.3.0`", "Unreleased target", "`v0.2.0`", "Latest tagged release", "no package exports", "opencode-recursive-context", "opencode-learning-guard", "`0.1.0`", "`0.2.0`"]) {
   assertIncludes(compatibilityDoc, needle, "docs/compatibility.md");
 }
 
 const evaluationDoc = read("docs/evaluation.md");
-for (const needle of ["verify:drift", "verify:runtime", "verify:runtime:fixture", "verify:live-eval", "contract/config evaluation", "Optional general live regression evaluation", "Harness Control Map", "path-boundary sensor", "trace-contract", "budgeted-termination", "subagent-result-schema", "adversarial-fixtures", "static behavior contracts", 'BASELINE_ROOT="/absolute/path/to/baseline"', 'CANDIDATE_ROOT="/absolute/path/to/candidate"', "absolute JSON path", "explicit, validated", "model-neutral runner/session artifact bundle", "standalone self-described outcome or report is never", "production `eval:live` entrypoint keeps the generic", "canonical", "runner-integrated verification", "Windows, Linux, or macOS production verifiers", "host_hook_e2e=failed", "cannot emit an installed-host milestone bundle"]) {
-  assertIncludes(evaluationDoc, needle, "docs/evaluation.md");
+const normalizedEvaluationDoc = evaluationDoc.replace(/\s+/gu, " ");
+for (const needle of ["verify:drift", "verify:runtime", "verify:runtime:fixture", "verify:live-eval", "contract/config evaluation", "Optional general live regression evaluation", "Harness Control Map", "path-boundary sensor", "trace-contract", "budgeted-termination", "subagent-result-schema", "adversarial-fixtures", "static behavior contracts", 'BASELINE_ROOT="/absolute/path/to/baseline"', 'CANDIDATE_ROOT="/absolute/path/to/candidate"', "absolute JSON path", "explicit, validated", "model-neutral runner/session artifact bundle", "standalone self-described outcome or report is never", "production `eval:live` entrypoint keeps the generic", "canonical", "runner-integrated verification", "Windows, Linux, or macOS production verifiers", "host_hook_e2e=failed", "cannot emit an installed-host milestone bundle", documentedCorpusSize, documentedBritishCorpusDetail, "Selected component commands", "NORMAL_SESSION_QUALITY_TOOL_IDS", "Windows uses the built-in Job Object controller", "Linux and macOS must first provision", "An unconfigured host fails closed"]) {
+  assertIncludes(normalizedEvaluationDoc, needle, "docs/evaluation.md");
+}
+for (const stale of ["12+1 corpus", "only the eight `quality_*` tools", "The component commands are:"]) {
+  assertNotIncludes(normalizedEvaluationDoc, stale, "docs/evaluation.md", "HARNESS-S085", "Keep corpus, tool ownership, and verification-stage wording synchronized with executable registries.");
 }
 
 const releaseDoc = read("docs/release.md");
-for (const needle of ["harness-release-review", "guide/sensor coherence", "permission safety", "verify:live-eval", "OPENCODE_BASELINE_PROFILE", "OPENCODE_HARNESS_PROFILE", "defect", 'BASELINE_ROOT="/absolute/path/to/baseline"', 'CANDIDATE_ROOT="/absolute/path/to/candidate"', "absolute artifact path", "only a partial smoke", "must not be passed to `npm run assess:candidate`", "selector-free full run", "`development`, `held_out`, and `canary`", "Windows, Linux, and macOS production verifiers", "Windows, Linux, and macOS producers", "installed/self-hosted job", "sealed `failed` host receipt", "`sudo-helper-v2`", "cannot emit an", "installed-host milestone bundle"]) {
+for (const needle of ["harness-release-review", "guide/sensor coherence", "permission safety", "verify:live-eval", "OPENCODE_BASELINE_PROFILE", "OPENCODE_HARNESS_PROFILE", "defect", 'BASELINE_ROOT="/absolute/path/to/baseline"', 'CANDIDATE_ROOT="/absolute/path/to/candidate"', "absolute artifact path", "only a partial smoke", "must not be passed to `npm run assess:candidate`", "selector-free full run", "`development`, `held_out`, and `canary`", "Windows, Linux, and macOS production verifiers", "Windows, Linux, and macOS producers", "installed/self-hosted job", "sealed `failed` host receipt", "`sudo-helper-v2`", "cannot emit an", "installed-host milestone bundle", aggregateJobDisplayName, "workflow name alone is not a", "process groups and `taskkill` are cleanup"]) {
   assertIncludes(releaseDoc, needle, "docs/release.md");
 }
 const partialLiveRunIndex = releaseDoc.indexOf("npm run eval:live -- --suite development");
@@ -1428,7 +1510,7 @@ if (partialLiveRunIndex === -1 || fullLiveRunIndex === -1 || candidateAssessment
 }
 
 const adoptionDoc = read("docs/adoption.md");
-for (const needle of ["docs/harnessability.md", "npm run verify:runtime", "npm run verify:adoption-bundle", "fixtures/sample-project/", "fixtures/live/", "Harnessability", "Post-Adoption Confidence Levels", "fault injection", "portable-adoption-bundle:start", ".opencode/plugins/engineering-dossier.mjs", ".opencode/quality/checks.json", "lib/feedback", "lib/quality", "opencode-harness/feedback", "opencode-harness/quality", "opencode-harness/quality-plugin", "Do not copy the whole `.opencode/` directory", "sudo-helper-v2", "pidfd", "trusted-toolchain-resolution-v5"]) {
+for (const needle of ["docs/harnessability.md", "npm run verify:runtime", "npm run verify:adoption-bundle", "fixtures/sample-project/", "fixtures/live/", "Harnessability", "Post-Adoption Confidence Levels", "fault injection", "portable-adoption-bundle:start", ".opencode/plugins/engineering-dossier.mjs", ".opencode/quality/checks.json", "lib/feedback", "lib/quality", "opencode-harness/feedback", "opencode-harness/quality", "opencode-harness/quality-plugin", "Do not copy the whole `.opencode/` directory", "sudo-helper-v2", "pidfd", "trusted-toolchain-resolution-v5", "Node.js 24 or newer", "## How The Quality Gate Works", "## Project Configuration", "## Computational Enforcement Boundary", "AssignProcessToJobObject", "OPENCODE_QUALITY_CGROUP_*", "OPENCODE_QUALITY_MACOS_*", "For workspace observation and built-in Node/npm checks", "sanitized `rev-parse`"]) {
   assertIncludes(adoptionDoc, needle, "docs/adoption.md");
 }
 
@@ -1467,14 +1549,15 @@ for (const needle of [
 }
 
 const harnessabilityDoc = read("docs/harnessability.md");
-for (const needle of ["Verification ladder", "evaluation corpus readiness", "hidden checks"]) {
+for (const needle of ["Verification ladder", "evaluation corpus readiness", "hidden checks", "Job Object controller", ".github/workflows/verify.yml"]) {
   assertIncludes(harnessabilityDoc, needle, "docs/harnessability.md");
 }
 
 const highAssuranceWorkflow = read("examples/high-assurance-project/WORKFLOW.md");
-for (const needle of ["Targeted tests", "Shared Mutable State", "High/Critical Order", "does not grant permissions", "Example Safe Allowlist"]) {
+for (const needle of ["Targeted tests", "Shared Mutable State", "High/Critical Order", "does not grant permissions", "## Trusted Project Checks", "QUALITY_NATIVE_BASH_DISABLED", ".opencode/quality/checks.json", "project-checks.example.json"]) {
   assertIncludes(highAssuranceWorkflow, needle, "examples/high-assurance-project/WORKFLOW.md");
 }
+assertNotIncludes(highAssuranceWorkflow, "## Example Safe Allowlist", "examples/high-assurance-project/WORKFLOW.md", "HARNESS-S085", "Do not recommend native Bash allowlists for instrumented quality sessions.");
 
 const liveEvalScript = read("scripts/evaluate-live.mjs");
 for (const needle of [
@@ -1584,6 +1667,7 @@ for (const needle of ["agent-list.txt", "unexpected-agent", "wrongRequiredModeFi
 }
 
 const liveEvalReadme = read("evals/README.md");
+const normalizedLiveEvalReadme = liveEvalReadme.replace(/\s+/gu, " ");
 assertIncludes(liveEvalReadme, 'BASELINE_ROOT="/absolute/path/to/baseline"', "evals/README.md", "HARNESS-S061", "Live-eval examples must identify the baseline evidence root explicitly.");
 assertIncludes(liveEvalReadme, 'CANDIDATE_ROOT="/absolute/path/to/candidate"', "evals/README.md", "HARNESS-S061", "Live-eval examples must identify the candidate evidence root explicitly.");
 assertIncludes(liveEvalReadme, "runner-only `workspace_policy`", "evals/README.md", "HARNESS-S061", "Live-eval README must document runner-owned mutation enforcement.");
@@ -1603,6 +1687,10 @@ assertIncludes(liveEvalReadme, "trace/report directories", "evals/README.md", "H
 assertIncludes(liveEvalReadme, "staged only into absent target paths", "evals/README.md", "HARNESS-S061", "Live-eval README should document hidden check target collision prevention.");
 assertIncludes(liveEvalReadme, "allowlisted sanitized model/tool/cost", "evals/README.md", "HARNESS-S061", "Live-eval README should document the implemented adapter metadata allowlist.");
 assertIncludes(liveEvalReadme, "OPENCODE_BASELINE_PERMISSION_EVIDENCE", "evals/README.md", "HARNESS-S061", "Live-eval README should document content-bound profile evidence.");
+assertIncludes(normalizedLiveEvalReadme, documentedAmericanCorpusDetail, "evals/README.md", "HARNESS-S085", "Keep the documented live corpus synchronized with the executable suite manifest.");
+assertIncludes(liveEvalReadme, "OPENCODE_QUALITY_CGROUP_*", "evals/README.md", "HARNESS-S085", "Document Linux production containment before presenting a live adapter command.");
+assertIncludes(liveEvalReadme, "OPENCODE_QUALITY_MACOS_*", "evals/README.md", "HARNESS-S085", "Document macOS production containment before presenting a live adapter command.");
+assertIncludes(liveEvalReadme, "Cleanup-only process", "evals/README.md", "HARNESS-S085", "Do not present process-group or taskkill cleanup as verified containment.");
 assertIncludes(liveEvalReadme, "symlinks, junctions", "evals/README.md", "HARNESS-S061", "Live-eval README should document physical path confinement.");
 assertIncludes(liveEvalReadme, "transcripts, prompts", "evals/README.md", "HARNESS-S061", "Live-eval README should document transcript and prompt exclusion.");
 assertNotIncludes(liveEvalReadme, "setup source", "evals/README.md", "HARNESS-S061", "Do not document setup source until the runner supports it.");
@@ -1899,15 +1987,23 @@ const changelog = read("CHANGELOG.md");
 assertIncludes(changelog, "## Unreleased (target: 0.3.0)", "CHANGELOG.md");
 assertIncludes(changelog, "## 0.2.0 - 2026-06-15", "CHANGELOG.md");
 assertIncludes(changelog, "## 0.1.0 - 2026-06-15", "CHANGELOG.md");
+assertIncludes(changelog, "macOS exclusive-UID bundles", "CHANGELOG.md", "HARNESS-S085", "Keep the unreleased completion-evidence summary aligned with all mandatory platform producers.");
+assertIncludes(changelog, "Removed macOS runner-image drift from workspace observation", "CHANGELOG.md", "HARNESS-S085", "Keep the fixed workspace Git correction visible in the unreleased contract.");
 
 const codeowners = read("CODEOWNERS");
 assertIncludes(codeowners, "@Tah10n", "CODEOWNERS");
 
 const security = read("SECURITY.md");
 assertIncludes(security, "Reporting a Vulnerability", "SECURITY.md");
+for (const needle of ["trusted toolchain identity", "process-containment boundaries", "same-run receipt provenance", aggregateJobDisplayName, "Redact credentials"]) {
+  assertIncludes(security, needle, "SECURITY.md", "HARNESS-S085", "Keep the security policy aligned with the current trusted execution and evidence boundaries.");
+}
 
 const contributing = read("CONTRIBUTING.md");
 assertIncludes(contributing, "npm run verify", "CONTRIBUTING.md");
+for (const needle of ["Node.js 24 or newer", "npm run verify:runtime", "diagnostic subsets", aggregateJobDisplayName, "Linux, Windows, and macOS producers"]) {
+  assertIncludes(contributing, needle, "CONTRIBUTING.md", "HARNESS-S085", "Keep contributor verification guidance aligned with the full installed and cross-platform gates.");
+}
 
 const privateMarkers = (process.env.HARNESS_FORBIDDEN_MARKERS ?? "")
   .split(",")

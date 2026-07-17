@@ -19,6 +19,8 @@ metadata:
 
 - OS + runtime versions
 - Exact command(s) run
-- Full error output (not paraphrased)
+- Exact relevant error output captured locally; share or persist only redacted,
+  non-sensitive excerpts without credentials, private paths, PII, or raw
+  production payloads
 - Recent changes (git diff / last commits)
 - Boundary check: callers, config, environment, and tests nearest to the failure

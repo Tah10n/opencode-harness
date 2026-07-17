@@ -12,7 +12,7 @@ boundary information for the harness to regulate agent work effectively.
 ## Prerequisites
 
 - OpenCode installed in the target environment.
-- Node.js available for local verification.
+- Node.js 24 or newer for local verification, matching `package.json` and CI.
 - Capability packages configured where the host profile can load them:
   - [`opencode-recursive-context`](https://github.com/Tah10n/opencode-recursive-context)
   - [`opencode-learning-guard`](https://github.com/Tah10n/opencode-learning-guard)
@@ -113,6 +113,14 @@ Run the template verifier before publishing or copying changes:
 ```sh
 npm run verify
 ```
+
+Every child stage uses production process containment. Windows uses the built-in
+Job Object controller. Linux requires the guarded cgroup-v2 delegation and
+`OPENCODE_QUALITY_CGROUP_*` configuration from the `linux-containment` workflow
+job; macOS requires the exclusive-UID controller, marker, lease, and
+`OPENCODE_QUALITY_MACOS_*` configuration from `macos-containment`. An
+unconfigured Linux or macOS host fails closed rather than falling back to a
+process group.
 
 After installing into a live OpenCode configuration, verify the effective
 runtime surface:
@@ -266,7 +274,7 @@ child-session binding and failed-tool cleanup. `permission.ask` is a secondary
 correlation check and never upgrades host policy. A configured architecture
 policy and the project check catalog are fingerprint-bound at session start.
 
-## Как работает quality gate
+## How The Quality Gate Works
 
 Every primary development session begins `unclassified`. The orchestrator must
 call `quality_session_start` before mutation. `standard-lite` is a compact path
@@ -281,7 +289,7 @@ edge/failure mappings, baseline evidence, and both architect and reviewer
 contributions. The plugin computes the gate. The agent cannot set status,
 fingerprints, IDs, verification, attestation, or trusted timestamps.
 
-## Что нужно настроить в проекте
+## Project Configuration
 
 - `.opencode/quality/checks.json` with argv-only real project commands;
 - `.opencode/quality/toolchains.json` with logical executable IDs mapped to
@@ -300,7 +308,8 @@ source walk. Bootstrap workers and native controllers receive only a minimal
 runner-owned environment; ambient `NODE_*`, `LD_*`, `DYLD_*`, and profiler
 injection variables do not cross the pre-containment boundary. On Windows the
 controller opens and retains the worker handle, records creation time, and
-requires a fresh response over the original IPC channel before Job assignment;
+requires a fresh response over the original IPC channel before
+`AssignProcessToJobObject`;
 on Linux the coordinator and watchdog remain outside an exclusive delegated
 cgroup-v2 root. The host must set `OPENCODE_QUALITY_CGROUP_ROOT` and
 `OPENCODE_QUALITY_CGROUP_ATTACH_MODE=sudo-helper-v2`, point
@@ -355,13 +364,14 @@ concurrent scope is rejected by the held lease. A normal logged-in account
 without the protected host marker is intentionally unavailable. The
 `macos-containment` GitHub Actions job is the canonical provisioning and
 receipt example.
-For built-in Node/npm checks, install a singly linked root-owned mode-`0555`
-copy of the canonical host Git binary at
+For workspace observation and built-in Node/npm checks, install a singly linked
+root-owned mode-`0555` copy of the canonical host Git binary at
 `/usr/local/libexec/opencode-quality-git/bin/git`. macOS developer-tool and Homebrew
-Git launch paths can be symlinked shims; the trusted-toolchain resolver does
-not follow those aliases. The CI job resolves a Git source only from bounded
-system/Homebrew/Xcode roots, installs the protected copy, and executes it as
-the workload account before accepting the boundary.
+Git launch paths can be image-dependent or symlinked shims; workspace
+observation and the trusted-toolchain resolver use only the protected copy and
+do not follow those aliases. The CI job resolves a Git source only from bounded
+system/Homebrew/Xcode roots, installs the protected copy, and verifies a
+sanitized `rev-parse` as the workload account before accepting the boundary.
 Also install a singly linked root-owned mode-`0555` copy of the canonical
 system `sh` binary at `/usr/local/libexec/opencode-quality-shell/bin/sh`.
 The npm resolver identity-binds this executable, sets
@@ -416,7 +426,7 @@ of spawn; trusted project-command cwd is also checked before the sync worker,
 after containment readiness, and in the contained child before project code can
 load.
 
-## Что computationally enforced
+## Computational Enforcement Boundary
 
 The plugin enforces registration, classification, gate state, exact ownership,
 one-shot edit/task capabilities, catalog and architecture drift, control

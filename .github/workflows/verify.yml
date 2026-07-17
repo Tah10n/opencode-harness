@@ -563,6 +563,30 @@ jobs:
           done
           sudo -u "$user" /usr/bin/env PATH="$PATH" node --version
 
+      - name: Verify dedicated macOS workspace Git
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo -u "$OPENCODE_QUALITY_RUN_USER" -- /usr/bin/env \
+            HOME="$OPENCODE_QUALITY_RUN_HOME" \
+            PATH="$PATH" \
+            EXPECTED_WORKSPACE_GIT="$OPENCODE_QUALITY_MACOS_FIXED_GIT_ROOT/bin/git" \
+            EXPECTED_HEAD="$GITHUB_SHA" \
+            node --input-type=module -e '
+              import {
+                resolveTrustedGitExecutable,
+                runSafeGitObservation,
+              } from "./lib/quality/normal-session-workspace.mjs";
+              const executable = resolveTrustedGitExecutable();
+              if (executable !== process.env.EXPECTED_WORKSPACE_GIT) {
+                throw new Error("macOS workspace observation selected an unexpected Git executable");
+              }
+              const head = runSafeGitObservation(process.cwd(), ["rev-parse", "HEAD"]).trim();
+              if (head !== process.env.EXPECTED_HEAD) {
+                throw new Error("macOS workspace Git did not observe the checked-out HEAD");
+              }
+            '
+
       - name: Run configured macOS full verifier
         shell: bash
         run: |

@@ -13,6 +13,7 @@ import {
   TRUSTED_TOOLCHAIN_LIMITS,
   TRUSTED_TOOLCHAIN_MAP_PATH,
   TRUSTED_TOOLCHAIN_RESOLVERS,
+  TRUSTED_MACOS_FIXED_GIT_PATH,
   TRUSTED_MACOS_NPM_SCRIPT_SHELL_PATH,
   assertProtectedMacosFixedExecutable,
   assertTrustedToolchainCommandBinding,
@@ -34,7 +35,7 @@ const trustedToolchainsSource = fs.readFileSync(
   "utf8",
 );
 const fixedMacosGitCandidate = trustedToolchainsSource.indexOf(
-  'return ["/usr/local/libexec/opencode-quality-git/bin/git"];',
+  "return [TRUSTED_MACOS_FIXED_GIT_PATH];",
 );
 const protectedMacosToolStart = trustedToolchainsSource.indexOf("function assertProtectedMacosFixedExecutable");
 const resolveFixedGitStart = trustedToolchainsSource.indexOf("function resolveFixedGit");
@@ -56,6 +57,11 @@ assert(protectedMacosToolStart >= 0
   && protectedMacosToolSource.includes("operations.writable")
   && resolveFixedGitSource.includes('assertProtectedMacosFixedExecutable(candidate, "trusted fixed auxiliary Git")'),
 "macOS fixed host executables must fail closed on wrong ownership, mode, links, or writable ancestry");
+assert.equal(
+  TRUSTED_MACOS_FIXED_GIT_PATH,
+  "/usr/local/libexec/opencode-quality-git/bin/git",
+  "macOS Git must use the exact protected fixed executable",
+);
 assert.equal(
   TRUSTED_MACOS_NPM_SCRIPT_SHELL_PATH,
   "/usr/local/libexec/opencode-quality-shell/bin/sh",

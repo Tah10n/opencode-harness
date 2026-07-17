@@ -13,6 +13,12 @@ tagged capability until a `v0.3.0` release completes these gates.
    npm run verify
    ```
 
+   Windows uses the built-in Job Object controller. Before running this gate on
+   Linux or macOS, provision the guarded cgroup-v2 or exclusive-UID boundary
+   exactly as the corresponding `.github/workflows/verify.yml` job does.
+   Unconfigured hosts fail closed; process groups and `taskkill` are cleanup
+   fallbacks, not release evidence.
+
    For package, fixture, or adoption-boundary changes, the default gate includes
    `npm run verify:adoption-bundle`; it must pass from its isolated temporary
    copy without a live provider.
@@ -196,8 +202,11 @@ Create a GitHub Release from the pushed tag and include:
 
 ## Branch Protection
 
-The `main` branch should require the `Verify` GitHub Actions check, block force
-pushes, and require pull requests for non-admin changes.
+The `main` branch should require the `Milestone 2 receipt aggregation` check
+from the `Verify` workflow, block force pushes, and require pull requests for
+non-admin changes. That aggregate check depends on successful deterministic,
+Linux, Windows, and macOS receipt producers; the workflow name alone is not a
+branch-protection context.
 
 ## Engineering quality release checks
 

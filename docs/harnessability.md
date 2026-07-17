@@ -40,9 +40,13 @@ A project is strongly harnessable when it also has:
 1. Add or update `WORKFLOW.md` with the project's commands and safety notes.
 2. Add project-local skills only for recurring workflows that are not already
    covered by the global harness.
-3. Run `npm run verify` in this template before copying changes.
-4. Copy the profile into the host OpenCode configuration.
-5. Run `npm run verify:runtime` from this repository against the installed
+3. Provision the production process-containment boundary for the verification
+   host. Windows uses the built-in Job Object controller; Linux and macOS must
+   follow the corresponding `.github/workflows/verify.yml` cgroup-v2 or
+   exclusive-UID provisioning contract.
+4. Run `npm run verify` in this template before copying changes.
+5. Copy the profile into the host OpenCode configuration.
+6. Run `npm run verify:runtime` from this repository against the installed
    profile, or run the equivalent `opencode debug` commands manually.
-6. Treat every repeated agent failure as a candidate for a new guide, a new
+7. Treat every repeated agent failure as a candidate for a new guide, a new
    deterministic sensor, or a project-local fixture.

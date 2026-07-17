@@ -18,7 +18,7 @@ outside the default model-free gate.
 
 | Layer | Command | What it proves | What it does not prove |
 | --- | --- | --- | --- |
-| Deterministic repository verification | `npm run verify` | Static structure, feedback foundation, trace store, immutable report history, adapter process-tree boundary, contract/config evaluation, drift, runtime parser fixtures, 12+1 corpus validation, infrastructure tracing self-test, and acceptance-engine self-tests. It requires no model, network, or installed live adapter. | Actual model behaviour or the installed profile. |
+| Deterministic repository verification | `npm run verify` | Static structure, feedback foundation, trace store, immutable report history, adapter process-tree boundary, contract/config evaluation, drift, runtime parser fixtures, 24+1 corpus validation, infrastructure tracing self-test, and acceptance-engine self-tests. It requires no model, network, or installed live adapter. | Actual model behaviour or the installed profile. |
 | Installed permission surface | `npm run verify:runtime` | Current `opencode debug` output and effective tool/delegation permissions. | End-to-end task quality. |
 | Actual behavioural evaluation | `npm run eval:live` | Real adapter/model/tool behaviour on isolated baseline/candidate copies with hidden evidence. | Deterministic CI assurance or permission compatibility by itself. |
 | Candidate decision | `npm run assess:candidate` | Deterministic, policy-backed `accepted`, `rejected`, or `inconclusive` decision over trusted paired evidence. | Automatic harness mutation or deployment. |
@@ -37,7 +37,12 @@ Run the complete local/CI gate:
 npm run verify
 ```
 
-The component commands are:
+Windows uses the built-in Job Object controller. Linux and macOS must first
+provision the production cgroup-v2 or exclusive-UID containment contract shown
+in the corresponding `.github/workflows/verify.yml` jobs. An unconfigured host
+fails closed; process groups and `taskkill` are not successful containment.
+
+Selected component commands are:
 
 - `npm run verify:static` — structural prompt/config/docs contracts;
 - `npm run verify:feedback-foundation` — canonical data, privacy, atomic file
@@ -53,7 +58,7 @@ The component commands are:
 - `npm run verify:adoption-bundle` — isolated source-bundle copy, public export
   import, manifest validation, and buffered self-test without a live provider;
 - `npm run verify:runtime:fixture` — deterministic parser fixtures only;
-- `npm run verify:live-manifests` — exact 12+1 corpus, suites, selection, and
+- `npm run verify:live-manifests` — exact 24+1 corpus, suites, selection, and
   declarative trace assertions;
 - `npm run verify:live-eval` — manifest validation plus infrastructure runner
   self-tests without a model, including a no-process in-memory/batch-commit test
@@ -207,11 +212,16 @@ termination schemas, structured subagent handoff, and static adversarial
 fixtures.
 
 The live corpus under `fixtures/live/`, `evals/scenarios/`, and
-`evals/hidden/` adds twelve distinct behavioural mechanisms: small local work,
-broad audit, visible-plus-hidden bug, related call path, read-only review,
-prompt-injection data, fake secret bait, stale context, conflicting write
-scope, weak handoff, project-local knowledge, and approval-gated destructive
-work. See [live-evaluation.md](live-evaluation.md).
+`evals/hidden/` has 24 behavioural scenarios plus 1 infrastructure self-test.
+Twelve scenarios cover orchestration and safety: small local work, broad audit,
+visible-plus-hidden bugs, related call paths, read-only review, prompt-injection
+data, fake secret bait, stale context, conflicting write scope, weak handoff,
+project-local knowledge, and approval-gated destructive work. Twelve additional
+engineering-quality scenarios cover small controls, public API compatibility,
+persistence and rollback, migration, resource lifecycle, concurrency and
+cancellation, retry/idempotency, parser boundaries, stale cache/version skew,
+partial dependency failure, architecture boundaries, and cross-module
+invariants. See [live-evaluation.md](live-evaluation.md).
 
 ## Operational Versus Durable Memory
 
@@ -238,7 +248,8 @@ Live-evaluation mode
   assertions.
 
 The project-local `.opencode/plugins/engineering-dossier.mjs` bridge exposes
-only the eight `quality_*` tools documented in the README. Agents can author
+the `quality_*` tools defined by the authoritative
+`NORMAL_SESSION_QUALITY_TOOL_IDS` list. Agents can author
 dossier content, but runner-owned code derives workspace fingerprints, evaluates
 the gate, issues one-shot capabilities, validates canonical verification
 receipts, and creates the final attestation. Finalizing a dossier does not pass
@@ -371,7 +382,8 @@ npm run verify
 ```
 
 It requires no model, credentials, network, live adapter, or installed OpenCode
-runtime. The normal-session bridge, classification, catalog, trusted runner,
+runtime. The platform containment prerequisite described above still applies.
+The normal-session bridge, classification, catalog, trusted runner,
 bounded workspace observer, trusted toolchain resolver, process-containment
 contract, native-Bash denial, public plugin export, canonical-target, and
 deterministic runtime-fixture checks are stages inside that aggregate. The
