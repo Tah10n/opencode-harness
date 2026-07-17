@@ -306,9 +306,12 @@ cgroup-v2 root. The host must set `OPENCODE_QUALITY_CGROUP_ROOT` and
 `OPENCODE_QUALITY_CGROUP_ATTACH_MODE=sudo-helper-v2`, point
 `OPENCODE_QUALITY_CGROUP_ATTACH_HELPER` at a protected host-owned executable,
 and grant the dedicated workload principal permission to invoke only that
-helper. Build `native/linux-cgroup-attach-helper.c` for the host with the
-dedicated workload UID and
-`<root>/opencode-quality-workload/cgroup.procs` destination embedded, then
+helper. Build `native/linux-cgroup-attach-helper.c` for the host with
+`npm run build:linux-cgroup-attach -- --out <canonical-absolute-output> --uid <dedicated-uid> --control <canonical-absolute-cgroup.procs>`.
+Both path arguments reject every ASCII control character (`U+0000` through
+`U+001F` and `U+007F`) before compiler selection. The command embeds the
+dedicated workload UID and `<root>/opencode-quality-workload/cgroup.procs`
+destination, then
 install it root-owned, singly linked, executable, and non-group/world-writable
 outside the delegated root. The parent first proves the original idle worker
 through a one-shot IPC challenge. The v2 helper accepts only that bounded PID,

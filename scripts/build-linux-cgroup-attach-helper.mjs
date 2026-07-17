@@ -4,7 +4,11 @@ import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 
-function parseArguments(argv) {
+export function containsAsciiControlCharacter(value) {
+  return typeof value === "string" && /[\u0000-\u001f\u007f]/u.test(value);
+}
+
+export function parseArguments(argv, { platform = process.platform } = {}) {
   const result = { out: null, uid: null, control: null };
   for (let index = 0; index < argv.length; index += 1) {
     const option = argv[index];
@@ -13,10 +17,10 @@ function parseArguments(argv) {
     else if (option === "--control" && result.control === null) result.control = argv[++index] ?? null;
     else throw new Error(`unsupported Linux helper build argument: ${option}`);
   }
-  if (process.platform !== "linux") throw new Error("Linux cgroup attach helper can only be built on Linux");
+  if (platform !== "linux") throw new Error("Linux cgroup attach helper can only be built on Linux");
   if (typeof result.out !== "string" || !path.isAbsolute(result.out)
     || path.normalize(result.out) !== result.out || path.resolve(result.out) !== result.out
-    || result.out.includes("\0") || Buffer.byteLength(result.out, "utf8") > 4096) {
+    || containsAsciiControlCharacter(result.out) || Buffer.byteLength(result.out, "utf8") > 4096) {
     throw new Error("--out must be a canonical absolute path");
   }
   if (fs.existsSync(result.out)) throw new Error("Linux helper output already exists");
@@ -26,7 +30,7 @@ function parseArguments(argv) {
   }
   if (typeof result.control !== "string" || !path.isAbsolute(result.control)
     || path.normalize(result.control) !== result.control || path.resolve(result.control) !== result.control
-    || result.control.includes("\0") || Buffer.byteLength(result.control, "utf8") > 4096) {
+    || containsAsciiControlCharacter(result.control) || Buffer.byteLength(result.control, "utf8") > 4096) {
     throw new Error("--control must be a bounded canonical absolute path");
   }
   if (typeof result.uid !== "string" || !/^[1-9][0-9]*$/u.test(result.uid)
@@ -68,12 +72,16 @@ function trustedCompiler() {
   throw new Error("a protected fixed system C compiler is required");
 }
 
-function main() {
-  const options = parseArguments(process.argv.slice(2));
+export function buildLinuxCgroupAttachHelper(argv, {
+  platform = process.platform,
+  resolveCompiler = trustedCompiler,
+  spawnCompiler = spawnSync,
+} = {}) {
+  const options = parseArguments(argv, { platform });
   const source = fileURLToPath(new URL("../native/linux-cgroup-attach-helper.c", import.meta.url));
-  const compiler = trustedCompiler();
+  const compiler = resolveCompiler();
   const parent = fs.realpathSync.native(path.dirname(options.out));
-  const execution = spawnSync(compiler, [
+  const execution = spawnCompiler(compiler, [
     "-std=c11", "-O2", "-Wall", "-Wextra", "-Werror", "-fstack-protector-strong",
     "-D_FORTIFY_SOURCE=2", "-fPIE", "-pie",
     `-DOPENCODE_EXPECTED_UID=${options.uid}`,
@@ -104,12 +112,25 @@ function main() {
     throw new Error("Linux helper build output is invalid");
   }
   fs.chmodSync(options.out, 0o555);
-  console.log(`Built Linux cgroup attach helper: ${options.out}`);
+  return options.out;
 }
 
-try {
-  main();
-} catch (error) {
-  console.error(`Linux cgroup attach helper build failed: ${error.message}`);
-  process.exitCode = 1;
+function isMainModule() {
+  if (typeof process.argv[1] !== "string") return false;
+  const modulePath = fileURLToPath(import.meta.url);
+  try {
+    return fs.realpathSync.native(process.argv[1]) === fs.realpathSync.native(modulePath);
+  } catch {
+    return path.resolve(process.argv[1]) === modulePath;
+  }
+}
+
+if (isMainModule()) {
+  try {
+    const output = buildLinuxCgroupAttachHelper(process.argv.slice(2));
+    console.log(`Built Linux cgroup attach helper: ${output}`);
+  } catch (error) {
+    console.error(`Linux cgroup attach helper build failed: ${error.message}`);
+    process.exitCode = 1;
+  }
 }

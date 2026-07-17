@@ -23,6 +23,10 @@ import {
   sealMilestone2OperationalReport,
   writeMilestone2OperationalReportFromEnvironment,
 } from "../lib/quality/milestone-operational-report.mjs";
+import {
+  buildLinuxCgroupAttachHelper,
+  containsAsciiControlCharacter,
+} from "./build-linux-cgroup-attach-helper.mjs";
 
 const pause = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 const canonicalTempBase = fs.realpathSync.native(os.tmpdir());
@@ -63,6 +67,117 @@ for (const required of [
 assert(linuxAttachHelperSource.indexOf("pidfd_signal(pidfd, SIGSTOP)")
   < linuxAttachHelperSource.lastIndexOf("identity_matches(&identity, expected_start_ticks)"),
 "native Linux helper must revalidate worker identity after SIGSTOP");
+
+const helperBuildFixtureRoot = temporaryDirectory("opencode-linux-helper-build-");
+try {
+  const validOutput = path.join(helperBuildFixtureRoot, "valid-helper");
+  const validControl = path.join(helperBuildFixtureRoot, "control path", "cgroup.procs");
+  let compilerSelections = 0;
+  let compilerSpawns = 0;
+  let compilerInvocation = null;
+  assert.equal(containsAsciiControlCharacter(validOutput), false);
+  assert.equal(containsAsciiControlCharacter(validControl), false);
+  assert.equal(buildLinuxCgroupAttachHelper([
+    "--out", validOutput,
+    "--uid", "1000",
+    "--control", validControl,
+  ], {
+    platform: "linux",
+    resolveCompiler: () => {
+      compilerSelections += 1;
+      return path.join(helperBuildFixtureRoot, "trusted-cc");
+    },
+    spawnCompiler: (file, args, options) => {
+      compilerSpawns += 1;
+      compilerInvocation = { file, args, options };
+      fs.writeFileSync(validOutput, "fixture helper\n", "utf8");
+      return { error: undefined, signal: null, status: 0 };
+    },
+  }), validOutput);
+  assert.equal(compilerSelections, 1, "valid helper input did not select exactly one compiler");
+  assert.equal(compilerSpawns, 1, "valid helper input did not invoke exactly one compiler");
+  assert.equal(compilerInvocation.options.shell, false, "helper compiler must not use a shell");
+  assert.equal(compilerInvocation.options.cwd, helperBuildFixtureRoot);
+  assert.equal(compilerInvocation.args.at(-1), validOutput, "compiler output path semantics changed");
+  const controlDefine = compilerInvocation.args.find((argument) => (
+    argument.startsWith("-DOPENCODE_CGROUP_CONTROL=")
+  ));
+  assert.equal(
+    JSON.parse(controlDefine.slice("-DOPENCODE_CGROUP_CONTROL=".length)),
+    validControl,
+    "compiler control-path define did not preserve the validated path",
+  );
+  const fixtureIdentity = fs.lstatSync(validOutput, { bigint: true });
+  assert(fixtureIdentity.isFile() && !fixtureIdentity.isSymbolicLink() && fixtureIdentity.nlink === 1n);
+
+  const controlLabels = new Map([
+    [0x00, "NUL"],
+    [0x09, "TAB"],
+    [0x0a, "LF"],
+    [0x0d, "CR"],
+    [0x1b, "ESC"],
+    [0x7f, "DEL"],
+  ]);
+  const asciiControls = [
+    ...Array.from({ length: 0x20 }, (_, codePoint) => codePoint),
+    0x7f,
+  ];
+  for (const codePoint of asciiControls) {
+    const character = String.fromCodePoint(codePoint);
+    const label = controlLabels.get(codePoint) ?? `U+${codePoint.toString(16).padStart(4, "0")}`;
+    assert.equal(containsAsciiControlCharacter(character), true, `${label} was not classified as ASCII control`);
+    for (const field of ["out", "control"]) {
+      const caseDirectory = path.join(helperBuildFixtureRoot, `${field}-${codePoint}`);
+      fs.mkdirSync(caseDirectory);
+      const output = field === "out"
+        ? path.join(caseDirectory, `helper${character}`)
+        : path.join(caseDirectory, "helper");
+      const control = field === "control"
+        ? path.join(caseDirectory, `cgroup${character}.procs`)
+        : path.join(caseDirectory, "cgroup.procs");
+      let invalidCompilerSelections = 0;
+      let invalidCompilerSpawns = 0;
+      assert.throws(() => buildLinuxCgroupAttachHelper([
+        "--out", output,
+        "--uid", "1000",
+        "--control", control,
+      ], {
+        platform: "linux",
+        resolveCompiler: () => {
+          invalidCompilerSelections += 1;
+          return path.join(helperBuildFixtureRoot, "trusted-cc");
+        },
+        spawnCompiler: () => {
+          invalidCompilerSpawns += 1;
+          return { error: undefined, signal: null, status: 0 };
+        },
+      }), /canonical absolute path/u, `${label} in --${field} was accepted`);
+      assert.equal(invalidCompilerSelections, 0, `${label} in --${field} selected a compiler`);
+      assert.equal(invalidCompilerSpawns, 0, `${label} in --${field} invoked a compiler`);
+      assert.deepEqual(fs.readdirSync(caseDirectory), [], `${label} in --${field} left output behind`);
+    }
+  }
+
+  if (process.platform === "linux") {
+    const realOutput = path.join(helperBuildFixtureRoot, "real-helper");
+    const realControl = path.join(helperBuildFixtureRoot, "real-cgroup.procs");
+    buildLinuxCgroupAttachHelper([
+      "--out", realOutput,
+      "--uid", "1000",
+      "--control", realControl,
+    ]);
+    const realIdentity = fs.lstatSync(realOutput, { bigint: true });
+    assert(realIdentity.isFile(), "real Linux helper output is not a regular file");
+    assert(!realIdentity.isSymbolicLink(), "real Linux helper output is a symlink");
+    assert.equal(realIdentity.nlink, 1n, "real Linux helper output is multiply linked");
+    assert((realIdentity.mode & 0o111n) !== 0n, "real Linux helper output is not executable");
+    assert.equal(realIdentity.mode & 0o022n, 0n, "real Linux helper output is group/world writable");
+    assert.equal(realIdentity.mode & 0o777n, 0o555n, "real Linux helper output mode is not 0555");
+  }
+} finally {
+  fs.rmSync(helperBuildFixtureRoot, { recursive: true, force: true });
+}
+
 const macosMarkerValidation = macosControllerSource.indexOf("validate_uid_marker(marker_path, workload_uid)");
 const macosLeaseAcquisition = macosControllerSource.indexOf("acquire_uid_lease(lease_path, workload_uid)");
 const macosScopeCapture = macosControllerSource.indexOf("capture_scope(coordinator_pid, worker_pid, probe, &scope)");
@@ -826,6 +941,16 @@ const windowsUnexpectedInputError = await preparePlatformProcessContainment({ pi
 assert.equal(await windowsUnexpectedInputError.terminateAndVerify(100), false);
 assert.equal(windowsUnexpectedInputError.status().failure, "process_containment_failed");
 
+const windowsExpectedInputCloseError = await preparePlatformProcessContainment({ pid: 4242 }, 100, {
+  platform: "win32",
+  windowsPowerShellIdentity: windowsIdentity,
+  spawnController: () => createFakeWindowsController({ stdinErrorOnEnd: "EPIPE" }),
+  scopeIdFactory: () => "windows-job-expected-input-close-error",
+});
+assert.equal(await windowsExpectedInputCloseError.terminateAndVerify(100), false);
+assert.equal(windowsExpectedInputCloseError.status().teardown_verified, false);
+assert.equal(windowsExpectedInputCloseError.status().failure, "process_containment_failed");
+
 let identityReads = 0;
 const driftingOptions = {
   platform: "win32",
@@ -918,6 +1043,15 @@ const macosUnexpectedInputError = await preparePlatformProcessContainment({ pid:
 });
 assert.equal(await macosUnexpectedInputError.terminateAndVerify(100), false);
 assert.equal(macosUnexpectedInputError.status().failure, "process_containment_failed");
+
+const macosExpectedInputCloseError = await preparePlatformProcessContainment({ pid: 4242 }, 100, {
+  ...macosOptions,
+  spawnMacosController: () => createFakeMacosController({ stdinErrorOnEnd: "EPIPE" }),
+  scopeIdFactory: () => "macos-exclusive-uid-expected-input-close-error",
+});
+assert.equal(await macosExpectedInputCloseError.terminateAndVerify(100), false);
+assert.equal(macosExpectedInputCloseError.status().teardown_verified, false);
+assert.equal(macosExpectedInputCloseError.status().failure, "process_containment_failed");
 
 let macosIdentityReads = 0;
 const driftingMacosOptions = {
@@ -1348,6 +1482,52 @@ assert.equal(managedResult.teardown_verified, true);
 assert.deepEqual(managedResult.containment_identity, managedIdentity);
 assert.equal(managedResult.containment_state.teardown_verified, true);
 
+function assertInheritedCwdRaceOutcome({
+  result,
+  swapped,
+  swapBlockedCode,
+  platform,
+  retainedContent = null,
+  replacementExists = null,
+  activeContent = null,
+}) {
+  if (swapped && result.status === null) {
+    assert.equal(result.error?.code, "PROCESS_WORKING_DIRECTORY_CHANGED", JSON.stringify(result));
+  } else if (swapped) {
+    assert.equal(result.status, 0, JSON.stringify(result));
+    assert.equal(retainedContent, "original", "contained command did not inherit the already-open original cwd");
+    assert.equal(replacementExists, false, "contained command re-resolved the replaced cwd path");
+  } else {
+    assert.equal(result.status, 0, JSON.stringify(result));
+    assert.equal(platform, "win32", "cwd replacement was unexpectedly blocked off Windows");
+    assert(["EACCES", "EBUSY", "EPERM"].includes(swapBlockedCode),
+      `Windows blocked cwd replacement with unexpected code ${swapBlockedCode}`);
+    assert.equal(activeContent, "original", "command did not execute from the OS-protected original Windows cwd");
+  }
+}
+
+assertInheritedCwdRaceOutcome({
+  result: { status: null, error: { code: "PROCESS_WORKING_DIRECTORY_CHANGED" } },
+  swapped: true,
+  swapBlockedCode: null,
+  platform: "linux",
+});
+assertInheritedCwdRaceOutcome({
+  result: { status: 0, error: null },
+  swapped: true,
+  swapBlockedCode: null,
+  platform: "linux",
+  retainedContent: "original",
+  replacementExists: false,
+});
+assertInheritedCwdRaceOutcome({
+  result: { status: 0, error: null },
+  swapped: false,
+  swapBlockedCode: "EBUSY",
+  platform: "win32",
+  activeContent: "original",
+});
+
 const inheritedCwdRoot = temporaryDirectory("opencode-inherited-cwd-");
 try {
   const activeCwd = path.join(inheritedCwdRoot, "active");
@@ -1408,36 +1588,21 @@ try {
     },
   });
   assert.equal(inheritedCwdResult.teardown_verified, true);
-  if (swapped && inheritedCwdResult.status === null) {
-    assert.equal(
-      inheritedCwdResult.error?.code,
-      "PROCESS_WORKING_DIRECTORY_CHANGED",
-      JSON.stringify(inheritedCwdResult),
-    );
-  } else {
-    assert.equal(inheritedCwdResult.status, 0, JSON.stringify(inheritedCwdResult));
-  }
-  if (swapped && inheritedCwdResult.status === 0) {
-    assert.equal(
-      fs.readFileSync(path.join(retainedCwd, "executed.txt"), "utf8"),
-      "original",
-      "contained command did not inherit the already-open original cwd",
-    );
-    assert.equal(
-      fs.existsSync(path.join(activeCwd, "executed.txt")),
-      false,
-      "contained command re-resolved the replaced cwd path",
-    );
-  } else {
-    assert.equal(process.platform, "win32", "cwd replacement was unexpectedly blocked off Windows");
-    assert(["EACCES", "EBUSY", "EPERM"].includes(swapBlockedCode),
-      `Windows blocked cwd replacement with unexpected code ${swapBlockedCode}`);
-    assert.equal(
-      fs.readFileSync(path.join(activeCwd, "executed.txt"), "utf8"),
-      "original",
-      "command did not execute from the OS-protected original Windows cwd",
-    );
-  }
+  assertInheritedCwdRaceOutcome({
+    result: inheritedCwdResult,
+    swapped,
+    swapBlockedCode,
+    platform: process.platform,
+    retainedContent: swapped && inheritedCwdResult.status === 0
+      ? fs.readFileSync(path.join(retainedCwd, "executed.txt"), "utf8")
+      : null,
+    replacementExists: swapped && inheritedCwdResult.status === 0
+      ? fs.existsSync(path.join(activeCwd, "executed.txt"))
+      : null,
+    activeContent: !swapped
+      ? fs.readFileSync(path.join(activeCwd, "executed.txt"), "utf8")
+      : null,
+  });
 } finally {
   fs.rmSync(inheritedCwdRoot, { recursive: true, force: true });
 }
