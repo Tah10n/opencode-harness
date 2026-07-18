@@ -24,8 +24,19 @@
     "quality-persistence-rollback-architecture-respected",
     "quality-persistence-rollback-ownership-respected",
     "quality-persistence-rollback-integrated-verification",
-    "quality-persistence-rollback-valid-completion"
+    "quality-persistence-rollback-valid-completion",
+    "quality-persistence-rollback-context-strategy-before-edit",
+    "quality-persistence-rollback-context-receipts-bound",
+    "quality-persistence-rollback-context-report-before-edit",
+    "quality-persistence-rollback-context-direct-transitive-paths",
+    "quality-persistence-rollback-context-exclusions-evidenced",
+    "quality-persistence-rollback-context-critical-paths-deep",
+    "quality-persistence-rollback-context-unknowns-resolved",
+    "quality-persistence-rollback-context-verification-linked",
+    "quality-persistence-rollback-context-discovery-bounded",
+    "quality-persistence-rollback-context-ownership",
+    "quality-persistence-rollback-context-final-reconciliation"
   ],
   "suite": "held_out",
-  "fixture_fingerprint": "9c8bd8483ae77979c1842f7cd02eea2477bbd2f8f84408472dbc097bb68c0cec"
+  "fixture_fingerprint": "e3fa199d8cbbf1695c14826d2777cac4b45b73b79adc0d9c3bbd9dcd6c2d5aa8"
 }

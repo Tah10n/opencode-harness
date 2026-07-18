@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "sidecar_version": "1.0.0",
+  "scenario_id": "quality-hidden-reexport-consumer",
+  "seeded_defect": "The display helper reuses the uppercase public normalizer, so the lowercase display contract fails before implementation.",
+  "visible_oracle": { "command": "node --test test/visible.test.mjs", "seeded_status": "failed" },
+  "bad_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-hidden-reexport-consumer/bad/token.mjs", "target": "src/token.mjs", "sha256": "fd5b11cdf81e82be559d4f453dc0e194c8b94610a9f513dbab144621fd06f6de" }
+  ] },
+  "compliant_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-hidden-reexport-consumer/good/token.mjs", "target": "src/token.mjs", "sha256": "14c6aed72cde2d647feb7c2d2b483d1251379eb127132d51a12f71430a26dbf6" }
+  ] },
+  "hidden_counterexample": "A worker imports the token through a package re-export and still requires the legacy uppercase key.",
+  "forbidden_regression": "Do not change the API package re-export or its uppercase consumer contract.",
+  "risk_class": "high",
+  "workload_class": "hidden-reexport-consumer",
+  "expected_ownership": ["src/token.mjs"],
+  "required_quality_assertion_ids": [
+    "quality-hidden-reexport-consumer-dossier-before-edit",
+    "quality-hidden-reexport-consumer-gate-before-edit",
+    "quality-hidden-reexport-consumer-coverage-recorded",
+    "quality-hidden-reexport-consumer-unknowns-resolved",
+    "quality-hidden-reexport-consumer-mapping-verified",
+    "quality-hidden-reexport-consumer-architecture-respected",
+    "quality-hidden-reexport-consumer-ownership-respected",
+    "quality-hidden-reexport-consumer-integrated-verification",
+    "quality-hidden-reexport-consumer-valid-completion"
+  ],
+  "suite": "development",
+  "fixture_fingerprint": "5ca1669ea91d81dba32773e7946e8fa7fb00341aa1fa7237ce290d6bcc2b2b86"
+}

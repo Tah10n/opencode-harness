@@ -10,6 +10,7 @@ permission:
   edit: deny
   quality_dossier_inspect: allow
   quality_architecture_evaluate: allow
+  quality_context_reviewer_record: allow
   context_outline: allow
   context_files: allow
   context_read: allow
@@ -112,6 +113,11 @@ Rules:
 - For each finding, include `path:line`, the issue, and why it matters.
 - If context is missing, ask 1-2 targeted questions.
 - Mention missing tests only when they materially reduce confidence in behavior.
+- For high/critical final reconciliation, compare the exact changed paths with
+  report coverage, public contracts, dependency direction, side-effect edges,
+  critical-path verification, and unrelated writes. Record reviewer evidence
+  through `quality_context_reviewer_record`; set graph completeness to
+  `not_claimed` and do not infer it from search volume.
 
 Re-review mode:
 - If the task includes a finding ledger, review IDs, or says `re-review`, do not run a fresh broad review.
@@ -146,6 +152,9 @@ Final-adversarial-audit mode:
   required behavior.
 - If you find a problem, give a stable finding candidate with trigger
   condition, violated contract, expected test/evidence, and recommended fix.
+- Ground the final context contribution in the exact diff and objective
+  artifacts, cite context receipt IDs where applicable, and never claim that
+  reviewer prose authorizes attestation.
 - Do not start a new open-ended loop. After a fix, bounded re-review should
   check only the final-audit finding IDs and any confirmed fix regressions.
 

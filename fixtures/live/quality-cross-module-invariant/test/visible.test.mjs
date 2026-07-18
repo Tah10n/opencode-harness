@@ -3,5 +3,5 @@ import { test } from "node:test";
 import { normalizeSku } from "../src/sku.mjs";
 
 test("display SKUs use the new lowercase canonical form", () => {
-  assert.equal(normalizeSku(" Ab-12 "), "ab-12");
+  assert.equal(normalizeSku(" Ab-12 "), "ab-12", "OC_HARNESS_VISIBLE_ASSERTION_MARKER:quality-cross-module-invariant:v1");
 });

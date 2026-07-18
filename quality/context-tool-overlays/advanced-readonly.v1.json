@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "overlay_version": "1.0.0",
+  "overlay_id": "advanced-readonly-v1",
+  "mode": "optional-host-overlay",
+  "portable_default_unchanged": true,
+  "portable_default_tools": [
+    "context_files",
+    "context_outline",
+    "context_read",
+    "context_search"
+  ],
+  "advanced_tool_grants": [
+    { "tool_id": "context_batch_read", "access": "allow", "capability": "read_only" },
+    { "tool_id": "context_map", "access": "allow", "capability": "read_only" },
+    { "tool_id": "context_related", "access": "allow", "capability": "read_only" },
+    { "tool_id": "context_symbols", "access": "allow", "capability": "read_only" }
+  ],
+  "allowed_risk_classes": ["critical", "high"],
+  "forbidden_capabilities": ["network", "shell", "write"],
+  "persistence_behavior": "unchanged",
+  "installed_runtime_states": [
+    "advanced_available",
+    "advanced_unavailable",
+    "minimal_available",
+    "unsupported_host_schema"
+  ]
+}

@@ -24,8 +24,19 @@
     "quality-stale-cache-version-skew-architecture-respected",
     "quality-stale-cache-version-skew-ownership-respected",
     "quality-stale-cache-version-skew-integrated-verification",
-    "quality-stale-cache-version-skew-valid-completion"
+    "quality-stale-cache-version-skew-valid-completion",
+    "quality-stale-cache-version-skew-context-strategy-before-edit",
+    "quality-stale-cache-version-skew-context-receipts-bound",
+    "quality-stale-cache-version-skew-context-report-before-edit",
+    "quality-stale-cache-version-skew-context-direct-transitive-paths",
+    "quality-stale-cache-version-skew-context-exclusions-evidenced",
+    "quality-stale-cache-version-skew-context-critical-paths-deep",
+    "quality-stale-cache-version-skew-context-unknowns-resolved",
+    "quality-stale-cache-version-skew-context-verification-linked",
+    "quality-stale-cache-version-skew-context-discovery-bounded",
+    "quality-stale-cache-version-skew-context-ownership",
+    "quality-stale-cache-version-skew-context-final-reconciliation"
   ],
   "suite": "held_out",
-  "fixture_fingerprint": "f5874fc3e8f014f343007cf78758a8b0eef146a267ad2aedef7e29c768bb9d7a"
+  "fixture_fingerprint": "7fdf71422c1618db63c9d6194506d11560b787489c4e28acf34e23130e1fd1fd"
 }

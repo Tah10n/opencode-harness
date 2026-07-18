@@ -276,7 +276,38 @@ const baseGraph = buildEngineeringImpactGraph(baseGraphInput());
 for (const schema of [impactSchema, policySchema, evaluationSchema, postEvidenceSchema]) {
   assert.equal(schema.$schema, "https://json-schema.org/draft/2020-12/schema");
   assert.equal(schema.additionalProperties, false);
-  assert.equal(schema.properties.schema_version.const, 1);
+}
+assert.deepEqual(
+  [impactSchema, policySchema, evaluationSchema, postEvidenceSchema].map((schema) => schema.properties.schema_version.const),
+  [1, 1, 1, 3],
+  "architecture artifact schema versions must match their current writers",
+);
+assert.equal(postEvidenceSchema.properties.producer.const, "opencode-harness/post-edit-architecture-v3");
+assert.equal(postEvidenceSchema.$defs.graph_delta.properties.schema_version.const, 2);
+assert(postEvidenceSchema.required.includes("planned_graph_fingerprint"));
+assert(postEvidenceSchema.required.includes("graph_delta"));
+assert(postEvidenceSchema.$defs.graph_delta.required.includes("trust_regressions"));
+assert.equal(
+  postEvidenceSchema.$defs.trust_regression.properties.id.$ref,
+  "#/$defs/trust_regression_id",
+);
+assert.equal(
+  postEvidenceSchema.$defs.unplanned_item.properties.id.$ref,
+  "#/$defs/unplanned_item_id",
+);
+const trustRegressionIdPattern = new RegExp(postEvidenceSchema.$defs.trust_regression_id.pattern);
+for (const id of ["TRUSTREG-valid-id", `TRUSTREG-${"x".repeat(119)}`]) {
+  assert.equal(trustRegressionIdPattern.test(id), true, `schema must accept trust regression ID ${id}`);
+}
+for (const id of ["TRUSTREG-", "TRUSTREG-trailing.", "UNPLANNED-wrong-prefix", `TRUSTREG-${"x".repeat(120)}`]) {
+  assert.equal(trustRegressionIdPattern.test(id), false, `schema must reject trust regression ID ${id}`);
+}
+const unplannedItemIdPattern = new RegExp(postEvidenceSchema.$defs.unplanned_item_id.pattern);
+for (const id of ["UNPLANNED-valid-id", `UNPLANNED-${"x".repeat(118)}`]) {
+  assert.equal(unplannedItemIdPattern.test(id), true, `schema must accept unplanned item ID ${id}`);
+}
+for (const id of ["UNPLANNED-", "UNPLANNED-trailing.", "TRUSTREG-wrong-prefix", `UNPLANNED-${"x".repeat(119)}`]) {
+  assert.equal(unplannedItemIdPattern.test(id), false, `schema must reject unplanned item ID ${id}`);
 }
 assert.equal(validateArchitecturePolicy(policyExample), policyExample);
 assert.equal(parseArchitecturePolicy(JSON.stringify(policyExample)).fingerprint, policyExample.fingerprint);
@@ -360,7 +391,7 @@ const cleanPolicy = policyWith({
 });
 assert.equal(validateArchitecturePolicy(cleanPolicy), cleanPolicy);
 assert(Object.isFrozen(cleanPolicy.rules));
-const cleanEvaluation = evaluateArchitecturePolicy({ graph: baseGraph, policy: cleanPolicy, baseline: null });
+const cleanEvaluation = evaluateArchitecturePolicy({ graph: baseGraph, policy: cleanPolicy, baseline: baseGraph });
 assert.equal(cleanEvaluation.status, "passed");
 assert.equal(cleanEvaluation.computational, true);
 assert.equal(validateArchitectureEvaluation(cleanEvaluation), cleanEvaluation);
@@ -383,6 +414,7 @@ const postEvidence = createPostEditArchitectureEvidence({
   extractor_output_fingerprint: `sha256:${"5".repeat(64)}`,
   policy: cleanPolicy,
   final_workspace_fingerprint: `sha256:${"4".repeat(64)}`,
+  planned_graph: baseGraph,
   extracted_graph: baseGraph,
   architecture_evaluation: cleanEvaluation,
   completed_at: "2026-07-15T12:00:00.000Z",
@@ -399,6 +431,7 @@ rejects(() => createPostEditArchitectureEvidence({
   extractor_output_fingerprint: postEvidence.extractor_output_fingerprint,
   policy: cleanPolicy,
   final_workspace_fingerprint: postEvidence.final_workspace_fingerprint,
+  planned_graph: baseGraph,
   extracted_graph: graphWith({ id: "GRAPH-post-unbound" }),
   architecture_evaluation: cleanEvaluation,
   completed_at: "2026-07-15T12:00:00.000Z",
@@ -415,6 +448,7 @@ rejects(() => createPostEditArchitectureEvidence({
   extractor_output_fingerprint: postEvidence.extractor_output_fingerprint,
   policy: cleanPolicy,
   final_workspace_fingerprint: postEvidence.final_workspace_fingerprint,
+  planned_graph: baseGraph,
   extracted_graph: baseGraph,
   architecture_evaluation: cleanEvaluation,
   completed_at: "2026-07-15T12:00:00.000Z",

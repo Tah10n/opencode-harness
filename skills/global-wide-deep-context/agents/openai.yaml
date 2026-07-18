@@ -1,0 +1,4 @@
+interface:
+  display_name: "Wide/Deep Context"
+  short_description: "Evidence-gated wide and deep change analysis"
+  default_prompt: "Use $global-wide-deep-context to analyze this high-risk change before implementation."

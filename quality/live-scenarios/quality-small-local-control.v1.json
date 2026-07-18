@@ -27,10 +27,18 @@
     "quality-small-local-control-no-delegation",
     "quality-small-local-control-single-edit",
     "quality-small-local-control-integrated-verification",
-    "quality-small-local-control-valid-completion"
+    "quality-small-local-control-valid-completion",
+    "quality-small-local-control-context-strategy-before-edit",
+    "quality-small-local-control-context-receipts-bound",
+    "quality-small-local-control-context-unknowns-resolved",
+    "quality-small-local-control-context-verification-linked",
+    "quality-small-local-control-context-discovery-bounded",
+    "quality-small-local-control-context-ownership",
+    "quality-small-local-control-context-final-reconciliation",
+    "quality-small-local-control-context-standard-lite-bounded"
   ],
   "suite": "development",
-  "fixture_fingerprint": "3a3861cbc5df9f21cb45237b08d5c1a381b7a120448447645801dd8d638d3336",
+  "fixture_fingerprint": "6169e75f3cc714cc88de5ae8e793f8a1c9769c1edc4b9d0ed9244bbf783f74ca",
   "anti_overengineering": {
     "max_delegations": 0,
     "max_changed_files": 1,

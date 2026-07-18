@@ -1,0 +1,199 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Tah10n/opencode-harness/quality/schemas/whole-system-context-report.schema.json",
+  "title": "Whole-System Context Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_id",
+    "session_key",
+    "run_id",
+    "task_id",
+    "risk_class",
+    "strategy_id",
+    "strategy_binding_fingerprint",
+    "workspace_fingerprint",
+    "dossier_id",
+    "dossier_analysis_fingerprint",
+    "impact_graph_id",
+    "impact_graph_fingerprint",
+    "status",
+    "revision",
+    "wide_analysis",
+    "claims",
+    "deep_analyses",
+    "questions",
+    "task_evidence",
+    "tool_state",
+    "budget_state",
+    "receipt_ids",
+    "created_at",
+    "updated_at",
+    "finalized_at",
+    "fingerprint"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "report_id": { "type": "string", "pattern": "^CONTEXT-[A-Za-z0-9._-]+$" },
+    "session_key": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "run_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "task_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "risk_class": { "enum": ["high", "critical"] },
+    "strategy_id": { "enum": ["high-wide-deep-v1", "critical-wide-deep-v1"] },
+    "strategy_binding_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "workspace_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "dossier_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "dossier_analysis_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "impact_graph_id": { "type": "string", "pattern": "^GRAPH-[A-Za-z0-9._-]+$" },
+    "impact_graph_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "status": { "enum": ["draft", "finalized"] },
+    "revision": { "type": "integer", "minimum": 1 },
+    "wide_analysis": { "type": "array", "maxItems": 64, "items": { "$ref": "#/$defs/wide" } },
+    "claims": { "type": "array", "maxItems": 256, "items": { "$ref": "#/$defs/claim" } },
+    "deep_analyses": { "type": "array", "maxItems": 128, "items": { "$ref": "#/$defs/deep" } },
+    "questions": { "type": "array", "maxItems": 128, "items": { "$ref": "#/$defs/question" } },
+    "task_evidence": { "$ref": "#/$defs/taskEvidence" },
+    "tool_state": { "$ref": "#/$defs/toolState" },
+    "budget_state": { "$ref": "#/$defs/budgetState" },
+    "receipt_ids": { "$ref": "#/$defs/stringArray" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "finalized_at": { "type": ["string", "null"], "format": "date-time" },
+    "fingerprint": { "$ref": "#/$defs/fingerprint" }
+  },
+  "$defs": {
+    "fingerprint": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "stringArray": { "type": "array", "maxItems": 256, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 512 } },
+    "wide": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "category", "classification", "claim_ids", "subject_ids", "receipt_ids", "rationale"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^WIDE-[A-Za-z0-9._-]+$" },
+        "category": { "type": "string" },
+        "classification": { "enum": ["represented", "reasoned_excluded"] },
+        "claim_ids": { "$ref": "#/$defs/stringArray" },
+        "subject_ids": { "$ref": "#/$defs/stringArray" },
+        "receipt_ids": { "$ref": "#/$defs/stringArray" },
+        "rationale": { "type": ["string", "null"], "maxLength": 2000 }
+      }
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "statement", "subject_ids", "receipt_ids"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^CLAIM-[A-Za-z0-9._-]+$" },
+        "kind": { "enum": ["observed", "inferred", "unresolved_hypothesis", "reasoned_exclusion"] },
+        "statement": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "subject_ids": { "$ref": "#/$defs/stringArray" },
+        "receipt_ids": { "$ref": "#/$defs/stringArray" }
+      }
+    },
+    "dimension": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dimension", "classification", "analysis", "not_applicable_reason", "receipt_ids", "verification_ids"],
+      "properties": {
+        "dimension": { "type": "string" },
+        "classification": { "enum": ["applicable", "not_applicable"] },
+        "analysis": { "type": ["string", "null"], "maxLength": 4000 },
+        "not_applicable_reason": { "type": ["string", "null"], "maxLength": 2000 },
+        "receipt_ids": { "$ref": "#/$defs/stringArray" },
+        "verification_ids": { "$ref": "#/$defs/stringArray" }
+      }
+    },
+    "deep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id", "impact_path_id", "node_ids", "edge_ids", "symbol_ids", "inputs", "outputs",
+        "dimensions", "falsification_question_id", "invariant_ids", "edge_case_ids", "failure_mode_ids",
+        "test_obligation_ids", "unresolved_question_ids", "receipt_ids"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^DEEP-[A-Za-z0-9._-]+$" },
+        "impact_path_id": { "type": "string", "pattern": "^BLAST-[A-Za-z0-9._-]+$" },
+        "node_ids": { "$ref": "#/$defs/stringArray" },
+        "edge_ids": { "$ref": "#/$defs/stringArray" },
+        "symbol_ids": { "$ref": "#/$defs/stringArray" },
+        "inputs": { "$ref": "#/$defs/stringArray" },
+        "outputs": { "$ref": "#/$defs/stringArray" },
+        "dimensions": { "type": "array", "maxItems": 32, "items": { "$ref": "#/$defs/dimension" } },
+        "falsification_question_id": { "type": "string", "pattern": "^QUESTION-[A-Za-z0-9._-]+$" },
+        "invariant_ids": { "$ref": "#/$defs/stringArray" },
+        "edge_case_ids": { "$ref": "#/$defs/stringArray" },
+        "failure_mode_ids": { "$ref": "#/$defs/stringArray" },
+        "test_obligation_ids": { "$ref": "#/$defs/stringArray" },
+        "unresolved_question_ids": { "$ref": "#/$defs/stringArray" },
+        "receipt_ids": { "$ref": "#/$defs/stringArray" }
+      }
+    },
+    "question": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "question_key", "statement", "expected_observation", "actual_observation", "status", "receipt_ids", "impact_if_wrong", "next_action", "applied_update_ids", "applied_update_fingerprint"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^QUESTION-[A-Za-z0-9._-]+$" },
+        "question_key": { "enum": ["owning_abstraction", "error_propagation", "sibling_variants", "test_gap_root_cause", "public_entry_point", "negative_path", "compatibility", "analogous_features", "externally_observed_behavior", "all_boundary_consumers", "dependency_ownership", "preserved_operational_contract", "visible_symptom_chain", "falsifying_observation", "mixed_version", "rollback", "partial_success", "restart_recovery", "trust_boundaries", "denial_paths", "sensitive_data_movement", "unsafe_encoding"] },
+        "statement": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "expected_observation": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "actual_observation": { "type": ["string", "null"], "maxLength": 2000 },
+        "status": { "enum": ["confirmed", "refuted", "uncertain", "not_applicable"] },
+        "receipt_ids": { "$ref": "#/$defs/stringArray" },
+        "impact_if_wrong": { "enum": ["low", "material", "high"] },
+        "next_action": { "type": ["string", "null"], "maxLength": 2000 },
+        "applied_update_ids": { "$ref": "#/$defs/stringArray" }
+        ,"applied_update_fingerprint": {
+          "oneOf": [
+            { "$ref": "#/$defs/fingerprint" },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "taskEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owning_abstraction_claim_id", "sibling_variant_question_ids", "characterization_test_ids", "negative_path_ids", "compatibility_ids", "reproduction_status", "reproduction_evidence_ids"],
+      "properties": {
+        "owning_abstraction_claim_id": { "type": ["string", "null"] },
+        "sibling_variant_question_ids": { "$ref": "#/$defs/stringArray" },
+        "characterization_test_ids": { "$ref": "#/$defs/stringArray" },
+        "negative_path_ids": { "$ref": "#/$defs/stringArray" },
+        "compatibility_ids": { "$ref": "#/$defs/stringArray" },
+        "reproduction_status": { "enum": ["not_required", "reproduced", "unavailable_nonmaterial", "unavailable_material"] },
+        "reproduction_evidence_ids": { "$ref": "#/$defs/stringArray" }
+      }
+    },
+    "toolState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["minimal_available", "advanced_available", "advanced_unavailable", "unsupported_schema_tools", "fallback_used", "reduced_semantic_coverage", "semantic_completeness_claimed", "unresolved_truncation_receipt_ids"],
+      "properties": {
+        "minimal_available": { "$ref": "#/$defs/stringArray" },
+        "advanced_available": { "$ref": "#/$defs/stringArray" },
+        "advanced_unavailable": { "$ref": "#/$defs/stringArray" },
+        "unsupported_schema_tools": { "$ref": "#/$defs/stringArray" },
+        "fallback_used": { "type": "boolean" },
+        "reduced_semantic_coverage": { "type": "boolean" },
+        "semantic_completeness_claimed": { "type": "boolean" },
+        "unresolved_truncation_receipt_ids": { "$ref": "#/$defs/stringArray" }
+      }
+    },
+    "budgetState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["context_calls_used", "context_calls_max", "read_only_subagents_used", "read_only_subagents_max", "exhausted", "unresolved_area"],
+      "properties": {
+        "context_calls_used": { "type": "integer", "minimum": 0 },
+        "context_calls_max": { "type": "integer", "minimum": 1 },
+        "read_only_subagents_used": { "type": "integer", "minimum": 0 },
+        "read_only_subagents_max": { "type": "integer", "minimum": 0 },
+        "exhausted": { "type": "boolean" },
+        "unresolved_area": { "type": ["string", "null"], "maxLength": 2000 }
+      }
+    }
+  }
+}

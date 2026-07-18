@@ -25,6 +25,33 @@ const DEFAULT_DISCOVERY_LIMITS = Object.freeze({
   maxPromptBytes: 512 * 1024,
   maxTotalPromptBytes: 8 * 1024 * 1024,
 });
+const COUNT_WORD_VALUES = Object.freeze({
+  zero: 0,
+  one: 1,
+  two: 2,
+  three: 3,
+  four: 4,
+  five: 5,
+  six: 6,
+  seven: 7,
+  eight: 8,
+  nine: 9,
+  ten: 10,
+  eleven: 11,
+  twelve: 12,
+  thirteen: 13,
+  fourteen: 14,
+  fifteen: 15,
+  sixteen: 16,
+  seventeen: 17,
+  eighteen: 18,
+  nineteen: 19,
+  twenty: 20,
+});
+const DOCUMENTED_PROMPT_COUNT_PATTERN = new RegExp(
+  String.raw`\b(?<agents>\d+|${Object.keys(COUNT_WORD_VALUES).join("|")})\s+agent prompts?\b[\s\S]{0,160}?\b(?<skills>\d+|${Object.keys(COUNT_WORD_VALUES).join("|")})\s+skill entrypoints?\b`,
+  "giu",
+);
 
 function check(condition, message) {
   if (!condition) throw new Error(message);
@@ -38,6 +65,58 @@ function expectContractError(code, action) {
     throw error;
   }
   throw new Error(`expected ${code}`);
+}
+
+function expectFailure(label, messageFragment, action) {
+  try {
+    action();
+  } catch (error) {
+    check(
+      error instanceof Error && error.message.includes(messageFragment),
+      `${label} failed for an unexpected reason: ${error?.message ?? String(error)}`,
+    );
+    return;
+  }
+  throw new Error(`${label} did not fail`);
+}
+
+function parseDocumentedCount(token, label) {
+  const normalized = token.toLowerCase();
+  const value = /^\d+$/u.test(normalized) ? Number(normalized) : COUNT_WORD_VALUES[normalized];
+  check(Number.isSafeInteger(value) && value >= 0, `${label} has an unsupported count: ${token}`);
+  return value;
+}
+
+function documentedPromptEntrypointCounts(text, label) {
+  const matches = [...text.matchAll(DOCUMENTED_PROMPT_COUNT_PATTERN)];
+  check(matches.length === 1, `${label} must contain exactly one current agent/skill prompt inventory count`);
+  return {
+    agentPrompts: parseDocumentedCount(matches[0].groups.agents, `${label} agent prompt count`),
+    skillEntrypoints: parseDocumentedCount(matches[0].groups.skills, `${label} skill entrypoint count`),
+  };
+}
+
+function discoveredPromptEntrypointCounts(sources) {
+  const agentPrompts = sources.filter((entry) => /^agents\/[^/]+\.md$/u.test(entry.path)).length;
+  const skillEntrypoints = sources.filter((entry) => /^skills\/.+\/SKILL\.md$/u.test(entry.path)).length;
+  check(
+    agentPrompts + skillEntrypoints === sources.length,
+    "current prompt discovery contains a path outside the agent/skill entrypoint contract",
+  );
+  return { agentPrompts, skillEntrypoints };
+}
+
+function assertCurrentPromptInventoryDocumentation(sources, documents) {
+  const discovered = discoveredPromptEntrypointCounts(sources);
+  for (const document of documents) {
+    const documented = documentedPromptEntrypointCounts(document.text, document.path);
+    check(
+      documented.agentPrompts === discovered.agentPrompts
+      && documented.skillEntrypoints === discovered.skillEntrypoints,
+      `${document.path} prompt inventory count drift: documents ${documented.agentPrompts} agent/${documented.skillEntrypoints} skill entrypoints; current discovery has ${discovered.agentPrompts} agent/${discovered.skillEntrypoints}`,
+    );
+  }
+  return discovered;
 }
 
 function git(args, options = {}) {
@@ -240,6 +319,35 @@ for (const definition of baseline.sentinel_definitions) {
 }
 
 const currentSources = worktreeSources();
+const currentInventoryDocuments = [
+  { path: "README.md", text: fs.readFileSync(path.join(root, "README.md"), "utf8") },
+  { path: "docs/harness-map.md", text: fs.readFileSync(path.join(root, "docs", "harness-map.md"), "utf8") },
+];
+const currentEntrypointCounts = assertCurrentPromptInventoryDocumentation(currentSources, currentInventoryDocuments);
+const staleHarnessMapDocuments = currentInventoryDocuments.map((document) => document.path === "docs/harness-map.md"
+  ? { ...document, text: document.text.replace(/\bnine skill entrypoints\b/iu, "eight skill entrypoints") }
+  : document);
+check(
+  staleHarnessMapDocuments.find((document) => document.path === "docs/harness-map.md").text
+    !== currentInventoryDocuments.find((document) => document.path === "docs/harness-map.md").text,
+  "stale documented-count fixture must replace the current nine-skill wording",
+);
+expectFailure(
+  "stale eight-skill documentation fixture",
+  "prompt inventory count drift",
+  () => assertCurrentPromptInventoryDocumentation(currentSources, staleHarnessMapDocuments),
+);
+expectFailure(
+  "undocumented current-skill fixture",
+  "prompt inventory count drift",
+  () => assertCurrentPromptInventoryDocumentation([
+    ...cloneSources(currentSources),
+    {
+      path: "skills/test-undocumented-current-skill/SKILL.md",
+      content: Buffer.from("test-only undocumented current skill entrypoint\n", "utf8"),
+    },
+  ], currentInventoryDocuments),
+);
 const current = buildInventory({
   inventoryId: "current-engineering-prompts-v1",
   sourceKind: "worktree",
@@ -631,5 +739,5 @@ check(clonedSources.filter((entry) => entry.path.startsWith("agents/")).length =
 check(clonedSources.filter((entry) => entry.path.startsWith("skills/")).length === 8, "baseline source clone must retain all 8 skills");
 
 console.log(
-  `Verified prompt inventory: ${baseline.entries.length} agent/skill baselines, bounded recursive skill discovery, ${baseline.duplicate_groups.length} intentional duplicate groups, semantic sentinels, CRLF stability, and fail-closed undeclared drift.`,
+  `Verified prompt inventory: ${baseline.entries.length} historical agent/skill baselines, current docs bind ${currentEntrypointCounts.agentPrompts} agent/${currentEntrypointCounts.skillEntrypoints} skill entrypoints, bounded recursive skill discovery, ${baseline.duplicate_groups.length} intentional duplicate groups, semantic sentinels, CRLF stability, and fail-closed undeclared drift.`,
 );

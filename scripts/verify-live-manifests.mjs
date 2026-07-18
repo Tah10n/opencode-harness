@@ -36,6 +36,8 @@ const expectedSuites = Object.freeze({
     "quality-concurrency-cancellation",
     "quality-parser-boundaries",
     "quality-small-local-control",
+    "quality-hidden-reexport-consumer",
+    "quality-owning-abstraction",
   ],
   held_out: [
     "broad-audit-bounded-context",
@@ -46,6 +48,8 @@ const expectedSuites = Object.freeze({
     "quality-retry-idempotency",
     "quality-stale-cache-version-skew",
     "quality-partial-dependency-failure",
+    "quality-alternate-config-path",
+    "quality-sibling-defect-variant",
   ],
   canary: [
     "review-read-only-trap",
@@ -86,10 +90,29 @@ function schemaStringAccepts(schema, value) {
 
 const { scenarios, suiteManifest } = loadScenarioCorpus({ root });
 const behavioral = scenarios.filter((scenario) => scenario.id !== "runner-self-test");
-assert.equal(scenarios.length, 25, "corpus must contain 24 behavioral scenarios plus runner self-test");
-assert.equal(behavioral.length, 24);
-assert.equal(new Set(behavioral.map((scenario) => scenario.failure_family)).size, 24, "failure families must be distinct");
+const infrastructure = scenarios.filter((scenario) => scenario.id === "runner-self-test");
+assert.equal(scenarios.length, 29, "corpus must contain 28 behavioral scenarios plus runner self-test");
+assert.equal(behavioral.length, 28);
+assert.equal(infrastructure.length, 1);
+assert.equal(new Set(behavioral.map((scenario) => scenario.failure_family)).size, 28, "failure families must be distinct");
 assert(new Set(behavioral.map((scenario) => scenario.repo_fixture)).size >= 8, "corpus must use at least eight mechanism-specific fixtures");
+
+const documentedCorpusPhrase = `${behavioral.length} behavioural scenarios plus ${infrastructure.length} infrastructure self-test`;
+for (const relativePath of ["docs/evaluation.md", "docs/live-evaluation.md"]) {
+  const document = fs.readFileSync(path.join(root, relativePath), "utf8");
+  assert(
+    document.includes(documentedCorpusPhrase),
+    `${relativePath} must state the machine-derived live corpus size: ${documentedCorpusPhrase}`,
+  );
+  for (const match of document.matchAll(/\b(\d+)\s*\+\s*(\d+)\s+corpus\b/giu)) {
+    assert.equal(
+      `${match[1]}+${match[2]}`,
+      `${behavioral.length}+${infrastructure.length}`,
+      `${relativePath} contains a stale live corpus count: ${match[0]}`,
+    );
+  }
+}
+
 for (const scenario of behavioral) {
   assert.equal(schemaStringAccepts(scenarioSchema.properties.repo_fixture, scenario.repo_fixture), true, `${scenario.id} fixture must satisfy the public schema`);
   assert(["read_only", "allowlist"].includes(scenario.workspace_policy.mode), `${scenario.id} needs an explicit workspace policy`);
@@ -105,7 +128,7 @@ assert.deepEqual(Object.keys(suiteManifest.suites), SUITE_NAMES);
 assert.deepEqual(BEHAVIORAL_SUITE_NAMES, ["development", "held_out", "canary"]);
 
 const defaultSelection = selectScenarios({ scenarios, suiteManifest });
-assert.equal(defaultSelection.length, 24);
+assert.equal(defaultSelection.length, 28);
 assert(defaultSelection.every((entry) => entry.suite !== "infrastructure"));
 assert.deepEqual(selectScenarios({ scenarios, suiteManifest, suite: "canary" }).map((entry) => entry.scenario.id), expectedSuites.canary);
 assert.equal(selectScenarios({ scenarios, suiteManifest, scenarioIds: "runner-self-test" })[0].suite, "infrastructure");
@@ -350,4 +373,4 @@ for (const relativePath of ["handoffs/initial.json", "handoffs/redirected.json"]
   assert(weakHandoff.hidden_trace_assertions.some((entry) => entry.op === "context_receipt_exists" && entry.relative_path === relativePath));
 }
 
-console.log("Live manifest, suite, corpus, and trace assertion self-tests passed (24 behavioral + 1 infrastructure).");
+console.log("Live manifest, suite, corpus, and trace assertion self-tests passed (28 behavioral + 1 infrastructure).");

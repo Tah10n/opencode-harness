@@ -51,15 +51,23 @@ const requiredQualityDirectories = Object.freeze([
   "native",
   "quality",
   "quality/acceptance",
+  "quality/context-tool-overlays",
   "quality/examples",
   "quality/live-scenarios",
   "quality/live-scenarios/artifacts",
   "quality/prompt-inventory",
   "quality/schemas",
+  "skills/global-wide-deep-context",
 ]);
 
 const requiredQualityFiles = Object.freeze([
   "lib/quality/index.mjs",
+  "lib/quality/context-receipt-store.mjs",
+  "lib/quality/context-receipts.mjs",
+  "lib/quality/context-reconciliation.mjs",
+  "lib/quality/context-strategies.mjs",
+  "lib/quality/context-sufficiency.mjs",
+  "lib/quality/context-tool-adapters.mjs",
   "lib/quality/milestone-dod.mjs",
   "lib/quality/normal-session-bridge.mjs",
   "lib/quality/normal-session-plugin.mjs",
@@ -75,22 +83,31 @@ const requiredQualityFiles = Object.freeze([
   "lib/quality/trusted-toolchains.mjs",
   "lib/quality/verification-targets.mjs",
   "lib/quality/whitespace.mjs",
+  "lib/quality/whole-system-context-report.mjs",
   ".opencode/plugins/engineering-dossier.mjs",
   ".opencode/quality/checks.json",
   ".opencode/quality/toolchains.json",
   "quality/examples/global-quality-plugin.mjs",
   "quality/examples/project-checks.example.json",
   "quality/acceptance/acceptance-policy.v2.json",
+  "quality/acceptance/acceptance-policy.v3.json",
+  "quality/context-live-scenarios.v1.json",
+  "quality/context-strategies.v1.json",
+  "quality/context-tool-overlays/advanced-readonly.v1.json",
+  "quality/live-scenarios/quality-alternate-config-path.v1.json",
   "quality/live-scenarios/quality-architecture-boundary.v1.json",
   "quality/live-scenarios/quality-concurrency-cancellation.v1.json",
   "quality/live-scenarios/quality-cross-module-invariant.v1.json",
+  "quality/live-scenarios/quality-hidden-reexport-consumer.v1.json",
   "quality/live-scenarios/quality-migration-compatibility.v1.json",
+  "quality/live-scenarios/quality-owning-abstraction.v1.json",
   "quality/live-scenarios/quality-parser-boundaries.v1.json",
   "quality/live-scenarios/quality-partial-dependency-failure.v1.json",
   "quality/live-scenarios/quality-persistence-rollback.v1.json",
   "quality/live-scenarios/quality-public-api-compatibility.v1.json",
   "quality/live-scenarios/quality-resource-lifecycle.v1.json",
   "quality/live-scenarios/quality-retry-idempotency.v1.json",
+  "quality/live-scenarios/quality-sibling-defect-variant.v1.json",
   "quality/live-scenarios/quality-small-local-control.v1.json",
   "quality/live-scenarios/quality-stale-cache-version-skew.v1.json",
   "quality/milestone-2-dod.v1.json",
@@ -101,6 +118,9 @@ const requiredQualityFiles = Object.freeze([
   "quality/schemas/architecture-evaluation.schema.json",
   "quality/schemas/architecture-policy.example.json",
   "quality/schemas/architecture-policy.schema.json",
+  "quality/schemas/context-receipt.schema.json",
+  "quality/schemas/context-reconciliation.schema.json",
+  "quality/schemas/context-sufficiency-decision.schema.json",
   "quality/schemas/engineering-dossier.schema.json",
   "quality/schemas/engineering-gate-decision.schema.json",
   "quality/schemas/engineering-impact-graph.schema.json",
@@ -111,6 +131,11 @@ const requiredQualityFiles = Object.freeze([
   "quality/schemas/toolchain-host-configuration.schema.json",
   "quality/schemas/toolchain-map.schema.json",
   "quality/schemas/quality-attestation.schema.json",
+  "quality/schemas/whole-system-context-report.schema.json",
+  "docs/whole-system-context.md",
+  "skills/global-wide-deep-context/SKILL.md",
+  "skills/global-wide-deep-context/agents/openai.yaml",
+  "scripts/context-test-fixtures.mjs",
   "scripts/verify-milestone-2-dod.mjs",
   "scripts/build-macos-containment.mjs",
   "native/macos-exclusive-uid-controller.c",
@@ -120,6 +145,14 @@ const requiredQualityFiles = Object.freeze([
   "scripts/verify-quality-contracts.mjs",
   "scripts/verify-quality-live-runner.mjs",
   "scripts/verify-quality-live-manifests.mjs",
+  "scripts/verify-context-live-manifests.mjs",
+  "scripts/verify-context-acceptance.mjs",
+  "scripts/verify-context-receipts.mjs",
+  "scripts/verify-context-reconciliation.mjs",
+  "scripts/verify-context-strategies.mjs",
+  "scripts/verify-context-sufficiency.mjs",
+  "scripts/verify-context-tool-overlay.mjs",
+  "scripts/verify-whole-system-context.mjs",
   "scripts/verify-normal-session-quality-bridge.mjs",
   "scripts/probe-normal-session-plugin-api.mjs",
   "scripts/verify-session-classification.mjs",
@@ -139,10 +172,17 @@ const requiredQualityFiles = Object.freeze([
 ]);
 
 const requiredQualityExports = Object.freeze([
+  "adaptContextToolOutput",
   "assessQualityCandidate",
+  "createContextReceiptStore",
   "createNormalSessionQualityBridge",
   "createNormalSessionQualityPlugin",
   "createQualityOutcomes",
+  "createWholeSystemContextReportDraft",
+  "evaluateContextSufficiency",
+  "reconcileFinalBlastRadius",
+  "selectMinimumContextStrategy",
+  "validateContextAcceptanceMetrics",
   "validateArchitecturePolicy",
   "validateEngineeringDossier",
   "validateEngineeringGateDecision",
@@ -353,6 +393,10 @@ try {
     ...completeDeclaration,
     exportNames: requiredQualityExports.filter((name) => name !== "requiredEngineeringVerificationTargets"),
   });
+  expectQualityContractFailure("wide/deep context export omission sensor", {
+    ...completeDeclaration,
+    exportNames: requiredQualityExports.filter((name) => name !== "evaluateContextSufficiency"),
+  });
 
   for (const entry of adoptionEntries) {
     copyConfined(entry);
@@ -427,10 +471,19 @@ try {
       'quality.validatePromptInventory(readJson("quality/prompt-inventory/baseline.v2.json"));',
       'quality.validateArchitecturePolicy(readJson("quality/schemas/architecture-policy.example.json"));',
       'quality.validateQualityAcceptancePolicy(readJson("quality/acceptance/acceptance-policy.v2.json"));',
+      'quality.validateQualityAcceptancePolicy(readJson("quality/acceptance/acceptance-policy.v3.json"));',
     ].join("\n"),
   ]);
   await runNode("quality contract verifier", ["scripts/verify-quality-contracts.mjs"]);
   await runNode("quality live manifest verifier", ["scripts/verify-quality-live-manifests.mjs"]);
+  await runNode("context strategy verifier", ["scripts/verify-context-strategies.mjs"]);
+  await runNode("context receipt verifier", ["scripts/verify-context-receipts.mjs"]);
+  await runNode("whole-system context verifier", ["scripts/verify-whole-system-context.mjs"]);
+  await runNode("context sufficiency verifier", ["scripts/verify-context-sufficiency.mjs"]);
+  await runNode("context reconciliation verifier", ["scripts/verify-context-reconciliation.mjs"]);
+  await runNode("context tool overlay verifier", ["scripts/verify-context-tool-overlay.mjs"]);
+  await runNode("context live manifest verifier", ["scripts/verify-context-live-manifests.mjs"]);
+  await runNode("context acceptance verifier", ["scripts/verify-context-acceptance.mjs"]);
   await runNode("milestone 2 DoD contract-only verifier", ["scripts/verify-milestone-2-dod.mjs"]);
   await runNode("static bundle verifier", ["scripts/verify-harness.mjs"]);
   await runNode("live manifest verifier", ["scripts/verify-live-manifests.mjs"]);

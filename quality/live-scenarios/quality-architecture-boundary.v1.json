@@ -24,8 +24,19 @@
     "quality-architecture-boundary-architecture-respected",
     "quality-architecture-boundary-ownership-respected",
     "quality-architecture-boundary-integrated-verification",
-    "quality-architecture-boundary-valid-completion"
+    "quality-architecture-boundary-valid-completion",
+    "quality-architecture-boundary-context-strategy-before-edit",
+    "quality-architecture-boundary-context-receipts-bound",
+    "quality-architecture-boundary-context-report-before-edit",
+    "quality-architecture-boundary-context-direct-transitive-paths",
+    "quality-architecture-boundary-context-exclusions-evidenced",
+    "quality-architecture-boundary-context-critical-paths-deep",
+    "quality-architecture-boundary-context-unknowns-resolved",
+    "quality-architecture-boundary-context-verification-linked",
+    "quality-architecture-boundary-context-discovery-bounded",
+    "quality-architecture-boundary-context-ownership",
+    "quality-architecture-boundary-context-final-reconciliation"
   ],
   "suite": "development",
-  "fixture_fingerprint": "ec94333e311d522fe4a56c0feb2e3e5ac36a16bac69abf5b4d2486c7900ffddf"
+  "fixture_fingerprint": "345f54cceb33bb9ee698868938552023872851cd8d2f574bcf7cd08e821b51a9"
 }

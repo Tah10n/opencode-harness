@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "sidecar_version": "1.0.0",
+  "scenario_id": "quality-sibling-defect-variant",
+  "seeded_defect": "The shared alias normalizer preserves case, so the visible email expectation fails before implementation.",
+  "visible_oracle": { "command": "node --test test/visible.test.mjs", "seeded_status": "failed" },
+  "bad_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-sibling-defect-variant/bad/email.mjs", "target": "src/email.mjs", "sha256": "b785b860450265815c53a69ba37b0d61d1910fa73a5357b3a0b9d4e5ee4a9b89" }
+  ] },
+  "compliant_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-sibling-defect-variant/good/aliases.mjs", "target": "src/aliases.mjs", "sha256": "525b30af1f692fe997c82b9ed57c9eb2f5356b6384f7b6b6c945ad12a78e1441" }
+  ] },
+  "hidden_counterexample": "The analogous SMS module calls the same shared normalizer and exposes the unchanged case bug.",
+  "forbidden_regression": "Do not patch only the email sibling while leaving the SMS variant incorrect.",
+  "risk_class": "high",
+  "workload_class": "sibling-defect-variant",
+  "expected_ownership": ["src/aliases.mjs", "src/email.mjs"],
+  "required_quality_assertion_ids": [
+    "quality-sibling-defect-variant-dossier-before-edit",
+    "quality-sibling-defect-variant-gate-before-edit",
+    "quality-sibling-defect-variant-coverage-recorded",
+    "quality-sibling-defect-variant-unknowns-resolved",
+    "quality-sibling-defect-variant-mapping-verified",
+    "quality-sibling-defect-variant-architecture-respected",
+    "quality-sibling-defect-variant-ownership-respected",
+    "quality-sibling-defect-variant-integrated-verification",
+    "quality-sibling-defect-variant-valid-completion"
+  ],
+  "suite": "held_out",
+  "fixture_fingerprint": "4a149cbeb48cc15f1216f5cc0cc80469f5eb7a81bd9cbfcd7072f74a5492c138"
+}

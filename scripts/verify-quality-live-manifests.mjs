@@ -9,6 +9,13 @@ import {
   loadScenarioCorpus,
   publicScenarioForAdapter,
 } from "../lib/feedback/manifests.mjs";
+import { managedCommandOutputMarkerFingerprint } from "../lib/feedback/process-tree.mjs";
+import {
+  qualityLiveAssertionMarker,
+  qualityLiveFixtureFingerprint,
+  qualityLiveVisibleOracleContract,
+  validateQualityLiveScenarioSidecar,
+} from "../lib/quality/live-scenarios.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const sidecarRoot = path.join(root, "quality", "live-scenarios");
@@ -54,6 +61,18 @@ const QUALITY_ALLOCATION = Object.freeze({
     "quality-resource-lifecycle",
     "quality-migration-compatibility",
   ],
+});
+
+const M3_CONTEXT_ALLOCATION = Object.freeze({
+  development: [
+    "quality-hidden-reexport-consumer",
+    "quality-owning-abstraction",
+  ],
+  held_out: [
+    "quality-alternate-config-path",
+    "quality-sibling-defect-variant",
+  ],
+  canary: [],
 });
 
 const WORKLOAD_CLASSES = Object.freeze({
@@ -219,6 +238,44 @@ function runNodeTest(workspace, command, label) {
   });
 }
 
+function literalCount(value, literal) {
+  let count = 0;
+  let offset = 0;
+  while (true) {
+    const next = value.indexOf(literal, offset);
+    if (next === -1) return count;
+    count += 1;
+    offset = next + literal.length;
+  }
+}
+
+function assertSeededAssertionMarker({ scenario, sidecar }) {
+  const marker = qualityLiveAssertionMarker(scenario.id);
+  const fixture = path.join(root, ...scenario.repo_fixture.split("/"));
+  assert.equal(qualityLiveFixtureFingerprint(fixture), sidecar.fixture_fingerprint, `${scenario.id} marker-bearing fixture fingerprint drifted`);
+  const visibleTest = fs.readFileSync(path.join(fixture, "test", "visible.test.mjs"), "utf8");
+  assert.equal(literalCount(visibleTest, marker), 1, `${scenario.id} visible assertion marker must occur once in its test source`);
+  const contract = qualityLiveVisibleOracleContract({ scenario, sidecar });
+  assert.equal(contract.assertion_marker_fingerprint, managedCommandOutputMarkerFingerprint(marker));
+  assert.equal(contract.assertion_marker_count, 1);
+  assert.equal(JSON.stringify(contract).includes(marker), false, `${scenario.id} oracle contract leaked raw marker text`);
+
+  const seededWorkspace = fs.mkdtempSync(path.join(os.tmpdir(), `opencode-quality-${scenario.id}-seeded-`));
+  try {
+    fs.cpSync(fixture, seededWorkspace, { recursive: true, errorOnExist: true });
+    const seeded = runNodeTest(seededWorkspace, sidecar.visible_oracle.command, `${scenario.id}.seeded`);
+    assert.equal(seeded.error, undefined, `${scenario.id} seeded visible test could not execute`);
+    assert.equal(seeded.status, 1, `${scenario.id} seeded defect must fail its visible oracle with the signed node:test assertion exit`);
+    assert.equal(
+      literalCount(`${seeded.stdout}${seeded.stderr}`, marker),
+      1,
+      `${scenario.id} seeded visible failure must emit its assertion marker exactly once`,
+    );
+  } finally {
+    fs.rmSync(seededWorkspace, { recursive: true, force: true });
+  }
+}
+
 function materializeVariant({ scenario, sidecar, variant }) {
   const workspace = fs.mkdtempSync(path.join(os.tmpdir(), `opencode-quality-${scenario.id}-${variant}-`));
   fs.cpSync(path.join(root, ...scenario.repo_fixture.split("/")), workspace, { recursive: true, errorOnExist: true });
@@ -262,7 +319,9 @@ assert.equal(new Set(Object.values(WORKLOAD_CLASSES)).size, 12, "workload classe
 const { scenarios, suiteManifest } = loadScenarioCorpus({ root });
 assert.equal(suiteManifest.manifest_version, "2.0.0", "quality corpus requires suite manifest 2.0.0");
 for (const [suite, prefix] of Object.entries(M1_PREFIX)) {
-  const expected = suite === "infrastructure" ? prefix : [...prefix, ...(QUALITY_ALLOCATION[suite] ?? [])];
+  const expected = suite === "infrastructure"
+    ? prefix
+    : [...prefix, ...(QUALITY_ALLOCATION[suite] ?? []), ...(M3_CONTEXT_ALLOCATION[suite] ?? [])];
   assert.deepEqual(suiteManifest.suites[suite], expected, `${suite} changed M1 order/membership or quality append order`);
 }
 
@@ -270,18 +329,28 @@ const sidecarFiles = fs.readdirSync(sidecarRoot, { withFileTypes: true })
   .filter((entry) => entry.isFile() && entry.name.endsWith(".v1.json"))
   .map((entry) => entry.name)
   .sort();
-assert.deepEqual(sidecarFiles, qualityIds.map((id) => `${id}.v1.json`).sort(), "runner-only sidecar set drifted");
+const contextIds = Object.values(M3_CONTEXT_ALLOCATION).flat();
+assert.equal(contextIds.length, 4);
+assert.equal(new Set(contextIds).size, 4);
+assert.deepEqual(
+  sidecarFiles,
+  [...qualityIds, ...contextIds].map((id) => `${id}.v1.json`).sort(),
+  "runner-only sidecar set drifted",
+);
 
 const hiddenHashes = new Set();
 const hiddenCounterexamples = new Set();
 const patchBundles = new Set();
 const failureFamilies = new Set();
+const visibleOracleIdentities = new Set();
+const expectedFailureSignatures = new Set();
 
 for (const scenarioId of qualityIds) {
   const scenario = scenarios.find((entry) => entry.id === scenarioId);
   assert(scenario, `missing scenario ${scenarioId}`);
   const suite = Object.entries(QUALITY_ALLOCATION).find(([, ids]) => ids.includes(scenarioId))[0];
   const sidecar = readJson(`quality/live-scenarios/${scenarioId}.v1.json`);
+  validateQualityLiveScenarioSidecar(sidecar, scenario);
   const expectedSidecarKeys = scenarioId === "quality-small-local-control"
     ? [...SIDECAR_KEYS, "anti_overengineering"]
     : SIDECAR_KEYS;
@@ -313,19 +382,36 @@ for (const scenarioId of qualityIds) {
   exactKeys(sidecar.visible_oracle, ["command", "seeded_status"], `${scenarioId}.visible_oracle`);
   assert.equal(sidecar.visible_oracle.command, scenario.visible_checks[0]);
   assert.equal(sidecar.visible_oracle.seeded_status, "failed");
+  const oracleContract = qualityLiveVisibleOracleContract({ scenario, sidecar });
+  assert.match(oracleContract.oracle_identity_fingerprint, /^sha256:[0-9a-f]{64}$/u);
+  assert.match(oracleContract.expected_failure_signature, /^sha256:[0-9a-f]{64}$/u);
+  assert(!visibleOracleIdentities.has(oracleContract.oracle_identity_fingerprint), `${scenarioId} reused a visible-oracle identity`);
+  assert(!expectedFailureSignatures.has(oracleContract.expected_failure_signature), `${scenarioId} reused an expected-failure signature`);
+  visibleOracleIdentities.add(oracleContract.oracle_identity_fingerprint);
+  expectedFailureSignatures.add(oracleContract.expected_failure_signature);
 
   const expectedAssertionIds = COMMON_ASSERTION_SUFFIXES.map((suffix) => `${scenarioId}-${suffix}`);
   if (scenarioId === "quality-small-local-control") {
     expectedAssertionIds.splice(7, 0, `${scenarioId}-no-delegation`, `${scenarioId}-single-edit`);
   }
-  assert.deepEqual(sidecar.required_quality_assertion_ids, expectedAssertionIds, `${scenarioId} required quality assertions drifted`);
-  assert.deepEqual(scenario.hidden_trace_assertions.map((entry) => entry.assertion_id), expectedAssertionIds, `${scenarioId} trace assertion order drifted`);
+  const scenarioAssertionIds = scenario.hidden_trace_assertions.map((entry) => entry.assertion_id);
+  assert.deepEqual(
+    scenarioAssertionIds.slice(0, expectedAssertionIds.length),
+    expectedAssertionIds,
+    `${scenarioId} M2 assertion prefix drifted`,
+  );
+  assert.deepEqual(
+    sidecar.required_quality_assertion_ids,
+    scenarioAssertionIds,
+    `${scenarioId} sidecar assertion binding drifted from its exact eval assertions`,
+  );
 
   const fixture = path.join(root, ...scenario.repo_fixture.split("/"));
   const fixtureFiles = regularFiles(fixture);
   assert(fixtureFiles.length >= 3 && fixtureFiles.length <= 8, `${scenarioId} fixture is not bounded`);
   assert(fixtureFiles.reduce((total, file) => total + fs.statSync(file).size, 0) <= 20000, `${scenarioId} fixture is too large`);
   assert.equal(fixtureFingerprint(fixture), sidecar.fixture_fingerprint, `${scenarioId} fixture fingerprint drifted`);
+  assert.equal(qualityLiveFixtureFingerprint(fixture), sidecar.fixture_fingerprint, `${scenarioId} runtime fixture fingerprint drifted`);
   assert.equal(fixtureFiles.some((file) => path.relative(fixture, file).split(path.sep).includes(".live-hidden")), false, `${scenarioId} public fixture contains hidden files`);
 
   const hiddenEntry = scenario.hidden_check_files[0];
@@ -363,19 +449,21 @@ for (const scenarioId of qualityIds) {
     });
   }
 
-  const seededWorkspace = fs.mkdtempSync(path.join(os.tmpdir(), `opencode-quality-${scenarioId}-seeded-`));
-  try {
-    fs.cpSync(fixture, seededWorkspace, { recursive: true, errorOnExist: true });
-    const seeded = runNodeTest(seededWorkspace, sidecar.visible_oracle.command, `${scenarioId}.seeded`);
-    assert.equal(seeded.error, undefined, `${scenarioId} seeded visible test could not execute`);
-    assert.notEqual(seeded.status, 0, `${scenarioId} seeded defect must fail its visible oracle`);
-  } finally {
-    fs.rmSync(seededWorkspace, { recursive: true, force: true });
-  }
+  assertSeededAssertionMarker({ scenario, sidecar });
   assertVariantOracle({ scenario, sidecar, variant: "bad" });
   assertVariantOracle({ scenario, sidecar, variant: "good" });
 }
 
+for (const scenarioId of contextIds) {
+  const scenario = scenarios.find((entry) => entry.id === scenarioId);
+  assert(scenario, `missing context scenario ${scenarioId}`);
+  const sidecar = readJson(`quality/live-scenarios/${scenarioId}.v1.json`);
+  validateQualityLiveScenarioSidecar(sidecar, scenario);
+  assertSeededAssertionMarker({ scenario, sidecar });
+}
+
 assert.equal(failureFamilies.size, 12, "quality failure families must be unique");
 assert.equal(hiddenHashes.size, 12, "hidden oracles must be mechanism-specific");
-console.log("Quality live-manifest self-test passed (12 behavioral scenarios; bad patches trapped, compliant patches accepted).\n");
+assert.equal(visibleOracleIdentities.size, 12, "visible oracle identities must be scenario-specific");
+assert.equal(expectedFailureSignatures.size, 12, "expected failure signatures must be scenario-specific");
+console.log("Quality live-manifest self-test passed (12 M2 scenarios, 16 sidecars; bad patches trapped, compliant patches accepted).\n");

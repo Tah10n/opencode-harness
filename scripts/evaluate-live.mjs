@@ -51,13 +51,19 @@ import { createEngineeringPreimplementationEvidence } from "../lib/quality/gate.
 import {
   createQualityLiveCoordinator,
   finalizeQualityLiveAttestation,
+  finalizeQualityLiveContextReconciliation,
   handleQualityLiveOperation,
   inspectQualityLiveCoordinator,
+  qualityLiveContextObservationRequest,
   qualityLiveIntegratedVerificationTargetIds,
+  qualityLivePlanChallengeRequest,
   qualityLivePrecompletionVerifierCodes,
+  qualityLiveReviewerRequest,
   qualityLiveSessionForPublication,
   recordQualityLiveImplementation,
   recordQualityLiveRunnerIntegratedVerification,
+  recordQualityLiveObservedContextToolCall,
+  recordQualityLiveReadOnlyContextSubagent,
 } from "../lib/quality/live-coordinator.mjs";
 import { validatePromptInventory } from "../lib/quality/prompt-inventory.mjs";
 import {
@@ -66,7 +72,11 @@ import {
 import { createEngineeringQualityStore } from "../lib/quality/store.mjs";
 import {
   loadQualityLiveScenarioSidecar,
+  qualityLiveAssertionMarker,
+  qualityLiveFailureSignature,
+  qualityLiveFixtureFingerprint,
   qualityLiveCheckCatalog,
+  qualityLiveVisibleOracleContract,
 } from "../lib/quality/live-scenarios.mjs";
 import { createInjectedTestContainmentFactory } from "./injected-test-containment.mjs";
 
@@ -83,6 +93,7 @@ const deterministicSelfTestContainmentFactory = deterministicSelfTestMode
   : null;
 const TASK_ID = "task-root";
 const RUNNER_AGENT = "live-eval-runner";
+const RUNNER_CHECK_EXECUTION_METADATA = new WeakMap();
 const REQUIRED_RUNNER_PHASES = Object.freeze([
   "task_start",
   "fixture_preparation",
@@ -264,25 +275,33 @@ function stageHiddenFiles(scenario, repo, sourceRoot = root) {
   }
 }
 
-async function runCommand(command, cwd, timeout, checkId) {
+async function runCommand(command, cwd, timeout, checkId, outputMarker = null) {
   const result = await runManagedCommand({
     file: process.platform === "win32" ? (process.env.ComSpec || "cmd.exe") : "/bin/sh",
     args: process.platform === "win32" ? ["/d", "/s", "/c", command] : ["-c", command],
     cwd,
     timeout,
     maxOutputChars: 1024 * 1024,
+    outputMarker,
     ...(deterministicSelfTestContainmentFactory === null
       ? {}
       : { processContainmentFactory: deterministicSelfTestContainmentFactory }),
   });
   const status = result.timed_out ? "timed_out" : result.status === 0 && !result.error ? "passed" : "failed";
-  return {
+  const checkResult = {
     check_id: checkId,
     status,
     exit_code: Number.isInteger(result.status) ? result.status : null,
     stdout_chars: result.stdout_chars,
     stderr_chars: result.stderr_chars,
   };
+  RUNNER_CHECK_EXECUTION_METADATA.set(checkResult, Object.freeze({
+    timed_out: result.timed_out === true,
+    error_code: typeof result.error?.code === "string" ? result.error.code : null,
+    output_marker_fingerprint: result.output_marker_match?.fingerprint ?? null,
+    output_marker_count: result.output_marker_match?.count ?? null,
+  }));
+  return checkResult;
 }
 
 function unavailableChecks(scenario, phase, commands) {
@@ -298,7 +317,16 @@ function unavailableChecks(scenario, phase, commands) {
 async function executeChecks(scenario, phase, commands, repo) {
   const results = [];
   for (let index = 0; index < commands.length; index += 1) {
-    results.push(await runCommand(commands[index], repo, scenario.timeout, stableCheckId(scenario.id, phase, index)));
+    const outputMarker = phase === "preimplementation" && index === 0
+      ? qualityLiveAssertionMarker(scenario.id)
+      : null;
+    results.push(await runCommand(
+      commands[index],
+      repo,
+      scenario.timeout,
+      stableCheckId(scenario.id, phase, index),
+      outputMarker,
+    ));
   }
   return results;
 }
@@ -446,34 +474,174 @@ function promptAttestation(sourceRoot) {
   };
 }
 
+function boundedOracleResult(results) {
+  if (!Array.isArray(results) || results.length !== 1) return null;
+  const result = results[0];
+  if (!result || typeof result !== "object" || Array.isArray(result)) return null;
+  if (JSON.stringify(Object.keys(result).sort()) !== JSON.stringify([
+    "check_id", "exit_code", "status", "stderr_chars", "stdout_chars",
+  ])) return null;
+  if (typeof result.check_id !== "string" || typeof result.status !== "string") return null;
+  if (result.exit_code !== null && !Number.isInteger(result.exit_code)) return null;
+  if (!Number.isSafeInteger(result.stdout_chars) || result.stdout_chars < 0
+    || !Number.isSafeInteger(result.stderr_chars) || result.stderr_chars < 0) return null;
+  return {
+    check_id: result.check_id,
+    status: result.status,
+    exit_code: result.exit_code,
+    stdout_chars: result.stdout_chars,
+    stderr_chars: result.stderr_chars,
+  };
+}
+
+export function runnerVisibleOracleObservation({
+  scenario,
+  sidecar,
+  results,
+  actualFixtureFingerprint,
+  workspaceFingerprintBefore,
+  workspaceFingerprintAfter,
+  executionMetadata,
+}) {
+  const oracle = qualityLiveVisibleOracleContract({ scenario, sidecar });
+  const result = boundedOracleResult(results);
+  const resultFingerprint = result === null ? null : fingerprint({
+    oracle_identity_fingerprint: oracle.oracle_identity_fingerprint,
+    result,
+  });
+  let observedOutcome = "unavailable";
+  let observedFailureSignature = null;
+  let observationReason = "malformed";
+  const markerMetadataValid = executionMetadata?.output_marker_fingerprint === oracle.assertion_marker_fingerprint
+    && Number.isSafeInteger(executionMetadata?.output_marker_count)
+    && executionMetadata.output_marker_count >= 0;
+  if (!Array.isArray(results) || results.length === 0) {
+    observationReason = "missing";
+  } else if (actualFixtureFingerprint !== oracle.fixture_fingerprint) {
+    observationReason = "fixture_fingerprint_mismatch";
+  } else if (workspaceFingerprintBefore !== workspaceFingerprintAfter) {
+    observationReason = "workspace_changed";
+  } else if (result === null) {
+    observationReason = "malformed";
+  } else if (result.check_id !== stableCheckId(scenario.id, "preimplementation", 0)) {
+    observationReason = "unrelated_failure";
+  } else if (result.status === "timed_out" || executionMetadata?.timed_out === true) {
+    observationReason = "timed_out";
+  } else if (!executionMetadata || executionMetadata.timed_out !== false
+    || executionMetadata.error_code !== null || !markerMetadataValid) {
+    observationReason = "unrelated_failure";
+  } else if (result.status === "passed" && result.exit_code === 0
+    && executionMetadata.output_marker_count === 0) {
+    observedOutcome = "passing_characterization";
+    observationReason = "observed_pass";
+  } else if (result.status === "failed" && Number.isInteger(result.exit_code) && result.exit_code !== 0) {
+    let candidateFailureSignature = null;
+    try {
+      candidateFailureSignature = qualityLiveFailureSignature({
+        oracle_identity_fingerprint: oracle.oracle_identity_fingerprint,
+        exit_code: result.exit_code,
+        assertion_marker_fingerprint: executionMetadata.output_marker_fingerprint,
+        assertion_marker_count: executionMetadata.output_marker_count,
+      });
+    } catch (error) {
+      if (!(error instanceof ContractError) || error.code !== "QUALITY_INTEGER") throw error;
+    }
+    if (candidateFailureSignature === oracle.expected_failure_signature) {
+      observedOutcome = "failing_reproducer";
+      observedFailureSignature = candidateFailureSignature;
+      observationReason = "observed_failure";
+    } else {
+      observationReason = "unrelated_failure";
+    }
+  } else {
+    observationReason = "unrelated_failure";
+  }
+  return Object.freeze({
+    oracle_id: oracle.oracle_id,
+    command: oracle.command,
+    oracle_identity_fingerprint: oracle.oracle_identity_fingerprint,
+    workspace_fingerprint: workspaceFingerprintBefore,
+    expected_failure_signature: oracle.expected_failure_signature,
+    observed_outcome: observedOutcome,
+    observed_failure_signature: observedFailureSignature,
+    result_fingerprint: resultFingerprint,
+    observation_reason: observationReason,
+  });
+}
+
 export function runnerPreimplementationEvidence({
   dossier,
   scenarioId,
-  setupResults,
+  preimplementationOracleObservation,
   traceSnapshot,
+  trustedPlanChallengeResultIds = new Set(),
   evaluatedAt,
 }) {
   const baselineCheckId = `${scenarioId}-baseline`;
   const baselineObligation = dossier.test_obligations.find((entry) => entry.check_id === baselineCheckId);
-  const setupEvent = traceSnapshot.events.find(
-    (entry) => entry.agent === RUNNER_AGENT && entry.event_type === "setup_verification",
+  const oracleEvent = traceSnapshot.events.find(
+    (entry) => entry.agent === RUNNER_AGENT && entry.tool_or_command === "preimplementation-visible-oracle",
   );
   const baselineReceipts = dossier.verification_plan.baseline_check_ids.includes(baselineCheckId)
     && baselineObligation
+    && preimplementationOracleObservation !== null
     ? [{
       receipt_id: `${baselineCheckId}-receipt`,
       check_id: baselineCheckId,
       trusted_producer: "opencode-harness-quality-runner",
       phase: "preimplementation",
-      status: phaseStatus(setupResults) === "passed" ? "passed" : "failed",
+      status: (() => {
+        const expectedOutcome = baselineObligation.kind === "reproducer"
+          ? "failing_reproducer"
+          : baselineObligation.kind === "characterization" ? "passing_characterization" : null;
+        const commandMatches = baselineObligation.command_or_mechanism === preimplementationOracleObservation.command;
+        if (expectedOutcome === null || !commandMatches || preimplementationOracleObservation.observed_outcome === "unavailable") return "blocked";
+        return preimplementationOracleObservation.observed_outcome === expectedOutcome ? "passed" : "failed";
+      })(),
       command_or_mechanism: baselineObligation.command_or_mechanism,
       evidence_fingerprint: fingerprint({
         scenario_id: scenarioId,
         check_id: baselineCheckId,
         command_or_mechanism: baselineObligation.command_or_mechanism,
-        setup_results: setupResults,
+        oracle_event_id: oracleEvent?.event_id ?? null,
+        oracle_event_timestamp: oracleEvent?.timestamp ?? null,
+        oracle_observation: preimplementationOracleObservation,
       }),
-      completed_at: setupEvent?.timestamp ?? evaluatedAt,
+      completed_at: evaluatedAt,
+      oracle_observation: (() => {
+        const expectedOutcome = baselineObligation.kind === "reproducer"
+          ? "failing_reproducer"
+          : baselineObligation.kind === "characterization" ? "passing_characterization" : null;
+        const commandMatches = baselineObligation.command_or_mechanism === preimplementationOracleObservation.command;
+        let observedOutcome = preimplementationOracleObservation.observed_outcome;
+        let observedFailureSignature = preimplementationOracleObservation.observed_failure_signature;
+        let reasonCode;
+        if (expectedOutcome === null || !commandMatches) {
+          observedOutcome = "unavailable";
+          observedFailureSignature = null;
+          reasonCode = "obligation_mismatch";
+        } else if (observedOutcome === "unavailable") {
+          reasonCode = preimplementationOracleObservation.observation_reason;
+        } else if (observedOutcome === expectedOutcome) {
+          reasonCode = observedOutcome === "failing_reproducer"
+            ? "matched_expected_failure"
+            : "matched_passing_characterization";
+        } else {
+          reasonCode = observedOutcome === "passing_characterization" ? "unexpected_pass" : "unexpected_failure";
+        }
+        return {
+          oracle_id: preimplementationOracleObservation.oracle_id,
+          command: preimplementationOracleObservation.command,
+          oracle_identity_fingerprint: preimplementationOracleObservation.oracle_identity_fingerprint,
+          workspace_fingerprint: preimplementationOracleObservation.workspace_fingerprint,
+          expected_outcome: expectedOutcome ?? "passing_characterization",
+          observed_outcome: observedOutcome,
+          expected_failure_signature: preimplementationOracleObservation.expected_failure_signature,
+          observed_failure_signature: observedFailureSignature,
+          result_fingerprint: preimplementationOracleObservation.result_fingerprint,
+          reason_code: reasonCode,
+        };
+      })(),
     }]
     : [];
   const planChallengeReceipts = [];
@@ -482,6 +650,7 @@ export function runnerPreimplementationEvidence({
     ["reviewer", dossier.plan_challenge.reviewer_result_id],
   ]) {
     if (resultId === null) continue;
+    if (!trustedPlanChallengeResultIds.has(resultId)) continue;
     const job = traceSnapshot.jobs.find(
       (entry) => entry.request.task_id === resultId && entry.request.agent === role,
     );
@@ -535,6 +704,192 @@ function traceOperationHandler(instrumentation, { denyValues = [] } = {}) {
     }
     throw new ContractError("LIVE_TRACE_OPERATION", `unsupported adapter trace operation: ${operation}`);
   };
+}
+
+const CONTEXT_RECONCILIATION_CHECK_KEYS = Object.freeze([
+  "changed_path_ownership",
+  "public_contracts",
+  "dependency_directions",
+  "side_effect_edges",
+  "critical_path_tests",
+  "unrelated_changes",
+]);
+
+function resolveRunnerReviewerReconciliation(trustedResults, input) {
+  const result = trustedResults.get(input.reviewer_result_id);
+  if (!result
+    || result.final_workspace_fingerprint !== input.final_workspace_fingerprint
+    || result.final_diff_fingerprint !== input.final_diff_fingerprint
+    || JSON.stringify(result.changed_paths) !== JSON.stringify(input.changed_paths)) {
+    throw new ContractError("CONTEXT_RECONCILIATION_REVIEWER_UNTRUSTED", "final reconciliation lacks a runner-created reviewer result for the exact final diff");
+  }
+  return {
+    reviewer_result_id: result.reviewer_result_id,
+    checks: result.checks,
+    completed_at: result.completed_at,
+  };
+}
+
+function runnerReviewerChecks(request) {
+  const pass = (passed, findingId) => ({
+    status: passed ? "passed" : "blocked",
+    finding_ids: passed ? [] : [findingId],
+  });
+  const plannedTestObligationIds = new Set(request.planned_test_obligation_ids ?? []);
+  return {
+    changed_path_ownership: pass(
+      request.changed_paths.every((entry) => entry.ownership_ids.length > 0),
+      "runner-review-unowned-path",
+    ),
+    public_contracts: pass(request.unexpected_public_contracts.length === 0, "runner-review-public-contract"),
+    dependency_directions: pass(request.unexpected_dependency_directions.length === 0, "runner-review-dependency"),
+    side_effect_edges: pass(request.unexpected_side_effect_edges.length === 0, "runner-review-side-effect"),
+    critical_path_tests: pass(
+      request.changed_paths.filter((entry) => ["source", "schema", "config"].includes(entry.kind))
+        .every((entry) => entry.test_obligation_ids.length > 0
+          && entry.test_obligation_ids.every((id) => plannedTestObligationIds.has(id))),
+      "runner-review-critical-test",
+    ),
+    unrelated_changes: pass(request.unrelated_paths.length === 0, "runner-review-unrelated-change"),
+  };
+}
+
+async function recordRunnerReviewerReconciliation({ traceStore, runId, risk, request, reviewFn, trustedResults }) {
+  traceStore.createJob(runId, {
+    task_id: request.reviewer_result_id,
+    parent_task_id: TASK_ID,
+    agent: "reviewer",
+    assigned_scope: `Review runner-observed final diff ${request.final_diff_fingerprint}.`,
+    write_scope: [],
+    risk,
+  });
+  traceStore.transitionJob(runId, request.reviewer_result_id, { state: "running" });
+  const completeBlockedReview = (summary) => traceStore.completeJob(runId, request.reviewer_result_id, {
+    state: "blocked",
+    result: {
+      status: "blocked",
+      assigned_scope: `Review runner-observed final diff ${request.final_diff_fingerprint}.`,
+      summary,
+      evidence: [
+        `runner-final-workspace:${request.final_workspace_fingerprint}`,
+        `runner-final-diff:${request.final_diff_fingerprint}`,
+      ],
+      files_changed: [],
+      verification: "Runner failed closed while settling the independent final-diff review callback.",
+      decision_unblocked: "none",
+      uncertainty: "The independent final-diff review did not return a trusted complete result.",
+      risks: ["Final context reconciliation remains blocked."],
+      next_step: "Provide a trusted independent reviewer and rerun final reconciliation.",
+      termination_reason: "verification_failed",
+    },
+  });
+  let review;
+  try {
+    review = await reviewFn(Object.freeze(structuredClone(request)));
+  } catch (error) {
+    completeBlockedReview("Runner reviewer callback failed before producing a trusted result.");
+    throw error;
+  }
+  if (!review || typeof review !== "object" || Array.isArray(review)
+    || JSON.stringify(Object.keys(review).sort()) !== JSON.stringify(["checks"])) {
+    completeBlockedReview("Runner reviewer callback returned a malformed result.");
+    throw new ContractError("CONTEXT_RECONCILIATION_REVIEWER_UNTRUSTED", "runner reviewer callback returned an invalid result shape");
+  }
+  const checks = structuredClone(review.checks);
+  const allPassed = CONTEXT_RECONCILIATION_CHECK_KEYS.every((key) => checks?.[key]?.status === "passed");
+  const completed = traceStore.completeJob(runId, request.reviewer_result_id, {
+    state: allPassed ? "completed" : "blocked",
+    result: {
+      status: allPassed ? "no-findings" : "blocked",
+      assigned_scope: `Review runner-observed final diff ${request.final_diff_fingerprint}.`,
+      summary: allPassed ? "Runner-owned final-diff review passed." : "Runner-owned final-diff review found blocking evidence.",
+      evidence: [
+        `runner-final-workspace:${request.final_workspace_fingerprint}`,
+        `runner-final-diff:${request.final_diff_fingerprint}`,
+      ],
+      files_changed: [],
+      verification: "Runner created the read-only review after observing the final workspace and exact diff.",
+      decision_unblocked: allPassed ? "final context reconciliation" : "none",
+      uncertainty: allPassed ? "graph completeness is not claimed" : "blocking runner review evidence remains",
+      risks: allPassed ? [] : ["final context reconciliation blocked"],
+      next_step: allPassed ? "continue to integrated verification" : "revise the implementation or analysis",
+      termination_reason: allPassed ? "verified" : "verification_failed",
+    },
+  });
+  trustedResults.set(request.reviewer_result_id, Object.freeze({
+    reviewer_result_id: request.reviewer_result_id,
+    final_workspace_fingerprint: request.final_workspace_fingerprint,
+    final_diff_fingerprint: request.final_diff_fingerprint,
+    changed_paths: structuredClone(request.changed_paths),
+    checks,
+    completed_at: completed.result.completed_at,
+  }));
+}
+
+async function recordRunnerPlanChallenge({
+  traceStore,
+  runId,
+  risk,
+  request,
+  challengeFn,
+  trustedResultIds,
+  qualityCoordinator,
+}) {
+  const challenge = await challengeFn(Object.freeze(structuredClone(request)));
+  if (!challenge || typeof challenge !== "object" || Array.isArray(challenge)
+    || JSON.stringify(Object.keys(challenge).sort()) !== JSON.stringify(["architect", "reviewer"])) {
+    throw new ContractError("QUALITY_PLAN_CHALLENGE_UNTRUSTED", "runner plan challenge callback returned an invalid result shape");
+  }
+  for (const [role, resultId] of [
+    ["architect", request.architect_result_id],
+    ["reviewer", request.reviewer_result_id],
+  ]) {
+    const contribution = challenge[role];
+    if (!contribution || typeof contribution !== "object" || Array.isArray(contribution)
+      || JSON.stringify(Object.keys(contribution).sort()) !== JSON.stringify(["evidence_refs", "status", "summary"])
+      || !["passed", "blocked"].includes(contribution.status)
+      || typeof contribution.summary !== "string"
+      || !Array.isArray(contribution.evidence_refs)) {
+      throw new ContractError("QUALITY_PLAN_CHALLENGE_UNTRUSTED", `runner ${role} plan challenge result is invalid`);
+    }
+    assertPersistenceSafe(contribution, { label: `runner ${role} plan challenge` });
+    recordQualityLiveReadOnlyContextSubagent(qualityCoordinator, resultId);
+    traceStore.createJob(runId, {
+      task_id: resultId,
+      parent_task_id: TASK_ID,
+      agent: role,
+      assigned_scope: `Independently challenge dossier ${request.dossier.dossier_id} before finalization.`,
+      write_scope: [],
+      risk,
+    });
+    traceStore.transitionJob(runId, resultId, { state: "running" });
+    const passed = contribution.status === "passed";
+    traceStore.completeJob(runId, resultId, {
+      state: passed ? "completed" : "blocked",
+      result: {
+        status: passed ? (role === "reviewer" ? "no-findings" : "completed") : "blocked",
+        assigned_scope: `Independently challenge dossier ${request.dossier.dossier_id} before finalization.`,
+        summary: contribution.summary,
+        evidence: contribution.evidence_refs.map((entry) => `${entry.kind}:${entry.value}`),
+        files_changed: [],
+        verification: "Runner-created read-only plan challenge bound to the immutable dossier draft fingerprint.",
+        decision_unblocked: passed ? "preimplementation quality gate" : "none",
+        uncertainty: passed ? "No blocking bounded-plan concern remains." : "Blocking plan concern remains.",
+        risks: passed ? [] : ["Plan challenge did not pass."],
+        next_step: passed ? "Finalize the challenged dossier." : "Revise and challenge the dossier again.",
+        termination_reason: passed ? "verified" : "verification_failed",
+      },
+    });
+    trustedResultIds.add(resultId);
+  }
+  return Object.freeze({
+    architect_result_id: request.architect_result_id,
+    reviewer_result_id: request.reviewer_result_id,
+    evidence_refs: Object.freeze([
+      { kind: "job", value: request.architect_result_id },
+      { kind: "job", value: request.reviewer_result_id },
+    ]),
+  });
 }
 
 function cancelUnsettledAdapterJobs(traceStore, runId) {
@@ -617,6 +972,205 @@ function buildVerificationChecks({ setup, adapterClassification, visible, hidden
   ];
 }
 
+function runnerContextTruncation() {
+  return {
+    inventoryLimitReached: false,
+    resultLimitReached: false,
+    matchLimitReached: false,
+    byteLimitReached: false,
+    lineLimitReached: false,
+    durationLimitReached: false,
+    excerptTruncated: false,
+    contextBeforeTruncated: false,
+    contextAfterTruncated: false,
+    symbolLimitReached: false,
+    relationshipLimitReached: false,
+    snapshotChanged: false,
+    coveragePartial: false,
+  };
+}
+
+function runnerContextReadOutput(relativePath, content) {
+  const lines = Math.max(1, content.split(/\r?\n/u).length);
+  const bytes = Buffer.byteLength(content, "utf8");
+  return JSON.stringify({
+    schemaVersion: 2,
+    tool: "context_read",
+    worktree: ".",
+    scope: { path: relativePath, filters: {} },
+    snapshot: {
+      fingerprint: fingerprint({ relativePath, content }).slice("sha256:".length),
+      fingerprintKind: "content",
+      fingerprintScope: relativePath,
+      complete: true,
+      stable: true,
+      changedDuringOperation: false,
+      truncationReasons: [],
+    },
+    coverage: {
+      candidateFiles: 1,
+      scannedFiles: 1,
+      bytesScanned: bytes,
+      skippedSecret: 0,
+      skippedGenerated: 0,
+      skippedLarge: 0,
+      skippedUnreadable: 0,
+      unsupportedLanguages: {},
+      truncation: runnerContextTruncation(),
+      truncationReasons: [],
+      partial: false,
+    },
+    limits: {},
+    usage: { files: 1, directories: 0, bytes, lines, matches: 0, ranges: 1 },
+    truncated: false,
+    ok: true,
+    path: relativePath,
+    sha256: fingerprint(content).slice("sha256:".length),
+    bytes,
+    totalLines: lines,
+    selectedRange: { startLine: 1, endLine: lines },
+    encoding: "utf-8",
+    stableDuringRead: true,
+    truncatedBefore: false,
+    truncatedAfter: false,
+    text: content,
+  });
+}
+
+function runnerContextOutlineOutput(files, availableToolIds) {
+  return JSON.stringify({
+    schemaVersion: 2,
+    tool: "context_outline",
+    worktree: ".",
+    scope: { path: ".", filters: {} },
+    snapshot: {
+      fingerprint: fingerprint({ files }).slice("sha256:".length),
+      fingerprintKind: "metadata",
+      fingerprintScope: ".",
+      complete: true,
+      stable: true,
+      changedDuringOperation: false,
+      truncationReasons: [],
+    },
+    coverage: {
+      candidateFiles: files.length,
+      scannedFiles: files.length,
+      bytesScanned: 0,
+      skippedSecret: 0,
+      skippedGenerated: 0,
+      skippedLarge: 0,
+      skippedUnreadable: 0,
+      unsupportedLanguages: {},
+      truncation: runnerContextTruncation(),
+      truncationReasons: [],
+      partial: false,
+    },
+    limits: {},
+    usage: { files: files.length, directories: 0, bytes: 0, lines: 0, matches: 0, ranges: 0 },
+    truncated: false,
+    guidance: files.filter((entry) => /(^|\/)(AGENTS|WORKFLOW|README)\.md$/iu.test(entry))
+      .map((entry) => ({ path: entry, appliesTo: "." })),
+    filesSample: files.map((entry) => ({ path: entry, size: 0 })),
+    tools: [...availableToolIds],
+    toolset: availableToolIds.some((entry) => ["context_map", "context_batch_read", "context_symbols", "context_related"].includes(entry)) ? "advanced" : "minimal",
+    explicitEnabledTools: [],
+  });
+}
+
+export async function observeRunnerQualityContext({
+  fixture,
+  recordObservedContextToolCall,
+  remaining_context_calls: remainingContextCalls,
+  available_tool_ids: availableToolIds = ["context_outline", "context_files", "context_search", "context_read"],
+}) {
+  const receiptIds = [];
+  const manifest = captureOrdinaryTreeManifest(fixture.repo);
+  const files = manifest.entries.filter((entry) => entry.type === "file").map((entry) => entry.path).sort();
+  if (files.length === 0 || files.length + 1 > Math.min(16, remainingContextCalls)) {
+    throw new ContractError("CONTEXT_RECEIPT_BUDGET_EXHAUSTED", "runner context observer cannot fit the bounded outline and file reads into the selected strategy budget");
+  }
+  receiptIds.push(recordObservedContextToolCall({
+    session_id: "runner-quality-context",
+    call_id: "runner-context-outline-1",
+    tool_id: "context_outline",
+    args: {},
+    output: runnerContextOutlineOutput(files, availableToolIds),
+    parent_question_id: null,
+    evidence_refs: [{ kind: "runtime", value: "runner-observed-installed-context-tool-surface" }],
+  }).receipt_id);
+  let totalBytes = 0;
+  for (const [index, relativePath] of files.entries()) {
+    const absolutePath = path.join(fixture.repo, ...relativePath.split("/"));
+    const stat = fs.lstatSync(absolutePath);
+    if (!stat.isFile() || stat.isSymbolicLink() || stat.size > 256 * 1024) {
+      throw new ContractError("CONTEXT_RECEIPT_BUDGET_EXHAUSTED", `runner context observer cannot completely read ${relativePath}`);
+    }
+    totalBytes += stat.size;
+    if (totalBytes > 1024 * 1024) {
+      throw new ContractError("CONTEXT_RECEIPT_BUDGET_EXHAUSTED", "runner context observer exceeded its 1 MiB cumulative read boundary");
+    }
+    const content = fs.readFileSync(absolutePath, "utf8");
+    receiptIds.push(recordObservedContextToolCall({
+      session_id: "runner-quality-context",
+      call_id: `runner-context-read-${index + 1}`,
+      tool_id: "context_read",
+      args: { path: relativePath, startLine: 1, maxLines: Math.max(1, content.split(/\r?\n/u).length), maxBytes: 256 * 1024, format: "text" },
+      output: runnerContextReadOutput(relativePath, content),
+      parent_question_id: null,
+      evidence_refs: [{ kind: "file", value: relativePath }],
+    }).receipt_id);
+  }
+  return Object.freeze({ receipt_ids: Object.freeze(receiptIds) });
+}
+
+export async function observeRunnerStandardLiteContext({
+  fixture,
+  ownership_paths: ownershipPaths,
+  recordObservedContextToolCall,
+  remaining_context_calls: remainingContextCalls,
+}) {
+  const receiptIds = [];
+  const paths = [...new Set(ownershipPaths)].sort();
+  if (paths.length === 0 || paths.length > Math.min(12, remainingContextCalls)) {
+    throw new ContractError("CONTEXT_STANDARD_LITE_EVIDENCE_MISSING", "standard-lite context observer requires a bounded non-empty ownership path set");
+  }
+  let totalBytes = 0;
+  for (const [index, relativePath] of paths.entries()) {
+    const absolutePath = path.resolve(fixture.repo, ...relativePath.split("/"));
+    if (!isInside(fixture.repo, absolutePath)) throw new ContractError("CONTEXT_RECEIPT_PATH", "standard-lite context path escapes the fixture");
+    const stat = fs.lstatSync(absolutePath);
+    if (!stat.isFile() || stat.isSymbolicLink() || stat.size > 256 * 1024) {
+      throw new ContractError("CONTEXT_STANDARD_LITE_EVIDENCE_MISSING", `standard-lite cannot completely read ${relativePath}`);
+    }
+    totalBytes += stat.size;
+    if (totalBytes > 512 * 1024) throw new ContractError("CONTEXT_STANDARD_LITE_OVERANALYSIS", "standard-lite local reads exceeded 512 KiB");
+    const content = fs.readFileSync(absolutePath, "utf8");
+    receiptIds.push(recordObservedContextToolCall({
+      session_id: "runner-quality-context",
+      call_id: `runner-standard-context-read-${index + 1}`,
+      tool_id: "context_read",
+      args: { path: relativePath, startLine: 1, maxLines: Math.max(1, content.split(/\r?\n/u).length), maxBytes: 256 * 1024, format: "text" },
+      output: runnerContextReadOutput(relativePath, content),
+      parent_question_id: null,
+      evidence_refs: [{ kind: "file", value: relativePath }],
+    }).receipt_id);
+  }
+  return Object.freeze({ receipt_ids: Object.freeze(receiptIds) });
+}
+
+export async function observeRunnerDefaultQualityContext(input) {
+  return input.strategy_binding?.strategy_id === "standard-lite-local-v1"
+    ? observeRunnerStandardLiteContext(input)
+    : observeRunnerQualityContext(input);
+}
+
+export function productionQualityScenarioRunOptions(sourceRoot) {
+  return Object.freeze({
+    sourceRoot,
+    observeQualityContextFn: observeRunnerDefaultQualityContext,
+  });
+}
+
 async function runScenarioProfile({
   adapterUrl,
   scenario,
@@ -628,6 +1182,7 @@ async function runScenarioProfile({
   sourceRoot = root,
   prepareFixtureFn = prepareFixture,
   executeChecksFn = executeChecks,
+  executePreimplementationOracleFn = executeChecks,
   stageHiddenFilesFn = stageHiddenFiles,
   runAdapterModuleFn = (input) => runAdapterModule({
     ...input,
@@ -637,6 +1192,11 @@ async function runScenarioProfile({
   }),
   cleanupFixtureFn = (temporaryRoot) => fs.rmSync(temporaryRoot, { recursive: true, force: true }),
   qualitySidecarOverride = undefined,
+  qualityArchitectureEvaluatorFn = projectArchitectureEvaluator,
+  qualityArchitectureAuditorFn = projectArchitectureAuditor,
+  observeQualityContextFn = undefined,
+  challengeQualityPlanFn = undefined,
+  reviewQualityReconciliationFn = undefined,
 }) {
   const risk = riskForScenario(scenario);
   const qualitySidecar = qualitySidecarOverride === undefined
@@ -657,6 +1217,8 @@ async function runScenarioProfile({
   let qualityAttestation = null;
   let qualityBundlePublished = false;
   let workspaceAfterManifest = null;
+  const trustedReviewerResults = new Map();
+  const trustedPlanChallengeResultIds = new Set();
   try {
   const run = traceStore.createRun({
     scenario_id: scenario.id,
@@ -669,6 +1231,7 @@ async function runScenarioProfile({
   const runId = run.run_id;
   const startedAt = Date.now();
   let setupResults = unavailableChecks(scenario, "setup", scenario.setup_commands);
+  let preimplementationOracleObservation = null;
   let visibleResults = unavailableChecks(scenario, "visible", scenario.visible_checks);
   let hiddenShellResults = unavailableChecks(scenario, "hidden", scenario.hidden_checks);
   let workspaceResult = unavailableWorkspacePolicyCheck(scenario);
@@ -725,6 +1288,34 @@ async function runScenarioProfile({
     if (setupStatus === "passed") {
       workspaceBeforeManifest = captureOrdinaryTreeManifest(fixture.repo);
       if (qualitySidecar !== null) {
+        let oracleResults = null;
+        let actualFixtureFingerprint = null;
+        try {
+          actualFixtureFingerprint = qualityLiveFixtureFingerprint(fixture.repo);
+          oracleResults = await executePreimplementationOracleFn(
+            scenario,
+            "preimplementation",
+            [qualitySidecar.visible_oracle.command],
+            fixture.repo,
+          );
+        } catch {
+          oracleResults = null;
+        }
+        const workspaceAfterOracle = captureOrdinaryTreeManifest(fixture.repo);
+        preimplementationOracleObservation = runnerVisibleOracleObservation({
+          scenario,
+          sidecar: qualitySidecar,
+          results: oracleResults,
+          actualFixtureFingerprint,
+          workspaceFingerprintBefore: workspaceBeforeManifest.fingerprint,
+          workspaceFingerprintAfter: workspaceAfterOracle.fingerprint,
+          executionMetadata: Array.isArray(oracleResults) && oracleResults.length === 1
+            ? RUNNER_CHECK_EXECUTION_METADATA.get(oracleResults[0]) ?? null
+            : null,
+        });
+        const oracleMatched = preimplementationOracleObservation.observed_outcome === "failing_reproducer"
+          && preimplementationOracleObservation.observed_failure_signature === preimplementationOracleObservation.expected_failure_signature;
+        if (!oracleMatched) incompleteEvidence.push("QUALITY_BASELINE_ORACLE_UNTRUSTED");
         qualityCatalog = qualityLiveCheckCatalog(scenario.id, qualitySidecar.risk_class);
         const qualityStore = createEngineeringQualityStore({ run_id: runId, task_id: TASK_ID });
         qualityCoordinator = createQualityLiveCoordinator({
@@ -745,15 +1336,17 @@ async function runScenarioProfile({
             return { sequence: event.sequence, evidence_refs: event.evidence_refs, verifier_codes: event.verifier_codes };
           },
           observe_workspace: () => captureOrdinaryTreeManifest(fixture.repo).fingerprint,
-          evaluate_architecture: projectArchitectureEvaluator(fixture.repo),
-          audit_architecture: projectArchitectureAuditor(fixture.repo),
+          evaluate_architecture: qualityArchitectureEvaluatorFn(fixture.repo),
+          audit_architecture: qualityArchitectureAuditorFn(fixture.repo),
           collect_preimplementation_evidence: ({ dossier, evaluated_at: evaluatedAt }) => runnerPreimplementationEvidence({
             dossier,
             scenarioId: scenario.id,
-            setupResults,
+            preimplementationOracleObservation,
             traceSnapshot: traceStore.inspectRun(runId),
+            trustedPlanChallengeResultIds,
             evaluatedAt,
           }),
+          resolve_reviewer_reconciliation: (input) => resolveRunnerReviewerReconciliation(trustedReviewerResults, input),
         });
       }
       emitRunnerPhase({
@@ -768,14 +1361,64 @@ async function runScenarioProfile({
         risk,
       });
       const baseTraceHandler = traceOperationHandler(instrumentation, { denyValues });
+      let contextObservationPerformed = false;
+      let planChallengePerformed = false;
       const adapterTraceHandler = qualityCoordinator === null
         ? baseTraceHandler
-        : (operation, payload) => handleQualityLiveOperation(
-          qualityCoordinator,
-          operation,
-          payload,
-          baseTraceHandler,
-        );
+        : async (operation, payload) => {
+          if (operation === "quality_observe_context") {
+            if (payload === null || typeof payload !== "object" || Array.isArray(payload) || Object.keys(payload).length !== 0) {
+              throw new ContractError("QUALITY_LIVE_OPERATION", "quality_observe_context accepts an empty request");
+            }
+            if (contextObservationPerformed) throw new ContractError("CONTEXT_RECEIPT_DUPLICATE", "runner context observation was requested more than once");
+            if (typeof observeQualityContextFn !== "function") {
+              throw new ContractError("QUALITY_CONTEXT_OBSERVER_UNAVAILABLE", "runner lacks a trusted host context observer");
+            }
+            const observationRequest = qualityLiveContextObservationRequest(qualityCoordinator);
+            const callbackResult = await observeQualityContextFn({
+              ...observationRequest,
+              coordinator: qualityCoordinator,
+              fixture,
+              scenario,
+              recordObservedContextToolCall: (contextPayload) => recordQualityLiveObservedContextToolCall(qualityCoordinator, contextPayload),
+            });
+            const afterObservation = qualityLiveContextObservationRequest(qualityCoordinator);
+            const newReceiptIds = afterObservation.existing_receipt_ids.slice(observationRequest.existing_receipt_ids.length);
+            if (!callbackResult || typeof callbackResult !== "object" || Array.isArray(callbackResult)
+              || JSON.stringify(Object.keys(callbackResult).sort()) !== JSON.stringify(["receipt_ids"])
+              || !Array.isArray(callbackResult.receipt_ids)
+              || callbackResult.receipt_ids.length === 0
+              || callbackResult.receipt_ids.some((entry) => typeof entry !== "string")
+              || new Set(callbackResult.receipt_ids).size !== callbackResult.receipt_ids.length
+              || JSON.stringify(callbackResult.receipt_ids) !== JSON.stringify(newReceiptIds)) {
+              throw new ContractError("QUALITY_CONTEXT_OBSERVER_UNTRUSTED", "runner context observer returned a malformed or receipt-incoherent result");
+            }
+            contextObservationPerformed = true;
+            return handleQualityLiveOperation(qualityCoordinator, "quality_inspect", {}, baseTraceHandler);
+          }
+          if (operation === "quality_challenge_plan") {
+            if (payload === null || typeof payload !== "object" || Array.isArray(payload) || Object.keys(payload).length !== 0) {
+              throw new ContractError("QUALITY_LIVE_OPERATION", "quality_challenge_plan accepts an empty request");
+            }
+            if (planChallengePerformed) throw new ContractError("QUALITY_PLAN_CHALLENGE_UNTRUSTED", "runner plan challenge was requested more than once");
+            if (typeof challengeQualityPlanFn !== "function") {
+              throw new ContractError("QUALITY_PLAN_CHALLENGE_UNTRUSTED", "high/critical work lacks an independently supplied runner plan challenge callback");
+            }
+            const challengeRequest = qualityLivePlanChallengeRequest(qualityCoordinator);
+            const result = await recordRunnerPlanChallenge({
+              traceStore,
+              runId,
+              risk,
+              request: challengeRequest,
+              challengeFn: challengeQualityPlanFn,
+              trustedResultIds: trustedPlanChallengeResultIds,
+              qualityCoordinator,
+            });
+            planChallengePerformed = true;
+            return result;
+          }
+          return handleQualityLiveOperation(qualityCoordinator, operation, payload, baseTraceHandler);
+        };
       try {
         adapterProcessStarted = true;
         adapterResult = await runAdapterModuleFn({
@@ -812,6 +1455,7 @@ async function runScenarioProfile({
           adapterClassification = "failed";
           incompleteEvidence.push("ADAPTER_TEARDOWN_UNVERIFIED");
         }
+        if (error instanceof ContractError) incompleteEvidence.push(error.code);
       }
       const unsettledJobs = cancelUnsettledAdapterJobs(traceStore, runId);
       if (unsettledJobs > 0) {
@@ -842,6 +1486,31 @@ async function runScenarioProfile({
           recordQualityLiveImplementation(qualityCoordinator, {
             final_workspace_fingerprint: workspaceAfterManifest.fingerprint,
             changed_paths: workspacePolicy.changedPaths,
+          });
+          let trustedReviewFn;
+          if (reviewQualityReconciliationFn === undefined) {
+            trustedReviewFn = qualitySidecar.risk_class === "standard-lite"
+              ? (request) => ({ checks: runnerReviewerChecks(request) })
+              : null;
+          } else {
+            if (typeof reviewQualityReconciliationFn !== "function") {
+              throw new ContractError("QUALITY_LIVE_CALLBACK", "reviewQualityReconciliationFn must be a function when explicitly supplied");
+            }
+            trustedReviewFn = reviewQualityReconciliationFn;
+          }
+          if (trustedReviewFn === null) {
+            throw new ContractError(
+              "CONTEXT_RECONCILIATION_REVIEWER_UNTRUSTED",
+              "high and critical live reconciliation requires an independently supplied runner reviewer callback",
+            );
+          }
+          await recordRunnerReviewerReconciliation({
+            traceStore,
+            runId,
+            risk,
+            request: qualityLiveReviewerRequest(qualityCoordinator),
+            reviewFn: trustedReviewFn,
+            trustedResults: trustedReviewerResults,
           });
         }
       } catch (error) {
@@ -993,15 +1662,6 @@ async function runScenarioProfile({
   if (adapterClassification === "timed_out") incompleteEvidence.push("ADAPTER_TIMED_OUT");
   else if (adapterClassification === "failed") incompleteEvidence.push("ADAPTER_FAILED");
 
-  if (fixture?.temporaryRoot && fs.existsSync(fixture.temporaryRoot)) {
-    try {
-      cleanupFixtureFn(fixture.temporaryRoot);
-      fixture = null;
-    } catch {
-      incompleteEvidence.push("FIXTURE_CLEANUP_FAILED");
-    }
-  }
-
   const preliminaryPassed = phaseStatus(setupResults) === "passed"
     && adapterClassification === "passed"
     && phaseStatus(visibleResults) === "passed"
@@ -1016,6 +1676,12 @@ async function runScenarioProfile({
       anticipatedQualityVerifierCodes = [...qualityLivePrecompletionVerifierCodes(qualityCoordinator)];
       if (preliminaryPassed && !anticipatedQualityVerifierCodes.includes("ENGINEERING_EDGE_FAILURE_MAPPING_VERIFIED")) {
         anticipatedQualityVerifierCodes.push("ENGINEERING_EDGE_FAILURE_MAPPING_VERIFIED");
+      }
+      if (preliminaryPassed && !anticipatedQualityVerifierCodes.includes("CONTEXT_EDGE_FAILURE_VERIFICATION_LINKED")) {
+        anticipatedQualityVerifierCodes.push("CONTEXT_EDGE_FAILURE_VERIFICATION_LINKED");
+      }
+      if (preliminaryPassed && !anticipatedQualityVerifierCodes.includes("CONTEXT_FINAL_RECONCILIATION_COMPLETE")) {
+        anticipatedQualityVerifierCodes.push("CONTEXT_FINAL_RECONCILIATION_COMPLETE");
       }
     } catch (error) {
       incompleteEvidence.push(error instanceof ContractError ? error.code : "QUALITY_INTEGRATED_VERIFICATION_MISSING");
@@ -1039,7 +1705,7 @@ async function runScenarioProfile({
     const assertion = scenario.hidden_trace_assertions[index];
     const lifecycleAssertion = assertion.op === "event_exists" && assertion.event_type === "verification";
     const anticipatedQualityCode = assertion.op === "verifier_code_exists"
-      && assertion.code.startsWith("ENGINEERING_")
+      && (assertion.code.startsWith("ENGINEERING_") || assertion.code.startsWith("CONTEXT_"))
       && anticipatedQualityVerifierCodes.includes(assertion.code);
     return lifecycleAssertion || anticipatedQualityCode
       ? { ...entry, status: "passed", reason_code: "ASSERTION_PASSED" }
@@ -1087,6 +1753,18 @@ async function runScenarioProfile({
   let qualityIntegratedRecorded = false;
   if (qualityCoordinator !== null && preVerificationStatus === "passed") {
     try {
+      const postCheckManifest = captureOrdinaryTreeManifest(fixture.repo);
+      const hiddenTargets = new Set(scenario.hidden_check_files.map((entry) => entry.target));
+      const unexpectedPostReviewDrift = changedOrdinaryTreePaths(workspaceAfterManifest, postCheckManifest)
+        .filter((entry) => ![...hiddenTargets].some((target) => (
+          entry === target || target.startsWith(`${entry}/`) || entry.startsWith(`${target}/`)
+        )));
+      if (unexpectedPostReviewDrift.length > 0) {
+        throw new ContractError(
+          "CONTEXT_RECONCILIATION_FINAL_WORKSPACE_STALE",
+          `workspace changed after runner reviewer observation: ${unexpectedPostReviewDrift.join(",")}`,
+        );
+      }
       recordQualityLiveRunnerIntegratedVerification(qualityCoordinator, {
         evidence_id: `integrated-${runId}-${verificationEvent.sequence}`,
         trace_event: verificationEvent,
@@ -1097,6 +1775,7 @@ async function runScenarioProfile({
         workspace_result: workspaceResult,
         termination_accepted: terminationAccepted,
       });
+      finalizeQualityLiveContextReconciliation(qualityCoordinator);
       qualityIntegratedRecorded = true;
     } catch (error) {
       incompleteEvidence.push(error instanceof ContractError ? error.code : "QUALITY_INTEGRATED_VERIFICATION_MISSING");
@@ -1106,7 +1785,8 @@ async function runScenarioProfile({
   if (qualityCoordinator !== null) {
     const verifierCodes = qualityLivePrecompletionVerifierCodes(qualityCoordinator);
     const requiredCodes = scenario.hidden_trace_assertions
-      .filter((entry) => entry.op === "verifier_code_exists" && entry.code.startsWith("ENGINEERING_"))
+      .filter((entry) => entry.op === "verifier_code_exists"
+        && (entry.code.startsWith("ENGINEERING_") || entry.code.startsWith("CONTEXT_")))
       .map((entry) => entry.code);
     appendRunnerEvent(traceStore, runId, risk, {
       event_type: "tool_call",
@@ -1171,6 +1851,14 @@ async function runScenarioProfile({
   }
   if (qualityCoordinator !== null && qualityAttestation === null) {
     incompleteEvidence.push("QUALITY_ATTESTATION_UNAVAILABLE");
+  }
+  if (fixture?.temporaryRoot && fs.existsSync(fixture.temporaryRoot)) {
+    try {
+      cleanupFixtureFn(fixture.temporaryRoot);
+      fixture = null;
+    } catch {
+      incompleteEvidence.push("FIXTURE_CLEANUP_FAILED");
+    }
   }
   if (verificationStatus !== "failed" && incompleteEvidence.length > 0) verificationStatus = "incomplete";
   const completedEvidence = preliminaryPassed
@@ -2095,7 +2783,7 @@ async function main() {
       evaluationRunId,
       evidenceKind: "live",
       modelName: process.env.OPENCODE_MODEL || null,
-      scenarioRunOptions: { sourceRoot: sourceSnapshot.snapshotRoot },
+      scenarioRunOptions: productionQualityScenarioRunOptions(sourceSnapshot.snapshotRoot),
     });
     sourceSnapshot.verifyIntegrity();
     if (repositoryStateFingerprint(root) !== sourceSnapshot.repositoryFingerprint) {
@@ -2119,7 +2807,7 @@ async function main() {
   }
 }
 
-export { runEvaluation, runScenarioProfile, runSelfTest };
+export { runEvaluation, runScenarioProfile, runnerReviewerChecks, runSelfTest };
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {

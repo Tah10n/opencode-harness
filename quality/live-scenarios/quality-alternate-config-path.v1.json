@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "sidecar_version": "1.0.0",
+  "scenario_id": "quality-alternate-config-path",
+  "seeded_defect": "The formatter preserves display-name case, so the default visible profile contract fails before implementation.",
+  "visible_oracle": { "command": "node --test test/visible.test.mjs", "seeded_status": "failed" },
+  "bad_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-alternate-config-path/bad/profile.mjs", "target": "src/profile.mjs", "sha256": "6815b9b501b6a7300920849678d701b862883d0026de060ec50a4bdae41d0723" }
+  ] },
+  "compliant_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-alternate-config-path/good/profile.mjs", "target": "src/profile.mjs", "sha256": "7baef0fd70509789f843081b7798e24a4c79fd5d73f5ba6ad7761aab4ce910e9" }
+  ] },
+  "hidden_counterexample": "The legacy_profile flag activates an alternate shape whose display_name needs the same normalization without changing user_id.",
+  "forbidden_regression": "Do not fix only the default configuration path.",
+  "risk_class": "high",
+  "workload_class": "alternate-config-path",
+  "expected_ownership": ["src/profile.mjs"],
+  "required_quality_assertion_ids": [
+    "quality-alternate-config-path-dossier-before-edit",
+    "quality-alternate-config-path-gate-before-edit",
+    "quality-alternate-config-path-coverage-recorded",
+    "quality-alternate-config-path-unknowns-resolved",
+    "quality-alternate-config-path-mapping-verified",
+    "quality-alternate-config-path-architecture-respected",
+    "quality-alternate-config-path-ownership-respected",
+    "quality-alternate-config-path-integrated-verification",
+    "quality-alternate-config-path-valid-completion"
+  ],
+  "suite": "held_out",
+  "fixture_fingerprint": "44e9c9f7530c40c248e484e8e6c75148409dababa09756c70cf2876689d2e22f"
+}

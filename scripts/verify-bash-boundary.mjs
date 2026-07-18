@@ -9,9 +9,11 @@ import {
   executeNormalSessionQualityTool,
   handleNormalSessionChatMessage,
   handleNormalSessionPermission,
+  handleNormalSessionToolAfter,
   handleNormalSessionToolBefore,
 } from "../lib/quality/normal-session-bridge.mjs";
 import { ContractError, fingerprint } from "../lib/quality/validation.mjs";
+import { contextReadToolOutput } from "./context-test-fixtures.mjs";
 
 function expectCode(callback, code) {
   assert.throws(callback, (error) => error instanceof ContractError && error.code === code);
@@ -89,6 +91,21 @@ function classifyAndGate(sessionID) {
       concurrency_sensitive: false,
       unresolved_unknowns: false,
     },
+  });
+  const callID = `bash-context-read-${sessionID}`;
+  handleNormalSessionToolBefore(bridge, {
+    tool: "context_read",
+    sessionID,
+    callID,
+  }, { args: { path: "src/file.mjs", startLine: 1, maxLines: 1, maxBytes: 4096, format: "text" } });
+  handleNormalSessionToolAfter(bridge, {
+    tool: "context_read",
+    sessionID,
+    callID,
+  }, {
+    output: contextReadToolOutput("src/file.mjs", callID),
+    title: "bash-boundary context read",
+    metadata: {},
   });
   call(sessionID, "orchestrator", "quality_dossier_finalize", { expected_revision: 1 });
 }

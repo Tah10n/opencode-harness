@@ -1,0 +1,399 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Cross-field status, reason, tool-output, mutation, chain, privacy, and fingerprint checks are canonical in lib/quality/context-receipts.mjs and lib/quality/context-receipt-store.mjs.",
+  "title": "OpenCode Harness Runner-Owned Context Receipt v2",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "producer",
+    "receipt_id",
+    "sequence",
+    "previous_receipt_fingerprint",
+    "session_key",
+    "parent_session_key",
+    "producer_session_key",
+    "producer_role",
+    "run_id",
+    "task_id",
+    "worktree_fingerprint",
+    "source_fingerprint",
+    "context_strategy_id",
+    "context_strategy_fingerprint",
+    "parent_question_id",
+    "evidence_refs",
+    "mutation_revision_started",
+    "mutation_revision_completed",
+    "tool_id",
+    "call_key_fingerprint",
+    "started_at",
+    "completed_at",
+    "status",
+    "reason_code",
+    "tool_output_schema_version",
+    "request",
+    "tool_snapshot",
+    "result",
+    "fingerprint"
+  ],
+  "properties": {
+    "schema_version": { "const": 2 },
+    "producer": { "const": "opencode-harness/context-receipt-v2" },
+    "receipt_id": { "$ref": "#/$defs/id" },
+    "sequence": { "type": "integer", "minimum": 1 },
+    "previous_receipt_fingerprint": { "$ref": "#/$defs/nullableFingerprint" },
+    "session_key": { "$ref": "#/$defs/sessionKey" },
+    "parent_session_key": {
+      "oneOf": [
+        { "$ref": "#/$defs/sessionKey" },
+        { "type": "null" }
+      ]
+    },
+    "producer_session_key": { "$ref": "#/$defs/sessionKey" },
+    "producer_role": {
+      "enum": ["runner", "owner_session", "architect", "diagnose", "explore", "general", "researcher", "reviewer", "verifier"]
+    },
+    "run_id": { "$ref": "#/$defs/id" },
+    "task_id": { "$ref": "#/$defs/id" },
+    "worktree_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "source_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "context_strategy_id": { "enum": ["standard-lite-local-v1", "high-wide-deep-v1", "critical-wide-deep-v1"] },
+    "context_strategy_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "parent_question_id": {
+      "oneOf": [
+        { "$ref": "#/$defs/id" },
+        { "type": "null" }
+      ]
+    },
+    "evidence_refs": {
+      "type": "array",
+      "maxItems": 64,
+      "items": { "$ref": "#/$defs/evidenceRef" }
+    },
+    "mutation_revision_started": { "type": "integer", "minimum": 0 },
+    "mutation_revision_completed": { "type": "integer", "minimum": 0 },
+    "tool_id": { "$ref": "#/$defs/toolId" },
+    "call_key_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "started_at": { "$ref": "#/$defs/timestamp" },
+    "completed_at": { "$ref": "#/$defs/timestamp" },
+    "status": {
+      "enum": ["success", "empty", "truncated", "timeout", "unavailable", "failed", "interrupted"]
+    },
+    "reason_code": {
+      "enum": [
+        null,
+        "deadline_exceeded",
+        "tool_unavailable",
+        "unsupported_schema",
+        "output_too_large",
+        "invalid_output",
+        "tool_failed",
+        "stale_snapshot",
+        "snapshot_mismatch",
+        "hash_mismatch",
+        "partial_coverage",
+        "partial_tool_failure",
+        "mutation_during_context",
+        "cancelled",
+        "host_interrupted",
+        "pending_recovery"
+      ]
+    },
+    "tool_output_schema_version": { "enum": [2, null] },
+    "request": { "$ref": "#/$defs/request" },
+    "tool_snapshot": {
+      "oneOf": [
+        { "$ref": "#/$defs/snapshot" },
+        { "type": "null" }
+      ]
+    },
+    "result": {
+      "oneOf": [
+        { "$ref": "#/$defs/result" },
+        { "type": "null" }
+      ]
+    },
+    "fingerprint": { "$ref": "#/$defs/fingerprint" }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$" },
+    "sessionKey": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "fingerprint": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "nullableFingerprint": {
+      "oneOf": [
+        { "$ref": "#/$defs/fingerprint" },
+        { "type": "null" }
+      ]
+    },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "path": { "type": "string", "minLength": 1, "maxLength": 1024 },
+    "toolId": {
+      "enum": [
+        "context_outline",
+        "context_files",
+        "context_search",
+        "context_read",
+        "context_map",
+        "context_batch_read",
+        "context_symbols",
+        "context_related"
+      ]
+    },
+    "evidenceRef": {
+      "type": "object",
+      "required": ["kind", "value"],
+      "properties": {
+        "kind": { "enum": ["file", "symbol", "command", "event", "check", "run", "job", "doc", "runtime"] },
+        "value": { "type": "string", "minLength": 1, "maxLength": 512 }
+      },
+      "additionalProperties": false
+    },
+    "requestRange": {
+      "type": "object",
+      "required": ["path", "start_line", "max_lines"],
+      "properties": {
+        "path": { "$ref": "#/$defs/path" },
+        "start_line": { "type": "integer", "minimum": 1 },
+        "max_lines": {
+          "oneOf": [
+            { "type": "integer", "minimum": 1 },
+            { "type": "null" }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "requestLimits": {
+      "type": "object",
+      "properties": {
+        "depth": { "type": "integer", "minimum": 1 },
+        "limit": { "type": "integer", "minimum": 1 },
+        "max_results": { "type": "integer", "minimum": 1 },
+        "max_matches": { "type": "integer", "minimum": 1 },
+        "max_files": { "type": "integer", "minimum": 1 },
+        "max_bytes": { "type": "integer", "minimum": 1 },
+        "max_bytes_per_file": { "type": "integer", "minimum": 1 },
+        "max_total_bytes": { "type": "integer", "minimum": 1 },
+        "max_total_lines": { "type": "integer", "minimum": 1 },
+        "max_lines": { "type": "integer", "minimum": 1 },
+        "max_duration_ms": { "type": "integer", "minimum": 1 },
+        "context_lines": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "request": {
+      "type": "object",
+      "required": [
+        "scope_paths",
+        "relationship_target_path",
+        "relationship_scope_path",
+        "ranges",
+        "query_fingerprint",
+        "relationship_kinds",
+        "extensions",
+        "limits",
+        "format"
+      ],
+      "properties": {
+        "scope_paths": {
+          "type": "array",
+          "maxItems": 128,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/path" }
+        },
+        "relationship_target_path": {
+          "oneOf": [
+            { "$ref": "#/$defs/path" },
+            { "type": "null" }
+          ]
+        },
+        "relationship_scope_path": {
+          "oneOf": [
+            { "$ref": "#/$defs/path" },
+            { "type": "null" }
+          ]
+        },
+        "ranges": {
+          "type": "array",
+          "maxItems": 128,
+          "items": { "$ref": "#/$defs/requestRange" }
+        },
+        "query_fingerprint": { "$ref": "#/$defs/nullableFingerprint" },
+        "relationship_kinds": {
+          "type": "array",
+          "maxItems": 5,
+          "uniqueItems": true,
+          "items": { "enum": ["direct-import", "imported-by", "likely-test", "same-basename", "sibling"] }
+        },
+        "extensions": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^\\.[a-z0-9][a-z0-9._+-]{0,31}$" }
+        },
+        "limits": { "$ref": "#/$defs/requestLimits" },
+        "format": { "enum": ["text", "json", null] }
+      },
+      "additionalProperties": false
+    },
+    "snapshot": {
+      "type": "object",
+      "required": [
+        "fingerprint",
+        "fingerprint_kind",
+        "fingerprint_scope",
+        "complete",
+        "stable",
+        "changed_during_operation"
+      ],
+      "properties": {
+        "fingerprint": { "$ref": "#/$defs/fingerprint" },
+        "fingerprint_kind": { "enum": ["metadata", "content", "partial-content"] },
+        "fingerprint_scope": { "$ref": "#/$defs/path" },
+        "complete": { "type": "boolean" },
+        "stable": { "type": "boolean" },
+        "changed_during_operation": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "lineRange": {
+      "type": "object",
+      "required": ["path", "start_line", "end_line"],
+      "properties": {
+        "path": { "$ref": "#/$defs/path" },
+        "start_line": { "type": "integer", "minimum": 1 },
+        "end_line": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "symbolId": {
+      "type": "object",
+      "required": ["symbol_id", "path", "line", "kind"],
+      "properties": {
+        "symbol_id": { "$ref": "#/$defs/fingerprint" },
+        "path": { "$ref": "#/$defs/path" },
+        "line": { "type": "integer", "minimum": 1 },
+        "kind": { "enum": ["class", "constant", "enum", "function", "interface", "method", "record", "type"] }
+      },
+      "additionalProperties": false
+    },
+    "relationship": {
+      "type": "object",
+      "required": ["path", "relationship", "confidence"],
+      "properties": {
+        "path": { "$ref": "#/$defs/path" },
+        "relationship": { "enum": ["direct-import", "imported-by", "likely-test", "same-basename", "sibling"] },
+        "confidence": { "enum": ["high", "medium", "low"] }
+      },
+      "additionalProperties": false
+    },
+    "counts": {
+      "type": "object",
+      "required": [
+        "candidate_files",
+        "scanned_files",
+        "bytes_scanned",
+        "skipped_secret",
+        "skipped_generated",
+        "skipped_large",
+        "skipped_unreadable",
+        "files",
+        "directories",
+        "lines",
+        "matches",
+        "ranges",
+        "symbols",
+        "relationships"
+      ],
+      "properties": {
+        "candidate_files": { "type": "integer", "minimum": 0 },
+        "scanned_files": { "type": "integer", "minimum": 0 },
+        "bytes_scanned": { "type": "integer", "minimum": 0 },
+        "skipped_secret": { "type": "integer", "minimum": 0 },
+        "skipped_generated": { "type": "integer", "minimum": 0 },
+        "skipped_large": { "type": "integer", "minimum": 0 },
+        "skipped_unreadable": { "type": "integer", "minimum": 0 },
+        "files": { "type": "integer", "minimum": 0 },
+        "directories": { "type": "integer", "minimum": 0 },
+        "lines": { "type": "integer", "minimum": 0 },
+        "matches": { "type": "integer", "minimum": 0 },
+        "ranges": { "type": "integer", "minimum": 0 },
+        "symbols": { "type": "integer", "minimum": 0 },
+        "relationships": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "coverage": {
+      "type": "object",
+      "required": ["partial", "complete", "stable", "changed_during_operation", "truncation_codes"],
+      "properties": {
+        "partial": { "type": "boolean" },
+        "complete": { "type": "boolean" },
+        "stable": { "type": "boolean" },
+        "changed_during_operation": { "type": "boolean" },
+        "truncation_codes": {
+          "type": "array",
+          "maxItems": 32,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1, "maxLength": 128 }
+        }
+      },
+      "additionalProperties": false
+    },
+    "result": {
+      "type": "object",
+      "required": [
+        "result_fingerprint",
+        "relative_paths",
+        "guidance_paths",
+        "line_ranges",
+        "symbol_ids",
+        "relationships",
+        "tool_inventory",
+        "counts",
+        "coverage",
+        "empty"
+      ],
+      "properties": {
+        "result_fingerprint": { "$ref": "#/$defs/fingerprint" },
+        "relative_paths": {
+          "type": "array",
+          "maxItems": 128,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/path" }
+        },
+        "guidance_paths": {
+          "type": "array",
+          "maxItems": 256,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/relative_path" }
+        },
+        "line_ranges": {
+          "type": "array",
+          "maxItems": 128,
+          "items": { "$ref": "#/$defs/lineRange" }
+        },
+        "symbol_ids": {
+          "type": "array",
+          "maxItems": 128,
+          "items": { "$ref": "#/$defs/symbolId" }
+        },
+        "relationships": {
+          "type": "array",
+          "maxItems": 128,
+          "items": { "$ref": "#/$defs/relationship" }
+        },
+        "tool_inventory": {
+          "type": "array",
+          "maxItems": 8,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/toolId" }
+        },
+        "counts": { "$ref": "#/$defs/counts" },
+        "coverage": { "$ref": "#/$defs/coverage" },
+        "empty": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

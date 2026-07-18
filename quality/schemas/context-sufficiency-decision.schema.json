@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Tah10n/opencode-harness/quality/schemas/context-sufficiency-decision.schema.json",
+  "title": "Context Sufficiency Decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "decision_id",
+    "session_key",
+    "run_id",
+    "task_id",
+    "risk_class",
+    "strategy_id",
+    "strategy_binding_fingerprint",
+    "workspace_fingerprint",
+    "dossier_id",
+    "dossier_analysis_fingerprint",
+    "impact_graph_id",
+    "impact_graph_fingerprint",
+    "report_id",
+    "report_fingerprint",
+    "receipt_index_fingerprint",
+    "preimplementation_cutoff_sequence",
+    "implementation_started_sequence",
+    "task_profile_evidence",
+    "status",
+    "reasons",
+    "evaluated_at",
+    "fingerprint"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "decision_id": { "type": "string", "pattern": "^CTXDEC-[A-Za-z0-9._-]+$" },
+    "session_key": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "run_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "task_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "risk_class": { "enum": ["standard-lite", "high", "critical"] },
+    "strategy_id": { "enum": ["standard-lite-local-v1", "high-wide-deep-v1", "critical-wide-deep-v1"] },
+    "strategy_binding_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "workspace_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "dossier_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "dossier_analysis_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "impact_graph_id": { "type": ["string", "null"] },
+    "impact_graph_fingerprint": { "anyOf": [{ "$ref": "#/$defs/fingerprint" }, { "type": "null" }] },
+    "report_id": { "type": ["string", "null"] },
+    "report_fingerprint": { "anyOf": [{ "$ref": "#/$defs/fingerprint" }, { "type": "null" }] },
+    "receipt_index_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "preimplementation_cutoff_sequence": { "type": "integer", "minimum": 0 },
+    "implementation_started_sequence": { "type": ["integer", "null"], "minimum": 1 },
+    "task_profile_evidence": {
+      "anyOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schema_version", "producer", "evidence_id", "session_key", "run_id", "task_id",
+            "workspace_fingerprint", "dossier_id", "dossier_analysis_fingerprint", "checks",
+            "created_at", "fingerprint"
+          ],
+          "properties": {
+            "schema_version": { "const": 1 },
+            "producer": { "const": "opencode-harness/context-task-profile-evidence-v1" },
+            "evidence_id": { "type": "string", "pattern": "^CTXPROFILE-[A-Za-z0-9._-]+$" },
+            "session_key": { "type": "string", "minLength": 1, "maxLength": 256 },
+            "run_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+            "task_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+            "workspace_fingerprint": { "$ref": "#/$defs/fingerprint" },
+            "dossier_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+            "dossier_analysis_fingerprint": { "$ref": "#/$defs/fingerprint" },
+            "checks": {
+              "type": "array",
+              "maxItems": 32,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "obligation_id", "check_id", "purpose", "phase", "status", "observed_outcome",
+                  "trusted_producer", "command_or_mechanism", "evidence_fingerprint", "completed_at"
+                ],
+                "properties": {
+                  "obligation_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+                  "check_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+                  "purpose": { "enum": ["reproducer", "characterization"] },
+                  "phase": { "const": "preimplementation" },
+                  "status": { "enum": ["passed", "failed", "blocked"] },
+                  "observed_outcome": { "enum": ["failing_reproducer", "passing_characterization", "unavailable", "failed"] },
+                  "trusted_producer": { "type": "string", "minLength": 1, "maxLength": 256 },
+                  "command_or_mechanism": { "type": "string", "minLength": 1, "maxLength": 2000 },
+                  "evidence_fingerprint": { "$ref": "#/$defs/fingerprint" },
+                  "completed_at": { "type": "string", "format": "date-time" }
+                }
+              }
+            },
+            "created_at": { "type": "string", "format": "date-time" },
+            "fingerprint": { "$ref": "#/$defs/fingerprint" }
+          }
+        }
+      ]
+    },
+    "status": { "enum": ["sufficient", "insufficient", "blocked"] },
+    "reasons": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "subject_ids", "message"],
+        "properties": {
+          "code": { "type": "string", "pattern": "^CONTEXT_[A-Z0-9_]+$" },
+          "subject_ids": { "type": "array", "maxItems": 64, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 512 } },
+          "message": { "type": "string", "minLength": 1, "maxLength": 2000 }
+        }
+      }
+    },
+    "evaluated_at": { "type": "string", "format": "date-time" },
+    "fingerprint": { "$ref": "#/$defs/fingerprint" }
+  },
+  "$defs": {
+    "fingerprint": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  }
+}

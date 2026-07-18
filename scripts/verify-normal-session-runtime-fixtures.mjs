@@ -9,6 +9,7 @@ import { pathToFileURL } from "node:url";
 import { createNormalSessionQualityPlugin } from "../lib/quality/quality-plugin.mjs";
 import { validateMilestone2ReceiptBundle } from "../lib/quality/milestone-dod.mjs";
 import { NORMAL_SESSION_QUALITY_TOOL_IDS } from "../lib/quality/normal-session-bridge.mjs";
+import { expectedNormalSessionQualityPermission } from "../lib/quality/normal-session-profile-permissions.mjs";
 import { observeContentBoundWorkspace } from "../lib/quality/normal-session-workspace.mjs";
 import {
   NORMAL_SESSION_HOST_EVIDENCE_PRODUCER,
@@ -67,6 +68,65 @@ const adapterRequestKeys = [
 ];
 const rawStdoutCanary = "RAW_STDOUT_CANARY_NORMAL_SESSION_RUNTIME";
 const rawStderrCanary = "RAW_STDERR_CANARY_NORMAL_SESSION_RUNTIME";
+
+function readAgentQualityPermissions(sourceRoot, agentName) {
+  const source = fs.readFileSync(path.join(sourceRoot, "agents", `${agentName}.md`), "utf8").replace(/^\uFEFF/u, "");
+  if (!source.startsWith("---\n") && !source.startsWith("---\r\n")) {
+    throw new ContractError("QUALITY_HOST_PERMISSION_MISMATCH", `agent profile lacks frontmatter: ${agentName}`);
+  }
+  const lines = source.split(/\r?\n/u);
+  const permissions = new Map();
+  let inPermission = false;
+  for (const line of lines.slice(1)) {
+    if (line === "---") break;
+    if (line === "permission:") {
+      inPermission = true;
+      continue;
+    }
+    if (!inPermission) continue;
+    if (/^\S/u.test(line)) break;
+    const match = /^  (quality_[a-z0-9_]+): (allow|ask|deny)$/u.exec(line);
+    if (match) permissions.set(match[1], match[2]);
+  }
+  return permissions;
+}
+
+function adoptedQualityPermissionMatrix(sourceRoot, mutate = null) {
+  let rootConfig;
+  try {
+    rootConfig = JSON.parse(fs.readFileSync(path.join(sourceRoot, "opencode.json"), "utf8"));
+  } catch {
+    return false;
+  }
+  if (rootConfig.permission?.["quality_*"] !== "deny") return false;
+  const agentRoot = path.join(sourceRoot, "agents");
+  if (!fs.existsSync(agentRoot)) return false;
+  const agentNames = fs.readdirSync(agentRoot)
+    .filter((entry) => entry.endsWith(".md"))
+    .map((entry) => entry.slice(0, -3))
+    .sort();
+  const permissions = new Map(agentNames.map((agentName) => [agentName, readAgentQualityPermissions(sourceRoot, agentName)]));
+  if (mutate !== null) mutate(permissions);
+  for (const agentName of agentNames) {
+    const explicit = permissions.get(agentName);
+    for (const toolId of NORMAL_SESSION_QUALITY_TOOL_IDS) {
+      const effective = explicit.get(toolId) ?? rootConfig.permission["quality_*"];
+      if (effective !== expectedNormalSessionQualityPermission(agentName, toolId)) return false;
+    }
+    if ([...explicit.keys()].some((toolId) => !NORMAL_SESSION_QUALITY_TOOL_IDS.includes(toolId))) return false;
+  }
+  return ["orchestrator", "orchestrator-deep", "architect", "reviewer", "verifier"]
+    .every((agentName) => permissions.has(agentName));
+}
+
+assert.equal(adoptedQualityPermissionMatrix(root), true,
+  "adopted agent profiles must resolve the complete normal-session quality permission matrix");
+assert.equal(adoptedQualityPermissionMatrix(root, (permissions) => {
+  permissions.get("orchestrator").delete("quality_context_strategy_escalate");
+}), false, "missing orchestrator escalation permission must be detected");
+assert.equal(adoptedQualityPermissionMatrix(root, (permissions) => {
+  permissions.get("general").set("quality_context_strategy_escalate", "allow");
+}), false, "non-orchestrator escalation exposure must be detected");
 
 function git(workspaceRoot, args) {
   const result = spawnSync("git", args, {
@@ -201,6 +261,58 @@ function scopeFacts() {
     concurrency_sensitive: false,
     unresolved_unknowns: false,
   };
+}
+
+function runtimeContextReadOutput(relativePath, content) {
+  const lineCount = Math.max(1, content.split(/\r?\n/u).length);
+  const truncation = Object.fromEntries([
+    "inventoryLimitReached", "resultLimitReached", "matchLimitReached", "byteLimitReached",
+    "lineLimitReached", "durationLimitReached", "excerptTruncated", "contextBeforeTruncated",
+    "contextAfterTruncated", "symbolLimitReached", "relationshipLimitReached", "snapshotChanged",
+    "coveragePartial",
+  ].map((key) => [key, false]));
+  return JSON.stringify({
+    schemaVersion: 2,
+    tool: "context_read",
+    worktree: ".",
+    scope: { path: relativePath, filters: {} },
+    snapshot: {
+      fingerprint: fingerprint({ relativePath, content }).slice("sha256:".length),
+      fingerprintKind: "content",
+      fingerprintScope: relativePath,
+      complete: true,
+      stable: true,
+      changedDuringOperation: false,
+      truncationReasons: [],
+    },
+    coverage: {
+      candidateFiles: 1,
+      scannedFiles: 1,
+      bytesScanned: Buffer.byteLength(content, "utf8"),
+      skippedSecret: 0,
+      skippedGenerated: 0,
+      skippedLarge: 0,
+      skippedUnreadable: 0,
+      unsupportedLanguages: {},
+      truncation,
+      truncationReasons: [],
+      partial: false,
+    },
+    limits: {},
+    usage: { files: 1, directories: 0, bytes: Buffer.byteLength(content, "utf8"), lines: lineCount, matches: 0, ranges: 1 },
+    truncated: false,
+    ok: true,
+    path: relativePath,
+    sha256: fingerprint(content).slice("sha256:".length),
+    bytes: Buffer.byteLength(content, "utf8"),
+    totalLines: lineCount,
+    selectedRange: { startLine: 1, endLine: lineCount },
+    encoding: "utf-8",
+    stableDuringRead: true,
+    truncatedBefore: false,
+    truncatedAfter: false,
+    text: content,
+  });
 }
 
 function sessionStartRequest(request, riskClass) {
@@ -422,6 +534,20 @@ export async function executeDeterministicFixtureAdapter(request) {
 
   await invokeHook("chat.message", "chat_message", owner);
   const started = await invokeTool("quality_session_start", sessionStartRequest(request, "standard-lite"), owner);
+  const contextCallId = "runtime-v2-context-read-owned";
+  const ownedContent = fs.readFileSync(path.join(workspaceRoot, request.changed_path), "utf8");
+  await invokeHook(
+    "tool.execute.before",
+    "tool_execute_before",
+    { tool: "context_read", sessionID: owner.sessionID, callID: contextCallId },
+    { args: { path: request.changed_path, startLine: 1, maxLines: Math.max(1, ownedContent.split(/\r?\n/u).length), maxBytes: 4096, format: "text" } },
+  );
+  await invokeHook(
+    "tool.execute.after",
+    "tool_execute_after",
+    { tool: "context_read", sessionID: owner.sessionID, callID: contextCallId },
+    { output: runtimeContextReadOutput(request.changed_path, ownedContent), title: "context read", metadata: {} },
+  );
   const gated = await invokeTool("quality_dossier_finalize", { expected_revision: started.dossier_revision }, owner);
   if (gated.gate_status !== "passed") throw new ContractError("QUALITY_HOST_FIXTURE_GATE", "fixture quality gate did not pass");
   const postGateCode = await captureContractCode(() => invokeHook(
@@ -450,11 +576,9 @@ export async function executeDeterministicFixtureAdapter(request) {
     { tool: "edit", sessionID: owner.sessionID, callID: editCallId },
     editOutput,
   );
-  // Deterministic fixture mode has no installed permission service, so it models
-  // a matching independent permission observation as fixture data. Installed-host
-  // adapters must derive it from the adopted host permission surface;
-  // permission.ask is not invoked by OpenCode 1.17.20.
-  const effectivePermissionsMatch = true;
+  // permission.ask is not invoked by OpenCode 1.17.20, so fixture mode derives
+  // effective tool exposure from the adopted root deny plus every agent override.
+  const effectivePermissionsMatch = adoptedQualityPermissionMatrix(root);
   fs.writeFileSync(path.join(workspaceRoot, request.changed_path), request.expected_content, "utf8");
   await invokeHook(
     "tool.execute.after",
@@ -477,6 +601,35 @@ export async function executeDeterministicFixtureAdapter(request) {
   const trustedCheck = verification.receipts.find((entry) => entry.kind === "check" && entry.check_id === "probe-pass");
   if (!verification.complete || !trustedCheck || trustedCheck.status !== "passed") {
     throw new ContractError("QUALITY_HOST_FIXTURE_VERIFICATION", "actual bridge verification lacks a passing trusted check receipt");
+  }
+  const reconciliationFacts = {
+    changed_paths: [{
+      path: request.changed_path,
+      kind: "source",
+      ownership_ids: ["SLICE-standard-lite-owned"],
+      context_subject_ids: ["AREA-standard-lite-1"],
+      test_obligation_ids: ["TEST-standard-lite-1"],
+    }],
+    unexpected_public_contracts: [],
+    unexpected_dependency_directions: [],
+    unexpected_side_effect_edges: [],
+    unrelated_paths: [],
+    unplanned_items: [],
+  };
+  const reconciliationChecks = Object.fromEntries([
+    "changed_path_ownership", "public_contracts", "dependency_directions", "side_effect_edges",
+    "critical_path_tests", "unrelated_changes",
+  ].map((key) => [key, { status: "passed", finding_ids: [] }]));
+  await invokeTool("quality_context_reviewer_record", {
+    ...reconciliationFacts,
+    checks: reconciliationChecks,
+  }, { ...owner, agent: "reviewer" });
+  const contextReconciliation = await invokeTool("quality_context_reconcile", {
+    evidence_mode: "reviewer_grounded",
+    ...reconciliationFacts,
+  }, owner);
+  if (contextReconciliation.status !== "passed" || contextReconciliation.graph_completeness !== "not_claimed") {
+    throw new ContractError("QUALITY_HOST_FIXTURE_RECONCILIATION", "reviewer-grounded final context reconciliation did not pass honestly");
   }
   const attestation = await invokeTool("quality_session_finalize", { expected_revision: started.dossier_revision }, owner);
   if (verification.workspace_fingerprint !== finalWorkspace.source_fingerprint
@@ -907,6 +1060,7 @@ async function runFixtureSuite() {
       "--milestone-out", forbiddenMilestoneOutput,
     ]);
     assert.equal(forbiddenMilestoneRun.status, 1, forbiddenMilestoneRun.stderr);
+    assert.notEqual(forbiddenMilestoneRun.stdout.trim(), "", forbiddenMilestoneRun.stderr);
     assert.deepEqual(
       JSON.parse(forbiddenMilestoneRun.stdout).reason_codes,
       ["QUALITY_HOST_MILESTONE_REQUIRES_INSTALLED_ADAPTER"],

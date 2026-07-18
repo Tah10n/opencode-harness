@@ -1,9 +1,14 @@
 import assert from "node:assert/strict";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import { spawnSync } from "node:child_process";
 
 import {
   QUALITY_ACCEPTANCE_PRODUCERS,
   QUALITY_VIOLATION_KEYS,
   createQualityAcceptancePolicy,
+  createQualityAcceptancePolicyV3,
   createQualityLiveReport,
   createQualityOutcomes,
   sealQualityAcceptanceDecision,
@@ -12,8 +17,17 @@ import {
 } from "../lib/quality/acceptance-contracts.mjs";
 import { assessQualityCandidate } from "../lib/quality/acceptance-engine.mjs";
 import { createEngineeringCheckCatalog } from "../lib/quality/gate.mjs";
+import { validateEngineeringQualityRunBundle } from "../lib/quality/run-bundle.mjs";
 import { fingerprint } from "../lib/quality/validation.mjs";
-import { createDeterministicQualityRun } from "./verify-quality-live-runner.mjs";
+import {
+  assessQualityBundles,
+  parseQualityBundleAssessmentArgs,
+} from "./assess-quality-bundles.mjs";
+import {
+  convertRunBundleToLegacyV2,
+  createDeterministicHighQualityRun,
+  createDeterministicQualityRun,
+} from "./verify-quality-live-runner.mjs";
 
 const AT = "2026-07-14T10:00:00.000Z";
 
@@ -55,6 +69,21 @@ function decisionInput(decision) {
   return copy;
 }
 
+function contextPolicyInput(
+  scenarioId = "quality-small-local-control",
+  riskClass = "standard-lite",
+) {
+  const policy = JSON.parse(fs.readFileSync("quality/acceptance/acceptance-policy.v3.json", "utf8"));
+  delete policy.schema_version;
+  delete policy.fingerprint;
+  return {
+    ...policy,
+    policy_version: "3.0.0-test",
+    required_scenarios: [scenarioId],
+    required_scenario_risks: { [scenarioId]: riskClass },
+  };
+}
+
 const runs = [];
 try {
   const baseline = await createDeterministicQualityRun({ profileRole: "baseline" });
@@ -69,6 +98,14 @@ try {
     profileRole: "candidate",
     runIdentity: "shared-quality-run",
   });
+  const highBaseline = await createDeterministicHighQualityRun({ profileRole: "baseline" });
+  const highCandidate = await createDeterministicHighQualityRun({ profileRole: "candidate" });
+  const criticalBaseline = await createDeterministicHighQualityRun({ profileRole: "baseline", riskClass: "critical" });
+  const criticalCandidate = await createDeterministicHighQualityRun({ profileRole: "candidate", riskClass: "critical" });
+  const legacyBaseline = await createDeterministicQualityRun({ profileRole: "baseline", runIdentity: "legacy-v2-baseline" });
+  const legacyCandidate = await createDeterministicQualityRun({ profileRole: "candidate", runIdentity: "legacy-v2-candidate" });
+  convertRunBundleToLegacyV2(legacyBaseline.runDir);
+  convertRunBundleToLegacyV2(legacyCandidate.runDir);
   runs.push(
     baseline,
     candidate,
@@ -76,8 +113,23 @@ try {
     narrowedCandidate,
     reusedIdentityBaseline,
     reusedIdentityCandidate,
+    highBaseline,
+    highCandidate,
+    criticalBaseline,
+    criticalCandidate,
+    legacyBaseline,
+    legacyCandidate,
   );
   const policy = createQualityAcceptancePolicy(policyInput());
+  const contextPolicy = createQualityAcceptancePolicyV3(contextPolicyInput());
+  const highContextPolicy = createQualityAcceptancePolicyV3(contextPolicyInput(
+    "quality-public-api-compatibility",
+    "high",
+  ));
+  const criticalContextPolicy = createQualityAcceptancePolicyV3(contextPolicyInput(
+    "quality-public-api-compatibility",
+    "critical",
+  ));
 
   const baselineOutcome = createQualityOutcomes(bundleEntry(baseline, "host/baseline"));
   const candidateOutcome = createQualityOutcomes(bundleEntry(candidate, "host/candidate"));
@@ -101,6 +153,172 @@ try {
   assert.equal(accepted.summary.target_universe_mismatch_count, 0);
   assert(!accepted.gates.some((entry) => entry.gate_id.includes("model")), "model identity became an acceptance gate");
   validateQualityAcceptanceDecision(accepted);
+
+  const contextAccepted = assessQualityCandidate({
+    policy: contextPolicy,
+    bundles: [bundleEntry(baseline, "host/baseline"), bundleEntry(candidate, "host/candidate")],
+    decision_id: "decision-context-accepted",
+    clock: () => new Date(AT),
+  });
+  assert.equal(contextAccepted.decision, "accepted", "v3 context policy rejected complete trusted context bundles");
+
+  const highBaselineOutcome = createQualityOutcomes(bundleEntry(highBaseline, "host/high-baseline"));
+  const highCandidateOutcome = createQualityOutcomes(bundleEntry(highCandidate, "host/high-candidate"));
+  for (const outcome of [highBaselineOutcome, highCandidateOutcome]) {
+    assert.equal(outcome.complete, true);
+    assert.equal(outcome.context_metrics.risk_class, "high");
+    assert.equal(outcome.context_metrics.required_wide_category_coverage_basis_points, 10000);
+    assert.equal(outcome.context_metrics.critical_path_deep_analysis_coverage_basis_points, 10000);
+    assert(Object.values(outcome.context_hard_gates).every(Boolean), JSON.stringify(outcome.context_hard_gates));
+  }
+  const highContextAccepted = assessQualityCandidate({
+    policy: highContextPolicy,
+    bundles: [
+      bundleEntry(highBaseline, "host/high-baseline"),
+      bundleEntry(highCandidate, "host/high-candidate"),
+    ],
+    decision_id: "decision-high-context-accepted",
+    clock: () => new Date(AT),
+  });
+  assert.equal(
+    highContextAccepted.decision,
+    "accepted",
+    "validated high-risk runner bundles did not pass the v3 acceptance engine",
+  );
+  assert.equal(highContextAccepted.summary.baseline_complete_count, 1);
+  assert.equal(highContextAccepted.summary.candidate_complete_count, 1);
+
+  const criticalContextAccepted = assessQualityCandidate({
+    policy: criticalContextPolicy,
+    bundles: [
+      bundleEntry(criticalBaseline, "host/critical-baseline"),
+      bundleEntry(criticalCandidate, "host/critical-candidate"),
+    ],
+    decision_id: "decision-critical-context-accepted",
+    clock: () => new Date(AT),
+  });
+  assert.equal(
+    criticalContextAccepted.decision,
+    "accepted",
+    "validated critical runner bundles did not pass the v3 acceptance engine",
+  );
+
+  const qualityCliRoot = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-quality-bundle-assessment-"));
+  try {
+    const policyPath = path.join(qualityCliRoot, "policy.json");
+    const legacyPolicyPath = path.join(qualityCliRoot, "legacy-policy.json");
+    const baselineCatalogPath = path.join(qualityCliRoot, "baseline-catalog.json");
+    const candidateCatalogPath = path.join(qualityCliRoot, "candidate-catalog.json");
+    const legacyBaselineCatalogPath = path.join(qualityCliRoot, "legacy-baseline-catalog.json");
+    const legacyCandidateCatalogPath = path.join(qualityCliRoot, "legacy-candidate-catalog.json");
+    fs.writeFileSync(policyPath, `${JSON.stringify(highContextPolicy, null, 2)}\n`, "utf8");
+    fs.writeFileSync(legacyPolicyPath, `${JSON.stringify(policy, null, 2)}\n`, "utf8");
+    fs.writeFileSync(baselineCatalogPath, `${JSON.stringify(highBaseline.checkCatalog, null, 2)}\n`, "utf8");
+    fs.writeFileSync(candidateCatalogPath, `${JSON.stringify(highCandidate.checkCatalog, null, 2)}\n`, "utf8");
+    fs.writeFileSync(legacyBaselineCatalogPath, `${JSON.stringify(legacyBaseline.checkCatalog, null, 2)}\n`, "utf8");
+    fs.writeFileSync(legacyCandidateCatalogPath, `${JSON.stringify(legacyCandidate.checkCatalog, null, 2)}\n`, "utf8");
+    const cliDecision = assessQualityBundles({
+      policyPath,
+      bundlePairs: [
+        { runDirectory: highBaseline.runDir, catalogPath: baselineCatalogPath },
+        { runDirectory: highCandidate.runDir, catalogPath: candidateCatalogPath },
+      ],
+      decisionId: "decision-high-context-cli",
+      clock: () => new Date(AT),
+    });
+    assert.equal(cliDecision.decision, "accepted", "supported quality bundle assessment entrypoint rejected valid high bundles");
+    const aliasedRunParent = path.join(qualityCliRoot, "aliased-run-parent");
+    fs.symlinkSync(
+      path.dirname(highBaseline.runDir),
+      aliasedRunParent,
+      process.platform === "win32" ? "junction" : "dir",
+    );
+    const aliasedRunDirectory = path.join(aliasedRunParent, path.basename(highBaseline.runDir));
+    assert.throws(
+      () => assessQualityBundles({
+        policyPath,
+        bundlePairs: [{ runDirectory: aliasedRunDirectory, catalogPath: baselineCatalogPath }],
+        decisionId: "decision-aliased-bundle-cli",
+        clock: () => new Date(AT),
+      }),
+      (error) => error?.code === "QUALITY_ASSESSMENT_PATH",
+      "quality bundle CLI accepted an ordinary final directory reached through a linked parent",
+    );
+    assert.throws(
+      () => validateEngineeringQualityRunBundle(aliasedRunDirectory),
+      (error) => error?.code === "QUALITY_BUNDLE_TYPE",
+      "quality bundle validator accepted an ordinary run directory reached through a linked parent",
+    );
+    fs.unlinkSync(aliasedRunParent);
+    const cliScript = path.resolve("scripts/assess-quality-bundles.mjs");
+    const runCli = (args) => spawnSync(process.execPath, [cliScript, ...args], { encoding: "utf8" });
+    const highCliArgs = [
+      "--policy", policyPath,
+      "--bundle", highBaseline.runDir,
+      "--catalog", baselineCatalogPath,
+      "--bundle", highCandidate.runDir,
+      "--catalog", candidateCatalogPath,
+      "--decision-id", "decision-high-context-cli-process",
+    ];
+    const validProcess = runCli(highCliArgs);
+    assert.equal(validProcess.status, 0, validProcess.stderr);
+    assert.equal(JSON.parse(validProcess.stdout).decision, "accepted");
+
+    const rejectedProcess = runCli([
+      "--policy", policyPath,
+      "--bundle", highBaseline.runDir,
+      "--catalog", baselineCatalogPath,
+      "--decision-id", "decision-high-context-cli-rejected",
+    ]);
+    assert.equal(rejectedProcess.status, 2, rejectedProcess.stderr);
+    assert.notEqual(JSON.parse(rejectedProcess.stdout).decision, "accepted");
+
+    for (const relativePath of [
+      "quality/context-report.json",
+      "quality/context-sufficiency-decision.json",
+      "quality/context-reconciliation.json",
+    ]) {
+      const artifactPath = path.join(highCandidate.runDir, ...relativePath.split("/"));
+      const original = fs.readFileSync(artifactPath, "utf8");
+      try {
+        fs.writeFileSync(artifactPath, `${original}\n`, "utf8");
+        const tamperedProcess = runCli(highCliArgs);
+        assert.equal(tamperedProcess.status, 1, `${relativePath}: ${tamperedProcess.stdout}\n${tamperedProcess.stderr}`);
+      } finally {
+        fs.writeFileSync(artifactPath, original, "utf8");
+      }
+    }
+
+    const legacyProcess = runCli([
+      "--policy", legacyPolicyPath,
+      "--bundle", legacyBaseline.runDir,
+      "--catalog", legacyBaselineCatalogPath,
+      "--bundle", legacyCandidate.runDir,
+      "--catalog", legacyCandidateCatalogPath,
+      "--decision-id", "decision-legacy-v2-cli-process",
+    ]);
+    assert.equal(legacyProcess.status, 0, legacyProcess.stderr);
+    assert.equal(JSON.parse(legacyProcess.stdout).decision, "accepted");
+    assert.deepEqual(parseQualityBundleAssessmentArgs([
+      "--policy", policyPath,
+      "--bundle", highBaseline.runDir,
+      "--catalog", baselineCatalogPath,
+      "--bundle", highCandidate.runDir,
+      "--catalog", candidateCatalogPath,
+      "--decision-id", "decision-high-context-cli",
+    ]), {
+      policyPath,
+      decisionId: "decision-high-context-cli",
+      bundlePaths: [highBaseline.runDir, highCandidate.runDir],
+      catalogPaths: [baselineCatalogPath, candidateCatalogPath],
+    });
+    assert.throws(
+      () => parseQualityBundleAssessmentArgs(["--policy", policyPath, "--bundle", highBaseline.runDir]),
+      /QUALITY_ASSESSMENT_CLI_PAIR/u,
+    );
+  } finally {
+    fs.rmSync(qualityCliRoot, { recursive: true, force: true });
+  }
 
   const alternateModel = assessQualityCandidate({
     policy,

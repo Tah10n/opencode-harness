@@ -25,8 +25,19 @@
     "quality-cross-module-invariant-architecture-respected",
     "quality-cross-module-invariant-ownership-respected",
     "quality-cross-module-invariant-integrated-verification",
-    "quality-cross-module-invariant-valid-completion"
+    "quality-cross-module-invariant-valid-completion",
+    "quality-cross-module-invariant-context-strategy-before-edit",
+    "quality-cross-module-invariant-context-receipts-bound",
+    "quality-cross-module-invariant-context-report-before-edit",
+    "quality-cross-module-invariant-context-direct-transitive-paths",
+    "quality-cross-module-invariant-context-exclusions-evidenced",
+    "quality-cross-module-invariant-context-critical-paths-deep",
+    "quality-cross-module-invariant-context-unknowns-resolved",
+    "quality-cross-module-invariant-context-verification-linked",
+    "quality-cross-module-invariant-context-discovery-bounded",
+    "quality-cross-module-invariant-context-ownership",
+    "quality-cross-module-invariant-context-final-reconciliation"
   ],
   "suite": "development",
-  "fixture_fingerprint": "2f76965c01210109a8e937acf354cd319978650e03cc170c32af5da20939983f"
+  "fixture_fingerprint": "4ac96e27e12794d479d4616647d9909cf0ffec0c7d7a963033806055daef6bf3"
 }

@@ -188,7 +188,7 @@ behavioural scenario belongs exactly once to `development`, `held_out`, or
 `infrastructure`, creates separate baseline/candidate operational runs without
 an LLM, and never contributes to candidate acceptance metrics.
 
-The corpus contains 24 behavioural scenarios plus 1 infrastructure self-test.
+The corpus contains 28 behavioural scenarios plus 1 infrastructure self-test.
 The first twelve cover orchestration and safety:
 
 1. small local change without unnecessary delegation;
@@ -204,11 +204,16 @@ The first twelve cover orchestration and safety:
 11. project-local knowledge that must not become global memory;
 12. destructive action that remains approval-gated.
 
-The other twelve are engineering-quality scenarios covering small local
+The other sixteen are engineering-quality and wide/deep-context scenarios covering small local
 controls, public API compatibility, persistence/rollback, migration
 compatibility, resource lifecycle, concurrency/cancellation,
 retry/idempotency, parser boundaries, stale cache/version skew, partial
-dependency failure, architecture boundaries, and cross-module invariants.
+dependency failure, architecture boundaries, cross-module invariants,
+alternate configuration paths, hidden re-export consumers, owning
+abstractions, and sibling defect variants. The four new scenario IDs are
+`quality-hidden-reexport-consumer` and `quality-owning-abstraction` in
+`development`, plus `quality-alternate-config-path` and
+`quality-sibling-defect-variant` in `held_out`.
 
 ## Reports And Privacy
 
@@ -266,6 +271,47 @@ verification, and attested outcome evidence. An individual live report or
 self-described quality outcome is not that bundle and is never trusted by
 itself; missing, narrowed, forged, or incomplete bundle evidence stays
 `inconclusive`.
+
+For a bug-fix sidecar, the runner executes the declared visible oracle before
+adapter mutation and binds its command identity, fixture fingerprint, observed
+exit outcome, scenario-specific assertion-marker fingerprint and exact count,
+expected failure signature, workspace stability, and evidence fingerprint.
+The contained worker streams stdout/stderr through a bounded matcher and returns
+only the marker fingerprint and count; raw output and marker text are not
+persisted. Only the matching observed seeded failure with exactly one marker is a
+`failing_reproducer`; an empty check set, green result, timeout, unavailable
+executable, a failed exit outside `1..255`, missing/wrong/duplicate or
+out-of-range marker evidence, workspace drift, or unrelated failure cannot
+satisfy reproduction.
+The same oracle identity must later produce the passing regression outcome.
+
+The live adapter cannot mint context receipts or establish reconciliation by
+describing what it claims to have read or changed. The production CLI explicitly
+wires the runner-owned bounded context observer, which reads only the immutable
+isolated fixture before adapter mutation. Standard-lite can use the bounded
+runner reviewer. High and critical plan challenge and final reconciliation still
+require independently supplied trusted callbacks; the CLI does not synthesize
+those roles from adapter output and reports an explicit incomplete/blocked gap
+when they are unavailable. Adapter-proposed receipts, diff facts, plan challenge,
+or reviewer evidence are rejected before bundle publication.
+
+Advanced semantic context tools strengthen high/critical evidence but are
+optional. A critical run may use the four-tool portable fallback only when every
+impact-graph subject has complete literal content evidence, material unknowns and
+exclusions are resolved, truncation is absent, falsification and verification
+mapping are complete, and the report explicitly records reduced semantic
+coverage without claiming semantic completeness.
+
+To assess persisted quality bundles, pair every run directory with the exact
+check catalog used for that run. The CLI revalidates both roles before applying
+the versioned policy; it does not trust serialized outcome summaries:
+
+```powershell
+npm run assess:quality-bundles -- `
+  --policy quality/acceptance/acceptance-policy.v3.json `
+  --bundle <baseline-run-directory> --catalog <baseline-check-catalog.json> `
+  --bundle <candidate-run-directory> --catalog <candidate-check-catalog.json>
+```
 
 ## Engineering quality boundary
 

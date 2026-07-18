@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -9,11 +11,13 @@ import {
   createNormalSessionQualityBridge,
   executeNormalSessionQualityTool,
   handleNormalSessionChatMessage,
+  handleNormalSessionToolAfter,
   handleNormalSessionToolBefore,
   inspectNormalSessionQualityState,
   inspectNormalSessionRegistration,
 } from "../lib/quality/normal-session-bridge.mjs";
 import { ContractError, fingerprint } from "../lib/quality/validation.mjs";
+import { contextReadToolOutput } from "./context-test-fixtures.mjs";
 
 function expectCode(callback, code) {
   assert.throws(callback, (error) => error instanceof ContractError && error.code === code);
@@ -106,6 +110,50 @@ function call(sessionID, agent, toolId, request) {
     { request: JSON.stringify(request) },
     { sessionID, agent },
   );
+}
+
+let contextCallSequence = 0;
+function recordLocalContext(targetBridge, sessionID, relativePath = "src/file.mjs") {
+  const callID = `classification-context-read-${++contextCallSequence}`;
+  handleNormalSessionToolBefore(targetBridge, {
+    tool: "context_read",
+    sessionID,
+    callID,
+  }, { args: { path: relativePath, startLine: 1, maxLines: 1, maxBytes: 4096, format: "text" } });
+  handleNormalSessionToolAfter(targetBridge, {
+    tool: "context_read",
+    sessionID,
+    callID,
+  }, {
+    output: contextReadToolOutput(relativePath, callID),
+    title: "classification context read",
+    metadata: {},
+  });
+}
+
+function reconcileForAttestation(targetBridge, sessionID) {
+  const facts = {
+    changed_paths: [],
+    unexpected_public_contracts: [],
+    unexpected_dependency_directions: [],
+    unexpected_side_effect_edges: [],
+    unrelated_paths: [],
+    unplanned_items: [],
+  };
+  const checks = Object.fromEntries([
+    "changed_path_ownership",
+    "public_contracts",
+    "dependency_directions",
+    "side_effect_edges",
+    "critical_path_tests",
+    "unrelated_changes",
+  ].map((key) => [key, { status: "passed", finding_ids: [] }]));
+  executeNormalSessionQualityTool(targetBridge, "quality_context_reviewer_record", {
+    request: JSON.stringify({ ...facts, checks }),
+  }, { sessionID, agent: "reviewer" });
+  return executeNormalSessionQualityTool(targetBridge, "quality_context_reconcile", {
+    request: JSON.stringify({ evidence_mode: "reviewer_grounded", ...facts }),
+  }, { sessionID, agent: "orchestrator" });
 }
 
 function standardStart(overrides = {}) {
@@ -204,6 +252,7 @@ assert.deepEqual(
   started,
   "an exact standard-lite classification retry must return the existing runner-owned result",
 );
+recordLocalContext(bridge, session);
 expectCode(
   () => call(session, "orchestrator", "quality_session_start", standardStart({ user_visible_goal: "conflicting replay" })),
   "QUALITY_SESSION_REPLAY",
@@ -221,6 +270,7 @@ const verification = call(session, "verifier", "quality_verification_record", { 
 assert.equal(verification.complete, true);
 assert.equal(inspectNormalSessionQualityState(bridge, session).lifecycle, "verified");
 assert.equal(inspectNormalSessionRegistration(bridge, session).lifecycle, "verified");
+assert.equal(reconcileForAttestation(bridge, session).status, "passed");
 const attestation = call(session, "orchestrator", "quality_session_finalize", { expected_revision: 1 });
 assert.match(attestation.fingerprint, /^sha256:[a-f0-9]{64}$/u);
 assert.equal(inspectNormalSessionRegistration(bridge, session).lifecycle, "attested");
@@ -365,10 +415,67 @@ const faultOptions = {
   observeWorkspace,
   affectedFileInspector: () => ["src/file.mjs"],
   runTrustedTarget: () => ({ status: "passed", command_id: "fixture", exit_code: 0 }),
+  lockStaleMs: 0,
   failureInjector: (stage) => {
     if (stage === injectedFailure) throw new Error(`injected:${stage}`);
   },
 };
+
+function hardExitRiskEscalation(sessionID, stage) {
+  const bridgeModuleUrl = new URL("../lib/quality/normal-session-bridge.mjs", import.meta.url).href;
+  const childSource = String.raw`
+const [bridgeModuleUrl, workspaceRoot, sessionID, failureStage] = process.argv.slice(1);
+const api = await import(bridgeModuleUrl);
+const checkCatalog = api.createDefaultNormalSessionCheckCatalog();
+const standardLitePolicy = {
+  allowed_ownership_prefixes: ["src"],
+  protected_paths: ["src/auth", "src/security", "src/security.mjs"],
+};
+const catalogBinding = {
+  catalog: {
+    catalog_id: checkCatalog.catalog_id,
+    standard_lite_policy: standardLitePolicy,
+    checks: [
+      ...checkCatalog.checks.map((entry) => ({ check_id: entry.check_id, phases: [...entry.phases], purpose: "verification" })),
+      { check_id: "normal-bug-reproducer", phases: ["preimplementation", "integration"], purpose: "bug_reproducer" },
+      { check_id: "normal-integration-only", phases: ["integration"], purpose: "verification" },
+    ],
+  },
+  fingerprint: checkCatalog.fingerprint,
+};
+const bridge = api.createNormalSessionQualityBridge({
+  workspaceRoot,
+  checkCatalog,
+  projectCatalogLoader: () => catalogBinding,
+  standardLitePolicy,
+  observeWorkspace: () => { throw new Error("hard-exit recovery must not re-observe the workspace"); },
+  affectedFileInspector: () => ["src/file.mjs"],
+  runTrustedTarget: () => ({ status: "passed", command_id: "fixture", exit_code: 0 }),
+  lockStaleMs: 0,
+  failureInjector: (stage) => {
+    if (stage === failureStage) process.exit(73);
+  },
+});
+api.executeNormalSessionQualityTool(bridge, "quality_context_strategy_escalate", {
+  request: JSON.stringify({ requested_strategy_id: "high-wide-deep-v1" }),
+}, { sessionID, agent: "orchestrator" });
+process.exit(74);
+`;
+  return spawnSync(process.execPath, [
+    "--input-type=module",
+    "--eval",
+    childSource,
+    bridgeModuleUrl,
+    tempRoot,
+    sessionID,
+    stage,
+  ], {
+    encoding: "utf8",
+    shell: false,
+    windowsHide: true,
+    timeout: 30_000,
+  });
+}
 let faultBridge = createNormalSessionQualityBridge(faultOptions);
 const faultSession = "session/lifecycle-fault-recovery";
 handleNormalSessionChatMessage(faultBridge, { sessionID: faultSession, agent: "orchestrator" });
@@ -384,6 +491,7 @@ const recoveredStart = executeNormalSessionQualityTool(faultBridge, "quality_ses
   request: JSON.stringify(standardStart()),
 }, { sessionID: faultSession, agent: "orchestrator" });
 assert.equal(recoveredStart.lifecycle, "dossier_draft");
+recordLocalContext(faultBridge, faultSession);
 
 injectedFailure = "after_registry_classification";
 let bugFaultBridge = createNormalSessionQualityBridge(faultOptions);
@@ -406,11 +514,266 @@ assert.deepEqual(
   bugStart().reproduction_contract,
 );
 
+for (const stage of [
+  "after_owner_risk_escalation",
+  "after_registry_risk_escalation",
+  "after_strategy_binding_publish",
+]) {
+  injectedFailure = null;
+  let transactionBridge = createNormalSessionQualityBridge(faultOptions);
+  const transactionSession = `session/risk-escalation-${stage}`;
+  const transactionContext = { sessionID: transactionSession, agent: "orchestrator" };
+  handleNormalSessionChatMessage(transactionBridge, transactionContext);
+  executeNormalSessionQualityTool(transactionBridge, "quality_session_start", {
+    request: JSON.stringify(standardStart()),
+  }, transactionContext);
+  recordLocalContext(transactionBridge, transactionSession);
+  const ownerBeforeFailure = inspectNormalSessionQualityState(transactionBridge, transactionSession);
+  const registrationBeforeFailure = inspectNormalSessionRegistration(transactionBridge, transactionSession);
+
+  injectedFailure = stage;
+  assert.throws(() => executeNormalSessionQualityTool(transactionBridge, "quality_context_strategy_escalate", {
+    request: JSON.stringify({ requested_strategy_id: "high-wide-deep-v1" }),
+  }, transactionContext), new RegExp(`injected:${stage}`, "u"));
+  injectedFailure = null;
+  assert.deepEqual(inspectNormalSessionQualityState(transactionBridge, transactionSession), ownerBeforeFailure,
+    `${stage} must restore the exact owner state`);
+  assert.deepEqual(inspectNormalSessionRegistration(transactionBridge, transactionSession), registrationBeforeFailure,
+    `${stage} must restore the exact registry state`);
+
+  transactionBridge = createNormalSessionQualityBridge(faultOptions);
+  assert.deepEqual(inspectNormalSessionQualityState(transactionBridge, transactionSession), ownerBeforeFailure,
+    `${stage} restoration must survive restart`);
+  assert.deepEqual(inspectNormalSessionRegistration(transactionBridge, transactionSession), registrationBeforeFailure,
+    `${stage} registry restoration must survive restart`);
+  executeNormalSessionQualityTool(transactionBridge, "quality_context_strategy_escalate", {
+    request: JSON.stringify({ requested_strategy_id: "high-wide-deep-v1" }),
+  }, transactionContext);
+  const escalatedOwner = inspectNormalSessionQualityState(transactionBridge, transactionSession);
+  const escalatedRegistration = inspectNormalSessionRegistration(transactionBridge, transactionSession);
+  assert.equal(escalatedOwner.dossier.risk_class, "high");
+  assert.equal(escalatedOwner.context_strategy.strategy_id, "high-wide-deep-v1");
+  assert.equal(escalatedOwner.context_report, null, "risk promotion must require a newly planned impact graph");
+  assert.equal(escalatedOwner.standard_lite_policy, null);
+  assert.deepEqual(escalatedOwner.cumulative_affected_paths, ownerBeforeFailure.cumulative_affected_paths,
+    "escalation must retain prior path facts only as re-observation obligations");
+  assert.equal(escalatedRegistration.risk_class, "high");
+  assert.equal(escalatedRegistration.standard_lite_policy, null);
+}
+
+for (const stage of ["after_owner_risk_escalation", "after_registry_risk_escalation"]) {
+  injectedFailure = null;
+  let crashBridge = createNormalSessionQualityBridge(faultOptions);
+  const crashSession = `session/risk-escalation-hard-exit-${stage}`;
+  const crashContext = { sessionID: crashSession, agent: "orchestrator" };
+  handleNormalSessionChatMessage(crashBridge, crashContext);
+  executeNormalSessionQualityTool(crashBridge, "quality_session_start", {
+    request: JSON.stringify(standardStart()),
+  }, crashContext);
+  recordLocalContext(crashBridge, crashSession);
+  const ownerBeforeCrash = inspectNormalSessionQualityState(crashBridge, crashSession);
+  assert(ownerBeforeCrash.context_receipt_ids.length > 0, `${stage} fixture must retain context receipts`);
+  assert(ownerBeforeCrash.cumulative_affected_paths.length > 0, `${stage} fixture must retain affected path facts`);
+
+  const child = hardExitRiskEscalation(crashSession, stage);
+  assert.equal(child.status, 73, `${stage} child must terminate at the durable crash window: ${child.stderr}`);
+
+  crashBridge = createNormalSessionQualityBridge(faultOptions);
+  let expectedContextReceiptIds = ownerBeforeCrash.context_receipt_ids;
+  if (stage === "after_owner_risk_escalation") {
+    assert.equal(inspectNormalSessionRegistration(crashBridge, crashSession).risk_class, "standard-lite",
+      "owner-only crash window must begin restart with the lower registry authority");
+    const postCrashCallID = `classification-context-read-${++contextCallSequence}`;
+    handleNormalSessionToolBefore(crashBridge, {
+      tool: "context_read",
+      sessionID: crashSession,
+      callID: postCrashCallID,
+    }, { args: { path: "src/file.mjs", startLine: 1, maxLines: 1, maxBytes: 4096, format: "text" } });
+    assert.equal(inspectNormalSessionRegistration(crashBridge, crashSession).risk_class, "high",
+      "context authority must reconcile the registry before starting post-crash discovery");
+    handleNormalSessionToolAfter(crashBridge, {
+      tool: "context_read",
+      sessionID: crashSession,
+      callID: postCrashCallID,
+    }, {
+      output: contextReadToolOutput("src/file.mjs", postCrashCallID),
+      title: "post-crash classification context read",
+      metadata: {},
+    });
+    expectedContextReceiptIds = inspectNormalSessionQualityState(crashBridge, crashSession).context_receipt_ids;
+    assert.equal(expectedContextReceiptIds.length, ownerBeforeCrash.context_receipt_ids.length + 1,
+      "reconciled post-crash context settlement must append exactly one active-strategy receipt");
+  }
+  const recovered = executeNormalSessionQualityTool(crashBridge, "quality_dossier_inspect", {
+    request: "{}",
+  }, crashContext);
+  assert.equal(recovered.context_strategy_id, "high-wide-deep-v1");
+  const recoveredOwner = inspectNormalSessionQualityState(crashBridge, crashSession);
+  const recoveredRegistration = inspectNormalSessionRegistration(crashBridge, crashSession);
+  assert.equal(recoveredOwner.dossier.risk_class, "high", `${stage} owner authority must survive restart`);
+  assert.equal(recoveredRegistration.risk_class, "high", `${stage} registry projection must roll forward on restart`);
+  assert.equal(recoveredOwner.standard_lite_policy, null);
+  assert.equal(recoveredOwner.reproduction_contract, null);
+  assert.equal(recoveredOwner.context_report, null);
+  assert.equal(recoveredOwner.context_task_profile_evidence, null);
+  assert.equal(recoveredOwner.context_decision, null);
+  assert.deepEqual(recoveredOwner.contributions, []);
+  assert.equal(recoveredOwner.reviewer_reconciliation_evidence, null);
+  assert.equal(recoveredOwner.context_reconciliation, null);
+  assert.equal(recoveredOwner.gate, null);
+  assert.equal(recoveredOwner.preimplementation_evidence, null);
+  assert.deepEqual(recoveredOwner.preimplementation_check_receipts, []);
+  assert.equal(recoveredOwner.architecture_evaluation, null);
+  assert.equal(recoveredOwner.post_architecture_evidence, null);
+  assert.deepEqual(recoveredOwner.capabilities, []);
+  assert.deepEqual(recoveredOwner.pending_context_calls, []);
+  assert.deepEqual(recoveredOwner.pending_mutations, []);
+  assert.equal(recoveredOwner.active_task_launch, null);
+  assert.equal(recoveredOwner.verification, null);
+  assert.equal(recoveredOwner.attestation, null);
+  assert.equal(recoveredOwner.first_mutation_sequence, null);
+  assert.deepEqual(recoveredOwner.context_receipt_ids, expectedContextReceiptIds,
+    `${stage} restart repair must preserve the exact reconciled context receipt history`);
+  assert.deepEqual(recoveredOwner.context_read_only_subagent_ids, ownerBeforeCrash.context_read_only_subagent_ids,
+    `${stage} restart repair must preserve pre-promotion context subagent facts`);
+  assert.deepEqual(recoveredOwner.cumulative_affected_paths, ownerBeforeCrash.cumulative_affected_paths,
+    `${stage} restart repair must preserve pre-promotion affected path facts`);
+  assert.equal(recoveredOwner.dossier.mode, "full");
+  assert.equal(recoveredOwner.dossier.revision, 1);
+  assert.equal(recoveredOwner.dossier.created_at, recoveredOwner.dossier.updated_at);
+  assert.equal(recoveredOwner.dossier.finalized_at, null);
+  assert.deepEqual(recoveredOwner.dossier.plan_challenge, {
+    architect_result_id: null,
+    reviewer_result_id: null,
+    blockers: [],
+    evidence_refs: [],
+  });
+  assert.deepEqual(recoveredOwner.dossier.gate_state, {
+    status: "not_evaluated",
+    gate_id: null,
+    reason_codes: [],
+  });
+
+  const ownerRevision = recoveredOwner.state_revision;
+  const registrationRevision = recoveredRegistration.state_revision;
+  executeNormalSessionQualityTool(crashBridge, "quality_context_strategy_escalate", {
+    request: JSON.stringify({ requested_strategy_id: "high-wide-deep-v1" }),
+  }, crashContext);
+  assert.equal(inspectNormalSessionQualityState(crashBridge, crashSession).state_revision, ownerRevision,
+    `${stage} same-target retry must not rewrite owner state`);
+  assert.equal(inspectNormalSessionRegistration(crashBridge, crashSession).state_revision, registrationRevision,
+    `${stage} same-target retry must not rewrite registry state`);
+}
+
+injectedFailure = null;
+let laterDraftBridge = createNormalSessionQualityBridge(faultOptions);
+const laterDraftSession = "session/risk-escalation-later-draft-lower-registry";
+const laterDraftContext = { sessionID: laterDraftSession, agent: "orchestrator" };
+handleNormalSessionChatMessage(laterDraftBridge, laterDraftContext);
+executeNormalSessionQualityTool(laterDraftBridge, "quality_session_start", {
+  request: JSON.stringify(standardStart()),
+}, laterDraftContext);
+const lowerRegistration = inspectNormalSessionRegistration(laterDraftBridge, laterDraftSession);
+executeNormalSessionQualityTool(laterDraftBridge, "quality_context_strategy_escalate", {
+  request: JSON.stringify({ requested_strategy_id: "high-wide-deep-v1" }),
+}, laterDraftContext);
+executeNormalSessionQualityTool(laterDraftBridge, "quality_architecture_evaluate", {
+  request: JSON.stringify({ expected_revision: 1, blockers: [] }),
+}, { sessionID: laterDraftSession, agent: "architect" });
+const laterDraftOwner = inspectNormalSessionQualityState(laterDraftBridge, laterDraftSession);
+assert.equal(laterDraftOwner.lifecycle, "dossier_draft");
+assert.equal(laterDraftOwner.dossier.revision, 2);
+assert.equal(laterDraftOwner.dossier.impact_graph, null);
+assert.equal(laterDraftOwner.context_report, null);
+assert.equal(laterDraftOwner.contributions.length, 1);
+const laterDraftSessionKey = createHash("sha256").update(laterDraftSession).digest("hex");
+const lowerRegistrationPath = path.join(
+  tempRoot,
+  ".oc_harness",
+  "quality",
+  "session-registry",
+  `${laterDraftSessionKey}.json`,
+);
+fs.writeFileSync(lowerRegistrationPath, `${JSON.stringify(lowerRegistration)}\n`, "utf8");
+laterDraftBridge = createNormalSessionQualityBridge(faultOptions);
+expectCode(() => executeNormalSessionQualityTool(laterDraftBridge, "quality_dossier_inspect", {
+  request: "{}",
+}, laterDraftContext), "QUALITY_LIFECYCLE_RECONCILIATION");
+
+injectedFailure = null;
+let progressedReceiptBridge = createNormalSessionQualityBridge(faultOptions);
+const progressedReceiptSession = "session/risk-escalation-progressed-receipt-lower-registry";
+const progressedReceiptContext = { sessionID: progressedReceiptSession, agent: "orchestrator" };
+handleNormalSessionChatMessage(progressedReceiptBridge, progressedReceiptContext);
+executeNormalSessionQualityTool(progressedReceiptBridge, "quality_session_start", {
+  request: JSON.stringify(standardStart()),
+}, progressedReceiptContext);
+const progressedLowerRegistration = inspectNormalSessionRegistration(progressedReceiptBridge, progressedReceiptSession);
+executeNormalSessionQualityTool(progressedReceiptBridge, "quality_context_strategy_escalate", {
+  request: JSON.stringify({ requested_strategy_id: "high-wide-deep-v1" }),
+}, progressedReceiptContext);
+recordLocalContext(progressedReceiptBridge, progressedReceiptSession);
+const progressedReceiptOwner = inspectNormalSessionQualityState(progressedReceiptBridge, progressedReceiptSession);
+assert.equal(progressedReceiptOwner.dossier.revision, 1);
+assert.equal(progressedReceiptOwner.context_report, null);
+assert.equal(progressedReceiptOwner.pending_context_calls.length, 0);
+assert.equal(progressedReceiptOwner.context_receipt_ids.length > 0, true);
+const progressedReceiptSessionKey = createHash("sha256").update(progressedReceiptSession).digest("hex");
+const progressedLowerRegistrationPath = path.join(
+  tempRoot,
+  ".oc_harness",
+  "quality",
+  "session-registry",
+  `${progressedReceiptSessionKey}.json`,
+);
+fs.writeFileSync(progressedLowerRegistrationPath, `${JSON.stringify(progressedLowerRegistration)}\n`, "utf8");
+progressedReceiptBridge = createNormalSessionQualityBridge(faultOptions);
+expectCode(() => executeNormalSessionQualityTool(progressedReceiptBridge, "quality_dossier_inspect", {
+  request: "{}",
+}, progressedReceiptContext), "QUALITY_LIFECYCLE_RECONCILIATION");
+
+injectedFailure = null;
+let reverseMismatchBridge = createNormalSessionQualityBridge(faultOptions);
+const reverseMismatchSession = "session/risk-escalation-reverse-mismatch";
+const reverseMismatchContext = { sessionID: reverseMismatchSession, agent: "orchestrator" };
+handleNormalSessionChatMessage(reverseMismatchBridge, reverseMismatchContext);
+executeNormalSessionQualityTool(reverseMismatchBridge, "quality_session_start", {
+  request: JSON.stringify(standardStart()),
+}, reverseMismatchContext);
+const reverseRegistration = structuredClone(inspectNormalSessionRegistration(reverseMismatchBridge, reverseMismatchSession));
+reverseRegistration.risk_class = "high";
+reverseRegistration.lifecycle = "dossier_draft";
+reverseRegistration.lifecycle_history.push({
+  lifecycle: "dossier_draft",
+  at: "2026-07-18T12:00:00.000Z",
+  reason_code: "TEST_REVERSE_RISK_MISMATCH",
+});
+reverseRegistration.classification_revision += 1;
+reverseRegistration.reproduction_contract = null;
+reverseRegistration.standard_lite_policy = null;
+reverseRegistration.scope_facts = null;
+delete reverseRegistration.fingerprint;
+reverseRegistration.fingerprint = fingerprint(reverseRegistration);
+const reverseSessionKey = createHash("sha256").update(reverseMismatchSession).digest("hex");
+const reverseRegistrationPath = path.join(
+  tempRoot,
+  ".oc_harness",
+  "quality",
+  "session-registry",
+  `${reverseSessionKey}.json`,
+);
+fs.writeFileSync(reverseRegistrationPath, `${JSON.stringify(reverseRegistration)}\n`, "utf8");
+reverseMismatchBridge = createNormalSessionQualityBridge(faultOptions);
+expectCode(() => executeNormalSessionQualityTool(reverseMismatchBridge, "quality_dossier_inspect", {
+  request: "{}",
+}, reverseMismatchContext), "QUALITY_LIFECYCLE_RECONCILIATION");
+
 for (const [stage, toolId, agent] of [
   ["after_owner_gate", "quality_dossier_finalize", "orchestrator"],
   ["after_owner_verification", "quality_verification_record", "verifier"],
   ["after_owner_attestation", "quality_session_finalize", "orchestrator"],
 ]) {
+  if (stage === "after_owner_attestation") reconcileForAttestation(faultBridge, faultSession);
   injectedFailure = stage;
   assert.throws(() => executeNormalSessionQualityTool(faultBridge, toolId, {
     request: JSON.stringify({ expected_revision: 1 }),
@@ -422,6 +785,30 @@ for (const [stage, toolId, agent] of [
   }, { sessionID: faultSession, agent }));
 }
 assert.equal(inspectNormalSessionRegistration(faultBridge, faultSession).lifecycle, "attested");
+
+const escalationSession = "session/classification-escalation";
+handleNormalSessionChatMessage(bridge, { sessionID: escalationSession, agent: "orchestrator" });
+call(escalationSession, "orchestrator", "quality_session_start", standardStart());
+const escalationBefore = inspectNormalSessionRegistration(bridge, escalationSession);
+assert.notEqual(escalationBefore.standard_lite_policy, null);
+assert.equal(escalationBefore.initial_affected_paths.includes("src/file.mjs"), true);
+call(escalationSession, "orchestrator", "quality_context_strategy_escalate", {
+  requested_strategy_id: "high-wide-deep-v1",
+});
+const escalationAfter = inspectNormalSessionRegistration(bridge, escalationSession);
+assert.equal(escalationAfter.risk_class, "high");
+assert.equal(escalationAfter.lifecycle, "dossier_draft");
+assert.equal(escalationAfter.standard_lite_policy, null, "escalation must remove standard-lite policy authority");
+assert.equal(escalationAfter.scope_facts, null, "escalation must remove standard-lite classification authority");
+assert.equal(escalationAfter.reproduction_contract, null);
+assert.deepEqual(escalationAfter.initial_affected_paths, escalationBefore.initial_affected_paths,
+  "pre-escalation affected paths must remain durable re-observation facts");
+const escalationRevision = escalationAfter.state_revision;
+call(escalationSession, "orchestrator", "quality_context_strategy_escalate", {
+  requested_strategy_id: "high-wide-deep-v1",
+});
+assert.equal(inspectNormalSessionRegistration(bridge, escalationSession).state_revision, escalationRevision,
+  "same-target escalation must be idempotent");
 
 handleNormalSessionChatMessage(bridge, { sessionID: "session/high", agent: "orchestrator-deep" });
 const high = call("session/high", "orchestrator-deep", "quality_session_start", {

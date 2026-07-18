@@ -31,6 +31,16 @@ import {
   engineeringImpactGraphFingerprintInput,
 } from "../lib/quality/impact-graph.mjs";
 import { PREMORTEM_CATEGORIES } from "../lib/quality/constants.mjs";
+import { selectMinimumContextStrategy } from "../lib/quality/context-strategies.mjs";
+import {
+  createContextReceiptEvidenceIndex,
+  createStandardLiteContextSummary,
+  evaluateContextSufficiency,
+} from "../lib/quality/context-sufficiency.mjs";
+import {
+  createReviewerReconciliationEvidence,
+  reconcileFinalBlastRadius,
+} from "../lib/quality/context-reconciliation.mjs";
 import {
   publishEngineeringQualityRunBundle,
   validateEngineeringQualityRunBundle,
@@ -42,6 +52,8 @@ import {
   sessionFinalizeAttestation,
   sessionLinkGate,
   sessionObserveWorkspace,
+  sessionRecordContextDecision,
+  sessionRecordContextReconciliation,
   sessionRecordDossier,
   sessionRecordImplementation,
   sessionRecordImplementationDelegation,
@@ -52,12 +64,21 @@ import {
   createEngineeringQualityStore,
   inspectEngineeringDossier,
   inspectGateDecision,
+  recordContextDecisionEvidenceBundle,
+  recordContextReceiptEvidenceIndex,
   recordEngineeringDossier,
   recordGateDecision,
+  snapshotEngineeringQualityStore,
 } from "../lib/quality/store.mjs";
 import { createIntegratedVerificationEvidence } from "../lib/quality/verification-evidence.mjs";
+import {
+  createWholeSystemContextReportDraft,
+  finalizeWholeSystemContextReport,
+} from "../lib/quality/whole-system-context-report.mjs";
 import { standardLiteDossierRequest } from "../lib/quality/standard-lite.mjs";
 import { requiredEngineeringVerificationTargets } from "../lib/quality/verification-targets.mjs";
+import { fingerprint } from "../lib/quality/validation.mjs";
+import { contextTestReceipt, contextTestTaskProfileEvidence } from "./context-test-fixtures.mjs";
 
 const START_COMMIT = "0a1d56605b9b8923ac27c3b3b405b38177ca7741";
 const FP_A = `sha256:${"a".repeat(64)}`;
@@ -66,6 +87,8 @@ const FP_C = `sha256:${"c".repeat(64)}`;
 const FP_D = `sha256:${"d".repeat(64)}`;
 const FP_E = `sha256:${"e".repeat(64)}`;
 const tests = [];
+let contextSequence = 0;
+const contextReportsByDecisionId = new Map();
 
 function test(name, callback) {
   tests.push({ name, callback });
@@ -73,6 +96,304 @@ function test(name, callback) {
 
 function assertContractError(callback, code) {
   assert.throws(callback, (error) => error instanceof ContractError && error.code === code);
+}
+
+function contextReceiptForDossier(dossier, sequence) {
+  const sessionKey = fingerprint({ purpose: "quality-session", sequence }).slice("sha256:".length);
+  const outline = contextTestReceipt({
+    receiptId: `CTXRECEIPT-quality-${sequence}-outline`,
+    sequence: 1,
+    dossier,
+    workspaceFingerprint: FP_A,
+    sessionKey,
+    toolId: "context_outline",
+    startedAt: "2026-07-13T00:00:10Z",
+    completedAt: "2026-07-13T00:00:20Z",
+  });
+  const content = contextTestReceipt({
+    receiptId: `CTXRECEIPT-quality-${sequence}`,
+    sequence: 2,
+    dossier,
+    workspaceFingerprint: FP_A,
+    sessionKey,
+    previousReceiptFingerprint: outline.fingerprint,
+    startedAt: "2026-07-13T00:00:30Z",
+    completedAt: "2026-07-13T00:01:00Z",
+  });
+  return [outline, content];
+}
+
+function fullContextContent(strategy, dossier, receipts) {
+  const receiptIds = receipts.map((entry) => entry.receipt_id);
+  const graph = dossier.impact_graph;
+  const subjectIds = [
+    ...graph.nodes.map((entry) => entry.id),
+    ...graph.edges.map((entry) => entry.id),
+    ...graph.affected_paths.map((entry) => entry.id),
+    ...graph.excluded_siblings.map((entry) => entry.id),
+  ];
+  const claims = strategy.required_wide_categories.map((category, index) => ({
+    id: `CLAIM-quality-${contextSequence}-${index}`,
+    kind: category === "excluded_sibling_paths" ? "reasoned_exclusion" : "observed",
+    statement: `Runner-observed bounded evidence covers ${category}.`,
+    subject_ids: subjectIds,
+    receipt_ids: receiptIds,
+  }));
+  const wideAnalysis = strategy.required_wide_categories.map((category, index) => ({
+    id: `WIDE-quality-${contextSequence}-${index}`,
+    category,
+    classification: category === "relevant_unknown_paths" ? "reasoned_excluded" : "represented",
+    claim_ids: [claims[index].id],
+    subject_ids: subjectIds,
+    receipt_ids: receiptIds,
+    rationale: category === "relevant_unknown_paths" ? "No material unresolved path remains in the bounded fixture." : null,
+  }));
+  const criticalPaths = graph.affected_paths.filter((entry) => entry.critical);
+  const pathQuestionKeys = strategy.required_questions.filter((entry) => entry !== "sibling_variants");
+  const questions = criticalPaths.map((entry, index) => ({
+    id: `QUESTION-quality-${contextSequence}-${index}`,
+    question_key: pathQuestionKeys[index % pathQuestionKeys.length],
+    statement: `The negative path for ${entry.id} preserves the declared invariant.`,
+    expected_observation: "The negative path is rejected without an unexpected side effect.",
+    actual_observation: "The bounded regression path rejected the invalid input.",
+    status: "confirmed",
+    receipt_ids: receiptIds,
+    impact_if_wrong: "high",
+    next_action: null,
+    applied_update_ids: [],
+    applied_update_fingerprint: null,
+  }));
+  if (strategy.requires_sibling_variant_discovery) questions.push({
+    id: `QUESTION-quality-${contextSequence}-sibling`,
+    question_key: "sibling_variants",
+    statement: "Applicable sibling variants use the same corrected owner.",
+    expected_observation: "No sibling retains the root defect.",
+    actual_observation: "The bounded sibling scan found no missed variant.",
+    status: "confirmed",
+    receipt_ids: receiptIds,
+    impact_if_wrong: "high",
+    next_action: null,
+    applied_update_ids: [],
+    applied_update_fingerprint: null,
+  });
+  for (const [index, questionKey] of strategy.required_questions.entries()) {
+    if (questions.some((entry) => entry.question_key === questionKey)) continue;
+    questions.push({
+      id: `QUESTION-quality-${contextSequence}-required-${index}`,
+      question_key: questionKey,
+      statement: `The ${questionKey} assumption matches the bounded quality fixture.`,
+      expected_observation: `Runner evidence resolves ${questionKey}.`,
+      actual_observation: `The linked receipt and verification plan resolve ${questionKey}.`,
+      status: "confirmed",
+      receipt_ids: receiptIds,
+      impact_if_wrong: "high",
+      next_action: null,
+      applied_update_ids: [],
+      applied_update_fingerprint: null,
+    });
+  }
+  const invariantId = dossier.invariants[0]?.id;
+  const edgeCaseId = dossier.edge_cases[0]?.id;
+  const failureModeId = dossier.failure_modes[0]?.id;
+  const testObligationId = dossier.test_obligations[0]?.id;
+  const deepAnalyses = criticalPaths.map((entry, index) => ({
+    id: `DEEP-quality-${contextSequence}-${index}`,
+    impact_path_id: entry.id,
+    node_ids: entry.node_ids,
+    edge_ids: entry.edge_ids,
+    symbol_ids: ["quality-fixture"],
+    inputs: ["bounded fixture input"],
+    outputs: ["verified fixture result"],
+    dimensions: strategy.required_deep_dimensions.map((dimension) => ({
+      dimension,
+      classification: "applicable",
+      analysis: `${dimension} is covered by the linked fixture obligation.`,
+      not_applicable_reason: null,
+      receipt_ids: receiptIds,
+      verification_ids: [testObligationId],
+    })),
+    falsification_question_id: questions[index].id,
+    invariant_ids: [invariantId],
+    edge_case_ids: [edgeCaseId],
+    failure_mode_ids: [failureModeId],
+    test_obligation_ids: [testObligationId],
+    unresolved_question_ids: [],
+    receipt_ids: receiptIds,
+  }));
+  return {
+    wide_analysis: wideAnalysis,
+    claims,
+    deep_analyses: deepAnalyses,
+    questions,
+    task_evidence: {
+      owning_abstraction_claim_id: ["bug_fix", "diagnosis_driven_implementation"].includes(strategy.task_profile) ? claims[0].id : null,
+      sibling_variant_question_ids: strategy.requires_sibling_variant_discovery ? [questions.find((entry) => entry.question_key === "sibling_variants").id] : [],
+      characterization_test_ids: strategy.requires_characterization ? [testObligationId] : [],
+      negative_path_ids: strategy.requires_negative_path ? [edgeCaseId] : [],
+      compatibility_ids: strategy.requires_compatibility ? [invariantId] : [],
+      reproduction_status: strategy.requires_pre_change_reproduction ? "reproduced" : "not_required",
+      reproduction_evidence_ids: strategy.requires_pre_change_reproduction ? [testObligationId] : [],
+    },
+    tool_state: {
+      minimal_available: ["context_files", "context_outline", "context_read", "context_search"],
+      advanced_available: ["context_batch_read"],
+      advanced_unavailable: ["context_map", "context_symbols", "context_related"],
+      unsupported_schema_tools: [],
+      fallback_used: false,
+      reduced_semantic_coverage: true,
+      semantic_completeness_claimed: false,
+      unresolved_truncation_receipt_ids: [],
+    },
+    budget_state: {
+      context_calls_used: receipts.length,
+      context_calls_max: strategy.budgets.max_context_calls,
+      read_only_subagents_used: 0,
+      read_only_subagents_max: strategy.budgets.max_read_only_subagents,
+      exhausted: false,
+      unresolved_area: null,
+    },
+  };
+}
+
+function recordSufficientTestContext(session, dossier, { record = true } = {}) {
+  contextSequence += 1;
+  const strategy = selectMinimumContextStrategy({
+    risk_class: dossier.risk_class,
+    task_type: dossier.task_type,
+  });
+  const sessionKey = fingerprint({ purpose: "quality-session", sequence: contextSequence }).slice("sha256:".length);
+  let receipts = [];
+  let report = null;
+  let standardSummary = null;
+  if (dossier.risk_class === "standard-lite") {
+    const receipt = contextTestReceipt({
+      receiptId: `CTXRECEIPT-quality-${contextSequence}`,
+      sequence: 1,
+      dossier,
+      workspaceFingerprint: FP_A,
+      sessionKey,
+      toolId: "context_read",
+      observedPaths: [dossier.affected_areas[0]?.path ?? "lib/app.mjs"],
+      startedAt: "2026-07-13T00:00:30Z",
+      completedAt: "2026-07-13T00:01:00Z",
+    });
+    receipts = [receipt];
+    standardSummary = createStandardLiteContextSummary({
+      summary_id: `CTXLOCAL-quality-${contextSequence}`,
+      session_key: sessionKey,
+      strategy_binding: strategy,
+      workspace_fingerprint: FP_A,
+      dossier,
+      receipt_ids: [receipt.receipt_id],
+      inspected_paths: [dossier.affected_areas[0]?.path ?? "lib/app.mjs"],
+      context_calls: 1,
+      finalized_at: "2026-07-13T00:02:00Z",
+    });
+  } else {
+    receipts = contextReceiptForDossier(dossier, contextSequence);
+    const draft = createWholeSystemContextReportDraft({
+      report_id: `CONTEXT-quality-${contextSequence}`,
+      session_key: sessionKey,
+      strategy_binding: strategy,
+      workspace_fingerprint: FP_A,
+      dossier,
+      created_at: "2026-07-13T00:01:00Z",
+      content: fullContextContent(strategy, dossier, receipts),
+    });
+    report = finalizeWholeSystemContextReport(draft, {
+      finalized_at: "2026-07-13T00:02:00Z",
+      strategy_binding: strategy,
+      workspace_fingerprint: FP_A,
+      dossier,
+      receipt_index: { receipts },
+    });
+  }
+  const decision = evaluateContextSufficiency({
+    decision_id: `CTXDEC-quality-${contextSequence}`,
+    session_key: sessionKey,
+    strategy_binding: strategy,
+    dossier,
+    workspace_fingerprint: FP_A,
+    receipt_index: { receipts },
+    report,
+    standard_lite_summary: standardSummary,
+    task_profile_evidence: contextTestTaskProfileEvidence({
+      dossier,
+      sessionKey,
+      workspaceFingerprint: FP_A,
+      evidenceId: `CTXPROFILE-quality-${contextSequence}`,
+      completedAt: "2026-07-13T00:01:15Z",
+      createdAt: "2026-07-13T00:01:30Z",
+    }),
+    evaluated_at: "2026-07-13T00:03:00Z",
+  });
+  assert.equal(decision.status, "sufficient", JSON.stringify(decision.reasons));
+  contextReportsByDecisionId.set(decision.decision_id, report);
+  const receiptIndex = createContextReceiptEvidenceIndex({ receipts }, {
+    session_key: sessionKey,
+    run_id: dossier.run_id,
+    task_id: dossier.task_id,
+    source_fingerprint: FP_A,
+  });
+  if (!record) return { decision, receipt_index: receiptIndex, report };
+  sessionRecordContextDecision(session, { decision, receipt_index: receiptIndex, report });
+  return decision;
+}
+
+function createPassedTestReconciliation(decision, dossier, finalWorkspaceFingerprint, changedPaths = ["lib/app.mjs"]) {
+  const verifiedTestObligation = dossier.test_obligations.find((entry) => (
+    entry.required === true && ["slice", "integration"].includes(entry.phase)
+  ));
+  assert(verifiedTestObligation, "fixture requires a mandatory post-mutation test obligation");
+  const mappedPaths = changedPaths.map((entry) => ({
+    path: entry,
+    kind: "source",
+    ownership_ids: [dossier.implementation_slices[0]?.id ?? "SLICE-quality"],
+    context_subject_ids: [dossier.impact_graph?.affected_paths[0]?.id ?? dossier.affected_areas[0]?.id ?? "AREA-quality"],
+    test_obligation_ids: [verifiedTestObligation.id],
+  }));
+  const finalDiffFingerprint = fingerprint({
+    changed_paths: mappedPaths,
+    unexpected_public_contracts: [],
+    unexpected_dependency_directions: [],
+    unexpected_side_effect_edges: [],
+    unrelated_paths: [],
+    unplanned_items: [],
+  });
+  const reviewerEvidence = createReviewerReconciliationEvidence({
+    reviewer_result_id: `reviewer-quality-${contextSequence}`,
+    session_key: decision.session_key,
+    context_decision: decision,
+    final_workspace_fingerprint: finalWorkspaceFingerprint,
+    final_diff_fingerprint: finalDiffFingerprint,
+    changed_paths: mappedPaths,
+    checks: Object.fromEntries([
+      "changed_path_ownership", "public_contracts", "dependency_directions", "side_effect_edges", "critical_path_tests", "unrelated_changes",
+    ].map((key) => [key, { status: "passed", finding_ids: [] }])),
+    unplanned_item_ids: [],
+    completed_at: "2026-07-13T00:04:00Z",
+  });
+  const reconciliation = reconcileFinalBlastRadius({
+    reconciliation_id: `CTXREC-quality-${contextSequence}`,
+    session_key: decision.session_key,
+    context_decision: decision,
+    dossier,
+    context_report: contextReportsByDecisionId.get(decision.decision_id) ?? null,
+    final_workspace_fingerprint: finalWorkspaceFingerprint,
+    changed_paths: mappedPaths,
+    verified_post_mutation_test_obligation_ids: [verifiedTestObligation.id],
+    evidence_mode: "reviewer_grounded",
+    reviewer_evidence: reviewerEvidence,
+    reconciled_at: "2026-07-13T00:04:30Z",
+  });
+  assert.equal(reconciliation.status, "passed", JSON.stringify(reconciliation.reason_codes));
+  return reconciliation;
+}
+
+function recordPassedTestReconciliation(session, decision, dossier, finalWorkspaceFingerprint, changedPaths = ["lib/app.mjs"]) {
+  const reconciliation = createPassedTestReconciliation(decision, dossier, finalWorkspaceFingerprint, changedPaths);
+  sessionRecordContextReconciliation(session, reconciliation);
+  return reconciliation;
 }
 
 function mapping(classification, overrides = {}) {
@@ -778,6 +1099,7 @@ function preparedImplementationSession({ runId, dossierId, workspaceFingerprint 
   const gate = passedGate(dossier, { gate_id: `gate-${runId}`, check_catalog: checkCatalog });
   const store = createEngineeringQualityStore({ run_id: runId, task_id: dossier.task_id });
   const session = createEngineeringQualitySession({ store, initial_workspace_fingerprint: FP_A });
+  const contextDecision = recordSufficientTestContext(session, dossier);
   sessionRecordDossier(session, dossier);
   sessionLinkGate(session, {
     decision: gate,
@@ -800,7 +1122,7 @@ function preparedImplementationSession({ runId, dossierId, workspaceFingerprint 
     workspace_fingerprint: workspaceFingerprint,
     files_written: ["lib/app.mjs"],
   });
-  return { dossier, checkCatalog, gate, session };
+  return { dossier, checkCatalog, gate, store, session, contextDecision };
 }
 
 test("dossier lifecycle is immutable, CAS-versioned, strict, and fingerprinted", () => {
@@ -1337,6 +1659,7 @@ test("passed linked gate authorizes bounded implementation and produces ordered 
   const gate = passedGate(dossier, { gate_id: "gate-session" });
   const store = createEngineeringQualityStore({ run_id: "run-session", task_id: "task-quality" });
   const session = createEngineeringQualitySession({ store, initial_workspace_fingerprint: FP_A });
+  recordSufficientTestContext(session, dossier);
   sessionRecordDossier(session, dossier);
   const linked = sessionLinkGate(session, {
     decision: gate,
@@ -1389,6 +1712,292 @@ test("authorization rejects out-of-ownership, false-prefix, traversal, and empty
       write_scope: writeScope,
     }), code);
   }
+});
+
+test("rejected context decision artifacts do not poison a corrected retry on the same store", () => {
+  const dossier = finalizedDossier({
+    dossier_id: "dossier-context-decision-retry",
+    run_id: "run-context-decision-retry",
+    risk_class: "high",
+    mode: "full",
+    content: fullDossierContent("high"),
+  });
+  const store = createEngineeringQualityStore({ run_id: dossier.run_id, task_id: dossier.task_id });
+  const session = createEngineeringQualitySession({ store, initial_workspace_fingerprint: FP_A });
+  const correct = recordSufficientTestContext(null, dossier, { record: false });
+  const alternate = recordSufficientTestContext(null, dossier, { record: false });
+  const mismatchedIndex = createContextReceiptEvidenceIndex({ receipts: [] }, {
+    session_key: correct.decision.session_key,
+    run_id: dossier.run_id,
+    task_id: dossier.task_id,
+    source_fingerprint: FP_A,
+  });
+
+  assertContractError(() => sessionRecordContextDecision(session, {
+    decision: correct.decision,
+    receipt_index: mismatchedIndex,
+    report: correct.report,
+  }), "CONTEXT_DECISION_BINDING");
+  assertContractError(() => sessionRecordContextDecision(session, {
+    decision: correct.decision,
+    receipt_index: correct.receipt_index,
+    report: alternate.report,
+  }), "CONTEXT_DECISION_BINDING");
+  assert.equal(inspectEngineeringQualitySession(session).lifecycle, "init");
+
+  const recorded = sessionRecordContextDecision(session, correct);
+  assert.equal(recorded.decision_id, correct.decision.decision_id);
+  assert.equal(inspectEngineeringQualitySession(session).lifecycle, "context_sufficient");
+  const replayed = recordContextDecisionEvidenceBundle(store, correct);
+  assert.equal(replayed.decision.fingerprint, correct.decision.fingerprint);
+  assert.equal(replayed.receipt_index.fingerprint, correct.receipt_index.fingerprint);
+  assert.equal(replayed.report.fingerprint, correct.report.fingerprint);
+});
+
+test("context decision bundle preserves nullable task-profile evidence semantics", () => {
+  const dossier = finalizedDossier({
+    dossier_id: "dossier-context-null-task-profile",
+    run_id: "run-context-null-task-profile",
+    risk_class: "high",
+    mode: "full",
+    content: fullDossierContent("high"),
+  });
+  const bundle = recordSufficientTestContext(null, dossier, { record: false });
+  const refingerprint = (value, patch) => {
+    const source = { ...structuredClone(value), ...patch };
+    delete source.fingerprint;
+    return { ...source, fingerprint: fingerprint(source) };
+  };
+  const mismatchedTaskProfile = refingerprint(bundle.decision.task_profile_evidence, {
+    session_key: "mismatched-task-profile-session",
+  });
+  const mismatchedDecision = refingerprint(bundle.decision, {
+    task_profile_evidence: mismatchedTaskProfile,
+  });
+  const nullableDecision = refingerprint(bundle.decision, { task_profile_evidence: null });
+  const store = createEngineeringQualityStore({ run_id: dossier.run_id, task_id: dossier.task_id });
+  const session = createEngineeringQualitySession({ store, initial_workspace_fingerprint: FP_A });
+
+  assertContractError(() => sessionRecordContextDecision(session, {
+    ...bundle,
+    decision: mismatchedDecision,
+  }), "CONTEXT_DECISION_BINDING");
+  assert.equal(inspectEngineeringQualitySession(session).lifecycle, "init");
+
+  const recorded = sessionRecordContextDecision(session, {
+    ...bundle,
+    decision: nullableDecision,
+  });
+  assert.equal(recorded.status, "sufficient");
+  assert.equal(recorded.task_profile_evidence, null);
+  assert.equal(inspectEngineeringQualitySession(session).lifecycle, "context_sufficient");
+  const replayed = recordContextDecisionEvidenceBundle(store, {
+    ...bundle,
+    decision: nullableDecision,
+  });
+  assert.equal(replayed.decision.fingerprint, nullableDecision.fingerprint);
+  assert.equal(replayed.decision.task_profile_evidence, null);
+});
+
+test("conflicting low-level context partial state does not receive new bundle records", () => {
+  const dossier = finalizedDossier({
+    dossier_id: "dossier-context-partial-conflict",
+    run_id: "run-context-partial-conflict",
+  });
+  const gate = passedGate(dossier, { gate_id: "gate-context-partial-conflict" });
+  const correct = recordSufficientTestContext(null, dossier, { record: false });
+  const conflictingIndex = createContextReceiptEvidenceIndex({ receipts: [] }, {
+    session_key: correct.decision.session_key,
+    run_id: dossier.run_id,
+    task_id: dossier.task_id,
+    source_fingerprint: FP_A,
+  });
+  const store = createEngineeringQualityStore({ run_id: dossier.run_id, task_id: dossier.task_id });
+  recordEngineeringDossier(store, dossier);
+  recordGateDecision(store, gate);
+  recordContextReceiptEvidenceIndex(store, conflictingIndex);
+  const session = createEngineeringQualitySession({ store, initial_workspace_fingerprint: FP_A });
+
+  assertContractError(
+    () => sessionRecordContextDecision(session, correct),
+    "CONTEXT_RECEIPT_INDEX_CONFLICT",
+  );
+  const snapshot = snapshotEngineeringQualityStore(store);
+  assert.equal(snapshot.context_receipt_index.fingerprint, conflictingIndex.fingerprint);
+  assert.equal(snapshot.context_sufficiency_decision, null);
+  assert.equal(snapshot.context_report, null);
+  assert.equal(inspectEngineeringQualitySession(session).lifecycle, "init");
+});
+
+test("context decision bundle quota rejection is atomic", () => {
+  const dossier = finalizedDossier({
+    dossier_id: "dossier-context-bundle-quota",
+    run_id: "run-context-bundle-quota",
+  });
+  const gate = passedGate(dossier, { gate_id: "gate-context-bundle-quota" });
+  const bundle = recordSufficientTestContext(null, dossier, { record: false });
+  const bytes = (value) => Buffer.byteLength(`${JSON.stringify(value, null, 2)}\n`, "utf8");
+  const dossierBytes = bytes(dossier);
+  const gateBytes = bytes(gate);
+  const indexBytes = bytes(bundle.receipt_index);
+  const decisionBytes = bytes(bundle.decision);
+  const recordBytes = Math.max(1024, dossierBytes, gateBytes, indexBytes, decisionBytes);
+  const baselineBytes = dossierBytes + gateBytes;
+  const bundleBytes = baselineBytes + Math.max(indexBytes, decisionBytes);
+  assert(bundleBytes >= recordBytes);
+  assert(bundleBytes < baselineBytes + indexBytes + decisionBytes);
+  const store = createEngineeringQualityStore({
+    run_id: dossier.run_id,
+    task_id: dossier.task_id,
+    limits: { recordBytes, bundleBytes },
+  });
+  recordEngineeringDossier(store, dossier);
+  recordGateDecision(store, gate);
+  const session = createEngineeringQualitySession({ store, initial_workspace_fingerprint: FP_A });
+
+  assertContractError(
+    () => sessionRecordContextDecision(session, bundle),
+    "QUALITY_BUNDLE_BYTES",
+  );
+  const snapshot = snapshotEngineeringQualityStore(store);
+  assert.equal(snapshot.context_receipt_index, null);
+  assert.equal(snapshot.context_sufficiency_decision, null);
+  assert.equal(snapshot.context_report, null);
+  assert.equal(inspectEngineeringQualitySession(session).lifecycle, "init");
+});
+
+test("final context reconciliation cannot precede integrated verification", () => {
+  const current = preparedImplementationSession({
+    runId: "run-reconciliation-before-verification",
+    dossierId: "dossier-reconciliation-before-verification",
+  });
+  assertContractError(
+    () => recordPassedTestReconciliation(current.session, current.contextDecision, current.dossier, FP_B),
+    "CONTEXT_RECONCILIATION_ORDER",
+  );
+});
+
+test("rejected stale reconciliation does not poison a corrected retry on the same store", () => {
+  const prepared = preparedImplementationSession({
+    runId: "run-reconciliation-retry",
+    dossierId: "dossier-reconciliation-retry",
+  });
+  const targetIds = [
+    ...prepared.dossier.verification_boundary.check_ids,
+    ...prepared.dossier.verification_boundary.mechanism_ids,
+  ];
+  const event = syntheticVerificationEvent({
+    runId: prepared.dossier.run_id,
+    sequence: 4,
+    targetIds,
+  });
+  const evidence = integratedEvidence({
+    dossier: prepared.dossier,
+    gate: prepared.gate,
+    checkCatalog: prepared.checkCatalog,
+    traceEvent: event,
+    workspaceFingerprint: FP_B,
+  });
+  sessionRecordIntegratedVerification(prepared.session, {
+    evidence,
+    check_catalog: prepared.checkCatalog,
+  });
+
+  const stale = createPassedTestReconciliation(
+    prepared.contextDecision,
+    prepared.dossier,
+    FP_C,
+  );
+  assertContractError(
+    () => sessionRecordContextReconciliation(prepared.session, stale),
+    "CONTEXT_RECONCILIATION_FINAL_WORKSPACE_STALE",
+  );
+  assert.equal(inspectEngineeringQualitySession(prepared.session).context_reconciliation_id, null);
+
+  const corrected = createPassedTestReconciliation(
+    prepared.contextDecision,
+    prepared.dossier,
+    FP_B,
+  );
+  const recorded = sessionRecordContextReconciliation(prepared.session, corrected);
+  assert.equal(recorded.reconciliation_id, corrected.reconciliation_id);
+  assert.equal(
+    inspectEngineeringQualitySession(prepared.session).context_reconciliation_id,
+    corrected.reconciliation_id,
+  );
+});
+
+test("workspace changes invalidate integrated verification before reconciliation and remain retryable", () => {
+  const prepared = preparedImplementationSession({
+    runId: "run-reconciliation-workspace-reverification",
+    dossierId: "dossier-reconciliation-workspace-reverification",
+  });
+  const targetIds = [
+    ...prepared.dossier.verification_boundary.check_ids,
+    ...prepared.dossier.verification_boundary.mechanism_ids,
+  ];
+  const firstEvent = syntheticVerificationEvent({
+    runId: prepared.dossier.run_id,
+    sequence: 4,
+    targetIds,
+  });
+  sessionRecordIntegratedVerification(prepared.session, {
+    evidence: integratedEvidence({
+      dossier: prepared.dossier,
+      gate: prepared.gate,
+      checkCatalog: prepared.checkCatalog,
+      traceEvent: firstEvent,
+      workspaceFingerprint: FP_B,
+    }),
+    check_catalog: prepared.checkCatalog,
+  });
+
+  sessionObserveWorkspace(prepared.session, { fingerprint: FP_C, sequence: 5 });
+  let sessionState = inspectEngineeringQualitySession(prepared.session);
+  assert.equal(sessionState.integrated_verification_sequence, null);
+  assert.equal(sessionState.integrated_verification_evidence_id, null);
+  const currentWorkspaceReconciliation = createPassedTestReconciliation(
+    prepared.contextDecision,
+    prepared.dossier,
+    FP_C,
+  );
+  assertContractError(
+    () => sessionRecordContextReconciliation(prepared.session, currentWorkspaceReconciliation),
+    "CONTEXT_RECONCILIATION_ORDER",
+  );
+  sessionState = inspectEngineeringQualitySession(prepared.session);
+  assert.equal(sessionState.lifecycle, "implementation_enabled");
+  assert.equal(sessionState.context_reconciliation_id, null);
+  assert.equal(snapshotEngineeringQualityStore(prepared.store).context_reconciliation, null);
+
+  const secondEvent = syntheticVerificationEvent({
+    runId: prepared.dossier.run_id,
+    sequence: 6,
+    targetIds,
+  });
+  const secondEvidence = integratedEvidence({
+    dossier: prepared.dossier,
+    gate: prepared.gate,
+    checkCatalog: prepared.checkCatalog,
+    traceEvent: secondEvent,
+    workspaceFingerprint: FP_C,
+  });
+  sessionRecordIntegratedVerification(prepared.session, {
+    evidence: secondEvidence,
+    check_catalog: prepared.checkCatalog,
+  });
+  const recorded = sessionRecordContextReconciliation(prepared.session, currentWorkspaceReconciliation);
+  assert.equal(recorded.reconciliation_id, currentWorkspaceReconciliation.reconciliation_id);
+  assert.equal(
+    inspectEngineeringQualitySession(prepared.session).integrated_verification_evidence_id,
+    secondEvidence.evidence_id,
+  );
+
+  assertContractError(
+    () => sessionObserveWorkspace(prepared.session, { fingerprint: FP_D, sequence: 7 }),
+    "CONTEXT_RECONCILIATION_ORDER",
+  );
+  assert.equal(inspectEngineeringQualitySession(prepared.session).lifecycle, "failed");
 });
 
 test("integrated evidence rejects omitted, substituted, duplicate, and untrusted execution receipts", () => {
@@ -1518,6 +2127,7 @@ test("preimplementation mechanism receipts remain bound to gate-authoritative pl
   assert.equal(gate.status, "passed", JSON.stringify(gate.reasons));
   const store = createEngineeringQualityStore({ run_id: dossier.run_id, task_id: dossier.task_id });
   const session = createEngineeringQualitySession({ store, initial_workspace_fingerprint: FP_A });
+  recordSufficientTestContext(session, dossier);
   sessionRecordDossier(session, dossier);
   sessionLinkGate(session, {
     decision: gate,
@@ -1615,6 +2225,7 @@ test("late edit and delegation invalidate evidence until a later trusted verific
   assert.equal(inspectEngineeringQualitySession(prepared.session).integrated_verification_sequence, null);
   sessionRecordImplementationDelegation(prepared.session, { sequence: 7, write_scope: ["lib/app.mjs"] });
   const finalEvidence = recordAt(8, FP_C);
+  recordPassedTestReconciliation(prepared.session, prepared.contextDecision, prepared.dossier, FP_C);
   const attestation = sessionFinalizeAttestation(prepared.session, {
     final_workspace_fingerprint: FP_C,
     teardown_verified: true,
@@ -1665,6 +2276,7 @@ test("high session cannot attest completion after a failed trusted post-architec
   assert.equal(gate.status, "passed", JSON.stringify(gate.reasons));
   const store = createEngineeringQualityStore({ run_id: dossier.run_id, task_id: dossier.task_id });
   const session = createEngineeringQualitySession({ store, initial_workspace_fingerprint: FP_A });
+  const contextDecision = recordSufficientTestContext(session, dossier);
   sessionRecordDossier(session, dossier);
   sessionLinkGate(session, {
     decision: gate,
@@ -1702,6 +2314,7 @@ test("high session cannot attest completion after a failed trusted post-architec
     }),
     check_catalog: qualityCatalog,
   });
+  recordPassedTestReconciliation(session, contextDecision, dossier, FP_B);
   assertContractError(() => sessionFinalizeAttestation(session, {
     final_workspace_fingerprint: FP_B,
     teardown_verified: true,
@@ -1767,6 +2380,7 @@ test("quality bundle is runner-bound, post-teardown, atomic, and restart-idempot
     });
     const store = createEngineeringQualityStore({ run_id: runId, task_id: "task-quality" });
     const session = createEngineeringQualitySession({ store, initial_workspace_fingerprint: FP_A });
+    const contextDecision = recordSufficientTestContext(session, dossier);
     sessionRecordDossier(session, dossier);
     sessionLinkGate(session, {
       decision: gate,
@@ -1818,6 +2432,7 @@ test("quality bundle is runner-bound, post-teardown, atomic, and restart-idempot
       evidence: executionEvidence,
       check_catalog: qualityCatalog,
     });
+    recordPassedTestReconciliation(session, contextDecision, dossier, FP_B);
     sessionFinalizeAttestation(session, {
       final_workspace_fingerprint: FP_B,
       teardown_verified: true,
@@ -1936,10 +2551,15 @@ test("attestation rejects inverted ordering, false teardown, and fingerprint tam
     prompt_profile_id: "prompt-main",
     prompt_profile_fingerprint: FP_D,
     post_architecture_evaluation_fingerprint: null,
+    context_strategy_id: "standard-lite-local-v1",
+    context_sufficiency_decision_fingerprint: FP_C,
+    context_reconciliation_fingerprint: FP_E,
     artifact_refs: [
       { kind: "file", value: "quality/dossier.json" },
       { kind: "file", value: "quality/gate.json" },
       { kind: "file", value: "quality/integrated-verification-evidence.json" },
+      { kind: "file", value: "quality/context-sufficiency-decision.json" },
+      { kind: "file", value: "quality/context-reconciliation.json" },
     ],
     teardown_verified: true,
     attested_at: "2026-07-13T00:05:00Z",

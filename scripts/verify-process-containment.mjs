@@ -16,6 +16,8 @@ import {
 } from "../lib/feedback/process-containment.mjs";
 import {
   captureManagedCommandWorkingDirectoryIdentity,
+  createManagedCommandOutputMarkerMatcher,
+  managedCommandOutputMarkerFingerprint,
   runManagedCommand,
 } from "../lib/feedback/process-tree.mjs";
 import { MILESTONE_DOD_DESCENDANT_SCENARIO_IDS } from "../lib/quality/milestone-dod.mjs";
@@ -27,9 +29,28 @@ import {
   buildLinuxCgroupAttachHelper,
   containsAsciiControlCharacter,
 } from "./build-linux-cgroup-attach-helper.mjs";
+import { createInjectedTestContainmentFactory } from "./injected-test-containment.mjs";
 
 const pause = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 const canonicalTempBase = fs.realpathSync.native(os.tmpdir());
+
+const streamedOutputMarker = "OC_HARNESS_PROCESS_MARKER:stream-boundary";
+const streamedMatcher = createManagedCommandOutputMarkerMatcher(streamedOutputMarker);
+streamedMatcher.push(Buffer.from(`noise:${streamedOutputMarker.slice(0, 11)}`, "utf8"));
+streamedMatcher.push(Buffer.from(streamedOutputMarker.slice(11, 29), "utf8"));
+streamedMatcher.push(Buffer.from(`${streamedOutputMarker.slice(29)}:tail`, "utf8"));
+assert.deepEqual(streamedMatcher.result(), {
+  fingerprint: managedCommandOutputMarkerFingerprint(streamedOutputMarker),
+  count: 1,
+});
+const duplicateOutputMatcher = createManagedCommandOutputMarkerMatcher(streamedOutputMarker);
+duplicateOutputMatcher.push(`${streamedOutputMarker}${streamedOutputMarker}`);
+assert.equal(duplicateOutputMatcher.result().count, 2);
+const wrongOutputMatcher = createManagedCommandOutputMarkerMatcher(streamedOutputMarker);
+wrongOutputMatcher.push("OC_HARNESS_PROCESS_MARKER:wrong");
+assert.equal(wrongOutputMatcher.result().count, 0);
+assert.throws(() => createManagedCommandOutputMarkerMatcher(""), /outputMarker/u);
+
 function temporaryDirectory(prefix) {
   return fs.realpathSync.native(fs.mkdtempSync(path.join(canonicalTempBase, prefix)));
 }
@@ -1481,6 +1502,28 @@ assert.deepEqual(managedEvents, ["spawn-idle-worker", "attach-before-initialize"
 assert.equal(managedResult.teardown_verified, true);
 assert.deepEqual(managedResult.containment_identity, managedIdentity);
 assert.equal(managedResult.containment_state.teardown_verified, true);
+
+const streamedMarkerParts = [streamedOutputMarker.slice(0, 17), streamedOutputMarker.slice(17)];
+const streamedManagedResult = await runManagedCommand({
+  file: process.execPath,
+  args: [
+    "-e",
+    "process.stdout.write(process.argv[1]); setTimeout(() => process.stdout.write(process.argv[2]), 5);",
+    ...streamedMarkerParts,
+  ],
+  cwd: process.cwd(),
+  timeout: 1000,
+  outputMarker: streamedOutputMarker,
+  processContainmentFactory: createInjectedTestContainmentFactory("injected-output-marker-test-containment-v1"),
+});
+assert.equal(streamedManagedResult.status, 0);
+assert.deepEqual(streamedManagedResult.output_marker_match, {
+  fingerprint: managedCommandOutputMarkerFingerprint(streamedOutputMarker),
+  count: 1,
+});
+assert.deepEqual(Object.keys(streamedManagedResult.output_marker_match).sort(), ["count", "fingerprint"]);
+assert.equal(Object.hasOwn(streamedManagedResult, "output_marker_match_valid"), false);
+assert.equal(JSON.stringify(streamedManagedResult).includes(streamedOutputMarker), false);
 
 function assertInheritedCwdRaceOutcome({
   result,

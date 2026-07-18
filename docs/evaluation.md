@@ -18,7 +18,7 @@ outside the default model-free gate.
 
 | Layer | Command | What it proves | What it does not prove |
 | --- | --- | --- | --- |
-| Deterministic repository verification | `npm run verify` | Static structure, feedback foundation, trace store, immutable report history, adapter process-tree boundary, contract/config evaluation, drift, runtime parser fixtures, 24+1 corpus validation, infrastructure tracing self-test, and acceptance-engine self-tests. It requires no model, network, or installed live adapter. | Actual model behaviour or the installed profile. |
+| Deterministic repository verification | `npm run verify` | Static structure, feedback foundation, trace store, immutable report history, adapter process-tree boundary, contract/config evaluation, drift, runtime parser fixtures, 28+1 corpus validation, infrastructure tracing self-test, and acceptance-engine self-tests. It requires no model, network, or installed live adapter. | Actual model behaviour or the installed profile. |
 | Installed permission surface | `npm run verify:runtime` | Current `opencode debug` output and effective tool/delegation permissions. | End-to-end task quality. |
 | Actual behavioural evaluation | `npm run eval:live` | Real adapter/model/tool behaviour on isolated baseline/candidate copies with hidden evidence. | Deterministic CI assurance or permission compatibility by itself. |
 | Candidate decision | `npm run assess:candidate` | Deterministic, policy-backed `accepted`, `rejected`, or `inconclusive` decision over trusted paired evidence. | Automatic harness mutation or deployment. |
@@ -58,7 +58,7 @@ Selected component commands are:
 - `npm run verify:adoption-bundle` — isolated source-bundle copy, public export
   import, manifest validation, and buffered self-test without a live provider;
 - `npm run verify:runtime:fixture` — deterministic parser fixtures only;
-- `npm run verify:live-manifests` — exact 24+1 corpus, suites, selection, and
+- `npm run verify:live-manifests` — exact 28+1 corpus, suites, selection, and
   declarative trace assertions;
 - `npm run verify:live-eval` — manifest validation plus infrastructure runner
   self-tests without a model, including a no-process in-memory/batch-commit test
@@ -212,16 +212,21 @@ termination schemas, structured subagent handoff, and static adversarial
 fixtures.
 
 The live corpus under `fixtures/live/`, `evals/scenarios/`, and
-`evals/hidden/` has 24 behavioural scenarios plus 1 infrastructure self-test.
+`evals/hidden/` has 28 behavioural scenarios plus 1 infrastructure self-test.
+This is the checked 28+1 corpus.
 Twelve scenarios cover orchestration and safety: small local work, broad audit,
 visible-plus-hidden bugs, related call paths, read-only review, prompt-injection
 data, fake secret bait, stale context, conflicting write scope, weak handoff,
-project-local knowledge, and approval-gated destructive work. Twelve additional
+project-local knowledge, and approval-gated destructive work. Sixteen additional
 engineering-quality scenarios cover small controls, public API compatibility,
 persistence and rollback, migration, resource lifecycle, concurrency and
 cancellation, retry/idempotency, parser boundaries, stale cache/version skew,
 partial dependency failure, architecture boundaries, and cross-module
-invariants. See [live-evaluation.md](live-evaluation.md).
+invariants. The added wide/deep mechanisms are
+`quality-hidden-reexport-consumer` and `quality-owning-abstraction` in the
+`development` suite, and `quality-alternate-config-path` and
+`quality-sibling-defect-variant` in `held_out`. See
+[live-evaluation.md](live-evaluation.md).
 
 ## Operational Versus Durable Memory
 
@@ -368,12 +373,35 @@ standalone self-described outcome or report is never a trusted acceptance
 input; missing, narrowed, forged, or incomplete bundle evidence is
 `inconclusive`, never `accepted`.
 
+For persisted quality artifacts, use the supported bundle entrypoint. Each
+`--catalog` is paired with the `--bundle` at the same occurrence index; the command
+rejects symlinks and oversized ordinary JSON inputs, revalidates every run
+directory, and only then calls the canonical acceptance engine:
+
+```powershell
+npm run assess:quality-bundles -- `
+  --policy quality/acceptance/acceptance-policy.v3.json `
+  --bundle <baseline-run-directory> --catalog <baseline-check-catalog.json> `
+  --bundle <candidate-run-directory> --catalog <candidate-check-catalog.json>
+```
+
+Policy v3 keeps the v2 standard-lite guarantees and additionally requires the
+receipt-backed context hard gates and full wide/deep coverage for selected
+high/critical scenarios. A non-accepted decision exits with status 2; malformed
+or untrusted inputs exit with status 1.
+
 The production `eval:live` entrypoint keeps the generic live-evaluation path.
 When a selected scenario has a validated quality sidecar, that same runner
 constructs the bound quality artifact bundle and invokes canonical
 runner-integrated verification while creating its receipt. Quality sidecars do
 not create a second model-comparison runner or bypass the generic workspace,
 hidden-check, teardown, and report boundaries.
+
+The adapter supplies task execution output, not trust. Context receipts are
+recorded only from runner-observed context calls (or the installed
+normal-session hook), the final diff is derived from runner workspace
+observation, and reviewer reconciliation is resolved from immutable traced job
+results. Adapter-proposed receipt, diff, or reviewer evidence fails closed.
 
 The default deterministic boundary is:
 

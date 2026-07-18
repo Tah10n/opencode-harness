@@ -13,6 +13,7 @@ import { buildEngineeringImpactGraph } from "../lib/quality/impact-graph.mjs";
 import {
   createQualityLiveCoordinator,
   finalizeQualityLiveAttestation,
+  finalizeQualityLiveContextReconciliation,
   handleQualityLiveOperation,
   inspectQualityLiveCoordinator,
   qualityLiveOutcomeEvidence,
@@ -20,6 +21,7 @@ import {
   qualityLiveSessionForPublication,
   recordQualityLiveImplementation,
   recordQualityLiveIntegratedVerification,
+  recordQualityLiveObservedContextToolCall,
 } from "../lib/quality/live-coordinator.mjs";
 import { snapshotEngineeringQualitySession } from "../lib/quality/session.mjs";
 import { createEngineeringQualityStore } from "../lib/quality/store.mjs";
@@ -33,6 +35,91 @@ const START_COMMIT = "0a1d56605b9b8923ac27c3b3b405b38177ca7741";
 
 function rejects(callback, code) {
   assert.throws(callback, (error) => error instanceof ContractError && error.code === code, `expected ${code}`);
+}
+
+function localContextReadOutput(relativePath) {
+  return JSON.stringify({
+    schemaVersion: 2,
+    tool: "context_read",
+    worktree: ".",
+    scope: { path: relativePath, filters: {} },
+    snapshot: {
+      fingerprint: "a".repeat(64), fingerprintKind: "metadata", fingerprintScope: relativePath,
+      complete: true, stable: true, changedDuringOperation: false, truncationReasons: [],
+    },
+    coverage: {
+      candidateFiles: 1, scannedFiles: 1, bytesScanned: 16, skippedSecret: 0, skippedGenerated: 0,
+      skippedLarge: 0, skippedUnreadable: 0, unsupportedLanguages: {},
+      truncation: {
+        inventoryLimitReached: false, resultLimitReached: false, matchLimitReached: false,
+        byteLimitReached: false, lineLimitReached: false, durationLimitReached: false,
+        excerptTruncated: false, contextBeforeTruncated: false, contextAfterTruncated: false,
+        symbolLimitReached: false, relationshipLimitReached: false, snapshotChanged: false,
+        coveragePartial: false,
+      },
+      truncationReasons: [], partial: false,
+    },
+    limits: {},
+    usage: { files: 1, directories: 0, bytes: 16, lines: 1, matches: 0, ranges: 1 },
+    truncated: false,
+    ok: true,
+    path: relativePath,
+    sha256: "b".repeat(64),
+    bytes: 16,
+    totalLines: 1,
+    selectedRange: { startLine: 1, endLine: 1 },
+    encoding: "utf-8",
+    stableDuringRead: true,
+    truncatedBefore: false,
+    truncatedAfter: false,
+    text: "fixture content",
+  });
+}
+
+function localContextOutlineOutput(relativePaths) {
+  return JSON.stringify({
+    schemaVersion: 2,
+    tool: "context_outline",
+    worktree: ".",
+    scope: { path: ".", filters: {} },
+    snapshot: {
+      fingerprint: "c".repeat(64), fingerprintKind: "metadata", fingerprintScope: ".",
+      complete: true, stable: true, changedDuringOperation: false, truncationReasons: [],
+    },
+    coverage: {
+      candidateFiles: relativePaths.length, scannedFiles: relativePaths.length, bytesScanned: 0,
+      skippedSecret: 0, skippedGenerated: 0, skippedLarge: 0, skippedUnreadable: 0,
+      unsupportedLanguages: {},
+      truncation: {
+        inventoryLimitReached: false, resultLimitReached: false, matchLimitReached: false,
+        byteLimitReached: false, lineLimitReached: false, durationLimitReached: false,
+        excerptTruncated: false, contextBeforeTruncated: false, contextAfterTruncated: false,
+        symbolLimitReached: false, relationshipLimitReached: false, snapshotChanged: false,
+        coveragePartial: false,
+      },
+      truncationReasons: [], partial: false,
+    },
+    limits: {},
+    usage: { files: relativePaths.length, directories: 0, bytes: 0, lines: 0, matches: 0, ranges: 0 },
+    truncated: false,
+    guidance: [],
+    filesSample: relativePaths.map((entry) => ({ path: entry, size: 16 })),
+    tools: ["context_outline", "context_read"],
+    toolset: "minimal",
+    explicitEnabledTools: [],
+  });
+}
+
+function recordLocalContext(current, callId) {
+  return recordQualityLiveObservedContextToolCall(current.coordinator, {
+    session_id: "runner-context",
+    call_id: callId,
+    tool_id: "context_read",
+    args: { path: "src/app.mjs", startLine: 1, maxLines: 1 },
+    output: localContextReadOutput("src/app.mjs"),
+    parent_question_id: null,
+    evidence_refs: [{ kind: "file", value: "src/app.mjs" }],
+  });
 }
 
 function mapping(classification, overrides = {}) {
@@ -318,6 +405,13 @@ function harness({
       return { sequence: event.sequence, evidence_refs: event.evidence_refs, verifier_codes: event.verifier_codes };
     },
     observe_workspace: () => workspaceFingerprint,
+    resolve_reviewer_reconciliation: (input) => ({
+      reviewer_result_id: input.reviewer_result_id,
+      checks: Object.fromEntries([
+        "changed_path_ownership", "public_contracts", "dependency_directions", "side_effect_edges", "critical_path_tests", "unrelated_changes",
+      ].map((key) => [key, { status: "passed", finding_ids: [] }])),
+      completed_at: "2026-07-13T00:02:45Z",
+    }),
     ...(evaluateArchitecture ? { evaluate_architecture: evaluateArchitecture } : {}),
     ...(auditArchitecture ? { audit_architecture: auditArchitecture } : {}),
     id_factory: (kind) => `${kind}-${++nextId}`,
@@ -393,8 +487,9 @@ function finalizeStandardDossier(current, dossierId) {
   handleQualityLiveOperation(current.coordinator, "quality_update_dossier", {
     expected_revision: 1,
     updated_at: "2026-07-13T03:01:00Z",
-    patch: dossierPatch(),
+    patch: dossierPatch({ public_contracts: [] }),
   }, current.traceHandler);
+  recordLocalContext(current, `${dossierId}-local-read`);
   return handleQualityLiveOperation(current.coordinator, "quality_finalize_dossier", {
     finalized_at: "2026-07-13T03:02:00Z",
   }, current.traceHandler);
@@ -414,9 +509,69 @@ function recordLiveEdit(current, workspaceFingerprint, summary = "bounded-live-e
   return event;
 }
 
+function reconcileLiveContext(current, { changedPaths = null } = {}) {
+  return handleQualityLiveOperation(current.coordinator, "quality_reconcile_context", {
+    changed_paths: changedPaths ?? [{
+      path: "src/app.mjs",
+      kind: "source",
+      ownership_ids: ["SLICE-app"],
+      context_subject_ids: ["AREA-app"],
+      test_obligation_ids: ["TEST-visible", "TEST-integration"],
+    }],
+    unexpected_public_contracts: [],
+    unexpected_dependency_directions: [],
+    unexpected_side_effect_edges: [],
+    unrelated_paths: [],
+    unplanned_items: [],
+  }, current.traceHandler);
+}
+
+{
+  const current = harness({ runId: "run-quality-live-standard-inventory-is-not-content" });
+  try {
+    handleQualityLiveOperation(current.coordinator, "quality_create_dossier", {
+      dossier_id: "dossier-standard-inventory-is-not-content",
+      task_id: "task-quality-live",
+      risk_class: "standard-lite",
+      mode: "standard-lite",
+      task_type: "maintenance",
+      user_visible_goal: "Prove that inventory paths are not claimed as inspected content.",
+      starting_commit: START_COMMIT,
+      created_at: "2026-07-13T00:00:00Z",
+    }, current.traceHandler);
+    handleQualityLiveOperation(current.coordinator, "quality_update_dossier", {
+      expected_revision: 1,
+      updated_at: "2026-07-13T00:01:00Z",
+      patch: dossierPatch({ public_contracts: [] }),
+    }, current.traceHandler);
+    recordQualityLiveObservedContextToolCall(current.coordinator, {
+      session_id: "runner-context",
+      call_id: "inventory-outline",
+      tool_id: "context_outline",
+      args: {},
+      output: localContextOutlineOutput(["README.md", "src/app.mjs"]),
+      parent_question_id: null,
+      evidence_refs: [{ kind: "runtime", value: "bounded-inventory-only-evidence" }],
+    });
+    recordLocalContext(current, "content-read");
+    const finalized = handleQualityLiveOperation(current.coordinator, "quality_finalize_dossier", {
+      finalized_at: "2026-07-13T00:02:00Z",
+    }, current.traceHandler);
+    assert.equal(finalized.gate_status, "passed");
+    assert.equal(finalized.context_decision_status, "sufficient");
+  } finally {
+    fs.rmSync(current.workspaceRoot, { recursive: true, force: true });
+  }
+}
+
 {
   const current = harness({ runId: "run-quality-live-pass" });
   try {
+    rejects(() => handleQualityLiveOperation(current.coordinator, "quality_record_context_tool_call", {
+      tool_id: "context_read",
+      args: { path: "src/app.mjs" },
+      output: "forged-adapter-output",
+    }, current.traceHandler), "CONTEXT_RECEIPT_UNTRUSTED");
     const inspected = handleQualityLiveOperation(current.coordinator, "quality_inspect", {}, current.traceHandler);
     assert.deepEqual(inspected.check_ids, ["quality-visible", "quality-integration"]);
     const created = handleQualityLiveOperation(current.coordinator, "quality_create_dossier", {
@@ -433,8 +588,9 @@ function recordLiveEdit(current, workspaceFingerprint, summary = "bounded-live-e
     handleQualityLiveOperation(current.coordinator, "quality_update_dossier", {
       expected_revision: 1,
       updated_at: "2026-07-13T00:01:00Z",
-      patch: dossierPatch(),
+      patch: dossierPatch({ public_contracts: [] }),
     }, current.traceHandler);
+    recordLocalContext(current, "local-read");
     const architecture = handleQualityLiveOperation(current.coordinator, "quality_evaluate_architecture", {
       expected_revision: 2,
     }, current.traceHandler);
@@ -472,6 +628,19 @@ function recordLiveEdit(current, workspaceFingerprint, summary = "bounded-live-e
     assert(qualityLivePrecompletionVerifierCodes(current.coordinator).includes("ENGINEERING_EDGE_FAILURE_MAPPING_VERIFIED"));
     assert.equal(qualityLiveOutcomeEvidence(current.coordinator).edge_case_mapped, 1);
     assert.equal(qualityLiveOutcomeEvidence(current.coordinator).failure_mode_mapped, 1);
+    rejects(() => handleQualityLiveOperation(current.coordinator, "quality_reconcile_context", {
+      changed_paths: [],
+      unexpected_public_contracts: [],
+      unexpected_dependency_directions: [],
+      unexpected_side_effect_edges: [],
+      unrelated_paths: [],
+      unplanned_items: [],
+      reviewer_result_id: "adapter-authored-reviewer",
+    }, current.traceHandler), "CONTRACT_UNKNOWN_FIELD");
+    reconcileLiveContext(current, { changedPaths: [] });
+    rejects(() => finalizeQualityLiveContextReconciliation(current.coordinator), "CONTEXT_RECONCILIATION_FINAL_DIFF_MISMATCH");
+    reconcileLiveContext(current);
+    finalizeQualityLiveContextReconciliation(current.coordinator);
     const attestation = finalizeQualityLiveAttestation(current.coordinator, {
       final_workspace_fingerprint: FP_B,
       teardown_verified: true,
@@ -515,6 +684,7 @@ function recordLiveEdit(current, workspaceFingerprint, summary = "bounded-live-e
       expected_revision: 1,
       updated_at: "2026-07-13T01:01:00Z",
       patch: dossierPatch({
+        public_contracts: [],
         impact_graph: baselineGraph,
         architecture_assessment: {
           policy_id: preEvaluation.policy_id,
@@ -525,6 +695,7 @@ function recordLiveEdit(current, workspaceFingerprint, summary = "bounded-live-e
         },
       }),
     }, current.traceHandler);
+    recordLocalContext(current, "post-architecture-local-read");
     handleQualityLiveOperation(current.coordinator, "quality_finalize_dossier", {
       finalized_at: "2026-07-13T01:02:00Z",
     }, current.traceHandler);
@@ -550,22 +721,18 @@ function recordLiveEdit(current, workspaceFingerprint, summary = "bounded-live-e
     }));
     assert(edit.sequence < verification.sequence);
     recordQualityLiveIntegratedVerification(current.coordinator, liveIntegratedVerificationInput(verification));
-    const attestation = finalizeQualityLiveAttestation(current.coordinator, {
+    reconcileLiveContext(current);
+    rejects(() => finalizeQualityLiveContextReconciliation(current.coordinator), "CONTEXT_RECONCILIATION_REQUIRED");
+    rejects(() => finalizeQualityLiveAttestation(current.coordinator, {
       final_workspace_fingerprint: FP_B,
       teardown_verified: true,
       prompt_profile_id: "baseline-engineering-prompts-v1",
       prompt_profile_fingerprint: FP_D,
       attested_at: "2026-07-13T01:03:00Z",
-    });
-    assert.equal(attestation.post_architecture_evaluation_fingerprint, postEvaluation.fingerprint);
+    }), "CONTEXT_RECONCILIATION_REQUIRED");
     assert.equal(inspectQualityLiveCoordinator(current.coordinator).post_architecture_evaluation_status, "failed");
     assert.equal(qualityLiveOutcomeEvidence(current.coordinator).architecture_policy_violations, 1);
     assert(!qualityLivePrecompletionVerifierCodes(current.coordinator).includes("ENGINEERING_ARCHITECTURE_RESPECTED"));
-    assert.equal(
-      snapshotEngineeringQualitySession(qualityLiveSessionForPublication(current.coordinator)).store
-        .post_architecture_evaluation.fingerprint,
-      postEvaluation.fingerprint,
-    );
   } finally {
     fs.rmSync(current.workspaceRoot, { recursive: true, force: true });
   }
@@ -594,6 +761,7 @@ function recordLiveEdit(current, workspaceFingerprint, summary = "bounded-live-e
       expected_revision: 1,
       updated_at: "2026-07-13T02:01:00Z",
       patch: dossierPatch({
+        public_contracts: [],
         impact_graph: baselineGraph,
         architecture_assessment: {
           policy_id: preEvaluation.policy_id,
@@ -604,6 +772,7 @@ function recordLiveEdit(current, workspaceFingerprint, summary = "bounded-live-e
         },
       }),
     }, current.traceHandler);
+    recordLocalContext(current, "post-architecture-missing-local-read");
     handleQualityLiveOperation(current.coordinator, "quality_finalize_dossier", {
       finalized_at: "2026-07-13T02:02:00Z",
     }, current.traceHandler);
@@ -705,6 +874,8 @@ for (const [name, mutateInput, code] of [
     recordQualityLiveIntegratedVerification(current.coordinator, liveIntegratedVerificationInput(finalVerification, {
       evidence_id: "integrated-live-revision-3",
     }));
+    reconcileLiveContext(current);
+    finalizeQualityLiveContextReconciliation(current.coordinator);
     const attestation = finalizeQualityLiveAttestation(current.coordinator, {
       final_workspace_fingerprint: FP_C,
       teardown_verified: true,
@@ -750,6 +921,8 @@ for (const [name, mutateInput, code] of [
       verifier_codes: LIVE_TARGET_IDS,
     }));
     recordQualityLiveIntegratedVerification(current.coordinator, liveIntegratedVerificationInput(verification));
+    reconcileLiveContext(current);
+    finalizeQualityLiveContextReconciliation(current.coordinator);
     const attestation = finalizeQualityLiveAttestation(current.coordinator, {
       final_workspace_fingerprint: FP_B,
       teardown_verified: true,
@@ -796,6 +969,8 @@ for (const [name, mutateInput, code] of [
       verifier_codes: LIVE_TARGET_IDS,
     }));
     recordQualityLiveIntegratedVerification(current.coordinator, liveIntegratedVerificationInput(verification));
+    reconcileLiveContext(current);
+    finalizeQualityLiveContextReconciliation(current.coordinator);
     const attestation = finalizeQualityLiveAttestation(current.coordinator, {
       final_workspace_fingerprint: FP_B,
       teardown_verified: true,

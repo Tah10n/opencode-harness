@@ -30,8 +30,13 @@ separate baseline/candidate operational runs, and does not affect acceptance.
 
 Every behavioral scenario belongs exactly once to the first three suites.
 Unknown, duplicate, or missing membership fails validation. Suite membership
-is runner metadata and never enters adapter context. The current corpus has 24
+is runner metadata and never enters adapter context. The current corpus has 28
 behavioral scenarios plus 1 infrastructure self-test.
+
+The four wide/deep-context additions are
+`quality-hidden-reexport-consumer` and `quality-owning-abstraction` in
+`development`, and `quality-alternate-config-path` and
+`quality-sibling-defect-variant` in `held_out`.
 
 ```sh
 npm run eval:live -- --suite development

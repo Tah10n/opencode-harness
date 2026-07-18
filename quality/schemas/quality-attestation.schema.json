@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$comment": "Ordering, teardown, prompt identity, artifact, and fingerprint constraints are canonical in lib/quality/attestation.mjs. Model-bound v1 attestations are intentionally not completion evidence under v2.",
-  "title": "OpenCode Harness Quality Attestation v2",
+  "$comment": "Ordering, teardown, prompt identity, context decision/reconciliation, artifact, and fingerprint constraints are canonical in lib/quality/attestation.mjs.",
+  "title": "OpenCode Harness Quality Attestation v3",
   "type": "object",
   "required": [
     "schema_version",
@@ -24,13 +24,16 @@
     "prompt_profile_id",
     "prompt_profile_fingerprint",
     "post_architecture_evaluation_fingerprint",
+    "context_strategy_id",
+    "context_sufficiency_decision_fingerprint",
+    "context_reconciliation_fingerprint",
     "artifact_refs",
     "teardown_verified",
     "attested_at",
     "fingerprint"
   ],
   "properties": {
-    "schema_version": { "const": 2 },
+    "schema_version": { "const": 3 },
     "run_id": { "$ref": "#/$defs/id" },
     "task_id": { "$ref": "#/$defs/id" },
     "dossier_id": { "$ref": "#/$defs/id" },
@@ -55,6 +58,14 @@
     "prompt_profile_id": { "$ref": "#/$defs/id" },
     "prompt_profile_fingerprint": { "$ref": "#/$defs/fingerprint" },
     "post_architecture_evaluation_fingerprint": {
+      "anyOf": [
+        { "$ref": "#/$defs/fingerprint" },
+        { "type": "null" }
+      ]
+    },
+    "context_strategy_id": { "enum": ["standard-lite-local-v1", "high-wide-deep-v1", "critical-wide-deep-v1"] },
+    "context_sufficiency_decision_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "context_reconciliation_fingerprint": {
       "anyOf": [
         { "$ref": "#/$defs/fingerprint" },
         { "type": "null" }

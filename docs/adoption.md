@@ -176,6 +176,13 @@ Use these layers in order:
    permission snapshots. Only fully attested report generations participate;
    the canonical workspace corpus supplies required repetitions and scenario
    fingerprints.
+5. Quality-bundle assessment: `npm run assess:quality-bundles -- --policy
+   quality/acceptance/acceptance-policy.v3.json --bundle <baseline-run-dir>
+   --catalog <baseline-catalog.json> --bundle <candidate-run-dir> --catalog
+   <candidate-catalog.json>`. This separate entrypoint revalidates persisted
+   runner/session bundles and their exact catalogs before a model-neutral
+   quality decision. Policy v3 enforces the context hard gates for selected
+   high/critical scenarios while retaining v2 standard-lite semantics.
 
 Live evaluation is behavioural evidence, not a replacement for runtime
 permission checks. Candidate assessment does not apply changes automatically.
@@ -503,6 +510,10 @@ untrusted parser input and returns `blocked_external_state`; it cannot elevate
 itself to `passed`. Missing host/provider/adapter also returns
 `blocked_external_state`; no deterministic check fabricates host discovery or
 callback invocation.
+For high/critical live quality runs, trust remains runner-owned: the adapter
+cannot mint a context receipt, declare the authoritative final diff, or
+self-attest reviewer reconciliation. Those values come from runner-observed
+context calls, workspace observation, and immutable traced reviewer results.
 The API probe is therefore an explicit installed-runtime smoke and is not a
 stage of the clean-checkout `npm run verify` chain.
 

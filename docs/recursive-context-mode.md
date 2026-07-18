@@ -23,9 +23,10 @@ This is not a new slash command. The mode is selected automatically by the orche
   those advanced tools are opt-in for host profiles. This template intentionally
   grants only the four-tool minimal safe harness surface by default.
 - Read-only and diagnostic agents can use those tools: `explore`, `reviewer`, `architect`, `diagnose`, and `verifier`.
-- Milestone 2 turns bounded discovery evidence into an Engineering Dossier
-  impact graph for instrumented high/critical work. The tools still do not
-  authorize edits or declare the quality gate passed.
+- Milestone 3 records actual bounded context operations as sanitized receipts,
+  links wide/deep analysis to the Milestone 2 impact graph, and computes context
+  sufficiency before the existing Engineering Dossier gate. The tools and
+  report still do not authorize edits or declare either gate passed.
 
 ## Basis
 
@@ -80,14 +81,19 @@ Skip this mode for direct, small, single-file, or obviously local tasks.
 ## Relationship To The Engineering Gate
 
 Recursive context supplies bounded evidence; it is not the gate itself. For a
-high or critical instrumented task, discovery should identify direct and
+high or critical instrumented task, actual operations produce runner-owned
+receipt IDs. Discovery should identify direct and
 transitive entry points, consumers, contracts, schemas/configuration,
 tests/fixtures, public compatibility surfaces, persistence/lifecycle edges,
 excluded siblings, and relevant unknown paths. Those facts are recorded as
-stable nodes, edges, paths, evidence references, exclusions, and
-unknown-resolution plans in the Engineering Dossier impact graph.
+stable wide-report items linked to nodes, edges, paths, exclusions, and
+unknown-resolution plans in the existing Engineering Dossier impact graph.
+Each critical impact path also receives a separate deep analysis. The runner
+checks current receipt bindings, required coverage, falsification, deep
+dimensions, unknowns, truncation, and verification mappings before allowing
+the dossier gate to finalize.
 
-When semantic `context_*` tools are unavailable, the dossier records that fact,
+When semantic `context_*` tools are unavailable, the context report records that fact,
 the bounded fallback tools used, and reduced semantic coverage. It must not
 pretend that literal search proved semantic completeness. For high/critical
 work, skipping semantic discovery without that explicit fallback blocks the
@@ -103,7 +109,9 @@ not add an autonomous prompt-mutation loop.
 
 Read-only discovery before a high/critical gate remains allowed. An edit or
 writable delegated job is not: only the parent runner can validate the
-finalized dossier, append the causal gate event, and enable implementation.
+finalized context report, compute sufficiency, validate the finalized dossier,
+append the causal gate event, and enable implementation. Before attestation it
+also reconciles the exact final diff with the planned context.
 
 ## Verification
 

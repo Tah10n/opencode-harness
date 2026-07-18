@@ -5,5 +5,5 @@ import { transfer } from "../src/store.mjs";
 test("a successful transfer preserves total value", () => {
   const store = { source: 10, target: 1 };
   assert.equal(transfer(store, "source", "target", 4), true);
-  assert.deepEqual(store, { source: 6, target: 5 });
+  assert.deepEqual(store, { source: 6, target: 5 }, "OC_HARNESS_VISIBLE_ASSERTION_MARKER:quality-persistence-rollback:v1");
 });

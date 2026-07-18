@@ -110,10 +110,16 @@ If a host omits or cannot parse a required pre-tool surface, runtime verificatio
 returns `incomplete`. If a constructed pre-tool callback fails to deny the
 native edit or writable-delegation probes, it returns `failed`.
 
-Quality attestation schema v2 is intentionally model-neutral. Model-bound v1
-attestations are not accepted as v2 completion evidence. Prompt inventory
+The public quality-attestation reader accepts strict schema v2 and v3
+documents; new attestations are emitted only as context-aware v3. Model-bound
+v1 attestations are not accepted as completion evidence. Prompt inventory
 schema v2 keeps model and provider settings as informational metadata while
 permission, prompt, tool, and sentinel drift remain gated.
+
+The post-edit architecture reader preserves strict evidence v1 and graph
+evidence v2 as historical input. New authoritative reconciliation evidence is
+written only as evidence v3 with graph-delta v2; historical forms cannot
+authorize a fresh extractor-grounded reconciliation.
 
 Active model IDs are read only from `agents/*.md` frontmatter. Availability
 of a configured model is an installed-host concern and never a requirement for

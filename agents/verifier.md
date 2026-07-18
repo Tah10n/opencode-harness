@@ -104,6 +104,11 @@ Rules:
   `timed out`, `not permitted`, `command unavailable`, or `not applicable`.
 - Distinguish existing failures from newly introduced failures by using the
   baseline evidence supplied by the orchestrator.
+- For high/critical work, inspect the receipt index, Whole-System Context
+  Report, context sufficiency decision, and final reconciliation supplied by
+  the runner. Confirm session/workspace binding, exact changed-path coverage,
+  and critical-path-to-check mapping; treat missing, stale, truncated, or
+  mismatched evidence as a verification gap.
 - Do not recommend `complete` if a mandatory gate is missing, failed, timed
   out, not permitted, command-unavailable, or unverified.
 

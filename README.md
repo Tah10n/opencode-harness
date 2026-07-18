@@ -16,6 +16,9 @@ This repository contains a reusable OpenCode behavior profile:
   pre-implementation gate with persisted baseline/plan-challenge execution
   receipts, bounded impact graphs, optional project architecture policies, and
   explicit invariant/edge/failure/test mappings;
+- a runner-selected wide/deep context strategy with bounded context receipts,
+  a linked Whole-System Context Report, computational sufficiency, and final
+  blast-radius reconciliation;
 - an executable feedback plane: schema-v2 operational traces, immutable live
   reports, paired baseline/candidate assessment, and explicit decisions;
 - an OpenCode-native quality bridge with bounded dossier tools and runner-owned
@@ -153,36 +156,81 @@ recursive-context tools are host opt-ins.
    preserved behavior, local edge cases, ownership, and trusted checks. The
    runner synthesizes this compact dossier; callers do not replace or update it
    with `quality_dossier_create` or `quality_dossier_update`.
-4. `high` and `critical` require the full Engineering Dossier, impact graph,
-   invariants, edge/failure mappings, baseline evidence, and independent
-   architect and reviewer contributions.
-5. The plugin and runner compute the gate. Native edit, write, patch, and
+4. `high` and `critical` first use the runner-selected context strategy. Actual
+   bounded context operations create sanitized machine-owned receipts through
+   the runner observer or trusted normal-session host hook; live adapters cannot
+   mint those receipts from self-described output. The agent completes a
+   Whole-System Context Report linked to the existing impact graph, and the
+   runner computes context sufficiency.
+5. Only after context sufficiency passes may the full Engineering Dossier be
+   finalized with its impact graph, invariants, edge/failure mappings, baseline
+   evidence, and independent architect and reviewer contributions.
+6. The plugin and runner compute the existing gate. Native edit, write, patch, and
    writable `task.general` calls remain denied until the runner records a
    passed gate. Native `bash` remains disabled in an instrumented quality
    session.
-6. A passed gate issues one-shot authority for exact owned paths. Tests, lint,
+7. A passed gate issues one-shot authority for exact owned paths. Tests, lint,
    typecheck, and builds run only as runner-owned trusted project checks.
-7. The runner compares the bounded source workspace before and after mutation:
+8. The runner compares the bounded source workspace before and after mutation:
    tracked changes, untracked non-ignored files, exact ownership, declared
    generated outputs, the Git index, and `HEAD`. Ordinary ignored dependency,
    cache, and build trees stay outside the source walk; `.oc_harness` has a
    separate control-state guard.
-8. Project checks declare a logical `executable_id` in
+9. Project checks declare a logical `executable_id` in
    `.opencode/quality/checks.json`. `.opencode/quality/toolchains.json` maps it
    to an approved resolver family. The runner avoids ambient `PATH`, rechecks
    identity immediately before spawn, sanitizes the environment, and uses
    `shell: false`.
-9. A `standard-lite` bug fix binds one catalog check as both the pre-fix
+10. A `standard-lite` bug fix binds one catalog check as both the pre-fix
    reproducer and the integration regression. The runner records expected
    pre-fix failure, post-fix pass, unrelated outcome, or bounded unavailability
    with an explicit reason. Unexpected pass, unrelated evidence, and material
    uncertainty block the compact path.
-10. A configured high/critical architecture policy accepts only a freshly
+11. A configured high/critical architecture policy accepts only a freshly
     created or rewritten runner-owned final graph from its integration check.
     Missing, stale, unavailable, failed, or policy-violating evidence cannot
     produce attestation.
-11. Final attestation is valid only for the current source workspace after all
-    mandatory trusted checks and any required post-edit architecture review.
+12. Before attestation, the runner derives the exact final diff and resolves
+    immutable reviewer evidence, then reconciles them with planned ownership,
+    report coverage, public contracts, dependency and side-effect edges, and
+    critical-path verification. Adapter-declared diff or reviewer claims are
+    never trusted. An unplanned high-impact path invalidates prior sufficiency
+    and requires re-analysis.
+13. Final attestation is valid only for the current source workspace after all
+    mandatory trusted checks, any required post-edit architecture review, and
+    final context reconciliation.
+
+## How The Agent Understands A Change
+
+For high or critical work, a wide pass finds where the change can have an
+effect: entry points, callers, consumers, contracts, state, side effects,
+architecture boundaries, tests, siblings, and unresolved paths. A deep pass
+then follows each critical path to find the ways it can fail, including state
+transitions, errors, retries, cancellation, concurrency, rollback, cleanup,
+compatibility, and security where applicable.
+
+The architect challenges architecture, ownership, exclusions, and blast
+radius. The reviewer challenges counterexamples, edge cases, and test design.
+The plugin blocks implementation until the required receipt-backed evidence is
+present and the runner computes sufficient context; the existing Engineering
+Dossier gate still owns mutation authorization. Final verification and
+reconciliation bind the result to the current workspace, not an earlier diff.
+
+Genuinely local `standard-lite` work keeps a short local plan and bounded local
+evidence. See [Whole-System Context](docs/whole-system-context.md) for the exact
+strategy, receipt, fallback, sufficiency, and reconciliation contracts.
+
+Persisted quality run directories can be assessed without trusting an in-memory
+outcome. `npm run assess:quality-bundles` revalidates every bundle and its paired
+check catalog before applying the versioned policy. This is separate from the
+general live-report command `npm run assess:candidate`:
+
+```powershell
+npm run assess:quality-bundles -- `
+  --policy quality/acceptance/acceptance-policy.v3.json `
+  --bundle <baseline-run-directory> --catalog <baseline-check-catalog.json> `
+  --bundle <candidate-run-directory> --catalog <candidate-check-catalog.json>
+```
 
 `quality_command_authorize` returns `QUALITY_NATIVE_BASH_DISABLED` for native
 Bash before and after classification. Runner-owned read-only Git observations
@@ -307,7 +355,7 @@ when changing adoption contents or package boundaries:
 npm run verify:adoption-bundle
 ```
 
-Milestone 2's model-free quality checks are also available individually:
+Milestones 2 and 3 model-free quality checks are also available individually:
 
 ```powershell
 npm run verify:quality-contracts
@@ -316,6 +364,7 @@ npm run verify:architecture-policy
 npm run verify:impact-graph
 npm run verify:prompt-inventory
 npm run verify:quality-live-coordinator
+npm run verify:quality-live-runner
 npm run verify:quality-verification-targets
 npm run verify:normal-session-quality-bridge
 npm run verify:session-classification
@@ -332,6 +381,14 @@ npm run verify:quality-live-manifests
 npm run verify:quality-acceptance
 npm run verify:whitespace:fixture
 npm run verify:milestone-2-dod-contract
+npm run verify:context-strategies
+npm run verify:context-receipts
+npm run verify:whole-system-context
+npm run verify:context-sufficiency
+npm run verify:context-reconciliation
+npm run verify:context-tool-overlay
+npm run verify:context-live-manifests
+npm run verify:context-acceptance
 ```
 
 The DoD contract command validates only the manifest and status policy: it
@@ -348,7 +405,7 @@ particular,
 `probe:runtime:quality-plugin-api` is intentionally excluded from this default
 chain because it resolves a machine-local `@opencode-ai/plugin` installation.
 These commands validate contracts, schemas, failure
-cases, corpus structure, and evaluation logic. The prompt inventory covers 11 agent prompts and eight
+cases, corpus structure, and evaluation logic. The prompt inventory covers 11 agent prompts and nine
 skill entrypoints. These checks do not prove an installed model profile or
 actual model behaviour.
 
@@ -417,7 +474,8 @@ The static evaluation scenarios are documented in
 [docs/evaluation.md](docs/evaluation.md). Compatibility and release guidance
 live in [docs/compatibility.md](docs/compatibility.md) and
 [docs/release.md](docs/release.md). Optional general live evaluation is documented
-in [docs/live-evaluation.md](docs/live-evaluation.md). Static adversarial
+in [docs/live-evaluation.md](docs/live-evaluation.md). The wide/deep context
+contract is documented in [docs/whole-system-context.md](docs/whole-system-context.md). Static adversarial
 fixtures live under [fixtures/adversarial/](fixtures/adversarial/).
 
 `npm run verify` is deterministic repository-side assurance. It requires no

@@ -24,8 +24,19 @@
     "quality-resource-lifecycle-architecture-respected",
     "quality-resource-lifecycle-ownership-respected",
     "quality-resource-lifecycle-integrated-verification",
-    "quality-resource-lifecycle-valid-completion"
+    "quality-resource-lifecycle-valid-completion",
+    "quality-resource-lifecycle-context-strategy-before-edit",
+    "quality-resource-lifecycle-context-receipts-bound",
+    "quality-resource-lifecycle-context-report-before-edit",
+    "quality-resource-lifecycle-context-direct-transitive-paths",
+    "quality-resource-lifecycle-context-exclusions-evidenced",
+    "quality-resource-lifecycle-context-critical-paths-deep",
+    "quality-resource-lifecycle-context-unknowns-resolved",
+    "quality-resource-lifecycle-context-verification-linked",
+    "quality-resource-lifecycle-context-discovery-bounded",
+    "quality-resource-lifecycle-context-ownership",
+    "quality-resource-lifecycle-context-final-reconciliation"
   ],
   "suite": "canary",
-  "fixture_fingerprint": "12552537e1fdbed89ffefdfe7c7bf66ce1134326b238d2a7d6808264010f36e5"
+  "fixture_fingerprint": "612172c18153668cc5f8f1cdee25371e3d46b50ba3c33d9d96161acdb913a004"
 }

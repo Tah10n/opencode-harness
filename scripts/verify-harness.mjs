@@ -9,6 +9,8 @@ import {
   deterministicStageEnvironment,
 } from "./verify-all.mjs";
 import { milestone2ExpectedChecks } from "../lib/quality/milestone-dod.mjs";
+import { NORMAL_SESSION_QUALITY_TOOL_IDS } from "../lib/quality/normal-session-bridge.mjs";
+import { NORMAL_SESSION_QUALITY_PROFILE_PERMISSIONS } from "../lib/quality/normal-session-profile-permissions.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const failures = [];
@@ -396,6 +398,8 @@ const expectedDeterministicStages = [
   "eval", "verify:drift", "verify:adoption-bundle", "verify:runtime:fixture", "verify:runtime:quality-hooks:fixture",
   "verify:live-eval", "verify:acceptance",
   "verify:quality-contracts", "verify:engineering-dossier", "verify:architecture-policy", "verify:impact-graph",
+  "verify:context-strategies", "verify:context-receipts", "verify:whole-system-context", "verify:context-sufficiency",
+  "verify:context-reconciliation", "verify:context-tool-overlay", "verify:context-live-manifests", "verify:context-acceptance",
   "verify:prompt-inventory", "verify:quality-live-coordinator", "verify:quality-live-runner", "verify:quality-verification-targets",
   "verify:normal-session-quality-bridge", "verify:session-classification", "verify:project-check-catalog",
   "verify:workspace-observation", "verify:trusted-toolchain-host-config", "verify:trusted-toolchains", "verify:process-containment",
@@ -503,6 +507,7 @@ for (const [name, command] of Object.entries({
   "verify:whitespace": "node scripts/verify-committed-whitespace.mjs",
   "verify:whitespace:fixture": "node scripts/verify-committed-whitespace-fixtures.mjs",
   "assess:candidate": "node scripts/assess-candidate.mjs",
+  "assess:quality-bundles": "node scripts/assess-quality-bundles.mjs",
   "evidence:static": "node scripts/capture-static-evidence.mjs",
   trace: "node scripts/trace-run.mjs",
 })) {
@@ -683,28 +688,10 @@ for (const agent of agentNames) {
 if (config.permission?.["quality_*"] !== "deny") {
   fail("HARNESS-S084", "root quality_* permission must deny by default", "Expose only the bounded quality tools on explicitly authorized agent profiles.");
 }
-const qualityToolIds = [
-  "quality_session_start",
-  "quality_dossier_create",
-  "quality_dossier_update",
-  "quality_dossier_inspect",
-  "quality_architecture_evaluate",
-  "quality_dossier_finalize",
-  "quality_action_authorize",
-  "quality_command_authorize",
-  "quality_verification_record",
-  "quality_session_finalize",
-];
-const qualityPermissions = new Map([
-  ["orchestrator", ["quality_session_start", "quality_dossier_create", "quality_dossier_update", "quality_dossier_inspect", "quality_dossier_finalize", "quality_action_authorize", "quality_session_finalize"]],
-  ["orchestrator-deep", ["quality_session_start", "quality_dossier_create", "quality_dossier_update", "quality_dossier_inspect", "quality_dossier_finalize", "quality_action_authorize", "quality_session_finalize"]],
-  ["architect", ["quality_dossier_inspect", "quality_architecture_evaluate"]],
-  ["reviewer", ["quality_dossier_inspect", "quality_architecture_evaluate"]],
-  ["verifier", ["quality_dossier_inspect", "quality_verification_record"]],
-]);
+const qualityToolIds = NORMAL_SESSION_QUALITY_TOOL_IDS;
 for (const agent of agentNames) {
   const permission = frontmatters.get(agent)?.permission ?? {};
-  const allowed = new Set(qualityPermissions.get(agent) ?? []);
+  const allowed = new Set(NORMAL_SESSION_QUALITY_PROFILE_PERMISSIONS[agent] ?? []);
   for (const toolId of qualityToolIds) {
     if (allowed.has(toolId) && permission[toolId] !== "allow") {
       fail("HARNESS-S084", `${agent} must allow ${toolId}`, "Restore the reviewed normal-session quality-tool permission matrix.");

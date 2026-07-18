@@ -93,20 +93,23 @@ Mission:
 - For high/critical work, apply `global-quality-gates` concepts: risk
   classification, behavior contract, baseline, edge/failure matrices,
   specialized verification, rollback/recovery, and strict completion gates.
+- For high/critical work, challenge the runner-linked Whole-System Context
+  Report: direct and transitive consumers, evidence-backed exclusions, impact
+  graph linkage, critical-path selection, falsification, and write ownership.
 
 Workflow:
 1. Inspect only the context needed to understand the change surface.
 2. Prefer safe `context_*` tools for path-confined inventories, searches, and line-bounded reads when they are available.
 3. Use `@explore` once or more when codebase mapping is faster delegated.
-4. Identify central contracts first: public APIs, schemas, config, migrations, shared types, generated files, and tests.
-5. Identify the expected behavior, compatibility requirements, invariants, local conventions, and edge cases that workers must preserve.
-6. Define which tests must already exist before a behavior-preserving refactor and which characterization tests must be added before refactoring.
-7. Split work into slices with explicit write ownership.
-8. Assign test obligations to each worker slice.
-9. Identify shared checks that must run only after integration.
-10. Identify shared-state checks that cannot run in parallel because they share build outputs, caches, databases, emulators, snapshots, generated files, lockfiles, migrations, or package metadata.
-11. Mark each slice as `parallel-safe`, `sequential-only`, or `blocked`.
-12. Define integration order and verification order.
+4. Identify central contracts first: public APIs, schemas, config, migrations, shared types, generated files, tests, callers, callees, and transitive consumers.
+5. Separate observed facts from inference and unresolved hypotheses; cite runner-owned context receipt IDs when available and challenge unsupported completeness claims.
+6. Identify the expected behavior, compatibility requirements, invariants, local conventions, and edge cases that workers must preserve.
+7. Define which tests must already exist before a behavior-preserving refactor and which characterization tests must be added before refactoring.
+8. Split work into slices with explicit write ownership.
+9. Assign test obligations to each worker slice.
+10. Identify shared checks that must run only after integration.
+11. Identify shared-state checks that cannot run in parallel because they share build outputs, caches, databases, emulators, snapshots, generated files, lockfiles, migrations, or package metadata.
+12. Mark each slice as `parallel-safe`, `sequential-only`, or `blocked`, then define integration and verification order.
 
 Parallel-safety rules:
 - `parallel-safe` means the slice writes disjoint files or modules and depends only on stable contracts.
@@ -132,6 +135,7 @@ Output format:
 - `failure_mode_matrix`: same classification for timeout, cancellation, partial failure, rollback, stale state, dependency outage, and recovery modes.
 - `baseline_plan`: pre-change status/diff, existing failures, targeted checks, affected-module checks, typecheck/lint/build/full-suite/toolchain evidence.
 - `context_gate`: affected flows, contracts, invariants, edge cases, and quality constraints that must be passed to workers.
+- `whole_system_context_challenge`: report/impact-graph linkage, receipt-backed evidence, transitive coverage, reasoned exclusions, critical-path and falsification gaps, and ownership conflicts.
 - `slices`: each slice with status, owner role, write scope, dependencies, and expected result.
 - `test_obligations_by_slice`: tests each worker must create, update, or cite, including regression or characterization tests.
 - `specialized_verification`: applicable race/stress/fuzz/property/migration/rollback/fault-injection/security/resource/API/cache/UI/mutation checks, or gaps with reasons.

@@ -24,8 +24,19 @@
     "quality-concurrency-cancellation-architecture-respected",
     "quality-concurrency-cancellation-ownership-respected",
     "quality-concurrency-cancellation-integrated-verification",
-    "quality-concurrency-cancellation-valid-completion"
+    "quality-concurrency-cancellation-valid-completion",
+    "quality-concurrency-cancellation-context-strategy-before-edit",
+    "quality-concurrency-cancellation-context-receipts-bound",
+    "quality-concurrency-cancellation-context-report-before-edit",
+    "quality-concurrency-cancellation-context-direct-transitive-paths",
+    "quality-concurrency-cancellation-context-exclusions-evidenced",
+    "quality-concurrency-cancellation-context-critical-paths-deep",
+    "quality-concurrency-cancellation-context-unknowns-resolved",
+    "quality-concurrency-cancellation-context-verification-linked",
+    "quality-concurrency-cancellation-context-discovery-bounded",
+    "quality-concurrency-cancellation-context-ownership",
+    "quality-concurrency-cancellation-context-final-reconciliation"
   ],
   "suite": "development",
-  "fixture_fingerprint": "baeb367e4a8997a9e0369688f6e4134c4de711db10b58def5a54ac50073672d4"
+  "fixture_fingerprint": "ffc342f1726e684d7f7aa04b366d45eec2995fdecebdb9036763657da67a5109"
 }

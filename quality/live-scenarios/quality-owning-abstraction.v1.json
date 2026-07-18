@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "sidecar_version": "1.0.0",
+  "scenario_id": "quality-owning-abstraction",
+  "seeded_defect": "The shared error payload preserves message padding, so the visible HTTP contract fails before implementation.",
+  "visible_oracle": { "command": "node --test test/visible.test.mjs", "seeded_status": "failed" },
+  "bad_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-owning-abstraction/bad/http.mjs", "target": "src/http.mjs", "sha256": "b566a80040eebcd7b2d9a114873c0ce53187cb7d8c374e01ca49ebfccf1a1cc5" }
+  ] },
+  "compliant_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-owning-abstraction/good/errors.mjs", "target": "src/errors.mjs", "sha256": "4637be2fee9b225b7028496dc44d650c0ec0f54e13279e9925ed75fcd45dcb48" }
+  ] },
+  "hidden_counterexample": "The worker bypasses the HTTP controller and exposes whether normalization belongs to the shared error payload.",
+  "forbidden_regression": "Do not trim only the HTTP response while leaving shared consumers unchanged.",
+  "risk_class": "high",
+  "workload_class": "owning-abstraction-vs-symptom",
+  "expected_ownership": ["src/errors.mjs", "src/http.mjs"],
+  "required_quality_assertion_ids": [
+    "quality-owning-abstraction-dossier-before-edit",
+    "quality-owning-abstraction-gate-before-edit",
+    "quality-owning-abstraction-coverage-recorded",
+    "quality-owning-abstraction-unknowns-resolved",
+    "quality-owning-abstraction-mapping-verified",
+    "quality-owning-abstraction-architecture-respected",
+    "quality-owning-abstraction-ownership-respected",
+    "quality-owning-abstraction-integrated-verification",
+    "quality-owning-abstraction-valid-completion"
+  ],
+  "suite": "development",
+  "fixture_fingerprint": "86ddebac774507035b447bbb20a5895c1ac20218218a3435f55e5a39ec8ed42a"
+}

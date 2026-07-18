@@ -24,8 +24,19 @@
     "quality-public-api-compatibility-architecture-respected",
     "quality-public-api-compatibility-ownership-respected",
     "quality-public-api-compatibility-integrated-verification",
-    "quality-public-api-compatibility-valid-completion"
+    "quality-public-api-compatibility-valid-completion",
+    "quality-public-api-compatibility-context-strategy-before-edit",
+    "quality-public-api-compatibility-context-receipts-bound",
+    "quality-public-api-compatibility-context-report-before-edit",
+    "quality-public-api-compatibility-context-direct-transitive-paths",
+    "quality-public-api-compatibility-context-exclusions-evidenced",
+    "quality-public-api-compatibility-context-critical-paths-deep",
+    "quality-public-api-compatibility-context-unknowns-resolved",
+    "quality-public-api-compatibility-context-verification-linked",
+    "quality-public-api-compatibility-context-discovery-bounded",
+    "quality-public-api-compatibility-context-ownership",
+    "quality-public-api-compatibility-context-final-reconciliation"
   ],
   "suite": "development",
-  "fixture_fingerprint": "e185e75801ef8c66aa2d8a3cea65b3b20ffa5f87573fd0fe69ce00ce3288c910"
+  "fixture_fingerprint": "dfb58b4b57e142dab9ad4e49627b507e4236e09276905199c11e280d0982db4b"
 }

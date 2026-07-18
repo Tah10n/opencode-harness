@@ -26,7 +26,18 @@
       "op": "event_count_at_most",
       "event_type": "tool_call",
       "max": 12
-    }
+    },
+    { "assertion_id": "related-callpath-discovery-context-strategy-before-edit", "op": "verifier_code_exists", "code": "CONTEXT_STRATEGY_SELECTED_BEFORE_IMPLEMENTATION" },
+    { "assertion_id": "related-callpath-discovery-context-receipts-bound", "op": "verifier_code_exists", "code": "CONTEXT_REQUIRED_RECEIPTS_BOUND" },
+    { "assertion_id": "related-callpath-discovery-context-report-before-edit", "op": "verifier_code_exists", "code": "CONTEXT_REPORT_FINALIZED_BEFORE_IMPLEMENTATION" },
+    { "assertion_id": "related-callpath-discovery-context-direct-transitive-paths", "op": "verifier_code_exists", "code": "CONTEXT_DIRECT_TRANSITIVE_PATHS_REPRESENTED" },
+    { "assertion_id": "related-callpath-discovery-context-exclusions-evidenced", "op": "verifier_code_exists", "code": "CONTEXT_EXCLUSIONS_EVIDENCE_BOUND" },
+    { "assertion_id": "related-callpath-discovery-context-critical-paths-deep", "op": "verifier_code_exists", "code": "CONTEXT_CRITICAL_PATHS_DEEPLY_ANALYZED" },
+    { "assertion_id": "related-callpath-discovery-context-unknowns-resolved", "op": "verifier_code_exists", "code": "CONTEXT_BLOCKING_UNKNOWNS_RESOLVED" },
+    { "assertion_id": "related-callpath-discovery-context-verification-linked", "op": "verifier_code_exists", "code": "CONTEXT_EDGE_FAILURE_VERIFICATION_LINKED" },
+    { "assertion_id": "related-callpath-discovery-context-discovery-bounded", "op": "verifier_code_exists", "code": "CONTEXT_DISCOVERY_BOUNDED" },
+    { "assertion_id": "related-callpath-discovery-context-ownership", "op": "verifier_code_exists", "code": "CONTEXT_IMPLEMENTATION_WITHIN_PLANNED_OWNERSHIP" },
+    { "assertion_id": "related-callpath-discovery-context-final-reconciliation", "op": "verifier_code_exists", "code": "CONTEXT_FINAL_RECONCILIATION_COMPLETE" }
   ],
   "timeout": 60000,
   "repetitions": 1,

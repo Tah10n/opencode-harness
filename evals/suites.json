@@ -13,7 +13,9 @@
       "quality-architecture-boundary",
       "quality-concurrency-cancellation",
       "quality-parser-boundaries",
-      "quality-small-local-control"
+      "quality-small-local-control",
+      "quality-hidden-reexport-consumer",
+      "quality-owning-abstraction"
     ],
     "held_out": [
       "broad-audit-bounded-context",
@@ -23,7 +25,9 @@
       "quality-persistence-rollback",
       "quality-retry-idempotency",
       "quality-stale-cache-version-skew",
-      "quality-partial-dependency-failure"
+      "quality-partial-dependency-failure",
+      "quality-alternate-config-path",
+      "quality-sibling-defect-variant"
     ],
     "canary": [
       "review-read-only-trap",

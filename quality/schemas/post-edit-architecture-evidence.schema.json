@@ -16,14 +16,16 @@
     "policy_fingerprint",
     "final_workspace_fingerprint",
     "extracted_graph_fingerprint",
+    "planned_graph_fingerprint",
+    "graph_delta",
     "architecture_evaluation",
     "completed_at",
     "fingerprint"
   ],
   "properties": {
-    "schema_version": { "const": 1 },
+    "schema_version": { "const": 3 },
     "evidence_id": { "$ref": "#/$defs/safe_id" },
-    "producer": { "const": "opencode-harness/post-edit-architecture-v1" },
+    "producer": { "const": "opencode-harness/post-edit-architecture-v3" },
     "mechanism_kind": { "enum": ["project_check", "runner_owned_extractor"] },
     "extractor_identity": { "$ref": "#/$defs/extractor_identity" },
     "evaluator_identity": { "$ref": "#/$defs/evaluator_identity" },
@@ -34,6 +36,8 @@
     "policy_fingerprint": { "$ref": "#/$defs/fingerprint" },
     "final_workspace_fingerprint": { "$ref": "#/$defs/fingerprint" },
     "extracted_graph_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "planned_graph_fingerprint": { "$ref": "#/$defs/fingerprint" },
+    "graph_delta": { "$ref": "#/$defs/graph_delta" },
     "architecture_evaluation": { "$ref": "architecture-evaluation.schema.json" },
     "completed_at": { "type": "string", "format": "date-time" },
     "fingerprint": { "$ref": "#/$defs/fingerprint" }
@@ -52,6 +56,20 @@
       "minLength": 1,
       "maxLength": 128,
       "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+    },
+    "trust_regression_id": {
+      "type": "string",
+      "pattern": "^TRUSTREG-[A-Za-z0-9._-]{0,118}[A-Za-z0-9_-]$"
+    },
+    "unplanned_item_id": {
+      "type": "string",
+      "pattern": "^UNPLANNED-[A-Za-z0-9._-]{0,117}[A-Za-z0-9_-]$"
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048,
+      "pattern": "^(?!/)(?![A-Za-z]:)(?!.*\\\\)(?!.*(?:^|/)\\.\\.?(?:/|$))(?!.*//)[^:]+$"
     },
     "extractor_identity": {
       "type": "object",
@@ -77,6 +95,149 @@
           "items": { "$ref": "#/$defs/safe_id" }
         },
         "implementation_fingerprint": { "$ref": "#/$defs/fingerprint" }
+      }
+    },
+    "delta_signature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["signature", "count"],
+      "properties": {
+        "signature": { "$ref": "#/$defs/fingerprint" },
+        "count": { "type": "integer", "minimum": 1, "maximum": 4096 }
+      }
+    },
+    "delta_signatures": {
+      "type": "array",
+      "maxItems": 128,
+      "items": { "$ref": "#/$defs/delta_signature" }
+    },
+    "bounded_unique_strings": {
+      "type": "array",
+      "maxItems": 128,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1, "maxLength": 1000 }
+    },
+    "trust_regression": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "subject", "path", "before", "after", "description"],
+      "properties": {
+        "id": { "$ref": "#/$defs/trust_regression_id" },
+        "kind": {
+          "enum": [
+            "coverage_regression",
+            "confidence_regression",
+            "unknown_added",
+            "exclusion_added",
+            "boundary_loss",
+            "critical_path_downgrade"
+          ]
+        },
+        "subject": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "path": { "anyOf": [{ "$ref": "#/$defs/path" }, { "type": "null" }] },
+        "before": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "after": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "description": { "type": "string", "minLength": 1, "maxLength": 2000 }
+      }
+    },
+    "unplanned_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "severity", "path", "description", "disposition", "analysis_update_id"],
+      "properties": {
+        "id": { "$ref": "#/$defs/unplanned_item_id" },
+        "kind": {
+          "enum": [
+            "node",
+            "edge",
+            "contract",
+            "side_effect",
+            "dependency",
+            "path",
+            "coverage",
+            "unknown",
+            "exclusion",
+            "boundary"
+          ]
+        },
+        "severity": { "enum": ["medium", "high", "critical"] },
+        "path": { "anyOf": [{ "$ref": "#/$defs/path" }, { "type": "null" }] },
+        "description": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "disposition": { "const": "requires_reanalysis" },
+        "analysis_update_id": { "type": "null" }
+      }
+    },
+    "delta_counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "added_nodes",
+        "removed_nodes",
+        "added_edges",
+        "removed_edges",
+        "added_affected_paths",
+        "removed_affected_paths",
+        "trust_regressions"
+      ],
+      "properties": {
+        "added_nodes": { "$ref": "#/$defs/delta_count" },
+        "removed_nodes": { "$ref": "#/$defs/delta_count" },
+        "added_edges": { "$ref": "#/$defs/delta_count" },
+        "removed_edges": { "$ref": "#/$defs/delta_count" },
+        "added_affected_paths": { "$ref": "#/$defs/delta_count" },
+        "removed_affected_paths": { "$ref": "#/$defs/delta_count" },
+        "trust_regressions": { "$ref": "#/$defs/delta_count" }
+      }
+    },
+    "delta_count": { "type": "integer", "minimum": 0, "maximum": 4096 },
+    "graph_delta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "planned_graph_fingerprint",
+        "final_graph_fingerprint",
+        "added_nodes",
+        "removed_nodes",
+        "added_edges",
+        "removed_edges",
+        "added_affected_paths",
+        "removed_affected_paths",
+        "unexpected_public_contracts",
+        "unexpected_dependency_directions",
+        "unexpected_side_effect_edges",
+        "trust_regressions",
+        "unplanned_items",
+        "counts",
+        "truncated",
+        "fingerprint"
+      ],
+      "properties": {
+        "schema_version": { "const": 2 },
+        "planned_graph_fingerprint": { "$ref": "#/$defs/fingerprint" },
+        "final_graph_fingerprint": { "$ref": "#/$defs/fingerprint" },
+        "added_nodes": { "$ref": "#/$defs/delta_signatures" },
+        "removed_nodes": { "$ref": "#/$defs/delta_signatures" },
+        "added_edges": { "$ref": "#/$defs/delta_signatures" },
+        "removed_edges": { "$ref": "#/$defs/delta_signatures" },
+        "added_affected_paths": { "$ref": "#/$defs/delta_signatures" },
+        "removed_affected_paths": { "$ref": "#/$defs/delta_signatures" },
+        "unexpected_public_contracts": { "$ref": "#/$defs/bounded_unique_strings" },
+        "unexpected_dependency_directions": { "$ref": "#/$defs/bounded_unique_strings" },
+        "unexpected_side_effect_edges": { "$ref": "#/$defs/bounded_unique_strings" },
+        "trust_regressions": {
+          "type": "array",
+          "maxItems": 128,
+          "items": { "$ref": "#/$defs/trust_regression" }
+        },
+        "unplanned_items": {
+          "type": "array",
+          "maxItems": 128,
+          "items": { "$ref": "#/$defs/unplanned_item" }
+        },
+        "counts": { "$ref": "#/$defs/delta_counts" },
+        "truncated": { "type": "boolean" },
+        "fingerprint": { "$ref": "#/$defs/fingerprint" }
       }
     }
   }

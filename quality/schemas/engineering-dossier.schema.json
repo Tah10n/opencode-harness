@@ -54,7 +54,7 @@
     "task_id": { "$ref": "#/$defs/id" },
     "risk_class": { "enum": ["standard-lite", "high", "critical"] },
     "mode": { "enum": ["standard-lite", "full"] },
-    "task_type": { "enum": ["bug_fix", "behavior_preserving_refactor", "new_feature", "migration", "security", "maintenance"] },
+    "task_type": { "enum": ["bug_fix", "diagnosis_driven_implementation", "behavior_preserving_refactor", "new_feature", "migration", "security", "maintenance"] },
     "user_visible_goal": { "type": "string", "minLength": 1 },
     "revision": { "type": "integer", "minimum": 1 },
     "status": { "enum": ["draft", "finalized"] },

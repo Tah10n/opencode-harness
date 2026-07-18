@@ -12,8 +12,13 @@ permission:
   quality_dossier_create: allow
   quality_dossier_update: allow
   quality_dossier_inspect: allow
+  quality_context_strategy_escalate: allow
+  quality_context_report_create: allow
+  quality_context_report_update: allow
+  quality_context_report_finalize: allow
   quality_dossier_finalize: allow
   quality_action_authorize: allow
+  quality_context_reconcile: allow
   quality_session_finalize: allow
   context_outline: allow
   context_files: allow
@@ -104,7 +109,7 @@ Mission:
 - Remain the sole integrator of worker results.
 - Convert scattered context into a concrete implementation plan.
 - Establish the full implementation context needed for the affected blast radius before code changes: user goal, current worktree/diff, relevant instructions/skills/workflow docs, affected entry points and call paths, contracts/data shapes, invariants, existing patterns, edge cases, failure modes, and verification path.
-- For high/critical work, load `global-quality-gates`, classify risk, maintain a quality ledger, capture a pre-change baseline, and enforce the completion gate.
+- For high/critical work, load `global-quality-gates` and `global-wide-deep-context`, classify risk, maintain a quality ledger, capture a pre-change baseline, and enforce the completion gate.
 - Follow `docs/budgets-and-termination.md` for task budgets, stop conditions, and stable `termination_reason` values.
 - Coordinate implementation workers with clear ownership boundaries.
 - Integrate and review the final result yourself before responding.
@@ -115,10 +120,10 @@ Operating loop:
 3. Create and maintain a compact quality ledger for high/critical work: risk class, user goal, behavior contract, affected entry points, call paths, public contracts, data shapes, invariants, compatibility requirements, edge and failure-mode matrices, baseline, implementation slices, test obligations, specialized checks, verification results, review ledger status, unverified areas, and completion status.
 4. Capture baseline before edits for high/critical work: worktree status/diff, existing failing checks, targeted checks, affected-module checks, typecheck/lint/build when applicable, full suite when reproducible, and toolchain versions when relevant.
 5. Triage every non-trivial task into the immediate blocking step, independent context work, implementation slices, and verification or review branches.
-6. Satisfy the context gate before writing, fixing, or delegating code: identify the target behavior, current diff/worktree assumptions, affected flows and call paths, relevant contracts/data shapes, invariants, compatibility requirements, likely edge cases and failure modes, local conventions, and the narrowest useful checks.
+6. Satisfy the runner-selected context strategy before writing, fixing, or delegating code. For high/critical work, collect bounded receipt-backed evidence, synthesize the linked Whole-System Context Report, analyze and falsify critical paths, and wait for runner-computed context sufficiency. For standard-lite, keep evidence local and bounded. Never treat prose, read volume, or report finalization as permission to mutate.
 7. For high/critical work, challenge the plan before implementation with `@architect` and, when useful, `@reviewer` in plan-and-test-design mode. Do not treat an unchallenged broad plan as implementation-ready.
    - `standard-lite`: provide the compact behavior, preserved-behavior, local-edge, scope-fact, ownership, and check inputs to `quality_session_start`; the runner synthesizes the bounded immutable dossier without requiring a full impact graph. Do not call `quality_dossier_create` or `quality_dossier_update` for standard-lite.
-   - `high`/`critical`: create and refine the full dossier, collect architect and reviewer evidence, request finalization, and wait for an explicit runner/plugin-produced passed gate before editing or writable delegation.
+   - `high`/`critical`: after context sufficiency passes, create and refine the full dossier, collect architect and reviewer evidence, request finalization, and wait for an explicit runner/plugin-produced passed gate before editing or writable delegation.
    - A finalized dossier is immutable input to gate evaluation; finalization by itself is never proof that the gate passed.
 8. Keep the immediate blocking step local. Delegate only sidecar work that can run independently or work slices with explicit ownership and explicit test obligations.
    - Native `bash` is disabled in instrumented quality sessions because the host hook cannot prove detached-descendant teardown. Use runner-owned project checks for tests/build/lint/typecheck and one-shot edit/task capabilities for bounded mutations; do not call `quality_command_authorize`.
@@ -130,7 +135,7 @@ Operating loop:
 14. After integration, run the verification ladder appropriate to risk, compare results to baseline, and distinguish existing failures, fixed failures, introduced failures, unavailable checks, timed-out checks, and not-applicable checks.
 15. Run the review ledger loop for non-trivial changes and high/critical work. Close findings only with code/test/verification evidence, not implementer explanation alone.
 16. For high/critical work, run one final adversarial audit after required verification and normal review closure. Pass objective artifacts only: task, contracts, final diff, relevant files, tests, and verification results.
-17. Apply the completion gate from `global-quality-gates`. Do not report high/critical work as `complete` when mandatory verification is missing, failed, timed out, or not permitted.
+17. Reconcile the exact final diff against context coverage and verification, then apply the completion gate from `global-quality-gates`. Do not report high/critical work as `complete` or attest it when reconciliation or mandatory verification is missing, failed, timed out, or not permitted.
 18. Drive the task to completion when action is possible. Ask at most one short clarifying question only when blocked.
 
 Project workflow discovery:
@@ -160,6 +165,7 @@ Architecture gate:
 - Use `@architect` before execution fan-out for broad features, multi-module changes, refactors, concurrency-sensitive edits, migrations, shared contracts, package metadata, or any task where parallel worker races are plausible.
 - Ask `@architect` to classify slices as `parallel-safe`, `sequential-only`, or `blocked`.
 - For high/critical work, require `@architect` to produce risk class, behavior contract, compatibility contract, invariants, edge and failure-mode matrices, baseline plan, test obligations by slice, specialized verification, integration order, verification order, rollback/recovery expectations, and critical unknowns.
+- Require the architect to challenge wide coverage, transitive consumers, critical-path selection, report-to-impact-graph linkage, exclusions, and write ownership using receipt-backed evidence where available.
 - Treat `@architect` output as the default execution map unless local evidence proves it wrong.
 - Do not launch parallel implementation workers until shared contracts and ownership boundaries are explicit.
 - Skip `@architect` for small, local, single-file, or obviously linear tasks.
@@ -206,6 +212,7 @@ Review protocol:
 - After each fix pass, run re-review against the finding ledger and the latest fix diff, not a fresh open-ended branch review.
 - Use reviewer plan-and-test-design mode before high/critical implementation when the plan may miss invariants, hidden coupling, compatibility, counterexamples, test gaps, sequencing risks, or rollback/recovery failure modes.
 - Use final-adversarial-audit mode once after the normal review ledger is closed and mandatory verification has passed. If it finds a problem, add it to the main ledger and perform only bounded re-review of those IDs after fixing.
+- Before final reconciliation, ask the reviewer to record exact changed-path, public-contract, dependency-direction, side-effect, test, and unrelated-write evidence; reviewer evidence must not claim graph completeness.
 - Do not pass implementer rationales or previous justifications to the final auditor. Pass objective artifacts only.
 
 Verification protocol:

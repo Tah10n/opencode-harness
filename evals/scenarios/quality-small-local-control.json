@@ -21,7 +21,15 @@
     { "assertion_id": "quality-small-local-control-no-delegation", "op": "event_count_at_most", "event_type": "delegation", "max": 0 },
     { "assertion_id": "quality-small-local-control-single-edit", "op": "event_count_at_most", "event_type": "edit", "max": 1 },
     { "assertion_id": "quality-small-local-control-integrated-verification", "op": "event_exists", "event_type": "verification", "status": "completed" },
-    { "assertion_id": "quality-small-local-control-valid-completion", "op": "termination_reason_equals", "value": "verified" }
+    { "assertion_id": "quality-small-local-control-valid-completion", "op": "termination_reason_equals", "value": "verified" },
+    { "assertion_id": "quality-small-local-control-context-strategy-before-edit", "op": "verifier_code_exists", "code": "CONTEXT_STRATEGY_SELECTED_BEFORE_IMPLEMENTATION" },
+    { "assertion_id": "quality-small-local-control-context-receipts-bound", "op": "verifier_code_exists", "code": "CONTEXT_REQUIRED_RECEIPTS_BOUND" },
+    { "assertion_id": "quality-small-local-control-context-unknowns-resolved", "op": "verifier_code_exists", "code": "CONTEXT_BLOCKING_UNKNOWNS_RESOLVED" },
+    { "assertion_id": "quality-small-local-control-context-verification-linked", "op": "verifier_code_exists", "code": "CONTEXT_EDGE_FAILURE_VERIFICATION_LINKED" },
+    { "assertion_id": "quality-small-local-control-context-discovery-bounded", "op": "verifier_code_exists", "code": "CONTEXT_DISCOVERY_BOUNDED" },
+    { "assertion_id": "quality-small-local-control-context-ownership", "op": "verifier_code_exists", "code": "CONTEXT_IMPLEMENTATION_WITHIN_PLANNED_OWNERSHIP" },
+    { "assertion_id": "quality-small-local-control-context-final-reconciliation", "op": "verifier_code_exists", "code": "CONTEXT_FINAL_RECONCILIATION_COMPLETE" },
+    { "assertion_id": "quality-small-local-control-context-standard-lite-bounded", "op": "verifier_code_exists", "code": "CONTEXT_STANDARD_LITE_PROCESS_BOUNDED" }
   ],
   "timeout": 60000,
   "repetitions": 2,

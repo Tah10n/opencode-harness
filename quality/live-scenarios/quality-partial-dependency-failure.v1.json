@@ -24,8 +24,19 @@
     "quality-partial-dependency-failure-architecture-respected",
     "quality-partial-dependency-failure-ownership-respected",
     "quality-partial-dependency-failure-integrated-verification",
-    "quality-partial-dependency-failure-valid-completion"
+    "quality-partial-dependency-failure-valid-completion",
+    "quality-partial-dependency-failure-context-strategy-before-edit",
+    "quality-partial-dependency-failure-context-receipts-bound",
+    "quality-partial-dependency-failure-context-report-before-edit",
+    "quality-partial-dependency-failure-context-direct-transitive-paths",
+    "quality-partial-dependency-failure-context-exclusions-evidenced",
+    "quality-partial-dependency-failure-context-critical-paths-deep",
+    "quality-partial-dependency-failure-context-unknowns-resolved",
+    "quality-partial-dependency-failure-context-verification-linked",
+    "quality-partial-dependency-failure-context-discovery-bounded",
+    "quality-partial-dependency-failure-context-ownership",
+    "quality-partial-dependency-failure-context-final-reconciliation"
   ],
   "suite": "held_out",
-  "fixture_fingerprint": "c321238173e3dcec0fe3df4c6c8d998cfc61cbc47731f0c06592f10622e37bd2"
+  "fixture_fingerprint": "00cad06b792f8dfab606bd14156db61b2308d0d2ab27837c8fc54247cab476e5"
 }

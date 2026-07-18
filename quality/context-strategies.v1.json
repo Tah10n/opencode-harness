@@ -1,0 +1,255 @@
+{
+  "schema_version": 1,
+  "catalog_id": "wide-deep-context-v1",
+  "strategies": [
+    {
+      "id": "standard-lite-local-v1",
+      "risk_classes": ["standard-lite"],
+      "required_wide_categories": [
+        "repository_guidance",
+        "direct_callers_callees",
+        "existing_tests"
+      ],
+      "required_deep_dimensions": [],
+      "preferred_tools": ["context_outline", "context_files", "context_search", "context_read"],
+      "fallback_tools": ["bounded_literal_search", "bounded_file_read"],
+      "stop_conditions": [
+        "local_scope_confirmed",
+        "required_categories_resolved",
+        "further_reads_duplicate_or_low_value"
+      ],
+      "escalation_conditions": [
+        "public_contract_discovered",
+        "transitive_consumer_discovered",
+        "persistence_discovered",
+        "concurrency_discovered",
+        "security_boundary_discovered",
+        "migration_discovered",
+        "multi_module_impact_discovered",
+        "budget_exhausted_with_unknowns"
+      ],
+      "budgets": {
+        "max_context_calls": 12,
+        "max_read_only_subagents": 0
+      },
+      "semantic_relation_evidence": "optional",
+      "sibling_variant_discovery": "task_profile",
+      "pre_change_reproduction": "task_profile"
+    },
+    {
+      "id": "high-wide-deep-v1",
+      "risk_classes": ["high"],
+      "required_wide_categories": [
+        "repository_guidance",
+        "module_service_map",
+        "externally_reachable_entry_points",
+        "direct_callers_callees",
+        "transitive_consumers_side_effects",
+        "public_contracts_configuration",
+        "state_external_dependencies",
+        "architecture_ownership",
+        "existing_tests",
+        "sibling_implementations",
+        "excluded_sibling_paths",
+        "relevant_unknown_paths",
+        "context_tool_fallback",
+        "budget_truncation_state"
+      ],
+      "required_deep_dimensions": [
+        "inputs_preconditions",
+        "outputs_postconditions",
+        "state_transitions",
+        "data_transformations",
+        "side_effects",
+        "error_propagation",
+        "retry_repeated_invocation",
+        "idempotency",
+        "timeout_cancellation",
+        "concurrency_ordering",
+        "transaction_rollback",
+        "resource_cleanup",
+        "cache_stale_state",
+        "compatibility_version_skew",
+        "authorization_data_sensitivity"
+      ],
+      "preferred_tools": [
+        "context_outline",
+        "context_files",
+        "context_map",
+        "context_symbols",
+        "context_related",
+        "context_search",
+        "context_batch_read",
+        "context_read"
+      ],
+      "fallback_tools": ["context_outline", "context_files", "context_search", "context_read"],
+      "stop_conditions": [
+        "required_categories_resolved",
+        "critical_paths_classified",
+        "blocking_unknowns_resolved",
+        "risks_mapped_to_verification",
+        "further_reads_duplicate_or_low_value"
+      ],
+      "escalation_conditions": [
+        "critical_scope_fact_discovered",
+        "semantic_evidence_required_but_unavailable",
+        "budget_exhausted_with_unknowns"
+      ],
+      "budgets": {
+        "max_context_calls": 48,
+        "max_read_only_subagents": 4
+      },
+      "semantic_relation_evidence": "preferred_with_honest_fallback",
+      "sibling_variant_discovery": "task_profile",
+      "pre_change_reproduction": "task_profile"
+    },
+    {
+      "id": "critical-wide-deep-v1",
+      "risk_classes": ["critical"],
+      "required_wide_categories": [
+        "repository_guidance",
+        "module_service_map",
+        "externally_reachable_entry_points",
+        "direct_callers_callees",
+        "transitive_consumers_side_effects",
+        "public_contracts_configuration",
+        "state_external_dependencies",
+        "architecture_ownership",
+        "existing_tests",
+        "sibling_implementations",
+        "excluded_sibling_paths",
+        "relevant_unknown_paths",
+        "context_tool_fallback",
+        "budget_truncation_state"
+      ],
+      "required_deep_dimensions": [
+        "inputs_preconditions",
+        "outputs_postconditions",
+        "state_transitions",
+        "data_transformations",
+        "side_effects",
+        "error_propagation",
+        "retry_repeated_invocation",
+        "idempotency",
+        "timeout_cancellation",
+        "concurrency_ordering",
+        "transaction_rollback",
+        "resource_cleanup",
+        "cache_stale_state",
+        "compatibility_version_skew",
+        "authorization_data_sensitivity",
+        "recovery_restart",
+        "security_data_integrity"
+      ],
+      "preferred_tools": [
+        "context_outline",
+        "context_files",
+        "context_map",
+        "context_symbols",
+        "context_related",
+        "context_search",
+        "context_batch_read",
+        "context_read"
+      ],
+      "fallback_tools": ["context_outline", "context_files", "context_search", "context_read"],
+      "stop_conditions": [
+        "required_categories_resolved",
+        "critical_paths_classified",
+        "blocking_unknowns_resolved",
+        "risks_mapped_to_verification",
+        "further_reads_duplicate_or_low_value"
+      ],
+      "escalation_conditions": [
+        "semantic_evidence_required_but_unavailable",
+        "external_evidence_required",
+        "budget_exhausted_with_unknowns"
+      ],
+      "budgets": {
+        "max_context_calls": 72,
+        "max_read_only_subagents": 6
+      },
+      "semantic_relation_evidence": "preferred_with_honest_fallback",
+      "sibling_variant_discovery": "task_profile",
+      "pre_change_reproduction": "task_profile"
+    }
+  ],
+  "task_profiles": [
+    {
+      "id": "bug_fix",
+      "required_questions": ["owning_abstraction", "error_propagation", "sibling_variants", "test_gap_root_cause"],
+      "additional_wide_categories": ["sibling_implementations"],
+      "additional_deep_dimensions": ["error_propagation"],
+      "requires_sibling_variant_discovery": true,
+      "requires_pre_change_reproduction": true,
+      "requires_characterization": false,
+      "requires_negative_path": false,
+      "requires_compatibility": false
+    },
+    {
+      "id": "new_feature",
+      "required_questions": ["public_entry_point", "negative_path", "compatibility", "analogous_features"],
+      "additional_wide_categories": ["public_contracts_configuration"],
+      "additional_deep_dimensions": ["compatibility_version_skew"],
+      "requires_sibling_variant_discovery": false,
+      "requires_pre_change_reproduction": false,
+      "requires_characterization": false,
+      "requires_negative_path": true,
+      "requires_compatibility": true
+    },
+    {
+      "id": "behavior_preserving_refactor",
+      "required_questions": ["externally_observed_behavior", "all_boundary_consumers", "dependency_ownership"],
+      "additional_wide_categories": ["transitive_consumers_side_effects"],
+      "additional_deep_dimensions": ["compatibility_version_skew"],
+      "requires_sibling_variant_discovery": false,
+      "requires_pre_change_reproduction": false,
+      "requires_characterization": true,
+      "requires_negative_path": false,
+      "requires_compatibility": true
+    },
+    {
+      "id": "maintenance",
+      "required_questions": ["preserved_operational_contract"],
+      "additional_wide_categories": [],
+      "additional_deep_dimensions": [],
+      "requires_sibling_variant_discovery": false,
+      "requires_pre_change_reproduction": false,
+      "requires_characterization": false,
+      "requires_negative_path": false,
+      "requires_compatibility": false
+    },
+    {
+      "id": "diagnosis_driven_implementation",
+      "required_questions": ["visible_symptom_chain", "owning_abstraction", "falsifying_observation", "sibling_variants"],
+      "additional_wide_categories": ["sibling_implementations"],
+      "additional_deep_dimensions": ["error_propagation"],
+      "requires_sibling_variant_discovery": true,
+      "requires_pre_change_reproduction": true,
+      "requires_characterization": false,
+      "requires_negative_path": true,
+      "requires_compatibility": false
+    },
+    {
+      "id": "migration",
+      "required_questions": ["mixed_version", "rollback", "partial_success", "restart_recovery"],
+      "additional_wide_categories": ["state_external_dependencies"],
+      "additional_deep_dimensions": ["transaction_rollback", "compatibility_version_skew", "recovery_restart"],
+      "requires_sibling_variant_discovery": false,
+      "requires_pre_change_reproduction": false,
+      "requires_characterization": true,
+      "requires_negative_path": true,
+      "requires_compatibility": true
+    },
+    {
+      "id": "security",
+      "required_questions": ["trust_boundaries", "denial_paths", "sensitive_data_movement", "unsafe_encoding"],
+      "additional_wide_categories": ["public_contracts_configuration"],
+      "additional_deep_dimensions": ["authorization_data_sensitivity", "security_data_integrity"],
+      "requires_sibling_variant_discovery": false,
+      "requires_pre_change_reproduction": false,
+      "requires_characterization": false,
+      "requires_negative_path": true,
+      "requires_compatibility": false
+    }
+  ]
+}

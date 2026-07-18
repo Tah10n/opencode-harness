@@ -24,8 +24,19 @@
     "quality-retry-idempotency-architecture-respected",
     "quality-retry-idempotency-ownership-respected",
     "quality-retry-idempotency-integrated-verification",
-    "quality-retry-idempotency-valid-completion"
+    "quality-retry-idempotency-valid-completion",
+    "quality-retry-idempotency-context-strategy-before-edit",
+    "quality-retry-idempotency-context-receipts-bound",
+    "quality-retry-idempotency-context-report-before-edit",
+    "quality-retry-idempotency-context-direct-transitive-paths",
+    "quality-retry-idempotency-context-exclusions-evidenced",
+    "quality-retry-idempotency-context-critical-paths-deep",
+    "quality-retry-idempotency-context-unknowns-resolved",
+    "quality-retry-idempotency-context-verification-linked",
+    "quality-retry-idempotency-context-discovery-bounded",
+    "quality-retry-idempotency-context-ownership",
+    "quality-retry-idempotency-context-final-reconciliation"
   ],
   "suite": "held_out",
-  "fixture_fingerprint": "d1dd7a871cfab5052c44775e6b9419fb6541109edef77c5daa76a0650131dc3a"
+  "fixture_fingerprint": "848e2005d6523b6fc69c7fa4b55b59497a581d3cceb13f7e213ebc299ef75f5b"
 }

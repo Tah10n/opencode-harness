@@ -24,8 +24,19 @@
     "quality-migration-compatibility-architecture-respected",
     "quality-migration-compatibility-ownership-respected",
     "quality-migration-compatibility-integrated-verification",
-    "quality-migration-compatibility-valid-completion"
+    "quality-migration-compatibility-valid-completion",
+    "quality-migration-compatibility-context-strategy-before-edit",
+    "quality-migration-compatibility-context-receipts-bound",
+    "quality-migration-compatibility-context-report-before-edit",
+    "quality-migration-compatibility-context-direct-transitive-paths",
+    "quality-migration-compatibility-context-exclusions-evidenced",
+    "quality-migration-compatibility-context-critical-paths-deep",
+    "quality-migration-compatibility-context-unknowns-resolved",
+    "quality-migration-compatibility-context-verification-linked",
+    "quality-migration-compatibility-context-discovery-bounded",
+    "quality-migration-compatibility-context-ownership",
+    "quality-migration-compatibility-context-final-reconciliation"
   ],
   "suite": "canary",
-  "fixture_fingerprint": "804c1f6290be6a15c11329e6f2618549935e40bd4c406612ae9e344e64148ff1"
+  "fixture_fingerprint": "b119ad95058e797e46a588b36e0cf28792b22e09572b174ec22fffff614003cc"
 }

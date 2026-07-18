@@ -41,6 +41,15 @@ These rules apply to all projects.
 - For broad, high-risk, production-readiness, migration, security/privacy,
   persistence, concurrency, public-contract, or multi-module implementation,
   load `global-quality-gates` before edits.
+- For the same high/critical work, also load `global-wide-deep-context` before
+  edits.
+- For high/critical work, follow the runner-selected context strategy, retain
+  only runner-owned receipt IDs for context-tool evidence, complete the linked
+  Whole-System Context Report, and wait for runner-computed context sufficiency
+  before finalizing the existing Engineering Dossier gate. Reconcile the exact
+  final diff against that report before attestation. Keep runner-confirmed
+  `standard-lite` work bounded to local evidence instead of forcing a broad
+  graph or report.
 - Before code changes in high/critical work, classify risk and record the
   behavior contract, compatibility requirements, pre-change baseline, edge and
   failure-mode matrix, and test obligations.
