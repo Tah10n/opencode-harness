@@ -30,9 +30,24 @@ import {
   runScenarioProfile,
 } from "./evaluate-live.mjs";
 import { completeContextContent } from "./context-test-fixtures.mjs";
+import { createInjectedTestContainmentFactory } from "./injected-test-containment.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const START_COMMIT = "0a1d56605b9b8923ac27c3b3b405b38177ca7741";
+
+function createObservedQualityLiveRunnerTestContainment() {
+  const baseFactory = createInjectedTestContainmentFactory(
+    "injected-quality-live-runner-test-containment-v1",
+  );
+  let invocationCount = 0;
+  return Object.freeze({
+    factory: async (worker) => {
+      invocationCount += 1;
+      return baseFactory(worker);
+    },
+    invocationCount: () => invocationCount,
+  });
+}
 
 function highImpactGraph(ownershipPath, riskClass = "high") {
   const critical = riskClass === "critical";
@@ -716,8 +731,10 @@ export async function createDeterministicQualityRun({
   runIdentity = null,
   observerMode = "production",
   reviewerMode = "implicit",
+  oracleMode = "managed",
 } = {}) {
   assert(["baseline", "candidate"].includes(profileRole), "profileRole must be baseline or candidate");
+  assert(["managed", "forged-result"].includes(oracleMode), "oracleMode must be managed or forged-result");
   const workspaceRoot = fs.mkdtempSync(path.join(os.tmpdir(), `opencode-quality-live-runner-${profileRole}-`));
   const scenario = loadScenarioCorpus({ root }).scenarios
     .find((entry) => entry.id === "quality-small-local-control");
@@ -734,6 +751,7 @@ export async function createDeterministicQualityRun({
     }),
   });
   const checkCatalog = qualityLiveCheckCatalog(scenario.id, "standard-lite");
+  const testContainment = createObservedQualityLiveRunnerTestContainment();
   const executeFixtureChecks = async (_scenario, phase, commands, repo) => {
     if (phase === "setup") return [];
     const moduleUrl = `${pathToFileURL(path.join(repo, "src", "label.mjs")).href}?phase=${phase}&v=${Date.now()}`;
@@ -855,6 +873,17 @@ export async function createDeterministicQualityRun({
           : reviewerMode === "malformed"
             ? { reviewQualityReconciliationFn: async () => ({ unexpected: true }) }
             : (() => { throw new Error(`unknown reviewerMode ${reviewerMode}`); })();
+    const oracleOptions = oracleMode === "managed"
+      ? {}
+      : {
+          executePreimplementationOracleFn: async (oracleScenario, phase, commands) => commands.map((_, index) => ({
+            check_id: stableCheckId(oracleScenario.id, phase, index),
+            status: "failed",
+            exit_code: 1,
+            stdout_chars: 0,
+            stderr_chars: 0,
+          })),
+        };
     const result = await runScenarioProfile({
       adapterUrl: "fixture://quality-live-runner",
       scenario,
@@ -868,11 +897,16 @@ export async function createDeterministicQualityRun({
       evaluationRunId: `quality-live-runner-${profileRole}-${narrowed ? "narrow" : "full"}`,
       traceStore,
       sourceRoot: productionOptions.sourceRoot,
+      processContainmentFactory: testContainment.factory,
       observeQualityContextFn,
       ...reviewerOptions,
+      ...oracleOptions,
       runAdapterModuleFn: qualityAdapter,
       executeChecksFn: executeFixtureChecks,
     });
+    if (oracleMode === "managed") {
+      assert.equal(testContainment.invocationCount(), 1, "managed baseline oracle did not use explicit test containment exactly once");
+    }
     const runDir = path.join(workspaceRoot, ".oc_harness", "runs", result.operational_run_id);
     const expectedCallbackFailure = observerMode === "null"
       ? "QUALITY_CONTEXT_OBSERVER_UNAVAILABLE"
@@ -890,6 +924,21 @@ export async function createDeterministicQualityRun({
     if (expectedCallbackFailure !== null) {
       assert.notEqual(result.status, "passed", `${observerMode}/${reviewerMode} callback failure passed`);
       assert(result.incomplete_evidence.includes(expectedCallbackFailure), JSON.stringify(result.incomplete_evidence));
+      return {
+        workspaceRoot,
+        runDir,
+        result,
+        bundle: null,
+        checkCatalog,
+        cleanup: () => fs.rmSync(workspaceRoot, { recursive: true, force: true }),
+      };
+    }
+    if (oracleMode === "forged-result") {
+      assert.equal(testContainment.invocationCount(), 0, "forged oracle unexpectedly reached the managed command path");
+      assert.notEqual(result.status, "passed", "plain oracle results produced a passing quality run");
+      assert(result.incomplete_evidence.includes("QUALITY_BASELINE_ORACLE_UNTRUSTED"), JSON.stringify(result.incomplete_evidence));
+      assert.equal(result.quality_bundle_manifest_fingerprint, null);
+      assert.equal(result.quality_outcomes, null);
       return {
         workspaceRoot,
         runDir,
@@ -973,6 +1022,7 @@ export async function createDeterministicHighQualityRun({
     }),
   });
   const checkCatalog = qualityLiveCheckCatalog(scenario.id, riskClass);
+  const testContainment = createObservedQualityLiveRunnerTestContainment();
   const architectResultId = `architect-${scenario.id}-${profileRole}`;
   const planReviewerResultId = `plan-reviewer-${scenario.id}-${profileRole}`;
   const finalReviewerResultId = `final-reviewer-${scenario.id}-${profileRole}`;
@@ -1179,6 +1229,7 @@ export async function createDeterministicHighQualityRun({
       evaluationRunId: `quality-live-runner-${riskClass}-${profileRole}`,
       traceStore,
       sourceRoot: root,
+      processContainmentFactory: testContainment.factory,
       qualitySidecarOverride: qualitySidecar,
       runAdapterModuleFn: async (input) => {
         try {
@@ -1248,6 +1299,7 @@ export async function createDeterministicHighQualityRun({
         },
       } : {}),
     });
+    assert(testContainment.invocationCount() > 0, `${riskClass} runner did not use explicit test containment`);
     const runDir = path.join(workspaceRoot, ".oc_harness", "runs", result.operational_run_id);
     if (adapterError !== null) throw adapterError;
     if (!provideRunnerReviewer) {
@@ -1517,6 +1569,15 @@ async function main() {
     assert.equal(typeof productionOptions.observeQualityContextFn, "function");
     assert.equal(Object.hasOwn(productionOptions, "challengeQualityPlanFn"), false);
     assert.equal(Object.hasOwn(productionOptions, "reviewQualityReconciliationFn"), false);
+    assert.equal(Object.hasOwn(productionOptions, "processContainmentFactory"), false);
+    const forgedOracleRun = await createDeterministicQualityRun({ profileRole: "candidate", oracleMode: "forged-result" });
+    try {
+      assert.notEqual(forgedOracleRun.result.status, "passed");
+      assert.equal(forgedOracleRun.bundle, null);
+      assert(forgedOracleRun.result.incomplete_evidence.includes("QUALITY_BASELINE_ORACLE_UNTRUSTED"));
+    } finally {
+      forgedOracleRun.cleanup();
+    }
     assertRunnerVisibleOracleMatrix({ scenario, dossier: run.bundle.dossier });
     assertRunnerReviewerConfigMapping();
     const baselineReceipt = run.bundle.preimplementation_evidence.baseline_receipts[0];

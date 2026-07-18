@@ -1580,9 +1580,9 @@ for (const needle of [
   "adapterFailureReason",
   "adapter_success_unavailable",
   "infrastructure_self_test",
-  "deterministicSelfTestMode",
+  "createLiveEvalSelfTestRunOptions",
   "injected-live-eval-test-containment-v1",
-  "deterministicSelfTestContainmentFactory",
+  "processContainmentFactory",
   "HIDDEN_STAGED_AFTER_ADAPTER",
   "LIVE_TRACE_ASSERTIONS",
   "task_start",
@@ -1601,6 +1601,20 @@ for (const needle of [
   "--scenario",
 ]) {
   assertIncludes(liveEvalScript, needle, "scripts/evaluate-live.mjs");
+}
+assertNotIncludes(liveEvalScript, "deterministicSelfTestMode", "scripts/evaluate-live.mjs", "HARNESS-S086", "Self-test containment must be selected explicitly per run, not from process argv at import time.");
+assertNotIncludes(liveEvalScript, "deterministicSelfTestContainmentFactory", "scripts/evaluate-live.mjs", "HARNESS-S086", "Self-test containment must not depend on module-global process state.");
+const qualityLiveRunnerScript = read("scripts/verify-quality-live-runner.mjs");
+for (const needle of [
+  "createObservedQualityLiveRunnerTestContainment",
+  "injected-quality-live-runner-test-containment-v1",
+  "processContainmentFactory: testContainment.factory",
+  "executePreimplementationOracleFn",
+  'oracleMode = "managed"',
+  '"forged-result"',
+  "invocationCount",
+]) {
+  assertIncludes(qualityLiveRunnerScript, needle, "scripts/verify-quality-live-runner.mjs", "HARNESS-S086", "Deterministic quality runs must explicitly own test-only containment while retaining an unforgeable managed oracle boundary.");
 }
 assertNotIncludes(liveEvalScript, "setup_source", "scripts/evaluate-live.mjs", "HARNESS-S058", "Keep live-eval validation aligned with the implemented repo_fixture runner.");
 assertNotIncludes(liveEvalScript, "fake live success", "scripts/evaluate-live.mjs", "HARNESS-S058", "Do not add fake live success support to the live-eval runner.");

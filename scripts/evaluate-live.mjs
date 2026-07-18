@@ -32,7 +32,6 @@ import {
   AdapterTimeoutError,
   runAdapterModule,
 } from "../lib/feedback/adapter-worker.mjs";
-import { classifyProcessContainment } from "../lib/feedback/process-containment.mjs";
 import { validateLiveReport, validatePermissionSnapshot } from "../lib/feedback/acceptance.mjs";
 import {
   captureOrdinaryTreeManifest,
@@ -83,14 +82,6 @@ import { createInjectedTestContainmentFactory } from "./injected-test-containmen
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const reportDir = path.join(root, "evals", "reports");
 const canonicalTemporaryRoot = fs.realpathSync.native(path.resolve(os.tmpdir()));
-const deterministicSelfTestMode = process.argv.slice(2).some((argument) => (
-  argument === "--self-test" || argument === "--self-test-buffered"
-));
-const selfTestPlatformContainment = deterministicSelfTestMode ? classifyProcessContainment() : null;
-const deterministicSelfTestContainmentFactory = deterministicSelfTestMode
-  && selfTestPlatformContainment.support_state !== "verified"
-  ? createInjectedTestContainmentFactory("injected-live-eval-test-containment-v1")
-  : null;
 const TASK_ID = "task-root";
 const RUNNER_AGENT = "live-eval-runner";
 const RUNNER_CHECK_EXECUTION_METADATA = new WeakMap();
@@ -275,7 +266,7 @@ function stageHiddenFiles(scenario, repo, sourceRoot = root) {
   }
 }
 
-async function runCommand(command, cwd, timeout, checkId, outputMarker = null) {
+async function runCommand(command, cwd, timeout, checkId, outputMarker = null, processContainmentFactory = null) {
   const result = await runManagedCommand({
     file: process.platform === "win32" ? (process.env.ComSpec || "cmd.exe") : "/bin/sh",
     args: process.platform === "win32" ? ["/d", "/s", "/c", command] : ["-c", command],
@@ -283,9 +274,9 @@ async function runCommand(command, cwd, timeout, checkId, outputMarker = null) {
     timeout,
     maxOutputChars: 1024 * 1024,
     outputMarker,
-    ...(deterministicSelfTestContainmentFactory === null
+    ...(processContainmentFactory === null
       ? {}
-      : { processContainmentFactory: deterministicSelfTestContainmentFactory }),
+      : { processContainmentFactory }),
   });
   const status = result.timed_out ? "timed_out" : result.status === 0 && !result.error ? "passed" : "failed";
   const checkResult = {
@@ -314,7 +305,7 @@ function unavailableChecks(scenario, phase, commands) {
   }));
 }
 
-async function executeChecks(scenario, phase, commands, repo) {
+async function executeChecks(scenario, phase, commands, repo, processContainmentFactory = null) {
   const results = [];
   for (let index = 0; index < commands.length; index += 1) {
     const outputMarker = phase === "preimplementation" && index === 0
@@ -326,6 +317,7 @@ async function executeChecks(scenario, phase, commands, repo) {
       scenario.timeout,
       stableCheckId(scenario.id, phase, index),
       outputMarker,
+      processContainmentFactory,
     ));
   }
   return results;
@@ -1181,14 +1173,15 @@ async function runScenarioProfile({
   modelName = null,
   sourceRoot = root,
   prepareFixtureFn = prepareFixture,
-  executeChecksFn = executeChecks,
-  executePreimplementationOracleFn = executeChecks,
+  processContainmentFactory = null,
+  executeChecksFn = undefined,
+  executePreimplementationOracleFn = undefined,
   stageHiddenFilesFn = stageHiddenFiles,
   runAdapterModuleFn = (input) => runAdapterModule({
     ...input,
-    ...(deterministicSelfTestContainmentFactory === null
+    ...(processContainmentFactory === null
       ? {}
-      : { processContainmentFactory: deterministicSelfTestContainmentFactory }),
+      : { processContainmentFactory }),
   }),
   cleanupFixtureFn = (temporaryRoot) => fs.rmSync(temporaryRoot, { recursive: true, force: true }),
   qualitySidecarOverride = undefined,
@@ -1198,6 +1191,17 @@ async function runScenarioProfile({
   challengeQualityPlanFn = undefined,
   reviewQualityReconciliationFn = undefined,
 }) {
+  const defaultExecuteChecks = (checkScenario, phase, commands, repo) => executeChecks(
+    checkScenario,
+    phase,
+    commands,
+    repo,
+    processContainmentFactory,
+  );
+  const executeScenarioChecks = executeChecksFn === undefined ? defaultExecuteChecks : executeChecksFn;
+  const executePreimplementationOracle = executePreimplementationOracleFn === undefined
+    ? defaultExecuteChecks
+    : executePreimplementationOracleFn;
   const risk = riskForScenario(scenario);
   const qualitySidecar = qualitySidecarOverride === undefined
     ? loadQualityLiveScenarioSidecar({ root: sourceRoot, scenario })
@@ -1274,7 +1278,7 @@ async function runScenarioProfile({
       verifier_codes: ["FIXTURE_ISOLATED"],
     });
 
-    setupResults = await executeChecksFn(scenario, "setup", scenario.setup_commands, fixture.repo);
+    setupResults = await executeScenarioChecks(scenario, "setup", scenario.setup_commands, fixture.repo);
     const setupStatus = phaseStatus(setupResults);
     emitRunnerPhase({
       event_type: "setup_verification",
@@ -1292,7 +1296,7 @@ async function runScenarioProfile({
         let actualFixtureFingerprint = null;
         try {
           actualFixtureFingerprint = qualityLiveFixtureFingerprint(fixture.repo);
-          oracleResults = await executePreimplementationOracleFn(
+          oracleResults = await executePreimplementationOracle(
             scenario,
             "preimplementation",
             [qualitySidecar.visible_oracle.command],
@@ -1522,7 +1526,7 @@ async function runScenarioProfile({
         if (error instanceof ContractError) incompleteEvidence.push(error.code);
       }
 
-      visibleResults = await executeChecksFn(scenario, "visible", scenario.visible_checks, fixture.repo);
+      visibleResults = await executeScenarioChecks(scenario, "visible", scenario.visible_checks, fixture.repo);
       const visibleStatus = phaseStatus(visibleResults);
       emitRunnerPhase({
         event_type: "visible_check",
@@ -1575,7 +1579,7 @@ async function runScenarioProfile({
       }
       if (hiddenStaged) {
         try {
-          hiddenShellResults = await executeChecksFn(scenario, "hidden", scenario.hidden_checks, fixture.repo);
+          hiddenShellResults = await executeScenarioChecks(scenario, "hidden", scenario.hidden_checks, fixture.repo);
           const hiddenStatus = phaseStatus(hiddenShellResults);
           emitRunnerPhase({
             event_type: "hidden_check",
@@ -2057,7 +2061,20 @@ async function runEvaluation({
   return report;
 }
 
+function createLiveEvalSelfTestRunOptions() {
+  return Object.freeze({
+    processContainmentFactory: createInjectedTestContainmentFactory(
+      "injected-live-eval-test-containment-v1",
+    ),
+  });
+}
+
 async function runBufferedPublicationSelfTest(corpus) {
+  const selfTestRunOptions = createLiveEvalSelfTestRunOptions();
+  const runSelfTestScenarioProfile = (options) => runScenarioProfile({
+    ...options,
+    ...selfTestRunOptions,
+  });
   const temporaryWorkspace = createCanonicalTemporaryDirectory("opencode-live-buffered-self-test-");
   try {
     const scenario = corpus.scenarios.find((entry) => entry.id === "runner-self-test");
@@ -2078,7 +2095,7 @@ async function runBufferedPublicationSelfTest(corpus) {
       profile_fingerprint: profileFingerprint,
     };
     let observedPreCommit = false;
-    const result = await runScenarioProfile({
+    const result = await runSelfTestScenarioProfile({
       adapterUrl: "buffered-self-test://adapter",
       scenario,
       repetition: 1,
@@ -2114,7 +2131,7 @@ async function runBufferedPublicationSelfTest(corpus) {
     };
     let unverifiedRejected = false;
     try {
-      await runScenarioProfile({
+      await runSelfTestScenarioProfile({
         adapterUrl: "buffered-self-test://unverified",
         scenario,
         repetition: 1,
@@ -2151,11 +2168,14 @@ async function runBufferedPublicationSelfTest(corpus) {
         traceStore: abortTraceStore,
         evaluationRunId: "eval-buffered-self-test-report",
         evidenceKind: "infrastructure_self_test",
-        scenarioRunOptions: { prepareFixtureFn: prepareUnverifiedFixture },
+        scenarioRunOptions: {
+          ...selfTestRunOptions,
+          prepareFixtureFn: prepareUnverifiedFixture,
+        },
         runScenarioProfileFn: async (options) => {
           profileCalls += 1;
           if (profileCalls > 1) throw new ContractError("LIVE_SELF_TEST_BUFFERED_ORDER", "evaluation continued after unverified teardown");
-          return runScenarioProfile({
+          return runSelfTestScenarioProfile({
             ...options,
             runAdapterModuleFn: async () => { throw new AdapterExecutionError("adapter_teardown_unverified"); },
           });
@@ -2174,6 +2194,11 @@ async function runBufferedPublicationSelfTest(corpus) {
 }
 
 async function runSelfTest(corpus) {
+  const selfTestRunOptions = createLiveEvalSelfTestRunOptions();
+  const runSelfTestScenarioProfile = (options) => runScenarioProfile({
+    ...options,
+    ...selfTestRunOptions,
+  });
   const temporaryWorkspace = createCanonicalTemporaryDirectory("opencode-live-self-test-");
   try {
     if (adapterFailureReason({}) !== "adapter_success_unavailable" || adapterFailureReason({ passed: true }) !== null) {
@@ -2379,6 +2404,7 @@ export async function runScenario(context) {
       evidenceKind: "infrastructure_self_test",
       modelName: "deterministic-self-test",
       createdAt: "2026-07-10T10:00:00.000Z",
+      scenarioRunOptions: selfTestRunOptions,
     });
     if (report.results.length !== 2 || report.results.some((result) => result.status !== "passed")) {
       throw new ContractError("LIVE_SELF_TEST_RESULTS", "infrastructure profiles did not both pass");
@@ -2404,7 +2430,7 @@ export async function runScenario(context) {
     }
 
     const reviewScenario = corpus.scenarios.find((scenario) => scenario.id === "review-read-only-trap");
-    const reviewResult = await runScenarioProfile({
+    const reviewResult = await runSelfTestScenarioProfile({
       adapterUrl: pathToFileURL(adapterPath).href,
       scenario: reviewScenario,
       repetition: 1,
@@ -2419,7 +2445,7 @@ export async function runScenario(context) {
       throw new ContractError("LIVE_SELF_TEST_REVIEW_FINDING", "structured review finding did not persist through the frozen trace contract");
     }
 
-    const stealthWriteResult = await runScenarioProfile({
+    const stealthWriteResult = await runSelfTestScenarioProfile({
       adapterUrl: "self-test://stealth-write",
       scenario: reviewScenario,
       repetition: 1,
@@ -2451,7 +2477,7 @@ export async function runScenario(context) {
       throw new ContractError("LIVE_SELF_TEST_WORKSPACE_POLICY", "runner-owned workspace policy trusted a stealth adapter write");
     }
 
-    const stealthDirectoryResult = await runScenarioProfile({
+    const stealthDirectoryResult = await runSelfTestScenarioProfile({
       adapterUrl: "self-test://stealth-directory",
       scenario: reviewScenario,
       repetition: 1,
@@ -2505,7 +2531,7 @@ export async function runScenario(context) {
       });
       return { passed: true, profile_fingerprint: selfTestProfiles[0].profile_fingerprint };
     };
-    const unexpectedBlockedResult = await runScenarioProfile({
+    const unexpectedBlockedResult = await runSelfTestScenarioProfile({
       adapterUrl: "self-test://unexpected-blocked",
       scenario: reviewScenario,
       repetition: 1,
@@ -2524,7 +2550,7 @@ export async function runScenario(context) {
       op: "termination_reason_equals",
       value: "blocked_permission",
     });
-    const expectedBlockedResult = await runScenarioProfile({
+    const expectedBlockedResult = await runSelfTestScenarioProfile({
       adapterUrl: "self-test://expected-blocked",
       scenario: expectedBlockedScenario,
       repetition: 1,
@@ -2538,7 +2564,7 @@ export async function runScenario(context) {
       throw new ContractError("LIVE_SELF_TEST_TERMINATION", "exact runner-owned non-success termination assertion did not pass");
     }
 
-    const noOpReview = await runScenarioProfile({
+    const noOpReview = await runSelfTestScenarioProfile({
       adapterUrl: pathToFileURL(adapterPath).href,
       scenario: reviewScenario,
       repetition: 1,
@@ -2558,7 +2584,7 @@ export async function runScenario(context) {
     const teardownFixtureRoot = path.join(temporaryWorkspace, "teardown-unverified-fixture");
     let teardownRejected = false;
     try {
-      await runScenarioProfile({
+      await runSelfTestScenarioProfile({
         adapterUrl: pathToFileURL(adapterPath).href,
         scenario: infrastructureScenario,
         repetition: 1,
@@ -2588,7 +2614,7 @@ export async function runScenario(context) {
       ["failure", async () => ({ passed: false }), "HIDDEN_SKIPPED_ADAPTER_FAILURE"],
     ]) {
       let hiddenStageCalls = 0;
-      const failedAdapterResult = await runScenarioProfile({
+      const failedAdapterResult = await runSelfTestScenarioProfile({
         adapterUrl: pathToFileURL(adapterPath).href,
         scenario: infrastructureScenario,
         repetition: 1,
@@ -2607,7 +2633,7 @@ export async function runScenario(context) {
         throw new ContractError("LIVE_SELF_TEST_HIDDEN_BOUNDARY", `${label} adapter execution did not block hidden staging`);
       }
     }
-    const unsettledJobResult = await runScenarioProfile({
+    const unsettledJobResult = await runSelfTestScenarioProfile({
       adapterUrl: pathToFileURL(adapterPath).href,
       scenario: infrastructureScenario,
       repetition: 1,
@@ -2627,7 +2653,7 @@ export async function runScenario(context) {
       throw new ContractError("LIVE_SELF_TEST_UNSETTLED_JOB", "runner did not terminally cancel unsettled adapter jobs");
     }
 
-    const cleanupFailure = await runScenarioProfile({
+    const cleanupFailure = await runSelfTestScenarioProfile({
       adapterUrl: pathToFileURL(adapterPath).href,
       scenario: infrastructureScenario,
       repetition: 1,
@@ -2655,6 +2681,7 @@ export async function runScenario(context) {
       modelName: arbitraryBait,
       createdAt: "2026-07-10T10:00:30.000Z",
       scenarioRunOptions: {
+        ...selfTestRunOptions,
         runAdapterModuleFn: async () => ({
           passed: true,
           profile_fingerprint: selfTestProfiles[0].profile_fingerprint,
@@ -2680,7 +2707,7 @@ export async function runScenario(context) {
       throw new ContractError("LIVE_SELF_TEST_REPORT_PRIVACY", "arbitrary deny-value reached immutable report history");
     }
 
-    const earlyFailure = await runScenarioProfile({
+    const earlyFailure = await runSelfTestScenarioProfile({
       adapterUrl: pathToFileURL(adapterPath).href,
       scenario: infrastructureScenario,
       repetition: 1,
@@ -2704,7 +2731,7 @@ export async function runScenario(context) {
       || ["setup_verification", "adapter_invocation", "adapter_result", "visible_check", "hidden_staging", "hidden_check"].some((phase) => earlyStatuses[phase] !== "blocked")) {
       throw new ContractError("LIVE_SELF_TEST_PHASE_LEDGER", "early fixture failure phase placeholders were not honest failed/blocked states");
     }
-    const midRunFailure = await runScenarioProfile({
+    const midRunFailure = await runSelfTestScenarioProfile({
       adapterUrl: pathToFileURL(adapterPath).href,
       scenario: infrastructureScenario,
       repetition: 1,
@@ -2714,7 +2741,13 @@ export async function runScenario(context) {
       modelName: "deterministic-self-test",
       executeChecksFn: (scenario, phase, commands, repo) => {
         if (phase === "visible") throw new ContractError("LIVE_SELF_TEST_VISIBLE_FAILURE", "injected visible-check failure");
-        return executeChecks(scenario, phase, commands, repo);
+        return executeChecks(
+          scenario,
+          phase,
+          commands,
+          repo,
+          selfTestRunOptions.processContainmentFactory,
+        );
       },
     });
     const midRunTrace = traceStore.inspectRun(midRunFailure.operational_run_id);
