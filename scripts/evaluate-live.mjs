@@ -1150,6 +1150,23 @@ export async function observeRunnerStandardLiteContext({
   return Object.freeze({ receipt_ids: Object.freeze(receiptIds) });
 }
 
+function recordRunnerOwnedContextTraceReceipt(instrumentation, contextPayload, receipt) {
+  if (receipt?.status !== "success") return;
+  const relativePaths = contextPayload.tool_id === "context_read"
+    ? [contextPayload.args?.path]
+    : contextPayload.tool_id === "context_batch_read"
+      ? (contextPayload.args?.ranges ?? []).map((entry) => entry?.path)
+      : [];
+  const boundedPaths = [...new Set(relativePaths.filter((entry) => typeof entry === "string" && entry.length > 0))].sort();
+  if (boundedPaths.length === 0) return;
+  instrumentation.recordContextReceipt({
+    source_kind: boundedPaths.length === 1 ? "file" : "files",
+    summary: "Runner-owned quality context content read.",
+    relative_paths: boundedPaths,
+    snapshot_fingerprint: receipt.fingerprint,
+  });
+}
+
 export async function observeRunnerDefaultQualityContext(input) {
   return input.strategy_binding?.strategy_id === "standard-lite-local-v1"
     ? observeRunnerStandardLiteContext(input)
@@ -1384,7 +1401,11 @@ async function runScenarioProfile({
               coordinator: qualityCoordinator,
               fixture,
               scenario,
-              recordObservedContextToolCall: (contextPayload) => recordQualityLiveObservedContextToolCall(qualityCoordinator, contextPayload),
+              recordObservedContextToolCall: (contextPayload) => {
+                const receipt = recordQualityLiveObservedContextToolCall(qualityCoordinator, contextPayload);
+                recordRunnerOwnedContextTraceReceipt(instrumentation, contextPayload, receipt);
+                return receipt;
+              },
             });
             const afterObservation = qualityLiveContextObservationRequest(qualityCoordinator);
             const newReceiptIds = afterObservation.existing_receipt_ids.slice(observationRequest.existing_receipt_ids.length);

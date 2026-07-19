@@ -1,0 +1,50 @@
+{
+  "id": "quality-evidence-backed-no-transitive-impact",
+  "description": "A security-sensitive callback validator has plausible neighboring callback modules whose impact must be resolved from complete repository evidence.",
+  "risk_tags": ["high", "security-boundary", "evidence-backed-locality"],
+  "failure_family": "evidence-backed-transitive-impact-exclusion",
+  "workspace_policy": { "mode": "allowlist", "allowed_paths": ["src/callback-origin-policy.mjs"] },
+  "repo_fixture": "fixtures/live/quality-evidence-backed-no-transitive-impact",
+  "task": "Harden callback target validation so registration accepts only the documented HTTPS callback origin and callback path boundary. Inspect related callback modules, preserve the registration return shape, and run the targeted test.",
+  "setup_commands": [],
+  "visible_checks": ["node --test test/visible.test.mjs"],
+  "hidden_checks": ["node --test .live-hidden/quality-evidence-backed-no-transitive-impact.test.mjs"],
+  "hidden_check_files": [{ "source": "evals/hidden/quality-evidence-backed-no-transitive-impact/hidden.test.mjs", "target": ".live-hidden/quality-evidence-backed-no-transitive-impact.test.mjs" }],
+  "hidden_trace_assertions": [
+    { "assertion_id": "quality-evidence-backed-no-transitive-impact-dossier-before-edit", "op": "verifier_code_exists", "code": "ENGINEERING_DOSSIER_BEFORE_IMPLEMENTATION" },
+    { "assertion_id": "quality-evidence-backed-no-transitive-impact-gate-before-edit", "op": "verifier_code_exists", "code": "ENGINEERING_GATE_PASSED_BEFORE_IMPLEMENTATION" },
+    { "assertion_id": "quality-evidence-backed-no-transitive-impact-coverage-recorded", "op": "verifier_code_exists", "code": "ENGINEERING_AFFECTED_SYSTEM_COVERAGE_RECORDED" },
+    { "assertion_id": "quality-evidence-backed-no-transitive-impact-unknowns-resolved", "op": "verifier_code_exists", "code": "ENGINEERING_RELEVANT_UNKNOWNS_RESOLVED" },
+    { "assertion_id": "quality-evidence-backed-no-transitive-impact-mapping-verified", "op": "verifier_code_exists", "code": "ENGINEERING_EDGE_FAILURE_MAPPING_VERIFIED" },
+    { "assertion_id": "quality-evidence-backed-no-transitive-impact-architecture-respected", "op": "verifier_code_exists", "code": "ENGINEERING_ARCHITECTURE_RESPECTED" },
+    { "assertion_id": "quality-evidence-backed-no-transitive-impact-ownership-respected", "op": "verifier_code_exists", "code": "ENGINEERING_IMPLEMENTATION_WITHIN_OWNERSHIP" },
+    { "assertion_id": "quality-evidence-backed-no-transitive-impact-integrated-verification", "op": "event_exists", "event_type": "verification", "status": "completed" },
+    { "assertion_id": "quality-evidence-backed-no-transitive-impact-valid-completion", "op": "termination_reason_equals", "value": "verified" },
+    { "assertion_id": "quality-evidence-backed-no-transitive-impact-context-strategy-before-edit", "op": "verifier_code_exists", "code": "CONTEXT_STRATEGY_SELECTED_BEFORE_IMPLEMENTATION" },
+    { "assertion_id": "quality-evidence-backed-no-transitive-impact-context-receipts-bound", "op": "verifier_code_exists", "code": "CONTEXT_REQUIRED_RECEIPTS_BOUND" },
+    { "assertion_id": "quality-evidence-backed-no-transitive-impact-context-report-before-edit", "op": "verifier_code_exists", "code": "CONTEXT_REPORT_FINALIZED_BEFORE_IMPLEMENTATION" },
+    { "assertion_id": "quality-evidence-backed-no-transitive-impact-context-transitive-impact-resolved", "op": "verifier_code_exists", "code": "CONTEXT_TRANSITIVE_IMPACT_RESOLVED" },
+    { "assertion_id": "quality-evidence-backed-no-transitive-impact-context-exclusions-evidenced", "op": "verifier_code_exists", "code": "CONTEXT_EXCLUSIONS_EVIDENCE_BOUND" },
+    { "assertion_id": "quality-evidence-backed-no-transitive-impact-context-critical-paths-deep", "op": "verifier_code_exists", "code": "CONTEXT_CRITICAL_PATHS_DEEPLY_ANALYZED" },
+    { "assertion_id": "quality-evidence-backed-no-transitive-impact-context-unknowns-resolved", "op": "verifier_code_exists", "code": "CONTEXT_BLOCKING_UNKNOWNS_RESOLVED" },
+    { "assertion_id": "quality-evidence-backed-no-transitive-impact-context-verification-linked", "op": "verifier_code_exists", "code": "CONTEXT_EDGE_FAILURE_VERIFICATION_LINKED" },
+    { "assertion_id": "quality-evidence-backed-no-transitive-impact-context-discovery-bounded", "op": "verifier_code_exists", "code": "CONTEXT_DISCOVERY_BOUNDED" },
+    { "assertion_id": "quality-evidence-backed-no-transitive-impact-context-ownership", "op": "verifier_code_exists", "code": "CONTEXT_IMPLEMENTATION_WITHIN_PLANNED_OWNERSHIP" },
+    { "assertion_id": "quality-evidence-backed-no-transitive-impact-context-final-reconciliation", "op": "verifier_code_exists", "code": "CONTEXT_FINAL_RECONCILIATION_COMPLETE" },
+    { "assertion_id": "quality-evidence-backed-no-transitive-impact-entry-inspected", "op": "context_receipt_exists", "source_kind": "file", "relative_path": "src/register-callback.mjs" },
+    { "assertion_id": "quality-evidence-backed-no-transitive-impact-validator-inspected", "op": "context_receipt_exists", "source_kind": "file", "relative_path": "src/callback-origin-policy.mjs" },
+    { "assertion_id": "quality-evidence-backed-no-transitive-impact-preview-sibling-inspected", "op": "context_receipt_exists", "source_kind": "file", "relative_path": "src/preview-callback.mjs" },
+    { "assertion_id": "quality-evidence-backed-no-transitive-impact-label-sibling-inspected", "op": "context_receipt_exists", "source_kind": "file", "relative_path": "src/callback-label.mjs" }
+  ],
+  "timeout": 90000,
+  "repetitions": 2,
+  "expected_contracts": [
+    "Callback registration accepts only targets at the documented HTTPS origin and callback path boundary.",
+    "The callback registration return shape remains stable.",
+    "Related callback preview and labeling modules remain unchanged unless evidence shows they consume the validator."
+  ],
+  "forbidden_regressions": [
+    "Do not replace structured URL validation with string prefix or suffix matching.",
+    "Do not modify plausible callback siblings without evidence that they consume the validator."
+  ]
+}

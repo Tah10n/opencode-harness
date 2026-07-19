@@ -18,7 +18,7 @@ outside the default model-free gate.
 
 | Layer | Command | What it proves | What it does not prove |
 | --- | --- | --- | --- |
-| Deterministic repository verification | `npm run verify` | Static structure, feedback foundation, trace store, immutable report history, adapter process-tree boundary, contract/config evaluation, drift, runtime parser fixtures, 28+1 corpus validation, infrastructure tracing self-test, and acceptance-engine self-tests. It requires no model, network, or installed live adapter. | Actual model behaviour or the installed profile. |
+| Deterministic repository verification | `npm run verify` | Static structure, feedback foundation, trace store, immutable report history, adapter process-tree boundary, contract/config evaluation, drift, runtime parser fixtures, 29+1 corpus validation, infrastructure tracing self-test, and acceptance-engine self-tests. It requires no model, network, or installed live adapter. | Actual model behaviour or the installed profile. |
 | Installed permission surface | `npm run verify:runtime` | Current `opencode debug` output and effective tool/delegation permissions. | End-to-end task quality. |
 | Actual behavioural evaluation | `npm run eval:live` | Real adapter/model/tool behaviour on isolated baseline/candidate copies with hidden evidence. | Deterministic CI assurance or permission compatibility by itself. |
 | Candidate decision | `npm run assess:candidate` | Deterministic, policy-backed `accepted`, `rejected`, or `inconclusive` decision over trusted paired evidence. | Automatic harness mutation or deployment. |
@@ -58,7 +58,7 @@ Selected component commands are:
 - `npm run verify:adoption-bundle` — isolated source-bundle copy, public export
   import, manifest validation, and buffered self-test without a live provider;
 - `npm run verify:runtime:fixture` — deterministic parser fixtures only;
-- `npm run verify:live-manifests` — exact 28+1 corpus, suites, selection, and
+- `npm run verify:live-manifests` — exact 29+1 corpus, suites, selection, and
   declarative trace assertions;
 - `npm run verify:live-eval` — manifest validation plus infrastructure runner
   self-tests without a model, including a no-process in-memory/batch-commit test
@@ -212,12 +212,12 @@ termination schemas, structured subagent handoff, and static adversarial
 fixtures.
 
 The live corpus under `fixtures/live/`, `evals/scenarios/`, and
-`evals/hidden/` has 28 behavioural scenarios plus 1 infrastructure self-test.
-This is the checked 28+1 corpus.
+`evals/hidden/` has 29 behavioural scenarios plus 1 infrastructure self-test.
+This is the checked 29+1 corpus.
 Twelve scenarios cover orchestration and safety: small local work, broad audit,
 visible-plus-hidden bugs, related call paths, read-only review, prompt-injection
 data, fake secret bait, stale context, conflicting write scope, weak handoff,
-project-local knowledge, and approval-gated destructive work. Sixteen additional
+project-local knowledge, and approval-gated destructive work. Seventeen additional
 engineering-quality scenarios cover small controls, public API compatibility,
 persistence and rollback, migration, resource lifecycle, concurrency and
 cancellation, retry/idempotency, parser boundaries, stale cache/version skew,
@@ -225,7 +225,8 @@ partial dependency failure, architecture boundaries, and cross-module
 invariants. The added wide/deep mechanisms are
 `quality-hidden-reexport-consumer` and `quality-owning-abstraction` in the
 `development` suite, and `quality-alternate-config-path` and
-`quality-sibling-defect-variant` in `held_out`. See
+`quality-sibling-defect-variant` and
+`quality-evidence-backed-no-transitive-impact` in `held_out`. See
 [live-evaluation.md](live-evaluation.md).
 
 ## Operational Versus Durable Memory
@@ -385,9 +386,13 @@ npm run assess:quality-bundles -- `
   --bundle <candidate-run-directory> --catalog <candidate-check-catalog.json>
 ```
 
-Policy v3 keeps the v2 standard-lite guarantees and additionally requires the
+Policy 3.1 keeps the v2 standard-lite guarantees and additionally requires the
 receipt-backed context hard gates and full wide/deep coverage for selected
-high/critical scenarios. A non-accepted decision exits with status 2; malformed
+high/critical scenarios. Its `transitive_impact_resolved` gate accepts either a
+machine-evidenced transitive path or an evidence-backed exclusion; unresolved or
+contradicted impact still fails closed. Current context outcomes use schema 4.
+Policy 3.0 and schema-3 outcomes remain an explicit legacy contract and are not
+silently reinterpreted. A non-accepted decision exits with status 2; malformed
 or untrusted inputs exit with status 1.
 
 The production `eval:live` entrypoint keeps the generic live-evaluation path.

@@ -43,6 +43,7 @@ function refingerprint(value) {
 function fullFlow({
   riskClass = "high",
   taskType = "bug_fix",
+  transitiveImpact = "represented",
   requestedTaskProfile = null,
   receiptObservedPaths = null,
   receiptToolId = "context_batch_read",
@@ -50,7 +51,7 @@ function fullFlow({
   receiptCompletedAt = undefined,
   mutateContent = null,
 } = {}) {
-  const dossier = contextTestDossier({ riskClass, taskType });
+  const dossier = contextTestDossier({ riskClass, taskType, transitiveImpact });
   const strategy = selectMinimumContextStrategy({
     risk_class: riskClass,
     task_type: taskType,
@@ -163,6 +164,23 @@ const sufficient = decide(valid);
 validateContextSufficiencyDecision(sufficient);
 assert.equal(sufficient.status, "sufficient");
 assert.deepEqual(sufficient.reasons, []);
+
+for (const forbiddenKind of ["reasoned_exclusion", "unresolved_hypothesis", "inferred"]) {
+  const forbiddenTransitiveClaim = fullFlow({
+    mutateContent: (content) => {
+      const wide = content.wide_analysis.find((entry) => entry.category === "transitive_consumers_side_effects");
+      for (const claim of content.claims.filter((entry) => wide.claim_ids.includes(entry.id))) {
+        claim.kind = forbiddenKind;
+      }
+    },
+  });
+  hasCode(decide(forbiddenTransitiveClaim), "CONTEXT_TRANSITIVE_PATH_MISSING");
+}
+
+const validEvidenceBackedExclusion = fullFlow({ transitiveImpact: "excluded" });
+const exclusionDecision = decide(validEvidenceBackedExclusion);
+assert.equal(exclusionDecision.status, "sufficient");
+assert.deepEqual(exclusionDecision.reasons, []);
 
 const oneReadAllSubjects = fullFlow({ receiptObservedPaths: ["lib/context-example.mjs"] });
 const oneReadDecision = decide(oneReadAllSubjects);

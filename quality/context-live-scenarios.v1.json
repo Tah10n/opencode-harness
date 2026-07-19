@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalog_version": "1.0.0",
+  "catalog_version": "1.1.0",
   "code_profiles": {
     "standard-lite-v1": [
       "CONTEXT_STRATEGY_SELECTED_BEFORE_IMPLEMENTATION",
@@ -24,6 +24,19 @@
       "CONTEXT_DISCOVERY_BOUNDED",
       "CONTEXT_IMPLEMENTATION_WITHIN_PLANNED_OWNERSHIP",
       "CONTEXT_FINAL_RECONCILIATION_COMPLETE"
+    ],
+    "wide-deep-resolved-v1": [
+      "CONTEXT_STRATEGY_SELECTED_BEFORE_IMPLEMENTATION",
+      "CONTEXT_REQUIRED_RECEIPTS_BOUND",
+      "CONTEXT_REPORT_FINALIZED_BEFORE_IMPLEMENTATION",
+      "CONTEXT_TRANSITIVE_IMPACT_RESOLVED",
+      "CONTEXT_EXCLUSIONS_EVIDENCE_BOUND",
+      "CONTEXT_CRITICAL_PATHS_DEEPLY_ANALYZED",
+      "CONTEXT_BLOCKING_UNKNOWNS_RESOLVED",
+      "CONTEXT_EDGE_FAILURE_VERIFICATION_LINKED",
+      "CONTEXT_DISCOVERY_BOUNDED",
+      "CONTEXT_IMPLEMENTATION_WITHIN_PLANNED_OWNERSHIP",
+      "CONTEXT_FINAL_RECONCILIATION_COMPLETE"
     ]
   },
   "scenarios": [
@@ -31,6 +44,7 @@
     { "scenario_id": "quality-architecture-boundary", "scenario_kind": "existing", "risk_class": "high", "strategy_id": "high-wide-deep-v1", "code_profile": "wide-deep-v1", "requires_full_context_report": true },
     { "scenario_id": "quality-concurrency-cancellation", "scenario_kind": "existing", "risk_class": "high", "strategy_id": "high-wide-deep-v1", "code_profile": "wide-deep-v1", "requires_full_context_report": true },
     { "scenario_id": "quality-cross-module-invariant", "scenario_kind": "existing", "risk_class": "high", "strategy_id": "high-wide-deep-v1", "code_profile": "wide-deep-v1", "requires_full_context_report": true },
+    { "scenario_id": "quality-evidence-backed-no-transitive-impact", "scenario_kind": "new", "risk_class": "high", "strategy_id": "high-wide-deep-v1", "code_profile": "wide-deep-resolved-v1", "requires_full_context_report": true },
     { "scenario_id": "quality-hidden-reexport-consumer", "scenario_kind": "new", "risk_class": "high", "strategy_id": "high-wide-deep-v1", "code_profile": "wide-deep-v1", "requires_full_context_report": true },
     { "scenario_id": "quality-migration-compatibility", "scenario_kind": "existing", "risk_class": "critical", "strategy_id": "critical-wide-deep-v1", "code_profile": "wide-deep-v1", "requires_full_context_report": true },
     { "scenario_id": "quality-owning-abstraction", "scenario_kind": "new", "risk_class": "high", "strategy_id": "high-wide-deep-v1", "code_profile": "wide-deep-v1", "requires_full_context_report": true },

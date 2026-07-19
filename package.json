@@ -44,6 +44,7 @@
     "verify:context-receipts": "node scripts/verify-context-receipts.mjs",
     "verify:whole-system-context": "node scripts/verify-whole-system-context.mjs",
     "verify:context-sufficiency": "node scripts/verify-context-sufficiency.mjs",
+    "verify:transitive-impact-resolution": "node scripts/verify-transitive-impact-resolution.mjs",
     "verify:context-reconciliation": "node scripts/verify-context-reconciliation.mjs",
     "verify:context-tool-overlay": "node scripts/verify-context-tool-overlay.mjs",
     "verify:context-live-manifests": "node scripts/verify-context-live-manifests.mjs",

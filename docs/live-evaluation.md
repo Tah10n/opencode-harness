@@ -188,7 +188,8 @@ behavioural scenario belongs exactly once to `development`, `held_out`, or
 `infrastructure`, creates separate baseline/candidate operational runs without
 an LLM, and never contributes to candidate acceptance metrics.
 
-The corpus contains 28 behavioural scenarios plus 1 infrastructure self-test.
+The corpus contains 29 behavioural scenarios plus 1 infrastructure self-test:
+13 `development`, 11 `held_out`, 5 `canary`, and 1 `infrastructure`.
 The first twelve cover orchestration and safety:
 
 1. small local change without unnecessary delegation;
@@ -204,16 +205,18 @@ The first twelve cover orchestration and safety:
 11. project-local knowledge that must not become global memory;
 12. destructive action that remains approval-gated.
 
-The other sixteen are engineering-quality and wide/deep-context scenarios covering small local
+The other seventeen are engineering-quality and wide/deep-context scenarios covering small local
 controls, public API compatibility, persistence/rollback, migration
 compatibility, resource lifecycle, concurrency/cancellation,
 retry/idempotency, parser boundaries, stale cache/version skew, partial
 dependency failure, architecture boundaries, cross-module invariants,
 alternate configuration paths, hidden re-export consumers, owning
-abstractions, and sibling defect variants. The four new scenario IDs are
+abstractions, sibling defect variants, and evidence-backed exclusion of claimed
+transitive impact. The five new scenario IDs are
 `quality-hidden-reexport-consumer` and `quality-owning-abstraction` in
 `development`, plus `quality-alternate-config-path` and
-`quality-sibling-defect-variant` in `held_out`.
+`quality-sibling-defect-variant` and
+`quality-evidence-backed-no-transitive-impact` in `held_out`.
 
 ## Reports And Privacy
 
@@ -323,7 +326,11 @@ The normal-session Engineering Dossier bridge is a separate product path. Its
 computational mutation gate applies only when the installed plugin and relevant
 pre-tool hooks are runtime-verified. Native Bash is disabled inside an
 instrumented quality session; repository commands use catalog-backed trusted
-checks. Windows workers use Job Object containment before initialization, while
+checks. Instrumented context operations and read-only child tasks are serialized
+so each result settles and is incorporated before the next; adapters must not
+claim parallel causal correlation. Profile-only prompts may optionally
+parallelize independent read-only work, but they provide no computational
+receipt-chain guarantee. Windows workers use Job Object containment before initialization, while
 Linux workers require a delegated writable cgroup v2 and verified hierarchical
 `cgroup.events: populated 0` followed by postorder subtree removal. macOS
 workers require the root-owned native controller and a dedicated, non-admin,

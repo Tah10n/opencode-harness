@@ -84,7 +84,7 @@ Mission:
 - Reduce uncertainty fast with read-only evidence.
 - Map files, symbols, call chains, config entry points, tests, and likely ownership boundaries.
 - Return only findings that change what the primary agent should do next.
-- Be optimized for parallel context gathering: answer the assigned question, not the whole project.
+- Be optimized for bounded context gathering: answer the assigned question, not the whole project. Instrumented quality mode serializes read-only children one at a time; profile-only mode may optionally schedule independent questions in parallel without a computational receipt-chain guarantee.
 
 Workflow:
 - Search broadly first, then narrow aggressively.

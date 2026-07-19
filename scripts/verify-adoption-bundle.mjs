@@ -74,6 +74,7 @@ const requiredQualityFiles = Object.freeze([
   "lib/quality/normal-session-workspace.mjs",
   "lib/quality/project-check-catalog.mjs",
   "lib/quality/post-architecture-evidence.mjs",
+  "lib/quality/preimplementation-sequence.mjs",
   "lib/quality/quality-plugin.mjs",
   "lib/quality/runtime-hook-verification.mjs",
   "lib/quality/session-classification.mjs",
@@ -98,6 +99,7 @@ const requiredQualityFiles = Object.freeze([
   "quality/live-scenarios/quality-architecture-boundary.v1.json",
   "quality/live-scenarios/quality-concurrency-cancellation.v1.json",
   "quality/live-scenarios/quality-cross-module-invariant.v1.json",
+  "quality/live-scenarios/quality-evidence-backed-no-transitive-impact.v1.json",
   "quality/live-scenarios/quality-hidden-reexport-consumer.v1.json",
   "quality/live-scenarios/quality-migration-compatibility.v1.json",
   "quality/live-scenarios/quality-owning-abstraction.v1.json",
@@ -151,6 +153,8 @@ const requiredQualityFiles = Object.freeze([
   "scripts/verify-context-reconciliation.mjs",
   "scripts/verify-context-strategies.mjs",
   "scripts/verify-context-sufficiency.mjs",
+  "lib/quality/transitive-impact-resolution.mjs",
+  "scripts/verify-transitive-impact-resolution.mjs",
   "scripts/verify-context-tool-overlay.mjs",
   "scripts/verify-whole-system-context.mjs",
   "scripts/verify-normal-session-quality-bridge.mjs",
@@ -178,6 +182,7 @@ const requiredQualityExports = Object.freeze([
   "createNormalSessionQualityBridge",
   "createNormalSessionQualityPlugin",
   "createQualityOutcomes",
+  "evaluateTransitiveImpactResolution",
   "createWholeSystemContextReportDraft",
   "evaluateContextSufficiency",
   "reconcileFinalBlastRadius",
@@ -480,6 +485,7 @@ try {
   await runNode("context receipt verifier", ["scripts/verify-context-receipts.mjs"]);
   await runNode("whole-system context verifier", ["scripts/verify-whole-system-context.mjs"]);
   await runNode("context sufficiency verifier", ["scripts/verify-context-sufficiency.mjs"]);
+  await runNode("transitive impact resolution verifier", ["scripts/verify-transitive-impact-resolution.mjs"]);
   await runNode("context reconciliation verifier", ["scripts/verify-context-reconciliation.mjs"]);
   await runNode("context tool overlay verifier", ["scripts/verify-context-tool-overlay.mjs"]);
   await runNode("context live manifest verifier", ["scripts/verify-context-live-manifests.mjs"]);

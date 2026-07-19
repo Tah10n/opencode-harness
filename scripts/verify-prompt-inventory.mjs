@@ -11,6 +11,12 @@ import {
   sealPromptInventory,
   validatePromptInventory,
 } from "../lib/quality/prompt-inventory.mjs";
+import {
+  CONTEXT_EXECUTION_MODE_CONTRACT,
+  HIGH_CRITICAL_PREIMPLEMENTATION_SEQUENCE,
+  PROVISIONAL_DOSSIER_PHRASE,
+  assertSemanticSequence,
+} from "../lib/quality/preimplementation-sequence.mjs";
 import { ContractError, canonicalJson } from "../lib/quality/validation.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -291,6 +297,148 @@ function recursivelyRejectRawPromptFields(value, label = "inventory") {
   }
 }
 
+function readWorkspaceText(relativePath) {
+  return fs.readFileSync(path.join(root, ...relativePath.split("/")), "utf8");
+}
+
+function sectionBetween(text, startHeading, endHeading, label) {
+  const start = text.indexOf(startHeading);
+  check(start >= 0, `${label} is missing ${startHeading}`);
+  const end = endHeading === null ? text.length : text.indexOf(endHeading, start + startHeading.length);
+  check(end >= 0, `${label} is missing ${endHeading}`);
+  return text.slice(start, end);
+}
+
+const OPERATIONAL_SEQUENCE_MARKERS = Object.freeze({
+  session_registration: "`chat.message`",
+  risk_and_strategy: "`quality_session_start`",
+  provisional_dossier: PROVISIONAL_DOSSIER_PHRASE,
+  context_receipts: /runner-owned context receipts/iu,
+  serialized_read_only_children: /serialized read-only child tasks/iu,
+  dossier_refinement: "`quality_dossier_update`",
+  context_report_refinement: "`quality_context_report_update`",
+  context_sufficiency: /`quality_context_report_finalize`[\s\S]{0,180}context\s+sufficiency/iu,
+  current_plan_challenges: /current\s+Dossier[\s\S]{0,180}current\s+context\s+report/iu,
+  dossier_gate: "`quality_dossier_finalize`",
+  mutation_authorization: /runner-owned passed gate[\s\S]{0,80}(?:authorizes|permits)/iu,
+});
+
+function assertModeAwareReadOnlyGuidance(text, label) {
+  check(
+    /instrumented[\s\S]{0,320}(?:serializ(?:ed|es)|one[\s\S]{0,80}at a time)/iu.test(text),
+    `${label} must state that instrumented context or read-only child work is serialized`,
+  );
+  check(
+    /profile-only[\s\S]{0,320}(?:parallel|parallelize)/iu.test(text),
+    `${label} must confine optional parallel read-only work to profile-only mode`,
+  );
+}
+
+function assertPreimplementationSemantics() {
+  check(
+    HIGH_CRITICAL_PREIMPLEMENTATION_SEQUENCE.map((entry) => entry.id).join(",")
+      === "session_registration,risk_and_strategy,provisional_dossier,context_receipts,serialized_read_only_children,dossier_refinement,context_report_refinement,context_sufficiency,current_plan_challenges,dossier_gate,mutation_authorization",
+    "the canonical high/critical preimplementation stage registry drifted",
+  );
+  check(CONTEXT_EXECUTION_MODE_CONTRACT.instrumented.context_operations === "serialized", "instrumented context operations must stay serialized");
+  check(CONTEXT_EXECUTION_MODE_CONTRACT.instrumented.read_only_children === "serialized", "instrumented read-only children must stay serialized");
+  check(CONTEXT_EXECUTION_MODE_CONTRACT.instrumented.parallel_child_correlation === false, "instrumented mode must not claim parallel child correlation");
+  check(CONTEXT_EXECUTION_MODE_CONTRACT.profile_only.optional_parallel_read_only_fanout === true, "profile-only mode must retain optional parallel read-only guidance");
+  check(CONTEXT_EXECUTION_MODE_CONTRACT.profile_only.computational_receipt_chain === false, "profile-only mode must not claim a computational receipt chain");
+
+  const orchestrator = readWorkspaceText("agents/orchestrator.md");
+  const orchestratorDeep = readWorkspaceText("agents/orchestrator-deep.md");
+  const readme = readWorkspaceText("README.md");
+  const wholeSystem = readWorkspaceText("docs/whole-system-context.md");
+  const sequenceDocuments = [
+    {
+      label: "agents/orchestrator.md high/critical sequence",
+      text: sectionBetween(orchestrator, "High/critical instrumented sequence:", "8. Keep the immediate blocking step local.", "agents/orchestrator.md"),
+    },
+    {
+      label: "agents/orchestrator-deep.md high/critical sequence",
+      text: sectionBetween(orchestratorDeep, "High/critical instrumented sequence:", "- Native `bash`", "agents/orchestrator-deep.md"),
+    },
+    {
+      label: "README.md quality gate sequence",
+      text: sectionBetween(readme, "## How The Quality Gate Works", "## How The Agent Understands A Change", "README.md"),
+    },
+    {
+      label: "docs/whole-system-context.md sequence",
+      text: sectionBetween(wholeSystem, "## Sequence and authority", "## Strategy classes", "docs/whole-system-context.md"),
+    },
+  ];
+  for (const document of sequenceDocuments) {
+    assertSemanticSequence(document.text, OPERATIONAL_SEQUENCE_MARKERS, { label: document.label });
+  }
+
+  const orchestratorSequence = sequenceDocuments[0].text;
+  expectFailure(
+    "missing provisional Dossier phrase fixture",
+    "provisional_dossier",
+    () => assertSemanticSequence(
+      orchestratorSequence.replace(PROVISIONAL_DOSSIER_PHRASE, "initial planning notes"),
+      OPERATIONAL_SEQUENCE_MARKERS,
+      { label: "missing provisional Dossier phrase fixture" },
+    ),
+  );
+  expectFailure(
+    "report/Dossier finalization reordering fixture",
+    "context_sufficiency",
+    () => assertSemanticSequence(
+      orchestratorSequence
+        .replace("`quality_context_report_finalize`", "`quality_dossier_finalize`")
+        .replace("`quality_dossier_finalize` and existing gate evaluation", "`quality_context_report_finalize` and existing gate evaluation"),
+      OPERATIONAL_SEQUENCE_MARKERS,
+      { label: "report/Dossier finalization reordering fixture" },
+    ),
+  );
+  expectFailure(
+    "premature sufficiency authority fixture",
+    "mutation_authorization",
+    () => assertSemanticSequence(
+      orchestratorSequence.replace(/runner-owned passed gate authorizes mutation/iu, "context sufficiency authorizes mutation"),
+      OPERATIONAL_SEQUENCE_MARKERS,
+      { label: "premature sufficiency authority fixture" },
+    ),
+  );
+
+  const modeAwareDocuments = [
+    "AGENTS.md",
+    "agents/orchestrator.md",
+    "agents/orchestrator-deep.md",
+    "agents/explore.md",
+    "skills/global-wide-deep-context/SKILL.md",
+    "skills/global-review-ledger/SKILL.md",
+    "README.md",
+    "docs/whole-system-context.md",
+    "docs/recursive-context-mode.md",
+    "docs/adoption.md",
+    "docs/live-evaluation.md",
+  ];
+  for (const relativePath of modeAwareDocuments) {
+    assertModeAwareReadOnlyGuidance(readWorkspaceText(relativePath), relativePath);
+  }
+  const obsoleteParallelClaims = [
+    "Parallelize independent read-only discovery",
+    "parallel context gathering",
+    "Launch multiple `@explore` tasks in parallel",
+    "Be optimized for parallel context gathering",
+    "Use up to ten `@reviewer` subagents in parallel",
+  ];
+  for (const relativePath of modeAwareDocuments) {
+    const text = readWorkspaceText(relativePath);
+    for (const obsoleteClaim of obsoleteParallelClaims) {
+      check(!text.includes(obsoleteClaim), `${relativePath} retains obsolete unqualified guidance: ${obsoleteClaim}`);
+    }
+  }
+
+  const pluginDescriptions = readWorkspaceText("lib/quality/normal-session-plugin.mjs");
+  check(pluginDescriptions.includes(PROVISIONAL_DOSSIER_PHRASE), "quality_dossier_create description must use the canonical provisional Dossier phrase");
+  check(/current Dossier and current context report/iu.test(pluginDescriptions), "challenge tool description must bind contributions to the current composite analysis");
+  check(/finalization alone does not authorize mutation/iu.test(pluginDescriptions), "Dossier finalization description must preserve the mutation authority boundary");
+}
+
 const baseline = JSON.parse(fs.readFileSync(baselinePath, "utf8"));
 const declarations = JSON.parse(fs.readFileSync(declarationsPath, "utf8"));
 validatePromptInventory(baseline);
@@ -359,6 +507,7 @@ check(
   currentComparison.status === "passed",
   `current prompt inventory has undeclared drift: ${currentComparison.findings.map((entry) => `${entry.code}:${entry.path}`).join(", ")}`,
 );
+assertPreimplementationSemantics();
 
 const crlfSources = baselineSources().map((source) => ({
   path: source.path,
@@ -739,5 +888,5 @@ check(clonedSources.filter((entry) => entry.path.startsWith("agents/")).length =
 check(clonedSources.filter((entry) => entry.path.startsWith("skills/")).length === 8, "baseline source clone must retain all 8 skills");
 
 console.log(
-  `Verified prompt inventory: ${baseline.entries.length} historical agent/skill baselines, current docs bind ${currentEntrypointCounts.agentPrompts} agent/${currentEntrypointCounts.skillEntrypoints} skill entrypoints, bounded recursive skill discovery, ${baseline.duplicate_groups.length} intentional duplicate groups, semantic sentinels, CRLF stability, and fail-closed undeclared drift.`,
+  `Verified prompt inventory: ${baseline.entries.length} historical agent/skill baselines, current docs bind ${currentEntrypointCounts.agentPrompts} agent/${currentEntrypointCounts.skillEntrypoints} skill entrypoints, bounded recursive skill discovery, canonical preimplementation ordering, mode-aware serialization guidance, ${baseline.duplicate_groups.length} intentional duplicate groups, semantic sentinels, CRLF stability, and fail-closed undeclared drift.`,
 );

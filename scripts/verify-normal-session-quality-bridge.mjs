@@ -824,7 +824,7 @@ function contextReadOutput(relativePath) {
   });
 }
 
-function prepareHighContext(targetBridge, context, { includeExistingActiveReceipts = false } = {}) {
+function prepareHighContext(targetBridge, context, { includeExistingActiveReceipts = false, finalize = true } = {}) {
   let state = inspectNormalSessionQualityState(targetBridge, context.sessionID);
   assert(["high", "critical"].includes(state.dossier.risk_class));
   const graph = state.dossier.impact_graph;
@@ -998,6 +998,10 @@ function prepareHighContext(targetBridge, context, { includeExistingActiveReceip
   const updated = executeRawNormalSessionQualityTool(targetBridge, "quality_context_report_update", {
     request: JSON.stringify({ expected_revision: state.context_report.revision, patch: content }),
   }, context);
+  if (!finalize) {
+    assert.equal(persistedControlText(tempRoot).includes(RAW_CONTEXT_OUTPUT_CANARY), false, "raw context output must remain transient");
+    return { report: updated.report, decision: null };
+  }
   const finalizedContext = executeRawNormalSessionQualityTool(targetBridge, "quality_context_report_finalize", {
     request: JSON.stringify({ expected_revision: updated.report.revision }),
   }, context);
@@ -1074,6 +1078,26 @@ assertContractError(
   () => handleNormalSessionToolBefore(bridge, { tool: "task", sessionID: "session/standard-lite-uninstrumented", callID: "call-standard-lite" }, nativeTask("general")),
   "QUALITY_SESSION_UNCLASSIFIED",
 );
+
+const preDossierContext = { sessionID: "session/high-context-before-dossier", agent: "orchestrator" };
+const preDossierRequest = fullDossierRequest();
+handleNormalSessionChatMessage(bridge, preDossierContext);
+executeRawNormalSessionQualityTool(bridge, "quality_session_start", {
+  request: JSON.stringify(startRequestFromDossier(preDossierRequest)),
+}, preDossierContext);
+assertContractError(() => handleNormalSessionToolBefore(bridge, {
+  tool: "context_outline",
+  sessionID: preDossierContext.sessionID,
+  callID: "context-before-provisional-dossier",
+}, { args: {} }), "CONTEXT_DOSSIER_REQUIRED");
+executeRawNormalSessionQualityTool(bridge, "quality_dossier_create", {
+  request: JSON.stringify(preDossierRequest),
+}, preDossierContext);
+const preDossierState = inspectNormalSessionQualityState(bridge, preDossierContext.sessionID);
+assert.equal(preDossierState.dossier.status, "draft");
+assert.equal(preDossierState.context_report.status, "draft");
+assert.equal(preDossierState.context_receipt_ids.length, 0);
+assert.equal(preDossierState.dossier.impact_graph !== null, true, "the provisional impact graph must exist before context discovery");
 
 const immediateEscalationContext = { sessionID: "session/strategy-escalation-initial-path", agent: "orchestrator" };
 handleNormalSessionChatMessage(bridge, immediateEscalationContext);
@@ -1448,13 +1472,27 @@ phaseRequest.verification_plan.baseline_check_ids = ["normal-engineering-quality
 phaseRequest.verification_boundary.check_ids.push("normal-engineering-quality", "normal-committed-whitespace");
 trustedTargetCalls.length = 0;
 executeNormalSessionQualityTool(bridge, "quality_dossier_create", { request: JSON.stringify(phaseRequest) }, phaseContext);
-prepareHighContext(bridge, phaseContext);
+const phaseContextResult = prepareHighContext(bridge, phaseContext);
+const phaseSufficiencyState = inspectNormalSessionQualityState(bridge, phaseContext.sessionID);
+assert.equal(phaseContextResult.decision.status, "sufficient");
+assert.equal(phaseSufficiencyState.dossier.status, "draft", "context sufficiency must precede Dossier finalization");
+assert.equal(phaseSufficiencyState.contributions.length, 0, "context sufficiency must not fabricate plan challenges");
+assert.equal(phaseSufficiencyState.dossier.plan_challenge.architect_result_id, null);
+assert.equal(phaseSufficiencyState.dossier.plan_challenge.reviewer_result_id, null);
+assert.equal(phaseSufficiencyState.context_decision.strategy_binding_fingerprint, phaseSufficiencyState.context_strategy.fingerprint);
+assert.equal(phaseSufficiencyState.context_decision.dossier_analysis_fingerprint, phaseSufficiencyState.context_report.dossier_analysis_fingerprint);
+assert.equal(phaseSufficiencyState.context_decision.report_fingerprint, phaseSufficiencyState.context_report.fingerprint);
 const phaseArchitect = executeNormalSessionQualityTool(bridge, "quality_architecture_evaluate", {
   request: JSON.stringify({ expected_revision: 1, blockers: [] }),
 }, { ...phaseContext, agent: "architect" });
 const phaseReviewer = executeNormalSessionQualityTool(bridge, "quality_architecture_evaluate", {
   request: JSON.stringify({ expected_revision: phaseArchitect.dossier_revision, blockers: [] }),
 }, { ...phaseContext, agent: "reviewer" });
+const phaseChallengeState = inspectNormalSessionQualityState(bridge, phaseContext.sessionID);
+assert.equal(phaseChallengeState.contributions.length, 2);
+assert.equal(phaseChallengeState.contributions[0].subject_fingerprint, phaseChallengeState.contributions[1].subject_fingerprint,
+  "architect and reviewer must challenge the same current Dossier/strategy/report composite");
+assert.match(phaseChallengeState.contributions[0].subject_fingerprint, /^sha256:/);
 executeNormalSessionQualityTool(bridge, "quality_dossier_finalize", {
   request: JSON.stringify({ expected_revision: phaseReviewer.dossier_revision }),
 }, phaseContext);
@@ -1735,6 +1773,7 @@ let staleContribution = executeNormalSessionQualityTool(bridge, "quality_archite
 staleContribution = executeNormalSessionQualityTool(bridge, "quality_architecture_evaluate", {
   request: JSON.stringify({ expected_revision: staleContribution.dossier_revision, blockers: [] }),
 }, { sessionID: staleContext.sessionID, agent: "reviewer" });
+const staleSubjectFingerprint = inspectNormalSessionQualityState(bridge, staleContext.sessionID).contributions[0].subject_fingerprint;
 executeNormalSessionQualityTool(bridge, "quality_dossier_update", {
   request: JSON.stringify({
     expected_revision: staleContribution.dossier_revision,
@@ -1745,6 +1784,65 @@ const staleState = inspectNormalSessionQualityState(bridge, staleContext.session
 assert.equal(staleState.contributions.length, 0, "semantic dossier updates must invalidate prior challenge evidence");
 assert.equal(staleState.dossier.plan_challenge.architect_result_id, null);
 assert.equal(staleState.dossier.plan_challenge.reviewer_result_id, null);
+assert.equal(staleState.context_decision, null, "Dossier analysis changes must invalidate context sufficiency");
+assert.match(staleSubjectFingerprint, /^sha256:/);
+
+const refutedReportContext = { sessionID: "session/refuted-report-update", agent: "orchestrator" };
+executeNormalSessionQualityTool(bridge, "quality_dossier_create", {
+  request: JSON.stringify(fullDossierRequest()),
+}, refutedReportContext);
+const refutedReportDraft = prepareHighContext(bridge, refutedReportContext, { finalize: false }).report;
+let refutedReportContribution = executeNormalSessionQualityTool(bridge, "quality_architecture_evaluate", {
+  request: JSON.stringify({ expected_revision: 1, blockers: [] }),
+}, { ...refutedReportContext, agent: "architect" });
+refutedReportContribution = executeNormalSessionQualityTool(bridge, "quality_architecture_evaluate", {
+  request: JSON.stringify({ expected_revision: refutedReportContribution.dossier_revision, blockers: [] }),
+}, { ...refutedReportContext, agent: "reviewer" });
+const refutedReportBeforeUpdate = inspectNormalSessionQualityState(bridge, refutedReportContext.sessionID);
+const staleReportChallengeSubject = refutedReportBeforeUpdate.contributions[0].subject_fingerprint;
+assert.equal(refutedReportBeforeUpdate.contributions[1].subject_fingerprint, staleReportChallengeSubject);
+const refutedQuestions = structuredClone(refutedReportDraft.questions);
+const refutedDeepAnalyses = structuredClone(refutedReportDraft.deep_analyses);
+const refutedQuestion = refutedQuestions.find((question) => (
+  refutedDeepAnalyses.some((deep) => deep.falsification_question_id === question.id)
+));
+const refutedDeepAnalysis = refutedDeepAnalyses.find((deep) => deep.falsification_question_id === refutedQuestion.id);
+refutedQuestion.status = "refuted";
+refutedQuestion.actual_observation = "The alternate branch disproved the original path assumption and was incorporated into the deep analysis";
+refutedQuestion.applied_update_ids = [refutedDeepAnalysis.id];
+refutedQuestion.applied_update_fingerprint = null;
+refutedDeepAnalysis.inputs = [...refutedDeepAnalysis.inputs, "refuted alternate branch incorporated into the current path analysis"];
+const refutedReportUpdate = executeRawNormalSessionQualityTool(bridge, "quality_context_report_update", {
+  request: JSON.stringify({
+    expected_revision: refutedReportDraft.revision,
+    patch: { questions: refutedQuestions, deep_analyses: refutedDeepAnalyses },
+  }),
+}, refutedReportContext);
+assert.match(refutedReportUpdate.report.questions.find((question) => question.id === refutedQuestion.id).applied_update_fingerprint, /^sha256:/,
+  "a refuted hypothesis must carry a runner-owned causal update fingerprint");
+const refutedReportInvalidatedState = inspectNormalSessionQualityState(bridge, refutedReportContext.sessionID);
+assert.equal(refutedReportInvalidatedState.contributions.length, 0, "report analysis changes must invalidate stale plan challenges");
+assert.equal(refutedReportInvalidatedState.dossier.plan_challenge.architect_result_id, null);
+assert.equal(refutedReportInvalidatedState.dossier.plan_challenge.reviewer_result_id, null);
+assert.equal(refutedReportInvalidatedState.context_decision, null);
+const refutedReportFinalized = executeRawNormalSessionQualityTool(bridge, "quality_context_report_finalize", {
+  request: JSON.stringify({ expected_revision: refutedReportUpdate.report.revision }),
+}, refutedReportContext);
+assert.equal(refutedReportFinalized.decision.status, "sufficient", JSON.stringify(refutedReportFinalized.decision.reasons));
+let freshRefutedContribution = executeNormalSessionQualityTool(bridge, "quality_architecture_evaluate", {
+  request: JSON.stringify({ expected_revision: refutedReportUpdate.dossier_revision, blockers: [] }),
+}, { ...refutedReportContext, agent: "architect" });
+freshRefutedContribution = executeNormalSessionQualityTool(bridge, "quality_architecture_evaluate", {
+  request: JSON.stringify({ expected_revision: freshRefutedContribution.dossier_revision, blockers: [] }),
+}, { ...refutedReportContext, agent: "reviewer" });
+const refutedReportFreshState = inspectNormalSessionQualityState(bridge, refutedReportContext.sessionID);
+assert.equal(refutedReportFreshState.contributions[0].subject_fingerprint, refutedReportFreshState.contributions[1].subject_fingerprint);
+assert.notEqual(refutedReportFreshState.contributions[0].subject_fingerprint, staleReportChallengeSubject,
+  "fresh challenges must bind the updated Dossier/strategy/report composite");
+const refutedReportGate = executeNormalSessionQualityTool(bridge, "quality_dossier_finalize", {
+  request: JSON.stringify({ expected_revision: freshRefutedContribution.dossier_revision }),
+}, refutedReportContext);
+assert.equal(refutedReportGate.gate_status, "passed");
 
 const staleLockContext = { sessionID: "session/stale-lock", agent: "orchestrator" };
 executeNormalSessionQualityTool(bridge, "quality_dossier_create", { request: JSON.stringify(fullDossierRequest()) }, staleLockContext);
@@ -1789,6 +1887,62 @@ const recoveredFailureState = inspectNormalSessionQualityState(bridge, failureCo
 assert.equal(recoveredFailureState.active_task_launch, null, "failed task launch must not wedge the session");
 assert.deepEqual(recoveredFailureState.incomplete_reasons, []);
 
+const crashRecoverySourceBridge = createNormalSessionQualityBridge(options);
+const crashRecoveryContext = { sessionID: "session/context-pending-crash-recovery", agent: "orchestrator" };
+executeNormalSessionQualityTool(crashRecoverySourceBridge, "quality_dossier_create", {
+  request: JSON.stringify(fullDossierRequest()),
+}, crashRecoveryContext);
+handleNormalSessionToolBefore(crashRecoverySourceBridge, {
+  tool: "task",
+  sessionID: crashRecoveryContext.sessionID,
+  callID: "call-context-crash-recovery-explore",
+}, nativeTask("explore"));
+const crashRecoveryChildID = "session/context-pending-crash-recovery-child";
+handleNormalSessionEvent(crashRecoverySourceBridge, {
+  type: "session.created",
+  properties: { info: { id: crashRecoveryChildID, parentID: crashRecoveryContext.sessionID } },
+});
+const interruptedContextCallID = `context-read-crash-${++contextCallTick}`;
+const interruptedPending = handleNormalSessionToolBefore(crashRecoverySourceBridge, {
+  tool: "context_read",
+  sessionID: crashRecoveryChildID,
+  callID: interruptedContextCallID,
+}, { args: { path: "src/file.mjs", startLine: 1, maxLines: 64, maxBytes: 4096, format: "text" } });
+assert.equal(inspectNormalSessionQualityState(crashRecoverySourceBridge, crashRecoveryContext.sessionID).pending_context_calls.length, 1);
+
+const crashRecoveryRestartedBridge = createNormalSessionQualityBridge(options);
+const postRecoveryContextCallID = `context-read-recovered-${++contextCallTick}`;
+handleNormalSessionToolBefore(crashRecoveryRestartedBridge, {
+  tool: "context_read",
+  sessionID: crashRecoveryChildID,
+  callID: postRecoveryContextCallID,
+}, { args: { path: "src/file.mjs", startLine: 1, maxLines: 64, maxBytes: 4096, format: "text" } });
+handleNormalSessionToolAfter(crashRecoveryRestartedBridge, {
+  tool: "context_read",
+  sessionID: crashRecoveryChildID,
+  callID: postRecoveryContextCallID,
+}, { output: contextReadOutput("src/file.mjs"), title: "post-restart context read", metadata: {} });
+const crashRecoveryOwnerState = inspectNormalSessionQualityState(crashRecoveryRestartedBridge, crashRecoveryContext.sessionID);
+assert.equal(crashRecoveryOwnerState.pending_context_calls.length, 0);
+const crashRecoveryReceiptStore = createContextReceiptStore({ workspaceRoot: tempRoot });
+const crashRecoveryReceiptIndex = crashRecoveryReceiptStore.inspectSession(crashRecoveryOwnerState.session_key);
+const crashRecoveryReceipts = crashRecoveryReceiptIndex.receipt_refs.slice(-2).map((receiptRef) => (
+  crashRecoveryReceiptStore.readReceipt(crashRecoveryOwnerState.session_key, receiptRef.receipt_id)
+));
+assert.equal(crashRecoveryReceipts[0].receipt_id, interruptedPending.receipt_id);
+assert.equal(crashRecoveryReceipts[0].status, "interrupted");
+assert.equal(crashRecoveryReceipts[0].reason_code, "pending_recovery");
+assert.equal(crashRecoveryReceipts[1].status, "success");
+assert.equal(crashRecoveryReceipts[1].sequence, crashRecoveryReceipts[0].sequence + 1);
+assert.equal(crashRecoveryReceipts[1].previous_receipt_fingerprint, crashRecoveryReceipts[0].fingerprint,
+  "post-restart context settlement must extend the recovered immutable receipt chain");
+handleNormalSessionToolAfter(crashRecoveryRestartedBridge, {
+  tool: "task",
+  sessionID: crashRecoveryContext.sessionID,
+  callID: "call-context-crash-recovery-explore",
+});
+assert.equal(inspectNormalSessionQualityState(crashRecoveryRestartedBridge, crashRecoveryContext.sessionID).active_task_launch, null);
+
 const highContext = { sessionID: "session/high", agent: "orchestrator" };
 executeNormalSessionQualityTool(bridge, "quality_dossier_create", {
   request: JSON.stringify(fullDossierRequest()),
@@ -1798,6 +1952,11 @@ handleNormalSessionToolBefore(bridge, {
   sessionID: highContext.sessionID,
   callID: "call-high-context-explore",
 }, nativeTask("explore"));
+assertContractError(() => handleNormalSessionToolBefore(bridge, {
+  tool: "task",
+  sessionID: highContext.sessionID,
+  callID: "call-high-context-overlap",
+}, nativeTask("reviewer")), "QUALITY_TASK_SERIALIZATION");
 const highContextChildID = "session/high-context-explore";
 handleNormalSessionEvent(bridge, {
   type: "session.created",
@@ -1809,6 +1968,36 @@ handleNormalSessionToolBefore(bridge, {
   sessionID: highContextChildID,
   callID: highContextReadCallID,
 }, { args: { path: "src/file.mjs", startLine: 1, maxLines: 64, maxBytes: 4096, format: "text" } });
+assertContractError(() => handleNormalSessionToolBefore(bridge, {
+  tool: "context_outline",
+  sessionID: highContext.sessionID,
+  callID: "context-overlap-while-child-read-pending",
+}, { args: {} }), "CONTEXT_RECEIPT_PENDING");
+assertContractError(() => executeNormalSessionQualityTool(bridge, "quality_context_report_finalize", {
+  request: JSON.stringify({ expected_revision: 1 }),
+}, highContext), "CONTEXT_RECEIPT_PENDING");
+executeNormalSessionQualityTool(bridge, "quality_dossier_inspect", { request: "{}" }, highContext);
+assert.equal(
+  inspectNormalSessionQualityState(bridge, highContext.sessionID).pending_context_calls.length,
+  1,
+  "read-only inspection must not recover or mutate the active context call",
+);
+assertContractError(() => handleNormalSessionToolBefore(bridge, {
+  tool: "edit",
+  sessionID: highContext.sessionID,
+  callID: "edit-overlap-while-context-pending",
+}, nativeEdit()), "CONTEXT_RECEIPT_PENDING");
+assertContractError(() => handleNormalSessionToolAfter(bridge, {
+  tool: "task",
+  sessionID: highContext.sessionID,
+  callID: "call-high-context-explore",
+}), "CONTEXT_RECEIPT_PENDING");
+assert.equal(
+  inspectNormalSessionQualityState(bridge, highContext.sessionID).active_task_launch?.phase,
+  "child_active",
+  "out-of-order task settlement must preserve the child link until its context call settles",
+);
+assert.equal(inspectNormalSessionQualityState(bridge, highContextChildID).status, "active");
 handleNormalSessionToolAfter(bridge, {
   tool: "context_read",
   sessionID: highContextChildID,
@@ -1831,6 +2020,47 @@ handleNormalSessionToolAfter(bridge, {
   sessionID: highContext.sessionID,
   callID: "call-high-context-explore",
 });
+handleNormalSessionToolBefore(bridge, {
+  tool: "task",
+  sessionID: highContext.sessionID,
+  callID: "call-high-context-reviewer",
+}, nativeTask("reviewer"));
+const highContextReviewerChildID = "session/high-context-reviewer";
+handleNormalSessionEvent(bridge, {
+  type: "session.created",
+  properties: { info: { id: highContextReviewerChildID, parentID: highContext.sessionID } },
+});
+const highContextReviewerReadCallID = `context-read-child-${++contextCallTick}`;
+handleNormalSessionToolBefore(bridge, {
+  tool: "context_read",
+  sessionID: highContextReviewerChildID,
+  callID: highContextReviewerReadCallID,
+}, { args: { path: "src/file.mjs", startLine: 1, maxLines: 64, maxBytes: 4096, format: "text" } });
+handleNormalSessionToolAfter(bridge, {
+  tool: "context_read",
+  sessionID: highContextReviewerChildID,
+  callID: highContextReviewerReadCallID,
+}, { output: contextReadOutput("src/file.mjs"), title: "reviewer child context read", metadata: {} });
+const highContextReviewerChildState = inspectNormalSessionQualityState(bridge, highContextReviewerChildID);
+const sequentialChildReceiptIndex = childContextReceiptStore.inspectSession(highContextOwnerState.session_key);
+const sequentialChildReceipts = sequentialChildReceiptIndex.receipt_refs.slice(-2).map((receiptRef) => (
+  childContextReceiptStore.readReceipt(highContextOwnerState.session_key, receiptRef.receipt_id)
+));
+assert.equal(sequentialChildReceipts[0].producer_session_key, highContextChildState.session_key);
+assert.equal(sequentialChildReceipts[0].producer_role, "explore");
+assert.equal(sequentialChildReceipts[1].producer_session_key, highContextReviewerChildState.session_key);
+assert.equal(sequentialChildReceipts[1].producer_role, "reviewer");
+assert.equal(sequentialChildReceipts[1].sequence, sequentialChildReceipts[0].sequence + 1);
+assert.equal(sequentialChildReceipts[1].previous_receipt_fingerprint, sequentialChildReceipts[0].fingerprint,
+  "serialized child context evidence must preserve the immutable receipt chain");
+handleNormalSessionToolAfter(bridge, {
+  tool: "task",
+  sessionID: highContext.sessionID,
+  callID: "call-high-context-reviewer",
+});
+const settledSequentialChildState = inspectNormalSessionQualityState(bridge, highContext.sessionID);
+assert.equal(settledSequentialChildState.active_task_launch, null);
+assert.equal(settledSequentialChildState.context_read_only_subagent_ids.length, 2);
 assertContractError(
   () => executeNormalSessionQualityTool(bridge, "quality_dossier_finalize", { request: JSON.stringify({ expected_revision: 1 }) }, highContext),
   "QUALITY_PLAN_CHALLENGE_MISSING",

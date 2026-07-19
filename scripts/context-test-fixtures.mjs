@@ -65,7 +65,7 @@ export function contextReadToolOutput(relativePath, identity = "context-test-rea
   });
 }
 
-function boundary(category, references = {}, rationale = null) {
+function boundary(category, references = {}, rationale = null, evidenceRefs = null) {
   return {
     id: `BOUNDARY-${category}`,
     category,
@@ -76,18 +76,36 @@ function boundary(category, references = {}, rationale = null) {
     unknown_ids: references.unknown_ids ?? [],
     excluded_sibling_ids: references.excluded_sibling_ids ?? [],
     rationale,
-    evidence_refs: [{ kind: "file", value: "lib/context-example.mjs" }],
+    evidence_refs: evidenceRefs ?? [{ kind: "file", value: "lib/context-example.mjs" }],
   };
 }
 
-export function contextTestImpactGraph(riskClass = "high") {
+export function contextTestImpactGraph(riskClass = "high", { transitiveImpact = "represented" } = {}) {
+  if (!["represented", "excluded"].includes(transitiveImpact)) {
+    throw new Error("context test transitive impact must be represented or excluded");
+  }
+  const transitiveExcluded = transitiveImpact === "excluded";
   const boundaryByCategory = {
     direct_affected_paths: boundary("direct_affected_paths", { path_ids: ["BLAST-direct"] }),
-    transitive_affected_paths: boundary("transitive_affected_paths", { path_ids: ["BLAST-transitive"] }),
+    transitive_affected_paths: transitiveExcluded
+      ? boundary(
+        "transitive_affected_paths",
+        {},
+        "A complete bounded inventory and content inspection found no consumer beyond the owning service.",
+        [{ kind: "runtime", value: "CTXRECEIPT-001" }],
+      )
+      : boundary("transitive_affected_paths", { path_ids: ["BLAST-transitive"] }),
     externally_reachable_entry_points: boundary("externally_reachable_entry_points", { node_ids: ["NODE-entry"] }),
-    downstream_state_or_side_effects: boundary("downstream_state_or_side_effects", { node_ids: ["NODE-store"], edge_ids: ["EDGE-service-store"] }),
-    cross_boundary_contracts: boundary("cross_boundary_contracts", { node_ids: ["NODE-entry", "NODE-store"], edge_ids: ["EDGE-entry-service", "EDGE-service-store"] }),
-    critical_path_tests: boundary("critical_path_tests", { node_ids: ["NODE-test"], path_ids: ["BLAST-direct", "BLAST-transitive"] }),
+    downstream_state_or_side_effects: transitiveExcluded
+      ? boundary("downstream_state_or_side_effects", {}, "The bounded component has no downstream state or external side-effect edge.")
+      : boundary("downstream_state_or_side_effects", { node_ids: ["NODE-store"], edge_ids: ["EDGE-service-store"] }),
+    cross_boundary_contracts: transitiveExcluded
+      ? boundary("cross_boundary_contracts", { node_ids: ["NODE-entry"], edge_ids: ["EDGE-entry-service"] })
+      : boundary("cross_boundary_contracts", { node_ids: ["NODE-entry", "NODE-store"], edge_ids: ["EDGE-entry-service", "EDGE-service-store"] }),
+    critical_path_tests: boundary("critical_path_tests", {
+      node_ids: ["NODE-test"],
+      path_ids: transitiveExcluded ? ["BLAST-direct"] : ["BLAST-direct", "BLAST-transitive"],
+    }),
     relevant_unknown_paths: boundary("relevant_unknown_paths", {}, "bounded scan found no unresolved relevant path"),
     excluded_sibling_paths: boundary("excluded_sibling_paths", { excluded_sibling_ids: ["EXCLUDED-docs"] }),
   };
@@ -98,17 +116,17 @@ export function contextTestImpactGraph(riskClass = "high") {
     nodes: [
       { id: "NODE-entry", kind: "public_api", path: "lib/context-example.mjs", symbol: "run", label: "entry", boundary: "entry_point", confidence: "observed", coverage: "complete", evidence_refs: evidence },
       { id: "NODE-service", kind: "module", path: "lib/context-service.mjs", symbol: "apply", label: "owner", boundary: "module", confidence: "observed", coverage: "complete", evidence_refs: evidence },
-      { id: "NODE-store", kind: "data_store", path: "lib/context-store.mjs", symbol: "save", label: "store", boundary: "persistence", confidence: "observed", coverage: "complete", evidence_refs: evidence },
+      ...(transitiveExcluded ? [] : [{ id: "NODE-store", kind: "data_store", path: "lib/context-store.mjs", symbol: "save", label: "store", boundary: "persistence", confidence: "observed", coverage: "complete", evidence_refs: evidence }]),
       { id: "NODE-test", kind: "test", path: "scripts/verify-context-sufficiency.mjs", symbol: null, label: "verification", boundary: "operational", confidence: "observed", coverage: "complete", evidence_refs: [{ kind: "file", value: "scripts/verify-context-sufficiency.mjs" }] },
     ],
     edges: [
       { id: "EDGE-entry-service", from: "NODE-entry", to: "NODE-service", relationship: "calls", confidence: "observed", coverage: "complete", evidence_refs: evidence },
-      { id: "EDGE-service-store", from: "NODE-service", to: "NODE-store", relationship: "writes", confidence: "observed", coverage: "complete", evidence_refs: evidence },
+      ...(transitiveExcluded ? [] : [{ id: "EDGE-service-store", from: "NODE-service", to: "NODE-store", relationship: "writes", confidence: "observed", coverage: "complete", evidence_refs: evidence }]),
       { id: "EDGE-test-service", from: "NODE-test", to: "NODE-service", relationship: "verifies", confidence: "observed", coverage: "complete", evidence_refs: [{ kind: "file", value: "scripts/verify-context-sufficiency.mjs" }] },
     ],
     affected_paths: [
       { id: "BLAST-direct", kind: "direct", node_ids: ["NODE-entry", "NODE-service"], edge_ids: ["EDGE-entry-service"], critical: true, verification_node_ids: ["NODE-test"], confidence: "observed", evidence_refs: evidence },
-      { id: "BLAST-transitive", kind: "transitive", node_ids: ["NODE-entry", "NODE-service", "NODE-store"], edge_ids: ["EDGE-entry-service", "EDGE-service-store"], critical: true, verification_node_ids: ["NODE-test"], confidence: "observed", evidence_refs: evidence },
+      ...(transitiveExcluded ? [] : [{ id: "BLAST-transitive", kind: "transitive", node_ids: ["NODE-entry", "NODE-service", "NODE-store"], edge_ids: ["EDGE-entry-service", "EDGE-service-store"], critical: true, verification_node_ids: ["NODE-test"], confidence: "observed", evidence_refs: evidence }]),
     ],
     excluded_siblings: [{ id: "EXCLUDED-docs", path: "docs/harness-map.md", reason: "documentation does not import or execute the runtime path", confidence: "observed", evidence_refs: [{ kind: "file", value: "docs/harness-map.md" }] }],
     unknowns: [],
@@ -140,7 +158,12 @@ function directMapping() {
   };
 }
 
-export function contextTestDossier({ riskClass = "high", taskType = "bug_fix", additionalTestObligations = [] } = {}) {
+export function contextTestDossier({
+  riskClass = "high",
+  taskType = "bug_fix",
+  additionalTestObligations = [],
+  transitiveImpact = "represented",
+} = {}) {
   const full = ["high", "critical"].includes(riskClass);
   const preChangeObligations = ["bug_fix", "diagnosis_driven_implementation"].includes(taskType)
     ? [{ id: "TEST-reproducer", check_id: "context-reproducer", kind: "reproducer", phase: "preimplementation", scope_ids: ["AREA-main"], command_or_mechanism: "node scripts/verify-context-reproducer.mjs", required: true, trusted_producer: "opencode-harness-context-verifier" }]
@@ -166,7 +189,7 @@ export function contextTestDossier({ riskClass = "high", taskType = "bug_fix", a
       { id: "TEST-context", check_id: "context-regression", kind: "integration", phase: "integration", scope_ids: ["AREA-main"], command_or_mechanism: "node scripts/verify-context-sufficiency.mjs", required: true, trusted_producer: "opencode-harness-context-verifier" },
       ...additionalTestObligations,
     ],
-    impact_graph: full ? contextTestImpactGraph(riskClass) : null,
+    impact_graph: full ? contextTestImpactGraph(riskClass, { transitiveImpact }) : null,
     context_coverage: {
       status: "complete",
       affected_area_ids: ["AREA-main"],

@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "sidecar_version": "1.0.0",
+  "scenario_id": "quality-evidence-backed-no-transitive-impact",
+  "seeded_defect": "The callback validator uses a hostname suffix check, so the visible hostile-host assertion fails before implementation.",
+  "visible_oracle": { "command": "node --test test/visible.test.mjs", "seeded_status": "failed" },
+  "bad_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-evidence-backed-no-transitive-impact/bad/callback-origin-policy.mjs", "target": "src/callback-origin-policy.mjs", "sha256": "b2e67139f20579b0aea2675c4028bc6843910e81adff3b1da691de1c355666dd" }
+  ] },
+  "compliant_patch": { "files": [
+    { "source": "quality/live-scenarios/artifacts/quality-evidence-backed-no-transitive-impact/good/callback-origin-policy.mjs", "target": "src/callback-origin-policy.mjs", "sha256": "c2b2603061d92f841105f00fd10d5153fb15fd7a17ef66ab2e9b01c30da0d32b" }
+  ] },
+  "hidden_counterexample": "Exact-host validation alone still accepts credentials, a non-default port, and a callback-lookalike path outside the documented boundary.",
+  "forbidden_regression": "Do not replace structured URL validation with string prefix or suffix matching.",
+  "risk_class": "high",
+  "workload_class": "security-callback-origin-locality",
+  "expected_ownership": ["src/callback-origin-policy.mjs"],
+  "required_quality_assertion_ids": [
+    "quality-evidence-backed-no-transitive-impact-dossier-before-edit",
+    "quality-evidence-backed-no-transitive-impact-gate-before-edit",
+    "quality-evidence-backed-no-transitive-impact-coverage-recorded",
+    "quality-evidence-backed-no-transitive-impact-unknowns-resolved",
+    "quality-evidence-backed-no-transitive-impact-mapping-verified",
+    "quality-evidence-backed-no-transitive-impact-architecture-respected",
+    "quality-evidence-backed-no-transitive-impact-ownership-respected",
+    "quality-evidence-backed-no-transitive-impact-integrated-verification",
+    "quality-evidence-backed-no-transitive-impact-valid-completion"
+  ],
+  "suite": "held_out",
+  "fixture_fingerprint": "a3801ca33d473b3b8ced8918d5183ac69765b9e3ebb862b973f9e3b60da16db3"
+}

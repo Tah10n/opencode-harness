@@ -399,6 +399,7 @@ const expectedDeterministicStages = [
   "verify:live-eval", "verify:acceptance",
   "verify:quality-contracts", "verify:engineering-dossier", "verify:architecture-policy", "verify:impact-graph",
   "verify:context-strategies", "verify:context-receipts", "verify:whole-system-context", "verify:context-sufficiency",
+  "verify:transitive-impact-resolution",
   "verify:context-reconciliation", "verify:context-tool-overlay", "verify:context-live-manifests", "verify:context-acceptance",
   "verify:prompt-inventory", "verify:quality-live-coordinator", "verify:quality-live-runner", "verify:quality-verification-targets",
   "verify:normal-session-quality-bridge", "verify:session-classification", "verify:project-check-catalog",

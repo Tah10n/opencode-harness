@@ -1343,7 +1343,8 @@ export async function createDeterministicHighQualityRun({
     assert.equal(bundle.attestation.schema_version, 3);
     assert.equal(bundle.context_sufficiency_decision.status, "sufficient");
     assert.equal(bundle.context_reconciliation.status, "passed");
-    const reviewerJobs = traceStore.inspectRun(result.operational_run_id).jobs
+    const traceSnapshot = traceStore.inspectRun(result.operational_run_id);
+    const reviewerJobs = traceSnapshot.jobs
       .filter((entry) => entry.request.agent === "reviewer");
     const adapterAuthoredReviewer = reviewerJobs.find((entry) => entry.request.task_id === finalReviewerResultId);
     const runnerReviewer = reviewerJobs.find((entry) => entry.request.assigned_scope.startsWith("Review runner-observed final diff "));
@@ -1356,6 +1357,7 @@ export async function createDeterministicHighQualityRun({
       runDir,
       result,
       bundle,
+      traceSnapshot,
       checkCatalog,
       cleanup: () => fs.rmSync(workspaceRoot, { recursive: true, force: true }),
     };
@@ -1692,6 +1694,14 @@ async function main() {
       assert.equal(highRun.result.quality_outcomes?.context_metrics.required_wide_category_coverage_basis_points, 10000);
       assert.equal(highRun.result.quality_outcomes?.context_metrics.critical_path_deep_analysis_coverage_basis_points, 10000);
       assert.equal(highRun.bundle.context_receipt_index.receipts.length, 5);
+      assert.deepEqual(
+        highRun.traceSnapshot.context_receipts
+          .filter((entry) => entry.source_kind === "file")
+          .flatMap((entry) => entry.relative_paths)
+          .sort(),
+        ["README.md", "src/api.mjs", "src/consumer.mjs", "test/visible.test.mjs"],
+        "runner-owned quality context reads were not mirrored into path-specific trace receipts",
+      );
       assert.deepEqual(
         highRun.bundle.context_receipt_index.receipts.map((entry) => entry.tool_id),
         ["context_outline", "context_read", "context_read", "context_read", "context_read"],

@@ -291,10 +291,17 @@ one-shot mutation authority, post-change verification, and final attestation.
 The runner synthesizes this compact dossier; callers must not replace or update
 it with `quality_dossier_create` or `quality_dossier_update`.
 
-`high` and `critical` require the full dossier, impact graph, invariants,
-edge/failure mappings, baseline evidence, and both architect and reviewer
-contributions. The plugin computes the gate. The agent cannot set status,
-fingerprints, IDs, verification, attestation, or trusted timestamps.
+For `high` and `critical`, `quality_session_start` selects the strategy, then
+`quality_dossier_create` records a provisional Engineering Dossier draft and
+provisional impact graph before receipt-backed discovery. Instrumented context
+operations and read-only children are serialized; profile-only mode may
+optionally parallelize independent read-only work without a computational
+receipt-chain guarantee. Evidence updates the Dossier and linked report; report
+finalization and runner-computed sufficiency come before architect and reviewer
+challenges against the current analysis. Dossier finalization evaluates the
+existing gate, and only a runner-owned passed gate authorizes mutation. The
+agent cannot set status, fingerprints, IDs, verification, attestation, or
+trusted timestamps.
 
 ## Project Configuration
 

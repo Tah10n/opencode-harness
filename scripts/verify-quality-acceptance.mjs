@@ -11,6 +11,7 @@ import {
   createQualityAcceptancePolicyV3,
   createQualityLiveReport,
   createQualityOutcomes,
+  qualityAcceptancePolicyOutcomeSchema,
   sealQualityAcceptanceDecision,
   validateQualityAcceptanceDecision,
   validateQualityLiveReport,
@@ -78,9 +79,34 @@ function contextPolicyInput(
   delete policy.fingerprint;
   return {
     ...policy,
-    policy_version: "3.0.0-test",
+    policy_version: "3.1.0-test",
     required_scenarios: [scenarioId],
     required_scenario_risks: { [scenarioId]: riskClass },
+  };
+}
+
+function legacyContextPolicyInput(
+  scenarioId = "quality-small-local-control",
+  riskClass = "standard-lite",
+) {
+  const current = contextPolicyInput(scenarioId, riskClass);
+  const contextRequirements = structuredClone(current.context_requirements);
+  contextRequirements.required_metric_keys = [
+    ...contextRequirements.required_metric_keys.filter((key) => ![
+      "contradicted_transitive_exclusion_count",
+      "evidence_backed_transitive_exclusion_count",
+      "transitive_impact_resolution",
+    ].includes(key)),
+    "required_transitive_path_count",
+  ].sort();
+  contextRequirements.required_hard_gates = contextRequirements.required_hard_gates
+    .map((key) => key === "transitive_impact_resolved" ? "transitive_paths_represented" : key)
+    .sort();
+  contextRequirements.minimum_represented_transitive_path_count = 1;
+  return {
+    ...current,
+    policy_version: "3.0.0-test",
+    context_requirements: contextRequirements,
   };
 }
 
@@ -122,6 +148,7 @@ try {
   );
   const policy = createQualityAcceptancePolicy(policyInput());
   const contextPolicy = createQualityAcceptancePolicyV3(contextPolicyInput());
+  const legacyContextPolicy = createQualityAcceptancePolicyV3(legacyContextPolicyInput());
   const highContextPolicy = createQualityAcceptancePolicyV3(contextPolicyInput(
     "quality-public-api-compatibility",
     "high",
@@ -135,6 +162,10 @@ try {
   const candidateOutcome = createQualityOutcomes(bundleEntry(candidate, "host/candidate"));
   assert.equal(baselineOutcome.complete, true);
   assert.equal(candidateOutcome.complete, true);
+  assert.equal(baselineOutcome.schema_version, 4);
+  assert.equal(candidateOutcome.schema_version, 4);
+  assert.equal(candidateOutcome.producer_id, QUALITY_ACCEPTANCE_PRODUCERS.contextQualityOutcomes);
+  assert.equal(candidateOutcome.context_metrics.transitive_impact_resolution, "not_applicable");
   assert.equal(candidateOutcome.check_catalog_fingerprint, candidate.checkCatalog.fingerprint);
   assert.equal(candidateOutcome.quality_bundle_manifest_fingerprint, candidate.bundle.manifest.fingerprint);
   assert(candidateOutcome.required_check_ids.includes("quality-small-local-control-baseline"));
@@ -160,13 +191,28 @@ try {
     decision_id: "decision-context-accepted",
     clock: () => new Date(AT),
   });
-  assert.equal(contextAccepted.decision, "accepted", "v3 context policy rejected complete trusted context bundles");
+  assert.equal(contextAccepted.decision, "accepted", "v3.1 context policy rejected complete trusted context bundles");
+  assert.equal(qualityAcceptancePolicyOutcomeSchema(contextPolicy), 4);
+  assert.equal(qualityAcceptancePolicyOutcomeSchema(legacyContextPolicy), 3);
+  assert.throws(
+    () => assessQualityCandidate({
+      policy: legacyContextPolicy,
+      bundles: [bundleEntry(baseline), bundleEntry(candidate)],
+      decision_id: "decision-legacy-context-boundary",
+      clock: () => new Date(AT),
+    }),
+    /QUALITY_ACCEPTANCE_CONTEXT_SCHEMA/u,
+    "a 3.0 policy silently consumed current v4 outcomes",
+  );
 
   const highBaselineOutcome = createQualityOutcomes(bundleEntry(highBaseline, "host/high-baseline"));
   const highCandidateOutcome = createQualityOutcomes(bundleEntry(highCandidate, "host/high-candidate"));
   for (const outcome of [highBaselineOutcome, highCandidateOutcome]) {
     assert.equal(outcome.complete, true);
     assert.equal(outcome.context_metrics.risk_class, "high");
+    assert.equal(outcome.schema_version, 4);
+    assert.equal(outcome.context_metrics.transitive_impact_resolution, "represented");
+    assert(outcome.context_metrics.represented_transitive_path_count > 0);
     assert.equal(outcome.context_metrics.required_wide_category_coverage_basis_points, 10000);
     assert.equal(outcome.context_metrics.critical_path_deep_analysis_coverage_basis_points, 10000);
     assert(Object.values(outcome.context_hard_gates).every(Boolean), JSON.stringify(outcome.context_hard_gates));
@@ -183,7 +229,7 @@ try {
   assert.equal(
     highContextAccepted.decision,
     "accepted",
-    "validated high-risk runner bundles did not pass the v3 acceptance engine",
+    "validated high-risk runner bundles did not pass the v3.1 acceptance engine",
   );
   assert.equal(highContextAccepted.summary.baseline_complete_count, 1);
   assert.equal(highContextAccepted.summary.candidate_complete_count, 1);
@@ -200,7 +246,7 @@ try {
   assert.equal(
     criticalContextAccepted.decision,
     "accepted",
-    "validated critical runner bundles did not pass the v3 acceptance engine",
+    "validated critical runner bundles did not pass the v3.1 acceptance engine",
   );
 
   const qualityCliRoot = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-quality-bundle-assessment-"));
@@ -274,6 +320,7 @@ try {
     assert.notEqual(JSON.parse(rejectedProcess.stdout).decision, "accepted");
 
     for (const relativePath of [
+      "quality/context-receipt-index.json",
       "quality/context-report.json",
       "quality/context-sufficiency-decision.json",
       "quality/context-reconciliation.json",

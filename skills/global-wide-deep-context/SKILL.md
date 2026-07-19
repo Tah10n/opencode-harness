@@ -18,15 +18,24 @@ completion contracts. Do not restate or replace those contracts here.
 ## Follow the selected strategy
 
 1. Read the runner-selected strategy and task profile.
-2. Form narrow questions for the affected system instead of requesting a
+2. For high or critical work, confirm that a provisional Engineering Dossier
+   draft and provisional impact graph exist before any instrumented context
+   operation.
+3. Form narrow questions for the affected system instead of requesting a
    repository dump.
-3. Collect bounded read-only evidence and retain only runner-owned receipt IDs.
-4. Synthesize the wide pass and link it to the existing impact graph.
-5. Analyze each critical impact path separately.
+4. Collect bounded read-only evidence and retain only runner-owned receipt IDs.
+   Instrumented context operations and read-only children are serialized: settle,
+   bind, and incorporate one result before launching the next. Profile-only mode
+   may optionally parallelize independent read-only work, but it provides no
+   computational receipt-chain guarantee.
+5. Refine the Dossier impact graph and linked report from the evidence, synthesize
+   the wide pass, and analyze each critical impact path separately.
 6. Finalize the report only after required categories, challenges, and
-   falsification attempts are represented.
-7. Wait for runner-computed context sufficiency before finalizing the dossier or
-   requesting writable work.
+   falsification attempts are represented, then wait for runner-computed context
+   sufficiency.
+7. Ask architect and reviewer to challenge the current Dossier and current
+   context report. Then finalize the Dossier, evaluate the existing gate, and
+   request writable work only after a runner-owned passed gate.
 
 Escalate when discovery reveals a stronger risk class or a boundary the current
 strategy does not cover. Never request a weaker strategy than the runner chose.
@@ -47,7 +56,8 @@ Separate observed facts, inferred relationships, unresolved hypotheses, and
 reasoned exclusions. Attach receipt IDs to non-inferred claims. Literal search
 may locate candidates but does not prove complete semantic relations.
 
-Use `explore` for independent mapping questions. Ask `architect` to challenge
+Use `explore` for narrow independent mapping questions under the active mode's
+serialization contract. Ask `architect` to challenge
 blast radius, ownership, and critical-path selection. Ask `reviewer` to
 challenge counterexamples, edge cases, and test obligations. Keep each request
 narrow and require evidence, uncertainty, and the decision unblocked.

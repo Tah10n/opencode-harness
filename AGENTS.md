@@ -16,7 +16,7 @@ These rules apply to all projects.
 - Before writing or fixing code, build a context inventory for the affected blast radius: user goal, current worktree/diff, relevant instructions/skills/workflow docs, affected entry points and call paths, contracts/data shapes, invariants, existing patterns, edge cases, failure modes, and verification path. If any required context is missing, use `@explore` and/or `@architect` first.
 - Treat implementation quality as part of the task, not a follow-up: prefer the smallest cohesive design, follow local conventions, avoid unnecessary duplication, avoid speculative abstractions, preserve module boundaries, and check error handling and edge cases.
 - Do not assign `@general` a coding task unless the handoff includes the write scope, expected behavior, affected entry points/call paths, relevant contracts/invariants, known edge cases/failure modes, and narrow verification boundary.
-- Parallelize independent read-only discovery for broad tasks; keep immediate blockers and small local work in the root loop.
+- Decompose independent read-only discovery for broad tasks, but keep immediate blockers and small local work in the root loop. In instrumented quality mode, context operations and read-only child tasks are serialized so each result can be settled and incorporated before the next launch; profile-only mode may optionally parallelize independent read-only work, but it provides no computational receipt-chain guarantee.
 - Parallelize implementation only after `@architect` has produced explicit disjoint write ownership.
 - If slices share files, shared contracts, generated outputs, lockfiles, migrations, package metadata, snapshots, or formatter output, serialize them.
 - The orchestrator remains the sole integrator of worker results.
@@ -27,7 +27,7 @@ These rules apply to all projects.
 - The orchestrator must aggregate subagent results by evidence, uncertainty,
   termination reason, and decision unblocked. Do not paste raw subagent output
   as the final answer.
-- For broad audits, production-readiness checks, repo/article study, long logs, large diffs, or multi-module bug sweeps, automatically use recursive-context mode: keep the root context small, use safe read-only context tools when available (`context_outline`, `context_files`, `context_search`, `context_read`), fan out focused `@explore`/`@researcher`/`@reviewer` tasks, and aggregate compact evidence before deciding or editing.
+- For broad audits, production-readiness checks, repo/article study, long logs, large diffs, or multi-module bug sweeps, automatically use recursive-context mode: keep the root context small, use safe read-only context tools when available (`context_outline`, `context_files`, `context_search`, `context_read`), assign focused `@explore`/`@researcher`/`@reviewer` tasks under the active mode's serialization contract, and aggregate compact evidence before deciding or editing.
 - Do not use recursive-context mode for small, local, single-file, or directly answerable tasks.
 - See `docs/recursive-context-mode.md` for the rationale, safety model, tool behavior, and validation commands.
 - When the user asks for review, keep the task read-only: do not edit files, stage changes, commit, or run fix commands unless the user explicitly asks for fixes.
@@ -43,13 +43,16 @@ These rules apply to all projects.
   load `global-quality-gates` before edits.
 - For the same high/critical work, also load `global-wide-deep-context` before
   edits.
-- For high/critical work, follow the runner-selected context strategy, retain
-  only runner-owned receipt IDs for context-tool evidence, complete the linked
-  Whole-System Context Report, and wait for runner-computed context sufficiency
-  before finalizing the existing Engineering Dossier gate. Reconcile the exact
-  final diff against that report before attestation. Keep runner-confirmed
-  `standard-lite` work bounded to local evidence instead of forcing a broad
-  graph or report.
+- For high/critical work, after `quality_session_start` create a provisional
+  Engineering Dossier draft with its provisional impact graph before collecting
+  runner-owned context receipts. Refine the Dossier and linked Whole-System
+  Context Report from that evidence, finalize the report, and wait for
+  runner-computed context sufficiency. Then require architect and reviewer
+  challenges against the current Dossier and current report, finalize the
+  Dossier, and evaluate the existing gate. Only a runner-owned passed gate
+  authorizes mutation. Reconcile the exact final diff against the report before
+  attestation. Keep runner-confirmed `standard-lite` work bounded to local
+  evidence instead of forcing a broad graph or report.
 - Before code changes in high/critical work, classify risk and record the
   behavior contract, compatibility requirements, pre-change baseline, edge and
   failure-mode matrix, and test obligations.

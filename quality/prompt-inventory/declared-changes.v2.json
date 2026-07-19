@@ -73,6 +73,11 @@
       "rationale": "Align computational Engineering Dossier risk classes with schema and constants while preserving the legacy operational trace label."
     },
     {
+      "path": "skills/global-review-ledger/SKILL.md",
+      "aspects": ["content"],
+      "rationale": "Make reviewer decomposition mode-aware: serialized in instrumented quality sessions and only optionally parallel in profile-only guidance."
+    },
+    {
       "path": "skills/global-wide-deep-context/SKILL.md",
       "aspects": ["content"],
       "rationale": "Add the focused receipt-backed wide and deep analysis procedure, fallback rules, stopping criteria, and final blast-radius reconciliation for high or critical work."

@@ -67,22 +67,32 @@ as part of the agent permission surface.
 
 Use recursive-context mode automatically when a task is broad enough that direct reading would pollute the root context or miss important surfaces.
 
-Recommended sequence:
+Recommended sequence for high or critical instrumented work:
 
-1. Start with `context_outline` or repo workflow guidance.
-2. Use `context_files` and `context_search` to identify likely entry points, tests, contracts, and docs.
-3. Use `context_read` for bounded file ranges instead of dumping whole files.
-4. Fan out independent semantic checks to focused subagents.
-5. Aggregate compact evidence with file and line references.
-6. Only then decide whether to implement, review, diagnose, or verify.
+1. After classification, create the provisional Engineering Dossier draft and
+   provisional impact graph.
+2. Start with `context_outline` or repo workflow guidance.
+3. Use `context_files`, `context_search`, and bounded `context_read` ranges to
+   identify likely entry points, tests, contracts, and docs.
+4. Run instrumented context operations and focused read-only children one at a
+   time; settle, bind, and incorporate each result before the next launch.
+5. Aggregate compact evidence with file and line references, then refine the
+   Dossier and Whole-System Context Report.
+6. Only after report finalization, runner-computed sufficiency, current plan
+   challenges, Dossier finalization, and a passed gate may implementation begin.
+
+Profile-only mode may optionally parallelize independent semantic checks, but it
+cannot claim computational receipt-chain correlation. Instrumented mode is
+serialized even when the questions themselves are independent.
 
 Skip this mode for direct, small, single-file, or obviously local tasks.
 
 ## Relationship To The Engineering Gate
 
 Recursive context supplies bounded evidence; it is not the gate itself. For a
-high or critical instrumented task, actual operations produce runner-owned
-receipt IDs. Discovery should identify direct and
+high or critical instrumented task, the provisional impact graph exists first
+and actual operations then produce runner-owned receipt IDs. Discovery should
+identify direct and
 transitive entry points, consumers, contracts, schemas/configuration,
 tests/fixtures, public compatibility surfaces, persistence/lifecycle edges,
 excluded siblings, and relevant unknown paths. Those facts are recorded as

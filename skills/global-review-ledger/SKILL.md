@@ -1,6 +1,6 @@
 ---
 name: global-review-ledger
-description: Use for code review, parallel reviewer fan-out, finding ledgers, and bounded review-fix-re-review loops
+description: Use for code review, reviewer scope decomposition, finding ledgers, and bounded review-fix-re-review loops
 license: MIT
 compatibility: opencode
 metadata:
@@ -10,7 +10,7 @@ metadata:
 
 - Review requests are read-only unless the user explicitly asks for fixes.
 - Do not edit files, stage changes, commit, or run fix commands during review.
-- Use up to ten `@reviewer` subagents in parallel only when distinct scopes are useful.
+- Use up to ten `@reviewer` subagents only when distinct scopes are useful. Instrumented quality mode runs reviewer children one at a time so each result is settled and incorporated before the next; profile-only mode may optionally parallelize independent reviewer scopes without a computational receipt-chain guarantee.
 - Prefer distinct reviewer scopes: correctness, tests/coverage, API/contracts, security/privacy, performance/concurrency/resource lifecycle, and UX/i18n/docs/build-release.
 - Each reviewer must return concrete findings with severity, file/line evidence, impact, and a recommended fix.
 

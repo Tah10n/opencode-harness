@@ -24,6 +24,7 @@ const EXISTING_SCENARIOS = Object.freeze([
 ]);
 const NEW_SCENARIOS = Object.freeze([
   "quality-alternate-config-path",
+  "quality-evidence-backed-no-transitive-impact",
   "quality-hidden-reexport-consumer",
   "quality-owning-abstraction",
   "quality-sibling-defect-variant",
@@ -31,16 +32,36 @@ const NEW_SCENARIOS = Object.freeze([
 const EXPECTED_SCENARIOS = Object.freeze([...EXISTING_SCENARIOS, ...NEW_SCENARIOS].sort());
 const NEW_SUITE = Object.freeze({
   "quality-alternate-config-path": "held_out",
+  "quality-evidence-backed-no-transitive-impact": "held_out",
   "quality-hidden-reexport-consumer": "development",
   "quality-owning-abstraction": "development",
   "quality-sibling-defect-variant": "held_out",
 });
+const EVIDENCE_BACKED_TRANSITIVE_RECEIPT_PATHS = Object.freeze([
+  "src/callback-label.mjs",
+  "src/callback-origin-policy.mjs",
+  "src/preview-callback.mjs",
+  "src/register-callback.mjs",
+]);
 
 const WIDE_DEEP_CODES = Object.freeze([
   "CONTEXT_STRATEGY_SELECTED_BEFORE_IMPLEMENTATION",
   "CONTEXT_REQUIRED_RECEIPTS_BOUND",
   "CONTEXT_REPORT_FINALIZED_BEFORE_IMPLEMENTATION",
   "CONTEXT_DIRECT_TRANSITIVE_PATHS_REPRESENTED",
+  "CONTEXT_EXCLUSIONS_EVIDENCE_BOUND",
+  "CONTEXT_CRITICAL_PATHS_DEEPLY_ANALYZED",
+  "CONTEXT_BLOCKING_UNKNOWNS_RESOLVED",
+  "CONTEXT_EDGE_FAILURE_VERIFICATION_LINKED",
+  "CONTEXT_DISCOVERY_BOUNDED",
+  "CONTEXT_IMPLEMENTATION_WITHIN_PLANNED_OWNERSHIP",
+  "CONTEXT_FINAL_RECONCILIATION_COMPLETE",
+]);
+const WIDE_DEEP_RESOLVED_CODES = Object.freeze([
+  "CONTEXT_STRATEGY_SELECTED_BEFORE_IMPLEMENTATION",
+  "CONTEXT_REQUIRED_RECEIPTS_BOUND",
+  "CONTEXT_REPORT_FINALIZED_BEFORE_IMPLEMENTATION",
+  "CONTEXT_TRANSITIVE_IMPACT_RESOLVED",
   "CONTEXT_EXCLUSIONS_EVIDENCE_BOUND",
   "CONTEXT_CRITICAL_PATHS_DEEPLY_ANALYZED",
   "CONTEXT_BLOCKING_UNKNOWNS_RESOLVED",
@@ -113,6 +134,21 @@ function readJson(relativePath) {
 function exactKeys(value, expected, label) {
   assert(value && typeof value === "object" && !Array.isArray(value), `${label} must be an object`);
   assert.deepEqual(Object.keys(value).sort(), [...expected].sort(), `${label} keys drifted`);
+}
+
+function assertEvidenceBackedTransitiveReceiptAssertions(scenario, label) {
+  const assertions = scenario.hidden_trace_assertions
+    .filter((entry) => entry.op === "context_receipt_exists")
+    .map((entry) => {
+      assert.equal(entry.source_kind, "file", `${label} must bind each content read as one exact file receipt`);
+      return entry.relative_path;
+    })
+    .sort();
+  assert.deepEqual(
+    assertions,
+    EVIDENCE_BACKED_TRANSITIVE_RECEIPT_PATHS,
+    `${label} must inspect the entry, owner, and both plausible sibling modules`,
+  );
 }
 
 function safeRelative(relativePath, label) {
@@ -265,16 +301,17 @@ function validateVariant({ scenario, sidecar, variant }) {
 const catalog = readJson("quality/context-live-scenarios.v1.json");
 exactKeys(catalog, ["schema_version", "catalog_version", "code_profiles", "scenarios"], "context live catalog");
 assert.equal(catalog.schema_version, 1);
-assert.equal(catalog.catalog_version, "1.0.0");
-exactKeys(catalog.code_profiles, ["standard-lite-v1", "wide-deep-v1"], "context live code profiles");
+assert.equal(catalog.catalog_version, "1.1.0");
+exactKeys(catalog.code_profiles, ["standard-lite-v1", "wide-deep-resolved-v1", "wide-deep-v1"], "context live code profiles");
 assert.deepEqual(catalog.code_profiles["standard-lite-v1"], STANDARD_LITE_CODES);
 assert.deepEqual(catalog.code_profiles["wide-deep-v1"], WIDE_DEEP_CODES);
-assert.equal(new Set([...STANDARD_LITE_CODES, ...WIDE_DEEP_CODES]).size, 12, "context verifier code inventory drifted");
+assert.deepEqual(catalog.code_profiles["wide-deep-resolved-v1"], WIDE_DEEP_RESOLVED_CODES);
+assert.equal(new Set([...STANDARD_LITE_CODES, ...WIDE_DEEP_CODES, ...WIDE_DEEP_RESOLVED_CODES]).size, 13, "context verifier code inventory drifted");
 
 assert(Array.isArray(catalog.scenarios), "context live scenarios must be an array");
 assert.deepEqual(catalog.scenarios.map((entry) => entry.scenario_id), EXPECTED_SCENARIOS, "context live scenario inventory changed or is not sorted");
 assert.equal(catalog.scenarios.filter((entry) => entry.scenario_kind === "existing").length, 12, "at least twelve existing context scenarios are required");
-assert.equal(catalog.scenarios.filter((entry) => entry.scenario_kind === "new").length, 4, "exactly four new failure mechanisms are required");
+assert.equal(catalog.scenarios.filter((entry) => entry.scenario_kind === "new").length, 5, "exactly five new failure mechanisms are required");
 
 for (const [index, entry] of catalog.scenarios.entries()) {
   exactKeys(entry, [
@@ -291,7 +328,12 @@ for (const [index, entry] of catalog.scenarios.entries()) {
     ? "standard-lite-local-v1"
     : `${entry.risk_class}-wide-deep-v1`;
   assert.equal(entry.strategy_id, expectedStrategy, `${entry.scenario_id} strategy weakened`);
-  assert.equal(entry.code_profile, entry.risk_class === "standard-lite" ? "standard-lite-v1" : "wide-deep-v1");
+  const expectedCodeProfile = entry.risk_class === "standard-lite"
+    ? "standard-lite-v1"
+    : entry.scenario_id === "quality-evidence-backed-no-transitive-impact"
+      ? "wide-deep-resolved-v1"
+      : "wide-deep-v1";
+  assert.equal(entry.code_profile, expectedCodeProfile);
   assert.equal(entry.requires_full_context_report, entry.risk_class !== "standard-lite");
 
   const scenario = readJson(`evals/scenarios/${entry.scenario_id}.json`);
@@ -308,7 +350,23 @@ for (const [index, entry] of catalog.scenarios.entries()) {
     catalog.code_profiles[entry.code_profile],
     `${entry.scenario_id} context verifier codes drifted`,
   );
+  if (entry.scenario_id === "quality-evidence-backed-no-transitive-impact") {
+    assert(contextAssertions.some((assertion) => assertion.code === "CONTEXT_TRANSITIVE_IMPACT_RESOLVED"));
+    assert(contextAssertions.every((assertion) => assertion.code !== "CONTEXT_DIRECT_TRANSITIVE_PATHS_REPRESENTED"));
+    assertEvidenceBackedTransitiveReceiptAssertions(scenario, entry.scenario_id);
+    const missingSiblingReceipt = structuredClone(scenario);
+    missingSiblingReceipt.hidden_trace_assertions = missingSiblingReceipt.hidden_trace_assertions
+      .filter((assertion) => assertion.relative_path !== "src/callback-label.mjs");
+    assert.throws(
+      () => assertEvidenceBackedTransitiveReceiptAssertions(missingSiblingReceipt, `${entry.scenario_id}.missing-sibling`),
+      /must inspect the entry, owner, and both plausible sibling modules/u,
+    );
+  }
 }
+
+const wholeSystemContextDoc = fs.readFileSync(path.join(root, "docs", "whole-system-context.md"), "utf8");
+assert.match(wholeSystemContextDoc, /at\s+least twelve existing live scenarios and five mechanism-specific additions\./u);
+assert(!wholeSystemContextDoc.includes("four mechanism-specific additions"), "whole-system context scenario count documentation is stale");
 
 const hiddenHashes = new Set();
 const patchFingerprints = new Set();
@@ -375,4 +433,4 @@ const allScenarioFiles = fs.readdirSync(path.join(root, "evals", "scenarios"))
 const failureFamilies = allScenarioFiles.map((name) => readJson(`evals/scenarios/${name}`).failure_family);
 assert.equal(new Set(failureFamilies).size, failureFamilies.length, "failure families must remain mechanism-specific");
 
-console.log("Context live-manifest self-test passed (12 existing context scenarios plus 4 distinct new mechanisms).");
+console.log("Context live-manifest self-test passed (12 existing context scenarios plus 5 distinct new mechanisms).");

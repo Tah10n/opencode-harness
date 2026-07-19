@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "manifest_version": "2.0.0",
+  "manifest_version": "2.1.0",
   "suites": {
     "development": [
       "small-local-no-delegation",
@@ -27,7 +27,8 @@
       "quality-stale-cache-version-skew",
       "quality-partial-dependency-failure",
       "quality-alternate-config-path",
-      "quality-sibling-defect-variant"
+      "quality-sibling-defect-variant",
+      "quality-evidence-backed-no-transitive-impact"
     ],
     "canary": [
       "review-read-only-trap",

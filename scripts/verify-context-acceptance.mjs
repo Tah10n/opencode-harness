@@ -9,6 +9,7 @@ import {
   createQualityAcceptancePolicy,
   createQualityAcceptancePolicyV3,
   evaluateContextAcceptanceHardGates,
+  qualityAcceptancePolicyOutcomeSchema,
   qualityOutcomesFingerprint,
   validateContextAcceptanceHardGates,
   validateContextAcceptanceMetrics,
@@ -49,8 +50,10 @@ function highMetrics() {
     deep_analyzed_critical_path_count: 2,
     critical_path_deep_analysis_coverage_basis_points: 10_000,
     blocking_unknown_count: 0,
-    required_transitive_path_count: 2,
+    transitive_impact_resolution: "represented",
     represented_transitive_path_count: 2,
+    evidence_backed_transitive_exclusion_count: 0,
+    contradicted_transitive_exclusion_count: 0,
     reasoned_exclusion_count: 1,
     exclusions_evidenced: true,
     context_tool_call_count: 6,
@@ -83,8 +86,10 @@ function standardLiteMetrics() {
     deep_analyzed_critical_path_count: 0,
     critical_path_deep_analysis_coverage_basis_points: null,
     blocking_unknown_count: 0,
-    required_transitive_path_count: 0,
+    transitive_impact_resolution: "not_applicable",
     represented_transitive_path_count: 0,
+    evidence_backed_transitive_exclusion_count: 0,
+    contradicted_transitive_exclusion_count: 0,
     reasoned_exclusion_count: 0,
     exclusions_evidenced: true,
     context_tool_call_count: 3,
@@ -105,6 +110,31 @@ function standardLiteMetrics() {
   };
 }
 
+function legacyHighMetrics() {
+  const metrics = highMetrics();
+  delete metrics.transitive_impact_resolution;
+  delete metrics.evidence_backed_transitive_exclusion_count;
+  delete metrics.contradicted_transitive_exclusion_count;
+  metrics.required_transitive_path_count = 2;
+  return metrics;
+}
+
+function legacyHighGates() {
+  const gates = structuredClone(evaluateContextAcceptanceHardGates(highMetrics()));
+  delete gates.transitive_impact_resolved;
+  gates.transitive_paths_represented = true;
+  return gates;
+}
+
+function legacyContextRequirements(current) {
+  return {
+    ...current,
+    required_metric_keys: Object.keys(legacyHighMetrics()).sort(),
+    required_hard_gates: Object.keys(legacyHighGates()).sort(),
+    minimum_represented_transitive_path_count: 1,
+  };
+}
+
 function expectRejectedMetric(label, base, changes, gateId) {
   const metrics = { ...base, ...changes };
   validateContextAcceptanceMetrics(metrics);
@@ -121,6 +151,30 @@ validateQualityAcceptancePolicy(v2);
 validateQualityAcceptancePolicy(v3);
 assert.deepEqual(createQualityAcceptancePolicy(withoutEnvelope(v2)), v2, "v2 policy round-trip changed");
 assert.deepEqual(createQualityAcceptancePolicyV3(withoutEnvelope(v3)), v3, "v3 policy round-trip changed");
+const legacyV3Policy = createQualityAcceptancePolicyV3({
+  ...withoutEnvelope(v3),
+  policy_version: "3.0.0-test",
+  context_requirements: legacyContextRequirements(v3.context_requirements),
+});
+assert.equal(qualityAcceptancePolicyOutcomeSchema(legacyV3Policy), 3);
+assert.equal(qualityAcceptancePolicyOutcomeSchema(v3), 4);
+assert.throws(
+  () => createQualityAcceptancePolicyV3({
+    ...withoutEnvelope(v3),
+    policy_version: "3.0.0-test",
+  }),
+  /CONTRACT_|QUALITY_CONTEXT_POLICY_SURFACE/u,
+  "the 3.0 policy boundary silently accepted the 3.1 context surface",
+);
+assert.throws(
+  () => createQualityAcceptancePolicyV3({
+    ...withoutEnvelope(v3),
+    policy_version: "3.1.0-test",
+    context_requirements: legacyContextRequirements(v3.context_requirements),
+  }),
+  /CONTRACT_|QUALITY_CONTEXT_POLICY_SURFACE/u,
+  "the 3.1 policy boundary silently accepted the legacy context surface",
+);
 for (const scenarioId of v2.required_scenarios) {
   assert(v3.required_scenarios.includes(scenarioId), `v3 dropped the Milestone 2 scenario ${scenarioId}`);
 }
@@ -132,6 +186,11 @@ for (const scenario of contextCatalog.scenarios) {
     `v3 risk drifted for ${scenario.scenario_id}`,
   );
 }
+assert.equal(
+  v3.required_scenario_risks["quality-evidence-backed-no-transitive-impact"],
+  "high",
+  "the real no-transitive-impact acceptance scenario is not a required high-risk gate",
+);
 assert.equal(
   nestedKeys(v3).some((key) => /score/iu.test(key)),
   false,
@@ -152,6 +211,45 @@ const happyHigh = highMetrics();
 validateContextAcceptanceMetrics(happyHigh);
 const happyHighGates = evaluateContextAcceptanceHardGates(happyHigh);
 assert(allPassed(happyHighGates), "complete high wide/deep evidence did not pass");
+const excludedHigh = {
+  ...happyHigh,
+  transitive_impact_resolution: "evidence_backed_excluded",
+  represented_transitive_path_count: 0,
+  evidence_backed_transitive_exclusion_count: 1,
+};
+assert(
+  allPassed(evaluateContextAcceptanceHardGates(excludedHigh)),
+  "evidence-backed absence of transitive impact did not pass the non-scalar hard gate",
+);
+const unresolvedHigh = {
+  ...happyHigh,
+  transitive_impact_resolution: "unresolved",
+  represented_transitive_path_count: 0,
+};
+expectRejectedMetric(
+  "unresolved transitive impact",
+  unresolvedHigh,
+  {},
+  "transitive_impact_resolved",
+);
+const contradictedHigh = {
+  ...unresolvedHigh,
+  contradicted_transitive_exclusion_count: 1,
+};
+expectRejectedMetric(
+  "contradicted transitive exclusion",
+  contradictedHigh,
+  {},
+  "transitive_impact_resolved",
+);
+assert.throws(
+  () => validateContextAcceptanceMetrics({
+    ...excludedHigh,
+    contradicted_transitive_exclusion_count: 1,
+  }),
+  /QUALITY_CONTEXT_METRIC_RELATION/u,
+  "a contradicted exclusion was allowed to claim an evidence-backed resolution",
+);
 
 const stableFingerprint = `sha256:${"a".repeat(64)}`;
 const v2OutcomeSource = {
@@ -182,32 +280,63 @@ const v2Outcome = {
   fingerprint: qualityOutcomesFingerprint(v2OutcomeSource),
 };
 validateQualityOutcomes(v2Outcome);
-const v3OutcomeSource = {
+const legacyV3OutcomeSource = {
   ...v2OutcomeSource,
   schema_version: 3,
+  producer_id: QUALITY_ACCEPTANCE_PRODUCERS.legacyContextQualityOutcomes,
+  context_metrics: legacyHighMetrics(),
+  context_hard_gates: legacyHighGates(),
+};
+const legacyV3Outcome = {
+  ...legacyV3OutcomeSource,
+  fingerprint: qualityOutcomesFingerprint(legacyV3OutcomeSource),
+};
+validateQualityOutcomes(legacyV3Outcome);
+const v4OutcomeSource = {
+  ...v2OutcomeSource,
+  schema_version: 4,
   producer_id: QUALITY_ACCEPTANCE_PRODUCERS.contextQualityOutcomes,
   context_metrics: happyHigh,
   context_hard_gates: happyHighGates,
 };
-const v3Outcome = {
-  ...v3OutcomeSource,
-  fingerprint: qualityOutcomesFingerprint(v3OutcomeSource),
+const v4Outcome = {
+  ...v4OutcomeSource,
+  fingerprint: qualityOutcomesFingerprint(v4OutcomeSource),
 };
-validateQualityOutcomes(v3Outcome);
+validateQualityOutcomes(v4Outcome);
 const failedHiddenMetrics = { ...happyHigh, hidden_defect_escape_count: 1 };
-const falseGreenV3Source = {
-  ...v3OutcomeSource,
+const falseGreenV4Source = {
+  ...v4OutcomeSource,
   context_metrics: failedHiddenMetrics,
   context_hard_gates: evaluateContextAcceptanceHardGates(failedHiddenMetrics),
 };
-const falseGreenV3 = {
-  ...falseGreenV3Source,
-  fingerprint: qualityOutcomesFingerprint(falseGreenV3Source),
+const falseGreenV4 = {
+  ...falseGreenV4Source,
+  fingerprint: qualityOutcomesFingerprint(falseGreenV4Source),
 };
 assert.throws(
-  () => validateQualityOutcomes(falseGreenV3),
+  () => validateQualityOutcomes(falseGreenV4),
   /QUALITY_ACCEPTANCE_OUTCOME_COMPLETENESS/u,
-  "v3 outcome claimed complete while a context hard gate failed",
+  "v4 outcome claimed complete while a context hard gate failed",
+);
+const unresolvedV4Source = {
+  ...v4OutcomeSource,
+  complete: false,
+  context_metrics: unresolvedHigh,
+  context_hard_gates: evaluateContextAcceptanceHardGates(unresolvedHigh),
+};
+validateQualityOutcomes({
+  ...unresolvedV4Source,
+  fingerprint: qualityOutcomesFingerprint(unresolvedV4Source),
+});
+const unresolvedFalseGreenSource = { ...unresolvedV4Source, complete: true };
+assert.throws(
+  () => validateQualityOutcomes({
+    ...unresolvedFalseGreenSource,
+    fingerprint: qualityOutcomesFingerprint(unresolvedFalseGreenSource),
+  }),
+  /QUALITY_ACCEPTANCE_OUTCOME_COMPLETENESS/u,
+  "an unresolved transitive regression remained acceptance-complete",
 );
 assert.equal(
   happyHighGates.truncations_resolved,
@@ -231,9 +360,10 @@ expectRejectedMetric("missing deep analysis", happyHigh, {
 expectRejectedMetric("blocking unknown", happyHigh, {
   blocking_unknown_count: 1,
 }, "blocking_unknowns_resolved");
-expectRejectedMetric("missing transitive representation", happyHigh, {
-  represented_transitive_path_count: 1,
-}, "transitive_paths_represented");
+expectRejectedMetric("missing transitive resolution", happyHigh, {
+  transitive_impact_resolution: "unresolved",
+  represented_transitive_path_count: 0,
+}, "transitive_impact_resolved");
 expectRejectedMetric("missing exclusion evidence", happyHigh, {
   exclusions_evidenced: false,
 }, "exclusions_evidenced");
@@ -265,6 +395,15 @@ expectRejectedMetric("missing high context report", happyHigh, {
 
 const happyStandardLite = standardLiteMetrics();
 assert(allPassed(evaluateContextAcceptanceHardGates(happyStandardLite)), "bounded standard-lite evidence did not pass");
+assert.equal(happyStandardLite.transitive_impact_resolution, "not_applicable");
+assert.throws(
+  () => validateContextAcceptanceMetrics({
+    ...happyStandardLite,
+    transitive_impact_resolution: "unresolved",
+  }),
+  /QUALITY_CONTEXT_METRIC_RELATION/u,
+  "standard-lite silently inherited the full transitive-impact gate",
+);
 expectRejectedMetric("standard-lite over-analysis", happyStandardLite, {
   context_tool_call_count: 13,
   standard_lite_over_analysis_count: 1,
@@ -305,5 +444,5 @@ assert.throws(
 );
 
 console.log(
-  "Context acceptance self-test passed (v2 compatibility, 29 metrics, 14 hard gates, 14 negative mechanisms, standard-lite control, happy paths).",
+  "Context acceptance self-test passed (v2/v3 compatibility, v4 current contract, 31 metrics, 14 hard gates, 16 fail-closed mechanisms, standard-lite control).",
 );

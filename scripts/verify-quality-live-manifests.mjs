@@ -71,6 +71,7 @@ const M3_CONTEXT_ALLOCATION = Object.freeze({
   held_out: [
     "quality-alternate-config-path",
     "quality-sibling-defect-variant",
+    "quality-evidence-backed-no-transitive-impact",
   ],
   canary: [],
 });
@@ -317,7 +318,7 @@ assert.equal(new Set(qualityIds).size, 12);
 assert.equal(new Set(Object.values(WORKLOAD_CLASSES)).size, 12, "workload classes must remain distinct");
 
 const { scenarios, suiteManifest } = loadScenarioCorpus({ root });
-assert.equal(suiteManifest.manifest_version, "2.0.0", "quality corpus requires suite manifest 2.0.0");
+assert.equal(suiteManifest.manifest_version, "2.1.0", "quality corpus requires suite manifest 2.1.0");
 for (const [suite, prefix] of Object.entries(M1_PREFIX)) {
   const expected = suite === "infrastructure"
     ? prefix
@@ -330,8 +331,8 @@ const sidecarFiles = fs.readdirSync(sidecarRoot, { withFileTypes: true })
   .map((entry) => entry.name)
   .sort();
 const contextIds = Object.values(M3_CONTEXT_ALLOCATION).flat();
-assert.equal(contextIds.length, 4);
-assert.equal(new Set(contextIds).size, 4);
+assert.equal(contextIds.length, 5);
+assert.equal(new Set(contextIds).size, 5);
 assert.deepEqual(
   sidecarFiles,
   [...qualityIds, ...contextIds].map((id) => `${id}.v1.json`).sort(),
@@ -466,4 +467,4 @@ assert.equal(failureFamilies.size, 12, "quality failure families must be unique"
 assert.equal(hiddenHashes.size, 12, "hidden oracles must be mechanism-specific");
 assert.equal(visibleOracleIdentities.size, 12, "visible oracle identities must be scenario-specific");
 assert.equal(expectedFailureSignatures.size, 12, "expected failure signatures must be scenario-specific");
-console.log("Quality live-manifest self-test passed (12 M2 scenarios, 16 sidecars; bad patches trapped, compliant patches accepted).\n");
+console.log("Quality live-manifest self-test passed (12 M2 scenarios, 17 sidecars; bad patches trapped, compliant patches accepted).\n");

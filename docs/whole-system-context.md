@@ -13,16 +13,25 @@ strategy, records evidence, and reports a concise blocked-or-ready result.
 
 For high and critical work, the order is fixed:
 
-1. Classify the quality session.
-2. Select the minimum context strategy.
-3. Record bounded context-operation receipts.
-4. Finalize the Whole-System Context Report.
-5. Let the runner calculate context sufficiency.
-6. Finalize the Engineering Dossier.
-7. Evaluate the existing quality gate.
-8. Authorize a bounded mutation only after both computations pass.
+1. `chat.message` registers the session.
+2. `quality_session_start` classifies risk and selects the minimum context
+   strategy.
+3. `quality_dossier_create` creates a provisional Engineering Dossier draft and
+   provisional impact graph.
+4. Bounded context operations produce runner-owned context receipts, and
+   serialized read-only child tasks settle, bind, and incorporate one at a time.
+5. `quality_dossier_update` refines the Dossier and impact graph from evidence.
+6. `quality_context_report_update` refines the linked Whole-System Context Report.
+7. `quality_context_report_finalize` lets the runner calculate context
+   sufficiency; insufficient analysis leaves the report and Dossier unready.
+8. Architect and reviewer challenge the current Dossier and current context
+   report. Any analytical update invalidates stale challenge contributions.
+9. `quality_dossier_finalize` finalizes the current Dossier and evaluates the
+   existing quality gate.
+10. Only a runner-owned passed gate authorizes a bounded mutation.
 
-The report does not authorize writes. The agent cannot choose a weaker
+The report does not authorize writes. Context sufficiency and Dossier
+finalization also do not authorize writes. The agent cannot choose a weaker
 strategy, invent receipt IDs, set the sufficiency result, or substitute prose
 for runner evidence.
 
@@ -52,10 +61,29 @@ reasoning, raw subagent transcripts, secrets, or absolute private paths. A
 report may reference only current receipts from its own session and workspace.
 Post-mutation or stale receipts cannot prove pre-mutation analysis.
 
+The derived receipt-evidence index uses schema v3. Each relationship record
+preserves the requested target path, related path, relationship kind, and
+confidence; the legacy `relationship_paths` list is only a derived summary and
+never authorizes a semantic decision. `direct-import` is normalized as target
+to related path, while `imported-by` is normalized as related path to target.
+Only a correctly directed high-confidence import may positively support a
+semantic graph edge. An import candidate at any confidence fails closed when it
+contradicts a claimed absence of transitive consumers. Heuristic
+`likely-test`, `same-basename`, and `sibling` relations require classification
+and direct inspection but do not by themselves prove a consumer. Evidence-index
+v2 is rejected by authorizing paths because it irreversibly discarded the
+relationship kind, direction, and confidence.
+
 In the live quality path, only the runner's context observer may turn a context
 operation into one of these receipts. Adapter output is untrusted task output;
 there is no adapter callback that can mint a trusted receipt. The installed
 normal-session bridge applies the same rule at its host-hook boundary.
+
+Instrumented quality mode serializes context operations and read-only child
+tasks because a second pending operation or active child is rejected. Each
+result is settled, bound, and incorporated before the next launch. Profile-only
+mode may optionally parallelize independent read-only work, but it provides no
+computational receipt-chain guarantee.
 
 ## Wide and deep analysis
 
@@ -98,7 +126,7 @@ stronger evidence, not a portable-operation prerequisite.
 ## Evaluation and reconciliation
 
 `quality/context-live-scenarios.v1.json` binds context verifier codes to at
-least twelve existing live scenarios and four mechanism-specific additions.
+least twelve existing live scenarios and five mechanism-specific additions.
 Runner-owned hidden assertions check ordering, receipts, wide/deep coverage,
 unknown resolution, verification mapping, bounded discovery, ownership, and
 final reconciliation. Standard-lite separately checks that the process stayed

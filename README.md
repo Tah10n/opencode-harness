@@ -156,65 +156,82 @@ recursive-context tools are host opt-ins.
    preserved behavior, local edge cases, ownership, and trusted checks. The
    runner synthesizes this compact dossier; callers do not replace or update it
    with `quality_dossier_create` or `quality_dossier_update`.
-4. `high` and `critical` first use the runner-selected context strategy. Actual
-   bounded context operations create sanitized machine-owned receipts through
+4. For `high` and `critical`, the runner-selected strategy begins with a
+   provisional Engineering Dossier draft and provisional impact graph created by
+   `quality_dossier_create`.
+5. Actual bounded context operations create runner-owned context receipts through
    the runner observer or trusted normal-session host hook; live adapters cannot
-   mint those receipts from self-described output. The agent completes a
-   Whole-System Context Report linked to the existing impact graph, and the
-   runner computes context sufficiency.
-5. Only after context sufficiency passes may the full Engineering Dossier be
-   finalized with its impact graph, invariants, edge/failure mappings, baseline
-   evidence, and independent architect and reviewer contributions.
-6. The plugin and runner compute the existing gate. Native edit, write, patch, and
-   writable `task.general` calls remain denied until the runner records a
-   passed gate. Native `bash` remains disabled in an instrumented quality
-   session.
-7. A passed gate issues one-shot authority for exact owned paths. Tests, lint,
+   mint receipts from self-described output. Instrumented context operations and
+   serialized read-only child tasks run one at a time so each result is settled,
+   bound, and incorporated before the next launch.
+6. Evidence refines the Dossier through `quality_dossier_update` and the linked
+   report through `quality_context_report_update`. The agent then calls
+   `quality_context_report_finalize`, and the runner computes context sufficiency.
+7. Architect and reviewer challenge the current Dossier and current context
+   report. `quality_dossier_finalize` then evaluates the existing gate. Report
+   finalization, context sufficiency, and Dossier finalization do not authorize
+   mutation; only a runner-owned passed gate authorizes mutation. Native `bash`
+   remains disabled in an instrumented quality session.
+8. A passed gate issues one-shot authority for exact owned paths. Tests, lint,
    typecheck, and builds run only as runner-owned trusted project checks.
-8. The runner compares the bounded source workspace before and after mutation:
+9. The runner compares the bounded source workspace before and after mutation:
    tracked changes, untracked non-ignored files, exact ownership, declared
    generated outputs, the Git index, and `HEAD`. Ordinary ignored dependency,
    cache, and build trees stay outside the source walk; `.oc_harness` has a
    separate control-state guard.
-9. Project checks declare a logical `executable_id` in
+10. Project checks declare a logical `executable_id` in
    `.opencode/quality/checks.json`. `.opencode/quality/toolchains.json` maps it
    to an approved resolver family. The runner avoids ambient `PATH`, rechecks
    identity immediately before spawn, sanitizes the environment, and uses
    `shell: false`.
-10. A `standard-lite` bug fix binds one catalog check as both the pre-fix
+11. A `standard-lite` bug fix binds one catalog check as both the pre-fix
    reproducer and the integration regression. The runner records expected
    pre-fix failure, post-fix pass, unrelated outcome, or bounded unavailability
    with an explicit reason. Unexpected pass, unrelated evidence, and material
    uncertainty block the compact path.
-11. A configured high/critical architecture policy accepts only a freshly
+12. A configured high/critical architecture policy accepts only a freshly
     created or rewritten runner-owned final graph from its integration check.
     Missing, stale, unavailable, failed, or policy-violating evidence cannot
     produce attestation.
-12. Before attestation, the runner derives the exact final diff and resolves
+13. Before attestation, the runner derives the exact final diff and resolves
     immutable reviewer evidence, then reconciles them with planned ownership,
     report coverage, public contracts, dependency and side-effect edges, and
     critical-path verification. Adapter-declared diff or reviewer claims are
     never trusted. An unplanned high-impact path invalidates prior sufficiency
     and requires re-analysis.
-13. Final attestation is valid only for the current source workspace after all
+14. Final attestation is valid only for the current source workspace after all
     mandatory trusted checks, any required post-edit architecture review, and
     final context reconciliation.
 
 ## How The Agent Understands A Change
 
-For high or critical work, a wide pass finds where the change can have an
-effect: entry points, callers, consumers, contracts, state, side effects,
-architecture boundaries, tests, siblings, and unresolved paths. A deep pass
-then follows each critical path to find the ways it can fail, including state
-transitions, errors, retries, cancellation, concurrency, rollback, cleanup,
-compatibility, and security where applicable.
+For high or critical work, the agent builds understanding in a visible loop:
 
-The architect challenges architecture, ownership, exclusions, and blast
-radius. The reviewer challenges counterexamples, edge cases, and test design.
-The plugin blocks implementation until the required receipt-backed evidence is
-present and the runner computes sufficient context; the existing Engineering
-Dossier gate still owns mutation authorization. Final verification and
-reconciliation bind the result to the current workspace, not an earlier diff.
+1. `chat.message` registers the task, and `quality_session_start` classifies its
+   risk and selects the minimum context strategy.
+2. `quality_dossier_create` records a provisional Engineering Dossier draft and
+   provisional map of entry points, callers, consumers, contracts, state,
+   side effects, tests, siblings, unknowns, and critical paths.
+3. The agent reads one relevant area at a time. Each bounded operation produces a
+   runner-owned context receipt; instrumented read-only children are serialized.
+4. New evidence is expected to change the provisional map. The agent applies
+   those changes through `quality_dossier_update` rather than defending its first
+   guess.
+5. `quality_context_report_update` records the wide affected-system view and the
+   deep failure analysis for every critical path.
+6. `quality_context_report_finalize` asks the runner to compute context
+   sufficiency. Missing direct evidence or unresolved transitive impact keeps the
+   report draft. A genuinely local path may instead prove that no transitive
+   consumer exists, but only with complete runner-owned evidence; agent prose or
+   a partial search is never enough.
+7. Architect and reviewer challenge the current Dossier and current context
+   report, including exclusions, counterexamples, edge cases, and test design.
+8. `quality_dossier_finalize` evaluates the existing Engineering Dossier gate.
+   Neither report finalization, context sufficiency, nor Dossier finalization is
+   mutation authority.
+9. Only a runner-owned passed gate permits exact, one-shot writes.
+10. After implementation, verification and exact-diff reconciliation compare the
+    result with the current report and workspace, not an earlier plan or diff.
 
 Genuinely local `standard-lite` work keeps a short local plan and bounded local
 evidence. See [Whole-System Context](docs/whole-system-context.md) for the exact
@@ -483,9 +500,12 @@ model, credentials, network, live adapter, installed OpenCode runtime, or
 machine-local plugin API package. Run `npm run probe:runtime:quality-plugin-api`
 separately only in the installed target environment.
 
-Profile-only mode is prompt guidance. Instrumented quality mode adds the
-session registry, dossier/gate, workspace binding and mutation hooks described
-above. Live-evaluation mode remains a separate isolated scenario runner.
+Profile-only mode is prompt guidance and may optionally parallelize independent
+read-only work, but it cannot claim computational receipt-chain correlation.
+Instrumented quality mode adds the session registry, Dossier/gate, workspace
+binding, and mutation hooks described above; its context operations and child
+tasks are serialized. Live-evaluation mode remains a separate isolated scenario
+runner.
 `session.created` still lacks the originating task call ID, so child binding is
 serialized and cardinality-checked rather than claimed as cryptographically
 causal. Actual host discovery and hook invocation remain external evidence;

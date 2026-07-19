@@ -17,14 +17,30 @@ import {
   handleQualityLiveOperation,
   inspectQualityLiveCoordinator,
   qualityLiveOutcomeEvidence,
+  qualityLiveContextImpactVerifierCodes,
   qualityLivePrecompletionVerifierCodes,
   qualityLiveSessionForPublication,
   recordQualityLiveImplementation,
   recordQualityLiveIntegratedVerification,
   recordQualityLiveObservedContextToolCall,
 } from "../lib/quality/live-coordinator.mjs";
+import { createContextReceiptEvidenceIndex } from "../lib/quality/context-sufficiency.mjs";
+import { selectMinimumContextStrategy } from "../lib/quality/context-strategies.mjs";
+import {
+  createWholeSystemContextReportDraft,
+  finalizeWholeSystemContextReport,
+} from "../lib/quality/whole-system-context-report.mjs";
 import { snapshotEngineeringQualitySession } from "../lib/quality/session.mjs";
 import { createEngineeringQualityStore } from "../lib/quality/store.mjs";
+import {
+  completeContextContent,
+  CONTEXT_TEST_FINAL_TIME,
+  CONTEXT_TEST_SESSION_KEY,
+  CONTEXT_TEST_TIME,
+  CONTEXT_TEST_WORKSPACE,
+  contextTestDossier,
+  contextTestReceipt,
+} from "./context-test-fixtures.mjs";
 
 const FP_A = `sha256:${"a".repeat(64)}`;
 const FP_B = `sha256:${"b".repeat(64)}`;
@@ -120,6 +136,143 @@ function recordLocalContext(current, callId) {
     parent_question_id: null,
     evidence_refs: [{ kind: "file", value: "src/app.mjs" }],
   });
+}
+
+function contextImpactVerifierFixture(transitiveImpact) {
+  const dossier = contextTestDossier({ transitiveImpact });
+  const strategy = selectMinimumContextStrategy({
+    risk_class: dossier.risk_class,
+    task_type: dossier.task_type,
+  });
+  const outline = contextTestReceipt({
+    receiptId: "CTXRECEIPT-OUTLINE",
+    sequence: 1,
+    dossier,
+    toolId: "context_outline",
+    startedAt: "2026-07-17T10:01:00.000Z",
+    completedAt: "2026-07-17T10:02:00.000Z",
+  });
+  const content = contextTestReceipt({
+    receiptId: "CTXRECEIPT-001",
+    sequence: 2,
+    dossier,
+    toolId: "context_batch_read",
+    previousReceiptFingerprint: outline.fingerprint,
+  });
+  const receipts = [outline, content];
+  const reportDraft = createWholeSystemContextReportDraft({
+    report_id: `CONTEXT-live-coordinator-${transitiveImpact}`,
+    session_key: CONTEXT_TEST_SESSION_KEY,
+    strategy_binding: strategy,
+    workspace_fingerprint: CONTEXT_TEST_WORKSPACE,
+    dossier,
+    created_at: CONTEXT_TEST_TIME,
+    content: completeContextContent({
+      strategyBinding: strategy,
+      dossier,
+      receiptIds: receipts.map((entry) => entry.receipt_id),
+      advancedAvailable: ["context_batch_read"],
+    }),
+  });
+  const contextReport = finalizeWholeSystemContextReport(reportDraft, {
+    finalized_at: CONTEXT_TEST_FINAL_TIME,
+    strategy_binding: strategy,
+    workspace_fingerprint: CONTEXT_TEST_WORKSPACE,
+    dossier,
+    receipt_index: { receipts },
+  });
+  const receiptEvidenceIndex = createContextReceiptEvidenceIndex({ receipts }, {
+    session_key: CONTEXT_TEST_SESSION_KEY,
+    run_id: dossier.run_id,
+    task_id: dossier.task_id,
+    source_fingerprint: CONTEXT_TEST_WORKSPACE,
+  });
+  return { impactGraph: dossier.impact_graph, contextReport, receiptEvidenceIndex };
+}
+
+function contextImpactCodes(value) {
+  return qualityLiveContextImpactVerifierCodes({
+    impact_graph: value.impactGraph,
+    context_report: value.contextReport,
+    receipt_evidence_index: value.receiptEvidenceIndex,
+  });
+}
+
+{
+  const represented = contextImpactVerifierFixture("represented");
+  assert.deepEqual(contextImpactCodes(represented), [
+    "CONTEXT_DIRECT_TRANSITIVE_PATHS_REPRESENTED",
+    "CONTEXT_TRANSITIVE_IMPACT_RESOLVED",
+    "CONTEXT_EXCLUSIONS_EVIDENCE_BOUND",
+  ]);
+  for (const forbiddenKind of ["reasoned_exclusion", "unresolved_hypothesis", "inferred"]) {
+    const forbidden = structuredClone(represented);
+    const wide = forbidden.contextReport.wide_analysis.find(
+      (entry) => entry.category === "transitive_consumers_side_effects",
+    );
+    for (const claim of forbidden.contextReport.claims.filter((entry) => wide.claim_ids.includes(entry.id))) {
+      claim.kind = forbiddenKind;
+    }
+    const forbiddenCodes = contextImpactCodes(forbidden);
+    assert(!forbiddenCodes.includes("CONTEXT_DIRECT_TRANSITIVE_PATHS_REPRESENTED"));
+    assert(!forbiddenCodes.includes("CONTEXT_TRANSITIVE_IMPACT_RESOLVED"));
+  }
+
+  const unsupportedDirectClaim = structuredClone(represented);
+  for (const claim of unsupportedDirectClaim.contextReport.claims) {
+    claim.subject_ids = claim.subject_ids.filter((entry) => entry !== "BLAST-direct");
+  }
+  unsupportedDirectClaim.contextReport.claims.push({
+    id: "CLAIM-unsupported-direct-path",
+    kind: "observed",
+    statement: "The direct path is asserted from an inventory receipt that does not inspect its source scope.",
+    subject_ids: ["BLAST-direct"],
+    receipt_ids: ["CTXRECEIPT-OUTLINE"],
+  });
+  const unsupportedDirectCodes = contextImpactCodes(unsupportedDirectClaim);
+  assert(!unsupportedDirectCodes.includes("CONTEXT_DIRECT_TRANSITIVE_PATHS_REPRESENTED"));
+  assert(!unsupportedDirectCodes.includes("CONTEXT_TRANSITIVE_IMPACT_RESOLVED"));
+
+  const excluded = contextImpactVerifierFixture("excluded");
+  assert.deepEqual(contextImpactCodes(excluded), [
+    "CONTEXT_TRANSITIVE_IMPACT_RESOLVED",
+    "CONTEXT_EXCLUSIONS_EVIDENCE_BOUND",
+  ]);
+
+  const unresolved = structuredClone(excluded);
+  unresolved.receiptEvidenceIndex.receipts[1].observed_paths = unresolved.receiptEvidenceIndex.receipts[1].observed_paths
+    .filter((entry) => entry !== "docs/harness-map.md");
+  assert(!contextImpactCodes(unresolved).includes("CONTEXT_TRANSITIVE_IMPACT_RESOLVED"));
+
+  const truncated = structuredClone(excluded);
+  truncated.receiptEvidenceIndex.receipts[1].status = "truncated";
+  truncated.receiptEvidenceIndex.receipts[1].coverage.partial = true;
+  truncated.receiptEvidenceIndex.receipts[1].coverage.complete = false;
+  assert(!contextImpactCodes(truncated).includes("CONTEXT_TRANSITIVE_IMPACT_RESOLVED"));
+
+  const crossBound = structuredClone(excluded);
+  crossBound.receiptEvidenceIndex.source_fingerprint = FP_E;
+  assert(!contextImpactCodes(crossBound).includes("CONTEXT_TRANSITIVE_IMPACT_RESOLVED"));
+
+  const contradicted = structuredClone(excluded);
+  contradicted.receiptEvidenceIndex.receipts[1].relationships.push({
+    target_path: "docs/harness-map.md",
+    related_path: "lib/context-service.mjs",
+    relationship: "direct-import",
+    confidence: "low",
+  });
+  contradicted.receiptEvidenceIndex.receipts[1].relationship_paths.push("lib/context-service.mjs");
+  assert(!contextImpactCodes(contradicted).includes("CONTEXT_TRANSITIVE_IMPACT_RESOLVED"));
+
+  const heuristic = structuredClone(excluded);
+  heuristic.receiptEvidenceIndex.receipts[1].relationships.push({
+    target_path: "lib/context-service.mjs",
+    related_path: "docs/harness-map.md",
+    relationship: "same-basename",
+    confidence: "low",
+  });
+  heuristic.receiptEvidenceIndex.receipts[1].relationship_paths.push("docs/harness-map.md");
+  assert(contextImpactCodes(heuristic).includes("CONTEXT_TRANSITIVE_IMPACT_RESOLVED"));
 }
 
 function mapping(classification, overrides = {}) {
@@ -1057,4 +1210,4 @@ for (const [name, action] of [
   }
 }
 
-console.log("Quality live coordinator self-tests passed (15 contracts).");
+console.log("Quality live coordinator self-tests passed (16 contracts).");
