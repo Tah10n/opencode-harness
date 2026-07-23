@@ -28,6 +28,7 @@ These rules apply to all projects.
   termination reason, and decision unblocked. Do not paste raw subagent output
   as the final answer.
 - For broad audits, production-readiness checks, repo/article study, long logs, large diffs, or multi-module bug sweeps, automatically use recursive-context mode: keep the root context small, use safe read-only context tools when available (`context_outline`, `context_files`, `context_search`, `context_read`), assign focused `@explore`/`@researcher`/`@reviewer` tasks under the active mode's serialization contract, and aggregate compact evidence before deciding or editing.
+- Avoid duplicate broad symbol scans: if a targeted `context_symbols` call is planned, call `context_map` with `includeSymbols: false`; use `context_map(includeSymbols: true)` only as a compact initial sample when no separate symbol scan is needed, and repeat broad `context_symbols` only with a new query, kind, or narrower scope.
 - Do not use recursive-context mode for small, local, single-file, or directly answerable tasks.
 - See `docs/recursive-context-mode.md` for the rationale, safety model, tool behavior, and validation commands.
 - When the user asks for review, keep the task read-only: do not edit files, stage changes, commit, or run fix commands unless the user explicitly asks for fixes.
@@ -46,10 +47,12 @@ These rules apply to all projects.
 - For high/critical work, after `quality_session_start` create a provisional
   Engineering Dossier draft with its provisional impact graph before collecting
   runner-owned context receipts. Refine the Dossier and linked Whole-System
-  Context Report from that evidence, finalize the report, and wait for
-  runner-computed context sufficiency. Then require architect and reviewer
-  challenges against the current Dossier and current report, finalize the
-  Dossier, and evaluate the existing gate. Only a runner-owned passed gate
+  Context Report from that evidence, finalize the Whole-System Context Report,
+  and wait for the current runner-owned sufficient context decision. Then
+  require architect and reviewer challenges against the canonical current
+  challenge subject: Dossier analysis, selected strategy, finalized report
+  analysis, exact sufficiency decision, and task-profile evidence. Finalize the
+  Dossier and evaluate the existing gate. Only a runner-owned passed gate
   authorizes mutation. Reconcile the exact final diff against the report before
   attestation. Keep runner-confirmed `standard-lite` work bounded to local
   evidence instead of forcing a broad graph or report.

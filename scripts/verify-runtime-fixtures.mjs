@@ -33,6 +33,18 @@ const missingRequiredAgentFixture = path.join(tempDir, "runtime-debug-missing-re
 const extraDangerousAgentFixture = path.join(tempDir, "runtime-debug-extra-dangerous-agent");
 const extraExactLearningAgentFixture = path.join(tempDir, "runtime-debug-extra-exact-learning-agent");
 const extraMalformedAgentFixture = path.join(tempDir, "runtime-debug-extra-malformed-agent");
+const neutralSourceProfile = path.join(tempDir, "source-profile-neutral");
+const directPinnedSourceProfile = path.join(tempDir, "source-profile-direct-pin");
+const nestedPinnedSourceProfile = path.join(tempDir, "source-profile-nested-pin");
+const permissionNamedSourceProfile = path.join(tempDir, "source-profile-permission-tool-name");
+const configPinnedSourceProfile = path.join(tempDir, "source-profile-config-pin");
+const arrayPinnedSourceProfile = path.join(tempDir, "source-profile-array-pin");
+const sequencePinnedSourceProfile = path.join(tempDir, "source-profile-sequence-pin");
+const flowPinnedSourceProfile = path.join(tempDir, "source-profile-flow-pin");
+const anchoredPinnedSourceProfile = path.join(tempDir, "source-profile-anchor-pin");
+const keyAnchoredPinnedSourceProfile = path.join(tempDir, "source-profile-key-anchor-pin");
+const keyTaggedPinnedSourceProfile = path.join(tempDir, "source-profile-key-tag-pin");
+const keyAliasedPinnedSourceProfile = path.join(tempDir, "source-profile-key-alias-pin");
 const requiredAgentNames = ["orchestrator", "orchestrator-deep", "review-orchestrator", "explore", "architect", "general", "reviewer", "diagnose", "verifier", "researcher", "improver"];
 const agentModes = new Map([
   ["orchestrator", "primary"],
@@ -333,6 +345,102 @@ try {
   const safe = runFixture(safeFixture);
   if (safe.status !== 0) {
     fail(`safe runtime fixture should pass, exited ${safe.status}\n${outputOf(safe)}`);
+  }
+
+  for (const profile of [
+    neutralSourceProfile,
+    directPinnedSourceProfile,
+    nestedPinnedSourceProfile,
+    permissionNamedSourceProfile,
+    configPinnedSourceProfile,
+    arrayPinnedSourceProfile,
+    sequencePinnedSourceProfile,
+    flowPinnedSourceProfile,
+    anchoredPinnedSourceProfile,
+    keyAnchoredPinnedSourceProfile,
+    keyTaggedPinnedSourceProfile,
+    keyAliasedPinnedSourceProfile,
+  ]) {
+    fs.mkdirSync(profile, { recursive: true });
+    fs.cpSync(path.join(root, "agents"), path.join(profile, "agents"), { recursive: true });
+    fs.copyFileSync(path.join(root, "opencode.json"), path.join(profile, "opencode.json"));
+  }
+  const explicitNeutral = runFixture(safeFixture, { env: { HARNESS_RUNTIME_PROFILE_ROOT: neutralSourceProfile } });
+  if (explicitNeutral.status !== 0) {
+    fail(`explicit model-neutral source profile should pass\n${outputOf(explicitNeutral)}`);
+  }
+  const directPinnedAgent = path.join(directPinnedSourceProfile, "agents", "general.md");
+  fs.writeFileSync(
+    directPinnedAgent,
+    fs.readFileSync(directPinnedAgent, "utf8").replace(/^mode:\s*subagent$/mu, "mode: subagent\nmodel: example/pinned"),
+    "utf8",
+  );
+  expectFailure(
+    runFixture(safeFixture, { env: { HARNESS_RUNTIME_PROFILE_ROOT: directPinnedSourceProfile } }),
+    "HARNESS-R025",
+    "direct source model pin fixture",
+  );
+  const nestedPinnedAgent = path.join(nestedPinnedSourceProfile, "agents", "general.md");
+  fs.writeFileSync(
+    nestedPinnedAgent,
+    fs.readFileSync(nestedPinnedAgent, "utf8").replace(
+      /^mode:\s*subagent$/mu,
+      "mode: subagent\nruntime:\n  providerOptions:\n    temperature: 0.2",
+    ),
+    "utf8",
+  );
+  expectFailure(
+    runFixture(safeFixture, { env: { HARNESS_RUNTIME_PROFILE_ROOT: nestedPinnedSourceProfile } }),
+    "HARNESS-R025",
+    "nested source provider-options fixture",
+  );
+  const pinnedConfigPath = path.join(configPinnedSourceProfile, "opencode.json");
+  const pinnedConfig = JSON.parse(fs.readFileSync(pinnedConfigPath, "utf8"));
+  pinnedConfig.model = "example/pinned";
+  fs.writeFileSync(pinnedConfigPath, `${JSON.stringify(pinnedConfig, null, 2)}\n`, "utf8");
+  expectFailure(
+    runFixture(safeFixture, { env: { HARNESS_RUNTIME_PROFILE_ROOT: configPinnedSourceProfile } }),
+    "HARNESS-R025",
+    "core opencode.json model pin fixture",
+  );
+  const arrayPinnedConfigPath = path.join(arrayPinnedSourceProfile, "opencode.json");
+  const arrayPinnedConfig = JSON.parse(fs.readFileSync(arrayPinnedConfigPath, "utf8"));
+  arrayPinnedConfig.profiles = [{ providerOptions: { temperature: 0.2 } }];
+  fs.writeFileSync(arrayPinnedConfigPath, `${JSON.stringify(arrayPinnedConfig, null, 2)}\n`, "utf8");
+  expectFailure(
+    runFixture(safeFixture, { env: { HARNESS_RUNTIME_PROFILE_ROOT: arrayPinnedSourceProfile } }),
+    "HARNESS-R025",
+    "array-nested opencode.json provider-options fixture",
+  );
+  for (const [profile, replacement, label] of [
+    [sequencePinnedSourceProfile, "mode: subagent\nprofiles:\n  - model: example/pinned", "sequence source model pin fixture"],
+    [flowPinnedSourceProfile, "mode: subagent\nruntime: { provider: example }", "flow source provider fixture"],
+    [anchoredPinnedSourceProfile, "mode: subagent\ndefaults: &defaults\n  model: example/pinned\nruntime:\n  <<: *defaults", "anchored source model pin fixture"],
+    [keyAnchoredPinnedSourceProfile, "mode: subagent\n&key model: example/pinned", "key-side anchor source model pin fixture"],
+    [keyTaggedPinnedSourceProfile, "mode: subagent\n!!str model: example/pinned", "key-side tag source model pin fixture"],
+    [keyAliasedPinnedSourceProfile, "mode: subagent\n*model: example/pinned", "key-side alias source model pin fixture"],
+  ]) {
+    const pinnedAgent = path.join(profile, "agents", "general.md");
+    fs.writeFileSync(
+      pinnedAgent,
+      fs.readFileSync(pinnedAgent, "utf8").replace(/^mode:\s*subagent$/mu, replacement),
+      "utf8",
+    );
+    expectFailure(
+      runFixture(safeFixture, { env: { HARNESS_RUNTIME_PROFILE_ROOT: profile } }),
+      "HARNESS-R025",
+      label,
+    );
+  }
+  const permissionNamedAgent = path.join(permissionNamedSourceProfile, "agents", "general.md");
+  fs.writeFileSync(
+    permissionNamedAgent,
+    fs.readFileSync(permissionNamedAgent, "utf8").replace("permission:\n", "permission:\n  model: deny\n  providerOptions: deny\n"),
+    "utf8",
+  );
+  const permissionNamed = runFixture(safeFixture, { env: { HARNESS_RUNTIME_PROFILE_ROOT: permissionNamedSourceProfile } });
+  if (permissionNamed.status !== 0) {
+    fail(`permission tool names must not be mistaken for model configuration\n${outputOf(permissionNamed)}`);
   }
 
   fs.cpSync(safeFixture, missingInventoryFixture, { recursive: true });

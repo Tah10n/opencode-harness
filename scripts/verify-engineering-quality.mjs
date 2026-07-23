@@ -68,16 +68,19 @@ import {
   recordContextReceiptEvidenceIndex,
   recordEngineeringDossier,
   recordGateDecision,
+  recordPreimplementationEvidence,
   snapshotEngineeringQualityStore,
 } from "../lib/quality/store.mjs";
 import { createIntegratedVerificationEvidence } from "../lib/quality/verification-evidence.mjs";
 import {
   createWholeSystemContextReportDraft,
+  engineeringDossierAnalysisFingerprint,
   finalizeWholeSystemContextReport,
 } from "../lib/quality/whole-system-context-report.mjs";
+import { createPlanChallengeSubject } from "../lib/quality/plan-challenge-subject.mjs";
+import { fingerprint } from "../lib/quality/validation.mjs";
 import { standardLiteDossierRequest } from "../lib/quality/standard-lite.mjs";
 import { requiredEngineeringVerificationTargets } from "../lib/quality/verification-targets.mjs";
-import { fingerprint } from "../lib/quality/validation.mjs";
 import { contextTestReceipt, contextTestTaskProfileEvidence } from "./context-test-fixtures.mjs";
 
 const START_COMMIT = "0a1d56605b9b8923ac27c3b3b405b38177ca7741";
@@ -908,6 +911,39 @@ function catalog(overrides = {}) {
   });
 }
 
+function gateContextArtifacts(dossier) {
+  const strategy = { fingerprint: FP_A };
+  const taskProfileEvidence = {
+    session_key: "session-quality",
+    run_id: dossier.run_id,
+    task_id: dossier.task_id,
+    dossier_id: dossier.dossier_id,
+    fingerprint: FP_D,
+  };
+  const contextReport = {
+    status: "finalized",
+    session_key: "session-quality",
+    run_id: dossier.run_id,
+    task_id: dossier.task_id,
+    dossier_id: dossier.dossier_id,
+    analysis_marker: "engineering-quality-gate-current-context",
+    fingerprint: FP_E,
+  };
+  const contextDecision = {
+    status: "sufficient",
+    session_key: "session-quality",
+    run_id: dossier.run_id,
+    task_id: dossier.task_id,
+    dossier_id: dossier.dossier_id,
+    dossier_analysis_fingerprint: engineeringDossierAnalysisFingerprint(dossier),
+    strategy_binding_fingerprint: strategy.fingerprint,
+    report_fingerprint: contextReport.fingerprint,
+    task_profile_evidence: taskProfileEvidence,
+    fingerprint: FP_C,
+  };
+  return { strategy, contextReport, contextDecision, taskProfileEvidence };
+}
+
 function preimplementationEvidence(dossier, overrides = {}) {
   const obligations = new Map(dossier.test_obligations
     .filter((entry) => entry.phase === "preimplementation")
@@ -925,12 +961,34 @@ function preimplementationEvidence(dossier, overrides = {}) {
       completed_at: "2026-07-13T00:02:00Z",
     };
   });
+  const artifacts = overrides.current_artifacts ?? gateContextArtifacts(dossier);
+  const challengeSubject = createPlanChallengeSubject({
+    dossier,
+    strategy_binding: artifacts.strategy,
+    context_report: artifacts.contextReport,
+    context_decision: artifacts.contextDecision,
+    task_profile_evidence: artifacts.taskProfileEvidence,
+  });
+  const challengeBinding = {
+    session_key: artifacts.contextDecision.session_key,
+    run_id: dossier.run_id,
+    task_id: dossier.task_id,
+    dossier_id: dossier.dossier_id,
+    dossier_analysis_fingerprint: challengeSubject.dossier_analysis_fingerprint,
+    context_strategy_fingerprint: challengeSubject.context_strategy_fingerprint,
+    context_report_fingerprint: artifacts.contextReport.fingerprint,
+    context_report_analysis_fingerprint: challengeSubject.context_report_analysis_fingerprint,
+    context_decision_fingerprint: challengeSubject.context_decision_fingerprint,
+    context_task_profile_evidence_fingerprint: challengeSubject.context_task_profile_evidence_fingerprint,
+    subject_fingerprint: challengeSubject.fingerprint,
+  };
   const planChallengeReceipts = ["high", "critical"].includes(dossier.risk_class)
     ? [
       {
         receipt_id: "plan-receipt-architect",
         result_id: dossier.plan_challenge.architect_result_id ?? "missing-architect-result",
         role: "architect",
+        ...challengeBinding,
         mechanism_id: "contract-review",
         trusted_producer: "opencode-harness-quality-verifier",
         phase: "preimplementation",
@@ -942,6 +1000,7 @@ function preimplementationEvidence(dossier, overrides = {}) {
         receipt_id: "plan-receipt-reviewer",
         result_id: dossier.plan_challenge.reviewer_result_id ?? "missing-reviewer-result",
         role: "reviewer",
+        ...challengeBinding,
         mechanism_id: "contract-review",
         trusted_producer: "opencode-harness-quality-verifier",
         phase: "preimplementation",
@@ -963,6 +1022,7 @@ function preimplementationEvidence(dossier, overrides = {}) {
 function passedGate(dossier, overrides = {}) {
   const requiresPreimplementationEvidence = ["high", "critical"].includes(dossier.risk_class)
     || requiredEngineeringVerificationTargets(dossier).preimplementationCheckIds.length > 0;
+  const artifacts = overrides.current_artifacts ?? gateContextArtifacts(dossier);
   return evaluateEngineeringGate({
     gate_id: overrides.gate_id ?? "gate-quality",
     dossier,
@@ -971,6 +1031,10 @@ function passedGate(dossier, overrides = {}) {
       ? overrides.preimplementation_evidence
       : requiresPreimplementationEvidence ? preimplementationEvidence(dossier) : null,
     architecture_evaluation: overrides.architecture_evaluation ?? null,
+    context_strategy_binding: artifacts.strategy,
+    context_report: artifacts.contextReport,
+    context_decision: artifacts.contextDecision,
+    context_task_profile_evidence: artifacts.taskProfileEvidence,
     evaluated_at: "2026-07-13T00:03:00Z",
   });
 }
@@ -1395,6 +1459,32 @@ test("high gate requires runner-owned baseline and independent plan challenge re
   });
   assert.equal(failed.status, "blocked");
   assert(failed.reasons.some((entry) => entry.code === "QUALITY_BASELINE_EVIDENCE_MISSING"));
+
+  const challengeWith = (receipt, overrides) => {
+    const candidate = { ...receipt, ...overrides };
+    candidate.subject_fingerprint = fingerprint({
+      schema_version: 1,
+      dossier_analysis_fingerprint: candidate.dossier_analysis_fingerprint,
+      context_strategy_fingerprint: candidate.context_strategy_fingerprint,
+      context_report_analysis_fingerprint: candidate.context_report_analysis_fingerprint,
+      context_decision_fingerprint: candidate.context_decision_fingerprint,
+      context_task_profile_evidence_fingerprint: candidate.context_task_profile_evidence_fingerprint,
+    });
+    return candidate;
+  };
+  for (const [label, planChallengeReceipts] of [
+    ["cross-run", good.plan_challenge_receipts.map((entry, index) => index === 0 ? { ...entry, run_id: "run-replayed" } : entry)],
+    ["stale-dossier", good.plan_challenge_receipts.map((entry) => challengeWith(entry, { dossier_analysis_fingerprint: FP_E }))],
+    ["split-subject", good.plan_challenge_receipts.map((entry, index) => index === 1 ? challengeWith(entry, { context_decision_fingerprint: FP_E }) : entry)],
+  ]) {
+    const evidence = preimplementationEvidence(dossier, { plan_challenge_receipts: planChallengeReceipts });
+    const decision = passedGate(dossier, {
+      gate_id: `gate-receipts-${label}`,
+      preimplementation_evidence: evidence,
+    });
+    assert.equal(decision.status, "blocked", `${label} challenge evidence unexpectedly passed`);
+    assert(decision.reasons.some((entry) => entry.code === "QUALITY_PLAN_CHALLENGE_MISSING"));
+  }
 });
 
 test("gate requires every canonical preimplementation target, not only baseline plan IDs", () => {
@@ -1496,7 +1586,7 @@ test("gate requires every canonical preimplementation target, not only baseline 
   const negativeCases = [
     ["missing", good.baseline_receipts.filter((entry) => entry.check_id !== "quality-extra-preimplementation"), "quality-extra-preimplementation"],
     ["failed", good.baseline_receipts.map((entry) => entry === extraReceipt ? { ...entry, status: "failed" } : entry), "quality-plan-preimplementation"],
-    ["stale", good.baseline_receipts.map((entry) => entry === extraReceipt ? { ...entry, completed_at: "2026-07-13T00:00:30Z" } : entry), "quality-plan-preimplementation"],
+    ["stale", good.baseline_receipts.map((entry) => entry === extraReceipt ? { ...entry, completed_at: "2026-07-12T23:59:59Z" } : entry), "quality-plan-preimplementation"],
     ["producer", good.baseline_receipts.map((entry) => entry === extraReceipt ? { ...entry, trusted_producer: "substituted-producer" } : entry), "quality-plan-preimplementation"],
     ["binding", good.baseline_receipts.map((entry) => entry === extraReceipt ? { ...entry, command_or_mechanism: "substituted-command" } : entry), "quality-plan-preimplementation"],
   ];
@@ -2118,17 +2208,34 @@ test("preimplementation mechanism receipts remain bound to gate-authoritative pl
     content: fullDossierContent("high"),
   });
   const checkCatalog = catalog();
-  const authoritative = preimplementationEvidence(dossier);
+  const store = createEngineeringQualityStore({ run_id: dossier.run_id, task_id: dossier.task_id });
+  const session = createEngineeringQualitySession({ store, initial_workspace_fingerprint: FP_A });
+  const contextDecision = recordSufficientTestContext(session, dossier);
+  const currentArtifacts = {
+    strategy: { fingerprint: contextDecision.strategy_binding_fingerprint },
+    contextReport: contextReportsByDecisionId.get(contextDecision.decision_id),
+    contextDecision,
+    taskProfileEvidence: contextDecision.task_profile_evidence,
+  };
+  const authoritative = preimplementationEvidence(dossier, { current_artifacts: currentArtifacts });
   const gate = passedGate(dossier, {
     gate_id: "gate-plan-receipt-binding",
     check_catalog: checkCatalog,
     preimplementation_evidence: authoritative,
+    current_artifacts: currentArtifacts,
   });
   assert.equal(gate.status, "passed", JSON.stringify(gate.reasons));
-  const store = createEngineeringQualityStore({ run_id: dossier.run_id, task_id: dossier.task_id });
-  const session = createEngineeringQualitySession({ store, initial_workspace_fingerprint: FP_A });
-  recordSufficientTestContext(session, dossier);
   sessionRecordDossier(session, dossier);
+  const staleReportEvidence = preimplementationEvidence(dossier, {
+    current_artifacts: currentArtifacts,
+    plan_challenge_receipts: authoritative.plan_challenge_receipts.map((entry, index) => (
+      index === 0 ? { ...entry, context_report_fingerprint: FP_A } : entry
+    )),
+  });
+  assertContractError(
+    () => recordPreimplementationEvidence(store, staleReportEvidence),
+    "QUALITY_PLAN_CHALLENGE_STALE",
+  );
   sessionLinkGate(session, {
     decision: gate,
     preimplementation_evidence: authoritative,
@@ -2268,19 +2375,28 @@ test("high session cannot attest completion after a failed trusted post-architec
     },
   });
   const qualityCatalog = catalog();
+  const store = createEngineeringQualityStore({ run_id: dossier.run_id, task_id: dossier.task_id });
+  const session = createEngineeringQualitySession({ store, initial_workspace_fingerprint: FP_A });
+  const contextDecision = recordSufficientTestContext(session, dossier);
+  const currentArtifacts = {
+    strategy: { fingerprint: contextDecision.strategy_binding_fingerprint },
+    contextReport: contextReportsByDecisionId.get(contextDecision.decision_id),
+    contextDecision,
+    taskProfileEvidence: contextDecision.task_profile_evidence,
+  };
+  const preimplementation = preimplementationEvidence(dossier, { current_artifacts: currentArtifacts });
   const gate = passedGate(dossier, {
     gate_id: "gate-high-post-architecture",
     check_catalog: qualityCatalog,
     architecture_evaluation: preArchitecture,
+    preimplementation_evidence: preimplementation,
+    current_artifacts: currentArtifacts,
   });
   assert.equal(gate.status, "passed", JSON.stringify(gate.reasons));
-  const store = createEngineeringQualityStore({ run_id: dossier.run_id, task_id: dossier.task_id });
-  const session = createEngineeringQualitySession({ store, initial_workspace_fingerprint: FP_A });
-  const contextDecision = recordSufficientTestContext(session, dossier);
   sessionRecordDossier(session, dossier);
   sessionLinkGate(session, {
     decision: gate,
-    preimplementation_evidence: preimplementationEvidence(dossier),
+    preimplementation_evidence: preimplementation,
     architecture_evaluation: preArchitecture,
     workspace_fingerprint: FP_A,
     append_trace: () => ({

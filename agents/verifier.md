@@ -2,9 +2,6 @@
 description: Read-only verifier for targeted tests, typechecks, lint, and regression checks after implementation
 mode: subagent
 hidden: true
-model: openai/gpt-5.6-sol
-reasoningEffort: medium
-textVerbosity: low
 steps: 120
 permission:
   edit: deny

@@ -1,37 +1,47 @@
-# Model Configuration
+# Model-Neutral Host Selection
 
-Model selection is a user-configurable host preference. The active
-`model:` field in each `agents/*.md` frontmatter block is the only
-configuration authority; quality logic does not consult a second model catalog.
+OpenCode owns model selection. Select a model with the OpenCode UI, command, or
+host configuration supported by the installed version, then start the harness
+normally. Primary agents use that user-selected model. Subagents inherit model
+selection according to the installed OpenCode host behavior.
 
-| Roles | Current model | Agent files |
-| --- | --- | --- |
-| Orchestration, architecture, implementation, review, verification, diagnosis, and improvement | `openai/gpt-5.6-sol` | `orchestrator.md`, `orchestrator-deep.md`, `review-orchestrator.md`, `architect.md`, `general.md`, `reviewer.md`, `verifier.md`, `diagnose.md`, `improver.md` |
-| Bounded exploration and research | `openai/gpt-5.6-terra` | `explore.md`, `researcher.md` |
+Do not add model IDs, provider IDs, reasoning or thinking controls, sampling
+parameters, or provider-specific option blocks to core `agents/*.md`
+frontmatter. Those files define roles, orchestration limits, and permissions;
+they are not a second model configuration layer.
 
-All paths above are under `agents/`.
+The core profile can be used with any OpenCode-supported model capable of using
+the required tools and following the workflow. This is a compatibility boundary,
+not a claim that every model produces equal coding quality. Provider-specific
+tuning belongs to the user's OpenCode host configuration.
 
-To change a model, edit the `model:` field in the YAML frontmatter of the
-relevant `agents/<name>.md` file.
+## Adoption example
 
-Example:
+1. Copy the portable profile without changing its core agent frontmatter.
+2. Select the desired tool-capable model through OpenCode.
+3. Start a primary harness agent and, when appropriate, let it delegate a
+   bounded subtask.
+4. Use the installed OpenCode session or agent diagnostics to observe the
+   primary selection and the host's documented subagent inheritance behavior.
+5. Run `npm run verify:runtime` to verify the model-neutral source profile and
+   the effective permission/delegation surface.
 
-```yaml
-model: openai/your-model-id
-```
+When the profile source is outside the repository that contains the verifier,
+set `HARNESS_RUNTIME_PROFILE_ROOT` to that profile root. The directory must
+contain the complete `agents/` directory. The verifier rejects direct,
+snake-case, and nested model/provider generation settings while allowing an
+unrelated permission tool name such as `permission.model`.
 
-Preserve the role prompt and permissions when changing only the model.
-`reasoningEffort` and `textVerbosity` are separate optional frontmatter
-settings. A replacement provider or model may support different values or may
-not support those options at all, so verify them against the installed host.
+The runtime probe does not prescribe a model, compare models, route requests, or
+provide a fallback. Host availability and inheritance remain installed-host
+observations; lack of a live OpenCode installation is reported as an external
+verification gap rather than inferred success.
 
-The prompt inventory records model and provider-option values as informational
-metadata, but model-only changes do not fail the quality gate and do not require
-updating a fingerprinted catalog. Permission, tool-surface, safety-sentinel, and
-quality-relevant prompt changes remain reviewable drift.
+Prompt inventory schema v3 omits model and provider-option fields from the
+quality-policy shape. It still detects raw-byte changes while gating role text,
+step limits, permissions, tool/delegation surfaces, and safety sentinels. Schema
+v2 remains strict historical read compatibility only.
 
-Installed-runtime checks may warn that a configured model is unavailable.
-`npm run verify` stays model-free, credential-free, network-free, and
-independent of any installed OpenCode runtime. Host-supplied model identity may
-appear as optional trace or report metadata; it never authorizes an edit,
-completes an Engineering Dossier, or passes quality acceptance.
+Model identity may appear in allowlisted trace or report metadata. That metadata
+is optional and observational: it never authorizes mutation, completes an
+Engineering Dossier, passes a quality gate, or satisfies acceptance.

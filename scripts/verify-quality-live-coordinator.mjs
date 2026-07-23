@@ -242,6 +242,8 @@ function contextImpactCodes(value) {
   const unresolved = structuredClone(excluded);
   unresolved.receiptEvidenceIndex.receipts[1].observed_paths = unresolved.receiptEvidenceIndex.receipts[1].observed_paths
     .filter((entry) => entry !== "docs/harness-map.md");
+  unresolved.receiptEvidenceIndex.receipts[1].content_ranges = unresolved.receiptEvidenceIndex.receipts[1].content_ranges
+    .filter((entry) => entry.path !== "docs/harness-map.md");
   assert(!contextImpactCodes(unresolved).includes("CONTEXT_TRANSITIVE_IMPACT_RESOLVED"));
 
   const truncated = structuredClone(excluded);

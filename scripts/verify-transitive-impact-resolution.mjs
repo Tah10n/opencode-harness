@@ -1,4 +1,7 @@
 import assert from "node:assert/strict";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
 
 import {
   beginContextReceiptOperation,
@@ -9,6 +12,7 @@ import {
   createContextReceiptEvidenceIndex,
   validateContextReceiptEvidenceIndex,
 } from "../lib/quality/context-sufficiency.mjs";
+import { deriveContextFileCoverage } from "../lib/quality/context-file-coverage.mjs";
 import { CONTEXT_TOOL_OUTPUT_SCHEMA_VERSION } from "../lib/quality/context-tool-adapters.mjs";
 import {
   deriveTransitiveImpactMetrics,
@@ -28,6 +32,11 @@ import {
   contextTestDossier,
   contextTestReceipt,
 } from "./context-test-fixtures.mjs";
+import {
+  LARGE_CONTEXT_RELATIVE_PATH,
+  createLargeContextFileFixture,
+  createLargeContextRangeReceipt,
+} from "./context-large-file-fixture.mjs";
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
@@ -276,6 +285,78 @@ function flow(
   return { dossier, report, receiptEvidence, receipts };
 }
 
+function largeExcludedFlow(fixture, { complete = true } = {}) {
+  const dossier = contextTestDossier({
+    transitiveImpact: "excluded",
+    excludedSiblingPath: LARGE_CONTEXT_RELATIVE_PATH,
+  });
+  const strategy = selectMinimumContextStrategy({ risk_class: dossier.risk_class, task_type: dossier.task_type });
+  const outline = contextTestReceipt({
+    receiptId: "CTXRECEIPT-LARGE-OUTLINE",
+    sequence: 1,
+    dossier,
+    toolId: "context_outline",
+    startedAt: "2026-07-17T10:01:00.000Z",
+    completedAt: "2026-07-17T10:02:00.000Z",
+  });
+  const regularPaths = [...new Set(dossier.impact_graph.nodes.map((entry) => entry.path).filter(Boolean))];
+  const regularContent = contextTestReceipt({
+    receiptId: "CTXRECEIPT-001",
+    sequence: 2,
+    dossier,
+    toolId: "context_batch_read",
+    observedPaths: regularPaths,
+    previousReceiptFingerprint: outline.fingerprint,
+  });
+  const definitions = complete
+    ? [[1, 500], [501, 1000], [1001, 1200]]
+    : [[1, 500], [501, 1000]];
+  let previousReceiptFingerprint = regularContent.fingerprint;
+  const rangeReceipts = definitions.map(([startLine, endLine], index) => {
+    const receipt = createLargeContextRangeReceipt({
+      fixture,
+      dossier,
+      strategy,
+      receiptId: `CTXRECEIPT-LARGE-RANGE-${index + 1}`,
+      sequence: index + 3,
+      previousReceiptFingerprint,
+      startLine,
+      endLine,
+    });
+    previousReceiptFingerprint = receipt.fingerprint;
+    return receipt;
+  });
+  const receipts = [outline, regularContent, ...rangeReceipts];
+  const content = completeContextContent({
+    strategyBinding: strategy,
+    dossier,
+    receiptIds: receipts.map((entry) => entry.receipt_id),
+  });
+  const draft = createWholeSystemContextReportDraft({
+    report_id: `CONTEXT-large-excluded-${complete ? "complete" : "partial"}`,
+    session_key: CONTEXT_TEST_SESSION_KEY,
+    strategy_binding: strategy,
+    workspace_fingerprint: CONTEXT_TEST_WORKSPACE,
+    dossier,
+    created_at: CONTEXT_TEST_TIME,
+    content,
+  });
+  const report = finalizeWholeSystemContextReport(draft, {
+    finalized_at: "2026-07-17T10:30:00.000Z",
+    strategy_binding: strategy,
+    workspace_fingerprint: CONTEXT_TEST_WORKSPACE,
+    dossier,
+    receipt_index: { receipts },
+  });
+  const receiptEvidence = createContextReceiptEvidenceIndex({ receipts }, {
+    session_key: CONTEXT_TEST_SESSION_KEY,
+    run_id: dossier.run_id,
+    task_id: dossier.task_id,
+    source_fingerprint: CONTEXT_TEST_WORKSPACE,
+  });
+  return { dossier, report, receiptEvidence, receipts };
+}
+
 function evaluate(value, options = {}) {
   return evaluateTransitiveImpactResolution({
     impact_graph: value.dossier.impact_graph,
@@ -309,7 +390,7 @@ function withSemanticImportEdge(value) {
 
 const representedFlow = flow("represented");
 validateContextReceiptEvidenceIndex(representedFlow.receiptEvidence);
-assert.equal(representedFlow.receiptEvidence.schema_version, 3);
+assert.equal(representedFlow.receiptEvidence.schema_version, 4);
 assert.ok(representedFlow.receiptEvidence.receipts.every((entry) => Array.isArray(entry.relationships)));
 const represented = evaluate(representedFlow);
 assert.equal(represented.resolution, "represented");
@@ -613,6 +694,8 @@ const unreadContentReceipt = unreadHeuristic.receiptEvidence.receipts.find(
 );
 unreadContentReceipt.observed_paths = unreadContentReceipt.observed_paths
   .filter((entry) => entry !== "docs/harness-map.md");
+unreadContentReceipt.content_ranges = unreadContentReceipt.content_ranges
+  .filter((entry) => entry.path !== "docs/harness-map.md");
 expectUnresolved(unreadHeuristic, "CONTEXT_CLAIM_EVIDENCE_MISSING");
 
 const truncatedImport = clone(importedByExcludedSibling);
@@ -638,4 +721,61 @@ blocking.dossier.impact_graph.coverage.boundaries.find(
 ).unknown_ids.push("GRAPHUNKNOWN-consumer");
 expectUnresolved(blocking, "CONTEXT_BLOCKING_UNKNOWN");
 
-console.log("Transitive impact resolution verification passed (represented, evidence-backed exclusion, and fail-closed negatives).");
+const largeFixtureRoot = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-transitive-large-"));
+try {
+  const largeFixture = createLargeContextFileFixture(largeFixtureRoot);
+  const largeComplete = largeExcludedFlow(largeFixture);
+  validateContextReceiptEvidenceIndex(largeComplete.receiptEvidence);
+  const largeCoverage = largeComplete.receiptEvidence.file_coverage.find(
+    (entry) => entry.path === LARGE_CONTEXT_RELATIVE_PATH,
+  );
+  assert.equal(largeCoverage.status, "complete");
+  assert.deepEqual(largeCoverage.covered_ranges, [{ start_line: 1, end_line: 1200 }]);
+  assert.equal(evaluate(largeComplete).resolution, "evidence_backed_excluded");
+
+  const multiPathGap = clone(largeComplete);
+  const secondPath = multiPathGap.dossier.impact_graph.nodes.find((entry) => typeof entry.path === "string").path;
+  const regularProjection = multiPathGap.receiptEvidence.receipts.find((entry) => entry.receipt_id === "CTXRECEIPT-001");
+  regularProjection.content_ranges = regularProjection.content_ranges.filter((entry) => entry.path !== secondPath);
+  regularProjection.observed_paths = regularProjection.observed_paths.filter((entry) => entry !== secondPath);
+  const batchProjection = multiPathGap.receiptEvidence.receipts.find((entry) => entry.receipt_id === "CTXRECEIPT-LARGE-RANGE-1");
+  batchProjection.tool_id = "context_batch_read";
+  batchProjection.observed_paths = [...new Set([...batchProjection.observed_paths, secondPath])].sort();
+  batchProjection.content_ranges.push({
+    path: secondPath,
+    start_line: 1,
+    end_line: 1,
+    total_lines: 2,
+    content_version_fingerprint: `sha256:${"d".repeat(64)}`,
+    stable: true,
+    changed_during_operation: false,
+    range_truncated_before: false,
+    range_truncated_after: true,
+  });
+  multiPathGap.receiptEvidence.file_coverage = deriveContextFileCoverage(multiPathGap.receiptEvidence);
+  const multiPathIndexSource = clone(multiPathGap.receiptEvidence);
+  delete multiPathIndexSource.fingerprint;
+  multiPathGap.receiptEvidence.fingerprint = fingerprint(multiPathIndexSource);
+  validateContextReceiptEvidenceIndex(multiPathGap.receiptEvidence);
+  assert.equal(
+    multiPathGap.receiptEvidence.file_coverage.find((entry) => entry.path === LARGE_CONTEXT_RELATIVE_PATH).status,
+    "complete",
+  );
+  assert.equal(
+    multiPathGap.receiptEvidence.file_coverage.find((entry) => entry.path === secondPath).status,
+    "incomplete",
+  );
+  expectUnresolved(multiPathGap, "CONTEXT_CLAIM_EVIDENCE_MISSING");
+
+  const largePartial = largeExcludedFlow(largeFixture, { complete: false });
+  const partialCoverage = largePartial.receiptEvidence.file_coverage.find(
+    (entry) => entry.path === LARGE_CONTEXT_RELATIVE_PATH,
+  );
+  assert.equal(partialCoverage.status, "incomplete");
+  assert.deepEqual(partialCoverage.gap_ranges, [{ start_line: 1001, end_line: 1200 }]);
+  expectUnresolved(largePartial, "CONTEXT_CLAIM_EVIDENCE_MISSING");
+} finally {
+  fs.rmSync(largeFixtureRoot, { recursive: true, force: true });
+}
+
+console.log("Transitive impact resolution verification passed (represented, bounded large-file exclusion, and fail-closed negatives).");

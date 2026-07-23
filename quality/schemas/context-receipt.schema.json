@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$comment": "Cross-field status, reason, tool-output, mutation, chain, privacy, and fingerprint checks are canonical in lib/quality/context-receipts.mjs and lib/quality/context-receipt-store.mjs.",
-  "title": "OpenCode Harness Runner-Owned Context Receipt v2",
+  "title": "OpenCode Harness Runner-Owned Context Receipt v3",
   "type": "object",
   "required": [
     "schema_version",
@@ -36,8 +36,8 @@
     "fingerprint"
   ],
   "properties": {
-    "schema_version": { "const": 2 },
-    "producer": { "const": "opencode-harness/context-receipt-v2" },
+    "schema_version": { "const": 3 },
+    "producer": { "const": "opencode-harness/context-receipt-v3" },
     "receipt_id": { "$ref": "#/$defs/id" },
     "sequence": { "type": "integer", "minimum": 1 },
     "previous_receipt_fingerprint": { "$ref": "#/$defs/nullableFingerprint" },
@@ -84,12 +84,14 @@
         "deadline_exceeded",
         "tool_unavailable",
         "unsupported_schema",
+        "unsupported_contract",
         "output_too_large",
         "invalid_output",
         "tool_failed",
         "stale_snapshot",
         "snapshot_mismatch",
         "hash_mismatch",
+        "cursor_mismatch",
         "partial_coverage",
         "partial_tool_failure",
         "mutation_during_context",
@@ -155,7 +157,13 @@
         "start_line": { "type": "integer", "minimum": 1 },
         "max_lines": {
           "oneOf": [
-            { "type": "integer", "minimum": 1 },
+            { "type": "integer", "minimum": 1, "maximum": 500 },
+            { "type": "null" }
+          ]
+        },
+        "expected_content_version_fingerprint": {
+          "oneOf": [
+            { "$ref": "#/$defs/fingerprint" },
             { "type": "null" }
           ]
         }
@@ -174,9 +182,10 @@
         "max_bytes_per_file": { "type": "integer", "minimum": 1 },
         "max_total_bytes": { "type": "integer", "minimum": 1 },
         "max_total_lines": { "type": "integer", "minimum": 1 },
-        "max_lines": { "type": "integer", "minimum": 1 },
+        "max_lines": { "type": "integer", "minimum": 1, "maximum": 500 },
         "max_duration_ms": { "type": "integer", "minimum": 1 },
-        "context_lines": { "type": "integer", "minimum": 0 }
+        "context_lines": { "type": "integer", "minimum": 0 },
+        "page_size": { "type": "integer", "minimum": 1 }
       },
       "additionalProperties": false
     },
@@ -231,7 +240,20 @@
           "items": { "type": "string", "pattern": "^\\.[a-z0-9][a-z0-9._+-]{0,31}$" }
         },
         "limits": { "$ref": "#/$defs/requestLimits" },
-        "format": { "enum": ["text", "json", null] }
+        "format": { "enum": ["text", "json", null] },
+        "after_path": {
+          "oneOf": [
+            { "$ref": "#/$defs/path" },
+            { "type": "null" }
+          ]
+        },
+        "expected_snapshot_fingerprint": {
+          "oneOf": [
+            { "$ref": "#/$defs/fingerprint" },
+            { "type": "null" }
+          ]
+        },
+        "require_stable_snapshot": { "type": "boolean" }
       },
       "additionalProperties": false
     },
@@ -262,6 +284,32 @@
         "path": { "$ref": "#/$defs/path" },
         "start_line": { "type": "integer", "minimum": 1 },
         "end_line": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "contentRange": {
+      "type": "object",
+      "required": [
+        "path",
+        "start_line",
+        "end_line",
+        "total_lines",
+        "content_version_fingerprint",
+        "stable",
+        "changed_during_operation",
+        "range_truncated_before",
+        "range_truncated_after"
+      ],
+      "properties": {
+        "path": { "$ref": "#/$defs/path" },
+        "start_line": { "type": "integer", "minimum": 1 },
+        "end_line": { "type": "integer", "minimum": 1 },
+        "total_lines": { "type": "integer", "minimum": 1 },
+        "content_version_fingerprint": { "$ref": "#/$defs/fingerprint" },
+        "stable": { "const": true },
+        "changed_during_operation": { "const": false },
+        "range_truncated_before": { "type": "boolean" },
+        "range_truncated_after": { "type": "boolean" }
       },
       "additionalProperties": false
     },
@@ -339,13 +387,38 @@
       },
       "additionalProperties": false
     },
+    "guidanceEntry": {
+      "type": "object",
+      "required": ["path", "kind", "applies_to", "source"],
+      "properties": {
+        "path": { "$ref": "#/$defs/path" },
+        "kind": { "enum": ["agents", "workflow", "skill", "codeowners"] },
+        "applies_to": { "$ref": "#/$defs/path" },
+        "source": { "const": "discovered" }
+      },
+      "additionalProperties": false
+    },
+    "itemFailure": {
+      "type": "object",
+      "required": ["path", "reason_code"],
+      "properties": {
+        "path": { "$ref": "#/$defs/path" },
+        "reason_code": {
+          "enum": ["hash_mismatch", "byte_limit_reached", "line_limit_reached", "tool_failed"]
+        }
+      },
+      "additionalProperties": false
+    },
     "result": {
       "type": "object",
       "required": [
         "result_fingerprint",
         "relative_paths",
         "guidance_paths",
+        "guidance_entries",
+        "item_failures",
         "line_ranges",
+        "content_ranges",
         "symbol_ids",
         "relationships",
         "tool_inventory",
@@ -363,14 +436,29 @@
         },
         "guidance_paths": {
           "type": "array",
-          "maxItems": 256,
+          "maxItems": 128,
           "uniqueItems": true,
-          "items": { "$ref": "#/$defs/relative_path" }
+          "items": { "$ref": "#/$defs/path" }
+        },
+        "guidance_entries": {
+          "type": "array",
+          "maxItems": 128,
+          "items": { "$ref": "#/$defs/guidanceEntry" }
+        },
+        "item_failures": {
+          "type": "array",
+          "maxItems": 20,
+          "items": { "$ref": "#/$defs/itemFailure" }
         },
         "line_ranges": {
           "type": "array",
           "maxItems": 128,
           "items": { "$ref": "#/$defs/lineRange" }
+        },
+        "content_ranges": {
+          "type": "array",
+          "maxItems": 128,
+          "items": { "$ref": "#/$defs/contentRange" }
         },
         "symbol_ids": {
           "type": "array",

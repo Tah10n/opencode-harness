@@ -2,9 +2,6 @@
 description: Read-only implementation architect for decomposition, ownership boundaries, and parallel-safety planning
 mode: subagent
 hidden: true
-model: openai/gpt-5.6-sol
-reasoningEffort: high
-textVerbosity: low
 steps: 150
 permission:
   edit: deny

@@ -42,6 +42,8 @@
     "verify:architecture-policy": "node scripts/verify-quality-architecture.mjs",
     "verify:context-strategies": "node scripts/verify-context-strategies.mjs",
     "verify:context-receipts": "node scripts/verify-context-receipts.mjs",
+    "verify:recursive-context-contract": "node scripts/verify-recursive-context-contract.mjs",
+    "verify:context-file-coverage": "node scripts/verify-context-file-coverage.mjs",
     "verify:whole-system-context": "node scripts/verify-whole-system-context.mjs",
     "verify:context-sufficiency": "node scripts/verify-context-sufficiency.mjs",
     "verify:transitive-impact-resolution": "node scripts/verify-transitive-impact-resolution.mjs",

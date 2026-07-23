@@ -1,9 +1,6 @@
 ---
 description: Parallel implementation worker for scoped code changes, focused verification, and execution-heavy tasks
 mode: subagent
-model: openai/gpt-5.6-sol
-reasoningEffort: high
-textVerbosity: low
 steps: 240
 permission:
   edit: ask

@@ -291,12 +291,17 @@ The same oracle identity must later produce the passing regression outcome.
 The live adapter cannot mint context receipts or establish reconciliation by
 describing what it claims to have read or changed. The production CLI explicitly
 wires the runner-owned bounded context observer, which reads only the immutable
-isolated fixture before adapter mutation. Standard-lite can use the bounded
-runner reviewer. High and critical plan challenge and final reconciliation still
-require independently supplied trusted callbacks; the CLI does not synthesize
-those roles from adapter output and reports an explicit incomplete/blocked gap
-when they are unavailable. Adapter-proposed receipts, diff facts, plan challenge,
-or reviewer evidence are rejected before bundle publication.
+isolated fixture before adapter mutation. Files longer than 500 lines are read as
+ordered bounded ranges whose salted file identity and total-line count must form
+one complete union. Standard-lite can use the bounded runner reviewer. High and
+critical plan challenge callbacks run only after the finalized report has a
+current runner-owned sufficient context decision, and their architect/reviewer
+results bind the same canonical current challenge subject. Final reconciliation
+also requires an independently supplied trusted callback; the CLI does not
+synthesize those roles from adapter output and reports an explicit
+incomplete/blocked gap when they are unavailable. Adapter-proposed receipts,
+diff facts, plan challenge, or reviewer evidence are rejected before bundle
+publication.
 
 Advanced semantic context tools strengthen high/critical evidence but are
 optional. A critical run may use the four-tool portable fallback only when every

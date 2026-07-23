@@ -80,7 +80,10 @@ function boundary(category, references = {}, rationale = null, evidenceRefs = nu
   };
 }
 
-export function contextTestImpactGraph(riskClass = "high", { transitiveImpact = "represented" } = {}) {
+export function contextTestImpactGraph(riskClass = "high", {
+  transitiveImpact = "represented",
+  excludedSiblingPath = "docs/harness-map.md",
+} = {}) {
   if (!["represented", "excluded"].includes(transitiveImpact)) {
     throw new Error("context test transitive impact must be represented or excluded");
   }
@@ -128,7 +131,13 @@ export function contextTestImpactGraph(riskClass = "high", { transitiveImpact = 
       { id: "BLAST-direct", kind: "direct", node_ids: ["NODE-entry", "NODE-service"], edge_ids: ["EDGE-entry-service"], critical: true, verification_node_ids: ["NODE-test"], confidence: "observed", evidence_refs: evidence },
       ...(transitiveExcluded ? [] : [{ id: "BLAST-transitive", kind: "transitive", node_ids: ["NODE-entry", "NODE-service", "NODE-store"], edge_ids: ["EDGE-entry-service", "EDGE-service-store"], critical: true, verification_node_ids: ["NODE-test"], confidence: "observed", evidence_refs: evidence }]),
     ],
-    excluded_siblings: [{ id: "EXCLUDED-docs", path: "docs/harness-map.md", reason: "documentation does not import or execute the runtime path", confidence: "observed", evidence_refs: [{ kind: "file", value: "docs/harness-map.md" }] }],
+    excluded_siblings: [{
+      id: "EXCLUDED-docs",
+      path: excludedSiblingPath,
+      reason: "the inspected sibling does not import or execute the runtime path",
+      confidence: "observed",
+      evidence_refs: [{ kind: "file", value: excludedSiblingPath }],
+    }],
     unknowns: [],
     coverage: {
       completeness: "complete",
@@ -163,6 +172,7 @@ export function contextTestDossier({
   taskType = "bug_fix",
   additionalTestObligations = [],
   transitiveImpact = "represented",
+  excludedSiblingPath = "docs/harness-map.md",
 } = {}) {
   const full = ["high", "critical"].includes(riskClass);
   const preChangeObligations = ["bug_fix", "diagnosis_driven_implementation"].includes(taskType)
@@ -189,7 +199,7 @@ export function contextTestDossier({
       { id: "TEST-context", check_id: "context-regression", kind: "integration", phase: "integration", scope_ids: ["AREA-main"], command_or_mechanism: "node scripts/verify-context-sufficiency.mjs", required: true, trusted_producer: "opencode-harness-context-verifier" },
       ...additionalTestObligations,
     ],
-    impact_graph: full ? contextTestImpactGraph(riskClass, { transitiveImpact }) : null,
+    impact_graph: full ? contextTestImpactGraph(riskClass, { transitiveImpact, excludedSiblingPath }) : null,
     context_coverage: {
       status: "complete",
       affected_area_ids: ["AREA-main"],

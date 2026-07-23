@@ -308,9 +308,11 @@ expectContractError(
   "malformed v3 attestation without legacy fallback",
 );
 
-const promptInventory = readJson("quality/prompt-inventory/baseline.v2.json");
+const legacyPromptInventory = readJson("quality/prompt-inventory/baseline.v2.json");
+const promptInventory = readJson("quality/prompt-inventory/baseline.v3.json");
 const acceptancePolicy = readJson("quality/acceptance/acceptance-policy.v2.json");
 const contextAcceptancePolicy = readJson("quality/acceptance/acceptance-policy.v3.json");
+quality.validatePromptInventory(legacyPromptInventory);
 quality.validatePromptInventory(promptInventory);
 quality.validateQualityAcceptancePolicy(acceptancePolicy);
 quality.validateQualityAcceptancePolicy(contextAcceptancePolicy);
@@ -320,4 +322,4 @@ assert.equal(
   "quality package must preserve canonical verification-target implementation identity",
 );
 
-console.log("Quality contract verification passed (closed schemas, strict v2/v3 attestation compatibility, model-neutral acceptance, and public API identity).");
+console.log("Quality contract verification passed (closed schemas, strict prompt-inventory v2/v3 and attestation compatibility, model-neutral acceptance, and public API identity).");

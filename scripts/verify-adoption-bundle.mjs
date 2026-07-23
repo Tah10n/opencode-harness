@@ -38,6 +38,7 @@ const adoptionEntries = [
   "lib/quality",
   "native",
   "opencode.json",
+  "package-lock.json",
   "package.json",
   "quality",
   "scripts",
@@ -61,6 +62,7 @@ const requiredQualityDirectories = Object.freeze([
 ]);
 
 const requiredQualityFiles = Object.freeze([
+  "package-lock.json",
   "lib/quality/index.mjs",
   "lib/quality/context-receipt-store.mjs",
   "lib/quality/context-receipts.mjs",
@@ -116,7 +118,9 @@ const requiredQualityFiles = Object.freeze([
   "quality/milestone-2-dod.v2.json",
   "quality/milestone-2-dod.v3.json",
   "quality/prompt-inventory/baseline.v2.json",
+  "quality/prompt-inventory/baseline.v3.json",
   "quality/prompt-inventory/declared-changes.v2.json",
+  "quality/prompt-inventory/declared-changes.v3.json",
   "quality/schemas/architecture-evaluation.schema.json",
   "quality/schemas/architecture-policy.example.json",
   "quality/schemas/architecture-policy.schema.json",
@@ -246,6 +250,7 @@ function assertPortableAdoptionDeclaration(entries) {
     "quality",
     "scripts",
     "evals",
+    "package-lock.json",
   ]) {
     if (!entries.includes(requiredEntry)) {
       throw new Error(`portable adoption bundle is missing ${requiredEntry}`);
@@ -317,6 +322,9 @@ function assertQualityAdoptionContract({ entries, hasPath, exportNames }) {
   if (!entries.includes("quality")) {
     throw new Error("quality adoption contract requires the top-level quality copy entry");
   }
+  if (!entries.includes("package-lock.json")) {
+    throw new Error("quality adoption contract requires the root package lock used by CI");
+  }
   for (const requiredDirectory of requiredQualityDirectories) {
     if (!hasPath(requiredDirectory, "directory")) {
       throw new Error(`quality adoption contract is missing directory: ${requiredDirectory}`);
@@ -386,6 +394,10 @@ try {
     ...completeDeclaration,
     entries: adoptionEntries.filter((entry) => entry !== "quality"),
   });
+  expectQualityContractFailure("root package lock omission sensor", {
+    ...completeDeclaration,
+    entries: adoptionEntries.filter((entry) => entry !== "package-lock.json"),
+  });
   expectQualityContractFailure("quality subtree omission sensor", {
     ...completeDeclaration,
     hasPath: (relativePath) => relativePath !== "quality/schemas",
@@ -430,6 +442,7 @@ try {
     "evals/suites.json",
     "fixtures/sample-project/WORKFLOW.md",
     "lib/feedback/index.mjs",
+    "package-lock.json",
     "package.json",
     "scripts/assess-candidate.mjs",
     "scripts/capture-static-evidence.mjs",
@@ -437,6 +450,16 @@ try {
     "scripts/verify-live-manifests.mjs",
   ]) {
     assertBundlePath(requiredFile);
+  }
+  const packageManifest = JSON.parse(fs.readFileSync(path.join(bundleRoot, "package.json"), "utf8").replace(/^\uFEFF/u, ""));
+  const packageLock = JSON.parse(fs.readFileSync(path.join(bundleRoot, "package-lock.json"), "utf8").replace(/^\uFEFF/u, ""));
+  const lockedRoot = packageLock.packages?.[""];
+  if (packageLock.lockfileVersion !== 3
+    || packageLock.name !== packageManifest.name
+    || packageLock.version !== packageManifest.version
+    || lockedRoot?.name !== packageManifest.name
+    || lockedRoot?.version !== packageManifest.version) {
+    throw new Error("adoption bundle root package-lock.json does not bind the copied package.json identity");
   }
   for (const forbiddenPath of [
     ".oc_harness",
@@ -474,6 +497,7 @@ try {
       'if (typeof qualityPlugin.createNormalSessionQualityPlugin !== "function") throw new Error("missing public quality-plugin factory");',
       'if (typeof quality.verifyCommittedWhitespace !== "function") throw new Error("missing committed-whitespace verifier");',
       'quality.validatePromptInventory(readJson("quality/prompt-inventory/baseline.v2.json"));',
+      'quality.validatePromptInventory(readJson("quality/prompt-inventory/baseline.v3.json"));',
       'quality.validateArchitecturePolicy(readJson("quality/schemas/architecture-policy.example.json"));',
       'quality.validateQualityAcceptancePolicy(readJson("quality/acceptance/acceptance-policy.v2.json"));',
       'quality.validateQualityAcceptancePolicy(readJson("quality/acceptance/acceptance-policy.v3.json"));',

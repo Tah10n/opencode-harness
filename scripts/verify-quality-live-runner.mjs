@@ -30,6 +30,10 @@ import {
   runScenarioProfile,
 } from "./evaluate-live.mjs";
 import { completeContextContent } from "./context-test-fixtures.mjs";
+import {
+  LARGE_CONTEXT_LINE_COUNT,
+  createLargeContextFileFixture,
+} from "./context-large-file-fixture.mjs";
 import { createInjectedTestContainmentFactory } from "./injected-test-containment.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -993,6 +997,7 @@ export async function createDeterministicHighQualityRun({
   mutateAfterRunnerReview = false,
   provideRunnerReviewer = true,
   planChallengeMode = "valid",
+  updateFinalizedReport = false,
 } = {}) {
   assert(["baseline", "candidate"].includes(profileRole), "profileRole must be baseline or candidate");
   assert(["high", "critical"].includes(riskClass), "riskClass must be high or critical");
@@ -1023,13 +1028,16 @@ export async function createDeterministicHighQualityRun({
   });
   const checkCatalog = qualityLiveCheckCatalog(scenario.id, riskClass);
   const testContainment = createObservedQualityLiveRunnerTestContainment();
-  const architectResultId = `architect-${scenario.id}-${profileRole}`;
-  const planReviewerResultId = `plan-reviewer-${scenario.id}-${profileRole}`;
   const finalReviewerResultId = `final-reviewer-${scenario.id}-${profileRole}`;
   let adapterRepo = null;
+  let adapterTrace = null;
+  let nestedChallengeResult = null;
+  let stalePlanChallengeRejected = false;
+  const planChallengeRequests = [];
   const qualityAdapter = async ({ context, onTrace, workingDirectory }) => {
     assert.equal(workingDirectory, context.repo, "adapter cwd is not bound to the isolated fixture");
     adapterRepo = context.repo;
+    adapterTrace = onTrace;
     const inspected = await onTrace("quality_inspect", {});
     assert.deepEqual(inspected.ownership_paths, [ownershipPath]);
     assert.equal(inspected.risk_class, riskClass);
@@ -1047,24 +1055,6 @@ export async function createDeterministicHighQualityRun({
       created_at: createdAt,
     };
     const created = await onTrace("quality_create_dossier", dossierInput);
-    await completeReadOnlyJob(onTrace, {
-      taskId: architectResultId,
-      agent: "architect",
-      scope: "Challenge the high-risk public API plan, ownership, compatibility, and architecture boundaries.",
-      status: "completed",
-      evidence: ["impact graph and compatibility contract challenged"],
-      summary: "The plan covers the additive API contract, legacy caller behavior, and bounded ownership.",
-      risk: riskClass,
-    });
-    await completeReadOnlyJob(onTrace, {
-      taskId: planReviewerResultId,
-      agent: "reviewer",
-      scope: "Review the high-risk plan for missing edge cases, failure modes, tests, and rollback assumptions.",
-      status: "no-findings",
-      evidence: ["edge failure and verification mappings challenged"],
-      summary: "No unresolved high or medium plan blocker remains in the bounded fixture.",
-      risk: riskClass,
-    });
     const initialPatch = highDossierPatch(scenario.id, {
       impactGraph: graph,
       architectureEvaluation,
@@ -1094,38 +1084,73 @@ export async function createDeterministicHighQualityRun({
       observed.context_receipt_ids,
       Array.from({ length: expectedReceiptCount }, (_, index) => `context-live-${index + 1}`),
     );
-    const challenge = await onTrace("quality_challenge_plan", {});
-    const challengedAt = new Date().toISOString();
-    const planChallenge = {
-      architect_result_id: challenge.architect_result_id,
-      reviewer_result_id: challenge.reviewer_result_id,
-      blockers: [],
-      evidence_refs: challenge.evidence_refs,
-    };
-    const challenged = await onTrace("quality_update_dossier", {
-      expected_revision: updated.revision,
-      updated_at: challengedAt,
-      patch: { plan_challenge: planChallenge },
-    });
-    const localDraft = updateEngineeringDossierDraft(localInitialDraft, {
-      expected_revision: localInitialDraft.revision,
-      updated_at: challengedAt,
-      patch: { plan_challenge: planChallenge },
-    });
+    const reportCreatedAt = new Date().toISOString();
     const strategy = selectMinimumContextStrategy({ risk_class: riskClass, task_type: "new_feature" });
-    await onTrace("quality_create_context_report", {
-      report_id: `CONTEXT-live-${riskClass}-${profileRole}`,
-      created_at: challengedAt,
-      content: completeContextContent({
-        strategyBinding: strategy,
-        dossier: localDraft,
-        receiptIds: observed.context_receipt_ids,
-        minimalAvailable: ["context_outline", "context_files", "context_search", "context_read"],
-        advancedAvailable: riskClass === "critical" ? ["context_related"] : [],
-        readOnlySubagents: 4,
-      }),
+    const reportContent = completeContextContent({
+      strategyBinding: strategy,
+      dossier: localInitialDraft,
+      receiptIds: observed.context_receipt_ids,
+      minimalAvailable: ["context_outline", "context_files", "context_search", "context_read"],
+      advancedAvailable: riskClass === "critical" ? ["context_related"] : [],
+      readOnlySubagents: 0,
     });
-    assert.equal(challenged.revision, localDraft.revision);
+    const reportCreated = await onTrace("quality_create_context_report", {
+      report_id: `CONTEXT-live-${riskClass}-${profileRole}`,
+      created_at: reportCreatedAt,
+      content: reportContent,
+    });
+    assert.equal(reportCreated.context_report_status, "draft");
+    let contextFinalized = await onTrace("quality_finalize_context", {
+      expected_revision: reportCreated.context_report_revision,
+    });
+    assert.equal(contextFinalized.context_report_status, "finalized");
+    assert.equal(contextFinalized.context_decision_status, "sufficient");
+    if (updateFinalizedReport) {
+      const reportUpdated = await onTrace("quality_update_context_report", {
+        expected_revision: contextFinalized.context_report_revision,
+        updated_at: new Date().toISOString(),
+        patch: { claims: reportContent.claims },
+      });
+      assert.equal(reportUpdated.context_report_status, "draft");
+      assert.equal(reportUpdated.context_report_revision, contextFinalized.context_report_revision + 1);
+      await assert.rejects(
+        () => onTrace("quality_update_context_report", {
+          expected_revision: reportCreated.context_report_revision,
+          updated_at: new Date().toISOString(),
+          patch: { claims: reportContent.claims },
+        }),
+        (error) => error instanceof ContractError && error.code === "CONTEXT_REPORT_REVISION_CONFLICT",
+        "a stale pre-finalization report revision was accepted after reopening the finalized report",
+      );
+      contextFinalized = await onTrace("quality_finalize_context", {
+        expected_revision: reportUpdated.context_report_revision,
+      });
+      assert.equal(contextFinalized.context_report_status, "finalized");
+      assert.equal(contextFinalized.context_decision_status, "sufficient");
+    }
+    let challenge;
+    if (planChallengeMode === "retry") {
+      await assert.rejects(
+        () => onTrace("quality_challenge_plan", {}),
+        (error) => error instanceof ContractError && error.code === "QUALITY_PLAN_CHALLENGE_TEST_THROW",
+        "the first injected live challenge failure did not propagate",
+      );
+      challenge = await onTrace("quality_challenge_plan", {});
+    } else if (planChallengeMode === "reentrant-stale") {
+      await assert.rejects(
+        () => onTrace("quality_challenge_plan", {}),
+        (error) => {
+          stalePlanChallengeRejected = error instanceof ContractError && error.code === "QUALITY_PLAN_CHALLENGE_STALE";
+          return stalePlanChallengeRejected;
+        },
+        "an older overlapping live challenge result was accepted after a newer attempt settled",
+      );
+      assert(nestedChallengeResult, "the newer overlapping live challenge attempt did not settle");
+      challenge = nestedChallengeResult;
+    } else {
+      challenge = await onTrace("quality_challenge_plan", {});
+    }
+    assert.equal(challenge.dossier_revision, localInitialDraft.revision + 1);
     const finalized = await onTrace("quality_finalize_dossier", { finalized_at: new Date().toISOString() });
     assert.equal(finalized.gate_status, "passed", JSON.stringify(finalized));
     assert.equal(finalized.context_decision_status, "sufficient");
@@ -1188,7 +1213,21 @@ export async function createDeterministicHighQualityRun({
   };
   let adapterError = null;
   try {
-    const validPlanChallengeFn = (request) => {
+    const validPlanChallengeResult = (request) => {
+      assert.equal(request.context_report.status, "finalized");
+      assert.equal(request.context_decision.status, "sufficient");
+      assert.equal(request.context_decision.report_fingerprint, request.context_report.fingerprint);
+      assert.equal(
+        request.context_decision.task_profile_evidence.fingerprint,
+        request.task_profile_evidence.fingerprint,
+      );
+      assert.equal(request.subject.dossier_analysis_fingerprint, request.context_decision.dossier_analysis_fingerprint);
+      assert.equal(request.subject.context_strategy_fingerprint, request.strategy_binding.fingerprint);
+      assert.equal(request.subject.context_decision_fingerprint, request.context_decision.fingerprint);
+      assert.equal(
+        request.subject.context_task_profile_evidence_fingerprint,
+        request.task_profile_evidence.fingerprint,
+      );
       const dossierMatches = request.dossier.impact_graph?.fingerprint === graph.fingerprint
         && request.dossier.verification_plan.integration_check_ids.length > 0
         && request.dossier.public_contracts.some((entry) => entry.compatibility_decision === "preserve");
@@ -1205,7 +1244,25 @@ export async function createDeterministicHighQualityRun({
         },
       };
     };
-    const planChallengeOptions = planChallengeMode === "valid"
+    let planChallengeInvocation = 0;
+    const validPlanChallengeFn = async (request) => {
+      planChallengeInvocation += 1;
+      planChallengeRequests.push({
+        challenge_epoch: request.challenge_epoch,
+        challenge_attempt_id: request.challenge_attempt_id,
+        architect_result_id: request.architect_result_id,
+        reviewer_result_id: request.reviewer_result_id,
+      });
+      if (planChallengeMode === "retry" && planChallengeInvocation === 1) {
+        throw new ContractError("QUALITY_PLAN_CHALLENGE_TEST_THROW", "injected transient challenge failure");
+      }
+      if (planChallengeMode === "reentrant-stale" && planChallengeInvocation === 1) {
+        assert(adapterTrace, "adapter trace handler is unavailable for overlapping challenge test");
+        nestedChallengeResult = await adapterTrace("quality_challenge_plan", {});
+      }
+      return validPlanChallengeResult(request);
+    };
+    const planChallengeOptions = ["valid", "retry", "reentrant-stale"].includes(planChallengeMode)
       ? { challengeQualityPlanFn: validPlanChallengeFn }
       : planChallengeMode === "omitted"
         ? {}
@@ -1359,6 +1416,8 @@ export async function createDeterministicHighQualityRun({
       bundle,
       traceSnapshot,
       checkCatalog,
+      planChallengeRequests,
+      stalePlanChallengeRejected,
       cleanup: () => fs.rmSync(workspaceRoot, { recursive: true, force: true }),
     };
   } catch (error) {
@@ -1398,13 +1457,60 @@ export function convertRunBundleToLegacyV2(runDir) {
   for (const key of ["context_strategy_id", "context_sufficiency_decision_fingerprint", "context_reconciliation_fingerprint"]) delete attestation[key];
   attestation.schema_version = 2;
   attestation.artifact_refs = attestation.artifact_refs.filter((entry) => !entry.value.startsWith("quality/context-"));
-  const legacyAttestation = refingerprint(attestation);
   const manifestPath = path.join(qualityDir, "manifest.json");
   const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+  const preimplementationPath = path.join(qualityDir, "preimplementation-evidence.json");
+  if (fs.existsSync(preimplementationPath)) {
+    const evidence = JSON.parse(fs.readFileSync(preimplementationPath, "utf8"));
+    evidence.schema_version = 1;
+    for (const receipt of evidence.plan_challenge_receipts) {
+      for (const key of [
+        "session_key",
+        "run_id",
+        "task_id",
+        "dossier_id",
+        "dossier_analysis_fingerprint",
+        "context_strategy_fingerprint",
+        "context_report_fingerprint",
+        "context_report_analysis_fingerprint",
+        "context_decision_fingerprint",
+        "context_task_profile_evidence_fingerprint",
+        "subject_fingerprint",
+      ]) delete receipt[key];
+    }
+    const legacyEvidence = refingerprint(evidence);
+    const descriptor = manifest.artifacts.find(
+      (entry) => entry.relative_path === "quality/preimplementation-evidence.json",
+    );
+    descriptor.schema_version = 1;
+    descriptor.fingerprint = legacyEvidence.fingerprint;
+    descriptor.bytes = writePrettyJson(preimplementationPath, legacyEvidence);
+    const gatePath = path.join(qualityDir, "gate.json");
+    const gate = JSON.parse(fs.readFileSync(gatePath, "utf8"));
+    gate.preimplementation_evidence_fingerprint = legacyEvidence.fingerprint;
+    const legacyGate = refingerprint(gate);
+    const gateDescriptor = manifest.artifacts.find((entry) => entry.relative_path === "quality/gate.json");
+    gateDescriptor.fingerprint = legacyGate.fingerprint;
+    gateDescriptor.bytes = writePrettyJson(gatePath, legacyGate);
+    attestation.gate_fingerprint = legacyGate.fingerprint;
+    const integratedPath = path.join(qualityDir, "integrated-verification-evidence.json");
+    if (fs.existsSync(integratedPath)) {
+      const integrated = JSON.parse(fs.readFileSync(integratedPath, "utf8"));
+      integrated.gate_fingerprint = legacyGate.fingerprint;
+      const legacyIntegrated = refingerprint(integrated);
+      const integratedDescriptor = manifest.artifacts.find(
+        (entry) => entry.relative_path === "quality/integrated-verification-evidence.json",
+      );
+      integratedDescriptor.fingerprint = legacyIntegrated.fingerprint;
+      integratedDescriptor.bytes = writePrettyJson(integratedPath, legacyIntegrated);
+      attestation.integrated_verification_evidence_fingerprint = legacyIntegrated.fingerprint;
+    }
+  }
   const removed = manifest.artifacts.filter((entry) => entry.relative_path.startsWith("quality/context-"));
   for (const descriptor of removed) fs.unlinkSync(path.join(runDir, ...descriptor.relative_path.split("/")));
   manifest.schema_version = 2;
   manifest.artifacts = manifest.artifacts.filter((entry) => !entry.relative_path.startsWith("quality/context-"));
+  const legacyAttestation = refingerprint(attestation);
   const attestationDescriptor = manifest.artifacts.find((entry) => entry.relative_path === "quality/attestation.json");
   attestationDescriptor.schema_version = 2;
   attestationDescriptor.fingerprint = legacyAttestation.fingerprint;
@@ -1686,6 +1792,32 @@ async function main() {
     } finally {
       legacyRun.cleanup();
     }
+    const longContextRoot = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-live-range-observer-"));
+    try {
+      const fixture = createLargeContextFileFixture(longContextRoot);
+      const observedCalls = [];
+      const observation = await observeRunnerQualityContext({
+        fixture: { repo: longContextRoot },
+        remaining_context_calls: 16,
+        recordObservedContextToolCall: (input) => {
+          observedCalls.push(structuredClone(input));
+          return { receipt_id: `long-live-receipt-${observedCalls.length}`, status: "truncated" };
+        },
+      });
+      const reads = observedCalls.filter((entry) => entry.tool_id === "context_read");
+      assert.equal(reads.length, 3);
+      assert.deepEqual(reads.map((entry) => entry.args.startLine), [1, 501, 1001]);
+      assert.deepEqual(reads.map((entry) => entry.args.maxLines), [500, 500, 200]);
+      assert(reads.every((entry) => entry.args.maxLines <= 500));
+      const outputs = reads.map((entry) => JSON.parse(entry.output));
+      assert(outputs.every((entry) => entry.totalLines === LARGE_CONTEXT_LINE_COUNT));
+      assert.equal(new Set(outputs.map((entry) => entry.sha256)).size, 1);
+      assert.equal(observation.receipt_ids.length, 4);
+      assert.equal(fixture.lines.length, LARGE_CONTEXT_LINE_COUNT);
+    } finally {
+      fs.rmSync(longContextRoot, { recursive: true, force: true });
+    }
+
     const highRun = await createDeterministicHighQualityRun({ profileRole: "candidate" });
     try {
       assert.equal(highRun.result.status, "passed");
@@ -1694,6 +1826,25 @@ async function main() {
       assert.equal(highRun.result.quality_outcomes?.context_metrics.required_wide_category_coverage_basis_points, 10000);
       assert.equal(highRun.result.quality_outcomes?.context_metrics.critical_path_deep_analysis_coverage_basis_points, 10000);
       assert.equal(highRun.bundle.context_receipt_index.receipts.length, 5);
+      const baselineReceipt = highRun.bundle.preimplementation_evidence.baseline_receipts[0];
+      const taskProfileCheck = highRun.bundle.context_sufficiency_decision.task_profile_evidence.checks[0];
+      assert.deepEqual({
+        check_id: baselineReceipt.check_id,
+        trusted_producer: baselineReceipt.trusted_producer,
+        phase: baselineReceipt.phase,
+        status: baselineReceipt.status,
+        command_or_mechanism: baselineReceipt.command_or_mechanism,
+        evidence_fingerprint: baselineReceipt.evidence_fingerprint,
+        completed_at: baselineReceipt.completed_at,
+      }, {
+        check_id: taskProfileCheck.check_id,
+        trusted_producer: taskProfileCheck.trusted_producer,
+        phase: taskProfileCheck.phase,
+        status: taskProfileCheck.status,
+        command_or_mechanism: taskProfileCheck.command_or_mechanism,
+        evidence_fingerprint: taskProfileCheck.evidence_fingerprint,
+        completed_at: taskProfileCheck.completed_at,
+      }, "final gate must reuse the exact cached baseline receipt fields used for context sufficiency");
       assert.deepEqual(
         highRun.traceSnapshot.context_receipts
           .filter((entry) => entry.source_kind === "file")
@@ -1707,8 +1858,150 @@ async function main() {
         ["context_outline", "context_read", "context_read", "context_read", "context_read"],
       );
       assert.equal(highRun.bundle.context_reconciliation.status, "passed");
+      const preimplementationPath = path.join(highRun.runDir, "quality", "preimplementation-evidence.json");
+      const manifestPath = path.join(highRun.runDir, "quality", "manifest.json");
+      const originalPreimplementation = fs.readFileSync(preimplementationPath, "utf8");
+      const originalManifest = fs.readFileSync(manifestPath, "utf8");
+      try {
+        const stalePreimplementation = JSON.parse(originalPreimplementation);
+        stalePreimplementation.plan_challenge_receipts[0].context_report_fingerprint = `sha256:${"0".repeat(64)}`;
+        const refingerprintedPreimplementation = refingerprint(stalePreimplementation);
+        const preimplementationBytes = writePrettyJson(preimplementationPath, refingerprintedPreimplementation);
+        const updatedManifest = JSON.parse(originalManifest);
+        const descriptor = updatedManifest.artifacts.find(
+          (entry) => entry.relative_path === "quality/preimplementation-evidence.json",
+        );
+        descriptor.fingerprint = refingerprintedPreimplementation.fingerprint;
+        descriptor.bytes = preimplementationBytes;
+        updatedManifest.total_bytes = updatedManifest.artifacts.reduce((total, entry) => total + entry.bytes, 0);
+        writePrettyJson(manifestPath, refingerprint(updatedManifest));
+        assert.throws(
+          () => validateEngineeringQualityRunBundle(highRun.runDir),
+          (error) => error instanceof ContractError && error.code === "QUALITY_PLAN_CHALLENGE_STALE",
+          "a self-consistent bundle replaying a challenge against another report was accepted",
+        );
+      } finally {
+        fs.writeFileSync(preimplementationPath, originalPreimplementation, "utf8");
+        fs.writeFileSync(manifestPath, originalManifest, "utf8");
+      }
+
+      const gatePath = path.join(highRun.runDir, "quality", "gate.json");
+      const attestationPath = path.join(highRun.runDir, "quality", "attestation.json");
+      const integratedPath = path.join(highRun.runDir, "quality", "integrated-verification-evidence.json");
+      const originalGate = fs.readFileSync(gatePath, "utf8");
+      const originalAttestation = fs.readFileSync(attestationPath, "utf8");
+      const originalIntegrated = fs.readFileSync(integratedPath, "utf8");
+      try {
+        const gateWithoutEvidence = JSON.parse(originalGate);
+        gateWithoutEvidence.preimplementation_evidence_fingerprint = null;
+        const resealedGate = refingerprint(gateWithoutEvidence);
+        const integratedWithoutEvidence = JSON.parse(originalIntegrated);
+        integratedWithoutEvidence.gate_fingerprint = resealedGate.fingerprint;
+        const resealedIntegrated = refingerprint(integratedWithoutEvidence);
+        const attestationWithoutEvidence = JSON.parse(originalAttestation);
+        attestationWithoutEvidence.gate_fingerprint = resealedGate.fingerprint;
+        attestationWithoutEvidence.integrated_verification_evidence_fingerprint = resealedIntegrated.fingerprint;
+        attestationWithoutEvidence.artifact_refs = attestationWithoutEvidence.artifact_refs.filter(
+          (entry) => entry.value !== "quality/preimplementation-evidence.json",
+        );
+        const resealedAttestation = refingerprint(attestationWithoutEvidence);
+        const manifestWithoutEvidence = JSON.parse(originalManifest);
+        manifestWithoutEvidence.artifacts = manifestWithoutEvidence.artifacts.filter(
+          (entry) => entry.relative_path !== "quality/preimplementation-evidence.json",
+        );
+        const gateDescriptor = manifestWithoutEvidence.artifacts.find(
+          (entry) => entry.relative_path === "quality/gate.json",
+        );
+        gateDescriptor.fingerprint = resealedGate.fingerprint;
+        gateDescriptor.bytes = writePrettyJson(gatePath, resealedGate);
+        const integratedDescriptor = manifestWithoutEvidence.artifacts.find(
+          (entry) => entry.relative_path === "quality/integrated-verification-evidence.json",
+        );
+        integratedDescriptor.fingerprint = resealedIntegrated.fingerprint;
+        integratedDescriptor.bytes = writePrettyJson(integratedPath, resealedIntegrated);
+        const attestationDescriptor = manifestWithoutEvidence.artifacts.find(
+          (entry) => entry.relative_path === "quality/attestation.json",
+        );
+        attestationDescriptor.fingerprint = resealedAttestation.fingerprint;
+        attestationDescriptor.bytes = writePrettyJson(attestationPath, resealedAttestation);
+        manifestWithoutEvidence.total_bytes = manifestWithoutEvidence.artifacts.reduce(
+          (total, entry) => total + entry.bytes,
+          0,
+        );
+        fs.unlinkSync(preimplementationPath);
+        writePrettyJson(manifestPath, refingerprint(manifestWithoutEvidence));
+        assert.throws(
+          () => validateEngineeringQualityRunBundle(highRun.runDir),
+          (error) => error instanceof ContractError
+            && error.code === "QUALITY_BUNDLE_BINDING"
+            && error.message.includes("requires current preimplementation evidence"),
+          "a resealed passed high-assurance bundle omitted mandatory preimplementation evidence",
+        );
+      } finally {
+        fs.writeFileSync(preimplementationPath, originalPreimplementation, "utf8");
+        fs.writeFileSync(gatePath, originalGate, "utf8");
+        fs.writeFileSync(attestationPath, originalAttestation, "utf8");
+        fs.writeFileSync(integratedPath, originalIntegrated, "utf8");
+        fs.writeFileSync(manifestPath, originalManifest, "utf8");
+      }
+
+      convertRunBundleToLegacyV2(highRun.runDir);
+      const validatedLegacyHigh = validateEngineeringQualityRunBundle(highRun.runDir);
+      assert.equal(validatedLegacyHigh.manifest.schema_version, 2);
+      assert.equal(validatedLegacyHigh.preimplementation_evidence.schema_version, 1);
+      assert.equal(validatedLegacyHigh.context_report, null);
+      assert.equal(validatedLegacyHigh.context_sufficiency_decision, null);
     } finally {
       highRun.cleanup();
+    }
+    const recoveredChallengeRun = await createDeterministicHighQualityRun({
+      profileRole: "candidate",
+      planChallengeMode: "retry",
+      updateFinalizedReport: true,
+    });
+    try {
+      assert.equal(recoveredChallengeRun.result.status, "passed");
+      assert.deepEqual(
+        recoveredChallengeRun.planChallengeRequests.map((entry) => entry.challenge_epoch),
+        [1, 2],
+        "a transient live challenge failure did not mint a fresh retry epoch",
+      );
+      for (const key of ["challenge_attempt_id", "architect_result_id", "reviewer_result_id"]) {
+        assert.equal(
+          new Set(recoveredChallengeRun.planChallengeRequests.map((entry) => entry[key])).size,
+          2,
+          `${key} was reused across live challenge retries`,
+        );
+      }
+      assert.equal(recoveredChallengeRun.bundle.context_report.status, "finalized");
+      assert(
+        recoveredChallengeRun.bundle.context_report.revision >= 4,
+        "the finalized report was not reopened, revised, and finalized again",
+      );
+    } finally {
+      recoveredChallengeRun.cleanup();
+    }
+    const overlappingChallengeRun = await createDeterministicHighQualityRun({
+      profileRole: "candidate",
+      planChallengeMode: "reentrant-stale",
+    });
+    try {
+      assert.equal(overlappingChallengeRun.result.status, "passed");
+      assert.equal(overlappingChallengeRun.stalePlanChallengeRejected, true);
+      assert.deepEqual(
+        overlappingChallengeRun.planChallengeRequests.map((entry) => entry.challenge_epoch),
+        [1, 2],
+      );
+      const authoritativeIds = new Set(
+        overlappingChallengeRun.bundle.preimplementation_evidence.plan_challenge_receipts
+          .map((entry) => entry.result_id),
+      );
+      assert(authoritativeIds.has(overlappingChallengeRun.planChallengeRequests[1].architect_result_id));
+      assert(authoritativeIds.has(overlappingChallengeRun.planChallengeRequests[1].reviewer_result_id));
+      assert(!authoritativeIds.has(overlappingChallengeRun.planChallengeRequests[0].architect_result_id));
+      assert(!authoritativeIds.has(overlappingChallengeRun.planChallengeRequests[0].reviewer_result_id));
+    } finally {
+      overlappingChallengeRun.cleanup();
     }
     for (const [planChallengeMode, expectedCode] of [
       ["omitted", "QUALITY_PLAN_CHALLENGE_UNTRUSTED"],

@@ -11,6 +11,10 @@ import {
 import { milestone2ExpectedChecks } from "../lib/quality/milestone-dod.mjs";
 import { NORMAL_SESSION_QUALITY_TOOL_IDS } from "../lib/quality/normal-session-bridge.mjs";
 import { NORMAL_SESSION_QUALITY_PROFILE_PERMISSIONS } from "../lib/quality/normal-session-profile-permissions.mjs";
+import {
+  findForbiddenAgentModelConfiguration,
+  inspectAgentPromptModelNeutrality,
+} from "../lib/quality/prompt-inventory.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const failures = [];
@@ -374,7 +378,7 @@ for (const forbiddenFile of [
   "scripts/verify-model-profiles.mjs",
 ]) {
   if (exists(forbiddenFile)) {
-    fail("HARNESS-S001", `removed model-comparison artifact returned: ${forbiddenFile}`, "Keep model selection in active agent frontmatter only.");
+    fail("HARNESS-S001", `removed model-comparison artifact returned: ${forbiddenFile}`, "Keep core model selection in the OpenCode host and outside harness policy artifacts.");
   }
 }
 
@@ -398,7 +402,7 @@ const expectedDeterministicStages = [
   "eval", "verify:drift", "verify:adoption-bundle", "verify:runtime:fixture", "verify:runtime:quality-hooks:fixture",
   "verify:live-eval", "verify:acceptance",
   "verify:quality-contracts", "verify:engineering-dossier", "verify:architecture-policy", "verify:impact-graph",
-  "verify:context-strategies", "verify:context-receipts", "verify:whole-system-context", "verify:context-sufficiency",
+  "verify:context-strategies", "verify:context-receipts", "verify:context-file-coverage", "verify:whole-system-context", "verify:context-sufficiency",
   "verify:transitive-impact-resolution",
   "verify:context-reconciliation", "verify:context-tool-overlay", "verify:context-live-manifests", "verify:context-acceptance",
   "verify:prompt-inventory", "verify:quality-live-coordinator", "verify:quality-live-runner", "verify:quality-verification-targets",
@@ -577,6 +581,14 @@ for (const ignored of [".oc_harness/", "evals/reports/", "evals/decisions/"]) {
 }
 
 const config = JSON.parse(read("opencode.json"));
+const configModelConfiguration = findForbiddenAgentModelConfiguration(config);
+if (configModelConfiguration.length > 0) {
+  fail(
+    "HARNESS-S024",
+    `opencode.json contains forbidden core model/provider configuration: ${configModelConfiguration.map((entry) => entry.path).join(", ")}`,
+    "Keep model selection in the user's OpenCode host configuration rather than the reusable core profile.",
+  );
+}
 if (config.default_agent !== "orchestrator") {
   fail("HARNESS-S016", "opencode.json default_agent must be orchestrator", "Restore the primary harness orchestrator.");
 }
@@ -644,8 +656,85 @@ const contextAgents = ["orchestrator", "orchestrator-deep", "review-orchestrator
 const contextTools = ["context_outline", "context_files", "context_read", "context_search"];
 const frontmatters = new Map();
 
+const modelNeutralitySensorControls = [
+  {
+    label: "direct model field",
+    frontmatter: { model: "example/model", permission: {} },
+    expected: ["model"],
+  },
+  {
+    label: "snake-case generation field",
+    frontmatter: { top_p: 0.9, permission: {} },
+    expected: ["top_p"],
+  },
+  {
+    label: "nested provider options",
+    frontmatter: { runtime: { providerOptions: { temperature: 0.2 } }, permission: {} },
+    expected: ["runtime.providerOptions"],
+  },
+  {
+    label: "array-nested provider options",
+    frontmatter: { profiles: [{ providerOptions: { temperature: 0.2 } }], permission: {} },
+    expected: ["profiles[0].providerOptions"],
+  },
+  {
+    label: "model-neutral fields and permission tool names",
+    frontmatter: { description: "neutral", mode: "subagent", steps: 20, permission: { model: "deny", providerOptions: "deny" } },
+    expected: [],
+  },
+];
+for (const control of modelNeutralitySensorControls) {
+  const actual = findForbiddenAgentModelConfiguration(control.frontmatter).map((entry) => entry.path);
+  if (JSON.stringify(actual) !== JSON.stringify(control.expected)) {
+    fail("HARNESS-S024", `model-neutrality sensor failed its ${control.label} control`, "Keep direct, snake-case, object/array-nested model/provider configuration detection fail-closed outside permission tool names.");
+  }
+}
+
+const modelNeutralitySourceControls = [
+  {
+    label: "direct source model field",
+    source: "---\ndescription: control\nmode: subagent\nmodel: example/model\npermission:\n  edit: deny\n---\ncontrol\n",
+    expected: ["model"],
+  },
+  {
+    label: "model-neutral source permission names",
+    source: "---\ndescription: control\nmode: subagent\npermission:\n  model: deny\n  providerOptions: deny\n---\ncontrol\n",
+    expected: [],
+  },
+];
+const claimsAgentOwnedModelAuthority = (text) => (
+  /frontmatter\s+is\s+the\s+(?:only\s+)?authority\s+for\s+model/iu.test(text)
+  || /model(?:\s+and\s+provider[^.\n]*)?\s+(?:selection|settings)[^.\n]*\bfrontmatter\b[^.\n]*\bauthorit/iu.test(text)
+);
+if (!claimsAgentOwnedModelAuthority("Agent frontmatter is the only authority for model settings.")) {
+  fail("HARNESS-S024", "model-authority wording sensor missed its positive control", "Keep stale agent-owned model authority claims detectable in active prompts.");
+}
+for (const control of modelNeutralitySourceControls) {
+  const actual = inspectAgentPromptModelNeutrality(control.source, control.label).map((entry) => entry.path);
+  if (JSON.stringify(actual) !== JSON.stringify(control.expected)) {
+    fail("HARNESS-S024", `model-neutrality source sensor failed its ${control.label} control`, "Keep source-level model/provider detection aligned with the production prompt parser.");
+  }
+}
+for (const control of [
+  ["block sequence", "profiles:\n  - model: example/pinned"],
+  ["flow collection", "runtime: { provider: example }"],
+  ["anchor and merge", "defaults: &defaults\n  model: example/pinned\nruntime:\n  <<: *defaults"],
+  ["key-side anchor", "&key model: example/pinned"],
+  ["key-side tag", "!!str model: example/pinned"],
+  ["key-side alias", "*model: example/pinned"],
+]) {
+  const source = `---\ndescription: control\nmode: subagent\n${control[1]}\npermission:\n  edit: deny\n---\ncontrol\n`;
+  try {
+    inspectAgentPromptModelNeutrality(source, `${control[0]} control`);
+    fail("HARNESS-S024", `model-neutrality source sensor accepted unsupported ${control[0]} YAML`, "Keep unsupported YAML syntax fail-closed so model/provider settings cannot hide outside the bounded parser.");
+  } catch {
+    // Expected: unsupported YAML must fail closed before it can hide model/provider settings.
+  }
+}
+
 for (const agent of agentNames) {
   const file = `agents/${agent}.md`;
+  const source = read(file);
   const frontmatter = frontmatterFor(file);
   frontmatters.set(agent, frontmatter);
   if (!frontmatter.description) {
@@ -657,8 +746,28 @@ for (const agent of agentNames) {
   if (!frontmatter.permission || typeof frontmatter.permission !== "object") {
     fail("HARNESS-S024", `${file} missing permission block`, "Declare the agent permission surface explicitly.");
   }
-  if (typeof frontmatter.model !== "string" || frontmatter.model.length === 0) {
-    fail("HARNESS-S024", `${file} must declare a non-empty model preference`, "Keep the user-configurable model choice in active agent frontmatter.");
+  try {
+    const modelConfiguration = inspectAgentPromptModelNeutrality(source, file);
+    if (modelConfiguration.length > 0) {
+      fail(
+        "HARNESS-S024",
+        `${file} contains forbidden core model/provider configuration: ${modelConfiguration.map((entry) => entry.path).join(", ")}`,
+        "Remove model/provider generation settings from core agent frontmatter and let the OpenCode host own model selection.",
+      );
+    }
+  } catch (error) {
+    fail(
+      "HARNESS-S024",
+      `${file} model-neutral frontmatter cannot be inspected: ${error instanceof Error ? error.message : String(error)}`,
+      "Use the bounded mapping-only YAML frontmatter syntax and keep model/provider generation settings host-owned.",
+    );
+  }
+  if (claimsAgentOwnedModelAuthority(source)) {
+    fail(
+      "HARNESS-S024",
+      `${file} assigns model-selection authority to agent frontmatter`,
+      "Keep model selection and provider-specific options owned by the OpenCode host.",
+    );
   }
 
   const permission = frontmatter.permission ?? {};
@@ -843,6 +952,45 @@ assertIncludes(recursiveDocs, "minimal safe harness surface", "docs/recursive-co
 assertIncludes(recursiveDocs, "advanced tools are opt-in", "docs/recursive-context-mode.md");
 assertIncludes(recursiveDocs, "not an absolute security boundary", "docs/recursive-context-mode.md");
 assertIncludes(recursiveDocs, "optional live validation", "docs/recursive-context-mode.md");
+for (const [label, text] of [
+  ["AGENTS.md", read("AGENTS.md")],
+  ["agents/orchestrator.md", read("agents/orchestrator.md")],
+  ["agents/orchestrator-deep.md", read("agents/orchestrator-deep.md")],
+  ["skills/global-wide-deep-context/SKILL.md", read("skills/global-wide-deep-context/SKILL.md")],
+  ["docs/recursive-context-mode.md", recursiveDocs],
+]) {
+  for (const needle of ["targeted `context_symbols`", "includeSymbols: false", "new query, kind, or narrower scope"]) {
+    assertIncludes(text, needle, label, "HARNESS-S090", "Keep targeted symbol discovery from duplicating a broad context_map symbol scan.");
+  }
+}
+const recursiveContractVerifier = read("scripts/verify-recursive-context-contract.mjs");
+for (const needle of [
+  "RecursiveContextPlugin",
+  "adaptContextToolRequest",
+  "adaptContextToolOutput",
+  "beginContextReceiptOperation",
+  "completeContextReceiptOperation",
+  "contentBackedInspectedRanges",
+  "all eight tools",
+]) {
+  assertIncludes(recursiveContractVerifier, needle, "scripts/verify-recursive-context-contract.mjs", "HARNESS-S091", "The cross-repository verifier must exercise real capability output through real receipt adapters.");
+}
+const recursiveContractWorkflow = read(".github/workflows/recursive-context-contract.yml");
+for (const needle of [
+  "recursive-context-contract",
+  "capability_sha",
+  "^[0-9a-f]{40}$",
+  "ref: ${{ inputs.capability_sha }}",
+  "Confirm the checked-out capability commit",
+  "Install recursive-context dependencies",
+  "Build recursive-context capability",
+  "verify:recursive-context-contract",
+]) {
+  assertIncludes(needle === "^[0-9a-f]{40}$" ? recursiveContractWorkflow.replaceAll("\\", "") : recursiveContractWorkflow,
+    needle, ".github/workflows/recursive-context-contract.yml", "HARNESS-S091",
+    "CI must use an immutable capability commit and verify the real recursive-context contract.");
+}
+assertNotIncludes(read(".github/workflows/verify.yml"), "repository: Tah10n/opencode-recursive-context", ".github/workflows/verify.yml", "HARNESS-S091", "The default workflow must not use an implicit mutable capability checkout.");
 assertNotIncludes(recursiveDocs, "plugins/recursive-context.ts", "docs/recursive-context-mode.md");
 
 const liveEvaluationDocs = read("docs/live-evaluation.md");
@@ -954,29 +1102,63 @@ for (const needle of [
   assertIncludes(readme, needle, "README.md", "HARNESS-S008", "Keep platform and installed-host completion semantics explicit and synchronized.");
 }
 const modelsSection = readme.split("## Models", 2)[1]?.split(/^## /mu, 1)[0] ?? "";
-for (const agent of agentNames) {
-  const file = `agents/${agent}.md`;
-  const row = modelsSection.split(/\r?\n/u).find((line) => line.includes(`\`${file}\``)) ?? "";
-  const model = frontmatters.get(agent)?.model;
-  assertIncludes(row, `\`${model}\``, `README.md Models row for ${file}`, "HARNESS-S083", "Keep each README model-table row synchronized with its active agent frontmatter.");
-}
+const normalizedModelsSection = modelsSection.replace(/\s+/gu, " ");
+assertIncludes(readme, "## Models", "README.md Models instructions", "HARNESS-S083", "Keep the model-neutral configuration section documented.");
 for (const needle of [
-  "## Models",
-  "The active agent frontmatter is the authoritative model configuration.",
-  "When changing only the model, preserve the role prompt and permissions.",
-  "`reasoningEffort` and `textVerbosity` are separate optional frontmatter",
+  "OpenCode is the only model-selection authority for the core profile.",
+  "The core `agents/*.md` frontmatter contains no model, provider, or generation-option settings.",
+  "subagents inherit model selection according to the installed OpenCode host",
+  "Model identity is optional observational metadata only.",
+  "does not implement model A/B testing, automatic model routing, or automatic fallback",
 ]) {
-  assertIncludes(readme, needle, "README.md Models instructions", "HARNESS-S083", "Preserve the exact direct model-replacement instructions.");
+  assertIncludes(normalizedModelsSection, needle, "README.md Models instructions", "HARNESS-S083", "Keep host-owned model selection and model-neutral harness authority explicit.");
 }
 const normalizedReadme = readme.replace(/\s+/gu, " ");
 for (const needle of [
-  "To change a model, edit the `model:` field in the YAML frontmatter of the relevant `agents/<name>.md` file.",
-  "No generated catalog or fingerprint must be updated for a model-only change.",
+  "Primary agents use the model selected by the user through OpenCode",
+  "works with any OpenCode-supported model that can use the required tools and follow the workflow",
+  "never grants permission, passes a quality gate, completes an Engineering Dossier, or satisfies acceptance",
+  "Different models can still produce different coding quality",
 ]) {
-  assertIncludes(normalizedReadme, needle, "README.md Models instructions", "HARNESS-S083", "Preserve the exact direct model-replacement instructions independent of Markdown line wrapping.");
+  assertIncludes(normalizedReadme, needle, "README.md Models instructions", "HARNESS-S083", "Keep model-neutral behavior and quality limits explicit independent of Markdown line wrapping.");
 }
-for (const forbidden of ["quality/model-profiles", "GPT-5.5", "Luna", "96-comparison", "model A/B"]) {
-  assertNotIncludes(readme, forbidden, "README.md Models instructions", "HARNESS-S083", "Keep model selection direct and free of removed comparison infrastructure.");
+for (const forbidden of ["quality/model-profiles", "GPT-5.5", "Luna", "96-comparison", "model: openai/", "edit the `model:` field"]) {
+  assertNotIncludes(modelsSection, forbidden, "README.md Models instructions", "HARNESS-S083", "Keep core model selection host-owned and free of model IDs or agent-frontmatter replacement instructions.");
+}
+const modelProfilesDoc = read("docs/model-profiles.md");
+const modelNeutralAdoptionDoc = read("docs/adoption.md");
+const modelNeutralCompatibilityDoc = read("docs/compatibility.md");
+const modelNeutralReleaseDoc = read("docs/release.md");
+for (const [label, text, needles] of [
+  ["docs/model-profiles.md", modelProfilesDoc, [
+    "OpenCode owns model selection.",
+    "Primary agents use that user-selected model.",
+    "Subagents inherit model selection according to the installed OpenCode host behavior.",
+    "Prompt inventory schema v3 omits model and provider-option fields",
+    "Schema v2 remains strict historical read compatibility only",
+  ]],
+  ["docs/adoption.md", modelNeutralAdoptionDoc, [
+    "Select the desired tool-capable model through OpenCode",
+    "HARNESS_RUNTIME_PROFILE_ROOT",
+    "does not compare models, route requests by model, or provide an automatic fallback",
+  ]],
+  ["docs/compatibility.md", modelNeutralCompatibilityDoc, [
+    "Prompt inventory schema v2 remains strict historical read compatibility.",
+    "New inventories use schema v3",
+    "The user-selected OpenCode model is authoritative.",
+  ]],
+  ["docs/release.md", modelNeutralReleaseDoc, [
+    "Core agent frontmatter must remain free of model/provider generation settings",
+    "model selection stays in OpenCode",
+  ]],
+]) {
+  const normalized = text.replace(/\s+/gu, " ");
+  for (const needle of needles) {
+    assertIncludes(normalized, needle, label, "HARNESS-S083", "Keep model-neutral adoption, compatibility, and release guidance synchronized.");
+  }
+}
+for (const forbidden of ["openai/gpt-", "anthropic/", "google/", "edit the `model:` field", "active agent frontmatter is the authoritative model"]) {
+  assertNotIncludes(modelProfilesDoc.toLocaleLowerCase("en-US"), forbidden.toLocaleLowerCase("en-US"), "docs/model-profiles.md", "HARNESS-S083", "Keep model selection in OpenCode and model IDs out of the core guidance.");
 }
 
 const traceContractDoc = read("docs/trace-contract.md");
@@ -1468,7 +1650,7 @@ for (const commandFile of ["commands/learn.md", "commands/curate-learning.md"]) 
 }
 
 const compatibilityDoc = read("docs/compatibility.md");
-for (const needle of ["`0.3.0`", "Unreleased target", "`v0.2.0`", "Latest tagged release", "no package exports", "opencode-recursive-context", "opencode-learning-guard", "`0.1.0`", "`0.2.0`"]) {
+for (const needle of ["`0.3.0`", "Unreleased target", "`v0.2.0`", "Latest tagged release", "no package exports", "opencode-recursive-context", "opencode-learning-guard", "`0.2.0`", "output schema v2", "contract 2.0", "policy 1", "verify:recursive-context-contract"]) {
   assertIncludes(compatibilityDoc, needle, "docs/compatibility.md");
 }
 

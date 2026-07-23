@@ -677,15 +677,15 @@ const lowerRegistration = inspectNormalSessionRegistration(laterDraftBridge, lat
 executeNormalSessionQualityTool(laterDraftBridge, "quality_context_strategy_escalate", {
   request: JSON.stringify({ requested_strategy_id: "high-wide-deep-v1" }),
 }, laterDraftContext);
-executeNormalSessionQualityTool(laterDraftBridge, "quality_architecture_evaluate", {
+expectCode(() => executeNormalSessionQualityTool(laterDraftBridge, "quality_architecture_evaluate", {
   request: JSON.stringify({ expected_revision: 1, blockers: [] }),
-}, { sessionID: laterDraftSession, agent: "architect" });
+}, { sessionID: laterDraftSession, agent: "architect" }), "QUALITY_PLAN_CHALLENGE_BEFORE_CONTEXT_SUFFICIENCY");
 const laterDraftOwner = inspectNormalSessionQualityState(laterDraftBridge, laterDraftSession);
 assert.equal(laterDraftOwner.lifecycle, "dossier_draft");
-assert.equal(laterDraftOwner.dossier.revision, 2);
+assert.equal(laterDraftOwner.dossier.revision, 1);
 assert.equal(laterDraftOwner.dossier.impact_graph, null);
 assert.equal(laterDraftOwner.context_report, null);
-assert.equal(laterDraftOwner.contributions.length, 1);
+assert.equal(laterDraftOwner.contributions.length, 0);
 const laterDraftSessionKey = createHash("sha256").update(laterDraftSession).digest("hex");
 const lowerRegistrationPath = path.join(
   tempRoot,
@@ -696,9 +696,13 @@ const lowerRegistrationPath = path.join(
 );
 fs.writeFileSync(lowerRegistrationPath, `${JSON.stringify(lowerRegistration)}\n`, "utf8");
 laterDraftBridge = createNormalSessionQualityBridge(faultOptions);
-expectCode(() => executeNormalSessionQualityTool(laterDraftBridge, "quality_dossier_inspect", {
+assert.doesNotThrow(() => executeNormalSessionQualityTool(laterDraftBridge, "quality_dossier_inspect", {
   request: "{}",
-}, laterDraftContext), "QUALITY_LIFECYCLE_RECONCILIATION");
+}, laterDraftContext));
+const repairedLaterDraftOwner = inspectNormalSessionQualityState(laterDraftBridge, laterDraftSession);
+const repairedLaterDraftRegistration = inspectNormalSessionRegistration(laterDraftBridge, laterDraftSession);
+assert.equal(repairedLaterDraftOwner.dossier.risk_class, repairedLaterDraftRegistration.risk_class);
+assert.equal(repairedLaterDraftOwner.lifecycle, repairedLaterDraftRegistration.lifecycle);
 
 injectedFailure = null;
 let progressedReceiptBridge = createNormalSessionQualityBridge(faultOptions);

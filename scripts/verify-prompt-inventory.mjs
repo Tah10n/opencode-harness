@@ -8,6 +8,7 @@ import {
   comparePromptInventories,
   createIntentionalDuplicationAllowlist,
   createPromptInventory,
+  inspectAgentPromptModelNeutrality,
   sealPromptInventory,
   validatePromptInventory,
 } from "../lib/quality/prompt-inventory.mjs";
@@ -20,8 +21,9 @@ import {
 import { ContractError, canonicalJson } from "../lib/quality/validation.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const baselinePath = path.join(root, "quality", "prompt-inventory", "baseline.v2.json");
-const declarationsPath = path.join(root, "quality", "prompt-inventory", "declared-changes.v2.json");
+const baselinePath = path.join(root, "quality", "prompt-inventory", "baseline.v3.json");
+const declarationsPath = path.join(root, "quality", "prompt-inventory", "declared-changes.v3.json");
+const legacyBaselinePath = path.join(root, "quality", "prompt-inventory", "baseline.v2.json");
 const baselineCommit = "0a1d56605b9b8923ac27c3b3b405b38177ca7741";
 const DEFAULT_DISCOVERY_LIMITS = Object.freeze({
   maxDirectories: 512,
@@ -317,8 +319,9 @@ const OPERATIONAL_SEQUENCE_MARKERS = Object.freeze({
   serialized_read_only_children: /serialized read-only child tasks/iu,
   dossier_refinement: "`quality_dossier_update`",
   context_report_refinement: "`quality_context_report_update`",
-  context_sufficiency: /`quality_context_report_finalize`[\s\S]{0,180}context\s+sufficiency/iu,
-  current_plan_challenges: /current\s+Dossier[\s\S]{0,180}current\s+context\s+report/iu,
+  context_report_finalization: "`quality_context_report_finalize`",
+  context_sufficiency_decision: /runner-(?:owned|computed)[\s\S]{0,120}sufficient\s+context\s+decision/iu,
+  current_plan_challenges: /architect\s+and\s+reviewer[\s\S]{0,300}canonical\s+(?:current\s+)?challenge\s+subject/iu,
   dossier_gate: "`quality_dossier_finalize`",
   mutation_authorization: /runner-owned passed gate[\s\S]{0,80}(?:authorizes|permits)/iu,
 });
@@ -337,7 +340,7 @@ function assertModeAwareReadOnlyGuidance(text, label) {
 function assertPreimplementationSemantics() {
   check(
     HIGH_CRITICAL_PREIMPLEMENTATION_SEQUENCE.map((entry) => entry.id).join(",")
-      === "session_registration,risk_and_strategy,provisional_dossier,context_receipts,serialized_read_only_children,dossier_refinement,context_report_refinement,context_sufficiency,current_plan_challenges,dossier_gate,mutation_authorization",
+      === "session_registration,risk_and_strategy,provisional_dossier,context_receipts,serialized_read_only_children,dossier_refinement,context_report_refinement,context_report_finalization,context_sufficiency_decision,current_plan_challenges,dossier_gate,mutation_authorization",
     "the canonical high/critical preimplementation stage registry drifted",
   );
   check(CONTEXT_EXECUTION_MODE_CONTRACT.instrumented.context_operations === "serialized", "instrumented context operations must stay serialized");
@@ -384,13 +387,25 @@ function assertPreimplementationSemantics() {
   );
   expectFailure(
     "report/Dossier finalization reordering fixture",
-    "context_sufficiency",
+    "context_sufficiency_decision",
     () => assertSemanticSequence(
       orchestratorSequence
         .replace("`quality_context_report_finalize`", "`quality_dossier_finalize`")
         .replace("`quality_dossier_finalize` and existing gate evaluation", "`quality_context_report_finalize` and existing gate evaluation"),
       OPERATIONAL_SEQUENCE_MARKERS,
       { label: "report/Dossier finalization reordering fixture" },
+    ),
+  );
+  expectFailure(
+    "challenge-before-sufficient-decision fixture",
+    "current_plan_challenges",
+    () => assertSemanticSequence(
+      orchestratorSequence.replace(
+        /runner-owned sufficient context decision[\s\S]{0,300}(Architect and reviewer[\s\S]{0,300}canonical current challenge subject)/iu,
+        "$1 before any runner-owned sufficient context decision",
+      ),
+      OPERATIONAL_SEQUENCE_MARKERS,
+      { label: "challenge-before-sufficient-decision fixture" },
     ),
   );
   expectFailure(
@@ -435,25 +450,47 @@ function assertPreimplementationSemantics() {
 
   const pluginDescriptions = readWorkspaceText("lib/quality/normal-session-plugin.mjs");
   check(pluginDescriptions.includes(PROVISIONAL_DOSSIER_PHRASE), "quality_dossier_create description must use the canonical provisional Dossier phrase");
-  check(/current Dossier and current context report/iu.test(pluginDescriptions), "challenge tool description must bind contributions to the current composite analysis");
+  check(/canonical current challenge subject/iu.test(pluginDescriptions), "challenge tool description must bind contributions to the canonical current subject");
   check(/finalization alone does not authorize mutation/iu.test(pluginDescriptions), "Dossier finalization description must preserve the mutation authority boundary");
+
+  for (const relativePath of [
+    "AGENTS.md",
+    "agents/orchestrator.md",
+    "agents/orchestrator-deep.md",
+    "skills/global-wide-deep-context/SKILL.md",
+    "README.md",
+    "docs/whole-system-context.md",
+    "docs/adoption.md",
+  ]) {
+    const text = readWorkspaceText(relativePath);
+    check(/finalized\s+(?:Whole-System\s+Context\s+Report|report)/iu.test(text), `${relativePath} must require a finalized context report before formal challenges`);
+    check(/runner-owned\s+sufficient\s+context\s+decision/iu.test(text), `${relativePath} must require the current runner-owned sufficient decision`);
+    check(/canonical\s+current\s+challenge\s+subject/iu.test(text), `${relativePath} must name the canonical current challenge subject`);
+  }
 }
 
 const baseline = JSON.parse(fs.readFileSync(baselinePath, "utf8"));
 const declarations = JSON.parse(fs.readFileSync(declarationsPath, "utf8"));
+const legacyBaseline = JSON.parse(fs.readFileSync(legacyBaselinePath, "utf8"));
 validatePromptInventory(baseline);
+validatePromptInventory(legacyBaseline);
 check(
   declarations
   && Object.keys(declarations).sort().join(",") === "baseline_commit,changes,schema_version"
-  && declarations.schema_version === 2
+  && declarations.schema_version === 3
   && declarations.baseline_commit === baselineCommit
   && Array.isArray(declarations.changes),
-  "declared prompt changes must be a strict version-2 manifest bound to the starting commit",
+  "declared prompt changes must be a strict version-3 manifest bound to the starting commit",
 );
 recursivelyRejectRawPromptFields(baseline);
+recursivelyRejectRawPromptFields(legacyBaseline);
+check(
+  baseline.entries.every((entry) => !Object.hasOwn(entry, "model") && !Object.hasOwn(entry, "options")),
+  "prompt inventory v3 must not persist model or provider-option fields",
+);
 
 const regeneratedBaseline = buildInventory({
-  inventoryId: "baseline-engineering-prompts-v2",
+  inventoryId: "baseline-engineering-prompts-v3",
   sourceKind: "git_commit",
   sourceRevision: baselineCommit,
   sources: baselineSources(),
@@ -497,7 +534,7 @@ expectFailure(
   ], currentInventoryDocuments),
 );
 const current = buildInventory({
-  inventoryId: "current-engineering-prompts-v1",
+  inventoryId: "current-engineering-prompts-v3",
   sourceKind: "worktree",
   sourceRevision: null,
   sources: currentSources,
@@ -679,9 +716,13 @@ const modelDrift = buildInventory({
 const modelMetadataComparison = comparePromptInventories(baseline, modelDrift);
 check(
   modelMetadataComparison.status === "passed"
-  && modelMetadataComparison.changes.some((entry) => entry.code === "PROMPT_MODEL_METADATA_CHANGED")
-  && modelMetadataComparison.changes.some((entry) => entry.code === "PROMPT_CONFIG_METADATA_ONLY"),
-  "model-only frontmatter drift must remain visible but must not become a quality gate",
+  && modelMetadataComparison.changes.some((entry) => entry.code === "PROMPT_NON_POLICY_FRONTMATTER_ONLY"),
+  "model/provider frontmatter bytes must remain visible without becoming quality policy",
+);
+check(
+  inspectAgentPromptModelNeutrality(modelDriftSources.find((entry) => entry.path === "agents/general.md").content.toString("utf8"))
+    .some((entry) => entry.path === "model"),
+  "shared model-neutrality sensor must reject a direct model pin even though inventory v3 excludes it from quality policy",
 );
 
 const toolDriftSources = mutateSource(
@@ -873,6 +914,7 @@ check(
 );
 
 expectContractError("CONTRACT_UNKNOWN_FIELD", () => validatePromptInventory({ ...baseline, invented: true }));
+expectContractError("PROMPT_INVENTORY_VERSION_SKEW", () => comparePromptInventories(legacyBaseline, baseline));
 check(
   comparePromptInventories(baseline, current, {
     declaredChanges: [{

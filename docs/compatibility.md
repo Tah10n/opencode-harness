@@ -6,7 +6,7 @@
 | --- | --- | --- | --- | --- |
 | `opencode-harness` | <https://github.com/Tah10n/opencode-harness> | `0.3.0` | Unreleased target | Development orchestration profile with feedback APIs, live evaluation, candidate assessment, docs, and verifiers. |
 | `opencode-harness` | <https://github.com/Tah10n/opencode-harness/tree/v0.2.0> | `v0.2.0` | Latest tagged release | Tagged orchestration profile, rules, docs, and verifier; its package has no package exports and does not expose feedback API subpaths. |
-| `opencode-recursive-context` | <https://github.com/Tah10n/opencode-recursive-context> | `0.1.0` | Compatible capability | Safe read-only `context_*` tools. |
+| `opencode-recursive-context` | <https://github.com/Tah10n/opencode-recursive-context> | `0.2.0` | Coordinated release target | Safe read-only `context_*` tools; output schema v2, contract 2.0, policy 1. |
 | `opencode-learning-guard` | <https://github.com/Tah10n/opencode-learning-guard> | `0.2.0` | Compatible capability | Bounded `oc_learning_*` memory and managed-skill write tools. |
 
 Do not read development-checkout documentation as a claim about `v0.2.0`.
@@ -21,6 +21,25 @@ grants. The default harness contract is the minimal safe surface:
 `context_outline`, `context_files`, `context_search`, and `context_read`.
 Advanced tools such as `context_map`, `context_batch_read`, `context_symbols`,
 and `context_related` are host opt-ins.
+
+| Harness target | Capability target | Output schema | Contract | Policy | Minimal surface | Advanced opt-in surface |
+| --- | --- | --- | --- | --- | --- | --- |
+| `opencode-harness` `0.3.0` | `opencode-recursive-context` `0.2.0` | v2 | 2.0 | 1 | `context_outline`, `context_files`, `context_search`, `context_read` | `context_map`, `context_batch_read`, `context_symbols`, `context_related` |
+
+Harness adapters also accept legacy schema-v2 capability envelopes without
+the additive producer metadata. When metadata is present, an unknown producer
+or unsupported contract fails closed. The harness has no production runtime
+dependency on the capability package; the contract export is consumed only by
+tests, tooling, and the explicit cross-repository verifier.
+
+Capability output schema v2 is distinct from the harness evidence formats.
+New runner-owned context receipts use schema v3 and new receipt-evidence indexes
+use schema v4. Strict index v3 remains readable as historical evidence but
+cannot authorize aggregate file coverage. New preimplementation evidence uses
+schema v2; legacy quality bundle v2 dispatches strictly to evidence schema v1
+and forbids context artifacts. A passed high/critical bundle v3 requires current
+evidence v2 together with its bound report, sufficiency decision, and task-profile
+evidence; a resealed bundle cannot omit that preimplementation chain.
 
 ## Runtime Expectations
 
@@ -47,6 +66,20 @@ For this repository:
 ```sh
 npm run verify
 ```
+
+For the real capability/consumer boundary with both checkouts present:
+
+```sh
+npm run verify:recursive-context-contract -- --capability-root ../opencode-recursive-context
+```
+
+This explicit verifier is intentionally outside the default `npm run verify`,
+so an absent sibling checkout cannot make the deterministic harness suite
+environment-dependent. The dedicated `Recursive context contract` workflow
+requires a full 40-character capability commit SHA, checks out exactly that
+commit, confirms `HEAD`, and runs the matrix on Linux and Windows. A branch,
+tag, or implicit default-branch checkout is not accepted. Invoke that workflow
+only after the coordinated capability commit is reachable on GitHub.
 
 For an installed OpenCode profile:
 
@@ -113,17 +146,22 @@ native edit or writable-delegation probes, it returns `failed`.
 The public quality-attestation reader accepts strict schema v2 and v3
 documents; new attestations are emitted only as context-aware v3. Model-bound
 v1 attestations are not accepted as completion evidence. Prompt inventory
-schema v2 keeps model and provider settings as informational metadata while
-permission, prompt, tool, and sentinel drift remain gated.
+schema v2 remains strict historical read compatibility. New inventories use
+schema v3, which omits model/provider configuration from the policy shape while
+retaining raw-byte observability and gating role content, step limits,
+permissions, tools, delegation, and sentinels. Mixed v2/v3 inventory comparison
+fails closed.
 
 The post-edit architecture reader preserves strict evidence v1 and graph
 evidence v2 as historical input. New authoritative reconciliation evidence is
 written only as evidence v3 with graph-delta v2; historical forms cannot
 authorize a fresh extractor-grounded reconciliation.
 
-Active model IDs are read only from `agents/*.md` frontmatter. Availability
-of a configured model is an installed-host concern and never a requirement for
-`npm run verify`.
+The user-selected OpenCode model is authoritative. Core `agents/*.md`
+frontmatter contains no model/provider generation settings; primary agents use
+the host selection and subagents inherit according to installed-host behavior.
+Model availability and inheritance are host observations and never requirements
+for deterministic `npm run verify` acceptance.
 
 The committed-whitespace verifier invokes Git with argv arrays and supports
 Windows and POSIX. GitHub pull-request and push runs require a full checkout and

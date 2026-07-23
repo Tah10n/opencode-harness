@@ -6,6 +6,21 @@ This section describes the development checkout. The latest tagged release is
 still `v0.2.0`; its package metadata has no `exports` field and does not expose
 the feedback-plane ESM subpaths documented for the `0.3.0` target.
 
+- Made the core profile model-neutral: all 11 agent frontmatters now defer model
+  selection to OpenCode, prompt inventory v3 removes model/provider options from
+  quality policy while retaining strict v2 read compatibility, and static plus
+  runtime-fixture sensors reject direct, nested, sequence, flow, anchor, and
+  merge-based pins. Model identity remains optional observational metadata and
+  cannot authorize mutation or acceptance.
+- Hardened recursive-context authorization: exact requested read ranges are
+  mandatory, paginated inventory pages remain partial until a complete chain is
+  represented, batch item failures are bound to partial/failed state, only
+  content reads can prove guidance, and malformed standard-lite evidence blocks
+  instead of aborting the quality session. Current receipt/index schemas are v3/v4.
+- Preserved genuine high/critical legacy bundle-v2 reads through strict
+  preimplementation-evidence v1 validation while requiring v2 evidence plus the
+  current context artifact set for passed high/critical bundle v3. The portable
+  adoption contract now includes the root `package-lock.json` required by CI.
 - Removed macOS runner-image drift from workspace observation by reusing the
   protected fixed Git executable and verifying a sanitized `rev-parse` under
   the dedicated workload UID before the full verifier starts.
@@ -128,7 +143,7 @@ the feedback-plane ESM subpaths documented for the `0.3.0` target.
 - Removed the model-profile catalog, 96-cell model-comparison manifests,
   model-specific runtime evidence, paired-model promotion scripts, and their
   release gates. General baseline/candidate live regression evaluation remains
-  model-neutral; agent frontmatter is the only active model source.
+  model-neutral; model selection remains owned by the OpenCode host.
 - Replaced worktree-only whitespace checking with a sealed verifier for local
   unstaged/staged state, pull-request merge-base ranges, push ranges, initial
   pushes, and clean-checkout current-commit fallback.

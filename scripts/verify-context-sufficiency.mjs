@@ -6,8 +6,10 @@ import { fileURLToPath } from "node:url";
 import { selectMinimumContextStrategy } from "../lib/quality/context-strategies.mjs";
 import {
   contentBackedInspectedPaths,
+  createContextReceiptEvidenceIndex,
   createStandardLiteContextSummary,
   evaluateContextSufficiency,
+  validateContextReceiptEvidenceIndex,
   validateContextSufficiencyDecision,
 } from "../lib/quality/context-sufficiency.mjs";
 import {
@@ -49,6 +51,7 @@ function fullFlow({
   receiptToolId = "context_batch_read",
   receiptTruncated = false,
   receiptCompletedAt = undefined,
+  searchContentReads = true,
   mutateContent = null,
 } = {}) {
   const dossier = contextTestDossier({ riskClass, taskType, transitiveImpact });
@@ -81,6 +84,22 @@ function fullFlow({
     ...(receiptObservedPaths === null ? {} : { observedPaths: receiptObservedPaths }),
   });
   const receipts = [outline, receipt];
+  if (receiptToolId === "context_search" && searchContentReads) {
+    let previousReceiptFingerprint = receipt.fingerprint;
+    for (const [index, observedPath] of receipt.result.relative_paths.entries()) {
+      const contentRead = contextTestReceipt({
+        receiptId: `CTXRECEIPT-SEARCH-CONTENT-${index + 1}`,
+        sequence: index + 3,
+        dossier,
+        toolId: "context_read",
+        availableToolIds: ["context_outline", "context_files", "context_search", "context_read"],
+        observedPaths: [observedPath],
+        previousReceiptFingerprint,
+      });
+      receipts.push(contentRead);
+      previousReceiptFingerprint = contentRead.fingerprint;
+    }
+  }
   const content = completeContextContent({
     strategyBinding: strategy,
     dossier,
@@ -193,6 +212,9 @@ const inventoryOnlyDecision = decide(inventoryOnlyAllSubjects);
 hasCode(inventoryOnlyDecision, "CONTEXT_CLAIM_EVIDENCE_MISSING");
 hasCode(inventoryOnlyDecision, "CONTEXT_DIRECT_PATH_MISSING");
 hasCode(inventoryOnlyDecision, "CONTEXT_TRANSITIVE_PATH_MISSING");
+
+const searchOnlyGuidance = fullFlow({ receiptToolId: "context_search", searchContentReads: false });
+hasCode(decide(searchOnlyGuidance), "CONTEXT_WIDE_CATEGORY_MISSING");
 
 const omittedTruncation = fullFlow({ receiptTruncated: true });
 hasCode(decide(omittedTruncation), "CONTEXT_TRUNCATION_UNRESOLVED");
@@ -319,6 +341,11 @@ const standardReceipt = contextTestReceipt({
   observedPaths: ["lib/context-example.mjs"],
 });
 assert.deepEqual(contentBackedInspectedPaths({ receipts: [standardReceipt] }), ["lib/context-example.mjs"]);
+const lineRangeOnlyRead = clone(standardReceipt);
+lineRangeOnlyRead.result.content_ranges = [];
+const lineRangeOnlyReadReceipt = refingerprint(lineRangeOnlyRead);
+assert(lineRangeOnlyReadReceipt.result.line_ranges.length > 0);
+assert.deepEqual(contentBackedInspectedPaths({ receipts: [lineRangeOnlyReadReceipt] }), []);
 const standardSummary = createStandardLiteContextSummary({
   summary_id: "CTXLOCAL-valid",
   session_key: standardReceipt.session_key,
@@ -342,6 +369,54 @@ const standardInput = {
 };
 assert.equal(evaluateContextSufficiency(standardInput).status, "sufficient");
 
+const unknownReceiptSummary = refingerprint({
+  ...standardSummary,
+  receipt_ids: ["CTXRECEIPT-MISSING"],
+});
+const unknownReceiptDecision = evaluateContextSufficiency({
+  ...standardInput,
+  decision_id: "CTXDEC-standard-unknown-receipt",
+  standard_lite_summary: unknownReceiptSummary,
+});
+hasCode(unknownReceiptDecision, "CONTEXT_RECEIPT_UNKNOWN");
+hasCode(unknownReceiptDecision, "CONTEXT_STANDARD_LITE_EVIDENCE_MISSING");
+
+const duplicateReceiptDecision = evaluateContextSufficiency({
+  ...standardInput,
+  decision_id: "CTXDEC-standard-duplicate-receipt",
+  receipt_index: { receipts: [standardReceipt, standardReceipt] },
+});
+hasCode(duplicateReceiptDecision, "CONTEXT_RECEIPT_DUPLICATE");
+hasCode(duplicateReceiptDecision, "CONTEXT_STANDARD_LITE_EVIDENCE_MISSING");
+
+const wrongSessionReceipt = refingerprint({ ...standardReceipt, session_key: "f".repeat(64) });
+const wrongSessionDecision = evaluateContextSufficiency({
+  ...standardInput,
+  decision_id: "CTXDEC-standard-invalid-binding",
+  receipt_index: { receipts: [wrongSessionReceipt] },
+});
+hasCode(wrongSessionDecision, "CONTEXT_RECEIPT_BINDING_INVALID");
+hasCode(wrongSessionDecision, "CONTEXT_STANDARD_LITE_EVIDENCE_MISSING");
+
+const currentIndex = createContextReceiptEvidenceIndex(
+  { receipts: valid.receipts },
+  {
+    session_key: valid.receipt.session_key,
+    run_id: valid.dossier.run_id,
+    task_id: valid.dossier.task_id,
+    source_fingerprint: CONTEXT_TEST_WORKSPACE,
+  },
+);
+const forgedIndex = clone(currentIndex);
+const forgedBatchProjection = forgedIndex.receipts.find((entry) => entry.tool_id === "context_batch_read");
+forgedBatchProjection.item_failures = [{ path: forgedBatchProjection.observed_paths[0], reason_code: "hash_mismatch" }];
+delete forgedIndex.fingerprint;
+forgedIndex.fingerprint = fingerprint(forgedIndex);
+assert.throws(
+  () => validateContextReceiptEvidenceIndex(forgedIndex),
+  (error) => error?.code === "CONTEXT_RECEIPT_ITEM_FAILURE",
+);
+
 const standardOutline = contextTestReceipt({
   receiptId: "CTXRECEIPT-STANDARD-OUTLINE",
   sequence: 1,
@@ -361,7 +436,7 @@ const standardSearch = contextTestReceipt({
 });
 assert.deepEqual(
   contentBackedInspectedPaths({ receipts: [standardOutline, standardSearch] }),
-  ["lib/context-example.mjs"],
+  [],
 );
 assert.deepEqual(contentBackedInspectedPaths({ receipts: [standardOutline] }), []);
 const truncatedStandardSearch = contextTestReceipt({

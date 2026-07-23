@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$comment": "Cross-field producer, phase, command, dossier, status, and fingerprint checks are canonical in lib/quality/gate.mjs.",
-  "title": "OpenCode Harness Preimplementation Evidence v1",
+  "title": "OpenCode Harness Preimplementation Evidence v2",
   "type": "object",
   "required": [
     "schema_version",
@@ -13,7 +13,7 @@
     "fingerprint"
   ],
   "properties": {
-    "schema_version": { "const": 1 },
+    "schema_version": { "const": 2 },
     "evidence_id": { "$ref": "#/$defs/id" },
     "dossier_id": { "$ref": "#/$defs/id" },
     "dossier_fingerprint": { "$ref": "#/$defs/fingerprint" },
@@ -50,11 +50,28 @@
     },
     "challengeReceipt": {
       "type": "object",
-      "required": ["receipt_id", "result_id", "role", "mechanism_id", "trusted_producer", "phase", "status", "evidence_fingerprint", "completed_at"],
+      "required": [
+        "receipt_id", "result_id", "role", "session_key", "run_id", "task_id", "dossier_id",
+        "dossier_analysis_fingerprint", "context_strategy_fingerprint", "context_report_fingerprint",
+        "context_report_analysis_fingerprint", "context_decision_fingerprint",
+        "context_task_profile_evidence_fingerprint", "subject_fingerprint", "mechanism_id",
+        "trusted_producer", "phase", "status", "evidence_fingerprint", "completed_at"
+      ],
       "properties": {
         "receipt_id": { "$ref": "#/$defs/id" },
         "result_id": { "$ref": "#/$defs/id" },
         "role": { "enum": ["architect", "reviewer"] },
+        "session_key": { "$ref": "#/$defs/id" },
+        "run_id": { "$ref": "#/$defs/id" },
+        "task_id": { "$ref": "#/$defs/id" },
+        "dossier_id": { "$ref": "#/$defs/id" },
+        "dossier_analysis_fingerprint": { "$ref": "#/$defs/fingerprint" },
+        "context_strategy_fingerprint": { "$ref": "#/$defs/fingerprint" },
+        "context_report_fingerprint": { "$ref": "#/$defs/fingerprint" },
+        "context_report_analysis_fingerprint": { "$ref": "#/$defs/fingerprint" },
+        "context_decision_fingerprint": { "$ref": "#/$defs/fingerprint" },
+        "context_task_profile_evidence_fingerprint": { "$ref": "#/$defs/fingerprint" },
+        "subject_fingerprint": { "$ref": "#/$defs/fingerprint" },
         "mechanism_id": { "$ref": "#/$defs/id" },
         "trusted_producer": { "type": "string", "minLength": 1 },
         "phase": { "const": "preimplementation" },

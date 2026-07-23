@@ -12,6 +12,10 @@ import {
 } from "../lib/feedback/evidence.mjs";
 import { collectResolvedPermissionSurface, extractPermissionSurface } from "../lib/feedback/permission-surface.mjs";
 import { assertPersistenceSafe, assertSafePersistenceId } from "../lib/feedback/privacy.mjs";
+import {
+  findForbiddenAgentModelConfiguration,
+  inspectAgentPromptModelNeutrality,
+} from "../lib/quality/prompt-inventory.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const runtimeCwd = process.env.HARNESS_RUNTIME_CWD
@@ -23,6 +27,9 @@ const fixtureSource = fixtureArg || process.env.HARNESS_RUNTIME_FIXTURE_DIR;
 const fixtureDir = fixtureSource
   ? path.resolve(fixtureSource)
   : null;
+const runtimeProfileRoot = process.env.HARNESS_RUNTIME_PROFILE_ROOT
+  ? path.resolve(process.env.HARNESS_RUNTIME_PROFILE_ROOT)
+  : root;
 const evidenceProfileArgIndex = process.argv.indexOf("--evidence-profile");
 const evidenceProfile = evidenceProfileArgIndex === -1 ? null : process.argv[evidenceProfileArgIndex + 1];
 const subjectEvidenceArgIndex = process.argv.indexOf("--subject-evidence");
@@ -72,6 +79,7 @@ function spawnOpenCode(args) {
 function reportAndExit() {
   console.error("Harness runtime verification failed:");
   console.error(`Runtime cwd: ${runtimeCwd}`);
+  console.error(`Runtime profile source: ${runtimeProfileRoot}`);
   for (const failure of failures) {
     console.error(`- ${failure.code}: ${failure.message}`);
     if (failure.fix) {
@@ -79,6 +87,74 @@ function reportAndExit() {
     }
   }
   process.exit(1);
+}
+
+function verifySourceProfileModelNeutrality() {
+  const configPath = path.join(runtimeProfileRoot, "opencode.json");
+  try {
+    const config = JSON.parse(fs.readFileSync(configPath, "utf8"));
+    const violations = findForbiddenAgentModelConfiguration(config);
+    if (violations.length > 0) {
+      fail(
+        "HARNESS-R025",
+        `opencode.json contains forbidden core model/provider configuration: ${violations.map((violation) => violation.path).join(", ")}`,
+        "Keep model selection in the user's OpenCode host configuration rather than the reusable core profile.",
+      );
+    }
+  } catch (error) {
+    fail(
+      "HARNESS-R025",
+      `cannot inspect source opencode.json: ${error instanceof Error ? error.message : String(error)}`,
+      "Point HARNESS_RUNTIME_PROFILE_ROOT at a complete harness profile with valid opencode.json.",
+    );
+  }
+  const agentsDir = path.join(runtimeProfileRoot, "agents");
+  let entries;
+  try {
+    entries = fs.readdirSync(agentsDir, { withFileTypes: true });
+  } catch (error) {
+    fail(
+      "HARNESS-R025",
+      `cannot read source agent profile: ${error instanceof Error ? error.message : String(error)}`,
+      "Point HARNESS_RUNTIME_PROFILE_ROOT at a complete harness profile containing agents/*.md.",
+    );
+    return;
+  }
+  const promptNames = new Set(entries
+    .filter((entry) => entry.isFile() && entry.name.endsWith(".md"))
+    .map((entry) => entry.name.slice(0, -3)));
+  const missing = requiredAgentNames.filter((name) => !promptNames.has(name));
+  if (missing.length > 0) {
+    fail(
+      "HARNESS-R025",
+      `source agent profile is missing required prompts: ${missing.join(", ")}`,
+      "Use the complete model-neutral core agents directory.",
+    );
+  }
+  for (const entry of entries.filter((candidate) => candidate.name.endsWith(".md")).sort((left, right) => left.name.localeCompare(right.name))) {
+    if (!entry.isFile()) {
+      fail("HARNESS-R025", `source agent prompt is not an ordinary file: agents/${entry.name}`, "Keep core agent prompts as ordinary Markdown files.");
+      continue;
+    }
+    const relativePath = `agents/${entry.name}`;
+    try {
+      const text = fs.readFileSync(path.join(agentsDir, entry.name), "utf8");
+      const violations = inspectAgentPromptModelNeutrality(text, relativePath);
+      if (violations.length > 0) {
+        fail(
+          "HARNESS-R025",
+          `${relativePath} contains forbidden core model/provider configuration: ${violations.map((violation) => violation.path).join(", ")}`,
+          "Remove model/provider generation settings from core agent frontmatter and select the model through OpenCode.",
+        );
+      }
+    } catch (error) {
+      fail(
+        "HARNESS-R025",
+        `${relativePath} cannot be inspected: ${error instanceof Error ? error.message : String(error)}`,
+        "Restore valid YAML frontmatter and keep it model-neutral.",
+      );
+    }
+  }
 }
 
 function loadSubjectEvidence() {
@@ -121,6 +197,7 @@ function loadSubjectEvidence() {
 }
 
 const subjectEvidence = loadSubjectEvidence();
+verifySourceProfileModelNeutrality();
 if (failures.length > 0) reportAndExit();
 
 if (!fixtureDir) {

@@ -311,9 +311,10 @@ npm run assess:candidate -- --help
 ```
 
 Baseline and candidate are harness profiles, not prescribed models. Do not make
-a model comparison or a particular model ID a release requirement. A model-only
-frontmatter change needs no generated catalog update, but the active README
-table and agent-file list must stay accurate.
+a model comparison or a particular model ID a release requirement. Core agent
+frontmatter must remain free of model/provider generation settings; model
+selection stays in OpenCode. Optional model identity in trace/report metadata is
+observational and cannot pass a release or quality gate.
 
 Do not publish, tag, push, or create a release from verification alone. Those
 remain explicit human-authorized steps.

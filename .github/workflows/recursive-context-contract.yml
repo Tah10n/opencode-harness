@@ -1,0 +1,74 @@
+name: Recursive context contract
+
+on:
+  workflow_dispatch:
+    inputs:
+      capability_sha:
+        description: Full immutable opencode-recursive-context commit SHA to verify
+        required: true
+        type: string
+permissions:
+  contents: read
+
+jobs:
+  recursive-context-contract:
+    name: Recursive context contract (${{ matrix.os }} / Node 24)
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+    steps:
+      - name: Require an immutable capability commit
+        shell: bash
+        env:
+          CAPABILITY_SHA: ${{ inputs.capability_sha }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$CAPABILITY_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "capability_sha must be a full lowercase 40-character commit SHA" >&2
+            exit 1
+          fi
+
+      - name: Checkout harness
+        uses: actions/checkout@v4
+        with:
+          path: opencode-harness
+
+      - name: Checkout pinned recursive-context capability
+        uses: actions/checkout@v4
+        with:
+          repository: Tah10n/opencode-recursive-context
+          ref: ${{ inputs.capability_sha }}
+          path: opencode-recursive-context
+
+      - name: Confirm the checked-out capability commit
+        shell: bash
+        env:
+          CAPABILITY_SHA: ${{ inputs.capability_sha }}
+        run: |
+          set -euo pipefail
+          test "$(git -C opencode-recursive-context rev-parse HEAD)" = "$CAPABILITY_SHA"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Install harness dependencies
+        working-directory: opencode-harness
+        run: npm ci
+
+      - name: Install recursive-context dependencies
+        working-directory: opencode-recursive-context
+        run: npm ci
+
+      - name: Build recursive-context capability
+        working-directory: opencode-recursive-context
+        run: npm run build
+
+      - name: Verify the real cross-repository contract
+        working-directory: opencode-harness
+        run: npm run verify:recursive-context-contract -- --capability-root ../opencode-recursive-context --skip-build

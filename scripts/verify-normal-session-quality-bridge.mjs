@@ -1012,11 +1012,15 @@ function prepareHighContext(targetBridge, context, { includeExistingActiveReceip
 
 function prepareStandardContext(targetBridge, context, observedPath) {
   const callID = `context-read-${++contextCallTick}`;
+  const args = { path: observedPath, startLine: 1, maxLines: 64, maxBytes: 4096 };
   handleNormalSessionToolBefore(targetBridge, {
     tool: "context_read",
     sessionID: context.sessionID,
     callID,
-  }, { args: { path: observedPath, startLine: 1, maxLines: 64, maxBytes: 4096, format: "text" } });
+  }, { args });
+  assert.equal(args.format, "json", "instrumented context_read must execute with the JSON envelope");
+  const pending = inspectNormalSessionQualityState(targetBridge, context.sessionID).pending_context_calls.at(-1);
+  assert.equal(pending.request.format, "json", "the receipt request must bind the executed JSON format");
   handleNormalSessionToolAfter(targetBridge, {
     tool: "context_read",
     sessionID: context.sessionID,
@@ -1434,6 +1438,48 @@ handleNormalSessionEvent(bridge, { type: "session.created", properties: { info: 
 assert.match(attestation.fingerprint, /^sha256:/);
 assert.equal(Object.hasOwn(attestation, "model_profile_id"), false, "normal attestation must be model-free");
 
+const earlyChallengeContext = { sessionID: "session/early-plan-challenge", agent: "orchestrator" };
+executeNormalSessionQualityTool(bridge, "quality_dossier_create", {
+  request: JSON.stringify(fullDossierRequest()),
+}, earlyChallengeContext);
+for (const role of ["architect", "reviewer"]) {
+  assertContractError(() => executeNormalSessionQualityTool(bridge, "quality_architecture_evaluate", {
+    request: JSON.stringify({ expected_revision: 1, blockers: [] }),
+  }, { ...earlyChallengeContext, agent: role }), "QUALITY_PLAN_CHALLENGE_BEFORE_CONTEXT_SUFFICIENCY");
+}
+prepareHighContext(bridge, earlyChallengeContext, { finalize: false });
+for (const role of ["architect", "reviewer"]) {
+  assertContractError(() => executeNormalSessionQualityTool(bridge, "quality_architecture_evaluate", {
+    request: JSON.stringify({ expected_revision: 1, blockers: [] }),
+  }, { ...earlyChallengeContext, agent: role }), "QUALITY_PLAN_CHALLENGE_BEFORE_CONTEXT_SUFFICIENCY");
+}
+
+const insufficientChallengeContext = { sessionID: "session/insufficient-plan-challenge", agent: "orchestrator" };
+executeNormalSessionQualityTool(bridge, "quality_dossier_create", {
+  request: JSON.stringify(fullDossierRequest()),
+}, insufficientChallengeContext);
+const insufficientDraft = prepareHighContext(bridge, insufficientChallengeContext, { finalize: false }).report;
+const insufficientQuestions = structuredClone(insufficientDraft.questions);
+insufficientQuestions[0].status = "uncertain";
+insufficientQuestions[0].actual_observation = null;
+insufficientQuestions[0].next_action = "resolve the material uncertainty before formal plan challenge";
+const insufficientUpdate = executeRawNormalSessionQualityTool(bridge, "quality_context_report_update", {
+  request: JSON.stringify({
+    expected_revision: insufficientDraft.revision,
+    patch: { questions: insufficientQuestions },
+  }),
+}, insufficientChallengeContext);
+const insufficientFinalization = executeRawNormalSessionQualityTool(bridge, "quality_context_report_finalize", {
+  request: JSON.stringify({ expected_revision: insufficientUpdate.report.revision }),
+}, insufficientChallengeContext);
+assert.equal(insufficientFinalization.report.status, "finalized");
+assert.equal(insufficientFinalization.decision.status, "insufficient");
+for (const role of ["architect", "reviewer"]) {
+  assertContractError(() => executeNormalSessionQualityTool(bridge, "quality_architecture_evaluate", {
+    request: JSON.stringify({ expected_revision: 1, blockers: [] }),
+  }, { ...insufficientChallengeContext, agent: role }), "QUALITY_PLAN_CHALLENGE_BEFORE_CONTEXT_SUFFICIENCY");
+}
+
 const phaseContext = { sessionID: "session/phase-aware-targets", agent: "orchestrator" };
 const phaseRequest = fullDossierRequest();
 phaseRequest.test_obligations.push(
@@ -1482,9 +1528,41 @@ assert.equal(phaseSufficiencyState.dossier.plan_challenge.reviewer_result_id, nu
 assert.equal(phaseSufficiencyState.context_decision.strategy_binding_fingerprint, phaseSufficiencyState.context_strategy.fingerprint);
 assert.equal(phaseSufficiencyState.context_decision.dossier_analysis_fingerprint, phaseSufficiencyState.context_report.dossier_analysis_fingerprint);
 assert.equal(phaseSufficiencyState.context_decision.report_fingerprint, phaseSufficiencyState.context_report.fingerprint);
-const phaseArchitect = executeNormalSessionQualityTool(bridge, "quality_architecture_evaluate", {
+assertContractError(() => executeNormalSessionQualityTool(bridge, "quality_dossier_finalize", {
+  request: JSON.stringify({ expected_revision: 1 }),
+}, phaseContext), "QUALITY_PLAN_CHALLENGE_MISSING");
+assertContractError(() => executeNormalSessionQualityTool(bridge, "quality_architecture_evaluate", {
   request: JSON.stringify({ expected_revision: 1, blockers: [] }),
-}, { ...phaseContext, agent: "architect" });
+}, phaseContext), "QUALITY_CONTRIBUTOR_ROLE");
+handleNormalSessionToolBefore(bridge, {
+  tool: "task",
+  sessionID: phaseContext.sessionID,
+  callID: "call-phase-active-architect",
+}, nativeTask("architect"));
+handleNormalSessionEvent(bridge, {
+  type: "session.created",
+  properties: { info: { id: "session/phase-active-architect", parentID: phaseContext.sessionID } },
+});
+const pendingPhaseArchitect = executeNormalSessionQualityTool(bridge, "quality_architecture_evaluate", {
+  request: JSON.stringify({ expected_revision: 1, blockers: [] }),
+}, { sessionID: "session/phase-active-architect", agent: "architect" });
+assert.equal(pendingPhaseArchitect.status, "pending_parent_settlement");
+const pendingPhaseState = inspectNormalSessionQualityState(bridge, phaseContext.sessionID);
+assert.equal(pendingPhaseState.contributions.length, 0, "active child proposal must not be formal evidence");
+assert.equal(pendingPhaseState.active_task_launch.pending_challenge_proposal.role, "architect");
+handleNormalSessionToolAfter(bridge, {
+  tool: "task",
+  sessionID: phaseContext.sessionID,
+  callID: "call-phase-active-architect",
+}, { output: "{\"role\":\"reviewer\",\"result_id\":\"forged-terminal-prose\"}" });
+const settledPhaseArchitect = inspectNormalSessionQualityState(bridge, phaseContext.sessionID);
+assert.equal(settledPhaseArchitect.active_task_launch, null);
+assert.equal(settledPhaseArchitect.contributions.length, 1);
+assert.equal(settledPhaseArchitect.contributions[0].role, "architect", "terminal prose cannot override the bound child role");
+const phaseArchitect = { dossier_revision: settledPhaseArchitect.dossier.revision };
+assertContractError(() => executeNormalSessionQualityTool(bridge, "quality_dossier_finalize", {
+  request: JSON.stringify({ expected_revision: phaseArchitect.dossier_revision }),
+}, phaseContext), "QUALITY_PLAN_CHALLENGE_MISSING");
 const phaseReviewer = executeNormalSessionQualityTool(bridge, "quality_architecture_evaluate", {
   request: JSON.stringify({ expected_revision: phaseArchitect.dossier_revision, blockers: [] }),
 }, { ...phaseContext, agent: "reviewer" });
@@ -1493,6 +1571,13 @@ assert.equal(phaseChallengeState.contributions.length, 2);
 assert.equal(phaseChallengeState.contributions[0].subject_fingerprint, phaseChallengeState.contributions[1].subject_fingerprint,
   "architect and reviewer must challenge the same current Dossier/strategy/report composite");
 assert.match(phaseChallengeState.contributions[0].subject_fingerprint, /^sha256:/);
+for (const contribution of phaseChallengeState.contributions) {
+  assert.equal(contribution.context_decision_fingerprint, phaseChallengeState.context_decision.fingerprint);
+  assert.equal(
+    contribution.context_task_profile_evidence_fingerprint,
+    phaseChallengeState.context_task_profile_evidence.fingerprint,
+  );
+}
 executeNormalSessionQualityTool(bridge, "quality_dossier_finalize", {
   request: JSON.stringify({ expected_revision: phaseReviewer.dossier_revision }),
 }, phaseContext);
@@ -1510,6 +1595,10 @@ assert.deepEqual(trustedTargetCalls.map(({ targetId, phase }) => ({ targetId, ph
   { targetId: "normal-harness-static", phase: "integration" },
 ]);
 const phaseState = inspectNormalSessionQualityState(bridge, phaseContext.sessionID);
+assert.deepEqual(
+  phaseState.preimplementation_evidence.plan_challenge_receipts.map((entry) => entry.context_decision_fingerprint),
+  [phaseState.context_decision.fingerprint, phaseState.context_decision.fingerprint],
+);
 assert.equal(phaseState.preimplementation_check_receipts[0].duration_ms, 17);
 assert.deepEqual(phaseState.verification.target_check_ids, ["normal-committed-whitespace", "normal-harness-static"]);
 assert.deepEqual(
@@ -1572,13 +1661,16 @@ function bugStartRequest(expectedPreFix = "failing_reproducer") {
     },
   };
 }
+const bugBridgeTargetCalls = new WeakMap();
 function createBugBridge(preOutcome, postOutcome = "passing_regression") {
-  return createNormalSessionQualityBridge({
+  const calls = [];
+  const targetBridge = createNormalSessionQualityBridge({
     ...options,
     checkCatalog: bugEngineeringCatalog,
     projectCatalog: bugProjectCatalog,
     evaluateGate: undefined,
     runTrustedTarget: ({ phase }) => {
+      calls.push(phase);
       const observedOutcome = phase === "preimplementation" ? preOutcome : postOutcome;
       return {
         status: ["unavailable", "timed_out", "oversized", "malformed"].includes(observedOutcome) ? "blocked" : "passed",
@@ -1593,6 +1685,8 @@ function createBugBridge(preOutcome, postOutcome = "passing_regression") {
       };
     },
   });
+  bugBridgeTargetCalls.set(targetBridge, calls);
+  return targetBridge;
 }
 function startBugSession(targetBridge, sessionID, expectedPreFix = "failing_reproducer") {
   const context = { sessionID, agent: "orchestrator" };
@@ -1607,12 +1701,36 @@ function startBugSession(targetBridge, sessionID, expectedPreFix = "failing_repr
 
 const honestBugBridge = createBugBridge("failing_reproducer");
 const honestBugContext = startBugSession(honestBugBridge, "session/bug-reproducer-honest");
+const honestBugPreGateState = inspectNormalSessionQualityState(honestBugBridge, honestBugContext.sessionID);
+assert.equal(honestBugPreGateState.preimplementation_check_receipts.length, 0);
+assert.deepEqual(bugBridgeTargetCalls.get(honestBugBridge), []);
 const honestBugGate = executeRawNormalSessionQualityTool(honestBugBridge, "quality_dossier_finalize", {
   request: JSON.stringify({ expected_revision: 1 }),
 }, honestBugContext);
 assert.equal(honestBugGate.gate_status, "passed");
-const honestPreReceipt = inspectNormalSessionQualityState(honestBugBridge, honestBugContext.sessionID)
-  .preimplementation_check_receipts[0];
+const honestBugPostGateState = inspectNormalSessionQualityState(honestBugBridge, honestBugContext.sessionID);
+const honestPreReceipt = honestBugPostGateState.preimplementation_check_receipts[0];
+assert.deepEqual(bugBridgeTargetCalls.get(honestBugBridge), ["preimplementation"], "task-profile and gate finalization must execute the baseline once");
+const profiledHonestBugCheck = honestBugPostGateState.context_decision.task_profile_evidence.checks[0];
+const gateHonestBugReceipt = honestBugPostGateState.preimplementation_evidence.baseline_receipts[0];
+assert.equal(honestPreReceipt.evidence_fingerprint, profiledHonestBugCheck.evidence_fingerprint);
+assert.deepEqual({
+  check_id: gateHonestBugReceipt.check_id,
+  trusted_producer: gateHonestBugReceipt.trusted_producer,
+  phase: gateHonestBugReceipt.phase,
+  status: gateHonestBugReceipt.status,
+  command_or_mechanism: gateHonestBugReceipt.command_or_mechanism,
+  evidence_fingerprint: gateHonestBugReceipt.evidence_fingerprint,
+  completed_at: gateHonestBugReceipt.completed_at,
+}, {
+  check_id: profiledHonestBugCheck.check_id,
+  trusted_producer: profiledHonestBugCheck.trusted_producer,
+  phase: profiledHonestBugCheck.phase,
+  status: profiledHonestBugCheck.status,
+  command_or_mechanism: profiledHonestBugCheck.command_or_mechanism,
+  evidence_fingerprint: profiledHonestBugCheck.evidence_fingerprint,
+  completed_at: profiledHonestBugCheck.completed_at,
+}, "gate evidence must reuse the exact baseline execution fields used by context sufficiency");
 assert.equal(honestPreReceipt.observed_outcome, "failing_reproducer");
 executeRawNormalSessionQualityTool(honestBugBridge, "quality_action_authorize", {
   request: JSON.stringify({ expected_revision: 1, kind: "edit", paths: ["src/file.mjs"] }),
@@ -1767,6 +1885,7 @@ assert.match(longAttestation.fingerprint, /^sha256:/);
 
 const staleContext = { sessionID: "session/stale-challenge", agent: "orchestrator" };
 executeNormalSessionQualityTool(bridge, "quality_dossier_create", { request: JSON.stringify(fullDossierRequest()) }, staleContext);
+prepareHighContext(bridge, staleContext);
 let staleContribution = executeNormalSessionQualityTool(bridge, "quality_architecture_evaluate", {
   request: JSON.stringify({ expected_revision: 1, blockers: [] }),
 }, { sessionID: staleContext.sessionID, agent: "architect" });
@@ -1786,12 +1905,68 @@ assert.equal(staleState.dossier.plan_challenge.architect_result_id, null);
 assert.equal(staleState.dossier.plan_challenge.reviewer_result_id, null);
 assert.equal(staleState.context_decision, null, "Dossier analysis changes must invalidate context sufficiency");
 assert.match(staleSubjectFingerprint, /^sha256:/);
+assertContractError(() => executeNormalSessionQualityTool(bridge, "quality_architecture_evaluate", {
+  request: JSON.stringify({
+    expected_revision: staleState.dossier.revision,
+    blockers: [],
+    result_id: staleContribution.result_id,
+  }),
+}, { ...staleContext, agent: "architect" }), "CONTRACT_UNKNOWN_FIELD");
+
+const newReceiptChallengeContext = { sessionID: "session/new-receipt-invalidates-challenge", agent: "orchestrator" };
+executeNormalSessionQualityTool(bridge, "quality_dossier_create", {
+  request: JSON.stringify(fullDossierRequest()),
+}, newReceiptChallengeContext);
+prepareHighContext(bridge, newReceiptChallengeContext);
+let newReceiptContribution = executeNormalSessionQualityTool(bridge, "quality_architecture_evaluate", {
+  request: JSON.stringify({ expected_revision: 1, blockers: [] }),
+}, { ...newReceiptChallengeContext, agent: "architect" });
+newReceiptContribution = executeNormalSessionQualityTool(bridge, "quality_architecture_evaluate", {
+  request: JSON.stringify({ expected_revision: newReceiptContribution.dossier_revision, blockers: [] }),
+}, { ...newReceiptChallengeContext, agent: "reviewer" });
+const beforeNewReceipt = inspectNormalSessionQualityState(bridge, newReceiptChallengeContext.sessionID);
+const newReceiptCallID = `context-read-${++contextCallTick}`;
+handleNormalSessionToolBefore(bridge, {
+  tool: "context_read",
+  sessionID: newReceiptChallengeContext.sessionID,
+  callID: newReceiptCallID,
+}, { args: { path: "src/file.mjs", startLine: 1, maxLines: 64, maxBytes: 4096, format: "text" } });
+handleNormalSessionToolAfter(bridge, {
+  tool: "context_read",
+  sessionID: newReceiptChallengeContext.sessionID,
+  callID: newReceiptCallID,
+}, { output: contextReadOutput("src/file.mjs"), title: "context read", metadata: {} });
+const afterNewReceipt = inspectNormalSessionQualityState(bridge, newReceiptChallengeContext.sessionID);
+assert.equal(afterNewReceipt.contributions.length, 0, "new context evidence must invalidate both formal challenges");
+assert.equal(afterNewReceipt.dossier.plan_challenge.architect_result_id, null);
+assert.equal(afterNewReceipt.dossier.plan_challenge.reviewer_result_id, null);
+assert.notEqual(afterNewReceipt.context_decision.fingerprint, beforeNewReceipt.context_decision.fingerprint);
+
+const strategyChallengeContext = { sessionID: "session/strategy-invalidates-challenge", agent: "orchestrator" };
+executeNormalSessionQualityTool(bridge, "quality_dossier_create", {
+  request: JSON.stringify(fullDossierRequest()),
+}, strategyChallengeContext);
+prepareHighContext(bridge, strategyChallengeContext);
+let strategyContribution = executeNormalSessionQualityTool(bridge, "quality_architecture_evaluate", {
+  request: JSON.stringify({ expected_revision: 1, blockers: [] }),
+}, { ...strategyChallengeContext, agent: "architect" });
+strategyContribution = executeNormalSessionQualityTool(bridge, "quality_architecture_evaluate", {
+  request: JSON.stringify({ expected_revision: strategyContribution.dossier_revision, blockers: [] }),
+}, { ...strategyChallengeContext, agent: "reviewer" });
+const escalatedAfterChallenge = executeNormalSessionQualityTool(bridge, "quality_context_strategy_escalate", {
+  request: JSON.stringify({ requested_strategy_id: "critical-wide-deep-v1" }),
+}, strategyChallengeContext);
+assert.equal(escalatedAfterChallenge.context_strategy_id, "critical-wide-deep-v1");
+const strategyInvalidatedState = inspectNormalSessionQualityState(bridge, strategyChallengeContext.sessionID);
+assert.equal(strategyInvalidatedState.contributions.length, 0);
+assert.equal(strategyInvalidatedState.dossier.plan_challenge.architect_result_id, null);
+assert.equal(strategyInvalidatedState.dossier.plan_challenge.reviewer_result_id, null);
 
 const refutedReportContext = { sessionID: "session/refuted-report-update", agent: "orchestrator" };
 executeNormalSessionQualityTool(bridge, "quality_dossier_create", {
   request: JSON.stringify(fullDossierRequest()),
 }, refutedReportContext);
-const refutedReportDraft = prepareHighContext(bridge, refutedReportContext, { finalize: false }).report;
+const refutedReportDraft = prepareHighContext(bridge, refutedReportContext).report;
 let refutedReportContribution = executeNormalSessionQualityTool(bridge, "quality_architecture_evaluate", {
   request: JSON.stringify({ expected_revision: 1, blockers: [] }),
 }, { ...refutedReportContext, agent: "architect" });

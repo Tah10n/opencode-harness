@@ -47,6 +47,7 @@ import {
 import { createQualityOutcomes } from "../lib/quality/acceptance-contracts.mjs";
 import { evaluateArchitecturePolicy, parseArchitecturePolicy } from "../lib/quality/architecture.mjs";
 import { createEngineeringPreimplementationEvidence } from "../lib/quality/gate.mjs";
+import { engineeringDossierAnalysisFingerprint } from "../lib/quality/whole-system-context-report.mjs";
 import {
   createQualityLiveCoordinator,
   finalizeQualityLiveAttestation,
@@ -59,6 +60,7 @@ import {
   qualityLivePrecompletionVerifierCodes,
   qualityLiveReviewerRequest,
   qualityLiveSessionForPublication,
+  recordQualityLivePlanChallenge,
   recordQualityLiveImplementation,
   recordQualityLiveRunnerIntegratedVerification,
   recordQualityLiveObservedContextToolCall,
@@ -457,7 +459,7 @@ function projectArchitectureAuditor(repo) {
 }
 
 function promptAttestation(sourceRoot) {
-  const file = path.resolve(sourceRoot, "quality", "prompt-inventory", "baseline.v2.json");
+  const file = path.resolve(sourceRoot, "quality", "prompt-inventory", "baseline.v3.json");
   const inventory = JSON.parse(fs.readFileSync(file, "utf8").replace(/^\uFEFF/u, ""));
   validatePromptInventory(inventory);
   return {
@@ -566,7 +568,6 @@ export function runnerPreimplementationEvidence({
   scenarioId,
   preimplementationOracleObservation,
   traceSnapshot,
-  trustedPlanChallengeResultIds = new Set(),
   evaluatedAt,
 }) {
   const baselineCheckId = `${scenarioId}-baseline`;
@@ -636,38 +637,12 @@ export function runnerPreimplementationEvidence({
       })(),
     }]
     : [];
-  const planChallengeReceipts = [];
-  for (const [role, resultId] of [
-    ["architect", dossier.plan_challenge.architect_result_id],
-    ["reviewer", dossier.plan_challenge.reviewer_result_id],
-  ]) {
-    if (resultId === null) continue;
-    if (!trustedPlanChallengeResultIds.has(resultId)) continue;
-    const job = traceSnapshot.jobs.find(
-      (entry) => entry.request.task_id === resultId && entry.request.agent === role,
-    );
-    if (!job?.result) continue;
-    const passed = job.status.state === "completed"
-      && job.result.termination_reason === "verified"
-      && ["completed", "no-findings"].includes(job.result.status);
-    planChallengeReceipts.push({
-      receipt_id: `${role}-${resultId}-receipt`,
-      result_id: resultId,
-      role,
-      mechanism_id: `${scenarioId}-${role}-plan-challenge`,
-      trusted_producer: `opencode-harness-traced-${role}`,
-      phase: "preimplementation",
-      status: passed ? "passed" : "failed",
-      evidence_fingerprint: fingerprint({ request: job.request, status: job.status, result: job.result }),
-      completed_at: job.result.completed_at,
-    });
-  }
   return createEngineeringPreimplementationEvidence({
     evidence_id: `preimpl-${dossier.dossier_id}`,
     dossier_id: dossier.dossier_id,
-    dossier_fingerprint: dossier.fingerprint,
+    dossier_fingerprint: dossier.fingerprint ?? engineeringDossierAnalysisFingerprint(dossier),
     baseline_receipts: baselineReceipts,
-    plan_challenge_receipts: planChallengeReceipts,
+    plan_challenge_receipts: [],
   });
 }
 
@@ -832,6 +807,7 @@ async function recordRunnerPlanChallenge({
     || JSON.stringify(Object.keys(challenge).sort()) !== JSON.stringify(["architect", "reviewer"])) {
     throw new ContractError("QUALITY_PLAN_CHALLENGE_UNTRUSTED", "runner plan challenge callback returned an invalid result shape");
   }
+  const contributions = [];
   for (const [role, resultId] of [
     ["architect", request.architect_result_id],
     ["reviewer", request.reviewer_result_id],
@@ -845,26 +821,25 @@ async function recordRunnerPlanChallenge({
       throw new ContractError("QUALITY_PLAN_CHALLENGE_UNTRUSTED", `runner ${role} plan challenge result is invalid`);
     }
     assertPersistenceSafe(contribution, { label: `runner ${role} plan challenge` });
-    recordQualityLiveReadOnlyContextSubagent(qualityCoordinator, resultId);
-    traceStore.createJob(runId, {
+    const created = traceStore.createJob(runId, {
       task_id: resultId,
       parent_task_id: TASK_ID,
       agent: role,
-      assigned_scope: `Independently challenge dossier ${request.dossier.dossier_id} before finalization.`,
+      assigned_scope: `Independently challenge dossier ${request.dossier.dossier_id} after runner-owned context sufficiency.`,
       write_scope: [],
       risk,
     });
     traceStore.transitionJob(runId, resultId, { state: "running" });
     const passed = contribution.status === "passed";
-    traceStore.completeJob(runId, resultId, {
+    const completed = traceStore.completeJob(runId, resultId, {
       state: passed ? "completed" : "blocked",
       result: {
         status: passed ? (role === "reviewer" ? "no-findings" : "completed") : "blocked",
-        assigned_scope: `Independently challenge dossier ${request.dossier.dossier_id} before finalization.`,
+        assigned_scope: `Independently challenge dossier ${request.dossier.dossier_id} after runner-owned context sufficiency.`,
         summary: contribution.summary,
         evidence: contribution.evidence_refs.map((entry) => `${entry.kind}:${entry.value}`),
         files_changed: [],
-        verification: "Runner-created read-only plan challenge bound to the immutable dossier draft fingerprint.",
+        verification: "Runner-created read-only plan challenge bound to the canonical post-sufficiency subject fingerprint.",
         decision_unblocked: passed ? "preimplementation quality gate" : "none",
         uncertainty: passed ? "No blocking bounded-plan concern remains." : "Blocking plan concern remains.",
         risks: passed ? [] : ["Plan challenge did not pass."],
@@ -873,15 +848,27 @@ async function recordRunnerPlanChallenge({
       },
     });
     trustedResultIds.add(resultId);
+    contributions.push({
+      role,
+      result_id: resultId,
+      blocking: !passed,
+      evidence_fingerprint: fingerprint({ request: created.request, status: completed.status, result: completed.result }),
+      completed_at: completed.result.completed_at,
+    });
   }
-  return Object.freeze({
-    architect_result_id: request.architect_result_id,
-    reviewer_result_id: request.reviewer_result_id,
-    evidence_refs: Object.freeze([
+  const evidenceRefs = Object.freeze([
       { kind: "job", value: request.architect_result_id },
       { kind: "job", value: request.reviewer_result_id },
-    ]),
+    ]);
+  const recorded = recordQualityLivePlanChallenge(qualityCoordinator, {
+    challenge_epoch: request.challenge_epoch,
+    challenge_attempt_id: request.challenge_attempt_id,
+    subject_fingerprint: request.subject.fingerprint,
+    contributions,
+    evidence_refs: evidenceRefs,
+    recorded_at: contributions.map((entry) => entry.completed_at).sort().at(-1),
   });
+  return Object.freeze({ ...recorded, evidence_refs: evidenceRefs });
 }
 
 function cancelUnsettledAdapterJobs(traceStore, runId) {
@@ -982,9 +969,13 @@ function runnerContextTruncation() {
   };
 }
 
-function runnerContextReadOutput(relativePath, content) {
-  const lines = Math.max(1, content.split(/\r?\n/u).length);
-  const bytes = Buffer.byteLength(content, "utf8");
+const RUNNER_CONTEXT_MAX_LINES = 500;
+
+function runnerContextReadOutput(relativePath, content, { startLine, endLine }) {
+  const sourceLines = content.split(/\r?\n/u);
+  const totalLines = Math.max(1, sourceLines.length);
+  const text = sourceLines.slice(startLine - 1, endLine).join("\n");
+  const bytes = Buffer.byteLength(text, "utf8");
   return JSON.stringify({
     schemaVersion: 2,
     tool: "context_read",
@@ -1012,21 +1003,30 @@ function runnerContextReadOutput(relativePath, content) {
       truncationReasons: [],
       partial: false,
     },
-    limits: {},
-    usage: { files: 1, directories: 0, bytes, lines, matches: 0, ranges: 1 },
+    limits: { maxLines: endLine - startLine + 1 },
+    usage: { files: 1, directories: 0, bytes, lines: endLine - startLine + 1, matches: 0, ranges: 1 },
     truncated: false,
     ok: true,
     path: relativePath,
     sha256: fingerprint(content).slice("sha256:".length),
     bytes,
-    totalLines: lines,
-    selectedRange: { startLine: 1, endLine: lines },
+    totalLines,
+    selectedRange: { startLine, endLine },
     encoding: "utf-8",
     stableDuringRead: true,
-    truncatedBefore: false,
-    truncatedAfter: false,
-    text: content,
+    truncatedBefore: startLine > 1,
+    truncatedAfter: endLine < totalLines,
+    text,
   });
+}
+
+function runnerContextReadRanges(content) {
+  const totalLines = Math.max(1, content.split(/\r?\n/u).length);
+  const ranges = [];
+  for (let startLine = 1; startLine <= totalLines; startLine += RUNNER_CONTEXT_MAX_LINES) {
+    ranges.push({ startLine, endLine: Math.min(totalLines, startLine + RUNNER_CONTEXT_MAX_LINES - 1) });
+  }
+  return ranges;
 }
 
 function runnerContextOutlineOutput(files, availableToolIds) {
@@ -1078,7 +1078,17 @@ export async function observeRunnerQualityContext({
   const receiptIds = [];
   const manifest = captureOrdinaryTreeManifest(fixture.repo);
   const files = manifest.entries.filter((entry) => entry.type === "file").map((entry) => entry.path).sort();
-  if (files.length === 0 || files.length + 1 > Math.min(16, remainingContextCalls)) {
+  const readableFiles = files.map((relativePath) => {
+    const absolutePath = path.join(fixture.repo, ...relativePath.split("/"));
+    const stat = fs.lstatSync(absolutePath);
+    if (!stat.isFile() || stat.isSymbolicLink() || stat.size > 256 * 1024) {
+      throw new ContractError("CONTEXT_RECEIPT_BUDGET_EXHAUSTED", `runner context observer cannot completely read ${relativePath}`);
+    }
+    const content = fs.readFileSync(absolutePath, "utf8");
+    return { relativePath, stat, content, ranges: runnerContextReadRanges(content) };
+  });
+  const requiredCalls = 1 + readableFiles.reduce((sum, entry) => sum + entry.ranges.length, 0);
+  if (files.length === 0 || requiredCalls > Math.min(16, remainingContextCalls)) {
     throw new ContractError("CONTEXT_RECEIPT_BUDGET_EXHAUSTED", "runner context observer cannot fit the bounded outline and file reads into the selected strategy budget");
   }
   receiptIds.push(recordObservedContextToolCall({
@@ -1091,26 +1101,24 @@ export async function observeRunnerQualityContext({
     evidence_refs: [{ kind: "runtime", value: "runner-observed-installed-context-tool-surface" }],
   }).receipt_id);
   let totalBytes = 0;
-  for (const [index, relativePath] of files.entries()) {
-    const absolutePath = path.join(fixture.repo, ...relativePath.split("/"));
-    const stat = fs.lstatSync(absolutePath);
-    if (!stat.isFile() || stat.isSymbolicLink() || stat.size > 256 * 1024) {
-      throw new ContractError("CONTEXT_RECEIPT_BUDGET_EXHAUSTED", `runner context observer cannot completely read ${relativePath}`);
-    }
+  let readCall = 0;
+  for (const { relativePath, stat, content, ranges } of readableFiles) {
     totalBytes += stat.size;
     if (totalBytes > 1024 * 1024) {
       throw new ContractError("CONTEXT_RECEIPT_BUDGET_EXHAUSTED", "runner context observer exceeded its 1 MiB cumulative read boundary");
     }
-    const content = fs.readFileSync(absolutePath, "utf8");
-    receiptIds.push(recordObservedContextToolCall({
-      session_id: "runner-quality-context",
-      call_id: `runner-context-read-${index + 1}`,
-      tool_id: "context_read",
-      args: { path: relativePath, startLine: 1, maxLines: Math.max(1, content.split(/\r?\n/u).length), maxBytes: 256 * 1024, format: "text" },
-      output: runnerContextReadOutput(relativePath, content),
-      parent_question_id: null,
-      evidence_refs: [{ kind: "file", value: relativePath }],
-    }).receipt_id);
+    for (const range of ranges) {
+      readCall += 1;
+      receiptIds.push(recordObservedContextToolCall({
+        session_id: "runner-quality-context",
+        call_id: `runner-context-read-${readCall}`,
+        tool_id: "context_read",
+        args: { path: relativePath, startLine: range.startLine, maxLines: range.endLine - range.startLine + 1, maxBytes: 256 * 1024, format: "text" },
+        output: runnerContextReadOutput(relativePath, content, range),
+        parent_question_id: null,
+        evidence_refs: [{ kind: "file", value: relativePath }],
+      }).receipt_id);
+    }
   }
   return Object.freeze({ receipt_ids: Object.freeze(receiptIds) });
 }
@@ -1123,35 +1131,43 @@ export async function observeRunnerStandardLiteContext({
 }) {
   const receiptIds = [];
   const paths = [...new Set(ownershipPaths)].sort();
-  if (paths.length === 0 || paths.length > Math.min(12, remainingContextCalls)) {
-    throw new ContractError("CONTEXT_STANDARD_LITE_EVIDENCE_MISSING", "standard-lite context observer requires a bounded non-empty ownership path set");
-  }
-  let totalBytes = 0;
-  for (const [index, relativePath] of paths.entries()) {
+  const readableFiles = paths.map((relativePath) => {
     const absolutePath = path.resolve(fixture.repo, ...relativePath.split("/"));
     if (!isInside(fixture.repo, absolutePath)) throw new ContractError("CONTEXT_RECEIPT_PATH", "standard-lite context path escapes the fixture");
     const stat = fs.lstatSync(absolutePath);
     if (!stat.isFile() || stat.isSymbolicLink() || stat.size > 256 * 1024) {
       throw new ContractError("CONTEXT_STANDARD_LITE_EVIDENCE_MISSING", `standard-lite cannot completely read ${relativePath}`);
     }
+    const content = fs.readFileSync(absolutePath, "utf8");
+    return { relativePath, stat, content, ranges: runnerContextReadRanges(content) };
+  });
+  const requiredCalls = readableFiles.reduce((sum, entry) => sum + entry.ranges.length, 0);
+  if (paths.length === 0 || requiredCalls > Math.min(12, remainingContextCalls)) {
+    throw new ContractError("CONTEXT_STANDARD_LITE_EVIDENCE_MISSING", "standard-lite context observer requires bounded complete ownership-path reads");
+  }
+  let totalBytes = 0;
+  let readCall = 0;
+  for (const { relativePath, stat, content, ranges } of readableFiles) {
     totalBytes += stat.size;
     if (totalBytes > 512 * 1024) throw new ContractError("CONTEXT_STANDARD_LITE_OVERANALYSIS", "standard-lite local reads exceeded 512 KiB");
-    const content = fs.readFileSync(absolutePath, "utf8");
-    receiptIds.push(recordObservedContextToolCall({
-      session_id: "runner-quality-context",
-      call_id: `runner-standard-context-read-${index + 1}`,
-      tool_id: "context_read",
-      args: { path: relativePath, startLine: 1, maxLines: Math.max(1, content.split(/\r?\n/u).length), maxBytes: 256 * 1024, format: "text" },
-      output: runnerContextReadOutput(relativePath, content),
-      parent_question_id: null,
-      evidence_refs: [{ kind: "file", value: relativePath }],
-    }).receipt_id);
+    for (const range of ranges) {
+      readCall += 1;
+      receiptIds.push(recordObservedContextToolCall({
+        session_id: "runner-quality-context",
+        call_id: `runner-standard-context-read-${readCall}`,
+        tool_id: "context_read",
+        args: { path: relativePath, startLine: range.startLine, maxLines: range.endLine - range.startLine + 1, maxBytes: 256 * 1024, format: "text" },
+        output: runnerContextReadOutput(relativePath, content, range),
+        parent_question_id: null,
+        evidence_refs: [{ kind: "file", value: relativePath }],
+      }).receipt_id);
+    }
   }
   return Object.freeze({ receipt_ids: Object.freeze(receiptIds) });
 }
 
 function recordRunnerOwnedContextTraceReceipt(instrumentation, contextPayload, receipt) {
-  if (receipt?.status !== "success") return;
+  if (!["success", "truncated"].includes(receipt?.status)) return;
   const relativePaths = contextPayload.tool_id === "context_read"
     ? [contextPayload.args?.path]
     : contextPayload.tool_id === "context_batch_read"
@@ -1364,7 +1380,6 @@ async function runScenarioProfile({
             scenarioId: scenario.id,
             preimplementationOracleObservation,
             traceSnapshot: traceStore.inspectRun(runId),
-            trustedPlanChallengeResultIds,
             evaluatedAt,
           }),
           resolve_reviewer_reconciliation: (input) => resolveRunnerReviewerReconciliation(trustedReviewerResults, input),
@@ -1383,7 +1398,6 @@ async function runScenarioProfile({
       });
       const baseTraceHandler = traceOperationHandler(instrumentation, { denyValues });
       let contextObservationPerformed = false;
-      let planChallengePerformed = false;
       const adapterTraceHandler = qualityCoordinator === null
         ? baseTraceHandler
         : async (operation, payload) => {
@@ -1425,7 +1439,6 @@ async function runScenarioProfile({
             if (payload === null || typeof payload !== "object" || Array.isArray(payload) || Object.keys(payload).length !== 0) {
               throw new ContractError("QUALITY_LIVE_OPERATION", "quality_challenge_plan accepts an empty request");
             }
-            if (planChallengePerformed) throw new ContractError("QUALITY_PLAN_CHALLENGE_UNTRUSTED", "runner plan challenge was requested more than once");
             if (typeof challengeQualityPlanFn !== "function") {
               throw new ContractError("QUALITY_PLAN_CHALLENGE_UNTRUSTED", "high/critical work lacks an independently supplied runner plan challenge callback");
             }
@@ -1439,7 +1452,6 @@ async function runScenarioProfile({
               trustedResultIds: trustedPlanChallengeResultIds,
               qualityCoordinator,
             });
-            planChallengePerformed = true;
             return result;
           }
           return handleQualityLiveOperation(qualityCoordinator, operation, payload, baseTraceHandler);

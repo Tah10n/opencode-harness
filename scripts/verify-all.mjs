@@ -44,6 +44,7 @@ export const DETERMINISTIC_STAGE_REGISTRY = Object.freeze([
   { command_id: "verify-impact-graph", npm_script: "verify:impact-graph", check_ids: ["engineering-impact-graph"] },
   { command_id: "verify-context-strategies", npm_script: "verify:context-strategies", check_ids: [] },
   { command_id: "verify-context-receipts", npm_script: "verify:context-receipts", check_ids: [] },
+  { command_id: "verify-context-file-coverage", npm_script: "verify:context-file-coverage", check_ids: [] },
   { command_id: "verify-whole-system-context", npm_script: "verify:whole-system-context", check_ids: [] },
   { command_id: "verify-context-sufficiency", npm_script: "verify:context-sufficiency", check_ids: [] },
   { command_id: "verify-transitive-impact-resolution", npm_script: "verify:transitive-impact-resolution", check_ids: [] },

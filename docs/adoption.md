@@ -17,6 +17,23 @@ boundary information for the harness to regulate agent work effectively.
   - [`opencode-recursive-context`](https://github.com/Tah10n/opencode-recursive-context)
   - [`opencode-learning-guard`](https://github.com/Tah10n/opencode-learning-guard)
 
+For the recursive-context capability used with this harness, keep the built-in
+protections and add only the harness-owned runtime report prefixes:
+
+```json
+{
+  "additionalIgnorePathPrefixes": [
+    "evals/reports",
+    "evals/decisions"
+  ]
+}
+```
+
+Do not shorten these to a generic prefix such as `reports`; another repository
+may legitimately keep source under that name. Path-prefix comparison follows
+the capability filesystem policy: case-sensitive on POSIX and case-insensitive
+on Windows, after canonical POSIX-relative normalization.
+
 ## Files To Copy
 
 Copy or adapt this exact portable source-bundle contract. Directory entries
@@ -48,6 +65,7 @@ lib/feedback
 lib/quality
 native
 opencode.json
+package-lock.json
 package.json
 quality
 scripts
@@ -296,9 +314,11 @@ For `high` and `critical`, `quality_session_start` selects the strategy, then
 provisional impact graph before receipt-backed discovery. Instrumented context
 operations and read-only children are serialized; profile-only mode may
 optionally parallelize independent read-only work without a computational
-receipt-chain guarantee. Evidence updates the Dossier and linked report; report
-finalization and runner-computed sufficiency come before architect and reviewer
-challenges against the current analysis. Dossier finalization evaluates the
+receipt-chain guarantee. Evidence updates the Dossier and linked report. The
+finalized Whole-System Context Report and current runner-owned sufficient context
+decision must exist before architect and reviewer challenge the canonical current
+challenge subject: current Dossier analysis, selected strategy, finalized report
+analysis, exact sufficiency decision, and task-profile evidence. Dossier finalization evaluates the
 existing gate, and only a runner-owned passed gate authorizes mutation. The
 agent cannot set status, fingerprints, IDs, verification, attestation, or
 trusted timestamps.
@@ -524,7 +544,22 @@ context calls, workspace observation, and immutable traced reviewer results.
 The API probe is therefore an explicit installed-runtime smoke and is not a
 stage of the clean-checkout `npm run verify` chain.
 
-Agent frontmatter is the only model configuration authority. Changing a
-`model:` line does not require updating a generated catalog. Preserve the
-agent's role prompt and permission block; treat `reasoningEffort` and
-`textVerbosity` as optional provider-specific settings.
+Select the desired tool-capable model through OpenCode before starting the
+adopted profile. Do not add model/provider IDs or generation options to the core
+agent frontmatter. Primary agents use the user-selected OpenCode model, and
+subagents inherit model selection according to the installed host behavior.
+
+For a profile stored outside this repository, point the source-profile sensor at
+it before the runtime probe:
+
+```powershell
+$env:HARNESS_RUNTIME_PROFILE_ROOT = "C:\absolute\path\to\adopted-profile"
+npm run verify:runtime
+```
+
+Observe model selection and subagent inheritance through the installed OpenCode
+session or agent diagnostics; do not turn that observation into a quality-gate
+input. The harness does not compare models, route requests by model, or provide
+an automatic fallback. Model identity remains optional trace/report metadata and
+cannot authorize mutation, complete a Dossier, pass a gate, or satisfy
+acceptance. See [model-profiles.md](model-profiles.md).

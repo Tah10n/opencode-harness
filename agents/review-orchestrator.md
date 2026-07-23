@@ -1,9 +1,6 @@
 ---
 description: Strict read-only primary orchestrator for broad code review and harness release review
 mode: primary
-model: openai/gpt-5.6-sol
-reasoningEffort: xhigh
-textVerbosity: low
 steps: 260
 color: blue
 permission:

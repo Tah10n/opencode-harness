@@ -52,8 +52,8 @@ behaviour dimensions.
 | Immutable decision history | Feedback | Computational | Decision provenance and auditability | After every assessment | `evals/decisions/` |
 | Runtime verifier | Feedback | Computational | Installed profile correctness, modes, exclusive permissions, and complete installed-agent inventory | After adoption or upgrade | `opencode agent list`, `scripts/verify-runtime.mjs` |
 | Installed quality surfaces | Feedback | Computational | The explicit API probe checks installed plugin API/factory compatibility; the runtime-hook verifier separately classifies host discovery, callback invocation, child-task causality, and effective adopted permissions. Native Bash is disabled in quality sessions. | After adoption or OpenCode upgrade | `scripts/probe-normal-session-plugin-api.mjs`, `scripts/verify-normal-session-runtime.mjs`, `lib/quality/runtime-hook-verification.mjs` |
-| Agent model frontmatter | Feedforward | Host configuration | User-selected model preference | Host configuration changes | `agents/*.md`, `docs/model-profiles.md` |
-| Agent/skill prompt inventory | Feedforward and feedback | Computational | Maintainability, safety, prompt and permission drift | Before prompt or permission changes | 11 agent prompts plus nine skill entrypoints in `quality/prompt-inventory/`; model metadata is informational |
+| OpenCode model selection | Feedforward | Host configuration | User-selected tool-capable model and host-defined subagent inheritance | Host configuration changes | OpenCode host, `docs/model-profiles.md`; core `agents/*.md` remain model-neutral |
+| Agent/skill prompt inventory | Feedforward and feedback | Computational | Maintainability, safety, prompt, step-limit, and permission drift | Before prompt or permission changes | 11 agent prompts plus nine skill entrypoints in `quality/prompt-inventory/`; v3 excludes model/provider configuration from quality policy |
 | Harness release review | Feedback | Inferential | Harness coherence | Before minor or major release | `harness-release-review`, `skills/global-harness-release-review/SKILL.md` |
 | Optional general live regression evaluation (baseline/candidate) | Feedback | Live computational plus inferential scoring | Actual agent behaviour | Optional release or material prompt changes | `docs/live-evaluation.md`, `evals/`, `scripts/evaluate-live.mjs` |
 | Controlled self-improvement | Feedback to feedforward | Inferential plus bounded writes | Maintainability | After verified lessons | `agents/improver.md`, `skills/global-self-improvement/SKILL.md` |
@@ -127,9 +127,10 @@ behaviour dimensions.
 - Static structural checks and contract/config evaluation do not prove actual
   LLM behaviour. Use optional general live evaluation when prompt, orchestration,
   delegation, or review-loop changes need behavioural evidence.
-- Active model selection lives only in `agents/*.md` frontmatter and is not a
-  quality theorem. Host-supplied model metadata never authorizes mutation or
-  passes acceptance.
+- Active model selection lives only in the OpenCode host and is not a quality
+  theorem. Core agent frontmatter stays model-neutral. Host-supplied model
+  metadata never authorizes mutation, passes a gate, completes a Dossier, or
+  satisfies acceptance.
 - The evaluation and acceptance plane does not autonomously edit the active
   harness. Permissions, security rules, hidden checks, and acceptance policy
   stay outside any future proposal loop; rejected candidates never mutate the

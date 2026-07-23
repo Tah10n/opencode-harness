@@ -30,12 +30,14 @@ completion contracts. Do not restate or replace those contracts here.
    computational receipt-chain guarantee.
 5. Refine the Dossier impact graph and linked report from the evidence, synthesize
    the wide pass, and analyze each critical impact path separately.
-6. Finalize the report only after required categories, challenges, and
-   falsification attempts are represented, then wait for runner-computed context
-   sufficiency.
-7. Ask architect and reviewer to challenge the current Dossier and current
-   context report. Then finalize the Dossier, evaluate the existing gate, and
-   request writable work only after a runner-owned passed gate.
+6. Finalize the Whole-System Context Report only after required categories and
+   falsification attempts are represented, then wait for the current runner-owned
+   sufficient context decision.
+7. Ask architect and reviewer to challenge the canonical current challenge
+   subject: current Dossier analysis, selected strategy, finalized report
+   analysis, exact sufficiency decision, and task-profile evidence. Then finalize
+   the Dossier, evaluate the existing gate, and request writable work only after
+   a runner-owned passed gate.
 
 Escalate when discovery reveals a stronger risk class or a boundary the current
 strategy does not cover. Never request a weaker strategy than the runner chose.
@@ -97,6 +99,13 @@ Prefer the portable read-only tools `context_outline`, `context_files`,
 the optional read-only overlay. Do not add shell, network, write, or persistence
 authority to obtain context.
 
+Avoid duplicate broad symbol scans. If a targeted `context_symbols` call is
+planned, call `context_map` with `includeSymbols: false`. Use
+`context_map(includeSymbols: true)` only as a compact initial sample when no
+separate symbol scan is needed, and repeat broad `context_symbols` only with a
+new query, kind, or narrower scope. A changed scope may justify another scan;
+this is an operating rule, not a runtime prohibition.
+
 Record unavailable or truncated semantic evidence honestly. Fall back to
 bounded file discovery and literal search, state the reduced semantic coverage,
 and keep any unsupported completeness claim blocked.
@@ -121,8 +130,10 @@ side-effect edges were analyzed, critical paths map to final verification, and
 the diff contains no unrelated write.
 
 Invalidate prior sufficiency when implementation introduces an unplanned
-high-impact path. Revise the report, repeat architect/reviewer challenge as
-needed, and let the runner re-evaluate the existing gate.
+high-impact path. Revise and re-finalize the report, obtain a new runner-owned
+sufficient context decision, repeat both architect/reviewer contributions
+against the new canonical current challenge subject, and let the runner
+re-evaluate the existing gate.
 
 ## Keep standard-lite local
 

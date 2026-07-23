@@ -51,6 +51,12 @@ The tools are read-only and path-confined to the current worktree.
 
 They skip common generated or high-noise directories, including `.git`, `node_modules`, build outputs, caches, virtual environments, IDE folders, and test caches.
 
+The capability also excludes `.oc_harness` so runner receipts, reports, and
+control state cannot feed back into repository inventory or fingerprints. For
+this harness, configure the additive host policy with
+`additionalIgnorePathPrefixes: ["evals/reports", "evals/decisions"]`; do not
+use a broad prefix such as `reports`, which could hide legitimate source.
+
 They refuse secret-like files and paths, including `.env`, `.env.*` except `.env.example`, private key names, cloud credential directories, common package-manager and build credential files such as `.npmrc`, `.netrc`, `.git-credentials`, `gradle.properties`, `local.properties`, `settings.xml`, and key/certificate extensions such as `.key`, `.pem`, `.p12`, and `.pfx`.
 
 `context_search` returns bounded match excerpts rather than full arbitrarily long lines. When a line is shortened, the result marks `textTruncated: true` and increments `truncatedMatches`.
@@ -63,6 +69,32 @@ read or shell tools. This harness therefore verifies both guidance and
 effective permissions where possible, and documents native shell/read exposure
 as part of the agent permission surface.
 
+## Capability Contract
+
+The coordinated target is `opencode-recursive-context` 0.2.0 with output schema
+v2, contract version 2.0, and policy version 1. Legacy schema-v2 envelopes
+without producer metadata remain accepted; present metadata must identify the
+known producer and a supported contract.
+
+- `guidance` remains a path-only string array for legacy consumers.
+  `guidanceEntries` adds bounded `kind`, `appliesTo`, and `source` metadata; the
+  harness persists no guidance contents.
+- Instrumented normal-session `context_read` calls execute with `format: "json"`
+  and bind that actual format in their receipt. Direct capability calls retain
+  the existing text default.
+- Excerpt shortening and range boundaries are informational. They may remain in
+  `truncation_codes`, but do not make complete stable coverage partial. File,
+  byte, line, match, symbol, relationship, deadline, and snapshot ceilings do.
+- A successful `context_batch_read` contributes the same content-backed ranges
+  as individual reads. A mixed batch preserves only successful path-local
+  ranges and typed item failures; it remains partial and cannot establish
+  complete requested-scope coverage.
+- `context_files` pagination is bound to the full inventory snapshot through a
+  canonical cursor and expected fingerprint. Individual paginated pages remain
+  partial, non-authorizing evidence until a complete continuation-chain shape is
+  represented by the receipt contract. `context_map.workspaces` is bounded,
+  path-only repository evidence derived without executing manifests.
+
 ## Operating Rules
 
 Use recursive-context mode automatically when a task is broad enough that direct reading would pollute the root context or miss important surfaces.
@@ -74,6 +106,10 @@ Recommended sequence for high or critical instrumented work:
 2. Start with `context_outline` or repo workflow guidance.
 3. Use `context_files`, `context_search`, and bounded `context_read` ranges to
    identify likely entry points, tests, contracts, and docs.
+   If a targeted `context_symbols` call is planned, use
+   `context_map(includeSymbols: false)`. `context_map(includeSymbols: true)` is
+   a compact initial sample only when no separate symbol scan is needed; repeat
+   broad symbol scans only with a new query, kind, or narrower scope.
 4. Run instrumented context operations and focused read-only children one at a
    time; settle, bind, and incorporate each result before the next launch.
 5. Aggregate compact evidence with file and line references, then refine the
@@ -132,6 +168,7 @@ The expected validation commands are:
 - `opencode debug agent review-orchestrator`
 - `opencode debug agent explore`
 - `opencode debug agent reviewer`
+- `npm run verify:recursive-context-contract -- --capability-root ../opencode-recursive-context`
 
 The key expected result is that the live OpenCode config includes the external
 recursive-context capability configured by the host, and the relevant agents

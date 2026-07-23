@@ -1,0 +1,129 @@
+{
+  "schema_version": 3,
+  "baseline_commit": "0a1d56605b9b8923ac27c3b3b405b38177ca7741",
+  "changes": [
+    {
+      "path": "agents/architect.md",
+      "aspects": [
+        "content",
+        "tool_surface",
+        "permission_surface"
+      ],
+      "rationale": "Challenge receipt-backed whole-system coverage, impact-graph linkage, critical paths, exclusions, and explicit write ownership without mutation authority."
+    },
+    {
+      "path": "agents/diagnose.md",
+      "aspects": [
+        "content"
+      ],
+      "rationale": "Preserve the established diagnosis prompt while core model and provider generation settings remain outside harness policy."
+    },
+    {
+      "path": "agents/explore.md",
+      "aspects": [
+        "content"
+      ],
+      "rationale": "Preserve bounded exploration guidance while core model and provider generation settings remain outside harness policy."
+    },
+    {
+      "path": "agents/general.md",
+      "aspects": [
+        "content",
+        "permission_surface"
+      ],
+      "rationale": "Require native edit permission mediation so writable implementation cannot bypass the runner-owned quality gate."
+    },
+    {
+      "path": "agents/improver.md",
+      "aspects": [
+        "content"
+      ],
+      "rationale": "Preserve the gated learning workflow while core model and provider generation settings remain outside harness policy."
+    },
+    {
+      "path": "agents/orchestrator-deep.md",
+      "aspects": [
+        "content",
+        "tool_surface",
+        "permission_surface"
+      ],
+      "rationale": "Require the runner-selected wide/deep context strategy, receipt-backed report, sufficiency decision, dossier gate, and final reconciliation before attestation."
+    },
+    {
+      "path": "agents/orchestrator.md",
+      "aspects": [
+        "content",
+        "tool_surface",
+        "permission_surface"
+      ],
+      "rationale": "Keep standard-lite bounded while requiring receipt-backed wide/deep context, sufficiency, dossier authorization, and final reconciliation for high or critical work."
+    },
+    {
+      "path": "agents/researcher.md",
+      "aspects": [
+        "content"
+      ],
+      "rationale": "Preserve read-only research guidance while core model and provider generation settings remain outside harness policy."
+    },
+    {
+      "path": "agents/review-orchestrator.md",
+      "aspects": [
+        "content"
+      ],
+      "rationale": "Preserve the read-only review workflow while core model and provider generation settings remain outside harness policy."
+    },
+    {
+      "path": "agents/reviewer.md",
+      "aspects": [
+        "content",
+        "tool_surface",
+        "permission_surface"
+      ],
+      "rationale": "Allow bounded plan challenge and reviewer-grounded exact-diff reconciliation evidence without granting mutation capabilities or graph-completeness authority."
+    },
+    {
+      "path": "agents/verifier.md",
+      "aspects": [
+        "content",
+        "tool_surface",
+        "permission_surface"
+      ],
+      "rationale": "Require verification of context receipt, report, sufficiency, reconciliation, and exact changed-path bindings while preserving the verifier read-only boundary."
+    },
+    {
+      "path": "skills/global-debugging/SKILL.md",
+      "aspects": [
+        "content"
+      ],
+      "rationale": "Require exact debugging evidence while preventing credentials, private paths, PII, and raw production payloads from being shared or persisted."
+    },
+    {
+      "path": "skills/global-harness-release-review/SKILL.md",
+      "aspects": [
+        "content"
+      ],
+      "rationale": "Extend semantic release review to the complete Milestone 2 workflow, producer, receipt, and same-run provenance contract."
+    },
+    {
+      "path": "skills/global-quality-gates/SKILL.md",
+      "aspects": [
+        "content"
+      ],
+      "rationale": "Align computational Engineering Dossier risk classes with schema and constants while preserving the legacy operational trace label."
+    },
+    {
+      "path": "skills/global-review-ledger/SKILL.md",
+      "aspects": [
+        "content"
+      ],
+      "rationale": "Make reviewer decomposition mode-aware: serialized in instrumented quality sessions and only optionally parallel in profile-only guidance."
+    },
+    {
+      "path": "skills/global-wide-deep-context/SKILL.md",
+      "aspects": [
+        "content"
+      ],
+      "rationale": "Add the focused receipt-backed wide and deep analysis procedure, fallback rules, stopping criteria, and final blast-radius reconciliation for high or critical work."
+    }
+  ]
+}

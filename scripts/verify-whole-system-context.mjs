@@ -9,6 +9,7 @@ import {
   finalizeWholeSystemContextReport,
   updateWholeSystemContextReportDraft,
   validateWholeSystemContextReport,
+  wholeSystemContextReportAnalysisFingerprint,
 } from "../lib/quality/whole-system-context-report.mjs";
 import { fingerprint } from "../lib/quality/validation.mjs";
 import {
@@ -77,11 +78,19 @@ const finalized = finalizeWholeSystemContextReport(updated, {
 validateWholeSystemContextReport(finalized, { dossier, impactGraph: dossier.impact_graph });
 assert.equal(finalized.status, "finalized");
 assert.equal(finalized.revision, 3);
-rejects("CONTEXT_REPORT_FINALIZED", () => updateWholeSystemContextReportDraft(finalized, {
+const reopened = updateWholeSystemContextReportDraft(finalized, {
   expected_revision: finalized.revision,
   updated_at: "2026-07-17T10:06:00.000Z",
   patch: { claims: finalized.claims },
-}));
+});
+assert.equal(reopened.status, "draft");
+assert.equal(reopened.revision, finalized.revision + 1);
+assert.equal(reopened.finalized_at, null);
+assert.equal(finalized.status, "finalized", "the prior finalized report must remain immutable");
+assert.equal(
+  wholeSystemContextReportAnalysisFingerprint(reopened),
+  wholeSystemContextReportAnalysisFingerprint(finalized),
+);
 
 rejects("CONTEXT_RECEIPT_UNKNOWN", () => finalizeWholeSystemContextReport(draft, {
   finalized_at: CONTEXT_TEST_FINAL_TIME,

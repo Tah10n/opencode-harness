@@ -294,6 +294,222 @@ test("all eight context-tool adapters persist only bounded allowlisted evidence"
   }
 });
 
+test("legacy and typed guidance normalize to bounded metadata without contents", () => {
+  const legacy = complete(begin("context_outline"), envelope("context_outline", {
+    ...toolCases.context_outline.result,
+    guidance: ["AGENTS.md", "WORKFLOW.md"],
+  }));
+  assert.equal(legacy.status, "success");
+  assert.deepEqual(legacy.result.guidance_paths, ["AGENTS.md", "WORKFLOW.md"]);
+  assert.deepEqual(legacy.result.guidance_entries, []);
+
+  const typed = complete(begin("context_outline"), envelope("context_outline", {
+    ...toolCases.context_outline.result,
+    guidance: ["docs/legacy-fallback.md"],
+    guidanceEntries: [{
+      path: "packages/api/AGENTS.md",
+      kind: "agents",
+      appliesTo: "packages/api",
+      source: "discovered",
+    }],
+  }));
+  assert.equal(typed.status, "success");
+  assert.deepEqual(typed.result.guidance_paths, ["packages/api/AGENTS.md"]);
+  assert.deepEqual(typed.result.guidance_entries, [{
+    path: "packages/api/AGENTS.md",
+    kind: "agents",
+    applies_to: "packages/api",
+    source: "discovered",
+  }]);
+  assert.equal(JSON.stringify(typed).includes("legacy-fallback"), false);
+
+  const typedMap = complete(begin("context_map"), envelope("context_map", {
+    ...toolCases.context_map.result,
+    guidanceEntries: [{ path: "src/WORKFLOW.md", kind: "workflow", appliesTo: "src", source: "discovered" }],
+  }));
+  assert.equal(typedMap.status, "success");
+  assert.deepEqual(typedMap.result.guidance_entries, [{
+    path: "src/WORKFLOW.md",
+    kind: "workflow",
+    applies_to: "src",
+    source: "discovered",
+  }]);
+});
+
+test("informational truncation preserves complete successful coverage", () => {
+  const middle = complete(begin("context_read", 1, {
+    args: { path: "src/large.js", startLine: 100, maxLines: 21, format: "json" },
+  }), envelope("context_read", {
+    ...toolCases.context_read.result,
+    path: "src/large.js",
+    bytes: 5000,
+    totalLines: 500,
+    selectedRange: { startLine: 100, endLine: 120 },
+    truncatedBefore: true,
+    truncatedAfter: true,
+  }));
+  assert.equal(middle.status, "success");
+  assert.equal(middle.reason_code, null);
+  assert.equal(middle.result.coverage.partial, false);
+  assert.equal(middle.result.coverage.complete, true);
+  assert(middle.result.coverage.truncation_codes.includes("range_truncated_before"));
+  assert(middle.result.coverage.truncation_codes.includes("range_truncated_after"));
+
+  const excerpt = complete(begin("context_search"), envelope("context_search", {
+    ...toolCases.context_search.result,
+    matches: [{
+      ...toolCases.context_search.result.matches[0],
+      textTruncated: true,
+    }],
+  }, {
+    coverage: {
+      candidateFiles: 3,
+      scannedFiles: 2,
+      bytesScanned: 120,
+      skippedSecret: 0,
+      skippedGenerated: 0,
+      skippedLarge: 0,
+      skippedUnreadable: 0,
+      unsupportedLanguages: {},
+      truncation: truncation({ excerptTruncated: true }),
+      truncationReasons: [],
+      partial: false,
+    },
+  }));
+  assert.equal(excerpt.status, "success");
+  assert.equal(excerpt.result.coverage.partial, false);
+  assert(excerpt.result.coverage.truncation_codes.includes("excerpt_truncated"));
+
+  const inconsistent = complete(begin("context_search"), envelope("context_search", toolCases.context_search.result, {
+    coverage: {
+      candidateFiles: 3,
+      scannedFiles: 2,
+      bytesScanned: 120,
+      skippedSecret: 0,
+      skippedGenerated: 0,
+      skippedLarge: 0,
+      skippedUnreadable: 0,
+      unsupportedLanguages: {},
+      truncation: truncation({ matchLimitReached: true }),
+      truncationReasons: [],
+      partial: false,
+    },
+  }));
+  assert.equal(inconsistent.status, "failed");
+  assert.equal(inconsistent.reason_code, "unsupported_schema");
+});
+
+test("secret policy permits only the exact .env.example exception", () => {
+  const allowed = complete(begin("context_read", 1, {
+    args: { path: ".env.example", startLine: 1, maxLines: 1, format: "json" },
+  }), envelope("context_read", {
+    ...toolCases.context_read.result,
+    path: ".env.example",
+    bytes: 8,
+    totalLines: 1,
+    selectedRange: { startLine: 1, endLine: 1 },
+  }));
+  assert.equal(allowed.status, "success");
+  assert(allowed.result.relative_paths.includes(".env.example"));
+  for (const secret of [".env", ".env.local", ".env.production"]) {
+    expectContract(
+      () => begin("context_read", 1, { args: { path: secret, format: "json" } }),
+      "CONTEXT_RECEIPT_SECRET_PATH",
+    );
+  }
+  for (const secretDescendant of [".env.example/private.key", ".Env.Example/nested.txt"]) {
+    expectContract(
+      () => begin("context_read", 1, { args: { path: secretDescendant, format: "json" } }),
+      "CONTEXT_RECEIPT_SECRET_PATH",
+    );
+  }
+  expectContract(
+    () => begin("context_read", 1, { args: { path: ".oc_harness/private/runtime.json", format: "json" } }),
+    "CONTEXT_RECEIPT_CONTROL_PATH",
+  );
+});
+
+test("authorizing request bindings are salted, explicit, and additive to early v3 receipts", () => {
+  const expectedSha256 = "2".repeat(64);
+  const expectedSnapshot = createHash("sha256").update("context_files-snapshot").digest("hex");
+  const boundRead = begin("context_read", 1, {
+    args: {
+      path: "src/app.js",
+      startLine: 1,
+      maxLines: 10,
+      expectedSha256,
+      format: "json",
+    },
+  });
+  assert.match(boundRead.request.ranges[0].expected_content_version_fingerprint, /^sha256:[0-9a-f]{64}$/);
+  assert.equal(JSON.stringify(boundRead.request).includes(expectedSha256), false);
+
+  const boundPage = begin("context_files", 1, {
+    args: {
+      path: "src",
+      pageSize: 2,
+      afterPath: "src/a.js",
+      expectedSnapshotFingerprint: expectedSnapshot,
+      requireStableSnapshot: true,
+    },
+  });
+  assert.equal(boundPage.request.after_path, "src/a.js");
+  assert.equal(boundPage.request.expected_snapshot_fingerprint, `sha256:${expectedSnapshot}`);
+  assert.equal(boundPage.request.require_stable_snapshot, true);
+
+  const acceptedRead = complete(boundRead, envelope("context_read", toolCases.context_read.result));
+  assert.equal(acceptedRead.status, "success");
+  const wrongRead = complete(begin("context_read", 1, {
+    args: { ...toolCases.context_read.args, expectedSha256: "4".repeat(64) },
+  }), envelope("context_read", toolCases.context_read.result));
+  assert.equal(wrongRead.reason_code, "unsupported_schema");
+
+  const acceptedSearch = complete(begin("context_search", 1, {
+    args: { ...toolCases.context_search.args, expectedSnapshotFingerprint: expectedSnapshot },
+  }), envelope("context_search", {
+    ...toolCases.context_search.result,
+    verifiedSnapshotFingerprint: expectedSnapshot,
+  }));
+  assert.equal(acceptedSearch.status, "success");
+  const wrongSearch = complete(begin("context_search", 1, {
+    args: { ...toolCases.context_search.args, expectedSnapshotFingerprint: expectedSnapshot },
+  }), envelope("context_search", {
+    ...toolCases.context_search.result,
+    verifiedSnapshotFingerprint: "5".repeat(64),
+  }));
+  assert.equal(wrongSearch.reason_code, "unsupported_schema");
+
+  const legacyBody = structuredClone(successfulReceipt("context_read"));
+  delete legacyBody.fingerprint;
+  delete legacyBody.request.after_path;
+  delete legacyBody.request.expected_snapshot_fingerprint;
+  delete legacyBody.request.require_stable_snapshot;
+  for (const range of legacyBody.request.ranges) delete range.expected_content_version_fingerprint;
+  const legacyReceipt = createContextReceipt(legacyBody);
+  validateContextReceipt(legacyReceipt);
+  assert.equal(legacyReceipt.schema_version, CONTEXT_RECEIPT_SCHEMA_VERSION);
+});
+
+test("producer contract metadata is additive and incompatible contracts fail clearly", () => {
+  const metadata = {
+    producer: "opencode-recursive-context",
+    producerVersion: "0.2.0",
+    contractVersion: "2.0",
+    policyVersion: 1,
+  };
+  assert.equal(complete(begin("context_files"), envelope("context_files", toolCases.context_files.result)).status, "success");
+  assert.equal(complete(begin("context_files"), envelope("context_files", toolCases.context_files.result, metadata)).status, "success");
+  for (const incompatible of [
+    { ...metadata, producer: "unknown-producer" },
+    { ...metadata, contractVersion: "3.0" },
+    { producer: metadata.producer },
+  ]) {
+    const receipt = complete(begin("context_files"), envelope("context_files", toolCases.context_files.result, incompatible));
+    assert.equal(receipt.status, "failed");
+    assert.equal(receipt.reason_code, "unsupported_contract");
+  }
+});
+
 test("adapter receipts fail closed when output exceeds the exact normalized request", () => {
   const unsupported = (pending, output) => {
     const receipt = complete(pending, output);
@@ -338,6 +554,11 @@ test("adapter receipts fail closed when output exceeds the exact normalized requ
   for (const result of [
     { ...toolCases.context_read.result, path: "src/other.js" },
     { ...toolCases.context_read.result, selectedRange: { startLine: 1, endLine: 11 } },
+    {
+      ...toolCases.context_read.result,
+      selectedRange: { startLine: 1, endLine: 5 },
+      truncatedAfter: true,
+    },
   ]) unsupported(begin("context_read"), envelope("context_read", result));
   unsupported(begin("context_batch_read"), envelope("context_batch_read", {
     results: [{
@@ -346,6 +567,220 @@ test("adapter receipts fail closed when output exceeds the exact normalized requ
     }],
     usedLines: 10,
   }));
+
+  const samePathArgs = {
+    ranges: [
+      { path: "src/app.js", startLine: 1, maxLines: 5 },
+      { path: "src/app.js", startLine: 11, maxLines: 5 },
+    ],
+  };
+  const samePathResult = (startLine, endLine) => ({
+    path: "src/app.js",
+    ok: true,
+    sha256: "3".repeat(64),
+    bytes: 20,
+    totalLines: 20,
+    selectedRange: { startLine, endLine },
+    encoding: "utf-8",
+    stableDuringRead: true,
+    truncatedBefore: startLine > 1,
+    truncatedAfter: endLine < 20,
+    text: RAW_SOURCE_CANARY,
+  });
+  const samePathEnvelope = (results) => envelope("context_batch_read", {
+    results,
+    usedLines: results.reduce((total, entry) => total + entry.selectedRange.endLine - entry.selectedRange.startLine + 1, 0),
+  });
+  const samePathAccepted = complete(
+    begin("context_batch_read", 1, { args: samePathArgs }),
+    samePathEnvelope([samePathResult(1, 5), samePathResult(11, 15)]),
+  );
+  assert.equal(samePathAccepted.status, "success");
+  assert.equal(samePathAccepted.reason_code, null);
+  assert.notEqual(samePathAccepted.reason_code, "unsupported_schema");
+  unsupported(
+    begin("context_batch_read", 1, { args: samePathArgs }),
+    samePathEnvelope([samePathResult(6, 10)]),
+  );
+
+  const reordered = complete(
+    begin("context_batch_read", 1, { args: samePathArgs }),
+    samePathEnvelope([samePathResult(11, 15), samePathResult(1, 5)]),
+  );
+  assert.equal(reordered.status, "success");
+  unsupported(
+    begin("context_batch_read", 1, { args: samePathArgs }),
+    samePathEnvelope([samePathResult(1, 5), samePathResult(1, 5)]),
+  );
+
+  unsupported(
+    begin("context_batch_read", 1, {
+      args: { ranges: [{ path: "src/app.js", startLine: 1, maxLines: 10, expectedSha256: "4".repeat(64) }] },
+    }),
+    envelope("context_batch_read", toolCases.context_batch_read.result),
+  );
+  unsupported(
+    begin("context_batch_read", 1, {
+      args: { ranges: [{ path: "src/app.js", expectedSha256: "a".repeat(64) }] },
+    }),
+    envelope("context_batch_read", {
+      results: [{
+        path: "src/app.js",
+        ok: false,
+        error: "hash-mismatch",
+        expectedSha256: "b".repeat(64),
+        actualSha256: "c".repeat(64),
+      }],
+      usedLines: 0,
+    }),
+  );
+});
+
+test("pagination and failure outputs remain bound to the exact request", () => {
+  const unsupported = (pending, output) => {
+    const receipt = complete(pending, output);
+    assert.equal(receipt.reason_code, "unsupported_schema");
+  };
+  const snapshot = createHash("sha256").update("context_files-snapshot").digest("hex");
+  const files = [{ path: "src/a.js", size: 1 }, { path: "src/b.js", size: 1 }];
+  unsupported(
+    begin("context_files", 1, { args: { path: "src", limit: 10, pageSize: 2 } }),
+    envelope("context_files", { files }),
+  );
+  const firstPage = complete(
+    begin("context_files", 1, { args: { path: "src", limit: 10, pageSize: 2 } }),
+    envelope("context_files", { files, hasMore: true, nextAfterPath: "src/b.js" }),
+  );
+  assert.equal(firstPage.status, "truncated");
+  assert.equal(firstPage.reason_code, "partial_coverage");
+  assert(firstPage.result.coverage.truncation_codes.includes("pagination_page"));
+  const unsolicitedContinuation = complete(
+    begin("context_files", 1, { args: { path: "src", limit: 10 } }),
+    envelope("context_files", { files, hasMore: true, nextAfterPath: "src/b.js" }),
+  );
+  assert.equal(unsolicitedContinuation.status, "truncated");
+  assert(unsolicitedContinuation.result.coverage.truncation_codes.includes("pagination_page"));
+
+  const continuedRequest = {
+    path: "src",
+    limit: 10,
+    pageSize: 2,
+    afterPath: "src/a.js",
+    expectedSnapshotFingerprint: snapshot,
+  };
+  const continued = complete(
+    begin("context_files", 1, { args: continuedRequest }),
+    envelope("context_files", { files: [{ path: "src/b.js", size: 1 }], hasMore: false, nextAfterPath: null }),
+  );
+  assert.equal(continued.status, "truncated");
+  assert.equal(continued.reason_code, "partial_coverage");
+  assert(continued.result.coverage.truncation_codes.includes("pagination_page"));
+  unsupported(
+    begin("context_files", 1, { args: continuedRequest }),
+    envelope("context_files", { files: [{ path: "src/a.js", size: 1 }], hasMore: false, nextAfterPath: null }),
+  );
+  unsupported(
+    begin("context_files", 1, { args: { ...continuedRequest, expectedSnapshotFingerprint: "6".repeat(64) } }),
+    envelope("context_files", { files: [{ path: "src/b.js", size: 1 }], hasMore: false, nextAfterPath: null }),
+  );
+  unsupported(
+    begin("context_files"),
+    envelope("context_files", { ok: false, error: "cursor-mismatch" }),
+  );
+  unsupported(
+    begin("context_files", 1, {
+      args: { path: "src", expectedSnapshotFingerprint: "7".repeat(64) },
+    }),
+    envelope("context_files", {
+      ok: false,
+      error: "snapshot-mismatch",
+      expectedSnapshotFingerprint: "8".repeat(64),
+      actualSnapshotFingerprint: snapshot,
+    }),
+  );
+
+  const directFailure = complete(begin("context_read", 1, {
+    args: { path: "src/app.js", expectedSha256: "a".repeat(64), format: "json" },
+  }), envelope("context_read", {
+    ok: false,
+    error: "hash-mismatch",
+    path: "src/app.js",
+    expectedSha256: "a".repeat(64),
+    actualSha256: "b".repeat(64),
+  }));
+  assert.equal(directFailure.reason_code, "hash_mismatch");
+  unsupported(
+    begin("context_read", 1, {
+      args: { path: "src/app.js", expectedSha256: "a".repeat(64), format: "json" },
+    }),
+    envelope("context_read", {
+      ok: false,
+      error: "hash-mismatch",
+      path: "src/app.js",
+      expectedSha256: "c".repeat(64),
+      actualSha256: "b".repeat(64),
+    }),
+  );
+});
+
+test("unstable reads and undeclared skipped content cannot authorize evidence", () => {
+  const unstableRead = complete(begin("context_read"), envelope("context_read", {
+    ...toolCases.context_read.result,
+    stableDuringRead: false,
+  }));
+  assert.equal(unstableRead.reason_code, "unsupported_schema");
+  const unstableBatch = complete(begin("context_batch_read"), envelope("context_batch_read", {
+    ...toolCases.context_batch_read.result,
+    results: [{ ...toolCases.context_batch_read.result.results[0], stableDuringRead: false }],
+  }));
+  assert.equal(unstableBatch.reason_code, "unsupported_schema");
+
+  const forgedBody = structuredClone(successfulReceipt("context_read"));
+  delete forgedBody.fingerprint;
+  forgedBody.result.content_ranges[0].stable = false;
+  expectContract(() => createContextReceipt(forgedBody), "CONTEXT_RECEIPT_RANGE_UNTRUSTED");
+
+  const coverage = (partial) => ({
+    candidateFiles: 3,
+    scannedFiles: 1,
+    bytesScanned: 120,
+    skippedSecret: 0,
+    skippedGenerated: 0,
+    skippedLarge: 1,
+    skippedUnreadable: 1,
+    unsupportedLanguages: {},
+    truncation: truncation({ coveragePartial: partial }),
+    truncationReasons: partial ? ["skipped-large", "skipped-unreadable"] : [],
+    partial,
+  });
+  const undeclared = complete(begin("context_files"), envelope(
+    "context_files",
+    { files: [{ path: "src/app.js", size: 10 }] },
+    { coverage: coverage(false) },
+  ));
+  assert.equal(undeclared.reason_code, "unsupported_schema");
+  const declared = complete(begin("context_files"), envelope(
+    "context_files",
+    { files: [{ path: "src/app.js", size: 10 }] },
+    { coverage: coverage(true), truncated: true },
+  ));
+  assert.equal(declared.status, "truncated");
+  assert.equal(declared.reason_code, "partial_coverage");
+});
+
+test("typed batch failures cannot coexist with complete success or an untyped partial failure", () => {
+  const forgedSuccess = structuredClone(successfulReceipt("context_batch_read"));
+  delete forgedSuccess.fingerprint;
+  forgedSuccess.result.item_failures = [{ path: "src/app.js", reason_code: "hash_mismatch" }];
+  expectContract(() => createContextReceipt(forgedSuccess), "CONTEXT_RECEIPT_ITEM_FAILURE");
+
+  const forgedPartial = structuredClone(successfulReceipt("context_batch_read"));
+  delete forgedPartial.fingerprint;
+  forgedPartial.status = "truncated";
+  forgedPartial.reason_code = "partial_tool_failure";
+  forgedPartial.result.coverage.partial = true;
+  forgedPartial.result.coverage.complete = false;
+  expectContract(() => createContextReceipt(forgedPartial), "CONTEXT_RECEIPT_ITEM_FAILURE");
 });
 
 test("outline guidance overflow is bounded and explicitly truncated", () => {
@@ -417,7 +852,7 @@ test("empty, truncated, timeout, unavailable, failed, and interrupted remain dis
       skippedLarge: 0,
       skippedUnreadable: 0,
       unsupportedLanguages: {},
-      truncation: truncation({ matchLimitReached: true }),
+      truncation: truncation({ matchLimitReached: true, coveragePartial: true }),
       truncationReasons: [RAW_ERROR_CANARY],
       partial: true,
     },
@@ -506,13 +941,43 @@ test("batch arbitrary errors and family raw fields never cross the allowlist", (
   }));
   assert.equal(receipt.status, "failed");
   assert.equal(receipt.reason_code, "tool_failed");
+  assert.deepEqual(receipt.result.item_failures, [{ path: "src/app.js", reason_code: "tool_failed" }]);
   assert.equal(JSON.stringify(receipt).includes(RAW_ERROR_CANARY), false);
+
+  const typedFailures = complete(begin("context_batch_read", 1, {
+    args: { ranges: [
+      { path: "src/hash.js", expectedSha256: "a".repeat(64) },
+      { path: "src/bytes.js" },
+      { path: "src/lines.js" },
+    ] },
+  }), envelope("context_batch_read", {
+    results: [
+      {
+        path: "src/hash.js",
+        ok: false,
+        error: "hash-mismatch",
+        expectedSha256: "a".repeat(64),
+        actualSha256: "b".repeat(64),
+      },
+      { path: "src/bytes.js", ok: false, error: "byte-limit-reached" },
+      { path: "src/lines.js", ok: false, error: "line-limit-reached" },
+    ],
+    usedLines: 0,
+  }));
+  assert.equal(typedFailures.status, "failed");
+  assert.equal(typedFailures.reason_code, "tool_failed");
+  assert.deepEqual(typedFailures.result.item_failures, [
+    { path: "src/bytes.js", reason_code: "byte_limit_reached" },
+    { path: "src/hash.js", reason_code: "hash_mismatch" },
+    { path: "src/lines.js", reason_code: "line_limit_reached" },
+  ]);
 });
 
 test("runner bindings reject unsafe paths, unknown args, raw failure payloads, and mutation races", () => {
   expectContract(() => begin("context_read", 1, { args: { path: ABSOLUTE_PATH_CANARY, format: "json" } }), "PRIVACY_PATH");
   expectContract(() => begin("context_read", 1, { args: { path: ".env", format: "json" } }), "CONTEXT_RECEIPT_SECRET_PATH");
   expectContract(() => begin("context_files", 1, { args: { path: "src", raw: RAW_SOURCE_CANARY } }), "CONTEXT_RECEIPT_REQUEST_FIELD");
+  expectContract(() => begin("context_read", 1, { args: { path: "src/app.js", startLine: 1, maxLines: 501 } }), "CONTEXT_RECEIPT_INTEGER");
   expectContract(() => failContextReceiptOperation(begin("context_files"), {
     status: "failed",
     reason_code: "tool_failed",
@@ -536,6 +1001,16 @@ test("runner bindings reject unsafe paths, unknown args, raw failure payloads, a
   delete unsafeBody.fingerprint;
   unsafeBody.request.scope_paths = ["credentials.json"];
   expectContract(() => createContextReceipt(unsafeBody), "CONTEXT_RECEIPT_SECRET_PATH");
+
+  const oversizedRange = structuredClone(successfulReceipt("context_read"));
+  delete oversizedRange.fingerprint;
+  oversizedRange.result.content_ranges[0] = {
+    ...oversizedRange.result.content_ranges[0],
+    end_line: 501,
+    total_lines: 501,
+    range_truncated_after: false,
+  };
+  expectContract(() => createContextReceipt(oversizedRange), "CONTEXT_RECEIPT_RANGE");
 });
 
 test("same-session and pre-mutation validators reject cross-run and post-mutation evidence", () => {

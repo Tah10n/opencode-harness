@@ -23,7 +23,7 @@ This repository contains a reusable OpenCode behavior profile:
   reports, paired baseline/candidate assessment, and explicit decisions;
 - an OpenCode-native quality bridge with bounded dossier tools and runner-owned
   `tool.execute.before` decisions for native edits and writable delegation;
-- direct, user-editable model configuration in active `agents/*.md`
+- host-owned model selection with model-neutral core `agents/*.md`
   frontmatter;
 - trace, budget/termination, and shared subagent result-schema contracts;
 - a strict read-only primary review orchestrator for diff and release review;
@@ -78,6 +78,7 @@ lib/feedback
 lib/quality
 native
 opencode.json
+package-lock.json
 package.json
 quality
 scripts
@@ -101,8 +102,8 @@ readiness guidance lives in [docs/harnessability.md](docs/harnessability.md).
 Trace, budget, and subagent handoff contracts live in
 [docs/trace-contract.md](docs/trace-contract.md),
 [docs/budgets-and-termination.md](docs/budgets-and-termination.md), and
-[docs/subagent-result-schema.md](docs/subagent-result-schema.md). Model
-configuration guidance lives in
+[docs/subagent-result-schema.md](docs/subagent-result-schema.md). Model-neutral
+host-selection guidance lives in
 [docs/model-profiles.md](docs/model-profiles.md).
 
 ## Adoption
@@ -166,9 +167,12 @@ recursive-context tools are host opt-ins.
    bound, and incorporated before the next launch.
 6. Evidence refines the Dossier through `quality_dossier_update` and the linked
    report through `quality_context_report_update`. The agent then calls
-   `quality_context_report_finalize`, and the runner computes context sufficiency.
-7. Architect and reviewer challenge the current Dossier and current context
-   report. `quality_dossier_finalize` then evaluates the existing gate. Report
+   `quality_context_report_finalize`.
+7. Wait for the current runner-owned sufficient context decision. Architect and
+   reviewer then challenge the canonical current challenge subject: current
+   Dossier analysis, selected strategy, finalized report analysis, exact
+   sufficiency decision, and task-profile evidence. `quality_dossier_finalize`
+   then evaluates the existing gate. Report
    finalization, context sufficiency, and Dossier finalization do not authorize
    mutation; only a runner-owned passed gate authorizes mutation. Native `bash`
    remains disabled in an instrumented quality session.
@@ -219,13 +223,16 @@ For high or critical work, the agent builds understanding in a visible loop:
    guess.
 5. `quality_context_report_update` records the wide affected-system view and the
    deep failure analysis for every critical path.
-6. `quality_context_report_finalize` asks the runner to compute context
-   sufficiency. Missing direct evidence or unresolved transitive impact keeps the
-   report draft. A genuinely local path may instead prove that no transitive
+6. `quality_context_report_finalize` finalizes the Whole-System Context Report.
+   Missing direct evidence or unresolved transitive impact produces a non-sufficient
+   runner decision. A genuinely local path may instead prove that no transitive
    consumer exists, but only with complete runner-owned evidence; agent prose or
    a partial search is never enough.
-7. Architect and reviewer challenge the current Dossier and current context
-   report, including exclusions, counterexamples, edge cases, and test design.
+7. Wait for the current runner-owned sufficient context decision. Architect and
+   reviewer then challenge the canonical current challenge subject: current
+   Dossier analysis, selected strategy, finalized report analysis, exact
+   sufficiency decision, and task-profile evidence, including exclusions,
+   counterexamples, edge cases, and test design.
 8. `quality_dossier_finalize` evaluates the existing Engineering Dossier gate.
    Neither report finalization, context sufficiency, nor Dossier finalization is
    mutation authority.
@@ -554,31 +561,26 @@ scripts/               local deterministic harness checks
 
 ## Models
 
-The active agent frontmatter is the authoritative model configuration. Model
-selection is not hard-coded into dossier, gate, verification, or acceptance
-logic, and no model comparison is a deterministic or release gate.
+OpenCode is the only model-selection authority for the core profile. The core
+`agents/*.md` frontmatter contains no model, provider, or generation-option
+settings. Primary agents use the model selected by the user through OpenCode;
+subagents inherit model selection according to the installed OpenCode host.
 
-| Roles | Current model | Files |
-| --- | --- | --- |
-| Orchestrators, architect, implementation, review, verifier, diagnose, improver | `openai/gpt-5.6-sol` | `agents/orchestrator.md`, `agents/orchestrator-deep.md`, `agents/review-orchestrator.md`, `agents/architect.md`, `agents/general.md`, `agents/reviewer.md`, `agents/verifier.md`, `agents/diagnose.md`, `agents/improver.md` |
-| Explore and researcher | `openai/gpt-5.6-terra` | `agents/explore.md`, `agents/researcher.md` |
+The core profile works with any OpenCode-supported model that can use the
+required tools and follow the workflow. Different models can still produce
+different coding quality, so model choice and any provider-specific tuning stay
+with the user and the host.
 
-To change a model, edit the `model:` field in the YAML frontmatter of the
-relevant `agents/<name>.md` file.
+The harness continues to enforce permissions, context gathering, Engineering
+Dossier state, quality gates, trusted checks, verification, and final
+reconciliation independently of that choice. Model identity is optional
+observational metadata only. It never grants permission, passes a quality gate,
+completes an Engineering Dossier, or satisfies acceptance.
 
-Example:
-
-```yaml
-model: openai/your-model-id
-```
-
-When changing only the model, preserve the role prompt and permissions.
-`reasoningEffort` and `textVerbosity` are separate optional frontmatter
-settings; adjust them only when appropriate for the replacement model. Not all
-providers support the same settings. No generated catalog or fingerprint must
-be updated for a model-only change. See
-[docs/model-profiles.md](docs/model-profiles.md) for the compact configuration
-reference.
+The core harness does not implement model A/B testing, automatic model routing,
+or automatic fallback. In particular, it never silently switches to a preferred
+model. See [docs/model-profiles.md](docs/model-profiles.md) for adoption and
+runtime-probe guidance.
 
 ## Why This Is A Harness
 

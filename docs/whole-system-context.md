@@ -22,13 +22,16 @@ For high and critical work, the order is fixed:
    serialized read-only child tasks settle, bind, and incorporate one at a time.
 5. `quality_dossier_update` refines the Dossier and impact graph from evidence.
 6. `quality_context_report_update` refines the linked Whole-System Context Report.
-7. `quality_context_report_finalize` lets the runner calculate context
-   sufficiency; insufficient analysis leaves the report and Dossier unready.
-8. Architect and reviewer challenge the current Dossier and current context
-   report. Any analytical update invalidates stale challenge contributions.
-9. `quality_dossier_finalize` finalizes the current Dossier and evaluates the
+7. `quality_context_report_finalize` finalizes the Whole-System Context Report.
+8. Wait for the current runner-owned sufficient context decision; an insufficient
+   decision leaves the Dossier unready.
+9. Architect and reviewer challenge the canonical current challenge subject:
+   current Dossier analysis, selected strategy, finalized report analysis, exact
+   sufficiency decision, and task-profile evidence. Any change to one of those
+   inputs invalidates both contributions.
+10. `quality_dossier_finalize` finalizes the current Dossier and evaluates the
    existing quality gate.
-10. Only a runner-owned passed gate authorizes a bounded mutation.
+11. Only a runner-owned passed gate authorizes a bounded mutation.
 
 The report does not authorize writes. Context sufficiency and Dossier
 finalization also do not authorize writes. The agent cannot choose a weaker
@@ -61,7 +64,34 @@ reasoning, raw subagent transcripts, secrets, or absolute private paths. A
 report may reference only current receipts from its own session and workspace.
 Post-mutation or stale receipts cannot prove pre-mutation analysis.
 
-The derived receipt-evidence index uses schema v3. Each relationship record
+Context receipts use schema v3. Direct `context_read` and `context_batch_read`
+results persist only bounded ranges plus a runner-salted exact file-version
+fingerprint and total-line count. Adjacent or overlapping ranges may prove one
+complete file only when their union covers `1..totalLines` for one stable,
+pre-mutation session/workspace/strategy binding. Gaps, mixed identities or line
+counts, hash mismatches, partial batch failures, non-range truncation, drift,
+cross-session evidence, and post-mutation reads fail closed. Search, inventory,
+and symbol hits never substitute for content coverage, and the per-call maximum
+remains 500 lines.
+
+Authorizing v3 requests additionally retain only safe bindings: a salted
+expected content-version fingerprint per requested range, the expected
+snapshot fingerprint, canonical pagination cursor, and stable-snapshot
+requirement when supplied. Early v3 receipts without these additive fields
+remain readable, but new output is accepted only when its successful reads,
+batch cardinality, pagination, failures, and verified snapshots match the exact
+request. A claimed successful read with `stableDuringRead: false` is rejected
+before it can become content-backed evidence.
+
+A single `context_files` pagination page is transport evidence, not proof of a
+complete repository inventory. Paginated pages remain partial and cannot support
+an authorizing exclusion until a future receipt contract can represent and
+validate the complete terminal continuation chain on one snapshot.
+
+The derived receipt-evidence index uses schema v4 and stores canonical per-file
+coverage diagnostics. Strict schema-v3 indexes remain readable as legacy evidence
+but cannot authorize aggregate full-file coverage because they lack salted file
+identity and total-line metadata. Each relationship record
 preserves the requested target path, related path, relationship kind, and
 confidence; the legacy `relationship_paths` list is only a derived summary and
 never authorizes a semantic decision. `direct-import` is normalized as target
@@ -73,6 +103,12 @@ contradicts a claimed absence of transitive consumers. Heuristic
 and direct inspection but do not by themselves prove a consumer. Evidence-index
 v2 is rejected by authorizing paths because it irreversibly discarded the
 relationship kind, direction, and confidence.
+
+Preimplementation evidence uses schema v2. High/critical architect and reviewer
+receipts bind the same canonical subject fingerprint, including the current
+Dossier analysis, strategy, finalized report analysis, runner-owned sufficient
+decision, and task-profile evidence. A one-sided, replayed, or stale contribution
+cannot pass the gate.
 
 In the live quality path, only the runner's context observer may turn a context
 operation into one of these receipts. Adapter output is untrusted task output;

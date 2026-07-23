@@ -407,6 +407,10 @@ recorded only from runner-observed context calls (or the installed
 normal-session hook), the final diff is derived from runner workspace
 observation, and reviewer reconciliation is resolved from immutable traced job
 results. Adapter-proposed receipt, diff, or reviewer evidence fails closed.
+Runner-owned context reads retain the 500-line call ceiling and aggregate only
+stable same-version ranges. High/critical architect and reviewer callbacks run
+only after a finalized report and current runner-owned sufficient context
+decision, and both bind the canonical current challenge subject.
 
 The default deterministic boundary is:
 
