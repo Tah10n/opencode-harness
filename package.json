@@ -60,6 +60,7 @@
     "verify:live-manifests": "node scripts/verify-live-manifests.mjs",
     "verify:impact-graph": "node scripts/verify-quality-architecture.mjs",
     "verify:normal-session-quality-bridge": "node scripts/verify-normal-session-quality-bridge.mjs",
+    "verify:package-boundary": "node scripts/verify-package-boundary.mjs",
     "verify:session-classification": "node scripts/verify-session-classification.mjs",
     "verify:project-check-catalog": "node scripts/verify-project-check-catalog.mjs",
     "verify:workspace-observation": "node scripts/verify-workspace-observation.mjs",

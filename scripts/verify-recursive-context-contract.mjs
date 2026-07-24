@@ -331,6 +331,8 @@ async function main() {
     assert.equal(JSON.stringify(outline.receipt).includes(RAW_GUIDANCE_CANARY), false);
 
     const firstPage = await alpha.execute(tools, "context_files", { limit: 100, pageSize: 3 }, { expectedStatus: "success" });
+    assert.equal(firstPage.receipt.result.coverage.partial, false);
+    assert(firstPage.receipt.result.coverage.truncation_codes.includes("pagination_page"));
     const pagedPaths = [...firstPage.envelope.files.map((entry) => entry.path)];
     let page = firstPage;
     while (page.envelope.hasMore) {
@@ -341,6 +343,8 @@ async function main() {
         expectedSnapshotFingerprint: firstPage.envelope.snapshot.fingerprint,
       }, { expectedStatus: "success" });
       assert.equal(page.envelope.snapshot.fingerprint, firstPage.envelope.snapshot.fingerprint);
+      assert.equal(page.receipt.result.coverage.partial, false);
+      assert(page.receipt.result.coverage.truncation_codes.includes("pagination_page"));
       pagedPaths.push(...page.envelope.files.map((entry) => entry.path));
       assert(pagedPaths.length < 200, "pagination must remain bounded");
     }

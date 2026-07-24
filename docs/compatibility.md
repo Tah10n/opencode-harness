@@ -33,13 +33,15 @@ dependency on the capability package; the contract export is consumed only by
 tests, tooling, and the explicit cross-repository verifier.
 
 Capability output schema v2 is distinct from the harness evidence formats.
-New runner-owned context receipts use schema v3 and new receipt-evidence indexes
-use schema v4. Strict index v3 remains readable as historical evidence but
-cannot authorize aggregate file coverage. New preimplementation evidence uses
-schema v2; legacy quality bundle v2 dispatches strictly to evidence schema v1
-and forbids context artifacts. A passed high/critical bundle v3 requires current
-evidence v2 together with its bound report, sufficiency decision, and task-profile
-evidence; a resealed bundle cannot omit that preimplementation chain.
+New runner-owned context receipts use schema v4 and new receipt-evidence indexes
+use schema v5 (pinning receipt v4). Strict index v3 remains readable as
+historical evidence but cannot authorize aggregate file coverage; index v4
+pinned the obsolete receipt v3 contract and is rejected fail-closed. New
+preimplementation evidence uses schema v2; legacy quality bundle v2 dispatches
+strictly to evidence schema v1 and forbids context artifacts. A passed
+high/critical bundle v3 requires current evidence v2 together with its bound
+report, sufficiency decision, and task-profile evidence; a resealed bundle
+cannot omit that preimplementation chain.
 
 ## Runtime Expectations
 

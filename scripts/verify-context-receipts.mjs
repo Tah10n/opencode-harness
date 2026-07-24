@@ -23,7 +23,7 @@ import {
   CONTEXT_TOOL_OUTPUT_SCHEMA_VERSION,
   adaptContextToolOutput,
 } from "../lib/quality/context-tool-adapters.mjs";
-import { ContractError } from "../lib/quality/validation.mjs";
+import { ContractError, fingerprint } from "../lib/quality/validation.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const tests = [];
@@ -651,15 +651,14 @@ test("pagination and failure outputs remain bound to the exact request", () => {
     begin("context_files", 1, { args: { path: "src", limit: 10, pageSize: 2 } }),
     envelope("context_files", { files, hasMore: true, nextAfterPath: "src/b.js" }),
   );
-  assert.equal(firstPage.status, "truncated");
-  assert.equal(firstPage.reason_code, "partial_coverage");
+  assert.equal(firstPage.status, "success");
+  assert.equal(firstPage.reason_code, null);
+  assert.equal(firstPage.result.coverage.partial, false);
   assert(firstPage.result.coverage.truncation_codes.includes("pagination_page"));
-  const unsolicitedContinuation = complete(
+  unsupported(
     begin("context_files", 1, { args: { path: "src", limit: 10 } }),
     envelope("context_files", { files, hasMore: true, nextAfterPath: "src/b.js" }),
   );
-  assert.equal(unsolicitedContinuation.status, "truncated");
-  assert(unsolicitedContinuation.result.coverage.truncation_codes.includes("pagination_page"));
 
   const continuedRequest = {
     path: "src",
@@ -672,9 +671,27 @@ test("pagination and failure outputs remain bound to the exact request", () => {
     begin("context_files", 1, { args: continuedRequest }),
     envelope("context_files", { files: [{ path: "src/b.js", size: 1 }], hasMore: false, nextAfterPath: null }),
   );
-  assert.equal(continued.status, "truncated");
-  assert.equal(continued.reason_code, "partial_coverage");
+  assert.equal(continued.status, "success");
+  assert.equal(continued.reason_code, null);
+  assert.equal(continued.result.coverage.partial, false);
   assert(continued.result.coverage.truncation_codes.includes("pagination_page"));
+  const boundedPageEnvelope = JSON.parse(envelope(
+    "context_files",
+    { files, hasMore: true, nextAfterPath: "src/b.js" },
+  ));
+  boundedPageEnvelope.snapshot.complete = false;
+  boundedPageEnvelope.coverage.truncation.inventoryLimitReached = true;
+  boundedPageEnvelope.coverage.truncation.coveragePartial = true;
+  boundedPageEnvelope.coverage.partial = true;
+  boundedPageEnvelope.truncated = true;
+  const boundedPage = complete(
+    begin("context_files", 1, { args: { path: "src", limit: 10, pageSize: 2 } }),
+    JSON.stringify(boundedPageEnvelope),
+  );
+  assert.equal(boundedPage.status, "truncated");
+  assert.equal(boundedPage.reason_code, "partial_coverage");
+  assert(boundedPage.result.coverage.truncation_codes.includes("inventory_limit_reached"));
+  assert(boundedPage.result.coverage.truncation_codes.includes("pagination_page"));
   unsupported(
     begin("context_files", 1, { args: continuedRequest }),
     envelope("context_files", { files: [{ path: "src/a.js", size: 1 }], hasMore: false, nextAfterPath: null }),
@@ -720,6 +737,54 @@ test("pagination and failure outputs remain bound to the exact request", () => {
       expectedSha256: "c".repeat(64),
       actualSha256: "b".repeat(64),
     }),
+  );
+});
+
+test("paginated request without pagination_page marker fails validation", () => {
+  const paginatedReceipt = complete(
+    begin("context_files", 1, { args: { path: "src", limit: 10, pageSize: 2 } }),
+    envelope("context_files", { files: [{ path: "src/a.js", size: 1 }], hasMore: true, nextAfterPath: "src/a.js" }),
+  );
+  assert(paginatedReceipt.result.coverage.truncation_codes.includes("pagination_page"));
+  const stripped = structuredClone(paginatedReceipt);
+  stripped.result.coverage.truncation_codes = stripped.result.coverage.truncation_codes.filter((code) => code !== "pagination_page");
+  delete stripped.fingerprint;
+  stripped.fingerprint = fingerprint(stripped);
+  assert.throws(
+    () => validateContextReceipt(stripped),
+    (error) => error instanceof ContractError && error.code === "CONTEXT_RECEIPT_PAGINATION",
+  );
+
+  // Failure receipts legitimately lack the marker (adapter returns before adding it)
+  const cursorMismatch = complete(
+    begin("context_files", 1, { args: { path: "src", limit: 10, pageSize: 2, afterPath: "src/a.js", expectedSnapshotFingerprint: createHash("sha256").update("cursor-snap").digest("hex") } }),
+    envelope("context_files", { ok: false, error: "cursor-mismatch" }),
+  );
+  assert.equal(cursorMismatch.status, "failed");
+  assert.equal(cursorMismatch.reason_code, "cursor_mismatch");
+  assert(!(cursorMismatch.result.coverage.truncation_codes ?? []).includes("pagination_page"));
+  validateContextReceipt(cursorMismatch);
+
+  // Reverse: false pagination_page on a non-context_files tool
+  const readReceipt = successfulReceipt("context_read");
+  const forgedRead = structuredClone(readReceipt);
+  forgedRead.result.coverage.truncation_codes.push("pagination_page");
+  delete forgedRead.fingerprint;
+  forgedRead.fingerprint = fingerprint(forgedRead);
+  assert.throws(
+    () => validateContextReceipt(forgedRead),
+    (error) => error instanceof ContractError && error.code === "CONTEXT_RECEIPT_PAGINATION",
+  );
+
+  // Reverse: false pagination_page on a non-paginated context_files
+  const filesReceipt = successfulReceipt("context_files");
+  const forgedFiles = structuredClone(filesReceipt);
+  forgedFiles.result.coverage.truncation_codes.push("pagination_page");
+  delete forgedFiles.fingerprint;
+  forgedFiles.fingerprint = fingerprint(forgedFiles);
+  assert.throws(
+    () => validateContextReceipt(forgedFiles),
+    (error) => error instanceof ContractError && error.code === "CONTEXT_RECEIPT_PAGINATION",
   );
 });
 

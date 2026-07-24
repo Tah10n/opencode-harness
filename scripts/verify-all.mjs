@@ -2,6 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import process from "node:process";
+import { performance } from "node:perf_hooks";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { runManagedCommand } from "../lib/feedback/process-tree.mjs";
@@ -34,6 +35,7 @@ export const DETERMINISTIC_STAGE_REGISTRY = Object.freeze([
   { command_id: "eval", npm_script: "eval", check_ids: [] },
   { command_id: "verify-drift", npm_script: "verify:drift", check_ids: [] },
   { command_id: "verify-adoption-bundle", npm_script: "verify:adoption-bundle", check_ids: [] },
+  { command_id: "verify-package-boundary", npm_script: "verify:package-boundary", check_ids: [] },
   { command_id: "verify-runtime-fixture", npm_script: "verify:runtime:fixture", check_ids: [] },
   { command_id: "verify-runtime-quality-hooks-fixture", npm_script: "verify:runtime:quality-hooks:fixture", check_ids: ["runtime-quality-hooks-fixtures"] },
   { command_id: "verify-live-eval", npm_script: "verify:live-eval", check_ids: [] },
@@ -113,6 +115,35 @@ export function deterministicStageEnvironment(environment = process.env) {
   return result;
 }
 
+function formatDuration(durationMs) {
+  if (!Number.isFinite(durationMs) || durationMs < 0) {
+    throw new TypeError("stage duration must be a non-negative finite number");
+  }
+  return durationMs < 1_000
+    ? `${Math.round(durationMs)} ms`
+    : `${(durationMs / 1_000).toFixed(3)} s`;
+}
+
+export function formatStageTimingSummary(entries) {
+  if (!Array.isArray(entries)) {
+    throw new TypeError("stage timing entries must be an array");
+  }
+  const normalized = entries.map((entry) => {
+    if (!entry || typeof entry.label !== "string" || entry.label.length === 0
+      || !["passed", "failed"].includes(entry.status)) {
+      throw new TypeError("stage timing entries require a label and passed or failed status");
+    }
+    formatDuration(entry.duration_ms);
+    return entry;
+  });
+  const totalDurationMs = normalized.reduce((total, entry) => total + entry.duration_ms, 0);
+  return [
+    "Deterministic stage timing summary:",
+    ...normalized.map((entry) => `- ${entry.label}: ${formatDuration(entry.duration_ms)} (${entry.status})`),
+    `Total measured duration: ${formatDuration(totalDurationMs)}`,
+  ].join("\n");
+}
+
 export function deterministicExpectedChecks() {
   return [
     ...DETERMINISTIC_STAGE_REGISTRY.flatMap((stage) => stage.check_ids.map((checkId) => ({
@@ -166,6 +197,7 @@ function receiptFromResult({ checkId, commandId, startedAt, completedAt, result 
 
 async function runCommand(commandId, command, checkIds) {
   const startedAt = new Date().toISOString();
+  const monotonicStartedAt = performance.now();
   let result;
   try {
     result = await runManagedCommand({
@@ -186,6 +218,7 @@ async function runCommand(commandId, command, checkIds) {
     };
   }
   const completedAt = new Date().toISOString();
+  const durationMs = performance.now() - monotonicStartedAt;
   const receipts = checkIds.map((checkId) => receiptFromResult({
     checkId,
     commandId,
@@ -193,7 +226,7 @@ async function runCommand(commandId, command, checkIds) {
     completedAt,
     result,
   }));
-  return { result, receipts, startedAt, completedAt };
+  return { result, receipts, startedAt, completedAt, duration_ms: durationMs };
 }
 
 function writeDeterministicReceiptBundle(output, context, receipts) {
@@ -278,6 +311,7 @@ async function main() {
   const receipts = [];
   const runStartedAt = new Date().toISOString();
   const passedCommands = [];
+  const stageTimings = [];
 
   try {
 
@@ -285,19 +319,34 @@ async function main() {
     console.log(`Deterministic stage: npm run ${stage.npm_script}`);
     const outcome = await runCommand(stage.command_id, npmInvocation(stage.npm_script), stage.check_ids);
     receipts.push(...outcome.receipts);
-    if (outcome.result.status !== 0 || outcome.result.timed_out || outcome.result.error) {
+    const stagePassed = outcome.result.status === 0 && !outcome.result.timed_out && !outcome.result.error;
+    stageTimings.push({
+      label: `npm run ${stage.npm_script}`,
+      status: stagePassed ? "passed" : "failed",
+      duration_ms: outcome.duration_ms,
+    });
+    if (!stagePassed) {
       console.error(
-        `Stage failed: npm run ${stage.npm_script} (exit ${outcome.result.status ?? "unavailable"}; stdout chars ${outcome.result.stdout_chars}; stderr chars ${outcome.result.stderr_chars}).`,
+        `Stage failed: npm run ${stage.npm_script} after ${formatDuration(outcome.duration_ms)} (exit ${outcome.result.status ?? "unavailable"}; stdout chars ${outcome.result.stdout_chars}; stderr chars ${outcome.result.stderr_chars}).`,
       );
       break;
     }
+    console.log(`Deterministic stage passed in ${formatDuration(outcome.duration_ms)}: npm run ${stage.npm_script}`);
     passedCommands.push(stage.command_id);
   }
 
   if (passedCommands.length === DETERMINISTIC_STAGE_REGISTRY.length) {
     console.log("Deterministic stage: committed whitespace verification");
     const whitespaceStartedAt = new Date().toISOString();
+    const whitespaceMonotonicStartedAt = performance.now();
     const whitespaceOutcome = committedWhitespaceReceipt(whitespaceStartedAt);
+    const whitespaceDurationMs = performance.now() - whitespaceMonotonicStartedAt;
+    stageTimings.push({
+      label: "committed whitespace verification",
+      status: whitespaceOutcome.whitespace.status === "passed" ? "passed" : "failed",
+      duration_ms: whitespaceDurationMs,
+    });
+    console.log(`Committed whitespace verification ${whitespaceOutcome.whitespace.status} in ${formatDuration(whitespaceDurationMs)}.`);
     receipts.push(whitespaceOutcome.receipt);
     if (whitespaceOutcome.whitespace.status === "passed") {
       const completedAt = whitespaceOutcome.completedAt;
@@ -343,6 +392,9 @@ async function main() {
     throw new Error(`deterministic verify-all did not complete its declared contract suite, got ${facts.deterministic_contracts}`);
   }
   } finally {
+    if (stageTimings.length > 0) {
+      console.log(formatStageTimingSummary(stageTimings));
+    }
     assertMilestone2RunContextStable(runContext, {
       workspaceRoot: root,
       localJobId: "deterministic-contracts",

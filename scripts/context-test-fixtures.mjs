@@ -220,6 +220,8 @@ export function contextTestReceipt({
   toolId = "context_batch_read",
   availableToolIds = ["context_outline", "context_files", "context_search", "context_read", "context_batch_read"],
   observedPaths = null,
+  contextFilesPath = ".",
+  contextFilesPageSize = null,
   truncated = false,
   mutationRevisionStarted = 0,
   mutationRevisionCompleted = 0,
@@ -236,6 +238,7 @@ export function contextTestReceipt({
     ...dossier.affected_areas.map((entry) => entry.path),
   ])].sort();
   if (toolId === "context_read") paths = paths.slice(0, 1);
+  if (toolId === "context_files" && contextFilesPageSize !== null) paths = paths.slice(0, contextFilesPageSize);
   const salt = fingerprint({ purpose: "context-test-salt" });
   const strategy = selectMinimumContextStrategy({ risk_class: dossier.risk_class, task_type: dossier.task_type });
   const pending = beginContextReceiptOperation({
@@ -261,7 +264,11 @@ export function contextTestReceipt({
     args: toolId === "context_outline"
       ? {}
        : toolId === "context_files"
-       ? { path: ".", limit: 128 }
+       ? {
+         path: contextFilesPath,
+         limit: 128,
+         ...(contextFilesPageSize === null ? {} : { pageSize: contextFilesPageSize }),
+       }
        : toolId === "context_search"
        ? { query: "bounded", path: ".", contextLines: 0 }
        : toolId === "context_read"
@@ -323,7 +330,10 @@ export function contextTestReceipt({
         explicitEnabledTools: [],
       }
       : toolId === "context_files"
-       ? { files: paths.map((entry) => ({ path: entry, size: 32 })) }
+       ? {
+         files: paths.map((entry) => ({ path: entry, size: 32 })),
+         ...(contextFilesPageSize === null ? {} : { hasMore: false, nextAfterPath: null }),
+       }
       : toolId === "context_search"
         ? {
           query: "bounded",

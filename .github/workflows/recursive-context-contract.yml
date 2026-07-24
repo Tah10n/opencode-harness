@@ -33,12 +33,12 @@ jobs:
           fi
 
       - name: Checkout harness
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           path: opencode-harness
 
       - name: Checkout pinned recursive-context capability
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           repository: Tah10n/opencode-recursive-context
           ref: ${{ inputs.capability_sha }}
@@ -53,7 +53,7 @@ jobs:
           test "$(git -C opencode-recursive-context rev-parse HEAD)" = "$CAPABILITY_SHA"
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: "24"
 

@@ -13,10 +13,17 @@ the feedback-plane ESM subpaths documented for the `0.3.0` target.
   merge-based pins. Model identity remains optional observational metadata and
   cannot authorize mutation or acceptance.
 - Hardened recursive-context authorization: exact requested read ranges are
-  mandatory, paginated inventory pages remain partial until a complete chain is
-  represented, batch item failures are bound to partial/failed state, only
-  content reads can prove guidance, and malformed standard-lite evidence blocks
-  instead of aborting the quality session. Current receipt/index schemas are v3/v4.
+  mandatory, pagination is retained as informational transport metadata without
+  overriding full bounded-inventory coverage, paginated scopes cannot authorize
+  absence or sibling-variant claims, batch item failures are bound to
+  partial/failed state, only content reads can prove guidance, and malformed
+  standard-lite evidence blocks instead of aborting the quality session. The
+  receipt schema bumped to v4 (producer `opencode-harness/context-receipt-v4`)
+  so consumers fail closed against receipts produced under the pre-pagination
+  v3 contract, and the receipt-evidence index bumped to v5 pinning receipt v4,
+  so an index built against the old receipt v3 contract (index v4) is rejected
+  fail-closed instead of sharing the new index version. Current receipt/index
+  schemas are v4/v5.
 - Preserved genuine high/critical legacy bundle-v2 reads through strict
   preimplementation-evidence v1 validation while requiring v2 evidence plus the
   current context artifact set for passed high/critical bundle v3. The portable

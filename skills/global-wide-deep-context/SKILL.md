@@ -1,6 +1,10 @@
 ---
 name: global-wide-deep-context
 description: Build bounded, receipt-backed whole-system context before high or critical implementation. Use for broad, cross-module, public-contract, persistence, concurrency, lifecycle, migration, security, or compatibility changes that require direct and transitive impact analysis, deep critical-path reasoning, falsification, and final blast-radius reconciliation; keep genuinely local standard-lite work compact.
+license: MIT
+compatibility: opencode
+metadata:
+  workflow: context-analysis
 ---
 
 # Global Wide/Deep Context

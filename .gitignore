@@ -1,6 +1,7 @@
 ﻿node_modules/
 dist/
 .cache/
+.qwen/
 .oc_learning/
 .oc_harness/
 local/

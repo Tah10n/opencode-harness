@@ -90,9 +90,10 @@ known producer and a supported contract.
   ranges and typed item failures; it remains partial and cannot establish
   complete requested-scope coverage.
 - `context_files` pagination is bound to the full inventory snapshot through a
-  canonical cursor and expected fingerprint. Individual paginated pages remain
-  partial, non-authorizing evidence until a complete continuation-chain shape is
-  represented by the receipt contract. `context_map.workspaces` is bounded,
+  canonical cursor and expected fingerprint. `pagination_page` records the
+  presentation boundary without changing a complete producer snapshot into
+  partial coverage; real inventory ceilings remain partial. A single page scope
+  still cannot authorize an absence claim. `context_map.workspaces` is bounded,
   path-only repository evidence derived without executing manifests.
 
 ## Operating Rules

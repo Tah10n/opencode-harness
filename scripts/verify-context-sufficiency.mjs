@@ -201,6 +201,90 @@ const exclusionDecision = decide(validEvidenceBackedExclusion);
 assert.equal(exclusionDecision.status, "sufficient");
 assert.deepEqual(exclusionDecision.reasons, []);
 
+const paginatedAbsenceDossier = contextTestDossier({ transitiveImpact: "excluded" });
+const paginatedAbsenceStrategy = selectMinimumContextStrategy({
+  risk_class: paginatedAbsenceDossier.risk_class,
+  task_type: paginatedAbsenceDossier.task_type,
+});
+const paginatedAbsenceOutline = contextTestReceipt({
+  receiptId: "CTXRECEIPT-PAGINATED-OUTLINE",
+  sequence: 1,
+  dossier: paginatedAbsenceDossier,
+  toolId: "context_outline",
+  observedPaths: ["AGENTS.md"],
+  startedAt: "2026-07-17T10:01:00.000Z",
+  completedAt: "2026-07-17T10:02:00.000Z",
+});
+const paginatedAbsenceContent = contextTestReceipt({
+  receiptId: "CTXRECEIPT-PAGINATED-CONTENT",
+  sequence: 2,
+  dossier: paginatedAbsenceDossier,
+  toolId: "context_batch_read",
+  observedPaths: [...new Set([
+    ...paginatedAbsenceDossier.impact_graph.nodes.map((entry) => entry.path).filter(Boolean),
+    ...paginatedAbsenceDossier.affected_areas.map((entry) => entry.path),
+  ])],
+  previousReceiptFingerprint: paginatedAbsenceOutline.fingerprint,
+  startedAt: "2026-07-17T10:02:10.000Z",
+  completedAt: "2026-07-17T10:03:00.000Z",
+});
+const paginatedAbsencePage = contextTestReceipt({
+  receiptId: "CTXRECEIPT-PAGINATED-EMPTY",
+  sequence: 3,
+  dossier: paginatedAbsenceDossier,
+  toolId: "context_files",
+  observedPaths: [],
+  contextFilesPath: "docs/harness-map.md",
+  contextFilesPageSize: 1,
+  previousReceiptFingerprint: paginatedAbsenceContent.fingerprint,
+  startedAt: "2026-07-17T10:03:10.000Z",
+  completedAt: "2026-07-17T10:04:00.000Z",
+});
+assert.equal(paginatedAbsencePage.status, "empty");
+assert.equal(paginatedAbsencePage.request.limits.page_size, 1);
+assert(paginatedAbsencePage.result.coverage.truncation_codes.includes("pagination_page"));
+const paginatedAbsenceReceipts = [
+  paginatedAbsenceOutline,
+  paginatedAbsenceContent,
+  paginatedAbsencePage,
+];
+const paginatedAbsenceContentReport = completeContextContent({
+  strategyBinding: paginatedAbsenceStrategy,
+  dossier: paginatedAbsenceDossier,
+  receiptIds: paginatedAbsenceReceipts.map((entry) => entry.receipt_id),
+  advancedAvailable: ["context_batch_read"],
+});
+const paginatedAbsenceDraft = createWholeSystemContextReportDraft({
+  report_id: "CONTEXT-paginated-absence",
+  session_key: paginatedAbsenceContent.session_key,
+  strategy_binding: paginatedAbsenceStrategy,
+  workspace_fingerprint: CONTEXT_TEST_WORKSPACE,
+  dossier: paginatedAbsenceDossier,
+  created_at: CONTEXT_TEST_TIME,
+  content: paginatedAbsenceContentReport,
+});
+const paginatedAbsenceReport = finalizeWholeSystemContextReport(paginatedAbsenceDraft, {
+  finalized_at: CONTEXT_TEST_FINAL_TIME,
+  strategy_binding: paginatedAbsenceStrategy,
+  workspace_fingerprint: CONTEXT_TEST_WORKSPACE,
+  dossier: paginatedAbsenceDossier,
+  receipt_index: { receipts: paginatedAbsenceReceipts },
+});
+const paginatedAbsenceDecision = decide({
+  dossier: paginatedAbsenceDossier,
+  strategy: paginatedAbsenceStrategy,
+  receipt: paginatedAbsenceContent,
+  outline: paginatedAbsenceOutline,
+  receipts: paginatedAbsenceReceipts,
+  report: paginatedAbsenceReport,
+  taskProfileEvidence: contextTestTaskProfileEvidence({
+    dossier: paginatedAbsenceDossier,
+    sessionKey: paginatedAbsenceContent.session_key,
+  }),
+});
+hasCode(paginatedAbsenceDecision, "CONTEXT_CLAIM_EVIDENCE_MISSING");
+hasCode(paginatedAbsenceDecision, "CONTEXT_SIBLING_DISCOVERY_MISSING");
+
 const oneReadAllSubjects = fullFlow({ receiptObservedPaths: ["lib/context-example.mjs"] });
 const oneReadDecision = decide(oneReadAllSubjects);
 hasCode(oneReadDecision, "CONTEXT_CLAIM_EVIDENCE_MISSING");
@@ -515,5 +599,165 @@ const escalatedSummary = refingerprint({
 hasCode(evaluateContextSufficiency({ ...standardInput, decision_id: "CTXDEC-standard-escalate", standard_lite_summary: escalatedSummary }), "CONTEXT_STANDARD_LITE_ESCALATION_REQUIRED");
 const overbuiltSummary = refingerprint({ ...standardSummary, broad_fanout: true });
 hasCode(evaluateContextSufficiency({ ...standardInput, decision_id: "CTXDEC-standard-overbuilt", standard_lite_summary: overbuiltSummary }), "CONTEXT_STANDARD_LITE_OVERANALYSIS");
+
+// RCL-001 regression: a later paginated page must not clear an earlier real truncation
+const rcl001Flow = fullFlow({ receiptTruncated: true, receiptToolId: "context_files" });
+const rcl001Page = contextTestReceipt({
+  receiptId: "CTXRECEIPT-RCL001-PAGE",
+  sequence: 3,
+  dossier: rcl001Flow.dossier,
+  toolId: "context_files",
+  contextFilesPageSize: 2,
+  previousReceiptFingerprint: rcl001Flow.receipt.fingerprint,
+  startedAt: "2026-07-17T10:04:01.000Z",
+  completedAt: "2026-07-17T10:04:10.000Z",
+});
+assert(rcl001Page.result.coverage.truncation_codes.includes("pagination_page"));
+const rcl001Receipts = [...rcl001Flow.receipts, rcl001Page];
+const rcl001Report = reportForReceipts(rcl001Flow, rcl001Receipts, "CONTEXT-rcl001-pagination-truncation");
+hasCode(decide(rcl001Flow, {
+  receipt_index: { receipts: rcl001Receipts },
+  report: rcl001Report,
+}), "CONTEXT_TRUNCATION_UNRESOLVED");
+
+// Positive counterpart to RCL-001: a complete non-paginated rerun of the same
+// bounded discovery request resolves the earlier truncation. The rerun shares
+// the truncated receipt's request identity (same scope, page_size null) and is
+// complete/stable, so the exhaustive rerun clears CONTEXT_TRUNCATION_UNRESOLVED.
+const rerunFlow = fullFlow({ receiptTruncated: true, receiptToolId: "context_files" });
+const rerunComplete = contextTestReceipt({
+  receiptId: "CTXRECEIPT-RERUN-COMPLETE",
+  sequence: 3,
+  dossier: rerunFlow.dossier,
+  toolId: "context_files",
+  previousReceiptFingerprint: rerunFlow.receipt.fingerprint,
+  startedAt: "2026-07-17T10:04:01.000Z",
+  completedAt: "2026-07-17T10:04:10.000Z",
+});
+assert.equal(rerunComplete.status, "success");
+assert.equal(rerunComplete.result.coverage.complete, true);
+assert(!rerunComplete.result.coverage.truncation_codes.includes("pagination_page"));
+const rerunReceipts = [...rerunFlow.receipts, rerunComplete];
+const rerunReport = reportForReceipts(rerunFlow, rerunReceipts, "CONTEXT-rerun-resolves-truncation");
+const rerunDecision = decide(rerunFlow, {
+  receipt_index: { receipts: rerunReceipts },
+  report: rerunReport,
+});
+assert.ok(
+  !rerunDecision.reasons.some((entry) => entry.code === "CONTEXT_TRUNCATION_UNRESOLVED"),
+  `complete non-paginated rerun must resolve the earlier truncation; got ${rerunDecision.reasons.map((entry) => entry.code).join(", ")}`,
+);
+
+// RCL-002 regression: a paginated page preserves positive path evidence but
+// does not contribute authorizing inventory.  With excluded siblings present
+// the page's path lands in inventoryPaths only, which must NOT satisfy the
+// exhaustive sibling boundary: a single page cannot prove the bounded sibling
+// scan found all variants, so CONTEXT_SIBLING_DISCOVERY_MISSING must appear.
+// The same authorizing guard protects the excludedPaths.size===0 branch where a
+// lone page must not open the gate.
+const rcl002Page = contextTestReceipt({
+  receiptId: "CTXRECEIPT-RCL002-PAGE",
+  sequence: 3,
+  dossier: paginatedAbsenceDossier,
+  toolId: "context_files",
+  observedPaths: ["docs/harness-map.md"],
+  contextFilesPath: "docs/harness-map.md",
+  contextFilesPageSize: 1,
+  previousReceiptFingerprint: paginatedAbsenceContent.fingerprint,
+  startedAt: "2026-07-17T10:03:10.000Z",
+  completedAt: "2026-07-17T10:04:00.000Z",
+});
+assert(rcl002Page.result.coverage.truncation_codes.includes("pagination_page"));
+assert(rcl002Page.result.relative_paths.includes("docs/harness-map.md"));
+const rcl002Receipts = [paginatedAbsenceOutline, paginatedAbsenceContent, rcl002Page];
+const rcl002Content = completeContextContent({
+  strategyBinding: paginatedAbsenceStrategy,
+  dossier: paginatedAbsenceDossier,
+  receiptIds: rcl002Receipts.map((entry) => entry.receipt_id),
+  advancedAvailable: ["context_batch_read"],
+});
+const rcl002Draft = createWholeSystemContextReportDraft({
+  report_id: "CONTEXT-rcl002-pagination-sibling",
+  session_key: paginatedAbsenceContent.session_key,
+  strategy_binding: paginatedAbsenceStrategy,
+  workspace_fingerprint: CONTEXT_TEST_WORKSPACE,
+  dossier: paginatedAbsenceDossier,
+  created_at: CONTEXT_TEST_TIME,
+  content: rcl002Content,
+});
+const rcl002Report = finalizeWholeSystemContextReport(rcl002Draft, {
+  finalized_at: CONTEXT_TEST_FINAL_TIME,
+  strategy_binding: paginatedAbsenceStrategy,
+  workspace_fingerprint: CONTEXT_TEST_WORKSPACE,
+  dossier: paginatedAbsenceDossier,
+  receipt_index: { receipts: rcl002Receipts },
+});
+const rcl002Decision = decide({
+  dossier: paginatedAbsenceDossier,
+  strategy: paginatedAbsenceStrategy,
+  receipt: paginatedAbsenceContent,
+  outline: paginatedAbsenceOutline,
+  receipts: rcl002Receipts,
+  report: rcl002Report,
+  taskProfileEvidence: contextTestTaskProfileEvidence({
+    dossier: paginatedAbsenceDossier,
+    sessionKey: paginatedAbsenceContent.session_key,
+  }),
+});
+hasCode(rcl002Decision, "CONTEXT_SIBLING_DISCOVERY_MISSING");
+hasCode(rcl002Decision, "CONTEXT_CLAIM_EVIDENCE_MISSING");
+
+// RCL-002 (round 2) regression: a direct content read of one known excluded
+// sibling is positive evidence about that sibling but does NOT enumerate the
+// sibling boundary, so it cannot satisfy the exhaustive sibling-variant
+// discovery gate. Only a complete non-literal discovery inventory
+// (authorizingInventoryPaths) may close it.
+const rcl002SiblingRead = contextTestReceipt({
+  receiptId: "CTXRECEIPT-RCL002-SIBLING-READ",
+  sequence: 3,
+  dossier: paginatedAbsenceDossier,
+  toolId: "context_read",
+  observedPaths: ["docs/harness-map.md"],
+  previousReceiptFingerprint: paginatedAbsenceContent.fingerprint,
+  startedAt: "2026-07-17T10:03:10.000Z",
+  completedAt: "2026-07-17T10:04:00.000Z",
+});
+assert(rcl002SiblingRead.result.relative_paths.includes("docs/harness-map.md"));
+const rcl002ReadReceipts = [paginatedAbsenceOutline, paginatedAbsenceContent, rcl002SiblingRead];
+const rcl002ReadContent = completeContextContent({
+  strategyBinding: paginatedAbsenceStrategy,
+  dossier: paginatedAbsenceDossier,
+  receiptIds: rcl002ReadReceipts.map((entry) => entry.receipt_id),
+  advancedAvailable: ["context_batch_read"],
+});
+const rcl002ReadDraft = createWholeSystemContextReportDraft({
+  report_id: "CONTEXT-rcl002-content-read-sibling",
+  session_key: paginatedAbsenceContent.session_key,
+  strategy_binding: paginatedAbsenceStrategy,
+  workspace_fingerprint: CONTEXT_TEST_WORKSPACE,
+  dossier: paginatedAbsenceDossier,
+  created_at: CONTEXT_TEST_TIME,
+  content: rcl002ReadContent,
+});
+const rcl002ReadReport = finalizeWholeSystemContextReport(rcl002ReadDraft, {
+  finalized_at: CONTEXT_TEST_FINAL_TIME,
+  strategy_binding: paginatedAbsenceStrategy,
+  workspace_fingerprint: CONTEXT_TEST_WORKSPACE,
+  dossier: paginatedAbsenceDossier,
+  receipt_index: { receipts: rcl002ReadReceipts },
+});
+const rcl002ReadDecision = decide({
+  dossier: paginatedAbsenceDossier,
+  strategy: paginatedAbsenceStrategy,
+  receipt: paginatedAbsenceContent,
+  outline: paginatedAbsenceOutline,
+  receipts: rcl002ReadReceipts,
+  report: rcl002ReadReport,
+  taskProfileEvidence: contextTestTaskProfileEvidence({
+    dossier: paginatedAbsenceDossier,
+    sessionKey: paginatedAbsenceContent.session_key,
+  }),
+});
+hasCode(rcl002ReadDecision, "CONTEXT_SIBLING_DISCOVERY_MISSING");
 
 console.log("Context sufficiency verification passed (portable critical fallback, strict unknown/truncation gates, and content-backed standard-lite evidence).");

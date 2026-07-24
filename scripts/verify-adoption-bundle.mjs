@@ -67,6 +67,7 @@ const requiredQualityFiles = Object.freeze([
   "lib/quality/context-receipt-store.mjs",
   "lib/quality/context-receipts.mjs",
   "lib/quality/context-reconciliation.mjs",
+  "lib/quality/context-discovery-tools.mjs",
   "lib/quality/context-strategies.mjs",
   "lib/quality/context-sufficiency.mjs",
   "lib/quality/context-tool-adapters.mjs",

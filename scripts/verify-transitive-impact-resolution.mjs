@@ -3,10 +3,12 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
+import * as qualityPublicApi from "../lib/quality/index.mjs";
 import {
   beginContextReceiptOperation,
   completeContextReceiptOperation,
 } from "../lib/quality/context-receipts.mjs";
+import { isNonLiteralDiscoveryTool } from "../lib/quality/context-discovery-tools.mjs";
 import { selectMinimumContextStrategy } from "../lib/quality/context-strategies.mjs";
 import {
   createContextReceiptEvidenceIndex,
@@ -40,6 +42,24 @@ import {
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
+}
+
+assert.equal(
+  "NON_LITERAL_DISCOVERY_TOOLS" in qualityPublicApi,
+  false,
+  "the public quality API must not expose a mutable authorization registry",
+);
+for (const toolId of [
+  "context_outline",
+  "context_files",
+  "context_map",
+  "context_symbols",
+  "context_related",
+]) {
+  assert.equal(isNonLiteralDiscoveryTool(toolId), true, `${toolId} must remain authorizing discovery`);
+}
+for (const toolId of ["context_read", "context_batch_read", "context_search", "", null]) {
+  assert.equal(isNonLiteralDiscoveryTool(toolId), false, `${String(toolId)} must not authorize discovery`);
 }
 
 function completeCoverageTruncation() {
@@ -122,6 +142,76 @@ function contextMapInventoryReceipt({ dossier, strategy, previousReceiptFingerpr
   return completeContextReceiptOperation(pending, {
     output,
     completed_at: "2026-07-17T10:04:00.000Z",
+    mutation_revision_completed: 0,
+    fingerprint_salt: salt,
+  });
+}
+
+function contextFilesPaginatedInventoryReceipt({ dossier, strategy, paths }) {
+  const inventoryPaths = [...new Set(paths)].sort();
+  const pagePaths = inventoryPaths.slice(0, 1);
+  const hasMore = pagePaths.length < inventoryPaths.length;
+  const salt = "transitive-impact-paginated-inventory-verifier-salt";
+  const pending = beginContextReceiptOperation({
+    receipt_id: "CTXRECEIPT-PAGE",
+    sequence: 1,
+    previous_receipt_fingerprint: null,
+    session_key: CONTEXT_TEST_SESSION_KEY,
+    parent_session_key: null,
+    producer_session_key: CONTEXT_TEST_SESSION_KEY,
+    producer_role: "runner",
+    run_id: dossier.run_id,
+    task_id: dossier.task_id,
+    worktree_fingerprint: CONTEXT_TEST_WORKSPACE,
+    source_fingerprint: CONTEXT_TEST_WORKSPACE,
+    context_strategy_id: strategy.strategy_id,
+    context_strategy_fingerprint: strategy.fingerprint,
+    parent_question_id: null,
+    evidence_refs: pagePaths.map((value) => ({ kind: "file", value })),
+    mutation_revision_started: 0,
+    tool_id: "context_files",
+    call_key_fingerprint: fingerprint({ purpose: "paginated-transitive-exclusion" }),
+    started_at: "2026-07-17T10:01:00.000Z",
+    args: { path: ".", limit: 128, pageSize: 1 },
+    fingerprint_salt: salt,
+  });
+  const output = JSON.stringify({
+    schemaVersion: CONTEXT_TOOL_OUTPUT_SCHEMA_VERSION,
+    tool: "context_files",
+    worktree: ".",
+    scope: { path: ".", filters: {} },
+    snapshot: {
+      fingerprint: "c".repeat(64),
+      fingerprintKind: "metadata",
+      fingerprintScope: ".",
+      complete: true,
+      stable: true,
+      changedDuringOperation: false,
+      truncationReasons: [],
+    },
+    coverage: {
+      candidateFiles: inventoryPaths.length,
+      scannedFiles: inventoryPaths.length,
+      bytesScanned: inventoryPaths.length * 32,
+      skippedSecret: 0,
+      skippedGenerated: 0,
+      skippedLarge: 0,
+      skippedUnreadable: 0,
+      unsupportedLanguages: {},
+      truncation: completeCoverageTruncation(),
+      truncationReasons: [],
+      partial: false,
+    },
+    limits: {},
+    usage: { files: pagePaths.length, directories: 1, bytes: pagePaths.length * 32, lines: 0, matches: 0, ranges: 0 },
+    truncated: false,
+    files: pagePaths.map((path) => ({ path, size: 32 })),
+    hasMore,
+    nextAfterPath: hasMore ? pagePaths.at(-1) : null,
+  });
+  return completeContextReceiptOperation(pending, {
+    output,
+    completed_at: "2026-07-17T10:02:00.000Z",
     mutation_revision_completed: 0,
     fingerprint_salt: salt,
   });
@@ -215,20 +305,12 @@ function contextRelatedReceipt({
 
 function flow(
   transitiveImpact = "represented",
-  { contentTool = "context_batch_read", relationshipEvidence = null } = {},
+  { contentTool = "context_batch_read", discoveryMode = "outline", relationshipEvidence = null } = {},
 ) {
   const dossier = contextTestDossier({ transitiveImpact });
   const strategy = selectMinimumContextStrategy({
     risk_class: dossier.risk_class,
     task_type: dossier.task_type,
-  });
-  const outline = contextTestReceipt({
-    receiptId: "CTXRECEIPT-OUTLINE",
-    sequence: 1,
-    dossier,
-    toolId: "context_outline",
-    startedAt: "2026-07-17T10:01:00.000Z",
-    completedAt: "2026-07-17T10:02:00.000Z",
   });
   const contentPaths = [
     ...new Set([
@@ -236,16 +318,30 @@ function flow(
       ...dossier.impact_graph.excluded_siblings.map((entry) => entry.path),
     ]),
   ];
+  const discovery = discoveryMode === "paginated"
+    ? contextFilesPaginatedInventoryReceipt({
+      dossier,
+      strategy,
+      paths: ["AGENTS.md", ...contentPaths],
+    })
+    : contextTestReceipt({
+      receiptId: "CTXRECEIPT-OUTLINE",
+      sequence: 1,
+      dossier,
+      toolId: "context_outline",
+      startedAt: "2026-07-17T10:01:00.000Z",
+      completedAt: "2026-07-17T10:02:00.000Z",
+    });
   const contentRead = contentTool === "context_map"
-    ? contextMapInventoryReceipt({ dossier, strategy, previousReceiptFingerprint: outline.fingerprint, paths: contentPaths })
+    ? contextMapInventoryReceipt({ dossier, strategy, previousReceiptFingerprint: discovery.fingerprint, paths: contentPaths })
     : contextTestReceipt({
       receiptId: "CTXRECEIPT-001",
       sequence: 2,
       dossier,
       toolId: contentTool,
-      previousReceiptFingerprint: outline.fingerprint,
+      previousReceiptFingerprint: discovery.fingerprint,
     });
-  const receipts = [outline, contentRead];
+  const receipts = [discovery, contentRead];
   if (relationshipEvidence !== null) {
     receipts.push(contextRelatedReceipt({
       dossier,
@@ -390,7 +486,7 @@ function withSemanticImportEdge(value) {
 
 const representedFlow = flow("represented");
 validateContextReceiptEvidenceIndex(representedFlow.receiptEvidence);
-assert.equal(representedFlow.receiptEvidence.schema_version, 4);
+assert.equal(representedFlow.receiptEvidence.schema_version, 5);
 assert.ok(representedFlow.receiptEvidence.receipts.every((entry) => Array.isArray(entry.relationships)));
 const represented = evaluate(representedFlow);
 assert.equal(represented.resolution, "represented");
@@ -561,6 +657,14 @@ truncatedRootInventory.receiptEvidence.receipts[0].requested_paths = ["."];
 truncatedRootInventory.receiptEvidence.receipts[0].coverage.partial = true;
 truncatedRootInventory.receiptEvidence.receipts[0].coverage.complete = false;
 expectUnresolved(truncatedRootInventory, "CONTEXT_CLAIM_EVIDENCE_MISSING");
+
+const paginatedRootInventory = flow("excluded", { discoveryMode: "paginated" });
+const paginatedReceipt = paginatedRootInventory.receipts.find((entry) => entry.tool_id === "context_files");
+assert.equal(paginatedReceipt.status, "success");
+assert.equal(paginatedReceipt.result.coverage.partial, false);
+assert(paginatedReceipt.result.coverage.truncation_codes.includes("pagination_page"));
+validateContextReceiptEvidenceIndex(paginatedRootInventory.receiptEvidence);
+expectUnresolved(paginatedRootInventory, "CONTEXT_CLAIM_EVIDENCE_MISSING");
 
 const crossWorkspace = clone(excludedFlow);
 crossWorkspace.receiptEvidence.source_fingerprint = "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";

@@ -533,7 +533,7 @@ test("search, inventory, and symbol evidence never substitute for full content",
   );
 });
 
-test("evidence index v4 persists canonical diagnostics but schema v3 cannot prove aggregation", () => {
+test("evidence index v5 persists canonical diagnostics but schema v3 cannot prove aggregation", () => {
   const receipts = ranges([[1, 500], [501, 1000], [1001, 1200]], { prefix: "CTX-LARGE-INDEX" });
   const index = createContextReceiptEvidenceIndex({ receipts }, {
     session_key: CONTEXT_TEST_SESSION_KEY,
@@ -542,7 +542,7 @@ test("evidence index v4 persists canonical diagnostics but schema v3 cannot prov
     source_fingerprint: CONTEXT_TEST_WORKSPACE,
   });
   validateContextReceiptEvidenceIndex(index);
-  assert.equal(index.schema_version, 4);
+  assert.equal(index.schema_version, 5);
   assert.equal(index.file_coverage[0].status, "complete");
   const legacy = legacyIndexFrom(index);
   validateContextReceiptEvidenceIndex(legacy);
@@ -572,6 +572,12 @@ test("evidence index v4 persists canonical diagnostics but schema v3 cannot prov
   unknownSchema.schema_version = 99;
   assert.throws(
     () => deriveContextFileCoverage(unknownSchema),
+    (error) => error instanceof ContractError && error.code === "CONTEXT_RECEIPT_INDEX_SCHEMA",
+  );
+  const obsoleteIndexV4 = clone(index);
+  obsoleteIndexV4.schema_version = 4;
+  assert.throws(
+    () => deriveContextFileCoverage(obsoleteIndexV4),
     (error) => error instanceof ContractError && error.code === "CONTEXT_RECEIPT_INDEX_SCHEMA",
   );
   const tampered = clone(index);

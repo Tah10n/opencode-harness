@@ -7,6 +7,7 @@ import {
   canonicalStageTemporaryRoot,
   deterministicExpectedChecks,
   deterministicStageEnvironment,
+  formatStageTimingSummary,
 } from "./verify-all.mjs";
 import { milestone2ExpectedChecks } from "../lib/quality/milestone-dod.mjs";
 import { NORMAL_SESSION_QUALITY_TOOL_IDS } from "../lib/quality/normal-session-bridge.mjs";
@@ -47,6 +48,28 @@ if (canonicalStageTemporaryRoot({ [deterministicTemporaryKey]: root }) !== expec
 
 function fail(code, message, fix) {
   failures.push({ code, message, fix });
+}
+
+const timingSummaryFixture = formatStageTimingSummary([
+  { label: "npm run verify:fast", status: "passed", duration_ms: 250 },
+  { label: "npm run verify:slow", status: "failed", duration_ms: 1_500 },
+]);
+if (timingSummaryFixture !== [
+  "Deterministic stage timing summary:",
+  "- npm run verify:fast: 250 ms (passed)",
+  "- npm run verify:slow: 1.500 s (failed)",
+  "Total measured duration: 1.750 s",
+].join("\n")) {
+  fail("HARNESS-S092", "verify-all stage timing summary drifted from the reviewed format", "Keep per-stage status, duration, and total duration visible.");
+}
+let invalidTimingRejected = false;
+try {
+  formatStageTimingSummary([{ label: "invalid", status: "passed", duration_ms: -1 }]);
+} catch {
+  invalidTimingRejected = true;
+}
+if (!invalidTimingRejected) {
+  fail("HARNESS-S092", "verify-all accepted an invalid negative stage duration", "Reject malformed timing data instead of reporting misleading performance evidence.");
 }
 
 function read(relativePath) {
@@ -178,6 +201,8 @@ function assertPermission(agent, permission, key, expected, code, fix) {
 const requiredFiles = [
   "AGENTS.md",
   ".gitattributes",
+  ".github/dependabot.yml",
+  ".github/workflows/recursive-context-contract.yml",
   ".github/workflows/verify.yml",
   "CHANGELOG.md",
   "CODEOWNERS",
@@ -292,6 +317,7 @@ const requiredFiles = [
   "scripts/injected-test-containment.mjs",
   "scripts/trace-run.mjs",
   "scripts/verify-adoption-bundle.mjs",
+  "scripts/verify-package-boundary.mjs",
   "scripts/verify-adapter-worker.mjs",
   "scripts/build-linux-cgroup-attach-helper.mjs",
   "scripts/verify-candidate-assessment.mjs",
@@ -399,7 +425,7 @@ for (const forbiddenScript of ["assess:quality-candidate", "verify:model-profile
 }
 const expectedDeterministicStages = [
   "verify:static", "verify:feedback-foundation", "verify:trace-store", "verify:report-history", "verify:adapter-worker",
-  "eval", "verify:drift", "verify:adoption-bundle", "verify:runtime:fixture", "verify:runtime:quality-hooks:fixture",
+  "eval", "verify:drift", "verify:adoption-bundle", "verify:package-boundary", "verify:runtime:fixture", "verify:runtime:quality-hooks:fixture",
   "verify:live-eval", "verify:acceptance",
   "verify:quality-contracts", "verify:engineering-dossier", "verify:architecture-policy", "verify:impact-graph",
   "verify:context-strategies", "verify:context-receipts", "verify:context-file-coverage", "verify:whole-system-context", "verify:context-sufficiency",
@@ -481,6 +507,7 @@ for (const [name, command] of Object.entries({
   "verify:report-history": "node scripts/verify-report-history.mjs",
   "verify:adapter-worker": "node scripts/verify-adapter-worker.mjs",
   "verify:adoption-bundle": "node scripts/verify-adoption-bundle.mjs",
+  "verify:package-boundary": "node scripts/verify-package-boundary.mjs",
   "verify:live-manifests": "node scripts/verify-live-manifests.mjs",
   "verify:quality-contracts": "node scripts/verify-quality-contracts.mjs",
   "verify:engineering-dossier": "node scripts/verify-engineering-quality.mjs",
@@ -544,6 +571,8 @@ for (const needle of [
   "sealMilestone2ReceiptBundle",
   "OPENCODE_MILESTONE_RECEIPTS_OUT",
   "deterministic_contracts",
+  "formatStageTimingSummary",
+  "performance.now()",
   "Operational runtime and installed-host evidence are reported separately",
 ]) {
   assertIncludes(verifyAllScript, needle, "scripts/verify-all.mjs", "HARNESS-S008", "The default verifier must remain a runner-owned bounded receipt aggregator.");
@@ -944,6 +973,17 @@ for (const [label, text] of [
   for (const needle of ["`standard-lite`", "`high`", "`critical`", "operational trace", "legacy `standard`"]) {
     assertIncludes(text, needle, label, "HARNESS-S049", "Distinguish dossier standard-lite from the legacy operational trace standard label.");
   }
+}
+
+const wideDeepContextFrontmatter = frontmatterFor("skills/global-wide-deep-context/SKILL.md");
+if (wideDeepContextFrontmatter.license !== "MIT"
+  || wideDeepContextFrontmatter.compatibility !== "opencode"
+  || wideDeepContextFrontmatter.metadata?.workflow !== "context-analysis") {
+  fail(
+    "HARNESS-S092",
+    "global-wide-deep-context frontmatter must declare the standard license, compatibility, and workflow metadata",
+    "Keep reusable skill metadata consistent with the other global skills.",
+  );
 }
 
 const recursiveDocs = read("docs/recursive-context-mode.md");
@@ -1358,6 +1398,110 @@ for (const file of [
 }
 
 const workflow = read(".github/workflows/verify.yml");
+const pinnedActionShas = Object.freeze({
+  "actions/checkout": "34e114876b0b11c390a56381ad16ebd13914f8d5",
+  "actions/setup-node": "49933ea5288caeca8642d1e84afbd3f7d6820020",
+  "actions/upload-artifact": "ea165f8d65b6e75b540449e92b4886f43607fa02",
+  "actions/download-artifact": "d3f86a106a0bac45b974a628896c90dbdf5c8093",
+});
+function isGitHubWorkflowFileName(fileName) {
+  return /\.ya?ml$/iu.test(fileName);
+}
+if (!isGitHubWorkflowFileName("fixture.yml")
+  || !isGitHubWorkflowFileName("fixture.yaml")
+  || !isGitHubWorkflowFileName("FIXTURE.YML")
+  || isGitHubWorkflowFileName("fixture.yml.txt")) {
+  fail("HARNESS-S092", "GitHub workflow filename sensor failed its control cases", "Scan every .yml and .yaml workflow file.");
+}
+function discoverGitHubWorkflowDocuments() {
+  const workflowDirectory = ".github/workflows";
+  const absoluteDirectory = path.join(root, workflowDirectory);
+  if (!fs.existsSync(absoluteDirectory)) {
+    fail("HARNESS-S092", `${workflowDirectory} is missing`, "Restore the GitHub workflow directory.");
+    return [];
+  }
+  const directoryStats = fs.lstatSync(absoluteDirectory);
+  if (!directoryStats.isDirectory() || directoryStats.isSymbolicLink()) {
+    fail("HARNESS-S092", `${workflowDirectory} must be a regular directory`, "Keep workflow discovery inside the checked repository directory.");
+    return [];
+  }
+  const entries = fs.readdirSync(absoluteDirectory, { withFileTypes: true })
+    .filter((entry) => isGitHubWorkflowFileName(entry.name))
+    .sort((left, right) => left.name < right.name ? -1 : left.name > right.name ? 1 : 0);
+  if (entries.length === 0) {
+    fail("HARNESS-S092", `${workflowDirectory} contains no .yml or .yaml workflows`, "Restore at least one checked GitHub workflow.");
+  }
+  const documents = [];
+  for (const entry of entries) {
+    const relativePath = `${workflowDirectory}/${entry.name}`;
+    if (!entry.isFile()) {
+      fail("HARNESS-S092", `${relativePath} must be a regular file`, "Do not hide workflow content behind a symlink or special file.");
+      continue;
+    }
+    documents.push([relativePath, read(relativePath)]);
+  }
+  return documents;
+}
+const workflowDocuments = discoverGitHubWorkflowDocuments();
+function workflowUsesReferences(workflowText) {
+  const references = [];
+  for (const [lineIndex, line] of workflowText.split(/\r?\n/u).entries()) {
+    const match = line.match(/^\s*(?:-\s*)?uses:\s*(.*?)\s*$/u);
+    if (!match) continue;
+    const rawValue = match[1].trim();
+    const quoted = rawValue.match(/^(["'])(.*?)\1(?:\s+#.*)?$/u);
+    const reference = (quoted ? quoted[2] : rawValue.replace(/\s+#.*$/u, "")).trim();
+    references.push({ line: lineIndex + 1, reference });
+  }
+  return references;
+}
+const workflowUsesSensorFixture = workflowUsesReferences([
+  "steps:",
+  "  - uses: actions/checkout@v4",
+  `  uses: "actions/setup-node@${pinnedActionShas["actions/setup-node"]}" # reviewed`,
+  "  - uses: ./local-action",
+].join("\n"));
+if (workflowUsesSensorFixture.length !== 3
+  || workflowUsesSensorFixture[0].reference !== "actions/checkout@v4"
+  || workflowUsesSensorFixture[1].reference !== `actions/setup-node@${pinnedActionShas["actions/setup-node"]}`
+  || workflowUsesSensorFixture[2].reference !== "./local-action") {
+  fail("HARNESS-S092", "GitHub workflow uses sensor failed its control cases", "Recognize list-item, mapping, quoted, and local action references.");
+}
+const observedPinnedActions = new Set();
+for (const [workflowPath, workflowText] of workflowDocuments) {
+  for (const { line, reference } of workflowUsesReferences(workflowText)) {
+    if (reference.startsWith("./") || reference.startsWith("docker://")) continue;
+    const revisionSeparator = reference.lastIndexOf("@");
+    if (revisionSeparator <= 0 || revisionSeparator === reference.length - 1) {
+      fail("HARNESS-S092", `${workflowPath}:${line} uses unpinned external action reference ${reference || "<empty>"}`, "Pin every external GitHub Action to a full immutable commit SHA.");
+      continue;
+    }
+    const action = reference.slice(0, revisionSeparator);
+    const revision = reference.slice(revisionSeparator + 1);
+    if (!/^[0-9a-f]{40}$/u.test(revision)) {
+      fail("HARNESS-S092", `${workflowPath}:${line} uses floating action reference ${action}@${revision}`, "Pin every external GitHub Action to a full immutable commit SHA.");
+      continue;
+    }
+    if (pinnedActionShas[action] && pinnedActionShas[action] !== revision) {
+      fail("HARNESS-S092", `${workflowPath}:${line} uses an unreviewed commit for ${action}`, "Update the reviewed action SHA and its static contract together.");
+    }
+    observedPinnedActions.add(action);
+  }
+}
+for (const action of Object.keys(pinnedActionShas)) {
+  if (!observedPinnedActions.has(action)) {
+    fail("HARNESS-S092", `GitHub workflows no longer exercise pinned action ${action}`, "Keep the reviewed action inventory synchronized with workflow usage.");
+  }
+}
+const dependabot = read(".github/dependabot.yml");
+for (const needle of [
+  "version: 2",
+  'package-ecosystem: "github-actions"',
+  'directory: "/"',
+  'interval: "weekly"',
+]) {
+  assertIncludes(dependabot, needle, ".github/dependabot.yml", "HARNESS-S092", "Keep weekly GitHub Actions update automation enabled for immutable pins.");
+}
 function workflowJobBlock(jobId) {
   const lines = workflow.split(/\r?\n/u);
   const escapedJobId = jobId.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
@@ -1377,7 +1521,7 @@ function workflowJobBlock(jobId) {
 }
 
 for (const needle of [
-  "pull_request:", "workflow_dispatch:", "npm run verify", "actions/setup-node@v4", "Harness verification",
+  "pull_request:", "workflow_dispatch:", "npm run verify", `actions/setup-node@${pinnedActionShas["actions/setup-node"]}`, "Harness verification",
   "linux-containment:", "windows-containment:", "macos-containment:",
   "ubuntu-latest", "windows-latest", "macos-latest",
   "OPENCODE_QUALITY_CGROUP_ROOT", "OPENCODE_QUALITY_CGROUP_ATTACH_MODE=sudo-helper-v2",
@@ -1385,8 +1529,8 @@ for (const needle of [
   "npm run build:linux-cgroup-attach", "Reject stale Linux worker identity",
   "native Linux helper did not reject a stale worker identity without side effects",
   "npm run milestone:2:operational",
-  "npm run milestone:2:assess", "--host-unavailable", "actions/upload-artifact@v4",
-  "actions/download-artifact@v4", "sudo useradd", "attach helper can write the guard cgroup",
+  "npm run milestone:2:assess", "--host-unavailable", `actions/upload-artifact@${pinnedActionShas["actions/upload-artifact"]}`,
+  `actions/download-artifact@${pinnedActionShas["actions/download-artifact"]}`, "sudo useradd", "attach helper can write the guard cgroup",
   "sudo setfacl -m", "sudo setfacl -x",
   "Harden trusted Node distribution permissions", "-exec chmod go-w {} +", "-perm /022",
   "npm run build:macos-containment", "OPENCODE_QUALITY_MACOS_CONTROLLER",
@@ -1708,6 +1852,19 @@ for (const needle of [
   "injected-test-only",
 ]) {
   assertIncludes(adoptionBundleVerifier, needle, "scripts/verify-adoption-bundle.mjs", "HARNESS-S082", "Keep the portable adoption bundle and its no-provider temp-copy smoke complete.");
+}
+const packageBoundaryVerifier = read("scripts/verify-package-boundary.mjs");
+for (const needle of [
+  '"pack"',
+  '"--dry-run"',
+  '"--json"',
+  '"--ignore-scripts"',
+  '".qwen/"',
+  "assertIgnorePolicy",
+  "forbiddenPrefixes",
+  "scripts/verify-package-boundary.mjs",
+]) {
+  assertIncludes(packageBoundaryVerifier, needle, "scripts/verify-package-boundary.mjs", "HARNESS-S092", "Keep the exact npm package boundary protected by a local dry-run sensor.");
 }
 const injectedTestContainment = read("scripts/injected-test-containment.mjs");
 for (const needle of [

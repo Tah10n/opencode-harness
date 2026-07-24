@@ -64,7 +64,7 @@ reasoning, raw subagent transcripts, secrets, or absolute private paths. A
 report may reference only current receipts from its own session and workspace.
 Post-mutation or stale receipts cannot prove pre-mutation analysis.
 
-Context receipts use schema v3. Direct `context_read` and `context_batch_read`
+Context receipts use schema v4. Direct `context_read` and `context_batch_read`
 results persist only bounded ranges plus a runner-salted exact file-version
 fingerprint and total-line count. Adjacent or overlapping ranges may prove one
 complete file only when their union covers `1..totalLines` for one stable,
@@ -74,24 +74,28 @@ cross-session evidence, and post-mutation reads fail closed. Search, inventory,
 and symbol hits never substitute for content coverage, and the per-call maximum
 remains 500 lines.
 
-Authorizing v3 requests additionally retain only safe bindings: a salted
+Authorizing v4 requests additionally retain only safe bindings: a salted
 expected content-version fingerprint per requested range, the expected
 snapshot fingerprint, canonical pagination cursor, and stable-snapshot
-requirement when supplied. Early v3 receipts without these additive fields
-remain readable, but new output is accepted only when its successful reads,
-batch cardinality, pagination, failures, and verified snapshots match the exact
-request. A claimed successful read with `stableDuringRead: false` is rejected
-before it can become content-backed evidence.
+requirement when supplied. Receipts without these additive fields remain
+readable, but the pre-pagination v3 schema fails closed, and new output is
+accepted only when its successful reads, batch cardinality, pagination,
+failures, and verified snapshots match the exact request. A claimed successful
+read with `stableDuringRead: false` is rejected before it can become
+content-backed evidence.
 
 A single `context_files` pagination page is transport evidence, not proof of a
-complete repository inventory. Paginated pages remain partial and cannot support
-an authorizing exclusion until a future receipt contract can represent and
-validate the complete terminal continuation chain on one snapshot.
+complete repository inventory. The informational `pagination_page` marker does
+not override the producer's full bounded-inventory coverage, so a page can have
+successful receipt status; its scoped request still cannot support an
+authorizing absence claim. Actual inventory ceilings and snapshot instability
+remain partial and fail closed.
 
-The derived receipt-evidence index uses schema v4 and stores canonical per-file
+The derived receipt-evidence index uses schema v5 and stores canonical per-file
 coverage diagnostics. Strict schema-v3 indexes remain readable as legacy evidence
 but cannot authorize aggregate full-file coverage because they lack salted file
-identity and total-line metadata. Each relationship record
+identity and total-line metadata; schema-v4 indexes pinned the obsolete receipt
+v3 contract and are rejected fail-closed. Each relationship record
 preserves the requested target path, related path, relationship kind, and
 confidence; the legacy `relationship_paths` list is only a derived summary and
 never authorizes a semantic decision. `direct-import` is normalized as target
