@@ -31,6 +31,10 @@ the feedback-plane ESM subpaths documented for the `0.3.0` target.
 - Removed macOS runner-image drift from workspace observation by reusing the
   protected fixed Git executable and verifying a sanitized `rev-parse` under
   the dedicated workload UID before the full verifier starts.
+- Upgraded the pinned GitHub Actions set to the reviewed Node 24-compatible
+  checkout v7, setup-node v7, upload-artifact v7, and download-artifact v8
+  commits, kept the static reviewed-SHA registry synchronized, and grouped
+  future Dependabot action updates into one review unit.
 - Standardized public documentation on English, made the adoption guide the
   canonical detailed containment reference, synchronized the 24+1 live corpus,
   current capability versions, installed-runtime prerequisites, and release
