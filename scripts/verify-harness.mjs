@@ -282,6 +282,7 @@ const requiredFiles = [
   "evals/scenarios/runner-self-test.json",
   "lib/feedback/acceptance.mjs",
   "lib/feedback/adapter-worker.mjs",
+  "lib/benchmark/isolation.mjs",
   "lib/feedback/contracts.mjs",
   "lib/feedback/evidence.mjs",
   "lib/quality/milestone-dod.mjs",
@@ -311,9 +312,11 @@ const requiredFiles = [
   "lib/feedback/trace-assertions.mjs",
   "lib/feedback/trace-store.mjs",
   "scripts/assess-candidate.mjs",
+  "scripts/verify-benchmark-isolation.mjs",
   "scripts/capture-static-evidence.mjs",
   "scripts/evaluate-live.mjs",
   "scripts/evaluate-harness.mjs",
+  "scripts/verify-runtime-quality-hooks-composite.mjs",
   "scripts/injected-test-containment.mjs",
   "scripts/trace-run.mjs",
   "scripts/verify-adoption-bundle.mjs",
@@ -502,6 +505,7 @@ if (packageJson.scripts?.["verify:live-eval"] !== "npm run verify:live-manifests
 for (const [name, command] of Object.entries({
   "build:macos-containment": "node scripts/build-macos-containment.mjs",
   "build:linux-cgroup-attach": "node scripts/build-linux-cgroup-attach-helper.mjs",
+  "verify:benchmark:isolation": "node scripts/verify-benchmark-isolation.mjs",
   "verify:feedback-foundation": "node scripts/verify-feedback-foundation.mjs",
   "verify:trace-store": "node scripts/verify-trace-store.mjs",
   "verify:report-history": "node scripts/verify-report-history.mjs",
@@ -529,7 +533,8 @@ for (const [name, command] of Object.entries({
   "verify:global-quality-plugin-export": "node scripts/verify-global-quality-plugin-export.mjs",
   "probe:runtime:quality-plugin-api": "node scripts/probe-normal-session-plugin-api.mjs",
   "verify:runtime:quality-hooks": "node scripts/verify-normal-session-runtime.mjs",
-  "verify:runtime:quality-hooks:fixture": "node scripts/verify-normal-session-runtime-fixtures.mjs",
+  "verify:runtime:quality-hooks:core-fixture": "node scripts/verify-normal-session-runtime-fixtures.mjs",
+  "verify:runtime:quality-hooks:fixture": "node scripts/verify-runtime-quality-hooks-composite.mjs",
   "verify:quality-live-manifests": "node scripts/verify-quality-live-manifests.mjs",
   "verify:quality-acceptance": "node scripts/verify-quality-acceptance.mjs",
   "verify:milestone-2-dod-contract": "node scripts/verify-milestone-2-dod.mjs",
@@ -546,6 +551,24 @@ for (const [name, command] of Object.entries({
   if (packageJson.scripts?.[name] !== command) {
     fail("HARNESS-S009", `package.json must expose ${name}`, `Set ${name} to ${command}.`);
   }
+}
+
+const runtimeQualityFixtureComposite = fs.readFileSync(
+  path.join(root, "scripts", "verify-runtime-quality-hooks-composite.mjs"),
+  "utf8",
+);
+for (const requiredScript of [
+  "verify:runtime:quality-hooks:core-fixture",
+  "verify:live-eval",
+  "verify:process-containment",
+  "verify:acceptance",
+]) {
+  if (!runtimeQualityFixtureComposite.includes(`"${requiredScript}"`)) {
+    throw new Error(`runtime quality fixture composite is missing ${requiredScript}`);
+  }
+}
+if (!runtimeQualityFixtureComposite.includes("Promise.all(")) {
+  throw new Error("runtime quality fixture composite must execute independent checks concurrently");
 }
 if (packageJson.scripts?.["verify:static"] !== "node scripts/verify-harness.mjs") {
   fail("HARNESS-S010", "package.json must expose npm run verify:static", "Restore the static verifier entry.");

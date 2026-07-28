@@ -1,5 +1,4 @@
 import fs from "node:fs";
-import os from "node:os";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -12,12 +11,14 @@ import {
   stableCheckId,
 } from "../lib/feedback/contracts.mjs";
 import {
-  assertConfinedExistingPath,
-  assertConfinedTree,
-  assertNoSymlinkEscape,
-  ensureConfinedDirectory,
   isInside,
 } from "../lib/feedback/files.mjs";
+import {
+  createConfinedTemporaryDirectory,
+  evaluateWorkspacePolicy,
+  prepareIsolatedFixture,
+  stageIsolatedFiles,
+} from "../lib/benchmark/isolation.mjs";
 import { assertPersistenceSafe, sanitizeBoundedString } from "../lib/feedback/privacy.mjs";
 import { createAdapterInstrumentation, createTraceStore } from "../lib/feedback/index.mjs";
 import {
@@ -83,7 +84,6 @@ import { createInjectedTestContainmentFactory } from "./injected-test-containmen
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const reportDir = path.join(root, "evals", "reports");
-const canonicalTemporaryRoot = fs.realpathSync.native(path.resolve(os.tmpdir()));
 const TASK_ID = "task-root";
 const RUNNER_AGENT = "live-eval-runner";
 const RUNNER_CHECK_EXECUTION_METADATA = new WeakMap();
@@ -101,12 +101,10 @@ const REQUIRED_RUNNER_PHASES = Object.freeze([
 ]);
 
 function createCanonicalTemporaryDirectory(prefix) {
-  const temporaryRoot = fs.mkdtempSync(path.join(canonicalTemporaryRoot, prefix));
-  if (fs.realpathSync.native(temporaryRoot) !== temporaryRoot) {
-    fs.rmSync(temporaryRoot, { recursive: true, force: true });
-    throw new ContractError("LIVE_TEMP_ROOT", "live-evaluation temporary root must be physically canonical");
-  }
-  return temporaryRoot;
+  return createConfinedTemporaryDirectory(prefix, {
+    contractCode: "LIVE_TEMP_ROOT",
+    contractMessage: "live-evaluation temporary root must be physically canonical",
+  });
 }
 
 function parseArgs(argv) {
@@ -212,60 +210,26 @@ function adapterUrlFromEnvironment(env = process.env) {
 }
 
 function prepareFixture(scenario, profileRole, sourceRoot = root) {
-  const resolvedSourceRoot = path.resolve(sourceRoot);
-  const source = path.resolve(resolvedSourceRoot, scenario.repo_fixture);
-  if (!isInside(resolvedSourceRoot, source)) {
-    throw new ContractError("LIVE_FIXTURE", `validated fixture is unavailable for ${scenario.id}`);
-  }
-  try {
-    assertConfinedTree(resolvedSourceRoot, source);
-  } catch {
-    throw new ContractError("LIVE_FIXTURE", `validated fixture is not a physically confined ordinary tree for ${scenario.id}`);
-  }
-  const temporaryRoot = createCanonicalTemporaryDirectory(`opencode-live-${scenario.id}-${profileRole}-`);
-  const repo = path.join(temporaryRoot, "repo");
-  try {
-    fs.cpSync(source, repo, { recursive: true, errorOnExist: true });
-    assertConfinedTree(temporaryRoot, repo);
-    return { temporaryRoot, repo };
-  } catch (error) {
-    fs.rmSync(temporaryRoot, { recursive: true, force: true });
-    throw error;
-  }
-}
-
-function lstatExists(targetPath) {
-  try {
-    fs.lstatSync(targetPath);
-    return true;
-  } catch (error) {
-    if (error?.code === "ENOENT") return false;
-    throw error;
-  }
+  return prepareIsolatedFixture({
+    scenarioId: scenario.id,
+    fixturePath: scenario.repo_fixture,
+    profileId: profileRole,
+    sourceRoot,
+    temporaryPrefix: "opencode-live",
+    fixtureContractCode: "LIVE_FIXTURE",
+    temporaryRootContractCode: "LIVE_TEMP_ROOT",
+  });
 }
 
 function stageHiddenFiles(scenario, repo, sourceRoot = root) {
-  const resolvedSourceRoot = path.resolve(sourceRoot);
-  for (const entry of scenario.hidden_check_files) {
-    const source = path.resolve(resolvedSourceRoot, entry.source);
-    const target = path.resolve(repo, entry.target);
-    if (!isInside(resolvedSourceRoot, source) || !isInside(repo, target)) {
-      throw new ContractError("LIVE_HIDDEN_PATH", `hidden file path is invalid for ${scenario.id}`);
-    }
-    assertConfinedExistingPath(resolvedSourceRoot, source, { type: "file" });
-    if (lstatExists(target)) {
-      throw new ContractError("LIVE_HIDDEN_COLLISION", `hidden target already exists for ${scenario.id}`);
-    }
-    assertNoSymlinkEscape(repo, target);
-    ensureConfinedDirectory(repo, path.dirname(target));
-    assertNoSymlinkEscape(repo, target);
-    assertConfinedExistingPath(resolvedSourceRoot, source, { type: "file" });
-    if (lstatExists(target)) {
-      throw new ContractError("LIVE_HIDDEN_COLLISION", `hidden target already exists for ${scenario.id}`);
-    }
-    fs.copyFileSync(source, target, fs.constants.COPYFILE_EXCL);
-    assertConfinedExistingPath(repo, target, { type: "file" });
-  }
+  stageIsolatedFiles({
+    scenarioId: scenario.id,
+    files: scenario.hidden_check_files,
+    repo,
+    sourceRoot,
+    pathContractCode: "LIVE_HIDDEN_PATH",
+    collisionContractCode: "LIVE_HIDDEN_COLLISION",
+  });
 }
 
 async function runCommand(command, cwd, timeout, checkId, outputMarker = null, processContainmentFactory = null) {
@@ -906,15 +870,15 @@ function assertionChecks(scenario, assertionResults) {
 }
 
 function workspacePolicyCheck(scenario, beforeManifest, afterManifest) {
-  const allowedPaths = new Set(scenario.workspace_policy.mode === "allowlist"
-    ? scenario.workspace_policy.allowed_paths
-    : []);
-  const changedPaths = changedOrdinaryTreePaths(beforeManifest, afterManifest);
-  const unexpectedPaths = changedPaths.filter((relativePath) => !allowedPaths.has(relativePath));
+  const { passed, changedPaths, unexpectedPaths } = evaluateWorkspacePolicy({
+    workspacePolicy: scenario.workspace_policy,
+    beforeManifest,
+    afterManifest,
+  });
   return {
     result: {
       check_id: stableCheckId(scenario.id, "workspace", 0),
-      status: unexpectedPaths.length === 0 ? "passed" : "failed",
+      status: passed ? "passed" : "failed",
       exit_code: null,
       stdout_chars: 0,
       stderr_chars: 0,
