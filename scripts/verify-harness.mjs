@@ -16,6 +16,13 @@ import {
   findForbiddenAgentModelConfiguration,
   inspectAgentPromptModelNeutrality,
 } from "../lib/quality/prompt-inventory.mjs";
+import { verifyBenchmarkAdapter } from "./verify-benchmark-adapter.mjs";
+import { verifyBenchmarkComparisonReporting } from "./verify-benchmark-comparison-reporting.mjs";
+import { verifyBenchmarkContracts } from "./verify-benchmark-contracts.mjs";
+import { verifyBenchmarkRenderer } from "./verify-benchmark-renderer.mjs";
+import { verifyBenchmarkReporting } from "./verify-benchmark-reporting.mjs";
+import { verifyBenchmarkRunner } from "./verify-benchmark-runner.mjs";
+import { verifyBenchmarkStatistics } from "./verify-benchmark-statistics.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const failures = [];
@@ -280,9 +287,32 @@ const requiredFiles = [
   "evals/suite.schema.json",
   "evals/suites.json",
   "evals/scenarios/runner-self-test.json",
+  "profiles/inventory.v1.json",
+  "benchmarks/synthetic/families.v1.json",
+  "benchmarks/synthetic/suites.v1.json",
+  "benchmarks/synthetic/comparison-policy.v1.json",
+  "benchmarks/synthetic/schemas/profile-inventory.schema.json",
+  "benchmarks/synthetic/schemas/family-registry.schema.json",
+  "benchmarks/synthetic/schemas/suite-manifest.schema.json",
+  "benchmarks/synthetic/schemas/comparison-policy.schema.json",
+  "benchmarks/synthetic/schemas/template-set.schema.json",
+  "benchmarks/synthetic/schemas/generated-instance.schema.json",
+  "benchmarks/synthetic/schemas/comparison-report.v1.schema.json",
+  "benchmarks/synthetic/templates.v1.json",
+  "adoption/schemas/adoption-bundle.schema.json",
+  "adoption/core.v1.json",
+  "adoption/quality.v1.json",
+  "adoption/evaluation.v1.json",
+  "adoption/complete.v1.json",
   "lib/feedback/acceptance.mjs",
   "lib/feedback/adapter-worker.mjs",
+  "lib/benchmark/contracts.mjs",
+  "lib/benchmark/comparison-reporting.mjs",
   "lib/benchmark/isolation.mjs",
+  "lib/benchmark/opencode-adapter.mjs",
+  "lib/benchmark/profiles.mjs",
+  "lib/benchmark/renderer.mjs",
+  "lib/benchmark/statistics.mjs",
   "lib/feedback/contracts.mjs",
   "lib/feedback/evidence.mjs",
   "lib/quality/milestone-dod.mjs",
@@ -312,7 +342,12 @@ const requiredFiles = [
   "lib/feedback/trace-assertions.mjs",
   "lib/feedback/trace-store.mjs",
   "scripts/assess-candidate.mjs",
+  "scripts/verify-benchmark-adapter.mjs",
+  "scripts/verify-benchmark-comparison-reporting.mjs",
+  "scripts/verify-benchmark-contracts.mjs",
   "scripts/verify-benchmark-isolation.mjs",
+  "scripts/verify-benchmark-renderer.mjs",
+  "scripts/verify-benchmark-statistics.mjs",
   "scripts/capture-static-evidence.mjs",
   "scripts/evaluate-live.mjs",
   "scripts/evaluate-harness.mjs",
@@ -505,7 +540,14 @@ if (packageJson.scripts?.["verify:live-eval"] !== "npm run verify:live-manifests
 for (const [name, command] of Object.entries({
   "build:macos-containment": "node scripts/build-macos-containment.mjs",
   "build:linux-cgroup-attach": "node scripts/build-linux-cgroup-attach-helper.mjs",
+  "verify:benchmark:adapter": "node scripts/verify-benchmark-adapter.mjs",
+  "verify:benchmark:comparison-reporting": "node scripts/verify-benchmark-comparison-reporting.mjs",
   "verify:benchmark:isolation": "node scripts/verify-benchmark-isolation.mjs",
+  "verify:benchmark:contracts": "node scripts/verify-benchmark-contracts.mjs",
+  "verify:benchmark:renderer": "node scripts/verify-benchmark-renderer.mjs",
+  "verify:benchmark:reporting": "node scripts/verify-benchmark-reporting.mjs",
+  "verify:benchmark:runner": "node scripts/verify-benchmark-runner.mjs",
+  "verify:benchmark:statistics": "node scripts/verify-benchmark-statistics.mjs",
   "verify:feedback-foundation": "node scripts/verify-feedback-foundation.mjs",
   "verify:trace-store": "node scripts/verify-trace-store.mjs",
   "verify:report-history": "node scripts/verify-report-history.mjs",
@@ -551,6 +593,48 @@ for (const [name, command] of Object.entries({
   if (packageJson.scripts?.[name] !== command) {
     fail("HARNESS-S009", `package.json must expose ${name}`, `Set ${name} to ${command}.`);
   }
+}
+
+try {
+  verifyBenchmarkContracts({ root });
+} catch (error) {
+  fail("HARNESS-S093", `synthetic benchmark contracts failed: ${error.message}`, "Restore the canonical strict inventory, profile, suite, policy, and adoption composition.");
+}
+
+try {
+  verifyBenchmarkRenderer({ root });
+} catch (error) {
+  fail("HARNESS-S094", `synthetic benchmark renderer failed: ${error.message}`, "Restore deterministic declarative rendering, replay, bounds, hidden staging, and executable family oracles.");
+}
+
+try {
+  await verifyBenchmarkAdapter({ root });
+} catch (error) {
+  fail("HARNESS-S095", `synthetic OpenCode adapter failed: ${error.message}`, "Restore isolated profile materialization, argv-only execution, bounded JSONL parsing, and honest adapter lifecycle states.");
+}
+
+try {
+  await verifyBenchmarkRunner({ root });
+} catch (error) {
+  fail("HARNESS-S096", `synthetic paired runner failed: ${error.message}`, "Restore counterbalanced fresh-run pairing, post-teardown hidden staging, fail-closed trace evidence, and whole-task semantics.");
+}
+
+try {
+  verifyBenchmarkReporting();
+} catch (error) {
+  fail("HARNESS-S097", `synthetic run reporting failed: ${error.message}`, "Restore strict privacy-safe validation, immutable report publication, marker-last completion, and locked latest pointers.");
+}
+
+try {
+  verifyBenchmarkStatistics({ root });
+} catch (error) {
+  fail("HARNESS-S098", `synthetic benchmark statistics failed: ${error.message}`, "Restore paired macro-family metrics, deterministic bootstrap, exact McNemar, predeclared guardrails, and explicit verdict states.");
+}
+
+try {
+  verifyBenchmarkComparisonReporting({ root });
+} catch (error) {
+  fail("HARNESS-S099", `synthetic comparison reporting failed: ${error.message}`, "Restore source-bound comparison rendering, immutable marker-last publication, CSV summaries, and incomplete-evidence handling.");
 }
 
 const runtimeQualityFixtureComposite = fs.readFileSync(
