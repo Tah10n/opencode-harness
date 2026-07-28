@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opencode-harness.invalid/schemas/adoption-bundle-pointer-v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "schema_path",
+    "inventory_path",
+    "bundle_id",
+    "view"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "schema_path": {
+      "const": "adoption/schemas/adoption-bundle.schema.json"
+    },
+    "inventory_path": {
+      "const": "profiles/inventory.v1.json"
+    },
+    "bundle_id": {
+      "enum": [
+        "core",
+        "quality",
+        "evaluation",
+        "complete"
+      ]
+    },
+    "view": {
+      "enum": [
+        "adoption_bundles.core",
+        "adoption_bundles.quality",
+        "adoption_bundles.evaluation",
+        "adoption_bundles.complete"
+      ]
+    }
+  }
+}

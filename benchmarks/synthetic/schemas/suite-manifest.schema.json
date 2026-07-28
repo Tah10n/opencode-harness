@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opencode-harness.invalid/schemas/synthetic-suite-manifest-v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "schema_path",
+    "inventory_path",
+    "view"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "schema_path": {
+      "const": "benchmarks/synthetic/schemas/suite-manifest.schema.json"
+    },
+    "inventory_path": {
+      "const": "profiles/inventory.v1.json"
+    },
+    "view": {
+      "const": "benchmark.suites"
+    }
+  }
+}

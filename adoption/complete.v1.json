@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "schema_path": "adoption/schemas/adoption-bundle.schema.json",
+  "inventory_path": "profiles/inventory.v1.json",
+  "bundle_id": "complete",
+  "view": "adoption_bundles.complete"
+}

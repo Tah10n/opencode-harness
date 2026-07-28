@@ -1,0 +1,763 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opencode-harness.invalid/schemas/synthetic-profile-inventory-v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "schema_path",
+    "inventory_id",
+    "permission_policies",
+    "roles",
+    "skills",
+    "components",
+    "profiles",
+    "benchmark",
+    "adoption_bundles"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "schema_path": {
+      "const": "benchmarks/synthetic/schemas/profile-inventory.schema.json"
+    },
+    "inventory_id": {
+      "const": "opencode-harness-synthetic-inventory-v1"
+    },
+    "permission_policies": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/permissionPolicy"
+      }
+    },
+    "roles": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/role"
+      }
+    },
+    "skills": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/pathItem"
+      }
+    },
+    "components": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/bundleItem"
+      }
+    },
+    "profiles": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "$ref": "#/$defs/profile"
+      }
+    },
+    "benchmark": {
+      "$ref": "#/$defs/benchmark"
+    },
+    "adoption_bundles": {
+      "type": "array",
+      "minItems": 4,
+      "items": {
+        "$ref": "#/$defs/adoptionBundle"
+      }
+    }
+  },
+  "$defs": {
+    "permissionPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "ordinary_read",
+        "ordinary_edit",
+        "ordinary_test",
+        "dangerous_actions",
+        "network",
+        "durable_memory",
+        "hidden_fixture_during_agent"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "ordinary_read": {
+          "const": "allow"
+        },
+        "ordinary_edit": {
+          "const": "allow"
+        },
+        "ordinary_test": {
+          "const": "allow"
+        },
+        "dangerous_actions": {
+          "const": "ask"
+        },
+        "network": {
+          "const": "deny"
+        },
+        "durable_memory": {
+          "const": "deny"
+        },
+        "hidden_fixture_during_agent": {
+          "const": "deny"
+        }
+      }
+    },
+    "permissions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "read",
+        "edit",
+        "test",
+        "delegate"
+      ],
+      "properties": {
+        "read": {
+          "enum": [
+            "allow",
+            "deny"
+          ]
+        },
+        "edit": {
+          "enum": [
+            "allow",
+            "ask",
+            "deny"
+          ]
+        },
+        "test": {
+          "enum": [
+            "allow",
+            "deny"
+          ]
+        },
+        "delegate": {
+          "enum": [
+            "allow",
+            "deny",
+            "scoped"
+          ]
+        }
+      }
+    },
+    "role": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "prompt_path",
+        "permission_policy_id",
+        "permissions"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "builtin-primary",
+            "repository-primary",
+            "repository-read-only",
+            "repository-worker"
+          ]
+        },
+        "prompt_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "permission_policy_id": {
+          "type": "string"
+        },
+        "permissions": {
+          "$ref": "#/$defs/permissions"
+        }
+      }
+    },
+    "pathItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "path",
+        "bundle_id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "bundle_id": {
+          "type": "string"
+        }
+      }
+    },
+    "bundleItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "bundle_id",
+        "paths"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "bundle_id": {
+          "type": "string"
+        },
+        "paths": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "display_name",
+        "primary_role_id",
+        "prompt_source",
+        "role_ids",
+        "skill_ids",
+        "component_ids",
+        "delegation_default",
+        "review_mode",
+        "context_mode",
+        "mutation_gate",
+        "permission_policy_id"
+      ],
+      "properties": {
+        "id": {
+          "enum": [
+            "plain",
+            "profile-only",
+            "instrumented"
+          ]
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "primary_role_id": {
+          "type": "string"
+        },
+        "prompt_source": {
+          "enum": [
+            "builtin",
+            "repository"
+          ]
+        },
+        "role_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "skill_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "component_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "delegation_default": {
+          "enum": [
+            "disabled",
+            "scoped",
+            "orchestrated"
+          ]
+        },
+        "review_mode": {
+          "enum": [
+            "ordinary",
+            "ledger",
+            "challenge-ledger"
+          ]
+        },
+        "context_mode": {
+          "enum": [
+            "local",
+            "profile",
+            "runner-receipts"
+          ]
+        },
+        "mutation_gate": {
+          "enum": [
+            "none",
+            "computational"
+          ]
+        },
+        "permission_policy_id": {
+          "type": "string"
+        }
+      }
+    },
+    "instanceBounds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "prompt_max_chars",
+        "public_files_max",
+        "public_lines_max",
+        "changed_files_min",
+        "changed_files_max",
+        "check_timeout_ms",
+        "agent_timeout_min_ms",
+        "agent_timeout_max_ms",
+        "network_allowed",
+        "package_operations_allowed",
+        "lockfile_operations_allowed"
+      ],
+      "properties": {
+        "prompt_max_chars": {
+          "type": "integer"
+        },
+        "public_files_max": {
+          "type": "integer"
+        },
+        "public_lines_max": {
+          "type": "integer"
+        },
+        "changed_files_min": {
+          "type": "integer"
+        },
+        "changed_files_max": {
+          "type": "integer"
+        },
+        "check_timeout_ms": {
+          "type": "integer"
+        },
+        "agent_timeout_min_ms": {
+          "type": "integer"
+        },
+        "agent_timeout_max_ms": {
+          "type": "integer"
+        },
+        "network_allowed": {
+          "type": "boolean"
+        },
+        "package_operations_allowed": {
+          "type": "boolean"
+        },
+        "lockfile_operations_allowed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "family": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "category",
+        "risk",
+        "title"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "category": {
+          "type": "string"
+        },
+        "risk": {
+          "enum": [
+            "standard",
+            "high",
+            "critical"
+          ]
+        },
+        "title": {
+          "type": "string"
+        }
+      }
+    },
+    "suite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "family_ids",
+        "repetitions",
+        "profile_ids",
+        "declared_run_count"
+      ],
+      "properties": {
+        "id": {
+          "enum": [
+            "smoke",
+            "standard",
+            "full"
+          ]
+        },
+        "family_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "repetitions": {
+          "type": "integer"
+        },
+        "profile_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "declared_run_count": {
+          "type": "integer"
+        }
+      }
+    },
+    "adapterContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "argv_array_only",
+        "shell_forbidden",
+        "exact_workspace_cwd",
+        "jsonl_events",
+        "bounded_streams",
+        "process_tree_containment",
+        "isolated_home_and_config",
+        "profile_specific_branching_forbidden",
+        "unavailable_status"
+      ],
+      "properties": {
+        "argv_array_only": {
+          "type": "boolean"
+        },
+        "shell_forbidden": {
+          "type": "boolean"
+        },
+        "exact_workspace_cwd": {
+          "type": "boolean"
+        },
+        "jsonl_events": {
+          "type": "boolean"
+        },
+        "bounded_streams": {
+          "type": "boolean"
+        },
+        "process_tree_containment": {
+          "type": "boolean"
+        },
+        "isolated_home_and_config": {
+          "type": "boolean"
+        },
+        "profile_specific_branching_forbidden": {
+          "type": "boolean"
+        },
+        "unavailable_status": {
+          "const": "blocked_external_state"
+        }
+      }
+    },
+    "verdictRules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "insufficient_sample",
+        "inconclusive",
+        "candidate_better",
+        "candidate_worse",
+        "no_clear_difference"
+      ],
+      "properties": {
+        "insufficient_sample": {
+          "type": "string"
+        },
+        "inconclusive": {
+          "type": "string"
+        },
+        "candidate_better": {
+          "type": "string"
+        },
+        "candidate_worse": {
+          "type": "string"
+        },
+        "no_clear_difference": {
+          "type": "string"
+        }
+      }
+    },
+    "comparisonGuardrails": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "whole_task_success_rate_delta_minimum",
+        "hidden_pass_rate_delta_minimum",
+        "new_canary_safety_regressions_maximum",
+        "review_only_mutation_rate_delta_maximum",
+        "scope_violation_rate_delta_maximum",
+        "small_task_success_rate_delta_minimum",
+        "paired_ci_lower_bound_minimum",
+        "minimum_practical_improvement",
+        "cost_duration_blocking_by_default",
+        "smoke_candidate_better_allowed"
+      ],
+      "properties": {
+        "whole_task_success_rate_delta_minimum": {
+          "type": "number"
+        },
+        "hidden_pass_rate_delta_minimum": {
+          "type": "number"
+        },
+        "new_canary_safety_regressions_maximum": {
+          "type": "integer"
+        },
+        "review_only_mutation_rate_delta_maximum": {
+          "type": "number"
+        },
+        "scope_violation_rate_delta_maximum": {
+          "type": "number"
+        },
+        "small_task_success_rate_delta_minimum": {
+          "type": "number"
+        },
+        "paired_ci_lower_bound_minimum": {
+          "type": "number"
+        },
+        "minimum_practical_improvement": {
+          "type": "number"
+        },
+        "cost_duration_blocking_by_default": {
+          "type": "boolean"
+        },
+        "smoke_candidate_better_allowed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "comparisonPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "analysis_seed",
+        "minimum_complete_pairs",
+        "minimum_discordant_pairs",
+        "bootstrap_resamples",
+        "confidence_level",
+        "mcnemar_alpha",
+        "pair_identity_fields",
+        "counterbalance_hash_inputs",
+        "defect_escape_metric",
+        "legacy_release_schema_preserved",
+        "guardrails",
+        "verdict_order",
+        "verdict_rules"
+      ],
+      "properties": {
+        "analysis_seed": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+        },
+        "minimum_complete_pairs": {
+          "type": "integer"
+        },
+        "minimum_discordant_pairs": {
+          "type": "integer"
+        },
+        "bootstrap_resamples": {
+          "type": "integer"
+        },
+        "confidence_level": {
+          "type": "number"
+        },
+        "mcnemar_alpha": {
+          "type": "number"
+        },
+        "pair_identity_fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "counterbalance_hash_inputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "defect_escape_metric": {
+          "const": "defect_escape_v2"
+        },
+        "legacy_release_schema_preserved": {
+          "type": "boolean"
+        },
+        "guardrails": {
+          "$ref": "#/$defs/comparisonGuardrails"
+        },
+        "verdict_order": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "verdict_rules": {
+          "$ref": "#/$defs/verdictRules"
+        }
+      }
+    },
+    "reportContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "formats",
+        "immutable",
+        "absolute_paths_allowed",
+        "forbidden_data"
+      ],
+      "properties": {
+        "formats": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "immutable": {
+          "type": "boolean"
+        },
+        "absolute_paths_allowed": {
+          "type": "boolean"
+        },
+        "forbidden_data": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "benchmark": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "instance_bounds",
+        "families",
+        "suites",
+        "anti_cheating_cases",
+        "parser_fixtures",
+        "adapter_contract",
+        "comparison_policy",
+        "report_contract"
+      ],
+      "properties": {
+        "instance_bounds": {
+          "$ref": "#/$defs/instanceBounds"
+        },
+        "families": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/family"
+          }
+        },
+        "suites": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/suite"
+          }
+        },
+        "anti_cheating_cases": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "parser_fixtures": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "adapter_contract": {
+          "$ref": "#/$defs/adapterContract"
+        },
+        "comparison_policy": {
+          "$ref": "#/$defs/comparisonPolicy"
+        },
+        "report_contract": {
+          "$ref": "#/$defs/reportContract"
+        }
+      }
+    },
+    "adoptionBundle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "extends",
+        "profile_ids",
+        "component_ids",
+        "role_ids",
+        "skill_ids"
+      ],
+      "properties": {
+        "id": {
+          "enum": [
+            "core",
+            "quality",
+            "evaluation",
+            "complete"
+          ]
+        },
+        "extends": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "profile_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "component_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "role_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "skill_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

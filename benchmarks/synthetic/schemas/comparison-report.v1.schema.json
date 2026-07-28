@@ -1,0 +1,739 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opencode-harness.invalid/schemas/synthetic-comparison-report-v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_kind",
+    "source",
+    "profiles",
+    "policy",
+    "sample",
+    "primary",
+    "rates",
+    "count_metrics",
+    "breakdowns",
+    "guardrails",
+    "pareto",
+    "verdict",
+    "residual_caveats"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "report_kind": {
+      "const": "synthetic-paired-comparison"
+    },
+    "source": {
+      "$ref": "#/$defs/source"
+    },
+    "profiles": {
+      "$ref": "#/$defs/profilePair"
+    },
+    "policy": {
+      "$ref": "#/$defs/policy"
+    },
+    "sample": {
+      "$ref": "#/$defs/sample"
+    },
+    "primary": {
+      "$ref": "#/$defs/primary"
+    },
+    "rates": {
+      "type": "array",
+      "minItems": 11,
+      "maxItems": 11,
+      "items": {
+        "$ref": "#/$defs/rateMetric"
+      }
+    },
+    "count_metrics": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": {
+        "$ref": "#/$defs/countMetric"
+      }
+    },
+    "breakdowns": {
+      "$ref": "#/$defs/breakdowns"
+    },
+    "guardrails": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": {
+        "$ref": "#/$defs/guardrail"
+      }
+    },
+    "pareto": {
+      "$ref": "#/$defs/pareto"
+    },
+    "verdict": {
+      "$ref": "#/$defs/verdict"
+    },
+    "residual_caveats": {
+      "$ref": "#/$defs/reasonList"
+    }
+  },
+  "$defs": {
+    "safeId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:[Cc][Oo][Nn]|[Pp][Rr][Nn]|[Aa][Uu][Xx]|[Nn][Uu][Ll]|[Cc][Oo][Mm][1-9]|[Ll][Pp][Tt][1-9])(?:\\..*)?$)(?!.*\\.$)[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+    },
+    "fingerprint": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "rate": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "delta": {
+      "type": "number",
+      "minimum": -1,
+      "maximum": 1
+    },
+    "nullableRate": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/rate"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "nullableDelta": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/delta"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "nullableNumber": {
+      "oneOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "nullableBoolean": {
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "reasonList": {
+      "type": "array",
+      "maxItems": 32,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/safeId"
+      }
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "fingerprint"
+      ],
+      "properties": {
+        "id": {
+          "enum": [
+            "plain",
+            "profile-only",
+            "instrumented"
+          ]
+        },
+        "fingerprint": {
+          "$ref": "#/$defs/fingerprint"
+        }
+      }
+    },
+    "profilePair": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "baseline",
+        "candidate"
+      ],
+      "properties": {
+        "baseline": {
+          "$ref": "#/$defs/profile"
+        },
+        "candidate": {
+          "$ref": "#/$defs/profile"
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "run_id",
+        "run_report_fingerprint",
+        "suite_id",
+        "suite_complete",
+        "suite_manifest_fingerprint",
+        "comparison_policy_fingerprint",
+        "profile_inventory_fingerprint",
+        "seed"
+      ],
+      "properties": {
+        "run_id": {
+          "$ref": "#/$defs/safeId"
+        },
+        "run_report_fingerprint": {
+          "$ref": "#/$defs/fingerprint"
+        },
+        "suite_id": {
+          "enum": [
+            "smoke",
+            "standard",
+            "full"
+          ]
+        },
+        "suite_complete": {
+          "type": "boolean"
+        },
+        "suite_manifest_fingerprint": {
+          "$ref": "#/$defs/fingerprint"
+        },
+        "comparison_policy_fingerprint": {
+          "$ref": "#/$defs/fingerprint"
+        },
+        "profile_inventory_fingerprint": {
+          "$ref": "#/$defs/fingerprint"
+        },
+        "seed": {
+          "$ref": "#/$defs/safeId"
+        }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "analysis_seed",
+        "minimum_complete_pairs",
+        "minimum_discordant_pairs",
+        "bootstrap_resamples",
+        "confidence_level",
+        "mcnemar_alpha"
+      ],
+      "properties": {
+        "analysis_seed": {
+          "$ref": "#/$defs/safeId"
+        },
+        "minimum_complete_pairs": {
+          "const": 24
+        },
+        "minimum_discordant_pairs": {
+          "const": 10
+        },
+        "bootstrap_resamples": {
+          "const": 10000
+        },
+        "confidence_level": {
+          "const": 0.95
+        },
+        "mcnemar_alpha": {
+          "const": 0.05
+        }
+      }
+    },
+    "sample": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "declared_pairs",
+        "reported_pairs",
+        "complete_pairs",
+        "incomplete_pairs",
+        "family_count",
+        "discordant_pairs",
+        "report_complete"
+      ],
+      "properties": {
+        "declared_pairs": {
+          "$ref": "#/$defs/count"
+        },
+        "reported_pairs": {
+          "$ref": "#/$defs/count"
+        },
+        "complete_pairs": {
+          "$ref": "#/$defs/count"
+        },
+        "incomplete_pairs": {
+          "$ref": "#/$defs/count"
+        },
+        "family_count": {
+          "$ref": "#/$defs/count"
+        },
+        "discordant_pairs": {
+          "$ref": "#/$defs/count"
+        },
+        "report_complete": {
+          "type": "boolean"
+        }
+      }
+    },
+    "pairedOutcomes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "both_pass",
+        "baseline_only",
+        "candidate_only",
+        "both_fail"
+      ],
+      "properties": {
+        "both_pass": {
+          "$ref": "#/$defs/count"
+        },
+        "baseline_only": {
+          "$ref": "#/$defs/count"
+        },
+        "candidate_only": {
+          "$ref": "#/$defs/count"
+        },
+        "both_fail": {
+          "$ref": "#/$defs/count"
+        }
+      }
+    },
+    "bootstrap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "method",
+        "resamples",
+        "confidence_level",
+        "seed_fingerprint",
+        "lower",
+        "upper"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "computed",
+            "insufficient_sample",
+            "no_data"
+          ]
+        },
+        "method": {
+          "const": "stratified-family-paired-percentile-v1"
+        },
+        "resamples": {
+          "const": 10000
+        },
+        "confidence_level": {
+          "const": 0.95
+        },
+        "seed_fingerprint": {
+          "$ref": "#/$defs/fingerprint"
+        },
+        "lower": {
+          "$ref": "#/$defs/nullableDelta"
+        },
+        "upper": {
+          "$ref": "#/$defs/nullableDelta"
+        }
+      }
+    },
+    "mcnemar": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "discordant_pairs",
+        "baseline_only",
+        "candidate_only",
+        "p_value",
+        "alpha",
+        "significant"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "computed",
+            "insufficient_sample",
+            "insufficient_discordance"
+          ]
+        },
+        "discordant_pairs": {
+          "$ref": "#/$defs/count"
+        },
+        "baseline_only": {
+          "$ref": "#/$defs/count"
+        },
+        "candidate_only": {
+          "$ref": "#/$defs/count"
+        },
+        "p_value": {
+          "$ref": "#/$defs/nullableRate"
+        },
+        "alpha": {
+          "const": 0.05
+        },
+        "significant": {
+          "$ref": "#/$defs/nullableBoolean"
+        }
+      }
+    },
+    "primary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "metric",
+        "averaging",
+        "baseline_rate",
+        "candidate_rate",
+        "delta",
+        "paired_outcomes",
+        "bootstrap",
+        "mcnemar"
+      ],
+      "properties": {
+        "metric": {
+          "const": "whole_task_success"
+        },
+        "averaging": {
+          "const": "macro_by_family"
+        },
+        "baseline_rate": {
+          "$ref": "#/$defs/nullableRate"
+        },
+        "candidate_rate": {
+          "$ref": "#/$defs/nullableRate"
+        },
+        "delta": {
+          "$ref": "#/$defs/nullableDelta"
+        },
+        "paired_outcomes": {
+          "$ref": "#/$defs/pairedOutcomes"
+        },
+        "bootstrap": {
+          "$ref": "#/$defs/bootstrap"
+        },
+        "mcnemar": {
+          "$ref": "#/$defs/mcnemar"
+        }
+      }
+    },
+    "rateMetric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "direction",
+        "pair_scope",
+        "applicable_pairs",
+        "availability",
+        "baseline_rate",
+        "candidate_rate",
+        "delta"
+      ],
+      "properties": {
+        "id": {
+          "enum": [
+            "whole_task_success",
+            "visible_pass",
+            "hidden_pass",
+            "defect_escape_v2",
+            "scope_violation",
+            "review_only_mutation",
+            "unnecessary_delegation",
+            "verification_omission",
+            "timeout",
+            "incomplete_evidence",
+            "false_block"
+          ]
+        },
+        "direction": {
+          "enum": [
+            "higher_is_better",
+            "lower_is_better"
+          ]
+        },
+        "pair_scope": {
+          "enum": [
+            "complete_pairs",
+            "reported_pairs"
+          ]
+        },
+        "applicable_pairs": {
+          "$ref": "#/$defs/count"
+        },
+        "availability": {
+          "enum": [
+            "available",
+            "unavailable"
+          ]
+        },
+        "baseline_rate": {
+          "$ref": "#/$defs/nullableRate"
+        },
+        "candidate_rate": {
+          "$ref": "#/$defs/nullableRate"
+        },
+        "delta": {
+          "$ref": "#/$defs/nullableDelta"
+        }
+      }
+    },
+    "countMetric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "unit",
+        "applicable_pairs",
+        "availability",
+        "baseline_mean",
+        "candidate_mean",
+        "delta"
+      ],
+      "properties": {
+        "id": {
+          "enum": [
+            "tool_call_count",
+            "subagent_call_count",
+            "context_read_count",
+            "permission_request_count",
+            "duration_ms",
+            "cost_usd"
+          ]
+        },
+        "unit": {
+          "enum": [
+            "count",
+            "milliseconds",
+            "usd"
+          ]
+        },
+        "applicable_pairs": {
+          "$ref": "#/$defs/count"
+        },
+        "availability": {
+          "enum": [
+            "available",
+            "unavailable"
+          ]
+        },
+        "baseline_mean": {
+          "$ref": "#/$defs/nullableNumber"
+        },
+        "candidate_mean": {
+          "$ref": "#/$defs/nullableNumber"
+        },
+        "delta": {
+          "$ref": "#/$defs/nullableNumber"
+        }
+      }
+    },
+    "breakdownRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dimension",
+        "id",
+        "complete_pairs",
+        "family_count",
+        "baseline_rate",
+        "candidate_rate",
+        "delta"
+      ],
+      "properties": {
+        "dimension": {
+          "enum": [
+            "family",
+            "category",
+            "risk"
+          ]
+        },
+        "id": {
+          "$ref": "#/$defs/safeId"
+        },
+        "complete_pairs": {
+          "$ref": "#/$defs/count"
+        },
+        "family_count": {
+          "$ref": "#/$defs/count"
+        },
+        "baseline_rate": {
+          "$ref": "#/$defs/nullableRate"
+        },
+        "candidate_rate": {
+          "$ref": "#/$defs/nullableRate"
+        },
+        "delta": {
+          "$ref": "#/$defs/nullableDelta"
+        }
+      }
+    },
+    "breakdowns": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "by_family",
+        "by_category",
+        "by_risk"
+      ],
+      "properties": {
+        "by_family": {
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "$ref": "#/$defs/breakdownRow"
+          }
+        },
+        "by_category": {
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "$ref": "#/$defs/breakdownRow"
+          }
+        },
+        "by_risk": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "$ref": "#/$defs/breakdownRow"
+          }
+        }
+      }
+    },
+    "guardrail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "status",
+        "observed",
+        "operator",
+        "threshold"
+      ],
+      "properties": {
+        "id": {
+          "enum": [
+            "whole_task_success_rate_delta",
+            "hidden_pass_rate_delta",
+            "new_canary_safety_regressions",
+            "review_only_mutation_rate_delta",
+            "scope_violation_rate_delta",
+            "small_task_success_rate_delta"
+          ]
+        },
+        "status": {
+          "enum": [
+            "passed",
+            "failed",
+            "unavailable"
+          ]
+        },
+        "observed": {
+          "$ref": "#/$defs/nullableNumber"
+        },
+        "operator": {
+          "enum": [
+            "gte",
+            "lte"
+          ]
+        },
+        "threshold": {
+          "type": "number"
+        }
+      }
+    },
+    "scopeSafetyRegressions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "new_canary_safety_regressions",
+        "scope_violation_rate_delta",
+        "review_only_mutation_rate_delta"
+      ],
+      "properties": {
+        "new_canary_safety_regressions": {
+          "$ref": "#/$defs/count"
+        },
+        "scope_violation_rate_delta": {
+          "$ref": "#/$defs/nullableDelta"
+        },
+        "review_only_mutation_rate_delta": {
+          "$ref": "#/$defs/nullableDelta"
+        }
+      }
+    },
+    "pareto": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "quality_gain",
+        "duration_overhead",
+        "cost_overhead",
+        "scope_safety_regressions"
+      ],
+      "properties": {
+        "quality_gain": {
+          "$ref": "#/$defs/nullableDelta"
+        },
+        "duration_overhead": {
+          "$ref": "#/$defs/nullableNumber"
+        },
+        "cost_overhead": {
+          "$ref": "#/$defs/nullableNumber"
+        },
+        "scope_safety_regressions": {
+          "$ref": "#/$defs/scopeSafetyRegressions"
+        }
+      }
+    },
+    "verdict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reasons"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "insufficient_sample",
+            "inconclusive",
+            "candidate_better",
+            "candidate_worse",
+            "no_clear_difference"
+          ]
+        },
+        "reasons": {
+          "$ref": "#/$defs/reasonList"
+        }
+      }
+    }
+  }
+}
