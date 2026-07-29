@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -13,6 +14,8 @@ import {
   SYNTHETIC_FAMILY_IDS,
   SYNTHETIC_PARSER_FIXTURES,
   SYNTHETIC_PROFILE_IDS,
+  assertAdoptionBundleEntryPaths,
+  assertPortableContractPath,
   loadSyntheticContracts,
   resolveRepositoryEntry,
   resolveAdoptionBundle,
@@ -20,11 +23,197 @@ import {
 } from "../lib/benchmark/contracts.mjs";
 import { assertSafeId } from "../lib/feedback/contracts.mjs";
 import { parsePromptFrontmatter } from "../lib/quality/prompt-inventory.mjs";
+import {
+  DEFAULT_MODEL_FREE_CHECKS,
+  validateSyntheticModelFreeSelfTestReport,
+} from "../lib/benchmark/self-test.mjs";
+import { validateSyntheticReplayReport } from "../lib/benchmark/replay.mjs";
 
 const defaultRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const FIXTURE_FINGERPRINT = `sha256:${"0".repeat(64)}`;
 
 function expectCode(callback, code) {
   assert.throws(callback, (error) => error?.code === code, `expected ${code}`);
+}
+
+function sameSchemaValue(left, right) {
+  return JSON.stringify(left) === JSON.stringify(right);
+}
+
+function matchesSchemaFragment(schema, value) {
+  if (schema === true) return true;
+  if (schema === false || schema === null || typeof schema !== "object") return false;
+  if (Object.hasOwn(schema, "const") && !sameSchemaValue(value, schema.const)) return false;
+  if (Array.isArray(schema.enum) && !schema.enum.some((entry) => sameSchemaValue(value, entry))) {
+    return false;
+  }
+  if (Array.isArray(schema.required)) {
+    if (value === null || typeof value !== "object" || Array.isArray(value)) return false;
+    if (schema.required.some((key) => !Object.hasOwn(value, key))) return false;
+  }
+  if (schema.properties !== undefined) {
+    if (value === null || typeof value !== "object" || Array.isArray(value)) return false;
+    for (const [key, nestedSchema] of Object.entries(schema.properties)) {
+      if (Object.hasOwn(value, key) && !matchesSchemaFragment(nestedSchema, value[key])) {
+        return false;
+      }
+    }
+  }
+  if (Array.isArray(schema.allOf)
+      && !schema.allOf.every((entry) => matchesSchemaFragment(entry, value))) {
+    return false;
+  }
+  if (schema.if !== undefined) {
+    const selected = matchesSchemaFragment(schema.if, value) ? schema.then : schema.else;
+    if (selected !== undefined && !matchesSchemaFragment(selected, value)) return false;
+  }
+  if (schema.items !== undefined) {
+    if (!Array.isArray(value)) return false;
+    if (!value.every((entry) => matchesSchemaFragment(schema.items, entry))) return false;
+  }
+  if (schema.contains !== undefined) {
+    if (!Array.isArray(value)) return false;
+    const matches = value.filter((entry) => matchesSchemaFragment(schema.contains, entry)).length;
+    if (matches < (schema.minContains ?? 1)) return false;
+    if (schema.maxContains !== undefined && matches > schema.maxContains) return false;
+  }
+  if (schema.not !== undefined && matchesSchemaFragment(schema.not, value)) return false;
+  return true;
+}
+
+function matchesRootCrossFieldSemantics(schema, document) {
+  return (schema.allOf ?? []).every((entry) => matchesSchemaFragment(entry, document));
+}
+
+function selfTestSchemaFixture() {
+  return {
+    schema_version: 1,
+    report_kind: "synthetic-model-free-self-test",
+    run_id: "schema-self-test",
+    created_at: "2026-01-01T00:00:00.000Z",
+    evidence_class: "model-free-fixture",
+    model_execution: false,
+    complete: true,
+    check_count: DEFAULT_MODEL_FREE_CHECKS.length,
+    checks: DEFAULT_MODEL_FREE_CHECKS.map((definition) => ({
+      ...definition,
+      status: "passed",
+      exit_code: 0,
+      timed_out: false,
+      duration_ms: 1,
+      stdout_bytes: 0,
+      stderr_bytes: 0,
+      stdout_fingerprint: FIXTURE_FINGERPRINT,
+      stderr_fingerprint: FIXTURE_FINGERPRINT,
+    })),
+    residual_caveats: [
+      "model-free-only",
+      "no-model-quality-claim",
+    ],
+  };
+}
+
+function replaySchemaFixture({
+  modelExecutionConfirmed = true,
+  adapterCompletedCorrectly = true,
+  evidenceComplete = true,
+  wholeTaskSuccess = true,
+  executionStatus = "completed",
+  terminationReason = "verified",
+  reason = null,
+} = {}) {
+  return {
+    schema_version: 1,
+    report_kind: "synthetic-profile-replay",
+    run_id: "schema-replay",
+    created_at: "2026-01-01T00:00:00.000Z",
+    evidence_class: "model-backed-attempt",
+    model_execution_confirmed: modelExecutionConfirmed,
+    family_id: "function-boundaries",
+    seed: "schema-seed",
+    repetition: 1,
+    instance_fingerprint: FIXTURE_FINGERPRINT,
+    profile_id: "plain",
+    model_binding_fingerprint: FIXTURE_FINGERPRINT,
+    execution_status: executionStatus,
+    termination_reason: terminationReason,
+    reason,
+    adapter_completed_correctly: adapterCompletedCorrectly,
+    evidence_complete: evidenceComplete,
+    whole_task_success: wholeTaskSuccess,
+    result_fingerprint: FIXTURE_FINGERPRINT,
+    residual_caveats: [
+      "single-profile-replay-no-comparison",
+    ],
+  };
+}
+
+function verifyEvidenceSchemaRuntimeParity(selfTestSchema, replaySchema) {
+  const allPassed = selfTestSchemaFixture();
+  assert.equal(matchesRootCrossFieldSemantics(selfTestSchema, allPassed), true);
+  assert.equal(validateSyntheticModelFreeSelfTestReport(allPassed), allPassed);
+
+  const failed = structuredClone(allPassed);
+  failed.complete = false;
+  failed.checks[0].status = "failed";
+  failed.checks[0].exit_code = 1;
+  assert.equal(matchesRootCrossFieldSemantics(selfTestSchema, failed), true);
+  assert.equal(validateSyntheticModelFreeSelfTestReport(failed), failed);
+
+  const falseComplete = structuredClone(failed);
+  falseComplete.complete = true;
+  assert.equal(matchesRootCrossFieldSemantics(selfTestSchema, falseComplete), false);
+  expectCode(
+    () => validateSyntheticModelFreeSelfTestReport(falseComplete),
+    "SYNTHETIC_SELF_TEST_COMPLETE",
+  );
+
+  const falseIncomplete = structuredClone(allPassed);
+  falseIncomplete.complete = false;
+  assert.equal(matchesRootCrossFieldSemantics(selfTestSchema, falseIncomplete), false);
+  expectCode(
+    () => validateSyntheticModelFreeSelfTestReport(falseIncomplete),
+    "SYNTHETIC_SELF_TEST_COMPLETE",
+  );
+
+  const completedReplay = replaySchemaFixture();
+  assert.equal(matchesRootCrossFieldSemantics(replaySchema, completedReplay), true);
+  assert.equal(validateSyntheticReplayReport(completedReplay), completedReplay);
+
+  const failedReplay = replaySchemaFixture({
+    modelExecutionConfirmed: false,
+    adapterCompletedCorrectly: false,
+    evidenceComplete: false,
+    wholeTaskSuccess: false,
+    executionStatus: "failed",
+    terminationReason: "verification_failed",
+    reason: "fixture_failure",
+  });
+  assert.equal(matchesRootCrossFieldSemantics(replaySchema, failedReplay), true);
+  assert.equal(validateSyntheticReplayReport(failedReplay), failedReplay);
+
+  for (const [modelExecutionConfirmed, adapterCompletedCorrectly] of [
+    [true, false],
+    [false, true],
+  ]) {
+    const contradictoryReplay = replaySchemaFixture({
+      modelExecutionConfirmed,
+      adapterCompletedCorrectly,
+      evidenceComplete: false,
+      wholeTaskSuccess: false,
+      executionStatus: "failed",
+      terminationReason: "verification_failed",
+      reason: "fixture_failure",
+    });
+    assert.equal(
+      matchesRootCrossFieldSemantics(replaySchema, contradictoryReplay),
+      false,
+    );
+    expectCode(
+      () => validateSyntheticReplayReport(contradictoryReplay),
+      "SYNTHETIC_REPLAY_EVIDENCE",
+    );
+  }
 }
 
 function verifyConfiguredRolePermissions(root, roles) {
@@ -111,6 +300,98 @@ function materializeCoreFixture(root, core) {
   }
 }
 
+function materializeExecutableBundleFixture(root, bundle, {
+  prefix,
+  imports,
+  commands = [],
+  missingDependency = null,
+  missingDependencyCommands = [],
+} = {}) {
+  const fixtureRoot = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), prefix));
+  const runNode = (
+    argv,
+    label,
+    expectedStatus = 0,
+    expectedStderrIncludes = null,
+  ) => {
+    const result = spawnSync(process.execPath, argv, {
+      cwd: fixtureRoot,
+      encoding: "utf8",
+      timeout: 120_000,
+      maxBuffer: 1024 * 1024,
+      windowsHide: true,
+      shell: false,
+    });
+    assert.equal(result.error, undefined, `${label} failed to spawn: ${result.error?.message}`);
+    assert.equal(
+      result.status,
+      expectedStatus,
+      `${label} exited ${result.status}\nstdout:\n${result.stdout}\nstderr:\n${result.stderr}`,
+    );
+    if (expectedStderrIncludes !== null) {
+      assert(
+        result.stderr.includes(expectedStderrIncludes),
+        `${label} stderr did not include ${expectedStderrIncludes}\nstderr:\n${result.stderr}`,
+      );
+    }
+  };
+  try {
+    const orderedEntryPaths = [...bundle.entry_paths].sort((left, right) => (
+      left.split("/").length - right.split("/").length
+        || left.localeCompare(right)
+    ));
+    for (const entryPath of orderedEntryPaths) {
+      const source = resolveRepositoryEntry(root, entryPath);
+      const target = path.join(fixtureRoot, ...entryPath.split("/"));
+      if (fs.existsSync(target)) continue;
+      fs.mkdirSync(path.dirname(target), { recursive: true });
+      fs.cpSync(source, target, { recursive: true, errorOnExist: false, force: false });
+    }
+    for (const entryPath of bundle.entry_paths) {
+      assert(
+        fs.existsSync(path.join(fixtureRoot, ...entryPath.split("/"))),
+        `${bundle.bundle_id} materialization omitted ${entryPath}`,
+      );
+    }
+    const probePath = path.join(fixtureRoot, "bundle-import-probe.mjs");
+    fs.writeFileSync(
+      probePath,
+      `for (const specifier of ${JSON.stringify(imports)}) await import(specifier);\n`,
+      "utf8",
+    );
+    runNode([probePath], `${bundle.bundle_id} import closure`);
+    for (const command of commands) {
+      const definition = Array.isArray(command) ? { argv: command } : command;
+      runNode(
+        definition.argv,
+        definition.label ?? `${bundle.bundle_id} executable command`,
+        definition.expectedStatus ?? 0,
+        definition.expectedStderrIncludes ?? null,
+      );
+    }
+    if (missingDependency !== null) {
+      const dependencyPath = path.join(fixtureRoot, ...missingDependency.split("/"));
+      const quarantinedPath = `${dependencyPath}.missing`;
+      fs.renameSync(dependencyPath, quarantinedPath);
+      try {
+        runNode([probePath], `${bundle.bundle_id} missing-dependency negative fixture`, 1);
+        for (const command of missingDependencyCommands) {
+          runNode(
+            command.argv,
+            command.label,
+            command.expectedStatus,
+            command.expectedStderrIncludes,
+          );
+        }
+      } finally {
+        fs.renameSync(quarantinedPath, dependencyPath);
+      }
+    }
+  } finally {
+    fs.rmSync(fixtureRoot, { recursive: true, force: true });
+  }
+}
+
 function verifyWholeTaskSuccessEvidenceSchema(schema) {
   assert.deepEqual(schema.$defs.count, {
     type: "integer",
@@ -186,8 +467,20 @@ function verifyWholeTaskSuccessEvidenceNegativeFixtures(schema) {
   }
 }
 
-export function verifyBenchmarkContracts({ root = defaultRoot } = {}) {
-  const contracts = loadSyntheticContracts(root);
+function verifyPortableContractPaths() {
+  assert.equal(
+    assertPortableContractPath(".github/workflows/verify.yml"),
+    ".github/workflows/verify.yml",
+  );
+  assert.equal(
+    assertPortableContractPath(".opencode/plugins/engineering-dossier.mjs"),
+    ".opencode/plugins/engineering-dossier.mjs",
+  );
+  assert.throws(() => assertPortableContractPath(".git/config"));
+  assert.throws(() => assertPortableContractPath("nested/.github/workflow.yml"));
+}
+
+function verifyBenchmarkEvaluationContractsLoaded({ root, contracts }) {
   assert.deepEqual(contracts.families.map((entry) => entry.id), SYNTHETIC_FAMILY_IDS);
   assert.deepEqual(contracts.inventory.profiles.map((entry) => entry.id), SYNTHETIC_PROFILE_IDS);
   assert.deepEqual(contracts.inventory.benchmark.anti_cheating_cases, SYNTHETIC_ANTI_CHEATING_CASES);
@@ -209,6 +502,41 @@ export function verifyBenchmarkContracts({ root = defaultRoot } = {}) {
   assert.equal(comparisonReportSchema.properties.report_kind.const, "synthetic-paired-comparison");
   assert.deepEqual(comparisonReportSchema.$defs.verdict.properties.status.enum, contracts.comparison_policy.verdict_order);
   assert.equal(comparisonReportSchema.$defs.bootstrap.properties.resamples.const, BOOTSTRAP_RESAMPLES);
+  const selfTestReportSchema =
+    contracts.schemas["benchmarks/synthetic/schemas/model-free-self-test-report.v1.schema.json"];
+  assert.equal(
+    selfTestReportSchema.$id,
+    "https://opencode-harness.invalid/schemas/synthetic-model-free-self-test-report-v1",
+  );
+  assert.equal(selfTestReportSchema.properties.report_kind.const, "synthetic-model-free-self-test");
+  assert.equal(selfTestReportSchema.properties.model_execution.const, false);
+  assert.equal(
+    selfTestReportSchema.properties.check_count.const,
+    DEFAULT_MODEL_FREE_CHECKS.length,
+  );
+  assert.equal(
+    selfTestReportSchema.properties.checks.prefixItems.length,
+    DEFAULT_MODEL_FREE_CHECKS.length,
+  );
+  for (const [index, definition] of DEFAULT_MODEL_FREE_CHECKS.entries()) {
+    const binding =
+      selfTestReportSchema.properties.checks.prefixItems[index].allOf[1].properties;
+    assert.equal(binding.id.const, definition.id);
+    assert.equal(binding.script.const, definition.script);
+  }
+  const replayReportSchema =
+    contracts.schemas["benchmarks/synthetic/schemas/replay-report.v1.schema.json"];
+  assert.equal(
+    replayReportSchema.$id,
+    "https://opencode-harness.invalid/schemas/synthetic-replay-report-v1",
+  );
+  assert.equal(replayReportSchema.properties.report_kind.const, "synthetic-profile-replay");
+  assert.equal(Object.hasOwn(replayReportSchema.properties, "model_execution"), false);
+  assert.equal(
+    replayReportSchema.properties.model_execution_confirmed.type,
+    "boolean",
+  );
+  verifyEvidenceSchemaRuntimeParity(selfTestReportSchema, replayReportSchema);
   const reportSafeIdPattern = new RegExp(runReportSchema.$defs.safeId.pattern);
   for (const id of ["run-1", "plain.profile"]) {
     assert.equal(reportSafeIdPattern.test(id), true);
@@ -225,6 +553,9 @@ export function verifyBenchmarkContracts({ root = defaultRoot } = {}) {
 
   const suiteCounts = Object.fromEntries(contracts.suites.map((suite) => [suite.id, suite.declared_run_count]));
   assert.deepEqual(suiteCounts, { smoke: 16, standard: 72, full: 240 });
+  for (const suite of contracts.suites) {
+    assert.deepEqual(suite.profile_ids, SYNTHETIC_PROFILE_IDS);
+  }
 
   const core = resolveAdoptionBundle(contracts.inventory, "core");
   const quality = resolveAdoptionBundle(contracts.inventory, "quality");
@@ -238,6 +569,12 @@ export function verifyBenchmarkContracts({ root = defaultRoot } = {}) {
   assert(core.entry_paths.length > 0);
   assert(quality.entry_paths.length > core.entry_paths.length);
   assert(evaluation.entry_paths.some((entry) => entry === "benchmarks/synthetic"));
+  assert(evaluation.component_ids.includes("benchmark-commands"));
+  assert(evaluation.entry_paths.includes("package.json"));
+  assert(evaluation.entry_paths.includes("scripts/benchmark-synthetic.mjs"));
+  assert(evaluation.entry_paths.includes("scripts/verify-benchmark-cli.mjs"));
+  assert(evaluation.entry_paths.includes("scripts/verify-benchmark-runner.mjs"));
+  assert(evaluation.entry_paths.includes(".github/workflows/synthetic-benchmark.yml"));
   assert(complete.entry_paths.some((entry) => entry === "scripts"));
   assert(quality.component_ids.includes("computational-mutation-gate"));
   assert(!core.component_ids.includes("computational-mutation-gate"));
@@ -250,7 +587,6 @@ export function verifyBenchmarkContracts({ root = defaultRoot } = {}) {
   testPermissionDrift.find((entry) => entry.id === "general").permissions.test = "deny";
   assert.throws(() => verifyConfiguredRolePermissions(root, testPermissionDrift), /test permission drifted/);
   verifyPhysicalConfinementNegativeFixture();
-  materializeCoreFixture(root, core);
 
   const withUnknownField = structuredClone(contracts.inventory);
   withUnknownField.unknown = true;
@@ -302,6 +638,85 @@ export function verifyBenchmarkContracts({ root = defaultRoot } = {}) {
     profile_ids: [...SYNTHETIC_PROFILE_IDS],
     adoption_chain: complete.chain,
   };
+}
+
+function verifyExecutableBundleClosures(root, contracts) {
+  const core = resolveAdoptionBundle(contracts.inventory, "core");
+  const quality = resolveAdoptionBundle(contracts.inventory, "quality");
+  const evaluation = resolveAdoptionBundle(contracts.inventory, "evaluation");
+  materializeCoreFixture(root, core);
+  materializeExecutableBundleFixture(root, quality, {
+    prefix: "synthetic-quality-bundle-",
+    imports: ["./lib/quality/quality-plugin.mjs"],
+    missingDependency: "lib/feedback/contracts.mjs",
+  });
+  materializeExecutableBundleFixture(root, evaluation, {
+    prefix: "synthetic-evaluation-bundle-",
+    imports: [
+      "./lib/benchmark/cli.mjs",
+      "./scripts/verify-benchmark-adapter.mjs",
+      "./scripts/verify-benchmark-ci.mjs",
+      "./scripts/verify-benchmark-cli.mjs",
+      "./scripts/verify-benchmark-comparison-reporting.mjs",
+      "./scripts/verify-benchmark-contracts.mjs",
+      "./scripts/verify-benchmark-evaluation-contracts.mjs",
+      "./scripts/verify-benchmark-isolation.mjs",
+      "./scripts/verify-benchmark-renderer.mjs",
+      "./scripts/verify-benchmark-reporting.mjs",
+      "./scripts/verify-benchmark-runner.mjs",
+      "./scripts/verify-benchmark-statistics.mjs",
+    ],
+    commands: [
+      ["scripts/benchmark-synthetic-validate.mjs"],
+      ["scripts/verify-benchmark-evaluation-contracts.mjs"],
+      {
+        argv: ["scripts/verify-benchmark-contracts.mjs"],
+        label: "full verifier rejects evaluation-only bundle",
+        expectedStatus: 1,
+        expectedStderrIncludes: "SYNTHETIC_MISSING_FILE",
+      },
+      {
+        argv: [
+          "scripts/verify-benchmark-contracts.mjs",
+          "--scope",
+          "evaluation",
+        ],
+        label: "full verifier cannot downgrade through argv",
+        expectedStatus: 1,
+        expectedStderrIncludes: "SYNTHETIC_MISSING_FILE",
+      },
+    ],
+    missingDependency: "scripts/verify-benchmark-runner.mjs",
+    missingDependencyCommands: [
+      {
+        argv: ["scripts/benchmark-synthetic-validate.mjs"],
+        label: "production loader rejects a missing evaluation dependency",
+        expectedStatus: 1,
+        expectedStderrIncludes: "SYNTHETIC_MISSING_FILE",
+      },
+      {
+        argv: ["scripts/verify-benchmark-evaluation-contracts.mjs"],
+        label: "evaluation verifier rejects a missing evaluation dependency",
+        expectedStatus: 1,
+        expectedStderrIncludes: "SYNTHETIC_MISSING_FILE",
+      },
+    ],
+  });
+}
+
+export function verifyBenchmarkEvaluationContracts({ root = defaultRoot } = {}) {
+  verifyPortableContractPaths();
+  const contracts = loadSyntheticContracts(root);
+  return verifyBenchmarkEvaluationContractsLoaded({ root, contracts });
+}
+
+export function verifyBenchmarkContracts({ root = defaultRoot } = {}) {
+  verifyPortableContractPaths();
+  const contracts = loadSyntheticContracts(root);
+  assertAdoptionBundleEntryPaths(root, contracts.inventory, "complete");
+  const result = verifyBenchmarkEvaluationContractsLoaded({ root, contracts });
+  verifyExecutableBundleClosures(root, contracts);
+  return result;
 }
 
 const invokedPath = process.argv[1] ? pathToFileURL(path.resolve(process.argv[1])).href : null;

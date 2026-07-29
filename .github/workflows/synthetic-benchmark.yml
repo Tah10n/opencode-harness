@@ -1,0 +1,129 @@
+name: Synthetic Benchmark (manual model-backed)
+
+on:
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: Synthetic suite
+        required: true
+        type: choice
+        default: smoke
+        options:
+          - smoke
+          - standard
+          - full
+      baseline:
+        description: Baseline profile
+        required: true
+        type: choice
+        default: plain
+        options:
+          - plain
+          - profile-only
+          - instrumented
+      candidate:
+        description: Candidate profile
+        required: true
+        type: choice
+        default: instrumented
+        options:
+          - plain
+          - profile-only
+          - instrumented
+      seed:
+        description: Portable deterministic seed
+        required: true
+        type: string
+        default: "20260728"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: synthetic-benchmark-${{ github.ref }}-${{ inputs.suite }}-${{ inputs.baseline }}-${{ inputs.candidate }}
+  cancel-in-progress: false
+
+jobs:
+  benchmark:
+    name: Model-backed synthetic ablation
+    runs-on: [self-hosted, opencode-benchmark]
+    environment: synthetic-benchmark
+    timeout-minutes: 360
+    env:
+      OPENCODE_BENCH_MODEL: ${{ secrets.OPENCODE_BENCH_MODEL }}
+      OPENCODE_BENCH_PROVIDER: ${{ secrets.OPENCODE_BENCH_PROVIDER }}
+      OPENCODE_BENCH_VARIANT: ${{ secrets.OPENCODE_BENCH_VARIANT }}
+      BENCH_SUITE: ${{ inputs.suite }}
+      BENCH_BASELINE: ${{ inputs.baseline }}
+      BENCH_CANDIDATE: ${{ inputs.candidate }}
+      BENCH_SEED: ${{ inputs.seed }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Install exact dependencies
+        run: npm ci
+
+      - name: Run model-free benchmark preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run bench:synthetic:validate
+          npm run bench:synthetic:self-test
+
+      - name: Require host-owned model configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${OPENCODE_BENCH_MODEL:-}" ]]; then
+            echo "OPENCODE_BENCH_MODEL is not configured in the protected environment." >&2
+            exit 2
+          fi
+
+      - name: Run paired synthetic benchmark
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "$BENCH_SUITE" in
+            smoke) repetitions=1 ;;
+            standard) repetitions=3 ;;
+            full) repetitions=5 ;;
+            *) echo "Unsupported suite." >&2; exit 1 ;;
+          esac
+          npm run bench:synthetic -- \
+            --suite "$BENCH_SUITE" \
+            --baseline "$BENCH_BASELINE" \
+            --candidate "$BENCH_CANDIDATE" \
+            --seed "$BENCH_SEED" \
+            --repetitions "$repetitions"
+
+      - name: Revalidate immutable raw and comparison artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          report_path="$(node -e '
+            const fs = require("node:fs");
+            const latest = JSON.parse(fs.readFileSync("evals/reports/synthetic/latest.json", "utf8"));
+            if (!/^(?!(?:con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\..*)?$)(?!.*\.$)[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/i.test(latest.run_id)) {
+              throw new Error("latest synthetic run ID is invalid");
+            }
+            process.stdout.write(`evals/reports/synthetic/runs/${latest.run_id}/report.json`);
+          ')"
+          npm run bench:synthetic:compare -- --report "$report_path"
+
+      - name: Upload validated synthetic artifacts
+        if: success()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: synthetic-benchmark-${{ github.run_id }}-${{ github.run_attempt }}
+          path: evals/reports/synthetic
+          if-no-files-found: error
+          retention-days: 14

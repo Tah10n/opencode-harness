@@ -247,6 +247,12 @@
       "id": "computational-mutation-gate",
       "bundle_id": "quality",
       "paths": [
+        ".opencode/plugins/engineering-dossier.mjs",
+        ".opencode/quality",
+        "quality",
+        "lib/quality",
+        "lib/feedback",
+        "package.json",
         "lib/quality/gate.mjs",
         "lib/quality/normal-session-bridge.mjs"
       ]
@@ -263,7 +269,8 @@
       "bundle_id": "quality",
       "paths": [
         "lib/quality/trusted-project-runner.mjs",
-        "lib/quality/project-check-catalog.mjs"
+        "lib/quality/project-check-catalog.mjs",
+        "native"
       ]
     },
     {
@@ -288,7 +295,8 @@
         "adoption",
         "benchmarks/synthetic",
         "lib/benchmark/contracts.mjs",
-        "scripts/verify-benchmark-contracts.mjs"
+        "scripts/verify-benchmark-contracts.mjs",
+        "scripts/verify-benchmark-evaluation-contracts.mjs"
       ]
     },
     {
@@ -325,6 +333,33 @@
       "bundle_id": "evaluation",
       "paths": [
         "lib/benchmark"
+      ]
+    },
+    {
+      "id": "benchmark-commands",
+      "bundle_id": "evaluation",
+      "paths": [
+        ".github/workflows/synthetic-benchmark.yml",
+        ".github/workflows/verify.yml",
+        "package.json",
+        "package-lock.json",
+        "scripts/benchmark-synthetic.mjs",
+        "scripts/benchmark-synthetic-compare.mjs",
+        "scripts/benchmark-synthetic-replay.mjs",
+        "scripts/benchmark-synthetic-self-test.mjs",
+        "scripts/benchmark-synthetic-validate.mjs",
+        "scripts/injected-test-containment.mjs",
+        "scripts/verify-benchmark-adapter.mjs",
+        "scripts/verify-benchmark-ci.mjs",
+        "scripts/verify-benchmark-cli.mjs",
+        "scripts/verify-benchmark-comparison-reporting.mjs",
+        "scripts/verify-benchmark-contracts.mjs",
+        "scripts/verify-benchmark-evaluation-contracts.mjs",
+        "scripts/verify-benchmark-isolation.mjs",
+        "scripts/verify-benchmark-renderer.mjs",
+        "scripts/verify-benchmark-reporting.mjs",
+        "scripts/verify-benchmark-runner.mjs",
+        "scripts/verify-benchmark-statistics.mjs"
       ]
     },
     {
@@ -571,6 +606,7 @@
         "repetitions": 1,
         "profile_ids": [
           "plain",
+          "profile-only",
           "instrumented"
         ],
         "declared_run_count": 16
@@ -594,6 +630,7 @@
         "repetitions": 3,
         "profile_ids": [
           "plain",
+          "profile-only",
           "instrumented"
         ],
         "declared_run_count": 72
@@ -796,7 +833,8 @@
         "opencode-adapter",
         "paired-runner",
         "paired-statistics",
-        "privacy-safe-reports"
+        "privacy-safe-reports",
+        "benchmark-commands"
       ],
       "role_ids": [
         "build"

@@ -2,6 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { assertAdoptionBundleEntryPaths } from "../lib/benchmark/contracts.mjs";
 import { classifyProcessContainment } from "../lib/feedback/process-containment.mjs";
 import { runManagedCommand } from "../lib/feedback/process-tree.mjs";
 import { createInjectedTestContainmentFactory } from "./injected-test-containment.mjs";
@@ -28,18 +29,22 @@ const adoptionEntries = [
   "LICENSE",
   "README.md",
   "SECURITY.md",
+  "adoption",
   "agents",
+  "benchmarks",
   "commands",
   "docs",
   "evals",
   "examples",
   "fixtures",
+  "lib/benchmark",
   "lib/feedback",
   "lib/quality",
   "native",
   "opencode.json",
   "package-lock.json",
   "package.json",
+  "profiles",
   "quality",
   "scripts",
   "skills",
@@ -246,8 +251,12 @@ function assertPortableAdoptionDeclaration(entries) {
   for (const requiredEntry of [
     ".opencode/plugins/engineering-dossier.mjs",
     ".opencode/quality/checks.json",
+    "adoption",
+    "benchmarks",
+    "lib/benchmark",
     "lib/feedback",
     "lib/quality",
+    "profiles",
     "quality",
     "scripts",
     "evals",
@@ -344,6 +353,15 @@ function assertQualityAdoptionContract({ entries, hasPath, exportNames }) {
   }
 }
 
+function expectPortableAdoptionDeclarationFailure(label, entries) {
+  try {
+    assertPortableAdoptionDeclaration(entries);
+  } catch {
+    return;
+  }
+  throw new Error(`${label} did not fail closed`);
+}
+
 function expectQualityContractFailure(label, input) {
   try {
     assertQualityAdoptionContract(input);
@@ -383,6 +401,11 @@ try {
     if (JSON.stringify(documentedEntries) !== JSON.stringify(adoptionEntries)) {
       throw new Error(`${documentationPath} portable adoption list drifted from adoptionEntries`);
     }
+  }
+  for (const requiredEntry of ["adoption", "benchmarks", "lib/benchmark", "profiles"]) {
+    expectPortableAdoptionDeclarationFailure(`${requiredEntry} omission sensor`, adoptionEntries.filter(
+      (entry) => entry !== requiredEntry,
+    ));
   }
 
   const completeDeclaration = {
@@ -427,24 +450,32 @@ try {
   });
 
   for (const requiredDirectory of [
+    "adoption",
+    "benchmarks/synthetic",
     "evals/hidden",
     "evals/scenarios",
     "fixtures/live",
     "fixtures/sample-project",
+    "lib/benchmark",
     "lib/feedback",
+    "profiles",
     "scripts",
   ]) {
     assertBundlePath(requiredDirectory, "directory");
   }
   for (const requiredFile of [
+    "adoption/complete.v1.json",
+    "benchmarks/synthetic/families.v1.json",
     "evals/acceptance-policy.json",
     "evals/scenario.schema.json",
     "evals/suite.schema.json",
     "evals/suites.json",
     "fixtures/sample-project/WORKFLOW.md",
+    "lib/benchmark/opencode-adapter.mjs",
     "lib/feedback/index.mjs",
     "package-lock.json",
     "package.json",
+    "profiles/inventory.v1.json",
     "scripts/assess-candidate.mjs",
     "scripts/capture-static-evidence.mjs",
     "scripts/evaluate-live.mjs",
@@ -452,6 +483,10 @@ try {
   ]) {
     assertBundlePath(requiredFile);
   }
+  const bundledInventory = JSON.parse(
+    fs.readFileSync(path.join(bundleRoot, "profiles/inventory.v1.json"), "utf8").replace(/^\uFEFF/u, ""),
+  );
+  assertAdoptionBundleEntryPaths(bundleRoot, bundledInventory, "complete");
   const packageManifest = JSON.parse(fs.readFileSync(path.join(bundleRoot, "package.json"), "utf8").replace(/^\uFEFF/u, ""));
   const packageLock = JSON.parse(fs.readFileSync(path.join(bundleRoot, "package-lock.json"), "utf8").replace(/^\uFEFF/u, ""));
   const lockedRoot = packageLock.packages?.[""];

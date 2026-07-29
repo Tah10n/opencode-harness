@@ -1,0 +1,477 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opencode-harness.invalid/schemas/synthetic-model-free-self-test-report-v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_kind",
+    "run_id",
+    "created_at",
+    "evidence_class",
+    "model_execution",
+    "complete",
+    "check_count",
+    "checks",
+    "residual_caveats"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "report_kind": {
+      "const": "synthetic-model-free-self-test"
+    },
+    "run_id": {
+      "$ref": "#/$defs/safeId"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "maxLength": 32
+    },
+    "evidence_class": {
+      "const": "model-free-fixture"
+    },
+    "model_execution": {
+      "const": false
+    },
+    "complete": {
+      "type": "boolean"
+    },
+    "check_count": {
+      "const": 10
+    },
+    "checks": {
+      "type": "array",
+      "minItems": 10,
+      "maxItems": 10,
+      "prefixItems": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/check"
+            },
+            {
+              "properties": {
+                "id": {
+                  "const": "benchmark-evaluation-contracts"
+                },
+                "script": {
+                  "const": "scripts/verify-benchmark-evaluation-contracts.mjs"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/check"
+            },
+            {
+              "properties": {
+                "id": {
+                  "const": "benchmark-renderer"
+                },
+                "script": {
+                  "const": "scripts/verify-benchmark-renderer.mjs"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/check"
+            },
+            {
+              "properties": {
+                "id": {
+                  "const": "benchmark-isolation"
+                },
+                "script": {
+                  "const": "scripts/verify-benchmark-isolation.mjs"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/check"
+            },
+            {
+              "properties": {
+                "id": {
+                  "const": "benchmark-adapter"
+                },
+                "script": {
+                  "const": "scripts/verify-benchmark-adapter.mjs"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/check"
+            },
+            {
+              "properties": {
+                "id": {
+                  "const": "benchmark-runner"
+                },
+                "script": {
+                  "const": "scripts/verify-benchmark-runner.mjs"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/check"
+            },
+            {
+              "properties": {
+                "id": {
+                  "const": "benchmark-reporting"
+                },
+                "script": {
+                  "const": "scripts/verify-benchmark-reporting.mjs"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/check"
+            },
+            {
+              "properties": {
+                "id": {
+                  "const": "benchmark-statistics"
+                },
+                "script": {
+                  "const": "scripts/verify-benchmark-statistics.mjs"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/check"
+            },
+            {
+              "properties": {
+                "id": {
+                  "const": "benchmark-comparison-reporting"
+                },
+                "script": {
+                  "const": "scripts/verify-benchmark-comparison-reporting.mjs"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/check"
+            },
+            {
+              "properties": {
+                "id": {
+                  "const": "benchmark-cli"
+                },
+                "script": {
+                  "const": "scripts/verify-benchmark-cli.mjs"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/check"
+            },
+            {
+              "properties": {
+                "id": {
+                  "const": "benchmark-ci"
+                },
+                "script": {
+                  "const": "scripts/verify-benchmark-ci.mjs"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "items": false
+    },
+    "residual_caveats": {
+      "const": [
+        "model-free-only",
+        "no-model-quality-claim"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "complete": {
+            "const": true
+          }
+        },
+        "required": [
+          "complete"
+        ]
+      },
+      "then": {
+        "properties": {
+          "checks": {
+            "items": {
+              "properties": {
+                "status": {
+                  "const": "passed"
+                }
+              },
+              "required": [
+                "status"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "complete": {
+            "const": false
+          }
+        },
+        "required": [
+          "complete"
+        ]
+      },
+      "then": {
+        "properties": {
+          "checks": {
+            "contains": {
+              "properties": {
+                "status": {
+                  "enum": [
+                    "failed",
+                    "timed_out",
+                    "spawn_failed"
+                  ]
+                }
+              },
+              "required": [
+                "status"
+              ]
+            },
+            "minContains": 1
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "safeId": {
+      "type": "string",
+      "pattern": "^(?!(?:con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\\..*)?$)(?!.*\\.$)[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+    },
+    "fingerprint": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "script",
+        "status",
+        "exit_code",
+        "timed_out",
+        "duration_ms",
+        "stdout_bytes",
+        "stderr_bytes",
+        "stdout_fingerprint",
+        "stderr_fingerprint"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/safeId"
+        },
+        "script": {
+          "type": "string",
+          "pattern": "^scripts/[A-Za-z0-9._-]+\\.mjs$",
+          "maxLength": 180
+        },
+        "status": {
+          "enum": [
+            "passed",
+            "failed",
+            "timed_out",
+            "spawn_failed"
+          ]
+        },
+        "exit_code": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 255
+        },
+        "timed_out": {
+          "type": "boolean"
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 900000
+        },
+        "stdout_bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1048576
+        },
+        "stderr_bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1048576
+        },
+        "stdout_fingerprint": {
+          "$ref": "#/$defs/fingerprint"
+        },
+        "stderr_fingerprint": {
+          "$ref": "#/$defs/fingerprint"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "passed"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "exit_code": {
+                "const": 0
+              },
+              "timed_out": {
+                "const": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "failed"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "exit_code": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 255
+              },
+              "timed_out": {
+                "const": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "timed_out",
+                  "spawn_failed"
+                ]
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "exit_code": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "timed_out"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "timed_out": {
+                "const": true
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "spawn_failed"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "timed_out": {
+                "const": false
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
