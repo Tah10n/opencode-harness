@@ -20,9 +20,10 @@ function notRunOutcome(reason) {
   return { status: "not_run", passed: null, violations: [reason] };
 }
 
-function incompleteReport(contracts) {
+function incompleteReport(contracts, sourceRoot) {
   const report = structuredClone(createStatisticsFixtureReport(contracts, {
     mode: "better",
+    sourceRoot,
   }));
   const pair = report.pairs[0];
   const candidate = pair.candidate;
@@ -99,11 +100,21 @@ function preseedComparisonFiles(root, report, contents, count) {
 
 export function verifyBenchmarkComparisonReporting({ root = defaultRoot } = {}) {
   const contracts = loadSyntheticContracts(root);
-  const report = createStatisticsFixtureReport(contracts, { mode: "better" });
-  const comparison = analyzeSyntheticRunReport({
-    report,
-    policy: contracts.comparison_policy,
+  const fixtureReport = (options) => createStatisticsFixtureReport(contracts, {
+    ...options,
+    sourceRoot: root,
   });
+  const analyzeReport = (sourceReport) => analyzeSyntheticRunReport({
+    report: sourceReport,
+    policy: contracts.comparison_policy,
+    contractSourceRoot: root,
+  });
+  const publishComparison = (options) => publishSyntheticComparisonArtifacts({
+    ...options,
+    contractSourceRoot: root,
+  });
+  const report = fixtureReport({ mode: "better" });
+  const comparison = analyzeReport(report);
   const markdown = renderSyntheticComparisonMarkdown({
     report,
     comparison,
@@ -123,11 +134,8 @@ export function verifyBenchmarkComparisonReporting({ root = defaultRoot } = {}) 
   assert(csv.includes("\"guardrail\""));
   assert.equal(encodeSyntheticComparisonCsvCell(-0.05), "\"-0.05\"");
   assert.equal(encodeSyntheticComparisonCsvCell("=2+3"), "\"'=2+3\"");
-  const worseReport = createStatisticsFixtureReport(contracts, { mode: "worse" });
-  const worseComparison = analyzeSyntheticRunReport({
-    report: worseReport,
-    policy: contracts.comparison_policy,
-  });
+  const worseReport = fixtureReport({ mode: "worse" });
+  const worseComparison = analyzeReport(worseReport);
   const worseCsv = renderSyntheticComparisonCsv({
     report: worseReport,
     comparison: worseComparison,
@@ -145,7 +153,7 @@ export function verifyBenchmarkComparisonReporting({ root = defaultRoot } = {}) 
   const divergentRoot = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), "synthetic-comparison-divergent-")));
   const markerDivergentRoot = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), "synthetic-comparison-marker-divergent-")));
   try {
-    const published = publishSyntheticComparisonArtifacts({
+    const published = publishComparison({
       sourceRoot: completeRoot,
       relativeRoot: "reports",
       report,
@@ -159,7 +167,7 @@ export function verifyBenchmarkComparisonReporting({ root = defaultRoot } = {}) 
     );
     assert.equal(fs.existsSync(path.join(completeRoot, published.files.latest)), true);
     assert.equal(
-      publishSyntheticComparisonArtifacts({
+      publishComparison({
         sourceRoot: completeRoot,
         relativeRoot: "reports",
         report,
@@ -171,12 +179,9 @@ export function verifyBenchmarkComparisonReporting({ root = defaultRoot } = {}) 
 
     const divergentReport = structuredClone(report);
     divergentReport.created_at = "2026-01-03T00:00:00.000Z";
-    const divergentComparison = analyzeSyntheticRunReport({
-      report: divergentReport,
-      policy: contracts.comparison_policy,
-    });
+    const divergentComparison = analyzeReport(divergentReport);
     assert.throws(
-      () => publishSyntheticComparisonArtifacts({
+      () => publishComparison({
         sourceRoot: completeRoot,
         relativeRoot: "reports",
         report: divergentReport,
@@ -187,7 +192,7 @@ export function verifyBenchmarkComparisonReporting({ root = defaultRoot } = {}) 
     );
 
     assert.throws(
-      () => publishSyntheticComparisonArtifacts({
+      () => publishComparison({
         sourceRoot: interruptedRoot,
         relativeRoot: "reports",
         report,
@@ -207,7 +212,7 @@ export function verifyBenchmarkComparisonReporting({ root = defaultRoot } = {}) 
     );
     assert.equal(fs.existsSync(path.join(interruptedRunRoot, "comparison.json")), true);
     assert.equal(fs.existsSync(path.join(interruptedRunRoot, "comparison-completion.json")), false);
-    const recovered = publishSyntheticComparisonArtifacts({
+    const recovered = publishComparison({
       sourceRoot: interruptedRoot,
       relativeRoot: "reports",
       report,
@@ -224,7 +229,7 @@ export function verifyBenchmarkComparisonReporting({ root = defaultRoot } = {}) 
       expectedContents,
       1,
     );
-    const partialOneRecovered = publishSyntheticComparisonArtifacts({
+    const partialOneRecovered = publishComparison({
       sourceRoot: partialOneRoot,
       relativeRoot: "reports",
       report,
@@ -244,7 +249,7 @@ export function verifyBenchmarkComparisonReporting({ root = defaultRoot } = {}) 
       expectedContents,
       2,
     );
-    const partialTwoRecovered = publishSyntheticComparisonArtifacts({
+    const partialTwoRecovered = publishComparison({
       sourceRoot: partialTwoRoot,
       relativeRoot: "reports",
       report,
@@ -270,7 +275,7 @@ export function verifyBenchmarkComparisonReporting({ root = defaultRoot } = {}) 
       "utf8",
     );
     assert.throws(
-      () => publishSyntheticComparisonArtifacts({
+      () => publishComparison({
         sourceRoot: divergentRoot,
         relativeRoot: "reports",
         report,
@@ -292,7 +297,7 @@ export function verifyBenchmarkComparisonReporting({ root = defaultRoot } = {}) 
       "utf8",
     );
     assert.throws(
-      () => publishSyntheticComparisonArtifacts({
+      () => publishComparison({
         sourceRoot: markerDivergentRoot,
         relativeRoot: "reports",
         report,
@@ -305,12 +310,9 @@ export function verifyBenchmarkComparisonReporting({ root = defaultRoot } = {}) 
       assert.equal(fs.existsSync(path.join(markerDivergentRunRoot, name)), false);
     }
 
-    const incomplete = incompleteReport(contracts);
-    const incompleteComparison = analyzeSyntheticRunReport({
-      report: incomplete,
-      policy: contracts.comparison_policy,
-    });
-    const incompletePublished = publishSyntheticComparisonArtifacts({
+    const incomplete = incompleteReport(contracts, root);
+    const incompleteComparison = analyzeReport(incomplete);
+    const incompletePublished = publishComparison({
       sourceRoot: incompleteRoot,
       relativeRoot: "reports",
       report: incomplete,

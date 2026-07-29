@@ -5,6 +5,10 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { loadSyntheticContracts } from "../lib/benchmark/contracts.mjs";
 import { fingerprint } from "../lib/feedback/contracts.mjs";
 import {
+  loadSyntheticTemplateSet,
+  renderSyntheticInstance,
+} from "../lib/benchmark/renderer.mjs";
+import {
   analyzeSyntheticRunReport,
   exactTwoSidedMcNemar,
   macroFamilyPairedRate,
@@ -128,9 +132,11 @@ function successPattern(mode, familyIndex, repetition) {
 export function createStatisticsFixtureReport(contracts, {
   mode,
   suiteId = "standard",
+  sourceRoot = defaultRoot,
 }) {
   const suite = contracts.suites.find((entry) => entry.id === suiteId);
   assert(suite);
+  const templateSet = loadSyntheticTemplateSet(sourceRoot, contracts);
   const familyById = new Map(contracts.families.map((entry) => [entry.id, entry]));
   const baselineFingerprint = fp("profile-plain");
   const candidateFingerprint = fp("profile-instrumented");
@@ -152,7 +158,14 @@ export function createStatisticsFixtureReport(contracts, {
     const family = familyById.get(familyId);
     assert(family);
     for (let repetition = 1; repetition <= suite.repetitions; repetition += 1) {
-      const generatedFixtureFingerprint = fp(`${suiteId}-${familyId}-${repetition}`);
+      const instance = renderSyntheticInstance({
+        contracts,
+        templateSet,
+        familyId,
+        seed: "statistics-self-test",
+        repetition,
+      });
+      const generatedFixtureFingerprint = instance.generated_fixture_fingerprint;
       const identity = {
         family_id: familyId,
         category: family.category,
@@ -173,8 +186,8 @@ export function createStatisticsFixtureReport(contracts, {
           ? ["plain", "instrumented"]
           : ["instrumented", "plain"],
         binding: {
-          public_fixture_fingerprint: fp(`public-${familyId}-${repetition}`),
-          hidden_fixture_fingerprint: fp(`hidden-${familyId}-${repetition}`),
+          public_fixture_fingerprint: instance.public_fixture_fingerprint,
+          hidden_fixture_fingerprint: instance.hidden_fixture_fingerprint,
           effective_public_input_fingerprint: fp(`input-${familyId}-${repetition}`),
           initial_public_manifest_fingerprint: fp(`manifest-${familyId}-${repetition}`),
           model_fingerprint: modelFingerprint(execution),
@@ -212,7 +225,7 @@ export function createStatisticsFixtureReport(contracts, {
     suite: {
       id: suiteId,
       manifest_fingerprint: contracts.fingerprints.suites,
-      template_set_fingerprint: fp("templates"),
+      template_set_fingerprint: fingerprint(templateSet),
       comparison_policy_fingerprint: contracts.fingerprints.comparison_policy,
       profile_inventory_fingerprint: contracts.fingerprints.inventory,
       seed: "statistics-self-test",
@@ -250,6 +263,16 @@ function countMetricById(comparison, id) {
 
 export function verifyBenchmarkStatistics({ root = defaultRoot } = {}) {
   const contracts = loadSyntheticContracts(root);
+  const fixtureReport = (options) => createStatisticsFixtureReport(contracts, {
+    ...options,
+    sourceRoot: root,
+  });
+  const analyzeReport = (report, policy = contracts.comparison_policy) =>
+    analyzeSyntheticRunReport({
+      report,
+      policy,
+      contractSourceRoot: root,
+    });
   const macro = macroFamilyPairedRate([
     { family_id: "large-family", baseline: false, candidate: true },
     { family_id: "large-family", baseline: false, candidate: true },
@@ -261,15 +284,19 @@ export function verifyBenchmarkStatistics({ root = defaultRoot } = {}) {
   assert.equal(macro.delta, 0);
   assert.equal(exactTwoSidedMcNemar(12, 0), 0.00048828125);
 
-  const betterReport = createStatisticsFixtureReport(contracts, { mode: "better" });
-  const better = analyzeSyntheticRunReport({
-    report: betterReport,
-    policy: contracts.comparison_policy,
-  });
-  const betterReplay = analyzeSyntheticRunReport({
-    report: structuredClone(betterReport),
-    policy: structuredClone(contracts.comparison_policy),
-  });
+  const betterReport = fixtureReport({ mode: "better" });
+  assert.throws(
+    () => analyzeSyntheticRunReport({
+      report: betterReport,
+      policy: contracts.comparison_policy,
+    }),
+    (error) => error?.code === "SYNTHETIC_REPORT_SOURCE_BINDING",
+  );
+  const better = analyzeReport(betterReport);
+  const betterReplay = analyzeReport(
+    structuredClone(betterReport),
+    structuredClone(contracts.comparison_policy),
+  );
   assert.deepEqual(betterReplay, better);
   assert.equal(validateSyntheticComparisonReport(better, {
     report: betterReport,
@@ -303,10 +330,7 @@ export function verifyBenchmarkStatistics({ root = defaultRoot } = {}) {
       pair[role].fingerprints.trace = fp(`metadata-trace-${role}-${pairIndex}`);
     }
   }
-  const metadataOnlyReplay = analyzeSyntheticRunReport({
-    report: metadataOnlyReport,
-    policy: contracts.comparison_policy,
-  });
+  const metadataOnlyReplay = analyzeReport(metadataOnlyReport);
   assert.equal(
     metadataOnlyReplay.primary.bootstrap.seed_fingerprint,
     better.primary.bootstrap.seed_fingerprint,
@@ -350,49 +374,37 @@ export function verifyBenchmarkStatistics({ root = defaultRoot } = {}) {
   assert.equal(metricById(better, "incomplete_evidence").pair_scope, "reported_pairs");
   assert.equal(metricById(better, "incomplete_evidence").candidate_rate, 0);
 
-  const worse = analyzeSyntheticRunReport({
-    report: createStatisticsFixtureReport(contracts, { mode: "worse" }),
-    policy: contracts.comparison_policy,
-  });
+  const worse = analyzeReport(fixtureReport({ mode: "worse" }));
   assert.equal(worse.verdict.status, "candidate_worse");
   assert(worse.primary.bootstrap.upper < 0);
   assert.equal(worse.primary.paired_outcomes.baseline_only, 12);
   assert.equal(worse.pareto.scope_safety_regressions.new_canary_safety_regressions, 12);
 
-  const inconclusive = analyzeSyntheticRunReport({
-    report: createStatisticsFixtureReport(contracts, { mode: "inconclusive" }),
-    policy: contracts.comparison_policy,
-  });
+  const inconclusive = analyzeReport(fixtureReport({ mode: "inconclusive" }));
   assert.equal(inconclusive.verdict.status, "inconclusive");
   assert.equal(inconclusive.primary.mcnemar.status, "insufficient_discordance");
   assert.equal(inconclusive.sample.discordant_pairs, 8);
 
-  const noClear = analyzeSyntheticRunReport({
-    report: createStatisticsFixtureReport(contracts, { mode: "balanced" }),
-    policy: contracts.comparison_policy,
-  });
+  const noClear = analyzeReport(fixtureReport({ mode: "balanced" }));
   assert.equal(noClear.verdict.status, "no_clear_difference");
   assert.equal(noClear.primary.mcnemar.status, "computed");
   assert.equal(noClear.primary.mcnemar.p_value, 1);
   assert.equal(noClear.primary.delta, 0);
 
-  const insufficient = analyzeSyntheticRunReport({
-    report: createStatisticsFixtureReport(contracts, { mode: "better", suiteId: "smoke" }),
-    policy: contracts.comparison_policy,
-  });
+  const insufficient = analyzeReport(fixtureReport({
+    mode: "better",
+    suiteId: "smoke",
+  }));
   assert.equal(insufficient.verdict.status, "insufficient_sample");
   assert.equal(insufficient.primary.bootstrap.status, "insufficient_sample");
   assert.equal(insufficient.primary.bootstrap.lower, null);
   assert(insufficient.residual_caveats.includes("smoke-not-eligible-for-candidate-better"));
 
-  const stalePolicy = createStatisticsFixtureReport(contracts, { mode: "better" });
+  const stalePolicy = fixtureReport({ mode: "better" });
   stalePolicy.suite.comparison_policy_fingerprint = fp("stale-policy");
   assert.throws(
-    () => analyzeSyntheticRunReport({
-      report: stalePolicy,
-      policy: contracts.comparison_policy,
-    }),
-    (error) => error?.code === "SYNTHETIC_COMPARISON_POLICY",
+    () => analyzeReport(stalePolicy),
+    (error) => error?.code === "SYNTHETIC_REPORT_SOURCE_BINDING",
   );
   const inconsistentOutput = structuredClone(better);
   inconsistentOutput.primary.paired_outcomes.candidate_only += 1;

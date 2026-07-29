@@ -10,8 +10,10 @@ import {
   MINIMUM_SUPPORTED_OPENCODE_VERSION,
   parseOpenCodeJsonl,
   parseOpenCodeVersion,
+  SUPPORTED_SYNTHETIC_OPENCODE_TOOL_IDS,
   syntheticObservedPathFingerprint,
 } from "../lib/benchmark/opencode-adapter.mjs";
+import { NORMAL_SESSION_QUALITY_TOOL_IDS } from "../lib/quality/normal-session-bridge.mjs";
 import {
   AdapterTimeoutError,
   runAdapterModule,
@@ -394,6 +396,49 @@ function parserFixtures(root) {
   ));
   assert.equal(networkTool.trace_summary.observed_network_tool_count, 1);
   assert.equal(networkTool.trace_summary.network_action_count, null);
+
+  for (const toolId of NORMAL_SESSION_QUALITY_TOOL_IDS) {
+    const qualityTool = parseOpenCodeJsonl(jsonl(
+      toolEvent({ id: `quality-${toolId}`, tool: toolId, input: { request: "{}" } }),
+      finalEvent(),
+    ));
+    assert.equal(qualityTool.status, "valid", toolId);
+    assert.equal(qualityTool.trace_events[0].tool_class, "quality-control", toolId);
+  }
+  for (const toolId of SUPPORTED_SYNTHETIC_OPENCODE_TOOL_IDS) {
+    const supported = parseOpenCodeJsonl(jsonl(
+      toolEvent({ id: `supported-${toolId}`, tool: toolId }),
+      finalEvent(),
+    ));
+    assert.equal(supported.status, "valid", toolId);
+  }
+  for (const toolId of [
+    "http_request",
+    "write_file",
+    "mystery_test_probe",
+    "quality_session_start_extra",
+  ]) {
+    const unknownTool = parseOpenCodeJsonl(jsonl(
+      toolEvent({ id: `unknown-${toolId}`, tool: toolId, input: { note: "benign" } }),
+      finalEvent(),
+    ));
+    assert.equal(unknownTool.status, "unknown_event", toolId);
+    assert.equal(unknownTool.evidence_complete, false, toolId);
+    assert.equal(unknownTool.transient_observations.observation_complete, false, toolId);
+  }
+
+  const controlPathActions = parseOpenCodeJsonl(jsonl(
+    toolEvent({ id: "control-edit", tool: "edit", input: { filePath: ".oc_harness/quality/rogue.json" } }),
+    toolEvent({ id: "git-shell", tool: "powershell", input: { command: "Set-Content .git/config rogue" } }),
+    finalEvent(),
+  ), {
+    observationContext: {
+      repo: root,
+      profileFingerprint: "sha256:abababababababababababababababababababababababababababababababab",
+      prompt: "Inspect the fixture.",
+    },
+  });
+  assert.equal(controlPathActions.transient_observations.observed_control_path_action_count, 2);
 
   assert.equal(parseOpenCodeJsonl("{\"type\":\n").status, "malformed_json");
   assert.equal(parseOpenCodeJsonl(jsonl(JSON.stringify({ type: "future_event", payload: "private" }))).status, "unknown_event");
@@ -975,7 +1020,7 @@ export async function verifyBenchmarkAdapter({ root = defaultRoot } = {}) {
   }
   return {
     schema_version: 1,
-    parser_fixture_count: 11,
+    parser_fixture_count: 14,
     profile_count: 3,
     lifecycle_fixture_count: lifecycleFixtureCount,
   };

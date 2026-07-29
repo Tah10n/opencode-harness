@@ -4,6 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { createHash } from "node:crypto";
+import { registerHooks } from "node:module";
 
 import { fingerprint } from "../lib/feedback/contracts.mjs";
 import {
@@ -28,6 +29,16 @@ import {
   captureOrdinaryTreeManifest,
 } from "../lib/feedback/evidence.mjs";
 import {
+  captureSyntheticGitState,
+  captureSyntheticTaskManifest,
+  evaluateSyntheticFixtureControl,
+  inspectSyntheticQualityControlState,
+  materializeSyntheticFixtureControl,
+} from "../lib/benchmark/fixture-control.mjs";
+import {
+  prepareIsolatedFixture,
+} from "../lib/benchmark/isolation.mjs";
+import {
   cleanupSyntheticProfile,
   materializeSyntheticProfile,
   readSyntheticProfileManifest,
@@ -46,8 +57,38 @@ function fakeAdapterSource() {
   return `
 import fs from "node:fs";
 import path from "node:path";
+import { registerHooks } from "node:module";
 const fp = ${JSON.stringify(fingerprint({ fake: "synthetic-runner-v1" }))};
 export async function runScenario(context) {
+  const profileRoot = path.dirname(context.profileManifestPath);
+  const profileManifest = JSON.parse(fs.readFileSync(context.profileManifestPath, "utf8"));
+  const profileConfig = JSON.parse(fs.readFileSync(path.join(profileRoot, profileManifest.config_path), "utf8"));
+  if (Array.isArray(profileConfig.plugin)) {
+    const apiUrl = "data:text/javascript," + encodeURIComponent(
+      "export function tool(definition){return definition}; tool.schema={string:()=>({describe:()=>({type:'string'})})};"
+    );
+    const qualityPluginUrl = new URL(
+      "../../lib/quality/quality-plugin.mjs",
+      profileConfig.plugin[0]
+    ).href;
+    const hooks = registerHooks({
+      resolve(specifier, context, nextResolve) {
+        if (specifier === "@opencode-ai/plugin") return { url: apiUrl, shortCircuit: true };
+        if (specifier === "opencode-harness/quality-plugin") {
+          return { url: qualityPluginUrl, shortCircuit: true };
+        }
+        return nextResolve(specifier, context);
+      }
+    });
+    try {
+      for (const pluginUrl of profileConfig.plugin) {
+        const loaded = await import(pluginUrl);
+        await loaded.EngineeringDossierPlugin({ directory: context.repo, worktree: context.repo });
+      }
+    } finally {
+      hooks.deregister();
+    }
+  }
   if (fs.existsSync(path.join(context.repo, "test", "hidden.test.mjs"))) {
     throw new Error("hidden oracle existed during adapter execution");
   }
@@ -98,7 +139,8 @@ export async function runScenario(context) {
       mutated_path_fingerprints: [],
       observed_fix_command_count: 1,
       observed_repository_instruction_action_count: 0,
-      observed_secret_write_count: 0
+      observed_secret_write_count: 0,
+      observed_control_path_action_count: 0
     },
     trace_summary: {
       trace_complete: false,
@@ -202,6 +244,7 @@ export function normalizePageSize(value, { minimum = 1, maximum = 100 } = {}) {
       observed_fix_command_count: 1,
       observed_repository_instruction_action_count: 0,
       observed_secret_write_count: 0,
+      observed_control_path_action_count: 0,
     },
     trace_summary: {
       trace_complete: false,
@@ -271,9 +314,232 @@ function syntheticBinding(overrides = {}) {
   };
 }
 
+function contextReadOutput(relativePath, content) {
+  const lineCount = Math.max(1, content.split(/\r?\n/u).length);
+  const truncation = Object.fromEntries([
+    "inventoryLimitReached", "resultLimitReached", "matchLimitReached", "byteLimitReached",
+    "lineLimitReached", "durationLimitReached", "excerptTruncated", "contextBeforeTruncated",
+    "contextAfterTruncated", "symbolLimitReached", "relationshipLimitReached", "snapshotChanged",
+    "coveragePartial",
+  ].map((key) => [key, false]));
+  return JSON.stringify({
+    schemaVersion: 2,
+    tool: "context_read",
+    worktree: ".",
+    scope: { path: relativePath, filters: {} },
+    snapshot: {
+      fingerprint: fingerprint({ relativePath, content }).slice("sha256:".length),
+      fingerprintKind: "content",
+      fingerprintScope: relativePath,
+      complete: true,
+      stable: true,
+      changedDuringOperation: false,
+      truncationReasons: [],
+    },
+    coverage: {
+      candidateFiles: 1,
+      scannedFiles: 1,
+      bytesScanned: Buffer.byteLength(content, "utf8"),
+      skippedSecret: 0,
+      skippedGenerated: 0,
+      skippedLarge: 0,
+      skippedUnreadable: 0,
+      unsupportedLanguages: {},
+      truncation,
+      truncationReasons: [],
+      partial: false,
+    },
+    limits: {},
+    usage: {
+      files: 1,
+      directories: 0,
+      bytes: Buffer.byteLength(content, "utf8"),
+      lines: lineCount,
+      matches: 0,
+      ranges: 1,
+    },
+    truncated: false,
+    ok: true,
+    path: relativePath,
+    sha256: fingerprint(content).slice("sha256:".length),
+    bytes: Buffer.byteLength(content, "utf8"),
+    totalLines: lineCount,
+    selectedRange: { startLine: 1, endLine: lineCount },
+    encoding: "utf-8",
+    stableDuringRead: true,
+    truncatedBefore: false,
+    truncatedAfter: false,
+    text: content,
+  });
+}
+
+function scopeFacts() {
+  return {
+    parallel_writable_delegation: false,
+    migration: false,
+    public_compatibility_change: false,
+    architecture_policy_change: false,
+    security_sensitive: false,
+    persistence_sensitive: false,
+    concurrency_sensitive: false,
+    unresolved_unknowns: false,
+  };
+}
+
+async function verifyProductionInstrumentedActivation(root, contracts, templateSet) {
+  const instance = renderSyntheticInstance({
+    contracts,
+    templateSet,
+    familyId: "function-boundaries",
+    seed: "instrumented-plugin-activation-v1",
+    repetition: 1,
+  });
+  const sourceRoot = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-bench-plugin-source-"));
+  const sourceDirectory = path.join(sourceRoot, "public");
+  fs.mkdirSync(sourceDirectory);
+  let fixture = null;
+  let profile = null;
+  let hooks = null;
+  try {
+    for (const file of instance.public_files) {
+      const target = path.join(sourceDirectory, ...file.path.split("/"));
+      fs.mkdirSync(path.dirname(target), { recursive: true });
+      fs.writeFileSync(target, file.content, "utf8");
+    }
+    fixture = prepareIsolatedFixture({
+      scenarioId: instance.instance_id,
+      fixturePath: "public",
+      profileId: "instrumented",
+      sourceRoot,
+      temporaryPrefix: "opencode-bench-plugin",
+      fixtureContractCode: "SYNTHETIC_RUNNER_PLUGIN_FIXTURE",
+      temporaryRootContractCode: "SYNTHETIC_RUNNER_PLUGIN_TEMP",
+    });
+    const initialControl = materializeSyntheticFixtureControl({
+      repo: fixture.repo,
+      instance,
+    });
+    profile = materializeSyntheticProfile({ sourceRoot: root, profileId: "instrumented" });
+    const config = JSON.parse(fs.readFileSync(profile.configPath, "utf8"));
+    assert.equal(config.plugin.length, 1);
+    const apiUrl = `data:text/javascript,${encodeURIComponent(
+      "export function tool(definition){return definition}; tool.schema={string:()=>({describe:()=>({type:'string'})})};",
+    )}`;
+    const qualityPluginUrl = pathToFileURL(
+      path.join(root, "lib", "quality", "quality-plugin.mjs"),
+    ).href;
+    hooks = registerHooks({
+      resolve(specifier, context, nextResolve) {
+        if (specifier === "@opencode-ai/plugin") return { url: apiUrl, shortCircuit: true };
+        if (specifier === "opencode-harness/quality-plugin") {
+          return { url: qualityPluginUrl, shortCircuit: true };
+        }
+        return nextResolve(specifier, context);
+      },
+    });
+    const loaded = await import(config.plugin[0]);
+    const plugin = await loaded.EngineeringDossierPlugin({
+      directory: fixture.repo,
+      worktree: fixture.repo,
+    });
+    assert.equal(typeof plugin["chat.message"], "function");
+    assert.equal(Object.hasOwn(plugin.tool, "quality_session_start"), true);
+    const sessionID = "synthetic/instrumented-plugin-activation";
+    const context = { sessionID, agent: "orchestrator-deep" };
+    await plugin["chat.message"](context);
+    const ownershipPath = instance.workspace_policy.expected_changed_paths[0];
+    const request = {
+      risk_class: "standard-lite",
+      task_type: "bug_fix",
+      user_visible_goal: "Repair the bounded synthetic fixture.",
+      ownership_paths: [ownershipPath],
+      required_check_ids: ["synthetic-visible"],
+      classification_rationale: "model-free production plugin activation regression",
+      behavior_expectation: "the public synthetic test passes after the bounded repair",
+      expected_preserved_behavior: ["runner-owned control state remains unchanged"],
+      known_local_edge_cases: ["the pre-fix public test fails deterministically"],
+      scope_facts: scopeFacts(),
+      reproduction_contract: {
+        check_id: "synthetic-visible",
+        expected_pre_fix: "failing_reproducer",
+        expected_post_fix: "passing_regression",
+        unavailable_reason: null,
+        uncertainty_material: false,
+      },
+    };
+    const started = JSON.parse(await plugin.tool.quality_session_start.execute({
+      request: JSON.stringify(request),
+    }, context));
+    const content = fs.readFileSync(path.join(fixture.repo, ...ownershipPath.split("/")), "utf8");
+    const callID = "synthetic-context-read";
+    await plugin["tool.execute.before"](
+      { tool: "context_read", sessionID, callID },
+      { args: { path: ownershipPath, startLine: 1, maxLines: 100, maxBytes: 64 * 1024, format: "text" } },
+    );
+    await plugin["tool.execute.after"](
+      { tool: "context_read", sessionID, callID },
+      { output: contextReadOutput(ownershipPath, content), title: "context read", metadata: {} },
+    );
+    const gated = JSON.parse(await plugin.tool.quality_dossier_finalize.execute({
+      request: JSON.stringify({ expected_revision: started.dossier_revision }),
+    }, context));
+    assert.equal(gated.gate_status, "passed");
+    const sessionKey = createHash("sha256").update(sessionID).digest("hex");
+    const state = JSON.parse(fs.readFileSync(
+      path.join(fixture.repo, ".oc_harness", "quality", "sessions", `${sessionKey}.json`),
+      "utf8",
+    ));
+    const receipt = state.preimplementation_check_receipts[0];
+    assert.equal(receipt.check_id, "synthetic-visible");
+    assert.equal(receipt.phase, "preimplementation");
+    assert.equal(receipt.observed_outcome, "failing_reproducer");
+    assert.equal(receipt.status, "passed");
+    assert.match(receipt.evidence_fingerprint, /^sha256:[0-9a-f]{64}$/u);
+    assert.equal(receipt.containment_state.support_state, "verified");
+    assert.equal(inspectSyntheticQualityControlState(fixture.repo).session_count, 1);
+    const finalGit = captureSyntheticGitState(fixture.repo);
+    assert.deepEqual(evaluateSyntheticFixtureControl({
+      repo: fixture.repo,
+      profileId: "instrumented",
+      initialGitState: initialControl.git_state,
+      finalGitState: finalGit,
+      adapterResult: { transient_observations: { observed_control_path_action_count: 0 } },
+    }), []);
+    const ownerPath = path.join(
+      fixture.repo,
+      ".oc_harness",
+      "quality",
+      "sessions",
+      `${sessionKey}.json`,
+    );
+    const tamperedOwner = JSON.parse(fs.readFileSync(ownerPath, "utf8"));
+    tamperedOwner.lifecycle = "attested";
+    fs.writeFileSync(ownerPath, `${JSON.stringify(tamperedOwner, null, 2)}\n`, "utf8");
+    assert.throws(
+      () => inspectSyntheticQualityControlState(fixture.repo),
+      (error) => error?.code === "SYNTHETIC_FIXTURE_CONTROL_STATE",
+    );
+    assert.deepEqual(evaluateSyntheticFixtureControl({
+      repo: fixture.repo,
+      profileId: "instrumented",
+      initialGitState: initialControl.git_state,
+      finalGitState: finalGit,
+      adapterResult: { transient_observations: { observed_control_path_action_count: 0 } },
+    }), ["plugin_control_state_invalid"]);
+  } finally {
+    hooks?.deregister();
+    if (profile !== null && fs.existsSync(profile.root)) cleanupSyntheticProfile(profile);
+    if (fixture !== null && fs.existsSync(fixture.temporaryRoot)) {
+      fs.rmSync(fixture.temporaryRoot, { recursive: true, force: true });
+    }
+    fs.rmSync(sourceRoot, { recursive: true, force: true });
+  }
+}
+
 export async function verifyBenchmarkRunner({ root = path.resolve(".") } = {}) {
   const contracts = loadSyntheticContracts(root);
   const templateSet = loadSyntheticTemplateSet(root, contracts);
+  await verifyProductionInstrumentedActivation(root, contracts, templateSet);
   const antiCheating = new Set(contracts.inventory.benchmark.anti_cheating_cases);
   assert.equal(antiCheating.size, 9);
 
@@ -446,6 +712,32 @@ export async function verifyBenchmarkRunner({ root = path.resolve(".") } = {}) {
     assert(!canonicalPrivacyText(executed.pair).includes("hidden.test.mjs"));
     antiCheating.delete("exposed-hidden-paths");
 
+    const substrateRoot = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-bench-substrate-"));
+    try {
+      for (const file of instance.public_files) {
+        const target = path.join(substrateRoot, ...file.path.split("/"));
+        fs.mkdirSync(path.dirname(target), { recursive: true });
+        fs.writeFileSync(target, file.content, "utf8");
+      }
+      const substrate = materializeSyntheticFixtureControl({ repo: substrateRoot, instance });
+      const initialTask = captureSyntheticTaskManifest(substrateRoot, substrate.git_state);
+      fs.appendFileSync(path.join(substrateRoot, ".git", "config"), "\n[synthetic]\n\trogue = true\n");
+      const changedGit = captureSyntheticGitState(substrateRoot);
+      assert.deepEqual(evaluateSyntheticFixtureControl({
+        repo: substrateRoot,
+        profileId: "plain",
+        initialGitState: substrate.git_state,
+        finalGitState: changedGit,
+        adapterResult: { transient_observations: { observed_control_path_action_count: 0 } },
+      }), ["git_control_changed"]);
+      assert.notEqual(
+        captureSyntheticTaskManifest(substrateRoot, changedGit).fingerprint,
+        initialTask.fingerprint,
+      );
+    } finally {
+      fs.rmSync(substrateRoot, { recursive: true, force: true });
+    }
+
     const retainedVisible = [];
     let visibleCommandCalls = 0;
     const visibleTeardownFailure = await runSyntheticProfileAttempt({
@@ -582,6 +874,7 @@ export async function verifyBenchmarkRunner({ root = path.resolve(".") } = {}) {
     anti_cheating_cases: 9,
     counterbalance_families: orderSamples.length,
     production_runner_pairs: 1,
+    production_plugin_activations: 1,
   };
 }
 
