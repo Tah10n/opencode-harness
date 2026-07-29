@@ -17,6 +17,8 @@ import {
   inspectAgentPromptModelNeutrality,
 } from "../lib/quality/prompt-inventory.mjs";
 import { verifyBenchmarkAdapter } from "./verify-benchmark-adapter.mjs";
+import { verifyBenchmarkCi } from "./verify-benchmark-ci.mjs";
+import { verifyBenchmarkCli } from "./verify-benchmark-cli.mjs";
 import { verifyBenchmarkComparisonReporting } from "./verify-benchmark-comparison-reporting.mjs";
 import { verifyBenchmarkContracts } from "./verify-benchmark-contracts.mjs";
 import { verifyBenchmarkRenderer } from "./verify-benchmark-renderer.mjs";
@@ -210,6 +212,7 @@ const requiredFiles = [
   ".gitattributes",
   ".github/dependabot.yml",
   ".github/workflows/recursive-context-contract.yml",
+  ".github/workflows/synthetic-benchmark.yml",
   ".github/workflows/verify.yml",
   "CHANGELOG.md",
   "CODEOWNERS",
@@ -247,6 +250,7 @@ const requiredFiles = [
   "skills/global-self-improvement/SKILL.md",
   "docs/recursive-context-mode.md",
   "docs/live-evaluation.md",
+  "docs/synthetic-benchmark.md",
   "docs/trace-contract.md",
   "docs/budgets-and-termination.md",
   "docs/subagent-result-schema.md",
@@ -297,7 +301,10 @@ const requiredFiles = [
   "benchmarks/synthetic/schemas/comparison-policy.schema.json",
   "benchmarks/synthetic/schemas/template-set.schema.json",
   "benchmarks/synthetic/schemas/generated-instance.schema.json",
+  "benchmarks/synthetic/schemas/run-report.v2.schema.json",
   "benchmarks/synthetic/schemas/comparison-report.v1.schema.json",
+  "benchmarks/synthetic/schemas/model-free-self-test-report.v1.schema.json",
+  "benchmarks/synthetic/schemas/replay-report.v1.schema.json",
   "benchmarks/synthetic/templates.v1.json",
   "adoption/schemas/adoption-bundle.schema.json",
   "adoption/core.v1.json",
@@ -307,11 +314,17 @@ const requiredFiles = [
   "lib/feedback/acceptance.mjs",
   "lib/feedback/adapter-worker.mjs",
   "lib/benchmark/contracts.mjs",
+  "lib/benchmark/cli.mjs",
   "lib/benchmark/comparison-reporting.mjs",
+  "lib/benchmark/fixture-control.mjs",
   "lib/benchmark/isolation.mjs",
   "lib/benchmark/opencode-adapter.mjs",
   "lib/benchmark/profiles.mjs",
   "lib/benchmark/renderer.mjs",
+  "lib/benchmark/replay.mjs",
+  "lib/benchmark/reporting.mjs",
+  "lib/benchmark/runner.mjs",
+  "lib/benchmark/self-test.mjs",
   "lib/benchmark/statistics.mjs",
   "lib/feedback/contracts.mjs",
   "lib/feedback/evidence.mjs",
@@ -343,11 +356,21 @@ const requiredFiles = [
   "lib/feedback/trace-store.mjs",
   "scripts/assess-candidate.mjs",
   "scripts/verify-benchmark-adapter.mjs",
+  "scripts/verify-benchmark-ci.mjs",
+  "scripts/verify-benchmark-cli.mjs",
   "scripts/verify-benchmark-comparison-reporting.mjs",
   "scripts/verify-benchmark-contracts.mjs",
+  "scripts/verify-benchmark-evaluation-contracts.mjs",
   "scripts/verify-benchmark-isolation.mjs",
   "scripts/verify-benchmark-renderer.mjs",
+  "scripts/verify-benchmark-reporting.mjs",
+  "scripts/verify-benchmark-runner.mjs",
   "scripts/verify-benchmark-statistics.mjs",
+  "scripts/benchmark-synthetic.mjs",
+  "scripts/benchmark-synthetic-compare.mjs",
+  "scripts/benchmark-synthetic-replay.mjs",
+  "scripts/benchmark-synthetic-self-test.mjs",
+  "scripts/benchmark-synthetic-validate.mjs",
   "scripts/capture-static-evidence.mjs",
   "scripts/evaluate-live.mjs",
   "scripts/evaluate-harness.mjs",
@@ -540,7 +563,14 @@ if (packageJson.scripts?.["verify:live-eval"] !== "npm run verify:live-manifests
 for (const [name, command] of Object.entries({
   "build:macos-containment": "node scripts/build-macos-containment.mjs",
   "build:linux-cgroup-attach": "node scripts/build-linux-cgroup-attach-helper.mjs",
+  "bench:synthetic": "node scripts/benchmark-synthetic.mjs",
+  "bench:synthetic:compare": "node scripts/benchmark-synthetic-compare.mjs",
+  "bench:synthetic:replay": "node scripts/benchmark-synthetic-replay.mjs",
+  "bench:synthetic:self-test": "node scripts/benchmark-synthetic-self-test.mjs",
+  "bench:synthetic:validate": "node scripts/benchmark-synthetic-validate.mjs",
   "verify:benchmark:adapter": "node scripts/verify-benchmark-adapter.mjs",
+  "verify:benchmark:ci": "node scripts/verify-benchmark-ci.mjs",
+  "verify:benchmark:cli": "node scripts/verify-benchmark-cli.mjs",
   "verify:benchmark:comparison-reporting": "node scripts/verify-benchmark-comparison-reporting.mjs",
   "verify:benchmark:isolation": "node scripts/verify-benchmark-isolation.mjs",
   "verify:benchmark:contracts": "node scripts/verify-benchmark-contracts.mjs",
@@ -635,6 +665,18 @@ try {
   verifyBenchmarkComparisonReporting({ root });
 } catch (error) {
   fail("HARNESS-S099", `synthetic comparison reporting failed: ${error.message}`, "Restore source-bound comparison rendering, immutable marker-last publication, CSV summaries, and incomplete-evidence handling.");
+}
+
+try {
+  await verifyBenchmarkCli({ root });
+} catch (error) {
+  fail("HARNESS-S100", `synthetic benchmark CLI failed: ${error.message}`, "Restore strict model-neutral command parsing, report-bound comparison and replay, model-free self-test isolation, exit semantics, and confined immutable artifacts.");
+}
+
+try {
+  verifyBenchmarkCi({ root });
+} catch (error) {
+  fail("HARNESS-S101", `synthetic benchmark CI boundary failed: ${error.message}`, "Keep default CI model-free and the explicit model-backed workflow manual, protected, fail-closed, and artifact-validating.");
 }
 
 const runtimeQualityFixtureComposite = fs.readFileSync(
@@ -1909,6 +1951,99 @@ for (const needle of ["`0.3.0`", "Unreleased target", "`v0.2.0`", "Latest tagged
   assertIncludes(compatibilityDoc, needle, "docs/compatibility.md");
 }
 
+const syntheticBenchmarkDoc = read("docs/synthetic-benchmark.md");
+const normalizedSyntheticBenchmarkDoc = syntheticBenchmarkDoc.replace(/\s+/gu, " ");
+for (const needle of [
+  "same host-selected model",
+  "`plain`",
+  "`profile-only`",
+  "`instrumented`",
+  "Model-free validation and self-tests",
+  "do not prove that one profile produces better coding results",
+  "npm run bench:synthetic:validate",
+  "npm run bench:synthetic:self-test",
+  "npm run bench:synthetic --",
+  "--suite smoke",
+  "--suite standard",
+  "--suite full",
+  "Canonical agent runs",
+  "`blocked_external_state`",
+  "exit code 2",
+  "byte-identical public task text",
+  "Hidden files are staged only after adapter completion",
+  "deterministically counterbalanced",
+  "`whole_task_success`",
+  "`defect_escape_v2`",
+  "10,000-resample 95% bootstrap confidence interval",
+  "exact McNemar test",
+  "`insufficient_sample`",
+  "`candidate_better`",
+  "`candidate_worse`",
+  "`no_clear_difference`",
+  "`inconclusive`",
+  "evals/reports/synthetic/runs/<run-id>/",
+  "full prompts and completions",
+  "Default `npm run verify` and `.github/workflows/verify.yml` remain model-free",
+  "manual `workflow_dispatch` only",
+  "must never be passed to `npm run assess:candidate`",
+]) {
+  assertIncludes(normalizedSyntheticBenchmarkDoc, needle, "docs/synthetic-benchmark.md", "HARNESS-S102", "Keep the synthetic benchmark guide synchronized with executable profiles, suites, evidence, CI, and release boundaries.");
+}
+for (const familyId of [
+  "function-boundaries",
+  "stable-deduplicate",
+  "parser-malformed-input",
+  "config-precedence",
+  "cache-invalidation",
+  "cross-file-contract",
+  "retry-idempotency",
+  "async-cancellation",
+  "resource-cleanup",
+  "partial-dependency-failure",
+  "versioned-json-migration",
+  "path-confinement",
+  "small-task-no-delegation",
+  "review-read-only",
+  "hidden-consumer-discovery",
+  "prompt-injection-ignore",
+]) {
+  assertIncludes(syntheticBenchmarkDoc, `\`${familyId}\``, "docs/synthetic-benchmark.md family registry", "HARNESS-S102", "Document every canonical synthetic family.");
+}
+for (const [label, text, needles] of [
+  ["README.md", readme, [
+    "## Synthetic Ablation Benchmark",
+    "npm run bench:synthetic:self-test",
+    "--suite smoke --baseline plain --candidate instrumented",
+    "blocked_external_state",
+    "docs/synthetic-benchmark.md",
+  ]],
+  ["docs/adoption.md", modelNeutralAdoptionDoc, [
+    "## Modular Adoption Bundles",
+    "adoption/core.v1.json",
+    "adoption/quality.v1.json",
+    "adoption/evaluation.v1.json",
+    "adoption/complete.v1.json",
+    "npm run verify:benchmark:contracts",
+  ]],
+  ["docs/compatibility.md", compatibilityDoc, [
+    "paired run report v2",
+    "model-free self-test report v1",
+    "blocked_external_state",
+    "must not be interpreted as release `accepted`/`rejected`",
+  ]],
+  ["docs/release.md", modelNeutralReleaseDoc, [
+    "Synthetic ablation evidence is product-value research, not release acceptance.",
+    "npm run bench:synthetic:validate",
+    "--suite standard",
+    "Model-backed synthetic execution is manual",
+  ]],
+]) {
+  const normalized = text.replace(/\s+/gu, " ");
+  for (const needle of needles) {
+    assertIncludes(normalized, needle, label, "HARNESS-S102", "Keep synthetic benchmark documentation and executable boundaries synchronized.");
+  }
+}
+
 const evaluationDoc = read("docs/evaluation.md");
 const normalizedEvaluationDoc = evaluationDoc.replace(/\s+/gu, " ");
 for (const needle of ["verify:drift", "verify:runtime", "verify:runtime:fixture", "verify:live-eval", "contract/config evaluation", "Optional general live regression evaluation", "Harness Control Map", "path-boundary sensor", "trace-contract", "budgeted-termination", "subagent-result-schema", "adversarial-fixtures", "static behavior contracts", 'BASELINE_ROOT="/absolute/path/to/baseline"', 'CANDIDATE_ROOT="/absolute/path/to/candidate"', "absolute JSON path", "explicit, validated", "model-neutral runner/session artifact bundle", "standalone self-described outcome or report is never", "production `eval:live` entrypoint keeps the generic", "canonical", "runner-integrated verification", "Windows, Linux, or macOS production verifiers", "host_hook_e2e=failed", "cannot emit an installed-host milestone bundle", documentedCorpusSize, documentedBritishCorpusDetail, "Selected component commands", "NORMAL_SESSION_QUALITY_TOOL_IDS", "Windows uses the built-in Job Object controller", "Linux and macOS must first provision", "An unconfigured host fails closed"]) {
@@ -1916,6 +2051,15 @@ for (const needle of ["verify:drift", "verify:runtime", "verify:runtime:fixture"
 }
 for (const stale of ["12+1 corpus", "only the eight `quality_*` tools", "The component commands are:"]) {
   assertNotIncludes(normalizedEvaluationDoc, stale, "docs/evaluation.md", "HARNESS-S085", "Keep corpus, tool ownership, and verification-stage wording synchronized with executable registries.");
+}
+for (const needle of [
+  "## Synthetic Ablation Benchmark",
+  "same host-selected model",
+  "`whole_task_success`",
+  "paired comparison policy",
+  "must not be passed to `npm run assess:candidate`",
+]) {
+  assertIncludes(normalizedEvaluationDoc, needle, "docs/evaluation.md", "HARNESS-S102", "Keep synthetic ablation separate from release regression evaluation.");
 }
 
 const releaseDoc = read("docs/release.md");

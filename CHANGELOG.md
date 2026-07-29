@@ -6,6 +6,21 @@ This section describes the development checkout. The latest tagged release is
 still `v0.2.0`; its package metadata has no `exports` field and does not expose
 the feedback-plane ESM subpaths documented for the `0.3.0` target.
 
+- Added a model-neutral synthetic ablation benchmark with honest `plain`,
+  `profile-only`, and `instrumented` profiles; 16 deterministic short-task
+  families; smoke, standard, and full suites; seeded declarative rendering;
+  isolated real OpenCode execution; counterbalanced paired runs; hidden staging
+  after verified teardown; corrected `defect_escape_v2`; paired statistics;
+  immutable privacy-safe JSON/Markdown/CSV reports; replay; and model-free
+  validation/self-tests.
+- Added strict versioned run, comparison, replay, and self-test schemas; simple
+  benchmark/compare/replay commands; a protected manual self-hosted
+  model-backed workflow; and model-free default-CI sensors that never simulate
+  model success. Synthetic verdicts remain separate from the existing
+  `assess:candidate` release acceptance contract.
+- Added mechanically verified core, quality, evaluation, and complete adoption
+  views backed by the canonical profile inventory. The isolated core view
+  excludes benchmark, quality, and native containment infrastructure.
 - Made the core profile model-neutral: all 11 agent frontmatters now defer model
   selection to OpenCode, prompt inventory v3 removes model/provider options from
   quality policy while retaining strict v2 read compatibility, and static plus

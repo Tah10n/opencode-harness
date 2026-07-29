@@ -58,6 +58,13 @@ cannot omit that preimplementation chain.
 - Trace writers emit schema version 2. Readers accept the exact documented
   schema-v1 event shape when safe, but do not reinterpret malformed legacy
   artifacts or append v2 events to a v1 stream.
+- Synthetic benchmark artifacts use separate strict schemas: paired run report
+  v2, paired comparison report v1, replay report v1, and model-free self-test
+  report v1. They do not alter the existing live release-report readers or
+  candidate-assessment evidence chain.
+- The benchmark CLI returns `blocked_external_state` with exit code 2 when a
+  host-selected model or compatible real OpenCode adapter is unavailable. It
+  never converts missing external state into model success.
 - `opencode-recursive-context` defines its own Node.js support policy.
 - `opencode-learning-guard` defines its own Node.js support policy.
 
@@ -111,6 +118,15 @@ Optional general live regression evaluation is compatibility-adjacent
 behavioural evidence for
 prompt, orchestration, delegation, and review-loop changes. It does not replace
 static or runtime permission checks.
+
+Synthetic ablation is a second, explicitly separate behavioural path. It may
+compare `plain`, `profile-only`, and `instrumented` profiles whose expected
+tool and permission surfaces differ, while mechanically rejecting unexpected
+dangerous widening. Its `candidate_better`, `candidate_worse`,
+`no_clear_difference`, `inconclusive`, and `insufficient_sample` verdicts must
+not be interpreted as release `accepted`/`rejected` decisions or passed to
+`npm run assess:candidate`. See
+[synthetic-benchmark.md](synthetic-benchmark.md).
 
 The live runner requires an explicit host adapter module, baseline/candidate
 profiles, and content-bound installed permission evidence for both. A missing

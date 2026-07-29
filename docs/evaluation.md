@@ -29,6 +29,45 @@ LLM. It belongs to the `infrastructure` suite and does not count toward
 acceptance metrics. Static behavior contracts do not claim actual model
 behaviour was tested.
 
+## Synthetic Ablation Benchmark
+
+Synthetic ablation is a separate product-value experiment for the same
+host-selected model under `plain`, `profile-only`, and `instrumented`
+profiles. Unlike release candidate assessment, it intentionally permits
+declared profile surface differences, displays them, checks for unexpected
+dangerous widening, and applies a predeclared paired comparison policy.
+
+Its primary metric is `whole_task_success`; pairing uses family, generated
+instance fingerprint, and repetition. The analyzer reports family
+macro-averages, paired outcomes, deterministic bootstrap confidence intervals,
+exact McNemar tests when eligible, category/risk breakdowns, and a quality,
+duration, cost, and safety Pareto view. It emits no release
+`accepted`/`rejected` decision.
+
+Model-free entrypoints:
+
+```sh
+npm run bench:synthetic:validate
+npm run bench:synthetic:self-test
+```
+
+Cheap model-backed entrypoint:
+
+```sh
+npm run bench:synthetic -- \
+  --suite smoke \
+  --baseline plain \
+  --candidate instrumented \
+  --seed 20260728 \
+  --repetitions 1
+```
+
+Missing model/runtime configuration returns `blocked_external_state` instead
+of fabricated success. Synthetic reports remain separate from and must not be
+passed to `npm run assess:candidate`. See
+[synthetic-benchmark.md](synthetic-benchmark.md) for suites, families,
+fairness, hidden staging, replay, report integrity, and limitations.
+
 ## Deterministic Commands
 
 Run the complete local/CI gate:

@@ -68,18 +68,22 @@ CONTRIBUTING.md
 LICENSE
 README.md
 SECURITY.md
+adoption
 agents
+benchmarks
 commands
 docs
 evals
 examples
 fixtures
+lib/benchmark
 lib/feedback
 lib/quality
 native
 opencode.json
 package-lock.json
 package.json
+profiles
 quality
 scripts
 skills
@@ -88,8 +92,10 @@ skills
 
 The plugin is not a standalone file: it imports the `lib/quality/` boundary,
 and the package smoke imports both `opencode-harness/feedback` and
-`opencode-harness/quality`. Do not replace the explicit plugin path with all of
-`.opencode/`, and do not copy `.opencode/node_modules`,
+`opencode-harness/quality`. The `adoption/`, `benchmarks/`, `profiles/`, and
+`lib/benchmark/` entries are the executable synthetic-benchmark contract
+closure. Do not replace the explicit plugin path with all of `.opencode/`, and
+do not copy `.opencode/node_modules`,
 `.opencode/package.json`, `.opencode/package-lock.json`, runtime state, or
 generated evidence.
 
@@ -105,6 +111,30 @@ Trace, budget, and subagent handoff contracts live in
 [docs/subagent-result-schema.md](docs/subagent-result-schema.md). Model-neutral
 host-selection guidance lives in
 [docs/model-profiles.md](docs/model-profiles.md).
+
+## Synthetic Ablation Benchmark
+
+The separate synthetic benchmark compares the same host-selected model as
+`plain`, `profile-only`, or `instrumented` without changing the existing
+release acceptance contract. Validate the model-free machinery and run the
+cheap 16-agent smoke pair with:
+
+```powershell
+npm run bench:synthetic:validate
+npm run bench:synthetic:self-test
+npm run bench:synthetic -- --suite smoke --baseline plain --candidate instrumented --seed 20260728 --repetitions 1
+```
+
+Configure `OPENCODE_BENCH_MODEL` in the host or add
+`--model <host-selected-model>`. Missing model/runtime state returns
+`blocked_external_state` with exit code 2; it never creates fake passing
+evidence. A completed command means the comparison evidence is complete, not
+that the candidate won. Model-free checks do not prove model quality.
+
+See [docs/synthetic-benchmark.md](docs/synthetic-benchmark.md) for the profile
+contracts, 16 families, smoke/standard/full commands, fairness and hidden-data
+isolation, paired statistics, report privacy, replay, manual CI, and the strict
+separation from `npm run assess:candidate`.
 
 ## Adoption
 
@@ -377,6 +407,14 @@ when changing adoption contents or package boundaries:
 
 ```powershell
 npm run verify:adoption-bundle
+```
+
+Synthetic benchmark model-free checks are also available directly:
+
+```powershell
+npm run bench:synthetic:validate
+npm run bench:synthetic:self-test
+npm run verify:benchmark:ci
 ```
 
 Milestones 2 and 3 model-free quality checks are also available individually:

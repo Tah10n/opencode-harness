@@ -4,6 +4,13 @@ The current development target is unreleased `0.3.0`; the latest tagged
 release remains `v0.2.0`. Do not describe the feedback package exports as a
 tagged capability until a `v0.3.0` release completes these gates.
 
+Synthetic ablation evidence is product-value research, not release acceptance.
+Its profile surfaces may intentionally differ, and its reports must not be
+passed to `npm run assess:candidate`. The existing compatible-surface
+release-regression contract and first-party evidence chain remain
+authoritative for candidate decisions. Passing model-free synthetic checks
+proves only the benchmark machinery, not that a harness profile is better.
+
 ## Pre-Release Checks
 
 1. Ensure the worktree is clean or contains only release-intended changes.
@@ -12,6 +19,33 @@ tagged capability until a `v0.3.0` release completes these gates.
    ```sh
    npm run verify
    ```
+
+   The default gate remains model-free and includes synthetic schemas,
+   deterministic rendering, hidden-data isolation, fake-adapter lifecycle,
+   statistics, report history, bundle composition, CLI, and CI-boundary
+   checks. The focused model-free commands are:
+
+   ```sh
+   npm run bench:synthetic:validate
+   npm run bench:synthetic:self-test
+   ```
+
+   When credentials and a compatible contained OpenCode host are explicitly
+   available, a separate standard product-value experiment may be run:
+
+   ```sh
+   npm run bench:synthetic -- \
+     --suite standard \
+     --baseline profile-only \
+     --candidate instrumented \
+     --seed 20260728 \
+     --repetitions 3
+   ```
+
+   Record its immutable report separately. A complete result may inform
+   engineering judgment, but it does not satisfy or feed the release candidate
+   acceptance gate. Model-backed synthetic execution is manual and does not
+   run in the default workflow.
 
    Windows uses the built-in Job Object controller. Before running this gate on
    Linux or macOS, provision the guarded cgroup-v2 or exclusive-UID boundary

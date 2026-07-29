@@ -55,18 +55,22 @@ CONTRIBUTING.md
 LICENSE
 README.md
 SECURITY.md
+adoption
 agents
+benchmarks
 commands
 docs
 evals
 examples
 fixtures
+lib/benchmark
 lib/feedback
 lib/quality
 native
 opencode.json
 package-lock.json
 package.json
+profiles
 quality
 scripts
 skills
@@ -75,8 +79,10 @@ skills
 
 The exact plugin file depends on `lib/quality/` and the checked `quality/`
 schemas, policies, prompt inventory, and live sidecars. The package boundary
-also needs `lib/feedback/`, and the scripts, eval manifests, fixtures, and
-metadata above are executable inputs to deterministic verification.
+also needs `lib/feedback/`. The `adoption/`, `benchmarks/`, `profiles/`, and
+`lib/benchmark/` entries close the executable synthetic-benchmark contract;
+the scripts, eval manifests, fixtures, and metadata above are deterministic
+verification inputs.
 `fixtures/sample-project/` and `fixtures/live/` remain required subsets of the
 declared `fixtures` entry. Do not copy the whole `.opencode/` directory.
 
@@ -103,6 +109,47 @@ package exports them.
 Do not copy machine-local operational artifacts into the template.
 `.oc_harness/`, `evals/reports/`, and `evals/decisions/` remain ignored local
 state.
+
+## Modular Adoption Bundles
+
+`profiles/inventory.v1.json` is the canonical machine-readable source for
+profile membership, role permissions, required skills, benchmark composition,
+and adoption composition. The small manifests in `adoption/` select strict
+views from that inventory:
+
+- `adoption/core.v1.json` materializes `profile-only`: prompt-level
+  orchestration, scoped delegation, review ledger, termination policy,
+  verifier workflow, and safe permissions. Its isolated verifier proves that
+  it does not pull in the synthetic corpus, `lib/benchmark/`, `lib/quality/`,
+  `quality/`, or native containment;
+- `adoption/quality.v1.json` extends core with `instrumented`: the quality
+  plugin, Engineering Dossier, context evidence, trusted checks,
+  computational mutation gate, reconciliation, and attestation;
+- `adoption/evaluation.v1.json` extends quality with the honest `plain`
+  baseline, synthetic corpus, seeded renderer, real OpenCode adapter, paired
+  runner, statistics, privacy-safe reports, replay, and CLI commands;
+- `adoption/complete.v1.json` extends evaluation with the documentation and
+  release tooling used to develop and publish this repository.
+
+Validate all four compositions, the isolated core boundary, the importable
+quality/evaluation transitive closures, missing-dependency negative fixtures,
+and model-free validation executed from the materialized evaluation bundle
+with:
+
+```sh
+npm run verify:benchmark:contracts
+```
+
+The existing complete portable source-bundle smoke remains:
+
+```sh
+npm run verify:adoption-bundle
+```
+
+The evaluation bundle is optional for prompt-only adopters. Generated
+instances and `evals/reports/synthetic/` remain ignored operational state, not
+source-bundle inputs. See [synthetic-benchmark.md](synthetic-benchmark.md) for
+the benchmark execution and evidence contract.
 
 ## Local State Boundary
 
