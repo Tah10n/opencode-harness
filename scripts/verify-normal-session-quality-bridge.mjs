@@ -6,6 +6,7 @@ import process from "node:process";
 import { spawnSync } from "node:child_process";
 
 import {
+  NORMAL_SESSION_BRIDGE_PRODUCER,
   bindArchitectureEvaluatorImplementationFingerprint,
   createDefaultNormalSessionCheckCatalog,
   createNormalSessionQualityBridge,
@@ -16,11 +17,19 @@ import {
   handleNormalSessionToolAfter,
   handleNormalSessionToolBefore,
   inspectNormalSessionQualityState,
+  inspectNormalSessionRegistration,
   normalSessionQualityStatePath,
 } from "../lib/quality/normal-session-bridge.mjs";
 import { createNormalSessionQualityPlugin } from "../lib/quality/normal-session-plugin.mjs";
 import { PREMORTEM_CATEGORIES } from "../lib/quality/constants.mjs";
 import { createEngineeringCheckCatalog } from "../lib/quality/gate.mjs";
+import {
+  compareProjectCheckIds,
+  projectCheckCatalogFingerprint,
+  projectCatalogToEngineeringCatalog,
+  validateTimeoutOnlyProjectCatalogRotation,
+} from "../lib/quality/project-check-catalog.mjs";
+import { validateQualityCatalogRotationReceipt } from "../lib/quality/session-classification.mjs";
 import { buildEngineeringImpactGraph } from "../lib/quality/impact-graph.mjs";
 import {
   WORKSPACE_SNAPSHOT_SCHEMA_VERSION,
@@ -1376,6 +1385,7 @@ handleNormalSessionEvent(bridge, {
 });
 const generalChildState = inspectNormalSessionQualityState(bridge, "session/general");
 assert.equal(generalChildState.record_kind, "child_link");
+assert.equal(generalChildState.schema_version, 5);
 assert.equal(Object.hasOwn(generalChildState, "capabilities"), false, "child link must not clone parent capabilities");
 handleNormalSessionToolAfter(bridge, { tool: "task", sessionID: orchestrator.sessionID, callID: "call-task" });
 
@@ -1427,11 +1437,22 @@ assert.equal(secondEdit.status, "ask", "the permission hook must not upgrade ask
 currentPathVersions.set("src/file.mjs", 2);
 handleNormalSessionToolAfter(bridge, { tool: "apply_patch", sessionID: orchestrator.sessionID, callID: "call-edit-2" });
 assert.equal(inspectNormalSessionQualityState(bridge, orchestrator.sessionID).verification, null, "later edit must invalidate verification");
+invoke("quality_action_authorize", { expected_revision: dossierRevision, kind: "edit", paths: ["src/second.mjs"] });
+handleNormalSessionToolBefore(
+  bridge,
+  { tool: "edit", sessionID: orchestrator.sessionID, callID: "call-edit-3" },
+  nativeEdit("src/second.mjs"),
+);
+currentPathVersions.set("src/second.mjs", 1);
+handleNormalSessionToolAfter(
+  bridge,
+  { tool: "edit", sessionID: orchestrator.sessionID, callID: "call-edit-3" },
+);
 handleNormalSessionToolBefore(bridge, { tool: "task", sessionID: orchestrator.sessionID, callID: "call-verifier-2" }, nativeTask("verifier"));
 handleNormalSessionEvent(bridge, { type: "session.created", properties: { info: { id: "session/verifier-2", parentID: orchestrator.sessionID } } });
   verification = invoke("quality_verification_record", { expected_revision: dossierRevision }, { sessionID: "session/verifier-2", agent: "verifier" });
   handleNormalSessionToolAfter(bridge, { tool: "task", sessionID: orchestrator.sessionID, callID: "call-verifier-2" });
-  assert.equal(verification.mutation_revision, 2);
+  assert.equal(verification.mutation_revision, 3);
   const finalReconciliation = recordPassedReviewerReconciliation(bridge, orchestrator);
   assert.equal(finalReconciliation.status, "passed", JSON.stringify(finalReconciliation));
   const attestation = invoke("quality_session_finalize", { expected_revision: dossierRevision });
@@ -1479,6 +1500,121 @@ for (const role of ["architect", "reviewer"]) {
     request: JSON.stringify({ expected_revision: 1, blockers: [] }),
   }, { ...insufficientChallengeContext, agent: role }), "QUALITY_PLAN_CHALLENGE_BEFORE_CONTEXT_SUFFICIENCY");
 }
+
+const blockerEvidenceContext = { sessionID: "session/plan-challenge-blocker-evidence", agent: "orchestrator" };
+executeNormalSessionQualityTool(bridge, "quality_dossier_create", {
+  request: JSON.stringify(fullDossierRequest()),
+}, blockerEvidenceContext);
+prepareHighContext(bridge, blockerEvidenceContext);
+const directBlockerContribution = executeNormalSessionQualityTool(bridge, "quality_architecture_evaluate", {
+  request: JSON.stringify({
+    expected_revision: 1,
+    blockers: [{ severity: "medium", summary: "Direct canonical blocker evidence fixture.", resolved: false }],
+  }),
+}, { ...blockerEvidenceContext, agent: "reviewer" });
+let blockerEvidenceState = inspectNormalSessionQualityState(bridge, blockerEvidenceContext.sessionID);
+const directBlockerRef = {
+  kind: "runtime",
+  value: `plan-challenge-subject:${blockerEvidenceState.contributions[0].subject_fingerprint}`,
+};
+assert.equal(blockerEvidenceState.contributions[0].blocking, true);
+assert.deepEqual(blockerEvidenceState.dossier.plan_challenge.blockers[0].evidence_refs, [directBlockerRef]);
+
+handleNormalSessionToolBefore(bridge, {
+  tool: "task",
+  sessionID: blockerEvidenceContext.sessionID,
+  callID: "call-blocker-evidence-architect",
+}, nativeTask("architect"));
+handleNormalSessionEvent(bridge, {
+  type: "session.created",
+  properties: {
+    info: {
+      id: "session/plan-challenge-blocker-evidence-architect",
+      parentID: blockerEvidenceContext.sessionID,
+    },
+  },
+});
+const pendingBlockerContribution = executeNormalSessionQualityTool(bridge, "quality_architecture_evaluate", {
+  request: JSON.stringify({
+    expected_revision: directBlockerContribution.dossier_revision,
+    blockers: [{ severity: "high", summary: "Child canonical blocker evidence fixture.", resolved: false }],
+  }),
+}, { sessionID: "session/plan-challenge-blocker-evidence-architect", agent: "architect" });
+assert.equal(pendingBlockerContribution.status, "pending_parent_settlement");
+blockerEvidenceState = inspectNormalSessionQualityState(bridge, blockerEvidenceContext.sessionID);
+const pendingBlockerProposal = blockerEvidenceState.active_task_launch.pending_challenge_proposal;
+const childBlockerRef = {
+  kind: "runtime",
+  value: `plan-challenge-subject:${pendingBlockerProposal.subject.fingerprint}`,
+};
+assert.deepEqual(pendingBlockerProposal.blockers[0].evidence_refs, [childBlockerRef]);
+handleNormalSessionToolAfter(bridge, {
+  tool: "task",
+  sessionID: blockerEvidenceContext.sessionID,
+  callID: "call-blocker-evidence-architect",
+});
+blockerEvidenceState = inspectNormalSessionQualityState(bridge, blockerEvidenceContext.sessionID);
+const architectBlockerContribution = blockerEvidenceState.contributions.find((entry) => entry.role === "architect");
+assert.equal(architectBlockerContribution.blocking, true);
+assert.equal(architectBlockerContribution.subject_fingerprint, pendingBlockerProposal.subject.fingerprint);
+assert.deepEqual(
+  blockerEvidenceState.dossier.plan_challenge.blockers.find((entry) => entry.severity === "high").evidence_refs,
+  [childBlockerRef],
+);
+const blockedChallengeGate = executeNormalSessionQualityTool(bridge, "quality_dossier_finalize", {
+  request: JSON.stringify({ expected_revision: blockerEvidenceState.dossier.revision }),
+}, blockerEvidenceContext);
+assert.equal(blockedChallengeGate.dossier_status, "finalized");
+const finalizedBlockerDossier = inspectNormalSessionQualityState(bridge, blockerEvidenceContext.sessionID).dossier;
+assert.deepEqual(finalizedBlockerDossier.plan_challenge.blockers.map((entry) => entry.evidence_refs), [
+  [directBlockerRef],
+  [childBlockerRef],
+]);
+
+const staleProposalContext = { sessionID: "session/stale-child-blocker-subject", agent: "orchestrator" };
+executeNormalSessionQualityTool(bridge, "quality_dossier_create", {
+  request: JSON.stringify(fullDossierRequest()),
+}, staleProposalContext);
+prepareHighContext(bridge, staleProposalContext);
+handleNormalSessionToolBefore(bridge, {
+  tool: "task",
+  sessionID: staleProposalContext.sessionID,
+  callID: "call-stale-blocker-architect",
+}, nativeTask("architect"));
+handleNormalSessionEvent(bridge, {
+  type: "session.created",
+  properties: {
+    info: {
+      id: "session/stale-child-blocker-subject-architect",
+      parentID: staleProposalContext.sessionID,
+    },
+  },
+});
+executeNormalSessionQualityTool(bridge, "quality_architecture_evaluate", {
+  request: JSON.stringify({
+    expected_revision: 1,
+    blockers: [{ severity: "high", summary: "This proposal must become stale.", resolved: false }],
+  }),
+}, { sessionID: "session/stale-child-blocker-subject-architect", agent: "architect" });
+const staleProposalCallID = `context-read-${++contextCallTick}`;
+handleNormalSessionToolBefore(bridge, {
+  tool: "context_read",
+  sessionID: "session/stale-child-blocker-subject-architect",
+  callID: staleProposalCallID,
+}, { args: { path: "src/file.mjs", startLine: 1, maxLines: 64, maxBytes: 4096, format: "text" } });
+handleNormalSessionToolAfter(bridge, {
+  tool: "context_read",
+  sessionID: "session/stale-child-blocker-subject-architect",
+  callID: staleProposalCallID,
+}, { output: contextReadOutput("src/file.mjs"), title: "context read", metadata: {} });
+handleNormalSessionToolAfter(bridge, {
+  tool: "task",
+  sessionID: staleProposalContext.sessionID,
+  callID: "call-stale-blocker-architect",
+});
+const staleProposalState = inspectNormalSessionQualityState(bridge, staleProposalContext.sessionID);
+assert.equal(staleProposalState.contributions.length, 0, "a child proposal must be rejected after its canonical subject changes");
+assert.equal(staleProposalState.dossier.plan_challenge.blockers.length, 0);
 
 const phaseContext = { sessionID: "session/phase-aware-targets", agent: "orchestrator" };
 const phaseRequest = fullDossierRequest();
@@ -2022,7 +2158,7 @@ assert.equal(refutedReportGate.gate_status, "passed");
 const staleLockContext = { sessionID: "session/stale-lock", agent: "orchestrator" };
 executeNormalSessionQualityTool(bridge, "quality_dossier_create", { request: JSON.stringify(fullDossierRequest()) }, staleLockContext);
 const staleLockPath = normalSessionQualityStatePath(bridge, staleLockContext.sessionID).replace(/\.json$/u, ".lock");
-fs.writeFileSync(staleLockPath, JSON.stringify({ schema_version: 1, pid: 999999, created_at_ms: 0, nonce: "stale-fixture" }), "utf8");
+fs.writeFileSync(staleLockPath, `${JSON.stringify({ schema_version: 1, pid: 999999, created_at_ms: 0, nonce: "stale-fixture" })}\n`, "utf8");
 const staleLockUpdate = executeNormalSessionQualityTool(bridge, "quality_dossier_update", {
   request: JSON.stringify({
     expected_revision: 1,
@@ -2453,6 +2589,7 @@ assert.deepEqual(Object.keys(plugin.tool).sort(), [
   "quality_dossier_finalize",
   "quality_dossier_inspect",
   "quality_dossier_update",
+  "quality_project_catalog_rotate",
   "quality_session_finalize",
   "quality_session_start",
   "quality_verification_record",
@@ -2477,6 +2614,497 @@ assert.match(persistedCheckReceipt.evidence_fingerprint, /^sha256:[a-f0-9]{64}$/
 assertPersistedTamperRejected(bridge, orchestrator, (state) => {
   state.verification.receipts.find((entry) => entry.kind === "check").stdout_bytes += 1;
 }, "QUALITY_CHECK_RECEIPT");
+
+const rotationPaths = [
+  ".opencode/quality/checks.json",
+  "scripts/verify-normal-session-quality-bridge.mjs",
+];
+function rotationProjectCatalog({ engineeringTimeout = 120_000, harnessTimeout = 120_000 } = {}) {
+  return {
+    schema_version: 2,
+    catalog_id: "normal-session-timeout-rotation-v1",
+    standard_lite_policy: {
+      allowed_ownership_prefixes: [".opencode/quality", "scripts"],
+      protected_paths: [],
+    },
+    checks: [
+      ["normal-committed-whitespace", 120_000],
+      ["normal-engineering-quality", engineeringTimeout],
+      ["normal-harness-static", harnessTimeout],
+    ].map(([checkId, timeoutMs]) => ({
+      check_id: checkId,
+      executable_id: "node",
+      argv: ["src/file.mjs"],
+      cwd: ".",
+      phases: ["preimplementation", "slice", "integration"],
+      purpose: "verification",
+      generated_output_paths: [],
+      timeout_ms: timeoutMs,
+      max_output_chars: 1024 * 1024,
+    })),
+  };
+}
+const rotationPreviousCatalog = rotationProjectCatalog();
+const rotationCurrentCatalog = rotationProjectCatalog({
+  engineeringTimeout: 300_000,
+  harnessTimeout: 600_000,
+});
+const rotationPreviousFingerprint = projectCheckCatalogFingerprint(rotationPreviousCatalog);
+const rotationCurrentFingerprint = projectCheckCatalogFingerprint(rotationCurrentCatalog);
+const rotationEngineeringCatalog = createEngineeringCheckCatalog(projectCatalogToEngineeringCatalog(
+  rotationPreviousCatalog,
+  NORMAL_SESSION_BRIDGE_PRODUCER,
+));
+assert.equal(
+  createEngineeringCheckCatalog(projectCatalogToEngineeringCatalog(
+    rotationCurrentCatalog,
+    NORMAL_SESSION_BRIDGE_PRODUCER,
+  )).fingerprint,
+  rotationEngineeringCatalog.fingerprint,
+  "timeout-only fixture catalogs must preserve the engineering projection",
+);
+const punctuationCheckIds = ["a-b", "a.b", "a_b"].sort(compareProjectCheckIds);
+const punctuationPreviousCatalog = {
+  ...rotationProjectCatalog(),
+  catalog_id: "punctuation-timeout-rotation-v1",
+  checks: punctuationCheckIds.map((checkId) => ({
+    check_id: checkId,
+    executable_id: "node",
+    argv: ["src/file.mjs"],
+    cwd: ".",
+    phases: ["integration"],
+    purpose: "verification",
+    generated_output_paths: [],
+    timeout_ms: 120_000,
+    max_output_chars: 1024 * 1024,
+  })),
+};
+const punctuationCurrentCatalog = {
+  ...punctuationPreviousCatalog,
+  checks: punctuationPreviousCatalog.checks.map((entry) => ({ ...entry, timeout_ms: 120_001 })),
+};
+const punctuationEngineeringCatalog = createEngineeringCheckCatalog(projectCatalogToEngineeringCatalog(
+  punctuationPreviousCatalog,
+  NORMAL_SESSION_BRIDGE_PRODUCER,
+));
+const punctuationChanges = punctuationCheckIds.map((checkId) => ({
+  check_id: checkId,
+  previous_timeout_ms: 120_000,
+  next_timeout_ms: 120_001,
+}));
+assert.deepEqual(punctuationCheckIds, ["a-b", "a.b", "a_b"]);
+assert.doesNotThrow(() => validateTimeoutOnlyProjectCatalogRotation({
+  current_catalog: punctuationCurrentCatalog,
+  current_catalog_fingerprint: projectCheckCatalogFingerprint(punctuationCurrentCatalog),
+  previous_catalog_fingerprint: projectCheckCatalogFingerprint(punctuationPreviousCatalog),
+  engineering_catalog_fingerprint: punctuationEngineeringCatalog.fingerprint,
+  trusted_producer: NORMAL_SESSION_BRIDGE_PRODUCER,
+  timeout_changes: punctuationChanges,
+}));
+const punctuationReceiptSource = {
+  schema_version: 1,
+  session_key: "punctuation-session",
+  run_id: "punctuation-run",
+  task_id: "punctuation-task",
+  binding_revision: 1,
+  previous_catalog_id: punctuationPreviousCatalog.catalog_id,
+  previous_catalog_fingerprint: projectCheckCatalogFingerprint(punctuationPreviousCatalog),
+  next_catalog_id: punctuationCurrentCatalog.catalog_id,
+  next_catalog_fingerprint: projectCheckCatalogFingerprint(punctuationCurrentCatalog),
+  engineering_catalog_fingerprint: punctuationEngineeringCatalog.fingerprint,
+  dossier_revision: 1,
+  gate_fingerprint: fingerprint({ punctuation: "gate" }),
+  mutation_revision: 1,
+  mutation_call_id: "punctuation-mutation",
+  changed_paths: [".opencode/quality/checks.json"],
+  timeout_changes: punctuationChanges,
+  workspace_fingerprint: fingerprint({ punctuation: "workspace" }),
+  previous_owner_state_revision: 1,
+  previous_registry_state_revision: 1,
+  request_fingerprint: fingerprint({ punctuation: "request" }),
+  rotated_at: "2026-07-30T12:00:00.000Z",
+};
+assert.doesNotThrow(() => validateQualityCatalogRotationReceipt({
+  ...punctuationReceiptSource,
+  fingerprint: fingerprint(punctuationReceiptSource),
+}));
+
+const rotationPathVersions = new Map();
+const rotationObserver = () => fixtureWorkspaceSnapshot(
+  [...rotationPathVersions.entries()]
+    .map(([file, version]) => ({ path: file, fingerprint: fingerprint({ file, version }) }))
+    .sort((left, right) => left.path.localeCompare(right.path)),
+);
+let rotationFailureStage = null;
+function createRotationBridge(projectCatalog) {
+  return createNormalSessionQualityBridge({
+    workspaceRoot: tempRoot,
+    checkCatalog: rotationEngineeringCatalog,
+    projectCatalog,
+    observeWorkspace: rotationObserver,
+    affectedFileInspector: () => [],
+    runTrustedTarget,
+    evaluateGate: passedGate,
+    clock,
+    idFactory,
+    lockStaleMs: 0,
+    failureInjector: (stage) => {
+      if (stage === rotationFailureStage) throw new Error(`injected:${stage}`);
+    },
+  });
+}
+
+function prepareCatalogRotationFixture(sessionID, { legacy = true } = {}) {
+  rotationPathVersions.clear();
+  const previousBridge = createRotationBridge(rotationPreviousCatalog);
+  const context = { sessionID, agent: "orchestrator" };
+  const request = dossierRequest();
+  request.task_shape.summary = `catalog-rotation-${sessionID}`;
+  request.compatibility_contract.evidence_refs[0].value = rotationPaths[1];
+  request.affected_areas[0].path = rotationPaths[1];
+  request.affected_areas[0].evidence_refs[0].value = rotationPaths[1];
+  request.entry_points[0].path = rotationPaths[1];
+  request.entry_points[0].evidence_refs[0].value = rotationPaths[1];
+  request.verification_boundary.ownership_paths = [...rotationPaths];
+  executeNormalSessionQualityTool(previousBridge, "quality_dossier_create", {
+    request: JSON.stringify(request),
+  }, context);
+  executeRawNormalSessionQualityTool(previousBridge, "quality_dossier_finalize", {
+    request: JSON.stringify({ expected_revision: 1 }),
+  }, context);
+  executeRawNormalSessionQualityTool(previousBridge, "quality_action_authorize", {
+    request: JSON.stringify({ expected_revision: 1, kind: "edit", paths: rotationPaths }),
+  }, context);
+  handleNormalSessionToolBefore(previousBridge, {
+    tool: "apply_patch",
+    sessionID,
+    callID: `rotation-patch-${sessionID}`,
+  }, {
+    args: {
+      patchText: [
+        "*** Begin Patch",
+        ...rotationPaths.flatMap((file) => [
+          `*** Update File: ${file}`,
+          "@@",
+          "-old",
+          "+new",
+        ]),
+        "*** End Patch",
+      ].join("\n"),
+    },
+  });
+  rotationPaths.forEach((file) => rotationPathVersions.set(file, 1));
+  handleNormalSessionToolAfter(previousBridge, {
+    tool: "apply_patch",
+    sessionID,
+    callID: `rotation-patch-${sessionID}`,
+  });
+
+  const ownerPath = normalSessionQualityStatePath(previousBridge, sessionID);
+  if (legacy) {
+    const legacyOwner = JSON.parse(fs.readFileSync(ownerPath, "utf8"));
+    legacyOwner.schema_version = 5;
+    delete legacyOwner.project_catalog_binding_revision;
+    delete legacyOwner.project_catalog_rotation_history;
+    fs.writeFileSync(ownerPath, `${JSON.stringify(legacyOwner)}\n`, "utf8");
+    const legacyRegistration = structuredClone(inspectNormalSessionRegistration(previousBridge, sessionID));
+    legacyRegistration.schema_version = 2;
+    delete legacyRegistration.catalog_binding_revision;
+    delete legacyRegistration.catalog_rotation_history;
+    delete legacyRegistration.fingerprint;
+    legacyRegistration.fingerprint = fingerprint(legacyRegistration);
+    const registryPath = path.join(
+      tempRoot,
+      ".oc_harness",
+      "quality",
+      "session-registry",
+      `${legacyOwner.session_key}.json`,
+    );
+    fs.writeFileSync(registryPath, `${JSON.stringify(legacyRegistration)}\n`, "utf8");
+  }
+  const owner = inspectNormalSessionQualityState(previousBridge, sessionID);
+  const registration = inspectNormalSessionRegistration(previousBridge, sessionID);
+  const rotationRequest = {
+    expected_owner_state_revision: owner.state_revision,
+    expected_registry_state_revision: registration.state_revision,
+    expected_dossier_revision: owner.dossier.revision,
+    expected_gate_fingerprint: owner.gate.fingerprint,
+    expected_mutation_revision: 1,
+    expected_workspace_fingerprint: owner.last_workspace.source_fingerprint,
+    mutation_call_id: `rotation-patch-${sessionID}`,
+    previous_catalog_fingerprint: rotationPreviousFingerprint,
+    next_catalog_fingerprint: rotationCurrentFingerprint,
+    engineering_catalog_fingerprint: rotationEngineeringCatalog.fingerprint,
+    changed_paths: [...rotationPaths],
+    timeout_changes: [
+      {
+        check_id: "normal-engineering-quality",
+        previous_timeout_ms: 120_000,
+        next_timeout_ms: 300_000,
+      },
+      {
+        check_id: "normal-harness-static",
+        previous_timeout_ms: 120_000,
+        next_timeout_ms: 600_000,
+      },
+    ],
+  };
+  return {
+    context,
+    ownerPath,
+    legacyOwnerText: fs.readFileSync(ownerPath, "utf8"),
+    rotationRequest,
+  };
+}
+
+rotationFailureStage = null;
+const rotationFixture = prepareCatalogRotationFixture("session/catalog-timeout-rotation");
+let currentRotationBridge = createRotationBridge(rotationCurrentCatalog);
+assertContractError(() => executeRawNormalSessionQualityTool(
+  currentRotationBridge,
+  "quality_project_catalog_rotate",
+  { request: JSON.stringify(rotationFixture.rotationRequest) },
+  { ...rotationFixture.context, agent: "reviewer" },
+), "QUALITY_TOOL_ROLE");
+assertContractError(() => executeRawNormalSessionQualityTool(
+  currentRotationBridge,
+  "quality_project_catalog_rotate",
+  {
+    request: JSON.stringify({
+      ...rotationFixture.rotationRequest,
+      timeout_changes: rotationFixture.rotationRequest.timeout_changes.map((entry, index) => (
+        index === 0 ? { ...entry, previous_timeout_ms: 119_999 } : entry
+      )),
+    }),
+  },
+  rotationFixture.context,
+), "QUALITY_CATALOG_ROTATION_RECONSTRUCTION");
+assertContractError(() => executeRawNormalSessionQualityTool(
+  currentRotationBridge,
+  "quality_project_catalog_rotate",
+  {
+    request: JSON.stringify({
+      ...rotationFixture.rotationRequest,
+      changed_paths: [rotationPaths[1]],
+    }),
+  },
+  rotationFixture.context,
+), "QUALITY_CATALOG_ROTATION_PATHS");
+const rotationReceipt = executeRawNormalSessionQualityTool(
+  currentRotationBridge,
+  "quality_project_catalog_rotate",
+  { request: JSON.stringify(rotationFixture.rotationRequest) },
+  rotationFixture.context,
+);
+assert.equal(rotationReceipt.binding_revision, 1);
+assert.equal(rotationReceipt.previous_catalog_fingerprint, rotationPreviousFingerprint);
+assert.equal(rotationReceipt.next_catalog_fingerprint, rotationCurrentFingerprint);
+let rotatedOwner = inspectNormalSessionQualityState(currentRotationBridge, rotationFixture.context.sessionID);
+let rotatedRegistration = inspectNormalSessionRegistration(currentRotationBridge, rotationFixture.context.sessionID);
+assert.equal(rotatedOwner.schema_version, 6);
+assert.equal(rotatedRegistration.schema_version, 3);
+assert.equal(rotatedOwner.project_catalog_binding_revision, 1);
+assert.equal(rotatedRegistration.catalog_binding_revision, 1);
+assert.equal(rotatedOwner.project_catalog_rotation_history[0].fingerprint, rotationReceipt.fingerprint);
+assert.equal(rotatedRegistration.catalog_rotation_history[0].fingerprint, rotationReceipt.fingerprint);
+assert(
+  rotatedOwner.preimplementation_check_receipts.every(
+    (entry) => entry.catalog_fingerprint === rotationPreviousFingerprint,
+  ),
+  "catalog rotation must preserve the preimplementation receipt epoch",
+);
+const replayOwnerRevision = rotatedOwner.state_revision;
+const replayRegistryRevision = rotatedRegistration.state_revision;
+assert.deepEqual(executeRawNormalSessionQualityTool(
+  currentRotationBridge,
+  "quality_project_catalog_rotate",
+  { request: JSON.stringify(rotationFixture.rotationRequest) },
+  rotationFixture.context,
+), rotationReceipt);
+assert.equal(
+  inspectNormalSessionQualityState(currentRotationBridge, rotationFixture.context.sessionID).state_revision,
+  replayOwnerRevision,
+  "exact catalog rotation replay must not rewrite owner state",
+);
+assert.equal(
+  inspectNormalSessionRegistration(currentRotationBridge, rotationFixture.context.sessionID).state_revision,
+  replayRegistryRevision,
+  "exact catalog rotation replay must not rewrite registry state",
+);
+assert.doesNotThrow(() => executeRawNormalSessionQualityTool(
+  currentRotationBridge,
+  "quality_dossier_inspect",
+  { request: "{}" },
+  rotationFixture.context,
+));
+const rotatedVerification = executeRawNormalSessionQualityTool(
+  currentRotationBridge,
+  "quality_verification_record",
+  { request: JSON.stringify({ expected_revision: 1 }) },
+  { ...rotationFixture.context, agent: "verifier" },
+);
+assert(
+  rotatedVerification.receipts
+    .filter((entry) => entry.kind === "check")
+    .every((entry) => entry.catalog_fingerprint === rotationCurrentFingerprint),
+  "post-rotation integration receipts must bind the current catalog epoch",
+);
+
+rotationFailureStage = null;
+const ownerRecoveryFixture = prepareCatalogRotationFixture("session/catalog-owner-first-recovery");
+rotationFailureStage = "after_owner_catalog_rotation";
+currentRotationBridge = createRotationBridge(rotationCurrentCatalog);
+assert.throws(() => executeRawNormalSessionQualityTool(
+  currentRotationBridge,
+  "quality_project_catalog_rotate",
+  { request: JSON.stringify(ownerRecoveryFixture.rotationRequest) },
+  ownerRecoveryFixture.context,
+), /injected:after_owner_catalog_rotation/u);
+assert.equal(
+  inspectNormalSessionQualityState(currentRotationBridge, ownerRecoveryFixture.context.sessionID)
+    .project_catalog_rotation_history.length,
+  1,
+);
+assert.equal(
+  inspectNormalSessionRegistration(currentRotationBridge, ownerRecoveryFixture.context.sessionID)
+    .catalog_rotation_history,
+  undefined,
+  "owner-first crash window must leave the legacy registry predecessor intact",
+);
+rotationFailureStage = null;
+currentRotationBridge = createRotationBridge(rotationCurrentCatalog);
+assert.equal(executeRawNormalSessionQualityTool(
+  currentRotationBridge,
+  "quality_project_catalog_rotate",
+  { request: JSON.stringify(ownerRecoveryFixture.rotationRequest) },
+  ownerRecoveryFixture.context,
+).binding_revision, 1);
+
+const registryRecoveryFixture = prepareCatalogRotationFixture("session/catalog-registry-readback-recovery");
+rotationFailureStage = "after_registry_catalog_rotation";
+currentRotationBridge = createRotationBridge(rotationCurrentCatalog);
+assert.throws(() => executeRawNormalSessionQualityTool(
+  currentRotationBridge,
+  "quality_project_catalog_rotate",
+  { request: JSON.stringify(registryRecoveryFixture.rotationRequest) },
+  registryRecoveryFixture.context,
+), /injected:after_registry_catalog_rotation/u);
+rotationFailureStage = null;
+const committedOwnerRevision = inspectNormalSessionQualityState(
+  currentRotationBridge,
+  registryRecoveryFixture.context.sessionID,
+).state_revision;
+const committedRegistryRevision = inspectNormalSessionRegistration(
+  currentRotationBridge,
+  registryRecoveryFixture.context.sessionID,
+).state_revision;
+currentRotationBridge = createRotationBridge(rotationCurrentCatalog);
+assert.equal(executeRawNormalSessionQualityTool(
+  currentRotationBridge,
+  "quality_project_catalog_rotate",
+  { request: JSON.stringify(registryRecoveryFixture.rotationRequest) },
+  registryRecoveryFixture.context,
+).binding_revision, 1);
+assert.equal(
+  inspectNormalSessionQualityState(currentRotationBridge, registryRecoveryFixture.context.sessionID).state_revision,
+  committedOwnerRevision,
+);
+assert.equal(
+  inspectNormalSessionRegistration(currentRotationBridge, registryRecoveryFixture.context.sessionID).state_revision,
+  committedRegistryRevision,
+);
+
+const splitBrainFixture = prepareCatalogRotationFixture("session/catalog-split-brain");
+currentRotationBridge = createRotationBridge(rotationCurrentCatalog);
+executeRawNormalSessionQualityTool(
+  currentRotationBridge,
+  "quality_project_catalog_rotate",
+  { request: JSON.stringify(splitBrainFixture.rotationRequest) },
+  splitBrainFixture.context,
+);
+fs.writeFileSync(splitBrainFixture.ownerPath, splitBrainFixture.legacyOwnerText, "utf8");
+currentRotationBridge = createRotationBridge(rotationCurrentCatalog);
+assertContractError(() => executeRawNormalSessionQualityTool(
+  currentRotationBridge,
+  "quality_project_catalog_rotate",
+  { request: JSON.stringify(splitBrainFixture.rotationRequest) },
+  splitBrainFixture.context,
+), "QUALITY_CATALOG_ROTATION_SPLIT_BRAIN");
+assert.equal(
+  inspectNormalSessionRegistration(currentRotationBridge, splitBrainFixture.context.sessionID).lifecycle,
+  "failed",
+  "a detected rotation split-brain must durably fail the registry",
+);
+assertContractError(() => executeRawNormalSessionQualityTool(
+  currentRotationBridge,
+  "quality_verification_record",
+  { request: JSON.stringify({ expected_revision: 1 }) },
+  { ...splitBrainFixture.context, agent: "verifier" },
+), "QUALITY_CONTROL_STATE_TAMPER");
+
+const historySplitFixture = prepareCatalogRotationFixture("session/catalog-history-split-brain");
+currentRotationBridge = createRotationBridge(rotationCurrentCatalog);
+const historySplitReceipt = executeRawNormalSessionQualityTool(
+  currentRotationBridge,
+  "quality_project_catalog_rotate",
+  { request: JSON.stringify(historySplitFixture.rotationRequest) },
+  historySplitFixture.context,
+);
+const divergentOwner = JSON.parse(fs.readFileSync(historySplitFixture.ownerPath, "utf8"));
+const divergentReceiptSource = {
+  ...historySplitReceipt,
+  rotated_at: "2026-07-30T23:59:59.999Z",
+};
+delete divergentReceiptSource.fingerprint;
+const divergentReceipt = {
+  ...divergentReceiptSource,
+  fingerprint: fingerprint(divergentReceiptSource),
+};
+divergentOwner.project_catalog_rotation_history = [divergentReceipt];
+fs.writeFileSync(historySplitFixture.ownerPath, `${JSON.stringify(divergentOwner)}\n`, "utf8");
+currentRotationBridge = createRotationBridge(rotationCurrentCatalog);
+assertContractError(() => executeRawNormalSessionQualityTool(
+  currentRotationBridge,
+  "quality_dossier_inspect",
+  { request: "{}" },
+  historySplitFixture.context,
+), "QUALITY_CATALOG_ROTATION_SPLIT_BRAIN");
+assert.equal(
+  inspectNormalSessionRegistration(currentRotationBridge, historySplitFixture.context.sessionID).lifecycle,
+  "failed",
+);
+assert(
+  inspectNormalSessionQualityState(currentRotationBridge, historySplitFixture.context.sessionID)
+    .incomplete_reasons.includes("catalog_rotation_split_brain"),
+);
+for (const [toolId, request, agent] of [
+  ["quality_verification_record", { expected_revision: 1 }, "verifier"],
+  ["quality_action_authorize", { expected_revision: 1, kind: "edit", paths: rotationPaths }, "orchestrator"],
+  ["quality_session_finalize", { expected_revision: 1 }, "orchestrator"],
+]) {
+  assertContractError(() => executeRawNormalSessionQualityTool(
+    currentRotationBridge,
+    toolId,
+    { request: JSON.stringify(request) },
+    { ...historySplitFixture.context, agent },
+  ), "QUALITY_CONTROL_STATE_TAMPER");
+}
+currentRotationBridge = createRotationBridge(rotationCurrentCatalog);
+assertContractError(() => executeRawNormalSessionQualityTool(
+  currentRotationBridge,
+  "quality_verification_record",
+  { request: JSON.stringify({ expected_revision: 1 }) },
+  { ...historySplitFixture.context, agent: "verifier" },
+), "QUALITY_SESSION_INCOMPLETE");
+
+const defaultDriftFixture = prepareCatalogRotationFixture("session/catalog-default-drift");
+currentRotationBridge = createRotationBridge(rotationCurrentCatalog);
+assertContractError(() => executeRawNormalSessionQualityTool(
+  currentRotationBridge,
+  "quality_dossier_inspect",
+  { request: "{}" },
+  defaultDriftFixture.context,
+), "QUALITY_CHECK_CATALOG_DRIFT");
 
 function createScopeLimitFixture(initialAffectedPaths = []) {
   let scopeEntries = [{ path: "src/file.mjs", fingerprint: fingerprint({ file: "src/file.mjs", version: 0 }) }];

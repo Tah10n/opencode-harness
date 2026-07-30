@@ -2016,6 +2016,9 @@ for (const [label, text, needles] of [
     "--suite smoke --baseline plain --candidate instrumented",
     "blocked_external_state",
     "docs/synthetic-benchmark.md",
+    "`quality_project_catalog_rotate`",
+    "owner records are written as schema v6",
+    "child links remain an independent schema v5",
   ]],
   ["docs/adoption.md", modelNeutralAdoptionDoc, [
     "## Modular Adoption Bundles",

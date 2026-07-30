@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { spawn } from "node:child_process";
 import { canonicalJson, fingerprint } from "../lib/feedback/contracts.mjs";
 import {
   assertPersistenceSafe,
@@ -20,12 +21,32 @@ import {
   publishImmutableSet,
   resolveInside,
   withExclusiveLock,
+  withRecoverableExclusiveLock,
 } from "../lib/feedback/files.mjs";
 
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-feedback-foundation-"));
 
 function rejects(fn, code) {
   assert.throws(fn, (error) => error?.code === code, `expected ${code}`);
+}
+
+function childResult(child) {
+  let stdout = "";
+  let stderr = "";
+  child.stdout.on("data", (chunk) => { stdout += chunk; });
+  child.stderr.on("data", (chunk) => { stderr += chunk; });
+  return new Promise((resolve, reject) => {
+    child.once("error", reject);
+    child.once("exit", (code, signal) => resolve({ code, signal, stdout, stderr }));
+  });
+}
+
+async function waitForFile(targetPath, timeoutMs = 10_000) {
+  const deadline = Date.now() + timeoutMs;
+  while (!fs.existsSync(targetPath)) {
+    if (Date.now() >= deadline) throw new Error(`timed out waiting for ${path.basename(targetPath)}`);
+    await new Promise((resolve) => setTimeout(resolve, 10));
+  }
 }
 
 try {
@@ -119,6 +140,209 @@ try {
     afterLockWrite: () => { throw new Error("injected lock write failure"); },
   }), /injected lock write failure/);
   assert.equal(fs.existsSync(failedLock), false);
+
+  const recoverableLock = path.join(tmp, "recoverable.lock");
+  let recoverableCallbackCount = 0;
+  withRecoverableExclusiveLock(recoverableLock, () => {
+    recoverableCallbackCount += 1;
+    rejects(() => withRecoverableExclusiveLock(recoverableLock, () => {}, {
+      basePath: tmp,
+      lockStaleMs: 0,
+      processIsAlive: () => true,
+    }), "FILES_LOCKED");
+  }, {
+    basePath: tmp,
+    lockIdFactory: () => "recoverable-success",
+  });
+  assert.equal(recoverableCallbackCount, 1);
+  assert.equal(fs.existsSync(recoverableLock), false);
+
+  const prepublishLock = path.join(tmp, "recoverable-prepublish.lock");
+  assert.throws(() => withRecoverableExclusiveLock(prepublishLock, () => {}, {
+    basePath: tmp,
+    lockIdFactory: () => "prepublish",
+    beforeLeasePublish: () => { throw new Error("injected prepublish failure"); },
+  }), /injected prepublish failure/);
+  assert.equal(fs.existsSync(prepublishLock), false);
+  assert.equal(fs.readdirSync(tmp).some((entry) => entry.includes("prepublish.tmp")), false);
+
+  const malformedLock = path.join(tmp, "recoverable-malformed.lock");
+  fs.writeFileSync(malformedLock, '{"schema_version":1,"pid":', "utf8");
+  rejects(() => withRecoverableExclusiveLock(malformedLock, () => {}, {
+    basePath: tmp,
+    lockStaleMs: 0,
+    processIsAlive: () => false,
+  }), "FILES_LOCKED");
+  assert.equal(fs.readFileSync(malformedLock, "utf8"), '{"schema_version":1,"pid":');
+  fs.unlinkSync(malformedLock);
+
+  const staleLock = path.join(tmp, "recoverable-stale.lock");
+  fs.writeFileSync(staleLock, `${JSON.stringify({
+    schema_version: 1,
+    pid: 424242,
+    created_at_ms: 10,
+    nonce: "stale-complete",
+  })}\n`, "utf8");
+  let reclaimed = false;
+  withRecoverableExclusiveLock(staleLock, () => {
+    reclaimed = true;
+  }, {
+    basePath: tmp,
+    lockStaleMs: 10,
+    clockMs: () => 100,
+    processIsAlive: () => false,
+    lockIdFactory: () => "stale-successor",
+  });
+  assert.equal(reclaimed, true);
+  assert.equal(fs.existsSync(staleLock), false);
+
+  const reclaimRaceLock = path.join(tmp, "recoverable-reclaim-race.lock");
+  const reclaimRaceDisplaced = path.join(tmp, "recoverable-reclaim-race.displaced");
+  fs.writeFileSync(reclaimRaceLock, `${JSON.stringify({
+    schema_version: 1,
+    pid: 424242,
+    created_at_ms: 10,
+    nonce: "reclaim-race-stale",
+  })}\n`, "utf8");
+  const liveReplacement = `${JSON.stringify({
+    schema_version: 1,
+    pid: process.pid,
+    created_at_ms: 99,
+    nonce: "reclaim-race-live",
+  })}\n`;
+  assert.throws(() => withRecoverableExclusiveLock(reclaimRaceLock, () => {}, {
+    basePath: tmp,
+    lockStaleMs: 10,
+    clockMs: () => 100,
+    processIsAlive: () => false,
+    lockIdFactory: () => "reclaim-race-contender",
+    beforeStaleReclaim: () => {
+      fs.renameSync(reclaimRaceLock, reclaimRaceDisplaced);
+      fs.writeFileSync(reclaimRaceLock, liveReplacement, "utf8");
+    },
+  }), (error) => error?.code === "FILES_OWNERSHIP");
+  assert.equal(
+    fs.readFileSync(reclaimRaceLock, "utf8"),
+    liveReplacement,
+    "a stale snapshot must not remove a successor lease before detecting the identity race",
+  );
+  let thirdContenderEntered = false;
+  rejects(() => withRecoverableExclusiveLock(reclaimRaceLock, () => {
+    thirdContenderEntered = true;
+  }, {
+    basePath: tmp,
+    lockStaleMs: 0,
+    clockMs: () => 100,
+    processIsAlive: () => true,
+  }), "FILES_LOCKED");
+  assert.equal(thirdContenderEntered, false, "a third contender must remain excluded by the live successor lease");
+  fs.unlinkSync(reclaimRaceLock);
+  fs.unlinkSync(reclaimRaceDisplaced);
+
+  const crossProcessLock = path.join(tmp, "recoverable-cross-process.lock");
+  fs.writeFileSync(crossProcessLock, `${JSON.stringify({
+    schema_version: 1,
+    pid: 424242,
+    created_at_ms: 1,
+    nonce: "cross-process-stale",
+  })}\n`, "utf8");
+  const crossProcessClaimed = path.join(tmp, "cross-process-a-claimed");
+  const crossProcessRelease = path.join(tmp, "cross-process-a-release");
+  const crossProcessAActive = path.join(tmp, "cross-process-a-active");
+  const crossProcessBActive = path.join(tmp, "cross-process-b-active");
+  const crossProcessBBlocked = path.join(tmp, "cross-process-b-blocked");
+  const filesModuleUrl = new URL("../lib/feedback/files.mjs", import.meta.url).href;
+  const reclaimWorkerSource = String.raw`
+import fs from "node:fs";
+const [
+  filesModuleUrl, basePath, lockPath, role, claimedPath, releasePath,
+  activePath, blockedPath,
+] = process.argv.slice(1);
+const { withRecoverableExclusiveLock } = await import(filesModuleUrl);
+const waitCell = new Int32Array(new SharedArrayBuffer(4));
+try {
+  withRecoverableExclusiveLock(lockPath, () => {
+    fs.writeFileSync(activePath, role, "utf8");
+  }, {
+    basePath,
+    lockStaleMs: 0,
+    beforeStaleLeaseUnlink: role === "A" ? () => {
+      fs.writeFileSync(claimedPath, "claimed", "utf8");
+      const deadline = Date.now() + 10_000;
+      while (!fs.existsSync(releasePath)) {
+        if (Date.now() >= deadline) throw new Error("release signal timeout");
+        Atomics.wait(waitCell, 0, 0, 10);
+      }
+    } : undefined,
+  });
+  if (role === "B") process.exitCode = 91;
+} catch (error) {
+  if (role === "B" && error?.code === "FILES_LOCKED") {
+    fs.writeFileSync(blockedPath, "blocked", "utf8");
+    process.exitCode = 0;
+  } else {
+    process.stderr.write(String(error?.stack ?? error));
+    process.exitCode = 92;
+  }
+}
+`;
+  const workerArgs = (role, activePath) => [
+    "--input-type=module",
+    "--eval",
+    reclaimWorkerSource,
+    filesModuleUrl,
+    tmp,
+    crossProcessLock,
+    role,
+    crossProcessClaimed,
+    crossProcessRelease,
+    activePath,
+    crossProcessBBlocked,
+  ];
+  const workerOptions = {
+    cwd: tmp,
+    windowsHide: true,
+    stdio: ["ignore", "pipe", "pipe"],
+  };
+  const reclaimWorkerA = spawn(process.execPath, workerArgs("A", crossProcessAActive), workerOptions);
+  const reclaimWorkerAResult = childResult(reclaimWorkerA);
+  let reclaimWorkerBResult;
+  try {
+    await waitForFile(crossProcessClaimed);
+    const reclaimWorkerB = spawn(process.execPath, workerArgs("B", crossProcessBActive), workerOptions);
+    reclaimWorkerBResult = await childResult(reclaimWorkerB);
+  } finally {
+    fs.writeFileSync(crossProcessRelease, "release", "utf8");
+  }
+  const reclaimWorkerAFinal = await reclaimWorkerAResult;
+  assert.equal(reclaimWorkerBResult?.code, 0, reclaimWorkerBResult?.stderr);
+  assert.equal(reclaimWorkerAFinal.code, 0, reclaimWorkerAFinal.stderr);
+  assert.equal(fs.existsSync(crossProcessAActive), true, "the reclaim-claim owner must enter its callback");
+  assert.equal(fs.existsSync(crossProcessBActive), false, "a competing reclaim-er must never overlap callbacks");
+  assert.equal(fs.existsSync(crossProcessBBlocked), true, "the competing reclaim-er must fail closed on the live claim");
+  assert.equal(fs.existsSync(crossProcessLock), false, "the successful successor lease must be released normally");
+  assert.deepEqual(
+    fs.readdirSync(tmp).filter((entry) => (
+      entry.includes("recoverable-cross-process.lock.reclaim-")
+      || entry.includes("recoverable-cross-process.lock.claim-")
+    )),
+    [],
+    "successful cross-process reclaim must leave no claim or temporary artifacts",
+  );
+
+  const substitutedLock = path.join(tmp, "recoverable-substituted.lock");
+  const displacedLock = path.join(tmp, "recoverable-displaced.lock");
+  assert.throws(() => withRecoverableExclusiveLock(substitutedLock, () => {}, {
+    basePath: tmp,
+    lockIdFactory: () => "substitution",
+    beforeLeaseCleanup: () => {
+      fs.renameSync(substitutedLock, displacedLock);
+      fs.writeFileSync(substitutedLock, "replacement-owned-by-another-writer\n", "utf8");
+    },
+  }), (error) => error?.code === "FILES_OWNERSHIP");
+  assert.equal(fs.readFileSync(substitutedLock, "utf8"), "replacement-owned-by-another-writer\n");
+  fs.unlinkSync(substitutedLock);
+  fs.unlinkSync(displacedLock);
 
   const originalFstatSync = fs.fstatSync;
   try {

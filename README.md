@@ -237,6 +237,19 @@ recursive-context tools are host opt-ins.
     mandatory trusted checks, any required post-edit architecture review, and
     final context reconciliation.
 
+The only in-session project-catalog drift exception is
+`quality_project_catalog_rotate`. It is orchestrator-only and accepts one
+restarted, passed owner session after exactly one settled same-session edit.
+The caller must restart the plugin after changing the catalog and invoke this
+tool before any ordinary quality operation. The runner reconstructs the
+previous catalog from sorted timeout increases, proves both catalog epochs map
+to the gate's unchanged engineering-check fingerprint, binds the exact mutation
+call and workspace delta, then commits one fingerprinted receipt owner-first
+and registry-second. Exact replay, owner-first recovery, and fully committed
+replay are idempotent; registry-first or mismatched histories fail as split
+brain. Every other catalog change still fails closed as
+`QUALITY_CHECK_CATALOG_DRIFT`.
+
 ## How The Agent Understands A Change
 
 For high or critical work, the agent builds understanding in a visible loop:
@@ -365,6 +378,19 @@ outcomes, with total quotas and consistency-checked finalization. It is ignored
 by Git and the OpenCode watcher. Generated live reports
 and candidate decisions are likewise ignored under `evals/reports/` and
 `evals/decisions/`.
+
+Normal-session owner records are written as schema v6 and session-registry
+records as schema v3. Strict owner v5 and registry v2 records remain readable
+and retain their schema on ordinary writes; only a successful catalog rotation
+upgrades that pair. Minimal child links remain an independent schema v5 for
+active, closed, and quarantined states. Rotation history preserves the initial
+catalog epoch for preimplementation receipts and the current epoch for
+integration receipts. Registry writers use complete, atomically published
+lease files: live, malformed, partial, or identity-substituted leases fail
+closed, while an expired lease is reclaimed only after its recorded process is
+confirmed dead. Competing reclaimers serialize through a no-clobber,
+generation-bound claim; a crashed claimant can be superseded only by the next
+immutable claim generation after the claimant is both expired and dead.
 
 Operational evidence is disposable and must not become durable semantic
 memory. Reusable lessons remain gated through `global-memory`/`improver`, while

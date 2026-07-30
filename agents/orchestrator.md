@@ -15,6 +15,7 @@ permission:
   quality_context_report_finalize: allow
   quality_dossier_finalize: allow
   quality_action_authorize: allow
+  quality_project_catalog_rotate: allow
   quality_context_reconcile: allow
   quality_session_finalize: allow
   context_outline: allow

@@ -5,6 +5,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import process from "node:process";
+import { withRecoverableExclusiveLock } from "../lib/feedback/files.mjs";
 
 import {
   createDefaultNormalSessionCheckCatalog,
@@ -209,6 +210,9 @@ expectCode(
 
 const session = "session/standard";
 const firstRegistration = handleNormalSessionChatMessage(bridge, { sessionID: session, agent: "orchestrator" });
+assert.equal(firstRegistration.schema_version, 3);
+assert.equal(firstRegistration.catalog_binding_revision, 0);
+assert.deepEqual(firstRegistration.catalog_rotation_history, []);
 assert.equal(firstRegistration.lifecycle, "unclassified");
 assert.equal(firstRegistration.primary_development_agent, true);
 assert.equal(handleNormalSessionChatMessage(bridge, { sessionID: session, agent: "orchestrator" }).state_revision, firstRegistration.state_revision);
@@ -245,6 +249,9 @@ assert.equal(standardRegistration.risk_class, "standard-lite");
 assert.deepEqual(standardRegistration.ownership_paths, ["src"]);
 assert.deepEqual(standardRegistration.required_check_ids, ["normal-harness-static"]);
 const standardState = inspectNormalSessionQualityState(bridge, session);
+assert.equal(standardState.schema_version, 6);
+assert.equal(standardState.project_catalog_binding_revision, 0);
+assert.deepEqual(standardState.project_catalog_rotation_history, []);
 assert.equal(standardState.dossier.impact_graph, null, "standard-lite must not require a fabricated full impact graph");
 assert.equal(standardState.dossier.task_shape.worktree_state, "clean");
 assert.deepEqual(
@@ -896,6 +903,94 @@ expectCode(() => executeNormalSessionQualityTool(
   { request: JSON.stringify(standardStart()) },
   { sessionID: "session/dossier-race", agent: "orchestrator" },
 ), "QUALITY_WORKSPACE_UNTRACED");
+
+const leaseCrashRoot = path.join(tempRoot, ".oc_harness", "lease-crash-fixtures");
+fs.mkdirSync(leaseCrashRoot, { recursive: true });
+const filesModuleUrl = new URL("../lib/feedback/files.mjs", import.meta.url).href;
+const leaseCrashSource = String.raw`
+const [filesModuleUrl, basePath, lockPath, stage] = process.argv.slice(1);
+const { withRecoverableExclusiveLock } = await import(filesModuleUrl);
+withRecoverableExclusiveLock(lockPath, () => {
+  if (stage === "callback") process.exit(83);
+}, {
+  basePath,
+  lockStaleMs: 0,
+  lockIdFactory: () => "lease-crash-" + stage,
+  afterLeaseLink: () => {
+    if (stage === "after-link") process.exit(83);
+  },
+  afterLeasePublish: () => {
+    if (stage === "after-publish") process.exit(83);
+  },
+});
+process.exit(84);
+`;
+for (const [stage, expectedLinks] of [
+  ["after-link", 2],
+  ["after-publish", 1],
+  ["callback", 1],
+]) {
+  const lockPath = path.join(leaseCrashRoot, `${stage}.lock`);
+  const child = spawnSync(process.execPath, [
+    "--input-type=module",
+    "--eval",
+    leaseCrashSource,
+    filesModuleUrl,
+    leaseCrashRoot,
+    lockPath,
+    stage,
+  ], {
+    encoding: "utf8",
+    shell: false,
+    windowsHide: true,
+    timeout: 30_000,
+  });
+  assert.equal(child.status, 83, `${stage} must exit inside the intended lock crash window: ${child.stderr}`);
+  assert.equal(fs.lstatSync(lockPath).nlink, expectedLinks, `${stage} must leave only a complete published lease shape`);
+  let recovered = false;
+  withRecoverableExclusiveLock(lockPath, () => {
+    recovered = true;
+  }, {
+    basePath: leaseCrashRoot,
+    lockStaleMs: 0,
+    clockMs: () => Date.now() + 60_000,
+    processIsAlive: () => false,
+    lockIdFactory: () => `lease-recovered-${stage}`,
+  });
+  assert.equal(recovered, true, `${stage} lease must recover after its process is confirmed dead`);
+  assert.equal(fs.existsSync(lockPath), false);
+  assert.equal(
+    fs.readdirSync(leaseCrashRoot).some((entry) => entry.includes(`lease-crash-${stage}.tmp`)),
+    false,
+    `${stage} orphan publication link must be removed during recovery`,
+  );
+}
+
+const partialLease = path.join(leaseCrashRoot, "partial.lock");
+fs.writeFileSync(partialLease, '{"schema_version":1,"pid":', "utf8");
+expectCode(() => withRecoverableExclusiveLock(partialLease, () => {}, {
+  basePath: leaseCrashRoot,
+  lockStaleMs: 0,
+  processIsAlive: () => false,
+}), "FILES_LOCKED");
+assert.equal(fs.readFileSync(partialLease, "utf8"), '{"schema_version":1,"pid":');
+fs.unlinkSync(partialLease);
+
+const liveLease = path.join(leaseCrashRoot, "live.lock");
+fs.writeFileSync(liveLease, `${JSON.stringify({
+  schema_version: 1,
+  pid: process.pid,
+  created_at_ms: 1,
+  nonce: "live-lease",
+})}\n`, "utf8");
+expectCode(() => withRecoverableExclusiveLock(liveLease, () => {}, {
+  basePath: leaseCrashRoot,
+  lockStaleMs: 0,
+  clockMs: () => Date.now() + 60_000,
+  processIsAlive: () => true,
+}), "FILES_LOCKED");
+assert.equal(fs.existsSync(liveLease), true, "a live lease must not be reclaimed even after its stale age");
+fs.unlinkSync(liveLease);
 
 handleNormalSessionChatMessage(bridge, { sessionID: "session/catalog-drift", agent: "orchestrator" });
 call("session/catalog-drift", "orchestrator", "quality_session_start", standardStart());

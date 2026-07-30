@@ -127,6 +127,12 @@ assert.equal(adoptedQualityPermissionMatrix(root, (permissions) => {
 assert.equal(adoptedQualityPermissionMatrix(root, (permissions) => {
   permissions.get("general").set("quality_context_strategy_escalate", "allow");
 }), false, "non-orchestrator escalation exposure must be detected");
+assert.equal(adoptedQualityPermissionMatrix(root, (permissions) => {
+  permissions.get("orchestrator-deep").delete("quality_project_catalog_rotate");
+}), false, "missing orchestrator catalog-rotation permission must be detected");
+assert.equal(adoptedQualityPermissionMatrix(root, (permissions) => {
+  permissions.get("verifier").set("quality_project_catalog_rotate", "allow");
+}), false, "catalog rotation exposure outside orchestrators must be detected");
 
 function git(workspaceRoot, args) {
   const result = spawnSync("git", args, {

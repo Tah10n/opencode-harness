@@ -96,6 +96,7 @@ assert.deepEqual(Object.keys(plugin.tool).sort(), [
   "quality_dossier_finalize",
   "quality_dossier_inspect",
   "quality_dossier_update",
+  "quality_project_catalog_rotate",
   "quality_session_finalize",
   "quality_session_start",
   "quality_verification_record",

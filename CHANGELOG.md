@@ -18,6 +18,13 @@ the feedback-plane ESM subpaths documented for the `0.3.0` target.
   model-backed workflow; and model-free default-CI sensors that never simulate
   model success. Synthetic verdicts remain separate from the existing
   `assess:candidate` release acceptance contract.
+- Added a fail-closed, orchestrator-only project-check catalog rotation for the
+  narrow timeout-increase case. It reconstructs the previous catalog, proves
+  that the gate-bound engineering projection is unchanged, publishes one
+  owner-first receipt to owner schema v6 and registry schema v3, and recovers
+  exact retries after either durable commit. Legacy owner v5, registry v2, and
+  child-link v5 records remain strict readable forms and never auto-migrate on
+  ordinary writes.
 - Added mechanically verified core, quality, evaluation, and complete adoption
   views backed by the canonical profile inventory. The isolated core view
   excludes benchmark, quality, and native containment infrastructure.
