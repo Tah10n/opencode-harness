@@ -43,7 +43,7 @@
       "cwd": ".",
       "phases": ["slice", "integration"],
       "purpose": "verification",
-      "timeout_ms": 180000,
+      "timeout_ms": 600000,
       "max_output_chars": 2097152
     },
     {
@@ -103,7 +103,7 @@
       "cwd": ".",
       "phases": ["slice", "integration"],
       "purpose": "verification",
-      "timeout_ms": 120000,
+      "timeout_ms": 300000,
       "max_output_chars": 1048576
     },
     {

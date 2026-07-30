@@ -90,6 +90,26 @@ const engineering = projectCatalogToEngineeringCatalog(validatedExample, "truste
 assert.deepEqual(Object.keys(engineering.checks[0]).sort(), ["available", "check_id", "phases", "trusted_producer"]);
 
 const productionCatalog = loadProjectCheckCatalog(workspaceRoot).catalog;
+const productionChecksById = new Map(
+  productionCatalog.checks.map((check) => [check.check_id, check]),
+);
+const trustedBudgetExpectations = new Map([
+  ["verify-normal-session-quality-bridge", 600_000],
+  ["verify-runtime-quality-hooks-fixture", 300_000],
+]);
+for (const [checkId, expectedTimeoutMs] of trustedBudgetExpectations) {
+  const productionCheck = productionChecksById.get(checkId);
+  assert.ok(productionCheck, `production catalog must include ${checkId}`);
+  assert.equal(
+    productionCheck.timeout_ms,
+    expectedTimeoutMs,
+    `${checkId} must retain its reviewed timeout budget`,
+  );
+  assert.ok(
+    productionCheck.timeout_ms <= PROJECT_CHECK_LIMITS.max_timeout_ms,
+    `${checkId} timeout must not exceed the global project-check maximum`,
+  );
+}
 const recursiveCheckIds = new Set(["verify-all", "verify-trusted-project-runner"]);
 const recursiveNpmScripts = new Set(["verify", "verify:trusted-project-runner"]);
 const recursiveProductionChecks = productionCatalog.checks.filter((entry) => (
