@@ -14,12 +14,26 @@ import {
   runSyntheticCliMain,
 } from "../lib/benchmark/cli.mjs";
 import { loadSyntheticContracts } from "../lib/benchmark/contracts.mjs";
+import { fingerprint } from "../lib/feedback/contracts.mjs";
 import {
   publishSyntheticReplayReport,
   runSyntheticReplay,
   syntheticModelBindingFingerprint,
   validateSyntheticReplayReport,
+  validateSyntheticReplayReportSourceBinding,
 } from "../lib/benchmark/replay.mjs";
+import {
+  syntheticEffectivePublicInputFingerprint,
+  syntheticRunnerLimitsFingerprint,
+} from "../lib/benchmark/runner.mjs";
+import {
+  SYNTHETIC_OPENCODE_ADAPTER_VERSION,
+  syntheticOpenCodeAdapterFingerprint,
+} from "../lib/benchmark/opencode-adapter.mjs";
+import {
+  cleanupSyntheticProfile,
+  materializeSyntheticProfile,
+} from "../lib/benchmark/profiles.mjs";
 import { publishSyntheticRunArtifacts } from "../lib/benchmark/reporting.mjs";
 import {
   DEFAULT_MODEL_FREE_CHECKS,
@@ -59,7 +73,16 @@ function passingExecution(stdout = "", stderr = "") {
   };
 }
 
-function replayResult({
+function replayAttempt({
+  sourceRoot,
+  instance,
+  profileId,
+  operationalRunId,
+  model,
+  provider,
+  variant,
+  timeoutMs,
+}, {
   status = "completed",
   terminationReason = "verified",
   reason = null,
@@ -67,13 +90,81 @@ function replayResult({
   evidenceComplete = true,
   wholeTaskSuccess = true,
 } = {}) {
-  return {
+  const profile = materializeSyntheticProfile({ sourceRoot, profileId });
+  const profileFingerprint = profile.profileFingerprint;
+  cleanupSyntheticProfile(profile);
+  const completed = status === "completed";
+  const checkOutcome = () => completed
+    ? { status: "passed", passed: true, violations: [] }
+    : { status: "not_run", passed: null, violations: ["adapter_unavailable"] };
+  const initialWorkspace = fingerprint({
+    fixture: "replay-initial-workspace",
+    instance: instance.instance_fingerprint,
+  });
+  const result = {
+    profile_id: profileId,
+    profile_fingerprint: profileFingerprint,
+    operational_run_id: operationalRunId,
     execution_status: status,
     termination_reason: terminationReason,
     reason,
+    cli_version: completed ? "1.17.0" : null,
     adapter_completed_correctly: adapterCompleted,
+    agent_reported_success: completed,
+    termination_acceptable: completed,
+    visible_check: checkOutcome(),
+    hidden_check: checkOutcome(),
+    workspace_policy: checkOutcome(),
+    trace_policy: checkOutcome(),
+    teardown: { status: "passed", passed: true, violations: [] },
+    cleanup: { status: "passed", passed: true, violations: [] },
+    hidden_safety_failed: false,
     evidence_complete: evidenceComplete,
     whole_task_success: wholeTaskSuccess,
+    defect_escape_v2: false,
+    fingerprints: {
+      adapter: completed ? syntheticOpenCodeAdapterFingerprint() : null,
+      initial_workspace: initialWorkspace,
+      final_workspace: completed
+        ? fingerprint({ fixture: "replay-final-workspace", operationalRunId })
+        : null,
+      trace: completed ? fingerprint({ fixture: "replay-trace", operationalRunId }) : null,
+    },
+    metrics: {
+      tool_call_count: completed ? 1 : null,
+      subagent_call_count: completed ? 0 : null,
+      context_read_count: null,
+      permission_request_count: null,
+      dangerous_command_count: completed ? 0 : null,
+      network_action_count: completed ? 0 : null,
+      hidden_access_attempt_count: completed ? 0 : null,
+      workspace_mutation_count: completed ? 1 : null,
+      fix_command_count: completed ? 1 : null,
+      repository_instruction_action_count: completed ? 0 : null,
+      secret_write_count: completed ? 0 : null,
+      duration_ms: completed ? 1 : null,
+      cost_usd: null,
+      availability: {
+        context_reads: "unavailable",
+        permission_requests: "unavailable",
+        network_actions: completed ? "available" : "unavailable",
+        cost: "unavailable",
+      },
+    },
+    operational_trace_id: completed ? `trace-${operationalRunId}` : null,
+  };
+  return {
+    binding: {
+      public_fixture_fingerprint: instance.public_fixture_fingerprint,
+      hidden_fixture_fingerprint: instance.hidden_fixture_fingerprint,
+      effective_public_input_fingerprint: syntheticEffectivePublicInputFingerprint(instance),
+      initial_public_manifest_fingerprint: initialWorkspace,
+      model_fingerprint: syntheticModelBindingFingerprint({ provider, model, variant }),
+      timeout_ms: timeoutMs,
+      limits_fingerprint: syntheticRunnerLimitsFingerprint(),
+      adapter_protocol_version: SYNTHETIC_OPENCODE_ADAPTER_VERSION,
+    },
+    result,
   };
 }
 
@@ -521,10 +612,28 @@ export async function verifyBenchmarkCli({ root = defaultRoot } = {}) {
       provider: "fixture",
       runProfileAttempt: async () => {
         staleAttemptCalls += 1;
-        return { result: replayResult() };
+        throw new Error("stale replay unexpectedly executed");
       },
     }), (error) => error?.code === "SYNTHETIC_REPLAY_STALE_FINGERPRINT");
     assert.equal(staleAttemptCalls, 0);
+
+    await assert.rejects(() => runSyntheticReplay({
+      sourceRoot: root,
+      familyId,
+      seed: "replay-timeout-mismatch",
+      repetition: 1,
+      profileId: "plain",
+      model: "fixture/model",
+      provider: "fixture",
+      timeoutMs: 60_000,
+      runProfileAttempt: async (input) => {
+        const attempt = replayAttempt(input);
+        attempt.binding.timeout_ms = 90_000;
+        return attempt;
+      },
+      clock: () => new Date(FIXED_TIME),
+      idFactory: () => "replay-timeout-mismatch",
+    }), (error) => error?.code === "SYNTHETIC_REPORT_BINDING");
 
     const successfulReplay = await runSyntheticReplay({
       sourceRoot: root,
@@ -534,15 +643,97 @@ export async function verifyBenchmarkCli({ root = defaultRoot } = {}) {
       profileId: "plain",
       model: "fixture/model",
       provider: "fixture",
-      runProfileAttempt: async () => ({ result: replayResult() }),
+      runProfileAttempt: async (input) => replayAttempt(input),
       clock: () => new Date(FIXED_TIME),
       idFactory: () => "replay-cli-success",
     });
     validateSyntheticReplayReport(successfulReplay.report);
+    validateSyntheticReplayReportSourceBinding(successfulReplay.report, { sourceRoot: root });
+    assert.equal(Object.isFrozen(successfulReplay.report), true);
+    assert.equal(Object.isFrozen(successfulReplay.report.attempt), true);
+    assert.equal(Object.isFrozen(successfulReplay.report.attempt.binding), true);
+    assert.equal(Object.isFrozen(successfulReplay.report.attempt.result.metrics), true);
     assert.equal(successfulReplay.report.model_execution_confirmed, true);
     assert.equal(
       JSON.stringify(successfulReplay.report).includes("fixture/model"),
       false,
+    );
+    const malformedAttemptReplay = structuredClone(successfulReplay.report);
+    malformedAttemptReplay.attempt = null;
+    assert.throws(
+      () => validateSyntheticReplayReport(malformedAttemptReplay),
+      (error) => error?.code === "SYNTHETIC_REPLAY_SHAPE",
+    );
+    const detachedResultReplay = structuredClone(successfulReplay.report);
+    detachedResultReplay.attempt.result.metrics.tool_call_count += 1;
+    assert.throws(
+      () => validateSyntheticReplayReport(detachedResultReplay),
+      (error) => error?.code === "SYNTHETIC_REPLAY_EVIDENCE",
+    );
+    const mismatchedRunReplay = structuredClone(successfulReplay.report);
+    mismatchedRunReplay.attempt.result.operational_run_id = "replay-cli-other";
+    mismatchedRunReplay.result_fingerprint = fingerprint(mismatchedRunReplay.attempt.result);
+    assert.throws(
+      () => validateSyntheticReplayReport(mismatchedRunReplay),
+      (error) => error?.code === "SYNTHETIC_REPORT_BINDING",
+    );
+    const contradictoryInitialReplay = structuredClone(successfulReplay.report);
+    contradictoryInitialReplay.attempt.binding.initial_public_manifest_fingerprint =
+      "sha256:0000000000000000000000000000000000000000000000000000000000000000";
+    assert.throws(
+      () => validateSyntheticReplayReport(contradictoryInitialReplay),
+      (error) => error?.code === "SYNTHETIC_REPORT_BINDING",
+    );
+    const invalidTimeoutReplay = structuredClone(successfulReplay.report);
+    invalidTimeoutReplay.attempt.binding.timeout_ms = 59_999;
+    assert.throws(
+      () => validateSyntheticReplayReport(invalidTimeoutReplay),
+      (error) => error?.code === "SYNTHETIC_REPORT_TIMEOUT",
+    );
+    const staleInputReplay = structuredClone(successfulReplay.report);
+    staleInputReplay.attempt.binding.effective_public_input_fingerprint =
+      "sha256:0000000000000000000000000000000000000000000000000000000000000000";
+    validateSyntheticReplayReport(staleInputReplay);
+    assert.throws(
+      () => validateSyntheticReplayReportSourceBinding(staleInputReplay, { sourceRoot: root }),
+      (error) => error?.code === "SYNTHETIC_REPLAY_SOURCE_BINDING",
+    );
+    const staleLimitsReplay = structuredClone(successfulReplay.report);
+    staleLimitsReplay.attempt.binding.limits_fingerprint =
+      "sha256:0000000000000000000000000000000000000000000000000000000000000000";
+    validateSyntheticReplayReport(staleLimitsReplay);
+    assert.throws(
+      () => validateSyntheticReplayReportSourceBinding(staleLimitsReplay, { sourceRoot: root }),
+      (error) => error?.code === "SYNTHETIC_REPLAY_SOURCE_BINDING",
+    );
+    const staleProfileReplay = structuredClone(successfulReplay.report);
+    staleProfileReplay.profile_fingerprint =
+      "sha256:0000000000000000000000000000000000000000000000000000000000000000";
+    staleProfileReplay.attempt.result.profile_fingerprint =
+      staleProfileReplay.profile_fingerprint;
+    staleProfileReplay.result_fingerprint = fingerprint(staleProfileReplay.attempt.result);
+    validateSyntheticReplayReport(staleProfileReplay);
+    assert.throws(
+      () => validateSyntheticReplayReportSourceBinding(staleProfileReplay, { sourceRoot: root }),
+      (error) => error?.code === "SYNTHETIC_REPLAY_SOURCE_BINDING",
+    );
+    const staleAdapterReplay = structuredClone(successfulReplay.report);
+    staleAdapterReplay.attempt.result.fingerprints.adapter =
+      "sha256:0000000000000000000000000000000000000000000000000000000000000000";
+    staleAdapterReplay.result_fingerprint = fingerprint(staleAdapterReplay.attempt.result);
+    validateSyntheticReplayReport(staleAdapterReplay);
+    assert.throws(
+      () => validateSyntheticReplayReportSourceBinding(staleAdapterReplay, { sourceRoot: root }),
+      (error) => error?.code === "SYNTHETIC_REPLAY_SOURCE_BINDING",
+    );
+    const legacyReplay = structuredClone(successfulReplay.report);
+    legacyReplay.schema_version = 1;
+    delete legacyReplay.profile_fingerprint;
+    delete legacyReplay.attempt;
+    validateSyntheticReplayReport(legacyReplay);
+    assert.throws(
+      () => validateSyntheticReplayReportSourceBinding(legacyReplay, { sourceRoot: root }),
+      (error) => error?.code === "SYNTHETIC_REPLAY_SOURCE_BINDING",
     );
     const contradictoryReplay = structuredClone(successfulReplay.report);
     contradictoryReplay.model_execution_confirmed = false;
@@ -553,20 +744,69 @@ export async function verifyBenchmarkCli({ root = defaultRoot } = {}) {
     );
     assert.throws(() => publishSyntheticReplayReport({
       sourceRoot: fixtureRoot,
+      contractSourceRoot: root,
       report: contradictoryReplay,
       relativeRoot: "replays-invalid",
     }));
+    assert.equal(fs.existsSync(path.join(fixtureRoot, "replays-invalid")), false);
     const replayPublication = publishSyntheticReplayReport({
       sourceRoot: fixtureRoot,
+      contractSourceRoot: root,
       report: successfulReplay.report,
       relativeRoot: "replays",
     });
     assert.deepEqual(publishSyntheticReplayReport({
       sourceRoot: fixtureRoot,
+      contractSourceRoot: root,
       report: successfulReplay.report,
       relativeRoot: "replays",
     }), replayPublication);
     assert.equal(fs.existsSync(path.join(fixtureRoot, replayPublication.files.completion)), true);
+
+    const requestedReplay = {
+      sourceRoot: fixtureRoot,
+      contractSourceRoot: root,
+      familyId,
+      seed: successfulReplay.report.seed,
+      repetition: successfulReplay.report.repetition,
+      profileId: successfulReplay.report.profile_id,
+      instanceFingerprint: successfulReplay.report.instance_fingerprint,
+      model: "fixture/model",
+      provider: "fixture",
+      variant: null,
+      timeoutMs: successfulReplay.report.attempt.binding.timeout_ms,
+    };
+    const differentFamily = contracts.families.find((entry) => entry.id !== familyId).id;
+    const replayRequestMismatches = [
+      { familyId: differentFamily },
+      { seed: "different-replay-seed" },
+      { repetition: 2 },
+      { profileId: "profile-only" },
+      {
+        instanceFingerprint:
+          "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      },
+      { model: "fixture/other-model" },
+      { provider: "other-provider" },
+      { variant: "other-variant" },
+      { timeoutMs: 90_000 },
+    ];
+    for (const mismatch of replayRequestMismatches) {
+      let publishCalls = 0;
+      await assert.rejects(
+        () => replaySyntheticBenchmarkWorkflow({
+          ...requestedReplay,
+          ...mismatch,
+          runReplay: async () => successfulReplay,
+          publishReplay: () => {
+            publishCalls += 1;
+            throw new Error("mismatched replay must not publish");
+          },
+        }),
+        (error) => error?.code === "SYNTHETIC_CLI_REPLAY_BINDING",
+      );
+      assert.equal(publishCalls, 0);
+    }
 
     const blockedReplay = await runSyntheticReplay({
       sourceRoot: root,
@@ -576,15 +816,14 @@ export async function verifyBenchmarkCli({ root = defaultRoot } = {}) {
       profileId: "instrumented",
       model: "fixture/model",
       provider: "fixture",
-      runProfileAttempt: async () => ({
-        result: replayResult({
-          status: "blocked_external_state",
-          terminationReason: "blocked_external_state",
-          reason: "opencode_unavailable",
-          adapterCompleted: false,
-          evidenceComplete: false,
-          wholeTaskSuccess: false,
-        }),
+      timeoutMs: 60_000,
+      runProfileAttempt: async (input) => replayAttempt(input, {
+        status: "blocked_external_state",
+        terminationReason: "blocked_external_state",
+        reason: "opencode_unavailable",
+        adapterCompleted: false,
+        evidenceComplete: false,
+        wholeTaskSuccess: false,
       }),
       clock: () => new Date(FIXED_TIME),
       idFactory: () => "replay-cli-blocked",
@@ -598,6 +837,7 @@ export async function verifyBenchmarkCli({ root = defaultRoot } = {}) {
     );
     const replayWorkflow = await replaySyntheticBenchmarkWorkflow({
       sourceRoot: fixtureRoot,
+      contractSourceRoot: root,
       familyId,
       seed: "replay-blocked-seed",
       repetition: 1,
@@ -608,9 +848,10 @@ export async function verifyBenchmarkCli({ root = defaultRoot } = {}) {
       variant: null,
       timeoutMs: 60_000,
       runReplay: async () => blockedReplay,
-      publishReplay: ({ sourceRoot, report: replayReport }) =>
+      publishReplay: ({ sourceRoot, contractSourceRoot, report: replayReport }) =>
         publishSyntheticReplayReport({
           sourceRoot,
+          contractSourceRoot,
           report: replayReport,
           relativeRoot: "replays",
         }),

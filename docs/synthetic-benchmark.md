@@ -151,6 +151,14 @@ evidence only when real model execution is confirmed and the adapter,
 visible/hidden checks, workspace policy, trace assertions, and termination
 contract all complete. A stale fingerprint fails before model execution.
 
+New replay artifacts use strict replay report v2. The report stores the full
+privacy-safe attempt binding and result, and source-bound validation
+reconstructs the canonical instance and profile before publication. It also
+binds the effective public input, default runner limits, adapter protocol and
+fingerprint, operational run, initial workspace, and result fingerprint.
+Replay report v1 remains a strict historical structural read only; it cannot
+pass source-bound validation or be published as current replay evidence.
+
 ## Fairness, Isolation, And Anti-Cheating
 
 Each pair binds:
@@ -163,9 +171,13 @@ Each pair binds:
 - no network, package operations, lockfile operations, hidden paths, generator
   internals, policy thresholds, or other-profile result.
 
-Execution order is deterministically counterbalanced from the benchmark seed,
-family ID, and repetition instead of always running the baseline first. Order
-is stored in the report but does not change pair identity.
+Execution order is deterministically counterbalanced across the whole requested
+suite. The scheduler hashes the benchmark seed, suite ID, family ID, and
+repetition, uses those digests for a stable pair permutation, chooses one
+seeded starting role, and alternates the first profile for every subsequent
+pair. The same inputs reproduce the same schedule, while baseline-first and
+candidate-first counts differ by at most one. Per-pair profile order is stored
+in the report but does not change pair identity.
 
 Hidden files are staged only after adapter completion, verified process-tree
 teardown, and the pre-hidden workspace-policy check. Runner self-tests prove
@@ -239,9 +251,10 @@ instances are ignored machine-local artifacts.
 
 Reports retain profile/fixture/seed, suite, policy, and model-binding
 fingerprints, execution order, completeness, metrics, statistics, availability,
-and residual caveats. They exclude full prompts and completions, credentials,
-secrets, raw private logs, arbitrary adapter output, absolute user paths, and
-hidden source.
+and residual caveats. Replay report v2 additionally retains its exact
+privacy-safe attempt binding and result. Reports exclude full prompts and
+completions, credentials, secrets, raw private logs, arbitrary adapter output,
+absolute user paths, and hidden source.
 
 ## Adoption And CI
 

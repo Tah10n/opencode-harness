@@ -9,15 +9,21 @@ the feedback-plane ESM subpaths documented for the `0.3.0` target.
 - Added a model-neutral synthetic ablation benchmark with honest `plain`,
   `profile-only`, and `instrumented` profiles; 16 deterministic short-task
   families; smoke, standard, and full suites; seeded declarative rendering;
-  isolated real OpenCode execution; counterbalanced paired runs; hidden staging
-  after verified teardown; corrected `defect_escape_v2`; paired statistics;
-  immutable privacy-safe JSON/Markdown/CSV reports; replay; and model-free
+  isolated real OpenCode execution; reproducible suite-balanced paired
+  scheduling; hidden staging after verified teardown; corrected
+  `defect_escape_v2`; paired statistics; immutable privacy-safe
+  JSON/Markdown/CSV reports; source-bound replay; and model-free
   validation/self-tests.
 - Added strict versioned run, comparison, replay, and self-test schemas; simple
   benchmark/compare/replay commands; a protected manual self-hosted
   model-backed workflow; and model-free default-CI sensors that never simulate
   model success. Synthetic verdicts remain separate from the existing
   `assess:candidate` release acceptance contract.
+- Upgraded new replay evidence to schema v2 so every durable replay binds the
+  canonical instance, profile, effective public input, runner limits, adapter
+  contract, operational run, initial workspace, and full privacy-safe attempt
+  result. Strict replay-v1 reads remain available for historical structure
+  only and cannot be republished or treated as source-bound evidence.
 - Added a fail-closed, orchestrator-only project-check catalog rotation for the
   narrow timeout-increase case. It reconstructs the previous catalog, proves
   that the gate-bound engineering projection is unchanged, publishes one

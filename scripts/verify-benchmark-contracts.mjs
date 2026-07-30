@@ -537,6 +537,21 @@ function verifyBenchmarkEvaluationContractsLoaded({ root, contracts }) {
     "boolean",
   );
   verifyEvidenceSchemaRuntimeParity(selfTestReportSchema, replayReportSchema);
+  const replayReportV2Schema =
+    contracts.schemas["benchmarks/synthetic/schemas/replay-report.v2.schema.json"];
+  assert.equal(
+    replayReportV2Schema.$id,
+    "https://opencode-harness.invalid/schemas/synthetic-replay-report-v2",
+  );
+  assert.equal(replayReportV2Schema.properties.schema_version.const, 2);
+  assert.equal(
+    replayReportV2Schema.properties.attempt.properties.binding.$ref,
+    "https://opencode-harness.invalid/schemas/synthetic-run-report-v2#/$defs/pairBinding",
+  );
+  assert.equal(
+    replayReportV2Schema.properties.attempt.properties.result.$ref,
+    "https://opencode-harness.invalid/schemas/synthetic-run-report-v2#/$defs/runResult",
+  );
   const reportSafeIdPattern = new RegExp(runReportSchema.$defs.safeId.pattern);
   for (const id of ["run-1", "plain.profile"]) {
     assert.equal(reportSafeIdPattern.test(id), true);

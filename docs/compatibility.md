@@ -59,9 +59,13 @@ cannot omit that preimplementation chain.
   schema-v1 event shape when safe, but do not reinterpret malformed legacy
   artifacts or append v2 events to a v1 stream.
 - Synthetic benchmark artifacts use separate strict schemas: paired run report
-  v2, paired comparison report v1, replay report v1, and model-free self-test
-  report v1. They do not alter the existing live release-report readers or
-  candidate-assessment evidence chain.
+  v2, paired comparison report v1, replay report v2, and model-free self-test
+  report v1. Replay report v2 binds the full privacy-safe attempt to canonical
+  source, profile, runner, and adapter evidence. The strict replay-report-v1
+  reader remains for historical structural inspection only; v1 cannot satisfy
+  source binding or be republished as current evidence. These schemas do not
+  alter the existing live release-report readers or candidate-assessment
+  evidence chain.
 - The benchmark CLI returns `blocked_external_state` with exit code 2 when a
   host-selected model or compatible real OpenCode adapter is unavailable. It
   never converts missing external state into model success.

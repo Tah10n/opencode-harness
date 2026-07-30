@@ -713,6 +713,7 @@
       ],
       "counterbalance_hash_inputs": [
         "seed",
+        "suite_id",
         "family_id",
         "repetition"
       ],

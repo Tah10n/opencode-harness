@@ -11,6 +11,17 @@ import {
   renderSyntheticInstance,
 } from "../lib/benchmark/renderer.mjs";
 import {
+  counterbalancedProfileSchedule,
+  syntheticEffectivePublicInputFingerprint,
+} from "../lib/benchmark/runner.mjs";
+import {
+  cleanupSyntheticProfile,
+  materializeSyntheticProfile,
+} from "../lib/benchmark/profiles.mjs";
+import {
+  syntheticOpenCodeAdapterFingerprint,
+} from "../lib/benchmark/opencode-adapter.mjs";
+import {
   publishSyntheticRunArtifacts,
   renderSyntheticRunCsv,
   renderSyntheticRunMarkdown,
@@ -64,7 +75,7 @@ function successfulResult(profileId, profileFingerprint, suffix) {
     whole_task_success: true,
     defect_escape_v2: false,
     fingerprints: {
-      adapter: fp("adapter"),
+      adapter: syntheticOpenCodeAdapterFingerprint(),
       initial_workspace: fp("initial"),
       final_workspace: fp(`final-${suffix}`),
       trace: fp(`trace-${suffix}`),
@@ -116,65 +127,85 @@ function bindPairToInstance(pair, instance) {
   pair.binding.hidden_fixture_fingerprint = instance.hidden_fixture_fingerprint;
 }
 
-function completeReport(contracts, templateSet, runId = "reporting-self-test") {
-  const baselineFingerprint = fp("profile-plain");
-  const candidateFingerprint = fp("profile-instrumented");
+function canonicalProfileFingerprint(sourceRoot, profileId) {
+  const materialized = materializeSyntheticProfile({ sourceRoot, profileId });
+  try {
+    return materialized.profileFingerprint;
+  } finally {
+    cleanupSyntheticProfile(materialized);
+  }
+}
+
+function completeReport(
+  contracts,
+  templateSet,
+  runId = "reporting-self-test",
+  sourceRoot = defaultRoot,
+) {
+  const baselineFingerprint = canonicalProfileFingerprint(sourceRoot, "plain");
+  const candidateFingerprint = canonicalProfileFingerprint(sourceRoot, "instrumented");
   const suite = contracts.suites.find((entry) => entry.id === "smoke");
   assert(suite);
   const seed = "reporting-self-test";
-  const pairs = suite.family_ids.flatMap((familyId, familyIndex) => Array.from(
-    { length: suite.repetitions },
-    (_, repetitionIndex) => {
-      const repetition = repetitionIndex + 1;
-      const instance = renderSyntheticInstance({
+  const instances = suite.family_ids.flatMap((familyId) => (
+    Array.from({ length: suite.repetitions }, (_, repetitionIndex) => (
+      renderSyntheticInstance({
         contracts,
         templateSet,
         familyId,
         seed,
-        repetition,
-      });
-      const identity = {
-        family_id: instance.family_id,
-        category: instance.category,
-        risk: instance.risk,
-        generated_fixture_fingerprint: instance.generated_fixture_fingerprint,
-        repetition: instance.repetition,
-      };
-      return {
-        pair_id: pairId(identity),
-        identity,
-        order: (familyIndex + repetition) % 2 === 0
-          ? ["plain", "instrumented"]
-          : ["instrumented", "plain"],
-        binding: {
-          public_fixture_fingerprint: instance.public_fixture_fingerprint,
-          hidden_fixture_fingerprint: instance.hidden_fixture_fingerprint,
-          effective_public_input_fingerprint: fp(`input-${familyId}-${repetition}`),
-          initial_public_manifest_fingerprint: fp(`initial-${familyId}-${repetition}`),
-          model_fingerprint: modelBindingFingerprint({
-            provider: "fixture",
-            model: "fixture/model",
-            variant: null,
-          }),
-          timeout_ms: 60_000,
-          limits_fingerprint: fp("limits"),
-          adapter_protocol_version: 2,
-        },
-        complete: true,
-        incomplete_reasons: [],
-        baseline: successfulResult(
-          "plain",
-          baselineFingerprint,
-          `${familyId}-${repetition}-plain`,
-        ),
-        candidate: successfulResult(
-          "instrumented",
-          candidateFingerprint,
-          `${familyId}-${repetition}-instrumented`,
-        ),
-      };
-    },
+        repetition: repetitionIndex + 1,
+      })
+    ))
   ));
+  const orderByPairId = new Map(counterbalancedProfileSchedule({
+    seed,
+    suiteId: suite.id,
+    instances,
+    baselineProfileId: "plain",
+    candidateProfileId: "instrumented",
+  }).map((entry) => [entry.pair_id, entry.order]));
+  const pairs = instances.map((instance) => {
+    const identity = {
+      family_id: instance.family_id,
+      category: instance.category,
+      risk: instance.risk,
+      generated_fixture_fingerprint: instance.generated_fixture_fingerprint,
+      repetition: instance.repetition,
+    };
+    const currentPairId = pairId(identity);
+    return {
+      pair_id: currentPairId,
+      identity,
+      order: [...orderByPairId.get(currentPairId)],
+      binding: {
+        public_fixture_fingerprint: instance.public_fixture_fingerprint,
+        hidden_fixture_fingerprint: instance.hidden_fixture_fingerprint,
+        effective_public_input_fingerprint: syntheticEffectivePublicInputFingerprint(instance),
+        initial_public_manifest_fingerprint: fp("initial"),
+        model_fingerprint: modelBindingFingerprint({
+          provider: "fixture",
+          model: "fixture/model",
+          variant: null,
+        }),
+        timeout_ms: 60_000,
+        limits_fingerprint: fp("limits"),
+        adapter_protocol_version: 2,
+      },
+      complete: true,
+      incomplete_reasons: [],
+      baseline: successfulResult(
+        "plain",
+        baselineFingerprint,
+        `${instance.family_id}-${instance.repetition}-plain`,
+      ),
+      candidate: successfulResult(
+        "instrumented",
+        candidateFingerprint,
+        `${instance.family_id}-${instance.repetition}-instrumented`,
+      ),
+    };
+  });
   return {
     schema_version: 2,
     report_kind: "synthetic-paired-run",
@@ -220,11 +251,12 @@ function completeReport(contracts, templateSet, runId = "reporting-self-test") {
   };
 }
 
-function incompleteReport(contracts, templateSet) {
+function incompleteReport(contracts, templateSet, sourceRoot = defaultRoot) {
   const report = structuredClone(completeReport(
     contracts,
     templateSet,
     "reporting-incomplete-test",
+    sourceRoot,
   ));
   const candidate = report.pairs[0].candidate;
   Object.assign(candidate, {
@@ -295,7 +327,7 @@ function preseedRunFiles(root, report, contents, count) {
 export function verifyBenchmarkReporting({ root = defaultRoot } = {}) {
   const contracts = loadSyntheticContracts(root);
   const templateSet = loadSyntheticTemplateSet(root, contracts);
-  const report = completeReport(contracts, templateSet);
+  const report = completeReport(contracts, templateSet, "reporting-self-test", root);
   const publishRun = (options) => publishSyntheticRunArtifacts({
     ...options,
     contractSourceRoot: root,
@@ -351,6 +383,31 @@ export function verifyBenchmarkReporting({ root = defaultRoot } = {}) {
     staleSource.suite[fingerprintKey] = fp(`stale-${fingerprintKey}`);
     mustRejectSourceBinding(staleSource);
   }
+  const wrongOrder = structuredClone(report);
+  wrongOrder.pairs[0].order.reverse();
+  mustRejectSourceBinding(wrongOrder);
+  const wrongEffectiveInput = structuredClone(report);
+  wrongEffectiveInput.pairs[0].binding.effective_public_input_fingerprint =
+    fp("wrong-effective-input");
+  mustRejectSourceBinding(wrongEffectiveInput);
+  const wrongProfileFingerprint = structuredClone(report);
+  wrongProfileFingerprint.profiles.baseline.fingerprint = fp("wrong-profile");
+  for (const pair of wrongProfileFingerprint.pairs) {
+    pair.baseline.profile_fingerprint = wrongProfileFingerprint.profiles.baseline.fingerprint;
+  }
+  assert.equal(validateSyntheticRunReport(wrongProfileFingerprint), wrongProfileFingerprint);
+  mustRejectSourceBinding(wrongProfileFingerprint);
+  const wrongAdapterFingerprint = structuredClone(report);
+  for (const pair of wrongAdapterFingerprint.pairs) {
+    pair.baseline.fingerprints.adapter = fp("wrong-adapter");
+    pair.candidate.fingerprints.adapter = fp("wrong-adapter");
+  }
+  assert.equal(validateSyntheticRunReport(wrongAdapterFingerprint), wrongAdapterFingerprint);
+  mustRejectSourceBinding(wrongAdapterFingerprint);
+  const contradictoryInitialWorkspace = structuredClone(report);
+  contradictoryInitialWorkspace.pairs[0].baseline.fingerprints.initial_workspace =
+    fp("contradictory-initial-workspace");
+  mustReject(contradictoryInitialWorkspace, "SYNTHETIC_REPORT_PAIR");
   const markdown = renderSyntheticRunMarkdown(report);
   const csv = renderSyntheticRunCsv(report);
   assert(markdown.includes("instrumented then plain"));
@@ -467,6 +524,7 @@ export function verifyBenchmarkReporting({ root = defaultRoot } = {}) {
       contracts,
       templateSet,
       "reporting-interrupted-test",
+      root,
     );
     assert.throws(
       () => publishRun({
@@ -549,7 +607,7 @@ export function verifyBenchmarkReporting({ root = defaultRoot } = {}) {
       assert.equal(fs.existsSync(path.join(markerDivergentRunRoot, name)), false);
     }
 
-    const incomplete = incompleteReport(contracts, templateSet);
+    const incomplete = incompleteReport(contracts, templateSet, root);
     assert.equal(validateSyntheticRunReport(incomplete), incomplete);
     const incompletePublished = publishRun({
       sourceRoot: incompleteRoot,

@@ -129,7 +129,10 @@ Configure `OPENCODE_BENCH_MODEL` in the host or add
 `--model <host-selected-model>`. Missing model/runtime state returns
 `blocked_external_state` with exit code 2; it never creates fake passing
 evidence. A completed command means the comparison evidence is complete, not
-that the candidate won. Model-free checks do not prove model quality.
+that the candidate won. Model-free checks do not prove model quality. Paired
+execution is deterministically balanced across the whole requested suite. New
+single-profile replay artifacts use source-bound replay report v2; legacy
+replay report v1 remains readable only as historical structure.
 
 See [docs/synthetic-benchmark.md](docs/synthetic-benchmark.md) for the profile
 contracts, 16 families, smoke/standard/full commands, fairness and hidden-data

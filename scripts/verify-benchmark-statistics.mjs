@@ -9,6 +9,17 @@ import {
   renderSyntheticInstance,
 } from "../lib/benchmark/renderer.mjs";
 import {
+  counterbalancedProfileSchedule,
+  syntheticEffectivePublicInputFingerprint,
+} from "../lib/benchmark/runner.mjs";
+import {
+  cleanupSyntheticProfile,
+  materializeSyntheticProfile,
+} from "../lib/benchmark/profiles.mjs";
+import {
+  syntheticOpenCodeAdapterFingerprint,
+} from "../lib/benchmark/opencode-adapter.mjs";
+import {
   analyzeSyntheticRunReport,
   exactTwoSidedMcNemar,
   macroFamilyPairedRate,
@@ -28,6 +39,15 @@ function modelFingerprint(execution) {
     model: execution.model,
     variant: execution.variant,
   });
+}
+
+function canonicalProfileFingerprint(sourceRoot, profileId) {
+  const materialized = materializeSyntheticProfile({ sourceRoot, profileId });
+  try {
+    return materialized.profileFingerprint;
+  } finally {
+    cleanupSyntheticProfile(materialized);
+  }
 }
 
 function passedOutcome() {
@@ -72,7 +92,7 @@ function runResult({
     whole_task_success: success,
     defect_escape_v2: !success,
     fingerprints: {
-      adapter: fp("adapter"),
+      adapter: syntheticOpenCodeAdapterFingerprint(),
       initial_workspace: fp(`initial-${familyId}-${repetition}`),
       final_workspace: fp(`final-${suffix}`),
       trace: fp(`trace-${suffix}`),
@@ -138,8 +158,8 @@ export function createStatisticsFixtureReport(contracts, {
   assert(suite);
   const templateSet = loadSyntheticTemplateSet(sourceRoot, contracts);
   const familyById = new Map(contracts.families.map((entry) => [entry.id, entry]));
-  const baselineFingerprint = fp("profile-plain");
-  const candidateFingerprint = fp("profile-instrumented");
+  const baselineFingerprint = canonicalProfileFingerprint(sourceRoot, "plain");
+  const candidateFingerprint = canonicalProfileFingerprint(sourceRoot, "instrumented");
   const execution = {
     provider: "fixture",
     model: "fixture/model",
@@ -153,68 +173,77 @@ export function createStatisticsFixtureReport(contracts, {
       cost: "unavailable",
     },
   };
+  const instances = suite.family_ids.flatMap((familyId) => (
+    Array.from({ length: suite.repetitions }, (_, index) => renderSyntheticInstance({
+      contracts,
+      templateSet,
+      familyId,
+      seed: "statistics-self-test",
+      repetition: index + 1,
+    }))
+  ));
+  const orderByPairId = new Map(counterbalancedProfileSchedule({
+    seed: "statistics-self-test",
+    suiteId,
+    instances,
+    baselineProfileId: "plain",
+    candidateProfileId: "instrumented",
+  }).map((entry) => [entry.pair_id, entry.order]));
   const pairs = [];
-  for (const [familyIndex, familyId] of suite.family_ids.entries()) {
+  for (const instance of instances) {
+    const familyId = instance.family_id;
+    const familyIndex = suite.family_ids.indexOf(familyId);
     const family = familyById.get(familyId);
     assert(family);
-    for (let repetition = 1; repetition <= suite.repetitions; repetition += 1) {
-      const instance = renderSyntheticInstance({
-        contracts,
-        templateSet,
+    const repetition = instance.repetition;
+    const generatedFixtureFingerprint = instance.generated_fixture_fingerprint;
+    const identity = {
+      family_id: familyId,
+      category: family.category,
+      risk: family.risk,
+      generated_fixture_fingerprint: generatedFixtureFingerprint,
+      repetition,
+    };
+    const pattern = successPattern(mode, familyIndex, repetition);
+    const currentPairId = fingerprint({
+      schema: "synthetic-pair-identity-v1",
+      family_id: familyId,
+      generated_fixture_fingerprint: generatedFixtureFingerprint,
+      repetition,
+    });
+    pairs.push({
+      pair_id: currentPairId,
+      identity,
+      order: [...orderByPairId.get(currentPairId)],
+      binding: {
+        public_fixture_fingerprint: instance.public_fixture_fingerprint,
+        hidden_fixture_fingerprint: instance.hidden_fixture_fingerprint,
+        effective_public_input_fingerprint: syntheticEffectivePublicInputFingerprint(instance),
+        initial_public_manifest_fingerprint: fp(`initial-${familyId}-${repetition}`),
+        model_fingerprint: modelFingerprint(execution),
+        timeout_ms: execution.timeout_ms,
+        limits_fingerprint: execution.limits_fingerprint,
+        adapter_protocol_version: execution.adapter_protocol_version,
+      },
+      complete: true,
+      incomplete_reasons: [],
+      baseline: runResult({
+        profileId: "plain",
+        profileFingerprint: baselineFingerprint,
         familyId,
-        seed: "statistics-self-test",
         repetition,
-      });
-      const generatedFixtureFingerprint = instance.generated_fixture_fingerprint;
-      const identity = {
-        family_id: familyId,
-        category: family.category,
-        risk: family.risk,
-        generated_fixture_fingerprint: generatedFixtureFingerprint,
+        success: pattern.baseline,
+        role: "baseline",
+      }),
+      candidate: runResult({
+        profileId: "instrumented",
+        profileFingerprint: candidateFingerprint,
+        familyId,
         repetition,
-      };
-      const pattern = successPattern(mode, familyIndex, repetition);
-      pairs.push({
-        pair_id: fingerprint({
-          schema: "synthetic-pair-identity-v1",
-          family_id: familyId,
-          generated_fixture_fingerprint: generatedFixtureFingerprint,
-          repetition,
-        }),
-        identity,
-        order: (familyIndex + repetition) % 2 === 0
-          ? ["plain", "instrumented"]
-          : ["instrumented", "plain"],
-        binding: {
-          public_fixture_fingerprint: instance.public_fixture_fingerprint,
-          hidden_fixture_fingerprint: instance.hidden_fixture_fingerprint,
-          effective_public_input_fingerprint: fp(`input-${familyId}-${repetition}`),
-          initial_public_manifest_fingerprint: fp(`manifest-${familyId}-${repetition}`),
-          model_fingerprint: modelFingerprint(execution),
-          timeout_ms: execution.timeout_ms,
-          limits_fingerprint: execution.limits_fingerprint,
-          adapter_protocol_version: execution.adapter_protocol_version,
-        },
-        complete: true,
-        incomplete_reasons: [],
-        baseline: runResult({
-          profileId: "plain",
-          profileFingerprint: baselineFingerprint,
-          familyId,
-          repetition,
-          success: pattern.baseline,
-          role: "baseline",
-        }),
-        candidate: runResult({
-          profileId: "instrumented",
-          profileFingerprint: candidateFingerprint,
-          familyId,
-          repetition,
-          success: pattern.candidate,
-          role: "candidate",
-        }),
-      });
-    }
+        success: pattern.candidate,
+        role: "candidate",
+      }),
+    });
   }
   return {
     schema_version: 2,

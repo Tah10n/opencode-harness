@@ -8,7 +8,7 @@ import { registerHooks } from "node:module";
 
 import { fingerprint } from "../lib/feedback/contracts.mjs";
 import {
-  counterbalancedProfileOrder,
+  counterbalancedProfileSchedule,
   evaluateSyntheticWorkspacePolicy,
   officialSyntheticAdapterConfigurationIsProfileNeutral,
   runSyntheticProfileAttempt,
@@ -543,22 +543,44 @@ export async function verifyBenchmarkRunner({ root = path.resolve(".") } = {}) {
   const antiCheating = new Set(contracts.inventory.benchmark.anti_cheating_cases);
   assert.equal(antiCheating.size, 9);
 
-  const orderSamples = contracts.families.map((family) => counterbalancedProfileOrder({
-    seed: "runner-counterbalance-v1",
-    familyId: family.id,
-    repetition: 1,
-    baselineProfileId: "plain",
-    candidateProfileId: "instrumented",
-  }));
-  assert(orderSamples.some((entry) => entry[0] === "plain"));
-  assert(orderSamples.some((entry) => entry[0] === "instrumented"));
-  assert.deepEqual(orderSamples, contracts.families.map((family) => counterbalancedProfileOrder({
-    seed: "runner-counterbalance-v1",
-    familyId: family.id,
-    repetition: 1,
-    baselineProfileId: "plain",
-    candidateProfileId: "instrumented",
-  })));
+  const counterbalanceCases = [
+    ["smoke", "audit90"],
+    ["standard", "audit17908"],
+    ["full", "audit19562"],
+  ];
+  let counterbalancePairCount = 0;
+  for (const [suiteId, seed] of counterbalanceCases) {
+    const suite = contracts.suites.find((entry) => entry.id === suiteId);
+    const instances = suite.family_ids.flatMap((familyId) => (
+      Array.from({ length: suite.repetitions }, (_, index) => renderSyntheticInstance({
+        contracts,
+        templateSet,
+        familyId,
+        seed,
+        repetition: index + 1,
+      }))
+    ));
+    const scheduleOptions = {
+      seed,
+      suiteId,
+      instances,
+      baselineProfileId: "plain",
+      candidateProfileId: "instrumented",
+    };
+    const schedule = counterbalancedProfileSchedule(scheduleOptions);
+    assert.deepEqual(schedule, counterbalancedProfileSchedule(scheduleOptions));
+    assert.equal(schedule.length, instances.length);
+    assert.equal(new Set(schedule.map((entry) => entry.pair_id)).size, instances.length);
+    assert.equal(
+      schedule.filter((entry) => entry.order[0] === "plain").length,
+      schedule.filter((entry) => entry.order[0] === "instrumented").length,
+      `${suiteId} must be exactly suite-balanced for an even pair count`,
+    );
+    for (let index = 1; index < schedule.length; index += 1) {
+      assert.notEqual(schedule[index - 1].order[0], schedule[index].order[0]);
+    }
+    counterbalancePairCount += schedule.length;
+  }
   antiCheating.delete("fixed-baseline-first");
 
   assert.deepEqual(
@@ -690,6 +712,13 @@ export async function verifyBenchmarkRunner({ root = path.resolve(".") } = {}) {
       reportRunId: "runner-self-test",
       baselineProfileId: "plain",
       candidateProfileId: "instrumented",
+      scheduleEntry: counterbalancedProfileSchedule({
+        seed: instance.seed,
+        suiteId: "smoke",
+        instances: [instance],
+        baselineProfileId: "plain",
+        candidateProfileId: "instrumented",
+      })[0],
       model: "fixture/model",
       timeoutMs: 60_000,
       adapterUrl: pathToFileURL(fakeAdapterPath).href,
@@ -872,7 +901,7 @@ export async function verifyBenchmarkRunner({ root = path.resolve(".") } = {}) {
   assert.deepEqual([...antiCheating], []);
   return {
     anti_cheating_cases: 9,
-    counterbalance_families: orderSamples.length,
+    counterbalance_pairs: counterbalancePairCount,
     production_runner_pairs: 1,
     production_plugin_activations: 1,
   };
@@ -884,5 +913,5 @@ function canonicalPrivacyText(value) {
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const result = await verifyBenchmarkRunner();
-  console.log(`Synthetic benchmark runner verification passed (${result.anti_cheating_cases} anti-cheating cases, ${result.counterbalance_families} counterbalance families, ${result.production_runner_pairs} production pair).`);
+  console.log(`Synthetic benchmark runner verification passed (${result.anti_cheating_cases} anti-cheating cases, ${result.counterbalance_pairs} suite-balanced pairs, ${result.production_runner_pairs} production pair).`);
 }
