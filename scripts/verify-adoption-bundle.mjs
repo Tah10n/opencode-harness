@@ -371,12 +371,18 @@ function expectQualityContractFailure(label, input) {
   throw new Error(`${label} did not fail closed`);
 }
 
-async function runNode(label, args) {
+const DEFAULT_RUN_NODE_TIMEOUT_MS = 120_000;
+const STATIC_BUNDLE_VERIFIER_TIMEOUT_MS = 300_000;
+
+async function runNode(label, args, { timeout = DEFAULT_RUN_NODE_TIMEOUT_MS } = {}) {
+  if (!Number.isSafeInteger(timeout) || timeout <= 0 || timeout > STATIC_BUNDLE_VERIFIER_TIMEOUT_MS) {
+    throw new TypeError(`invalid ${label} timeout: expected a positive safe integer no greater than ${STATIC_BUNDLE_VERIFIER_TIMEOUT_MS}`);
+  }
   const result = await runManagedCommand({
     file: process.execPath,
     args,
     cwd: bundleRoot,
-    timeout: 120_000,
+    timeout,
     maxOutputChars: 2 * 1024 * 1024,
     ...(deterministicContainmentFactory === null
       ? {}
@@ -551,7 +557,11 @@ try {
   await runNode("context live manifest verifier", ["scripts/verify-context-live-manifests.mjs"]);
   await runNode("context acceptance verifier", ["scripts/verify-context-acceptance.mjs"]);
   await runNode("milestone 2 DoD contract-only verifier", ["scripts/verify-milestone-2-dod.mjs"]);
-  await runNode("static bundle verifier", ["scripts/verify-harness.mjs"]);
+  await runNode(
+    "static bundle verifier",
+    ["scripts/verify-harness.mjs"],
+    { timeout: STATIC_BUNDLE_VERIFIER_TIMEOUT_MS },
+  );
   await runNode("live manifest verifier", ["scripts/verify-live-manifests.mjs"]);
   await runNode("live manifest runner validation", ["scripts/evaluate-live.mjs", "--validate"]);
   await runNode("buffered infrastructure self-test", ["scripts/evaluate-live.mjs", "--self-test-buffered"]);

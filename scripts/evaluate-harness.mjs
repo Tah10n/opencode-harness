@@ -193,7 +193,7 @@ const scenarios = [
     checks: () => {
       includes("scripts/evaluate-live.mjs", "LIVE_SELF_TEST_HIDDEN_COLLISION", "Live-eval self-tests should cover hidden check target collisions.");
       includes("scripts/evaluate-live.mjs", "LIVE_HIDDEN_COLLISION", "Hidden check staging should fail on existing targets.");
-      includes("scripts/evaluate-live.mjs", "lstatExists(target)", "Hidden check staging should detect ordinary and dangling-link collisions before copying.");
+      includes("lib/benchmark/isolation.mjs", "lstatExists(target)", "Hidden check staging should detect ordinary and dangling-link collisions before copying.");
       includes("docs/live-evaluation.md", "must be absent before staging", "Live-eval docs should document absent-only hidden file staging.");
       includes("evals/README.md", "staged only into absent target paths", "Live-eval README should document hidden target collision prevention.");
     },
