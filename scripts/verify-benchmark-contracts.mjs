@@ -63,6 +63,10 @@ function matchesSchemaFragment(schema, value) {
       && !schema.allOf.every((entry) => matchesSchemaFragment(entry, value))) {
     return false;
   }
+  if (Array.isArray(schema.anyOf)
+      && !schema.anyOf.some((entry) => matchesSchemaFragment(entry, value))) {
+    return false;
+  }
   if (schema.if !== undefined) {
     const selected = matchesSchemaFragment(schema.if, value) ? schema.then : schema.else;
     if (selected !== undefined && !matchesSchemaFragment(selected, value)) return false;
@@ -214,6 +218,32 @@ function verifyEvidenceSchemaRuntimeParity(selfTestSchema, replaySchema) {
       "SYNTHETIC_REPLAY_EVIDENCE",
     );
   }
+}
+
+function verifyReplayV2CompleteNegativeEvidenceSchema(replaySchema) {
+  const completeNegative = replaySchemaFixture({
+    modelExecutionConfirmed: true,
+    adapterCompletedCorrectly: false,
+    evidenceComplete: true,
+    wholeTaskSuccess: false,
+    executionStatus: "failed",
+    terminationReason: "verification_failed",
+    reason: "opencode_missing_final",
+  });
+  completeNegative.schema_version = 2;
+  assert.equal(matchesRootCrossFieldSemantics(replaySchema, completeNegative), true);
+
+  const unconfirmed = structuredClone(completeNegative);
+  unconfirmed.model_execution_confirmed = false;
+  assert.equal(matchesRootCrossFieldSemantics(replaySchema, unconfirmed), false);
+
+  const unsupportedConfirmation = structuredClone(completeNegative);
+  unsupportedConfirmation.evidence_complete = false;
+  assert.equal(matchesRootCrossFieldSemantics(replaySchema, unsupportedConfirmation), false);
+
+  const incompleteStatus = structuredClone(completeNegative);
+  incompleteStatus.execution_status = "incomplete";
+  assert.equal(matchesRootCrossFieldSemantics(replaySchema, incompleteStatus), false);
 }
 
 function verifyConfiguredRolePermissions(root, roles) {
@@ -404,17 +434,20 @@ function verifyWholeTaskSuccessEvidenceSchema(schema) {
   );
   assert(successRule, "whole_task_success=true conditional is missing");
   const required = new Set(successRule.then.required);
-  for (const field of ["agent_reported_success", "fingerprints", "metrics", "operational_trace_id"]) {
+  for (const field of ["fingerprints", "metrics", "operational_trace_id"]) {
     assert(required.has(field), `successful runs must require ${field}`);
   }
   const properties = successRule.then.properties;
-  assert.equal(properties.agent_reported_success.const, true);
+  assert.equal(Object.hasOwn(properties, "agent_reported_success"), false,
+    "whole_task_success must be based on objective evidence rather than the agent self-report");
   for (const field of ["adapter", "initial_workspace", "final_workspace", "trace"]) {
     assert.equal(properties.fingerprints.properties[field].$ref, "#/$defs/fingerprint");
   }
   for (const field of [
     "tool_call_count",
     "subagent_call_count",
+    "model_turn_count",
+    "continuation_turn_count",
     "workspace_mutation_count",
     "fix_command_count",
     "duration_ms",
@@ -442,7 +475,7 @@ function verifyWholeTaskSuccessEvidenceNegativeFixtures(schema) {
     (candidate) => { delete candidate.$defs.count; },
     (candidate) => {
       const success = candidate.$defs.runResult.allOf[0].then;
-      delete success.properties.agent_reported_success;
+      success.properties.agent_reported_success = { const: true };
     },
     (candidate) => {
       candidate.$defs.runResult.allOf[0].then.properties.fingerprints.properties.adapter.$ref = "#/$defs/nullableFingerprint";
@@ -489,13 +522,16 @@ function verifyBenchmarkEvaluationContractsLoaded({ root, contracts }) {
   assert.equal(contracts.comparison_policy.minimum_discordant_pairs, MINIMUM_DISCORDANT_PAIRS);
   assert.equal(contracts.comparison_policy.bootstrap_resamples, BOOTSTRAP_RESAMPLES);
   assert.equal(contracts.comparison_policy.analysis_seed, SYNTHETIC_ANALYSIS_SEED);
-  const runReportSchema = contracts.schemas["benchmarks/synthetic/schemas/run-report.v2.schema.json"];
-  assert.equal(runReportSchema.$id, "https://opencode-harness.invalid/schemas/synthetic-run-report-v2");
-  assert.equal(runReportSchema.properties.schema_version.const, 2);
+  const runReportSchema = contracts.schemas["benchmarks/synthetic/schemas/run-report.v3.schema.json"];
+  assert.equal(runReportSchema.$id, "https://opencode-harness.invalid/schemas/synthetic-run-report-v3");
+  assert.equal(runReportSchema.properties.schema_version.const, 3);
   assert.equal(runReportSchema.properties.report_kind.const, "synthetic-paired-run");
   assert.equal(runReportSchema.properties.pairs.maxItems, 240);
   assert.equal(Object.hasOwn(runReportSchema.properties, "statistics"), false);
   assert.equal(Object.hasOwn(runReportSchema.properties, "verdict"), false);
+  assert(runReportSchema.$defs.pairBinding.required.includes("task_scope_fingerprint"));
+  assert(runReportSchema.$defs.runResult.required.includes("audit_evidence"));
+  assert.equal(runReportSchema.$defs.auditEvidence.additionalProperties, false);
   const comparisonReportSchema = contracts.schemas["benchmarks/synthetic/schemas/comparison-report.v1.schema.json"];
   assert.equal(comparisonReportSchema.$id, "https://opencode-harness.invalid/schemas/synthetic-comparison-report-v1");
   assert.equal(comparisonReportSchema.properties.schema_version.const, 1);
@@ -546,12 +582,13 @@ function verifyBenchmarkEvaluationContractsLoaded({ root, contracts }) {
   assert.equal(replayReportV2Schema.properties.schema_version.const, 2);
   assert.equal(
     replayReportV2Schema.properties.attempt.properties.binding.$ref,
-    "https://opencode-harness.invalid/schemas/synthetic-run-report-v2#/$defs/pairBinding",
+    "https://opencode-harness.invalid/schemas/synthetic-run-report-v3#/$defs/pairBinding",
   );
   assert.equal(
     replayReportV2Schema.properties.attempt.properties.result.$ref,
-    "https://opencode-harness.invalid/schemas/synthetic-run-report-v2#/$defs/runResult",
+    "https://opencode-harness.invalid/schemas/synthetic-run-report-v3#/$defs/runResult",
   );
+  verifyReplayV2CompleteNegativeEvidenceSchema(replayReportV2Schema);
   const reportSafeIdPattern = new RegExp(runReportSchema.$defs.safeId.pattern);
   for (const id of ["run-1", "plain.profile"]) {
     assert.equal(reportSafeIdPattern.test(id), true);
@@ -593,6 +630,19 @@ function verifyBenchmarkEvaluationContractsLoaded({ root, contracts }) {
   assert(complete.entry_paths.some((entry) => entry === "scripts"));
   assert(quality.component_ids.includes("computational-mutation-gate"));
   assert(!core.component_ids.includes("computational-mutation-gate"));
+
+  const profileOnly = contracts.inventory.profiles.find((entry) => entry.id === "profile-only");
+  const instrumented = contracts.inventory.profiles.find((entry) => entry.id === "instrumented");
+  assert.equal(instrumented.primary_role_id, profileOnly.primary_role_id);
+  assert.deepEqual(instrumented.role_ids, profileOnly.role_ids);
+  const confoundedInstrumentedProfile = structuredClone(contracts.inventory);
+  const confoundedProfile = confoundedInstrumentedProfile.profiles.find((entry) => entry.id === "instrumented");
+  confoundedProfile.primary_role_id = "orchestrator-deep";
+  confoundedProfile.role_ids[0] = "orchestrator-deep";
+  expectCode(
+    () => validateSyntheticInventory(confoundedInstrumentedProfile),
+    "SYNTHETIC_INSTRUMENTED_PROFILE",
+  );
 
   verifyConfiguredRolePermissions(root, contracts.inventory.roles);
   const readPermissionDrift = structuredClone(contracts.inventory.roles);

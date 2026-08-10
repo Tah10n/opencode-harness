@@ -419,7 +419,7 @@
       ],
       "properties": {
         "metric": {
-          "const": "whole_task_success"
+          "const": "task_correct"
         },
         "averaging": {
           "const": "macro_by_family"
@@ -460,6 +460,7 @@
       "properties": {
         "id": {
           "enum": [
+            "task_correct",
             "whole_task_success",
             "visible_pass",
             "hidden_pass",
@@ -469,6 +470,7 @@
             "unnecessary_delegation",
             "verification_omission",
             "timeout",
+            "oracle_check_timeout",
             "incomplete_evidence",
             "false_block"
           ]
@@ -524,6 +526,8 @@
             "subagent_call_count",
             "context_read_count",
             "permission_request_count",
+            "model_turn_count",
+            "continuation_turn_count",
             "duration_ms",
             "cost_usd"
           ]
@@ -572,7 +576,8 @@
           "enum": [
             "family",
             "category",
-            "risk"
+            "risk",
+            "source_class"
           ]
         },
         "id": {
@@ -601,7 +606,8 @@
       "required": [
         "by_family",
         "by_category",
-        "by_risk"
+        "by_risk",
+        "by_source_class"
       ],
       "properties": {
         "by_family": {
@@ -621,6 +627,13 @@
         "by_risk": {
           "type": "array",
           "maxItems": 3,
+          "items": {
+            "$ref": "#/$defs/breakdownRow"
+          }
+        },
+        "by_source_class": {
+          "type": "array",
+          "maxItems": 2,
           "items": {
             "$ref": "#/$defs/breakdownRow"
           }

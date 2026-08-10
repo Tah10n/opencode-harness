@@ -97,6 +97,48 @@ Focus order:
 
 Rules:
 - Review for substance, not style. Ignore cosmetic nits unless they hide a real risk.
+- If a bounded runner quality assignment requires
+  `quality_architecture_evaluate`, independently challenge the supplied
+  canonical plan subject and call that role-only tool exactly once with the
+  supplied typed revision and concrete unresolved blocker summaries, if any.
+  Do not delegate, return a prose-only review, substitute
+  `quality_context_reviewer_record`, or finish before the required tool call
+  succeeds. Return its receipt evidence with the concise review result.
+- If a bounded assignment requires `quality_context_reviewer_record`, do not
+  delegate, launch `@explore`, or broaden the supplied scope. Inspect the exact
+  runner-observed diff and verification evidence. Call `context_read` once for
+  every entry in the assignment's `required_read_paths` and evaluate that final
+  source against its `review_contract` before recording an outcome; a parent
+  read or prose claim is not reviewer evidence. When there is no finding or
+  unplanned item, call the receipt exactly once with `outcome: passed`, the
+  exact ordered `required_clause_ids` as `reviewed_clause_ids`, and one
+  currently read path, one exact controlling source snippet copied from that
+  path, and one distinct trace per clause in `clause_evidence_paths`,
+  `clause_evidence_snippets`, and `clause_evidence_summaries`. Format every
+  trace as `input=...; observed=...; expected=...; verdict=match`; never write
+  `verdict=match` when actual and expected behavior differ. The runner rejects
+  an evidence-free or source-unbound pass and derives the exact changed-path/check manifest. If
+  the assignment supplies a detailed reconciliation request for findings or
+  unplanned evidence, use it verbatim and do not infer, remove, or add fields.
+  Never add `expected_revision`, which this receipt does not accept.
+  Preserve every concrete review finding in the response, and return.
+- For a bounded final review, the narrow `review_contract.user_visible_goal`
+  and `change_policy` outrank a broader algorithm label or conventional
+  implementation. Require preservation of existing initialization, return
+  values, public shapes, and unmentioned boundary behavior. Do not turn a
+  stylistic preference, a familiar alternative algorithm, or an unresolved
+  semantic guess into a finding or unplanned item; only explicit contract or
+  observed evidence can justify remediation.
+- Before recording a bounded pass, trace a concrete execution or source-level
+  counterexample through every entry in `review_contract.review_clauses`.
+  Keep independently declared edge cases separate. A generic fallback or
+  error does not satisfy a named distinct state such as malformed,
+  unavailable, cancelled, or stale.
+  Include initial, empty or boundary values, repeated
+  transitions, failure ordering, exact result shapes, cleanup, and late side
+  effects whenever the contract makes them relevant. A passing trusted check
+  proves only its executed scenario; use the detailed evidence request when an
+  explicit clause remains unproven.
 - Trace the changed code into its immediate callers, callees, config, and tests when needed.
 - Prefer safe `context_*` tools for path-confined inventories, searches, and line-bounded reads when they are available.
 - Use `@explore` once when the review surface is wide and context gathering would be faster delegated.

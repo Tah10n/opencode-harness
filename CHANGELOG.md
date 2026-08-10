@@ -6,6 +6,11 @@ This section describes the development checkout. The latest tagged release is
 still `v0.2.0`; its package metadata has no `exports` field and does not expose
 the feedback-plane ESM subpaths documented for the `0.3.0` target.
 
+- Routed question-only high/critical context insufficiency back through a
+  direct Whole-System Context Report revision instead of rebuilding the
+  Engineering Dossier, and raised the explicit paired-attempt ceiling to 60
+  minutes while keeping the chosen timeout identical and source-bound across
+  both profiles.
 - Added a model-neutral synthetic ablation benchmark with honest `plain`,
   `profile-only`, and `instrumented` profiles; 16 deterministic short-task
   families; smoke, standard, and full suites; seeded declarative rendering;
@@ -14,6 +19,299 @@ the feedback-plane ESM subpaths documented for the `0.3.0` target.
   `defect_escape_v2`; paired statistics; immutable privacy-safe
   JSON/Markdown/CSV reports; source-bound replay; and model-free
   validation/self-tests.
+- Removed the remaining blind-benchmark scoring confounds. Every arm now sees
+  the same neutral exact changed-path scope, scope correctness accepts any
+  allowed subset rather than requiring undisclosed paths to change, and pair
+  bindings include the task-scope fingerprint. The neutrality verifier scans
+  the actual production tool and schema descriptions. Structured review uses
+  one-to-one semantic concept matching with bounded path aliases and line
+  tolerance, alias-aware negation/polarity rejection, and non-gating severity
+  calibration. Run report v3
+  publishes bounded fingerprinted scope, control-lifecycle, and review-match
+  audit evidence in JSON/Markdown/CSV, source-binds relational counts and
+  outcomes, and identifies unexpected paths only with bounded SHA-256 values;
+  registration-only control state is valid
+  incomplete evidence rather than malformed state.
+- Added four separately reported public-source task adaptations from QuixBugs,
+  pinned by upstream commit, MIT notice, exact source/test SHA-256 values,
+  transformation notes, and oracle basis. Added `source_class` breakdowns so
+  public and project-authored tasks are not silently pooled.
+- Split symmetric functional correctness (`task_correct`) from treatment and
+  lifecycle compliance (`whole_task_success`). Functional visible/hidden,
+  workspace, common-safety, teardown, and cleanup evidence is now the primary
+  paired statistic; end-to-end success remains a predeclared guardrail and
+  diagnostic rate. Incomplete treatment traces no longer make an otherwise
+  objectively verified solution incorrect; trace completeness remains explicit
+  in `trace_policy`, treatment compliance, and end-to-end success.
+- Separated raw tool overhead from the symmetric task-action budget. Mandatory
+  `quality_*`/`context_read` calls remain in raw latency and call-count metrics,
+  but their structured command/path metadata is no longer misclassified as an
+  executed task action, common-safety violation, or hidden-safety regression.
+- Added provider-only OpenCode authentication projection for synthetic runs,
+  credential-free version probes, enabled the same built-in authentication
+  plugins across all profiles, and added an identical last-ordered `shell.env`
+  credential firewall. A runner-owned in-memory compare-and-swap broker now
+  carries provider-only OAuth rotation across fresh isolated attempts without
+  exposing credential operations as trace/model tools or persisting credential
+  bytes. Provider/model/auth initialization failures, including structured
+  OAuth refresh 401 responses, now become privacy-safe external-state reasons
+  without retaining raw output, and model-backed evidence requires only
+  generated reproducible synthetic fixtures rather than a real repository.
+- Hardened installed-OpenCode startup for synthetic runs: profile config roots
+  are aligned to avoid duplicate dependency bootstrap, the required
+  `@opencode-ai/plugin` install runs in a bounded credential-free preflight,
+  its version and fingerprint-bound profile surface are revalidated before
+  provider credentials are projected, and the agent retains its full declared
+  timeout behind a bootstrap-aware worker deadline. Version discovery now has
+  a 30-second maximum and profile bootstrap receives a separate symmetric
+  budget up to the declared 1,200-second ceiling instead of fixed 5/60-second
+  cutoffs. The outer adapter worker deadline now derives from the complete
+  version + bootstrap + agent + settlement envelope instead of retaining the
+  obsolete fixed 65-second startup allowance. Fixture-owned quality
+  catalogs now use tracked `.opencode-harness/quality/` paths so OpenCode cannot
+  populate the task with `.opencode/node_modules`; only the exact
+  runtime-owned `.git/opencode` marker is normalized while all other Git
+  control state remains bound.
+- Upgraded the synthetic final-response protocol to v3 and parse OpenCode JSONL
+  text by assistant message identity, selecting the last non-empty message and
+  joining only its split parts. Coding tasks accept ordinary non-empty prose;
+  only review-only tasks use a neutral task-owned `review_findings` object.
+  Legacy v2 envelopes remain readable but are not prompted.
+- Made synthetic primary-agent permissions match the canonical benchmark-safe
+  inventory by removing only copied agent-local `bash` overrides, which
+  previously reintroduced a trailing broad `ask` rule and caused unattended
+  OpenCode runs to auto-reject ordinary tests. Missing, empty, or output-limited
+  final responses fail the adapter and whole-task contract while remaining
+  complete negative evidence when the stream, teardown, objective checks, and
+  cleanup are observable; malformed, truncated, errored, unknown, and
+  unfinished streams remain fail-closed and evidence-incomplete.
+- Record bounded agent timeouts as complete negative benchmark outcomes when
+  at least one substantive task event, process shutdown, containment teardown,
+  the captured JSONL structure, trace mapping, workspace observation, and runner
+  cleanup all verify. These attempts retain `budget_exhausted` and cannot count
+  as task success. A timeout with no task event is now
+  `opencode_no_progress_timeout` / `blocked_external_state`, cannot complete a
+  pair, and is never scored as a model failure; partial streams and unverified
+  teardown likewise remain incomplete. A suite-level circuit breaker now stops
+  after the current symmetric pair settles with external-state evidence, so a
+  failed endpoint cannot consume the rest of a long declared matrix.
+- Sealed verified workspaces after a passed final reviewer receipt. An
+  impulsive post-review edit or authorization now fails closed without
+  invalidating trusted verification, and runner guidance continues directly to
+  reconciliation and attestation. Reviewer receipts with blocked checks or
+  unplanned items retain an explicit bounded remediation action, so the seal
+  prevents speculative polishing without suppressing evidence-backed fixes.
+  The standard-lite primary prompt now exposes the same compact fast path and
+  avoids redundant native discovery, shell checks, and role-only tool probes.
+- Made the standard-lite behavior contract resistant to model-authored scope
+  broadening. The runner now treats the narrow `user_visible_goal` as the
+  authoritative requested and positive behavior, preserves pre-change edge
+  semantics unless that goal explicitly changes them, and passes the same goal
+  and change policy through edit and review contracts. In a registered quality
+  session, `quality_session_start` is the first workflow call; a fresh
+  standard-lite receipt advertises only its immediate `context_read`, and
+  dossier finalization appears only after that receipt settles. This removes
+  speculative algorithm replacement and premature lifecycle calls without
+  raising benchmark tool limits or weakening hidden checks.
+  When bounded evidence proves non-local impact, the insufficient decision now
+  recommends one typed `quality_context_strategy_escalate` transition with the
+  exact high strategy ID. Structured OpenCode hosts expose that argument
+  directly, so the lifecycle advances to high dossier refinement instead of
+  repeating an impossible standard-lite read/finalize loop.
+- Expanded the symmetric synthetic per-agent timeout contract from 60–90 to
+  60–3,600 seconds while keeping 300 seconds as the default and recommending
+  2,400 seconds for deliberately long quality lifecycles. Both compared sides
+  retain one identical source-bound budget; duration remains an explicit Pareto
+  metric instead of prematurely truncating the instrumented lifecycle.
+- Continue an incomplete instrumented lifecycle in the same validated OpenCode
+  session for at most sixty-four neutral turns, enough for the full high-risk
+  lifecycle plus bounded repair attempts. State-specific continuations identify
+  only the validated first action tool and optional task role, without exposing profiles,
+  comparison arms, task families, or evaluator conditions. Continuations share the original
+  symmetric wall-clock and output budgets, session/registration mismatches fail
+  closed, and reports expose turn counts without persisting raw session IDs.
+  The shared fail-closed stdout ceiling is now 16 MiB, large enough for the
+  initial response plus the declared 64-turn lifecycle; the former 1 MiB ceiling
+  could truncate an otherwise active long attempt before its time budget.
+  Read-only attempts accept one production-validated registration when no owner
+  lifecycle was started; an owner that was started must still reach attestation.
+  Agent wall-clock timeout and bounded oracle-check timeout are now separate
+  metrics instead of one misleading combined rate.
+- Compare continuation progress by semantic lifecycle state rather than noisy
+  state revisions, context-receipt counts, or aggregate control fingerprints.
+  The adapter now binds progress to opaque fingerprints of the Dossier analysis,
+  impact graph, context-report analysis, and exact runner-validated first
+  action. Different paths behind repeated `context_read` calls advance the
+  lifecycle while duplicate reads of one path and expected-revision churn still
+  count as a stall. Continuations execute that validated action directly from
+  the most recent typed receipt and inspect once only when its arguments are
+  unavailable, removing an avoidable inspect-only turn without weakening
+  revision or capability validation.
+  Six consecutive semantically unchanged responses now produce bounded complete
+  negative evidence without shortening the shared declared budget for
+  meaningful work. Failed trusted verification routes to a bounded remediation
+  edit, and a local `standard-lite` owner terminalizes after six linked verifier
+  attempts instead of running an unbounded repair loop; high/critical budgets
+  remain unchanged. Synthetic control inspection now projects the authoritative
+  registry-terminal `failed` lifecycle through the same production receipt used
+  by ordinary quality inspection, so a terminal owner cannot be mistaken for an
+  active owner and retried until `opencode_quality_progress_stalled`.
+- Seed direct high/critical starts and standard-lite risk promotions with a
+  conservative runner-owned partial impact graph plus linked context-report
+  draft. The seed uses bounded ordinary-file discovery inside classified
+  ownership, excludes control/dependency roots and filesystem aliases, marks
+  every subject inferred, and retains one blocking unknown until receipts drive
+  a compact `quality_dossier_update`; it reduces weak-model routing failures
+  without allowing provisional evidence through the gate.
+- Treat persistent Git index identity as semantic staged-entry metadata rather
+  than raw index bytes, so a read-only Git stat-cache refresh cannot fabricate a
+  workspace change. The raw index remains bound inside each observation for
+  race detection. If post-task workspace observation nevertheless fails, task
+  settlement now clears the active launch and one-shot capability, closes the
+  child link, records the incomplete reason, and terminalizes the session instead
+  of leaving every later verifier blocked by task serialization.
+- Calibrated bounded local async/cancellation repairs as `standard-lite` when
+  deterministic checks cover them and no shared-state, durable-persistence,
+  security, migration, architecture, or intentional public-contract boundary is
+  crossed. Inventory-only outline/file listings no longer fabricate transitive
+  impact from repository metadata such as `.gitignore`. OpenCode task prompts
+  replace all model-authored architect/verifier/reviewer task text with fixed
+  caller context before binding the exact runner assignment, so copied, partial,
+  malformed, or nested reserved markers cannot collide with trusted authority.
+  Final compact reviewer pass now requires current child-owned `context_read`
+  evidence for every retained changed source file and every retained source node
+  in the high/critical impact graph. Edit, plan-challenge, and final-review
+  assignments carry the narrow goal, positive behavior, preservation,
+  compatibility, edge cases, and counterexamples; reviewers must trace concrete
+  executions through each explicit clause and cannot treat one passing targeted
+  check as proof of unexecuted scenarios. Standard-lite keeps every declared
+  edge case as an independent review clause and bug-fix counterexample. A passed
+  reviewer receipt must reproduce the exact ordered clause IDs and bind each
+  clause to a current read path, an exact snippet present in that source, and a
+  distinct input/observed/expected trace; durable state retains only the
+  source-bound fingerprint. Failed trusted verification now requires a
+  runner-assigned read-only diagnosis of the current source and visible test or
+  check contract before another remediation edit can be authorized. Synthetic
+  hidden oracles now state exact result-shape, committed-receipt,
+  duplicate-call, failure, and scheduler-cancellation interface semantics
+  publicly instead of treating undisclosed requirements as failures.
+- Raised only the long-running normal-session quality-bridge verifier from the
+  ordinary 10-minute stage budget to a reviewed 20-minute outer bound after a
+  successful current-worktree run took 856.4 seconds, leaving only 4.8 percent
+  headroom under the former 15-minute ceiling. The adoption-bundle outer stage
+  remains at 15 minutes and all other ordinary deterministic stages retain the
+  10-minute default; project-check execution and timeout-rotation contracts are
+  unchanged.
+- Resolve the canonical Windows `opencode.exe` directly from the host `PATH`,
+  including standard npm-shim installations, because shell-free Node spawning
+  cannot execute a PowerShell function or `.cmd` shim. Source-bound incomplete
+  reports now also preserve a validated schedule prefix when the symmetric
+  external-state circuit breaker stops a run early.
+- Normalize confined absolute paths from native OpenCode edit/write calls to
+  their workspace-relative form before privacy validation. The host prefix is
+  never persisted, while scope, alias, control-path, and ownership checks remain
+  fail-closed; this prevents ordinary Windows tool calls from being rejected as
+  unsafe merely because OpenCode reports an absolute file path.
+- Bind runner-owned integration and bug-reproducer checks for both typed and
+  legacy string-envelope OpenCode plugin APIs. Older installed OpenCode hosts no
+  longer force the model to guess evaluator-owned check IDs before the first
+  quality session can start. When exactly one trusted reproducer exists, its
+  runner-owned ID now overrides an omitted or invalid model-supplied guess.
+- Added compact reviewer-grounded final reconciliation for passed reviews with
+  no unplanned items. The runner now derives canonical changed paths, ownership,
+  context subjects, and verified test obligations from current evidence instead
+  of forcing a weak model to duplicate the reviewer manifest at the root. Full
+  requests remain required for blocked, unplanned, or extractor-grounded cases.
+- Validate native command, workdir, description, and patch payloads as bounded
+  ephemeral tool input rather than persisted evidence. Absolute confined paths
+  and ordinary source text no longer trigger persistence redaction before the
+  lifecycle can return its authoritative pre-gate or Bash-disabled decision.
+  Trusted Git failures also carry stable privacy-safe subcodes for diagnosis.
+- Move synthetic check catalogs, toolchain bindings, and review verifier source
+  out of the public task tree into fingerprint-bound `.git/opencode-harness/`
+  control storage. The model can no longer discover evaluator-owned files and
+  then be penalized for that discovery. Read-only trusted Git observations now
+  receive up to two bounded 60-second attempts to tolerate verified transient
+  Windows process stalls without relaxing fail-closed workspace binding.
+- Made the canonical orchestrator capability-aware without exposing profile or
+  benchmark-arm labels: it uses the computational lifecycle only when the
+  corresponding tools are actually available and otherwise follows a direct
+  bounded inspect/edit/verify loop. `profile-only` and `instrumented` now receive
+  byte-identical agent and skill prompt trees. Added a confined evaluation-only
+  `context_read` producer so standard-lite context receipts are reachable,
+  classify that evaluation tool as a supported read-only OpenCode event and
+  report its observed count instead of an unavailable placeholder,
+  require exactly one fully attested owner lifecycle for instrumented success,
+  accept only successful post-mutation targeted verification, and keep agent
+  self-report out of objective `whole_task_success`.
+- Enforced the computational standard-lite sequence through executable plugin
+  state rather than a benchmark-specific model overlay, including the no-diff
+  review path. Review-only traces now
+  allow the two mandatory read-only `verifier`/`reviewer` delegations while
+  still forbidding mutation and fix commands; trusted verification,
+  `changed_paths: []` reconciliation, and attestation at mutation revision zero
+  are covered through the production OpenCode plugin surface.
+- Fixed replay-v2 cross-field validation so a fully observed timeout,
+  missing-final, or empty-final attempt can be published as complete negative
+  model-backed evidence even though the adapter and whole task failed. Model
+  execution confirmation now requires either correct adapter completion or
+  complete settled observational evidence; legacy replay-v1 semantics remain
+  unchanged.
+- Removed a benchmark ablation confound: `profile-only` and `instrumented` now
+  use the same canonical `orchestrator` prompt, working-role inventory, and
+  skill prompt tree. The only model-visible treatment difference is actual
+  computational tool availability; private plugins, runner-owned receipts,
+  mutation gate, reconciliation, and attestation remain execution evidence.
+- Kept the computational lifecycle as a plugin-enforced state machine:
+  context collection must reach a passed gate before mutation, and delegated
+  evidence cannot replace root-owned reconciliation and final attestation.
+- Removed benchmark-owned success/failure choreography and exact tool payloads
+  from the model prompt. Objective visible/hidden oracles and runner treatment
+  evidence now determine outcomes independently of final-answer self-labeling.
+- Split instrumented control-plane diagnostics into missing owner session,
+  invalid owner cardinality, and present-but-incomplete lifecycle codes so a
+  privacy-safe model-backed report can distinguish plugin discovery failure
+  from model sequencing failure.
+- Closed the instrumented pre-classification context escape: its production
+  bridge now rejects `context_*` until `quality_session_start` creates or
+  recovers the owner lifecycle. The OpenCode tool surface can recover a missing
+  `chat.message` callback only for `quality_session_start`, using the same
+  runner-provided session and agent identity before retrying the unchanged
+  fail-closed core operation.
+- Made the instrumented OpenCode plugin surface atomic: `quality_*` and the
+  receipt-producing `context_read` now come from one plugin object, while the
+  credential firewall remains the last separate plugin. This prevents a host
+  that shallowly combines multiple plugin `tool` maps from hiding the earlier
+  quality tools, and the context tool directly records its production receipt
+  instead of depending on cross-plugin tool hooks.
+- Fixed instrumented plugin startup under packaged Bun/OpenCode hosts, where
+  `process.execPath` names `opencode.exe` rather than a Node runtime. Built-in
+  Node discovery now accepts only an actual `node`/`node.exe`; each disposable
+  instrumented profile instead materializes and fingerprints a fixed-source
+  host toolchain configuration bound to the benchmark runner's real Node and
+  protected auxiliary Git, and both quality/context bridges use that same
+  installed anchor.
+- Removed the former benchmark-owned response example that could override a
+  review task's actual finding. Review-only prompts now require only the neutral
+  task-owned `review_findings` object; coding tasks accept ordinary prose.
+- Corrected the bounded reviewer handoff contract: only
+  `quality_verification_record` accepts the current dossier revision;
+  `quality_context_reviewer_record` now receives an explicit exact no-diff
+  facts/checks request with no forbidden `expected_revision` field. Incomplete
+  instrumented control state also reports the precise durable boundary—trusted
+  verification, reviewer evidence, root reconciliation, final attestation, or
+  failed lifecycle—alongside the stable aggregate incomplete code.
+- Removed benchmark-specific reviewer payload templates and ownership markers
+  from model-visible instructions; the production plugin validates any quality
+  receipt and reconciliation payload computationally.
+- Preserve trusted verification and the registry's `verified` lifecycle while
+  launching bounded read-only tasks. The previous native-task hook
+  unconditionally invalidated verification, which made the mandatory reviewer
+  task computationally unable to record post-verification reconciliation
+  evidence. The production synthetic regressions now exercise verifier and
+  reviewer through real task-before, child-session, chat-registration, child
+  quality-tool, and task-after hooks for both no-diff and post-mutation paths
+  before root reconciliation and attestation.
 - Added strict versioned run, comparison, replay, and self-test schemas; simple
   benchmark/compare/replay commands; a protected manual self-hosted
   model-backed workflow; and model-free default-CI sensors that never simulate

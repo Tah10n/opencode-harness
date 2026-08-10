@@ -73,6 +73,11 @@ assert.equal(schema.properties.schema_version.const, PROJECT_CHECK_CATALOG_SCHEM
 assert.equal(schema.additionalProperties, false);
 assert.equal(schema.properties.checks.items.additionalProperties, false);
 assert.equal(schema.properties.checks.items.properties.argv.minItems, undefined, "argv may be empty because it contains arguments only");
+assert.equal(
+  schema.properties.checks.items.properties.timeout_ms.maximum,
+  PROJECT_CHECK_LIMITS.max_timeout_ms,
+  "the published schema and normative runtime must share the reviewed project-check timeout ceiling",
+);
 assert.match(schema.properties.checks.items.properties.executable_id.$comment, /logical ID/u);
 assert.match(schema.properties.checks.items.properties.argv.$comment, /Arguments only/u);
 assert.deepEqual(Object.keys(schema.$defs.outcomeProtocol.properties.exit_codes.properties).sort(), [
@@ -94,7 +99,7 @@ const productionChecksById = new Map(
   productionCatalog.checks.map((check) => [check.check_id, check]),
 );
 const trustedBudgetExpectations = new Map([
-  ["verify-normal-session-quality-bridge", 600_000],
+  ["verify-normal-session-quality-bridge", 900_000],
   ["verify-runtime-quality-hooks-fixture", 300_000],
 ]);
 for (const [checkId, expectedTimeoutMs] of trustedBudgetExpectations) {

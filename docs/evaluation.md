@@ -37,12 +37,26 @@ profiles. Unlike release candidate assessment, it intentionally permits
 declared profile surface differences, displays them, checks for unexpected
 dangerous widening, and applies a predeclared paired comparison policy.
 
-Its primary metric is `whole_task_success`; pairing uses family, generated
-instance fingerprint, and repetition. The analyzer reports family
+Its primary functional metric is `task_correct`; the separate
+`whole_task_success` rate retains end-to-end treatment/lifecycle compliance.
+Pairing uses family, generated instance fingerprint, and repetition. The model
+is not told its profile or comparison arm. Each arm sees the same neutral exact
+changed-path scope; the scorer permits any subset inside it and leaves
+correctness to the executable visible/hidden checks. The actual materialized
+tool descriptions and schema descriptions are scanned for evaluator labels,
+not just the source prompt files. The analyzer reports family
 macro-averages, paired outcomes, deterministic bootstrap confidence intervals,
-exact McNemar tests when eligible, category/risk breakdowns, and a quality,
+exact McNemar tests when eligible, category/risk/source breakdowns, and a quality,
 duration, cost, and safety Pareto view. It emits no release
 `accepted`/`rejected` decision.
+
+Run report v3 publishes bounded fingerprinted scope, control-lifecycle, and
+semantic review-match audit evidence. Relational validation binds scope counts
+and violation codes, control classifications and counts, and review oracle
+fingerprints/outcomes back to the canonical generated instance. Unexpected or
+forbidden paths are represented only by bounded SHA-256 identifiers. It never
+publishes raw review bodies, hidden paths, absolute paths, credentials, or model
+logs.
 
 Model-free entrypoints:
 
@@ -312,6 +326,11 @@ Architect, reviewer, verifier, and general subagent sessions are represented by
 minimal child links rather than cloned parent state. Read-only contributions and
 trusted verification update the parent owner record; a writable general child
 is confined to the one serialized delegated path set. When
+the reviewer records a passed final review with no unplanned items, the root
+uses a compact reviewer-grounded reconciliation request. The runner derives the
+canonical changed-path manifest from the observed workspace and verified test
+obligations instead of requiring the model to repeat evaluator-owned facts.
+When
 `quality/architecture-policy.json` exists, its validated identity is bound at
 dossier creation. High/critical sessions require one integration-only
 architecture graph check. The runner binds its final generated output to the

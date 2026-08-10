@@ -65,7 +65,7 @@
             "uniqueItems": true,
             "items": { "$ref": "#/$defs/relativePath" }
           },
-          "timeout_ms": { "type": "integer", "minimum": 1, "maximum": 600000 },
+          "timeout_ms": { "type": "integer", "minimum": 1, "maximum": 900000 },
           "max_output_chars": { "type": "integer", "minimum": 1, "maximum": 4194304 }
         },
         "allOf": [

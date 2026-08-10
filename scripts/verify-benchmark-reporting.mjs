@@ -4,7 +4,10 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { loadSyntheticContracts } from "../lib/benchmark/contracts.mjs";
+import {
+  SYNTHETIC_AGENT_TIMEOUT_MAX_MS,
+  loadSyntheticContracts,
+} from "../lib/benchmark/contracts.mjs";
 import { fingerprint } from "../lib/feedback/contracts.mjs";
 import {
   loadSyntheticTemplateSet,
@@ -19,6 +22,7 @@ import {
   materializeSyntheticProfile,
 } from "../lib/benchmark/profiles.mjs";
 import {
+  SYNTHETIC_OPENCODE_ADAPTER_VERSION,
   syntheticOpenCodeAdapterFingerprint,
 } from "../lib/benchmark/opencode-adapter.mjs";
 import {
@@ -52,7 +56,64 @@ function passedOutcome() {
   return { status: "passed", passed: true, violations: [] };
 }
 
-function successfulResult(profileId, profileFingerprint, suffix) {
+function reviewMatchAudit(check) {
+  return {
+    strategy: "semantic-concept-one-to-one-v2",
+    candidate_count: 1,
+    oracle_count: check.expected_findings.length,
+    matched_count: check.expected_findings.length,
+    severity_calibrated_count: check.expected_findings.length,
+    location_calibrated_count: check.expected_findings.length,
+    oracle_fingerprint: fingerprint(check.expected_findings),
+  };
+}
+
+function auditEvidence(profileId, suffix, instance) {
+  const changedAllowedPaths = instance.task_scope.mode === "edit"
+    ? [...instance.task_scope.allowed_changed_paths]
+    : [];
+  const scope = {
+    mode: instance.task_scope.mode,
+    allowed_changed_paths: [...instance.task_scope.allowed_changed_paths],
+    max_changed_files: instance.task_scope.max_changed_files,
+    observation_status: "available",
+    changed_allowed_paths: changedAllowedPaths,
+    changed_path_count: changedAllowedPaths.length,
+    changed_paths_fingerprint: fingerprint({
+      schema: "synthetic-changed-paths-v1",
+      paths: changedAllowedPaths,
+    }),
+    unexpected_path_count: 0,
+    unexpected_path_ids: [],
+    unexpected_path_ids_complete: true,
+    forbidden_path_count: 0,
+    forbidden_path_ids: [],
+    forbidden_path_ids_complete: true,
+    violation_codes: [],
+  };
+  const instrumented = profileId === "instrumented";
+  const control = {
+    classification: instrumented ? "attested" : "absent",
+    session_count: instrumented ? 1 : 0,
+    registration_count: instrumented ? 1 : 0,
+    registration_only_count: 0,
+    owner_session_count: instrumented ? 1 : 0,
+    child_session_count: 0,
+    attested_owner_count: instrumented ? 1 : 0,
+    control_state_fingerprint: instrumented ? fp(`control-${suffix}`) : null,
+    violation_codes: [],
+  };
+  const reviewMatch = instance.visible_check.kind === "structured-review"
+    ? {
+        visible: reviewMatchAudit(instance.visible_check),
+        hidden: reviewMatchAudit(instance.hidden_check),
+      }
+    : null;
+  const source = { scope, control, review_match: reviewMatch };
+  return { ...source, fingerprint: fingerprint(source) };
+}
+
+function successfulResult(profileId, profileFingerprint, suffix, instance) {
   return {
     profile_id: profileId,
     profile_fingerprint: profileFingerprint,
@@ -61,19 +122,25 @@ function successfulResult(profileId, profileFingerprint, suffix) {
     termination_reason: "verified",
     reason: null,
     cli_version: "1.17.0",
+    adapter_evidence_observed: true,
     adapter_completed_correctly: true,
     agent_reported_success: true,
     termination_acceptable: true,
     visible_check: passedOutcome(),
     hidden_check: passedOutcome(),
     workspace_policy: passedOutcome(),
+    common_safety: passedOutcome(),
+    treatment_compliance: passedOutcome(),
     trace_policy: passedOutcome(),
     teardown: passedOutcome(),
     cleanup: passedOutcome(),
     hidden_safety_failed: false,
+    task_evidence_complete: true,
+    task_correct: true,
     evidence_complete: true,
     whole_task_success: true,
     defect_escape_v2: false,
+    audit_evidence: auditEvidence(profileId, suffix, instance),
     fingerprints: {
       adapter: syntheticOpenCodeAdapterFingerprint(),
       initial_workspace: fp("initial"),
@@ -85,6 +152,8 @@ function successfulResult(profileId, profileFingerprint, suffix) {
       subagent_call_count: 0,
       context_read_count: null,
       permission_request_count: null,
+      model_turn_count: 1,
+      continuation_turn_count: profileId === "instrumented" ? 1 : 0,
       dangerous_command_count: 0,
       network_action_count: 0,
       hidden_access_attempt_count: 0,
@@ -119,12 +188,14 @@ function bindPairToInstance(pair, instance) {
     family_id: instance.family_id,
     category: instance.category,
     risk: instance.risk,
+    source_class: instance.source_class,
     generated_fixture_fingerprint: instance.generated_fixture_fingerprint,
     repetition: instance.repetition,
   };
   pair.pair_id = pairId(pair.identity);
   pair.binding.public_fixture_fingerprint = instance.public_fixture_fingerprint;
   pair.binding.hidden_fixture_fingerprint = instance.hidden_fixture_fingerprint;
+  pair.binding.task_scope_fingerprint = fingerprint(instance.task_scope);
 }
 
 function canonicalProfileFingerprint(sourceRoot, profileId) {
@@ -170,6 +241,7 @@ function completeReport(
       family_id: instance.family_id,
       category: instance.category,
       risk: instance.risk,
+      source_class: instance.source_class,
       generated_fixture_fingerprint: instance.generated_fixture_fingerprint,
       repetition: instance.repetition,
     };
@@ -181,6 +253,7 @@ function completeReport(
       binding: {
         public_fixture_fingerprint: instance.public_fixture_fingerprint,
         hidden_fixture_fingerprint: instance.hidden_fixture_fingerprint,
+        task_scope_fingerprint: fingerprint(instance.task_scope),
         effective_public_input_fingerprint: syntheticEffectivePublicInputFingerprint(instance),
         initial_public_manifest_fingerprint: fp("initial"),
         model_fingerprint: modelBindingFingerprint({
@@ -190,7 +263,7 @@ function completeReport(
         }),
         timeout_ms: 60_000,
         limits_fingerprint: fp("limits"),
-        adapter_protocol_version: 2,
+        adapter_protocol_version: SYNTHETIC_OPENCODE_ADAPTER_VERSION,
       },
       complete: true,
       incomplete_reasons: [],
@@ -198,16 +271,18 @@ function completeReport(
         "plain",
         baselineFingerprint,
         `${instance.family_id}-${instance.repetition}-plain`,
+        instance,
       ),
       candidate: successfulResult(
         "instrumented",
         candidateFingerprint,
         `${instance.family_id}-${instance.repetition}-instrumented`,
+        instance,
       ),
     };
   });
   return {
-    schema_version: 2,
+    schema_version: 3,
     report_kind: "synthetic-paired-run",
     run_id: runId,
     generation_id: "generation-reporting-self-test",
@@ -228,7 +303,7 @@ function completeReport(
       variant: null,
       timeout_ms: 60_000,
       limits_fingerprint: fp("limits"),
-      adapter_protocol_version: 2,
+      adapter_protocol_version: SYNTHETIC_OPENCODE_ADAPTER_VERSION,
       model_tool_availability: {
         opencode: "available",
         model: "available",
@@ -264,14 +339,27 @@ function incompleteReport(contracts, templateSet, sourceRoot = defaultRoot) {
     termination_reason: "blocked_external_state",
     reason: "opencode_not_found",
     cli_version: null,
+    adapter_evidence_observed: false,
     adapter_completed_correctly: false,
     agent_reported_success: null,
     termination_acceptable: false,
+    common_safety: {
+      status: "incomplete",
+      passed: null,
+      violations: ["common_safety_unobserved"],
+    },
+    treatment_compliance: {
+      status: "not_run",
+      passed: null,
+      violations: ["control_not_observed"],
+    },
     trace_policy: {
       status: "incomplete",
       passed: null,
       violations: ["trace_evidence_incomplete"],
     },
+    task_evidence_complete: false,
+    task_correct: false,
     evidence_complete: false,
     whole_task_success: false,
     fingerprints: {
@@ -282,6 +370,8 @@ function incompleteReport(contracts, templateSet, sourceRoot = defaultRoot) {
       ...candidate.metrics,
       tool_call_count: null,
       subagent_call_count: null,
+      model_turn_count: null,
+      continuation_turn_count: null,
       dangerous_command_count: null,
       network_action_count: null,
       hidden_access_attempt_count: null,
@@ -310,6 +400,14 @@ function mustReject(value, code) {
   );
 }
 
+function rebindAudit(result) {
+  result.audit_evidence.fingerprint = fingerprint({
+    scope: result.audit_evidence.scope,
+    control: result.audit_evidence.control,
+    review_match: result.audit_evidence.review_match,
+  });
+}
+
 function preseedRunFiles(root, report, contents, count) {
   const runRoot = path.join(root, "reports", "runs", report.run_id);
   fs.mkdirSync(runRoot, { recursive: true });
@@ -336,6 +434,88 @@ export function verifyBenchmarkReporting({ root = defaultRoot } = {}) {
   assert.equal(validateSyntheticRunReportSourceBinding(report, {
     sourceRoot: root,
   }), report);
+  const boundedTimeoutDuration = structuredClone(report);
+  boundedTimeoutDuration.pairs[0].candidate.metrics.duration_ms = SYNTHETIC_AGENT_TIMEOUT_MAX_MS + 60_000;
+  assert.equal(validateSyntheticRunReport(boundedTimeoutDuration), boundedTimeoutDuration);
+  const unboundedTimeoutDuration = structuredClone(boundedTimeoutDuration);
+  unboundedTimeoutDuration.pairs[0].candidate.metrics.duration_ms += 1;
+  mustReject(unboundedTimeoutDuration, "SYNTHETIC_REPORT_COUNT");
+  const circuitBroken = incompleteReport(contracts, templateSet, root);
+  const circuitSuite = contracts.suites.find((entry) => entry.id === circuitBroken.suite.id);
+  const circuitInstances = circuitSuite.family_ids.flatMap((familyId) => (
+    Array.from({ length: circuitSuite.repetitions }, (_, index) => renderSyntheticInstance({
+      contracts,
+      templateSet,
+      familyId,
+      seed: circuitBroken.suite.seed,
+      repetition: index + 1,
+    }))
+  ));
+  const circuitSchedule = counterbalancedProfileSchedule({
+    seed: circuitBroken.suite.seed,
+    suiteId: circuitBroken.suite.id,
+    instances: circuitInstances,
+    baselineProfileId: circuitBroken.profiles.baseline.id,
+    candidateProfileId: circuitBroken.profiles.candidate.id,
+  });
+  const blockedPairId = circuitBroken.pairs[0].pair_id;
+  const blockedPairIndex = circuitSchedule.findIndex((entry) => entry.pair_id === blockedPairId);
+  assert(blockedPairIndex >= 0 && blockedPairIndex < circuitBroken.pairs.length - 1);
+  const observedPairIds = new Set(circuitSchedule.slice(0, blockedPairIndex + 1).map((entry) => entry.pair_id));
+  circuitBroken.pairs = circuitBroken.pairs.filter((pair) => observedPairIds.has(pair.pair_id));
+  circuitBroken.pair_count = circuitBroken.pairs.length;
+  circuitBroken.incomplete_reasons = [
+    "external-state-circuit-breaker",
+    "missing-pair",
+    "pair-evidence-incomplete",
+  ];
+  circuitBroken.residual_caveats.push("external-state-circuit-breaker");
+  assert.equal(validateSyntheticRunReport(circuitBroken), circuitBroken);
+  assert.equal(validateSyntheticRunReportSourceBinding(circuitBroken, {
+    sourceRoot: root,
+  }), circuitBroken);
+  const nonPrefixCircuit = structuredClone(circuitBroken);
+  const unexpectedPair = report.pairs.find((pair) => !observedPairIds.has(pair.pair_id));
+  nonPrefixCircuit.pairs[0] = structuredClone(unexpectedPair);
+  assert.throws(
+    () => validateSyntheticRunReportSourceBinding(nonPrefixCircuit, { sourceRoot: root }),
+    (error) => error?.code === "SYNTHETIC_REPORT_SOURCE_BINDING",
+  );
+  const readOnlyRegistration = structuredClone(report);
+  const readOnlyCandidate = readOnlyRegistration.pairs.find(
+    (pair) => pair.identity.family_id === "review-read-only",
+  ).candidate;
+  readOnlyCandidate.audit_evidence.control = {
+    classification: "registration_only",
+    session_count: 0,
+    registration_count: 1,
+    registration_only_count: 1,
+    owner_session_count: 0,
+    child_session_count: 0,
+    attested_owner_count: 0,
+    control_state_fingerprint: fp("read-only-registration"),
+    violation_codes: [],
+  };
+  readOnlyCandidate.metrics.continuation_turn_count = 0;
+  rebindAudit(readOnlyCandidate);
+  assert.equal(validateSyntheticRunReport(readOnlyRegistration), readOnlyRegistration);
+  assert.equal(validateSyntheticRunReportSourceBinding(readOnlyRegistration, {
+    sourceRoot: root,
+  }), readOnlyRegistration);
+  const completeNegative = structuredClone(report);
+  Object.assign(completeNegative.pairs[0].candidate, {
+    execution_status: "failed",
+    termination_reason: "verification_failed",
+    reason: "opencode_missing_final",
+    adapter_completed_correctly: false,
+    agent_reported_success: null,
+    termination_acceptable: false,
+    whole_task_success: false,
+  });
+  assert.equal(validateSyntheticRunReport(completeNegative), completeNegative);
+  assert.equal(validateSyntheticRunReportSourceBinding(completeNegative, {
+    sourceRoot: root,
+  }), completeNegative);
   const reordered = structuredClone(report);
   reordered.pairs.reverse();
   assert.equal(validateSyntheticRunReportSourceBinding(reordered, {
@@ -408,10 +588,53 @@ export function verifyBenchmarkReporting({ root = defaultRoot } = {}) {
   contradictoryInitialWorkspace.pairs[0].baseline.fingerprints.initial_workspace =
     fp("contradictory-initial-workspace");
   mustReject(contradictoryInitialWorkspace, "SYNTHETIC_REPORT_PAIR");
+  const staleAuditFingerprint = structuredClone(report);
+  staleAuditFingerprint.pairs[0].baseline.audit_evidence.scope.changed_path_count += 1;
+  mustReject(staleAuditFingerprint, "SYNTHETIC_REPORT_AUDIT");
+  const contradictoryScopeCounts = structuredClone(report);
+  contradictoryScopeCounts.pairs[0].baseline.audit_evidence.scope.changed_path_count += 1;
+  rebindAudit(contradictoryScopeCounts.pairs[0].baseline);
+  mustReject(contradictoryScopeCounts, "SYNTHETIC_REPORT_AUDIT");
+  const inventedScopeViolation = structuredClone(report);
+  inventedScopeViolation.pairs[0].baseline.audit_evidence.scope.violation_codes = ["unexpected_path_changed"];
+  rebindAudit(inventedScopeViolation.pairs[0].baseline);
+  mustReject(inventedScopeViolation, "SYNTHETIC_REPORT_AUDIT");
+  const contradictoryControlClassification = structuredClone(report);
+  contradictoryControlClassification.pairs[0].baseline.audit_evidence.control.classification = "attested";
+  rebindAudit(contradictoryControlClassification.pairs[0].baseline);
+  mustReject(contradictoryControlClassification, "SYNTHETIC_REPORT_AUDIT");
+  const reviewPairIndex = report.pairs.findIndex((pair) => pair.identity.family_id === "review-read-only");
+  assert.notEqual(reviewPairIndex, -1);
+  const impossibleReviewCounts = structuredClone(report);
+  impossibleReviewCounts.pairs[reviewPairIndex].baseline.audit_evidence.review_match.hidden.candidate_count = 0;
+  rebindAudit(impossibleReviewCounts.pairs[reviewPairIndex].baseline);
+  mustReject(impossibleReviewCounts, "SYNTHETIC_REPORT_AUDIT");
+  const staleReviewOracle = structuredClone(report);
+  staleReviewOracle.pairs[reviewPairIndex].baseline.audit_evidence.review_match.hidden.oracle_fingerprint = fp("wrong-review-oracle");
+  rebindAudit(staleReviewOracle.pairs[reviewPairIndex].baseline);
+  assert.equal(validateSyntheticRunReport(staleReviewOracle), staleReviewOracle);
+  mustRejectSourceBinding(staleReviewOracle);
+  const unboundedAuditPaths = structuredClone(report);
+  unboundedAuditPaths.pairs[0].baseline.audit_evidence.scope.allowed_changed_paths = [
+    "src/a.mjs",
+    "src/b.mjs",
+    "src/c.mjs",
+    "src/d.mjs",
+  ];
+  rebindAudit(unboundedAuditPaths.pairs[0].baseline);
+  mustReject(unboundedAuditPaths, "SYNTHETIC_REPORT_AUDIT");
+  const unsafeAuditPath = structuredClone(report);
+  unsafeAuditPath.pairs[0].baseline.audit_evidence.scope.allowed_changed_paths[0] = "C:/private/token.txt";
+  rebindAudit(unsafeAuditPath.pairs[0].baseline);
+  mustReject(unsafeAuditPath, "SYNTHETIC_PATH");
   const markdown = renderSyntheticRunMarkdown(report);
   const csv = renderSyntheticRunCsv(report);
   assert(markdown.includes("instrumented then plain"));
+  assert(markdown.includes("Baseline changed allowed paths"));
+  assert(markdown.includes("Baseline control"));
   assert(csv.includes('"candidate_whole_task_success"'));
+  assert(csv.includes('"task_scope_fingerprint"'));
+  assert(csv.includes('"candidate_audit_fingerprint"'));
   const privateInstance = renderSyntheticInstance({
     contracts,
     templateSet,
@@ -469,6 +692,55 @@ export function verifyBenchmarkReporting({ root = defaultRoot } = {}) {
     violations: ["hidden_failure"],
   };
   mustReject(inconsistentWhole, "SYNTHETIC_REPORT_SEMANTICS");
+  const traceOnlyFailure = structuredClone(report);
+  const traceOnlyCandidate = traceOnlyFailure.pairs[0].candidate;
+  traceOnlyCandidate.trace_policy = {
+    status: "failed",
+    passed: false,
+    violations: ["targeted_verification_missing"],
+  };
+  traceOnlyCandidate.hidden_safety_failed = false;
+  traceOnlyCandidate.whole_task_success = false;
+  assert.doesNotThrow(() => validateSyntheticRunReport(traceOnlyFailure));
+  const contradictoryAttestation = structuredClone(traceOnlyFailure);
+  const contradictoryCandidate = contradictoryAttestation.pairs[0].candidate;
+  contradictoryCandidate.treatment_compliance = {
+    status: "failed",
+    passed: false,
+    violations: ["plugin_quality_lifecycle_incomplete"],
+  };
+  contradictoryCandidate.audit_evidence.control.violation_codes = [
+    "plugin_quality_lifecycle_incomplete",
+  ];
+  rebindAudit(contradictoryCandidate);
+  mustReject(contradictoryAttestation, "SYNTHETIC_REPORT_AUDIT");
+  const nonInstrumentedControl = structuredClone(report);
+  const plainResult = nonInstrumentedControl.pairs[0].baseline;
+  plainResult.audit_evidence.control = {
+    classification: "registration_only",
+    session_count: 0,
+    registration_count: 1,
+    registration_only_count: 1,
+    owner_session_count: 0,
+    child_session_count: 0,
+    attested_owner_count: 0,
+    control_state_fingerprint: fp("unexpected-plain-control"),
+    violation_codes: [],
+  };
+  rebindAudit(plainResult);
+  mustReject(nonInstrumentedControl, "SYNTHETIC_REPORT_AUDIT");
+  const unexplainedWorkspaceFailure = structuredClone(report);
+  const unexplainedResult = unexplainedWorkspaceFailure.pairs[0].baseline;
+  unexplainedResult.workspace_policy = {
+    status: "failed",
+    passed: false,
+    violations: ["git_control_changed"],
+  };
+  unexplainedResult.hidden_safety_failed = true;
+  unexplainedResult.task_correct = false;
+  unexplainedResult.whole_task_success = false;
+  unexplainedResult.defect_escape_v2 = true;
+  mustReject(unexplainedWorkspaceFailure, "SYNTHETIC_REPORT_AUDIT");
   const duplicatePair = structuredClone(report);
   duplicatePair.pairs.push(structuredClone(duplicatePair.pairs[0]));
   duplicatePair.pair_count = duplicatePair.pairs.length;

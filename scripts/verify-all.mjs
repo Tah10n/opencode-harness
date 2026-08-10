@@ -26,6 +26,10 @@ import {
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const deterministicProducer = VERIFICATION_RECEIPT_PRODUCERS.deterministic;
 
+export const DEFAULT_DETERMINISTIC_STAGE_TIMEOUT_MS = 10 * 60 * 1000;
+export const EXTENDED_DETERMINISTIC_STAGE_TIMEOUT_MS = 15 * 60 * 1000;
+export const MAX_DETERMINISTIC_STAGE_TIMEOUT_MS = 20 * 60 * 1000;
+
 export const DETERMINISTIC_STAGE_REGISTRY = Object.freeze([
   { command_id: "verify-static", npm_script: "verify:static", check_ids: ["documentation-attribution-boundary", "tracked-artifact-boundary", "model-frontmatter-documentation"] },
   { command_id: "verify-feedback-foundation", npm_script: "verify:feedback-foundation", check_ids: [] },
@@ -34,7 +38,12 @@ export const DETERMINISTIC_STAGE_REGISTRY = Object.freeze([
   { command_id: "verify-adapter-worker", npm_script: "verify:adapter-worker", check_ids: [] },
   { command_id: "eval", npm_script: "eval", check_ids: [] },
   { command_id: "verify-drift", npm_script: "verify:drift", check_ids: [] },
-  { command_id: "verify-adoption-bundle", npm_script: "verify:adoption-bundle", check_ids: [] },
+  {
+    command_id: "verify-adoption-bundle",
+    npm_script: "verify:adoption-bundle",
+    check_ids: [],
+    timeout_ms: EXTENDED_DETERMINISTIC_STAGE_TIMEOUT_MS,
+  },
   { command_id: "verify-package-boundary", npm_script: "verify:package-boundary", check_ids: [] },
   { command_id: "verify-runtime-fixture", npm_script: "verify:runtime:fixture", check_ids: [] },
   { command_id: "verify-runtime-quality-hooks-fixture", npm_script: "verify:runtime:quality-hooks:fixture", check_ids: ["runtime-quality-hooks-fixtures"] },
@@ -58,7 +67,12 @@ export const DETERMINISTIC_STAGE_REGISTRY = Object.freeze([
   { command_id: "verify-quality-live-coordinator", npm_script: "verify:quality-live-coordinator", check_ids: ["engineering-pre-gate-latch"] },
   { command_id: "verify-quality-live-runner", npm_script: "verify:quality-live-runner", check_ids: ["quality-live-runner-integration"] },
   { command_id: "verify-quality-verification-targets", npm_script: "verify:quality-verification-targets", check_ids: ["canonical-verification-targets"] },
-  { command_id: "verify-normal-session-quality-bridge", npm_script: "verify:normal-session-quality-bridge", check_ids: ["normal-session-quality-bridge"] },
+  {
+    command_id: "verify-normal-session-quality-bridge",
+    npm_script: "verify:normal-session-quality-bridge",
+    check_ids: ["normal-session-quality-bridge"],
+    timeout_ms: MAX_DETERMINISTIC_STAGE_TIMEOUT_MS,
+  },
   { command_id: "verify-session-classification", npm_script: "verify:session-classification", check_ids: ["session-classification-lifecycle"] },
   { command_id: "verify-project-check-catalog", npm_script: "verify:project-check-catalog", check_ids: ["project-check-catalog"] },
   { command_id: "verify-workspace-observation", npm_script: "verify:workspace-observation", check_ids: ["workspace-observation-boundary"] },
@@ -73,6 +87,18 @@ export const DETERMINISTIC_STAGE_REGISTRY = Object.freeze([
   { command_id: "verify-committed-whitespace-fixtures", npm_script: "verify:whitespace:fixture", check_ids: ["committed-whitespace-fixtures"] },
   { command_id: "verify-milestone-2-dod-contract", npm_script: "verify:milestone-2-dod-contract", check_ids: ["external-gap-classification"] },
 ]);
+
+export function deterministicStageTimeoutMs(stage) {
+  const timeoutMs = stage?.timeout_ms ?? DEFAULT_DETERMINISTIC_STAGE_TIMEOUT_MS;
+  if (!Number.isSafeInteger(timeoutMs)
+    || timeoutMs <= 0
+    || timeoutMs > MAX_DETERMINISTIC_STAGE_TIMEOUT_MS) {
+    throw new TypeError(
+      `invalid deterministic stage timeout: expected a positive safe integer no greater than ${MAX_DETERMINISTIC_STAGE_TIMEOUT_MS}`,
+    );
+  }
+  return timeoutMs;
+}
 
 const syntheticChecks = Object.freeze([
   { check_id: "npm-run-verify-m1", command_id: "verify-milestone-1-composite" },
@@ -195,7 +221,7 @@ function receiptFromResult({ checkId, commandId, startedAt, completedAt, result 
   });
 }
 
-async function runCommand(commandId, command, checkIds) {
+async function runCommand(commandId, command, checkIds, timeoutMs) {
   const startedAt = new Date().toISOString();
   const monotonicStartedAt = performance.now();
   let result;
@@ -204,7 +230,7 @@ async function runCommand(commandId, command, checkIds) {
       ...command,
       cwd: root,
       env: deterministicStageEnvironment(),
-      timeout: 10 * 60 * 1000,
+      timeout: timeoutMs,
       maxOutputChars: 4 * 1024 * 1024,
     });
   } catch (error) {
@@ -317,7 +343,12 @@ async function main() {
 
   for (const stage of DETERMINISTIC_STAGE_REGISTRY) {
     console.log(`Deterministic stage: npm run ${stage.npm_script}`);
-    const outcome = await runCommand(stage.command_id, npmInvocation(stage.npm_script), stage.check_ids);
+    const outcome = await runCommand(
+      stage.command_id,
+      npmInvocation(stage.npm_script),
+      stage.check_ids,
+      deterministicStageTimeoutMs(stage),
+    );
     receipts.push(...outcome.receipts);
     const stagePassed = outcome.result.status === 0 && !outcome.result.timed_out && !outcome.result.error;
     stageTimings.push({

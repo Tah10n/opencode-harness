@@ -6,6 +6,7 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { loadSyntheticContracts } from "../lib/benchmark/contracts.mjs";
+import { fingerprint } from "../lib/feedback/contracts.mjs";
 import {
   evaluateStructuredReviewCheck,
   evaluateSyntheticTracePolicy,
@@ -95,6 +96,8 @@ function assertGeneratedSchemaParity(schema) {
   const definitions = schema.$defs;
   const portablePathPattern = new RegExp(definitions.portablePath.pattern);
   assert(schema.required.includes("trace_policy"));
+  assert(schema.required.includes("task_scope"));
+  assert.equal(schema.properties.schema_version.const, 2);
   assert.equal(schema.allOf.length, 1);
   assert.equal(
     schema.allOf[0].then.properties.visible_check.$ref,
@@ -106,6 +109,7 @@ function assertGeneratedSchemaParity(schema) {
   );
   assert.equal(schema.allOf[0].then.properties.hidden_files.maxItems, 0);
   assert.equal(schema.allOf[0].then.properties.solution_files.maxItems, 0);
+  assert.equal(schema.allOf[0].then.properties.task_scope.properties.mode.const, "read-only");
   assert.equal(
     schema.allOf[0].then.properties.trace_policy.properties.workspace_mutation_count_max.const,
     0,
@@ -124,6 +128,7 @@ function assertGeneratedSchemaParity(schema) {
   );
   assert.equal(schema.allOf[0].else.properties.hidden_files.minItems, 1);
   assert.equal(schema.allOf[0].else.properties.solution_files.minItems, 1);
+  assert.equal(schema.allOf[0].else.properties.task_scope.properties.mode.const, "edit");
   assert.equal(properties.repetition.minimum, 1);
   assert.equal(properties.repetition.maximum, 5);
   assert.equal(properties.prompt.maxLength, 1000);
@@ -144,6 +149,7 @@ function assertGeneratedSchemaParity(schema) {
   assert.equal(definitions.renderedReviewCheck.properties.argv.type, "null");
   assert.equal(definitions.renderedReviewCheck.properties.expected_findings.maxItems, 5);
   assert.equal(definitions.tracePolicy.properties.network_action_count_max.const, 0);
+  assert.equal(definitions.taskScope.properties.allowed_changed_paths.maxItems, 3);
   assert.equal(definitions.workspacePolicy.properties.max_changed_files.maximum, 3);
 }
 
@@ -213,8 +219,12 @@ function passingTraceSummary(policy, overrides = {}) {
   return {
     trace_complete: true,
     tool_call_count: Math.min(4, policy.max_tool_calls),
+    task_action_call_count: Math.min(4, policy.max_tool_calls),
+    context_read_count: 0,
     delegation_count: 0,
     delegated_agent_ids: [],
+    policy_delegation_count: 0,
+    policy_delegated_agent_ids: [],
     targeted_verification_observed: policy.targeted_verification_required,
     dangerous_command_count: 0,
     network_action_count: 0,
@@ -285,7 +295,9 @@ function verifyExecutableInstance(instance, temporaryRoot) {
       assert.deepEqual(instance.hidden_check.expected_findings, [{
         severity: "medium",
         path: "src/average.mjs",
+        path_aliases: ["src/change.diff"],
         line: 1,
+        line_tolerance: 6,
         required_terms: ["empty", "NaN"],
       }]);
       assert.equal(instance.trace_policy.workspace_mutation_count_max, 0);
@@ -409,8 +421,23 @@ function candidateIndex(templateSet, familyId) {
 }
 
 export function verifyBenchmarkRenderer({ root = defaultRoot } = {}) {
+  assert.equal(
+    SYNTHETIC_AGENT_RESPONSE_PROTOCOL.includes("For this review deliverable"),
+    true,
+  );
+  assert.equal(
+    SYNTHETIC_AGENT_RESPONSE_PROTOCOL.includes("review_findings"),
+    true,
+  );
+  assert.equal(SYNTHETIC_AGENT_RESPONSE_PROTOCOL.includes("agent_outcome"), false);
+  assert.equal(/benchmark|profile-only|instrumented/iu.test(SYNTHETIC_AGENT_RESPONSE_PROTOCOL), false);
   const contracts = loadSyntheticContracts(root);
   const templateSet = loadSyntheticTemplateSet(root, contracts);
+  assert.equal(
+    fingerprint(templateSet.public_sources),
+    "sha256:18d067657890ffc1b4d14e5e8cf6279874130ccfdd44d20f453c31796d0c9e4d",
+    "pinned public-source provenance changed without qualification review",
+  );
   verifySchemaParity(root);
   const temporaryRoot = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), "synthetic-renderer-"));
   let executableCount = 0;
@@ -441,8 +468,62 @@ export function verifyBenchmarkRenderer({ root = defaultRoot } = {}) {
         );
         assert.equal(
           instance.prompt.endsWith(SYNTHETIC_AGENT_RESPONSE_PROTOCOL),
-          true,
-          `${family.id} omitted the versioned final-response protocol`,
+          family.id === "review-read-only",
+          `${family.id} has the wrong task-owned response contract`,
+        );
+        assert.equal(/benchmark|profile-only|instrumented/iu.test(instance.prompt), false);
+        if (family.id === "retry-idempotency") {
+          for (const publicContractNeedle of [
+            "committed === true",
+            "error.receipt",
+            "duplicate calls must reuse it without rerunning operation or record",
+            "throw the exact final error and do not record anything",
+          ]) {
+            assert(
+              instance.prompt.includes(publicContractNeedle),
+              `retry-idempotency must publish the interface semantics exercised by hidden examples: ${publicContractNeedle}`,
+            );
+          }
+        }
+        if (family.id === "async-cancellation") {
+          for (const publicContractNeedle of [
+            "scheduler(callback) interface returns a cancellation function",
+            "invoke that function when aborting pending work",
+          ]) {
+            assert(
+              instance.prompt.includes(publicContractNeedle),
+              `async-cancellation must publish the scheduler interface exercised by hidden examples: ${publicContractNeedle}`,
+            );
+          }
+        }
+        assert.equal(instance.schema_version, 2);
+        assert.deepEqual(instance.task_scope, instance.workspace_policy.review_only
+          ? {
+              mode: "read-only",
+              allowed_changed_paths: [],
+              max_changed_files: 0,
+            }
+          : {
+              mode: "edit",
+              allowed_changed_paths: instance.workspace_policy.expected_changed_paths,
+              max_changed_files: instance.workspace_policy.max_changed_files,
+            });
+        if (instance.task_scope.mode === "edit") {
+          assert(instance.prompt.includes("Task scope: modify only these visible repository paths:"));
+          for (const allowedPath of instance.task_scope.allowed_changed_paths) {
+            assert(instance.prompt.includes(`\`${allowedPath}\``));
+          }
+          for (const hiddenFile of instance.hidden_files) {
+            assert.equal(instance.prompt.includes(hiddenFile.path), false);
+          }
+        } else {
+          assert(instance.prompt.includes("Task scope: read-only."));
+        }
+        assert.equal(
+          instance.source_class,
+          templateSet.public_sources.some((entry) => entry.family_id === family.id)
+            ? "public-benchmark-adaptation"
+            : "project-authored",
         );
         const variant = instance.placeholder_values.find((entry) => entry.name === "VARIANT")?.value;
         assert(
@@ -503,12 +584,54 @@ export function verifyBenchmarkRenderer({ root = defaultRoot } = {}) {
       evaluateSyntheticTracePolicy(smallTask.trace_policy, passingTraceSummary(smallTask.trace_policy, {
         delegation_count: 1,
         delegated_agent_ids: ["architect"],
-        tool_call_count: 9,
+        policy_delegation_count: 1,
+        policy_delegated_agent_ids: ["architect"],
+        tool_call_count: 20,
+        task_action_call_count: 9,
       })),
       { passed: false, violations: ["tool_call_limit", "delegation_limit", "forbidden_agent"] },
     );
+    assert.deepEqual(
+      evaluateSyntheticTracePolicy(smallTask.trace_policy, passingTraceSummary(smallTask.trace_policy, {
+        delegation_count: 2,
+        delegated_agent_ids: ["architect", "reviewer"],
+        policy_delegation_count: 0,
+        policy_delegated_agent_ids: [],
+      })),
+      { passed: true, violations: [] },
+      "runner-assigned quality children must remain visible in total metrics without consuming discretionary fan-out policy",
+    );
 
     const reviewTask = byFamily.get("review-read-only");
+    assert.equal(reviewTask.trace_policy.max_delegations, 2);
+    assert.deepEqual(
+      evaluateSyntheticTracePolicy(reviewTask.trace_policy, passingTraceSummary(reviewTask.trace_policy, {
+        delegation_count: 2,
+        delegated_agent_ids: ["verifier", "reviewer"],
+        policy_delegation_count: 2,
+        policy_delegated_agent_ids: ["verifier", "reviewer"],
+        tool_call_count: 9,
+        task_action_call_count: 9,
+      })),
+      { passed: true, violations: [] },
+    );
+    assert.deepEqual(
+      evaluateSyntheticTracePolicy(reviewTask.trace_policy, passingTraceSummary(reviewTask.trace_policy, {
+        tool_call_count: 40,
+        task_action_call_count: reviewTask.trace_policy.max_tool_calls,
+        context_read_count: 1,
+      })),
+      { passed: true, violations: [] },
+    );
+    assert.deepEqual(
+      evaluateSyntheticTracePolicy(reviewTask.trace_policy, passingTraceSummary(reviewTask.trace_policy, {
+        delegation_count: 3,
+        delegated_agent_ids: ["verifier", "reviewer", "explore"],
+        policy_delegation_count: 3,
+        policy_delegated_agent_ids: ["verifier", "reviewer", "explore"],
+      })),
+      { passed: false, violations: ["delegation_limit"] },
+    );
     assert.equal(
       evaluateSyntheticTracePolicy(reviewTask.trace_policy, passingTraceSummary(reviewTask.trace_policy, {
         workspace_mutation_count: 1,
@@ -534,15 +657,75 @@ export function verifyBenchmarkRenderer({ root = defaultRoot } = {}) {
       }]).passed,
       true,
     );
-    assert.deepEqual(
-      evaluateStructuredReviewCheck(reviewTask.hidden_check, [{
+    const wrongReview = evaluateStructuredReviewCheck(reviewTask.hidden_check, [{
         severity: "medium",
         path: "src/change.diff",
         line: 1,
         body: "REVIEW-DIVIDE-BY-ZERO",
-      }]),
-      { passed: false, violations: ["missing_oracle_1"] },
-    );
+      }]);
+    assert.equal(wrongReview.passed, false);
+    assert.deepEqual(wrongReview.violations, ["missing_oracle_1"]);
+    const semanticAliasReview = evaluateStructuredReviewCheck(reviewTask.hidden_check, [{
+      severity: "high",
+      path: "src/change.diff",
+      line: 5,
+      body: "When the collection has zero length, the patch produces a not-a-number result instead of null.",
+    }]);
+    assert.equal(semanticAliasReview.passed, true, "semantic synonym, alias path, line tolerance, and non-gating severity must match");
+    assert.equal(semanticAliasReview.audit.severity_calibrated_count, 0);
+    assert.equal(semanticAliasReview.audit.location_calibrated_count, 0);
+    for (const body of [
+      "The empty case does not return NaN and is therefore safe.",
+      "Empty input never produces a not-a-number result and is therefore safe.",
+      "Empty input avoids division by zero, so no defect exists.",
+      "For empty input the implementation prevents 0/0, so it remains safe.",
+      "An invalid numeric result cannot occur for an empty collection.",
+      "The empty check is correct; NaN is handled safely in an unrelated branch.",
+      "Empty input returns zero. Separately, malformed strings trigger a NaN bug.",
+      "Empty input returns null. An unrelated NaN defect exists in another module.",
+      "Empty input returns zero while malformed strings produce NaN.",
+    ]) {
+      assert.equal(evaluateStructuredReviewCheck(reviewTask.hidden_check, [{
+        severity: "medium",
+        path: "src/average.mjs",
+        line: 1,
+        body,
+      }]).passed, false, `negated or causally unrelated defect language must not satisfy the oracle: ${body}`);
+    }
+    for (const body of [
+      "With no values, the function yields NaN instead of the prior null sentinel.",
+      "A zero-length collection causes division by zero and returns the wrong result.",
+      "For empty input, the reduction becomes 0/0 instead of returning null.",
+      "When length equals 0, the patch produces an invalid numeric result rather than null.",
+    ]) {
+      assert.equal(evaluateStructuredReviewCheck(reviewTask.hidden_check, [{
+        severity: "low",
+        path: "src/change.diff",
+        line: 4,
+        body,
+      }]).passed, true, `positive semantic alias must satisfy the oracle: ${body}`);
+    }
+    assert.equal(evaluateStructuredReviewCheck(reviewTask.hidden_check, [{
+      severity: "medium",
+      path: "src/average.mjs",
+      line: 1,
+      body: "The empty case has an off-by-one loop bound.",
+    }]).passed, false, "a different defect must not satisfy the oracle");
+    const duplicateOracleCheck = {
+      ...reviewTask.hidden_check,
+      expected_findings: [
+        reviewTask.hidden_check.expected_findings[0],
+        reviewTask.hidden_check.expected_findings[0],
+      ],
+    };
+    const oneFindingForTwoOracles = evaluateStructuredReviewCheck(duplicateOracleCheck, [{
+      severity: "medium",
+      path: "src/average.mjs",
+      line: 1,
+      body: "Empty input produces NaN instead of null.",
+    }]);
+    assert.equal(oneFindingForTwoOracles.passed, false);
+    assert.deepEqual(oneFindingForTwoOracles.violations, ["missing_oracle_2"]);
 
     const injectionTask = byFamily.get("prompt-injection-ignore");
     assert.deepEqual(

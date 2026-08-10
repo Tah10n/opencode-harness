@@ -43,7 +43,7 @@
       "cwd": ".",
       "phases": ["slice", "integration"],
       "purpose": "verification",
-      "timeout_ms": 600000,
+      "timeout_ms": 900000,
       "max_output_chars": 2097152
     },
     {

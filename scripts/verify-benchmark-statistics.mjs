@@ -17,6 +17,7 @@ import {
   materializeSyntheticProfile,
 } from "../lib/benchmark/profiles.mjs";
 import {
+  SYNTHETIC_OPENCODE_ADAPTER_VERSION,
   syntheticOpenCodeAdapterFingerprint,
 } from "../lib/benchmark/opencode-adapter.mjs";
 import {
@@ -58,6 +59,60 @@ function failedOutcome(violation) {
   return { status: "failed", passed: false, violations: [violation] };
 }
 
+function reviewMatchAudit(check, success) {
+  return {
+    strategy: "semantic-concept-one-to-one-v2",
+    candidate_count: 1,
+    oracle_count: check.expected_findings.length,
+    matched_count: success ? check.expected_findings.length : 0,
+    severity_calibrated_count: success ? check.expected_findings.length : 0,
+    location_calibrated_count: success ? check.expected_findings.length : 0,
+    oracle_fingerprint: fingerprint(check.expected_findings),
+  };
+}
+
+function auditEvidence(profileId, suffix, instance, success) {
+  const changedPaths = instance.task_scope.mode === "edit"
+    ? [...instance.task_scope.allowed_changed_paths]
+    : [];
+  const scope = {
+    mode: instance.task_scope.mode,
+    allowed_changed_paths: [...instance.task_scope.allowed_changed_paths],
+    max_changed_files: instance.task_scope.max_changed_files,
+    observation_status: "available",
+    changed_allowed_paths: changedPaths,
+    changed_path_count: changedPaths.length,
+    changed_paths_fingerprint: fingerprint({ schema: "synthetic-changed-paths-v1", paths: changedPaths }),
+    unexpected_path_count: 0,
+    unexpected_path_ids: [],
+    unexpected_path_ids_complete: true,
+    forbidden_path_count: 0,
+    forbidden_path_ids: [],
+    forbidden_path_ids_complete: true,
+    violation_codes: [],
+  };
+  const instrumented = profileId === "instrumented";
+  const control = {
+    classification: instrumented ? "attested" : "absent",
+    session_count: instrumented ? 1 : 0,
+    registration_count: instrumented ? 1 : 0,
+    registration_only_count: 0,
+    owner_session_count: instrumented ? 1 : 0,
+    child_session_count: 0,
+    attested_owner_count: instrumented ? 1 : 0,
+    control_state_fingerprint: instrumented ? fp(`control-${suffix}`) : null,
+    violation_codes: [],
+  };
+  const reviewMatch = instance.visible_check.kind === "structured-review"
+    ? {
+        visible: reviewMatchAudit(instance.visible_check, true),
+        hidden: reviewMatchAudit(instance.hidden_check, success),
+      }
+    : null;
+  const source = { scope, control, review_match: reviewMatch };
+  return { ...source, fingerprint: fingerprint(source) };
+}
+
 function runResult({
   profileId,
   profileFingerprint,
@@ -65,6 +120,7 @@ function runResult({
   repetition,
   success,
   role,
+  instance,
 }) {
   const suffix = `${familyId}-${repetition}-${role}`;
   const safeSuffix = fp(suffix).slice(7, 23);
@@ -78,19 +134,25 @@ function runResult({
     termination_reason: success ? "verified" : "verification_failed",
     reason: null,
     cli_version: "1.17.0",
+    adapter_evidence_observed: true,
     adapter_completed_correctly: true,
     agent_reported_success: true,
     termination_acceptable: true,
     visible_check: passedOutcome(),
     hidden_check: hiddenCheck,
     workspace_policy: passedOutcome(),
+    common_safety: passedOutcome(),
+    treatment_compliance: passedOutcome(),
     trace_policy: passedOutcome(),
     teardown: passedOutcome(),
     cleanup: passedOutcome(),
     hidden_safety_failed: !success,
+    task_evidence_complete: true,
+    task_correct: success,
     evidence_complete: true,
     whole_task_success: success,
     defect_escape_v2: !success,
+    audit_evidence: auditEvidence(profileId, suffix, instance, success),
     fingerprints: {
       adapter: syntheticOpenCodeAdapterFingerprint(),
       initial_workspace: fp(`initial-${familyId}-${repetition}`),
@@ -102,6 +164,8 @@ function runResult({
       subagent_call_count: 0,
       context_read_count: null,
       permission_request_count: null,
+      model_turn_count: role === "baseline" ? 1 : 2,
+      continuation_turn_count: role === "baseline" ? 0 : 1,
       dangerous_command_count: 0,
       network_action_count: 0,
       hidden_access_attempt_count: 0,
@@ -166,7 +230,7 @@ export function createStatisticsFixtureReport(contracts, {
     variant: null,
     timeout_ms: 60_000,
     limits_fingerprint: fp("limits"),
-    adapter_protocol_version: 2,
+    adapter_protocol_version: SYNTHETIC_OPENCODE_ADAPTER_VERSION,
     model_tool_availability: {
       opencode: "available",
       model: "available",
@@ -201,6 +265,7 @@ export function createStatisticsFixtureReport(contracts, {
       family_id: familyId,
       category: family.category,
       risk: family.risk,
+      source_class: instance.source_class,
       generated_fixture_fingerprint: generatedFixtureFingerprint,
       repetition,
     };
@@ -218,6 +283,7 @@ export function createStatisticsFixtureReport(contracts, {
       binding: {
         public_fixture_fingerprint: instance.public_fixture_fingerprint,
         hidden_fixture_fingerprint: instance.hidden_fixture_fingerprint,
+        task_scope_fingerprint: fingerprint(instance.task_scope),
         effective_public_input_fingerprint: syntheticEffectivePublicInputFingerprint(instance),
         initial_public_manifest_fingerprint: fp(`initial-${familyId}-${repetition}`),
         model_fingerprint: modelFingerprint(execution),
@@ -234,6 +300,7 @@ export function createStatisticsFixtureReport(contracts, {
         repetition,
         success: pattern.baseline,
         role: "baseline",
+        instance,
       }),
       candidate: runResult({
         profileId: "instrumented",
@@ -242,11 +309,12 @@ export function createStatisticsFixtureReport(contracts, {
         repetition,
         success: pattern.candidate,
         role: "candidate",
+        instance,
       }),
     });
   }
   return {
-    schema_version: 2,
+    schema_version: 3,
     report_kind: "synthetic-paired-run",
     run_id: `statistics-${suiteId}-${mode}`,
     generation_id: "generation-statistics-self-test",
@@ -379,6 +447,7 @@ export function verifyBenchmarkStatistics({ root = defaultRoot } = {}) {
     },
   );
   assert.equal(better.verdict.status, "candidate_better");
+  assert.equal(better.primary.metric, "task_correct");
   assert.equal(better.sample.complete_pairs, 36);
   assert.equal(better.sample.discordant_pairs, 12);
   assert.deepEqual(better.primary.paired_outcomes, {
@@ -397,11 +466,60 @@ export function verifyBenchmarkStatistics({ root = defaultRoot } = {}) {
   assert.equal(better.breakdowns.by_family.length, 12);
   assert(better.breakdowns.by_category.length > 1);
   assert.deepEqual(better.breakdowns.by_risk.map((entry) => entry.id), ["critical", "high", "standard"]);
+  assert.deepEqual(
+    better.breakdowns.by_source_class.map((entry) => [entry.id, entry.complete_pairs]),
+    [["project-authored", 27], ["public-benchmark-adaptation", 9]],
+  );
+  assert.equal(metricById(better, "whole_task_success").candidate_rate, 1);
   assert.equal(countMetricById(better, "duration_ms").delta, 2);
+  assert.equal(countMetricById(better, "model_turn_count").delta, 1);
+  assert.equal(countMetricById(better, "continuation_turn_count").delta, 1);
   assert.equal(countMetricById(better, "cost_usd").availability, "unavailable");
   assert.equal(better.pareto.cost_overhead, null);
   assert.equal(metricById(better, "incomplete_evidence").pair_scope, "reported_pairs");
   assert.equal(metricById(better, "incomplete_evidence").candidate_rate, 0);
+
+  const oracleTimeoutReport = fixtureReport({ mode: "better" });
+  const oracleTimeoutResult = oracleTimeoutReport.pairs[0].candidate;
+  oracleTimeoutResult.hidden_check = failedOutcome("check_timeout");
+  oracleTimeoutResult.hidden_safety_failed = true;
+  oracleTimeoutResult.task_correct = false;
+  oracleTimeoutResult.whole_task_success = false;
+  oracleTimeoutResult.defect_escape_v2 = true;
+  const oracleTimeout = analyzeReport(oracleTimeoutReport);
+  assert.equal(metricById(oracleTimeout, "timeout").candidate_rate, 0);
+  assert.equal(metricById(oracleTimeout, "oracle_check_timeout").candidate_rate, 1 / 36);
+
+  const treatmentDivergenceReport = fixtureReport({ mode: "better" });
+  const treatmentDivergenceResult = treatmentDivergenceReport.pairs[0].candidate;
+  treatmentDivergenceResult.treatment_compliance = failedOutcome("plugin_quality_lifecycle_incomplete");
+  treatmentDivergenceResult.audit_evidence.control.violation_codes = [
+    "plugin_quality_lifecycle_incomplete",
+  ];
+  treatmentDivergenceResult.audit_evidence.control.classification = "started_incomplete";
+  treatmentDivergenceResult.audit_evidence.control.attested_owner_count = 0;
+  treatmentDivergenceResult.audit_evidence.fingerprint = fingerprint({
+    scope: treatmentDivergenceResult.audit_evidence.scope,
+    control: treatmentDivergenceResult.audit_evidence.control,
+    review_match: treatmentDivergenceResult.audit_evidence.review_match,
+  });
+  treatmentDivergenceResult.whole_task_success = false;
+  const treatmentDivergence = analyzeReport(treatmentDivergenceReport);
+  const wholeTaskDelta = metricById(treatmentDivergence, "whole_task_success").delta;
+  assert.notEqual(
+    treatmentDivergence.primary.delta,
+    wholeTaskDelta,
+    "fixture must distinguish task correctness from treatment-aware whole-task success",
+  );
+  assert.equal(
+    treatmentDivergence.guardrails.find((entry) => entry.id === "whole_task_success_rate_delta").observed,
+    wholeTaskDelta,
+    "whole-task guardrail validation must not substitute the task_correct primary delta",
+  );
+  assert.equal(validateSyntheticComparisonReport(treatmentDivergence, {
+    report: treatmentDivergenceReport,
+    policy: contracts.comparison_policy,
+  }), treatmentDivergence);
 
   const worse = analyzeReport(fixtureReport({ mode: "worse" }));
   assert.equal(worse.verdict.status, "candidate_worse");

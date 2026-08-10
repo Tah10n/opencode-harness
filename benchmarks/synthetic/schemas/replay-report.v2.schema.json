@@ -21,6 +21,7 @@
     "termination_reason",
     "reason",
     "adapter_completed_correctly",
+    "task_correct",
     "evidence_complete",
     "whole_task_success",
     "result_fingerprint",
@@ -98,6 +99,9 @@
     "adapter_completed_correctly": {
       "type": "boolean"
     },
+    "task_correct": {
+      "type": "boolean"
+    },
     "evidence_complete": {
       "type": "boolean"
     },
@@ -116,10 +120,10 @@
       ],
       "properties": {
         "binding": {
-          "$ref": "https://opencode-harness.invalid/schemas/synthetic-run-report-v2#/$defs/pairBinding"
+          "$ref": "https://opencode-harness.invalid/schemas/synthetic-run-report-v3#/$defs/pairBinding"
         },
         "result": {
-          "$ref": "https://opencode-harness.invalid/schemas/synthetic-run-report-v2#/$defs/runResult"
+          "$ref": "https://opencode-harness.invalid/schemas/synthetic-run-report-v3#/$defs/runResult"
         }
       }
     },
@@ -142,11 +146,22 @@
         ]
       },
       "then": {
-        "properties": {
-          "adapter_completed_correctly": {
-            "const": true
+        "anyOf": [
+          {
+            "properties": {
+              "adapter_completed_correctly": {
+                "const": true
+              }
+            }
+          },
+          {
+            "properties": {
+              "evidence_complete": {
+                "const": true
+              }
+            }
           }
-        }
+        ]
       }
     },
     {
@@ -163,6 +178,12 @@
       "then": {
         "properties": {
           "adapter_completed_correctly": {
+            "const": false
+          },
+          "task_correct": {
+            "const": false
+          },
+          "evidence_complete": {
             "const": false
           }
         }
@@ -184,11 +205,11 @@
           "model_execution_confirmed": {
             "const": true
           },
-          "adapter_completed_correctly": {
-            "const": true
-          },
           "execution_status": {
-            "const": "completed"
+            "enum": [
+              "completed",
+              "failed"
+            ]
           }
         }
       }

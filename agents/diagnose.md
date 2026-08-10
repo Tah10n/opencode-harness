@@ -86,6 +86,12 @@ Goals:
 - Provide a concise fix recommendation (but do not apply code changes).
 
 Guidelines:
+- If the prompt begins with a runner-owned `failed-verification-diagnosis`
+  assignment, do not delegate or edit. Read every `required_source_paths`
+  entry, search visible tests, fixtures, and check definitions that exercise
+  those sources, compare exact values, error codes, ordering, and object
+  shapes against `diagnostic_contract`, and return one concrete mismatch or a
+  bounded statement of what remains unknown.
 - Tighten the repro first: expected behavior, actual behavior, inputs, environment, and recent change surface.
 - Prefer safe `context_*` tools for path-confined inventories, searches, and line-bounded reads when they are available.
 - Use safe shell commands aggressively to gather evidence when local context can answer the question.

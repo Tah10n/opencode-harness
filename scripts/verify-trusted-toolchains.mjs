@@ -20,7 +20,9 @@ import {
   assertTrustedToolchainInvocationCurrent,
   loadTrustedToolchainMap,
   parseTrustedToolchainMap,
+  resolveFixedAuxiliaryGitExecutable,
   resolveTrustedToolchainInvocation,
+  trustedBuiltInNodeExecutable,
   trustedBuiltInCandidateRoots,
   trustedToolchainMapFingerprint,
   validateTrustedToolchainArguments,
@@ -112,6 +114,24 @@ assert.equal(writableByCurrentPrincipal("fixture", "protected fixture", () => {}
 expectCode(() => writableByCurrentPrincipal("fixture", "protected fixture", () => {
   throw Object.assign(new Error("ENOENT"), { code: "ENOENT" });
 }), "QUALITY_TOOLCHAIN_PATH");
+
+assert.equal(
+  trustedBuiltInNodeExecutable(path.join(repositoryRoot, "opencode.exe")),
+  null,
+  "a Bun/OpenCode host executable must not be treated as the built-in Node runtime",
+);
+assert.equal(
+  trustedBuiltInNodeExecutable(process.execPath),
+  fs.realpathSync.native(process.execPath),
+  "a real Node host must remain eligible for the built-in Node runtime",
+);
+const fixedAuxiliaryGit = resolveFixedAuxiliaryGitExecutable(repositoryRoot);
+assert.equal(fs.realpathSync.native(fixedAuxiliaryGit), fixedAuxiliaryGit);
+assert.equal(
+  fs.statSync(fixedAuxiliaryGit, { bigint: true }).nlink,
+  1n,
+  "fixed auxiliary Git must remain singly linked",
+);
 
 function protectedMacosFixture({
   leafOwner = 0n,
@@ -520,6 +540,27 @@ try {
   const loaded = loadTrustedToolchainMap(workspaceRoot);
   assert.equal(loaded.relative_path, TRUSTED_TOOLCHAIN_MAP_PATH);
   assert.equal(loaded.fingerprint, trustedToolchainMapFingerprint(loaded.map));
+  fs.mkdirSync(path.join(workspaceRoot, ".opencode-harness", "quality"), { recursive: true });
+  fs.writeFileSync(
+    path.join(workspaceRoot, ".opencode-harness", "quality", "toolchains.json"),
+    `${JSON.stringify(map())}\n`,
+  );
+  const alternateLoaded = loadTrustedToolchainMap(workspaceRoot, {
+    relativePath: ".opencode-harness/quality/toolchains.json",
+  });
+  assert.equal(alternateLoaded.relative_path, ".opencode-harness/quality/toolchains.json");
+  assert.equal(alternateLoaded.fingerprint, trustedToolchainMapFingerprint(alternateLoaded.map));
+  for (const relativePath of [
+    "../toolchains.json",
+    "C:/toolchains.json",
+    ".opencode-harness/../toolchains.json",
+    ".opencode-harness/quality/not-toolchains.json",
+  ]) {
+    expectCode(
+      () => loadTrustedToolchainMap(workspaceRoot, { relativePath }),
+      "QUALITY_TOOLCHAIN_MAP_PATH",
+    );
+  }
   fs.writeFileSync(
     path.join(workspaceRoot, ".opencode", "quality", "toolchains.json"),
     Buffer.alloc(TRUSTED_TOOLCHAIN_LIMITS.max_map_bytes + 1, 0x20),

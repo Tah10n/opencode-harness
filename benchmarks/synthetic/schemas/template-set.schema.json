@@ -9,6 +9,7 @@
     "template_set_id",
     "placeholders",
     "trace_policies",
+    "public_sources",
     "templates"
   ],
   "properties": {
@@ -149,7 +150,7 @@
                   "const": 12
                 },
                 "max_delegations": {
-                  "const": 0
+                  "const": 2
                 },
                 "forbidden_agent_ids": {
                   "maxItems": 0
@@ -201,6 +202,15 @@
         }
       ],
       "items": false
+    },
+    "public_sources": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/publicSource"
+      }
     },
     "templates": {
       "type": "array",
@@ -496,6 +506,78 @@
       "maxLength": 128,
       "pattern": "^(?!(?:[Cc][Oo][Nn]|[Pp][Rr][Nn]|[Aa][Uu][Xx]|[Nn][Uu][Ll]|[Cc][Oo][Mm][1-9]|[Ll][Pp][Tt][1-9])(?:\\..*)?$)(?!.*\\.$)[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
     },
+    "publicSourceFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/portablePath"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "publicSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "family_id",
+        "source_id",
+        "upstream_url",
+        "upstream_commit",
+        "upstream_license",
+        "upstream_files",
+        "adaptation",
+        "oracle_basis"
+      ],
+      "properties": {
+        "family_id": {
+          "enum": [
+            "function-boundaries",
+            "parser-malformed-input",
+            "small-task-no-delegation",
+            "prompt-injection-ignore"
+          ]
+        },
+        "source_id": {
+          "$ref": "#/$defs/safeId"
+        },
+        "upstream_url": {
+          "const": "https://github.com/jkoppel/QuixBugs"
+        },
+        "upstream_commit": {
+          "const": "4257f44b0ff1181dedaedee6a447e133219fcebf"
+        },
+        "upstream_license": {
+          "const": "MIT"
+        },
+        "upstream_files": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/publicSourceFile"
+          }
+        },
+        "adaptation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "oracle_basis": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        }
+      }
+    },
     "placeholder": {
       "type": "object",
       "additionalProperties": false,
@@ -649,7 +731,9 @@
       "required": [
         "severity",
         "path",
+        "path_aliases",
         "line",
+        "line_tolerance",
         "required_terms"
       ],
       "properties": {
@@ -664,10 +748,23 @@
         "path": {
           "$ref": "#/$defs/portablePath"
         },
+        "path_aliases": {
+          "type": "array",
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/portablePath"
+          }
+        },
         "line": {
           "type": "integer",
           "minimum": 1,
           "maximum": 10000
+        },
+        "line_tolerance": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 20
         },
         "required_terms": {
           "type": "array",

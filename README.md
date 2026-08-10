@@ -116,7 +116,17 @@ host-selection guidance lives in
 
 The separate synthetic benchmark compares the same host-selected model as
 `plain`, `profile-only`, or `instrumented` without changing the existing
-release acceptance contract. Validate the model-free machinery and run the
+release acceptance contract. The model is never told its profile or arm;
+`profile-only` and `instrumented` receive byte-identical agent/skill prompts.
+Every arm sees the same neutral exact changed-path scope, and validation scans
+the actual materialized tool/schema descriptions for evaluator labels. Run
+report v3 binds that scope and publishes bounded scope, control-lifecycle, and
+polarity-aware semantic review-match audit evidence without raw model text or
+hidden paths. Relational validation binds counts and outcomes to the canonical
+instance; unexpected paths are exposed only as bounded SHA-256 identifiers.
+Functional `task_correct` and end-to-end `whole_task_success` are reported
+separately, including a separately labeled QuixBugs-derived source stratum.
+Validate the model-free machinery and run the
 cheap 16-agent smoke pair with:
 
 ```powershell
@@ -133,6 +143,31 @@ that the candidate won. Model-free checks do not prove model quality. Paired
 execution is deterministically balanced across the whole requested suite. New
 single-profile replay artifacts use source-bound replay report v2; legacy
 replay report v1 remains readable only as historical structure.
+No-progress provider timeouts are external-state/incomplete evidence and are
+excluded rather than scored as task failures. `task_correct` never depends on
+treatment-trace completeness; that remains visible in `trace_policy` and
+`whole_task_success`.
+
+### Reference result: GPT-5.4 Mini (`low`)
+
+Real OpenCode full suite: 16 families, 5 repetitions, 80 complete paired
+instances, 160 fresh agent sessions.
+
+| Metric | `plain` | `instrumented` | Difference |
+| --- | ---: | ---: | ---: |
+| Functional `task_correct` | 76.25% | **90.00%** | **+13.75 pp** |
+| `whole_task_success` | 27.50% | **80.00%** | +52.50 pp |
+| Held-out checks passed | 76.25% | **92.50%** | +16.25 pp |
+| Verification omission | 63.75% | **2.50%** | -61.25 pp |
+| Mean agent duration | **28.6 s** | 268.5 s | +239.9 s |
+
+Primary paired 95% CI: **+8.75 to +18.75 pp**; exact McNemar
+`p=0.007385`; predeclared verdict: **`candidate_better`**. Instrumented was
+more correct and much more consistent about verification, but about 9.4 times
+slower. See the
+[full methodology and interpretation](docs/synthetic-benchmark.md#reference-result-gpt-54-mini-low)
+for per-family regressions, source strata, unavailable provider cost, and
+source-bound evidence.
 
 See [docs/synthetic-benchmark.md](docs/synthetic-benchmark.md) for the profile
 contracts, 16 families, smoke/standard/full commands, fairness and hidden-data
@@ -184,15 +219,29 @@ recursive-context tools are host opt-ins.
 
 1. `chat.message` registers each primary development session as
    `unclassified`.
-2. Before mutation, the orchestrator calls `quality_session_start` with the
-   risk class, goal, exact ownership, and trusted project checks.
+2. In a registered quality session, the orchestrator calls
+   `quality_session_start` first, before native reads/globs, skill discovery,
+   todo creation, shell checks, or delegation. It classifies from the visible
+   request and allowed ownership paths, then executes only the first
+   runner-recommended action and re-inspects after it settles.
 3. A clean, bounded local task may use `standard-lite`: declared behavior,
    preserved behavior, local edge cases, ownership, and trusted checks. The
    runner synthesizes this compact dossier; callers do not replace or update it
-   with `quality_dossier_create` or `quality_dossier_update`.
+   with `quality_dossier_create` or `quality_dossier_update`. A deterministic
+   one-function async/cancellation repair can remain local; shared-state races,
+   locks, durable persistence, security, migration, architecture changes, and
+   intentional public-contract changes still require escalation. The narrow
+   `user_visible_goal`, not a broader model-authored algorithm summary, is the
+   authoritative requested behavior. Unmentioned initialization, return values,
+   public shapes, and local boundary behavior remain preserved. A fresh
+   standard-lite session exposes only one immediate context read; finalization
+   is recommended only after that receipt is recorded.
 4. For `high` and `critical`, the runner-selected strategy begins with a
-   provisional Engineering Dossier draft and provisional impact graph created by
-   `quality_dossier_create`.
+   provisional Engineering Dossier draft, inferred partial impact graph, linked
+   draft report, and explicit blocking unknown created by the runner during the
+   start or monotonic escalation transition. Bounded context receipts must
+   replace the provisional analysis before finalization; the seed is not gate
+   evidence.
 5. Actual bounded context operations create runner-owned context receipts through
    the runner observer or trusted normal-session host hook; live adapters cannot
    mint receipts from self-described output. Instrumented context operations and
@@ -210,12 +259,31 @@ recursive-context tools are host opt-ins.
    mutation; only a runner-owned passed gate authorizes mutation. Native `bash`
    remains disabled in an instrumented quality session.
 8. A passed gate issues one-shot authority for exact owned paths. Tests, lint,
-   typecheck, and builds run only as runner-owned trusted project checks.
+   typecheck, and builds run only as runner-owned trusted project checks. A
+   failed check first routes to a runner-assigned read-only `diagnose` child,
+   which must inspect the current source plus visible tests/check definitions
+   and identify a concrete contract mismatch (or bounded uncertainty). Only
+   after that diagnosis can the runner issue a new bounded remediation edit
+   before another verifier. `standard-lite` terminalizes after six linked
+   verifier attempts so a weak model cannot turn a local repair into an
+   unbounded edit/check loop;
+   after trusted verification and a passed reviewer receipt, the final
+   workspace is sealed and the only remaining path is reconciliation plus
+   attestation. A reviewer receipt with blocked checks or unplanned items
+   instead exposes one explicit bounded remediation action. Rejected speculative
+   edits do not invalidate the passed verification or reopen mutation authority.
+   High and critical lifecycles keep their separate budgets. The expanded
+   normal-session bridge regression suite has one explicit reviewed 20-minute
+   verifier budget; other ordinary deterministic stages retain the 10-minute
+   default, so a valid long fixture is not mistaken for a failed check without
+   making verification unbounded.
 9. The runner compares the bounded source workspace before and after mutation:
    tracked changes, untracked non-ignored files, exact ownership, declared
    generated outputs, the Git index, and `HEAD`. Ordinary ignored dependency,
    cache, and build trees stay outside the source walk; `.oc_harness` has a
-   separate control-state guard.
+   separate control-state guard. Persistent index identity uses semantic staged
+   entries, so a read-only Git stat-cache refresh is ignored, while raw index
+   identity still guards races inside one atomic observation.
 10. Project checks declare a logical `executable_id` in
    `.opencode/quality/checks.json`. `.opencode/quality/toolchains.json` maps it
    to an approved resolver family. The runner avoids ambient `PATH`, rechecks
@@ -225,13 +293,22 @@ recursive-context tools are host opt-ins.
    reproducer and the integration regression. The runner records expected
    pre-fix failure, post-fix pass, unrelated outcome, or bounded unavailability
    with an explicit reason. Unexpected pass, unrelated evidence, and material
-   uncertainty block the compact path.
+   uncertainty block the compact path. When exactly one trusted reproducer is
+   available, the runner selects it even if the model omits or guesses an ID;
+   model input can select only among multiple runner-listed checks.
 12. A configured high/critical architecture policy accepts only a freshly
     created or rewritten runner-owned final graph from its integration check.
     Missing, stale, unavailable, failed, or policy-violating evidence cannot
     produce attestation.
 13. Before attestation, the runner derives the exact final diff and resolves
-    immutable reviewer evidence, then reconciles them with planned ownership,
+    immutable reviewer evidence. A linked final reviewer must first create
+    current `context_read` receipts for every retained changed source path; the
+    model cannot pass review with an ungrounded compact outcome. A passed review
+    must cover the runner's exact ordered clause IDs and bind every clause to a
+    current source path, an exact snippet present in that file, and a distinct
+    `input`/`observed`/`expected` execution trace. The raw snippets remain
+    transient; durable evidence retains their contract fingerprint. The runner
+    then reconciles that evidence with planned ownership,
     report coverage, public contracts, dependency and side-effect edges, and
     critical-path verification. Adapter-declared diff or reviewer claims are
     never trusted. An unplanned high-impact path invalidates prior sufficiency
@@ -259,14 +336,16 @@ For high or critical work, the agent builds understanding in a visible loop:
 
 1. `chat.message` registers the task, and `quality_session_start` classifies its
    risk and selects the minimum context strategy.
-2. `quality_dossier_create` records a provisional Engineering Dossier draft and
-   provisional map of entry points, callers, consumers, contracts, state,
-   side effects, tests, siblings, unknowns, and critical paths.
+2. The runner seeds a provisional Engineering Dossier draft, inferred partial
+   impact graph, linked draft report, and blocking unknown during the typed
+   start or monotonic escalation transition. Legacy explicit full-dossier flows
+   may still use `quality_dossier_create`; the ordinary structured path does not
+   require the model to invent a complete graph before it can collect evidence.
 3. The agent reads one relevant area at a time. Each bounded operation produces a
    runner-owned context receipt; instrumented read-only children are serialized.
-4. New evidence is expected to change the provisional map. The agent applies
-   those changes through `quality_dossier_update` rather than defending its first
-   guess.
+4. New evidence must replace or refine the provisional map. The agent applies
+   those changes through `quality_dossier_update` rather than treating the
+   runner seed as observed coverage.
 5. `quality_context_report_update` records the wide affected-system view and the
    deep failure analysis for every critical path.
 6. `quality_context_report_finalize` finalizes the Whole-System Context Report.
@@ -278,16 +357,26 @@ For high or critical work, the agent builds understanding in a visible loop:
    reviewer then challenge the canonical current challenge subject: current
    Dossier analysis, selected strategy, finalized report analysis, exact
    sufficiency decision, and task-profile evidence, including exclusions,
-   counterexamples, edge cases, and test design.
+   counterexamples, edge cases, and test design. The runner also supplies the
+   narrow goal and preservation contract, so a challenge cannot replace the
+   requested delta with a speculative conventional design.
 8. `quality_dossier_finalize` evaluates the existing Engineering Dossier gate.
    Neither report finalization, context sufficiency, nor Dossier finalization is
    mutation authority.
 9. Only a runner-owned passed gate permits exact, one-shot writes.
-10. After implementation, verification and exact-diff reconciliation compare the
-    result with the current report and workspace, not an earlier plan or diff.
+10. After implementation, the final reviewer reads retained changed files and
+    retained impact-graph source nodes, traces every explicit behavior, edge,
+    preservation, and counterexample clause, and treats a targeted check as
+    evidence only for its executed scenario. Independently declared edge cases
+    remain separate review clauses and counterexamples rather than being folded
+    into one generic fallback. Verification and exact-diff
+    reconciliation compare the result with the current report and workspace,
+    not an earlier plan or diff.
 
 Genuinely local `standard-lite` work keeps a short local plan and bounded local
-evidence. See [Whole-System Context](docs/whole-system-context.md) for the exact
+evidence. When that evidence discovers non-local impact, the runner returns one
+typed monotonic escalation action and moves the session to high-path dossier
+refinement instead of repeating local reads. See [Whole-System Context](docs/whole-system-context.md) for the exact
 strategy, receipt, fallback, sufficiency, and reconciliation contracts.
 
 Persisted quality run directories can be assessed without trusting an in-memory

@@ -12,6 +12,7 @@ import {
   createNormalSessionQualityBridge,
   executeNormalSessionQualityTool,
   handleNormalSessionChatMessage,
+  handleNormalSessionEvent,
   handleNormalSessionToolAfter,
   handleNormalSessionToolBefore,
   inspectNormalSessionQualityState,
@@ -132,28 +133,54 @@ function recordLocalContext(targetBridge, sessionID, relativePath = "src/file.mj
   });
 }
 
+let reviewerSequence = 0;
 function reconcileForAttestation(targetBridge, sessionID) {
-  const facts = {
-    changed_paths: [],
-    unexpected_public_contracts: [],
-    unexpected_dependency_directions: [],
-    unexpected_side_effect_edges: [],
-    unrelated_paths: [],
-    unplanned_items: [],
-  };
-  const checks = Object.fromEntries([
-    "changed_path_ownership",
-    "public_contracts",
-    "dependency_directions",
-    "side_effect_edges",
-    "critical_path_tests",
-    "unrelated_changes",
-  ].map((key) => [key, { status: "passed", finding_ids: [] }]));
+  const inspection = executeNormalSessionQualityTool(targetBridge, "quality_dossier_inspect", {
+    request: "{}",
+  }, { sessionID, agent: "orchestrator" });
+  const [reviewAction] = inspection.recommended_next_actions;
+  assert.equal(reviewAction?.tool_id, "task");
+  assert.equal(reviewAction?.target_agent, "reviewer");
+  assert.equal(reviewAction?.assignment?.tool_id, "quality_context_reviewer_record");
+  const sequence = ++reviewerSequence;
+  const taskCallID = `classification-final-review-${sequence}`;
+  const reviewerSessionID = `${sessionID}/final-review-${sequence}`;
+  handleNormalSessionToolBefore(targetBridge, {
+    tool: "task",
+    sessionID,
+    callID: taskCallID,
+  }, { args: { description: "reviewer task", prompt: "bounded task", subagent_type: "reviewer" } });
+  handleNormalSessionEvent(targetBridge, {
+    type: "session.created",
+    properties: { info: { id: reviewerSessionID, parentID: sessionID } },
+  });
+  for (const requiredPath of reviewAction.assignment.required_read_paths) {
+    recordLocalContext(targetBridge, reviewerSessionID, requiredPath);
+  }
+  const clauses = reviewAction.assignment.review_contract.review_clauses;
+  const evidencePaths = clauses.map((entry, index) => (
+    reviewAction.assignment.required_read_paths[index % reviewAction.assignment.required_read_paths.length]
+  ));
   executeNormalSessionQualityTool(targetBridge, "quality_context_reviewer_record", {
-    request: JSON.stringify({ ...facts, checks }),
-  }, { sessionID, agent: "reviewer" });
+    request: JSON.stringify({
+      outcome: "passed",
+      reviewed_clause_ids: clauses.map((entry) => entry.id),
+      clause_evidence_paths: evidencePaths,
+      clause_evidence_snippets: evidencePaths.map((evidencePath) => (
+        fs.readFileSync(path.join(tempRoot, evidencePath), "utf8").trim()
+      )),
+      clause_evidence_summaries: clauses.map((entry, index) => (
+        `${entry.id}: input=classification-fixture-${index + 1}; observed=current source preserves ${entry.category}; expected=${entry.category} contract remains satisfied; verdict=match`
+      )),
+    }),
+  }, { sessionID: reviewerSessionID, agent: "reviewer" });
+  handleNormalSessionToolAfter(targetBridge, {
+    tool: "task",
+    sessionID,
+    callID: taskCallID,
+  }, { output: "review complete", title: "final reviewer", metadata: {} });
   return executeNormalSessionQualityTool(targetBridge, "quality_context_reconcile", {
-    request: JSON.stringify({ evidence_mode: "reviewer_grounded", ...facts }),
+    request: JSON.stringify({ evidence_mode: "reviewer_grounded" }),
   }, { sessionID, agent: "orchestrator" });
 }
 
@@ -560,7 +587,8 @@ for (const stage of [
   const escalatedRegistration = inspectNormalSessionRegistration(transactionBridge, transactionSession);
   assert.equal(escalatedOwner.dossier.risk_class, "high");
   assert.equal(escalatedOwner.context_strategy.strategy_id, "high-wide-deep-v1");
-  assert.equal(escalatedOwner.context_report, null, "risk promotion must require a newly planned impact graph");
+  assert.equal(escalatedOwner.context_report.status, "draft");
+  assert.equal(escalatedOwner.dossier.impact_graph.coverage.completeness, "partial");
   assert.equal(escalatedOwner.standard_lite_policy, null);
   assert.deepEqual(escalatedOwner.cumulative_affected_paths, ownerBeforeFailure.cumulative_affected_paths,
     "escalation must retain prior path facts only as re-observation obligations");
@@ -621,7 +649,8 @@ for (const stage of ["after_owner_risk_escalation", "after_registry_risk_escalat
   assert.equal(recoveredRegistration.risk_class, "high", `${stage} registry projection must roll forward on restart`);
   assert.equal(recoveredOwner.standard_lite_policy, null);
   assert.equal(recoveredOwner.reproduction_contract, null);
-  assert.equal(recoveredOwner.context_report, null);
+  assert.equal(recoveredOwner.context_report.status, "draft");
+  assert.equal(recoveredOwner.dossier.impact_graph.coverage.completeness, "partial");
   assert.equal(recoveredOwner.context_task_profile_evidence, null);
   assert.equal(recoveredOwner.context_decision, null);
   assert.deepEqual(recoveredOwner.contributions, []);
@@ -646,7 +675,7 @@ for (const stage of ["after_owner_risk_escalation", "after_registry_risk_escalat
   assert.deepEqual(recoveredOwner.cumulative_affected_paths, ownerBeforeCrash.cumulative_affected_paths,
     `${stage} restart repair must preserve pre-promotion affected path facts`);
   assert.equal(recoveredOwner.dossier.mode, "full");
-  assert.equal(recoveredOwner.dossier.revision, 1);
+  assert.equal(recoveredOwner.dossier.revision, 2);
   assert.equal(recoveredOwner.dossier.created_at, recoveredOwner.dossier.updated_at);
   assert.equal(recoveredOwner.dossier.finalized_at, null);
   assert.deepEqual(recoveredOwner.dossier.plan_challenge, {
@@ -684,14 +713,15 @@ const lowerRegistration = inspectNormalSessionRegistration(laterDraftBridge, lat
 executeNormalSessionQualityTool(laterDraftBridge, "quality_context_strategy_escalate", {
   request: JSON.stringify({ requested_strategy_id: "high-wide-deep-v1" }),
 }, laterDraftContext);
+const laterDraftPromoted = inspectNormalSessionQualityState(laterDraftBridge, laterDraftSession);
 expectCode(() => executeNormalSessionQualityTool(laterDraftBridge, "quality_architecture_evaluate", {
-  request: JSON.stringify({ expected_revision: 1, blockers: [] }),
+  request: JSON.stringify({ expected_revision: laterDraftPromoted.dossier.revision, blockers: [] }),
 }, { sessionID: laterDraftSession, agent: "architect" }), "QUALITY_PLAN_CHALLENGE_BEFORE_CONTEXT_SUFFICIENCY");
 const laterDraftOwner = inspectNormalSessionQualityState(laterDraftBridge, laterDraftSession);
 assert.equal(laterDraftOwner.lifecycle, "dossier_draft");
-assert.equal(laterDraftOwner.dossier.revision, 1);
-assert.equal(laterDraftOwner.dossier.impact_graph, null);
-assert.equal(laterDraftOwner.context_report, null);
+assert.equal(laterDraftOwner.dossier.revision, 2);
+assert.equal(laterDraftOwner.dossier.impact_graph.coverage.completeness, "partial");
+assert.equal(laterDraftOwner.context_report.status, "draft");
 assert.equal(laterDraftOwner.contributions.length, 0);
 const laterDraftSessionKey = createHash("sha256").update(laterDraftSession).digest("hex");
 const lowerRegistrationPath = path.join(
@@ -725,8 +755,8 @@ executeNormalSessionQualityTool(progressedReceiptBridge, "quality_context_strate
 }, progressedReceiptContext);
 recordLocalContext(progressedReceiptBridge, progressedReceiptSession);
 const progressedReceiptOwner = inspectNormalSessionQualityState(progressedReceiptBridge, progressedReceiptSession);
-assert.equal(progressedReceiptOwner.dossier.revision, 1);
-assert.equal(progressedReceiptOwner.context_report, null);
+assert.equal(progressedReceiptOwner.dossier.revision, 2);
+assert.equal(progressedReceiptOwner.context_report.status, "draft");
 assert.equal(progressedReceiptOwner.pending_context_calls.length, 0);
 assert.equal(progressedReceiptOwner.context_receipt_ids.length > 0, true);
 const progressedReceiptSessionKey = createHash("sha256").update(progressedReceiptSession).digest("hex");

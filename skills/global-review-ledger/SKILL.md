@@ -10,7 +10,7 @@ metadata:
 
 - Review requests are read-only unless the user explicitly asks for fixes.
 - Do not edit files, stage changes, commit, or run fix commands during review.
-- Use up to ten `@reviewer` subagents only when distinct scopes are useful. Instrumented quality mode runs reviewer children one at a time so each result is settled and incorporated before the next; profile-only mode may optionally parallelize independent reviewer scopes without a computational receipt-chain guarantee.
+- Use up to ten `@reviewer` subagents only when distinct scopes are useful. When runner-owned receipt enforcement is active, run reviewer children one at a time so each result is settled and incorporated before the next; otherwise independent reviewer scopes may optionally run in parallel without a computational receipt-chain guarantee.
 - Prefer distinct reviewer scopes: correctness, tests/coverage, API/contracts, security/privacy, performance/concurrency/resource lifecycle, and UX/i18n/docs/build-release.
 - Each reviewer must return concrete findings with severity, file/line evidence, impact, and a recommended fix.
 

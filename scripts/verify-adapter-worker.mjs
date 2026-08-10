@@ -426,6 +426,72 @@ export async function runScenario() {
     "quality_authorize_action",
   ]);
 
+  const credentialAdapter = path.join(tmp, "credential-facade.mjs");
+  fs.writeFileSync(credentialAdapter, `export async function runScenario(context) {
+  const initial = await context.credential.read("example");
+  const updated = await context.credential.update({
+    provider_id: "example",
+    expected_revision: initial.revision,
+    auth_content: ${JSON.stringify(JSON.stringify({
+      example: {
+        type: "oauth",
+        refresh: "credential-worker-new-refresh",
+        access: "credential-worker-new-access",
+        expires: 2,
+      },
+    }))},
+  });
+  const final = await context.credential.read("example");
+  return { passed: true, revisions: [initial.revision, updated.revision, final.revision] };
+}
+`, "utf8");
+  let credentialRevision = 0;
+  let credentialAuthContent = JSON.stringify({
+    example: {
+      type: "oauth",
+      refresh: "credential-worker-old-refresh",
+      access: "credential-worker-old-access",
+      expires: 1,
+    },
+  });
+  const credentialOperations = [];
+  const credentialTraceOperations = [];
+  const credentialResult = await runAdapterModule({
+    adapterUrl: adapterUrl(credentialAdapter),
+    context: {},
+    timeout: 2000,
+    onTrace: (operation) => credentialTraceOperations.push(operation),
+    onCredential: (operation, payload) => {
+      credentialOperations.push(operation);
+      if (operation === "credential_read") {
+        return {
+          schema_version: 1,
+          provider_id: payload.provider_id,
+          revision: credentialRevision,
+          auth_content: credentialAuthContent,
+        };
+      }
+      assert.equal(operation, "credential_update");
+      assert.equal(payload.expected_revision, credentialRevision);
+      credentialAuthContent = payload.auth_content;
+      credentialRevision += 1;
+      return {
+        schema_version: 1,
+        provider_id: payload.provider_id,
+        revision: credentialRevision,
+      };
+    },
+  });
+  assert.deepEqual(credentialResult.revisions, [0, 1, 1]);
+  assert.deepEqual(credentialOperations, [
+    "credential_read",
+    "credential_update",
+    "credential_read",
+  ]);
+  assert.deepEqual(credentialTraceOperations, []);
+  assert.equal(JSON.stringify(credentialResult).includes("credential-worker"), false);
+  assert.equal(JSON.parse(credentialAuthContent).example.refresh, "credential-worker-new-refresh");
+
   const responseQuotaAdapter = path.join(tmp, "response-quota.mjs");
   fs.writeFileSync(responseQuotaAdapter, `export async function runScenario(context) {
   await context.quality.inspect();

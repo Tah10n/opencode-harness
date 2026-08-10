@@ -416,7 +416,9 @@
       ],
       "skill_ids": [
         "global-debugging",
-        "global-review-ledger"
+        "global-review-ledger",
+        "global-quality-gates",
+        "global-wide-deep-context"
       ],
       "component_ids": [
         "context-inventory",
@@ -435,10 +437,10 @@
     {
       "id": "instrumented",
       "display_name": "Computationally instrumented orchestration",
-      "primary_role_id": "orchestrator-deep",
+      "primary_role_id": "orchestrator",
       "prompt_source": "repository",
       "role_ids": [
-        "orchestrator-deep",
+        "orchestrator",
         "explore",
         "architect",
         "general",
@@ -487,7 +489,7 @@
       "changed_files_max": 3,
       "check_timeout_ms": 5000,
       "agent_timeout_min_ms": 60000,
-      "agent_timeout_max_ms": 90000,
+      "agent_timeout_max_ms": 3600000,
       "network_allowed": false,
       "package_operations_allowed": false,
       "lockfile_operations_allowed": false
@@ -686,7 +688,9 @@
       "nonzero-exit",
       "missing-final",
       "partial-truncated",
-      "stale-profile-fingerprint"
+      "stale-profile-fingerprint",
+      "session-bound",
+      "session-mismatch"
     ],
     "adapter_contract": {
       "argv_array_only": true,
@@ -794,7 +798,9 @@
       ],
       "skill_ids": [
         "global-debugging",
-        "global-review-ledger"
+        "global-review-ledger",
+        "global-quality-gates",
+        "global-wide-deep-context"
       ]
     },
     {
@@ -818,8 +824,6 @@
         "orchestrator-deep"
       ],
       "skill_ids": [
-        "global-quality-gates",
-        "global-wide-deep-context"
       ]
     },
     {

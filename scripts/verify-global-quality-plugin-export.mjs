@@ -3,7 +3,10 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-import { createNormalSessionQualityPlugin } from "opencode-harness/quality-plugin";
+import {
+  createNormalSessionQualityPlugin,
+  createOpenCodeSessionInfoResolver,
+} from "opencode-harness/quality-plugin";
 import { createDefaultNormalSessionCheckCatalog } from "../lib/quality/normal-session-bridge.mjs";
 import {
   classifyQualityPluginApiProbe,
@@ -28,6 +31,33 @@ const localWrapperSource = fs.readFileSync(path.join(root, ".opencode/plugins/en
 const globalWrapperSource = fs.readFileSync(path.join(root, "quality/examples/global-quality-plugin.mjs"), "utf8");
 assert.equal(localWrapperSource.includes("hostToolchainAnchorUrl"), false, "project-local wrapper cannot claim a host-owned anchor");
 assert(globalWrapperSource.includes("hostToolchainAnchorUrl: import.meta.url"), "global wrapper must bind host configuration beside itself");
+assert(localWrapperSource.includes("createOpenCodeSessionInfoResolver"), "project-local wrapper must synchronously bind host session ancestry");
+assert(globalWrapperSource.includes("createOpenCodeSessionInfoResolver"), "global wrapper must synchronously bind host session ancestry");
+
+const sessionLookupCalls = [];
+const resolveSessionInfo = createOpenCodeSessionInfoResolver({
+  session: {
+    async get(options) {
+      sessionLookupCalls.push(options);
+      return { data: { id: options.path.id, parentID: "session/parent" } };
+    },
+  },
+}, { directory: "C:/bounded/worktree" });
+assert.deepEqual(await resolveSessionInfo("session/child"), {
+  id: "session/child",
+  parentID: "session/parent",
+});
+assert.deepEqual(sessionLookupCalls, [{
+  path: { id: "session/child" },
+  query: { directory: "C:/bounded/worktree" },
+}]);
+await assert.rejects(
+  () => createOpenCodeSessionInfoResolver({
+    session: { get: async () => ({ data: { id: "session/other" } }) },
+  })("session/child"),
+  (error) => error instanceof ContractError && error.code === "QUALITY_SESSION_HOST_LOOKUP",
+  "host lookup must reject a mismatched session identity",
+);
 
 const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-harness-plugin-export-"));
 fs.mkdirSync(path.join(tempRoot, "src"));

@@ -326,7 +326,7 @@ const OPERATIONAL_SEQUENCE_MARKERS = Object.freeze({
   mutation_authorization: /runner-owned passed gate[\s\S]{0,80}(?:authorizes|permits)/iu,
 });
 
-function assertModeAwareReadOnlyGuidance(text, label) {
+function assertRunnerFacingReadOnlyGuidance(text, label) {
   check(
     /instrumented[\s\S]{0,320}(?:serializ(?:ed|es)|one[\s\S]{0,80}at a time)/iu.test(text),
     `${label} must state that instrumented context or read-only child work is serialized`,
@@ -334,6 +334,22 @@ function assertModeAwareReadOnlyGuidance(text, label) {
   check(
     /profile-only[\s\S]{0,320}(?:parallel|parallelize)/iu.test(text),
     `${label} must confine optional parallel read-only work to profile-only mode`,
+  );
+}
+
+function assertCapabilityAwareReadOnlyGuidance(text, label) {
+  check(
+    /runner-owned[\s\S]{0,120}receipt/iu.test(text)
+      && /(?:serializ(?:ed|es)|one[\s\S]{0,80}at a time)/iu.test(text),
+    `${label} must serialize context or read-only child work when runner-owned receipts are enforced`,
+  );
+  check(
+    /(?:without[\s\S]{0,260}(?:enforcement|receipt chain)[\s\S]{0,260}(?:parallel|parallelize)|otherwise[\s\S]{0,260}(?:parallel|parallelize)|when[\s\S]{0,180}(?:tools|receipts)[\s\S]{0,180}(?:absent|unavailable)[\s\S]{0,260}(?:parallel|parallelize))/iu.test(text),
+    `${label} must permit optional parallel read-only work only without runner-owned receipt enforcement`,
+  );
+  check(
+    !/(?:profile-only|instrumented mode|profile mode)/iu.test(text),
+    `${label} must describe observable capabilities without exposing runner-owned profile labels`,
   );
 }
 
@@ -355,8 +371,8 @@ function assertPreimplementationSemantics() {
   const wholeSystem = readWorkspaceText("docs/whole-system-context.md");
   const sequenceDocuments = [
     {
-      label: "agents/orchestrator.md high/critical sequence",
-      text: sectionBetween(orchestrator, "High/critical instrumented sequence:", "8. Keep the immediate blocking step local.", "agents/orchestrator.md"),
+      label: "agents/orchestrator.md high/critical capability sequence",
+      text: sectionBetween(orchestrator, "7. High/critical runner-owned sequence when the quality tools are available:", "8. Keep the immediate blocking step local.", "agents/orchestrator.md"),
     },
     {
       label: "agents/orchestrator-deep.md high/critical sequence",
@@ -418,21 +434,26 @@ function assertPreimplementationSemantics() {
     ),
   );
 
-  const modeAwareDocuments = [
-    "AGENTS.md",
+  const capabilityAwareDocuments = [
     "agents/orchestrator.md",
-    "agents/orchestrator-deep.md",
     "agents/explore.md",
     "skills/global-wide-deep-context/SKILL.md",
     "skills/global-review-ledger/SKILL.md",
+  ];
+  for (const relativePath of capabilityAwareDocuments) {
+    assertCapabilityAwareReadOnlyGuidance(readWorkspaceText(relativePath), relativePath);
+  }
+  const runnerFacingModeDocuments = [
+    "AGENTS.md",
+    "agents/orchestrator-deep.md",
     "README.md",
     "docs/whole-system-context.md",
     "docs/recursive-context-mode.md",
     "docs/adoption.md",
     "docs/live-evaluation.md",
   ];
-  for (const relativePath of modeAwareDocuments) {
-    assertModeAwareReadOnlyGuidance(readWorkspaceText(relativePath), relativePath);
+  for (const relativePath of runnerFacingModeDocuments) {
+    assertRunnerFacingReadOnlyGuidance(readWorkspaceText(relativePath), relativePath);
   }
   const obsoleteParallelClaims = [
     "Parallelize independent read-only discovery",
@@ -441,7 +462,7 @@ function assertPreimplementationSemantics() {
     "Be optimized for parallel context gathering",
     "Use up to ten `@reviewer` subagents in parallel",
   ];
-  for (const relativePath of modeAwareDocuments) {
+  for (const relativePath of [...capabilityAwareDocuments, ...runnerFacingModeDocuments]) {
     const text = readWorkspaceText(relativePath);
     for (const obsoleteClaim of obsoleteParallelClaims) {
       check(!text.includes(obsoleteClaim), `${relativePath} retains obsolete unqualified guidance: ${obsoleteClaim}`);

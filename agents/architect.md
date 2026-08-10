@@ -94,6 +94,17 @@ Mission:
   Report: direct and transitive consumers, evidence-backed exclusions, impact
   graph linkage, critical-path selection, falsification, and write ownership.
 
+Runner-owned assignment boundary:
+- If the bounded task prompt contains a runner quality assignment requiring
+  `quality_architecture_evaluate`, that role-only receipt is a mandatory part
+  of the task, not an optional follow-up or an action for the parent.
+- Inspect the supplied canonical subject and relevant evidence, then call
+  `quality_architecture_evaluate` exactly once with the supplied typed revision
+  and concrete unresolved blocker summaries, if any. Do not delegate, return a
+  plan-only response, or finish before that tool call succeeds.
+- After the receipt succeeds, return the concise architecture result and the
+  receipt evidence to the parent.
+
 Workflow:
 1. Inspect only the context needed to understand the change surface.
 2. Prefer safe `context_*` tools for path-confined inventories, searches, and line-bounded reads when they are available.

@@ -43,6 +43,7 @@ import { createContextReceiptStore } from "../lib/quality/context-receipt-store.
 const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-harness-normal-quality-"));
 fs.mkdirSync(path.join(tempRoot, "src"));
 fs.writeFileSync(path.join(tempRoot, "src", "file.mjs"), "export const value = 1;\n", "utf8");
+fs.writeFileSync(path.join(tempRoot, "src", "second.mjs"), "export const value = 1;\n", "utf8");
 
 let clockTick = 0;
 let idTick = 0;
@@ -50,12 +51,16 @@ const currentPathVersions = new Map();
 const headSha = "a".repeat(40);
 const clock = () => new Date(Date.UTC(2026, 6, 14, 10, 0, clockTick++)).toISOString();
 const idFactory = (prefix) => `${prefix}-${String(++idTick).padStart(4, "0")}`;
-function fixtureWorkspaceSnapshot(entries, outputEntries = []) {
+function fixtureWorkspaceSnapshot(
+  entries,
+  outputEntries = [],
+  indexFingerprint = fingerprint({ fixture: "index" }),
+) {
   const sourceBody = {
     schema_version: WORKSPACE_SNAPSHOT_SCHEMA_VERSION,
     head_sha: headSha,
     index_entry_count: 0,
-    index_fingerprint: fingerprint({ fixture: "index" }),
+    index_fingerprint: indexFingerprint,
     entries,
     dirty: false,
   };
@@ -705,22 +710,193 @@ function reconciliationFacts(targetBridge, context) {
   };
 }
 
-function recordPassedReviewerReconciliation(targetBridge, context) {
+function passedReviewerClauseRequest(reviewAction) {
+  const clauses = reviewAction.assignment.review_contract.review_clauses;
+  const paths = reviewAction.assignment.required_read_paths;
+  assert.ok(clauses.length > 0, "passed review requires runner-owned clauses");
+  assert.ok(paths.length > 0, "passed review requires runner-owned source paths");
+  return {
+    outcome: "passed",
+    reviewed_clause_ids: clauses.map((entry) => entry.id),
+    clause_evidence_paths: clauses.map((entry, index) => paths[index % paths.length]),
+    clause_evidence_snippets: clauses.map(() => "export const value = 1;"),
+    clause_evidence_summaries: clauses.map((entry, index) => (
+      `${entry.id}: input=fixture-${index + 1}; observed=the controlling export preserves ${entry.category}; expected=${entry.expected_behavior}; verdict=match`
+    )),
+  };
+}
+
+function recordPassedReviewerReconciliation(targetBridge, context, {
+  compact = true,
+  assertDetailedMismatch = false,
+} = {}) {
   const facts = reconciliationFacts(targetBridge, context);
-  const checks = Object.fromEntries([
-    "changed_path_ownership", "public_contracts", "dependency_directions", "side_effect_edges",
-    "critical_path_tests", "unrelated_changes",
-  ].map((key) => [key, { status: "passed", finding_ids: [] }]));
+  const preReviewInspection = executeRawNormalSessionQualityTool(targetBridge, "quality_dossier_inspect", {
+    request: "{}",
+  }, context);
+  assert.equal(preReviewInspection.recommended_next_actions.length, 1);
+  const [reviewAction] = preReviewInspection.recommended_next_actions;
+  assert.equal(reviewAction.tool_id, "task");
+  assert.equal(reviewAction.target_agent, "reviewer");
+  assert.equal(reviewAction.assignment.tool_id, "quality_context_reviewer_record");
+  assert.equal(Object.hasOwn(reviewAction.assignment, "passed_request"), false);
+  assert.deepEqual(
+    reviewAction.assignment.required_clause_ids,
+    reviewAction.assignment.review_contract.review_clauses.map((entry) => entry.id),
+  );
+  assert.ok(
+    facts.changed_paths.every((entry) => reviewAction.assignment.required_read_paths.includes(entry.path)),
+    "runner-owned reviewer assignment must include every changed source path",
+  );
+  assert.ok(
+    reviewAction.assignment.required_read_paths.length > 0,
+    "runner-owned reviewer assignment must retain at least one contract-relevant review path",
+  );
+  assert.equal(
+    reviewAction.assignment.required_read_paths.some((entry) => (
+      reviewAction.assignment.required_read_paths.some((candidate) => (
+        candidate !== entry && candidate.startsWith(`${entry}/`)
+      ))
+    )),
+    false,
+    "runner-owned reviewer assignments must prefer concrete child files over their directory prefixes",
+  );
+  assert.equal(
+    reviewAction.assignment.review_contract.requested_behavior,
+    inspectNormalSessionQualityState(targetBridge, context.sessionID).dossier.behavior_contract.requested_behavior,
+  );
+  assert.equal(
+    reviewAction.assignment.review_contract.user_visible_goal,
+    inspectNormalSessionQualityState(targetBridge, context.sessionID).dossier.user_visible_goal,
+  );
+  assert.match(
+    reviewAction.assignment.review_contract.change_policy,
+    /narrow user_visible_goal is authoritative/u,
+    "reviewer assignments must reject semantic broadening and conventional-algorithm preference",
+  );
+  assert.match(reviewAction.assignment.instruction, /every required_read_paths entry with context_read/u);
+  assert.match(reviewAction.assignment.instruction, /uncertainty or style preference alone is not a finding/u);
+  assert.match(reviewAction.assignment.instruction, /trace one concrete execution or source-level counterexample through every clause/u);
+  assert.match(reviewAction.assignment.instruction, /passing trusted check proves only the scenario it executes/u);
+  assert.match(reviewAction.assignment.instruction, /exact controlling source snippet/u);
+  assert.match(reviewAction.assignment.instruction, /input=.*observed=.*expected=.*verdict=match/u);
+  assert.match(reviewAction.assignment.instruction, /generic fallback or error does not satisfy a named distinct state/u);
+  const reviewTaskIndex = ++reviewTaskTick;
+  const reviewTaskCallID = `call-final-review-${reviewTaskIndex}`;
+  const reviewerSessionID = `session/final-review-${reviewTaskIndex}`;
+  handleNormalSessionToolBefore(targetBridge, {
+    tool: "task",
+    sessionID: context.sessionID,
+    callID: reviewTaskCallID,
+  }, nativeTask("reviewer"));
+  handleNormalSessionEvent(targetBridge, {
+    type: "session.created",
+    properties: { info: { id: reviewerSessionID, parentID: context.sessionID } },
+  });
+  for (const requiredPath of reviewAction.assignment.required_read_paths) {
+    const callID = `context-read-final-review-${++contextCallTick}`;
+    handleNormalSessionToolBefore(targetBridge, {
+      tool: "context_read",
+      sessionID: reviewerSessionID,
+      callID,
+    }, { args: { path: requiredPath, startLine: 1, maxLines: 64, maxBytes: 4096, format: "text" } });
+    handleNormalSessionToolAfter(targetBridge, {
+      tool: "context_read",
+      sessionID: reviewerSessionID,
+      callID,
+    }, { output: contextReadOutput(requiredPath), title: "final reviewer evidence read", metadata: {} });
+  }
+  const passedReviewRequest = passedReviewerClauseRequest(reviewAction);
+  assertContractError(() => executeRawNormalSessionQualityTool(targetBridge, "quality_context_reviewer_record", {
+    request: JSON.stringify({
+      ...passedReviewRequest,
+      clause_evidence_snippets: passedReviewRequest.clause_evidence_snippets.map(() => "not present in current source"),
+    }),
+  }, { sessionID: reviewerSessionID, agent: "reviewer" }), "CONTEXT_REVIEW_SOURCE_EVIDENCE_MISMATCH");
+  assertContractError(() => executeRawNormalSessionQualityTool(targetBridge, "quality_context_reviewer_record", {
+    request: JSON.stringify({
+      ...passedReviewRequest,
+      clause_evidence_summaries: passedReviewRequest.clause_evidence_summaries.map((entry, index) => (
+        index === 0 ? "generic prose without an observed versus expected trace" : entry
+      )),
+    }),
+  }, { sessionID: reviewerSessionID, agent: "reviewer" }), "CONTEXT_REVIEW_CLAUSE_EVIDENCE_MISSING");
   executeRawNormalSessionQualityTool(targetBridge, "quality_context_reviewer_record", {
-    request: JSON.stringify({ ...facts, checks }),
-  }, { ...context, agent: "reviewer" });
+    request: JSON.stringify(passedReviewRequest),
+  }, { sessionID: reviewerSessionID, agent: "reviewer" });
+  handleNormalSessionToolAfter(targetBridge, {
+    tool: "task",
+    sessionID: context.sessionID,
+    callID: reviewTaskCallID,
+  });
+  const sealedBefore = inspectNormalSessionQualityState(targetBridge, context.sessionID);
+  assert.match(sealedBefore.reviewer_reconciliation_evidence.contract_review_fingerprint, /^sha256:/u);
+  const [sealedPath] = sealedBefore.dossier.verification_boundary.ownership_paths;
+  assert.ok(sealedPath, "passed-review sealing requires one owned path fixture");
+  assertContractError(() => handleNormalSessionToolBefore(targetBridge, {
+    tool: "edit",
+    sessionID: context.sessionID,
+    callID: `sealed-review-edit-${sealedBefore.mutation_revision}`,
+  }, nativeEdit(sealedPath)), "QUALITY_VERIFIED_REVIEW_SEALED");
+  assertContractError(() => executeRawNormalSessionQualityTool(targetBridge, "quality_action_authorize", {
+    request: JSON.stringify({
+      expected_revision: sealedBefore.dossier.revision,
+      kind: "edit",
+      paths: [sealedPath],
+    }),
+  }, context), "QUALITY_VERIFIED_REVIEW_SEALED");
+  const sealedAfter = inspectNormalSessionQualityState(targetBridge, context.sessionID);
+  assert.equal(sealedAfter.lifecycle, "verified", "rejected post-review mutation must preserve verified lifecycle");
+  assert.equal(
+    sealedAfter.verification.fingerprint,
+    sealedBefore.verification.fingerprint,
+    "rejected post-review mutation must preserve trusted verification",
+  );
+  assert.equal(
+    sealedAfter.reviewer_reconciliation_evidence.fingerprint,
+    sealedBefore.reviewer_reconciliation_evidence.fingerprint,
+    "rejected post-review mutation must preserve the passed reviewer receipt",
+  );
+  const inspection = executeRawNormalSessionQualityTool(targetBridge, "quality_dossier_inspect", {
+    request: "{}",
+  }, context);
+  assert.deepEqual(
+    inspection.runner_observed_changed_paths,
+    facts.changed_paths.map((entry) => entry.path).sort(),
+    "inspection must expose the runner-owned changed-path names without model reconstruction",
+  );
+  assert.deepEqual(
+    inspection.recommended_next_actions,
+    [{
+      tool_id: "quality_context_reconcile",
+      request: { evidence_mode: "reviewer_grounded" },
+      reason: "A passed reviewer receipt is present; ask the runner to derive and reconcile the exact final changed-path manifest.",
+    }],
+  );
+  if (assertDetailedMismatch) {
+    const [firstChangedPath, ...remainingChangedPaths] = facts.changed_paths;
+    assert.ok(firstChangedPath, "the mismatch regression requires at least one runner-observed changed path");
+    assertContractError(() => executeRawNormalSessionQualityTool(targetBridge, "quality_context_reconcile", {
+      request: JSON.stringify({
+        evidence_mode: "reviewer_grounded",
+        ...facts,
+        changed_paths: [
+          { ...firstChangedPath, path: "src/not-runner-observed.mjs" },
+          ...remainingChangedPaths,
+        ],
+      }),
+    }, context), "CONTEXT_RECONCILIATION_CHANGED_PATH_MISMATCH");
+  }
   return executeRawNormalSessionQualityTool(targetBridge, "quality_context_reconcile", {
-    request: JSON.stringify({ evidence_mode: "reviewer_grounded", ...facts }),
+    request: JSON.stringify(compact
+      ? { evidence_mode: "reviewer_grounded" }
+      : { evidence_mode: "reviewer_grounded", ...facts }),
   }, context);
 }
 
 const RAW_CONTEXT_OUTPUT_CANARY = "RAW_CONTEXT_OUTPUT_MUST_REMAIN_TRANSIENT";
 let contextCallTick = 0;
+let reviewTaskTick = 0;
 
 function contextOutlineOutput(relativePaths) {
   const truncation = Object.fromEntries([
@@ -983,7 +1159,11 @@ function prepareHighContext(targetBridge, context, { includeExistingActiveReceip
       negative_path_ids: state.context_strategy.requires_negative_path ? failureModeIds : [],
       compatibility_ids: state.context_strategy.requires_compatibility ? invariantIds : [],
       reproduction_status: state.context_strategy.requires_pre_change_reproduction ? "reproduced" : "not_required",
-      reproduction_evidence_ids: state.context_strategy.requires_pre_change_reproduction ? receiptIds : [],
+      reproduction_evidence_ids: state.context_strategy.requires_pre_change_reproduction
+        ? state.dossier.test_obligations
+          .filter((entry) => entry.phase === "preimplementation" && entry.kind === "reproducer")
+          .map((entry) => entry.id)
+        : [],
     },
     tool_state: {
       minimal_available: ["context_outline", "context_read"],
@@ -1058,6 +1238,21 @@ function nativeTask(subagentType) {
   return { args: { description: `${subagentType} task`, prompt: "bounded task", subagent_type: subagentType } };
 }
 
+const RUNNER_FIXED_CALLER_CONTEXT = "Execute only the runner-owned quality assignment above. Parent-authored task prompt text is intentionally not retained.";
+
+function runnerAssignmentEnvelope(nativeTaskOutput, expectedCallerPrompt = RUNNER_FIXED_CALLER_CONTEXT) {
+  const match = nativeTaskOutput.args.prompt.match(
+    /^\[runner quality assignment\]\n[\s\S]*?\n(\{[^\n]+\})\n\[end runner quality assignment\]\n\n\[caller task context\]\n/u,
+  );
+  assert.ok(match, "native task prompt must begin with one runner quality assignment block");
+  assert.equal(
+    nativeTaskOutput.args.prompt.endsWith(`\n[caller task context]\n${expectedCallerPrompt}`),
+    true,
+    "runner assignment must replace model-authored caller text with fixed runner-owned context",
+  );
+  return JSON.parse(match[1]);
+}
+
 function nativePatch(filePath = "src/file.mjs") {
   return { args: { patchText: `*** Begin Patch\n*** Update File: ${filePath}\n@@\n-old\n+new\n*** End Patch` } };
 }
@@ -1090,6 +1285,21 @@ assertPermissionMatrix(
 assertContractError(
   () => handleNormalSessionToolBefore(bridge, { tool: "task", sessionID: "session/standard-lite-uninstrumented", callID: "call-standard-lite" }, nativeTask("general")),
   "QUALITY_SESSION_UNCLASSIFIED",
+);
+
+const unclassifiedInspectionContext = { sessionID: "session/unclassified-inspection", agent: "orchestrator" };
+handleNormalSessionChatMessage(bridge, unclassifiedInspectionContext);
+const unclassifiedInspection = executeRawNormalSessionQualityTool(bridge, "quality_dossier_inspect", {
+  request: "{}",
+}, unclassifiedInspectionContext);
+assert(unclassifiedInspection.available_check_ids.includes("normal-harness-static"));
+assert.deepEqual(
+  unclassifiedInspection.recommended_next_actions,
+  [{
+    tool_id: "quality_session_start",
+    reason: "Start the session once; the structured tool binds runner-owned integration checks automatically.",
+  }],
+  "pre-start inspection must expose runner-owned check IDs without requiring the model to guess them",
 );
 
 const preDossierContext = { sessionID: "session/high-context-before-dossier", agent: "orchestrator" };
@@ -1167,14 +1377,19 @@ executeRawNormalSessionQualityTool(bridge, "quality_context_strategy_escalate", 
 }, escalationContext);
 let escalationState = inspectNormalSessionQualityState(bridge, escalationContext.sessionID);
 assert.equal(escalationState.dossier.risk_class, "high");
-assert.equal(escalationState.context_report, null);
+assert.equal(escalationState.context_report.status, "draft");
+assert.equal(escalationState.dossier.impact_graph.coverage.completeness, "partial");
 assert.equal(escalationState.standard_lite_policy, null);
 assert.deepEqual(escalationState.context_receipt_ids, standardReceiptIds,
   "escalation must retain prior receipts only as audit and re-observation history");
 assert.equal(escalationState.cumulative_affected_paths.includes("src"), true);
-assertContractError(() => executeRawNormalSessionQualityTool(bridge, "quality_context_report_create", {
-  request: JSON.stringify({ expected_dossier_revision: escalationState.dossier.revision }),
-}, escalationContext), "CONTEXT_GRAPH_REQUIRED");
+assert.deepEqual(
+  executeRawNormalSessionQualityTool(bridge, "quality_dossier_inspect", {
+    request: "{}",
+  }, escalationContext).recommended_next_actions.map((entry) => entry.tool_id),
+  ["context_outline", "context_read"],
+  "promotion must expose fresh high-strategy evidence work instead of requiring a graph before reads",
+);
 const highPlan = fullDossierRequest();
 executeRawNormalSessionQualityTool(bridge, "quality_dossier_update", {
   request: JSON.stringify({
@@ -1203,7 +1418,8 @@ executeRawNormalSessionQualityTool(bridge, "quality_context_strategy_escalate", 
 escalationState = inspectNormalSessionQualityState(bridge, escalationContext.sessionID);
 assert.equal(escalationState.dossier.risk_class, "critical");
 assert.equal(escalationState.context_strategy.strategy_id, "critical-wide-deep-v1");
-assert.equal(escalationState.context_report, null);
+assert.equal(escalationState.context_report.status, "draft");
+assert.equal(escalationState.dossier.impact_graph.coverage.completeness, "partial");
 assert.equal(escalationState.context_decision, null);
 assert.deepEqual(escalationState.context_receipt_ids, receiptsBeforeCritical);
 const criticalEscalationRevision = escalationState.state_revision;
@@ -1231,9 +1447,14 @@ assert.equal(criticalEscalationContextResult.decision.status, "sufficient",
 
 const standardInventoryContext = { sessionID: "session/standard-lite-content-backed-summary", agent: "orchestrator" };
 handleNormalSessionChatMessage(bridge, standardInventoryContext);
-executeRawNormalSessionQualityTool(bridge, "quality_session_start", {
+const standardInventoryStart = executeRawNormalSessionQualityTool(bridge, "quality_session_start", {
   request: JSON.stringify(startRequestFromDossier(dossierRequest())),
 }, standardInventoryContext);
+assert.deepEqual(
+  standardInventoryStart.recommended_next_actions.map((entry) => entry.tool_id),
+  ["context_read"],
+  "a fresh standard-lite session must expose only its immediate bounded context action",
+);
 const inventoryCallID = `context-outline-${++contextCallTick}`;
 handleNormalSessionToolBefore(bridge, {
   tool: "context_outline",
@@ -1244,8 +1465,20 @@ handleNormalSessionToolAfter(bridge, {
   tool: "context_outline",
   sessionID: standardInventoryContext.sessionID,
   callID: inventoryCallID,
-}, { output: contextOutlineOutput(["README.md", "src/file.mjs"]), title: "context outline", metadata: {} });
+}, { output: contextOutlineOutput([".gitignore", "README.md", "src/file.mjs"]), title: "context outline", metadata: {} });
 prepareStandardContext(bridge, standardInventoryContext, "src/file.mjs");
+const standardInventoryInspection = executeRawNormalSessionQualityTool(bridge, "quality_dossier_inspect", {
+  request: "{}",
+}, standardInventoryContext);
+assert.deepEqual(
+  standardInventoryInspection.recommended_next_actions,
+  [{
+    tool_id: "quality_dossier_finalize",
+    request: { expected_revision: 1 },
+    reason: "Evaluate the bounded standard-lite gate immediately after the minimum task-relevant local context is recorded.",
+  }],
+  "a context-backed standard-lite inspection must point directly to gate evaluation without profile choreography",
+);
 executeRawNormalSessionQualityTool(bridge, "quality_dossier_finalize", {
   request: JSON.stringify({ expected_revision: 1 }),
 }, standardInventoryContext);
@@ -1253,6 +1486,50 @@ const standardInventoryState = inspectNormalSessionQualityState(bridge, standard
 assert.deepEqual(standardInventoryState.standard_lite_context_summary.inspected_paths, ["src/file.mjs"],
   "inventory-only paths must not be promoted to content-backed inspected paths");
 assert.equal(standardInventoryState.context_decision.status, "sufficient");
+assert.deepEqual(standardInventoryState.context_decision.reasons, [],
+  "repository inventory metadata must not be misclassified as a transitive standard-lite impact");
+
+const standardEscalationRecommendationContext = {
+  sessionID: "session/standard-lite-runner-owned-escalation",
+  agent: "orchestrator",
+};
+handleNormalSessionChatMessage(bridge, standardEscalationRecommendationContext);
+executeRawNormalSessionQualityTool(bridge, "quality_session_start", {
+  request: JSON.stringify(startRequestFromDossier(dossierRequest())),
+}, standardEscalationRecommendationContext);
+prepareStandardContext(bridge, standardEscalationRecommendationContext, "src/file.mjs");
+prepareStandardContext(bridge, standardEscalationRecommendationContext, "other/consumer.mjs");
+assertContractError(() => executeRawNormalSessionQualityTool(bridge, "quality_dossier_finalize", {
+  request: JSON.stringify({ expected_revision: 1 }),
+}, standardEscalationRecommendationContext), "CONTEXT_SUFFICIENCY_REQUIRED");
+const standardEscalationRecommendation = executeRawNormalSessionQualityTool(
+  bridge,
+  "quality_dossier_inspect",
+  { request: "{}" },
+  standardEscalationRecommendationContext,
+);
+assert.deepEqual(standardEscalationRecommendation.recommended_next_actions, [{
+  tool_id: "quality_context_strategy_escalate",
+  request: { requested_strategy_id: "high-wide-deep-v1" },
+  reason: "Bounded context discovered non-local impact. Escalate monotonically to the runner-owned high wide/deep strategy, then re-inspect; repeating standard-lite reads cannot satisfy this decision.",
+}], "a non-local standard-lite decision must expose one reachable typed escalation action instead of another read");
+executeRawNormalSessionQualityTool(bridge, "quality_context_strategy_escalate", {
+  request: JSON.stringify({ requested_strategy_id: "high-wide-deep-v1" }),
+}, standardEscalationRecommendationContext);
+const standardEscalatedState = inspectNormalSessionQualityState(
+  bridge,
+  standardEscalationRecommendationContext.sessionID,
+);
+assert.equal(standardEscalatedState.dossier.risk_class, "high");
+assert.equal(standardEscalatedState.context_strategy.strategy_id, "high-wide-deep-v1");
+assert.equal(standardEscalatedState.context_decision, null);
+assert.deepEqual(
+  executeRawNormalSessionQualityTool(bridge, "quality_dossier_inspect", {
+    request: "{}",
+  }, standardEscalationRecommendationContext).recommended_next_actions.map((entry) => entry.tool_id),
+  ["context_outline", "context_read"],
+  "the successful escalation must advance to fresh high-strategy context evidence",
+);
 
 invoke("quality_dossier_create", dossierRequest());
 const controlPathRequest = dossierRequest();
@@ -1320,6 +1597,18 @@ assertContractError(
   "QUALITY_PRE_GATE_VIOLATION",
 );
 assertContractError(
+  () => handleNormalSessionToolBefore(bridge, {
+    tool: "bash", sessionID: "session/standard-lite-uninstrumented", callID: "call-unclassified-absolute-bash",
+  }, {
+    args: {
+      command: `node --test "${path.join(tempRoot, "src", "file.mjs")}"`,
+      description: "Run the task-local test from the model-visible worktree",
+      workdir: tempRoot,
+    },
+  }),
+  "QUALITY_SESSION_UNCLASSIFIED",
+);
+assertContractError(
   () => handleNormalSessionToolBefore(bridge, { tool: "task", sessionID: orchestrator.sessionID, callID: "call-pregate-task" }, nativeTask("general")),
   "QUALITY_PRE_GATE_VIOLATION",
 );
@@ -1361,6 +1650,19 @@ invoke("quality_action_authorize", {
   paths: ["src/file.mjs"],
   target_agent: "general",
 });
+assert.deepEqual(
+  invoke("quality_dossier_inspect", {}).recommended_next_actions,
+  [{
+    tool_id: "task",
+    target_agent: "general",
+    request_requirements: {
+      paths: ["src/file.mjs"],
+      instruction: "Launch one general implementation worker for the requested change within exactly these already-authorized paths. Do not request another capability first.",
+    },
+    reason: "A writable task capability is already outstanding. Consume it with the intended implementation task before requesting verification or another authorization.",
+  }],
+  "an outstanding writable-task capability must become the exclusive native task action instead of another authorization",
+);
 assertContractError(() => invoke("quality_action_authorize", {
   expected_revision: dossierRevision,
   kind: "edit",
@@ -1390,13 +1692,43 @@ assert.equal(Object.hasOwn(generalChildState, "capabilities"), false, "child lin
 handleNormalSessionToolAfter(bridge, { tool: "task", sessionID: orchestrator.sessionID, callID: "call-task" });
 
 invoke("quality_action_authorize", { expected_revision: dossierRevision, kind: "edit", paths: ["src/file.mjs"] });
-handleNormalSessionToolBefore(bridge, { tool: "edit", sessionID: orchestrator.sessionID, callID: "call-edit-1" }, nativeEdit("src\\file.mjs"));
+const authorizedEditState = inspectNormalSessionQualityState(bridge, orchestrator.sessionID);
+assert.deepEqual(
+  invoke("quality_dossier_inspect", {}).recommended_next_actions,
+  [{
+    tool_id: "edit",
+    request_requirements: {
+      paths: ["src/file.mjs"],
+      edit_contract: {
+        user_visible_goal: authorizedEditState.dossier.user_visible_goal,
+        requested_behavior: authorizedEditState.dossier.behavior_contract.requested_behavior,
+        positive_behavior: [...authorizedEditState.dossier.behavior_contract.positive_behavior],
+        preserved_behavior: [...authorizedEditState.dossier.behavior_contract.preserved_behavior],
+        compatibility_requirements: [...authorizedEditState.dossier.behavior_contract.compatibility_requirements],
+        edge_cases: authorizedEditState.dossier.edge_cases.map((entry) => ({
+          condition: entry.condition,
+          expected_behavior: entry.expected_behavior,
+        })),
+        counterexamples: authorizedEditState.dossier.counterexamples.map((entry) => ({
+          statement: entry.statement,
+          expected_behavior: entry.expected_behavior,
+        })),
+        change_policy: "The narrow user_visible_goal is authoritative when a broader behavior summary or conventional implementation would change unrequested semantics. Require the smallest cohesive delta and preserve initial values, returns, public shapes, and unmentioned boundary behavior. Do not turn algorithmic preference or uncertainty into a finding.",
+      },
+      instruction: "Use the native edit, write, or apply_patch tool within exactly these already-authorized paths. Implement every explicit clause in edit_contract and only the narrow user_visible_goal with the smallest cohesive semantic delta. Before editing, trace concrete normal, boundary, repeated-transition, and failure examples through the intended code wherever the contract makes them relevant; the targeted visible check proves only its own scenario. Preserve existing initialization, return values, public shapes, and every unmentioned boundary behavior; a conventional algorithm or refactor is not contract evidence and must not replace a smaller repair. Do not request another capability first.",
+    },
+    reason: "An edit capability is already outstanding. Consume it with the intended native mutation before requesting verification or another authorization.",
+  }],
+  "an outstanding edit capability must become the exclusive native mutation action instead of another authorization",
+);
+const absoluteNativeEditPath = path.join(tempRoot, "src", "file.mjs");
+handleNormalSessionToolBefore(bridge, { tool: "edit", sessionID: orchestrator.sessionID, callID: "call-edit-1" }, nativeEdit(absoluteNativeEditPath));
 assertPermissionMatrix({
   type: "edit",
-  pattern: "src\\file.mjs",
+  pattern: absoluteNativeEditPath,
   sessionID: orchestrator.sessionID,
   callID: "call-edit-1",
-}, (originalStatus) => originalStatus, "an exactly authorized edit must preserve the original permission status after path normalization");
+}, (originalStatus) => originalStatus, "an exactly authorized edit must preserve the original permission status after confined absolute-path normalization");
 assertPermissionMatrix({
   type: "edit",
   pattern: "src/other.mjs",
@@ -1448,16 +1780,235 @@ handleNormalSessionToolAfter(
   bridge,
   { tool: "edit", sessionID: orchestrator.sessionID, callID: "call-edit-3" },
 );
+const postMutationInspection = invoke("quality_dossier_inspect", {});
+assert.deepEqual(postMutationInspection.recommended_next_actions, [{
+  tool_id: "task",
+  target_agent: "verifier",
+  assignment: {
+    tool_id: "quality_verification_record",
+    request: { expected_revision: dossierRevision },
+    instruction: "Call this verifier-only tool exactly once with the supplied typed revision, return its receipt, and do not run native shell checks or delegate.",
+  },
+  reason: "Launch the verifier with this exact bounded assignment so it records trusted verification for the final mutation before review and reconciliation.",
+}]);
 handleNormalSessionToolBefore(bridge, { tool: "task", sessionID: orchestrator.sessionID, callID: "call-verifier-2" }, nativeTask("verifier"));
 handleNormalSessionEvent(bridge, { type: "session.created", properties: { info: { id: "session/verifier-2", parentID: orchestrator.sessionID } } });
+trustedTargetResultOverride = { status: "failed", observed_outcome: "failed", exit_code: 1 };
+try {
   verification = invoke("quality_verification_record", { expected_revision: dossierRevision }, { sessionID: "session/verifier-2", agent: "verifier" });
-  handleNormalSessionToolAfter(bridge, { tool: "task", sessionID: orchestrator.sessionID, callID: "call-verifier-2" });
-  assert.equal(verification.mutation_revision, 3);
-  const finalReconciliation = recordPassedReviewerReconciliation(bridge, orchestrator);
+} finally {
+  trustedTargetResultOverride = null;
+}
+handleNormalSessionToolAfter(bridge, { tool: "task", sessionID: orchestrator.sessionID, callID: "call-verifier-2" });
+assert.equal(verification.complete, false);
+const failedVerificationInspection = invoke("quality_dossier_inspect", {});
+assert.equal(failedVerificationInspection.recommended_next_actions.length, 1);
+const [failedVerificationDiagnosis] = failedVerificationInspection.recommended_next_actions;
+assert.equal(failedVerificationDiagnosis.tool_id, "task");
+assert.equal(failedVerificationDiagnosis.target_agent, "diagnose");
+assert.equal(failedVerificationDiagnosis.assignment.assignment_kind, "failed-verification-diagnosis");
+assert.ok(failedVerificationDiagnosis.assignment.required_source_paths.includes("src/file.mjs"));
+assert.equal(
+  failedVerificationDiagnosis.assignment.diagnostic_contract.user_visible_goal,
+  inspectNormalSessionQualityState(bridge, orchestrator.sessionID).dossier.user_visible_goal,
+);
+assert.match(failedVerificationDiagnosis.assignment.instruction, /visible repository tests/u);
+assertContractError(() => invoke("quality_action_authorize", {
+  expected_revision: dossierRevision,
+  kind: "edit",
+  paths: ["src/file.mjs"],
+}), "QUALITY_VERIFICATION_DIAGNOSIS_REQUIRED");
+const diagnosisCall = {
+  tool: "task",
+  sessionID: orchestrator.sessionID,
+  callID: "call-diagnose-verifier-2",
+};
+const diagnosisArgs = nativeTask("diagnose");
+handleNormalSessionToolBefore(bridge, diagnosisCall, diagnosisArgs);
+assert.match(diagnosisArgs.args.prompt, /failed-verification-diagnosis/u);
+assert.match(diagnosisArgs.args.prompt, /Do not edit, delegate, or call quality receipt tools/u);
+handleNormalSessionEvent(bridge, {
+  type: "session.created",
+  properties: { info: { id: "session/diagnose-verifier-2", parentID: orchestrator.sessionID } },
+});
+handleNormalSessionToolAfter(bridge, diagnosisCall, {
+  output: "src/file.mjs differs from the exact visible assertion in test/public.test.mjs",
+});
+const diagnosedVerificationInspection = invoke("quality_dossier_inspect", {});
+assert.deepEqual(diagnosedVerificationInspection.recommended_next_actions, [{
+  tool_id: "quality_action_authorize",
+  request_requirements: {
+    expected_revision: dossierRevision,
+    kind: "edit",
+    paths: "choose only the exact remediation files within ownership_paths",
+  },
+  reason: "Trusted verification failed on the current mutation. Use the failed receipt returned by the verifier task to authorize and apply one bounded remediation edit before launching another verifier.",
+}], "a settled diagnosis must unblock one bounded remediation mutation instead of repeating verifier on unchanged source");
+invoke("quality_action_authorize", { expected_revision: dossierRevision, kind: "edit", paths: ["src/file.mjs"] });
+handleNormalSessionToolBefore(
+  bridge,
+  { tool: "apply_patch", sessionID: orchestrator.sessionID, callID: "call-edit-remediation" },
+  nativePatch(),
+);
+currentPathVersions.set("src/file.mjs", 3);
+handleNormalSessionToolAfter(
+  bridge,
+  { tool: "apply_patch", sessionID: orchestrator.sessionID, callID: "call-edit-remediation" },
+);
+assert.equal(inspectNormalSessionQualityState(bridge, orchestrator.sessionID).verification, null);
+handleNormalSessionToolBefore(bridge, { tool: "task", sessionID: orchestrator.sessionID, callID: "call-verifier-3" }, nativeTask("verifier"));
+handleNormalSessionEvent(bridge, { type: "session.created", properties: { info: { id: "session/verifier-3", parentID: orchestrator.sessionID } } });
+verification = invoke("quality_verification_record", { expected_revision: dossierRevision }, { sessionID: "session/verifier-3", agent: "verifier" });
+handleNormalSessionToolAfter(bridge, { tool: "task", sessionID: orchestrator.sessionID, callID: "call-verifier-3" });
+assert.equal(verification.complete, true);
+assert.equal(verification.mutation_revision, 4);
+const blockedReviewFacts = reconciliationFacts(bridge, orchestrator);
+const blockedReviewChecks = Object.fromEntries([
+  "changed_path_ownership", "public_contracts", "dependency_directions", "side_effect_edges",
+  "critical_path_tests", "unrelated_changes",
+].map((key) => [key, { status: "passed", finding_ids: [] }]));
+assertContractError(() => executeRawNormalSessionQualityTool(bridge, "quality_context_reviewer_record", {
+  request: JSON.stringify({ ...blockedReviewFacts, checks: blockedReviewChecks }),
+}, { ...orchestrator, agent: "reviewer" }), "CONTEXT_REVIEW_CLAUSE_EVIDENCE_REQUIRED");
+blockedReviewChecks.critical_path_tests = {
+  status: "blocked",
+  finding_ids: ["FIND-review-remediation"],
+};
+executeRawNormalSessionQualityTool(bridge, "quality_context_reviewer_record", {
+  request: JSON.stringify({ ...blockedReviewFacts, checks: blockedReviewChecks }),
+}, { ...orchestrator, agent: "reviewer" });
+const blockedReviewInspection = invoke("quality_dossier_inspect", {});
+assert.deepEqual(blockedReviewInspection.recommended_next_actions, [{
+  tool_id: "quality_action_authorize",
+  request_requirements: {
+    expected_revision: dossierRevision,
+    kind: "edit",
+    paths: "choose only the exact remediation files within ownership_paths",
+  },
+  reason: "The current reviewer receipt records blocked checks or unplanned items. Authorize and apply one bounded remediation edit before launching fresh verification and review.",
+}], "a blocked reviewer receipt must expose one bounded remediation action");
+invoke("quality_action_authorize", { expected_revision: dossierRevision, kind: "edit", paths: ["src/file.mjs"] });
+handleNormalSessionToolBefore(bridge, {
+  tool: "apply_patch",
+  sessionID: orchestrator.sessionID,
+  callID: "call-edit-review-remediation",
+}, nativePatch());
+currentPathVersions.set("src/file.mjs", 4);
+handleNormalSessionToolAfter(bridge, {
+  tool: "apply_patch",
+  sessionID: orchestrator.sessionID,
+  callID: "call-edit-review-remediation",
+});
+const remediatedReviewState = inspectNormalSessionQualityState(bridge, orchestrator.sessionID);
+assert.equal(remediatedReviewState.verification, null, "review remediation must invalidate the prior verification");
+assert.equal(remediatedReviewState.reviewer_reconciliation_evidence, null,
+  "review remediation must invalidate the prior blocked reviewer receipt");
+handleNormalSessionToolBefore(bridge, {
+  tool: "task",
+  sessionID: orchestrator.sessionID,
+  callID: "call-verifier-review-remediation",
+}, nativeTask("verifier"));
+handleNormalSessionEvent(bridge, {
+  type: "session.created",
+  properties: { info: { id: "session/verifier-review-remediation", parentID: orchestrator.sessionID } },
+});
+verification = invoke("quality_verification_record", { expected_revision: dossierRevision }, {
+  sessionID: "session/verifier-review-remediation",
+  agent: "verifier",
+});
+handleNormalSessionToolAfter(bridge, {
+  tool: "task",
+  sessionID: orchestrator.sessionID,
+  callID: "call-verifier-review-remediation",
+});
+assert.equal(verification.complete, true, "review remediation must require and accept fresh trusted verification");
+  const finalReconciliation = recordPassedReviewerReconciliation(bridge, orchestrator, {
+    assertDetailedMismatch: true,
+  });
   assert.equal(finalReconciliation.status, "passed", JSON.stringify(finalReconciliation));
   const attestation = invoke("quality_session_finalize", { expected_revision: dossierRevision });
 assert.match(attestation.fingerprint, /^sha256:/);
 assert.equal(Object.hasOwn(attestation, "model_profile_id"), false, "normal attestation must be model-free");
+
+const remediationBudgetContext = { sessionID: "session/remediation-budget", agent: "orchestrator" };
+executeNormalSessionQualityTool(bridge, "quality_dossier_create", {
+  request: JSON.stringify(dossierRequest()),
+}, remediationBudgetContext);
+executeRawNormalSessionQualityTool(bridge, "quality_dossier_finalize", {
+  request: JSON.stringify({ expected_revision: 1 }),
+}, remediationBudgetContext);
+for (let attempt = 1; attempt <= 6; attempt += 1) {
+  executeRawNormalSessionQualityTool(bridge, "quality_action_authorize", {
+    request: JSON.stringify({ expected_revision: 1, kind: "edit", paths: ["src/file.mjs"] }),
+  }, remediationBudgetContext);
+  const editCall = {
+    tool: "apply_patch",
+    sessionID: remediationBudgetContext.sessionID,
+    callID: `remediation-budget-edit-${attempt}`,
+  };
+  handleNormalSessionToolBefore(bridge, editCall, nativePatch());
+  currentPathVersions.set("src/file.mjs", 100 + attempt);
+  handleNormalSessionToolAfter(bridge, editCall);
+
+  const verifierCall = {
+    tool: "task",
+    sessionID: remediationBudgetContext.sessionID,
+    callID: `remediation-budget-verifier-${attempt}`,
+  };
+  handleNormalSessionToolBefore(bridge, verifierCall, nativeTask("verifier"));
+  const childSessionID = `${remediationBudgetContext.sessionID}/verifier-${attempt}`;
+  handleNormalSessionEvent(bridge, {
+    type: "session.created",
+    properties: { info: { id: childSessionID, parentID: remediationBudgetContext.sessionID } },
+  });
+  trustedTargetResultOverride = { status: "failed", observed_outcome: "failed", exit_code: 1 };
+  let failedRemediationVerification;
+  try {
+    failedRemediationVerification = executeRawNormalSessionQualityTool(bridge, "quality_verification_record", {
+      request: JSON.stringify({ expected_revision: 1 }),
+    }, { sessionID: childSessionID, agent: "verifier" });
+  } finally {
+    trustedTargetResultOverride = null;
+  }
+  assert.equal(failedRemediationVerification.complete, false);
+  handleNormalSessionToolAfter(bridge, verifierCall);
+  const remediationInspection = executeRawNormalSessionQualityTool(bridge, "quality_dossier_inspect", {
+    request: "{}",
+  }, remediationBudgetContext);
+  if (attempt < 6) {
+    assert.equal(remediationInspection.lifecycle, "implementation_enabled");
+    assert.equal(remediationInspection.recommended_next_actions[0].tool_id, "task");
+    assert.equal(remediationInspection.recommended_next_actions[0].target_agent, "diagnose");
+    const diagnoseCall = {
+      tool: "task",
+      sessionID: remediationBudgetContext.sessionID,
+      callID: `remediation-budget-diagnose-${attempt}`,
+    };
+    handleNormalSessionToolBefore(bridge, diagnoseCall, nativeTask("diagnose"));
+    handleNormalSessionEvent(bridge, {
+      type: "session.created",
+      properties: {
+        info: {
+          id: `${remediationBudgetContext.sessionID}/diagnose-${attempt}`,
+          parentID: remediationBudgetContext.sessionID,
+        },
+      },
+    });
+    handleNormalSessionToolAfter(bridge, diagnoseCall, {
+      output: `bounded visible-test mismatch ${attempt}`,
+    });
+    const diagnosedInspection = executeRawNormalSessionQualityTool(bridge, "quality_dossier_inspect", {
+      request: "{}",
+    }, remediationBudgetContext);
+    assert.equal(diagnosedInspection.recommended_next_actions[0].tool_id, "quality_action_authorize");
+  } else {
+    assert.equal(remediationInspection.lifecycle, "failed");
+    assert(remediationInspection.incomplete_reasons.includes("verification_remediation_budget_exhausted"));
+    assert(remediationInspection.incomplete_reasons.includes("QUALITY_VERIFICATION_REMEDIATION_BUDGET_EXHAUSTED"));
+    assert.deepEqual(remediationInspection.recommended_next_actions, []);
+  }
+}
+currentPathVersions.clear();
 
 const earlyChallengeContext = { sessionID: "session/early-plan-challenge", agent: "orchestrator" };
 executeNormalSessionQualityTool(bridge, "quality_dossier_create", {
@@ -1495,11 +2046,38 @@ const insufficientFinalization = executeRawNormalSessionQualityTool(bridge, "qua
 }, insufficientChallengeContext);
 assert.equal(insufficientFinalization.report.status, "finalized");
 assert.equal(insufficientFinalization.decision.status, "insufficient");
+const insufficientInspection = executeRawNormalSessionQualityTool(bridge, "quality_dossier_inspect", {
+  request: "{}",
+}, insufficientChallengeContext);
+assert.equal(
+  insufficientInspection.recommended_next_actions[0].tool_id,
+  "quality_context_report_update",
+  `question-only insufficiency must revise the report instead of rebuilding the Dossier: ${JSON.stringify(insufficientFinalization.decision.reasons)}`,
+);
+assert.equal(
+  insufficientInspection.recommended_next_actions[0].request_requirements.expected_revision,
+  insufficientFinalization.report.revision,
+);
 for (const role of ["architect", "reviewer"]) {
   assertContractError(() => executeNormalSessionQualityTool(bridge, "quality_architecture_evaluate", {
     request: JSON.stringify({ expected_revision: 1, blockers: [] }),
   }, { ...insufficientChallengeContext, agent: role }), "QUALITY_PLAN_CHALLENGE_BEFORE_CONTEXT_SUFFICIENCY");
 }
+const recoveredQuestions = structuredClone(insufficientFinalization.report.questions);
+recoveredQuestions[0].status = "confirmed";
+recoveredQuestions[0].actual_observation = "The bounded receipts resolve the previously material uncertainty.";
+recoveredQuestions[0].next_action = null;
+const recoveredReport = executeRawNormalSessionQualityTool(bridge, "quality_context_report_update", {
+  request: JSON.stringify({
+    expected_revision: insufficientFinalization.report.revision,
+    patch: { questions: recoveredQuestions },
+  }),
+}, insufficientChallengeContext);
+assert.equal(recoveredReport.report.status, "draft");
+const recoveredFinalization = executeRawNormalSessionQualityTool(bridge, "quality_context_report_finalize", {
+  request: JSON.stringify({ expected_revision: recoveredReport.report.revision }),
+}, insufficientChallengeContext);
+assert.equal(recoveredFinalization.decision.status, "sufficient");
 
 const blockerEvidenceContext = { sessionID: "session/plan-challenge-blocker-evidence", agent: "orchestrator" };
 executeNormalSessionQualityTool(bridge, "quality_dossier_create", {
@@ -1576,6 +2154,18 @@ executeNormalSessionQualityTool(bridge, "quality_dossier_create", {
   request: JSON.stringify(fullDossierRequest()),
 }, staleProposalContext);
 prepareHighContext(bridge, staleProposalContext);
+const staleProposalCanonicalState = inspectNormalSessionQualityState(bridge, staleProposalContext.sessionID);
+const staleProposalPrelaunchInspection = executeNormalSessionQualityTool(
+  bridge,
+  "quality_dossier_inspect",
+  { request: "{}" },
+  staleProposalContext,
+);
+assert.deepEqual(
+  staleProposalPrelaunchInspection.recommended_next_actions.map((entry) => [entry.tool_id, entry.target_agent ?? null]),
+  [["task", "architect"]],
+  JSON.stringify(staleProposalPrelaunchInspection),
+);
 handleNormalSessionToolBefore(bridge, {
   tool: "task",
   sessionID: staleProposalContext.sessionID,
@@ -1615,6 +2205,10 @@ handleNormalSessionToolAfter(bridge, {
 const staleProposalState = inspectNormalSessionQualityState(bridge, staleProposalContext.sessionID);
 assert.equal(staleProposalState.contributions.length, 0, "a child proposal must be rejected after its canonical subject changes");
 assert.equal(staleProposalState.dossier.plan_challenge.blockers.length, 0);
+assert.notEqual(staleProposalState.context_decision.fingerprint, staleProposalCanonicalState.context_decision.fingerprint,
+  "novel challenge-child evidence must reopen the canonical context decision");
+assert.equal(staleProposalState.context_read_only_subagent_ids.length, 1,
+  "a plan-challenge child that discovers novel evidence must be reclassified into the discovery budget");
 
 const phaseContext = { sessionID: "session/phase-aware-targets", agent: "orchestrator" };
 const phaseRequest = fullDossierRequest();
@@ -1744,6 +2338,55 @@ assert.deepEqual(
   ["slice", "integration"],
   "one logical check ID must retain both required phase receipts",
 );
+const phasePostGateDecisionFingerprint = phaseState.context_decision.fingerprint;
+const phasePostGateDossierFingerprint = phaseState.dossier.fingerprint;
+const phasePostGateReceiptCount = phaseState.context_receipt_ids.length;
+const phasePostGateReadOnlySubagentCount = phaseState.context_read_only_subagent_ids.length;
+const [phasePostGateReviewAction] = executeRawNormalSessionQualityTool(bridge, "quality_dossier_inspect", {
+  request: "{}",
+}, phaseContext).recommended_next_actions;
+handleNormalSessionToolBefore(bridge, {
+  tool: "task",
+  sessionID: phaseContext.sessionID,
+  callID: "call-phase-post-gate-reviewer",
+}, nativeTask("reviewer"));
+const phasePostGateReviewerSessionID = "session/phase-post-gate-reviewer";
+handleNormalSessionEvent(bridge, {
+  type: "session.created",
+  properties: { info: { id: phasePostGateReviewerSessionID, parentID: phaseContext.sessionID } },
+});
+const phasePostGateReadCallID = `context-read-${++contextCallTick}`;
+handleNormalSessionToolBefore(bridge, {
+  tool: "context_read",
+  sessionID: phasePostGateReviewerSessionID,
+  callID: phasePostGateReadCallID,
+}, { args: { path: "src/file.mjs", startLine: 1, maxLines: 64, maxBytes: 4096, format: "text" } });
+handleNormalSessionToolAfter(bridge, {
+  tool: "context_read",
+  sessionID: phasePostGateReviewerSessionID,
+  callID: phasePostGateReadCallID,
+}, { output: contextReadOutput("src/file.mjs"), title: "post-gate reviewer audit read", metadata: {} });
+const phasePostGateAuditState = inspectNormalSessionQualityState(bridge, phaseContext.sessionID);
+assert.equal(phasePostGateAuditState.context_decision.fingerprint, phasePostGateDecisionFingerprint,
+  "post-gate reviewer audit evidence must not rewrite the sealed preimplementation decision");
+assert.equal(phasePostGateAuditState.dossier.fingerprint, phasePostGateDossierFingerprint,
+  "post-gate reviewer audit evidence must not mutate the finalized challenged dossier");
+assert.equal(phasePostGateAuditState.context_receipt_ids.length, phasePostGateReceiptCount + 1,
+  "post-gate reviewer reads must remain available in the append-only audit trail");
+assert.equal(phasePostGateAuditState.context_read_only_subagent_ids.length, phasePostGateReadOnlySubagentCount,
+  "post-gate review must remain outside the preimplementation discovery budget");
+executeRawNormalSessionQualityTool(bridge, "quality_context_reviewer_record", {
+  request: JSON.stringify(passedReviewerClauseRequest(phasePostGateReviewAction)),
+}, { sessionID: phasePostGateReviewerSessionID, agent: "reviewer" });
+handleNormalSessionToolAfter(bridge, {
+  tool: "task",
+  sessionID: phaseContext.sessionID,
+  callID: "call-phase-post-gate-reviewer",
+});
+const phasePostGateReconciliation = executeRawNormalSessionQualityTool(bridge, "quality_context_reconcile", {
+  request: JSON.stringify({ evidence_mode: "reviewer_grounded" }),
+}, phaseContext);
+assert.equal(phasePostGateReconciliation.status, "passed");
 assertPersistedTamperRejected(bridge, phaseContext, (state) => {
   state.verification.target_check_ids.splice(1, 0, state.verification.target_check_ids[0]);
 }, "QUALITY_STATE_BINDING");
@@ -1756,7 +2399,20 @@ const bugEngineeringCatalog = createEngineeringCheckCatalog({
     phases: ["preimplementation", "integration"],
     available: true,
   }],
-  mechanisms: [],
+  mechanisms: [
+    {
+      mechanism_id: "normal-architect-challenge",
+      trusted_producer: "opencode-harness-normal-quality-runner",
+      phases: ["preimplementation", "integration"],
+      available: true,
+    },
+    {
+      mechanism_id: "normal-reviewer-challenge",
+      trusted_producer: "opencode-harness-normal-quality-runner",
+      phases: ["preimplementation", "integration"],
+      available: true,
+    },
+  ],
 });
 const bugProjectCatalog = {
   schema_version: 2,
@@ -2013,7 +2669,7 @@ assert.deepEqual(longSessionState.incomplete_reasons, []);
   request: JSON.stringify({ expected_revision: longSessionRevision }),
   }, { ...longSessionContext, agent: "verifier" });
   assert.equal(longVerification.complete, true, "a valid session must remain verifiable after more than 128 delegated edit cycles");
-  assert.equal(recordPassedReviewerReconciliation(bridge, longSessionContext).status, "passed");
+  assert.equal(recordPassedReviewerReconciliation(bridge, longSessionContext, { compact: false }).status, "passed");
   const longAttestation = executeNormalSessionQualityTool(bridge, "quality_session_finalize", {
   request: JSON.stringify({ expected_revision: longSessionRevision }),
 }, longSessionContext);
@@ -2023,11 +2679,22 @@ const staleContext = { sessionID: "session/stale-challenge", agent: "orchestrato
 executeNormalSessionQualityTool(bridge, "quality_dossier_create", { request: JSON.stringify(fullDossierRequest()) }, staleContext);
 prepareHighContext(bridge, staleContext);
 let staleContribution = executeNormalSessionQualityTool(bridge, "quality_architecture_evaluate", {
-  request: JSON.stringify({ expected_revision: 1, blockers: [] }),
+  request: JSON.stringify({
+    expected_revision: 1,
+    blockers: [{
+      severity: "high",
+      summary: "The current task summary omits the independently observed cancellation ordering obligation.",
+      resolved: false,
+    }],
+  }),
 }, { sessionID: staleContext.sessionID, agent: "architect" });
 staleContribution = executeNormalSessionQualityTool(bridge, "quality_architecture_evaluate", {
   request: JSON.stringify({ expected_revision: staleContribution.dossier_revision, blockers: [] }),
 }, { sessionID: staleContext.sessionID, agent: "reviewer" });
+const blockerReplanInspection = executeNormalSessionQualityTool(bridge, "quality_dossier_inspect", {
+  request: "{}",
+}, staleContext);
+assert.equal(blockerReplanInspection.recommended_next_actions[0].tool_id, "quality_dossier_update");
 const staleSubjectFingerprint = inspectNormalSessionQualityState(bridge, staleContext.sessionID).contributions[0].subject_fingerprint;
 executeNormalSessionQualityTool(bridge, "quality_dossier_update", {
   request: JSON.stringify({
@@ -2048,6 +2715,34 @@ assertContractError(() => executeNormalSessionQualityTool(bridge, "quality_archi
     result_id: staleContribution.result_id,
   }),
 }, { ...staleContext, agent: "architect" }), "CONTRACT_UNKNOWN_FIELD");
+
+const sealedSubjectContext = { sessionID: "session/sealed-sufficient-subject", agent: "orchestrator" };
+executeNormalSessionQualityTool(bridge, "quality_dossier_create", {
+  request: JSON.stringify(fullDossierRequest()),
+}, sealedSubjectContext);
+prepareHighContext(bridge, sealedSubjectContext);
+let sealedSubjectContribution = executeNormalSessionQualityTool(bridge, "quality_architecture_evaluate", {
+  request: JSON.stringify({ expected_revision: 1, blockers: [] }),
+}, { ...sealedSubjectContext, agent: "architect" });
+sealedSubjectContribution = executeNormalSessionQualityTool(bridge, "quality_architecture_evaluate", {
+  request: JSON.stringify({ expected_revision: sealedSubjectContribution.dossier_revision, blockers: [] }),
+}, { ...sealedSubjectContext, agent: "reviewer" });
+assert.deepEqual(
+  executeNormalSessionQualityTool(bridge, "quality_dossier_inspect", { request: "{}" }, sealedSubjectContext)
+    .recommended_next_actions.map((entry) => entry.tool_id),
+  ["quality_dossier_finalize"],
+);
+assertContractError(() => executeNormalSessionQualityTool(bridge, "quality_dossier_update", {
+  request: JSON.stringify({
+    expected_revision: sealedSubjectContribution.dossier_revision,
+    patch: { task_shape: { ...fullDossierRequest().task_shape, summary: "Unnecessary post-challenge churn." } },
+  }),
+}, sealedSubjectContext), "QUALITY_PLAN_SUBJECT_SEALED");
+assert.equal(
+  inspectNormalSessionQualityState(bridge, sealedSubjectContext.sessionID).contributions.length,
+  2,
+  "a rejected redundant replan must preserve both current independent challenge receipts",
+);
 
 const newReceiptChallengeContext = { sessionID: "session/new-receipt-invalidates-challenge", agent: "orchestrator" };
 executeNormalSessionQualityTool(bridge, "quality_dossier_create", {
@@ -2254,6 +2949,49 @@ handleNormalSessionToolAfter(crashRecoveryRestartedBridge, {
 });
 assert.equal(inspectNormalSessionQualityState(crashRecoveryRestartedBridge, crashRecoveryContext.sessionID).active_task_launch, null);
 
+const reusedContextCallIDContext = { sessionID: "session/reused-context-call-id", agent: "orchestrator" };
+executeNormalSessionQualityTool(bridge, "quality_dossier_create", {
+  request: JSON.stringify(fullDossierRequest()),
+}, reusedContextCallIDContext);
+const reusedContextCallID = "context-read-reused-across-continuations";
+for (let occurrence = 0; occurrence < 2; occurrence += 1) {
+  handleNormalSessionToolBefore(bridge, {
+    tool: "context_read",
+    sessionID: reusedContextCallIDContext.sessionID,
+    callID: reusedContextCallID,
+  }, { args: { path: "src/file.mjs", startLine: 1, maxLines: 64, maxBytes: 4096, format: "text" } });
+  handleNormalSessionToolAfter(bridge, {
+    tool: "context_read",
+    sessionID: reusedContextCallIDContext.sessionID,
+    callID: reusedContextCallID,
+  }, { output: contextReadOutput("src/file.mjs"), title: `reused context read ${occurrence + 1}`, metadata: {} });
+}
+const reusedContextCallIDState = inspectNormalSessionQualityState(bridge, reusedContextCallIDContext.sessionID);
+assert.equal(reusedContextCallIDState.pending_context_calls.length, 0,
+  "sequential reuse of a settled OpenCode call ID must not wedge the context lifecycle");
+const reusedContextCallIDReceiptStore = createContextReceiptStore({ workspaceRoot: tempRoot });
+const reusedContextCallIDReceiptIndex = reusedContextCallIDReceiptStore.inspectSession(reusedContextCallIDState.session_key);
+const reusedContextCallIDReceipts = reusedContextCallIDReceiptIndex.receipt_refs.map((receiptRef) => (
+  reusedContextCallIDReceiptStore.readReceipt(reusedContextCallIDState.session_key, receiptRef.receipt_id)
+));
+assert.equal(reusedContextCallIDReceipts.length, 2,
+  "each sequential occurrence of a reused call ID must publish its own receipt");
+assert.equal(reusedContextCallIDReceipts[1].sequence, reusedContextCallIDReceipts[0].sequence + 1);
+assert.equal(reusedContextCallIDReceipts[1].previous_receipt_fingerprint, reusedContextCallIDReceipts[0].fingerprint,
+  "reused call ID occurrences must remain chained by their receipt sequence");
+assert.notEqual(reusedContextCallIDReceipts[1].call_key_fingerprint, reusedContextCallIDReceipts[0].call_key_fingerprint,
+  "receipt occurrence identity must not rely on OpenCode call ID uniqueness");
+handleNormalSessionToolAfter(bridge, {
+  tool: "context_read",
+  sessionID: reusedContextCallIDContext.sessionID,
+  callID: reusedContextCallID,
+}, { output: contextReadOutput("src/file.mjs"), title: "duplicate late settlement", metadata: {} });
+assert.equal(
+  createContextReceiptStore({ workspaceRoot: tempRoot }).inspectSession(reusedContextCallIDState.session_key).receipt_count,
+  2,
+  "a duplicate after hook must not republish the last settled occurrence",
+);
+
 const highContext = { sessionID: "session/high", agent: "orchestrator" };
 executeNormalSessionQualityTool(bridge, "quality_dossier_create", {
   request: JSON.stringify(fullDossierRequest()),
@@ -2334,40 +3072,40 @@ handleNormalSessionToolAfter(bridge, {
 handleNormalSessionToolBefore(bridge, {
   tool: "task",
   sessionID: highContext.sessionID,
-  callID: "call-high-context-reviewer",
-}, nativeTask("reviewer"));
-const highContextReviewerChildID = "session/high-context-reviewer";
+  callID: "call-high-context-researcher",
+}, nativeTask("researcher"));
+const highContextResearcherChildID = "session/high-context-researcher";
 handleNormalSessionEvent(bridge, {
   type: "session.created",
-  properties: { info: { id: highContextReviewerChildID, parentID: highContext.sessionID } },
+  properties: { info: { id: highContextResearcherChildID, parentID: highContext.sessionID } },
 });
-const highContextReviewerReadCallID = `context-read-child-${++contextCallTick}`;
+const highContextResearcherReadCallID = `context-read-child-${++contextCallTick}`;
 handleNormalSessionToolBefore(bridge, {
   tool: "context_read",
-  sessionID: highContextReviewerChildID,
-  callID: highContextReviewerReadCallID,
+  sessionID: highContextResearcherChildID,
+  callID: highContextResearcherReadCallID,
 }, { args: { path: "src/file.mjs", startLine: 1, maxLines: 64, maxBytes: 4096, format: "text" } });
 handleNormalSessionToolAfter(bridge, {
   tool: "context_read",
-  sessionID: highContextReviewerChildID,
-  callID: highContextReviewerReadCallID,
-}, { output: contextReadOutput("src/file.mjs"), title: "reviewer child context read", metadata: {} });
-const highContextReviewerChildState = inspectNormalSessionQualityState(bridge, highContextReviewerChildID);
+  sessionID: highContextResearcherChildID,
+  callID: highContextResearcherReadCallID,
+}, { output: contextReadOutput("src/file.mjs"), title: "researcher child context read", metadata: {} });
+const highContextResearcherChildState = inspectNormalSessionQualityState(bridge, highContextResearcherChildID);
 const sequentialChildReceiptIndex = childContextReceiptStore.inspectSession(highContextOwnerState.session_key);
 const sequentialChildReceipts = sequentialChildReceiptIndex.receipt_refs.slice(-2).map((receiptRef) => (
   childContextReceiptStore.readReceipt(highContextOwnerState.session_key, receiptRef.receipt_id)
 ));
 assert.equal(sequentialChildReceipts[0].producer_session_key, highContextChildState.session_key);
 assert.equal(sequentialChildReceipts[0].producer_role, "explore");
-assert.equal(sequentialChildReceipts[1].producer_session_key, highContextReviewerChildState.session_key);
-assert.equal(sequentialChildReceipts[1].producer_role, "reviewer");
+assert.equal(sequentialChildReceipts[1].producer_session_key, highContextResearcherChildState.session_key);
+assert.equal(sequentialChildReceipts[1].producer_role, "researcher");
 assert.equal(sequentialChildReceipts[1].sequence, sequentialChildReceipts[0].sequence + 1);
 assert.equal(sequentialChildReceipts[1].previous_receipt_fingerprint, sequentialChildReceipts[0].fingerprint,
   "serialized child context evidence must preserve the immutable receipt chain");
 handleNormalSessionToolAfter(bridge, {
   tool: "task",
   sessionID: highContext.sessionID,
-  callID: "call-high-context-reviewer",
+  callID: "call-high-context-researcher",
 });
 const settledSequentialChildState = inspectNormalSessionQualityState(bridge, highContext.sessionID);
 assert.equal(settledSequentialChildState.active_task_launch, null);
@@ -2599,6 +3337,921 @@ assert.equal(typeof plugin["permission.ask"], "function");
 assert.equal(typeof plugin["tool.execute.before"], "function");
 assert.equal(typeof plugin["tool.execute.after"], "function");
 
+const continuationContext = { sessionID: "session/plugin-task-continuation", agent: "orchestrator" };
+currentPathVersions.clear();
+await plugin["chat.message"](continuationContext);
+await plugin.tool.quality_session_start.execute({
+  request: JSON.stringify(startRequestFromDossier(dossierRequest())),
+}, continuationContext);
+const continuationContextCall = {
+  tool: "context_read",
+  sessionID: continuationContext.sessionID,
+  callID: "call-plugin-continuation-context",
+};
+const continuationContextArgs = { path: "src/file.mjs", startLine: 1, maxLines: 64, maxBytes: 4096 };
+await plugin["tool.execute.before"](continuationContextCall, { args: continuationContextArgs });
+await plugin["tool.execute.after"](continuationContextCall, {
+  title: "context read",
+  output: contextReadOutput("src/file.mjs"),
+  metadata: {},
+});
+await plugin.tool.quality_dossier_finalize.execute({
+  request: JSON.stringify({ expected_revision: 1 }),
+}, continuationContext);
+await plugin.tool.quality_action_authorize.execute({
+  request: JSON.stringify({ expected_revision: 1, kind: "edit", paths: ["src/file.mjs"] }),
+}, continuationContext);
+const continuationEditCall = {
+  tool: "edit",
+  sessionID: continuationContext.sessionID,
+  callID: "call-plugin-continuation-edit",
+};
+await plugin["tool.execute.before"](continuationEditCall, nativeEdit());
+currentPathVersions.set("src/file.mjs", 1);
+await plugin["tool.execute.after"](continuationEditCall, { title: "edit", output: "done", metadata: {} });
+
+const continuationVerifierCall = {
+  tool: "task",
+  sessionID: continuationContext.sessionID,
+  callID: "call-plugin-continuation-verifier",
+};
+const continuationVerifierArgs = nativeTask("verifier");
+await plugin["tool.execute.before"](continuationVerifierCall, continuationVerifierArgs);
+assert.deepEqual(runnerAssignmentEnvelope(continuationVerifierArgs), {
+  schema_version: 1,
+  target_agent: "verifier",
+  assignment: {
+    tool_id: "quality_verification_record",
+    request: { expected_revision: 1 },
+    instruction: "Call this verifier-only tool exactly once with the supplied typed revision, return its receipt, and do not run native shell checks or delegate.",
+  },
+});
+const continuationVerifierSessionID = "session/plugin-task-continuation/verifier";
+await plugin.event({ event: {
+  type: "session.created",
+  properties: { info: { id: continuationVerifierSessionID, parentID: continuationContext.sessionID } },
+} });
+await plugin.tool.quality_verification_record.execute({
+  request: JSON.stringify({ expected_revision: 1 }),
+}, { sessionID: continuationVerifierSessionID, agent: "verifier" });
+const continuationVerifierOutput = { title: "verifier", output: "verification complete", metadata: { preserved: true } };
+await plugin["tool.execute.after"](continuationVerifierCall, continuationVerifierOutput);
+assert.match(continuationVerifierOutput.output, /\[runner quality continuation\]/);
+assert.match(continuationVerifierOutput.output, /quality_context_reviewer_record/);
+assert.equal(continuationVerifierOutput.metadata.preserved, true, "task continuation must preserve host metadata");
+assert.equal(continuationVerifierOutput.metadata.quality_continuation.lifecycle, "verified");
+assert.equal(
+  continuationVerifierOutput.metadata.quality_continuation.recommended_next_actions[0].target_agent,
+  "reviewer",
+  "a settled verifier task must return the exact reviewer continuation to the caller",
+);
+
+const continuationReviewerCall = {
+  tool: "task",
+  sessionID: continuationContext.sessionID,
+  callID: "call-plugin-continuation-reviewer",
+};
+const continuationReviewerArgs = nativeTask("reviewer");
+await plugin["tool.execute.before"](continuationReviewerCall, continuationReviewerArgs);
+const continuationReviewerAssignment = continuationVerifierOutput.metadata
+  .quality_continuation.recommended_next_actions[0].assignment;
+assert.deepEqual(runnerAssignmentEnvelope(continuationReviewerArgs), {
+  schema_version: 1,
+  target_agent: "reviewer",
+  assignment: continuationReviewerAssignment,
+});
+assert.deepEqual(continuationReviewerAssignment.required_read_paths, ["src/file.mjs"]);
+assert.equal(
+  continuationReviewerAssignment.review_contract.requested_behavior,
+  inspectNormalSessionQualityState(bridge, continuationContext.sessionID).dossier.user_visible_goal,
+  "reviewer continuation must bind the narrow user-visible goal rather than a broader model summary",
+);
+const continuationPassedReviewRequest = passedReviewerClauseRequest({
+  assignment: continuationReviewerAssignment,
+});
+const continuationReviewerSessionID = "session/plugin-task-continuation/reviewer";
+await plugin.event({ event: {
+  type: "session.created",
+  properties: { info: { id: continuationReviewerSessionID, parentID: continuationContext.sessionID } },
+} });
+await assert.rejects(
+  () => plugin.tool.quality_context_reviewer_record.execute({
+    request: JSON.stringify({ outcome: "passed" }),
+  }, { sessionID: continuationReviewerSessionID, agent: "reviewer" }),
+  (error) => error instanceof ContractError,
+  "an evidence-free passed reviewer receipt must be rejected",
+);
+await assert.rejects(
+  () => plugin.tool.quality_context_reviewer_record.execute({
+    request: JSON.stringify(continuationPassedReviewRequest),
+  }, { sessionID: continuationReviewerSessionID, agent: "reviewer" }),
+  (error) => error?.code === "CONTEXT_REVIEW_EVIDENCE_MISSING",
+  "a linked final reviewer cannot pass without reading every current changed source path",
+);
+const continuationReviewerReadCall = {
+  tool: "context_read",
+  sessionID: continuationReviewerSessionID,
+  callID: "call-plugin-continuation-reviewer-read",
+};
+await plugin["tool.execute.before"](continuationReviewerReadCall, {
+  args: { path: "src/file.mjs", startLine: 1, maxLines: 64, maxBytes: 4096 },
+});
+await plugin["tool.execute.after"](continuationReviewerReadCall, {
+  title: "reviewer context read",
+  output: contextReadOutput("src/file.mjs"),
+  metadata: {},
+});
+await plugin.tool.quality_context_reviewer_record.execute({
+  request: JSON.stringify(continuationPassedReviewRequest),
+}, { sessionID: continuationReviewerSessionID, agent: "reviewer" });
+const continuationReviewerOutput = { title: "reviewer", output: "review complete", metadata: {} };
+await plugin["tool.execute.after"](continuationReviewerCall, continuationReviewerOutput);
+assert.match(continuationReviewerOutput.output, /quality_context_reconcile/);
+assert.equal(
+  continuationReviewerOutput.metadata.quality_continuation.recommended_next_actions[0].request.evidence_mode,
+  "reviewer_grounded",
+  "a settled reviewer task must return the exact reconciliation continuation to the caller",
+);
+await plugin.tool.quality_context_reconcile.execute({
+  request: JSON.stringify({ evidence_mode: "reviewer_grounded" }),
+}, continuationContext);
+await plugin.tool.quality_session_finalize.execute({
+  request: JSON.stringify({ expected_revision: 1 }),
+}, continuationContext);
+currentPathVersions.clear();
+
+const legacyBugPlugin = createNormalSessionQualityPlugin({
+  toolFactory: fakeToolFactory,
+  workspaceRoot: tempRoot,
+  bridgeOptions: {
+    ...options,
+    checkCatalog: bugEngineeringCatalog,
+    projectCatalog: bugProjectCatalog,
+    evaluateGate: undefined,
+    runTrustedTarget: ({ phase }) => ({
+      status: "passed",
+      observed_outcome: phase === "preimplementation" ? "failing_reproducer" : "passing_regression",
+      exit_code: phase === "preimplementation" ? 10 : 0,
+      duration_ms: 1,
+      stdout_bytes: 0,
+      stderr_bytes: 0,
+      command_fingerprint: fingerprint({ phase, fixture: "legacy-plugin-runner-owned-checks" }),
+    }),
+  },
+});
+const legacyBugContext = { sessionID: "session/legacy-plugin-runner-owned-checks", agent: "orchestrator" };
+await legacyBugPlugin["chat.message"](legacyBugContext);
+const legacyBugStartSource = bugStartRequest();
+delete legacyBugStartSource.required_check_ids;
+delete legacyBugStartSource.reproduction_contract;
+const legacyBugStartReceipt = JSON.parse(await legacyBugPlugin.tool.quality_session_start.execute({
+  request: JSON.stringify(legacyBugStartSource),
+}, legacyBugContext));
+assert.equal(legacyBugStartReceipt.lifecycle, "dossier_draft");
+assert.deepEqual(
+  legacyBugStartReceipt.available_check_ids,
+  ["normal-bug-reproducer"],
+  "legacy string-envelope plugin APIs must start with runner-bound integration and reproducer checks even when the model supplies no IDs",
+);
+
+const fakeStructuredSchema = () => {
+  const schema = {};
+  schema.describe = () => schema;
+  schema.optional = () => schema;
+  return schema;
+};
+const structuredToolFactory = (definition) => definition;
+structuredToolFactory.schema = {
+  string: fakeStructuredSchema,
+  number: fakeStructuredSchema,
+  boolean: fakeStructuredSchema,
+  enum: fakeStructuredSchema,
+  array: fakeStructuredSchema,
+};
+const structuredSessionParents = new Map();
+const structuredSessionLookups = [];
+const structuredPlugin = createNormalSessionQualityPlugin({
+  toolFactory: structuredToolFactory,
+  workspaceRoot: tempRoot,
+  bridgeOptions: options,
+  sessionInfoResolver: async (sessionID) => {
+    structuredSessionLookups.push(sessionID);
+    return {
+      id: sessionID,
+      parentID: structuredSessionParents.get(sessionID) ?? null,
+    };
+  },
+});
+assert.deepEqual(Object.keys(structuredPlugin.tool.quality_dossier_inspect.args), []);
+assert.deepEqual(
+  Object.keys(structuredPlugin.tool.quality_context_strategy_escalate.args),
+  ["requested_strategy_id"],
+  "structured OpenCode hosts must expose a directly callable typed escalation request",
+);
+assert.deepEqual(Object.keys(structuredPlugin.tool.quality_dossier_update.args), [
+  "expected_revision",
+  "entry_path",
+  "related_paths",
+  "compatibility_decision",
+  "compatibility_analysis",
+  "owning_abstraction",
+  "impact_analysis",
+  "has_downstream_side_effects",
+  "side_effect_analysis",
+  "has_cross_boundary_contracts",
+  "contract_analysis",
+  "rollback_expectation",
+  "recovery_expectation",
+  "counterexample",
+  "premortem_analysis",
+  "unresolved_unknowns",
+]);
+assert.deepEqual(Object.keys(structuredPlugin.tool.quality_context_report_update.args), [
+  "expected_revision",
+  "observed_system_behavior",
+  "owning_abstraction",
+  "input_summary",
+  "output_summary",
+  "falsification_observation",
+  "sibling_variant_observation",
+  "compatibility_observation",
+  "negative_path_observation",
+  "unresolved_questions",
+]);
+assert.deepEqual(Object.keys(structuredPlugin.tool.quality_context_report_finalize.args), ["expected_revision"]);
+assert.deepEqual(Object.keys(structuredPlugin.tool.quality_architecture_evaluate.args), [
+  "expected_revision", "blocker_summaries",
+]);
+assert.deepEqual(Object.keys(structuredPlugin.tool.quality_dossier_finalize.args), ["expected_revision"]);
+assert.deepEqual(Object.keys(structuredPlugin.tool.quality_verification_record.args), ["expected_revision"]);
+assert.deepEqual(Object.keys(structuredPlugin.tool.quality_session_finalize.args), ["expected_revision"]);
+assert.deepEqual(Object.keys(structuredPlugin.tool.quality_action_authorize.args), [
+  "expected_revision", "kind", "paths", "target_agent",
+]);
+assert.deepEqual(Object.keys(structuredPlugin.tool.quality_context_reviewer_record.args), [
+  "outcome", "reviewed_clause_ids", "clause_evidence_paths", "clause_evidence_snippets",
+  "clause_evidence_summaries", "request",
+]);
+assert.deepEqual(Object.keys(structuredPlugin.tool.quality_context_reconcile.args), ["evidence_mode", "request"]);
+const structuredContext = { sessionID: "session/structured-quality-start", agent: "orchestrator" };
+await structuredPlugin["chat.message"](structuredContext);
+const structuredInitialInspection = JSON.parse(await structuredPlugin.tool.quality_dossier_inspect.execute({}, structuredContext));
+assert.equal(structuredInitialInspection.lifecycle, "unclassified");
+const structuredStartSource = startRequestFromDossier(dossierRequest());
+const structuredStartText = await structuredPlugin.tool.quality_session_start.execute({
+  risk_class: structuredStartSource.risk_class,
+  task_type: structuredStartSource.task_type,
+  user_visible_goal: structuredStartSource.user_visible_goal,
+  ownership_paths: structuredStartSource.ownership_paths,
+  classification_rationale: structuredStartSource.classification_rationale,
+  behavior_expectation: structuredStartSource.behavior_expectation,
+  expected_preserved_behavior: structuredStartSource.expected_preserved_behavior,
+  known_local_edge_cases: structuredStartSource.known_local_edge_cases,
+  ...structuredStartSource.scope_facts,
+  ...(structuredStartSource.reproduction_contract === undefined ? {} : {
+    reproduction_check_id: structuredStartSource.reproduction_contract.check_id,
+    reproduction_expected_pre_fix: structuredStartSource.reproduction_contract.expected_pre_fix,
+    reproduction_unavailable_reason: undefined,
+    reproduction_uncertainty_material: structuredStartSource.reproduction_contract.uncertainty_material,
+  }),
+}, structuredContext);
+const structuredStartReceipt = JSON.parse(structuredStartText);
+assert.equal(structuredStartReceipt.lifecycle, "dossier_draft");
+assert.deepEqual(
+  structuredStartReceipt.recommended_next_actions.map((entry) => entry.tool_id),
+  ["context_read"],
+  "typed plugin arguments must reconstruct the strict request without advertising a premature finalization action",
+);
+const structuredEscalationReceipt = JSON.parse(
+  await structuredPlugin.tool.quality_context_strategy_escalate.execute({
+    requested_strategy_id: "high-wide-deep-v1",
+  }, structuredContext),
+);
+assert.equal(structuredEscalationReceipt.risk_class, "high");
+assert.equal(structuredEscalationReceipt.context_strategy_id, "high-wide-deep-v1");
+assert.deepEqual(
+  structuredEscalationReceipt.recommended_next_actions.map((entry) => entry.tool_id),
+  ["context_outline", "context_read"],
+  "risk escalation must seed a conservative graph and immediately expose the receipt-producing context sequence",
+);
+
+const structuredHighContext = { sessionID: "session/structured-quality-high-seed", agent: "orchestrator" };
+await structuredPlugin["chat.message"](structuredHighContext);
+const structuredHighArgs = {
+  risk_class: structuredStartSource.risk_class,
+  task_type: structuredStartSource.task_type,
+  user_visible_goal: "Protect an async cancellation boundary without late settlement.",
+  ownership_paths: structuredStartSource.ownership_paths,
+  classification_rationale: "A bounded local change has a real concurrency-sensitive failure mode.",
+  behavior_expectation: "Cancellation settles exactly once and late work cannot publish a result.",
+  expected_preserved_behavior: ["successful uncancelled work still resolves normally"],
+  known_local_edge_cases: ["cancellation races with a late completion callback"],
+  ...structuredStartSource.scope_facts,
+  concurrency_sensitive: true,
+};
+const structuredHighReceipt = JSON.parse(await structuredPlugin.tool.quality_session_start.execute(
+  structuredHighArgs,
+  structuredHighContext,
+));
+assert.equal(structuredHighReceipt.risk_class, "high", "truthful scope facts must monotonically select the runner minimum risk");
+assert.equal(structuredHighReceipt.lifecycle, "dossier_draft");
+assert.match(structuredHighReceipt.dossier_id, /^dossier-/u);
+assert.match(structuredHighReceipt.context_report_id, /^CONTEXT-/u);
+assert.deepEqual(
+  structuredHighReceipt.recommended_next_actions.map((entry) => entry.tool_id),
+  ["context_outline", "context_read"],
+  "a typed high start must seed a partial runner-owned graph and return receipt-producing actions before model analysis",
+);
+const structuredHighProvisionalState = inspectNormalSessionQualityState(
+  createNormalSessionQualityBridge(options),
+  structuredHighContext.sessionID,
+);
+assert.equal(structuredHighProvisionalState.dossier.impact_graph.coverage.completeness, "partial");
+assert.equal(
+  structuredHighProvisionalState.dossier.impact_graph.nodes.every((entry) => entry.confidence === "inferred"),
+  true,
+  "the runner seed must identify its graph subjects as inferred rather than receipt-observed",
+);
+assert.equal(
+  structuredHighProvisionalState.dossier.impact_graph.unknowns.some((entry) => entry.blocking),
+  true,
+  "the provisional graph must preserve an explicit blocking unknown until context receipts settle",
+);
+const structuredHighReplay = JSON.parse(await structuredPlugin.tool.quality_session_start.execute(
+  structuredHighArgs,
+  structuredHighContext,
+));
+assert.equal(structuredHighReplay.dossier_id, structuredHighReceipt.dossier_id, "an exact typed retry must recover the same seeded owner state");
+const structuredHighInspection = JSON.parse(await structuredPlugin.tool.quality_dossier_inspect.execute({}, structuredHighContext));
+assert.equal(structuredHighInspection.dossier_id, structuredHighReceipt.dossier_id);
+assert.deepEqual(
+  structuredHighInspection.recommended_next_actions.map((entry) => entry.tool_id),
+  ["context_outline", "context_read"],
+  "high dossier inspection must keep returning the executable evidence sequence",
+);
+const structuredCompactContextAnalysis = {
+  expected_revision: structuredHighInspection.context_report_revision,
+  observed_system_behavior: "The complete outline and source read show one bounded module on the critical path.",
+  owning_abstraction: "The src/file.mjs module is the observed owner of the bounded behavior.",
+  input_summary: "The critical path receives the exported module value and a cancellation ordering decision.",
+  output_summary: "The critical path emits one settled value and no duplicate late completion.",
+  falsification_observation: "The bounded source read exposes the late-settlement scenario represented by the counterexample.",
+  sibling_variant_observation: "The complete bounded outline contains no additional sibling implementation requiring separate treatment.",
+  compatibility_observation: "The existing export path remains present and the compact analysis preserves its contract.",
+  negative_path_observation: "The bounded source evidence supports rejecting a duplicate settlement after cancellation.",
+  unresolved_questions: [],
+};
+await assert.rejects(
+  () => structuredPlugin.tool.quality_context_report_update.execute(
+    structuredCompactContextAnalysis,
+    structuredHighContext,
+  ),
+  (error) => error?.code === "CONTEXT_COMPACT_ANALYSIS_EVIDENCE_MISSING",
+  "even a runner-seeded report must fail closed before its outline and file receipts exist",
+);
+const structuredOutlineCallID = `structured-context-outline-${++contextCallTick}`;
+const structuredOutlineResult = contextOutlineOutput(["src/file.mjs"]);
+await structuredPlugin["tool.execute.before"]({
+  tool: "context_outline",
+  sessionID: structuredHighContext.sessionID,
+  callID: structuredOutlineCallID,
+}, { args: {} });
+await structuredPlugin["tool.execute.after"]({
+  tool: "context_outline",
+  sessionID: structuredHighContext.sessionID,
+  callID: structuredOutlineCallID,
+}, {
+  output: structuredOutlineResult,
+  title: "structured compact context outline",
+  metadata: {},
+});
+const structuredRequiredReadPaths = structuredHighInspection.recommended_next_actions
+  .filter((entry) => entry.tool_id === "context_read")
+  .map((entry) => entry.request.path);
+assert.deepEqual(structuredRequiredReadPaths, ["src/file.mjs"]);
+const structuredReadResults = new Map();
+for (const observedPath of structuredRequiredReadPaths) {
+  const callID = `structured-context-read-${++contextCallTick}`;
+  const readResult = contextReadOutput(observedPath);
+  structuredReadResults.set(observedPath, readResult);
+  await structuredPlugin["tool.execute.before"]({
+    tool: "context_read",
+    sessionID: structuredHighContext.sessionID,
+    callID,
+  }, { args: { path: observedPath, startLine: 1, maxLines: 64, maxBytes: 4096, format: "text" } });
+  await structuredPlugin["tool.execute.after"]({
+    tool: "context_read",
+    sessionID: structuredHighContext.sessionID,
+    callID,
+  }, { output: readResult, title: "structured compact context read", metadata: {} });
+}
+const structuredHighEvidenceInspection = JSON.parse(
+  await structuredPlugin.tool.quality_dossier_inspect.execute({}, structuredHighContext),
+);
+assert.deepEqual(
+  structuredHighEvidenceInspection.recommended_next_actions.map((entry) => entry.tool_id),
+  ["quality_dossier_update"],
+  "settled receipts must route the model to replace the provisional graph before report analysis",
+);
+const structuredHighUpdated = JSON.parse(await structuredPlugin.tool.quality_dossier_update.execute({
+  expected_revision: structuredHighEvidenceInspection.dossier_revision,
+  entry_path: "src/file.mjs",
+  related_paths: [],
+  compatibility_decision: "preserve",
+  compatibility_analysis: "The bounded module contract and existing export remain compatible.",
+  owning_abstraction: "The src/file.mjs module owns the bounded exported value behavior.",
+  impact_analysis: "The runner-bound check reads the module export directly; no additional caller or callee was observed.",
+  has_downstream_side_effects: false,
+  side_effect_analysis: "The module returns a value and performs no downstream write, event, or external side effect.",
+  has_cross_boundary_contracts: false,
+  contract_analysis: "The bounded internal export does not change a public, serialized, configuration, or event contract.",
+  rollback_expectation: "Restore the owned module revision if the bounded behavior or check regresses.",
+  recovery_expectation: "A failed attempt leaves no partial state and a retry re-evaluates the same module input.",
+  counterexample: "A cancellation arriving after completion must not publish a second settlement.",
+  premortem_analysis: "The bounded module has no migration, persistence, or distributed partial-commit mechanism beyond the classified race.",
+  unresolved_unknowns: [],
+}, structuredHighContext));
+assert.equal(structuredHighUpdated.dossier_revision, structuredHighEvidenceInspection.dossier_revision + 1);
+assert.match(structuredHighUpdated.context_report_id, /^CONTEXT-/u);
+assert.deepEqual(
+  structuredHighUpdated.recommended_next_actions.map((entry) => entry.tool_id),
+  ["quality_context_report_update"],
+  "the receipt-grounded graph must advance directly to report refinement without duplicate reads",
+);
+structuredCompactContextAnalysis.expected_revision = structuredHighUpdated.context_report_revision;
+const structuredHighReportUpdate = JSON.parse(await structuredPlugin.tool.quality_context_report_update.execute(
+  structuredCompactContextAnalysis,
+  structuredHighContext,
+));
+assert.equal(structuredHighReportUpdate.report.revision, structuredCompactContextAnalysis.expected_revision + 1);
+const structuredHighPersistedState = inspectNormalSessionQualityState(
+  createNormalSessionQualityBridge(options),
+  structuredHighContext.sessionID,
+);
+const representedTransitivePath = structuredHighPersistedState.dossier.impact_graph.affected_paths
+  .find((entry) => entry.kind === "transitive");
+const representedTransitiveWide = structuredHighReportUpdate.report.wide_analysis
+  .find((entry) => entry.category === "transitive_consumers_side_effects");
+assert.ok(representedTransitivePath);
+assert.ok(representedTransitiveWide);
+assert.equal(
+  [
+    representedTransitivePath.id,
+    ...representedTransitivePath.node_ids,
+    ...representedTransitivePath.edge_ids,
+  ].every((subjectId) => representedTransitiveWide.subject_ids.includes(subjectId)),
+  true,
+  "represented transitive paths must bind every path, node, and edge subject into the receipt-backed wide analysis",
+);
+const structuredHighReportInspection = JSON.parse(
+  await structuredPlugin.tool.quality_dossier_inspect.execute({}, structuredHighContext),
+);
+assert.deepEqual(
+  structuredHighReportInspection.recommended_next_actions.map((entry) => entry.tool_id),
+  ["quality_context_report_finalize"],
+);
+for (const [index, receiptRole] of ["architect", "reviewer", "verifier"].entries()) {
+  await assert.rejects(
+    () => structuredPlugin["tool.execute.before"](
+      {
+        tool: "task",
+        sessionID: structuredHighContext.sessionID,
+        callID: `structured-high-premature-${receiptRole}-${index}`,
+      },
+      nativeTask(receiptRole),
+    ),
+    (error) => error?.code === "QUALITY_TASK_PHASE"
+      && error.message.includes("quality_context_report_finalize"),
+    `receipt role ${receiptRole} must not launch before its exact runner-owned phase`,
+  );
+}
+assert.deepEqual(
+  JSON.parse(await structuredPlugin.tool.quality_dossier_inspect.execute({}, structuredHighContext))
+    .recommended_next_actions.map((entry) => entry.tool_id),
+  ["quality_context_report_finalize"],
+  "rejected premature receipt-role tasks must leave the quality phase unchanged",
+);
+const structuredHighContextDecision = JSON.parse(
+  await structuredPlugin.tool.quality_context_report_finalize.execute({
+    expected_revision: structuredHighReportUpdate.report.revision,
+  }, structuredHighContext),
+);
+assert.equal(structuredHighContextDecision.report.status, "finalized");
+assert.equal(structuredHighContextDecision.decision.status, "sufficient");
+const structuredStateBridge = createNormalSessionQualityBridge(options);
+const structuredCanonicalContextState = inspectNormalSessionQualityState(
+  structuredStateBridge,
+  structuredHighContext.sessionID,
+);
+const structuredCanonicalDecisionFingerprint = structuredCanonicalContextState.context_decision.fingerprint;
+const structuredCanonicalReportFingerprint = structuredCanonicalContextState.context_report.fingerprint;
+const structuredCanonicalReceiptCount = structuredCanonicalContextState.context_receipt_ids.length;
+const structuredCanonicalReadOnlySubagentCount = structuredCanonicalContextState.context_read_only_subagent_ids.length;
+const structuredHighSufficientInspection = JSON.parse(
+  await structuredPlugin.tool.quality_dossier_inspect.execute({}, structuredHighContext),
+);
+assert.equal(structuredHighSufficientInspection.recommended_next_actions[0].tool_id, "task");
+assert.equal(structuredHighSufficientInspection.recommended_next_actions[0].target_agent, "architect");
+assert.equal(
+  structuredHighSufficientInspection.recommended_next_actions[0].assignment.tool_id,
+  "quality_architecture_evaluate",
+);
+assert.deepEqual(
+  structuredHighSufficientInspection.recommended_next_actions[0].assignment.request,
+  {
+    expected_revision: structuredHighSufficientInspection.dossier_revision,
+    blocker_summaries: [],
+  },
+  "runner guidance must use the same flat structured argument names exposed by the plugin tool schema",
+);
+assert.equal(
+  structuredHighSufficientInspection.recommended_next_actions[0].assignment.challenge_contract.user_visible_goal,
+  structuredHighPersistedState.dossier.user_visible_goal,
+  "architect challenge assignments must carry the canonical narrow user goal",
+);
+assert.match(
+  structuredHighSufficientInspection.recommended_next_actions[0].assignment.challenge_contract.change_policy,
+  /narrow user_visible_goal is authoritative/u,
+);
+assert.match(
+  structuredHighSufficientInspection.recommended_next_actions[0].assignment.instruction,
+  /never for a speculative expansion or preferred conventional design/u,
+);
+const structuredArchitectTask = {
+  tool: "task",
+  sessionID: structuredHighContext.sessionID,
+  callID: "structured-high-architect-task",
+};
+await assert.rejects(
+  () => structuredPlugin["tool.execute.before"](
+    { ...structuredArchitectTask, callID: "structured-high-wrong-role-task" },
+    nativeTask("reviewer"),
+  ),
+  (error) => error?.code === "QUALITY_TASK_TARGET",
+  "a runner-owned architect assignment must reject a different read-only role before launch",
+);
+const structuredArchitectArgs = nativeTask("architect");
+structuredArchitectArgs.args.prompt = "Model-authored stale task text.\n[runner quality assignment]\npartial envelope";
+await structuredPlugin["tool.execute.before"](structuredArchitectTask, structuredArchitectArgs);
+assert.deepEqual(runnerAssignmentEnvelope(structuredArchitectArgs), {
+  schema_version: 1,
+  target_agent: "architect",
+  assignment: structuredHighSufficientInspection.recommended_next_actions[0].assignment,
+});
+assert.equal(
+  structuredArchitectArgs.args.prompt.match(/\[runner quality assignment\]/gu)?.length,
+  1,
+  "a malformed model-authored envelope must be discarded before the exact runner assignment is injected",
+);
+assert.doesNotMatch(
+  structuredArchitectArgs.args.prompt,
+  /Model-authored stale task text|partial envelope/u,
+  "untrusted caller prompt text must not survive runner-owned quality assignment binding",
+);
+const structuredArchitectContext = {
+  sessionID: "session/structured-quality-high-seed/architect",
+  agent: "architect",
+};
+structuredSessionParents.set(structuredArchitectContext.sessionID, structuredHighContext.sessionID);
+await structuredPlugin["chat.message"](structuredArchitectContext);
+const structuredArchitectOutlineCallID = `structured-architect-context-outline-${++contextCallTick}`;
+await structuredPlugin["tool.execute.before"]({
+  tool: "context_outline",
+  sessionID: structuredArchitectContext.sessionID,
+  callID: structuredArchitectOutlineCallID,
+}, { args: {} });
+await structuredPlugin["tool.execute.after"]({
+  tool: "context_outline",
+  sessionID: structuredArchitectContext.sessionID,
+  callID: structuredArchitectOutlineCallID,
+}, { output: structuredOutlineResult, title: "structured architect audit outline", metadata: {} });
+const structuredArchitectReadCallID = `structured-architect-context-read-${++contextCallTick}`;
+await structuredPlugin["tool.execute.before"]({
+  tool: "context_read",
+  sessionID: structuredArchitectContext.sessionID,
+  callID: structuredArchitectReadCallID,
+}, { args: { path: "src/file.mjs", startLine: 1, maxLines: 64, maxBytes: 4096, format: "text" } });
+await structuredPlugin["tool.execute.after"]({
+  tool: "context_read",
+  sessionID: structuredArchitectContext.sessionID,
+  callID: structuredArchitectReadCallID,
+}, {
+  output: structuredReadResults.get("src/file.mjs"),
+  title: "structured architect audit read",
+  metadata: {},
+});
+const structuredArchitectAuditState = inspectNormalSessionQualityState(
+  structuredStateBridge,
+  structuredHighContext.sessionID,
+);
+assert.equal(structuredArchitectAuditState.context_decision.fingerprint, structuredCanonicalDecisionFingerprint,
+  "exact duplicate architect audit reads must not replace the canonical sufficient context decision");
+assert.equal(structuredArchitectAuditState.context_report.fingerprint, structuredCanonicalReportFingerprint,
+  "exact duplicate architect audit reads must not reopen the finalized context report");
+assert.equal(structuredArchitectAuditState.context_receipt_ids.length, structuredCanonicalReceiptCount + 2,
+  "challenge audit reads must remain persisted as an append-only receipt trail");
+assert.equal(
+  structuredArchitectAuditState.context_read_only_subagent_ids.length,
+  structuredCanonicalReadOnlySubagentCount,
+  "a required plan-challenge child must not consume the context-discovery subagent budget",
+);
+await structuredPlugin.tool.quality_architecture_evaluate.execute({
+  expected_revision: structuredHighSufficientInspection.dossier_revision,
+  blocker_summaries: [],
+}, structuredArchitectContext);
+await structuredPlugin.event({
+  event: {
+    type: "session.created",
+    properties: {
+      info: {
+        id: structuredArchitectContext.sessionID,
+        parentID: structuredHighContext.sessionID,
+      },
+    },
+  },
+});
+await structuredPlugin["tool.execute.after"](structuredArchitectTask, {
+  output: "architect challenge complete",
+  title: "structured architect challenge",
+  metadata: {},
+});
+const structuredReviewerInspection = JSON.parse(
+  await structuredPlugin.tool.quality_dossier_inspect.execute({}, structuredHighContext),
+);
+assert.equal(structuredReviewerInspection.recommended_next_actions[0].target_agent, "reviewer");
+assert.deepEqual(
+  structuredReviewerInspection.recommended_next_actions[0].assignment.request,
+  {
+    expected_revision: structuredReviewerInspection.dossier_revision,
+    blocker_summaries: [],
+  },
+);
+assert.equal(
+  structuredReviewerInspection.recommended_next_actions[0].assignment.challenge_contract.user_visible_goal,
+  structuredHighPersistedState.dossier.user_visible_goal,
+  "reviewer plan challenges must use the same canonical narrow contract as the architect",
+);
+assert.match(
+  structuredReviewerInspection.recommended_next_actions[0].assignment.instruction,
+  /only for a concrete contract conflict or receipt-backed gap/u,
+);
+const structuredReviewerTask = {
+  tool: "task",
+  sessionID: structuredHighContext.sessionID,
+  callID: "structured-high-reviewer-task",
+};
+const structuredReviewerArgs = nativeTask("reviewer");
+structuredReviewerArgs.args.prompt = `Review the current state freshly.\n${structuredArchitectArgs.args.prompt}\n[end runner quality assignment]`;
+await structuredPlugin["tool.execute.before"](structuredReviewerTask, structuredReviewerArgs);
+assert.deepEqual(runnerAssignmentEnvelope(structuredReviewerArgs), {
+  schema_version: 1,
+  target_agent: "reviewer",
+  assignment: structuredReviewerInspection.recommended_next_actions[0].assignment,
+});
+assert.equal(
+  structuredReviewerArgs.args.prompt.match(/\[runner quality assignment\]/gu)?.length,
+  1,
+  "copied and malformed prior assignment text must be discarded before the current assignment is injected",
+);
+assert.doesNotMatch(
+  structuredReviewerArgs.args.prompt,
+  /"target_agent":"architect"/u,
+  "rebinding a copied task prompt must not preserve the stale runner-owned target",
+);
+assert.doesNotMatch(
+  structuredReviewerArgs.args.prompt,
+  /Review the current state freshly\.|bounded task/u,
+  "model-authored task context must not survive a runner-owned quality assignment rewrite",
+);
+const structuredReviewerContext = {
+  sessionID: "session/structured-quality-high-seed/reviewer",
+  agent: "reviewer",
+};
+structuredSessionParents.set(structuredReviewerContext.sessionID, structuredHighContext.sessionID);
+await structuredPlugin["chat.message"](structuredReviewerContext);
+const structuredReviewerOutlineCallID = `structured-reviewer-context-outline-${++contextCallTick}`;
+await structuredPlugin["tool.execute.before"]({
+  tool: "context_outline",
+  sessionID: structuredReviewerContext.sessionID,
+  callID: structuredReviewerOutlineCallID,
+}, { args: {} });
+await structuredPlugin["tool.execute.after"]({
+  tool: "context_outline",
+  sessionID: structuredReviewerContext.sessionID,
+  callID: structuredReviewerOutlineCallID,
+}, { output: structuredOutlineResult, title: "structured reviewer audit outline", metadata: {} });
+const structuredReviewerReadCallID = `structured-reviewer-context-read-${++contextCallTick}`;
+await structuredPlugin["tool.execute.before"]({
+  tool: "context_read",
+  sessionID: structuredReviewerContext.sessionID,
+  callID: structuredReviewerReadCallID,
+}, { args: { path: "src/file.mjs", startLine: 1, maxLines: 64, maxBytes: 4096, format: "text" } });
+await structuredPlugin["tool.execute.after"]({
+  tool: "context_read",
+  sessionID: structuredReviewerContext.sessionID,
+  callID: structuredReviewerReadCallID,
+}, {
+  output: structuredReadResults.get("src/file.mjs"),
+  title: "structured reviewer audit read",
+  metadata: {},
+});
+const structuredReviewerAuditState = inspectNormalSessionQualityState(
+  structuredStateBridge,
+  structuredHighContext.sessionID,
+);
+assert.equal(structuredReviewerAuditState.context_decision.fingerprint, structuredCanonicalDecisionFingerprint,
+  "exact duplicate reviewer audit reads must preserve the architect-bound context subject");
+assert.equal(structuredReviewerAuditState.context_receipt_ids.length, structuredCanonicalReceiptCount + 4,
+  "both independent challenge audit trails must remain persisted");
+assert.equal(
+  structuredReviewerAuditState.context_read_only_subagent_ids.length,
+  structuredCanonicalReadOnlySubagentCount,
+  "required reviewer challenge work must remain outside the discovery fan-out budget",
+);
+await structuredPlugin.tool.quality_architecture_evaluate.execute({
+  expected_revision: structuredReviewerInspection.dossier_revision,
+  blocker_summaries: [],
+}, structuredReviewerContext);
+await structuredPlugin.event({
+  event: {
+    type: "session.created",
+    properties: {
+      info: {
+        id: structuredReviewerContext.sessionID,
+        parentID: structuredHighContext.sessionID,
+      },
+    },
+  },
+});
+await structuredPlugin["tool.execute.after"](structuredReviewerTask, {
+  output: "reviewer challenge complete",
+  title: "structured reviewer challenge",
+  metadata: {},
+});
+const structuredHighChallengeInspection = JSON.parse(
+  await structuredPlugin.tool.quality_dossier_inspect.execute({}, structuredHighContext),
+);
+assert.deepEqual(
+  structuredHighChallengeInspection.recommended_next_actions.map((entry) => entry.tool_id),
+  ["quality_dossier_finalize"],
+);
+const structuredHighGate = JSON.parse(await structuredPlugin.tool.quality_dossier_finalize.execute({
+  expected_revision: structuredHighChallengeInspection.dossier_revision,
+}, structuredHighContext));
+assert.equal(structuredHighGate.gate_status, "passed");
+assert.equal(
+  structuredSessionLookups.filter((sessionID) => sessionID === structuredArchitectContext.sessionID).length,
+  1,
+  "authoritative child lookup must bind the architect before a delayed session.created event",
+);
+assert.equal(
+  structuredSessionLookups.filter((sessionID) => sessionID === structuredReviewerContext.sessionID).length,
+  1,
+  "authoritative child lookup must bind the reviewer before a delayed session.created event",
+);
+
+const structuredBugPlugin = createNormalSessionQualityPlugin({
+  toolFactory: structuredToolFactory,
+  workspaceRoot: tempRoot,
+  bridgeOptions: {
+    ...options,
+    checkCatalog: bugEngineeringCatalog,
+    projectCatalog: bugProjectCatalog,
+    evaluateGate: undefined,
+    runTrustedTarget: ({ phase }) => ({
+      status: "passed",
+      observed_outcome: phase === "preimplementation" ? "failing_reproducer" : "passing_regression",
+      exit_code: phase === "preimplementation" ? 10 : 0,
+      duration_ms: 1,
+      stdout_bytes: 0,
+      stderr_bytes: 0,
+      command_fingerprint: fingerprint({ phase, fixture: "structured-plugin-runner-owned-checks" }),
+    }),
+  },
+});
+const structuredBugContext = { sessionID: "session/structured-plugin-runner-owned-checks", agent: "orchestrator" };
+await structuredBugPlugin["chat.message"](structuredBugContext);
+const structuredBugSource = bugStartRequest();
+const structuredBugReceipt = JSON.parse(await structuredBugPlugin.tool.quality_session_start.execute({
+  risk_class: structuredBugSource.risk_class,
+  task_type: structuredBugSource.task_type,
+  user_visible_goal: structuredBugSource.user_visible_goal,
+  ownership_paths: structuredBugSource.ownership_paths,
+  classification_rationale: structuredBugSource.classification_rationale,
+  behavior_expectation: structuredBugSource.behavior_expectation,
+  expected_preserved_behavior: structuredBugSource.expected_preserved_behavior,
+  known_local_edge_cases: structuredBugSource.known_local_edge_cases,
+  ...structuredBugSource.scope_facts,
+  concurrency_sensitive: true,
+  reproduction_check_id: "model-guessed-nonexistent-check",
+  reproduction_expected_pre_fix: structuredBugSource.reproduction_contract.expected_pre_fix,
+  reproduction_unavailable_reason: undefined,
+  reproduction_uncertainty_material: structuredBugSource.reproduction_contract.uncertainty_material,
+}, structuredBugContext));
+assert.equal(structuredBugReceipt.lifecycle, "dossier_draft");
+assert.equal(structuredBugReceipt.risk_class, "high");
+assert.deepEqual(
+  structuredBugReceipt.available_check_ids,
+  ["normal-bug-reproducer"],
+  "a unique runner-owned reproducer must override an invalid model-supplied check ID",
+);
+const structuredBugDossier = JSON.parse(await structuredBugPlugin.tool.quality_dossier_update.execute({
+  expected_revision: structuredBugReceipt.dossier_revision,
+  entry_path: "src/file.mjs",
+  related_paths: [],
+  compatibility_decision: "preserve",
+  compatibility_analysis: "The bounded bug fix preserves the existing module export contract.",
+  owning_abstraction: "The src/file.mjs module owns the bounded bug behavior.",
+  impact_analysis: "The runner-bound reproducer exercises the owned module directly and no additional caller was observed.",
+  has_downstream_side_effects: false,
+  side_effect_analysis: "The bounded module has no external write, event, or durable side effect.",
+  has_cross_boundary_contracts: false,
+  contract_analysis: "The fix does not change a public, serialized, configuration, or event contract.",
+  rollback_expectation: "Restore the owned module revision if the regression check fails.",
+  recovery_expectation: "A failed attempt leaves no partial state and the reproducer can be rerun.",
+  counterexample: "The pre-fix behavior remains observable when the regression condition is exercised.",
+  premortem_analysis: "The bounded bug has no migration, persistence, or distributed partial-commit mechanism.",
+  unresolved_unknowns: [],
+}, structuredBugContext));
+const structuredBugOutlineCallID = `structured-bug-context-outline-${++contextCallTick}`;
+await structuredBugPlugin["tool.execute.before"]({
+  tool: "context_outline",
+  sessionID: structuredBugContext.sessionID,
+  callID: structuredBugOutlineCallID,
+}, { args: {} });
+await structuredBugPlugin["tool.execute.after"]({
+  tool: "context_outline",
+  sessionID: structuredBugContext.sessionID,
+  callID: structuredBugOutlineCallID,
+}, {
+  output: contextOutlineOutput(["src/file.mjs"]),
+  title: "structured high bug context outline",
+  metadata: {},
+});
+for (const action of structuredBugDossier.recommended_next_actions.filter((entry) => entry.tool_id === "context_read")) {
+  const callID = `structured-bug-context-read-${++contextCallTick}`;
+  await structuredBugPlugin["tool.execute.before"]({
+    tool: "context_read",
+    sessionID: structuredBugContext.sessionID,
+    callID,
+  }, { args: { path: action.request.path, startLine: 1, maxLines: 64, maxBytes: 4096, format: "text" } });
+  await structuredBugPlugin["tool.execute.after"]({
+    tool: "context_read",
+    sessionID: structuredBugContext.sessionID,
+    callID,
+  }, { output: contextReadOutput(action.request.path), title: "structured high bug context read", metadata: {} });
+}
+const structuredBugBeforeReport = JSON.parse(
+  await structuredBugPlugin.tool.quality_dossier_inspect.execute({}, structuredBugContext),
+);
+const structuredBugReport = JSON.parse(await structuredBugPlugin.tool.quality_context_report_update.execute({
+  expected_revision: structuredBugBeforeReport.context_report_revision,
+  observed_system_behavior: "The complete outline and source read show the bounded pre-fix behavior and its owner.",
+  owning_abstraction: "The src/file.mjs module is the observed owner of the bug behavior.",
+  input_summary: "The critical path receives the bounded reproducer input.",
+  output_summary: "The pre-fix path produces the failing-reproducer outcome.",
+  falsification_observation: "The trusted preimplementation check observes the expected failing reproducer.",
+  sibling_variant_observation: "The complete outline contains no additional sibling implementation.",
+  compatibility_observation: "The existing export path remains present and compatible.",
+  negative_path_observation: "The bounded source and reproducer expose the regression path.",
+  unresolved_questions: [],
+}, structuredBugContext));
+const structuredBugInspectionBridge = createNormalSessionQualityBridge({
+  ...options,
+  checkCatalog: bugEngineeringCatalog,
+  projectCatalog: bugProjectCatalog,
+});
+const structuredBugReportState = inspectNormalSessionQualityState(
+  structuredBugInspectionBridge,
+  structuredBugContext.sessionID,
+);
+const structuredBugReproducerObligationIds = structuredBugReportState.dossier.test_obligations
+  .filter((entry) => entry.phase === "preimplementation" && entry.kind === "reproducer")
+  .map((entry) => entry.id);
+assert.deepEqual(
+  structuredBugReport.report.task_evidence.reproduction_evidence_ids,
+  structuredBugReproducerObligationIds,
+  "compact high bug reports must bind reproduction evidence to test obligations, not context receipts",
+);
+assert.equal(
+  structuredBugReport.report.task_evidence.reproduction_evidence_ids
+    .some((entry) => structuredBugReportState.context_receipt_ids.includes(entry)),
+  false,
+  "context receipt identities must never be substituted for reproducer obligation identities",
+);
+const structuredBugContextDecision = JSON.parse(
+  await structuredBugPlugin.tool.quality_context_report_finalize.execute({
+    expected_revision: structuredBugReport.report.revision,
+  }, structuredBugContext),
+);
+assert.equal(structuredBugContextDecision.decision.status, "sufficient");
+assert.equal(structuredBugContextDecision.decision.reasons.length, 0);
+assert.equal(structuredBugContextDecision.decision.task_profile_evidence.checks[0].status, "passed");
+assert.equal(
+  structuredBugContextDecision.decision.task_profile_evidence.checks[0].observed_outcome,
+  "failing_reproducer",
+);
+
 const stateText = fs.readFileSync(normalSessionQualityStatePath(bridge, orchestrator.sessionID), "utf8");
 assert.equal(stateText.includes(orchestrator.sessionID), false, "raw host session ID must not be persisted");
 assert.equal(stateText.includes(tempRoot), false, "private absolute worktree path must not be persisted");
@@ -2647,7 +4300,7 @@ function rotationProjectCatalog({ engineeringTimeout = 120_000, harnessTimeout =
 const rotationPreviousCatalog = rotationProjectCatalog();
 const rotationCurrentCatalog = rotationProjectCatalog({
   engineeringTimeout: 300_000,
-  harnessTimeout: 600_000,
+  harnessTimeout: 900_000,
 });
 const rotationPreviousFingerprint = projectCheckCatalogFingerprint(rotationPreviousCatalog);
 const rotationCurrentFingerprint = projectCheckCatalogFingerprint(rotationCurrentCatalog);
@@ -2845,7 +4498,7 @@ function prepareCatalogRotationFixture(sessionID, { legacy = true } = {}) {
       {
         check_id: "normal-harness-static",
         previous_timeout_ms: 120_000,
-        next_timeout_ms: 600_000,
+        next_timeout_ms: 900_000,
       },
     ],
   };
@@ -3143,6 +4796,59 @@ function startAndGateScopeFixture(targetBridge, sessionID) {
   }, context);
   return context;
 }
+
+let settlementIndexRevision = 0;
+const settlementIndexObserver = () => fixtureWorkspaceSnapshot(
+  [{ path: "src/file.mjs", fingerprint: fingerprint({ file: "src/file.mjs", version: 0 }) }],
+  [],
+  fingerprint({ fixture: "task-settlement-index", revision: settlementIndexRevision }),
+);
+const settlementIndexBridge = createNormalSessionQualityBridge({
+  workspaceRoot: tempRoot,
+  checkCatalog: createDefaultNormalSessionCheckCatalog(),
+  standardLitePolicy: options.standardLitePolicy,
+  observeWorkspace: settlementIndexObserver,
+  affectedFileInspector: () => [],
+  runTrustedTarget,
+  evaluateGate: passedGate,
+  clock,
+  idFactory,
+});
+const settlementIndexContext = startAndGateScopeFixture(
+  settlementIndexBridge,
+  "session/task-settlement-index-change",
+);
+executeNormalSessionQualityTool(settlementIndexBridge, "quality_action_authorize", {
+  request: JSON.stringify({ expected_revision: 1, kind: "task", paths: ["src/file.mjs"], target_agent: "general" }),
+}, settlementIndexContext);
+handleNormalSessionToolBefore(settlementIndexBridge, {
+  tool: "task",
+  sessionID: settlementIndexContext.sessionID,
+  callID: "task-settlement-index-change",
+}, nativeTask("general"));
+const settlementIndexChild = "session/task-settlement-index-change/child";
+handleNormalSessionEvent(settlementIndexBridge, {
+  type: "session.created",
+  properties: { info: { id: settlementIndexChild, parentID: settlementIndexContext.sessionID } },
+});
+settlementIndexRevision += 1;
+assertContractError(() => handleNormalSessionToolAfter(settlementIndexBridge, {
+  tool: "task",
+  sessionID: settlementIndexContext.sessionID,
+  callID: "task-settlement-index-change",
+}), "QUALITY_WORKSPACE_INDEX_CHANGED");
+const settlementIndexState = inspectNormalSessionQualityState(
+  settlementIndexBridge,
+  settlementIndexContext.sessionID,
+);
+assert.equal(settlementIndexState.active_task_launch, null,
+  "a failed task settlement must release its serialized launch instead of permanently blocking the owner");
+assert(settlementIndexState.incomplete_reasons.includes("task_settlement_workspace_invalid"));
+assert.equal(inspectNormalSessionRegistration(
+  settlementIndexBridge,
+  settlementIndexContext.sessionID,
+).lifecycle, "failed", "an untrusted semantic index change must still fail closed");
+assert.equal(inspectNormalSessionQualityState(settlementIndexBridge, settlementIndexChild).status, "closed");
 
 const cumulativeFixture = createScopeLimitFixture();
 const cumulativeContext = startAndGateScopeFixture(cumulativeFixture.bridge, "session/standard-lite-cumulative");
@@ -3491,6 +5197,25 @@ for (const driftKind of ["malformed", "missing"]) {
   executeNormalSessionQualityTool(driftBridge, "quality_dossier_finalize", {
     request: JSON.stringify({ expected_revision: driftReviewer.dossier_revision }),
   }, driftContext);
+  executeNormalSessionQualityTool(driftBridge, "quality_action_authorize", {
+    request: JSON.stringify({
+      expected_revision: driftReviewer.dossier_revision,
+      kind: "edit",
+      paths: ["src/file.mjs"],
+    }),
+  }, driftContext);
+  const driftEditCallID = `call-catalog-${driftKind}-edit`;
+  handleNormalSessionToolBefore(driftBridge, {
+    tool: "edit",
+    sessionID: driftContext.sessionID,
+    callID: driftEditCallID,
+  }, nativeEdit());
+  currentPathVersions.set("src/file.mjs", (currentPathVersions.get("src/file.mjs") ?? 0) + 1);
+  handleNormalSessionToolAfter(driftBridge, {
+    tool: "edit",
+    sessionID: driftContext.sessionID,
+    callID: driftEditCallID,
+  });
   handleNormalSessionToolBefore(driftBridge, {
     tool: "task",
     sessionID: driftContext.sessionID,

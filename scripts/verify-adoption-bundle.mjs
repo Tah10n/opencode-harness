@@ -372,7 +372,7 @@ function expectQualityContractFailure(label, input) {
 }
 
 const DEFAULT_RUN_NODE_TIMEOUT_MS = 120_000;
-const STATIC_BUNDLE_VERIFIER_TIMEOUT_MS = 300_000;
+const STATIC_BUNDLE_VERIFIER_TIMEOUT_MS = 600_000;
 
 async function runNode(label, args, { timeout = DEFAULT_RUN_NODE_TIMEOUT_MS } = {}) {
   if (!Number.isSafeInteger(timeout) || timeout <= 0 || timeout > STATIC_BUNDLE_VERIFIER_TIMEOUT_MS) {

@@ -608,31 +608,67 @@ export async function executeDeterministicFixtureAdapter(request) {
   if (!verification.complete || !trustedCheck || trustedCheck.status !== "passed") {
     throw new ContractError("QUALITY_HOST_FIXTURE_VERIFICATION", "actual bridge verification lacks a passing trusted check receipt");
   }
-  const reconciliationFacts = {
-    changed_paths: [{
-      path: request.changed_path,
-      kind: "source",
-      ownership_ids: ["SLICE-standard-lite-owned"],
-      context_subject_ids: ["AREA-standard-lite-1"],
-      test_obligation_ids: ["TEST-standard-lite-1"],
-    }],
-    unexpected_public_contracts: [],
-    unexpected_dependency_directions: [],
-    unexpected_side_effect_edges: [],
-    unrelated_paths: [],
-    unplanned_items: [],
-  };
-  const reconciliationChecks = Object.fromEntries([
-    "changed_path_ownership", "public_contracts", "dependency_directions", "side_effect_edges",
-    "critical_path_tests", "unrelated_changes",
-  ].map((key) => [key, { status: "passed", finding_ids: [] }]));
+  const preReviewInspection = await invokeTool("quality_dossier_inspect", {}, owner);
+  const [reviewAction] = preReviewInspection.recommended_next_actions;
+  if (reviewAction?.tool_id !== "task" || reviewAction.target_agent !== "reviewer"
+    || reviewAction.assignment?.tool_id !== "quality_context_reviewer_record") {
+    throw new ContractError("QUALITY_HOST_FIXTURE_REVIEW", "fixture did not receive the runner-owned final reviewer assignment");
+  }
+  const reviewTaskCallId = "runtime-v2-final-review-task";
+  const reviewer = { sessionID: "runtime-v2/final-reviewer", agent: "reviewer" };
+  await invokeHook(
+    "tool.execute.before",
+    "tool_execute_before",
+    { tool: "task", sessionID: owner.sessionID, callID: reviewTaskCallId },
+    { args: { description: "reviewer task", prompt: "bounded task", subagent_type: "reviewer" } },
+  );
+  await invokeHook("event", "event", {
+    event: {
+      type: "session.created",
+      properties: { info: { id: reviewer.sessionID, parentID: owner.sessionID } },
+    },
+  });
+  const reviewSourceByPath = new Map();
+  for (const [index, requiredPath] of reviewAction.assignment.required_read_paths.entries()) {
+    const source = fs.readFileSync(path.join(workspaceRoot, requiredPath), "utf8");
+    reviewSourceByPath.set(requiredPath, source);
+    const callID = `runtime-v2-final-review-read-${index + 1}`;
+    await invokeHook(
+      "tool.execute.before",
+      "tool_execute_before",
+      { tool: "context_read", sessionID: reviewer.sessionID, callID },
+      { args: { path: requiredPath, startLine: 1, maxLines: Math.max(1, source.split(/\r?\n/u).length), maxBytes: 4096, format: "text" } },
+    );
+    await invokeHook(
+      "tool.execute.after",
+      "tool_execute_after",
+      { tool: "context_read", sessionID: reviewer.sessionID, callID },
+      { output: runtimeContextReadOutput(requiredPath, source), title: "final reviewer evidence read", metadata: {} },
+    );
+  }
+  const reviewClauses = reviewAction.assignment.review_contract.review_clauses;
+  const clauseEvidencePaths = reviewClauses.map((entry, index) => (
+    reviewAction.assignment.required_read_paths[index % reviewAction.assignment.required_read_paths.length]
+  ));
   await invokeTool("quality_context_reviewer_record", {
-    ...reconciliationFacts,
-    checks: reconciliationChecks,
-  }, { ...owner, agent: "reviewer" });
+    outcome: "passed",
+    reviewed_clause_ids: reviewClauses.map((entry) => entry.id),
+    clause_evidence_paths: clauseEvidencePaths,
+    clause_evidence_snippets: clauseEvidencePaths.map((evidencePath) => (
+      reviewSourceByPath.get(evidencePath).split(/\r?\n/u).find((line) => line.trim().length >= 4)?.trim()
+    )),
+    clause_evidence_summaries: reviewClauses.map((entry, index) => (
+      `${entry.id}: input=runtime-fixture-${index + 1}; observed=current source and passing probe preserve ${entry.category}; expected=${entry.category} contract remains satisfied; verdict=match`
+    )),
+  }, reviewer);
+  await invokeHook(
+    "tool.execute.after",
+    "tool_execute_after",
+    { tool: "task", sessionID: owner.sessionID, callID: reviewTaskCallId },
+    { output: "review complete", title: "final reviewer", metadata: {} },
+  );
   const contextReconciliation = await invokeTool("quality_context_reconcile", {
     evidence_mode: "reviewer_grounded",
-    ...reconciliationFacts,
   }, owner);
   if (contextReconciliation.status !== "passed" || contextReconciliation.graph_completeness !== "not_claimed") {
     throw new ContractError("QUALITY_HOST_FIXTURE_RECONCILIATION", "reviewer-grounded final context reconciliation did not pass honestly");

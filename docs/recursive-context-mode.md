@@ -102,8 +102,10 @@ Use recursive-context mode automatically when a task is broad enough that direct
 
 Recommended sequence for high or critical instrumented work:
 
-1. After classification, create the provisional Engineering Dossier draft and
-   provisional impact graph.
+1. After classification, accept the runner-seeded provisional Engineering
+   Dossier draft, inferred partial impact graph, and linked draft report. They
+   carry a blocking unknown and are scaffolding for discovery, not evidence of
+   completeness.
 2. Start with `context_outline` or repo workflow guidance.
 3. Use `context_files`, `context_search`, and bounded `context_read` ranges to
    identify likely entry points, tests, contracts, and docs.

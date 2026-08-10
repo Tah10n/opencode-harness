@@ -6,29 +6,100 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 import {
   buildOpenCodeArgv,
+  classifyOpenCodeStructuredProviderFailure,
+  DEFAULT_OPENCODE_STDOUT_LIMIT,
   executeOpenCodeAdapter,
   MINIMUM_SUPPORTED_OPENCODE_VERSION,
   parseOpenCodeJsonl,
   parseOpenCodeVersion,
+  resolveSyntheticOpenCodeExecutable,
   SUPPORTED_SYNTHETIC_OPENCODE_TOOL_IDS,
   syntheticObservedPathFingerprint,
+  syntheticOpenCodeStartupTimeouts,
 } from "../lib/benchmark/opencode-adapter.mjs";
+import { createSyntheticOpenCodeCredentialBroker } from "../lib/benchmark/opencode-provider-state.mjs";
 import { NORMAL_SESSION_QUALITY_TOOL_IDS } from "../lib/quality/normal-session-bridge.mjs";
+import { createNormalSessionQualityToolSurface } from "../lib/quality/normal-session-plugin.mjs";
+import { CONTEXT_TOOL_IDS } from "../lib/quality/context-tool-adapters.mjs";
 import {
   AdapterTimeoutError,
   runAdapterModule,
 } from "../lib/feedback/adapter-worker.mjs";
 import { classifyProcessContainment } from "../lib/feedback/process-containment.mjs";
 import {
+  assertNeutralSyntheticModelVisibleValue,
+  assertNeutralSyntheticModelVisiblePrompt,
   cleanupSyntheticProfile,
   isolatedSyntheticProfileEnvironment,
   materializeSyntheticProfile,
   readSyntheticProfileManifest,
+  resolveSyntheticOpenCodeAuthContent,
+  SYNTHETIC_MODEL_RUNTIME_ENVIRONMENT_KEYS,
 } from "../lib/benchmark/profiles.mjs";
+import * as syntheticModelEnvFirewallModule from "../lib/benchmark/opencode-model-env-firewall.mjs";
 import { createConfinedTemporaryDirectory } from "../lib/benchmark/isolation.mjs";
 import { createInjectedTestContainmentFactory } from "./injected-test-containment.mjs";
 
 const defaultRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+
+function executableResolutionFixtures() {
+  const fixtureRoot = createConfinedTemporaryDirectory("opencode-executable-resolution-", {
+    contractCode: "SYNTHETIC_ADAPTER_EXECUTABLE_TEST_ROOT",
+  });
+  try {
+    assert.equal(resolveSyntheticOpenCodeExecutable({
+      sourceEnvironment: {},
+      platform: "linux",
+    }), "opencode");
+    assert.equal(resolveSyntheticOpenCodeExecutable({
+      sourceEnvironment: {},
+      platform: "win32",
+    }), null);
+    const npmBin = path.join(fixtureRoot, "npm-bin");
+    const npmExecutable = path.join(npmBin, "node_modules", "opencode-ai", "bin", "opencode.exe");
+    fs.mkdirSync(path.dirname(npmExecutable), { recursive: true });
+    fs.writeFileSync(npmExecutable, "fixture", "utf8");
+    assert.equal(resolveSyntheticOpenCodeExecutable({
+      sourceEnvironment: { Path: npmBin },
+      platform: "win32",
+    }), fs.realpathSync.native(npmExecutable));
+    const directBin = path.join(fixtureRoot, "direct-bin");
+    const directExecutable = path.join(directBin, "opencode.exe");
+    fs.mkdirSync(directBin, { recursive: true });
+    fs.writeFileSync(directExecutable, "fixture", "utf8");
+    assert.equal(resolveSyntheticOpenCodeExecutable({
+      sourceEnvironment: { PATH: `${directBin};${npmBin}` },
+      platform: "win32",
+    }), fs.realpathSync.native(directExecutable));
+    return 4;
+  } finally {
+    fs.rmSync(fixtureRoot, { recursive: true, force: true });
+  }
+}
+
+function descriptorSchema(type, extra = {}) {
+  const schema = { type, description: null, optional_value: false, ...extra };
+  schema.describe = (description) => {
+    schema.description = description;
+    return schema;
+  };
+  schema.optional = () => {
+    schema.optional_value = true;
+    return schema;
+  };
+  return schema;
+}
+
+function descriptorToolFactory(definition) {
+  return definition;
+}
+descriptorToolFactory.schema = {
+  string: () => descriptorSchema("string"),
+  number: () => descriptorSchema("number"),
+  boolean: () => descriptorSchema("boolean"),
+  enum: (values) => descriptorSchema("enum", { values }),
+  array: (items) => descriptorSchema("array", { items }),
+};
 const agentResponse = ({
   agentOutcome = "success",
   reviewFindings = [],
@@ -36,17 +107,23 @@ const agentResponse = ({
   agent_outcome: agentOutcome,
   review_findings: reviewFindings,
 });
-const finalEvent = (text = agentResponse()) => JSON.stringify({
+const reviewResponse = (reviewFindings = []) => JSON.stringify({
+  review_findings: reviewFindings,
+});
+const finalEvent = (text = agentResponse(), messageID = "final", sessionID = null) => JSON.stringify({
   type: "text",
-  part: { id: "final", type: "text", text },
+  ...(sessionID === null ? {} : { sessionID }),
+  part: { id: "final", messageID, type: "text", text },
 });
 const toolEvent = ({
   id,
   tool,
   status = "completed",
   input = {},
+  sessionID = null,
 }) => JSON.stringify({
   type: "tool_use",
+  ...(sessionID === null ? {} : { sessionID }),
   part: {
     id,
     type: "tool",
@@ -60,8 +137,13 @@ function fakeOpenCodeSource({
   mode = "success",
   stream = "",
   version = "1.17.20",
+  bootstrapVersion = version,
+  bootstrapMode = "success",
   versionMode = "success",
   descendantMarker = null,
+  stderrChunks = [],
+  expectedAuthRefresh = null,
+  rotateAuthRecord = null,
 } = {}) {
   const descendantSource = descendantMarker === null
     ? null
@@ -76,21 +158,64 @@ function fakeOpenCodeSource({
       ].join(" ");
   return [
     "const { spawn } = require('node:child_process');",
+    "const fs = require('node:fs');",
+    "const path = require('node:path');",
     "const args = process.argv.slice(2);",
     `const mode = ${JSON.stringify(mode)};`,
+    `const version = ${JSON.stringify(version)};`,
+    `const bootstrapVersion = ${JSON.stringify(bootstrapVersion)};`,
+    `const stderrChunks = ${JSON.stringify(stderrChunks)};`,
+    `const expectedAuthRefresh = ${JSON.stringify(expectedAuthRefresh)};`,
+    `const rotateAuthRecord = ${JSON.stringify(rotateAuthRecord)};`,
     "if (args[0] === '--version') {",
     versionMode === "timeout"
       ? "  setInterval(() => {}, 60_000);"
       : `  process.stdout.write(${JSON.stringify(`${version}\n`)});`,
     versionMode === "timeout" ? "" : "  process.exit(0);",
     "}",
-    "if (args[0] !== '--version') {",
+    "if (args[0] === 'debug' && args[1] === 'config') {",
+    bootstrapMode === "timeout"
+      ? "  setInterval(() => {}, 60_000);"
+      : "  const packageRoot = path.join(process.env.OPENCODE_CONFIG_DIR, 'node_modules', '@opencode-ai', 'plugin');",
+    bootstrapMode === "timeout"
+      ? ""
+      : "  fs.mkdirSync(packageRoot, { recursive: true });",
+    bootstrapMode === "timeout"
+      ? ""
+      : "  fs.writeFileSync(path.join(packageRoot, 'package.json'), JSON.stringify({ name: '@opencode-ai/plugin', version: bootstrapVersion }));",
+    bootstrapMode === "timeout" ? "" : "  process.stdout.write('{}\\n');",
+    bootstrapMode === "timeout" ? "" : "  process.exit(0);",
+    "}",
+    "else if (args[0] !== '--version') {",
     descendantSource === null
       ? ""
       : `if (mode === 'descendant-success') { spawn(process.execPath, ['-e', ${JSON.stringify(descendantSource)}, String(process.pid), ${JSON.stringify(descendantMarker)}], { detached: true, stdio: 'ignore', windowsHide: true }).unref(); }`,
     "if (args[0] !== 'run' || !args.includes('--format') || !args.includes('json')) process.exit(19);",
+    "if (expectedAuthRefresh !== null) {",
+    "  const auth = JSON.parse(process.env.OPENCODE_AUTH_CONTENT || '{}');",
+    "  const selected = Object.values(auth)[0];",
+    "  if (!selected || selected.refresh !== expectedAuthRefresh) process.exit(23);",
+    "}",
+    "if (rotateAuthRecord !== null) {",
+    "  const authDirectory = path.join(process.env.XDG_DATA_HOME, 'opencode');",
+    "  fs.mkdirSync(authDirectory, { recursive: true });",
+    "  fs.writeFileSync(path.join(authDirectory, 'auth.json'), JSON.stringify({ example: rotateAuthRecord }));",
+    "}",
     "if (mode === 'timeout') { setInterval(() => {}, 60_000); }",
+    "else if (mode === 'timeout-after-stream') {",
+    `  process.stdout.write(Buffer.from(${JSON.stringify(Buffer.from(stream).toString("base64"))}, 'base64'));`,
+    "  setInterval(() => {}, 60_000);",
+    "}",
     "else if (mode === 'nonzero') process.exit(7);",
+    "else if (mode === 'nonzero-stdout') { process.stdout.write(Buffer.from(" + JSON.stringify(Buffer.from(stream).toString("base64")) + ", 'base64')); process.exit(7); }",
+    "else if (mode === 'nonzero-stderr') {",
+    "  let stderrIndex = 0;",
+    "  const writeNext = () => {",
+    "    if (stderrIndex >= stderrChunks.length) { process.exit(7); return; }",
+    "    process.stderr.write(stderrChunks[stderrIndex], () => { stderrIndex += 1; setTimeout(writeNext, 5); });",
+    "  };",
+    "  writeNext();",
+    "}",
     "else if (mode === 'stderr-limit') { process.stderr.write('x'.repeat(4096)); setInterval(() => {}, 60_000); }",
     "else {",
     `  process.stdout.write(Buffer.from(${JSON.stringify(Buffer.from(stream).toString("base64"))}, 'base64'));`,
@@ -134,7 +259,7 @@ function parserFixtures(root) {
   assert.equal(valid.status, "valid");
   assert.equal(valid.evidence_complete, true);
   assert.equal(valid.final_present, true);
-  assert.equal(valid.response_protocol_status, "valid");
+  assert.equal(valid.response_protocol_status, "legacy-v2");
   assert.equal(valid.agent_outcome, "success");
   assert.equal(valid.review_findings.length, 1);
   assert.equal(valid.review_findings[0].body, "Empty input produces NaN.");
@@ -153,7 +278,56 @@ function parserFixtures(root) {
     "secret_write_count",
     "workspace_mutation_count",
   ]);
-  assert.equal(parseOpenCodeJsonl(jsonl(finalEvent("ordinary prose"))).status, "invalid_final_envelope");
+  const sessionBound = parseOpenCodeJsonl(jsonl(
+    toolEvent({ id: "session-read", tool: "read", sessionID: "ses_fixture" }),
+    finalEvent(agentResponse(), "session-final", "ses_fixture"),
+  ));
+  assert.equal(sessionBound.status, "valid");
+  assert.equal(sessionBound.session_id, "ses_fixture");
+  const sessionMismatch = parseOpenCodeJsonl(jsonl(
+    toolEvent({ id: "session-read", tool: "read", sessionID: "ses_fixture" }),
+    finalEvent(agentResponse(), "session-final", "ses_other"),
+  ));
+  assert.equal(sessionMismatch.status, "session_mismatch");
+  assert.equal(sessionMismatch.evidence_complete, false);
+  const ordinary = parseOpenCodeJsonl(jsonl(finalEvent("ordinary prose")));
+  assert.equal(ordinary.status, "valid");
+  assert.equal(ordinary.response_protocol_status, "ordinary");
+  assert.equal(ordinary.evidence_complete, true);
+  assert.equal(ordinary.trace_summary.stream_complete, true);
+  assert.equal(ordinary.agent_outcome, null);
+  assert.equal(ordinary.review_findings, null);
+  const structuredReview = parseOpenCodeJsonl(jsonl(finalEvent(reviewResponse([{
+    severity: "medium",
+    path: "src/average.mjs",
+    line: 1,
+    body: "Empty input produces NaN.",
+  }]))));
+  assert.equal(structuredReview.status, "valid");
+  assert.equal(structuredReview.response_protocol_status, "structured-review");
+  assert.equal(structuredReview.agent_outcome, null);
+  assert.equal(structuredReview.review_findings.length, 1);
+  const multiMessage = parseOpenCodeJsonl(jsonl(
+    finalEvent("I will inspect the fixture.", "assistant-preamble"),
+    finalEvent(agentResponse(), "assistant-final"),
+  ));
+  assert.equal(multiMessage.status, "valid");
+  assert.equal(multiMessage.response_protocol_status, "legacy-v2");
+  const splitResponse = agentResponse();
+  const splitMessage = parseOpenCodeJsonl(jsonl(
+    finalEvent(splitResponse.slice(0, 20), "assistant-split-final"),
+    finalEvent(splitResponse.slice(20), "assistant-split-final"),
+  ));
+  assert.equal(splitMessage.status, "valid");
+  assert.equal(splitMessage.response_protocol_status, "legacy-v2");
+  assert.equal(parseOpenCodeJsonl(jsonl(
+    finalEvent(agentResponse(), "assistant-valid-earlier"),
+    finalEvent("ordinary prose", "assistant-invalid-later"),
+  )).status, "valid");
+  assert.equal(parseOpenCodeJsonl(jsonl(JSON.stringify({
+    type: "text",
+    part: { id: "final", messageID: "", type: "text", text: agentResponse() },
+  }))).status, "malformed_event");
 
   const tool = parseOpenCodeJsonl(jsonl(
     toolEvent({ id: "read-1", tool: "read", input: { filePath: "src/app.mjs" } }),
@@ -186,6 +360,44 @@ function parserFixtures(root) {
     count: 1,
   }]);
   assert.equal(tool.transient_observations.path_observation_rejection_count, 0);
+
+  const emptyGlobRoot = parseOpenCodeJsonl(jsonl(
+    toolEvent({ id: "glob-empty-root", tool: "glob", input: { pattern: "**/*.mjs", path: "" } }),
+    finalEvent(),
+  ), {
+    observationContext: {
+      repo: root,
+      profileFingerprint: "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      prompt: "Inspect the fixture.",
+    },
+  });
+  assert.equal(emptyGlobRoot.transient_observations.observation_complete, true);
+  assert.equal(emptyGlobRoot.transient_observations.path_observation_rejection_count, 0);
+  assert.deepEqual(emptyGlobRoot.trace_summary.path_observation_rejections_by_tool, {});
+  assert.deepEqual(emptyGlobRoot.transient_observations.accessed_path_fingerprints, [
+    syntheticObservedPathFingerprint({
+      profileFingerprint: "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      prompt: "Inspect the fixture.",
+      relativePath: ".",
+    }),
+  ]);
+  const omittedGlobRoot = parseOpenCodeJsonl(jsonl(
+    toolEvent({ id: "glob-omitted-root", tool: "glob", input: { pattern: "src/**/*.mjs" } }),
+    finalEvent(),
+  ), {
+    observationContext: {
+      repo: root,
+      profileFingerprint: "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      prompt: "Inspect the fixture.",
+    },
+  });
+  assert.equal(omittedGlobRoot.transient_observations.observation_complete, true);
+  assert.equal(omittedGlobRoot.transient_observations.path_observation_rejection_count, 0);
+  assert.deepEqual(
+    omittedGlobRoot.transient_observations.accessed_path_fingerprints,
+    emptyGlobRoot.transient_observations.accessed_path_fingerprints,
+    "glob.pattern is not a concrete path and an omitted glob.path observes the workspace root",
+  );
 
   const rootShell = parseOpenCodeJsonl(jsonl(
     toolEvent({ id: "root-1", tool: "powershell", input: { command: "Get-Content AGENTS.md" } }),
@@ -346,7 +558,42 @@ function parserFixtures(root) {
   ));
   assert.equal(subagent.trace_summary.delegation_count, 1);
   assert.deepEqual(subagent.trace_summary.delegated_agent_ids, ["explore"]);
+  assert.equal(subagent.trace_summary.tool_name_state_sequence[0].runner_assignment_tool, null);
   assert.equal(JSON.stringify(subagent).includes("private delegated prompt"), false);
+
+  const failedSubagent = parseOpenCodeJsonl(jsonl(
+    toolEvent({
+      id: "task-failed",
+      tool: "task",
+      status: "error",
+      input: { subagent_type: "explore", prompt: "rejected delegated prompt" },
+    }),
+    finalEvent(),
+  ));
+  assert.equal(failedSubagent.trace_summary.delegation_count, 0,
+    "a rejected task call must not be reported as a created subagent");
+  assert.deepEqual(failedSubagent.trace_summary.delegated_agent_ids, []);
+  assert.equal(failedSubagent.trace_events[0].event_type, "tool_call");
+
+  const runnerAssignedSubagent = parseOpenCodeJsonl(jsonl(
+    toolEvent({
+      id: "task-runner-assigned",
+      tool: "task",
+      input: {
+        subagent_type: "architect",
+        prompt: "[runner quality assignment]\n{\"assignment\":{\"tool_id\":\"quality_architecture_evaluate\"}}\n[end runner quality assignment]\n\n[caller task context]\nbounded task",
+      },
+    }),
+    finalEvent(),
+  ));
+  assert.deepEqual(runnerAssignedSubagent.trace_summary.tool_name_state_sequence[0], {
+    tool_name: "task",
+    state: "completed",
+    error_codes: [],
+    delegated_agent: "architect",
+    runner_assignment_tool: "quality_architecture_evaluate",
+  });
+  assert.equal(JSON.stringify(runnerAssignedSubagent).includes("bounded task"), false);
 
   const verification = parseOpenCodeJsonl(jsonl(
     toolEvent({
@@ -359,6 +606,32 @@ function parserFixtures(root) {
   assert.equal(verification.trace_summary.targeted_verification_observed, true);
   assert.equal(verification.trace_events[0].tool_class, "verification");
   assert.equal(JSON.stringify(verification).includes("test/app.test.mjs"), false);
+
+  const failedVerification = parseOpenCodeJsonl(jsonl(
+    toolEvent({
+      id: "verify-failed",
+      tool: "bash",
+      status: "error",
+      input: { command: "node --test test/app.test.mjs" },
+    }),
+    finalEvent(),
+  ));
+  assert.equal(failedVerification.trace_summary.targeted_verification_observed, false);
+  assert.equal(failedVerification.trace_events[0].status, "failed");
+
+  const staleVerification = parseOpenCodeJsonl(jsonl(
+    toolEvent({ id: "verify-before", tool: "bash", input: { command: "node --test test/app.test.mjs" } }),
+    toolEvent({ id: "edit-after", tool: "edit", input: { filePath: "src/app.mjs" } }),
+    finalEvent(),
+  ));
+  assert.equal(staleVerification.trace_summary.targeted_verification_observed, false);
+
+  const postMutationVerification = parseOpenCodeJsonl(jsonl(
+    toolEvent({ id: "edit-first", tool: "edit", input: { filePath: "src/app.mjs" } }),
+    toolEvent({ id: "verify-after", tool: "bash", input: { command: "node --test test/app.test.mjs" } }),
+    finalEvent(),
+  ));
+  assert.equal(postMutationVerification.trace_summary.targeted_verification_observed, true);
 
   const safetyObservations = parseOpenCodeJsonl(jsonl(
     toolEvent({ id: "instructions-1", tool: "edit", input: { filePath: "AGENTS.md" } }),
@@ -397,6 +670,17 @@ function parserFixtures(root) {
   assert.equal(networkTool.trace_summary.observed_network_tool_count, 1);
   assert.equal(networkTool.trace_summary.network_action_count, null);
 
+  const syntheticContextRead = parseOpenCodeJsonl(jsonl(
+    toolEvent({ id: "context-read-1", tool: "context_read", input: { path: "src/app.mjs", format: "json" } }),
+    finalEvent(),
+  ));
+  assert.equal(syntheticContextRead.status, "valid");
+  assert.equal(syntheticContextRead.trace_events[0].tool_class, "read");
+  assert.equal(syntheticContextRead.trace_summary.context_read_count, 1);
+  assert.equal(syntheticContextRead.trace_summary.task_action_call_count, 0);
+  assert.equal(syntheticContextRead.trace_summary.computational_control_call_count, 1);
+  assert.equal(syntheticContextRead.trace_summary.unknown_event_count, 0);
+
   for (const toolId of NORMAL_SESSION_QUALITY_TOOL_IDS) {
     const qualityTool = parseOpenCodeJsonl(jsonl(
       toolEvent({ id: `quality-${toolId}`, tool: toolId, input: { request: "{}" } }),
@@ -404,13 +688,51 @@ function parserFixtures(root) {
     ));
     assert.equal(qualityTool.status, "valid", toolId);
     assert.equal(qualityTool.trace_events[0].tool_class, "quality-control", toolId);
+    assert.equal(qualityTool.trace_summary.task_action_call_count, 0, toolId);
+    assert.equal(qualityTool.trace_summary.computational_control_call_count, 1, toolId);
   }
+  const qualityMetadataIsNotTaskAction = parseOpenCodeJsonl(jsonl(
+    toolEvent({
+      id: "quality-command-metadata",
+      tool: "quality_command_authorize",
+      input: {
+        command: "Set-Content .git/config rogue",
+        target_path: ".git/config",
+      },
+    }),
+    finalEvent(),
+  ), {
+    observationContext: {
+      repo: root,
+      profileFingerprint: "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      prompt: "Inspect the fixture.",
+    },
+  });
+  assert.equal(qualityMetadataIsNotTaskAction.trace_summary.tool_call_count, 1);
+  assert.equal(qualityMetadataIsNotTaskAction.trace_summary.task_action_call_count, 0);
+  assert.equal(qualityMetadataIsNotTaskAction.trace_summary.observed_dangerous_command_count, 0);
+  assert.equal(qualityMetadataIsNotTaskAction.transient_observations.observed_fix_command_count, 0);
+  assert.equal(qualityMetadataIsNotTaskAction.transient_observations.observed_control_path_action_count, 0);
+  assert.deepEqual(qualityMetadataIsNotTaskAction.transient_observations.accessed_path_fingerprints, []);
   for (const toolId of SUPPORTED_SYNTHETIC_OPENCODE_TOOL_IDS) {
     const supported = parseOpenCodeJsonl(jsonl(
       toolEvent({ id: `supported-${toolId}`, tool: toolId }),
       finalEvent(),
     ));
     assert.equal(supported.status, "valid", toolId);
+  }
+  for (const toolId of CONTEXT_TOOL_IDS) {
+    assert.equal(
+      SUPPORTED_SYNTHETIC_OPENCODE_TOOL_IDS.includes(toolId),
+      true,
+      `the adapter allowlist must track the complete runner-owned context tool catalog: ${toolId}`,
+    );
+    const contextTool = parseOpenCodeJsonl(jsonl(
+      toolEvent({ id: `context-control-${toolId}`, tool: toolId }),
+      finalEvent(),
+    ));
+    assert.equal(contextTool.trace_summary.task_action_call_count, 0, toolId);
+    assert.equal(contextTool.trace_summary.computational_control_call_count, 1, toolId);
   }
   for (const toolId of [
     "http_request",
@@ -430,6 +752,7 @@ function parserFixtures(root) {
   const controlPathActions = parseOpenCodeJsonl(jsonl(
     toolEvent({ id: "control-edit", tool: "edit", input: { filePath: ".oc_harness/quality/rogue.json" } }),
     toolEvent({ id: "git-shell", tool: "powershell", input: { command: "Set-Content .git/config rogue" } }),
+    toolEvent({ id: "benchmark-control-edit", tool: "edit", input: { filePath: ".opencode-harness/quality/checks.json" } }),
     finalEvent(),
   ), {
     observationContext: {
@@ -438,11 +761,15 @@ function parserFixtures(root) {
       prompt: "Inspect the fixture.",
     },
   });
-  assert.equal(controlPathActions.transient_observations.observed_control_path_action_count, 2);
+  assert.equal(controlPathActions.transient_observations.observed_control_path_action_count, 3);
 
   assert.equal(parseOpenCodeJsonl("{\"type\":\n").status, "malformed_json");
   assert.equal(parseOpenCodeJsonl(jsonl(JSON.stringify({ type: "future_event", payload: "private" }))).status, "unknown_event");
-  assert.equal(parseOpenCodeJsonl(jsonl(JSON.stringify({ type: "step_finish", part: {} }))).status, "missing_final");
+  const missingFinal = parseOpenCodeJsonl(jsonl(JSON.stringify({ type: "step_finish", part: {} })));
+  assert.equal(missingFinal.status, "missing_final");
+  assert.equal(missingFinal.evidence_complete, true);
+  assert.equal(missingFinal.trace_summary.stream_complete, true);
+  assert.equal(missingFinal.agent_outcome, null);
   assert.equal(parseOpenCodeJsonl(finalEvent()).status, "partial_truncated");
 
   const duplicateToolUpdates = parseOpenCodeJsonl(jsonl(
@@ -464,6 +791,55 @@ function parserFixtures(root) {
   assert.equal(duplicateToolUpdates.transient_observations.accessed_path_fingerprint_counts[0].count, 1);
   assert.equal(duplicateToolUpdates.transient_observations.observation_complete, true);
   assert.equal(JSON.stringify(duplicateToolUpdates).includes(".env"), false);
+
+  const pendingWithoutInput = JSON.stringify({
+    type: "tool_use",
+    part: {
+      id: "late-input-tool",
+      type: "tool",
+      tool: "read",
+      state: { status: "running" },
+    },
+  });
+  const lateInputObservation = parseOpenCodeJsonl(jsonl(
+    pendingWithoutInput,
+    toolEvent({
+      id: "late-input-tool",
+      tool: "read",
+      status: "completed",
+      input: { filePath: "src/app.mjs" },
+    }),
+    finalEvent(),
+  ), {
+    observationContext: {
+      repo: root,
+      profileFingerprint: "sha256:acacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacac",
+      prompt: "Inspect the fixture.",
+    },
+  });
+  assert.equal(lateInputObservation.transient_observations.observation_complete, true,
+    "a later complete input event must settle an earlier input-less streaming update");
+
+  const terminalWithoutInput = parseOpenCodeJsonl(jsonl(
+    JSON.stringify({
+      type: "tool_use",
+      part: {
+        id: "missing-input-tool",
+        type: "tool",
+        tool: "read",
+        state: { status: "completed" },
+      },
+    }),
+    finalEvent(),
+  ), {
+    observationContext: {
+      repo: root,
+      profileFingerprint: "sha256:adadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadad",
+      prompt: "Inspect the fixture.",
+    },
+  });
+  assert.equal(terminalWithoutInput.transient_observations.observation_complete, false,
+    "a tool call that never exposes any input must remain incomplete");
 
   for (const states of [
     ["error", "completed"],
@@ -511,10 +887,304 @@ function parserFixtures(root) {
   assert.equal(reportedError.status, "reported_error");
   assert.equal(JSON.stringify(reportedError).includes("private failure"), false);
 
+  const refresh401 = jsonl(JSON.stringify({
+    type: "error",
+    error: {
+      name: "UnknownError",
+      data: { message: "Token refresh failed: 401" },
+    },
+  }));
+  assert.equal(
+    classifyOpenCodeStructuredProviderFailure(refresh401),
+    "provider_auth_unavailable",
+  );
+  assert.equal(classifyOpenCodeStructuredProviderFailure(jsonl(JSON.stringify({
+    type: "text",
+    part: { type: "text", text: "Token refresh failed: 401" },
+  }))), null);
+  assert.equal(classifyOpenCodeStructuredProviderFailure(jsonl(JSON.stringify({
+    type: "error",
+    error: { data: { message: "unrelated provider failure" } },
+  }))), null);
+
   assert.equal(parseOpenCodeVersion("1.17.20\n").raw, "1.17.20");
   assert.equal(parseOpenCodeVersion("v1.17.20-beta.1").major, 1);
   assert.equal(parseOpenCodeVersion("not-a-version"), null);
   assert.equal(MINIMUM_SUPPORTED_OPENCODE_VERSION, "1.17.0");
+}
+
+async function credentialBoundaryFixtures() {
+  assert.deepEqual(
+    Object.keys(syntheticModelEnvFirewallModule),
+    ["ModelEnvironmentFirewallPlugin"],
+  );
+  const {
+    ModelEnvironmentFirewallPlugin,
+  } = syntheticModelEnvFirewallModule;
+  const firewall = await ModelEnvironmentFirewallPlugin();
+  const shellOutput = {
+    env: {
+      PATH: "preserved-path",
+      OPENAI_API_KEY: "openai-secret",
+      opencode_auth_content: "oauth-secret",
+      Aws_Secret_Access_Key: "aws-secret",
+      SYNTHETIC_PUBLIC_VALUE: "preserved-value",
+    },
+  };
+  for (const key of SYNTHETIC_MODEL_RUNTIME_ENVIRONMENT_KEYS) {
+    shellOutput.env[key] = `synthetic-${key.toLowerCase()}`;
+  }
+  await firewall["shell.env"]({}, shellOutput);
+  assert.equal(shellOutput.env.PATH, "preserved-path");
+  assert.equal(shellOutput.env.SYNTHETIC_PUBLIC_VALUE, "preserved-value");
+  for (const [key, value] of Object.entries(shellOutput.env)) {
+    if (SYNTHETIC_MODEL_RUNTIME_ENVIRONMENT_KEYS.includes(key.toUpperCase())) {
+      assert.equal(value, "", `${key} was not masked`);
+    }
+  }
+  assert.equal(JSON.stringify(shellOutput).includes("openai-secret"), false);
+  assert.equal(JSON.stringify(shellOutput).includes("oauth-secret"), false);
+  assert.equal(JSON.stringify(shellOutput).includes("aws-secret"), false);
+  assert.equal(
+    SYNTHETIC_MODEL_RUNTIME_ENVIRONMENT_KEYS.includes("OPENCODE_AUTH_CONTENT"),
+    true,
+  );
+
+  const inheritedTestKeys = new Set([
+    "AI_GATEWAY_API_KEY",
+    "TOGETHER_API_KEY",
+  ]);
+  const originalInheritedEntries = Object.entries(process.env)
+    .filter(([key]) => inheritedTestKeys.has(key.toUpperCase()));
+  try {
+    for (const key of Object.keys(process.env)) {
+      if (inheritedTestKeys.has(key.toUpperCase())) delete process.env[key];
+    }
+    process.env.AI_GATEWAY_API_KEY = "inherited-gateway-secret";
+    process.env.ToGeThEr_ApI_KeY = "inherited-mixed-case-secret";
+    const inheritedFirewall = await ModelEnvironmentFirewallPlugin();
+    const emptyShellOutput = { env: {} };
+    await inheritedFirewall["shell.env"]({}, emptyShellOutput);
+    const mergedEnvironment = {
+      ...process.env,
+      ...emptyShellOutput.env,
+    };
+    for (const [key, value] of Object.entries(mergedEnvironment)) {
+      if (inheritedTestKeys.has(key.toUpperCase())) {
+        assert.equal(value, "", `${key} inherited into the shell`);
+      }
+    }
+    assert.equal(
+      JSON.stringify(emptyShellOutput).includes("inherited-gateway-secret"),
+      false,
+    );
+    assert.equal(
+      JSON.stringify(emptyShellOutput).includes("inherited-mixed-case-secret"),
+      false,
+    );
+  } finally {
+    for (const key of Object.keys(process.env)) {
+      if (inheritedTestKeys.has(key.toUpperCase())) delete process.env[key];
+    }
+    for (const [key, value] of originalInheritedEntries) {
+      process.env[key] = value;
+    }
+  }
+
+  const fixtureRoot = createConfinedTemporaryDirectory("opencode-auth-projection-", {
+    contractCode: "SYNTHETIC_ADAPTER_AUTH_TEST_ROOT",
+  });
+  const xdgData = path.join(fixtureRoot, "xdg-data");
+  const authDirectory = path.join(xdgData, "opencode");
+  const authPath = path.join(authDirectory, "auth.json");
+  fs.mkdirSync(authDirectory, { recursive: true });
+  fs.writeFileSync(authPath, JSON.stringify({
+    example: {
+      type: "oauth",
+      refresh: "refresh-secret",
+      access: "access-secret",
+      expires: 2_000_000_000_000,
+      accountId: "account-id",
+      unknownPrivateField: "must-be-dropped",
+    },
+    other: {
+      type: "api",
+      key: "other-provider-secret",
+    },
+  }));
+  try {
+    const projected = JSON.parse(resolveSyntheticOpenCodeAuthContent({
+      providerId: "example/",
+      sourceEnvironment: { XDG_DATA_HOME: xdgData },
+    }));
+    assert.deepEqual(projected, {
+      example: {
+        type: "oauth",
+        refresh: "refresh-secret",
+        access: "access-secret",
+        expires: 2_000_000_000_000,
+        accountId: "account-id",
+      },
+    });
+    assert.equal(JSON.stringify(projected).includes("other-provider-secret"), false);
+    assert.equal(JSON.stringify(projected).includes("unknownPrivateField"), false);
+
+    const explicitProjection = JSON.parse(resolveSyntheticOpenCodeAuthContent({
+      providerId: "example",
+      sourceEnvironment: {
+        XDG_DATA_HOME: xdgData,
+        opencode_auth_content: JSON.stringify({
+          example: {
+            type: "api",
+            key: "explicit-secret",
+            metadata: { endpoint: "synthetic" },
+            ignored: "drop-me",
+          },
+        }),
+      },
+    }));
+    assert.deepEqual(explicitProjection, {
+      example: {
+        type: "api",
+        key: "explicit-secret",
+        metadata: { endpoint: "synthetic" },
+      },
+    });
+    assert.equal(resolveSyntheticOpenCodeAuthContent({
+      providerId: "missing",
+      sourceEnvironment: { XDG_DATA_HOME: xdgData },
+    }), null);
+
+    const homeBase = path.join(fixtureRoot, "home-base");
+    const userProfileBase = path.join(fixtureRoot, "user-profile-base");
+    for (const [base, key] of [
+      [homeBase, "home-source"],
+      [userProfileBase, "user-profile-source"],
+    ]) {
+      const directory = path.join(base, ".local", "share", "opencode");
+      fs.mkdirSync(directory, { recursive: true });
+      fs.writeFileSync(path.join(directory, "auth.json"), JSON.stringify({
+        example: { type: "api", key },
+      }));
+    }
+    const platformProjection = JSON.parse(resolveSyntheticOpenCodeAuthContent({
+      providerId: "example",
+      sourceEnvironment: {
+        HOME: homeBase,
+        USERPROFILE: userProfileBase,
+      },
+    }));
+    assert.equal(
+      platformProjection.example.key,
+      process.platform === "win32" ? "user-profile-source" : "home-source",
+    );
+
+    assert.throws(
+      () => resolveSyntheticOpenCodeAuthContent({
+        providerId: "example",
+        sourceEnvironment: { OPENCODE_AUTH_CONTENT: "{" },
+      }),
+      (error) => error?.code === "SYNTHETIC_PROFILE_AUTH",
+    );
+    assert.throws(
+      () => resolveSyntheticOpenCodeAuthContent({
+        providerId: "example",
+        sourceEnvironment: {
+          OPENCODE_AUTH_CONTENT: "x".repeat((64 * 1024) + 1),
+        },
+      }),
+      (error) => error?.code === "SYNTHETIC_PROFILE_AUTH",
+    );
+    assert.throws(
+      () => resolveSyntheticOpenCodeAuthContent({
+        providerId: "example",
+        sourceEnvironment: {
+          OPENCODE_AUTH_CONTENT: JSON.stringify({
+            example: {
+              type: "oauth",
+              refresh: "refresh-only",
+              expires: 1,
+            },
+          }),
+        },
+      }),
+      (error) => error?.code === "SYNTHETIC_PROFILE_AUTH",
+    );
+    assert.throws(
+      () => resolveSyntheticOpenCodeAuthContent({
+        providerId: "example",
+        sourceEnvironment: {
+          OPENCODE_AUTH_CONTENT: "{}",
+          opencode_auth_content: "{}",
+        },
+      }),
+      (error) => error?.code === "SYNTHETIC_PROFILE_AUTH",
+    );
+
+    const broker = createSyntheticOpenCodeCredentialBroker({
+      providerId: "example",
+      sourceEnvironment: {
+        OPENCODE_AUTH_CONTENT: JSON.stringify({
+          example: {
+            type: "oauth",
+            refresh: "broker-refresh-old",
+            access: "broker-access-old",
+            expires: 1,
+          },
+          other: { type: "api", key: "broker-other-secret" },
+        }),
+      },
+    });
+    const initialBrokerRead = await broker.handle("credential_read", {
+      provider_id: "example",
+    });
+    assert.equal(initialBrokerRead.revision, 0);
+    assert.equal(JSON.parse(initialBrokerRead.auth_content).example.refresh, "broker-refresh-old");
+    assert.equal(initialBrokerRead.auth_content.includes("broker-other-secret"), false);
+    const brokerUpdate = await broker.handle("credential_update", {
+      provider_id: "example",
+      expected_revision: 0,
+      auth_content: JSON.stringify({
+        example: {
+          type: "oauth",
+          refresh: "broker-refresh-new",
+          access: "broker-access-new",
+          expires: 2,
+          ignored: "drop-this",
+        },
+      }),
+    });
+    assert.equal(brokerUpdate.revision, 1);
+    const updatedBrokerRead = await broker.handle("credential_read", {
+      provider_id: "example",
+    });
+    assert.equal(updatedBrokerRead.revision, 1);
+    assert.equal(JSON.parse(updatedBrokerRead.auth_content).example.refresh, "broker-refresh-new");
+    assert.equal(updatedBrokerRead.auth_content.includes("drop-this"), false);
+    await assert.rejects(
+      broker.handle("credential_update", {
+        provider_id: "example",
+        expected_revision: 0,
+        auth_content: updatedBrokerRead.auth_content,
+      }),
+      (error) => error?.code === "SYNTHETIC_CREDENTIAL_REVISION",
+    );
+    await assert.rejects(
+      broker.handle("credential_read", { provider_id: "other" }),
+      (error) => error?.code === "SYNTHETIC_CREDENTIAL_PROVIDER",
+    );
+    await assert.rejects(
+      broker.handle("credential_update", {
+        provider_id: "example",
+        expected_revision: 1,
+        auth_content: "{",
+      }),
+      (error) => error?.code === "SYNTHETIC_CREDENTIAL_CONTENT"
+        && !String(error).includes("broker-refresh-new"),
+    );
+  } finally {
+    fs.rmSync(fixtureRoot, { recursive: true, force: true });
+  }
 }
 
 function profileFixtures(root) {
@@ -538,31 +1208,138 @@ function profileFixtures(root) {
     assertNoAbsolutePaths(instrumentedManifest);
     assert.equal(plainManifest.profile_evidence.runtime_surface.schema_version, 1);
     assert.equal(profileOnlyManifest.profile_evidence.runtime_surface.materialized_files.length > 0, true);
-    assert.equal(instrumentedManifest.profile_evidence.runtime_surface.plugin_sources.length, 1);
+    assert.deepEqual(
+      plainManifest.profile_evidence.runtime_surface.plugin_sources.map((entry) => entry.id),
+      ["credential-firewall"],
+    );
+    assert.deepEqual(
+      profileOnlyManifest.profile_evidence.runtime_surface.plugin_sources.map((entry) => entry.id),
+      ["credential-firewall"],
+    );
+    assert.deepEqual(
+      instrumentedManifest.profile_evidence.runtime_surface.plugin_sources.map((entry) => entry.id),
+      ["engineering-dossier", "credential-firewall"],
+    );
+    assert.equal(
+      instrumentedManifest.profile_evidence.source_entries.some(
+        (entry) => entry.kind === "plugin-dependency" && entry.id === "context-bridge",
+      ),
+      true,
+    );
 
     const plainConfig = JSON.parse(fs.readFileSync(plainA.configPath, "utf8"));
     const profileOnlyConfig = JSON.parse(fs.readFileSync(profileOnly.configPath, "utf8"));
     const instrumentedConfig = JSON.parse(fs.readFileSync(instrumented.configPath, "utf8"));
     assert.equal(plainConfig.default_agent, "build");
     assert.equal(Object.hasOwn(plainConfig, "instructions"), false);
-    assert.equal(Object.hasOwn(plainConfig, "plugin"), false);
+    assert.equal(plainConfig.plugin.length, 1);
     assert.equal(fs.existsSync(path.join(plainA.configDirectory, "agents")), false);
     assert.equal(fs.existsSync(path.join(plainA.configDirectory, "skills")), false);
     assert.equal(profileOnlyConfig.default_agent, "orchestrator");
     assert.equal(profileOnlyConfig.permission["quality_*"], "deny");
-    assert.equal(Object.hasOwn(profileOnlyConfig, "plugin"), false);
-    assert.equal(fs.existsSync(path.join(profileOnly.configDirectory, "agents", "orchestrator.md")), true);
+    assert.equal(profileOnlyConfig.plugin.length, 1);
+    assert.equal(Object.hasOwn(profileOnlyConfig, "instructions"), false);
+    const profileOnlyPrimaryPath = path.join(profileOnly.configDirectory, "agents", "orchestrator.md");
+    assert.equal(fs.existsSync(profileOnlyPrimaryPath), true);
+    const profileOnlyPrimary = fs.readFileSync(profileOnlyPrimaryPath, "utf8");
+    assert.equal(/^  bash:$/mu.test(profileOnlyPrimary), false);
+    assert.equal(/^  task:$/mu.test(profileOnlyPrimary), true);
+    assert.equal(profileOnlyPrimary.includes("Profile mode:"), false);
+    assert.equal(profileOnlyPrimary.includes("profile-only"), false);
+    assert.equal(fs.existsSync(path.join(profileOnly.configDirectory, "instructions")), false);
     assert.equal(fs.existsSync(path.join(profileOnly.configDirectory, "skills", "global-review-ledger", "SKILL.md")), true);
-    assert.equal(instrumentedConfig.default_agent, "orchestrator-deep");
+    assert.equal(instrumentedConfig.default_agent, profileOnlyConfig.default_agent);
     assert.equal(instrumentedConfig.permission["quality_*"], "allow");
-    assert.equal(instrumentedConfig.plugin.length, 1);
-    assert.equal(fs.existsSync(path.join(instrumented.configDirectory, "agents", "orchestrator-deep.md")), true);
+    assert.equal(instrumentedConfig.plugin.length, 2);
+    assert.equal(Object.hasOwn(instrumentedConfig, "instructions"), false);
+    const instrumentedPrimaryPath = path.join(instrumented.configDirectory, "agents", "orchestrator.md");
+    assert.equal(fs.existsSync(instrumentedPrimaryPath), true);
+    const instrumentedPrimary = fs.readFileSync(instrumentedPrimaryPath, "utf8");
+    assert.equal(instrumentedPrimary, profileOnlyPrimary);
+    assert.equal(/^  bash:$/mu.test(instrumentedPrimary), false);
+    assert.equal(/^  task:$/mu.test(instrumentedPrimary), true);
+    const instrumentedVerifier = fs.readFileSync(
+      path.join(instrumented.configDirectory, "agents", "verifier.md"),
+      "utf8",
+    );
+    assert.equal(instrumentedVerifier.includes("bounded instrumented synthetic"), false);
+    assert.equal(instrumentedVerifier.includes("`quality_verification_record`"), true);
+    assert.equal(instrumentedVerifier.includes("requested receipt tool exactly once"), true);
+    const instrumentedReviewer = fs.readFileSync(
+      path.join(instrumented.configDirectory, "agents", "reviewer.md"),
+      "utf8",
+    );
+    assert.equal(instrumentedReviewer.includes("bounded instrumented synthetic"), false);
+    assert.equal(instrumentedReviewer.includes("`quality_context_reviewer_record`"), true);
+    assert.equal(instrumentedReviewer.includes("exactly once"), true);
+    assert.equal(instrumentedReviewer.includes("Never add `expected_revision`"), true);
+    assert.equal(fs.existsSync(path.join(instrumented.configDirectory, "agents", "orchestrator-deep.md")), false);
+    assert.equal(fs.existsSync(path.join(instrumented.configDirectory, "instructions")), false);
     assert.equal(fs.existsSync(path.join(instrumented.configDirectory, "skills", "global-quality-gates", "SKILL.md")), true);
+    assert.equal(assertNeutralSyntheticModelVisiblePrompt(profileOnly.configDirectory), true);
+    assert.equal(assertNeutralSyntheticModelVisiblePrompt(instrumented.configDirectory), true);
+    const actualQualityToolSurface = createNormalSessionQualityToolSurface({
+      toolFactory: descriptorToolFactory,
+      bridge: {},
+    });
+    assert.deepEqual(Object.keys(actualQualityToolSurface).sort(), [...NORMAL_SESSION_QUALITY_TOOL_IDS].sort());
+    assert.equal(
+      assertNeutralSyntheticModelVisibleValue(actualQualityToolSurface, "production quality tool surface"),
+      true,
+    );
+    assert.throws(
+      () => assertNeutralSyntheticModelVisibleValue(
+        { description: "Use this only in the instrumented evaluation arm." },
+        "negative tool descriptor fixture",
+      ),
+      (error) => error?.code === "SYNTHETIC_PROFILE_PROMPT_LEAK",
+    );
+
+    const sharedPromptRoots = ["agents", "skills"];
+    for (const relativeRoot of sharedPromptRoots) {
+      const left = path.join(profileOnly.configDirectory, relativeRoot);
+      const right = path.join(instrumented.configDirectory, relativeRoot);
+      const relativeFiles = (rootDirectory) => fs.readdirSync(rootDirectory, {
+        recursive: true,
+        withFileTypes: true,
+      }).filter((entry) => entry.isFile()).map((entry) => path.relative(
+        rootDirectory,
+        path.join(entry.parentPath, entry.name),
+      ).replaceAll("\\", "/")).sort();
+      const leftFiles = relativeFiles(left);
+      const rightFiles = relativeFiles(right);
+      assert.deepEqual(rightFiles, leftFiles);
+      for (const relativePath of leftFiles) {
+        assert.deepEqual(
+          fs.readFileSync(path.join(right, relativePath)),
+          fs.readFileSync(path.join(left, relativePath)),
+        );
+      }
+    }
+
+    for (const materializedProfile of [plainA, plainB, profileOnly, instrumented]) {
+      const temporaryName = path.basename(materializedProfile.root);
+      assert.equal(temporaryName.startsWith("opencode-runtime-"), true);
+      assert.equal(temporaryName.includes(materializedProfile.profileId), false);
+    }
+    for (const relativePath of [
+      "lib/benchmark/opencode-context-bridge-plugin.mjs",
+      "lib/benchmark/opencode-engineering-dossier-plugin.mjs",
+      "lib/benchmark/opencode-model-env-firewall.mjs",
+    ]) {
+      const source = fs.readFileSync(path.join(root, ...relativePath.split("/")), "utf8");
+      assert.equal(
+        /synthetic|benchmark|profile-only|instrumented|agent_outcome|profile\s+mode|(?:control|treatment|evaluation)\s+arm/iu.test(source),
+        false,
+        `${relativePath} exposes evaluator-owned terminology through the runtime surface`,
+      );
+    }
 
     for (const config of [plainConfig, profileOnlyConfig, instrumentedConfig]) {
       const serialized = JSON.stringify(config);
       assert.equal(/"model"\s*:/u.test(serialized), false);
       assert.equal(/"provider"\s*:/u.test(serialized), false);
+      assert.equal(config.snapshot, false);
       assert.equal(config.permission.edit, "allow");
       assert.equal(config.permission.external_directory, "deny");
       assert.equal(config.permission.webfetch, "deny");
@@ -583,6 +1360,7 @@ function profileFixtures(root) {
       OPENCODE_PERMISSION: "{\"edit\":\"deny\"}",
       OPENCODE_AUTO_SHARE: "true",
       OPENCODE_DISABLE_DEFAULT_PLUGINS: "false",
+      OPENCODE_AUTH_CONTENT: "{\"example\":{\"type\":\"api\",\"key\":\"not-copied-directly\"}}",
       OPENAI_API_KEY: "preserved-for-runtime-only",
       PROVIDER_TOKEN: "must-not-reach-child",
       GITHUB_TOKEN: "must-not-reach-child",
@@ -592,20 +1370,31 @@ function profileFixtures(root) {
     assert.equal(environment.USERPROFILE, readback.directories.home);
     assert.equal(environment.OPENCODE_CONFIG, readback.configPath);
     assert.equal(environment.OPENCODE_CONFIG_DIR, readback.configDirectory);
+    assert.equal(path.join(environment.XDG_CONFIG_HOME, "opencode"), readback.configDirectory);
     assert.equal(environment.OPENAI_API_KEY, "preserved-for-runtime-only");
+    assert.equal(Object.hasOwn(environment, "OPENCODE_AUTH_CONTENT"), false);
     assert.equal(Object.hasOwn(environment, "PROVIDER_TOKEN"), false);
     assert.equal(Object.hasOwn(environment, "GITHUB_TOKEN"), false);
     assert.equal(Object.hasOwn(environment, "NODE_OPTIONS"), false);
     assert.equal(Object.hasOwn(environment, "OPENCODE_CONFIG_CONTENT"), false);
     assert.equal(Object.hasOwn(environment, "OPENCODE_PERMISSION"), false);
     assert.equal(environment.OPENCODE_AUTO_SHARE, "false");
-    assert.equal(environment.OPENCODE_DISABLE_DEFAULT_PLUGINS, "true");
+    assert.equal(environment.OPENCODE_DISABLE_DEFAULT_PLUGINS, "false");
     assert.equal(environment.OPENCODE_DISABLE_AUTOUPDATE, "true");
     assert.equal(environment.OPENCODE_DISABLE_LSP_DOWNLOAD, "true");
     assert.equal(environment.OPENCODE_DISABLE_MODELS_FETCH, "true");
     assert.equal(environment.OPENCODE_DISABLE_CLAUDE_CODE, "true");
     assert.equal(Object.values(environment).includes("poison-home"), false);
     assert.equal(Object.values(environment).includes("poison-config"), false);
+    const versionEnvironment = isolatedSyntheticProfileEnvironment(
+      readback,
+      {
+        PATH: process.env.PATH ?? "",
+        OPENAI_API_KEY: "must-not-reach-version-probe",
+      },
+      { includeModelCredentials: false },
+    );
+    assert.equal(Object.hasOwn(versionEnvironment, "OPENAI_API_KEY"), false);
 
     const copiedPrompt = path.join(
       profileOnly.configDirectory,
@@ -646,7 +1435,7 @@ function profileFixtures(root) {
       () => readSyntheticProfileManifest(stalePath),
       (error) => error?.code === "SYNTHETIC_PROFILE_MANIFEST",
     );
-    return { plain: plainA, all: materialized };
+    return { plain: plainA, instrumented, all: materialized };
   } catch (error) {
     for (const entry of materialized.reverse()) {
       if (fs.existsSync(entry.root)) cleanupSyntheticProfile(entry);
@@ -655,7 +1444,7 @@ function profileFixtures(root) {
   }
 }
 
-async function executionFixtures(root, plainProfile) {
+async function executionFixtures(root, plainProfile, instrumentedProfile) {
   const fixtureRoot = createConfinedTemporaryDirectory("opencode-adapter-fixture-", {
     contractCode: "SYNTHETIC_ADAPTER_TEST_ROOT",
   });
@@ -663,12 +1452,30 @@ async function executionFixtures(root, plainProfile) {
   fs.mkdirSync(repo);
   const originalCwd = process.cwd();
   const invocations = [];
+  const credentialKeys = new Set(SYNTHETIC_MODEL_RUNTIME_ENVIRONMENT_KEYS);
   const spawnFixture = (executable, args, options) => {
-    invocations.push({ executable, args: [...args], options: { ...options, env: { ...options.env } } });
+    const sanitizedEnvironment = {};
+    const observedCredentialKeys = [];
+    for (const [key, value] of Object.entries(options.env ?? {})) {
+      if (credentialKeys.has(key.toUpperCase())) {
+        sanitizedEnvironment[key] = "<redacted>";
+        observedCredentialKeys.push(key.toUpperCase());
+      } else {
+        sanitizedEnvironment[key] = value;
+      }
+    }
+    invocations.push({
+      executable,
+      args: [...args],
+      credential_keys: observedCredentialKeys.sort(),
+      options: { ...options, env: sanitizedEnvironment },
+    });
     return spawn(executable, args, options);
   };
   const traceEvents = [];
   const controller = new AbortController();
+  const oauthSecretCanary = "oauth-secret-canary-must-not-persist";
+  const apiSecretCanary = "api-secret-canary-must-not-persist";
   const baseInput = {
     repo,
     prompt: "Fix the public fixture and run its targeted test.",
@@ -676,9 +1483,10 @@ async function executionFixtures(root, plainProfile) {
     profileFingerprint: plainProfile.profileFingerprint,
     profileManifestPath: plainProfile.manifestPath,
     model: "example/model",
-    provider: "example",
+    provider: null,
     variant: "high",
     timeout: 60_000,
+    taskScopeMode: "edit",
     signal: controller.signal,
     trace: {
       async emit(event) {
@@ -697,11 +1505,88 @@ async function executionFixtures(root, plainProfile) {
   const fakeCli = writeFakeOpenCode(fixtureRoot, "fake-opencode-success", {
     stream: successfulStream,
   });
+  const missingFinalCli = writeFakeOpenCode(fixtureRoot, "fake-opencode-missing-final", {
+    stream: jsonl(JSON.stringify({ type: "step_finish", part: {} })),
+  });
+  const invalidFinalCli = writeFakeOpenCode(fixtureRoot, "fake-opencode-invalid-final", {
+    stream: jsonl(finalEvent("ordinary prose")),
+  });
   const nonzeroCli = writeFakeOpenCode(fixtureRoot, "fake-opencode-nonzero", {
     mode: "nonzero",
   });
+  const stderrSecretCanary = "stderr-secret-canary-must-not-persist";
+  const modelUnavailableCli = writeFakeOpenCode(
+    fixtureRoot,
+    "fake-opencode-model-unavailable",
+    {
+      mode: "nonzero-stderr",
+      stderrChunks: [
+        `diagnostic:${stderrSecretCanary}:ProviderModel`,
+        "NotFound",
+        `Error:${stderrSecretCanary}`,
+      ],
+    },
+  );
+  const authUnavailableCli = writeFakeOpenCode(
+    fixtureRoot,
+    "fake-opencode-auth-unavailable",
+    {
+      mode: "nonzero-stderr",
+      stderrChunks: ["Provider", "Auth", `Error:${stderrSecretCanary}`],
+    },
+  );
+  const structuredAuthUnavailableCli = writeFakeOpenCode(
+    fixtureRoot,
+    "fake-opencode-structured-auth-unavailable",
+    {
+      mode: "nonzero-stdout",
+      stream: jsonl(JSON.stringify({
+        type: "error",
+        error: {
+          name: "UnknownError",
+          data: { message: "Token refresh failed: 401" },
+        },
+      })),
+    },
+  );
+  const providerUnavailableCli = writeFakeOpenCode(
+    fixtureRoot,
+    "fake-opencode-provider-unavailable",
+    {
+      mode: "nonzero-stderr",
+      stderrChunks: ["ProviderInit", `Error:${stderrSecretCanary}`],
+    },
+  );
+  const multiMarkerSingleChunkCli = writeFakeOpenCode(
+    fixtureRoot,
+    "fake-opencode-multi-marker-single-chunk",
+    {
+      mode: "nonzero-stderr",
+      stderrChunks: ["ProviderInitError ProviderAuthError"],
+    },
+  );
+  const multiMarkerSplitChunkCli = writeFakeOpenCode(
+    fixtureRoot,
+    "fake-opencode-multi-marker-split-chunk",
+    {
+      mode: "nonzero-stderr",
+      stderrChunks: ["ProviderInitError ", "ProviderAuthError"],
+    },
+  );
+  const classifiedOutputLimitCli = writeFakeOpenCode(
+    fixtureRoot,
+    "fake-opencode-classified-output-limit",
+    {
+      mode: "nonzero-stderr",
+      stderrChunks: ["ProviderAuthError", "x".repeat(4_096)],
+    },
+  );
   const timeoutCli = writeFakeOpenCode(fixtureRoot, "fake-opencode-timeout", {
     mode: "timeout",
+  });
+  const progressTimeoutCli = writeFakeOpenCode(fixtureRoot, "fake-opencode-progress-timeout", {
+    mode: "timeout-after-stream",
+    stream: jsonl(toolEvent({ id: "progress-read", tool: "read", input: { filePath: "src/app.mjs" } })),
   });
   const unsupportedCli = writeFakeOpenCode(fixtureRoot, "fake-opencode-unsupported", {
     version: "2.0.0",
@@ -709,9 +1594,66 @@ async function executionFixtures(root, plainProfile) {
   const belowMinimumCli = writeFakeOpenCode(fixtureRoot, "fake-opencode-below-minimum", {
     version: "1.16.99",
   });
+  const invalidBootstrapCli = writeFakeOpenCode(fixtureRoot, "fake-opencode-invalid-bootstrap", {
+    bootstrapVersion: "1.17.19",
+  });
+  const bootstrapTimeoutCli = writeFakeOpenCode(fixtureRoot, "fake-opencode-bootstrap-timeout", {
+    bootstrapMode: "timeout",
+  });
   const cancelledVersionCli = writeFakeOpenCode(fixtureRoot, "fake-opencode-cancel-version", {
     versionMode: "timeout",
   });
+  const continuationSession = "ses_quality_fixture";
+  const continuationClis = [
+    writeFakeOpenCode(fixtureRoot, "fake-opencode-continuation-registration", {
+      stream: jsonl(finalEvent(agentResponse(), "registration-final", continuationSession)),
+    }),
+    writeFakeOpenCode(fixtureRoot, "fake-opencode-continuation-started", {
+      stream: jsonl(
+        toolEvent({
+          id: "quality-start",
+          tool: "quality_session_start",
+          sessionID: continuationSession,
+        }),
+        finalEvent(agentResponse(), "started-final", continuationSession),
+      ),
+    }),
+    writeFakeOpenCode(fixtureRoot, "fake-opencode-continuation-attested", {
+      stream: jsonl(
+        toolEvent({
+          id: "quality-verify",
+          tool: "quality_verification_record",
+          sessionID: continuationSession,
+        }),
+        toolEvent({
+          id: "quality-reconcile",
+          tool: "quality_context_reconcile",
+          sessionID: continuationSession,
+        }),
+        toolEvent({
+          id: "quality-finalize",
+          tool: "quality_session_finalize",
+          sessionID: continuationSession,
+        }),
+        finalEvent(agentResponse(), "attested-final", continuationSession),
+      ),
+    }),
+  ];
+  const aggregateOutputSession = "ses_quality_aggregate_output_fixture";
+  const aggregateOutputCli = writeFakeOpenCode(
+    fixtureRoot,
+    "fake-opencode-aggregate-continuation-output",
+    {
+      stream: jsonl(
+        JSON.stringify({
+          type: "reasoning",
+          sessionID: aggregateOutputSession,
+          part: { text: "x".repeat(96 * 1024) },
+        }),
+        finalEvent(agentResponse(), "aggregate-final", aggregateOutputSession),
+      ),
+    },
+  );
   try {
     process.chdir(repo);
     const success = await executeOpenCodeAdapter(baseInput, {
@@ -724,12 +1666,23 @@ async function executionFixtures(root, plainProfile) {
         OPENCODE_PERMISSION: "{\"edit\":\"deny\"}",
         OPENCODE_AUTO_SHARE: "true",
         GITHUB_TOKEN: "must-not-reach-child",
+        OPENAI_API_KEY: apiSecretCanary,
+        OPENCODE_AUTH_CONTENT: JSON.stringify({
+          example: {
+            type: "oauth",
+            refresh: `${oauthSecretCanary}-refresh`,
+            access: `${oauthSecretCanary}-access`,
+            expires: 2_000_000_000_000,
+          },
+        }),
       },
     });
     assert.equal(success.passed, true);
     assert.equal(success.status, "completed");
     assert.equal(success.profile_fingerprint, plainProfile.profileFingerprint);
     assert.equal(success.trace_summary.tool_call_count, 4);
+    assert.equal(success.trace_summary.task_action_call_count, 4);
+    assert.equal(success.trace_summary.computational_control_call_count, 0);
     assert.equal(success.trace_summary.delegation_count, 1);
     assert.equal(success.trace_summary.targeted_verification_observed, true);
     assert.equal(success.trace_summary.trace_complete, false);
@@ -745,10 +1698,16 @@ async function executionFixtures(root, plainProfile) {
     assert.equal(success.transient_observations.observed_secret_write_count, 0);
     assert.equal(traceEvents.length, 4);
     assert.equal(JSON.stringify(success).includes("test/app.test.mjs"), false);
-    assert.equal(invocations.length, 2);
+    assert.equal(invocations.length, 3);
     assert.deepEqual(invocations[0].args, [fakeCli, "--version"]);
+    assert.deepEqual(invocations[0].credential_keys, []);
     assert.deepEqual(
       invocations[1].args,
+      [fakeCli, "debug", "config"],
+    );
+    assert.deepEqual(invocations[1].credential_keys, []);
+    assert.deepEqual(
+      invocations[2].args,
       [
         fakeCli,
         "run",
@@ -765,17 +1724,405 @@ async function executionFixtures(root, plainProfile) {
         "high",
       ],
     );
-    for (const invocation of invocations) {
+    assert.deepEqual(
+      invocations[2].credential_keys,
+      ["OPENAI_API_KEY", "OPENCODE_AUTH_CONTENT"],
+    );
+    assert.equal(
+      invocations[2].options.env.OPENCODE_AUTH_CONTENT,
+      "<redacted>",
+    );
+    assert.equal(invocations[2].options.env.OPENAI_API_KEY, "<redacted>");
+    assert.equal(JSON.stringify(invocations).includes(oauthSecretCanary), false);
+    assert.equal(JSON.stringify(invocations).includes(apiSecretCanary), false);
+    assert.equal(JSON.stringify(success).includes(oauthSecretCanary), false);
+    assert.equal(JSON.stringify(success).includes(apiSecretCanary), false);
+
+    const continuationInvocations = [];
+    let continuationRunIndex = 0;
+    const continuationSpawn = (spawnExecutable, spawnArgs, spawnOptions) => {
+      let selectedArgs = spawnArgs;
+      if (spawnArgs.includes("run")) {
+        const selectedCli = continuationClis[Math.min(
+          continuationRunIndex,
+          continuationClis.length - 1,
+        )];
+        continuationRunIndex += 1;
+        selectedArgs = [selectedCli, ...spawnArgs.slice(1)];
+        continuationInvocations.push([...selectedArgs]);
+      }
+      return spawn(spawnExecutable, selectedArgs, spawnOptions);
+    };
+    const continuationStates = [
+      {
+        classification: "registration_only",
+        registration_count: 1,
+        owner_session_count: 0,
+        attested_owner_count: 0,
+        failed_owner_count: 0,
+        session_id: continuationSession,
+      },
+      {
+        classification: "started_incomplete",
+        registration_count: 1,
+        owner_session_count: 1,
+        attested_owner_count: 0,
+        failed_owner_count: 0,
+        recommended_action_tool_id: "task",
+        recommended_action_target_agent: "verifier",
+        session_id: continuationSession,
+      },
+      {
+        classification: "attested",
+        registration_count: 1,
+        owner_session_count: 1,
+        attested_owner_count: 1,
+        failed_owner_count: 0,
+        session_id: continuationSession,
+      },
+    ];
+    let continuationInspectionIndex = 0;
+    const instrumentedInput = {
+      ...baseInput,
+      profileId: instrumentedProfile.profileId,
+      profileFingerprint: instrumentedProfile.profileFingerprint,
+      profileManifestPath: instrumentedProfile.manifestPath,
+    };
+    const continued = await executeOpenCodeAdapter(instrumentedInput, {
+      spawnImpl: continuationSpawn,
+      executable: process.execPath,
+      executableArgsPrefix: [continuationClis[0]],
+      controlStateInspector: () => continuationStates[
+        Math.min(continuationInspectionIndex++, continuationStates.length - 1)
+      ],
+    });
+    assert.equal(continued.passed, true);
+    assert.equal(continued.status, "completed");
+    assert.equal(continued.model_turn_count, 3);
+    assert.equal(continued.continuation_turn_count, 2);
+    assert.equal(continued.trace_summary.computational_control_call_count, 4);
+    assert.equal(continuationInvocations.length, 3);
+    assert.equal(continuationInvocations[0].includes("--session"), false);
+    assert.match(
+      continuationInvocations[1][continuationInvocations[1].indexOf("run") + 1],
+      /quality_session_start/u,
+    );
+    assert.match(
+      continuationInvocations[2][continuationInvocations[2].indexOf("run") + 1],
+      /quality_dossier_inspect/u,
+    );
+    const startedIncompletePrompt = continuationInvocations[2][continuationInvocations[2].indexOf("run") + 1];
+    assert.match(startedIncompletePrompt, /host has validated the current runner-owned first action/u);
+    assert.match(startedIncompletePrompt, /Execute that action directly from the most recent receipt/u);
+    assert.match(startedIncompletePrompt, /call quality_dossier_inspect once/u);
+    assert.match(startedIncompletePrompt, /Inspect only after that action settles/u);
+    assert.match(startedIncompletePrompt, /native edit or writable task/u);
+    assert.match(startedIncompletePrompt, /instead of calling quality_action_authorize again/u);
+    assert.match(startedIncompletePrompt, /First action: task targeted at verifier/u);
+    assert.match(startedIncompletePrompt, /Launch one fresh verifier task now/u);
+    assert.match(startedIncompletePrompt, /without a session ID or resume parameter/u);
+    assert.match(startedIncompletePrompt, /short fresh role-specific prompt/u);
+    assert.match(startedIncompletePrompt, /reuse an injected task prompt/u);
+    assert.match(startedIncompletePrompt, /Let the child invoke its receipt tool exactly once/u);
+    for (const invocation of continuationInvocations.slice(1)) {
+      assert.equal(invocation.includes("--session"), true);
+      assert.equal(invocation[invocation.indexOf("--session") + 1], continuationSession);
+      assert.equal(invocation.includes("example/model"), true);
+      assert.equal(
+        assertNeutralSyntheticModelVisibleValue(
+          invocation[invocation.indexOf("run") + 1],
+          "quality continuation prompt",
+        ),
+        true,
+      );
+    }
+
+    let aggregateOutputInspectionIndex = 0;
+    const aggregateOutputContinuation = await executeOpenCodeAdapter(instrumentedInput, {
+      executable: process.execPath,
+      executableArgsPrefix: [aggregateOutputCli],
+      controlStateInspector: () => {
+        aggregateOutputInspectionIndex += 1;
+        return aggregateOutputInspectionIndex < 12
+          ? {
+            ...continuationStates[0],
+            session_id: aggregateOutputSession,
+            dossier_revision: aggregateOutputInspectionIndex,
+            dossier_analysis_fingerprint: `sha256:${aggregateOutputInspectionIndex.toString(16).padStart(64, "0")}`,
+          }
+          : {
+            ...continuationStates[2],
+            session_id: aggregateOutputSession,
+          };
+      },
+    });
+    assert.equal(aggregateOutputContinuation.status, "completed");
+    assert.equal(aggregateOutputContinuation.reason, null);
+    assert.equal(aggregateOutputContinuation.model_turn_count, 12);
+    assert.equal(aggregateOutputContinuation.continuation_turn_count, 11);
+    assert(aggregateOutputContinuation.stdout_bytes > 1024 * 1024);
+    assert(aggregateOutputContinuation.stdout_bytes < DEFAULT_OPENCODE_STDOUT_LIMIT);
+
+    let distinctActionInspectionIndex = 0;
+    const distinctActionProgress = await executeOpenCodeAdapter(instrumentedInput, {
+      spawnImpl: continuationSpawn,
+      executable: process.execPath,
+      executableArgsPrefix: [continuationClis[0]],
+      controlStateInspector: () => {
+        distinctActionInspectionIndex += 1;
+        return distinctActionInspectionIndex < 8
+          ? {
+            ...continuationStates[1],
+            lifecycle: "dossier_draft",
+            recommended_action_tool_id: "context_read",
+            recommended_action_target_agent: null,
+            recommended_action_fingerprint: `sha256:${distinctActionInspectionIndex.toString(16).padStart(64, "0")}`,
+          }
+          : {
+            ...continuationStates[2],
+            recommended_action_fingerprint: null,
+          };
+      },
+    });
+    assert.equal(distinctActionProgress.status, "completed");
+    assert.equal(distinctActionProgress.reason, null);
+    assert.equal(distinctActionProgress.model_turn_count, 8);
+    assert.equal(distinctActionProgress.continuation_turn_count, 7);
+    assert.equal(distinctActionProgress.quality_progress_summary.unchanged_continuation_count, 0);
+    assert.equal(
+      new Set(distinctActionProgress.quality_progress_summary.recent_states
+        .map((entry) => entry.semantic_progress_fingerprint)).size,
+      8,
+      "different runner-validated first actions must count as semantic progress even when their tool id is unchanged",
+    );
+
+    const readOnlyRegistration = await executeOpenCodeAdapter({
+      ...instrumentedInput,
+      taskScopeMode: "read-only",
+    }, {
+      executable: process.execPath,
+      executableArgsPrefix: [continuationClis[0]],
+      controlStateInspector: () => continuationStates[0],
+    });
+    assert.equal(readOnlyRegistration.passed, true);
+    assert.equal(readOnlyRegistration.model_turn_count, 1);
+    assert.equal(readOnlyRegistration.continuation_turn_count, 0);
+
+    const mismatchedSession = await executeOpenCodeAdapter(instrumentedInput, {
+      executable: process.execPath,
+      executableArgsPrefix: [continuationClis[0]],
+      controlStateInspector: () => ({
+        ...continuationStates[0],
+        session_id: "ses_other",
+      }),
+    });
+    assert.equal(mismatchedSession.passed, false);
+    assert.equal(mismatchedSession.reason, "opencode_session_mismatch");
+
+    const failedLifecycle = await executeOpenCodeAdapter(instrumentedInput, {
+      executable: process.execPath,
+      executableArgsPrefix: [continuationClis[0]],
+      controlStateInspector: () => ({
+        ...continuationStates[1],
+        failed_owner_count: 1,
+        lifecycle: "failed",
+        recommended_action_tool_id: null,
+        recommended_action_target_agent: null,
+      }),
+    });
+    assert.equal(failedLifecycle.passed, false);
+    assert.equal(failedLifecycle.reason, "opencode_quality_lifecycle_failed");
+    assert.equal(failedLifecycle.model_turn_count, 1);
+    assert.equal(failedLifecycle.continuation_turn_count, 0);
+
+    let exhaustedInspectionIndex = 0;
+    const exhaustedContinuation = await executeOpenCodeAdapter(instrumentedInput, {
+      spawnImpl: continuationSpawn,
+      executable: process.execPath,
+      executableArgsPrefix: [continuationClis[0]],
+      controlStateInspector: () => ({
+        ...continuationStates[0],
+        dossier_revision: ++exhaustedInspectionIndex,
+        dossier_analysis_fingerprint: `sha256:${exhaustedInspectionIndex.toString(16).padStart(64, "0")}`,
+      }),
+    });
+    assert.equal(exhaustedContinuation.passed, false);
+    assert.equal(exhaustedContinuation.reason, "opencode_quality_continuation_exhausted");
+    assert.equal(exhaustedContinuation.model_turn_count, 65);
+    assert.equal(exhaustedContinuation.continuation_turn_count, 64);
+
+    const stalledInvocationStart = continuationInvocations.length;
+    const stalledTraceEvents = [];
+    let stalledInspectionIndex = 0;
+    const stalledContinuation = await executeOpenCodeAdapter({
+      ...instrumentedInput,
+      trace: {
+        async emit(event) {
+          stalledTraceEvents.push(event);
+          return null;
+        },
+      },
+    }, {
+      spawnImpl: continuationSpawn,
+      executable: process.execPath,
+      executableArgsPrefix: [continuationClis[0]],
+      controlStateInspector: () => {
+        stalledInspectionIndex += 1;
+        return {
+          ...continuationStates[1],
+          lifecycle: "implementation_enabled",
+          state_revision: 11 + stalledInspectionIndex,
+          risk_class: "high",
+          dossier_revision: 3 + stalledInspectionIndex,
+          dossier_analysis_fingerprint: `sha256:${"b".repeat(64)}`,
+          impact_graph_fingerprint: `sha256:${"c".repeat(64)}`,
+          context_strategy_id: "high-wide-deep-v1",
+          context_report_revision: 2 + stalledInspectionIndex,
+          context_report_analysis_fingerprint: `sha256:${"d".repeat(64)}`,
+          context_report_status: "finalized",
+          context_decision_status: "insufficient",
+          context_decision_reason_count: 1,
+          context_decision_reason_codes: ["CONTEXT_REPRODUCTION_MISSING"],
+          context_receipt_count: 1 + stalledInspectionIndex,
+          contribution_roles: [],
+          gate_status: "passed",
+          mutation_revision: 0,
+          outstanding_capability_count: 1,
+          outstanding_capability_kind: "edit",
+          pending_mutation_count: 0,
+          active_task_target_agent: null,
+          active_task_phase: null,
+          verification_complete: false,
+          context_reconciliation_status: null,
+          recommended_action_tool_id: "edit",
+          recommended_action_target_agent: null,
+          recommended_action_fingerprint: `sha256:${"a".repeat(64)}`,
+          fingerprint: `sha256:${stalledInspectionIndex.toString(16).padStart(64, "0")}`,
+        };
+      },
+    });
+    assert.equal(stalledContinuation.passed, false);
+    assert.equal(stalledContinuation.reason, "opencode_quality_progress_stalled");
+    assert.equal(stalledContinuation.model_turn_count, 7);
+    assert.equal(stalledContinuation.continuation_turn_count, 6);
+    assert.equal(stalledContinuation.quality_progress_summary.unchanged_continuation_count, 6);
+    assert.equal(stalledContinuation.quality_progress_summary.last_state.lifecycle, "implementation_enabled");
+    assert.equal(stalledContinuation.quality_progress_summary.last_state.risk_class, "high");
+    assert.equal(stalledContinuation.quality_progress_summary.last_state.context_strategy_id, "high-wide-deep-v1");
+    assert.equal(stalledContinuation.quality_progress_summary.last_state.context_decision_status, "insufficient");
+    assert.deepEqual(stalledContinuation.quality_progress_summary.last_state.context_decision_reason_codes, ["CONTEXT_REPRODUCTION_MISSING"]);
+    assert.equal(stalledContinuation.quality_progress_summary.last_state.outstanding_capability_count, 1);
+    assert.equal(stalledContinuation.quality_progress_summary.last_state.outstanding_capability_kind, "edit");
+    assert.equal(stalledContinuation.quality_progress_summary.last_state.recommended_action_tool_id, "edit");
+    assert.equal(stalledContinuation.quality_progress_summary.last_state.recommended_action_target_agent, null);
+    assert.equal(stalledContinuation.quality_progress_summary.last_state.recommended_action_fingerprint, `sha256:${"a".repeat(64)}`);
+    assert.equal(stalledContinuation.quality_progress_summary.recent_states.length, 7);
+    assert.equal(
+      new Set(stalledContinuation.quality_progress_summary.recent_states.map((entry) => entry.control_fingerprint)).size,
+      7,
+      "changing technical control fingerprints must remain observable in diagnostics",
+    );
+    assert.equal(
+      new Set(stalledContinuation.quality_progress_summary.recent_states.map((entry) => entry.dossier_revision)).size,
+      7,
+      "revision churn must remain visible for diagnostics",
+    );
+    assert.equal(
+      new Set(stalledContinuation.quality_progress_summary.recent_states
+        .map((entry) => entry.dossier_analysis_fingerprint)).size,
+      1,
+      "the regression fixture must keep dossier analysis semantically unchanged",
+    );
+    assert.equal(
+      new Set(stalledContinuation.quality_progress_summary.recent_states.map((entry) => entry.semantic_progress_fingerprint)).size,
+      1,
+      "technical revisions and duplicate context receipt counts must not disguise semantic lifecycle stagnation",
+    );
+    assert(stalledTraceEvents.length > 0,
+      `a fully observed quality stall must emit its settled trace before returning the negative outcome: ${JSON.stringify({
+        parser_status: stalledContinuation.parser_status,
+        tool_call_count: stalledContinuation.trace_summary?.tool_call_count ?? null,
+        trace_event_count: stalledTraceEvents.length,
+      })}`);
+    const stalledInvocations = continuationInvocations.slice(stalledInvocationStart);
+    assert.equal(stalledInvocations.length, 7);
+    const firstAdaptivePrompt = stalledInvocations[2][stalledInvocations[2].indexOf("run") + 1];
+    const lastAdaptivePrompt = stalledInvocations.at(-1)[stalledInvocations.at(-1).indexOf("run") + 1];
+    assert.match(firstAdaptivePrompt, /no durable quality-state change/u);
+    assert.match(firstAdaptivePrompt, /Consecutive unchanged continuation count: 1/u);
+    assert.match(firstAdaptivePrompt, /already-authorized native edit as the first action/u);
+    assert.match(firstAdaptivePrompt, /Implement the requested change now/u);
+    assert.match(lastAdaptivePrompt, /Consecutive unchanged continuation count: 5/u);
+    assert.equal(assertNeutralSyntheticModelVisibleValue(lastAdaptivePrompt, "stalled quality continuation prompt"), true);
+
+    const missingFinal = await executeOpenCodeAdapter(baseInput, {
+      executable: process.execPath,
+      executableArgsPrefix: [missingFinalCli],
+    });
+    assert.equal(missingFinal.passed, false);
+    assert.equal(missingFinal.status, "failed");
+    assert.equal(missingFinal.reason, "opencode_missing_final");
+    assert.equal(missingFinal.parser_status, "missing_final");
+    assert.equal(missingFinal.agent_outcome, null);
+    assert.equal(missingFinal.trace_summary.stream_complete, true);
+    assert.equal(missingFinal.transient_observations.observation_complete, true);
+
+    const ordinaryJsonFinal = await executeOpenCodeAdapter(baseInput, {
+      executable: process.execPath,
+      executableArgsPrefix: [invalidFinalCli],
+    });
+    assert.equal(ordinaryJsonFinal.passed, true);
+    assert.equal(ordinaryJsonFinal.status, "completed");
+    assert.equal(ordinaryJsonFinal.reason, null);
+    assert.equal(ordinaryJsonFinal.parser_status, "valid");
+    assert.equal(ordinaryJsonFinal.response_protocol_status, "ordinary");
+    assert.equal(ordinaryJsonFinal.agent_outcome, null);
+    assert.equal(ordinaryJsonFinal.trace_summary.stream_complete, true);
+    assert.equal(ordinaryJsonFinal.transient_observations.observation_complete, true);
+    for (const [index, invocation] of invocations.entries()) {
       assert.equal(invocation.options.shell, false);
-      assert.equal(invocation.options.cwd, repo);
+      assert.equal(
+        invocation.options.cwd,
+        index === 1 ? path.join(plainProfile.root, "tmp") : repo,
+      );
       assert.equal(invocation.options.env.OPENCODE_CONFIG, plainProfile.configPath);
       assert.equal(invocation.options.env.OPENCODE_CONFIG_DIR, plainProfile.configDirectory);
       assert.equal(Object.hasOwn(invocation.options.env, "OPENCODE_CONFIG_CONTENT"), false);
       assert.equal(Object.hasOwn(invocation.options.env, "OPENCODE_PERMISSION"), false);
       assert.equal(Object.hasOwn(invocation.options.env, "GITHUB_TOKEN"), false);
       assert.equal(invocation.options.env.OPENCODE_AUTO_SHARE, "false");
-      assert.equal(invocation.options.env.OPENCODE_DISABLE_DEFAULT_PLUGINS, "true");
+      assert.equal(invocation.options.env.OPENCODE_DISABLE_DEFAULT_PLUGINS, "false");
     }
+
+    let caseProjectionKeys = null;
+    const caseBindingSpawn = (executable, args, options) => {
+      if (args.includes("run")) {
+        caseProjectionKeys = Object.keys(JSON.parse(
+          options.env.OPENCODE_AUTH_CONTENT,
+        ));
+      }
+      return spawn(executable, args, options);
+    };
+    const caseBinding = await executeOpenCodeAdapter({
+      ...baseInput,
+      provider: "EXAMPLE",
+    }, {
+      spawnImpl: caseBindingSpawn,
+      executable: process.execPath,
+      executableArgsPrefix: [fakeCli],
+      sourceEnvironment: {
+        ...process.env,
+        OPENCODE_AUTH_CONTENT: JSON.stringify({
+          example: {
+            type: "api",
+            key: "case-binding-secret",
+          },
+        }),
+      },
+    });
+    assert.equal(caseBinding.passed, true);
+    assert.deepEqual(caseProjectionKeys, ["example"]);
+    assert.equal(JSON.stringify(caseBinding).includes("case-binding-secret"), false);
 
     const stale = await executeOpenCodeAdapter({
       ...baseInput,
@@ -826,13 +2173,98 @@ async function executionFixtures(root, plainProfile) {
     assert.equal(nonzero.reason, "opencode_nonzero_exit");
     assert.equal(nonzero.exit_code, 7);
 
+    const modelUnavailable = await executeOpenCodeAdapter(baseInput, {
+      executable: process.execPath,
+      executableArgsPrefix: [modelUnavailableCli],
+    });
+    assert.equal(modelUnavailable.status, "blocked_external_state");
+    assert.equal(modelUnavailable.reason, "opencode_model_unavailable");
+    assert.equal(modelUnavailable.exit_code, 7);
+    assert.equal(JSON.stringify(modelUnavailable).includes(stderrSecretCanary), false);
+
+    const authUnavailable = await executeOpenCodeAdapter(baseInput, {
+      executable: process.execPath,
+      executableArgsPrefix: [authUnavailableCli],
+    });
+    assert.equal(authUnavailable.status, "blocked_external_state");
+    assert.equal(authUnavailable.reason, "opencode_auth_unavailable");
+    assert.equal(JSON.stringify(authUnavailable).includes(stderrSecretCanary), false);
+
+    const structuredAuthUnavailable = await executeOpenCodeAdapter(baseInput, {
+      executable: process.execPath,
+      executableArgsPrefix: [structuredAuthUnavailableCli],
+    });
+    assert.equal(structuredAuthUnavailable.status, "blocked_external_state");
+    assert.equal(structuredAuthUnavailable.reason, "opencode_auth_unavailable");
+    assert.equal(JSON.stringify(structuredAuthUnavailable).includes("Token refresh failed"), false);
+
+    const providerUnavailable = await executeOpenCodeAdapter(baseInput, {
+      executable: process.execPath,
+      executableArgsPrefix: [providerUnavailableCli],
+    });
+    assert.equal(providerUnavailable.status, "blocked_external_state");
+    assert.equal(providerUnavailable.reason, "opencode_provider_unavailable");
+    assert.equal(JSON.stringify(providerUnavailable).includes(stderrSecretCanary), false);
+
+    const multiMarkerSingleChunk = await executeOpenCodeAdapter(baseInput, {
+      executable: process.execPath,
+      executableArgsPrefix: [multiMarkerSingleChunkCli],
+    });
+    const multiMarkerSplitChunk = await executeOpenCodeAdapter(baseInput, {
+      executable: process.execPath,
+      executableArgsPrefix: [multiMarkerSplitChunkCli],
+    });
+    assert.equal(multiMarkerSingleChunk.reason, "opencode_auth_unavailable");
+    assert.equal(multiMarkerSplitChunk.reason, "opencode_auth_unavailable");
+    assert.equal(
+      multiMarkerSingleChunk.status,
+      multiMarkerSplitChunk.status,
+    );
+
+    const classifiedOutputLimit = await executeOpenCodeAdapter(baseInput, {
+      executable: process.execPath,
+      executableArgsPrefix: [classifiedOutputLimitCli],
+      limits: { stderrBytes: 1_024 },
+    });
+    assert.equal(classifiedOutputLimit.status, "failed");
+    assert.equal(classifiedOutputLimit.reason, "opencode_output_limit");
+
+    const providerMismatch = await executeOpenCodeAdapter({
+      ...baseInput,
+      provider: "other",
+    }, {
+      spawnImpl: () => {
+        throw new Error("provider mismatch must fail before spawn");
+      },
+    });
+    assert.equal(providerMismatch.status, "failed");
+    assert.equal(providerMismatch.reason, "invalid_adapter_input");
+
     const timedOut = await executeOpenCodeAdapter(baseInput, {
       executable: process.execPath,
       executableArgsPrefix: [timeoutCli],
       operationTimeoutMs: 500,
     });
     assert.equal(timedOut.passed, false);
-    assert.equal(timedOut.reason, "opencode_timeout");
+    assert.equal(timedOut.status, "blocked_external_state");
+    assert.equal(timedOut.termination_reason, "blocked_external_state");
+    assert.equal(timedOut.reason, "opencode_no_progress_timeout");
+    assert.equal(timedOut.parser_status, "missing_final");
+    assert.equal(timedOut.progress_observed, false);
+    assert.equal(timedOut.transient_observations, null);
+
+    const progressTimedOut = await executeOpenCodeAdapter(baseInput, {
+      executable: process.execPath,
+      executableArgsPrefix: [progressTimeoutCli],
+      operationTimeoutMs: 500,
+    });
+    assert.equal(progressTimedOut.passed, false);
+    assert.equal(progressTimedOut.status, "failed");
+    assert.equal(progressTimedOut.termination_reason, "budget_exhausted");
+    assert.equal(progressTimedOut.reason, "opencode_timeout");
+    assert.equal(progressTimedOut.parser_status, "missing_final");
+    assert(progressTimedOut.trace_summary.event_count > 0);
+    assert.equal(progressTimedOut.transient_observations.observation_complete, true);
 
     const unsupported = await executeOpenCodeAdapter(baseInput, {
       executable: process.execPath,
@@ -848,6 +2280,42 @@ async function executionFixtures(root, plainProfile) {
     });
     assert.equal(belowMinimum.status, "blocked_external_state");
     assert.equal(belowMinimum.reason, "opencode_version_unsupported");
+
+    const invalidBootstrap = await executeOpenCodeAdapter(baseInput, {
+      executable: process.execPath,
+      executableArgsPrefix: [invalidBootstrapCli],
+    });
+    assert.equal(invalidBootstrap.status, "failed");
+    assert.equal(invalidBootstrap.reason, "opencode_profile_bootstrap_invalid");
+
+    assert.deepEqual(
+      syntheticOpenCodeStartupTimeouts(300_000),
+      { version_ms: 30_000, profile_bootstrap_ms: 300_000 },
+    );
+    assert.deepEqual(
+      syntheticOpenCodeStartupTimeouts(500),
+      { version_ms: 500, profile_bootstrap_ms: 500 },
+    );
+    assert.throws(
+      () => syntheticOpenCodeStartupTimeouts(0),
+      (error) => error?.code === "SYNTHETIC_OPENCODE_STARTUP_TIMEOUT",
+    );
+    const bootstrapTimeoutController = new AbortController();
+    const bootstrapTimeoutCancellation = setTimeout(
+      () => bootstrapTimeoutController.abort(),
+      2_000,
+    );
+    const bootstrapTimedOut = await executeOpenCodeAdapter({
+      ...baseInput,
+      signal: bootstrapTimeoutController.signal,
+    }, {
+      executable: process.execPath,
+      executableArgsPrefix: [bootstrapTimeoutCli],
+      operationTimeoutMs: 500,
+    });
+    clearTimeout(bootstrapTimeoutCancellation);
+    assert.equal(bootstrapTimedOut.status, "failed");
+    assert.equal(bootstrapTimedOut.reason, "opencode_profile_bootstrap_timeout");
 
     const versionCancellation = new AbortController();
     const versionCancellationTimer = setTimeout(() => versionCancellation.abort(), 50);
@@ -881,6 +2349,74 @@ async function executionFixtures(root, plainProfile) {
     assert.equal(unavailable.status, "blocked_external_state");
     assert.equal(unavailable.reason, "opencode_not_found");
 
+    const rotatingCredentialBroker = createSyntheticOpenCodeCredentialBroker({
+      providerId: "example",
+      sourceEnvironment: {
+        OPENCODE_AUTH_CONTENT: JSON.stringify({
+          example: {
+            type: "oauth",
+            refresh: "rotation-refresh-old",
+            access: "rotation-access-old",
+            expires: 1,
+          },
+        }),
+      },
+    });
+    const rotatedAuthRecord = {
+      type: "oauth",
+      refresh: "rotation-refresh-new",
+      access: "rotation-access-new",
+      expires: 2,
+    };
+    const rotatingCli = writeFakeOpenCode(fixtureRoot, "fake-opencode-credential-rotation", {
+      stream: successfulStream,
+      expectedAuthRefresh: "rotation-refresh-old",
+      rotateAuthRecord: rotatedAuthRecord,
+    });
+    const rotatedReadCli = writeFakeOpenCode(fixtureRoot, "fake-opencode-credential-rotation-readback", {
+      stream: successfulStream,
+      expectedAuthRefresh: "rotation-refresh-new",
+    });
+    const rotatingInput = {
+      ...baseInput,
+      credential: {
+        read: (providerId) => rotatingCredentialBroker.handle("credential_read", {
+          provider_id: providerId,
+        }),
+        update: (payload) => rotatingCredentialBroker.handle("credential_update", payload),
+      },
+    };
+    const rotatedFirst = await executeOpenCodeAdapter(rotatingInput, {
+      executable: process.execPath,
+      executableArgsPrefix: [rotatingCli],
+      sourceEnvironment: {},
+    });
+    assert.equal(rotatedFirst.status, "completed");
+    const rotatedBrokerRead = await rotatingCredentialBroker.handle("credential_read", {
+      provider_id: "example",
+    });
+    assert.equal(rotatedBrokerRead.revision, 1);
+    assert.equal(JSON.parse(rotatedBrokerRead.auth_content).example.refresh, "rotation-refresh-new");
+    const rotatedSecond = await executeOpenCodeAdapter(rotatingInput, {
+      executable: process.execPath,
+      executableArgsPrefix: [rotatedReadCli],
+      sourceEnvironment: {},
+    });
+    assert.equal(rotatedSecond.status, "completed");
+    for (const result of [rotatedFirst, rotatedSecond]) {
+      const serialized = JSON.stringify(result);
+      assert.equal(serialized.includes("rotation-refresh-old"), false);
+      assert.equal(serialized.includes("rotation-refresh-new"), false);
+      assert.equal(serialized.includes("rotation-access-new"), false);
+    }
+    fs.rmSync(path.join(
+      readSyntheticProfileManifest(plainProfile.manifestPath).directories.data,
+      "opencode",
+    ), {
+      recursive: true,
+      force: true,
+    });
+
     const argv = buildOpenCodeArgv({
       prompt: baseInput.prompt,
       agent: "build",
@@ -893,7 +2429,7 @@ async function executionFixtures(root, plainProfile) {
     process.chdir(originalCwd);
     fs.rmSync(fixtureRoot, { recursive: true, force: true });
   }
-  return 9;
+  return 25;
 }
 
 async function productionCompositionFixtures(root, plainProfile) {
@@ -937,6 +2473,7 @@ async function productionCompositionFixtures(root, plainProfile) {
     provider: "example",
     variant: null,
     timeout: 60_000,
+    taskScopeMode: "read-only",
   };
   const injectedContainment = createInjectedTestContainmentFactory(
     "injected-synthetic-adapter-composition-test-containment-v1",
@@ -1008,10 +2545,11 @@ async function productionCompositionFixtures(root, plainProfile) {
 
 export async function verifyBenchmarkAdapter({ root = defaultRoot } = {}) {
   parserFixtures(root);
+  await credentialBoundaryFixtures();
   const profiles = profileFixtures(root);
-  let lifecycleFixtureCount = 0;
+  let lifecycleFixtureCount = executableResolutionFixtures();
   try {
-    lifecycleFixtureCount += await executionFixtures(root, profiles.plain);
+    lifecycleFixtureCount += await executionFixtures(root, profiles.plain, profiles.instrumented);
     lifecycleFixtureCount += await productionCompositionFixtures(root, profiles.plain);
   } finally {
     for (const entry of profiles.all.reverse()) {
@@ -1020,7 +2558,7 @@ export async function verifyBenchmarkAdapter({ root = defaultRoot } = {}) {
   }
   return {
     schema_version: 1,
-    parser_fixture_count: 14,
+    parser_fixture_count: 16,
     profile_count: 3,
     lifecycle_fixture_count: lifecycleFixtureCount,
   };

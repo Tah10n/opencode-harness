@@ -3,10 +3,14 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
+  DEFAULT_DETERMINISTIC_STAGE_TIMEOUT_MS,
   DETERMINISTIC_STAGE_REGISTRY,
+  EXTENDED_DETERMINISTIC_STAGE_TIMEOUT_MS,
+  MAX_DETERMINISTIC_STAGE_TIMEOUT_MS,
   canonicalStageTemporaryRoot,
   deterministicExpectedChecks,
   deterministicStageEnvironment,
+  deterministicStageTimeoutMs,
   formatStageTimingSummary,
 } from "./verify-all.mjs";
 import { milestone2ExpectedChecks } from "../lib/quality/milestone-dod.mjs";
@@ -301,7 +305,7 @@ const requiredFiles = [
   "benchmarks/synthetic/schemas/comparison-policy.schema.json",
   "benchmarks/synthetic/schemas/template-set.schema.json",
   "benchmarks/synthetic/schemas/generated-instance.schema.json",
-  "benchmarks/synthetic/schemas/run-report.v2.schema.json",
+  "benchmarks/synthetic/schemas/run-report.v3.schema.json",
   "benchmarks/synthetic/schemas/comparison-report.v1.schema.json",
   "benchmarks/synthetic/schemas/model-free-self-test-report.v1.schema.json",
   "benchmarks/synthetic/schemas/replay-report.v1.schema.json",
@@ -509,6 +513,34 @@ if (DETERMINISTIC_STAGE_REGISTRY.some((stage) => stage.npm_script === "probe:run
 if (new Set(DETERMINISTIC_STAGE_REGISTRY.map((stage) => stage.command_id)).size !== DETERMINISTIC_STAGE_REGISTRY.length) {
   fail("HARNESS-S008", "verify-all command IDs must be unique", "Give each deterministic stage one stable command_id.");
 }
+const adoptionBundleStage = DETERMINISTIC_STAGE_REGISTRY.find((stage) => stage.npm_script === "verify:adoption-bundle");
+const normalSessionQualityBridgeStage = DETERMINISTIC_STAGE_REGISTRY.find(
+  (stage) => stage.npm_script === "verify:normal-session-quality-bridge",
+);
+if (!adoptionBundleStage
+  || deterministicStageTimeoutMs(adoptionBundleStage) !== EXTENDED_DETERMINISTIC_STAGE_TIMEOUT_MS
+  || EXTENDED_DETERMINISTIC_STAGE_TIMEOUT_MS !== 15 * 60 * 1000) {
+  fail("HARNESS-S008", "the adoption bundle stage must retain its reviewed 15-minute outer budget", "Keep the nested portable-bundle verifier bounded without truncating its 10-minute inner verifier budget.");
+}
+if (!normalSessionQualityBridgeStage
+  || deterministicStageTimeoutMs(normalSessionQualityBridgeStage) !== MAX_DETERMINISTIC_STAGE_TIMEOUT_MS
+  || MAX_DETERMINISTIC_STAGE_TIMEOUT_MS !== 20 * 60 * 1000) {
+  fail("HARNESS-S008", "the normal-session quality bridge stage must retain its reviewed 20-minute budget", "Keep the growing bridge regression suite bounded with measured headroom above the ordinary 10-minute default.");
+}
+if (DETERMINISTIC_STAGE_REGISTRY
+  .filter((stage) => ![adoptionBundleStage, normalSessionQualityBridgeStage].includes(stage))
+  .some((stage) => deterministicStageTimeoutMs(stage) !== DEFAULT_DETERMINISTIC_STAGE_TIMEOUT_MS)) {
+  fail("HARNESS-S008", "an ordinary deterministic stage drifted from the default 10-minute budget", "Use a longer stage budget only for an explicitly reviewed long-running verifier.");
+}
+let oversizedStageTimeoutRejected = false;
+try {
+  deterministicStageTimeoutMs({ timeout_ms: MAX_DETERMINISTIC_STAGE_TIMEOUT_MS + 1 });
+} catch {
+  oversizedStageTimeoutRejected = true;
+}
+if (!oversizedStageTimeoutRejected) {
+  fail("HARNESS-S008", "verify-all accepted a deterministic stage timeout above the reviewed maximum", "Fail closed on unbounded or malformed stage budgets.");
+}
 for (const stage of DETERMINISTIC_STAGE_REGISTRY) {
   if (!packageJson.scripts?.[stage.npm_script] || stage.npm_script === "verify") {
     fail("HARNESS-S008", `verify-all references missing or recursive npm stage ${stage.npm_script}`, "Keep the registry and package scripts coherent and non-recursive.");
@@ -710,6 +742,10 @@ if (packageJson.scripts?.["verify:runtime:fixture"] !== "node scripts/verify-run
   fail("HARNESS-S012", "package.json must expose npm run verify:runtime:fixture", "Restore the deterministic runtime fixture verifier entry.");
 }
 const verifyAllScript = read("scripts/verify-all.mjs");
+const verifyAdoptionBundleScript = read("scripts/verify-adoption-bundle.mjs");
+if (!verifyAdoptionBundleScript.includes("const STATIC_BUNDLE_VERIFIER_TIMEOUT_MS = 600_000;")) {
+  fail("HARNESS-S008", "the nested static bundle verifier lost its reviewed 10-minute budget", "Keep the inner verifier budget below the adoption stage outer budget.");
+}
 for (const needle of [
   "DETERMINISTIC_STAGE_REGISTRY",
   "sealVerificationReceipt",
@@ -1961,6 +1997,8 @@ for (const needle of [
   "`instrumented`",
   "Model-free validation and self-tests",
   "do not prove that one profile produces better coding results",
+  "model is never told which profile or comparison arm",
+  "byte-identical agent and skill prompt trees",
   "npm run bench:synthetic:validate",
   "npm run bench:synthetic:self-test",
   "npm run bench:synthetic --",
@@ -1977,6 +2015,9 @@ for (const needle of [
   "replay report v2",
   "historical structural read only",
   "`whole_task_success`",
+  "`task_correct`",
+  "QuixBugs",
+  "`source_class: public-benchmark-adaptation`",
   "`defect_escape_v2`",
   "10,000-resample 95% bootstrap confidence interval",
   "exact McNemar test",
@@ -2064,6 +2105,7 @@ for (const stale of ["12+1 corpus", "only the eight `quality_*` tools", "The com
 for (const needle of [
   "## Synthetic Ablation Benchmark",
   "same host-selected model",
+  "`task_correct`",
   "`whole_task_success`",
   "paired comparison policy",
   "must not be passed to `npm run assess:candidate`",

@@ -101,6 +101,59 @@ function replayAttempt({
     fixture: "replay-initial-workspace",
     instance: instance.instance_fingerprint,
   });
+  const changedAllowedPaths = completed && instance.task_scope.mode === "edit"
+    ? [...instance.task_scope.allowed_changed_paths]
+    : [];
+  const scopeAudit = {
+    mode: instance.task_scope.mode,
+    allowed_changed_paths: [...instance.task_scope.allowed_changed_paths],
+    max_changed_files: instance.task_scope.max_changed_files,
+    observation_status: completed ? "available" : "unavailable",
+    changed_allowed_paths: changedAllowedPaths,
+    changed_path_count: completed ? changedAllowedPaths.length : null,
+    changed_paths_fingerprint: completed
+      ? fingerprint({ schema: "synthetic-changed-paths-v1", paths: changedAllowedPaths })
+      : null,
+    unexpected_path_count: completed ? 0 : null,
+    unexpected_path_ids: [],
+    unexpected_path_ids_complete: completed,
+    forbidden_path_count: completed ? 0 : null,
+    forbidden_path_ids: [],
+    forbidden_path_ids_complete: completed,
+    violation_codes: completed ? [] : ["workspace_not_observed"],
+  };
+  const instrumented = profileId === "instrumented" && completed;
+  const controlAudit = {
+    classification: instrumented ? "attested" : "absent",
+    session_count: instrumented ? 1 : 0,
+    registration_count: instrumented ? 1 : 0,
+    registration_only_count: 0,
+    owner_session_count: instrumented ? 1 : 0,
+    child_session_count: 0,
+    attested_owner_count: instrumented ? 1 : 0,
+    control_state_fingerprint: instrumented ? fingerprint({ fixture: "replay-control", operationalRunId }) : null,
+    violation_codes: [],
+  };
+  const reviewAudit = (check) => ({
+    strategy: "semantic-concept-one-to-one-v2",
+    candidate_count: 1,
+    oracle_count: check.expected_findings.length,
+    matched_count: check.expected_findings.length,
+    severity_calibrated_count: check.expected_findings.length,
+    location_calibrated_count: check.expected_findings.length,
+    oracle_fingerprint: fingerprint(check.expected_findings),
+  });
+  const reviewMatchAudit = instance.visible_check.kind === "structured-review"
+    ? {
+        visible: completed ? reviewAudit(instance.visible_check) : null,
+        hidden: completed ? reviewAudit(instance.hidden_check) : null,
+      }
+    : null;
+  const auditEvidenceSource = {
+    scope: scopeAudit,
+    control: controlAudit,
+    review_match: reviewMatchAudit,
+  };
   const result = {
     profile_id: profileId,
     profile_fingerprint: profileFingerprint,
@@ -109,19 +162,28 @@ function replayAttempt({
     termination_reason: terminationReason,
     reason,
     cli_version: completed ? "1.17.0" : null,
+    adapter_evidence_observed: completed,
     adapter_completed_correctly: adapterCompleted,
     agent_reported_success: completed,
     termination_acceptable: completed,
     visible_check: checkOutcome(),
     hidden_check: checkOutcome(),
     workspace_policy: checkOutcome(),
+    common_safety: checkOutcome(),
+    treatment_compliance: checkOutcome(),
     trace_policy: checkOutcome(),
     teardown: { status: "passed", passed: true, violations: [] },
     cleanup: { status: "passed", passed: true, violations: [] },
     hidden_safety_failed: false,
+    task_evidence_complete: completed,
+    task_correct: completed,
     evidence_complete: evidenceComplete,
     whole_task_success: wholeTaskSuccess,
     defect_escape_v2: false,
+    audit_evidence: {
+      ...auditEvidenceSource,
+      fingerprint: fingerprint(auditEvidenceSource),
+    },
     fingerprints: {
       adapter: completed ? syntheticOpenCodeAdapterFingerprint() : null,
       initial_workspace: initialWorkspace,
@@ -135,6 +197,8 @@ function replayAttempt({
       subagent_call_count: completed ? 0 : null,
       context_read_count: null,
       permission_request_count: null,
+      model_turn_count: completed ? 1 : null,
+      continuation_turn_count: completed && profileId === "instrumented" ? 1 : completed ? 0 : null,
       dangerous_command_count: completed ? 0 : null,
       network_action_count: completed ? 0 : null,
       hidden_access_attempt_count: completed ? 0 : null,
@@ -157,6 +221,7 @@ function replayAttempt({
     binding: {
       public_fixture_fingerprint: instance.public_fixture_fingerprint,
       hidden_fixture_fingerprint: instance.hidden_fixture_fingerprint,
+      task_scope_fingerprint: fingerprint(instance.task_scope),
       effective_public_input_fingerprint: syntheticEffectivePublicInputFingerprint(instance),
       initial_public_manifest_fingerprint: initialWorkspace,
       model_fingerprint: syntheticModelBindingFingerprint({ provider, model, variant }),
@@ -166,6 +231,25 @@ function replayAttempt({
     },
     result,
   };
+}
+
+function completeNegativeReplayAttempt(input, {
+  reason = "opencode_missing_final",
+  terminationReason = "verification_failed",
+} = {}) {
+  const attempt = replayAttempt(input);
+  Object.assign(attempt.result, {
+    execution_status: "failed",
+    termination_reason: terminationReason,
+    reason,
+    adapter_completed_correctly: false,
+    agent_reported_success: null,
+    termination_acceptable: false,
+    evidence_complete: true,
+    whole_task_success: false,
+    defect_escape_v2: false,
+  });
+  return attempt;
 }
 
 function canonicalTemporaryRoot(prefix) {
@@ -216,6 +300,34 @@ export async function verifyBenchmarkCli({ root = defaultRoot } = {}) {
     assert.equal(parsed.suiteId, "smoke");
     assert.equal(parsed.seed, "cli-seed");
     assert.equal(parsed.model, "fixture/model");
+    assert.equal(parsed.timeoutMs, 300_000);
+    assert.equal(parseSyntheticCliArguments("run", [
+      "--seed",
+      "extended-timeout",
+      "--model",
+      "fixture/model",
+      "--timeout-ms",
+      "300000",
+    ], {}).timeoutMs, 300_000);
+    assert.equal(parseSyntheticCliArguments("run", [
+      "--seed",
+      "maximum-timeout",
+      "--model",
+      "fixture/model",
+      "--timeout-ms",
+      "3600000",
+    ], {}).timeoutMs, 3_600_000);
+    assert.throws(
+      () => parseSyntheticCliArguments("run", [
+        "--seed",
+        "excessive-timeout",
+        "--model",
+        "fixture/model",
+        "--timeout-ms",
+        "3600001",
+      ], {}),
+      (error) => error?.code === "SYNTHETIC_CLI_USAGE",
+    );
     const emptyOptionalEnvironment = parseSyntheticCliArguments("run", [
       "--seed",
       "empty-optional-environment",
@@ -343,6 +455,35 @@ export async function verifyBenchmarkCli({ root = defaultRoot } = {}) {
       syntheticModelBindingFingerprint(report.execution),
     );
     assert.equal(JSON.stringify(runWorkflow.output).includes(report.execution.model), false);
+
+    let runPublishedBeforeAnalysisFailure = false;
+    await assert.rejects(runSyntheticBenchmarkWorkflow({
+      sourceRoot: fixtureRoot,
+      contractSourceRoot: root,
+      suiteId: report.suite.id,
+      baselineProfileId: report.profiles.baseline.id,
+      candidateProfileId: report.profiles.candidate.id,
+      seed: report.suite.seed,
+      repetitions: report.suite.repetitions,
+      model: report.execution.model,
+      provider: report.execution.provider,
+      variant: report.execution.variant,
+      timeoutMs: report.execution.timeout_ms,
+      loadContracts: () => contracts,
+      runPairedBenchmark: async () => structuredClone(report),
+      publishRunArtifacts: () => {
+        runPublishedBeforeAnalysisFailure = true;
+        return { files: {} };
+      },
+      analyzeRunReport: () => {
+        throw new Error("synthetic comparison analysis failed");
+      },
+    }), /synthetic comparison analysis failed/);
+    assert.equal(
+      runPublishedBeforeAnalysisFailure,
+      true,
+      "a valid expensive run must be published before fallible comparison analysis",
+    );
 
     const reportPath = runWorkflow.output.run_artifacts.json;
     const loaded = loadRunArtifact({
@@ -658,6 +799,38 @@ export async function verifyBenchmarkCli({ root = defaultRoot } = {}) {
       JSON.stringify(successfulReplay.report).includes("fixture/model"),
       false,
     );
+    const completeNegativeReplay = await runSyntheticReplay({
+      sourceRoot: root,
+      familyId,
+      seed: "replay-complete-negative-seed",
+      repetition: 1,
+      profileId: "plain",
+      model: "fixture/model",
+      provider: "fixture",
+      runProfileAttempt: async (input) => completeNegativeReplayAttempt(input),
+      clock: () => new Date(FIXED_TIME),
+      idFactory: () => "replay-cli-complete-negative",
+    });
+    validateSyntheticReplayReport(completeNegativeReplay.report);
+    validateSyntheticReplayReportSourceBinding(completeNegativeReplay.report, { sourceRoot: root });
+    assert.equal(completeNegativeReplay.report.model_execution_confirmed, true);
+    assert.equal(completeNegativeReplay.report.adapter_completed_correctly, false);
+    assert.equal(completeNegativeReplay.report.evidence_complete, true);
+    assert.equal(completeNegativeReplay.report.whole_task_success, false);
+    assert.equal(completeNegativeReplay.report.execution_status, "failed");
+    assert.equal(completeNegativeReplay.report.reason, "opencode_missing_final");
+    const unconfirmedNegativeReplay = structuredClone(completeNegativeReplay.report);
+    unconfirmedNegativeReplay.model_execution_confirmed = false;
+    assert.throws(
+      () => validateSyntheticReplayReport(unconfirmedNegativeReplay),
+      (error) => error?.code === "SYNTHETIC_REPLAY_EVIDENCE",
+    );
+    const unsupportedExecutionConfirmation = structuredClone(completeNegativeReplay.report);
+    unsupportedExecutionConfirmation.evidence_complete = false;
+    assert.throws(
+      () => validateSyntheticReplayReport(unsupportedExecutionConfirmation),
+      (error) => error?.code === "SYNTHETIC_REPLAY_EVIDENCE",
+    );
     const malformedAttemptReplay = structuredClone(successfulReplay.report);
     malformedAttemptReplay.attempt = null;
     assert.throws(
@@ -729,6 +902,7 @@ export async function verifyBenchmarkCli({ root = defaultRoot } = {}) {
     const legacyReplay = structuredClone(successfulReplay.report);
     legacyReplay.schema_version = 1;
     delete legacyReplay.profile_fingerprint;
+    delete legacyReplay.task_correct;
     delete legacyReplay.attempt;
     validateSyntheticReplayReport(legacyReplay);
     assert.throws(
@@ -807,6 +981,39 @@ export async function verifyBenchmarkCli({ root = defaultRoot } = {}) {
       );
       assert.equal(publishCalls, 0);
     }
+
+    const completeNegativeWorkflow = await replaySyntheticBenchmarkWorkflow({
+      sourceRoot: fixtureRoot,
+      contractSourceRoot: root,
+      familyId,
+      seed: completeNegativeReplay.report.seed,
+      repetition: completeNegativeReplay.report.repetition,
+      profileId: completeNegativeReplay.report.profile_id,
+      instanceFingerprint: completeNegativeReplay.report.instance_fingerprint,
+      model: "fixture/model",
+      provider: "fixture",
+      variant: null,
+      timeoutMs: completeNegativeReplay.report.attempt.binding.timeout_ms,
+      runReplay: async () => completeNegativeReplay,
+      publishReplay: ({ sourceRoot, contractSourceRoot, report: replayReport }) =>
+        publishSyntheticReplayReport({
+          sourceRoot,
+          contractSourceRoot,
+          report: replayReport,
+          relativeRoot: "replays-complete-negative",
+        }),
+    });
+    assert.equal(completeNegativeWorkflow.exitCode, SYNTHETIC_CLI_EXIT.success);
+    assert.equal(completeNegativeWorkflow.output.status, "failed");
+    assert.equal(completeNegativeWorkflow.output.evidence_complete, true);
+    assert.equal(completeNegativeWorkflow.output.whole_task_success, false);
+    assert.equal(
+      fs.existsSync(path.join(
+        fixtureRoot,
+        completeNegativeWorkflow.output.replay_artifacts.completion,
+      )),
+      true,
+    );
 
     const blockedReplay = await runSyntheticReplay({
       sourceRoot: root,

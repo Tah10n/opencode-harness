@@ -374,6 +374,11 @@ function createPassedTestReconciliation(decision, dossier, finalWorkspaceFingerp
       "changed_path_ownership", "public_contracts", "dependency_directions", "side_effect_edges", "critical_path_tests", "unrelated_changes",
     ].map((key) => [key, { status: "passed", finding_ids: [] }])),
     unplanned_item_ids: [],
+    contract_review_fingerprint: fingerprint({
+      schema: "test-review-contract-v1",
+      final_workspace_fingerprint: finalWorkspaceFingerprint,
+      changed_paths: mappedPaths,
+    }),
     completed_at: "2026-07-13T00:04:00Z",
   });
   const reconciliation = reconcileFinalBlastRadius({
@@ -644,7 +649,13 @@ function finalizedStandardLiteDossier(taskType) {
     classification_rationale: "single bounded local ownership with trusted integration verification",
     behavior_expectation: "the bounded behavior remains correct",
     expected_preserved_behavior: ["unrelated behavior remains unchanged"],
-    known_local_edge_cases: ["stale or failed verification remains blocked"],
+    known_local_edge_cases: taskType === "bug_fix"
+      ? [
+        "the first dependency fails while the second succeeds",
+        "the second dependency fails while the first succeeds",
+        "malformed dependency data remains distinguishable from an availability failure",
+      ]
+      : ["stale or failed verification remains blocked"],
     ...(taskType === "bug_fix" ? {
       reproduction_contract: {
         check_id: "quality-integration",
@@ -660,6 +671,17 @@ function finalizedStandardLiteDossier(taskType) {
   const content = standardLiteDossierRequest(registration, {
     trustedProducer: "opencode-harness-quality-verifier",
   });
+  assert.equal(
+    content.behavior_contract.requested_behavior,
+    registration.user_visible_goal,
+    "standard-lite must bind the narrow user-visible goal instead of a broader model-authored behavior summary",
+  );
+  assert.deepEqual(content.behavior_contract.positive_behavior, [registration.user_visible_goal]);
+  assert.match(
+    content.edge_cases[0].expected_behavior,
+    /Preserve pre-change behavior unless the narrow user_visible_goal explicitly changes it/u,
+    "standard-lite edge behavior must default to preservation rather than conventional semantic expansion",
+  );
   const draft = createEngineeringDossierDraft({
     dossier_id: `dossier-standard-lite-${taskType}`,
     run_id: registration.run_id,
@@ -1244,6 +1266,18 @@ test("standard-lite supports every bounded task type with one operational check 
     if (taskType === "bug_fix") {
       assert.deepEqual(dossier.test_obligations.map((entry) => entry.phase), ["preimplementation", "integration"]);
       assert.deepEqual(dossier.verification_plan.baseline_check_ids, ["quality-integration"]);
+      assert.deepEqual(dossier.edge_cases.map((entry) => entry.condition), [
+        "the first dependency fails while the second succeeds",
+        "the second dependency fails while the first succeeds",
+        "malformed dependency data remains distinguishable from an availability failure",
+      ], "standard-lite must retain every declared local edge case as an independent review subject");
+      assert.equal(dossier.counterexamples.length, 3,
+        "a standard-lite bug fix must retain every declared local edge case as an independent counterexample");
+      assert.deepEqual(
+        dossier.premortem_matrix.find((entry) => entry.id === "PREMORTEM-standard-lite-local")?.subject_ids,
+        dossier.edge_cases.map((entry) => entry.id),
+        "the local premortem entry must cover every independently retained edge case",
+      );
       assert.deepEqual(requiredEngineeringVerificationTargets(dossier).checkTargets, [
         { checkId: "quality-integration", phase: "preimplementation" },
         { checkId: "quality-integration", phase: "integration" },

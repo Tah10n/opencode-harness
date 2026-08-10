@@ -198,10 +198,11 @@ function createProbeWorkspace() {
   const qualityPluginUrl = pathToFileURL(path.join(root, "lib", "quality", "quality-plugin.mjs")).href;
   fs.writeFileSync(path.join(probeRoot, ".opencode", "plugins", "engineering-dossier.mjs"), [
     'import { tool } from "@opencode-ai/plugin";',
-    `import { createNormalSessionQualityPlugin } from ${JSON.stringify(qualityPluginUrl)};`,
-    "export const EngineeringDossierPlugin = async ({ directory, worktree }) => createNormalSessionQualityPlugin({",
+    `import { createNormalSessionQualityPlugin, createOpenCodeSessionInfoResolver } from ${JSON.stringify(qualityPluginUrl)};`,
+    "export const EngineeringDossierPlugin = async ({ client, directory, worktree }) => createNormalSessionQualityPlugin({",
     "  toolFactory: tool,",
     "  workspaceRoot: worktree ?? directory,",
+    "  sessionInfoResolver: createOpenCodeSessionInfoResolver(client, { directory }),",
     "});",
     "",
   ].join("\n"), "utf8");

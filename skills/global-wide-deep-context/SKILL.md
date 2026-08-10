@@ -22,16 +22,16 @@ completion contracts. Do not restate or replace those contracts here.
 ## Follow the selected strategy
 
 1. Read the runner-selected strategy and task profile.
-2. For high or critical work, confirm that a provisional Engineering Dossier
-   draft and provisional impact graph exist before any instrumented context
-   operation.
+2. For high or critical work with runner-owned quality tools, confirm that a
+   provisional Engineering Dossier draft and provisional impact graph exist
+   before any receipt-producing context operation.
 3. Form narrow questions for the affected system instead of requesting a
    repository dump.
 4. Collect bounded read-only evidence and retain only runner-owned receipt IDs.
-   Instrumented context operations and read-only children are serialized: settle,
-   bind, and incorporate one result before launching the next. Profile-only mode
-   may optionally parallelize independent read-only work, but it provides no
-   computational receipt-chain guarantee.
+   Receipt-producing context operations and read-only children are serialized:
+   settle, bind, and incorporate one result before launching the next. Without
+   runner-owned receipt enforcement, independent read-only work may optionally
+   run in parallel but provides no computational receipt-chain guarantee.
 5. Refine the Dossier impact graph and linked report from the evidence, synthesize
    the wide pass, and analyze each critical impact path separately.
 6. Finalize the Whole-System Context Report only after required categories and

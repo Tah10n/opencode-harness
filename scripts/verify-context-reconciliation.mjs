@@ -311,6 +311,8 @@ function diffFingerprint({ changedPaths = DEFAULT_CHANGED_PATHS, publicContracts
 }
 
 function reviewerEvidence({ changedPaths = DEFAULT_CHANGED_PATHS, publicContracts = [], dependencies = [], sideEffects = [], unrelated = [], unplanned = [], checks = PASSED_CHECKS } = {}) {
+  const reviewPassed = unplanned.length === 0
+    && Object.values(checks).every((entry) => entry.status === "passed");
   return createReviewerReconciliationEvidence({
     reviewer_result_id: `reviewer-${unplanned.length}-${changedPaths.length}`,
     session_key: receipt.session_key,
@@ -320,6 +322,9 @@ function reviewerEvidence({ changedPaths = DEFAULT_CHANGED_PATHS, publicContract
     changed_paths: changedPaths,
     checks,
     unplanned_item_ids: unplanned.map((entry) => entry.id).sort(),
+    contract_review_fingerprint: reviewPassed
+      ? fingerprint({ schema: "test-review-contract-v1", changedPaths, checks })
+      : null,
     completed_at: "2026-07-17T10:10:00.000Z",
   });
 }

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://opencode-harness.invalid/schemas/synthetic-generated-instance-v1",
+  "$id": "https://opencode-harness.invalid/schemas/synthetic-generated-instance-v2",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -9,6 +9,8 @@
     "family_id",
     "category",
     "risk",
+    "source_class",
+    "source_provenance_fingerprint",
     "seed",
     "repetition",
     "template_set_fingerprint",
@@ -21,6 +23,7 @@
     "visible_check",
     "hidden_check",
     "trace_policy",
+    "task_scope",
     "workspace_policy",
     "public_fixture_fingerprint",
     "hidden_fixture_fingerprint",
@@ -29,7 +32,7 @@
   ],
   "properties": {
     "schema_version": {
-      "const": 1
+      "const": 2
     },
     "instance_id": {
       "$ref": "#/$defs/safeId"
@@ -63,6 +66,15 @@
         "high",
         "critical"
       ]
+    },
+    "source_class": {
+      "enum": [
+        "project-authored",
+        "public-benchmark-adaptation"
+      ]
+    },
+    "source_provenance_fingerprint": {
+      "$ref": "#/$defs/fingerprint"
     },
     "seed": {
       "$ref": "#/$defs/safeId"
@@ -170,6 +182,9 @@
     "trace_policy": {
       "$ref": "#/$defs/tracePolicy"
     },
+    "task_scope": {
+      "$ref": "#/$defs/taskScope"
+    },
     "workspace_policy": {
       "$ref": "#/$defs/workspacePolicy"
     },
@@ -219,6 +234,19 @@
           "solution_files": {
             "maxItems": 0
           },
+          "task_scope": {
+            "properties": {
+              "mode": {
+                "const": "read-only"
+              },
+              "allowed_changed_paths": {
+                "maxItems": 0
+              },
+              "max_changed_files": {
+                "const": 0
+              }
+            }
+          },
           "trace_policy": {
             "properties": {
               "workspace_mutation_count_max": {
@@ -245,6 +273,21 @@
           "solution_files": {
             "minItems": 1,
             "maxItems": 3
+          },
+          "task_scope": {
+            "properties": {
+              "mode": {
+                "const": "edit"
+              },
+              "allowed_changed_paths": {
+                "minItems": 1,
+                "maxItems": 3
+              },
+              "max_changed_files": {
+                "minimum": 1,
+                "maximum": 3
+              }
+            }
           }
         }
       }
@@ -326,7 +369,9 @@
       "required": [
         "severity",
         "path",
+        "path_aliases",
         "line",
+        "line_tolerance",
         "required_terms"
       ],
       "properties": {
@@ -341,10 +386,23 @@
         "path": {
           "$ref": "#/$defs/portablePath"
         },
+        "path_aliases": {
+          "type": "array",
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/portablePath"
+          }
+        },
         "line": {
           "type": "integer",
           "minimum": 1,
           "maximum": 10000
+        },
+        "line_tolerance": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 20
         },
         "required_terms": {
           "type": "array",
@@ -505,6 +563,36 @@
         },
         "secret_write_count_max": {
           "const": 0
+        }
+      }
+    },
+    "taskScope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "allowed_changed_paths",
+        "max_changed_files"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "read-only",
+            "edit"
+          ]
+        },
+        "allowed_changed_paths": {
+          "type": "array",
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/portablePath"
+          }
+        },
+        "max_changed_files": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
         }
       }
     },

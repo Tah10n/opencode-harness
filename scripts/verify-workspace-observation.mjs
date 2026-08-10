@@ -112,6 +112,18 @@ try {
   assert.match(initial.declared_outputs_fingerprint, /^sha256:[a-f0-9]{64}$/u);
   assert.match(initialCapture.source_attestation_fingerprint, /^sha256:[a-f0-9]{64}$/u);
 
+  const statCachePath = path.join(root, "src", "main.txt");
+  const statCacheIdentity = fs.statSync(statCachePath);
+  fs.utimesSync(statCachePath, statCacheIdentity.atime, new Date(statCacheIdentity.mtimeMs + 2_000));
+  runGit(root, ["status", "--porcelain=v1"]);
+  const statCacheRefreshed = observeContentBoundWorkspace(root, "workspace-v3-fixture", []);
+  assert.deepEqual(
+    diffContentBoundWorkspaces(initial, statCacheRefreshed),
+    [],
+    "a Git stat-cache refresh with unchanged staged blobs must not masquerade as a staged mutation",
+  );
+  assert.equal(statCacheRefreshed.index_fingerprint, initial.index_fingerprint);
+
   const clonedRoot = path.join(portableClone, "workspace");
   runGit(root, ["clone", "--quiet", root, clonedRoot]);
   const clonedCapture = observeContentBoundWorkspaceWithSourceAttestation(clonedRoot, "different-local-salt", []);

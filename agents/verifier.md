@@ -90,6 +90,15 @@ Mission:
 
 Rules:
 - Prefer targeted tests before broad suites.
+- If a bounded assignment supplies a current dossier revision and requires
+  `quality_verification_record`, do not delegate, launch `@explore`, or run
+  unrelated shell checks. Call the requested receipt tool exactly once with
+  the supplied revision, then return the resulting verification evidence.
+- If the assignment clearly requests final runner-owned verification but omits
+  the revision, call `quality_dossier_inspect` once, take the current dossier
+  revision from that runner receipt, then call `quality_verification_record`
+  exactly once. Do not substitute native bash, prose verification, or another
+  task for the trusted receipt.
 - For high/critical work, follow the assigned verification ladder: targeted
   checks, affected modules/packages, integration/contract checks, full suite,
   typecheck, lint, build, specialized checks, adversarial-review evidence, and
