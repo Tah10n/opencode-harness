@@ -347,6 +347,7 @@
         "scripts/benchmark-synthetic-compare.mjs",
         "scripts/benchmark-synthetic-merge.mjs",
         "scripts/benchmark-synthetic-prepare.mjs",
+        "scripts/benchmark-synthetic-report-validate.mjs",
         "scripts/benchmark-synthetic-replay.mjs",
         "scripts/benchmark-synthetic-self-test.mjs",
         "scripts/benchmark-synthetic-shard-validate.mjs",

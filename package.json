@@ -27,6 +27,7 @@
     "assess:quality-bundles": "node scripts/assess-quality-bundles.mjs",
     "bench:synthetic": "node scripts/benchmark-synthetic.mjs",
     "bench:synthetic:compare": "node scripts/benchmark-synthetic-compare.mjs",
+    "bench:synthetic:report:validate": "node scripts/benchmark-synthetic-report-validate.mjs",
     "bench:synthetic:merge": "node scripts/benchmark-synthetic-merge.mjs",
     "bench:synthetic:prepare": "node scripts/benchmark-synthetic-prepare.mjs",
     "bench:synthetic:replay": "node scripts/benchmark-synthetic-replay.mjs",

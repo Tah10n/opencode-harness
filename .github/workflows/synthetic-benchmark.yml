@@ -155,7 +155,7 @@ jobs:
           set -euo pipefail
           report_path="${{ steps.benchmark.outputs.report_path }}"
           if [[ -n "$report_path" && -f "$report_path" ]]; then
-            npm run bench:synthetic:compare -- --report "$report_path"
+            validation="$(npm run --silent bench:synthetic:report:validate -- --report "$report_path")"
           else
             benchmark_exit="${{ steps.benchmark.outputs.benchmark_exit || '1' }}"
             classification=artifact-missing
@@ -166,14 +166,37 @@ jobs:
               --generation "${{ needs.prepare.outputs.parent_generation_id }}" \
               --classification "$classification" \
               --exit-code "$benchmark_exit"
+            status_path="evals/reports/synthetic/workflow-status/${{ github.run_id }}-single.json"
+            validation="$(STATUS_PATH="$status_path" node -e 'process.stdout.write(JSON.stringify({ status: "workflow-status", artifact_files: [process.env.STATUS_PATH] }))')"
           fi
+          VALIDATION_JSON="$validation" UPLOAD_ROOT="$RUNNER_TEMP/synthetic-upload" node -e '
+            const fs = require("node:fs");
+            const path = require("node:path");
+            const value = JSON.parse(process.env.VALIDATION_JSON);
+            if (!Array.isArray(value.artifact_files) || value.artifact_files.length === 0) process.exit(1);
+            const sourceRoot = fs.realpathSync(process.cwd());
+            const uploadRoot = path.resolve(process.env.UPLOAD_ROOT);
+            if (fs.existsSync(uploadRoot)) process.exit(1);
+            fs.mkdirSync(uploadRoot);
+            for (const entry of value.artifact_files) {
+              if (typeof entry !== "string" || entry.startsWith("/") || entry.includes("\n")) process.exit(1);
+              const source = fs.realpathSync(path.resolve(sourceRoot, ...entry.split("/")));
+              const relative = path.relative(sourceRoot, source).split(path.sep).join("/");
+              if (relative !== entry) process.exit(1);
+              const target = path.resolve(uploadRoot, ...entry.split("/"));
+              if (!target.startsWith(`${uploadRoot}${path.sep}`)) process.exit(1);
+              fs.mkdirSync(path.dirname(target), { recursive: true });
+              fs.copyFileSync(source, target, fs.constants.COPYFILE_EXCL);
+            }
+            process.stdout.write(`artifact_path=${uploadRoot}\n`);
+          ' >> "$GITHUB_OUTPUT"
 
       - name: Upload validated single-run artifacts
         if: always() && steps.validate.outcome == 'success'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: synthetic-single-${{ github.run_id }}-${{ github.run_attempt }}
-          path: evals/reports/synthetic
+          path: ${{ steps.validate.outputs.artifact_path }}
           if-no-files-found: error
           retention-days: 14
 
@@ -239,7 +262,7 @@ jobs:
           set -euo pipefail
           report_path="${{ steps.benchmark.outputs.report_path }}"
           if [[ -n "$report_path" && -f "$report_path" ]]; then
-            npm run bench:synthetic:shard:validate -- --report "$report_path"
+            validation="$(npm run --silent bench:synthetic:shard:validate -- --report "$report_path")"
           else
             benchmark_exit="${{ steps.benchmark.outputs.benchmark_exit || '1' }}"
             classification=artifact-missing
@@ -251,14 +274,37 @@ jobs:
               --generation "${{ needs.prepare.outputs.parent_generation_id }}" \
               --classification "$classification" \
               --exit-code "$benchmark_exit"
+            status_path="evals/reports/synthetic/workflow-status/${{ github.run_id }}-${{ matrix.family_id }}.json"
+            validation="$(STATUS_PATH="$status_path" node -e 'process.stdout.write(JSON.stringify({ status: "workflow-status", artifact_files: [process.env.STATUS_PATH] }))')"
           fi
+          VALIDATION_JSON="$validation" UPLOAD_ROOT="$RUNNER_TEMP/synthetic-upload" node -e '
+            const fs = require("node:fs");
+            const path = require("node:path");
+            const value = JSON.parse(process.env.VALIDATION_JSON);
+            if (!Array.isArray(value.artifact_files) || value.artifact_files.length === 0) process.exit(1);
+            const sourceRoot = fs.realpathSync(process.cwd());
+            const uploadRoot = path.resolve(process.env.UPLOAD_ROOT);
+            if (fs.existsSync(uploadRoot)) process.exit(1);
+            fs.mkdirSync(uploadRoot);
+            for (const entry of value.artifact_files) {
+              if (typeof entry !== "string" || entry.startsWith("/") || entry.includes("\n")) process.exit(1);
+              const source = fs.realpathSync(path.resolve(sourceRoot, ...entry.split("/")));
+              const relative = path.relative(sourceRoot, source).split(path.sep).join("/");
+              if (relative !== entry) process.exit(1);
+              const target = path.resolve(uploadRoot, ...entry.split("/"));
+              if (!target.startsWith(`${uploadRoot}${path.sep}`)) process.exit(1);
+              fs.mkdirSync(path.dirname(target), { recursive: true });
+              fs.copyFileSync(source, target, fs.constants.COPYFILE_EXCL);
+            }
+            process.stdout.write(`artifact_path=${uploadRoot}\n`);
+          ' >> "$GITHUB_OUTPUT"
 
       - name: Upload validated family artifact
         if: always() && steps.validate.outcome == 'success'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: synthetic-shard-${{ matrix.family_id }}-${{ github.run_id }}-${{ github.run_attempt }}
-          path: evals/reports/synthetic
+          path: ${{ steps.validate.outputs.artifact_path }}
           if-no-files-found: error
           retention-days: 14
 
@@ -328,7 +374,7 @@ jobs:
           set -euo pipefail
           report_path="${{ steps.benchmark.outputs.report_path }}"
           if [[ -n "$report_path" && -f "$report_path" ]]; then
-            npm run bench:synthetic:compare -- --report "$report_path"
+            validation="$(npm run --silent bench:synthetic:report:validate -- --report "$report_path")"
           else
             benchmark_exit="${{ steps.benchmark.outputs.benchmark_exit || '1' }}"
             classification=artifact-missing
@@ -339,14 +385,38 @@ jobs:
               --generation "${{ needs.prepare.outputs.parent_generation_id }}" \
               --classification "$classification" \
               --exit-code "$benchmark_exit"
+            status_path="evals/reports/synthetic/workflow-status/${{ github.run_id }}-merge.json"
+            validation="$(STATUS_PATH="$status_path" node -e 'process.stdout.write(JSON.stringify({ status: "workflow-status", artifact_files: [process.env.STATUS_PATH] }))')"
           fi
+          VALIDATION_JSON="$validation" UPLOAD_ROOT="$RUNNER_TEMP/synthetic-upload" node -e '
+            const fs = require("node:fs");
+            const path = require("node:path");
+            const value = JSON.parse(process.env.VALIDATION_JSON);
+            if (value.status === "validated" && value.complete !== true) process.exit(1);
+            if (!Array.isArray(value.artifact_files) || value.artifact_files.length === 0) process.exit(1);
+            const sourceRoot = fs.realpathSync(process.cwd());
+            const uploadRoot = path.resolve(process.env.UPLOAD_ROOT);
+            if (fs.existsSync(uploadRoot)) process.exit(1);
+            fs.mkdirSync(uploadRoot);
+            for (const entry of value.artifact_files) {
+              if (typeof entry !== "string" || entry.startsWith("/") || entry.includes("\n")) process.exit(1);
+              const source = fs.realpathSync(path.resolve(sourceRoot, ...entry.split("/")));
+              const relative = path.relative(sourceRoot, source).split(path.sep).join("/");
+              if (relative !== entry) process.exit(1);
+              const target = path.resolve(uploadRoot, ...entry.split("/"));
+              if (!target.startsWith(`${uploadRoot}${path.sep}`)) process.exit(1);
+              fs.mkdirSync(path.dirname(target), { recursive: true });
+              fs.copyFileSync(source, target, fs.constants.COPYFILE_EXCL);
+            }
+            process.stdout.write(`artifact_path=${uploadRoot}\n`);
+          ' >> "$GITHUB_OUTPUT"
 
       - name: Upload validated merged artifacts
         if: always() && steps.validate.outcome == 'success'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: synthetic-merged-${{ github.run_id }}-${{ github.run_attempt }}
-          path: evals/reports/synthetic
+          path: ${{ steps.validate.outputs.artifact_path }}
           if-no-files-found: error
           retention-days: 14
 

@@ -66,8 +66,8 @@ export function verifyBenchmarkCi({ root = defaultRoot } = {}) {
     "npm run --silent bench:synthetic:prepare --",
     "npm run --silent bench:synthetic:shard --",
     "npm run --silent bench:synthetic:merge --",
-    "npm run bench:synthetic:shard:validate --",
-    "npm run bench:synthetic:compare -- --report \"$report_path\"",
+    "npm run --silent bench:synthetic:shard:validate --",
+    "npm run --silent bench:synthetic:report:validate -- --report \"$report_path\"",
   ]) {
     assert(manualWorkflow.includes(command), `manual workflow is missing ${command}`);
   }
@@ -85,15 +85,26 @@ export function verifyBenchmarkCi({ root = defaultRoot } = {}) {
     assert(manualWorkflow.includes(restore));
   }
   assert.match(manualWorkflow, /benchmark-synthetic-workflow-status\.mjs/u);
-  assert.match(manualWorkflow, /path: evals\/reports\/synthetic/u);
+  assert.equal(manualWorkflow.includes("path: evals/reports/synthetic\n"), false);
+  assert.equal(
+    (manualWorkflow.match(/path: \$\{\{ steps\.validate\.outputs\.artifact_path \}\}/gu) ?? []).length,
+    3,
+  );
+  assert.equal((manualWorkflow.match(/UPLOAD_ROOT="\$RUNNER_TEMP\/synthetic-upload"/gu) ?? []).length, 3);
+  assert.equal((manualWorkflow.match(/if \(fs\.existsSync\(uploadRoot\)\) process\.exit\(1\)/gu) ?? []).length, 3);
+  assert.equal((manualWorkflow.match(/fs\.constants\.COPYFILE_EXCL/gu) ?? []).length, 3);
   assert.match(manualWorkflow, /actions\/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a/u);
   assert.match(manualWorkflow, /actions\/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c/u);
+  assert(
+    manualWorkflow.indexOf("npm run bench:synthetic:report:validate")
+      < manualWorkflow.indexOf("Upload validated single-run artifacts"),
+  );
   assert(
     manualWorkflow.indexOf("npm run bench:synthetic:shard:validate")
       < manualWorkflow.indexOf("Upload validated family artifact"),
   );
   assert(
-    manualWorkflow.lastIndexOf("npm run bench:synthetic:compare")
+    manualWorkflow.lastIndexOf("npm run --silent bench:synthetic:report:validate")
       < manualWorkflow.indexOf("Upload validated merged artifacts"),
   );
   for (const bypass of ["continue-on-error:", "|| true", "exit 0"]) {

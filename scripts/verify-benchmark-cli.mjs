@@ -12,6 +12,7 @@ import {
   replaySyntheticBenchmarkWorkflow,
   runSyntheticBenchmarkWorkflow,
   runSyntheticCliMain,
+  validateSyntheticRunReportArtifactWorkflow,
 } from "../lib/benchmark/cli.mjs";
 import { loadSyntheticContracts } from "../lib/benchmark/contracts.mjs";
 import { fingerprint } from "../lib/feedback/contracts.mjs";
@@ -433,6 +434,28 @@ export async function verifyBenchmarkCli({ root = defaultRoot } = {}) {
     });
     assert.equal(blockedErr.read(), "");
 
+    for (const complete of [true, false]) {
+      const validatedDiagnostic = validateSyntheticRunReportArtifactWorkflow({
+        sourceRoot: root,
+        reportPath: "unused-injected-report.json",
+        compareRunReport: () => ({
+          exitCode: complete ? SYNTHETIC_CLI_EXIT.success : SYNTHETIC_CLI_EXIT.failure,
+          output: {
+            status: complete ? "analyzed" : "incomplete_evidence",
+            run_id: complete ? "complete-diagnostic" : "incomplete-diagnostic",
+            complete,
+            verdict: complete ? "no_clear_difference" : "inconclusive",
+            comparison_fingerprint: `sha256:${"0".repeat(64)}`,
+            comparison_artifacts: { json: "comparison.json" },
+          },
+        }),
+      });
+      assert.equal(validatedDiagnostic.exitCode, SYNTHETIC_CLI_EXIT.success);
+      assert.equal(validatedDiagnostic.output.status, "validated");
+      assert.equal(validatedDiagnostic.output.complete, complete);
+      assert(validatedDiagnostic.output.artifact_files.includes("unused-injected-report.json"));
+    }
+
     const directedMicroPairs = [
       ["plain", "profile-only"],
       ["profile-only", "plain"],
@@ -688,6 +711,27 @@ export async function verifyBenchmarkCli({ root = defaultRoot } = {}) {
     assert.equal(incompleteComparison.exitCode, SYNTHETIC_CLI_EXIT.failure);
     assert.equal(incompleteComparison.output.status, "incomplete_evidence");
     assert.equal(incompleteComparison.output.comparison_artifacts.completion, null);
+    const validatedIncomplete = validateSyntheticRunReportArtifactWorkflow({
+      sourceRoot: fixtureRoot,
+      contractSourceRoot: root,
+      reportPath: incompletePublication.files.json,
+      loadContracts: () => contracts,
+    });
+    assert.equal(validatedIncomplete.exitCode, SYNTHETIC_CLI_EXIT.success);
+    assert.equal(validatedIncomplete.output.status, "validated");
+    assert.equal(validatedIncomplete.output.complete, false);
+    assert.equal(validatedIncomplete.output.artifact_files.includes(incompletePublication.files.json), true);
+    assert.equal(validatedIncomplete.output.artifact_files.some((entry) => entry.endsWith("/completion.json")), false);
+    const incompleteMarkdownFile = path.join(fixtureRoot, incompletePublication.files.markdown);
+    const incompleteMarkdown = fs.readFileSync(incompleteMarkdownFile, "utf8");
+    fs.writeFileSync(incompleteMarkdownFile, `${incompleteMarkdown}tampered\n`);
+    assert.throws(() => validateSyntheticRunReportArtifactWorkflow({
+      sourceRoot: fixtureRoot,
+      contractSourceRoot: root,
+      reportPath: incompletePublication.files.json,
+      loadContracts: () => contracts,
+    }), (error) => error?.code === "SYNTHETIC_CLI_REPORT_ARTIFACT");
+    fs.writeFileSync(incompleteMarkdownFile, incompleteMarkdown);
 
     const outsideRoot = path.join(fixtureRoot, "outside-project");
     const attackRoot = path.join(fixtureRoot, "attack-project");
