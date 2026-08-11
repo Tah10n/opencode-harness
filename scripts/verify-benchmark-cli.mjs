@@ -433,6 +433,112 @@ export async function verifyBenchmarkCli({ root = defaultRoot } = {}) {
     });
     assert.equal(blockedErr.read(), "");
 
+    const directedMicroPairs = [
+      ["plain", "profile-only"],
+      ["profile-only", "plain"],
+      ["plain", "instrumented"],
+      ["instrumented", "plain"],
+      ["profile-only", "instrumented"],
+      ["instrumented", "profile-only"],
+    ];
+    for (const [baselineProfileId, candidateProfileId] of directedMicroPairs) {
+      const reachedRunner = new Error(`runner-reached-${baselineProfileId}-${candidateProfileId}`);
+      let runnerCalls = 0;
+      await assert.rejects(runSyntheticBenchmarkWorkflow({
+        sourceRoot: root,
+        suiteId: "micro",
+        baselineProfileId,
+        candidateProfileId,
+        seed: "micro-directed-pair",
+        semanticVariants: 1,
+        trajectoryRepetitions: 1,
+        model: "fixture/model",
+        provider: "fixture",
+        variant: null,
+        timeoutMs: 300_000,
+        loadContracts: () => contracts,
+        runPairedBenchmark: async (options) => {
+          runnerCalls += 1;
+          assert.equal(options.baselineProfileId, baselineProfileId);
+          assert.equal(options.candidateProfileId, candidateProfileId);
+          throw reachedRunner;
+        },
+      }), (error) => error === reachedRunner);
+      assert.equal(runnerCalls, 1, `${baselineProfileId} -> ${candidateProfileId} did not pass CLI preflight`);
+    }
+
+    for (const profileId of ["plain", "profile-only", "instrumented"]) {
+      let runnerCalls = 0;
+      const samePairOut = captureStream();
+      const samePairErr = captureStream();
+      assert.equal(await runSyntheticCliMain({
+        command: "run",
+        argv: [
+          "--suite", "micro",
+          "--baseline", profileId,
+          "--candidate", profileId,
+          "--seed", "micro-identical-pair",
+        ],
+        sourceRoot: root,
+        environment: {},
+        stdout: samePairOut.stream,
+        stderr: samePairErr.stream,
+        dependencies: {
+          run: {
+            loadContracts: () => contracts,
+            runPairedBenchmark: async () => {
+              runnerCalls += 1;
+              throw new Error("must not run an invalid profile pair");
+            },
+          },
+        },
+      }), SYNTHETIC_CLI_EXIT.failure);
+      assert.equal(runnerCalls, 0);
+      assert.equal(samePairOut.read(), "");
+      assert.deepEqual(JSON.parse(samePairErr.read()), {
+        status: "invalid_configuration",
+        code: "SYNTHETIC_SUITE_PLAN_PROFILE",
+        message: "SYNTHETIC_SUITE_PLAN_PROFILE: paired profiles must differ",
+      });
+    }
+
+    for (const [dimensionOption, value, expectedCode] of [
+      ["--semantic-variants", "2", "SYNTHETIC_CLI_SEMANTIC_VARIANTS"],
+      ["--trajectory-repetitions", "2", "SYNTHETIC_CLI_TRAJECTORIES"],
+    ]) {
+      let runnerCalls = 0;
+      const dimensionOut = captureStream();
+      const dimensionErr = captureStream();
+      assert.equal(await runSyntheticCliMain({
+        command: "run",
+        argv: [
+          "--suite", "micro",
+          "--baseline", "plain",
+          "--candidate", "profile-only",
+          "--seed", "micro-invalid-dimensions",
+          dimensionOption, value,
+        ],
+        sourceRoot: root,
+        environment: {},
+        stdout: dimensionOut.stream,
+        stderr: dimensionErr.stream,
+        dependencies: {
+          run: {
+            loadContracts: () => contracts,
+            runPairedBenchmark: async () => {
+              runnerCalls += 1;
+              throw new Error("must not run with non-canonical suite dimensions");
+            },
+          },
+        },
+      }), SYNTHETIC_CLI_EXIT.failure);
+      assert.equal(runnerCalls, 0);
+      assert.equal(dimensionOut.read(), "");
+      const dimensionFailure = JSON.parse(dimensionErr.read());
+      assert.equal(dimensionFailure.status, "invalid_configuration");
+      assert.equal(dimensionFailure.code, expectedCode);
+    }
+
     const invalidOut = captureStream();
     const invalidErr = captureStream();
     assert.equal(await runSyntheticCliMain({

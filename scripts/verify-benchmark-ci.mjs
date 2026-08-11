@@ -55,7 +55,7 @@ export function verifyBenchmarkCi({ root = defaultRoot } = {}) {
     assert(suiteChoices.includes(`          - ${suite.id}`));
     assert.deepEqual(
       suite.profile_ids,
-      suite.id === "micro" ? ["plain", "instrumented"] : profileIds,
+      profileIds,
     );
   }
 

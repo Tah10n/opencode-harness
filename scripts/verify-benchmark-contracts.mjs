@@ -710,7 +710,7 @@ function verifyBenchmarkEvaluationContractsLoaded({ root, contracts }) {
   for (const suite of contracts.suites) {
     assert.deepEqual(
       suite.profile_ids,
-      suite.id === "micro" ? ["plain", "instrumented"] : SYNTHETIC_PROFILE_IDS,
+      SYNTHETIC_PROFILE_IDS,
     );
   }
 

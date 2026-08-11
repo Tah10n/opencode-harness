@@ -613,6 +613,7 @@
         "trajectory_repetitions": 1,
         "profile_ids": [
           "plain",
+          "profile-only",
           "instrumented"
         ],
         "declared_run_count": 8
