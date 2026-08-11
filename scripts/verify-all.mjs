@@ -6,6 +6,7 @@ import { performance } from "node:perf_hooks";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { runManagedCommand } from "../lib/feedback/process-tree.mjs";
+import { MODEL_FREE_AGGREGATE_STAGE_TIMEOUT_MS } from "../lib/benchmark/model-free-manifest.mjs";
 import {
   VERIFICATION_RECEIPT_PRODUCERS,
   assessMilestone2Receipts,
@@ -28,11 +29,36 @@ const deterministicProducer = VERIFICATION_RECEIPT_PRODUCERS.deterministic;
 
 export const DEFAULT_DETERMINISTIC_STAGE_TIMEOUT_MS = 10 * 60 * 1000;
 export const EXTENDED_DETERMINISTIC_STAGE_TIMEOUT_MS = 15 * 60 * 1000;
-export const MAX_DETERMINISTIC_STAGE_TIMEOUT_MS = 20 * 60 * 1000;
+export const NORMAL_SESSION_BRIDGE_STAGE_TIMEOUT_MS = 20 * 60 * 1000;
+export const DETERMINISTIC_VERIFY_WORKFLOW_JOB_TIMEOUT_MS = 6 * 60 * 60 * 1000;
+export const DETERMINISTIC_VERIFY_WORKFLOW_RESERVE_MS = 60 * 60 * 1000;
+export const MAX_DETERMINISTIC_VERIFY_BUDGET_MS =
+  DETERMINISTIC_VERIFY_WORKFLOW_JOB_TIMEOUT_MS - DETERMINISTIC_VERIFY_WORKFLOW_RESERVE_MS;
+
+const SPECIAL_DETERMINISTIC_STAGE_TIMEOUTS = Object.freeze({
+  "verify:adoption-bundle": Object.freeze({
+    timeout_class: "extended",
+    timeout_ms: EXTENDED_DETERMINISTIC_STAGE_TIMEOUT_MS,
+  }),
+  "verify:normal-session-quality-bridge": Object.freeze({
+    timeout_class: "normal-session-bridge",
+    timeout_ms: NORMAL_SESSION_BRIDGE_STAGE_TIMEOUT_MS,
+  }),
+  "verify:benchmark:model-free": Object.freeze({
+    timeout_class: "model-free-aggregate",
+    timeout_ms: MODEL_FREE_AGGREGATE_STAGE_TIMEOUT_MS,
+  }),
+});
 
 export const DETERMINISTIC_STAGE_REGISTRY = Object.freeze([
   { command_id: "verify-static", npm_script: "verify:static", check_ids: ["documentation-attribution-boundary", "tracked-artifact-boundary", "model-frontmatter-documentation"] },
-  { command_id: "verify-benchmark-model-free", npm_script: "verify:benchmark:model-free", check_ids: [] },
+  {
+    command_id: "verify-benchmark-model-free",
+    npm_script: "verify:benchmark:model-free",
+    check_ids: [],
+    timeout_class: "model-free-aggregate",
+    timeout_ms: MODEL_FREE_AGGREGATE_STAGE_TIMEOUT_MS,
+  },
   { command_id: "verify-feedback-foundation", npm_script: "verify:feedback-foundation", check_ids: [] },
   { command_id: "verify-trace-store", npm_script: "verify:trace-store", check_ids: [] },
   { command_id: "verify-report-history", npm_script: "verify:report-history", check_ids: [] },
@@ -43,7 +69,7 @@ export const DETERMINISTIC_STAGE_REGISTRY = Object.freeze([
     command_id: "verify-adoption-bundle",
     npm_script: "verify:adoption-bundle",
     check_ids: [],
-    timeout_ms: EXTENDED_DETERMINISTIC_STAGE_TIMEOUT_MS,
+    timeout_class: "extended",
   },
   { command_id: "verify-package-boundary", npm_script: "verify:package-boundary", check_ids: [] },
   { command_id: "verify-runtime-fixture", npm_script: "verify:runtime:fixture", check_ids: [] },
@@ -72,7 +98,7 @@ export const DETERMINISTIC_STAGE_REGISTRY = Object.freeze([
     command_id: "verify-normal-session-quality-bridge",
     npm_script: "verify:normal-session-quality-bridge",
     check_ids: ["normal-session-quality-bridge"],
-    timeout_ms: MAX_DETERMINISTIC_STAGE_TIMEOUT_MS,
+    timeout_class: "normal-session-bridge",
   },
   { command_id: "verify-session-classification", npm_script: "verify:session-classification", check_ids: ["session-classification-lifecycle"] },
   { command_id: "verify-project-check-catalog", npm_script: "verify:project-check-catalog", check_ids: ["project-check-catalog"] },
@@ -90,15 +116,41 @@ export const DETERMINISTIC_STAGE_REGISTRY = Object.freeze([
 ]);
 
 export function deterministicStageTimeoutMs(stage) {
-  const timeoutMs = stage?.timeout_ms ?? DEFAULT_DETERMINISTIC_STAGE_TIMEOUT_MS;
-  if (!Number.isSafeInteger(timeoutMs)
-    || timeoutMs <= 0
-    || timeoutMs > MAX_DETERMINISTIC_STAGE_TIMEOUT_MS) {
-    throw new TypeError(
-      `invalid deterministic stage timeout: expected a positive safe integer no greater than ${MAX_DETERMINISTIC_STAGE_TIMEOUT_MS}`,
+  if (stage === null || typeof stage !== "object" || Array.isArray(stage)
+    || typeof stage.npm_script !== "string" || stage.npm_script.length === 0) {
+    throw new TypeError("deterministic stage must name an npm script");
+  }
+  const expected = SPECIAL_DETERMINISTIC_STAGE_TIMEOUTS[stage.npm_script] ?? Object.freeze({
+    timeout_class: "ordinary",
+    timeout_ms: DEFAULT_DETERMINISTIC_STAGE_TIMEOUT_MS,
+  });
+  const timeoutClass = stage.timeout_class ?? "ordinary";
+  if (timeoutClass !== expected.timeout_class) {
+    throw new TypeError(`invalid deterministic stage timeout class for ${stage.npm_script}`);
+  }
+  const hasExactTimeout = Object.hasOwn(stage, "timeout_ms");
+  if (timeoutClass === "model-free-aggregate") {
+    if (!hasExactTimeout || stage.timeout_ms !== expected.timeout_ms) {
+      throw new TypeError("model-free aggregate stage must use the exact canonical timeout");
+    }
+  } else if (hasExactTimeout) {
+    throw new TypeError("only the model-free aggregate may declare an exact stage timeout");
+  }
+  return expected.timeout_ms;
+}
+
+export function deterministicStageTimeoutWithinVerifyBudget(stage, elapsedMs) {
+  if (!Number.isFinite(elapsedMs) || elapsedMs < 0) {
+    throw new TypeError("deterministic verify elapsed time must be a non-negative finite number");
+  }
+  const stageTimeoutMs = deterministicStageTimeoutMs(stage);
+  const remainingVerifyBudgetMs = Math.floor(MAX_DETERMINISTIC_VERIFY_BUDGET_MS - elapsedMs);
+  if (remainingVerifyBudgetMs < stageTimeoutMs) {
+    throw new Error(
+      `insufficient remaining deterministic verify budget for ${stage.npm_script}: requires ${stageTimeoutMs} ms, has ${Math.max(0, remainingVerifyBudgetMs)} ms`,
     );
   }
-  return timeoutMs;
+  return stageTimeoutMs;
 }
 
 const syntheticChecks = Object.freeze([
@@ -337,6 +389,7 @@ async function main() {
   const runContext = captureMilestone2RunContext({ workspaceRoot: root, localJobId: "deterministic-contracts" });
   const receipts = [];
   const runStartedAt = new Date().toISOString();
+  const verifyBudgetStartedAt = performance.now();
   const passedCommands = [];
   const stageTimings = [];
 
@@ -348,7 +401,10 @@ async function main() {
       stage.command_id,
       npmInvocation(stage.npm_script),
       stage.check_ids,
-      deterministicStageTimeoutMs(stage),
+      deterministicStageTimeoutWithinVerifyBudget(
+        stage,
+        performance.now() - verifyBudgetStartedAt,
+      ),
     );
     receipts.push(...outcome.receipts);
     const stagePassed = outcome.result.status === 0 && !outcome.result.timed_out && !outcome.result.error;

@@ -4,15 +4,23 @@ import { fileURLToPath } from "node:url";
 
 import {
   DEFAULT_DETERMINISTIC_STAGE_TIMEOUT_MS,
+  DETERMINISTIC_VERIFY_WORKFLOW_JOB_TIMEOUT_MS,
+  DETERMINISTIC_VERIFY_WORKFLOW_RESERVE_MS,
   DETERMINISTIC_STAGE_REGISTRY,
   EXTENDED_DETERMINISTIC_STAGE_TIMEOUT_MS,
-  MAX_DETERMINISTIC_STAGE_TIMEOUT_MS,
+  MAX_DETERMINISTIC_VERIFY_BUDGET_MS,
+  NORMAL_SESSION_BRIDGE_STAGE_TIMEOUT_MS,
   canonicalStageTemporaryRoot,
   deterministicExpectedChecks,
   deterministicStageEnvironment,
   deterministicStageTimeoutMs,
+  deterministicStageTimeoutWithinVerifyBudget,
   formatStageTimingSummary,
 } from "./verify-all.mjs";
+import {
+  MODEL_FREE_AGGREGATE_STAGE_TIMEOUT_MS,
+  MODEL_FREE_SERIAL_INNER_BUDGET_MS,
+} from "../lib/benchmark/model-free-manifest.mjs";
 import { milestone2ExpectedChecks } from "../lib/quality/milestone-dod.mjs";
 import { NORMAL_SESSION_QUALITY_TOOL_IDS } from "../lib/quality/normal-session-bridge.mjs";
 import { NORMAL_SESSION_QUALITY_PROFILE_PERMISSIONS } from "../lib/quality/normal-session-profile-permissions.mjs";
@@ -511,32 +519,84 @@ if (new Set(DETERMINISTIC_STAGE_REGISTRY.map((stage) => stage.command_id)).size 
   fail("HARNESS-S008", "verify-all command IDs must be unique", "Give each deterministic stage one stable command_id.");
 }
 const adoptionBundleStage = DETERMINISTIC_STAGE_REGISTRY.find((stage) => stage.npm_script === "verify:adoption-bundle");
+const modelFreeAggregateStage = DETERMINISTIC_STAGE_REGISTRY.find(
+  (stage) => stage.npm_script === "verify:benchmark:model-free",
+);
 const normalSessionQualityBridgeStage = DETERMINISTIC_STAGE_REGISTRY.find(
   (stage) => stage.npm_script === "verify:normal-session-quality-bridge",
 );
 if (!adoptionBundleStage
   || deterministicStageTimeoutMs(adoptionBundleStage) !== EXTENDED_DETERMINISTIC_STAGE_TIMEOUT_MS
+  || adoptionBundleStage.timeout_class !== "extended"
   || EXTENDED_DETERMINISTIC_STAGE_TIMEOUT_MS !== 15 * 60 * 1000) {
   fail("HARNESS-S008", "the adoption bundle stage must retain its reviewed 15-minute outer budget", "Keep the nested portable-bundle verifier bounded without truncating its 10-minute inner verifier budget.");
 }
 if (!normalSessionQualityBridgeStage
-  || deterministicStageTimeoutMs(normalSessionQualityBridgeStage) !== MAX_DETERMINISTIC_STAGE_TIMEOUT_MS
-  || MAX_DETERMINISTIC_STAGE_TIMEOUT_MS !== 20 * 60 * 1000) {
+  || deterministicStageTimeoutMs(normalSessionQualityBridgeStage) !== NORMAL_SESSION_BRIDGE_STAGE_TIMEOUT_MS
+  || normalSessionQualityBridgeStage.timeout_class !== "normal-session-bridge"
+  || NORMAL_SESSION_BRIDGE_STAGE_TIMEOUT_MS !== 20 * 60 * 1000) {
   fail("HARNESS-S008", "the normal-session quality bridge stage must retain its reviewed 20-minute budget", "Keep the growing bridge regression suite bounded with measured headroom above the ordinary 10-minute default.");
 }
+if (!modelFreeAggregateStage
+  || modelFreeAggregateStage.timeout_class !== "model-free-aggregate"
+  || modelFreeAggregateStage.timeout_ms !== MODEL_FREE_AGGREGATE_STAGE_TIMEOUT_MS
+  || deterministicStageTimeoutMs(modelFreeAggregateStage) !== MODEL_FREE_AGGREGATE_STAGE_TIMEOUT_MS
+  || MODEL_FREE_AGGREGATE_STAGE_TIMEOUT_MS < MODEL_FREE_SERIAL_INNER_BUDGET_MS) {
+  fail("HARNESS-S008", "the model-free aggregate stage lacks its exact canonical serial budget", "Bind the aggregate stage to the manifest-derived timeout without widening ordinary stages.");
+}
 if (DETERMINISTIC_STAGE_REGISTRY
-  .filter((stage) => ![adoptionBundleStage, normalSessionQualityBridgeStage].includes(stage))
+  .filter((stage) => ![
+    adoptionBundleStage,
+    modelFreeAggregateStage,
+    normalSessionQualityBridgeStage,
+  ].includes(stage))
   .some((stage) => deterministicStageTimeoutMs(stage) !== DEFAULT_DETERMINISTIC_STAGE_TIMEOUT_MS)) {
   fail("HARNESS-S008", "an ordinary deterministic stage drifted from the default 10-minute budget", "Use a longer stage budget only for an explicitly reviewed long-running verifier.");
 }
-let oversizedStageTimeoutRejected = false;
-try {
-  deterministicStageTimeoutMs({ timeout_ms: MAX_DETERMINISTIC_STAGE_TIMEOUT_MS + 1 });
-} catch {
-  oversizedStageTimeoutRejected = true;
+for (const invalidStage of [
+  { npm_script: "verify:static", timeout_ms: MODEL_FREE_AGGREGATE_STAGE_TIMEOUT_MS },
+  { npm_script: "verify:static", timeout_ms: -1 },
+  { npm_script: "verify:static", timeout_class: "unknown" },
+  { ...modelFreeAggregateStage, timeout_ms: MODEL_FREE_SERIAL_INNER_BUDGET_MS - 1 },
+  { ...modelFreeAggregateStage, timeout_ms: Number.MAX_SAFE_INTEGER },
+]) {
+  let rejected = false;
+  try {
+    deterministicStageTimeoutMs(invalidStage);
+  } catch {
+    rejected = true;
+  }
+  if (!rejected) {
+    fail("HARNESS-S008", "verify-all accepted an unreviewed deterministic stage timeout", "Reject malformed, arbitrary, or non-canonical stage budgets.");
+  }
 }
-if (!oversizedStageTimeoutRejected) {
-  fail("HARNESS-S008", "verify-all accepted a deterministic stage timeout above the reviewed maximum", "Fail closed on unbounded or malformed stage budgets.");
+if (MAX_DETERMINISTIC_VERIFY_BUDGET_MS !== 5 * 60 * 60 * 1000
+  || DETERMINISTIC_VERIFY_WORKFLOW_JOB_TIMEOUT_MS !== 6 * 60 * 60 * 1000
+  || DETERMINISTIC_VERIFY_WORKFLOW_RESERVE_MS !== 60 * 60 * 1000
+  || MAX_DETERMINISTIC_VERIFY_BUDGET_MS
+    !== DETERMINISTIC_VERIFY_WORKFLOW_JOB_TIMEOUT_MS - DETERMINISTIC_VERIFY_WORKFLOW_RESERVE_MS
+  || MAX_DETERMINISTIC_VERIFY_BUDGET_MS <= MODEL_FREE_AGGREGATE_STAGE_TIMEOUT_MS) {
+  fail("HARNESS-S008", "verify-all overall budget is not the reviewed bounded five-hour ceiling", "Keep the full verifier below the explicit six-hour GitHub job ceiling.");
+}
+if (deterministicStageTimeoutWithinVerifyBudget(modelFreeAggregateStage, 0)
+    !== MODEL_FREE_AGGREGATE_STAGE_TIMEOUT_MS) {
+  fail("HARNESS-S008", "verify-all changed the canonical timeout of a stage that fits the overall budget", "Launch every admitted stage with its full reviewed timeout.");
+}
+for (const [stage, elapsedMs] of [
+  [modelFreeAggregateStage, MAX_DETERMINISTIC_VERIFY_BUDGET_MS
+    - MODEL_FREE_AGGREGATE_STAGE_TIMEOUT_MS + 1],
+  [{ npm_script: "verify:static" }, MAX_DETERMINISTIC_VERIFY_BUDGET_MS
+    - DEFAULT_DETERMINISTIC_STAGE_TIMEOUT_MS + 1],
+]) {
+  let rejected = false;
+  try {
+    deterministicStageTimeoutWithinVerifyBudget(stage, elapsedMs);
+  } catch {
+    rejected = true;
+  }
+  if (!rejected) {
+    fail("HARNESS-S008", "verify-all silently shortened a late deterministic stage", "Reject a stage before launch unless its full reviewed timeout fits the remaining overall budget.");
+  }
 }
 for (const stage of DETERMINISTIC_STAGE_REGISTRY) {
   if (!packageJson.scripts?.[stage.npm_script] || stage.npm_script === "verify") {
