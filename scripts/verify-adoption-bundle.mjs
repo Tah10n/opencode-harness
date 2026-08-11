@@ -481,7 +481,7 @@ try {
     "lib/feedback/index.mjs",
     "package-lock.json",
     "package.json",
-    "profiles/inventory.v1.json",
+    "profiles/inventory.v2.json",
     "scripts/assess-candidate.mjs",
     "scripts/capture-static-evidence.mjs",
     "scripts/evaluate-live.mjs",
@@ -490,7 +490,7 @@ try {
     assertBundlePath(requiredFile);
   }
   const bundledInventory = JSON.parse(
-    fs.readFileSync(path.join(bundleRoot, "profiles/inventory.v1.json"), "utf8").replace(/^\uFEFF/u, ""),
+    fs.readFileSync(path.join(bundleRoot, "profiles/inventory.v2.json"), "utf8").replace(/^\uFEFF/u, ""),
   );
   assertAdoptionBundleEntryPaths(bundleRoot, bundledInventory, "complete");
   const packageManifest = JSON.parse(fs.readFileSync(path.join(bundleRoot, "package.json"), "utf8").replace(/^\uFEFF/u, ""));
