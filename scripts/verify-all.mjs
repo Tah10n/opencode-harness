@@ -2,11 +2,21 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import process from "node:process";
+import { spawn } from "node:child_process";
 import { performance } from "node:perf_hooks";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { runManagedCommand } from "../lib/feedback/process-tree.mjs";
-import { MODEL_FREE_AGGREGATE_STAGE_TIMEOUT_MS } from "../lib/benchmark/model-free-manifest.mjs";
+import {
+  runManagedCommand,
+  terminateProcessTree,
+} from "../lib/feedback/process-tree.mjs";
+import {
+  MODEL_FREE_AGGREGATE_STAGE_TIMEOUT_MS,
+  SYNTHETIC_MODEL_FREE_CONTAINMENT_ENVIRONMENT_KEYS,
+  SYNTHETIC_MODEL_FREE_ENVIRONMENT_MARKER,
+  SYNTHETIC_MODEL_FREE_FORBIDDEN_ENVIRONMENT_KEYS,
+} from "../lib/benchmark/model-free-manifest.mjs";
+import { resolveRepositoryEntry } from "../lib/benchmark/contracts.mjs";
 import {
   VERIFICATION_RECEIPT_PRODUCERS,
   assessMilestone2Receipts,
@@ -25,6 +35,7 @@ import {
 } from "../lib/quality/whitespace.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+export const MODEL_FREE_COORDINATOR_ENTRY = "scripts/verify-benchmark-model-free.mjs";
 const deterministicProducer = VERIFICATION_RECEIPT_PRODUCERS.deterministic;
 
 export const DEFAULT_DETERMINISTIC_STAGE_TIMEOUT_MS = 10 * 60 * 1000;
@@ -58,6 +69,7 @@ export const DETERMINISTIC_STAGE_REGISTRY = Object.freeze([
     check_ids: [],
     timeout_class: "model-free-aggregate",
     timeout_ms: MODEL_FREE_AGGREGATE_STAGE_TIMEOUT_MS,
+    execution_class: "model-free-coordinator",
   },
   { command_id: "verify-feedback-foundation", npm_script: "verify:feedback-foundation", check_ids: [] },
   { command_id: "verify-trace-store", npm_script: "verify:trace-store", check_ids: [] },
@@ -139,6 +151,21 @@ export function deterministicStageTimeoutMs(stage) {
   return expected.timeout_ms;
 }
 
+export function deterministicStageExecutionClass(stage) {
+  if (stage === null || typeof stage !== "object" || Array.isArray(stage)
+    || typeof stage.npm_script !== "string" || stage.npm_script.length === 0) {
+    throw new TypeError("deterministic stage must name an npm script");
+  }
+  const expected = stage.npm_script === "verify:benchmark:model-free"
+    ? "model-free-coordinator"
+    : "managed";
+  const actual = stage.execution_class ?? "managed";
+  if (actual !== expected) {
+    throw new TypeError(`invalid deterministic stage execution class for ${stage.npm_script}`);
+  }
+  return actual;
+}
+
 export function deterministicStageTimeoutWithinVerifyBudget(stage, elapsedMs) {
   if (!Number.isFinite(elapsedMs) || elapsedMs < 0) {
     throw new TypeError("deterministic verify elapsed time must be a non-negative finite number");
@@ -194,6 +221,16 @@ export function deterministicStageEnvironment(environment = process.env) {
   return result;
 }
 
+export function modelFreeCoordinatorStageEnvironment(environment = process.env) {
+  const result = deterministicStageEnvironment(environment);
+  for (const key of SYNTHETIC_MODEL_FREE_CONTAINMENT_ENVIRONMENT_KEYS) {
+    if (typeof environment[key] === "string") result[key] = environment[key];
+  }
+  for (const key of SYNTHETIC_MODEL_FREE_FORBIDDEN_ENVIRONMENT_KEYS) delete result[key];
+  result[SYNTHETIC_MODEL_FREE_ENVIRONMENT_MARKER] = "1";
+  return result;
+}
+
 function formatDuration(durationMs) {
   if (!Number.isFinite(durationMs) || durationMs < 0) {
     throw new TypeError("stage duration must be a non-negative finite number");
@@ -243,11 +280,33 @@ export function deterministicExpectedChecks() {
   ];
 }
 
-function npmInvocation(npmScript) {
-  if (process.env.npm_execpath) {
-    return { file: process.execPath, args: [process.env.npm_execpath, "run", npmScript] };
+function npmInvocation(npmScript, {
+  environment = process.env,
+  nodeExecutable = process.execPath,
+  platform = process.platform,
+} = {}) {
+  if (environment.npm_execpath) {
+    return { file: nodeExecutable, args: [environment.npm_execpath, "run", npmScript] };
   }
-  return { file: process.platform === "win32" ? "npm.cmd" : "npm", args: ["run", npmScript] };
+  return { file: platform === "win32" ? "npm.cmd" : "npm", args: ["run", npmScript] };
+}
+
+export function deterministicStageInvocation(stage, {
+  sourceRoot = root,
+  environment = process.env,
+  nodeExecutable = process.execPath,
+  platform = process.platform,
+} = {}) {
+  if (deterministicStageExecutionClass(stage) === "model-free-coordinator") {
+    return {
+      file: nodeExecutable,
+      args: [resolveRepositoryEntry(sourceRoot, MODEL_FREE_COORDINATOR_ENTRY, {
+        expectedKind: "file",
+        maxFileBytes: 2 * 1024 * 1024,
+      })],
+    };
+  }
+  return npmInvocation(stage.npm_script, { environment, nodeExecutable, platform });
 }
 
 function receiptFromResult({ checkId, commandId, startedAt, completedAt, result }) {
@@ -274,18 +333,137 @@ function receiptFromResult({ checkId, commandId, startedAt, completedAt, result 
   });
 }
 
-async function runCommand(commandId, command, checkIds, timeoutMs) {
+async function runModelFreeCoordinatorCommand({
+  stage,
+  file,
+  args,
+  cwd,
+  env,
+  timeout,
+  maxOutputChars,
+}) {
+  if (deterministicStageExecutionClass(stage) !== "model-free-coordinator") {
+    throw new TypeError("control-plane coordinator launcher is reserved for the model-free aggregate");
+  }
+  return new Promise((resolve, reject) => {
+    let child;
+    try {
+      child = spawn(file, args, {
+        cwd,
+        env,
+        detached: process.platform !== "win32",
+        shell: false,
+        stdio: ["ignore", "pipe", "pipe"],
+        windowsHide: true,
+      });
+    } catch (error) {
+      reject(error);
+      return;
+    }
+    const state = { exited: false, closed: false, spawnFailed: false };
+    let stdoutChars = 0;
+    let stderrChars = 0;
+    let stdoutBytes = 0;
+    let stderrBytes = 0;
+    let settled = false;
+    let terminationStarted = false;
+    let timer;
+
+    const finish = (result) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      resolve({
+        ...result,
+        stdout_chars: stdoutChars,
+        stderr_chars: stderrChars,
+        stdout_bytes: stdoutBytes,
+        stderr_bytes: stderrBytes,
+      });
+    };
+    const terminate = async ({ timedOut, errorCode }) => {
+      if (terminationStarted || settled) return;
+      terminationStarted = true;
+      await terminateProcessTree(child, state, {
+        graceMs: 50,
+        confirmationMs: 2_000,
+        containment: null,
+      });
+      finish({
+        status: null,
+        signal: null,
+        timed_out: timedOut,
+        teardown_verified: false,
+        error: errorCode === null ? undefined : Object.assign(new Error(errorCode), { code: errorCode }),
+      });
+    };
+    const count = (kind, chunk) => {
+      const bytes = Buffer.isBuffer(chunk) ? chunk.length : Buffer.byteLength(String(chunk), "utf8");
+      const chars = String(chunk).length;
+      if (kind === "stdout") {
+        stdoutBytes += bytes;
+        stdoutChars += chars;
+      } else {
+        stderrBytes += bytes;
+        stderrChars += chars;
+      }
+      if (stdoutBytes + stderrBytes > maxOutputChars) {
+        void terminate({ timedOut: false, errorCode: "MODEL_FREE_COORDINATOR_OUTPUT_LIMIT" });
+      }
+    };
+
+    child.stdout?.on("data", (chunk) => count("stdout", chunk));
+    child.stderr?.on("data", (chunk) => count("stderr", chunk));
+    child.once("spawn", () => {
+      timer = setTimeout(() => {
+        void terminate({ timedOut: true, errorCode: null });
+      }, timeout);
+    });
+    child.once("error", (error) => {
+      state.spawnFailed = !Number.isInteger(child.pid);
+      finish({
+        status: null,
+        signal: null,
+        timed_out: false,
+        teardown_verified: state.spawnFailed,
+        error,
+      });
+    });
+    child.once("exit", () => {
+      state.exited = true;
+    });
+    child.once("close", (code, signal) => {
+      state.closed = true;
+      if (terminationStarted) return;
+      finish({
+        status: Number.isInteger(code) ? code : null,
+        signal: typeof signal === "string" ? signal : null,
+        timed_out: false,
+        teardown_verified: true,
+      });
+    });
+  });
+}
+
+async function runCommand(stage, command, timeoutMs) {
+  const { command_id: commandId, check_ids: checkIds } = stage;
   const startedAt = new Date().toISOString();
   const monotonicStartedAt = performance.now();
   let result;
   try {
-    result = await runManagedCommand({
+    const executionClass = deterministicStageExecutionClass(stage);
+    const input = {
       ...command,
       cwd: root,
-      env: deterministicStageEnvironment(),
+      env: executionClass === "model-free-coordinator"
+        ? modelFreeCoordinatorStageEnvironment()
+        : deterministicStageEnvironment(),
       timeout: timeoutMs,
       maxOutputChars: 4 * 1024 * 1024,
-    });
+    };
+    result = executionClass === "model-free-coordinator"
+      ? await runModelFreeCoordinatorCommand({ stage, ...input })
+      : await runManagedCommand(input);
   } catch (error) {
     result = {
       status: null,
@@ -398,9 +576,8 @@ async function main() {
   for (const stage of DETERMINISTIC_STAGE_REGISTRY) {
     console.log(`Deterministic stage: npm run ${stage.npm_script}`);
     const outcome = await runCommand(
-      stage.command_id,
-      npmInvocation(stage.npm_script),
-      stage.check_ids,
+      stage,
+      deterministicStageInvocation(stage),
       deterministicStageTimeoutWithinVerifyBudget(
         stage,
         performance.now() - verifyBudgetStartedAt,

@@ -7,19 +7,26 @@ import {
   DETERMINISTIC_VERIFY_WORKFLOW_JOB_TIMEOUT_MS,
   DETERMINISTIC_VERIFY_WORKFLOW_RESERVE_MS,
   DETERMINISTIC_STAGE_REGISTRY,
+  MODEL_FREE_COORDINATOR_ENTRY,
   EXTENDED_DETERMINISTIC_STAGE_TIMEOUT_MS,
   MAX_DETERMINISTIC_VERIFY_BUDGET_MS,
   NORMAL_SESSION_BRIDGE_STAGE_TIMEOUT_MS,
   canonicalStageTemporaryRoot,
   deterministicExpectedChecks,
+  deterministicStageExecutionClass,
+  deterministicStageInvocation,
   deterministicStageEnvironment,
   deterministicStageTimeoutMs,
   deterministicStageTimeoutWithinVerifyBudget,
   formatStageTimingSummary,
+  modelFreeCoordinatorStageEnvironment,
 } from "./verify-all.mjs";
 import {
   MODEL_FREE_AGGREGATE_STAGE_TIMEOUT_MS,
   MODEL_FREE_SERIAL_INNER_BUDGET_MS,
+  SYNTHETIC_MODEL_FREE_CONTAINMENT_ENVIRONMENT_KEYS,
+  SYNTHETIC_MODEL_FREE_ENVIRONMENT_MARKER,
+  SYNTHETIC_MODEL_FREE_FORBIDDEN_ENVIRONMENT_KEYS,
 } from "../lib/benchmark/model-free-manifest.mjs";
 import { milestone2ExpectedChecks } from "../lib/quality/milestone-dod.mjs";
 import { NORMAL_SESSION_QUALITY_TOOL_IDS } from "../lib/quality/normal-session-bridge.mjs";
@@ -46,6 +53,38 @@ if (deterministicEnvironmentFixture.KEEP_ME !== "kept"
     code: "HARNESS-S084",
     message: "deterministic stage environment did not preserve ordinary values while removing containment coordination",
     fix: "Keep deterministic child stages isolated from platform containment coordination variables.",
+  });
+}
+const modelFreeContainmentFixture = Object.fromEntries(
+  SYNTHETIC_MODEL_FREE_CONTAINMENT_ENVIRONMENT_KEYS.map((key, index) => [
+    key,
+    `/runner-owned/containment-${index + 1}`,
+  ]),
+);
+const modelFreeCoordinatorEnvironmentFixture = modelFreeCoordinatorStageEnvironment({
+  KEEP_ME: "kept",
+  OPENCODE_QUALITY_MACOS_POISON: "/poison/controller",
+  OPENCODE_QUALITY_CGROUP_POISON: "/poison/cgroup",
+  OPENCODE_BENCH_MODEL: "forbidden/model",
+  OPENCODE_BENCH_PROVIDER: "forbidden",
+  OPENCODE_BENCH_VARIANT: "forbidden",
+  [deterministicTemporaryKey]: root,
+  ...modelFreeContainmentFixture,
+});
+if (modelFreeCoordinatorEnvironmentFixture.KEEP_ME !== "kept"
+  || modelFreeCoordinatorEnvironmentFixture[SYNTHETIC_MODEL_FREE_ENVIRONMENT_MARKER] !== "1"
+  || SYNTHETIC_MODEL_FREE_CONTAINMENT_ENVIRONMENT_KEYS.some(
+    (key) => modelFreeCoordinatorEnvironmentFixture[key] !== modelFreeContainmentFixture[key],
+  )
+  || SYNTHETIC_MODEL_FREE_FORBIDDEN_ENVIRONMENT_KEYS.some(
+    (key) => modelFreeCoordinatorEnvironmentFixture[key] !== undefined,
+  )
+  || modelFreeCoordinatorEnvironmentFixture.OPENCODE_QUALITY_MACOS_POISON !== undefined
+  || modelFreeCoordinatorEnvironmentFixture.OPENCODE_QUALITY_CGROUP_POISON !== undefined) {
+  failures.push({
+    code: "HARNESS-S084",
+    message: "model-free coordinator environment did not preserve only its reviewed containment capability",
+    fix: "Keep the aggregate control plane model-free and reintroduce only the exact platform containment allowlist.",
   });
 }
 const expectedDeterministicTemporaryRoot = fs.realpathSync.native(root);
@@ -493,6 +532,14 @@ if (packageJson.engines?.node !== ">=24") {
 if (packageJson.scripts?.verify !== "node scripts/verify-all.mjs") {
   fail("HARNESS-S008", "package.json must route npm run verify through the bounded runner-owned receipt aggregator", "Set verify to node scripts/verify-all.mjs.");
 }
+for (const forbiddenScript of [
+  "preverify:benchmark:model-free",
+  "postverify:benchmark:model-free",
+]) {
+  if (Object.hasOwn(packageJson.scripts ?? {}, forbiddenScript)) {
+    fail("HARNESS-S008", `model-free coordinator lifecycle hook is forbidden: ${forbiddenScript}`, "Launch the canonical aggregate entrypoint directly without npm lifecycle indirection.");
+  }
+}
 for (const forbiddenScript of ["assess:quality-candidate", "verify:model-profiles"]) {
   if (packageJson.scripts?.[forbiddenScript]) {
     fail("HARNESS-S008", `removed model-comparison command returned: ${forbiddenScript}`, "Keep general live evaluation model-neutral and outside deterministic acceptance.");
@@ -543,10 +590,44 @@ if (!normalSessionQualityBridgeStage
 }
 if (!modelFreeAggregateStage
   || modelFreeAggregateStage.timeout_class !== "model-free-aggregate"
+  || modelFreeAggregateStage.execution_class !== "model-free-coordinator"
+  || deterministicStageExecutionClass(modelFreeAggregateStage) !== "model-free-coordinator"
   || modelFreeAggregateStage.timeout_ms !== MODEL_FREE_AGGREGATE_STAGE_TIMEOUT_MS
   || deterministicStageTimeoutMs(modelFreeAggregateStage) !== MODEL_FREE_AGGREGATE_STAGE_TIMEOUT_MS
   || MODEL_FREE_AGGREGATE_STAGE_TIMEOUT_MS < MODEL_FREE_SERIAL_INNER_BUDGET_MS) {
   fail("HARNESS-S008", "the model-free aggregate stage lacks its exact canonical serial budget", "Bind the aggregate stage to the manifest-derived timeout without widening ordinary stages.");
+}
+if (modelFreeAggregateStage) {
+  const coordinatorInvocation = deterministicStageInvocation(modelFreeAggregateStage, {
+    sourceRoot: root,
+    environment: { npm_execpath: "/poison/npm-cli.js" },
+  });
+  const expectedCoordinatorEntry = fs.realpathSync.native(path.join(root, MODEL_FREE_COORDINATOR_ENTRY));
+  if (coordinatorInvocation.file !== process.execPath
+    || coordinatorInvocation.args.length !== 1
+    || coordinatorInvocation.args[0] !== expectedCoordinatorEntry) {
+    fail("HARNESS-S008", "the model-free coordinator is not bound directly to its canonical Node entrypoint", "Bypass npm and its lifecycle hooks for the sole control-plane stage.");
+  }
+}
+if (DETERMINISTIC_STAGE_REGISTRY
+  .filter((stage) => stage !== modelFreeAggregateStage)
+  .some((stage) => deterministicStageExecutionClass(stage) !== "managed")) {
+  fail("HARNESS-S008", "an ordinary deterministic stage escaped managed containment", "Reserve coordinator execution exclusively for the canonical model-free aggregate.");
+}
+for (const invalidStage of [
+  { npm_script: "verify:static", execution_class: "model-free-coordinator" },
+  { ...modelFreeAggregateStage, execution_class: "managed" },
+  { ...modelFreeAggregateStage, execution_class: "unknown" },
+]) {
+  let rejected = false;
+  try {
+    deterministicStageExecutionClass(invalidStage);
+  } catch {
+    rejected = true;
+  }
+  if (!rejected) {
+    fail("HARNESS-S008", "verify-all accepted an unreviewed deterministic stage execution class", "Keep the control-plane exception exact and fail closed for every other stage.");
+  }
 }
 if (DETERMINISTIC_STAGE_REGISTRY
   .filter((stage) => ![
@@ -1334,7 +1415,8 @@ for (const needle of [
 for (const needle of [
   "`sudo-helper-v2`",
   "AssignProcessToJobObject",
-  "Each deterministic stage owns exactly one outer containment scope",
+  "Each ordinary deterministic stage owns exactly one outer containment scope",
+  "sole allowlisted control-plane exception",
   "conclusive adapter, evidence,",
   '"Same run" includes provider, run ID, attempt, repository, HEAD',
   "installed-host milestone bundle at all",

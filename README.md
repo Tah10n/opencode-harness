@@ -599,11 +599,18 @@ cases, corpus structure, and evaluation logic. The prompt inventory covers 11 ag
 skill entrypoints. These checks do not prove an installed model profile or
 actual model behaviour.
 
-Each deterministic stage owns exactly one outer containment scope. Containment
-controller coordinates are removed from the stage child environment, and
-recursive runner self-tests are not valid project-catalog checks. Direct
-operational verification remains separate and receives the host coordinates it
-needs.
+Each ordinary deterministic stage owns exactly one outer containment scope.
+The canonical model-free aggregate is the sole allowlisted control-plane exception:
+it remains outside an outer workload scope so its fixed 11-check
+inventory can acquire fresh production containment without prohibited nesting.
+The coordinator strips model/provider/variant inputs, reintroduces only the
+exact runner-owned Linux or macOS containment coordinates, and fails closed on
+timeout, output overflow, launch failure, or unverified cleanup. Recursive
+runner self-tests remain invalid project-catalog checks, and no other stage may
+select coordinator execution. The dispatcher resolves and launches the
+canonical aggregate Node entrypoint directly, so ambient npm lifecycle hooks
+cannot add uncontained work. Direct operational verification remains
+separate and receives the host coordinates it needs.
 
 Platform jobs produce typed operational bundles only through real verifier
 reports, then a separate command aggregates those artifacts instead of trusting

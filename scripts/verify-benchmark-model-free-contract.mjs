@@ -11,16 +11,23 @@ import {
   MODEL_FREE_CHECK_COUNT,
   MODEL_FREE_CHECK_TIMEOUT_MS,
   MODEL_FREE_SERIAL_INNER_BUDGET_MS,
+  SYNTHETIC_MODEL_FREE_CONTAINMENT_CHECK_IDS,
+  SYNTHETIC_MODEL_FREE_CONTAINMENT_ENVIRONMENT_KEYS,
   SYNTHETIC_MODEL_FREE_ENVIRONMENT_MARKER,
   SYNTHETIC_MODEL_FREE_FORBIDDEN_ENVIRONMENT_KEYS,
   modelFreeAggregateStageTimeoutMs,
 } from "../lib/benchmark/model-free-manifest.mjs";
+import { syntheticModelFreeCheckEnvironment } from "../lib/benchmark/self-test.mjs";
 import {
   DEFAULT_DETERMINISTIC_STAGE_TIMEOUT_MS,
   DETERMINISTIC_VERIFY_WORKFLOW_JOB_TIMEOUT_MS,
   DETERMINISTIC_STAGE_REGISTRY,
   MAX_DETERMINISTIC_VERIFY_BUDGET_MS,
+  MODEL_FREE_COORDINATOR_ENTRY,
+  deterministicStageExecutionClass,
+  deterministicStageInvocation,
   deterministicStageTimeoutMs,
+  modelFreeCoordinatorStageEnvironment,
 } from "./verify-all.mjs";
 
 const defaultRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -47,6 +54,11 @@ export function verifyBenchmarkModelFreeContract({ root = defaultRoot } = {}) {
   assert.deepEqual(DEFAULT_MODEL_FREE_CHECKS.map(({ id, script }) => [id, script]), expectedChecks);
   assert.equal(new Set(DEFAULT_MODEL_FREE_CHECKS.map((check) => check.id)).size, expectedChecks.length);
   assert.equal(new Set(DEFAULT_MODEL_FREE_CHECKS.map((check) => check.script)).size, expectedChecks.length);
+  assert.deepEqual(
+    SYNTHETIC_MODEL_FREE_CONTAINMENT_CHECK_IDS,
+    ["benchmark-runner"],
+    "only the production runner verifier may receive containment coordinates",
+  );
   assert.equal(
     MODEL_FREE_CHECK_TIMEOUT_MS,
     300_000,
@@ -75,6 +87,8 @@ export function verifyBenchmarkModelFreeContract({ root = defaultRoot } = {}) {
     packageJson.scripts?.["verify:benchmark:model-free"],
     "node scripts/verify-benchmark-model-free.mjs",
   );
+  assert.equal(packageJson.scripts?.["preverify:benchmark:model-free"], undefined);
+  assert.equal(packageJson.scripts?.["postverify:benchmark:model-free"], undefined);
   const aggregateSource = read(root, "scripts/verify-benchmark-model-free.mjs");
   assert.match(aggregateSource, /await runSyntheticModelFreeSelfTest\(\{ sourceRoot: root \}\)/u);
   assert.equal(
@@ -87,6 +101,36 @@ export function verifyBenchmarkModelFreeContract({ root = defaultRoot } = {}) {
   );
   assert.equal(aggregateStages.length, 1, "model-free aggregate must occur exactly once in npm run verify");
   assert.deepEqual(aggregateStages[0].check_ids, []);
+  const coordinatorInvocation = deterministicStageInvocation(aggregateStages[0], {
+    sourceRoot: root,
+    environment: { npm_execpath: "/poison/npm-cli.js" },
+  });
+  assert.equal(coordinatorInvocation.file, process.execPath);
+  assert.deepEqual(coordinatorInvocation.args, [
+    fs.realpathSync.native(path.join(root, ...MODEL_FREE_COORDINATOR_ENTRY.split("/"))),
+  ]);
+  assert(!coordinatorInvocation.args.includes("/poison/npm-cli.js"));
+  const ordinaryInvocation = deterministicStageInvocation({ npm_script: "verify:static" }, {
+    sourceRoot: root,
+    environment: { npm_execpath: "/trusted/npm-cli.js" },
+  });
+  assert.deepEqual(ordinaryInvocation, {
+    file: process.execPath,
+    args: ["/trusted/npm-cli.js", "run", "verify:static"],
+  });
+  assert.equal(
+    deterministicStageExecutionClass(aggregateStages[0]),
+    "model-free-coordinator",
+  );
+  assert.equal(deterministicStageExecutionClass({ npm_script: "verify:static" }), "managed");
+  assert.throws(() => deterministicStageExecutionClass({
+    ...aggregateStages[0],
+    execution_class: "managed",
+  }));
+  assert.throws(() => deterministicStageExecutionClass({
+    npm_script: "verify:static",
+    execution_class: "model-free-coordinator",
+  }));
   assert.equal(
     deterministicStageTimeoutMs(aggregateStages[0]),
     MODEL_FREE_AGGREGATE_STAGE_TIMEOUT_MS,
@@ -138,6 +182,62 @@ export function verifyBenchmarkModelFreeContract({ root = defaultRoot } = {}) {
   assert(selfTestSource.includes(`result[SYNTHETIC_MODEL_FREE_ENVIRONMENT_MARKER] = "1"`));
   for (const key of SYNTHETIC_MODEL_FREE_FORBIDDEN_ENVIRONMENT_KEYS) {
     assert(selfTestSource.includes("SYNTHETIC_MODEL_FREE_FORBIDDEN_ENVIRONMENT_KEYS"), key);
+  }
+  const containmentFixture = Object.fromEntries(
+    SYNTHETIC_MODEL_FREE_CONTAINMENT_ENVIRONMENT_KEYS.map((key, index) => [
+      key,
+      `/runner-owned/containment-${index + 1}`,
+    ]),
+  );
+  const environmentFixture = {
+    HOME: root,
+    PATH: process.env.PATH ?? "",
+    KEEP_ME: "ordinary-stage-value",
+    OPENCODE_QUALITY_CGROUP_POISON: "/poison/cgroup",
+    OPENCODE_QUALITY_MACOS_POISON: "/poison/controller",
+    OPENCODE_BENCH_MODEL: "forbidden/model",
+    OPENCODE_BENCH_PROVIDER: "forbidden",
+    OPENCODE_BENCH_VARIANT: "forbidden",
+    ...containmentFixture,
+  };
+  const coordinatorEnvironment = modelFreeCoordinatorStageEnvironment(environmentFixture);
+  assert.equal(coordinatorEnvironment.KEEP_ME, "ordinary-stage-value");
+  assert.equal(coordinatorEnvironment[SYNTHETIC_MODEL_FREE_ENVIRONMENT_MARKER], "1");
+  assert.deepEqual(
+    Object.fromEntries(SYNTHETIC_MODEL_FREE_CONTAINMENT_ENVIRONMENT_KEYS.map((key) => [
+      key,
+      coordinatorEnvironment[key],
+    ])),
+    containmentFixture,
+  );
+  assert.equal(coordinatorEnvironment.OPENCODE_QUALITY_CGROUP_POISON, undefined);
+  assert.equal(coordinatorEnvironment.OPENCODE_QUALITY_MACOS_POISON, undefined);
+  for (const key of SYNTHETIC_MODEL_FREE_FORBIDDEN_ENVIRONMENT_KEYS) {
+    assert.equal(coordinatorEnvironment[key], undefined);
+  }
+  const checkEnvironment = syntheticModelFreeCheckEnvironment(environmentFixture);
+  assert.equal(checkEnvironment.KEEP_ME, undefined, "check environments must retain strong bootstrap sanitation");
+  assert.equal(
+    checkEnvironment.PATH,
+    path.dirname(process.execPath),
+    "model-free checks may resolve only the current trusted Node distribution from PATH",
+  );
+  assert.equal(checkEnvironment[SYNTHETIC_MODEL_FREE_ENVIRONMENT_MARKER], "1");
+  for (const key of SYNTHETIC_MODEL_FREE_CONTAINMENT_ENVIRONMENT_KEYS) {
+    assert.equal(checkEnvironment[key], undefined);
+  }
+  const containedCheckEnvironment = syntheticModelFreeCheckEnvironment(environmentFixture, {
+    includeContainment: true,
+  });
+  assert.deepEqual(
+    Object.fromEntries(SYNTHETIC_MODEL_FREE_CONTAINMENT_ENVIRONMENT_KEYS.map((key) => [
+      key,
+      containedCheckEnvironment[key],
+    ])),
+    containmentFixture,
+  );
+  for (const key of SYNTHETIC_MODEL_FREE_FORBIDDEN_ENVIRONMENT_KEYS) {
+    assert.equal(checkEnvironment[key], undefined);
   }
   const adapterSource = read(root, "lib/benchmark/opencode-adapter.mjs");
   assert(adapterSource.includes(`sourceEnvironment.${SYNTHETIC_MODEL_FREE_ENVIRONMENT_MARKER} === "1"`));

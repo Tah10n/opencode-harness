@@ -95,6 +95,21 @@ four values. This is a technical upper bound for deterministic orchestration,
 not an agent/model timeout or a benchmark quality threshold; ordinary
 deterministic stages retain their smaller timeout classes.
 
+That stage is a bounded control-plane coordinator rather than another managed
+workload. Wrapping it in the ordinary outer containment scope would make the
+production runner check attempt prohibited nested containment. The dispatcher
+therefore reserves coordinator execution to this exact aggregate, forwards
+only the runner-owned Linux cgroup or macOS exclusive-UID coordinates, exposes
+them only to the production runner verifier from the canonical inventory, and
+keeps every model/provider/variant input absent. It resolves the canonical
+repository entry and launches it directly with the current Node executable;
+npm lifecycle hooks are outside this control-plane boundary. The canonical checks still run
+as separate processes in fixed order with their 300-second deadlines and a
+minimal `PATH` containing only the current trusted Node distribution; runner
+and adapter workloads acquire the existing production containment boundary.
+Timeout, output overflow, launch failure, or unverified coordinator cleanup is
+a failed stage and cannot produce deterministic completion evidence.
+
 Configure the same host model for both sides with `OPENCODE_BENCH_MODEL`, and
 optionally `OPENCODE_BENCH_PROVIDER` and `OPENCODE_BENCH_VARIANT`, or pass the
 equivalent CLI flags. Then run the bounded eight-agent operational micro check:
@@ -948,8 +963,11 @@ deterministic stage registry reaches that aggregate exactly once. It includes
 the meta-contract, evaluation contracts, renderer, isolation, adapter, runner,
 reporting, statistics, comparison reporting, CLI, and CI boundary verifiers.
 The aggregate strips model/provider/variant environment variables and sets the
-model-free execution marker, so ambient OpenCode cannot launch. The aggregate
-stage receives its exact computed 3,360,000 ms timeout; the enclosing default
+model-free execution marker, so ambient OpenCode cannot launch. Its exact
+containment-coordinate allowlist exists only because the aggregate is the sole
+control-plane stage and the production runner check must establish a fresh,
+non-nested boundary. The aggregate stage receives its exact computed
+3,360,000 ms timeout; the enclosing default
 verification job is 360 minutes, while `verify-all` admits at most 300 minutes
 of stages and preserves a one-hour job reserve. Model-free
 self-test reports are schema v2; immutable v1 remains the historical 10-check
