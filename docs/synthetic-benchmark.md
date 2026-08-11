@@ -19,7 +19,7 @@ paired model-backed run.
 | `instrumented` | Full production harness | The profile-only behavior plus the Engineering Dossier, impact graph, runner-owned context receipts, context sufficiency, exact ownership, trusted project checks, computational mutation gate, final reconciliation, and attestation. |
 
 The profiles are views over one canonical inventory in
-`profiles/inventory.v1.json`; they do not duplicate agent prompts. Model,
+`profiles/inventory.v2.json`; they do not duplicate agent prompts. Model,
 provider, and reasoning/variant selection remain host-owned. The benchmark
 records a binding fingerprint and observational availability metadata, but
 model metadata cannot authorize mutation, pass a quality gate, or establish
@@ -87,9 +87,13 @@ npm run bench:synthetic:self-test
 npm run verify:benchmark:model-free
 ```
 
-The canonical aggregate runs the checks serially with a finite 300-second
-per-check verifier timeout. This is an orchestration budget for deterministic
-fixture verification, not an agent timeout or a benchmark quality threshold.
+The canonical aggregate runs 11 checks serially with a finite 300-second
+per-check verifier timeout and 60 seconds of bounded aggregate overhead. Its
+computed outer stage timeout is therefore `11 × 300,000 + 60,000 = 3,360,000`
+ms (56 minutes). The manifest is the single source for the check count and all
+four values. This is a technical upper bound for deterministic orchestration,
+not an agent/model timeout or a benchmark quality threshold; ordinary
+deterministic stages retain their smaller timeout classes.
 
 Configure the same host model for both sides with `OPENCODE_BENCH_MODEL`, and
 optionally `OPENCODE_BENCH_PROVIDER` and `OPENCODE_BENCH_VARIANT`, or pass the
@@ -335,40 +339,79 @@ models, or evaluator hints.
 
 ## Suites And Cost
 
-Smoke, standard, and full permit any two distinct profiles from `plain`,
-`profile-only`, and `instrumented`. Micro is fixed to `plain` and
-`instrumented`. Every declared run count is for one paired invocation: two
-agent runs per family/semantic-variant/trajectory tuple.
+Every suite permits any two distinct profiles from `plain`, `profile-only`,
+and `instrumented`. A micro invocation still executes only the selected pair,
+so adding `profile-only` to the allowed inventory does not add a third arm.
+Every declared run count is for one paired invocation: two agent runs per
+family/semantic-variant/trajectory tuple.
 
 | Suite | Families | Semantic variants | Trajectories per variant | Profiles | Agent runs | Intended use |
 | --- | ---: | ---: | ---: | --- | ---: | --- |
-| `micro` | 4 | 1 | 1 | `plain` + `instrumented` | 8 | Fast operational wiring check only; never yields `candidate_better`. |
+| `micro` | 4 | 1 | 1 | Any selected pair | 8 | Fast operational wiring check only; never yields `candidate_better`. |
 | `smoke` | 8 | 1 | 1 | Any selected pair | 16 | Broad evaluation smoke. It is not a wall-clock or model-turn cost guarantee and never yields `candidate_better`. |
 | `standard` | 12 | 3 | 2 | Any selected pair | 144 | Main clustered comparison before a material harness change. |
 | `full` | 16 | 5 | 2 | Any selected pair | 320 | Full clustered research across all families. |
 
-Examples:
+The three principal micro ablations are `plain → profile-only`,
+`profile-only → instrumented`, and `plain → instrumented`; every reverse
+direction is also valid. CLI preflight rejects identical or non-member profiles
+and non-canonical suite dimensions before requiring a model binding or invoking
+the runner.
+
+Micro and smoke remain single jobs. Standard and full are always prepared and
+executed as one matrix shard per family. For local orchestration, first obtain
+the canonical family matrix, run its family entries, validate every shard, and
+then merge the complete artifact directory:
 
 ```sh
-npm run bench:synthetic -- \
+npm run bench:synthetic:prepare -- \
+  --suite standard \
+  --baseline profile-only \
+  --candidate instrumented \
+  --seed 20260728
+
+npm run bench:synthetic:shard -- \
+  --suite standard \
+  --family <family-id-from-prepare> \
+  --baseline profile-only \
+  --candidate instrumented \
+  --seed 20260728
+
+npm run bench:synthetic:shard:validate -- \
+  --report <repo-relative-shard-report.json>
+
+npm run bench:synthetic:merge -- \
   --suite standard \
   --baseline profile-only \
   --candidate instrumented \
   --seed 20260728 \
-  --semantic-variants 3 \
-  --trajectory-repetitions 2
-
-npm run bench:synthetic -- \
-  --suite full \
-  --baseline plain \
-  --candidate instrumented \
-  --seed 20260728 \
-  --semantic-variants 5 \
-  --trajectory-repetitions 2
+  --shards evals/reports/synthetic/shards
 ```
 
-The default suite is `smoke`, but `--seed` and a model binding are always
-required. Model-backed suites are intentionally outside mandatory model-free CI.
+Each shard reconstructs the full suite schedule, selects only its canonical
+family projection, and stores a strict shard-v1 report. Only a complete shard
+receives an immutable completion marker; an incomplete shard remains a valid
+diagnostic artifact but cannot enter merge. The report binds the parent generation, suite/source
+fingerprints, family, selected profiles, model, executable, adapter, timeout,
+limits, exact expected/actual pair universe, and projected order. Merge rejects
+missing, duplicate, foreign, incomplete, or mixed-binding shards and rejects a
+stale or reordered internal schedule projection or pair order. Artifact arrival
+order is irrelevant: merge reconstructs the original global pair order and
+only then publishes the one canonical run report and comparison.
+
+Single-run and shard jobs have a 300-minute timeout with a 15-minute reserve
+and a bounded 20-minute artifact allowance. Preflight computes
+`2 × pair_count × syntheticAdapterWorkerTimeoutMs(timeoutMs) + 20 minutes` and
+rejects any configuration above the remaining 285 minutes. At the default
+300-second agent timeout, the largest full-family shard is 10 pairs/20 attempts:
+`20 × 635 seconds + 20 minutes = 231 minutes 40 seconds`, leaving the reserve.
+The merge job is bounded to 60 minutes, with 20 minutes overhead and a
+10-minute reserve.
+
+The default suite is `smoke`; model-backed attempts require `--seed` and a model
+binding. Model-free prepare and merge commands reconstruct bindings from the
+canonical inventory and validated shard reports. Model-backed suites are
+intentionally outside mandatory model-free CI.
 
 ## Synthetic Families
 
@@ -529,12 +572,12 @@ opens a suite circuit breaker: the remaining declared pairs are not launched,
 and the immutable partial report is marked incomplete. A stale fingerprint
 fails before model execution.
 
-New replay artifacts use strict replay report v3. The report stores the full
+New replay artifacts use strict replay report v4. The report stores the full
 privacy-safe attempt binding and result, and source-bound validation
 reconstructs the canonical instance and profile before publication. It also
 binds the effective public input, default runner limits, adapter protocol and
 fingerprint, operational run, initial workspace, and result fingerprint.
-Replay reports v1 and v2 remain a strict historical structural read only; they
+Replay reports v1-v3 remain strict historical structural read-only evidence; they
 cannot pass current source-bound validation or be published as current replay
 evidence.
 
@@ -614,9 +657,13 @@ format. Trace completeness is evaluated separately by `trace_policy` and the
 end-to-end metric.
 
 `whole_task_success` is the intention-to-treat end-to-end metric. It additionally
-requires adapter completion, acceptable termination, the declared trace policy,
-complete treatment evidence, and treatment compliance. This keeps functional
-quality and lifecycle compliance visible instead of silently conflating them.
+requires adapter completion, acceptable termination, `claimed_completion=true`,
+`explicit_block=false`, `explicit_failure=false`, the declared trace policy,
+complete treatment evidence, and treatment compliance. An explicitly blocked
+or failed attempt may therefore remain objectively `task_correct=true` and
+`false_block=true`, but it can never be a whole-task success. This keeps
+functional quality and lifecycle compliance visible instead of silently
+conflating them.
 Targeted verification is observed only from a successful terminal verification
 after the last mutation (or from trusted attested quality evidence), never from
 a failed or stale pre-mutation check.
@@ -837,7 +884,7 @@ self-tests and single-profile replays use separate
 `model-free-self-tests/` and `replays/` subtrees. All generated reports and
 instances are ignored machine-local artifacts.
 
-Run report v4 retains profile/fixture/seed, semantic and trajectory identity,
+Run report v5 retains profile/fixture/seed, semantic and trajectory identity,
 suite, policy, model, and
 task-scope binding fingerprints, execution order, completeness, metrics,
 statistics, availability, executable identity binding, and residual caveats. Each attempt also contains a
@@ -848,7 +895,7 @@ classification/counts; and source-bound semantic review matched/oracle and
 severity/location calibration counts. Review matching is one-to-one,
 alias-aware, and polarity-aware: negated, safe, or “no defect” claims cannot
 satisfy a positive defect oracle. JSON, Markdown, and CSV expose this
-evidence without retaining finding bodies. Replay report v3 additionally retains its exact
+evidence without retaining finding bodies. Replay report v4 additionally retains its exact
 privacy-safe attempt binding and result. Reports exclude full prompts and
 completions, credentials, secrets, raw private logs, arbitrary adapter output,
 absolute user paths, and hidden source.
@@ -901,12 +948,19 @@ deterministic stage registry reaches that aggregate exactly once. It includes
 the meta-contract, evaluation contracts, renderer, isolation, adapter, runner,
 reporting, statistics, comparison reporting, CLI, and CI boundary verifiers.
 The aggregate strips model/provider/variant environment variables and sets the
-model-free execution marker, so ambient OpenCode cannot launch. Model-free
+model-free execution marker, so ambient OpenCode cannot launch. The aggregate
+stage receives its exact computed 3,360,000 ms timeout; the enclosing default
+verification job is 360 minutes, while `verify-all` admits at most 300 minutes
+of stages and preserves a one-hour job reserve. Model-free
 self-test reports are schema v2; immutable v1 remains the historical 10-check
 schema. The
 `Synthetic benchmark` workflow is manual `workflow_dispatch` only, uses a
-protected self-hosted environment, fails closed when model configuration is
-absent, and uploads artifacts only after a complete revalidated run.
+protected self-hosted environment, prepares its family matrix from the
+canonical inventory, fails closed when model configuration is absent, and
+uploads only privacy-safe artifacts after `always()` revalidation. Failed jobs
+restore the original nonzero benchmark status after preserving validated
+diagnostics; only a complete strict merge can publish the final standard/full
+comparison.
 
 ## Relationship To Release Acceptance
 

@@ -120,15 +120,15 @@ release acceptance contract. The model is never told its profile or arm;
 `profile-only` and `instrumented` receive byte-identical agent/skill prompts.
 Every arm sees the same neutral exact changed-path scope, and validation scans
 the actual materialized tool/schema descriptions for evaluator labels. Run
-report v4 binds that scope, semantic/trajectory identity, and the canonical
+report v5 binds that scope, semantic/trajectory identity, and the canonical
 OpenCode executable while publishing bounded scope, control-lifecycle, and
 polarity-aware semantic review-match audit evidence without raw model text or
 hidden paths. Relational validation binds counts and outcomes to the canonical
 instance; unexpected paths are exposed only as bounded SHA-256 identifiers.
 Functional `task_correct` and end-to-end `whole_task_success` are reported
 separately, including a separately labeled QuixBugs-derived source stratum.
-Validate the model-free machinery and run the bounded eight-agent micro pair
-with:
+Validate the model-free machinery and run any selected pair of distinct
+profiles in the bounded eight-agent micro suite with:
 
 ```powershell
 npm run bench:synthetic:validate
@@ -137,14 +137,19 @@ npm run verify:benchmark:model-free
 npm run bench:synthetic -- --suite micro --baseline plain --candidate instrumented --seed 20260728 --semantic-variants 1 --trajectory-repetitions 1
 ```
 
+Either side may instead be `profile-only`; every two distinct profiles and
+both directions are valid while the micro cost remains eight agent runs.
+
 Configure `OPENCODE_BENCH_MODEL` in the host or add
 `--model <host-selected-model>`. Missing model/runtime state returns
 `blocked_external_state` with exit code 2; it never creates fake passing
 evidence. A completed command means the comparison evidence is complete, not
 that the candidate won. Model-free checks do not prove model quality. Paired
-execution is deterministically balanced across the whole requested suite. New
-single-profile replay artifacts use source-bound replay report v3; legacy
-replay reports v1/v2 remain readable only as historical structure.
+execution is deterministically balanced across the whole requested suite.
+Standard and full execute as canonical family shards and produce a verdict only
+after strict complete-universe merge. New single-profile replay artifacts use
+source-bound replay report v4; replay v1-v3 remain readable only as historical
+structure.
 No-progress provider timeouts are external-state/incomplete evidence and are
 excluded rather than scored as task failures. `task_correct` never depends on
 treatment-trace completeness; that remains visible in `trace_policy` and

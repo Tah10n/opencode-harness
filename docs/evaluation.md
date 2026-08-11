@@ -52,7 +52,7 @@ raw-pair McNemar, category/risk/source breakdowns, and a quality,
 duration, cost, and safety Pareto view. It emits no release
 `accepted`/`rejected` decision.
 
-Run report v4 publishes bounded fingerprinted scope, semantic/trajectory and
+Run report v5 publishes bounded fingerprinted scope, semantic/trajectory and
 canonical-executable identity, control-lifecycle, and
 semantic review-match audit evidence. Relational validation binds scope counts
 and violation codes, control classifications and counts, and review oracle

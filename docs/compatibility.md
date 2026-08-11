@@ -59,11 +59,13 @@ cannot omit that preimplementation chain.
   schema-v1 event shape when safe, but do not reinterpret malformed legacy
   artifacts or append v2 events to a v1 stream.
 - Synthetic benchmark artifacts use separate strict current schemas: generated
-  instance v3, paired run report v4, paired comparison report v2, replay report
-  v3, and model-free self-test report v2. Replay report v3 binds the full
+  instance v3, paired run report v5, family shard report v1, paired comparison
+  report v2, replay report v4, and model-free self-test report v2. Replay report
+  v4 binds the full
   privacy-safe attempt to canonical source, profile, runner, adapter, semantic
-  variant, trajectory, and executable evidence. Strict replay-report-v1/v2
-  readers remain for historical structural inspection only; legacy reports
+  variant, trajectory, and executable evidence. Strict replay-report-v1/v2/v3
+  readers and the prior run-report schemas remain for historical structural
+  inspection only; legacy reports
   cannot satisfy current source binding or be republished as current evidence.
   Model-free self-test v1 remains the immutable historical 10-check schema.
   These schemas do not

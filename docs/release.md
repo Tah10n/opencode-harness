@@ -32,19 +32,21 @@ proves only the benchmark machinery, not that a harness profile is better.
    ```
 
    When credentials and a compatible contained OpenCode host are explicitly
-   available, a separate standard product-value experiment may be run:
+   available, dispatch the protected manual synthetic workflow for a separate
+   standard product-value experiment. Its model-free preparation is equivalent
+   to:
 
    ```sh
-   npm run bench:synthetic -- \
+   npm run bench:synthetic:prepare -- \
      --suite standard \
      --baseline profile-only \
      --candidate instrumented \
-     --seed 20260728 \
-     --semantic-variants 3 \
-     --trajectory-repetitions 2
+     --seed 20260728
    ```
 
-   Record its immutable report separately. A complete result may inform
+   The workflow executes the returned family matrix, validates each immutable
+   shard, and strictly merges the complete family universe before comparison.
+   Record its immutable merged report separately. A complete result may inform
    engineering judgment, but it does not satisfy or feed the release candidate
    acceptance gate. Model-backed synthetic execution is manual and does not
    run in the default workflow.
