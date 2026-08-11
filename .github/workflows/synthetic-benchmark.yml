@@ -44,20 +44,25 @@ concurrency:
   group: synthetic-benchmark-${{ github.ref }}-${{ inputs.suite }}-${{ inputs.baseline }}-${{ inputs.candidate }}
   cancel-in-progress: false
 
+env:
+  OPENCODE_BENCH_MODEL: ${{ secrets.OPENCODE_BENCH_MODEL }}
+  OPENCODE_BENCH_PROVIDER: ${{ secrets.OPENCODE_BENCH_PROVIDER }}
+  OPENCODE_BENCH_VARIANT: ${{ secrets.OPENCODE_BENCH_VARIANT }}
+  BENCH_SUITE: ${{ inputs.suite }}
+  BENCH_BASELINE: ${{ inputs.baseline }}
+  BENCH_CANDIDATE: ${{ inputs.candidate }}
+  BENCH_SEED: ${{ inputs.seed }}
+
 jobs:
-  benchmark:
-    name: Model-backed synthetic ablation
+  prepare:
+    name: Validate contracts and prepare execution matrix
     runs-on: [self-hosted, opencode-benchmark]
     environment: synthetic-benchmark
-    timeout-minutes: 360
-    env:
-      OPENCODE_BENCH_MODEL: ${{ secrets.OPENCODE_BENCH_MODEL }}
-      OPENCODE_BENCH_PROVIDER: ${{ secrets.OPENCODE_BENCH_PROVIDER }}
-      OPENCODE_BENCH_VARIANT: ${{ secrets.OPENCODE_BENCH_VARIANT }}
-      BENCH_SUITE: ${{ inputs.suite }}
-      BENCH_BASELINE: ${{ inputs.baseline }}
-      BENCH_CANDIDATE: ${{ inputs.candidate }}
-      BENCH_SEED: ${{ inputs.seed }}
+    timeout-minutes: 90
+    outputs:
+      execution_mode: ${{ steps.matrix.outputs.execution_mode }}
+      family_matrix: ${{ steps.matrix.outputs.family_matrix }}
+      parent_generation_id: ${{ steps.matrix.outputs.parent_generation_id }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -80,52 +85,272 @@ jobs:
           npm run bench:synthetic:validate
           npm run bench:synthetic:self-test
 
-      - name: Require host-owned model configuration
+      - name: Prepare canonical matrix and execution budget
+        id: matrix
         shell: bash
         run: |
           set -euo pipefail
-          if [[ -z "${OPENCODE_BENCH_MODEL:-}" ]]; then
-            echo "OPENCODE_BENCH_MODEL is not configured in the protected environment." >&2
-            exit 2
-          fi
+          preparation="$(npm run --silent bench:synthetic:prepare -- \
+            --suite "$BENCH_SUITE" \
+            --baseline "$BENCH_BASELINE" \
+            --candidate "$BENCH_CANDIDATE" \
+            --seed "$BENCH_SEED")"
+          PREPARATION_JSON="$preparation" node -e '
+            const value = JSON.parse(process.env.PREPARATION_JSON);
+            process.stdout.write(`execution_mode=${value.execution_mode}\n`);
+            process.stdout.write(`family_matrix=${JSON.stringify(value.matrix)}\n`);
+            process.stdout.write(`parent_generation_id=${value.parent_generation_id}\n`);
+          ' >> "$GITHUB_OUTPUT"
+
+  single:
+    name: Model-backed ${{ inputs.suite }} paired run
+    if: needs.prepare.outputs.execution_mode == 'single-job'
+    needs: prepare
+    runs-on: [self-hosted, opencode-benchmark]
+    environment: synthetic-benchmark
+    timeout-minutes: 300
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Install exact dependencies
+        run: npm ci
 
       - name: Run paired synthetic benchmark
+        id: benchmark
+        shell: bash
+        run: |
+          set -uo pipefail
+          output="$RUNNER_TEMP/synthetic-single-output.json"
+          set +e
+          npm run --silent bench:synthetic -- \
+            --suite "$BENCH_SUITE" \
+            --baseline "$BENCH_BASELINE" \
+            --candidate "$BENCH_CANDIDATE" \
+            --seed "$BENCH_SEED" > "$output"
+          benchmark_exit=$?
+          set -e
+          echo "benchmark_exit=$benchmark_exit" >> "$GITHUB_OUTPUT"
+          if [[ -s "$output" ]]; then
+            OUTPUT_JSON="$output" node -e '
+              const fs = require("node:fs");
+              const value = JSON.parse(fs.readFileSync(process.env.OUTPUT_JSON, "utf8"));
+              if (value.run_artifacts?.json) process.stdout.write(`report_path=${value.run_artifacts.json}\n`);
+            ' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Validate privacy-safe run artifacts
+        id: validate
+        if: always()
         shell: bash
         run: |
           set -euo pipefail
-          case "$BENCH_SUITE" in
-            micro|smoke) semantic_variants=1; trajectory_repetitions=1 ;;
-            standard) semantic_variants=3; trajectory_repetitions=2 ;;
-            full) semantic_variants=5; trajectory_repetitions=2 ;;
-            *) echo "Unsupported suite." >&2; exit 1 ;;
-          esac
-          npm run bench:synthetic -- \
+          report_path="${{ steps.benchmark.outputs.report_path }}"
+          if [[ -n "$report_path" && -f "$report_path" ]]; then
+            npm run bench:synthetic:compare -- --report "$report_path"
+          else
+            benchmark_exit="${{ steps.benchmark.outputs.benchmark_exit || '1' }}"
+            classification=artifact-missing
+            if [[ "$benchmark_exit" -ne 0 ]]; then classification=benchmark-failed-before-report; fi
+            node scripts/benchmark-synthetic-workflow-status.mjs \
+              --job "${{ github.run_id }}-single" \
+              --suite "$BENCH_SUITE" \
+              --generation "${{ needs.prepare.outputs.parent_generation_id }}" \
+              --classification "$classification" \
+              --exit-code "$benchmark_exit"
+          fi
+
+      - name: Upload validated single-run artifacts
+        if: always() && steps.validate.outcome == 'success'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: synthetic-single-${{ github.run_id }}-${{ github.run_attempt }}
+          path: evals/reports/synthetic
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Restore benchmark exit status
+        if: always()
+        shell: bash
+        run: exit "${{ steps.benchmark.outputs.benchmark_exit || '1' }}"
+
+  shard:
+    name: ${{ inputs.suite }} / ${{ matrix.family_id }}
+    if: needs.prepare.outputs.execution_mode == 'family-sharded'
+    needs: prepare
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.prepare.outputs.family_matrix) }}
+    runs-on: [self-hosted, opencode-benchmark]
+    environment: synthetic-benchmark
+    timeout-minutes: 300
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Install exact dependencies
+        run: npm ci
+
+      - name: Run canonical family projection
+        id: benchmark
+        shell: bash
+        run: |
+          set -uo pipefail
+          output="$RUNNER_TEMP/synthetic-shard-output.json"
+          set +e
+          npm run --silent bench:synthetic:shard -- \
+            --suite "$BENCH_SUITE" \
+            --family "${{ matrix.family_id }}" \
+            --baseline "$BENCH_BASELINE" \
+            --candidate "$BENCH_CANDIDATE" \
+            --seed "$BENCH_SEED" > "$output"
+          benchmark_exit=$?
+          set -e
+          echo "benchmark_exit=$benchmark_exit" >> "$GITHUB_OUTPUT"
+          if [[ -s "$output" ]]; then
+            OUTPUT_JSON="$output" node -e '
+              const fs = require("node:fs");
+              const value = JSON.parse(fs.readFileSync(process.env.OUTPUT_JSON, "utf8"));
+              if (value.shard_artifacts?.json) process.stdout.write(`report_path=${value.shard_artifacts.json}\n`);
+            ' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Validate privacy-safe shard artifact
+        id: validate
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          report_path="${{ steps.benchmark.outputs.report_path }}"
+          if [[ -n "$report_path" && -f "$report_path" ]]; then
+            npm run bench:synthetic:shard:validate -- --report "$report_path"
+          else
+            benchmark_exit="${{ steps.benchmark.outputs.benchmark_exit || '1' }}"
+            classification=artifact-missing
+            if [[ "$benchmark_exit" -ne 0 ]]; then classification=benchmark-failed-before-report; fi
+            node scripts/benchmark-synthetic-workflow-status.mjs \
+              --job "${{ github.run_id }}-${{ matrix.family_id }}" \
+              --suite "$BENCH_SUITE" \
+              --family "${{ matrix.family_id }}" \
+              --generation "${{ needs.prepare.outputs.parent_generation_id }}" \
+              --classification "$classification" \
+              --exit-code "$benchmark_exit"
+          fi
+
+      - name: Upload validated family artifact
+        if: always() && steps.validate.outcome == 'success'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: synthetic-shard-${{ matrix.family_id }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: evals/reports/synthetic
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Restore shard exit status
+        if: always()
+        shell: bash
+        run: exit "${{ steps.benchmark.outputs.benchmark_exit || '1' }}"
+
+  merge:
+    name: Validate and merge family shards
+    if: always() && needs.prepare.outputs.execution_mode == 'family-sharded'
+    needs: [prepare, shard]
+    runs-on: [self-hosted, opencode-benchmark]
+    environment: synthetic-benchmark
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Install exact dependencies
+        run: npm ci
+
+      - name: Download validated family artifacts
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: synthetic-shard-*-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .
+          merge-multiple: true
+
+      - name: Strictly merge the complete family universe
+        id: benchmark
+        shell: bash
+        run: |
+          set -uo pipefail
+          output="$RUNNER_TEMP/synthetic-merge-output.json"
+          set +e
+          npm run --silent bench:synthetic:merge -- \
             --suite "$BENCH_SUITE" \
             --baseline "$BENCH_BASELINE" \
             --candidate "$BENCH_CANDIDATE" \
             --seed "$BENCH_SEED" \
-            --semantic-variants "$semantic_variants" \
-            --trajectory-repetitions "$trajectory_repetitions"
+            --shards evals/reports/synthetic/shards > "$output"
+          benchmark_exit=$?
+          set -e
+          echo "benchmark_exit=$benchmark_exit" >> "$GITHUB_OUTPUT"
+          if [[ -s "$output" ]]; then
+            OUTPUT_JSON="$output" node -e '
+              const fs = require("node:fs");
+              const value = JSON.parse(fs.readFileSync(process.env.OUTPUT_JSON, "utf8"));
+              if (value.run_artifacts?.json) process.stdout.write(`report_path=${value.run_artifacts.json}\n`);
+            ' >> "$GITHUB_OUTPUT"
+          fi
 
-      - name: Revalidate immutable raw and comparison artifacts
+      - name: Revalidate merged run and comparison
+        id: validate
+        if: always()
         shell: bash
         run: |
           set -euo pipefail
-          report_path="$(node -e '
-            const fs = require("node:fs");
-            const latest = JSON.parse(fs.readFileSync("evals/reports/synthetic/latest.json", "utf8"));
-            if (!/^(?!(?:con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\..*)?$)(?!.*\.$)[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/i.test(latest.run_id)) {
-              throw new Error("latest synthetic run ID is invalid");
-            }
-            process.stdout.write(`evals/reports/synthetic/runs/${latest.run_id}/report.json`);
-          ')"
-          npm run bench:synthetic:compare -- --report "$report_path"
+          report_path="${{ steps.benchmark.outputs.report_path }}"
+          if [[ -n "$report_path" && -f "$report_path" ]]; then
+            npm run bench:synthetic:compare -- --report "$report_path"
+          else
+            benchmark_exit="${{ steps.benchmark.outputs.benchmark_exit || '1' }}"
+            classification=artifact-missing
+            if [[ "$benchmark_exit" -ne 0 ]]; then classification=benchmark-failed-before-report; fi
+            node scripts/benchmark-synthetic-workflow-status.mjs \
+              --job "${{ github.run_id }}-merge" \
+              --suite "$BENCH_SUITE" \
+              --generation "${{ needs.prepare.outputs.parent_generation_id }}" \
+              --classification "$classification" \
+              --exit-code "$benchmark_exit"
+          fi
 
-      - name: Upload validated synthetic artifacts
-        if: success()
+      - name: Upload validated merged artifacts
+        if: always() && steps.validate.outcome == 'success'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: synthetic-benchmark-${{ github.run_id }}-${{ github.run_attempt }}
+          name: synthetic-merged-${{ github.run_id }}-${{ github.run_attempt }}
           path: evals/reports/synthetic
           if-no-files-found: error
           retention-days: 14
+
+      - name: Restore merge exit status
+        if: always()
+        shell: bash
+        run: exit "${{ steps.benchmark.outputs.benchmark_exit || '1' }}"

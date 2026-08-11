@@ -14,9 +14,9 @@ import {
   renderSyntheticInstance,
 } from "../lib/benchmark/renderer.mjs";
 import {
-  counterbalancedProfileSchedule,
   syntheticEffectivePublicInputFingerprint,
 } from "../lib/benchmark/runner.mjs";
+import { buildSyntheticSuitePlan } from "../lib/benchmark/suite-plan.mjs";
 import {
   cleanupSyntheticProfile,
   materializeSyntheticProfile,
@@ -224,36 +224,28 @@ function canonicalProfileFingerprint(sourceRoot, profileId) {
   }
 }
 
-function completeReport(
+export function completeReport(
   contracts,
   templateSet,
   runId = "reporting-self-test",
   sourceRoot = defaultRoot,
+  suiteId = "smoke",
 ) {
   const baselineFingerprint = canonicalProfileFingerprint(sourceRoot, "plain");
   const candidateFingerprint = canonicalProfileFingerprint(sourceRoot, "instrumented");
-  const suite = contracts.suites.find((entry) => entry.id === "smoke");
+  const suite = contracts.suites.find((entry) => entry.id === suiteId);
   assert(suite);
   const seed = "reporting-self-test";
-  const instances = suite.family_ids.flatMap((familyId) => (
-    Array.from({ length: suite.semantic_variants }, (_, semanticIndex) => (
-      Array.from({ length: suite.trajectory_repetitions }, (_, trajectoryIndex) => renderSyntheticInstance({
-        contracts,
-        templateSet,
-        familyId,
-        seed,
-        semanticVariantIndex: semanticIndex + 1,
-        repetition: trajectoryIndex + 1,
-      }))
-    )).flat()
-  ));
-  const orderByPairId = new Map(counterbalancedProfileSchedule({
-    seed,
+  const plan = buildSyntheticSuitePlan({
+    contracts,
+    templateSet,
     suiteId: suite.id,
-    instances,
+    seed,
     baselineProfileId: "plain",
     candidateProfileId: "instrumented",
-  }).map((entry) => [entry.pair_id, entry.order]));
+  });
+  const { instances } = plan;
+  const orderByPairId = new Map(plan.schedule.map((entry) => [entry.pair_id, entry.order]));
   const pairs = instances.map((instance) => {
     const identity = {
       family_id: instance.family_id,
@@ -312,10 +304,10 @@ function completeReport(
     schema_version: 4,
     report_kind: "synthetic-paired-run",
     run_id: runId,
-    generation_id: "generation-reporting-self-test",
+    generation_id: plan.generation_id,
     created_at: "2026-01-01T00:00:00.000Z",
     suite: {
-      id: "smoke",
+      id: suite.id,
       manifest_fingerprint: contracts.fingerprints.suites,
       template_set_fingerprint: fingerprint(templateSet),
       comparison_policy_fingerprint: contracts.fingerprints.comparison_policy,
@@ -613,6 +605,9 @@ export function verifyBenchmarkReporting({ root = defaultRoot } = {}) {
     staleSource.suite[fingerprintKey] = fp(`stale-${fingerprintKey}`);
     mustRejectSourceBinding(staleSource);
   }
+  const staleGeneration = structuredClone(report);
+  staleGeneration.generation_id = "generation-stale-source-binding";
+  mustRejectSourceBinding(staleGeneration);
   const wrongOrder = structuredClone(report);
   wrongOrder.pairs[0].order.reverse();
   mustRejectSourceBinding(wrongOrder);

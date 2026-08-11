@@ -43,6 +43,7 @@ import {
   materializeSyntheticFixtureControl,
   syntheticRecommendedActionFingerprint,
 } from "../lib/benchmark/fixture-control.mjs";
+import { verifyBenchmarkSharding } from "./verify-benchmark-sharding.mjs";
 import {
   prepareIsolatedFixture,
 } from "../lib/benchmark/isolation.mjs";
@@ -2409,5 +2410,7 @@ function canonicalPrivacyText(value) {
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const result = await verifyBenchmarkRunner();
+  const sharding = await verifyBenchmarkSharding();
   console.log(`Synthetic benchmark runner verification passed (${result.anti_cheating_cases} anti-cheating cases, ${result.counterbalance_pairs} suite-balanced pairs, ${result.production_runner_pairs} production pair).`);
+  console.log(`Synthetic benchmark sharding verification passed (${sharding.families} family shards; ${sharding.negative_cases} negative cases).`);
 }

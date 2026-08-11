@@ -345,9 +345,14 @@
         "package-lock.json",
         "scripts/benchmark-synthetic.mjs",
         "scripts/benchmark-synthetic-compare.mjs",
+        "scripts/benchmark-synthetic-merge.mjs",
+        "scripts/benchmark-synthetic-prepare.mjs",
         "scripts/benchmark-synthetic-replay.mjs",
         "scripts/benchmark-synthetic-self-test.mjs",
+        "scripts/benchmark-synthetic-shard-validate.mjs",
+        "scripts/benchmark-synthetic-shard.mjs",
         "scripts/benchmark-synthetic-validate.mjs",
+        "scripts/benchmark-synthetic-workflow-status.mjs",
         "scripts/injected-test-containment.mjs",
         "scripts/verify-benchmark-adapter.mjs",
         "scripts/verify-benchmark-ci.mjs",
@@ -361,6 +366,7 @@
         "scripts/verify-benchmark-renderer.mjs",
         "scripts/verify-benchmark-reporting.mjs",
         "scripts/verify-benchmark-runner.mjs",
+        "scripts/verify-benchmark-sharding.mjs",
         "scripts/verify-benchmark-statistics.mjs"
       ]
     },

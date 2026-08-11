@@ -6,12 +6,11 @@ import { loadSyntheticContracts } from "../lib/benchmark/contracts.mjs";
 import { fingerprint } from "../lib/feedback/contracts.mjs";
 import {
   loadSyntheticTemplateSet,
-  renderSyntheticInstance,
 } from "../lib/benchmark/renderer.mjs";
 import {
-  counterbalancedProfileSchedule,
   syntheticEffectivePublicInputFingerprint,
 } from "../lib/benchmark/runner.mjs";
+import { buildSyntheticSuitePlan } from "../lib/benchmark/suite-plan.mjs";
 import {
   cleanupSyntheticProfile,
   materializeSyntheticProfile,
@@ -255,25 +254,16 @@ export function createStatisticsFixtureReport(contracts, {
       cost: "unavailable",
     },
   };
-  const instances = suite.family_ids.flatMap((familyId) => (
-    Array.from({ length: suite.semantic_variants }, (_, semanticIndex) => (
-      Array.from({ length: suite.trajectory_repetitions }, (_, trajectoryIndex) => renderSyntheticInstance({
-        contracts,
-        templateSet,
-        familyId,
-        seed: "statistics-self-test",
-        semanticVariantIndex: semanticIndex + 1,
-        repetition: trajectoryIndex + 1,
-      }))
-    )).flat()
-  ));
-  const orderByPairId = new Map(counterbalancedProfileSchedule({
-    seed: "statistics-self-test",
+  const plan = buildSyntheticSuitePlan({
+    contracts,
+    templateSet,
     suiteId,
-    instances,
+    seed: "statistics-self-test",
     baselineProfileId: "plain",
     candidateProfileId: "instrumented",
-  }).map((entry) => [entry.pair_id, entry.order]));
+  });
+  const { instances } = plan;
+  const orderByPairId = new Map(plan.schedule.map((entry) => [entry.pair_id, entry.order]));
   const pairs = [];
   for (const instance of instances) {
     const familyId = instance.family_id;
@@ -351,7 +341,7 @@ export function createStatisticsFixtureReport(contracts, {
     schema_version: 4,
     report_kind: "synthetic-paired-run",
     run_id: `statistics-${suiteId}-${mode}`,
-    generation_id: "generation-statistics-self-test",
+    generation_id: plan.generation_id,
     created_at: "2026-01-01T00:00:00.000Z",
     suite: {
       id: suiteId,
@@ -458,7 +448,6 @@ export function verifyBenchmarkStatistics({ root = defaultRoot } = {}) {
   );
   const metadataOnlyReport = structuredClone(betterReport);
   metadataOnlyReport.run_id = "statistics-standard-better-metadata-replay";
-  metadataOnlyReport.generation_id = "generation-statistics-metadata-replay";
   metadataOnlyReport.created_at = "2026-01-02T00:00:00.000Z";
   metadataOnlyReport.pairs.reverse();
   for (const [pairIndex, pair] of metadataOnlyReport.pairs.entries()) {

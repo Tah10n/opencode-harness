@@ -528,6 +528,11 @@ function verifyBenchmarkEvaluationContractsLoaded({ root, contracts }) {
   assert.equal(legacyRunReportSchema.properties.schema_version.const, 3);
   const runReportSchema = contracts.schemas["benchmarks/synthetic/schemas/run-report.v4.schema.json"];
   assert.equal(runReportSchema.$id, "https://opencode-harness.invalid/schemas/synthetic-run-report-v4");
+  const shardReportSchema = contracts.schemas["benchmarks/synthetic/schemas/shard-report.v1.schema.json"];
+  assert.equal(shardReportSchema.$id, "https://opencode-harness.invalid/schemas/synthetic-shard-report-v1");
+  assert.equal(shardReportSchema.additionalProperties, false);
+  assert.equal(shardReportSchema.properties.shard_marker.const, "synthetic-paired-family-shard-v1");
+  assert.equal(shardReportSchema.properties.schedule_projection.maxItems, 10);
   assert.equal(runReportSchema.properties.schema_version.const, 4);
   assert(runReportSchema.$defs.execution.required.includes("executable_fingerprint"));
   assert.equal(
