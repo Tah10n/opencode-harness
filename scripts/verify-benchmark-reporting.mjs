@@ -117,10 +117,11 @@ function auditEvidence(profileId, suffix, instance) {
 }
 
 function successfulResult(profileId, profileFingerprint, suffix, instance) {
+  const safeSuffix = fp(suffix).slice(7, 23);
   return {
     profile_id: profileId,
     profile_fingerprint: profileFingerprint,
-    operational_run_id: `op-${suffix}`,
+    operational_run_id: `op-${safeSuffix}`,
     execution_status: "completed",
     termination_reason: "verified",
     reason: null,
@@ -182,7 +183,7 @@ function successfulResult(profileId, profileFingerprint, suffix, instance) {
         cost: "unavailable",
       },
     },
-    operational_trace_id: `trace-${suffix}`,
+    operational_trace_id: `trace-${safeSuffix}`,
   };
 }
 
