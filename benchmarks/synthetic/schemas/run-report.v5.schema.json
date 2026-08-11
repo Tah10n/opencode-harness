@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opencode-harness.invalid/schemas/synthetic-run-report-v5",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_kind",
+    "run_id",
+    "generation_id",
+    "created_at",
+    "suite",
+    "execution",
+    "profiles",
+    "complete",
+    "incomplete_reasons",
+    "pair_count",
+    "pairs",
+    "residual_caveats"
+  ],
+  "properties": {
+    "schema_version": { "const": 5 },
+    "report_kind": { "const": "synthetic-paired-run" },
+    "run_id": { "$ref": "#/$defs/safeId" },
+    "generation_id": { "$ref": "#/$defs/safeId" },
+    "created_at": { "type": "string", "format": "date-time", "maxLength": 40 },
+    "suite": { "$ref": "#/$defs/suite" },
+    "execution": { "$ref": "#/$defs/execution" },
+    "profiles": { "$ref": "#/$defs/profilePair" },
+    "complete": { "type": "boolean" },
+    "incomplete_reasons": { "$ref": "#/$defs/reasonList" },
+    "pair_count": { "type": "integer", "minimum": 0, "maximum": 240 },
+    "pairs": {
+      "type": "array",
+      "maxItems": 240,
+      "items": { "$ref": "#/$defs/pair" }
+    },
+    "residual_caveats": {
+      "type": "array",
+      "maxItems": 32,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/safeId" }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "complete": { "const": true } }, "required": ["complete"] },
+      "then": { "properties": { "incomplete_reasons": { "maxItems": 0 } } }
+    },
+    {
+      "if": { "properties": { "complete": { "const": false } }, "required": ["complete"] },
+      "then": { "properties": { "incomplete_reasons": { "minItems": 1 } } }
+    }
+  ],
+  "$defs": {
+    "safeId": { "$ref": "https://opencode-harness.invalid/schemas/synthetic-run-report-v4#/$defs/safeId" },
+    "fingerprint": { "$ref": "https://opencode-harness.invalid/schemas/synthetic-run-report-v4#/$defs/fingerprint" },
+    "nullableFingerprint": { "$ref": "https://opencode-harness.invalid/schemas/synthetic-run-report-v4#/$defs/nullableFingerprint" },
+    "reasonList": { "$ref": "https://opencode-harness.invalid/schemas/synthetic-run-report-v4#/$defs/reasonList" },
+    "suite": { "$ref": "https://opencode-harness.invalid/schemas/synthetic-run-report-v4#/$defs/suite" },
+    "execution": { "$ref": "https://opencode-harness.invalid/schemas/synthetic-run-report-v4#/$defs/execution" },
+    "profilePair": { "$ref": "https://opencode-harness.invalid/schemas/synthetic-run-report-v4#/$defs/profilePair" },
+    "pairBinding": { "$ref": "https://opencode-harness.invalid/schemas/synthetic-run-report-v4#/$defs/pairBinding" },
+    "runResult": {
+      "allOf": [
+        { "$ref": "https://opencode-harness.invalid/schemas/synthetic-run-report-v4#/$defs/runResult" },
+        {
+          "if": {
+            "properties": { "termination_acceptable": { "const": true } },
+            "required": ["termination_acceptable"]
+          },
+          "then": {
+            "properties": {
+              "claimed_completion": { "const": true },
+              "explicit_block": { "const": false },
+              "explicit_failure": { "const": false }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "whole_task_success": { "const": true } },
+            "required": ["whole_task_success"]
+          },
+          "then": {
+            "properties": {
+              "claimed_completion": { "const": true },
+              "explicit_block": { "const": false },
+              "explicit_failure": { "const": false },
+              "false_block": { "type": "null" },
+              "defect_escape_v2": { "const": false }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "false_block": { "const": true } }, "required": ["false_block"] },
+          "then": { "properties": { "whole_task_success": { "const": false } } }
+        },
+        {
+          "if": { "properties": { "defect_escape_v2": { "const": true } }, "required": ["defect_escape_v2"] },
+          "then": { "properties": { "whole_task_success": { "const": false } } }
+        }
+      ]
+    },
+    "pair": {
+      "allOf": [
+        { "$ref": "https://opencode-harness.invalid/schemas/synthetic-run-report-v4#/$defs/pair" },
+        {
+          "properties": {
+            "baseline": { "$ref": "#/$defs/runResult" },
+            "candidate": { "$ref": "#/$defs/runResult" }
+          }
+        }
+      ]
+    }
+  }
+}

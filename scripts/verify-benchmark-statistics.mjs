@@ -141,7 +141,7 @@ function runResult({
     claimed_outcome_availability: "available",
     explicit_block: false,
     explicit_failure: false,
-    termination_acceptable: true,
+    termination_acceptable: success,
     visible_check: passedOutcome(),
     hidden_check: hiddenCheck,
     workspace_policy: passedOutcome(),
@@ -338,7 +338,7 @@ export function createStatisticsFixtureReport(contracts, {
     });
   }
   return {
-    schema_version: 4,
+    schema_version: 5,
     report_kind: "synthetic-paired-run",
     run_id: `statistics-${suiteId}-${mode}`,
     generation_id: plan.generation_id,

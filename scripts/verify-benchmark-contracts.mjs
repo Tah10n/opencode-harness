@@ -526,6 +526,31 @@ function verifyBenchmarkEvaluationContractsLoaded({ root, contracts }) {
   assert.equal(contracts.comparison_policy.analysis_seed, SYNTHETIC_ANALYSIS_SEED);
   const legacyRunReportSchema = contracts.schemas["benchmarks/synthetic/schemas/run-report.v3.schema.json"];
   assert.equal(legacyRunReportSchema.properties.schema_version.const, 3);
+  const currentRunReportSchema = contracts.schemas["benchmarks/synthetic/schemas/run-report.v5.schema.json"];
+  assert.equal(currentRunReportSchema.$id, "https://opencode-harness.invalid/schemas/synthetic-run-report-v5");
+  assert.equal(currentRunReportSchema.properties.schema_version.const, 5);
+  assert.equal(
+    currentRunReportSchema.$defs.pair.allOf[1].properties.candidate.$ref,
+    "#/$defs/runResult",
+  );
+  const currentTerminationRule = currentRunReportSchema.$defs.runResult.allOf.find((entry) => (
+    entry.if?.properties?.termination_acceptable?.const === true
+  ));
+  assert(currentTerminationRule, "current run report schema must constrain accepted termination");
+  for (const [field, expected] of [
+    ["claimed_completion", true],
+    ["explicit_block", false],
+    ["explicit_failure", false],
+  ]) {
+    assert.equal(currentTerminationRule.then.properties[field].const, expected);
+  }
+  const currentSuccessRule = currentRunReportSchema.$defs.runResult.allOf.find((entry) => (
+    entry.if?.properties?.whole_task_success?.const === true
+  ));
+  assert(currentSuccessRule, "current run report schema must constrain whole-task success");
+  assert.equal(currentSuccessRule.then.properties.claimed_completion.const, true);
+  assert.equal(currentSuccessRule.then.properties.explicit_block.const, false);
+  assert.equal(currentSuccessRule.then.properties.explicit_failure.const, false);
   const runReportSchema = contracts.schemas["benchmarks/synthetic/schemas/run-report.v4.schema.json"];
   assert.equal(runReportSchema.$id, "https://opencode-harness.invalid/schemas/synthetic-run-report-v4");
   const shardReportSchema = contracts.schemas["benchmarks/synthetic/schemas/shard-report.v1.schema.json"];
@@ -648,6 +673,24 @@ function verifyBenchmarkEvaluationContractsLoaded({ root, contracts }) {
     replayReportV3Schema.properties.attempt.properties.result.$ref,
     "https://opencode-harness.invalid/schemas/synthetic-run-report-v4#/$defs/runResult",
   );
+  const replayReportV4Schema =
+    contracts.schemas["benchmarks/synthetic/schemas/replay-report.v4.schema.json"];
+  assert.equal(
+    replayReportV4Schema.$id,
+    "https://opencode-harness.invalid/schemas/synthetic-replay-report-v4",
+  );
+  assert.equal(replayReportV4Schema.properties.schema_version.const, 4);
+  assert.equal(
+    replayReportV4Schema.properties.attempt.properties.binding.$ref,
+    "https://opencode-harness.invalid/schemas/synthetic-run-report-v5#/$defs/pairBinding",
+  );
+  assert.equal(
+    replayReportV4Schema.properties.attempt.properties.result.$ref,
+    "https://opencode-harness.invalid/schemas/synthetic-run-report-v5#/$defs/runResult",
+  );
+  for (const field of ["explicit_block", "explicit_failure"]) {
+    assert(replayReportV4Schema.required.includes(field));
+  }
   const reportSafeIdPattern = new RegExp(runReportSchema.$defs.safeId.pattern);
   for (const id of ["run-1", "plain.profile"]) {
     assert.equal(reportSafeIdPattern.test(id), true);

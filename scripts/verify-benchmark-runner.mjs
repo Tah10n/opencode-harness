@@ -1779,10 +1779,20 @@ export async function verifyBenchmarkRunner({ root = path.resolve(".") } = {}) {
       "production-outcome-ordinary",
       finalStream("Implemented the requested change and verified it."),
     );
+    const successfulCli = writeProductionOutcomeCli(
+      temporaryRoot,
+      "production-outcome-successful",
+      finalStream(JSON.stringify({ agent_outcome: "success", review_findings: [] })),
+    );
     const blockedCli = writeProductionOutcomeCli(
       temporaryRoot,
       "production-outcome-blocked",
       finalStream(JSON.stringify({ agent_outcome: "blocked", review_findings: [] })),
+    );
+    const failedCli = writeProductionOutcomeCli(
+      temporaryRoot,
+      "production-outcome-failed",
+      finalStream(JSON.stringify({ agent_outcome: "failed", review_findings: [] })),
     );
     const missingCli = writeProductionOutcomeCli(
       temporaryRoot,
@@ -1857,8 +1867,20 @@ export async function verifyBenchmarkRunner({ root = path.resolve(".") } = {}) {
       cli: ordinaryCli,
     });
     assert.equal(ordinaryObjectivePass.result.claimed_completion, true);
+    assert.equal(ordinaryObjectivePass.result.termination_acceptable, true);
+    assert.equal(ordinaryObjectivePass.result.whole_task_success, true);
     assert.equal(ordinaryObjectivePass.result.defect_escape_v2, false);
     assert.equal(ordinaryObjectivePass.result.false_block, null);
+
+    const explicitSuccessObjectivePass = await runOutcomeAttempt({
+      id: "runner-outcome-explicit-success-objective-pass",
+      cli: successfulCli,
+    });
+    assert.equal(explicitSuccessObjectivePass.result.claimed_completion, true);
+    assert.equal(explicitSuccessObjectivePass.result.explicit_block, false);
+    assert.equal(explicitSuccessObjectivePass.result.explicit_failure, false);
+    assert.equal(explicitSuccessObjectivePass.result.termination_acceptable, true);
+    assert.equal(explicitSuccessObjectivePass.result.whole_task_success, true);
 
     const explicitBlockedObjectivePass = await runOutcomeAttempt({
       id: "runner-outcome-explicit-block-objective-pass",
@@ -1867,10 +1889,29 @@ export async function verifyBenchmarkRunner({ root = path.resolve(".") } = {}) {
     assert.equal(explicitBlockedObjectivePass.result.claimed_completion, false);
     assert.equal(explicitBlockedObjectivePass.result.claimed_outcome_availability, "available");
     assert.equal(explicitBlockedObjectivePass.result.explicit_block, true);
+    assert.equal(explicitBlockedObjectivePass.result.task_correct, true);
+    assert.equal(explicitBlockedObjectivePass.result.termination_acceptable, false);
+    assert.equal(explicitBlockedObjectivePass.result.whole_task_success, false);
     assert.equal(
       explicitBlockedObjectivePass.result.false_block,
       true,
       JSON.stringify(explicitBlockedObjectivePass.result, null, 2),
+    );
+
+    const explicitFailedObjectivePass = await runOutcomeAttempt({
+      id: "runner-outcome-explicit-failure-objective-pass",
+      cli: failedCli,
+    });
+    assert.equal(explicitFailedObjectivePass.result.claimed_completion, false);
+    assert.equal(explicitFailedObjectivePass.result.claimed_outcome_availability, "available");
+    assert.equal(explicitFailedObjectivePass.result.explicit_failure, true);
+    assert.equal(explicitFailedObjectivePass.result.task_correct, true);
+    assert.equal(explicitFailedObjectivePass.result.termination_acceptable, false);
+    assert.equal(explicitFailedObjectivePass.result.whole_task_success, false);
+    assert.equal(
+      explicitFailedObjectivePass.result.false_block,
+      true,
+      JSON.stringify(explicitFailedObjectivePass.result, null, 2),
     );
 
     for (const [id, cli, finalResponseBytes] of [
@@ -1881,6 +1922,7 @@ export async function verifyBenchmarkRunner({ root = path.resolve(".") } = {}) {
     ]) {
       const incompleteClaim = await runOutcomeAttempt({ id, cli, finalResponseBytes });
       assert.equal(incompleteClaim.result.claimed_completion, false);
+      assert.equal(incompleteClaim.result.whole_task_success, false);
       assert.equal(incompleteClaim.result.false_block, null);
     }
 
@@ -2334,6 +2376,9 @@ export async function verifyBenchmarkRunner({ root = path.resolve(".") } = {}) {
     task_evidence_complete: true,
     task_correct: true,
     evidence_complete: true,
+    claimed_completion: true,
+    explicit_block: false,
+    explicit_failure: false,
   };
   assert.equal(syntheticWholeTaskSuccess(baseOutcome), true);
   assert.equal(syntheticWholeTaskSuccess({ ...baseOutcome, agent_reported_success: false }), true);
@@ -2344,10 +2389,17 @@ export async function verifyBenchmarkRunner({ root = path.resolve(".") } = {}) {
     "hidden_safety_failed",
     "task_correct",
     "evidence_complete",
+    "claimed_completion",
   ]) {
     assert.equal(syntheticWholeTaskSuccess({
       ...baseOutcome,
       [key]: key === "hidden_safety_failed",
+    }), false);
+  }
+  for (const key of ["explicit_block", "explicit_failure"]) {
+    assert.equal(syntheticWholeTaskSuccess({
+      ...baseOutcome,
+      [key]: true,
     }), false);
   }
   for (const key of [

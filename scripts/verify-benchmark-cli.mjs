@@ -957,6 +957,8 @@ export async function verifyBenchmarkCli({ root = defaultRoot } = {}) {
     delete legacyReplay.profile_fingerprint;
     delete legacyReplay.task_correct;
     delete legacyReplay.claimed_completion;
+    delete legacyReplay.explicit_block;
+    delete legacyReplay.explicit_failure;
     delete legacyReplay.false_block;
     delete legacyReplay.attempt;
     validateSyntheticReplayReport(legacyReplay);
@@ -969,10 +971,21 @@ export async function verifyBenchmarkCli({ root = defaultRoot } = {}) {
     legacyV2Replay.repetition = legacyV2Replay.trajectory_repetition;
     for (const field of ["semantic_variant_index", "semantic_variant_id", "semantic_variant_fingerprint", "trajectory_id", "trajectory_fingerprint", "trajectory_repetition"]) delete legacyV2Replay[field];
     delete legacyV2Replay.claimed_completion;
+    delete legacyV2Replay.explicit_block;
+    delete legacyV2Replay.explicit_failure;
     delete legacyV2Replay.false_block;
     validateSyntheticReplayReport(legacyV2Replay);
     assert.throws(
       () => validateSyntheticReplayReportSourceBinding(legacyV2Replay, { sourceRoot: root }),
+      (error) => error?.code === "SYNTHETIC_REPLAY_SOURCE_BINDING",
+    );
+    const legacyV3Replay = structuredClone(successfulReplay.report);
+    legacyV3Replay.schema_version = 3;
+    delete legacyV3Replay.explicit_block;
+    delete legacyV3Replay.explicit_failure;
+    validateSyntheticReplayReport(legacyV3Replay);
+    assert.throws(
+      () => validateSyntheticReplayReportSourceBinding(legacyV3Replay, { sourceRoot: root }),
       (error) => error?.code === "SYNTHETIC_REPLAY_SOURCE_BINDING",
     );
     const contradictoryReplay = structuredClone(successfulReplay.report);

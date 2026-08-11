@@ -301,7 +301,7 @@ export function completeReport(
     };
   });
   return {
-    schema_version: 4,
+    schema_version: 5,
     report_kind: "synthetic-paired-run",
     run_id: runId,
     generation_id: plan.generation_id,
@@ -754,6 +754,8 @@ export function verifyBenchmarkReporting({ root = defaultRoot } = {}) {
     claimed_completion: false,
     claimed_outcome_availability: "available",
     explicit_block: true,
+    termination_acceptable: false,
+    whole_task_success: false,
     false_block: true,
   });
   assert.equal(validateSyntheticRunReport(explicitBlocked), explicitBlocked);
