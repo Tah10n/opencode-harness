@@ -115,6 +115,9 @@ successful child stderr is never forwarded. Every published line carries an
 inert framing prefix. The outer launcher validates that envelope and discards
 its contents in favour of a generic diagnostic if framing, privacy, byte-bound,
 or workflow-command checks fail.
+The temporary trusted-host toolchain configuration used by synthetic profile
+fixtures is created exclusively with mode `0600`; a permissive CI umask cannot
+turn that control-plane lease into a group-writable source.
 
 Configure the same host model for both sides with `OPENCODE_BENCH_MODEL`, and
 optionally `OPENCODE_BENCH_PROVIDER` and `OPENCODE_BENCH_VARIANT`, or pass the

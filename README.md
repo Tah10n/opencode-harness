@@ -615,6 +615,8 @@ outer launcher accepts only that privacy-validated framing and replaces any
 raw or malformed stderr with a generic message; successful child stderr remains
 hidden. Direct operational verification remains
 separate and receives the host coordinates it needs.
+Synthetic profile fixtures also create their temporary host-toolchain lease
+with an explicit owner-only `0600` mode, independent of the runner's umask.
 
 Platform jobs produce typed operational bundles only through real verifier
 reports, then a separate command aggregates those artifacts instead of trusting

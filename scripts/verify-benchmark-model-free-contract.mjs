@@ -453,6 +453,12 @@ export async function verifyBenchmarkModelFreeContract({ root = defaultRoot } = 
   assert.equal(timedOutCoordinator.timed_out, true);
   assert.equal(timedOutCoordinator.teardown_verified, false);
   const adapterSource = read(root, "lib/benchmark/opencode-adapter.mjs");
+  const profilesSource = read(root, "lib/benchmark/profiles.mjs");
+  assert.match(
+    profilesSource,
+    /TRUSTED_TOOLCHAIN_HOST_CONFIG_FILENAME,[\s\S]{0,800}flag: "wx",\s*mode: 0o600,[\s\S]{0,500}configurationMode === 0o600/u,
+    "synthetic host toolchain configuration must not inherit a group-writable host umask",
+  );
   assert(adapterSource.includes(`sourceEnvironment.${SYNTHETIC_MODEL_FREE_ENVIRONMENT_MARKER} === "1"`));
   assert.match(
     adapterSource,
