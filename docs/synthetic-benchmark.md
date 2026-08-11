@@ -87,6 +87,10 @@ npm run bench:synthetic:self-test
 npm run verify:benchmark:model-free
 ```
 
+The canonical aggregate runs the checks serially with a finite 300-second
+per-check verifier timeout. This is an orchestration budget for deterministic
+fixture verification, not an agent timeout or a benchmark quality threshold.
+
 Configure the same host model for both sides with `OPENCODE_BENCH_MODEL`, and
 optionally `OPENCODE_BENCH_PROVIDER` and `OPENCODE_BENCH_VARIANT`, or pass the
 equivalent CLI flags. Then run the bounded eight-agent operational micro check:

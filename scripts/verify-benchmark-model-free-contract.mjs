@@ -8,6 +8,7 @@ import {
   SYNTHETIC_MODEL_FREE_ENVIRONMENT_MARKER,
   SYNTHETIC_MODEL_FREE_FORBIDDEN_ENVIRONMENT_KEYS,
 } from "../lib/benchmark/model-free-manifest.mjs";
+import { DEFAULT_MODEL_FREE_CHECK_TIMEOUT_MS } from "../lib/benchmark/self-test.mjs";
 import { DETERMINISTIC_STAGE_REGISTRY } from "./verify-all.mjs";
 
 const defaultRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -34,6 +35,11 @@ export function verifyBenchmarkModelFreeContract({ root = defaultRoot } = {}) {
   assert.deepEqual(DEFAULT_MODEL_FREE_CHECKS.map(({ id, script }) => [id, script]), expectedChecks);
   assert.equal(new Set(DEFAULT_MODEL_FREE_CHECKS.map((check) => check.id)).size, expectedChecks.length);
   assert.equal(new Set(DEFAULT_MODEL_FREE_CHECKS.map((check) => check.script)).size, expectedChecks.length);
+  assert.equal(
+    DEFAULT_MODEL_FREE_CHECK_TIMEOUT_MS,
+    300_000,
+    "each model-free verifier needs finite headroom above the production runner regression duration",
+  );
   for (const { script } of DEFAULT_MODEL_FREE_CHECKS) {
     assert.equal(fs.statSync(path.join(root, ...script.split("/"))).isFile(), true, script);
   }
