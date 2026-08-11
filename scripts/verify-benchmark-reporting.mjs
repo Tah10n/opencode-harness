@@ -16,7 +16,10 @@ import {
 import {
   syntheticEffectivePublicInputFingerprint,
 } from "../lib/benchmark/runner.mjs";
-import { buildSyntheticSuitePlan } from "../lib/benchmark/suite-plan.mjs";
+import {
+  buildSyntheticSuitePlan,
+  counterbalancedProfileSchedule,
+} from "../lib/benchmark/suite-plan.mjs";
 import {
   cleanupSyntheticProfile,
   materializeSyntheticProfile,
@@ -669,7 +672,7 @@ export function verifyBenchmarkReporting({ root = defaultRoot } = {}) {
   rebindAudit(unboundedAuditPaths.pairs[0].baseline);
   mustReject(unboundedAuditPaths, "SYNTHETIC_REPORT_AUDIT");
   const unsafeAuditPath = structuredClone(report);
-  unsafeAuditPath.pairs[0].baseline.audit_evidence.scope.allowed_changed_paths[0] = "C:/private/token.txt";
+  unsafeAuditPath.pairs[0].baseline.audit_evidence.scope.allowed_changed_paths[0] = "/private/token.txt";
   rebindAudit(unsafeAuditPath.pairs[0].baseline);
   mustReject(unsafeAuditPath, "SYNTHETIC_PATH");
   const markdown = renderSyntheticRunMarkdown(report);

@@ -541,6 +541,8 @@ export function verifyBenchmarkStatistics({ root = defaultRoot } = {}) {
       claimed_outcome_availability: "available",
       explicit_block: true,
       explicit_failure: false,
+      termination_acceptable: false,
+      whole_task_success: false,
       false_block: true,
     });
   }
