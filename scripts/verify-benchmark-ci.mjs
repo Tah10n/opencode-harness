@@ -84,6 +84,14 @@ export function verifyBenchmarkCi({ root = defaultRoot } = {}) {
   for (const restore of ["Restore benchmark exit status", "Restore shard exit status", "Restore merge exit status"]) {
     assert(manualWorkflow.includes(restore));
   }
+  assert.equal((manualWorkflow.match(/effective_exit="\$benchmark_exit"/gu) ?? []).length, 3);
+  assert.equal((manualWorkflow.match(/if \[\[ "\$benchmark_exit" -eq 0 \]\]; then/gu) ?? []).length, 3);
+  assert.equal((manualWorkflow.match(/effective_exit=1/gu) ?? []).length, 3);
+  assert.equal(
+    (manualWorkflow.match(/run: exit "\$\{\{ steps\.validate\.outputs\.effective_exit \|\| '1' \}\}"/gu) ?? []).length,
+    3,
+  );
+  assert.equal(manualWorkflow.includes("run: exit \"${{ steps.benchmark.outputs.benchmark_exit || '1' }}\""), false);
   assert.match(manualWorkflow, /benchmark-synthetic-workflow-status\.mjs/u);
   assert.equal(manualWorkflow.includes("path: evals/reports/synthetic\n"), false);
   assert.equal(
