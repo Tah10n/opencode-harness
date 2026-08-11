@@ -108,7 +108,13 @@ as separate processes in fixed order with their 300-second deadlines and a
 minimal `PATH` containing only the current trusted Node distribution; runner
 and adapter workloads acquire the existing production containment boundary.
 Timeout, output overflow, launch failure, or unverified coordinator cleanup is
-a failed stage and cannot produce deterministic completion evidence.
+a failed stage and cannot produce deterministic completion evidence. A failed
+canonical check may publish only its check ID, exit metadata, and a bounded
+head/tail diagnostic after control-character cleanup and privacy redaction;
+successful child stderr is never forwarded. Every published line carries an
+inert framing prefix. The outer launcher validates that envelope and discards
+its contents in favour of a generic diagnostic if framing, privacy, byte-bound,
+or workflow-command checks fail.
 
 Configure the same host model for both sides with `OPENCODE_BENCH_MODEL`, and
 optionally `OPENCODE_BENCH_PROVIDER` and `OPENCODE_BENCH_VARIANT`, or pass the

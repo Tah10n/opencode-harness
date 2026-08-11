@@ -609,7 +609,11 @@ timeout, output overflow, launch failure, or unverified cleanup. Recursive
 runner self-tests remain invalid project-catalog checks, and no other stage may
 select coordinator execution. The dispatcher resolves and launches the
 canonical aggregate Node entrypoint directly, so ambient npm lifecycle hooks
-cannot add uncontained work. Direct operational verification remains
+cannot add uncontained work. On failure only, the coordinator emits a bounded,
+redacted and inertly framed diagnostic for the failed canonical check. The
+outer launcher accepts only that privacy-validated framing and replaces any
+raw or malformed stderr with a generic message; successful child stderr remains
+hidden. Direct operational verification remains
 separate and receives the host coordinates it needs.
 
 Platform jobs produce typed operational bundles only through real verifier

@@ -18,6 +18,10 @@ import {
 } from "../lib/benchmark/model-free-manifest.mjs";
 import { resolveRepositoryEntry } from "../lib/benchmark/contracts.mjs";
 import {
+  createSyntheticModelFreeDiagnosticAccumulator,
+  validateSyntheticModelFreeFailureDiagnosticEnvelope,
+} from "../lib/benchmark/self-test.mjs";
+import {
   VERIFICATION_RECEIPT_PRODUCERS,
   assessMilestone2Receipts,
   deriveMilestone2StatusFacts,
@@ -333,7 +337,7 @@ function receiptFromResult({ checkId, commandId, startedAt, completedAt, result 
   });
 }
 
-async function runModelFreeCoordinatorCommand({
+export async function runModelFreeCoordinatorCommand({
   stage,
   file,
   args,
@@ -365,6 +369,7 @@ async function runModelFreeCoordinatorCommand({
     let stderrChars = 0;
     let stdoutBytes = 0;
     let stderrBytes = 0;
+    const stderrDiagnostic = createSyntheticModelFreeDiagnosticAccumulator();
     let settled = false;
     let terminationStarted = false;
     let timer;
@@ -373,12 +378,16 @@ async function runModelFreeCoordinatorCommand({
       if (settled) return;
       settled = true;
       clearTimeout(timer);
+      const failed = result.status !== 0 || result.timed_out || result.error !== undefined;
       resolve({
         ...result,
         stdout_chars: stdoutChars,
         stderr_chars: stderrChars,
         stdout_bytes: stdoutBytes,
         stderr_bytes: stderrBytes,
+        failure_diagnostic: failed && stderrDiagnostic.stats().total_bytes > 0
+          ? validateSyntheticModelFreeFailureDiagnosticEnvelope(stderrDiagnostic.value())
+          : null,
       });
     };
     const terminate = async ({ timedOut, errorCode }) => {
@@ -406,6 +415,7 @@ async function runModelFreeCoordinatorCommand({
       } else {
         stderrBytes += bytes;
         stderrChars += chars;
+        stderrDiagnostic.append(chunk);
       }
       if (stdoutBytes + stderrBytes > maxOutputChars) {
         void terminate({ timedOut: false, errorCode: "MODEL_FREE_COORDINATOR_OUTPUT_LIMIT" });
@@ -592,7 +602,7 @@ async function main() {
     });
     if (!stagePassed) {
       console.error(
-        `Stage failed: npm run ${stage.npm_script} after ${formatDuration(outcome.duration_ms)} (exit ${outcome.result.status ?? "unavailable"}; stdout chars ${outcome.result.stdout_chars}; stderr chars ${outcome.result.stderr_chars}).`,
+        `Stage failed: npm run ${stage.npm_script} after ${formatDuration(outcome.duration_ms)} (exit ${outcome.result.status ?? "unavailable"}; stdout chars ${outcome.result.stdout_chars}; stderr chars ${outcome.result.stderr_chars}).${outcome.result.failure_diagnostic ? `\n${outcome.result.failure_diagnostic}` : ""}`,
       );
       break;
     }

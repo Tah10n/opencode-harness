@@ -17,7 +17,15 @@ import {
   SYNTHETIC_MODEL_FREE_FORBIDDEN_ENVIRONMENT_KEYS,
   modelFreeAggregateStageTimeoutMs,
 } from "../lib/benchmark/model-free-manifest.mjs";
-import { syntheticModelFreeCheckEnvironment } from "../lib/benchmark/self-test.mjs";
+import {
+  SYNTHETIC_MODEL_FREE_FAILURE_DIAGNOSTIC_MAX_BYTES,
+  createSyntheticModelFreeDiagnosticAccumulator,
+  formatSyntheticModelFreeFailureDiagnostic,
+  runSyntheticModelFreeSelfTest,
+  sanitizeSyntheticModelFreeFailureDiagnostic,
+  syntheticModelFreeCheckEnvironment,
+  validateSyntheticModelFreeFailureDiagnosticEnvelope,
+} from "../lib/benchmark/self-test.mjs";
 import {
   DEFAULT_DETERMINISTIC_STAGE_TIMEOUT_MS,
   DETERMINISTIC_VERIFY_WORKFLOW_JOB_TIMEOUT_MS,
@@ -28,6 +36,7 @@ import {
   deterministicStageInvocation,
   deterministicStageTimeoutMs,
   modelFreeCoordinatorStageEnvironment,
+  runModelFreeCoordinatorCommand,
 } from "./verify-all.mjs";
 
 const defaultRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -36,7 +45,7 @@ function read(root, relativePath) {
   return fs.readFileSync(path.join(root, ...relativePath.split("/")), "utf8").replace(/^\uFEFF/u, "");
 }
 
-export function verifyBenchmarkModelFreeContract({ root = defaultRoot } = {}) {
+export async function verifyBenchmarkModelFreeContract({ root = defaultRoot } = {}) {
   const packageJson = JSON.parse(read(root, "package.json"));
   const expectedChecks = [
     ["benchmark-model-free-contract", "scripts/verify-benchmark-model-free-contract.mjs"],
@@ -90,7 +99,10 @@ export function verifyBenchmarkModelFreeContract({ root = defaultRoot } = {}) {
   assert.equal(packageJson.scripts?.["preverify:benchmark:model-free"], undefined);
   assert.equal(packageJson.scripts?.["postverify:benchmark:model-free"], undefined);
   const aggregateSource = read(root, "scripts/verify-benchmark-model-free.mjs");
-  assert.match(aggregateSource, /await runSyntheticModelFreeSelfTest\(\{ sourceRoot: root \}\)/u);
+  assert.match(
+    aggregateSource,
+    /await runSyntheticModelFreeSelfTest\(\{\s*sourceRoot: root,\s*failureReporter: diagnosticWriter,\s*\}\)/u,
+  );
   assert.equal(
     [...aggregateSource.matchAll(/await runSyntheticModelFreeSelfTest\(/gu)].length,
     1,
@@ -239,6 +251,207 @@ export function verifyBenchmarkModelFreeContract({ root = defaultRoot } = {}) {
   for (const key of SYNTHETIC_MODEL_FREE_FORBIDDEN_ENVIRONMENT_KEYS) {
     assert.equal(checkEnvironment[key], undefined);
   }
+  const secretCanary = "FAKE_API_TOKEN=diagnostic-secret-canary";
+  const absoluteCanary = "/private/diagnostic/path";
+  const fileUrlCanary = "file:///Users/private/diagnostic.mjs:10:2";
+  const formattedDiagnostic = formatSyntheticModelFreeFailureDiagnostic({
+    checkId: "benchmark-runner",
+    status: "failed",
+    exitCode: 1,
+    signal: null,
+    timedOut: false,
+    errorCode: null,
+    stderr: `assertion marker\n${secretCanary}\n${absoluteCanary}\n${fileUrlCanary}\n\u001b[31mcolored\u001b[0m\u0000tail marker\n::error file=foo.js,line=1::forged annotation\n::add-mask::attacker-mask\n-----BEGIN PRIVATE KEY-----\nprivate-key-body-canary\n-----END PRIVATE KEY-----`,
+  });
+  assert(formattedDiagnostic.includes("model-free check benchmark-runner failed"));
+  assert(formattedDiagnostic.includes("assertion marker"));
+  assert(formattedDiagnostic.includes("colored?tail marker"));
+  assert(formattedDiagnostic.includes("[redacted]"));
+  assert(!formattedDiagnostic.includes(secretCanary));
+  assert(!formattedDiagnostic.includes(absoluteCanary));
+  assert(!formattedDiagnostic.includes(fileUrlCanary));
+  assert(formattedDiagnostic.includes("[redacted-path]"));
+  assert(!formattedDiagnostic.includes("\u001b"));
+  assert(!formattedDiagnostic.includes("\u0000"));
+  assert(!formattedDiagnostic.includes("private-key-body-canary"));
+  assert(!formattedDiagnostic.includes("::error"));
+  assert(!formattedDiagnostic.includes("::add-mask"));
+  assert(formattedDiagnostic.split("\n").every(
+    (line) => line.startsWith("[model-free-diagnostic] ")
+      || line === "[...model-free diagnostic truncated...]",
+  ));
+  const longAssignmentCanary = "assignment-value-canary";
+  const longAssignment = sanitizeSyntheticModelFreeFailureDiagnostic(
+    `FAKE_API_TOKEN=${longAssignmentCanary.repeat(8_000)}`,
+  );
+  assert(longAssignment.includes("[redacted]"));
+  assert(!longAssignment.includes(longAssignmentCanary));
+  const pemDiagnostic = sanitizeSyntheticModelFreeFailureDiagnostic(
+    "-----BEGIN PRIVATE KEY-----\npem-body-canary\n-----END PRIVATE KEY-----",
+  );
+  assert(!pemDiagnostic.includes("pem-body-canary"));
+  assert(pemDiagnostic.split("\n").every((line) => line.startsWith("[model-free-diagnostic] ")));
+  for (const armorLabel of [
+    "ENCRYPTED PRIVATE KEY",
+    "DSA PRIVATE KEY",
+    "PGP PRIVATE KEY BLOCK",
+    "PGP SECRET KEY BLOCK",
+  ]) {
+    const bodyCanary = `armor-body-canary-${armorLabel.replaceAll(" ", "-")}`;
+    const armorDiagnostic = formatSyntheticModelFreeFailureDiagnostic({
+      checkId: "benchmark-runner",
+      status: "failed",
+      exitCode: 1,
+      signal: null,
+      timedOut: false,
+      errorCode: null,
+      stderr: `-----BEGIN ${armorLabel}-----\n${bodyCanary}\n-----END ${armorLabel}-----`,
+    });
+    assert(!armorDiagnostic.includes(bodyCanary));
+    const armorAccumulator = createSyntheticModelFreeDiagnosticAccumulator();
+    armorAccumulator.append(`${armorDiagnostic}\n`);
+    assert.equal(
+      validateSyntheticModelFreeFailureDiagnosticEnvelope(armorAccumulator.value()),
+      armorDiagnostic,
+    );
+  }
+  const oversizedDiagnostic = sanitizeSyntheticModelFreeFailureDiagnostic(
+    Array.from({ length: 128 }, (_, index) => `safe-line-${index}-${"x".repeat(1024)}`).join("\n"),
+  );
+  assert(Buffer.byteLength(oversizedDiagnostic, "utf8") <= SYNTHETIC_MODEL_FREE_FAILURE_DIAGNOSTIC_MAX_BYTES);
+  assert(oversizedDiagnostic.includes("[...model-free diagnostic truncated...]"));
+
+  const accumulator = createSyntheticModelFreeDiagnosticAccumulator({ maxBytes: 1024 });
+  accumulator.append(Buffer.from("head-marker\n", "utf8"));
+  for (let index = 0; index < 128; index += 1) {
+    accumulator.append(Buffer.from(`stream-${index}-${"x".repeat(256)}\n`, "utf8"));
+  }
+  accumulator.append(Buffer.from("tail-marker", "utf8"));
+  const accumulatorStats = accumulator.stats();
+  assert.equal(accumulatorStats.max_bytes, 1024);
+  assert(accumulatorStats.total_bytes > accumulatorStats.max_bytes);
+  assert(accumulatorStats.stored_bytes <= accumulatorStats.max_bytes);
+  assert.equal(accumulatorStats.truncated, true);
+  assert(accumulator.value().includes("head-marker"));
+  assert(accumulator.value().includes("tail-marker"));
+  assert(accumulator.value().includes("[...model-free diagnostic truncated...]"));
+  const chunkInvariantPayload = Buffer.from(
+    `single-head-${"z".repeat(256 * 1024)}-single-tail`,
+    "utf8",
+  );
+  const singleChunkAccumulator = createSyntheticModelFreeDiagnosticAccumulator({ maxBytes: 1024 });
+  singleChunkAccumulator.append(chunkInvariantPayload);
+  const fragmentedAccumulator = createSyntheticModelFreeDiagnosticAccumulator({ maxBytes: 1024 });
+  for (let offset = 0; offset < chunkInvariantPayload.length; offset += 37) {
+    fragmentedAccumulator.append(chunkInvariantPayload.subarray(offset, offset + 37));
+  }
+  assert.equal(singleChunkAccumulator.value(), fragmentedAccumulator.value());
+  assert(singleChunkAccumulator.stats().stored_bytes <= 1024);
+  assert(fragmentedAccumulator.stats().stored_bytes <= 1024);
+  const safeEnvelopeAccumulator = createSyntheticModelFreeDiagnosticAccumulator();
+  safeEnvelopeAccumulator.append(Buffer.from(`${formattedDiagnostic}\n`, "utf8"));
+  assert.equal(
+    validateSyntheticModelFreeFailureDiagnosticEnvelope(safeEnvelopeAccumulator.value()),
+    formattedDiagnostic,
+  );
+  for (const unsafeEnvelope of [
+    `FAKE_API_TOKEN=${"assignment-value-canary".repeat(8_000)}`,
+    `${"prefix".repeat(16_000)}\n-----BEGIN PRIVATE KEY-----\npem-envelope-body-canary\n-----END PRIVATE KEY-----`,
+    "::error file=foo.js,line=1::forged annotation",
+    "[model-free-diagnostic] /private/envelope/path",
+    "[model-free-diagnostic] safe\rFORGED",
+    "[model-free-diagnostic] safe\tFORGED",
+    "[model-free-diagnostic] safe\u061CFORGED",
+    "[model-free-diagnostic] safe\u200EFORGED",
+    "[model-free-diagnostic] safe\u200FFORGED",
+    "[model-free-diagnostic] safe\u202EFORGED",
+    "[model-free-diagnostic] safe\u2067FORGED",
+  ]) {
+    const unsafeAccumulator = createSyntheticModelFreeDiagnosticAccumulator();
+    unsafeAccumulator.append(Buffer.from(unsafeEnvelope, "utf8"));
+    const validated = validateSyntheticModelFreeFailureDiagnosticEnvelope(unsafeAccumulator.value());
+    assert(validated.includes("failure diagnostic unavailable"));
+    assert(!validated.includes("assignment-value-canary"));
+    assert(!validated.includes("pem-envelope-body-canary"));
+    assert(!validated.includes("::error"));
+    assert(!validated.includes("/private/envelope/path"));
+  }
+
+  const reportedFailures = [];
+  const containmentOptions = [];
+  const failedSelfTest = await runSyntheticModelFreeSelfTest({
+    sourceRoot: root,
+    executor: async ({ script, includeContainment }) => {
+      containmentOptions.push([script, includeContainment]);
+      const failed = script === "scripts/verify-benchmark-runner.mjs";
+      return {
+        exitCode: failed ? 1 : 0,
+        signal: null,
+        stdout: "",
+        stderr: failed ? "runner assertion marker" : "successful stderr must stay silent",
+        errorCode: null,
+        durationMs: 1,
+      };
+    },
+    failureReporter: (diagnostic) => reportedFailures.push(diagnostic),
+  });
+  assert.equal(failedSelfTest.complete, false);
+  assert.equal(reportedFailures.length, 1);
+  assert(reportedFailures[0].includes("benchmark-runner failed"));
+  assert(reportedFailures[0].includes("runner assertion marker"));
+  assert.deepEqual(
+    containmentOptions.filter(([, includeContainment]) => includeContainment).map(([script]) => script),
+    ["scripts/verify-benchmark-runner.mjs"],
+  );
+
+  const coordinatorStage = aggregateStages[0];
+  const successfulCoordinator = await runModelFreeCoordinatorCommand({
+    stage: coordinatorStage,
+    file: process.execPath,
+    args: ["-e", "process.stderr.write('successful diagnostic must stay hidden')"],
+    cwd: root,
+    env: syntheticModelFreeCheckEnvironment(),
+    timeout: 5_000,
+    maxOutputChars: 4 * 1024 * 1024,
+  });
+  assert.equal(successfulCoordinator.status, 0);
+  assert.equal(successfulCoordinator.failure_diagnostic, null);
+  const failedCoordinator = await runModelFreeCoordinatorCommand({
+    stage: coordinatorStage,
+    file: process.execPath,
+    args: ["-e", `process.stderr.write(${JSON.stringify(`${formattedDiagnostic}\n`)}); process.exit(3)`],
+    cwd: root,
+    env: syntheticModelFreeCheckEnvironment(),
+    timeout: 5_000,
+    maxOutputChars: 4 * 1024 * 1024,
+  });
+  assert.equal(failedCoordinator.status, 3);
+  assert(failedCoordinator.failure_diagnostic.includes("model-free check benchmark-runner failed"));
+  assert(Buffer.byteLength(failedCoordinator.failure_diagnostic, "utf8") <= SYNTHETIC_MODEL_FREE_FAILURE_DIAGNOSTIC_MAX_BYTES);
+  const unsafeLargeCoordinator = await runModelFreeCoordinatorCommand({
+    stage: coordinatorStage,
+    file: process.execPath,
+    args: ["-e", "for (let index = 0; index < 128; index += 1) process.stderr.write(`unsafe-tail-${index}-${'x'.repeat(1024)}\\n`); process.exit(4)"],
+    cwd: root,
+    env: syntheticModelFreeCheckEnvironment(),
+    timeout: 5_000,
+    maxOutputChars: 4 * 1024 * 1024,
+  });
+  assert.equal(unsafeLargeCoordinator.status, 4);
+  assert(unsafeLargeCoordinator.failure_diagnostic.includes("failure diagnostic unavailable"));
+  assert(!unsafeLargeCoordinator.failure_diagnostic.includes("unsafe-tail"));
+  const timedOutCoordinator = await runModelFreeCoordinatorCommand({
+    stage: coordinatorStage,
+    file: process.execPath,
+    args: ["-e", "setInterval(() => {}, 1_000)"],
+    cwd: root,
+    env: syntheticModelFreeCheckEnvironment(),
+    timeout: 50,
+    maxOutputChars: 4 * 1024 * 1024,
+  });
+  assert.equal(timedOutCoordinator.status, null);
+  assert.equal(timedOutCoordinator.timed_out, true);
+  assert.equal(timedOutCoordinator.teardown_verified, false);
   const adapterSource = read(root, "lib/benchmark/opencode-adapter.mjs");
   assert(adapterSource.includes(`sourceEnvironment.${SYNTHETIC_MODEL_FREE_ENVIRONMENT_MARKER} === "1"`));
   assert.match(
@@ -255,6 +468,6 @@ export function verifyBenchmarkModelFreeContract({ root = defaultRoot } = {}) {
 
 const invokedPath = process.argv[1] ? pathToFileURL(path.resolve(process.argv[1])).href : null;
 if (invokedPath === import.meta.url) {
-  const result = verifyBenchmarkModelFreeContract();
+  const result = await verifyBenchmarkModelFreeContract();
   process.stdout.write(`Synthetic model-free manifest verified (${result.check_count} checks; exactly one aggregate stage).\n`);
 }
