@@ -57,6 +57,7 @@ import {
 import {
   SYNTHETIC_OPENCODE_ADAPTER_VERSION,
   executeOpenCodeAdapter,
+  resolveSyntheticOpenCodeExecutableIdentity,
 } from "../lib/benchmark/opencode-adapter.mjs";
 import { createSyntheticOpenCodeCredentialBroker } from "../lib/benchmark/opencode-provider-state.mjs";
 
@@ -1944,6 +1945,81 @@ export async function verifyBenchmarkRunner({ root = path.resolve(".") } = {}) {
     );
     assert(!canonicalPrivacyText(executed.pair).includes("hidden.test.mjs"));
     antiCheating.delete("exposed-hidden-paths");
+
+    const driftShimBin = path.join(temporaryRoot, "pair-drift-shim-bin");
+    const driftShimTarget = path.join(
+      driftShimBin,
+      "node_modules",
+      "opencode-ai",
+      "bin",
+      "opencode",
+    );
+    fs.mkdirSync(path.dirname(driftShimTarget), { recursive: true });
+    fs.copyFileSync(ordinaryCli, driftShimTarget);
+    fs.writeFileSync(
+      path.join(driftShimBin, "opencode.cmd"),
+      '@echo off\r\n"%dp0%\\node.exe" "%dp0%\\node_modules\\opencode-ai\\bin\\opencode" %*\r\n',
+      "utf8",
+    );
+    const pairDriftIdentity = resolveSyntheticOpenCodeExecutableIdentity({
+      sourceEnvironment: { PATH: driftShimBin },
+      platform: "win32",
+    });
+    assert(pairDriftIdentity);
+    let pairDriftAttemptCount = 0;
+    const baselineFirstSchedule = {
+      ...counterbalancedProfileSchedule({
+        seed: instance.seed,
+        suiteId: "smoke",
+        instances: [instance],
+        baselineProfileId: "plain",
+        candidateProfileId: "profile-only",
+      })[0],
+      order: ["plain", "profile-only"],
+    };
+    await assert.rejects(
+      runSyntheticPair({
+        sourceRoot: root,
+        contracts,
+        templateSet,
+        instance,
+        reportRunId: "runner-between-arm-executable-drift",
+        baselineProfileId: "plain",
+        candidateProfileId: "profile-only",
+        scheduleEntry: baselineFirstSchedule,
+        model: "fixture/model",
+        provider: "fixture",
+        timeoutMs: 60_000,
+        opencodeExecutableIdentity: pairDriftIdentity,
+        attemptRunner: async (input) => {
+          pairDriftAttemptCount += 1;
+          const settled = await runSyntheticProfileAttempt(input);
+          assert.equal(settled.result.adapter_completed_correctly, true);
+          assert.equal(settled.result.visible_check.passed, true);
+          assert.equal(settled.result.hidden_check.passed, true);
+          assert.equal(settled.result.evidence_complete, true);
+          fs.appendFileSync(driftShimTarget, "// between-arm drift\n", "utf8");
+          return settled;
+        },
+        credentialBroker: createSyntheticOpenCodeCredentialBroker({
+          providerId: "fixture",
+          sourceEnvironment: {
+            OPENCODE_AUTH_CONTENT: JSON.stringify({
+              fixture: { type: "api", key: "runner-between-arm-fixture" },
+            }),
+          },
+        }),
+        commandRunner: deterministicCommandRunner([0, 0]),
+        clock: () => new Date("2026-01-01T00:00:00.000Z"),
+        idFactory: deterministicIdFactory(),
+      }),
+      (error) => error?.code === "SYNTHETIC_OPENCODE_EXECUTABLE_DRIFT",
+    );
+    assert.equal(
+      pairDriftAttemptCount,
+      1,
+      "baseline must settle and candidate attempt must not launch after executable drift",
+    );
 
     const sharedCredentialBroker = createSyntheticOpenCodeCredentialBroker({
       providerId: "fixture",

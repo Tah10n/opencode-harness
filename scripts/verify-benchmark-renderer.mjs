@@ -14,6 +14,7 @@ import {
   renderSyntheticInstance,
   replaySyntheticInstance,
   SYNTHETIC_AGENT_RESPONSE_PROTOCOL,
+  syntheticSemanticOperationalPlan,
   validateSyntheticTemplateSet,
 } from "../lib/benchmark/renderer.mjs";
 
@@ -45,6 +46,56 @@ function substantiveSemanticShapeFingerprint(instance) {
     visible_check: instance.visible_check,
     hidden_check: instance.hidden_check,
   });
+}
+
+function assertOperationalAxisCounterfactuals(templateSet) {
+  const surroundingAssignments = (axes, excludedName, index = 0, current = {}) => {
+    if (index === axes.length) return [current];
+    const axis = axes[index];
+    if (axis.name === excludedName) {
+      return surroundingAssignments(axes, excludedName, index + 1, current);
+    }
+    return axis.values.flatMap((value) => surroundingAssignments(
+      axes,
+      excludedName,
+      index + 1,
+      { ...current, [axis.name]: value },
+    ));
+  };
+  for (const familyId of [
+    "cache-invalidation",
+    "retry-idempotency",
+    "resource-cleanup",
+    "small-task-no-delegation",
+  ]) {
+    const family = templateSet.semantic_families.find((entry) => entry.family_id === familyId);
+    assert(family, `${familyId} semantic family is missing`);
+    const allAxisLiterals = family.axes.flatMap((axis) => [axis.name, ...axis.values]);
+    for (const axis of family.axes) {
+      for (const surrounding of surroundingAssignments(family.axes, axis.name)) {
+        const plans = axis.values.map((value) => syntheticSemanticOperationalPlan(familyId, {
+          ...surrounding,
+          [axis.name]: value,
+        }));
+        assert(plans.every((plan) => plan !== null), `${familyId}.${axis.name} lacks an operational plan`);
+        assert.equal(
+          new Set(plans.map((plan) => fingerprint(plan))).size,
+          axis.values.length,
+          `${familyId}.${axis.name} has behaviorally duplicate values in ${JSON.stringify(surrounding)}`,
+        );
+        for (const plan of plans) {
+          const serialized = JSON.stringify(plan);
+          for (const literal of allAxisLiterals) {
+            assert.equal(
+              serialized.includes(`"${literal}"`),
+              false,
+              `${familyId}.${axis.name} operational proof leaked declarative axis literal ${literal}`,
+            );
+          }
+        }
+      }
+    }
+  }
 }
 
 function assertTemplateSchemaParity(schema) {
@@ -495,6 +546,7 @@ export function verifyBenchmarkRenderer({ root = defaultRoot } = {}) {
   assert.equal(/benchmark|profile-only|instrumented/iu.test(SYNTHETIC_AGENT_RESPONSE_PROTOCOL), false);
   const contracts = loadSyntheticContracts(root);
   const templateSet = loadSyntheticTemplateSet(root, contracts);
+  assertOperationalAxisCounterfactuals(templateSet);
   assert.equal(
     fingerprint(templateSet.public_sources),
     "sha256:18d067657890ffc1b4d14e5e8cf6279874130ccfdd44d20f453c31796d0c9e4d",
