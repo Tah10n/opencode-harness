@@ -1774,45 +1774,58 @@ export async function verifyBenchmarkRunner({ root = path.resolve(".") } = {}) {
       type: "text",
       part: { id: "final", messageID: "final", type: "text", text },
     })}\n`;
+    const verificationStream = `${JSON.stringify({
+      type: "tool_use",
+      part: {
+        id: "verify-outcome",
+        type: "tool",
+        tool: "bash",
+        state: {
+          status: "completed",
+          input: { command: "npm test" },
+        },
+      },
+    })}\n`;
+    const verifiedFinalStream = (text) => `${verificationStream}${finalStream(text)}`;
     const ordinaryCli = writeProductionOutcomeCli(
       temporaryRoot,
       "production-outcome-ordinary",
-      finalStream("Implemented the requested change and verified it."),
+      verifiedFinalStream("Implemented the requested change and verified it."),
     );
     const successfulCli = writeProductionOutcomeCli(
       temporaryRoot,
       "production-outcome-successful",
-      finalStream(JSON.stringify({ agent_outcome: "success", review_findings: [] })),
+      verifiedFinalStream(JSON.stringify({ agent_outcome: "success", review_findings: [] })),
     );
     const blockedCli = writeProductionOutcomeCli(
       temporaryRoot,
       "production-outcome-blocked",
-      finalStream(JSON.stringify({ agent_outcome: "blocked", review_findings: [] })),
+      verifiedFinalStream(JSON.stringify({ agent_outcome: "blocked", review_findings: [] })),
     );
     const failedCli = writeProductionOutcomeCli(
       temporaryRoot,
       "production-outcome-failed",
-      finalStream(JSON.stringify({ agent_outcome: "failed", review_findings: [] })),
+      verifiedFinalStream(JSON.stringify({ agent_outcome: "failed", review_findings: [] })),
     );
     const missingCli = writeProductionOutcomeCli(
       temporaryRoot,
       "production-outcome-missing",
-      `${JSON.stringify({ type: "step_finish", part: {} })}\n`,
+      `${verificationStream}${JSON.stringify({ type: "step_finish", part: {} })}\n`,
     );
     const emptyCli = writeProductionOutcomeCli(
       temporaryRoot,
       "production-outcome-empty",
-      finalStream(""),
+      verifiedFinalStream(""),
     );
     const truncatedCli = writeProductionOutcomeCli(
       temporaryRoot,
       "production-outcome-truncated",
-      finalStream("Truncated final response.").trimEnd(),
+      verifiedFinalStream("Truncated final response.").trimEnd(),
     );
     const limitedCli = writeProductionOutcomeCli(
       temporaryRoot,
       "production-outcome-limited",
-      finalStream("x".repeat(2_048)),
+      verifiedFinalStream("x".repeat(2_048)),
     );
     const spoofedRunnerAssignmentCli = writeProductionOutcomeCli(
       temporaryRoot,
