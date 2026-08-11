@@ -1,0 +1,315 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opencode-harness.invalid/schemas/synthetic-replay-report-v3",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_kind",
+    "run_id",
+    "created_at",
+    "evidence_class",
+    "model_execution_confirmed",
+    "family_id",
+    "seed",
+    "semantic_variant_index",
+    "semantic_variant_id",
+    "semantic_variant_fingerprint",
+    "trajectory_id",
+    "trajectory_fingerprint",
+    "trajectory_repetition",
+    "instance_fingerprint",
+    "profile_id",
+    "profile_fingerprint",
+    "model_binding_fingerprint",
+    "execution_status",
+    "termination_reason",
+    "reason",
+    "adapter_completed_correctly",
+    "task_correct",
+    "claimed_completion",
+    "false_block",
+    "evidence_complete",
+    "whole_task_success",
+    "result_fingerprint",
+    "attempt",
+    "residual_caveats"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 3
+    },
+    "report_kind": {
+      "const": "synthetic-profile-replay"
+    },
+    "run_id": {
+      "$ref": "#/$defs/safeId"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "maxLength": 32
+    },
+    "evidence_class": {
+      "const": "model-backed-attempt"
+    },
+    "model_execution_confirmed": {
+      "type": "boolean"
+    },
+    "family_id": {
+      "$ref": "#/$defs/safeId"
+    },
+    "seed": {
+      "$ref": "#/$defs/safeId"
+    },
+    "semantic_variant_index": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "semantic_variant_id": {
+      "$ref": "#/$defs/safeId"
+    },
+    "semantic_variant_fingerprint": {
+      "$ref": "#/$defs/fingerprint"
+    },
+    "trajectory_id": {
+      "$ref": "#/$defs/safeId"
+    },
+    "trajectory_fingerprint": {
+      "$ref": "#/$defs/fingerprint"
+    },
+    "trajectory_repetition": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "instance_fingerprint": {
+      "$ref": "#/$defs/fingerprint"
+    },
+    "profile_id": {
+      "enum": [
+        "plain",
+        "profile-only",
+        "instrumented"
+      ]
+    },
+    "profile_fingerprint": {
+      "$ref": "#/$defs/fingerprint"
+    },
+    "model_binding_fingerprint": {
+      "$ref": "#/$defs/fingerprint"
+    },
+    "execution_status": {
+      "enum": [
+        "completed",
+        "failed",
+        "incomplete",
+        "blocked_external_state"
+      ]
+    },
+    "termination_reason": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "reason": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 256
+    },
+    "adapter_completed_correctly": {
+      "type": "boolean"
+    },
+    "task_correct": {
+      "type": "boolean"
+    },
+    "claimed_completion": {
+      "type": "boolean"
+    },
+    "false_block": {
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "evidence_complete": {
+      "type": "boolean"
+    },
+    "whole_task_success": {
+      "type": "boolean"
+    },
+    "result_fingerprint": {
+      "$ref": "#/$defs/fingerprint"
+    },
+    "attempt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "binding",
+        "result"
+      ],
+      "properties": {
+        "binding": {
+          "$ref": "https://opencode-harness.invalid/schemas/synthetic-run-report-v4#/$defs/pairBinding"
+        },
+        "result": {
+          "$ref": "https://opencode-harness.invalid/schemas/synthetic-run-report-v4#/$defs/runResult"
+        }
+      }
+    },
+    "residual_caveats": {
+      "const": [
+        "single-profile-replay-no-comparison"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "model_execution_confirmed": {
+            "const": true
+          }
+        },
+        "required": [
+          "model_execution_confirmed"
+        ]
+      },
+      "then": {
+        "anyOf": [
+          {
+            "properties": {
+              "adapter_completed_correctly": {
+                "const": true
+              }
+            }
+          },
+          {
+            "properties": {
+              "evidence_complete": {
+                "const": true
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "model_execution_confirmed": {
+            "const": false
+          }
+        },
+        "required": [
+          "model_execution_confirmed"
+        ]
+      },
+      "then": {
+        "properties": {
+          "adapter_completed_correctly": {
+            "const": false
+          },
+          "task_correct": {
+            "const": false
+          },
+          "evidence_complete": {
+            "const": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "evidence_complete": {
+            "const": true
+          }
+        },
+        "required": [
+          "evidence_complete"
+        ]
+      },
+      "then": {
+        "properties": {
+          "model_execution_confirmed": {
+            "const": true
+          },
+          "execution_status": {
+            "enum": [
+              "completed",
+              "failed"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "execution_status": {
+            "const": "blocked_external_state"
+          }
+        },
+        "required": [
+          "execution_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "model_execution_confirmed": {
+            "const": false
+          },
+          "adapter_completed_correctly": {
+            "const": false
+          },
+          "evidence_complete": {
+            "const": false
+          },
+          "whole_task_success": {
+            "const": false
+          },
+          "termination_reason": {
+            "const": "blocked_external_state"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "whole_task_success": {
+            "const": true
+          }
+        },
+        "required": [
+          "whole_task_success"
+        ]
+      },
+      "then": {
+        "properties": {
+          "evidence_complete": {
+            "const": true
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "safeId": {
+      "type": "string",
+      "pattern": "^(?!(?:con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\\..*)?$)(?!.*\\.$)[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+    },
+    "fingerprint": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  }
+}

@@ -20,15 +20,6 @@ import {
   findForbiddenAgentModelConfiguration,
   inspectAgentPromptModelNeutrality,
 } from "../lib/quality/prompt-inventory.mjs";
-import { verifyBenchmarkAdapter } from "./verify-benchmark-adapter.mjs";
-import { verifyBenchmarkCi } from "./verify-benchmark-ci.mjs";
-import { verifyBenchmarkCli } from "./verify-benchmark-cli.mjs";
-import { verifyBenchmarkComparisonReporting } from "./verify-benchmark-comparison-reporting.mjs";
-import { verifyBenchmarkContracts } from "./verify-benchmark-contracts.mjs";
-import { verifyBenchmarkRenderer } from "./verify-benchmark-renderer.mjs";
-import { verifyBenchmarkReporting } from "./verify-benchmark-reporting.mjs";
-import { verifyBenchmarkRunner } from "./verify-benchmark-runner.mjs";
-import { verifyBenchmarkStatistics } from "./verify-benchmark-statistics.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const failures = [];
@@ -306,10 +297,13 @@ const requiredFiles = [
   "benchmarks/synthetic/schemas/template-set.schema.json",
   "benchmarks/synthetic/schemas/generated-instance.schema.json",
   "benchmarks/synthetic/schemas/run-report.v3.schema.json",
+  "benchmarks/synthetic/schemas/run-report.v4.schema.json",
   "benchmarks/synthetic/schemas/comparison-report.v1.schema.json",
   "benchmarks/synthetic/schemas/model-free-self-test-report.v1.schema.json",
+  "benchmarks/synthetic/schemas/model-free-self-test-report.v2.schema.json",
   "benchmarks/synthetic/schemas/replay-report.v1.schema.json",
   "benchmarks/synthetic/schemas/replay-report.v2.schema.json",
+  "benchmarks/synthetic/schemas/replay-report.v3.schema.json",
   "benchmarks/synthetic/templates.v1.json",
   "adoption/schemas/adoption-bundle.schema.json",
   "adoption/core.v1.json",
@@ -323,6 +317,7 @@ const requiredFiles = [
   "lib/benchmark/comparison-reporting.mjs",
   "lib/benchmark/fixture-control.mjs",
   "lib/benchmark/isolation.mjs",
+  "lib/benchmark/model-free-manifest.mjs",
   "lib/benchmark/opencode-adapter.mjs",
   "lib/benchmark/profiles.mjs",
   "lib/benchmark/renderer.mjs",
@@ -367,6 +362,8 @@ const requiredFiles = [
   "scripts/verify-benchmark-contracts.mjs",
   "scripts/verify-benchmark-evaluation-contracts.mjs",
   "scripts/verify-benchmark-isolation.mjs",
+  "scripts/verify-benchmark-model-free-contract.mjs",
+  "scripts/verify-benchmark-model-free.mjs",
   "scripts/verify-benchmark-renderer.mjs",
   "scripts/verify-benchmark-reporting.mjs",
   "scripts/verify-benchmark-runner.mjs",
@@ -490,7 +487,7 @@ for (const forbiddenScript of ["assess:quality-candidate", "verify:model-profile
   }
 }
 const expectedDeterministicStages = [
-  "verify:static", "verify:feedback-foundation", "verify:trace-store", "verify:report-history", "verify:adapter-worker",
+  "verify:static", "verify:benchmark:model-free", "verify:feedback-foundation", "verify:trace-store", "verify:report-history", "verify:adapter-worker",
   "eval", "verify:drift", "verify:adoption-bundle", "verify:package-boundary", "verify:runtime:fixture", "verify:runtime:quality-hooks:fixture",
   "verify:live-eval", "verify:acceptance",
   "verify:quality-contracts", "verify:engineering-dossier", "verify:architecture-policy", "verify:impact-graph",
@@ -606,6 +603,7 @@ for (const [name, command] of Object.entries({
   "verify:benchmark:cli": "node scripts/verify-benchmark-cli.mjs",
   "verify:benchmark:comparison-reporting": "node scripts/verify-benchmark-comparison-reporting.mjs",
   "verify:benchmark:isolation": "node scripts/verify-benchmark-isolation.mjs",
+  "verify:benchmark:model-free": "node scripts/verify-benchmark-model-free.mjs",
   "verify:benchmark:contracts": "node scripts/verify-benchmark-contracts.mjs",
   "verify:benchmark:renderer": "node scripts/verify-benchmark-renderer.mjs",
   "verify:benchmark:reporting": "node scripts/verify-benchmark-reporting.mjs",
@@ -656,60 +654,6 @@ for (const [name, command] of Object.entries({
   if (packageJson.scripts?.[name] !== command) {
     fail("HARNESS-S009", `package.json must expose ${name}`, `Set ${name} to ${command}.`);
   }
-}
-
-try {
-  verifyBenchmarkContracts({ root });
-} catch (error) {
-  fail("HARNESS-S093", `synthetic benchmark contracts failed: ${error.message}`, "Restore the canonical strict inventory, profile, suite, policy, and adoption composition.");
-}
-
-try {
-  verifyBenchmarkRenderer({ root });
-} catch (error) {
-  fail("HARNESS-S094", `synthetic benchmark renderer failed: ${error.message}`, "Restore deterministic declarative rendering, replay, bounds, hidden staging, and executable family oracles.");
-}
-
-try {
-  await verifyBenchmarkAdapter({ root });
-} catch (error) {
-  fail("HARNESS-S095", `synthetic OpenCode adapter failed: ${error.message}`, "Restore isolated profile materialization, argv-only execution, bounded JSONL parsing, and honest adapter lifecycle states.");
-}
-
-try {
-  await verifyBenchmarkRunner({ root });
-} catch (error) {
-  fail("HARNESS-S096", `synthetic paired runner failed: ${error.message}`, "Restore counterbalanced fresh-run pairing, post-teardown hidden staging, fail-closed trace evidence, and whole-task semantics.");
-}
-
-try {
-  verifyBenchmarkReporting();
-} catch (error) {
-  fail("HARNESS-S097", `synthetic run reporting failed: ${error.message}`, "Restore strict privacy-safe validation, immutable report publication, marker-last completion, and locked latest pointers.");
-}
-
-try {
-  verifyBenchmarkStatistics({ root });
-} catch (error) {
-  fail("HARNESS-S098", `synthetic benchmark statistics failed: ${error.message}`, "Restore paired macro-family metrics, deterministic bootstrap, exact McNemar, predeclared guardrails, and explicit verdict states.");
-}
-
-try {
-  verifyBenchmarkComparisonReporting({ root });
-} catch (error) {
-  fail("HARNESS-S099", `synthetic comparison reporting failed: ${error.message}`, "Restore source-bound comparison rendering, immutable marker-last publication, CSV summaries, and incomplete-evidence handling.");
-}
-
-try {
-  await verifyBenchmarkCli({ root });
-} catch (error) {
-  fail("HARNESS-S100", `synthetic benchmark CLI failed: ${error.message}`, "Restore strict model-neutral command parsing, report-bound comparison and replay, model-free self-test isolation, exit semantics, and confined immutable artifacts.");
-}
-
-try {
-  verifyBenchmarkCi({ root });
-} catch (error) {
-  fail("HARNESS-S101", `synthetic benchmark CI boundary failed: ${error.message}`, "Keep default CI model-free and the explicit model-backed workflow manual, protected, fail-closed, and artifact-validating.");
 }
 
 const runtimeQualityFixtureComposite = fs.readFileSync(
@@ -2002,25 +1946,25 @@ for (const needle of [
   "npm run bench:synthetic:validate",
   "npm run bench:synthetic:self-test",
   "npm run bench:synthetic --",
-  "--suite smoke",
+  "--suite micro",
   "--suite standard",
   "--suite full",
-  "Canonical agent runs",
+  "Agent runs",
   "`blocked_external_state`",
   "exit code 2",
   "byte-identical public task text",
   "Hidden files are staged only after adapter completion",
   "deterministically counterbalanced",
   "balanced across the whole requested suite",
-  "replay report v2",
+  "replay report v3",
   "historical structural read only",
   "`whole_task_success`",
   "`task_correct`",
   "QuixBugs",
   "`source_class: public-benchmark-adaptation`",
   "`defect_escape_v2`",
-  "10,000-resample 95% bootstrap confidence interval",
-  "exact McNemar test",
+  "10,000-resample hierarchical bootstrap",
+  "family-mean sign-flip",
   "`insufficient_sample`",
   "`candidate_better`",
   "`candidate_worse`",
@@ -2058,7 +2002,7 @@ for (const [label, text, needles] of [
   ["README.md", readme, [
     "## Synthetic Ablation Benchmark",
     "npm run bench:synthetic:self-test",
-    "--suite smoke --baseline plain --candidate instrumented",
+    "--suite micro --baseline plain --candidate instrumented",
     "blocked_external_state",
     "docs/synthetic-benchmark.md",
     "`quality_project_catalog_rotate`",
@@ -2067,17 +2011,17 @@ for (const [label, text, needles] of [
   ]],
   ["docs/adoption.md", modelNeutralAdoptionDoc, [
     "## Modular Adoption Bundles",
-    "adoption/core.v1.json",
-    "adoption/quality.v1.json",
-    "adoption/evaluation.v1.json",
-    "adoption/complete.v1.json",
+    "adoption/core.v2.json",
+    "adoption/quality.v2.json",
+    "adoption/evaluation.v2.json",
+    "adoption/complete.v2.json",
     "npm run verify:benchmark:contracts",
   ]],
   ["docs/compatibility.md", compatibilityDoc, [
-    "paired run report v2",
-    "replay report v2",
+    "paired run report v4",
+    "replay report v3",
     "historical structural inspection only",
-    "model-free self-test report v1",
+    "model-free self-test report v2",
     "blocked_external_state",
     "must not be interpreted as release `accepted`/`rejected`",
   ]],

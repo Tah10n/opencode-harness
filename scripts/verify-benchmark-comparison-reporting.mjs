@@ -35,6 +35,10 @@ function incompleteReport(contracts, sourceRoot) {
     adapter_evidence_observed: false,
     adapter_completed_correctly: false,
     agent_reported_success: null,
+    claimed_completion: false,
+    claimed_outcome_availability: "unavailable",
+    explicit_block: false,
+    explicit_failure: false,
     termination_acceptable: false,
     visible_check: notRunOutcome("visible_check_not_run"),
     hidden_check: notRunOutcome("hidden_check_not_run"),
@@ -56,6 +60,7 @@ function incompleteReport(contracts, sourceRoot) {
     evidence_complete: false,
     whole_task_success: false,
     defect_escape_v2: false,
+    false_block: null,
     fingerprints: {
       adapter: null,
       initial_workspace: candidate.fingerprints.initial_workspace,
@@ -63,8 +68,12 @@ function incompleteReport(contracts, sourceRoot) {
       trace: null,
     },
     metrics: {
-      tool_call_count: null,
+      total_tool_call_count: null,
+      task_action_call_count: null,
+      computational_control_call_count: null,
       subagent_call_count: null,
+      discretionary_delegation_count: null,
+      runner_assigned_delegation_count: null,
       context_read_count: null,
       permission_request_count: null,
       model_turn_count: null,
@@ -126,6 +135,23 @@ export function verifyBenchmarkComparisonReporting({ root = defaultRoot } = {}) 
   });
   const report = fixtureReport({ mode: "better" });
   const comparison = analyzeReport(report);
+  const suppressedDefectEscapeReport = structuredClone(report);
+  Object.assign(suppressedDefectEscapeReport.pairs[0].candidate, {
+    claimed_completion: false,
+    hidden_check: {
+      status: "failed",
+      passed: false,
+      violations: ["hidden_regression"],
+    },
+    hidden_safety_failed: true,
+    task_correct: false,
+    whole_task_success: false,
+    defect_escape_v2: false,
+  });
+  assert.throws(
+    () => analyzeReport(suppressedDefectEscapeReport),
+    (error) => error?.code === "SYNTHETIC_REPORT_OUTCOME",
+  );
   const markdown = renderSyntheticComparisonMarkdown({
     report,
     comparison,

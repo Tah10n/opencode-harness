@@ -125,6 +125,10 @@ function successfulResult(profileId, profileFingerprint, suffix, instance) {
     adapter_evidence_observed: true,
     adapter_completed_correctly: true,
     agent_reported_success: true,
+    claimed_completion: true,
+    claimed_outcome_availability: "available",
+    explicit_block: false,
+    explicit_failure: false,
     termination_acceptable: true,
     visible_check: passedOutcome(),
     hidden_check: passedOutcome(),
@@ -140,6 +144,7 @@ function successfulResult(profileId, profileFingerprint, suffix, instance) {
     evidence_complete: true,
     whole_task_success: true,
     defect_escape_v2: false,
+    false_block: null,
     audit_evidence: auditEvidence(profileId, suffix, instance),
     fingerprints: {
       adapter: syntheticOpenCodeAdapterFingerprint(),
@@ -148,8 +153,12 @@ function successfulResult(profileId, profileFingerprint, suffix, instance) {
       trace: fp(`trace-${suffix}`),
     },
     metrics: {
-      tool_call_count: 3,
+      total_tool_call_count: 3,
+      task_action_call_count: 3,
+      computational_control_call_count: 0,
       subagent_call_count: 0,
+      discretionary_delegation_count: 0,
+      runner_assigned_delegation_count: 0,
       context_read_count: null,
       permission_request_count: null,
       model_turn_count: 1,
@@ -176,10 +185,14 @@ function successfulResult(profileId, profileFingerprint, suffix, instance) {
 
 function pairId(identity) {
   return fingerprint({
-    schema: "synthetic-pair-identity-v1",
+    schema: "synthetic-pair-identity-v2",
     family_id: identity.family_id,
+    semantic_variant_id: identity.semantic_variant_id,
+    semantic_variant_fingerprint: identity.semantic_variant_fingerprint,
+    trajectory_id: identity.trajectory_id,
+    trajectory_fingerprint: identity.trajectory_fingerprint,
     generated_fixture_fingerprint: identity.generated_fixture_fingerprint,
-    repetition: identity.repetition,
+    trajectory_repetition: identity.trajectory_repetition,
   });
 }
 
@@ -189,8 +202,12 @@ function bindPairToInstance(pair, instance) {
     category: instance.category,
     risk: instance.risk,
     source_class: instance.source_class,
+    semantic_variant_id: instance.semantic_variant_id,
+    semantic_variant_fingerprint: instance.semantic_variant_fingerprint,
+    trajectory_id: instance.trajectory_id,
+    trajectory_fingerprint: instance.trajectory_fingerprint,
     generated_fixture_fingerprint: instance.generated_fixture_fingerprint,
-    repetition: instance.repetition,
+    trajectory_repetition: instance.repetition,
   };
   pair.pair_id = pairId(pair.identity);
   pair.binding.public_fixture_fingerprint = instance.public_fixture_fingerprint;
@@ -219,15 +236,16 @@ function completeReport(
   assert(suite);
   const seed = "reporting-self-test";
   const instances = suite.family_ids.flatMap((familyId) => (
-    Array.from({ length: suite.repetitions }, (_, repetitionIndex) => (
-      renderSyntheticInstance({
+    Array.from({ length: suite.semantic_variants }, (_, semanticIndex) => (
+      Array.from({ length: suite.trajectory_repetitions }, (_, trajectoryIndex) => renderSyntheticInstance({
         contracts,
         templateSet,
         familyId,
         seed,
-        repetition: repetitionIndex + 1,
-      })
-    ))
+        semanticVariantIndex: semanticIndex + 1,
+        repetition: trajectoryIndex + 1,
+      }))
+    )).flat()
   ));
   const orderByPairId = new Map(counterbalancedProfileSchedule({
     seed,
@@ -242,8 +260,12 @@ function completeReport(
       category: instance.category,
       risk: instance.risk,
       source_class: instance.source_class,
+      semantic_variant_id: instance.semantic_variant_id,
+      semantic_variant_fingerprint: instance.semantic_variant_fingerprint,
+      trajectory_id: instance.trajectory_id,
+      trajectory_fingerprint: instance.trajectory_fingerprint,
       generated_fixture_fingerprint: instance.generated_fixture_fingerprint,
-      repetition: instance.repetition,
+      trajectory_repetition: instance.repetition,
     };
     const currentPairId = pairId(identity);
     return {
@@ -261,6 +283,11 @@ function completeReport(
           model: "fixture/model",
           variant: null,
         }),
+        executable_fingerprint: fp("executable"),
+        executable_version: "1.17.0",
+        executable_basename: "opencode",
+        executable_platform: "linux",
+        executable_identity_policy_version: 2,
         timeout_ms: 60_000,
         limits_fingerprint: fp("limits"),
         adapter_protocol_version: SYNTHETIC_OPENCODE_ADAPTER_VERSION,
@@ -270,19 +297,19 @@ function completeReport(
       baseline: successfulResult(
         "plain",
         baselineFingerprint,
-        `${instance.family_id}-${instance.repetition}-plain`,
+        `${instance.family_id}-${instance.semantic_variant_id}-${instance.repetition}-plain`,
         instance,
       ),
       candidate: successfulResult(
         "instrumented",
         candidateFingerprint,
-        `${instance.family_id}-${instance.repetition}-instrumented`,
+        `${instance.family_id}-${instance.semantic_variant_id}-${instance.repetition}-instrumented`,
         instance,
       ),
     };
   });
   return {
-    schema_version: 3,
+    schema_version: 4,
     report_kind: "synthetic-paired-run",
     run_id: runId,
     generation_id: "generation-reporting-self-test",
@@ -294,7 +321,8 @@ function completeReport(
       comparison_policy_fingerprint: contracts.fingerprints.comparison_policy,
       profile_inventory_fingerprint: contracts.fingerprints.inventory,
       seed,
-      repetitions: suite.repetitions,
+      semantic_variants: suite.semantic_variants,
+      trajectory_repetitions: suite.trajectory_repetitions,
       declared_pair_count: pairs.length,
     },
     execution: {
@@ -304,6 +332,11 @@ function completeReport(
       timeout_ms: 60_000,
       limits_fingerprint: fp("limits"),
       adapter_protocol_version: SYNTHETIC_OPENCODE_ADAPTER_VERSION,
+      executable_fingerprint: fp("executable"),
+      executable_version: "1.17.0",
+      executable_basename: "opencode",
+      executable_platform: "linux",
+      executable_identity_policy_version: 2,
       model_tool_availability: {
         opencode: "available",
         model: "available",
@@ -342,6 +375,10 @@ function incompleteReport(contracts, templateSet, sourceRoot = defaultRoot) {
     adapter_evidence_observed: false,
     adapter_completed_correctly: false,
     agent_reported_success: null,
+    claimed_completion: false,
+    claimed_outcome_availability: "unavailable",
+    explicit_block: false,
+    explicit_failure: false,
     termination_acceptable: false,
     common_safety: {
       status: "incomplete",
@@ -362,14 +399,19 @@ function incompleteReport(contracts, templateSet, sourceRoot = defaultRoot) {
     task_correct: false,
     evidence_complete: false,
     whole_task_success: false,
+    false_block: null,
     fingerprints: {
       ...candidate.fingerprints,
       adapter: null,
     },
     metrics: {
       ...candidate.metrics,
-      tool_call_count: null,
+      total_tool_call_count: null,
+      task_action_call_count: null,
+      computational_control_call_count: null,
       subagent_call_count: null,
+      discretionary_delegation_count: null,
+      runner_assigned_delegation_count: null,
       model_turn_count: null,
       continuation_turn_count: null,
       dangerous_command_count: null,
@@ -443,13 +485,16 @@ export function verifyBenchmarkReporting({ root = defaultRoot } = {}) {
   const circuitBroken = incompleteReport(contracts, templateSet, root);
   const circuitSuite = contracts.suites.find((entry) => entry.id === circuitBroken.suite.id);
   const circuitInstances = circuitSuite.family_ids.flatMap((familyId) => (
-    Array.from({ length: circuitSuite.repetitions }, (_, index) => renderSyntheticInstance({
-      contracts,
-      templateSet,
-      familyId,
-      seed: circuitBroken.suite.seed,
-      repetition: index + 1,
-    }))
+    Array.from({ length: circuitSuite.semantic_variants }, (_, semanticIndex) => (
+      Array.from({ length: circuitSuite.trajectory_repetitions }, (_, trajectoryIndex) => renderSyntheticInstance({
+        contracts,
+        templateSet,
+        familyId,
+        seed: circuitBroken.suite.seed,
+        semanticVariantIndex: semanticIndex + 1,
+        repetition: trajectoryIndex + 1,
+      }))
+    )).flat()
   ));
   const circuitSchedule = counterbalancedProfileSchedule({
     seed: circuitBroken.suite.seed,
@@ -509,8 +554,13 @@ export function verifyBenchmarkReporting({ root = defaultRoot } = {}) {
     reason: "opencode_missing_final",
     adapter_completed_correctly: false,
     agent_reported_success: null,
+    claimed_completion: false,
+    claimed_outcome_availability: "unavailable",
+    explicit_block: false,
+    explicit_failure: false,
     termination_acceptable: false,
     whole_task_success: false,
+    false_block: null,
   });
   assert.equal(validateSyntheticRunReport(completeNegative), completeNegative);
   assert.equal(validateSyntheticRunReportSourceBinding(completeNegative, {
@@ -640,7 +690,8 @@ export function verifyBenchmarkReporting({ root = defaultRoot } = {}) {
     templateSet,
     familyId: report.pairs[0].identity.family_id,
     seed: report.suite.seed,
-    repetition: report.pairs[0].identity.repetition,
+    semanticVariantIndex: 1,
+    repetition: report.pairs[0].identity.trajectory_repetition,
   });
   for (const forbidden of [
     privateInstance.prompt,
@@ -673,10 +724,57 @@ export function verifyBenchmarkReporting({ root = defaultRoot } = {}) {
   }
   const unsafeExecutionStatus = structuredClone(report);
   unsafeExecutionStatus.pairs[0].candidate.execution_status = "failed";
-  mustReject(unsafeExecutionStatus, "SYNTHETIC_REPORT_SEMANTICS");
+  mustReject(unsafeExecutionStatus, "SYNTHETIC_REPORT_OUTCOME");
+  const ordinaryCompletion = structuredClone(report);
+  Object.assign(ordinaryCompletion.pairs[0].candidate, {
+    agent_reported_success: null,
+    claimed_outcome_availability: "unavailable",
+  });
+  assert.equal(validateSyntheticRunReport(ordinaryCompletion), ordinaryCompletion);
+  const validDefectEscape = structuredClone(report);
+  Object.assign(validDefectEscape.pairs[0].candidate, {
+    hidden_check: {
+      status: "failed",
+      passed: false,
+      violations: ["hidden_regression"],
+    },
+    hidden_safety_failed: true,
+    task_correct: false,
+    whole_task_success: false,
+    defect_escape_v2: true,
+  });
+  assert.equal(validateSyntheticRunReport(validDefectEscape), validDefectEscape);
+  const suppressedDefectEscape = structuredClone(validDefectEscape);
+  Object.assign(suppressedDefectEscape.pairs[0].candidate, {
+    claimed_completion: false,
+    defect_escape_v2: false,
+  });
+  mustReject(suppressedDefectEscape, "SYNTHETIC_REPORT_OUTCOME");
+  const inventedOrdinaryFalseBlock = structuredClone(ordinaryCompletion);
+  inventedOrdinaryFalseBlock.pairs[0].candidate.false_block = false;
+  mustReject(inventedOrdinaryFalseBlock, "SYNTHETIC_REPORT_SEMANTICS");
+  const explicitBlocked = structuredClone(report);
+  Object.assign(explicitBlocked.pairs[0].candidate, {
+    agent_reported_success: false,
+    claimed_completion: false,
+    claimed_outcome_availability: "available",
+    explicit_block: true,
+    false_block: true,
+  });
+  assert.equal(validateSyntheticRunReport(explicitBlocked), explicitBlocked);
+  const hiddenFalseBlock = structuredClone(explicitBlocked);
+  hiddenFalseBlock.pairs[0].candidate.false_block = false;
+  mustReject(hiddenFalseBlock, "SYNTHETIC_REPORT_SEMANTICS");
   const staleModelBinding = structuredClone(report);
   staleModelBinding.pairs[0].binding.model_fingerprint = fp("stale-model");
   mustReject(staleModelBinding, "SYNTHETIC_REPORT_BINDING");
+  const staleExecutableBinding = structuredClone(report);
+  staleExecutableBinding.pairs[0].binding.executable_fingerprint = fp("stale-executable");
+  mustReject(staleExecutableBinding, "SYNTHETIC_REPORT_BINDING");
+  const partialExecutableIdentity = structuredClone(report);
+  partialExecutableIdentity.execution.executable_basename = null;
+  mustReject(partialExecutableIdentity, "SYNTHETIC_REPORT_EXECUTABLE");
+  assert.equal(JSON.stringify(report).includes(root), false);
   const markdownInjection = structuredClone(report);
   markdownInjection.execution.model = "x` ![pixel](https://example.invalid/pixel) `";
   for (const pair of markdownInjection.pairs) {
@@ -902,7 +1000,7 @@ export function verifyBenchmarkReporting({ root = defaultRoot } = {}) {
   }
   return {
     formats: 5,
-    semantic_rejections: 15,
+    semantic_rejections: 17,
     publication_modes: 5,
   };
 }

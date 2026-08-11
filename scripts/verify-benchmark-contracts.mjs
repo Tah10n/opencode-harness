@@ -7,8 +7,9 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 import {
   BOOTSTRAP_RESAMPLES,
+  MINIMUM_COMPLETE_FAMILIES,
   MINIMUM_COMPLETE_PAIRS,
-  MINIMUM_DISCORDANT_PAIRS,
+  MINIMUM_NONZERO_FAMILY_DELTAS,
   SYNTHETIC_ANALYSIS_SEED,
   SYNTHETIC_ANTI_CHEATING_CASES,
   SYNTHETIC_FAMILY_IDS,
@@ -91,7 +92,7 @@ function matchesRootCrossFieldSemantics(schema, document) {
 
 function selfTestSchemaFixture() {
   return {
-    schema_version: 1,
+    schema_version: 2,
     report_kind: "synthetic-model-free-self-test",
     run_id: "schema-self-test",
     created_at: "2026-01-01T00:00:00.000Z",
@@ -444,7 +445,7 @@ function verifyWholeTaskSuccessEvidenceSchema(schema) {
     assert.equal(properties.fingerprints.properties[field].$ref, "#/$defs/fingerprint");
   }
   for (const field of [
-    "tool_call_count",
+    "total_tool_call_count",
     "subagent_call_count",
     "model_turn_count",
     "continuation_turn_count",
@@ -481,7 +482,7 @@ function verifyWholeTaskSuccessEvidenceNegativeFixtures(schema) {
       candidate.$defs.runResult.allOf[0].then.properties.fingerprints.properties.adapter.$ref = "#/$defs/nullableFingerprint";
     },
     (candidate) => {
-      candidate.$defs.runResult.allOf[0].then.properties.metrics.properties.tool_call_count.$ref = "#/$defs/nullableCount";
+      candidate.$defs.runResult.allOf[0].then.properties.metrics.properties.total_tool_call_count.$ref = "#/$defs/nullableCount";
     },
     (candidate) => {
       candidate.$defs.runResult.allOf[0].then.properties.metrics.properties.dangerous_command_count.const = null;
@@ -519,31 +520,66 @@ function verifyBenchmarkEvaluationContractsLoaded({ root, contracts }) {
   assert.deepEqual(contracts.inventory.benchmark.anti_cheating_cases, SYNTHETIC_ANTI_CHEATING_CASES);
   assert.deepEqual(contracts.inventory.benchmark.parser_fixtures, SYNTHETIC_PARSER_FIXTURES);
   assert.equal(contracts.comparison_policy.minimum_complete_pairs, MINIMUM_COMPLETE_PAIRS);
-  assert.equal(contracts.comparison_policy.minimum_discordant_pairs, MINIMUM_DISCORDANT_PAIRS);
+  assert.equal(contracts.comparison_policy.minimum_complete_families, MINIMUM_COMPLETE_FAMILIES);
+  assert.equal(contracts.comparison_policy.minimum_nonzero_family_deltas, MINIMUM_NONZERO_FAMILY_DELTAS);
   assert.equal(contracts.comparison_policy.bootstrap_resamples, BOOTSTRAP_RESAMPLES);
   assert.equal(contracts.comparison_policy.analysis_seed, SYNTHETIC_ANALYSIS_SEED);
-  const runReportSchema = contracts.schemas["benchmarks/synthetic/schemas/run-report.v3.schema.json"];
-  assert.equal(runReportSchema.$id, "https://opencode-harness.invalid/schemas/synthetic-run-report-v3");
-  assert.equal(runReportSchema.properties.schema_version.const, 3);
+  const legacyRunReportSchema = contracts.schemas["benchmarks/synthetic/schemas/run-report.v3.schema.json"];
+  assert.equal(legacyRunReportSchema.properties.schema_version.const, 3);
+  const runReportSchema = contracts.schemas["benchmarks/synthetic/schemas/run-report.v4.schema.json"];
+  assert.equal(runReportSchema.$id, "https://opencode-harness.invalid/schemas/synthetic-run-report-v4");
+  assert.equal(runReportSchema.properties.schema_version.const, 4);
+  assert(runReportSchema.$defs.execution.required.includes("executable_fingerprint"));
+  assert.equal(
+    runReportSchema.$defs.execution.properties.executable_fingerprint.$ref,
+    "#/$defs/nullableFingerprint",
+  );
+  assert(runReportSchema.$defs.pairBinding.required.includes("executable_fingerprint"));
+  assert.equal(
+    runReportSchema.$defs.pairBinding.properties.executable_fingerprint.$ref,
+    "#/$defs/nullableFingerprint",
+  );
   assert.equal(runReportSchema.properties.report_kind.const, "synthetic-paired-run");
   assert.equal(runReportSchema.properties.pairs.maxItems, 240);
   assert.equal(Object.hasOwn(runReportSchema.properties, "statistics"), false);
   assert.equal(Object.hasOwn(runReportSchema.properties, "verdict"), false);
   assert(runReportSchema.$defs.pairBinding.required.includes("task_scope_fingerprint"));
   assert(runReportSchema.$defs.runResult.required.includes("audit_evidence"));
+  assert(runReportSchema.$defs.runResult.required.includes("claimed_completion"));
+  assert(runReportSchema.$defs.runResult.required.includes("false_block"));
+  const completionEquivalence = runReportSchema.$defs.runResult.allOf.find((entry) => (
+    entry.if?.properties?.adapter_evidence_observed?.const === true
+      && entry.if?.properties?.execution_status?.const === "completed"
+      && entry.if?.properties?.teardown?.properties?.passed?.const === true
+      && entry.then?.properties?.claimed_completion?.const === true
+  ));
+  assert(completionEquivalence, "run report schema must derive claimed completion from settled execution evidence");
+  const completionEvidence = runReportSchema.$defs.runResult.allOf.find((entry) => (
+    entry.if?.properties?.claimed_completion?.const === true
+      && entry.then?.properties?.teardown?.properties?.passed?.const === true
+  ));
+  assert(completionEvidence, "run report schema must reject completion without verified teardown");
   assert.equal(runReportSchema.$defs.auditEvidence.additionalProperties, false);
-  const comparisonReportSchema = contracts.schemas["benchmarks/synthetic/schemas/comparison-report.v1.schema.json"];
-  assert.equal(comparisonReportSchema.$id, "https://opencode-harness.invalid/schemas/synthetic-comparison-report-v1");
-  assert.equal(comparisonReportSchema.properties.schema_version.const, 1);
+  const comparisonReportSchema = contracts.schemas["benchmarks/synthetic/schemas/comparison-report.v2.schema.json"];
+  assert.equal(comparisonReportSchema.$id, "https://opencode-harness.invalid/schemas/synthetic-comparison-report-v2");
+  assert.equal(comparisonReportSchema.properties.schema_version.const, 2);
   assert.equal(comparisonReportSchema.properties.report_kind.const, "synthetic-paired-comparison");
   assert.deepEqual(comparisonReportSchema.$defs.verdict.properties.status.enum, contracts.comparison_policy.verdict_order);
   assert.equal(comparisonReportSchema.$defs.bootstrap.properties.resamples.const, BOOTSTRAP_RESAMPLES);
+  assert.equal(comparisonReportSchema.$defs.bootstrap.properties.method.const, contracts.comparison_policy.bootstrap_method);
+  assert.equal(comparisonReportSchema.$defs.familySignFlip.properties.method.const, contracts.comparison_policy.family_sign_flip_method);
+  assert.equal(comparisonReportSchema.$defs.diagnostics.additionalProperties, false);
+  assert.equal(comparisonReportSchema.properties.count_metrics.minItems, 12);
+  assert.equal(comparisonReportSchema.properties.count_metrics.maxItems, 12);
   const selfTestReportSchema =
+    contracts.schemas["benchmarks/synthetic/schemas/model-free-self-test-report.v2.schema.json"];
+  const legacySelfTestReportSchema =
     contracts.schemas["benchmarks/synthetic/schemas/model-free-self-test-report.v1.schema.json"];
   assert.equal(
     selfTestReportSchema.$id,
-    "https://opencode-harness.invalid/schemas/synthetic-model-free-self-test-report-v1",
+    "https://opencode-harness.invalid/schemas/synthetic-model-free-self-test-report-v2",
   );
+  assert.equal(selfTestReportSchema.properties.schema_version.const, 2);
   assert.equal(selfTestReportSchema.properties.report_kind.const, "synthetic-model-free-self-test");
   assert.equal(selfTestReportSchema.properties.model_execution.const, false);
   assert.equal(
@@ -560,6 +596,9 @@ function verifyBenchmarkEvaluationContractsLoaded({ root, contracts }) {
     assert.equal(binding.id.const, definition.id);
     assert.equal(binding.script.const, definition.script);
   }
+  assert.equal(legacySelfTestReportSchema.properties.schema_version.const, 1);
+  assert.equal(legacySelfTestReportSchema.properties.check_count.const, 10);
+  assert.equal(legacySelfTestReportSchema.properties.checks.prefixItems.length, 10);
   const replayReportSchema =
     contracts.schemas["benchmarks/synthetic/schemas/replay-report.v1.schema.json"];
   assert.equal(
@@ -589,6 +628,21 @@ function verifyBenchmarkEvaluationContractsLoaded({ root, contracts }) {
     "https://opencode-harness.invalid/schemas/synthetic-run-report-v3#/$defs/runResult",
   );
   verifyReplayV2CompleteNegativeEvidenceSchema(replayReportV2Schema);
+  const replayReportV3Schema =
+    contracts.schemas["benchmarks/synthetic/schemas/replay-report.v3.schema.json"];
+  assert.equal(
+    replayReportV3Schema.$id,
+    "https://opencode-harness.invalid/schemas/synthetic-replay-report-v3",
+  );
+  assert.equal(replayReportV3Schema.properties.schema_version.const, 3);
+  assert.equal(
+    replayReportV3Schema.properties.attempt.properties.binding.$ref,
+    "https://opencode-harness.invalid/schemas/synthetic-run-report-v4#/$defs/pairBinding",
+  );
+  assert.equal(
+    replayReportV3Schema.properties.attempt.properties.result.$ref,
+    "https://opencode-harness.invalid/schemas/synthetic-run-report-v4#/$defs/runResult",
+  );
   const reportSafeIdPattern = new RegExp(runReportSchema.$defs.safeId.pattern);
   for (const id of ["run-1", "plain.profile"]) {
     assert.equal(reportSafeIdPattern.test(id), true);
@@ -599,14 +653,17 @@ function verifyBenchmarkEvaluationContractsLoaded({ root, contracts }) {
     assert.throws(() => assertSafeId(id));
   }
   assert.equal(runReportSchema.$defs.checkOutcome.allOf.length, 3);
-  assert.equal(runReportSchema.$defs.runResult.allOf.length, 3);
+  assert.equal(runReportSchema.$defs.runResult.allOf.length, 7);
   verifyWholeTaskSuccessEvidenceSchema(runReportSchema);
   verifyWholeTaskSuccessEvidenceNegativeFixtures(runReportSchema);
 
   const suiteCounts = Object.fromEntries(contracts.suites.map((suite) => [suite.id, suite.declared_run_count]));
-  assert.deepEqual(suiteCounts, { smoke: 16, standard: 72, full: 240 });
+  assert.deepEqual(suiteCounts, { micro: 8, smoke: 16, standard: 144, full: 320 });
   for (const suite of contracts.suites) {
-    assert.deepEqual(suite.profile_ids, SYNTHETIC_PROFILE_IDS);
+    assert.deepEqual(
+      suite.profile_ids,
+      suite.id === "micro" ? ["plain", "instrumented"] : SYNTHETIC_PROFILE_IDS,
+    );
   }
 
   const core = resolveAdoptionBundle(contracts.inventory, "core");
@@ -626,6 +683,8 @@ function verifyBenchmarkEvaluationContractsLoaded({ root, contracts }) {
   assert(evaluation.entry_paths.includes("scripts/benchmark-synthetic.mjs"));
   assert(evaluation.entry_paths.includes("scripts/verify-benchmark-cli.mjs"));
   assert(evaluation.entry_paths.includes("scripts/verify-benchmark-runner.mjs"));
+  assert(evaluation.entry_paths.includes("scripts/verify-benchmark-model-free.mjs"));
+  assert(evaluation.entry_paths.includes("scripts/verify-benchmark-model-free-contract.mjs"));
   assert(evaluation.entry_paths.includes(".github/workflows/synthetic-benchmark.yml"));
   assert(complete.entry_paths.some((entry) => entry === "scripts"));
   assert(quality.component_ids.includes("computational-mutation-gate"));
@@ -662,11 +721,11 @@ function verifyBenchmarkEvaluationContractsLoaded({ root, contracts }) {
   expectCode(() => validateSyntheticInventory(missingFamily), "SYNTHETIC_FAMILY_EXACT_SET");
 
   const wrongSuiteCount = structuredClone(contracts.inventory);
-  wrongSuiteCount.benchmark.suites[0].declared_run_count = 15;
+  wrongSuiteCount.benchmark.suites[0].declared_run_count = 7;
   expectCode(() => validateSyntheticInventory(wrongSuiteCount), "SYNTHETIC_SUITE_CARDINALITY");
 
   const wrongSchemaVersion = structuredClone(contracts.inventory);
-  wrongSchemaVersion.schema_version = 2;
+  wrongSchemaVersion.schema_version = 1;
   expectCode(() => validateSyntheticInventory(wrongSchemaVersion), "SYNTHETIC_SCHEMA_VERSION");
 
   const dangerousPermissionDrift = structuredClone(contracts.inventory);
@@ -787,5 +846,5 @@ export function verifyBenchmarkContracts({ root = defaultRoot } = {}) {
 const invokedPath = process.argv[1] ? pathToFileURL(path.resolve(process.argv[1])).href : null;
 if (invokedPath === import.meta.url) {
   const result = verifyBenchmarkContracts();
-  console.log(`Synthetic benchmark contracts verified (${result.family_count} families; smoke=${result.suite_run_counts.smoke}, standard=${result.suite_run_counts.standard}, full=${result.suite_run_counts.full}).`);
+  console.log(`Synthetic benchmark contracts verified (${result.family_count} families; micro=${result.suite_run_counts.micro}, smoke=${result.suite_run_counts.smoke}, standard=${result.suite_run_counts.standard}, full=${result.suite_run_counts.full}).`);
 }

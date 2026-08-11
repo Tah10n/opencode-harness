@@ -1,0 +1,7 @@
+{
+  "schema_version": 2,
+  "schema_path": "adoption/schemas/adoption-bundle.v2.schema.json",
+  "inventory_path": "profiles/inventory.v2.json",
+  "bundle_id": "evaluation",
+  "view": "adoption_bundles.evaluation"
+}

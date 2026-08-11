@@ -19,6 +19,6 @@ const invokedPath = process.argv[1]
 if (invokedPath === import.meta.url) {
   const result = verifyInstalledBenchmarkEvaluationContracts();
   console.log(
-    `Synthetic benchmark evaluation contracts verified (${result.family_count} families; smoke=${result.suite_run_counts.smoke}, standard=${result.suite_run_counts.standard}, full=${result.suite_run_counts.full}).`,
+    `Synthetic benchmark evaluation contracts verified (${result.family_count} families; micro=${result.suite_run_counts.micro}, smoke=${result.suite_run_counts.smoke}, standard=${result.suite_run_counts.standard}, full=${result.suite_run_counts.full}).`,
   );
 }

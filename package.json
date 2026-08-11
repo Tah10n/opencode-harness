@@ -51,6 +51,7 @@
     "verify:benchmark:comparison-reporting": "node scripts/verify-benchmark-comparison-reporting.mjs",
     "verify:benchmark:contracts": "node scripts/verify-benchmark-contracts.mjs",
     "verify:benchmark:isolation": "node scripts/verify-benchmark-isolation.mjs",
+    "verify:benchmark:model-free": "node scripts/verify-benchmark-model-free.mjs",
     "verify:benchmark:renderer": "node scripts/verify-benchmark-renderer.mjs",
     "verify:benchmark:reporting": "node scripts/verify-benchmark-reporting.mjs",
     "verify:benchmark:runner": "node scripts/verify-benchmark-runner.mjs",

@@ -9,6 +9,7 @@ on:
         type: choice
         default: smoke
         options:
+          - micro
           - smoke
           - standard
           - full
@@ -93,9 +94,9 @@ jobs:
         run: |
           set -euo pipefail
           case "$BENCH_SUITE" in
-            smoke) repetitions=1 ;;
-            standard) repetitions=3 ;;
-            full) repetitions=5 ;;
+            micro|smoke) semantic_variants=1; trajectory_repetitions=1 ;;
+            standard) semantic_variants=3; trajectory_repetitions=2 ;;
+            full) semantic_variants=5; trajectory_repetitions=2 ;;
             *) echo "Unsupported suite." >&2; exit 1 ;;
           esac
           npm run bench:synthetic -- \
@@ -103,7 +104,8 @@ jobs:
             --baseline "$BENCH_BASELINE" \
             --candidate "$BENCH_CANDIDATE" \
             --seed "$BENCH_SEED" \
-            --repetitions "$repetitions"
+            --semantic-variants "$semantic_variants" \
+            --trajectory-repetitions "$trajectory_repetitions"
 
       - name: Revalidate immutable raw and comparison artifacts
         shell: bash

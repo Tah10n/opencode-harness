@@ -33,6 +33,10 @@ export function verifyBenchmarkCi({ root = defaultRoot } = {}) {
   );
   assert.equal(/^\s{6}model:\s*$/mu.test(manualWorkflow), false);
   assert.match(manualWorkflow, /default: smoke/u);
+  const suiteChoices = manualWorkflow.slice(
+    manualWorkflow.indexOf("      suite:"),
+    manualWorkflow.indexOf("      baseline:"),
+  );
   const baselineChoices = manualWorkflow.slice(
     manualWorkflow.indexOf("      baseline:"),
     manualWorkflow.indexOf("      candidate:"),
@@ -47,12 +51,22 @@ export function verifyBenchmarkCi({ root = defaultRoot } = {}) {
     assert(candidateChoices.includes(`          - ${profileId}`));
   }
   for (const suite of contracts.suites) {
-    assert.deepEqual(suite.profile_ids, profileIds);
+    assert(suiteChoices.includes(`          - ${suite.id}`));
+    assert.deepEqual(
+      suite.profile_ids,
+      suite.id === "micro" ? ["plain", "instrumented"] : profileIds,
+    );
   }
   assert.match(manualWorkflow, /npm ci/u);
   assert.match(manualWorkflow, /npm run bench:synthetic:validate/u);
   assert.match(manualWorkflow, /npm run bench:synthetic:self-test/u);
   assert.match(manualWorkflow, /npm run bench:synthetic -- \\/u);
+  assert.match(manualWorkflow, /micro\|smoke\) semantic_variants=1; trajectory_repetitions=1/u);
+  assert.match(manualWorkflow, /standard\) semantic_variants=3; trajectory_repetitions=2/u);
+  assert.match(manualWorkflow, /full\) semantic_variants=5; trajectory_repetitions=2/u);
+  assert.match(manualWorkflow, /--semantic-variants "\$semantic_variants"/u);
+  assert.match(manualWorkflow, /--trajectory-repetitions "\$trajectory_repetitions"/u);
+  assert.equal(manualWorkflow.includes("--repetitions"), false);
   assert.match(manualWorkflow, /npm run bench:synthetic:compare -- --report "\$report_path"/u);
   assert.match(manualWorkflow, /if: success\(\)/u);
   assert.match(manualWorkflow, /path: evals\/reports\/synthetic/u);

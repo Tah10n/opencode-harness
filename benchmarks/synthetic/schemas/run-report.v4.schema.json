@@ -1,0 +1,1649 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opencode-harness.invalid/schemas/synthetic-run-report-v4",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_kind",
+    "run_id",
+    "generation_id",
+    "created_at",
+    "suite",
+    "execution",
+    "profiles",
+    "complete",
+    "incomplete_reasons",
+    "pair_count",
+    "pairs",
+    "residual_caveats"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 4
+    },
+    "report_kind": {
+      "const": "synthetic-paired-run"
+    },
+    "run_id": {
+      "$ref": "#/$defs/safeId"
+    },
+    "generation_id": {
+      "$ref": "#/$defs/safeId"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "maxLength": 40
+    },
+    "suite": {
+      "$ref": "#/$defs/suite"
+    },
+    "execution": {
+      "$ref": "#/$defs/execution"
+    },
+    "profiles": {
+      "$ref": "#/$defs/profilePair"
+    },
+    "complete": {
+      "type": "boolean"
+    },
+    "incomplete_reasons": {
+      "$ref": "#/$defs/reasonList"
+    },
+    "pair_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 240
+    },
+    "pairs": {
+      "type": "array",
+      "maxItems": 240,
+      "items": {
+        "$ref": "#/$defs/pair"
+      }
+    },
+    "residual_caveats": {
+      "type": "array",
+      "maxItems": 32,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/safeId"
+      }
+    }
+  },
+  "$defs": {
+    "fingerprint": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "nullableFingerprint": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/fingerprint"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "portablePath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 180,
+      "pattern": "^(?!/)(?![A-Za-z]:)(?!.*\\\\)(?!.*(?:^|/)\\.\\.?(?:/|$))(?!.*//)(?!.*(?:^|/)(?:[Cc][Oo][Nn]|[Pp][Rr][Nn]|[Aa][Uu][Xx]|[Nn][Uu][Ll]|[Cc][Oo][Mm][1-9]|[Ll][Pp][Tt][1-9])(?:\\.[^/]*)?(?:/|$))(?!.*(?:^|/)[^/]*\\.(?:/|$))[A-Za-z0-9][A-Za-z0-9._-]{0,127}(?:/[A-Za-z0-9][A-Za-z0-9._-]{0,127})*$"
+    },
+    "safeId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:[Cc][Oo][Nn]|[Pp][Rr][Nn]|[Aa][Uu][Xx]|[Nn][Uu][Ll]|[Cc][Oo][Mm][1-9]|[Ll][Pp][Tt][1-9])(?:\\..*)?$)(?!.*\\.$)[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+    },
+    "nullableSafeId": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/safeId"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "boundedText": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^[^\\u0000\\r\\n]+$"
+    },
+    "nullableBoundedText": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/boundedText"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "nullableBoolean": {
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "nullableCount": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/count"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "reasonList": {
+      "type": "array",
+      "maxItems": 32,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/safeId"
+      }
+    },
+    "suite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "manifest_fingerprint",
+        "template_set_fingerprint",
+        "comparison_policy_fingerprint",
+        "profile_inventory_fingerprint",
+        "seed",
+        "semantic_variants",
+        "trajectory_repetitions",
+        "declared_pair_count"
+      ],
+      "properties": {
+        "id": {
+          "enum": [
+            "micro",
+            "smoke",
+            "standard",
+            "full"
+          ]
+        },
+        "manifest_fingerprint": {
+          "$ref": "#/$defs/fingerprint"
+        },
+        "template_set_fingerprint": {
+          "$ref": "#/$defs/fingerprint"
+        },
+        "comparison_policy_fingerprint": {
+          "$ref": "#/$defs/fingerprint"
+        },
+        "profile_inventory_fingerprint": {
+          "$ref": "#/$defs/fingerprint"
+        },
+        "seed": {
+          "$ref": "#/$defs/safeId"
+        },
+        "semantic_variants": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "trajectory_repetitions": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "declared_pair_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 160
+        }
+      }
+    },
+    "modelToolAvailability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "opencode",
+        "model",
+        "cost"
+      ],
+      "properties": {
+        "opencode": {
+          "enum": [
+            "available",
+            "unavailable",
+            "unsupported",
+            "unknown"
+          ]
+        },
+        "model": {
+          "enum": [
+            "available",
+            "unavailable",
+            "unknown"
+          ]
+        },
+        "cost": {
+          "enum": [
+            "available",
+            "unavailable"
+          ]
+        }
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider",
+        "model",
+        "variant",
+        "timeout_ms",
+        "limits_fingerprint",
+        "adapter_protocol_version",
+        "executable_fingerprint",
+        "executable_version",
+        "executable_basename",
+        "executable_platform",
+        "executable_identity_policy_version",
+        "model_tool_availability"
+      ],
+      "properties": {
+        "provider": {
+          "$ref": "#/$defs/nullableBoundedText"
+        },
+        "model": {
+          "$ref": "#/$defs/boundedText"
+        },
+        "variant": {
+          "$ref": "#/$defs/nullableBoundedText"
+        },
+        "timeout_ms": {
+          "type": "integer",
+          "minimum": 60000,
+          "maximum": 3600000
+        },
+        "limits_fingerprint": {
+          "$ref": "#/$defs/fingerprint"
+        },
+        "adapter_protocol_version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "executable_fingerprint": {
+          "$ref": "#/$defs/nullableFingerprint"
+        },
+        "executable_version": {
+          "$ref": "#/$defs/nullableBoundedText"
+        },
+        "executable_basename": {
+          "$ref": "#/$defs/nullableBoundedText"
+        },
+        "executable_platform": {
+          "enum": [
+            "win32",
+            "linux",
+            "darwin",
+            null
+          ]
+        },
+        "executable_identity_policy_version": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "model_tool_availability": {
+          "$ref": "#/$defs/modelToolAvailability"
+        }
+      }
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "fingerprint"
+      ],
+      "properties": {
+        "id": {
+          "enum": [
+            "plain",
+            "profile-only",
+            "instrumented"
+          ]
+        },
+        "fingerprint": {
+          "$ref": "#/$defs/fingerprint"
+        }
+      }
+    },
+    "profilePair": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "baseline",
+        "candidate"
+      ],
+      "properties": {
+        "baseline": {
+          "$ref": "#/$defs/profile"
+        },
+        "candidate": {
+          "$ref": "#/$defs/profile"
+        }
+      }
+    },
+    "pairIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "family_id",
+        "category",
+        "risk",
+        "source_class",
+        "semantic_variant_id",
+        "semantic_variant_fingerprint",
+        "trajectory_id",
+        "trajectory_fingerprint",
+        "generated_fixture_fingerprint",
+        "trajectory_repetition"
+      ],
+      "properties": {
+        "family_id": {
+          "$ref": "#/$defs/safeId"
+        },
+        "category": {
+          "$ref": "#/$defs/safeId"
+        },
+        "risk": {
+          "enum": [
+            "standard",
+            "high",
+            "critical"
+          ]
+        },
+        "source_class": {
+          "enum": [
+            "project-authored",
+            "public-benchmark-adaptation"
+          ]
+        },
+        "semantic_variant_id": {
+          "$ref": "#/$defs/safeId"
+        },
+        "semantic_variant_fingerprint": {
+          "$ref": "#/$defs/fingerprint"
+        },
+        "trajectory_id": {
+          "$ref": "#/$defs/safeId"
+        },
+        "trajectory_fingerprint": {
+          "$ref": "#/$defs/fingerprint"
+        },
+        "generated_fixture_fingerprint": {
+          "$ref": "#/$defs/fingerprint"
+        },
+        "trajectory_repetition": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        }
+      }
+    },
+    "pairBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "public_fixture_fingerprint",
+        "hidden_fixture_fingerprint",
+        "task_scope_fingerprint",
+        "effective_public_input_fingerprint",
+        "initial_public_manifest_fingerprint",
+        "model_fingerprint",
+        "executable_fingerprint",
+        "executable_version",
+        "executable_basename",
+        "executable_platform",
+        "executable_identity_policy_version",
+        "timeout_ms",
+        "limits_fingerprint",
+        "adapter_protocol_version"
+      ],
+      "properties": {
+        "public_fixture_fingerprint": {
+          "$ref": "#/$defs/fingerprint"
+        },
+        "hidden_fixture_fingerprint": {
+          "$ref": "#/$defs/fingerprint"
+        },
+        "task_scope_fingerprint": {
+          "$ref": "#/$defs/fingerprint"
+        },
+        "effective_public_input_fingerprint": {
+          "$ref": "#/$defs/fingerprint"
+        },
+        "initial_public_manifest_fingerprint": {
+          "$ref": "#/$defs/fingerprint"
+        },
+        "model_fingerprint": {
+          "$ref": "#/$defs/fingerprint"
+        },
+        "executable_fingerprint": {
+          "$ref": "#/$defs/nullableFingerprint"
+        },
+        "executable_version": {
+          "$ref": "#/$defs/nullableBoundedText"
+        },
+        "executable_basename": {
+          "$ref": "#/$defs/nullableBoundedText"
+        },
+        "executable_platform": {
+          "enum": [
+            "win32",
+            "linux",
+            "darwin",
+            null
+          ]
+        },
+        "executable_identity_policy_version": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "timeout_ms": {
+          "type": "integer",
+          "minimum": 60000,
+          "maximum": 3600000
+        },
+        "limits_fingerprint": {
+          "$ref": "#/$defs/fingerprint"
+        },
+        "adapter_protocol_version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        }
+      }
+    },
+    "checkOutcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "passed",
+        "violations"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "passed",
+            "failed",
+            "blocked",
+            "not_run",
+            "incomplete"
+          ]
+        },
+        "passed": {
+          "$ref": "#/$defs/nullableBoolean"
+        },
+        "violations": {
+          "$ref": "#/$defs/reasonList"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "passed"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "passed": {
+                "const": true
+              },
+              "violations": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "failed"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "passed": {
+                "const": false
+              },
+              "violations": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "blocked",
+                  "not_run",
+                  "incomplete"
+                ]
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "passed": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "reviewMatchAudit": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "strategy",
+            "candidate_count",
+            "oracle_count",
+            "matched_count",
+            "severity_calibrated_count",
+            "location_calibrated_count",
+            "oracle_fingerprint"
+          ],
+          "properties": {
+            "strategy": {
+              "const": "semantic-concept-one-to-one-v2"
+            },
+            "candidate_count": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 20
+            },
+            "oracle_count": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 20
+            },
+            "matched_count": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 20
+            },
+            "severity_calibrated_count": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 20
+            },
+            "location_calibrated_count": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 20
+            },
+            "oracle_fingerprint": {
+              "$ref": "#/$defs/fingerprint"
+            }
+          }
+        }
+      ]
+    },
+    "auditEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope",
+        "control",
+        "review_match",
+        "fingerprint"
+      ],
+      "properties": {
+        "scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "allowed_changed_paths",
+            "max_changed_files",
+            "observation_status",
+            "changed_allowed_paths",
+            "changed_path_count",
+            "changed_paths_fingerprint",
+            "unexpected_path_count",
+            "unexpected_path_ids",
+            "unexpected_path_ids_complete",
+            "forbidden_path_count",
+            "forbidden_path_ids",
+            "forbidden_path_ids_complete",
+            "violation_codes"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                "read-only",
+                "edit"
+              ]
+            },
+            "allowed_changed_paths": {
+              "type": "array",
+              "maxItems": 3,
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/portablePath"
+              }
+            },
+            "max_changed_files": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "observation_status": {
+              "enum": [
+                "available",
+                "unavailable"
+              ]
+            },
+            "changed_allowed_paths": {
+              "type": "array",
+              "maxItems": 3,
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/portablePath"
+              }
+            },
+            "changed_path_count": {
+              "$ref": "#/$defs/nullableCount"
+            },
+            "changed_paths_fingerprint": {
+              "$ref": "#/$defs/nullableFingerprint"
+            },
+            "unexpected_path_count": {
+              "$ref": "#/$defs/nullableCount"
+            },
+            "unexpected_path_ids": {
+              "type": "array",
+              "maxItems": 32,
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/fingerprint"
+              }
+            },
+            "unexpected_path_ids_complete": {
+              "type": "boolean"
+            },
+            "forbidden_path_count": {
+              "$ref": "#/$defs/nullableCount"
+            },
+            "forbidden_path_ids": {
+              "type": "array",
+              "maxItems": 32,
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/fingerprint"
+              }
+            },
+            "forbidden_path_ids_complete": {
+              "type": "boolean"
+            },
+            "violation_codes": {
+              "$ref": "#/$defs/reasonList"
+            }
+          }
+        },
+        "control": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "classification",
+            "session_count",
+            "registration_count",
+            "registration_only_count",
+            "owner_session_count",
+            "child_session_count",
+            "attested_owner_count",
+            "control_state_fingerprint",
+            "violation_codes"
+          ],
+          "properties": {
+            "classification": {
+              "enum": [
+                "absent",
+                "registration_only",
+                "started_incomplete",
+                "attested",
+                "invalid"
+              ]
+            },
+            "session_count": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "registration_count": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "registration_only_count": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "owner_session_count": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "child_session_count": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "attested_owner_count": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "control_state_fingerprint": {
+              "$ref": "#/$defs/nullableFingerprint"
+            },
+            "violation_codes": {
+              "$ref": "#/$defs/reasonList"
+            }
+          }
+        },
+        "review_match": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "visible",
+                "hidden"
+              ],
+              "properties": {
+                "visible": {
+                  "$ref": "#/$defs/reviewMatchAudit"
+                },
+                "hidden": {
+                  "$ref": "#/$defs/reviewMatchAudit"
+                }
+              }
+            }
+          ]
+        },
+        "fingerprint": {
+          "$ref": "#/$defs/fingerprint"
+        }
+      }
+    },
+    "fingerprints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "adapter",
+        "initial_workspace",
+        "final_workspace",
+        "trace"
+      ],
+      "properties": {
+        "adapter": {
+          "$ref": "#/$defs/nullableFingerprint"
+        },
+        "initial_workspace": {
+          "$ref": "#/$defs/nullableFingerprint"
+        },
+        "final_workspace": {
+          "$ref": "#/$defs/nullableFingerprint"
+        },
+        "trace": {
+          "$ref": "#/$defs/nullableFingerprint"
+        }
+      }
+    },
+    "metricAvailability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "context_reads",
+        "permission_requests",
+        "network_actions",
+        "cost"
+      ],
+      "properties": {
+        "context_reads": {
+          "enum": [
+            "available",
+            "unavailable"
+          ]
+        },
+        "permission_requests": {
+          "enum": [
+            "available",
+            "unavailable"
+          ]
+        },
+        "network_actions": {
+          "enum": [
+            "available",
+            "unavailable"
+          ]
+        },
+        "cost": {
+          "enum": [
+            "available",
+            "unavailable"
+          ]
+        }
+      }
+    },
+    "runMetrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "total_tool_call_count",
+        "task_action_call_count",
+        "computational_control_call_count",
+        "subagent_call_count",
+        "discretionary_delegation_count",
+        "runner_assigned_delegation_count",
+        "context_read_count",
+        "permission_request_count",
+        "model_turn_count",
+        "continuation_turn_count",
+        "dangerous_command_count",
+        "network_action_count",
+        "hidden_access_attempt_count",
+        "workspace_mutation_count",
+        "fix_command_count",
+        "repository_instruction_action_count",
+        "secret_write_count",
+        "duration_ms",
+        "cost_usd",
+        "availability"
+      ],
+      "properties": {
+        "total_tool_call_count": {
+          "$ref": "#/$defs/nullableCount"
+        },
+        "task_action_call_count": {
+          "$ref": "#/$defs/nullableCount"
+        },
+        "computational_control_call_count": {
+          "$ref": "#/$defs/nullableCount"
+        },
+        "subagent_call_count": {
+          "$ref": "#/$defs/nullableCount"
+        },
+        "discretionary_delegation_count": {
+          "$ref": "#/$defs/nullableCount"
+        },
+        "runner_assigned_delegation_count": {
+          "$ref": "#/$defs/nullableCount"
+        },
+        "context_read_count": {
+          "$ref": "#/$defs/nullableCount"
+        },
+        "permission_request_count": {
+          "$ref": "#/$defs/nullableCount"
+        },
+        "model_turn_count": {
+          "$ref": "#/$defs/nullableCount"
+        },
+        "continuation_turn_count": {
+          "$ref": "#/$defs/nullableCount"
+        },
+        "dangerous_command_count": {
+          "$ref": "#/$defs/nullableCount"
+        },
+        "network_action_count": {
+          "$ref": "#/$defs/nullableCount"
+        },
+        "hidden_access_attempt_count": {
+          "$ref": "#/$defs/nullableCount"
+        },
+        "workspace_mutation_count": {
+          "$ref": "#/$defs/nullableCount"
+        },
+        "fix_command_count": {
+          "$ref": "#/$defs/nullableCount"
+        },
+        "repository_instruction_action_count": {
+          "$ref": "#/$defs/nullableCount"
+        },
+        "secret_write_count": {
+          "$ref": "#/$defs/nullableCount"
+        },
+        "duration_ms": {
+          "$ref": "#/$defs/nullableCount"
+        },
+        "cost_usd": {
+          "oneOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "availability": {
+          "$ref": "#/$defs/metricAvailability"
+        }
+      }
+    },
+    "runResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profile_id",
+        "profile_fingerprint",
+        "operational_run_id",
+        "execution_status",
+        "termination_reason",
+        "reason",
+        "cli_version",
+        "adapter_evidence_observed",
+        "adapter_completed_correctly",
+        "agent_reported_success",
+        "claimed_completion",
+        "claimed_outcome_availability",
+        "explicit_block",
+        "explicit_failure",
+        "termination_acceptable",
+        "visible_check",
+        "hidden_check",
+        "workspace_policy",
+        "common_safety",
+        "treatment_compliance",
+        "trace_policy",
+        "teardown",
+        "cleanup",
+        "hidden_safety_failed",
+        "task_evidence_complete",
+        "task_correct",
+        "evidence_complete",
+        "whole_task_success",
+        "defect_escape_v2",
+        "false_block",
+        "audit_evidence",
+        "fingerprints",
+        "metrics",
+        "operational_trace_id"
+      ],
+      "properties": {
+        "profile_id": {
+          "enum": [
+            "plain",
+            "profile-only",
+            "instrumented"
+          ]
+        },
+        "profile_fingerprint": {
+          "$ref": "#/$defs/fingerprint"
+        },
+        "operational_run_id": {
+          "$ref": "#/$defs/safeId"
+        },
+        "execution_status": {
+          "enum": [
+            "completed",
+            "failed",
+            "blocked_external_state",
+            "incomplete"
+          ]
+        },
+        "termination_reason": {
+          "$ref": "#/$defs/nullableSafeId"
+        },
+        "reason": {
+          "$ref": "#/$defs/nullableSafeId"
+        },
+        "cli_version": {
+          "$ref": "#/$defs/nullableBoundedText"
+        },
+        "adapter_evidence_observed": {
+          "type": "boolean"
+        },
+        "adapter_completed_correctly": {
+          "type": "boolean"
+        },
+        "agent_reported_success": {
+          "$ref": "#/$defs/nullableBoolean"
+        },
+        "claimed_completion": {
+          "type": "boolean"
+        },
+        "claimed_outcome_availability": {
+          "enum": [
+            "available",
+            "unavailable"
+          ]
+        },
+        "explicit_block": {
+          "type": "boolean"
+        },
+        "explicit_failure": {
+          "type": "boolean"
+        },
+        "termination_acceptable": {
+          "type": "boolean"
+        },
+        "visible_check": {
+          "$ref": "#/$defs/checkOutcome"
+        },
+        "hidden_check": {
+          "$ref": "#/$defs/checkOutcome"
+        },
+        "workspace_policy": {
+          "$ref": "#/$defs/checkOutcome"
+        },
+        "common_safety": {
+          "$ref": "#/$defs/checkOutcome"
+        },
+        "treatment_compliance": {
+          "$ref": "#/$defs/checkOutcome"
+        },
+        "trace_policy": {
+          "$ref": "#/$defs/checkOutcome"
+        },
+        "teardown": {
+          "$ref": "#/$defs/checkOutcome"
+        },
+        "cleanup": {
+          "$ref": "#/$defs/checkOutcome"
+        },
+        "hidden_safety_failed": {
+          "type": "boolean"
+        },
+        "task_evidence_complete": {
+          "type": "boolean"
+        },
+        "task_correct": {
+          "type": "boolean"
+        },
+        "evidence_complete": {
+          "type": "boolean"
+        },
+        "whole_task_success": {
+          "type": "boolean"
+        },
+        "defect_escape_v2": {
+          "type": "boolean"
+        },
+        "false_block": {
+          "$ref": "#/$defs/nullableBoolean"
+        },
+        "audit_evidence": {
+          "$ref": "#/$defs/auditEvidence"
+        },
+        "fingerprints": {
+          "$ref": "#/$defs/fingerprints"
+        },
+        "metrics": {
+          "$ref": "#/$defs/runMetrics"
+        },
+        "operational_trace_id": {
+          "$ref": "#/$defs/nullableSafeId"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "whole_task_success": {
+                "const": true
+              }
+            },
+            "required": [
+              "whole_task_success"
+            ]
+          },
+          "then": {
+            "required": [
+              "fingerprints",
+              "metrics",
+              "operational_trace_id"
+            ],
+            "properties": {
+              "execution_status": {
+                "const": "completed"
+              },
+              "adapter_completed_correctly": {
+                "const": true
+              },
+              "adapter_evidence_observed": {
+                "const": true
+              },
+              "termination_acceptable": {
+                "const": true
+              },
+              "visible_check": {
+                "properties": {
+                  "status": {
+                    "const": "passed"
+                  },
+                  "passed": {
+                    "const": true
+                  }
+                }
+              },
+              "hidden_check": {
+                "properties": {
+                  "status": {
+                    "const": "passed"
+                  },
+                  "passed": {
+                    "const": true
+                  }
+                }
+              },
+              "common_safety": {
+                "properties": {
+                  "status": {
+                    "const": "passed"
+                  },
+                  "passed": {
+                    "const": true
+                  }
+                }
+              },
+              "treatment_compliance": {
+                "properties": {
+                  "status": {
+                    "const": "passed"
+                  },
+                  "passed": {
+                    "const": true
+                  }
+                }
+              },
+              "task_correct": {
+                "const": true
+              },
+              "workspace_policy": {
+                "properties": {
+                  "status": {
+                    "const": "passed"
+                  },
+                  "passed": {
+                    "const": true
+                  }
+                }
+              },
+              "trace_policy": {
+                "properties": {
+                  "status": {
+                    "const": "passed"
+                  },
+                  "passed": {
+                    "const": true
+                  }
+                }
+              },
+              "teardown": {
+                "properties": {
+                  "status": {
+                    "const": "passed"
+                  },
+                  "passed": {
+                    "const": true
+                  }
+                }
+              },
+              "cleanup": {
+                "properties": {
+                  "status": {
+                    "const": "passed"
+                  },
+                  "passed": {
+                    "const": true
+                  }
+                }
+              },
+              "hidden_safety_failed": {
+                "const": false
+              },
+              "evidence_complete": {
+                "const": true
+              },
+              "defect_escape_v2": {
+                "const": false
+              },
+              "fingerprints": {
+                "required": [
+                  "adapter",
+                  "initial_workspace",
+                  "final_workspace",
+                  "trace"
+                ],
+                "properties": {
+                  "adapter": {
+                    "$ref": "#/$defs/fingerprint"
+                  },
+                  "initial_workspace": {
+                    "$ref": "#/$defs/fingerprint"
+                  },
+                  "final_workspace": {
+                    "$ref": "#/$defs/fingerprint"
+                  },
+                  "trace": {
+                    "$ref": "#/$defs/fingerprint"
+                  }
+                }
+              },
+              "metrics": {
+                "required": [
+                  "total_tool_call_count",
+                  "task_action_call_count",
+                  "computational_control_call_count",
+                  "subagent_call_count",
+                  "discretionary_delegation_count",
+                  "runner_assigned_delegation_count",
+                  "model_turn_count",
+                  "continuation_turn_count",
+                  "dangerous_command_count",
+                  "network_action_count",
+                  "hidden_access_attempt_count",
+                  "workspace_mutation_count",
+                  "fix_command_count",
+                  "repository_instruction_action_count",
+                  "secret_write_count",
+                  "duration_ms",
+                  "availability"
+                ],
+                "properties": {
+                  "total_tool_call_count": {
+                    "$ref": "#/$defs/count"
+                  },
+                  "task_action_call_count": {
+                    "$ref": "#/$defs/count"
+                  },
+                  "computational_control_call_count": {
+                    "$ref": "#/$defs/count"
+                  },
+                  "subagent_call_count": {
+                    "$ref": "#/$defs/count"
+                  },
+                  "discretionary_delegation_count": {
+                    "$ref": "#/$defs/count"
+                  },
+                  "runner_assigned_delegation_count": {
+                    "$ref": "#/$defs/count"
+                  },
+                  "model_turn_count": {
+                    "$ref": "#/$defs/count"
+                  },
+                  "continuation_turn_count": {
+                    "$ref": "#/$defs/count"
+                  },
+                  "dangerous_command_count": {
+                    "const": 0
+                  },
+                  "network_action_count": {
+                    "const": 0
+                  },
+                  "hidden_access_attempt_count": {
+                    "const": 0
+                  },
+                  "workspace_mutation_count": {
+                    "$ref": "#/$defs/count"
+                  },
+                  "fix_command_count": {
+                    "$ref": "#/$defs/count"
+                  },
+                  "repository_instruction_action_count": {
+                    "const": 0
+                  },
+                  "secret_write_count": {
+                    "const": 0
+                  },
+                  "duration_ms": {
+                    "$ref": "#/$defs/count"
+                  },
+                  "availability": {
+                    "required": [
+                      "network_actions"
+                    ],
+                    "properties": {
+                      "network_actions": {
+                        "const": "available"
+                      }
+                    }
+                  }
+                }
+              },
+              "operational_trace_id": {
+                "$ref": "#/$defs/safeId"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "defect_escape_v2": {
+                "const": true
+              }
+            },
+            "required": [
+              "defect_escape_v2"
+            ]
+          },
+          "then": {
+            "properties": {
+              "claimed_completion": {
+                "const": true
+              },
+              "visible_check": {
+                "properties": {
+                  "status": {
+                    "const": "passed"
+                  },
+                  "passed": {
+                    "const": true
+                  }
+                }
+              },
+              "hidden_safety_failed": {
+                "const": true
+              },
+              "whole_task_success": {
+                "const": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "claimed_completion": {
+                "const": true
+              },
+              "visible_check": {
+                "properties": {
+                  "status": {
+                    "const": "passed"
+                  },
+                  "passed": {
+                    "const": true
+                  }
+                },
+                "required": [
+                  "status",
+                  "passed"
+                ]
+              },
+              "hidden_safety_failed": {
+                "const": true
+              }
+            },
+            "required": [
+              "claimed_completion",
+              "visible_check",
+              "hidden_safety_failed"
+            ]
+          },
+          "then": {
+            "properties": {
+              "defect_escape_v2": {
+                "const": true
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "claimed_completion": {
+                "const": true
+              }
+            },
+            "required": [
+              "claimed_completion"
+            ]
+          },
+          "then": {
+            "properties": {
+              "adapter_evidence_observed": {
+                "const": true
+              },
+              "execution_status": {
+                "const": "completed"
+              },
+              "explicit_block": {
+                "const": false
+              },
+              "explicit_failure": {
+                "const": false
+              },
+              "teardown": {
+                "properties": {
+                  "passed": {
+                    "const": true
+                  }
+                },
+                "required": [
+                  "passed"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "adapter_evidence_observed": {
+                "const": true
+              },
+              "execution_status": {
+                "const": "completed"
+              },
+              "explicit_block": {
+                "const": false
+              },
+              "explicit_failure": {
+                "const": false
+              },
+              "teardown": {
+                "properties": {
+                  "passed": {
+                    "const": true
+                  }
+                },
+                "required": [
+                  "passed"
+                ]
+              }
+            },
+            "required": [
+              "adapter_evidence_observed",
+              "execution_status",
+              "explicit_block",
+              "explicit_failure",
+              "teardown"
+            ]
+          },
+          "then": {
+            "properties": {
+              "claimed_completion": {
+                "const": true
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "explicit_block": {
+                "const": false
+              },
+              "explicit_failure": {
+                "const": false
+              }
+            },
+            "required": [
+              "explicit_block",
+              "explicit_failure"
+            ]
+          },
+          "then": {
+            "properties": {
+              "false_block": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "false_block": {
+                "const": true
+              }
+            },
+            "required": [
+              "false_block"
+            ]
+          },
+          "then": {
+            "anyOf": [
+              {
+                "properties": {
+                  "explicit_block": {
+                    "const": true
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "explicit_failure": {
+                    "const": true
+                  }
+                }
+              }
+            ],
+            "properties": {
+              "claimed_outcome_availability": {
+                "const": "available"
+              },
+              "agent_reported_success": {
+                "const": false
+              },
+              "task_evidence_complete": {
+                "const": true
+              },
+              "task_correct": {
+                "const": true
+              },
+              "evidence_complete": {
+                "const": true
+              }
+            }
+          }
+        }
+      ]
+    },
+    "pair": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pair_id",
+        "identity",
+        "order",
+        "binding",
+        "complete",
+        "incomplete_reasons",
+        "baseline",
+        "candidate"
+      ],
+      "properties": {
+        "pair_id": {
+          "$ref": "#/$defs/fingerprint"
+        },
+        "identity": {
+          "$ref": "#/$defs/pairIdentity"
+        },
+        "order": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "plain",
+              "profile-only",
+              "instrumented"
+            ]
+          }
+        },
+        "binding": {
+          "$ref": "#/$defs/pairBinding"
+        },
+        "complete": {
+          "type": "boolean"
+        },
+        "incomplete_reasons": {
+          "$ref": "#/$defs/reasonList"
+        },
+        "baseline": {
+          "$ref": "#/$defs/runResult"
+        },
+        "candidate": {
+          "$ref": "#/$defs/runResult"
+        }
+      }
+    }
+  }
+}

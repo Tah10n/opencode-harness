@@ -164,7 +164,11 @@ function replayAttempt({
     cli_version: completed ? "1.17.0" : null,
     adapter_evidence_observed: completed,
     adapter_completed_correctly: adapterCompleted,
-    agent_reported_success: completed,
+    agent_reported_success: completed ? true : null,
+    claimed_completion: completed,
+    claimed_outcome_availability: completed ? "available" : "unavailable",
+    explicit_block: false,
+    explicit_failure: false,
     termination_acceptable: completed,
     visible_check: checkOutcome(),
     hidden_check: checkOutcome(),
@@ -180,6 +184,7 @@ function replayAttempt({
     evidence_complete: evidenceComplete,
     whole_task_success: wholeTaskSuccess,
     defect_escape_v2: false,
+    false_block: null,
     audit_evidence: {
       ...auditEvidenceSource,
       fingerprint: fingerprint(auditEvidenceSource),
@@ -193,8 +198,12 @@ function replayAttempt({
       trace: completed ? fingerprint({ fixture: "replay-trace", operationalRunId }) : null,
     },
     metrics: {
-      tool_call_count: completed ? 1 : null,
+      total_tool_call_count: completed ? 1 : null,
+      task_action_call_count: completed ? 1 : null,
+      computational_control_call_count: completed ? 0 : null,
       subagent_call_count: completed ? 0 : null,
+      discretionary_delegation_count: completed ? 0 : null,
+      runner_assigned_delegation_count: completed ? 0 : null,
       context_read_count: null,
       permission_request_count: null,
       model_turn_count: completed ? 1 : null,
@@ -225,6 +234,11 @@ function replayAttempt({
       effective_public_input_fingerprint: syntheticEffectivePublicInputFingerprint(instance),
       initial_public_manifest_fingerprint: initialWorkspace,
       model_fingerprint: syntheticModelBindingFingerprint({ provider, model, variant }),
+      executable_fingerprint: fingerprint({ fixture: "executable" }),
+      executable_version: "1.17.0",
+      executable_basename: "opencode",
+      executable_platform: "linux",
+      executable_identity_policy_version: 2,
       timeout_ms: timeoutMs,
       limits_fingerprint: syntheticRunnerLimitsFingerprint(),
       adapter_protocol_version: SYNTHETIC_OPENCODE_ADAPTER_VERSION,
@@ -244,10 +258,15 @@ function completeNegativeReplayAttempt(input, {
     reason,
     adapter_completed_correctly: false,
     agent_reported_success: null,
+    claimed_completion: false,
+    claimed_outcome_availability: "unavailable",
+    explicit_block: false,
+    explicit_failure: false,
     termination_acceptable: false,
     evidence_complete: true,
     whole_task_success: false,
     defect_escape_v2: false,
+    false_block: null,
   });
   return attempt;
 }
@@ -271,8 +290,8 @@ export async function verifyBenchmarkCli({ root = defaultRoot } = {}) {
     contractSourceRoot: root,
   });
   assert.deepEqual(DEFAULT_MODEL_FREE_CHECKS[0], {
-    id: "benchmark-evaluation-contracts",
-    script: "scripts/verify-benchmark-evaluation-contracts.mjs",
+    id: "benchmark-model-free-contract",
+    script: "scripts/verify-benchmark-model-free-contract.mjs",
   });
   assert.equal(
     DEFAULT_MODEL_FREE_CHECKS.some(
@@ -439,7 +458,8 @@ export async function verifyBenchmarkCli({ root = defaultRoot } = {}) {
       baselineProfileId: report.profiles.baseline.id,
       candidateProfileId: report.profiles.candidate.id,
       seed: report.suite.seed,
-      repetitions: report.suite.repetitions,
+      semanticVariants: report.suite.semantic_variants,
+      trajectoryRepetitions: report.suite.trajectory_repetitions,
       model: report.execution.model,
       provider: report.execution.provider,
       variant: report.execution.variant,
@@ -464,7 +484,8 @@ export async function verifyBenchmarkCli({ root = defaultRoot } = {}) {
       baselineProfileId: report.profiles.baseline.id,
       candidateProfileId: report.profiles.candidate.id,
       seed: report.suite.seed,
-      repetitions: report.suite.repetitions,
+      semanticVariants: report.suite.semantic_variants,
+      trajectoryRepetitions: report.suite.trajectory_repetitions,
       model: report.execution.model,
       provider: report.execution.provider,
       variant: report.execution.variant,
@@ -594,7 +615,9 @@ export async function verifyBenchmarkCli({ root = defaultRoot } = {}) {
       path.join(scriptsRoot, "env-check.mjs"),
       [
         "const keys = [\"OPENCODE_BENCH_MODEL\", \"OPENCODE_BENCH_PROVIDER\", \"OPENCODE_BENCH_VARIANT\"];",
-        "process.stdout.write(keys.some((key) => Object.hasOwn(process.env, key)) ? \"present\" : \"absent\");",
+        "const secrets = keys.some((key) => Object.hasOwn(process.env, key)) ? \"present\" : \"absent\";",
+        "const isolated = process.env.OPENCODE_BENCH_MODEL_FREE === \"1\" ? \"isolated\" : \"unisolated\";",
+        "process.stdout.write(`${secrets}:${isolated}`);",
         "",
       ].join("\n"),
     );
@@ -610,7 +633,7 @@ export async function verifyBenchmarkCli({ root = defaultRoot } = {}) {
       },
     });
     assert.equal(environmentCheck.exitCode, 0);
-    assert.equal(environmentCheck.stdout, "absent");
+    assert.equal(environmentCheck.stdout, "absent:isolated");
 
     const selfTestReport = await runSyntheticModelFreeSelfTest({
       sourceRoot: fixtureRoot,
@@ -745,7 +768,8 @@ export async function verifyBenchmarkCli({ root = defaultRoot } = {}) {
       sourceRoot: root,
       familyId,
       seed: "replay-stale-seed",
-      repetition: 1,
+      semanticVariantIndex: 1,
+      trajectoryRepetition: 1,
       profileId: "plain",
       instanceFingerprint:
         "sha256:0000000000000000000000000000000000000000000000000000000000000000",
@@ -762,7 +786,8 @@ export async function verifyBenchmarkCli({ root = defaultRoot } = {}) {
       sourceRoot: root,
       familyId,
       seed: "replay-timeout-mismatch",
-      repetition: 1,
+      semanticVariantIndex: 1,
+      trajectoryRepetition: 1,
       profileId: "plain",
       model: "fixture/model",
       provider: "fixture",
@@ -780,7 +805,8 @@ export async function verifyBenchmarkCli({ root = defaultRoot } = {}) {
       sourceRoot: root,
       familyId,
       seed: "replay-success-seed",
-      repetition: 1,
+      semanticVariantIndex: 1,
+      trajectoryRepetition: 1,
       profileId: "plain",
       model: "fixture/model",
       provider: "fixture",
@@ -799,11 +825,35 @@ export async function verifyBenchmarkCli({ root = defaultRoot } = {}) {
       JSON.stringify(successfulReplay.report).includes("fixture/model"),
       false,
     );
+    const suppressedDefectEscapeReplay = structuredClone(successfulReplay.report);
+    Object.assign(suppressedDefectEscapeReplay.attempt.result, {
+      claimed_completion: false,
+      hidden_check: {
+        status: "failed",
+        passed: false,
+        violations: ["hidden_regression"],
+      },
+      hidden_safety_failed: true,
+      task_correct: false,
+      whole_task_success: false,
+      defect_escape_v2: false,
+    });
+    Object.assign(suppressedDefectEscapeReplay, {
+      claimed_completion: false,
+      task_correct: false,
+      whole_task_success: false,
+      result_fingerprint: fingerprint(suppressedDefectEscapeReplay.attempt.result),
+    });
+    assert.throws(
+      () => validateSyntheticReplayReport(suppressedDefectEscapeReplay),
+      (error) => error?.code === "SYNTHETIC_REPORT_OUTCOME",
+    );
     const completeNegativeReplay = await runSyntheticReplay({
       sourceRoot: root,
       familyId,
       seed: "replay-complete-negative-seed",
-      repetition: 1,
+      semanticVariantIndex: 1,
+      trajectoryRepetition: 1,
       profileId: "plain",
       model: "fixture/model",
       provider: "fixture",
@@ -838,7 +888,8 @@ export async function verifyBenchmarkCli({ root = defaultRoot } = {}) {
       (error) => error?.code === "SYNTHETIC_REPLAY_SHAPE",
     );
     const detachedResultReplay = structuredClone(successfulReplay.report);
-    detachedResultReplay.attempt.result.metrics.tool_call_count += 1;
+    detachedResultReplay.attempt.result.metrics.total_tool_call_count += 1;
+    detachedResultReplay.attempt.result.metrics.task_action_call_count += 1;
     assert.throws(
       () => validateSyntheticReplayReport(detachedResultReplay),
       (error) => error?.code === "SYNTHETIC_REPLAY_EVIDENCE",
@@ -901,12 +952,27 @@ export async function verifyBenchmarkCli({ root = defaultRoot } = {}) {
     );
     const legacyReplay = structuredClone(successfulReplay.report);
     legacyReplay.schema_version = 1;
+    legacyReplay.repetition = legacyReplay.trajectory_repetition;
+    for (const field of ["semantic_variant_index", "semantic_variant_id", "semantic_variant_fingerprint", "trajectory_id", "trajectory_fingerprint", "trajectory_repetition"]) delete legacyReplay[field];
     delete legacyReplay.profile_fingerprint;
     delete legacyReplay.task_correct;
+    delete legacyReplay.claimed_completion;
+    delete legacyReplay.false_block;
     delete legacyReplay.attempt;
     validateSyntheticReplayReport(legacyReplay);
     assert.throws(
       () => validateSyntheticReplayReportSourceBinding(legacyReplay, { sourceRoot: root }),
+      (error) => error?.code === "SYNTHETIC_REPLAY_SOURCE_BINDING",
+    );
+    const legacyV2Replay = structuredClone(successfulReplay.report);
+    legacyV2Replay.schema_version = 2;
+    legacyV2Replay.repetition = legacyV2Replay.trajectory_repetition;
+    for (const field of ["semantic_variant_index", "semantic_variant_id", "semantic_variant_fingerprint", "trajectory_id", "trajectory_fingerprint", "trajectory_repetition"]) delete legacyV2Replay[field];
+    delete legacyV2Replay.claimed_completion;
+    delete legacyV2Replay.false_block;
+    validateSyntheticReplayReport(legacyV2Replay);
+    assert.throws(
+      () => validateSyntheticReplayReportSourceBinding(legacyV2Replay, { sourceRoot: root }),
       (error) => error?.code === "SYNTHETIC_REPLAY_SOURCE_BINDING",
     );
     const contradictoryReplay = structuredClone(successfulReplay.report);
@@ -942,7 +1008,8 @@ export async function verifyBenchmarkCli({ root = defaultRoot } = {}) {
       contractSourceRoot: root,
       familyId,
       seed: successfulReplay.report.seed,
-      repetition: successfulReplay.report.repetition,
+      semanticVariantIndex: successfulReplay.report.semantic_variant_index,
+      trajectoryRepetition: successfulReplay.report.trajectory_repetition,
       profileId: successfulReplay.report.profile_id,
       instanceFingerprint: successfulReplay.report.instance_fingerprint,
       model: "fixture/model",
@@ -954,7 +1021,7 @@ export async function verifyBenchmarkCli({ root = defaultRoot } = {}) {
     const replayRequestMismatches = [
       { familyId: differentFamily },
       { seed: "different-replay-seed" },
-      { repetition: 2 },
+      { trajectoryRepetition: 2 },
       { profileId: "profile-only" },
       {
         instanceFingerprint:
@@ -987,7 +1054,8 @@ export async function verifyBenchmarkCli({ root = defaultRoot } = {}) {
       contractSourceRoot: root,
       familyId,
       seed: completeNegativeReplay.report.seed,
-      repetition: completeNegativeReplay.report.repetition,
+      semanticVariantIndex: completeNegativeReplay.report.semantic_variant_index,
+      trajectoryRepetition: completeNegativeReplay.report.trajectory_repetition,
       profileId: completeNegativeReplay.report.profile_id,
       instanceFingerprint: completeNegativeReplay.report.instance_fingerprint,
       model: "fixture/model",
@@ -1019,7 +1087,8 @@ export async function verifyBenchmarkCli({ root = defaultRoot } = {}) {
       sourceRoot: root,
       familyId,
       seed: "replay-blocked-seed",
-      repetition: 1,
+      semanticVariantIndex: 1,
+      trajectoryRepetition: 1,
       profileId: "instrumented",
       model: "fixture/model",
       provider: "fixture",
@@ -1047,7 +1116,8 @@ export async function verifyBenchmarkCli({ root = defaultRoot } = {}) {
       contractSourceRoot: root,
       familyId,
       seed: "replay-blocked-seed",
-      repetition: 1,
+      semanticVariantIndex: 1,
+      trajectoryRepetition: 1,
       profileId: "instrumented",
       instanceFingerprint: null,
       model: "fixture/model",

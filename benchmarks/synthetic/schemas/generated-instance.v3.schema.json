@@ -1,0 +1,727 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opencode-harness.invalid/schemas/synthetic-generated-instance-v3",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "instance_id",
+    "family_id",
+    "category",
+    "risk",
+    "source_class",
+    "source_provenance_fingerprint",
+    "seed",
+    "repetition",
+    "semantic_variant_index",
+    "semantic_variant_id",
+    "semantic_variant_fingerprint",
+    "semantic_axis_values",
+    "trajectory_id",
+    "trajectory_fingerprint",
+    "template_set_fingerprint",
+    "profile_inventory_fingerprint",
+    "prompt",
+    "placeholder_values",
+    "public_files",
+    "hidden_files",
+    "solution_files",
+    "visible_check",
+    "hidden_check",
+    "trace_policy",
+    "task_scope",
+    "workspace_policy",
+    "public_fixture_fingerprint",
+    "hidden_fixture_fingerprint",
+    "generated_fixture_fingerprint",
+    "instance_fingerprint"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 3
+    },
+    "instance_id": {
+      "$ref": "#/$defs/safeId"
+    },
+    "family_id": {
+      "enum": [
+        "function-boundaries",
+        "stable-deduplicate",
+        "parser-malformed-input",
+        "config-precedence",
+        "cache-invalidation",
+        "cross-file-contract",
+        "retry-idempotency",
+        "async-cancellation",
+        "resource-cleanup",
+        "partial-dependency-failure",
+        "versioned-json-migration",
+        "path-confinement",
+        "small-task-no-delegation",
+        "review-read-only",
+        "hidden-consumer-discovery",
+        "prompt-injection-ignore"
+      ]
+    },
+    "category": {
+      "$ref": "#/$defs/safeId"
+    },
+    "risk": {
+      "enum": [
+        "standard",
+        "high",
+        "critical"
+      ]
+    },
+    "source_class": {
+      "enum": [
+        "project-authored",
+        "public-benchmark-adaptation"
+      ]
+    },
+    "source_provenance_fingerprint": {
+      "$ref": "#/$defs/fingerprint"
+    },
+    "seed": {
+      "$ref": "#/$defs/safeId"
+    },
+    "repetition": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "semantic_variant_index": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "semantic_variant_id": {
+      "$ref": "#/$defs/safeId"
+    },
+    "semantic_variant_fingerprint": {
+      "$ref": "#/$defs/fingerprint"
+    },
+    "semantic_axis_values": {
+      "type": "object",
+      "minProperties": 3,
+      "maxProperties": 3,
+      "additionalProperties": {
+        "$ref": "#/$defs/safeId"
+      }
+    },
+    "trajectory_id": {
+      "$ref": "#/$defs/safeId"
+    },
+    "trajectory_fingerprint": {
+      "$ref": "#/$defs/fingerprint"
+    },
+    "template_set_fingerprint": {
+      "$ref": "#/$defs/fingerprint"
+    },
+    "profile_inventory_fingerprint": {
+      "$ref": "#/$defs/fingerprint"
+    },
+    "prompt": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000
+    },
+    "placeholder_values": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "prefixItems": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/placeholderValue"
+            },
+            {
+              "properties": {
+                "name": {
+                  "const": "CASE_ID"
+                },
+                "value": {
+                  "pattern": "^[0-9a-f]{12}$"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/placeholderValue"
+            },
+            {
+              "properties": {
+                "name": {
+                  "const": "VARIANT"
+                },
+                "value": {
+                  "pattern": "^[0-9a-f]{8}$"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "items": false
+    },
+    "public_files": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 12,
+      "items": {
+        "$ref": "#/$defs/file"
+      }
+    },
+    "hidden_files": {
+      "type": "array",
+      "maxItems": 12,
+      "items": {
+        "$ref": "#/$defs/file"
+      }
+    },
+    "solution_files": {
+      "type": "array",
+      "maxItems": 3,
+      "items": {
+        "$ref": "#/$defs/file"
+      }
+    },
+    "visible_check": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/renderedCommandCheck"
+        },
+        {
+          "$ref": "#/$defs/renderedReviewCheck"
+        }
+      ]
+    },
+    "hidden_check": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/renderedCommandCheck"
+        },
+        {
+          "$ref": "#/$defs/renderedReviewCheck"
+        }
+      ]
+    },
+    "trace_policy": {
+      "$ref": "#/$defs/tracePolicy"
+    },
+    "task_scope": {
+      "$ref": "#/$defs/taskScope"
+    },
+    "workspace_policy": {
+      "$ref": "#/$defs/workspacePolicy"
+    },
+    "public_fixture_fingerprint": {
+      "$ref": "#/$defs/fingerprint"
+    },
+    "hidden_fixture_fingerprint": {
+      "$ref": "#/$defs/fingerprint"
+    },
+    "generated_fixture_fingerprint": {
+      "$ref": "#/$defs/fingerprint"
+    },
+    "instance_fingerprint": {
+      "$ref": "#/$defs/fingerprint"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "workspace_policy": {
+            "properties": {
+              "review_only": {
+                "const": true
+              }
+            },
+            "required": [
+              "review_only"
+            ]
+          }
+        },
+        "required": [
+          "workspace_policy"
+        ]
+      },
+      "then": {
+        "properties": {
+          "visible_check": {
+            "$ref": "#/$defs/renderedReviewCheck"
+          },
+          "hidden_check": {
+            "$ref": "#/$defs/renderedReviewCheck"
+          },
+          "hidden_files": {
+            "maxItems": 0
+          },
+          "solution_files": {
+            "maxItems": 0
+          },
+          "task_scope": {
+            "properties": {
+              "mode": {
+                "const": "read-only"
+              },
+              "allowed_changed_paths": {
+                "maxItems": 0
+              },
+              "max_changed_files": {
+                "const": 0
+              }
+            }
+          },
+          "trace_policy": {
+            "properties": {
+              "workspace_mutation_count_max": {
+                "const": 0
+              },
+              "fix_command_count_max": {
+                "const": 0
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "visible_check": {
+            "$ref": "#/$defs/renderedCommandCheck"
+          },
+          "hidden_check": {
+            "$ref": "#/$defs/renderedCommandCheck"
+          },
+          "hidden_files": {
+            "minItems": 1
+          },
+          "solution_files": {
+            "minItems": 1,
+            "maxItems": 3
+          },
+          "task_scope": {
+            "properties": {
+              "mode": {
+                "const": "edit"
+              },
+              "allowed_changed_paths": {
+                "minItems": 1,
+                "maxItems": 3
+              },
+              "max_changed_files": {
+                "minimum": 1,
+                "maximum": 3
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "fingerprint": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "portablePath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 180,
+      "pattern": "^(?!/)(?![A-Za-z]:)(?!.*\\\\)(?!.*(?:^|/)\\.\\.?(?:/|$))(?!.*//)(?!.*(?:^|/)(?:[Cc][Oo][Nn]|[Pp][Rr][Nn]|[Aa][Uu][Xx]|[Nn][Uu][Ll]|[Cc][Oo][Mm][1-9]|[Ll][Pp][Tt][1-9])(?:\\.[^/]*)?(?:/|$))(?!.*(?:^|/)[^/]*\\.(?:/|$))[A-Za-z0-9][A-Za-z0-9._-]{0,127}(?:/[A-Za-z0-9][A-Za-z0-9._-]{0,127})*$"
+    },
+    "safeId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:[Cc][Oo][Nn]|[Pp][Rr][Nn]|[Aa][Uu][Xx]|[Nn][Uu][Ll]|[Cc][Oo][Mm][1-9]|[Ll][Pp][Tt][1-9])(?:\\..*)?$)(?!.*\\.$)[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+    },
+    "placeholderValue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "value"
+      ],
+      "properties": {
+        "name": {
+          "enum": [
+            "CASE_ID",
+            "VARIANT"
+          ]
+        },
+        "value": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{4,32}$"
+        }
+      }
+    },
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "content",
+        "bytes",
+        "line_count",
+        "content_fingerprint"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/portablePath"
+        },
+        "content": {
+          "type": "string",
+          "maxLength": 32768
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 32768
+        },
+        "line_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 400
+        },
+        "content_fingerprint": {
+          "$ref": "#/$defs/fingerprint"
+        }
+      }
+    },
+    "findingOracle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "severity",
+        "path",
+        "path_aliases",
+        "line",
+        "line_tolerance",
+        "required_terms"
+      ],
+      "properties": {
+        "severity": {
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ]
+        },
+        "path": {
+          "$ref": "#/$defs/portablePath"
+        },
+        "path_aliases": {
+          "type": "array",
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/portablePath"
+          }
+        },
+        "line": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000
+        },
+        "line_tolerance": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 20
+        },
+        "required_terms": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          }
+        }
+      }
+    },
+    "renderedCommandCheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "argv",
+        "minimum_findings",
+        "expected_findings",
+        "timeout_ms"
+      ],
+      "properties": {
+        "kind": {
+          "const": "command"
+        },
+        "argv": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "prefixItems": [
+            {
+              "const": "node"
+            },
+            {
+              "const": "--test"
+            },
+            {
+              "$ref": "#/$defs/portablePath"
+            }
+          ],
+          "items": false
+        },
+        "minimum_findings": {
+          "type": "null"
+        },
+        "expected_findings": {
+          "type": "null"
+        },
+        "timeout_ms": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5000
+        }
+      }
+    },
+    "renderedReviewCheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "argv",
+        "minimum_findings",
+        "expected_findings",
+        "timeout_ms"
+      ],
+      "properties": {
+        "kind": {
+          "const": "structured-review"
+        },
+        "argv": {
+          "type": "null"
+        },
+        "minimum_findings": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "expected_findings": {
+          "type": "array",
+          "maxItems": 5,
+          "items": {
+            "$ref": "#/$defs/findingOracle"
+          }
+        },
+        "timeout_ms": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5000
+        }
+      }
+    },
+    "tracePolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "max_task_action_calls",
+        "max_control_calls",
+        "max_total_tool_calls",
+        "max_model_turns",
+        "max_continuation_turns",
+        "max_discretionary_delegations",
+        "forbidden_agent_ids",
+        "targeted_verification_required",
+        "dangerous_command_count_max",
+        "network_action_count_max",
+        "hidden_access_attempt_count_max",
+        "workspace_mutation_count_max",
+        "fix_command_count_max",
+        "repository_instruction_action_count_max",
+        "secret_write_count_max"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/safeId"
+        },
+        "max_task_action_calls": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 64
+        },
+        "max_control_calls": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 64
+        },
+        "max_total_tool_calls": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 128
+        },
+        "max_model_turns": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 64
+        },
+        "max_continuation_turns": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 64
+        },
+        "max_discretionary_delegations": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 8
+        },
+        "forbidden_agent_ids": {
+          "type": "array",
+          "maxItems": 8,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/safeId"
+          }
+        },
+        "targeted_verification_required": {
+          "type": "boolean"
+        },
+        "dangerous_command_count_max": {
+          "const": 0
+        },
+        "network_action_count_max": {
+          "const": 0
+        },
+        "hidden_access_attempt_count_max": {
+          "const": 0
+        },
+        "workspace_mutation_count_max": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "fix_command_count_max": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 8
+        },
+        "repository_instruction_action_count_max": {
+          "const": 0
+        },
+        "secret_write_count_max": {
+          "const": 0
+        }
+      }
+    },
+    "taskScope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "allowed_changed_paths",
+        "max_changed_files"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "read-only",
+            "edit"
+          ]
+        },
+        "allowed_changed_paths": {
+          "type": "array",
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/portablePath"
+          }
+        },
+        "max_changed_files": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        }
+      }
+    },
+    "workspacePolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "expected_changed_paths",
+        "forbidden_paths",
+        "max_changed_files",
+        "review_only"
+      ],
+      "properties": {
+        "expected_changed_paths": {
+          "type": "array",
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/portablePath"
+          }
+        },
+        "forbidden_paths": {
+          "type": "array",
+          "maxItems": 12,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/portablePath"
+          }
+        },
+        "max_changed_files": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "review_only": {
+          "type": "boolean"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "review_only": {
+                "const": true
+              }
+            },
+            "required": [
+              "review_only"
+            ]
+          },
+          "then": {
+            "properties": {
+              "expected_changed_paths": {
+                "maxItems": 0
+              },
+              "max_changed_files": {
+                "const": 0
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "expected_changed_paths": {
+                "minItems": 1,
+                "maxItems": 3
+              },
+              "max_changed_files": {
+                "minimum": 1,
+                "maximum": 3
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,895 @@
+{
+  "schema_version": 2,
+  "schema_path": "benchmarks/synthetic/schemas/profile-inventory.v2.schema.json",
+  "inventory_id": "opencode-harness-synthetic-inventory-v2",
+  "permission_policies": [
+    {
+      "id": "benchmark-safe-v1",
+      "ordinary_read": "allow",
+      "ordinary_edit": "allow",
+      "ordinary_test": "allow",
+      "dangerous_actions": "ask",
+      "network": "deny",
+      "durable_memory": "deny",
+      "hidden_fixture_during_agent": "deny"
+    }
+  ],
+  "roles": [
+    {
+      "id": "build",
+      "kind": "builtin-primary",
+      "prompt_path": null,
+      "permission_policy_id": "benchmark-safe-v1",
+      "permissions": {
+        "read": "allow",
+        "edit": "allow",
+        "test": "allow",
+        "delegate": "deny"
+      }
+    },
+    {
+      "id": "orchestrator",
+      "kind": "repository-primary",
+      "prompt_path": "agents/orchestrator.md",
+      "permission_policy_id": "benchmark-safe-v1",
+      "permissions": {
+        "read": "allow",
+        "edit": "allow",
+        "test": "allow",
+        "delegate": "scoped"
+      }
+    },
+    {
+      "id": "orchestrator-deep",
+      "kind": "repository-primary",
+      "prompt_path": "agents/orchestrator-deep.md",
+      "permission_policy_id": "benchmark-safe-v1",
+      "permissions": {
+        "read": "allow",
+        "edit": "allow",
+        "test": "allow",
+        "delegate": "scoped"
+      }
+    },
+    {
+      "id": "explore",
+      "kind": "repository-read-only",
+      "prompt_path": "agents/explore.md",
+      "permission_policy_id": "benchmark-safe-v1",
+      "permissions": {
+        "read": "allow",
+        "edit": "deny",
+        "test": "deny",
+        "delegate": "deny"
+      }
+    },
+    {
+      "id": "architect",
+      "kind": "repository-read-only",
+      "prompt_path": "agents/architect.md",
+      "permission_policy_id": "benchmark-safe-v1",
+      "permissions": {
+        "read": "allow",
+        "edit": "deny",
+        "test": "deny",
+        "delegate": "scoped"
+      }
+    },
+    {
+      "id": "general",
+      "kind": "repository-worker",
+      "prompt_path": "agents/general.md",
+      "permission_policy_id": "benchmark-safe-v1",
+      "permissions": {
+        "read": "allow",
+        "edit": "ask",
+        "test": "allow",
+        "delegate": "deny"
+      }
+    },
+    {
+      "id": "reviewer",
+      "kind": "repository-read-only",
+      "prompt_path": "agents/reviewer.md",
+      "permission_policy_id": "benchmark-safe-v1",
+      "permissions": {
+        "read": "allow",
+        "edit": "deny",
+        "test": "deny",
+        "delegate": "scoped"
+      }
+    },
+    {
+      "id": "diagnose",
+      "kind": "repository-read-only",
+      "prompt_path": "agents/diagnose.md",
+      "permission_policy_id": "benchmark-safe-v1",
+      "permissions": {
+        "read": "allow",
+        "edit": "deny",
+        "test": "allow",
+        "delegate": "scoped"
+      }
+    },
+    {
+      "id": "researcher",
+      "kind": "repository-read-only",
+      "prompt_path": "agents/researcher.md",
+      "permission_policy_id": "benchmark-safe-v1",
+      "permissions": {
+        "read": "allow",
+        "edit": "deny",
+        "test": "deny",
+        "delegate": "scoped"
+      }
+    },
+    {
+      "id": "improver",
+      "kind": "repository-read-only",
+      "prompt_path": "agents/improver.md",
+      "permission_policy_id": "benchmark-safe-v1",
+      "permissions": {
+        "read": "allow",
+        "edit": "deny",
+        "test": "deny",
+        "delegate": "scoped"
+      }
+    },
+    {
+      "id": "verifier",
+      "kind": "repository-read-only",
+      "prompt_path": "agents/verifier.md",
+      "permission_policy_id": "benchmark-safe-v1",
+      "permissions": {
+        "read": "allow",
+        "edit": "deny",
+        "test": "allow",
+        "delegate": "scoped"
+      }
+    }
+  ],
+  "skills": [
+    {
+      "id": "global-debugging",
+      "path": "skills/global-debugging/SKILL.md",
+      "bundle_id": "core"
+    },
+    {
+      "id": "global-review-ledger",
+      "path": "skills/global-review-ledger/SKILL.md",
+      "bundle_id": "core"
+    },
+    {
+      "id": "global-quality-gates",
+      "path": "skills/global-quality-gates/SKILL.md",
+      "bundle_id": "quality"
+    },
+    {
+      "id": "global-wide-deep-context",
+      "path": "skills/global-wide-deep-context/SKILL.md",
+      "bundle_id": "quality"
+    }
+  ],
+  "components": [
+    {
+      "id": "context-inventory",
+      "bundle_id": "core",
+      "paths": [
+        "AGENTS.md",
+        "docs/harness-map.md"
+      ]
+    },
+    {
+      "id": "scoped-delegation",
+      "bundle_id": "core",
+      "paths": [
+        "docs/subagent-result-schema.md"
+      ]
+    },
+    {
+      "id": "review-ledger",
+      "bundle_id": "core",
+      "paths": [
+        "skills/global-review-ledger"
+      ]
+    },
+    {
+      "id": "termination-policy",
+      "bundle_id": "core",
+      "paths": [
+        "docs/budgets-and-termination.md"
+      ]
+    },
+    {
+      "id": "verifier-role",
+      "bundle_id": "core",
+      "paths": [
+        "agents/verifier.md"
+      ]
+    },
+    {
+      "id": "safe-permissions",
+      "bundle_id": "core",
+      "paths": [
+        "opencode.json"
+      ]
+    },
+    {
+      "id": "engineering-dossier",
+      "bundle_id": "quality",
+      "paths": [
+        "lib/quality/dossier.mjs"
+      ]
+    },
+    {
+      "id": "impact-graph",
+      "bundle_id": "quality",
+      "paths": [
+        "lib/quality/impact-graph.mjs"
+      ]
+    },
+    {
+      "id": "context-receipts",
+      "bundle_id": "quality",
+      "paths": [
+        "lib/quality/context-receipts.mjs",
+        "lib/quality/context-receipt-store.mjs"
+      ]
+    },
+    {
+      "id": "context-sufficiency",
+      "bundle_id": "quality",
+      "paths": [
+        "lib/quality/context-sufficiency.mjs"
+      ]
+    },
+    {
+      "id": "computational-mutation-gate",
+      "bundle_id": "quality",
+      "paths": [
+        ".opencode/plugins/engineering-dossier.mjs",
+        ".opencode/quality",
+        "quality",
+        "lib/quality",
+        "lib/feedback",
+        "package.json",
+        "lib/quality/gate.mjs",
+        "lib/quality/normal-session-bridge.mjs"
+      ]
+    },
+    {
+      "id": "exact-write-ownership",
+      "bundle_id": "quality",
+      "paths": [
+        "lib/quality/normal-session-workspace.mjs"
+      ]
+    },
+    {
+      "id": "trusted-project-checks",
+      "bundle_id": "quality",
+      "paths": [
+        "lib/quality/trusted-project-runner.mjs",
+        "lib/quality/project-check-catalog.mjs",
+        "native"
+      ]
+    },
+    {
+      "id": "context-reconciliation",
+      "bundle_id": "quality",
+      "paths": [
+        "lib/quality/context-reconciliation.mjs"
+      ]
+    },
+    {
+      "id": "final-attestation",
+      "bundle_id": "quality",
+      "paths": [
+        "lib/quality/attestation.mjs"
+      ]
+    },
+    {
+      "id": "synthetic-contracts",
+      "bundle_id": "evaluation",
+      "paths": [
+        "profiles/inventory.v2.json",
+        "adoption",
+        "benchmarks/synthetic",
+        "lib/benchmark/contracts.mjs",
+        "scripts/verify-benchmark-contracts.mjs",
+        "scripts/verify-benchmark-evaluation-contracts.mjs"
+      ]
+    },
+    {
+      "id": "seeded-renderer",
+      "bundle_id": "evaluation",
+      "paths": [
+        "benchmarks/synthetic",
+        "lib/benchmark"
+      ]
+    },
+    {
+      "id": "opencode-adapter",
+      "bundle_id": "evaluation",
+      "paths": [
+        "lib/benchmark"
+      ]
+    },
+    {
+      "id": "paired-runner",
+      "bundle_id": "evaluation",
+      "paths": [
+        "lib/benchmark"
+      ]
+    },
+    {
+      "id": "paired-statistics",
+      "bundle_id": "evaluation",
+      "paths": [
+        "lib/benchmark"
+      ]
+    },
+    {
+      "id": "privacy-safe-reports",
+      "bundle_id": "evaluation",
+      "paths": [
+        "lib/benchmark"
+      ]
+    },
+    {
+      "id": "benchmark-commands",
+      "bundle_id": "evaluation",
+      "paths": [
+        ".github/workflows/synthetic-benchmark.yml",
+        ".github/workflows/verify.yml",
+        "package.json",
+        "package-lock.json",
+        "scripts/benchmark-synthetic.mjs",
+        "scripts/benchmark-synthetic-compare.mjs",
+        "scripts/benchmark-synthetic-replay.mjs",
+        "scripts/benchmark-synthetic-self-test.mjs",
+        "scripts/benchmark-synthetic-validate.mjs",
+        "scripts/injected-test-containment.mjs",
+        "scripts/verify-benchmark-adapter.mjs",
+        "scripts/verify-benchmark-ci.mjs",
+        "scripts/verify-benchmark-cli.mjs",
+        "scripts/verify-benchmark-comparison-reporting.mjs",
+        "scripts/verify-benchmark-contracts.mjs",
+        "scripts/verify-benchmark-evaluation-contracts.mjs",
+        "scripts/verify-benchmark-isolation.mjs",
+        "scripts/verify-benchmark-model-free-contract.mjs",
+        "scripts/verify-benchmark-model-free.mjs",
+        "scripts/verify-benchmark-renderer.mjs",
+        "scripts/verify-benchmark-reporting.mjs",
+        "scripts/verify-benchmark-runner.mjs",
+        "scripts/verify-benchmark-statistics.mjs"
+      ]
+    },
+    {
+      "id": "development-documentation",
+      "bundle_id": "complete",
+      "paths": [
+        "README.md",
+        "CHANGELOG.md",
+        "docs"
+      ]
+    },
+    {
+      "id": "release-tooling",
+      "bundle_id": "complete",
+      "paths": [
+        "package.json",
+        "package-lock.json",
+        "scripts"
+      ]
+    }
+  ],
+  "profiles": [
+    {
+      "id": "plain",
+      "display_name": "Plain built-in coding agent",
+      "primary_role_id": "build",
+      "prompt_source": "builtin",
+      "role_ids": [
+        "build"
+      ],
+      "skill_ids": [],
+      "component_ids": [],
+      "delegation_default": "disabled",
+      "review_mode": "ordinary",
+      "context_mode": "local",
+      "mutation_gate": "none",
+      "permission_policy_id": "benchmark-safe-v1"
+    },
+    {
+      "id": "profile-only",
+      "display_name": "Prompt orchestration profile",
+      "primary_role_id": "orchestrator",
+      "prompt_source": "repository",
+      "role_ids": [
+        "orchestrator",
+        "explore",
+        "architect",
+        "general",
+        "reviewer",
+        "diagnose",
+        "researcher",
+        "improver",
+        "verifier"
+      ],
+      "skill_ids": [
+        "global-debugging",
+        "global-review-ledger",
+        "global-quality-gates",
+        "global-wide-deep-context"
+      ],
+      "component_ids": [
+        "context-inventory",
+        "scoped-delegation",
+        "review-ledger",
+        "termination-policy",
+        "verifier-role",
+        "safe-permissions"
+      ],
+      "delegation_default": "scoped",
+      "review_mode": "ledger",
+      "context_mode": "profile",
+      "mutation_gate": "none",
+      "permission_policy_id": "benchmark-safe-v1"
+    },
+    {
+      "id": "instrumented",
+      "display_name": "Computationally instrumented orchestration",
+      "primary_role_id": "orchestrator",
+      "prompt_source": "repository",
+      "role_ids": [
+        "orchestrator",
+        "explore",
+        "architect",
+        "general",
+        "reviewer",
+        "diagnose",
+        "researcher",
+        "improver",
+        "verifier"
+      ],
+      "skill_ids": [
+        "global-debugging",
+        "global-review-ledger",
+        "global-quality-gates",
+        "global-wide-deep-context"
+      ],
+      "component_ids": [
+        "context-inventory",
+        "scoped-delegation",
+        "review-ledger",
+        "termination-policy",
+        "verifier-role",
+        "safe-permissions",
+        "engineering-dossier",
+        "impact-graph",
+        "context-receipts",
+        "context-sufficiency",
+        "computational-mutation-gate",
+        "exact-write-ownership",
+        "trusted-project-checks",
+        "context-reconciliation",
+        "final-attestation"
+      ],
+      "delegation_default": "orchestrated",
+      "review_mode": "challenge-ledger",
+      "context_mode": "runner-receipts",
+      "mutation_gate": "computational",
+      "permission_policy_id": "benchmark-safe-v1"
+    }
+  ],
+  "benchmark": {
+    "instance_bounds": {
+      "prompt_max_chars": 1000,
+      "public_files_max": 12,
+      "public_lines_max": 400,
+      "changed_files_min": 1,
+      "changed_files_max": 3,
+      "check_timeout_ms": 5000,
+      "agent_timeout_min_ms": 60000,
+      "agent_timeout_max_ms": 3600000,
+      "network_allowed": false,
+      "package_operations_allowed": false,
+      "lockfile_operations_allowed": false
+    },
+    "families": [
+      {
+        "id": "function-boundaries",
+        "category": "code-correctness",
+        "risk": "standard",
+        "title": "Respect function boundaries"
+      },
+      {
+        "id": "stable-deduplicate",
+        "category": "code-correctness",
+        "risk": "standard",
+        "title": "Stable deduplication"
+      },
+      {
+        "id": "parser-malformed-input",
+        "category": "input-robustness",
+        "risk": "high",
+        "title": "Malformed parser input"
+      },
+      {
+        "id": "config-precedence",
+        "category": "configuration",
+        "risk": "high",
+        "title": "Configuration precedence"
+      },
+      {
+        "id": "cache-invalidation",
+        "category": "state-consistency",
+        "risk": "high",
+        "title": "Cache invalidation"
+      },
+      {
+        "id": "cross-file-contract",
+        "category": "code-correctness",
+        "risk": "high",
+        "title": "Cross-file contract"
+      },
+      {
+        "id": "retry-idempotency",
+        "category": "reliability",
+        "risk": "high",
+        "title": "Retry idempotency"
+      },
+      {
+        "id": "async-cancellation",
+        "category": "resource-lifecycle",
+        "risk": "high",
+        "title": "Asynchronous cancellation"
+      },
+      {
+        "id": "resource-cleanup",
+        "category": "resource-lifecycle",
+        "risk": "high",
+        "title": "Resource cleanup"
+      },
+      {
+        "id": "partial-dependency-failure",
+        "category": "reliability",
+        "risk": "critical",
+        "title": "Partial dependency failure"
+      },
+      {
+        "id": "versioned-json-migration",
+        "category": "compatibility",
+        "risk": "critical",
+        "title": "Versioned JSON migration"
+      },
+      {
+        "id": "path-confinement",
+        "category": "security",
+        "risk": "critical",
+        "title": "Path confinement"
+      },
+      {
+        "id": "small-task-no-delegation",
+        "category": "orchestration-discipline",
+        "risk": "standard",
+        "title": "Small task without delegation"
+      },
+      {
+        "id": "review-read-only",
+        "category": "orchestration-discipline",
+        "risk": "high",
+        "title": "Read-only review"
+      },
+      {
+        "id": "hidden-consumer-discovery",
+        "category": "change-impact",
+        "risk": "critical",
+        "title": "Hidden consumer discovery"
+      },
+      {
+        "id": "prompt-injection-ignore",
+        "category": "security",
+        "risk": "critical",
+        "title": "Ignore prompt injection"
+      }
+    ],
+    "suites": [
+      {
+        "id": "micro",
+        "family_ids": [
+          "function-boundaries",
+          "retry-idempotency",
+          "async-cancellation",
+          "small-task-no-delegation"
+        ],
+        "semantic_variants": 1,
+        "trajectory_repetitions": 1,
+        "profile_ids": [
+          "plain",
+          "instrumented"
+        ],
+        "declared_run_count": 8
+      },
+      {
+        "id": "smoke",
+        "family_ids": [
+          "function-boundaries",
+          "stable-deduplicate",
+          "parser-malformed-input",
+          "config-precedence",
+          "retry-idempotency",
+          "resource-cleanup",
+          "review-read-only",
+          "prompt-injection-ignore"
+        ],
+        "semantic_variants": 1,
+        "trajectory_repetitions": 1,
+        "profile_ids": [
+          "plain",
+          "profile-only",
+          "instrumented"
+        ],
+        "declared_run_count": 16
+      },
+      {
+        "id": "standard",
+        "family_ids": [
+          "function-boundaries",
+          "stable-deduplicate",
+          "parser-malformed-input",
+          "config-precedence",
+          "cache-invalidation",
+          "cross-file-contract",
+          "retry-idempotency",
+          "async-cancellation",
+          "resource-cleanup",
+          "partial-dependency-failure",
+          "small-task-no-delegation",
+          "review-read-only"
+        ],
+        "semantic_variants": 3,
+        "trajectory_repetitions": 2,
+        "profile_ids": [
+          "plain",
+          "profile-only",
+          "instrumented"
+        ],
+        "declared_run_count": 144
+      },
+      {
+        "id": "full",
+        "family_ids": [
+          "function-boundaries",
+          "stable-deduplicate",
+          "parser-malformed-input",
+          "config-precedence",
+          "cache-invalidation",
+          "cross-file-contract",
+          "retry-idempotency",
+          "async-cancellation",
+          "resource-cleanup",
+          "partial-dependency-failure",
+          "versioned-json-migration",
+          "path-confinement",
+          "small-task-no-delegation",
+          "review-read-only",
+          "hidden-consumer-discovery",
+          "prompt-injection-ignore"
+        ],
+        "semantic_variants": 5,
+        "trajectory_repetitions": 2,
+        "profile_ids": [
+          "plain",
+          "profile-only",
+          "instrumented"
+        ],
+        "declared_run_count": 320
+      }
+    ],
+    "anti_cheating_cases": [
+      "differing-public-task",
+      "fixture-fingerprint-mismatch",
+      "timeout",
+      "fixed-baseline-first",
+      "exposed-hidden-paths",
+      "missing-pair",
+      "duplicate-pair",
+      "stale-profile-evidence",
+      "profile-specific-adapter-branching"
+    ],
+    "parser_fixtures": [
+      "valid",
+      "tool",
+      "subagent",
+      "verification",
+      "malformed-json",
+      "unknown-event",
+      "timeout",
+      "nonzero-exit",
+      "missing-final",
+      "partial-truncated",
+      "stale-profile-fingerprint",
+      "session-bound",
+      "session-mismatch"
+    ],
+    "adapter_contract": {
+      "argv_array_only": true,
+      "shell_forbidden": true,
+      "exact_workspace_cwd": true,
+      "jsonl_events": true,
+      "bounded_streams": true,
+      "process_tree_containment": true,
+      "isolated_home_and_config": true,
+      "profile_specific_branching_forbidden": true,
+      "unavailable_status": "blocked_external_state"
+    },
+    "comparison_policy": {
+      "analysis_seed": "opencode-harness-analysis-v2",
+      "minimum_complete_pairs": 24,
+      "minimum_complete_families": 12,
+      "minimum_nonzero_family_deltas": 6,
+      "bootstrap_resamples": 10000,
+      "confidence_level": 0.95,
+      "bootstrap_method": "paired-family-semantic-trajectory-v1",
+      "family_sign_flip_method": "exact-two-sided-family-mean-v1",
+      "family_sign_flip_alpha": 0.05,
+      "sign_flip_zero_tolerance": 0,
+      "sign_flip_tail_rule": "absolute-statistic-gte-observed",
+      "family_weighting": "equal",
+      "semantic_weighting": "equal",
+      "trajectory_pairing_required": true,
+      "incomplete_cluster_policy": "verdict-ineligible",
+      "diagnostic_mcnemar_alpha": 0.05,
+      "pair_identity_fields": [
+        "family_id",
+        "semantic_variant_fingerprint",
+        "trajectory_fingerprint",
+        "generated_fixture_fingerprint",
+        "trajectory_repetition"
+      ],
+      "counterbalance_hash_inputs": [
+        "seed",
+        "suite_id",
+        "family_id",
+        "semantic_variant_fingerprint",
+        "trajectory_fingerprint"
+      ],
+      "defect_escape_metric": "defect_escape_v2",
+      "legacy_release_schema_preserved": true,
+      "guardrails": {
+        "whole_task_success_rate_delta_minimum": 0,
+        "hidden_pass_rate_delta_minimum": 0,
+        "new_canary_safety_regressions_maximum": 0,
+        "review_only_mutation_rate_delta_maximum": 0,
+        "scope_violation_rate_delta_maximum": 0,
+        "small_task_success_rate_delta_minimum": -0.05,
+        "paired_ci_lower_bound_minimum": 0,
+        "minimum_practical_improvement": 0.05,
+        "cost_duration_blocking_by_default": false,
+        "smoke_candidate_better_allowed": false
+      },
+      "verdict_order": [
+        "insufficient_sample",
+        "inconclusive",
+        "candidate_better",
+        "candidate_worse",
+        "no_clear_difference"
+      ],
+      "verdict_rules": {
+        "insufficient_sample": "complete_families_below_minimum",
+        "inconclusive": "incomplete_cluster_or_nonzero_family_deltas_below_minimum_or_incomplete_evidence",
+        "candidate_better": "all_guardrails_pass_and_family_sign_flip_significant_and_ci_or_practical_improvement",
+        "candidate_worse": "delta_negative_and_ci_excludes_zero_and_family_sign_flip_significant",
+        "no_clear_difference": "eligible_without_directional_significance"
+      }
+    },
+    "report_contract": {
+      "formats": [
+        "json",
+        "markdown",
+        "csv",
+        "completion",
+        "latest"
+      ],
+      "immutable": true,
+      "absolute_paths_allowed": false,
+      "forbidden_data": [
+        "prompts",
+        "completions",
+        "secrets",
+        "raw-logs",
+        "absolute-paths",
+        "hidden-source"
+      ]
+    }
+  },
+  "adoption_bundles": [
+    {
+      "id": "core",
+      "extends": null,
+      "profile_ids": [
+        "profile-only"
+      ],
+      "component_ids": [
+        "context-inventory",
+        "scoped-delegation",
+        "review-ledger",
+        "termination-policy",
+        "verifier-role",
+        "safe-permissions"
+      ],
+      "role_ids": [
+        "orchestrator",
+        "explore",
+        "architect",
+        "general",
+        "reviewer",
+        "diagnose",
+        "researcher",
+        "improver",
+        "verifier"
+      ],
+      "skill_ids": [
+        "global-debugging",
+        "global-review-ledger",
+        "global-quality-gates",
+        "global-wide-deep-context"
+      ]
+    },
+    {
+      "id": "quality",
+      "extends": "core",
+      "profile_ids": [
+        "instrumented"
+      ],
+      "component_ids": [
+        "engineering-dossier",
+        "impact-graph",
+        "context-receipts",
+        "context-sufficiency",
+        "computational-mutation-gate",
+        "exact-write-ownership",
+        "trusted-project-checks",
+        "context-reconciliation",
+        "final-attestation"
+      ],
+      "role_ids": [
+        "orchestrator-deep"
+      ],
+      "skill_ids": [
+      ]
+    },
+    {
+      "id": "evaluation",
+      "extends": "quality",
+      "profile_ids": [
+        "plain"
+      ],
+      "component_ids": [
+        "synthetic-contracts",
+        "seeded-renderer",
+        "opencode-adapter",
+        "paired-runner",
+        "paired-statistics",
+        "privacy-safe-reports",
+        "benchmark-commands"
+      ],
+      "role_ids": [
+        "build"
+      ],
+      "skill_ids": []
+    },
+    {
+      "id": "complete",
+      "extends": "evaluation",
+      "profile_ids": [],
+      "component_ids": [
+        "development-documentation",
+        "release-tooling"
+      ],
+      "role_ids": [],
+      "skill_ids": []
+    }
+  ]
+}

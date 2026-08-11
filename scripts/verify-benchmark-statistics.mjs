@@ -22,6 +22,7 @@ import {
 } from "../lib/benchmark/opencode-adapter.mjs";
 import {
   analyzeSyntheticRunReport,
+  exactTwoSidedFamilySignFlip,
   exactTwoSidedMcNemar,
   macroFamilyPairedRate,
   validateSyntheticComparisonReport,
@@ -122,7 +123,7 @@ function runResult({
   role,
   instance,
 }) {
-  const suffix = `${familyId}-${repetition}-${role}`;
+  const suffix = `${familyId}-${instance.semantic_variant_id}-${repetition}-${role}`;
   const safeSuffix = fp(suffix).slice(7, 23);
   const reviewOnly = familyId === "review-read-only";
   const hiddenCheck = success ? passedOutcome() : failedOutcome("hidden_failure");
@@ -137,6 +138,10 @@ function runResult({
     adapter_evidence_observed: true,
     adapter_completed_correctly: true,
     agent_reported_success: true,
+    claimed_completion: true,
+    claimed_outcome_availability: "available",
+    explicit_block: false,
+    explicit_failure: false,
     termination_acceptable: true,
     visible_check: passedOutcome(),
     hidden_check: hiddenCheck,
@@ -152,6 +157,7 @@ function runResult({
     evidence_complete: true,
     whole_task_success: success,
     defect_escape_v2: !success,
+    false_block: null,
     audit_evidence: auditEvidence(profileId, suffix, instance, success),
     fingerprints: {
       adapter: syntheticOpenCodeAdapterFingerprint(),
@@ -160,8 +166,12 @@ function runResult({
       trace: fp(`trace-${suffix}`),
     },
     metrics: {
-      tool_call_count: role === "baseline" ? 2 : 3,
+      total_tool_call_count: role === "baseline" ? 2 : 3,
+      task_action_call_count: role === "baseline" ? 2 : 3,
+      computational_control_call_count: 0,
       subagent_call_count: 0,
+      discretionary_delegation_count: 0,
+      runner_assigned_delegation_count: 0,
       context_read_count: null,
       permission_request_count: null,
       model_turn_count: role === "baseline" ? 1 : 2,
@@ -186,29 +196,32 @@ function runResult({
   };
 }
 
-function successPattern(mode, familyIndex, repetition) {
+function successPattern(mode, familyIndex, semanticVariantIndex) {
   if (mode === "better") {
     return {
-      baseline: repetition !== 1,
+      baseline: semanticVariantIndex !== 1,
       candidate: true,
     };
   }
   if (mode === "worse") {
     return {
       baseline: true,
-      candidate: repetition !== 1,
+      candidate: semanticVariantIndex !== 1,
     };
   }
   if (mode === "inconclusive") {
     return {
-      baseline: !(familyIndex < 8 && repetition === 1),
+      baseline: familyIndex !== 0,
       candidate: true,
     };
   }
+  if (mode === "pseudoreplication") {
+    return { baseline: familyIndex >= 5, candidate: true };
+  }
   if (mode === "balanced") {
-    if (familyIndex < 5 && repetition === 1) return { baseline: false, candidate: true };
-    if (familyIndex >= 5 && familyIndex < 10 && repetition === 1) return { baseline: true, candidate: false };
-    return { baseline: true, candidate: true };
+    return familyIndex < 6
+      ? { baseline: false, candidate: true }
+      : { baseline: true, candidate: false };
   }
   throw new Error(`unknown fixture mode ${mode}`);
 }
@@ -231,6 +244,11 @@ export function createStatisticsFixtureReport(contracts, {
     timeout_ms: 60_000,
     limits_fingerprint: fp("limits"),
     adapter_protocol_version: SYNTHETIC_OPENCODE_ADAPTER_VERSION,
+    executable_fingerprint: fp("executable"),
+    executable_version: "1.17.0",
+    executable_basename: "opencode",
+    executable_platform: "linux",
+    executable_identity_policy_version: 2,
     model_tool_availability: {
       opencode: "available",
       model: "available",
@@ -238,13 +256,16 @@ export function createStatisticsFixtureReport(contracts, {
     },
   };
   const instances = suite.family_ids.flatMap((familyId) => (
-    Array.from({ length: suite.repetitions }, (_, index) => renderSyntheticInstance({
-      contracts,
-      templateSet,
-      familyId,
-      seed: "statistics-self-test",
-      repetition: index + 1,
-    }))
+    Array.from({ length: suite.semantic_variants }, (_, semanticIndex) => (
+      Array.from({ length: suite.trajectory_repetitions }, (_, trajectoryIndex) => renderSyntheticInstance({
+        contracts,
+        templateSet,
+        familyId,
+        seed: "statistics-self-test",
+        semanticVariantIndex: semanticIndex + 1,
+        repetition: trajectoryIndex + 1,
+      }))
+    )).flat()
   ));
   const orderByPairId = new Map(counterbalancedProfileSchedule({
     seed: "statistics-self-test",
@@ -266,15 +287,23 @@ export function createStatisticsFixtureReport(contracts, {
       category: family.category,
       risk: family.risk,
       source_class: instance.source_class,
+      semantic_variant_id: instance.semantic_variant_id,
+      semantic_variant_fingerprint: instance.semantic_variant_fingerprint,
+      trajectory_id: instance.trajectory_id,
+      trajectory_fingerprint: instance.trajectory_fingerprint,
       generated_fixture_fingerprint: generatedFixtureFingerprint,
-      repetition,
+      trajectory_repetition: repetition,
     };
-    const pattern = successPattern(mode, familyIndex, repetition);
+    const pattern = successPattern(mode, familyIndex, instance.semantic_variant_index);
     const currentPairId = fingerprint({
-      schema: "synthetic-pair-identity-v1",
+      schema: "synthetic-pair-identity-v2",
       family_id: familyId,
+      semantic_variant_id: instance.semantic_variant_id,
+      semantic_variant_fingerprint: instance.semantic_variant_fingerprint,
+      trajectory_id: instance.trajectory_id,
+      trajectory_fingerprint: instance.trajectory_fingerprint,
       generated_fixture_fingerprint: generatedFixtureFingerprint,
-      repetition,
+      trajectory_repetition: repetition,
     });
     pairs.push({
       pair_id: currentPairId,
@@ -287,6 +316,11 @@ export function createStatisticsFixtureReport(contracts, {
         effective_public_input_fingerprint: syntheticEffectivePublicInputFingerprint(instance),
         initial_public_manifest_fingerprint: fp(`initial-${familyId}-${repetition}`),
         model_fingerprint: modelFingerprint(execution),
+        executable_fingerprint: execution.executable_fingerprint,
+        executable_version: execution.executable_version,
+        executable_basename: execution.executable_basename,
+        executable_platform: execution.executable_platform,
+        executable_identity_policy_version: execution.executable_identity_policy_version,
         timeout_ms: execution.timeout_ms,
         limits_fingerprint: execution.limits_fingerprint,
         adapter_protocol_version: execution.adapter_protocol_version,
@@ -314,7 +348,7 @@ export function createStatisticsFixtureReport(contracts, {
     });
   }
   return {
-    schema_version: 3,
+    schema_version: 4,
     report_kind: "synthetic-paired-run",
     run_id: `statistics-${suiteId}-${mode}`,
     generation_id: "generation-statistics-self-test",
@@ -326,7 +360,8 @@ export function createStatisticsFixtureReport(contracts, {
       comparison_policy_fingerprint: contracts.fingerprints.comparison_policy,
       profile_inventory_fingerprint: contracts.fingerprints.inventory,
       seed: "statistics-self-test",
-      repetitions: suite.repetitions,
+      semantic_variants: suite.semantic_variants,
+      trajectory_repetitions: suite.trajectory_repetitions,
       declared_pair_count: pairs.length,
     },
     execution,
@@ -380,6 +415,12 @@ export function verifyBenchmarkStatistics({ root = defaultRoot } = {}) {
   assert.equal(macro.candidate_rate, 0.5);
   assert.equal(macro.delta, 0);
   assert.equal(exactTwoSidedMcNemar(12, 0), 0.00048828125);
+  assert.deepEqual(exactTwoSidedFamilySignFlip([1, 1, 1, 1, 1, 1]), {
+    p_value: 0.03125,
+    enumerations: 64,
+    nonzero_family_deltas: 6,
+  });
+  assert.equal(exactTwoSidedFamilySignFlip([1, 1, 1, 1, 1]).p_value, 0.0625);
 
   const betterReport = fixtureReport({ mode: "better" });
   assert.throws(
@@ -436,48 +477,89 @@ export function verifyBenchmarkStatistics({ root = defaultRoot } = {}) {
     {
       lower: metadataOnlyReplay.primary.bootstrap.lower,
       upper: metadataOnlyReplay.primary.bootstrap.upper,
-      mcnemar: metadataOnlyReplay.primary.mcnemar,
+      family_sign_flip: metadataOnlyReplay.primary.family_sign_flip,
+      diagnostic_mcnemar: metadataOnlyReplay.diagnostics.mcnemar,
       verdict: metadataOnlyReplay.verdict,
     },
     {
       lower: better.primary.bootstrap.lower,
       upper: better.primary.bootstrap.upper,
-      mcnemar: better.primary.mcnemar,
+      family_sign_flip: better.primary.family_sign_flip,
+      diagnostic_mcnemar: better.diagnostics.mcnemar,
       verdict: better.verdict,
     },
   );
   assert.equal(better.verdict.status, "candidate_better");
+  assert.equal(better.source.executable_fingerprint, betterReport.execution.executable_fingerprint);
   assert.equal(better.primary.metric, "task_correct");
-  assert.equal(better.sample.complete_pairs, 36);
-  assert.equal(better.sample.discordant_pairs, 12);
-  assert.deepEqual(better.primary.paired_outcomes, {
-    both_pass: 24,
+  assert.equal(better.sample.complete_pairs, 72);
+  assert.equal(better.sample.complete_families, 12);
+  assert.equal(better.sample.complete_semantic_variants, 36);
+  assert.equal(better.sample.discordant_pairs, 24);
+  assert.deepEqual(better.diagnostics.raw_pair_paired_outcomes, {
+    both_pass: 48,
     baseline_only: 0,
-    candidate_only: 12,
+    candidate_only: 24,
     both_fail: 0,
   });
   assert.equal(better.primary.bootstrap.status, "computed");
   assert.equal(better.primary.bootstrap.resamples, 10_000);
   assert(better.primary.bootstrap.lower > 0);
-  assert.equal(better.primary.mcnemar.status, "computed");
-  assert.equal(better.primary.mcnemar.p_value, 0.00048828125);
-  assert.equal(better.primary.mcnemar.significant, true);
+  assert.equal(better.primary.family_sign_flip.status, "computed");
+  assert.equal(better.primary.family_sign_flip.p_value, 0.00048828125);
+  assert.equal(better.primary.family_sign_flip.significant, true);
+  assert.equal(better.diagnostics.mcnemar.significant, true);
   assert.equal(better.guardrails.every((entry) => entry.status === "passed"), true);
   assert.equal(better.breakdowns.by_family.length, 12);
   assert(better.breakdowns.by_category.length > 1);
   assert.deepEqual(better.breakdowns.by_risk.map((entry) => entry.id), ["critical", "high", "standard"]);
   assert.deepEqual(
     better.breakdowns.by_source_class.map((entry) => [entry.id, entry.complete_pairs]),
-    [["project-authored", 27], ["public-benchmark-adaptation", 9]],
+    [["project-authored", 54], ["public-benchmark-adaptation", 18]],
   );
   assert.equal(metricById(better, "whole_task_success").candidate_rate, 1);
   assert.equal(countMetricById(better, "duration_ms").delta, 2);
   assert.equal(countMetricById(better, "model_turn_count").delta, 1);
   assert.equal(countMetricById(better, "continuation_turn_count").delta, 1);
+  assert.equal(countMetricById(better, "task_action_call_count").delta, 1);
+  assert.equal(countMetricById(better, "computational_control_call_count").delta, 0);
+  assert.equal(countMetricById(better, "discretionary_delegation_count").delta, 0);
+  assert.equal(countMetricById(better, "runner_assigned_delegation_count").delta, 0);
   assert.equal(countMetricById(better, "cost_usd").availability, "unavailable");
   assert.equal(better.pareto.cost_overhead, null);
   assert.equal(metricById(better, "incomplete_evidence").pair_scope, "reported_pairs");
   assert.equal(metricById(better, "incomplete_evidence").candidate_rate, 0);
+  assert.equal(metricById(better, "false_block").availability, "unavailable");
+  const legacyRun = fixtureReport({ mode: "better" });
+  legacyRun.schema_version = 3;
+  assert.throws(
+    () => analyzeReport(legacyRun),
+    (error) => error?.code === "SYNTHETIC_REPORT_VERSION",
+  );
+
+  const explicitOutcomeReport = fixtureReport({ mode: "better" });
+  const explicitOutcomePair = explicitOutcomeReport.pairs.find(
+    (pair) => pair.baseline.task_correct && pair.candidate.task_correct,
+  );
+  assert(explicitOutcomePair);
+  for (const result of [
+    explicitOutcomePair.baseline,
+    explicitOutcomePair.candidate,
+  ]) {
+    Object.assign(result, {
+      agent_reported_success: false,
+      claimed_completion: false,
+      claimed_outcome_availability: "available",
+      explicit_block: true,
+      explicit_failure: false,
+      false_block: true,
+    });
+  }
+  const explicitOutcomeComparison = analyzeReport(explicitOutcomeReport);
+  assert.equal(metricById(explicitOutcomeComparison, "false_block").availability, "available");
+  assert.equal(metricById(explicitOutcomeComparison, "false_block").applicable_pairs, 1);
+  assert.equal(metricById(explicitOutcomeComparison, "false_block").baseline_rate, 1);
+  assert.equal(metricById(explicitOutcomeComparison, "false_block").candidate_rate, 1);
 
   const oracleTimeoutReport = fixtureReport({ mode: "better" });
   const oracleTimeoutResult = oracleTimeoutReport.pairs[0].candidate;
@@ -488,7 +570,7 @@ export function verifyBenchmarkStatistics({ root = defaultRoot } = {}) {
   oracleTimeoutResult.defect_escape_v2 = true;
   const oracleTimeout = analyzeReport(oracleTimeoutReport);
   assert.equal(metricById(oracleTimeout, "timeout").candidate_rate, 0);
-  assert.equal(metricById(oracleTimeout, "oracle_check_timeout").candidate_rate, 1 / 36);
+  assert.equal(metricById(oracleTimeout, "oracle_check_timeout").candidate_rate, 1 / 72);
 
   const treatmentDivergenceReport = fixtureReport({ mode: "better" });
   const treatmentDivergenceResult = treatmentDivergenceReport.pairs[0].candidate;
@@ -524,18 +606,26 @@ export function verifyBenchmarkStatistics({ root = defaultRoot } = {}) {
   const worse = analyzeReport(fixtureReport({ mode: "worse" }));
   assert.equal(worse.verdict.status, "candidate_worse");
   assert(worse.primary.bootstrap.upper < 0);
-  assert.equal(worse.primary.paired_outcomes.baseline_only, 12);
-  assert.equal(worse.pareto.scope_safety_regressions.new_canary_safety_regressions, 12);
+  assert.equal(worse.diagnostics.raw_pair_paired_outcomes.baseline_only, 24);
+  assert.equal(worse.pareto.scope_safety_regressions.new_canary_safety_regressions, 24);
 
   const inconclusive = analyzeReport(fixtureReport({ mode: "inconclusive" }));
   assert.equal(inconclusive.verdict.status, "inconclusive");
-  assert.equal(inconclusive.primary.mcnemar.status, "insufficient_discordance");
-  assert.equal(inconclusive.sample.discordant_pairs, 8);
+  assert.equal(inconclusive.primary.family_sign_flip.status, "insufficient_nonzero_families");
+  assert.equal(inconclusive.sample.nonzero_family_deltas, 1);
+  assert.equal(inconclusive.diagnostics.mcnemar.significant, true);
+  assert.equal(inconclusive.diagnostics.mcnemar.p_value, 0.03125);
+
+  const pseudoreplication = analyzeReport(fixtureReport({ mode: "pseudoreplication" }));
+  assert.equal(pseudoreplication.verdict.status, "inconclusive");
+  assert.equal(pseudoreplication.sample.nonzero_family_deltas, 5);
+  assert.equal(pseudoreplication.primary.family_sign_flip.status, "insufficient_nonzero_families");
+  assert.equal(pseudoreplication.diagnostics.mcnemar.significant, true);
 
   const noClear = analyzeReport(fixtureReport({ mode: "balanced" }));
   assert.equal(noClear.verdict.status, "no_clear_difference");
-  assert.equal(noClear.primary.mcnemar.status, "computed");
-  assert.equal(noClear.primary.mcnemar.p_value, 1);
+  assert.equal(noClear.primary.family_sign_flip.status, "computed");
+  assert.equal(noClear.primary.family_sign_flip.p_value, 1);
   assert.equal(noClear.primary.delta, 0);
 
   const insufficient = analyzeReport(fixtureReport({
@@ -547,14 +637,38 @@ export function verifyBenchmarkStatistics({ root = defaultRoot } = {}) {
   assert.equal(insufficient.primary.bootstrap.lower, null);
   assert(insufficient.residual_caveats.includes("smoke-not-eligible-for-candidate-better"));
 
+  const micro = analyzeReport(fixtureReport({
+    mode: "better",
+    suiteId: "micro",
+  }));
+  assert.equal(micro.source.suite_id, "micro");
+  assert.equal(micro.sample.declared_pairs, 4);
+  assert.equal(micro.verdict.status, "insufficient_sample");
+  assert.equal(micro.primary.bootstrap.status, "insufficient_sample");
+  assert(micro.residual_caveats.includes("micro-not-eligible-for-candidate-better"));
+
   const stalePolicy = fixtureReport({ mode: "better" });
   stalePolicy.suite.comparison_policy_fingerprint = fp("stale-policy");
   assert.throws(
     () => analyzeReport(stalePolicy),
     (error) => error?.code === "SYNTHETIC_REPORT_SOURCE_BINDING",
   );
+  const incompleteClusterReport = fixtureReport({ mode: "better" });
+  incompleteClusterReport.complete = false;
+  incompleteClusterReport.incomplete_reasons = ["pair-evidence-incomplete"];
+  incompleteClusterReport.pairs[0].complete = false;
+  incompleteClusterReport.pairs[0].incomplete_reasons = ["baseline-evidence-incomplete"];
+  const incompleteCluster = analyzeReport(incompleteClusterReport);
+  assert.equal(incompleteCluster.verdict.status, "inconclusive");
+  assert.deepEqual(incompleteCluster.verdict.reasons, ["incomplete-cluster"]);
+  assert.equal(incompleteCluster.primary.bootstrap.status, "incomplete_cluster");
+  assert.equal(incompleteCluster.primary.family_sign_flip.status, "incomplete_cluster");
+  assert.equal(incompleteCluster.sample.complete_families, 11);
+  assert.equal(incompleteCluster.sample.incomplete_families, 1);
+  assert.equal(incompleteCluster.sample.excluded_complete_pairs, 5);
+
   const inconsistentOutput = structuredClone(better);
-  inconsistentOutput.primary.paired_outcomes.candidate_only += 1;
+  inconsistentOutput.diagnostics.raw_pair_paired_outcomes.candidate_only += 1;
   assert.throws(
     () => validateSyntheticComparisonReport(inconsistentOutput, {
       report: betterReport,
@@ -573,6 +687,12 @@ export function verifyBenchmarkStatistics({ root = defaultRoot } = {}) {
       (error) => error?.code === code,
     );
   };
+  assertTamperRejected(
+    (comparison) => {
+      comparison.source.executable_fingerprint = fp("forged-executable");
+    },
+    "SYNTHETIC_COMPARISON_CANONICAL",
+  );
   assertTamperRejected(
     (comparison) => {
       comparison.guardrails[0].status = "failed";

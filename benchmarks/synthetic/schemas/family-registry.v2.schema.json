@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opencode-harness.invalid/schemas/synthetic-family-registry-v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "schema_path",
+    "inventory_path",
+    "view"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 2
+    },
+    "schema_path": {
+      "const": "benchmarks/synthetic/schemas/family-registry.v2.schema.json"
+    },
+    "inventory_path": {
+      "const": "profiles/inventory.v2.json"
+    },
+    "view": {
+      "const": "benchmark.families"
+    }
+  }
+}

@@ -32,6 +32,7 @@ export const MAX_DETERMINISTIC_STAGE_TIMEOUT_MS = 20 * 60 * 1000;
 
 export const DETERMINISTIC_STAGE_REGISTRY = Object.freeze([
   { command_id: "verify-static", npm_script: "verify:static", check_ids: ["documentation-attribution-boundary", "tracked-artifact-boundary", "model-frontmatter-documentation"] },
+  { command_id: "verify-benchmark-model-free", npm_script: "verify:benchmark:model-free", check_ids: [] },
   { command_id: "verify-feedback-foundation", npm_script: "verify:feedback-foundation", check_ids: [] },
   { command_id: "verify-trace-store", npm_script: "verify:trace-store", check_ids: [] },
   { command_id: "verify-report-history", npm_script: "verify:report-history", check_ids: [] },

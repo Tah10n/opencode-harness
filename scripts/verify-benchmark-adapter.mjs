@@ -9,10 +9,12 @@ import {
   classifyOpenCodeStructuredProviderFailure,
   DEFAULT_OPENCODE_STDOUT_LIMIT,
   executeOpenCodeAdapter,
+  assertSyntheticOpenCodeExecutableIdentity,
   MINIMUM_SUPPORTED_OPENCODE_VERSION,
   parseOpenCodeJsonl,
   parseOpenCodeVersion,
   resolveSyntheticOpenCodeExecutable,
+  resolveSyntheticOpenCodeExecutableIdentity,
   SUPPORTED_SYNTHETIC_OPENCODE_TOOL_IDS,
   syntheticObservedPathFingerprint,
   syntheticOpenCodeStartupTimeouts,
@@ -50,7 +52,7 @@ function executableResolutionFixtures() {
     assert.equal(resolveSyntheticOpenCodeExecutable({
       sourceEnvironment: {},
       platform: "linux",
-    }), "opencode");
+    }), null);
     assert.equal(resolveSyntheticOpenCodeExecutable({
       sourceEnvironment: {},
       platform: "win32",
@@ -71,7 +73,68 @@ function executableResolutionFixtures() {
       sourceEnvironment: { PATH: `${directBin};${npmBin}` },
       platform: "win32",
     }), fs.realpathSync.native(directExecutable));
-    return 4;
+    const shimBin = path.join(fixtureRoot, "shim-bin");
+    const shimTarget = path.join(shimBin, "node_modules", "opencode-ai", "bin", "opencode");
+    fs.mkdirSync(path.dirname(shimTarget), { recursive: true });
+    fs.writeFileSync(shimTarget, "console.log('fixture');\n", "utf8");
+    fs.writeFileSync(
+      path.join(shimBin, "opencode.cmd"),
+      '@echo off\r\n"%dp0%\\node.exe" "%dp0%\\node_modules\\opencode-ai\\bin\\opencode" %*\r\n',
+      "utf8",
+    );
+    const shimIdentity = resolveSyntheticOpenCodeExecutableIdentity({
+      sourceEnvironment: { PATH: shimBin },
+      platform: "win32",
+    });
+    assert(shimIdentity);
+    assert.equal(shimIdentity.launch_kind, "node-shim");
+    assert.equal(shimIdentity.launch_executable, fs.realpathSync.native(process.execPath));
+    assert.deepEqual(shimIdentity.launch_args_prefix, [fs.realpathSync.native(shimTarget)]);
+    assert.equal(JSON.stringify({ fingerprint: shimIdentity.fingerprint }).includes(fixtureRoot), false);
+    assert.equal(assertSyntheticOpenCodeExecutableIdentity(shimIdentity), shimIdentity);
+    fs.appendFileSync(shimTarget, "// drift\n", "utf8");
+    assert.throws(
+      () => assertSyntheticOpenCodeExecutableIdentity(shimIdentity),
+      (error) => error?.code === "SYNTHETIC_OPENCODE_EXECUTABLE_DRIFT",
+    );
+    const posixBin = path.join(fixtureRoot, "posix-bin");
+    const posixExecutable = path.join(posixBin, "opencode");
+    fs.mkdirSync(posixBin);
+    fs.writeFileSync(posixExecutable, "#!/bin/sh\nexit 0\n", "utf8");
+    fs.chmodSync(posixExecutable, 0o755);
+    const posixIdentity = resolveSyntheticOpenCodeExecutableIdentity({
+      platform: "linux",
+      pathEntries: [posixBin],
+    });
+    assert(posixIdentity);
+    assert.equal(posixIdentity.launch_executable, fs.realpathSync.native(posixExecutable));
+    assert.equal(posixIdentity.platform, "linux");
+    assert.equal(posixIdentity.basename, "opencode");
+    const linkedBin = path.join(fixtureRoot, "linked-posix-bin");
+    fs.symlinkSync(posixBin, linkedBin, process.platform === "win32" ? "junction" : "dir");
+    const symlinkIdentity = resolveSyntheticOpenCodeExecutableIdentity({
+      platform: "linux",
+      pathEntries: [linkedBin],
+    });
+    assert(symlinkIdentity);
+    assert.equal(symlinkIdentity.launch_executable, posixIdentity.launch_executable);
+    assert.equal(symlinkIdentity.fingerprint, posixIdentity.fingerprint);
+    if (process.platform !== "win32") {
+      fs.chmodSync(posixExecutable, 0o644);
+      assert.throws(
+        () => assertSyntheticOpenCodeExecutableIdentity(posixIdentity),
+        (error) => error?.code === "SYNTHETIC_OPENCODE_EXECUTABLE_DRIFT",
+      );
+      assert.equal(resolveSyntheticOpenCodeExecutableIdentity({
+        platform: "linux",
+        pathEntries: [posixBin],
+      }), null);
+    }
+    assert.equal(resolveSyntheticOpenCodeExecutableIdentity({
+      platform: "linux",
+      pathEntries: Array.from({ length: 257 }, () => posixBin),
+    }), null);
+    return 10;
   } finally {
     fs.rmSync(fixtureRoot, { recursive: true, force: true });
   }
@@ -591,8 +654,13 @@ function parserFixtures(root) {
     state: "completed",
     error_codes: [],
     delegated_agent: "architect",
-    runner_assignment_tool: "quality_architecture_evaluate",
+    runner_assignment_tool: null,
   });
+  assert.equal(
+    runnerAssignedSubagent.trace_summary.delegation_count,
+    1,
+    "model-controlled runner assignment markers must remain ordinary delegations",
+  );
   assert.equal(JSON.stringify(runnerAssignedSubagent).includes("bounded task"), false);
 
   const verification = parseOpenCodeJsonl(jsonl(
@@ -1511,6 +1579,18 @@ async function executionFixtures(root, plainProfile, instrumentedProfile) {
   const invalidFinalCli = writeFakeOpenCode(fixtureRoot, "fake-opencode-invalid-final", {
     stream: jsonl(finalEvent("ordinary prose")),
   });
+  const explicitBlockedCli = writeFakeOpenCode(fixtureRoot, "fake-opencode-explicit-blocked", {
+    stream: jsonl(finalEvent(agentResponse({ agentOutcome: "blocked" }))),
+  });
+  const emptyFinalCli = writeFakeOpenCode(fixtureRoot, "fake-opencode-empty-final", {
+    stream: jsonl(finalEvent("")),
+  });
+  const truncatedFinalCli = writeFakeOpenCode(fixtureRoot, "fake-opencode-truncated-final", {
+    stream: finalEvent("truncated response"),
+  });
+  const limitedFinalCli = writeFakeOpenCode(fixtureRoot, "fake-opencode-limited-final", {
+    stream: jsonl(finalEvent("x".repeat(2_048))),
+  });
   const nonzeroCli = writeFakeOpenCode(fixtureRoot, "fake-opencode-nonzero", {
     mode: "nonzero",
   });
@@ -1737,6 +1817,43 @@ async function executionFixtures(root, plainProfile, instrumentedProfile) {
     assert.equal(JSON.stringify(invocations).includes(apiSecretCanary), false);
     assert.equal(JSON.stringify(success).includes(oauthSecretCanary), false);
     assert.equal(JSON.stringify(success).includes(apiSecretCanary), false);
+
+    const driftShimBin = path.join(fixtureRoot, "drift-shim-bin");
+    const driftShimTarget = path.join(
+      driftShimBin,
+      "node_modules",
+      "opencode-ai",
+      "bin",
+      "opencode",
+    );
+    fs.mkdirSync(path.dirname(driftShimTarget), { recursive: true });
+    fs.copyFileSync(fakeCli, driftShimTarget);
+    fs.writeFileSync(
+      path.join(driftShimBin, "opencode.cmd"),
+      '@echo off\r\n"%dp0%\\node.exe" "%dp0%\\node_modules\\opencode-ai\\bin\\opencode" %*\r\n',
+      "utf8",
+    );
+    const driftIdentity = resolveSyntheticOpenCodeExecutableIdentity({
+      sourceEnvironment: { PATH: driftShimBin },
+      platform: "win32",
+    });
+    assert(driftIdentity);
+    let driftSpawnCount = 0;
+    await assert.rejects(
+      executeOpenCodeAdapter(baseInput, {
+        resolvedExecutableIdentity: driftIdentity,
+        spawnImpl: (spawnExecutable, spawnArgs, spawnOptions) => {
+          const child = spawn(spawnExecutable, spawnArgs, spawnOptions);
+          driftSpawnCount += 1;
+          if (driftSpawnCount === 1) {
+            child.once("close", () => fs.appendFileSync(driftShimTarget, "// replaced\n", "utf8"));
+          }
+          return child;
+        },
+      }),
+      (error) => error?.code === "SYNTHETIC_OPENCODE_EXECUTABLE_DRIFT",
+    );
+    assert.equal(driftSpawnCount, 1, "executable drift must stop before profile bootstrap");
 
     const continuationInvocations = [];
     let continuationRunIndex = 0;
@@ -2064,6 +2181,8 @@ async function executionFixtures(root, plainProfile, instrumentedProfile) {
     assert.equal(missingFinal.reason, "opencode_missing_final");
     assert.equal(missingFinal.parser_status, "missing_final");
     assert.equal(missingFinal.agent_outcome, null);
+    assert.equal(missingFinal.claimed_completion, false);
+    assert.equal(missingFinal.claimed_outcome_availability, "unavailable");
     assert.equal(missingFinal.trace_summary.stream_complete, true);
     assert.equal(missingFinal.transient_observations.observation_complete, true);
 
@@ -2077,8 +2196,37 @@ async function executionFixtures(root, plainProfile, instrumentedProfile) {
     assert.equal(ordinaryJsonFinal.parser_status, "valid");
     assert.equal(ordinaryJsonFinal.response_protocol_status, "ordinary");
     assert.equal(ordinaryJsonFinal.agent_outcome, null);
+    assert.equal(ordinaryJsonFinal.claimed_completion, true);
+    assert.equal(ordinaryJsonFinal.claimed_outcome_availability, "unavailable");
+    assert.equal(ordinaryJsonFinal.explicit_block, false);
+    assert.equal(ordinaryJsonFinal.explicit_failure, false);
     assert.equal(ordinaryJsonFinal.trace_summary.stream_complete, true);
     assert.equal(ordinaryJsonFinal.transient_observations.observation_complete, true);
+
+    const explicitBlocked = await executeOpenCodeAdapter(baseInput, {
+      executable: process.execPath,
+      executableArgsPrefix: [explicitBlockedCli],
+    });
+    assert.equal(explicitBlocked.passed, true);
+    assert.equal(explicitBlocked.claimed_completion, false);
+    assert.equal(explicitBlocked.claimed_outcome_availability, "available");
+    assert.equal(explicitBlocked.explicit_block, true);
+    assert.equal(explicitBlocked.explicit_failure, false);
+
+    for (const [cli, expectedReason] of [
+      [emptyFinalCli, "opencode_missing_final"],
+      [truncatedFinalCli, "opencode_partial_stream"],
+      [limitedFinalCli, "opencode_final_protocol_incompatible"],
+    ]) {
+      const boundedFinal = await executeOpenCodeAdapter(baseInput, {
+        executable: process.execPath,
+        executableArgsPrefix: [cli],
+        ...(cli === limitedFinalCli ? { limits: { finalResponseBytes: 1_024 } } : {}),
+      });
+      assert.equal(boundedFinal.passed, false);
+      assert.equal(boundedFinal.reason, expectedReason);
+      assert.equal(boundedFinal.claimed_completion, false);
+    }
     for (const [index, invocation] of invocations.entries()) {
       assert.equal(invocation.options.shell, false);
       assert.equal(
@@ -2228,6 +2376,7 @@ async function executionFixtures(root, plainProfile, instrumentedProfile) {
     });
     assert.equal(classifiedOutputLimit.status, "failed");
     assert.equal(classifiedOutputLimit.reason, "opencode_output_limit");
+    assert.equal(classifiedOutputLimit.claimed_completion, false);
 
     const providerMismatch = await executeOpenCodeAdapter({
       ...baseInput,
@@ -2349,6 +2498,21 @@ async function executionFixtures(root, plainProfile, instrumentedProfile) {
     assert.equal(unavailable.status, "blocked_external_state");
     assert.equal(unavailable.reason, "opencode_not_found");
 
+    let modelFreeSpawnCalls = 0;
+    const modelFreeAmbient = await executeOpenCodeAdapter(baseInput, {
+      sourceEnvironment: {
+        ...process.env,
+        OPENCODE_BENCH_MODEL_FREE: "1",
+      },
+      spawnImpl: () => {
+        modelFreeSpawnCalls += 1;
+        throw new Error("model-free verification attempted to launch ambient OpenCode");
+      },
+    });
+    assert.equal(modelFreeAmbient.status, "failed");
+    assert.equal(modelFreeAmbient.reason, "model_free_live_execution_forbidden");
+    assert.equal(modelFreeSpawnCalls, 0);
+
     const rotatingCredentialBroker = createSyntheticOpenCodeCredentialBroker({
       providerId: "example",
       sourceEnvironment: {
@@ -2429,7 +2593,7 @@ async function executionFixtures(root, plainProfile, instrumentedProfile) {
     process.chdir(originalCwd);
     fs.rmSync(fixtureRoot, { recursive: true, force: true });
   }
-  return 25;
+    return 27;
 }
 
 async function productionCompositionFixtures(root, plainProfile) {
