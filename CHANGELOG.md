@@ -13,12 +13,16 @@ the feedback-plane ESM subpaths documented for the `0.3.0` target.
   both profiles.
 - Added a model-neutral synthetic ablation benchmark with honest `plain`,
   `profile-only`, and `instrumented` profiles; 16 deterministic short-task
-  families; smoke, standard, and full suites; seeded declarative rendering;
+  families; micro, smoke, standard, and full suites; seeded declarative
+  semantic variants and separate repeated trajectories;
   isolated real OpenCode execution; reproducible suite-balanced paired
   scheduling; hidden staging after verified teardown; corrected
-  `defect_escape_v2`; paired statistics; immutable privacy-safe
+  ordinary-prose completion/`defect_escape_v2`/nullable `false_block` evidence;
+  hierarchical family/semantic/trajectory bootstrap plus exact family sign
+  flips; independent finite lifecycle-overhead limits; canonical cross-platform
+  executable identity binding; immutable privacy-safe
   JSON/Markdown/CSV reports; source-bound replay; and model-free
-  validation/self-tests.
+  validation/self-tests shared through one default-verification manifest.
 - Removed the remaining blind-benchmark scoring confounds. Every arm now sees
   the same neutral exact changed-path scope, scope correctness accepts any
   allowed subset rather than requiring undisclosed paths to change, and pair
@@ -26,7 +30,7 @@ the feedback-plane ESM subpaths documented for the `0.3.0` target.
   the actual production tool and schema descriptions. Structured review uses
   one-to-one semantic concept matching with bounded path aliases and line
   tolerance, alias-aware negation/polarity rejection, and non-gating severity
-  calibration. Run report v3
+  calibration. Run report v4
   publishes bounded fingerprinted scope, control-lifecycle, and review-match
   audit evidence in JSON/Markdown/CSV, source-binds relational counts and
   outcomes, and identifies unexpected paths only with bounded SHA-256 values;

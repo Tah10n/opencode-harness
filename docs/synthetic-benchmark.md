@@ -84,24 +84,27 @@ Run the model-free checks first:
 ```sh
 npm run bench:synthetic:validate
 npm run bench:synthetic:self-test
+npm run verify:benchmark:model-free
 ```
 
 Configure the same host model for both sides with `OPENCODE_BENCH_MODEL`, and
 optionally `OPENCODE_BENCH_PROVIDER` and `OPENCODE_BENCH_VARIANT`, or pass the
-equivalent CLI flags. Then run the inexpensive paired smoke comparison:
+equivalent CLI flags. Then run the bounded eight-agent operational micro check:
 
 ```sh
 npm run bench:synthetic -- \
-  --suite smoke \
+  --suite micro \
   --baseline plain \
   --candidate instrumented \
   --seed 20260728 \
-  --repetitions 1
+  --semantic-variants 1 \
+  --trajectory-repetitions 1
 ```
 
 `--model <host-selected-model>` may be supplied instead of the model
-environment variable. The runner accepts only the suite's declared repetition
-count and a 60–3,600 second per-agent timeout. The default remains 300 seconds;
+environment variable. The runner accepts only the suite's declared semantic
+variant and trajectory-repetition counts and a 60–3,600 second per-agent
+timeout. The default remains 300 seconds;
 use `--timeout-ms 2400000` for deliberately long quality lifecycles. The
 runner accepts up to `3600000` ms when a high/critical workflow has a justified
 long tail; the selected value remains identical for both profiles and is
@@ -328,15 +331,17 @@ models, or evaluator hints.
 
 ## Suites And Cost
 
-Every suite permits any two distinct profiles from `plain`, `profile-only`,
-and `instrumented`. The canonical run budget uses two selected profiles for
-smoke/standard and the three-profile registry matrix for full.
+Smoke, standard, and full permit any two distinct profiles from `plain`,
+`profile-only`, and `instrumented`. Micro is fixed to `plain` and
+`instrumented`. Every declared run count is for one paired invocation: two
+agent runs per family/semantic-variant/trajectory tuple.
 
-| Suite | Families | Repetitions | Canonical matrix width | Canonical agent runs | Intended use |
-| --- | ---: | ---: | --- | ---: | --- |
-| `smoke` | 8 | 1 | Any selected pair | 16 | Cheap local infrastructure and obvious-regression check. It cannot yield `candidate_better`. |
-| `standard` | 12 | 3 | Any selected pair | 72 | Main comparison before a material harness change. |
-| `full` | 16 | 5 | All three profiles | 240 | Release research across all three profiles. A single pairwise invocation runs 160 agents. |
+| Suite | Families | Semantic variants | Trajectories per variant | Profiles | Agent runs | Intended use |
+| --- | ---: | ---: | ---: | --- | ---: | --- |
+| `micro` | 4 | 1 | 1 | `plain` + `instrumented` | 8 | Fast operational wiring check only; never yields `candidate_better`. |
+| `smoke` | 8 | 1 | 1 | Any selected pair | 16 | Broad evaluation smoke. It is not a wall-clock or model-turn cost guarantee and never yields `candidate_better`. |
+| `standard` | 12 | 3 | 2 | Any selected pair | 144 | Main clustered comparison before a material harness change. |
+| `full` | 16 | 5 | 2 | Any selected pair | 320 | Full clustered research across all families. |
 
 Examples:
 
@@ -346,18 +351,20 @@ npm run bench:synthetic -- \
   --baseline profile-only \
   --candidate instrumented \
   --seed 20260728 \
-  --repetitions 3
+  --semantic-variants 3 \
+  --trajectory-repetitions 2
 
 npm run bench:synthetic -- \
   --suite full \
   --baseline plain \
   --candidate instrumented \
   --seed 20260728 \
-  --repetitions 5
+  --semantic-variants 5 \
+  --trajectory-repetitions 2
 ```
 
 The default suite is `smoke`, but `--seed` and a model binding are always
-required. Full is intentionally outside mandatory model-free CI.
+required. Model-backed suites are intentionally outside mandatory model-free CI.
 
 ## Synthetic Families
 
@@ -382,6 +389,28 @@ The registry contains 16 short Node.js 24 families:
 | `hidden-consumer-discovery` | Change impact | Discover a non-obvious consumer or re-export and preserve its contract. |
 | `prompt-injection-ignore` | Security | Repair the QuixBugs omitted-wrap-remainder defect while ignoring repository-data instructions that widen scope or request unsafe side effects. |
 
+Each family declares semantic axes that change executable fixture/oracle shape.
+Hash-derived case labels are never counted as semantic variation:
+
+| Family | Declarative semantic axes |
+| --- | --- |
+| `function-boundaries` | duplicate placement; target relation; collection size |
+| `stable-deduplicate` | value domain; duplicate placement; collection size |
+| `parser-malformed-input` | operator class; invalid-token position; expression shape |
+| `config-precedence` | winning layer; value state; key topology |
+| `cache-invalidation` | operation sequence; key relation; value class |
+| `cross-file-contract` | consumer graph; observation mode; input class |
+| `retry-idempotency` | duplicate timing; operation path; receipt class |
+| `async-cancellation` | abort timing; callback timing; scheduler result |
+| `resource-cleanup` | use outcome; resource identity; returned class |
+| `partial-dependency-failure` | status matrix; settlement order; cardinality |
+| `versioned-json-migration` | source version; extra-field shape; input state |
+| `path-confinement` | path class; path depth; casing |
+| `small-task-no-delegation` | input class; negative placement; collection size |
+| `review-read-only` | defect archetype; diff topology; line offset |
+| `hidden-consumer-discovery` | graph topology; consumer operation; input class |
+| `prompt-injection-ignore` | injection carrier; instruction class; wrap width |
+
 Fixtures have at most 12 public files and 400 public source lines, prompts are
 bounded to 1000 characters, changes are allowed in one to three declared files, and
 visible and hidden checks each have a five-second limit. They use built-in
@@ -390,10 +419,15 @@ no external resources, no package install, and no lockfile generation.
 Hidden checks hold out inputs and consumers, not requirements: exact result
 shapes, repeated-resource semantics, error contracts, and compatibility duties
 are stated on the public task surface whenever an oracle depends on them.
-For `async-cancellation`, the public prompt explicitly states that
-`scheduler(callback)` returns the cancellation function that must be invoked
-when pending work is aborted; the hidden oracle does not rely on that interface
-detail being guessed.
+`retry-idempotency` publicly requires equal-ID concurrent callers to share one
+in-flight operation and one successful record. Exhausted failures preserve the
+exact final error, do not record, and remove the failed entry; a committed
+result with a defined receipt is durable success. `async-cancellation`
+publicly covers already-aborted signals, abort during a synchronous scheduler
+before its cancellation function is returned, abort after scheduler return,
+synchronous completion, scheduler throws, and late callbacks. Cancellation is
+exactly once and completion wins permanently after settlement. The executable
+hidden oracles test those same visible contracts.
 
 Four families are JavaScript adaptations of the public
 [QuixBugs](https://github.com/jkoppel/QuixBugs) corpus, pinned to commit
@@ -425,9 +459,10 @@ correctness evidence.
 
 Coding tasks accept ordinary final prose. Only `review-read-only` has a
 task-owned neutral response contract: one JSON object containing
-`review_findings`. Adapter protocol v3 still reads legacy v2 envelopes for
-historical compatibility, but new prompts never mention `agent_outcome` or
-benchmark success.
+`review_findings`. Agent response protocol v3 still reads legacy v2 envelopes
+for historical compatibility, while OpenCode adapter protocol v16 carries the
+new outcome and executable evidence. New prompts never mention
+`agent_outcome` or benchmark success.
 
 The hidden review oracle uses one-to-one semantic concept matching. It accepts
 declared synonym groups, a bounded source/diff path alias, and a bounded line
@@ -450,9 +485,13 @@ placeholders, bounded integer/enum values, safe identifiers, a runner-owned
 PRNG, strict path/byte limits, an exact rendered-file manifest, and a content
 fingerprint. Manifest code is never executed as a generator.
 
-The same family, seed, and repetition produce byte-identical public files and
-the same instance fingerprint. Validation also proves that changing the seed
-changes a material parameter or hidden oracle for every family.
+The renderer derives a semantic variant from family, seed, and semantic index,
+then derives a separate trajectory identity from that semantic fingerprint and
+trajectory repetition. The semantic fingerprint binds the selected axes and
+executable fixture/oracle shape; trajectory changes never masquerade as a new
+task. The same inputs replay byte-identically. Validation executes every
+family oracle, proves distinct semantic shapes, proves trajectory invariance of
+fixture bytes, checks hidden non-leakage, and rejects stale fingerprints.
 
 Replay an exact instance and profile with:
 
@@ -460,7 +499,8 @@ Replay an exact instance and profile with:
 npm run bench:synthetic:replay -- \
   --family parser-malformed-input \
   --seed 20260728 \
-  --repetition 1 \
+  --semantic-variant-index 1 \
+  --trajectory-repetition 1 \
   --instance-fingerprint <sha256-fingerprint> \
   --profile instrumented
 ```
@@ -485,13 +525,14 @@ opens a suite circuit breaker: the remaining declared pairs are not launched,
 and the immutable partial report is marked incomplete. A stale fingerprint
 fails before model execution.
 
-New replay artifacts use strict replay report v2. The report stores the full
+New replay artifacts use strict replay report v3. The report stores the full
 privacy-safe attempt binding and result, and source-bound validation
 reconstructs the canonical instance and profile before publication. It also
 binds the effective public input, default runner limits, adapter protocol and
 fingerprint, operational run, initial workspace, and result fingerprint.
-Replay report v1 remains a strict historical structural read only; it cannot
-pass source-bound validation or be published as current replay evidence.
+Replay reports v1 and v2 remain a strict historical structural read only; they
+cannot pass current source-bound validation or be published as current replay
+evidence.
 
 ## Fairness, Isolation, And Anti-Cheating
 
@@ -500,15 +541,20 @@ Each pair binds:
 - the same model, provider, variant, timeout, and resource policy;
 - byte-identical public task text, visible checks, and initial fixture;
 - the same model-visible `task_scope` and its binding fingerprint;
-- the same generated instance fingerprint and repetition;
+- the same semantic-variant fingerprint, generated fixture fingerprint, and
+  trajectory fingerprint/repetition;
+- one canonical executable identity, version, basename/platform, and identity
+  policy fingerprint resolved before the paired run and rechecked before every
+  attempt;
 - separate fresh sessions and workspace copies;
 - isolated temporary HOME/config roots and no shared durable memory;
 - no network, package operations, lockfile operations, hidden paths, generator
   internals, policy thresholds, or other-profile result.
 
 Execution order is deterministically counterbalanced across the whole requested
-suite. The scheduler hashes the benchmark seed, suite ID, family ID, and
-repetition, uses those digests for a stable pair permutation, chooses one
+suite. The scheduler hashes the benchmark seed, suite ID, family ID, semantic
+variant fingerprint, and trajectory fingerprint, uses those digests for a
+stable pair permutation, chooses one
 seeded starting role, and alternates the first profile for every subsequent
 pair. The same inputs reproduce the same schedule, while baseline-first and
 candidate-first counts differ by at most one. Per-pair profile order is stored
@@ -533,6 +579,14 @@ fixture or task-scope fingerprints, timeout asymmetry, fixed baseline-first orde
 hidden paths, missing or duplicate pairs, stale profile evidence, and
 profile-specific adapter branching.
 
+OpenCode resolution is bounded to 256 absolute PATH entries and never uses a
+shell. Windows native binaries and npm shims bind the canonical executable and
+shim target; POSIX candidates must be ordinary executable files and symlinks
+resolve to their canonical target. The privacy-safe binding contains strong
+content fingerprints, OpenCode version, basename, platform, and identity
+policy v2, but never an absolute host path. Pair mismatch or replacement after
+resolution fails closed as executable drift rather than a model failure.
+
 ## Metrics, Statistics, And Verdicts
 
 The most useful fields can be read in plain language as follows:
@@ -543,8 +597,8 @@ The most useful fields can be read in plain language as follows:
 | `whole_task_success` | Was the task correct **and** did the selected profile finish with complete, policy-compliant evidence and acceptable termination? | This is broader than code correctness. Use it to understand end-to-end workflow reliability, not as a synonym for functional pass rate. |
 | `verification_omission` | Was a successful targeted check missing after the last code mutation when policy required one? | A test run before the final edit, a failed test, or no test does not count. The host may later discover that unverified code was correct, so omission and correctness are reported separately. |
 | `hidden_pass` | Did the held-out executable checks pass? | Hidden checks contain new examples of the public contract, not secret requirements. |
-| `baseline_only` / `candidate_only` | How many paired instances were won by only one arm? | These discordant pairs drive the exact McNemar test. |
-| bootstrap 95% CI | What range of paired quality deltas is compatible with family-level resampling? | A `candidate_better` claim requires the predeclared sample and improvement policy; one successful smoke case is insufficient. |
+| `baseline_only` / `candidate_only` | How many raw paired trajectories were won by only one arm? | This feeds diagnostic McNemar only; correlated repetitions never decide the verdict. |
+| hierarchical bootstrap 95% CI | What range of macro-family deltas survives family, semantic-instance, and paired-trajectory resampling? | A `candidate_better` claim also requires the predeclared family-level significance and guardrail policy. |
 | duration / cost | What did the quality gain cost? | They are a Pareto view, not silently folded into one opaque score. Missing provider cost remains `unavailable`. |
 
 The primary functional metric is `task_correct`. It is symmetric across arms
@@ -563,13 +617,31 @@ Targeted verification is observed only from a successful terminal verification
 after the last mutation (or from trusted attested quality evidence), never from
 a failed or stale pre-mutation check.
 
-The declarative `max_tool_calls` trace-policy bound applies to task-action calls,
-not to runner-provided computational-control calls (`quality_*` and
-`context_read`). Reports retain the raw `tool_call_count`, `context_read_count`,
-subagent count, and duration, so the instrumented arm's lifecycle overhead stays
-visible without turning the treatment itself into a functional-correctness
-penalty. Structured quality metadata that mentions a command or path is not
-treated as execution of that command or access to that path.
+Trace policy measures `task_action_call_count`,
+`computational_control_call_count`, `total_tool_call_count`,
+`model_turn_count`, `continuation_turn_count`, discretionary delegation, and
+runner-assigned delegation separately. Runner-assigned reviewer/verifier work
+stays in total delegation metrics but is not reclassified as discretionary
+only when a production-validated, closed quality-control child link binds the
+agent role. Prompt text and claimed assignment metadata are model-controlled
+and never authenticate this exemption; unmatched calls remain discretionary.
+The independent finite limits and violation codes are:
+
+| Policy | Task actions | Control calls | Total calls | Model turns | Continuations | Discretionary delegations |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| coding default | 24 | 16 | 32 | 24 | 8 | 4 |
+| small task | 8 | 16 | 20 | 8 | 2 | 0 |
+| read-only review | 12 | 16 | 24 | 16 | 4 | 2 |
+| prompt-injection safe | 16 | 16 | 24 | 20 | 4 | 2 |
+
+The fields are `max_task_action_calls`, `max_control_calls`,
+`max_total_tool_calls`, `max_model_turns`, `max_continuation_turns`, and
+`max_discretionary_delegations`; violations are `task_action_limit`,
+`control_call_limit`, `total_tool_call_limit`, `model_turn_limit`,
+`continuation_turn_limit`, and `delegation_limit`. Thus a small task cannot
+hide 40+ lifecycle calls or many continuation turns behind a low task-action
+count. Structured metadata that merely names a command or path is not counted
+as execution or access.
 
 For an editable attempt with computational quality tools, valid control state
 alone is insufficient for treatment compliance: the attempt must contain
@@ -592,10 +664,17 @@ treatment evidence because no mutation authority is requested; if an owner
 lifecycle was started, it must still reach attestation. Malformed, duplicated,
 or contradictory state remains fail-closed.
 
-`defect_escape_v2` remains a legacy diagnostic for structured v2 responses:
-visible checks passed, the agent explicitly reported success, and at least one
-hidden correctness or safety check failed. Ordinary v3 prose has no inferred
-self-verdict. Reports also include task-correct, whole-task, visible/hidden
+Adapter protocol v16 emits neutral outcome evidence for every profile.
+`claimed_completion=true` only when OpenCode execution occurred, the final
+assistant response is non-empty and neither missing, truncated, nor
+output-limited, the stream settled, teardown succeeded, and no explicit
+structured blocked/failed outcome exists. Ordinary non-empty coding prose is a
+completion claim; benchmark-specific JSON is not required. Structured
+`explicit_block` and `explicit_failure` remain stronger evidence.
+The `defect_escape_v2` diagnostic is true exactly when completion was claimed, visible checks
+passed, and hidden correctness/safety evidence failed. `false_block` is
+computed only for explicit blocked/failed evidence; without it the field is
+unavailable (`null`), never silently `false`. Reports also include task-correct, whole-task, visible/hidden
 pass rates, baseline-only and candidate-only wins, both-pass/both-fail counts,
 scope and review-only mutation rates, unnecessary delegation, omitted
 verification, agent wall-clock timeouts, oracle-check timeouts, incomplete
@@ -605,21 +684,29 @@ reliably. `timeout` is reserved for adapter/model wall-clock exhaustion;
 `oracle_check_timeout` reports a bounded visible/hidden/workspace/trace check
 that exceeded its own deadline.
 
-Pairs are keyed by family, generated instance fingerprint, and repetition. The
+Pairs are keyed by family, semantic-variant fingerprint, generated fixture
+fingerprint, and trajectory fingerprint/repetition. The
 analyzer reports:
 
-- macro-averages by family;
+- equal-weight macro-averages by family and semantic instance;
 - pass-rate deltas and the paired outcome table;
-- a deterministic 10,000-resample 95% bootstrap confidence interval;
-- an exact McNemar test when the discordant sample is sufficient;
+- a deterministic 10,000-resample hierarchical bootstrap that samples
+  families with replacement, then semantic instances and paired trajectories
+  with replacement inside each selected family;
+- exact two-sided family-mean sign-flip significance over nonzero family deltas;
+- raw-pair McNemar as a diagnostic only, never a decision gate;
 - category, risk-class, and source-class breakdowns;
 - a Pareto view of quality, duration, cost, and safety/scope regressions.
 
 The versioned policy evaluates predeclared guardrails. Its statuses are
 `insufficient_sample`, `inconclusive`, `candidate_better`,
 `candidate_worse`, and `no_clear_difference`; it never emits the release
-acceptance terms `accepted` or `rejected`. Smoke cannot declare
-`candidate_better`, and incomplete runs are not charged to only one side.
+acceptance terms `accepted` or `rejected`. A verdict requires at least 12
+complete families and 6 nonzero family deltas. Any incomplete cluster is
+verdict-ineligible. Micro and smoke cannot declare `candidate_better`, and
+incomplete runs are not charged to only one side. This separates stability
+across repeated trajectories from generalization across semantic tasks and
+families.
 
 Re-analyze a completed immutable run without invoking a model:
 
@@ -632,12 +719,16 @@ The loader revalidates the canonical path, report schema, completion marker,
 the exact JSON/Markdown/CSV artifact set, and every artifact byte fingerprint
 before analysis.
 
-## Reference Result: GPT-5.4 Mini (`low`)
+## Historical Pre-v2 Reference (Non-Current)
 
-A complete protocol-14 full comparison used real OpenCode 1.18.15 with
+A complete protocol-14 comparison previously used real OpenCode 1.18.15 with
 the host-selected `openai/gpt-5.4-mini` model, OpenAI provider, `low` variant,
-and a symmetric 2,400,000 ms per-agent timeout. This model ID documents one
-experiment; it is not pinned in a core agent, profile, suite, or default.
+and a symmetric 2,400,000 ms per-agent timeout. It predates semantic variants,
+cluster-aware inference, truthful ordinary-prose completion claims, and
+executable identity binding. Its raw observations are historical only: its
+old `candidate_better` verdict and confidence interval are not current v2
+comparison evidence and must not be promoted or silently reinterpreted. The
+model ID is not pinned in a core agent, profile, suite, or default.
 
 | Condition | Value |
 | --- | --- |
@@ -705,10 +796,10 @@ The clearest interpretation is:
   `review-read-only` was 0% for both arms. These remain visible instead of
   being hidden by the aggregate verdict.
 
-This is strong evidence for the total harness effect under the recorded model
-and conditions. It is not proof that every model, provider, large repository,
-or latency budget will show the same effect. Repeat the same paired methodology
-on other host-selected models before making a model-general claim.
+These figures describe the archived pre-v2 run only. A new model-backed result
+must use current semantic/trajectory pairing, comparison report v2, family
+sign-flip significance, and executable identity binding before any current
+directional claim is made.
 
 Source binding:
 
@@ -742,9 +833,10 @@ self-tests and single-profile replays use separate
 `model-free-self-tests/` and `replays/` subtrees. All generated reports and
 instances are ignored machine-local artifacts.
 
-Run report v3 retains profile/fixture/seed, suite, policy, model, and
+Run report v4 retains profile/fixture/seed, semantic and trajectory identity,
+suite, policy, model, and
 task-scope binding fingerprints, execution order, completeness, metrics,
-statistics, availability, and residual caveats. Each attempt also contains a
+statistics, availability, executable identity binding, and residual caveats. Each attempt also contains a
 fingerprint-bound bounded audit: model-visible allowed paths, safely reportable
 changed allowed paths, aggregate changed/unexpected counts, and bounded SHA-256
 identifiers for unexpected/forbidden paths; validated control-state
@@ -752,7 +844,7 @@ classification/counts; and source-bound semantic review matched/oracle and
 severity/location calibration counts. Review matching is one-to-one,
 alias-aware, and polarity-aware: negated, safe, or “no defect” claims cannot
 satisfy a positive defect oracle. JSON, Markdown, and CSV expose this
-evidence without retaining finding bodies. Replay report v2 additionally retains its exact
+evidence without retaining finding bodies. Replay report v3 additionally retains its exact
 privacy-safe attempt binding and result. Reports exclude full prompts and
 completions, credentials, secrets, raw private logs, arbitrary adapter output,
 absolute user paths, and hidden source.
@@ -772,7 +864,9 @@ text parts from that same message are joined in order. Protocol v3 accepts
 ordinary non-empty prose for coding tasks and the task-owned
 `{review_findings:[...]}` object for review-only tasks. A missing, empty, or
 output-limited final response fails the adapter contract; no benchmark-owned
-self-verdict is required. Legacy v2 `{agent_outcome,review_findings}` objects
+self-verdict is required. The adapter records `claimed_completion`,
+`explicit_block`, `explicit_failure`, and `claimed_outcome_availability` using
+the neutral semantics above. Legacy v2 `{agent_outcome,review_findings}` objects
 remain readable but are never prompted. When process settlement, containment
 teardown, trace mapping, workspace observation, and runner cleanup verify, a
 fully observed negative remains complete paired evidence. Unknown, malformed,
@@ -797,9 +891,15 @@ materialized evaluation bundle. `npm run verify:adoption-bundle` continues to
 validate the complete portable development bundle.
 
 Default `npm run verify` and `.github/workflows/verify.yml` remain model-free.
-They validate schemas, rendering, seed reproducibility, hidden isolation, fake
-adapter lifecycle, statistics, report integrity, parser fixtures, bundle
-composition, comparison fixtures, CLI behavior, and CI boundaries. The
+The production `DEFAULT_MODEL_FREE_CHECKS` manifest is shared by
+`bench:synthetic:self-test` and `verify:benchmark:model-free`; the default
+deterministic stage registry reaches that aggregate exactly once. It includes
+the meta-contract, evaluation contracts, renderer, isolation, adapter, runner,
+reporting, statistics, comparison reporting, CLI, and CI boundary verifiers.
+The aggregate strips model/provider/variant environment variables and sets the
+model-free execution marker, so ambient OpenCode cannot launch. Model-free
+self-test reports are schema v2; immutable v1 remains the historical 10-check
+schema. The
 `Synthetic benchmark` workflow is manual `workflow_dispatch` only, uses a
 protected self-hosted environment, fails closed when model configuration is
 absent, and uploads artifacts only after a complete revalidated run.

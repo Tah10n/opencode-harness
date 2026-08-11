@@ -120,19 +120,21 @@ release acceptance contract. The model is never told its profile or arm;
 `profile-only` and `instrumented` receive byte-identical agent/skill prompts.
 Every arm sees the same neutral exact changed-path scope, and validation scans
 the actual materialized tool/schema descriptions for evaluator labels. Run
-report v3 binds that scope and publishes bounded scope, control-lifecycle, and
+report v4 binds that scope, semantic/trajectory identity, and the canonical
+OpenCode executable while publishing bounded scope, control-lifecycle, and
 polarity-aware semantic review-match audit evidence without raw model text or
 hidden paths. Relational validation binds counts and outcomes to the canonical
 instance; unexpected paths are exposed only as bounded SHA-256 identifiers.
 Functional `task_correct` and end-to-end `whole_task_success` are reported
 separately, including a separately labeled QuixBugs-derived source stratum.
-Validate the model-free machinery and run the
-cheap 16-agent smoke pair with:
+Validate the model-free machinery and run the bounded eight-agent micro pair
+with:
 
 ```powershell
 npm run bench:synthetic:validate
 npm run bench:synthetic:self-test
-npm run bench:synthetic -- --suite smoke --baseline plain --candidate instrumented --seed 20260728 --repetitions 1
+npm run verify:benchmark:model-free
+npm run bench:synthetic -- --suite micro --baseline plain --candidate instrumented --seed 20260728 --semantic-variants 1 --trajectory-repetitions 1
 ```
 
 Configure `OPENCODE_BENCH_MODEL` in the host or add
@@ -141,17 +143,18 @@ Configure `OPENCODE_BENCH_MODEL` in the host or add
 evidence. A completed command means the comparison evidence is complete, not
 that the candidate won. Model-free checks do not prove model quality. Paired
 execution is deterministically balanced across the whole requested suite. New
-single-profile replay artifacts use source-bound replay report v2; legacy
-replay report v1 remains readable only as historical structure.
+single-profile replay artifacts use source-bound replay report v3; legacy
+replay reports v1/v2 remain readable only as historical structure.
 No-progress provider timeouts are external-state/incomplete evidence and are
 excluded rather than scored as task failures. `task_correct` never depends on
 treatment-trace completeness; that remains visible in `trace_policy` and
 `whole_task_success`.
 
-### Reference result: GPT-5.4 Mini (`low`)
+### Historical pre-v2 result (not current evidence)
 
-Real OpenCode full suite: 16 families, 5 repetitions, 80 complete paired
-instances, 160 fresh agent sessions.
+An archived real OpenCode run used the pre-v2 repetition and raw-pair
+statistics contract: 16 families, 5 repetitions, 80 complete pairs, and 160
+fresh agent sessions.
 
 | Metric | `plain` | `instrumented` | Difference |
 | --- | ---: | ---: | ---: |
@@ -161,16 +164,17 @@ instances, 160 fresh agent sessions.
 | Verification omission | 63.75% | **2.50%** | -61.25 pp |
 | Mean agent duration | **28.6 s** | 268.5 s | +239.9 s |
 
-Primary paired 95% CI: **+8.75 to +18.75 pp**; exact McNemar
-`p=0.007385`; predeclared verdict: **`candidate_better`**. Instrumented was
-more correct and much more consistent about verification, but about 9.4 times
-slower. See the
+The old analysis reported a +8.75 to +18.75 pp interval and raw McNemar
+`p=0.007385`, but it predates semantic variants, hierarchical bootstrap,
+family sign-flip inference, truthful ordinary-prose completion evidence, and
+executable identity binding. Its directional verdict is therefore not current
+v2 evidence and is not silently reinterpreted. See the
 [full methodology and interpretation](docs/synthetic-benchmark.md#reference-result-gpt-54-mini-low)
 for per-family regressions, source strata, unavailable provider cost, and
 source-bound evidence.
 
 See [docs/synthetic-benchmark.md](docs/synthetic-benchmark.md) for the profile
-contracts, 16 families, smoke/standard/full commands, fairness and hidden-data
+contracts, 16 families, micro/smoke/standard/full commands, fairness and hidden-data
 isolation, paired statistics, report privacy, replay, manual CI, and the strict
 separation from `npm run assess:candidate`.
 
@@ -532,6 +536,7 @@ Synthetic benchmark model-free checks are also available directly:
 ```powershell
 npm run bench:synthetic:validate
 npm run bench:synthetic:self-test
+npm run verify:benchmark:model-free
 npm run verify:benchmark:ci
 ```
 

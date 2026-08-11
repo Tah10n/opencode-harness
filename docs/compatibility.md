@@ -58,12 +58,15 @@ cannot omit that preimplementation chain.
 - Trace writers emit schema version 2. Readers accept the exact documented
   schema-v1 event shape when safe, but do not reinterpret malformed legacy
   artifacts or append v2 events to a v1 stream.
-- Synthetic benchmark artifacts use separate strict schemas: paired run report
-  v2, paired comparison report v1, replay report v2, and model-free self-test
-  report v1. Replay report v2 binds the full privacy-safe attempt to canonical
-  source, profile, runner, and adapter evidence. The strict replay-report-v1
-  reader remains for historical structural inspection only; v1 cannot satisfy
-  source binding or be republished as current evidence. These schemas do not
+- Synthetic benchmark artifacts use separate strict current schemas: generated
+  instance v3, paired run report v4, paired comparison report v2, replay report
+  v3, and model-free self-test report v2. Replay report v3 binds the full
+  privacy-safe attempt to canonical source, profile, runner, adapter, semantic
+  variant, trajectory, and executable evidence. Strict replay-report-v1/v2
+  readers remain for historical structural inspection only; legacy reports
+  cannot satisfy current source binding or be republished as current evidence.
+  Model-free self-test v1 remains the immutable historical 10-check schema.
+  These schemas do not
   alter the existing live release-report readers or candidate-assessment
   evidence chain.
 - The benchmark CLI returns `blocked_external_state` with exit code 2 when a

@@ -28,6 +28,7 @@ proves only the benchmark machinery, not that a harness profile is better.
    ```sh
    npm run bench:synthetic:validate
    npm run bench:synthetic:self-test
+   npm run verify:benchmark:model-free
    ```
 
    When credentials and a compatible contained OpenCode host are explicitly
@@ -39,7 +40,8 @@ proves only the benchmark machinery, not that a harness profile is better.
      --baseline profile-only \
      --candidate instrumented \
      --seed 20260728 \
-     --repetitions 3
+     --semantic-variants 3 \
+     --trajectory-repetitions 2
    ```
 
    Record its immutable report separately. A complete result may inform

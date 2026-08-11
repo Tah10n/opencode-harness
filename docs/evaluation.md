@@ -39,18 +39,21 @@ dangerous widening, and applies a predeclared paired comparison policy.
 
 Its primary functional metric is `task_correct`; the separate
 `whole_task_success` rate retains end-to-end treatment/lifecycle compliance.
-Pairing uses family, generated instance fingerprint, and repetition. The model
+Pairing uses family, semantic-variant fingerprint, generated fixture
+fingerprint, and a separate trajectory fingerprint/repetition. The model
 is not told its profile or comparison arm. Each arm sees the same neutral exact
 changed-path scope; the scorer permits any subset inside it and leaves
 correctness to the executable visible/hidden checks. The actual materialized
 tool descriptions and schema descriptions are scanned for evaluator labels,
 not just the source prompt files. The analyzer reports family
-macro-averages, paired outcomes, deterministic bootstrap confidence intervals,
-exact McNemar tests when eligible, category/risk/source breakdowns, and a quality,
+macro-averages, paired outcomes, deterministic hierarchical bootstrap
+confidence intervals, exact family-level sign-flip inference, diagnostic-only
+raw-pair McNemar, category/risk/source breakdowns, and a quality,
 duration, cost, and safety Pareto view. It emits no release
 `accepted`/`rejected` decision.
 
-Run report v3 publishes bounded fingerprinted scope, control-lifecycle, and
+Run report v4 publishes bounded fingerprinted scope, semantic/trajectory and
+canonical-executable identity, control-lifecycle, and
 semantic review-match audit evidence. Relational validation binds scope counts
 and violation codes, control classifications and counts, and review oracle
 fingerprints/outcomes back to the canonical generated instance. Unexpected or
@@ -63,17 +66,19 @@ Model-free entrypoints:
 ```sh
 npm run bench:synthetic:validate
 npm run bench:synthetic:self-test
+npm run verify:benchmark:model-free
 ```
 
 Cheap model-backed entrypoint:
 
 ```sh
 npm run bench:synthetic -- \
-  --suite smoke \
+  --suite micro \
   --baseline plain \
   --candidate instrumented \
   --seed 20260728 \
-  --repetitions 1
+  --semantic-variants 1 \
+  --trajectory-repetitions 1
 ```
 
 Missing model/runtime configuration returns `blocked_external_state` instead

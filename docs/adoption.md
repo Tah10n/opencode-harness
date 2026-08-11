@@ -112,23 +112,23 @@ state.
 
 ## Modular Adoption Bundles
 
-`profiles/inventory.v1.json` is the canonical machine-readable source for
+`profiles/inventory.v2.json` is the canonical machine-readable source for
 profile membership, role permissions, required skills, benchmark composition,
 and adoption composition. The small manifests in `adoption/` select strict
 views from that inventory:
 
-- `adoption/core.v1.json` materializes `profile-only`: prompt-level
+- `adoption/core.v2.json` materializes `profile-only`: prompt-level
   orchestration, scoped delegation, review ledger, termination policy,
   verifier workflow, and safe permissions. Its isolated verifier proves that
   it does not pull in the synthetic corpus, `lib/benchmark/`, `lib/quality/`,
   `quality/`, or native containment;
-- `adoption/quality.v1.json` extends core with `instrumented`: the quality
+- `adoption/quality.v2.json` extends core with `instrumented`: the quality
   plugin, Engineering Dossier, context evidence, trusted checks,
   computational mutation gate, reconciliation, and attestation;
-- `adoption/evaluation.v1.json` extends quality with the honest `plain`
+- `adoption/evaluation.v2.json` extends quality with the honest `plain`
   baseline, synthetic corpus, seeded renderer, real OpenCode adapter, paired
   runner, statistics, privacy-safe reports, replay, and CLI commands;
-- `adoption/complete.v1.json` extends evaluation with the documentation and
+- `adoption/complete.v2.json` extends evaluation with the documentation and
   release tooling used to develop and publish this repository.
 
 Validate all four compositions, the isolated core boundary, the importable
