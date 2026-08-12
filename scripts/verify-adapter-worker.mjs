@@ -396,8 +396,9 @@ export async function runScenario() {
   const architecture = await context.quality.evaluateArchitecture({ expected_revision: updated.revision });
   const finalized = await context.quality.finalizeDossier({ expected_revision: updated.revision });
   const inspected = await context.quality.inspect();
+  const trusted = await context.quality.runTrustedProjectCheck({ check_id: "bounded-check" });
   const authorized = await context.quality.authorizeAction({ kind: "edit", intent: "implementation", writable: true, write_scope: ["src/app.mjs"] });
-  return { passed: architecture.status === "not_configured" && finalized.status === "passed" && inspected.ready && authorized.authorized };
+  return { passed: architecture.status === "not_configured" && finalized.status === "passed" && inspected.ready && trusted.status === "passed" && authorized.authorized };
 }
 `, "utf8");
   const qualityOperations = [];
@@ -412,6 +413,7 @@ export async function runScenario() {
       if (operation === "quality_evaluate_architecture") return { status: "not_configured" };
       if (operation === "quality_finalize_dossier") return { status: "passed" };
       if (operation === "quality_inspect") return { ready: true };
+      if (operation === "quality_run_trusted_project_check") return { status: "passed" };
       if (operation === "quality_authorize_action") return { authorized: true };
       throw new Error("unexpected operation");
     },
@@ -423,8 +425,66 @@ export async function runScenario() {
     "quality_evaluate_architecture",
     "quality_finalize_dossier",
     "quality_inspect",
+    "quality_run_trusted_project_check",
     "quality_authorize_action",
   ]);
+
+  let trustedOperationAborted = false;
+  let trustedOperationTeardownComplete = false;
+  const trustedTimeoutStartedAt = Date.now();
+  await assert.rejects(runAdapterModule({
+    adapterUrl: adapterUrl(qualityAdapter),
+    context: {},
+    timeout: 75,
+    onTrace: (operation, _payload, operationContext) => {
+      if (operation !== "quality_run_trusted_project_check") {
+        if (operation === "quality_create_dossier") return { revision: 1 };
+        if (operation === "quality_update_dossier") return { revision: 2 };
+        if (operation === "quality_evaluate_architecture") return { status: "not_configured" };
+        if (operation === "quality_finalize_dossier") return { status: "passed" };
+        if (operation === "quality_inspect") return { ready: true };
+        throw new Error("unexpected operation before delayed trusted check");
+      }
+      assert.equal(Number.isSafeInteger(operationContext.deadline_ms), true);
+      return new Promise((_resolve, reject) => {
+        operationContext.signal.addEventListener("abort", () => {
+          trustedOperationAborted = true;
+          setTimeout(() => {
+            trustedOperationTeardownComplete = true;
+            reject(Object.assign(new Error("cancelled"), { code: "QUALITY_CHECK_BROKER_CANCELLED" }));
+          }, 25);
+        }, { once: true });
+      });
+    },
+  }), (error) => error instanceof AdapterTimeoutError);
+  assert.equal(trustedOperationAborted, true);
+  assert.equal(trustedOperationTeardownComplete, true, "secondary teardown must settle before adapter rejection");
+  assert.equal(Date.now() - trustedTimeoutStartedAt < 2_000, true, "outer adapter timeout must remain authoritative");
+
+  const unresponsiveTrustedStartedAt = Date.now();
+  await assert.rejects(runAdapterModule({
+    adapterUrl: adapterUrl(qualityAdapter),
+    context: {},
+    timeout: 75,
+    abortGraceMs: 0,
+    teardownGraceMs: 0,
+    teardownConfirmationMs: 25,
+    onTrace: (operation) => {
+      if (operation !== "quality_run_trusted_project_check") {
+        if (operation === "quality_create_dossier") return { revision: 1 };
+        if (operation === "quality_update_dossier") return { revision: 2 };
+        if (operation === "quality_evaluate_architecture") return { status: "not_configured" };
+        if (operation === "quality_finalize_dossier") return { status: "passed" };
+        if (operation === "quality_inspect") return { ready: true };
+        throw new Error("unexpected operation before unresponsive trusted check");
+      }
+      return new Promise(() => {});
+    },
+  }), (error) => (
+    error instanceof AdapterExecutionError
+      && error.classification === "adapter_operation_teardown_unverified"
+  ));
+  assert.equal(Date.now() - unresponsiveTrustedStartedAt < 2_000, true);
 
   const credentialAdapter = path.join(tmp, "credential-facade.mjs");
   fs.writeFileSync(credentialAdapter, `export async function runScenario(context) {
@@ -567,6 +627,9 @@ export async function runScenario() {
       HOME: "/safe/home",
       LANG: "C",
       SAFE_VALUE: "retained",
+      OPENCODE_QUALITY_CHECK_CGROUP_ROOT: "/poison/check-cgroup",
+      OPENCODE_QUALITY_CHECK_CGROUP_ATTACH_MODE: "sudo-helper-v2",
+      OPENCODE_QUALITY_CHECK_CGROUP_ATTACH_HELPER: "/poison/check-helper",
     }, "linux") },
     { HOME: "/safe/home", LANG: "C" },
   );
@@ -604,6 +667,11 @@ export async function runScenario() {
       process.env.DYLD_INSERT_LIBRARIES ?? null,
       process.env.COMPlus_Profiler ?? null,
     ],
+    trusted_check_containment_values: [
+      process.env.OPENCODE_QUALITY_CHECK_CGROUP_ROOT ?? null,
+      process.env.OPENCODE_QUALITY_CHECK_CGROUP_ATTACH_MODE ?? null,
+      process.env.OPENCODE_QUALITY_CHECK_CGROUP_ATTACH_HELPER ?? null,
+    ],
   };
 }
 `, "utf8");
@@ -631,11 +699,22 @@ export async function runScenario() {
       ["DYLD_INSERT_LIBRARIES", process.env.DYLD_INSERT_LIBRARIES],
       ["COMPlus_Profiler", process.env.COMPlus_Profiler],
     ]);
+    const trustedCheckContainmentKeys = [
+      "OPENCODE_QUALITY_CHECK_CGROUP_ROOT",
+      "OPENCODE_QUALITY_CHECK_CGROUP_ATTACH_MODE",
+      "OPENCODE_QUALITY_CHECK_CGROUP_ATTACH_HELPER",
+    ];
+    const trustedCheckContainmentEnvironment = new Map(
+      trustedCheckContainmentKeys.map((key) => [key, process.env[key]]),
+    );
     try {
       process.env.NODE_OPTIONS = `--require=${adapterBootstrapPreload.replaceAll("\\", "/")}`;
       process.env.LD_PRELOAD = path.join(tmp, "missing-loader-poison.so");
       process.env.DYLD_INSERT_LIBRARIES = path.join(tmp, "missing-loader-poison.dylib");
       process.env.COMPlus_Profiler = "{00000000-0000-0000-0000-000000000001}";
+      process.env.OPENCODE_QUALITY_CHECK_CGROUP_ROOT = "/poison/check-cgroup";
+      process.env.OPENCODE_QUALITY_CHECK_CGROUP_ATTACH_MODE = "sudo-helper-v2";
+      process.env.OPENCODE_QUALITY_CHECK_CGROUP_ATTACH_HELPER = "/poison/check-helper";
       const bootstrapResult = await runAdapterModuleProduction({
         adapterUrl: adapterUrl(loaderObservationAdapter),
         context: { scenario: { id: "bootstrap-sanitization" }, repo: tmp },
@@ -644,6 +723,7 @@ export async function runScenario() {
       });
       assert.equal(bootstrapResult.passed, true);
       assert.deepEqual(bootstrapResult.loader_values, [null, null, null]);
+      assert.deepEqual(bootstrapResult.trusted_check_containment_values, [null, null, null]);
       process.env.NODE_OPTIONS = `--require=${commandBootstrapPreload.replaceAll("\\", "/")}`;
       const bootstrapCommand = await runManagedCommandProduction({
         file: process.execPath,
@@ -660,6 +740,10 @@ export async function runScenario() {
       if (previousNodeOptions === undefined) delete process.env.NODE_OPTIONS;
       else process.env.NODE_OPTIONS = previousNodeOptions;
       for (const [key, value] of loaderPoison) {
+        if (value === undefined) delete process.env[key];
+        else process.env[key] = value;
+      }
+      for (const [key, value] of trustedCheckContainmentEnvironment) {
         if (value === undefined) delete process.env[key];
         else process.env[key] = value;
       }

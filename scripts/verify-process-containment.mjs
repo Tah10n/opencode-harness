@@ -1503,6 +1503,62 @@ assert.equal(managedResult.teardown_verified, true);
 assert.deepEqual(managedResult.containment_identity, managedIdentity);
 assert.equal(managedResult.containment_state.teardown_verified, true);
 
+const cancelledEvents = [];
+let cancelledContainmentClosed = false;
+const cancelledController = new AbortController();
+const cancelledContainment = Object.freeze({
+  ...managedContainment,
+  scope_id: "injected-cancelled-scope",
+  identity: Object.freeze({ ...managedIdentity, scope_id: "injected-cancelled-scope" }),
+  status: () => Object.freeze({
+    support_state: "verified",
+    kind: managedIdentity.kind,
+    scope_id: "injected-cancelled-scope",
+    teardown_verified: cancelledContainmentClosed,
+  }),
+  close: async () => {
+    cancelledEvents.push("secondary-teardown");
+    cancelledContainmentClosed = true;
+    return true;
+  },
+});
+const cancelledManagedCommand = runManagedCommand({
+  file: process.execPath,
+  args: ["-e", "setInterval(() => {}, 60_000)"],
+  cwd: process.cwd(),
+  timeout: 60_000,
+  signal: cancelledController.signal,
+  processFactory: () => {
+    cancelledEvents.push("secondary-spawn");
+    const child = new EventEmitter();
+    child.pid = 5253;
+    child.connected = true;
+    child.send = (message) => {
+      if (message?.type === "initialize") {
+        cancelledEvents.push("secondary-initialize");
+        queueMicrotask(() => cancelledController.abort());
+      }
+    };
+    return child;
+  },
+  processContainmentFactory: async () => {
+    cancelledEvents.push("secondary-attach");
+    return cancelledContainment;
+  },
+  treeTeardown: async (_child, _state, { containment }) => containment.close(100),
+});
+const cancelledManagedResult = await cancelledManagedCommand;
+assert.deepEqual(cancelledEvents, [
+  "secondary-spawn",
+  "secondary-attach",
+  "secondary-initialize",
+  "secondary-teardown",
+]);
+assert.equal(cancelledManagedResult.cancelled, true);
+assert.equal(cancelledManagedResult.error.code, "ECANCELED");
+assert.equal(cancelledManagedResult.teardown_verified, true);
+assert.equal(cancelledManagedResult.containment_state.teardown_verified, true);
+
 const streamedMarkerParts = [streamedOutputMarker.slice(0, 17), streamedOutputMarker.slice(17)];
 const streamedManagedResult = await runManagedCommand({
   file: process.execPath,

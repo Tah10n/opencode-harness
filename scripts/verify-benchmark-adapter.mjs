@@ -23,6 +23,15 @@ import { createSyntheticOpenCodeCredentialBroker } from "../lib/benchmark/openco
 import { NORMAL_SESSION_QUALITY_TOOL_IDS } from "../lib/quality/normal-session-bridge.mjs";
 import { createNormalSessionQualityToolSurface } from "../lib/quality/normal-session-plugin.mjs";
 import { CONTEXT_TOOL_IDS } from "../lib/quality/context-tool-adapters.mjs";
+import { loadSyntheticContracts } from "../lib/benchmark/contracts.mjs";
+import {
+  loadSyntheticTemplateSet,
+  renderSyntheticInstance,
+} from "../lib/benchmark/renderer.mjs";
+import {
+  inspectSyntheticQualityControlState,
+  materializeSyntheticFixtureControl,
+} from "../lib/benchmark/fixture-control.mjs";
 import {
   AdapterTimeoutError,
   runAdapterModule,
@@ -39,7 +48,19 @@ import {
   SYNTHETIC_MODEL_RUNTIME_ENVIRONMENT_KEYS,
 } from "../lib/benchmark/profiles.mjs";
 import * as syntheticModelEnvFirewallModule from "../lib/benchmark/opencode-model-env-firewall.mjs";
-import { createConfinedTemporaryDirectory } from "../lib/benchmark/isolation.mjs";
+import {
+  createSyntheticTrustedCheckBrokerRequest,
+  createSyntheticTrustedCheckBrokerResponse,
+  createSyntheticTrustedCheckBrokerServer,
+  createTrustedProjectCheckBrokerClient,
+  validateSyntheticTrustedCheckBrokerInvocation,
+  validateSyntheticTrustedCheckBrokerRequest,
+  validateSyntheticTrustedCheckBrokerResponse,
+} from "../lib/benchmark/opencode-trusted-check-broker.mjs";
+import {
+  createConfinedTemporaryDirectory,
+  prepareIsolatedFixture,
+} from "../lib/benchmark/isolation.mjs";
 import { createInjectedTestContainmentFactory } from "./injected-test-containment.mjs";
 
 const defaultRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -996,6 +1017,12 @@ async function credentialBoundaryFixtures() {
       OPENAI_API_KEY: "openai-secret",
       opencode_auth_content: "oauth-secret",
       Aws_Secret_Access_Key: "aws-secret",
+      OPENCODE_QUALITY_BROKER_DIRECTORY: "/private/broker",
+      OPENCODE_QUALITY_BROKER_SECRET: "broker-capability",
+      OPENCODE_QUALITY_BROKER_TIMEOUT_MS: "5000",
+      OPENCODE_QUALITY_CHECK_CGROUP_ROOT: "/private/check-cgroup",
+      OPENCODE_QUALITY_CHECK_CGROUP_ATTACH_MODE: "sudo-helper-v2",
+      OPENCODE_QUALITY_CHECK_CGROUP_ATTACH_HELPER: "/private/check-helper",
       SYNTHETIC_PUBLIC_VALUE: "preserved-value",
     },
   };
@@ -1013,6 +1040,15 @@ async function credentialBoundaryFixtures() {
   assert.equal(JSON.stringify(shellOutput).includes("openai-secret"), false);
   assert.equal(JSON.stringify(shellOutput).includes("oauth-secret"), false);
   assert.equal(JSON.stringify(shellOutput).includes("aws-secret"), false);
+  assert.equal(shellOutput.env.OPENCODE_QUALITY_BROKER_DIRECTORY, "");
+  assert.equal(shellOutput.env.OPENCODE_QUALITY_BROKER_SECRET, "");
+  assert.equal(shellOutput.env.OPENCODE_QUALITY_BROKER_TIMEOUT_MS, "");
+  for (const key of [
+    "OPENCODE_QUALITY_CHECK_CGROUP_ROOT",
+    "OPENCODE_QUALITY_CHECK_CGROUP_ATTACH_MODE",
+    "OPENCODE_QUALITY_CHECK_CGROUP_ATTACH_HELPER",
+  ]) assert.equal(shellOutput.env[key], "");
+  assert.equal(JSON.stringify(shellOutput).includes("broker-capability"), false);
   assert.equal(
     SYNTHETIC_MODEL_RUNTIME_ENVIRONMENT_KEYS.includes("OPENCODE_AUTH_CONTENT"),
     true,
@@ -1255,6 +1291,194 @@ async function credentialBoundaryFixtures() {
   }
 }
 
+async function trustedCheckBrokerFixtures() {
+  const fixtureRoot = createConfinedTemporaryDirectory("opencode-trusted-check-broker-fixture-", {
+    contractCode: "SYNTHETIC_TRUSTED_CHECK_BROKER_TEST_ROOT",
+  });
+  fs.chmodSync(fixtureRoot, 0o700);
+  const secret = "a".repeat(64);
+  const requestId = "b".repeat(32);
+  const payload = {
+    check_id: "synthetic-visible",
+    phase: "preimplementation",
+    catalog_fingerprint: `sha256:${"c".repeat(64)}`,
+    toolchain_map_fingerprint: `sha256:${"d".repeat(64)}`,
+    expected_source_workspace_fingerprint: `sha256:${"e".repeat(64)}`,
+    workspace_observation_salt: "broker-test-salt",
+    workspace_ownership_paths: ["src/app.mjs"],
+    workspace_generated_output_paths: [],
+  };
+  try {
+    const request = createSyntheticTrustedCheckBrokerRequest(payload, { requestId, secret });
+    assert.deepEqual(
+      validateSyntheticTrustedCheckBrokerRequest(request, { secret }).payload,
+      payload,
+    );
+    assert.deepEqual(validateSyntheticTrustedCheckBrokerInvocation({
+      request: payload,
+      timeout_ms: 5_000,
+    }), {
+      request: payload,
+      timeout_ms: 5_000,
+    });
+    assert.throws(
+      () => validateSyntheticTrustedCheckBrokerInvocation({ request: payload, timeout_ms: 0 }),
+      (error) => error?.code === "QUALITY_CHECK_BROKER_PROTOCOL",
+    );
+    assert.throws(
+      () => validateSyntheticTrustedCheckBrokerRequest({
+        ...request,
+        hmac: `hmac-sha256:${"0".repeat(64)}`,
+      }, { secret }),
+      (error) => error?.code === "QUALITY_CHECK_BROKER_AUTH",
+    );
+    const response = createSyntheticTrustedCheckBrokerResponse({
+      requestId,
+      result: { status: "passed" },
+      secret,
+    });
+    assert.throws(
+      () => validateSyntheticTrustedCheckBrokerResponse({ ...response, ok: "true" }, {
+        requestId,
+        secret,
+      }),
+      (error) => error?.code === "QUALITY_CHECK_BROKER_PROTOCOL",
+    );
+    assert.throws(
+      () => createTrustedProjectCheckBrokerClient({
+        environment: { OPENCODE_QUALITY_BROKER_DIRECTORY: fixtureRoot },
+        catalogFingerprint: payload.catalog_fingerprint,
+        toolchainMapFingerprint: payload.toolchain_map_fingerprint,
+      }),
+      (error) => error?.code === "QUALITY_CHECK_BROKER_UNAVAILABLE",
+    );
+    if (process.platform !== "win32") {
+      const sharedDirectory = path.join(fixtureRoot, "shared");
+      fs.mkdirSync(sharedDirectory, { mode: 0o755 });
+      fs.chmodSync(sharedDirectory, 0o755);
+      assert.throws(
+        () => createSyntheticTrustedCheckBrokerServer({
+          baseDirectory: sharedDirectory,
+          timeoutMs: 1_000,
+          handler: () => ({ status: "passed" }),
+        }),
+        (error) => error?.code === "QUALITY_CHECK_BROKER_UNAVAILABLE",
+      );
+    }
+
+    const server = createSyntheticTrustedCheckBrokerServer({
+      baseDirectory: fixtureRoot,
+      timeoutMs: 5_000,
+      handler: async (received) => {
+        assert.deepEqual(received, payload);
+        return { status: "passed", command_id: "trusted-project-check:synthetic-visible:preimplementation" };
+      },
+    });
+    const serverDirectory = server.environment.OPENCODE_QUALITY_BROKER_DIRECTORY;
+    server.start();
+    const clientPath = path.join(fixtureRoot, "broker-client.mjs");
+    const brokerUrl = pathToFileURL(path.join(defaultRoot, "lib", "benchmark", "opencode-trusted-check-broker.mjs")).href;
+    fs.writeFileSync(clientPath, [
+      `import { createTrustedProjectCheckBrokerClient } from ${JSON.stringify(brokerUrl)};`,
+      `const client = createTrustedProjectCheckBrokerClient({ catalogFingerprint: ${JSON.stringify(payload.catalog_fingerprint)}, toolchainMapFingerprint: ${JSON.stringify(payload.toolchain_map_fingerprint)} });`,
+      `const result = client(${JSON.stringify({
+        targetId: payload.check_id,
+        phase: payload.phase,
+        expectedSourceWorkspaceFingerprint: payload.expected_source_workspace_fingerprint,
+        workspaceObservationSalt: payload.workspace_observation_salt,
+        workspaceOwnershipPaths: payload.workspace_ownership_paths,
+        workspaceGeneratedOutputPaths: payload.workspace_generated_output_paths,
+      })});`,
+      "process.stdout.write(JSON.stringify(result));",
+    ].join("\n"), { flag: "wx" });
+    const childResult = await new Promise((resolve, reject) => {
+      const child = spawn(process.execPath, [clientPath], {
+        cwd: fixtureRoot,
+        env: { PATH: process.env.PATH ?? "", ...server.environment },
+        shell: false,
+        windowsHide: true,
+        stdio: ["ignore", "pipe", "pipe"],
+      });
+      const stdout = [];
+      const stderr = [];
+      child.stdout.on("data", (chunk) => stdout.push(Buffer.from(chunk)));
+      child.stderr.on("data", (chunk) => stderr.push(Buffer.from(chunk)));
+      child.once("error", reject);
+      child.once("close", (status, signal) => resolve({
+        status,
+        signal,
+        stdout: Buffer.concat(stdout).toString("utf8"),
+        stderr: Buffer.concat(stderr).toString("utf8"),
+      }));
+    });
+    const serverError = await server.close();
+    assert.equal(serverError, null);
+    assert.equal(fs.existsSync(serverDirectory), false);
+    assert.equal(childResult.status, 0, childResult.stderr);
+    assert.equal(childResult.signal, null);
+    assert.deepEqual(JSON.parse(childResult.stdout), {
+      status: "passed",
+      command_id: "trusted-project-check:synthetic-visible:preimplementation",
+    });
+
+    const failingServer = createSyntheticTrustedCheckBrokerServer({
+      baseDirectory: fixtureRoot,
+      timeoutMs: 5_000,
+      handler: () => {
+        throw Object.assign(new Error("containment unavailable"), {
+          code: "QUALITY_CHECK_CONTAINMENT_UNAVAILABLE",
+        });
+      },
+    });
+    const failingServerDirectory = failingServer.environment.OPENCODE_QUALITY_BROKER_DIRECTORY;
+    failingServer.start();
+    const failingClientPath = path.join(fixtureRoot, "broker-failing-client.mjs");
+    fs.writeFileSync(failingClientPath, [
+      `import { createTrustedProjectCheckBrokerClient } from ${JSON.stringify(brokerUrl)};`,
+      `const client = createTrustedProjectCheckBrokerClient({ catalogFingerprint: ${JSON.stringify(payload.catalog_fingerprint)}, toolchainMapFingerprint: ${JSON.stringify(payload.toolchain_map_fingerprint)} });`,
+      "try {",
+      `  client(${JSON.stringify({
+        targetId: payload.check_id,
+        phase: payload.phase,
+        expectedSourceWorkspaceFingerprint: payload.expected_source_workspace_fingerprint,
+        workspaceObservationSalt: payload.workspace_observation_salt,
+        workspaceOwnershipPaths: payload.workspace_ownership_paths,
+        workspaceGeneratedOutputPaths: payload.workspace_generated_output_paths,
+      })});`,
+      "  process.exitCode = 41;",
+      "} catch (error) { process.stdout.write(String(error?.code ?? '')); }",
+    ].join("\n"), { flag: "wx" });
+    const failingChildResult = await new Promise((resolve, reject) => {
+      const child = spawn(process.execPath, [failingClientPath], {
+        cwd: fixtureRoot,
+        env: { PATH: process.env.PATH ?? "", ...failingServer.environment },
+        shell: false,
+        windowsHide: true,
+        stdio: ["ignore", "pipe", "pipe"],
+      });
+      const stdout = [];
+      const stderr = [];
+      child.stdout.on("data", (chunk) => stdout.push(Buffer.from(chunk)));
+      child.stderr.on("data", (chunk) => stderr.push(Buffer.from(chunk)));
+      child.once("error", reject);
+      child.once("close", (status, signal) => resolve({
+        status,
+        signal,
+        stdout: Buffer.concat(stdout).toString("utf8"),
+        stderr: Buffer.concat(stderr).toString("utf8"),
+      }));
+    });
+    const failingServerError = await failingServer.close();
+    assert.equal(failingServerError, "QUALITY_CHECK_CONTAINMENT_UNAVAILABLE");
+    assert.equal(fs.existsSync(failingServerDirectory), false);
+    assert.equal(failingChildResult.status, 0, failingChildResult.stderr);
+    assert.equal(failingChildResult.signal, null);
+    assert.equal(failingChildResult.stdout, "QUALITY_CHECK_CONTAINMENT_UNAVAILABLE");
+  } finally {
+    fs.rmSync(fixtureRoot, { recursive: true, force: true });
+  }
+}
+
 function profileFixtures(root) {
   const materialized = [];
   try {
@@ -1291,6 +1515,12 @@ function profileFixtures(root) {
     assert.equal(
       instrumentedManifest.profile_evidence.source_entries.some(
         (entry) => entry.kind === "plugin-dependency" && entry.id === "context-bridge",
+      ),
+      true,
+    );
+    assert.equal(
+      instrumentedManifest.profile_evidence.source_entries.some(
+        (entry) => entry.kind === "plugin-dependency" && entry.id === "trusted-check-broker",
       ),
       true,
     );
@@ -1429,6 +1659,12 @@ function profileFixtures(root) {
       OPENCODE_AUTO_SHARE: "true",
       OPENCODE_DISABLE_DEFAULT_PLUGINS: "false",
       OPENCODE_AUTH_CONTENT: "{\"example\":{\"type\":\"api\",\"key\":\"not-copied-directly\"}}",
+      OPENCODE_QUALITY_BROKER_DIRECTORY: "/poison-broker",
+      OPENCODE_QUALITY_BROKER_SECRET: "poison-broker-secret",
+      OPENCODE_QUALITY_BROKER_TIMEOUT_MS: "1234",
+      OPENCODE_QUALITY_CHECK_CGROUP_ROOT: "/poison-check-cgroup",
+      OPENCODE_QUALITY_CHECK_CGROUP_ATTACH_MODE: "sudo-helper-v2",
+      OPENCODE_QUALITY_CHECK_CGROUP_ATTACH_HELPER: "/poison-check-helper",
       OPENAI_API_KEY: "preserved-for-runtime-only",
       PROVIDER_TOKEN: "must-not-reach-child",
       GITHUB_TOKEN: "must-not-reach-child",
@@ -1444,6 +1680,14 @@ function profileFixtures(root) {
     assert.equal(Object.hasOwn(environment, "PROVIDER_TOKEN"), false);
     assert.equal(Object.hasOwn(environment, "GITHUB_TOKEN"), false);
     assert.equal(Object.hasOwn(environment, "NODE_OPTIONS"), false);
+    assert.equal(Object.hasOwn(environment, "OPENCODE_QUALITY_BROKER_DIRECTORY"), false);
+    assert.equal(Object.hasOwn(environment, "OPENCODE_QUALITY_BROKER_SECRET"), false);
+    assert.equal(Object.hasOwn(environment, "OPENCODE_QUALITY_BROKER_TIMEOUT_MS"), false);
+    for (const key of [
+      "OPENCODE_QUALITY_CHECK_CGROUP_ROOT",
+      "OPENCODE_QUALITY_CHECK_CGROUP_ATTACH_MODE",
+      "OPENCODE_QUALITY_CHECK_CGROUP_ATTACH_HELPER",
+    ]) assert.equal(Object.hasOwn(environment, key), false);
     assert.equal(Object.hasOwn(environment, "OPENCODE_CONFIG_CONTENT"), false);
     assert.equal(Object.hasOwn(environment, "OPENCODE_PERMISSION"), false);
     assert.equal(environment.OPENCODE_AUTO_SHARE, "false");
@@ -1734,7 +1978,11 @@ async function executionFixtures(root, plainProfile, instrumentedProfile) {
       ),
     },
   );
+  const previousFixtureAuthContent = process.env.OPENCODE_AUTH_CONTENT;
   try {
+    process.env.OPENCODE_AUTH_CONTENT = JSON.stringify({
+      example: { type: "api", key: "adapter-execution-fixture-secret" },
+    });
     process.chdir(repo);
     const success = await executeOpenCodeAdapter(baseInput, {
       spawnImpl: spawnFixture,
@@ -1905,15 +2153,21 @@ async function executionFixtures(root, plainProfile, instrumentedProfile) {
       profileFingerprint: instrumentedProfile.profileFingerprint,
       profileManifestPath: instrumentedProfile.manifestPath,
     };
+    const instrumentedSourceEnvironment = {
+      OPENCODE_AUTH_CONTENT: JSON.stringify({
+        example: { type: "api", key: "instrumented-fixture-secret" },
+      }),
+    };
     const continued = await executeOpenCodeAdapter(instrumentedInput, {
       spawnImpl: continuationSpawn,
       executable: process.execPath,
       executableArgsPrefix: [continuationClis[0]],
+      sourceEnvironment: instrumentedSourceEnvironment,
       controlStateInspector: () => continuationStates[
         Math.min(continuationInspectionIndex++, continuationStates.length - 1)
       ],
     });
-    assert.equal(continued.passed, true);
+    assert.equal(continued.passed, true, JSON.stringify(continued, null, 2));
     assert.equal(continued.status, "completed");
     assert.equal(continued.model_turn_count, 3);
     assert.equal(continued.continuation_turn_count, 2);
@@ -1958,6 +2212,7 @@ async function executionFixtures(root, plainProfile, instrumentedProfile) {
     const aggregateOutputContinuation = await executeOpenCodeAdapter(instrumentedInput, {
       executable: process.execPath,
       executableArgsPrefix: [aggregateOutputCli],
+      sourceEnvironment: instrumentedSourceEnvironment,
       controlStateInspector: () => {
         aggregateOutputInspectionIndex += 1;
         return aggregateOutputInspectionIndex < 12
@@ -1985,6 +2240,7 @@ async function executionFixtures(root, plainProfile, instrumentedProfile) {
       spawnImpl: continuationSpawn,
       executable: process.execPath,
       executableArgsPrefix: [continuationClis[0]],
+      sourceEnvironment: instrumentedSourceEnvironment,
       controlStateInspector: () => {
         distinctActionInspectionIndex += 1;
         return distinctActionInspectionIndex < 8
@@ -2019,6 +2275,7 @@ async function executionFixtures(root, plainProfile, instrumentedProfile) {
     }, {
       executable: process.execPath,
       executableArgsPrefix: [continuationClis[0]],
+      sourceEnvironment: instrumentedSourceEnvironment,
       controlStateInspector: () => continuationStates[0],
     });
     assert.equal(readOnlyRegistration.passed, true);
@@ -2028,6 +2285,7 @@ async function executionFixtures(root, plainProfile, instrumentedProfile) {
     const mismatchedSession = await executeOpenCodeAdapter(instrumentedInput, {
       executable: process.execPath,
       executableArgsPrefix: [continuationClis[0]],
+      sourceEnvironment: instrumentedSourceEnvironment,
       controlStateInspector: () => ({
         ...continuationStates[0],
         session_id: "ses_other",
@@ -2039,6 +2297,7 @@ async function executionFixtures(root, plainProfile, instrumentedProfile) {
     const failedLifecycle = await executeOpenCodeAdapter(instrumentedInput, {
       executable: process.execPath,
       executableArgsPrefix: [continuationClis[0]],
+      sourceEnvironment: instrumentedSourceEnvironment,
       controlStateInspector: () => ({
         ...continuationStates[1],
         failed_owner_count: 1,
@@ -2057,6 +2316,7 @@ async function executionFixtures(root, plainProfile, instrumentedProfile) {
       spawnImpl: continuationSpawn,
       executable: process.execPath,
       executableArgsPrefix: [continuationClis[0]],
+      sourceEnvironment: instrumentedSourceEnvironment,
       controlStateInspector: () => ({
         ...continuationStates[0],
         dossier_revision: ++exhaustedInspectionIndex,
@@ -2083,6 +2343,7 @@ async function executionFixtures(root, plainProfile, instrumentedProfile) {
       spawnImpl: continuationSpawn,
       executable: process.execPath,
       executableArgsPrefix: [continuationClis[0]],
+      sourceEnvironment: instrumentedSourceEnvironment,
       controlStateInspector: () => {
         stalledInspectionIndex += 1;
         return {
@@ -2590,6 +2851,8 @@ async function executionFixtures(root, plainProfile, instrumentedProfile) {
     });
     assert.equal(argv.includes("--variant"), false);
   } finally {
+    if (previousFixtureAuthContent === undefined) delete process.env.OPENCODE_AUTH_CONTENT;
+    else process.env.OPENCODE_AUTH_CONTENT = previousFixtureAuthContent;
     process.chdir(originalCwd);
     fs.rmSync(fixtureRoot, { recursive: true, force: true });
   }
@@ -2623,6 +2886,7 @@ async function productionCompositionFixtures(root, plainProfile) {
     "  return executeOpenCodeAdapter(adapterInput, {",
     "    executable: process.execPath,",
     "    executableArgsPrefix: [fixtureCli],",
+    "    sourceEnvironment: { OPENCODE_AUTH_CONTENT: JSON.stringify({ example: { type: 'api', key: 'composition-fixture-secret' } }) },",
     "  });",
     "}",
     "",
@@ -2707,14 +2971,189 @@ async function productionCompositionFixtures(root, plainProfile) {
   }
 }
 
+function writeBrokeredQualityGateProbe(fixtureRoot, root, ownershipPath) {
+  const file = path.join(fixtureRoot, "brokered-quality-gate-probe.mjs");
+  const diagnosticFile = `${file}.diagnostic`;
+  const qualityPluginUrl = pathToFileURL(path.join(root, "lib", "quality", "quality-plugin.mjs")).href;
+  const source = [
+    "import fs from 'node:fs';",
+    "import path from 'node:path';",
+    "import { registerHooks } from 'node:module';",
+    "const args = process.argv.slice(2);",
+    "if (args[0] === '--version') { process.stdout.write('1.17.20\\n'); process.exit(0); }",
+    "if (args[0] === 'debug' && args[1] === 'config') {",
+    "  const packageRoot = path.join(process.env.OPENCODE_CONFIG_DIR, 'node_modules', '@opencode-ai', 'plugin');",
+    "  fs.mkdirSync(path.join(packageRoot, 'dist'), { recursive: true });",
+    "  fs.writeFileSync(path.join(packageRoot, 'package.json'), JSON.stringify({ name: '@opencode-ai/plugin', type: 'module', version: '1.17.20' }));",
+    "  fs.writeFileSync(path.join(packageRoot, 'dist', 'index.js'), \"function schema(){const value={describe:()=>value,int:()=>value,min:()=>value,max:()=>value,optional:()=>value};return value} export function tool(definition){return definition}; tool.schema={string:schema,number:schema,enum:()=>schema()};\");",
+    "  process.stdout.write('{}\\n');",
+    "  process.exit(0);",
+    "}",
+    "if (args[0] !== 'run' || !args.includes('--format') || !args.includes('json')) process.exit(19);",
+    "const apiUrl = 'data:text/javascript,' + encodeURIComponent(\"function schema(){const value={describe:()=>value,int:()=>value,min:()=>value,max:()=>value,optional:()=>value};return value} export function tool(definition){return definition}; tool.schema={string:schema,number:schema,enum:()=>schema()};\");",
+    `const qualityPluginUrl = ${JSON.stringify(qualityPluginUrl)};`,
+    "const hooks = registerHooks({ resolve(specifier, context, nextResolve) {",
+    "  if (specifier === '@opencode-ai/plugin') return { url: apiUrl, shortCircuit: true };",
+    "  if (specifier === 'opencode-harness/quality-plugin') return { url: qualityPluginUrl, shortCircuit: true };",
+    "  return nextResolve(specifier, context);",
+    "} });",
+    "try {",
+    "  const config = JSON.parse(fs.readFileSync(process.env.OPENCODE_CONFIG, 'utf8'));",
+    "  const loaded = await import(config.plugin[0]);",
+    "  const plugin = await loaded.EngineeringDossierPlugin({",
+    "    client: { session: { get: async ({ path: requestPath }) => ({ data: { id: requestPath.id, parentID: null } }) } },",
+    "    directory: process.cwd(),",
+    "    worktree: process.cwd(),",
+    "  });",
+    "  const context = { sessionID: 'brokered-production-gate', agent: 'orchestrator' };",
+    `  const ownershipPath = ${JSON.stringify(ownershipPath)};`,
+    "  const started = JSON.parse(await plugin.tool.quality_session_start.execute({ request: JSON.stringify({",
+    "    risk_class: 'standard-lite', task_type: 'bug_fix',",
+    "    user_visible_goal: 'Repair the bounded fixture.', ownership_paths: [ownershipPath],",
+    "    required_check_ids: ['synthetic-visible'],",
+    "    classification_rationale: 'production adapter broker composition regression',",
+    "    behavior_expectation: 'the public check passes after repair',",
+    "    expected_preserved_behavior: ['runner control remains unchanged'],",
+    "    known_local_edge_cases: ['the pre-fix reproducer fails deterministically'],",
+    "    scope_facts: { parallel_writable_delegation: false, migration: false, public_compatibility_change: false, architecture_policy_change: false, security_sensitive: false, persistence_sensitive: false, concurrency_sensitive: false, unresolved_unknowns: false },",
+    "    reproduction_contract: { check_id: 'synthetic-visible', expected_pre_fix: 'failing_reproducer', expected_post_fix: 'passing_regression', unavailable_reason: null, uncertainty_material: false },",
+    "  }) }, context));",
+    "  await plugin.tool.context_read.execute({ path: ownershipPath, startLine: 1, maxLines: 100, maxBytes: 65536, format: 'json' }, context);",
+    "  const gated = JSON.parse(await plugin.tool.quality_dossier_finalize.execute({ request: JSON.stringify({ expected_revision: started.dossier_revision }) }, context));",
+    "  if (gated.gate_status !== 'passed') throw new Error('quality gate did not pass');",
+    "  process.stderr.write('[brokered-quality-gate-passed]\\n');",
+    "  process.exitCode = 37;",
+    "} catch (error) {",
+    `  fs.writeFileSync(${JSON.stringify(diagnosticFile)}, String(error?.stack ?? error?.code ?? error?.message ?? error));`,
+    "  process.stderr.write(`[brokered-quality-gate-failed] ${String(error?.code ?? error?.message ?? error)}\\n`);",
+    "  process.exitCode = 38;",
+    "} finally { hooks.deregister(); }",
+    "",
+  ].join("\n");
+  fs.writeFileSync(file, source, { flag: "wx" });
+  return file;
+}
+
+async function productionTrustedCheckBrokerCompositionFixture(root, instrumentedProfile) {
+  const fixtureRoot = createConfinedTemporaryDirectory("opencode-adapter-broker-composition-", {
+    contractCode: "SYNTHETIC_ADAPTER_BROKER_COMPOSITION_ROOT",
+  });
+  const sourceDirectory = path.join(fixtureRoot, "source");
+  fs.mkdirSync(sourceDirectory);
+  const contracts = loadSyntheticContracts(root);
+  const templateSet = loadSyntheticTemplateSet(root, contracts);
+  const instance = renderSyntheticInstance({
+    contracts,
+    templateSet,
+    familyId: "function-boundaries",
+    seed: "adapter-broker-composition-v1",
+    repetition: 1,
+  });
+  for (const rendered of instance.public_files) {
+    const target = path.join(sourceDirectory, ...rendered.path.split("/"));
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.writeFileSync(target, rendered.content, "utf8");
+  }
+  let fixture = null;
+  try {
+    fixture = prepareIsolatedFixture({
+      scenarioId: instance.instance_id,
+      fixturePath: "source",
+      profileId: "instrumented",
+      sourceRoot: fixtureRoot,
+      temporaryPrefix: "opencode-bench-adapter-broker",
+      fixtureContractCode: "SYNTHETIC_ADAPTER_BROKER_FIXTURE",
+      temporaryRootContractCode: "SYNTHETIC_ADAPTER_BROKER_TEMP",
+    });
+    materializeSyntheticFixtureControl({ repo: fixture.repo, instance });
+    const ownershipPath = instance.workspace_policy.expected_changed_paths[0];
+    const probe = writeBrokeredQualityGateProbe(fixtureRoot, root, ownershipPath);
+    const productionAdapterUrl = pathToFileURL(path.join(root, "lib", "benchmark", "opencode-adapter.mjs")).href;
+    const wrapperPath = path.join(fixtureRoot, "broker-production-adapter-wrapper.mjs");
+    fs.writeFileSync(wrapperPath, [
+      `import { executeOpenCodeAdapter } from ${JSON.stringify(productionAdapterUrl)};`,
+      "export async function runScenario(context) {",
+      "  const { fixtureCli, ...adapterInput } = context;",
+      "  return executeOpenCodeAdapter(adapterInput, {",
+      "    executable: process.execPath,",
+      "    executableArgsPrefix: [fixtureCli],",
+      "    sourceEnvironment: { OPENCODE_AUTH_CONTENT: JSON.stringify({ example: { type: 'api', key: 'broker-composition-fixture-secret' } }) },",
+      "  });",
+      "}",
+      "",
+    ].join("\n"));
+    let brokerCalls = 0;
+    const result = await runAdapterModule({
+      adapterUrl: pathToFileURL(wrapperPath).href,
+      context: {
+        repo: fixture.repo,
+        prompt: "Repair the bounded fixture.",
+        profileId: instrumentedProfile.profileId,
+        profileFingerprint: instrumentedProfile.profileFingerprint,
+        profileManifestPath: instrumentedProfile.manifestPath,
+        model: "example/model",
+        provider: "example",
+        variant: null,
+        timeout: 60_000,
+        taskScopeMode: "edit",
+        fixtureCli: probe,
+      },
+      timeout: 15_000,
+      workingDirectory: fixture.repo,
+      processContainmentFactory: createInjectedTestContainmentFactory(
+        "injected-adapter-broker-composition-test-containment-v1",
+      ),
+      onTrace(operation, payload, operationContext) {
+        assert.equal(operation, "quality_run_trusted_project_check");
+        assert.equal(payload.request.check_id, "synthetic-visible");
+        assert.equal(payload.request.phase, "preimplementation");
+        assert.equal(payload.request.workspace_ownership_paths.includes(ownershipPath), true);
+        assert.equal(Number.isSafeInteger(payload.timeout_ms), true);
+        assert.equal(typeof operationContext.signal.aborted, "boolean");
+        assert.equal(Number.isSafeInteger(operationContext.deadline_ms), true);
+        brokerCalls += 1;
+        return { status: "passed" };
+      },
+    });
+    let qualityState = null;
+    let qualityStateError = null;
+    try {
+      qualityState = inspectSyntheticQualityControlState(fixture.repo);
+    } catch (error) {
+      qualityStateError = error?.code ?? error?.message ?? String(error);
+    }
+    const probeDiagnosticPath = `${probe}.diagnostic`;
+    const probeDiagnostic = fs.existsSync(probeDiagnosticPath)
+      ? fs.readFileSync(probeDiagnosticPath, "utf8")
+      : null;
+    assert.equal(
+      brokerCalls,
+      1,
+      JSON.stringify({ result, qualityState, qualityStateError, probeDiagnostic }, null, 2),
+    );
+    assert.equal(result.status, "failed");
+    assert.equal(result.reason, "opencode_nonzero_exit");
+    assert.equal(qualityState.gate_status, "passed");
+    assert.equal(qualityState.lifecycle, "implementation_enabled");
+    return 1;
+  } finally {
+    if (fixture !== null && fs.existsSync(fixture.temporaryRoot)) {
+      fs.rmSync(fixture.temporaryRoot, { recursive: true, force: true });
+    }
+    if (fs.existsSync(fixtureRoot)) fs.rmSync(fixtureRoot, { recursive: true, force: true });
+  }
+}
+
 export async function verifyBenchmarkAdapter({ root = defaultRoot } = {}) {
   parserFixtures(root);
   await credentialBoundaryFixtures();
+  await trustedCheckBrokerFixtures();
   const profiles = profileFixtures(root);
   let lifecycleFixtureCount = executableResolutionFixtures();
   try {
     lifecycleFixtureCount += await executionFixtures(root, profiles.plain, profiles.instrumented);
     lifecycleFixtureCount += await productionCompositionFixtures(root, profiles.plain);
+    lifecycleFixtureCount += await productionTrustedCheckBrokerCompositionFixture(root, profiles.instrumented);
   } finally {
     for (const entry of profiles.all.reverse()) {
       if (fs.existsSync(entry.root)) cleanupSyntheticProfile(entry);

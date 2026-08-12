@@ -18,10 +18,12 @@ import {
   syntheticAdapterWorkerTimeoutMs,
   syntheticFalseBlock,
   syntheticHiddenSafetyFailed,
+  syntheticInstrumentedContainmentPreflight,
   syntheticPairAttemptMismatchReasons,
   syntheticPairBindingMismatchReasons,
   syntheticPolicyDelegationObservation,
   syntheticTaskCorrect,
+  syntheticTrustedCheckContainmentOptions,
   syntheticTraceEventsMatch,
   syntheticWholeTaskSuccess,
   validateSyntheticPairSet,
@@ -65,6 +67,59 @@ import { createSyntheticOpenCodeCredentialBroker } from "../lib/benchmark/openco
 function sha256(value) {
   return `sha256:${createHash("sha256").update(value).digest("hex")}`;
 }
+
+assert.deepEqual(syntheticTrustedCheckContainmentOptions({
+  platform: "linux",
+  environment: {
+    OPENCODE_QUALITY_CHECK_CGROUP_ROOT: "/sys/fs/cgroup/trusted-check",
+    OPENCODE_QUALITY_CHECK_CGROUP_ATTACH_MODE: "sudo-helper-v2",
+    OPENCODE_QUALITY_CHECK_CGROUP_ATTACH_HELPER: "/usr/local/libexec/trusted-check-attach",
+  },
+}), {
+  cgroupRoot: "/sys/fs/cgroup/trusted-check",
+  cgroupAttachMode: "sudo-helper-v2",
+  cgroupAttachHelper: "/usr/local/libexec/trusted-check-attach",
+});
+assert.throws(
+  () => syntheticTrustedCheckContainmentOptions({
+    platform: "linux",
+    environment: { OPENCODE_QUALITY_CHECK_CGROUP_ROOT: "/sys/fs/cgroup/trusted-check" },
+  }),
+  (error) => error?.code === "SYNTHETIC_RUNNER_TRUSTED_CHECK_CONTAINMENT",
+);
+assert.throws(
+  () => syntheticTrustedCheckContainmentOptions({
+    platform: "linux",
+    environment: {
+      OPENCODE_QUALITY_CGROUP_ROOT: "/sys/fs/cgroup/shared",
+      OPENCODE_QUALITY_CGROUP_ATTACH_HELPER: "/usr/local/libexec/shared-attach",
+      OPENCODE_QUALITY_CHECK_CGROUP_ROOT: "/sys/fs/cgroup/shared",
+      OPENCODE_QUALITY_CHECK_CGROUP_ATTACH_MODE: "sudo-helper-v2",
+      OPENCODE_QUALITY_CHECK_CGROUP_ATTACH_HELPER: "/usr/local/libexec/check-attach",
+    },
+  }),
+  (error) => error?.code === "SYNTHETIC_RUNNER_TRUSTED_CHECK_CONTAINMENT",
+);
+assert.deepEqual(syntheticInstrumentedContainmentPreflight({
+  platform: "linux",
+  environment: {
+    OPENCODE_QUALITY_CGROUP_ROOT: "/sys/fs/cgroup/adapter",
+    OPENCODE_QUALITY_CGROUP_ATTACH_MODE: "sudo-helper-v2",
+    OPENCODE_QUALITY_CGROUP_ATTACH_HELPER: "/usr/local/libexec/adapter-attach",
+    OPENCODE_QUALITY_CHECK_CGROUP_ROOT: "/sys/fs/cgroup/trusted-check",
+    OPENCODE_QUALITY_CHECK_CGROUP_ATTACH_MODE: "sudo-helper-v2",
+    OPENCODE_QUALITY_CHECK_CGROUP_ATTACH_HELPER: "/usr/local/libexec/trusted-check-attach",
+  },
+  classifier: () => ({ support_state: "verified" }),
+}), {
+  cgroupRoot: "/sys/fs/cgroup/trusted-check",
+  cgroupAttachMode: "sudo-helper-v2",
+  cgroupAttachHelper: "/usr/local/libexec/trusted-check-attach",
+});
+assert.throws(
+  () => syntheticTrustedCheckContainmentOptions({ platform: "darwin", environment: {} }),
+  (error) => error?.code === "SYNTHETIC_RUNNER_TRUSTED_CHECK_CONTAINMENT",
+);
 
 function deterministicIdFactory() {
   let next = 0;

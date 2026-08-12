@@ -528,10 +528,36 @@ private disposable host-toolchain lease. That lease and runner control state
 are not copied into the public task and are treatment evidence, not functional
 correctness evidence.
 
+The instrumented OpenCode process already runs inside the adapter worker's
+verified containment scope, so it must not try to create a nested production
+scope for a trusted project check. For each model turn the adapter creates an
+owner-only private request directory and a random HMAC capability. The quality
+plugin may submit only the exact bounded trusted-check payload; the adapter
+forwards it through the existing quota-limited worker IPC, and the top-level
+runner reloads the protected catalog and toolchain map, fixes the worktree and
+generated-output scope, and executes the check under a fresh verified,
+independent containment boundary. On Linux the host must delegate a second
+exclusive cgroup-v2 root and fixed-destination helper through
+`OPENCODE_QUALITY_CHECK_CGROUP_ROOT`,
+`OPENCODE_QUALITY_CHECK_CGROUP_ATTACH_MODE=sudo-helper-v2`, and
+`OPENCODE_QUALITY_CHECK_CGROUP_ATTACH_HELPER`; reusing the adapter root is
+rejected. Windows uses an independent Job Object. The model-backed instrumented
+benchmark is fail-closed on macOS because the exclusive-UID controller cannot
+safely host two concurrent scopes for one principal; run that benchmark on
+Linux or Windows. Containment coordinates, command arguments, working
+directories, and host credentials never cross into OpenCode. The capability is
+blanked from model shell environments, request/response authentication and
+quotas are fail-closed, and timeout, protocol, handler, or cleanup failures
+invalidate the attempt. The runner executes the check through its asynchronous
+process-tree controller under the earlier of the authenticated per-turn budget
+and the outer adapter deadline. Either deadline cancels the check, terminates
+its independent containment scope, and requires verified teardown before the
+attempt can settle.
+
 Coding tasks accept ordinary final prose. Only `review-read-only` has a
 task-owned neutral response contract: one JSON object containing
 `review_findings`. Agent response protocol v3 still reads legacy v2 envelopes
-for historical compatibility, while OpenCode adapter protocol v16 carries the
+for historical compatibility, while OpenCode adapter protocol v17 carries the
 new outcome and executable evidence. New prompts never mention
 `agent_outcome` or benchmark success.
 
@@ -739,7 +765,7 @@ treatment evidence because no mutation authority is requested; if an owner
 lifecycle was started, it must still reach attestation. Malformed, duplicated,
 or contradictory state remains fail-closed.
 
-Adapter protocol v16 emits neutral outcome evidence for every profile.
+Adapter protocol v17 emits neutral outcome evidence for every profile.
 `claimed_completion=true` only when OpenCode execution occurred, the final
 assistant response is non-empty and neither missing, truncated, nor
 output-limited, the stream settled, teardown succeeded, and no explicit

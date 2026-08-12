@@ -155,28 +155,32 @@ excluded rather than scored as task failures. `task_correct` never depends on
 treatment-trace completeness; that remains visible in `trace_policy` and
 `whole_task_success`.
 
-### Historical pre-v2 result (not current evidence)
+### Reference benchmark results
 
-An archived real OpenCode run used the pre-v2 repetition and raw-pair
-statistics contract: 16 families, 5 repetitions, 80 complete pairs, and 160
-fresh agent sessions.
+The result below is `plain` → `instrumented`, with the paired difference in
+parentheses. It is a harness ablation within one model, not a model ranking.
 
-| Metric | `plain` | `instrumented` | Difference |
-| --- | ---: | ---: | ---: |
-| Functional `task_correct` | 76.25% | **90.00%** | **+13.75 pp** |
-| `whole_task_success` | 27.50% | **80.00%** | +52.50 pp |
-| Held-out checks passed | 76.25% | **92.50%** | +16.25 pp |
-| Verification omission | 63.75% | **2.50%** | -61.25 pp |
-| Mean agent duration | **28.6 s** | 268.5 s | +239.9 s |
+| Model / evidence | Sample | Functional `task_correct` | `whole_task_success` | Held-out pass | Verification omission | Mean duration |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `openai/gpt-5.6-luna`, `low` (current v5) | 160 pairs | 85.00% → 86.88% (+1.88 pp) | 10.63% → 75.00% (+64.38 pp) | 86.88% → 87.50% (+0.63 pp) | 57.50% → 11.25% (-46.25 pp) | 32.3 s → 166.2 s (+133.9 s) |
 
-The old analysis reported a +8.75 to +18.75 pp interval and raw McNemar
-`p=0.007385`, but it predates semantic variants, hierarchical bootstrap,
-family sign-flip inference, truthful ordinary-prose completion evidence, and
-executable identity binding. Its directional verdict is therefore not current
-v2 evidence and is not silently reinterpreted. See the
-[full methodology and interpretation](docs/synthetic-benchmark.md#reference-result-gpt-54-mini-low)
-for per-family regressions, source strata, unavailable provider cost, and
-source-bound evidence.
+The current run completed on 2026-08-12 using OpenCode 1.18.16, a 300,000 ms
+per-agent timeout, 16 families, five semantic variants, and two paired
+trajectories per variant (320 fresh OpenCode sessions). Its seed was
+`luna-low-full-20260812`.
+
+The primary equal-family `task_correct` delta was +1.88 pp with a 95%
+family/semantic/trajectory bootstrap interval of -13.13 to +18.13 pp and an
+exact family sign-flip `p=0.8125`. The policy verdict was therefore
+`no_clear_difference`: directional significance was not established, and the
+new-canary-safety-regressions guardrail counted 12 regressions. The much larger
+`whole_task_success` gain and lower verification-omission rate are useful
+operational observations, not a substitute for the primary quality verdict.
+The run had no incomplete pairs, no broker or containment failures, no scope
+violations, and verified teardown for all sessions. Its canonical run ID is
+`synthetic-merged-run-dbd0ee31-bae7-4c44-ab3e-cab3a2423fbc`.
+
+The current run's timeout rate was 0.00% → 10.63% (+10.63 pp).
 
 See [docs/synthetic-benchmark.md](docs/synthetic-benchmark.md) for the profile
 contracts, 16 families, micro/smoke/standard/full commands, fairness and hidden-data
@@ -617,6 +621,24 @@ hidden. Direct operational verification remains
 separate and receives the host coordinates it needs.
 Synthetic profile fixtures also create their temporary host-toolchain lease
 with an explicit owner-only `0600` mode, independent of the runner's umask.
+An instrumented benchmark adapter is itself a contained workload. Its OpenCode
+quality plugin therefore requests catalog-bound trusted checks through a
+private, per-turn authenticated channel to the top-level runner, which
+revalidates the protected catalog, toolchains, worktree, and output scope and
+creates the fresh independent check containment boundary. Linux hosts must
+provide a second delegated root and fixed-destination helper through
+`OPENCODE_QUALITY_CHECK_CGROUP_ROOT`,
+`OPENCODE_QUALITY_CHECK_CGROUP_ATTACH_MODE=sudo-helper-v2`, and
+`OPENCODE_QUALITY_CHECK_CGROUP_ATTACH_HELPER`; it must not reuse the adapter
+root. Windows uses an independent Job Object. Instrumented model-backed
+benchmark execution is intentionally unavailable on macOS because one
+exclusive workload UID cannot safely hold both scopes concurrently. No containment coordinate or
+arbitrary command crosses into the model process, the capability is removed
+from shell environments, and protocol, timeout, or cleanup failure invalidates
+the attempt. Brokered checks use the asynchronous runner-owned process-tree
+controller and inherit the earlier of the model-turn and outer adapter
+deadlines; cancellation completes and verifies the independent check teardown
+before the attempt settles.
 
 Platform jobs produce typed operational bundles only through real verifier
 reports, then a separate command aggregates those artifacts instead of trusting
