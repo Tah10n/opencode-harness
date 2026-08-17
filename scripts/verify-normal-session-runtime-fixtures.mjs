@@ -9,7 +9,10 @@ import { pathToFileURL } from "node:url";
 import { createNormalSessionQualityPlugin } from "../lib/quality/quality-plugin.mjs";
 import { validateMilestone2ReceiptBundle } from "../lib/quality/milestone-dod.mjs";
 import { NORMAL_SESSION_QUALITY_TOOL_IDS } from "../lib/quality/normal-session-bridge.mjs";
-import { expectedNormalSessionQualityPermission } from "../lib/quality/normal-session-profile-permissions.mjs";
+import {
+  NORMAL_SESSION_QUALITY_PROFILE_PERMISSIONS,
+  expectedNormalSessionQualityPermission,
+} from "../lib/quality/normal-session-profile-permissions.mjs";
 import { observeContentBoundWorkspace } from "../lib/quality/normal-session-workspace.mjs";
 import {
   NORMAL_SESSION_HOST_EVIDENCE_PRODUCER,
@@ -101,10 +104,8 @@ function adoptedQualityPermissionMatrix(sourceRoot, mutate = null) {
   if (rootConfig.permission?.["quality_*"] !== "deny") return false;
   const agentRoot = path.join(sourceRoot, "agents");
   if (!fs.existsSync(agentRoot)) return false;
-  const agentNames = fs.readdirSync(agentRoot)
-    .filter((entry) => entry.endsWith(".md"))
-    .map((entry) => entry.slice(0, -3))
-    .sort();
+  const agentNames = Object.keys(NORMAL_SESSION_QUALITY_PROFILE_PERMISSIONS).sort();
+  if (!agentNames.every((agentName) => fs.existsSync(path.join(agentRoot, `${agentName}.md`)))) return false;
   const permissions = new Map(agentNames.map((agentName) => [agentName, readAgentQualityPermissions(sourceRoot, agentName)]));
   if (mutate !== null) mutate(permissions);
   for (const agentName of agentNames) {
@@ -115,8 +116,7 @@ function adoptedQualityPermissionMatrix(sourceRoot, mutate = null) {
     }
     if ([...explicit.keys()].some((toolId) => !NORMAL_SESSION_QUALITY_TOOL_IDS.includes(toolId))) return false;
   }
-  return ["orchestrator", "orchestrator-deep", "architect", "reviewer", "verifier"]
-    .every((agentName) => permissions.has(agentName));
+  return permissions.size === agentNames.length;
 }
 
 assert.equal(adoptedQualityPermissionMatrix(root), true,
@@ -125,7 +125,7 @@ assert.equal(adoptedQualityPermissionMatrix(root, (permissions) => {
   permissions.get("orchestrator").delete("quality_context_strategy_escalate");
 }), false, "missing orchestrator escalation permission must be detected");
 assert.equal(adoptedQualityPermissionMatrix(root, (permissions) => {
-  permissions.get("general").set("quality_context_strategy_escalate", "allow");
+  permissions.get("architect").set("quality_context_strategy_escalate", "allow");
 }), false, "non-orchestrator escalation exposure must be detected");
 assert.equal(adoptedQualityPermissionMatrix(root, (permissions) => {
   permissions.get("orchestrator-deep").delete("quality_project_catalog_rotate");
