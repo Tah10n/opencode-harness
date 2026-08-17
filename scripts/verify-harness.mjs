@@ -139,7 +139,7 @@ function exists(relativePath) {
 function listFiles(dir, out = []) {
   for (const entry of fs.readdirSync(path.join(root, dir), { withFileTypes: true })) {
     const relativePath = path.join(dir, entry.name).replaceAll("\\", "/");
-    if ([".git", "node_modules", "dist", ".cache", ".oc_learning", "local"].includes(entry.name)) {
+    if ([".git", ".worktrees", "node_modules", "dist", ".cache", ".oc_learning", "local"].includes(entry.name)) {
       continue;
     }
     if (entry.isDirectory()) {
@@ -523,8 +523,8 @@ for (const forbiddenFile of [
 }
 
 const packageJson = JSON.parse(read("package.json"));
-if (packageJson.version !== "0.3.0") {
-  fail("HARNESS-S007", "package.json version must match the unreleased 0.3.0 target", "Update docs, changelog, and release metadata together with the version.");
+if (packageJson.version !== "0.4.0") {
+  fail("HARNESS-S007", "package.json version must match the unreleased 0.4.0 target", "Update docs, changelog, and release metadata together with the version.");
 }
 if (packageJson.engines?.node !== ">=24") {
   fail("HARNESS-S007", "package.json engines.node must match the Node 24 CI/runtime contract", "Declare engines.node as >=24 and keep CI aligned.");
@@ -546,7 +546,7 @@ for (const forbiddenScript of ["assess:quality-candidate", "verify:model-profile
   }
 }
 const expectedDeterministicStages = [
-  "verify:static", "verify:benchmark:model-free", "verify:feedback-foundation", "verify:trace-store", "verify:report-history", "verify:adapter-worker",
+  "verify:v0.4", "verify:static", "verify:benchmark:model-free", "verify:feedback-foundation", "verify:trace-store", "verify:report-history", "verify:adapter-worker",
   "eval", "verify:drift", "verify:adoption-bundle", "verify:package-boundary", "verify:runtime:fixture", "verify:runtime:quality-hooks:fixture",
   "verify:live-eval", "verify:acceptance",
   "verify:quality-contracts", "verify:engineering-dossier", "verify:architecture-policy", "verify:impact-graph",
@@ -899,8 +899,8 @@ if (configModelConfiguration.length > 0) {
     "Keep model selection in the user's OpenCode host configuration rather than the reusable core profile.",
   );
 }
-if (config.default_agent !== "orchestrator") {
-  fail("HARNESS-S016", "opencode.json default_agent must be orchestrator", "Restore the primary harness orchestrator.");
+if (config.default_agent !== "core") {
+  fail("HARNESS-S016", "opencode.json default_agent must be core", "Restore the minimal production-default core agent.");
 }
 for (const commandName of ["review-diff", "diagnose", "workflow", "harness-release-review"]) {
   if (!config.command?.[commandName]) {
@@ -1274,7 +1274,6 @@ assertIncludes(recursiveDocs, "advanced tools are opt-in", "docs/recursive-conte
 assertIncludes(recursiveDocs, "not an absolute security boundary", "docs/recursive-context-mode.md");
 assertIncludes(recursiveDocs, "optional live validation", "docs/recursive-context-mode.md");
 for (const [label, text] of [
-  ["AGENTS.md", read("AGENTS.md")],
   ["agents/orchestrator.md", read("agents/orchestrator.md")],
   ["agents/orchestrator-deep.md", read("agents/orchestrator-deep.md")],
   ["skills/global-wide-deep-context/SKILL.md", read("skills/global-wide-deep-context/SKILL.md")],
@@ -1935,12 +1934,18 @@ for (const needle of [
 }
 
 const agentsPolicy = read("AGENTS.md");
-assertIncludes(agentsPolicy, "skip it for simple, self-contained, or directly answerable tasks", "AGENTS.md");
-assertIncludes(agentsPolicy, "Do not invoke self-improvement just because a task completed", "AGENTS.md");
-assertIncludes(agentsPolicy, "Keep `oc_learning_*` write tools out of the root profile and ordinary agents", "AGENTS.md");
-assertIncludes(agentsPolicy, "load `global-quality-gates` before edits", "AGENTS.md");
-assertIncludes(agentsPolicy, "High/critical work cannot be reported as `complete`", "AGENTS.md");
-assertIncludes(agentsPolicy, "verification evidence", "AGENTS.md");
+for (const needle of [
+  "Small local tasks stay single-agent",
+  "`deep` is optional",
+  "`assurance` is experimental and opt-in",
+  "Missing optional context tools",
+  "never block an ordinary task",
+  "Model-free and structural checks do not prove model-backed behavior",
+  "Root, core, deep, and",
+  "assurance deny `oc_learning_*` writes",
+]) {
+  assertIncludes(agentsPolicy, needle, "AGENTS.md", "HARNESS-S050", "Keep the v0.4 default policy compact, risk-adaptive, and fail-closed.");
+}
 
 const orchestratorAgent = read("agents/orchestrator.md");
 assertIncludes(orchestratorAgent, "Do not call `@improver` just because a task completed", "agents/orchestrator.md");
@@ -2727,7 +2732,7 @@ for (const needle of ["new Map", "extractPermissionSurface", "collectResolvedPer
 }
 
 const changelog = read("CHANGELOG.md");
-assertIncludes(changelog, "## Unreleased (target: 0.3.0)", "CHANGELOG.md");
+assertIncludes(changelog, "## Unreleased (target: 0.4.0)", "CHANGELOG.md");
 assertIncludes(changelog, "## 0.2.0 - 2026-06-15", "CHANGELOG.md");
 assertIncludes(changelog, "## 0.1.0 - 2026-06-15", "CHANGELOG.md");
 assertIncludes(changelog, "macOS exclusive-UID bundles", "CHANGELOG.md", "HARNESS-S085", "Keep the unreleased completion-evidence summary aligned with all mandatory platform producers.");
