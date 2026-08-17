@@ -4,6 +4,7 @@ dist/
 .qwen/
 .oc_learning/
 .oc_harness/
+.worktrees/
 local/
 evals/reports/
 evals/decisions/
