@@ -20,21 +20,23 @@ by managed replacement.
 not active v0.4 product claims. No reader guesses an artifact version or
 upgrades historical evidence in place.
 
-## Legacy v0.3 and tagged-release compatibility set
+## Development and tagged-release compatibility set
 
-The table below describes the retained v0.3 package/capability boundary. It is
-not the active v0.4 development target described above.
+The table below distinguishes the active unreleased v0.4 target, the retained
+historical v0.3 development boundary, and the latest tagged v0.2.0 release.
 
 | Component | Repository | Version | Status | Role |
 | --- | --- | --- | --- | --- |
-| `opencode-harness` | <https://github.com/Tah10n/opencode-harness> | `0.3.0` | Unreleased target (legacy) | Historical orchestration profile with feedback APIs, live evaluation, candidate assessment, docs, and verifiers. |
+| `opencode-harness` | <https://github.com/Tah10n/opencode-harness> | `0.4.0` | Unreleased target | Risk-adaptive profiles plus the retained feedback APIs, evaluation, compatibility readers, docs, and verifiers. |
+| `opencode-harness` | <https://github.com/Tah10n/opencode-harness> | `0.3.0` | Historical development target | Preserved maximalist orchestration and assurance-engine implementation; not the active product default. |
 | `opencode-harness` | <https://github.com/Tah10n/opencode-harness/tree/v0.2.0> | `v0.2.0` | Latest tagged release | Tagged orchestration profile, rules, docs, and verifier; its package has no package exports and does not expose feedback API subpaths. |
 | `opencode-recursive-context` | <https://github.com/Tah10n/opencode-recursive-context> | `0.2.0` | Coordinated release target | Safe read-only `context_*` tools; output schema v2, contract 2.0, policy 1. |
 | `opencode-learning-guard` | <https://github.com/Tah10n/opencode-learning-guard> | `0.2.0` | Compatible capability | Bounded `oc_learning_*` memory and managed-skill write tools. |
 
 Do not read development-checkout documentation as a claim about `v0.2.0`.
 The public `opencode-harness/feedback` and `opencode-harness/trace-store`
-subpaths belong to the unreleased `0.3.0` target until that version is tagged.
+subpaths remain part of the unreleased `0.4.0` checkout. They originate in the
+retained v0.3 implementation; the tagged `v0.2.0` package does not expose them.
 
 Note: `oc_learning_*` remains the stable OpenCode tool prefix even though the
 repository and package are named `opencode-learning-guard`.
