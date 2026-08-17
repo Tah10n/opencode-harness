@@ -9,12 +9,15 @@
     "estimand_id",
     "suite_id",
     "bindings",
+    "evidence_class",
+    "trusted_producer",
     "status",
     "paired_effects",
     "per_family",
     "per_stratum",
     "pareto",
     "incomplete_outcomes",
+    "guardrail_results",
     "verdict",
     "source_evidence_fingerprint",
     "policy_fingerprint",
@@ -22,16 +25,42 @@
   ],
   "properties": {
     "schema_version": { "const": 1 },
-    "report_kind": { "const": "vnext-component-ablation-comparison" },
+    "report_kind": { "const": "vnext-compound-profile-transition-comparison" },
     "estimand_id": { "type": "string", "minLength": 1 },
     "suite_id": { "enum": ["smoke", "standard", "full"] },
     "bindings": { "type": "object", "minProperties": 13 },
+    "evidence_class": { "enum": ["model-backed-contained-run", "model-free-test"] },
+    "trusted_producer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["producer_id", "schema_version", "engine_fingerprint", "executable_identity"],
+      "properties": {
+        "producer_id": { "enum": ["opencode-harness-vnext-contained-runner", "opencode-harness-vnext-model-free-test-runner"] },
+        "schema_version": { "const": 1 },
+        "engine_fingerprint": { "pattern": "^sha256:[0-9a-f]{64}$" },
+        "executable_identity": { "type": "string", "minLength": 1 }
+      }
+    },
     "status": { "enum": ["complete", "incomplete", "blocked-unproven"] },
     "paired_effects": { "type": "object" },
     "per_family": { "type": "array", "items": { "type": "object" } },
     "per_stratum": { "type": "array", "items": { "type": "object" } },
     "pareto": { "type": "object" },
     "incomplete_outcomes": { "type": "array", "items": { "type": "object" } },
+    "guardrail_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "passed", "observed", "threshold"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "passed": { "type": "boolean" },
+          "observed": {},
+          "threshold": {}
+        }
+      }
+    },
     "verdict": {
       "enum": ["promote", "retain-optional", "reject", "inconclusive", "blocked-unproven"]
     },

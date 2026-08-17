@@ -6,9 +6,9 @@ has a distinct enforcement sensor.
 
 | Component | Failure mode prevented | Mechanically enforced property and sensor | Cost | Current evidence | Disposition | Reason |
 | --- | --- | --- | --- | --- | --- | --- |
-| Compact core rules | Local change misses direct contract or test | Prompt budget and core verifier require the bounded inspect/edit/verify/review loop | Low | Structural; behavioral ablation pending | core | Small default contract |
-| Targeted project verification | Final mutation is not checked | Core verifier and project commands require a post-mutation relevant check | Low to medium | v0.3 verification-omission signal; component effect pending | core | Objective feedback with bounded cost |
-| Independent final review | Checks miss semantic/API defects | Read-only reviewer permission contract and review ledger | Medium | Inferential; component ablation pending | deep | Useful selectively, not a small-task ritual |
+| Compact core rules | Local change misses direct contract or test | Prompt budget and core verifier require the bounded inspect/edit/verify/review loop | Low | Structural; compound profile-transition evidence pending | core | Small default contract |
+| Targeted project verification | Final mutation is not checked | Core verifier and project commands require a post-mutation relevant check | Low to medium | v0.3 verification-omission signal; isolated causal effect unclaimed | core | Objective feedback with bounded cost |
+| Independent final review | Checks miss semantic/API defects | Read-only reviewer permission contract and review ledger | Medium | Inferential; compound transition evidence pending | deep | Useful selectively, not a small-task ritual |
 | Recursive context | Hidden consumer or transitive contract is missed | Bounded read-only capability contract, limits, and fallback checks | Medium | Mixed inside v0.3 bundle; isolated evidence pending | deep | Relevant to broad tasks only |
 | Scoped read-only subagents | Root context is polluted or independent searches are missed | Deep delegation limit, read-only agents, one integrator | Medium | Structural; isolated evidence pending | deep | Optional decomposition |
 | Engineering Dossier | Risk and preserved behavior are underspecified | Closed dossier schemas and gate checks | High cognitive/runtime | v0.3 aggregate result inconclusive | assurance | Appropriate only for high-risk work |

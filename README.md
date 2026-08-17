@@ -26,7 +26,7 @@ contracts. Neither mode is silently activated by `core`.
 | `core` | Production default | Compact rules and direct verification loop | Recursive context, quality state, learning writes, lab |
 | `deep` | Optional | Bounded context and focused read-only exploration | Quality lifecycle and mutation gate |
 | `assurance` | Experimental opt-in | Four-operation facade over fail-closed v0.3 controls | Benchmark corpus and evaluation reports |
-| `lab` | Developer bundle, not an agent | Ablations, fixtures, statistics, replay, traces | User runtime claims |
+| `lab` | Developer bundle, not an agent | Profile-transition experiments, fixtures, statistics, replay, traces | User runtime claims |
 
 Materialize `deep` or `assurance` by changing `--profile`; add `--dry-run` to
 inspect the stable manifest and fingerprint first. Existing output is refused
@@ -53,7 +53,9 @@ permissions, portable materialization, facade-only standard and high-risk
 assurance lifecycles, structural child-assignment binding, legacy v2 reader compatibility,
 byte-bound cumulative arm materialization, rendered medium/high topology,
 runner-owned pair aggregation, receipt-recomputed observations, an in-process
-standard-to-full authorization boundary, and frozen promotion thresholds. These checks do
+standard-to-full authorization boundary, and frozen promotion thresholds. The installed
+OpenCode probes additionally load P0-P5, invoke all four P4/P5 context tools,
+confirm that P4 creates no quality state, and confirm one P5 receipt per context call. These checks do
 not prove that `deep` or `assurance` improves model-backed outcomes. The vNext
 contract requires paired smoke and standard runs before promotion; unavailable
 runtime evidence remains `blocked-unproven` and is never scored.

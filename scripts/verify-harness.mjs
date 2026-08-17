@@ -2183,7 +2183,7 @@ for (const [label, text, needles] of [
     "must not be interpreted as release `accepted`/`rejected`",
   ]],
   ["docs/release.md", modelNeutralReleaseDoc, [
-    "Synthetic ablation evidence is product-value research, not release acceptance.",
+    "Synthetic profile-transition evidence is product-value research, not release acceptance.",
     "npm run bench:synthetic:validate",
     "--suite standard",
     "Model-backed synthetic execution is manual",

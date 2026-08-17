@@ -166,7 +166,7 @@
       }
     }
   ],
-  "vnext_component_surface_deltas": {
+  "vnext_transition_surface_anchors": {
     "core-rules": [
       "/effective_config/default_agent",
       "/materialized_files/0/fingerprint",
@@ -204,9 +204,6 @@
       "/effective_config/plugin/1/fingerprint",
       "/effective_config/plugin/1/id",
       "/effective_config/plugin/1/source_path",
-      "/effective_config/plugin/2/fingerprint",
-      "/effective_config/plugin/2/id",
-      "/effective_config/plugin/2/source_path",
       "/materialized_files/0/fingerprint",
       "/materialized_files/0/path",
       "/materialized_files/1/fingerprint",
@@ -227,10 +224,7 @@
       "/materialized_files/8/path",
       "/plugin_sources/1/fingerprint",
       "/plugin_sources/1/id",
-      "/plugin_sources/1/source_path",
-      "/plugin_sources/2/fingerprint",
-      "/plugin_sources/2/id",
-      "/plugin_sources/2/source_path"
+      "/plugin_sources/1/source_path"
     ]
   },
   "profiles": [

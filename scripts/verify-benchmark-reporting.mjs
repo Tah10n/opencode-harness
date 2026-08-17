@@ -846,13 +846,16 @@ export function verifyBenchmarkReporting({ root = defaultRoot } = {}) {
   duplicatePair.suite.declared_pair_count = duplicatePair.pairs.length;
   mustReject(duplicatePair, "SYNTHETIC_REPORT_DUPLICATE_PAIR");
 
-  const completeRoot = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-bench-report-complete-"));
-  const interruptedRoot = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-bench-report-interrupted-"));
-  const incompleteRoot = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-bench-report-incomplete-"));
-  const partialOneRoot = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-bench-report-partial-one-"));
-  const partialTwoRoot = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-bench-report-partial-two-"));
-  const divergentRoot = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-bench-report-divergent-"));
-  const markerDivergentRoot = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-bench-report-marker-divergent-"));
+  const canonicalTemporaryRoot = (prefix) => fs.realpathSync.native(
+    fs.mkdtempSync(path.join(os.tmpdir(), prefix)),
+  );
+  const completeRoot = canonicalTemporaryRoot("opencode-bench-report-complete-");
+  const interruptedRoot = canonicalTemporaryRoot("opencode-bench-report-interrupted-");
+  const incompleteRoot = canonicalTemporaryRoot("opencode-bench-report-incomplete-");
+  const partialOneRoot = canonicalTemporaryRoot("opencode-bench-report-partial-one-");
+  const partialTwoRoot = canonicalTemporaryRoot("opencode-bench-report-partial-two-");
+  const divergentRoot = canonicalTemporaryRoot("opencode-bench-report-divergent-");
+  const markerDivergentRoot = canonicalTemporaryRoot("opencode-bench-report-marker-divergent-");
   try {
     let markerHookCalled = false;
     const published = publishRun({

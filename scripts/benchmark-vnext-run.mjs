@@ -3,7 +3,12 @@ import process from "node:process";
 import { fileURLToPath } from "node:url";
 
 import { ProfileV3Error, fingerprintProfileValue } from "../lib/profile-v3.mjs";
-import { buildVnextExecutionPlan, executeVnextFull, executeVnextPlan } from "../lib/benchmark/vnext-runner.mjs";
+import {
+  buildVnextExecutionPlan,
+  executeVnextFull,
+  executeVnextPlan,
+  executeVnextStandard,
+} from "../lib/benchmark/vnext-runner.mjs";
 import { resolveSyntheticOpenCodeExecutableIdentity } from "../lib/benchmark/opencode-adapter.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -71,6 +76,7 @@ try {
   };
   let plan;
   let report;
+  let completedEnvelope = null;
   if (options.suite === "full") {
     if (executableIdentity === null) {
       throw new ProfileV3Error("VNEXT_EXECUTABLE_UNAVAILABLE", "OpenCode executable identity is unavailable");
@@ -78,6 +84,15 @@ try {
     const executed = await executeVnextFull({ ...common, executableIdentity });
     plan = executed.plan;
     report = executed.report;
+    completedEnvelope = executed;
+  } else if (options.suite === "standard" && !options.planOnly) {
+    if (executableIdentity === null) {
+      throw new ProfileV3Error("VNEXT_EXECUTABLE_UNAVAILABLE", "OpenCode executable identity is unavailable");
+    }
+    const executed = await executeVnextStandard({ ...common, executableIdentity });
+    plan = executed.envelope.plan;
+    report = executed.envelope.report;
+    completedEnvelope = executed.envelope;
   } else {
     plan = buildVnextExecutionPlan({ ...common, suiteId: options.suite });
     if (executableIdentity === null) {
@@ -88,19 +103,22 @@ try {
     process.stdout.write(`${JSON.stringify(plan, null, 2)}\n`);
     process.exitCode = 0;
   } else {
-    if (report === undefined) {
+    if (completedEnvelope === null && report === undefined) {
       report = await executeVnextPlan({ repositoryRoot: root, plan, executableIdentity });
     }
-    const envelopeSource = {
-      schema_version: 1,
-      run_kind: "vnext-run-envelope",
-      plan,
-      report,
-    };
-    process.stdout.write(`${JSON.stringify({
-      ...envelopeSource,
-      envelope_fingerprint: fingerprintProfileValue(envelopeSource),
-    }, null, 2)}\n`);
+    if (completedEnvelope === null) {
+      const envelopeSource = {
+        schema_version: 1,
+        run_kind: "vnext-run-envelope",
+        plan,
+        report,
+      };
+      completedEnvelope = {
+        ...envelopeSource,
+        envelope_fingerprint: fingerprintProfileValue(envelopeSource),
+      };
+    }
+    process.stdout.write(`${JSON.stringify(completedEnvelope, null, 2)}\n`);
     if (report.status !== "complete") process.exitCode = 2;
   }
 } catch (error) {

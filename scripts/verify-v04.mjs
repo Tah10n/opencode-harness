@@ -32,10 +32,12 @@ import {
   buildVnextExecutionPlan,
   buildVnextPromotionDecisionFromRun,
   executeVnextPlanModelFreeTest,
-  applyVnextPromotionPolicy,
+  validateVnextFullRunEnvelope,
+  validateVnextStandardGate,
   validateVnextArmSurfaceDelta,
   validateVnextRunReport,
 } from "../lib/benchmark/vnext-runner.mjs";
+import { createBoundedContextToolSurface } from "../lib/benchmark/opencode-context-bridge-plugin.mjs";
 import { loadSyntheticContracts } from "../lib/benchmark/contracts.mjs";
 import {
   loadSyntheticTemplateSet,
@@ -133,14 +135,98 @@ function fakeToolFactory() {
   const chain = () => ({
     describe() { return this; },
     optional() { return this; },
+    int() { return this; },
+    min() { return this; },
+    max() { return this; },
   });
   const toolFactory = (definition) => definition;
   toolFactory.schema = {
     string: chain,
+    number: chain,
+    boolean: chain,
     enum: chain,
     array: chain,
   };
   return toolFactory;
+}
+
+async function verifyBoundedContextSurface() {
+  const temporaryRoot = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), "opencode-vnext-context-contract-")));
+  const execute = async (surface, toolId, args = {}) => JSON.parse(await surface[toolId].execute(args));
+  try {
+    const sensitivePaths = [
+      ".npmrc", ".netrc", ".pypirc", ".git-credentials", "id_rsa", "secrets/prod.json",
+      "credentials/cloud.json", ".ssh/id_ed25519", ".kube/config", ".aws/credentials",
+      "auth.json", "certificates/client.jks", "mobile/signing.p8", "vault/account.kdbx",
+    ];
+    for (const relativePath of sensitivePaths) {
+      const target = path.join(temporaryRoot, ...relativePath.split("/"));
+      fs.mkdirSync(path.dirname(target), { recursive: true });
+      fs.writeFileSync(target, "review-secret-token\n", "utf8");
+    }
+    fs.writeFileSync(path.join(temporaryRoot, "public.txt"), "public needle\n", "utf8");
+    let surface = createBoundedContextToolSurface({ toolFactory: fakeToolFactory(), workspaceRoot: temporaryRoot });
+    const outline = await execute(surface, "context_outline");
+    const files = await execute(surface, "context_files");
+    const search = await execute(surface, "context_search", { query: "review-secret-token" });
+    assert(outline.filesSample.every((entry) => !sensitivePaths.includes(entry.path))
+      && files.files.every((entry) => !sensitivePaths.includes(entry.path))
+      && search.matches.length === 0,
+    "V04_CONTEXT_SECRET", "context inventory or search exposed a sensitive path");
+    for (const relativePath of sensitivePaths) {
+      let rejected = false;
+      try {
+        await execute(surface, "context_read", { path: relativePath });
+      } catch {
+        rejected = true;
+      }
+      assert(rejected, "V04_CONTEXT_SECRET", `context_read exposed ${relativePath}`);
+    }
+
+    const fileLimitRoot = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), "opencode-vnext-context-files-")));
+    try {
+      for (let index = 0; index < 256; index += 1) {
+        fs.writeFileSync(path.join(fileLimitRoot, `f-${String(index).padStart(3, "0")}.txt`), "x", "utf8");
+      }
+      surface = createBoundedContextToolSurface({ toolFactory: fakeToolFactory(), workspaceRoot: fileLimitRoot });
+      const exact = await execute(surface, "context_outline");
+      assert(exact.filesSample.length === 256 && exact.coverage.partial === false,
+        "V04_CONTEXT_LIMIT", "exact context inventory file boundary was truncated");
+      fs.writeFileSync(path.join(fileLimitRoot, "z-overflow.txt"), "x", "utf8");
+      surface = createBoundedContextToolSurface({ toolFactory: fakeToolFactory(), workspaceRoot: fileLimitRoot });
+      for (const [toolId, args] of [["context_outline", {}], ["context_files", {}], ["context_search", { query: "x" }]]) {
+        const partial = await execute(surface, toolId, args);
+        assert(partial.coverage.partial === true
+          && partial.coverage.truncation.inventoryLimitReached === true,
+        "V04_CONTEXT_LIMIT", `${toolId} did not return bounded partial evidence at file limit +1`);
+      }
+      const direct = await execute(surface, "context_read", { path: "z-overflow.txt" });
+      assert(direct.text.includes("x"), "V04_CONTEXT_LIMIT",
+        "explicit context_read incorrectly depended on whole-workspace inventory");
+    } finally {
+      fs.rmSync(fileLimitRoot, { recursive: true, force: true });
+    }
+
+    const byteLimitRoot = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), "opencode-vnext-context-bytes-")));
+    try {
+      const chunk = Buffer.alloc(256 * 1024, 0x61);
+      for (let index = 0; index < 8; index += 1) fs.writeFileSync(path.join(byteLimitRoot, `${index}.txt`), chunk);
+      surface = createBoundedContextToolSurface({ toolFactory: fakeToolFactory(), workspaceRoot: byteLimitRoot });
+      const exact = await execute(surface, "context_outline");
+      assert(exact.coverage.bytesScanned === 2 * 1024 * 1024 && exact.coverage.partial === false,
+        "V04_CONTEXT_LIMIT", "exact context inventory byte boundary was truncated");
+      fs.writeFileSync(path.join(byteLimitRoot, "z-overflow.txt"), "x", "utf8");
+      surface = createBoundedContextToolSurface({ toolFactory: fakeToolFactory(), workspaceRoot: byteLimitRoot });
+      const partial = await execute(surface, "context_outline");
+      assert(partial.coverage.partial === true && partial.coverage.truncation.byteLimitReached === true,
+        "V04_CONTEXT_LIMIT", "context outline did not return partial evidence at byte limit +1");
+    } finally {
+      fs.rmSync(byteLimitRoot, { recursive: true, force: true });
+    }
+    return { status: "passed", sensitive_path_count: sensitivePaths.length };
+  } finally {
+    fs.rmSync(temporaryRoot, { recursive: true, force: true });
+  }
 }
 
 function runLegacyModelFree(relativeScript, label) {
@@ -749,6 +835,14 @@ function verifyAdoption() {
 }
 
 async function verifyLab() {
+  const context_surface = await verifyBoundedContextSurface();
+  const runnerExports = await import("../lib/benchmark/vnext-runner.mjs");
+  assert(!Object.hasOwn(runnerExports, "applyVnextPromotionPolicy"),
+    "V04_LAB_PROMOTION", "standalone comparison promotion API remains publicly callable");
+  const vnextRunCliSource = read("scripts/benchmark-vnext-run.mjs");
+  assert(vnextRunCliSource.includes("completedEnvelope = executed;")
+    && vnextRunCliSource.includes("JSON.stringify(completedEnvelope"),
+  "V04_LAB_FULL_CLI", "full CLI no longer emits the exact trusted full envelope");
   const loaded = loadVnextContracts(root);
   const validation = loaded.validation;
   const self_test = selfTestVnextContracts(root);
@@ -769,20 +863,36 @@ async function verifyLab() {
   "V04_LAB_PLAN", "smoke plan family or evidence binding coverage drifted");
   const unrelatedSurface = structuredClone(plans[0].arms.candidate);
   unrelatedSurface.runtime_surface.effective_config.unrelated_permission = "allow";
-  let unrelatedSurfaceRejected = false;
-  try {
-    validateVnextArmSurfaceDelta(
-      plans[0].arms.baseline,
-      unrelatedSurface,
-      plans[0].added_component_id,
-      loaded.inventory.vnext_component_surface_deltas[plans[0].added_component_id],
-    );
-  } catch (error) {
-    if (!(error instanceof ProfileV3Error)) throw error;
-    unrelatedSurfaceRejected = error.code === "VNEXT_ARM_DIFF";
+  const compoundDelta = validateVnextArmSurfaceDelta(
+    plans[0].arms.baseline,
+    unrelatedSurface,
+    plans[0].transition_anchor_component_id,
+    loaded.inventory.vnext_transition_surface_anchors[plans[0].transition_anchor_component_id],
+  );
+  assert(compoundDelta.estimand_kind === "compound-profile-transition"
+    && compoundDelta.changed_leaf_paths.includes("/effective_config/unrelated_permission"),
+  "V04_LAB_ARM_DELTA", "compound transition did not bind its complete observed surface delta");
+  const gateFixturePromotion = {
+    source_run_fingerprint: `sha256:${"1".repeat(64)}`,
+    comparison_fingerprint: `sha256:${"2".repeat(64)}`,
+    decision_fingerprint: `sha256:${"3".repeat(64)}`,
+  };
+  const gateFixture = {
+    standard_run_fingerprint: gateFixturePromotion.source_run_fingerprint,
+    standard_comparison_fingerprint: gateFixturePromotion.comparison_fingerprint,
+    standard_promotion_decision_fingerprint: gateFixturePromotion.decision_fingerprint,
+  };
+  validateVnextStandardGate(gateFixture, gateFixturePromotion);
+  for (const key of Object.keys(gateFixture)) {
+    let rejected = false;
+    try {
+      validateVnextStandardGate({ ...gateFixture, [key]: `sha256:${"0".repeat(64)}` }, gateFixturePromotion);
+    } catch (error) {
+      if (!(error instanceof ProfileV3Error)) throw error;
+      rejected = error.code === "VNEXT_FULL_GATE";
+    }
+    assert(rejected, "V04_LAB_FULL_GATE", `substituted ${key} was accepted`);
   }
-  assert(unrelatedSurfaceRejected, "V04_LAB_ARM_DELTA",
-    "an undeclared materialized surface change was accepted as a one-component ablation");
   let forgedFullDecisionRejected = false;
   try {
     buildVnextExecutionPlan({
@@ -796,7 +906,7 @@ async function verifyLab() {
       timeoutMs: 300_000,
       executableIdentity: "fixture-opencode-identity",
       standardRun: {
-        report_kind: "vnext-component-ablation-comparison",
+        report_kind: "vnext-compound-profile-transition-comparison",
         suite_id: "standard",
         estimand_id: loaded.contract.estimands[0].id,
         status: "complete",
@@ -824,6 +934,80 @@ async function verifyLab() {
       rejected = error.code === "VNEXT_ADAPTER_REPORT";
     }
     assert(rejected, "V04_LAB_REPORT_BINDING", "stale vnext run report was accepted");
+    if (plan === plans[0]) {
+      const fullEnvelopePlan = structuredClone(plan);
+      fullEnvelopePlan.suite_id = "full";
+      fullEnvelopePlan.standard_gate = gateFixture;
+      const { plan_fingerprint: _smokeFingerprint, ...fullEnvelopePlanSource } = fullEnvelopePlan;
+      fullEnvelopePlan.plan_fingerprint = fingerprintProfileValue(fullEnvelopePlanSource);
+      const fullEnvelopeReport = blockedVnextRunReport(fullEnvelopePlan, "fixture_full_blocked");
+      const fullEnvelopeSource = {
+        schema_version: 1,
+        run_kind: "vnext-full-run-envelope",
+        plan: fullEnvelopePlan,
+        report: fullEnvelopeReport,
+        standard_gate: gateFixture,
+      };
+      const fullEnvelope = {
+        ...fullEnvelopeSource,
+        envelope_fingerprint: fingerprintProfileValue(fullEnvelopeSource),
+      };
+      validateVnextFullRunEnvelope(fullEnvelope);
+      const mismatchedFullEnvelopeSource = {
+        ...fullEnvelopeSource,
+        standard_gate: { ...gateFixture, standard_run_fingerprint: `sha256:${"9".repeat(64)}` },
+      };
+      let mismatchedFullEnvelopeRejected = false;
+      try {
+        validateVnextFullRunEnvelope({
+          ...mismatchedFullEnvelopeSource,
+          envelope_fingerprint: fingerprintProfileValue(mismatchedFullEnvelopeSource),
+        });
+      } catch (error) {
+        if (!(error instanceof ProfileV3Error)) throw error;
+        mismatchedFullEnvelopeRejected = error.code === "VNEXT_FULL_ENVELOPE";
+      }
+      assert(mismatchedFullEnvelopeRejected, "V04_LAB_FULL_GATE",
+        "full envelope standard gate drifted from its plan without rejection");
+      for (const [id, mutate] of [
+        ["stale-source", (candidate) => { candidate.bindings.source_sha = "0".repeat(40); }],
+        ["stale-policy", (candidate) => { candidate.bindings.policy_fingerprint = `sha256:${"0".repeat(64)}`; }],
+        ["stale-evaluator", (candidate) => { candidate.bindings.evaluator_fingerprint = `sha256:${"0".repeat(64)}`; }],
+        ["noncanonical-schedule", (candidate) => { candidate.pair_schedule.reverse(); }],
+      ]) {
+        const noncanonicalPlan = structuredClone(plan);
+        mutate(noncanonicalPlan);
+        const { plan_fingerprint: _priorPlanFingerprint, ...noncanonicalSource } = noncanonicalPlan;
+        noncanonicalPlan.plan_fingerprint = fingerprintProfileValue(noncanonicalSource);
+        let noncanonicalRejected = false;
+        try {
+          buildVnextComparisonReport({ repositoryRoot: root, plan: noncanonicalPlan, report: blocked });
+        } catch (error) {
+          if (!(error instanceof ProfileV3Error)) throw error;
+          noncanonicalRejected = error.code === "VNEXT_PLAN_NONCANONICAL";
+        }
+        assert(noncanonicalRejected, "V04_LAB_CANONICAL_PLAN",
+          `${id} plan was accepted by compare against current source and contracts`);
+      }
+      const fakeProducer = structuredClone(blocked);
+      fakeProducer.trusted_producer.producer_id = "untrusted-fixture";
+      fakeProducer.evidence_fingerprint = fingerprintProfileValue({
+        plan_fingerprint: plan.plan_fingerprint,
+        evidence_class: fakeProducer.evidence_class,
+        trusted_producer: fakeProducer.trusted_producer,
+        pair_results: fakeProducer.pair_results,
+        incomplete_outcomes: fakeProducer.incomplete_outcomes,
+      });
+      let fakeProducerRejected = false;
+      try {
+        validateVnextRunReport(plan, fakeProducer);
+      } catch (error) {
+        if (!(error instanceof ProfileV3Error)) throw error;
+        fakeProducerRejected = error.code === "VNEXT_TRUSTED_PRODUCER";
+      }
+      assert(fakeProducerRejected, "V04_LAB_TRUSTED_PRODUCER",
+        "a fake run producer was accepted as trusted evidence");
+    }
 
     const sharedBinding = Object.freeze(Object.fromEntries([
       "public_fixture_fingerprint", "hidden_fixture_fingerprint", "task_scope_fingerprint",
@@ -893,19 +1077,49 @@ async function verifyLab() {
       ...envelopeSource,
       envelope_fingerprint: fingerprintProfileValue(envelopeSource),
     };
-    const decision = buildVnextPromotionDecisionFromRun({ repositoryRoot: root, envelope });
-    assert(comparison.verdict === "inconclusive" && decision.promotable === false,
-      "V04_LAB_PROMOTION", "smoke evidence was incorrectly treated as promotable");
-    const staleComparison = structuredClone(comparison);
-    staleComparison.verdict = "promote";
-    let staleDecisionRejected = false;
+    let modelFreePromotionRejected = false;
     try {
-      applyVnextPromotionPolicy(staleComparison);
+      buildVnextPromotionDecisionFromRun({ repositoryRoot: root, envelope });
     } catch (error) {
       if (!(error instanceof ProfileV3Error)) throw error;
-      staleDecisionRejected = error.code === "VNEXT_PROMOTION";
+      modelFreePromotionRejected = error.code === "VNEXT_PROMOTION_PROVENANCE";
     }
-    assert(staleDecisionRejected, "V04_LAB_PROMOTION", "tampered promotion comparison was accepted");
+    assert(comparison.verdict === "inconclusive" && modelFreePromotionRejected,
+      "V04_LAB_PROMOTION", "model-free smoke evidence was accepted as promotion evidence");
+    const relabelledReport = structuredClone(complete);
+    relabelledReport.evidence_class = "model-backed-contained-run";
+    relabelledReport.trusted_producer = {
+      producer_id: "opencode-harness-vnext-contained-runner",
+      schema_version: 1,
+      engine_fingerprint: plan.bindings.adapter_fingerprint,
+      executable_identity: plan.bindings.executable_identity,
+    };
+    relabelledReport.evidence_fingerprint = fingerprintProfileValue({
+      plan_fingerprint: plan.plan_fingerprint,
+      evidence_class: relabelledReport.evidence_class,
+      trusted_producer: relabelledReport.trusted_producer,
+      pair_results: relabelledReport.pair_results,
+      incomplete_outcomes: relabelledReport.incomplete_outcomes,
+    });
+    const relabelledEnvelopeSource = {
+      schema_version: 1,
+      run_kind: "vnext-run-envelope",
+      plan,
+      report: relabelledReport,
+    };
+    const relabelledEnvelope = {
+      ...relabelledEnvelopeSource,
+      envelope_fingerprint: fingerprintProfileValue(relabelledEnvelopeSource),
+    };
+    let relabelledRejected = false;
+    try {
+      buildVnextPromotionDecisionFromRun({ repositoryRoot: root, envelope: relabelledEnvelope });
+    } catch (error) {
+      if (!(error instanceof ProfileV3Error)) throw error;
+      relabelledRejected = error.code === "VNEXT_PROMOTION_PROVENANCE";
+    }
+    assert(relabelledRejected, "V04_LAB_PROMOTION",
+      "a relabelled model-free report was accepted as model-backed promotion evidence");
     if (plan === plans[0]) {
       const standardPlan = buildVnextExecutionPlan({
         repositoryRoot: root,
@@ -943,9 +1157,15 @@ async function verifyLab() {
         ...forgedEnvelopeSource,
         envelope_fingerprint: fingerprintProfileValue(forgedEnvelopeSource),
       };
-      const forgedDecision = buildVnextPromotionDecisionFromRun({ repositoryRoot: root, envelope: forgedEnvelope });
-      assert(forgedDecision.promotable === true,
-        "V04_LAB_FULL_GATE", "fabricated standard fixture must exercise the positive promotion branch");
+      let forgedDecisionRejected = false;
+      try {
+        buildVnextPromotionDecisionFromRun({ repositoryRoot: root, envelope: forgedEnvelope });
+      } catch (error) {
+        if (!(error instanceof ProfileV3Error)) throw error;
+        forgedDecisionRejected = error.code === "VNEXT_PROMOTION_PROVENANCE";
+      }
+      assert(forgedDecisionRejected,
+        "V04_LAB_FULL_GATE", "model-free fabricated standard run was accepted as promotion evidence");
       let forgedEnvelopeRejected = false;
       try {
         buildVnextExecutionPlan({
@@ -967,6 +1187,53 @@ async function verifyLab() {
       }
       assert(forgedEnvelopeRejected, "V04_LAB_FULL_GATE",
         "a self-consistent fabricated standard run unlocked full outside the in-process trusted runner");
+    }
+    if (plan.estimand_id === "core-reviewed-to-deep") {
+      const guardrailPlan = buildVnextExecutionPlan({
+        repositoryRoot: root,
+        suiteId: "standard",
+        estimandId: plan.estimand_id,
+        model: "fixture/model",
+        provider: "fixture-provider",
+        variant: "fixture-variant",
+        seed: "vnext-small-negative-control",
+        timeoutMs: 300_000,
+        executableIdentity: "fixture-opencode-identity",
+        allowDirty: true,
+      });
+      const familyStrata = new Map(loaded.contract.families.map((entry) => [entry.id, entry.stratum]));
+      const harmfulSmallRunner = async (input) => {
+        const attempt = structuredClone(await fakeAttemptRunner(input));
+        const stratum = familyStrata.get(input.instance.family_id);
+        const candidate = input.profileId === guardrailPlan.candidate_arm_id;
+        if (stratum === "medium") {
+          attempt.result.vnext_consumer_observation.preserved_consumer_count = candidate
+            ? attempt.result.vnext_consumer_observation.required_consumer_ids.length : 0;
+        }
+        if (stratum === "small" && candidate) {
+          attempt.result.hidden_check.passed = false;
+          attempt.result.task_correct = false;
+          attempt.result.whole_task_success = false;
+        }
+        return attempt;
+      };
+      const harmfulSmallReport = await executeVnextPlanModelFreeTest({
+        repositoryRoot: root,
+        plan: guardrailPlan,
+        attemptRunner: harmfulSmallRunner,
+        executableIdentity: "fixture-opencode-identity",
+      });
+      const harmfulSmallComparison = buildVnextComparisonReport({
+        repositoryRoot: root,
+        plan: guardrailPlan,
+        report: harmfulSmallReport,
+      });
+      const smallGuardrail = harmfulSmallComparison.guardrail_results.find(
+        (entry) => entry.id === "small-negative-control-delta-minimum",
+      );
+      assert(harmfulSmallComparison.verdict === "reject" && smallGuardrail?.passed === false,
+        "V04_LAB_SMALL_NEGATIVE_CONTROL",
+        "medium improvement with a harmful small-task control did not force rejection");
     }
     const invalidReports = [];
     const emptyComplete = structuredClone(complete);
@@ -1099,7 +1366,7 @@ async function verifyLab() {
       });
       if (dryPlan.status === 0) {
         const parsedPlan = JSON.parse(dryPlan.stdout);
-        assert(parsedPlan.plan_kind === "vnext-component-ablation-plan" && parsedPlan.pair_schedule.length > 0,
+        assert(parsedPlan.plan_kind === "vnext-compound-profile-transition-plan" && parsedPlan.pair_schedule.length > 0,
           "V04_LAB_MATERIALIZED", "materialized plan-only command did not bind executable pairs");
         materialized_checks = { validate: validate.status, self_test: selfTest.status, plan_only: "passed", esm_closure_files: closure.length };
       } else {
@@ -1142,6 +1409,7 @@ async function verifyLab() {
     bundle_fingerprint: lab.bundle_fingerprint,
     legacy_checks,
     materialized_checks,
+    context_surface,
   };
 }
 

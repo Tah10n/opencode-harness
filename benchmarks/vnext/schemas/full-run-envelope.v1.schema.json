@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opencode-harness.invalid/schemas/vnext-full-run-envelope-v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "run_kind",
+    "plan",
+    "report",
+    "standard_gate",
+    "envelope_fingerprint"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "run_kind": { "const": "vnext-full-run-envelope" },
+    "plan": { "$ref": "execution-plan.v1.schema.json" },
+    "report": { "$ref": "run-report.v1.schema.json" },
+    "standard_gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "standard_run_fingerprint",
+        "standard_comparison_fingerprint",
+        "standard_promotion_decision_fingerprint"
+      ],
+      "properties": {
+        "standard_run_fingerprint": { "pattern": "^sha256:[0-9a-f]{64}$" },
+        "standard_comparison_fingerprint": { "pattern": "^sha256:[0-9a-f]{64}$" },
+        "standard_promotion_decision_fingerprint": { "pattern": "^sha256:[0-9a-f]{64}$" }
+      }
+    },
+    "envelope_fingerprint": { "pattern": "^sha256:[0-9a-f]{64}$" }
+  }
+}

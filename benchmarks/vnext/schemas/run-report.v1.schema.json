@@ -89,6 +89,8 @@
     "run_id",
     "estimand_id",
     "suite_id",
+    "evidence_class",
+    "trusted_producer",
     "bindings",
     "status",
     "family_results",
@@ -104,6 +106,17 @@
     "run_id": { "type": "string", "minLength": 1 },
     "estimand_id": { "type": "string", "minLength": 1 },
     "suite_id": { "enum": ["smoke", "standard", "full"] },
+    "evidence_class": { "enum": ["model-backed-contained-run", "model-free-test"] },
+    "trusted_producer": {
+      "type": "object", "additionalProperties": false,
+      "required": ["producer_id", "schema_version", "engine_fingerprint", "executable_identity"],
+      "properties": {
+        "producer_id": { "enum": ["opencode-harness-vnext-contained-runner", "opencode-harness-vnext-model-free-test-runner"] },
+        "schema_version": { "const": 1 },
+        "engine_fingerprint": { "pattern": "^sha256:[0-9a-f]{64}$" },
+        "executable_identity": { "type": "string", "minLength": 1 }
+      }
+    },
     "bindings": {
       "type": "object",
       "minProperties": 14,

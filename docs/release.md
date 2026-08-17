@@ -7,13 +7,16 @@ promoted default claim.
 Before release, run `npm run verify:core`, `verify:deep`,
 `verify:assurance:model-free`, `verify:profiles`, `verify:adoption`,
 `verify:lab:model-free`, the vNext validate/self-test commands, and the aggregate
-`npm run verify`. Also run `npm run probe:runtime:v0.4` with installed OpenCode;
+`npm run verify`. Also run `npm run probe:runtime:v0.4` and
+`npm run probe:runtime:vnext` with installed OpenCode;
 it verifies source/materialized core tool isolation, the exact four-tool
-assurance catalog, and effective role permissions. Model-backed vNext work is a separate promotion gate and is
+assurance catalog, effective role permissions, the P0-P5 tool surfaces, actual
+P4/P5 context calls, P4 quality-state absence, and exactly one P5 receipt per
+context call. Model-backed vNext work is a separate promotion gate and is
 never required for deterministic CI; missing execution evidence leaves the
-affected component optional or experimental.
+affected profile transition unpromoted and experimental.
 
-Synthetic ablation evidence is product-value research, not release acceptance.
+Synthetic profile-transition evidence is product-value research, not release acceptance.
 Its profile surfaces may intentionally differ, and its reports must not be
 passed to `npm run assess:candidate`. The existing compatible-surface
 release-regression contract and first-party evidence chain remain

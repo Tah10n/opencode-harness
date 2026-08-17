@@ -52,6 +52,7 @@
     "milestone:2:operational": "node scripts/run-milestone-2-operational.mjs",
     "probe:runtime:quality-plugin-api": "node scripts/probe-normal-session-plugin-api.mjs",
     "probe:runtime:v0.4": "node scripts/probe-v04-runtime.mjs",
+    "probe:runtime:vnext": "node scripts/probe-vnext-runtime.mjs",
     "profile:materialize": "node scripts/profile-materialize.mjs",
     "trace": "node scripts/trace-run.mjs",
     "verify": "node scripts/verify-all.mjs",

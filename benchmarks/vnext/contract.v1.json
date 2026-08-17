@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "contract_id": "opencode-harness-vnext-ablation-v1",
+  "contract_id": "opencode-harness-vnext-compound-profile-transitions-v1",
   "inventory_path": "profiles/inventory.v3.json",
   "component_order": [
     "core-rules",
@@ -64,55 +64,72 @@
   "estimands": [
     {
       "id": "plain-to-core-rules",
+      "estimand_kind": "compound-profile-transition",
       "baseline_arm_id": "P0",
       "candidate_arm_id": "P1",
-      "added_component_id": "core-rules",
+      "transition_anchor_component_id": "core-rules",
       "eligible_strata": [
         "small",
         "medium"
       ],
+      "target_strata": ["small", "medium"],
+      "negative_control_strata": [],
       "target_metric": "functional_hidden_check_success"
     },
     {
       "id": "core-rules-to-core-verified",
+      "estimand_kind": "compound-profile-transition",
       "baseline_arm_id": "P1",
       "candidate_arm_id": "P2",
-      "added_component_id": "targeted-verification",
+      "transition_anchor_component_id": "targeted-verification",
       "eligible_strata": [
         "small",
         "medium"
       ],
+      "target_strata": ["small", "medium"],
+      "negative_control_strata": [],
       "target_metric": "verification_omission"
     },
     {
       "id": "core-verified-to-core-reviewed",
+      "estimand_kind": "compound-profile-transition",
       "baseline_arm_id": "P2",
       "candidate_arm_id": "P3",
-      "added_component_id": "independent-final-review",
+      "transition_anchor_component_id": "independent-final-review",
       "eligible_strata": [
         "small",
         "medium"
       ],
+      "target_strata": ["small", "medium"],
+      "negative_control_strata": [],
       "target_metric": "introduced_high_medium_defects"
     },
     {
       "id": "core-reviewed-to-deep",
+      "estimand_kind": "compound-profile-transition",
       "baseline_arm_id": "P3",
       "candidate_arm_id": "P4",
-      "added_component_id": "deep-context",
+      "transition_anchor_component_id": "deep-context",
       "eligible_strata": [
+        "small",
         "medium"
       ],
+      "target_strata": ["medium"],
+      "negative_control_strata": ["small"],
       "target_metric": "missed_consumer_rate"
     },
     {
       "id": "deep-to-assurance",
+      "estimand_kind": "compound-profile-transition",
       "baseline_arm_id": "P4",
       "candidate_arm_id": "P5",
-      "added_component_id": "assurance-controls",
+      "transition_anchor_component_id": "assurance-controls",
       "eligible_strata": [
+        "small",
         "high"
       ],
+      "target_strata": ["high"],
+      "negative_control_strata": ["small"],
       "target_metric": "regression_free_high_risk_success"
     }
   ],

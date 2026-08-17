@@ -16,27 +16,27 @@
   "full_run_policy": "only-after-positive-standard-signal-with-all-guardrails",
   "promotion_rules": [
     {
-      "component_id": "core-rules",
+      "estimand_id": "plain-to-core-rules",
       "target_metric": "functional_hidden_check_success",
       "direction": "higher-is-better"
     },
     {
-      "component_id": "targeted-verification",
+      "estimand_id": "core-rules-to-core-verified",
       "target_metric": "verification_omission",
       "direction": "lower-is-better"
     },
     {
-      "component_id": "independent-final-review",
+      "estimand_id": "core-verified-to-core-reviewed",
       "target_metric": "introduced_high_medium_defects",
       "direction": "lower-is-better"
     },
     {
-      "component_id": "deep-context",
+      "estimand_id": "core-reviewed-to-deep",
       "target_metric": "missed_consumer_rate",
       "direction": "lower-is-better"
     },
     {
-      "component_id": "assurance-controls",
+      "estimand_id": "deep-to-assurance",
       "target_metric": "regression_free_high_risk_success",
       "direction": "higher-is-better"
     }

@@ -7,6 +7,7 @@ import { spawnSync } from "node:child_process";
 
 import {
   NORMAL_SESSION_BRIDGE_PRODUCER,
+  MAX_NATIVE_TASK_PROMPT_BYTES,
   NORMAL_SESSION_QUALITY_TOOL_IDS,
   bindArchitectureEvaluatorImplementationFingerprint,
   createDefaultNormalSessionCheckCatalog,
@@ -20,6 +21,7 @@ import {
   inspectNormalSessionQualityState,
   inspectNormalSessionRegistration,
   normalSessionQualityStatePath,
+  renderRunnerAssignmentPrompt,
 } from "../lib/quality/normal-session-bridge.mjs";
 import { createNormalSessionQualityPlugin } from "../lib/quality/normal-session-plugin.mjs";
 import {
@@ -43,8 +45,14 @@ import {
   normalizeNormalSessionOwnedPath,
   observeContentBoundWorkspace,
 } from "../lib/quality/normal-session-workspace.mjs";
+import { QUALITY_LIMITS } from "../lib/quality/constants.mjs";
 import { ContractError, fingerprint } from "../lib/quality/validation.mjs";
 import { createContextReceiptStore } from "../lib/quality/context-receipt-store.mjs";
+import {
+  MAX_CHALLENGE_SNAPSHOT_BYTES,
+  createPlanChallengeSubject,
+  validatePlanChallengeSubject,
+} from "../lib/quality/plan-challenge-subject.mjs";
 
 const tempRoot = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), "opencode-harness-normal-quality-")));
 fs.mkdirSync(path.join(tempRoot, "src"));
@@ -634,12 +642,98 @@ assertContractError(() => createNormalSessionQualityBridge({
   evaluateArchitecture: sameSourceEvaluatorA,
 }), "QUALITY_POST_ARCHITECTURE_IDENTITY");
 const bridge = createNormalSessionQualityBridge(options);
+const boundaryEnvelope = {
+  schema_version: 1,
+  target_agent: "reviewer",
+  assignment: { tool_id: "quality_assurance_advance", instruction: "" },
+};
+assert.equal(
+  MAX_NATIVE_TASK_PROMPT_BYTES,
+  (2 * QUALITY_LIMITS.recordBytes) + MAX_CHALLENGE_SNAPSHOT_BYTES + (32 * 1024),
+  "the native task prompt cap must reserve two full contract-bound records plus the maximum challenge snapshot",
+);
+const boundaryBase = renderRunnerAssignmentPrompt(boundaryEnvelope);
+const boundaryFillBytes = MAX_NATIVE_TASK_PROMPT_BYTES - Buffer.byteLength(boundaryBase, "utf8");
+const exactBoundaryPrompt = renderRunnerAssignmentPrompt({
+  ...boundaryEnvelope,
+  assignment: { ...boundaryEnvelope.assignment, instruction: "x".repeat(boundaryFillBytes) },
+});
+assert.equal(Buffer.byteLength(exactBoundaryPrompt, "utf8"), MAX_NATIVE_TASK_PROMPT_BYTES,
+  "the exact native assignment prompt boundary must be accepted");
+assert.throws(() => renderRunnerAssignmentPrompt({
+  ...boundaryEnvelope,
+  assignment: { ...boundaryEnvelope.assignment, instruction: "x".repeat(boundaryFillBytes + 1) },
+}), (error) => error instanceof ContractError,
+"a runner assignment one byte above the native prompt boundary must fail closed");
+const maximumSnapshotBaseBytes = Buffer.byteLength(JSON.stringify({ padding: "" }), "utf8");
+const maximumChallengeSnapshot = { padding: "x".repeat(MAX_CHALLENGE_SNAPSHOT_BYTES - maximumSnapshotBaseBytes) };
+const challengeFingerprint = fingerprint({ fixture: "maximum-challenge-subject" });
+const maximumSubjectSource = {
+  schema_version: 3,
+  dossier_analysis_fingerprint: challengeFingerprint,
+  context_strategy_fingerprint: challengeFingerprint,
+  context_report_analysis_fingerprint: challengeFingerprint,
+  context_decision_fingerprint: challengeFingerprint,
+  context_task_profile_evidence_fingerprint: challengeFingerprint,
+  challenge_snapshot: maximumChallengeSnapshot,
+  challenge_snapshot_fingerprint: fingerprint(maximumChallengeSnapshot),
+};
+const maximumSubject = {
+  ...maximumSubjectSource,
+  fingerprint: fingerprint(maximumSubjectSource),
+};
+validatePlanChallengeSubject(maximumSubject);
+const completeChallengeContract = {
+  user_visible_goal: "Verify the bounded facade assignment.",
+  requested_behavior: "Preserve the complete behavior contract.",
+  positive_behavior: ["The requested behavior succeeds."],
+  negative_behavior: ["Unrequested behavior remains absent."],
+  boundary_behavior: ["Boundary inputs remain bounded."],
+  error_behavior: ["Invalid inputs fail closed."],
+  ordering_and_side_effects: ["Validation precedes durable side effects."],
+  preserved_behavior: ["Existing public behavior remains unchanged."],
+  compatibility_requirements: ["Serialized shapes remain compatible."],
+  security_requirements: ["Sensitive values remain undisclosed."],
+  completion_requirements: ["Every required receipt is present."],
+  edge_cases: [{ condition: "maximum snapshot", expected_behavior: "assignment remains bounded" }],
+  counterexamples: [{ statement: "oversized snapshot", expected_behavior: "reject" }],
+  change_policy: "Require the smallest cohesive change.",
+};
+const maximumFacadePrompt = {
+  args: {
+    prompt: renderRunnerAssignmentPrompt({
+      schema_version: 1,
+      target_agent: "architect",
+      assignment: {
+        tool_id: "quality_architecture_evaluate",
+        request: { expected_revision: 1, blockers: [] },
+        challenge_subject: maximumSubject,
+        challenge_contract: completeChallengeContract,
+        instruction: "Call quality_architecture_evaluate once.",
+      },
+    }),
+  },
+};
+rewriteRoleAssignmentForFacade({ tool: "task" }, maximumFacadePrompt);
+assert(Buffer.byteLength(maximumFacadePrompt.args.prompt, "utf8") <= MAX_NATIVE_TASK_PROMPT_BYTES,
+  "a maximum-valid challenge snapshot and complete contract must fit after facade rewrite");
+const oversizedSnapshot = { padding: `${maximumChallengeSnapshot.padding}x` };
+const oversizedSubjectSource = {
+  ...maximumSubjectSource,
+  challenge_snapshot: oversizedSnapshot,
+  challenge_snapshot_fingerprint: fingerprint(oversizedSnapshot),
+};
+assert.throws(() => validatePlanChallengeSubject({
+  ...oversizedSubjectSource,
+  fingerprint: fingerprint(oversizedSubjectSource),
+}), (error) => error instanceof ContractError,
+"a challenge snapshot one byte above the declared maximum must fail closed");
 const orchestrator = { sessionID: "session/root", agent: "orchestrator" };
 const architect = { ...orchestrator, agent: "architect" };
 const reviewer = { ...orchestrator, agent: "reviewer" };
 const verifier = { ...orchestrator, agent: "verifier" };
 
-function startRequestFromDossier(request) {
+function startRequestFromDossier(request, { seededHigh = false } = {}) {
   const common = {
     risk_class: request.risk_class,
     task_type: request.task_type,
@@ -648,7 +742,7 @@ function startRequestFromDossier(request) {
     required_check_ids: request.verification_boundary.integration_check_ids,
     classification_rationale: "deterministic bridge contract fixture",
   };
-  if (request.risk_class !== "standard-lite") return common;
+  if (request.risk_class !== "standard-lite" && !seededHigh) return common;
   return {
     ...common,
     behavior_expectation: request.behavior_contract.requested_behavior,
@@ -1714,8 +1808,14 @@ assert.deepEqual(
         user_visible_goal: authorizedEditState.dossier.user_visible_goal,
         requested_behavior: authorizedEditState.dossier.behavior_contract.requested_behavior,
         positive_behavior: [...authorizedEditState.dossier.behavior_contract.positive_behavior],
+        negative_behavior: [...authorizedEditState.dossier.behavior_contract.negative_behavior],
+        boundary_behavior: [...authorizedEditState.dossier.behavior_contract.boundary_behavior],
+        error_behavior: [...authorizedEditState.dossier.behavior_contract.error_behavior],
+        ordering_and_side_effects: [...authorizedEditState.dossier.behavior_contract.ordering_and_side_effects],
         preserved_behavior: [...authorizedEditState.dossier.behavior_contract.preserved_behavior],
         compatibility_requirements: [...authorizedEditState.dossier.behavior_contract.compatibility_requirements],
+        security_requirements: [...authorizedEditState.dossier.behavior_contract.security_requirements],
+        completion_requirements: [...authorizedEditState.dossier.behavior_contract.completion_requirements],
         edge_cases: authorizedEditState.dossier.edge_cases.map((entry) => ({
           condition: entry.condition,
           expected_behavior: entry.expected_behavior,
@@ -3623,6 +3723,88 @@ await plugin.tool.quality_context_reconcile.execute({
   ]);
   currentPathVersions.clear();
 
+  const durableControlSnapshot = () => {
+    const controlRoot = path.join(tempRoot, ".oc_harness");
+    if (!fs.existsSync(controlRoot)) return fingerprint({ absent: true });
+    const entries = [];
+    const visit = (directory, prefix = "") => {
+      for (const entry of fs.readdirSync(directory, { withFileTypes: true })
+        .sort((left, right) => left.name.localeCompare(right.name))) {
+        const relative = prefix === "" ? entry.name : `${prefix}/${entry.name}`;
+        const target = path.join(directory, entry.name);
+        if (entry.isDirectory()) {
+          entries.push({ path: relative, kind: "directory" });
+          visit(target, relative);
+        } else if (entry.isFile()) {
+          entries.push({ path: relative, kind: "file", content: fs.readFileSync(target, "utf8") });
+        }
+      }
+    };
+    visit(controlRoot);
+    return fingerprint(entries);
+  };
+  const malformedFacadeBridge = createNormalSessionQualityBridge({ ...options, workspaceRoot: tempRoot });
+  const malformedFacadeTools = createAssuranceFacadeToolSurface({
+    toolFactory: fakeToolFactory,
+    bridge: malformedFacadeBridge,
+  });
+  const malformedBefore = durableControlSnapshot();
+  await assert.rejects(
+    malformedFacadeTools.quality_assurance_start.execute({
+      request: JSON.stringify({
+        ...startRequestFromDossier(fullDossierRequest(), { seededHigh: true }),
+        dossier: { behavior_contract: null },
+      }),
+    }, { sessionID: "session/facade-malformed-start", agent: "assurance" }),
+    (error) => error instanceof ContractError && error.code === "QUALITY_FACADE_REQUEST",
+  );
+  assert.equal(durableControlSnapshot(), malformedBefore,
+    "malformed nested facade dossier must not mutate durable registration or owner state");
+
+  for (const failureStage of ["after_registry_classification", "after_owner_state_persisted"]) {
+    let armed = true;
+    const recoveryBridge = createNormalSessionQualityBridge({
+      ...options,
+      workspaceRoot: tempRoot,
+      failureInjector(stage) {
+        if (armed && stage === failureStage) {
+          armed = false;
+          throw new Error(`injected:${stage}`);
+        }
+      },
+    });
+    const recoveryTools = createAssuranceFacadeToolSurface({
+      toolFactory: fakeToolFactory,
+      bridge: recoveryBridge,
+    });
+    const recoveryContext = {
+      sessionID: `session/facade-recovery-${failureStage}`,
+      agent: "assurance",
+    };
+    const recoveryRequest = {
+      request: JSON.stringify(startRequestFromDossier(fullDossierRequest(), { seededHigh: true })),
+    };
+    await assert.rejects(
+      recoveryTools.quality_assurance_start.execute(recoveryRequest, recoveryContext),
+      new RegExp(`injected:${failureStage}`, "u"),
+    );
+    const recovered = JSON.parse(await recoveryTools.quality_assurance_start.execute(
+      recoveryRequest,
+      recoveryContext,
+    ));
+    const replayed = JSON.parse(await recoveryTools.quality_assurance_start.execute(
+      recoveryRequest,
+      recoveryContext,
+    ));
+    assert.deepEqual(replayed, recovered,
+      `${failureStage} exact replay must recover one idempotent facade start receipt`);
+    const recoveredState = inspectNormalSessionQualityState(recoveryBridge, recoveryContext.sessionID);
+    assert.equal(recoveredState.dossier.revision, 2,
+      "runner-seeded provisional high graph is the only dossier revision after recovery");
+    assert.equal(recoveredState.context_report.revision, 1,
+      "recovery must preserve one matching provisional context report");
+  }
+
   const highFacadeBridge = createNormalSessionQualityBridge({ ...options, workspaceRoot: tempRoot });
   const highFacadeTools = createAssuranceFacadeToolSurface({
     toolFactory: fakeToolFactory,
@@ -3638,14 +3820,44 @@ await plugin.tool.quality_context_reconcile.execute({
   const highFacadeContext = { sessionID: "session/facade-high-e2e", agent: "assurance" };
   handleNormalSessionChatMessage(highFacadeBridge, highFacadeContext);
   const highFacadeStart = await callHighFacade("quality_assurance_start", {
-    request: JSON.stringify({
-      ...startRequestFromDossier(fullDossierRequest()),
-      dossier: fullDossierRequest(),
-    }),
+    request: JSON.stringify(startRequestFromDossier(fullDossierRequest(), { seededHigh: true })),
   }, highFacadeContext);
+  const highFacadeReplay = await callHighFacade("quality_assurance_start", {
+    request: JSON.stringify(startRequestFromDossier(fullDossierRequest(), { seededHigh: true })),
+  }, highFacadeContext);
+  assert.deepEqual(highFacadeReplay, highFacadeStart,
+    "a lost high-start response must be replayable without creating a second owner dossier");
   assert.equal(highFacadeStart.risk_class, "high");
   assert.equal(highFacadeStart.lifecycle, "dossier_draft");
-  const highContextEvidence = collectHighContextEvidence(highFacadeBridge, highFacadeContext);
+  collectHighContextEvidence(highFacadeBridge, highFacadeContext);
+  const highDossierUpdated = await callHighFacade("quality_assurance_advance", {
+    transition: "dossier-update",
+    request: JSON.stringify({
+      compact_analysis: {
+      entry_path: "src/file.mjs",
+      related_paths: [],
+      compatibility_decision: "preserve",
+      compatibility_analysis: "The bounded module contract and existing export remain compatible.",
+      owning_abstraction: "The src/file.mjs module owns the bounded exported value behavior.",
+      impact_analysis: "The runner-bound check reads the module export directly; no additional caller or callee was observed.",
+      has_downstream_side_effects: false,
+      side_effect_analysis: "The module returns a value and performs no downstream write, event, or external side effect.",
+      has_cross_boundary_contracts: false,
+      contract_analysis: "The bounded internal export does not change a public, serialized, configuration, or event contract.",
+      rollback_expectation: "Restore the owned module revision if the bounded behavior or check regresses.",
+      recovery_expectation: "A failed attempt leaves no partial state and a retry re-evaluates the same module input.",
+      counterexample: "A cancellation arriving after completion must not publish a second settlement.",
+      premortem_analysis: "The bounded module has no migration, persistence, or distributed partial-commit mechanism beyond the classified race.",
+      unresolved_unknowns: [],
+      },
+    }),
+  }, highFacadeContext);
+  assert.equal(highDossierUpdated.next_actions[0].transition, "context-report-update");
+  const highContextEvidence = collectHighContextEvidence(
+    highFacadeBridge,
+    highFacadeContext,
+    { includeExistingActiveReceipts: true },
+  );
   const highReportUpdated = await callHighFacade("quality_assurance_advance", {
     transition: "context-report-update",
     request: JSON.stringify({ patch: highContextEvidence.content }),
@@ -4182,6 +4394,35 @@ assert.match(
   structuredHighSufficientInspection.recommended_next_actions[0].assignment.challenge_contract.change_policy,
   /narrow user_visible_goal is authoritative/u,
 );
+for (const field of [
+  "negative_behavior",
+  "boundary_behavior",
+  "error_behavior",
+  "ordering_and_side_effects",
+  "security_requirements",
+  "completion_requirements",
+]) {
+  assert.deepEqual(
+    structuredHighSufficientInspection.recommended_next_actions[0].assignment.challenge_contract[field],
+    structuredHighPersistedState.dossier.behavior_contract[field],
+    `architect challenge assignment must carry behavior_contract.${field}`,
+  );
+  const mutatedDossier = structuredClone(structuredCanonicalContextState.dossier);
+  mutatedDossier.behavior_contract[field] = [
+    ...mutatedDossier.behavior_contract[field],
+    `mutation-${field}`,
+  ];
+  const { fingerprint: _priorDossierFingerprint, ...mutatedDossierSource } = mutatedDossier;
+  mutatedDossier.fingerprint = fingerprint(mutatedDossierSource);
+  assert.throws(() => createPlanChallengeSubject({
+    dossier: mutatedDossier,
+    strategy_binding: structuredCanonicalContextState.context_strategy,
+    context_report: structuredCanonicalContextState.context_report,
+    context_decision: structuredCanonicalContextState.context_decision,
+    task_profile_evidence: structuredCanonicalContextState.context_task_profile_evidence,
+  }), (error) => error instanceof ContractError && error.code === "QUALITY_PLAN_CHALLENGE_STALE",
+  `changing behavior_contract.${field} must invalidate the prior challenge evidence`);
+}
 assert.match(
   structuredHighSufficientInspection.recommended_next_actions[0].assignment.instruction,
   /never for a speculative expansion or preferred conventional design/u,
