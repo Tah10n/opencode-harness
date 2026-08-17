@@ -58,6 +58,11 @@ workspace and review any host-side capability expansion.
 6. Run integration verification and one independent final review for a
    nontrivial change.
 
+Profile-only mode may parallelize independent read-only work within the bound
+above. Instrumented compatibility mode serializes context operations and
+read-only child tasks one at a time whenever runner-owned receipts are
+enforced; it does not claim a parallel computational receipt chain.
+
 Avoid duplicate broad symbol scans. If a targeted `context_symbols` query is
 planned under an opt-in host policy, use `context_map` with
 `includeSymbols: false`. Repeat a broad symbol query only for a new boundary:
