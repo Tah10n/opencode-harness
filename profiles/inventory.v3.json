@@ -423,6 +423,7 @@
       "base_bundle_id": null,
       "runtime_profile_id": null,
       "entries": [
+        { "source": "AGENTS.md", "target": "AGENTS.md" },
         { "source": ".opencode/assurance", "target": ".opencode/assurance" },
         { "source": "adoption", "target": "adoption" },
         { "source": "agents", "target": "agents" },
