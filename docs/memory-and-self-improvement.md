@@ -1,5 +1,15 @@
 # Memory and Self-Improvement
 
+## v0.4 runtime boundary
+
+`core`, `deep`, and `assurance` deny `oc_learning_*` by default. Normal task
+completion never mutates prompts or durable memory. Only an explicit `/learn`
+or `improver` maintenance workflow may request bounded learning writes; a
+proposal must be evaluated and accepted before it changes an active profile.
+Rejected proposals have no runtime effect. `opencode-learning-guard` is not a
+core dependency, and project-specific knowledge belongs in `WORKFLOW.md` or a
+project-local skill.
+
 This note documents the global OpenCode memory and self-improvement system: what changed, why it exists, and what the design is based on.
 
 ## Current shape

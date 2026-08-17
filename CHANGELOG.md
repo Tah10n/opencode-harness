@@ -1,6 +1,17 @@
 # Changelog
 
-## Unreleased (target: 0.3.0)
+## Unreleased (target: 0.4.0)
+
+- Replaced the active default with a compact `core` profile and isolated
+  optional `deep`, experimental `assurance`, and developer-only `lab` layers.
+- Added v3 profile inventory, deterministic portable materialization, prompt
+  budgets, bundle boundaries, and a four-operation facade over the preserved
+  v0.3 quality engine.
+- Added a separately versioned vNext component-ablation contract, promotion
+  policy, report schemas, and model-free validators while preserving v2
+  inventory fingerprints and historical report/replay readers.
+
+### Historical unreleased v0.3 development notes
 
 This section describes the development checkout. The latest tagged release is
 still `v0.2.0`; its package metadata has no `exports` field and does not expose

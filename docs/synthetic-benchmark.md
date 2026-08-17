@@ -1,5 +1,53 @@
 # Synthetic Ablation Benchmark
 
+## v0.4 vNext component contract
+
+The v0.3 benchmark described below remains byte-for-byte readable historical
+research. v0.4 adds a separate namespace under `benchmarks/vnext/` with six
+cumulative arms (`P0`–`P5`) and five adjacent estimands. Each candidate adds
+exactly one declared component: core rules, targeted verification, independent
+review, deep context, then assurance controls. Small, medium, and high-risk
+families are evaluated only where the estimand applies; there is no full
+cross-product.
+
+```sh
+npm run bench:vnext:validate
+npm run bench:vnext:self-test
+```
+
+Model-backed execution uses a repository-confined adapter so the same plan can
+be executed by a contained host without coupling `core` to benchmark runtime:
+
+```sh
+npm run bench:vnext:run -- \
+  --suite smoke \
+  --estimand plain-to-core-rules \
+  --model openai/gpt-5.6-luna \
+  --provider openai \
+  --variant low \
+  --seed v04-smoke-20260817 \
+  --timeout-ms 300000 \
+  --executable-identity opencode-1.18.16 \
+  --adapter path/to/repository-confined-adapter.mjs
+```
+
+Repeat smoke for all five estimands. Standard is then required for
+`core-rules-to-core-verified`, `core-verified-to-core-reviewed`, the medium-only
+`core-reviewed-to-deep`, and the high-only `deep-to-assurance`. Omit
+`--adapter` to obtain an exit-2 `blocked-unproven` report; this is a preflight,
+not model evidence. Plans refuse dirty source trees, bind all policy-required
+identities, serialize pairs, and never persist raw model output. Full remains
+blocked until a separate positive standard promotion decision exists.
+
+Product correctness, operational cost, and protocol diagnostics are separate
+metric classes. Promotion thresholds live in the predeclared versioned policy;
+incomplete/external-state outcomes are not scored. Model-free success proves
+only the contract. Model-backed evidence must bind one model/provider/variant,
+seed, timeout, executable, runner limits, fixtures, evaluator, inventory,
+contract, policy, and source revision for both sides of a pair.
+
+## Legacy v0.3 benchmark
+
 The synthetic benchmark is a separate, model-neutral product-value experiment
 for comparing the same host-selected model under different harness profiles. It
 does not replace release regression evaluation, and its reports must never be

@@ -1,5 +1,17 @@
 # Harnessability Checklist
 
+## Choose the smallest sufficient profile
+
+- `core` needs project guidance, a relevant local check, and clear secret/state
+  boundaries.
+- `deep` additionally benefits from a repository broad enough to justify
+  bounded context decomposition; the optional capability is not a prerequisite.
+- `assurance` additionally requires explicit ownership, trusted checks, and
+  supported containment for the high-risk operation. If any mandatory signal
+  is absent, the result is blocked rather than weakened.
+- `lab` requires reproducible fixtures and honest hidden-check isolation; it is
+  never an adoption prerequisite.
+
 Use this checklist before adopting the harness into a project. It identifies
 whether the project has enough structure for the harness to regulate agent work
 with useful confidence.

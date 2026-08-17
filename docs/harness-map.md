@@ -1,5 +1,19 @@
 # Harness Control Map
 
+## v0.4 layer map
+
+| Layer | Default? | Model-visible runtime | Primary responsibility |
+| --- | --- | --- | --- |
+| `core` | Yes | Compact rules, core agent, optional reviewer | Ordinary inspect/edit/verify/review work |
+| `deep` | No | Core plus bounded read-only context workflow | Broad discovery with one integrator |
+| `assurance` | No; experimental | Deep plus four high-level quality operations | Fail-closed high-risk mutation and attestation |
+| `lab` | Never | None | Benchmarks, evaluation, replay, traces, and research |
+
+Controls in the legacy matrix below are inventories, not one mandatory
+runtime. Dossier, receipts, containment, and attestation belong to assurance;
+recursive context belongs to deep; benchmark and acceptance machinery belongs
+to lab. Core contains only compact guidance and targeted project feedback.
+
 This map keeps the harness coherent as it grows. It classifies each guide and
 sensor by the terms used in Birgitta Böckeler's harness engineering article,
 published on Martin Fowler's site: feedforward versus feedback, computational

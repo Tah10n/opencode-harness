@@ -1,10 +1,33 @@
 # Compatibility
 
-## Development And Tagged Release Set
+## v0.4 development boundary
+
+| Component | Version | Status | Compatibility rule |
+| --- | --- | --- | --- |
+| Runtime profiles | inventory v3 | Unreleased | `core` default; `deep` optional; `assurance` experimental |
+| Historical synthetic benchmark | inventory v2 | Frozen | Exact bytes, fingerprints, report readers, and replay semantics retained |
+| Assurance facade | v1 | Experimental | Four model-visible operations dispatch to the unchanged 17-tool legacy engine |
+| vNext benchmark | contract/report v1 | Unproven | Separate namespace; never reinterprets v2 artifacts |
+
+The v3 materialized directory is an OpenCode config root, not the governed
+workspace. Assurance loads `plugins/assurance.mjs` explicitly, consumes
+project checks from the workspace, and consumes the machine-specific
+`plugins/quality-toolchains.host.v1.json` from the disjoint config root. That
+host file is outside the bundle fingerprint and is preserved, not generated,
+by managed replacement.
+
+`profile-only` and `instrumented` remain replay-compatible legacy definitions,
+not active v0.4 product claims. No reader guesses an artifact version or
+upgrades historical evidence in place.
+
+## Legacy v0.3 and tagged-release compatibility set
+
+The table below describes the retained v0.3 package/capability boundary. It is
+not the active v0.4 development target described above.
 
 | Component | Repository | Version | Status | Role |
 | --- | --- | --- | --- | --- |
-| `opencode-harness` | <https://github.com/Tah10n/opencode-harness> | `0.3.0` | Unreleased target | Development orchestration profile with feedback APIs, live evaluation, candidate assessment, docs, and verifiers. |
+| `opencode-harness` | <https://github.com/Tah10n/opencode-harness> | `0.3.0` | Unreleased target (legacy) | Historical orchestration profile with feedback APIs, live evaluation, candidate assessment, docs, and verifiers. |
 | `opencode-harness` | <https://github.com/Tah10n/opencode-harness/tree/v0.2.0> | `v0.2.0` | Latest tagged release | Tagged orchestration profile, rules, docs, and verifier; its package has no package exports and does not expose feedback API subpaths. |
 | `opencode-recursive-context` | <https://github.com/Tah10n/opencode-recursive-context> | `0.2.0` | Coordinated release target | Safe read-only `context_*` tools; output schema v2, contract 2.0, policy 1. |
 | `opencode-learning-guard` | <https://github.com/Tah10n/opencode-learning-guard> | `0.2.0` | Compatible capability | Bounded `oc_learning_*` memory and managed-skill write tools. |

@@ -1,5 +1,10 @@
 # Model-Neutral Host Selection
 
+The v0.4 `core`, `deep`, and `assurance` profiles remain model-neutral. A
+paired ablation must use the same host-selected model, provider, variant, and
+timeout on both sides; model identity is evidence binding, not a permission or
+quality claim. `lab` is not a model-visible profile.
+
 OpenCode owns model selection. Select a model with the OpenCode UI, command, or
 host configuration supported by the installed version, then start the harness
 normally. Primary agents use that user-selected model. Subagents inherit model

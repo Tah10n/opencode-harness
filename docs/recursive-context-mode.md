@@ -2,7 +2,12 @@
 
 ## Purpose
 
-Recursive context mode is the default workflow for large OpenCode audits and research-heavy tasks. It is intended for broad code audits, production-readiness checks, repository or article study, long-log review, large-diff review, and multi-module or multi-service bug sweeps.
+Recursive context mode is the optional `deep` workflow for large OpenCode
+audits and research-heavy tasks. It is intended for broad code audits,
+production-readiness checks, repository or article study, long-log review,
+large-diff review, and multi-module or multi-service bug sweeps. `core` never
+requires it, and missing capability tools fall back to bounded ordinary
+read/search without blocking the task.
 
 The goal is to keep the root orchestrator's context small and decision-focused while moving broad reading, search, and independent semantic checks into bounded read-only tools and focused subagents.
 
@@ -10,7 +15,8 @@ This is not a new slash command. The mode is selected automatically by the orche
 
 ## What Changed
 
-- `AGENTS.md` now tells the orchestrator to automatically enter recursive-context mode for broad audits and to skip it for small local tasks.
+- `AGENTS.md` now identifies when a user may explicitly select `deep`; small
+  local tasks remain in `core`.
 - `agents/orchestrator.md` and `agents/orchestrator-deep.md` define the automatic trigger, sequencing, and safety rules.
 - The separate `opencode-recursive-context` capability package provides the
   minimal safe harness surface of four read-only tools:

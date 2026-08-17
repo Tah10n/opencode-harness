@@ -1,5 +1,52 @@
 # Adoption Guide
 
+## v0.4 profile-first adoption
+
+Start with `core`; do not copy the historical complete bundle for ordinary
+use. From a source checkout:
+
+```sh
+npm run profile:materialize -- --profile core --output /absolute/target
+npm run profile:materialize -- --profile deep --output /absolute/target-deep
+npm run profile:materialize -- --profile assurance --output /absolute/target-assurance
+```
+
+Each target is an OpenCode configuration directory. Keep it disjoint from the
+project workspace, set `OPENCODE_CONFIG_DIR` to it, and run OpenCode from the
+project. Do not run an assurance profile with its configuration directory as
+the workspace: trusted host configuration must be outside the workspace.
+
+Use `--dry-run` to inspect the deterministic manifest without writing. The
+materializer rejects links, traversal, non-portable paths, unmanaged
+destinations, drifted managed files, untracked source inputs, dirty source
+trees, and implicit replacement. `--allow-dirty` is an explicit maintainer-only
+escape hatch for structural development probes: its manifest records
+`source_git_clean: false`, and the vNext runner refuses to use that bundle as
+model-backed evidence. `--force`
+replaces only a verified managed bundle and preserves the old directory as a
+backup. Replacement uses a recoverable transaction rather than claiming an
+always-present atomic directory swap on every supported filesystem. A fresh
+invocation validates the active bundle/backup and restores the last verified
+bundle after an interrupted rename. A live owner remains busy; only a
+provably dead owner may be recovered, and an unknown or inconsistent lock
+remains a hard failure. Core needs Node.js only to run this source-repository materializer; its
+materialized OpenCode runtime does not.
+
+`deep` requires no assurance plugin and falls back to ordinary bounded
+read/search if the optional context capability is absent. `assurance` is
+experimental and includes the quality engine and trusted-check/containment
+dependencies but not benchmark or evaluation content. Its project workspace,
+not the materialized config directory, must provide project-specific
+`.opencode/quality/checks.json` and `.opencode/quality/toolchains.json`.
+Provision the machine-specific
+`plugins/quality-toolchains.host.v1.json` beside the materialized assurance
+plugin; it is intentionally not generated or fingerprinted by the repository.
+The materializer accepts only this single-link, non-group/world-writable reserved host
+file and preserves its bytes across verified replacement. `lab` is for harness
+development and is not model-visible. Canonical definitions are in
+`profiles/inventory.v3.json`; the v2 section below is retained for historical
+replay compatibility.
+
 Use this guide when copying or adapting `opencode-harness` into an OpenCode
 configuration.
 
