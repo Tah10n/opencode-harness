@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opencode-harness.invalid/schemas/vnext-comparison-report-v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_kind",
+    "estimand_id",
+    "suite_id",
+    "bindings",
+    "status",
+    "paired_effects",
+    "per_family",
+    "per_stratum",
+    "pareto",
+    "incomplete_outcomes",
+    "verdict"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "report_kind": { "const": "vnext-component-ablation-comparison" },
+    "estimand_id": { "type": "string", "minLength": 1 },
+    "suite_id": { "enum": ["smoke", "standard", "full"] },
+    "bindings": { "type": "object", "minProperties": 13 },
+    "status": { "enum": ["complete", "incomplete", "blocked-unproven"] },
+    "paired_effects": { "type": "object" },
+    "per_family": { "type": "array", "items": { "type": "object" } },
+    "per_stratum": { "type": "array", "items": { "type": "object" } },
+    "pareto": { "type": "object" },
+    "incomplete_outcomes": { "type": "array", "items": { "type": "object" } },
+    "verdict": {
+      "enum": ["promote", "retain-optional", "reject", "inconclusive", "blocked-unproven"]
+    }
+  }
+}

@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opencode-harness.invalid/schemas/vnext-run-report-v1",
+  "$defs": {
+    "metricSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["baseline", "candidate", "paired_delta", "confidence_interval"],
+      "properties": {
+        "baseline": { "type": "number" },
+        "candidate": { "type": "number" },
+        "paired_delta": { "type": "number" },
+        "confidence_interval": {
+          "type": "array",
+          "prefixItems": [{ "type": "number" }, { "type": "number" }],
+          "items": false,
+          "minItems": 2,
+          "maxItems": 2
+        }
+      }
+    },
+    "productMetricGroup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "functional_hidden_check_success",
+        "regression_free_success",
+        "regression_free_high_risk_success",
+        "public_contract_preservation",
+        "structural_oracle_success",
+        "missed_consumer_rate",
+        "introduced_high_medium_defects",
+        "unnecessary_changed_files",
+        "verification_omission",
+        "task_completion_without_human_intervention"
+      ],
+      "properties": {
+        "functional_hidden_check_success": { "$ref": "#/$defs/metricSummary" },
+        "regression_free_success": { "$ref": "#/$defs/metricSummary" },
+        "regression_free_high_risk_success": { "$ref": "#/$defs/metricSummary" },
+        "public_contract_preservation": { "$ref": "#/$defs/metricSummary" },
+        "structural_oracle_success": { "$ref": "#/$defs/metricSummary" },
+        "missed_consumer_rate": { "$ref": "#/$defs/metricSummary" },
+        "introduced_high_medium_defects": { "$ref": "#/$defs/metricSummary" },
+        "unnecessary_changed_files": { "$ref": "#/$defs/metricSummary" },
+        "verification_omission": { "$ref": "#/$defs/metricSummary" },
+        "task_completion_without_human_intervention": { "$ref": "#/$defs/metricSummary" }
+      }
+    },
+    "operationalMetricGroup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tokens", "duration", "model_turns", "tool_calls", "delegated_child_count", "timeout_rate", "no_progress_turns"],
+      "properties": {
+        "tokens": { "$ref": "#/$defs/metricSummary" },
+        "duration": { "$ref": "#/$defs/metricSummary" },
+        "model_turns": { "$ref": "#/$defs/metricSummary" },
+        "tool_calls": { "$ref": "#/$defs/metricSummary" },
+        "delegated_child_count": { "$ref": "#/$defs/metricSummary" },
+        "timeout_rate": { "$ref": "#/$defs/metricSummary" },
+        "no_progress_turns": { "$ref": "#/$defs/metricSummary" }
+      }
+    },
+    "diagnosticMetricGroup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["whole_task_success", "protocol_compliance", "trace_completeness", "attestation_completeness"],
+      "properties": {
+        "whole_task_success": { "$ref": "#/$defs/metricSummary" },
+        "protocol_compliance": { "$ref": "#/$defs/metricSummary" },
+        "trace_completeness": { "$ref": "#/$defs/metricSummary" },
+        "attestation_completeness": { "$ref": "#/$defs/metricSummary" }
+      }
+    },
+    "incompleteOutcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reason", "scored"],
+      "properties": {
+        "status": { "type": "string", "minLength": 1 },
+        "reason": { "type": "string", "minLength": 1 },
+        "scored": { "const": false }
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "run_id",
+    "estimand_id",
+    "suite_id",
+    "bindings",
+    "status",
+    "family_results",
+    "product_metrics",
+    "operational_metrics",
+    "diagnostic_metrics",
+    "incomplete_outcomes"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "run_id": { "type": "string", "minLength": 1 },
+    "estimand_id": { "type": "string", "minLength": 1 },
+    "suite_id": { "enum": ["smoke", "standard", "full"] },
+    "bindings": {
+      "type": "object",
+      "minProperties": 14,
+      "additionalProperties": { "type": ["string", "number", "object"] }
+    },
+    "status": { "enum": ["complete", "incomplete", "blocked-unproven"] },
+    "family_results": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["family_id", "baseline_arm_id", "candidate_arm_id", "repetition_count", "status"],
+        "properties": {
+          "family_id": { "type": "string", "minLength": 1 },
+          "baseline_arm_id": { "pattern": "^P[0-5]$" },
+          "candidate_arm_id": { "pattern": "^P[0-5]$" },
+          "repetition_count": { "type": "integer", "minimum": 0 },
+          "status": { "enum": ["complete", "incomplete", "blocked"] }
+        }
+      }
+    },
+    "product_metrics": { "type": "object" },
+    "operational_metrics": { "type": "object" },
+    "diagnostic_metrics": { "type": "object" },
+    "incomplete_outcomes": { "type": "array", "items": { "$ref": "#/$defs/incompleteOutcome" } }
+  },
+  "if": { "properties": { "status": { "const": "complete" } }, "required": ["status"] },
+  "then": {
+    "properties": {
+      "family_results": {
+        "minItems": 1,
+        "items": { "properties": { "status": { "const": "complete" } }, "required": ["status"] }
+      },
+      "product_metrics": { "$ref": "#/$defs/productMetricGroup" },
+      "operational_metrics": { "$ref": "#/$defs/operationalMetricGroup" },
+      "diagnostic_metrics": { "$ref": "#/$defs/diagnosticMetricGroup" },
+      "incomplete_outcomes": { "maxItems": 0 }
+    }
+  },
+  "else": {
+    "properties": {
+      "product_metrics": { "maxProperties": 0 },
+      "operational_metrics": { "maxProperties": 0 },
+      "diagnostic_metrics": { "maxProperties": 0 },
+      "incomplete_outcomes": { "minItems": 1 }
+    }
+  },
+  "$comment": "Exact selected-family identity, metric arithmetic, ranges, and binding fingerprints are plan-dependent and are normatively enforced by validateVnextAdapterReport."
+}

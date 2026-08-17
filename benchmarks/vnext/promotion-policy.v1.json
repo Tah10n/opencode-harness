@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "policy_id": "opencode-harness-vnext-promotion-v1",
+  "status": "predeclared",
+  "created_before_model_backed_runs": true,
+  "confidence_level": 0.95,
+  "minimum_complete_pairs_per_stratum": 8,
+  "minimum_task_families_per_standard_estimand": 8,
+  "small_negative_control_delta_minimum": -0.03,
+  "functional_harm_ci_lower_bound_minimum": -0.05,
+  "timeout_rate_delta_maximum": 0.02,
+  "introduced_high_medium_defects_maximum": 0,
+  "incomplete_outcome_policy": "separate-not-scored",
+  "external_state_policy": "blocked-unproven",
+  "threshold_change_policy": "new-version-and-new-run-required",
+  "full_run_policy": "only-after-positive-standard-signal-with-all-guardrails",
+  "promotion_rules": [
+    {
+      "component_id": "core-rules",
+      "target_metric": "functional_hidden_check_success",
+      "direction": "higher-is-better"
+    },
+    {
+      "component_id": "targeted-verification",
+      "target_metric": "verification_omission",
+      "direction": "lower-is-better"
+    },
+    {
+      "component_id": "independent-final-review",
+      "target_metric": "introduced_high_medium_defects",
+      "direction": "lower-is-better"
+    },
+    {
+      "component_id": "deep-context",
+      "target_metric": "missed_consumer_rate",
+      "direction": "lower-is-better"
+    },
+    {
+      "component_id": "assurance-controls",
+      "target_metric": "regression_free_high_risk_success",
+      "direction": "higher-is-better"
+    }
+  ],
+  "required_bindings": [
+    "source_sha",
+    "policy_fingerprint",
+    "inventory_fingerprint",
+    "contract_fingerprint",
+    "executable_identity",
+    "adapter_fingerprint",
+    "model",
+    "provider",
+    "variant",
+    "seed",
+    "timeout_ms",
+    "runner_limits",
+    "fixture_fingerprint",
+    "evaluator_fingerprint"
+  ],
+  "verdicts": [
+    "promote",
+    "retain-optional",
+    "reject",
+    "inconclusive",
+    "blocked-unproven"
+  ]
+}
