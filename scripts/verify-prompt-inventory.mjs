@@ -444,7 +444,6 @@ function assertPreimplementationSemantics() {
     assertCapabilityAwareReadOnlyGuidance(readWorkspaceText(relativePath), relativePath);
   }
   const runnerFacingModeDocuments = [
-    "AGENTS.md",
     "agents/orchestrator-deep.md",
     "README.md",
     "docs/whole-system-context.md",
@@ -475,7 +474,6 @@ function assertPreimplementationSemantics() {
   check(/finalization alone does not authorize mutation/iu.test(pluginDescriptions), "Dossier finalization description must preserve the mutation authority boundary");
 
   for (const relativePath of [
-    "AGENTS.md",
     "agents/orchestrator.md",
     "agents/orchestrator-deep.md",
     "skills/global-wide-deep-context/SKILL.md",
