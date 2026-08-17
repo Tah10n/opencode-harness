@@ -48,13 +48,15 @@ omissions fell and duration/timeouts rose. It does not justify making the
 heavy lifecycle the default. See
 [the v0.3 research result](docs/research/v0.3-instrumented.md).
 
-Proven model-free in v0.4: profile closure, prompt budget, permissions,
-portable materialization, the four-operation assurance surface, legacy v2
-reader compatibility, exact one-component ablations, and frozen promotion
-thresholds. Still experimental: any claim that `deep` or `assurance` improves
-model-backed outcomes. The vNext contract requires paired smoke and standard
-runs before promotion; unavailable runtime evidence remains
-`blocked-unproven`.
+Proven model-free in v0.4: profile closure, prompt budget, effective
+permissions, portable materialization, facade-only standard and high-risk
+assurance lifecycles, structural child-assignment binding, legacy v2 reader compatibility,
+byte-bound cumulative arm materialization, rendered medium/high topology,
+runner-owned pair aggregation, receipt-recomputed observations, an in-process
+standard-to-full authorization boundary, and frozen promotion thresholds. These checks do
+not prove that `deep` or `assurance` improves model-backed outcomes. The vNext
+contract requires paired smoke and standard runs before promotion; unavailable
+runtime evidence remains `blocked-unproven` and is never scored.
 
 ### Migration from v0.3
 

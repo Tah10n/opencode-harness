@@ -15,8 +15,13 @@ npm run bench:vnext:validate
 npm run bench:vnext:self-test
 ```
 
-Model-backed execution uses a repository-confined adapter so the same plan can
-be executed by a contained host without coupling `core` to benchmark runtime:
+Model-backed vNext execution is runner-owned. The runner materializes both arms
+from the canonical inventory, fingerprints their effective runtime surfaces,
+counterbalances concrete rendered pairs, and invokes the repository's official
+contained OpenCode transport once per attempt. That low-level transport cannot
+return metrics, hidden outcomes, a comparison, or a promotion verdict. Hidden
+files are staged only after verified process-tree teardown; the runner derives
+all pair evidence and statistics.
 
 ```sh
 npm run bench:vnext:run -- \
@@ -26,18 +31,40 @@ npm run bench:vnext:run -- \
   --provider openai \
   --variant low \
   --seed v04-smoke-20260817 \
-  --timeout-ms 300000 \
-  --executable-identity opencode-1.18.16 \
-  --adapter path/to/repository-confined-adapter.mjs
+  --timeout-ms 300000 > vnext-smoke-run.json
 ```
 
 Repeat smoke for all five estimands. Standard is then required for
 `core-rules-to-core-verified`, `core-verified-to-core-reviewed`, the medium-only
-`core-reviewed-to-deep`, and the high-only `deep-to-assurance`. Omit
-`--adapter` to obtain an exit-2 `blocked-unproven` report; this is a preflight,
-not model evidence. Plans refuse dirty source trees, bind all policy-required
-identities, serialize pairs, and never persist raw model output. Full remains
-blocked until a separate positive standard promotion decision exists.
+`core-reviewed-to-deep`, and the high-only `deep-to-assurance`. Compare and
+apply the frozen promotion policy explicitly:
+
+```sh
+npm run bench:vnext:compare -- --run vnext-standard-run.json > vnext-standard-comparison.json
+npm run bench:vnext:promote -- --run vnext-standard-run.json
+```
+
+Plans refuse dirty source trees, derive executable identity from the verified
+OpenCode binary, bind the official execution-engine bytes, serialize pairs, and
+never persist raw model output. `--plan-only` performs a model-free preflight.
+Full has no artifact-based or plan-only entry point. A `--suite full` invocation
+first executes standard through the fixed trusted executor in the same process,
+recomputes every observation from bounded receipt inputs, and continues to full
+only while that in-memory decision is positive and all bindings still match.
+Neither a standalone comparison nor a self-consistent caller-created run
+envelope can unlock full execution. The separate compare/promote commands are
+inspectable reports; they are never full-run authorization tokens.
+
+The 26 vNext entries are executable task families, not aliases alone. Five
+small controls retain the proven legacy kernels. Ten medium families add a
+runner-validated 8–20-file repository graph with 1–4 writable paths and
+consumer, re-export, remote-test, config, and hidden-oracle edges. Eleven
+high-risk families use distinct executable kernels for authorization, path
+confinement, migration atomicity, rollback, durable persistence, duplicate side
+effects, shared-state concurrency, cancellation cleanup, partial dependency
+failure, public-schema compatibility, and prompt-data boundaries. Model-free
+self-tests prove each seeded high-risk defect fails its hidden oracle and each
+reference repair passes both public and hidden oracles.
 
 Product correctness, operational cost, and protocol diagnostics are separate
 metric classes. Promotion thresholds live in the predeclared versioned policy;

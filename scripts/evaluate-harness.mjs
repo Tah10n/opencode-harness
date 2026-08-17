@@ -85,7 +85,11 @@ const scenarios = [
         includes("agents/deep.md", `${tool}: allow`, "The canonical deep profile must be allowed to use bounded context tools directly.");
       }
       includes("agents/deep.md", "Delegate only independent read-only questions", "Deep delegation should remain read-only and bounded.");
-      includes("docs/recursive-context-mode.md", "Use recursive-context mode automatically", "Keep the design note aligned with the agent rule.");
+      includes("docs/recursive-context-mode.md", "`core` never switches to `deep` silently.", "Deep selection must remain explicit.");
+      includes("docs/recursive-context-mode.md", "choose the `deep` profile/configuration", "Document an explicit deep selection path.");
+      excludes("docs/recursive-context-mode.md", "Use recursive-context mode automatically", "The active v0.4 document must not retain the v0.3 automatic-selection contract.");
+      excludes("docs/recursive-context-mode.md", "Root orchestration stays in `orchestrator`", "The active v0.4 document must not describe the deprecated orchestrator runtime.");
+      includes("docs/legacy/v0.3/recursive-context-mode.md", "selected recursive-context mode automatically", "Preserve the old automatic workflow only as historical v0.3 documentation.");
     },
   },
   {
@@ -503,6 +507,11 @@ for (const probe of [
     scenarioId: "broad-audit-recursive-context",
     file: "agents/deep.md",
     needle: "Delegate only independent read-only questions",
+  },
+  {
+    scenarioId: "broad-audit-recursive-context",
+    file: "docs/recursive-context-mode.md",
+    needle: "`core` never switches to `deep` silently.",
   },
   {
     scenarioId: "critical-cannot-complete-with-missing-mandatory-verification",

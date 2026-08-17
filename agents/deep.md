@@ -7,6 +7,7 @@ permission:
   question: allow
   "quality_*": deny
   "oc_learning_*": deny
+  "context_*": deny
   context_outline: allow
   context_files: allow
   context_read: allow

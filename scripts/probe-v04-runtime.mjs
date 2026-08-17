@@ -120,7 +120,7 @@ function effectivePermission(rules, permissionId) {
   return action;
 }
 
-function probeAgentPermissions(profileRoot, workspaceRoot, agent, expectedAllows) {
+function probeAgentPermissions(profileRoot, workspaceRoot, agent, expectedAllows, expectedContextAllows = []) {
   const details = JSON.parse(runOpenCode(profileRoot, workspaceRoot, ["debug", "agent", agent]));
   const expected = new Set(expectedAllows);
   for (const toolId of [
@@ -135,7 +135,26 @@ function probeAgentPermissions(profileRoot, workspaceRoot, agent, expectedAllows
       fail("V04_RUNTIME_PERMISSION", `${agent} resolves ${toolId} to ${action}, expected ${required}`);
     }
   }
-  return Object.freeze({ agent, allowed_facade_tools: [...expected] });
+  const expectedContext = new Set(expectedContextAllows);
+  for (const toolId of [
+    "context_outline",
+    "context_files",
+    "context_search",
+    "context_read",
+    "context_write",
+    "context_exec",
+  ]) {
+    const action = effectivePermission(details.permission, toolId);
+    const required = expectedContext.has(toolId) ? "allow" : "deny";
+    if (action !== required) {
+      fail("V04_RUNTIME_PERMISSION", `${agent} resolves ${toolId} to ${action}, expected ${required}`);
+    }
+  }
+  return Object.freeze({
+    agent,
+    allowed_facade_tools: [...expected],
+    allowed_context_tools: [...expectedContext],
+  });
 }
 
 async function probeToolIds(profileRoot, workspaceRoot) {
@@ -244,8 +263,9 @@ try {
     "quality_assurance_advance",
     "quality_assurance_authorize",
   ];
+  const contextIds = ["context_outline", "context_files", "context_search", "context_read"];
   const permission_matrix = [
-    ...["build", "core", "deep", "explore"].map((agent) => (
+    ...["build", "core"].map((agent) => (
       probeAgentPermissions(
         materialized.assurance.profileRoot,
         materialized.assurance.workspaceRoot,
@@ -253,13 +273,23 @@ try {
         [],
       )
     )),
+    ...["deep", "explore"].map((agent) => (
+      probeAgentPermissions(
+        materialized.assurance.profileRoot,
+        materialized.assurance.workspaceRoot,
+        agent,
+        [],
+        contextIds,
+      )
+    )),
     probeAgentPermissions(
       materialized.assurance.profileRoot,
       materialized.assurance.workspaceRoot,
       "assurance",
       facadeIds,
+      contextIds,
     ),
-    ...["architect", "reviewer", "verifier"].map((agent) => (
+    ...["architect", "verifier"].map((agent) => (
       probeAgentPermissions(
         materialized.assurance.profileRoot,
         materialized.assurance.workspaceRoot,
@@ -267,6 +297,13 @@ try {
         ["quality_assurance_advance"],
       )
     )),
+    probeAgentPermissions(
+      materialized.assurance.profileRoot,
+      materialized.assurance.workspaceRoot,
+      "reviewer",
+      ["quality_assurance_advance"],
+      contextIds,
+    ),
   ];
   const coreProbe = await probeToolIds(materialized.core.profileRoot, materialized.core.workspaceRoot);
   const sourceCoreProbe = await probeToolIds(root, root);

@@ -99,10 +99,14 @@
       "target_metric": "verification_omission",
       "intervention_path": "benchmarks/vnext/components/targeted-verification.md",
       "intervention_vector": {
-        "prompt_fragments": ["benchmarks/vnext/components/targeted-verification.md"],
-        "roles": [],
-        "tools": [],
-        "permissions": []
+        "prompt_fragments": [
+          "benchmarks/vnext/components/targeted-verification.md",
+          "agents/core.md",
+          "agents/core-reviewer.md"
+        ],
+        "roles": ["primary-core", "read-only-reviewer"],
+        "tools": ["task"],
+        "permissions": ["task:read-only-reviewer"]
       }
     },
     {
@@ -111,10 +115,13 @@
       "target_metric": "introduced_high_medium_defects",
       "intervention_path": "benchmarks/vnext/components/independent-final-review.md",
       "intervention_vector": {
-        "prompt_fragments": ["benchmarks/vnext/components/independent-final-review.md"],
-        "roles": ["read-only-reviewer"],
-        "tools": ["task"],
-        "permissions": ["task:read-only-reviewer"]
+        "prompt_fragments": [
+          "benchmarks/vnext/components/independent-final-review.md",
+          "agents/core.md"
+        ],
+        "roles": ["primary-core-reviewed"],
+        "tools": [],
+        "permissions": ["review:mandatory"]
       }
     },
     {
@@ -123,8 +130,14 @@
       "target_metric": "missed_consumer_rate",
       "intervention_path": "benchmarks/vnext/components/deep-context.md",
       "intervention_vector": {
-        "prompt_fragments": ["benchmarks/vnext/components/deep-context.md"],
-        "roles": ["read-only-explorer"],
+        "prompt_fragments": [
+          "benchmarks/vnext/components/deep-context.md",
+          "agents/deep.md",
+          "agents/core.md",
+          "agents/core-reviewer.md",
+          "agents/explore.md"
+        ],
+        "roles": ["primary-deep", "read-only-explorer"],
         "tools": ["context_outline", "context_files", "context_search", "context_read"],
         "permissions": ["context:read-only"]
       }
@@ -135,8 +148,14 @@
       "target_metric": "regression_free_high_risk_success",
       "intervention_path": "benchmarks/vnext/components/assurance-controls.md",
       "intervention_vector": {
-        "prompt_fragments": ["benchmarks/vnext/components/assurance-controls.md"],
-        "roles": ["assurance-architect", "assurance-reviewer", "assurance-verifier"],
+        "prompt_fragments": [
+          "benchmarks/vnext/components/assurance-controls.md",
+          "agents/assurance.md",
+          "agents/assurance-architect.md",
+          "agents/assurance-reviewer.md",
+          "agents/assurance-verifier.md"
+        ],
+        "roles": ["primary-assurance", "assurance-architect", "assurance-reviewer", "assurance-verifier"],
         "tools": [
           "quality_assurance_start",
           "quality_assurance_inspect",
@@ -147,6 +166,73 @@
       }
     }
   ],
+  "vnext_component_surface_deltas": {
+    "core-rules": [
+      "/effective_config/default_agent",
+      "/materialized_files/0/fingerprint",
+      "/materialized_files/0/path"
+    ],
+    "targeted-verification": [
+      "/effective_config/default_agent",
+      "/materialized_files/0/fingerprint",
+      "/materialized_files/0/path",
+      "/materialized_files/1/fingerprint",
+      "/materialized_files/1/path"
+    ],
+    "independent-final-review": [
+      "/effective_config/default_agent",
+      "/materialized_files/1/fingerprint",
+      "/materialized_files/1/path"
+    ],
+    "deep-context": [
+      "/effective_config/default_agent",
+      "/effective_config/plugin/1/fingerprint",
+      "/effective_config/plugin/1/id",
+      "/effective_config/plugin/1/source_path",
+      "/materialized_files/1/fingerprint",
+      "/materialized_files/1/path",
+      "/materialized_files/2/fingerprint",
+      "/materialized_files/2/path",
+      "/materialized_files/3/fingerprint",
+      "/materialized_files/3/path",
+      "/plugin_sources/1/fingerprint",
+      "/plugin_sources/1/id",
+      "/plugin_sources/1/source_path"
+    ],
+    "assurance-controls": [
+      "/effective_config/default_agent",
+      "/effective_config/plugin/1/fingerprint",
+      "/effective_config/plugin/1/id",
+      "/effective_config/plugin/1/source_path",
+      "/effective_config/plugin/2/fingerprint",
+      "/effective_config/plugin/2/id",
+      "/effective_config/plugin/2/source_path",
+      "/materialized_files/0/fingerprint",
+      "/materialized_files/0/path",
+      "/materialized_files/1/fingerprint",
+      "/materialized_files/1/path",
+      "/materialized_files/2/fingerprint",
+      "/materialized_files/2/path",
+      "/materialized_files/3/fingerprint",
+      "/materialized_files/3/path",
+      "/materialized_files/4/fingerprint",
+      "/materialized_files/4/path",
+      "/materialized_files/5/fingerprint",
+      "/materialized_files/5/path",
+      "/materialized_files/6/fingerprint",
+      "/materialized_files/6/path",
+      "/materialized_files/7/fingerprint",
+      "/materialized_files/7/path",
+      "/materialized_files/8/fingerprint",
+      "/materialized_files/8/path",
+      "/plugin_sources/1/fingerprint",
+      "/plugin_sources/1/id",
+      "/plugin_sources/1/source_path",
+      "/plugin_sources/2/fingerprint",
+      "/plugin_sources/2/id",
+      "/plugin_sources/2/source_path"
+    ]
+  },
   "profiles": [
     {
       "id": "plain",
@@ -337,16 +423,25 @@
       "base_bundle_id": null,
       "runtime_profile_id": null,
       "entries": [
+        { "source": ".opencode/assurance", "target": ".opencode/assurance" },
         { "source": "adoption", "target": "adoption" },
+        { "source": "agents", "target": "agents" },
         { "source": "benchmarks", "target": "benchmarks" },
         { "source": "evals", "target": "evals" },
         { "source": "fixtures", "target": "fixtures" },
         { "source": "lib/benchmark", "target": "lib/benchmark" },
+        { "source": "lib/feedback", "target": "lib/feedback" },
+        { "source": "lib/quality", "target": "lib/quality" },
         { "source": "lib/profile-v3.mjs", "target": "lib/profile-v3.mjs" },
+        { "source": "native", "target": "native" },
         { "source": "profiles", "target": "profiles" },
-        { "source": "scripts", "target": "scripts" },
-        { "source": "package.json", "target": "package.json" },
-        { "source": "package-lock.json", "target": "package-lock.json" },
+        { "source": "quality", "target": "quality" },
+        { "source": "scripts/benchmark-vnext-validate.mjs", "target": "scripts/benchmark-vnext-validate.mjs" },
+        { "source": "scripts/benchmark-vnext-self-test.mjs", "target": "scripts/benchmark-vnext-self-test.mjs" },
+        { "source": "scripts/benchmark-vnext-run.mjs", "target": "scripts/benchmark-vnext-run.mjs" },
+        { "source": "scripts/benchmark-vnext-compare.mjs", "target": "scripts/benchmark-vnext-compare.mjs" },
+        { "source": "scripts/benchmark-vnext-promote.mjs", "target": "scripts/benchmark-vnext-promote.mjs" },
+        { "source": "profiles/config/lab.package.json", "target": "package.json" },
         { "source": "docs/synthetic-benchmark.md", "target": "docs/synthetic-benchmark.md" },
         { "source": "docs/research", "target": "docs/research" }
       ],

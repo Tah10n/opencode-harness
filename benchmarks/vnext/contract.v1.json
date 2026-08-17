@@ -273,7 +273,9 @@
       "fixture_id": "vnext-high-authorization-boundary",
       "source_family_id": "path-confinement",
       "source_semantic_variant": 1,
-      "requirement_visibility": "complete"
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 4],
+      "potential_file_bounds": [8, 20]
     },
     {
       "id": "high-path-confinement",
@@ -281,7 +283,9 @@
       "fixture_id": "vnext-high-path-confinement",
       "source_family_id": "path-confinement",
       "source_semantic_variant": 2,
-      "requirement_visibility": "complete"
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 4],
+      "potential_file_bounds": [8, 20]
     },
     {
       "id": "high-migration-atomicity",
@@ -289,7 +293,9 @@
       "fixture_id": "vnext-high-migration-atomicity",
       "source_family_id": "versioned-json-migration",
       "source_semantic_variant": 1,
-      "requirement_visibility": "complete"
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 4],
+      "potential_file_bounds": [8, 20]
     },
     {
       "id": "high-rollback",
@@ -297,7 +303,9 @@
       "fixture_id": "vnext-high-rollback",
       "source_family_id": "cache-invalidation",
       "source_semantic_variant": 3,
-      "requirement_visibility": "complete"
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 4],
+      "potential_file_bounds": [8, 20]
     },
     {
       "id": "high-durable-persistence",
@@ -305,7 +313,9 @@
       "fixture_id": "vnext-high-durable-persistence",
       "source_family_id": "retry-idempotency",
       "source_semantic_variant": 3,
-      "requirement_visibility": "complete"
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 4],
+      "potential_file_bounds": [8, 20]
     },
     {
       "id": "high-duplicate-side-effects",
@@ -313,7 +323,9 @@
       "fixture_id": "vnext-high-duplicate-side-effects",
       "source_family_id": "retry-idempotency",
       "source_semantic_variant": 3,
-      "requirement_visibility": "complete"
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 4],
+      "potential_file_bounds": [8, 20]
     },
     {
       "id": "high-shared-state-concurrency",
@@ -321,7 +333,9 @@
       "fixture_id": "vnext-high-shared-state-concurrency",
       "source_family_id": "async-cancellation",
       "source_semantic_variant": 2,
-      "requirement_visibility": "complete"
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 4],
+      "potential_file_bounds": [8, 20]
     },
     {
       "id": "high-cancellation-cleanup",
@@ -329,7 +343,9 @@
       "fixture_id": "vnext-high-cancellation-cleanup",
       "source_family_id": "resource-cleanup",
       "source_semantic_variant": 2,
-      "requirement_visibility": "complete"
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 4],
+      "potential_file_bounds": [8, 20]
     },
     {
       "id": "high-partial-dependency-failure",
@@ -337,7 +353,9 @@
       "fixture_id": "vnext-high-partial-dependency-failure",
       "source_family_id": "partial-dependency-failure",
       "source_semantic_variant": 2,
-      "requirement_visibility": "complete"
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 4],
+      "potential_file_bounds": [8, 20]
     },
     {
       "id": "high-public-schema-compatibility",
@@ -345,7 +363,9 @@
       "fixture_id": "vnext-high-public-schema-compatibility",
       "source_family_id": "cross-file-contract",
       "source_semantic_variant": 3,
-      "requirement_visibility": "complete"
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 4],
+      "potential_file_bounds": [8, 20]
     },
     {
       "id": "high-prompt-injection-widening",
@@ -353,7 +373,9 @@
       "fixture_id": "vnext-high-prompt-injection-widening",
       "source_family_id": "prompt-injection-ignore",
       "source_semantic_variant": 2,
-      "requirement_visibility": "complete"
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 4],
+      "potential_file_bounds": [8, 20]
     }
   ],
   "metrics": {
@@ -370,7 +392,6 @@
       "task_completion_without_human_intervention"
     ],
     "operational": [
-      "tokens",
       "duration",
       "model_turns",
       "tool_calls",

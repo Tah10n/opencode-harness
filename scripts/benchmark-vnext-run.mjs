@@ -2,13 +2,9 @@ import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 
-import { ProfileV3Error } from "../lib/profile-v3.mjs";
-import {
-  blockedVnextRunReport,
-  buildVnextExecutionPlan,
-  loadVnextAdapterModule,
-  validateVnextAdapterReport,
-} from "../lib/benchmark/vnext-runner.mjs";
+import { ProfileV3Error, fingerprintProfileValue } from "../lib/profile-v3.mjs";
+import { buildVnextExecutionPlan, executeVnextFull, executeVnextPlan } from "../lib/benchmark/vnext-runner.mjs";
+import { resolveSyntheticOpenCodeExecutableIdentity } from "../lib/benchmark/opencode-adapter.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -21,14 +17,17 @@ function parseArguments(values) {
     variant: null,
     seed: null,
     timeoutMs: 300_000,
-    executableIdentity: null,
-    adapter: null,
+    planOnly: false,
   };
   for (let index = 0; index < values.length; index += 1) {
     const key = values[index];
+    if (key === "--plan-only") {
+      result.planOnly = true;
+      continue;
+    }
     const next = values[index + 1];
     if (!["--suite", "--estimand", "--model", "--provider", "--variant", "--seed",
-      "--timeout-ms", "--executable-identity", "--adapter"].includes(key)
+      "--timeout-ms"].includes(key)
       || typeof next !== "string" || next.startsWith("--")) {
       throw new ProfileV3Error("VNEXT_RUN_ARGUMENT", `invalid argument ${key}`);
     }
@@ -40,13 +39,11 @@ function parseArguments(values) {
       "--variant": "variant",
       "--seed": "seed",
       "--timeout-ms": "timeoutMs",
-      "--executable-identity": "executableIdentity",
-      "--adapter": "adapter",
     }[key];
     result[property] = key === "--timeout-ms" ? Number(next) : next;
     index += 1;
   }
-  for (const required of ["suite", "estimand", "model", "provider", "seed", "executableIdentity"]) {
+  for (const required of ["suite", "estimand", "model", "provider", "seed"]) {
     if (result[required] === null) throw new ProfileV3Error("VNEXT_RUN_ARGUMENT", `--${required.replace(/[A-Z]/gu, (c) => `-${c.toLowerCase()}`)} is required`);
   }
   return result;
@@ -54,34 +51,46 @@ function parseArguments(values) {
 
 try {
   const options = parseArguments(process.argv.slice(2));
-  const loadedAdapter = options.adapter === null
-    ? null
-    : await loadVnextAdapterModule(root, path.resolve(options.adapter));
-  const plan = buildVnextExecutionPlan({
+  const executableIdentity = resolveSyntheticOpenCodeExecutableIdentity();
+  if (options.suite === "full" && options.planOnly) {
+    throw new ProfileV3Error("VNEXT_FULL_GATE", "full has no plan-only mode; it requires an in-process trusted standard execution");
+  }
+  const common = {
     repositoryRoot: root,
-    suiteId: options.suite,
     estimandId: options.estimand,
     model: options.model,
     provider: options.provider,
     variant: options.variant,
     seed: options.seed,
     timeoutMs: options.timeoutMs,
-    executableIdentity: options.executableIdentity,
-    adapterFingerprint: loadedAdapter?.fingerprint ?? "unconfigured",
-  });
-  if (options.adapter === null) {
-    process.stdout.write(`${JSON.stringify(blockedVnextRunReport(
-      plan,
-      "vnext_execution_adapter_not_configured",
-    ), null, 2)}\n`);
-    process.exitCode = 2;
+    executableIdentity: executableIdentity.fingerprint,
+  };
+  let plan;
+  let report;
+  if (options.suite === "full") {
+    const executed = await executeVnextFull({ ...common, executableIdentity });
+    plan = executed.plan;
+    report = executed.report;
   } else {
-    const adapter = loadedAdapter.module;
-    if (typeof adapter.runVnextPlan !== "function") {
-      throw new ProfileV3Error("VNEXT_ADAPTER_API", "adapter must export runVnextPlan(plan)");
+    plan = buildVnextExecutionPlan({ ...common, suiteId: options.suite });
+  }
+  if (options.planOnly) {
+    process.stdout.write(`${JSON.stringify(plan, null, 2)}\n`);
+    process.exitCode = 0;
+  } else {
+    if (report === undefined) {
+      report = await executeVnextPlan({ repositoryRoot: root, plan, executableIdentity });
     }
-    const report = validateVnextAdapterReport(plan, await adapter.runVnextPlan(plan));
-    process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
+    const envelopeSource = {
+      schema_version: 1,
+      run_kind: "vnext-run-envelope",
+      plan,
+      report,
+    };
+    process.stdout.write(`${JSON.stringify({
+      ...envelopeSource,
+      envelope_fingerprint: fingerprintProfileValue(envelopeSource),
+    }, null, 2)}\n`);
     if (report.status !== "complete") process.exitCode = 2;
   }
 } catch (error) {

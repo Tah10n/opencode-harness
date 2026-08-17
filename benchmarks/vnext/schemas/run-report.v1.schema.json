@@ -50,9 +50,8 @@
     "operationalMetricGroup": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["tokens", "duration", "model_turns", "tool_calls", "delegated_child_count", "timeout_rate", "no_progress_turns"],
+      "required": ["duration", "model_turns", "tool_calls", "delegated_child_count", "timeout_rate", "no_progress_turns"],
       "properties": {
-        "tokens": { "$ref": "#/$defs/metricSummary" },
         "duration": { "$ref": "#/$defs/metricSummary" },
         "model_turns": { "$ref": "#/$defs/metricSummary" },
         "tool_calls": { "$ref": "#/$defs/metricSummary" },
@@ -93,10 +92,12 @@
     "bindings",
     "status",
     "family_results",
+    "pair_results",
     "product_metrics",
     "operational_metrics",
     "diagnostic_metrics",
-    "incomplete_outcomes"
+    "incomplete_outcomes",
+    "evidence_fingerprint"
   ],
   "properties": {
     "schema_version": { "const": 1 },
@@ -125,10 +126,36 @@
         }
       }
     },
+    "pair_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "pair_id", "family_id", "stratum", "repetition", "order",
+          "instance_fingerprint", "required_consumer_ids", "status", "incomplete_reasons", "baseline",
+          "candidate", "evidence_fingerprint"
+        ],
+        "properties": {
+          "pair_id": { "type": "string", "minLength": 1 },
+          "family_id": { "type": "string", "minLength": 1 },
+          "stratum": { "enum": ["small", "medium", "high"] },
+          "repetition": { "type": "integer", "minimum": 1 },
+          "order": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "pattern": "^P[0-5]$" } },
+          "instance_fingerprint": { "pattern": "^sha256:[0-9a-f]{64}$" },
+          "required_consumer_ids": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+          "status": { "enum": ["complete", "incomplete"] },
+          "incomplete_reasons": { "type": "array", "items": { "type": "string" } },
+          "baseline": { "type": "object" },
+          "candidate": { "type": "object" },
+          "evidence_fingerprint": { "pattern": "^sha256:[0-9a-f]{64}$" }
+        }
+      }
+    },
     "product_metrics": { "type": "object" },
     "operational_metrics": { "type": "object" },
     "diagnostic_metrics": { "type": "object" },
-    "incomplete_outcomes": { "type": "array", "items": { "$ref": "#/$defs/incompleteOutcome" } }
+    "incomplete_outcomes": { "type": "array", "items": { "$ref": "#/$defs/incompleteOutcome" } },
+    "evidence_fingerprint": { "pattern": "^sha256:[0-9a-f]{64}$" }
   },
   "if": { "properties": { "status": { "const": "complete" } }, "required": ["status"] },
   "then": {
@@ -137,6 +164,7 @@
         "minItems": 1,
         "items": { "properties": { "status": { "const": "complete" } }, "required": ["status"] }
       },
+      "pair_results": { "minItems": 1, "items": { "properties": { "status": { "const": "complete" } } } },
       "product_metrics": { "$ref": "#/$defs/productMetricGroup" },
       "operational_metrics": { "$ref": "#/$defs/operationalMetricGroup" },
       "diagnostic_metrics": { "$ref": "#/$defs/diagnosticMetricGroup" },
@@ -151,5 +179,5 @@
       "incomplete_outcomes": { "minItems": 1 }
     }
   },
-  "$comment": "Exact selected-family identity, metric arithmetic, ranges, and binding fingerprints are plan-dependent and are normatively enforced by validateVnextAdapterReport."
+  "$comment": "Exact selected-family identity, metric arithmetic, ranges, and binding fingerprints are plan-dependent and are normatively enforced by validateVnextRunReport."
 }

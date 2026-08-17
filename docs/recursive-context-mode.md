@@ -1,190 +1,106 @@
-# Recursive Context Mode
+# Recursive Context in v0.4 `deep`
 
-## Purpose
+## Product boundary
 
-Recursive context mode is the optional `deep` workflow for large OpenCode
-audits and research-heavy tasks. It is intended for broad code audits,
-production-readiness checks, repository or article study, long-log review,
-large-diff review, and multi-module or multi-service bug sweeps. `core` never
-requires it, and missing capability tools fall back to bounded ordinary
-read/search without blocking the task.
+Recursive context is an optional capability of the explicit `deep` profile. It
+helps with broad audits, large diffs, multi-module investigations, long logs,
+and tasks whose relevant evidence does not fit a bounded local context.
 
-The goal is to keep the root orchestrator's context small and decision-focused while moving broad reading, search, and independent semantic checks into bounded read-only tools and focused subagents.
+`core` never switches to `deep` silently. It may recommend `deep`, but selection
+requires one of these explicit inputs:
 
-This is not a new slash command. The mode is selected automatically by the orchestrator when the task shape is large enough.
+- choose the `deep` profile/configuration;
+- invoke `/deep`;
+- apply a project-local `WORKFLOW.md` rule that explicitly selects `deep` for a
+  declared task class.
 
-## What Changed
+Once selected, the `deep` agent decides which bounded context operations are
+useful for the current task. This is ordinary workflow planning inside an
+already selected profile, not hidden profile escalation.
 
-- `AGENTS.md` now identifies when a user may explicitly select `deep`; small
-  local tasks remain in `core`.
-- `agents/orchestrator.md` and `agents/orchestrator-deep.md` define the automatic trigger, sequencing, and safety rules.
-- The separate `opencode-recursive-context` capability package provides the
-  minimal safe harness surface of four read-only tools:
-  - `context_outline`: returns a compact worktree map and detected workflow/skill guidance.
-  - `context_files`: returns a scoped file inventory.
-  - `context_search`: performs literal text search inside the current worktree.
-  - `context_read`: reads bounded line ranges from text files.
-- If the installed capability package also exposes advanced tools such as
-  `context_map`, `context_batch_read`, `context_symbols`, or `context_related`,
-  those advanced tools are opt-in for host profiles. This template intentionally
-  grants only the four-tool minimal safe harness surface by default.
-- Read-only and diagnostic agents can use those tools: `explore`, `reviewer`, `architect`, `diagnose`, and `verifier`.
-- Milestone 3 records actual bounded context operations as sanitized receipts,
-  links wide/deep analysis to the Milestone 2 impact graph, and computes context
-  sufficiency before the existing Engineering Dossier gate. The tools and
-  report still do not authorize edits or declare either gate passed.
+## Minimal capability
 
-## Basis
+The minimal safe harness surface of the coordinated
+`opencode-recursive-context` capability exposes four default read-only tools:
 
-The design is based on the Recursive Language Models idea from:
+- `context_outline` — compact workspace and guidance outline;
+- `context_files` — scoped, paginated file inventory;
+- `context_search` — bounded literal search excerpts;
+- `context_read` — bounded text ranges.
 
-- https://github.com/alexzhang13/rlm
-- https://alexzhang13.github.io/blog/2025/rlm/
-- https://arxiv.org/abs/2512.24601
+The v0.4 configs deny `context_*` by default. Only these four exact IDs are
+allowed on the agents that need them. A newly installed tool such as
+`context_write` or `context_exec` therefore remains denied. Advanced read-only
+tools (`context_map`, `context_batch_read`, `context_symbols`, or
+`context_related`) require a separate explicit host policy and are not part of
+the default `deep` surface: advanced tools are opt-in.
 
-The useful idea from RLM is not the exact Python implementation. The useful idea is context decomposition: keep the root model from ingesting the full context, expose the context through a programmatic environment, and let the root model inspect, filter, split, delegate, and aggregate evidence.
+The coordinated compatibility target is `opencode-recursive-context` 0.2.0,
+output schema v2, contract 2.0, and policy 1. The tools remain path-confined,
+skip generated/high-noise directories and `.oc_harness`, and refuse secret-like
+paths and credential files.
 
-For this OpenCode config, the implementation is deliberately OpenCode-native:
+Path filtering and permission rules reduce accidental exposure, but they are
+not an absolute security boundary against a malicious local process that
+already has the user's filesystem authority. Keep secrets outside the selected
+workspace and review any host-side capability expansion.
 
-- Root orchestration stays in `orchestrator`.
-- Semantic fan-out stays in existing subagents such as `@explore`, `@researcher`, `@reviewer`, `@diagnose`, and `@verifier`.
-- Context access uses local plugin tools instead of a Python `exec` REPL.
-- Existing OpenCode permissions remain the safety boundary.
+## Deep workflow
 
-## Safety Model
+1. Build a compact workspace map.
+2. Locate project guidance, entry points, consumers, tests, and public
+   contracts.
+3. Delegate only independent read-only questions, with at most three active
+   read-only children.
+4. Aggregate compact path/line evidence and distinguish observations,
+   inference, uncertainty, and reasoned exclusions.
+5. Implement through one integrator; do not delegate overlapping writes.
+6. Run integration verification and one independent final review for a
+   nontrivial change.
 
-The tools are read-only and path-confined to the current worktree.
+Avoid duplicate broad symbol scans. If a targeted `context_symbols` query is
+planned under an opt-in host policy, use `context_map` with
+`includeSymbols: false`. Repeat a broad symbol query only for a new boundary:
+new query, kind, or narrower scope.
 
-They skip common generated or high-noise directories, including `.git`, `node_modules`, build outputs, caches, virtual environments, IDE folders, and test caches.
+Do not create computational receipts merely to demonstrate protocol
+compliance. Structured evidence exists to support the engineering decision.
 
-The capability also excludes `.oc_harness` so runner receipts, reports, and
-control state cannot feed back into repository inventory or fingerprints. For
-this harness, configure the additive host policy with
-`additionalIgnorePathPrefixes: ["evals/reports", "evals/decisions"]`; do not
-use a broad prefix such as `reports`, which could hide legitimate source.
+## Fallback
 
-They refuse secret-like files and paths, including `.env`, `.env.*` except `.env.example`, private key names, cloud credential directories, common package-manager and build credential files such as `.npmrc`, `.netrc`, `.git-credentials`, `gradle.properties`, `local.properties`, `settings.xml`, and key/certificate extensions such as `.key`, `.pem`, `.p12`, and `.pfx`.
+If the optional capability is absent, use bounded ordinary file discovery,
+search, and line-range reads. Report the reduced semantic coverage and any
+unresolved path. Missing recursive-context tools do not block ordinary core or
+deep work and do not justify an unsupported completeness claim.
 
-`context_search` returns bounded match excerpts rather than full arbitrarily long lines. When a line is shortened, the result marks `textTruncated: true` and increments `truncatedMatches`.
+## Separation from assurance
 
-They do not provide shell execution, write access, package installation, network access, or permission escalation.
+`deep` does not include an Engineering Dossier, context-receipt chain,
+runner-computed context-sufficiency gate, mutation authorization, trusted-check
+lifecycle, reconciliation, or attestation. Those controls belong only to the
+explicit experimental `assurance` profile.
 
-The `context_*` tools are the preferred bounded read path for broad audits, but
-they are not an absolute security boundary when a profile also grants native
-read or shell tools. This harness therefore verifies both guidance and
-effective permissions where possible, and documents native shell/read exposure
-as part of the agent permission surface.
+A deep investigation may recommend assurance when it finds security,
+authorization, migration, durable persistence, shared-state concurrency,
+destructive-data, or critical-public-contract risk. It may not start assurance
+automatically unless an explicit project-local policy already selected it.
 
-## Capability Contract
-
-The coordinated target is `opencode-recursive-context` 0.2.0 with output schema
-v2, contract version 2.0, and policy version 1. Legacy schema-v2 envelopes
-without producer metadata remain accepted; present metadata must identify the
-known producer and a supported contract.
-
-- `guidance` remains a path-only string array for legacy consumers.
-  `guidanceEntries` adds bounded `kind`, `appliesTo`, and `source` metadata; the
-  harness persists no guidance contents.
-- Instrumented normal-session `context_read` calls execute with `format: "json"`
-  and bind that actual format in their receipt. Direct capability calls retain
-  the existing text default.
-- Excerpt shortening and range boundaries are informational. They may remain in
-  `truncation_codes`, but do not make complete stable coverage partial. File,
-  byte, line, match, symbol, relationship, deadline, and snapshot ceilings do.
-- A successful `context_batch_read` contributes the same content-backed ranges
-  as individual reads. A mixed batch preserves only successful path-local
-  ranges and typed item failures; it remains partial and cannot establish
-  complete requested-scope coverage.
-- `context_files` pagination is bound to the full inventory snapshot through a
-  canonical cursor and expected fingerprint. `pagination_page` records the
-  presentation boundary without changing a complete producer snapshot into
-  partial coverage; real inventory ceilings remain partial. A single page scope
-  still cannot authorize an absence claim. `context_map.workspaces` is bounded,
-  path-only repository evidence derived without executing manifests.
-
-## Operating Rules
-
-Use recursive-context mode automatically when a task is broad enough that direct reading would pollute the root context or miss important surfaces.
-
-Recommended sequence for high or critical instrumented work:
-
-1. After classification, accept the runner-seeded provisional Engineering
-   Dossier draft, inferred partial impact graph, and linked draft report. They
-   carry a blocking unknown and are scaffolding for discovery, not evidence of
-   completeness.
-2. Start with `context_outline` or repo workflow guidance.
-3. Use `context_files`, `context_search`, and bounded `context_read` ranges to
-   identify likely entry points, tests, contracts, and docs.
-   If a targeted `context_symbols` call is planned, use
-   `context_map(includeSymbols: false)`. `context_map(includeSymbols: true)` is
-   a compact initial sample only when no separate symbol scan is needed; repeat
-   broad symbol scans only with a new query, kind, or narrower scope.
-4. Run instrumented context operations and focused read-only children one at a
-   time; settle, bind, and incorporate each result before the next launch.
-5. Aggregate compact evidence with file and line references, then refine the
-   Dossier and Whole-System Context Report.
-6. Only after report finalization, runner-computed sufficiency, current plan
-   challenges, Dossier finalization, and a passed gate may implementation begin.
-
-Profile-only mode may optionally parallelize independent semantic checks, but it
-cannot claim computational receipt-chain correlation. Instrumented mode is
-serialized even when the questions themselves are independent.
-
-Skip this mode for direct, small, single-file, or obviously local tasks.
-
-## Relationship To The Engineering Gate
-
-Recursive context supplies bounded evidence; it is not the gate itself. For a
-high or critical instrumented task, the provisional impact graph exists first
-and actual operations then produce runner-owned receipt IDs. Discovery should
-identify direct and
-transitive entry points, consumers, contracts, schemas/configuration,
-tests/fixtures, public compatibility surfaces, persistence/lifecycle edges,
-excluded siblings, and relevant unknown paths. Those facts are recorded as
-stable wide-report items linked to nodes, edges, paths, exclusions, and
-unknown-resolution plans in the existing Engineering Dossier impact graph.
-Each critical impact path also receives a separate deep analysis. The runner
-checks current receipt bindings, required coverage, falsification, deep
-dimensions, unknowns, truncation, and verification mappings before allowing
-the dossier gate to finalize.
-
-When semantic `context_*` tools are unavailable, the context report records that fact,
-the bounded fallback tools used, and reduced semantic coverage. It must not
-pretend that literal search proved semantic completeness. For high/critical
-work, skipping semantic discovery without that explicit fallback blocks the
-gate.
-
-This is also the prompt-maintainability boundary: context and evidence belong
-in structured artifacts and inspectable subagent jobs, not in ever-growing
-copies of global policy inside each role prompt. The plan/execute/observe/improve
-workflow and explicit job/evidence shape are informed by Lilian Weng's
-[Harness Engineering for Self-Improvement](https://lilianweng.github.io/posts/2026-07-04-harness/),
-but this repository does not implement every system described there and does
-not add an autonomous prompt-mutation loop.
-
-Read-only discovery before a high/critical gate remains allowed. An edit or
-writable delegated job is not: only the parent runner can validate the
-finalized context report, compute sufficiency, validate the finalized dossier,
-append the causal gate event, and enable implementation. Before attestation it
-also reconciles the exact final diff with the planned context.
+The former v0.3 automatic orchestrator/instrumented workflow is preserved for
+historical replay in
+[`legacy/v0.3/recursive-context-mode.md`](legacy/v0.3/recursive-context-mode.md).
 
 ## Verification
 
-The expected validation commands are:
+Verify the active contract with:
 
-- `opencode debug config`
-- `opencode debug agent orchestrator`
-- `opencode debug agent review-orchestrator`
-- `opencode debug agent explore`
-- `opencode debug agent reviewer`
-- `npm run verify:recursive-context-contract -- --capability-root ../opencode-recursive-context`
+- `npm run verify:deep`
+- `npm run eval`
+- `npm run probe:runtime:v0.4`
 
-The key expected result is that the live OpenCode config includes the external
-recursive-context capability configured by the host, and the relevant agents
-show `context_outline`, `context_files`, `context_read`, and `context_search`
-as enabled tools. Additional `context_*` tools may be installed, but this
-profile does not require or grant them unless the host opts in.
+The installed-runtime probe is optional live validation. The deterministic
+checks remain the portable release baseline; a missing host capability must be
+reported as unverified rather than converted into a passing runtime claim.
 
-For prompt-level behaviour changes, optional live validation can run the same
-broad-audit prompt against baseline and candidate profiles, then score bounded
-context-tool use, subagent fan-out, evidence quality, and no-write behaviour.
+The required runtime result is that `deep` and its read-only explorer allow only
+the four minimal context tools, unknown prefixed tools remain denied, `core`
+exposes none of them, and profile selection remains explicit.

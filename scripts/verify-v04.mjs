@@ -23,11 +23,18 @@ import {
   selfTestVnextContracts,
 } from "../lib/benchmark/vnext-contracts.mjs";
 import {
+  renderVnextInstance,
+  validateRenderedVnextInstance,
+} from "../lib/benchmark/vnext-fixtures.mjs";
+import {
   blockedVnextRunReport,
+  buildVnextComparisonReport,
   buildVnextExecutionPlan,
-  loadVnextAdapterModule,
-  resolveVnextAdapterPath,
-  validateVnextAdapterReport,
+  buildVnextPromotionDecisionFromRun,
+  executeVnextPlanModelFreeTest,
+  applyVnextPromotionPolicy,
+  validateVnextArmSurfaceDelta,
+  validateVnextRunReport,
 } from "../lib/benchmark/vnext-runner.mjs";
 import { loadSyntheticContracts } from "../lib/benchmark/contracts.mjs";
 import {
@@ -38,6 +45,7 @@ import {
   ASSURANCE_FACADE_TOOL_IDS,
   createAssuranceFacadePlugin,
   createAssuranceFacadeToolSurface,
+  rewriteRoleAssignmentForFacade,
 } from "../lib/quality/assurance-facade.mjs";
 import { NORMAL_SESSION_QUALITY_TOOL_IDS } from "../lib/quality/normal-session-bridge.mjs";
 import { legacyQualityPluginEnabled } from "../lib/quality/normal-session-plugin.mjs";
@@ -111,6 +119,16 @@ function pathPresent(manifest, prefix) {
   return manifest.files.some((entry) => entry.path === prefix || entry.path.startsWith(`${prefix}/`));
 }
 
+function assertMaterializedEsmClosure(bundleRoot, entryPaths) {
+  const entries = [...new Set(entryPaths.map((entry) => normalizePortablePath(entry)))].sort();
+  for (const relativePath of entries) {
+    const absolutePath = path.join(bundleRoot, ...relativePath.split("/"));
+    assert(fs.existsSync(absolutePath) && fs.lstatSync(absolutePath).isFile(),
+      "V04_LAB_CLOSURE", `materialized command entry is missing: ${relativePath}`);
+  }
+  return entries;
+}
+
 function fakeToolFactory() {
   const chain = () => ({
     describe() { return this; },
@@ -138,6 +156,106 @@ function runLegacyModelFree(relativeScript, label) {
     fail("V04_LEGACY_CHECK", `${label} failed with status ${result.status}: ${output}`);
   }
   return { id: label, status: "passed" };
+}
+
+function verifyHighKernelOracles(instances) {
+  const fixtureRoot = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-vnext-high-kernels-"));
+  try {
+    for (const instance of instances) {
+      const targetRoot = path.join(fixtureRoot, instance.vnext_family_id);
+      for (const file of [...instance.public_files, ...instance.hidden_files]) {
+        const target = path.join(targetRoot, ...file.path.split("/"));
+        fs.mkdirSync(path.dirname(target), { recursive: true });
+        fs.writeFileSync(target, file.content, "utf8");
+      }
+      const before = spawnSync(process.execPath, ["--test", "test/hidden.test.mjs"], {
+        cwd: targetRoot,
+        encoding: "utf8",
+        shell: false,
+        windowsHide: true,
+        timeout: 10_000,
+      });
+      assert(before.status !== 0, "V04_LAB_HIGH_ORACLE",
+        `${instance.vnext_family_id} hidden oracle does not expose the seeded defect`);
+      for (const file of instance.solution_files) {
+        const target = path.join(targetRoot, ...file.path.split("/"));
+        fs.writeFileSync(target, file.content, "utf8");
+      }
+      const after = spawnSync(process.execPath, ["--test", "test/public.test.mjs", "test/hidden.test.mjs"], {
+        cwd: targetRoot,
+        encoding: "utf8",
+        shell: false,
+        windowsHide: true,
+        timeout: 10_000,
+      });
+      assert(after.status === 0, "V04_LAB_HIGH_ORACLE",
+        `${instance.vnext_family_id} solution does not satisfy both oracles: ${`${after.stdout}\n${after.stderr}`.slice(-2000)}`);
+    }
+  } finally {
+    fs.rmSync(fixtureRoot, { recursive: true, force: true });
+  }
+}
+
+function verifyMediumTopologyChecks(instances) {
+  const fixtureRoot = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-vnext-medium-topology-"));
+  try {
+    for (const instance of instances) {
+      const targetRoot = path.join(fixtureRoot, instance.vnext_family_id);
+      for (const file of instance.public_files) {
+        const target = path.join(targetRoot, ...file.path.split("/"));
+        fs.mkdirSync(path.dirname(target), { recursive: true });
+        fs.writeFileSync(target, file.content, "utf8");
+      }
+      for (const file of instance.solution_files) {
+        const target = path.join(targetRoot, ...file.path.split("/"));
+        fs.writeFileSync(target, file.content, "utf8");
+      }
+      const [command, ...args] = instance.visible_check.argv;
+      assert(command === "node", "V04_LAB_MEDIUM_TOPOLOGY",
+        `${instance.vnext_family_id} has an unsupported visible-check executable`);
+      const result = spawnSync(process.execPath, args, {
+        cwd: targetRoot,
+        encoding: "utf8",
+        shell: false,
+        windowsHide: true,
+        timeout: 10_000,
+      });
+      assert(result.status === 0, "V04_LAB_MEDIUM_TOPOLOGY",
+        `${instance.vnext_family_id} has a non-executable consumer graph: ${`${result.stdout}\n${result.stderr}`.slice(-2000)}`);
+      const consumerFile = instance.hidden_files.find((entry) => entry.path === "test/hidden-consumer.test.mjs");
+      assert(consumerFile !== undefined, "V04_LAB_MEDIUM_TOPOLOGY",
+        `${instance.vnext_family_id} has no hidden consumer oracle`);
+      const consumerTarget = path.join(targetRoot, ...consumerFile.path.split("/"));
+      fs.mkdirSync(path.dirname(consumerTarget), { recursive: true });
+      fs.writeFileSync(consumerTarget, consumerFile.content, "utf8");
+      const runConsumer = () => spawnSync(process.execPath, instance.consumer_check.argv.slice(1), {
+        cwd: targetRoot,
+        encoding: "utf8",
+        shell: false,
+        windowsHide: true,
+        timeout: 10_000,
+      });
+      const consumerPass = runConsumer();
+      assert(consumerPass.status === 0, "V04_LAB_MEDIUM_TOPOLOGY",
+        `${instance.vnext_family_id} consumer oracle rejects its reference repair`);
+      for (const [relativePath, broken] of [
+        ["src/public-api.mjs", "export const family = 'broken';\n"],
+        ["src/consumers/worker.mjs", "export const workerContract = [];\n"],
+        ["config/feature.json", "{\"family\":\"broken\",\"entry\":\"broken\"}\n"],
+        ["docs/contract.md", "# broken\n"],
+      ]) {
+        const target = path.join(targetRoot, ...relativePath.split("/"));
+        const original = fs.readFileSync(target, "utf8");
+        fs.writeFileSync(target, broken, "utf8");
+        const rejected = runConsumer();
+        fs.writeFileSync(target, original, "utf8");
+        assert(rejected.status !== 0, "V04_LAB_MEDIUM_TOPOLOGY",
+          `${instance.vnext_family_id} consumer oracle ignored broken ${relativePath}`);
+      }
+    }
+  } finally {
+    fs.rmSync(fixtureRoot, { recursive: true, force: true });
+  }
 }
 
 function verifyCore() {
@@ -194,8 +312,14 @@ function verifyDeep() {
   const deep = read("agents/deep.md");
   const config = readJson("profiles/config/deep.opencode.json");
   assert(config.default_agent === "deep" && config.permission["quality_*"] === "deny"
-    && config.permission["context_*"] === "allow",
+    && config.permission["context_*"] === "deny",
   "V04_DEEP_CONFIG", "deep effective config is invalid");
+  assertPermissionOrder(deep, '"context_*": deny', [
+    "context_outline: allow",
+    "context_files: allow",
+    "context_search: allow",
+    "context_read: allow",
+  ], "deep agent");
   assert(deep.includes("at most three active") && deep.includes("Do not delegate writes")
     && deep.includes("absence\nnever blocks an ordinary task"),
   "V04_DEEP_AGENT", "deep limits, integrator ownership, or fallback are missing");
@@ -248,6 +372,36 @@ function verifyAssurance() {
   });
   assert(JSON.stringify(Object.keys(surface)) === JSON.stringify(ASSURANCE_FACADE_TOOL_IDS),
     "V04_FACADE_SURFACE", "model-visible facade surface is not exact");
+  const assignmentOutput = { args: { prompt: [
+    "[runner quality assignment]",
+    "MANDATORY QUALITY BOUNDARY",
+    "Use assignment.request as the typed tool arguments when present.",
+    JSON.stringify({
+      schema_version: 1,
+      target_agent: "architect",
+      assignment: {
+        tool_id: "quality_architecture_evaluate",
+        request: { expected_revision: 7, blocker_summaries: [] },
+        instruction: "Call quality_architecture_evaluate once.",
+      },
+    }),
+    "[end runner quality assignment]",
+    "",
+    "[caller task context]",
+    "fixed",
+  ].join("\n") } };
+  rewriteRoleAssignmentForFacade({ tool: "task" }, assignmentOutput);
+  const rewrittenEnvelope = JSON.parse(assignmentOutput.args.prompt.split("\n")[3]);
+  assert(rewrittenEnvelope.assignment.tool_id === "quality_assurance_advance"
+    && rewrittenEnvelope.assignment.request.transition === "architecture-evaluate"
+    && rewrittenEnvelope.assignment.request.request === '{"blocker_summaries":[]}'
+    && !rewrittenEnvelope.assignment.request.request.includes("expected_revision"),
+  "V04_FACADE_ASSIGNMENT", "architect child assignment was not structurally rebound to facade arguments");
+  const facadeSource = read("lib/quality/assurance-facade.mjs");
+  for (const deadTransition of ["dossier-create", "context-report-create", "project-catalog-rotate"]) {
+    assert(!facadeSource.includes(`\"${deadTransition}\": Object.freeze`), "V04_FACADE_TRANSITION",
+      `unreachable facade transition remains advertised: ${deadTransition}`);
+  }
   for (const bridgeOptions of [null, [], { hostToolchainAnchorUrl: import.meta.url }, {
     hostToolchainConfigurationLease: {},
   }]) {
@@ -265,7 +419,8 @@ function verifyAssurance() {
     assert(rejected, "V04_FACADE_HOST_BOUNDARY", "facade accepted invalid or smuggled host configuration");
   }
   const config = readJson("profiles/config/assurance.opencode.json");
-  assert(config.default_agent === "assurance" && config.permission["quality_*"] === "deny",
+  assert(config.default_agent === "assurance" && config.permission["quality_*"] === "deny"
+    && config.permission["context_*"] === "deny",
     "V04_ASSURANCE_CONFIG", "assurance config must default to the facade and deny legacy wildcard");
   for (const toolId of ASSURANCE_FACADE_TOOL_IDS) {
     assert(config.permission[toolId] === undefined, "V04_ASSURANCE_CONFIG",
@@ -273,6 +428,18 @@ function verifyAssurance() {
   }
   assertPermissionOrder(read("agents/assurance.md"), '"quality_*": deny', ASSURANCE_FACADE_TOOL_IDS,
     "assurance agent");
+  assertPermissionOrder(read("agents/assurance.md"), '"context_*": deny', [
+    "context_outline: allow",
+    "context_files: allow",
+    "context_search: allow",
+    "context_read: allow",
+  ], "assurance context tools");
+  assertPermissionOrder(read("agents/assurance-reviewer.md"), '"context_*": deny', [
+    "context_outline: allow",
+    "context_files: allow",
+    "context_search: allow",
+    "context_read: allow",
+  ], "assurance reviewer context tools");
   for (const role of ["architect", "reviewer", "verifier"]) {
     assertPermissionOrder(read(`agents/assurance-${role}.md`), '"quality_*": deny',
       ["quality_assurance_advance: allow"], `assurance ${role}`);
@@ -286,6 +453,7 @@ function verifyAssurance() {
     assert(!pathPresent(manifest, forbidden), "V04_ASSURANCE_BUNDLE", `assurance contains lab path ${forbidden}`);
   }
   const legacy_checks = [
+    runLegacyModelFree("scripts/verify-normal-session-quality-bridge.mjs", "assurance-facade-lifecycle"),
     runLegacyModelFree("scripts/verify-quality-contracts.mjs", "quality-contracts"),
     runLegacyModelFree("scripts/verify-quality-architecture.mjs", "quality-architecture"),
     runLegacyModelFree("scripts/verify-process-containment.mjs", "process-containment"),
@@ -599,47 +767,207 @@ async function verifyLab() {
   assert(plans.every((plan) => plan.family_ids.length === plan.eligible_strata.length
     && Object.keys(plan.bindings).length === loaded.policy.required_bindings.length),
   "V04_LAB_PLAN", "smoke plan family or evidence binding coverage drifted");
+  const unrelatedSurface = structuredClone(plans[0].arms.candidate);
+  unrelatedSurface.runtime_surface.effective_config.unrelated_permission = "allow";
+  let unrelatedSurfaceRejected = false;
+  try {
+    validateVnextArmSurfaceDelta(
+      plans[0].arms.baseline,
+      unrelatedSurface,
+      plans[0].added_component_id,
+      loaded.inventory.vnext_component_surface_deltas[plans[0].added_component_id],
+    );
+  } catch (error) {
+    if (!(error instanceof ProfileV3Error)) throw error;
+    unrelatedSurfaceRejected = error.code === "VNEXT_ARM_DIFF";
+  }
+  assert(unrelatedSurfaceRejected, "V04_LAB_ARM_DELTA",
+    "an undeclared materialized surface change was accepted as a one-component ablation");
+  let forgedFullDecisionRejected = false;
+  try {
+    buildVnextExecutionPlan({
+      repositoryRoot: root,
+      suiteId: "full",
+      estimandId: loaded.contract.estimands[0].id,
+      model: "fixture/model",
+      provider: "fixture-provider",
+      variant: "fixture-variant",
+      seed: "vnext-model-free-plan",
+      timeoutMs: 300_000,
+      executableIdentity: "fixture-opencode-identity",
+      standardRun: {
+        report_kind: "vnext-component-ablation-comparison",
+        suite_id: "standard",
+        estimand_id: loaded.contract.estimands[0].id,
+        status: "complete",
+        verdict: "promote",
+        decision_fingerprint: "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      },
+      allowDirty: true,
+    });
+  } catch (error) {
+    if (!(error instanceof ProfileV3Error)) throw error;
+    forgedFullDecisionRejected = error.code === "VNEXT_FULL_GATE";
+  }
+  assert(forgedFullDecisionRejected, "V04_LAB_FULL_GATE",
+    "a caller-fabricated standard decision unlocked a full vNext plan");
   for (const plan of plans) {
     const blocked = blockedVnextRunReport(plan, "fixture_external_state_unavailable");
-    validateVnextAdapterReport(plan, blocked);
+    validateVnextRunReport(plan, blocked);
     const stale = structuredClone(blocked);
     stale.bindings.seed = "stale-seed";
     let rejected = false;
     try {
-      validateVnextAdapterReport(plan, stale);
+      validateVnextRunReport(plan, stale);
     } catch (error) {
       if (!(error instanceof ProfileV3Error)) throw error;
       rejected = error.code === "VNEXT_ADAPTER_REPORT";
     }
-    assert(rejected, "V04_LAB_REPORT_BINDING", "stale vnext adapter report was accepted");
+    assert(rejected, "V04_LAB_REPORT_BINDING", "stale vnext run report was accepted");
 
-    const summary = Object.freeze({
-      baseline: 0,
-      candidate: 0,
-      paired_delta: 0,
-      confidence_interval: Object.freeze([0, 0]),
+    const sharedBinding = Object.freeze(Object.fromEntries([
+      "public_fixture_fingerprint", "hidden_fixture_fingerprint", "task_scope_fingerprint",
+      "effective_public_input_fingerprint", "initial_public_manifest_fingerprint", "model_fingerprint",
+      "executable_fingerprint", "executable_version", "executable_basename", "executable_platform",
+      "executable_identity_policy_version", "timeout_ms", "limits_fingerprint", "adapter_protocol_version",
+    ].map((key) => [key, key === "timeout_ms" ? 300_000 : `fixture-${key}`])));
+    const fakeAttemptRunner = async ({ profileId, operationalRunId, instance }) => ({
+      binding: sharedBinding,
+      result: {
+        profile_id: profileId,
+        profile_fingerprint: profileId === plan.baseline_arm_id
+          ? plan.arms.baseline.profile_fingerprint : plan.arms.candidate.profile_fingerprint,
+        operational_run_id: operationalRunId,
+        execution_status: "completed",
+        termination_reason: "verified",
+        reason: null,
+        hidden_check: { passed: true },
+        workspace_policy: { passed: true },
+        task_correct: true,
+        whole_task_success: true,
+        defect_escape_v2: false,
+        trace_policy: { passed: true, violations: [] },
+        treatment_compliance: { passed: true, violations: [] },
+        evidence_complete: true,
+        audit_evidence: {
+          scope: {
+            changed_path_count: 1,
+            changed_allowed_paths: ["src/task.mjs"],
+            unexpected_path_count: 0,
+          },
+          control: { attested_owner_count: profileId === "P5" ? 1 : 0 },
+        },
+        metrics: {
+          duration_ms: 10,
+          model_turn_count: 1,
+          total_tool_call_count: 2,
+          subagent_call_count: profileId === "P0" ? 0 : 1,
+        },
+        operational_trace_id: `trace-${operationalRunId}`,
+        vnext_consumer_observation: {
+          required_consumer_ids: instance.required_consumer_ids ?? [],
+          preserved_consumer_count: instance.required_consumer_ids?.length ?? 0,
+          check_status: instance.required_consumer_ids === undefined ? "not_applicable" : "passed",
+          passed: true,
+        },
+        fingerprints: { adapter: "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" },
+      },
     });
-    const metricGroup = (ids) => Object.fromEntries(ids.map((id) => [id, summary]));
-    const complete = {
+    const complete = await executeVnextPlanModelFreeTest({
+      repositoryRoot: root,
+      plan,
+      attemptRunner: fakeAttemptRunner,
+      executableIdentity: "fixture-opencode-identity",
+    });
+    assert(complete.status === "complete" && complete.pair_results.length === plan.pair_schedule.length,
+      "V04_LAB_TRUSTED_RUNNER", "runner-owned fixture attempt execution did not produce complete pair evidence");
+    validateVnextRunReport(plan, complete);
+    const comparison = buildVnextComparisonReport({ repositoryRoot: root, plan, report: complete });
+    const envelopeSource = {
       schema_version: 1,
-      run_id: `fixture-${plan.estimand_id}`,
-      estimand_id: plan.estimand_id,
-      suite_id: plan.suite_id,
-      bindings: plan.bindings,
-      status: "complete",
-      family_results: plan.family_ids.map((familyId) => ({
-        family_id: familyId,
-        baseline_arm_id: plan.baseline_arm_id,
-        candidate_arm_id: plan.candidate_arm_id,
-        repetition_count: plan.bindings.runner_limits.trajectory_repetitions,
-        status: "complete",
-      })),
-      product_metrics: metricGroup(plan.metric_ids.product),
-      operational_metrics: metricGroup(plan.metric_ids.operational),
-      diagnostic_metrics: metricGroup(plan.metric_ids.diagnostic),
-      incomplete_outcomes: [],
+      run_kind: "vnext-run-envelope",
+      plan,
+      report: complete,
     };
-    validateVnextAdapterReport(plan, complete);
+    const envelope = {
+      ...envelopeSource,
+      envelope_fingerprint: fingerprintProfileValue(envelopeSource),
+    };
+    const decision = buildVnextPromotionDecisionFromRun({ repositoryRoot: root, envelope });
+    assert(comparison.verdict === "inconclusive" && decision.promotable === false,
+      "V04_LAB_PROMOTION", "smoke evidence was incorrectly treated as promotable");
+    const staleComparison = structuredClone(comparison);
+    staleComparison.verdict = "promote";
+    let staleDecisionRejected = false;
+    try {
+      applyVnextPromotionPolicy(staleComparison);
+    } catch (error) {
+      if (!(error instanceof ProfileV3Error)) throw error;
+      staleDecisionRejected = error.code === "VNEXT_PROMOTION";
+    }
+    assert(staleDecisionRejected, "V04_LAB_PROMOTION", "tampered promotion comparison was accepted");
+    if (plan === plans[0]) {
+      const standardPlan = buildVnextExecutionPlan({
+        repositoryRoot: root,
+        suiteId: "standard",
+        estimandId: plan.estimand_id,
+        model: "fixture/model",
+        provider: "fixture-provider",
+        variant: "fixture-variant",
+        seed: "vnext-model-free-plan",
+        timeoutMs: 300_000,
+        executableIdentity: "fixture-opencode-identity",
+        allowDirty: true,
+      });
+      const forgedAttemptRunner = async (input) => {
+        const attempt = structuredClone(await fakeAttemptRunner(input));
+        const candidate = input.profileId === standardPlan.candidate_arm_id;
+        attempt.result.hidden_check.passed = candidate;
+        attempt.result.task_correct = candidate;
+        attempt.result.whole_task_success = candidate;
+        return attempt;
+      };
+      const forgedStandard = await executeVnextPlanModelFreeTest({
+        repositoryRoot: root,
+        plan: standardPlan,
+        attemptRunner: forgedAttemptRunner,
+        executableIdentity: "fixture-opencode-identity",
+      });
+      const forgedEnvelopeSource = {
+        schema_version: 1,
+        run_kind: "vnext-run-envelope",
+        plan: standardPlan,
+        report: forgedStandard,
+      };
+      const forgedEnvelope = {
+        ...forgedEnvelopeSource,
+        envelope_fingerprint: fingerprintProfileValue(forgedEnvelopeSource),
+      };
+      const forgedDecision = buildVnextPromotionDecisionFromRun({ repositoryRoot: root, envelope: forgedEnvelope });
+      assert(forgedDecision.promotable === true,
+        "V04_LAB_FULL_GATE", "fabricated standard fixture must exercise the positive promotion branch");
+      let forgedEnvelopeRejected = false;
+      try {
+        buildVnextExecutionPlan({
+          repositoryRoot: root,
+          suiteId: "full",
+          estimandId: plan.estimand_id,
+          model: "fixture/model",
+          provider: "fixture-provider",
+          variant: "fixture-variant",
+          seed: "vnext-model-free-plan",
+          timeoutMs: 300_000,
+          executableIdentity: "fixture-opencode-identity",
+          standardRun: forgedEnvelope,
+          allowDirty: true,
+        });
+      } catch (error) {
+        if (!(error instanceof ProfileV3Error)) throw error;
+        forgedEnvelopeRejected = error.code === "VNEXT_FULL_GATE";
+      }
+      assert(forgedEnvelopeRejected, "V04_LAB_FULL_GATE",
+        "a self-consistent fabricated standard run unlocked full outside the in-process trusted runner");
+    }
     const invalidReports = [];
     const emptyComplete = structuredClone(complete);
     emptyComplete.product_metrics = {};
@@ -654,76 +982,31 @@ async function verifyLab() {
     outOfRange.product_metrics.functional_hidden_check_success.candidate = 2;
     invalidReports.push(outOfRange);
     const contradictory = structuredClone(complete);
-    contradictory.product_metrics.functional_hidden_check_success.candidate = 1;
+    contradictory.product_metrics.functional_hidden_check_success.candidate = 0;
     contradictory.product_metrics.functional_hidden_check_success.paired_delta = 0;
     invalidReports.push(contradictory);
+    const fabricatedPair = structuredClone(complete);
+    fabricatedPair.pair_results[0].candidate.observations.functional_hidden_check_success = 0;
+    invalidReports.push(fabricatedPair);
     const scoredBlocked = structuredClone(blocked);
     scoredBlocked.incomplete_outcomes[0].scored = true;
     invalidReports.push(scoredBlocked);
     for (const invalid of invalidReports) {
       let invalidRejected = false;
       try {
-        validateVnextAdapterReport(plan, invalid);
+        validateVnextRunReport(plan, invalid);
       } catch (error) {
         if (!(error instanceof ProfileV3Error)) throw error;
         invalidRejected = error.code === "VNEXT_ADAPTER_REPORT";
       }
-      assert(invalidRejected, "V04_LAB_REPORT_SCHEMA", "invalid vnext adapter report was accepted");
+      assert(invalidRejected, "V04_LAB_REPORT_SCHEMA", "invalid vnext run report was accepted");
     }
   }
 
-  const adapterProbeRoot = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-harness-v04-adapter-"));
-  try {
-    const repository = path.join(adapterProbeRoot, "repository");
-    const external = path.join(adapterProbeRoot, "external-adapter.mjs");
-    fs.mkdirSync(repository);
-    fs.writeFileSync(external, "throw new Error('must not execute');\n", "utf8");
-    const linked = path.join(repository, "linked-adapter.mjs");
-    fs.symlinkSync(external, linked, "file");
-    let linkRejected = false;
-    try {
-      resolveVnextAdapterPath(repository, linked);
-    } catch (error) {
-      if (!(error instanceof ProfileV3Error)) throw error;
-      linkRejected = error.code === "VNEXT_ADAPTER_PATH";
-    }
-    assert(linkRejected, "V04_ADAPTER_LINK", "linked external adapter was accepted");
-    const hardlinked = path.join(repository, "hardlinked-adapter.mjs");
-    fs.linkSync(external, hardlinked);
-    let hardlinkRejected = false;
-    try {
-      resolveVnextAdapterPath(repository, hardlinked);
-    } catch (error) {
-      if (!(error instanceof ProfileV3Error)) throw error;
-      hardlinkRejected = error.code === "VNEXT_ADAPTER_PATH";
-    }
-    assert(hardlinkRejected, "V04_ADAPTER_HARDLINK", "hardlinked external adapter was accepted");
-    const internal = path.join(repository, "adapter.mjs");
-    fs.writeFileSync(internal, "export async function runVnextPlan() { return null; }\n", "utf8");
-    const loadedAdapter = await loadVnextAdapterModule(repository, internal);
-    assert(typeof loadedAdapter.module.runVnextPlan === "function"
-      && /^sha256:[0-9a-f]{64}$/u.test(loadedAdapter.fingerprint),
-    "V04_ADAPTER_BYTES", "verified adapter bytes were not bound to the loaded module");
-    if (process.platform !== "win32") {
-      const repositoryAlias = path.join(adapterProbeRoot, "repository-alias");
-      fs.symlinkSync(repository, repositoryAlias, "dir");
-      assert(resolveVnextAdapterPath(repositoryAlias, path.join(repositoryAlias, "adapter.mjs"))
-        === fs.realpathSync.native(internal),
-        "V04_ADAPTER_ALIAS", "a valid adapter under a symlinked repository alias was rejected");
-    }
-  } finally {
-    fs.rmSync(adapterProbeRoot, { recursive: true, force: true });
-  }
-  const legacyContracts = loadSyntheticContracts(root);
-  const templateSet = loadSyntheticTemplateSet(root, legacyContracts);
-  const rendered = loaded.contract.families.map((family) => renderSyntheticInstance({
-    contracts: legacyContracts,
-    templateSet,
-    familyId: family.source_family_id,
-    seed: `vnext-${family.id}`,
-    semanticVariantIndex: family.source_semantic_variant,
-    repetition: 1,
-  }));
+  const rendered = loaded.contract.families.map((family) => validateRenderedVnextInstance(
+    renderVnextInstance({ repositoryRoot: root, family, seed: `vnext-${family.id}`, repetition: 1 }),
+    family,
+  ));
   assert(new Set(rendered.map((entry) => entry.instance_fingerprint)).size === rendered.length,
     "V04_LAB_FIXTURE", "vnext families do not render to distinct fixture identities");
   assert(rendered.every((entry) => (entry.hidden_files.length > 0 || entry.hidden_check.kind === "structured-review")
@@ -733,6 +1016,12 @@ async function verifyLab() {
       visible_check: entry.visible_check,
     }).includes(hidden.path))),
   "V04_LAB_HIDDEN", "vnext fixture rendering exposed a hidden path");
+  const highKernels = rendered.filter((entry) => entry.high_risk_contract !== undefined)
+    .map((entry) => entry.high_risk_contract.kernel_id);
+  assert(highKernels.length === 11 && new Set(highKernels).size === highKernels.length,
+    "V04_LAB_HIGH_KERNEL", "high-risk strata do not have distinct executable contracts");
+  verifyMediumTopologyChecks(rendered.filter((entry) => entry.risk === "medium"));
+  verifyHighKernelOracles(rendered.filter((entry) => entry.high_risk_contract !== undefined));
   const lab = buildProfileBundleManifest(root, "lab").manifest;
   assert(pathPresent(lab, "lib/profile-v3.mjs"),
     "V04_LAB_CLOSURE", "lab bundle is missing the vnext profile dependency");
@@ -757,6 +1046,16 @@ async function verifyLab() {
       path.join(output, MATERIALIZED_MANIFEST_NAME),
       "utf8",
     ));
+    const labPackage = JSON.parse(fs.readFileSync(path.join(output, "package.json"), "utf8"));
+    const declaredCommands = Object.values(labPackage.scripts ?? {}).map((command) => {
+      const match = /^node ([A-Za-z0-9._/-]+)$/u.exec(command);
+      assert(match !== null, "V04_LAB_PACKAGE", `unsupported materialized lab command: ${command}`);
+      return match[1];
+    });
+    assert(JSON.stringify(Object.keys(labPackage.scripts ?? {}).sort()) === JSON.stringify([
+      "bench:vnext:compare", "bench:vnext:promote", "bench:vnext:run", "bench:vnext:self-test", "bench:vnext:validate",
+    ]), "V04_LAB_PACKAGE", "materialized lab package exposes commands outside its supported closure");
+    const closure = assertMaterializedEsmClosure(output, declaredCommands);
     const run = (args, expectedStatus = 0) => {
       const result = spawnSync(process.execPath, args, {
         cwd: output,
@@ -771,16 +1070,30 @@ async function verifyLab() {
     };
     const validate = run(["scripts/benchmark-vnext-validate.mjs"]);
     const selfTest = run(["scripts/benchmark-vnext-self-test.mjs"]);
+    for (const [script, expectedCode] of [
+      ["scripts/benchmark-vnext-compare.mjs", "VNEXT_COMPARISON_ARGUMENT"],
+      ["scripts/benchmark-vnext-promote.mjs", "VNEXT_PROMOTION_ARGUMENT"],
+    ]) {
+      const probe = spawnSync(process.execPath, [script], {
+        cwd: output,
+        encoding: "utf8",
+        shell: false,
+        windowsHide: true,
+        timeout: 30_000,
+      });
+      assert(probe.status === 1 && probe.stderr.includes(expectedCode), "V04_LAB_MATERIALIZED",
+        `${script} did not expose its bounded argument contract`);
+    }
     const blockedArgs = [
       "scripts/benchmark-vnext-run.mjs", "--suite", "smoke", "--estimand", "plain-to-core-rules",
       "--model", "fixture/model", "--provider", "fixture-provider", "--seed", "fixture-seed",
-      "--timeout-ms", "300000", "--executable-identity", "fixture-opencode",
+      "--timeout-ms", "300000", "--plan-only",
     ];
     if (materializedManifest.source_git_clean) {
-      const blockedPlan = run(blockedArgs, 2);
-      assert(blockedPlan.status === "blocked-unproven",
-        "V04_LAB_MATERIALIZED", "materialized blocked plan was not explicit");
-      materialized_checks = { validate: validate.status, self_test: selfTest.status, blocked: blockedPlan.status };
+      const dryPlan = run(blockedArgs, 0);
+      assert(dryPlan.plan_kind === "vnext-component-ablation-plan" && dryPlan.pair_schedule.length > 0,
+        "V04_LAB_MATERIALIZED", "materialized plan-only command did not bind executable pairs");
+      materialized_checks = { validate: validate.status, self_test: selfTest.status, plan_only: "passed", esm_closure_files: closure.length };
     } else {
       const dirtyPlan = spawnSync(process.execPath, blockedArgs, {
         cwd: output,
@@ -791,7 +1104,7 @@ async function verifyLab() {
       });
       assert(dirtyPlan.status === 1 && dirtyPlan.stderr.includes("VNEXT_SOURCE_DIRTY"),
         "V04_LAB_MATERIALIZED", "dirty materialized source was accepted for model-backed planning");
-      materialized_checks = { validate: validate.status, self_test: selfTest.status, blocked: "rejected-dirty-source" };
+      materialized_checks = { validate: validate.status, self_test: selfTest.status, plan_only: "rejected-dirty-source", esm_closure_files: closure.length };
     }
   } finally {
     fs.rmSync(materializedRoot, { recursive: true, force: true });

@@ -6,7 +6,7 @@ promoted default claim.
 
 Before release, run `npm run verify:core`, `verify:deep`,
 `verify:assurance:model-free`, `verify:profiles`, `verify:adoption`,
-`verify:lab:model-free`, both `bench:vnext:*` contract checks, and the aggregate
+`verify:lab:model-free`, the vNext validate/self-test commands, and the aggregate
 `npm run verify`. Also run `npm run probe:runtime:v0.4` with installed OpenCode;
 it verifies source/materialized core tool isolation, the exact four-tool
 assurance catalog, and effective role permissions. Model-backed vNext work is a separate promotion gate and is
@@ -30,7 +30,7 @@ proves only the benchmark machinery, not that a harness profile is better.
    ```
 
    The default gate remains model-free and includes synthetic schemas,
-   deterministic rendering, hidden-data isolation, fake-adapter lifecycle,
+   deterministic rendering, hidden-data isolation, runner-owned fake-attempt lifecycle,
    statistics, report history, bundle composition, CLI, and CI-boundary
    checks. The focused model-free commands are:
 

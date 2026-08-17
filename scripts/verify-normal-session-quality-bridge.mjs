@@ -7,6 +7,7 @@ import { spawnSync } from "node:child_process";
 
 import {
   NORMAL_SESSION_BRIDGE_PRODUCER,
+  NORMAL_SESSION_QUALITY_TOOL_IDS,
   bindArchitectureEvaluatorImplementationFingerprint,
   createDefaultNormalSessionCheckCatalog,
   createNormalSessionQualityBridge,
@@ -21,6 +22,11 @@ import {
   normalSessionQualityStatePath,
 } from "../lib/quality/normal-session-bridge.mjs";
 import { createNormalSessionQualityPlugin } from "../lib/quality/normal-session-plugin.mjs";
+import {
+  createAssuranceFacadePlugin,
+  createAssuranceFacadeToolSurface,
+  rewriteRoleAssignmentForFacade,
+} from "../lib/quality/assurance-facade.mjs";
 import { PREMORTEM_CATEGORIES } from "../lib/quality/constants.mjs";
 import { createEngineeringCheckCatalog } from "../lib/quality/gate.mjs";
 import {
@@ -40,7 +46,7 @@ import {
 import { ContractError, fingerprint } from "../lib/quality/validation.mjs";
 import { createContextReceiptStore } from "../lib/quality/context-receipt-store.mjs";
 
-const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-harness-normal-quality-"));
+const tempRoot = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), "opencode-harness-normal-quality-")));
 fs.mkdirSync(path.join(tempRoot, "src"));
 fs.writeFileSync(path.join(tempRoot, "src", "file.mjs"), "export const value = 1;\n", "utf8");
 fs.writeFileSync(path.join(tempRoot, "src", "second.mjs"), "export const value = 1;\n", "utf8");
@@ -1009,7 +1015,7 @@ function contextReadOutput(relativePath) {
   });
 }
 
-function prepareHighContext(targetBridge, context, { includeExistingActiveReceipts = false, finalize = true } = {}) {
+function collectHighContextEvidence(targetBridge, context, { includeExistingActiveReceipts = false } = {}) {
   let state = inspectNormalSessionQualityState(targetBridge, context.sessionID);
   assert(["high", "critical"].includes(state.dossier.risk_class));
   const graph = state.dossier.impact_graph;
@@ -1184,6 +1190,11 @@ function prepareHighContext(targetBridge, context, { includeExistingActiveReceip
       unresolved_area: null,
     },
   };
+  return { state, content };
+}
+
+function prepareHighContext(targetBridge, context, { includeExistingActiveReceipts = false, finalize = true } = {}) {
+  const { state, content } = collectHighContextEvidence(targetBridge, context, { includeExistingActiveReceipts });
   const updated = executeRawNormalSessionQualityTool(targetBridge, "quality_context_report_update", {
     request: JSON.stringify({ expected_revision: state.context_report.revision, patch: content }),
   }, context);
@@ -3310,8 +3321,14 @@ assertContractError(
 );
 assert(inspectNormalSessionQualityState(bridge, attributionContext.sessionID).incomplete_reasons.includes("post_mutation_ownership_mismatch"), "unowned changes must persist a fail-closed reason");
 
+const fakeSchema = () => {
+  const schema = {};
+  schema.describe = () => schema;
+  schema.optional = () => schema;
+  return schema;
+};
 const fakeToolFactory = (definition) => definition;
-fakeToolFactory.schema = { string: () => ({ describe: () => ({ type: "string" }) }) };
+fakeToolFactory.schema = { string: fakeSchema, enum: fakeSchema, array: fakeSchema };
 const plugin = createNormalSessionQualityPlugin({ toolFactory: fakeToolFactory, workspaceRoot: tempRoot, bridgeOptions: options });
 assert.deepEqual(Object.keys(plugin.tool).sort(), [
   "quality_action_authorize",
@@ -3475,10 +3492,302 @@ assert.equal(
 await plugin.tool.quality_context_reconcile.execute({
   request: JSON.stringify({ evidence_mode: "reviewer_grounded" }),
 }, continuationContext);
-await plugin.tool.quality_session_finalize.execute({
-  request: JSON.stringify({ expected_revision: 1 }),
-}, continuationContext);
-currentPathVersions.clear();
+  await plugin.tool.quality_session_finalize.execute({
+    request: JSON.stringify({ expected_revision: 1 }),
+  }, continuationContext);
+  currentPathVersions.clear();
+
+  const facadePlugin = createAssuranceFacadePlugin({
+    toolFactory: fakeToolFactory,
+    workspaceRoot: tempRoot,
+    bridgeOptions: options,
+  });
+  const facadeCalls = [];
+  const callFacade = async (toolId, args, context) => {
+    assert.ok(Object.hasOwn(facadePlugin.tool, toolId), `facade must expose ${toolId}`);
+    assert.equal(NORMAL_SESSION_QUALITY_TOOL_IDS.includes(toolId), false,
+      "facade-only lifecycle must never invoke a legacy quality tool directly");
+    facadeCalls.push(toolId);
+    return JSON.parse(await facadePlugin.tool[toolId].execute(args, context));
+  };
+  const facadeContext = { sessionID: "session/facade-standard-lite-e2e", agent: "assurance" };
+  currentPathVersions.clear();
+  await facadePlugin["chat.message"](facadeContext);
+  const facadeStart = await callFacade("quality_assurance_start", {
+    request: JSON.stringify(startRequestFromDossier(dossierRequest())),
+  }, facadeContext);
+  assert.equal(facadeStart.lifecycle, "dossier_draft");
+  assert.deepEqual(facadeStart.next_actions.map((entry) => entry.facade_operation), ["context_read"]);
+  const facadeReadCall = {
+    tool: "context_read",
+    sessionID: facadeContext.sessionID,
+    callID: "call-facade-standard-context",
+  };
+  await facadePlugin["tool.execute.before"](facadeReadCall, {
+    args: { path: "src/file.mjs", startLine: 1, maxLines: 64, maxBytes: 4096 },
+  });
+  await facadePlugin["tool.execute.after"](facadeReadCall, {
+    title: "facade standard context",
+    output: contextReadOutput("src/file.mjs"),
+    metadata: {},
+  });
+  const facadeGate = await callFacade("quality_assurance_advance", {}, facadeContext);
+  assert.equal(facadeGate.gate_status, "passed");
+  assert.equal(facadeGate.next_actions[0].facade_operation, "quality_assurance_authorize");
+  await assert.rejects(
+    () => facadePlugin.tool.quality_assurance_advance.execute({
+      request: JSON.stringify({ expected_revision: 1 }),
+    }, facadeContext),
+    (error) => error?.code === "QUALITY_FACADE_NEXT_ACTION" || error?.code === "QUALITY_FACADE_RUNNER_FIELD",
+    "facade must not accept a caller-supplied runner revision",
+  );
+  await callFacade("quality_assurance_authorize", {
+    kind: "edit",
+    paths: ["src/file.mjs"],
+  }, facadeContext);
+  const facadeEditCall = {
+    tool: "edit",
+    sessionID: facadeContext.sessionID,
+    callID: "call-facade-standard-edit",
+  };
+  await facadePlugin["tool.execute.before"](facadeEditCall, nativeEdit());
+  currentPathVersions.set("src/file.mjs", 1);
+  await facadePlugin["tool.execute.after"](facadeEditCall, { title: "facade edit", output: "done", metadata: {} });
+
+  const facadeVerifierCall = {
+    tool: "task",
+    sessionID: facadeContext.sessionID,
+    callID: "call-facade-verifier",
+  };
+  const facadeVerifierArgs = nativeTask("verifier");
+  await facadePlugin["tool.execute.before"](facadeVerifierCall, facadeVerifierArgs);
+  const facadeVerifierEnvelope = runnerAssignmentEnvelope(facadeVerifierArgs);
+  assert.equal(facadeVerifierEnvelope.assignment.tool_id, "quality_assurance_advance");
+  assert.deepEqual(facadeVerifierEnvelope.assignment.request, {
+    transition: "verification-record",
+    request: "{}",
+  });
+  const facadeVerifierSessionID = `${facadeContext.sessionID}/verifier`;
+  await facadePlugin.event({ event: {
+    type: "session.created",
+    properties: { info: { id: facadeVerifierSessionID, parentID: facadeContext.sessionID } },
+  } });
+  await callFacade("quality_assurance_advance", facadeVerifierEnvelope.assignment.request, {
+    sessionID: facadeVerifierSessionID,
+    agent: "verifier",
+  });
+  await facadePlugin["tool.execute.after"](facadeVerifierCall, { title: "facade verifier", output: "verified", metadata: {} });
+
+  const facadeReviewerCall = {
+    tool: "task",
+    sessionID: facadeContext.sessionID,
+    callID: "call-facade-reviewer",
+  };
+  const facadeReviewerArgs = nativeTask("reviewer");
+  await facadePlugin["tool.execute.before"](facadeReviewerCall, facadeReviewerArgs);
+  const facadeReviewerEnvelope = runnerAssignmentEnvelope(facadeReviewerArgs);
+  assert.equal(facadeReviewerEnvelope.assignment.tool_id, "quality_assurance_advance");
+  assert.equal(facadeReviewerEnvelope.assignment.request.transition, "context-reviewer-record");
+  const facadeReviewerSessionID = `${facadeContext.sessionID}/reviewer`;
+  await facadePlugin.event({ event: {
+    type: "session.created",
+    properties: { info: { id: facadeReviewerSessionID, parentID: facadeContext.sessionID } },
+  } });
+  const facadeReviewerReadCall = {
+    tool: "context_read",
+    sessionID: facadeReviewerSessionID,
+    callID: "call-facade-reviewer-read",
+  };
+  await facadePlugin["tool.execute.before"](facadeReviewerReadCall, {
+    args: { path: "src/file.mjs", startLine: 1, maxLines: 64, maxBytes: 4096 },
+  });
+  await facadePlugin["tool.execute.after"](facadeReviewerReadCall, {
+    title: "facade reviewer context",
+    output: contextReadOutput("src/file.mjs"),
+    metadata: {},
+  });
+  const facadePassedReview = passedReviewerClauseRequest({ assignment: facadeReviewerEnvelope.assignment });
+  await callFacade("quality_assurance_advance", {
+    transition: "context-reviewer-record",
+    request: JSON.stringify(facadePassedReview),
+  }, { sessionID: facadeReviewerSessionID, agent: "reviewer" });
+  await facadePlugin["tool.execute.after"](facadeReviewerCall, { title: "facade reviewer", output: "reviewed", metadata: {} });
+  const facadeReconciled = await callFacade("quality_assurance_advance", {}, facadeContext);
+  assert.equal(facadeReconciled.lifecycle, "verified");
+  const facadeAttested = await callFacade("quality_assurance_advance", {}, facadeContext);
+  assert.equal(facadeAttested.lifecycle, "attested");
+  assert.deepEqual([...new Set(facadeCalls)].sort(), [
+    "quality_assurance_advance",
+    "quality_assurance_authorize",
+    "quality_assurance_start",
+  ]);
+  currentPathVersions.clear();
+
+  const highFacadeBridge = createNormalSessionQualityBridge({ ...options, workspaceRoot: tempRoot });
+  const highFacadeTools = createAssuranceFacadeToolSurface({
+    toolFactory: fakeToolFactory,
+    bridge: highFacadeBridge,
+  });
+  const highFacadeCalls = [];
+  const callHighFacade = async (toolId, args, context) => {
+    assert.equal(NORMAL_SESSION_QUALITY_TOOL_IDS.includes(toolId), false,
+      "high facade lifecycle must never invoke a legacy quality tool directly");
+    highFacadeCalls.push(toolId);
+    return JSON.parse(await highFacadeTools[toolId].execute(args, context));
+  };
+  const highFacadeContext = { sessionID: "session/facade-high-e2e", agent: "assurance" };
+  handleNormalSessionChatMessage(highFacadeBridge, highFacadeContext);
+  const highFacadeStart = await callHighFacade("quality_assurance_start", {
+    request: JSON.stringify({
+      ...startRequestFromDossier(fullDossierRequest()),
+      dossier: fullDossierRequest(),
+    }),
+  }, highFacadeContext);
+  assert.equal(highFacadeStart.risk_class, "high");
+  assert.equal(highFacadeStart.lifecycle, "dossier_draft");
+  const highContextEvidence = collectHighContextEvidence(highFacadeBridge, highFacadeContext);
+  const highReportUpdated = await callHighFacade("quality_assurance_advance", {
+    transition: "context-report-update",
+    request: JSON.stringify({ patch: highContextEvidence.content }),
+  }, highFacadeContext);
+  assert.equal(highReportUpdated.next_actions[0].transition, "context-report-finalize");
+  const highContextFinalized = await callHighFacade("quality_assurance_advance", {}, highFacadeContext);
+  assert.equal(highContextFinalized.next_actions[0].target_agent, "architect");
+
+  const settleHighChallenge = async (role) => {
+    const call = {
+      tool: "task",
+      sessionID: highFacadeContext.sessionID,
+      callID: `call-facade-high-${role}`,
+    };
+    const args = nativeTask(role);
+    handleNormalSessionToolBefore(highFacadeBridge, call, args);
+    rewriteRoleAssignmentForFacade(call, args);
+    const envelope = runnerAssignmentEnvelope(args);
+    assert.equal(envelope.assignment.tool_id, "quality_assurance_advance");
+    assert.equal(envelope.assignment.request.transition, "architecture-evaluate");
+    assert.match(envelope.assignment.challenge_subject?.fingerprint ?? "", /^sha256:/u,
+      `${role} facade assignment must embed the canonical challenge subject`);
+    assert.match(envelope.assignment.challenge_subject?.dossier_analysis_fingerprint ?? "", /^sha256:/u);
+    assert.match(envelope.assignment.challenge_subject?.context_report_analysis_fingerprint ?? "", /^sha256:/u);
+    const snapshot = envelope.assignment.challenge_subject?.challenge_snapshot;
+    assert.equal(snapshot?.task?.user_visible_goal, fullDossierRequest().user_visible_goal,
+      `${role} must receive the substantive challenged goal`);
+    assert.deepEqual(snapshot?.ownership?.ownership_paths, ["src"],
+      `${role} must receive bounded ownership paths`);
+    assert.ok(snapshot?.blast_radius?.impact_graph?.affected_paths.length >= 2,
+      `${role} must receive direct and transitive blast-radius paths`);
+    assert.ok(snapshot?.failure_and_recovery?.failure_modes.length > 0,
+      `${role} must receive failure-mode evidence`);
+    assert.ok(snapshot?.verification?.integration_check_ids.includes("normal-harness-static"),
+      `${role} must receive integration verification obligations`);
+    assert.ok(snapshot?.context?.report?.questions.length > 0,
+      `${role} must receive bounded context findings and questions`);
+    const childSessionID = `${highFacadeContext.sessionID}/${role}`;
+    handleNormalSessionEvent(highFacadeBridge, {
+      type: "session.created",
+      properties: { info: { id: childSessionID, parentID: highFacadeContext.sessionID } },
+    });
+    if (role === "architect") {
+      const tamperedSubject = structuredClone(envelope.assignment.challenge_subject);
+      tamperedSubject.challenge_snapshot.ownership.ownership_paths.push("unowned");
+      tamperedSubject.challenge_snapshot_fingerprint = fingerprint(tamperedSubject.challenge_snapshot);
+      const tamperedSource = { ...tamperedSubject };
+      delete tamperedSource.fingerprint;
+      tamperedSubject.fingerprint = fingerprint(tamperedSource);
+      assertContractError(() => executeRawNormalSessionQualityTool(highFacadeBridge, "quality_architecture_evaluate", {
+        request: JSON.stringify({
+          expected_revision: inspectNormalSessionQualityState(highFacadeBridge, highFacadeContext.sessionID).dossier.revision,
+          expected_subject_fingerprint: tamperedSubject.fingerprint,
+          blockers: [],
+        }),
+      }, { sessionID: childSessionID, agent: role }), "QUALITY_PLAN_CHALLENGE_STALE");
+    }
+    await callHighFacade("quality_assurance_advance", envelope.assignment.request, {
+      sessionID: childSessionID,
+      agent: role,
+    });
+    handleNormalSessionToolAfter(highFacadeBridge, call, { title: role, output: "challenge complete", metadata: {} });
+  };
+  await settleHighChallenge("architect");
+  await settleHighChallenge("reviewer");
+  const highGate = await callHighFacade("quality_assurance_advance", {}, highFacadeContext);
+  assert.equal(highGate.gate_status, "passed");
+  await callHighFacade("quality_assurance_authorize", {
+    kind: "edit",
+    paths: ["src/file.mjs"],
+  }, highFacadeContext);
+  const highEditCall = {
+    tool: "edit",
+    sessionID: highFacadeContext.sessionID,
+    callID: "call-facade-high-edit",
+  };
+  handleNormalSessionToolBefore(highFacadeBridge, highEditCall, nativeEdit());
+  currentPathVersions.set("src/file.mjs", 1);
+  handleNormalSessionToolAfter(highFacadeBridge, highEditCall, { title: "high edit", output: "done", metadata: {} });
+
+  const highVerifierCall = {
+    tool: "task",
+    sessionID: highFacadeContext.sessionID,
+    callID: "call-facade-high-verifier",
+  };
+  const highVerifierArgs = nativeTask("verifier");
+  handleNormalSessionToolBefore(highFacadeBridge, highVerifierCall, highVerifierArgs);
+  rewriteRoleAssignmentForFacade(highVerifierCall, highVerifierArgs);
+  const highVerifierEnvelope = runnerAssignmentEnvelope(highVerifierArgs);
+  const highVerifierSessionID = `${highFacadeContext.sessionID}/verifier`;
+  handleNormalSessionEvent(highFacadeBridge, {
+    type: "session.created",
+    properties: { info: { id: highVerifierSessionID, parentID: highFacadeContext.sessionID } },
+  });
+  await callHighFacade("quality_assurance_advance", highVerifierEnvelope.assignment.request, {
+    sessionID: highVerifierSessionID,
+    agent: "verifier",
+  });
+  handleNormalSessionToolAfter(highFacadeBridge, highVerifierCall, { title: "verifier", output: "verified", metadata: {} });
+
+  const highReviewCall = {
+    tool: "task",
+    sessionID: highFacadeContext.sessionID,
+    callID: "call-facade-high-final-reviewer",
+  };
+  const highReviewArgs = nativeTask("reviewer");
+  handleNormalSessionToolBefore(highFacadeBridge, highReviewCall, highReviewArgs);
+  rewriteRoleAssignmentForFacade(highReviewCall, highReviewArgs);
+  const highReviewEnvelope = runnerAssignmentEnvelope(highReviewArgs);
+  const highReviewSessionID = `${highFacadeContext.sessionID}/final-reviewer`;
+  handleNormalSessionEvent(highFacadeBridge, {
+    type: "session.created",
+    properties: { info: { id: highReviewSessionID, parentID: highFacadeContext.sessionID } },
+  });
+  const highReviewReadCall = {
+    tool: "context_read",
+    sessionID: highReviewSessionID,
+    callID: "call-facade-high-review-read",
+  };
+  handleNormalSessionToolBefore(highFacadeBridge, highReviewReadCall, {
+    args: { path: "src/file.mjs", startLine: 1, maxLines: 64, maxBytes: 4096 },
+  });
+  handleNormalSessionToolAfter(highFacadeBridge, highReviewReadCall, {
+    title: "high review context",
+    output: contextReadOutput("src/file.mjs"),
+    metadata: {},
+  });
+  await callHighFacade("quality_assurance_advance", {
+    transition: "context-reviewer-record",
+    request: JSON.stringify(passedReviewerClauseRequest({ assignment: highReviewEnvelope.assignment })),
+  }, { sessionID: highReviewSessionID, agent: "reviewer" });
+  handleNormalSessionToolAfter(highFacadeBridge, highReviewCall, { title: "reviewer", output: "reviewed", metadata: {} });
+  const highReconciled = await callHighFacade("quality_assurance_advance", {}, highFacadeContext);
+  assert.equal(highReconciled.lifecycle, "verified");
+  const highAttested = await callHighFacade("quality_assurance_advance", {}, highFacadeContext);
+  assert.equal(highAttested.lifecycle, "attested");
+  assert.deepEqual([...new Set(highFacadeCalls)].sort(), [
+    "quality_assurance_advance",
+    "quality_assurance_authorize",
+    "quality_assurance_start",
+  ]);
+  currentPathVersions.clear();
 
 const legacyBugPlugin = createNormalSessionQualityPlugin({
   toolFactory: fakeToolFactory,

@@ -1,0 +1,16 @@
+{
+  "name": "opencode-harness-lab",
+  "version": "0.4.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "bench:vnext:validate": "node scripts/benchmark-vnext-validate.mjs",
+    "bench:vnext:self-test": "node scripts/benchmark-vnext-self-test.mjs",
+    "bench:vnext:run": "node scripts/benchmark-vnext-run.mjs",
+    "bench:vnext:compare": "node scripts/benchmark-vnext-compare.mjs",
+    "bench:vnext:promote": "node scripts/benchmark-vnext-promote.mjs"
+  }
+}

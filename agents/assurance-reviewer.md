@@ -6,7 +6,11 @@ permission:
   edit: deny
   "quality_*": deny
   quality_assurance_advance: allow
-  "context_*": allow
+  "context_*": deny
+  context_outline: allow
+  context_files: allow
+  context_search: allow
+  context_read: allow
   task: deny
   bash: deny
 ---

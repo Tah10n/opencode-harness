@@ -15,7 +15,10 @@
     "per_stratum",
     "pareto",
     "incomplete_outcomes",
-    "verdict"
+    "verdict",
+    "source_evidence_fingerprint",
+    "policy_fingerprint",
+    "decision_fingerprint"
   ],
   "properties": {
     "schema_version": { "const": 1 },
@@ -31,6 +34,9 @@
     "incomplete_outcomes": { "type": "array", "items": { "type": "object" } },
     "verdict": {
       "enum": ["promote", "retain-optional", "reject", "inconclusive", "blocked-unproven"]
-    }
+    },
+    "source_evidence_fingerprint": { "pattern": "^sha256:[0-9a-f]{64}$" },
+    "policy_fingerprint": { "pattern": "^sha256:[0-9a-f]{64}$" },
+    "decision_fingerprint": { "pattern": "^sha256:[0-9a-f]{64}$" }
   }
 }

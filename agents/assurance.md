@@ -10,7 +10,11 @@ permission:
   quality_assurance_inspect: allow
   quality_assurance_advance: allow
   quality_assurance_authorize: allow
-  "context_*": allow
+  "context_*": deny
+  context_outline: allow
+  context_files: allow
+  context_search: allow
+  context_read: allow
   "oc_learning_*": deny
   task:
     "*": deny
