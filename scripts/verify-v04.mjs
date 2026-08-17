@@ -158,6 +158,7 @@ async function verifyBoundedContextSurface() {
       ".npmrc", ".netrc", ".pypirc", ".git-credentials", "id_rsa", "secrets/prod.json",
       "credentials/cloud.json", ".ssh/id_ed25519", ".kube/config", ".aws/credentials",
       "auth.json", "certificates/client.jks", "mobile/signing.p8", "vault/account.kdbx",
+      ".env.example/private.key",
     ];
     for (const relativePath of sensitivePaths) {
       const target = path.join(temporaryRoot, ...relativePath.split("/"));
