@@ -1090,10 +1090,28 @@ async function verifyLab() {
       "--timeout-ms", "300000", "--plan-only",
     ];
     if (materializedManifest.source_git_clean) {
-      const dryPlan = run(blockedArgs, 0);
-      assert(dryPlan.plan_kind === "vnext-component-ablation-plan" && dryPlan.pair_schedule.length > 0,
-        "V04_LAB_MATERIALIZED", "materialized plan-only command did not bind executable pairs");
-      materialized_checks = { validate: validate.status, self_test: selfTest.status, plan_only: "passed", esm_closure_files: closure.length };
+      const dryPlan = spawnSync(process.execPath, blockedArgs, {
+        cwd: output,
+        encoding: "utf8",
+        shell: false,
+        windowsHide: true,
+        timeout: 10 * 60 * 1000,
+      });
+      if (dryPlan.status === 0) {
+        const parsedPlan = JSON.parse(dryPlan.stdout);
+        assert(parsedPlan.plan_kind === "vnext-component-ablation-plan" && parsedPlan.pair_schedule.length > 0,
+          "V04_LAB_MATERIALIZED", "materialized plan-only command did not bind executable pairs");
+        materialized_checks = { validate: validate.status, self_test: selfTest.status, plan_only: "passed", esm_closure_files: closure.length };
+      } else {
+        assert(dryPlan.status === 1 && dryPlan.stderr.includes("VNEXT_EXECUTABLE_UNAVAILABLE"),
+          "V04_LAB_MATERIALIZED", `materialized plan-only command failed outside its executable-availability contract: ${dryPlan.stderr}`);
+        materialized_checks = {
+          validate: validate.status,
+          self_test: selfTest.status,
+          plan_only: "blocked-executable-unavailable",
+          esm_closure_files: closure.length,
+        };
+      }
     } else {
       const dirtyPlan = spawnSync(process.execPath, blockedArgs, {
         cwd: output,

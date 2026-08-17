@@ -52,6 +52,10 @@ function parseArguments(values) {
 try {
   const options = parseArguments(process.argv.slice(2));
   const executableIdentity = resolveSyntheticOpenCodeExecutableIdentity();
+  const executableBinding = executableIdentity?.fingerprint ?? fingerprintProfileValue({
+    schema_version: 1,
+    identity_kind: "unresolved-opencode-executable",
+  });
   if (options.suite === "full" && options.planOnly) {
     throw new ProfileV3Error("VNEXT_FULL_GATE", "full has no plan-only mode; it requires an in-process trusted standard execution");
   }
@@ -63,16 +67,22 @@ try {
     variant: options.variant,
     seed: options.seed,
     timeoutMs: options.timeoutMs,
-    executableIdentity: executableIdentity.fingerprint,
+    executableIdentity: executableBinding,
   };
   let plan;
   let report;
   if (options.suite === "full") {
+    if (executableIdentity === null) {
+      throw new ProfileV3Error("VNEXT_EXECUTABLE_UNAVAILABLE", "OpenCode executable identity is unavailable");
+    }
     const executed = await executeVnextFull({ ...common, executableIdentity });
     plan = executed.plan;
     report = executed.report;
   } else {
     plan = buildVnextExecutionPlan({ ...common, suiteId: options.suite });
+    if (executableIdentity === null) {
+      throw new ProfileV3Error("VNEXT_EXECUTABLE_UNAVAILABLE", "OpenCode executable identity is unavailable");
+    }
   }
   if (options.planOnly) {
     process.stdout.write(`${JSON.stringify(plan, null, 2)}\n`);
