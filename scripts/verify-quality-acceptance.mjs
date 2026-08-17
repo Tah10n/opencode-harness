@@ -249,7 +249,9 @@ try {
     "validated critical runner bundles did not pass the v3.1 acceptance engine",
   );
 
-  const qualityCliRoot = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-quality-bundle-assessment-"));
+  const qualityCliRoot = fs.realpathSync.native(
+    fs.mkdtempSync(path.join(os.tmpdir(), "opencode-quality-bundle-assessment-")),
+  );
   try {
     const policyPath = path.join(qualityCliRoot, "policy.json");
     const legacyPolicyPath = path.join(qualityCliRoot, "legacy-policy.json");

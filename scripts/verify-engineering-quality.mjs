@@ -934,6 +934,53 @@ function catalog(overrides = {}) {
 }
 
 function gateContextArtifacts(dossier) {
+  if (["high", "critical"].includes(dossier.risk_class)) {
+    const strategy = selectMinimumContextStrategy({
+      risk_class: dossier.risk_class,
+      task_type: dossier.task_type,
+    });
+    const sequence = `gate-${dossier.dossier_id}`;
+    const sessionKey = fingerprint({ purpose: "quality-session", sequence }).slice("sha256:".length);
+    const receipts = contextReceiptForDossier(dossier, sequence);
+    const draft = createWholeSystemContextReportDraft({
+      report_id: `CONTEXT-${sequence}`,
+      session_key: sessionKey,
+      strategy_binding: strategy,
+      workspace_fingerprint: FP_A,
+      dossier,
+      created_at: "2026-07-13T00:01:00Z",
+      content: fullContextContent(strategy, dossier, receipts),
+    });
+    const contextReport = finalizeWholeSystemContextReport(draft, {
+      finalized_at: "2026-07-13T00:02:00Z",
+      strategy_binding: strategy,
+      workspace_fingerprint: FP_A,
+      dossier,
+      receipt_index: { receipts },
+    });
+    const taskProfileEvidence = contextTestTaskProfileEvidence({
+      dossier,
+      sessionKey,
+      workspaceFingerprint: FP_A,
+      evidenceId: `CTXPROFILE-${sequence}`,
+      completedAt: "2026-07-13T00:01:15Z",
+      createdAt: "2026-07-13T00:01:30Z",
+    });
+    const contextDecision = evaluateContextSufficiency({
+      decision_id: `CTXDEC-${sequence}`,
+      session_key: sessionKey,
+      strategy_binding: strategy,
+      dossier,
+      workspace_fingerprint: FP_A,
+      receipt_index: { receipts },
+      report: contextReport,
+      standard_lite_summary: null,
+      task_profile_evidence: taskProfileEvidence,
+      evaluated_at: "2026-07-13T00:03:00Z",
+    });
+    assert.equal(contextDecision.status, "sufficient", JSON.stringify(contextDecision.reasons));
+    return { strategy, contextReport, contextDecision, taskProfileEvidence };
+  }
   const strategy = { fingerprint: FP_A };
   const taskProfileEvidence = {
     session_key: "session-quality",
@@ -1051,7 +1098,9 @@ function passedGate(dossier, overrides = {}) {
     check_catalog: overrides.check_catalog ?? catalog(),
     preimplementation_evidence: Object.hasOwn(overrides, "preimplementation_evidence")
       ? overrides.preimplementation_evidence
-      : requiresPreimplementationEvidence ? preimplementationEvidence(dossier) : null,
+      : requiresPreimplementationEvidence
+        ? preimplementationEvidence(dossier, { current_artifacts: artifacts })
+        : null,
     architecture_evaluation: overrides.architecture_evaluation ?? null,
     context_strategy_binding: artifacts.strategy,
     context_report: artifacts.contextReport,
@@ -2475,7 +2524,7 @@ test("high session cannot attest completion after a failed trusted post-architec
 });
 
 test("quality bundle is runner-bound, post-teardown, atomic, and restart-idempotent", () => {
-  const ws = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-quality-bundle-"));
+  const ws = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), "opencode-quality-bundle-")));
   try {
     const durable = createTraceStore({ workspaceRoot: ws });
     const staged = durable.createStagingStore();
