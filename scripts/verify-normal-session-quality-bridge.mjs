@@ -3850,6 +3850,231 @@ await plugin.tool.quality_context_reconcile.execute({
       "recovery must preserve one matching provisional context report");
   }
 
+  const phaseSplitProjectCatalog = {
+    schema_version: 2,
+    catalog_id: "normal-session-facade-phase-split-v1",
+    standard_lite_policy: options.standardLitePolicy,
+    checks: [
+      {
+        check_id: "integration-check",
+        executable_id: "node",
+        argv: ["src/file.mjs"],
+        cwd: ".",
+        phases: ["integration"],
+        purpose: "verification",
+        generated_output_paths: [],
+        timeout_ms: 120000,
+        max_output_chars: 1048576,
+      },
+      {
+        check_id: "pre-check",
+        executable_id: "node",
+        argv: ["src/file.mjs"],
+        cwd: ".",
+        phases: ["preimplementation"],
+        purpose: "verification",
+        generated_output_paths: [],
+        timeout_ms: 120000,
+        max_output_chars: 1048576,
+      },
+    ],
+  };
+  const phaseSplitBridge = createNormalSessionQualityBridge({
+    ...options,
+    checkCatalog: createEngineeringCheckCatalog(projectCatalogToEngineeringCatalog(
+      phaseSplitProjectCatalog,
+      NORMAL_SESSION_BRIDGE_PRODUCER,
+    )),
+    projectCatalog: phaseSplitProjectCatalog,
+    failureInjector(stage) {
+      if (stage === "after_owner_state_persisted") {
+        throw new Error("injected:phase-split-after-owner-state-persisted");
+      }
+    },
+  });
+  const phaseSplitTools = createAssuranceFacadeToolSurface({
+    toolFactory: fakeToolFactory,
+    bridge: phaseSplitBridge,
+  });
+  const phaseSplitContext = {
+    sessionID: "session/facade-recovery-phase-split",
+    agent: "assurance",
+  };
+  const phaseSplitRequest = {
+    request: JSON.stringify(facadeStartRequestFromDossier(fullDossierRequest(), { seededHigh: true })),
+  };
+  handleNormalSessionChatMessage(phaseSplitBridge, phaseSplitContext);
+  await assert.rejects(
+    phaseSplitTools.quality_assurance_start.execute(phaseSplitRequest, phaseSplitContext),
+    /injected:phase-split-after-owner-state-persisted/u,
+  );
+  const lostResponseState = inspectNormalSessionQualityState(
+    phaseSplitBridge,
+    phaseSplitContext.sessionID,
+  );
+  const phaseSplitRecovered = JSON.parse(await phaseSplitTools.quality_assurance_start.execute(
+    phaseSplitRequest,
+    phaseSplitContext,
+  ));
+  const phaseSplitReplayed = JSON.parse(await phaseSplitTools.quality_assurance_start.execute(
+    phaseSplitRequest,
+    phaseSplitContext,
+  ));
+  assert.deepEqual(phaseSplitReplayed, phaseSplitRecovered,
+    "phase-split lost-response replay must return the same lifecycle receipt");
+  assert.deepEqual(
+    inspectNormalSessionRegistration(phaseSplitBridge, phaseSplitContext.sessionID).required_check_ids,
+    ["integration-check"],
+    "classified facade replay must restore the registration integration checks instead of all available phases",
+  );
+  assert.deepEqual(
+    inspectNormalSessionQualityState(phaseSplitBridge, phaseSplitContext.sessionID),
+    lostResponseState,
+    "phase-split replay must retain the one owner state created before the lost response",
+  );
+
+  const bugPhaseSplitProjectCatalog = {
+    ...bugProjectCatalog,
+    catalog_id: "normal-session-facade-bug-phase-split-v1",
+    checks: [
+      ...bugProjectCatalog.checks,
+      {
+        check_id: "bug-pre-check",
+        executable_id: "node",
+        argv: ["src/file.mjs"],
+        cwd: ".",
+        phases: ["preimplementation"],
+        purpose: "verification",
+        generated_output_paths: [],
+        timeout_ms: 120000,
+        max_output_chars: 1048576,
+      },
+    ],
+  };
+  let bugPhaseSplitFailureArmed = true;
+  const bugPhaseSplitBridge = createNormalSessionQualityBridge({
+    ...options,
+    checkCatalog: createEngineeringCheckCatalog(projectCatalogToEngineeringCatalog(
+      bugPhaseSplitProjectCatalog,
+      NORMAL_SESSION_BRIDGE_PRODUCER,
+    )),
+    projectCatalog: bugPhaseSplitProjectCatalog,
+    evaluateGate: undefined,
+    failureInjector(stage) {
+      if (bugPhaseSplitFailureArmed && stage === "after_owner_state_persisted") {
+        bugPhaseSplitFailureArmed = false;
+        throw new Error("injected:bug-phase-split-after-owner-state-persisted");
+      }
+    },
+  });
+  const bugPhaseSplitTools = createAssuranceFacadeToolSurface({
+    toolFactory: fakeToolFactory,
+    bridge: bugPhaseSplitBridge,
+  });
+  const bugPhaseSplitContext = {
+    sessionID: "session/facade-bug-recovery-phase-split",
+    agent: "assurance",
+  };
+  const bugPhaseSplitSource = bugStartRequest();
+  delete bugPhaseSplitSource.required_check_ids;
+  delete bugPhaseSplitSource.reproduction_contract.check_id;
+  const bugPhaseSplitRequest = { request: JSON.stringify(bugPhaseSplitSource) };
+  handleNormalSessionChatMessage(bugPhaseSplitBridge, bugPhaseSplitContext);
+  await assert.rejects(
+    bugPhaseSplitTools.quality_assurance_start.execute(bugPhaseSplitRequest, bugPhaseSplitContext),
+    /injected:bug-phase-split-after-owner-state-persisted/u,
+  );
+  const savedBugRegistration = inspectNormalSessionRegistration(
+    bugPhaseSplitBridge,
+    bugPhaseSplitContext.sessionID,
+  );
+  assert.deepEqual(savedBugRegistration.required_check_ids, ["normal-bug-reproducer"]);
+  assert.equal(savedBugRegistration.reproduction_contract.check_id, "normal-bug-reproducer");
+  const recoveredBugPhaseSplit = JSON.parse(await bugPhaseSplitTools.quality_assurance_start.execute(
+    bugPhaseSplitRequest,
+    bugPhaseSplitContext,
+  ));
+  const replayedBugPhaseSplit = JSON.parse(await bugPhaseSplitTools.quality_assurance_start.execute(
+    bugPhaseSplitRequest,
+    bugPhaseSplitContext,
+  ));
+  assert.deepEqual(replayedBugPhaseSplit, recoveredBugPhaseSplit,
+    "standard-lite bug replay must restore its saved reproduction contract and lifecycle receipt");
+  assert.deepEqual(
+    inspectNormalSessionRegistration(bugPhaseSplitBridge, bugPhaseSplitContext.sessionID).reproduction_contract,
+    savedBugRegistration.reproduction_contract,
+    "standard-lite bug replay must retain the exact registered reproduction contract",
+  );
+  await assert.rejects(
+    bugPhaseSplitTools.quality_assurance_start.execute({
+      request: JSON.stringify({
+        ...bugPhaseSplitSource,
+        reproduction_contract: {
+          ...bugPhaseSplitSource.reproduction_contract,
+          expected_pre_fix: "unavailable",
+          unavailable_reason: "changed retry intent",
+        },
+      }),
+    }, bugPhaseSplitContext),
+    (error) => error?.code === "QUALITY_SESSION_REPLAY",
+    "classified facade replay must still reject changed caller-owned reproduction intent",
+  );
+
+  const multiReproducerProjectCatalog = {
+    ...bugProjectCatalog,
+    catalog_id: "normal-session-facade-multi-reproducer-v1",
+    checks: [
+      ...bugProjectCatalog.checks,
+      {
+        ...bugProjectCatalog.checks[0],
+        check_id: "normal-alternate-bug-reproducer",
+      },
+    ],
+  };
+  const multiReproducerBridge = createNormalSessionQualityBridge({
+    ...options,
+    checkCatalog: createEngineeringCheckCatalog(projectCatalogToEngineeringCatalog(
+      multiReproducerProjectCatalog,
+      NORMAL_SESSION_BRIDGE_PRODUCER,
+    )),
+    projectCatalog: multiReproducerProjectCatalog,
+    evaluateGate: undefined,
+  });
+  const multiReproducerTools = createAssuranceFacadeToolSurface({
+    toolFactory: fakeToolFactory,
+    bridge: multiReproducerBridge,
+  });
+  const multiReproducerContext = {
+    sessionID: "session/facade-multi-reproducer-replay",
+    agent: "assurance",
+  };
+  const multiReproducerSource = bugStartRequest();
+  delete multiReproducerSource.required_check_ids;
+  handleNormalSessionChatMessage(multiReproducerBridge, multiReproducerContext);
+  await multiReproducerTools.quality_assurance_start.execute({
+    request: JSON.stringify(multiReproducerSource),
+  }, multiReproducerContext);
+  assert.equal(
+    inspectNormalSessionRegistration(
+      multiReproducerBridge,
+      multiReproducerContext.sessionID,
+    ).reproduction_contract.check_id,
+    "normal-bug-reproducer",
+  );
+  await assert.rejects(
+    multiReproducerTools.quality_assurance_start.execute({
+      request: JSON.stringify({
+        ...multiReproducerSource,
+        reproduction_contract: {
+          ...multiReproducerSource.reproduction_contract,
+          check_id: "normal-alternate-bug-reproducer",
+        },
+      }),
+    }, multiReproducerContext),
+    (error) => error?.code === "QUALITY_SESSION_REPLAY",
+    "classified facade replay must reject a changed caller-selected reproducer check",
+  );
+
   const highFacadeBridge = createNormalSessionQualityBridge({ ...options, workspaceRoot: tempRoot });
   const highFacadeTools = createAssuranceFacadeToolSurface({
     toolFactory: fakeToolFactory,
