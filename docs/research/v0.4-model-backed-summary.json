@@ -12,7 +12,11 @@
   "secondary_binding": null,
   "secondary_replication": "not-configured",
   "preflight": {
-    "status": "passed",
+    "status": "blocked",
+    "deterministic_status": "passed",
+    "dependency_install_status": "performed before campaign but not captured in the campaign archive",
+    "model_binding_status": "unverified; execution did not reach provider invocation",
+    "containment_status": "blocked",
     "node_version": "v24.19.0",
     "opencode_version": "1.18.18",
     "containment_environment": "macOS host; P0-P5 installed-runtime probe passed; model-backed trusted-check concurrent containment unavailable"
@@ -143,13 +147,14 @@
     }
   },
   "operational": {
-    "wall_time_ms": 463686,
+    "wall_time_ms": 361479,
     "model_turns_observed": 0,
     "tool_calls_observed": 0,
     "delegated_child_calls_observed": 0,
     "timeout_count_observed": 0,
     "arm_duration_mean": null,
-    "arm_duration_median": null
+    "arm_duration_median": null,
+    "wall_time_scope": "campaign initialization through final attempted model-backed stage"
   },
   "token_usage": "not_observable",
   "monetary_cost": "not_observable",
