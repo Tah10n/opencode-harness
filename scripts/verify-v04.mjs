@@ -474,6 +474,12 @@ function verifyAssurance() {
     "V04_FACADE_SIZE", "assurance facade must expose three to five operations");
   assert(ASSURANCE_FACADE_TOOL_IDS.every((entry) => !LEGACY_TOOL_IDS.includes(entry)),
     "V04_FACADE_COLLISION", "facade collides with a legacy tool ID");
+  const assuranceAgent = read("agents/assurance.md");
+  for (const field of ["risk_class", "task_type", "user_visible_goal", "ownership_paths", "classification_rationale", "behavior_expectation", "expected_preserved_behavior", "known_local_edge_cases", "scope_facts", "unresolved_unknowns"]) {
+    assert(assuranceAgent.includes(`\`${field}\``), "V04_FACADE_START_GUIDANCE", `assurance start guidance omits ${field}`);
+  }
+  assert(assuranceAgent.includes("Never include runner-owned `required_check_ids`"),
+    "V04_FACADE_START_GUIDANCE", "assurance start guidance must protect runner-owned check IDs");
   const surface = createAssuranceFacadeToolSurface({
     toolFactory: fakeToolFactory(),
     bridge: Object.freeze({}),

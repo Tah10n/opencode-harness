@@ -3805,6 +3805,14 @@ await plugin.tool.quality_context_reconcile.execute({
   );
   assert.equal(durableControlSnapshot(), malformedBefore,
     "malformed nested facade dossier must not mutate durable registration or owner state");
+  await assert.rejects(
+    malformedFacadeTools.quality_assurance_start.execute({
+      request: JSON.stringify(facadeStartRequestFromDossier(fullDossierRequest())),
+    }, { sessionID: "session/facade-unseeded-high-start", agent: "assurance" }),
+    (error) => error instanceof ContractError && error.code === "QUALITY_FACADE_REQUEST",
+  );
+  assert.equal(durableControlSnapshot(), malformedBefore,
+    "unseeded high facade start must fail before durable registration is classified");
 
   for (const failureStage of ["after_registry_classification", "after_owner_state_persisted"]) {
     let armed = true;
