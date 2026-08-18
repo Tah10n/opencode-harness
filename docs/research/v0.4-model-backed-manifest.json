@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "campaign_id": "opencode-harness-v04-model-backed-47f58de-v1",
+  "tested_source_sha": "47f58de1f51930610dd9cf2272f38de9f7485e35",
+  "primary_binding": {
+    "model": "openai/gpt-5.6-luna",
+    "provider": "openai",
+    "variant": "low"
+  },
+  "secondary_binding": null,
+  "timeout_ms": 300000,
+  "max_model_attempts": 1500,
+  "max_external_retries_per_stage": 1,
+  "max_wall_clock_hours": 168,
+  "seeds": {
+    "smoke": "v04-47f58de-smoke-v1",
+    "standard": "v04-47f58de-standard-v1",
+    "full": "v04-47f58de-standard-v1",
+    "replication": "v04-47f58de-standard-v1"
+  },
+  "estimand_order": [
+    "plain-to-core-rules",
+    "core-rules-to-core-verified",
+    "core-verified-to-core-reviewed",
+    "core-reviewed-to-deep",
+    "deep-to-assurance"
+  ],
+  "full_priority": [
+    "core-rules-to-core-verified",
+    "core-reviewed-to-deep",
+    "deep-to-assurance",
+    "core-verified-to-core-reviewed",
+    "plain-to-core-rules"
+  ],
+  "retry_policy": "external-or-infrastructure-only",
+  "complete_negative_retry_policy": "forbidden",
+  "threshold_change_policy": "forbidden-during-campaign",
+  "environment": {
+    "node_version": "v24.19.0",
+    "npm_version": "11.17.0",
+    "git_version": "git version 2.50.1 (Apple Git-155)",
+    "opencode_version": "1.18.18",
+    "os": "darwin",
+    "os_release": "25.6.0",
+    "architecture": "arm64"
+  },
+  "source": {
+    "git_tree": "310f4d33193494323924a9e97dbae253e4a7bc22",
+    "file_sha256": {
+      "package-lock.json": "6e0bb3e71d1d3c35f1682ef3132945ad8b5d7370a7383be19dcc159d6a2b6355",
+      "profiles/inventory.v3.json": "33c7b56e5991a5c512c682eb6028e810847b4bf7ec1f1bbac3b170f80b4fb1f2",
+      "benchmarks/vnext/contract.v1.json": "c006fac872b47714bd5e9db5b3851ee5ce30f15bb79bd492572b94dfaf1ee2f7",
+      "benchmarks/vnext/promotion-policy.v1.json": "0c49676f0632099b157d4a714edf058e39355085932e5b02526717d1488f8a8c"
+    }
+  },
+  "created_at": "2026-08-18T15:16:09.065Z"
+}

@@ -1,0 +1,202 @@
+{
+  "schema_version": 1,
+  "summary_kind": "v04-model-backed-study-summary",
+  "status": "STUDY INVALID — BENCHMARK DEFECT",
+  "tested_source_sha": "47f58de1f51930610dd9cf2272f38de9f7485e35",
+  "campaign_sha256": "50b40e9c86c9fdda4c3ba5069229fbca8ef4e9ecff47d2576ac43f6703f5ead7",
+  "primary_binding": {
+    "model": "openai/gpt-5.6-luna",
+    "provider": "openai",
+    "variant": "low"
+  },
+  "secondary_binding": null,
+  "secondary_replication": "not-configured",
+  "preflight": {
+    "status": "passed",
+    "node_version": "v24.19.0",
+    "opencode_version": "1.18.18",
+    "containment_environment": "macOS host; P0-P5 installed-runtime probe passed; model-backed trusted-check concurrent containment unavailable"
+  },
+  "attempt_budget": {
+    "planned_smoke_and_standard": 280,
+    "charged_conservative": 8,
+    "observed_launched": 0,
+    "remaining": 1492,
+    "retries": 0
+  },
+  "smoke": [
+    {
+      "estimand": "plain-to-core-rules",
+      "status": "study-invalid",
+      "reason": "vnext-medium-visible-command-arity-mismatch",
+      "observed_model_attempts": 0
+    },
+    {
+      "estimand": "core-rules-to-core-verified",
+      "status": "study-invalid-not-run",
+      "reason": "vnext-medium-visible-command-arity-mismatch",
+      "observed_model_attempts": 0
+    },
+    {
+      "estimand": "core-verified-to-core-reviewed",
+      "status": "study-invalid-not-run",
+      "reason": "vnext-medium-visible-command-arity-mismatch",
+      "observed_model_attempts": 0
+    },
+    {
+      "estimand": "core-reviewed-to-deep",
+      "status": "study-invalid-not-run",
+      "reason": "vnext-medium-visible-command-arity-mismatch",
+      "observed_model_attempts": 0
+    },
+    {
+      "estimand": "deep-to-assurance",
+      "status": "blocked-unproven",
+      "reason": "SYNTHETIC_RUNNER_TRUSTED_CHECK_CONTAINMENT",
+      "observed_model_attempts": 0
+    }
+  ],
+  "standard": [
+    {
+      "estimand": "plain-to-core-rules",
+      "status": "not-run",
+      "reason": "smoke study-invalid"
+    },
+    {
+      "estimand": "core-rules-to-core-verified",
+      "status": "not-run",
+      "reason": "smoke study-invalid"
+    },
+    {
+      "estimand": "core-verified-to-core-reviewed",
+      "status": "not-run",
+      "reason": "smoke study-invalid"
+    },
+    {
+      "estimand": "core-reviewed-to-deep",
+      "status": "not-run",
+      "reason": "smoke study-invalid"
+    },
+    {
+      "estimand": "deep-to-assurance",
+      "status": "not-run",
+      "reason": "smoke blocked-unproven"
+    }
+  ],
+  "full": [
+    {
+      "estimand": "plain-to-core-rules",
+      "status": "not-run",
+      "reason": "no promotable valid standard decision"
+    },
+    {
+      "estimand": "core-rules-to-core-verified",
+      "status": "not-run",
+      "reason": "no promotable valid standard decision"
+    },
+    {
+      "estimand": "core-verified-to-core-reviewed",
+      "status": "not-run",
+      "reason": "no promotable valid standard decision"
+    },
+    {
+      "estimand": "core-reviewed-to-deep",
+      "status": "not-run",
+      "reason": "no promotable valid standard decision"
+    },
+    {
+      "estimand": "deep-to-assurance",
+      "status": "not-run",
+      "reason": "no promotable valid standard decision"
+    }
+  ],
+  "target_metrics": {
+    "plain-to-core-rules": {
+      "metric": "functional_hidden_check_success",
+      "ci": null,
+      "guardrails": null,
+      "verdict": "study-invalid"
+    },
+    "core-rules-to-core-verified": {
+      "metric": "verification_omission",
+      "ci": null,
+      "guardrails": null,
+      "verdict": "study-invalid"
+    },
+    "core-verified-to-core-reviewed": {
+      "metric": "introduced_high_medium_defects",
+      "ci": null,
+      "guardrails": null,
+      "verdict": "study-invalid"
+    },
+    "core-reviewed-to-deep": {
+      "metric": "missed_consumer_rate",
+      "ci": null,
+      "guardrails": null,
+      "verdict": "study-invalid"
+    },
+    "deep-to-assurance": {
+      "metric": "regression_free_high_risk_success",
+      "ci": null,
+      "guardrails": null,
+      "verdict": "blocked-unproven"
+    }
+  },
+  "operational": {
+    "wall_time_ms": 463686,
+    "model_turns_observed": 0,
+    "tool_calls_observed": 0,
+    "delegated_child_calls_observed": 0,
+    "timeout_count_observed": 0,
+    "arm_duration_mean": null,
+    "arm_duration_median": null
+  },
+  "token_usage": "not_observable",
+  "monetary_cost": "not_observable",
+  "recommendations": {
+    "core_rules": "unproven; no production default change",
+    "targeted_verification": "unproven; no production default change",
+    "independent_reviewer": "unproven; keep current conditional policy only as pre-study status, not evidence-backed promotion",
+    "deep": "unproven; retain optional pre-study disposition only",
+    "assurance": "blocked-unproven; retain experimental opt-in/research-only disposition"
+  },
+  "allowed_claims": [
+    "Frozen deterministic v0.4 validation and P0-P5 installed-runtime probe pass at the tested SHA",
+    "The frozen campaign exposed a reproducible medium-fixture benchmark defect before any model attempt",
+    "Model-backed assurance execution requires a supported concurrent containment environment unavailable on this macOS host"
+  ],
+  "forbidden_claims": [
+    "Any component improves task quality",
+    "Any component is promotable",
+    "Effects are model-independent",
+    "v0.4.0 is evidence-backed release-ready"
+  ],
+  "production_default_change": false,
+  "evidence_release_ready": false,
+  "invalidating_finding": {
+    "schema_version": 1,
+    "finding_kind": "v04-study-invalidating-benchmark-defect",
+    "finding_id": "vnext-medium-visible-command-arity-mismatch",
+    "severity": "HIGH",
+    "status": "validated",
+    "tested_source_sha": "47f58de1f51930610dd9cf2272f38de9f7485e35",
+    "affected_estimands": [
+      "plain-to-core-rules",
+      "core-rules-to-core-verified",
+      "core-verified-to-core-reviewed",
+      "core-reviewed-to-deep"
+    ],
+    "unaffected_estimands": [
+      "deep-to-assurance"
+    ],
+    "evidence": {
+      "observed_error_code": "VNEXT_RUN_UNEXPECTED",
+      "observed_error": "SYNTHETIC_FIXTURE_CONTROL_CHECK: fixture control supports only the validated node --test visible command",
+      "fixture_control_contract": "lib/benchmark/fixture-control.mjs requires command argv length exactly 3",
+      "vnext_medium_rendering": "lib/benchmark/vnext-fixtures.mjs appends test/remote-consumer.test.mjs, producing argv length 4",
+      "observed_model_attempts_before_failure": 0
+    },
+    "impact": "All medium-stratum vNext model-backed runs fail before producing an envelope; four estimands cannot be scored under the frozen contract. Fixing or bypassing this during the campaign would invalidate the manifest-bound study.",
+    "required_follow_up": "Repair and independently validate the benchmark in a separate change, then create a new campaign manifest/version; never rerun this manifest."
+  }
+}
