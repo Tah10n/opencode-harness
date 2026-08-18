@@ -6,9 +6,11 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 import {
   buildOpenCodeArgv,
+  buildSyntheticQualityContinuationPrompt,
   classifyOpenCodeStructuredProviderFailure,
   DEFAULT_OPENCODE_STDOUT_LIMIT,
   executeOpenCodeAdapter,
+  isSyntheticQualityProfileId,
   assertSyntheticOpenCodeExecutableIdentity,
   MINIMUM_SUPPORTED_OPENCODE_VERSION,
   parseOpenCodeJsonl,
@@ -64,6 +66,41 @@ import {
 import { createInjectedTestContainmentFactory } from "./injected-test-containment.mjs";
 
 const defaultRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+
+function qualityProfileIdentityFixtures() {
+  assert.equal(isSyntheticQualityProfileId("instrumented"), true);
+  assert.equal(isSyntheticQualityProfileId("P5"), true);
+  for (const profileId of ["plain", "profile-only", "P0", "P1", "P2", "P3", "P4"]) {
+    assert.equal(isSyntheticQualityProfileId(profileId), false, profileId);
+  }
+  const facadeContinuation = buildSyntheticQualityContinuationPrompt(
+    "started_incomplete",
+    0,
+    { recommended_action_tool_id: "quality_verification_record" },
+    "P5",
+  );
+  assert.match(facadeContinuation, /quality_assurance_advance/u);
+  assert.match(facadeContinuation, /never call quality_verification_record directly/u);
+  assert.doesNotMatch(facadeContinuation, /call quality_dossier_inspect/u);
+  const facadeRegistration = buildSyntheticQualityContinuationPrompt(
+    "registration_only",
+    0,
+    {},
+    "P5",
+  );
+  for (const field of ["risk_class", "task_type", "user_visible_goal", "ownership_paths", "classification_rationale", "behavior_expectation", "expected_preserved_behavior", "known_local_edge_cases", "scope_facts", "unresolved_unknowns"]) {
+    assert.match(facadeRegistration, new RegExp(field, "u"));
+  }
+  assert.match(facadeRegistration, /Do not include required_check_ids, dossier, or guessed fields/u);
+  const legacyContinuation = buildSyntheticQualityContinuationPrompt(
+    "started_incomplete",
+    0,
+    { recommended_action_tool_id: "quality_verification_record" },
+    "instrumented",
+  );
+  assert.match(legacyContinuation, /call quality_dossier_inspect once/u);
+  return 9;
+}
 
 function executableResolutionFixtures() {
   const fixtureRoot = createConfinedTemporaryDirectory("opencode-executable-resolution-", {
@@ -803,6 +840,13 @@ function parserFixtures(root) {
   assert.equal(qualityMetadataIsNotTaskAction.transient_observations.observed_fix_command_count, 0);
   assert.equal(qualityMetadataIsNotTaskAction.transient_observations.observed_control_path_action_count, 0);
   assert.deepEqual(qualityMetadataIsNotTaskAction.transient_observations.accessed_path_fingerprints, []);
+  const unknownIdentifiers = parseOpenCodeJsonl(jsonl(
+    JSON.stringify({ type: "future_event", sessionID: "ses_unknown" }),
+    toolEvent({ id: "unknown-tool", tool: "future_tool", input: {} }),
+  ));
+  assert.equal(unknownIdentifiers.status, "unknown_event");
+  assert.deepEqual(unknownIdentifiers.trace_summary.unknown_event_types, ["future_event"]);
+  assert.deepEqual(unknownIdentifiers.trace_summary.unknown_tool_ids, ["future_tool"]);
   for (const toolId of SUPPORTED_SYNTHETIC_OPENCODE_TOOL_IDS) {
     const supported = parseOpenCodeJsonl(jsonl(
       toolEvent({ id: `supported-${toolId}`, tool: toolId }),
@@ -3153,7 +3197,7 @@ export async function verifyBenchmarkAdapter({ root = defaultRoot } = {}) {
   await credentialBoundaryFixtures();
   await trustedCheckBrokerFixtures();
   const profiles = profileFixtures(root);
-  let lifecycleFixtureCount = executableResolutionFixtures();
+  let lifecycleFixtureCount = executableResolutionFixtures() + qualityProfileIdentityFixtures();
   try {
     lifecycleFixtureCount += await executionFixtures(root, profiles.plain, profiles.instrumented);
     lifecycleFixtureCount += await productionCompositionFixtures(root, profiles.plain);
