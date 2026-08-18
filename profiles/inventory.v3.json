@@ -1,0 +1,452 @@
+{
+  "schema_version": 3,
+  "inventory_id": "opencode-harness-risk-adaptive-v3",
+  "default_runtime_profile_id": "core",
+  "legacy_contract": {
+    "inventory_path": "profiles/inventory.v2.json",
+    "status": "frozen-replay-compatible",
+    "aliases": {
+      "profile-only": "core",
+      "instrumented": "assurance"
+    }
+  },
+  "prompt_budget": {
+    "source_paths": [
+      "AGENTS.md",
+      "agents/core.md"
+    ],
+    "hard_cap_characters": 16000,
+    "target_characters": 10000,
+    "encoding": "utf-8-code-points"
+  },
+  "facades": [
+    {
+      "id": "assurance-facade-v1",
+      "status": "experimental",
+      "model_visible_tool_ids": [
+        "quality_assurance_start",
+        "quality_assurance_inspect",
+        "quality_assurance_advance",
+        "quality_assurance_authorize"
+      ],
+      "legacy_dispatch_tool_count": 17,
+      "legacy_visibility": "compatibility-plugin-only"
+    }
+  ],
+  "roles": [
+    {
+      "id": "build",
+      "kind": "builtin-primary",
+      "prompt_path": null
+    },
+    {
+      "id": "core",
+      "kind": "repository-primary",
+      "prompt_path": "agents/core.md"
+    },
+    {
+      "id": "core-reviewer",
+      "kind": "repository-read-only",
+      "prompt_path": "agents/core-reviewer.md"
+    },
+    {
+      "id": "deep",
+      "kind": "repository-primary",
+      "prompt_path": "agents/deep.md"
+    },
+    {
+      "id": "explore",
+      "kind": "repository-read-only",
+      "prompt_path": "agents/explore.md"
+    },
+    {
+      "id": "assurance",
+      "kind": "repository-primary",
+      "prompt_path": "agents/assurance.md"
+    },
+    {
+      "id": "assurance-architect",
+      "kind": "repository-read-only",
+      "prompt_path": "agents/assurance-architect.md"
+    },
+    {
+      "id": "assurance-reviewer",
+      "kind": "repository-read-only",
+      "prompt_path": "agents/assurance-reviewer.md"
+    },
+    {
+      "id": "assurance-verifier",
+      "kind": "repository-read-only",
+      "prompt_path": "agents/assurance-verifier.md"
+    }
+  ],
+  "components": [
+    {
+      "id": "core-rules",
+      "status": "production",
+      "target_metric": "functional_hidden_check_success",
+      "intervention_path": "benchmarks/vnext/components/core-rules.md",
+      "intervention_vector": {
+        "prompt_fragments": ["benchmarks/vnext/components/core-rules.md"],
+        "roles": ["primary-core"],
+        "tools": [],
+        "permissions": []
+      }
+    },
+    {
+      "id": "targeted-verification",
+      "status": "production",
+      "target_metric": "verification_omission",
+      "intervention_path": "benchmarks/vnext/components/targeted-verification.md",
+      "intervention_vector": {
+        "prompt_fragments": [
+          "benchmarks/vnext/components/targeted-verification.md",
+          "agents/core.md",
+          "agents/core-reviewer.md"
+        ],
+        "roles": ["primary-core", "read-only-reviewer"],
+        "tools": ["task"],
+        "permissions": ["task:read-only-reviewer"]
+      }
+    },
+    {
+      "id": "independent-final-review",
+      "status": "optional",
+      "target_metric": "introduced_high_medium_defects",
+      "intervention_path": "benchmarks/vnext/components/independent-final-review.md",
+      "intervention_vector": {
+        "prompt_fragments": [
+          "benchmarks/vnext/components/independent-final-review.md",
+          "agents/core.md"
+        ],
+        "roles": ["primary-core-reviewed"],
+        "tools": [],
+        "permissions": ["review:mandatory"]
+      }
+    },
+    {
+      "id": "deep-context",
+      "status": "optional",
+      "target_metric": "missed_consumer_rate",
+      "intervention_path": "benchmarks/vnext/components/deep-context.md",
+      "intervention_vector": {
+        "prompt_fragments": [
+          "benchmarks/vnext/components/deep-context.md",
+          "agents/deep.md",
+          "agents/core.md",
+          "agents/core-reviewer.md",
+          "agents/explore.md"
+        ],
+        "roles": ["primary-deep", "read-only-explorer"],
+        "tools": ["context_outline", "context_files", "context_search", "context_read"],
+        "permissions": ["context:read-only"]
+      }
+    },
+    {
+      "id": "assurance-controls",
+      "status": "experimental",
+      "target_metric": "regression_free_high_risk_success",
+      "intervention_path": "benchmarks/vnext/components/assurance-controls.md",
+      "intervention_vector": {
+        "prompt_fragments": [
+          "benchmarks/vnext/components/assurance-controls.md",
+          "agents/assurance.md",
+          "agents/assurance-architect.md",
+          "agents/assurance-reviewer.md",
+          "agents/assurance-verifier.md"
+        ],
+        "roles": ["primary-assurance", "assurance-architect", "assurance-reviewer", "assurance-verifier"],
+        "tools": [
+          "quality_assurance_start",
+          "quality_assurance_inspect",
+          "quality_assurance_advance",
+          "quality_assurance_authorize"
+        ],
+        "permissions": ["quality:facade-only", "mutation:runner-authorized"]
+      }
+    }
+  ],
+  "vnext_transition_surface_anchors": {
+    "core-rules": [
+      "/effective_config/default_agent",
+      "/materialized_files/0/fingerprint",
+      "/materialized_files/0/path"
+    ],
+    "targeted-verification": [
+      "/effective_config/default_agent",
+      "/materialized_files/0/fingerprint",
+      "/materialized_files/0/path",
+      "/materialized_files/1/fingerprint",
+      "/materialized_files/1/path"
+    ],
+    "independent-final-review": [
+      "/effective_config/default_agent",
+      "/materialized_files/1/fingerprint",
+      "/materialized_files/1/path"
+    ],
+    "deep-context": [
+      "/effective_config/default_agent",
+      "/effective_config/plugin/1/fingerprint",
+      "/effective_config/plugin/1/id",
+      "/effective_config/plugin/1/source_path",
+      "/materialized_files/1/fingerprint",
+      "/materialized_files/1/path",
+      "/materialized_files/2/fingerprint",
+      "/materialized_files/2/path",
+      "/materialized_files/3/fingerprint",
+      "/materialized_files/3/path",
+      "/plugin_sources/1/fingerprint",
+      "/plugin_sources/1/id",
+      "/plugin_sources/1/source_path"
+    ],
+    "assurance-controls": [
+      "/effective_config/default_agent",
+      "/effective_config/plugin/1/fingerprint",
+      "/effective_config/plugin/1/id",
+      "/effective_config/plugin/1/source_path",
+      "/materialized_files/0/fingerprint",
+      "/materialized_files/0/path",
+      "/materialized_files/1/fingerprint",
+      "/materialized_files/1/path",
+      "/materialized_files/2/fingerprint",
+      "/materialized_files/2/path",
+      "/materialized_files/3/fingerprint",
+      "/materialized_files/3/path",
+      "/materialized_files/4/fingerprint",
+      "/materialized_files/4/path",
+      "/materialized_files/5/fingerprint",
+      "/materialized_files/5/path",
+      "/materialized_files/6/fingerprint",
+      "/materialized_files/6/path",
+      "/materialized_files/7/fingerprint",
+      "/materialized_files/7/path",
+      "/materialized_files/8/fingerprint",
+      "/materialized_files/8/path",
+      "/plugin_sources/1/fingerprint",
+      "/plugin_sources/1/id",
+      "/plugin_sources/1/source_path"
+    ]
+  },
+  "profiles": [
+    {
+      "id": "plain",
+      "status": "benchmark-only",
+      "runtime": false,
+      "primary_role_id": "build",
+      "component_ids": [],
+      "delegation_limit": 0,
+      "quality_surface": "none"
+    },
+    {
+      "id": "core",
+      "status": "production-default",
+      "runtime": true,
+      "primary_role_id": "core",
+      "component_ids": [
+        "core-rules",
+        "targeted-verification"
+      ],
+      "delegation_limit": 1,
+      "quality_surface": "none"
+    },
+    {
+      "id": "deep",
+      "status": "optional",
+      "runtime": true,
+      "primary_role_id": "deep",
+      "component_ids": [
+        "core-rules",
+        "targeted-verification",
+        "independent-final-review",
+        "deep-context"
+      ],
+      "delegation_limit": 3,
+      "quality_surface": "none"
+    },
+    {
+      "id": "assurance",
+      "status": "experimental-opt-in",
+      "runtime": true,
+      "primary_role_id": "assurance",
+      "component_ids": [
+        "core-rules",
+        "targeted-verification",
+        "independent-final-review",
+        "deep-context",
+        "assurance-controls"
+      ],
+      "delegation_limit": 3,
+      "quality_surface": "assurance-facade-v1"
+    },
+    {
+      "id": "profile-only",
+      "status": "deprecated-legacy-alias",
+      "runtime": false,
+      "primary_role_id": "core",
+      "component_ids": [
+        "core-rules"
+      ],
+      "delegation_limit": 0,
+      "quality_surface": "none"
+    },
+    {
+      "id": "instrumented",
+      "status": "deprecated-replay-compatible",
+      "runtime": false,
+      "primary_role_id": "assurance",
+      "component_ids": [
+        "core-rules",
+        "targeted-verification",
+        "independent-final-review",
+        "deep-context",
+        "assurance-controls"
+      ],
+      "delegation_limit": 3,
+      "quality_surface": "legacy-17-tool-compatibility"
+    }
+  ],
+  "adoption_bundles": [
+    {
+      "id": "core",
+      "base_bundle_id": null,
+      "runtime_profile_id": "core",
+      "entries": [
+        { "source": ".gitignore", "target": ".gitignore" },
+        { "source": "AGENTS.md", "target": "AGENTS.md" },
+        { "source": "LICENSE", "target": "LICENSE" },
+        { "source": "README.md", "target": "README.md" },
+        { "source": "profiles/config/core.opencode.json", "target": "opencode.json" },
+        { "source": "agents/core.md", "target": "agents/core.md" },
+        { "source": "agents/core-reviewer.md", "target": "agents/core-reviewer.md" },
+        { "source": "skills/global-debugging", "target": "skills/global-debugging" },
+        { "source": "skills/global-review-ledger", "target": "skills/global-review-ledger" },
+        { "source": "docs/adoption.md", "target": "docs/adoption.md" },
+        { "source": "docs/design-principles.md", "target": "docs/design-principles.md" },
+        { "source": "docs/model-profiles.md", "target": "docs/model-profiles.md" }
+      ],
+      "forbidden_prefixes": [
+        ".opencode/plugins",
+        "benchmarks",
+        "evals",
+        "lib/benchmark",
+        "lib/quality",
+        "native",
+        "quality",
+        "skills/global-memory",
+        "skills/global-self-improvement"
+      ]
+    },
+    {
+      "id": "deep",
+      "base_bundle_id": "core",
+      "runtime_profile_id": "deep",
+      "entries": [
+        { "source": ".gitignore", "target": ".gitignore" },
+        { "source": "AGENTS.md", "target": "AGENTS.md" },
+        { "source": "LICENSE", "target": "LICENSE" },
+        { "source": "README.md", "target": "README.md" },
+        { "source": "profiles/config/deep.opencode.json", "target": "opencode.json" },
+        { "source": "agents/core.md", "target": "agents/core.md" },
+        { "source": "agents/core-reviewer.md", "target": "agents/core-reviewer.md" },
+        { "source": "agents/deep.md", "target": "agents/deep.md" },
+        { "source": "agents/explore.md", "target": "agents/explore.md" },
+        { "source": "commands/deep.md", "target": "commands/deep.md" },
+        { "source": "skills/global-debugging", "target": "skills/global-debugging" },
+        { "source": "skills/global-review-ledger", "target": "skills/global-review-ledger" },
+        { "source": "docs/adoption.md", "target": "docs/adoption.md" },
+        { "source": "docs/design-principles.md", "target": "docs/design-principles.md" },
+        { "source": "docs/model-profiles.md", "target": "docs/model-profiles.md" },
+        { "source": "docs/recursive-context-mode.md", "target": "docs/recursive-context-mode.md" }
+      ],
+      "forbidden_prefixes": [
+        ".opencode/plugins",
+        "benchmarks",
+        "evals",
+        "lib/benchmark",
+        "lib/quality",
+        "native",
+        "quality",
+        "skills/global-memory",
+        "skills/global-self-improvement"
+      ]
+    },
+    {
+      "id": "assurance",
+      "base_bundle_id": "deep",
+      "runtime_profile_id": "assurance",
+      "entries": [
+        { "source": ".gitignore", "target": ".gitignore" },
+        { "source": "AGENTS.md", "target": "AGENTS.md" },
+        { "source": "LICENSE", "target": "LICENSE" },
+        { "source": "README.md", "target": "README.md" },
+        { "source": "profiles/config/assurance.opencode.json", "target": "opencode.json" },
+        { "source": "agents/core.md", "target": "agents/core.md" },
+        { "source": "agents/core-reviewer.md", "target": "agents/core-reviewer.md" },
+        { "source": "agents/deep.md", "target": "agents/deep.md" },
+        { "source": "agents/explore.md", "target": "agents/explore.md" },
+        { "source": "agents/assurance.md", "target": "agents/assurance.md" },
+        { "source": "agents/assurance-architect.md", "target": "agents/architect.md" },
+        { "source": "agents/assurance-reviewer.md", "target": "agents/reviewer.md" },
+        { "source": "agents/assurance-verifier.md", "target": "agents/verifier.md" },
+        { "source": "commands/deep.md", "target": "commands/deep.md" },
+        { "source": "commands/assure.md", "target": "commands/assure.md" },
+        { "source": ".opencode/assurance/assurance-plugin.mjs", "target": "plugins/assurance.mjs" },
+        { "source": "lib/feedback", "target": "lib/feedback" },
+        { "source": "lib/quality", "target": "lib/quality" },
+        { "source": "native", "target": "native" },
+        { "source": "quality", "target": "quality" },
+        { "source": "skills/global-debugging", "target": "skills/global-debugging" },
+        { "source": "skills/global-review-ledger", "target": "skills/global-review-ledger" },
+        { "source": "skills/global-quality-gates", "target": "skills/global-quality-gates" },
+        { "source": "skills/global-wide-deep-context", "target": "skills/global-wide-deep-context" },
+        { "source": "docs/adoption.md", "target": "docs/adoption.md" },
+        { "source": "docs/design-principles.md", "target": "docs/design-principles.md" },
+        { "source": "docs/model-profiles.md", "target": "docs/model-profiles.md" },
+        { "source": "docs/recursive-context-mode.md", "target": "docs/recursive-context-mode.md" }
+      ],
+      "forbidden_prefixes": [
+        "benchmarks",
+        "evals",
+        "lib/benchmark",
+        "skills/global-memory",
+        "skills/global-self-improvement"
+      ]
+    },
+    {
+      "id": "lab",
+      "base_bundle_id": null,
+      "runtime_profile_id": null,
+      "entries": [
+        { "source": "AGENTS.md", "target": "AGENTS.md" },
+        { "source": ".opencode/assurance", "target": ".opencode/assurance" },
+        { "source": "adoption", "target": "adoption" },
+        { "source": "agents", "target": "agents" },
+        { "source": "benchmarks", "target": "benchmarks" },
+        { "source": "evals", "target": "evals" },
+        { "source": "fixtures", "target": "fixtures" },
+        { "source": "lib/benchmark", "target": "lib/benchmark" },
+        { "source": "lib/feedback", "target": "lib/feedback" },
+        { "source": "lib/quality", "target": "lib/quality" },
+        { "source": "lib/profile-v3.mjs", "target": "lib/profile-v3.mjs" },
+        { "source": "native", "target": "native" },
+        { "source": "profiles", "target": "profiles" },
+        { "source": "quality", "target": "quality" },
+        { "source": "scripts/benchmark-vnext-validate.mjs", "target": "scripts/benchmark-vnext-validate.mjs" },
+        { "source": "scripts/benchmark-vnext-self-test.mjs", "target": "scripts/benchmark-vnext-self-test.mjs" },
+        { "source": "scripts/benchmark-vnext-run.mjs", "target": "scripts/benchmark-vnext-run.mjs" },
+        { "source": "scripts/benchmark-vnext-compare.mjs", "target": "scripts/benchmark-vnext-compare.mjs" },
+        { "source": "scripts/benchmark-vnext-promote.mjs", "target": "scripts/benchmark-vnext-promote.mjs" },
+        { "source": "profiles/config/lab.package.json", "target": "package.json" },
+        { "source": "docs/synthetic-benchmark.md", "target": "docs/synthetic-benchmark.md" },
+        { "source": "docs/research", "target": "docs/research" }
+      ],
+      "forbidden_prefixes": [
+        ".oc_harness",
+        "evals/decisions",
+        "evals/reports"
+      ]
+    }
+  ],
+  "benchmark_contract_path": "benchmarks/vnext/contract.v1.json",
+  "promotion_policy_path": "benchmarks/vnext/promotion-policy.v1.json"
+}

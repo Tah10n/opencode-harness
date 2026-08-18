@@ -2,7 +2,82 @@
 
 [![Verify](https://github.com/Tah10n/opencode-harness/actions/workflows/verify.yml/badge.svg)](https://github.com/Tah10n/opencode-harness/actions/workflows/verify.yml)
 
-Reproducible OpenCode orchestration profile.
+Risk-adaptive OpenCode engineering profiles.
+
+`core` is the small production default: project-aware inspect, edit, targeted
+verification, and final-diff review without a quality lifecycle or mandatory
+subagents. Install it from a clean tracked checkout with the deterministic
+materializer:
+
+```sh
+npm run profile:materialize -- --profile core --output /path/to/profile
+```
+
+Choose `deep` explicitly for broad audits, large diffs, long logs, or
+multi-module investigations that benefit from bounded read-only context and up
+to three focused explorers. Choose experimental `assurance` explicitly with
+`/assure` only for security, authorization, migrations, durable state,
+shared-state concurrency, destructive data changes, or critical public
+contracts. Neither mode is silently activated by `core`.
+
+| Profile | Status | Adds | Excludes |
+| --- | --- | --- | --- |
+| `plain` | Benchmark baseline | Built-in coding agent | Harness prompts and lifecycle |
+| `core` | Production default | Compact rules and direct verification loop | Recursive context, quality state, learning writes, lab |
+| `deep` | Optional | Bounded context and focused read-only exploration | Quality lifecycle and mutation gate |
+| `assurance` | Experimental opt-in | Four-operation facade over fail-closed v0.3 controls | Benchmark corpus and evaluation reports |
+| `lab` | Developer bundle, not an agent | Profile-transition experiments, fixtures, statistics, replay, traces | User runtime claims |
+
+Materialize `deep` or `assurance` by changing `--profile`; add `--dry-run` to
+inspect the stable manifest and fingerprint first. Existing output is refused
+unless it is an unchanged managed bundle and `--force` is explicit.
+
+The output is an OpenCode configuration directory, not a project workspace.
+Run OpenCode in the target project and point `OPENCODE_CONFIG_DIR` at the
+materialized directory. An assurance workspace keeps its project-owned
+`.opencode/quality/checks.json` and `toolchains.json`; the config directory
+keeps the host-owned `plugins/quality-toolchains.host.v1.json`. The materializer
+never invents machine identities and preserves that reserved host file across
+a verified `--force` replacement.
+
+### Evidence status
+
+The historical v0.3 `plain → instrumented` experiment found
+`no_clear_difference` on primary functional correctness, while verification
+omissions fell and duration/timeouts rose. It does not justify making the
+heavy lifecycle the default. See
+[the v0.3 research result](docs/research/v0.3-instrumented.md).
+
+Proven model-free in v0.4: profile closure, prompt budget, effective
+permissions, portable materialization, facade-only standard and high-risk
+assurance lifecycles, structural child-assignment binding, legacy v2 reader compatibility,
+byte-bound cumulative arm materialization, rendered medium/high topology,
+runner-owned pair aggregation, receipt-recomputed observations, an in-process
+standard-to-full authorization boundary, and frozen promotion thresholds. The installed
+OpenCode probes additionally load P0-P5, invoke all four P4/P5 context tools,
+confirm that P4 creates no quality state, and confirm one P5 receipt per context call. These checks do
+not prove that `deep` or `assurance` improves model-backed outcomes. The vNext
+contract requires paired smoke and standard runs before promotion; unavailable
+runtime evidence remains `blocked-unproven` and is never scored.
+
+### Migration from v0.3
+
+The source default changes from `orchestrator` to `core`. Historical
+`profile-only` and `instrumented` definitions and readers remain replay-only
+compatibility surfaces. Use `deep` for the former broad-context use case and
+explicit `assurance` for the latter high-risk lifecycle. The old complete
+portable bundle remains documented below as the legacy/lab source closure;
+new installations should use the v3 materializer.
+
+Development status: this checkout targets unreleased `0.4.0`. The latest
+tagged release remains `v0.2.0`; v0.3 is retained as a research contract rather
+than a promoted release claim.
+
+## Legacy v0.3 architecture and lab reference
+
+The remainder of this document preserves exact v0.3 operational and report
+contracts for existing verifiers and historical replay. They are not the v0.4
+default workflow.
 
 This repository contains a reusable OpenCode behavior profile:
 
@@ -37,7 +112,7 @@ This repository contains a reusable OpenCode behavior profile:
   drift, feedback persistence, live manifests, and runtime parser fixtures;
 - optional installed-runtime hook checks and general live regression evaluation.
 
-Development status: this checkout targets unreleased `0.3.0`. The latest
+Historical development status: this section described unreleased `0.3.0`. The latest
 tagged release is `v0.2.0`, whose package metadata has no `exports` field and
 therefore does not expose the feedback API subpaths described below.
 
@@ -599,7 +674,7 @@ particular,
 `probe:runtime:quality-plugin-api` is intentionally excluded from this default
 chain because it resolves a machine-local `@opencode-ai/plugin` installation.
 These commands validate contracts, schemas, failure
-cases, corpus structure, and evaluation logic. The prompt inventory covers 11 agent prompts and nine
+cases, corpus structure, and evaluation logic. The prompt inventory covers 18 agent prompts and nine
 skill entrypoints. These checks do not prove an installed model profile or
 actual model behaviour.
 

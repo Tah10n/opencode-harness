@@ -11,7 +11,7 @@ import { assertNoSymlinkEscape, isInside, readJson } from "../lib/feedback/files
 import { loadScenarioCorpus } from "../lib/feedback/manifests.mjs";
 import { createReportHistory } from "../lib/feedback/report-history.mjs";
 
-const root = process.cwd();
+const root = fs.realpathSync.native(process.cwd());
 
 function usage() {
   return [
@@ -69,10 +69,11 @@ function parseArgs(argv) {
 
 function readExplicitJson(inputPath, label) {
   if (typeof inputPath !== "string" || inputPath.length === 0) cliError("ACCEPTANCE_CLI_PATH", `${label} path is required`);
-  const resolved = path.resolve(root, inputPath);
-  if (!fs.existsSync(resolved) || !fs.statSync(resolved).isFile()) {
+  const lexical = path.resolve(root, inputPath);
+  if (!fs.existsSync(lexical) || !fs.statSync(lexical).isFile()) {
     cliError("ACCEPTANCE_CLI_PATH", `${label} file does not exist`);
   }
+  const resolved = fs.realpathSync.native(lexical);
   try {
     return readJson(resolved);
   } catch (error) {
@@ -95,8 +96,9 @@ function optionalJson(inputPath, label) {
 }
 
 function reportInput(history, reportPath) {
-  const resolved = path.resolve(root, reportPath);
+  const lexical = path.resolve(root, reportPath);
   try {
+    const resolved = fs.realpathSync.native(lexical);
     const inspected = history.inspect(resolved);
     const marker = inspected.marker;
     return {

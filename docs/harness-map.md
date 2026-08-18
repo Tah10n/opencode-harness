@@ -1,5 +1,19 @@
 # Harness Control Map
 
+## v0.4 layer map
+
+| Layer | Default? | Model-visible runtime | Primary responsibility |
+| --- | --- | --- | --- |
+| `core` | Yes | Compact rules, core agent, optional reviewer | Ordinary inspect/edit/verify/review work |
+| `deep` | No | Core plus bounded read-only context workflow | Broad discovery with one integrator |
+| `assurance` | No; experimental | Deep plus four high-level quality operations | Fail-closed high-risk mutation and attestation |
+| `lab` | Never | None | Benchmarks, evaluation, replay, traces, and research |
+
+Controls in the legacy matrix below are inventories, not one mandatory
+runtime. Dossier, receipts, containment, and attestation belong to assurance;
+recursive context belongs to deep; benchmark and acceptance machinery belongs
+to lab. Core contains only compact guidance and targeted project feedback.
+
 This map keeps the harness coherent as it grows. It classifies each guide and
 sensor by the terms used in Birgitta Böckeler's harness engineering article,
 published on Martin Fowler's site: feedforward versus feedback, computational
@@ -53,7 +67,7 @@ behaviour dimensions.
 | Runtime verifier | Feedback | Computational | Installed profile correctness, modes, exclusive permissions, and complete installed-agent inventory | After adoption or upgrade | `opencode agent list`, `scripts/verify-runtime.mjs` |
 | Installed quality surfaces | Feedback | Computational | The explicit API probe checks installed plugin API/factory compatibility; the runtime-hook verifier separately classifies host discovery, callback invocation, child-task causality, and effective adopted permissions. Native Bash is disabled in quality sessions. | After adoption or OpenCode upgrade | `scripts/probe-normal-session-plugin-api.mjs`, `scripts/verify-normal-session-runtime.mjs`, `lib/quality/runtime-hook-verification.mjs` |
 | OpenCode model selection | Feedforward | Host configuration | User-selected tool-capable model and host-defined subagent inheritance | Host configuration changes | OpenCode host, `docs/model-profiles.md`; core `agents/*.md` remain model-neutral |
-| Agent/skill prompt inventory | Feedforward and feedback | Computational | Maintainability, safety, prompt, step-limit, and permission drift | Before prompt or permission changes | 11 agent prompts plus nine skill entrypoints in `quality/prompt-inventory/`; v3 excludes model/provider configuration from quality policy |
+| Agent/skill prompt inventory | Feedforward and feedback | Computational | Maintainability, safety, prompt, step-limit, and permission drift | Before prompt or permission changes | 18 agent prompts plus nine skill entrypoints in `quality/prompt-inventory/`; v3 excludes model/provider configuration from quality policy |
 | Harness release review | Feedback | Inferential | Harness coherence | Before minor or major release | `harness-release-review`, `skills/global-harness-release-review/SKILL.md` |
 | Optional general live regression evaluation (baseline/candidate) | Feedback | Live computational plus inferential scoring | Actual agent behaviour | Optional release or material prompt changes | `docs/live-evaluation.md`, `evals/`, `scripts/evaluate-live.mjs` |
 | Controlled self-improvement | Feedback to feedforward | Inferential plus bounded writes | Maintainability | After verified lessons | `agents/improver.md`, `skills/global-self-improvement/SKILL.md` |

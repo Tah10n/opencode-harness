@@ -787,6 +787,22 @@ async function runProductionReadOnlyTask(plugin, {
   return result;
 }
 
+async function runProductionTool(plugin, toolId, args, context, callID) {
+  const input = { args: JSON.parse(JSON.stringify(args)) };
+  await plugin["tool.execute.before"]({
+    tool: toolId,
+    sessionID: context.sessionID,
+    callID,
+  }, input);
+  const result = await plugin.tool[toolId].execute(input.args, context);
+  await plugin["tool.execute.after"]({
+    tool: toolId,
+    sessionID: context.sessionID,
+    callID,
+  }, { output: result, title: toolId, metadata: {} });
+  return result;
+}
+
 function fixtureOpenCodeClient(sessionParents) {
   return {
     session: {
@@ -869,7 +885,13 @@ async function verifyProductionInstrumentedActivation(root, contracts, templateS
     const loaded = await import(config.plugin[0]);
     let plugin;
     try {
-      plugin = await loaded.EngineeringDossierPlugin({
+      const productionPlugin = loaded.createEngineeringDossierPlugin({
+        runTrustedTarget: ({ targetId, phase }) => ({
+          status: "passed",
+          command_id: `model-free-plugin-fixture:${targetId}:${phase}`,
+        }),
+      });
+      plugin = await productionPlugin({
         client: fixtureOpenCodeClient(sessionParents),
         directory: fixture.repo,
         worktree: fixture.repo,
@@ -907,18 +929,18 @@ async function verifyProductionInstrumentedActivation(root, contracts, templateS
     });
     const ownershipPath = instance.workspace_policy.expected_changed_paths[0];
     await assert.rejects(
-      () => plugin.tool.context_outline.execute({}, context),
+      () => runProductionTool(plugin, "context_outline", {}, context, "unclassified-outline"),
       (error) => error?.code === "QUALITY_SESSION_UNCLASSIFIED",
       "instrumented context outline must fail closed before quality_session_start",
     );
     await assert.rejects(
-      () => plugin.tool.context_read.execute({
+      () => runProductionTool(plugin, "context_read", {
         path: ownershipPath,
         startLine: 1,
         maxLines: 100,
         maxBytes: 64 * 1024,
         format: "json",
-      }, context),
+      }, context, "unclassified-read"),
       (error) => error?.code === "QUALITY_SESSION_UNCLASSIFIED",
       "instrumented context discovery must fail closed before quality_session_start",
     );
@@ -958,13 +980,15 @@ async function verifyProductionInstrumentedActivation(root, contracts, templateS
       () => plugin.tool.context_read.execute({ path: ".oc_harness/quality/state.json", format: "json" }),
       /outside the readable task surface/u,
     );
-    await plugin.tool.context_read.execute({
+    await runProductionTool(plugin, "context_read", {
       path: ownershipPath,
       startLine: 1,
       maxLines: 100,
       maxBytes: 64 * 1024,
       format: "json",
-    }, context);
+    }, context, "instrumented-owned-context-read");
+    assert.equal(inspectSyntheticQualityControlState(fixture.repo).context_receipt_count, 1,
+      "the production host hook sequence must publish exactly one context receipt");
     const gated = JSON.parse(await plugin.tool.quality_dossier_finalize.execute({
       request: JSON.stringify({ expected_revision: started.dossier_revision }),
     }, context));
@@ -1108,13 +1132,13 @@ async function verifyProductionInstrumentedActivation(root, contracts, templateS
       "instrumented-coding-reviewer",
       async (childContext) => {
         for (const reviewPath of codingReview.assignment.required_read_paths) {
-          await plugin.tool.context_read.execute({
+          await runProductionTool(plugin, "context_read", {
             path: reviewPath,
             startLine: 1,
             maxLines: 100,
             maxBytes: 64 * 1024,
             format: "json",
-          }, childContext);
+          }, childContext, `instrumented-review-context-${reviewPath}`);
         }
         return plugin.tool.quality_context_reviewer_record.execute({
           request: JSON.stringify(codingReview.request),
@@ -1157,7 +1181,12 @@ async function verifyProductionInstrumentedActivation(root, contracts, templateS
     process.env.OPENCODE_CONFIG_DIR = profile.configDirectory;
     let failurePlugin;
     try {
-      failurePlugin = await loaded.EngineeringDossierPlugin({
+      failurePlugin = await loaded.createEngineeringDossierPlugin({
+        runTrustedTarget: ({ targetId, phase }) => ({
+          status: "passed",
+          command_id: `model-free-plugin-fixture:${targetId}:${phase}`,
+        }),
+      })({
         client: fixtureOpenCodeClient(new Map()),
         directory: failureFixture.repo,
         worktree: failureFixture.repo,
@@ -1174,13 +1203,13 @@ async function verifyProductionInstrumentedActivation(root, contracts, templateS
     const failedStarted = JSON.parse(await failurePlugin.tool.quality_session_start.execute({
       request: JSON.stringify(request),
     }, failedContext));
-    await failurePlugin.tool.context_read.execute({
+    await runProductionTool(failurePlugin, "context_read", {
       path: ownershipPath,
       startLine: 1,
       maxLines: 100,
       maxBytes: 64 * 1024,
       format: "json",
-    }, failedContext);
+    }, failedContext, "instrumented-terminal-context-read");
     await failurePlugin.tool.quality_dossier_finalize.execute({
       request: JSON.stringify({ expected_revision: failedStarted.dossier_revision }),
     }, failedContext);
@@ -1332,7 +1361,12 @@ async function verifyProductionInstrumentedReadOnlyActivation(root, contracts, t
     const loaded = await import(config.plugin[0]);
     let plugin;
     try {
-      plugin = await loaded.EngineeringDossierPlugin({
+      plugin = await loaded.createEngineeringDossierPlugin({
+        runTrustedTarget: ({ targetId, phase }) => ({
+          status: "passed",
+          command_id: `model-free-plugin-fixture:${targetId}:${phase}`,
+        }),
+      })({
         client: fixtureOpenCodeClient(sessionParents),
         directory: fixture.repo,
         worktree: fixture.repo,
@@ -1391,13 +1425,15 @@ async function verifyProductionInstrumentedReadOnlyActivation(root, contracts, t
         scope_facts: scopeFacts(),
       }),
     }, context));
-    await plugin.tool.context_read.execute({
+    await runProductionTool(plugin, "context_read", {
       path: ownershipPath,
       startLine: 1,
       maxLines: 100,
       maxBytes: 64 * 1024,
       format: "json",
-    }, context);
+    }, context, "instrumented-read-only-context-read");
+    assert.equal(inspectSyntheticQualityControlState(fixture.repo).context_receipt_count, 1,
+      "the read-only production host hook sequence must publish exactly one context receipt");
     const gated = JSON.parse(await plugin.tool.quality_dossier_finalize.execute({
       request: JSON.stringify({ expected_revision: started.dossier_revision }),
     }, context));
@@ -1448,13 +1484,13 @@ async function verifyProductionInstrumentedReadOnlyActivation(root, contracts, t
       "instrumented-read-only-reviewer",
       async (childContext) => {
         for (const reviewPath of readOnlyReview.assignment.required_read_paths) {
-          await plugin.tool.context_read.execute({
+          await runProductionTool(plugin, "context_read", {
             path: reviewPath,
             startLine: 1,
             maxLines: 100,
             maxBytes: 64 * 1024,
             format: "json",
-          }, childContext);
+          }, childContext, `instrumented-read-only-review-context-${reviewPath}`);
         }
         return plugin.tool.quality_context_reviewer_record.execute({
           request: JSON.stringify(readOnlyReview.request),

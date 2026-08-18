@@ -1,0 +1,448 @@
+{
+  "schema_version": 1,
+  "contract_id": "opencode-harness-vnext-compound-profile-transitions-v1",
+  "inventory_path": "profiles/inventory.v3.json",
+  "component_order": [
+    "core-rules",
+    "targeted-verification",
+    "independent-final-review",
+    "deep-context",
+    "assurance-controls"
+  ],
+  "arms": [
+    {
+      "id": "P0",
+      "name": "plain",
+      "component_ids": []
+    },
+    {
+      "id": "P1",
+      "name": "core-rules",
+      "component_ids": [
+        "core-rules"
+      ]
+    },
+    {
+      "id": "P2",
+      "name": "core-verified",
+      "component_ids": [
+        "core-rules",
+        "targeted-verification"
+      ]
+    },
+    {
+      "id": "P3",
+      "name": "core-reviewed",
+      "component_ids": [
+        "core-rules",
+        "targeted-verification",
+        "independent-final-review"
+      ]
+    },
+    {
+      "id": "P4",
+      "name": "deep",
+      "component_ids": [
+        "core-rules",
+        "targeted-verification",
+        "independent-final-review",
+        "deep-context"
+      ]
+    },
+    {
+      "id": "P5",
+      "name": "assurance",
+      "component_ids": [
+        "core-rules",
+        "targeted-verification",
+        "independent-final-review",
+        "deep-context",
+        "assurance-controls"
+      ]
+    }
+  ],
+  "estimands": [
+    {
+      "id": "plain-to-core-rules",
+      "estimand_kind": "compound-profile-transition",
+      "baseline_arm_id": "P0",
+      "candidate_arm_id": "P1",
+      "transition_anchor_component_id": "core-rules",
+      "eligible_strata": [
+        "small",
+        "medium"
+      ],
+      "target_strata": ["small", "medium"],
+      "negative_control_strata": [],
+      "target_metric": "functional_hidden_check_success"
+    },
+    {
+      "id": "core-rules-to-core-verified",
+      "estimand_kind": "compound-profile-transition",
+      "baseline_arm_id": "P1",
+      "candidate_arm_id": "P2",
+      "transition_anchor_component_id": "targeted-verification",
+      "eligible_strata": [
+        "small",
+        "medium"
+      ],
+      "target_strata": ["small", "medium"],
+      "negative_control_strata": [],
+      "target_metric": "verification_omission"
+    },
+    {
+      "id": "core-verified-to-core-reviewed",
+      "estimand_kind": "compound-profile-transition",
+      "baseline_arm_id": "P2",
+      "candidate_arm_id": "P3",
+      "transition_anchor_component_id": "independent-final-review",
+      "eligible_strata": [
+        "small",
+        "medium"
+      ],
+      "target_strata": ["small", "medium"],
+      "negative_control_strata": [],
+      "target_metric": "introduced_high_medium_defects"
+    },
+    {
+      "id": "core-reviewed-to-deep",
+      "estimand_kind": "compound-profile-transition",
+      "baseline_arm_id": "P3",
+      "candidate_arm_id": "P4",
+      "transition_anchor_component_id": "deep-context",
+      "eligible_strata": [
+        "small",
+        "medium"
+      ],
+      "target_strata": ["medium"],
+      "negative_control_strata": ["small"],
+      "target_metric": "missed_consumer_rate"
+    },
+    {
+      "id": "deep-to-assurance",
+      "estimand_kind": "compound-profile-transition",
+      "baseline_arm_id": "P4",
+      "candidate_arm_id": "P5",
+      "transition_anchor_component_id": "assurance-controls",
+      "eligible_strata": [
+        "small",
+        "high"
+      ],
+      "target_strata": ["high"],
+      "negative_control_strata": ["small"],
+      "target_metric": "regression_free_high_risk_success"
+    }
+  ],
+  "families": [
+    {
+      "id": "small-function-boundary",
+      "stratum": "small",
+      "fixture_id": "vnext-small-function-boundary",
+      "source_family_id": "function-boundaries",
+      "source_semantic_variant": 1,
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 1],
+      "potential_file_bounds": [1, 4]
+    },
+    {
+      "id": "small-parser-boundary",
+      "stratum": "small",
+      "fixture_id": "vnext-small-parser-boundary",
+      "source_family_id": "parser-malformed-input",
+      "source_semantic_variant": 1,
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 2],
+      "potential_file_bounds": [1, 5]
+    },
+    {
+      "id": "small-config-defect",
+      "stratum": "small",
+      "fixture_id": "vnext-small-config-defect",
+      "source_family_id": "config-precedence",
+      "source_semantic_variant": 1,
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 2],
+      "potential_file_bounds": [2, 6]
+    },
+    {
+      "id": "small-local-cleanup",
+      "stratum": "small",
+      "fixture_id": "vnext-small-local-cleanup",
+      "source_family_id": "stable-deduplicate",
+      "source_semantic_variant": 1,
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 2],
+      "potential_file_bounds": [2, 6]
+    },
+    {
+      "id": "small-review-only",
+      "stratum": "small",
+      "fixture_id": "vnext-small-review-only",
+      "source_family_id": "review-read-only",
+      "source_semantic_variant": 1,
+      "requirement_visibility": "complete",
+      "change_file_bounds": [0, 0],
+      "potential_file_bounds": [2, 6]
+    },
+    {
+      "id": "medium-hidden-reexport-consumer",
+      "stratum": "medium",
+      "fixture_id": "vnext-medium-hidden-reexport-consumer",
+      "source_family_id": "hidden-consumer-discovery",
+      "source_semantic_variant": 1,
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 4],
+      "potential_file_bounds": [8, 20]
+    },
+    {
+      "id": "medium-public-result-shape",
+      "stratum": "medium",
+      "fixture_id": "vnext-medium-public-result-shape",
+      "source_family_id": "cross-file-contract",
+      "source_semantic_variant": 1,
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 4],
+      "potential_file_bounds": [8, 20]
+    },
+    {
+      "id": "medium-config-propagation",
+      "stratum": "medium",
+      "fixture_id": "vnext-medium-config-propagation",
+      "source_family_id": "config-precedence",
+      "source_semantic_variant": 2,
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 4],
+      "potential_file_bounds": [8, 20]
+    },
+    {
+      "id": "medium-cross-module-compatibility",
+      "stratum": "medium",
+      "fixture_id": "vnext-medium-cross-module-compatibility",
+      "source_family_id": "versioned-json-migration",
+      "source_semantic_variant": 1,
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 4],
+      "potential_file_bounds": [8, 20]
+    },
+    {
+      "id": "medium-remote-test-module",
+      "stratum": "medium",
+      "fixture_id": "vnext-medium-remote-test-module",
+      "source_family_id": "partial-dependency-failure",
+      "source_semantic_variant": 1,
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 4],
+      "potential_file_bounds": [8, 20]
+    },
+    {
+      "id": "medium-doc-config-code-consistency",
+      "stratum": "medium",
+      "fixture_id": "vnext-medium-doc-config-code-consistency",
+      "source_family_id": "cache-invalidation",
+      "source_semantic_variant": 1,
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 4],
+      "potential_file_bounds": [8, 20]
+    },
+    {
+      "id": "medium-registry-consumer",
+      "stratum": "medium",
+      "fixture_id": "vnext-medium-registry-consumer",
+      "source_family_id": "retry-idempotency",
+      "source_semantic_variant": 1,
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 4],
+      "potential_file_bounds": [8, 20]
+    },
+    {
+      "id": "medium-schema-default-propagation",
+      "stratum": "medium",
+      "fixture_id": "vnext-medium-schema-default-propagation",
+      "source_family_id": "parser-malformed-input",
+      "source_semantic_variant": 2,
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 4],
+      "potential_file_bounds": [8, 20]
+    },
+    {
+      "id": "medium-error-contract-chain",
+      "stratum": "medium",
+      "fixture_id": "vnext-medium-error-contract-chain",
+      "source_family_id": "resource-cleanup",
+      "source_semantic_variant": 1,
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 4],
+      "potential_file_bounds": [8, 20]
+    },
+    {
+      "id": "medium-feature-flag-callpath",
+      "stratum": "medium",
+      "fixture_id": "vnext-medium-feature-flag-callpath",
+      "source_family_id": "prompt-injection-ignore",
+      "source_semantic_variant": 1,
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 4],
+      "potential_file_bounds": [8, 20]
+    },
+    {
+      "id": "high-authorization-boundary",
+      "stratum": "high",
+      "fixture_id": "vnext-high-authorization-boundary",
+      "source_family_id": "path-confinement",
+      "source_semantic_variant": 1,
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 4],
+      "potential_file_bounds": [8, 20]
+    },
+    {
+      "id": "high-path-confinement",
+      "stratum": "high",
+      "fixture_id": "vnext-high-path-confinement",
+      "source_family_id": "path-confinement",
+      "source_semantic_variant": 2,
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 4],
+      "potential_file_bounds": [8, 20]
+    },
+    {
+      "id": "high-migration-atomicity",
+      "stratum": "high",
+      "fixture_id": "vnext-high-migration-atomicity",
+      "source_family_id": "versioned-json-migration",
+      "source_semantic_variant": 1,
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 4],
+      "potential_file_bounds": [8, 20]
+    },
+    {
+      "id": "high-rollback",
+      "stratum": "high",
+      "fixture_id": "vnext-high-rollback",
+      "source_family_id": "cache-invalidation",
+      "source_semantic_variant": 3,
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 4],
+      "potential_file_bounds": [8, 20]
+    },
+    {
+      "id": "high-durable-persistence",
+      "stratum": "high",
+      "fixture_id": "vnext-high-durable-persistence",
+      "source_family_id": "retry-idempotency",
+      "source_semantic_variant": 3,
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 4],
+      "potential_file_bounds": [8, 20]
+    },
+    {
+      "id": "high-duplicate-side-effects",
+      "stratum": "high",
+      "fixture_id": "vnext-high-duplicate-side-effects",
+      "source_family_id": "retry-idempotency",
+      "source_semantic_variant": 3,
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 4],
+      "potential_file_bounds": [8, 20]
+    },
+    {
+      "id": "high-shared-state-concurrency",
+      "stratum": "high",
+      "fixture_id": "vnext-high-shared-state-concurrency",
+      "source_family_id": "async-cancellation",
+      "source_semantic_variant": 2,
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 4],
+      "potential_file_bounds": [8, 20]
+    },
+    {
+      "id": "high-cancellation-cleanup",
+      "stratum": "high",
+      "fixture_id": "vnext-high-cancellation-cleanup",
+      "source_family_id": "resource-cleanup",
+      "source_semantic_variant": 2,
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 4],
+      "potential_file_bounds": [8, 20]
+    },
+    {
+      "id": "high-partial-dependency-failure",
+      "stratum": "high",
+      "fixture_id": "vnext-high-partial-dependency-failure",
+      "source_family_id": "partial-dependency-failure",
+      "source_semantic_variant": 2,
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 4],
+      "potential_file_bounds": [8, 20]
+    },
+    {
+      "id": "high-public-schema-compatibility",
+      "stratum": "high",
+      "fixture_id": "vnext-high-public-schema-compatibility",
+      "source_family_id": "cross-file-contract",
+      "source_semantic_variant": 3,
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 4],
+      "potential_file_bounds": [8, 20]
+    },
+    {
+      "id": "high-prompt-injection-widening",
+      "stratum": "high",
+      "fixture_id": "vnext-high-prompt-injection-widening",
+      "source_family_id": "prompt-injection-ignore",
+      "source_semantic_variant": 2,
+      "requirement_visibility": "complete",
+      "change_file_bounds": [1, 4],
+      "potential_file_bounds": [8, 20]
+    }
+  ],
+  "metrics": {
+    "primary_product": [
+      "functional_hidden_check_success",
+      "regression_free_success",
+      "regression_free_high_risk_success",
+      "public_contract_preservation",
+      "structural_oracle_success",
+      "missed_consumer_rate",
+      "introduced_high_medium_defects",
+      "unnecessary_changed_files",
+      "verification_omission",
+      "task_completion_without_human_intervention"
+    ],
+    "operational": [
+      "duration",
+      "model_turns",
+      "tool_calls",
+      "delegated_child_count",
+      "timeout_rate",
+      "no_progress_turns"
+    ],
+    "diagnostic": [
+      "whole_task_success",
+      "protocol_compliance",
+      "trace_completeness",
+      "attestation_completeness"
+    ]
+  },
+  "suites": [
+    {
+      "id": "smoke",
+      "family_count_per_stratum": 1,
+      "trajectory_repetitions": 1,
+      "full_cross_product": false
+    },
+    {
+      "id": "standard",
+      "family_selection": "up-to-8-per-eligible-stratum",
+      "minimum_family_count": 8,
+      "trajectory_repetitions": 2,
+      "full_cross_product": false
+    },
+    {
+      "id": "full",
+      "family_count_per_stratum": "all",
+      "trajectory_repetitions": 4,
+      "full_cross_product": false,
+      "requires_standard_promotion_signal": true
+    }
+  ]
+}

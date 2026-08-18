@@ -1,10 +1,22 @@
 # Release Process
 
-The current development target is unreleased `0.3.0`; the latest tagged
-release remains `v0.2.0`. Do not describe the feedback package exports as a
-tagged capability until a `v0.3.0` release completes these gates.
+The current development target is unreleased `0.4.0`; the latest tagged
+release remains `v0.2.0`. v0.3 reports are historical research evidence, not a
+promoted default claim.
 
-Synthetic ablation evidence is product-value research, not release acceptance.
+Before release, run `npm run verify:core`, `verify:deep`,
+`verify:assurance:model-free`, `verify:profiles`, `verify:adoption`,
+`verify:lab:model-free`, the vNext validate/self-test commands, and the aggregate
+`npm run verify`. Also run `npm run probe:runtime:v0.4` and
+`npm run probe:runtime:vnext` with installed OpenCode;
+it verifies source/materialized core tool isolation, the exact four-tool
+assurance catalog, effective role permissions, the P0-P5 tool surfaces, actual
+P4/P5 context calls, P4 quality-state absence, and exactly one P5 receipt per
+context call. Model-backed vNext work is a separate promotion gate and is
+never required for deterministic CI; missing execution evidence leaves the
+affected profile transition unpromoted and experimental.
+
+Synthetic profile-transition evidence is product-value research, not release acceptance.
 Its profile surfaces may intentionally differ, and its reports must not be
 passed to `npm run assess:candidate`. The existing compatible-surface
 release-regression contract and first-party evidence chain remain
@@ -21,7 +33,7 @@ proves only the benchmark machinery, not that a harness profile is better.
    ```
 
    The default gate remains model-free and includes synthetic schemas,
-   deterministic rendering, hidden-data isolation, fake-adapter lifecycle,
+   deterministic rendering, hidden-data isolation, runner-owned fake-attempt lifecycle,
    statistics, report history, bundle composition, CLI, and CI-boundary
    checks. The focused model-free commands are:
 

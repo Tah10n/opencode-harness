@@ -3,6 +3,34 @@
   "baseline_commit": "0a1d56605b9b8923ac27c3b3b405b38177ca7741",
   "changes": [
     {
+      "path": "agents/assurance-architect.md",
+      "aspects": [
+        "content"
+      ],
+      "rationale": "Add the read-only facade-only architecture challenger for explicit v0.4 assurance sessions."
+    },
+    {
+      "path": "agents/assurance-reviewer.md",
+      "aspects": [
+        "content"
+      ],
+      "rationale": "Add the read-only facade-only plan and final-change reviewer for explicit v0.4 assurance sessions."
+    },
+    {
+      "path": "agents/assurance-verifier.md",
+      "aspects": [
+        "content"
+      ],
+      "rationale": "Add the trusted-check facade-only verifier for explicit v0.4 assurance sessions."
+    },
+    {
+      "path": "agents/assurance.md",
+      "aspects": [
+        "content"
+      ],
+      "rationale": "Add the experimental opt-in v0.4 assurance primary with exactly four facade operations and fail-closed completion."
+    },
+    {
       "path": "agents/architect.md",
       "aspects": [
         "content",
@@ -10,6 +38,27 @@
         "permission_surface"
       ],
       "rationale": "Challenge receipt-backed whole-system coverage, impact-graph linkage, critical paths, exclusions, and explicit write ownership without mutation authority."
+    },
+    {
+      "path": "agents/core-reviewer.md",
+      "aspects": [
+        "content"
+      ],
+      "rationale": "Add the bounded read-only independent reviewer used only after integrated core or deep changes."
+    },
+    {
+      "path": "agents/core.md",
+      "aspects": [
+        "content"
+      ],
+      "rationale": "Add the compact v0.4 production default with a direct single-agent loop and no quality or context lifecycle."
+    },
+    {
+      "path": "agents/deep.md",
+      "aspects": [
+        "content"
+      ],
+      "rationale": "Add the optional v0.4 bounded-context profile with read-only exploration, one integrator, and no assurance lifecycle."
     },
     {
       "path": "agents/diagnose.md",

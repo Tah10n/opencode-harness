@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opencode-harness.invalid/schemas/vnext-execution-plan-v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "plan_kind",
+    "suite_id",
+    "estimand_id",
+    "estimand_kind",
+    "baseline_arm_id",
+    "candidate_arm_id",
+    "transition_anchor_component_id",
+    "eligible_strata",
+    "target_strata",
+    "negative_control_strata",
+    "family_ids",
+    "metric_ids",
+    "arms",
+    "surface_delta",
+    "pair_schedule",
+    "bindings",
+    "standard_gate",
+    "plan_fingerprint"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "plan_kind": { "const": "vnext-compound-profile-transition-plan" },
+    "suite_id": { "enum": ["smoke", "standard", "full"] },
+    "estimand_id": { "type": "string", "minLength": 1 },
+    "estimand_kind": { "const": "compound-profile-transition" },
+    "baseline_arm_id": { "pattern": "^P[0-5]$" },
+    "candidate_arm_id": { "pattern": "^P[0-5]$" },
+    "transition_anchor_component_id": { "type": "string", "minLength": 1 },
+    "eligible_strata": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "enum": ["small", "medium", "high"] }
+    },
+    "target_strata": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": { "enum": ["small", "medium", "high"] }
+    },
+    "negative_control_strata": {
+      "type": "array", "uniqueItems": true,
+      "items": { "const": "small" }
+    },
+    "family_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "metric_ids": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["product", "operational", "diagnostic"],
+      "properties": {
+        "product": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+        "operational": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+        "diagnostic": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "arms": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["baseline", "candidate"],
+      "properties": {
+        "baseline": { "type": "object" },
+        "candidate": { "type": "object" }
+      }
+    },
+    "surface_delta": {
+      "type": "object",
+      "required": ["transition_anchor_component_id", "estimand_kind", "changed_leaf_paths", "baseline_surface_fingerprint", "candidate_surface_fingerprint", "delta_contract_fingerprint", "delta_fingerprint"]
+    },
+    "pair_schedule": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["pair_id", "family_id", "stratum", "repetition", "instance_fingerprint", "public_fixture_fingerprint", "hidden_fixture_fingerprint", "topology_fingerprint", "required_consumer_ids", "order"]
+      }
+    },
+    "bindings": { "type": "object", "minProperties": 7 },
+    "standard_gate": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object", "additionalProperties": false,
+          "required": ["standard_run_fingerprint", "standard_comparison_fingerprint", "standard_promotion_decision_fingerprint"],
+          "properties": {
+            "standard_run_fingerprint": { "pattern": "^sha256:[0-9a-f]{64}$" },
+            "standard_comparison_fingerprint": { "pattern": "^sha256:[0-9a-f]{64}$" },
+            "standard_promotion_decision_fingerprint": { "pattern": "^sha256:[0-9a-f]{64}$" }
+          }
+        }
+      ]
+    },
+    "plan_fingerprint": { "pattern": "^sha256:[0-9a-f]{64}$" }
+  },
+  "allOf": [{
+    "if": { "properties": { "suite_id": { "const": "full" } } },
+    "then": { "properties": { "standard_gate": { "type": "object" } } },
+    "else": { "properties": { "standard_gate": { "type": "null" } } }
+  }]
+}

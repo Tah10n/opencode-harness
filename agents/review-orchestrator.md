@@ -2,7 +2,7 @@
 description: Strict read-only primary orchestrator for broad code review and harness release review
 mode: primary
 steps: 260
-color: blue
+color: info
 permission:
   edit: deny
   question: allow

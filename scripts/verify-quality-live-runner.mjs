@@ -739,7 +739,9 @@ export async function createDeterministicQualityRun({
 } = {}) {
   assert(["baseline", "candidate"].includes(profileRole), "profileRole must be baseline or candidate");
   assert(["managed", "forged-result"].includes(oracleMode), "oracleMode must be managed or forged-result");
-  const workspaceRoot = fs.mkdtempSync(path.join(os.tmpdir(), `opencode-quality-live-runner-${profileRole}-`));
+  const workspaceRoot = fs.realpathSync.native(
+    fs.mkdtempSync(path.join(os.tmpdir(), `opencode-quality-live-runner-${profileRole}-`)),
+  );
   const scenario = loadScenarioCorpus({ root }).scenarios
     .find((entry) => entry.id === "quality-small-local-control");
   assert(scenario, "quality-small-local-control scenario missing");
@@ -1001,7 +1003,9 @@ export async function createDeterministicHighQualityRun({
 } = {}) {
   assert(["baseline", "candidate"].includes(profileRole), "profileRole must be baseline or candidate");
   assert(["high", "critical"].includes(riskClass), "riskClass must be high or critical");
-  const workspaceRoot = fs.mkdtempSync(path.join(os.tmpdir(), `opencode-quality-live-runner-${riskClass}-${profileRole}-`));
+  const workspaceRoot = fs.realpathSync.native(
+    fs.mkdtempSync(path.join(os.tmpdir(), `opencode-quality-live-runner-${riskClass}-${profileRole}-`)),
+  );
   const canonicalScenario = loadScenarioCorpus({ root }).scenarios
     .find((entry) => entry.id === "quality-public-api-compatibility");
   assert(canonicalScenario, "quality-public-api-compatibility scenario missing");
@@ -1792,7 +1796,9 @@ async function main() {
     } finally {
       legacyRun.cleanup();
     }
-    const longContextRoot = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-live-range-observer-"));
+    const longContextRoot = fs.realpathSync.native(
+      fs.mkdtempSync(path.join(os.tmpdir(), "opencode-live-range-observer-")),
+    );
     try {
       const fixture = createLargeContextFileFixture(longContextRoot);
       const observedCalls = [];

@@ -7,6 +7,8 @@ import { spawnSync } from "node:child_process";
 
 import {
   NORMAL_SESSION_BRIDGE_PRODUCER,
+  MAX_NATIVE_TASK_PROMPT_BYTES,
+  NORMAL_SESSION_QUALITY_TOOL_IDS,
   bindArchitectureEvaluatorImplementationFingerprint,
   createDefaultNormalSessionCheckCatalog,
   createNormalSessionQualityBridge,
@@ -19,8 +21,14 @@ import {
   inspectNormalSessionQualityState,
   inspectNormalSessionRegistration,
   normalSessionQualityStatePath,
+  renderRunnerAssignmentPrompt,
 } from "../lib/quality/normal-session-bridge.mjs";
 import { createNormalSessionQualityPlugin } from "../lib/quality/normal-session-plugin.mjs";
+import {
+  createAssuranceFacadePlugin,
+  createAssuranceFacadeToolSurface,
+  rewriteRoleAssignmentForFacade,
+} from "../lib/quality/assurance-facade.mjs";
 import { PREMORTEM_CATEGORIES } from "../lib/quality/constants.mjs";
 import { createEngineeringCheckCatalog } from "../lib/quality/gate.mjs";
 import {
@@ -37,10 +45,16 @@ import {
   normalizeNormalSessionOwnedPath,
   observeContentBoundWorkspace,
 } from "../lib/quality/normal-session-workspace.mjs";
+import { QUALITY_LIMITS } from "../lib/quality/constants.mjs";
 import { ContractError, fingerprint } from "../lib/quality/validation.mjs";
 import { createContextReceiptStore } from "../lib/quality/context-receipt-store.mjs";
+import {
+  MAX_CHALLENGE_SNAPSHOT_BYTES,
+  createPlanChallengeSubject,
+  validatePlanChallengeSubject,
+} from "../lib/quality/plan-challenge-subject.mjs";
 
-const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-harness-normal-quality-"));
+const tempRoot = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), "opencode-harness-normal-quality-")));
 fs.mkdirSync(path.join(tempRoot, "src"));
 fs.writeFileSync(path.join(tempRoot, "src", "file.mjs"), "export const value = 1;\n", "utf8");
 fs.writeFileSync(path.join(tempRoot, "src", "second.mjs"), "export const value = 1;\n", "utf8");
@@ -628,12 +642,98 @@ assertContractError(() => createNormalSessionQualityBridge({
   evaluateArchitecture: sameSourceEvaluatorA,
 }), "QUALITY_POST_ARCHITECTURE_IDENTITY");
 const bridge = createNormalSessionQualityBridge(options);
+const boundaryEnvelope = {
+  schema_version: 1,
+  target_agent: "reviewer",
+  assignment: { tool_id: "quality_assurance_advance", instruction: "" },
+};
+assert.equal(
+  MAX_NATIVE_TASK_PROMPT_BYTES,
+  (2 * QUALITY_LIMITS.recordBytes) + MAX_CHALLENGE_SNAPSHOT_BYTES + (32 * 1024),
+  "the native task prompt cap must reserve two full contract-bound records plus the maximum challenge snapshot",
+);
+const boundaryBase = renderRunnerAssignmentPrompt(boundaryEnvelope);
+const boundaryFillBytes = MAX_NATIVE_TASK_PROMPT_BYTES - Buffer.byteLength(boundaryBase, "utf8");
+const exactBoundaryPrompt = renderRunnerAssignmentPrompt({
+  ...boundaryEnvelope,
+  assignment: { ...boundaryEnvelope.assignment, instruction: "x".repeat(boundaryFillBytes) },
+});
+assert.equal(Buffer.byteLength(exactBoundaryPrompt, "utf8"), MAX_NATIVE_TASK_PROMPT_BYTES,
+  "the exact native assignment prompt boundary must be accepted");
+assert.throws(() => renderRunnerAssignmentPrompt({
+  ...boundaryEnvelope,
+  assignment: { ...boundaryEnvelope.assignment, instruction: "x".repeat(boundaryFillBytes + 1) },
+}), (error) => error instanceof ContractError,
+"a runner assignment one byte above the native prompt boundary must fail closed");
+const maximumSnapshotBaseBytes = Buffer.byteLength(JSON.stringify({ padding: "" }), "utf8");
+const maximumChallengeSnapshot = { padding: "x".repeat(MAX_CHALLENGE_SNAPSHOT_BYTES - maximumSnapshotBaseBytes) };
+const challengeFingerprint = fingerprint({ fixture: "maximum-challenge-subject" });
+const maximumSubjectSource = {
+  schema_version: 3,
+  dossier_analysis_fingerprint: challengeFingerprint,
+  context_strategy_fingerprint: challengeFingerprint,
+  context_report_analysis_fingerprint: challengeFingerprint,
+  context_decision_fingerprint: challengeFingerprint,
+  context_task_profile_evidence_fingerprint: challengeFingerprint,
+  challenge_snapshot: maximumChallengeSnapshot,
+  challenge_snapshot_fingerprint: fingerprint(maximumChallengeSnapshot),
+};
+const maximumSubject = {
+  ...maximumSubjectSource,
+  fingerprint: fingerprint(maximumSubjectSource),
+};
+validatePlanChallengeSubject(maximumSubject);
+const completeChallengeContract = {
+  user_visible_goal: "Verify the bounded facade assignment.",
+  requested_behavior: "Preserve the complete behavior contract.",
+  positive_behavior: ["The requested behavior succeeds."],
+  negative_behavior: ["Unrequested behavior remains absent."],
+  boundary_behavior: ["Boundary inputs remain bounded."],
+  error_behavior: ["Invalid inputs fail closed."],
+  ordering_and_side_effects: ["Validation precedes durable side effects."],
+  preserved_behavior: ["Existing public behavior remains unchanged."],
+  compatibility_requirements: ["Serialized shapes remain compatible."],
+  security_requirements: ["Sensitive values remain undisclosed."],
+  completion_requirements: ["Every required receipt is present."],
+  edge_cases: [{ condition: "maximum snapshot", expected_behavior: "assignment remains bounded" }],
+  counterexamples: [{ statement: "oversized snapshot", expected_behavior: "reject" }],
+  change_policy: "Require the smallest cohesive change.",
+};
+const maximumFacadePrompt = {
+  args: {
+    prompt: renderRunnerAssignmentPrompt({
+      schema_version: 1,
+      target_agent: "architect",
+      assignment: {
+        tool_id: "quality_architecture_evaluate",
+        request: { expected_revision: 1, blockers: [] },
+        challenge_subject: maximumSubject,
+        challenge_contract: completeChallengeContract,
+        instruction: "Call quality_architecture_evaluate once.",
+      },
+    }),
+  },
+};
+rewriteRoleAssignmentForFacade({ tool: "task" }, maximumFacadePrompt);
+assert(Buffer.byteLength(maximumFacadePrompt.args.prompt, "utf8") <= MAX_NATIVE_TASK_PROMPT_BYTES,
+  "a maximum-valid challenge snapshot and complete contract must fit after facade rewrite");
+const oversizedSnapshot = { padding: `${maximumChallengeSnapshot.padding}x` };
+const oversizedSubjectSource = {
+  ...maximumSubjectSource,
+  challenge_snapshot: oversizedSnapshot,
+  challenge_snapshot_fingerprint: fingerprint(oversizedSnapshot),
+};
+assert.throws(() => validatePlanChallengeSubject({
+  ...oversizedSubjectSource,
+  fingerprint: fingerprint(oversizedSubjectSource),
+}), (error) => error instanceof ContractError,
+"a challenge snapshot one byte above the declared maximum must fail closed");
 const orchestrator = { sessionID: "session/root", agent: "orchestrator" };
 const architect = { ...orchestrator, agent: "architect" };
 const reviewer = { ...orchestrator, agent: "reviewer" };
 const verifier = { ...orchestrator, agent: "verifier" };
 
-function startRequestFromDossier(request) {
+function startRequestFromDossier(request, { seededHigh = false } = {}) {
   const common = {
     risk_class: request.risk_class,
     task_type: request.task_type,
@@ -642,7 +742,7 @@ function startRequestFromDossier(request) {
     required_check_ids: request.verification_boundary.integration_check_ids,
     classification_rationale: "deterministic bridge contract fixture",
   };
-  if (request.risk_class !== "standard-lite") return common;
+  if (request.risk_class !== "standard-lite" && !seededHigh) return common;
   return {
     ...common,
     behavior_expectation: request.behavior_contract.requested_behavior,
@@ -659,6 +759,12 @@ function startRequestFromDossier(request) {
       unresolved_unknowns: false,
     },
   };
+}
+
+function facadeStartRequestFromDossier(request, options) {
+  const facadeRequest = startRequestFromDossier(request, options);
+  delete facadeRequest.required_check_ids;
+  return facadeRequest;
 }
 
 function executeNormalSessionQualityTool(targetBridge, toolId, args, context) {
@@ -1009,7 +1115,7 @@ function contextReadOutput(relativePath) {
   });
 }
 
-function prepareHighContext(targetBridge, context, { includeExistingActiveReceipts = false, finalize = true } = {}) {
+function collectHighContextEvidence(targetBridge, context, { includeExistingActiveReceipts = false } = {}) {
   let state = inspectNormalSessionQualityState(targetBridge, context.sessionID);
   assert(["high", "critical"].includes(state.dossier.risk_class));
   const graph = state.dossier.impact_graph;
@@ -1184,6 +1290,11 @@ function prepareHighContext(targetBridge, context, { includeExistingActiveReceip
       unresolved_area: null,
     },
   };
+  return { state, content };
+}
+
+function prepareHighContext(targetBridge, context, { includeExistingActiveReceipts = false, finalize = true } = {}) {
+  const { state, content } = collectHighContextEvidence(targetBridge, context, { includeExistingActiveReceipts });
   const updated = executeRawNormalSessionQualityTool(targetBridge, "quality_context_report_update", {
     request: JSON.stringify({ expected_revision: state.context_report.revision, patch: content }),
   }, context);
@@ -1703,8 +1814,14 @@ assert.deepEqual(
         user_visible_goal: authorizedEditState.dossier.user_visible_goal,
         requested_behavior: authorizedEditState.dossier.behavior_contract.requested_behavior,
         positive_behavior: [...authorizedEditState.dossier.behavior_contract.positive_behavior],
+        negative_behavior: [...authorizedEditState.dossier.behavior_contract.negative_behavior],
+        boundary_behavior: [...authorizedEditState.dossier.behavior_contract.boundary_behavior],
+        error_behavior: [...authorizedEditState.dossier.behavior_contract.error_behavior],
+        ordering_and_side_effects: [...authorizedEditState.dossier.behavior_contract.ordering_and_side_effects],
         preserved_behavior: [...authorizedEditState.dossier.behavior_contract.preserved_behavior],
         compatibility_requirements: [...authorizedEditState.dossier.behavior_contract.compatibility_requirements],
+        security_requirements: [...authorizedEditState.dossier.behavior_contract.security_requirements],
+        completion_requirements: [...authorizedEditState.dossier.behavior_contract.completion_requirements],
         edge_cases: authorizedEditState.dossier.edge_cases.map((entry) => ({
           condition: entry.condition,
           expected_behavior: entry.expected_behavior,
@@ -3310,8 +3427,14 @@ assertContractError(
 );
 assert(inspectNormalSessionQualityState(bridge, attributionContext.sessionID).incomplete_reasons.includes("post_mutation_ownership_mismatch"), "unowned changes must persist a fail-closed reason");
 
+const fakeSchema = () => {
+  const schema = {};
+  schema.describe = () => schema;
+  schema.optional = () => schema;
+  return schema;
+};
 const fakeToolFactory = (definition) => definition;
-fakeToolFactory.schema = { string: () => ({ describe: () => ({ type: "string" }) }) };
+fakeToolFactory.schema = { string: fakeSchema, enum: fakeSchema, array: fakeSchema };
 const plugin = createNormalSessionQualityPlugin({ toolFactory: fakeToolFactory, workspaceRoot: tempRoot, bridgeOptions: options });
 assert.deepEqual(Object.keys(plugin.tool).sort(), [
   "quality_action_authorize",
@@ -3475,10 +3598,701 @@ assert.equal(
 await plugin.tool.quality_context_reconcile.execute({
   request: JSON.stringify({ evidence_mode: "reviewer_grounded" }),
 }, continuationContext);
-await plugin.tool.quality_session_finalize.execute({
-  request: JSON.stringify({ expected_revision: 1 }),
-}, continuationContext);
-currentPathVersions.clear();
+  await plugin.tool.quality_session_finalize.execute({
+    request: JSON.stringify({ expected_revision: 1 }),
+  }, continuationContext);
+  currentPathVersions.clear();
+
+  const runnerFieldBridge = createNormalSessionQualityBridge(options);
+  const runnerFieldTools = createAssuranceFacadeToolSurface({
+    toolFactory: fakeToolFactory,
+    bridge: runnerFieldBridge,
+  });
+  const runnerFieldProbeContext = { sessionID: "session/facade-runner-field-probe", agent: "assurance" };
+  handleNormalSessionChatMessage(runnerFieldBridge, runnerFieldProbeContext);
+  const runnerSelectedCheckIds = executeRawNormalSessionQualityTool(runnerFieldBridge, "quality_dossier_inspect", {
+    request: "{}",
+  }, runnerFieldProbeContext).available_check_ids;
+  for (const [label, suppliedCheckIds] of [
+    ["partial", runnerSelectedCheckIds.slice(0, 1)],
+    ["empty", []],
+    ["full", runnerSelectedCheckIds],
+  ]) {
+    const context = { sessionID: `session/facade-runner-field-${label}`, agent: "assurance" };
+    handleNormalSessionChatMessage(runnerFieldBridge, context);
+    await assert.rejects(
+      runnerFieldTools.quality_assurance_start.execute({
+        request: JSON.stringify({
+          ...facadeStartRequestFromDossier(dossierRequest()),
+          required_check_ids: suppliedCheckIds,
+        }),
+      }, context),
+      (error) => error?.code === "QUALITY_FACADE_RUNNER_FIELD",
+      `facade must reject ${label} caller-supplied runner check IDs`,
+    );
+  }
+  const runnerFieldValidContext = { sessionID: "session/facade-runner-field-valid", agent: "assurance" };
+  handleNormalSessionChatMessage(runnerFieldBridge, runnerFieldValidContext);
+  await runnerFieldTools.quality_assurance_start.execute({
+    request: JSON.stringify(facadeStartRequestFromDossier(dossierRequest())),
+  }, runnerFieldValidContext);
+  assert.deepEqual(
+    inspectNormalSessionRegistration(runnerFieldBridge, runnerFieldValidContext.sessionID).required_check_ids,
+    runnerSelectedCheckIds,
+    "facade-started dossier must retain the exact runner-selected check set",
+  );
+
+  const facadePlugin = createAssuranceFacadePlugin({
+    toolFactory: fakeToolFactory,
+    workspaceRoot: tempRoot,
+    bridgeOptions: options,
+  });
+  const facadeCalls = [];
+  const callFacade = async (toolId, args, context) => {
+    assert.ok(Object.hasOwn(facadePlugin.tool, toolId), `facade must expose ${toolId}`);
+    assert.equal(NORMAL_SESSION_QUALITY_TOOL_IDS.includes(toolId), false,
+      "facade-only lifecycle must never invoke a legacy quality tool directly");
+    facadeCalls.push(toolId);
+    return JSON.parse(await facadePlugin.tool[toolId].execute(args, context));
+  };
+  const facadeContext = { sessionID: "session/facade-standard-lite-e2e", agent: "assurance" };
+  currentPathVersions.clear();
+  await facadePlugin["chat.message"](facadeContext);
+  const facadeStart = await callFacade("quality_assurance_start", {
+    request: JSON.stringify(facadeStartRequestFromDossier(dossierRequest())),
+  }, facadeContext);
+  assert.equal(facadeStart.lifecycle, "dossier_draft");
+  assert.deepEqual(facadeStart.next_actions.map((entry) => entry.facade_operation), ["context_read"]);
+  const facadeReadCall = {
+    tool: "context_read",
+    sessionID: facadeContext.sessionID,
+    callID: "call-facade-standard-context",
+  };
+  await facadePlugin["tool.execute.before"](facadeReadCall, {
+    args: { path: "src/file.mjs", startLine: 1, maxLines: 64, maxBytes: 4096 },
+  });
+  await facadePlugin["tool.execute.after"](facadeReadCall, {
+    title: "facade standard context",
+    output: contextReadOutput("src/file.mjs"),
+    metadata: {},
+  });
+  const facadeGate = await callFacade("quality_assurance_advance", {}, facadeContext);
+  assert.equal(facadeGate.gate_status, "passed");
+  assert.equal(facadeGate.next_actions[0].facade_operation, "quality_assurance_authorize");
+  await assert.rejects(
+    () => facadePlugin.tool.quality_assurance_advance.execute({
+      request: JSON.stringify({ expected_revision: 1 }),
+    }, facadeContext),
+    (error) => error?.code === "QUALITY_FACADE_NEXT_ACTION" || error?.code === "QUALITY_FACADE_RUNNER_FIELD",
+    "facade must not accept a caller-supplied runner revision",
+  );
+  await callFacade("quality_assurance_authorize", {
+    kind: "edit",
+    paths: ["src/file.mjs"],
+  }, facadeContext);
+  const facadeEditCall = {
+    tool: "edit",
+    sessionID: facadeContext.sessionID,
+    callID: "call-facade-standard-edit",
+  };
+  await facadePlugin["tool.execute.before"](facadeEditCall, nativeEdit());
+  currentPathVersions.set("src/file.mjs", 1);
+  await facadePlugin["tool.execute.after"](facadeEditCall, { title: "facade edit", output: "done", metadata: {} });
+
+  const facadeVerifierCall = {
+    tool: "task",
+    sessionID: facadeContext.sessionID,
+    callID: "call-facade-verifier",
+  };
+  const facadeVerifierArgs = nativeTask("verifier");
+  await facadePlugin["tool.execute.before"](facadeVerifierCall, facadeVerifierArgs);
+  const facadeVerifierEnvelope = runnerAssignmentEnvelope(facadeVerifierArgs);
+  assert.equal(facadeVerifierEnvelope.assignment.tool_id, "quality_assurance_advance");
+  assert.deepEqual(facadeVerifierEnvelope.assignment.request, {
+    transition: "verification-record",
+    request: "{}",
+  });
+  const facadeVerifierSessionID = `${facadeContext.sessionID}/verifier`;
+  await facadePlugin.event({ event: {
+    type: "session.created",
+    properties: { info: { id: facadeVerifierSessionID, parentID: facadeContext.sessionID } },
+  } });
+  await callFacade("quality_assurance_advance", facadeVerifierEnvelope.assignment.request, {
+    sessionID: facadeVerifierSessionID,
+    agent: "verifier",
+  });
+  await facadePlugin["tool.execute.after"](facadeVerifierCall, { title: "facade verifier", output: "verified", metadata: {} });
+
+  const facadeReviewerCall = {
+    tool: "task",
+    sessionID: facadeContext.sessionID,
+    callID: "call-facade-reviewer",
+  };
+  const facadeReviewerArgs = nativeTask("reviewer");
+  await facadePlugin["tool.execute.before"](facadeReviewerCall, facadeReviewerArgs);
+  const facadeReviewerEnvelope = runnerAssignmentEnvelope(facadeReviewerArgs);
+  assert.equal(facadeReviewerEnvelope.assignment.tool_id, "quality_assurance_advance");
+  assert.equal(facadeReviewerEnvelope.assignment.request.transition, "context-reviewer-record");
+  const facadeReviewerSessionID = `${facadeContext.sessionID}/reviewer`;
+  await facadePlugin.event({ event: {
+    type: "session.created",
+    properties: { info: { id: facadeReviewerSessionID, parentID: facadeContext.sessionID } },
+  } });
+  const facadeReviewerReadCall = {
+    tool: "context_read",
+    sessionID: facadeReviewerSessionID,
+    callID: "call-facade-reviewer-read",
+  };
+  await facadePlugin["tool.execute.before"](facadeReviewerReadCall, {
+    args: { path: "src/file.mjs", startLine: 1, maxLines: 64, maxBytes: 4096 },
+  });
+  await facadePlugin["tool.execute.after"](facadeReviewerReadCall, {
+    title: "facade reviewer context",
+    output: contextReadOutput("src/file.mjs"),
+    metadata: {},
+  });
+  const facadePassedReview = passedReviewerClauseRequest({ assignment: facadeReviewerEnvelope.assignment });
+  await callFacade("quality_assurance_advance", {
+    transition: "context-reviewer-record",
+    request: JSON.stringify(facadePassedReview),
+  }, { sessionID: facadeReviewerSessionID, agent: "reviewer" });
+  await facadePlugin["tool.execute.after"](facadeReviewerCall, { title: "facade reviewer", output: "reviewed", metadata: {} });
+  const facadeReconciled = await callFacade("quality_assurance_advance", {}, facadeContext);
+  assert.equal(facadeReconciled.lifecycle, "verified");
+  const facadeAttested = await callFacade("quality_assurance_advance", {}, facadeContext);
+  assert.equal(facadeAttested.lifecycle, "attested");
+  assert.deepEqual([...new Set(facadeCalls)].sort(), [
+    "quality_assurance_advance",
+    "quality_assurance_authorize",
+    "quality_assurance_start",
+  ]);
+  currentPathVersions.clear();
+
+  const durableControlSnapshot = () => {
+    const controlRoot = path.join(tempRoot, ".oc_harness");
+    if (!fs.existsSync(controlRoot)) return fingerprint({ absent: true });
+    const entries = [];
+    const visit = (directory, prefix = "") => {
+      for (const entry of fs.readdirSync(directory, { withFileTypes: true })
+        .sort((left, right) => left.name.localeCompare(right.name))) {
+        const relative = prefix === "" ? entry.name : `${prefix}/${entry.name}`;
+        const target = path.join(directory, entry.name);
+        if (entry.isDirectory()) {
+          entries.push({ path: relative, kind: "directory" });
+          visit(target, relative);
+        } else if (entry.isFile()) {
+          entries.push({ path: relative, kind: "file", content: fs.readFileSync(target, "utf8") });
+        }
+      }
+    };
+    visit(controlRoot);
+    return fingerprint(entries);
+  };
+  const malformedFacadeBridge = createNormalSessionQualityBridge({ ...options, workspaceRoot: tempRoot });
+  const malformedFacadeTools = createAssuranceFacadeToolSurface({
+    toolFactory: fakeToolFactory,
+    bridge: malformedFacadeBridge,
+  });
+  const malformedBefore = durableControlSnapshot();
+  await assert.rejects(
+    malformedFacadeTools.quality_assurance_start.execute({
+      request: JSON.stringify({
+        ...facadeStartRequestFromDossier(fullDossierRequest(), { seededHigh: true }),
+        dossier: { behavior_contract: null },
+      }),
+    }, { sessionID: "session/facade-malformed-start", agent: "assurance" }),
+    (error) => error instanceof ContractError && error.code === "QUALITY_FACADE_REQUEST",
+  );
+  assert.equal(durableControlSnapshot(), malformedBefore,
+    "malformed nested facade dossier must not mutate durable registration or owner state");
+
+  for (const failureStage of ["after_registry_classification", "after_owner_state_persisted"]) {
+    let armed = true;
+    const recoveryBridge = createNormalSessionQualityBridge({
+      ...options,
+      workspaceRoot: tempRoot,
+      failureInjector(stage) {
+        if (armed && stage === failureStage) {
+          armed = false;
+          throw new Error(`injected:${stage}`);
+        }
+      },
+    });
+    const recoveryTools = createAssuranceFacadeToolSurface({
+      toolFactory: fakeToolFactory,
+      bridge: recoveryBridge,
+    });
+    const recoveryContext = {
+      sessionID: `session/facade-recovery-${failureStage}`,
+      agent: "assurance",
+    };
+    const recoveryRequest = {
+      request: JSON.stringify(facadeStartRequestFromDossier(fullDossierRequest(), { seededHigh: true })),
+    };
+    await assert.rejects(
+      recoveryTools.quality_assurance_start.execute(recoveryRequest, recoveryContext),
+      new RegExp(`injected:${failureStage}`, "u"),
+    );
+    const recovered = JSON.parse(await recoveryTools.quality_assurance_start.execute(
+      recoveryRequest,
+      recoveryContext,
+    ));
+    const replayed = JSON.parse(await recoveryTools.quality_assurance_start.execute(
+      recoveryRequest,
+      recoveryContext,
+    ));
+    assert.deepEqual(replayed, recovered,
+      `${failureStage} exact replay must recover one idempotent facade start receipt`);
+    const recoveredState = inspectNormalSessionQualityState(recoveryBridge, recoveryContext.sessionID);
+    assert.equal(recoveredState.dossier.revision, 2,
+      "runner-seeded provisional high graph is the only dossier revision after recovery");
+    assert.equal(recoveredState.context_report.revision, 1,
+      "recovery must preserve one matching provisional context report");
+  }
+
+  const phaseSplitProjectCatalog = {
+    schema_version: 2,
+    catalog_id: "normal-session-facade-phase-split-v1",
+    standard_lite_policy: options.standardLitePolicy,
+    checks: [
+      {
+        check_id: "integration-check",
+        executable_id: "node",
+        argv: ["src/file.mjs"],
+        cwd: ".",
+        phases: ["integration"],
+        purpose: "verification",
+        generated_output_paths: [],
+        timeout_ms: 120000,
+        max_output_chars: 1048576,
+      },
+      {
+        check_id: "pre-check",
+        executable_id: "node",
+        argv: ["src/file.mjs"],
+        cwd: ".",
+        phases: ["preimplementation"],
+        purpose: "verification",
+        generated_output_paths: [],
+        timeout_ms: 120000,
+        max_output_chars: 1048576,
+      },
+    ],
+  };
+  const phaseSplitBridge = createNormalSessionQualityBridge({
+    ...options,
+    checkCatalog: createEngineeringCheckCatalog(projectCatalogToEngineeringCatalog(
+      phaseSplitProjectCatalog,
+      NORMAL_SESSION_BRIDGE_PRODUCER,
+    )),
+    projectCatalog: phaseSplitProjectCatalog,
+    failureInjector(stage) {
+      if (stage === "after_owner_state_persisted") {
+        throw new Error("injected:phase-split-after-owner-state-persisted");
+      }
+    },
+  });
+  const phaseSplitTools = createAssuranceFacadeToolSurface({
+    toolFactory: fakeToolFactory,
+    bridge: phaseSplitBridge,
+  });
+  const phaseSplitContext = {
+    sessionID: "session/facade-recovery-phase-split",
+    agent: "assurance",
+  };
+  const phaseSplitRequest = {
+    request: JSON.stringify(facadeStartRequestFromDossier(fullDossierRequest(), { seededHigh: true })),
+  };
+  handleNormalSessionChatMessage(phaseSplitBridge, phaseSplitContext);
+  await assert.rejects(
+    phaseSplitTools.quality_assurance_start.execute(phaseSplitRequest, phaseSplitContext),
+    /injected:phase-split-after-owner-state-persisted/u,
+  );
+  const lostResponseState = inspectNormalSessionQualityState(
+    phaseSplitBridge,
+    phaseSplitContext.sessionID,
+  );
+  const phaseSplitRecovered = JSON.parse(await phaseSplitTools.quality_assurance_start.execute(
+    phaseSplitRequest,
+    phaseSplitContext,
+  ));
+  const phaseSplitReplayed = JSON.parse(await phaseSplitTools.quality_assurance_start.execute(
+    phaseSplitRequest,
+    phaseSplitContext,
+  ));
+  assert.deepEqual(phaseSplitReplayed, phaseSplitRecovered,
+    "phase-split lost-response replay must return the same lifecycle receipt");
+  assert.deepEqual(
+    inspectNormalSessionRegistration(phaseSplitBridge, phaseSplitContext.sessionID).required_check_ids,
+    ["integration-check"],
+    "classified facade replay must restore the registration integration checks instead of all available phases",
+  );
+  assert.deepEqual(
+    inspectNormalSessionQualityState(phaseSplitBridge, phaseSplitContext.sessionID),
+    lostResponseState,
+    "phase-split replay must retain the one owner state created before the lost response",
+  );
+
+  const bugPhaseSplitProjectCatalog = {
+    ...bugProjectCatalog,
+    catalog_id: "normal-session-facade-bug-phase-split-v1",
+    checks: [
+      ...bugProjectCatalog.checks,
+      {
+        check_id: "bug-pre-check",
+        executable_id: "node",
+        argv: ["src/file.mjs"],
+        cwd: ".",
+        phases: ["preimplementation"],
+        purpose: "verification",
+        generated_output_paths: [],
+        timeout_ms: 120000,
+        max_output_chars: 1048576,
+      },
+    ],
+  };
+  async function recoverPhaseSplitBugStart(label, mutateReproductionContract) {
+    let failureArmed = true;
+    const targetBridge = createNormalSessionQualityBridge({
+      ...options,
+      checkCatalog: createEngineeringCheckCatalog(projectCatalogToEngineeringCatalog(
+        bugPhaseSplitProjectCatalog,
+        NORMAL_SESSION_BRIDGE_PRODUCER,
+      )),
+      projectCatalog: bugPhaseSplitProjectCatalog,
+      evaluateGate: undefined,
+      failureInjector(stage) {
+        if (failureArmed && stage === "after_owner_state_persisted") {
+          failureArmed = false;
+          throw new Error(`injected:${label}-after-owner-state-persisted`);
+        }
+      },
+    });
+    const targetTools = createAssuranceFacadeToolSurface({
+      toolFactory: fakeToolFactory,
+      bridge: targetBridge,
+    });
+    const targetContext = {
+      sessionID: `session/facade-bug-recovery-${label}`,
+      agent: "assurance",
+    };
+    const source = bugStartRequest();
+    delete source.required_check_ids;
+    mutateReproductionContract(source.reproduction_contract);
+    const request = { request: JSON.stringify(source) };
+    handleNormalSessionChatMessage(targetBridge, targetContext);
+    await assert.rejects(
+      targetTools.quality_assurance_start.execute(request, targetContext),
+      new RegExp(`injected:${label}-after-owner-state-persisted`, "u"),
+    );
+    const registration = inspectNormalSessionRegistration(targetBridge, targetContext.sessionID);
+    assert.deepEqual(registration.required_check_ids, ["normal-bug-reproducer"]);
+    assert.equal(registration.reproduction_contract.check_id, "normal-bug-reproducer");
+    const recovered = JSON.parse(await targetTools.quality_assurance_start.execute(request, targetContext));
+    const replayed = JSON.parse(await targetTools.quality_assurance_start.execute(request, targetContext));
+    assert.deepEqual(replayed, recovered,
+      `${label} must replay the same raw facade request after a lost response`);
+    assert.deepEqual(
+      inspectNormalSessionRegistration(targetBridge, targetContext.sessionID).reproduction_contract,
+      registration.reproduction_contract,
+      `${label} replay must retain the exact registered reproduction contract`,
+    );
+    return { bridge: targetBridge, tools: targetTools, context: targetContext, source };
+  }
+
+  const bugPhaseSplitFixture = await recoverPhaseSplitBugStart(
+    "omitted-reproducer",
+    (contract) => { delete contract.check_id; },
+  );
+  const staleUniqueReproducerFixture = await recoverPhaseSplitBugStart(
+    "stale-unique-reproducer",
+    (contract) => { contract.check_id = "stale-model-guessed-id"; },
+  );
+  assert.equal(
+    inspectNormalSessionRegistration(
+      staleUniqueReproducerFixture.bridge,
+      staleUniqueReproducerFixture.context.sessionID,
+    ).reproduction_contract.check_id,
+    "normal-bug-reproducer",
+    "a unique trusted reproducer must override the same stale caller ID on initial start and replay",
+  );
+  const redundantUnavailableReasonFixture = await recoverPhaseSplitBugStart(
+    "redundant-unavailable-reason",
+    (contract) => { contract.unavailable_reason = "irrelevant caller reason"; },
+  );
+  assert.equal(
+    inspectNormalSessionRegistration(
+      redundantUnavailableReasonFixture.bridge,
+      redundantUnavailableReasonFixture.context.sessionID,
+    ).reproduction_contract.unavailable_reason,
+    null,
+    "a non-unavailable pre-fix outcome must canonicalize the same redundant reason to null on start and replay",
+  );
+  await assert.rejects(
+    bugPhaseSplitFixture.tools.quality_assurance_start.execute({
+      request: JSON.stringify({
+        ...bugPhaseSplitFixture.source,
+        reproduction_contract: {
+          ...bugPhaseSplitFixture.source.reproduction_contract,
+          expected_pre_fix: "unavailable",
+          unavailable_reason: "changed retry intent",
+        },
+      }),
+    }, bugPhaseSplitFixture.context),
+    (error) => error?.code === "QUALITY_SESSION_REPLAY",
+    "classified facade replay must still reject changed caller-owned reproduction intent",
+  );
+
+  const multiReproducerProjectCatalog = {
+    ...bugProjectCatalog,
+    catalog_id: "normal-session-facade-multi-reproducer-v1",
+    checks: [
+      ...bugProjectCatalog.checks,
+      {
+        ...bugProjectCatalog.checks[0],
+        check_id: "normal-alternate-bug-reproducer",
+      },
+    ],
+  };
+  const multiReproducerBridge = createNormalSessionQualityBridge({
+    ...options,
+    checkCatalog: createEngineeringCheckCatalog(projectCatalogToEngineeringCatalog(
+      multiReproducerProjectCatalog,
+      NORMAL_SESSION_BRIDGE_PRODUCER,
+    )),
+    projectCatalog: multiReproducerProjectCatalog,
+    evaluateGate: undefined,
+  });
+  const multiReproducerTools = createAssuranceFacadeToolSurface({
+    toolFactory: fakeToolFactory,
+    bridge: multiReproducerBridge,
+  });
+  const multiReproducerContext = {
+    sessionID: "session/facade-multi-reproducer-replay",
+    agent: "assurance",
+  };
+  const multiReproducerSource = bugStartRequest();
+  delete multiReproducerSource.required_check_ids;
+  handleNormalSessionChatMessage(multiReproducerBridge, multiReproducerContext);
+  await multiReproducerTools.quality_assurance_start.execute({
+    request: JSON.stringify(multiReproducerSource),
+  }, multiReproducerContext);
+  assert.equal(
+    inspectNormalSessionRegistration(
+      multiReproducerBridge,
+      multiReproducerContext.sessionID,
+    ).reproduction_contract.check_id,
+    "normal-bug-reproducer",
+  );
+  await assert.rejects(
+    multiReproducerTools.quality_assurance_start.execute({
+      request: JSON.stringify({
+        ...multiReproducerSource,
+        reproduction_contract: {
+          ...multiReproducerSource.reproduction_contract,
+          check_id: "normal-alternate-bug-reproducer",
+        },
+      }),
+    }, multiReproducerContext),
+    (error) => error?.code === "QUALITY_SESSION_REPLAY",
+    "classified facade replay must reject a changed caller-selected reproducer check",
+  );
+
+  const highFacadeBridge = createNormalSessionQualityBridge({ ...options, workspaceRoot: tempRoot });
+  const highFacadeTools = createAssuranceFacadeToolSurface({
+    toolFactory: fakeToolFactory,
+    bridge: highFacadeBridge,
+  });
+  const highFacadeCalls = [];
+  const callHighFacade = async (toolId, args, context) => {
+    assert.equal(NORMAL_SESSION_QUALITY_TOOL_IDS.includes(toolId), false,
+      "high facade lifecycle must never invoke a legacy quality tool directly");
+    highFacadeCalls.push(toolId);
+    return JSON.parse(await highFacadeTools[toolId].execute(args, context));
+  };
+  const highFacadeContext = { sessionID: "session/facade-high-e2e", agent: "assurance" };
+  handleNormalSessionChatMessage(highFacadeBridge, highFacadeContext);
+  const highFacadeStart = await callHighFacade("quality_assurance_start", {
+    request: JSON.stringify(facadeStartRequestFromDossier(fullDossierRequest(), { seededHigh: true })),
+  }, highFacadeContext);
+  const highFacadeReplay = await callHighFacade("quality_assurance_start", {
+    request: JSON.stringify(facadeStartRequestFromDossier(fullDossierRequest(), { seededHigh: true })),
+  }, highFacadeContext);
+  assert.deepEqual(highFacadeReplay, highFacadeStart,
+    "a lost high-start response must be replayable without creating a second owner dossier");
+  assert.equal(highFacadeStart.risk_class, "high");
+  assert.equal(highFacadeStart.lifecycle, "dossier_draft");
+  collectHighContextEvidence(highFacadeBridge, highFacadeContext);
+  const highDossierUpdated = await callHighFacade("quality_assurance_advance", {
+    transition: "dossier-update",
+    request: JSON.stringify({
+      compact_analysis: {
+      entry_path: "src/file.mjs",
+      related_paths: [],
+      compatibility_decision: "preserve",
+      compatibility_analysis: "The bounded module contract and existing export remain compatible.",
+      owning_abstraction: "The src/file.mjs module owns the bounded exported value behavior.",
+      impact_analysis: "The runner-bound check reads the module export directly; no additional caller or callee was observed.",
+      has_downstream_side_effects: false,
+      side_effect_analysis: "The module returns a value and performs no downstream write, event, or external side effect.",
+      has_cross_boundary_contracts: false,
+      contract_analysis: "The bounded internal export does not change a public, serialized, configuration, or event contract.",
+      rollback_expectation: "Restore the owned module revision if the bounded behavior or check regresses.",
+      recovery_expectation: "A failed attempt leaves no partial state and a retry re-evaluates the same module input.",
+      counterexample: "A cancellation arriving after completion must not publish a second settlement.",
+      premortem_analysis: "The bounded module has no migration, persistence, or distributed partial-commit mechanism beyond the classified race.",
+      unresolved_unknowns: [],
+      },
+    }),
+  }, highFacadeContext);
+  assert.equal(highDossierUpdated.next_actions[0].transition, "context-report-update");
+  const highContextEvidence = collectHighContextEvidence(
+    highFacadeBridge,
+    highFacadeContext,
+    { includeExistingActiveReceipts: true },
+  );
+  const highReportUpdated = await callHighFacade("quality_assurance_advance", {
+    transition: "context-report-update",
+    request: JSON.stringify({ patch: highContextEvidence.content }),
+  }, highFacadeContext);
+  assert.equal(highReportUpdated.next_actions[0].transition, "context-report-finalize");
+  const highContextFinalized = await callHighFacade("quality_assurance_advance", {}, highFacadeContext);
+  assert.equal(highContextFinalized.next_actions[0].target_agent, "architect");
+
+  const settleHighChallenge = async (role) => {
+    const call = {
+      tool: "task",
+      sessionID: highFacadeContext.sessionID,
+      callID: `call-facade-high-${role}`,
+    };
+    const args = nativeTask(role);
+    handleNormalSessionToolBefore(highFacadeBridge, call, args);
+    rewriteRoleAssignmentForFacade(call, args);
+    const envelope = runnerAssignmentEnvelope(args);
+    assert.equal(envelope.assignment.tool_id, "quality_assurance_advance");
+    assert.equal(envelope.assignment.request.transition, "architecture-evaluate");
+    assert.match(envelope.assignment.challenge_subject?.fingerprint ?? "", /^sha256:/u,
+      `${role} facade assignment must embed the canonical challenge subject`);
+    assert.match(envelope.assignment.challenge_subject?.dossier_analysis_fingerprint ?? "", /^sha256:/u);
+    assert.match(envelope.assignment.challenge_subject?.context_report_analysis_fingerprint ?? "", /^sha256:/u);
+    const snapshot = envelope.assignment.challenge_subject?.challenge_snapshot;
+    assert.equal(snapshot?.task?.user_visible_goal, fullDossierRequest().user_visible_goal,
+      `${role} must receive the substantive challenged goal`);
+    assert.deepEqual(snapshot?.ownership?.ownership_paths, ["src"],
+      `${role} must receive bounded ownership paths`);
+    assert.ok(snapshot?.blast_radius?.impact_graph?.affected_paths.length >= 2,
+      `${role} must receive direct and transitive blast-radius paths`);
+    assert.ok(snapshot?.failure_and_recovery?.failure_modes.length > 0,
+      `${role} must receive failure-mode evidence`);
+    assert.ok(snapshot?.verification?.integration_check_ids.includes("normal-harness-static"),
+      `${role} must receive integration verification obligations`);
+    assert.ok(snapshot?.context?.report?.questions.length > 0,
+      `${role} must receive bounded context findings and questions`);
+    const childSessionID = `${highFacadeContext.sessionID}/${role}`;
+    handleNormalSessionEvent(highFacadeBridge, {
+      type: "session.created",
+      properties: { info: { id: childSessionID, parentID: highFacadeContext.sessionID } },
+    });
+    if (role === "architect") {
+      const tamperedSubject = structuredClone(envelope.assignment.challenge_subject);
+      tamperedSubject.challenge_snapshot.ownership.ownership_paths.push("unowned");
+      tamperedSubject.challenge_snapshot_fingerprint = fingerprint(tamperedSubject.challenge_snapshot);
+      const tamperedSource = { ...tamperedSubject };
+      delete tamperedSource.fingerprint;
+      tamperedSubject.fingerprint = fingerprint(tamperedSource);
+      assertContractError(() => executeRawNormalSessionQualityTool(highFacadeBridge, "quality_architecture_evaluate", {
+        request: JSON.stringify({
+          expected_revision: inspectNormalSessionQualityState(highFacadeBridge, highFacadeContext.sessionID).dossier.revision,
+          expected_subject_fingerprint: tamperedSubject.fingerprint,
+          blockers: [],
+        }),
+      }, { sessionID: childSessionID, agent: role }), "QUALITY_PLAN_CHALLENGE_STALE");
+    }
+    await callHighFacade("quality_assurance_advance", envelope.assignment.request, {
+      sessionID: childSessionID,
+      agent: role,
+    });
+    handleNormalSessionToolAfter(highFacadeBridge, call, { title: role, output: "challenge complete", metadata: {} });
+  };
+  await settleHighChallenge("architect");
+  await settleHighChallenge("reviewer");
+  const highGate = await callHighFacade("quality_assurance_advance", {}, highFacadeContext);
+  assert.equal(highGate.gate_status, "passed");
+  await callHighFacade("quality_assurance_authorize", {
+    kind: "edit",
+    paths: ["src/file.mjs"],
+  }, highFacadeContext);
+  const highEditCall = {
+    tool: "edit",
+    sessionID: highFacadeContext.sessionID,
+    callID: "call-facade-high-edit",
+  };
+  handleNormalSessionToolBefore(highFacadeBridge, highEditCall, nativeEdit());
+  currentPathVersions.set("src/file.mjs", 1);
+  handleNormalSessionToolAfter(highFacadeBridge, highEditCall, { title: "high edit", output: "done", metadata: {} });
+
+  const highVerifierCall = {
+    tool: "task",
+    sessionID: highFacadeContext.sessionID,
+    callID: "call-facade-high-verifier",
+  };
+  const highVerifierArgs = nativeTask("verifier");
+  handleNormalSessionToolBefore(highFacadeBridge, highVerifierCall, highVerifierArgs);
+  rewriteRoleAssignmentForFacade(highVerifierCall, highVerifierArgs);
+  const highVerifierEnvelope = runnerAssignmentEnvelope(highVerifierArgs);
+  const highVerifierSessionID = `${highFacadeContext.sessionID}/verifier`;
+  handleNormalSessionEvent(highFacadeBridge, {
+    type: "session.created",
+    properties: { info: { id: highVerifierSessionID, parentID: highFacadeContext.sessionID } },
+  });
+  await callHighFacade("quality_assurance_advance", highVerifierEnvelope.assignment.request, {
+    sessionID: highVerifierSessionID,
+    agent: "verifier",
+  });
+  handleNormalSessionToolAfter(highFacadeBridge, highVerifierCall, { title: "verifier", output: "verified", metadata: {} });
+
+  const highReviewCall = {
+    tool: "task",
+    sessionID: highFacadeContext.sessionID,
+    callID: "call-facade-high-final-reviewer",
+  };
+  const highReviewArgs = nativeTask("reviewer");
+  handleNormalSessionToolBefore(highFacadeBridge, highReviewCall, highReviewArgs);
+  rewriteRoleAssignmentForFacade(highReviewCall, highReviewArgs);
+  const highReviewEnvelope = runnerAssignmentEnvelope(highReviewArgs);
+  const highReviewSessionID = `${highFacadeContext.sessionID}/final-reviewer`;
+  handleNormalSessionEvent(highFacadeBridge, {
+    type: "session.created",
+    properties: { info: { id: highReviewSessionID, parentID: highFacadeContext.sessionID } },
+  });
+  const highReviewReadCall = {
+    tool: "context_read",
+    sessionID: highReviewSessionID,
+    callID: "call-facade-high-review-read",
+  };
+  handleNormalSessionToolBefore(highFacadeBridge, highReviewReadCall, {
+    args: { path: "src/file.mjs", startLine: 1, maxLines: 64, maxBytes: 4096 },
+  });
+  handleNormalSessionToolAfter(highFacadeBridge, highReviewReadCall, {
+    title: "high review context",
+    output: contextReadOutput("src/file.mjs"),
+    metadata: {},
+  });
+  await callHighFacade("quality_assurance_advance", {
+    transition: "context-reviewer-record",
+    request: JSON.stringify(passedReviewerClauseRequest({ assignment: highReviewEnvelope.assignment })),
+  }, { sessionID: highReviewSessionID, agent: "reviewer" });
+  handleNormalSessionToolAfter(highFacadeBridge, highReviewCall, { title: "reviewer", output: "reviewed", metadata: {} });
+  const highReconciled = await callHighFacade("quality_assurance_advance", {}, highFacadeContext);
+  assert.equal(highReconciled.lifecycle, "verified");
+  const highAttested = await callHighFacade("quality_assurance_advance", {}, highFacadeContext);
+  assert.equal(highAttested.lifecycle, "attested");
+  assert.deepEqual([...new Set(highFacadeCalls)].sort(), [
+    "quality_assurance_advance",
+    "quality_assurance_authorize",
+    "quality_assurance_start",
+  ]);
+  currentPathVersions.clear();
 
 const legacyBugPlugin = createNormalSessionQualityPlugin({
   toolFactory: fakeToolFactory,
@@ -3873,6 +4687,35 @@ assert.match(
   structuredHighSufficientInspection.recommended_next_actions[0].assignment.challenge_contract.change_policy,
   /narrow user_visible_goal is authoritative/u,
 );
+for (const field of [
+  "negative_behavior",
+  "boundary_behavior",
+  "error_behavior",
+  "ordering_and_side_effects",
+  "security_requirements",
+  "completion_requirements",
+]) {
+  assert.deepEqual(
+    structuredHighSufficientInspection.recommended_next_actions[0].assignment.challenge_contract[field],
+    structuredHighPersistedState.dossier.behavior_contract[field],
+    `architect challenge assignment must carry behavior_contract.${field}`,
+  );
+  const mutatedDossier = structuredClone(structuredCanonicalContextState.dossier);
+  mutatedDossier.behavior_contract[field] = [
+    ...mutatedDossier.behavior_contract[field],
+    `mutation-${field}`,
+  ];
+  const { fingerprint: _priorDossierFingerprint, ...mutatedDossierSource } = mutatedDossier;
+  mutatedDossier.fingerprint = fingerprint(mutatedDossierSource);
+  assert.throws(() => createPlanChallengeSubject({
+    dossier: mutatedDossier,
+    strategy_binding: structuredCanonicalContextState.context_strategy,
+    context_report: structuredCanonicalContextState.context_report,
+    context_decision: structuredCanonicalContextState.context_decision,
+    task_profile_evidence: structuredCanonicalContextState.context_task_profile_evidence,
+  }), (error) => error instanceof ContractError && error.code === "QUALITY_PLAN_CHALLENGE_STALE",
+  `changing behavior_contract.${field} must invalidate the prior challenge evidence`);
+}
 assert.match(
   structuredHighSufficientInspection.recommended_next_actions[0].assignment.instruction,
   /never for a speculative expansion or preferred conventional design/u,

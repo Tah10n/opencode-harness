@@ -66,6 +66,7 @@ const SPECIAL_DETERMINISTIC_STAGE_TIMEOUTS = Object.freeze({
 });
 
 export const DETERMINISTIC_STAGE_REGISTRY = Object.freeze([
+  { command_id: "verify-v04", npm_script: "verify:v0.4", check_ids: [] },
   { command_id: "verify-static", npm_script: "verify:static", check_ids: ["documentation-attribution-boundary", "tracked-artifact-boundary", "model-frontmatter-documentation"] },
   {
     command_id: "verify-benchmark-model-free",
@@ -482,6 +483,7 @@ async function runCommand(stage, command, timeoutMs) {
       stderr_chars: 0,
       timed_out: false,
       error,
+      failure_diagnostic: `${error?.code ?? "UNEXPECTED"}: ${error?.message ?? String(error)}`,
     };
   }
   const completedAt = new Date().toISOString();

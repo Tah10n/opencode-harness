@@ -1,4 +1,97 @@
-# Synthetic Ablation Benchmark
+# Synthetic Profile-Transition Benchmark
+
+## v0.4 vNext compound profile-transition contract
+
+The v0.3 benchmark described below remains byte-for-byte readable historical
+research. v0.4 adds a separate namespace under `benchmarks/vnext/` with six
+cumulative arms (`P0`–`P5`) and five adjacent compound profile-transition
+estimands. A transition may change prompts, roles, permissions, configuration,
+and plugin bytes together. It therefore estimates the effect of moving between
+the two complete materialized profiles; it is not a causal estimate for one
+isolated mechanism. Small, medium, and high-risk families are evaluated only
+where the transition applies; there is no full cross-product.
+
+```sh
+npm run bench:vnext:validate
+npm run bench:vnext:self-test
+```
+
+Model-backed vNext execution is runner-owned. The runner materializes both arms
+from the canonical inventory, fingerprints their effective runtime surfaces,
+counterbalances concrete rendered pairs, and invokes the repository's official
+contained OpenCode transport once per attempt. That low-level transport cannot
+return metrics, hidden outcomes, a comparison, or a promotion verdict. Hidden
+files are staged only after verified process-tree teardown; the runner derives
+all pair evidence and statistics.
+
+```sh
+npm run bench:vnext:run -- \
+  --suite smoke \
+  --estimand plain-to-core-rules \
+  --model openai/gpt-5.6-luna \
+  --provider openai \
+  --variant low \
+  --seed v04-smoke-20260817 \
+  --timeout-ms 300000 > vnext-smoke-run.json
+```
+
+Repeat smoke for all five estimands. Standard is then required for
+`core-rules-to-core-verified`, `core-verified-to-core-reviewed`, the medium-target
+`core-reviewed-to-deep`, and the high-target `deep-to-assurance`. Standard plans
+for the latter transitions also include the frozen small-task negative control. Inspect a
+saved run separately; when an authorizing promotion result is needed, rerun standard and
+apply the frozen policy in the same trusted process:
+
+```sh
+npm run bench:vnext:compare -- --run vnext-standard-run.json > vnext-standard-comparison.json
+npm run bench:vnext:promote -- \
+  --estimand core-reviewed-to-deep \
+  --model openai/gpt-5.4 \
+  --provider openai \
+  --variant low \
+  --seed v04-standard-20260817 \
+  --timeout-ms 300000
+```
+
+Plans refuse dirty source trees, derive executable identity from the verified
+OpenCode binary, bind the official execution-engine bytes, serialize pairs, and
+never persist raw model output. `--plan-only` performs a model-free preflight.
+Full has no artifact-based or plan-only entry point. A `--suite full` invocation
+first executes standard through the fixed trusted executor in the same process,
+recomputes every observation from bounded receipt inputs, and continues to full
+only while that in-memory decision is positive and all bindings still match.
+The full plan and envelope bind the standard run, comparison, and promotion
+decision fingerprints. Compare rebuilds the current canonical plan before
+accepting source, policy, inventory, contract, engine, evaluator, arm, family,
+or pair-schedule evidence; promote constructs and validates that plan directly.
+Neither a standalone comparison nor a self-consistent caller-created run
+envelope can unlock full execution. Compare is an inspectable artifact report,
+not an authorization token. Promote deliberately performs a fresh contained
+standard run because serialized self-hashed JSON does not retain runner-owned
+in-process provenance.
+
+The 26 vNext entries are executable task families, not aliases alone. Five
+small controls retain the proven legacy kernels. Ten medium families add a
+runner-validated 8–20-file repository graph with 1–4 writable paths and
+consumer, re-export, remote-test, config, and hidden-oracle edges. Eleven
+high-risk families use distinct executable kernels for authorization, path
+confinement, migration atomicity, rollback, durable persistence, duplicate side
+effects, shared-state concurrency, cancellation cleanup, partial dependency
+failure, public-schema compatibility, and prompt-data boundaries. Model-free
+self-tests prove each seeded high-risk defect fails its hidden oracle and each
+reference repair passes both public and hidden oracles.
+
+Product correctness, operational cost, and protocol diagnostics are separate
+metric classes. Promotion thresholds live in the predeclared versioned policy;
+incomplete/external-state outcomes are not scored. Minimum pairs per stratum,
+minimum target families, small-task harm, timeout, functional harm, and defect
+guardrails are all mandatory. Model-free success proves only the contract and
+is rejected by promotion. Promotion evidence must be classed as a trusted
+`model-backed-contained-run` and bind one model/provider/variant,
+seed, timeout, executable, runner limits, fixtures, evaluator, inventory,
+contract, policy, and source revision for both sides of a pair.
+
+## Legacy v0.3 benchmark
 
 The synthetic benchmark is a separate, model-neutral product-value experiment
 for comparing the same host-selected model under different harness profiles. It

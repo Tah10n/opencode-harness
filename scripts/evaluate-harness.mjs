@@ -4,8 +4,12 @@ import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const failures = [];
+const sourceOverrides = new Map();
 
 function read(relativePath) {
+  if (sourceOverrides.has(relativePath)) {
+    return sourceOverrides.get(relativePath);
+  }
   const fullPath = path.join(root, relativePath);
   if (!fs.existsSync(fullPath)) {
     fail("HARNESS-E001", `${relativePath} is missing`, "Restore the contract file or update the scenario.");
@@ -25,6 +29,14 @@ function includes(file, needle, fix) {
   }
 }
 
+function includesNormalized(file, needle, fix) {
+  const normalize = (value) => value.replace(/\s+/g, " ").trim();
+  const text = normalize(read(file));
+  if (!text.includes(normalize(needle))) {
+    fail("HARNESS-E002", `${file} missing expected invariant: ${needle}`, fix);
+  }
+}
+
 function excludes(file, needle, fix) {
   const text = read(file);
   if (text.includes(needle)) {
@@ -38,27 +50,56 @@ function exists(file, fix) {
   }
 }
 
+function expectScenarioRejectsMutation({ scenarioId, file, needle }) {
+  const scenario = scenarios.find((entry) => entry.id === scenarioId);
+  if (!scenario) {
+    fail("HARNESS-E005", `mutation self-test references unknown scenario: ${scenarioId}`, "Keep mutation probes bound to a live v0.4 scenario.");
+    return;
+  }
+
+  const original = read(file);
+  if (!original.includes(needle)) {
+    fail("HARNESS-E005", `mutation self-test sentinel is missing from ${file}: ${needle}`, "Update the probe with the canonical profile invariant.");
+    return;
+  }
+
+  sourceOverrides.set(file, original.replace(needle, "[mutated-v0.4-invariant]"));
+  const failureCount = failures.length;
+  scenario.checks();
+  sourceOverrides.delete(file);
+  if (failures.length === failureCount) {
+    fail("HARNESS-E005", `${scenarioId} accepted a weakened canonical profile: ${file}`, "Bind the scenario to the materialized v0.4 profile source.");
+    return;
+  }
+  failures.splice(failureCount);
+}
+
 const scenarios = [
   {
     id: "broad-audit-recursive-context",
     category: "architecture-fitness",
     checks: () => {
-      includes("AGENTS.md", "automatically use recursive-context mode", "Broad audits should trigger recursive-context mode from the global rule.");
-      includes("agents/orchestrator.md", "Automatic recursive-context mode:", "The primary orchestrator should contain the runtime trigger.");
+      includes("AGENTS.md", "`deep` is optional for broad audits", "The compact core rules should route broad audits to the optional deep profile.");
+      includes("agents/deep.md", "Use this agent only for broad audits", "The canonical deep profile should stay scoped to broad work.");
       for (const tool of ["context_outline", "context_files", "context_search", "context_read"]) {
-        includes("agents/orchestrator.md", `${tool}: allow`, "The orchestrator must be allowed to use safe context tools directly.");
+        includes("agents/deep.md", `${tool}: allow`, "The canonical deep profile must be allowed to use bounded context tools directly.");
       }
-      includes("docs/recursive-context-mode.md", "Use recursive-context mode automatically", "Keep the design note aligned with the agent rule.");
+      includes("agents/deep.md", "Delegate only independent read-only questions", "Deep delegation should remain read-only and bounded.");
+      includes("docs/recursive-context-mode.md", "`core` never switches to `deep` silently.", "Deep selection must remain explicit.");
+      includes("docs/recursive-context-mode.md", "choose the `deep` profile/configuration", "Document an explicit deep selection path.");
+      excludes("docs/recursive-context-mode.md", "Use recursive-context mode automatically", "The active v0.4 document must not retain the v0.3 automatic-selection contract.");
+      excludes("docs/recursive-context-mode.md", "Root orchestration stays in `orchestrator`", "The active v0.4 document must not describe the deprecated orchestrator runtime.");
+      includes("docs/legacy/v0.3/recursive-context-mode.md", "selected recursive-context mode automatically", "Preserve the old automatic workflow only as historical v0.3 documentation.");
     },
   },
   {
     id: "review-read-only-ledger",
     category: "maintainability",
     checks: () => {
-      includes("AGENTS.md", "When the user asks for review, keep the task read-only", "Review must not silently turn into a fix pass.");
+      includesNormalized("AGENTS.md", "Review-only requests remain read-only unless the user explicitly asks for fixes.", "The compact core rules should retain the review-only boundary.");
       includes("skills/global-review-ledger/SKILL.md", "Review requests are read-only", "The review skill should preserve read-only semantics.");
-      includes("agents/reviewer.md", "edit: deny", "Reviewer must remain read-only at the permission layer.");
-      includes("agents/reviewer.md", "Re-review mode:", "The reviewer must support ledger-bounded re-review.");
+      includes("agents/core-reviewer.md", "edit: deny", "The canonical core/deep reviewer must remain read-only at the permission layer.");
+      includes("agents/assurance-reviewer.md", "edit: deny", "The canonical assurance reviewer must remain read-only at the permission layer.");
       includes("opencode.json", "Read-only review of current diff", "The review command should be clear about read-only behavior.");
     },
   },
@@ -66,8 +107,9 @@ const scenarios = [
     id: "small-local-task-single-agent",
     category: "maintainability",
     checks: () => {
-      includes("AGENTS.md", "Prefer the single-agent loop for small, local, single-file, or directly answerable tasks.", "Small work should not pay orchestration overhead.");
-      includes("agents/orchestrator.md", "Prefer a single linear loop for small, local, single-file, or directly answerable tasks.", "The primary orchestrator should retain the same local-work bias.");
+      includes("AGENTS.md", "Small local tasks stay single-agent.", "Small work should not pay orchestration overhead.");
+      includes("agents/core.md", "Stay single-agent for small local work.", "The canonical core profile should retain the same local-work bias.");
+      includes("agents/core.md", "Do not call architect,", "Core should not pay routine orchestration overhead.");
       excludes("AGENTS.md", "Always delegate", "Delegation should stay conditional, not automatic.");
     },
   },
@@ -75,9 +117,8 @@ const scenarios = [
     id: "architecture-gate-before-parallel-implementation",
     category: "architecture-fitness",
     checks: () => {
-      includes("AGENTS.md", "Use `@architect` before broad or parallel implementation", "Parallel write work needs an architecture gate.");
-      includes("agents/orchestrator.md", "Parallelize implementation only after `@architect` has produced explicit disjoint write ownership.", "The orchestrator must require explicit write ownership.");
-      includes("agents/orchestrator.md", "If slices share files, shared contracts, generated outputs, lockfiles, migrations, package metadata, snapshots, or formatter output, serialize them.", "Shared mutable outputs should force serialization.");
+      includes("agents/deep.md", "Implement as the single integrator. Do not delegate writes.", "The canonical deep profile should prohibit parallel delegated writes.");
+      excludes("agents/deep.md", "architect: allow", "Deep must not expose the assurance architecture role.");
     },
   },
   {
@@ -85,8 +126,10 @@ const scenarios = [
     category: "architecture-fitness",
     checks: () => {
       exists("skills/global-quality-gates/SKILL.md", "High-assurance work should have a detailed quality-gate skill.");
-      includes("AGENTS.md", "load `global-quality-gates` before edits", "Global rules should trigger quality gates for high-risk work.");
-      includes("agents/orchestrator.md", "load `global-quality-gates`", "Primary orchestrator should load quality gates for high-risk work.");
+      includes("AGENTS.md", "`assurance` is experimental and opt-in.", "The compact core rules should route high-risk work to the explicit assurance profile.");
+      includes("agents/core.md", "recommend `assurance`; do not start it automatically.", "Core should recommend, but never silently enter, assurance.");
+      includes("agents/assurance.md", "This is an experimental opt-in profile.", "The canonical assurance profile should remain explicit and experimental.");
+      includes("agents/assurance.md", "Use only the four high-level assurance operations.", "Assurance should use the bounded facade rather than legacy low-level tools.");
       includes("docs/harness-map.md", "Quality gates", "The control map should classify quality gates.");
     },
   },
@@ -123,8 +166,8 @@ const scenarios = [
     category: "safety",
     checks: () => {
       includes("skills/global-quality-gates/SKILL.md", "incomplete-with-critical-verification-gap", "Critical work should have a non-complete status for verification gaps.");
-      includes("AGENTS.md", "High/critical work cannot be reported as `complete`", "Global rules should block false completion.");
-      includes("agents/verifier.md", "Do not recommend `complete` if a mandatory gate is missing", "Verifier should not recommend completion with missing mandatory gates.");
+      includes("agents/assurance.md", "Missing trusted checks, containment, verification, reconciliation,\nor attestation is a blocked or incomplete result, never a pass.", "The canonical assurance profile should block false completion.");
+      includes("agents/assurance-verifier.md", "Do not run native shell checks, mutate, delegate, or convert\nan unavailable check into a pass.", "The canonical assurance verifier should fail closed on unavailable evidence.");
     },
   },
   {
@@ -270,7 +313,7 @@ const scenarios = [
     id: "dangerous-commands-ask",
     category: "safety",
     checks: () => {
-      includes("AGENTS.md", "Ask for explicit user permission *before* running any command that is destructive/irreversible", "The global safety rule should be explicit.");
+      includes("AGENTS.md", "Ask before destructive, irreversible, privileged, or broad external actions", "The compact global safety rule should be explicit.");
       includes("opencode.json", "\"git reset*\": \"ask\"", "Dangerous git history commands should require approval.");
       includes("opencode.json", "\"Remove-Item *\": \"ask\"", "Destructive filesystem commands should require approval.");
       includes("opencode.json", "\"git push --force*\": \"ask\"", "Force pushes should require approval.");
@@ -407,7 +450,8 @@ const scenarios = [
       }
       includes("docs/budgets-and-termination.md", "no remaining high-value independent work", "Budget policy should define concrete stop conditions.");
       includes("docs/budgets-and-termination.md", "worker output is weak after one narrowing", "Weak worker output should not cause unbounded loops.");
-      includes("AGENTS.md", "docs/budgets-and-termination.md", "Global rules should point at the budget policy.");
+      includes("agents/core-reviewer.md", "a stable termination reason", "The canonical core/deep reviewer should report a bounded termination result.");
+      includes("agents/assurance.md", "report residual risk and\nunverified areas explicitly", "The canonical assurance profile should report residual gaps honestly.");
       includes("agents/orchestrator.md", "termination_reason", "Primary orchestrator should require termination reasons.");
       includes("docs/harness-map.md", "Budget and termination policy", "Budget policy should be represented in the control map.");
     },
@@ -452,6 +496,31 @@ const scenarios = [
     },
   },
 ];
+
+for (const probe of [
+  {
+    scenarioId: "small-local-task-single-agent",
+    file: "agents/core.md",
+    needle: "Stay single-agent for small local work.",
+  },
+  {
+    scenarioId: "broad-audit-recursive-context",
+    file: "agents/deep.md",
+    needle: "Delegate only independent read-only questions",
+  },
+  {
+    scenarioId: "broad-audit-recursive-context",
+    file: "docs/recursive-context-mode.md",
+    needle: "`core` never switches to `deep` silently.",
+  },
+  {
+    scenarioId: "critical-cannot-complete-with-missing-mandatory-verification",
+    file: "agents/assurance.md",
+    needle: "Missing trusted checks, containment, verification, reconciliation,",
+  },
+]) {
+  expectScenarioRejectsMutation(probe);
+}
 
 for (const scenario of scenarios) {
   scenario.checks();
