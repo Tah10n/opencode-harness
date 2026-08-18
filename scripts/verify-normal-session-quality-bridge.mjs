@@ -761,6 +761,12 @@ function startRequestFromDossier(request, { seededHigh = false } = {}) {
   };
 }
 
+function facadeStartRequestFromDossier(request, options) {
+  const facadeRequest = startRequestFromDossier(request, options);
+  delete facadeRequest.required_check_ids;
+  return facadeRequest;
+}
+
 function executeNormalSessionQualityTool(targetBridge, toolId, args, context) {
   if (toolId === "quality_dossier_create") {
     currentPathVersions.clear();
@@ -3597,6 +3603,45 @@ await plugin.tool.quality_context_reconcile.execute({
   }, continuationContext);
   currentPathVersions.clear();
 
+  const runnerFieldBridge = createNormalSessionQualityBridge(options);
+  const runnerFieldTools = createAssuranceFacadeToolSurface({
+    toolFactory: fakeToolFactory,
+    bridge: runnerFieldBridge,
+  });
+  const runnerFieldProbeContext = { sessionID: "session/facade-runner-field-probe", agent: "assurance" };
+  handleNormalSessionChatMessage(runnerFieldBridge, runnerFieldProbeContext);
+  const runnerSelectedCheckIds = executeRawNormalSessionQualityTool(runnerFieldBridge, "quality_dossier_inspect", {
+    request: "{}",
+  }, runnerFieldProbeContext).available_check_ids;
+  for (const [label, suppliedCheckIds] of [
+    ["partial", runnerSelectedCheckIds.slice(0, 1)],
+    ["empty", []],
+    ["full", runnerSelectedCheckIds],
+  ]) {
+    const context = { sessionID: `session/facade-runner-field-${label}`, agent: "assurance" };
+    handleNormalSessionChatMessage(runnerFieldBridge, context);
+    await assert.rejects(
+      runnerFieldTools.quality_assurance_start.execute({
+        request: JSON.stringify({
+          ...facadeStartRequestFromDossier(dossierRequest()),
+          required_check_ids: suppliedCheckIds,
+        }),
+      }, context),
+      (error) => error?.code === "QUALITY_FACADE_RUNNER_FIELD",
+      `facade must reject ${label} caller-supplied runner check IDs`,
+    );
+  }
+  const runnerFieldValidContext = { sessionID: "session/facade-runner-field-valid", agent: "assurance" };
+  handleNormalSessionChatMessage(runnerFieldBridge, runnerFieldValidContext);
+  await runnerFieldTools.quality_assurance_start.execute({
+    request: JSON.stringify(facadeStartRequestFromDossier(dossierRequest())),
+  }, runnerFieldValidContext);
+  assert.deepEqual(
+    inspectNormalSessionRegistration(runnerFieldBridge, runnerFieldValidContext.sessionID).required_check_ids,
+    runnerSelectedCheckIds,
+    "facade-started dossier must retain the exact runner-selected check set",
+  );
+
   const facadePlugin = createAssuranceFacadePlugin({
     toolFactory: fakeToolFactory,
     workspaceRoot: tempRoot,
@@ -3614,7 +3659,7 @@ await plugin.tool.quality_context_reconcile.execute({
   currentPathVersions.clear();
   await facadePlugin["chat.message"](facadeContext);
   const facadeStart = await callFacade("quality_assurance_start", {
-    request: JSON.stringify(startRequestFromDossier(dossierRequest())),
+    request: JSON.stringify(facadeStartRequestFromDossier(dossierRequest())),
   }, facadeContext);
   assert.equal(facadeStart.lifecycle, "dossier_draft");
   assert.deepEqual(facadeStart.next_actions.map((entry) => entry.facade_operation), ["context_read"]);
@@ -3752,7 +3797,7 @@ await plugin.tool.quality_context_reconcile.execute({
   await assert.rejects(
     malformedFacadeTools.quality_assurance_start.execute({
       request: JSON.stringify({
-        ...startRequestFromDossier(fullDossierRequest(), { seededHigh: true }),
+        ...facadeStartRequestFromDossier(fullDossierRequest(), { seededHigh: true }),
         dossier: { behavior_contract: null },
       }),
     }, { sessionID: "session/facade-malformed-start", agent: "assurance" }),
@@ -3782,7 +3827,7 @@ await plugin.tool.quality_context_reconcile.execute({
       agent: "assurance",
     };
     const recoveryRequest = {
-      request: JSON.stringify(startRequestFromDossier(fullDossierRequest(), { seededHigh: true })),
+      request: JSON.stringify(facadeStartRequestFromDossier(fullDossierRequest(), { seededHigh: true })),
     };
     await assert.rejects(
       recoveryTools.quality_assurance_start.execute(recoveryRequest, recoveryContext),
@@ -3820,10 +3865,10 @@ await plugin.tool.quality_context_reconcile.execute({
   const highFacadeContext = { sessionID: "session/facade-high-e2e", agent: "assurance" };
   handleNormalSessionChatMessage(highFacadeBridge, highFacadeContext);
   const highFacadeStart = await callHighFacade("quality_assurance_start", {
-    request: JSON.stringify(startRequestFromDossier(fullDossierRequest(), { seededHigh: true })),
+    request: JSON.stringify(facadeStartRequestFromDossier(fullDossierRequest(), { seededHigh: true })),
   }, highFacadeContext);
   const highFacadeReplay = await callHighFacade("quality_assurance_start", {
-    request: JSON.stringify(startRequestFromDossier(fullDossierRequest(), { seededHigh: true })),
+    request: JSON.stringify(facadeStartRequestFromDossier(fullDossierRequest(), { seededHigh: true })),
   }, highFacadeContext);
   assert.deepEqual(highFacadeReplay, highFacadeStart,
     "a lost high-start response must be replayable without creating a second owner dossier");

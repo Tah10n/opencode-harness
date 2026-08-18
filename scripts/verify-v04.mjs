@@ -32,6 +32,7 @@ import {
   buildVnextExecutionPlan,
   buildVnextPromotionDecisionFromRun,
   executeVnextPlanModelFreeTest,
+  seededUnit,
   validateVnextFullRunEnvelope,
   validateVnextStandardGate,
   validateVnextArmSurfaceDelta,
@@ -309,40 +310,60 @@ function verifyMediumTopologyChecks(instances) {
       });
       assert(result.status === 0, "V04_LAB_MEDIUM_TOPOLOGY",
         `${instance.vnext_family_id} has a non-executable consumer graph: ${`${result.stdout}\n${result.stderr}`.slice(-2000)}`);
-      const consumerFile = instance.hidden_files.find((entry) => entry.path === "test/hidden-consumer.test.mjs");
-      assert(consumerFile !== undefined, "V04_LAB_MEDIUM_TOPOLOGY",
-        `${instance.vnext_family_id} has no hidden consumer oracle`);
-      const consumerTarget = path.join(targetRoot, ...consumerFile.path.split("/"));
-      fs.mkdirSync(path.dirname(consumerTarget), { recursive: true });
-      fs.writeFileSync(consumerTarget, consumerFile.content, "utf8");
-      const runConsumer = () => spawnSync(process.execPath, instance.consumer_check.argv.slice(1), {
-        cwd: targetRoot,
-        encoding: "utf8",
-        shell: false,
-        windowsHide: true,
-        timeout: 10_000,
-      });
-      const consumerPass = runConsumer();
-      assert(consumerPass.status === 0, "V04_LAB_MEDIUM_TOPOLOGY",
-        `${instance.vnext_family_id} consumer oracle rejects its reference repair`);
-      for (const [relativePath, broken] of [
-        ["src/public-api.mjs", "export const family = 'broken';\n"],
-        ["src/consumers/worker.mjs", "export const workerContract = [];\n"],
-        ["config/feature.json", "{\"family\":\"broken\",\"entry\":\"broken\"}\n"],
-        ["docs/contract.md", "# broken\n"],
+      const consumerFiles = instance.hidden_files.filter((entry) => entry.path.startsWith("test/hidden-consumer-"));
+      assert(consumerFiles.length === instance.required_consumer_ids.length, "V04_LAB_MEDIUM_TOPOLOGY",
+        `${instance.vnext_family_id} lacks one hidden oracle per consumer`);
+      for (const consumerFile of consumerFiles) {
+        const consumerTarget = path.join(targetRoot, ...consumerFile.path.split("/"));
+        fs.mkdirSync(path.dirname(consumerTarget), { recursive: true });
+        fs.writeFileSync(consumerTarget, consumerFile.content, "utf8");
+      }
+      const runConsumers = () => Object.fromEntries(instance.consumer_checks.map((entry) => {
+        const outcome = spawnSync(process.execPath, entry.check.argv.slice(1), {
+          cwd: targetRoot,
+          encoding: "utf8",
+          shell: false,
+          windowsHide: true,
+          timeout: 10_000,
+        });
+        return [entry.consumer_id, outcome.status === 0];
+      }));
+      const consumerPass = runConsumers();
+      assert(Object.values(consumerPass).every(Boolean), "V04_LAB_MEDIUM_TOPOLOGY",
+        `${instance.vnext_family_id} consumer oracles reject their reference repair`);
+      for (const [relativePath, broken, rejectedSuffix] of [
+        ["src/public-api.mjs", "export const family = 'broken';\n", "remote-worker"],
+        ["src/consumers/worker.mjs", "export const workerContract = [];\n", "remote-worker"],
+        ["config/feature.json", "{\"family\":\"broken\",\"entry\":\"broken\"}\n", "config-binding"],
+        ["docs/contract.md", "# broken\n", "documentation-contract"],
       ]) {
         const target = path.join(targetRoot, ...relativePath.split("/"));
         const original = fs.readFileSync(target, "utf8");
         fs.writeFileSync(target, broken, "utf8");
-        const rejected = runConsumer();
+        const observed = runConsumers();
         fs.writeFileSync(target, original, "utf8");
-        assert(rejected.status !== 0, "V04_LAB_MEDIUM_TOPOLOGY",
-          `${instance.vnext_family_id} consumer oracle ignored broken ${relativePath}`);
+        const preserved = Object.values(observed).filter(Boolean).length;
+        assert(observed[`${instance.vnext_family_id}:${rejectedSuffix}`] === false
+          && preserved === 2
+          && (instance.required_consumer_ids.length - preserved) / instance.required_consumer_ids.length === (1 / 3),
+        "V04_LAB_MEDIUM_TOPOLOGY",
+        `${instance.vnext_family_id} consumer oracles did not isolate broken ${relativePath}`);
       }
     }
   } finally {
     fs.rmSync(fixtureRoot, { recursive: true, force: true });
   }
+}
+
+function verifyBootstrapSamplerCoverage() {
+  const samples = Array.from({ length: 4096 }, (_unused, index) => seededUnit("vnext-bootstrap-coverage", index));
+  assert(samples.every((entry) => entry >= 0 && entry < 1),
+    "V04_LAB_BOOTSTRAP", "deterministic bootstrap sampler escaped [0, 1)");
+  assert(samples.some((entry) => entry < 0.5) && samples.some((entry) => entry >= 0.5),
+    "V04_LAB_BOOTSTRAP", "deterministic bootstrap sampler did not cover both halves");
+  const selectedIndexes = new Set(samples.map((entry) => Math.floor(entry * 8)));
+  assert(selectedIndexes.size === 8,
+    "V04_LAB_BOOTSTRAP", "deterministic bootstrap sampler cannot select all eight family rows");
 }
 
 function verifyCore() {
@@ -720,6 +741,101 @@ function verifyAdoption() {
     assert(!fs.existsSync(recoveryLock) && !fs.existsSync(recoveryStaging),
       "V04_RECOVERY", "fresh materializer invocation did not recover stale transaction state");
 
+    const doubleFailureOutput = path.join(temporaryRoot, "double-failure-core");
+    materializeProfileBundleV3({
+      repositoryRoot: root,
+      bundleId: "core",
+      outputDirectory: doubleFailureOutput,
+      allowDirty: true,
+    });
+    const doubleFailure = spawnSync(process.execPath, [
+      path.join(root, "scripts/fixtures/materializer-double-rename-failure.mjs"),
+      root,
+      doubleFailureOutput,
+    ], {
+      cwd: root,
+      encoding: "utf8",
+      shell: false,
+      windowsHide: true,
+      timeout: 60_000,
+    });
+    assert(doubleFailure.status === 0, "V04_DOUBLE_RENAME_FAILURE",
+      `double rename failure fixture failed: ${`${doubleFailure.stdout}\n${doubleFailure.stderr}`.slice(-2000)}`);
+    const doubleFailureLock = path.join(temporaryRoot, ".double-failure-core.materialize.lock");
+    const interruptedMembers = fs.readdirSync(temporaryRoot)
+      .filter((entry) => entry.startsWith(".double-failure-core."));
+    assert(!fs.existsSync(doubleFailureOutput)
+      && fs.existsSync(doubleFailureLock)
+      && interruptedMembers.some((entry) => entry.startsWith(".double-failure-core.backup-"))
+      && interruptedMembers.some((entry) => entry.startsWith(".double-failure-core.staging-")),
+    "V04_DOUBLE_RENAME_FAILURE", "failed rollback discarded its durable recovery record");
+    let recoveredThenRefusedOverwrite = false;
+    try {
+      materializeProfileBundleV3({
+        repositoryRoot: root,
+        bundleId: "core",
+        outputDirectory: doubleFailureOutput,
+        allowDirty: true,
+      });
+    } catch (error) {
+      if (!(error instanceof ProfileV3Error)) throw error;
+      recoveredThenRefusedOverwrite = error.code === "PROFILE_V3_OVERWRITE";
+    }
+    assert(recoveredThenRefusedOverwrite
+      && fs.existsSync(doubleFailureOutput)
+      && !fs.existsSync(doubleFailureLock)
+      && !fs.readdirSync(temporaryRoot).some((entry) => entry.startsWith(".double-failure-core.staging-")),
+    "V04_DOUBLE_RENAME_RECOVERY", "fresh process did not restore the preserved backup and clear recovery state");
+    verifyMaterializedConfig(doubleFailureOutput, "core");
+
+    const ambiguousBackupOutput = path.join(temporaryRoot, "ambiguous-backup-core");
+    materializeProfileBundleV3({
+      repositoryRoot: root,
+      bundleId: "core",
+      outputDirectory: ambiguousBackupOutput,
+      allowDirty: true,
+    });
+    const ambiguousBackup = spawnSync(process.execPath, [
+      path.join(root, "scripts/fixtures/materializer-double-rename-failure.mjs"),
+      root,
+      ambiguousBackupOutput,
+      "ambiguous-backup",
+    ], {
+      cwd: root,
+      encoding: "utf8",
+      shell: false,
+      windowsHide: true,
+      timeout: 60_000,
+    });
+    assert(ambiguousBackup.status === 0, "V04_AMBIGUOUS_BACKUP_FAILURE",
+      `ambiguous backup fixture failed: ${`${ambiguousBackup.stdout}\n${ambiguousBackup.stderr}`.slice(-2000)}`);
+    const ambiguousBackupLock = path.join(temporaryRoot, ".ambiguous-backup-core.materialize.lock");
+    const ambiguousMembers = fs.readdirSync(temporaryRoot)
+      .filter((entry) => entry.startsWith(".ambiguous-backup-core."));
+    assert(!fs.existsSync(ambiguousBackupOutput)
+      && fs.existsSync(ambiguousBackupLock)
+      && ambiguousMembers.some((entry) => entry.startsWith(".ambiguous-backup-core.backup-"))
+      && ambiguousMembers.some((entry) => entry.startsWith(".ambiguous-backup-core.staging-")),
+    "V04_AMBIGUOUS_BACKUP_FAILURE", "ambiguous first rename discarded its durable recovery record");
+    let ambiguousRecoveredThenRefusedOverwrite = false;
+    try {
+      materializeProfileBundleV3({
+        repositoryRoot: root,
+        bundleId: "core",
+        outputDirectory: ambiguousBackupOutput,
+        allowDirty: true,
+      });
+    } catch (error) {
+      if (!(error instanceof ProfileV3Error)) throw error;
+      ambiguousRecoveredThenRefusedOverwrite = error.code === "PROFILE_V3_OVERWRITE";
+    }
+    assert(ambiguousRecoveredThenRefusedOverwrite
+      && fs.existsSync(ambiguousBackupOutput)
+      && !fs.existsSync(ambiguousBackupLock)
+      && !fs.readdirSync(temporaryRoot).some((entry) => entry.startsWith(".ambiguous-backup-core.staging-")),
+    "V04_AMBIGUOUS_BACKUP_RECOVERY", "fresh process did not recover an ambiguous first rename");
+    verifyMaterializedConfig(ambiguousBackupOutput, "core");
+
     const liveOutput = path.join(temporaryRoot, "live-core");
     materializeProfileBundleV3({
       repositoryRoot: root,
@@ -836,6 +952,7 @@ function verifyAdoption() {
 }
 
 async function verifyLab() {
+  verifyBootstrapSamplerCoverage();
   const context_surface = await verifyBoundedContextSurface();
   const runnerExports = await import("../lib/benchmark/vnext-runner.mjs");
   assert(!Object.hasOwn(runnerExports, "applyVnextPromotionPolicy"),
@@ -1051,6 +1168,11 @@ async function verifyLab() {
         operational_trace_id: `trace-${operationalRunId}`,
         vnext_consumer_observation: {
           required_consumer_ids: instance.required_consumer_ids ?? [],
+          consumer_results: (instance.required_consumer_ids ?? []).map((consumerId) => ({
+            consumer_id: consumerId,
+            status: "passed",
+            passed: true,
+          })),
           preserved_consumer_count: instance.required_consumer_ids?.length ?? 0,
           check_status: instance.required_consumer_ids === undefined ? "not_applicable" : "passed",
           passed: true,
@@ -1190,6 +1312,59 @@ async function verifyLab() {
         "a self-consistent fabricated standard run unlocked full outside the in-process trusted runner");
     }
     if (plan.estimand_id === "core-reviewed-to-deep") {
+      const familyStrata = new Map(loaded.contract.families.map((entry) => [entry.id, entry.stratum]));
+      const partialConsumerReport = await executeVnextPlanModelFreeTest({
+        repositoryRoot: root,
+        plan,
+        executableIdentity: "fixture-opencode-identity",
+        attemptRunner: async (input) => {
+          const attempt = structuredClone(await fakeAttemptRunner(input));
+          if (familyStrata.get(input.instance.family_id) === "medium"
+            && input.profileId === plan.candidate_arm_id) {
+            const consumer = attempt.result.vnext_consumer_observation;
+            consumer.consumer_results.at(-1).status = "failed";
+            consumer.consumer_results.at(-1).passed = false;
+            consumer.preserved_consumer_count = 2;
+            consumer.check_status = "failed";
+            consumer.passed = false;
+          }
+          return attempt;
+        },
+      });
+      const partialMediumAttempts = partialConsumerReport.pair_results
+        .filter((pair) => pair.stratum === "medium")
+        .map((pair) => pair.candidate);
+      assert(partialMediumAttempts.length > 0
+        && partialMediumAttempts.every((attempt) => attempt.observations.missed_consumer_rate === (1 / 3)),
+      "V04_LAB_CONSUMER_METRIC", "two preserved consumers out of three did not produce a 1/3 missed-consumer rate");
+
+      const unsettledConsumerReport = await executeVnextPlanModelFreeTest({
+        repositoryRoot: root,
+        plan,
+        executableIdentity: "fixture-opencode-identity",
+        attemptRunner: async (input) => {
+          const attempt = structuredClone(await fakeAttemptRunner(input));
+          if (familyStrata.get(input.instance.family_id) === "medium"
+            && input.profileId === plan.candidate_arm_id) {
+            const consumer = attempt.result.vnext_consumer_observation;
+            consumer.consumer_results.at(-1).status = "not_run";
+            consumer.consumer_results.at(-1).passed = null;
+            consumer.preserved_consumer_count = 2;
+            consumer.check_status = "incomplete";
+            consumer.passed = null;
+          }
+          return attempt;
+        },
+      });
+      const unsettledMediumAttempts = unsettledConsumerReport.pair_results
+        .filter((pair) => pair.stratum === "medium")
+        .map((pair) => pair.candidate);
+      assert(unsettledConsumerReport.status === "incomplete"
+        && Object.keys(unsettledConsumerReport.product_metrics).length === 0
+        && unsettledMediumAttempts.every((attempt) => attempt.evidence_complete === false
+          && attempt.observations.missed_consumer_rate === null),
+      "V04_LAB_CONSUMER_INCOMPLETE", "an unexecuted consumer oracle was scored as complete negative evidence");
+
       const guardrailPlan = buildVnextExecutionPlan({
         repositoryRoot: root,
         suiteId: "standard",
@@ -1202,14 +1377,20 @@ async function verifyLab() {
         executableIdentity: "fixture-opencode-identity",
         allowDirty: true,
       });
-      const familyStrata = new Map(loaded.contract.families.map((entry) => [entry.id, entry.stratum]));
       const harmfulSmallRunner = async (input) => {
         const attempt = structuredClone(await fakeAttemptRunner(input));
         const stratum = familyStrata.get(input.instance.family_id);
         const candidate = input.profileId === guardrailPlan.candidate_arm_id;
         if (stratum === "medium") {
-          attempt.result.vnext_consumer_observation.preserved_consumer_count = candidate
-            ? attempt.result.vnext_consumer_observation.required_consumer_ids.length : 0;
+          const consumer = attempt.result.vnext_consumer_observation;
+          consumer.consumer_results = consumer.required_consumer_ids.map((consumerId) => ({
+            consumer_id: consumerId,
+            status: candidate ? "passed" : "failed",
+            passed: candidate,
+          }));
+          consumer.preserved_consumer_count = candidate ? consumer.required_consumer_ids.length : 0;
+          consumer.check_status = candidate ? "passed" : "failed";
+          consumer.passed = candidate;
         }
         if (stratum === "small" && candidate) {
           attempt.result.hidden_check.passed = false;
