@@ -10,6 +10,12 @@
 - Added a separately versioned vNext component-ablation contract, promotion
   policy, report schemas, and model-free validators while preserving v2
   inventory fingerprints and historical report/replay readers.
+- Recorded the frozen source-bound v0.4 model-backed campaign as
+  `STUDY INVALID — BENCHMARK DEFECT`: medium fixtures cannot cross the current
+  three-argument visible-check control boundary, while the unaffected
+  assurance smoke is `blocked-unproven` on macOS without supported concurrent
+  trusted-check containment. No model attempts were observed, no component was
+  promoted, and no runtime or threshold changed.
 
 ### Historical unreleased v0.3 development notes
 

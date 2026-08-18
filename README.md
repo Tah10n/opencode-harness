@@ -60,6 +60,16 @@ not prove that `deep` or `assurance` improves model-backed outcomes. The vNext
 contract requires paired smoke and standard runs before promotion; unavailable
 runtime evidence remains `blocked-unproven` and is never scored.
 
+The frozen v0.4 model-backed campaign at source
+`47f58de1f51930610dd9cf2272f38de9f7485e35` did not produce scored evidence.
+A validated medium-fixture command-arity defect invalidated the four estimands
+that use medium strata before any model attempt. The independent
+`deep → assurance` small/high smoke was blocked before any model attempt because
+this macOS host has no supported concurrent trusted-check containment boundary.
+No component was promoted, no production default changed, and this checkout is
+not evidence-backed release-ready. See the
+[v0.4 study report](docs/research/v0.4-model-backed-study.md).
+
 ### Migration from v0.3
 
 The source default changes from `orchestrator` to `core`. Historical
