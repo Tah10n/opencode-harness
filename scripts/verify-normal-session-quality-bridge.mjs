@@ -3951,71 +3951,94 @@ await plugin.tool.quality_context_reconcile.execute({
       },
     ],
   };
-  let bugPhaseSplitFailureArmed = true;
-  const bugPhaseSplitBridge = createNormalSessionQualityBridge({
-    ...options,
-    checkCatalog: createEngineeringCheckCatalog(projectCatalogToEngineeringCatalog(
-      bugPhaseSplitProjectCatalog,
-      NORMAL_SESSION_BRIDGE_PRODUCER,
-    )),
-    projectCatalog: bugPhaseSplitProjectCatalog,
-    evaluateGate: undefined,
-    failureInjector(stage) {
-      if (bugPhaseSplitFailureArmed && stage === "after_owner_state_persisted") {
-        bugPhaseSplitFailureArmed = false;
-        throw new Error("injected:bug-phase-split-after-owner-state-persisted");
-      }
-    },
-  });
-  const bugPhaseSplitTools = createAssuranceFacadeToolSurface({
-    toolFactory: fakeToolFactory,
-    bridge: bugPhaseSplitBridge,
-  });
-  const bugPhaseSplitContext = {
-    sessionID: "session/facade-bug-recovery-phase-split",
-    agent: "assurance",
-  };
-  const bugPhaseSplitSource = bugStartRequest();
-  delete bugPhaseSplitSource.required_check_ids;
-  delete bugPhaseSplitSource.reproduction_contract.check_id;
-  const bugPhaseSplitRequest = { request: JSON.stringify(bugPhaseSplitSource) };
-  handleNormalSessionChatMessage(bugPhaseSplitBridge, bugPhaseSplitContext);
+  async function recoverPhaseSplitBugStart(label, mutateReproductionContract) {
+    let failureArmed = true;
+    const targetBridge = createNormalSessionQualityBridge({
+      ...options,
+      checkCatalog: createEngineeringCheckCatalog(projectCatalogToEngineeringCatalog(
+        bugPhaseSplitProjectCatalog,
+        NORMAL_SESSION_BRIDGE_PRODUCER,
+      )),
+      projectCatalog: bugPhaseSplitProjectCatalog,
+      evaluateGate: undefined,
+      failureInjector(stage) {
+        if (failureArmed && stage === "after_owner_state_persisted") {
+          failureArmed = false;
+          throw new Error(`injected:${label}-after-owner-state-persisted`);
+        }
+      },
+    });
+    const targetTools = createAssuranceFacadeToolSurface({
+      toolFactory: fakeToolFactory,
+      bridge: targetBridge,
+    });
+    const targetContext = {
+      sessionID: `session/facade-bug-recovery-${label}`,
+      agent: "assurance",
+    };
+    const source = bugStartRequest();
+    delete source.required_check_ids;
+    mutateReproductionContract(source.reproduction_contract);
+    const request = { request: JSON.stringify(source) };
+    handleNormalSessionChatMessage(targetBridge, targetContext);
+    await assert.rejects(
+      targetTools.quality_assurance_start.execute(request, targetContext),
+      new RegExp(`injected:${label}-after-owner-state-persisted`, "u"),
+    );
+    const registration = inspectNormalSessionRegistration(targetBridge, targetContext.sessionID);
+    assert.deepEqual(registration.required_check_ids, ["normal-bug-reproducer"]);
+    assert.equal(registration.reproduction_contract.check_id, "normal-bug-reproducer");
+    const recovered = JSON.parse(await targetTools.quality_assurance_start.execute(request, targetContext));
+    const replayed = JSON.parse(await targetTools.quality_assurance_start.execute(request, targetContext));
+    assert.deepEqual(replayed, recovered,
+      `${label} must replay the same raw facade request after a lost response`);
+    assert.deepEqual(
+      inspectNormalSessionRegistration(targetBridge, targetContext.sessionID).reproduction_contract,
+      registration.reproduction_contract,
+      `${label} replay must retain the exact registered reproduction contract`,
+    );
+    return { bridge: targetBridge, tools: targetTools, context: targetContext, source };
+  }
+
+  const bugPhaseSplitFixture = await recoverPhaseSplitBugStart(
+    "omitted-reproducer",
+    (contract) => { delete contract.check_id; },
+  );
+  const staleUniqueReproducerFixture = await recoverPhaseSplitBugStart(
+    "stale-unique-reproducer",
+    (contract) => { contract.check_id = "stale-model-guessed-id"; },
+  );
+  assert.equal(
+    inspectNormalSessionRegistration(
+      staleUniqueReproducerFixture.bridge,
+      staleUniqueReproducerFixture.context.sessionID,
+    ).reproduction_contract.check_id,
+    "normal-bug-reproducer",
+    "a unique trusted reproducer must override the same stale caller ID on initial start and replay",
+  );
+  const redundantUnavailableReasonFixture = await recoverPhaseSplitBugStart(
+    "redundant-unavailable-reason",
+    (contract) => { contract.unavailable_reason = "irrelevant caller reason"; },
+  );
+  assert.equal(
+    inspectNormalSessionRegistration(
+      redundantUnavailableReasonFixture.bridge,
+      redundantUnavailableReasonFixture.context.sessionID,
+    ).reproduction_contract.unavailable_reason,
+    null,
+    "a non-unavailable pre-fix outcome must canonicalize the same redundant reason to null on start and replay",
+  );
   await assert.rejects(
-    bugPhaseSplitTools.quality_assurance_start.execute(bugPhaseSplitRequest, bugPhaseSplitContext),
-    /injected:bug-phase-split-after-owner-state-persisted/u,
-  );
-  const savedBugRegistration = inspectNormalSessionRegistration(
-    bugPhaseSplitBridge,
-    bugPhaseSplitContext.sessionID,
-  );
-  assert.deepEqual(savedBugRegistration.required_check_ids, ["normal-bug-reproducer"]);
-  assert.equal(savedBugRegistration.reproduction_contract.check_id, "normal-bug-reproducer");
-  const recoveredBugPhaseSplit = JSON.parse(await bugPhaseSplitTools.quality_assurance_start.execute(
-    bugPhaseSplitRequest,
-    bugPhaseSplitContext,
-  ));
-  const replayedBugPhaseSplit = JSON.parse(await bugPhaseSplitTools.quality_assurance_start.execute(
-    bugPhaseSplitRequest,
-    bugPhaseSplitContext,
-  ));
-  assert.deepEqual(replayedBugPhaseSplit, recoveredBugPhaseSplit,
-    "standard-lite bug replay must restore its saved reproduction contract and lifecycle receipt");
-  assert.deepEqual(
-    inspectNormalSessionRegistration(bugPhaseSplitBridge, bugPhaseSplitContext.sessionID).reproduction_contract,
-    savedBugRegistration.reproduction_contract,
-    "standard-lite bug replay must retain the exact registered reproduction contract",
-  );
-  await assert.rejects(
-    bugPhaseSplitTools.quality_assurance_start.execute({
+    bugPhaseSplitFixture.tools.quality_assurance_start.execute({
       request: JSON.stringify({
-        ...bugPhaseSplitSource,
+        ...bugPhaseSplitFixture.source,
         reproduction_contract: {
-          ...bugPhaseSplitSource.reproduction_contract,
+          ...bugPhaseSplitFixture.source.reproduction_contract,
           expected_pre_fix: "unavailable",
           unavailable_reason: "changed retry intent",
         },
       }),
-    }, bugPhaseSplitContext),
+    }, bugPhaseSplitFixture.context),
     (error) => error?.code === "QUALITY_SESSION_REPLAY",
     "classified facade replay must still reject changed caller-owned reproduction intent",
   );
