@@ -45,6 +45,7 @@ import {
   cleanupSyntheticProfile,
   isolatedSyntheticProfileEnvironment,
   materializeSyntheticProfile,
+  materializeVnextSyntheticProfile,
   readSyntheticProfileManifest,
   resolveSyntheticOpenCodeAuthContent,
   SYNTHETIC_MODEL_RUNTIME_ENVIRONMENT_KEYS,
@@ -2113,6 +2114,27 @@ async function executionFixtures(root, plainProfile, instrumentedProfile) {
     assert.equal(success.trace_summary.workspace_mutation_count, null);
     assert.equal(success.trace_summary.fix_command_count, null);
     assert.equal(success.trace_summary.observed_mutation_tool_count, 1);
+    const reviewerProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P3" });
+    try {
+      const explicitReviewer = await executeOpenCodeAdapter({
+        ...baseInput,
+        agentId: "core-reviewer",
+        profileId: reviewerProfile.profileId,
+        profileFingerprint: reviewerProfile.profileFingerprint,
+        profileManifestPath: reviewerProfile.manifestPath,
+        taskScopeMode: "read-only",
+        trace: { async emit() { return null; } },
+      }, {
+        spawnImpl: spawn,
+        executable: process.execPath,
+        executableArgsPrefix: [fakeCli],
+      });
+      assert.equal(explicitReviewer.passed, true);
+      assert.equal(explicitReviewer.status, "completed");
+      assert.equal(explicitReviewer.profile_fingerprint, reviewerProfile.profileFingerprint);
+    } finally {
+      cleanupSyntheticProfile(reviewerProfile);
+    }
     assert.equal(success.agent_outcome, "success");
     assert.deepEqual(success.review_findings, []);
     assert.equal(success.transient_observations.observation_complete, true);
