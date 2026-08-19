@@ -5,6 +5,46 @@ The development and validation manifests are executable and their reference
 solutions pass every visible, hidden, and consumer check. No model-backed v2
 outcome exists, and the holdout is intentionally unselected.
 
+## Development campaign runner
+
+`npm run bench:v2:campaign` materializes the physical development or sealed
+validation split, counterbalances adjacent cumulative arms per family and
+repetition, and executes the existing isolated OpenCode adapter. The manual
+`benchmark-v2-development.yml` workflow pins the primary binding to
+`openai/gpt-5.6-luna`, provider `openai`, variant `low`, and 300000 ms. It first
+runs a model-backed baseline/candidate acceptance pair, requires Linux cgroup-v2
+configuration, then runs the full paired campaign.
+
+Persisted reports exclude prompts, fixture contents, hidden files, reference
+solutions, stdout/stderr, and credentials. The artifact reader recomputes plan,
+pair, and report fingerprints before upload. Development output may retain or
+reject a candidate for another architecture generation; it is not confirmatory
+evidence and cannot produce a product promotion claim.
+
+The primary test is the preregistered one-sided exact paired sign permutation
+over discordant task outcomes (`candidate-greater`), matching the power model.
+Confidence intervals resample whole task families, so paired repetitions from
+one family remain clustered. Development reports also emit stratum, safety,
+timeout, activation, defect-relation, and duration guardrails from the frozen
+policy without changing thresholds after observing outcomes.
+
+Example plan inspection (model-free and allowed on a dirty development tree):
+
+```sh
+npm run bench:v2:campaign -- --plan-only --allow-dirty \
+  --split development --generation generation-1 \
+  --baseline P1 --candidate P2 \
+  --model openai/gpt-5.6-luna --provider openai --variant low \
+  --timeout-ms 300000 --seed preregistered-development-seed --repetitions 1
+```
+
+Validation requires `--validation-use-ordinal 1` or `2`; the runner rejects a
+missing or out-of-range ordinal. The manual workflow gives each validation
+generation/ordinal a stable artifact name and rejects a run when that persisted
+artifact already exists. Deleting evidence to reuse an ordinal violates the
+sealed-validation contract even if the repository cannot prevent that external
+administrative action.
+
 ## Why the design is paired and sealed
 
 The primary outcome is binary and both arms run the same task/seed/binding, so

@@ -1,0 +1,196 @@
+name: Benchmark v2 development (manual model-backed)
+
+on:
+  workflow_dispatch:
+    inputs:
+      split:
+        description: Development or sealed validation corpus
+        required: true
+        type: choice
+        default: development
+        options: [development, validation]
+      generation:
+        description: Immutable architecture-generation identifier
+        required: true
+        type: string
+      baseline:
+        description: Baseline cumulative arm
+        required: true
+        type: choice
+        options: [P0, P1, P2, P3]
+      candidate:
+        description: Candidate cumulative arm
+        required: true
+        type: choice
+        options: [P1, P2, P3, P4]
+      seed:
+        description: Preregistered development seed
+        required: true
+        type: string
+      validation_use_ordinal:
+        description: Required for validation (1 or 2); ignored for development
+        required: true
+        type: choice
+        default: "1"
+        options: ["1", "2"]
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: benchmark-v2-${{ github.ref }}-${{ inputs.split }}-${{ inputs.generation }}-${{ inputs.baseline }}-${{ inputs.candidate }}
+  cancel-in-progress: false
+
+env:
+  BENCHMARK_V2_MODEL: openai/gpt-5.6-luna
+  BENCHMARK_V2_PROVIDER: openai
+  BENCHMARK_V2_VARIANT: low
+  BENCHMARK_V2_TIMEOUT_MS: "300000"
+
+jobs:
+  campaign:
+    name: ${{ inputs.split }} ${{ inputs.baseline }} to ${{ inputs.candidate }}
+    runs-on: [self-hosted, opencode-benchmark]
+    environment: synthetic-benchmark
+    timeout-minutes: 360
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Install exact dependencies
+        run: npm ci
+
+      - name: Verify campaign contracts and Linux containment
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(uname -s)" = "Linux"
+          test "$(stat -fc %T /sys/fs/cgroup)" = "cgroup2fs"
+          test -n "${OPENCODE_QUALITY_CGROUP_ROOT:-}"
+          test -n "${OPENCODE_QUALITY_CGROUP_ATTACH_MODE:-}"
+          test -n "${OPENCODE_QUALITY_CGROUP_ATTACH_HELPER:-}"
+          npm run verify:benchmark:v2:contracts
+          npm run verify:benchmark:v2:fixtures
+          npm run verify:benchmark:v2:campaign
+          npm run verify:benchmark:adapter
+          npm run verify:core-verification-runner
+          npm run verify:bounded-repository-map-runner
+          npm run verify:automatic-review-gate
+          git diff --exit-code
+          test -z "$(git status --porcelain=v1 --untracked-files=all)"
+
+      - name: Bind evidence artifact identity
+        id: artifact
+        shell: bash
+        env:
+          SPLIT: ${{ inputs.split }}
+          GENERATION: ${{ inputs.generation }}
+          VALIDATION_USE_ORDINAL: ${{ inputs.validation_use_ordinal }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$GENERATION" =~ ^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$ ]]; then
+            echo "generation must be a bounded artifact-safe identifier" >&2
+            exit 1
+          fi
+          if [[ "$SPLIT" == "validation" ]]; then
+            name="benchmark-v2-validation-${GENERATION}-use-${VALIDATION_USE_ORDINAL}"
+          else
+            name="benchmark-v2-development-${GENERATION}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          fi
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+
+      - name: Reject reused sealed-validation ordinal
+        if: inputs.split == 'validation'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT_NAME: ${{ steps.artifact.outputs.name }}
+        run: |
+          set -euo pipefail
+          response="$RUNNER_TEMP/benchmark-v2-existing-artifacts.json"
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts?per_page=100" --paginate --slurp > "$response"
+          ARTIFACT_RESPONSE="$response" node -e '
+            const fs = require("node:fs");
+            const pages = JSON.parse(fs.readFileSync(process.env.ARTIFACT_RESPONSE, "utf8"));
+            const matches = pages.flatMap((page) => page.artifacts ?? []).filter((artifact) => artifact.name === process.env.ARTIFACT_NAME);
+            if (matches.length !== 0) {
+              process.stderr.write(`validation use ordinal already has ${matches.length} persisted artifact(s)\n`);
+              process.exit(1);
+            }
+          '
+
+      - name: Run hash-bound paired campaign
+        id: campaign
+        shell: bash
+        env:
+          SPLIT: ${{ inputs.split }}
+          GENERATION: ${{ inputs.generation }}
+          BASELINE: ${{ inputs.baseline }}
+          CANDIDATE: ${{ inputs.candidate }}
+          SEED: ${{ inputs.seed }}
+          REPETITIONS: "1"
+          VALIDATION_USE_ORDINAL: ${{ inputs.validation_use_ordinal }}
+        run: |
+          set -euo pipefail
+          output="$RUNNER_TEMP/benchmark-v2-campaign-output.json"
+          args=(
+            --split "$SPLIT"
+            --generation "$GENERATION"
+            --baseline "$BASELINE"
+            --candidate "$CANDIDATE"
+            --model "$BENCHMARK_V2_MODEL"
+            --provider "$BENCHMARK_V2_PROVIDER"
+            --variant "$BENCHMARK_V2_VARIANT"
+            --timeout-ms "$BENCHMARK_V2_TIMEOUT_MS"
+            --seed "$SEED"
+            --repetitions "$REPETITIONS"
+          )
+          if [[ "$SPLIT" == "validation" ]]; then
+            args+=(--validation-use-ordinal "$VALIDATION_USE_ORDINAL")
+          fi
+          acceptance="$RUNNER_TEMP/benchmark-v2-acceptance.json"
+          npm run --silent bench:v2:campaign -- --acceptance-only "${args[@]}" > "$acceptance"
+          ACCEPTANCE_OUTPUT="$acceptance" node -e '
+            const fs = require("node:fs");
+            const value = JSON.parse(fs.readFileSync(process.env.ACCEPTANCE_OUTPUT, "utf8"));
+            if (value.status !== "passed" || value.evidence_class !== "model-backed-acceptance") process.exit(1);
+          '
+          npm run --silent bench:v2:campaign -- "${args[@]}" > "$output"
+          REPORT_OUTPUT="$output" node -e '
+            const fs = require("node:fs");
+            const value = JSON.parse(fs.readFileSync(process.env.REPORT_OUTPUT, "utf8"));
+            if (typeof value.report_path !== "string") process.exit(1);
+            process.stdout.write(`report_path=${value.report_path}\n`);
+            process.stdout.write(`decision=${value.decision}\n`);
+          ' >> "$GITHUB_OUTPUT"
+
+      - name: Validate privacy-safe evidence artifact
+        id: validate
+        shell: bash
+        env:
+          REPORT_PATH: ${{ steps.campaign.outputs.report_path }}
+        run: |
+          set -euo pipefail
+          validation="$(npm run --silent bench:v2:campaign:validate -- --report "$REPORT_PATH")"
+          VALIDATION_JSON="$validation" node -e '
+            const value = JSON.parse(process.env.VALIDATION_JSON);
+            if (value.status !== "validated" || !Array.isArray(value.artifact_files) || value.artifact_files.length !== 1) process.exit(1);
+            process.stdout.write(`artifact_path=${value.artifact_files[0]}\n`);
+          ' >> "$GITHUB_OUTPUT"
+
+      - name: Upload validated campaign evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ${{ steps.artifact.outputs.name }}
+          path: ${{ steps.validate.outputs.artifact_path }}
+          if-no-files-found: error
+          retention-days: 90

@@ -384,6 +384,7 @@ const requiredFiles = [
   "lib/quality/automatic-review-gate.mjs",
   "lib/benchmark/v2-contracts.mjs",
   "lib/benchmark/v2-fixtures.mjs",
+  "lib/benchmark/v2-campaign.mjs",
   "lib/benchmark/v2-validation-kernels.mjs",
   "lib/quality/milestone-dod.mjs",
   "lib/quality/normal-session-bridge.mjs",
@@ -426,6 +427,9 @@ const requiredFiles = [
   "scripts/verify-core-verification-runner.mjs",
   "scripts/verify-benchmark-v2-contracts.mjs",
   "scripts/verify-benchmark-v2-fixtures.mjs",
+  "scripts/verify-benchmark-v2-campaign.mjs",
+  "scripts/benchmark-v2-campaign.mjs",
+  "scripts/validate-benchmark-v2-campaign.mjs",
   "scripts/verify-bounded-repository-map.mjs",
   "scripts/verify-bounded-repository-map-runner.mjs",
   "scripts/verify-automatic-review-gate.mjs",
@@ -561,7 +565,7 @@ for (const forbiddenScript of ["assess:quality-candidate", "verify:model-profile
   }
 }
 const expectedDeterministicStages = [
-  "verify:v0.4", "verify:static", "verify:benchmark:model-free", "verify:evaluator:paired-defects", "verify:core-verification-gate", "verify:core-verification-runner", "verify:benchmark:v2:contracts", "verify:benchmark:v2:fixtures", "verify:bounded-repository-map", "verify:bounded-repository-map-runner", "verify:automatic-review-gate", "verify:feedback-foundation", "verify:trace-store", "verify:report-history", "verify:adapter-worker",
+  "verify:v0.4", "verify:static", "verify:benchmark:model-free", "verify:evaluator:paired-defects", "verify:core-verification-gate", "verify:core-verification-runner", "verify:benchmark:v2:contracts", "verify:benchmark:v2:fixtures", "verify:benchmark:v2:campaign", "verify:bounded-repository-map", "verify:bounded-repository-map-runner", "verify:automatic-review-gate", "verify:feedback-foundation", "verify:trace-store", "verify:report-history", "verify:adapter-worker",
   "eval", "verify:drift", "verify:adoption-bundle", "verify:package-boundary", "verify:runtime:fixture", "verify:runtime:quality-hooks:fixture",
   "verify:live-eval", "verify:acceptance",
   "verify:quality-contracts", "verify:engineering-dossier", "verify:architecture-policy", "verify:impact-graph",
@@ -774,6 +778,7 @@ for (const [name, command] of Object.entries({
   "verify:core-verification-runner": "node scripts/verify-core-verification-runner.mjs",
   "verify:benchmark:v2:contracts": "node scripts/verify-benchmark-v2-contracts.mjs",
   "verify:benchmark:v2:fixtures": "node scripts/verify-benchmark-v2-fixtures.mjs",
+  "verify:benchmark:v2:campaign": "node scripts/verify-benchmark-v2-campaign.mjs",
   "verify:bounded-repository-map": "node scripts/verify-bounded-repository-map.mjs",
   "verify:bounded-repository-map-runner": "node scripts/verify-bounded-repository-map-runner.mjs",
   "verify:automatic-review-gate": "node scripts/verify-automatic-review-gate.mjs",

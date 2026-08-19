@@ -1,0 +1,97 @@
+import path from "node:path";
+import process from "node:process";
+import { fileURLToPath } from "node:url";
+
+import {
+  buildBenchmarkV2CampaignPlan,
+  executeBenchmarkV2Acceptance,
+  executeBenchmarkV2Campaign,
+  writeBenchmarkV2CampaignReport,
+} from "../lib/benchmark/v2-campaign.mjs";
+import { resolveSyntheticOpenCodeExecutableIdentity } from "../lib/benchmark/opencode-adapter.mjs";
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+
+function parse(values) {
+  const result = {
+    split: null,
+    generationId: null,
+    baselineArmId: null,
+    candidateArmId: null,
+    model: null,
+    provider: null,
+    variant: null,
+    seed: null,
+    timeoutMs: 300_000,
+    repetitions: 1,
+    validationUseOrdinal: null,
+    planOnly: false,
+    acceptanceOnly: false,
+    allowDirty: false,
+  };
+  const mapping = {
+    "--split": "split",
+    "--generation": "generationId",
+    "--baseline": "baselineArmId",
+    "--candidate": "candidateArmId",
+    "--model": "model",
+    "--provider": "provider",
+    "--variant": "variant",
+    "--seed": "seed",
+    "--timeout-ms": "timeoutMs",
+    "--repetitions": "repetitions",
+    "--validation-use-ordinal": "validationUseOrdinal",
+  };
+  for (let index = 0; index < values.length; index += 1) {
+    const key = values[index];
+    if (key === "--plan-only") {
+      result.planOnly = true;
+      continue;
+    }
+    if (key === "--acceptance-only") {
+      result.acceptanceOnly = true;
+      continue;
+    }
+    if (key === "--allow-dirty") {
+      result.allowDirty = true;
+      continue;
+    }
+    const property = mapping[key];
+    const next = values[index + 1];
+    if (property === undefined || typeof next !== "string" || next.startsWith("--")) throw new Error(`invalid argument ${key}`);
+    result[property] = ["timeoutMs", "repetitions", "validationUseOrdinal"].includes(property) ? Number(next) : next;
+    index += 1;
+  }
+  for (const key of ["split", "generationId", "baselineArmId", "candidateArmId", "model", "provider", "variant", "seed"]) {
+    if (result[key] === null) throw new Error(`missing ${key}`);
+  }
+  if (result.planOnly && result.acceptanceOnly) throw new Error("plan-only and acceptance-only are mutually exclusive");
+  if (result.allowDirty && !result.planOnly) throw new Error("--allow-dirty is restricted to plan-only inspection");
+  return result;
+}
+
+try {
+  const options = parse(process.argv.slice(2));
+  const executableIdentity = resolveSyntheticOpenCodeExecutableIdentity();
+  if (executableIdentity === null && !options.planOnly) throw new Error("OpenCode executable identity is unavailable");
+  const plan = buildBenchmarkV2CampaignPlan({
+    repositoryRoot: root,
+    ...options,
+    executableIdentity,
+  });
+  if (options.planOnly) {
+    process.stdout.write(`${JSON.stringify(plan, null, 2)}\n`);
+  } else if (options.acceptanceOnly) {
+    const acceptance = await executeBenchmarkV2Acceptance({ repositoryRoot: root, plan, executableIdentity });
+    process.stdout.write(`${JSON.stringify(acceptance, null, 2)}\n`);
+    if (acceptance.status !== "passed") process.exitCode = 2;
+  } else {
+    const report = await executeBenchmarkV2Campaign({ repositoryRoot: root, plan, executableIdentity });
+    const reportPath = writeBenchmarkV2CampaignReport(root, report);
+    process.stdout.write(`${JSON.stringify({ status: report.status, decision: report.decision, report_path: reportPath, report_fingerprint: report.report_fingerprint }, null, 2)}\n`);
+    if (report.status !== "complete") process.exitCode = 2;
+  }
+} catch (error) {
+  process.stderr.write(`${error.code ?? "BENCHMARK_V2_CAMPAIGN_UNEXPECTED"}: ${error.message}\n`);
+  process.exitCode = 1;
+}
