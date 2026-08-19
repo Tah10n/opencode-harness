@@ -381,6 +381,7 @@ const requiredFiles = [
   "lib/benchmark/paired-defect-evaluator.mjs",
   "lib/quality/core-verification-gate.mjs",
   "lib/benchmark/v2-contracts.mjs",
+  "lib/benchmark/v2-fixtures.mjs",
   "lib/quality/milestone-dod.mjs",
   "lib/quality/normal-session-bridge.mjs",
   "lib/quality/normal-session-plugin.mjs",
@@ -421,6 +422,7 @@ const requiredFiles = [
   "scripts/verify-core-verification-gate.mjs",
   "scripts/verify-core-verification-runner.mjs",
   "scripts/verify-benchmark-v2-contracts.mjs",
+  "scripts/verify-benchmark-v2-fixtures.mjs",
   "scripts/verify-benchmark-renderer.mjs",
   "scripts/verify-benchmark-reporting.mjs",
   "scripts/verify-benchmark-runner.mjs",
@@ -553,7 +555,7 @@ for (const forbiddenScript of ["assess:quality-candidate", "verify:model-profile
   }
 }
 const expectedDeterministicStages = [
-  "verify:v0.4", "verify:static", "verify:benchmark:model-free", "verify:evaluator:paired-defects", "verify:core-verification-gate", "verify:core-verification-runner", "verify:benchmark:v2:contracts", "verify:feedback-foundation", "verify:trace-store", "verify:report-history", "verify:adapter-worker",
+  "verify:v0.4", "verify:static", "verify:benchmark:model-free", "verify:evaluator:paired-defects", "verify:core-verification-gate", "verify:core-verification-runner", "verify:benchmark:v2:contracts", "verify:benchmark:v2:fixtures", "verify:feedback-foundation", "verify:trace-store", "verify:report-history", "verify:adapter-worker",
   "eval", "verify:drift", "verify:adoption-bundle", "verify:package-boundary", "verify:runtime:fixture", "verify:runtime:quality-hooks:fixture",
   "verify:live-eval", "verify:acceptance",
   "verify:quality-contracts", "verify:engineering-dossier", "verify:architecture-policy", "verify:impact-graph",
@@ -765,6 +767,7 @@ for (const [name, command] of Object.entries({
   "verify:core-verification-gate": "node scripts/verify-core-verification-gate.mjs",
   "verify:core-verification-runner": "node scripts/verify-core-verification-runner.mjs",
   "verify:benchmark:v2:contracts": "node scripts/verify-benchmark-v2-contracts.mjs",
+  "verify:benchmark:v2:fixtures": "node scripts/verify-benchmark-v2-fixtures.mjs",
   "verify:benchmark:contracts": "node scripts/verify-benchmark-contracts.mjs",
   "verify:benchmark:renderer": "node scripts/verify-benchmark-renderer.mjs",
   "verify:benchmark:reporting": "node scripts/verify-benchmark-reporting.mjs",

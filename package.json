@@ -70,6 +70,7 @@
     "verify:core-verification-gate": "node scripts/verify-core-verification-gate.mjs",
     "verify:core-verification-runner": "node scripts/verify-core-verification-runner.mjs",
     "verify:benchmark:v2:contracts": "node scripts/verify-benchmark-v2-contracts.mjs",
+    "verify:benchmark:v2:fixtures": "node scripts/verify-benchmark-v2-fixtures.mjs",
     "verify:benchmark:renderer": "node scripts/verify-benchmark-renderer.mjs",
     "verify:benchmark:reporting": "node scripts/verify-benchmark-reporting.mjs",
     "verify:benchmark:runner": "node scripts/verify-benchmark-runner.mjs",
