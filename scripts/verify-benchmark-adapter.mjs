@@ -265,6 +265,7 @@ function fakeOpenCodeSource({
   stderrChunks = [],
   expectedAuthRefresh = null,
   rotateAuthRecord = null,
+  continuationStream = "",
 } = {}) {
   const descendantSource = descendantMarker === null
     ? null
@@ -288,6 +289,7 @@ function fakeOpenCodeSource({
     `const stderrChunks = ${JSON.stringify(stderrChunks)};`,
     `const expectedAuthRefresh = ${JSON.stringify(expectedAuthRefresh)};`,
     `const rotateAuthRecord = ${JSON.stringify(rotateAuthRecord)};`,
+    `const continuationStream = ${JSON.stringify(Buffer.from(continuationStream).toString("base64"))};`,
     "if (args[0] === '--version') {",
     versionMode === "timeout"
       ? "  setInterval(() => {}, 60_000);"
@@ -338,6 +340,10 @@ function fakeOpenCodeSource({
     "  writeNext();",
     "}",
     "else if (mode === 'stderr-limit') { process.stderr.write('x'.repeat(4096)); setInterval(() => {}, 60_000); }",
+    "else if (mode === 'missing-final-then-final') {",
+    "  const selected = args.includes('--session') ? continuationStream : " + JSON.stringify(Buffer.from(stream).toString("base64")) + ";",
+    "  process.stdout.write(Buffer.from(selected, 'base64'));",
+    "}",
     "else {",
     `  process.stdout.write(Buffer.from(${JSON.stringify(Buffer.from(stream).toString("base64"))}, 'base64'));`,
     "}",
@@ -1885,6 +1891,30 @@ async function executionFixtures(root, plainProfile, instrumentedProfile) {
   const missingFinalCli = writeFakeOpenCode(fixtureRoot, "fake-opencode-missing-final", {
     stream: jsonl(JSON.stringify({ type: "step_finish", part: {} })),
   });
+  const finalContinuationSession = "ses_final_continuation_fixture";
+  const finalContinuationCli = writeFakeOpenCode(fixtureRoot, "fake-opencode-final-continuation", {
+    mode: "missing-final-then-final",
+    stream: jsonl(JSON.stringify({
+      type: "step_finish",
+      sessionID: finalContinuationSession,
+      part: {},
+    })),
+    continuationStream: jsonl(finalEvent(
+      "Completed the requested change; targeted checks passed.",
+      "final-after-continuation",
+      finalContinuationSession,
+    )),
+  });
+  const repeatedMissingFinalStream = jsonl(JSON.stringify({
+    type: "step_finish",
+    sessionID: finalContinuationSession,
+    part: {},
+  }));
+  const repeatedMissingFinalCli = writeFakeOpenCode(fixtureRoot, "fake-opencode-repeated-missing-final", {
+    mode: "missing-final-then-final",
+    stream: repeatedMissingFinalStream,
+    continuationStream: repeatedMissingFinalStream,
+  });
   const invalidFinalCli = writeFakeOpenCode(fixtureRoot, "fake-opencode-invalid-final", {
     stream: jsonl(finalEvent("ordinary prose")),
   });
@@ -2511,6 +2541,53 @@ async function executionFixtures(root, plainProfile, instrumentedProfile) {
     assert.equal(missingFinal.claimed_outcome_availability, "unavailable");
     assert.equal(missingFinal.trace_summary.stream_complete, true);
     assert.equal(missingFinal.transient_observations.observation_complete, true);
+
+    const finalResponseInvocations = [];
+    const finalResponseSpawn = (executable, args, options) => {
+      finalResponseInvocations.push([...args]);
+      return spawn(executable, args, options);
+    };
+    const finalContinuation = await executeOpenCodeAdapter(baseInput, {
+      executable: process.execPath,
+      executableArgsPrefix: [finalContinuationCli],
+      spawnImpl: finalResponseSpawn,
+    });
+    assert.equal(finalContinuation.passed, true, JSON.stringify(finalContinuation, null, 2));
+    assert.equal(finalContinuation.status, "completed");
+    assert.equal(finalContinuation.parser_status, "valid");
+    assert.equal(finalContinuation.model_turn_count, 2);
+    assert.equal(finalContinuation.continuation_turn_count, 1);
+    const finalContinuationRuns = finalResponseInvocations
+      .filter((args) => args[0] === finalContinuationCli && args.includes("run"));
+    assert.equal(finalContinuationRuns.length, 2);
+    assert.equal(finalContinuationRuns[0].includes("--session"), false);
+    assert.equal(finalContinuationRuns[1].includes("--session"), true);
+    assert.equal(
+      finalContinuationRuns[1][finalContinuationRuns[1].indexOf("--session") + 1],
+      finalContinuationSession,
+    );
+    const finalContinuationPrompt = finalContinuationRuns[1][finalContinuationRuns[1].indexOf("run") + 1];
+    assert.match(finalContinuationPrompt, /Do not call tools or make further changes/u);
+    assert.match(finalContinuationPrompt, /truthful final response/u);
+    assert.equal(assertNeutralSyntheticModelVisibleValue(
+      finalContinuationPrompt,
+      "final response continuation prompt",
+    ), true);
+
+    const repeatedMissingFinalInvocationStart = finalResponseInvocations.length;
+    const repeatedMissingFinal = await executeOpenCodeAdapter(baseInput, {
+      executable: process.execPath,
+      executableArgsPrefix: [repeatedMissingFinalCli],
+      spawnImpl: finalResponseSpawn,
+    });
+    assert.equal(repeatedMissingFinal.passed, false);
+    assert.equal(repeatedMissingFinal.reason, "opencode_missing_final");
+    assert.equal(repeatedMissingFinal.model_turn_count, 2);
+    assert.equal(repeatedMissingFinal.continuation_turn_count, 1);
+    const repeatedMissingFinalRuns = finalResponseInvocations
+      .slice(repeatedMissingFinalInvocationStart)
+      .filter((args) => args[0] === repeatedMissingFinalCli && args.includes("run"));
+    assert.equal(repeatedMissingFinalRuns.length, 2, "missing final may receive exactly one continuation");
 
     const ordinaryJsonFinal = await executeOpenCodeAdapter(baseInput, {
       executable: process.execPath,

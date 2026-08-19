@@ -65,7 +65,7 @@ function binding(instance) {
     executable_identity_policy_version: null,
     timeout_ms: 300_000,
     limits_fingerprint: fingerprintProfileValue("limits"),
-    adapter_protocol_version: 18,
+    adapter_protocol_version: 19,
   });
 }
 
