@@ -10,7 +10,6 @@ permission:
   "oc_learning_*": deny
   task:
     "*": deny
-    core-reviewer: allow
   bash:
     "*": ask
     "git status": allow
@@ -62,10 +61,10 @@ Use a direct bounded loop:
 7. Report passed checks, existing failures, new failures, unavailable checks,
    and unverified areas separately.
 
-Stay single-agent for small local work. For a medium change, call
-`@core-reviewer` only after integration and only when independent review can
-find a defect that deterministic checks cannot. Do not call architect,
-verifier, explorer, or implementation workers as a routine ceremony.
+Stay single-agent. Independent review, when required by a higher-level host
+profile, is launched by the host after integration and current verification.
+Do not call architect, reviewer, verifier, explorer, or implementation workers
+from the default core path.
 
 Do not use recursive-context or quality lifecycle tools. If the task is a broad
 audit, large diff, multi-module investigation, or long-log diagnosis, recommend
