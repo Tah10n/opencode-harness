@@ -52,7 +52,7 @@ try {
     reference_patch_access: "forbidden-before-model-settlement",
     repositories: [{
       id: "example-repository", url: "https://github.com/example/repository",
-      license_spdx: "MIT", license_path: "license", license_blob_sha: licenseBlobSha,
+      license_spdx: "MIT", license_path: "license", license_blob_shas: [licenseBlobSha],
     }],
     candidates: [{
       id: "real-small-value-contract", stratum: "small", repository_id: "example-repository",
@@ -96,7 +96,7 @@ try {
     registry: changedPathRegistry, candidateId: "real-small-value-contract", repositoryRoot: root,
   }), /BENCHMARK_V2_REAL_CHANGED_PATHS/u);
   const wrongLicenseRegistry = structuredClone(registry);
-  wrongLicenseRegistry.repositories[0].license_blob_sha = "a".repeat(40);
+  wrongLicenseRegistry.repositories[0].license_blob_shas = ["a".repeat(40)];
   assert.throws(() => prepareBenchmarkV2RealCommitCandidate({
     registry: wrongLicenseRegistry, candidateId: "real-small-value-contract", repositoryRoot: root,
   }), /BENCHMARK_V2_REAL_LICENSE/u);

@@ -111,6 +111,18 @@ repository can be fetched in the trusted runtime, every visible requirement is
 audited for completeness, and every prepared fixture and post-settlement oracle
 passes the corpus gate.
 
+The pre-model source audit is reproducible against an object-filtered cache in
+which each repository directory is named by its registry ID:
+
+```sh
+npm run bench:v2:real-commit:verify-sources -- --cache-root /trusted/cache
+```
+
+The command verifies the origin, commit-parent relation, historical MIT blob,
+changed-path identity, bounded parent snapshot, and unique fixture identity for
+all 36 candidates. It does not fetch repositories, read reference files, or
+claim that visible requirements and post-settlement oracles are complete.
+
 The preregistered pilot runs only after a positive synthetic holdout gate and is
 external-validity evidence, never promotion evidence. It requires at least 12
 new paired tasks from at least three compatible-license repositories. Every

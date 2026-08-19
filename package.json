@@ -44,6 +44,7 @@
     "bench:v2:campaign:validate": "node scripts/validate-benchmark-v2-campaign.mjs",
     "bench:v2:freeze": "node scripts/benchmark-v2-freeze.mjs",
     "bench:v2:freeze:validate": "node scripts/validate-benchmark-v2-freeze.mjs",
+    "bench:v2:real-commit:verify-sources": "node scripts/benchmark-v2-real-commit-verify-sources.mjs",
     "bench:v2:salt:commit": "node scripts/create-benchmark-v2-salt-commitment.mjs",
     "build:macos-containment": "node scripts/build-macos-containment.mjs",
     "build:linux-cgroup-attach": "node scripts/build-linux-cgroup-attach-helper.mjs",

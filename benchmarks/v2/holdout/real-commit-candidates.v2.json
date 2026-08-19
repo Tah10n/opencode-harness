@@ -6,11 +6,11 @@
   "metadata_source": "github-commit-api-without-patch-bodies",
   "reference_patch_access": "forbidden-before-model-settlement",
   "repositories": [
-    { "id": "sindresorhus-p-limit", "url": "https://github.com/sindresorhus/p-limit", "license_spdx": "MIT", "license_path": "license", "license_blob_sha": "fa7ceba3eb4a9657a9db7f3ffca4e4e97a9019de" },
-    { "id": "sindresorhus-p-map", "url": "https://github.com/sindresorhus/p-map", "license_spdx": "MIT", "license_path": "license", "license_blob_sha": "fa7ceba3eb4a9657a9db7f3ffca4e4e97a9019de" },
-    { "id": "sindresorhus-yocto-queue", "url": "https://github.com/sindresorhus/yocto-queue", "license_spdx": "MIT", "license_path": "license", "license_blob_sha": "fa7ceba3eb4a9657a9db7f3ffca4e4e97a9019de" },
-    { "id": "sindresorhus-onetime", "url": "https://github.com/sindresorhus/onetime", "license_spdx": "MIT", "license_path": "license", "license_blob_sha": "fa7ceba3eb4a9657a9db7f3ffca4e4e97a9019de" },
-    { "id": "sindresorhus-delay", "url": "https://github.com/sindresorhus/delay", "license_spdx": "MIT", "license_path": "license", "license_blob_sha": "fa7ceba3eb4a9657a9db7f3ffca4e4e97a9019de" }
+    { "id": "sindresorhus-p-limit", "url": "https://github.com/sindresorhus/p-limit", "license_spdx": "MIT", "license_path": "license", "license_blob_shas": ["654d0bfe943437d43242325b1fbcff5f400d84ee", "e7af2f77107d73046421ef56c4684cbfdd3c1e89", "fa7ceba3eb4a9657a9db7f3ffca4e4e97a9019de"] },
+    { "id": "sindresorhus-p-map", "url": "https://github.com/sindresorhus/p-map", "license_spdx": "MIT", "license_path": "license", "license_blob_shas": ["654d0bfe943437d43242325b1fbcff5f400d84ee", "e7af2f77107d73046421ef56c4684cbfdd3c1e89", "fa7ceba3eb4a9657a9db7f3ffca4e4e97a9019de"] },
+    { "id": "sindresorhus-yocto-queue", "url": "https://github.com/sindresorhus/yocto-queue", "license_spdx": "MIT", "license_path": "license", "license_blob_shas": ["654d0bfe943437d43242325b1fbcff5f400d84ee", "e7af2f77107d73046421ef56c4684cbfdd3c1e89", "fa7ceba3eb4a9657a9db7f3ffca4e4e97a9019de"] },
+    { "id": "sindresorhus-onetime", "url": "https://github.com/sindresorhus/onetime", "license_spdx": "MIT", "license_path": "license", "license_blob_shas": ["654d0bfe943437d43242325b1fbcff5f400d84ee", "e7af2f77107d73046421ef56c4684cbfdd3c1e89", "fa7ceba3eb4a9657a9db7f3ffca4e4e97a9019de"] },
+    { "id": "sindresorhus-delay", "url": "https://github.com/sindresorhus/delay", "license_spdx": "MIT", "license_path": "license", "license_blob_shas": ["654d0bfe943437d43242325b1fbcff5f400d84ee", "e7af2f77107d73046421ef56c4684cbfdd3c1e89", "fa7ceba3eb4a9657a9db7f3ffca4e4e97a9019de"] }
   ],
   "candidates": [
     { "id": "real-small-p-limit-function-type", "stratum": "small", "repository_id": "sindresorhus-p-limit", "commit_sha": "ccb80b2721a6a4a27ce5ad7721fe939162a35b31", "parent_sha": "c944e4a4363ff41a7202d5dec346cc174c3ecf49", "title": "Fix limitFunction type", "changed_paths": ["index.d.ts", "index.test-d.ts"] },

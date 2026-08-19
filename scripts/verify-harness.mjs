@@ -439,6 +439,7 @@ const requiredFiles = [
   "scripts/benchmark-v2-campaign.mjs",
   "scripts/validate-benchmark-v2-campaign.mjs",
   "scripts/benchmark-v2-freeze.mjs",
+  "scripts/benchmark-v2-real-commit-verify-sources.mjs",
   "scripts/validate-benchmark-v2-freeze.mjs",
   "scripts/create-benchmark-v2-salt-commitment.mjs",
   "scripts/verify-bounded-repository-map.mjs",
