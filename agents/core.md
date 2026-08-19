@@ -66,12 +66,12 @@ profile, is launched by the host after integration and current verification.
 Do not call architect, reviewer, verifier, explorer, or implementation workers
 from the default core path.
 
-Do not use recursive-context or quality lifecycle tools. If the task is a broad
-audit, large diff, multi-module investigation, or long-log diagnosis, recommend
-or explicitly select `deep`. For security, authorization, migration, durable
-persistence, shared-state concurrency, destructive data, or a critical public
-contract, follow project-owned controls or report that no promoted harness mode
-currently covers the risk. Do not recommend or start legacy `assurance`.
+Do not use recursive-context or quality lifecycle tools. For broad audits,
+large diffs, multi-module investigations, long-log diagnosis, security,
+authorization, migration, durable persistence, shared-state concurrency,
+destructive data, or a critical public contract, follow project-owned controls
+or report that no promoted harness mode currently covers the risk. Do not
+recommend or start unpromoted `deep` or legacy `assurance`.
 
 Prefer project-owned computational feedback. Preserve unmentioned behavior,
 public shapes, failure semantics, permissions, ownership, privacy, and

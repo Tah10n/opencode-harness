@@ -13,17 +13,16 @@ materializer:
 npm run profile:materialize -- --profile core --output /path/to/profile
 ```
 
-Choose `deep` explicitly for broad audits, large diffs, long logs, or
-multi-module investigations that benefit from bounded read-only context and up
-to three focused explorers. Legacy `assurance` is retained only for historical
-research and replay; it is not a recommended high-risk product workflow.
-Neither mode is silently activated by `core`.
+`deep` is currently an unpromoted development candidate for broad multi-module
+work; do not use it as a product recommendation until medium-task evidence is
+positive. Legacy `assurance` is retained only for historical research and
+replay. Neither mode is silently activated by `core`.
 
 | Profile | Status | Adds | Excludes |
 | --- | --- | --- | --- |
 | `plain` | Benchmark baseline | Built-in coding agent | Harness prompts and lifecycle |
 | `core` | Unpromoted development default | Compact rules and host-owned verification gate | Recursive context, quality state, learning writes, lab |
-| `deep` | Optional | Bounded context and focused read-only exploration | Quality lifecycle and mutation gate |
+| `deep` | Unpromoted development candidate | Host-owned bounded repository map experiment | Product recommendations and quality lifecycle |
 | `assurance` | Deprecated research-only | Four-operation compatibility facade over v0.3 controls | Product recommendations and release claims |
 | `lab` | Developer bundle, not an agent | Profile-transition experiments, fixtures, statistics, replay, traces | User runtime claims |
 
@@ -64,8 +63,9 @@ runtime evidence remains `blocked-unproven` and is never scored.
 
 The source default changes from `orchestrator` to `core`. Historical
 `profile-only` and `instrumented` definitions and readers remain replay-only
-compatibility surfaces. Use `deep` for the former broad-context use case; the
-legacy high-risk lifecycle is retained for research rather than recommended.
+compatibility surfaces. The former broad-context use case is now represented by
+an unpromoted host-map experiment; the legacy high-risk lifecycle is retained
+for research rather than recommended.
 The old complete portable bundle remains documented below as the legacy/lab source closure;
 new installations should use the v3 materializer.
 

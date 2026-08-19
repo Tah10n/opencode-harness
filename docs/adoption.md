@@ -7,11 +7,11 @@ use. From a source checkout:
 
 ```sh
 npm run profile:materialize -- --profile core --output /absolute/target
-npm run profile:materialize -- --profile deep --output /absolute/target-deep
 ```
 
-Legacy research reproduction may additionally materialize `assurance` with an
-explicit `--profile assurance`; it is not part of the product adoption path.
+Research evaluation may additionally materialize unpromoted `deep` or legacy
+`assurance` with an explicit profile flag; neither is part of the product
+adoption path.
 
 Each target is an OpenCode configuration directory. Keep it disjoint from the
 project workspace, set `OPENCODE_CONFIG_DIR` to it, and run OpenCode from the

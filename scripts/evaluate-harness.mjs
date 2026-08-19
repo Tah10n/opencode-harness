@@ -79,13 +79,10 @@ const scenarios = [
     id: "broad-audit-recursive-context",
     category: "architecture-fitness",
     checks: () => {
-      includes("AGENTS.md", "`deep` is optional for broad audits", "The compact core rules should route broad audits to the optional deep profile.");
-      includes("agents/deep.md", "Use this agent only for broad audits", "The canonical deep profile should stay scoped to broad work.");
-      for (const tool of ["context_outline", "context_files", "context_search", "context_read"]) {
-        includes("agents/deep.md", `${tool}: allow`, "The canonical deep profile must be allowed to use bounded context tools directly.");
-      }
-      includes("agents/deep.md", "Delegate only independent read-only questions", "Deep delegation should remain read-only and bounded.");
-      includes("docs/recursive-context-mode.md", "`core` never switches to `deep` silently.", "Deep selection must remain explicit.");
+      includes("AGENTS.md", "`deep` is an unpromoted development candidate", "The compact policy must not claim deep is promoted.");
+      exists("lib/quality/bounded-repository-map.mjs", "The deep candidate needs a host-owned bounded map implementation.");
+      includes("benchmarks/vnext/components/deep-context.md", "The model does not launch explorers", "Context activation must be host-owned.");
+      includes("docs/recursive-context-mode.md", "`core` never switches to or recommends `deep`.", "Deep must remain outside the product path before evidence.");
       includes("docs/recursive-context-mode.md", "choose the `deep` profile/configuration", "Document an explicit deep selection path.");
       excludes("docs/recursive-context-mode.md", "Use recursive-context mode automatically", "The active v0.4 document must not retain the v0.3 automatic-selection contract.");
       excludes("docs/recursive-context-mode.md", "Root orchestration stays in `orchestrator`", "The active v0.4 document must not describe the deprecated orchestrator runtime.");
@@ -127,7 +124,7 @@ const scenarios = [
     checks: () => {
       exists("skills/global-quality-gates/SKILL.md", "High-assurance work should have a detailed quality-gate skill.");
       includes("AGENTS.md", "`assurance` is a deprecated research-only compatibility profile.", "The compact core rules must not route product work to legacy assurance.");
-      includes("agents/core.md", "Do not recommend or start legacy `assurance`.", "Core should keep legacy assurance outside the product path.");
+      includes("agents/core.md", "recommend or start unpromoted `deep` or legacy `assurance`.", "Core should keep unpromoted profiles outside the product path.");
       includes("agents/assurance.md", "This is a deprecated research-only compatibility profile.", "The legacy assurance profile should remain explicit and research-only.");
       includes("agents/assurance.md", "Use only the four high-level assurance operations.", "Assurance should use the bounded facade rather than legacy low-level tools.");
       includes("docs/harness-map.md", "Quality gates", "The control map should classify quality gates.");
@@ -505,13 +502,13 @@ for (const probe of [
   },
   {
     scenarioId: "broad-audit-recursive-context",
-    file: "agents/deep.md",
-    needle: "Delegate only independent read-only questions",
+    file: "benchmarks/vnext/components/deep-context.md",
+    needle: "The model does not launch explorers",
   },
   {
     scenarioId: "broad-audit-recursive-context",
     file: "docs/recursive-context-mode.md",
-    needle: "`core` never switches to `deep` silently.",
+    needle: "`core` never switches to or recommends `deep`.",
   },
   {
     scenarioId: "critical-cannot-complete-with-missing-mandatory-verification",

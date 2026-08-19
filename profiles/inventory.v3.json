@@ -125,20 +125,18 @@
     },
     {
       "id": "deep-context",
-      "status": "optional",
+      "status": "development-candidate",
       "target_metric": "missed_consumer_rate",
       "intervention_path": "benchmarks/vnext/components/deep-context.md",
       "intervention_vector": {
         "prompt_fragments": [
           "benchmarks/vnext/components/deep-context.md",
-          "agents/deep.md",
           "agents/core.md",
-          "agents/core-reviewer.md",
-          "agents/explore.md"
+          "agents/core-reviewer.md"
         ],
-        "roles": ["primary-deep", "read-only-explorer"],
-        "tools": ["context_outline", "context_files", "context_search", "context_read"],
-        "permissions": ["context:read-only"]
+        "roles": ["primary-core-context"],
+        "tools": [],
+        "permissions": ["host:bounded-repository-map"]
       }
     },
     {
@@ -185,18 +183,14 @@
     ],
     "deep-context": [
       "/effective_config/default_agent",
-      "/effective_config/plugin/1/fingerprint",
-      "/effective_config/plugin/1/id",
-      "/effective_config/plugin/1/source_path",
       "/materialized_files/1/fingerprint",
       "/materialized_files/1/path",
       "/materialized_files/2/fingerprint",
       "/materialized_files/2/path",
       "/materialized_files/3/fingerprint",
       "/materialized_files/3/path",
-      "/plugin_sources/1/fingerprint",
-      "/plugin_sources/1/id",
-      "/plugin_sources/1/source_path"
+      "/materialized_files/4/fingerprint",
+      "/materialized_files/4/path"
     ],
     "assurance-controls": [
       "/effective_config/default_agent",
@@ -250,7 +244,7 @@
     },
     {
       "id": "deep",
-      "status": "optional",
+      "status": "development-candidate",
       "runtime": true,
       "primary_role_id": "deep",
       "component_ids": [

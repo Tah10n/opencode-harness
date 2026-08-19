@@ -71,6 +71,8 @@
     "verify:core-verification-runner": "node scripts/verify-core-verification-runner.mjs",
     "verify:benchmark:v2:contracts": "node scripts/verify-benchmark-v2-contracts.mjs",
     "verify:benchmark:v2:fixtures": "node scripts/verify-benchmark-v2-fixtures.mjs",
+    "verify:bounded-repository-map": "node scripts/verify-bounded-repository-map.mjs",
+    "verify:bounded-repository-map-runner": "node scripts/verify-bounded-repository-map-runner.mjs",
     "verify:benchmark:renderer": "node scripts/verify-benchmark-renderer.mjs",
     "verify:benchmark:reporting": "node scripts/verify-benchmark-reporting.mjs",
     "verify:benchmark:runner": "node scripts/verify-benchmark-runner.mjs",

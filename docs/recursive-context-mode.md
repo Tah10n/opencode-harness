@@ -2,21 +2,21 @@
 
 ## Product boundary
 
-Recursive context is an optional capability of the explicit `deep` profile. It
-helps with broad audits, large diffs, multi-module investigations, long logs,
-and tasks whose relevant evidence does not fit a bounded local context.
+Recursive context is retained as an unpromoted development candidate of the
+explicit `deep` profile. It is not a product recommendation without separate
+positive medium-task evidence.
 
-`core` never switches to `deep` silently. It may recommend `deep`, but selection
-requires one of these explicit inputs:
+`core` never switches to or recommends `deep`. Research evaluation requires one
+of these explicit inputs:
 
 - choose the `deep` profile/configuration;
 - invoke `/deep`;
 - apply a project-local `WORKFLOW.md` rule that explicitly selects `deep` for a
   declared task class.
 
-Once selected, the `deep` agent decides which bounded context operations are
-useful for the current task. This is ordinary workflow planning inside an
-already selected profile, not hidden profile escalation.
+The retained runtime profile still exposes its historical bounded read-only
+operations for compatibility. The candidate mechanism under evaluation is
+instead host-owned: mapping runs before the model on every eligible medium task.
 
 ## Minimal capability
 

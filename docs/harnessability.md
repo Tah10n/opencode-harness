@@ -4,8 +4,8 @@
 
 - `core` needs project guidance, a relevant local check, and clear secret/state
   boundaries.
-- `deep` additionally benefits from a repository broad enough to justify
-  bounded context decomposition; the optional capability is not a prerequisite.
+- the unpromoted `deep` experiment requires a repository broad enough to
+  measure bounded context recall; it is not an adoption prerequisite.
 - legacy `assurance` additionally requires explicit ownership, trusted checks,
   and supported containment when reproducing historical research. It is not an
   adoption recommendation; missing mandatory signals remain blocked.

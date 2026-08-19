@@ -24,17 +24,17 @@ read-only unless the user explicitly asks for fixes.
 
 ## Select heavier profiles deliberately
 
-- `deep` is optional for broad audits, large diffs, multi-module
-  investigations, long logs, and tasks that do not fit bounded local context.
-  It may use focused read-only exploration and at most three independent
-  read-only children. The primary agent remains the integrator.
+- `deep` is an unpromoted development candidate for broad, multi-module work.
+  Do not recommend it for product use until separate medium-task evidence is
+  positive. Use bounded local discovery and report any resulting coverage gap.
 - `assurance` is a deprecated research-only compatibility profile. Do not
   recommend it for product work. A project-local `WORKFLOW.md` may still name
   it for historical reproduction, but that does not establish release evidence.
 - `lab` is not a runtime profile. It contains benchmark, evaluation, replay,
   trace, fixture, and experimental infrastructure.
 
-Core or deep must not start or recommend legacy assurance. For high-risk work,
+Core must not start or recommend unpromoted deep or legacy assurance. For broad
+or high-risk work,
 follow the project's own required controls or report that no promoted harness
 mode currently covers the risk. Missing optional context tools never block an ordinary task;
 fall back to bounded read/search and state the coverage gap.

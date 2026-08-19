@@ -5,7 +5,7 @@
 | Layer | Default? | Model-visible runtime | Primary responsibility |
 | --- | --- | --- | --- |
 | `core` | Yes; unpromoted | Compact rules, core agent, host-owned verification | Ordinary inspect/edit/verify/review work |
-| `deep` | No | Core plus bounded read-only context workflow | Broad discovery with one integrator |
+| `deep` | No; unpromoted | Host-owned bounded repository map candidate | Medium multi-file discovery experiment |
 | `assurance` | No; deprecated research-only | Legacy four-operation compatibility facade | Historical high-risk lifecycle reproduction |
 | `lab` | Never | None | Benchmarks, evaluation, replay, traces, and research |
 
