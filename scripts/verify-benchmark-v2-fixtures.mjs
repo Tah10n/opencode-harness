@@ -10,6 +10,7 @@ import {
   renderBenchmarkV2DevelopmentCorpus,
   renderBenchmarkV2ValidationCorpus,
   renderBenchmarkV2ProceduralSmallCorpus,
+  renderBenchmarkV2ProceduralMediumCorpus,
   validateBenchmarkV2DevelopmentCorpus,
   validateBenchmarkV2ValidationCorpus,
 } from "../lib/benchmark/v2-fixtures.mjs";
@@ -66,20 +67,33 @@ assert.throws(() => renderBenchmarkV2ProceduralSmallCorpus({
   seed: "benchmark-v2-holdout-small-fixture-verifier",
 }), /preregistered partial-materialization source/u);
 
-for (const instance of [...first, ...validation, ...proceduralSmall]) {
+const proceduralMedium = renderBenchmarkV2ProceduralMediumCorpus({
+  repositoryRoot: root,
+  registry: contracts.proceduralCandidates,
+  seed: "benchmark-v2-holdout-medium-fixture-verifier",
+  repetition: 1,
+});
+assert.equal(proceduralMedium.length, 24);
+assert.equal(new Set(proceduralMedium.map((instance) => instance.family_id)).size, 24);
+assert.equal(new Set(proceduralMedium.map((instance) => instance.instance_fingerprint)).size, 24);
+assert.equal(proceduralMedium.every((instance) => instance.solution_files.length === 2), true);
+
+for (const instance of [...first, ...validation, ...proceduralSmall, ...proceduralMedium]) {
   assert.equal(instance.prompt.includes("reference solution"), false);
   assert.equal(instance.public_files.length <= 20, true);
   assert.equal(instance.hidden_files.every((file) => ["test/", "hidden/"].some((prefix) => file.path.startsWith(prefix))), true);
   if (instance.solution_files.length === 2) {
-    assert.match(instance.prompt, /config\/feature\.json/u);
-    assert.match(instance.prompt, /At most 2 files may change/u);
-    assert.doesNotMatch(instance.prompt, /At most 1 file may change/u);
+    assert.equal(instance.task_scope.max_changed_files, 2);
+    for (const solution of instance.solution_files) {
+      assert.equal(instance.task_scope.allowed_changed_paths.includes(solution.path), true);
+      assert.equal(instance.prompt.includes(solution.path), true);
+    }
   }
 }
 
 const executionRoot = fs.mkdtempSync(path.join(os.tmpdir(), "benchmark-v2-fixtures-"));
 try {
-  for (const instance of [...first, ...validation, ...proceduralSmall]) {
+  for (const instance of [...first, ...validation, ...proceduralSmall, ...proceduralMedium]) {
     const fixtureRoot = path.join(executionRoot, instance.family_id);
     for (const file of [...instance.public_files, ...instance.solution_files, ...instance.hidden_files]) {
       const target = path.join(fixtureRoot, ...file.path.split("/"));
@@ -108,6 +122,8 @@ process.stdout.write(`${JSON.stringify({
   validation: validationSummary,
   procedural_small_count: proceduralSmall.length,
   procedural_small_fingerprints: proceduralSmall.map((instance) => instance.instance_fingerprint),
+  procedural_medium_count: proceduralMedium.length,
+  procedural_medium_fingerprints: proceduralMedium.map((instance) => instance.instance_fingerprint),
   development_fingerprints: first.map((instance) => instance.instance_fingerprint),
   validation_fingerprints: validation.map((instance) => instance.instance_fingerprint),
 }, null, 2)}\n`);

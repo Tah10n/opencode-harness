@@ -85,6 +85,13 @@ precision, encoding, date-canonicalization, and integer-boundary cases. This is
 fixture validation only; the procedural pool remains non-executable until the
 medium and high-risk slices pass the same gate.
 
+The medium slice adds 24 entry-point and remote-consumer fixtures. Every
+reference solution changes exactly two files: the implementation and its
+explicit public API contract. Public and post-settlement hidden checks import
+through that entry point, while a hidden consumer verifies the visible
+entry-to-service-to-worker chain. The pool still remains non-executable until
+the high-risk slice is complete.
+
 ## Real-repository pilot boundary
 
 The preregistered pilot runs only after a positive synthetic holdout gate and is
