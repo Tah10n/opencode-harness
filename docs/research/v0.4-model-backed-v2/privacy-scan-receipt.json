@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "receipt_kind": "operator-exact-credential-fragment-publication-scan",
+  "performed_at": "2026-08-19T03:46:35+02:00",
+  "status": "passed",
+  "campaign_fingerprint": "sha256:29508d7ed1a63a03e6554e1e020d0586ad4c945195e17ad524a3fc8c8753b406",
+  "scan_scope": {
+    "description": "The frozen manifest, artifact ledger, 19 published JSON evidence artifacts, component_decisions.json, the research report, root README.md, and root CHANGELOG.md; this receipt and derived-hashes.sha256 are excluded to avoid a recursive file-set definition.",
+    "file_count": 25,
+    "file_inventory_algorithm": "sha256 of sorted lines formatted as <file-sha256><two spaces><repository-relative-path><newline>",
+    "file_inventory_sha256": "799cea3dee39137fbccbb583657c6beb1749f4fb9bf3ea636648ac0b52557d42"
+  },
+  "credential_fragments": {
+    "source": "ephemeral OpenCode OpenAI authentication record inside the contained workload home",
+    "selection": ["access", "refresh", "accountId"],
+    "count": 3,
+    "values_persisted": false
+  },
+  "matches": 0,
+  "notes": [
+    "The scan compared exact credential bytes; it did not print or persist those bytes.",
+    "This is an operator verification receipt, not runner-produced model evidence."
+  ]
+}

@@ -48,6 +48,17 @@ omissions fell and duration/timeouts rose. It does not justify making the
 heavy lifecycle the default. See
 [the v0.3 research result](docs/research/v0.3-instrumented.md).
 
+The v0.4 model-backed component study completed all five preregistered
+profile-transition estimands on `openai/gpt-5.6-luna`: 130/130 standard pairs
+were complete, but every frozen in-process promotion decision was `reject`
+because the candidate failed the zero-tolerance introduced HIGH/MEDIUM defect
+guardrail. No full suite was authorized and no component was promoted. The
+result is model-specific because no qualified preregistered independent model
+binding was available. See the
+[v0.4 model-backed study](docs/research/v0.4-model-backed-v2/README.md), its
+[machine decisions](docs/research/v0.4-model-backed-v2/component_decisions.json),
+and the privacy-safe fingerprinted artifacts.
+
 Proven model-free in v0.4: profile closure, prompt budget, effective
 permissions, portable materialization, facade-only standard and high-risk
 assurance lifecycles, structural child-assignment binding, legacy v2 reader compatibility,
@@ -56,9 +67,10 @@ runner-owned pair aggregation, receipt-recomputed observations, an in-process
 standard-to-full authorization boundary, and frozen promotion thresholds. The installed
 OpenCode probes additionally load P0-P5, invoke all four P4/P5 context tools,
 confirm that P4 creates no quality state, and confirm one P5 receipt per context call. These checks do
-not prove that `deep` or `assurance` improves model-backed outcomes. The vNext
-contract requires paired smoke and standard runs before promotion; unavailable
-runtime evidence remains `blocked-unproven` and is never scored.
+not by themselves prove that `deep` or `assurance` improves model-backed
+outcomes. The completed primary-model study did not promote either component.
+Future claims still require a new paired smoke and in-process standard campaign;
+unavailable runtime evidence remains `blocked-unproven` and is never scored.
 
 ### Migration from v0.3
 
