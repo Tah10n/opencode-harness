@@ -115,6 +115,14 @@ or evaluator mutation invalidates the round rather than producing a rerun.
   (30 per stratum), two paired trajectories per family, and at least 23
   compatible-license real-commit-derived families.
 
+The committed real-commit registry is provenance only: 36 non-merge commit
+candidates, 12 per stratum, from five MIT repositories. It records immutable
+commit/parent identities, license-blob identities, titles, and changed-path
+metadata obtained without patch bodies. It is neither a selected holdout nor an
+executable task corpus. Task materialization and any reference-patch access must
+occur inside the frozen runner boundary; reference patches remain inaccessible
+until the corresponding model execution has settled.
+
 All task requirements must be visible. Hidden material may contain only
 concrete examples, consumers, and tests; it may not add requirements. Reference
 solutions stay runner-only and hidden files are installed only after model

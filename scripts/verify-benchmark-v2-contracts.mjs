@@ -14,6 +14,8 @@ const report = validateLoadedBenchmarkV2Contracts(root);
 assert.equal(report.status, "passed");
 assert.deepEqual(report.family_totals, { development: 36, validation: 30, holdout_planned: 90 });
 assert.equal(report.paired_holdout_observations, 180);
+assert.equal(report.real_commit_candidate_count, 36);
+assert.equal(report.real_commit_repository_count, 5);
 assert(report.exact_power > 0.86);
 assert(report.clustered_sensitivity_power > 0.82);
 
@@ -46,6 +48,28 @@ assert.throws(() => validateBenchmarkV2Contracts({
   ...loaded,
   saltCommitment: weakenedSaltCommitment,
 }), /BENCHMARK_V2_HOLDOUT_SALT/u);
+
+const exposedReferencePatch = structuredClone(loaded.realCommitCandidates);
+exposedReferencePatch.reference_patch_access = "available-before-model-settlement";
+assert.throws(() => validateBenchmarkV2Contracts({
+  ...loaded,
+  realCommitCandidates: exposedReferencePatch,
+}), /BENCHMARK_V2_REAL_COMMIT_REGISTRY/u);
+
+const duplicateRealCommit = structuredClone(loaded.realCommitCandidates);
+duplicateRealCommit.candidates[1].commit_sha = duplicateRealCommit.candidates[0].commit_sha;
+duplicateRealCommit.candidates[1].repository_id = duplicateRealCommit.candidates[0].repository_id;
+assert.throws(() => validateBenchmarkV2Contracts({
+  ...loaded,
+  realCommitCandidates: duplicateRealCommit,
+}), /BENCHMARK_V2_REAL_COMMIT_COVERAGE/u);
+
+const unsafeChangedPath = structuredClone(loaded.realCommitCandidates);
+unsafeChangedPath.candidates[0].changed_paths[0] = "../reference.patch";
+assert.throws(() => validateBenchmarkV2Contracts({
+  ...loaded,
+  realCommitCandidates: unsafeChangedPath,
+}), /BENCHMARK_V2_REAL_COMMIT_PATH/u);
 
 const underpowered = exactMcNemarPower({
   pair_count: 120,
