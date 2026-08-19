@@ -11,6 +11,8 @@ import {
   renderBenchmarkV2ValidationCorpus,
   renderBenchmarkV2ProceduralSmallCorpus,
   renderBenchmarkV2ProceduralMediumCorpus,
+  renderBenchmarkV2ProceduralHighCorpus,
+  buildBenchmarkV2ProceduralHoldoutPool,
   validateBenchmarkV2DevelopmentCorpus,
   validateBenchmarkV2ValidationCorpus,
 } from "../lib/benchmark/v2-fixtures.mjs";
@@ -60,12 +62,12 @@ assert.equal(proceduralSmall.length, 24);
 assert.equal(new Set(proceduralSmall.map((instance) => instance.family_id)).size, 24);
 assert.equal(new Set(proceduralSmall.map((instance) => instance.instance_fingerprint)).size, 24);
 const forgedProceduralRegistry = structuredClone(contracts.proceduralCandidates);
-forgedProceduralRegistry.task_materialization_status = "executable";
+forgedProceduralRegistry.task_materialization_status = "generator-recipes-preregistered-not-yet-materialized";
 assert.throws(() => renderBenchmarkV2ProceduralSmallCorpus({
   repositoryRoot: root,
   registry: forgedProceduralRegistry,
   seed: "benchmark-v2-holdout-small-fixture-verifier",
-}), /preregistered partial-materialization source/u);
+}), /preregistered executable source/u);
 
 const proceduralMedium = renderBenchmarkV2ProceduralMediumCorpus({
   repositoryRoot: root,
@@ -78,7 +80,29 @@ assert.equal(new Set(proceduralMedium.map((instance) => instance.family_id)).siz
 assert.equal(new Set(proceduralMedium.map((instance) => instance.instance_fingerprint)).size, 24);
 assert.equal(proceduralMedium.every((instance) => instance.solution_files.length === 2), true);
 
-for (const instance of [...first, ...validation, ...proceduralSmall, ...proceduralMedium]) {
+const proceduralHigh = renderBenchmarkV2ProceduralHighCorpus({
+  repositoryRoot: root,
+  registry: contracts.proceduralCandidates,
+  seed: "benchmark-v2-holdout-high-fixture-verifier",
+  repetition: 1,
+});
+assert.equal(proceduralHigh.length, 24);
+assert.equal(new Set(proceduralHigh.map((instance) => instance.family_id)).size, 24);
+assert.equal(new Set(proceduralHigh.map((instance) => instance.instance_fingerprint)).size, 24);
+assert.equal(proceduralHigh.every((instance) => instance.solution_files.length === 2
+  && instance.category === "high-risk-contract" && instance.risk === "critical"
+  && instance.high_risk_contract?.risk_domain), true);
+assert.equal(new Set(proceduralHigh.map((instance) => instance.high_risk_contract.risk_domain)).size, 11);
+const proceduralPool = buildBenchmarkV2ProceduralHoldoutPool({
+  registry: contracts.proceduralCandidates,
+  instances: [...proceduralSmall, ...proceduralMedium, ...proceduralHigh],
+});
+assert.equal(proceduralPool.task_materialization_status, "executable");
+assert.equal(proceduralPool.candidates.length, 72);
+assert.equal(new Set(proceduralPool.candidates.map((candidate) => candidate.task_identity)).size, 72);
+assert.equal(new Set(proceduralPool.candidates.map((candidate) => candidate.fixture_fingerprint)).size, 72);
+
+for (const instance of [...first, ...validation, ...proceduralSmall, ...proceduralMedium, ...proceduralHigh]) {
   assert.equal(instance.prompt.includes("reference solution"), false);
   assert.equal(instance.public_files.length <= 20, true);
   assert.equal(instance.hidden_files.every((file) => ["test/", "hidden/"].some((prefix) => file.path.startsWith(prefix))), true);
@@ -93,7 +117,7 @@ for (const instance of [...first, ...validation, ...proceduralSmall, ...procedur
 
 const executionRoot = fs.mkdtempSync(path.join(os.tmpdir(), "benchmark-v2-fixtures-"));
 try {
-  for (const instance of [...first, ...validation, ...proceduralSmall, ...proceduralMedium]) {
+  for (const instance of [...first, ...validation, ...proceduralSmall, ...proceduralMedium, ...proceduralHigh]) {
     const fixtureRoot = path.join(executionRoot, instance.family_id);
     for (const file of [...instance.public_files, ...instance.solution_files, ...instance.hidden_files]) {
       const target = path.join(fixtureRoot, ...file.path.split("/"));
@@ -124,6 +148,9 @@ process.stdout.write(`${JSON.stringify({
   procedural_small_fingerprints: proceduralSmall.map((instance) => instance.instance_fingerprint),
   procedural_medium_count: proceduralMedium.length,
   procedural_medium_fingerprints: proceduralMedium.map((instance) => instance.instance_fingerprint),
+  procedural_high_count: proceduralHigh.length,
+  procedural_high_fingerprints: proceduralHigh.map((instance) => instance.instance_fingerprint),
+  procedural_pool_candidate_count: proceduralPool.candidates.length,
   development_fingerprints: first.map((instance) => instance.instance_fingerprint),
   validation_fingerprints: validation.map((instance) => instance.instance_fingerprint),
 }, null, 2)}\n`);

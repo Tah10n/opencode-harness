@@ -73,11 +73,11 @@ assert.throws(() => validateBenchmarkV2Contracts({
   realCommitCandidates: unsafeChangedPath,
 }), /BENCHMARK_V2_REAL_COMMIT_PATH/u);
 
-const prematureProceduralExecution = structuredClone(loaded.proceduralCandidates);
-prematureProceduralExecution.task_materialization_status = "executable";
+const incompleteProceduralExecution = structuredClone(loaded.proceduralCandidates);
+incompleteProceduralExecution.task_materialization_status = "generator-recipes-preregistered-not-yet-materialized";
 assert.throws(() => validateBenchmarkV2Contracts({
   ...loaded,
-  proceduralCandidates: prematureProceduralExecution,
+  proceduralCandidates: incompleteProceduralExecution,
 }), /BENCHMARK_V2_PROCEDURAL_REGISTRY/u);
 
 const duplicateProceduralRecipe = structuredClone(loaded.proceduralCandidates);

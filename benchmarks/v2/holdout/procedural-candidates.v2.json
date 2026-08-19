@@ -3,7 +3,7 @@
   "registry_id": "benchmark-v2-procedural-holdout-candidates",
   "origin": "procedural-synthetic",
   "selection_status": "candidate-pool-not-selected",
-  "task_materialization_status": "generator-recipes-preregistered-not-yet-materialized",
+  "task_materialization_status": "executable",
   "requirements_visibility": "complete",
   "reference_solution_access": "runner-only-after-model-settlement",
   "candidates": [

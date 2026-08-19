@@ -74,23 +74,26 @@ of the same frozen source; each manifest remains bound to one freeze fingerprint
 
 The procedural universe is also preregistered before selection: 72 recipe
 identities, 24 per stratum. Every medium recipe declares a two-file solution and
-the high-risk registry covers all eleven preregistered risk domains. Its current
-status is explicitly not materialized; recipe metadata cannot be passed to the
-selector as an executable pool until every generated fixture and oracle passes
-the corpus contract.
+the high-risk registry covers all eleven preregistered risk domains. Recipe
+metadata alone cannot be passed to the selector: the executable pool is built
+only from the complete set of validated task-identity and fixture fingerprints.
 
 The first materialization slice covers all 24 small recipes. Their generated
 reference solutions pass visible and post-settlement hidden tests, including
-precision, encoding, date-canonicalization, and integer-boundary cases. This is
-fixture validation only; the procedural pool remains non-executable until the
-medium and high-risk slices pass the same gate.
+precision, encoding, date-canonicalization, and integer-boundary cases.
 
 The medium slice adds 24 entry-point and remote-consumer fixtures. Every
 reference solution changes exactly two files: the implementation and its
 explicit public API contract. Public and post-settlement hidden checks import
 through that entry point, while a hidden consumer verifies the visible
-entry-to-service-to-worker chain. The pool still remains non-executable until
-the high-risk slice is complete.
+entry-to-service-to-worker chain.
+
+The high-risk slice adds 24 two-file fixtures covering all eleven declared risk
+domains. Every instance carries a closed high-risk contract with the recipe,
+risk domain, and executable hidden oracle; public and hidden checks still enter
+through the same explicit API and remote-consumer topology. With all 72
+reference solutions passing, the procedural registry now materializes as a
+canonical executable pool; real-commit materialization remains a separate gate.
 
 ## Real-repository pilot boundary
 
