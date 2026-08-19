@@ -2,7 +2,7 @@
   "schema_version": 2,
   "split": "holdout",
   "selection_status": "unselected-until-freeze",
-  "selected_manifest_path": "benchmarks/v2/holdout/selected-families.v2.json",
+  "selected_manifest_path": ".oc_harness/benchmark-v2/holdout/round-<freeze-fingerprint-prefix>.selected.v2.json",
   "selected_manifest_must_be_absent_before_freeze": true,
   "family_count": 90,
   "family_count_by_stratum": {

@@ -62,6 +62,16 @@ post-freeze source, evaluator, policy, generator, model, timeout, executable, or
 seed drift invalidates the manifest. Holdout selection must consume the
 validated manifest in a later workflow step and publish it as immutable evidence.
 
+The post-freeze selector is deterministic over that frozen seed. It requires
+canonical executable procedural and real-commit pools, rejects overlap with
+earlier splits, selects exactly 30 families per stratum with 23 real-commit
+families overall, and writes a privacy-safe create-only selection manifest under
+the ignored `.oc_harness/benchmark-v2/holdout/` evidence directory. Provenance
+metadata alone is rejected as non-executable, so the committed real-commit
+candidate registry cannot trigger an early selection. Runtime selections do not
+mutate the source contract and therefore do not invalidate later verification
+of the same frozen source; each manifest remains bound to one freeze fingerprint.
+
 ## Real-repository pilot boundary
 
 The preregistered pilot runs only after a positive synthetic holdout gate and is
