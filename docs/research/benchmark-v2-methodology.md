@@ -62,6 +62,24 @@ post-freeze source, evaluator, policy, generator, model, timeout, executable, or
 seed drift invalidates the manifest. Holdout selection must consume the
 validated manifest in a later workflow step and publish it as immutable evidence.
 
+## Real-repository pilot boundary
+
+The preregistered pilot runs only after a positive synthetic holdout gate and is
+external-validity evidence, never promotion evidence. It requires at least 12
+new paired tasks from at least three compatible-license repositories. Every
+canonical task identity is checked against the complete 156-family development,
+validation, and holdout identity universe. The frozen binding is shared by both
+arms, raw model text is not persisted, and reference solutions remain runner-only
+until model settlement.
+
+The pilot supports external validity only when its paired direction is
+nonnegative, it introduces no CRITICAL regression, no more than 20% of the 24+
+arm executions fail at runtime, and installation/materialization passes for
+every task. Its summary publishes success direction, runtime and CRITICAL
+outcomes, duration/tool/turn ratios, task-evidence fingerprints, and the hash of
+the excluded identity universe. A negative or incomplete pilot cannot be hidden
+by the earlier synthetic result.
+
 ## Why the design is paired and sealed
 
 The primary outcome is binary and both arms run the same task/seed/binding, so

@@ -1,0 +1,21 @@
+{
+  "schema_version": 2,
+  "contract_id": "benchmark-v2-real-repository-pilot",
+  "status": "preregistered-pre-execution",
+  "run_after": "positive-synthetic-holdout-promotion-gate",
+  "promotion_role": "external-validity-only",
+  "minimum_task_count": 12,
+  "minimum_independent_repository_count": 3,
+  "task_origin": "new-real-repository-tasks",
+  "required_disjoint_from": ["development", "validation", "holdout"],
+  "comparison": "paired-plain-vs-frozen-final-candidate",
+  "binding_parity": ["model", "provider", "variant", "timeout_ms", "fixture", "seed", "arm_ordering_policy"],
+  "direction_guardrail": "pilot-paired-delta-must-be-nonnegative",
+  "new_critical_regressions_maximum": 0,
+  "runtime_failure_rate_maximum": 0.2,
+  "installation_materialization_pass_required": true,
+  "compatible_license_required": true,
+  "compatible_license_allowlist": ["MIT", "Apache-2.0", "BSD-2-Clause", "BSD-3-Clause", "ISC"],
+  "raw_model_text_persistence": "forbidden",
+  "reference_solution_visibility": "runner-only-after-model-settlement"
+}

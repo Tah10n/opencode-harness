@@ -386,6 +386,7 @@ const requiredFiles = [
   "lib/benchmark/v2-fixtures.mjs",
   "lib/benchmark/v2-campaign.mjs",
   "lib/benchmark/v2-freeze.mjs",
+  "lib/benchmark/v2-pilot.mjs",
   "lib/benchmark/v2-validation-kernels.mjs",
   "lib/quality/milestone-dod.mjs",
   "lib/quality/normal-session-bridge.mjs",
@@ -430,6 +431,7 @@ const requiredFiles = [
   "scripts/verify-benchmark-v2-fixtures.mjs",
   "scripts/verify-benchmark-v2-campaign.mjs",
   "scripts/verify-benchmark-v2-freeze.mjs",
+  "scripts/verify-benchmark-v2-pilot.mjs",
   "scripts/benchmark-v2-campaign.mjs",
   "scripts/validate-benchmark-v2-campaign.mjs",
   "scripts/benchmark-v2-freeze.mjs",
@@ -570,7 +572,7 @@ for (const forbiddenScript of ["assess:quality-candidate", "verify:model-profile
   }
 }
 const expectedDeterministicStages = [
-  "verify:v0.4", "verify:static", "verify:benchmark:model-free", "verify:evaluator:paired-defects", "verify:core-verification-gate", "verify:core-verification-runner", "verify:benchmark:v2:contracts", "verify:benchmark:v2:fixtures", "verify:benchmark:v2:campaign", "verify:benchmark:v2:freeze", "verify:bounded-repository-map", "verify:bounded-repository-map-runner", "verify:automatic-review-gate", "verify:feedback-foundation", "verify:trace-store", "verify:report-history", "verify:adapter-worker",
+  "verify:v0.4", "verify:static", "verify:benchmark:model-free", "verify:evaluator:paired-defects", "verify:core-verification-gate", "verify:core-verification-runner", "verify:benchmark:v2:contracts", "verify:benchmark:v2:fixtures", "verify:benchmark:v2:campaign", "verify:benchmark:v2:freeze", "verify:benchmark:v2:pilot", "verify:bounded-repository-map", "verify:bounded-repository-map-runner", "verify:automatic-review-gate", "verify:feedback-foundation", "verify:trace-store", "verify:report-history", "verify:adapter-worker",
   "eval", "verify:drift", "verify:adoption-bundle", "verify:package-boundary", "verify:runtime:fixture", "verify:runtime:quality-hooks:fixture",
   "verify:live-eval", "verify:acceptance",
   "verify:quality-contracts", "verify:engineering-dossier", "verify:architecture-policy", "verify:impact-graph",
@@ -785,6 +787,7 @@ for (const [name, command] of Object.entries({
   "verify:benchmark:v2:fixtures": "node scripts/verify-benchmark-v2-fixtures.mjs",
   "verify:benchmark:v2:campaign": "node scripts/verify-benchmark-v2-campaign.mjs",
   "verify:benchmark:v2:freeze": "node scripts/verify-benchmark-v2-freeze.mjs",
+  "verify:benchmark:v2:pilot": "node scripts/verify-benchmark-v2-pilot.mjs",
   "verify:bounded-repository-map": "node scripts/verify-bounded-repository-map.mjs",
   "verify:bounded-repository-map-runner": "node scripts/verify-bounded-repository-map-runner.mjs",
   "verify:automatic-review-gate": "node scripts/verify-automatic-review-gate.mjs",
