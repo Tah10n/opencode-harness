@@ -398,8 +398,14 @@ function verifyCore() {
   "V04_CORE_PERMISSIONS", "core must deny quality, context, and learning surfaces");
   assert(!core.includes("quality_assurance_start: allow")
     && !core.includes("context_outline: allow")
-    && coreBody.includes("Stay single-agent."),
+    && coreBody.includes("Stay single-agent.")
+    && coreBody.includes("never stop on a failed tool call")
+    && coreBody.includes("non-empty truthful final response"),
   "V04_CORE_AGENT", "core agent contains a heavy lifecycle or mandatory delegation");
+  const ablationCoreRules = read("benchmarks/vnext/components/core-rules.md");
+  assert(/never stop on\s+a failed tool call/u.test(ablationCoreRules)
+    && /non-empty truthful final response/u.test(ablationCoreRules),
+  "V04_CORE_RECOVERY", "core ablation arm omits tool-failure recovery or terminal response rules");
   const manifest = buildProfileBundleManifest(root, "core").manifest;
   for (const forbidden of ["lib/quality", "quality", "native", "lib/benchmark", "benchmarks", "evals", ".opencode/plugins"]) {
     assert(!pathPresent(manifest, forbidden), "V04_CORE_BUNDLE", `core contains forbidden path ${forbidden}`);

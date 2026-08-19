@@ -61,6 +61,11 @@ Use a direct bounded loop:
 7. Report passed checks, existing failures, new failures, unavailable checks,
    and unverified areas separately.
 
+After a tool error, inspect the returned failure and either retry once with
+corrected arguments or report the blocker; never stop on a failed tool call.
+Always finish with a non-empty truthful final response that states the outcome
+and verification status.
+
 Stay single-agent. Independent review, when required by a higher-level host
 profile, is launched by the host after integration and current verification.
 Do not call architect, reviewer, verifier, explorer, or implementation workers
