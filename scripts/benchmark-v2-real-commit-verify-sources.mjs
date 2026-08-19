@@ -21,9 +21,14 @@ const registry = JSON.parse(fs.readFileSync(
   path.join(repositoryRoot, "benchmarks/v2/holdout/real-commit-candidates.v2.json"),
   "utf8",
 ));
+const requirements = JSON.parse(fs.readFileSync(
+  path.join(repositoryRoot, "benchmarks/v2/holdout/real-commit-requirements.v2.json"),
+  "utf8",
+));
 const repositoryIds = new Set(registry.repositories.map((repository) => repository.id));
 const prepared = registry.candidates.map((candidate) => prepareBenchmarkV2RealCommitCandidate({
   registry,
+  requirements,
   candidateId: candidate.id,
   repositoryRoot: path.join(cacheRoot, candidate.repository_id),
 }));

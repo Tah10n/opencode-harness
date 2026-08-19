@@ -123,6 +123,14 @@ changed-path identity, bounded parent snapshot, and unique fixture identity for
 all 36 candidates. It does not fetch repositories, read reference files, or
 claim that visible requirements and post-settlement oracles are complete.
 
+Visible requirements are curated separately from public commit, issue, and pull
+request metadata without reading patch bodies. The requirement manifest binds
+one explicit behavior contract and evidence URL to every candidate. Its oracle
+scope permits post-settlement checks to assert only that contract and public
+contracts already present in the parent snapshot. The manifest remains marked
+`curated-pre-reference-oracle-audit` until the trusted post-settlement phase
+confirms that each historical oracle stays inside that scope.
+
 The preregistered pilot runs only after a positive synthetic holdout gate and is
 external-validity evidence, never promotion evidence. It requires at least 12
 new paired tasks from at least three compatible-license repositories. Every

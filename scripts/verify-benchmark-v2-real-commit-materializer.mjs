@@ -60,13 +60,32 @@ try {
       changed_paths: ["index.js", "test.js"],
     }],
   };
+  const requirements = {
+    schema_version: 2,
+    manifest_id: "benchmark-v2-real-commit-visible-requirements",
+    status: "curated-pre-reference-oracle-audit",
+    requirements_visibility: "complete-for-declared-oracle-scope",
+    reference_patch_access: "forbidden-before-model-settlement",
+    oracle_scope_policy: "post-settlement checks may assert only the visible requirement and parent-visible public contracts",
+    requirements: [{
+      candidate_id: "real-small-value-contract",
+      visible_requirement: "Change the exported value according to the complete public value contract while preserving its module surface.",
+      evidence_url: "https://github.com/example/repository/commit/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    }],
+  };
   const prepared = prepareBenchmarkV2RealCommitCandidate({
-    registry, candidateId: "real-small-value-contract", repositoryRoot: root,
+    registry, requirements, candidateId: "real-small-value-contract", repositoryRoot: root,
   });
   assert.equal(prepared.public_files.length <= 20, true);
   assert.equal(prepared.public_files.some((file) => file.content.includes("PARENT_ONLY")), true);
   assert.equal(JSON.stringify(prepared).includes("CHILD_REFERENCE_SECRET"), false);
   assert.equal(prepared.reference_patch_access, "forbidden-before-model-settlement");
+  const missingRequirements = structuredClone(requirements);
+  missingRequirements.requirements = [];
+  assert.throws(() => prepareBenchmarkV2RealCommitCandidate({
+    registry, requirements: missingRequirements,
+    candidateId: "real-small-value-contract", repositoryRoot: root,
+  }), /BENCHMARK_V2_REAL_REQUIREMENTS/u);
 
   const secret = randomBytes(32);
   const modelRunFingerprint = fingerprintProfileValue({ run: "settled" });
@@ -93,17 +112,17 @@ try {
   const changedPathRegistry = structuredClone(registry);
   changedPathRegistry.candidates[0].changed_paths = ["index.js"];
   assert.throws(() => prepareBenchmarkV2RealCommitCandidate({
-    registry: changedPathRegistry, candidateId: "real-small-value-contract", repositoryRoot: root,
+    registry: changedPathRegistry, requirements, candidateId: "real-small-value-contract", repositoryRoot: root,
   }), /BENCHMARK_V2_REAL_CHANGED_PATHS/u);
   const wrongLicenseRegistry = structuredClone(registry);
   wrongLicenseRegistry.repositories[0].license_blob_shas = ["a".repeat(40)];
   assert.throws(() => prepareBenchmarkV2RealCommitCandidate({
-    registry: wrongLicenseRegistry, candidateId: "real-small-value-contract", repositoryRoot: root,
+    registry: wrongLicenseRegistry, requirements, candidateId: "real-small-value-contract", repositoryRoot: root,
   }), /BENCHMARK_V2_REAL_LICENSE/u);
   const wrongRemoteRegistry = structuredClone(registry);
   wrongRemoteRegistry.repositories[0].url = "https://github.com/example/other";
   assert.throws(() => prepareBenchmarkV2RealCommitCandidate({
-    registry: wrongRemoteRegistry, candidateId: "real-small-value-contract", repositoryRoot: root,
+    registry: wrongRemoteRegistry, requirements, candidateId: "real-small-value-contract", repositoryRoot: root,
   }), /BENCHMARK_V2_REAL_REMOTE/u);
 } finally {
   fs.rmSync(root, { recursive: true, force: true });

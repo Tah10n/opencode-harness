@@ -16,6 +16,7 @@ assert.deepEqual(report.family_totals, { development: 36, validation: 30, holdou
 assert.equal(report.paired_holdout_observations, 180);
 assert.equal(report.real_commit_candidate_count, 36);
 assert.equal(report.real_commit_repository_count, 5);
+assert.equal(report.real_commit_requirement_count, 36);
 assert.equal(report.procedural_candidate_count, 72);
 assert.equal(report.procedural_high_risk_domain_count, 11);
 assert(report.exact_power > 0.86);
@@ -72,6 +73,20 @@ assert.throws(() => validateBenchmarkV2Contracts({
   ...loaded,
   realCommitCandidates: unsafeChangedPath,
 }), /BENCHMARK_V2_REAL_COMMIT_PATH/u);
+
+const missingRealRequirement = structuredClone(loaded.realCommitRequirements);
+missingRealRequirement.requirements.pop();
+assert.throws(() => validateBenchmarkV2Contracts({
+  ...loaded,
+  realCommitRequirements: missingRealRequirement,
+}), /BENCHMARK_V2_REAL_REQUIREMENT_COVERAGE/u);
+
+const hiddenRealRequirement = structuredClone(loaded.realCommitRequirements);
+hiddenRealRequirement.requirements[0].visible_requirement = "Apply the reference patch and satisfy the hidden tests for this otherwise unspecified behavior.";
+assert.throws(() => validateBenchmarkV2Contracts({
+  ...loaded,
+  realCommitRequirements: hiddenRealRequirement,
+}), /BENCHMARK_V2_REAL_REQUIREMENT/u);
 
 const incompleteProceduralExecution = structuredClone(loaded.proceduralCandidates);
 incompleteProceduralExecution.task_materialization_status = "generator-recipes-preregistered-not-yet-materialized";
