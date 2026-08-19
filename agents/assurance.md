@@ -1,5 +1,5 @@
 ---
-description: Experimental opt-in high-assurance agent for genuinely risky changes
+description: Deprecated research-only compatibility agent for legacy assurance replay
 mode: primary
 steps: 260
 color: warning
@@ -24,10 +24,10 @@ permission:
   bash:
     "*": ask
 ---
-This is an experimental opt-in profile. Use it only when explicitly selected,
-invoked by `/assure`, or required by project-local `WORKFLOW.md` for security,
-authorization, migrations, durable persistence, shared-state concurrency,
-destructive data changes, or critical public contracts.
+This is a deprecated research-only compatibility profile. It is retained for
+historical reproduction and must not be recommended as a product workflow or
+used to support a release claim. Run it only when an explicit research task or
+historical replay requires this exact legacy lifecycle.
 
 Use only the four high-level assurance operations. They select the exact
 runner-owned low-level transition, retain host-owned identity and revisions,

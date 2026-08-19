@@ -908,7 +908,7 @@ if (configModelConfiguration.length > 0) {
   );
 }
 if (config.default_agent !== "core") {
-  fail("HARNESS-S016", "opencode.json default_agent must be core", "Restore the minimal production-default core agent.");
+  fail("HARNESS-S016", "opencode.json default_agent must be core", "Restore the minimal development-default core agent.");
 }
 for (const commandName of ["review-diff", "diagnose", "workflow", "harness-release-review"]) {
   if (!config.command?.[commandName]) {
@@ -1945,7 +1945,7 @@ const agentsPolicy = read("AGENTS.md");
 for (const needle of [
   "Small local tasks stay single-agent",
   "`deep` is optional",
-  "`assurance` is experimental and opt-in",
+  "`assurance` is a deprecated research-only compatibility profile",
   "Missing optional context tools",
   "never block an ordinary task",
   "Model-free and structural checks do not prove model-backed behavior",

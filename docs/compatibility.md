@@ -4,9 +4,9 @@
 
 | Component | Version | Status | Compatibility rule |
 | --- | --- | --- | --- |
-| Runtime profiles | inventory v3 | Unreleased | `core` default; `deep` optional; `assurance` experimental |
+| Runtime profiles | inventory v3 | Unreleased | `core` development default; `deep` optional; `assurance` deprecated research-only |
 | Historical synthetic benchmark | inventory v2 | Frozen | Exact bytes, fingerprints, report readers, and replay semantics retained |
-| Assurance facade | v1 | Experimental | Four model-visible operations dispatch to the unchanged 17-tool legacy engine |
+| Assurance facade | v1 | Deprecated research-only | Four model-visible operations dispatch to the unchanged 17-tool legacy engine for replay |
 | vNext benchmark | contract/report v1 | Unproven | Separate namespace; never reinterprets v2 artifacts |
 
 The v3 materialized directory is an OpenCode config root, not the governed
