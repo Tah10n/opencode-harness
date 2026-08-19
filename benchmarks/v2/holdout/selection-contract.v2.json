@@ -1,0 +1,38 @@
+{
+  "schema_version": 2,
+  "split": "holdout",
+  "selection_status": "unselected-until-freeze",
+  "selected_manifest_path": "benchmarks/v2/holdout/selected-families.v2.json",
+  "selected_manifest_must_be_absent_before_freeze": true,
+  "family_count": 90,
+  "family_count_by_stratum": {
+    "small": 30,
+    "medium": 30,
+    "high": 30
+  },
+  "paired_trajectories_per_family": 2,
+  "minimum_real_commit_derived_fraction": 0.25,
+  "minimum_real_commit_derived_families": 23,
+  "seed_derivation": {
+    "algorithm": "sha256-canonical-json",
+    "ordered_inputs": [
+      "frozen_candidate_sha",
+      "github_workflow_run_id",
+      "preregistered_salt"
+    ],
+    "must_be_unknown_during_development": ["github_workflow_run_id"],
+    "salt_commitment_path": "benchmarks/v2/holdout/salt-commitment.v2.json"
+  },
+  "freeze_bindings": [
+    "harness_source_sha",
+    "evaluator_fingerprint",
+    "promotion_policy_fingerprint",
+    "task_generator_fingerprint",
+    "model",
+    "provider",
+    "variant",
+    "timeout_ms"
+  ],
+  "post_selection_mutation_policy": "invalidate-confirmatory-round",
+  "reference_solution_access": "runner-only-after-model-settlement"
+}

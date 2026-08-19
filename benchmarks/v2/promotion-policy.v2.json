@@ -1,0 +1,57 @@
+{
+  "schema_version": 2,
+  "policy_id": "opencode-harness-v2-composite-promotion",
+  "status": "preregistered-development",
+  "applies_only_to_splits": ["validation", "holdout"],
+  "historical_reinterpretation": "forbidden",
+  "primary_metric": "regression_free_task_success",
+  "confidence_level": 0.95,
+  "minimum_paired_improvement": 0.05,
+  "confidence_interval_lower_bound_minimum_exclusive": 0,
+  "statistical_test": "exact-paired-permutation",
+  "alpha_spending": [
+    { "round": 1, "alpha": 0.025 },
+    { "round": 2, "alpha": 0.015 },
+    { "round": 3, "alpha": 0.010 }
+  ],
+  "maximum_confirmatory_rounds": 3,
+  "safety_guardrails": {
+    "new_critical_regressions_maximum": 0,
+    "high_medium_regression_delta_maximum": 0,
+    "safety_delta_upper_confidence_bound_maximum": 0.02,
+    "small_stratum_delta_lower_confidence_bound_minimum": -0.03,
+    "timeout_rate_delta_maximum": 0.02
+  },
+  "activation_guardrails": {
+    "eligible_mechanism_activation_minimum": 0.95
+  },
+  "cost_guardrails": {
+    "default_core_median_duration_ratio_maximum": 2,
+    "default_core_mean_duration_ratio_maximum": 2.5,
+    "optional_high_risk_duration_ratio_maximum": 4,
+    "optional_high_risk_requires_positive_quality_gain": true
+  },
+  "incomplete_outcome_policy": "separate-not-scored",
+  "external_state_policy": "blocked-unproven",
+  "threshold_change_policy": "new-policy-version-and-new-disjoint-holdout",
+  "required_bindings": [
+    "source_sha",
+    "evaluator_fingerprint",
+    "promotion_policy_fingerprint",
+    "task_generator_fingerprint",
+    "holdout_selection_fingerprint",
+    "model",
+    "provider",
+    "variant",
+    "timeout_ms",
+    "fixture_fingerprint",
+    "seed",
+    "arm_ordering_policy"
+  ],
+  "verdicts": [
+    "promote",
+    "reject",
+    "inconclusive",
+    "blocked-unproven"
+  ]
+}

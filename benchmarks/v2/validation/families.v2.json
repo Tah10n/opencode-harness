@@ -1,0 +1,41 @@
+{
+  "schema_version": 2,
+  "split": "validation",
+  "selection_status": "sealed-after-generation",
+  "execution_status": "recipe-registry-only",
+  "maximum_uses_per_architecture_generation": 2,
+  "families": [
+    { "id": "validation-small-range-clamp", "stratum": "small", "recipe_id": "range-clamp" },
+    { "id": "validation-small-csv-quoting", "stratum": "small", "recipe_id": "csv-quoting" },
+    { "id": "validation-small-nullish-default", "stratum": "small", "recipe_id": "nullish-default" },
+    { "id": "validation-small-case-folding", "stratum": "small", "recipe_id": "case-folding" },
+    { "id": "validation-small-date-boundary", "stratum": "small", "recipe_id": "date-boundary" },
+    { "id": "validation-small-map-order", "stratum": "small", "recipe_id": "map-order" },
+    { "id": "validation-small-url-encoding", "stratum": "small", "recipe_id": "url-encoding" },
+    { "id": "validation-small-retry-limit", "stratum": "small", "recipe_id": "retry-limit" },
+    { "id": "validation-small-disposal-on-error", "stratum": "small", "recipe_id": "disposal-on-error" },
+    { "id": "validation-small-boolean-config", "stratum": "small", "recipe_id": "boolean-config" },
+
+    { "id": "validation-medium-export-alias", "stratum": "medium", "recipe_id": "export-alias" },
+    { "id": "validation-medium-command-registry", "stratum": "medium", "recipe_id": "command-registry" },
+    { "id": "validation-medium-env-config-chain", "stratum": "medium", "recipe_id": "env-config-chain" },
+    { "id": "validation-medium-feature-default-chain", "stratum": "medium", "recipe_id": "feature-default-chain" },
+    { "id": "validation-medium-error-code-compatibility", "stratum": "medium", "recipe_id": "error-code-compatibility" },
+    { "id": "validation-medium-json-field-roundtrip", "stratum": "medium", "recipe_id": "json-field-roundtrip" },
+    { "id": "validation-medium-cli-api-consistency", "stratum": "medium", "recipe_id": "cli-api-consistency" },
+    { "id": "validation-medium-middleware-callpath", "stratum": "medium", "recipe_id": "middleware-callpath" },
+    { "id": "validation-medium-generated-boundary", "stratum": "medium", "recipe_id": "generated-boundary" },
+    { "id": "validation-medium-worker-consumer", "stratum": "medium", "recipe_id": "worker-consumer" },
+
+    { "id": "validation-high-tenant-authorization", "stratum": "high", "recipe_id": "tenant-authorization" },
+    { "id": "validation-high-symlink-confinement", "stratum": "high", "recipe_id": "symlink-confinement" },
+    { "id": "validation-high-migration-restart", "stratum": "high", "recipe_id": "migration-restart" },
+    { "id": "validation-high-rollback-nested-state", "stratum": "high", "recipe_id": "rollback-nested-state" },
+    { "id": "validation-high-journal-commit-order", "stratum": "high", "recipe_id": "journal-commit-order" },
+    { "id": "validation-high-idempotency-key", "stratum": "high", "recipe_id": "idempotency-key" },
+    { "id": "validation-high-lock-release", "stratum": "high", "recipe_id": "lock-release" },
+    { "id": "validation-high-abort-listener-cleanup", "stratum": "high", "recipe_id": "abort-listener-cleanup" },
+    { "id": "validation-high-partial-batch-failure", "stratum": "high", "recipe_id": "partial-batch-failure" },
+    { "id": "validation-high-untrusted-template-boundary", "stratum": "high", "recipe_id": "untrusted-template-boundary" }
+  ]
+}

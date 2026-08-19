@@ -1,0 +1,35 @@
+{
+  "schema_version": 2,
+  "contract_id": "opencode-harness-v2-task-corpus",
+  "strata": ["small", "medium", "high"],
+  "requirements_visibility": "complete",
+  "hidden_content_allowed": ["concrete-examples", "consumers", "tests"],
+  "hidden_requirements": "forbidden",
+  "reference_solution_visibility": "runner-only",
+  "hidden_installation_phase": "after-model-settlement",
+  "public_file_count_maximum": 20,
+  "changed_file_count_bounds": [1, 4],
+  "medium_multifile_solution_fraction_minimum": 0.5,
+  "medium_required_topology_edges": [
+    "entry-point",
+    "consumer",
+    "test-or-config-contract"
+  ],
+  "high_risk_domains": [
+    "authorization",
+    "path-confinement",
+    "migration-atomicity",
+    "rollback",
+    "durable-persistence",
+    "duplicate-side-effects",
+    "shared-state-concurrency",
+    "cancellation-cleanup",
+    "partial-dependency-failure",
+    "schema-compatibility",
+    "untrusted-prompt-boundary"
+  ],
+  "allowed_origins": [
+    "procedural-synthetic",
+    "real-commit-derived-compatible-license"
+  ]
+}
