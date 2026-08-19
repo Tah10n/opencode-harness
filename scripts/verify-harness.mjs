@@ -382,6 +382,7 @@ const requiredFiles = [
   "lib/quality/core-verification-gate.mjs",
   "lib/benchmark/v2-contracts.mjs",
   "lib/benchmark/v2-fixtures.mjs",
+  "lib/benchmark/v2-validation-kernels.mjs",
   "lib/quality/milestone-dod.mjs",
   "lib/quality/normal-session-bridge.mjs",
   "lib/quality/normal-session-plugin.mjs",

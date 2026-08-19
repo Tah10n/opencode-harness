@@ -25,9 +25,12 @@ assert.throws(() => validateBenchmarkV2Contracts({
 
 const validationOverlap = structuredClone(loaded.validation);
 validationOverlap.families[0].recipe_id = loaded.dev.families[0].recipe_id;
+const validationBindingsOverlap = structuredClone(loaded.validationBindings);
+validationBindingsOverlap.bindings[0].kernel_id = loaded.dev.families[0].recipe_id;
 assert.throws(() => validateBenchmarkV2Contracts({
   ...loaded,
   validation: validationOverlap,
+  validationBindings: validationBindingsOverlap,
 }), /BENCHMARK_V2_SPLIT_OVERLAP/u);
 
 const weakenedPolicy = structuredClone(loaded.policy);

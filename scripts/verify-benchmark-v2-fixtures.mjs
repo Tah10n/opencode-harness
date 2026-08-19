@@ -8,13 +8,15 @@ import { fileURLToPath } from "node:url";
 import { loadBenchmarkV2Contracts, validateLoadedBenchmarkV2Contracts } from "../lib/benchmark/v2-contracts.mjs";
 import {
   renderBenchmarkV2DevelopmentCorpus,
+  renderBenchmarkV2ValidationCorpus,
   validateBenchmarkV2DevelopmentCorpus,
+  validateBenchmarkV2ValidationCorpus,
 } from "../lib/benchmark/v2-fixtures.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const contracts = loadBenchmarkV2Contracts(root);
 const contractReport = validateLoadedBenchmarkV2Contracts(root);
-assert.equal(contractReport.execution_status, "development-executable-validation-planned");
+assert.equal(contractReport.execution_status, "development-and-validation-executable");
 
 const first = renderBenchmarkV2DevelopmentCorpus({
   repositoryRoot: root,
@@ -35,7 +37,18 @@ assert.deepEqual(first, second);
 assert.deepEqual(summary.counts, { small: 12, medium: 12, high: 12 });
 assert.equal(summary.medium_multifile_count, 6);
 
-for (const instance of first) {
+const validation = renderBenchmarkV2ValidationCorpus({
+  repositoryRoot: root,
+  manifest: contracts.validation,
+  bindings: contracts.validationBindings,
+  seed: "benchmark-v2-validation-fixture-verifier",
+  repetition: 1,
+});
+const validationSummary = validateBenchmarkV2ValidationCorpus(validation);
+assert.deepEqual(validationSummary.counts, { small: 10, medium: 10, high: 10 });
+assert.equal(validationSummary.medium_multifile_count, 5);
+
+for (const instance of [...first, ...validation]) {
   assert.equal(instance.prompt.includes("reference solution"), false);
   assert.equal(instance.public_files.length <= 20, true);
   assert.equal(instance.hidden_files.every((file) => ["test/", "hidden/"].some((prefix) => file.path.startsWith(prefix))), true);
@@ -46,9 +59,9 @@ for (const instance of first) {
   }
 }
 
-const executionRoot = fs.mkdtempSync(path.join(os.tmpdir(), "benchmark-v2-development-fixtures-"));
+const executionRoot = fs.mkdtempSync(path.join(os.tmpdir(), "benchmark-v2-fixtures-"));
 try {
-  for (const instance of first) {
+  for (const instance of [...first, ...validation]) {
     const fixtureRoot = path.join(executionRoot, instance.family_id);
     for (const file of [...instance.public_files, ...instance.solution_files, ...instance.hidden_files]) {
       const target = path.join(fixtureRoot, ...file.path.split("/"));
@@ -62,7 +75,7 @@ try {
         timeout: check.timeout_ms,
         maxBuffer: 1024 * 1024,
       });
-      assert.equal(execution.status, 0, `${instance.family_id} reference solution failed ${check.argv.join(" ")}\n${execution.stderr}`);
+      assert.equal(execution.status, 0, `${instance.family_id} reference solution failed ${check.argv.join(" ")}\n${execution.stdout}\n${execution.stderr}`);
     }
   }
 } finally {
@@ -74,5 +87,7 @@ process.stdout.write(`${JSON.stringify({
   evidence_class: "model-free-fixture-validation",
   model_execution: false,
   ...summary,
-  corpus_fingerprint: first.map((instance) => instance.instance_fingerprint),
+  validation: validationSummary,
+  development_fingerprints: first.map((instance) => instance.instance_fingerprint),
+  validation_fingerprints: validation.map((instance) => instance.instance_fingerprint),
 }, null, 2)}\n`);

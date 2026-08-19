@@ -1,9 +1,9 @@
 # Benchmark v2 methodology
 
 Status: development-only design contract. No model-backed v2 result exists yet.
-The development manifest is executable and its reference solutions pass every
-visible, hidden, and consumer check. Validation remains a recipe registry, not
-an executable corpus, and the holdout is intentionally unselected.
+The development and validation manifests are executable and their reference
+solutions pass every visible, hidden, and consumer check. No model-backed v2
+outcome exists, and the holdout is intentionally unselected.
 
 ## Why the design is paired and sealed
 
@@ -33,8 +33,9 @@ or evaluator mutation invalidates the round rather than producing a rerun.
 
 - Development contains 36 executable families: 12 per stratum. Six of the 12
   medium reference solutions change two files.
-- Validation contains 30 disjoint planned recipes: 10 per stratum, with at most
-  two uses for one architecture generation.
+- Validation contains 30 disjoint executable families: 10 per stratum, with at
+  most two uses for one architecture generation. Five of ten medium reference
+  solutions change two files.
 - Holdout selection is deferred until freeze. The contract requires 90 families
   (30 per stratum), two paired trajectories per family, and at least 23
   compatible-license real-commit-derived families.

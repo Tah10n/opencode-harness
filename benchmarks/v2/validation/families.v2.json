@@ -2,7 +2,7 @@
   "schema_version": 2,
   "split": "validation",
   "selection_status": "sealed-after-generation",
-  "execution_status": "recipe-registry-only",
+  "execution_status": "executable",
   "maximum_uses_per_architecture_generation": 2,
   "families": [
     { "id": "validation-small-range-clamp", "stratum": "small", "recipe_id": "range-clamp" },

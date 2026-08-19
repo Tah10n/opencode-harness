@@ -1,0 +1,38 @@
+{
+  "schema_version": 2,
+  "split": "validation",
+  "bindings": [
+    { "family_id": "validation-small-range-clamp", "kernel_id": "range-clamp" },
+    { "family_id": "validation-small-csv-quoting", "kernel_id": "csv-quoting" },
+    { "family_id": "validation-small-nullish-default", "kernel_id": "nullish-default" },
+    { "family_id": "validation-small-case-folding", "kernel_id": "case-folding" },
+    { "family_id": "validation-small-date-boundary", "kernel_id": "date-boundary" },
+    { "family_id": "validation-small-map-order", "kernel_id": "map-order" },
+    { "family_id": "validation-small-url-encoding", "kernel_id": "url-encoding" },
+    { "family_id": "validation-small-retry-limit", "kernel_id": "retry-limit" },
+    { "family_id": "validation-small-disposal-on-error", "kernel_id": "disposal-on-error" },
+    { "family_id": "validation-small-boolean-config", "kernel_id": "boolean-config" },
+
+    { "family_id": "validation-medium-export-alias", "kernel_id": "export-alias", "multifile_solution": true },
+    { "family_id": "validation-medium-command-registry", "kernel_id": "command-registry", "multifile_solution": true },
+    { "family_id": "validation-medium-env-config-chain", "kernel_id": "env-config-chain", "multifile_solution": true },
+    { "family_id": "validation-medium-feature-default-chain", "kernel_id": "feature-default-chain", "multifile_solution": true },
+    { "family_id": "validation-medium-error-code-compatibility", "kernel_id": "error-code-compatibility", "multifile_solution": true },
+    { "family_id": "validation-medium-json-field-roundtrip", "kernel_id": "json-field-roundtrip" },
+    { "family_id": "validation-medium-cli-api-consistency", "kernel_id": "cli-api-consistency" },
+    { "family_id": "validation-medium-middleware-callpath", "kernel_id": "middleware-callpath" },
+    { "family_id": "validation-medium-generated-boundary", "kernel_id": "generated-boundary" },
+    { "family_id": "validation-medium-worker-consumer", "kernel_id": "worker-consumer" },
+
+    { "family_id": "validation-high-tenant-authorization", "kernel_id": "tenant-authorization" },
+    { "family_id": "validation-high-symlink-confinement", "kernel_id": "symlink-confinement" },
+    { "family_id": "validation-high-migration-restart", "kernel_id": "migration-restart" },
+    { "family_id": "validation-high-rollback-nested-state", "kernel_id": "rollback-nested-state" },
+    { "family_id": "validation-high-journal-commit-order", "kernel_id": "journal-commit-order" },
+    { "family_id": "validation-high-idempotency-key", "kernel_id": "idempotency-key" },
+    { "family_id": "validation-high-lock-release", "kernel_id": "lock-release" },
+    { "family_id": "validation-high-abort-listener-cleanup", "kernel_id": "abort-listener-cleanup" },
+    { "family_id": "validation-high-partial-batch-failure", "kernel_id": "partial-batch-failure" },
+    { "family_id": "validation-high-untrusted-template-boundary", "kernel_id": "untrusted-template-boundary" }
+  ]
+}
