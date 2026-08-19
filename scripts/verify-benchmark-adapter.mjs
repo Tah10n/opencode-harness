@@ -745,6 +745,27 @@ function parserFixtures(root) {
   assert.equal(failedVerification.trace_summary.targeted_verification_observed, false);
   assert.equal(failedVerification.trace_events[0].status, "failed");
 
+  const failedPatchDiagnostic = parseOpenCodeJsonl(jsonl(
+    JSON.stringify({
+      type: "tool_use",
+      part: {
+        id: "patch-failed",
+        type: "tool",
+        tool: "apply_patch",
+        state: {
+          status: "error",
+          input: { patchText: "private patch content" },
+          error: "Failed to find expected lines in fixture source",
+        },
+      },
+    }),
+    finalEvent(),
+  ));
+  assert.deepEqual(failedPatchDiagnostic.trace_summary.tool_name_state_sequence[0].error_codes,
+    ["BENCHMARK_TOOL_PATCH_CONTEXT_MISMATCH"]);
+  assert.equal(JSON.stringify(failedPatchDiagnostic).includes("private patch content"), false);
+  assert.equal(JSON.stringify(failedPatchDiagnostic).includes("fixture source"), false);
+
   const staleVerification = parseOpenCodeJsonl(jsonl(
     toolEvent({ id: "verify-before", tool: "bash", input: { command: "node --test test/app.test.mjs" } }),
     toolEvent({ id: "edit-after", tool: "edit", input: { filePath: "src/app.mjs" } }),
