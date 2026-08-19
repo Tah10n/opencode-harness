@@ -10,6 +10,16 @@
 - Added a separately versioned vNext component-ablation contract, promotion
   policy, report schemas, and model-free validators while preserving v2
   inventory fingerprints and historical report/replay readers.
+- Repaired vNext rendered visible checks so multi-file fixtures execute every
+  exact public check together, expanded deterministic family/negative-fixture
+  coverage, and closed P5 facade, continuation, parser, and atomic-start gaps
+  exposed by that end-to-end validation.
+- Published the frozen v0.4 model-backed component study for
+  `openai/gpt-5.6-luna`: all five standard transitions completed 26/26 pairs,
+  all five in-process decisions were `reject`, no full run was authorized, and
+  no component was promoted. The privacy-safe evidence bundle includes exact
+  hashes, machine decisions, environment/acceptance evidence, an explicit
+  preregistration erratum, and a model-specific limitation.
 
 ### Historical unreleased v0.3 development notes
 

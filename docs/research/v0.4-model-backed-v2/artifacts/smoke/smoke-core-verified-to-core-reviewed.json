@@ -1,0 +1,975 @@
+{
+  "schema_version": 1,
+  "run_kind": "vnext-run-envelope",
+  "plan": {
+    "schema_version": 1,
+    "plan_kind": "vnext-compound-profile-transition-plan",
+    "suite_id": "smoke",
+    "estimand_id": "core-verified-to-core-reviewed",
+    "estimand_kind": "compound-profile-transition",
+    "baseline_arm_id": "P2",
+    "candidate_arm_id": "P3",
+    "transition_anchor_component_id": "independent-final-review",
+    "eligible_strata": [
+      "small",
+      "medium"
+    ],
+    "target_strata": [
+      "small",
+      "medium"
+    ],
+    "negative_control_strata": [],
+    "family_ids": [
+      "medium-feature-flag-callpath",
+      "small-local-cleanup"
+    ],
+    "metric_ids": {
+      "product": [
+        "functional_hidden_check_success",
+        "regression_free_success",
+        "regression_free_high_risk_success",
+        "public_contract_preservation",
+        "structural_oracle_success",
+        "missed_consumer_rate",
+        "introduced_high_medium_defects",
+        "unnecessary_changed_files",
+        "verification_omission",
+        "task_completion_without_human_intervention"
+      ],
+      "operational": [
+        "duration",
+        "model_turns",
+        "tool_calls",
+        "delegated_child_count",
+        "timeout_rate",
+        "no_progress_turns"
+      ],
+      "diagnostic": [
+        "whole_task_success",
+        "protocol_compliance",
+        "trace_completeness",
+        "attestation_completeness"
+      ]
+    },
+    "arms": {
+      "baseline": {
+        "arm_id": "P2",
+        "component_ids": [
+          "core-rules",
+          "targeted-verification"
+        ],
+        "primary_agent_id": "core",
+        "profile_fingerprint": "sha256:4608c7497684e769a52273a92bf6a8dc88d4bcfab0b703359ba1e2bf7b910396",
+        "runtime_surface": {
+          "schema_version": 1,
+          "effective_config": {
+            "$schema": "https://opencode.ai/config.json",
+            "default_agent": "core",
+            "permission": {
+              "external_directory": "ask",
+              "oc_learning_*": "deny",
+              "quality_*": "deny",
+              "context_*": "deny",
+              "edit": "ask",
+              "bash": {
+                "*": "ask",
+                "git clean*": "ask",
+                "git reset*": "ask",
+                "git rebase*": "ask",
+                "git push --force*": "ask",
+                "rm *": "ask",
+                "sudo *": "ask"
+              }
+            },
+            "snapshot": false,
+            "plugin": [
+              {
+                "id": "lib/benchmark/opencode-model-env-firewall.mjs",
+                "source_path": "lib/benchmark/opencode-model-env-firewall.mjs",
+                "fingerprint": "sha256:db0470a28bf2795b8c1546a919075cbeb62edb118227d82247fa803338515dc8"
+              }
+            ]
+          },
+          "materialized_files": [
+            {
+              "path": "agents/core-reviewer.md",
+              "fingerprint": "sha256:457820d9633eab24ae56e64d922ad0f732bebc9323fc3c6aa95e4375f262b043"
+            },
+            {
+              "path": "agents/core.md",
+              "fingerprint": "sha256:73bbcf247416a53a1d9eb4b22234a43bbd3c14d653dc27efee5e99ffda136700"
+            }
+          ],
+          "plugin_sources": [
+            {
+              "id": "lib/benchmark/opencode-model-env-firewall.mjs",
+              "source_path": "lib/benchmark/opencode-model-env-firewall.mjs",
+              "fingerprint": "sha256:db0470a28bf2795b8c1546a919075cbeb62edb118227d82247fa803338515dc8"
+            }
+          ]
+        },
+        "source_entries": [
+          {
+            "kind": "plugin",
+            "id": "lib/benchmark/opencode-model-env-firewall.mjs",
+            "source_path": "lib/benchmark/opencode-model-env-firewall.mjs",
+            "files": [
+              {
+                "path": "opencode-model-env-firewall.mjs",
+                "fingerprint": "sha256:db0470a28bf2795b8c1546a919075cbeb62edb118227d82247fa803338515dc8"
+              }
+            ]
+          },
+          {
+            "kind": "agent-or-config",
+            "id": "agents/core.md",
+            "source_path": "agents/core.md",
+            "files": [
+              {
+                "path": "core.md",
+                "fingerprint": "sha256:73bbcf247416a53a1d9eb4b22234a43bbd3c14d653dc27efee5e99ffda136700"
+              }
+            ]
+          },
+          {
+            "kind": "agent-or-config",
+            "id": "agents/core-reviewer.md",
+            "source_path": "agents/core-reviewer.md",
+            "files": [
+              {
+                "path": "core-reviewer.md",
+                "fingerprint": "sha256:457820d9633eab24ae56e64d922ad0f732bebc9323fc3c6aa95e4375f262b043"
+              }
+            ]
+          },
+          {
+            "kind": "agent-or-config",
+            "id": "profiles/config/core.opencode.json",
+            "source_path": "profiles/config/core.opencode.json",
+            "files": [
+              {
+                "path": "core.opencode.json",
+                "fingerprint": "sha256:c0edffe10527386a481184d73322ee3f2cf4a9b557f72bcb952f408e58014851"
+              }
+            ]
+          }
+        ],
+        "common_overlay_id": "credential-firewall-v1"
+      },
+      "candidate": {
+        "arm_id": "P3",
+        "component_ids": [
+          "core-rules",
+          "targeted-verification",
+          "independent-final-review"
+        ],
+        "primary_agent_id": "vnext-core-reviewed",
+        "profile_fingerprint": "sha256:a8c019bdbbb59d443d47e541fe0a334261ea405628193b2bafb06a1e31ffd9e6",
+        "runtime_surface": {
+          "schema_version": 1,
+          "effective_config": {
+            "$schema": "https://opencode.ai/config.json",
+            "default_agent": "vnext-core-reviewed",
+            "permission": {
+              "external_directory": "ask",
+              "oc_learning_*": "deny",
+              "quality_*": "deny",
+              "context_*": "deny",
+              "edit": "ask",
+              "bash": {
+                "*": "ask",
+                "git clean*": "ask",
+                "git reset*": "ask",
+                "git rebase*": "ask",
+                "git push --force*": "ask",
+                "rm *": "ask",
+                "sudo *": "ask"
+              }
+            },
+            "snapshot": false,
+            "plugin": [
+              {
+                "id": "lib/benchmark/opencode-model-env-firewall.mjs",
+                "source_path": "lib/benchmark/opencode-model-env-firewall.mjs",
+                "fingerprint": "sha256:db0470a28bf2795b8c1546a919075cbeb62edb118227d82247fa803338515dc8"
+              }
+            ]
+          },
+          "materialized_files": [
+            {
+              "path": "agents/core-reviewer.md",
+              "fingerprint": "sha256:457820d9633eab24ae56e64d922ad0f732bebc9323fc3c6aa95e4375f262b043"
+            },
+            {
+              "path": "agents/vnext-core-reviewed.md",
+              "fingerprint": "sha256:502b169ed84744d12716db9c432cb469d8f58fa78b1f6fa9397a9d807d201eb5"
+            }
+          ],
+          "plugin_sources": [
+            {
+              "id": "lib/benchmark/opencode-model-env-firewall.mjs",
+              "source_path": "lib/benchmark/opencode-model-env-firewall.mjs",
+              "fingerprint": "sha256:db0470a28bf2795b8c1546a919075cbeb62edb118227d82247fa803338515dc8"
+            }
+          ]
+        },
+        "source_entries": [
+          {
+            "kind": "plugin",
+            "id": "lib/benchmark/opencode-model-env-firewall.mjs",
+            "source_path": "lib/benchmark/opencode-model-env-firewall.mjs",
+            "files": [
+              {
+                "path": "opencode-model-env-firewall.mjs",
+                "fingerprint": "sha256:db0470a28bf2795b8c1546a919075cbeb62edb118227d82247fa803338515dc8"
+              }
+            ]
+          },
+          {
+            "kind": "agent-or-config",
+            "id": "agents/core.md",
+            "source_path": "agents/core.md",
+            "files": [
+              {
+                "path": "core.md",
+                "fingerprint": "sha256:73bbcf247416a53a1d9eb4b22234a43bbd3c14d653dc27efee5e99ffda136700"
+              }
+            ]
+          },
+          {
+            "kind": "agent-or-config",
+            "id": "agents/core-reviewer.md",
+            "source_path": "agents/core-reviewer.md",
+            "files": [
+              {
+                "path": "core-reviewer.md",
+                "fingerprint": "sha256:457820d9633eab24ae56e64d922ad0f732bebc9323fc3c6aa95e4375f262b043"
+              }
+            ]
+          },
+          {
+            "kind": "agent-or-config",
+            "id": "profiles/config/core.opencode.json",
+            "source_path": "profiles/config/core.opencode.json",
+            "files": [
+              {
+                "path": "core.opencode.json",
+                "fingerprint": "sha256:c0edffe10527386a481184d73322ee3f2cf4a9b557f72bcb952f408e58014851"
+              }
+            ]
+          },
+          {
+            "kind": "agent-or-config",
+            "id": "benchmarks/vnext/components/independent-final-review.md",
+            "source_path": "benchmarks/vnext/components/independent-final-review.md",
+            "files": [
+              {
+                "path": "independent-final-review.md",
+                "fingerprint": "sha256:f12701de1c209472bdec6cbe3eae49bdc5716e8b0f5928f87412b2049b52b209"
+              }
+            ]
+          }
+        ],
+        "common_overlay_id": "credential-firewall-v1"
+      }
+    },
+    "surface_delta": {
+      "estimand_kind": "compound-profile-transition",
+      "transition_anchor_component_id": "independent-final-review",
+      "changed_leaf_paths": [
+        "/effective_config/default_agent",
+        "/materialized_files/1/fingerprint",
+        "/materialized_files/1/path"
+      ],
+      "baseline_surface_fingerprint": "sha256:fec4e79a9fa84fb4c986b3ad47d3554abe2e6184d29ddbc948382660a50ac758",
+      "candidate_surface_fingerprint": "sha256:89a3169fab4fb1e943c9206ce6c22d60ab0c10581cb00d71f960314027ec387a",
+      "delta_contract_fingerprint": "sha256:3924f7055fd6661800763485c0071602f653e3ab04e750101a66098420d07bf5",
+      "delta_fingerprint": "sha256:cf885a37dc2c6b420ac5c1b7ac1f84dec18d9ea5da7b06356a38c466f659871f"
+    },
+    "pair_schedule": [
+      {
+        "pair_id": "pair-dc9e06fe10c1ff8e34a8aff9",
+        "family_id": "medium-feature-flag-callpath",
+        "stratum": "medium",
+        "repetition": 1,
+        "instance_fingerprint": "sha256:24fdf439ebfdfe4413b714f57552e5a38231dd5475fc52d8afb1835a4dd4b3a3",
+        "public_fixture_fingerprint": "sha256:cc0173df741d26c866897c37978638f19a411cc59593a2f7258852515e3637e6",
+        "hidden_fixture_fingerprint": "sha256:e9d321ab6c0a96bdbc8fb580f0f7fceef1f1c8874ef722bc82ca913d0d7d11b3",
+        "topology_fingerprint": "sha256:72835cc9e8e48e8b2d0a32bf16b27e91c6a3e09522700af0c166251962042463",
+        "required_consumer_ids": [
+          "medium-feature-flag-callpath:remote-worker",
+          "medium-feature-flag-callpath:config-binding",
+          "medium-feature-flag-callpath:documentation-contract"
+        ],
+        "order": [
+          "P2",
+          "P3"
+        ]
+      },
+      {
+        "pair_id": "pair-0772dcd893cb0ff20c6dcb16",
+        "family_id": "small-local-cleanup",
+        "stratum": "small",
+        "repetition": 1,
+        "instance_fingerprint": "sha256:d68f8069cef913e328bac0d4c458e362f316347b33ec5315c9581ede869a91f6",
+        "public_fixture_fingerprint": "sha256:0cdfd3425a17957aef9f5b55018fa279a5d206a6b590f09c397e1ecf255256bd",
+        "hidden_fixture_fingerprint": "sha256:5eba9ff4c281e83f6e932fd01cdba8e92853272fe4df2ae67be9536b8edebe15",
+        "topology_fingerprint": "sha256:05ac11ce1e44b7b5ff428ec2bd152cebeabddc21b24a2241b68a220f6d318b3e",
+        "required_consumer_ids": [],
+        "order": [
+          "P2",
+          "P3"
+        ]
+      }
+    ],
+    "bindings": {
+      "source_sha": "7e4c3bd26f073f66a0ad6fd07451cbb9eb4b622a",
+      "policy_fingerprint": "sha256:f050a814723943d10c4346aa295606a316c02f21c250eeef82611a8c7409e6f3",
+      "inventory_fingerprint": "sha256:8054c2a1e944ecbc6278a6e5577936f0b99550423183d8defe5d50741f7f441f",
+      "contract_fingerprint": "sha256:84130aa932b04a3e090a6b6750c73cccba6b5c5e2ff4e4326e5ab409869b3274",
+      "executable_identity": "sha256:535c3132070d10ef43506e061933834728aa0ff611fe55e7dffb3ab89de821d8",
+      "adapter_fingerprint": "sha256:dfd2ca4271042a2416e30c82fbd2e0fa7b4566cf7d87b49093fff8038126ec20",
+      "model": "openai/gpt-5.6-luna",
+      "provider": "openai",
+      "variant": "low",
+      "seed": "v04-v2-smoke-core-verified-to-core-reviewed-7e4c3bd",
+      "timeout_ms": 300000,
+      "runner_limits": {
+        "max_parallel_pairs": 1,
+        "trajectory_repetitions": 1,
+        "raw_model_output_persisted": false
+      },
+      "fixture_fingerprint": "sha256:f4c4c955ce242d5342938fa377076fa068b50c67d76ab6a5084f70450ad95c86",
+      "evaluator_fingerprint": "sha256:7f8f56432c7401b938cc5fcf0ef413107e8855fe02d0d3131742cdba6aefa6e0"
+    },
+    "standard_gate": null,
+    "plan_fingerprint": "sha256:30e347277815c9c6db3b16d824f94e685234283314d2be06199cba88e9592bfa"
+  },
+  "report": {
+    "schema_version": 1,
+    "run_id": "vnext-30e347277815c9c6db3b16d8",
+    "estimand_id": "core-verified-to-core-reviewed",
+    "suite_id": "smoke",
+    "evidence_class": "model-backed-contained-run",
+    "trusted_producer": {
+      "producer_id": "opencode-harness-vnext-contained-runner",
+      "schema_version": 1,
+      "engine_fingerprint": "sha256:dfd2ca4271042a2416e30c82fbd2e0fa7b4566cf7d87b49093fff8038126ec20",
+      "executable_identity": "sha256:535c3132070d10ef43506e061933834728aa0ff611fe55e7dffb3ab89de821d8"
+    },
+    "bindings": {
+      "source_sha": "7e4c3bd26f073f66a0ad6fd07451cbb9eb4b622a",
+      "policy_fingerprint": "sha256:f050a814723943d10c4346aa295606a316c02f21c250eeef82611a8c7409e6f3",
+      "inventory_fingerprint": "sha256:8054c2a1e944ecbc6278a6e5577936f0b99550423183d8defe5d50741f7f441f",
+      "contract_fingerprint": "sha256:84130aa932b04a3e090a6b6750c73cccba6b5c5e2ff4e4326e5ab409869b3274",
+      "executable_identity": "sha256:535c3132070d10ef43506e061933834728aa0ff611fe55e7dffb3ab89de821d8",
+      "adapter_fingerprint": "sha256:dfd2ca4271042a2416e30c82fbd2e0fa7b4566cf7d87b49093fff8038126ec20",
+      "model": "openai/gpt-5.6-luna",
+      "provider": "openai",
+      "variant": "low",
+      "seed": "v04-v2-smoke-core-verified-to-core-reviewed-7e4c3bd",
+      "timeout_ms": 300000,
+      "runner_limits": {
+        "max_parallel_pairs": 1,
+        "trajectory_repetitions": 1,
+        "raw_model_output_persisted": false
+      },
+      "fixture_fingerprint": "sha256:f4c4c955ce242d5342938fa377076fa068b50c67d76ab6a5084f70450ad95c86",
+      "evaluator_fingerprint": "sha256:7f8f56432c7401b938cc5fcf0ef413107e8855fe02d0d3131742cdba6aefa6e0"
+    },
+    "status": "complete",
+    "family_results": [
+      {
+        "family_id": "medium-feature-flag-callpath",
+        "baseline_arm_id": "P2",
+        "candidate_arm_id": "P3",
+        "repetition_count": 1,
+        "status": "complete"
+      },
+      {
+        "family_id": "small-local-cleanup",
+        "baseline_arm_id": "P2",
+        "candidate_arm_id": "P3",
+        "repetition_count": 1,
+        "status": "complete"
+      }
+    ],
+    "pair_results": [
+      {
+        "pair_id": "pair-dc9e06fe10c1ff8e34a8aff9",
+        "family_id": "medium-feature-flag-callpath",
+        "stratum": "medium",
+        "repetition": 1,
+        "order": [
+          "P2",
+          "P3"
+        ],
+        "instance_fingerprint": "sha256:24fdf439ebfdfe4413b714f57552e5a38231dd5475fc52d8afb1835a4dd4b3a3",
+        "required_consumer_ids": [
+          "medium-feature-flag-callpath:remote-worker",
+          "medium-feature-flag-callpath:config-binding",
+          "medium-feature-flag-callpath:documentation-contract"
+        ],
+        "status": "complete",
+        "incomplete_reasons": [],
+        "baseline": {
+          "arm_id": "P2",
+          "profile_fingerprint": "sha256:4608c7497684e769a52273a92bf6a8dc88d4bcfab0b703359ba1e2bf7b910396",
+          "execution_status": "failed",
+          "termination_reason": "verification_failed",
+          "reason": "opencode_missing_final",
+          "evidence_complete": true,
+          "operational_trace_id": "vnext-pair-dc9e06fe10c1ff8e34a8aff9-P2",
+          "result_fingerprint": "sha256:58b4e332e80cc5a93055cfe8c6a438f3dff8069ca68ad553a82608ae64989369",
+          "binding_fingerprint": "sha256:6f6d1f798e888494077ddfc45361bb64ba0df78dc177106c5811aa8a9c272300",
+          "consumer_observation": {
+            "required_consumer_ids": [
+              "medium-feature-flag-callpath:remote-worker",
+              "medium-feature-flag-callpath:config-binding",
+              "medium-feature-flag-callpath:documentation-contract"
+            ],
+            "consumer_results": [
+              {
+                "consumer_id": "medium-feature-flag-callpath:remote-worker",
+                "status": "passed",
+                "passed": true
+              },
+              {
+                "consumer_id": "medium-feature-flag-callpath:config-binding",
+                "status": "passed",
+                "passed": true
+              },
+              {
+                "consumer_id": "medium-feature-flag-callpath:documentation-contract",
+                "status": "passed",
+                "passed": true
+              }
+            ],
+            "preserved_consumer_count": 3,
+            "check_status": "passed",
+            "passed": true
+          },
+          "observation_inputs": {
+            "hidden_check_passed": false,
+            "workspace_policy_passed": true,
+            "task_correct": false,
+            "whole_task_success": false,
+            "defect_escape_v2": false,
+            "trace_policy_passed": false,
+            "trace_violations": [
+              "targeted_verification_missing"
+            ],
+            "treatment_compliance_passed": true,
+            "unexpected_path_count": 0,
+            "attested_owner_count": 0,
+            "duration_ms": 27255,
+            "model_turn_count": 1,
+            "total_tool_call_count": 11,
+            "subagent_call_count": 0,
+            "reason": "opencode_missing_final",
+            "termination_reason": "verification_failed",
+            "evidence_complete": true,
+            "consumer_observation": {
+              "required_consumer_ids": [
+                "medium-feature-flag-callpath:remote-worker",
+                "medium-feature-flag-callpath:config-binding",
+                "medium-feature-flag-callpath:documentation-contract"
+              ],
+              "consumer_results": [
+                {
+                  "consumer_id": "medium-feature-flag-callpath:remote-worker",
+                  "status": "passed",
+                  "passed": true
+                },
+                {
+                  "consumer_id": "medium-feature-flag-callpath:config-binding",
+                  "status": "passed",
+                  "passed": true
+                },
+                {
+                  "consumer_id": "medium-feature-flag-callpath:documentation-contract",
+                  "status": "passed",
+                  "passed": true
+                }
+              ],
+              "preserved_consumer_count": 3,
+              "check_status": "passed",
+              "passed": true
+            }
+          },
+          "observations": {
+            "functional_hidden_check_success": 0,
+            "regression_free_success": 0,
+            "regression_free_high_risk_success": 0,
+            "public_contract_preservation": 1,
+            "structural_oracle_success": 1,
+            "missed_consumer_rate": 0,
+            "introduced_high_medium_defects": 0,
+            "unnecessary_changed_files": 0,
+            "verification_omission": 1,
+            "task_completion_without_human_intervention": 0,
+            "duration": 27255,
+            "model_turns": 1,
+            "tool_calls": 11,
+            "delegated_child_count": 0,
+            "timeout_rate": 0,
+            "no_progress_turns": 0,
+            "whole_task_success": 0,
+            "protocol_compliance": 0,
+            "trace_completeness": 1,
+            "attestation_completeness": 1
+          }
+        },
+        "candidate": {
+          "arm_id": "P3",
+          "profile_fingerprint": "sha256:a8c019bdbbb59d443d47e541fe0a334261ea405628193b2bafb06a1e31ffd9e6",
+          "execution_status": "failed",
+          "termination_reason": "verification_failed",
+          "reason": "opencode_missing_final",
+          "evidence_complete": true,
+          "operational_trace_id": "vnext-pair-dc9e06fe10c1ff8e34a8aff9-P3",
+          "result_fingerprint": "sha256:2829e6e287648259f8861518e138602523bd6e7487890b53c81149f61cd9bd77",
+          "binding_fingerprint": "sha256:6f6d1f798e888494077ddfc45361bb64ba0df78dc177106c5811aa8a9c272300",
+          "consumer_observation": {
+            "required_consumer_ids": [
+              "medium-feature-flag-callpath:remote-worker",
+              "medium-feature-flag-callpath:config-binding",
+              "medium-feature-flag-callpath:documentation-contract"
+            ],
+            "consumer_results": [
+              {
+                "consumer_id": "medium-feature-flag-callpath:remote-worker",
+                "status": "passed",
+                "passed": true
+              },
+              {
+                "consumer_id": "medium-feature-flag-callpath:config-binding",
+                "status": "passed",
+                "passed": true
+              },
+              {
+                "consumer_id": "medium-feature-flag-callpath:documentation-contract",
+                "status": "passed",
+                "passed": true
+              }
+            ],
+            "preserved_consumer_count": 3,
+            "check_status": "passed",
+            "passed": true
+          },
+          "observation_inputs": {
+            "hidden_check_passed": false,
+            "workspace_policy_passed": true,
+            "task_correct": false,
+            "whole_task_success": false,
+            "defect_escape_v2": false,
+            "trace_policy_passed": false,
+            "trace_violations": [
+              "targeted_verification_missing"
+            ],
+            "treatment_compliance_passed": true,
+            "unexpected_path_count": 0,
+            "attested_owner_count": 0,
+            "duration_ms": 19008,
+            "model_turn_count": 1,
+            "total_tool_call_count": 6,
+            "subagent_call_count": 0,
+            "reason": "opencode_missing_final",
+            "termination_reason": "verification_failed",
+            "evidence_complete": true,
+            "consumer_observation": {
+              "required_consumer_ids": [
+                "medium-feature-flag-callpath:remote-worker",
+                "medium-feature-flag-callpath:config-binding",
+                "medium-feature-flag-callpath:documentation-contract"
+              ],
+              "consumer_results": [
+                {
+                  "consumer_id": "medium-feature-flag-callpath:remote-worker",
+                  "status": "passed",
+                  "passed": true
+                },
+                {
+                  "consumer_id": "medium-feature-flag-callpath:config-binding",
+                  "status": "passed",
+                  "passed": true
+                },
+                {
+                  "consumer_id": "medium-feature-flag-callpath:documentation-contract",
+                  "status": "passed",
+                  "passed": true
+                }
+              ],
+              "preserved_consumer_count": 3,
+              "check_status": "passed",
+              "passed": true
+            }
+          },
+          "observations": {
+            "functional_hidden_check_success": 0,
+            "regression_free_success": 0,
+            "regression_free_high_risk_success": 0,
+            "public_contract_preservation": 1,
+            "structural_oracle_success": 1,
+            "missed_consumer_rate": 0,
+            "introduced_high_medium_defects": 0,
+            "unnecessary_changed_files": 0,
+            "verification_omission": 1,
+            "task_completion_without_human_intervention": 0,
+            "duration": 19008,
+            "model_turns": 1,
+            "tool_calls": 6,
+            "delegated_child_count": 0,
+            "timeout_rate": 0,
+            "no_progress_turns": 0,
+            "whole_task_success": 0,
+            "protocol_compliance": 0,
+            "trace_completeness": 1,
+            "attestation_completeness": 1
+          }
+        },
+        "evidence_fingerprint": "sha256:cc680ac6fb360a497cb26d15ec2ee0f86e64fcb5b4cbca71c5b49df026ad6f4e"
+      },
+      {
+        "pair_id": "pair-0772dcd893cb0ff20c6dcb16",
+        "family_id": "small-local-cleanup",
+        "stratum": "small",
+        "repetition": 1,
+        "order": [
+          "P2",
+          "P3"
+        ],
+        "instance_fingerprint": "sha256:d68f8069cef913e328bac0d4c458e362f316347b33ec5315c9581ede869a91f6",
+        "required_consumer_ids": [],
+        "status": "complete",
+        "incomplete_reasons": [],
+        "baseline": {
+          "arm_id": "P2",
+          "profile_fingerprint": "sha256:4608c7497684e769a52273a92bf6a8dc88d4bcfab0b703359ba1e2bf7b910396",
+          "execution_status": "failed",
+          "termination_reason": "verification_failed",
+          "reason": "opencode_missing_final",
+          "evidence_complete": true,
+          "operational_trace_id": "vnext-pair-0772dcd893cb0ff20c6dcb16-P2",
+          "result_fingerprint": "sha256:1f3ab1090a9c77a89a0b348166bb32d5c3b9a4707d06926949365201c744f96b",
+          "binding_fingerprint": "sha256:5a392ce9e07d3658e324bc128ebfdade62e87495309c309823e6e0dcb4c6c835",
+          "consumer_observation": {
+            "required_consumer_ids": [],
+            "consumer_results": [],
+            "preserved_consumer_count": 0,
+            "check_status": "not_applicable",
+            "passed": true
+          },
+          "observation_inputs": {
+            "hidden_check_passed": false,
+            "workspace_policy_passed": true,
+            "task_correct": false,
+            "whole_task_success": false,
+            "defect_escape_v2": false,
+            "trace_policy_passed": false,
+            "trace_violations": [
+              "targeted_verification_missing"
+            ],
+            "treatment_compliance_passed": true,
+            "unexpected_path_count": 0,
+            "attested_owner_count": 0,
+            "duration_ms": 7315,
+            "model_turn_count": 1,
+            "total_tool_call_count": 2,
+            "subagent_call_count": 0,
+            "reason": "opencode_missing_final",
+            "termination_reason": "verification_failed",
+            "evidence_complete": true,
+            "consumer_observation": {
+              "required_consumer_ids": [],
+              "consumer_results": [],
+              "preserved_consumer_count": 0,
+              "check_status": "not_applicable",
+              "passed": true
+            }
+          },
+          "observations": {
+            "functional_hidden_check_success": 0,
+            "regression_free_success": 0,
+            "regression_free_high_risk_success": 0,
+            "public_contract_preservation": 1,
+            "structural_oracle_success": 0,
+            "missed_consumer_rate": 0,
+            "introduced_high_medium_defects": 0,
+            "unnecessary_changed_files": 0,
+            "verification_omission": 1,
+            "task_completion_without_human_intervention": 0,
+            "duration": 7315,
+            "model_turns": 1,
+            "tool_calls": 2,
+            "delegated_child_count": 0,
+            "timeout_rate": 0,
+            "no_progress_turns": 0,
+            "whole_task_success": 0,
+            "protocol_compliance": 0,
+            "trace_completeness": 1,
+            "attestation_completeness": 1
+          }
+        },
+        "candidate": {
+          "arm_id": "P3",
+          "profile_fingerprint": "sha256:a8c019bdbbb59d443d47e541fe0a334261ea405628193b2bafb06a1e31ffd9e6",
+          "execution_status": "failed",
+          "termination_reason": "verification_failed",
+          "reason": "opencode_missing_final",
+          "evidence_complete": true,
+          "operational_trace_id": "vnext-pair-0772dcd893cb0ff20c6dcb16-P3",
+          "result_fingerprint": "sha256:7051cfd953eb3bf0976e6e25b3ca432c73ee65460a6e16a6ed4a40180ccf5f19",
+          "binding_fingerprint": "sha256:5a392ce9e07d3658e324bc128ebfdade62e87495309c309823e6e0dcb4c6c835",
+          "consumer_observation": {
+            "required_consumer_ids": [],
+            "consumer_results": [],
+            "preserved_consumer_count": 0,
+            "check_status": "not_applicable",
+            "passed": true
+          },
+          "observation_inputs": {
+            "hidden_check_passed": false,
+            "workspace_policy_passed": true,
+            "task_correct": false,
+            "whole_task_success": false,
+            "defect_escape_v2": false,
+            "trace_policy_passed": false,
+            "trace_violations": [
+              "targeted_verification_missing"
+            ],
+            "treatment_compliance_passed": true,
+            "unexpected_path_count": 0,
+            "attested_owner_count": 0,
+            "duration_ms": 17926,
+            "model_turn_count": 1,
+            "total_tool_call_count": 8,
+            "subagent_call_count": 0,
+            "reason": "opencode_missing_final",
+            "termination_reason": "verification_failed",
+            "evidence_complete": true,
+            "consumer_observation": {
+              "required_consumer_ids": [],
+              "consumer_results": [],
+              "preserved_consumer_count": 0,
+              "check_status": "not_applicable",
+              "passed": true
+            }
+          },
+          "observations": {
+            "functional_hidden_check_success": 0,
+            "regression_free_success": 0,
+            "regression_free_high_risk_success": 0,
+            "public_contract_preservation": 1,
+            "structural_oracle_success": 0,
+            "missed_consumer_rate": 0,
+            "introduced_high_medium_defects": 0,
+            "unnecessary_changed_files": 0,
+            "verification_omission": 1,
+            "task_completion_without_human_intervention": 0,
+            "duration": 17926,
+            "model_turns": 1,
+            "tool_calls": 8,
+            "delegated_child_count": 0,
+            "timeout_rate": 0,
+            "no_progress_turns": 0,
+            "whole_task_success": 0,
+            "protocol_compliance": 0,
+            "trace_completeness": 1,
+            "attestation_completeness": 1
+          }
+        },
+        "evidence_fingerprint": "sha256:2066c2f60c45168a5170b6f99cce3fbfb2717ae312269b1c4d9c3d718543b46d"
+      }
+    ],
+    "product_metrics": {
+      "functional_hidden_check_success": {
+        "baseline": 0,
+        "candidate": 0,
+        "paired_delta": 0,
+        "confidence_interval": [
+          0,
+          0
+        ]
+      },
+      "regression_free_success": {
+        "baseline": 0,
+        "candidate": 0,
+        "paired_delta": 0,
+        "confidence_interval": [
+          0,
+          0
+        ]
+      },
+      "regression_free_high_risk_success": {
+        "baseline": 0,
+        "candidate": 0,
+        "paired_delta": 0,
+        "confidence_interval": [
+          0,
+          0
+        ]
+      },
+      "public_contract_preservation": {
+        "baseline": 1,
+        "candidate": 1,
+        "paired_delta": 0,
+        "confidence_interval": [
+          0,
+          0
+        ]
+      },
+      "structural_oracle_success": {
+        "baseline": 0.5,
+        "candidate": 0.5,
+        "paired_delta": 0,
+        "confidence_interval": [
+          0,
+          0
+        ]
+      },
+      "missed_consumer_rate": {
+        "baseline": 0,
+        "candidate": 0,
+        "paired_delta": 0,
+        "confidence_interval": [
+          0,
+          0
+        ]
+      },
+      "introduced_high_medium_defects": {
+        "baseline": 0,
+        "candidate": 0,
+        "paired_delta": 0,
+        "confidence_interval": [
+          0,
+          0
+        ]
+      },
+      "unnecessary_changed_files": {
+        "baseline": 0,
+        "candidate": 0,
+        "paired_delta": 0,
+        "confidence_interval": [
+          0,
+          0
+        ]
+      },
+      "verification_omission": {
+        "baseline": 1,
+        "candidate": 1,
+        "paired_delta": 0,
+        "confidence_interval": [
+          0,
+          0
+        ]
+      },
+      "task_completion_without_human_intervention": {
+        "baseline": 0,
+        "candidate": 0,
+        "paired_delta": 0,
+        "confidence_interval": [
+          0,
+          0
+        ]
+      }
+    },
+    "operational_metrics": {
+      "duration": {
+        "baseline": 17285,
+        "candidate": 18467,
+        "paired_delta": 1182,
+        "confidence_interval": [
+          -8247,
+          10611
+        ]
+      },
+      "model_turns": {
+        "baseline": 1,
+        "candidate": 1,
+        "paired_delta": 0,
+        "confidence_interval": [
+          0,
+          0
+        ]
+      },
+      "tool_calls": {
+        "baseline": 6.5,
+        "candidate": 7,
+        "paired_delta": 0.5,
+        "confidence_interval": [
+          -5,
+          6
+        ]
+      },
+      "delegated_child_count": {
+        "baseline": 0,
+        "candidate": 0,
+        "paired_delta": 0,
+        "confidence_interval": [
+          0,
+          0
+        ]
+      },
+      "timeout_rate": {
+        "baseline": 0,
+        "candidate": 0,
+        "paired_delta": 0,
+        "confidence_interval": [
+          0,
+          0
+        ]
+      },
+      "no_progress_turns": {
+        "baseline": 0,
+        "candidate": 0,
+        "paired_delta": 0,
+        "confidence_interval": [
+          0,
+          0
+        ]
+      }
+    },
+    "diagnostic_metrics": {
+      "whole_task_success": {
+        "baseline": 0,
+        "candidate": 0,
+        "paired_delta": 0,
+        "confidence_interval": [
+          0,
+          0
+        ]
+      },
+      "protocol_compliance": {
+        "baseline": 0,
+        "candidate": 0,
+        "paired_delta": 0,
+        "confidence_interval": [
+          0,
+          0
+        ]
+      },
+      "trace_completeness": {
+        "baseline": 1,
+        "candidate": 1,
+        "paired_delta": 0,
+        "confidence_interval": [
+          0,
+          0
+        ]
+      },
+      "attestation_completeness": {
+        "baseline": 1,
+        "candidate": 1,
+        "paired_delta": 0,
+        "confidence_interval": [
+          0,
+          0
+        ]
+      }
+    },
+    "incomplete_outcomes": [],
+    "evidence_fingerprint": "sha256:041453a2cea6f34d4f7a0117927b274235fffd401004a73af7a35586ceea2d4d"
+  },
+  "envelope_fingerprint": "sha256:b7a433af590da3363475476c69cf054f512370bc9976dbbe947c3b8d9f658cba"
+}

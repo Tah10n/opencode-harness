@@ -1,0 +1,2700 @@
+{
+  "schema_version": 1,
+  "run_kind": "vnext-run-envelope",
+  "plan": {
+    "schema_version": 1,
+    "plan_kind": "vnext-compound-profile-transition-plan",
+    "suite_id": "smoke",
+    "estimand_id": "deep-to-assurance",
+    "estimand_kind": "compound-profile-transition",
+    "baseline_arm_id": "P4",
+    "candidate_arm_id": "P5",
+    "transition_anchor_component_id": "assurance-controls",
+    "eligible_strata": [
+      "small",
+      "high"
+    ],
+    "target_strata": [
+      "high"
+    ],
+    "negative_control_strata": [
+      "small"
+    ],
+    "family_ids": [
+      "high-durable-persistence",
+      "small-config-defect"
+    ],
+    "metric_ids": {
+      "product": [
+        "functional_hidden_check_success",
+        "regression_free_success",
+        "regression_free_high_risk_success",
+        "public_contract_preservation",
+        "structural_oracle_success",
+        "missed_consumer_rate",
+        "introduced_high_medium_defects",
+        "unnecessary_changed_files",
+        "verification_omission",
+        "task_completion_without_human_intervention"
+      ],
+      "operational": [
+        "duration",
+        "model_turns",
+        "tool_calls",
+        "delegated_child_count",
+        "timeout_rate",
+        "no_progress_turns"
+      ],
+      "diagnostic": [
+        "whole_task_success",
+        "protocol_compliance",
+        "trace_completeness",
+        "attestation_completeness"
+      ]
+    },
+    "arms": {
+      "baseline": {
+        "arm_id": "P4",
+        "component_ids": [
+          "core-rules",
+          "targeted-verification",
+          "independent-final-review",
+          "deep-context"
+        ],
+        "primary_agent_id": "deep",
+        "profile_fingerprint": "sha256:27aea26333afbbfdd1a6c06a38d24c6bace8e58bafd6b3c07665bfe0932ce540",
+        "runtime_surface": {
+          "schema_version": 1,
+          "effective_config": {
+            "$schema": "https://opencode.ai/config.json",
+            "default_agent": "deep",
+            "permission": {
+              "external_directory": "ask",
+              "oc_learning_*": "deny",
+              "quality_*": "deny",
+              "context_*": "deny",
+              "edit": "ask",
+              "bash": {
+                "*": "ask",
+                "git clean*": "ask",
+                "git reset*": "ask",
+                "git rebase*": "ask",
+                "git push --force*": "ask",
+                "rm *": "ask",
+                "sudo *": "ask"
+              }
+            },
+            "snapshot": false,
+            "plugin": [
+              {
+                "id": "lib/benchmark/opencode-model-env-firewall.mjs",
+                "source_path": "lib/benchmark/opencode-model-env-firewall.mjs",
+                "fingerprint": "sha256:db0470a28bf2795b8c1546a919075cbeb62edb118227d82247fa803338515dc8"
+              },
+              {
+                "id": "lib/benchmark/opencode-context-bridge-plugin.mjs",
+                "source_path": "lib/benchmark/opencode-context-bridge-plugin.mjs",
+                "fingerprint": "sha256:42b3ea64f196da896c533f4bf7dc3525fc5ac931e7217ff2f2647fb14393ef66"
+              }
+            ]
+          },
+          "materialized_files": [
+            {
+              "path": "agents/core-reviewer.md",
+              "fingerprint": "sha256:457820d9633eab24ae56e64d922ad0f732bebc9323fc3c6aa95e4375f262b043"
+            },
+            {
+              "path": "agents/core.md",
+              "fingerprint": "sha256:73bbcf247416a53a1d9eb4b22234a43bbd3c14d653dc27efee5e99ffda136700"
+            },
+            {
+              "path": "agents/deep.md",
+              "fingerprint": "sha256:366a1b4bd1d49e0f11153ff220051a2bd0b939b7added62c6ca159339b21fe64"
+            },
+            {
+              "path": "agents/explore.md",
+              "fingerprint": "sha256:5c654ef78f0f5857ea9d1210bfbc62a9dc3e0266b7eb2e67ba4b76a31494f32a"
+            },
+            {
+              "path": "runtime/lib/benchmark/opencode-context-bridge-plugin.mjs",
+              "fingerprint": "sha256:42b3ea64f196da896c533f4bf7dc3525fc5ac931e7217ff2f2647fb14393ef66"
+            },
+            {
+              "path": "runtime/lib/feedback/context-sensitive-paths.mjs",
+              "fingerprint": "sha256:a5a0076fc7c36c5f5d8fc476f3c4f3958a140ba6f350bb420984596b3f229659"
+            }
+          ],
+          "plugin_sources": [
+            {
+              "id": "lib/benchmark/opencode-model-env-firewall.mjs",
+              "source_path": "lib/benchmark/opencode-model-env-firewall.mjs",
+              "fingerprint": "sha256:db0470a28bf2795b8c1546a919075cbeb62edb118227d82247fa803338515dc8"
+            },
+            {
+              "id": "lib/benchmark/opencode-context-bridge-plugin.mjs",
+              "source_path": "lib/benchmark/opencode-context-bridge-plugin.mjs",
+              "fingerprint": "sha256:42b3ea64f196da896c533f4bf7dc3525fc5ac931e7217ff2f2647fb14393ef66"
+            }
+          ]
+        },
+        "source_entries": [
+          {
+            "kind": "plugin",
+            "id": "lib/benchmark/opencode-model-env-firewall.mjs",
+            "source_path": "lib/benchmark/opencode-model-env-firewall.mjs",
+            "files": [
+              {
+                "path": "opencode-model-env-firewall.mjs",
+                "fingerprint": "sha256:db0470a28bf2795b8c1546a919075cbeb62edb118227d82247fa803338515dc8"
+              }
+            ]
+          },
+          {
+            "kind": "agent-or-config",
+            "id": "agents/deep.md",
+            "source_path": "agents/deep.md",
+            "files": [
+              {
+                "path": "deep.md",
+                "fingerprint": "sha256:366a1b4bd1d49e0f11153ff220051a2bd0b939b7added62c6ca159339b21fe64"
+              }
+            ]
+          },
+          {
+            "kind": "agent-or-config",
+            "id": "agents/core.md",
+            "source_path": "agents/core.md",
+            "files": [
+              {
+                "path": "core.md",
+                "fingerprint": "sha256:73bbcf247416a53a1d9eb4b22234a43bbd3c14d653dc27efee5e99ffda136700"
+              }
+            ]
+          },
+          {
+            "kind": "agent-or-config",
+            "id": "agents/core-reviewer.md",
+            "source_path": "agents/core-reviewer.md",
+            "files": [
+              {
+                "path": "core-reviewer.md",
+                "fingerprint": "sha256:457820d9633eab24ae56e64d922ad0f732bebc9323fc3c6aa95e4375f262b043"
+              }
+            ]
+          },
+          {
+            "kind": "agent-or-config",
+            "id": "agents/explore.md",
+            "source_path": "agents/explore.md",
+            "files": [
+              {
+                "path": "explore.md",
+                "fingerprint": "sha256:5c654ef78f0f5857ea9d1210bfbc62a9dc3e0266b7eb2e67ba4b76a31494f32a"
+              }
+            ]
+          },
+          {
+            "kind": "agent-or-config",
+            "id": "profiles/config/deep.opencode.json",
+            "source_path": "profiles/config/deep.opencode.json",
+            "files": [
+              {
+                "path": "deep.opencode.json",
+                "fingerprint": "sha256:738b8c63b94fe571e97c2d1343790935df9cf63828f6434595aa09a2bfc92087"
+              }
+            ]
+          },
+          {
+            "kind": "agent-or-config",
+            "id": "benchmarks/vnext/components/deep-context.md",
+            "source_path": "benchmarks/vnext/components/deep-context.md",
+            "files": [
+              {
+                "path": "deep-context.md",
+                "fingerprint": "sha256:849cec093d9ac592b737199ae1ddeb68ad4ed5e52aa3d099b07a77beaf7aca48"
+              }
+            ]
+          },
+          {
+            "kind": "plugin",
+            "id": "lib/benchmark/opencode-context-bridge-plugin.mjs",
+            "source_path": "lib/benchmark/opencode-context-bridge-plugin.mjs",
+            "files": [
+              {
+                "path": "opencode-context-bridge-plugin.mjs",
+                "fingerprint": "sha256:42b3ea64f196da896c533f4bf7dc3525fc5ac931e7217ff2f2647fb14393ef66"
+              }
+            ]
+          },
+          {
+            "kind": "agent-or-config",
+            "id": "lib/feedback/context-sensitive-paths.mjs",
+            "source_path": "lib/feedback/context-sensitive-paths.mjs",
+            "files": [
+              {
+                "path": "context-sensitive-paths.mjs",
+                "fingerprint": "sha256:a5a0076fc7c36c5f5d8fc476f3c4f3958a140ba6f350bb420984596b3f229659"
+              }
+            ]
+          }
+        ],
+        "common_overlay_id": "credential-firewall-v1"
+      },
+      "candidate": {
+        "arm_id": "P5",
+        "component_ids": [
+          "core-rules",
+          "targeted-verification",
+          "independent-final-review",
+          "deep-context",
+          "assurance-controls"
+        ],
+        "primary_agent_id": "assurance",
+        "profile_fingerprint": "sha256:c887f0dbcb7c8aca4a182b6b08ca40c5941b330fc7bb03cd2930aaab345f4ba3",
+        "runtime_surface": {
+          "schema_version": 1,
+          "effective_config": {
+            "$schema": "https://opencode.ai/config.json",
+            "default_agent": "assurance",
+            "plugin": [
+              {
+                "id": "lib/benchmark/opencode-model-env-firewall.mjs",
+                "source_path": "lib/benchmark/opencode-model-env-firewall.mjs",
+                "fingerprint": "sha256:db0470a28bf2795b8c1546a919075cbeb62edb118227d82247fa803338515dc8"
+              },
+              {
+                "id": "lib/benchmark/opencode-assurance-context-plugin.mjs",
+                "source_path": "lib/benchmark/opencode-assurance-context-plugin.mjs",
+                "fingerprint": "sha256:aca5309487a991133e06a039313199daa264dead01aebfe44fcd998bb7758c21"
+              }
+            ],
+            "permission": {
+              "external_directory": "ask",
+              "oc_learning_*": "deny",
+              "quality_*": "deny",
+              "context_*": "deny",
+              "edit": "ask",
+              "bash": {
+                "*": "ask",
+                "git clean*": "ask",
+                "git reset*": "ask",
+                "git rebase*": "ask",
+                "git push --force*": "ask",
+                "rm *": "ask",
+                "sudo *": "ask"
+              }
+            },
+            "snapshot": false
+          },
+          "materialized_files": [
+            {
+              "path": "agents/architect.md",
+              "fingerprint": "sha256:403b8590aa7619f61ab524effbd056fa78bbc888de7c5557aa8b365c7ba69cc8"
+            },
+            {
+              "path": "agents/assurance.md",
+              "fingerprint": "sha256:0d65c7c48a5364ebd27b3e1e823070f38346654485de448b55449953302704c9"
+            },
+            {
+              "path": "agents/core-reviewer.md",
+              "fingerprint": "sha256:457820d9633eab24ae56e64d922ad0f732bebc9323fc3c6aa95e4375f262b043"
+            },
+            {
+              "path": "agents/core.md",
+              "fingerprint": "sha256:73bbcf247416a53a1d9eb4b22234a43bbd3c14d653dc27efee5e99ffda136700"
+            },
+            {
+              "path": "agents/deep.md",
+              "fingerprint": "sha256:366a1b4bd1d49e0f11153ff220051a2bd0b939b7added62c6ca159339b21fe64"
+            },
+            {
+              "path": "agents/explore.md",
+              "fingerprint": "sha256:5c654ef78f0f5857ea9d1210bfbc62a9dc3e0266b7eb2e67ba4b76a31494f32a"
+            },
+            {
+              "path": "agents/reviewer.md",
+              "fingerprint": "sha256:f44cd536bf8c040de613dca2f1a7c220880efc5a67625f0dd3744c7941eb86f1"
+            },
+            {
+              "path": "agents/verifier.md",
+              "fingerprint": "sha256:4a134f3e906d99cf4c8c515be9517967d4dd88c5a343ea0306f77b43bbee2ba6"
+            },
+            {
+              "path": "quality-toolchains.host.v1.json",
+              "fingerprint": "sha256:7007642eff50163404e7a9458ecc33eab5b6cc4cfcd6d91405dc2c89829369ba"
+            },
+            {
+              "path": "runtime/lib/benchmark/opencode-assurance-context-plugin.mjs",
+              "fingerprint": "sha256:aca5309487a991133e06a039313199daa264dead01aebfe44fcd998bb7758c21"
+            },
+            {
+              "path": "runtime/lib/benchmark/opencode-context-bridge-plugin.mjs",
+              "fingerprint": "sha256:42b3ea64f196da896c533f4bf7dc3525fc5ac931e7217ff2f2647fb14393ef66"
+            },
+            {
+              "path": "runtime/lib/feedback/acceptance.mjs",
+              "fingerprint": "sha256:8ed6600a63f27a10c5fab7b2e8b2f8ee2f48ef1253dae77af2cfa6e91b7a9c3a"
+            },
+            {
+              "path": "runtime/lib/feedback/adapter-worker.mjs",
+              "fingerprint": "sha256:e8bb593ef33d5df642c7fb3fc0eb80587442e41b94d962ca94ac87663c2d7e14"
+            },
+            {
+              "path": "runtime/lib/feedback/context-sensitive-paths.mjs",
+              "fingerprint": "sha256:a5a0076fc7c36c5f5d8fc476f3c4f3958a140ba6f350bb420984596b3f229659"
+            },
+            {
+              "path": "runtime/lib/feedback/contracts.mjs",
+              "fingerprint": "sha256:ee917de5d21b650d8126b484331306db394c00b5dd39f966ef100f4dc5a3096b"
+            },
+            {
+              "path": "runtime/lib/feedback/evidence.mjs",
+              "fingerprint": "sha256:88a28dc08ab7b486fe9d80fb67a2fd72a95de5048f547b05c13870134c20f0b7"
+            },
+            {
+              "path": "runtime/lib/feedback/files.mjs",
+              "fingerprint": "sha256:5ee2f5cf8f31abea8a2870af267bb177753c7c96e5a5fbe68d2417aad70cae4c"
+            },
+            {
+              "path": "runtime/lib/feedback/index.mjs",
+              "fingerprint": "sha256:09581319b7063be3ea6f4adc4152f6e17495f09fcf159bd1eebddec5eeeeb1ff"
+            },
+            {
+              "path": "runtime/lib/feedback/managed-command-sync-worker.mjs",
+              "fingerprint": "sha256:ccfbffe9f8b69a3d09adb0b999cb71bf33c3b19262c6759160e9fb00997f984b"
+            },
+            {
+              "path": "runtime/lib/feedback/manifests.mjs",
+              "fingerprint": "sha256:30a040ab49179ef8e34e7c9342b6776b78ba17a19d049ecb77226e4077029d31"
+            },
+            {
+              "path": "runtime/lib/feedback/permission-surface.mjs",
+              "fingerprint": "sha256:ae49848ccab8d9666d8fdd6cc0ec5ad895398d80dba98ebf37b53e5504dbccfb"
+            },
+            {
+              "path": "runtime/lib/feedback/privacy.mjs",
+              "fingerprint": "sha256:0ad6d1a7fd8bedee0e40f0f394ebe3eab80eb195b2c36dc69a4e9ee932a21807"
+            },
+            {
+              "path": "runtime/lib/feedback/process-containment.mjs",
+              "fingerprint": "sha256:a753c1f2a18dad40d43414a026d06be43e4eaf653a40051a2688914f62af9c73"
+            },
+            {
+              "path": "runtime/lib/feedback/process-tree.mjs",
+              "fingerprint": "sha256:8d523f65af19cccb734573337d30f202c7fa22c2c3d70eb299dd8008f05f8bb7"
+            },
+            {
+              "path": "runtime/lib/feedback/report-history.mjs",
+              "fingerprint": "sha256:120d2a8058b7fa27a593038a813dba116a576d7d27b5320d98aed37929ca6d4d"
+            },
+            {
+              "path": "runtime/lib/feedback/trace-assertions.mjs",
+              "fingerprint": "sha256:aab7284281ba00211dc6dbebe1194d506beee1546dbf6330ab002bde06324689"
+            },
+            {
+              "path": "runtime/lib/feedback/trace-store.mjs",
+              "fingerprint": "sha256:97dc5acf38656267bf6d66a89c7c91b27c330cbb866d4bbbeaa7179178fdbb91"
+            },
+            {
+              "path": "runtime/lib/quality/acceptance-contracts.mjs",
+              "fingerprint": "sha256:21fcfdf814cc72936b4556dd9862002fdd67f5f5d05d120128f1dd7b91caed6f"
+            },
+            {
+              "path": "runtime/lib/quality/acceptance-engine.mjs",
+              "fingerprint": "sha256:6ba57c786510809b6315706531425cbebcdc304373a58dbb19199187efd49d05"
+            },
+            {
+              "path": "runtime/lib/quality/architecture.mjs",
+              "fingerprint": "sha256:93964c227a9e4728fa95ee9103d99c8aea04626365b353168b184c62a11a6da6"
+            },
+            {
+              "path": "runtime/lib/quality/assertions.mjs",
+              "fingerprint": "sha256:efec9e29e57bd817b93cd8ab4924fc8512f2240547fb7d3deda195230deb3c9b"
+            },
+            {
+              "path": "runtime/lib/quality/assurance-facade.mjs",
+              "fingerprint": "sha256:8da0df22766a144b134702d090e5cb98e3b97e8a2619f83d506a08255040db25"
+            },
+            {
+              "path": "runtime/lib/quality/attestation.mjs",
+              "fingerprint": "sha256:6271793ebd824fecfe0a79db893721f1d656ecc1b91cacb992c4a6b5a6b50c4b"
+            },
+            {
+              "path": "runtime/lib/quality/compact-high-analysis.mjs",
+              "fingerprint": "sha256:08ccc32ae43447fb4c8ac84900f7c2ff00897712f67a8a5074f5cc660c81ecb1"
+            },
+            {
+              "path": "runtime/lib/quality/constants.mjs",
+              "fingerprint": "sha256:ce33320829ad638d7622957c0343cf0f4b9fbcd7db5d1d2c17ce6c9fb940a805"
+            },
+            {
+              "path": "runtime/lib/quality/context-discovery-tools.mjs",
+              "fingerprint": "sha256:88fcfd86536d76a308fb727b0fa30f98aa8c49bcf07b22260df33f2db1443bea"
+            },
+            {
+              "path": "runtime/lib/quality/context-file-coverage.mjs",
+              "fingerprint": "sha256:14fe5887a77ae503c8d8544d5b4b7d7d0e2f1726bdc0bdb4c9f91e0763daaf6f"
+            },
+            {
+              "path": "runtime/lib/quality/context-path-kind.mjs",
+              "fingerprint": "sha256:7df23b4a16ae45822603a9f3e2a6f4bf8f968c1d2df226eb9e68c092b18fc8d0"
+            },
+            {
+              "path": "runtime/lib/quality/context-receipt-store.mjs",
+              "fingerprint": "sha256:a9287eac58092742df2dd18bdc1f82c6958a6e1f9c495f9c18ce5ef562b2f066"
+            },
+            {
+              "path": "runtime/lib/quality/context-receipts.mjs",
+              "fingerprint": "sha256:ec80de31f7f95e09fd0401e4bbc22a8950e3c1b23065fc7a9b33b238a8bf7fe8"
+            },
+            {
+              "path": "runtime/lib/quality/context-reconciliation.mjs",
+              "fingerprint": "sha256:4cf0f29b59a5ca8f56bf163bda5afb80c37eb787ad6e9283e90db4a44896c902"
+            },
+            {
+              "path": "runtime/lib/quality/context-strategies.mjs",
+              "fingerprint": "sha256:e0b374cec1eddcd249dbdaeb929b5382f1d5bf63d5420b29a0caaa81e8d6a7af"
+            },
+            {
+              "path": "runtime/lib/quality/context-sufficiency.mjs",
+              "fingerprint": "sha256:900b91edc0cfed4ce4d148e8e5b0fa15ba497c7d95013171ecc0075d2c5a68d2"
+            },
+            {
+              "path": "runtime/lib/quality/context-tool-adapters.mjs",
+              "fingerprint": "sha256:5c05d84d2b9a3d8ef5b4a65ad0145f4213704d8e0663eb0744408f12605dea42"
+            },
+            {
+              "path": "runtime/lib/quality/context-tool-overlay.mjs",
+              "fingerprint": "sha256:66859936dd123582cadab5bfd549db4188f26ec09830b0badd708ce1c8233119"
+            },
+            {
+              "path": "runtime/lib/quality/dossier.mjs",
+              "fingerprint": "sha256:f8cf0a1d1b738cb7aef7b8fda1b88bbee06e577eb51279377093bb0ed8eabeb5"
+            },
+            {
+              "path": "runtime/lib/quality/gate.mjs",
+              "fingerprint": "sha256:54c18c7f78da0004b2caffd7336c6a32b927dbeb7a3a1160475235c777ef57f3"
+            },
+            {
+              "path": "runtime/lib/quality/impact-graph.mjs",
+              "fingerprint": "sha256:4162f84bdfa5ef07ba9fd2abdc507c73d5ff9bb5a3c3f5120987c112bd185048"
+            },
+            {
+              "path": "runtime/lib/quality/index.mjs",
+              "fingerprint": "sha256:329628521ea60066ca5a5063779b9d72d8604a6c133d6b4206bc34bd8a33d302"
+            },
+            {
+              "path": "runtime/lib/quality/live-coordinator.mjs",
+              "fingerprint": "sha256:3a9fdc98a7cbb44cb4117a9c2f066360c7ba902c9912163c9f8267e58df2429f"
+            },
+            {
+              "path": "runtime/lib/quality/live-scenarios.mjs",
+              "fingerprint": "sha256:007be86f053cea521a3d16fcb4544a2ec140c67549070ace19f72c00f959cff8"
+            },
+            {
+              "path": "runtime/lib/quality/milestone-dod.mjs",
+              "fingerprint": "sha256:e14a400f889ba3b4b35a1bb24d2a4d744f8fb5689071053e2d324ac03cc03b04"
+            },
+            {
+              "path": "runtime/lib/quality/milestone-operational-report.mjs",
+              "fingerprint": "sha256:357c519b76f5d4029cfb276e071b1c966150c060a69ab89f9e9c30f8af67fa52"
+            },
+            {
+              "path": "runtime/lib/quality/milestone-run-context.mjs",
+              "fingerprint": "sha256:37cbaacdd2c486008c0252f92f3f9377c906172e1ec904e27eff6bbfb688ccd5"
+            },
+            {
+              "path": "runtime/lib/quality/normal-session-bridge.mjs",
+              "fingerprint": "sha256:8279e2f9412d78e709fdea286033a26d328b1a34ffa8d8574c14f81353983daf"
+            },
+            {
+              "path": "runtime/lib/quality/normal-session-plugin.mjs",
+              "fingerprint": "sha256:4a6f3b3c44b8bd0d8348414a10eb3e4911ff192e0aae8a924ae6c0715c358c82"
+            },
+            {
+              "path": "runtime/lib/quality/normal-session-profile-permissions.mjs",
+              "fingerprint": "sha256:127c550ccc30757a0079975360d0792739964767c55fb2b78b3613c8d2f8d7f3"
+            },
+            {
+              "path": "runtime/lib/quality/normal-session-workspace.mjs",
+              "fingerprint": "sha256:516b28fd84eed3bfcc0b5427b33b09e86dce237689b3ab5c4dd16f3dae5d2914"
+            },
+            {
+              "path": "runtime/lib/quality/plan-challenge-subject.mjs",
+              "fingerprint": "sha256:bfbd84ce68274c9844523fada8bdc9c6c6290db55f776a0cf2c94ef24c25f789"
+            },
+            {
+              "path": "runtime/lib/quality/post-architecture-evidence.mjs",
+              "fingerprint": "sha256:a62779d1bd65b0d7491692ad52cb451f9354ea325427af680f653e15eba8cf83"
+            },
+            {
+              "path": "runtime/lib/quality/preimplementation-sequence.mjs",
+              "fingerprint": "sha256:e3093aa592f9577f307cb936e5b0776ff603f3f15d6662a18cdc302e5a93fc78"
+            },
+            {
+              "path": "runtime/lib/quality/project-check-catalog.mjs",
+              "fingerprint": "sha256:97620f4dee3e983b15d745f4132ea2da34fbc9eadbe8094f723a13469f87930d"
+            },
+            {
+              "path": "runtime/lib/quality/prompt-inventory.mjs",
+              "fingerprint": "sha256:caf180cb1ccb5e97ccdf73e182c890328b3697bc934f5f5a774077e93aa9f76e"
+            },
+            {
+              "path": "runtime/lib/quality/quality-plugin.mjs",
+              "fingerprint": "sha256:74c9cce2d8385c7a4d68f984dacab7e2f6127b8d198916484ee9d117fde09fe5"
+            },
+            {
+              "path": "runtime/lib/quality/recursive-context-contract.mjs",
+              "fingerprint": "sha256:faed5717c695428c54763c457a0e6083c1ea7c4a6e536e7809b1651c9d6e9125"
+            },
+            {
+              "path": "runtime/lib/quality/run-bundle.mjs",
+              "fingerprint": "sha256:f716696dcaf9a87aa0dde477de669ab71f57b8145bf151f4425d4310d0f9f19f"
+            },
+            {
+              "path": "runtime/lib/quality/runtime-hook-verification.mjs",
+              "fingerprint": "sha256:f84d9cf42003cb2e89972e500748aaeb4836c1fb05203c69192aa91b185213d3"
+            },
+            {
+              "path": "runtime/lib/quality/session-classification.mjs",
+              "fingerprint": "sha256:9ded7e90b13d6f224e6cd13b4188fb44a76aad65bd291f7566e0291a254a8210"
+            },
+            {
+              "path": "runtime/lib/quality/session.mjs",
+              "fingerprint": "sha256:2ad6fa9515f3d67c73aee0342203ec98a0d1b409812c2c8a0afbff927bd60701"
+            },
+            {
+              "path": "runtime/lib/quality/standard-lite.mjs",
+              "fingerprint": "sha256:4a4197ff57fb33f894c6498dc7dd73602335195f741aee4c43d0a8354b6d333c"
+            },
+            {
+              "path": "runtime/lib/quality/store.mjs",
+              "fingerprint": "sha256:1203db15b493bb1f96b81b270ff15b5f7303b37d5bb8e3d3480572f97106ca87"
+            },
+            {
+              "path": "runtime/lib/quality/transitive-impact-resolution.mjs",
+              "fingerprint": "sha256:738996e87ed6bb3960a0a13e673e6dcb4fd3f1d64381ccd314eeb39f24bf596d"
+            },
+            {
+              "path": "runtime/lib/quality/trusted-project-runner.mjs",
+              "fingerprint": "sha256:4983a3473238cc6099d369e8f5497da6e06bcdb68613cfdd08ff2da7383ac96a"
+            },
+            {
+              "path": "runtime/lib/quality/trusted-toolchain-host-config.mjs",
+              "fingerprint": "sha256:22bcc5b970a10edc8af7db4f21b62f053b2cd2cfe1b19ab48b0366f38cc24d23"
+            },
+            {
+              "path": "runtime/lib/quality/trusted-toolchains.mjs",
+              "fingerprint": "sha256:22bc62a5e9aaad3f0c4e32ab187238ab352b5d499a9564ac2549ad11f59209e4"
+            },
+            {
+              "path": "runtime/lib/quality/validation.mjs",
+              "fingerprint": "sha256:4f0316ea80b040a277493ed205a2718a3fd095b214f8a79c79a343f4632c403d"
+            },
+            {
+              "path": "runtime/lib/quality/verification-evidence.mjs",
+              "fingerprint": "sha256:95a857f9e963767f189bf62767a51d40ddecc8a2b918dfad30876d38e6dc2805"
+            },
+            {
+              "path": "runtime/lib/quality/verification-targets.mjs",
+              "fingerprint": "sha256:8fdec53921af5caf65733d9c4bad0bc599bb0a81e21c2029d9a6a35a45ff4854"
+            },
+            {
+              "path": "runtime/lib/quality/whitespace.mjs",
+              "fingerprint": "sha256:cad9c60189230eec27c012146d8241b99a4305137677a764d2ee6cb749ff2b7c"
+            },
+            {
+              "path": "runtime/lib/quality/whole-system-context-report.mjs",
+              "fingerprint": "sha256:d37028c7c658683bdf5638da56477b2d4e75e2752fed4b4127b90208712328ba"
+            },
+            {
+              "path": "runtime/quality/acceptance/acceptance-policy.v2.json",
+              "fingerprint": "sha256:08173c1e500aaa9342c82871196852329a5664ca24b8dff423a76e6bce98f44c"
+            },
+            {
+              "path": "runtime/quality/acceptance/acceptance-policy.v3.json",
+              "fingerprint": "sha256:cc63258cd4013dcb68e8387be31acbaa4ff14a81c6675a2144e1f54e1a03c745"
+            },
+            {
+              "path": "runtime/quality/context-live-scenarios.v1.json",
+              "fingerprint": "sha256:fef82fad85e895d625dcbced30e7b9afcc242350e9a0ae873a84998117eab20d"
+            },
+            {
+              "path": "runtime/quality/context-strategies.v1.json",
+              "fingerprint": "sha256:476223a6b3bc7adea873dc467c7430aed02b3b8bd2873c8e73227e5363fa3046"
+            },
+            {
+              "path": "runtime/quality/context-tool-overlays/advanced-readonly.v1.json",
+              "fingerprint": "sha256:d6331f529375cfaf6cabfaf0060d88fc36bc80d12c83633df5fa4f3b8bbae1fe"
+            },
+            {
+              "path": "runtime/quality/examples/global-quality-plugin.mjs",
+              "fingerprint": "sha256:11971e93a62a8b0c723d6ac396a6001a77d4168630b96a1ea65e68a1a055babb"
+            },
+            {
+              "path": "runtime/quality/examples/project-checks.example.json",
+              "fingerprint": "sha256:6757135ab3a85cfecf02234a7ea65f9c14cc720325c76372390d44f36b1ea83f"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-alternate-config-path/bad/profile.mjs",
+              "fingerprint": "sha256:6815b9b501b6a7300920849678d701b862883d0026de060ec50a4bdae41d0723"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-alternate-config-path/good/profile.mjs",
+              "fingerprint": "sha256:7baef0fd70509789f843081b7798e24a4c79fd5d73f5ba6ad7761aab4ce910e9"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-architecture-boundary/bad/total.mjs",
+              "fingerprint": "sha256:e19f465aebcff02e881b368b15f8fb313b8e7c2f11ec2e334a09f2e1c92c3813"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-architecture-boundary/good/quote.mjs",
+              "fingerprint": "sha256:4a45ef49dbde4eb63da0c6e4ff31974f30b89795df55317d02f5d1b99d4e29b2"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-concurrency-cancellation/bad/pool.mjs",
+              "fingerprint": "sha256:0d5f3ab6f56d084d6275dbadda6041c5ac7b6a7b87a670f90fbb520f7c3eb478"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-concurrency-cancellation/good/pool.mjs",
+              "fingerprint": "sha256:ec4db798003fa21849e41aea19593889e2136986d5735ec59c16347e4ce8c79a"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-cross-module-invariant/bad/sku.mjs",
+              "fingerprint": "sha256:42025ffe8f4894bcf14342b5e6a5cdf04c3ddf5b9e20f1434709d7eeb4b1f7ba"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-cross-module-invariant/good/inventory.mjs",
+              "fingerprint": "sha256:206672af25afc8efec4ba913c327ba33715cdc8df0887a70062a5be31b3ac0f0"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-cross-module-invariant/good/sku.mjs",
+              "fingerprint": "sha256:42025ffe8f4894bcf14342b5e6a5cdf04c3ddf5b9e20f1434709d7eeb4b1f7ba"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-evidence-backed-no-transitive-impact/bad/callback-origin-policy.mjs",
+              "fingerprint": "sha256:b2e67139f20579b0aea2675c4028bc6843910e81adff3b1da691de1c355666dd"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-evidence-backed-no-transitive-impact/good/callback-origin-policy.mjs",
+              "fingerprint": "sha256:c2b2603061d92f841105f00fd10d5153fb15fd7a17ef66ab2e9b01c30da0d32b"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-hidden-reexport-consumer/bad/token.mjs",
+              "fingerprint": "sha256:fd5b11cdf81e82be559d4f453dc0e194c8b94610a9f513dbab144621fd06f6de"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-hidden-reexport-consumer/good/token.mjs",
+              "fingerprint": "sha256:14c6aed72cde2d647feb7c2d2b483d1251379eb127132d51a12f71430a26dbf6"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-migration-compatibility/bad/migration.mjs",
+              "fingerprint": "sha256:eef50202a017de5f8f0ee3cb8e7663f1470462d236a8b7838ae9733cf2ad4536"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-migration-compatibility/good/migration.mjs",
+              "fingerprint": "sha256:40872365f7e6aad4819d0a3d63724a8600e549205bbc5bdfb0abd6cbf3e31b31"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-owning-abstraction/bad/http.mjs",
+              "fingerprint": "sha256:b566a80040eebcd7b2d9a114873c0ce53187cb7d8c374e01ca49ebfccf1a1cc5"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-owning-abstraction/good/errors.mjs",
+              "fingerprint": "sha256:4637be2fee9b225b7028496dc44d650c0ec0f54e13279e9925ed75fcd45dcb48"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-parser-boundaries/bad/port.mjs",
+              "fingerprint": "sha256:a29be3522d5ca9383f2e2b199db83e5d54f059a967db46ddf510adf2e008b5db"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-parser-boundaries/good/port.mjs",
+              "fingerprint": "sha256:f051447d7ac31f6144085293aba299d0e0b3567f82c974368e61a1e9287bc3f5"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-partial-dependency-failure/bad/profile.mjs",
+              "fingerprint": "sha256:2832d54eca9ac770a54105084b90c90446392348413bc77119060fc4e96e9a06"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-partial-dependency-failure/good/profile.mjs",
+              "fingerprint": "sha256:8d1103a347c4cf6d6140ee096e3d17f7ac1b357b6ce660520a5237f8a338f14b"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-persistence-rollback/bad/store.mjs",
+              "fingerprint": "sha256:a96fc2589b2eb9d0d79aa418ad3faff88731875a9ed88056e5447ca6fba38e29"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-persistence-rollback/good/store.mjs",
+              "fingerprint": "sha256:92395aff9a79177dfc01f9f9c32be91a29c4262bc0daf0736255c548ec5875f0"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-public-api-compatibility/bad/api.mjs",
+              "fingerprint": "sha256:b3c2f323d4327c2150a8ccc0ad0199a67283065d4cdebf531e1342a6222b5d24"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-public-api-compatibility/good/api.mjs",
+              "fingerprint": "sha256:05ece10ebdf58c07c23588355e893dd4fe292292cee2ff1a0830cd96321685f5"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-resource-lifecycle/bad/client.mjs",
+              "fingerprint": "sha256:021079478b70917ffe5ef89ec153d370dff46eff59c6ae30f8bcdc07da9d15bd"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-resource-lifecycle/good/client.mjs",
+              "fingerprint": "sha256:18fc3220b2857a5bc7d8ea3c3f8ecd627e11d8bd9fb04a6fcaa07327632f576a"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-retry-idempotency/bad/events.mjs",
+              "fingerprint": "sha256:e7340a3fabb5c3847c47f9a0447041dd37ab848ff10be410fdcc9474ca355d6c"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-retry-idempotency/good/events.mjs",
+              "fingerprint": "sha256:63318ddc6fb2b1e113f352b32928ebe84848e15a29c9a620158088f72cc6466d"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-sibling-defect-variant/bad/email.mjs",
+              "fingerprint": "sha256:b785b860450265815c53a69ba37b0d61d1910fa73a5357b3a0b9d4e5ee4a9b89"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-sibling-defect-variant/good/aliases.mjs",
+              "fingerprint": "sha256:525b30af1f692fe997c82b9ed57c9eb2f5356b6384f7b6b6c945ad12a78e1441"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-small-local-control/bad/label.mjs",
+              "fingerprint": "sha256:9b5682eafe3fb0d4998ea0c3d81f9c8e643d16f9daf705244768fd430e65a156"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-small-local-control/bad/package.json",
+              "fingerprint": "sha256:f49c4a66261380ccb0b5e9e4011ff8a4217eb9c8ee78fee735f2dc4a8b76a952"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-small-local-control/good/label.mjs",
+              "fingerprint": "sha256:9b5682eafe3fb0d4998ea0c3d81f9c8e643d16f9daf705244768fd430e65a156"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-stale-cache-version-skew/bad/cache.mjs",
+              "fingerprint": "sha256:81adb2a4f1ab1dbe4fd530b4c3ec90a52fa1ec1fe726c4638ebc587465dba4cf"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/artifacts/quality-stale-cache-version-skew/good/cache.mjs",
+              "fingerprint": "sha256:839edf92b01218c81ccb425527c413d8bab39bf1aab691e021339a78acff499c"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/quality-alternate-config-path.v1.json",
+              "fingerprint": "sha256:3b48c6b12779d79010f167970d657f399ec31c1bcb54acce25b5d23a2488592c"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/quality-architecture-boundary.v1.json",
+              "fingerprint": "sha256:abf32531018dc7545f667fb424fe4d75cfd21f16b19af02120c9508f8dbd62e0"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/quality-concurrency-cancellation.v1.json",
+              "fingerprint": "sha256:8cc16845cc8ece7464848fb3156aa6e28fa0e9502205dabbde1b753b624a862c"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/quality-cross-module-invariant.v1.json",
+              "fingerprint": "sha256:5829a11820b2d10912372f85f80f7a1a8dfe0f93edcf2927672993e04b98b08e"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/quality-evidence-backed-no-transitive-impact.v1.json",
+              "fingerprint": "sha256:be2e3d8acc5feaf3e5fb4b1234bc03f5f6f6fd32b240fbb1a1d2a271dfbd73b0"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/quality-hidden-reexport-consumer.v1.json",
+              "fingerprint": "sha256:07a0f86cde077041c84a738c1ddec9cf39f78ab4fdb37fddc4653bee8e879cec"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/quality-migration-compatibility.v1.json",
+              "fingerprint": "sha256:7c0176a041333278311da06dc2515a864d96b2b92ecf8ecce272efa42eccebe9"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/quality-owning-abstraction.v1.json",
+              "fingerprint": "sha256:4660e668a274828f181cb352c9bb2555ab7e4537b4a6e5e972202fb30ec11bad"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/quality-parser-boundaries.v1.json",
+              "fingerprint": "sha256:5a3938654dda1563fa04de8c31d9beeb45d94a3fc8115e191bcc2f7caca82fdd"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/quality-partial-dependency-failure.v1.json",
+              "fingerprint": "sha256:ac3778b90f68983da9666800f9bacbb00d554712bf7c60d29e14e26cba022d9d"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/quality-persistence-rollback.v1.json",
+              "fingerprint": "sha256:f0b4604ae91eb5f65d37bc9ea145616269c00b7e86848fcd2682d705a77cc1d4"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/quality-public-api-compatibility.v1.json",
+              "fingerprint": "sha256:8e8439381d6ec5ae6f7f77f6755e90c2d12388d7ae4e38f65a184bef21685943"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/quality-resource-lifecycle.v1.json",
+              "fingerprint": "sha256:73f657f5c0a55a830502968f9e924da532a330376acff5670a906ffe1fecf88d"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/quality-retry-idempotency.v1.json",
+              "fingerprint": "sha256:6889f84de039631868b87dee6b297dcae883ed5ae34e09768d521c735b18f1f0"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/quality-sibling-defect-variant.v1.json",
+              "fingerprint": "sha256:8197777cc97262546abe7d3b421d497b9705b1406b69eb898c4e0c9ba598b7f4"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/quality-small-local-control.v1.json",
+              "fingerprint": "sha256:73bdb9c66f2ffe11a124175372d3e22116a239d725f2dbbc4b5764b1ccf7c2d7"
+            },
+            {
+              "path": "runtime/quality/live-scenarios/quality-stale-cache-version-skew.v1.json",
+              "fingerprint": "sha256:729511f0be9214b9ee523b753e5eeeaee001ee916bcfe66e62acb80a7eee9bb8"
+            },
+            {
+              "path": "runtime/quality/milestone-2-dod.v1.json",
+              "fingerprint": "sha256:46863e7ec0fa15ba1d300fc21f4f2acd9c039068a1d3855e665cab43221116d4"
+            },
+            {
+              "path": "runtime/quality/milestone-2-dod.v2.json",
+              "fingerprint": "sha256:73b819a1c6d9055dcca8bfdc0ab8cb91186eaf1fdb985921a35b98eb3c2bc500"
+            },
+            {
+              "path": "runtime/quality/milestone-2-dod.v3.json",
+              "fingerprint": "sha256:77b81a95ab53831f642cfa88ca181b1809f546ab84b15e167edd7e4632804645"
+            },
+            {
+              "path": "runtime/quality/prompt-inventory/baseline.v2.json",
+              "fingerprint": "sha256:400038b441cd1c858f9e425c54df92b9fcc7724e912da0554702c3e194e69b3d"
+            },
+            {
+              "path": "runtime/quality/prompt-inventory/baseline.v3.json",
+              "fingerprint": "sha256:3301f4f9974c508bde399b4a5d4ec837371769f26c21009313586ee4b93bd750"
+            },
+            {
+              "path": "runtime/quality/prompt-inventory/declared-changes.v2.json",
+              "fingerprint": "sha256:e21bca83d408b487e6b30afb24cf74f3c1b7785075fb0253e371427db20dfd10"
+            },
+            {
+              "path": "runtime/quality/prompt-inventory/declared-changes.v3.json",
+              "fingerprint": "sha256:a886cbe1901799fff2bb8dad2d1216698eb2fc5210867de4c8363ccde5620d42"
+            },
+            {
+              "path": "runtime/quality/schemas/architecture-evaluation.schema.json",
+              "fingerprint": "sha256:0db61c474d2efc62ffe81f2aac6a198c4b7af660bc22a117f3cce6c7b7eb018e"
+            },
+            {
+              "path": "runtime/quality/schemas/architecture-policy.example.json",
+              "fingerprint": "sha256:cf361bc2770251feb9ff929b6e6c6fe90a6750de2f815e4594cf7ba7c1c6d871"
+            },
+            {
+              "path": "runtime/quality/schemas/architecture-policy.schema.json",
+              "fingerprint": "sha256:daa322ba582b068537eafb91b37fe4d7c55e40884763619509174d8644bdc347"
+            },
+            {
+              "path": "runtime/quality/schemas/context-receipt.schema.json",
+              "fingerprint": "sha256:b552375ff88c9e1257b3b3b9a2424d0a8d7cd9b892936155f0cddb3ae839eceb"
+            },
+            {
+              "path": "runtime/quality/schemas/context-reconciliation.schema.json",
+              "fingerprint": "sha256:ebd99e17251d02c6e0da0e44992a9a24ed878376acd06d090e6046fe80e8ae63"
+            },
+            {
+              "path": "runtime/quality/schemas/context-sufficiency-decision.schema.json",
+              "fingerprint": "sha256:ee0f0fdd088d23b3499ebf073297f076e40660d27e0fb950b67ca0fe9e587d9b"
+            },
+            {
+              "path": "runtime/quality/schemas/engineering-dossier.schema.json",
+              "fingerprint": "sha256:16708f4b2eb84b31a8e577913b986767bdcb22fd68a6939cdee9a141c1ad0ab8"
+            },
+            {
+              "path": "runtime/quality/schemas/engineering-gate-decision.schema.json",
+              "fingerprint": "sha256:4950bd586586a6c1aa7cefb5026fd9b1ed383b991b06b2f5b2e597540e76c3b5"
+            },
+            {
+              "path": "runtime/quality/schemas/engineering-impact-graph.schema.json",
+              "fingerprint": "sha256:fd3880d8394ddb05a78c0245b28ee905c6cf0991b3d0b60e998c44705d0c9759"
+            },
+            {
+              "path": "runtime/quality/schemas/integrated-verification-evidence.schema.json",
+              "fingerprint": "sha256:8a5c6a20950e9d6948cec565e3a61c9a455419548bdfaa2b73b1087ab6602410"
+            },
+            {
+              "path": "runtime/quality/schemas/post-edit-architecture-evidence.schema.json",
+              "fingerprint": "sha256:26d07fc10b98092a37ef99e8688c862a59e6cef16d75c0de0435133a68f40737"
+            },
+            {
+              "path": "runtime/quality/schemas/preimplementation-evidence.schema.json",
+              "fingerprint": "sha256:a8b06f7341fd0311bb6488908c40bc879eb762ab6f0892d9b1e78747ead8771b"
+            },
+            {
+              "path": "runtime/quality/schemas/project-check-catalog.schema.json",
+              "fingerprint": "sha256:1dc4799824ec6a15545c9f298b1d0d70cf32573716706a591bccdd1707a54aa5"
+            },
+            {
+              "path": "runtime/quality/schemas/quality-attestation.schema.json",
+              "fingerprint": "sha256:e389f87c50d51a536a5c8d2b41efdee499c2284460a9c55e7884d41feadbcfda"
+            },
+            {
+              "path": "runtime/quality/schemas/toolchain-host-configuration.schema.json",
+              "fingerprint": "sha256:5a7eefc2062de8665c49e3ce043ae1f5a654a249a482803d0998bf01c83e9412"
+            },
+            {
+              "path": "runtime/quality/schemas/toolchain-map.schema.json",
+              "fingerprint": "sha256:d2b685b5bf377cf777d3b091e8b871c2892dc027744f5717db72c22a6a9893cc"
+            },
+            {
+              "path": "runtime/quality/schemas/whole-system-context-report.schema.json",
+              "fingerprint": "sha256:5d1ca0fb0289edc9122ca5d1fe0e9475173d49299de833f17a091657e2adb751"
+            }
+          ],
+          "plugin_sources": [
+            {
+              "id": "lib/benchmark/opencode-model-env-firewall.mjs",
+              "source_path": "lib/benchmark/opencode-model-env-firewall.mjs",
+              "fingerprint": "sha256:db0470a28bf2795b8c1546a919075cbeb62edb118227d82247fa803338515dc8"
+            },
+            {
+              "id": "lib/benchmark/opencode-assurance-context-plugin.mjs",
+              "source_path": "lib/benchmark/opencode-assurance-context-plugin.mjs",
+              "fingerprint": "sha256:aca5309487a991133e06a039313199daa264dead01aebfe44fcd998bb7758c21"
+            }
+          ]
+        },
+        "source_entries": [
+          {
+            "kind": "plugin",
+            "id": "lib/benchmark/opencode-model-env-firewall.mjs",
+            "source_path": "lib/benchmark/opencode-model-env-firewall.mjs",
+            "files": [
+              {
+                "path": "opencode-model-env-firewall.mjs",
+                "fingerprint": "sha256:db0470a28bf2795b8c1546a919075cbeb62edb118227d82247fa803338515dc8"
+              }
+            ]
+          },
+          {
+            "kind": "agent-or-config",
+            "id": "agents/assurance.md",
+            "source_path": "agents/assurance.md",
+            "files": [
+              {
+                "path": "assurance.md",
+                "fingerprint": "sha256:0d65c7c48a5364ebd27b3e1e823070f38346654485de448b55449953302704c9"
+              }
+            ]
+          },
+          {
+            "kind": "agent-or-config",
+            "id": "agents/assurance-architect.md",
+            "source_path": "agents/assurance-architect.md",
+            "files": [
+              {
+                "path": "assurance-architect.md",
+                "fingerprint": "sha256:403b8590aa7619f61ab524effbd056fa78bbc888de7c5557aa8b365c7ba69cc8"
+              }
+            ]
+          },
+          {
+            "kind": "agent-or-config",
+            "id": "agents/assurance-reviewer.md",
+            "source_path": "agents/assurance-reviewer.md",
+            "files": [
+              {
+                "path": "assurance-reviewer.md",
+                "fingerprint": "sha256:f44cd536bf8c040de613dca2f1a7c220880efc5a67625f0dd3744c7941eb86f1"
+              }
+            ]
+          },
+          {
+            "kind": "agent-or-config",
+            "id": "agents/assurance-verifier.md",
+            "source_path": "agents/assurance-verifier.md",
+            "files": [
+              {
+                "path": "assurance-verifier.md",
+                "fingerprint": "sha256:4a134f3e906d99cf4c8c515be9517967d4dd88c5a343ea0306f77b43bbee2ba6"
+              }
+            ]
+          },
+          {
+            "kind": "agent-or-config",
+            "id": "agents/deep.md",
+            "source_path": "agents/deep.md",
+            "files": [
+              {
+                "path": "deep.md",
+                "fingerprint": "sha256:366a1b4bd1d49e0f11153ff220051a2bd0b939b7added62c6ca159339b21fe64"
+              }
+            ]
+          },
+          {
+            "kind": "agent-or-config",
+            "id": "agents/core.md",
+            "source_path": "agents/core.md",
+            "files": [
+              {
+                "path": "core.md",
+                "fingerprint": "sha256:73bbcf247416a53a1d9eb4b22234a43bbd3c14d653dc27efee5e99ffda136700"
+              }
+            ]
+          },
+          {
+            "kind": "agent-or-config",
+            "id": "agents/core-reviewer.md",
+            "source_path": "agents/core-reviewer.md",
+            "files": [
+              {
+                "path": "core-reviewer.md",
+                "fingerprint": "sha256:457820d9633eab24ae56e64d922ad0f732bebc9323fc3c6aa95e4375f262b043"
+              }
+            ]
+          },
+          {
+            "kind": "agent-or-config",
+            "id": "agents/explore.md",
+            "source_path": "agents/explore.md",
+            "files": [
+              {
+                "path": "explore.md",
+                "fingerprint": "sha256:5c654ef78f0f5857ea9d1210bfbc62a9dc3e0266b7eb2e67ba4b76a31494f32a"
+              }
+            ]
+          },
+          {
+            "kind": "agent-or-config",
+            "id": "profiles/config/assurance.opencode.json",
+            "source_path": "profiles/config/assurance.opencode.json",
+            "files": [
+              {
+                "path": "assurance.opencode.json",
+                "fingerprint": "sha256:23ddb10b8031d1141e68539d358832544296f2d080e18dafd68fc73baae9fe84"
+              }
+            ]
+          },
+          {
+            "kind": "agent-or-config",
+            "id": "benchmarks/vnext/components/assurance-controls.md",
+            "source_path": "benchmarks/vnext/components/assurance-controls.md",
+            "files": [
+              {
+                "path": "assurance-controls.md",
+                "fingerprint": "sha256:149c4b4871d431c60791bcda2732dcc9f44f981eb3f2cfa54ccff53ba5896ea5"
+              }
+            ]
+          },
+          {
+            "kind": "plugin",
+            "id": "lib/benchmark/opencode-assurance-context-plugin.mjs",
+            "source_path": "lib/benchmark/opencode-assurance-context-plugin.mjs",
+            "files": [
+              {
+                "path": "opencode-assurance-context-plugin.mjs",
+                "fingerprint": "sha256:aca5309487a991133e06a039313199daa264dead01aebfe44fcd998bb7758c21"
+              }
+            ]
+          },
+          {
+            "kind": "agent-or-config",
+            "id": "lib/benchmark/opencode-context-bridge-plugin.mjs",
+            "source_path": "lib/benchmark/opencode-context-bridge-plugin.mjs",
+            "files": [
+              {
+                "path": "opencode-context-bridge-plugin.mjs",
+                "fingerprint": "sha256:42b3ea64f196da896c533f4bf7dc3525fc5ac931e7217ff2f2647fb14393ef66"
+              }
+            ]
+          },
+          {
+            "kind": "agent-or-config",
+            "id": "lib/feedback/context-sensitive-paths.mjs",
+            "source_path": "lib/feedback/context-sensitive-paths.mjs",
+            "files": [
+              {
+                "path": "context-sensitive-paths.mjs",
+                "fingerprint": "sha256:a5a0076fc7c36c5f5d8fc476f3c4f3958a140ba6f350bb420984596b3f229659"
+              }
+            ]
+          },
+          {
+            "kind": "plugin-dependency",
+            "id": "quality",
+            "source_path": "lib/quality",
+            "files": [
+              {
+                "path": "acceptance-contracts.mjs",
+                "fingerprint": "sha256:21fcfdf814cc72936b4556dd9862002fdd67f5f5d05d120128f1dd7b91caed6f"
+              },
+              {
+                "path": "acceptance-engine.mjs",
+                "fingerprint": "sha256:6ba57c786510809b6315706531425cbebcdc304373a58dbb19199187efd49d05"
+              },
+              {
+                "path": "architecture.mjs",
+                "fingerprint": "sha256:93964c227a9e4728fa95ee9103d99c8aea04626365b353168b184c62a11a6da6"
+              },
+              {
+                "path": "assertions.mjs",
+                "fingerprint": "sha256:efec9e29e57bd817b93cd8ab4924fc8512f2240547fb7d3deda195230deb3c9b"
+              },
+              {
+                "path": "assurance-facade.mjs",
+                "fingerprint": "sha256:8da0df22766a144b134702d090e5cb98e3b97e8a2619f83d506a08255040db25"
+              },
+              {
+                "path": "attestation.mjs",
+                "fingerprint": "sha256:6271793ebd824fecfe0a79db893721f1d656ecc1b91cacb992c4a6b5a6b50c4b"
+              },
+              {
+                "path": "compact-high-analysis.mjs",
+                "fingerprint": "sha256:08ccc32ae43447fb4c8ac84900f7c2ff00897712f67a8a5074f5cc660c81ecb1"
+              },
+              {
+                "path": "constants.mjs",
+                "fingerprint": "sha256:ce33320829ad638d7622957c0343cf0f4b9fbcd7db5d1d2c17ce6c9fb940a805"
+              },
+              {
+                "path": "context-discovery-tools.mjs",
+                "fingerprint": "sha256:88fcfd86536d76a308fb727b0fa30f98aa8c49bcf07b22260df33f2db1443bea"
+              },
+              {
+                "path": "context-file-coverage.mjs",
+                "fingerprint": "sha256:14fe5887a77ae503c8d8544d5b4b7d7d0e2f1726bdc0bdb4c9f91e0763daaf6f"
+              },
+              {
+                "path": "context-path-kind.mjs",
+                "fingerprint": "sha256:7df23b4a16ae45822603a9f3e2a6f4bf8f968c1d2df226eb9e68c092b18fc8d0"
+              },
+              {
+                "path": "context-receipt-store.mjs",
+                "fingerprint": "sha256:a9287eac58092742df2dd18bdc1f82c6958a6e1f9c495f9c18ce5ef562b2f066"
+              },
+              {
+                "path": "context-receipts.mjs",
+                "fingerprint": "sha256:ec80de31f7f95e09fd0401e4bbc22a8950e3c1b23065fc7a9b33b238a8bf7fe8"
+              },
+              {
+                "path": "context-reconciliation.mjs",
+                "fingerprint": "sha256:4cf0f29b59a5ca8f56bf163bda5afb80c37eb787ad6e9283e90db4a44896c902"
+              },
+              {
+                "path": "context-strategies.mjs",
+                "fingerprint": "sha256:e0b374cec1eddcd249dbdaeb929b5382f1d5bf63d5420b29a0caaa81e8d6a7af"
+              },
+              {
+                "path": "context-sufficiency.mjs",
+                "fingerprint": "sha256:900b91edc0cfed4ce4d148e8e5b0fa15ba497c7d95013171ecc0075d2c5a68d2"
+              },
+              {
+                "path": "context-tool-adapters.mjs",
+                "fingerprint": "sha256:5c05d84d2b9a3d8ef5b4a65ad0145f4213704d8e0663eb0744408f12605dea42"
+              },
+              {
+                "path": "context-tool-overlay.mjs",
+                "fingerprint": "sha256:66859936dd123582cadab5bfd549db4188f26ec09830b0badd708ce1c8233119"
+              },
+              {
+                "path": "dossier.mjs",
+                "fingerprint": "sha256:f8cf0a1d1b738cb7aef7b8fda1b88bbee06e577eb51279377093bb0ed8eabeb5"
+              },
+              {
+                "path": "gate.mjs",
+                "fingerprint": "sha256:54c18c7f78da0004b2caffd7336c6a32b927dbeb7a3a1160475235c777ef57f3"
+              },
+              {
+                "path": "impact-graph.mjs",
+                "fingerprint": "sha256:4162f84bdfa5ef07ba9fd2abdc507c73d5ff9bb5a3c3f5120987c112bd185048"
+              },
+              {
+                "path": "index.mjs",
+                "fingerprint": "sha256:329628521ea60066ca5a5063779b9d72d8604a6c133d6b4206bc34bd8a33d302"
+              },
+              {
+                "path": "live-coordinator.mjs",
+                "fingerprint": "sha256:3a9fdc98a7cbb44cb4117a9c2f066360c7ba902c9912163c9f8267e58df2429f"
+              },
+              {
+                "path": "live-scenarios.mjs",
+                "fingerprint": "sha256:007be86f053cea521a3d16fcb4544a2ec140c67549070ace19f72c00f959cff8"
+              },
+              {
+                "path": "milestone-dod.mjs",
+                "fingerprint": "sha256:e14a400f889ba3b4b35a1bb24d2a4d744f8fb5689071053e2d324ac03cc03b04"
+              },
+              {
+                "path": "milestone-operational-report.mjs",
+                "fingerprint": "sha256:357c519b76f5d4029cfb276e071b1c966150c060a69ab89f9e9c30f8af67fa52"
+              },
+              {
+                "path": "milestone-run-context.mjs",
+                "fingerprint": "sha256:37cbaacdd2c486008c0252f92f3f9377c906172e1ec904e27eff6bbfb688ccd5"
+              },
+              {
+                "path": "normal-session-bridge.mjs",
+                "fingerprint": "sha256:8279e2f9412d78e709fdea286033a26d328b1a34ffa8d8574c14f81353983daf"
+              },
+              {
+                "path": "normal-session-plugin.mjs",
+                "fingerprint": "sha256:4a6f3b3c44b8bd0d8348414a10eb3e4911ff192e0aae8a924ae6c0715c358c82"
+              },
+              {
+                "path": "normal-session-profile-permissions.mjs",
+                "fingerprint": "sha256:127c550ccc30757a0079975360d0792739964767c55fb2b78b3613c8d2f8d7f3"
+              },
+              {
+                "path": "normal-session-workspace.mjs",
+                "fingerprint": "sha256:516b28fd84eed3bfcc0b5427b33b09e86dce237689b3ab5c4dd16f3dae5d2914"
+              },
+              {
+                "path": "plan-challenge-subject.mjs",
+                "fingerprint": "sha256:bfbd84ce68274c9844523fada8bdc9c6c6290db55f776a0cf2c94ef24c25f789"
+              },
+              {
+                "path": "post-architecture-evidence.mjs",
+                "fingerprint": "sha256:a62779d1bd65b0d7491692ad52cb451f9354ea325427af680f653e15eba8cf83"
+              },
+              {
+                "path": "preimplementation-sequence.mjs",
+                "fingerprint": "sha256:e3093aa592f9577f307cb936e5b0776ff603f3f15d6662a18cdc302e5a93fc78"
+              },
+              {
+                "path": "project-check-catalog.mjs",
+                "fingerprint": "sha256:97620f4dee3e983b15d745f4132ea2da34fbc9eadbe8094f723a13469f87930d"
+              },
+              {
+                "path": "prompt-inventory.mjs",
+                "fingerprint": "sha256:caf180cb1ccb5e97ccdf73e182c890328b3697bc934f5f5a774077e93aa9f76e"
+              },
+              {
+                "path": "quality-plugin.mjs",
+                "fingerprint": "sha256:74c9cce2d8385c7a4d68f984dacab7e2f6127b8d198916484ee9d117fde09fe5"
+              },
+              {
+                "path": "recursive-context-contract.mjs",
+                "fingerprint": "sha256:faed5717c695428c54763c457a0e6083c1ea7c4a6e536e7809b1651c9d6e9125"
+              },
+              {
+                "path": "run-bundle.mjs",
+                "fingerprint": "sha256:f716696dcaf9a87aa0dde477de669ab71f57b8145bf151f4425d4310d0f9f19f"
+              },
+              {
+                "path": "runtime-hook-verification.mjs",
+                "fingerprint": "sha256:f84d9cf42003cb2e89972e500748aaeb4836c1fb05203c69192aa91b185213d3"
+              },
+              {
+                "path": "session-classification.mjs",
+                "fingerprint": "sha256:9ded7e90b13d6f224e6cd13b4188fb44a76aad65bd291f7566e0291a254a8210"
+              },
+              {
+                "path": "session.mjs",
+                "fingerprint": "sha256:2ad6fa9515f3d67c73aee0342203ec98a0d1b409812c2c8a0afbff927bd60701"
+              },
+              {
+                "path": "standard-lite.mjs",
+                "fingerprint": "sha256:4a4197ff57fb33f894c6498dc7dd73602335195f741aee4c43d0a8354b6d333c"
+              },
+              {
+                "path": "store.mjs",
+                "fingerprint": "sha256:1203db15b493bb1f96b81b270ff15b5f7303b37d5bb8e3d3480572f97106ca87"
+              },
+              {
+                "path": "transitive-impact-resolution.mjs",
+                "fingerprint": "sha256:738996e87ed6bb3960a0a13e673e6dcb4fd3f1d64381ccd314eeb39f24bf596d"
+              },
+              {
+                "path": "trusted-project-runner.mjs",
+                "fingerprint": "sha256:4983a3473238cc6099d369e8f5497da6e06bcdb68613cfdd08ff2da7383ac96a"
+              },
+              {
+                "path": "trusted-toolchain-host-config.mjs",
+                "fingerprint": "sha256:22bcc5b970a10edc8af7db4f21b62f053b2cd2cfe1b19ab48b0366f38cc24d23"
+              },
+              {
+                "path": "trusted-toolchains.mjs",
+                "fingerprint": "sha256:22bc62a5e9aaad3f0c4e32ab187238ab352b5d499a9564ac2549ad11f59209e4"
+              },
+              {
+                "path": "validation.mjs",
+                "fingerprint": "sha256:4f0316ea80b040a277493ed205a2718a3fd095b214f8a79c79a343f4632c403d"
+              },
+              {
+                "path": "verification-evidence.mjs",
+                "fingerprint": "sha256:95a857f9e963767f189bf62767a51d40ddecc8a2b918dfad30876d38e6dc2805"
+              },
+              {
+                "path": "verification-targets.mjs",
+                "fingerprint": "sha256:8fdec53921af5caf65733d9c4bad0bc599bb0a81e21c2029d9a6a35a45ff4854"
+              },
+              {
+                "path": "whitespace.mjs",
+                "fingerprint": "sha256:cad9c60189230eec27c012146d8241b99a4305137677a764d2ee6cb749ff2b7c"
+              },
+              {
+                "path": "whole-system-context-report.mjs",
+                "fingerprint": "sha256:d37028c7c658683bdf5638da56477b2d4e75e2752fed4b4127b90208712328ba"
+              }
+            ]
+          },
+          {
+            "kind": "plugin-dependency",
+            "id": "feedback",
+            "source_path": "lib/feedback",
+            "files": [
+              {
+                "path": "acceptance.mjs",
+                "fingerprint": "sha256:8ed6600a63f27a10c5fab7b2e8b2f8ee2f48ef1253dae77af2cfa6e91b7a9c3a"
+              },
+              {
+                "path": "adapter-worker.mjs",
+                "fingerprint": "sha256:e8bb593ef33d5df642c7fb3fc0eb80587442e41b94d962ca94ac87663c2d7e14"
+              },
+              {
+                "path": "context-sensitive-paths.mjs",
+                "fingerprint": "sha256:a5a0076fc7c36c5f5d8fc476f3c4f3958a140ba6f350bb420984596b3f229659"
+              },
+              {
+                "path": "contracts.mjs",
+                "fingerprint": "sha256:ee917de5d21b650d8126b484331306db394c00b5dd39f966ef100f4dc5a3096b"
+              },
+              {
+                "path": "evidence.mjs",
+                "fingerprint": "sha256:88a28dc08ab7b486fe9d80fb67a2fd72a95de5048f547b05c13870134c20f0b7"
+              },
+              {
+                "path": "files.mjs",
+                "fingerprint": "sha256:5ee2f5cf8f31abea8a2870af267bb177753c7c96e5a5fbe68d2417aad70cae4c"
+              },
+              {
+                "path": "index.mjs",
+                "fingerprint": "sha256:09581319b7063be3ea6f4adc4152f6e17495f09fcf159bd1eebddec5eeeeb1ff"
+              },
+              {
+                "path": "managed-command-sync-worker.mjs",
+                "fingerprint": "sha256:ccfbffe9f8b69a3d09adb0b999cb71bf33c3b19262c6759160e9fb00997f984b"
+              },
+              {
+                "path": "manifests.mjs",
+                "fingerprint": "sha256:30a040ab49179ef8e34e7c9342b6776b78ba17a19d049ecb77226e4077029d31"
+              },
+              {
+                "path": "permission-surface.mjs",
+                "fingerprint": "sha256:ae49848ccab8d9666d8fdd6cc0ec5ad895398d80dba98ebf37b53e5504dbccfb"
+              },
+              {
+                "path": "privacy.mjs",
+                "fingerprint": "sha256:0ad6d1a7fd8bedee0e40f0f394ebe3eab80eb195b2c36dc69a4e9ee932a21807"
+              },
+              {
+                "path": "process-containment.mjs",
+                "fingerprint": "sha256:a753c1f2a18dad40d43414a026d06be43e4eaf653a40051a2688914f62af9c73"
+              },
+              {
+                "path": "process-tree.mjs",
+                "fingerprint": "sha256:8d523f65af19cccb734573337d30f202c7fa22c2c3d70eb299dd8008f05f8bb7"
+              },
+              {
+                "path": "report-history.mjs",
+                "fingerprint": "sha256:120d2a8058b7fa27a593038a813dba116a576d7d27b5320d98aed37929ca6d4d"
+              },
+              {
+                "path": "trace-assertions.mjs",
+                "fingerprint": "sha256:aab7284281ba00211dc6dbebe1194d506beee1546dbf6330ab002bde06324689"
+              },
+              {
+                "path": "trace-store.mjs",
+                "fingerprint": "sha256:97dc5acf38656267bf6d66a89c7c91b27c330cbb866d4bbbeaa7179178fdbb91"
+              }
+            ]
+          },
+          {
+            "kind": "quality-contract",
+            "id": "quality-contracts",
+            "source_path": "quality",
+            "files": [
+              {
+                "path": "acceptance/acceptance-policy.v2.json",
+                "fingerprint": "sha256:08173c1e500aaa9342c82871196852329a5664ca24b8dff423a76e6bce98f44c"
+              },
+              {
+                "path": "acceptance/acceptance-policy.v3.json",
+                "fingerprint": "sha256:cc63258cd4013dcb68e8387be31acbaa4ff14a81c6675a2144e1f54e1a03c745"
+              },
+              {
+                "path": "context-live-scenarios.v1.json",
+                "fingerprint": "sha256:fef82fad85e895d625dcbced30e7b9afcc242350e9a0ae873a84998117eab20d"
+              },
+              {
+                "path": "context-strategies.v1.json",
+                "fingerprint": "sha256:476223a6b3bc7adea873dc467c7430aed02b3b8bd2873c8e73227e5363fa3046"
+              },
+              {
+                "path": "context-tool-overlays/advanced-readonly.v1.json",
+                "fingerprint": "sha256:d6331f529375cfaf6cabfaf0060d88fc36bc80d12c83633df5fa4f3b8bbae1fe"
+              },
+              {
+                "path": "examples/global-quality-plugin.mjs",
+                "fingerprint": "sha256:11971e93a62a8b0c723d6ac396a6001a77d4168630b96a1ea65e68a1a055babb"
+              },
+              {
+                "path": "examples/project-checks.example.json",
+                "fingerprint": "sha256:6757135ab3a85cfecf02234a7ea65f9c14cc720325c76372390d44f36b1ea83f"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-alternate-config-path/bad/profile.mjs",
+                "fingerprint": "sha256:6815b9b501b6a7300920849678d701b862883d0026de060ec50a4bdae41d0723"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-alternate-config-path/good/profile.mjs",
+                "fingerprint": "sha256:7baef0fd70509789f843081b7798e24a4c79fd5d73f5ba6ad7761aab4ce910e9"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-architecture-boundary/bad/total.mjs",
+                "fingerprint": "sha256:e19f465aebcff02e881b368b15f8fb313b8e7c2f11ec2e334a09f2e1c92c3813"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-architecture-boundary/good/quote.mjs",
+                "fingerprint": "sha256:4a45ef49dbde4eb63da0c6e4ff31974f30b89795df55317d02f5d1b99d4e29b2"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-concurrency-cancellation/bad/pool.mjs",
+                "fingerprint": "sha256:0d5f3ab6f56d084d6275dbadda6041c5ac7b6a7b87a670f90fbb520f7c3eb478"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-concurrency-cancellation/good/pool.mjs",
+                "fingerprint": "sha256:ec4db798003fa21849e41aea19593889e2136986d5735ec59c16347e4ce8c79a"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-cross-module-invariant/bad/sku.mjs",
+                "fingerprint": "sha256:42025ffe8f4894bcf14342b5e6a5cdf04c3ddf5b9e20f1434709d7eeb4b1f7ba"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-cross-module-invariant/good/inventory.mjs",
+                "fingerprint": "sha256:206672af25afc8efec4ba913c327ba33715cdc8df0887a70062a5be31b3ac0f0"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-cross-module-invariant/good/sku.mjs",
+                "fingerprint": "sha256:42025ffe8f4894bcf14342b5e6a5cdf04c3ddf5b9e20f1434709d7eeb4b1f7ba"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-evidence-backed-no-transitive-impact/bad/callback-origin-policy.mjs",
+                "fingerprint": "sha256:b2e67139f20579b0aea2675c4028bc6843910e81adff3b1da691de1c355666dd"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-evidence-backed-no-transitive-impact/good/callback-origin-policy.mjs",
+                "fingerprint": "sha256:c2b2603061d92f841105f00fd10d5153fb15fd7a17ef66ab2e9b01c30da0d32b"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-hidden-reexport-consumer/bad/token.mjs",
+                "fingerprint": "sha256:fd5b11cdf81e82be559d4f453dc0e194c8b94610a9f513dbab144621fd06f6de"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-hidden-reexport-consumer/good/token.mjs",
+                "fingerprint": "sha256:14c6aed72cde2d647feb7c2d2b483d1251379eb127132d51a12f71430a26dbf6"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-migration-compatibility/bad/migration.mjs",
+                "fingerprint": "sha256:eef50202a017de5f8f0ee3cb8e7663f1470462d236a8b7838ae9733cf2ad4536"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-migration-compatibility/good/migration.mjs",
+                "fingerprint": "sha256:40872365f7e6aad4819d0a3d63724a8600e549205bbc5bdfb0abd6cbf3e31b31"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-owning-abstraction/bad/http.mjs",
+                "fingerprint": "sha256:b566a80040eebcd7b2d9a114873c0ce53187cb7d8c374e01ca49ebfccf1a1cc5"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-owning-abstraction/good/errors.mjs",
+                "fingerprint": "sha256:4637be2fee9b225b7028496dc44d650c0ec0f54e13279e9925ed75fcd45dcb48"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-parser-boundaries/bad/port.mjs",
+                "fingerprint": "sha256:a29be3522d5ca9383f2e2b199db83e5d54f059a967db46ddf510adf2e008b5db"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-parser-boundaries/good/port.mjs",
+                "fingerprint": "sha256:f051447d7ac31f6144085293aba299d0e0b3567f82c974368e61a1e9287bc3f5"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-partial-dependency-failure/bad/profile.mjs",
+                "fingerprint": "sha256:2832d54eca9ac770a54105084b90c90446392348413bc77119060fc4e96e9a06"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-partial-dependency-failure/good/profile.mjs",
+                "fingerprint": "sha256:8d1103a347c4cf6d6140ee096e3d17f7ac1b357b6ce660520a5237f8a338f14b"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-persistence-rollback/bad/store.mjs",
+                "fingerprint": "sha256:a96fc2589b2eb9d0d79aa418ad3faff88731875a9ed88056e5447ca6fba38e29"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-persistence-rollback/good/store.mjs",
+                "fingerprint": "sha256:92395aff9a79177dfc01f9f9c32be91a29c4262bc0daf0736255c548ec5875f0"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-public-api-compatibility/bad/api.mjs",
+                "fingerprint": "sha256:b3c2f323d4327c2150a8ccc0ad0199a67283065d4cdebf531e1342a6222b5d24"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-public-api-compatibility/good/api.mjs",
+                "fingerprint": "sha256:05ece10ebdf58c07c23588355e893dd4fe292292cee2ff1a0830cd96321685f5"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-resource-lifecycle/bad/client.mjs",
+                "fingerprint": "sha256:021079478b70917ffe5ef89ec153d370dff46eff59c6ae30f8bcdc07da9d15bd"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-resource-lifecycle/good/client.mjs",
+                "fingerprint": "sha256:18fc3220b2857a5bc7d8ea3c3f8ecd627e11d8bd9fb04a6fcaa07327632f576a"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-retry-idempotency/bad/events.mjs",
+                "fingerprint": "sha256:e7340a3fabb5c3847c47f9a0447041dd37ab848ff10be410fdcc9474ca355d6c"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-retry-idempotency/good/events.mjs",
+                "fingerprint": "sha256:63318ddc6fb2b1e113f352b32928ebe84848e15a29c9a620158088f72cc6466d"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-sibling-defect-variant/bad/email.mjs",
+                "fingerprint": "sha256:b785b860450265815c53a69ba37b0d61d1910fa73a5357b3a0b9d4e5ee4a9b89"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-sibling-defect-variant/good/aliases.mjs",
+                "fingerprint": "sha256:525b30af1f692fe997c82b9ed57c9eb2f5356b6384f7b6b6c945ad12a78e1441"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-small-local-control/bad/label.mjs",
+                "fingerprint": "sha256:9b5682eafe3fb0d4998ea0c3d81f9c8e643d16f9daf705244768fd430e65a156"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-small-local-control/bad/package.json",
+                "fingerprint": "sha256:f49c4a66261380ccb0b5e9e4011ff8a4217eb9c8ee78fee735f2dc4a8b76a952"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-small-local-control/good/label.mjs",
+                "fingerprint": "sha256:9b5682eafe3fb0d4998ea0c3d81f9c8e643d16f9daf705244768fd430e65a156"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-stale-cache-version-skew/bad/cache.mjs",
+                "fingerprint": "sha256:81adb2a4f1ab1dbe4fd530b4c3ec90a52fa1ec1fe726c4638ebc587465dba4cf"
+              },
+              {
+                "path": "live-scenarios/artifacts/quality-stale-cache-version-skew/good/cache.mjs",
+                "fingerprint": "sha256:839edf92b01218c81ccb425527c413d8bab39bf1aab691e021339a78acff499c"
+              },
+              {
+                "path": "live-scenarios/quality-alternate-config-path.v1.json",
+                "fingerprint": "sha256:3b48c6b12779d79010f167970d657f399ec31c1bcb54acce25b5d23a2488592c"
+              },
+              {
+                "path": "live-scenarios/quality-architecture-boundary.v1.json",
+                "fingerprint": "sha256:abf32531018dc7545f667fb424fe4d75cfd21f16b19af02120c9508f8dbd62e0"
+              },
+              {
+                "path": "live-scenarios/quality-concurrency-cancellation.v1.json",
+                "fingerprint": "sha256:8cc16845cc8ece7464848fb3156aa6e28fa0e9502205dabbde1b753b624a862c"
+              },
+              {
+                "path": "live-scenarios/quality-cross-module-invariant.v1.json",
+                "fingerprint": "sha256:5829a11820b2d10912372f85f80f7a1a8dfe0f93edcf2927672993e04b98b08e"
+              },
+              {
+                "path": "live-scenarios/quality-evidence-backed-no-transitive-impact.v1.json",
+                "fingerprint": "sha256:be2e3d8acc5feaf3e5fb4b1234bc03f5f6f6fd32b240fbb1a1d2a271dfbd73b0"
+              },
+              {
+                "path": "live-scenarios/quality-hidden-reexport-consumer.v1.json",
+                "fingerprint": "sha256:07a0f86cde077041c84a738c1ddec9cf39f78ab4fdb37fddc4653bee8e879cec"
+              },
+              {
+                "path": "live-scenarios/quality-migration-compatibility.v1.json",
+                "fingerprint": "sha256:7c0176a041333278311da06dc2515a864d96b2b92ecf8ecce272efa42eccebe9"
+              },
+              {
+                "path": "live-scenarios/quality-owning-abstraction.v1.json",
+                "fingerprint": "sha256:4660e668a274828f181cb352c9bb2555ab7e4537b4a6e5e972202fb30ec11bad"
+              },
+              {
+                "path": "live-scenarios/quality-parser-boundaries.v1.json",
+                "fingerprint": "sha256:5a3938654dda1563fa04de8c31d9beeb45d94a3fc8115e191bcc2f7caca82fdd"
+              },
+              {
+                "path": "live-scenarios/quality-partial-dependency-failure.v1.json",
+                "fingerprint": "sha256:ac3778b90f68983da9666800f9bacbb00d554712bf7c60d29e14e26cba022d9d"
+              },
+              {
+                "path": "live-scenarios/quality-persistence-rollback.v1.json",
+                "fingerprint": "sha256:f0b4604ae91eb5f65d37bc9ea145616269c00b7e86848fcd2682d705a77cc1d4"
+              },
+              {
+                "path": "live-scenarios/quality-public-api-compatibility.v1.json",
+                "fingerprint": "sha256:8e8439381d6ec5ae6f7f77f6755e90c2d12388d7ae4e38f65a184bef21685943"
+              },
+              {
+                "path": "live-scenarios/quality-resource-lifecycle.v1.json",
+                "fingerprint": "sha256:73f657f5c0a55a830502968f9e924da532a330376acff5670a906ffe1fecf88d"
+              },
+              {
+                "path": "live-scenarios/quality-retry-idempotency.v1.json",
+                "fingerprint": "sha256:6889f84de039631868b87dee6b297dcae883ed5ae34e09768d521c735b18f1f0"
+              },
+              {
+                "path": "live-scenarios/quality-sibling-defect-variant.v1.json",
+                "fingerprint": "sha256:8197777cc97262546abe7d3b421d497b9705b1406b69eb898c4e0c9ba598b7f4"
+              },
+              {
+                "path": "live-scenarios/quality-small-local-control.v1.json",
+                "fingerprint": "sha256:73bdb9c66f2ffe11a124175372d3e22116a239d725f2dbbc4b5764b1ccf7c2d7"
+              },
+              {
+                "path": "live-scenarios/quality-stale-cache-version-skew.v1.json",
+                "fingerprint": "sha256:729511f0be9214b9ee523b753e5eeeaee001ee916bcfe66e62acb80a7eee9bb8"
+              },
+              {
+                "path": "milestone-2-dod.v1.json",
+                "fingerprint": "sha256:46863e7ec0fa15ba1d300fc21f4f2acd9c039068a1d3855e665cab43221116d4"
+              },
+              {
+                "path": "milestone-2-dod.v2.json",
+                "fingerprint": "sha256:73b819a1c6d9055dcca8bfdc0ab8cb91186eaf1fdb985921a35b98eb3c2bc500"
+              },
+              {
+                "path": "milestone-2-dod.v3.json",
+                "fingerprint": "sha256:77b81a95ab53831f642cfa88ca181b1809f546ab84b15e167edd7e4632804645"
+              },
+              {
+                "path": "prompt-inventory/baseline.v2.json",
+                "fingerprint": "sha256:400038b441cd1c858f9e425c54df92b9fcc7724e912da0554702c3e194e69b3d"
+              },
+              {
+                "path": "prompt-inventory/baseline.v3.json",
+                "fingerprint": "sha256:3301f4f9974c508bde399b4a5d4ec837371769f26c21009313586ee4b93bd750"
+              },
+              {
+                "path": "prompt-inventory/declared-changes.v2.json",
+                "fingerprint": "sha256:e21bca83d408b487e6b30afb24cf74f3c1b7785075fb0253e371427db20dfd10"
+              },
+              {
+                "path": "prompt-inventory/declared-changes.v3.json",
+                "fingerprint": "sha256:a886cbe1901799fff2bb8dad2d1216698eb2fc5210867de4c8363ccde5620d42"
+              },
+              {
+                "path": "schemas/architecture-evaluation.schema.json",
+                "fingerprint": "sha256:0db61c474d2efc62ffe81f2aac6a198c4b7af660bc22a117f3cce6c7b7eb018e"
+              },
+              {
+                "path": "schemas/architecture-policy.example.json",
+                "fingerprint": "sha256:cf361bc2770251feb9ff929b6e6c6fe90a6750de2f815e4594cf7ba7c1c6d871"
+              },
+              {
+                "path": "schemas/architecture-policy.schema.json",
+                "fingerprint": "sha256:daa322ba582b068537eafb91b37fe4d7c55e40884763619509174d8644bdc347"
+              },
+              {
+                "path": "schemas/context-receipt.schema.json",
+                "fingerprint": "sha256:b552375ff88c9e1257b3b3b9a2424d0a8d7cd9b892936155f0cddb3ae839eceb"
+              },
+              {
+                "path": "schemas/context-reconciliation.schema.json",
+                "fingerprint": "sha256:ebd99e17251d02c6e0da0e44992a9a24ed878376acd06d090e6046fe80e8ae63"
+              },
+              {
+                "path": "schemas/context-sufficiency-decision.schema.json",
+                "fingerprint": "sha256:ee0f0fdd088d23b3499ebf073297f076e40660d27e0fb950b67ca0fe9e587d9b"
+              },
+              {
+                "path": "schemas/engineering-dossier.schema.json",
+                "fingerprint": "sha256:16708f4b2eb84b31a8e577913b986767bdcb22fd68a6939cdee9a141c1ad0ab8"
+              },
+              {
+                "path": "schemas/engineering-gate-decision.schema.json",
+                "fingerprint": "sha256:4950bd586586a6c1aa7cefb5026fd9b1ed383b991b06b2f5b2e597540e76c3b5"
+              },
+              {
+                "path": "schemas/engineering-impact-graph.schema.json",
+                "fingerprint": "sha256:fd3880d8394ddb05a78c0245b28ee905c6cf0991b3d0b60e998c44705d0c9759"
+              },
+              {
+                "path": "schemas/integrated-verification-evidence.schema.json",
+                "fingerprint": "sha256:8a5c6a20950e9d6948cec565e3a61c9a455419548bdfaa2b73b1087ab6602410"
+              },
+              {
+                "path": "schemas/post-edit-architecture-evidence.schema.json",
+                "fingerprint": "sha256:26d07fc10b98092a37ef99e8688c862a59e6cef16d75c0de0435133a68f40737"
+              },
+              {
+                "path": "schemas/preimplementation-evidence.schema.json",
+                "fingerprint": "sha256:a8b06f7341fd0311bb6488908c40bc879eb762ab6f0892d9b1e78747ead8771b"
+              },
+              {
+                "path": "schemas/project-check-catalog.schema.json",
+                "fingerprint": "sha256:1dc4799824ec6a15545c9f298b1d0d70cf32573716706a591bccdd1707a54aa5"
+              },
+              {
+                "path": "schemas/quality-attestation.schema.json",
+                "fingerprint": "sha256:e389f87c50d51a536a5c8d2b41efdee499c2284460a9c55e7884d41feadbcfda"
+              },
+              {
+                "path": "schemas/toolchain-host-configuration.schema.json",
+                "fingerprint": "sha256:5a7eefc2062de8665c49e3ce043ae1f5a654a249a482803d0998bf01c83e9412"
+              },
+              {
+                "path": "schemas/toolchain-map.schema.json",
+                "fingerprint": "sha256:d2b685b5bf377cf777d3b091e8b871c2892dc027744f5717db72c22a6a9893cc"
+              },
+              {
+                "path": "schemas/whole-system-context-report.schema.json",
+                "fingerprint": "sha256:5d1ca0fb0289edc9122ca5d1fe0e9475173d49299de833f17a091657e2adb751"
+              }
+            ]
+          }
+        ],
+        "common_overlay_id": "credential-firewall-v1"
+      }
+    },
+    "surface_delta": {
+      "estimand_kind": "compound-profile-transition",
+      "transition_anchor_component_id": "assurance-controls",
+      "changed_leaf_paths": [
+        "/effective_config/default_agent",
+        "/effective_config/plugin/1/fingerprint",
+        "/effective_config/plugin/1/id",
+        "/effective_config/plugin/1/source_path",
+        "/materialized_files/0/fingerprint",
+        "/materialized_files/0/path",
+        "/materialized_files/1/fingerprint",
+        "/materialized_files/1/path",
+        "/materialized_files/10/fingerprint",
+        "/materialized_files/10/path",
+        "/materialized_files/100/fingerprint",
+        "/materialized_files/100/path",
+        "/materialized_files/101/fingerprint",
+        "/materialized_files/101/path",
+        "/materialized_files/102/fingerprint",
+        "/materialized_files/102/path",
+        "/materialized_files/103/fingerprint",
+        "/materialized_files/103/path",
+        "/materialized_files/104/fingerprint",
+        "/materialized_files/104/path",
+        "/materialized_files/105/fingerprint",
+        "/materialized_files/105/path",
+        "/materialized_files/106/fingerprint",
+        "/materialized_files/106/path",
+        "/materialized_files/107/fingerprint",
+        "/materialized_files/107/path",
+        "/materialized_files/108/fingerprint",
+        "/materialized_files/108/path",
+        "/materialized_files/109/fingerprint",
+        "/materialized_files/109/path",
+        "/materialized_files/11/fingerprint",
+        "/materialized_files/11/path",
+        "/materialized_files/110/fingerprint",
+        "/materialized_files/110/path",
+        "/materialized_files/111/fingerprint",
+        "/materialized_files/111/path",
+        "/materialized_files/112/fingerprint",
+        "/materialized_files/112/path",
+        "/materialized_files/113/fingerprint",
+        "/materialized_files/113/path",
+        "/materialized_files/114/fingerprint",
+        "/materialized_files/114/path",
+        "/materialized_files/115/fingerprint",
+        "/materialized_files/115/path",
+        "/materialized_files/116/fingerprint",
+        "/materialized_files/116/path",
+        "/materialized_files/117/fingerprint",
+        "/materialized_files/117/path",
+        "/materialized_files/118/fingerprint",
+        "/materialized_files/118/path",
+        "/materialized_files/119/fingerprint",
+        "/materialized_files/119/path",
+        "/materialized_files/12/fingerprint",
+        "/materialized_files/12/path",
+        "/materialized_files/120/fingerprint",
+        "/materialized_files/120/path",
+        "/materialized_files/121/fingerprint",
+        "/materialized_files/121/path",
+        "/materialized_files/122/fingerprint",
+        "/materialized_files/122/path",
+        "/materialized_files/123/fingerprint",
+        "/materialized_files/123/path",
+        "/materialized_files/124/fingerprint",
+        "/materialized_files/124/path",
+        "/materialized_files/125/fingerprint",
+        "/materialized_files/125/path",
+        "/materialized_files/126/fingerprint",
+        "/materialized_files/126/path",
+        "/materialized_files/127/fingerprint",
+        "/materialized_files/127/path",
+        "/materialized_files/128/fingerprint",
+        "/materialized_files/128/path",
+        "/materialized_files/129/fingerprint",
+        "/materialized_files/129/path",
+        "/materialized_files/13/fingerprint",
+        "/materialized_files/13/path",
+        "/materialized_files/130/fingerprint",
+        "/materialized_files/130/path",
+        "/materialized_files/131/fingerprint",
+        "/materialized_files/131/path",
+        "/materialized_files/132/fingerprint",
+        "/materialized_files/132/path",
+        "/materialized_files/133/fingerprint",
+        "/materialized_files/133/path",
+        "/materialized_files/134/fingerprint",
+        "/materialized_files/134/path",
+        "/materialized_files/135/fingerprint",
+        "/materialized_files/135/path",
+        "/materialized_files/136/fingerprint",
+        "/materialized_files/136/path",
+        "/materialized_files/137/fingerprint",
+        "/materialized_files/137/path",
+        "/materialized_files/138/fingerprint",
+        "/materialized_files/138/path",
+        "/materialized_files/139/fingerprint",
+        "/materialized_files/139/path",
+        "/materialized_files/14/fingerprint",
+        "/materialized_files/14/path",
+        "/materialized_files/140/fingerprint",
+        "/materialized_files/140/path",
+        "/materialized_files/141/fingerprint",
+        "/materialized_files/141/path",
+        "/materialized_files/142/fingerprint",
+        "/materialized_files/142/path",
+        "/materialized_files/143/fingerprint",
+        "/materialized_files/143/path",
+        "/materialized_files/144/fingerprint",
+        "/materialized_files/144/path",
+        "/materialized_files/145/fingerprint",
+        "/materialized_files/145/path",
+        "/materialized_files/146/fingerprint",
+        "/materialized_files/146/path",
+        "/materialized_files/147/fingerprint",
+        "/materialized_files/147/path",
+        "/materialized_files/148/fingerprint",
+        "/materialized_files/148/path",
+        "/materialized_files/149/fingerprint",
+        "/materialized_files/149/path",
+        "/materialized_files/15/fingerprint",
+        "/materialized_files/15/path",
+        "/materialized_files/150/fingerprint",
+        "/materialized_files/150/path",
+        "/materialized_files/151/fingerprint",
+        "/materialized_files/151/path",
+        "/materialized_files/152/fingerprint",
+        "/materialized_files/152/path",
+        "/materialized_files/153/fingerprint",
+        "/materialized_files/153/path",
+        "/materialized_files/154/fingerprint",
+        "/materialized_files/154/path",
+        "/materialized_files/155/fingerprint",
+        "/materialized_files/155/path",
+        "/materialized_files/156/fingerprint",
+        "/materialized_files/156/path",
+        "/materialized_files/157/fingerprint",
+        "/materialized_files/157/path",
+        "/materialized_files/158/fingerprint",
+        "/materialized_files/158/path",
+        "/materialized_files/159/fingerprint",
+        "/materialized_files/159/path",
+        "/materialized_files/16/fingerprint",
+        "/materialized_files/16/path",
+        "/materialized_files/160/fingerprint",
+        "/materialized_files/160/path",
+        "/materialized_files/161/fingerprint",
+        "/materialized_files/161/path",
+        "/materialized_files/162/fingerprint",
+        "/materialized_files/162/path",
+        "/materialized_files/163/fingerprint",
+        "/materialized_files/163/path",
+        "/materialized_files/17/fingerprint",
+        "/materialized_files/17/path",
+        "/materialized_files/18/fingerprint",
+        "/materialized_files/18/path",
+        "/materialized_files/19/fingerprint",
+        "/materialized_files/19/path",
+        "/materialized_files/2/fingerprint",
+        "/materialized_files/2/path",
+        "/materialized_files/20/fingerprint",
+        "/materialized_files/20/path",
+        "/materialized_files/21/fingerprint",
+        "/materialized_files/21/path",
+        "/materialized_files/22/fingerprint",
+        "/materialized_files/22/path",
+        "/materialized_files/23/fingerprint",
+        "/materialized_files/23/path",
+        "/materialized_files/24/fingerprint",
+        "/materialized_files/24/path",
+        "/materialized_files/25/fingerprint",
+        "/materialized_files/25/path",
+        "/materialized_files/26/fingerprint",
+        "/materialized_files/26/path",
+        "/materialized_files/27/fingerprint",
+        "/materialized_files/27/path",
+        "/materialized_files/28/fingerprint",
+        "/materialized_files/28/path",
+        "/materialized_files/29/fingerprint",
+        "/materialized_files/29/path",
+        "/materialized_files/3/fingerprint",
+        "/materialized_files/3/path",
+        "/materialized_files/30/fingerprint",
+        "/materialized_files/30/path",
+        "/materialized_files/31/fingerprint",
+        "/materialized_files/31/path",
+        "/materialized_files/32/fingerprint",
+        "/materialized_files/32/path",
+        "/materialized_files/33/fingerprint",
+        "/materialized_files/33/path",
+        "/materialized_files/34/fingerprint",
+        "/materialized_files/34/path",
+        "/materialized_files/35/fingerprint",
+        "/materialized_files/35/path",
+        "/materialized_files/36/fingerprint",
+        "/materialized_files/36/path",
+        "/materialized_files/37/fingerprint",
+        "/materialized_files/37/path",
+        "/materialized_files/38/fingerprint",
+        "/materialized_files/38/path",
+        "/materialized_files/39/fingerprint",
+        "/materialized_files/39/path",
+        "/materialized_files/4/fingerprint",
+        "/materialized_files/4/path",
+        "/materialized_files/40/fingerprint",
+        "/materialized_files/40/path",
+        "/materialized_files/41/fingerprint",
+        "/materialized_files/41/path",
+        "/materialized_files/42/fingerprint",
+        "/materialized_files/42/path",
+        "/materialized_files/43/fingerprint",
+        "/materialized_files/43/path",
+        "/materialized_files/44/fingerprint",
+        "/materialized_files/44/path",
+        "/materialized_files/45/fingerprint",
+        "/materialized_files/45/path",
+        "/materialized_files/46/fingerprint",
+        "/materialized_files/46/path",
+        "/materialized_files/47/fingerprint",
+        "/materialized_files/47/path",
+        "/materialized_files/48/fingerprint",
+        "/materialized_files/48/path",
+        "/materialized_files/49/fingerprint",
+        "/materialized_files/49/path",
+        "/materialized_files/5/fingerprint",
+        "/materialized_files/5/path",
+        "/materialized_files/50/fingerprint",
+        "/materialized_files/50/path",
+        "/materialized_files/51/fingerprint",
+        "/materialized_files/51/path",
+        "/materialized_files/52/fingerprint",
+        "/materialized_files/52/path",
+        "/materialized_files/53/fingerprint",
+        "/materialized_files/53/path",
+        "/materialized_files/54/fingerprint",
+        "/materialized_files/54/path",
+        "/materialized_files/55/fingerprint",
+        "/materialized_files/55/path",
+        "/materialized_files/56/fingerprint",
+        "/materialized_files/56/path",
+        "/materialized_files/57/fingerprint",
+        "/materialized_files/57/path",
+        "/materialized_files/58/fingerprint",
+        "/materialized_files/58/path",
+        "/materialized_files/59/fingerprint",
+        "/materialized_files/59/path",
+        "/materialized_files/6/fingerprint",
+        "/materialized_files/6/path",
+        "/materialized_files/60/fingerprint",
+        "/materialized_files/60/path",
+        "/materialized_files/61/fingerprint",
+        "/materialized_files/61/path",
+        "/materialized_files/62/fingerprint",
+        "/materialized_files/62/path",
+        "/materialized_files/63/fingerprint",
+        "/materialized_files/63/path",
+        "/materialized_files/64/fingerprint",
+        "/materialized_files/64/path",
+        "/materialized_files/65/fingerprint",
+        "/materialized_files/65/path",
+        "/materialized_files/66/fingerprint",
+        "/materialized_files/66/path",
+        "/materialized_files/67/fingerprint",
+        "/materialized_files/67/path",
+        "/materialized_files/68/fingerprint",
+        "/materialized_files/68/path",
+        "/materialized_files/69/fingerprint",
+        "/materialized_files/69/path",
+        "/materialized_files/7/fingerprint",
+        "/materialized_files/7/path",
+        "/materialized_files/70/fingerprint",
+        "/materialized_files/70/path",
+        "/materialized_files/71/fingerprint",
+        "/materialized_files/71/path",
+        "/materialized_files/72/fingerprint",
+        "/materialized_files/72/path",
+        "/materialized_files/73/fingerprint",
+        "/materialized_files/73/path",
+        "/materialized_files/74/fingerprint",
+        "/materialized_files/74/path",
+        "/materialized_files/75/fingerprint",
+        "/materialized_files/75/path",
+        "/materialized_files/76/fingerprint",
+        "/materialized_files/76/path",
+        "/materialized_files/77/fingerprint",
+        "/materialized_files/77/path",
+        "/materialized_files/78/fingerprint",
+        "/materialized_files/78/path",
+        "/materialized_files/79/fingerprint",
+        "/materialized_files/79/path",
+        "/materialized_files/8/fingerprint",
+        "/materialized_files/8/path",
+        "/materialized_files/80/fingerprint",
+        "/materialized_files/80/path",
+        "/materialized_files/81/fingerprint",
+        "/materialized_files/81/path",
+        "/materialized_files/82/fingerprint",
+        "/materialized_files/82/path",
+        "/materialized_files/83/fingerprint",
+        "/materialized_files/83/path",
+        "/materialized_files/84/fingerprint",
+        "/materialized_files/84/path",
+        "/materialized_files/85/fingerprint",
+        "/materialized_files/85/path",
+        "/materialized_files/86/fingerprint",
+        "/materialized_files/86/path",
+        "/materialized_files/87/fingerprint",
+        "/materialized_files/87/path",
+        "/materialized_files/88/fingerprint",
+        "/materialized_files/88/path",
+        "/materialized_files/89/fingerprint",
+        "/materialized_files/89/path",
+        "/materialized_files/9/fingerprint",
+        "/materialized_files/9/path",
+        "/materialized_files/90/fingerprint",
+        "/materialized_files/90/path",
+        "/materialized_files/91/fingerprint",
+        "/materialized_files/91/path",
+        "/materialized_files/92/fingerprint",
+        "/materialized_files/92/path",
+        "/materialized_files/93/fingerprint",
+        "/materialized_files/93/path",
+        "/materialized_files/94/fingerprint",
+        "/materialized_files/94/path",
+        "/materialized_files/95/fingerprint",
+        "/materialized_files/95/path",
+        "/materialized_files/96/fingerprint",
+        "/materialized_files/96/path",
+        "/materialized_files/97/fingerprint",
+        "/materialized_files/97/path",
+        "/materialized_files/98/fingerprint",
+        "/materialized_files/98/path",
+        "/materialized_files/99/fingerprint",
+        "/materialized_files/99/path",
+        "/plugin_sources/1/fingerprint",
+        "/plugin_sources/1/id",
+        "/plugin_sources/1/source_path"
+      ],
+      "baseline_surface_fingerprint": "sha256:aeb8c3eb3d275718d6c1d5c1675c3ae727a5c3872180dac1288c8c02425fdeae",
+      "candidate_surface_fingerprint": "sha256:3b56d2e0f5a473ac4869b87146d5acfde8548a9c31fbe4958dc949bb86c6c529",
+      "delta_contract_fingerprint": "sha256:8a801c71e6b78adea8d024bbf3c7767932945733f6e3c6cecb8a283ff2de6966",
+      "delta_fingerprint": "sha256:e518ce98afb8171accd50ba6c33b4f0896be1c5e81a49c498731a4f0e0674df0"
+    },
+    "pair_schedule": [
+      {
+        "pair_id": "pair-a77b9790f36f3c0ffa2cfdd0",
+        "family_id": "high-durable-persistence",
+        "stratum": "high",
+        "repetition": 1,
+        "instance_fingerprint": "sha256:53c3180ebf706c7f4b37f8fd2624b89cb3f85e3eff125f2f473c441f398ed3ce",
+        "public_fixture_fingerprint": "sha256:5b9595118850c39fac2548814a20c111b02ea237ab5efba6a4b796b469eb048e",
+        "hidden_fixture_fingerprint": "sha256:905000a7330c11374f843081dc1bc6bba8d03a54aebf68b07c083b206bc12a7d",
+        "topology_fingerprint": "sha256:a0d79858cbabec8d137a8dad5ffa3133431693a93a9252db414a814e00ef41f6",
+        "required_consumer_ids": [],
+        "order": [
+          "P5",
+          "P4"
+        ]
+      },
+      {
+        "pair_id": "pair-dae06670f1eca5123cc93e13",
+        "family_id": "small-config-defect",
+        "stratum": "small",
+        "repetition": 1,
+        "instance_fingerprint": "sha256:f56b4091d92d129887853af08fc84d711464c267ae3fd7497134beabf191e232",
+        "public_fixture_fingerprint": "sha256:9a24d5f4c662559bd6e9b64e51f9488cf6937d9499c828b4e9ca33a61bf543cc",
+        "hidden_fixture_fingerprint": "sha256:f3d35c6d5e8e155eb145687c7a1e187bcacff2fe698232f14a01139c5f8a090a",
+        "topology_fingerprint": "sha256:05ac11ce1e44b7b5ff428ec2bd152cebeabddc21b24a2241b68a220f6d318b3e",
+        "required_consumer_ids": [],
+        "order": [
+          "P5",
+          "P4"
+        ]
+      }
+    ],
+    "bindings": {
+      "source_sha": "7e4c3bd26f073f66a0ad6fd07451cbb9eb4b622a",
+      "policy_fingerprint": "sha256:f050a814723943d10c4346aa295606a316c02f21c250eeef82611a8c7409e6f3",
+      "inventory_fingerprint": "sha256:8054c2a1e944ecbc6278a6e5577936f0b99550423183d8defe5d50741f7f441f",
+      "contract_fingerprint": "sha256:84130aa932b04a3e090a6b6750c73cccba6b5c5e2ff4e4326e5ab409869b3274",
+      "executable_identity": "sha256:535c3132070d10ef43506e061933834728aa0ff611fe55e7dffb3ab89de821d8",
+      "adapter_fingerprint": "sha256:dfd2ca4271042a2416e30c82fbd2e0fa7b4566cf7d87b49093fff8038126ec20",
+      "model": "openai/gpt-5.6-luna",
+      "provider": "openai",
+      "variant": "low",
+      "seed": "v04-v2-smoke-deep-to-assurance-7e4c3bd",
+      "timeout_ms": 300000,
+      "runner_limits": {
+        "max_parallel_pairs": 1,
+        "trajectory_repetitions": 1,
+        "raw_model_output_persisted": false
+      },
+      "fixture_fingerprint": "sha256:75384deec486156eca4821b5a69a1d3e00ea4cd8dd16330e386706fe9bebb0db",
+      "evaluator_fingerprint": "sha256:7f8f56432c7401b938cc5fcf0ef413107e8855fe02d0d3131742cdba6aefa6e0"
+    },
+    "standard_gate": null,
+    "plan_fingerprint": "sha256:dedc987b55b2d1a0e5a9dad38c9809f6459b13b3f9e4f7ff2a70891a56c870f3"
+  },
+  "report": {
+    "schema_version": 1,
+    "run_id": "vnext-dedc987b55b2d1a0e5a9dad3",
+    "estimand_id": "deep-to-assurance",
+    "suite_id": "smoke",
+    "evidence_class": "model-backed-contained-run",
+    "trusted_producer": {
+      "producer_id": "opencode-harness-vnext-contained-runner",
+      "schema_version": 1,
+      "engine_fingerprint": "sha256:dfd2ca4271042a2416e30c82fbd2e0fa7b4566cf7d87b49093fff8038126ec20",
+      "executable_identity": "sha256:535c3132070d10ef43506e061933834728aa0ff611fe55e7dffb3ab89de821d8"
+    },
+    "bindings": {
+      "source_sha": "7e4c3bd26f073f66a0ad6fd07451cbb9eb4b622a",
+      "policy_fingerprint": "sha256:f050a814723943d10c4346aa295606a316c02f21c250eeef82611a8c7409e6f3",
+      "inventory_fingerprint": "sha256:8054c2a1e944ecbc6278a6e5577936f0b99550423183d8defe5d50741f7f441f",
+      "contract_fingerprint": "sha256:84130aa932b04a3e090a6b6750c73cccba6b5c5e2ff4e4326e5ab409869b3274",
+      "executable_identity": "sha256:535c3132070d10ef43506e061933834728aa0ff611fe55e7dffb3ab89de821d8",
+      "adapter_fingerprint": "sha256:dfd2ca4271042a2416e30c82fbd2e0fa7b4566cf7d87b49093fff8038126ec20",
+      "model": "openai/gpt-5.6-luna",
+      "provider": "openai",
+      "variant": "low",
+      "seed": "v04-v2-smoke-deep-to-assurance-7e4c3bd",
+      "timeout_ms": 300000,
+      "runner_limits": {
+        "max_parallel_pairs": 1,
+        "trajectory_repetitions": 1,
+        "raw_model_output_persisted": false
+      },
+      "fixture_fingerprint": "sha256:75384deec486156eca4821b5a69a1d3e00ea4cd8dd16330e386706fe9bebb0db",
+      "evaluator_fingerprint": "sha256:7f8f56432c7401b938cc5fcf0ef413107e8855fe02d0d3131742cdba6aefa6e0"
+    },
+    "status": "complete",
+    "family_results": [
+      {
+        "family_id": "high-durable-persistence",
+        "baseline_arm_id": "P4",
+        "candidate_arm_id": "P5",
+        "repetition_count": 1,
+        "status": "complete"
+      },
+      {
+        "family_id": "small-config-defect",
+        "baseline_arm_id": "P4",
+        "candidate_arm_id": "P5",
+        "repetition_count": 1,
+        "status": "complete"
+      }
+    ],
+    "pair_results": [
+      {
+        "pair_id": "pair-a77b9790f36f3c0ffa2cfdd0",
+        "family_id": "high-durable-persistence",
+        "stratum": "high",
+        "repetition": 1,
+        "order": [
+          "P5",
+          "P4"
+        ],
+        "instance_fingerprint": "sha256:53c3180ebf706c7f4b37f8fd2624b89cb3f85e3eff125f2f473c441f398ed3ce",
+        "required_consumer_ids": [],
+        "status": "complete",
+        "incomplete_reasons": [],
+        "baseline": {
+          "arm_id": "P4",
+          "profile_fingerprint": "sha256:27aea26333afbbfdd1a6c06a38d24c6bace8e58bafd6b3c07665bfe0932ce540",
+          "execution_status": "failed",
+          "termination_reason": "verification_failed",
+          "reason": "opencode_missing_final",
+          "evidence_complete": true,
+          "operational_trace_id": "vnext-pair-a77b9790f36f3c0ffa2cfdd0-P4",
+          "result_fingerprint": "sha256:3287faa704846767340d6a0b07ad605a6144b12e5adf78ad0fced82f1fe5a71f",
+          "binding_fingerprint": "sha256:0dd1406b433919dec812785f6db498769d8dd7a818fdf6b71e75c70dd7089dc5",
+          "consumer_observation": {
+            "required_consumer_ids": [],
+            "consumer_results": [],
+            "preserved_consumer_count": 0,
+            "check_status": "not_applicable",
+            "passed": true
+          },
+          "observation_inputs": {
+            "hidden_check_passed": false,
+            "workspace_policy_passed": true,
+            "task_correct": false,
+            "whole_task_success": false,
+            "defect_escape_v2": false,
+            "trace_policy_passed": false,
+            "trace_violations": [
+              "targeted_verification_missing"
+            ],
+            "treatment_compliance_passed": true,
+            "unexpected_path_count": 0,
+            "attested_owner_count": 0,
+            "duration_ms": 24602,
+            "model_turn_count": 1,
+            "total_tool_call_count": 12,
+            "subagent_call_count": 0,
+            "reason": "opencode_missing_final",
+            "termination_reason": "verification_failed",
+            "evidence_complete": true,
+            "consumer_observation": {
+              "required_consumer_ids": [],
+              "consumer_results": [],
+              "preserved_consumer_count": 0,
+              "check_status": "not_applicable",
+              "passed": true
+            }
+          },
+          "observations": {
+            "functional_hidden_check_success": 0,
+            "regression_free_success": 0,
+            "regression_free_high_risk_success": 0,
+            "public_contract_preservation": 1,
+            "structural_oracle_success": 0,
+            "missed_consumer_rate": 0,
+            "introduced_high_medium_defects": 0,
+            "unnecessary_changed_files": 0,
+            "verification_omission": 1,
+            "task_completion_without_human_intervention": 0,
+            "duration": 24602,
+            "model_turns": 1,
+            "tool_calls": 12,
+            "delegated_child_count": 0,
+            "timeout_rate": 0,
+            "no_progress_turns": 0,
+            "whole_task_success": 0,
+            "protocol_compliance": 0,
+            "trace_completeness": 1,
+            "attestation_completeness": 1
+          }
+        },
+        "candidate": {
+          "arm_id": "P5",
+          "profile_fingerprint": "sha256:c887f0dbcb7c8aca4a182b6b08ca40c5941b330fc7bb03cd2930aaab345f4ba3",
+          "execution_status": "failed",
+          "termination_reason": "verification_failed",
+          "reason": "opencode_quality_progress_stalled",
+          "evidence_complete": true,
+          "operational_trace_id": "vnext-pair-a77b9790f36f3c0ffa2cfdd0-P5",
+          "result_fingerprint": "sha256:f288434edabf874467435d6a26043be9c98f6b3f0daaf45f2f2639a0a81f4865",
+          "binding_fingerprint": "sha256:0dd1406b433919dec812785f6db498769d8dd7a818fdf6b71e75c70dd7089dc5",
+          "consumer_observation": {
+            "required_consumer_ids": [],
+            "consumer_results": [],
+            "preserved_consumer_count": 0,
+            "check_status": "not_applicable",
+            "passed": true
+          },
+          "observation_inputs": {
+            "hidden_check_passed": false,
+            "workspace_policy_passed": false,
+            "task_correct": false,
+            "whole_task_success": false,
+            "defect_escape_v2": false,
+            "trace_policy_passed": false,
+            "trace_violations": [
+              "control_call_limit",
+              "targeted_verification_missing",
+              "total_tool_call_limit",
+              "trace_incomplete"
+            ],
+            "treatment_compliance_passed": false,
+            "unexpected_path_count": 0,
+            "attested_owner_count": 0,
+            "duration_ms": 160694,
+            "model_turn_count": 7,
+            "total_tool_call_count": 40,
+            "subagent_call_count": 0,
+            "reason": "opencode_quality_progress_stalled",
+            "termination_reason": "verification_failed",
+            "evidence_complete": true,
+            "consumer_observation": {
+              "required_consumer_ids": [],
+              "consumer_results": [],
+              "preserved_consumer_count": 0,
+              "check_status": "not_applicable",
+              "passed": true
+            }
+          },
+          "observations": {
+            "functional_hidden_check_success": 0,
+            "regression_free_success": 0,
+            "regression_free_high_risk_success": 0,
+            "public_contract_preservation": 0,
+            "structural_oracle_success": 0,
+            "missed_consumer_rate": 0,
+            "introduced_high_medium_defects": 0,
+            "unnecessary_changed_files": 0,
+            "verification_omission": 1,
+            "task_completion_without_human_intervention": 0,
+            "duration": 160694,
+            "model_turns": 7,
+            "tool_calls": 40,
+            "delegated_child_count": 0,
+            "timeout_rate": 0,
+            "no_progress_turns": 0,
+            "whole_task_success": 0,
+            "protocol_compliance": 0,
+            "trace_completeness": 1,
+            "attestation_completeness": 0
+          }
+        },
+        "evidence_fingerprint": "sha256:e172a75bf712b5f18e9b18511fda67ba4167f3cca0c952d037e3c13270283eb5"
+      },
+      {
+        "pair_id": "pair-dae06670f1eca5123cc93e13",
+        "family_id": "small-config-defect",
+        "stratum": "small",
+        "repetition": 1,
+        "order": [
+          "P5",
+          "P4"
+        ],
+        "instance_fingerprint": "sha256:f56b4091d92d129887853af08fc84d711464c267ae3fd7497134beabf191e232",
+        "required_consumer_ids": [],
+        "status": "complete",
+        "incomplete_reasons": [],
+        "baseline": {
+          "arm_id": "P4",
+          "profile_fingerprint": "sha256:27aea26333afbbfdd1a6c06a38d24c6bace8e58bafd6b3c07665bfe0932ce540",
+          "execution_status": "failed",
+          "termination_reason": "verification_failed",
+          "reason": "opencode_missing_final",
+          "evidence_complete": true,
+          "operational_trace_id": "vnext-pair-dae06670f1eca5123cc93e13-P4",
+          "result_fingerprint": "sha256:67c4137349c706267c0d5f7ac0ef8ad26d0296066ad157a163da91ecf9d341d8",
+          "binding_fingerprint": "sha256:06c692bd42490cbbeb745572f3c221911c511a0bf6bc68c6bcabbc9a8f65a5eb",
+          "consumer_observation": {
+            "required_consumer_ids": [],
+            "consumer_results": [],
+            "preserved_consumer_count": 0,
+            "check_status": "not_applicable",
+            "passed": true
+          },
+          "observation_inputs": {
+            "hidden_check_passed": false,
+            "workspace_policy_passed": true,
+            "task_correct": false,
+            "whole_task_success": false,
+            "defect_escape_v2": false,
+            "trace_policy_passed": false,
+            "trace_violations": [
+              "targeted_verification_missing"
+            ],
+            "treatment_compliance_passed": true,
+            "unexpected_path_count": 0,
+            "attested_owner_count": 0,
+            "duration_ms": 14153,
+            "model_turn_count": 1,
+            "total_tool_call_count": 3,
+            "subagent_call_count": 0,
+            "reason": "opencode_missing_final",
+            "termination_reason": "verification_failed",
+            "evidence_complete": true,
+            "consumer_observation": {
+              "required_consumer_ids": [],
+              "consumer_results": [],
+              "preserved_consumer_count": 0,
+              "check_status": "not_applicable",
+              "passed": true
+            }
+          },
+          "observations": {
+            "functional_hidden_check_success": 0,
+            "regression_free_success": 0,
+            "regression_free_high_risk_success": 0,
+            "public_contract_preservation": 1,
+            "structural_oracle_success": 0,
+            "missed_consumer_rate": 0,
+            "introduced_high_medium_defects": 0,
+            "unnecessary_changed_files": 0,
+            "verification_omission": 1,
+            "task_completion_without_human_intervention": 0,
+            "duration": 14153,
+            "model_turns": 1,
+            "tool_calls": 3,
+            "delegated_child_count": 0,
+            "timeout_rate": 0,
+            "no_progress_turns": 0,
+            "whole_task_success": 0,
+            "protocol_compliance": 0,
+            "trace_completeness": 1,
+            "attestation_completeness": 1
+          }
+        },
+        "candidate": {
+          "arm_id": "P5",
+          "profile_fingerprint": "sha256:c887f0dbcb7c8aca4a182b6b08ca40c5941b330fc7bb03cd2930aaab345f4ba3",
+          "execution_status": "failed",
+          "termination_reason": "verification_failed",
+          "reason": "opencode_quality_progress_stalled",
+          "evidence_complete": true,
+          "operational_trace_id": "vnext-pair-dae06670f1eca5123cc93e13-P5",
+          "result_fingerprint": "sha256:bb4e535e616eed0993e1a854a4bebd13d33b7d9c0908d6eb8deb7aaf9f53ecdc",
+          "binding_fingerprint": "sha256:06c692bd42490cbbeb745572f3c221911c511a0bf6bc68c6bcabbc9a8f65a5eb",
+          "consumer_observation": {
+            "required_consumer_ids": [],
+            "consumer_results": [],
+            "preserved_consumer_count": 0,
+            "check_status": "not_applicable",
+            "passed": true
+          },
+          "observation_inputs": {
+            "hidden_check_passed": false,
+            "workspace_policy_passed": true,
+            "task_correct": false,
+            "whole_task_success": false,
+            "defect_escape_v2": false,
+            "trace_policy_passed": false,
+            "trace_violations": [
+              "control_call_limit",
+              "targeted_verification_missing",
+              "total_tool_call_limit"
+            ],
+            "treatment_compliance_passed": false,
+            "unexpected_path_count": 0,
+            "attested_owner_count": 0,
+            "duration_ms": 228243,
+            "model_turn_count": 7,
+            "total_tool_call_count": 33,
+            "subagent_call_count": 0,
+            "reason": "opencode_quality_progress_stalled",
+            "termination_reason": "verification_failed",
+            "evidence_complete": true,
+            "consumer_observation": {
+              "required_consumer_ids": [],
+              "consumer_results": [],
+              "preserved_consumer_count": 0,
+              "check_status": "not_applicable",
+              "passed": true
+            }
+          },
+          "observations": {
+            "functional_hidden_check_success": 0,
+            "regression_free_success": 0,
+            "regression_free_high_risk_success": 0,
+            "public_contract_preservation": 1,
+            "structural_oracle_success": 0,
+            "missed_consumer_rate": 0,
+            "introduced_high_medium_defects": 0,
+            "unnecessary_changed_files": 0,
+            "verification_omission": 1,
+            "task_completion_without_human_intervention": 0,
+            "duration": 228243,
+            "model_turns": 7,
+            "tool_calls": 33,
+            "delegated_child_count": 0,
+            "timeout_rate": 0,
+            "no_progress_turns": 0,
+            "whole_task_success": 0,
+            "protocol_compliance": 0,
+            "trace_completeness": 1,
+            "attestation_completeness": 0
+          }
+        },
+        "evidence_fingerprint": "sha256:5eb66696fa3c600fa46c04432a792ecb9a97a181ec38e0b1494bf0cfa804edb0"
+      }
+    ],
+    "product_metrics": {
+      "functional_hidden_check_success": {
+        "baseline": 0,
+        "candidate": 0,
+        "paired_delta": 0,
+        "confidence_interval": [
+          0,
+          0
+        ]
+      },
+      "regression_free_success": {
+        "baseline": 0,
+        "candidate": 0,
+        "paired_delta": 0,
+        "confidence_interval": [
+          0,
+          0
+        ]
+      },
+      "regression_free_high_risk_success": {
+        "baseline": 0,
+        "candidate": 0,
+        "paired_delta": 0,
+        "confidence_interval": [
+          0,
+          0
+        ]
+      },
+      "public_contract_preservation": {
+        "baseline": 1,
+        "candidate": 0.5,
+        "paired_delta": -0.5,
+        "confidence_interval": [
+          -1,
+          0
+        ]
+      },
+      "structural_oracle_success": {
+        "baseline": 0,
+        "candidate": 0,
+        "paired_delta": 0,
+        "confidence_interval": [
+          0,
+          0
+        ]
+      },
+      "missed_consumer_rate": {
+        "baseline": 0,
+        "candidate": 0,
+        "paired_delta": 0,
+        "confidence_interval": [
+          0,
+          0
+        ]
+      },
+      "introduced_high_medium_defects": {
+        "baseline": 0,
+        "candidate": 0,
+        "paired_delta": 0,
+        "confidence_interval": [
+          0,
+          0
+        ]
+      },
+      "unnecessary_changed_files": {
+        "baseline": 0,
+        "candidate": 0,
+        "paired_delta": 0,
+        "confidence_interval": [
+          0,
+          0
+        ]
+      },
+      "verification_omission": {
+        "baseline": 1,
+        "candidate": 1,
+        "paired_delta": 0,
+        "confidence_interval": [
+          0,
+          0
+        ]
+      },
+      "task_completion_without_human_intervention": {
+        "baseline": 0,
+        "candidate": 0,
+        "paired_delta": 0,
+        "confidence_interval": [
+          0,
+          0
+        ]
+      }
+    },
+    "operational_metrics": {
+      "duration": {
+        "baseline": 19377.5,
+        "candidate": 194468.5,
+        "paired_delta": 175091,
+        "confidence_interval": [
+          136092,
+          214090
+        ]
+      },
+      "model_turns": {
+        "baseline": 1,
+        "candidate": 7,
+        "paired_delta": 6,
+        "confidence_interval": [
+          6,
+          6
+        ]
+      },
+      "tool_calls": {
+        "baseline": 7.5,
+        "candidate": 36.5,
+        "paired_delta": 29,
+        "confidence_interval": [
+          28,
+          30
+        ]
+      },
+      "delegated_child_count": {
+        "baseline": 0,
+        "candidate": 0,
+        "paired_delta": 0,
+        "confidence_interval": [
+          0,
+          0
+        ]
+      },
+      "timeout_rate": {
+        "baseline": 0,
+        "candidate": 0,
+        "paired_delta": 0,
+        "confidence_interval": [
+          0,
+          0
+        ]
+      },
+      "no_progress_turns": {
+        "baseline": 0,
+        "candidate": 0,
+        "paired_delta": 0,
+        "confidence_interval": [
+          0,
+          0
+        ]
+      }
+    },
+    "diagnostic_metrics": {
+      "whole_task_success": {
+        "baseline": 0,
+        "candidate": 0,
+        "paired_delta": 0,
+        "confidence_interval": [
+          0,
+          0
+        ]
+      },
+      "protocol_compliance": {
+        "baseline": 0,
+        "candidate": 0,
+        "paired_delta": 0,
+        "confidence_interval": [
+          0,
+          0
+        ]
+      },
+      "trace_completeness": {
+        "baseline": 1,
+        "candidate": 1,
+        "paired_delta": 0,
+        "confidence_interval": [
+          0,
+          0
+        ]
+      },
+      "attestation_completeness": {
+        "baseline": 1,
+        "candidate": 0,
+        "paired_delta": -1,
+        "confidence_interval": [
+          -1,
+          -1
+        ]
+      }
+    },
+    "incomplete_outcomes": [],
+    "evidence_fingerprint": "sha256:62c644471b668dead46fe466adc6694584ad93575ee8460f2e9e0bb6bd0a5fd1"
+  },
+  "envelope_fingerprint": "sha256:4fb22bba8b4effd81590555a3445258427aca0225e1006cedf639ae4454b7b9f"
+}

@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "campaign_id": "opencode-harness-v04-model-backed-v2",
+  "campaign_fingerprint": "sha256:29508d7ed1a63a03e6554e1e020d0586ad4c945195e17ad524a3fc8c8753b406",
+  "campaign_fingerprint_scope": "campaign-manifest.json and the 19 JSON files listed in artifact-hashes.sha256; this derived decision summary is hashed separately",
+  "studied_source_sha": "7e4c3bd26f073f66a0ad6fd07451cbb9eb4b622a",
+  "evidence_class": "model-backed-contained-run",
+  "primary_binding": {
+    "model": "openai/gpt-5.6-luna",
+    "provider": "openai",
+    "variant": "low",
+    "timeout_ms": 300000
+  },
+  "overall_status": "study-complete-no-component-promoted",
+  "model_specific": true,
+  "secondary_replication": {
+    "status": "not-run-no-qualified-preregistered-binding",
+    "reason": "Only OpenAI was credential-qualified. Same-provider OpenAI models did not establish the required architecture independence; anonymous opencode free listings were not preregistered or availability-qualified."
+  },
+  "full_phase": {
+    "status": "not-run-by-policy",
+    "reason": "All five trusted in-process standard decisions were non-promotable."
+  },
+  "manifest_errata": [
+    {
+      "field": "runner_policy.trajectory_repetitions",
+      "manifest_value": 1,
+      "authoritative_standard_report_value": 2,
+      "handling": "The frozen manifest was not rewritten after results; suite-owned report bindings are authoritative."
+    }
+  ],
+  "decisions": [
+    {
+      "estimand_id": "plain-to-core-rules",
+      "status": "complete",
+      "complete_pairs": 26,
+      "incomplete_pairs": 0,
+      "verdict": "reject",
+      "promotable": false,
+      "target_metric": "functional_hidden_check_success",
+      "target_effect": {
+        "baseline": 0.07692307692307693,
+        "candidate": 0.11538461538461539,
+        "paired_delta": 0.038461538461538464,
+        "confidence_interval": [0, 0.11538461538461539]
+      },
+      "failed_guardrails": [
+        {
+          "id": "introduced-high-medium-defects-maximum",
+          "observed": 0.038461538461538464,
+          "threshold": 0
+        }
+      ],
+      "run_fingerprint": "sha256:3df00167eb614c233221754f800b5819778976771f970f84a23f66228ed4c605",
+      "evidence_fingerprint": "sha256:21b9969c57bfb45b0a5e363d4344ff5b0b581325d50336c5d586260a78b5d173",
+      "comparison_fingerprint": "sha256:065eb4188a542cd9c20b77475d6991ebecde66211ddb66bb1c10bce61b070b47",
+      "decision_fingerprint": "sha256:daba203cdf222ffbdb3463ab60f5936cddc5e917a6aba11e98903951332fdb42"
+    },
+    {
+      "estimand_id": "core-rules-to-core-verified",
+      "status": "complete",
+      "complete_pairs": 26,
+      "incomplete_pairs": 0,
+      "verdict": "reject",
+      "promotable": false,
+      "target_metric": "verification_omission",
+      "target_effect": {
+        "baseline": 0.9230769230769231,
+        "candidate": 0.9230769230769231,
+        "paired_delta": 0,
+        "confidence_interval": [0, 0]
+      },
+      "failed_guardrails": [
+        {
+          "id": "introduced-high-medium-defects-maximum",
+          "observed": 0.07692307692307693,
+          "threshold": 0
+        }
+      ],
+      "run_fingerprint": "sha256:71fa62d7124a832261e628c6744a801056516ac8c94d7fb5f05c8e1815854c15",
+      "evidence_fingerprint": "sha256:9e449ae3463daccc1460600846e0d0f46584d72143d6abc88631171171604325",
+      "comparison_fingerprint": "sha256:34cd3215288b5b6789672dd7e5a16e8a35c99cc595e92fac26a5a1aae602db44",
+      "decision_fingerprint": "sha256:b1d2703d8315ff91ddd9c90dc449d3934b52c1d2c51bec461129af02eab7a5d7"
+    },
+    {
+      "estimand_id": "core-verified-to-core-reviewed",
+      "status": "complete",
+      "complete_pairs": 26,
+      "incomplete_pairs": 0,
+      "verdict": "reject",
+      "promotable": false,
+      "target_metric": "introduced_high_medium_defects",
+      "target_effect": {
+        "baseline": 0.07692307692307693,
+        "candidate": 0.07692307692307693,
+        "paired_delta": 0,
+        "confidence_interval": [0, 0]
+      },
+      "failed_guardrails": [
+        {
+          "id": "introduced-high-medium-defects-maximum",
+          "observed": 0.07692307692307693,
+          "threshold": 0
+        }
+      ],
+      "run_fingerprint": "sha256:98a8760ebc9a3534aa09181d2c7b4f2c563822430684889a54d44402ed760ab4",
+      "evidence_fingerprint": "sha256:83453bede13404f8b0d9801d27bb0bba4f8c34a74250681d40c776f1e6dc57d1",
+      "comparison_fingerprint": "sha256:b4973ce43cf0a265e07e49a455f29bfab8c85af2095d50487b102cd7b690d5ad",
+      "decision_fingerprint": "sha256:0b0d76ada62290f15363296a82fc934537ce441739055291c596d2007fc71c3a"
+    },
+    {
+      "estimand_id": "core-reviewed-to-deep",
+      "status": "complete",
+      "complete_pairs": 26,
+      "incomplete_pairs": 0,
+      "verdict": "reject",
+      "promotable": false,
+      "target_metric": "missed_consumer_rate",
+      "target_effect": {
+        "baseline": 0,
+        "candidate": 0,
+        "paired_delta": 0,
+        "confidence_interval": [0, 0]
+      },
+      "failed_guardrails": [
+        {
+          "id": "introduced-high-medium-defects-maximum",
+          "observed": 0.07692307692307693,
+          "threshold": 0
+        }
+      ],
+      "run_fingerprint": "sha256:1f4960a7d55198592714ec1e68af8fad81f43ade5d10deab9cc1355e6ba0f68c",
+      "evidence_fingerprint": "sha256:74483b9ad702a55976232134ca5b6a1319f35ced0a2fac9c878d80c973fbea1c",
+      "comparison_fingerprint": "sha256:c719d4af2d790099ee7f1960744963c3a8cc31984cf8d3b7912e725b23a8ff9d",
+      "decision_fingerprint": "sha256:6152ddbb69ea4cd03e70eeb632f97b69241c1d69f799577ba876a045b1b81643"
+    },
+    {
+      "estimand_id": "deep-to-assurance",
+      "status": "complete",
+      "complete_pairs": 26,
+      "incomplete_pairs": 0,
+      "verdict": "reject",
+      "promotable": false,
+      "target_metric": "regression_free_high_risk_success",
+      "target_effect": {
+        "baseline": 0,
+        "candidate": 0,
+        "paired_delta": 0,
+        "confidence_interval": [0, 0]
+      },
+      "failed_guardrails": [
+        {
+          "id": "introduced-high-medium-defects-maximum",
+          "observed": 0.07692307692307693,
+          "threshold": 0
+        }
+      ],
+      "run_fingerprint": "sha256:983f4ac4f5ccc61c7858580024f2b983cc27c41cf48c9f11e7442067a2201d87",
+      "evidence_fingerprint": "sha256:7025b9079e5ad0f20018ae219819a6e082d5d90f8bfd79bca207623043c958b8",
+      "comparison_fingerprint": "sha256:cfe3bf331d8b8ae9d1223ba0b88416972ec9286bb6b6b4cf125c36ed42a5ea3a",
+      "decision_fingerprint": "sha256:071001202bb1c8f406922757db83f22a4bbf5ba629301ab4b13ff50449db9421"
+    }
+  ]
+}

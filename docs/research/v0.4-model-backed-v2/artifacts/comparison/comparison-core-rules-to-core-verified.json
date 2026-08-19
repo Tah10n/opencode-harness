@@ -1,0 +1,3070 @@
+{
+  "schema_version": 1,
+  "report_kind": "vnext-compound-profile-transition-comparison",
+  "estimand_id": "core-rules-to-core-verified",
+  "suite_id": "standard",
+  "bindings": {
+    "source_sha": "7e4c3bd26f073f66a0ad6fd07451cbb9eb4b622a",
+    "policy_fingerprint": "sha256:f050a814723943d10c4346aa295606a316c02f21c250eeef82611a8c7409e6f3",
+    "inventory_fingerprint": "sha256:8054c2a1e944ecbc6278a6e5577936f0b99550423183d8defe5d50741f7f441f",
+    "contract_fingerprint": "sha256:84130aa932b04a3e090a6b6750c73cccba6b5c5e2ff4e4326e5ab409869b3274",
+    "executable_identity": "sha256:535c3132070d10ef43506e061933834728aa0ff611fe55e7dffb3ab89de821d8",
+    "adapter_fingerprint": "sha256:dfd2ca4271042a2416e30c82fbd2e0fa7b4566cf7d87b49093fff8038126ec20",
+    "model": "openai/gpt-5.6-luna",
+    "provider": "openai",
+    "variant": "low",
+    "seed": "v04-v2-standard-core-rules-to-core-verified-7e4c3bd",
+    "timeout_ms": 300000,
+    "runner_limits": {
+      "max_parallel_pairs": 1,
+      "trajectory_repetitions": 2,
+      "raw_model_output_persisted": false
+    },
+    "fixture_fingerprint": "sha256:5b23c44d66838315061f5dfb85454b75cac3179e95b20b10ac88750f922ea6c0",
+    "evaluator_fingerprint": "sha256:7f8f56432c7401b938cc5fcf0ef413107e8855fe02d0d3131742cdba6aefa6e0"
+  },
+  "evidence_class": "model-backed-contained-run",
+  "trusted_producer": {
+    "producer_id": "opencode-harness-vnext-contained-runner",
+    "schema_version": 1,
+    "engine_fingerprint": "sha256:dfd2ca4271042a2416e30c82fbd2e0fa7b4566cf7d87b49093fff8038126ec20",
+    "executable_identity": "sha256:535c3132070d10ef43506e061933834728aa0ff611fe55e7dffb3ab89de821d8"
+  },
+  "status": "complete",
+  "paired_effects": {
+    "functional_hidden_check_success": {
+      "baseline": 0.07692307692307693,
+      "candidate": 0.07692307692307693,
+      "paired_delta": 0,
+      "confidence_interval": [
+        0,
+        0
+      ]
+    },
+    "regression_free_success": {
+      "baseline": 0,
+      "candidate": 0,
+      "paired_delta": 0,
+      "confidence_interval": [
+        0,
+        0
+      ]
+    },
+    "regression_free_high_risk_success": {
+      "baseline": 0,
+      "candidate": 0,
+      "paired_delta": 0,
+      "confidence_interval": [
+        0,
+        0
+      ]
+    },
+    "public_contract_preservation": {
+      "baseline": 1,
+      "candidate": 1,
+      "paired_delta": 0,
+      "confidence_interval": [
+        0,
+        0
+      ]
+    },
+    "structural_oracle_success": {
+      "baseline": 0.6153846153846154,
+      "candidate": 0.6153846153846154,
+      "paired_delta": 0,
+      "confidence_interval": [
+        0,
+        0
+      ]
+    },
+    "missed_consumer_rate": {
+      "baseline": 0,
+      "candidate": 0,
+      "paired_delta": 0,
+      "confidence_interval": [
+        0,
+        0
+      ]
+    },
+    "introduced_high_medium_defects": {
+      "baseline": 0.07692307692307693,
+      "candidate": 0.07692307692307693,
+      "paired_delta": 0,
+      "confidence_interval": [
+        0,
+        0
+      ]
+    },
+    "unnecessary_changed_files": {
+      "baseline": 0,
+      "candidate": 0,
+      "paired_delta": 0,
+      "confidence_interval": [
+        0,
+        0
+      ]
+    },
+    "verification_omission": {
+      "baseline": 0.9230769230769231,
+      "candidate": 0.9230769230769231,
+      "paired_delta": 0,
+      "confidence_interval": [
+        0,
+        0
+      ]
+    },
+    "task_completion_without_human_intervention": {
+      "baseline": 0,
+      "candidate": 0,
+      "paired_delta": 0,
+      "confidence_interval": [
+        0,
+        0
+      ]
+    },
+    "duration": {
+      "baseline": 18028.03846153846,
+      "candidate": 17515.653846153848,
+      "paired_delta": -512.3846153846134,
+      "confidence_interval": [
+        -3020,
+        1839.3461538461538
+      ]
+    },
+    "model_turns": {
+      "baseline": 1,
+      "candidate": 1,
+      "paired_delta": 0,
+      "confidence_interval": [
+        0,
+        0
+      ]
+    },
+    "tool_calls": {
+      "baseline": 6.769230769230769,
+      "candidate": 6.346153846153846,
+      "paired_delta": -0.42307692307692335,
+      "confidence_interval": [
+        -1.8846153846153846,
+        0.9615384615384616
+      ]
+    },
+    "delegated_child_count": {
+      "baseline": 0,
+      "candidate": 0,
+      "paired_delta": 0,
+      "confidence_interval": [
+        0,
+        0
+      ]
+    },
+    "timeout_rate": {
+      "baseline": 0,
+      "candidate": 0,
+      "paired_delta": 0,
+      "confidence_interval": [
+        0,
+        0
+      ]
+    },
+    "no_progress_turns": {
+      "baseline": 0,
+      "candidate": 0,
+      "paired_delta": 0,
+      "confidence_interval": [
+        0,
+        0
+      ]
+    },
+    "whole_task_success": {
+      "baseline": 0,
+      "candidate": 0,
+      "paired_delta": 0,
+      "confidence_interval": [
+        0,
+        0
+      ]
+    },
+    "protocol_compliance": {
+      "baseline": 0.07692307692307693,
+      "candidate": 0.07692307692307693,
+      "paired_delta": 0,
+      "confidence_interval": [
+        0,
+        0
+      ]
+    },
+    "trace_completeness": {
+      "baseline": 1,
+      "candidate": 1,
+      "paired_delta": 0,
+      "confidence_interval": [
+        0,
+        0
+      ]
+    },
+    "attestation_completeness": {
+      "baseline": 1,
+      "candidate": 1,
+      "paired_delta": 0,
+      "confidence_interval": [
+        0,
+        0
+      ]
+    }
+  },
+  "per_family": [
+    {
+      "family_id": "medium-config-propagation",
+      "pair_count": 2,
+      "paired_effects": {
+        "functional_hidden_check_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "regression_free_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "regression_free_high_risk_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "public_contract_preservation": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "structural_oracle_success": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "missed_consumer_rate": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "introduced_high_medium_defects": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "unnecessary_changed_files": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "verification_omission": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "task_completion_without_human_intervention": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "duration": {
+          "baseline": 15653.5,
+          "candidate": 19332,
+          "paired_delta": 3678.5,
+          "confidence_interval": [
+            3678.5,
+            3678.5
+          ]
+        },
+        "model_turns": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "tool_calls": {
+          "baseline": 5.5,
+          "candidate": 8,
+          "paired_delta": 2.5,
+          "confidence_interval": [
+            2.5,
+            2.5
+          ]
+        },
+        "delegated_child_count": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "timeout_rate": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "no_progress_turns": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "whole_task_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "protocol_compliance": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "trace_completeness": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "attestation_completeness": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "family_id": "medium-cross-module-compatibility",
+      "pair_count": 2,
+      "paired_effects": {
+        "functional_hidden_check_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "regression_free_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "regression_free_high_risk_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "public_contract_preservation": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "structural_oracle_success": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "missed_consumer_rate": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "introduced_high_medium_defects": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "unnecessary_changed_files": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "verification_omission": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "task_completion_without_human_intervention": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "duration": {
+          "baseline": 14172,
+          "candidate": 16373.5,
+          "paired_delta": 2201.5,
+          "confidence_interval": [
+            2201.5,
+            2201.5
+          ]
+        },
+        "model_turns": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "tool_calls": {
+          "baseline": 6.5,
+          "candidate": 5.5,
+          "paired_delta": -1,
+          "confidence_interval": [
+            -1,
+            -1
+          ]
+        },
+        "delegated_child_count": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "timeout_rate": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "no_progress_turns": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "whole_task_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "protocol_compliance": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "trace_completeness": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "attestation_completeness": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "family_id": "medium-doc-config-code-consistency",
+      "pair_count": 2,
+      "paired_effects": {
+        "functional_hidden_check_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "regression_free_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "regression_free_high_risk_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "public_contract_preservation": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "structural_oracle_success": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "missed_consumer_rate": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "introduced_high_medium_defects": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "unnecessary_changed_files": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "verification_omission": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "task_completion_without_human_intervention": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "duration": {
+          "baseline": 9122.5,
+          "candidate": 7171.5,
+          "paired_delta": -1951,
+          "confidence_interval": [
+            -1951,
+            -1951
+          ]
+        },
+        "model_turns": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "tool_calls": {
+          "baseline": 3,
+          "candidate": 2,
+          "paired_delta": -1,
+          "confidence_interval": [
+            -1,
+            -1
+          ]
+        },
+        "delegated_child_count": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "timeout_rate": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "no_progress_turns": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "whole_task_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "protocol_compliance": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "trace_completeness": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "attestation_completeness": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "family_id": "medium-error-contract-chain",
+      "pair_count": 2,
+      "paired_effects": {
+        "functional_hidden_check_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "regression_free_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "regression_free_high_risk_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "public_contract_preservation": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "structural_oracle_success": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "missed_consumer_rate": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "introduced_high_medium_defects": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "unnecessary_changed_files": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "verification_omission": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "task_completion_without_human_intervention": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "duration": {
+          "baseline": 28956,
+          "candidate": 26064,
+          "paired_delta": -2892,
+          "confidence_interval": [
+            -2892,
+            -2892
+          ]
+        },
+        "model_turns": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "tool_calls": {
+          "baseline": 10.5,
+          "candidate": 8,
+          "paired_delta": -2.5,
+          "confidence_interval": [
+            -2.5,
+            -2.5
+          ]
+        },
+        "delegated_child_count": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "timeout_rate": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "no_progress_turns": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "whole_task_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "protocol_compliance": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "trace_completeness": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "attestation_completeness": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "family_id": "medium-hidden-reexport-consumer",
+      "pair_count": 2,
+      "paired_effects": {
+        "functional_hidden_check_success": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "regression_free_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "regression_free_high_risk_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "public_contract_preservation": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "structural_oracle_success": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "missed_consumer_rate": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "introduced_high_medium_defects": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "unnecessary_changed_files": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "verification_omission": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "task_completion_without_human_intervention": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "duration": {
+          "baseline": 16185.5,
+          "candidate": 20087,
+          "paired_delta": 3901.5,
+          "confidence_interval": [
+            3901.5,
+            3901.5
+          ]
+        },
+        "model_turns": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "tool_calls": {
+          "baseline": 10,
+          "candidate": 11.5,
+          "paired_delta": 1.5,
+          "confidence_interval": [
+            1.5,
+            1.5
+          ]
+        },
+        "delegated_child_count": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "timeout_rate": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "no_progress_turns": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "whole_task_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "protocol_compliance": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "trace_completeness": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "attestation_completeness": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "family_id": "medium-registry-consumer",
+      "pair_count": 2,
+      "paired_effects": {
+        "functional_hidden_check_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "regression_free_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "regression_free_high_risk_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "public_contract_preservation": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "structural_oracle_success": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "missed_consumer_rate": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "introduced_high_medium_defects": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "unnecessary_changed_files": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "verification_omission": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "task_completion_without_human_intervention": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "duration": {
+          "baseline": 29045,
+          "candidate": 33073.5,
+          "paired_delta": 4028.5,
+          "confidence_interval": [
+            4028.5,
+            4028.5
+          ]
+        },
+        "model_turns": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "tool_calls": {
+          "baseline": 8,
+          "candidate": 10.5,
+          "paired_delta": 2.5,
+          "confidence_interval": [
+            2.5,
+            2.5
+          ]
+        },
+        "delegated_child_count": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "timeout_rate": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "no_progress_turns": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "whole_task_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "protocol_compliance": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "trace_completeness": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "attestation_completeness": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "family_id": "medium-remote-test-module",
+      "pair_count": 2,
+      "paired_effects": {
+        "functional_hidden_check_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "regression_free_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "regression_free_high_risk_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "public_contract_preservation": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "structural_oracle_success": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "missed_consumer_rate": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "introduced_high_medium_defects": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "unnecessary_changed_files": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "verification_omission": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "task_completion_without_human_intervention": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "duration": {
+          "baseline": 20145.5,
+          "candidate": 14049,
+          "paired_delta": -6096.5,
+          "confidence_interval": [
+            -6096.5,
+            -6096.5
+          ]
+        },
+        "model_turns": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "tool_calls": {
+          "baseline": 8,
+          "candidate": 6.5,
+          "paired_delta": -1.5,
+          "confidence_interval": [
+            -1.5,
+            -1.5
+          ]
+        },
+        "delegated_child_count": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "timeout_rate": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "no_progress_turns": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "whole_task_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "protocol_compliance": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "trace_completeness": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "attestation_completeness": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "family_id": "medium-schema-default-propagation",
+      "pair_count": 2,
+      "paired_effects": {
+        "functional_hidden_check_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "regression_free_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "regression_free_high_risk_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "public_contract_preservation": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "structural_oracle_success": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "missed_consumer_rate": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "introduced_high_medium_defects": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "unnecessary_changed_files": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "verification_omission": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "task_completion_without_human_intervention": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "duration": {
+          "baseline": 22574.5,
+          "candidate": 18619,
+          "paired_delta": -3955.5,
+          "confidence_interval": [
+            -3955.5,
+            -3955.5
+          ]
+        },
+        "model_turns": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "tool_calls": {
+          "baseline": 8,
+          "candidate": 5,
+          "paired_delta": -3,
+          "confidence_interval": [
+            -3,
+            -3
+          ]
+        },
+        "delegated_child_count": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "timeout_rate": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "no_progress_turns": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "whole_task_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "protocol_compliance": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "trace_completeness": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "attestation_completeness": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "family_id": "small-config-defect",
+      "pair_count": 2,
+      "paired_effects": {
+        "functional_hidden_check_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "regression_free_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "regression_free_high_risk_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "public_contract_preservation": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "structural_oracle_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "missed_consumer_rate": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "introduced_high_medium_defects": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "unnecessary_changed_files": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "verification_omission": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "task_completion_without_human_intervention": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "duration": {
+          "baseline": 21376,
+          "candidate": 13389,
+          "paired_delta": -7987,
+          "confidence_interval": [
+            -7987,
+            -7987
+          ]
+        },
+        "model_turns": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "tool_calls": {
+          "baseline": 8,
+          "candidate": 4.5,
+          "paired_delta": -3.5,
+          "confidence_interval": [
+            -3.5,
+            -3.5
+          ]
+        },
+        "delegated_child_count": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "timeout_rate": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "no_progress_turns": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "whole_task_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "protocol_compliance": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "trace_completeness": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "attestation_completeness": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "family_id": "small-function-boundary",
+      "pair_count": 2,
+      "paired_effects": {
+        "functional_hidden_check_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "regression_free_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "regression_free_high_risk_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "public_contract_preservation": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "structural_oracle_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "missed_consumer_rate": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "introduced_high_medium_defects": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "unnecessary_changed_files": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "verification_omission": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "task_completion_without_human_intervention": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "duration": {
+          "baseline": 14228,
+          "candidate": 18756,
+          "paired_delta": 4528,
+          "confidence_interval": [
+            4528,
+            4528
+          ]
+        },
+        "model_turns": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "tool_calls": {
+          "baseline": 5.5,
+          "candidate": 8.5,
+          "paired_delta": 3,
+          "confidence_interval": [
+            3,
+            3
+          ]
+        },
+        "delegated_child_count": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "timeout_rate": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "no_progress_turns": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "whole_task_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "protocol_compliance": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "trace_completeness": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "attestation_completeness": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "family_id": "small-local-cleanup",
+      "pair_count": 2,
+      "paired_effects": {
+        "functional_hidden_check_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "regression_free_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "regression_free_high_risk_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "public_contract_preservation": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "structural_oracle_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "missed_consumer_rate": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "introduced_high_medium_defects": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "unnecessary_changed_files": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "verification_omission": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "task_completion_without_human_intervention": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "duration": {
+          "baseline": 6725.5,
+          "candidate": 11542.5,
+          "paired_delta": 4817,
+          "confidence_interval": [
+            4817,
+            4817
+          ]
+        },
+        "model_turns": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "tool_calls": {
+          "baseline": 2,
+          "candidate": 5.5,
+          "paired_delta": 3.5,
+          "confidence_interval": [
+            3.5,
+            3.5
+          ]
+        },
+        "delegated_child_count": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "timeout_rate": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "no_progress_turns": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "whole_task_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "protocol_compliance": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "trace_completeness": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "attestation_completeness": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "family_id": "small-parser-boundary",
+      "pair_count": 2,
+      "paired_effects": {
+        "functional_hidden_check_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "regression_free_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "regression_free_high_risk_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "public_contract_preservation": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "structural_oracle_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "missed_consumer_rate": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "introduced_high_medium_defects": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "unnecessary_changed_files": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "verification_omission": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "task_completion_without_human_intervention": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "duration": {
+          "baseline": 23610,
+          "candidate": 18118.5,
+          "paired_delta": -5491.5,
+          "confidence_interval": [
+            -5491.5,
+            -5491.5
+          ]
+        },
+        "model_turns": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "tool_calls": {
+          "baseline": 9,
+          "candidate": 4,
+          "paired_delta": -5,
+          "confidence_interval": [
+            -5,
+            -5
+          ]
+        },
+        "delegated_child_count": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "timeout_rate": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "no_progress_turns": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "whole_task_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "protocol_compliance": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "trace_completeness": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "attestation_completeness": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "family_id": "small-review-only",
+      "pair_count": 2,
+      "paired_effects": {
+        "functional_hidden_check_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "regression_free_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "regression_free_high_risk_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "public_contract_preservation": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "structural_oracle_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "missed_consumer_rate": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "introduced_high_medium_defects": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "unnecessary_changed_files": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "verification_omission": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "task_completion_without_human_intervention": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "duration": {
+          "baseline": 12570.5,
+          "candidate": 11128,
+          "paired_delta": -1442.5,
+          "confidence_interval": [
+            -1442.5,
+            -1442.5
+          ]
+        },
+        "model_turns": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "tool_calls": {
+          "baseline": 4,
+          "candidate": 3,
+          "paired_delta": -1,
+          "confidence_interval": [
+            -1,
+            -1
+          ]
+        },
+        "delegated_child_count": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "timeout_rate": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "no_progress_turns": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "whole_task_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "protocol_compliance": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "trace_completeness": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "attestation_completeness": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        }
+      }
+    }
+  ],
+  "per_stratum": [
+    {
+      "stratum": "medium",
+      "pair_count": 16,
+      "family_count": 8,
+      "paired_effects": {
+        "functional_hidden_check_success": {
+          "baseline": 0.125,
+          "candidate": 0.125,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "regression_free_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "regression_free_high_risk_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "public_contract_preservation": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "structural_oracle_success": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "missed_consumer_rate": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "introduced_high_medium_defects": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "unnecessary_changed_files": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "verification_omission": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "task_completion_without_human_intervention": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "duration": {
+          "baseline": 19481.8125,
+          "candidate": 19346.1875,
+          "paired_delta": -135.625,
+          "confidence_interval": [
+            -2756.0625,
+            2486.875
+          ]
+        },
+        "model_turns": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "tool_calls": {
+          "baseline": 7.4375,
+          "candidate": 7.125,
+          "paired_delta": -0.3125,
+          "confidence_interval": [
+            -1.5625,
+            1.0625
+          ]
+        },
+        "delegated_child_count": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "timeout_rate": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "no_progress_turns": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "whole_task_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "protocol_compliance": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "trace_completeness": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "attestation_completeness": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "stratum": "small",
+      "pair_count": 10,
+      "family_count": 5,
+      "paired_effects": {
+        "functional_hidden_check_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "regression_free_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "regression_free_high_risk_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "public_contract_preservation": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "structural_oracle_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "missed_consumer_rate": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "introduced_high_medium_defects": {
+          "baseline": 0.2,
+          "candidate": 0.2,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "unnecessary_changed_files": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "verification_omission": {
+          "baseline": 0.8,
+          "candidate": 0.8,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "task_completion_without_human_intervention": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "duration": {
+          "baseline": 15702,
+          "candidate": 14586.8,
+          "paired_delta": -1115.2000000000007,
+          "confidence_interval": [
+            -5484,
+            3449.5
+          ]
+        },
+        "model_turns": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "tool_calls": {
+          "baseline": 5.7,
+          "candidate": 5.1,
+          "paired_delta": -0.6000000000000005,
+          "confidence_interval": [
+            -3.4,
+            2.4
+          ]
+        },
+        "delegated_child_count": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "timeout_rate": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "no_progress_turns": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "whole_task_success": {
+          "baseline": 0,
+          "candidate": 0,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "protocol_compliance": {
+          "baseline": 0.2,
+          "candidate": 0.2,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "trace_completeness": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        },
+        "attestation_completeness": {
+          "baseline": 1,
+          "candidate": 1,
+          "paired_delta": 0,
+          "confidence_interval": [
+            0,
+            0
+          ]
+        }
+      }
+    }
+  ],
+  "pareto": {
+    "target_metric": "verification_omission",
+    "duration_delta": -512.3846153846134,
+    "tool_call_delta": -0.42307692307692335,
+    "timeout_rate_delta": 0
+  },
+  "incomplete_outcomes": [],
+  "guardrail_results": [
+    {
+      "id": "minimum-complete-pairs-per-stratum",
+      "passed": true,
+      "observed": {
+        "medium": 16,
+        "small": 10
+      },
+      "threshold": 8
+    },
+    {
+      "id": "minimum-task-families-per-standard-estimand",
+      "passed": true,
+      "observed": 13,
+      "threshold": 8
+    },
+    {
+      "id": "small-negative-control-delta-minimum",
+      "passed": true,
+      "observed": null,
+      "threshold": -0.03
+    },
+    {
+      "id": "timeout-rate-delta-maximum",
+      "passed": true,
+      "observed": 0,
+      "threshold": 0.02
+    },
+    {
+      "id": "functional-harm-ci-lower-bound-minimum",
+      "passed": true,
+      "observed": 0,
+      "threshold": -0.05
+    },
+    {
+      "id": "introduced-high-medium-defects-maximum",
+      "passed": false,
+      "observed": 0.07692307692307693,
+      "threshold": 0
+    },
+    {
+      "id": "trusted-model-backed-contained-run",
+      "passed": true,
+      "observed": "model-backed-contained-run",
+      "threshold": "model-backed-contained-run"
+    }
+  ],
+  "verdict": "reject",
+  "source_evidence_fingerprint": "sha256:9e449ae3463daccc1460600846e0d0f46584d72143d6abc88631171171604325",
+  "policy_fingerprint": "sha256:f050a814723943d10c4346aa295606a316c02f21c250eeef82611a8c7409e6f3",
+  "decision_fingerprint": "sha256:34cd3215288b5b6789672dd7e5a16e8a35c99cc595e92fac26a5a1aae602db44"
+}
