@@ -378,6 +378,7 @@ const requiredFiles = [
   "lib/benchmark/statistics.mjs",
   "lib/feedback/contracts.mjs",
   "lib/feedback/evidence.mjs",
+  "lib/benchmark/paired-defect-evaluator.mjs",
   "lib/quality/milestone-dod.mjs",
   "lib/quality/normal-session-bridge.mjs",
   "lib/quality/normal-session-plugin.mjs",
@@ -414,6 +415,7 @@ const requiredFiles = [
   "scripts/verify-benchmark-isolation.mjs",
   "scripts/verify-benchmark-model-free-contract.mjs",
   "scripts/verify-benchmark-model-free.mjs",
+  "scripts/verify-benchmark-paired-defects.mjs",
   "scripts/verify-benchmark-renderer.mjs",
   "scripts/verify-benchmark-reporting.mjs",
   "scripts/verify-benchmark-runner.mjs",
@@ -546,7 +548,7 @@ for (const forbiddenScript of ["assess:quality-candidate", "verify:model-profile
   }
 }
 const expectedDeterministicStages = [
-  "verify:v0.4", "verify:static", "verify:benchmark:model-free", "verify:feedback-foundation", "verify:trace-store", "verify:report-history", "verify:adapter-worker",
+  "verify:v0.4", "verify:static", "verify:benchmark:model-free", "verify:evaluator:paired-defects", "verify:feedback-foundation", "verify:trace-store", "verify:report-history", "verify:adapter-worker",
   "eval", "verify:drift", "verify:adoption-bundle", "verify:package-boundary", "verify:runtime:fixture", "verify:runtime:quality-hooks:fixture",
   "verify:live-eval", "verify:acceptance",
   "verify:quality-contracts", "verify:engineering-dossier", "verify:architecture-policy", "verify:impact-graph",
@@ -754,6 +756,7 @@ for (const [name, command] of Object.entries({
   "verify:benchmark:comparison-reporting": "node scripts/verify-benchmark-comparison-reporting.mjs",
   "verify:benchmark:isolation": "node scripts/verify-benchmark-isolation.mjs",
   "verify:benchmark:model-free": "node scripts/verify-benchmark-model-free.mjs",
+  "verify:evaluator:paired-defects": "node scripts/verify-benchmark-paired-defects.mjs",
   "verify:benchmark:contracts": "node scripts/verify-benchmark-contracts.mjs",
   "verify:benchmark:renderer": "node scripts/verify-benchmark-renderer.mjs",
   "verify:benchmark:reporting": "node scripts/verify-benchmark-reporting.mjs",
