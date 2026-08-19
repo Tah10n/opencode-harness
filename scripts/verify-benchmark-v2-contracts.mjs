@@ -16,6 +16,8 @@ assert.deepEqual(report.family_totals, { development: 36, validation: 30, holdou
 assert.equal(report.paired_holdout_observations, 180);
 assert.equal(report.real_commit_candidate_count, 36);
 assert.equal(report.real_commit_repository_count, 5);
+assert.equal(report.procedural_candidate_count, 72);
+assert.equal(report.procedural_high_risk_domain_count, 11);
 assert(report.exact_power > 0.86);
 assert(report.clustered_sensitivity_power > 0.82);
 
@@ -70,6 +72,29 @@ assert.throws(() => validateBenchmarkV2Contracts({
   ...loaded,
   realCommitCandidates: unsafeChangedPath,
 }), /BENCHMARK_V2_REAL_COMMIT_PATH/u);
+
+const prematureProceduralExecution = structuredClone(loaded.proceduralCandidates);
+prematureProceduralExecution.task_materialization_status = "executable";
+assert.throws(() => validateBenchmarkV2Contracts({
+  ...loaded,
+  proceduralCandidates: prematureProceduralExecution,
+}), /BENCHMARK_V2_PROCEDURAL_REGISTRY/u);
+
+const duplicateProceduralRecipe = structuredClone(loaded.proceduralCandidates);
+duplicateProceduralRecipe.candidates[1].recipe_id = duplicateProceduralRecipe.candidates[0].recipe_id;
+assert.throws(() => validateBenchmarkV2Contracts({
+  ...loaded,
+  proceduralCandidates: duplicateProceduralRecipe,
+}), /BENCHMARK_V2_PROCEDURAL_COVERAGE/u);
+
+const missingRiskDomain = structuredClone(loaded.proceduralCandidates);
+for (const candidate of missingRiskDomain.candidates) {
+  if (candidate.risk_domain === "rollback") candidate.risk_domain = "authorization";
+}
+assert.throws(() => validateBenchmarkV2Contracts({
+  ...loaded,
+  proceduralCandidates: missingRiskDomain,
+}), /BENCHMARK_V2_PROCEDURAL_COVERAGE/u);
 
 const underpowered = exactMcNemarPower({
   pair_count: 120,

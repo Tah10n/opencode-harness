@@ -72,6 +72,13 @@ candidate registry cannot trigger an early selection. Runtime selections do not
 mutate the source contract and therefore do not invalidate later verification
 of the same frozen source; each manifest remains bound to one freeze fingerprint.
 
+The procedural universe is also preregistered before selection: 72 recipe
+identities, 24 per stratum. Every medium recipe declares a two-file solution and
+the high-risk registry covers all eleven preregistered risk domains. Its current
+status is explicitly not materialized; recipe metadata cannot be passed to the
+selector as an executable pool until every generated fixture and oracle passes
+the corpus contract.
+
 ## Real-repository pilot boundary
 
 The preregistered pilot runs only after a positive synthetic holdout gate and is
