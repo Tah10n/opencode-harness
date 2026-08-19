@@ -257,6 +257,7 @@ const withRemediation = await attempt("P3", findingReviewerAdapter, remediationP
 const withOffDiffFinding = await attempt("P3", offDiffReviewerAdapter);
 assert.equal(prompts.get("P3").includes("HOST_REPOSITORY_MAP_V1="), false);
 assert.equal(prompts.get("P4").includes("HOST_REPOSITORY_MAP_V1="), true);
+assert.doesNotMatch(prompts.get("P4"), /[\r\n]/u);
 assert(prompts.get("P4").length <= 16_000);
 assert.deepEqual(withoutMap.result.vnext_context_map_observation, {
   eligible: true,
@@ -270,8 +271,9 @@ assert.equal(withMap.result.vnext_context_map_observation.consumer_recall, 1);
 assert(withMap.result.vnext_context_map_observation.context_bytes <= 12_000);
 assert.equal(withMap.result.termination_acceptable, true);
 assert.equal(withMap.result.metrics.context_read_count, withoutMap.result.metrics.context_read_count + 1);
-assert.match(reviewerPrompt, /VISIBLE_REQUIREMENTS=/u);
+assert.match(reviewerPrompt, /VISIBLE_REQUIREMENTS_JSON=/u);
 assert.match(reviewerPrompt, /FINAL_DIFF_V1=/u);
+assert.doesNotMatch(reviewerPrompt, /[\r\n]/u);
 assert.equal(withReview.result.vnext_automatic_review_observation.review_required_count, 1);
 assert.equal(withReview.result.vnext_automatic_review_observation.review_started_count, 1);
 assert.equal(withReview.result.vnext_automatic_review_observation.review_completed_count, 1);

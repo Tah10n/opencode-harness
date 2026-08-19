@@ -23,9 +23,10 @@ try {
     before: "export const value = 1;\n",
     after: "export const value = 2;\n",
   });
-  const prompt = renderAutomaticReviewPrompt({ visible_requirements: "Change value to 2", final_diff: diff });
-  assert.match(prompt, /VISIBLE_REQUIREMENTS=Change value to 2/u);
+  const prompt = renderAutomaticReviewPrompt({ visible_requirements: "Change value to 2\nwithout side effects", final_diff: diff });
+  assert.match(prompt, /VISIBLE_REQUIREMENTS_JSON="Change value to 2\\nwithout side effects"/u);
   assert.match(prompt, /FINAL_DIFF_V1=/u);
+  assert.doesNotMatch(prompt, /[\r\n]/u);
   assert.doesNotMatch(prompt, /reference patch/iu);
   const complete = automaticReviewObservation({ eligible: true, started: true, completed: true, workspace_unchanged: true });
   assert.equal(complete.terminal_allowed, true);
