@@ -40,6 +40,13 @@ assert.throws(() => validateBenchmarkV2Contracts({
   policy: weakenedPolicy,
 }), /BENCHMARK_V2_POLICY/u);
 
+const weakenedSaltCommitment = structuredClone(loaded.saltCommitment);
+weakenedSaltCommitment.created_before_holdout_selection = false;
+assert.throws(() => validateBenchmarkV2Contracts({
+  ...loaded,
+  saltCommitment: weakenedSaltCommitment,
+}), /BENCHMARK_V2_HOLDOUT_SALT/u);
+
 const underpowered = exactMcNemarPower({
   pair_count: 120,
   candidate_only_probability: 0.10,

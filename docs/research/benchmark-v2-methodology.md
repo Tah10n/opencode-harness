@@ -45,6 +45,23 @@ artifact already exists. Deleting evidence to reuse an ordinal violates the
 sealed-validation contract even if the repository cannot prevent that external
 administrative action.
 
+## Pre-selection freeze
+
+The committed salt commitment binds a private, git-ignored 256-bit preimage;
+the preimage is not an evidence artifact. `npm run bench:v2:freeze` may run only
+from a clean committed tree and combines that salt with the frozen candidate SHA
+and previously unknown workflow run ID. Its manifest binds the Git tree, harness
+closure, evaluator, promotion policy, task-generator closure, complete benchmark
+contract, model/provider/variant/timeout, executable identity, candidate arm,
+alpha round, and arm-ordering policy.
+
+The freeze manifest is written with create-only semantics under `.oc_harness/`
+and has `holdout_selected: false`. It neither selects nor exposes holdout tasks.
+The strict reader rebuilds every binding from the current source and salt; any
+post-freeze source, evaluator, policy, generator, model, timeout, executable, or
+seed drift invalidates the manifest. Holdout selection must consume the
+validated manifest in a later workflow step and publish it as immutable evidence.
+
 ## Why the design is paired and sealed
 
 The primary outcome is binary and both arms run the same task/seed/binding, so

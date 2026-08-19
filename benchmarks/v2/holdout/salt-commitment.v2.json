@@ -1,0 +1,8 @@
+{
+  "schema_version": 2,
+  "commitment_id": "benchmark-v2-holdout-preregistered-salt",
+  "algorithm": "profile-value-sha256-v1",
+  "commitment": "sha256:ea612f2eb9a688d9de167af216c9cab4f05760b003f81fc822b598f17d8cd786",
+  "created_before_holdout_selection": true,
+  "preimage_storage": "git-ignored-private-runtime-state"
+}

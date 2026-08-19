@@ -82,6 +82,7 @@ export const DETERMINISTIC_STAGE_REGISTRY = Object.freeze([
   { command_id: "verify-benchmark-v2-contracts", npm_script: "verify:benchmark:v2:contracts", check_ids: [] },
   { command_id: "verify-benchmark-v2-fixtures", npm_script: "verify:benchmark:v2:fixtures", check_ids: [] },
   { command_id: "verify-benchmark-v2-campaign", npm_script: "verify:benchmark:v2:campaign", check_ids: [] },
+  { command_id: "verify-benchmark-v2-freeze", npm_script: "verify:benchmark:v2:freeze", check_ids: [] },
   { command_id: "verify-bounded-repository-map", npm_script: "verify:bounded-repository-map", check_ids: [] },
   { command_id: "verify-bounded-repository-map-runner", npm_script: "verify:bounded-repository-map-runner", check_ids: [] },
   { command_id: "verify-automatic-review-gate", npm_script: "verify:automatic-review-gate", check_ids: [] },
