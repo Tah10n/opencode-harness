@@ -8,8 +8,10 @@ use. From a source checkout:
 ```sh
 npm run profile:materialize -- --profile core --output /absolute/target
 npm run profile:materialize -- --profile deep --output /absolute/target-deep
-npm run profile:materialize -- --profile assurance --output /absolute/target-assurance
 ```
+
+Legacy research reproduction may additionally materialize `assurance` with an
+explicit `--profile assurance`; it is not part of the product adoption path.
 
 Each target is an OpenCode configuration directory. Keep it disjoint from the
 project workspace, set `OPENCODE_CONFIG_DIR` to it, and run OpenCode from the
@@ -33,9 +35,9 @@ remains a hard failure. Core needs Node.js only to run this source-repository ma
 materialized OpenCode runtime does not.
 
 `deep` requires no assurance plugin and falls back to ordinary bounded
-read/search if the optional context capability is absent. `assurance` is
-experimental and includes the quality engine and trusted-check/containment
-dependencies but not benchmark or evaluation content. Its project workspace,
+read/search if the optional context capability is absent. Legacy `assurance` is
+deprecated research-only and includes the quality engine and trusted-check/containment
+dependencies but not benchmark or evaluation content. For reproduction, its project workspace,
 not the materialized config directory, must provide project-specific
 `.opencode/quality/checks.json` and `.opencode/quality/toolchains.json`.
 Provision the machine-specific

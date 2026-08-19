@@ -68,9 +68,10 @@ from the default core path.
 
 Do not use recursive-context or quality lifecycle tools. If the task is a broad
 audit, large diff, multi-module investigation, or long-log diagnosis, recommend
-or explicitly select `deep`. If it crosses security, authorization, migration,
-durable persistence, shared-state concurrency, destructive data, or a critical
-public contract, recommend `assurance`; do not start it automatically.
+or explicitly select `deep`. For security, authorization, migration, durable
+persistence, shared-state concurrency, destructive data, or a critical public
+contract, follow project-owned controls or report that no promoted harness mode
+currently covers the risk. Do not recommend or start legacy `assurance`.
 
 Prefer project-owned computational feedback. Preserve unmentioned behavior,
 public shapes, failure semantics, permissions, ownership, privacy, and

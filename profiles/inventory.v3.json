@@ -238,7 +238,7 @@
     },
     {
       "id": "core",
-      "status": "production-default",
+      "status": "development-default",
       "runtime": true,
       "primary_role_id": "core",
       "component_ids": [
@@ -264,7 +264,7 @@
     },
     {
       "id": "assurance",
-      "status": "experimental-opt-in",
+      "status": "deprecated-research-only",
       "runtime": true,
       "primary_role_id": "assurance",
       "component_ids": [

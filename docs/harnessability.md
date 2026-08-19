@@ -6,9 +6,9 @@
   boundaries.
 - `deep` additionally benefits from a repository broad enough to justify
   bounded context decomposition; the optional capability is not a prerequisite.
-- `assurance` additionally requires explicit ownership, trusted checks, and
-  supported containment for the high-risk operation. If any mandatory signal
-  is absent, the result is blocked rather than weakened.
+- legacy `assurance` additionally requires explicit ownership, trusted checks,
+  and supported containment when reproducing historical research. It is not an
+  adoption recommendation; missing mandatory signals remain blocked.
 - `lab` requires reproducible fixtures and honest hidden-check isolation; it is
   never an adoption prerequisite.
 

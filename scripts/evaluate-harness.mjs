@@ -108,7 +108,7 @@ const scenarios = [
     category: "maintainability",
     checks: () => {
       includes("AGENTS.md", "Small local tasks stay single-agent.", "Small work should not pay orchestration overhead.");
-      includes("agents/core.md", "Stay single-agent for small local work.", "The canonical core profile should retain the same local-work bias.");
+      includes("agents/core.md", "Stay single-agent.", "The canonical core profile should remain single-agent by default.");
       includes("agents/core.md", "Do not call architect,", "Core should not pay routine orchestration overhead.");
       excludes("AGENTS.md", "Always delegate", "Delegation should stay conditional, not automatic.");
     },
@@ -126,9 +126,9 @@ const scenarios = [
     category: "architecture-fitness",
     checks: () => {
       exists("skills/global-quality-gates/SKILL.md", "High-assurance work should have a detailed quality-gate skill.");
-      includes("AGENTS.md", "`assurance` is experimental and opt-in.", "The compact core rules should route high-risk work to the explicit assurance profile.");
-      includes("agents/core.md", "recommend `assurance`; do not start it automatically.", "Core should recommend, but never silently enter, assurance.");
-      includes("agents/assurance.md", "This is an experimental opt-in profile.", "The canonical assurance profile should remain explicit and experimental.");
+      includes("AGENTS.md", "`assurance` is a deprecated research-only compatibility profile.", "The compact core rules must not route product work to legacy assurance.");
+      includes("agents/core.md", "Do not recommend or start legacy `assurance`.", "Core should keep legacy assurance outside the product path.");
+      includes("agents/assurance.md", "This is a deprecated research-only compatibility profile.", "The legacy assurance profile should remain explicit and research-only.");
       includes("agents/assurance.md", "Use only the four high-level assurance operations.", "Assurance should use the bounded facade rather than legacy low-level tools.");
       includes("docs/harness-map.md", "Quality gates", "The control map should classify quality gates.");
     },
@@ -501,7 +501,7 @@ for (const probe of [
   {
     scenarioId: "small-local-task-single-agent",
     file: "agents/core.md",
-    needle: "Stay single-agent for small local work.",
+    needle: "Stay single-agent.",
   },
   {
     scenarioId: "broad-audit-recursive-context",
