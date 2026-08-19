@@ -110,7 +110,7 @@
     },
     {
       "id": "independent-final-review",
-      "status": "optional",
+      "status": "development-candidate",
       "target_metric": "introduced_high_medium_defects",
       "intervention_path": "benchmarks/vnext/components/independent-final-review.md",
       "intervention_vector": {
@@ -118,9 +118,9 @@
           "benchmarks/vnext/components/independent-final-review.md",
           "agents/core.md"
         ],
-        "roles": ["primary-core-reviewed"],
+        "roles": ["primary-core-reviewed", "host-triggered-core-reviewer"],
         "tools": [],
-        "permissions": ["review:mandatory"]
+        "permissions": ["review:host-mandatory", "review:read-only"]
       }
     },
     {
@@ -178,19 +178,25 @@
     ],
     "independent-final-review": [
       "/effective_config/default_agent",
-      "/materialized_files/1/fingerprint",
-      "/materialized_files/1/path"
-    ],
-    "deep-context": [
-      "/effective_config/default_agent",
+      "/materialized_files/0/fingerprint",
+      "/materialized_files/0/path",
       "/materialized_files/1/fingerprint",
       "/materialized_files/1/path",
       "/materialized_files/2/fingerprint",
       "/materialized_files/2/path",
       "/materialized_files/3/fingerprint",
+      "/materialized_files/3/path"
+    ],
+    "deep-context": [
+      "/effective_config/default_agent",
+      "/materialized_files/1/fingerprint",
+      "/materialized_files/1/path",
+      "/materialized_files/3/fingerprint",
       "/materialized_files/3/path",
       "/materialized_files/4/fingerprint",
-      "/materialized_files/4/path"
+      "/materialized_files/4/path",
+      "/materialized_files/5/fingerprint",
+      "/materialized_files/5/path"
     ],
     "assurance-controls": [
       "/effective_config/default_agent",

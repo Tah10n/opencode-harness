@@ -21,6 +21,8 @@ const instance = renderBenchmarkV2DevelopmentFamily({
   seed: "bounded-repository-map-runner",
 });
 const prompts = new Map();
+let reviewerPrompt = null;
+let remediationPrimaryCallCount = 0;
 
 function commandRunner() {
   return Promise.resolve({
@@ -118,7 +120,93 @@ async function fixtureAdapter({ context, onTrace, timeout }) {
   };
 }
 
-async function attempt(profileId) {
+async function automaticReviewerAdapter({ context, timeout }) {
+  assert.equal(timeout, syntheticAdapterWorkerTimeoutMs(context.timeout));
+  assert.equal(context.agentId, "core-reviewer");
+  assert.equal(context.taskScopeMode, "read-only");
+  reviewerPrompt = context.prompt;
+  return {
+    passed: true,
+    status: "completed",
+    termination_reason: "verified",
+    reason: null,
+    adapter_protocol_version: SYNTHETIC_OPENCODE_ADAPTER_VERSION,
+    adapter_fingerprint: fingerprint({ fixture: "automatic-reviewer" }),
+    profile_fingerprint: context.profileFingerprint,
+    cli_version: "1.18.18",
+    parser_status: "valid",
+    response_protocol_status: "structured-review",
+    agent_outcome: null,
+    claimed_completion: true,
+    claimed_outcome_availability: "unavailable",
+    explicit_block: false,
+    explicit_failure: false,
+    review_findings: [],
+    transient_observations: {
+      observation_complete: true,
+      ambiguity_count: 0,
+      path_observation_rejection_count: 0,
+      observed_repository_instruction_action_count: 0,
+      observed_secret_write_count: 0,
+      observed_control_path_action_count: 0,
+    },
+    trace_summary: {
+      stream_complete: true,
+      unknown_event_count: 0,
+      unfinished_tool_call_count: 0,
+      observed_mutation_tool_count: 0,
+      observed_dangerous_command_count: 0,
+      observed_network_tool_count: 0,
+    },
+    stdout_bytes: 128,
+    stderr_bytes: 0,
+    duration_ms: 5,
+    model_turn_count: 1,
+    continuation_turn_count: 0,
+  };
+}
+
+async function findingReviewerAdapter(input) {
+  const result = await automaticReviewerAdapter(input);
+  return {
+    ...result,
+    review_findings: [{
+      severity: "MEDIUM",
+      path: instance.solution_files[0].path,
+      line: 1,
+      contract: "the final source must not retain the injected review marker",
+      evidence: "the exact final diff contains REVIEW_DEFECT_MARKER",
+      body: "remove only the marker and preserve the functional fix",
+    }],
+  };
+}
+
+async function offDiffReviewerAdapter(input) {
+  const result = await automaticReviewerAdapter(input);
+  return {
+    ...result,
+    review_findings: [{
+      severity: "HIGH",
+      path: "src/not-in-final-diff.mjs",
+      line: 1,
+      contract: "invented contract",
+      evidence: "invented evidence",
+      body: "do not accept this finding",
+    }],
+  };
+}
+
+async function remediationPrimaryAdapter(input) {
+  remediationPrimaryCallCount += 1;
+  const result = await fixtureAdapter(input);
+  if (remediationPrimaryCallCount === 1) {
+    const target = path.join(input.context.repo, ...instance.solution_files[0].path.split("/"));
+    fs.appendFileSync(target, "// REVIEW_DEFECT_MARKER\n", "utf8");
+  }
+  return result;
+}
+
+async function attempt(profileId, reviewerInvoker = null, primaryInvoker = fixtureAdapter) {
   let nextId = 0;
   return runSyntheticProfileAttempt({
     sourceRoot: root,
@@ -129,7 +217,8 @@ async function attempt(profileId) {
     provider: "fixture",
     timeoutMs: 60_000,
     adapterUrl: new URL("../lib/benchmark/opencode-adapter.mjs", import.meta.url).href,
-    adapterInvoker: fixtureAdapter,
+    adapterInvoker: primaryInvoker,
+    reviewerInvoker,
     commandRunner,
     profileMaterializer: materializeVnextSyntheticProfile,
     clock: () => new Date("2026-08-19T00:00:00.000Z"),
@@ -139,6 +228,9 @@ async function attempt(profileId) {
 
 const withoutMap = await attempt("P3");
 const withMap = await attempt("P4");
+const withReview = await attempt("P3", automaticReviewerAdapter);
+const withRemediation = await attempt("P3", findingReviewerAdapter, remediationPrimaryAdapter);
+const withOffDiffFinding = await attempt("P3", offDiffReviewerAdapter);
 assert.equal(prompts.get("P3").includes("HOST_REPOSITORY_MAP_V1="), false);
 assert.equal(prompts.get("P4").includes("HOST_REPOSITORY_MAP_V1="), true);
 assert(prompts.get("P4").length <= 16_000);
@@ -154,5 +246,23 @@ assert.equal(withMap.result.vnext_context_map_observation.consumer_recall, 1);
 assert(withMap.result.vnext_context_map_observation.context_bytes <= 12_000);
 assert.equal(withMap.result.termination_acceptable, true);
 assert.equal(withMap.result.metrics.context_read_count, withoutMap.result.metrics.context_read_count + 1);
+assert.match(reviewerPrompt, /VISIBLE_REQUIREMENTS=/u);
+assert.match(reviewerPrompt, /FINAL_DIFF_V1=/u);
+assert.equal(withReview.result.vnext_automatic_review_observation.review_required_count, 1);
+assert.equal(withReview.result.vnext_automatic_review_observation.review_started_count, 1);
+assert.equal(withReview.result.vnext_automatic_review_observation.review_completed_count, 1);
+assert.equal(withReview.result.vnext_automatic_review_observation.review_finding_count, 0);
+assert.equal(withReview.result.vnext_automatic_review_observation.reviewer_caused_fix_count, 0);
+assert.equal(withReview.result.vnext_automatic_review_observation.workspace_unchanged, true);
+assert.equal(withReview.result.termination_acceptable, true);
+assert.equal(remediationPrimaryCallCount, 2);
+assert.equal(withRemediation.result.vnext_automatic_review_observation.review_finding_count, 1);
+assert.equal(withRemediation.result.vnext_automatic_review_observation.reviewer_caused_fix_count, 1);
+assert.equal(withRemediation.result.vnext_automatic_review_observation.reason, "review_findings_remediated_and_reverified");
+assert.equal(withRemediation.result.visible_check.passed, true);
+assert.equal(withRemediation.result.termination_acceptable, true);
+assert.equal(withOffDiffFinding.result.vnext_automatic_review_observation.review_started_count, 1);
+assert.equal(withOffDiffFinding.result.vnext_automatic_review_observation.review_completed_count, 0);
+assert.equal(withOffDiffFinding.result.termination_acceptable, false);
 
 process.stdout.write("bounded repository map runner integration passed\n");

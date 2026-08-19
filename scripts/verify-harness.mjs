@@ -381,6 +381,7 @@ const requiredFiles = [
   "lib/benchmark/paired-defect-evaluator.mjs",
   "lib/quality/core-verification-gate.mjs",
   "lib/quality/bounded-repository-map.mjs",
+  "lib/quality/automatic-review-gate.mjs",
   "lib/benchmark/v2-contracts.mjs",
   "lib/benchmark/v2-fixtures.mjs",
   "lib/benchmark/v2-validation-kernels.mjs",
@@ -427,6 +428,7 @@ const requiredFiles = [
   "scripts/verify-benchmark-v2-fixtures.mjs",
   "scripts/verify-bounded-repository-map.mjs",
   "scripts/verify-bounded-repository-map-runner.mjs",
+  "scripts/verify-automatic-review-gate.mjs",
   "scripts/verify-benchmark-renderer.mjs",
   "scripts/verify-benchmark-reporting.mjs",
   "scripts/verify-benchmark-runner.mjs",
@@ -559,7 +561,7 @@ for (const forbiddenScript of ["assess:quality-candidate", "verify:model-profile
   }
 }
 const expectedDeterministicStages = [
-  "verify:v0.4", "verify:static", "verify:benchmark:model-free", "verify:evaluator:paired-defects", "verify:core-verification-gate", "verify:core-verification-runner", "verify:benchmark:v2:contracts", "verify:benchmark:v2:fixtures", "verify:bounded-repository-map", "verify:bounded-repository-map-runner", "verify:feedback-foundation", "verify:trace-store", "verify:report-history", "verify:adapter-worker",
+  "verify:v0.4", "verify:static", "verify:benchmark:model-free", "verify:evaluator:paired-defects", "verify:core-verification-gate", "verify:core-verification-runner", "verify:benchmark:v2:contracts", "verify:benchmark:v2:fixtures", "verify:bounded-repository-map", "verify:bounded-repository-map-runner", "verify:automatic-review-gate", "verify:feedback-foundation", "verify:trace-store", "verify:report-history", "verify:adapter-worker",
   "eval", "verify:drift", "verify:adoption-bundle", "verify:package-boundary", "verify:runtime:fixture", "verify:runtime:quality-hooks:fixture",
   "verify:live-eval", "verify:acceptance",
   "verify:quality-contracts", "verify:engineering-dossier", "verify:architecture-policy", "verify:impact-graph",
@@ -774,6 +776,7 @@ for (const [name, command] of Object.entries({
   "verify:benchmark:v2:fixtures": "node scripts/verify-benchmark-v2-fixtures.mjs",
   "verify:bounded-repository-map": "node scripts/verify-bounded-repository-map.mjs",
   "verify:bounded-repository-map-runner": "node scripts/verify-bounded-repository-map-runner.mjs",
+  "verify:automatic-review-gate": "node scripts/verify-automatic-review-gate.mjs",
   "verify:benchmark:contracts": "node scripts/verify-benchmark-contracts.mjs",
   "verify:benchmark:renderer": "node scripts/verify-benchmark-renderer.mjs",
   "verify:benchmark:reporting": "node scripts/verify-benchmark-reporting.mjs",

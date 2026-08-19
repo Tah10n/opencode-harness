@@ -447,7 +447,7 @@ const scenarios = [
       }
       includes("docs/budgets-and-termination.md", "no remaining high-value independent work", "Budget policy should define concrete stop conditions.");
       includes("docs/budgets-and-termination.md", "worker output is weak after one narrowing", "Weak worker output should not cause unbounded loops.");
-      includes("agents/core-reviewer.md", "a stable termination reason", "The canonical core/deep reviewer should report a bounded termination result.");
+      includes("agents/core-reviewer.md", "closed\nJSON schema", "The canonical core/deep reviewer should return a bounded closed result.");
       includes("agents/assurance.md", "report residual risk and\nunverified areas explicitly", "The canonical assurance profile should report residual gaps honestly.");
       includes("agents/orchestrator.md", "termination_reason", "Primary orchestrator should require termination reasons.");
       includes("docs/harness-map.md", "Budget and termination policy", "Budget policy should be represented in the control map.");
