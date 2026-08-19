@@ -9,6 +9,7 @@ import { loadBenchmarkV2Contracts, validateLoadedBenchmarkV2Contracts } from "..
 import {
   renderBenchmarkV2DevelopmentCorpus,
   renderBenchmarkV2ValidationCorpus,
+  renderBenchmarkV2ProceduralSmallCorpus,
   validateBenchmarkV2DevelopmentCorpus,
   validateBenchmarkV2ValidationCorpus,
 } from "../lib/benchmark/v2-fixtures.mjs";
@@ -48,7 +49,24 @@ const validationSummary = validateBenchmarkV2ValidationCorpus(validation);
 assert.deepEqual(validationSummary.counts, { small: 10, medium: 10, high: 10 });
 assert.equal(validationSummary.medium_multifile_count, 5);
 
-for (const instance of [...first, ...validation]) {
+const proceduralSmall = renderBenchmarkV2ProceduralSmallCorpus({
+  repositoryRoot: root,
+  registry: contracts.proceduralCandidates,
+  seed: "benchmark-v2-holdout-small-fixture-verifier",
+  repetition: 1,
+});
+assert.equal(proceduralSmall.length, 24);
+assert.equal(new Set(proceduralSmall.map((instance) => instance.family_id)).size, 24);
+assert.equal(new Set(proceduralSmall.map((instance) => instance.instance_fingerprint)).size, 24);
+const forgedProceduralRegistry = structuredClone(contracts.proceduralCandidates);
+forgedProceduralRegistry.task_materialization_status = "executable";
+assert.throws(() => renderBenchmarkV2ProceduralSmallCorpus({
+  repositoryRoot: root,
+  registry: forgedProceduralRegistry,
+  seed: "benchmark-v2-holdout-small-fixture-verifier",
+}), /preregistered partial-materialization source/u);
+
+for (const instance of [...first, ...validation, ...proceduralSmall]) {
   assert.equal(instance.prompt.includes("reference solution"), false);
   assert.equal(instance.public_files.length <= 20, true);
   assert.equal(instance.hidden_files.every((file) => ["test/", "hidden/"].some((prefix) => file.path.startsWith(prefix))), true);
@@ -61,7 +79,7 @@ for (const instance of [...first, ...validation]) {
 
 const executionRoot = fs.mkdtempSync(path.join(os.tmpdir(), "benchmark-v2-fixtures-"));
 try {
-  for (const instance of [...first, ...validation]) {
+  for (const instance of [...first, ...validation, ...proceduralSmall]) {
     const fixtureRoot = path.join(executionRoot, instance.family_id);
     for (const file of [...instance.public_files, ...instance.solution_files, ...instance.hidden_files]) {
       const target = path.join(fixtureRoot, ...file.path.split("/"));
@@ -88,6 +106,8 @@ process.stdout.write(`${JSON.stringify({
   model_execution: false,
   ...summary,
   validation: validationSummary,
+  procedural_small_count: proceduralSmall.length,
+  procedural_small_fingerprints: proceduralSmall.map((instance) => instance.instance_fingerprint),
   development_fingerprints: first.map((instance) => instance.instance_fingerprint),
   validation_fingerprints: validation.map((instance) => instance.instance_fingerprint),
 }, null, 2)}\n`);

@@ -79,6 +79,12 @@ status is explicitly not materialized; recipe metadata cannot be passed to the
 selector as an executable pool until every generated fixture and oracle passes
 the corpus contract.
 
+The first materialization slice covers all 24 small recipes. Their generated
+reference solutions pass visible and post-settlement hidden tests, including
+precision, encoding, date-canonicalization, and integer-boundary cases. This is
+fixture validation only; the procedural pool remains non-executable until the
+medium and high-risk slices pass the same gate.
+
 ## Real-repository pilot boundary
 
 The preregistered pilot runs only after a positive synthetic holdout gate and is

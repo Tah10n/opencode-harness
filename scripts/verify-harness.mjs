@@ -387,6 +387,7 @@ const requiredFiles = [
   "lib/benchmark/v2-campaign.mjs",
   "lib/benchmark/v2-freeze.mjs",
   "lib/benchmark/v2-holdout-selection.mjs",
+  "lib/benchmark/v2-holdout-kernels.mjs",
   "lib/benchmark/v2-pilot.mjs",
   "lib/benchmark/v2-validation-kernels.mjs",
   "lib/quality/milestone-dod.mjs",
