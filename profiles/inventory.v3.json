@@ -15,8 +15,8 @@
       "AGENTS.md",
       "agents/core.md"
     ],
-    "hard_cap_characters": 16000,
-    "target_characters": 10000,
+    "hard_cap_characters": 8000,
+    "target_characters": 7000,
     "encoding": "utf-8-code-points"
   },
   "facades": [
@@ -83,7 +83,7 @@
   "components": [
     {
       "id": "core-rules",
-      "status": "production",
+      "status": "development-candidate",
       "target_metric": "functional_hidden_check_success",
       "intervention_path": "benchmarks/vnext/components/core-rules.md",
       "intervention_vector": {
@@ -95,18 +95,17 @@
     },
     {
       "id": "targeted-verification",
-      "status": "production",
+      "status": "development-candidate",
       "target_metric": "verification_omission",
       "intervention_path": "benchmarks/vnext/components/targeted-verification.md",
       "intervention_vector": {
         "prompt_fragments": [
           "benchmarks/vnext/components/targeted-verification.md",
-          "agents/core.md",
-          "agents/core-reviewer.md"
+          "agents/core.md"
         ],
-        "roles": ["primary-core", "read-only-reviewer"],
-        "tools": ["task"],
-        "permissions": ["task:read-only-reviewer"]
+        "roles": ["primary-core"],
+        "tools": [],
+        "permissions": ["host:trusted-project-check"]
       }
     },
     {
@@ -246,7 +245,7 @@
         "core-rules",
         "targeted-verification"
       ],
-      "delegation_limit": 1,
+      "delegation_limit": 0,
       "quality_surface": "none"
     },
     {

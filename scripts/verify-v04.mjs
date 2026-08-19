@@ -398,7 +398,7 @@ function verifyCore() {
   "V04_CORE_PERMISSIONS", "core must deny quality, context, and learning surfaces");
   assert(!core.includes("quality_assurance_start: allow")
     && !core.includes("context_outline: allow")
-    && coreBody.includes("Stay single-agent for small local work"),
+    && coreBody.includes("Stay single-agent."),
   "V04_CORE_AGENT", "core agent contains a heavy lifecycle or mandatory delegation");
   const manifest = buildProfileBundleManifest(root, "core").manifest;
   for (const forbidden of ["lib/quality", "quality", "native", "lib/benchmark", "benchmarks", "evals", ".opencode/plugins"]) {
