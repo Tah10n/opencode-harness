@@ -37,6 +37,19 @@ function commandRunner() {
   });
 }
 
+function failingCommandRunner() {
+  return Promise.resolve({
+    status: 1,
+    signal: null,
+    stdout_chars: 0,
+    stderr_chars: 0,
+    stdout_bytes: 0,
+    stderr_bytes: 0,
+    timed_out: false,
+    teardown_verified: true,
+  });
+}
+
 async function fixtureAdapter({ context, onTrace, timeout }) {
   assert.equal(timeout, syntheticAdapterWorkerTimeoutMs(context.timeout));
   prompts.set(context.profileId, context.prompt);
@@ -206,7 +219,12 @@ async function remediationPrimaryAdapter(input) {
   return result;
 }
 
-async function attempt(profileId, reviewerInvoker = null, primaryInvoker = fixtureAdapter) {
+async function attempt(
+  profileId,
+  reviewerInvoker = null,
+  primaryInvoker = fixtureAdapter,
+  selectedCommandRunner = commandRunner,
+) {
   let nextId = 0;
   return runSyntheticProfileAttempt({
     sourceRoot: root,
@@ -219,7 +237,7 @@ async function attempt(profileId, reviewerInvoker = null, primaryInvoker = fixtu
     adapterUrl: new URL("../lib/benchmark/opencode-adapter.mjs", import.meta.url).href,
     adapterInvoker: primaryInvoker,
     reviewerInvoker,
-    commandRunner,
+    commandRunner: selectedCommandRunner,
     profileMaterializer: materializeVnextSyntheticProfile,
     clock: () => new Date("2026-08-19T00:00:00.000Z"),
     idFactory: (kind) => `${kind}-${profileId}-${++nextId}`,
@@ -229,6 +247,12 @@ async function attempt(profileId, reviewerInvoker = null, primaryInvoker = fixtu
 const withoutMap = await attempt("P3");
 const withMap = await attempt("P4");
 const withReview = await attempt("P3", automaticReviewerAdapter);
+const withReviewAfterFailedVerification = await attempt(
+  "P3",
+  automaticReviewerAdapter,
+  fixtureAdapter,
+  failingCommandRunner,
+);
 const withRemediation = await attempt("P3", findingReviewerAdapter, remediationPrimaryAdapter);
 const withOffDiffFinding = await attempt("P3", offDiffReviewerAdapter);
 assert.equal(prompts.get("P3").includes("HOST_REPOSITORY_MAP_V1="), false);
@@ -255,6 +279,20 @@ assert.equal(withReview.result.vnext_automatic_review_observation.review_finding
 assert.equal(withReview.result.vnext_automatic_review_observation.reviewer_caused_fix_count, 0);
 assert.equal(withReview.result.vnext_automatic_review_observation.workspace_unchanged, true);
 assert.equal(withReview.result.termination_acceptable, true);
+assert.equal(withReviewAfterFailedVerification.result.visible_check.passed, false);
+assert.equal(
+  withReviewAfterFailedVerification.result.vnext_automatic_review_observation.review_started_count,
+  1,
+);
+assert.equal(
+  withReviewAfterFailedVerification.result.vnext_automatic_review_observation.review_completed_count,
+  1,
+);
+assert.equal(
+  withReviewAfterFailedVerification.result.vnext_automatic_review_observation.operationally_complete,
+  true,
+);
+assert.equal(withReviewAfterFailedVerification.result.termination_acceptable, false);
 assert.equal(remediationPrimaryCallCount, 2);
 assert.equal(withRemediation.result.vnext_automatic_review_observation.review_finding_count, 1);
 assert.equal(withRemediation.result.vnext_automatic_review_observation.reviewer_caused_fix_count, 1);
