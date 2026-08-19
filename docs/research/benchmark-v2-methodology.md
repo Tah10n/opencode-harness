@@ -97,6 +97,20 @@ canonical executable pool; real-commit materialization remains a separate gate.
 
 ## Real-repository pilot boundary
 
+Real-commit materialization is phase-separated. The pre-model phase validates
+the exact origin, sole parent, MIT license blob, and changed-path metadata, then
+reads only a bounded parent-tree snapshot. It cannot return child-commit file
+contents. Reference files are read in a distinct post-settlement call only after
+an authenticated receipt binds the candidate, public fixture fingerprint, and
+settled model run. The settlement secret belongs to the trusted runner process
+and is neither written into the task workspace nor exposed through model tools.
+
+This boundary does not by itself make the canonical real-commit registry
+executable. That registry remains provenance-only until every preregistered
+repository can be fetched in the trusted runtime, every visible requirement is
+audited for completeness, and every prepared fixture and post-settlement oracle
+passes the corpus gate.
+
 The preregistered pilot runs only after a positive synthetic holdout gate and is
 external-validity evidence, never promotion evidence. It requires at least 12
 new paired tasks from at least three compatible-license repositories. Every
