@@ -54,6 +54,10 @@ import { NORMAL_SESSION_QUALITY_TOOL_IDS } from "../lib/quality/normal-session-b
 import { legacyQualityPluginEnabled } from "../lib/quality/normal-session-plugin.mjs";
 import { PRIMARY_DEVELOPMENT_AGENTS } from "../lib/quality/session-classification.mjs";
 import { ContractError } from "../lib/quality/validation.mjs";
+import {
+  cleanupSyntheticProfile,
+  materializeVnextSyntheticProfile,
+} from "../lib/benchmark/profiles.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const scopeIndex = process.argv.indexOf("--scope");
@@ -965,6 +969,24 @@ function verifyAdoption() {
 
 async function verifyLab() {
   verifyBootstrapSamplerCoverage();
+  for (const profileId of ["P0", "P1", "P5"]) {
+    const materialized = materializeVnextSyntheticProfile({ sourceRoot: root, profileId });
+    try {
+      const config = JSON.parse(fs.readFileSync(materialized.configPath, "utf8"));
+      assert(config.permission.edit === "allow", "V04_LAB_EDIT_PERMISSION",
+        `${profileId} cannot edit its isolated benchmark fixture`);
+      assert(config.permission.external_directory === "deny", "V04_LAB_EXTERNAL_PERMISSION",
+        `${profileId} can escape its isolated benchmark fixture`);
+      assert(config.permission.webfetch === "deny" && config.permission.websearch === "deny",
+        "V04_LAB_NETWORK_PERMISSION", `${profileId} can access unbound benchmark context`);
+      assert(config.permission["quality_*"] === (profileId === "P5" ? "allow" : "deny"),
+        "V04_LAB_QUALITY_PERMISSION", `${profileId} has the wrong quality-tool boundary`);
+      assert(config.permission.bash["node --test *"] === "allow", "V04_LAB_TEST_PERMISSION",
+        `${profileId} cannot run its isolated visible check`);
+    } finally {
+      cleanupSyntheticProfile(materialized);
+    }
+  }
   const context_surface = await verifyBoundedContextSurface();
   const runnerExports = await import("../lib/benchmark/vnext-runner.mjs");
   assert(!Object.hasOwn(runnerExports, "applyVnextPromotionPolicy"),
