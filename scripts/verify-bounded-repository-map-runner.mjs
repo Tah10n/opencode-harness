@@ -23,6 +23,7 @@ const instance = renderBenchmarkV2DevelopmentFamily({
 const prompts = new Map();
 let reviewerPrompt = null;
 let remediationPrimaryCallCount = 0;
+let latestPrimaryProfileManifestPath = null;
 
 function commandRunner() {
   return Promise.resolve({
@@ -52,6 +53,7 @@ function failingCommandRunner() {
 
 async function fixtureAdapter({ context, onTrace, timeout }) {
   assert.equal(timeout, syntheticAdapterWorkerTimeoutMs(context.timeout));
+  latestPrimaryProfileManifestPath = context.profileManifestPath;
   prompts.set(context.profileId, context.prompt);
   for (const file of instance.solution_files) {
     const target = path.join(context.repo, ...file.path.split("/"));
@@ -137,6 +139,7 @@ async function automaticReviewerAdapter({ context, timeout }) {
   assert.equal(timeout, syntheticAdapterWorkerTimeoutMs(context.timeout));
   assert.equal(context.agentId, "core-reviewer");
   assert.equal(context.taskScopeMode, "read-only");
+  assert.notEqual(context.profileManifestPath, latestPrimaryProfileManifestPath);
   reviewerPrompt = context.prompt;
   return {
     passed: true,
