@@ -71,6 +71,13 @@ diff-guided retry; `P0:P10` is reserved for a later plain composite only if the
 incremental transition passes every frozen development gate. P10 has no
 model-backed result yet.
 
+The first P10 campaign attempt on source `0d83dfa49849d32de48cad59a0819a184d06fa40`
+is study-invalid: a novel transition label fell through to composite activation
+aggregation instead of verification-remediation lifecycle aggregation. Its
+outcomes are not P10 evidence. P10 remains a new architecture generation of the
+canonical `verification-remediation` component and requires a fresh full
+development campaign after the registration repair.
+
 Persisted reports exclude prompts, fixture contents, hidden files, reference
 solutions, stdout/stderr, and credentials. The artifact reader recomputes plan,
 pair, and report fingerprints before upload. Development output may retain or

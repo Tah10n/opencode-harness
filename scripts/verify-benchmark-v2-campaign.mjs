@@ -169,7 +169,7 @@ const diffGuidedRetryPlan = buildBenchmarkV2CampaignPlan({
   executableIdentity: executableFingerprint,
   allowDirty: true,
 });
-assert.equal(diffGuidedRetryPlan.component_id, "diff-guided-verification-remediation");
+assert.equal(diffGuidedRetryPlan.component_id, "verification-remediation");
 assert.equal(diffGuidedRetryPlan.schedules.length, 36);
 assert.throws(() => buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
@@ -211,7 +211,7 @@ function binding(instance) {
 async function fakeAttempt({ instance, profileId }) {
   const ordinal = Number.parseInt(createHash(instance.family_id).slice(0, 2), 16);
   const baselineFailure = ordinal % 4 === 0;
-  const success = ["P6", "P8", "P9"].includes(profileId) ? true : !baselineFailure;
+  const success = ["P6", "P8", "P9", "P10"].includes(profileId) ? true : !baselineFailure;
   const passed = check(true);
   const hidden = success ? passed : check(false, "hidden-contract");
   const result = {
@@ -247,7 +247,7 @@ async function fakeAttempt({ instance, profileId }) {
       operationally_complete: true,
       terminal_allowed: true,
     } : null,
-    vnext_verification_remediation_observation: profileId === "P9" ? {
+    vnext_verification_remediation_observation: ["P9", "P10"].includes(profileId) ? {
       eligible: true,
       retry_required_count: 1,
       retry_started_count: 1,
@@ -300,6 +300,15 @@ const retryAcceptance = await executeBenchmarkV2Acceptance({
 assert.equal(retryAcceptance.status, "passed");
 assert.equal(retryAcceptance.family_id, "dev-medium-public-result-shape");
 assert.deepEqual(retryAcceptance.activation, { eligible: true, activated: true });
+const diffGuidedRetryAcceptance = await executeBenchmarkV2Acceptance({
+  repositoryRoot: root,
+  plan: diffGuidedRetryPlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: fakeAttempt,
+});
+assert.equal(diffGuidedRetryAcceptance.status, "passed");
+assert.equal(diffGuidedRetryAcceptance.family_id, "dev-medium-public-result-shape");
+assert.deepEqual(diffGuidedRetryAcceptance.activation, { eligible: true, activated: true });
 assert.equal(report.status, "complete");
 assert.equal(report.pair_results.length, 36);
 assert.equal(report.summary.statistics.activation.rate, 1);
