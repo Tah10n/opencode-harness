@@ -91,6 +91,19 @@ ablation; `P0:P11` is reserved for a later plain composite only if the
 incremental transition passes every development gate. P11 has no model-backed
 result yet.
 
+P11's full P10-to-P11 campaign activated its bounded map on the only eligible
+medium retry, but that retry returned no change and overall success declined
+from 25/36 to 24/36. P11 is rejected.
+
+Development-only arm `P12` keeps P10's diff-guided retry and additionally
+supplies the exact fixed public check invocation selected by the runner. The
+retry may execute it for visible diagnostics, but the runner independently
+reruns the same bound check and remains the evidence authority. The model
+cannot select a different terminal executable, argv, or check ID. `P10:P12`
+isolates check-addressed remediation; `P0:P12` remains reserved for a later
+plain composite only after every development gate passes. P12 has no
+model-backed result yet.
+
 Persisted reports exclude prompts, fixture contents, hidden files, reference
 solutions, stdout/stderr, and credentials. The artifact reader recomputes plan,
 pair, and report fingerprints before upload. Development output may retain or

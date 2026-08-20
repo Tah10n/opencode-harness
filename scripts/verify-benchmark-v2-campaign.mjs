@@ -24,6 +24,7 @@ const isolatedReviewerProfile = materializeVnextSyntheticProfile({ sourceRoot: r
 const verificationRemediationProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P9" });
 const diffGuidedVerificationRemediationProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P10" });
 const retryContextProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P11" });
+const checkAddressedProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P12" });
 try {
   assert.equal(plainProfile.primaryAgentId, "build");
   assert.equal(isolatedVerificationProfile.primaryAgentId, "build");
@@ -43,6 +44,10 @@ try {
       "runtime/host/core-verification-gate.mjs",
       "runtime/host/verification-remediation-gate.mjs",
     ],
+  );
+  assert.deepEqual(
+    checkAddressedProfile.profileEvidence.component_ids,
+    ["targeted-verification", "check-addressed-verification-remediation"],
   );
   assert.deepEqual(
     isolatedVerificationProfile.profileEvidence.runtime_surface.materialized_files.map((entry) => entry.path),
@@ -113,6 +118,7 @@ try {
   cleanupSyntheticProfile(verificationRemediationProfile);
   cleanupSyntheticProfile(diffGuidedVerificationRemediationProfile);
   cleanupSyntheticProfile(retryContextProfile);
+  cleanupSyntheticProfile(checkAddressedProfile);
 }
 const plan = buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
@@ -201,6 +207,22 @@ const retryContextPlan = buildBenchmarkV2CampaignPlan({
   allowDirty: true,
 });
 assert.equal(retryContextPlan.component_id, "retry-bounded-context");
+const checkAddressedPlan = buildBenchmarkV2CampaignPlan({
+  repositoryRoot: root,
+  split: "development",
+  generationId: "generation-fixture-check-addressed-1",
+  baselineArmId: "P10",
+  candidateArmId: "P12",
+  model: "fixture/model",
+  provider: "fixture",
+  variant: "low",
+  timeoutMs: 300_000,
+  seed: "campaign-fixture-seed",
+  repetitions: 1,
+  executableIdentity: executableFingerprint,
+  allowDirty: true,
+});
+assert.equal(checkAddressedPlan.component_id, "verification-remediation");
 assert.throws(() => buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
   split: "validation",
@@ -241,7 +263,7 @@ function binding(instance) {
 async function fakeAttempt({ instance, profileId }) {
   const ordinal = Number.parseInt(createHash(instance.family_id).slice(0, 2), 16);
   const baselineFailure = ordinal % 4 === 0;
-  const success = ["P6", "P8", "P9", "P10", "P11"].includes(profileId) ? true : !baselineFailure;
+  const success = ["P6", "P8", "P9", "P10", "P11", "P12"].includes(profileId) ? true : !baselineFailure;
   const passed = check(true);
   const hidden = success ? passed : check(false, "hidden-contract");
   const result = {
@@ -277,7 +299,7 @@ async function fakeAttempt({ instance, profileId }) {
       operationally_complete: true,
       terminal_allowed: true,
     } : null,
-    vnext_verification_remediation_observation: ["P9", "P10", "P11"].includes(profileId) ? {
+    vnext_verification_remediation_observation: ["P9", "P10", "P11", "P12"].includes(profileId) ? {
       eligible: true,
       retry_required_count: 1,
       retry_started_count: 1,
@@ -352,6 +374,15 @@ const retryContextAcceptance = await executeBenchmarkV2Acceptance({
 assert.equal(retryContextAcceptance.status, "passed");
 assert.equal(retryContextAcceptance.family_id, "dev-medium-public-result-shape");
 assert.deepEqual(retryContextAcceptance.activation, { eligible: true, activated: true });
+const checkAddressedAcceptance = await executeBenchmarkV2Acceptance({
+  repositoryRoot: root,
+  plan: checkAddressedPlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: fakeAttempt,
+});
+assert.equal(checkAddressedAcceptance.status, "passed");
+assert.equal(checkAddressedAcceptance.family_id, "dev-medium-public-result-shape");
+assert.deepEqual(checkAddressedAcceptance.activation, { eligible: true, activated: true });
 assert.equal(report.status, "complete");
 assert.equal(report.pair_results.length, 36);
 assert.equal(report.summary.statistics.activation.rate, 1);

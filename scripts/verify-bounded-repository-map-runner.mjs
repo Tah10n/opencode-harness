@@ -26,6 +26,7 @@ let remediationPrimaryCallCount = 0;
 let verificationRetryPrimaryCallCount = 0;
 let diffGuidedRetryPrimaryCallCount = 0;
 let retryContextPrimaryCallCount = 0;
+let checkAddressedPrimaryCallCount = 0;
 let invalidRetryPrimaryCallCount = 0;
 let latestPrimaryProfileManifestPath = null;
 
@@ -273,6 +274,16 @@ async function retryContextPrimaryAdapter(input) {
   return result;
 }
 
+async function checkAddressedPrimaryAdapter(input) {
+  checkAddressedPrimaryCallCount += 1;
+  const result = await fixtureAdapter(input);
+  if (checkAddressedPrimaryCallCount === 1) {
+    const target = path.join(input.context.repo, ...instance.solution_files[0].path.split("/"));
+    fs.appendFileSync(target, "// VISIBLE_VERIFICATION_DEFECT\n", "utf8");
+  }
+  return result;
+}
+
 async function invalidRetryPrimaryAdapter(input) {
   invalidRetryPrimaryCallCount += 1;
   const result = await fixtureAdapter(input);
@@ -343,6 +354,12 @@ const withRetryContext = await attempt(
   "P11",
   null,
   retryContextPrimaryAdapter,
+  failOnceCommandRunner(),
+);
+const withCheckAddressedRetry = await attempt(
+  "P12",
+  null,
+  checkAddressedPrimaryAdapter,
   failOnceCommandRunner(),
 );
 const withInvalidRetryMutation = await attempt(
@@ -427,6 +444,12 @@ assert.equal(withRetryContext.result.vnext_verification_remediation_observation.
 assert.equal(withRetryContext.result.termination_acceptable, true);
 assert.match(prompts.get("P11"), /CURRENT_PUBLIC_DIFF_V1=/u);
 assert.match(prompts.get("P11"), /HOST_REPOSITORY_MAP_V1=/u);
+assert.equal(checkAddressedPrimaryCallCount, 2);
+assert.equal(withCheckAddressedRetry.result.vnext_verification_remediation_observation.retry_verification_passed_count, 1);
+assert.equal(withCheckAddressedRetry.result.termination_acceptable, true);
+assert.match(prompts.get("P12"), /CURRENT_PUBLIC_DIFF_V1=/u);
+assert.match(prompts.get("P12"), /RUNNER_SELECTED_PUBLIC_CHECK_V1=/u);
+assert.match(prompts.get("P12"), /test\/public\.test\.mjs/u);
 assert.equal(invalidRetryPrimaryCallCount, 2);
 assert.equal(withInvalidRetryMutation.result.vnext_verification_remediation_observation.retry_completed_count, 0);
 assert.equal(withInvalidRetryMutation.result.vnext_verification_remediation_observation.retry_changed_count, 1);

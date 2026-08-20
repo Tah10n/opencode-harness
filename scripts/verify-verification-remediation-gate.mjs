@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 
 import {
+  renderCheckAddressedVerificationRemediationPrompt,
   renderDiffGuidedVerificationRemediationPrompt,
   verificationRemediationObservation,
 } from "../lib/quality/verification-remediation-gate.mjs";
@@ -37,6 +38,15 @@ const prompt = renderDiffGuidedVerificationRemediationPrompt({
 assert.match(prompt, /CURRENT_PUBLIC_DIFF_V1=/u);
 assert.match(prompt, /VISIBLE_REQUIREMENTS_JSON=/u);
 assert.doesNotMatch(prompt, /[\r\n]/u);
+
+const addressedPrompt = renderCheckAddressedVerificationRemediationPrompt({
+  visible_requirements: "Preserve the public result shape.",
+  current_diff: { schema_version: 1, files: [{ path: "src/task.mjs", before: "old", after: "new" }] },
+  fixed_public_check: { argv: ["node", "--test", "test/public.test.mjs"] },
+});
+assert.match(addressedPrompt, /RUNNER_SELECTED_PUBLIC_CHECK_V1=/u);
+assert.match(addressedPrompt, /test\/public\.test\.mjs/u);
+assert.doesNotMatch(addressedPrompt, /[\r\n]/u);
 
 const incompleteAfterMutation = verificationRemediationObservation({
   eligible: true,
