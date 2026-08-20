@@ -166,6 +166,19 @@ trusted check. `P6:P15` is the incremental estimand; no plain composite is
 allowed unless the new acceptance and complete development report pass every
 frozen guardrail.
 
+The first P6-to-P15 report on source
+`d77d7a8cabae8ed6a74adc141e4d8b5b8fcb3515` passed every incremental
+development guardrail with fingerprint
+`sha256:ee2d33593adcbc31a4837b8a4af4598a743487b037980f290166a6a226e44a01`.
+It improved regression-free success from 23/36 to 29/36 (+16.67 pp, 95% CI
+[5.56, 27.78] pp, one-sided exact p=0.015625), activated 13/13 eligible passes,
+and used 1.69x median and 1.45x mean duration. Pre-composite review then found
+that the reserved P0-to-P15 label lacked a dedicated activation dispatcher and
+would fall through to the unrelated generic review-plus-context composite.
+The incremental report remains valid, but the source cannot advance until a
+new registration-repair generation repeats P6-to-P15 under its new campaign
+fingerprint.
+
 Persisted reports exclude prompts, fixture contents, hidden files, reference
 solutions, stdout/stderr, and credentials. The artifact reader recomputes plan,
 pair, and report fingerprints before upload. Development output may retain or

@@ -289,6 +289,22 @@ const riskGatedContractPlan = buildBenchmarkV2CampaignPlan({
   allowDirty: true,
 });
 assert.equal(riskGatedContractPlan.component_id, "risk-gated-visible-contract-remediation");
+const riskGatedCompositePlan = buildBenchmarkV2CampaignPlan({
+  repositoryRoot: root,
+  split: "development",
+  generationId: "generation-fixture-risk-gated-composite-1",
+  baselineArmId: "P0",
+  candidateArmId: "P15",
+  model: "fixture/model",
+  provider: "fixture",
+  variant: "low",
+  timeoutMs: 300_000,
+  seed: "campaign-fixture-seed",
+  repetitions: 1,
+  executableIdentity: executableFingerprint,
+  allowDirty: true,
+});
+assert.equal(riskGatedCompositePlan.component_id, "verified-risk-gated-contract-candidate");
 assert.throws(() => buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
   split: "validation",
@@ -505,6 +521,15 @@ const riskGatedContractAcceptance = await executeBenchmarkV2Acceptance({
 assert.equal(riskGatedContractAcceptance.status, "passed");
 assert.equal(riskGatedContractAcceptance.family_id, "dev-high-authorization-boundary");
 assert.deepEqual(riskGatedContractAcceptance.activation, { eligible: true, activated: true });
+const riskGatedCompositeAcceptance = await executeBenchmarkV2Acceptance({
+  repositoryRoot: root,
+  plan: riskGatedCompositePlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: fakeAttempt,
+});
+assert.equal(riskGatedCompositeAcceptance.status, "passed");
+assert.equal(riskGatedCompositeAcceptance.family_id, "dev-high-authorization-boundary");
+assert.deepEqual(riskGatedCompositeAcceptance.activation, { eligible: true, activated: true });
 assert.equal(report.status, "complete");
 assert.equal(report.pair_results.length, 36);
 assert.equal(report.summary.statistics.activation.rate, 1);
