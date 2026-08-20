@@ -61,6 +61,16 @@ HIGH/MEDIUM regressions while resolving two, and failed the effect, confidence,
 exact-test, safety, HIGH/MEDIUM, and small-task gates. It is rejected and cannot
 advance to composite or validation.
 
+Development-only arm `P10` is a new architecture generation derived from the
+aggregate P9 retry categories. It keeps P6 verification and one retry, but the
+host also injects a bounded snapshot of the current public diff so the retry
+can inspect the failed implementation directly. The snapshot is restricted to
+allowed changed public paths and excludes check output, hidden files, reference
+content, executable selection, argv, and check IDs. `P6:P10` isolates the
+diff-guided retry; `P0:P10` is reserved for a later plain composite only if the
+incremental transition passes every frozen development gate. P10 has no
+model-backed result yet.
+
 Persisted reports exclude prompts, fixture contents, hidden files, reference
 solutions, stdout/stderr, and credentials. The artifact reader recomputes plan,
 pair, and report fingerprints before upload. Development output may retain or

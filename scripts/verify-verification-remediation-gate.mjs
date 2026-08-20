@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 
-import { verificationRemediationObservation } from "../lib/quality/verification-remediation-gate.mjs";
+import {
+  renderDiffGuidedVerificationRemediationPrompt,
+  verificationRemediationObservation,
+} from "../lib/quality/verification-remediation-gate.mjs";
 
 const inactive = verificationRemediationObservation({ eligible: false });
 assert.equal(inactive.operationally_complete, true);
@@ -26,6 +29,14 @@ const completed = verificationRemediationObservation({
 assert.equal(completed.operationally_complete, true);
 assert.equal(completed.retry_reverified_count, 1);
 assert.equal(completed.reason, "retry_verification_passed");
+
+const prompt = renderDiffGuidedVerificationRemediationPrompt({
+  visible_requirements: "Preserve the public result shape.",
+  current_diff: { schema_version: 1, files: [{ path: "src/task.mjs", before: "old", after: "new" }] },
+});
+assert.match(prompt, /CURRENT_PUBLIC_DIFF_V1=/u);
+assert.match(prompt, /VISIBLE_REQUIREMENTS_JSON=/u);
+assert.doesNotMatch(prompt, /[\r\n]/u);
 
 const incompleteAfterMutation = verificationRemediationObservation({
   eligible: true,

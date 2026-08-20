@@ -22,6 +22,7 @@ const plainProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profil
 const isolatedVerificationProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P6" });
 const isolatedReviewerProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P8" });
 const verificationRemediationProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P9" });
+const diffGuidedVerificationRemediationProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P10" });
 try {
   assert.equal(plainProfile.primaryAgentId, "build");
   assert.equal(isolatedVerificationProfile.primaryAgentId, "build");
@@ -80,11 +81,24 @@ try {
       "runtime/host/verification-remediation-gate.mjs",
     ],
   );
+  assert.equal(diffGuidedVerificationRemediationProfile.primaryAgentId, "build");
+  assert.deepEqual(
+    diffGuidedVerificationRemediationProfile.profileEvidence.component_ids,
+    ["targeted-verification", "diff-guided-verification-remediation"],
+  );
+  assert.deepEqual(
+    diffGuidedVerificationRemediationProfile.profileEvidence.runtime_surface.materialized_files.map((entry) => entry.path),
+    [
+      "runtime/host/core-verification-gate.mjs",
+      "runtime/host/verification-remediation-gate.mjs",
+    ],
+  );
 } finally {
   cleanupSyntheticProfile(plainProfile);
   cleanupSyntheticProfile(isolatedVerificationProfile);
   cleanupSyntheticProfile(isolatedReviewerProfile);
   cleanupSyntheticProfile(verificationRemediationProfile);
+  cleanupSyntheticProfile(diffGuidedVerificationRemediationProfile);
 }
 const plan = buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
@@ -140,6 +154,23 @@ const retryPlan = buildBenchmarkV2CampaignPlan({
 });
 assert.equal(retryPlan.component_id, "verification-remediation");
 assert.equal(retryPlan.schedules.length, 36);
+const diffGuidedRetryPlan = buildBenchmarkV2CampaignPlan({
+  repositoryRoot: root,
+  split: "development",
+  generationId: "generation-fixture-diff-guided-retry-1",
+  baselineArmId: "P6",
+  candidateArmId: "P10",
+  model: "fixture/model",
+  provider: "fixture",
+  variant: "low",
+  timeoutMs: 300_000,
+  seed: "campaign-fixture-seed",
+  repetitions: 1,
+  executableIdentity: executableFingerprint,
+  allowDirty: true,
+});
+assert.equal(diffGuidedRetryPlan.component_id, "diff-guided-verification-remediation");
+assert.equal(diffGuidedRetryPlan.schedules.length, 36);
 assert.throws(() => buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
   split: "validation",

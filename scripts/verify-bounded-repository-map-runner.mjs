@@ -24,6 +24,7 @@ const prompts = new Map();
 let reviewerPrompt = null;
 let remediationPrimaryCallCount = 0;
 let verificationRetryPrimaryCallCount = 0;
+let diffGuidedRetryPrimaryCallCount = 0;
 let invalidRetryPrimaryCallCount = 0;
 let latestPrimaryProfileManifestPath = null;
 
@@ -251,6 +252,16 @@ async function verificationRetryPrimaryAdapter(input) {
   return result;
 }
 
+async function diffGuidedRetryPrimaryAdapter(input) {
+  diffGuidedRetryPrimaryCallCount += 1;
+  const result = await fixtureAdapter(input);
+  if (diffGuidedRetryPrimaryCallCount === 1) {
+    const target = path.join(input.context.repo, ...instance.solution_files[0].path.split("/"));
+    fs.appendFileSync(target, "// VISIBLE_VERIFICATION_DEFECT\n", "utf8");
+  }
+  return result;
+}
+
 async function invalidRetryPrimaryAdapter(input) {
   invalidRetryPrimaryCallCount += 1;
   const result = await fixtureAdapter(input);
@@ -309,6 +320,12 @@ const withVerificationRetry = await attempt(
   "P9",
   null,
   verificationRetryPrimaryAdapter,
+  failOnceCommandRunner(),
+);
+const withDiffGuidedVerificationRetry = await attempt(
+  "P10",
+  null,
+  diffGuidedRetryPrimaryAdapter,
   failOnceCommandRunner(),
 );
 const withInvalidRetryMutation = await attempt(
@@ -377,6 +394,14 @@ assert.equal(withVerificationRetry.result.visible_check.passed, true);
 assert.equal(withVerificationRetry.result.termination_acceptable, true);
 assert.equal(withVerificationRetry.result.metrics.total_tool_call_count, 4);
 assert.match(prompts.get("P9"), /runner-selected trusted visible verification did not pass/u);
+assert.equal(diffGuidedRetryPrimaryCallCount, 2);
+assert.equal(withDiffGuidedVerificationRetry.result.vnext_verification_remediation_observation.eligible, true);
+assert.equal(withDiffGuidedVerificationRetry.result.vnext_verification_remediation_observation.retry_changed_count, 1);
+assert.equal(withDiffGuidedVerificationRetry.result.vnext_verification_remediation_observation.retry_verification_passed_count, 1);
+assert.equal(withDiffGuidedVerificationRetry.result.termination_acceptable, true);
+assert.match(prompts.get("P10"), /CURRENT_PUBLIC_DIFF_V1=/u);
+assert.match(prompts.get("P10"), /VISIBLE_VERIFICATION_DEFECT/u);
+assert.doesNotMatch(prompts.get("P10"), /[\r\n]/u);
 assert.equal(invalidRetryPrimaryCallCount, 2);
 assert.equal(withInvalidRetryMutation.result.vnext_verification_remediation_observation.retry_completed_count, 0);
 assert.equal(withInvalidRetryMutation.result.vnext_verification_remediation_observation.retry_changed_count, 1);
