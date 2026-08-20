@@ -35,7 +35,11 @@ shell access from the reviewer; repository inspection is limited to native
 read, glob, and grep tools. `P6:P8` is the only incremental transition for this
 generation, and `P0:P8` is reserved for a later plain comparison only if that
 transition passes every frozen development gate. P8 is not a product profile
-or release arm.
+or release arm. Its full development campaign also failed: only 14/24 required
+reviews completed, accepted reviews produced no findings or fixes, and the
+positive point estimate did not pass the confidence, exact-test, safety, small,
+or activation guardrails. The automatic reviewer is therefore rejected rather
+than retained in a later product candidate.
 
 The automatic-review acceptance smoke uses the existing
 `dev-medium-config-propagation` family because both arms must reach a bounded
