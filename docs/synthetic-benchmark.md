@@ -36,8 +36,8 @@ npm run bench:vnext:run -- \
 ```
 
 Repeat smoke for all five estimands. Standard is then required for
-`core-rules-to-core-verified`, `core-verified-to-core-reviewed`, the medium-target
-`core-reviewed-to-deep`, and the high-target `deep-to-assurance`. Standard plans
+`core-rules-to-core-verified`, the medium-target `core-verified-to-deep`,
+`deep-to-core-reviewed`, and the high-target `deep-to-assurance`. Standard plans
 for the latter transitions also include the frozen small-task negative control. Inspect a
 saved run separately; when an authorizing promotion result is needed, rerun standard and
 apply the frozen policy in the same trusted process:
@@ -45,7 +45,7 @@ apply the frozen policy in the same trusted process:
 ```sh
 npm run bench:vnext:compare -- --run vnext-standard-run.json > vnext-standard-comparison.json
 npm run bench:vnext:promote -- \
-  --estimand core-reviewed-to-deep \
+  --estimand core-verified-to-deep \
   --model openai/gpt-5.4 \
   --provider openai \
   --variant low \

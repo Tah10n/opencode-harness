@@ -26,13 +26,13 @@
       "direction": "lower-is-better"
     },
     {
-      "estimand_id": "core-verified-to-core-reviewed",
-      "target_metric": "introduced_high_medium_defects",
+      "estimand_id": "core-verified-to-deep",
+      "target_metric": "missed_consumer_rate",
       "direction": "lower-is-better"
     },
     {
-      "estimand_id": "core-reviewed-to-deep",
-      "target_metric": "missed_consumer_rate",
+      "estimand_id": "deep-to-core-reviewed",
+      "target_metric": "introduced_high_medium_defects",
       "direction": "lower-is-better"
     },
     {

@@ -5,8 +5,8 @@
   "component_order": [
     "core-rules",
     "targeted-verification",
-    "independent-final-review",
     "deep-context",
+    "independent-final-review",
     "assurance-controls"
   ],
   "arms": [
@@ -32,21 +32,21 @@
     },
     {
       "id": "P3",
-      "name": "core-reviewed",
-      "component_ids": [
-        "core-rules",
-        "targeted-verification",
-        "independent-final-review"
-      ]
-    },
-    {
-      "id": "P4",
       "name": "deep",
       "component_ids": [
         "core-rules",
         "targeted-verification",
-        "independent-final-review",
         "deep-context"
+      ]
+    },
+    {
+      "id": "P4",
+      "name": "core-reviewed",
+      "component_ids": [
+        "core-rules",
+        "targeted-verification",
+        "deep-context",
+        "independent-final-review"
       ]
     },
     {
@@ -55,8 +55,8 @@
       "component_ids": [
         "core-rules",
         "targeted-verification",
-        "independent-final-review",
         "deep-context",
+        "independent-final-review",
         "assurance-controls"
       ]
     }
@@ -91,24 +91,10 @@
       "target_metric": "verification_omission"
     },
     {
-      "id": "core-verified-to-core-reviewed",
+      "id": "core-verified-to-deep",
       "estimand_kind": "compound-profile-transition",
       "baseline_arm_id": "P2",
       "candidate_arm_id": "P3",
-      "transition_anchor_component_id": "independent-final-review",
-      "eligible_strata": [
-        "small",
-        "medium"
-      ],
-      "target_strata": ["small", "medium"],
-      "negative_control_strata": [],
-      "target_metric": "introduced_high_medium_defects"
-    },
-    {
-      "id": "core-reviewed-to-deep",
-      "estimand_kind": "compound-profile-transition",
-      "baseline_arm_id": "P3",
-      "candidate_arm_id": "P4",
       "transition_anchor_component_id": "deep-context",
       "eligible_strata": [
         "small",
@@ -117,6 +103,21 @@
       "target_strata": ["medium"],
       "negative_control_strata": ["small"],
       "target_metric": "missed_consumer_rate"
+    },
+    {
+      "id": "deep-to-core-reviewed",
+      "estimand_kind": "compound-profile-transition",
+      "baseline_arm_id": "P3",
+      "candidate_arm_id": "P4",
+      "transition_anchor_component_id": "independent-final-review",
+      "eligible_strata": [
+        "small",
+        "medium",
+        "high"
+      ],
+      "target_strata": ["medium", "high"],
+      "negative_control_strata": ["small"],
+      "target_metric": "introduced_high_medium_defects"
     },
     {
       "id": "deep-to-assurance",

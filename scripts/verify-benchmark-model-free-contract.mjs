@@ -161,10 +161,10 @@ export async function verifyBenchmarkModelFreeContract({ root = defaultRoot } = 
     deterministicStageTimeoutMs({ npm_script: "verify:static" }),
     DEFAULT_DETERMINISTIC_STAGE_TIMEOUT_MS,
   );
+  const individualVerifierScripts = new Set(DEFAULT_MODEL_FREE_CHECKS.map(({ script }) => `node ${script}`));
   assert.equal(
     DETERMINISTIC_STAGE_REGISTRY.some(
-      (stage) => stage.npm_script.startsWith("verify:benchmark:")
-        && stage.npm_script !== "verify:benchmark:model-free",
+      (stage) => individualVerifierScripts.has(packageJson.scripts?.[stage.npm_script]),
     ),
     false,
     "individual benchmark verifiers must not also be deterministic stages",

@@ -1345,7 +1345,7 @@ async function verifyLab() {
       assert(forgedEnvelopeRejected, "V04_LAB_FULL_GATE",
         "a self-consistent fabricated standard run unlocked full outside the in-process trusted runner");
     }
-    if (plan.estimand_id === "core-reviewed-to-deep") {
+    if (plan.estimand_id === "core-verified-to-deep") {
       const familyStrata = new Map(loaded.contract.families.map((entry) => [entry.id, entry.stratum]));
       const partialConsumerReport = await executeVnextPlanModelFreeTest({
         repositoryRoot: root,

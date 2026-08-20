@@ -346,16 +346,16 @@ try {
         installWorkspaceCatalog(workspaceRoot);
         installHostConfiguration(profile.configDirectory);
       }
-      if (["P4", "P5"].includes(profileId)) installPluginApi(profile.configDirectory);
+      if (profileId === "P5") installPluginApi(profile.configDirectory);
       const inventoryProbe = await installedToolIds(profile, workspaceRoot, `${profileId}-inventory`);
       const ids = inventoryProbe.ids;
       const contextIds = ids.filter((entry) => entry.startsWith("context_")).sort();
       const qualityIds = ids.filter((entry) => entry.startsWith("quality_")).sort();
-      if (["P0", "P1", "P2", "P3"].includes(profileId)
+      if (["P0", "P1", "P2", "P3", "P4"].includes(profileId)
         && (contextIds.length !== 0 || qualityIds.length !== 0)) {
         fail(`${profileId} unexpectedly exposes context or quality tools`);
       }
-      if (["P4", "P5"].includes(profileId)) {
+      if (profileId === "P5") {
         const expectedContext = ["context_files", "context_outline", "context_read", "context_search"];
         if (JSON.stringify(contextIds) !== JSON.stringify(expectedContext)) {
           fail(`${profileId} context tool inventory mismatch: ${contextIds.join(",")}\n${inventoryProbe.diagnostics.slice(-5000)}`);
@@ -375,20 +375,14 @@ try {
             return [];
           }
         });
-        const expectedInstalledCalls = profileId === "P5" ? server.expectedCalls : server.expectedCalls;
+        const expectedInstalledCalls = server.expectedCalls;
         if (JSON.stringify(installedCalls.map((entry) => entry.tool)) !== JSON.stringify(expectedInstalledCalls)
           || installedCalls.some((entry) => entry.state?.status !== "completed")) {
           fail(`${profileId} installed tool calls did not complete exactly once: ${JSON.stringify(installedCalls)}\nSTDOUT:\n${invocation?.stdout.slice(-8000)}\nSTDERR:\n${invocation?.stderr.slice(-4000)}`);
         }
-        if (profileId === "P4") {
-          if (fs.existsSync(path.join(workspaceRoot, ".oc_harness"))) {
-            fail("P4 installed context calls created quality state");
-          }
-        } else {
-          const qualityState = inspectSyntheticQualityControlState(workspaceRoot);
-          if (qualityState.context_receipt_count !== 4) {
-            fail(`P5 expected exactly four context receipts, observed ${qualityState.context_receipt_count}`);
-          }
+        const qualityState = inspectSyntheticQualityControlState(workspaceRoot);
+        if (qualityState.context_receipt_count !== 4) {
+          fail(`P5 expected exactly four context receipts, observed ${qualityState.context_receipt_count}`);
         }
       }
       evidence.push({ profile_id: profileId, context_tool_ids: contextIds, quality_tool_ids: qualityIds });

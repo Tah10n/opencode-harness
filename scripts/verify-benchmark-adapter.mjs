@@ -2114,7 +2114,7 @@ async function executionFixtures(root, plainProfile, instrumentedProfile) {
     assert.equal(success.trace_summary.workspace_mutation_count, null);
     assert.equal(success.trace_summary.fix_command_count, null);
     assert.equal(success.trace_summary.observed_mutation_tool_count, 1);
-    const reviewerProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P3" });
+    const reviewerProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P4" });
     try {
       const explicitReviewer = await executeOpenCodeAdapter({
         ...baseInput,

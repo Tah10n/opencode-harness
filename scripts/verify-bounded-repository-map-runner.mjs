@@ -247,21 +247,21 @@ async function attempt(
   });
 }
 
-const withoutMap = await attempt("P3");
-const withMap = await attempt("P4");
-const withReview = await attempt("P3", automaticReviewerAdapter);
+const withoutMap = await attempt("P2");
+const withMap = await attempt("P3");
+const withReview = await attempt("P4", automaticReviewerAdapter);
 const withReviewAfterFailedVerification = await attempt(
-  "P3",
+  "P4",
   automaticReviewerAdapter,
   fixtureAdapter,
   failingCommandRunner,
 );
-const withRemediation = await attempt("P3", findingReviewerAdapter, remediationPrimaryAdapter);
-const withOffDiffFinding = await attempt("P3", offDiffReviewerAdapter);
-assert.equal(prompts.get("P3").includes("HOST_REPOSITORY_MAP_V1="), false);
-assert.equal(prompts.get("P4").includes("HOST_REPOSITORY_MAP_V1="), true);
-assert.doesNotMatch(prompts.get("P4"), /[\r\n]/u);
-assert(prompts.get("P4").length <= 16_000);
+const withRemediation = await attempt("P4", findingReviewerAdapter, remediationPrimaryAdapter);
+const withOffDiffFinding = await attempt("P4", offDiffReviewerAdapter);
+assert.equal(prompts.get("P2").includes("HOST_REPOSITORY_MAP_V1="), false);
+assert.equal(prompts.get("P3").includes("HOST_REPOSITORY_MAP_V1="), true);
+assert.doesNotMatch(prompts.get("P3"), /[\r\n]/u);
+assert(prompts.get("P3").length <= 16_000);
 assert.deepEqual(withoutMap.result.vnext_context_map_observation, {
   eligible: true,
   activated: false,

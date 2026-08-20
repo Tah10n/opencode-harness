@@ -53,8 +53,8 @@ assurance lifecycles, structural child-assignment binding, legacy v2 reader comp
 byte-bound cumulative arm materialization, rendered medium/high topology,
 runner-owned pair aggregation, receipt-recomputed observations, an in-process
 standard-to-full authorization boundary, and frozen promotion thresholds. The installed
-OpenCode probes additionally load P0-P5, invoke all four P4/P5 context tools,
-confirm that P4 creates no quality state, and confirm one P5 receipt per context call. These checks do
+OpenCode probes additionally load P0-P5, confirm that P0-P4 expose no context or
+quality tools, and confirm one P5 receipt for each of its four context calls. These checks do
 not prove that `deep` or `assurance` improves model-backed outcomes. The vNext
 contract requires paired smoke and standard runs before promotion; unavailable
 runtime evidence remains `blocked-unproven` and is never scored.
