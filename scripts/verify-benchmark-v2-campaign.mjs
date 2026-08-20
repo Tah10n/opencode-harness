@@ -23,6 +23,7 @@ const isolatedVerificationProfile = materializeVnextSyntheticProfile({ sourceRoo
 const isolatedReviewerProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P8" });
 const verificationRemediationProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P9" });
 const diffGuidedVerificationRemediationProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P10" });
+const retryContextProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P11" });
 try {
   assert.equal(plainProfile.primaryAgentId, "build");
   assert.equal(isolatedVerificationProfile.primaryAgentId, "build");
@@ -30,6 +31,18 @@ try {
   assert.deepEqual(
     isolatedVerificationProfile.profileEvidence.runtime_surface.effective_config,
     plainProfile.profileEvidence.runtime_surface.effective_config,
+  );
+  assert.deepEqual(
+    retryContextProfile.profileEvidence.component_ids,
+    ["targeted-verification", "diff-guided-verification-remediation", "retry-bounded-context"],
+  );
+  assert.deepEqual(
+    retryContextProfile.profileEvidence.runtime_surface.materialized_files.map((entry) => entry.path),
+    [
+      "runtime/host/bounded-repository-map.mjs",
+      "runtime/host/core-verification-gate.mjs",
+      "runtime/host/verification-remediation-gate.mjs",
+    ],
   );
   assert.deepEqual(
     isolatedVerificationProfile.profileEvidence.runtime_surface.materialized_files.map((entry) => entry.path),
@@ -99,6 +112,7 @@ try {
   cleanupSyntheticProfile(isolatedReviewerProfile);
   cleanupSyntheticProfile(verificationRemediationProfile);
   cleanupSyntheticProfile(diffGuidedVerificationRemediationProfile);
+  cleanupSyntheticProfile(retryContextProfile);
 }
 const plan = buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
@@ -171,6 +185,22 @@ const diffGuidedRetryPlan = buildBenchmarkV2CampaignPlan({
 });
 assert.equal(diffGuidedRetryPlan.component_id, "verification-remediation");
 assert.equal(diffGuidedRetryPlan.schedules.length, 36);
+const retryContextPlan = buildBenchmarkV2CampaignPlan({
+  repositoryRoot: root,
+  split: "development",
+  generationId: "generation-fixture-retry-context-1",
+  baselineArmId: "P10",
+  candidateArmId: "P11",
+  model: "fixture/model",
+  provider: "fixture",
+  variant: "low",
+  timeoutMs: 300_000,
+  seed: "campaign-fixture-seed",
+  repetitions: 1,
+  executableIdentity: executableFingerprint,
+  allowDirty: true,
+});
+assert.equal(retryContextPlan.component_id, "retry-bounded-context");
 assert.throws(() => buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
   split: "validation",
@@ -211,7 +241,7 @@ function binding(instance) {
 async function fakeAttempt({ instance, profileId }) {
   const ordinal = Number.parseInt(createHash(instance.family_id).slice(0, 2), 16);
   const baselineFailure = ordinal % 4 === 0;
-  const success = ["P6", "P8", "P9", "P10"].includes(profileId) ? true : !baselineFailure;
+  const success = ["P6", "P8", "P9", "P10", "P11"].includes(profileId) ? true : !baselineFailure;
   const passed = check(true);
   const hidden = success ? passed : check(false, "hidden-contract");
   const result = {
@@ -247,7 +277,7 @@ async function fakeAttempt({ instance, profileId }) {
       operationally_complete: true,
       terminal_allowed: true,
     } : null,
-    vnext_verification_remediation_observation: ["P9", "P10"].includes(profileId) ? {
+    vnext_verification_remediation_observation: ["P9", "P10", "P11"].includes(profileId) ? {
       eligible: true,
       retry_required_count: 1,
       retry_started_count: 1,
@@ -257,7 +287,11 @@ async function fakeAttempt({ instance, profileId }) {
       retry_verification_passed_count: 1,
       operationally_complete: true,
     } : null,
-    vnext_context_map_observation: null,
+    vnext_context_map_observation: profileId === "P11" ? {
+      eligible: true,
+      activated: true,
+      reason: "host_map_injected_before_retry",
+    } : null,
     audit_evidence: { fixture: true },
     fingerprints: { adapter: `sha256:${"b".repeat(64)}` },
   };
@@ -309,6 +343,15 @@ const diffGuidedRetryAcceptance = await executeBenchmarkV2Acceptance({
 assert.equal(diffGuidedRetryAcceptance.status, "passed");
 assert.equal(diffGuidedRetryAcceptance.family_id, "dev-medium-public-result-shape");
 assert.deepEqual(diffGuidedRetryAcceptance.activation, { eligible: true, activated: true });
+const retryContextAcceptance = await executeBenchmarkV2Acceptance({
+  repositoryRoot: root,
+  plan: retryContextPlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: fakeAttempt,
+});
+assert.equal(retryContextAcceptance.status, "passed");
+assert.equal(retryContextAcceptance.family_id, "dev-medium-public-result-shape");
+assert.deepEqual(retryContextAcceptance.activation, { eligible: true, activated: true });
 assert.equal(report.status, "complete");
 assert.equal(report.pair_results.length, 36);
 assert.equal(report.summary.statistics.activation.rate, 1);
