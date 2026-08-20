@@ -101,8 +101,23 @@ retry may execute it for visible diagnostics, but the runner independently
 reruns the same bound check and remains the evidence authority. The model
 cannot select a different terminal executable, argv, or check ID. `P10:P12`
 isolates check-addressed remediation; `P0:P12` remains reserved for a later
-plain composite only after every development gate passes. P12 has no
-model-backed result yet.
+plain composite only after every development gate passes.
+
+The full P10-to-P12 development campaign on source
+`b6f28bc6c56c4bab0cbc55f007c32289d3eba565` activated all three eligible
+retries but declined from 27/36 to 25/36, introduced three HIGH/MEDIUM
+regressions while resolving one, and failed the effect, confidence, exact-test,
+safety, HIGH/MEDIUM, and small-task gates. P12 is rejected.
+
+Development-only arm `P13` keeps P10's single diff-guided retry and adds the
+fixed public command from P12, but removes the model-owned diagnostic gap. The
+credential-free host execution supplies a transient, privacy-sanitized public
+check diagnostic capped at 8,000 UTF-8 bytes. Private absolute paths,
+sensitive-looking lines, terminal controls, hidden output, and reference
+content are unavailable. The diagnostic is never persisted, and the host
+independently reruns the bound check after a mutation. `P10:P13` is the
+incremental remediation estimand; `P0:P13` is reserved for a later plain
+comparison only if the incremental transition passes every development gate.
 
 Persisted reports exclude prompts, fixture contents, hidden files, reference
 solutions, stdout/stderr, and credentials. The artifact reader recomputes plan,
