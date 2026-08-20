@@ -55,7 +55,11 @@ primary attempt receives only the visible requirements and public repository,
 may mutate once, and must pass the same runner-owned check after the mutation.
 `P6:P9` isolates this retry; `P0:P9` remains reserved for a later plain
 comparison only if the incremental transition passes every development gate.
-P9 is development-only and has no model-backed result yet.
+P9 is development-only. Its full P6-to-P9 development campaign activated all
+six required retries but declined from 27/36 to 26/36, introduced three
+HIGH/MEDIUM regressions while resolving two, and failed the effect, confidence,
+exact-test, safety, HIGH/MEDIUM, and small-task gates. It is rejected and cannot
+advance to composite or validation.
 
 Persisted reports exclude prompts, fixture contents, hidden files, reference
 solutions, stdout/stderr, and credentials. The artifact reader recomputes plan,
