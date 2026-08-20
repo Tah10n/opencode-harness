@@ -5,6 +5,7 @@ import {
   renderCheckAddressedVerificationRemediationPrompt,
   renderDiffGuidedVerificationRemediationPrompt,
   renderDiagnosticGuidedVerificationRemediationPrompt,
+  renderVisibleContractRemediationPrompt,
   verificationRemediationObservation,
 } from "../lib/quality/verification-remediation-gate.mjs";
 
@@ -72,6 +73,17 @@ const diagnosticPrompt = renderDiagnosticGuidedVerificationRemediationPrompt({
 assert.match(diagnosticPrompt, /PUBLIC_CHECK_DIAGNOSTIC_V1=/u);
 assert.match(diagnosticPrompt, /not ok 1 - preserves shape/u);
 assert.doesNotMatch(diagnosticPrompt, /[\r\n]/u);
+
+const contractPrompt = renderVisibleContractRemediationPrompt({
+  visible_requirements: "Preserve the public result shape.",
+  current_diff: { schema_version: 1, files: [{ path: "src/task.mjs", before: "old", after: "new" }] },
+  fixed_public_check: { argv: ["node", "--test", "test/public.test.mjs"] },
+  public_check_status: "passed",
+});
+assert.match(contractPrompt, /visible-contract conformance pass/u);
+assert.match(contractPrompt, /PUBLIC_CHECK_RESULT_V1=/u);
+assert.match(contractPrompt, /"status":"passed"/u);
+assert.doesNotMatch(contractPrompt, /[\r\n]/u);
 
 const incompleteAfterMutation = verificationRemediationObservation({
   eligible: true,

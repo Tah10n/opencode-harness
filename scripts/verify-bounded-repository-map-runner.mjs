@@ -28,6 +28,7 @@ let diffGuidedRetryPrimaryCallCount = 0;
 let retryContextPrimaryCallCount = 0;
 let checkAddressedPrimaryCallCount = 0;
 let diagnosticGuidedPrimaryCallCount = 0;
+let visibleContractPrimaryCallCount = 0;
 let invalidRetryPrimaryCallCount = 0;
 let latestPrimaryProfileManifestPath = null;
 
@@ -298,6 +299,16 @@ async function diagnosticGuidedPrimaryAdapter(input) {
   return result;
 }
 
+async function visibleContractPrimaryAdapter(input) {
+  visibleContractPrimaryCallCount += 1;
+  const result = await fixtureAdapter(input);
+  if (visibleContractPrimaryCallCount === 1) {
+    const target = path.join(input.context.repo, ...instance.solution_files[0].path.split("/"));
+    fs.appendFileSync(target, "// VISIBLE_CONTRACT_DEFECT\n", "utf8");
+  }
+  return result;
+}
+
 async function invalidRetryPrimaryAdapter(input) {
   invalidRetryPrimaryCallCount += 1;
   const result = await fixtureAdapter(input);
@@ -381,6 +392,12 @@ const withDiagnosticGuidedRetry = await attempt(
   null,
   diagnosticGuidedPrimaryAdapter,
   failOnceCommandRunner(),
+);
+const withVisibleContractRemediation = await attempt(
+  "P14",
+  null,
+  visibleContractPrimaryAdapter,
+  commandRunner,
 );
 const withInvalidRetryMutation = await attempt(
   "P9",
@@ -478,6 +495,15 @@ assert.match(prompts.get("P13"), /RUNNER_SELECTED_PUBLIC_CHECK_V1=/u);
 assert.match(prompts.get("P13"), /PUBLIC_CHECK_DIAGNOSTIC_V1=/u);
 assert.match(prompts.get("P13"), /VISIBLE_PUBLIC_DIAGNOSTIC/u);
 assert.doesNotMatch(JSON.stringify(withDiagnosticGuidedRetry.result), /VISIBLE_PUBLIC_DIAGNOSTIC/u);
+assert.equal(visibleContractPrimaryCallCount, 2);
+assert.equal(withVisibleContractRemediation.result.vnext_verification_remediation_observation.eligible, true);
+assert.equal(withVisibleContractRemediation.result.vnext_verification_remediation_observation.retry_completed_count, 1);
+assert.equal(withVisibleContractRemediation.result.vnext_verification_remediation_observation.retry_changed_count, 1);
+assert.equal(withVisibleContractRemediation.result.vnext_verification_remediation_observation.retry_verification_passed_count, 1);
+assert.equal(withVisibleContractRemediation.result.termination_acceptable, true);
+assert.match(prompts.get("P14"), /visible-contract conformance pass/u);
+assert.match(prompts.get("P14"), /PUBLIC_CHECK_RESULT_V1=/u);
+assert.match(prompts.get("P14"), /"status":"passed"/u);
 assert.equal(invalidRetryPrimaryCallCount, 2);
 assert.equal(withInvalidRetryMutation.result.vnext_verification_remediation_observation.retry_completed_count, 0);
 assert.equal(withInvalidRetryMutation.result.vnext_verification_remediation_observation.retry_changed_count, 1);

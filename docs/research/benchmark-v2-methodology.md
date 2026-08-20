@@ -131,6 +131,20 @@ an eligible retry must be operationally complete. Deterministic integration
 tests exercise the diagnostic retry path, while the unchanged full development
 campaign measures model-backed activation over every eligible family.
 
+The P13 full runner later emitted terminal `reject-development-candidate`, but
+an external packaging filename error prevented canonical validation and durable
+copy before the ephemeral container was removed. The architecture is rejected
+and the generation is not rerun; no unavailable pair metric is reported.
+
+Development-only arm `P14` replaces failed-check-only retries with one
+host-triggered visible-contract conformance pass after every completed
+medium/high first attempt. It receives only visible requirements, the current
+public diff, fixed public check status, and a sanitized public diagnostic when
+that check failed. Small tasks are an untreated negative control. Any mutation
+makes verification stale and the host reruns the fixed check. `P6:P14` isolates
+this mechanism; `P0:P14` remains reserved until every incremental development
+gate passes.
+
 Persisted reports exclude prompts, fixture contents, hidden files, reference
 solutions, stdout/stderr, and credentials. The artifact reader recomputes plan,
 pair, and report fingerprints before upload. Development output may retain or
