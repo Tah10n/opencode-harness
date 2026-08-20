@@ -15,6 +15,12 @@ repetition, and executes the existing isolated OpenCode adapter. The manual
 runs a model-backed baseline/candidate acceptance pair, requires Linux cgroup-v2
 configuration, then runs the full paired campaign.
 
+After the compact-rules ablation was neutral, development-only arm `P6` was
+reserved for the isolated `P0:P6` host-verification experiment. It uses the
+same plain primary agent as P0 and differs only by the runner-owned
+post-mutation verification gate. P6 is not a product profile or a vNext
+release arm; it exists to remove the rejected prompt component as a confounder.
+
 Persisted reports exclude prompts, fixture contents, hidden files, reference
 solutions, stdout/stderr, and credentials. The artifact reader recomputes plan,
 pair, and report fingerprints before upload. Development output may retain or

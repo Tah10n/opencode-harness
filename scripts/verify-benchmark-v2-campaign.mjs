@@ -9,15 +9,41 @@ import {
   validateBenchmarkV2CampaignReport,
 } from "../lib/benchmark/v2-campaign.mjs";
 import { fingerprintProfileValue } from "../lib/profile-v3.mjs";
+import {
+  cleanupSyntheticProfile,
+  materializeVnextSyntheticProfile,
+} from "../lib/benchmark/profiles.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const executableFingerprint = `sha256:${"a".repeat(64)}`;
+const plainProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P0" });
+const isolatedVerificationProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P6" });
+try {
+  assert.equal(plainProfile.primaryAgentId, "build");
+  assert.equal(isolatedVerificationProfile.primaryAgentId, "build");
+  assert.deepEqual(isolatedVerificationProfile.profileEvidence.component_ids, ["targeted-verification"]);
+  assert.deepEqual(
+    isolatedVerificationProfile.profileEvidence.runtime_surface.effective_config,
+    plainProfile.profileEvidence.runtime_surface.effective_config,
+  );
+  assert.deepEqual(
+    isolatedVerificationProfile.profileEvidence.runtime_surface.materialized_files.map((entry) => entry.path),
+    ["runtime/host/core-verification-gate.mjs"],
+  );
+  assert.equal(
+    isolatedVerificationProfile.profileEvidence.source_entries.some((entry) => entry.source_path === "agents/core.md"),
+    false,
+  );
+} finally {
+  cleanupSyntheticProfile(plainProfile);
+  cleanupSyntheticProfile(isolatedVerificationProfile);
+}
 const plan = buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
   split: "development",
   generationId: "generation-fixture-1",
-  baselineArmId: "P1",
-  candidateArmId: "P2",
+  baselineArmId: "P0",
+  candidateArmId: "P6",
   model: "fixture/model",
   provider: "fixture",
   variant: "low",
@@ -36,8 +62,8 @@ assert.throws(() => buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
   split: "validation",
   generationId: "generation-fixture-1",
-  baselineArmId: "P1",
-  candidateArmId: "P2",
+  baselineArmId: "P0",
+  candidateArmId: "P6",
   model: "fixture/model",
   provider: "fixture",
   variant: "low",
@@ -72,7 +98,7 @@ function binding(instance) {
 async function fakeAttempt({ instance, profileId }) {
   const ordinal = Number.parseInt(createHash(instance.family_id).slice(0, 2), 16);
   const baselineFailure = ordinal % 4 === 0;
-  const success = profileId === "P2" ? true : !baselineFailure;
+  const success = profileId === "P6" ? true : !baselineFailure;
   const passed = check(true);
   const hidden = success ? passed : check(false, "hidden-contract");
   const result = {
@@ -89,7 +115,7 @@ async function fakeAttempt({ instance, profileId }) {
     cleanup: passed,
     hidden_safety_failed: !success,
     metrics: {
-      duration_ms: profileId === "P2" ? 150 : 100,
+      duration_ms: profileId === "P6" ? 150 : 100,
       total_tool_call_count: 2,
       task_action_call_count: 2,
       computational_control_call_count: 0,
