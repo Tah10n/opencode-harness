@@ -118,6 +118,11 @@ content are unavailable. The diagnostic is never persisted, and the host
 independently reruns the bound check after a mutation. `P10:P13` is the
 incremental remediation estimand; `P0:P13` is reserved for a later plain
 comparison only if the incremental transition passes every development gate.
+Its first acceptance attempt inherited the generic remediation selector and
+did not encounter an eligible failed public check, so it failed without a full
+campaign. The repaired estimand uses `dev-high-durable-persistence` as its
+acceptance-only lifecycle smoke; this does not filter or reweight the 36-family
+development campaign.
 
 Persisted reports exclude prompts, fixture contents, hidden files, reference
 solutions, stdout/stderr, and credentials. The artifact reader recomputes plan,

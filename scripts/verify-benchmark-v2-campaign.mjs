@@ -244,7 +244,7 @@ const diagnosticGuidedPlan = buildBenchmarkV2CampaignPlan({
   executableIdentity: executableFingerprint,
   allowDirty: true,
 });
-assert.equal(diagnosticGuidedPlan.component_id, "verification-remediation");
+assert.equal(diagnosticGuidedPlan.component_id, "diagnostic-guided-verification-remediation");
 assert.throws(() => buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
   split: "validation",
@@ -405,6 +405,15 @@ const checkAddressedAcceptance = await executeBenchmarkV2Acceptance({
 assert.equal(checkAddressedAcceptance.status, "passed");
 assert.equal(checkAddressedAcceptance.family_id, "dev-medium-public-result-shape");
 assert.deepEqual(checkAddressedAcceptance.activation, { eligible: true, activated: true });
+const diagnosticGuidedAcceptance = await executeBenchmarkV2Acceptance({
+  repositoryRoot: root,
+  plan: diagnosticGuidedPlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: fakeAttempt,
+});
+assert.equal(diagnosticGuidedAcceptance.status, "passed");
+assert.equal(diagnosticGuidedAcceptance.family_id, "dev-high-durable-persistence");
+assert.deepEqual(diagnosticGuidedAcceptance.activation, { eligible: true, activated: true });
 assert.equal(report.status, "complete");
 assert.equal(report.pair_results.length, 36);
 assert.equal(report.summary.statistics.activation.rate, 1);
