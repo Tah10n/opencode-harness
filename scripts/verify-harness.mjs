@@ -445,6 +445,7 @@ const requiredFiles = [
   "scripts/verify-bounded-repository-map.mjs",
   "scripts/verify-bounded-repository-map-runner.mjs",
   "scripts/verify-automatic-review-gate.mjs",
+  "scripts/verify-verification-remediation-gate.mjs",
   "scripts/verify-benchmark-renderer.mjs",
   "scripts/verify-benchmark-reporting.mjs",
   "scripts/verify-benchmark-runner.mjs",
@@ -577,7 +578,7 @@ for (const forbiddenScript of ["assess:quality-candidate", "verify:model-profile
   }
 }
 const expectedDeterministicStages = [
-  "verify:v0.4", "verify:static", "verify:benchmark:model-free", "verify:evaluator:paired-defects", "verify:core-verification-gate", "verify:core-verification-runner", "verify:benchmark:v2:contracts", "verify:benchmark:v2:fixtures", "verify:benchmark:v2:campaign", "verify:benchmark:v2:freeze", "verify:benchmark:v2:real-commit-materializer", "verify:benchmark:v2:pilot", "verify:bounded-repository-map", "verify:bounded-repository-map-runner", "verify:automatic-review-gate", "verify:feedback-foundation", "verify:trace-store", "verify:report-history", "verify:adapter-worker",
+  "verify:v0.4", "verify:static", "verify:benchmark:model-free", "verify:evaluator:paired-defects", "verify:core-verification-gate", "verify:core-verification-runner", "verify:benchmark:v2:contracts", "verify:benchmark:v2:fixtures", "verify:benchmark:v2:campaign", "verify:benchmark:v2:freeze", "verify:benchmark:v2:real-commit-materializer", "verify:benchmark:v2:pilot", "verify:bounded-repository-map", "verify:bounded-repository-map-runner", "verify:automatic-review-gate", "verify:verification-remediation-gate", "verify:feedback-foundation", "verify:trace-store", "verify:report-history", "verify:adapter-worker",
   "eval", "verify:drift", "verify:adoption-bundle", "verify:package-boundary", "verify:runtime:fixture", "verify:runtime:quality-hooks:fixture",
   "verify:live-eval", "verify:acceptance",
   "verify:quality-contracts", "verify:engineering-dossier", "verify:architecture-policy", "verify:impact-graph",
@@ -798,6 +799,7 @@ for (const [name, command] of Object.entries({
   "verify:bounded-repository-map": "node scripts/verify-bounded-repository-map.mjs",
   "verify:bounded-repository-map-runner": "node scripts/verify-bounded-repository-map-runner.mjs",
   "verify:automatic-review-gate": "node scripts/verify-automatic-review-gate.mjs",
+  "verify:verification-remediation-gate": "node scripts/verify-verification-remediation-gate.mjs",
   "verify:benchmark:contracts": "node scripts/verify-benchmark-contracts.mjs",
   "verify:benchmark:renderer": "node scripts/verify-benchmark-renderer.mjs",
   "verify:benchmark:reporting": "node scripts/verify-benchmark-reporting.mjs",

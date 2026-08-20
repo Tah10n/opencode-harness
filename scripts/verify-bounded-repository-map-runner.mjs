@@ -23,6 +23,8 @@ const instance = renderBenchmarkV2DevelopmentFamily({
 const prompts = new Map();
 let reviewerPrompt = null;
 let remediationPrimaryCallCount = 0;
+let verificationRetryPrimaryCallCount = 0;
+let invalidRetryPrimaryCallCount = 0;
 let latestPrimaryProfileManifestPath = null;
 
 function commandRunner() {
@@ -49,6 +51,23 @@ function failingCommandRunner() {
     timed_out: false,
     teardown_verified: true,
   });
+}
+
+function failOnceCommandRunner() {
+  let callCount = 0;
+  return () => {
+    callCount += 1;
+    return Promise.resolve({
+      status: callCount === 1 ? 1 : 0,
+      signal: null,
+      stdout_chars: 0,
+      stderr_chars: 0,
+      stdout_bytes: 0,
+      stderr_bytes: 0,
+      timed_out: false,
+      teardown_verified: true,
+    });
+  };
 }
 
 async function fixtureAdapter({ context, onTrace, timeout }) {
@@ -222,6 +241,34 @@ async function remediationPrimaryAdapter(input) {
   return result;
 }
 
+async function verificationRetryPrimaryAdapter(input) {
+  verificationRetryPrimaryCallCount += 1;
+  const result = await fixtureAdapter(input);
+  if (verificationRetryPrimaryCallCount === 1) {
+    const target = path.join(input.context.repo, ...instance.solution_files[0].path.split("/"));
+    fs.appendFileSync(target, "// VISIBLE_VERIFICATION_DEFECT\n", "utf8");
+  }
+  return result;
+}
+
+async function invalidRetryPrimaryAdapter(input) {
+  invalidRetryPrimaryCallCount += 1;
+  const result = await fixtureAdapter(input);
+  if (invalidRetryPrimaryCallCount === 1) {
+    const target = path.join(input.context.repo, ...instance.solution_files[0].path.split("/"));
+    fs.appendFileSync(target, "// VISIBLE_VERIFICATION_DEFECT\n", "utf8");
+    return result;
+  }
+  fs.writeFileSync(path.join(input.context.repo, "unexpected-retry-output.mjs"), "export default true;\n", "utf8");
+  return {
+    ...result,
+    passed: false,
+    status: "failed",
+    termination_reason: "verification_failed",
+    reason: "opencode_nonzero_exit",
+  };
+}
+
 async function attempt(
   profileId,
   reviewerInvoker = null,
@@ -258,6 +305,18 @@ const withReviewAfterFailedVerification = await attempt(
 );
 const withRemediation = await attempt("P4", findingReviewerAdapter, remediationPrimaryAdapter);
 const withOffDiffFinding = await attempt("P4", offDiffReviewerAdapter);
+const withVerificationRetry = await attempt(
+  "P9",
+  null,
+  verificationRetryPrimaryAdapter,
+  failOnceCommandRunner(),
+);
+const withInvalidRetryMutation = await attempt(
+  "P9",
+  null,
+  invalidRetryPrimaryAdapter,
+  failOnceCommandRunner(),
+);
 assert.equal(prompts.get("P2").includes("HOST_REPOSITORY_MAP_V1="), false);
 assert.equal(prompts.get("P3").includes("HOST_REPOSITORY_MAP_V1="), true);
 assert.doesNotMatch(prompts.get("P3"), /[\r\n]/u);
@@ -307,5 +366,21 @@ assert.equal(withRemediation.result.termination_acceptable, true);
 assert.equal(withOffDiffFinding.result.vnext_automatic_review_observation.review_started_count, 1);
 assert.equal(withOffDiffFinding.result.vnext_automatic_review_observation.review_completed_count, 0);
 assert.equal(withOffDiffFinding.result.termination_acceptable, false);
+assert.equal(verificationRetryPrimaryCallCount, 2);
+assert.equal(withVerificationRetry.result.vnext_verification_remediation_observation.eligible, true);
+assert.equal(withVerificationRetry.result.vnext_verification_remediation_observation.retry_started_count, 1);
+assert.equal(withVerificationRetry.result.vnext_verification_remediation_observation.retry_completed_count, 1);
+assert.equal(withVerificationRetry.result.vnext_verification_remediation_observation.retry_changed_count, 1);
+assert.equal(withVerificationRetry.result.vnext_verification_remediation_observation.retry_reverified_count, 1);
+assert.equal(withVerificationRetry.result.vnext_verification_remediation_observation.retry_verification_passed_count, 1);
+assert.equal(withVerificationRetry.result.visible_check.passed, true);
+assert.equal(withVerificationRetry.result.termination_acceptable, true);
+assert.equal(withVerificationRetry.result.metrics.total_tool_call_count, 4);
+assert.match(prompts.get("P9"), /runner-selected trusted visible verification did not pass/u);
+assert.equal(invalidRetryPrimaryCallCount, 2);
+assert.equal(withInvalidRetryMutation.result.vnext_verification_remediation_observation.retry_completed_count, 0);
+assert.equal(withInvalidRetryMutation.result.vnext_verification_remediation_observation.retry_changed_count, 1);
+assert.equal(withInvalidRetryMutation.result.workspace_policy.passed, false);
+assert.equal(withInvalidRetryMutation.result.termination_acceptable, false);
 
 process.stdout.write("bounded repository map runner integration passed\n");

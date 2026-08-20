@@ -85,6 +85,7 @@
     "verify:bounded-repository-map": "node scripts/verify-bounded-repository-map.mjs",
     "verify:bounded-repository-map-runner": "node scripts/verify-bounded-repository-map-runner.mjs",
     "verify:automatic-review-gate": "node scripts/verify-automatic-review-gate.mjs",
+    "verify:verification-remediation-gate": "node scripts/verify-verification-remediation-gate.mjs",
     "verify:benchmark:renderer": "node scripts/verify-benchmark-renderer.mjs",
     "verify:benchmark:reporting": "node scripts/verify-benchmark-reporting.mjs",
     "verify:benchmark:runner": "node scripts/verify-benchmark-runner.mjs",

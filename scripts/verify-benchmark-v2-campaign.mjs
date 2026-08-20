@@ -21,6 +21,7 @@ const executableFingerprint = `sha256:${"a".repeat(64)}`;
 const plainProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P0" });
 const isolatedVerificationProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P6" });
 const isolatedReviewerProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P8" });
+const verificationRemediationProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P9" });
 try {
   assert.equal(plainProfile.primaryAgentId, "build");
   assert.equal(isolatedVerificationProfile.primaryAgentId, "build");
@@ -67,10 +68,23 @@ try {
     "agents/core-reviewer.md",
   ).frontmatter;
   assert.equal(reviewerFrontmatter.permission.bash, "deny");
+  assert.equal(verificationRemediationProfile.primaryAgentId, "build");
+  assert.deepEqual(
+    verificationRemediationProfile.profileEvidence.component_ids,
+    ["targeted-verification", "verification-remediation"],
+  );
+  assert.deepEqual(
+    verificationRemediationProfile.profileEvidence.runtime_surface.materialized_files.map((entry) => entry.path),
+    [
+      "runtime/host/core-verification-gate.mjs",
+      "runtime/host/verification-remediation-gate.mjs",
+    ],
+  );
 } finally {
   cleanupSyntheticProfile(plainProfile);
   cleanupSyntheticProfile(isolatedVerificationProfile);
   cleanupSyntheticProfile(isolatedReviewerProfile);
+  cleanupSyntheticProfile(verificationRemediationProfile);
 }
 const plan = buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
@@ -109,6 +123,23 @@ const reviewerPlan = buildBenchmarkV2CampaignPlan({
 });
 assert.equal(reviewerPlan.component_id, "independent-final-review");
 assert.equal(reviewerPlan.schedules.length, 36);
+const retryPlan = buildBenchmarkV2CampaignPlan({
+  repositoryRoot: root,
+  split: "development",
+  generationId: "generation-fixture-retry-1",
+  baselineArmId: "P6",
+  candidateArmId: "P9",
+  model: "fixture/model",
+  provider: "fixture",
+  variant: "low",
+  timeoutMs: 300_000,
+  seed: "campaign-fixture-seed",
+  repetitions: 1,
+  executableIdentity: executableFingerprint,
+  allowDirty: true,
+});
+assert.equal(retryPlan.component_id, "verification-remediation");
+assert.equal(retryPlan.schedules.length, 36);
 assert.throws(() => buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
   split: "validation",
@@ -149,7 +180,7 @@ function binding(instance) {
 async function fakeAttempt({ instance, profileId }) {
   const ordinal = Number.parseInt(createHash(instance.family_id).slice(0, 2), 16);
   const baselineFailure = ordinal % 4 === 0;
-  const success = ["P6", "P8"].includes(profileId) ? true : !baselineFailure;
+  const success = ["P6", "P8", "P9"].includes(profileId) ? true : !baselineFailure;
   const passed = check(true);
   const hidden = success ? passed : check(false, "hidden-contract");
   const result = {
@@ -185,6 +216,16 @@ async function fakeAttempt({ instance, profileId }) {
       operationally_complete: true,
       terminal_allowed: true,
     } : null,
+    vnext_verification_remediation_observation: profileId === "P9" ? {
+      eligible: true,
+      retry_required_count: 1,
+      retry_started_count: 1,
+      retry_completed_count: 1,
+      retry_changed_count: 1,
+      retry_reverified_count: 1,
+      retry_verification_passed_count: 1,
+      operationally_complete: true,
+    } : null,
     vnext_context_map_observation: null,
     audit_evidence: { fixture: true },
     fingerprints: { adapter: `sha256:${"b".repeat(64)}` },
@@ -219,6 +260,15 @@ const reviewerAcceptance = await executeBenchmarkV2Acceptance({
 assert.equal(reviewerAcceptance.status, "passed");
 assert.equal(reviewerAcceptance.family_id, "dev-medium-config-propagation");
 assert.deepEqual(reviewerAcceptance.activation, { eligible: true, activated: true });
+const retryAcceptance = await executeBenchmarkV2Acceptance({
+  repositoryRoot: root,
+  plan: retryPlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: fakeAttempt,
+});
+assert.equal(retryAcceptance.status, "passed");
+assert.equal(retryAcceptance.family_id, "dev-medium-public-result-shape");
+assert.deepEqual(retryAcceptance.activation, { eligible: true, activated: true });
 assert.equal(report.status, "complete");
 assert.equal(report.pair_results.length, 36);
 assert.equal(report.summary.statistics.activation.rate, 1);

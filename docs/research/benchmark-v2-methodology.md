@@ -47,6 +47,16 @@ multi-file integration for the reviewer lifecycle to be exercised. This
 selector affects acceptance only; it does not remove, reorder, or reweight any
 family in a full campaign.
 
+Development-only arm `P9` replaces the rejected reviewer experiment with one
+host-owned remediation retry on top of P6. The retry is eligible only when the
+runner-selected trusted visible check settles as `failed`; passed, unavailable,
+incomplete, and infrastructure outcomes do not trigger it. A fresh confined
+primary attempt receives only the visible requirements and public repository,
+may mutate once, and must pass the same runner-owned check after the mutation.
+`P6:P9` isolates this retry; `P0:P9` remains reserved for a later plain
+comparison only if the incremental transition passes every development gate.
+P9 is development-only and has no model-backed result yet.
+
 Persisted reports exclude prompts, fixture contents, hidden files, reference
 solutions, stdout/stderr, and credentials. The artifact reader recomputes plan,
 pair, and report fingerprints before upload. Development output may retain or
