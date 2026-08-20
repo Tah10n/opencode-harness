@@ -97,6 +97,14 @@ assert.deepEqual(riskGatedVisibleContractRemediationDecision({
   stratum: "medium",
   public_check_status: "passed",
   allowed_target_paths: ["config/feature.json", "src/task.mjs"],
+  changed_paths: ["config/feature.json", "src/task.mjs"],
+  first_attempt_completed: true,
+  include_multi_target: true,
+}), { eligible: true, reasons: ["multi-target"] });
+assert.deepEqual(riskGatedVisibleContractRemediationDecision({
+  stratum: "medium",
+  public_check_status: "passed",
+  allowed_target_paths: ["config/feature.json", "src/task.mjs"],
   changed_paths: ["src/task.mjs"],
   first_attempt_completed: true,
 }), { eligible: true, reasons: ["visible-target-missing"] });
@@ -134,6 +142,10 @@ assert.throws(
 );
 assert.throws(
   () => verificationRemediationObservation({ eligible: true, started: true, completed: true, reverified: true }),
+  /VERIFICATION_REMEDIATION_OBSERVATION/u,
+);
+assert.throws(
+  () => verificationRemediationObservation({ eligible: false, trigger_reasons: ["multi-target"] }),
   /VERIFICATION_REMEDIATION_OBSERVATION/u,
 );
 

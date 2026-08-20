@@ -29,6 +29,7 @@ let retryContextPrimaryCallCount = 0;
 let checkAddressedPrimaryCallCount = 0;
 let diagnosticGuidedPrimaryCallCount = 0;
 let visibleContractPrimaryCallCount = 0;
+let multiTargetContractPrimaryCallCount = 0;
 let invalidRetryPrimaryCallCount = 0;
 let latestPrimaryProfileManifestPath = null;
 
@@ -309,6 +310,11 @@ async function visibleContractPrimaryAdapter(input) {
   return result;
 }
 
+async function multiTargetContractPrimaryAdapter(input) {
+  multiTargetContractPrimaryCallCount += 1;
+  return fixtureAdapter(input);
+}
+
 async function invalidRetryPrimaryAdapter(input) {
   invalidRetryPrimaryCallCount += 1;
   const result = await fixtureAdapter(input);
@@ -410,6 +416,12 @@ const withRiskGatedContractRemediation = await attempt(
   null,
   visibleContractPrimaryAdapter,
   failOnceCommandRunner(),
+);
+const withMultiTargetContractRemediation = await attempt(
+  "P16",
+  null,
+  multiTargetContractPrimaryAdapter,
+  commandRunner,
 );
 const withInvalidRetryMutation = await attempt(
   "P9",
@@ -521,6 +533,14 @@ assert.match(prompts.get("P15"), /PUBLIC_CHECK_RESULT_V1=/u);
 assert.equal(withRiskGatedContractSkip.result.vnext_verification_remediation_observation.eligible, false);
 assert.equal(withRiskGatedContractRemediation.result.vnext_verification_remediation_observation.eligible, true);
 assert.equal(withRiskGatedContractRemediation.result.vnext_verification_remediation_observation.retry_completed_count, 1);
+assert.equal(multiTargetContractPrimaryCallCount, 2);
+assert.equal(withMultiTargetContractRemediation.result.vnext_verification_remediation_observation.eligible, true);
+assert.equal(withMultiTargetContractRemediation.result.vnext_verification_remediation_observation.retry_completed_count, 1);
+assert.deepEqual(
+  withMultiTargetContractRemediation.result.vnext_verification_remediation_observation.trigger_reasons,
+  ["multi-target"],
+);
+assert.match(prompts.get("P16"), /visible-contract conformance pass/u);
 assert.equal(invalidRetryPrimaryCallCount, 2);
 assert.equal(withInvalidRetryMutation.result.vnext_verification_remediation_observation.retry_completed_count, 0);
 assert.equal(withInvalidRetryMutation.result.vnext_verification_remediation_observation.retry_changed_count, 1);

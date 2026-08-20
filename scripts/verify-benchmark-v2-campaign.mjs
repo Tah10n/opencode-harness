@@ -28,6 +28,7 @@ const checkAddressedProfile = materializeVnextSyntheticProfile({ sourceRoot: roo
 const diagnosticGuidedProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P13" });
 const visibleContractProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P14" });
 const riskGatedContractProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P15" });
+const multiTargetContractProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P16" });
 try {
   assert.equal(plainProfile.primaryAgentId, "build");
   assert.equal(isolatedVerificationProfile.primaryAgentId, "build");
@@ -63,6 +64,10 @@ try {
   assert.deepEqual(
     riskGatedContractProfile.profileEvidence.component_ids,
     ["targeted-verification", "risk-gated-visible-contract-remediation"],
+  );
+  assert.deepEqual(
+    multiTargetContractProfile.profileEvidence.component_ids,
+    ["targeted-verification", "multi-target-visible-contract-remediation"],
   );
   assert.deepEqual(
     isolatedVerificationProfile.profileEvidence.runtime_surface.materialized_files.map((entry) => entry.path),
@@ -137,6 +142,7 @@ try {
   cleanupSyntheticProfile(diagnosticGuidedProfile);
   cleanupSyntheticProfile(visibleContractProfile);
   cleanupSyntheticProfile(riskGatedContractProfile);
+  cleanupSyntheticProfile(multiTargetContractProfile);
 }
 const plan = buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
@@ -305,6 +311,38 @@ const riskGatedCompositePlan = buildBenchmarkV2CampaignPlan({
   allowDirty: true,
 });
 assert.equal(riskGatedCompositePlan.component_id, "verified-risk-gated-contract-candidate");
+const multiTargetContractPlan = buildBenchmarkV2CampaignPlan({
+  repositoryRoot: root,
+  split: "development",
+  generationId: "generation-fixture-multi-target-contract-1",
+  baselineArmId: "P15",
+  candidateArmId: "P16",
+  model: "fixture/model",
+  provider: "fixture",
+  variant: "low",
+  timeoutMs: 300_000,
+  seed: "campaign-fixture-seed",
+  repetitions: 1,
+  executableIdentity: executableFingerprint,
+  allowDirty: true,
+});
+assert.equal(multiTargetContractPlan.component_id, "multi-target-contract-expansion");
+const multiTargetCompositePlan = buildBenchmarkV2CampaignPlan({
+  repositoryRoot: root,
+  split: "development",
+  generationId: "generation-fixture-multi-target-composite-1",
+  baselineArmId: "P0",
+  candidateArmId: "P16",
+  model: "fixture/model",
+  provider: "fixture",
+  variant: "low",
+  timeoutMs: 300_000,
+  seed: "campaign-fixture-seed",
+  repetitions: 1,
+  executableIdentity: executableFingerprint,
+  allowDirty: true,
+});
+assert.equal(multiTargetCompositePlan.component_id, "verified-multi-target-contract-candidate");
 assert.throws(() => buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
   split: "validation",
@@ -345,7 +383,7 @@ function binding(instance) {
 async function fakeAttempt({ instance, profileId }) {
   const ordinal = Number.parseInt(createHash(instance.family_id).slice(0, 2), 16);
   const baselineFailure = ordinal % 4 === 0;
-  const success = ["P6", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15"].includes(profileId) ? true : !baselineFailure;
+  const success = ["P6", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16"].includes(profileId) ? true : !baselineFailure;
   const passed = check(true);
   const hidden = success ? passed : check(false, "hidden-contract");
   const result = {
@@ -381,7 +419,7 @@ async function fakeAttempt({ instance, profileId }) {
       operationally_complete: true,
       terminal_allowed: true,
     } : null,
-    vnext_verification_remediation_observation: ["P9", "P10", "P11", "P12", "P13", "P14", "P15"].includes(profileId) ? {
+    vnext_verification_remediation_observation: ["P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16"].includes(profileId) ? {
       eligible: true,
       retry_required_count: 1,
       retry_started_count: 1,
@@ -390,6 +428,7 @@ async function fakeAttempt({ instance, profileId }) {
       retry_reverified_count: 1,
       retry_verification_passed_count: 1,
       operationally_complete: true,
+      trigger_reasons: profileId === "P16" ? ["multi-target"] : ["fixture-trigger"],
     } : null,
     vnext_context_map_observation: profileId === "P11" ? {
       eligible: true,
@@ -530,6 +569,24 @@ const riskGatedCompositeAcceptance = await executeBenchmarkV2Acceptance({
 assert.equal(riskGatedCompositeAcceptance.status, "passed");
 assert.equal(riskGatedCompositeAcceptance.family_id, "dev-high-authorization-boundary");
 assert.deepEqual(riskGatedCompositeAcceptance.activation, { eligible: true, activated: true });
+const multiTargetContractAcceptance = await executeBenchmarkV2Acceptance({
+  repositoryRoot: root,
+  plan: multiTargetContractPlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: fakeAttempt,
+});
+assert.equal(multiTargetContractAcceptance.status, "passed");
+assert.equal(multiTargetContractAcceptance.family_id, "dev-medium-config-propagation");
+assert.deepEqual(multiTargetContractAcceptance.activation, { eligible: true, activated: true });
+const multiTargetCompositeAcceptance = await executeBenchmarkV2Acceptance({
+  repositoryRoot: root,
+  plan: multiTargetCompositePlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: fakeAttempt,
+});
+assert.equal(multiTargetCompositeAcceptance.status, "passed");
+assert.equal(multiTargetCompositeAcceptance.family_id, "dev-medium-config-propagation");
+assert.deepEqual(multiTargetCompositeAcceptance.activation, { eligible: true, activated: true });
 assert.equal(report.status, "complete");
 assert.equal(report.pair_results.length, 36);
 assert.equal(report.summary.statistics.activation.rate, 1);

@@ -179,6 +179,21 @@ The incremental report remains valid, but the source cannot advance until a
 new registration-repair generation repeats P6-to-P15 under its new campaign
 fingerprint.
 
+The repaired P6-to-P15 generation on source
+`9e7d8bb330b341006b3dd0edbcbe3ac26a91bd89` passed all incremental gates, but
+the dedicated P0-to-P15 composite was rejected. Its success delta was only
++2.78 pp with a 95% CI of [-5.56, 13.89] pp and one-sided exact p=0.5000; the
+safety guard also failed after one new HIGH/MEDIUM regression. P15 therefore
+does not advance to validation.
+
+Development-only arm `P16` retains P15 and adds one deterministic eligibility
+signal: a completed medium task with more than one explicitly allowed visible
+target receives the bounded visible-contract pass. Campaign observations bind
+the public trigger reasons, and `P15:P16` activation requires the exact
+`multi-target` reason rather than any pre-existing P15 retry. `P15:P16` is the
+incremental estimand; `P0:P16` remains prohibited unless that fresh full
+development report passes every frozen gate.
+
 Persisted reports exclude prompts, fixture contents, hidden files, reference
 solutions, stdout/stderr, and credentials. The artifact reader recomputes plan,
 pair, and report fingerprints before upload. Development output may retain or
