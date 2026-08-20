@@ -71,7 +71,7 @@ const defaultRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "
 function qualityProfileIdentityFixtures() {
   assert.equal(isSyntheticQualityProfileId("instrumented"), true);
   assert.equal(isSyntheticQualityProfileId("P5"), true);
-  for (const profileId of ["plain", "profile-only", "P0", "P1", "P2", "P3", "P4", "P6"]) {
+  for (const profileId of ["plain", "profile-only", "P0", "P1", "P2", "P3", "P4", "P6", "P7"]) {
     assert.equal(isSyntheticQualityProfileId(profileId), false, profileId);
   }
   const facadeContinuation = buildSyntheticQualityContinuationPrompt(
@@ -1919,6 +1919,20 @@ async function executionFixtures(root, plainProfile, instrumentedProfile) {
   const invalidFinalCli = writeFakeOpenCode(fixtureRoot, "fake-opencode-invalid-final", {
     stream: jsonl(finalEvent("ordinary prose")),
   });
+  const structuredReviewContinuationSession = "ses_structured_review_continuation_fixture";
+  const structuredReviewContinuationCli = writeFakeOpenCode(fixtureRoot, "fake-opencode-structured-review-continuation", {
+    mode: "missing-final-then-final",
+    stream: jsonl(finalEvent(
+      "No findings.",
+      "ordinary-review-before-continuation",
+      structuredReviewContinuationSession,
+    )),
+    continuationStream: jsonl(finalEvent(
+      JSON.stringify({ review_findings: [] }),
+      "structured-review-after-continuation",
+      structuredReviewContinuationSession,
+    )),
+  });
   const explicitBlockedCli = writeFakeOpenCode(fixtureRoot, "fake-opencode-explicit-blocked", {
     stream: jsonl(finalEvent(agentResponse({ agentOutcome: "blocked" }))),
   });
@@ -2627,6 +2641,49 @@ async function executionFixtures(root, plainProfile, instrumentedProfile) {
     assert.equal(ordinaryJsonFinal.explicit_failure, false);
     assert.equal(ordinaryJsonFinal.trace_summary.stream_complete, true);
     assert.equal(ordinaryJsonFinal.transient_observations.observation_complete, true);
+
+    const structuredReviewProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P7" });
+    try {
+      const structuredReviewInvocations = [];
+      const structuredReviewSpawn = (executable, args, options) => {
+        structuredReviewInvocations.push([...args]);
+        return spawn(executable, args, options);
+      };
+      const repairedStructuredReview = await executeOpenCodeAdapter({
+        ...baseInput,
+        agentId: "core-reviewer",
+        profileId: structuredReviewProfile.profileId,
+        profileFingerprint: structuredReviewProfile.profileFingerprint,
+        profileManifestPath: structuredReviewProfile.manifestPath,
+        taskScopeMode: "read-only",
+      }, {
+        executable: process.execPath,
+        executableArgsPrefix: [structuredReviewContinuationCli],
+        spawnImpl: structuredReviewSpawn,
+      });
+      assert.equal(repairedStructuredReview.passed, true, JSON.stringify(repairedStructuredReview, null, 2));
+      assert.equal(repairedStructuredReview.response_protocol_status, "structured-review");
+      assert.deepEqual(repairedStructuredReview.review_findings, []);
+      assert.equal(repairedStructuredReview.model_turn_count, 2);
+      assert.equal(repairedStructuredReview.continuation_turn_count, 1);
+      const structuredReviewRuns = structuredReviewInvocations
+        .filter((args) => args[0] === structuredReviewContinuationCli && args.includes("run"));
+      assert.equal(structuredReviewRuns.length, 2);
+      assert.equal(structuredReviewRuns[1].includes("--session"), true);
+      assert.equal(
+        structuredReviewRuns[1][structuredReviewRuns[1].indexOf("--session") + 1],
+        structuredReviewContinuationSession,
+      );
+      const structuredReviewPrompt = structuredReviewRuns[1][structuredReviewRuns[1].indexOf("run") + 1];
+      assert.match(structuredReviewPrompt, /exactly one JSON object/u);
+      assert.match(structuredReviewPrompt, /Do not call tools or change files/u);
+      assert.equal(assertNeutralSyntheticModelVisibleValue(
+        structuredReviewPrompt,
+        "structured review continuation prompt",
+      ), true);
+    } finally {
+      cleanupSyntheticProfile(structuredReviewProfile);
+    }
 
     const explicitBlocked = await executeOpenCodeAdapter(baseInput, {
       executable: process.execPath,

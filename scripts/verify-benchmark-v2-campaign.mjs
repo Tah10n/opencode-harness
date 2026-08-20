@@ -18,6 +18,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const executableFingerprint = `sha256:${"a".repeat(64)}`;
 const plainProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P0" });
 const isolatedVerificationProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P6" });
+const isolatedReviewerProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P7" });
 try {
   assert.equal(plainProfile.primaryAgentId, "build");
   assert.equal(isolatedVerificationProfile.primaryAgentId, "build");
@@ -34,9 +35,31 @@ try {
     isolatedVerificationProfile.profileEvidence.source_entries.some((entry) => entry.source_path === "agents/core.md"),
     false,
   );
+  assert.equal(isolatedReviewerProfile.primaryAgentId, "build");
+  assert.deepEqual(
+    isolatedReviewerProfile.profileEvidence.component_ids,
+    ["targeted-verification", "independent-final-review"],
+  );
+  assert.deepEqual(
+    isolatedReviewerProfile.profileEvidence.runtime_surface.effective_config,
+    isolatedVerificationProfile.profileEvidence.runtime_surface.effective_config,
+  );
+  assert.deepEqual(
+    isolatedReviewerProfile.profileEvidence.runtime_surface.materialized_files.map((entry) => entry.path),
+    [
+      "agents/core-reviewer.md",
+      "runtime/host/automatic-review-gate.mjs",
+      "runtime/host/core-verification-gate.mjs",
+    ],
+  );
+  assert.equal(
+    isolatedReviewerProfile.profileEvidence.source_entries.some((entry) => entry.source_path === "agents/core.md"),
+    false,
+  );
 } finally {
   cleanupSyntheticProfile(plainProfile);
   cleanupSyntheticProfile(isolatedVerificationProfile);
+  cleanupSyntheticProfile(isolatedReviewerProfile);
 }
 const plan = buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
@@ -58,6 +81,23 @@ assert.equal(plan.schedules.length, 36);
 assert.equal(plan.component_id, "targeted-verification");
 assert.deepEqual([...new Set(plan.schedules.map((entry) => entry.stratum))].sort(), ["high", "medium", "small"]);
 assert.equal(new Set(plan.schedules.map((entry) => entry.pair_id)).size, 36);
+const reviewerPlan = buildBenchmarkV2CampaignPlan({
+  repositoryRoot: root,
+  split: "development",
+  generationId: "generation-fixture-reviewer-1",
+  baselineArmId: "P6",
+  candidateArmId: "P7",
+  model: "fixture/model",
+  provider: "fixture",
+  variant: "low",
+  timeoutMs: 300_000,
+  seed: "campaign-fixture-seed",
+  repetitions: 1,
+  executableIdentity: executableFingerprint,
+  allowDirty: true,
+});
+assert.equal(reviewerPlan.component_id, "independent-final-review");
+assert.equal(reviewerPlan.schedules.length, 36);
 assert.throws(() => buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
   split: "validation",

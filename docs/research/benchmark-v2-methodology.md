@@ -21,6 +21,12 @@ same plain primary agent as P0 and differs only by the runner-owned
 post-mutation verification gate. P6 is not a product profile or a vNext
 release arm; it exists to remove the rejected prompt component as a confounder.
 
+Development-only arm `P7` adds the host-triggered read-only reviewer to P6.
+The `P6:P7` transition isolates reviewer activation and effect after current
+runner verification, while `P0:P7` is reserved for a later plain comparison
+only if the incremental reviewer transition first passes development gates.
+P7 is not a product profile or release arm.
+
 Persisted reports exclude prompts, fixture contents, hidden files, reference
 solutions, stdout/stderr, and credentials. The artifact reader recomputes plan,
 pair, and report fingerprints before upload. Development output may retain or

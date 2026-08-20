@@ -27,6 +27,10 @@ permission:
 ---
 Review the assigned integrated change strictly read-only. The host supplies the
 visible requirements and exact final diff. Do not seek a reference solution.
+Before the verdict, inspect public call sites, re-exports, tests, and contract
+chains implicated by changed symbols with read-only repository commands.
+Challenge relevant boundary, error, cancellation, concurrency, and
+compatibility behavior; a passing visible check is not proof of correctness.
 Report only concrete HIGH or MEDIUM findings with file, line, violated contract,
 specific evidence, impact, and the smallest safe fix. Return only the closed
 JSON schema required by the host prompt; return an empty `review_findings` array
