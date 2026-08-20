@@ -138,7 +138,7 @@ function binding(instance) {
 async function fakeAttempt({ instance, profileId }) {
   const ordinal = Number.parseInt(createHash(instance.family_id).slice(0, 2), 16);
   const baselineFailure = ordinal % 4 === 0;
-  const success = profileId === "P6" ? true : !baselineFailure;
+  const success = ["P6", "P7"].includes(profileId) ? true : !baselineFailure;
   const passed = check(true);
   const hidden = success ? passed : check(false, "hidden-contract");
   const result = {
@@ -164,7 +164,16 @@ async function fakeAttempt({ instance, profileId }) {
       continuation_turn_count: 0,
     },
     vnext_host_verification_observation: { activation_eligible: true, activated: true, allowed: true },
-    vnext_automatic_review_observation: null,
+    vnext_automatic_review_observation: profileId === "P7" ? {
+      eligible: true,
+      review_required_count: 1,
+      review_started_count: 1,
+      review_completed_count: 1,
+      review_finding_count: 0,
+      reviewer_caused_fix_count: 0,
+      operationally_complete: true,
+      terminal_allowed: true,
+    } : null,
     vnext_context_map_observation: null,
     audit_evidence: { fixture: true },
     fingerprints: { adapter: `sha256:${"b".repeat(64)}` },
@@ -190,6 +199,15 @@ const acceptance = await executeBenchmarkV2Acceptance({
 });
 assert.equal(acceptance.status, "passed");
 assert.equal(acceptance.activation.activated, true);
+const reviewerAcceptance = await executeBenchmarkV2Acceptance({
+  repositoryRoot: root,
+  plan: reviewerPlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: fakeAttempt,
+});
+assert.equal(reviewerAcceptance.status, "passed");
+assert.equal(reviewerAcceptance.family_id, "dev-medium-config-propagation");
+assert.deepEqual(reviewerAcceptance.activation, { eligible: true, activated: true });
 assert.equal(report.status, "complete");
 assert.equal(report.pair_results.length, 36);
 assert.equal(report.summary.statistics.activation.rate, 1);

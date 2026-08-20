@@ -27,6 +27,12 @@ runner verification, while `P0:P7` is reserved for a later plain comparison
 only if the incremental reviewer transition first passes development gates.
 P7 is not a product profile or release arm.
 
+The automatic-review acceptance smoke uses the existing
+`dev-medium-config-propagation` family because both arms must reach a bounded
+multi-file integration for the reviewer lifecycle to be exercised. This
+selector affects acceptance only; it does not remove, reorder, or reweight any
+family in a full campaign.
+
 Persisted reports exclude prompts, fixture contents, hidden files, reference
 solutions, stdout/stderr, and credentials. The artifact reader recomputes plan,
 pair, and report fingerprints before upload. Development output may retain or
