@@ -6,6 +6,7 @@ import {
   renderDiffGuidedVerificationRemediationPrompt,
   renderDiagnosticGuidedVerificationRemediationPrompt,
   renderVisibleContractRemediationPrompt,
+  riskGatedVisibleContractRemediationDecision,
   verificationRemediationObservation,
 } from "../lib/quality/verification-remediation-gate.mjs";
 
@@ -84,6 +85,35 @@ assert.match(contractPrompt, /visible-contract conformance pass/u);
 assert.match(contractPrompt, /PUBLIC_CHECK_RESULT_V1=/u);
 assert.match(contractPrompt, /"status":"passed"/u);
 assert.doesNotMatch(contractPrompt, /[\r\n]/u);
+
+assert.deepEqual(riskGatedVisibleContractRemediationDecision({
+  stratum: "medium",
+  public_check_status: "passed",
+  allowed_target_paths: ["src/task.mjs"],
+  changed_paths: ["src/task.mjs"],
+  first_attempt_completed: true,
+}), { eligible: false, reasons: [] });
+assert.deepEqual(riskGatedVisibleContractRemediationDecision({
+  stratum: "medium",
+  public_check_status: "passed",
+  allowed_target_paths: ["config/feature.json", "src/task.mjs"],
+  changed_paths: ["src/task.mjs"],
+  first_attempt_completed: true,
+}), { eligible: true, reasons: ["visible-target-missing"] });
+assert.deepEqual(riskGatedVisibleContractRemediationDecision({
+  stratum: "small",
+  public_check_status: "failed",
+  allowed_target_paths: ["src/task.mjs"],
+  changed_paths: ["src/task.mjs"],
+  first_attempt_completed: true,
+}), { eligible: true, reasons: ["public-check-failed"] });
+assert.deepEqual(riskGatedVisibleContractRemediationDecision({
+  stratum: "high",
+  public_check_status: "passed",
+  allowed_target_paths: ["src/task.mjs"],
+  changed_paths: ["src/task.mjs"],
+  first_attempt_completed: true,
+}), { eligible: true, reasons: ["high-risk"] });
 
 const incompleteAfterMutation = verificationRemediationObservation({
   eligible: true,

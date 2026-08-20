@@ -156,6 +156,16 @@ passes. It is still rejected because the frozen small-stratum lower bound was
 workspace, so this generation cannot justify the unconditional second model
 call or advance to composite or validation.
 
+Development-only arm `P15` retains one visible-contract conformance pass but
+gates it on deterministic public state. High-risk tasks are always eligible;
+other tasks are eligible only after a failed fixed public check or when an
+explicitly allowed visible target path is missing from the first-attempt diff.
+The lower-risk passing and complete path skips the extra model call. Any P15
+mutation still invalidates prior verification and requires the same fixed
+trusted check. `P6:P15` is the incremental estimand; no plain composite is
+allowed unless the new acceptance and complete development report pass every
+frozen guardrail.
+
 Persisted reports exclude prompts, fixture contents, hidden files, reference
 solutions, stdout/stderr, and credentials. The artifact reader recomputes plan,
 pair, and report fingerprints before upload. Development output may retain or

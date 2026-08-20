@@ -27,6 +27,7 @@ const retryContextProfile = materializeVnextSyntheticProfile({ sourceRoot: root,
 const checkAddressedProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P12" });
 const diagnosticGuidedProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P13" });
 const visibleContractProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P14" });
+const riskGatedContractProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P15" });
 try {
   assert.equal(plainProfile.primaryAgentId, "build");
   assert.equal(isolatedVerificationProfile.primaryAgentId, "build");
@@ -58,6 +59,10 @@ try {
   assert.deepEqual(
     visibleContractProfile.profileEvidence.component_ids,
     ["targeted-verification", "visible-contract-remediation"],
+  );
+  assert.deepEqual(
+    riskGatedContractProfile.profileEvidence.component_ids,
+    ["targeted-verification", "risk-gated-visible-contract-remediation"],
   );
   assert.deepEqual(
     isolatedVerificationProfile.profileEvidence.runtime_surface.materialized_files.map((entry) => entry.path),
@@ -131,6 +136,7 @@ try {
   cleanupSyntheticProfile(checkAddressedProfile);
   cleanupSyntheticProfile(diagnosticGuidedProfile);
   cleanupSyntheticProfile(visibleContractProfile);
+  cleanupSyntheticProfile(riskGatedContractProfile);
 }
 const plan = buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
@@ -267,6 +273,22 @@ const visibleContractPlan = buildBenchmarkV2CampaignPlan({
   allowDirty: true,
 });
 assert.equal(visibleContractPlan.component_id, "visible-contract-remediation");
+const riskGatedContractPlan = buildBenchmarkV2CampaignPlan({
+  repositoryRoot: root,
+  split: "development",
+  generationId: "generation-fixture-risk-gated-contract-1",
+  baselineArmId: "P6",
+  candidateArmId: "P15",
+  model: "fixture/model",
+  provider: "fixture",
+  variant: "low",
+  timeoutMs: 300_000,
+  seed: "campaign-fixture-seed",
+  repetitions: 1,
+  executableIdentity: executableFingerprint,
+  allowDirty: true,
+});
+assert.equal(riskGatedContractPlan.component_id, "risk-gated-visible-contract-remediation");
 assert.throws(() => buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
   split: "validation",
@@ -307,7 +329,7 @@ function binding(instance) {
 async function fakeAttempt({ instance, profileId }) {
   const ordinal = Number.parseInt(createHash(instance.family_id).slice(0, 2), 16);
   const baselineFailure = ordinal % 4 === 0;
-  const success = ["P6", "P8", "P9", "P10", "P11", "P12", "P13", "P14"].includes(profileId) ? true : !baselineFailure;
+  const success = ["P6", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15"].includes(profileId) ? true : !baselineFailure;
   const passed = check(true);
   const hidden = success ? passed : check(false, "hidden-contract");
   const result = {
@@ -343,7 +365,7 @@ async function fakeAttempt({ instance, profileId }) {
       operationally_complete: true,
       terminal_allowed: true,
     } : null,
-    vnext_verification_remediation_observation: ["P9", "P10", "P11", "P12", "P13", "P14"].includes(profileId) ? {
+    vnext_verification_remediation_observation: ["P9", "P10", "P11", "P12", "P13", "P14", "P15"].includes(profileId) ? {
       eligible: true,
       retry_required_count: 1,
       retry_started_count: 1,
@@ -474,6 +496,15 @@ const visibleContractAcceptance = await executeBenchmarkV2Acceptance({
 assert.equal(visibleContractAcceptance.status, "passed");
 assert.equal(visibleContractAcceptance.family_id, "dev-medium-config-propagation");
 assert.deepEqual(visibleContractAcceptance.activation, { eligible: true, activated: true });
+const riskGatedContractAcceptance = await executeBenchmarkV2Acceptance({
+  repositoryRoot: root,
+  plan: riskGatedContractPlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: fakeAttempt,
+});
+assert.equal(riskGatedContractAcceptance.status, "passed");
+assert.equal(riskGatedContractAcceptance.family_id, "dev-high-authorization-boundary");
+assert.deepEqual(riskGatedContractAcceptance.activation, { eligible: true, activated: true });
 assert.equal(report.status, "complete");
 assert.equal(report.pair_results.length, 36);
 assert.equal(report.summary.statistics.activation.rate, 1);
