@@ -145,6 +145,17 @@ makes verification stale and the host reruns the fixed check. `P6:P14` isolates
 this mechanism; `P0:P14` remains reserved until every incremental development
 gate passes.
 
+The complete P6-to-P14 development report on source
+`c60643ce30d67514f7730653a23025104650a142` was canonically validated with
+fingerprint
+`sha256:190d8aac6864f9dd49d686fd367e7605379c2cfca750d3b2cf9eaf4c07dffbef`.
+It improved regression-free success from 19/36 to 28/36 (+25.00 pp, 95% CI
+[5.56, 44.44] pp, one-sided exact p=0.01123) and completed all 24 eligible
+passes. It is still rejected because the frozen small-stratum lower bound was
+-33.33 pp and median duration was 2.20x baseline. Only four passes changed the
+workspace, so this generation cannot justify the unconditional second model
+call or advance to composite or validation.
+
 Persisted reports exclude prompts, fixture contents, hidden files, reference
 solutions, stdout/stderr, and credentials. The artifact reader recomputes plan,
 pair, and report fingerprints before upload. Development output may retain or
