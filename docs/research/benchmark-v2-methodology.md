@@ -78,6 +78,19 @@ outcomes are not P10 evidence. P10 remains a new architecture generation of the
 canonical `verification-remediation` component and requires a fresh full
 development campaign after the registration repair.
 
+The repaired P6-to-P10 campaign on source
+`454a286b2189f0ea143227d0bac3822aa4aca28e` completed all 36 pairs and all six
+eligible retries, but improved only from 26/36 to 27/36. Its confidence interval
+crossed zero and the exact-test and safety gates failed, so P10 is rejected.
+
+Development-only arm `P11` isolates retry-time bounded context on top of P10.
+The primary attempt remains unchanged. Only when a medium task reaches an
+eligible failed-check retry does the host build and inject the existing bounded
+repository map alongside the public diff. `P10:P11` is the deep-context
+ablation; `P0:P11` is reserved for a later plain composite only if the
+incremental transition passes every development gate. P11 has no model-backed
+result yet.
+
 Persisted reports exclude prompts, fixture contents, hidden files, reference
 solutions, stdout/stderr, and credentials. The artifact reader recomputes plan,
 pair, and report fingerprints before upload. Development output may retain or
