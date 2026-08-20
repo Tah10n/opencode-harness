@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -9,6 +10,7 @@ import {
   validateBenchmarkV2CampaignReport,
 } from "../lib/benchmark/v2-campaign.mjs";
 import { fingerprintProfileValue } from "../lib/profile-v3.mjs";
+import { parsePromptFrontmatter } from "../lib/quality/prompt-inventory.mjs";
 import {
   cleanupSyntheticProfile,
   materializeVnextSyntheticProfile,
@@ -18,7 +20,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const executableFingerprint = `sha256:${"a".repeat(64)}`;
 const plainProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P0" });
 const isolatedVerificationProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P6" });
-const isolatedReviewerProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P7" });
+const isolatedReviewerProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P8" });
 try {
   assert.equal(plainProfile.primaryAgentId, "build");
   assert.equal(isolatedVerificationProfile.primaryAgentId, "build");
@@ -56,6 +58,15 @@ try {
     isolatedReviewerProfile.profileEvidence.source_entries.some((entry) => entry.source_path === "agents/core.md"),
     false,
   );
+  const reviewerSource = fs.readFileSync(
+    path.join(isolatedReviewerProfile.configDirectory, "agents", "core-reviewer.md"),
+    "utf8",
+  );
+  const reviewerFrontmatter = parsePromptFrontmatter(
+    reviewerSource,
+    "agents/core-reviewer.md",
+  ).frontmatter;
+  assert.equal(reviewerFrontmatter.permission.bash, "deny");
 } finally {
   cleanupSyntheticProfile(plainProfile);
   cleanupSyntheticProfile(isolatedVerificationProfile);
@@ -86,7 +97,7 @@ const reviewerPlan = buildBenchmarkV2CampaignPlan({
   split: "development",
   generationId: "generation-fixture-reviewer-1",
   baselineArmId: "P6",
-  candidateArmId: "P7",
+  candidateArmId: "P8",
   model: "fixture/model",
   provider: "fixture",
   variant: "low",
@@ -138,7 +149,7 @@ function binding(instance) {
 async function fakeAttempt({ instance, profileId }) {
   const ordinal = Number.parseInt(createHash(instance.family_id).slice(0, 2), 16);
   const baselineFailure = ordinal % 4 === 0;
-  const success = ["P6", "P7"].includes(profileId) ? true : !baselineFailure;
+  const success = ["P6", "P8"].includes(profileId) ? true : !baselineFailure;
   const passed = check(true);
   const hidden = success ? passed : check(false, "hidden-contract");
   const result = {
@@ -164,7 +175,7 @@ async function fakeAttempt({ instance, profileId }) {
       continuation_turn_count: 0,
     },
     vnext_host_verification_observation: { activation_eligible: true, activated: true, allowed: true },
-    vnext_automatic_review_observation: profileId === "P7" ? {
+    vnext_automatic_review_observation: profileId === "P8" ? {
       eligible: true,
       review_required_count: 1,
       review_started_count: 1,

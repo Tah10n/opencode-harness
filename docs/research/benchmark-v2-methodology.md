@@ -25,7 +25,17 @@ Development-only arm `P7` adds the host-triggered read-only reviewer to P6.
 The `P6:P7` transition isolates reviewer activation and effect after current
 runner verification, while `P0:P7` is reserved for a later plain comparison
 only if the incremental reviewer transition first passes development gates.
-P7 is not a product profile or release arm.
+P7 is not a product profile or release arm. Its first full development campaign
+failed operational activation because permitted shell inspection produced
+ambiguous trace evidence.
+
+Development-only arm `P8` is the next architecture generation. It keeps the
+same P6 host-verification baseline and automatic-review lifecycle but removes
+shell access from the reviewer; repository inspection is limited to native
+read, glob, and grep tools. `P6:P8` is the only incremental transition for this
+generation, and `P0:P8` is reserved for a later plain comparison only if that
+transition passes every frozen development gate. P8 is not a product profile
+or release arm.
 
 The automatic-review acceptance smoke uses the existing
 `dev-medium-config-propagation` family because both arms must reach a bounded
