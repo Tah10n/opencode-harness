@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
 
 import {
+  buildBoundedPublicCheckDiagnostic,
   renderCheckAddressedVerificationRemediationPrompt,
   renderDiffGuidedVerificationRemediationPrompt,
+  renderDiagnosticGuidedVerificationRemediationPrompt,
   verificationRemediationObservation,
 } from "../lib/quality/verification-remediation-gate.mjs";
 
@@ -47,6 +49,29 @@ const addressedPrompt = renderCheckAddressedVerificationRemediationPrompt({
 assert.match(addressedPrompt, /RUNNER_SELECTED_PUBLIC_CHECK_V1=/u);
 assert.match(addressedPrompt, /test\/public\.test\.mjs/u);
 assert.doesNotMatch(addressedPrompt, /[\r\n]/u);
+
+const diagnostic = buildBoundedPublicCheckDiagnostic({
+  result: {
+    status: 1,
+    stdout: "TAP version 13\nnot ok 1 - preserves shape",
+    stderr: "at /private/tmp/public-work/test/public.test.mjs:12:3\u001b[31m",
+  },
+  redacted_roots: ["/private/tmp/public-work"],
+});
+assert.equal(diagnostic.exit_status, 1);
+assert.match(diagnostic.output, /\[workspace\]\/test\/public\.test\.mjs/u);
+assert.doesNotMatch(diagnostic.output, /private\/tmp/u);
+assert.doesNotMatch(diagnostic.output, /\u001b/u);
+
+const diagnosticPrompt = renderDiagnosticGuidedVerificationRemediationPrompt({
+  visible_requirements: "Preserve the public result shape.",
+  current_diff: { schema_version: 1, files: [{ path: "src/task.mjs", before: "old", after: "new" }] },
+  fixed_public_check: { argv: ["node", "--test", "test/public.test.mjs"] },
+  public_check_diagnostic: diagnostic,
+});
+assert.match(diagnosticPrompt, /PUBLIC_CHECK_DIAGNOSTIC_V1=/u);
+assert.match(diagnosticPrompt, /not ok 1 - preserves shape/u);
+assert.doesNotMatch(diagnosticPrompt, /[\r\n]/u);
 
 const incompleteAfterMutation = verificationRemediationObservation({
   eligible: true,

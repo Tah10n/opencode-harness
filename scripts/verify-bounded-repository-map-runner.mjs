@@ -27,6 +27,7 @@ let verificationRetryPrimaryCallCount = 0;
 let diffGuidedRetryPrimaryCallCount = 0;
 let retryContextPrimaryCallCount = 0;
 let checkAddressedPrimaryCallCount = 0;
+let diagnosticGuidedPrimaryCallCount = 0;
 let invalidRetryPrimaryCallCount = 0;
 let latestPrimaryProfileManifestPath = null;
 
@@ -60,12 +61,15 @@ function failOnceCommandRunner() {
   let callCount = 0;
   return () => {
     callCount += 1;
+    const stdout = callCount === 1 ? "not ok 1 - VISIBLE_PUBLIC_DIAGNOSTIC" : "ok 1";
     return Promise.resolve({
       status: callCount === 1 ? 1 : 0,
       signal: null,
-      stdout_chars: 0,
+      stdout,
+      stderr: "",
+      stdout_chars: stdout.length,
       stderr_chars: 0,
-      stdout_bytes: 0,
+      stdout_bytes: Buffer.byteLength(stdout, "utf8"),
       stderr_bytes: 0,
       timed_out: false,
       teardown_verified: true,
@@ -284,6 +288,16 @@ async function checkAddressedPrimaryAdapter(input) {
   return result;
 }
 
+async function diagnosticGuidedPrimaryAdapter(input) {
+  diagnosticGuidedPrimaryCallCount += 1;
+  const result = await fixtureAdapter(input);
+  if (diagnosticGuidedPrimaryCallCount === 1) {
+    const target = path.join(input.context.repo, ...instance.solution_files[0].path.split("/"));
+    fs.appendFileSync(target, "// VISIBLE_VERIFICATION_DEFECT\n", "utf8");
+  }
+  return result;
+}
+
 async function invalidRetryPrimaryAdapter(input) {
   invalidRetryPrimaryCallCount += 1;
   const result = await fixtureAdapter(input);
@@ -360,6 +374,12 @@ const withCheckAddressedRetry = await attempt(
   "P12",
   null,
   checkAddressedPrimaryAdapter,
+  failOnceCommandRunner(),
+);
+const withDiagnosticGuidedRetry = await attempt(
+  "P13",
+  null,
+  diagnosticGuidedPrimaryAdapter,
   failOnceCommandRunner(),
 );
 const withInvalidRetryMutation = await attempt(
@@ -450,6 +470,14 @@ assert.equal(withCheckAddressedRetry.result.termination_acceptable, true);
 assert.match(prompts.get("P12"), /CURRENT_PUBLIC_DIFF_V1=/u);
 assert.match(prompts.get("P12"), /RUNNER_SELECTED_PUBLIC_CHECK_V1=/u);
 assert.match(prompts.get("P12"), /test\/public\.test\.mjs/u);
+assert.equal(diagnosticGuidedPrimaryCallCount, 2);
+assert.equal(withDiagnosticGuidedRetry.result.vnext_verification_remediation_observation.retry_verification_passed_count, 1);
+assert.equal(withDiagnosticGuidedRetry.result.termination_acceptable, true);
+assert.match(prompts.get("P13"), /CURRENT_PUBLIC_DIFF_V1=/u);
+assert.match(prompts.get("P13"), /RUNNER_SELECTED_PUBLIC_CHECK_V1=/u);
+assert.match(prompts.get("P13"), /PUBLIC_CHECK_DIAGNOSTIC_V1=/u);
+assert.match(prompts.get("P13"), /VISIBLE_PUBLIC_DIAGNOSTIC/u);
+assert.doesNotMatch(JSON.stringify(withDiagnosticGuidedRetry.result), /VISIBLE_PUBLIC_DIAGNOSTIC/u);
 assert.equal(invalidRetryPrimaryCallCount, 2);
 assert.equal(withInvalidRetryMutation.result.vnext_verification_remediation_observation.retry_completed_count, 0);
 assert.equal(withInvalidRetryMutation.result.vnext_verification_remediation_observation.retry_changed_count, 1);
