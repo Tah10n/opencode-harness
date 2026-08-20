@@ -124,6 +124,13 @@ campaign. The repaired estimand uses `dev-high-durable-persistence` as its
 acceptance-only lifecycle smoke; this does not filter or reweight the 36-family
 development campaign.
 
+That high-risk smoke also completed before remediation became eligible. Rather
+than select families until a stochastic first attempt fails, P13 acceptance now
+uses conditional activation semantics: an ineligible clean completion passes;
+an eligible retry must be operationally complete. Deterministic integration
+tests exercise the diagnostic retry path, while the unchanged full development
+campaign measures model-backed activation over every eligible family.
+
 Persisted reports exclude prompts, fixture contents, hidden files, reference
 solutions, stdout/stderr, and credentials. The artifact reader recomputes plan,
 pair, and report fingerprints before upload. Development output may retain or

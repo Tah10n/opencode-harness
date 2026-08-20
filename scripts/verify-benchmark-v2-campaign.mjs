@@ -342,6 +342,27 @@ async function fakeAttempt({ instance, profileId }) {
   return Object.freeze({ result: Object.freeze(result), binding: binding(instance) });
 }
 
+async function ineligibleDiagnosticAttempt(input) {
+  const attempt = await fakeAttempt(input);
+  if (input.profileId !== "P13") return attempt;
+  return Object.freeze({
+    ...attempt,
+    result: Object.freeze({
+      ...attempt.result,
+      vnext_verification_remediation_observation: Object.freeze({
+        eligible: false,
+        retry_required_count: 0,
+        retry_started_count: 0,
+        retry_completed_count: 0,
+        retry_changed_count: 0,
+        retry_reverified_count: 0,
+        retry_verification_passed_count: 0,
+        operationally_complete: true,
+      }),
+    }),
+  });
+}
+
 function createHash(value) {
   return fingerprintProfileValue(value).slice(7);
 }
@@ -414,6 +435,14 @@ const diagnosticGuidedAcceptance = await executeBenchmarkV2Acceptance({
 assert.equal(diagnosticGuidedAcceptance.status, "passed");
 assert.equal(diagnosticGuidedAcceptance.family_id, "dev-high-durable-persistence");
 assert.deepEqual(diagnosticGuidedAcceptance.activation, { eligible: true, activated: true });
+const ineligibleDiagnosticAcceptance = await executeBenchmarkV2Acceptance({
+  repositoryRoot: root,
+  plan: diagnosticGuidedPlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: ineligibleDiagnosticAttempt,
+});
+assert.equal(ineligibleDiagnosticAcceptance.status, "passed");
+assert.deepEqual(ineligibleDiagnosticAcceptance.activation, { eligible: false, activated: false });
 assert.equal(report.status, "complete");
 assert.equal(report.pair_results.length, 36);
 assert.equal(report.summary.statistics.activation.rate, 1);
