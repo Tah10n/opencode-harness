@@ -36,6 +36,7 @@ const coreV2ProductionProfile = materializeVnextSyntheticProfile({ sourceRoot: r
 const coreV2ExactCoordinatorProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P21" });
 const coreV2AdversarialAuditProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P22" });
 const coreV2BoundedContextProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P23" });
+const coreV2TransactionalProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P24" });
 try {
   assert.equal(plainProfile.primaryAgentId, "build");
   assert.equal(isolatedVerificationProfile.primaryAgentId, "build");
@@ -84,6 +85,10 @@ try {
     specializedContractProfile.profileEvidence.runtime_surface.materialized_files
       .some((entry) => entry.path === "agents/contract-auditor.md"),
     true,
+  );
+  assert.deepEqual(
+    coreV2TransactionalProfile.profileEvidence.component_ids,
+    ["targeted-verification", "bounded-pre-mutation-context", "risk-gated-specialized-visible-contract-remediation", "exact-core-v2-coordinator", "adversarial-counterexample-audit", "transactional-remediation-rollback"],
   );
   assert.deepEqual(
     stratifiedCoreProfile.profileEvidence.component_ids,
@@ -219,6 +224,7 @@ try {
   cleanupSyntheticProfile(coreV2ExactCoordinatorProfile);
   cleanupSyntheticProfile(coreV2AdversarialAuditProfile);
   cleanupSyntheticProfile(coreV2BoundedContextProfile);
+  cleanupSyntheticProfile(coreV2TransactionalProfile);
 }
 const plan = buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
@@ -563,6 +569,22 @@ const coreV2BoundedContextPlan = buildBenchmarkV2CampaignPlan({
   allowDirty: true,
 });
 assert.equal(coreV2BoundedContextPlan.component_id, "core-v2-bounded-context-candidate");
+const coreV2TransactionalPlan = buildBenchmarkV2CampaignPlan({
+  repositoryRoot: root,
+  split: "development",
+  generationId: "generation-fixture-core-v2-transactional-1",
+  baselineArmId: "P0",
+  candidateArmId: "P24",
+  model: "fixture/model",
+  provider: "fixture",
+  variant: "low",
+  timeoutMs: 300_000,
+  seed: "campaign-fixture-seed",
+  repetitions: 1,
+  executableIdentity: executableFingerprint,
+  allowDirty: true,
+});
+assert.equal(coreV2TransactionalPlan.component_id, "core-v2-transactional-candidate");
 assert.throws(() => buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
   split: "validation",

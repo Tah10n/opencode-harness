@@ -41,6 +41,7 @@ let riskGatedSpecializedPrimaryCallCount = 0;
 let coreV2ProductionPrimaryCallCount = 0;
 let coreV2ExactCoordinatorPrimaryCallCount = 0;
 let coreV2AdversarialAuditPrimaryCallCount = 0;
+let coreV2TransactionalPrimaryCallCount = 0;
 let invalidRetryPrimaryCallCount = 0;
 let latestPrimaryProfileManifestPath = null;
 
@@ -83,6 +84,26 @@ function failOnceCommandRunner() {
       stdout_chars: stdout.length,
       stderr_chars: 0,
       stdout_bytes: Buffer.byteLength(stdout, "utf8"),
+      stderr_bytes: 0,
+      timed_out: false,
+      teardown_verified: true,
+    });
+  };
+}
+
+function transactionalCommandRunner() {
+  let callCount = 0;
+  return () => {
+    callCount += 1;
+    const status = callCount === 2 ? 1 : 0;
+    return Promise.resolve({
+      status,
+      signal: null,
+      stdout: status === 0 ? "ok 1" : "not ok 1 - remediation regression",
+      stderr: "",
+      stdout_chars: 4,
+      stderr_chars: 0,
+      stdout_bytes: 4,
       stderr_bytes: 0,
       timed_out: false,
       teardown_verified: true,
@@ -380,6 +401,24 @@ async function coreV2AdversarialAuditPrimaryAdapter(input) {
   return result;
 }
 
+async function coreV2TransactionalPrimaryAdapter(input) {
+  coreV2TransactionalPrimaryCallCount += 1;
+  if (coreV2TransactionalPrimaryCallCount === 1) assert.equal(input.context.agentId, undefined);
+  if (coreV2TransactionalPrimaryCallCount === 2) assert.equal(input.context.agentId, "contract-auditor");
+  const result = await fixtureAdapter(input);
+  if (coreV2TransactionalPrimaryCallCount === 1 && instance.solution_files.length > 1) {
+    const omitted = instance.solution_files[1];
+    const original = instance.public_files.find((entry) => entry.path === omitted.path);
+    assert(original);
+    fs.writeFileSync(path.join(input.context.repo, ...omitted.path.split("/")), original.content, "utf8");
+  }
+  if (coreV2TransactionalPrimaryCallCount === 2) {
+    const target = path.join(input.context.repo, ...instance.solution_files[0].path.split("/"));
+    fs.appendFileSync(target, "// TRANSACTIONAL_REMEDIATION_REGRESSION\n", "utf8");
+  }
+  return result;
+}
+
 async function invalidRetryPrimaryAdapter(input) {
   invalidRetryPrimaryCallCount += 1;
   const result = await fixtureAdapter(input);
@@ -529,6 +568,12 @@ const withCoreV2BoundedContext = await attempt(
   null,
   fixtureAdapter,
   commandRunner,
+);
+const withCoreV2Transactional = await attempt(
+  "P24",
+  null,
+  coreV2TransactionalPrimaryAdapter,
+  transactionalCommandRunner(),
 );
 const withInvalidRetryMutation = await attempt(
   "P9",
@@ -701,6 +746,12 @@ assert.equal(withCoreV2BoundedContext.result.vnext_context_map_observation.eligi
 assert.equal(withCoreV2BoundedContext.result.vnext_context_map_observation.activated, true);
 assert.equal(withCoreV2BoundedContext.result.vnext_context_map_observation.reason, "host_map_injected_before_model");
 assert.equal(withCoreV2BoundedContext.result.termination_acceptable, true);
+assert.equal(coreV2TransactionalPrimaryCallCount, 2);
+assert.equal(withCoreV2Transactional.result.vnext_verification_remediation_observation.rollback_attempted_count, 1);
+assert.equal(withCoreV2Transactional.result.vnext_verification_remediation_observation.rollback_completed_count, 1);
+assert.equal(withCoreV2Transactional.result.vnext_verification_remediation_observation.reason, "retry_rolled_back_and_reverified");
+assert.equal(withCoreV2Transactional.result.visible_check.passed, true);
+assert.equal(withCoreV2Transactional.result.termination_acceptable, true);
 assert.throws(
   () => vnextInitialAgentId({ profile_id: "P18", stratum: "unknown" }),
   /SYNTHETIC_RUNNER_INITIAL_AGENT/u,

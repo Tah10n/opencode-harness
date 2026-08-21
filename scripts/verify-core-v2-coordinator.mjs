@@ -106,6 +106,35 @@ assert.deepEqual(remediated.remediation.trigger_reasons, [
   "visible-target-missing",
 ]);
 
+const transactionalCheckIds = [];
+let restoredSnapshot = null;
+const transactional = await runCoreV2Coordinator({
+  workspace_root: "/fixture",
+  visible_requirements: "Preserve the verified public behavior during the high-risk audit.",
+  stratum: "high",
+  allowed_target_paths: ["src/task.mjs", "test/task.test.mjs"],
+  catalog_fingerprint: fp("catalog"),
+  checks,
+  invoke_primary: async () => ({ completed: true }),
+  invoke_contract_auditor: async () => ({ completed: true }),
+  run_selected_check: async ({ check_id }) => {
+    transactionalCheckIds.push(check_id);
+    return transactionalCheckIds.length === 2 ? failedCheck(check_id) : passedCheck(check_id);
+  },
+  observe_workspace: observer(snapshots("initial", "primary", "audit", "primary")),
+  diff_workspaces: diff,
+  rollback_failed_remediation: true,
+  restore_workspace: async ({ snapshot }) => { restoredSnapshot = snapshot; },
+});
+assert.equal(transactional.status, "completed");
+assert.deepEqual(transactionalCheckIds, ["source-check", "source-check", "source-check"]);
+assert.equal(restoredSnapshot.id, "primary");
+assert.equal(transactional.remediation.rollback_attempted_count, 1);
+assert.equal(transactional.remediation.rollback_completed_count, 1);
+assert.equal(transactional.remediation.retry_verification_passed_count, 1);
+assert.equal(transactional.remediation.reason, "retry_rolled_back_and_reverified");
+assert.equal(transactional.terminal.reason, "post_last_mutation_verification_passed");
+
 let noCheckPrompt = null;
 const noApplicable = await runCoreV2Coordinator({
   workspace_root: "/fixture",
