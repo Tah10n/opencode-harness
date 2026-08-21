@@ -231,6 +231,16 @@ combines the existing public-only risk gate with the bounded contract auditor.
 It must pass isolated P6-to-P19 and full P0-to-P19 development gates before the
 remaining sealed validation use can be consumed.
 
+P19 passed its isolated P6 comparison and a complete P0 plain composite on
+source `9588551bf0c5fcb3034f87cd39ea220a4218d1e9`. The complete composite was
+22/36 to 30/36 (+22.22 pp, 95% CI [11.11, 36.11] pp, one-sided exact
+p=0.00390625), with 36/36 activation, no new HIGH/MEDIUM or critical
+regression, and 1.781x/1.665x median/mean duration. An earlier composite
+generation is preserved separately as incomplete because one plain profile
+bootstrap timed out; it emitted no summary and was not interpreted. P19 remains
+development-only until its exact host lifecycle is materialized as a runtime
+profile; only that source may use validation ordinal 2.
+
 Persisted reports exclude prompts, fixture contents, hidden files, reference
 solutions, stdout/stderr, and credentials. The artifact reader recomputes plan,
 pair, and report fingerprints before upload. Development output may retain or
