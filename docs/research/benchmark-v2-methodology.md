@@ -223,6 +223,14 @@ The public family stratum is the only dispatcher input. `P0:P18` is the full
 development estimand and must pass fresh acceptance plus every frozen gate
 before any sealed validation use.
 
+P18 passed its development gate but failed sealed validation use 1 on all 30
+validation families: +10.00 pp, 95% CI [-6.67, 26.67] pp, one-sided exact
+p=0.2265625, with failed safety, small-stratum, and median-cost guardrails. It
+is rejected and is not rerun. Development-only P19 removes compact-small and
+combines the existing public-only risk gate with the bounded contract auditor.
+It must pass isolated P6-to-P19 and full P0-to-P19 development gates before the
+remaining sealed validation use can be consumed.
+
 Persisted reports exclude prompts, fixture contents, hidden files, reference
 solutions, stdout/stderr, and credentials. The artifact reader recomputes plan,
 pair, and report fingerprints before upload. Development output may retain or

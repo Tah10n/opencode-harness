@@ -36,6 +36,7 @@ let visibleContractPrimaryCallCount = 0;
 let multiTargetContractPrimaryCallCount = 0;
 let specializedContractPrimaryCallCount = 0;
 let stratifiedCorePrimaryCallCount = 0;
+let riskGatedSpecializedPrimaryCallCount = 0;
 let invalidRetryPrimaryCallCount = 0;
 let latestPrimaryProfileManifestPath = null;
 
@@ -336,6 +337,13 @@ async function stratifiedCorePrimaryAdapter(input) {
   return fixtureAdapter(input);
 }
 
+async function riskGatedSpecializedPrimaryAdapter(input) {
+  riskGatedSpecializedPrimaryCallCount += 1;
+  if (riskGatedSpecializedPrimaryCallCount === 1) assert.equal(input.context.agentId, undefined);
+  if (riskGatedSpecializedPrimaryCallCount === 2) assert.equal(input.context.agentId, "contract-auditor");
+  return fixtureAdapter(input);
+}
+
 async function invalidRetryPrimaryAdapter(input) {
   invalidRetryPrimaryCallCount += 1;
   const result = await fixtureAdapter(input);
@@ -455,6 +463,12 @@ const withStratifiedCore = await attempt(
   null,
   stratifiedCorePrimaryAdapter,
   commandRunner,
+);
+const withRiskGatedSpecialized = await attempt(
+  "P19",
+  null,
+  riskGatedSpecializedPrimaryAdapter,
+  failOnceCommandRunner(),
 );
 const withInvalidRetryMutation = await attempt(
   "P9",
@@ -591,6 +605,13 @@ assert.deepEqual(
 assert.equal(vnextInitialAgentId({ profile_id: "P18", stratum: "small" }), "vnext-small-core");
 assert.equal(vnextInitialAgentId({ profile_id: "P18", stratum: "medium" }), null);
 assert.equal(vnextInitialAgentId({ profile_id: "P17", stratum: "small" }), null);
+assert.equal(riskGatedSpecializedPrimaryCallCount, 2);
+assert.equal(withRiskGatedSpecialized.result.vnext_verification_remediation_observation.eligible, true);
+assert.deepEqual(
+  withRiskGatedSpecialized.result.vnext_verification_remediation_observation.trigger_reasons,
+  ["risk-gated-specialized-visible-contract", "public-check-failed"],
+);
+assert.match(prompts.get("P19"), /visible-contract conformance pass/u);
 assert.throws(
   () => vnextInitialAgentId({ profile_id: "P18", stratum: "unknown" }),
   /SYNTHETIC_RUNNER_INITIAL_AGENT/u,
