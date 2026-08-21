@@ -1,0 +1,6 @@
+{
+  "schema_version": 3,
+  "inventory_path": "profiles/inventory.v3.json",
+  "bundle_id": "core-v2",
+  "view": "adoption_bundles.core-v2"
+}

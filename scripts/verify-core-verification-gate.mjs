@@ -66,6 +66,17 @@ const remutated = recordCoreWorkspaceMutation(failed, {
 assert.equal(remutated.mutation_revision, 2);
 assert.equal(remutated.selected_check_id, "narrow-test");
 assert.equal(remutated.verification, null);
+const pinned = recordCoreWorkspaceMutation(failed, {
+  changed_paths: ["src/feature.mjs", "test/feature.test.mjs"],
+  workspace_fingerprint: fp("workspace-pinned"),
+  pinned_check_id: "narrow-source",
+});
+assert.equal(pinned.selected_check_id, "narrow-source");
+assert.throws(() => recordCoreWorkspaceMutation(failed, {
+  changed_paths: ["test/feature.test.mjs"],
+  workspace_fingerprint: fp("workspace-invalid-pin"),
+  pinned_check_id: "narrow-source",
+}), /CORE_VERIFICATION_CHECK_PIN/u);
 const passed = completeCoreVerification(
   startCoreVerification(remutated, { check_id: "narrow-test" }),
   {

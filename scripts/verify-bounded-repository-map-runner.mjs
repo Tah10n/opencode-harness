@@ -37,6 +37,7 @@ let multiTargetContractPrimaryCallCount = 0;
 let specializedContractPrimaryCallCount = 0;
 let stratifiedCorePrimaryCallCount = 0;
 let riskGatedSpecializedPrimaryCallCount = 0;
+let coreV2ProductionPrimaryCallCount = 0;
 let invalidRetryPrimaryCallCount = 0;
 let latestPrimaryProfileManifestPath = null;
 
@@ -344,6 +345,13 @@ async function riskGatedSpecializedPrimaryAdapter(input) {
   return fixtureAdapter(input);
 }
 
+async function coreV2ProductionPrimaryAdapter(input) {
+  coreV2ProductionPrimaryCallCount += 1;
+  if (coreV2ProductionPrimaryCallCount === 1) assert.equal(input.context.agentId, undefined);
+  if (coreV2ProductionPrimaryCallCount === 2) assert.equal(input.context.agentId, "contract-auditor");
+  return fixtureAdapter(input);
+}
+
 async function invalidRetryPrimaryAdapter(input) {
   invalidRetryPrimaryCallCount += 1;
   const result = await fixtureAdapter(input);
@@ -468,6 +476,12 @@ const withRiskGatedSpecialized = await attempt(
   "P19",
   null,
   riskGatedSpecializedPrimaryAdapter,
+  failOnceCommandRunner(),
+);
+const withCoreV2Production = await attempt(
+  "P20",
+  null,
+  coreV2ProductionPrimaryAdapter,
   failOnceCommandRunner(),
 );
 const withInvalidRetryMutation = await attempt(
@@ -612,6 +626,14 @@ assert.deepEqual(
   ["risk-gated-specialized-visible-contract", "public-check-failed"],
 );
 assert.match(prompts.get("P19"), /visible-contract conformance pass/u);
+assert.equal(coreV2ProductionPrimaryCallCount, 2);
+assert.equal(withCoreV2Production.result.vnext_verification_remediation_observation.eligible, true);
+assert.deepEqual(
+  withCoreV2Production.result.vnext_verification_remediation_observation.trigger_reasons,
+  ["risk-gated-specialized-visible-contract", "public-check-failed"],
+);
+assert.match(prompts.get("P20"), /visible-contract conformance pass/u);
+assert.match(prompts.get("P20"), /RUNNER_SELECTED_PUBLIC_CHECK_V1=/u);
 assert.throws(
   () => vnextInitialAgentId({ profile_id: "P18", stratum: "unknown" }),
   /SYNTHETIC_RUNNER_INITIAL_AGENT/u,

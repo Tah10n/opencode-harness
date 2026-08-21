@@ -32,6 +32,7 @@ const multiTargetContractProfile = materializeVnextSyntheticProfile({ sourceRoot
 const specializedContractProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P17" });
 const stratifiedCoreProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P18" });
 const riskGatedSpecializedProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P19" });
+const coreV2ProductionProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P20" });
 try {
   assert.equal(plainProfile.primaryAgentId, "build");
   assert.equal(isolatedVerificationProfile.primaryAgentId, "build");
@@ -98,6 +99,17 @@ try {
   assert.equal(
     riskGatedSpecializedProfile.profileEvidence.runtime_surface.materialized_files
       .some((entry) => entry.path === "agents/contract-auditor.md"),
+    true,
+  );
+  assert.deepEqual(
+    coreV2ProductionProfile.profileEvidence.component_ids,
+    ["targeted-verification", "risk-gated-specialized-visible-contract-remediation"],
+  );
+  assert.equal(coreV2ProductionProfile.primaryAgentId, "build");
+  assert.equal(coreV2ProductionProfile.profileEvidence.runtime_surface.effective_config.default_agent, "build");
+  assert.equal(
+    coreV2ProductionProfile.profileEvidence.runtime_surface.materialized_files
+      .some((entry) => entry.path === "runtime/host/core-v2-coordinator.mjs"),
     true,
   );
   assert.deepEqual(
@@ -177,6 +189,7 @@ try {
   cleanupSyntheticProfile(specializedContractProfile);
   cleanupSyntheticProfile(stratifiedCoreProfile);
   cleanupSyntheticProfile(riskGatedSpecializedProfile);
+  cleanupSyntheticProfile(coreV2ProductionProfile);
 }
 const plan = buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
@@ -457,6 +470,22 @@ const riskGatedSpecializedCompositePlan = buildBenchmarkV2CampaignPlan({
   allowDirty: true,
 });
 assert.equal(riskGatedSpecializedCompositePlan.component_id, "verified-risk-gated-specialized-contract-candidate");
+const coreV2ProductionPlan = buildBenchmarkV2CampaignPlan({
+  repositoryRoot: root,
+  split: "development",
+  generationId: "generation-fixture-core-v2-production-1",
+  baselineArmId: "P0",
+  candidateArmId: "P20",
+  model: "fixture/model",
+  provider: "fixture",
+  variant: "low",
+  timeoutMs: 300_000,
+  seed: "campaign-fixture-seed",
+  repetitions: 1,
+  executableIdentity: executableFingerprint,
+  allowDirty: true,
+});
+assert.equal(coreV2ProductionPlan.component_id, "core-v2-production-candidate");
 assert.throws(() => buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
   split: "validation",
@@ -497,7 +526,7 @@ function binding(instance) {
 async function fakeAttempt({ instance, profileId }) {
   const ordinal = Number.parseInt(createHash(instance.family_id).slice(0, 2), 16);
   const baselineFailure = ordinal % 4 === 0;
-  const success = ["P6", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19"].includes(profileId) ? true : !baselineFailure;
+  const success = ["P6", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20"].includes(profileId) ? true : !baselineFailure;
   const passed = check(true);
   const hidden = success ? passed : check(false, "hidden-contract");
   const result = {
@@ -533,7 +562,7 @@ async function fakeAttempt({ instance, profileId }) {
       operationally_complete: true,
       terminal_allowed: true,
     } : null,
-    vnext_verification_remediation_observation: ["P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19"].includes(profileId) ? {
+    vnext_verification_remediation_observation: ["P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20"].includes(profileId) ? {
       eligible: true,
       retry_required_count: 1,
       retry_started_count: 1,
@@ -544,7 +573,7 @@ async function fakeAttempt({ instance, profileId }) {
       operationally_complete: true,
       trigger_reasons: profileId === "P16"
         ? ["multi-target"]
-        : profileId === "P19" ? ["risk-gated-specialized-visible-contract", "high-risk"]
+        : ["P19", "P20"].includes(profileId) ? ["risk-gated-specialized-visible-contract", "high-risk"]
         : ["P17", "P18"].includes(profileId) ? ["specialized-visible-contract"] : ["fixture-trigger"],
     } : null,
     vnext_context_map_observation: profileId === "P11" ? {
@@ -749,6 +778,15 @@ const riskGatedSpecializedCompositeAcceptance = await executeBenchmarkV2Acceptan
 assert.equal(riskGatedSpecializedCompositeAcceptance.status, "passed");
 assert.equal(riskGatedSpecializedCompositeAcceptance.family_id, "dev-high-authorization-boundary");
 assert.deepEqual(riskGatedSpecializedCompositeAcceptance.activation, { eligible: true, activated: true });
+const coreV2ProductionAcceptance = await executeBenchmarkV2Acceptance({
+  repositoryRoot: root,
+  plan: coreV2ProductionPlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: fakeAttempt,
+});
+assert.equal(coreV2ProductionAcceptance.status, "passed");
+assert.equal(coreV2ProductionAcceptance.family_id, "dev-high-authorization-boundary");
+assert.deepEqual(coreV2ProductionAcceptance.activation, { eligible: true, activated: true });
 assert.equal(report.status, "complete");
 assert.equal(report.pair_results.length, 36);
 assert.equal(report.summary.statistics.activation.rate, 1);

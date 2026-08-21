@@ -220,7 +220,7 @@ async function probeToolIds(profileRoot, workspaceRoot) {
 try {
   const evidence = [];
   const materialized = {};
-  for (const profile of ["core", "deep", "assurance"]) {
+  for (const profile of ["core", "core-v2", "deep", "assurance"]) {
     const output = path.join(temporaryRoot, profile);
     const workspace = path.join(temporaryRoot, "workspaces", profile);
     fs.mkdirSync(workspace, { recursive: true });
@@ -246,10 +246,12 @@ try {
       .map((match) => match[1]);
     const required = {
       core: ["core", "core-reviewer"],
+      "core-v2": ["build", "core", "core-reviewer", "contract-auditor"],
       deep: ["core", "core-reviewer", "deep", "explore"],
       assurance: ["core", "core-reviewer", "deep", "explore", "assurance", "architect", "reviewer", "verifier"],
     }[profile];
-    if (config.default_agent !== profile || required.some((name) => !names.includes(name))) {
+    const expectedDefaultAgent = profile === "core-v2" ? "build" : profile;
+    if (config.default_agent !== expectedDefaultAgent || required.some((name) => !names.includes(name))) {
       fail("V04_RUNTIME_DISCOVERY", `${profile} effective runtime profile is incomplete`);
     }
     if (profile !== "assurance" && names.includes("assurance")) {

@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import process from "node:process";
 import { spawnSync } from "node:child_process";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 import {
   ASSURANCE_FACADE_TOOL_IDS as PROFILE_FACADE_TOOL_IDS,
@@ -62,7 +62,7 @@ import {
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const scopeIndex = process.argv.indexOf("--scope");
 const scope = scopeIndex === -1 ? "all" : process.argv[scopeIndex + 1];
-const validScopes = new Set(["core", "deep", "assurance", "profiles", "adoption", "lab", "all"]);
+const validScopes = new Set(["core", "core-v2", "deep", "assurance", "profiles", "adoption", "lab", "all"]);
 const V2_INVENTORY_SHA256 = "7e86432871d000d72f60cc562e09f866ba9e9fa7bbc241cd58752791f26f4471";
 const LEGACY_TOOL_IDS = Object.freeze([
   "quality_session_start",
@@ -455,6 +455,33 @@ function verifyDeep() {
   };
 }
 
+function verifyCoreV2() {
+  const config = readJson("profiles/config/core-v2.opencode.json");
+  assert(config.default_agent === "build" && config.permission["quality_*"] === "deny"
+    && config.permission["context_*"] === "deny" && config.permission["oc_learning_*"] === "deny",
+  "V04_CORE_V2_CONFIG", "core-v2 effective config or denial boundary is invalid");
+  const manifest = buildProfileBundleManifest(root, "core-v2").manifest;
+  for (const required of [
+    "agents/contract-auditor.md",
+    "lib/feedback/contracts.mjs",
+    "lib/quality/core-v2-coordinator.mjs",
+    "lib/quality/core-verification-gate.mjs",
+    "lib/quality/verification-remediation-gate.mjs",
+  ]) {
+    assert(pathPresent(manifest, required), "V04_CORE_V2_BUNDLE", `core-v2 is missing ${required}`);
+  }
+  for (const forbidden of ["quality", "native", "lib/benchmark", "benchmarks", "evals", ".opencode/plugins"]) {
+    assert(!pathPresent(manifest, forbidden), "V04_CORE_V2_BUNDLE", `core-v2 contains forbidden path ${forbidden}`);
+  }
+  return {
+    status: "passed",
+    promotion_status: "validation-candidate",
+    bundle_file_count: manifest.file_count,
+    bundle_total_bytes: manifest.total_bytes,
+    bundle_fingerprint: manifest.bundle_fingerprint,
+  };
+}
+
 function verifyProfiles() {
   const loaded = loadProfileV3Pointers(root);
   const v2Bytes = fs.readFileSync(path.join(root, "profiles/inventory.v2.json"));
@@ -632,7 +659,7 @@ function verifyAdoption() {
       allowDirty: true,
     });
     assert(!fs.existsSync(dryParent), "V04_DRY_RUN_WRITE", "dry-run created an output parent");
-    for (const profile of ["core", "deep", "assurance"]) {
+    for (const profile of ["core", "core-v2", "deep", "assurance"]) {
       const output = path.join(temporaryRoot, profile);
       materializeProfileBundleV3({
         repositoryRoot: root,
@@ -640,7 +667,16 @@ function verifyAdoption() {
         outputDirectory: output,
         allowDirty: true,
       });
-      verifyMaterializedConfig(output, profile);
+      verifyMaterializedConfig(output, profile === "core-v2" ? "build" : profile);
+      if (profile === "core-v2") {
+        const importProbe = spawnSync(process.execPath, [
+          "--input-type=module",
+          "--eval",
+          `await import(${JSON.stringify(pathToFileURL(path.join(output, "lib/quality/core-v2-coordinator.mjs")).href)})`,
+        ], { encoding: "utf8", shell: false, windowsHide: true, timeout: 30_000 });
+        assert(importProbe.status === 0, "V04_CORE_V2_IMPORT",
+          `materialized core-v2 coordinator import failed: ${`${importProbe.stdout}\n${importProbe.stderr}`.slice(-2000)}`);
+      }
       let refused = false;
       try {
         materializeProfileBundleV3({
@@ -1631,6 +1667,7 @@ async function verifyLab() {
 
 async function runScope(selected) {
   if (selected === "core") return { core: verifyCore() };
+  if (selected === "core-v2") return { "core-v2": verifyCoreV2() };
   if (selected === "deep") return { deep: verifyDeep() };
   if (selected === "assurance") return { assurance: verifyAssurance() };
   if (selected === "profiles") return { profiles: verifyProfiles() };
@@ -1638,6 +1675,7 @@ async function runScope(selected) {
   if (selected === "lab") return { lab: await verifyLab() };
   return {
     core: verifyCore(),
+    "core-v2": verifyCoreV2(),
     deep: verifyDeep(),
     profiles: verifyProfiles(),
     adoption: verifyAdoption(),

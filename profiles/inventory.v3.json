@@ -50,6 +50,11 @@
       "prompt_path": "agents/core-reviewer.md"
     },
     {
+      "id": "contract-auditor",
+      "kind": "repository-bounded-remediation",
+      "prompt_path": "agents/contract-auditor.md"
+    },
+    {
       "id": "deep",
       "kind": "repository-primary",
       "prompt_path": "agents/deep.md"
@@ -106,6 +111,21 @@
         "roles": ["primary-core"],
         "tools": [],
         "permissions": ["host:trusted-project-check"]
+      }
+    },
+    {
+      "id": "risk-gated-specialized-visible-contract-remediation",
+      "status": "validation-candidate",
+      "target_metric": "functional_hidden_check_success",
+      "intervention_path": "benchmarks/vnext/components/risk-gated-specialized-visible-contract-remediation.md",
+      "intervention_vector": {
+        "prompt_fragments": [
+          "benchmarks/vnext/components/risk-gated-specialized-visible-contract-remediation.md",
+          "agents/contract-auditor.md"
+        ],
+        "roles": ["primary-build", "host-triggered-contract-auditor"],
+        "tools": [],
+        "permissions": ["host:trusted-project-check", "remediation:single-risk-gated-pass"]
       }
     },
     {
@@ -175,6 +195,17 @@
       "/materialized_files/1/fingerprint",
       "/materialized_files/1/path"
     ],
+    "risk-gated-specialized-visible-contract-remediation": [
+      "/effective_config/default_agent",
+      "/materialized_files/0/fingerprint",
+      "/materialized_files/0/path",
+      "/materialized_files/1/fingerprint",
+      "/materialized_files/1/path",
+      "/materialized_files/2/fingerprint",
+      "/materialized_files/2/path",
+      "/materialized_files/3/fingerprint",
+      "/materialized_files/3/path"
+    ],
     "deep-context": [
       "/effective_config/default_agent",
       "/materialized_files/0/fingerprint",
@@ -243,6 +274,18 @@
       "component_ids": [
         "core-rules",
         "targeted-verification"
+      ],
+      "delegation_limit": 0,
+      "quality_surface": "none"
+    },
+    {
+      "id": "core-v2",
+      "status": "validation-candidate",
+      "runtime": true,
+      "primary_role_id": "build",
+      "component_ids": [
+        "targeted-verification",
+        "risk-gated-specialized-visible-contract-remediation"
       ],
       "delegation_limit": 0,
       "quality_surface": "none"
@@ -328,6 +371,41 @@
         "evals",
         "lib/benchmark",
         "lib/quality",
+        "native",
+        "quality",
+        "skills/global-memory",
+        "skills/global-self-improvement"
+      ]
+    },
+    {
+      "id": "core-v2",
+      "base_bundle_id": "core",
+      "runtime_profile_id": "core-v2",
+      "entries": [
+        { "source": ".gitignore", "target": ".gitignore" },
+        { "source": "AGENTS.md", "target": "AGENTS.md" },
+        { "source": "LICENSE", "target": "LICENSE" },
+        { "source": "README.md", "target": "README.md" },
+        { "source": "profiles/config/core-v2.opencode.json", "target": "opencode.json" },
+        { "source": "agents/core.md", "target": "agents/core.md" },
+        { "source": "agents/core-reviewer.md", "target": "agents/core-reviewer.md" },
+        { "source": "agents/contract-auditor.md", "target": "agents/contract-auditor.md" },
+        { "source": "lib/feedback/contracts.mjs", "target": "lib/feedback/contracts.mjs" },
+        { "source": "lib/feedback/privacy.mjs", "target": "lib/feedback/privacy.mjs" },
+        { "source": "lib/quality/core-v2-coordinator.mjs", "target": "lib/quality/core-v2-coordinator.mjs" },
+        { "source": "lib/quality/core-verification-gate.mjs", "target": "lib/quality/core-verification-gate.mjs" },
+        { "source": "lib/quality/verification-remediation-gate.mjs", "target": "lib/quality/verification-remediation-gate.mjs" },
+        { "source": "skills/global-debugging", "target": "skills/global-debugging" },
+        { "source": "skills/global-review-ledger", "target": "skills/global-review-ledger" },
+        { "source": "docs/adoption.md", "target": "docs/adoption.md" },
+        { "source": "docs/design-principles.md", "target": "docs/design-principles.md" },
+        { "source": "docs/model-profiles.md", "target": "docs/model-profiles.md" }
+      ],
+      "forbidden_prefixes": [
+        ".opencode/plugins",
+        "benchmarks",
+        "evals",
+        "lib/benchmark",
         "native",
         "quality",
         "skills/global-memory",
