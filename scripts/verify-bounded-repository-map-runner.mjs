@@ -39,6 +39,7 @@ let stratifiedCorePrimaryCallCount = 0;
 let riskGatedSpecializedPrimaryCallCount = 0;
 let coreV2ProductionPrimaryCallCount = 0;
 let coreV2ExactCoordinatorPrimaryCallCount = 0;
+let coreV2AdversarialAuditPrimaryCallCount = 0;
 let invalidRetryPrimaryCallCount = 0;
 let latestPrimaryProfileManifestPath = null;
 
@@ -365,6 +366,18 @@ async function coreV2ExactCoordinatorPrimaryAdapter(input) {
   return result;
 }
 
+async function coreV2AdversarialAuditPrimaryAdapter(input) {
+  coreV2AdversarialAuditPrimaryCallCount += 1;
+  if (coreV2AdversarialAuditPrimaryCallCount === 1) assert.equal(input.context.agentId, undefined);
+  if (coreV2AdversarialAuditPrimaryCallCount === 2) assert.equal(input.context.agentId, "contract-auditor");
+  const result = await fixtureAdapter(input);
+  if (coreV2AdversarialAuditPrimaryCallCount === 2) {
+    const target = path.join(input.context.repo, ...instance.solution_files[0].path.split("/"));
+    fs.appendFileSync(target, "// ADVERSARIAL_AUDIT_REMEDIATION\n", "utf8");
+  }
+  return result;
+}
+
 async function invalidRetryPrimaryAdapter(input) {
   invalidRetryPrimaryCallCount += 1;
   const result = await fixtureAdapter(input);
@@ -501,6 +514,12 @@ const withCoreV2ExactCoordinator = await attempt(
   "P21",
   null,
   coreV2ExactCoordinatorPrimaryAdapter,
+  failOnceCommandRunner(),
+);
+const withCoreV2AdversarialAudit = await attempt(
+  "P22",
+  null,
+  coreV2AdversarialAuditPrimaryAdapter,
   failOnceCommandRunner(),
 );
 const withInvalidRetryMutation = await attempt(
@@ -662,6 +681,12 @@ assert.deepEqual(
 assert.equal(withCoreV2ExactCoordinator.result.vnext_host_verification_observation.allowed, true);
 assert.match(prompts.get("P21"), /visible-contract conformance pass/u);
 assert.match(prompts.get("P21"), /RUNNER_SELECTED_PUBLIC_CHECK_V1=/u);
+assert.doesNotMatch(prompts.get("P21"), /concrete counterexamples/u);
+assert.equal(coreV2AdversarialAuditPrimaryCallCount, 2);
+assert.equal(withCoreV2AdversarialAudit.result.vnext_verification_remediation_observation.eligible, true);
+assert.equal(withCoreV2AdversarialAudit.result.vnext_host_verification_observation.allowed, true);
+assert.match(prompts.get("P22"), /concrete counterexamples/u);
+assert.match(prompts.get("P22"), /RUNNER_SELECTED_PUBLIC_CHECK_V1=/u);
 assert.throws(
   () => vnextInitialAgentId({ profile_id: "P18", stratum: "unknown" }),
   /SYNTHETIC_RUNNER_INITIAL_AGENT/u,

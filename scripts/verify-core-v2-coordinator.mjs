@@ -96,6 +96,7 @@ assert.equal(remediated.status, "completed");
 assert.deepEqual(retryCheckIds, ["source-check", "source-check"]);
 assert.equal(auditInput.agent_id, "contract-auditor");
 assert.match(auditInput.prompt, /PUBLIC_CHECK_RESULT_V1=/u);
+assert.match(auditInput.prompt, /concrete counterexamples/u);
 assert.equal(remediated.activation.verification_started_count, 2);
 assert.equal(remediated.remediation.retry_verification_passed_count, 1);
 assert.deepEqual(remediated.remediation.trigger_reasons, [
@@ -122,6 +123,7 @@ const noApplicable = await runCoreV2Coordinator({
 assert.equal(noApplicable.status, "completed");
 assert.equal(noApplicable.terminal.reason, "no_applicable_trusted_check");
 assert.match(noCheckPrompt, /RUNNER_SELECTED_PUBLIC_CHECK_V1=null/u);
+assert.match(noCheckPrompt, /concrete counterexamples/u);
 assert.doesNotMatch(noCheckPrompt, /unavailable.*argv/u);
 
 const unavailable = await runCoreV2Coordinator({
