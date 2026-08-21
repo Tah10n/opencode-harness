@@ -25,6 +25,7 @@ const instance = renderBenchmarkV2DevelopmentFamily({
   seed: "bounded-repository-map-runner",
 });
 const prompts = new Map();
+const firstPrompts = new Map();
 let reviewerPrompt = null;
 let remediationPrimaryCallCount = 0;
 let verificationRetryPrimaryCallCount = 0;
@@ -93,6 +94,7 @@ async function fixtureAdapter({ context, onTrace, timeout }) {
   assert.equal(timeout, syntheticAdapterWorkerTimeoutMs(context.timeout));
   latestPrimaryProfileManifestPath = context.profileManifestPath;
   prompts.set(context.profileId, context.prompt);
+  if (!firstPrompts.has(context.profileId)) firstPrompts.set(context.profileId, context.prompt);
   for (const file of instance.solution_files) {
     const target = path.join(context.repo, ...file.path.split("/"));
     fs.mkdirSync(path.dirname(target), { recursive: true });
@@ -522,6 +524,12 @@ const withCoreV2AdversarialAudit = await attempt(
   coreV2AdversarialAuditPrimaryAdapter,
   failOnceCommandRunner(),
 );
+const withCoreV2BoundedContext = await attempt(
+  "P23",
+  null,
+  fixtureAdapter,
+  commandRunner,
+);
 const withInvalidRetryMutation = await attempt(
   "P9",
   null,
@@ -687,6 +695,12 @@ assert.equal(withCoreV2AdversarialAudit.result.vnext_verification_remediation_ob
 assert.equal(withCoreV2AdversarialAudit.result.vnext_host_verification_observation.allowed, true);
 assert.match(prompts.get("P22"), /concrete counterexamples/u);
 assert.match(prompts.get("P22"), /RUNNER_SELECTED_PUBLIC_CHECK_V1=/u);
+assert.match(firstPrompts.get("P23"), /HOST_REPOSITORY_MAP_V1=/u);
+assert.doesNotMatch(firstPrompts.get("P23"), /[\r\n]/u);
+assert.equal(withCoreV2BoundedContext.result.vnext_context_map_observation.eligible, true);
+assert.equal(withCoreV2BoundedContext.result.vnext_context_map_observation.activated, true);
+assert.equal(withCoreV2BoundedContext.result.vnext_context_map_observation.reason, "host_map_injected_before_model");
+assert.equal(withCoreV2BoundedContext.result.termination_acceptable, true);
 assert.throws(
   () => vnextInitialAgentId({ profile_id: "P18", stratum: "unknown" }),
   /SYNTHETIC_RUNNER_INITIAL_AGENT/u,

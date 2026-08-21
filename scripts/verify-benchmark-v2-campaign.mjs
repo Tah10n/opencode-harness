@@ -35,6 +35,7 @@ const riskGatedSpecializedProfile = materializeVnextSyntheticProfile({ sourceRoo
 const coreV2ProductionProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P20" });
 const coreV2ExactCoordinatorProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P21" });
 const coreV2AdversarialAuditProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P22" });
+const coreV2BoundedContextProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P23" });
 try {
   assert.equal(plainProfile.primaryAgentId, "build");
   assert.equal(isolatedVerificationProfile.primaryAgentId, "build");
@@ -129,6 +130,15 @@ try {
     ["targeted-verification", "risk-gated-specialized-visible-contract-remediation", "exact-core-v2-coordinator", "adversarial-counterexample-audit"],
   );
   assert.deepEqual(
+    coreV2BoundedContextProfile.profileEvidence.component_ids,
+    ["targeted-verification", "bounded-pre-mutation-context", "risk-gated-specialized-visible-contract-remediation", "exact-core-v2-coordinator", "adversarial-counterexample-audit"],
+  );
+  assert.equal(
+    coreV2BoundedContextProfile.profileEvidence.runtime_surface.materialized_files
+      .some((entry) => entry.path === "runtime/host/bounded-repository-map.mjs"),
+    true,
+  );
+  assert.deepEqual(
     isolatedVerificationProfile.profileEvidence.runtime_surface.materialized_files.map((entry) => entry.path),
     ["runtime/host/core-verification-gate.mjs"],
   );
@@ -208,6 +218,7 @@ try {
   cleanupSyntheticProfile(coreV2ProductionProfile);
   cleanupSyntheticProfile(coreV2ExactCoordinatorProfile);
   cleanupSyntheticProfile(coreV2AdversarialAuditProfile);
+  cleanupSyntheticProfile(coreV2BoundedContextProfile);
 }
 const plan = buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
@@ -536,6 +547,22 @@ const coreV2AdversarialAuditPlan = buildBenchmarkV2CampaignPlan({
   allowDirty: true,
 });
 assert.equal(coreV2AdversarialAuditPlan.component_id, "core-v2-adversarial-audit-candidate");
+const coreV2BoundedContextPlan = buildBenchmarkV2CampaignPlan({
+  repositoryRoot: root,
+  split: "development",
+  generationId: "generation-fixture-core-v2-bounded-context-1",
+  baselineArmId: "P0",
+  candidateArmId: "P23",
+  model: "fixture/model",
+  provider: "fixture",
+  variant: "low",
+  timeoutMs: 300_000,
+  seed: "campaign-fixture-seed",
+  repetitions: 1,
+  executableIdentity: executableFingerprint,
+  allowDirty: true,
+});
+assert.equal(coreV2BoundedContextPlan.component_id, "core-v2-bounded-context-candidate");
 assert.throws(() => buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
   split: "validation",
