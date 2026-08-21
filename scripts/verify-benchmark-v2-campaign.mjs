@@ -29,6 +29,7 @@ const diagnosticGuidedProfile = materializeVnextSyntheticProfile({ sourceRoot: r
 const visibleContractProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P14" });
 const riskGatedContractProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P15" });
 const multiTargetContractProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P16" });
+const specializedContractProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P17" });
 try {
   assert.equal(plainProfile.primaryAgentId, "build");
   assert.equal(isolatedVerificationProfile.primaryAgentId, "build");
@@ -68,6 +69,15 @@ try {
   assert.deepEqual(
     multiTargetContractProfile.profileEvidence.component_ids,
     ["targeted-verification", "multi-target-visible-contract-remediation"],
+  );
+  assert.deepEqual(
+    specializedContractProfile.profileEvidence.component_ids,
+    ["targeted-verification", "specialized-visible-contract-remediation"],
+  );
+  assert.equal(
+    specializedContractProfile.profileEvidence.runtime_surface.materialized_files
+      .some((entry) => entry.path === "agents/contract-auditor.md"),
+    true,
   );
   assert.deepEqual(
     isolatedVerificationProfile.profileEvidence.runtime_surface.materialized_files.map((entry) => entry.path),
@@ -143,6 +153,7 @@ try {
   cleanupSyntheticProfile(visibleContractProfile);
   cleanupSyntheticProfile(riskGatedContractProfile);
   cleanupSyntheticProfile(multiTargetContractProfile);
+  cleanupSyntheticProfile(specializedContractProfile);
 }
 const plan = buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
@@ -343,6 +354,38 @@ const multiTargetCompositePlan = buildBenchmarkV2CampaignPlan({
   allowDirty: true,
 });
 assert.equal(multiTargetCompositePlan.component_id, "verified-multi-target-contract-candidate");
+const specializedContractPlan = buildBenchmarkV2CampaignPlan({
+  repositoryRoot: root,
+  split: "development",
+  generationId: "generation-fixture-specialized-contract-1",
+  baselineArmId: "P6",
+  candidateArmId: "P17",
+  model: "fixture/model",
+  provider: "fixture",
+  variant: "low",
+  timeoutMs: 300_000,
+  seed: "campaign-fixture-seed",
+  repetitions: 1,
+  executableIdentity: executableFingerprint,
+  allowDirty: true,
+});
+assert.equal(specializedContractPlan.component_id, "specialized-visible-contract-remediation");
+const specializedCompositePlan = buildBenchmarkV2CampaignPlan({
+  repositoryRoot: root,
+  split: "development",
+  generationId: "generation-fixture-specialized-composite-1",
+  baselineArmId: "P0",
+  candidateArmId: "P17",
+  model: "fixture/model",
+  provider: "fixture",
+  variant: "low",
+  timeoutMs: 300_000,
+  seed: "campaign-fixture-seed",
+  repetitions: 1,
+  executableIdentity: executableFingerprint,
+  allowDirty: true,
+});
+assert.equal(specializedCompositePlan.component_id, "verified-specialized-contract-candidate");
 assert.throws(() => buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
   split: "validation",
@@ -383,7 +426,7 @@ function binding(instance) {
 async function fakeAttempt({ instance, profileId }) {
   const ordinal = Number.parseInt(createHash(instance.family_id).slice(0, 2), 16);
   const baselineFailure = ordinal % 4 === 0;
-  const success = ["P6", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16"].includes(profileId) ? true : !baselineFailure;
+  const success = ["P6", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17"].includes(profileId) ? true : !baselineFailure;
   const passed = check(true);
   const hidden = success ? passed : check(false, "hidden-contract");
   const result = {
@@ -419,7 +462,7 @@ async function fakeAttempt({ instance, profileId }) {
       operationally_complete: true,
       terminal_allowed: true,
     } : null,
-    vnext_verification_remediation_observation: ["P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16"].includes(profileId) ? {
+    vnext_verification_remediation_observation: ["P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17"].includes(profileId) ? {
       eligible: true,
       retry_required_count: 1,
       retry_started_count: 1,
@@ -428,7 +471,9 @@ async function fakeAttempt({ instance, profileId }) {
       retry_reverified_count: 1,
       retry_verification_passed_count: 1,
       operationally_complete: true,
-      trigger_reasons: profileId === "P16" ? ["multi-target"] : ["fixture-trigger"],
+      trigger_reasons: profileId === "P16"
+        ? ["multi-target"]
+        : profileId === "P17" ? ["specialized-visible-contract"] : ["fixture-trigger"],
     } : null,
     vnext_context_map_observation: profileId === "P11" ? {
       eligible: true,
@@ -587,6 +632,24 @@ const multiTargetCompositeAcceptance = await executeBenchmarkV2Acceptance({
 assert.equal(multiTargetCompositeAcceptance.status, "passed");
 assert.equal(multiTargetCompositeAcceptance.family_id, "dev-medium-config-propagation");
 assert.deepEqual(multiTargetCompositeAcceptance.activation, { eligible: true, activated: true });
+const specializedContractAcceptance = await executeBenchmarkV2Acceptance({
+  repositoryRoot: root,
+  plan: specializedContractPlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: fakeAttempt,
+});
+assert.equal(specializedContractAcceptance.status, "passed");
+assert.equal(specializedContractAcceptance.family_id, "dev-medium-config-propagation");
+assert.deepEqual(specializedContractAcceptance.activation, { eligible: true, activated: true });
+const specializedCompositeAcceptance = await executeBenchmarkV2Acceptance({
+  repositoryRoot: root,
+  plan: specializedCompositePlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: fakeAttempt,
+});
+assert.equal(specializedCompositeAcceptance.status, "passed");
+assert.equal(specializedCompositeAcceptance.family_id, "dev-medium-config-propagation");
+assert.deepEqual(specializedCompositeAcceptance.activation, { eligible: true, activated: true });
 assert.equal(report.status, "complete");
 assert.equal(report.pair_results.length, 36);
 assert.equal(report.summary.statistics.activation.rate, 1);

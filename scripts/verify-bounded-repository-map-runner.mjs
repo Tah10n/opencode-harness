@@ -30,6 +30,7 @@ let checkAddressedPrimaryCallCount = 0;
 let diagnosticGuidedPrimaryCallCount = 0;
 let visibleContractPrimaryCallCount = 0;
 let multiTargetContractPrimaryCallCount = 0;
+let specializedContractPrimaryCallCount = 0;
 let invalidRetryPrimaryCallCount = 0;
 let latestPrimaryProfileManifestPath = null;
 
@@ -315,6 +316,14 @@ async function multiTargetContractPrimaryAdapter(input) {
   return fixtureAdapter(input);
 }
 
+async function specializedContractPrimaryAdapter(input) {
+  specializedContractPrimaryCallCount += 1;
+  if (specializedContractPrimaryCallCount === 2) {
+    assert.equal(input.context.agentId, "contract-auditor");
+  }
+  return fixtureAdapter(input);
+}
+
 async function invalidRetryPrimaryAdapter(input) {
   invalidRetryPrimaryCallCount += 1;
   const result = await fixtureAdapter(input);
@@ -421,6 +430,12 @@ const withMultiTargetContractRemediation = await attempt(
   "P16",
   null,
   multiTargetContractPrimaryAdapter,
+  commandRunner,
+);
+const withSpecializedContractRemediation = await attempt(
+  "P17",
+  null,
+  specializedContractPrimaryAdapter,
   commandRunner,
 );
 const withInvalidRetryMutation = await attempt(
@@ -541,6 +556,14 @@ assert.deepEqual(
   ["multi-target"],
 );
 assert.match(prompts.get("P16"), /visible-contract conformance pass/u);
+assert.equal(specializedContractPrimaryCallCount, 2);
+assert.equal(withSpecializedContractRemediation.result.vnext_verification_remediation_observation.eligible, true);
+assert.equal(withSpecializedContractRemediation.result.vnext_verification_remediation_observation.retry_completed_count, 1);
+assert.deepEqual(
+  withSpecializedContractRemediation.result.vnext_verification_remediation_observation.trigger_reasons,
+  ["specialized-visible-contract"],
+);
+assert.match(prompts.get("P17"), /visible-contract conformance pass/u);
 assert.equal(invalidRetryPrimaryCallCount, 2);
 assert.equal(withInvalidRetryMutation.result.vnext_verification_remediation_observation.retry_completed_count, 0);
 assert.equal(withInvalidRetryMutation.result.vnext_verification_remediation_observation.retry_changed_count, 1);

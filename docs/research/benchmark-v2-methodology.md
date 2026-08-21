@@ -194,6 +194,21 @@ the public trigger reasons, and `P15:P16` activation requires the exact
 incremental estimand; `P0:P16` remains prohibited unless that fresh full
 development report passes every frozen gate.
 
+The P15-to-P16 development report on source
+`3e142776e9685c7c8005a6b66310401b57aa4a6c` was rejected. All six exact
+multi-target activations completed and cost stayed near baseline, but success
+improved only from 27/36 to 28/36 (+2.78 pp, 95% CI [-8.33, 13.89] pp,
+one-sided exact p=0.5000). Medium outcomes were neutral, with one discordance in
+each direction, so P16 cannot advance to composite or validation.
+
+Development-only arm `P17` uses P6 as its unchanged first-attempt baseline and
+starts one specialized contract auditor after every completed medium/high
+attempt. The auditor has a 64-step cap, native read/glob/grep/edit access, and
+no shell or delegation. It receives the same public-only conformance envelope
+as P14. `P6:P17` isolates this specialist pass; `P0:P17` remains prohibited
+unless fresh acceptance and the full development report pass every frozen
+gate.
+
 Persisted reports exclude prompts, fixture contents, hidden files, reference
 solutions, stdout/stderr, and credentials. The artifact reader recomputes plan,
 pair, and report fingerprints before upload. Development output may retain or
