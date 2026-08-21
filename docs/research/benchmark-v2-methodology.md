@@ -209,6 +209,20 @@ as P14. `P6:P17` isolates this specialist pass; `P0:P17` remains prohibited
 unless fresh acceptance and the full development report pass every frozen
 gate.
 
+The full P6-to-P17 report on source
+`6e28056926ad6e980b11353cec3f06053bdd91e4` completed all 24 specialist passes
+and improved success from 25/36 to 29/36, but its 95% CI [-2.78, 25.00] pp
+crossed zero and one-sided exact p=0.109375 missed the frozen threshold. The
+untreated small stratum declined from 12/12 to 11/12. CI, exact-test, and small
+guardrails failed, so P17 cannot advance.
+
+Development-only arm `P18` is a deterministic stratified candidate. Small
+tasks use the previously measured compact-rules primary role and no specialist;
+medium/high tasks keep the plain primary plus P17's bounded specialist pass.
+The public family stratum is the only dispatcher input. `P0:P18` is the full
+development estimand and must pass fresh acceptance plus every frozen gate
+before any sealed validation use.
+
 Persisted reports exclude prompts, fixture contents, hidden files, reference
 solutions, stdout/stderr, and credentials. The artifact reader recomputes plan,
 pair, and report fingerprints before upload. Development output may retain or

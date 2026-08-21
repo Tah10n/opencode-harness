@@ -4,7 +4,11 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { fingerprint } from "../lib/feedback/contracts.mjs";
-import { runSyntheticProfileAttempt, syntheticAdapterWorkerTimeoutMs } from "../lib/benchmark/runner.mjs";
+import {
+  runSyntheticProfileAttempt,
+  syntheticAdapterWorkerTimeoutMs,
+  vnextInitialAgentId,
+} from "../lib/benchmark/runner.mjs";
 import { loadBenchmarkV2Contracts } from "../lib/benchmark/v2-contracts.mjs";
 import { renderBenchmarkV2DevelopmentFamily } from "../lib/benchmark/v2-fixtures.mjs";
 import { materializeVnextSyntheticProfile } from "../lib/benchmark/profiles.mjs";
@@ -31,6 +35,7 @@ let diagnosticGuidedPrimaryCallCount = 0;
 let visibleContractPrimaryCallCount = 0;
 let multiTargetContractPrimaryCallCount = 0;
 let specializedContractPrimaryCallCount = 0;
+let stratifiedCorePrimaryCallCount = 0;
 let invalidRetryPrimaryCallCount = 0;
 let latestPrimaryProfileManifestPath = null;
 
@@ -324,6 +329,13 @@ async function specializedContractPrimaryAdapter(input) {
   return fixtureAdapter(input);
 }
 
+async function stratifiedCorePrimaryAdapter(input) {
+  stratifiedCorePrimaryCallCount += 1;
+  if (stratifiedCorePrimaryCallCount === 1) assert.equal(input.context.agentId, undefined);
+  if (stratifiedCorePrimaryCallCount === 2) assert.equal(input.context.agentId, "contract-auditor");
+  return fixtureAdapter(input);
+}
+
 async function invalidRetryPrimaryAdapter(input) {
   invalidRetryPrimaryCallCount += 1;
   const result = await fixtureAdapter(input);
@@ -436,6 +448,12 @@ const withSpecializedContractRemediation = await attempt(
   "P17",
   null,
   specializedContractPrimaryAdapter,
+  commandRunner,
+);
+const withStratifiedCore = await attempt(
+  "P18",
+  null,
+  stratifiedCorePrimaryAdapter,
   commandRunner,
 );
 const withInvalidRetryMutation = await attempt(
@@ -564,6 +582,19 @@ assert.deepEqual(
   ["specialized-visible-contract"],
 );
 assert.match(prompts.get("P17"), /visible-contract conformance pass/u);
+assert.equal(stratifiedCorePrimaryCallCount, 2);
+assert.equal(withStratifiedCore.result.vnext_verification_remediation_observation.eligible, true);
+assert.deepEqual(
+  withStratifiedCore.result.vnext_verification_remediation_observation.trigger_reasons,
+  ["specialized-visible-contract"],
+);
+assert.equal(vnextInitialAgentId({ profile_id: "P18", stratum: "small" }), "vnext-small-core");
+assert.equal(vnextInitialAgentId({ profile_id: "P18", stratum: "medium" }), null);
+assert.equal(vnextInitialAgentId({ profile_id: "P17", stratum: "small" }), null);
+assert.throws(
+  () => vnextInitialAgentId({ profile_id: "P18", stratum: "unknown" }),
+  /SYNTHETIC_RUNNER_INITIAL_AGENT/u,
+);
 assert.equal(invalidRetryPrimaryCallCount, 2);
 assert.equal(withInvalidRetryMutation.result.vnext_verification_remediation_observation.retry_completed_count, 0);
 assert.equal(withInvalidRetryMutation.result.vnext_verification_remediation_observation.retry_changed_count, 1);
