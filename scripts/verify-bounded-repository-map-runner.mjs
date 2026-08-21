@@ -38,6 +38,7 @@ let specializedContractPrimaryCallCount = 0;
 let stratifiedCorePrimaryCallCount = 0;
 let riskGatedSpecializedPrimaryCallCount = 0;
 let coreV2ProductionPrimaryCallCount = 0;
+let coreV2ExactCoordinatorPrimaryCallCount = 0;
 let invalidRetryPrimaryCallCount = 0;
 let latestPrimaryProfileManifestPath = null;
 
@@ -352,6 +353,18 @@ async function coreV2ProductionPrimaryAdapter(input) {
   return fixtureAdapter(input);
 }
 
+async function coreV2ExactCoordinatorPrimaryAdapter(input) {
+  coreV2ExactCoordinatorPrimaryCallCount += 1;
+  if (coreV2ExactCoordinatorPrimaryCallCount === 1) assert.equal(input.context.agentId, undefined);
+  if (coreV2ExactCoordinatorPrimaryCallCount === 2) assert.equal(input.context.agentId, "contract-auditor");
+  const result = await fixtureAdapter(input);
+  if (coreV2ExactCoordinatorPrimaryCallCount === 2) {
+    const target = path.join(input.context.repo, ...instance.solution_files[0].path.split("/"));
+    fs.appendFileSync(target, "// EXACT_COORDINATOR_REMEDIATION\n", "utf8");
+  }
+  return result;
+}
+
 async function invalidRetryPrimaryAdapter(input) {
   invalidRetryPrimaryCallCount += 1;
   const result = await fixtureAdapter(input);
@@ -482,6 +495,12 @@ const withCoreV2Production = await attempt(
   "P20",
   null,
   coreV2ProductionPrimaryAdapter,
+  failOnceCommandRunner(),
+);
+const withCoreV2ExactCoordinator = await attempt(
+  "P21",
+  null,
+  coreV2ExactCoordinatorPrimaryAdapter,
   failOnceCommandRunner(),
 );
 const withInvalidRetryMutation = await attempt(
@@ -634,6 +653,15 @@ assert.deepEqual(
 );
 assert.match(prompts.get("P20"), /visible-contract conformance pass/u);
 assert.match(prompts.get("P20"), /RUNNER_SELECTED_PUBLIC_CHECK_V1=/u);
+assert.equal(coreV2ExactCoordinatorPrimaryCallCount, 2);
+assert.equal(withCoreV2ExactCoordinator.result.vnext_verification_remediation_observation.eligible, true);
+assert.deepEqual(
+  withCoreV2ExactCoordinator.result.vnext_verification_remediation_observation.trigger_reasons,
+  ["risk-gated-specialized-visible-contract", "public-check-failed"],
+);
+assert.equal(withCoreV2ExactCoordinator.result.vnext_host_verification_observation.allowed, true);
+assert.match(prompts.get("P21"), /visible-contract conformance pass/u);
+assert.match(prompts.get("P21"), /RUNNER_SELECTED_PUBLIC_CHECK_V1=/u);
 assert.throws(
   () => vnextInitialAgentId({ profile_id: "P18", stratum: "unknown" }),
   /SYNTHETIC_RUNNER_INITIAL_AGENT/u,

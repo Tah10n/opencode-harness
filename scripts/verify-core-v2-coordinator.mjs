@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 
 import { fingerprint } from "../lib/feedback/contracts.mjs";
-import { runCoreV2Coordinator } from "../lib/quality/core-v2-coordinator.mjs";
+import {
+  runCoreV2Coordinator,
+  runCoreV2PostMutationCoordinator,
+} from "../lib/quality/core-v2-coordinator.mjs";
 
 const fp = (value) => fingerprint({ value });
 const snapshots = (...ids) => ids.map((id) => ({ fingerprint: fp(id), id }));
@@ -53,6 +56,23 @@ const simple = await runCoreV2Coordinator({
 assert.equal(simple.status, "completed");
 assert.deepEqual(simpleCheckIds, ["source-check"]);
 assert.equal(simple.remediation.eligible, false);
+
+const resumed = await runCoreV2PostMutationCoordinator({
+  workspace_root: "/fixture",
+  visible_requirements: "Update the visible source contract.",
+  stratum: "medium",
+  allowed_target_paths: ["src/task.mjs"],
+  catalog_fingerprint: fp("catalog"),
+  checks,
+  initial_workspace: snapshots("initial")[0],
+  primary_result: { completed: true },
+  invoke_contract_auditor: async () => { throw new Error("auditor must not run"); },
+  run_selected_check: async ({ check_id }) => passedCheck(check_id),
+  observe_workspace: observer(snapshots("primary")),
+  diff_workspaces: diff,
+});
+assert.equal(resumed.status, "completed");
+assert.equal(resumed.terminal.reason, "post_last_mutation_verification_passed");
 
 const retryCheckIds = [];
 let auditInput = null;

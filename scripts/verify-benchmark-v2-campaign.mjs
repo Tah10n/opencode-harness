@@ -33,6 +33,7 @@ const specializedContractProfile = materializeVnextSyntheticProfile({ sourceRoot
 const stratifiedCoreProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P18" });
 const riskGatedSpecializedProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P19" });
 const coreV2ProductionProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P20" });
+const coreV2ExactCoordinatorProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P21" });
 try {
   assert.equal(plainProfile.primaryAgentId, "build");
   assert.equal(isolatedVerificationProfile.primaryAgentId, "build");
@@ -109,6 +110,16 @@ try {
   assert.equal(coreV2ProductionProfile.profileEvidence.runtime_surface.effective_config.default_agent, "build");
   assert.equal(
     coreV2ProductionProfile.profileEvidence.runtime_surface.materialized_files
+      .some((entry) => entry.path === "runtime/host/core-v2-coordinator.mjs"),
+    true,
+  );
+  assert.deepEqual(
+    coreV2ExactCoordinatorProfile.profileEvidence.component_ids,
+    ["targeted-verification", "risk-gated-specialized-visible-contract-remediation", "exact-core-v2-coordinator"],
+  );
+  assert.equal(coreV2ExactCoordinatorProfile.primaryAgentId, "build");
+  assert.equal(
+    coreV2ExactCoordinatorProfile.profileEvidence.runtime_surface.materialized_files
       .some((entry) => entry.path === "runtime/host/core-v2-coordinator.mjs"),
     true,
   );
@@ -190,6 +201,7 @@ try {
   cleanupSyntheticProfile(stratifiedCoreProfile);
   cleanupSyntheticProfile(riskGatedSpecializedProfile);
   cleanupSyntheticProfile(coreV2ProductionProfile);
+  cleanupSyntheticProfile(coreV2ExactCoordinatorProfile);
 }
 const plan = buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
@@ -486,6 +498,22 @@ const coreV2ProductionPlan = buildBenchmarkV2CampaignPlan({
   allowDirty: true,
 });
 assert.equal(coreV2ProductionPlan.component_id, "core-v2-production-candidate");
+const coreV2ExactCoordinatorPlan = buildBenchmarkV2CampaignPlan({
+  repositoryRoot: root,
+  split: "development",
+  generationId: "generation-fixture-core-v2-exact-coordinator-1",
+  baselineArmId: "P0",
+  candidateArmId: "P21",
+  model: "fixture/model",
+  provider: "fixture",
+  variant: "low",
+  timeoutMs: 300_000,
+  seed: "campaign-fixture-seed",
+  repetitions: 1,
+  executableIdentity: executableFingerprint,
+  allowDirty: true,
+});
+assert.equal(coreV2ExactCoordinatorPlan.component_id, "core-v2-exact-coordinator-candidate");
 assert.throws(() => buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
   split: "validation",
