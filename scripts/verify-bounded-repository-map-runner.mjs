@@ -581,6 +581,12 @@ const withContractFirst = await attempt(
   fixtureAdapter,
   commandRunner,
 );
+const withHostCompiledContract = await attempt(
+  "P26",
+  null,
+  fixtureAdapter,
+  commandRunner,
+);
 const withInvalidRetryMutation = await attempt(
   "P9",
   null,
@@ -763,6 +769,14 @@ assert.equal(withContractFirst.result.vnext_context_map_observation.activated, t
 assert.equal(withContractFirst.result.vnext_host_verification_observation.activated, true);
 assert.equal(withContractFirst.result.vnext_verification_remediation_observation.eligible, false);
 assert.equal(withContractFirst.result.termination_acceptable, true);
+assert.match(firstPrompts.get("P26"), /HOST_REPOSITORY_MAP_V1=/u);
+assert.match(firstPrompts.get("P26"), /HOST_VISIBLE_CONTRACT_V1=/u);
+assert.equal(withHostCompiledContract.result.vnext_context_map_observation.activated, true);
+assert.equal(withHostCompiledContract.result.vnext_visible_contract_observation.activated, true);
+assert.equal(withHostCompiledContract.result.vnext_visible_contract_observation.clause_count > 0, true);
+assert.equal(withHostCompiledContract.result.vnext_host_verification_observation.activated, true);
+assert.equal(withHostCompiledContract.result.vnext_verification_remediation_observation.eligible, false);
+assert.equal(withHostCompiledContract.result.termination_acceptable, true);
 assert.throws(
   () => vnextInitialAgentId({ profile_id: "P18", stratum: "unknown" }),
   /SYNTHETIC_RUNNER_INITIAL_AGENT/u,
