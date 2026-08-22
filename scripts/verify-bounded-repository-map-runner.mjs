@@ -42,6 +42,7 @@ let coreV2ProductionPrimaryCallCount = 0;
 let coreV2ExactCoordinatorPrimaryCallCount = 0;
 let coreV2AdversarialAuditPrimaryCallCount = 0;
 let coreV2TransactionalPrimaryCallCount = 0;
+let stratifiedVisibleContractPrimaryCallCount = 0;
 let invalidRetryPrimaryCallCount = 0;
 let latestPrimaryProfileManifestPath = null;
 
@@ -419,6 +420,18 @@ async function coreV2TransactionalPrimaryAdapter(input) {
   return result;
 }
 
+async function stratifiedVisibleContractPrimaryAdapter(input) {
+  stratifiedVisibleContractPrimaryCallCount += 1;
+  if (stratifiedVisibleContractPrimaryCallCount === 1) assert.equal(input.context.agentId, undefined);
+  if (stratifiedVisibleContractPrimaryCallCount === 2) assert.equal(input.context.agentId, "contract-auditor");
+  const result = await fixtureAdapter(input);
+  if (stratifiedVisibleContractPrimaryCallCount === 2) {
+    const target = path.join(input.context.repo, ...instance.solution_files[0].path.split("/"));
+    fs.appendFileSync(target, "// STRATIFIED_AUDIT_REMEDIATION\n", "utf8");
+  }
+  return result;
+}
+
 async function invalidRetryPrimaryAdapter(input) {
   invalidRetryPrimaryCallCount += 1;
   const result = await fixtureAdapter(input);
@@ -586,6 +599,12 @@ const withHostCompiledContract = await attempt(
   null,
   fixtureAdapter,
   commandRunner,
+);
+const withStratifiedVisibleContract = await attempt(
+  "P27",
+  null,
+  stratifiedVisibleContractPrimaryAdapter,
+  failOnceCommandRunner(),
 );
 const withInvalidRetryMutation = await attempt(
   "P9",
@@ -777,6 +796,16 @@ assert.equal(withHostCompiledContract.result.vnext_visible_contract_observation.
 assert.equal(withHostCompiledContract.result.vnext_host_verification_observation.activated, true);
 assert.equal(withHostCompiledContract.result.vnext_verification_remediation_observation.eligible, false);
 assert.equal(withHostCompiledContract.result.termination_acceptable, true);
+assert.equal(stratifiedVisibleContractPrimaryCallCount, 2);
+assert.match(firstPrompts.get("P27"), /HOST_REPOSITORY_MAP_V1=/u);
+assert.doesNotMatch(firstPrompts.get("P27"), /HOST_VISIBLE_CONTRACT_V1=/u);
+assert.equal(withStratifiedVisibleContract.result.vnext_context_map_observation.activated, true);
+assert.equal(withStratifiedVisibleContract.result.vnext_visible_contract_observation.eligible, false);
+assert.equal(withStratifiedVisibleContract.result.vnext_verification_remediation_observation.operationally_complete, true);
+assert.equal(withStratifiedVisibleContract.result.vnext_host_verification_observation.allowed, true);
+assert.equal(withStratifiedVisibleContract.result.termination_acceptable, true);
+assert.equal(vnextInitialAgentId({ profile_id: "P27", stratum: "small" }), "core-v3-build");
+assert.equal(vnextInitialAgentId({ profile_id: "P27", stratum: "medium" }), null);
 assert.throws(
   () => vnextInitialAgentId({ profile_id: "P18", stratum: "unknown" }),
   /SYNTHETIC_RUNNER_INITIAL_AGENT/u,
