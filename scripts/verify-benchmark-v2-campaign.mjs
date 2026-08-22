@@ -43,6 +43,7 @@ const stratifiedVisibleContractProfile = materializeVnextSyntheticProfile({ sour
 const manifestTransactionalAuditProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P28" });
 const evidenceGatedManifestAuditProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P29" });
 const manifestRiskGatedAuditProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P30" });
+const criticalManifestRiskAuditProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P31" });
 try {
   assert.equal(plainProfile.primaryAgentId, "build");
   assert.equal(isolatedVerificationProfile.primaryAgentId, "build");
@@ -130,6 +131,11 @@ try {
   assert.deepEqual(
     manifestRiskGatedAuditProfile.profileEvidence.component_ids,
     ["host-compiled-visible-contract", "targeted-verification", "bounded-pre-mutation-context", "manifest-risk-gated-specialized-remediation", "exact-core-v2-coordinator", "adversarial-counterexample-audit", "transactional-remediation-rollback"],
+  );
+  assert.equal(criticalManifestRiskAuditProfile.primaryAgentId, "core-v3-build");
+  assert.deepEqual(
+    criticalManifestRiskAuditProfile.profileEvidence.component_ids,
+    ["host-compiled-visible-contract", "targeted-verification", "bounded-pre-mutation-context", "critical-manifest-risk-gated-remediation", "exact-core-v2-coordinator", "adversarial-counterexample-audit", "transactional-remediation-rollback"],
   );
   assert.deepEqual(
     stratifiedCoreProfile.profileEvidence.component_ids,
@@ -272,6 +278,7 @@ try {
   cleanupSyntheticProfile(manifestTransactionalAuditProfile);
   cleanupSyntheticProfile(evidenceGatedManifestAuditProfile);
   cleanupSyntheticProfile(manifestRiskGatedAuditProfile);
+  cleanupSyntheticProfile(criticalManifestRiskAuditProfile);
 }
 const plan = buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
@@ -728,6 +735,22 @@ const manifestRiskGatedAuditPlan = buildBenchmarkV2CampaignPlan({
   allowDirty: true,
 });
 assert.equal(manifestRiskGatedAuditPlan.component_id, "manifest-risk-gated-audit-candidate");
+const criticalManifestRiskAuditPlan = buildBenchmarkV2CampaignPlan({
+  repositoryRoot: root,
+  split: "development",
+  generationId: "generation-fixture-critical-manifest-risk-audit-1",
+  baselineArmId: "P0",
+  candidateArmId: "P31",
+  model: "fixture/model",
+  provider: "fixture",
+  variant: "low",
+  timeoutMs: 300_000,
+  seed: "campaign-fixture-seed",
+  repetitions: 1,
+  executableIdentity: executableFingerprint,
+  allowDirty: true,
+});
+assert.equal(criticalManifestRiskAuditPlan.component_id, "critical-manifest-risk-audit-candidate");
 assert.throws(() => buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
   split: "validation",

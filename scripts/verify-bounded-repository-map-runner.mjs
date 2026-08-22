@@ -47,6 +47,7 @@ let stratifiedVisibleContractPrimaryCallCount = 0;
 let manifestTransactionalAuditPrimaryCallCount = 0;
 let evidenceGatedManifestAuditPrimaryCallCount = 0;
 let manifestRiskGatedAuditPrimaryCallCount = 0;
+let criticalManifestRiskAuditPrimaryCallCount = 0;
 let invalidRetryPrimaryCallCount = 0;
 let latestPrimaryProfileManifestPath = null;
 
@@ -472,6 +473,12 @@ async function manifestRiskGatedAuditPrimaryAdapter(input) {
   return fixtureAdapter(input);
 }
 
+async function criticalManifestRiskAuditPrimaryAdapter(input) {
+  criticalManifestRiskAuditPrimaryCallCount += 1;
+  assert.equal(input.context.agentId, undefined);
+  return fixtureAdapter(input);
+}
+
 async function invalidRetryPrimaryAdapter(input) {
   invalidRetryPrimaryCallCount += 1;
   const result = await fixtureAdapter(input);
@@ -662,6 +669,12 @@ const withManifestRiskGatedAudit = await attempt(
   "P30",
   null,
   manifestRiskGatedAuditPrimaryAdapter,
+  commandRunner,
+);
+const withCriticalManifestRiskAudit = await attempt(
+  "P31",
+  null,
+  criticalManifestRiskAuditPrimaryAdapter,
   commandRunner,
 );
 const withInvalidRetryMutation = await attempt(
@@ -895,6 +908,12 @@ assert.match(firstPrompts.get("P30"), /HOST_VISIBLE_CONTRACT_V1=/u);
 assert.equal(withManifestRiskGatedAudit.result.vnext_verification_remediation_observation.eligible, false);
 assert.equal(withManifestRiskGatedAudit.result.termination_acceptable, true);
 assert.equal(vnextInitialAgentId({ profile_id: "P30", stratum: "high" }), null);
+assert.equal(criticalManifestRiskAuditPrimaryCallCount, 1);
+assert.match(firstPrompts.get("P31"), /HOST_REPOSITORY_MAP_V1=/u);
+assert.match(firstPrompts.get("P31"), /HOST_VISIBLE_CONTRACT_V1=/u);
+assert.equal(withCriticalManifestRiskAudit.result.vnext_verification_remediation_observation.eligible, false);
+assert.equal(withCriticalManifestRiskAudit.result.termination_acceptable, true);
+assert.equal(vnextInitialAgentId({ profile_id: "P31", stratum: "high" }), null);
 assert.throws(
   () => vnextInitialAgentId({ profile_id: "P18", stratum: "unknown" }),
   /SYNTHETIC_RUNNER_INITIAL_AGENT/u,
