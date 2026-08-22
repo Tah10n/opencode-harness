@@ -62,6 +62,51 @@ assert.deepEqual(evaluateBenchmarkV2MechanismActivation(
   reviewerFreeActivationCandidate,
   "high",
 ), { eligible: true, activated: true });
+assert.deepEqual(evaluateBenchmarkV2MechanismActivation(
+  "public-check-failure-only-transactional-candidate",
+  {
+    activation: {
+      verification_remediation: {
+        eligible: true,
+        operationally_complete: true,
+        trigger_reasons: ["risk-gated-specialized-visible-contract", "public-check-failed"],
+        rollback_attempted_count: 1,
+        rollback_completed_count: 1,
+      },
+    },
+  },
+  "high",
+), { eligible: true, activated: true });
+assert.deepEqual(evaluateBenchmarkV2MechanismActivation(
+  "public-check-failure-only-transactional-candidate",
+  {
+    activation: {
+      verification_remediation: {
+        eligible: false,
+        operationally_complete: true,
+        trigger_reasons: [],
+        rollback_attempted_count: 0,
+        rollback_completed_count: 0,
+      },
+    },
+  },
+  "high",
+), { eligible: false, activated: false });
+assert.deepEqual(evaluateBenchmarkV2MechanismActivation(
+  "public-check-failure-only-transactional-candidate",
+  {
+    activation: {
+      verification_remediation: {
+        eligible: true,
+        operationally_complete: false,
+        trigger_reasons: ["risk-gated-specialized-visible-contract", "public-check-failed"],
+        rollback_attempted_count: 1,
+        rollback_completed_count: 0,
+      },
+    },
+  },
+  "high",
+), { eligible: true, activated: false });
 assert.equal(evaluateBenchmarkV2MechanismActivation(
   "reviewer-free-exact-core-candidate",
   {
@@ -100,6 +145,7 @@ const manifestRiskGatedAuditProfile = materializeVnextSyntheticProfile({ sourceR
 const criticalManifestRiskAuditProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P31" });
 const reviewerFreeExactCoreProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P32" });
 const scenarioTypedVisibleContractProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P33" });
+const publicCheckFailureOnlyProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P34" });
 try {
   assert.equal(plainProfile.primaryAgentId, "build");
   assert.equal(isolatedVerificationProfile.primaryAgentId, "build");
@@ -212,6 +258,16 @@ try {
     scenarioTypedVisibleContractProfile.profileEvidence.runtime_surface.materialized_files
       .some((entry) => entry.path === "agents/contract-auditor.md"),
     false,
+  );
+  assert.equal(publicCheckFailureOnlyProfile.primaryAgentId, "core-v4-build");
+  assert.deepEqual(
+    publicCheckFailureOnlyProfile.profileEvidence.component_ids,
+    ["scenario-typed-visible-contract", "targeted-verification", "bounded-pre-mutation-context", "exact-core-v2-coordinator", "public-check-failure-only-remediation", "transactional-remediation-rollback"],
+  );
+  assert.equal(
+    publicCheckFailureOnlyProfile.profileEvidence.runtime_surface.materialized_files
+      .some((entry) => entry.path === "agents/contract-auditor.md"),
+    true,
   );
   assert.deepEqual(
     stratifiedCoreProfile.profileEvidence.component_ids,
@@ -357,6 +413,7 @@ try {
   cleanupSyntheticProfile(criticalManifestRiskAuditProfile);
   cleanupSyntheticProfile(reviewerFreeExactCoreProfile);
   cleanupSyntheticProfile(scenarioTypedVisibleContractProfile);
+  cleanupSyntheticProfile(publicCheckFailureOnlyProfile);
 }
 const plan = buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
@@ -888,6 +945,26 @@ assert.equal(
   scenarioTypedVisibleContractPlan.bindings.candidate_profile_fingerprint,
   scenarioTypedVisibleContractProfile.profileFingerprint,
 );
+const publicCheckFailureOnlyPlan = buildBenchmarkV2CampaignPlan({
+  repositoryRoot: root,
+  split: "development",
+  generationId: "generation-fixture-public-check-failure-only-1",
+  baselineArmId: "P0",
+  candidateArmId: "P34",
+  model: "fixture/model",
+  provider: "fixture",
+  variant: "low",
+  timeoutMs: 300_000,
+  seed: "campaign-fixture-seed",
+  repetitions: 1,
+  executableIdentity: executableFingerprint,
+  allowDirty: true,
+});
+assert.equal(publicCheckFailureOnlyPlan.component_id, "public-check-failure-only-transactional-candidate");
+assert.equal(
+  publicCheckFailureOnlyPlan.bindings.candidate_profile_fingerprint,
+  publicCheckFailureOnlyProfile.profileFingerprint,
+);
 assert.throws(() => buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
   split: "validation",
@@ -928,7 +1005,7 @@ function binding(instance) {
 async function fakeAttempt({ instance, profileId }) {
   const ordinal = Number.parseInt(createHash(instance.family_id).slice(0, 2), 16);
   const baselineFailure = ordinal % 4 === 0;
-  const success = ["P6", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20"].includes(profileId) ? true : !baselineFailure;
+  const success = ["P6", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20", "P34"].includes(profileId) ? true : !baselineFailure;
   const passed = check(true);
   const hidden = success ? passed : check(false, "hidden-contract");
   const result = {
@@ -964,7 +1041,7 @@ async function fakeAttempt({ instance, profileId }) {
       operationally_complete: true,
       terminal_allowed: true,
     } : null,
-    vnext_verification_remediation_observation: ["P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20"].includes(profileId) ? {
+    vnext_verification_remediation_observation: ["P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20", "P34"].includes(profileId) ? {
       eligible: true,
       retry_required_count: 1,
       retry_started_count: 1,
@@ -973,7 +1050,9 @@ async function fakeAttempt({ instance, profileId }) {
       retry_reverified_count: 1,
       retry_verification_passed_count: 1,
       operationally_complete: true,
-      trigger_reasons: profileId === "P16"
+      trigger_reasons: profileId === "P34"
+        ? ["risk-gated-specialized-visible-contract", "public-check-failed"]
+        : profileId === "P16"
         ? ["multi-target"]
         : ["P19", "P20"].includes(profileId) ? ["risk-gated-specialized-visible-contract", "high-risk"]
         : ["P17", "P18"].includes(profileId) ? ["specialized-visible-contract"] : ["fixture-trigger"],
@@ -1189,6 +1268,15 @@ const coreV2ProductionAcceptance = await executeBenchmarkV2Acceptance({
 assert.equal(coreV2ProductionAcceptance.status, "passed");
 assert.equal(coreV2ProductionAcceptance.family_id, "dev-high-authorization-boundary");
 assert.deepEqual(coreV2ProductionAcceptance.activation, { eligible: true, activated: true });
+const publicCheckFailureOnlyAcceptance = await executeBenchmarkV2Acceptance({
+  repositoryRoot: root,
+  plan: publicCheckFailureOnlyPlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: fakeAttempt,
+});
+assert.equal(publicCheckFailureOnlyAcceptance.status, "passed");
+assert.equal(publicCheckFailureOnlyAcceptance.family_id, "dev-high-duplicate-side-effects");
+assert.deepEqual(publicCheckFailureOnlyAcceptance.activation, { eligible: true, activated: true });
 assert.equal(report.status, "complete");
 assert.equal(report.pair_results.length, 36);
 assert.equal(report.summary.statistics.activation.rate, 1);

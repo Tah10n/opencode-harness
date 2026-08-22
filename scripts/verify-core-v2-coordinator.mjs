@@ -59,6 +59,29 @@ assert.equal(coreV2RemediationPlan({
   audit_trigger_policy: "public-evidence-only",
 }).eligible, true);
 assert.equal(coreV2RemediationPlan({
+  visible_requirements: "Update the public contract.",
+  stratum: "high",
+  allowed_target_paths: ["src/task.mjs"],
+  changed_paths: [],
+  first_attempt_completed: true,
+  current_diff: { changed_paths: [] },
+  fixed_public_check: null,
+  public_check_status: "passed",
+  audit_trigger_policy: "public-check-failure-only",
+}).eligible, false);
+assert.equal(coreV2RemediationPlan({
+  visible_requirements: "Update the public contract.",
+  stratum: "small",
+  allowed_target_paths: ["src/task.mjs"],
+  changed_paths: ["src/task.mjs"],
+  first_attempt_completed: true,
+  current_diff: { changed_paths: ["src/task.mjs"] },
+  fixed_public_check: { argv: ["node", "--test"] },
+  public_check_status: "failed",
+  public_check_diagnostic: { exit_status: 1, output: "not ok", truncated: false },
+  audit_trigger_policy: "public-check-failure-only",
+}).eligible, true);
+assert.equal(coreV2RemediationPlan({
   visible_requirements: "Preserve ordering at the trust boundary.",
   stratum: "high",
   allowed_target_paths: ["src/task.mjs"],

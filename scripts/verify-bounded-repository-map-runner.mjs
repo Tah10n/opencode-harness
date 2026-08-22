@@ -49,6 +49,8 @@ let evidenceGatedManifestAuditPrimaryCallCount = 0;
 let manifestRiskGatedAuditPrimaryCallCount = 0;
 let criticalManifestRiskAuditPrimaryCallCount = 0;
 let reviewerFreeExactCorePrimaryCallCount = 0;
+let publicCheckFailureOnlyPrimaryCallCount = 0;
+let publicCheckFailureOnlySkipPrimaryCallCount = 0;
 let invalidRetryPrimaryCallCount = 0;
 let latestPrimaryProfileManifestPath = null;
 
@@ -486,6 +488,24 @@ async function reviewerFreeExactCorePrimaryAdapter(input) {
   return fixtureAdapter(input);
 }
 
+async function publicCheckFailureOnlyPrimaryAdapter(input) {
+  publicCheckFailureOnlyPrimaryCallCount += 1;
+  if (publicCheckFailureOnlyPrimaryCallCount === 1) assert.equal(input.context.agentId, undefined);
+  if (publicCheckFailureOnlyPrimaryCallCount === 2) assert.equal(input.context.agentId, "contract-auditor");
+  const result = await fixtureAdapter(input);
+  if (publicCheckFailureOnlyPrimaryCallCount === 2) {
+    const target = path.join(input.context.repo, ...instance.solution_files[0].path.split("/"));
+    fs.appendFileSync(target, "// PUBLIC_CHECK_FAILURE_ONLY_REMEDIATION\n", "utf8");
+  }
+  return result;
+}
+
+async function publicCheckFailureOnlySkipPrimaryAdapter(input) {
+  publicCheckFailureOnlySkipPrimaryCallCount += 1;
+  assert.equal(input.context.agentId, undefined);
+  return fixtureAdapter(input);
+}
+
 async function invalidRetryPrimaryAdapter(input) {
   invalidRetryPrimaryCallCount += 1;
   const result = await fixtureAdapter(input);
@@ -694,6 +714,18 @@ const withScenarioTypedVisibleContract = await attempt(
   "P33",
   null,
   reviewerFreeExactCorePrimaryAdapter,
+  commandRunner,
+);
+const withPublicCheckFailureOnly = await attempt(
+  "P34",
+  null,
+  publicCheckFailureOnlyPrimaryAdapter,
+  failOnceCommandRunner(),
+);
+const withPublicCheckFailureOnlySkip = await attempt(
+  "P34",
+  null,
+  publicCheckFailureOnlySkipPrimaryAdapter,
   commandRunner,
 );
 const withInvalidRetryMutation = await attempt(
@@ -947,6 +979,25 @@ assert.equal(withScenarioTypedVisibleContract.result.vnext_verification_remediat
 assert.equal(withScenarioTypedVisibleContract.result.vnext_verification_remediation_observation.retry_started_count, 0);
 assert.equal(withScenarioTypedVisibleContract.result.termination_acceptable, true);
 assert.equal(vnextInitialAgentId({ profile_id: "P33", stratum: "high" }), null);
+assert.equal(publicCheckFailureOnlyPrimaryCallCount, 2);
+assert.match(firstPrompts.get("P34"), /HOST_REPOSITORY_MAP_V1=/u);
+assert.match(firstPrompts.get("P34"), /HOST_VISIBLE_CONTRACT_V2=/u);
+assert.equal(withPublicCheckFailureOnly.result.vnext_verification_remediation_observation.eligible, true);
+assert.equal(withPublicCheckFailureOnly.result.vnext_verification_remediation_observation.retry_started_count, 1);
+assert.equal(withPublicCheckFailureOnly.result.vnext_verification_remediation_observation.retry_completed_count, 1);
+assert.equal(withPublicCheckFailureOnly.result.vnext_verification_remediation_observation.retry_changed_count, 1);
+assert.equal(withPublicCheckFailureOnly.result.vnext_verification_remediation_observation.retry_verification_passed_count, 1);
+assert.deepEqual(
+  withPublicCheckFailureOnly.result.vnext_verification_remediation_observation.trigger_reasons,
+  ["risk-gated-specialized-visible-contract", "public-check-failed"],
+);
+assert.equal(withPublicCheckFailureOnly.result.vnext_verification_remediation_observation.rollback_attempted_count, 0);
+assert.equal(withPublicCheckFailureOnly.result.termination_acceptable, true);
+assert.equal(publicCheckFailureOnlySkipPrimaryCallCount, 1);
+assert.equal(withPublicCheckFailureOnlySkip.result.vnext_verification_remediation_observation.eligible, false);
+assert.equal(withPublicCheckFailureOnlySkip.result.vnext_verification_remediation_observation.retry_started_count, 0);
+assert.equal(withPublicCheckFailureOnlySkip.result.termination_acceptable, true);
+assert.equal(vnextInitialAgentId({ profile_id: "P34", stratum: "high" }), null);
 assert.throws(
   () => vnextInitialAgentId({ profile_id: "P18", stratum: "unknown" }),
   /SYNTHETIC_RUNNER_INITIAL_AGENT/u,

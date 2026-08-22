@@ -37,7 +37,7 @@ function freeze(seedSuffix = "a") {
       variant: "low",
       timeout_ms: 300_000,
       executable_fingerprint: `sha256:${"6".repeat(64)}`,
-      candidate_profile_id: "P33",
+      candidate_profile_id: "P34",
       candidate_profile_fingerprint: `sha256:${"7".repeat(64)}`,
       arm_ordering_policy: "sha256-family-repetition-counterbalance-v1",
     },
