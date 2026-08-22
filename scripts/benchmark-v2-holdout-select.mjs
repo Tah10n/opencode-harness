@@ -55,7 +55,7 @@ try {
   });
 
   const loaded = loadBenchmarkV2Contracts(root);
-  const render = { repositoryRoot: root, seed: freeze.holdout_seed, repetition: 1 };
+  const render = { repositoryRoot: root, seed: freeze.holdout_seed.slice(7), repetition: 1 };
   const proceduralInstances = [
     ...renderBenchmarkV2ProceduralSmallCorpus({ ...render, registry: loaded.proceduralCandidates }),
     ...renderBenchmarkV2ProceduralMediumCorpus({ ...render, registry: loaded.proceduralCandidates }),
