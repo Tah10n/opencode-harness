@@ -46,6 +46,7 @@ let coreV2TransactionalPrimaryCallCount = 0;
 let stratifiedVisibleContractPrimaryCallCount = 0;
 let manifestTransactionalAuditPrimaryCallCount = 0;
 let evidenceGatedManifestAuditPrimaryCallCount = 0;
+let manifestRiskGatedAuditPrimaryCallCount = 0;
 let invalidRetryPrimaryCallCount = 0;
 let latestPrimaryProfileManifestPath = null;
 
@@ -465,6 +466,12 @@ async function evidenceGatedManifestAuditPrimaryAdapter(input) {
   return result;
 }
 
+async function manifestRiskGatedAuditPrimaryAdapter(input) {
+  manifestRiskGatedAuditPrimaryCallCount += 1;
+  assert.equal(input.context.agentId, undefined);
+  return fixtureAdapter(input);
+}
+
 async function invalidRetryPrimaryAdapter(input) {
   invalidRetryPrimaryCallCount += 1;
   const result = await fixtureAdapter(input);
@@ -650,6 +657,12 @@ const withEvidenceGatedManifestAudit = await attempt(
   null,
   evidenceGatedManifestAuditPrimaryAdapter,
   failOnceCommandRunner(),
+);
+const withManifestRiskGatedAudit = await attempt(
+  "P30",
+  null,
+  manifestRiskGatedAuditPrimaryAdapter,
+  commandRunner,
 );
 const withInvalidRetryMutation = await attempt(
   "P9",
@@ -876,6 +889,12 @@ assert.deepEqual(
 assert.equal(withEvidenceGatedManifestAudit.result.vnext_verification_remediation_observation.operationally_complete, true);
 assert.equal(withEvidenceGatedManifestAudit.result.termination_acceptable, true);
 assert.equal(vnextInitialAgentId({ profile_id: "P29", stratum: "high" }), null);
+assert.equal(manifestRiskGatedAuditPrimaryCallCount, 1);
+assert.match(firstPrompts.get("P30"), /HOST_REPOSITORY_MAP_V1=/u);
+assert.match(firstPrompts.get("P30"), /HOST_VISIBLE_CONTRACT_V1=/u);
+assert.equal(withManifestRiskGatedAudit.result.vnext_verification_remediation_observation.eligible, false);
+assert.equal(withManifestRiskGatedAudit.result.termination_acceptable, true);
+assert.equal(vnextInitialAgentId({ profile_id: "P30", stratum: "high" }), null);
 assert.throws(
   () => vnextInitialAgentId({ profile_id: "P18", stratum: "unknown" }),
   /SYNTHETIC_RUNNER_INITIAL_AGENT/u,

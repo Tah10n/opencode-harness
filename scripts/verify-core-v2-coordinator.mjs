@@ -58,6 +58,30 @@ assert.equal(coreV2RemediationPlan({
   public_check_diagnostic: { exit_status: 1, output: "not ok", truncated: false },
   audit_trigger_policy: "public-evidence-only",
 }).eligible, true);
+assert.equal(coreV2RemediationPlan({
+  visible_requirements: "Preserve ordering at the trust boundary.",
+  stratum: "high",
+  allowed_target_paths: ["src/task.mjs"],
+  changed_paths: ["src/task.mjs"],
+  first_attempt_completed: true,
+  current_diff: { changed_paths: ["src/task.mjs"] },
+  fixed_public_check: { argv: ["node", "--test"] },
+  public_check_status: "passed",
+  audit_trigger_policy: "manifest-risk-or-evidence",
+  visible_contract_categories: ["ordering", "trust-boundary"],
+}).eligible, true);
+assert.equal(coreV2RemediationPlan({
+  visible_requirements: "Update the result.",
+  stratum: "high",
+  allowed_target_paths: ["src/task.mjs"],
+  changed_paths: ["src/task.mjs"],
+  first_attempt_completed: true,
+  current_diff: { changed_paths: ["src/task.mjs"] },
+  fixed_public_check: { argv: ["node", "--test"] },
+  public_check_status: "passed",
+  audit_trigger_policy: "manifest-risk-or-evidence",
+  visible_contract_categories: ["behavior"],
+}).eligible, false);
 
 function observer(sequence) {
   let index = 0;
