@@ -7,6 +7,7 @@ import { fingerprint } from "../lib/feedback/contracts.mjs";
 import {
   runSyntheticProfileAttempt,
   syntheticAdapterWorkerTimeoutMs,
+  vnextInitialAgentContext,
   vnextInitialAgentId,
 } from "../lib/benchmark/runner.mjs";
 import { loadBenchmarkV2Contracts } from "../lib/benchmark/v2-contracts.mjs";
@@ -806,6 +807,9 @@ assert.equal(withStratifiedVisibleContract.result.vnext_host_verification_observ
 assert.equal(withStratifiedVisibleContract.result.termination_acceptable, true);
 assert.equal(vnextInitialAgentId({ profile_id: "P27", stratum: "small" }), "core-v3-build");
 assert.equal(vnextInitialAgentId({ profile_id: "P27", stratum: "medium" }), null);
+assert.deepEqual(vnextInitialAgentContext({ profile_id: "P18", stratum: "small" }), { agentId: "vnext-small-core" });
+assert.deepEqual(vnextInitialAgentContext({ profile_id: "P27", stratum: "small" }), { agentId: "core-v3-build" });
+assert.deepEqual(vnextInitialAgentContext({ profile_id: "P27", stratum: "high" }), {});
 assert.throws(
   () => vnextInitialAgentId({ profile_id: "P18", stratum: "unknown" }),
   /SYNTHETIC_RUNNER_INITIAL_AGENT/u,
