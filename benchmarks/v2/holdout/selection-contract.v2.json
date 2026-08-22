@@ -28,6 +28,7 @@
     "evaluator_fingerprint",
     "promotion_policy_fingerprint",
     "task_generator_fingerprint",
+    "candidate_profile_fingerprint",
     "model",
     "provider",
     "variant",

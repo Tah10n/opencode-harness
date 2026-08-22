@@ -1726,6 +1726,48 @@ for (const file of [
 }
 
 const workflow = read(".github/workflows/verify.yml");
+const benchmarkV2DevelopmentWorkflow = read(".github/workflows/benchmark-v2-development.yml");
+const benchmarkV2ConfirmatoryWorkflow = read(".github/workflows/benchmark-v2-confirmatory.yml");
+const benchmarkV2DevelopmentConcurrency = benchmarkV2DevelopmentWorkflow.match(/concurrency:\n([\s\S]*?)\nenv:/u)?.[1] ?? "";
+const benchmarkV2ValidationArtifactBranch = benchmarkV2DevelopmentWorkflow.match(
+  /if \[\[ "\$SPLIT" == "validation" \]\]; then\n([\s\S]*?)\n\s*else/u,
+)?.[1] ?? "";
+for (const needle of [
+  "fingerprintVnextSyntheticProfile",
+  "benchmark-v2-validation-${ARCHITECTURE_KEY}-use-${VALIDATION_USE_ORDINAL}",
+]) {
+  assertIncludes(
+    benchmarkV2DevelopmentWorkflow,
+    needle,
+    ".github/workflows/benchmark-v2-development.yml",
+    "HARNESS-S093",
+    "Keep sealed validation identity bound to the materialized candidate profile fingerprint.",
+  );
+}
+if (benchmarkV2DevelopmentConcurrency.includes("inputs.generation")) {
+  fail(
+    "HARNESS-S093",
+    ".github/workflows/benchmark-v2-development.yml concurrency can be bypassed by renaming the architecture generation",
+    "Key validation concurrency by split, arms, and sealed-use ordinal rather than caller prose.",
+  );
+}
+if (!benchmarkV2ValidationArtifactBranch.includes("ARCHITECTURE_KEY")
+  || benchmarkV2ValidationArtifactBranch.includes("GENERATION")) {
+  fail(
+    "HARNESS-S093",
+    ".github/workflows/benchmark-v2-development.yml validation artifact identity is not exclusively architecture-bound",
+    "Persist each sealed validation use under the full materialized candidate profile fingerprint and ordinal.",
+  );
+}
+for (const needle of ["--candidate-profile P32", "--candidate P32"]) {
+  assertIncludes(
+    benchmarkV2ConfirmatoryWorkflow,
+    needle,
+    ".github/workflows/benchmark-v2-confirmatory.yml",
+    "HARNESS-S093",
+    "Keep confirmatory freeze and execution on the same final candidate profile.",
+  );
+}
 const pinnedActionShas = Object.freeze({
   "actions/checkout": "3d3c42e5aac5ba805825da76410c181273ba90b1",
   "actions/setup-node": "820762786026740c76f36085b0efc47a31fe5020",

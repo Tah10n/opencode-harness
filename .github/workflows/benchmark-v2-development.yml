@@ -22,7 +22,7 @@ on:
         description: Candidate cumulative arm
         required: true
         type: choice
-        options: [P1, P2, P3, P4, P31]
+        options: [P1, P2, P3, P4, P32]
       seed:
         description: Preregistered development seed
         required: true
@@ -39,7 +39,7 @@ permissions:
   actions: read
 
 concurrency:
-  group: benchmark-v2-${{ github.ref }}-${{ inputs.split }}-${{ inputs.generation }}-${{ inputs.baseline }}-${{ inputs.candidate }}
+  group: benchmark-v2-${{ github.ref }}-${{ inputs.split }}-${{ inputs.baseline }}-${{ inputs.candidate }}-${{ inputs.validation_use_ordinal }}
   cancel-in-progress: false
 
 env:
@@ -88,6 +88,20 @@ jobs:
           git diff --exit-code
           test -z "$(git status --porcelain=v1 --untracked-files=all)"
 
+      - name: Derive architecture identity
+        id: architecture
+        shell: bash
+        env:
+          CANDIDATE: ${{ inputs.candidate }}
+        run: |
+          set -euo pipefail
+          CANDIDATE_PROFILE="$CANDIDATE" node --input-type=module -e '
+            import { fingerprintVnextSyntheticProfile } from "./lib/benchmark/profiles.mjs";
+            const value = fingerprintVnextSyntheticProfile({ sourceRoot: process.cwd(), profileId: process.env.CANDIDATE_PROFILE });
+            process.stdout.write(`fingerprint=${value}\n`);
+            process.stdout.write(`key=${value.slice(7)}\n`);
+          ' >> "$GITHUB_OUTPUT"
+
       - name: Bind evidence artifact identity
         id: artifact
         shell: bash
@@ -95,6 +109,7 @@ jobs:
           SPLIT: ${{ inputs.split }}
           GENERATION: ${{ inputs.generation }}
           VALIDATION_USE_ORDINAL: ${{ inputs.validation_use_ordinal }}
+          ARCHITECTURE_KEY: ${{ steps.architecture.outputs.key }}
         run: |
           set -euo pipefail
           if [[ ! "$GENERATION" =~ ^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$ ]]; then
@@ -102,7 +117,7 @@ jobs:
             exit 1
           fi
           if [[ "$SPLIT" == "validation" ]]; then
-            name="benchmark-v2-validation-${GENERATION}-use-${VALIDATION_USE_ORDINAL}"
+            name="benchmark-v2-validation-${ARCHITECTURE_KEY}-use-${VALIDATION_USE_ORDINAL}"
           else
             name="benchmark-v2-development-${GENERATION}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           fi

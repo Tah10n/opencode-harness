@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import {
   buildBenchmarkV2CampaignPlan,
   evaluateExactFamilyClusterPermutation,
+  evaluateBenchmarkV2MechanismActivation,
   executeBenchmarkV2Acceptance,
   executeBenchmarkV2Campaign,
   validateBenchmarkV2CampaignReport,
@@ -43,6 +44,29 @@ const sevenToOne = evaluateExactFamilyClusterPermutation([
   exactPair("baseline-only", true, false),
 ]);
 assert.equal(sevenToOne.p_value, 0.03515625);
+const reviewerFreeActivationCandidate = {
+  activation: {
+    host_verification: { activation_eligible: true, activated: true },
+    bounded_context: { eligible: true, activated: true },
+    visible_contract: { eligible: true, activated: true },
+    verification_remediation: { eligible: false, retry_started_count: 0 },
+  },
+};
+assert.deepEqual(evaluateBenchmarkV2MechanismActivation(
+  "reviewer-free-exact-core-candidate",
+  reviewerFreeActivationCandidate,
+  "medium",
+), { eligible: true, activated: true });
+assert.equal(evaluateBenchmarkV2MechanismActivation(
+  "reviewer-free-exact-core-candidate",
+  {
+    activation: {
+      ...reviewerFreeActivationCandidate.activation,
+      verification_remediation: { eligible: true, retry_started_count: 1 },
+    },
+  },
+  "high",
+).activated, false);
 const plainProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P0" });
 const isolatedVerificationProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P6" });
 const isolatedReviewerProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P8" });
@@ -69,6 +93,7 @@ const manifestTransactionalAuditProfile = materializeVnextSyntheticProfile({ sou
 const evidenceGatedManifestAuditProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P29" });
 const manifestRiskGatedAuditProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P30" });
 const criticalManifestRiskAuditProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P31" });
+const reviewerFreeExactCoreProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P32" });
 try {
   assert.equal(plainProfile.primaryAgentId, "build");
   assert.equal(isolatedVerificationProfile.primaryAgentId, "build");
@@ -161,6 +186,16 @@ try {
   assert.deepEqual(
     criticalManifestRiskAuditProfile.profileEvidence.component_ids,
     ["host-compiled-visible-contract", "targeted-verification", "bounded-pre-mutation-context", "critical-manifest-risk-gated-remediation", "exact-core-v2-coordinator", "adversarial-counterexample-audit", "transactional-remediation-rollback"],
+  );
+  assert.equal(reviewerFreeExactCoreProfile.primaryAgentId, "core-v3-build");
+  assert.deepEqual(
+    reviewerFreeExactCoreProfile.profileEvidence.component_ids,
+    ["host-compiled-visible-contract", "targeted-verification", "bounded-pre-mutation-context", "exact-core-v2-coordinator", "reviewer-remediation-removed"],
+  );
+  assert.equal(
+    reviewerFreeExactCoreProfile.profileEvidence.runtime_surface.materialized_files
+      .some((entry) => entry.path === "agents/contract-auditor.md"),
+    false,
   );
   assert.deepEqual(
     stratifiedCoreProfile.profileEvidence.component_ids,
@@ -304,6 +339,7 @@ try {
   cleanupSyntheticProfile(evidenceGatedManifestAuditProfile);
   cleanupSyntheticProfile(manifestRiskGatedAuditProfile);
   cleanupSyntheticProfile(criticalManifestRiskAuditProfile);
+  cleanupSyntheticProfile(reviewerFreeExactCoreProfile);
 }
 const plan = buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
@@ -322,6 +358,8 @@ const plan = buildBenchmarkV2CampaignPlan({
 });
 
 assert.equal(plan.schedules.length, 36);
+assert.equal(plan.bindings.baseline_profile_fingerprint, plainProfile.profileFingerprint);
+assert.equal(plan.bindings.candidate_profile_fingerprint, isolatedVerificationProfile.profileFingerprint);
 assert.equal(plan.component_id, "targeted-verification");
 assert.deepEqual([...new Set(plan.schedules.map((entry) => entry.stratum))].sort(), ["high", "medium", "small"]);
 assert.equal(new Set(plan.schedules.map((entry) => entry.pair_id)).size, 36);
@@ -776,6 +814,43 @@ const criticalManifestRiskAuditPlan = buildBenchmarkV2CampaignPlan({
   allowDirty: true,
 });
 assert.equal(criticalManifestRiskAuditPlan.component_id, "critical-manifest-risk-audit-candidate");
+const reviewerFreeExactCorePlan = buildBenchmarkV2CampaignPlan({
+  repositoryRoot: root,
+  split: "development",
+  generationId: "generation-fixture-reviewer-free-exact-core-1",
+  baselineArmId: "P0",
+  candidateArmId: "P32",
+  model: "fixture/model",
+  provider: "fixture",
+  variant: "low",
+  timeoutMs: 300_000,
+  seed: "campaign-fixture-seed",
+  repetitions: 1,
+  executableIdentity: executableFingerprint,
+  allowDirty: true,
+});
+assert.equal(reviewerFreeExactCorePlan.component_id, "reviewer-free-exact-core-candidate");
+assert.equal(reviewerFreeExactCorePlan.bindings.candidate_profile_fingerprint, reviewerFreeExactCoreProfile.profileFingerprint);
+const reviewerFreeRenamedGenerationPlan = buildBenchmarkV2CampaignPlan({
+  repositoryRoot: root,
+  split: "development",
+  generationId: "generation-fixture-reviewer-free-exact-core-renamed",
+  baselineArmId: "P0",
+  candidateArmId: "P32",
+  model: "fixture/model",
+  provider: "fixture",
+  variant: "low",
+  timeoutMs: 300_000,
+  seed: "campaign-fixture-seed",
+  repetitions: 1,
+  executableIdentity: executableFingerprint,
+  allowDirty: true,
+});
+assert.notEqual(reviewerFreeRenamedGenerationPlan.generation_id, reviewerFreeExactCorePlan.generation_id);
+assert.equal(
+  reviewerFreeRenamedGenerationPlan.bindings.candidate_profile_fingerprint,
+  reviewerFreeExactCorePlan.bindings.candidate_profile_fingerprint,
+);
 assert.throws(() => buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
   split: "validation",

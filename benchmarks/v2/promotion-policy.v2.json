@@ -36,6 +36,8 @@
   "threshold_change_policy": "new-policy-version-and-new-disjoint-holdout",
   "required_bindings": [
     "source_sha",
+    "baseline_profile_fingerprint",
+    "candidate_profile_fingerprint",
     "evaluator_fingerprint",
     "promotion_policy_fingerprint",
     "task_generator_fingerprint",

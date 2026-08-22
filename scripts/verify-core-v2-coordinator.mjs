@@ -82,6 +82,19 @@ assert.equal(coreV2RemediationPlan({
   audit_trigger_policy: "manifest-risk-or-evidence",
   visible_contract_categories: ["behavior"],
 }).eligible, false);
+assert.equal(coreV2RemediationPlan({
+  visible_requirements: "Deny cross-tenant access.",
+  stratum: "high",
+  allowed_target_paths: ["src/task.mjs"],
+  changed_paths: ["src/task.mjs"],
+  first_attempt_completed: true,
+  current_diff: { changed_paths: ["src/task.mjs"] },
+  fixed_public_check: { argv: ["node", "--test"] },
+  public_check_status: "failed",
+  public_check_diagnostic: { exit_status: 1, output: "not ok", truncated: false },
+  audit_trigger_policy: "disabled",
+  visible_contract_categories: ["trust-boundary"],
+}).eligible, false);
 
 function observer(sequence) {
   let index = 0;
