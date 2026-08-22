@@ -1744,11 +1744,14 @@ for (const needle of [
     "Keep sealed validation identity bound to the materialized candidate profile fingerprint.",
   );
 }
-if (benchmarkV2DevelopmentConcurrency.includes("inputs.generation")) {
+if (benchmarkV2DevelopmentConcurrency.trim() !== [
+  "group: benchmark-v2-${{ github.ref }}-${{ inputs.split }}",
+  "  cancel-in-progress: false",
+].join("\n")) {
   fail(
     "HARNESS-S093",
-    ".github/workflows/benchmark-v2-development.yml concurrency can be bypassed by renaming the architecture generation",
-    "Key validation concurrency by split, arms, and sealed-use ordinal rather than caller prose.",
+    ".github/workflows/benchmark-v2-development.yml does not serialize the complete sealed-validation split",
+    "Use one non-cancelling split-level lock so alternate labels, arms, or ordinals cannot race the persisted-use check.",
   );
 }
 if (!benchmarkV2ValidationArtifactBranch.includes("ARCHITECTURE_KEY")

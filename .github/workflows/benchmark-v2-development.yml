@@ -39,7 +39,7 @@ permissions:
   actions: read
 
 concurrency:
-  group: benchmark-v2-${{ github.ref }}-${{ inputs.split }}-${{ inputs.baseline }}-${{ inputs.candidate }}-${{ inputs.validation_use_ordinal }}
+  group: benchmark-v2-${{ github.ref }}-${{ inputs.split }}
   cancel-in-progress: false
 
 env:

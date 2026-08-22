@@ -421,7 +421,7 @@ SHA. Development and validation reports bind both arm profile fingerprints.
 The workflow keys each sealed-validation artifact by the full candidate
 profile fingerprint and ordinal, so changing the display generation string
 cannot reset the two-use allowance; concurrency is serialized on the same
-candidate/ordinal boundary.
+development-or-validation split before the persisted-use check.
 
 The committed real-commit registry is provenance only: 36 non-merge commit
 candidates, 12 per stratum, from five MIT repositories. It records immutable
