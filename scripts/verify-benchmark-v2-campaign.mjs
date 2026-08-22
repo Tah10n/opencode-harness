@@ -57,6 +57,11 @@ assert.deepEqual(evaluateBenchmarkV2MechanismActivation(
   reviewerFreeActivationCandidate,
   "medium",
 ), { eligible: true, activated: true });
+assert.deepEqual(evaluateBenchmarkV2MechanismActivation(
+  "scenario-typed-visible-contract-exact-core-candidate",
+  reviewerFreeActivationCandidate,
+  "high",
+), { eligible: true, activated: true });
 assert.equal(evaluateBenchmarkV2MechanismActivation(
   "reviewer-free-exact-core-candidate",
   {
@@ -94,6 +99,7 @@ const evidenceGatedManifestAuditProfile = materializeVnextSyntheticProfile({ sou
 const manifestRiskGatedAuditProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P30" });
 const criticalManifestRiskAuditProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P31" });
 const reviewerFreeExactCoreProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P32" });
+const scenarioTypedVisibleContractProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P33" });
 try {
   assert.equal(plainProfile.primaryAgentId, "build");
   assert.equal(isolatedVerificationProfile.primaryAgentId, "build");
@@ -194,6 +200,16 @@ try {
   );
   assert.equal(
     reviewerFreeExactCoreProfile.profileEvidence.runtime_surface.materialized_files
+      .some((entry) => entry.path === "agents/contract-auditor.md"),
+    false,
+  );
+  assert.equal(scenarioTypedVisibleContractProfile.primaryAgentId, "core-v4-build");
+  assert.deepEqual(
+    scenarioTypedVisibleContractProfile.profileEvidence.component_ids,
+    ["scenario-typed-visible-contract", "targeted-verification", "bounded-pre-mutation-context", "exact-core-v2-coordinator", "reviewer-remediation-removed"],
+  );
+  assert.equal(
+    scenarioTypedVisibleContractProfile.profileEvidence.runtime_surface.materialized_files
       .some((entry) => entry.path === "agents/contract-auditor.md"),
     false,
   );
@@ -340,6 +356,7 @@ try {
   cleanupSyntheticProfile(manifestRiskGatedAuditProfile);
   cleanupSyntheticProfile(criticalManifestRiskAuditProfile);
   cleanupSyntheticProfile(reviewerFreeExactCoreProfile);
+  cleanupSyntheticProfile(scenarioTypedVisibleContractProfile);
 }
 const plan = buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
@@ -850,6 +867,26 @@ assert.notEqual(reviewerFreeRenamedGenerationPlan.generation_id, reviewerFreeExa
 assert.equal(
   reviewerFreeRenamedGenerationPlan.bindings.candidate_profile_fingerprint,
   reviewerFreeExactCorePlan.bindings.candidate_profile_fingerprint,
+);
+const scenarioTypedVisibleContractPlan = buildBenchmarkV2CampaignPlan({
+  repositoryRoot: root,
+  split: "development",
+  generationId: "generation-fixture-scenario-typed-visible-contract-1",
+  baselineArmId: "P0",
+  candidateArmId: "P33",
+  model: "fixture/model",
+  provider: "fixture",
+  variant: "low",
+  timeoutMs: 300_000,
+  seed: "campaign-fixture-seed",
+  repetitions: 1,
+  executableIdentity: executableFingerprint,
+  allowDirty: true,
+});
+assert.equal(scenarioTypedVisibleContractPlan.component_id, "scenario-typed-visible-contract-exact-core-candidate");
+assert.equal(
+  scenarioTypedVisibleContractPlan.bindings.candidate_profile_fingerprint,
+  scenarioTypedVisibleContractProfile.profileFingerprint,
 );
 assert.throws(() => buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,

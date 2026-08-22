@@ -1762,7 +1762,7 @@ if (!benchmarkV2ValidationArtifactBranch.includes("ARCHITECTURE_KEY")
     "Persist each sealed validation use under the full materialized candidate profile fingerprint and ordinal.",
   );
 }
-for (const needle of ["--candidate-profile P32", "--candidate P32"]) {
+for (const needle of ["--candidate-profile P33", "--candidate P33"]) {
   assertIncludes(
     benchmarkV2ConfirmatoryWorkflow,
     needle,

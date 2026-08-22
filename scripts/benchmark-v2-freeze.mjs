@@ -20,7 +20,7 @@ function parse(values) {
     provider: null,
     variant: null,
     timeoutMs: 300_000,
-    candidateProfileId: "P32",
+    candidateProfileId: "P33",
     inspectOnly: false,
   };
   const mapping = {

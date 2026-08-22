@@ -690,6 +690,12 @@ const withReviewerFreeExactCore = await attempt(
   reviewerFreeExactCorePrimaryAdapter,
   commandRunner,
 );
+const withScenarioTypedVisibleContract = await attempt(
+  "P33",
+  null,
+  reviewerFreeExactCorePrimaryAdapter,
+  commandRunner,
+);
 const withInvalidRetryMutation = await attempt(
   "P9",
   null,
@@ -927,13 +933,20 @@ assert.match(firstPrompts.get("P31"), /HOST_VISIBLE_CONTRACT_V1=/u);
 assert.equal(withCriticalManifestRiskAudit.result.vnext_verification_remediation_observation.eligible, false);
 assert.equal(withCriticalManifestRiskAudit.result.termination_acceptable, true);
 assert.equal(vnextInitialAgentId({ profile_id: "P31", stratum: "high" }), null);
-assert.equal(reviewerFreeExactCorePrimaryCallCount, 1);
+assert.equal(reviewerFreeExactCorePrimaryCallCount, 2);
 assert.match(firstPrompts.get("P32"), /HOST_REPOSITORY_MAP_V1=/u);
 assert.match(firstPrompts.get("P32"), /HOST_VISIBLE_CONTRACT_V1=/u);
 assert.equal(withReviewerFreeExactCore.result.vnext_verification_remediation_observation.eligible, false);
 assert.equal(withReviewerFreeExactCore.result.vnext_verification_remediation_observation.retry_started_count, 0);
 assert.equal(withReviewerFreeExactCore.result.termination_acceptable, true);
 assert.equal(vnextInitialAgentId({ profile_id: "P32", stratum: "high" }), null);
+assert.match(firstPrompts.get("P33"), /HOST_REPOSITORY_MAP_V1=/u);
+assert.match(firstPrompts.get("P33"), /HOST_VISIBLE_CONTRACT_V2=/u);
+assert.match(firstPrompts.get("P33"), /review_focus/u);
+assert.equal(withScenarioTypedVisibleContract.result.vnext_verification_remediation_observation.eligible, false);
+assert.equal(withScenarioTypedVisibleContract.result.vnext_verification_remediation_observation.retry_started_count, 0);
+assert.equal(withScenarioTypedVisibleContract.result.termination_acceptable, true);
+assert.equal(vnextInitialAgentId({ profile_id: "P33", stratum: "high" }), null);
 assert.throws(
   () => vnextInitialAgentId({ profile_id: "P18", stratum: "unknown" }),
   /SYNTHETIC_RUNNER_INITIAL_AGENT/u,
