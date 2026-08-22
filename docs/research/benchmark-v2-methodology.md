@@ -376,15 +376,22 @@ by the earlier synthetic result.
 ## Why the design is paired and sealed
 
 The primary outcome is binary and both arms run the same task/seed/binding, so
-the confirmatory test is paired. Exact McNemar power depends on discordant
-pairs, not merely the total sample size. The preregistered calculation assumes
-candidate-only success probability 0.10 and baseline-only success probability
-0.02: an eight-point effect and 0.12 discordance. With 90 families and two
-paired trajectories per family, 180 paired observations give exact one-sided
-power 0.8695 at round-one alpha 0.025. A sensitivity calculation applies a
-1.10 design effect for within-family correlation and still gives power 0.8297.
-The executable calculation lives in `lib/benchmark/v2-contracts.mjs` and is
-recomputed by `npm run verify:benchmark:v2:contracts`.
+the confirmatory test is paired. The independent unit is nevertheless the task
+family, not either of its two correlated trajectories. The primary exact test
+therefore sums the two signed binary arm differences within each family and
+performs a one-sided exact sign permutation over the resulting family
+clusters. Raw-trajectory McNemar counts remain diagnostic only.
+
+The preregistered power calculation assumes candidate-only success probability
+0.10 and baseline-only success probability 0.02 per trajectory: an eight-point
+effect and 0.12 discordance. A shared-categorical-outcome mixture fixes the
+within-family correlation at 0.10. With 90 independent families and two paired
+trajectories per family, exact power for the family-cluster sign-permutation
+test is 0.8300 at round-one alpha 0.025. Treating all 180 trajectories as
+independent would give 0.8695, but that value is retained only as a
+trajectory-naive sensitivity and cannot support promotion. The executable
+calculation lives in `lib/benchmark/v2-contracts.mjs` and is recomputed by
+`npm run verify:benchmark:v2:contracts`.
 
 Matched-pair design literature emphasizes that discordance probability is a
 primary sample-size input and that exact size/power should be considered for
@@ -407,6 +414,14 @@ or evaluator mutation invalidates the round rather than producing a rerun.
 - Holdout selection is deferred until freeze. The contract requires 90 families
   (30 per stratum), two paired trajectories per family, and at least 23
   compatible-license real-commit-derived families.
+
+An architecture generation is identified by the complete materialized
+candidate profile fingerprint, not by a caller-supplied label or repository
+SHA. Development and validation reports bind both arm profile fingerprints.
+The workflow keys each sealed-validation artifact by the full candidate
+profile fingerprint and ordinal, so changing the display generation string
+cannot reset the two-use allowance; concurrency is serialized on the same
+candidate/ordinal boundary.
 
 The committed real-commit registry is provenance only: 36 non-merge commit
 candidates, 12 per stratum, from five MIT repositories. It records immutable
