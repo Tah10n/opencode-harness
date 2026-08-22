@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 
 import {
   buildBenchmarkV2CampaignPlan,
+  evaluateExactFamilyClusterPermutation,
   executeBenchmarkV2Acceptance,
   executeBenchmarkV2Campaign,
   validateBenchmarkV2CampaignReport,
@@ -18,6 +19,30 @@ import {
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const executableFingerprint = `sha256:${"a".repeat(64)}`;
+const exactPair = (familyId, baseline, candidate) => ({
+  family_id: familyId,
+  defects: {
+    baseline: { regression_free_task_success: baseline },
+    candidate: { regression_free_task_success: candidate },
+  },
+});
+const clusteredExact = evaluateExactFamilyClusterPermutation([
+  exactPair("family-a", false, true),
+  exactPair("family-a", false, true),
+  exactPair("family-b", false, true),
+  exactPair("family-b", true, false),
+]);
+assert.deepEqual(clusteredExact, {
+  family_count: 2,
+  nonzero_family_cluster_count: 1,
+  observed_family_difference_sum: 2,
+  p_value: 0.5,
+});
+const sevenToOne = evaluateExactFamilyClusterPermutation([
+  ...Array.from({ length: 7 }, (_, index) => exactPair(`candidate-${index}`, false, true)),
+  exactPair("baseline-only", true, false),
+]);
+assert.equal(sevenToOne.p_value, 0.03515625);
 const plainProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P0" });
 const isolatedVerificationProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P6" });
 const isolatedReviewerProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P8" });

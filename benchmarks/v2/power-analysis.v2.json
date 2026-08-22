@@ -1,23 +1,20 @@
 {
   "schema_version": 2,
-  "analysis_id": "v2-exact-paired-binary-power",
+  "analysis_id": "v2-exact-family-cluster-permutation-power",
   "calculated_before_confirmatory_run": true,
-  "primary_test": "one-sided-exact-mcnemar",
+  "primary_test": "one-sided-exact-family-cluster-sign-permutation",
   "allocated_alpha_round_1": 0.025,
   "minimum_useful_absolute_effect": 0.08,
   "assumed_candidate_only_success_probability": 0.10,
   "assumed_baseline_only_success_probability": 0.02,
   "assumed_discordance_probability": 0.12,
+  "assumed_within_family_correlation": 0.10,
+  "within_family_correlation_model": "shared-categorical-outcome-mixture",
   "family_count": 90,
   "paired_trajectories_per_family": 2,
   "paired_observation_count": 180,
-  "exact_power": 0.8694777967,
+  "exact_family_cluster_power": 0.8299732002,
   "minimum_required_power": 0.80,
-  "cluster_sensitivity": {
-    "assumed_within_family_correlation": 0.10,
-    "design_effect": 1.10,
-    "effective_pair_count_floor": 163,
-    "exact_power_at_effective_pair_count": 0.8297438599
-  },
-  "interpretation": "Power is conditional on preregistered discordance assumptions; observed discordance and family clustering must be reported without changing thresholds."
+  "trajectory_naive_power_sensitivity": 0.8694777967,
+  "interpretation": "Primary power is calculated at the independent family-cluster unit under the preregistered shared-categorical correlation model. The trajectory-naive value is sensitivity-only and cannot support promotion. Observed discordance and family clustering must be reported without changing thresholds."
 }

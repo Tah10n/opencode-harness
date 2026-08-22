@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
+  exactFamilyClusterPermutationPower,
   exactMcNemarPower,
   loadBenchmarkV2Contracts,
   validateBenchmarkV2Contracts,
@@ -19,8 +20,8 @@ assert.equal(report.real_commit_repository_count, 5);
 assert.equal(report.real_commit_requirement_count, 36);
 assert.equal(report.procedural_candidate_count, 72);
 assert.equal(report.procedural_high_risk_domain_count, 11);
-assert(report.exact_power > 0.86);
-assert(report.clustered_sensitivity_power > 0.82);
+assert(report.exact_family_cluster_power > 0.82);
+assert(report.trajectory_naive_sensitivity_power > report.exact_family_cluster_power);
 
 const loaded = loadBenchmarkV2Contracts(root);
 assert.throws(() => validateBenchmarkV2Contracts({
@@ -102,6 +103,13 @@ assert.throws(() => validateBenchmarkV2Contracts({
   proceduralCandidates: duplicateProceduralRecipe,
 }), /BENCHMARK_V2_PROCEDURAL_COVERAGE/u);
 
+const developmentProceduralOverlap = structuredClone(loaded.proceduralCandidates);
+developmentProceduralOverlap.candidates[0].recipe_id = loaded.dev.families[0].recipe_id;
+assert.throws(() => validateBenchmarkV2Contracts({
+  ...loaded,
+  proceduralCandidates: developmentProceduralOverlap,
+}), /BENCHMARK_V2_SPLIT_OVERLAP/u);
+
 const missingRiskDomain = structuredClone(loaded.proceduralCandidates);
 for (const candidate of missingRiskDomain.candidates) {
   if (candidate.risk_domain === "rollback") candidate.risk_domain = "authorization";
@@ -118,5 +126,23 @@ const underpowered = exactMcNemarPower({
   alpha: 0.025,
 });
 assert(underpowered < 0.80);
+
+const clusteredPower = exactFamilyClusterPermutationPower({
+  family_count: 90,
+  paired_trajectories_per_family: 2,
+  candidate_only_probability: 0.10,
+  baseline_only_probability: 0.02,
+  within_family_correlation: 0.10,
+  alpha: 0.025,
+});
+assert(Math.abs(clusteredPower - 0.8299732002) < 1e-9);
+assert(Number.isFinite(exactFamilyClusterPermutationPower({
+  family_count: 8,
+  paired_trajectories_per_family: 2,
+  candidate_only_probability: 0.10,
+  baseline_only_probability: 0.02,
+  within_family_correlation: 1,
+  alpha: 0.025,
+})));
 
 process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);

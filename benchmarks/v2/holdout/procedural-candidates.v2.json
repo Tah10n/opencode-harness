@@ -35,7 +35,7 @@
     { "id": "proc-medium-export-registry", "stratum": "medium", "recipe_id": "public-export-registry", "topology_class": "entry-reexport-consumer", "changed_file_count": 2 },
     { "id": "proc-medium-config-default", "stratum": "medium", "recipe_id": "config-default-propagation", "topology_class": "config-entry-consumer", "changed_file_count": 2 },
     { "id": "proc-medium-env-schema", "stratum": "medium", "recipe_id": "environment-schema-chain", "topology_class": "schema-entry-consumer", "changed_file_count": 2 },
-    { "id": "proc-medium-feature-callpath", "stratum": "medium", "recipe_id": "feature-flag-callpath", "topology_class": "config-entry-consumer", "changed_file_count": 2 },
+    { "id": "proc-medium-middleware-timeout", "stratum": "medium", "recipe_id": "middleware-timeout-propagation", "topology_class": "config-entry-consumer", "changed_file_count": 2 },
     { "id": "proc-medium-error-surface", "stratum": "medium", "recipe_id": "error-code-surface", "topology_class": "entry-reexport-consumer", "changed_file_count": 2 },
     { "id": "proc-medium-version-table", "stratum": "medium", "recipe_id": "version-compatibility-table", "topology_class": "registry-entry-consumer", "changed_file_count": 2 },
     { "id": "proc-medium-event-registry", "stratum": "medium", "recipe_id": "event-name-registry", "topology_class": "registry-entry-consumer", "changed_file_count": 2 },
