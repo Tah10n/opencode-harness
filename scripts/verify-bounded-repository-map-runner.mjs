@@ -575,6 +575,12 @@ const withCoreV2Transactional = await attempt(
   coreV2TransactionalPrimaryAdapter,
   transactionalCommandRunner(),
 );
+const withContractFirst = await attempt(
+  "P25",
+  null,
+  fixtureAdapter,
+  commandRunner,
+);
 const withInvalidRetryMutation = await attempt(
   "P9",
   null,
@@ -752,6 +758,11 @@ assert.equal(withCoreV2Transactional.result.vnext_verification_remediation_obser
 assert.equal(withCoreV2Transactional.result.vnext_verification_remediation_observation.reason, "retry_rolled_back_and_reverified");
 assert.equal(withCoreV2Transactional.result.visible_check.passed, true);
 assert.equal(withCoreV2Transactional.result.termination_acceptable, true);
+assert.match(firstPrompts.get("P25"), /HOST_REPOSITORY_MAP_V1=/u);
+assert.equal(withContractFirst.result.vnext_context_map_observation.activated, true);
+assert.equal(withContractFirst.result.vnext_host_verification_observation.activated, true);
+assert.equal(withContractFirst.result.vnext_verification_remediation_observation.eligible, false);
+assert.equal(withContractFirst.result.termination_acceptable, true);
 assert.throws(
   () => vnextInitialAgentId({ profile_id: "P18", stratum: "unknown" }),
   /SYNTHETIC_RUNNER_INITIAL_AGENT/u,
