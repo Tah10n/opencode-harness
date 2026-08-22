@@ -44,6 +44,7 @@ let coreV2ExactCoordinatorPrimaryCallCount = 0;
 let coreV2AdversarialAuditPrimaryCallCount = 0;
 let coreV2TransactionalPrimaryCallCount = 0;
 let stratifiedVisibleContractPrimaryCallCount = 0;
+let manifestTransactionalAuditPrimaryCallCount = 0;
 let invalidRetryPrimaryCallCount = 0;
 let latestPrimaryProfileManifestPath = null;
 
@@ -433,6 +434,24 @@ async function stratifiedVisibleContractPrimaryAdapter(input) {
   return result;
 }
 
+async function manifestTransactionalAuditPrimaryAdapter(input) {
+  manifestTransactionalAuditPrimaryCallCount += 1;
+  if (manifestTransactionalAuditPrimaryCallCount === 1) assert.equal(input.context.agentId, undefined);
+  if (manifestTransactionalAuditPrimaryCallCount === 2) assert.equal(input.context.agentId, "contract-auditor");
+  const result = await fixtureAdapter(input);
+  if (manifestTransactionalAuditPrimaryCallCount === 1 && instance.solution_files.length > 1) {
+    const omitted = instance.solution_files[1];
+    const original = instance.public_files.find((entry) => entry.path === omitted.path);
+    assert(original);
+    fs.writeFileSync(path.join(input.context.repo, ...omitted.path.split("/")), original.content, "utf8");
+  }
+  if (manifestTransactionalAuditPrimaryCallCount === 2) {
+    const target = path.join(input.context.repo, ...instance.solution_files[0].path.split("/"));
+    fs.appendFileSync(target, "// MANIFEST_TRANSACTIONAL_AUDIT_REGRESSION\n", "utf8");
+  }
+  return result;
+}
+
 async function invalidRetryPrimaryAdapter(input) {
   invalidRetryPrimaryCallCount += 1;
   const result = await fixtureAdapter(input);
@@ -606,6 +625,12 @@ const withStratifiedVisibleContract = await attempt(
   null,
   stratifiedVisibleContractPrimaryAdapter,
   failOnceCommandRunner(),
+);
+const withManifestTransactionalAudit = await attempt(
+  "P28",
+  null,
+  manifestTransactionalAuditPrimaryAdapter,
+  transactionalCommandRunner(),
 );
 const withInvalidRetryMutation = await attempt(
   "P9",
@@ -810,6 +835,18 @@ assert.equal(vnextInitialAgentId({ profile_id: "P27", stratum: "medium" }), null
 assert.deepEqual(vnextInitialAgentContext({ profile_id: "P18", stratum: "small" }), { agentId: "vnext-small-core" });
 assert.deepEqual(vnextInitialAgentContext({ profile_id: "P27", stratum: "small" }), { agentId: "core-v3-build" });
 assert.deepEqual(vnextInitialAgentContext({ profile_id: "P27", stratum: "high" }), {});
+assert.equal(manifestTransactionalAuditPrimaryCallCount, 2);
+assert.match(firstPrompts.get("P28"), /HOST_REPOSITORY_MAP_V1=/u);
+assert.match(firstPrompts.get("P28"), /HOST_VISIBLE_CONTRACT_V1=/u);
+assert.equal(withManifestTransactionalAudit.result.vnext_context_map_observation.activated, true);
+assert.equal(withManifestTransactionalAudit.result.vnext_visible_contract_observation.activated, true);
+assert.equal(withManifestTransactionalAudit.result.vnext_verification_remediation_observation.rollback_attempted_count, 1);
+assert.equal(withManifestTransactionalAudit.result.vnext_verification_remediation_observation.rollback_completed_count, 1);
+assert.equal(withManifestTransactionalAudit.result.vnext_verification_remediation_observation.reason, "retry_rolled_back_and_reverified");
+assert.equal(withManifestTransactionalAudit.result.visible_check.passed, true);
+assert.equal(withManifestTransactionalAudit.result.termination_acceptable, true);
+assert.equal(vnextInitialAgentId({ profile_id: "P28", stratum: "small" }), null);
+assert.deepEqual(vnextInitialAgentContext({ profile_id: "P28", stratum: "high" }), {});
 assert.throws(
   () => vnextInitialAgentId({ profile_id: "P18", stratum: "unknown" }),
   /SYNTHETIC_RUNNER_INITIAL_AGENT/u,
