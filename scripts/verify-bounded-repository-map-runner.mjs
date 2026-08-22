@@ -45,6 +45,7 @@ let coreV2AdversarialAuditPrimaryCallCount = 0;
 let coreV2TransactionalPrimaryCallCount = 0;
 let stratifiedVisibleContractPrimaryCallCount = 0;
 let manifestTransactionalAuditPrimaryCallCount = 0;
+let evidenceGatedManifestAuditPrimaryCallCount = 0;
 let invalidRetryPrimaryCallCount = 0;
 let latestPrimaryProfileManifestPath = null;
 
@@ -452,6 +453,18 @@ async function manifestTransactionalAuditPrimaryAdapter(input) {
   return result;
 }
 
+async function evidenceGatedManifestAuditPrimaryAdapter(input) {
+  evidenceGatedManifestAuditPrimaryCallCount += 1;
+  if (evidenceGatedManifestAuditPrimaryCallCount === 1) assert.equal(input.context.agentId, undefined);
+  if (evidenceGatedManifestAuditPrimaryCallCount === 2) assert.equal(input.context.agentId, "contract-auditor");
+  const result = await fixtureAdapter(input);
+  if (evidenceGatedManifestAuditPrimaryCallCount === 2) {
+    const target = path.join(input.context.repo, ...instance.solution_files[0].path.split("/"));
+    fs.appendFileSync(target, "// EVIDENCE_GATED_AUDIT_REMEDIATION\n", "utf8");
+  }
+  return result;
+}
+
 async function invalidRetryPrimaryAdapter(input) {
   invalidRetryPrimaryCallCount += 1;
   const result = await fixtureAdapter(input);
@@ -631,6 +644,12 @@ const withManifestTransactionalAudit = await attempt(
   null,
   manifestTransactionalAuditPrimaryAdapter,
   transactionalCommandRunner(),
+);
+const withEvidenceGatedManifestAudit = await attempt(
+  "P29",
+  null,
+  evidenceGatedManifestAuditPrimaryAdapter,
+  failOnceCommandRunner(),
 );
 const withInvalidRetryMutation = await attempt(
   "P9",
@@ -847,6 +866,16 @@ assert.equal(withManifestTransactionalAudit.result.visible_check.passed, true);
 assert.equal(withManifestTransactionalAudit.result.termination_acceptable, true);
 assert.equal(vnextInitialAgentId({ profile_id: "P28", stratum: "small" }), null);
 assert.deepEqual(vnextInitialAgentContext({ profile_id: "P28", stratum: "high" }), {});
+assert.equal(evidenceGatedManifestAuditPrimaryCallCount, 2);
+assert.match(firstPrompts.get("P29"), /HOST_REPOSITORY_MAP_V1=/u);
+assert.match(firstPrompts.get("P29"), /HOST_VISIBLE_CONTRACT_V1=/u);
+assert.deepEqual(
+  withEvidenceGatedManifestAudit.result.vnext_verification_remediation_observation.trigger_reasons,
+  ["risk-gated-specialized-visible-contract", "public-check-failed"],
+);
+assert.equal(withEvidenceGatedManifestAudit.result.vnext_verification_remediation_observation.operationally_complete, true);
+assert.equal(withEvidenceGatedManifestAudit.result.termination_acceptable, true);
+assert.equal(vnextInitialAgentId({ profile_id: "P29", stratum: "high" }), null);
 assert.throws(
   () => vnextInitialAgentId({ profile_id: "P18", stratum: "unknown" }),
   /SYNTHETIC_RUNNER_INITIAL_AGENT/u,

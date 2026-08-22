@@ -41,6 +41,7 @@ const contractFirstProfile = materializeVnextSyntheticProfile({ sourceRoot: root
 const hostCompiledContractProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P26" });
 const stratifiedVisibleContractProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P27" });
 const manifestTransactionalAuditProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P28" });
+const evidenceGatedManifestAuditProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P29" });
 try {
   assert.equal(plainProfile.primaryAgentId, "build");
   assert.equal(isolatedVerificationProfile.primaryAgentId, "build");
@@ -118,6 +119,11 @@ try {
     manifestTransactionalAuditProfile.profileEvidence.runtime_surface.materialized_files
       .some((entry) => entry.path === "runtime/host/visible-contract-manifest.mjs"),
     true,
+  );
+  assert.equal(evidenceGatedManifestAuditProfile.primaryAgentId, "core-v3-build");
+  assert.deepEqual(
+    evidenceGatedManifestAuditProfile.profileEvidence.component_ids,
+    ["host-compiled-visible-contract", "targeted-verification", "bounded-pre-mutation-context", "public-evidence-gated-specialized-remediation", "exact-core-v2-coordinator", "adversarial-counterexample-audit", "transactional-remediation-rollback"],
   );
   assert.deepEqual(
     stratifiedCoreProfile.profileEvidence.component_ids,
@@ -258,6 +264,7 @@ try {
   cleanupSyntheticProfile(hostCompiledContractProfile);
   cleanupSyntheticProfile(stratifiedVisibleContractProfile);
   cleanupSyntheticProfile(manifestTransactionalAuditProfile);
+  cleanupSyntheticProfile(evidenceGatedManifestAuditProfile);
 }
 const plan = buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
@@ -682,6 +689,22 @@ const manifestTransactionalAuditPlan = buildBenchmarkV2CampaignPlan({
   allowDirty: true,
 });
 assert.equal(manifestTransactionalAuditPlan.component_id, "manifest-transactional-audit-candidate");
+const evidenceGatedManifestAuditPlan = buildBenchmarkV2CampaignPlan({
+  repositoryRoot: root,
+  split: "development",
+  generationId: "generation-fixture-evidence-gated-manifest-audit-1",
+  baselineArmId: "P0",
+  candidateArmId: "P29",
+  model: "fixture/model",
+  provider: "fixture",
+  variant: "low",
+  timeoutMs: 300_000,
+  seed: "campaign-fixture-seed",
+  repetitions: 1,
+  executableIdentity: executableFingerprint,
+  allowDirty: true,
+});
+assert.equal(evidenceGatedManifestAuditPlan.component_id, "evidence-gated-manifest-audit-candidate");
 assert.throws(() => buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
   split: "validation",

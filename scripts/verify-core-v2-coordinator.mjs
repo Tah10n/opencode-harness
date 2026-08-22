@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 
 import { fingerprint } from "../lib/feedback/contracts.mjs";
 import {
+  coreV2RemediationPlan,
   runCoreV2Coordinator,
   runCoreV2PostMutationCoordinator,
 } from "../lib/quality/core-v2-coordinator.mjs";
@@ -33,6 +34,30 @@ const failedCheck = (checkId) => ({
   fixed_public_check: { argv: ["node", "--test", "test/task.test.mjs"] },
   public_check_diagnostic: { exit_status: 1, output: "not ok", truncated: false },
 });
+
+assert.equal(coreV2RemediationPlan({
+  visible_requirements: "Preserve the public contract.",
+  stratum: "high",
+  allowed_target_paths: ["src/task.mjs"],
+  changed_paths: ["src/task.mjs"],
+  first_attempt_completed: true,
+  current_diff: { changed_paths: ["src/task.mjs"] },
+  fixed_public_check: { argv: ["node", "--test"] },
+  public_check_status: "passed",
+  audit_trigger_policy: "public-evidence-only",
+}).eligible, false);
+assert.equal(coreV2RemediationPlan({
+  visible_requirements: "Preserve the public contract.",
+  stratum: "high",
+  allowed_target_paths: ["src/task.mjs"],
+  changed_paths: ["src/task.mjs"],
+  first_attempt_completed: true,
+  current_diff: { changed_paths: ["src/task.mjs"] },
+  fixed_public_check: { argv: ["node", "--test"] },
+  public_check_status: "failed",
+  public_check_diagnostic: { exit_status: 1, output: "not ok", truncated: false },
+  audit_trigger_policy: "public-evidence-only",
+}).eligible, true);
 
 function observer(sequence) {
   let index = 0;

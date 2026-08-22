@@ -335,7 +335,7 @@ async function runOpenCode(profile, workspaceRoot, profileId, server) {
 
 try {
   const evidence = [];
-  for (const profileId of ["P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20", "P21", "P22", "P23", "P24", "P25", "P26", "P27", "P28"]) {
+  for (const profileId of ["P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20", "P21", "P22", "P23", "P24", "P25", "P26", "P27", "P28", "P29"]) {
     const profile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId });
     try {
       const workspaceRoot = path.join(temporaryRoot, "workspaces", profileId);
@@ -351,7 +351,7 @@ try {
       const ids = inventoryProbe.ids;
       const contextIds = ids.filter((entry) => entry.startsWith("context_")).sort();
       const qualityIds = ids.filter((entry) => entry.startsWith("quality_")).sort();
-      if (["P0", "P1", "P2", "P3", "P4", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20", "P21", "P22", "P23", "P24", "P25", "P26", "P27", "P28"].includes(profileId)
+      if (["P0", "P1", "P2", "P3", "P4", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20", "P21", "P22", "P23", "P24", "P25", "P26", "P27", "P28", "P29"].includes(profileId)
         && (contextIds.length !== 0 || qualityIds.length !== 0)) {
         fail(`${profileId} unexpectedly exposes context or quality tools`);
       }
