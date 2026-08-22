@@ -1,0 +1,179 @@
+name: Benchmark v2 confirmatory holdout (manual model-backed)
+
+on:
+  workflow_dispatch:
+    inputs:
+      round:
+        description: Preregistered confirmatory round
+        required: true
+        type: choice
+        default: "1"
+        options: ["1", "2", "3"]
+      generation:
+        description: Immutable confirmatory generation identifier
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: benchmark-v2-confirmatory-${{ github.sha }}-${{ inputs.round }}
+  cancel-in-progress: false
+
+env:
+  BENCHMARK_V2_MODEL: openai/gpt-5.6-luna
+  BENCHMARK_V2_PROVIDER: openai
+  BENCHMARK_V2_VARIANT: low
+  BENCHMARK_V2_TIMEOUT_MS: "300000"
+
+jobs:
+  confirmatory:
+    runs-on: [self-hosted, opencode-benchmark]
+    environment: synthetic-benchmark
+    timeout-minutes: 720
+    steps:
+      - name: Checkout exact frozen source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Install exact dependencies
+        run: npm ci
+
+      - name: Verify immutable confirmatory machinery
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(uname -s)" = "Linux"
+          test "$(stat -fc %T /sys/fs/cgroup)" = "cgroup2fs"
+          test -n "${OPENCODE_QUALITY_CGROUP_ROOT:-}"
+          test -n "${OPENCODE_QUALITY_CGROUP_ATTACH_MODE:-}"
+          test -n "${OPENCODE_QUALITY_CGROUP_ATTACH_HELPER:-}"
+          npm run verify:benchmark:v2:contracts
+          npm run verify:benchmark:v2:fixtures
+          npm run verify:benchmark:v2:campaign
+          npm run verify:benchmark:v2:freeze
+          npm run verify:benchmark:v2:holdout-selection
+          npm run verify:benchmark:adapter
+          git diff --exit-code
+          test -z "$(git status --porcelain=v1 --untracked-files=all)"
+
+      - name: Materialize private preregistered salt
+        shell: bash
+        env:
+          HOLDOUT_SALT: ${{ secrets.BENCHMARK_V2_HOLDOUT_SALT }}
+        run: |
+          set -euo pipefail
+          [[ "$HOLDOUT_SALT" =~ ^[0-9a-f]{64}$ ]]
+          install -d -m 700 .oc_harness/benchmark-v2/private
+          printf '%s\n' "$HOLDOUT_SALT" > .oc_harness/benchmark-v2/private/holdout-salt.v2.txt
+          chmod 600 .oc_harness/benchmark-v2/private/holdout-salt.v2.txt
+
+      - name: Freeze before selection
+        id: freeze
+        shell: bash
+        env:
+          ROUND: ${{ inputs.round }}
+        run: |
+          set -euo pipefail
+          output="$RUNNER_TEMP/freeze.json"
+          npm run --silent bench:v2:freeze -- \
+            --round "$ROUND" \
+            --workflow-run-id "$GITHUB_RUN_ID" \
+            --model "$BENCHMARK_V2_MODEL" \
+            --provider "$BENCHMARK_V2_PROVIDER" \
+            --variant "$BENCHMARK_V2_VARIANT" \
+            --timeout-ms "$BENCHMARK_V2_TIMEOUT_MS" \
+            --candidate-profile P31 > "$output"
+          FREEZE_OUTPUT="$output" node -e '
+            const fs = require("node:fs");
+            const value = JSON.parse(fs.readFileSync(process.env.FREEZE_OUTPUT, "utf8"));
+            process.stdout.write(`path=${value.manifest_path}\n`);
+            process.stdout.write(`fingerprint=${value.freeze_fingerprint}\n`);
+            process.stdout.write(`seed=${value.holdout_seed}\n`);
+          ' >> "$GITHUB_OUTPUT"
+
+      - name: Select disjoint holdout once
+        id: selection
+        shell: bash
+        env:
+          FREEZE_PATH: ${{ steps.freeze.outputs.path }}
+        run: |
+          set -euo pipefail
+          output="$RUNNER_TEMP/selection.json"
+          npm run --silent bench:v2:holdout:select -- \
+            --freeze "$FREEZE_PATH" \
+            --salt-file .oc_harness/benchmark-v2/private/holdout-salt.v2.txt > "$output"
+          SELECTION_OUTPUT="$output" node -e '
+            const fs = require("node:fs");
+            const value = JSON.parse(fs.readFileSync(process.env.SELECTION_OUTPUT, "utf8"));
+            if (value.family_count !== 90 || value.real_commit_derived_family_count < 23) process.exit(1);
+            process.stdout.write(`path=${value.selection_path}\n`);
+          ' >> "$GITHUB_OUTPUT"
+
+      - name: Run sealed paired confirmatory campaign
+        id: campaign
+        shell: bash
+        env:
+          GENERATION: ${{ inputs.generation }}
+          FREEZE_PATH: ${{ steps.freeze.outputs.path }}
+          SELECTION_PATH: ${{ steps.selection.outputs.path }}
+          HOLDOUT_SEED: ${{ steps.freeze.outputs.seed }}
+        run: |
+          set -euo pipefail
+          [[ "$GENERATION" =~ ^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$ ]]
+          output="$RUNNER_TEMP/campaign.json"
+          npm run --silent bench:v2:campaign -- \
+            --split holdout \
+            --generation "$GENERATION" \
+            --baseline P0 \
+            --candidate P31 \
+            --model "$BENCHMARK_V2_MODEL" \
+            --provider "$BENCHMARK_V2_PROVIDER" \
+            --variant "$BENCHMARK_V2_VARIANT" \
+            --timeout-ms "$BENCHMARK_V2_TIMEOUT_MS" \
+            --seed "$HOLDOUT_SEED" \
+            --repetitions 2 \
+            --freeze "$FREEZE_PATH" \
+            --selection "$SELECTION_PATH" \
+            --salt-file .oc_harness/benchmark-v2/private/holdout-salt.v2.txt > "$output"
+          CAMPAIGN_OUTPUT="$output" node -e '
+            const fs = require("node:fs");
+            const value = JSON.parse(fs.readFileSync(process.env.CAMPAIGN_OUTPUT, "utf8"));
+            process.stdout.write(`path=${value.report_path}\n`);
+            process.stdout.write(`decision=${value.decision}\n`);
+          ' >> "$GITHUB_OUTPUT"
+
+      - name: Revalidate bound evidence
+        shell: bash
+        env:
+          REPORT_PATH: ${{ steps.campaign.outputs.path }}
+          FREEZE_PATH: ${{ steps.freeze.outputs.path }}
+          SELECTION_PATH: ${{ steps.selection.outputs.path }}
+        run: |
+          set -euo pipefail
+          npm run --silent bench:v2:freeze:validate -- \
+            --manifest "$FREEZE_PATH" --fingerprint "${{ steps.freeze.outputs.fingerprint }}"
+          npm run --silent bench:v2:campaign:validate -- \
+            --report "$REPORT_PATH" \
+            --freeze "$FREEZE_PATH" \
+            --selection "$SELECTION_PATH" \
+            --salt-file .oc_harness/benchmark-v2/private/holdout-salt.v2.txt
+
+      - name: Upload privacy-safe confirmatory evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: benchmark-v2-confirmatory-${{ inputs.generation }}-round-${{ inputs.round }}-${{ github.run_id }}
+          path: |
+            ${{ steps.freeze.outputs.path }}
+            ${{ steps.selection.outputs.path }}
+            ${{ steps.campaign.outputs.path }}
+          if-no-files-found: error
+          retention-days: 90

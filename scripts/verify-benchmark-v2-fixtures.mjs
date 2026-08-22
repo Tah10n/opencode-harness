@@ -12,7 +12,9 @@ import {
   renderBenchmarkV2ProceduralSmallCorpus,
   renderBenchmarkV2ProceduralMediumCorpus,
   renderBenchmarkV2ProceduralHighCorpus,
+  renderBenchmarkV2RealCommitCorpus,
   buildBenchmarkV2ProceduralHoldoutPool,
+  buildBenchmarkV2RealCommitHoldoutPool,
   validateBenchmarkV2DevelopmentCorpus,
   validateBenchmarkV2ValidationCorpus,
 } from "../lib/benchmark/v2-fixtures.mjs";
@@ -102,7 +104,28 @@ assert.equal(proceduralPool.candidates.length, 72);
 assert.equal(new Set(proceduralPool.candidates.map((candidate) => candidate.task_identity)).size, 72);
 assert.equal(new Set(proceduralPool.candidates.map((candidate) => candidate.fixture_fingerprint)).size, 72);
 
-for (const instance of [...first, ...validation, ...proceduralSmall, ...proceduralMedium, ...proceduralHigh]) {
+const realCommit = renderBenchmarkV2RealCommitCorpus({
+  repositoryRoot: root,
+  registry: contracts.realCommitCandidates,
+  requirements: contracts.realCommitRequirements,
+  seed: "benchmark-v2-real-commit-fixture-verifier",
+  repetition: 1,
+});
+assert.equal(realCommit.length, 36);
+assert.deepEqual(Object.fromEntries(["small", "medium", "high"].map((stratum) => [
+  stratum, realCommit.filter((instance) => instance.family_id.startsWith(`real-${stratum}-`)).length,
+])), { small: 12, medium: 12, high: 12 });
+const realCommitPool = buildBenchmarkV2RealCommitHoldoutPool({
+  registry: contracts.realCommitCandidates,
+  instances: realCommit,
+});
+assert.equal(realCommitPool.task_materialization_status, "executable");
+assert.equal(realCommitPool.candidates.length, 36);
+assert.equal(new Set(realCommitPool.candidates.map((candidate) => candidate.task_identity)).size, 36);
+assert.equal(new Set(realCommitPool.candidates.map((candidate) => candidate.fixture_fingerprint)).size, 36);
+
+const executableInstances = [...first, ...validation, ...proceduralSmall, ...proceduralMedium, ...proceduralHigh, ...realCommit];
+for (const instance of executableInstances) {
   assert.equal(instance.prompt.includes("reference solution"), false);
   assert.equal(instance.public_files.length <= 20, true);
   assert.equal(instance.hidden_files.every((file) => ["test/", "hidden/"].some((prefix) => file.path.startsWith(prefix))), true);
@@ -117,7 +140,7 @@ for (const instance of [...first, ...validation, ...proceduralSmall, ...procedur
 
 const executionRoot = fs.mkdtempSync(path.join(os.tmpdir(), "benchmark-v2-fixtures-"));
 try {
-  for (const instance of [...first, ...validation, ...proceduralSmall, ...proceduralMedium, ...proceduralHigh]) {
+  for (const instance of executableInstances) {
     const fixtureRoot = path.join(executionRoot, instance.family_id);
     for (const file of [...instance.public_files, ...instance.solution_files, ...instance.hidden_files]) {
       const target = path.join(fixtureRoot, ...file.path.split("/"));

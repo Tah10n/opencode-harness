@@ -1,5 +1,6 @@
 import path from "node:path";
 import process from "node:process";
+import fs from "node:fs";
 import { fileURLToPath } from "node:url";
 
 import {
@@ -28,6 +29,9 @@ function parse(values) {
     planOnly: false,
     acceptanceOnly: false,
     allowDirty: false,
+    freezePath: null,
+    selectionPath: null,
+    saltFile: null,
   };
   const mapping = {
     "--split": "split",
@@ -41,6 +45,9 @@ function parse(values) {
     "--timeout-ms": "timeoutMs",
     "--repetitions": "repetitions",
     "--validation-use-ordinal": "validationUseOrdinal",
+    "--freeze": "freezePath",
+    "--selection": "selectionPath",
+    "--salt-file": "saltFile",
   };
   for (let index = 0; index < values.length; index += 1) {
     const key = values[index];
@@ -67,17 +74,30 @@ function parse(values) {
   }
   if (result.planOnly && result.acceptanceOnly) throw new Error("plan-only and acceptance-only are mutually exclusive");
   if (result.allowDirty && !result.planOnly) throw new Error("--allow-dirty is restricted to plan-only inspection");
+  if (result.split === "holdout" && [result.freezePath, result.selectionPath, result.saltFile].some((value) => value === null)) {
+    throw new Error("holdout requires --freeze, --selection, and --salt-file");
+  }
   return result;
+}
+
+function readJson(value) {
+  return value === null ? null : JSON.parse(fs.readFileSync(path.resolve(root, value), "utf8"));
 }
 
 try {
   const options = parse(process.argv.slice(2));
   const executableIdentity = resolveSyntheticOpenCodeExecutableIdentity();
   if (executableIdentity === null && !options.planOnly) throw new Error("OpenCode executable identity is unavailable");
+  const freezeManifest = readJson(options.freezePath);
+  const selectionManifest = readJson(options.selectionPath);
+  const salt = options.saltFile === null ? null : fs.readFileSync(path.resolve(root, options.saltFile), "utf8").trim();
   const plan = buildBenchmarkV2CampaignPlan({
     repositoryRoot: root,
     ...options,
     executableIdentity,
+    freezeManifest,
+    selectionManifest,
+    salt,
   });
   if (options.planOnly) {
     process.stdout.write(`${JSON.stringify(plan, null, 2)}\n`);
@@ -86,8 +106,12 @@ try {
     process.stdout.write(`${JSON.stringify(acceptance, null, 2)}\n`);
     if (acceptance.status !== "passed") process.exitCode = 2;
   } else {
-    const report = await executeBenchmarkV2Campaign({ repositoryRoot: root, plan, executableIdentity });
-    const reportPath = writeBenchmarkV2CampaignReport(root, report);
+    const report = await executeBenchmarkV2Campaign({
+      repositoryRoot: root, plan, executableIdentity, freezeManifest, selectionManifest, salt,
+    });
+    const reportPath = writeBenchmarkV2CampaignReport(root, report, {
+      freezeManifest, selectionManifest, salt,
+    });
     process.stdout.write(`${JSON.stringify({ status: report.status, decision: report.decision, report_path: reportPath, report_fingerprint: report.report_fingerprint }, null, 2)}\n`);
     if (report.status !== "complete") process.exitCode = 2;
   }

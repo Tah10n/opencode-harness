@@ -37,7 +37,7 @@ function freeze(seedSuffix = "a") {
       variant: "low",
       timeout_ms: 300_000,
       executable_fingerprint: `sha256:${"6".repeat(64)}`,
-      candidate_profile_id: "P4",
+      candidate_profile_id: "P31",
       arm_ordering_policy: "sha256-family-repetition-counterbalance-v1",
     },
   };
@@ -79,6 +79,8 @@ const first = buildBenchmarkV2HoldoutSelection({
 assert.equal(validateBenchmarkV2HoldoutSelection(first), first);
 assert.equal(first.family_count, 90);
 assert.equal(first.real_commit_derived_family_count, 23);
+assert.equal(first.excluded_task_identity_count, 2);
+assert.match(first.excluded_task_identities_fingerprint, /^sha256:[0-9a-f]{64}$/u);
 assert.deepEqual(first.family_count_by_stratum, { small: 30, medium: 30, high: 30 });
 assert.deepEqual(
   Object.values(first.composition_by_stratum).map((entry) => entry.real_commit_derived).sort(),

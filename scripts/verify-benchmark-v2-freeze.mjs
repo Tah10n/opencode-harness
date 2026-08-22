@@ -56,7 +56,7 @@ try {
     provider: "openai",
     variant: "low",
     timeoutMs: 300_000,
-    candidateProfileId: "P4",
+    candidateProfileId: "P31",
     executableFingerprint,
   };
   const manifest = buildBenchmarkV2FreezeManifest(options);
@@ -106,7 +106,7 @@ try {
     workflowRunId: "bad workflow value",
   }), /BENCHMARK_V2_FREEZE_INPUT/u);
 
-  fs.appendFileSync(path.join(root, "agents", "core.md"), "\nfixture drift\n", "utf8");
+  fs.appendFileSync(path.join(root, "agents", "core-v3.md"), "\nfixture drift\n", "utf8");
   assert.throws(() => validateBenchmarkV2FreezeManifest(manifest, {
     repositoryRoot: root,
     salt,

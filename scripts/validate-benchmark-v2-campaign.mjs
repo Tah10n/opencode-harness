@@ -7,10 +7,18 @@ import { validateBenchmarkV2CampaignReport } from "../lib/benchmark/v2-campaign.
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const values = process.argv.slice(2);
-if (values.length !== 2 || values[0] !== "--report" || values[1].startsWith("/") || values[1].includes("\\")) {
-  throw new Error("usage: --report <workspace-relative-json>");
+const options = { report: null, freeze: null, selection: null, saltFile: null };
+const mapping = { "--report": "report", "--freeze": "freeze", "--selection": "selection", "--salt-file": "saltFile" };
+for (let index = 0; index < values.length; index += 2) {
+  const property = mapping[values[index]];
+  const value = values[index + 1];
+  if (property === undefined || typeof value !== "string" || value.startsWith("/") || value.includes("\\")) {
+    throw new Error("usage: --report <path> [--freeze <path> --selection <path> --salt-file <path>]");
+  }
+  options[property] = value;
 }
-const relativePath = values[1];
+if (options.report === null) throw new Error("--report is required");
+const relativePath = options.report;
 const target = path.resolve(root, ...relativePath.split("/"));
 const relative = path.relative(root, target).split(path.sep).join("/");
 const stat = fs.lstatSync(target);
@@ -18,7 +26,15 @@ if (relative !== relativePath || !stat.isFile() || stat.isSymbolicLink() || stat
   throw new Error("campaign report path is unsafe or unbounded");
 }
 const report = JSON.parse(fs.readFileSync(target, "utf8"));
-validateBenchmarkV2CampaignReport(report, { repositoryRoot: root });
+const readOptionalJson = (value) => value === null ? null
+  : JSON.parse(fs.readFileSync(path.resolve(root, ...value.split("/")), "utf8"));
+const freezeManifest = readOptionalJson(options.freeze);
+const selectionManifest = readOptionalJson(options.selection);
+const salt = options.saltFile === null ? null
+  : fs.readFileSync(path.resolve(root, ...options.saltFile.split("/")), "utf8").trim();
+validateBenchmarkV2CampaignReport(report, {
+  repositoryRoot: root, freezeManifest, selectionManifest, salt,
+});
 process.stdout.write(`${JSON.stringify({
   status: "validated",
   report_status: report.status,
