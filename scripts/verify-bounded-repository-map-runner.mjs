@@ -27,6 +27,14 @@ const instance = renderBenchmarkV2DevelopmentFamily({
   binding,
   seed: "bounded-repository-map-runner",
 });
+const smallFamily = contracts.dev.families.find((entry) => entry.id === "dev-small-boundary-search");
+const smallBinding = contracts.devBindings.bindings.find((entry) => entry.family_id === smallFamily.id);
+const smallInstance = renderBenchmarkV2DevelopmentFamily({
+  repositoryRoot: root,
+  family: smallFamily,
+  binding: smallBinding,
+  seed: "bounded-repository-map-runner-small",
+});
 const prompts = new Map();
 const firstPrompts = new Map();
 let reviewerPrompt = null;
@@ -122,12 +130,12 @@ function transactionalCommandRunner() {
   };
 }
 
-async function fixtureAdapter({ context, onTrace, timeout }) {
+async function fixtureAdapterForInstance(targetInstance, { context, onTrace, timeout }) {
   assert.equal(timeout, syntheticAdapterWorkerTimeoutMs(context.timeout));
   latestPrimaryProfileManifestPath = context.profileManifestPath;
   prompts.set(context.profileId, context.prompt);
   if (!firstPrompts.has(context.profileId)) firstPrompts.set(context.profileId, context.prompt);
-  for (const file of instance.solution_files) {
+  for (const file of targetInstance.solution_files) {
     const target = path.join(context.repo, ...file.path.split("/"));
     fs.mkdirSync(path.dirname(target), { recursive: true });
     fs.writeFileSync(target, file.content, "utf8");
@@ -205,6 +213,10 @@ async function fixtureAdapter({ context, onTrace, timeout }) {
     model_turn_count: 1,
     continuation_turn_count: 0,
   };
+}
+
+async function fixtureAdapter(input) {
+  return fixtureAdapterForInstance(instance, input);
 }
 
 async function automaticReviewerAdapter({ context, timeout }) {
@@ -490,6 +502,12 @@ async function reviewerFreeExactCorePrimaryAdapter(input) {
   return fixtureAdapter(input);
 }
 
+async function protocolBoundSmallPrimaryAdapter(input) {
+  assert.equal(input.context.profileId, "P39");
+  assert.equal(input.context.agentId, "core-v4-build");
+  return fixtureAdapterForInstance(smallInstance, input);
+}
+
 async function publicCheckFailureOnlyPrimaryAdapter(input) {
   publicCheckFailureOnlyPrimaryCallCount += 1;
   if (publicCheckFailureOnlyPrimaryCallCount === 1) assert.equal(input.context.agentId, undefined);
@@ -531,11 +549,12 @@ async function attempt(
   reviewerInvoker = null,
   primaryInvoker = fixtureAdapter,
   selectedCommandRunner = commandRunner,
+  selectedInstance = instance,
 ) {
   let nextId = 0;
   return runSyntheticProfileAttempt({
     sourceRoot: root,
-    instance,
+    instance: selectedInstance,
     profileId,
     operationalRunId: `bounded-repository-map-${profileId}`,
     model: "fixture/model",
@@ -747,6 +766,13 @@ const withProtocolBoundSmallNoAudit = await attempt(
   null,
   reviewerFreeExactCorePrimaryAdapter,
   commandRunner,
+);
+const withProtocolBoundSmallNoAuditSmall = await attempt(
+  "P39",
+  null,
+  protocolBoundSmallPrimaryAdapter,
+  commandRunner,
+  smallInstance,
 );
 const withPublicCheckFailureOnly = await attempt(
   "P34",
@@ -1097,6 +1123,27 @@ assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P39", stratum: "
 assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P39", stratum: "medium" }), true);
 assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P39", stratum: "high" }), true);
 assert.equal(vnextCoreV2AuditTriggerPolicy("P39"), "disabled");
+assert.equal(withProtocolBoundSmallNoAuditSmall.result.execution_status, "completed");
+assert.doesNotMatch(prompts.get("P39"), /HOST_VISIBLE_CONTRACT_V[12]=/u);
+assert.doesNotMatch(prompts.get("P39"), /HOST_REPOSITORY_MAP_V1=/u);
+assert.deepEqual(withProtocolBoundSmallNoAuditSmall.result.vnext_primary_route_observation, {
+  eligible: true,
+  activated: true,
+  stratum: "small",
+  agent_id: "core-v4-build",
+  visible_contract_version: "NONE",
+  reason: "host_route_bound",
+});
+assert.deepEqual(withProtocolBoundSmallNoAuditSmall.result.vnext_visible_contract_observation, {
+  eligible: false,
+  activated: false,
+  reason: "profile_without_visible_contract_manifest",
+  manifest_fingerprint: null,
+  clause_count: 0,
+});
+assert.equal(withProtocolBoundSmallNoAuditSmall.result.vnext_verification_remediation_observation.eligible, false);
+assert.equal(withProtocolBoundSmallNoAuditSmall.result.vnext_verification_remediation_observation.retry_started_count, 0);
+assert.equal(withProtocolBoundSmallNoAuditSmall.result.vnext_verification_remediation_observation.retry_completed_count, 0);
 assert.equal(publicCheckFailureOnlyPrimaryCallCount, 2);
 assert.match(firstPrompts.get("P34"), /HOST_REPOSITORY_MAP_V1=/u);
 assert.match(firstPrompts.get("P34"), /HOST_VISIBLE_CONTRACT_V2=/u);
