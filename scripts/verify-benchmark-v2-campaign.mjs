@@ -1068,6 +1068,46 @@ async function fakeAttempt({ instance, profileId }) {
   return Object.freeze({ result: Object.freeze(result), binding: binding(instance) });
 }
 
+async function conditionalNoopAttempt(input) {
+  const attempt = await fakeAttempt(input);
+  if (input.profileId !== "P34") return attempt;
+  return Object.freeze({
+    ...attempt,
+    result: Object.freeze({
+      ...attempt.result,
+      vnext_verification_remediation_observation: Object.freeze({
+        eligible: false,
+        retry_required_count: 0,
+        retry_started_count: 0,
+        retry_completed_count: 0,
+        retry_changed_count: 0,
+        retry_reverified_count: 0,
+        retry_verification_passed_count: 0,
+        rollback_attempted_count: 0,
+        rollback_completed_count: 0,
+        operationally_complete: true,
+        trigger_reasons: Object.freeze([]),
+      }),
+    }),
+  });
+}
+
+async function conditionalNoopWithoutVerificationAttempt(input) {
+  const attempt = await conditionalNoopAttempt(input);
+  if (input.profileId !== "P34") return attempt;
+  return Object.freeze({
+    ...attempt,
+    result: Object.freeze({
+      ...attempt.result,
+      vnext_host_verification_observation: Object.freeze({
+        activation_eligible: true,
+        activated: false,
+        allowed: false,
+      }),
+    }),
+  });
+}
+
 async function ineligibleDiagnosticAttempt(input) {
   const attempt = await fakeAttempt(input);
   if (input.profileId !== "P13") return attempt;
@@ -1107,6 +1147,7 @@ const acceptance = await executeBenchmarkV2Acceptance({
 });
 assert.equal(acceptance.status, "passed");
 assert.equal(acceptance.activation.activated, true);
+assert.deepEqual(acceptance.mechanism_acceptance, { satisfied: true, mode: "activated" });
 const reviewerAcceptance = await executeBenchmarkV2Acceptance({
   repositoryRoot: root,
   plan: reviewerPlan,
@@ -1277,6 +1318,30 @@ const publicCheckFailureOnlyAcceptance = await executeBenchmarkV2Acceptance({
 assert.equal(publicCheckFailureOnlyAcceptance.status, "passed");
 assert.equal(publicCheckFailureOnlyAcceptance.family_id, "dev-high-duplicate-side-effects");
 assert.deepEqual(publicCheckFailureOnlyAcceptance.activation, { eligible: true, activated: true });
+assert.deepEqual(publicCheckFailureOnlyAcceptance.mechanism_acceptance, { satisfied: true, mode: "activated" });
+const publicCheckFailureOnlyNoopAcceptance = await executeBenchmarkV2Acceptance({
+  repositoryRoot: root,
+  plan: publicCheckFailureOnlyPlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: conditionalNoopAttempt,
+});
+assert.equal(publicCheckFailureOnlyNoopAcceptance.status, "passed");
+assert.deepEqual(publicCheckFailureOnlyNoopAcceptance.activation, { eligible: false, activated: false });
+assert.deepEqual(publicCheckFailureOnlyNoopAcceptance.mechanism_acceptance, {
+  satisfied: true,
+  mode: "verified-not-needed",
+});
+const publicCheckFailureOnlyUnverifiedNoopAcceptance = await executeBenchmarkV2Acceptance({
+  repositoryRoot: root,
+  plan: publicCheckFailureOnlyPlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: conditionalNoopWithoutVerificationAttempt,
+});
+assert.equal(publicCheckFailureOnlyUnverifiedNoopAcceptance.status, "failed");
+assert.deepEqual(publicCheckFailureOnlyUnverifiedNoopAcceptance.mechanism_acceptance, {
+  satisfied: false,
+  mode: "unsatisfied",
+});
 assert.equal(report.status, "complete");
 assert.equal(report.pair_results.length, 36);
 assert.equal(report.summary.statistics.activation.rate, 1);
