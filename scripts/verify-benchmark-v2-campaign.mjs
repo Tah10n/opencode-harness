@@ -152,6 +152,7 @@ const reviewerFreeExactCoreProfile = materializeVnextSyntheticProfile({ sourceRo
 const scenarioTypedVisibleContractProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P33" });
 const publicCheckFailureOnlyProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P34" });
 const secretMutationGuardProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P35" });
+const stratifiedScenarioVisibleContractProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P36" });
 try {
   assert.equal(plainProfile.primaryAgentId, "build");
   assert.equal(isolatedVerificationProfile.primaryAgentId, "build");
@@ -1007,6 +1008,26 @@ const secretMutationGuardPlan = buildBenchmarkV2CampaignPlan({
   allowDirty: true,
 });
 assert.equal(secretMutationGuardPlan.component_id, "secret-mutation-guard-candidate");
+const stratifiedScenarioVisibleContractPlan = buildBenchmarkV2CampaignPlan({
+  repositoryRoot: root,
+  split: "development",
+  generationId: "generation-fixture-stratified-scenario-visible-contract-1",
+  baselineArmId: "P0",
+  candidateArmId: "P36",
+  model: "fixture/model",
+  provider: "fixture",
+  variant: "low",
+  timeoutMs: 300_000,
+  seed: "campaign-fixture-seed",
+  repetitions: 1,
+  executableIdentity: executableFingerprint,
+  allowDirty: true,
+});
+assert.equal(stratifiedScenarioVisibleContractPlan.component_id, "stratified-scenario-visible-contract-candidate");
+assert.equal(
+  stratifiedScenarioVisibleContractPlan.bindings.candidate_profile_fingerprint,
+  stratifiedScenarioVisibleContractProfile.profileFingerprint,
+);
 assert.throws(() => buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
   split: "validation",
@@ -1047,7 +1068,7 @@ function binding(instance) {
 async function fakeAttempt({ instance, profileId }) {
   const ordinal = Number.parseInt(createHash(instance.family_id).slice(0, 2), 16);
   const baselineFailure = ordinal % 4 === 0;
-  const success = ["P6", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20", "P34", "P35"].includes(profileId) ? true : !baselineFailure;
+  const success = ["P6", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20", "P34", "P35", "P36"].includes(profileId) ? true : !baselineFailure;
   const passed = check(true);
   const hidden = success ? passed : check(false, "hidden-contract");
   const result = {
@@ -1104,6 +1125,13 @@ async function fakeAttempt({ instance, profileId }) {
       activated: true,
       denied_count: 0,
       reason: "runtime_guard_bound",
+    } : null,
+    vnext_visible_contract_observation: profileId === "P36" ? {
+      eligible: true,
+      activated: true,
+      reason: "host_visible_contract_compiled_before_model",
+      manifest_fingerprint: `sha256:${"d".repeat(64)}`,
+      clause_count: 1,
     } : null,
     vnext_context_map_observation: profileId === "P11" ? {
       eligible: true,
@@ -1377,6 +1405,16 @@ assert.equal(secretMutationGuardAcceptance.status, "passed");
 assert.equal(secretMutationGuardAcceptance.family_id, "dev-high-secret-redaction");
 assert.deepEqual(secretMutationGuardAcceptance.activation, { eligible: true, activated: true });
 assert.deepEqual(secretMutationGuardAcceptance.mechanism_acceptance, { satisfied: true, mode: "activated" });
+const stratifiedScenarioVisibleContractAcceptance = await executeBenchmarkV2Acceptance({
+  repositoryRoot: root,
+  plan: stratifiedScenarioVisibleContractPlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: fakeAttempt,
+});
+assert.equal(stratifiedScenarioVisibleContractAcceptance.status, "passed");
+assert.equal(stratifiedScenarioVisibleContractAcceptance.family_id, "dev-small-malformed-parser");
+assert.deepEqual(stratifiedScenarioVisibleContractAcceptance.activation, { eligible: true, activated: true });
+assert.deepEqual(stratifiedScenarioVisibleContractAcceptance.mechanism_acceptance, { satisfied: true, mode: "activated" });
 const publicCheckFailureOnlyNoopAcceptance = await executeBenchmarkV2Acceptance({
   repositoryRoot: root,
   plan: publicCheckFailureOnlyPlan,

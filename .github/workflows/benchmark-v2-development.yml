@@ -22,7 +22,7 @@ on:
         description: Candidate cumulative arm
         required: true
         type: choice
-        options: [P1, P2, P3, P4, P35]
+        options: [P1, P2, P3, P4, P36]
       seed:
         description: Preregistered development seed
         required: true

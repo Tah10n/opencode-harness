@@ -92,7 +92,7 @@ jobs:
             --provider "$BENCHMARK_V2_PROVIDER" \
             --variant "$BENCHMARK_V2_VARIANT" \
             --timeout-ms "$BENCHMARK_V2_TIMEOUT_MS" \
-            --candidate-profile P35 > "$output"
+            --candidate-profile P36 > "$output"
           FREEZE_OUTPUT="$output" node -e '
             const fs = require("node:fs");
             const value = JSON.parse(fs.readFileSync(process.env.FREEZE_OUTPUT, "utf8"));
@@ -135,7 +135,7 @@ jobs:
             --split holdout \
             --generation "$GENERATION" \
             --baseline P0 \
-            --candidate P35 \
+            --candidate P36 \
             --model "$BENCHMARK_V2_MODEL" \
             --provider "$BENCHMARK_V2_PROVIDER" \
             --variant "$BENCHMARK_V2_VARIANT" \
