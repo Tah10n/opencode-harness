@@ -156,6 +156,7 @@ const stratifiedScenarioVisibleContractProfile = materializeVnextSyntheticProfil
 const minimalSmallScenarioVisibleContractProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P37" });
 const minimalSmallScenarioVisibleContractNoAuditProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P38" });
 const protocolBoundSmallNoAuditProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P39" });
+const smallProtocolOnlyProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P40" });
 try {
   assert.equal(plainProfile.primaryAgentId, "build");
   assert.equal(isolatedVerificationProfile.primaryAgentId, "build");
@@ -428,6 +429,19 @@ try {
     protocolBoundSmallNoAuditProfile.profileEvidence.component_ids,
     ["protocol-bound-small-no-audit", "targeted-verification", "bounded-pre-mutation-context", "exact-core-v2-coordinator"],
   );
+  assert.equal(smallProtocolOnlyProfile.primaryAgentId, "build");
+  assert.deepEqual(
+    smallProtocolOnlyProfile.profileEvidence.component_ids,
+    ["small-protocol-only", "targeted-verification"],
+  );
+  assert.deepEqual(
+    smallProtocolOnlyProfile.profileEvidence.runtime_surface.effective_config,
+    plainProfile.profileEvidence.runtime_surface.effective_config,
+  );
+  assert.deepEqual(
+    smallProtocolOnlyProfile.profileEvidence.runtime_surface.materialized_files.map((entry) => entry.path),
+    ["agents/core-v4-build.md", "runtime/host/core-verification-gate.mjs"],
+  );
 } finally {
   cleanupSyntheticProfile(plainProfile);
   cleanupSyntheticProfile(isolatedVerificationProfile);
@@ -463,6 +477,7 @@ try {
   cleanupSyntheticProfile(minimalSmallScenarioVisibleContractProfile);
   cleanupSyntheticProfile(minimalSmallScenarioVisibleContractNoAuditProfile);
   cleanupSyntheticProfile(protocolBoundSmallNoAuditProfile);
+  cleanupSyntheticProfile(smallProtocolOnlyProfile);
 }
 const plan = buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
@@ -1110,6 +1125,26 @@ assert.equal(
   protocolBoundSmallNoAuditPlan.bindings.candidate_profile_fingerprint,
   protocolBoundSmallNoAuditProfile.profileFingerprint,
 );
+const smallProtocolOnlyPlan = buildBenchmarkV2CampaignPlan({
+  repositoryRoot: root,
+  split: "development",
+  generationId: "generation-fixture-small-protocol-only-1",
+  baselineArmId: "P0",
+  candidateArmId: "P40",
+  model: "fixture/model",
+  provider: "fixture",
+  variant: "low",
+  timeoutMs: 300_000,
+  seed: "campaign-fixture-seed",
+  repetitions: 1,
+  executableIdentity: executableFingerprint,
+  allowDirty: true,
+});
+assert.equal(smallProtocolOnlyPlan.component_id, "small-protocol-only-candidate");
+assert.equal(
+  smallProtocolOnlyPlan.bindings.candidate_profile_fingerprint,
+  smallProtocolOnlyProfile.profileFingerprint,
+);
 assert.throws(() => buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
   split: "validation",
@@ -1150,7 +1185,7 @@ function binding(instance) {
 async function fakeAttempt({ instance, profileId }) {
   const ordinal = Number.parseInt(createHash(instance.family_id).slice(0, 2), 16);
   const baselineFailure = ordinal % 4 === 0;
-  const success = ["P6", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20", "P34", "P35", "P36", "P37", "P38", "P39"].includes(profileId) ? true : !baselineFailure;
+  const success = ["P6", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20", "P34", "P35", "P36", "P37", "P38", "P39", "P40"].includes(profileId) ? true : !baselineFailure;
   const passed = check(true);
   const hidden = success ? passed : check(false, "hidden-contract");
   const result = {
@@ -1207,7 +1242,7 @@ async function fakeAttempt({ instance, profileId }) {
         ? ["multi-target"]
         : ["P19", "P20"].includes(profileId) ? ["risk-gated-specialized-visible-contract", "high-risk"]
         : ["P17", "P18"].includes(profileId) ? ["specialized-visible-contract"] : ["fixture-trigger"],
-    } : ["P38", "P39"].includes(profileId) ? {
+    } : ["P38", "P39", "P40"].includes(profileId) ? {
       eligible: false,
       retry_started_count: 0,
       retry_completed_count: 0,
@@ -1225,15 +1260,22 @@ async function fakeAttempt({ instance, profileId }) {
       reason: "host_visible_contract_compiled_before_model",
       manifest_fingerprint: `sha256:${"d".repeat(64)}`,
       clause_count: 1,
+    } : profileId === "P40" ? {
+      eligible: false,
+      activated: false,
+      reason: "profile_without_visible_contract_manifest",
+      manifest_fingerprint: null,
+      clause_count: 0,
     } : null,
-    vnext_primary_route_observation: ["P36", "P37", "P38", "P39"].includes(profileId) ? {
+    vnext_primary_route_observation: ["P36", "P37", "P38", "P39", "P40"].includes(profileId) ? {
       eligible: true,
       activated: true,
       stratum: /(?:^|-)high-/u.test(instance.family_id)
         ? "high" : /(?:^|-)medium-/u.test(instance.family_id) ? "medium" : "small",
       agent_id: /(?:^|-)small-/u.test(instance.family_id)
-        ? (profileId === "P36" ? "core-v3-build" : profileId === "P39" ? "core-v4-build" : "build") : "core-v4-build",
-      visible_contract_version: /(?:^|-)small-/u.test(instance.family_id)
+        ? (profileId === "P36" ? "core-v3-build" : ["P39", "P40"].includes(profileId) ? "core-v4-build" : "build")
+        : (profileId === "P40" ? "build" : "core-v4-build"),
+      visible_contract_version: profileId === "P40" ? "NONE" : /(?:^|-)small-/u.test(instance.family_id)
         ? (profileId === "P36" ? "V1" : "NONE") : "V2",
       reason: "host_route_bound",
     } : null,
@@ -1241,7 +1283,7 @@ async function fakeAttempt({ instance, profileId }) {
       eligible: true,
       activated: true,
       reason: "host_map_injected_before_retry",
-    } : null,
+    } : profileId === "P40" ? { eligible: true, activated: false, reason: "profile_without_host_context" } : null,
     audit_evidence: { fixture: true },
     fingerprints: { adapter: `sha256:${"b".repeat(64)}` },
   };
@@ -1661,6 +1703,71 @@ const protocolBoundSmallUnexpectedRetryAcceptance = await executeBenchmarkV2Acce
 });
 assert.equal(protocolBoundSmallUnexpectedRetryAcceptance.status, "failed");
 assert.deepEqual(protocolBoundSmallUnexpectedRetryAcceptance.activation, { eligible: true, activated: false });
+const smallProtocolOnlyAcceptance = await executeBenchmarkV2Acceptance({
+  repositoryRoot: root,
+  plan: smallProtocolOnlyPlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: fakeAttempt,
+});
+assert.equal(smallProtocolOnlyAcceptance.status, "passed");
+assert.equal(smallProtocolOnlyAcceptance.family_id, "dev-small-boundary-search");
+assert.deepEqual(smallProtocolOnlyAcceptance.activation, { eligible: true, activated: true });
+const smallProtocolOnlyWrongRouteAcceptance = await executeBenchmarkV2Acceptance({
+  repositoryRoot: root,
+  plan: smallProtocolOnlyPlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: async (input) => {
+    const attempt = await fakeAttempt(input);
+    if (input.profileId !== "P40") return attempt;
+    return Object.freeze({
+      ...attempt,
+      result: Object.freeze({
+        ...attempt.result,
+        vnext_primary_route_observation: Object.freeze({
+          ...attempt.result.vnext_primary_route_observation,
+          agent_id: "build",
+        }),
+      }),
+    });
+  },
+});
+assert.equal(smallProtocolOnlyWrongRouteAcceptance.status, "failed");
+assert.deepEqual(smallProtocolOnlyWrongRouteAcceptance.activation, { eligible: true, activated: false });
+const smallProtocolOnlyMediumActivationFixture = {
+  activation: {
+    primary_route: {
+      eligible: true,
+      activated: true,
+      stratum: "medium",
+      agent_id: "build",
+      visible_contract_version: "NONE",
+    },
+    host_verification: { activation_eligible: true, activated: true, allowed: true },
+    verification_remediation: { eligible: false, retry_started_count: 0, retry_completed_count: 0 },
+    bounded_context: { eligible: true, activated: false, reason: "profile_without_host_context" },
+    visible_contract: { eligible: false, activated: false },
+  },
+  metrics: { model_turn_count: 1, continuation_turn_count: 0 },
+};
+assert.deepEqual(
+  evaluateBenchmarkV2MechanismActivation(
+    "small-protocol-only-candidate",
+    smallProtocolOnlyMediumActivationFixture,
+    "medium",
+  ),
+  { eligible: true, activated: true },
+);
+assert.deepEqual(
+  evaluateBenchmarkV2MechanismActivation(
+    "small-protocol-only-candidate",
+    {
+      ...smallProtocolOnlyMediumActivationFixture,
+      metrics: { model_turn_count: 2, continuation_turn_count: 1 },
+    },
+    "medium",
+  ),
+  { eligible: true, activated: false },
+);
 const publicCheckFailureOnlyNoopAcceptance = await executeBenchmarkV2Acceptance({
   repositoryRoot: root,
   plan: publicCheckFailureOnlyPlan,
@@ -1702,6 +1809,28 @@ assert.equal(report.summary.statistics.overhead.total_tool_calls.median_ratio, 1
 assert.equal(report.summary.statistics.overhead.model_turns.median_ratio, 1);
 assert.match(report.report_fingerprint, /^sha256:[0-9a-f]{64}$/u);
 assert.equal(validateBenchmarkV2CampaignReport(report, { repositoryRoot: root }), report);
+const smallProtocolOnlyReport = await executeBenchmarkV2Campaign({
+  repositoryRoot: root,
+  plan: smallProtocolOnlyPlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: fakeAttempt,
+});
+assert.equal(smallProtocolOnlyReport.status, "complete");
+assert.equal(smallProtocolOnlyReport.summary.statistics.activation.rate, 1);
+assert.deepEqual(
+  smallProtocolOnlyReport.pair_results.reduce((routes, pair) => {
+    const route = pair.candidate.activation.primary_route;
+    const key = `${route.stratum}:${route.agent_id}:${route.visible_contract_version}`;
+    routes[key] = (routes[key] ?? 0) + 1;
+    return routes;
+  }, {}),
+  {
+    "small:core-v4-build:NONE": 12,
+    "medium:build:NONE": 12,
+    "high:build:NONE": 12,
+  },
+);
+assert.equal(validateBenchmarkV2CampaignReport(smallProtocolOnlyReport, { repositoryRoot: root }), smallProtocolOnlyReport);
 const tampered = structuredClone(report);
 tampered.pair_results[0].candidate.metrics.duration_ms += 1;
 assert.throws(() => validateBenchmarkV2CampaignReport(tampered, { repositoryRoot: root }), /REPORT_SCHEMA|REPORT_PAIRS/u);
