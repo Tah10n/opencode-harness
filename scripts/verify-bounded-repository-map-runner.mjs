@@ -1004,6 +1004,14 @@ assert.equal(withSecretMutationGuard.result.termination_acceptable, true);
 assert.equal(vnextInitialAgentId({ profile_id: "P35", stratum: "high" }), null);
 assert.match(firstPrompts.get("P36"), /HOST_REPOSITORY_MAP_V1=/u);
 assert.match(firstPrompts.get("P36"), /HOST_VISIBLE_CONTRACT_V2=/u);
+assert.deepEqual(withStratifiedScenarioVisibleContract.result.vnext_primary_route_observation, {
+  eligible: true,
+  activated: true,
+  stratum: "medium",
+  agent_id: "core-v4-build",
+  visible_contract_version: "V2",
+  reason: "host_route_bound",
+});
 assert.equal(withStratifiedScenarioVisibleContract.result.termination_acceptable, true);
 assert.equal(vnextInitialAgentId({ profile_id: "P36", stratum: "small" }), "core-v3-build");
 assert.equal(vnextInitialAgentId({ profile_id: "P36", stratum: "medium" }), null);

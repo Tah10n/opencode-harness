@@ -1133,6 +1133,15 @@ async function fakeAttempt({ instance, profileId }) {
       manifest_fingerprint: `sha256:${"d".repeat(64)}`,
       clause_count: 1,
     } : null,
+    vnext_primary_route_observation: profileId === "P36" ? {
+      eligible: true,
+      activated: true,
+      stratum: /(?:^|-)high-/u.test(instance.family_id)
+        ? "high" : /(?:^|-)medium-/u.test(instance.family_id) ? "medium" : "small",
+      agent_id: /(?:^|-)small-/u.test(instance.family_id) ? "core-v3-build" : "core-v4-build",
+      visible_contract_version: /(?:^|-)small-/u.test(instance.family_id) ? "V1" : "V2",
+      reason: "host_route_bound",
+    } : null,
     vnext_context_map_observation: profileId === "P11" ? {
       eligible: true,
       activated: true,
@@ -1415,6 +1424,29 @@ assert.equal(stratifiedScenarioVisibleContractAcceptance.status, "passed");
 assert.equal(stratifiedScenarioVisibleContractAcceptance.family_id, "dev-small-malformed-parser");
 assert.deepEqual(stratifiedScenarioVisibleContractAcceptance.activation, { eligible: true, activated: true });
 assert.deepEqual(stratifiedScenarioVisibleContractAcceptance.mechanism_acceptance, { satisfied: true, mode: "activated" });
+const stratifiedScenarioWrongRouteAcceptance = await executeBenchmarkV2Acceptance({
+  repositoryRoot: root,
+  plan: stratifiedScenarioVisibleContractPlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: async (input) => {
+    const attempt = await fakeAttempt(input);
+    if (input.profileId !== "P36") return attempt;
+    return Object.freeze({
+      ...attempt,
+      result: Object.freeze({
+        ...attempt.result,
+        vnext_primary_route_observation: Object.freeze({
+          ...attempt.result.vnext_primary_route_observation,
+          agent_id: "core-v4-build",
+          visible_contract_version: "V2",
+        }),
+      }),
+    });
+  },
+});
+assert.equal(stratifiedScenarioWrongRouteAcceptance.status, "failed");
+assert.deepEqual(stratifiedScenarioWrongRouteAcceptance.activation, { eligible: true, activated: false });
+assert.deepEqual(stratifiedScenarioWrongRouteAcceptance.mechanism_acceptance, { satisfied: false, mode: "unsatisfied" });
 const publicCheckFailureOnlyNoopAcceptance = await executeBenchmarkV2Acceptance({
   repositoryRoot: root,
   plan: publicCheckFailureOnlyPlan,
