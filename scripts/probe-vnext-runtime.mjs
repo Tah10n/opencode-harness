@@ -311,7 +311,7 @@ async function runOpenCode(profile, workspaceRoot, profileId, server) {
     "--dir", workspaceRoot,
     "--agent", profileId === "P5" ? "assurance"
       : profileId === "P35" ? "core-v5-build"
-        : ["P36", "P37"].includes(profileId) ? "core-v4-build" : "deep",
+        : ["P36", "P37", "P38"].includes(profileId) ? "core-v4-build" : "deep",
     "Execute the installed runtime probe exactly through the requested tools.",
   ], {
     cwd: workspaceRoot,
@@ -340,7 +340,7 @@ async function runOpenCode(profile, workspaceRoot, profileId, server) {
 
 try {
   const evidence = [];
-  for (const profileId of ["P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20", "P21", "P22", "P23", "P24", "P25", "P26", "P27", "P28", "P29", "P30", "P31", "P32", "P33", "P34", "P35", "P36", "P37"]) {
+  for (const profileId of ["P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20", "P21", "P22", "P23", "P24", "P25", "P26", "P27", "P28", "P29", "P30", "P31", "P32", "P33", "P34", "P35", "P36", "P37", "P38"]) {
     const profile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId });
     try {
       const workspaceRoot = path.join(temporaryRoot, "workspaces", profileId);
@@ -356,7 +356,7 @@ try {
       const ids = inventoryProbe.ids;
       const contextIds = ids.filter((entry) => entry.startsWith("context_")).sort();
       const qualityIds = ids.filter((entry) => entry.startsWith("quality_")).sort();
-      if (["P0", "P1", "P2", "P3", "P4", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20", "P21", "P22", "P23", "P24", "P25", "P26", "P27", "P28", "P29", "P30", "P31", "P32", "P33", "P34", "P35", "P36", "P37"].includes(profileId)
+      if (["P0", "P1", "P2", "P3", "P4", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20", "P21", "P22", "P23", "P24", "P25", "P26", "P27", "P28", "P29", "P30", "P31", "P32", "P33", "P34", "P35", "P36", "P37", "P38"].includes(profileId)
         && (contextIds.length !== 0 || qualityIds.length !== 0)) {
         fail(`${profileId} unexpectedly exposes context or quality tools`);
       }
