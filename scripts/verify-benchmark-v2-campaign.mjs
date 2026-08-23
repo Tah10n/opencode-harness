@@ -155,6 +155,7 @@ const secretMutationGuardProfile = materializeVnextSyntheticProfile({ sourceRoot
 const stratifiedScenarioVisibleContractProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P36" });
 const minimalSmallScenarioVisibleContractProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P37" });
 const minimalSmallScenarioVisibleContractNoAuditProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P38" });
+const protocolBoundSmallNoAuditProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P39" });
 try {
   assert.equal(plainProfile.primaryAgentId, "build");
   assert.equal(isolatedVerificationProfile.primaryAgentId, "build");
@@ -422,6 +423,11 @@ try {
     minimalSmallScenarioVisibleContractNoAuditProfile.profileEvidence.component_ids,
     ["minimal-small-scenario-visible-contract-no-audit", "targeted-verification", "bounded-pre-mutation-context", "exact-core-v2-coordinator"],
   );
+  assert.equal(protocolBoundSmallNoAuditProfile.primaryAgentId, "build");
+  assert.deepEqual(
+    protocolBoundSmallNoAuditProfile.profileEvidence.component_ids,
+    ["protocol-bound-small-no-audit", "targeted-verification", "bounded-pre-mutation-context", "exact-core-v2-coordinator"],
+  );
 } finally {
   cleanupSyntheticProfile(plainProfile);
   cleanupSyntheticProfile(isolatedVerificationProfile);
@@ -456,6 +462,7 @@ try {
   cleanupSyntheticProfile(stratifiedScenarioVisibleContractProfile);
   cleanupSyntheticProfile(minimalSmallScenarioVisibleContractProfile);
   cleanupSyntheticProfile(minimalSmallScenarioVisibleContractNoAuditProfile);
+  cleanupSyntheticProfile(protocolBoundSmallNoAuditProfile);
 }
 const plan = buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
@@ -1083,6 +1090,26 @@ assert.equal(
   minimalSmallScenarioVisibleContractNoAuditPlan.bindings.candidate_profile_fingerprint,
   minimalSmallScenarioVisibleContractNoAuditProfile.profileFingerprint,
 );
+const protocolBoundSmallNoAuditPlan = buildBenchmarkV2CampaignPlan({
+  repositoryRoot: root,
+  split: "development",
+  generationId: "generation-fixture-protocol-bound-small-no-audit-1",
+  baselineArmId: "P0",
+  candidateArmId: "P39",
+  model: "fixture/model",
+  provider: "fixture",
+  variant: "low",
+  timeoutMs: 300_000,
+  seed: "campaign-fixture-seed",
+  repetitions: 1,
+  executableIdentity: executableFingerprint,
+  allowDirty: true,
+});
+assert.equal(protocolBoundSmallNoAuditPlan.component_id, "protocol-bound-small-no-audit-candidate");
+assert.equal(
+  protocolBoundSmallNoAuditPlan.bindings.candidate_profile_fingerprint,
+  protocolBoundSmallNoAuditProfile.profileFingerprint,
+);
 assert.throws(() => buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
   split: "validation",
@@ -1123,7 +1150,7 @@ function binding(instance) {
 async function fakeAttempt({ instance, profileId }) {
   const ordinal = Number.parseInt(createHash(instance.family_id).slice(0, 2), 16);
   const baselineFailure = ordinal % 4 === 0;
-  const success = ["P6", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20", "P34", "P35", "P36", "P37", "P38"].includes(profileId) ? true : !baselineFailure;
+  const success = ["P6", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20", "P34", "P35", "P36", "P37", "P38", "P39"].includes(profileId) ? true : !baselineFailure;
   const passed = check(true);
   const hidden = success ? passed : check(false, "hidden-contract");
   const result = {
@@ -1174,7 +1201,7 @@ async function fakeAttempt({ instance, profileId }) {
         ? ["multi-target"]
         : ["P19", "P20"].includes(profileId) ? ["risk-gated-specialized-visible-contract", "high-risk"]
         : ["P17", "P18"].includes(profileId) ? ["specialized-visible-contract"] : ["fixture-trigger"],
-    } : profileId === "P38" ? {
+    } : ["P38", "P39"].includes(profileId) ? {
       eligible: false,
       retry_started_count: 0,
       retry_completed_count: 0,
@@ -1186,20 +1213,20 @@ async function fakeAttempt({ instance, profileId }) {
       reason: "runtime_guard_bound",
     } : null,
     vnext_visible_contract_observation: (profileId === "P36"
-      || (["P37", "P38"].includes(profileId) && !/(?:^|-)small-/u.test(instance.family_id))) ? {
+      || (["P37", "P38", "P39"].includes(profileId) && !/(?:^|-)small-/u.test(instance.family_id))) ? {
       eligible: true,
       activated: true,
       reason: "host_visible_contract_compiled_before_model",
       manifest_fingerprint: `sha256:${"d".repeat(64)}`,
       clause_count: 1,
     } : null,
-    vnext_primary_route_observation: ["P36", "P37", "P38"].includes(profileId) ? {
+    vnext_primary_route_observation: ["P36", "P37", "P38", "P39"].includes(profileId) ? {
       eligible: true,
       activated: true,
       stratum: /(?:^|-)high-/u.test(instance.family_id)
         ? "high" : /(?:^|-)medium-/u.test(instance.family_id) ? "medium" : "small",
       agent_id: /(?:^|-)small-/u.test(instance.family_id)
-        ? (profileId === "P36" ? "core-v3-build" : "build") : "core-v4-build",
+        ? (profileId === "P36" ? "core-v3-build" : profileId === "P39" ? "core-v4-build" : "build") : "core-v4-build",
       visible_contract_version: /(?:^|-)small-/u.test(instance.family_id)
         ? (profileId === "P36" ? "V1" : "NONE") : "V2",
       reason: "host_route_bound",
@@ -1575,6 +1602,59 @@ const minimalSmallScenarioUnexpectedRetryAcceptance = await executeBenchmarkV2Ac
 assert.equal(minimalSmallScenarioUnexpectedRetryAcceptance.status, "failed");
 assert.deepEqual(minimalSmallScenarioUnexpectedRetryAcceptance.activation, { eligible: true, activated: false });
 assert.deepEqual(minimalSmallScenarioUnexpectedRetryAcceptance.mechanism_acceptance, { satisfied: false, mode: "unsatisfied" });
+const protocolBoundSmallNoAuditAcceptance = await executeBenchmarkV2Acceptance({
+  repositoryRoot: root,
+  plan: protocolBoundSmallNoAuditPlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: fakeAttempt,
+});
+assert.equal(protocolBoundSmallNoAuditAcceptance.status, "passed");
+assert.equal(protocolBoundSmallNoAuditAcceptance.family_id, "dev-small-boundary-search");
+assert.deepEqual(protocolBoundSmallNoAuditAcceptance.activation, { eligible: true, activated: true });
+assert.deepEqual(protocolBoundSmallNoAuditAcceptance.mechanism_acceptance, { satisfied: true, mode: "activated" });
+const protocolBoundSmallWrongRouteAcceptance = await executeBenchmarkV2Acceptance({
+  repositoryRoot: root,
+  plan: protocolBoundSmallNoAuditPlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: async (input) => {
+    const attempt = await fakeAttempt(input);
+    if (input.profileId !== "P39") return attempt;
+    return Object.freeze({
+      ...attempt,
+      result: Object.freeze({
+        ...attempt.result,
+        vnext_primary_route_observation: Object.freeze({
+          ...attempt.result.vnext_primary_route_observation,
+          agent_id: "build",
+        }),
+      }),
+    });
+  },
+});
+assert.equal(protocolBoundSmallWrongRouteAcceptance.status, "failed");
+assert.deepEqual(protocolBoundSmallWrongRouteAcceptance.activation, { eligible: true, activated: false });
+const protocolBoundSmallUnexpectedRetryAcceptance = await executeBenchmarkV2Acceptance({
+  repositoryRoot: root,
+  plan: protocolBoundSmallNoAuditPlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: async (input) => {
+    const attempt = await fakeAttempt(input);
+    if (input.profileId !== "P39") return attempt;
+    return Object.freeze({
+      ...attempt,
+      result: Object.freeze({
+        ...attempt.result,
+        vnext_verification_remediation_observation: Object.freeze({
+          eligible: true,
+          retry_started_count: 1,
+          retry_completed_count: 0,
+        }),
+      }),
+    });
+  },
+});
+assert.equal(protocolBoundSmallUnexpectedRetryAcceptance.status, "failed");
+assert.deepEqual(protocolBoundSmallUnexpectedRetryAcceptance.activation, { eligible: true, activated: false });
 const publicCheckFailureOnlyNoopAcceptance = await executeBenchmarkV2Acceptance({
   repositoryRoot: root,
   plan: publicCheckFailureOnlyPlan,
