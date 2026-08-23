@@ -1158,6 +1158,12 @@ async function fakeAttempt({ instance, profileId }) {
     execution_status: "completed",
     termination_reason: "verified",
     reason: null,
+    execution_diagnostics: {
+      exit_code: 0,
+      stdout_bytes: 512,
+      stderr_bytes: 0,
+      stderr_fingerprint: null,
+    },
     evidence_complete: true,
     visible_check: passed,
     hidden_check: hidden,
@@ -1680,6 +1686,12 @@ assert.deepEqual(publicCheckFailureOnlyUnverifiedNoopAcceptance.mechanism_accept
 });
 assert.equal(report.status, "complete");
 assert.equal(report.pair_results.length, 36);
+assert.deepEqual(report.pair_results[0].baseline.execution_diagnostics, {
+  exit_code: 0,
+  stdout_bytes: 512,
+  stderr_bytes: 0,
+  stderr_fingerprint: null,
+});
 assert.equal(report.summary.statistics.activation.rate, 1);
 assert(report.summary.statistics.primary.paired_delta > 0);
 assert.notEqual(report.summary.statistics.medium_stratum, null);

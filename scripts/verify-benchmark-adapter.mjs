@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { spawn } from "node:child_process";
@@ -2030,6 +2031,11 @@ async function executionFixtures(root, plainProfile, instrumentedProfile) {
   const nonzeroCli = writeFakeOpenCode(fixtureRoot, "fake-opencode-nonzero", {
     mode: "nonzero",
   });
+  const diagnosticNonzeroStderr = "ordinary bounded diagnostic";
+  const diagnosticNonzeroCli = writeFakeOpenCode(fixtureRoot, "fake-opencode-diagnostic-nonzero", {
+    mode: "nonzero-stderr",
+    stderrChunks: [diagnosticNonzeroStderr],
+  });
   const stderrSecretCanary = "stderr-secret-canary-must-not-persist";
   const modelUnavailableCli = writeFakeOpenCode(
     fixtureRoot,
@@ -2884,6 +2890,20 @@ async function executionFixtures(root, plainProfile, instrumentedProfile) {
     assert.equal(nonzero.passed, false);
     assert.equal(nonzero.reason, "opencode_nonzero_exit");
     assert.equal(nonzero.exit_code, 7);
+    assert.equal(nonzero.stderr_fingerprint, null);
+
+    const diagnosticNonzero = await executeOpenCodeAdapter(baseInput, {
+      executable: process.execPath,
+      executableArgsPrefix: [diagnosticNonzeroCli],
+    });
+    assert.equal(diagnosticNonzero.reason, "opencode_nonzero_exit");
+    assert.equal(diagnosticNonzero.exit_code, 7);
+    assert.equal(diagnosticNonzero.stderr_bytes, Buffer.byteLength(diagnosticNonzeroStderr));
+    assert.equal(
+      diagnosticNonzero.stderr_fingerprint,
+      `sha256:${createHash("sha256").update(diagnosticNonzeroStderr).digest("hex")}`,
+    );
+    assert.equal(JSON.stringify(diagnosticNonzero).includes(diagnosticNonzeroStderr), false);
 
     const modelUnavailable = await executeOpenCodeAdapter(baseInput, {
       executable: process.execPath,
