@@ -56,7 +56,7 @@ try {
     provider: "openai",
     variant: "low",
     timeoutMs: 300_000,
-    candidateProfileId: "P36",
+    candidateProfileId: "P37",
     executableFingerprint,
   };
   const manifest = buildBenchmarkV2FreezeManifest(options);

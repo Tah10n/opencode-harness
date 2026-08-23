@@ -9,6 +9,7 @@ import {
   syntheticAdapterWorkerTimeoutMs,
   vnextInitialAgentContext,
   vnextInitialAgentId,
+  vnextVisibleContractManifestEnabled,
 } from "../lib/benchmark/runner.mjs";
 import { loadBenchmarkV2Contracts } from "../lib/benchmark/v2-contracts.mjs";
 import { renderBenchmarkV2DevelopmentFamily } from "../lib/benchmark/v2-fixtures.mjs";
@@ -484,7 +485,7 @@ async function criticalManifestRiskAuditPrimaryAdapter(input) {
 
 async function reviewerFreeExactCorePrimaryAdapter(input) {
   reviewerFreeExactCorePrimaryCallCount += 1;
-  assert.equal(input.context.agentId, undefined);
+  assert.equal(input.context.agentId, input.context.profileId === "P37" ? "core-v4-build" : undefined);
   return fixtureAdapter(input);
 }
 
@@ -724,6 +725,12 @@ const withSecretMutationGuard = await attempt(
 );
 const withStratifiedScenarioVisibleContract = await attempt(
   "P36",
+  null,
+  reviewerFreeExactCorePrimaryAdapter,
+  commandRunner,
+);
+const withMinimalSmallScenarioVisibleContract = await attempt(
+  "P37",
   null,
   reviewerFreeExactCorePrimaryAdapter,
   commandRunner,
@@ -977,7 +984,7 @@ assert.match(firstPrompts.get("P31"), /HOST_VISIBLE_CONTRACT_V1=/u);
 assert.equal(withCriticalManifestRiskAudit.result.vnext_verification_remediation_observation.eligible, false);
 assert.equal(withCriticalManifestRiskAudit.result.termination_acceptable, true);
 assert.equal(vnextInitialAgentId({ profile_id: "P31", stratum: "high" }), null);
-assert.equal(reviewerFreeExactCorePrimaryCallCount, 4);
+assert.equal(reviewerFreeExactCorePrimaryCallCount, 5);
 assert.match(firstPrompts.get("P32"), /HOST_REPOSITORY_MAP_V1=/u);
 assert.match(firstPrompts.get("P32"), /HOST_VISIBLE_CONTRACT_V1=/u);
 assert.equal(withReviewerFreeExactCore.result.vnext_verification_remediation_observation.eligible, false);
@@ -1015,6 +1022,24 @@ assert.deepEqual(withStratifiedScenarioVisibleContract.result.vnext_primary_rout
 assert.equal(withStratifiedScenarioVisibleContract.result.termination_acceptable, true);
 assert.equal(vnextInitialAgentId({ profile_id: "P36", stratum: "small" }), "core-v3-build");
 assert.equal(vnextInitialAgentId({ profile_id: "P36", stratum: "medium" }), null);
+assert.equal(withMinimalSmallScenarioVisibleContract.result.execution_status, "completed");
+assert.match(firstPrompts.get("P37"), /HOST_REPOSITORY_MAP_V1=/u);
+assert.match(firstPrompts.get("P37"), /HOST_VISIBLE_CONTRACT_V2=/u);
+assert.deepEqual(withMinimalSmallScenarioVisibleContract.result.vnext_primary_route_observation, {
+  eligible: true,
+  activated: true,
+  stratum: "medium",
+  agent_id: "core-v4-build",
+  visible_contract_version: "V2",
+  reason: "host_route_bound",
+});
+assert.equal(withMinimalSmallScenarioVisibleContract.result.termination_acceptable, true);
+assert.equal(vnextInitialAgentId({ profile_id: "P37", stratum: "small" }), null);
+assert.equal(vnextInitialAgentId({ profile_id: "P37", stratum: "medium" }), "core-v4-build");
+assert.equal(vnextInitialAgentId({ profile_id: "P37", stratum: "high" }), "core-v4-build");
+assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P37", stratum: "small" }), false);
+assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P37", stratum: "medium" }), true);
+assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P37", stratum: "high" }), true);
 assert.equal(publicCheckFailureOnlyPrimaryCallCount, 2);
 assert.match(firstPrompts.get("P34"), /HOST_REPOSITORY_MAP_V1=/u);
 assert.match(firstPrompts.get("P34"), /HOST_VISIBLE_CONTRACT_V2=/u);
