@@ -1762,13 +1762,25 @@ if (!benchmarkV2ValidationArtifactBranch.includes("ARCHITECTURE_KEY")
     "Persist each sealed validation use under the full materialized candidate profile fingerprint and ordinal.",
   );
 }
-for (const needle of ["--candidate-profile P34", "--candidate P34"]) {
+for (const needle of ["--candidate-profile P35", "--candidate P35"]) {
   assertIncludes(
     benchmarkV2ConfirmatoryWorkflow,
     needle,
     ".github/workflows/benchmark-v2-confirmatory.yml",
     "HARNESS-S093",
     "Keep confirmatory freeze and execution on the same final candidate profile.",
+  );
+}
+for (const [workflow, workflowPath, campaignLabel] of [
+  [benchmarkV2DevelopmentWorkflow, ".github/workflows/benchmark-v2-development.yml", "development"],
+  [benchmarkV2ConfirmatoryWorkflow, ".github/workflows/benchmark-v2-confirmatory.yml", "confirmatory"],
+]) {
+  assertIncludes(
+    workflow,
+    "npm run probe:runtime:vnext",
+    workflowPath,
+    "HARNESS-S093",
+    `Run the installed-runtime profile probe before the ${campaignLabel} model-backed campaign.`,
   );
 }
 const pinnedActionShas = Object.freeze({

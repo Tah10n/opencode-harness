@@ -216,7 +216,10 @@ function finalChunks(model, sequence) {
 
 async function createToolCallingServer(profileId) {
   const model = "vnext-tool-caller";
-  const calls = profileId === "P5" ? [
+  const calls = profileId === "P35" ? [
+    ["write", { filePath: ".env", content: "must not be written\n" }],
+    ["write", { filePath: "safe.txt", content: "guarded safe write\n" }],
+  ] : profileId === "P5" ? [
     ["quality_assurance_start", { request: JSON.stringify({
       risk_class: "high",
       task_type: "maintenance",
@@ -306,7 +309,7 @@ async function runOpenCode(profile, workspaceRoot, profileId, server) {
   const child = spawn("opencode", [
     "run", "--print-logs", "--log-level", "DEBUG", "--format", "json", "--model", `fixture/${server.model}`,
     "--dir", workspaceRoot,
-    "--agent", profileId === "P5" ? "assurance" : "deep",
+    "--agent", profileId === "P5" ? "assurance" : profileId === "P35" ? "core-v5-build" : "deep",
     "Execute the installed runtime probe exactly through the requested tools.",
   ], {
     cwd: workspaceRoot,
@@ -335,7 +338,7 @@ async function runOpenCode(profile, workspaceRoot, profileId, server) {
 
 try {
   const evidence = [];
-  for (const profileId of ["P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20", "P21", "P22", "P23", "P24", "P25", "P26", "P27", "P28", "P29", "P30", "P31", "P32", "P33", "P34"]) {
+  for (const profileId of ["P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20", "P21", "P22", "P23", "P24", "P25", "P26", "P27", "P28", "P29", "P30", "P31", "P32", "P33", "P34", "P35"]) {
     const profile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId });
     try {
       const workspaceRoot = path.join(temporaryRoot, "workspaces", profileId);
@@ -351,7 +354,7 @@ try {
       const ids = inventoryProbe.ids;
       const contextIds = ids.filter((entry) => entry.startsWith("context_")).sort();
       const qualityIds = ids.filter((entry) => entry.startsWith("quality_")).sort();
-      if (["P0", "P1", "P2", "P3", "P4", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20", "P21", "P22", "P23", "P24", "P25", "P26", "P27", "P28", "P29", "P30", "P31", "P32", "P33", "P34"].includes(profileId)
+      if (["P0", "P1", "P2", "P3", "P4", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20", "P21", "P22", "P23", "P24", "P25", "P26", "P27", "P28", "P29", "P30", "P31", "P32", "P33", "P34", "P35"].includes(profileId)
         && (contextIds.length !== 0 || qualityIds.length !== 0)) {
         fail(`${profileId} unexpectedly exposes context or quality tools`);
       }
@@ -383,6 +386,33 @@ try {
         const qualityState = inspectSyntheticQualityControlState(workspaceRoot);
         if (qualityState.context_receipt_count !== 4) {
           fail(`P5 expected exactly four context receipts, observed ${qualityState.context_receipt_count}`);
+        }
+      }
+      if (profileId === "P35") {
+        const server = await createToolCallingServer(profileId);
+        let invocation;
+        try {
+          invocation = await runOpenCode(profile, workspaceRoot, profileId, server);
+        } finally {
+          await server.close();
+        }
+        const installedCalls = invocation.stdout.split(/\r?\n/u).filter(Boolean).flatMap((line) => {
+          try {
+            const event = JSON.parse(line);
+            return event.type === "tool_use" && event.part?.type === "tool" ? [event.part] : [];
+          } catch {
+            return [];
+          }
+        });
+        if (installedCalls.length !== 2
+          || installedCalls[0].tool !== "write"
+          || !["error", "failed"].includes(installedCalls[0].state?.status)
+          || !JSON.stringify(installedCalls[0].state).includes("CONTRACT_SECRET_MUTATION_DENIED")
+          || installedCalls[1].tool !== "write"
+          || installedCalls[1].state?.status !== "completed"
+          || fs.existsSync(path.join(workspaceRoot, ".env"))
+          || fs.readFileSync(path.join(workspaceRoot, "safe.txt"), "utf8") !== "guarded safe write\n") {
+          fail(`P35 mutation guard did not deny then allow exactly once: ${JSON.stringify(installedCalls)}\nSTDOUT:\n${invocation.stdout.slice(-8000)}\nSTDERR:\n${invocation.stderr.slice(-4000)}`);
         }
       }
       evidence.push({ profile_id: profileId, context_tool_ids: contextIds, quality_tool_ids: qualityIds });

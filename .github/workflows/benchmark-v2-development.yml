@@ -22,7 +22,7 @@ on:
         description: Candidate cumulative arm
         required: true
         type: choice
-        options: [P1, P2, P3, P4, P34]
+        options: [P1, P2, P3, P4, P35]
       seed:
         description: Preregistered development seed
         required: true
@@ -82,6 +82,7 @@ jobs:
           npm run verify:benchmark:v2:fixtures
           npm run verify:benchmark:v2:campaign
           npm run verify:benchmark:adapter
+          npm run probe:runtime:vnext
           npm run verify:core-verification-runner
           npm run verify:bounded-repository-map-runner
           npm run verify:automatic-review-gate

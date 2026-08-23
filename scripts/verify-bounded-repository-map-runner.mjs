@@ -716,6 +716,12 @@ const withScenarioTypedVisibleContract = await attempt(
   reviewerFreeExactCorePrimaryAdapter,
   commandRunner,
 );
+const withSecretMutationGuard = await attempt(
+  "P35",
+  null,
+  reviewerFreeExactCorePrimaryAdapter,
+  commandRunner,
+);
 const withPublicCheckFailureOnly = await attempt(
   "P34",
   null,
@@ -965,7 +971,7 @@ assert.match(firstPrompts.get("P31"), /HOST_VISIBLE_CONTRACT_V1=/u);
 assert.equal(withCriticalManifestRiskAudit.result.vnext_verification_remediation_observation.eligible, false);
 assert.equal(withCriticalManifestRiskAudit.result.termination_acceptable, true);
 assert.equal(vnextInitialAgentId({ profile_id: "P31", stratum: "high" }), null);
-assert.equal(reviewerFreeExactCorePrimaryCallCount, 2);
+assert.equal(reviewerFreeExactCorePrimaryCallCount, 3);
 assert.match(firstPrompts.get("P32"), /HOST_REPOSITORY_MAP_V1=/u);
 assert.match(firstPrompts.get("P32"), /HOST_VISIBLE_CONTRACT_V1=/u);
 assert.equal(withReviewerFreeExactCore.result.vnext_verification_remediation_observation.eligible, false);
@@ -979,6 +985,17 @@ assert.equal(withScenarioTypedVisibleContract.result.vnext_verification_remediat
 assert.equal(withScenarioTypedVisibleContract.result.vnext_verification_remediation_observation.retry_started_count, 0);
 assert.equal(withScenarioTypedVisibleContract.result.termination_acceptable, true);
 assert.equal(vnextInitialAgentId({ profile_id: "P33", stratum: "high" }), null);
+assert.match(firstPrompts.get("P35"), /HOST_REPOSITORY_MAP_V1=/u);
+assert.match(firstPrompts.get("P35"), /HOST_VISIBLE_CONTRACT_V2=/u);
+assert.equal(withSecretMutationGuard.result.vnext_verification_remediation_observation.eligible, false);
+assert.deepEqual(withSecretMutationGuard.result.vnext_secret_mutation_guard_observation, {
+  eligible: true,
+  activated: true,
+  denied_count: 0,
+  reason: "runtime_guard_bound",
+});
+assert.equal(withSecretMutationGuard.result.termination_acceptable, true);
+assert.equal(vnextInitialAgentId({ profile_id: "P35", stratum: "high" }), null);
 assert.equal(publicCheckFailureOnlyPrimaryCallCount, 2);
 assert.match(firstPrompts.get("P34"), /HOST_REPOSITORY_MAP_V1=/u);
 assert.match(firstPrompts.get("P34"), /HOST_VISIBLE_CONTRACT_V2=/u);

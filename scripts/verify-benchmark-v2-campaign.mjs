@@ -107,6 +107,11 @@ assert.deepEqual(evaluateBenchmarkV2MechanismActivation(
   },
   "high",
 ), { eligible: true, activated: false });
+assert.deepEqual(evaluateBenchmarkV2MechanismActivation(
+  "secret-mutation-guard-candidate",
+  { activation: { secret_mutation_guard: { eligible: true, activated: true, denied_count: 1 } } },
+  "high",
+), { eligible: true, activated: true });
 assert.equal(evaluateBenchmarkV2MechanismActivation(
   "reviewer-free-exact-core-candidate",
   {
@@ -146,6 +151,7 @@ const criticalManifestRiskAuditProfile = materializeVnextSyntheticProfile({ sour
 const reviewerFreeExactCoreProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P32" });
 const scenarioTypedVisibleContractProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P33" });
 const publicCheckFailureOnlyProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P34" });
+const secretMutationGuardProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P35" });
 try {
   assert.equal(plainProfile.primaryAgentId, "build");
   assert.equal(isolatedVerificationProfile.primaryAgentId, "build");
@@ -267,6 +273,19 @@ try {
   assert.equal(
     publicCheckFailureOnlyProfile.profileEvidence.runtime_surface.materialized_files
       .some((entry) => entry.path === "agents/contract-auditor.md"),
+    true,
+  );
+  assert.deepEqual(secretMutationGuardProfile.profileEvidence.component_ids, [
+    "scenario-typed-visible-contract",
+    "targeted-verification",
+    "bounded-pre-mutation-context",
+    "exact-core-v2-coordinator",
+    "secret-mutation-guard",
+  ]);
+  assert.equal(secretMutationGuardProfile.primaryAgentId, "core-v5-build");
+  assert.equal(
+    secretMutationGuardProfile.profileEvidence.runtime_surface.materialized_files
+      .some((entry) => entry.path.endsWith("opencode-mutation-path-guard-plugin.mjs")),
     true,
   );
   assert.deepEqual(
@@ -414,6 +433,7 @@ try {
   cleanupSyntheticProfile(reviewerFreeExactCoreProfile);
   cleanupSyntheticProfile(scenarioTypedVisibleContractProfile);
   cleanupSyntheticProfile(publicCheckFailureOnlyProfile);
+  cleanupSyntheticProfile(secretMutationGuardProfile);
 }
 const plan = buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
@@ -965,6 +985,22 @@ assert.equal(
   publicCheckFailureOnlyPlan.bindings.candidate_profile_fingerprint,
   publicCheckFailureOnlyProfile.profileFingerprint,
 );
+const secretMutationGuardPlan = buildBenchmarkV2CampaignPlan({
+  repositoryRoot: root,
+  split: "development",
+  generationId: "generation-fixture-secret-mutation-guard-1",
+  baselineArmId: "P0",
+  candidateArmId: "P35",
+  model: "fixture/model",
+  provider: "fixture",
+  variant: "low",
+  timeoutMs: 300_000,
+  seed: "campaign-fixture-seed",
+  repetitions: 1,
+  executableIdentity: executableFingerprint,
+  allowDirty: true,
+});
+assert.equal(secretMutationGuardPlan.component_id, "secret-mutation-guard-candidate");
 assert.throws(() => buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
   split: "validation",
@@ -998,14 +1034,14 @@ function binding(instance) {
     executable_identity_policy_version: null,
     timeout_ms: 300_000,
     limits_fingerprint: fingerprintProfileValue("limits"),
-    adapter_protocol_version: 19,
+    adapter_protocol_version: 20,
   });
 }
 
 async function fakeAttempt({ instance, profileId }) {
   const ordinal = Number.parseInt(createHash(instance.family_id).slice(0, 2), 16);
   const baselineFailure = ordinal % 4 === 0;
-  const success = ["P6", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20", "P34"].includes(profileId) ? true : !baselineFailure;
+  const success = ["P6", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20", "P34", "P35"].includes(profileId) ? true : !baselineFailure;
   const passed = check(true);
   const hidden = success ? passed : check(false, "hidden-contract");
   const result = {
@@ -1056,6 +1092,12 @@ async function fakeAttempt({ instance, profileId }) {
         ? ["multi-target"]
         : ["P19", "P20"].includes(profileId) ? ["risk-gated-specialized-visible-contract", "high-risk"]
         : ["P17", "P18"].includes(profileId) ? ["specialized-visible-contract"] : ["fixture-trigger"],
+    } : null,
+    vnext_secret_mutation_guard_observation: profileId === "P35" ? {
+      eligible: true,
+      activated: true,
+      denied_count: 0,
+      reason: "runtime_guard_bound",
     } : null,
     vnext_context_map_observation: profileId === "P11" ? {
       eligible: true,
@@ -1319,6 +1361,16 @@ assert.equal(publicCheckFailureOnlyAcceptance.status, "passed");
 assert.equal(publicCheckFailureOnlyAcceptance.family_id, "dev-high-duplicate-side-effects");
 assert.deepEqual(publicCheckFailureOnlyAcceptance.activation, { eligible: true, activated: true });
 assert.deepEqual(publicCheckFailureOnlyAcceptance.mechanism_acceptance, { satisfied: true, mode: "activated" });
+const secretMutationGuardAcceptance = await executeBenchmarkV2Acceptance({
+  repositoryRoot: root,
+  plan: secretMutationGuardPlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: fakeAttempt,
+});
+assert.equal(secretMutationGuardAcceptance.status, "passed");
+assert.equal(secretMutationGuardAcceptance.family_id, "dev-high-secret-redaction");
+assert.deepEqual(secretMutationGuardAcceptance.activation, { eligible: true, activated: true });
+assert.deepEqual(secretMutationGuardAcceptance.mechanism_acceptance, { satisfied: true, mode: "activated" });
 const publicCheckFailureOnlyNoopAcceptance = await executeBenchmarkV2Acceptance({
   repositoryRoot: root,
   plan: publicCheckFailureOnlyPlan,
