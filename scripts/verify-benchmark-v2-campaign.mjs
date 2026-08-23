@@ -288,6 +288,12 @@ try {
       .some((entry) => entry.path.endsWith("opencode-mutation-path-guard-plugin.mjs")),
     true,
   );
+  assert.equal(
+    secretMutationGuardProfile.profileEvidence.source_entries
+      .some((entry) => entry.source_path === "lib/benchmark/mutation-path-policy.mjs"
+        && entry.kind === "plugin-dependency"),
+    true,
+  );
   assert.deepEqual(
     stratifiedCoreProfile.profileEvidence.component_ids,
     ["compact-small-core-rules", "targeted-verification", "specialized-visible-contract-remediation"],

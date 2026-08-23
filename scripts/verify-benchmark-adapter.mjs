@@ -130,6 +130,17 @@ async function secretMutationGuardFixtures() {
   assert.equal(secretMutationIntent("bash", { command: "cat .env.local" }), true);
   assert.equal(secretMutationIntent("bash", { command: "node --test test/secret-redaction.test.mjs" }), false);
   assert.equal(secretMutationIntent("bash", { command: "node --test test/mycredentials.json.test.mjs" }), false);
+  assert.equal(secretMutationIntent("bash", { command: "x".repeat((128 * 1024) + 1) }), true);
+  assert.equal(secretMutationIntent("write", {
+    filePath: "src/large-safe.txt",
+    content: "x".repeat((128 * 1024) + 1),
+  }), false);
+  assert.equal(secretMutationIntent("multiedit", {
+    edits: Array.from({ length: 513 }, (_, index) => ({
+      filePath: `src/safe-${index}.txt`,
+      content: "safe",
+    })),
+  }), true);
   const plugin = await SecretMutationGuardPlugin();
   await plugin["tool.execute.before"](
     { tool: "edit" },
