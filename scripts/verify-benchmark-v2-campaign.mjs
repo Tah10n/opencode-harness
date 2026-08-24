@@ -162,6 +162,7 @@ const highRiskCompactProtocolProfile = materializeVnextSyntheticProfile({ source
 const correctedRequirementsUniversalCompactProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P43" });
 const editTaskNoMutationRemediationProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P44" });
 const highRiskFinalDiffReconciliationProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P45" });
+const terminalFailureRemediationProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P46" });
 try {
   assert.equal(plainProfile.primaryAgentId, "build");
   assert.equal(isolatedVerificationProfile.primaryAgentId, "build");
@@ -507,6 +508,23 @@ try {
       "runtime/host/verification-remediation-gate.mjs",
     ],
   );
+  assert.equal(terminalFailureRemediationProfile.primaryAgentId, "build");
+  assert.deepEqual(
+    terminalFailureRemediationProfile.profileEvidence.component_ids,
+    ["universal-compact-protocol", "targeted-verification", "terminal-failure-remediation"],
+  );
+  assert.deepEqual(
+    terminalFailureRemediationProfile.profileEvidence.runtime_surface.effective_config,
+    plainProfile.profileEvidence.runtime_surface.effective_config,
+  );
+  assert.deepEqual(
+    terminalFailureRemediationProfile.profileEvidence.runtime_surface.materialized_files.map((entry) => entry.path),
+    [
+      "agents/core-v4-build.md",
+      "runtime/host/core-verification-gate.mjs",
+      "runtime/host/verification-remediation-gate.mjs",
+    ],
+  );
   assert.equal(highRiskCompactProtocolProfile.primaryAgentId, "build");
   assert.deepEqual(
     highRiskCompactProtocolProfile.profileEvidence.component_ids,
@@ -561,6 +579,7 @@ try {
   cleanupSyntheticProfile(correctedRequirementsUniversalCompactProfile);
   cleanupSyntheticProfile(editTaskNoMutationRemediationProfile);
   cleanupSyntheticProfile(highRiskFinalDiffReconciliationProfile);
+  cleanupSyntheticProfile(terminalFailureRemediationProfile);
 }
 const plan = buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
@@ -1328,6 +1347,26 @@ assert.equal(
   highRiskFinalDiffReconciliationPlan.bindings.candidate_profile_fingerprint,
   highRiskFinalDiffReconciliationProfile.profileFingerprint,
 );
+const terminalFailureRemediationPlan = buildBenchmarkV2CampaignPlan({
+  repositoryRoot: root,
+  split: "development",
+  generationId: "generation-fixture-terminal-failure-remediation-1",
+  baselineArmId: "P0",
+  candidateArmId: "P46",
+  model: "fixture/model",
+  provider: "fixture",
+  variant: "low",
+  timeoutMs: 300_000,
+  seed: "campaign-fixture-seed",
+  repetitions: 1,
+  executableIdentity: executableFingerprint,
+  allowDirty: true,
+});
+assert.equal(terminalFailureRemediationPlan.component_id, "terminal-failure-remediation-candidate");
+assert.equal(
+  terminalFailureRemediationPlan.bindings.candidate_profile_fingerprint,
+  terminalFailureRemediationProfile.profileFingerprint,
+);
 assert.throws(() => buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
   split: "validation",
@@ -1368,7 +1407,7 @@ function binding(instance) {
 async function fakeAttempt({ instance, profileId }) {
   const ordinal = Number.parseInt(createHash(instance.family_id).slice(0, 2), 16);
   const baselineFailure = ordinal % 4 === 0;
-  const success = ["P6", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20", "P34", "P35", "P36", "P37", "P38", "P39", "P40", "P41", "P42", "P43", "P44", "P45"].includes(profileId) ? true : !baselineFailure;
+  const success = ["P6", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20", "P34", "P35", "P36", "P37", "P38", "P39", "P40", "P41", "P42", "P43", "P44", "P45", "P46"].includes(profileId) ? true : !baselineFailure;
   const passed = check(true);
   const hidden = success ? passed : check(false, "hidden-contract");
   const result = {
@@ -1425,6 +1464,16 @@ async function fakeAttempt({ instance, profileId }) {
         ? ["multi-target"]
         : ["P19", "P20"].includes(profileId) ? ["risk-gated-specialized-visible-contract", "high-risk"]
         : ["P17", "P18"].includes(profileId) ? ["specialized-visible-contract"] : ["fixture-trigger"],
+    } : profileId === "P46" ? {
+      eligible: true,
+      retry_required_count: 1,
+      retry_started_count: 1,
+      retry_completed_count: 1,
+      retry_changed_count: 1,
+      retry_reverified_count: 1,
+      retry_verification_passed_count: 1,
+      operationally_complete: true,
+      trigger_reasons: ["public-check-failed"],
     } : profileId === "P45" && /(?:^|-)high-/u.test(instance.family_id) ? {
       eligible: true,
       retry_required_count: 1,
@@ -1435,7 +1484,7 @@ async function fakeAttempt({ instance, profileId }) {
       retry_verification_passed_count: 0,
       operationally_complete: true,
       trigger_reasons: ["high-risk-final-diff-reconciliation"],
-    } : ["P38", "P39", "P40", "P41", "P42", "P43", "P44", "P45"].includes(profileId) ? {
+    } : ["P38", "P39", "P40", "P41", "P42", "P43", "P44", "P45", "P46"].includes(profileId) ? {
       eligible: false,
       retry_started_count: 0,
       retry_completed_count: 0,
@@ -1453,22 +1502,22 @@ async function fakeAttempt({ instance, profileId }) {
       reason: "host_visible_contract_compiled_before_model",
       manifest_fingerprint: `sha256:${"d".repeat(64)}`,
       clause_count: 1,
-    } : ["P40", "P41", "P42", "P43", "P44", "P45"].includes(profileId) ? {
+    } : ["P40", "P41", "P42", "P43", "P44", "P45", "P46"].includes(profileId) ? {
       eligible: false,
       activated: false,
       reason: "profile_without_visible_contract_manifest",
       manifest_fingerprint: null,
       clause_count: 0,
     } : null,
-    vnext_primary_route_observation: ["P36", "P37", "P38", "P39", "P40", "P41", "P42", "P43", "P44", "P45"].includes(profileId) ? {
+    vnext_primary_route_observation: ["P36", "P37", "P38", "P39", "P40", "P41", "P42", "P43", "P44", "P45", "P46"].includes(profileId) ? {
       eligible: true,
       activated: true,
       stratum: /(?:^|-)high-/u.test(instance.family_id)
         ? "high" : /(?:^|-)medium-/u.test(instance.family_id) ? "medium" : "small",
       agent_id: /(?:^|-)small-/u.test(instance.family_id)
-        ? (profileId === "P36" ? "core-v3-build" : ["P39", "P40", "P41", "P42", "P43", "P44", "P45"].includes(profileId) ? "core-v4-build" : "build")
+        ? (profileId === "P36" ? "core-v3-build" : ["P39", "P40", "P41", "P42", "P43", "P44", "P45", "P46"].includes(profileId) ? "core-v4-build" : "build")
         : (profileId === "P40" ? "build" : profileId === "P42" && /(?:^|-)high-/u.test(instance.family_id) ? "core-v6-build" : "core-v4-build"),
-      visible_contract_version: ["P40", "P41", "P42", "P43", "P44", "P45"].includes(profileId) ? "NONE" : /(?:^|-)small-/u.test(instance.family_id)
+      visible_contract_version: ["P40", "P41", "P42", "P43", "P44", "P45", "P46"].includes(profileId) ? "NONE" : /(?:^|-)small-/u.test(instance.family_id)
         ? (profileId === "P36" ? "V1" : "NONE") : "V2",
       reason: "host_route_bound",
     } : null,
@@ -1476,7 +1525,7 @@ async function fakeAttempt({ instance, profileId }) {
       eligible: true,
       activated: true,
       reason: "host_map_injected_before_retry",
-    } : ["P40", "P41", "P42", "P43", "P44", "P45"].includes(profileId) ? { eligible: true, activated: false, reason: "profile_without_host_context" } : null,
+    } : ["P40", "P41", "P42", "P43", "P44", "P45", "P46"].includes(profileId) ? { eligible: true, activated: false, reason: "profile_without_host_context" } : null,
     audit_evidence: { fixture: true },
     fingerprints: { adapter: `sha256:${"b".repeat(64)}` },
   };
@@ -1485,7 +1534,7 @@ async function fakeAttempt({ instance, profileId }) {
 
 async function conditionalNoopAttempt(input) {
   const attempt = await fakeAttempt(input);
-  if (input.profileId !== "P34") return attempt;
+  if (!["P34", "P46"].includes(input.profileId)) return attempt;
   return Object.freeze({
     ...attempt,
     result: Object.freeze({
@@ -1509,7 +1558,7 @@ async function conditionalNoopAttempt(input) {
 
 async function conditionalNoopWithoutVerificationAttempt(input) {
   const attempt = await conditionalNoopAttempt(input);
-  if (input.profileId !== "P34") return attempt;
+  if (!["P34", "P46"].includes(input.profileId)) return attempt;
   return Object.freeze({
     ...attempt,
     result: Object.freeze({
@@ -1983,6 +2032,15 @@ const highRiskFinalDiffReconciliationAcceptance = await executeBenchmarkV2Accept
 assert.equal(highRiskFinalDiffReconciliationAcceptance.status, "passed");
 assert.equal(highRiskFinalDiffReconciliationAcceptance.family_id, "dev-high-authorization-boundary");
 assert.deepEqual(highRiskFinalDiffReconciliationAcceptance.activation, { eligible: true, activated: true });
+const terminalFailureRemediationAcceptance = await executeBenchmarkV2Acceptance({
+  repositoryRoot: root,
+  plan: terminalFailureRemediationPlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: fakeAttempt,
+});
+assert.equal(terminalFailureRemediationAcceptance.status, "passed");
+assert.equal(terminalFailureRemediationAcceptance.family_id, "dev-medium-plugin-registry");
+assert.deepEqual(terminalFailureRemediationAcceptance.activation, { eligible: true, activated: true });
 const highRiskCompactProtocolAcceptance = await executeBenchmarkV2Acceptance({
   repositoryRoot: root,
   plan: highRiskCompactProtocolPlan,
@@ -2187,6 +2245,66 @@ assert.deepEqual(
   ),
   { eligible: false, activated: false },
 );
+const terminalFailureRemediationActivationFixture = {
+  ...universalCompactProtocolMediumActivationFixture,
+  activation: {
+    ...universalCompactProtocolMediumActivationFixture.activation,
+    verification_remediation: {
+      eligible: true,
+      retry_started_count: 1,
+      retry_completed_count: 1,
+      retry_changed_count: 1,
+      retry_reverified_count: 1,
+      retry_verification_passed_count: 1,
+      operationally_complete: true,
+      trigger_reasons: ["public-check-failed"],
+    },
+  },
+};
+assert.deepEqual(
+  evaluateBenchmarkV2MechanismActivation(
+    "terminal-failure-remediation-candidate",
+    terminalFailureRemediationActivationFixture,
+    "medium",
+  ),
+  { eligible: true, activated: true },
+);
+assert.deepEqual(
+  evaluateBenchmarkV2MechanismActivation(
+    "terminal-failure-remediation-candidate",
+    {
+      ...terminalFailureRemediationActivationFixture,
+      activation: {
+        ...terminalFailureRemediationActivationFixture.activation,
+        verification_remediation: {
+          ...terminalFailureRemediationActivationFixture.activation.verification_remediation,
+          retry_changed_count: 0,
+          retry_reverified_count: 0,
+          retry_verification_passed_count: 0,
+        },
+      },
+    },
+    "medium",
+  ),
+  { eligible: true, activated: false },
+);
+assert.deepEqual(
+  evaluateBenchmarkV2MechanismActivation(
+    "terminal-failure-remediation-candidate",
+    {
+      ...terminalFailureRemediationActivationFixture,
+      activation: {
+        ...terminalFailureRemediationActivationFixture.activation,
+        verification_remediation: {
+          ...terminalFailureRemediationActivationFixture.activation.verification_remediation,
+          trigger_reasons: ["public-check-failed", "edit-task-no-mutation"],
+        },
+      },
+    },
+    "medium",
+  ),
+  { eligible: false, activated: false },
+);
 const highRiskCompactProtocolActivationFixture = {
   ...universalCompactProtocolMediumActivationFixture,
   activation: {
@@ -2243,6 +2361,42 @@ const publicCheckFailureOnlyUnverifiedNoopAcceptance = await executeBenchmarkV2A
 });
 assert.equal(publicCheckFailureOnlyUnverifiedNoopAcceptance.status, "failed");
 assert.deepEqual(publicCheckFailureOnlyUnverifiedNoopAcceptance.mechanism_acceptance, {
+  satisfied: false,
+  mode: "unsatisfied",
+});
+const terminalFailureNoopAcceptance = await executeBenchmarkV2Acceptance({
+  repositoryRoot: root,
+  plan: terminalFailureRemediationPlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: conditionalNoopAttempt,
+});
+assert.equal(terminalFailureNoopAcceptance.status, "passed");
+assert.deepEqual(terminalFailureNoopAcceptance.activation, { eligible: false, activated: false });
+assert.deepEqual(terminalFailureNoopAcceptance.mechanism_acceptance, {
+  satisfied: true,
+  mode: "verified-not-needed",
+});
+const terminalFailureWrongRouteNoopAcceptance = await executeBenchmarkV2Acceptance({
+  repositoryRoot: root,
+  plan: terminalFailureRemediationPlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: async (input) => {
+    const attempt = await conditionalNoopAttempt(input);
+    if (input.profileId !== "P46") return attempt;
+    return Object.freeze({
+      ...attempt,
+      result: Object.freeze({
+        ...attempt.result,
+        vnext_primary_route_observation: Object.freeze({
+          ...attempt.result.vnext_primary_route_observation,
+          agent_id: "build",
+        }),
+      }),
+    });
+  },
+});
+assert.equal(terminalFailureWrongRouteNoopAcceptance.status, "failed");
+assert.deepEqual(terminalFailureWrongRouteNoopAcceptance.mechanism_acceptance, {
   satisfied: false,
   mode: "unsatisfied",
 });
@@ -2360,6 +2514,20 @@ assert.equal(highRiskFinalDiffReconciliationReport.summary.statistics.activation
 assert.equal(
   validateBenchmarkV2CampaignReport(highRiskFinalDiffReconciliationReport, { repositoryRoot: root }),
   highRiskFinalDiffReconciliationReport,
+);
+const terminalFailureRemediationReport = await executeBenchmarkV2Campaign({
+  repositoryRoot: root,
+  plan: terminalFailureRemediationPlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: fakeAttempt,
+});
+assert.equal(terminalFailureRemediationReport.status, "complete");
+assert.equal(terminalFailureRemediationReport.summary.statistics.activation.eligible_count, 36);
+assert.equal(terminalFailureRemediationReport.summary.statistics.activation.activated_count, 36);
+assert.equal(terminalFailureRemediationReport.summary.statistics.activation.rate, 1);
+assert.equal(
+  validateBenchmarkV2CampaignReport(terminalFailureRemediationReport, { repositoryRoot: root }),
+  terminalFailureRemediationReport,
 );
 const highRiskCompactProtocolReport = await executeBenchmarkV2Campaign({
   repositoryRoot: root,

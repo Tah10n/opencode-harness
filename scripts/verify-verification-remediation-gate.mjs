@@ -9,8 +9,10 @@ import {
   renderDiagnosticGuidedVerificationRemediationPrompt,
   renderEditTaskNoMutationRemediationPrompt,
   renderHighRiskFinalDiffReconciliationPrompt,
+  renderTerminalFailureRemediationPrompt,
   renderVisibleContractRemediationPrompt,
   riskGatedVisibleContractRemediationDecision,
+  terminalFailureRemediationDecision,
   verificationRemediationObservation,
 } from "../lib/quality/verification-remediation-gate.mjs";
 
@@ -69,6 +71,31 @@ const noMutationPrompt = renderEditTaskNoMutationRemediationPrompt({
 assert.match(noMutationPrompt, /requires an edit.*made no workspace mutation/u);
 assert.match(noMutationPrompt, /RUNNER_SELECTED_PUBLIC_CHECK_V1=/u);
 assert.doesNotMatch(noMutationPrompt, /[\r\n]/u);
+
+assert.deepEqual(terminalFailureRemediationDecision({
+  task_scope_mode: "edit",
+  changed_path_count: 0,
+  public_check_status: "unavailable",
+  first_attempt_completed: true,
+}), { eligible: true, reasons: ["edit-task-no-mutation"] });
+assert.deepEqual(terminalFailureRemediationDecision({
+  task_scope_mode: "edit",
+  changed_path_count: 1,
+  public_check_status: "failed",
+  first_attempt_completed: true,
+}), { eligible: true, reasons: ["public-check-failed"] });
+assert.deepEqual(terminalFailureRemediationDecision({
+  task_scope_mode: "edit",
+  changed_path_count: 1,
+  public_check_status: "passed",
+  first_attempt_completed: true,
+}), { eligible: false, reasons: [] });
+assert.deepEqual(terminalFailureRemediationDecision({
+  task_scope_mode: "edit",
+  changed_path_count: 1,
+  public_check_status: "unavailable",
+  first_attempt_completed: true,
+}), { eligible: false, reasons: [] });
 
 assert.deepEqual(highRiskFinalDiffReconciliationDecision({
   stratum: "high",
@@ -131,6 +158,29 @@ assert.match(diagnosticPrompt, /PUBLIC_CHECK_DIAGNOSTIC_V1=/u);
 assert.match(diagnosticPrompt, /not ok 1 - preserves shape/u);
 assert.doesNotMatch(diagnosticPrompt, /[\r\n]/u);
 
+const terminalNoMutationPrompt = renderTerminalFailureRemediationPrompt({
+  trigger_reason: "edit-task-no-mutation",
+  visible_requirements: "Make the requested edit.",
+  current_diff: { schema_version: 1, files: [] },
+  fixed_public_check: { argv: ["node", "--test", "test/public.test.mjs"] },
+});
+assert.match(terminalNoMutationPrompt, /made no workspace mutation/u);
+assert.doesNotMatch(terminalNoMutationPrompt, /PUBLIC_CHECK_DIAGNOSTIC_V1=/u);
+const terminalFailedCheckPrompt = renderTerminalFailureRemediationPrompt({
+  trigger_reason: "public-check-failed",
+  visible_requirements: "Preserve the public result shape.",
+  current_diff: { schema_version: 1, files: [{ path: "src/task.mjs", before: "old", after: "new" }] },
+  fixed_public_check: { argv: ["node", "--test", "test/public.test.mjs"] },
+  public_check_diagnostic: diagnostic,
+});
+assert.match(terminalFailedCheckPrompt, /PUBLIC_CHECK_DIAGNOSTIC_V1=/u);
+assert.throws(() => renderTerminalFailureRemediationPrompt({
+  trigger_reason: "public-check-failed",
+  visible_requirements: "Preserve the public result shape.",
+  current_diff: { schema_version: 1, files: [] },
+  fixed_public_check: { argv: ["node", "--test", "test/public.test.mjs"] },
+}), /VERIFICATION_REMEDIATION_PROMPT/u);
+
 const contractPrompt = renderVisibleContractRemediationPrompt({
   visible_requirements: "Preserve the public result shape.",
   current_diff: { schema_version: 1, files: [{ path: "src/task.mjs", before: "old", after: "new" }] },
@@ -171,6 +221,13 @@ assert.deepEqual(riskGatedVisibleContractRemediationDecision({
   changed_paths: ["src/task.mjs"],
   first_attempt_completed: true,
 }), { eligible: true, reasons: ["public-check-failed"] });
+assert.deepEqual(riskGatedVisibleContractRemediationDecision({
+  stratum: "high",
+  public_check_status: "unavailable",
+  allowed_target_paths: ["src/task.mjs"],
+  changed_paths: [],
+  first_attempt_completed: true,
+}), { eligible: false, reasons: [] });
 assert.deepEqual(riskGatedVisibleContractRemediationDecision({
   stratum: "high",
   public_check_status: "passed",
