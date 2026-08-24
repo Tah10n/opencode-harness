@@ -1922,9 +1922,9 @@ const editTaskNoMutationRemediationAcceptance = await executeBenchmarkV2Acceptan
   executableIdentity: executableFingerprint,
   attemptRunner: fakeAttempt,
 });
-assert.equal(editTaskNoMutationRemediationAcceptance.status, "passed");
+assert.equal(editTaskNoMutationRemediationAcceptance.status, "failed");
 assert.equal(editTaskNoMutationRemediationAcceptance.family_id, "dev-high-duplicate-side-effects");
-assert.deepEqual(editTaskNoMutationRemediationAcceptance.activation, { eligible: true, activated: true });
+assert.deepEqual(editTaskNoMutationRemediationAcceptance.activation, { eligible: false, activated: false });
 const highRiskCompactProtocolAcceptance = await executeBenchmarkV2Acceptance({
   repositoryRoot: root,
   plan: highRiskCompactProtocolPlan,
@@ -2014,7 +2014,7 @@ assert.deepEqual(
     universalCompactProtocolMediumActivationFixture,
     "medium",
   ),
-  { eligible: true, activated: true },
+  { eligible: false, activated: false },
 );
 assert.deepEqual(
   evaluateBenchmarkV2MechanismActivation(
@@ -2211,7 +2211,9 @@ const editTaskNoMutationRemediationReport = await executeBenchmarkV2Campaign({
   attemptRunner: fakeAttempt,
 });
 assert.equal(editTaskNoMutationRemediationReport.status, "complete");
-assert.equal(editTaskNoMutationRemediationReport.summary.statistics.activation.rate, 1);
+assert.equal(editTaskNoMutationRemediationReport.summary.statistics.activation.rate, null);
+assert.equal(editTaskNoMutationRemediationReport.summary.guardrails.activation, false);
+assert.equal(editTaskNoMutationRemediationReport.decision, "reject-development-candidate");
 assert.equal(
   validateBenchmarkV2CampaignReport(editTaskNoMutationRemediationReport, { repositoryRoot: root }),
   editTaskNoMutationRemediationReport,
