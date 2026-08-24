@@ -74,6 +74,8 @@ let highRiskFinalDiffMediumCallCount = 0;
 let terminalFailureCheckPrimaryCallCount = 0;
 let terminalFailureNoMutationPrimaryCallCount = 0;
 let terminalFailurePassedPrimaryCallCount = 0;
+let terminalFailureReplacementPrimaryCallCount = 0;
+let terminalFailureReplacementOriginalContent = null;
 let publicCheckFailureOnlyPrimaryCallCount = 0;
 let publicCheckFailureOnlySkipPrimaryCallCount = 0;
 let invalidRetryPrimaryCallCount = 0;
@@ -626,6 +628,21 @@ async function terminalFailurePassedPrimaryAdapter(input) {
   return fixtureAdapter(input);
 }
 
+async function terminalFailureReplacementPrimaryAdapter(input) {
+  terminalFailureReplacementPrimaryCallCount += 1;
+  assert.equal(input.context.profileId, "P47");
+  assert.equal(input.context.agentId, "core-v4-build");
+  const target = path.join(input.context.repo, ...instance.solution_files[0].path.split("/"));
+  if (terminalFailureReplacementPrimaryCallCount === 1) {
+    terminalFailureReplacementOriginalContent = fs.readFileSync(target, "utf8");
+  } else {
+    assert.equal(fs.readFileSync(target, "utf8"), terminalFailureReplacementOriginalContent);
+    assert.match(input.context.prompt, /CURRENT_PUBLIC_DIFF_V1=/u);
+    assert.match(input.context.prompt, /PUBLIC_CHECK_DIAGNOSTIC_V1=/u);
+  }
+  return fixtureAdapter(input);
+}
+
 async function highRiskCompactProtocolPrimaryAdapter(input) {
   assert.equal(input.context.profileId, "P42");
   assert.equal(input.context.agentId, "core-v6-build");
@@ -965,6 +982,12 @@ const withTerminalPassedNegativeControl = await attempt(
   null,
   terminalFailurePassedPrimaryAdapter,
   commandRunner,
+);
+const withTerminalFailureReplacement = await attempt(
+  "P47",
+  null,
+  terminalFailureReplacementPrimaryAdapter,
+  failOnceCommandRunner(),
 );
 const withHighRiskCompactProtocol = await attempt(
   "P42",
@@ -1522,6 +1545,30 @@ assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P46", stratum: "
 assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P46", stratum: "medium" }), false);
 assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P46", stratum: "high" }), false);
 assert.equal(vnextCoreV2AuditTriggerPolicy("P46"), "disabled");
+assert.equal(terminalFailureReplacementPrimaryCallCount, 2, JSON.stringify({
+  visible_check: withTerminalFailureReplacement.result.visible_check,
+  workspace: withTerminalFailureReplacement.result.workspace_policy,
+  remediation: withTerminalFailureReplacement.result.vnext_verification_remediation_observation,
+  termination: withTerminalFailureReplacement.result.execution_status,
+}));
+assert.equal(withTerminalFailureReplacement.result.execution_status, "completed");
+assert.equal(withTerminalFailureReplacement.result.vnext_verification_remediation_observation.eligible, true);
+assert.equal(withTerminalFailureReplacement.result.vnext_verification_remediation_observation.replacement_reset_attempted_count, 1);
+assert.equal(withTerminalFailureReplacement.result.vnext_verification_remediation_observation.replacement_reset_completed_count, 1);
+assert.equal(withTerminalFailureReplacement.result.vnext_verification_remediation_observation.retry_changed_count, 1);
+assert.equal(withTerminalFailureReplacement.result.vnext_verification_remediation_observation.retry_reverified_count, 1);
+assert.equal(withTerminalFailureReplacement.result.vnext_verification_remediation_observation.retry_verification_passed_count, 1);
+assert.deepEqual(
+  withTerminalFailureReplacement.result.vnext_verification_remediation_observation.trigger_reasons,
+  ["public-check-failed"],
+);
+assert.equal(vnextInitialAgentId({ profile_id: "P47", stratum: "small" }), "core-v4-build");
+assert.equal(vnextInitialAgentId({ profile_id: "P47", stratum: "medium" }), "core-v4-build");
+assert.equal(vnextInitialAgentId({ profile_id: "P47", stratum: "high" }), "core-v4-build");
+assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P47", stratum: "small" }), false);
+assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P47", stratum: "medium" }), false);
+assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P47", stratum: "high" }), false);
+assert.equal(vnextCoreV2AuditTriggerPolicy("P47"), "disabled");
 assert.equal(withHighRiskCompactProtocol.result.execution_status, "completed");
 assert.doesNotMatch(firstPrompts.get("P42"), /HOST_VISIBLE_CONTRACT_V[12]=/u);
 assert.doesNotMatch(firstPrompts.get("P42"), /HOST_REPOSITORY_MAP_V1=/u);

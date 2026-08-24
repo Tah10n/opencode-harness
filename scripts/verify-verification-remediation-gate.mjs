@@ -41,6 +41,21 @@ assert.equal(completed.operationally_complete, true);
 assert.equal(completed.retry_reverified_count, 1);
 assert.equal(completed.reason, "retry_verification_passed");
 
+const replacementCompleted = verificationRemediationObservation({
+  eligible: true,
+  started: true,
+  completed: true,
+  changed: true,
+  reverified: true,
+  verification_passed: true,
+  replacement_reset_attempted: true,
+  replacement_reset_completed: true,
+  trigger_reasons: ["public-check-failed"],
+});
+assert.equal(replacementCompleted.replacement_reset_attempted_count, 1);
+assert.equal(replacementCompleted.replacement_reset_completed_count, 1);
+assert.equal(replacementCompleted.operationally_complete, true);
+
 const prompt = renderDiffGuidedVerificationRemediationPrompt({
   visible_requirements: "Preserve the public result shape.",
   current_diff: { schema_version: 1, files: [{ path: "src/task.mjs", before: "old", after: "new" }] },
@@ -261,5 +276,21 @@ assert.throws(
   () => verificationRemediationObservation({ eligible: false, trigger_reasons: ["multi-target"] }),
   /VERIFICATION_REMEDIATION_OBSERVATION/u,
 );
+assert.throws(
+  () => verificationRemediationObservation({
+    eligible: true,
+    started: true,
+    completed: true,
+    replacement_reset_completed: true,
+  }),
+  /VERIFICATION_REMEDIATION_OBSERVATION/u,
+);
+const incompleteReplacementReset = verificationRemediationObservation({
+  eligible: true,
+  started: true,
+  completed: true,
+  replacement_reset_attempted: true,
+});
+assert.equal(incompleteReplacementReset.operationally_complete, false);
 
 process.stdout.write("verification remediation gate passed\n");
