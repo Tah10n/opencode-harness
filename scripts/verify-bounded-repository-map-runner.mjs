@@ -35,6 +35,14 @@ const smallInstance = renderBenchmarkV2DevelopmentFamily({
   binding: smallBinding,
   seed: "bounded-repository-map-runner-small",
 });
+const highFamily = contracts.dev.families.find((entry) => entry.id === "dev-high-authorization-boundary");
+const highBinding = contracts.devBindings.bindings.find((entry) => entry.family_id === highFamily.id);
+const highInstance = renderBenchmarkV2DevelopmentFamily({
+  repositoryRoot: root,
+  family: highFamily,
+  binding: highBinding,
+  seed: "bounded-repository-map-runner-high",
+});
 const prompts = new Map();
 const firstPrompts = new Map();
 let reviewerPrompt = null;
@@ -526,6 +534,12 @@ async function universalCompactProtocolPrimaryAdapter(input) {
   return fixtureAdapter(input);
 }
 
+async function highRiskCompactProtocolPrimaryAdapter(input) {
+  assert.equal(input.context.profileId, "P42");
+  assert.equal(input.context.agentId, "core-v6-build");
+  return fixtureAdapterForInstance(highInstance, input);
+}
+
 async function publicCheckFailureOnlyPrimaryAdapter(input) {
   publicCheckFailureOnlyPrimaryCallCount += 1;
   if (publicCheckFailureOnlyPrimaryCallCount === 1) assert.equal(input.context.agentId, undefined);
@@ -810,6 +824,13 @@ const withUniversalCompactProtocol = await attempt(
   null,
   universalCompactProtocolPrimaryAdapter,
   commandRunner,
+);
+const withHighRiskCompactProtocol = await attempt(
+  "P42",
+  null,
+  highRiskCompactProtocolPrimaryAdapter,
+  commandRunner,
+  highInstance,
 );
 const withPublicCheckFailureOnly = await attempt(
   "P34",
@@ -1254,6 +1275,37 @@ assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P41", stratum: "
 assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P41", stratum: "medium" }), false);
 assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P41", stratum: "high" }), false);
 assert.equal(vnextCoreV2AuditTriggerPolicy("P41"), "disabled");
+assert.equal(withHighRiskCompactProtocol.result.execution_status, "completed");
+assert.doesNotMatch(firstPrompts.get("P42"), /HOST_VISIBLE_CONTRACT_V[12]=/u);
+assert.doesNotMatch(firstPrompts.get("P42"), /HOST_REPOSITORY_MAP_V1=/u);
+assert.deepEqual(withHighRiskCompactProtocol.result.vnext_primary_route_observation, {
+  eligible: true,
+  activated: true,
+  stratum: "high",
+  agent_id: "core-v6-build",
+  visible_contract_version: "NONE",
+  reason: "host_route_bound",
+});
+assert.deepEqual(withHighRiskCompactProtocol.result.vnext_context_map_observation, {
+  eligible: false,
+  activated: false,
+  reason: "profile_without_host_context",
+});
+assert.deepEqual(withHighRiskCompactProtocol.result.vnext_visible_contract_observation, {
+  eligible: false,
+  activated: false,
+  reason: "profile_without_visible_contract_manifest",
+  manifest_fingerprint: null,
+  clause_count: 0,
+});
+assert.equal(withHighRiskCompactProtocol.result.vnext_verification_remediation_observation.eligible, false);
+assert.equal(vnextInitialAgentId({ profile_id: "P42", stratum: "small" }), "core-v4-build");
+assert.equal(vnextInitialAgentId({ profile_id: "P42", stratum: "medium" }), "core-v4-build");
+assert.equal(vnextInitialAgentId({ profile_id: "P42", stratum: "high" }), "core-v6-build");
+assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P42", stratum: "small" }), false);
+assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P42", stratum: "medium" }), false);
+assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P42", stratum: "high" }), false);
+assert.equal(vnextCoreV2AuditTriggerPolicy("P42"), "disabled");
 assert.equal(publicCheckFailureOnlyPrimaryCallCount, 2);
 assert.match(firstPrompts.get("P34"), /HOST_REPOSITORY_MAP_V1=/u);
 assert.match(firstPrompts.get("P34"), /HOST_VISIBLE_CONTRACT_V2=/u);
