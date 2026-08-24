@@ -2,9 +2,11 @@ import assert from "node:assert/strict";
 
 import {
   buildBoundedPublicCheckDiagnostic,
+  editTaskNoMutationRemediationDecision,
   renderCheckAddressedVerificationRemediationPrompt,
   renderDiffGuidedVerificationRemediationPrompt,
   renderDiagnosticGuidedVerificationRemediationPrompt,
+  renderEditTaskNoMutationRemediationPrompt,
   renderVisibleContractRemediationPrompt,
   riskGatedVisibleContractRemediationDecision,
   verificationRemediationObservation,
@@ -42,6 +44,29 @@ const prompt = renderDiffGuidedVerificationRemediationPrompt({
 assert.match(prompt, /CURRENT_PUBLIC_DIFF_V1=/u);
 assert.match(prompt, /VISIBLE_REQUIREMENTS_JSON=/u);
 assert.doesNotMatch(prompt, /[\r\n]/u);
+
+assert.deepEqual(editTaskNoMutationRemediationDecision({
+  task_scope_mode: "edit",
+  changed_path_count: 0,
+  first_attempt_completed: true,
+}), { eligible: true, reasons: ["edit-task-no-mutation"] });
+assert.deepEqual(editTaskNoMutationRemediationDecision({
+  task_scope_mode: "edit",
+  changed_path_count: 1,
+  first_attempt_completed: true,
+}), { eligible: false, reasons: [] });
+assert.deepEqual(editTaskNoMutationRemediationDecision({
+  task_scope_mode: "read-only",
+  changed_path_count: 0,
+  first_attempt_completed: true,
+}), { eligible: false, reasons: [] });
+const noMutationPrompt = renderEditTaskNoMutationRemediationPrompt({
+  visible_requirements: "Make the requested edit.",
+  fixed_public_check: { argv: ["node", "--test", "test/public.test.mjs"] },
+});
+assert.match(noMutationPrompt, /requires an edit.*made no workspace mutation/u);
+assert.match(noMutationPrompt, /RUNNER_SELECTED_PUBLIC_CHECK_V1=/u);
+assert.doesNotMatch(noMutationPrompt, /[\r\n]/u);
 
 const addressedPrompt = renderCheckAddressedVerificationRemediationPrompt({
   visible_requirements: "Preserve the public result shape.",
