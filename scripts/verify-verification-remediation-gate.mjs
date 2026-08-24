@@ -3,10 +3,12 @@ import assert from "node:assert/strict";
 import {
   buildBoundedPublicCheckDiagnostic,
   editTaskNoMutationRemediationDecision,
+  highRiskFinalDiffReconciliationDecision,
   renderCheckAddressedVerificationRemediationPrompt,
   renderDiffGuidedVerificationRemediationPrompt,
   renderDiagnosticGuidedVerificationRemediationPrompt,
   renderEditTaskNoMutationRemediationPrompt,
+  renderHighRiskFinalDiffReconciliationPrompt,
   renderVisibleContractRemediationPrompt,
   riskGatedVisibleContractRemediationDecision,
   verificationRemediationObservation,
@@ -67,6 +69,35 @@ const noMutationPrompt = renderEditTaskNoMutationRemediationPrompt({
 assert.match(noMutationPrompt, /requires an edit.*made no workspace mutation/u);
 assert.match(noMutationPrompt, /RUNNER_SELECTED_PUBLIC_CHECK_V1=/u);
 assert.doesNotMatch(noMutationPrompt, /[\r\n]/u);
+
+assert.deepEqual(highRiskFinalDiffReconciliationDecision({
+  stratum: "high",
+  task_scope_mode: "edit",
+  public_check_status: "passed",
+  first_attempt_completed: true,
+}), { eligible: true, reasons: ["high-risk-final-diff-reconciliation"] });
+assert.deepEqual(highRiskFinalDiffReconciliationDecision({
+  stratum: "medium",
+  task_scope_mode: "edit",
+  public_check_status: "failed",
+  first_attempt_completed: true,
+}), { eligible: false, reasons: [] });
+assert.deepEqual(highRiskFinalDiffReconciliationDecision({
+  stratum: "high",
+  task_scope_mode: "edit",
+  public_check_status: "unavailable",
+  first_attempt_completed: true,
+}), { eligible: false, reasons: [] });
+const highRiskReconciliationPrompt = renderHighRiskFinalDiffReconciliationPrompt({
+  visible_requirements: "Preserve the visible trust boundary.",
+  current_diff: { schema_version: 1, files: [{ path: "src/task.mjs", before: "old", after: "new" }] },
+  fixed_public_check: { argv: ["node", "--test", "test/public.test.mjs"] },
+  public_check_status: "passed",
+});
+assert.match(highRiskReconciliationPrompt, /bounded final-diff reconciliation/u);
+assert.match(highRiskReconciliationPrompt, /CURRENT_PUBLIC_DIFF_V1=/u);
+assert.match(highRiskReconciliationPrompt, /FIXED_PUBLIC_CHECK_JSON=/u);
+assert.doesNotMatch(highRiskReconciliationPrompt, /[\r\n]/u);
 
 const addressedPrompt = renderCheckAddressedVerificationRemediationPrompt({
   visible_requirements: "Preserve the public result shape.",

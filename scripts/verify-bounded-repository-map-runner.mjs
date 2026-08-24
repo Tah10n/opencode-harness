@@ -69,6 +69,8 @@ let criticalManifestRiskAuditPrimaryCallCount = 0;
 let reviewerFreeExactCorePrimaryCallCount = 0;
 let editTaskNoMutationPrimaryCallCount = 0;
 let editTaskMutationPrimaryCallCount = 0;
+let highRiskFinalDiffPrimaryCallCount = 0;
+let highRiskFinalDiffMediumCallCount = 0;
 let publicCheckFailureOnlyPrimaryCallCount = 0;
 let publicCheckFailureOnlySkipPrimaryCallCount = 0;
 let invalidRetryPrimaryCallCount = 0;
@@ -561,6 +563,26 @@ async function editTaskMutationPrimaryAdapter(input) {
   return fixtureAdapter(input);
 }
 
+async function highRiskFinalDiffPrimaryAdapter(input) {
+  highRiskFinalDiffPrimaryCallCount += 1;
+  assert.equal(input.context.profileId, "P45");
+  assert.equal(input.context.agentId, "core-v4-build");
+  if (highRiskFinalDiffPrimaryCallCount === 2) {
+    assert.match(input.context.prompt, /bounded final-diff reconciliation/u);
+    assert.match(input.context.prompt, /CURRENT_PUBLIC_DIFF_V1=/u);
+    assert.match(input.context.prompt, /FIXED_PUBLIC_CHECK_JSON=/u);
+    assert.match(input.context.prompt, /PUBLIC_CHECK_STATUS=passed/u);
+  }
+  return fixtureAdapterForInstance(highInstance, input);
+}
+
+async function highRiskFinalDiffMediumPrimaryAdapter(input) {
+  highRiskFinalDiffMediumCallCount += 1;
+  assert.equal(input.context.profileId, "P45");
+  assert.equal(input.context.agentId, "core-v4-build");
+  return fixtureAdapter(input);
+}
+
 async function highRiskCompactProtocolPrimaryAdapter(input) {
   assert.equal(input.context.profileId, "P42");
   assert.equal(input.context.agentId, "core-v6-build");
@@ -868,6 +890,19 @@ const withEditTaskMutationNoRetry = await attempt(
   "P44",
   null,
   editTaskMutationPrimaryAdapter,
+  commandRunner,
+);
+const withHighRiskFinalDiffReconciliation = await attempt(
+  "P45",
+  null,
+  highRiskFinalDiffPrimaryAdapter,
+  commandRunner,
+  highInstance,
+);
+const withHighRiskFinalDiffMediumNegativeControl = await attempt(
+  "P45",
+  null,
+  highRiskFinalDiffMediumPrimaryAdapter,
   commandRunner,
 );
 const withHighRiskCompactProtocol = await attempt(
@@ -1371,6 +1406,26 @@ assert.equal(vnextCoreV2AuditTriggerPolicy("P44"), "disabled");
 assert.equal(editTaskMutationPrimaryCallCount, 1);
 assert.equal(withEditTaskMutationNoRetry.result.vnext_verification_remediation_observation.eligible, false);
 assert.equal(withEditTaskMutationNoRetry.result.vnext_verification_remediation_observation.retry_started_count, 0);
+assert.equal(highRiskFinalDiffPrimaryCallCount, 2);
+assert.equal(withHighRiskFinalDiffReconciliation.result.execution_status, "completed");
+assert.equal(withHighRiskFinalDiffReconciliation.result.vnext_verification_remediation_observation.eligible, true);
+assert.equal(withHighRiskFinalDiffReconciliation.result.vnext_verification_remediation_observation.retry_started_count, 1);
+assert.equal(withHighRiskFinalDiffReconciliation.result.vnext_verification_remediation_observation.retry_completed_count, 1);
+assert.equal(withHighRiskFinalDiffReconciliation.result.vnext_verification_remediation_observation.retry_changed_count, 0);
+assert.deepEqual(
+  withHighRiskFinalDiffReconciliation.result.vnext_verification_remediation_observation.trigger_reasons,
+  ["high-risk-final-diff-reconciliation"],
+);
+assert.equal(highRiskFinalDiffMediumCallCount, 1);
+assert.equal(withHighRiskFinalDiffMediumNegativeControl.result.vnext_verification_remediation_observation.eligible, false);
+assert.equal(withHighRiskFinalDiffMediumNegativeControl.result.vnext_verification_remediation_observation.retry_started_count, 0);
+assert.equal(vnextInitialAgentId({ profile_id: "P45", stratum: "small" }), "core-v4-build");
+assert.equal(vnextInitialAgentId({ profile_id: "P45", stratum: "medium" }), "core-v4-build");
+assert.equal(vnextInitialAgentId({ profile_id: "P45", stratum: "high" }), "core-v4-build");
+assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P45", stratum: "small" }), false);
+assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P45", stratum: "medium" }), false);
+assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P45", stratum: "high" }), false);
+assert.equal(vnextCoreV2AuditTriggerPolicy("P45"), "disabled");
 assert.equal(withHighRiskCompactProtocol.result.execution_status, "completed");
 assert.doesNotMatch(firstPrompts.get("P42"), /HOST_VISIBLE_CONTRACT_V[12]=/u);
 assert.doesNotMatch(firstPrompts.get("P42"), /HOST_REPOSITORY_MAP_V1=/u);
