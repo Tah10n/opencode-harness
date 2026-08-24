@@ -18,6 +18,8 @@ import {
   validateBenchmarkV2DevelopmentCorpus,
   validateBenchmarkV2ValidationCorpus,
 } from "../lib/benchmark/v2-fixtures.mjs";
+import { BENCHMARK_V2_VALIDATION_VISIBLE_REQUIREMENTS } from "../lib/benchmark/v2-validation-kernels.mjs";
+import { BENCHMARK_V2_DEV_HIGH_VISIBLE_REQUIREMENTS } from "../lib/benchmark/vnext-fixtures.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const contracts = loadBenchmarkV2Contracts(root);
@@ -42,6 +44,20 @@ const summary = validateBenchmarkV2DevelopmentCorpus(first);
 assert.deepEqual(first, second);
 assert.deepEqual(summary.counts, { small: 12, medium: 12, high: 12 });
 assert.equal(summary.medium_multifile_count, 6);
+const developmentByFamily = new Map(first.map((instance) => [instance.family_id, instance]));
+const developmentHighBindings = contracts.devBindings.bindings.filter((binding) => (
+  contracts.dev.families.find((family) => family.id === binding.family_id)?.stratum === "high"
+));
+assert.deepEqual(
+  [...new Set(developmentHighBindings.map((binding) => binding.kernel_id))].sort(),
+  Object.keys(BENCHMARK_V2_DEV_HIGH_VISIBLE_REQUIREMENTS).sort(),
+);
+for (const binding of developmentHighBindings) {
+  const instance = developmentByFamily.get(binding.family_id);
+  const requirements = BENCHMARK_V2_DEV_HIGH_VISIBLE_REQUIREMENTS[binding.kernel_id];
+  assert.equal(instance.prompt.includes(requirements), true);
+  assert.equal(instance.high_risk_contract.visible_requirements, requirements);
+}
 
 const validation = renderBenchmarkV2ValidationCorpus({
   repositoryRoot: root,
@@ -53,6 +69,19 @@ const validation = renderBenchmarkV2ValidationCorpus({
 const validationSummary = validateBenchmarkV2ValidationCorpus(validation);
 assert.deepEqual(validationSummary.counts, { small: 10, medium: 10, high: 10 });
 assert.equal(validationSummary.medium_multifile_count, 5);
+assert.deepEqual(
+  [...new Set(contracts.validationBindings.bindings.map((binding) => binding.kernel_id))].sort(),
+  Object.keys(BENCHMARK_V2_VALIDATION_VISIBLE_REQUIREMENTS).sort(),
+);
+const validationByFamily = new Map(validation.map((instance) => [instance.family_id, instance]));
+for (const binding of contracts.validationBindings.bindings) {
+  const instance = validationByFamily.get(binding.family_id);
+  const requirements = BENCHMARK_V2_VALIDATION_VISIBLE_REQUIREMENTS[binding.kernel_id];
+  assert.equal(instance.prompt.includes(requirements), true);
+  if (instance.high_risk_contract !== undefined) {
+    assert.equal(instance.high_risk_contract.visible_requirements, requirements);
+  }
+}
 
 const proceduralSmall = renderBenchmarkV2ProceduralSmallCorpus({
   repositoryRoot: root,
