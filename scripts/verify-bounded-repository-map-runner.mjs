@@ -558,6 +558,18 @@ async function universalCompactProtocolPrimaryAdapter(input) {
   return fixtureAdapter(input);
 }
 
+async function minimalStratumProtocolMediumPrimaryAdapter(input) {
+  assert.equal(input.context.profileId, "P51");
+  assert.equal(input.context.agentId, "core-v4-build");
+  return fixtureAdapter(input);
+}
+
+async function minimalStratumProtocolSmallPrimaryAdapter(input) {
+  assert.equal(input.context.profileId, "P51");
+  assert.equal(input.context.agentId, undefined);
+  return fixtureAdapterForInstance(smallInstance, input);
+}
+
 async function editTaskNoMutationPrimaryAdapter(input) {
   editTaskNoMutationPrimaryCallCount += 1;
   assert.equal(input.context.profileId, "P44");
@@ -1027,6 +1039,19 @@ const withBoundedMapOnlySmall = await attempt(
   "P50",
   null,
   boundedMapOnlySmallPrimaryAdapter,
+  commandRunner,
+  smallInstance,
+);
+const withMinimalStratumProtocolMedium = await attempt(
+  "P51",
+  null,
+  minimalStratumProtocolMediumPrimaryAdapter,
+  commandRunner,
+);
+const withMinimalStratumProtocolSmall = await attempt(
+  "P51",
+  null,
+  minimalStratumProtocolSmallPrimaryAdapter,
   commandRunner,
   smallInstance,
 );
@@ -1649,6 +1674,38 @@ assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P50", stratum: "
 assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P50", stratum: "medium" }), false);
 assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P50", stratum: "high" }), false);
 assert.equal(vnextCoreV2AuditTriggerPolicy("P50"), "disabled");
+assert.doesNotMatch(firstPrompts.get("P51"), /HOST_REPOSITORY_MAP_V1=/u);
+assert.doesNotMatch(firstPrompts.get("P51"), /HOST_VISIBLE_CONTRACT_V[12]=/u);
+assert.deepEqual(withMinimalStratumProtocolMedium.result.vnext_primary_route_observation, {
+  eligible: true,
+  activated: true,
+  stratum: "medium",
+  agent_id: "core-v4-build",
+  visible_contract_version: "NONE",
+  reason: "host_route_bound",
+});
+assert.equal(withMinimalStratumProtocolMedium.result.vnext_context_map_observation.activated, false);
+assert.equal(withMinimalStratumProtocolMedium.result.vnext_context_map_observation.reason, "profile_without_host_context");
+assert.equal(withMinimalStratumProtocolMedium.result.vnext_host_verification_observation.activated, true);
+assert.equal(withMinimalStratumProtocolMedium.result.vnext_verification_remediation_observation.eligible, false);
+assert.doesNotMatch(prompts.get("P51"), /HOST_REPOSITORY_MAP_V1=/u);
+assert.deepEqual(withMinimalStratumProtocolSmall.result.vnext_primary_route_observation, {
+  eligible: true,
+  activated: true,
+  stratum: "small",
+  agent_id: "build",
+  visible_contract_version: "NONE",
+  reason: "host_route_bound",
+});
+assert.equal(withMinimalStratumProtocolSmall.result.vnext_context_map_observation.activated, false);
+assert.equal(withMinimalStratumProtocolSmall.result.vnext_visible_contract_observation.activated, false);
+assert.equal(vnextInitialAgentId({ profile_id: "P51", stratum: "small" }), null);
+assert.equal(vnextInitialAgentId({ profile_id: "P51", stratum: "medium" }), "core-v4-build");
+assert.equal(vnextInitialAgentId({ profile_id: "P51", stratum: "high" }), "core-v4-build");
+assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P51", stratum: "small" }), false);
+assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P51", stratum: "medium" }), false);
+assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P51", stratum: "high" }), false);
+assert.equal(vnextCoreV2AuditTriggerPolicy("P51"), "disabled");
 assert.equal(highRiskFinalDiffPrimaryCallCount, 2);
 assert.equal(withHighRiskFinalDiffReconciliation.result.execution_status, "completed");
 assert.equal(withHighRiskFinalDiffReconciliation.result.vnext_verification_remediation_observation.eligible, true);

@@ -167,6 +167,7 @@ const terminalFailureReplacementProfile = materializeVnextSyntheticProfile({ sou
 const repairedNoMutationRecoveryProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P48" });
 const minimalDirectProtocolProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P49" });
 const boundedMapOnlyProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P50" });
+const minimalStratumProtocolProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P51" });
 try {
   assert.equal(plainProfile.primaryAgentId, "build");
   assert.equal(isolatedVerificationProfile.primaryAgentId, "build");
@@ -542,6 +543,19 @@ try {
       "runtime/host/core-verification-gate.mjs",
     ],
   );
+  assert.equal(minimalStratumProtocolProfile.primaryAgentId, "build");
+  assert.deepEqual(
+    minimalStratumProtocolProfile.profileEvidence.component_ids,
+    ["minimal-stratum-protocol", "targeted-verification"],
+  );
+  assert.deepEqual(
+    minimalStratumProtocolProfile.profileEvidence.runtime_surface.effective_config,
+    plainProfile.profileEvidence.runtime_surface.effective_config,
+  );
+  assert.deepEqual(
+    minimalStratumProtocolProfile.profileEvidence.runtime_surface.materialized_files.map((entry) => entry.path),
+    ["agents/core-v4-build.md", "runtime/host/core-verification-gate.mjs"],
+  );
   assert.equal(highRiskFinalDiffReconciliationProfile.primaryAgentId, "build");
   assert.deepEqual(
     highRiskFinalDiffReconciliationProfile.profileEvidence.component_ids,
@@ -634,6 +648,8 @@ try {
   cleanupSyntheticProfile(terminalFailureReplacementProfile);
   cleanupSyntheticProfile(repairedNoMutationRecoveryProfile);
   cleanupSyntheticProfile(minimalDirectProtocolProfile);
+  cleanupSyntheticProfile(boundedMapOnlyProfile);
+  cleanupSyntheticProfile(minimalStratumProtocolProfile);
 }
 const plan = buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
@@ -1441,6 +1457,26 @@ assert.equal(
   boundedMapOnlyPlan.bindings.candidate_profile_fingerprint,
   boundedMapOnlyProfile.profileFingerprint,
 );
+const minimalStratumProtocolPlan = buildBenchmarkV2CampaignPlan({
+  repositoryRoot: root,
+  split: "development",
+  generationId: "generation-fixture-minimal-stratum-protocol-1",
+  baselineArmId: "P0",
+  candidateArmId: "P51",
+  model: "fixture/model",
+  provider: "fixture",
+  variant: "low",
+  timeoutMs: 300_000,
+  seed: "campaign-fixture-seed",
+  repetitions: 1,
+  executableIdentity: executableFingerprint,
+  allowDirty: true,
+});
+assert.equal(minimalStratumProtocolPlan.component_id, "minimal-stratum-protocol-candidate");
+assert.equal(
+  minimalStratumProtocolPlan.bindings.candidate_profile_fingerprint,
+  minimalStratumProtocolProfile.profileFingerprint,
+);
 const highRiskFinalDiffReconciliationPlan = buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
   split: "development",
@@ -1541,7 +1577,7 @@ function binding(instance) {
 async function fakeAttempt({ instance, profileId }) {
   const ordinal = Number.parseInt(createHash(instance.family_id).slice(0, 2), 16);
   const baselineFailure = ordinal % 4 === 0;
-  const success = ["P6", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20", "P34", "P35", "P36", "P37", "P38", "P39", "P40", "P41", "P42", "P43", "P44", "P45", "P46", "P47", "P48", "P49", "P50"].includes(profileId) ? true : !baselineFailure;
+  const success = ["P6", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20", "P34", "P35", "P36", "P37", "P38", "P39", "P40", "P41", "P42", "P43", "P44", "P45", "P46", "P47", "P48", "P49", "P50", "P51"].includes(profileId) ? true : !baselineFailure;
   const passed = check(true);
   const hidden = success ? passed : check(false, "hidden-contract");
   const result = {
@@ -1582,6 +1618,16 @@ async function fakeAttempt({ instance, profileId }) {
       reviewer_caused_fix_count: 0,
       operationally_complete: true,
       terminal_allowed: true,
+    } : profileId === "P51" ? {
+      eligible: false,
+      review_required_count: 0,
+      review_started_count: 0,
+      review_completed_count: 0,
+      review_finding_count: 0,
+      reviewer_caused_fix_count: 0,
+      operationally_complete: true,
+      terminal_allowed: true,
+      reason: "not_eligible",
     } : null,
     vnext_verification_remediation_observation: ["P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20", "P34"].includes(profileId) ? {
       eligible: true,
@@ -1620,7 +1666,7 @@ async function fakeAttempt({ instance, profileId }) {
       retry_verification_passed_count: 0,
       operationally_complete: true,
       trigger_reasons: ["high-risk-final-diff-reconciliation"],
-    } : ["P38", "P39", "P40", "P41", "P42", "P43", "P44", "P45", "P46", "P47", "P48", "P49", "P50"].includes(profileId) ? {
+    } : ["P38", "P39", "P40", "P41", "P42", "P43", "P44", "P45", "P46", "P47", "P48", "P49", "P50", "P51"].includes(profileId) ? {
       eligible: false,
       retry_required_count: 0,
       retry_started_count: 0,
@@ -1640,14 +1686,14 @@ async function fakeAttempt({ instance, profileId }) {
       reason: "host_visible_contract_compiled_before_model",
       manifest_fingerprint: `sha256:${"d".repeat(64)}`,
       clause_count: 1,
-    } : ["P40", "P41", "P42", "P43", "P44", "P45", "P46", "P47", "P48", "P49", "P50"].includes(profileId) ? {
+    } : ["P40", "P41", "P42", "P43", "P44", "P45", "P46", "P47", "P48", "P49", "P50", "P51"].includes(profileId) ? {
       eligible: false,
       activated: false,
       reason: "profile_without_visible_contract_manifest",
       manifest_fingerprint: null,
       clause_count: 0,
     } : null,
-    vnext_primary_route_observation: ["P36", "P37", "P38", "P39", "P40", "P41", "P42", "P43", "P44", "P45", "P46", "P47", "P48", "P49", "P50"].includes(profileId) ? {
+    vnext_primary_route_observation: ["P36", "P37", "P38", "P39", "P40", "P41", "P42", "P43", "P44", "P45", "P46", "P47", "P48", "P49", "P50", "P51"].includes(profileId) ? {
       eligible: true,
       activated: true,
       stratum: /(?:^|-)high-/u.test(instance.family_id)
@@ -1655,7 +1701,7 @@ async function fakeAttempt({ instance, profileId }) {
       agent_id: profileId === "P49" ? "core-v7-build" : /(?:^|-)small-/u.test(instance.family_id)
         ? (profileId === "P36" ? "core-v3-build" : ["P39", "P40", "P41", "P42", "P43", "P44", "P45", "P46", "P47", "P48", "P50"].includes(profileId) ? "core-v4-build" : "build")
         : (profileId === "P40" ? "build" : profileId === "P42" && /(?:^|-)high-/u.test(instance.family_id) ? "core-v6-build" : "core-v4-build"),
-      visible_contract_version: ["P40", "P41", "P42", "P43", "P44", "P45", "P46", "P47", "P48", "P49", "P50"].includes(profileId) ? "NONE" : /(?:^|-)small-/u.test(instance.family_id)
+      visible_contract_version: ["P40", "P41", "P42", "P43", "P44", "P45", "P46", "P47", "P48", "P49", "P50", "P51"].includes(profileId) ? "NONE" : /(?:^|-)small-/u.test(instance.family_id)
         ? (profileId === "P36" ? "V1" : "NONE") : "V2",
       reason: "host_route_bound",
     } : null,
@@ -1672,7 +1718,7 @@ async function fakeAttempt({ instance, profileId }) {
       eligible: false,
       activated: false,
       reason: "not_eligible",
-    } : ["P40", "P41", "P42", "P43", "P44", "P45", "P46", "P47", "P48", "P49"].includes(profileId) ? { eligible: true, activated: false, reason: "profile_without_host_context" } : null,
+    } : ["P40", "P41", "P42", "P43", "P44", "P45", "P46", "P47", "P48", "P49", "P51"].includes(profileId) ? { eligible: true, activated: false, reason: "profile_without_host_context" } : null,
     audit_evidence: { fixture: true },
     fingerprints: { adapter: `sha256:${"b".repeat(64)}` },
   };
@@ -2201,6 +2247,40 @@ const boundedMapOnlyAcceptance = await executeBenchmarkV2Acceptance({
 assert.equal(boundedMapOnlyAcceptance.status, "passed");
 assert.equal(boundedMapOnlyAcceptance.family_id, "dev-medium-feature-flag-callpath");
 assert.deepEqual(boundedMapOnlyAcceptance.activation, { eligible: true, activated: true });
+const minimalStratumProtocolAcceptance = await executeBenchmarkV2Acceptance({
+  repositoryRoot: root,
+  plan: minimalStratumProtocolPlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: fakeAttempt,
+});
+assert.equal(
+  minimalStratumProtocolAcceptance.status,
+  "passed",
+  JSON.stringify(minimalStratumProtocolAcceptance),
+);
+assert.equal(minimalStratumProtocolAcceptance.family_id, "dev-medium-public-result-shape");
+assert.deepEqual(minimalStratumProtocolAcceptance.activation, { eligible: true, activated: true });
+const minimalStratumProtocolWrongRouteAcceptance = await executeBenchmarkV2Acceptance({
+  repositoryRoot: root,
+  plan: minimalStratumProtocolPlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: async (input) => {
+    const attempt = await fakeAttempt(input);
+    if (input.profileId !== "P51") return attempt;
+    return Object.freeze({
+      ...attempt,
+      result: Object.freeze({
+        ...attempt.result,
+        vnext_primary_route_observation: Object.freeze({
+          ...attempt.result.vnext_primary_route_observation,
+          agent_id: "build",
+        }),
+      }),
+    });
+  },
+});
+assert.equal(minimalStratumProtocolWrongRouteAcceptance.status, "failed");
+assert.deepEqual(minimalStratumProtocolWrongRouteAcceptance.activation, { eligible: true, activated: false });
 const highRiskFinalDiffReconciliationAcceptance = await executeBenchmarkV2Acceptance({
   repositoryRoot: root,
   plan: highRiskFinalDiffReconciliationPlan,
@@ -2309,6 +2389,89 @@ const boundedMapOnlyMediumActivationFixture = {
     bounded_context: { eligible: true, activated: true, reason: "host_map_injected" },
   },
 };
+const minimalStratumProtocolMediumActivationFixture = {
+  ...universalCompactProtocolMediumActivationFixture,
+  activation: {
+    ...universalCompactProtocolMediumActivationFixture.activation,
+    automatic_review: {
+      eligible: false,
+      review_started_count: 0,
+      review_completed_count: 0,
+    },
+  },
+};
+assert.deepEqual(
+  evaluateBenchmarkV2MechanismActivation(
+    "minimal-stratum-protocol-candidate",
+    minimalStratumProtocolMediumActivationFixture,
+    "medium",
+  ),
+  { eligible: true, activated: true },
+);
+assert.deepEqual(
+  evaluateBenchmarkV2MechanismActivation(
+    "minimal-stratum-protocol-candidate",
+    {
+      ...minimalStratumProtocolMediumActivationFixture,
+      activation: {
+        ...minimalStratumProtocolMediumActivationFixture.activation,
+        host_verification: { activation_eligible: true, activated: true, allowed: false },
+      },
+    },
+    "medium",
+  ),
+  { eligible: true, activated: true },
+);
+assert.deepEqual(
+  evaluateBenchmarkV2MechanismActivation(
+    "minimal-stratum-protocol-candidate",
+    {
+      ...minimalStratumProtocolMediumActivationFixture,
+      activation: {
+        ...minimalStratumProtocolMediumActivationFixture.activation,
+        host_verification: { activation_eligible: true, activated: false, allowed: false },
+      },
+    },
+    "medium",
+  ),
+  { eligible: true, activated: false },
+);
+assert.deepEqual(
+  evaluateBenchmarkV2MechanismActivation(
+    "minimal-stratum-protocol-candidate",
+    {
+      ...minimalStratumProtocolMediumActivationFixture,
+      activation: {
+        ...minimalStratumProtocolMediumActivationFixture.activation,
+        primary_route: {
+          ...minimalStratumProtocolMediumActivationFixture.activation.primary_route,
+          stratum: "small",
+          agent_id: "build",
+        },
+      },
+    },
+    "small",
+  ),
+  { eligible: true, activated: true },
+);
+assert.deepEqual(
+  evaluateBenchmarkV2MechanismActivation(
+    "minimal-stratum-protocol-candidate",
+    {
+      ...minimalStratumProtocolMediumActivationFixture,
+      activation: {
+        ...minimalStratumProtocolMediumActivationFixture.activation,
+        primary_route: {
+          ...minimalStratumProtocolMediumActivationFixture.activation.primary_route,
+          stratum: "small",
+          agent_id: "core-v4-build",
+        },
+      },
+    },
+    "small",
+  ),
+  { eligible: true, activated: false },
+);
 assert.deepEqual(
   evaluateBenchmarkV2MechanismActivation(
     "bounded-map-only-candidate",
@@ -2764,6 +2927,39 @@ assert.deepEqual(
   },
 );
 assert.equal(validateBenchmarkV2CampaignReport(universalCompactProtocolReport, { repositoryRoot: root }), universalCompactProtocolReport);
+const minimalStratumProtocolReport = await executeBenchmarkV2Campaign({
+  repositoryRoot: root,
+  plan: minimalStratumProtocolPlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: fakeAttempt,
+});
+assert.equal(minimalStratumProtocolReport.status, "complete");
+assert.equal(minimalStratumProtocolReport.summary.statistics.activation.rate, 1);
+assert.deepEqual(
+  minimalStratumProtocolReport.pair_results.reduce((routes, pair) => {
+    const route = pair.candidate.activation.primary_route;
+    const key = `${route.stratum}:${route.agent_id}:${route.visible_contract_version}`;
+    routes[key] = (routes[key] ?? 0) + 1;
+    return routes;
+  }, {}),
+  {
+    "small:build:NONE": 12,
+    "medium:core-v4-build:NONE": 12,
+    "high:core-v4-build:NONE": 12,
+  },
+);
+assert.equal(
+  minimalStratumProtocolReport.pair_results.filter((pair) => pair.candidate.activation.bounded_context.activated).length,
+  0,
+);
+assert.equal(
+  minimalStratumProtocolReport.pair_results.filter((pair) => pair.candidate.activation.visible_contract.activated).length,
+  0,
+);
+assert.equal(
+  validateBenchmarkV2CampaignReport(minimalStratumProtocolReport, { repositoryRoot: root }),
+  minimalStratumProtocolReport,
+);
 const correctedRequirementsUniversalCompactReport = await executeBenchmarkV2Campaign({
   repositoryRoot: root,
   plan: correctedRequirementsUniversalCompactPlan,
