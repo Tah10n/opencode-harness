@@ -69,6 +69,8 @@ let criticalManifestRiskAuditPrimaryCallCount = 0;
 let reviewerFreeExactCorePrimaryCallCount = 0;
 let editTaskNoMutationPrimaryCallCount = 0;
 let editTaskMutationPrimaryCallCount = 0;
+let repairedNoMutationPrimaryCallCount = 0;
+let repairedNoMutationNegativeControlCallCount = 0;
 let highRiskFinalDiffPrimaryCallCount = 0;
 let highRiskFinalDiffMediumCallCount = 0;
 let terminalFailureCheckPrimaryCallCount = 0;
@@ -568,6 +570,31 @@ async function editTaskMutationPrimaryAdapter(input) {
   return fixtureAdapter(input);
 }
 
+async function repairedNoMutationPrimaryAdapter(input) {
+  repairedNoMutationPrimaryCallCount += 1;
+  assert.equal(input.context.profileId, "P48");
+  assert.equal(input.context.agentId, "core-v4-build");
+  if (repairedNoMutationPrimaryCallCount === 2) {
+    assert.match(input.context.prompt, /requires an edit.*made no workspace mutation/u);
+    assert.match(input.context.prompt, /RUNNER_SELECTED_PUBLIC_CHECK_V1=/u);
+    return fixtureAdapter(input);
+  }
+  const originals = instance.solution_files.map((file) => {
+    const target = path.join(input.context.repo, ...file.path.split("/"));
+    return { target, content: fs.readFileSync(target, "utf8") };
+  });
+  const result = await fixtureAdapter(input);
+  for (const original of originals) fs.writeFileSync(original.target, original.content, "utf8");
+  return result;
+}
+
+async function repairedNoMutationNegativeControlAdapter(input) {
+  repairedNoMutationNegativeControlCallCount += 1;
+  assert.equal(input.context.profileId, "P48");
+  assert.equal(input.context.agentId, "core-v4-build");
+  return fixtureAdapter(input);
+}
+
 async function highRiskFinalDiffPrimaryAdapter(input) {
   highRiskFinalDiffPrimaryCallCount += 1;
   assert.equal(input.context.profileId, "P45");
@@ -950,6 +977,18 @@ const withEditTaskMutationNoRetry = await attempt(
   "P44",
   null,
   editTaskMutationPrimaryAdapter,
+  commandRunner,
+);
+const withRepairedNoMutationRecovery = await attempt(
+  "P48",
+  null,
+  repairedNoMutationPrimaryAdapter,
+  commandRunner,
+);
+const withRepairedNoMutationNegativeControl = await attempt(
+  "P48",
+  null,
+  repairedNoMutationNegativeControlAdapter,
   commandRunner,
 );
 const withHighRiskFinalDiffReconciliation = await attempt(
@@ -1490,6 +1529,38 @@ assert.equal(vnextCoreV2AuditTriggerPolicy("P44"), "disabled");
 assert.equal(editTaskMutationPrimaryCallCount, 1);
 assert.equal(withEditTaskMutationNoRetry.result.vnext_verification_remediation_observation.eligible, false);
 assert.equal(withEditTaskMutationNoRetry.result.vnext_verification_remediation_observation.retry_started_count, 0);
+assert.equal(repairedNoMutationPrimaryCallCount, 2);
+assert.doesNotMatch(firstPrompts.get("P48"), /HOST_VISIBLE_CONTRACT_V[12]=/u);
+assert.doesNotMatch(firstPrompts.get("P48"), /HOST_REPOSITORY_MAP_V1=/u);
+assert.deepEqual(withRepairedNoMutationRecovery.result.vnext_primary_route_observation, {
+  eligible: true,
+  activated: true,
+  stratum: "medium",
+  agent_id: "core-v4-build",
+  visible_contract_version: "NONE",
+  reason: "host_route_bound",
+});
+assert.equal(withRepairedNoMutationRecovery.result.vnext_verification_remediation_observation.eligible, true);
+assert.equal(withRepairedNoMutationRecovery.result.vnext_verification_remediation_observation.retry_started_count, 1);
+assert.equal(withRepairedNoMutationRecovery.result.vnext_verification_remediation_observation.retry_completed_count, 1);
+assert.equal(withRepairedNoMutationRecovery.result.vnext_verification_remediation_observation.retry_changed_count, 1);
+assert.equal(withRepairedNoMutationRecovery.result.vnext_verification_remediation_observation.retry_reverified_count, 1);
+assert.equal(withRepairedNoMutationRecovery.result.vnext_verification_remediation_observation.retry_verification_passed_count, 1);
+assert.deepEqual(
+  withRepairedNoMutationRecovery.result.vnext_verification_remediation_observation.trigger_reasons,
+  ["edit-task-no-mutation"],
+);
+assert.equal(vnextInitialAgentId({ profile_id: "P48", stratum: "small" }), "core-v4-build");
+assert.equal(vnextInitialAgentId({ profile_id: "P48", stratum: "medium" }), "core-v4-build");
+assert.equal(vnextInitialAgentId({ profile_id: "P48", stratum: "high" }), "core-v4-build");
+assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P48", stratum: "small" }), false);
+assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P48", stratum: "medium" }), false);
+assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P48", stratum: "high" }), false);
+assert.equal(vnextCoreV2AuditTriggerPolicy("P48"), "disabled");
+assert.equal(repairedNoMutationNegativeControlCallCount, 1);
+assert.equal(withRepairedNoMutationNegativeControl.result.vnext_verification_remediation_observation.eligible, false);
+assert.equal(withRepairedNoMutationNegativeControl.result.vnext_verification_remediation_observation.retry_started_count, 0);
+assert.equal(withRepairedNoMutationNegativeControl.result.vnext_verification_remediation_observation.retry_completed_count, 0);
 assert.equal(highRiskFinalDiffPrimaryCallCount, 2);
 assert.equal(withHighRiskFinalDiffReconciliation.result.execution_status, "completed");
 assert.equal(withHighRiskFinalDiffReconciliation.result.vnext_verification_remediation_observation.eligible, true);

@@ -164,6 +164,7 @@ const editTaskNoMutationRemediationProfile = materializeVnextSyntheticProfile({ 
 const highRiskFinalDiffReconciliationProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P45" });
 const terminalFailureRemediationProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P46" });
 const terminalFailureReplacementProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P47" });
+const repairedNoMutationRecoveryProfile = materializeVnextSyntheticProfile({ sourceRoot: root, profileId: "P48" });
 try {
   assert.equal(plainProfile.primaryAgentId, "build");
   assert.equal(isolatedVerificationProfile.primaryAgentId, "build");
@@ -492,6 +493,23 @@ try {
       "runtime/host/verification-remediation-gate.mjs",
     ],
   );
+  assert.equal(repairedNoMutationRecoveryProfile.primaryAgentId, "build");
+  assert.deepEqual(
+    repairedNoMutationRecoveryProfile.profileEvidence.component_ids,
+    ["universal-compact-protocol", "targeted-verification", "edit-task-no-mutation-remediation"],
+  );
+  assert.deepEqual(
+    repairedNoMutationRecoveryProfile.profileEvidence.runtime_surface.effective_config,
+    plainProfile.profileEvidence.runtime_surface.effective_config,
+  );
+  assert.deepEqual(
+    repairedNoMutationRecoveryProfile.profileEvidence.runtime_surface.materialized_files.map((entry) => entry.path),
+    [
+      "agents/core-v4-build.md",
+      "runtime/host/core-verification-gate.mjs",
+      "runtime/host/verification-remediation-gate.mjs",
+    ],
+  );
   assert.equal(highRiskFinalDiffReconciliationProfile.primaryAgentId, "build");
   assert.deepEqual(
     highRiskFinalDiffReconciliationProfile.profileEvidence.component_ids,
@@ -581,6 +599,8 @@ try {
   cleanupSyntheticProfile(editTaskNoMutationRemediationProfile);
   cleanupSyntheticProfile(highRiskFinalDiffReconciliationProfile);
   cleanupSyntheticProfile(terminalFailureRemediationProfile);
+  cleanupSyntheticProfile(terminalFailureReplacementProfile);
+  cleanupSyntheticProfile(repairedNoMutationRecoveryProfile);
 }
 const plan = buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
@@ -1328,6 +1348,26 @@ assert.equal(
   editTaskNoMutationRemediationPlan.bindings.candidate_profile_fingerprint,
   editTaskNoMutationRemediationProfile.profileFingerprint,
 );
+const repairedNoMutationRecoveryPlan = buildBenchmarkV2CampaignPlan({
+  repositoryRoot: root,
+  split: "development",
+  generationId: "generation-fixture-repaired-no-mutation-recovery-1",
+  baselineArmId: "P0",
+  candidateArmId: "P48",
+  model: "fixture/model",
+  provider: "fixture",
+  variant: "low",
+  timeoutMs: 300_000,
+  seed: "campaign-fixture-seed",
+  repetitions: 1,
+  executableIdentity: executableFingerprint,
+  allowDirty: true,
+});
+assert.equal(repairedNoMutationRecoveryPlan.component_id, "edit-task-no-mutation-remediation-candidate");
+assert.equal(
+  repairedNoMutationRecoveryPlan.bindings.candidate_profile_fingerprint,
+  repairedNoMutationRecoveryProfile.profileFingerprint,
+);
 const highRiskFinalDiffReconciliationPlan = buildBenchmarkV2CampaignPlan({
   repositoryRoot: root,
   split: "development",
@@ -1428,7 +1468,7 @@ function binding(instance) {
 async function fakeAttempt({ instance, profileId }) {
   const ordinal = Number.parseInt(createHash(instance.family_id).slice(0, 2), 16);
   const baselineFailure = ordinal % 4 === 0;
-  const success = ["P6", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20", "P34", "P35", "P36", "P37", "P38", "P39", "P40", "P41", "P42", "P43", "P44", "P45", "P46", "P47"].includes(profileId) ? true : !baselineFailure;
+  const success = ["P6", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20", "P34", "P35", "P36", "P37", "P38", "P39", "P40", "P41", "P42", "P43", "P44", "P45", "P46", "P47", "P48"].includes(profileId) ? true : !baselineFailure;
   const passed = check(true);
   const hidden = success ? passed : check(false, "hidden-contract");
   const result = {
@@ -1507,10 +1547,12 @@ async function fakeAttempt({ instance, profileId }) {
       retry_verification_passed_count: 0,
       operationally_complete: true,
       trigger_reasons: ["high-risk-final-diff-reconciliation"],
-    } : ["P38", "P39", "P40", "P41", "P42", "P43", "P44", "P45", "P46", "P47"].includes(profileId) ? {
+    } : ["P38", "P39", "P40", "P41", "P42", "P43", "P44", "P45", "P46", "P47", "P48"].includes(profileId) ? {
       eligible: false,
+      retry_required_count: 0,
       retry_started_count: 0,
       retry_completed_count: 0,
+      operationally_complete: true,
     } : null,
     vnext_secret_mutation_guard_observation: profileId === "P35" ? {
       eligible: true,
@@ -1525,22 +1567,22 @@ async function fakeAttempt({ instance, profileId }) {
       reason: "host_visible_contract_compiled_before_model",
       manifest_fingerprint: `sha256:${"d".repeat(64)}`,
       clause_count: 1,
-    } : ["P40", "P41", "P42", "P43", "P44", "P45", "P46", "P47"].includes(profileId) ? {
+    } : ["P40", "P41", "P42", "P43", "P44", "P45", "P46", "P47", "P48"].includes(profileId) ? {
       eligible: false,
       activated: false,
       reason: "profile_without_visible_contract_manifest",
       manifest_fingerprint: null,
       clause_count: 0,
     } : null,
-    vnext_primary_route_observation: ["P36", "P37", "P38", "P39", "P40", "P41", "P42", "P43", "P44", "P45", "P46", "P47"].includes(profileId) ? {
+    vnext_primary_route_observation: ["P36", "P37", "P38", "P39", "P40", "P41", "P42", "P43", "P44", "P45", "P46", "P47", "P48"].includes(profileId) ? {
       eligible: true,
       activated: true,
       stratum: /(?:^|-)high-/u.test(instance.family_id)
         ? "high" : /(?:^|-)medium-/u.test(instance.family_id) ? "medium" : "small",
       agent_id: /(?:^|-)small-/u.test(instance.family_id)
-        ? (profileId === "P36" ? "core-v3-build" : ["P39", "P40", "P41", "P42", "P43", "P44", "P45", "P46", "P47"].includes(profileId) ? "core-v4-build" : "build")
+        ? (profileId === "P36" ? "core-v3-build" : ["P39", "P40", "P41", "P42", "P43", "P44", "P45", "P46", "P47", "P48"].includes(profileId) ? "core-v4-build" : "build")
         : (profileId === "P40" ? "build" : profileId === "P42" && /(?:^|-)high-/u.test(instance.family_id) ? "core-v6-build" : "core-v4-build"),
-      visible_contract_version: ["P40", "P41", "P42", "P43", "P44", "P45", "P46", "P47"].includes(profileId) ? "NONE" : /(?:^|-)small-/u.test(instance.family_id)
+      visible_contract_version: ["P40", "P41", "P42", "P43", "P44", "P45", "P46", "P47", "P48"].includes(profileId) ? "NONE" : /(?:^|-)small-/u.test(instance.family_id)
         ? (profileId === "P36" ? "V1" : "NONE") : "V2",
       reason: "host_route_bound",
     } : null,
@@ -1548,7 +1590,7 @@ async function fakeAttempt({ instance, profileId }) {
       eligible: true,
       activated: true,
       reason: "host_map_injected_before_retry",
-    } : ["P40", "P41", "P42", "P43", "P44", "P45", "P46", "P47"].includes(profileId) ? { eligible: true, activated: false, reason: "profile_without_host_context" } : null,
+    } : ["P40", "P41", "P42", "P43", "P44", "P45", "P46", "P47", "P48"].includes(profileId) ? { eligible: true, activated: false, reason: "profile_without_host_context" } : null,
     audit_evidence: { fixture: true },
     fingerprints: { adapter: `sha256:${"b".repeat(64)}` },
   };
@@ -1557,7 +1599,7 @@ async function fakeAttempt({ instance, profileId }) {
 
 async function conditionalNoopAttempt(input) {
   const attempt = await fakeAttempt(input);
-  if (!["P34", "P46", "P47"].includes(input.profileId)) return attempt;
+  if (!["P34", "P46", "P47", "P48"].includes(input.profileId)) return attempt;
   return Object.freeze({
     ...attempt,
     result: Object.freeze({
@@ -1581,7 +1623,7 @@ async function conditionalNoopAttempt(input) {
 
 async function conditionalNoopWithoutVerificationAttempt(input) {
   const attempt = await conditionalNoopAttempt(input);
-  if (!["P34", "P46", "P47"].includes(input.profileId)) return attempt;
+  if (!["P34", "P46", "P47", "P48"].includes(input.profileId)) return attempt;
   return Object.freeze({
     ...attempt,
     result: Object.freeze({
@@ -2046,6 +2088,19 @@ const editTaskNoMutationRemediationAcceptance = await executeBenchmarkV2Acceptan
 assert.equal(editTaskNoMutationRemediationAcceptance.status, "failed");
 assert.equal(editTaskNoMutationRemediationAcceptance.family_id, "dev-high-duplicate-side-effects");
 assert.deepEqual(editTaskNoMutationRemediationAcceptance.activation, { eligible: false, activated: false });
+const repairedNoMutationRecoveryAcceptance = await executeBenchmarkV2Acceptance({
+  repositoryRoot: root,
+  plan: repairedNoMutationRecoveryPlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: fakeAttempt,
+});
+assert.equal(repairedNoMutationRecoveryAcceptance.status, "passed");
+assert.equal(repairedNoMutationRecoveryAcceptance.family_id, "dev-high-duplicate-side-effects");
+assert.deepEqual(repairedNoMutationRecoveryAcceptance.activation, { eligible: false, activated: false });
+assert.deepEqual(repairedNoMutationRecoveryAcceptance.mechanism_acceptance, {
+  satisfied: true,
+  mode: "verified-not-needed",
+});
 const highRiskFinalDiffReconciliationAcceptance = await executeBenchmarkV2Acceptance({
   repositoryRoot: root,
   plan: highRiskFinalDiffReconciliationPlan,
@@ -2590,6 +2645,20 @@ assert.equal(editTaskNoMutationRemediationReport.decision, "reject-development-c
 assert.equal(
   validateBenchmarkV2CampaignReport(editTaskNoMutationRemediationReport, { repositoryRoot: root }),
   editTaskNoMutationRemediationReport,
+);
+const repairedNoMutationRecoveryReport = await executeBenchmarkV2Campaign({
+  repositoryRoot: root,
+  plan: repairedNoMutationRecoveryPlan,
+  executableIdentity: executableFingerprint,
+  attemptRunner: fakeAttempt,
+});
+assert.equal(repairedNoMutationRecoveryReport.status, "complete");
+assert.equal(repairedNoMutationRecoveryReport.summary.statistics.activation.rate, null);
+assert.equal(repairedNoMutationRecoveryReport.summary.guardrails.activation, false);
+assert.equal(repairedNoMutationRecoveryReport.decision, "reject-development-candidate");
+assert.equal(
+  validateBenchmarkV2CampaignReport(repairedNoMutationRecoveryReport, { repositoryRoot: root }),
+  repairedNoMutationRecoveryReport,
 );
 const highRiskFinalDiffReconciliationReport = await executeBenchmarkV2Campaign({
   repositoryRoot: root,
