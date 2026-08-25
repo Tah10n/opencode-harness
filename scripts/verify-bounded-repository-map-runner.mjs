@@ -528,6 +528,18 @@ async function protocolBoundSmallPrimaryAdapter(input) {
   return fixtureAdapterForInstance(smallInstance, input);
 }
 
+async function boundedMapOnlyPrimaryAdapter(input) {
+  assert.equal(input.context.profileId, "P50");
+  assert.equal(input.context.agentId, "core-v4-build");
+  return fixtureAdapter(input);
+}
+
+async function boundedMapOnlySmallPrimaryAdapter(input) {
+  assert.equal(input.context.profileId, "P50");
+  assert.equal(input.context.agentId, "core-v4-build");
+  return fixtureAdapterForInstance(smallInstance, input);
+}
+
 async function smallProtocolOnlyMediumPrimaryAdapter(input) {
   assert.equal(input.context.profileId, "P40");
   assert.equal(input.context.agentId, undefined);
@@ -1004,6 +1016,19 @@ const withMinimalDirectProtocol = await attempt(
   null,
   minimalDirectPrimaryAdapter,
   commandRunner,
+);
+const withBoundedMapOnly = await attempt(
+  "P50",
+  null,
+  boundedMapOnlyPrimaryAdapter,
+  commandRunner,
+);
+const withBoundedMapOnlySmall = await attempt(
+  "P50",
+  null,
+  boundedMapOnlySmallPrimaryAdapter,
+  commandRunner,
+  smallInstance,
 );
 const withHighRiskFinalDiffReconciliation = await attempt(
   "P45",
@@ -1597,6 +1622,33 @@ assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P49", stratum: "
 assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P49", stratum: "medium" }), false);
 assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P49", stratum: "high" }), false);
 assert.equal(vnextCoreV2AuditTriggerPolicy("P49"), "disabled");
+assert.match(firstPrompts.get("P50"), /HOST_REPOSITORY_MAP_V1=/u);
+assert.doesNotMatch(firstPrompts.get("P50"), /HOST_VISIBLE_CONTRACT_V[12]=/u);
+assert.deepEqual(withBoundedMapOnly.result.vnext_primary_route_observation, {
+  eligible: true,
+  activated: true,
+  stratum: "medium",
+  agent_id: "core-v4-build",
+  visible_contract_version: "NONE",
+  reason: "host_route_bound",
+});
+assert.equal(withBoundedMapOnly.result.vnext_context_map_observation.eligible, true);
+assert.equal(withBoundedMapOnly.result.vnext_context_map_observation.activated, true);
+assert.equal(withBoundedMapOnly.result.vnext_host_verification_observation.allowed, true);
+assert.equal(withBoundedMapOnly.result.vnext_verification_remediation_observation.eligible, false);
+assert.doesNotMatch(prompts.get("P50"), /HOST_REPOSITORY_MAP_V1=/u);
+assert.deepEqual(withBoundedMapOnlySmall.result.vnext_context_map_observation, {
+  eligible: false,
+  activated: false,
+  reason: "not_eligible",
+});
+assert.equal(vnextInitialAgentId({ profile_id: "P50", stratum: "small" }), "core-v4-build");
+assert.equal(vnextInitialAgentId({ profile_id: "P50", stratum: "medium" }), "core-v4-build");
+assert.equal(vnextInitialAgentId({ profile_id: "P50", stratum: "high" }), "core-v4-build");
+assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P50", stratum: "small" }), false);
+assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P50", stratum: "medium" }), false);
+assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P50", stratum: "high" }), false);
+assert.equal(vnextCoreV2AuditTriggerPolicy("P50"), "disabled");
 assert.equal(highRiskFinalDiffPrimaryCallCount, 2);
 assert.equal(withHighRiskFinalDiffReconciliation.result.execution_status, "completed");
 assert.equal(withHighRiskFinalDiffReconciliation.result.vnext_verification_remediation_observation.eligible, true);
