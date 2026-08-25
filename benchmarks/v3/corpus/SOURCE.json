@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "repository": "https://github.com/eslint/eslint",
+  "source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "source_commit": "5634542be580750ffb1a5766470f9e9c72719696",
+  "license": "MIT",
+  "spdx_license": "MIT",
+  "license_fingerprint": "sha256:73e2034fe7f17e603f7c3a4bb7f8b71db11a63f94907d08e756c9d4d72a35505",
+  "provenance_bundle": {
+    "sha256": "sha256:833eec2517b913b6543bceb2dd64313ad38687a75820c172be9ef32f689684b0",
+    "size": 43987615,
+    "redistribution_status": "excluded-from-git-and-release-assets",
+    "local_environment_variable": "BENCHMARK_V3_PROVENANCE_BUNDLE"
+  },
+  "third_party_notices": "THIRD_PARTY_NOTICES.md",
+  "materializer": "scripts/materialize-benchmark-v3-provenance.mjs",
+  "derivation": "unique-real-eslint-source-lineages-with-quarantined-unverified-public-contracts-and-hidden-upstream-tests"
+}

@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-development-small-12",
+  "oracle": "upstream-eslint-rule-test-and-closed-mutation-set",
+  "defect_severity": "unclassified",
+  "reference_files": [
+    {
+      "path": "lib/unsupported-api.js",
+      "content": "/**\n * @fileoverview APIs that are not officially supported by ESLint.\n *      These APIs may change or be removed at any time. Use at your\n *      own risk.\n * @author Nicholas C. Zakas\n */\n\n\"use strict\";\n\n//-----------------------------------------------------------------------------\n// Requirements\n//-----------------------------------------------------------------------------\n\nconst { shouldUseFlatConfig } = require(\"./eslint/eslint\");\nconst builtinRules = require(\"./rules\");\n\n//-----------------------------------------------------------------------------\n// Exports\n//-----------------------------------------------------------------------------\n\nmodule.exports = { builtinRules, shouldUseFlatConfig };\n"
+    }
+  ],
+  "hidden_test_files": [
+    {
+      "path": "tests/lib/unsupported-api.js",
+      "content": "/**\n * @fileoverview Tests for unsupported-api.\n * @author Nicholas C. Zakas\n */\n\n\"use strict\";\n\n//-----------------------------------------------------------------------------\n// Requirements\n//-----------------------------------------------------------------------------\n\nconst assert = require(\"chai\").assert,\n\t{\n\t\tLazyLoadingRuleMap,\n\t} = require(\"../../lib/rules/utils/lazy-loading-rule-map\"),\n\tapi = require(\"../../lib/unsupported-api\");\n\n//-----------------------------------------------------------------------------\n// Tests\n//-----------------------------------------------------------------------------\n\ndescribe(\"unsupported-api\", () => {\n\tit(\"should not have FileEnumerator exposed\", () => {\n\t\tassert(!(\"FileEnumerator\" in api));\n\t});\n\n\tit(\"should not have FlatESLint exposed\", () => {\n\t\tassert(!(\"FlatESLint\" in api));\n\t});\n\n\tit(\"should not have LegacyESLint exposed\", () => {\n\t\tassert(!(\"LegacyESLint\" in api));\n\t});\n\n\tit(\"should not have ESLint exposed\", () => {\n\t\tassert(!(\"ESLint\" in api));\n\t});\n\n\tit(\"should have shouldUseFlatConfig exposed\", () => {\n\t\tassert.isFunction(api.shouldUseFlatConfig);\n\t});\n\n\tit(\"should not have FlatRuleTester exposed\", () => {\n\t\tassert(!(\"FlatRuleTester\" in api));\n\t});\n\n\tit(\"should have builtinRules exposed\", () => {\n\t\tassert.instanceOf(api.builtinRules, LazyLoadingRuleMap);\n\t});\n});\n"
+    }
+  ],
+  "allowed_mutation_paths": [
+    "lib/unsupported-api.js"
+  ],
+  "test_argv": [
+    "--timeout",
+    "30000",
+    "tests/lib/unsupported-api.js"
+  ],
+  "runtime_key": "eslint-v10",
+  "runtime_version": "10.0",
+  "provenance": {
+    "kind": "real-commit-derived",
+    "repository": "https://github.com/eslint/eslint",
+    "source_commit": "e80485fcd27196fa0b6f6b5c7ac8cf49ad4b079d",
+    "parent_commit": "14956543d42ab542f72820f38941d0bcc39a1fbb",
+    "source_paths": [
+      "lib/unsupported-api.js"
+    ],
+    "patch_fingerprint": "sha256:4fc8638dfa3c76d07d4199c258b1588a20896b47a3d2b6fe6dcaa3a110a34d9a",
+    "visible_requirement_fingerprint": "sha256:416fc4227e51c8acffe9cf191d17df79f3a2453b06fad29b29769ee7032fa304",
+    "license": "MIT",
+    "license_fingerprint": "sha256:73e2034fe7f17e603f7c3a4bb7f8b71db11a63f94907d08e756c9d4d72a35505"
+  },
+  "requirement_coverage": {
+    "schema_version": 1,
+    "contract_fingerprint": "sha256:1295ab349e4b9db99e42d4f4f6d877293aa41ddef9aa096ca0626690fe8d5ac2",
+    "contract_completeness": "unverified",
+    "hidden_test_witnesses": [
+      {
+        "hidden_test_fingerprint": "sha256:601b85c99ef0f3eaec7c041cd5197b49b94ca1c90354665b0c8b123280141b8b",
+        "clause_ids": [
+          "REQ-001",
+          "REQ-002"
+        ]
+      }
+    ],
+    "runner_witnesses": [
+      {
+        "witness_id": "closed-mutation-set",
+        "clause_ids": [
+          "REQ-003"
+        ]
+      }
+    ]
+  }
+}

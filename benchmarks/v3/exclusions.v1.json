@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "frozen_archive_sha": "a3aeec427afdc073fd70a8fccb27fd274b81b724",
+  "prior_campaign": "P0-P52-on-benchmark-v2",
+  "v2_registry_fingerprints": [
+    "sha256:051552ee5800477e9df035acf848b0411789424dd0f8c0c8822fafb5ba171357",
+    "sha256:d4b69485e981d1a81a51e4d399d5b7d96c26f37286a6e0c47b689b6cdd9f58bd",
+    "sha256:e197413a8ad0bdde53811bbe94ba80803e29b2230f0b82ee911b24aceae1b0f0"
+  ],
+  "forbidden_source_repositories": [
+    "https://github.com/sindresorhus/p-limit",
+    "https://github.com/sindresorhus/p-map",
+    "https://github.com/sindresorhus/yocto-queue",
+    "https://github.com/sindresorhus/onetime",
+    "https://github.com/sindresorhus/delay"
+  ],
+  "identity_rule": "v3 source repository, source commit, semantic kernel, and family fingerprint must be globally fresh and must not use a v2 real-commit repository"
+}

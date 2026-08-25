@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-holdout-small-19",
+  "oracle": "upstream-eslint-rule-test-and-closed-mutation-set",
+  "defect_severity": "unclassified",
+  "reference_files": [
+    {
+      "path": "lib/rules/no-confusing-arrow.js",
+      "content": "/**\n * @fileoverview A rule to warn against using arrow functions when they could be\n * confused with comparisons\n * @author Jxck <https://github.com/Jxck>\n */\n\n\"use strict\";\n\nconst astUtils = require(\"./utils/ast-utils.js\");\n\n//------------------------------------------------------------------------------\n// Helpers\n//------------------------------------------------------------------------------\n\n/**\n * Checks whether or not a node is a conditional expression.\n * @param {ASTNode} node node to test\n * @returns {boolean} `true` if the node is a conditional expression.\n */\nfunction isConditional(node) {\n    return node && node.type === \"ConditionalExpression\";\n}\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../shared/types').Rule} */\nmodule.exports = {\n    meta: {\n        type: \"suggestion\",\n\n        docs: {\n            description: \"disallow arrow functions where they could be confused with comparisons\",\n            recommended: false,\n            url: \"https://eslint.org/docs/rules/no-confusing-arrow\"\n        },\n\n        fixable: \"code\",\n\n        schema: [{\n            type: \"object\",\n            properties: {\n                allowParens: { type: \"boolean\", default: true },\n                onlyOneSimpleParam: { type: \"boolean\", default: false }\n            },\n            additionalProperties: false\n        }],\n\n        messages: {\n            confusing: \"Arrow function used ambiguously with a conditional expression.\"\n        }\n    },\n\n    create(context) {\n        const config = context.options[0] || {};\n        const allowParens = config.allowParens || (config.allowParens === void 0);\n        const onlyOneSimpleParam = config.onlyOneSimpleParam;\n        const sourceCode = context.getSourceCode();\n\n\n        /**\n         * Reports if an arrow function contains an ambiguous conditional.\n         * @param {ASTNode} node A node to check and report.\n         * @returns {void}\n         */\n        function checkArrowFunc(node) {\n            const body = node.body;\n\n            if (isConditional(body) &&\n                !(allowParens && astUtils.isParenthesised(sourceCode, body)) &&\n                !(onlyOneSimpleParam && !(node.params.length === 1 && node.params[0].type === \"Identifier\"))) {\n                context.report({\n                    node,\n                    messageId: \"confusing\",\n                    fix(fixer) {\n\n                        // if `allowParens` is not set to true don't bother wrapping in parens\n                        return allowParens && fixer.replaceText(node.body, `(${sourceCode.getText(node.body)})`);\n                    }\n                });\n            }\n        }\n\n        return {\n            ArrowFunctionExpression: checkArrowFunc\n        };\n    }\n};\n"
+    }
+  ],
+  "hidden_test_files": [
+    {
+      "path": "tests/lib/rules/no-confusing-arrow.js",
+      "content": "/**\n * @fileoverview Tests for no-confusing-arrow rule.\n * @author Jxck <https://github.com/Jxck>\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst rule = require(\"../../../lib/rules/no-confusing-arrow\"),\n    { RuleTester } = require(\"../../../lib/rule-tester\");\n\n//------------------------------------------------------------------------------\n// Tests\n//------------------------------------------------------------------------------\n\nconst ruleTester = new RuleTester({ parserOptions: { ecmaVersion: 6 } });\n\nruleTester.run(\"no-confusing-arrow\", rule, {\n    valid: [\n        \"a => { return 1 ? 2 : 3; }\",\n        { code: \"a => { return 1 ? 2 : 3; }\", options: [{ allowParens: false }] },\n\n        \"var x = a => { return 1 ? 2 : 3; }\",\n        { code: \"var x = a => { return 1 ? 2 : 3; }\", options: [{ allowParens: false }] },\n\n        \"var x = (a) => { return 1 ? 2 : 3; }\",\n        { code: \"var x = (a) => { return 1 ? 2 : 3; }\", options: [{ allowParens: false }] },\n\n        \"var x = a => (1 ? 2 : 3)\",\n        { code: \"var x = a => (1 ? 2 : 3)\", options: [{ allowParens: true }] },\n\n        \"var x = (a,b) => (1 ? 2 : 3)\",\n        { code: \"() => 1 ? 2 : 3\", options: [{ onlyOneSimpleParam: true }] },\n        { code: \"(a, b) => 1 ? 2 : 3\", options: [{ onlyOneSimpleParam: true }] },\n        { code: \"(a = b) => 1 ? 2 : 3\", options: [{ onlyOneSimpleParam: true }] },\n        { code: \"({ a }) => 1 ? 2 : 3\", options: [{ onlyOneSimpleParam: true }] },\n        { code: \"([a]) => 1 ? 2 : 3\", options: [{ onlyOneSimpleParam: true }] },\n        { code: \"(...a) => 1 ? 2 : 3\", options: [{ onlyOneSimpleParam: true }] }\n    ],\n    invalid: [\n        {\n            code: \"a => 1 ? 2 : 3\",\n            output: \"a => (1 ? 2 : 3)\",\n            errors: [{ messageId: \"confusing\" }]\n        },\n        {\n            code: \"a => 1 ? 2 : 3\",\n            output: \"a => (1 ? 2 : 3)\",\n            options: [{ allowParens: true }],\n            errors: [{ messageId: \"confusing\" }]\n        },\n        {\n            code: \"a => 1 ? 2 : 3\",\n            output: null,\n            options: [{ allowParens: false }],\n            errors: [{ messageId: \"confusing\" }]\n        },\n        {\n            code: \"var x = a => 1 ? 2 : 3\",\n            output: \"var x = a => (1 ? 2 : 3)\",\n            errors: [{ messageId: \"confusing\" }]\n        },\n        {\n            code: \"var x = a => 1 ? 2 : 3\",\n            output: \"var x = a => (1 ? 2 : 3)\",\n            options: [{ allowParens: true }],\n            errors: [{ messageId: \"confusing\" }]\n        },\n        {\n            code: \"var x = a => 1 ? 2 : 3\",\n            output: null,\n            options: [{ allowParens: false }],\n            errors: [{ messageId: \"confusing\" }]\n        },\n        {\n            code: \"var x = (a) => 1 ? 2 : 3\",\n            output: \"var x = (a) => (1 ? 2 : 3)\",\n            errors: [{ messageId: \"confusing\" }]\n        },\n        {\n            code: \"var x = () => 1 ? 2 : 3\",\n            output: \"var x = () => (1 ? 2 : 3)\",\n            errors: [{ messageId: \"confusing\" }]\n        },\n        {\n            code: \"var x = () => 1 ? 2 : 3\",\n            output: \"var x = () => (1 ? 2 : 3)\",\n            options: [{}],\n            errors: [{ messageId: \"confusing\" }]\n        },\n        {\n            code: \"var x = () => 1 ? 2 : 3\",\n            output: \"var x = () => (1 ? 2 : 3)\",\n            options: [{ onlyOneSimpleParam: false }],\n            errors: [{ messageId: \"confusing\" }]\n        },\n        {\n            code: \"var x = (a, b) => 1 ? 2 : 3\",\n            output: \"var x = (a, b) => (1 ? 2 : 3)\",\n            errors: [{ messageId: \"confusing\" }]\n        },\n        {\n            code: \"var x = (a = b) => 1 ? 2 : 3\",\n            output: \"var x = (a = b) => (1 ? 2 : 3)\",\n            errors: [{ messageId: \"confusing\" }]\n        },\n        {\n            code: \"var x = ({ a }) => 1 ? 2 : 3\",\n            output: \"var x = ({ a }) => (1 ? 2 : 3)\",\n            errors: [{ messageId: \"confusing\" }]\n        },\n        {\n            code: \"var x = ([a]) => 1 ? 2 : 3\",\n            output: \"var x = ([a]) => (1 ? 2 : 3)\",\n            errors: [{ messageId: \"confusing\" }]\n        },\n        {\n            code: \"var x = (...a) => 1 ? 2 : 3\",\n            output: \"var x = (...a) => (1 ? 2 : 3)\",\n            errors: [{ messageId: \"confusing\" }]\n        }\n    ]\n});\n"
+    }
+  ],
+  "allowed_mutation_paths": [
+    "lib/rules/no-confusing-arrow.js"
+  ],
+  "test_argv": [
+    "--timeout",
+    "30000",
+    "tests/lib/rules/no-confusing-arrow.js"
+  ],
+  "runtime_key": "eslint-v8.9",
+  "runtime_version": "8.9",
+  "provenance": {
+    "kind": "real-commit-derived",
+    "repository": "https://github.com/eslint/eslint",
+    "source_commit": "345e70d9d6490fb12b18953f56f3cea28fd61d83",
+    "parent_commit": "bfaa5488bbc794c0d160fb55bd277a2c618953b2",
+    "source_paths": [
+      "lib/rules/no-confusing-arrow.js"
+    ],
+    "patch_fingerprint": "sha256:08aab9f55d3d09536a0cd39bbaa6b413219960994792229f808810c9a778133a",
+    "visible_requirement_fingerprint": "sha256:0d5e4cd92256d73a88d3df5c7367c114a48d259218e73fc5d7ce89744ec6be34",
+    "license": "MIT",
+    "license_fingerprint": "sha256:73e2034fe7f17e603f7c3a4bb7f8b71db11a63f94907d08e756c9d4d72a35505"
+  },
+  "requirement_coverage": {
+    "schema_version": 1,
+    "contract_fingerprint": "sha256:1f5e64121bd1d1ec0da80f972343fe7d4520a34f22e46c8fee431d3a5063cfd8",
+    "contract_completeness": "unverified",
+    "hidden_test_witnesses": [
+      {
+        "hidden_test_fingerprint": "sha256:8e54beba8c99a19f6ca3b66c76875acd6043440357817099224949216256b276",
+        "clause_ids": [
+          "REQ-001",
+          "REQ-002"
+        ]
+      }
+    ],
+    "runner_witnesses": [
+      {
+        "witness_id": "closed-mutation-set",
+        "clause_ids": [
+          "REQ-003"
+        ]
+      }
+    ]
+  }
+}

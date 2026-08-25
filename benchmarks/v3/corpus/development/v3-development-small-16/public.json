@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-development-small-16",
+  "split": "development",
+  "stratum": "small",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-development-small-16-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:0700c04303ba1248090b889d7c2cd16eb3e48ee3e249e8fb8ec07cd0f61a9222"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/cli-engine/formatters/checkstyle.js",
+      "content": "/**\n * @fileoverview CheckStyle XML reporter\n * @author Ian Christian Myers\n */\n\"use strict\";\n\nconst xmlEscape = require(\"../xml-escape\");\n\n//------------------------------------------------------------------------------\n// Helper Functions\n//------------------------------------------------------------------------------\n\n/**\n * Returns the severity of warning or error\n * @param {Object} message message object to examine\n * @returns {string} severity level\n * @private\n */\nfunction getMessageType(message) {\n    if (message.fatal || message.severity === 2) {\n        return \"error\";\n    }\n    return \"warning\";\n\n}\n\n//------------------------------------------------------------------------------\n// Public Interface\n//------------------------------------------------------------------------------\n\nmodule.exports = function(results) {\n\n    let output = \"\";\n\n    output += \"<?xml version=\\\"1.0\\\" encoding=\\\"utf-8\\\"?>\";\n    output += \"<checkstyle version=\\\"4.3\\\">\";\n\n    results.forEach(result => {\n        const messages = result.messages;\n\n        output += `<file name=\"${xmlEscape(result.filePath)}\">`;\n\n        messages.forEach(message => {\n            output += [\n                `<error line=\"${xmlEscape(message.line)}\"`,\n                `column=\"${xmlEscape(message.column)}\"`,\n                `severity=\"${xmlEscape(getMessageType(message))}\"`,\n                `message=\"${xmlEscape(message.message)}${message.ruleId ? ` (${message.ruleId})` : \"\"}\"`,\n                `source=\"${message.ruleId ? xmlEscape(`eslint.rules.${message.ruleId}`) : \"\"}\" />`\n            ].join(\" \");\n        });\n\n        output += \"</file>\";\n\n    });\n\n    output += \"</checkstyle>\";\n\n    return output;\n};\n"
+    }
+  ]
+}

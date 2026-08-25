@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-development-high-14",
+  "split": "development",
+  "stratum": "high",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-development-high-14-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:230675d840c37e38a99af0f57199e371439eb835b94e33d8eec53e1873880bca"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/multiline-ternary.js",
+      "content": "/**\n * @fileoverview Enforce newlines between operands of ternary expressions\n * @author Kai Cataldo\n */\n\n\"use strict\";\n\nconst astUtils = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\nmodule.exports = {\n    meta: {\n        type: \"layout\",\n\n        docs: {\n            description: \"enforce newlines between operands of ternary expressions\",\n            category: \"Stylistic Issues\",\n            recommended: false,\n            url: \"https://eslint.org/docs/rules/multiline-ternary\"\n        },\n\n        schema: [\n            {\n                enum: [\"always\", \"always-multiline\", \"never\"]\n            }\n        ],\n        messages: {\n            expectedTestCons: \"Expected newline between test and consequent of ternary expression.\",\n            expectedConsAlt: \"Expected newline between consequent and alternate of ternary expression.\",\n            unexpectedTestCons: \"Unexpected newline between test and consequent of ternary expression.\",\n            unexpectedConsAlt: \"Unexpected newline between consequent and alternate of ternary expression.\"\n        }\n    },\n\n    create(context) {\n        const option = context.options[0];\n        const multiline = option !== \"never\";\n        const allowSingleLine = option === \"always-multiline\";\n        const sourceCode = context.getSourceCode();\n\n        //--------------------------------------------------------------------------\n        // Public\n        //--------------------------------------------------------------------------\n\n        return {\n            ConditionalExpression(node) {\n                const questionToken = sourceCode.getTokenAfter(node.test, astUtils.isNotClosingParenToken);\n                const colonToken = sourceCode.getTokenAfter(node.consequent, astUtils.isNotClosingParenToken);\n\n                const firstTokenOfTest = sourceCode.getFirstToken(node);\n                const lastTokenOfTest = sourceCode.getTokenBefore(questionToken);\n                const firstTokenOfConsequent = sourceCode.getTokenAfter(questionToken);\n                const lastTokenOfConsequent = sourceCode.getTokenBefore(colonToken);\n                const firstTokenOfAlternate = sourceCode.getTokenAfter(colonToken);\n\n                const areTestAndConsequentOnSameLine = astUtils.isTokenOnSameLine(lastTokenOfTest, firstTokenOfConsequent);\n                const areConsequentAndAlternateOnSameLine = astUtils.isTokenOnSameLine(lastTokenOfConsequent, firstTokenOfAlternate);\n\n                if (!multiline) {\n                    if (!areTestAndConsequentOnSameLine) {\n                        context.report({\n                            node: node.test,\n                            loc: {\n                                start: firstTokenOfTest.loc.start,\n                                end: lastTokenOfTest.loc.end\n                            },\n                            messageId: \"unexpectedTestCons\"\n                        });\n                    }\n\n                    if (!areConsequentAndAlternateOnSameLine) {\n                        context.report({\n                            node: node.consequent,\n                            loc: {\n                                start: firstTokenOfConsequent.loc.start,\n                                end: lastTokenOfConsequent.loc.end\n                            },\n                            messageId: \"unexpectedConsAlt\"\n                        });\n                    }\n                } else {\n                    if (allowSingleLine && node.loc.start.line === node.loc.end.line) {\n                        return;\n                    }\n\n                    if (areTestAndConsequentOnSameLine) {\n                        context.report({\n                            node: node.test,\n                            loc: {\n                                start: firstTokenOfTest.loc.start,\n                                end: lastTokenOfTest.loc.end\n                            },\n                            messageId: \"expectedTestCons\"\n                        });\n                    }\n\n                    if (areConsequentAndAlternateOnSameLine) {\n                        context.report({\n                            node: node.consequent,\n                            loc: {\n                                start: firstTokenOfConsequent.loc.start,\n                                end: lastTokenOfConsequent.loc.end\n                            },\n                            messageId: \"expectedConsAlt\"\n                        });\n                    }\n                }\n            }\n        };\n    }\n};\n"
+    }
+  ]
+}

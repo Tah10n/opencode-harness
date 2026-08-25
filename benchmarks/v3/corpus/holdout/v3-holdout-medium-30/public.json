@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-holdout-medium-30",
+  "split": "holdout",
+  "stratum": "medium",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-holdout-medium-30-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:067055cd2be742b90933ae5dad6bcb64b71f12c9a1e4e6b995597cdc35cdf0ce"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/max-lines.js",
+      "content": "/**\n * @fileoverview enforce a maximum file length\n * @author Alberto Rodríguez\n */\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst lodash = require(\"lodash\");\nconst astUtils = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\nmodule.exports = {\n    meta: {\n        type: \"suggestion\",\n\n        docs: {\n            description: \"enforce a maximum number of lines per file\",\n            category: \"Stylistic Issues\",\n            recommended: false,\n            url: \"https://eslint.org/docs/rules/max-lines\"\n        },\n\n        schema: [\n            {\n                oneOf: [\n                    {\n                        type: \"integer\",\n                        minimum: 0\n                    },\n                    {\n                        type: \"object\",\n                        properties: {\n                            max: {\n                                type: \"integer\",\n                                minimum: 0\n                            },\n                            skipComments: {\n                                type: \"boolean\"\n                            },\n                            skipBlankLines: {\n                                type: \"boolean\"\n                            }\n                        },\n                        additionalProperties: false\n                    }\n                ]\n            }\n        ],\n        messages: {\n            exceed:\n                \"File has too many lines ({{actual}}). Maximum allowed is {{max}}.\"\n        }\n    },\n\n    create(context) {\n        const option = context.options[0];\n        let max = 300;\n\n        if (\n            typeof option === \"object\" &&\n            Object.prototype.hasOwnProperty.call(option, \"max\")\n        ) {\n            max = option.max;\n        } else if (typeof option === \"number\") {\n            max = option;\n        }\n\n        const skipComments = option && option.skipComments;\n        const skipBlankLines = option && option.skipBlankLines;\n\n        const sourceCode = context.getSourceCode();\n\n        /**\n         * Returns whether or not a token is a comment node type\n         * @param {Token} token The token to check\n         * @returns {boolean} True if the token is a comment node\n         */\n        function isCommentNodeType(token) {\n            return token && (token.type === \"Block\" || token.type === \"Line\");\n        }\n\n        /**\n         * Returns the line numbers of a comment that don't have any code on the same line\n         * @param {Node} comment The comment node to check\n         * @returns {number[]} The line numbers\n         */\n        function getLinesWithoutCode(comment) {\n            let start = comment.loc.start.line;\n            let end = comment.loc.end.line;\n\n            let token;\n\n            token = comment;\n            do {\n                token = sourceCode.getTokenBefore(token, {\n                    includeComments: true\n                });\n            } while (isCommentNodeType(token));\n\n            if (token && astUtils.isTokenOnSameLine(token, comment)) {\n                start += 1;\n            }\n\n            token = comment;\n            do {\n                token = sourceCode.getTokenAfter(token, {\n                    includeComments: true\n                });\n            } while (isCommentNodeType(token));\n\n            if (token && astUtils.isTokenOnSameLine(comment, token)) {\n                end -= 1;\n            }\n\n            if (start <= end) {\n                return lodash.range(start, end + 1);\n            }\n            return [];\n        }\n\n        return {\n            \"Program:exit\"() {\n                let lines = sourceCode.lines.map((text, i) => ({\n                    lineNumber: i + 1,\n                    text\n                }));\n\n                if (skipBlankLines) {\n                    lines = lines.filter(l => l.text.trim() !== \"\");\n                }\n\n                if (skipComments) {\n                    const comments = sourceCode.getAllComments();\n\n                    const commentLines = lodash.flatten(\n                        comments.map(comment => getLinesWithoutCode(comment))\n                    );\n\n                    lines = lines.filter(\n                        l => !lodash.includes(commentLines, l.lineNumber)\n                    );\n                }\n\n                if (lines.length > max) {\n                    const loc = {\n                        start: {\n                            line: lines[max].lineNumber,\n                            column: 0\n                        },\n                        end: {\n                            line: sourceCode.lines.length,\n                            column: lodash.last(sourceCode.lines).length\n                        }\n                    };\n\n                    context.report({\n                        loc,\n                        messageId: \"exceed\",\n                        data: {\n                            max,\n                            actual: lines.length\n                        }\n                    });\n                }\n            }\n        };\n    }\n};\n"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-small-12",
+  "split": "validation",
+  "stratum": "small",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-validation-small-12-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:881928ea7a6131e4f1aedcf3e3d883761e46b543859ac08d054cf6738e702098"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/cli-engine/lint-result-cache.js",
+      "content": "/**\n * @fileoverview Utility for caching lint results.\n * @author Kevin Partington\n */\n\"use strict\";\n\n//-----------------------------------------------------------------------------\n// Requirements\n//-----------------------------------------------------------------------------\n\nconst assert = require(\"assert\");\nconst fs = require(\"fs\");\nconst fileEntryCache = require(\"file-entry-cache\");\nconst stringify = require(\"json-stable-stringify-without-jsonify\");\nconst pkg = require(\"../../package.json\");\nconst hash = require(\"./hash\");\n\n//-----------------------------------------------------------------------------\n// Helpers\n//-----------------------------------------------------------------------------\n\nconst configHashCache = new WeakMap();\n\n/**\n * Calculates the hash of the config\n * @param {ConfigArray} config The config.\n * @returns {string} The hash of the config\n */\nfunction hashOfConfigFor(config) {\n    if (!configHashCache.has(config)) {\n        configHashCache.set(config, hash(`${pkg.version}_${stringify(config)}`));\n    }\n\n    return configHashCache.get(config);\n}\n\n//-----------------------------------------------------------------------------\n// Public Interface\n//-----------------------------------------------------------------------------\n\n/**\n * Lint result cache. This wraps around the file-entry-cache module,\n * transparently removing properties that are difficult or expensive to\n * serialize and adding them back in on retrieval.\n */\nclass LintResultCache {\n\n    /**\n     * Creates a new LintResultCache instance.\n     * @param {string} cacheFileLocation The cache file location.\n     *   configuration lookup by file path).\n     */\n    constructor(cacheFileLocation) {\n        assert(cacheFileLocation, \"Cache file location is required\");\n\n        this.fileEntryCache = fileEntryCache.create(cacheFileLocation);\n    }\n\n    /**\n     * Retrieve cached lint results for a given file path, if present in the\n     * cache. If the file is present and has not been changed, rebuild any\n     * missing result information.\n     * @param {string} filePath The file for which to retrieve lint results.\n     * @param {ConfigArray} config The config of the file.\n     * @returns {Object|null} The rebuilt lint results, or null if the file is\n     *   changed or not in the filesystem.\n     */\n    getCachedLintResults(filePath, config) {\n\n        /*\n         * Cached lint results are valid if and only if:\n         * 1. The file is present in the filesystem\n         * 2. The file has not changed since the time it was previously linted\n         * 3. The ESLint configuration has not changed since the time the file\n         *    was previously linted\n         * If any of these are not true, we will not reuse the lint results.\n         */\n\n        const fileDescriptor = this.fileEntryCache.getFileDescriptor(filePath);\n        const hashOfConfig = hashOfConfigFor(config);\n        const changed = fileDescriptor.changed || fileDescriptor.meta.hashOfConfig !== hashOfConfig;\n\n        if (fileDescriptor.notFound || changed) {\n            return null;\n        }\n\n        // If source is present but null, need to reread the file from the filesystem.\n        if (fileDescriptor.meta.results && fileDescriptor.meta.results.source === null) {\n            fileDescriptor.meta.results.source = fs.readFileSync(filePath, \"utf-8\");\n        }\n\n        return fileDescriptor.meta.results;\n    }\n\n    /**\n     * Set the cached lint results for a given file path, after removing any\n     * information that will be both unnecessary and difficult to serialize.\n     * Avoids caching results with an \"output\" property (meaning fixes were\n     * applied), to prevent potentially incorrect results if fixes are not\n     * written to disk.\n     * @param {string} filePath The file for which to set lint results.\n     * @param {ConfigArray} config The config of the file.\n     * @param {Object} result The lint result to be set for the file.\n     * @returns {void}\n     */\n    setCachedLintResults(filePath, config, result) {\n        if (result && Object.prototype.hasOwnProperty.call(result, \"output\")) {\n            return;\n        }\n\n        const fileDescriptor = this.fileEntryCache.getFileDescriptor(filePath);\n\n        if (fileDescriptor && !fileDescriptor.notFound) {\n\n            // Serialize the result, except that we want to remove the file source if present.\n            const resultToSerialize = Object.assign({}, result);\n\n            /*\n             * Set result.source to null.\n             * In `getCachedLintResults`, if source is explicitly null, we will\n             * read the file from the filesystem to set the value again.\n             */\n            if (Object.prototype.hasOwnProperty.call(resultToSerialize, \"source\")) {\n                resultToSerialize.source = null;\n            }\n\n            fileDescriptor.meta.results = resultToSerialize;\n            fileDescriptor.meta.hashOfConfig = hashOfConfigFor(config);\n        }\n    }\n\n    /**\n     * Persists the in-memory cache to disk.\n     * @returns {void}\n     */\n    reconcile() {\n        this.fileEntryCache.reconcile();\n    }\n}\n\nmodule.exports = LintResultCache;\n"
+    }
+  ]
+}

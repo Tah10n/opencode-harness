@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-development-small-09",
+  "split": "development",
+  "stratum": "small",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-development-small-09-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:e84599a2ad5e8aff9d6b3e7bf7d2778a672aaf580bf9305c4966dc9c8dbe64f8"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-with.js",
+      "content": "/**\n * @fileoverview Rule to flag use of with statement\n * @author Nicholas C. Zakas\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../types').Rule.RuleModule} */\nmodule.exports = {\n\tmeta: {\n\t\ttype: \"suggestion\",\n\n\t\tdocs: {\n\t\t\tdescription: \"Disallow `with` statements\",\n\t\t\trecommended: true,\n\t\t\turl: \"https://eslint.org/docs/latest/rules/no-with\",\n\t\t},\n\n\t\tschema: [],\n\n\t\tmessages: {\n\t\t\tunexpectedWith: \"Unexpected use of 'with' statement.\",\n\t\t},\n\t},\n\n\tcreate(context) {\n\t\treturn {\n\t\t\tWithStatement(node) {\n\t\t\t\tcontext.report({ node, messageId: \"unexpectedWith\" });\n\t\t\t},\n\t\t};\n\t},\n};\n"
+    }
+  ]
+}

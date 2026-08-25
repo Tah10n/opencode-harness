@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-development-small-02",
+  "oracle": "upstream-eslint-rule-test-and-closed-mutation-set",
+  "defect_severity": "unclassified",
+  "reference_files": [
+    {
+      "path": "lib/rules/no-new-symbol.js",
+      "content": "/**\n * @fileoverview Rule to disallow use of the new operator with the `Symbol` object\n * @author Alberto Rodríguez\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\nmodule.exports = {\n    meta: {\n        type: \"problem\",\n\n        docs: {\n            description: \"disallow `new` operators with the `Symbol` object\",\n            category: \"ECMAScript 6\",\n            recommended: true,\n            url: \"https://eslint.org/docs/rules/no-new-symbol\"\n        },\n\n        schema: [],\n\n        messages: {\n            noNewSymbol: \"`Symbol` cannot be called as a constructor.\"\n        }\n    },\n\n    create(context) {\n\n        return {\n            \"Program:exit\"() {\n                const globalScope = context.getScope();\n                const variable = globalScope.set.get(\"Symbol\");\n\n                if (variable && variable.defs.length === 0) {\n                    variable.references.forEach(ref => {\n                        const node = ref.identifier;\n                        const parent = node.parent;\n\n                        if (parent && parent.type === \"NewExpression\" && parent.callee === node) {\n                            context.report({\n                                node,\n                                messageId: \"noNewSymbol\"\n                            });\n                        }\n                    });\n                }\n            }\n        };\n\n    }\n};\n"
+    }
+  ],
+  "hidden_test_files": [
+    {
+      "path": "tests/lib/rules/no-new-symbol.js",
+      "content": "/**\n * @fileoverview Tests for the no-new-symbol rule\n * @author Alberto Rodríguez\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst rule = require(\"../../../lib/rules/no-new-symbol\"),\n    { RuleTester } = require(\"../../../lib/rule-tester\");\n\n//------------------------------------------------------------------------------\n// Tests\n//------------------------------------------------------------------------------\n\nconst ruleTester = new RuleTester({ env: { es6: true } });\n\nruleTester.run(\"no-new-symbol\", rule, {\n    valid: [\n        \"var foo = Symbol('foo');\",\n        \"function bar(Symbol) { var baz = new Symbol('baz');}\",\n        \"function Symbol() {} new Symbol();\",\n        \"new foo(Symbol);\",\n        \"new foo(bar, Symbol);\"\n    ],\n    invalid: [\n        {\n            code: \"var foo = new Symbol('foo');\",\n            errors: [{ messageId: \"noNewSymbol\" }]\n        },\n        {\n            code: \"function bar() { return function Symbol() {}; } var baz = new Symbol('baz');\",\n            errors: [{ messageId: \"noNewSymbol\" }]\n        }\n    ]\n});\n"
+    }
+  ],
+  "allowed_mutation_paths": [
+    "lib/rules/no-new-symbol.js"
+  ],
+  "test_argv": [
+    "--timeout",
+    "30000",
+    "tests/lib/rules/no-new-symbol.js"
+  ],
+  "runtime_key": "eslint-v7",
+  "runtime_version": "7.0",
+  "provenance": {
+    "kind": "real-commit-derived",
+    "repository": "https://github.com/eslint/eslint",
+    "source_commit": "1710296082083602a904b080908657bb431fb56c",
+    "parent_commit": "cc014514c29626e556acb0a528e3478b3725e284",
+    "source_paths": [
+      "lib/rules/no-new-symbol.js"
+    ],
+    "patch_fingerprint": "sha256:855b1b99291ec487abbdcd1e590bb892188b15313bd7788e61688df362209924",
+    "visible_requirement_fingerprint": "sha256:f21b5b88d6a1766e1373cde80efdaf353f46b5dafdf7dea377519acb87006260",
+    "license": "MIT",
+    "license_fingerprint": "sha256:73e2034fe7f17e603f7c3a4bb7f8b71db11a63f94907d08e756c9d4d72a35505"
+  },
+  "requirement_coverage": {
+    "schema_version": 1,
+    "contract_fingerprint": "sha256:6d408afe52127416049c5d3646d948feb8207b8f04dce371f5ab4f3f5ba27c8d",
+    "contract_completeness": "unverified",
+    "hidden_test_witnesses": [
+      {
+        "hidden_test_fingerprint": "sha256:a0c1d9827a03ccd142a465ad52e265e111ebdf8bb74e05236d458482269ca8a1",
+        "clause_ids": [
+          "REQ-001",
+          "REQ-002"
+        ]
+      }
+    ],
+    "runner_witnesses": [
+      {
+        "witness_id": "closed-mutation-set",
+        "clause_ids": [
+          "REQ-003"
+        ]
+      }
+    ]
+  }
+}

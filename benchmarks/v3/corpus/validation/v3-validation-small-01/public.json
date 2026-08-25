@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-small-01",
+  "split": "validation",
+  "stratum": "small",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-validation-small-01-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:6d625539e9ebb02b2902b262d3e335d7173b855ad09b81fcc811fa4586364873"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-octal.js",
+      "content": "/**\n * @fileoverview Rule to flag when initializing octal literal\n * @author Ilya Volodin\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../shared/types').Rule} */\nmodule.exports = {\n    meta: {\n        type: \"suggestion\",\n\n        docs: {\n            description: \"disallow octal literals\",\n            recommended: true,\n            url: \"https://eslint.org/docs/rules/no-octal\"\n        },\n\n        schema: [],\n\n        messages: {\n            noOcatal: \"Octal literals should not be used.\"\n        }\n    },\n\n    create(context) {\n\n        return {\n\n            Literal(node) {\n                if (typeof node.value === \"number\" && /^0[0-9]/u.test(node.raw)) {\n                    context.report({\n                        node,\n                        messageId: \"noOcatal\"\n                    });\n                }\n            }\n        };\n\n    }\n};\n"
+    }
+  ]
+}

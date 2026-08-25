@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-small-15",
+  "split": "validation",
+  "stratum": "small",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-validation-small-15-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:192ecaef2b3fc1b60e3603f1cbd2bef3e7345b92b0b6c32b76b2f0bfda9762a6"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/prefer-numeric-literals.js",
+      "content": "/**\n * @fileoverview Rule to disallow `parseInt()` in favor of binary, octal, and hexadecimal literals\n * @author Annie Zhang, Henry Zhu\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst astUtils = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Helpers\n//------------------------------------------------------------------------------\n\nconst radixMap = new Map([\n\t[2, { system: \"binary\", literalPrefix: \"0b\" }],\n\t[8, { system: \"octal\", literalPrefix: \"0o\" }],\n\t[16, { system: \"hexadecimal\", literalPrefix: \"0x\" }],\n]);\n\n/**\n * Checks to see if a CallExpression's callee node is `parseInt` or\n * `Number.parseInt`.\n * @param {ASTNode} calleeNode The callee node to evaluate.\n * @returns {boolean} True if the callee is `parseInt` or `Number.parseInt`,\n * false otherwise.\n */\nfunction isParseInt(calleeNode) {\n\treturn (\n\t\tastUtils.isSpecificId(calleeNode, \"parseInt\") ||\n\t\tastUtils.isSpecificMemberAccess(calleeNode, \"Number\", \"parseInt\")\n\t);\n}\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../types').Rule.RuleModule} */\nmodule.exports = {\n\tmeta: {\n\t\ttype: \"suggestion\",\n\n\t\tdocs: {\n\t\t\tdescription:\n\t\t\t\t\"Disallow `parseInt()` and `Number.parseInt()` in favor of binary, octal, and hexadecimal literals\",\n\t\t\trecommended: false,\n\t\t\tfrozen: true,\n\t\t\turl: \"https://eslint.org/docs/latest/rules/prefer-numeric-literals\",\n\t\t},\n\n\t\tschema: [],\n\n\t\tmessages: {\n\t\t\tuseLiteral:\n\t\t\t\t\"Use {{system}} literals instead of {{functionName}}().\",\n\t\t},\n\n\t\tfixable: \"code\",\n\t},\n\n\tcreate(context) {\n\t\tconst sourceCode = context.sourceCode;\n\n\t\t//----------------------------------------------------------------------\n\t\t// Public\n\t\t//----------------------------------------------------------------------\n\n\t\treturn {\n\t\t\t\"CallExpression[arguments.length=2]\"(node) {\n\t\t\t\tconst [strNode, radixNode] = node.arguments,\n\t\t\t\t\tstr = astUtils.getStaticStringValue(strNode),\n\t\t\t\t\tradix = radixNode.value;\n\n\t\t\t\tif (\n\t\t\t\t\tstr !== null &&\n\t\t\t\t\tastUtils.isStringLiteral(strNode) &&\n\t\t\t\t\tradixNode.type === \"Literal\" &&\n\t\t\t\t\ttypeof radix === \"number\" &&\n\t\t\t\t\tradixMap.has(radix) &&\n\t\t\t\t\tisParseInt(node.callee)\n\t\t\t\t) {\n\t\t\t\t\tconst { system, literalPrefix } = radixMap.get(radix);\n\n\t\t\t\t\tcontext.report({\n\t\t\t\t\t\tnode,\n\t\t\t\t\t\tmessageId: \"useLiteral\",\n\t\t\t\t\t\tdata: {\n\t\t\t\t\t\t\tsystem,\n\t\t\t\t\t\t\tfunctionName: sourceCode.getText(node.callee),\n\t\t\t\t\t\t},\n\t\t\t\t\t\tfix(fixer) {\n\t\t\t\t\t\t\tif (sourceCode.getCommentsInside(node).length) {\n\t\t\t\t\t\t\t\treturn null;\n\t\t\t\t\t\t\t}\n\n\t\t\t\t\t\t\tconst replacement = `${literalPrefix}${str}`;\n\n\t\t\t\t\t\t\tif (+replacement !== parseInt(str, radix)) {\n\t\t\t\t\t\t\t\t/*\n\t\t\t\t\t\t\t\t * If the newly-produced literal would be invalid, (e.g. 0b1234),\n\t\t\t\t\t\t\t\t * or it would yield an incorrect parseInt result for some other reason, don't make a fix.\n\t\t\t\t\t\t\t\t *\n\t\t\t\t\t\t\t\t * If `str` had numeric separators, `+replacement` will evaluate to `NaN` because unary `+`\n\t\t\t\t\t\t\t\t * per the specification doesn't support numeric separators. Thus, the above condition will be `true`\n\t\t\t\t\t\t\t\t * (`NaN !== anything` is always `true`) regardless of the `parseInt(str, radix)` value.\n\t\t\t\t\t\t\t\t * Consequently, no autofixes will be made. This is correct behavior because `parseInt` also\n\t\t\t\t\t\t\t\t * doesn't support numeric separators, but it does parse part of the string before the first `_`,\n\t\t\t\t\t\t\t\t * so the autofix would be invalid:\n\t\t\t\t\t\t\t\t *\n\t\t\t\t\t\t\t\t *   parseInt(\"1_1\", 2) // === 1\n\t\t\t\t\t\t\t\t *   0b1_1 // === 3\n\t\t\t\t\t\t\t\t */\n\t\t\t\t\t\t\t\treturn null;\n\t\t\t\t\t\t\t}\n\n\t\t\t\t\t\t\tconst tokenBefore = sourceCode.getTokenBefore(node),\n\t\t\t\t\t\t\t\ttokenAfter = sourceCode.getTokenAfter(node);\n\t\t\t\t\t\t\tlet prefix = \"\",\n\t\t\t\t\t\t\t\tsuffix = \"\";\n\n\t\t\t\t\t\t\tif (\n\t\t\t\t\t\t\t\ttokenBefore &&\n\t\t\t\t\t\t\t\ttokenBefore.range[1] === node.range[0] &&\n\t\t\t\t\t\t\t\t!astUtils.canTokensBeAdjacent(\n\t\t\t\t\t\t\t\t\ttokenBefore,\n\t\t\t\t\t\t\t\t\treplacement,\n\t\t\t\t\t\t\t\t)\n\t\t\t\t\t\t\t) {\n\t\t\t\t\t\t\t\tprefix = \" \";\n\t\t\t\t\t\t\t}\n\n\t\t\t\t\t\t\tif (\n\t\t\t\t\t\t\t\ttokenAfter &&\n\t\t\t\t\t\t\t\tnode.range[1] === tokenAfter.range[0] &&\n\t\t\t\t\t\t\t\t!astUtils.canTokensBeAdjacent(\n\t\t\t\t\t\t\t\t\treplacement,\n\t\t\t\t\t\t\t\t\ttokenAfter,\n\t\t\t\t\t\t\t\t)\n\t\t\t\t\t\t\t) {\n\t\t\t\t\t\t\t\tsuffix = \" \";\n\t\t\t\t\t\t\t}\n\n\t\t\t\t\t\t\treturn fixer.replaceText(\n\t\t\t\t\t\t\t\tnode,\n\t\t\t\t\t\t\t\t`${prefix}${replacement}${suffix}`,\n\t\t\t\t\t\t\t);\n\t\t\t\t\t\t},\n\t\t\t\t\t});\n\t\t\t\t}\n\t\t\t},\n\t\t};\n\t},\n};\n"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-development-medium-19",
+  "split": "development",
+  "stratum": "medium",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-development-medium-19-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:2752cbf2aeb7263c8b9330bbec465c90547df89ac8359cfcf61f793f80128d77"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-unused-expressions.js",
+      "content": "/**\n * @fileoverview Flag expressions in statement position that do not side effect\n * @author Michael Ficarra\n */\n\"use strict\";\n\nconst astUtils = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/**\n * Returns `true`.\n * @returns {boolean} `true`.\n */\nfunction alwaysTrue() {\n\treturn true;\n}\n\n/**\n * Returns `false`.\n * @returns {boolean} `false`.\n */\nfunction alwaysFalse() {\n\treturn false;\n}\n\n/** @type {import('../types').Rule.RuleModule} */\nmodule.exports = {\n\tmeta: {\n\t\tdialects: [\"javascript\", \"typescript\"],\n\t\tlanguage: \"javascript\",\n\t\ttype: \"suggestion\",\n\n\t\tdocs: {\n\t\t\tdescription: \"Disallow unused expressions\",\n\t\t\trecommended: false,\n\t\t\turl: \"https://eslint.org/docs/latest/rules/no-unused-expressions\",\n\t\t},\n\n\t\tschema: [\n\t\t\t{\n\t\t\t\ttype: \"object\",\n\t\t\t\tproperties: {\n\t\t\t\t\tallowShortCircuit: {\n\t\t\t\t\t\ttype: \"boolean\",\n\t\t\t\t\t},\n\t\t\t\t\tallowTernary: {\n\t\t\t\t\t\ttype: \"boolean\",\n\t\t\t\t\t},\n\t\t\t\t\tallowTaggedTemplates: {\n\t\t\t\t\t\ttype: \"boolean\",\n\t\t\t\t\t},\n\t\t\t\t\tenforceForJSX: {\n\t\t\t\t\t\ttype: \"boolean\",\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t\tadditionalProperties: false,\n\t\t\t},\n\t\t],\n\n\t\tdefaultOptions: [\n\t\t\t{\n\t\t\t\tallowShortCircuit: false,\n\t\t\t\tallowTernary: false,\n\t\t\t\tallowTaggedTemplates: false,\n\t\t\t\tenforceForJSX: false,\n\t\t\t},\n\t\t],\n\n\t\tmessages: {\n\t\t\tunusedExpression:\n\t\t\t\t\"Expected an assignment or function call and instead saw an expression.\",\n\t\t},\n\t},\n\n\tcreate(context) {\n\t\tconst [\n\t\t\t{\n\t\t\t\tallowShortCircuit,\n\t\t\t\tallowTernary,\n\t\t\t\tallowTaggedTemplates,\n\t\t\t\tenforceForJSX,\n\t\t\t},\n\t\t] = context.options;\n\n\t\t/**\n\t\t * Has AST suggesting a directive.\n\t\t * @param {ASTNode} node any node\n\t\t * @returns {boolean} whether the given node structurally represents a directive\n\t\t */\n\t\tfunction looksLikeDirective(node) {\n\t\t\treturn (\n\t\t\t\tnode.type === \"ExpressionStatement\" &&\n\t\t\t\tnode.expression.type === \"Literal\" &&\n\t\t\t\ttypeof node.expression.value === \"string\"\n\t\t\t);\n\t\t}\n\n\t\t/**\n\t\t * Gets the leading sequence of members in a list that pass the predicate.\n\t\t * @param {Function} predicate ([a] -> Boolean) the function used to make the determination\n\t\t * @param {a[]} list the input list\n\t\t * @returns {a[]} the leading sequence of members in the given list that pass the given predicate\n\t\t */\n\t\tfunction takeWhile(predicate, list) {\n\t\t\tfor (let i = 0; i < list.length; ++i) {\n\t\t\t\tif (!predicate(list[i])) {\n\t\t\t\t\treturn list.slice(0, i);\n\t\t\t\t}\n\t\t\t}\n\t\t\treturn list.slice();\n\t\t}\n\n\t\t/**\n\t\t * Gets leading directives nodes in a Node body.\n\t\t * @param {ASTNode} node a Program or BlockStatement node\n\t\t * @returns {ASTNode[]} the leading sequence of directive nodes in the given node's body\n\t\t */\n\t\tfunction directives(node) {\n\t\t\treturn takeWhile(looksLikeDirective, node.body);\n\t\t}\n\n\t\t/**\n\t\t * Detect if a Node is a directive.\n\t\t * @param {ASTNode} node any node\n\t\t * @returns {boolean} whether the given node is considered a directive in its current position\n\t\t */\n\t\tfunction isDirective(node) {\n\t\t\t/**\n\t\t\t * https://tc39.es/ecma262/#directive-prologue\n\t\t\t *\n\t\t\t * Only `FunctionBody`, `ScriptBody` and `ModuleBody` can have directive prologue.\n\t\t\t * Class static blocks do not have directive prologue.\n\t\t\t */\n\t\t\treturn (\n\t\t\t\tastUtils.isTopLevelExpressionStatement(node) &&\n\t\t\t\tdirectives(node.parent).includes(node)\n\t\t\t);\n\t\t}\n\n\t\t/**\n\t\t * The member functions return `true` if the type has no side-effects.\n\t\t * Unknown nodes are handled as `false`, then this rule ignores those.\n\t\t */\n\t\tconst Checker = Object.assign(Object.create(null), {\n\t\t\tisDisallowed(node) {\n\t\t\t\treturn (Checker[node.type] || alwaysFalse)(node);\n\t\t\t},\n\n\t\t\tArrayExpression: alwaysTrue,\n\t\t\tArrowFunctionExpression: alwaysTrue,\n\t\t\tBinaryExpression: alwaysTrue,\n\t\t\tChainExpression(node) {\n\t\t\t\treturn Checker.isDisallowed(node.expression);\n\t\t\t},\n\t\t\tClassExpression: alwaysTrue,\n\t\t\tConditionalExpression(node) {\n\t\t\t\tif (allowTernary) {\n\t\t\t\t\treturn (\n\t\t\t\t\t\tChecker.isDisallowed(node.consequent) ||\n\t\t\t\t\t\tChecker.isDisallowed(node.alternate)\n\t\t\t\t\t);\n\t\t\t\t}\n\t\t\t\treturn true;\n\t\t\t},\n\t\t\tFunctionExpression: alwaysTrue,\n\t\t\tIdentifier: alwaysTrue,\n\t\t\tJSXElement() {\n\t\t\t\treturn enforceForJSX;\n\t\t\t},\n\t\t\tJSXFragment() {\n\t\t\t\treturn enforceForJSX;\n\t\t\t},\n\t\t\tLiteral: alwaysTrue,\n\t\t\tLogicalExpression(node) {\n\t\t\t\tif (allowShortCircuit) {\n\t\t\t\t\treturn Checker.isDisallowed(node.right);\n\t\t\t\t}\n\t\t\t\treturn true;\n\t\t\t},\n\t\t\tMemberExpression: alwaysTrue,\n\t\t\tMetaProperty: alwaysTrue,\n\t\t\tObjectExpression: alwaysTrue,\n\t\t\tSequenceExpression: alwaysTrue,\n\t\t\tTaggedTemplateExpression() {\n\t\t\t\treturn !allowTaggedTemplates;\n\t\t\t},\n\t\t\tTemplateLiteral: alwaysTrue,\n\t\t\tThisExpression: alwaysTrue,\n\t\t\tUnaryExpression(node) {\n\t\t\t\treturn node.operator !== \"void\" && node.operator !== \"delete\";\n\t\t\t},\n\t\t\t// TypeScript-specific node types\n\t\t\tTSAsExpression(node) {\n\t\t\t\treturn Checker.isDisallowed(node.expression);\n\t\t\t},\n\t\t\tTSTypeAssertion(node) {\n\t\t\t\treturn Checker.isDisallowed(node.expression);\n\t\t\t},\n\t\t\tTSNonNullExpression(node) {\n\t\t\t\treturn Checker.isDisallowed(node.expression);\n\t\t\t},\n\t\t\tTSInstantiationExpression(node) {\n\t\t\t\treturn Checker.isDisallowed(node.expression);\n\t\t\t},\n\t\t});\n\n\t\treturn {\n\t\t\tExpressionStatement(node) {\n\t\t\t\tif (\n\t\t\t\t\tChecker.isDisallowed(node.expression) &&\n\t\t\t\t\t!isDirective(node)\n\t\t\t\t) {\n\t\t\t\t\tcontext.report({ node, messageId: \"unusedExpression\" });\n\t\t\t\t}\n\t\t\t},\n\t\t};\n\t},\n};\n"
+    }
+  ]
+}

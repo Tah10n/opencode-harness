@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-development-small-01",
+  "oracle": "upstream-eslint-rule-test-and-closed-mutation-set",
+  "defect_severity": "unclassified",
+  "reference_files": [
+    {
+      "path": "lib/rules/one-var-declaration-per-line.js",
+      "content": "/**\n * @fileoverview Rule to check multiple var declarations per line\n * @author Alberto Rodríguez\n */\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\nmodule.exports = {\n    meta: {\n        type: \"suggestion\",\n\n        docs: {\n            description: \"require or disallow newlines around variable declarations\",\n            category: \"Stylistic Issues\",\n            recommended: false,\n            url: \"https://eslint.org/docs/rules/one-var-declaration-per-line\"\n        },\n\n        schema: [\n            {\n                enum: [\"always\", \"initializations\"]\n            }\n        ],\n\n        fixable: \"whitespace\",\n\n        messages: {\n            expectVarOnNewline: \"Expected variable declaration to be on a new line.\"\n        }\n    },\n\n    create(context) {\n\n        const always = context.options[0] === \"always\";\n\n        //--------------------------------------------------------------------------\n        // Helpers\n        //--------------------------------------------------------------------------\n\n\n        /**\n         * Determine if provided keyword is a variant of for specifiers\n         * @private\n         * @param {string} keyword keyword to test\n         * @returns {boolean} True if `keyword` is a variant of for specifier\n         */\n        function isForTypeSpecifier(keyword) {\n            return keyword === \"ForStatement\" || keyword === \"ForInStatement\" || keyword === \"ForOfStatement\";\n        }\n\n        /**\n         * Checks newlines around variable declarations.\n         * @private\n         * @param {ASTNode} node `VariableDeclaration` node to test\n         * @returns {void}\n         */\n        function checkForNewLine(node) {\n            if (isForTypeSpecifier(node.parent.type)) {\n                return;\n            }\n\n            const declarations = node.declarations;\n            let prev;\n\n            declarations.forEach(current => {\n                if (prev && prev.loc.end.line === current.loc.start.line) {\n                    if (always || prev.init || current.init) {\n                        context.report({\n                            node,\n                            messageId: \"expectVarOnNewline\",\n                            loc: current.loc,\n                            fix: fixer => fixer.insertTextBefore(current, \"\\n\")\n                        });\n                    }\n                }\n                prev = current;\n            });\n        }\n\n        //--------------------------------------------------------------------------\n        // Public\n        //--------------------------------------------------------------------------\n\n        return {\n            VariableDeclaration: checkForNewLine\n        };\n\n    }\n};\n"
+    }
+  ],
+  "hidden_test_files": [
+    {
+      "path": "tests/lib/rules/one-var-declaration-per-line.js",
+      "content": "/**\n * @fileoverview Tests for one-var-declaration-per-line rule.\n * @author Alberto Rodríguez\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst rule = require(\"../../../lib/rules/one-var-declaration-per-line\"),\n    { RuleTester } = require(\"../../../lib/rule-tester\");\n\n//------------------------------------------------------------------------------\n// Fixtures\n//------------------------------------------------------------------------------\n\n/**\n * Returns an error object at the specified line and column\n * @private\n * @param {int} line line number\n * @param {int} column column number\n * @returns {Object} Error object\n */\nfunction errorAt(line, column) {\n    return {\n        messageId: \"expectVarOnNewline\",\n        type: \"VariableDeclaration\",\n        line,\n        column\n    };\n}\n\n\n//------------------------------------------------------------------------------\n// Tests\n//------------------------------------------------------------------------------\n\nconst ruleTester = new RuleTester();\n\nruleTester.run(\"one-var-declaration-per-line\", rule, {\n    valid: [\n        { code: \"var a, b, c,\\nd = 0;\", options: [\"initializations\"] },\n        { code: \"var a, b, c,\\n\\nd = 0;\", options: [\"initializations\"] },\n        { code: \"var a, b,\\nc=0\\nd = 0;\", options: [\"initializations\"] },\n        { code: \"let a, b;\", options: [\"initializations\"], parserOptions: { ecmaVersion: 6 } },\n        { code: \"var a = 0; var b = 0;\", options: [\"initializations\"] },\n        \"var a, b,\\nc=0\\nd = 0;\",\n\n        { code: \"var a,\\nb,\\nc,\\nd = 0;\", options: [\"always\"] },\n        { code: \"var a = 0,\\nb;\", options: [\"always\"] },\n        { code: \"var a = 0,\\n\\nb;\", options: [\"always\"] },\n\n        { code: \"var a; var b;\", options: [\"always\"] },\n        { code: \"for(var a = 0, b = 0;;){}\", options: [\"always\"] },\n        { code: \"for(let a = 0, b = 0;;){}\", options: [\"always\"], parserOptions: { ecmaVersion: 6 } },\n        { code: \"for(const a = 0, b = 0;;){}\", options: [\"always\"], parserOptions: { ecmaVersion: 6 } },\n        { code: \"for(var a in obj){}\", options: [\"always\"] },\n        { code: \"for(let a in obj){}\", options: [\"always\"], parserOptions: { ecmaVersion: 6 } },\n        { code: \"for(const a in obj){}\", options: [\"always\"], parserOptions: { ecmaVersion: 6 } },\n        { code: \"for(var a of arr){}\", options: [\"always\"], parserOptions: { ecmaVersion: 6 } },\n        { code: \"for(let a of arr){}\", options: [\"always\"], parserOptions: { ecmaVersion: 6 } },\n        { code: \"for(const a of arr){}\", options: [\"always\"], parserOptions: { ecmaVersion: 6 } },\n\n        { code: \"export let a, b;\", options: [\"initializations\"], parserOptions: { ecmaVersion: 6, sourceType: \"module\" } },\n        { code: \"export let a,\\n b = 0;\", options: [\"initializations\"], parserOptions: { ecmaVersion: 6, sourceType: \"module\" } }\n    ],\n\n    invalid: [\n        { code: \"var foo, bar;\", output: \"var foo, \\nbar;\", options: [\"always\"], errors: [{ line: 1, column: 10, endLine: 1, endColumn: 13 }] },\n        { code: \"var a, b;\", output: \"var a, \\nb;\", options: [\"always\"], errors: [errorAt(1, 8)] },\n        { code: \"let a, b;\", output: \"let a, \\nb;\", options: [\"always\"], parserOptions: { ecmaVersion: 6 }, errors: [errorAt(1, 8)] },\n        { code: \"var a, b = 0;\", output: \"var a, \\nb = 0;\", options: [\"always\"], errors: [errorAt(1, 8)] },\n        { code: \"var a = {\\n foo: bar\\n}, b;\", output: \"var a = {\\n foo: bar\\n}, \\nb;\", options: [\"always\"], errors: [errorAt(3, 4)] },\n        { code: \"var a\\n=0, b;\", output: \"var a\\n=0, \\nb;\", options: [\"always\"], errors: [errorAt(2, 5)] },\n        { code: \"let a, b = 0;\", output: \"let a, \\nb = 0;\", options: [\"always\"], parserOptions: { ecmaVersion: 6 }, errors: [errorAt(1, 8)] },\n        { code: \"const a = 0, b = 0;\", output: \"const a = 0, \\nb = 0;\", options: [\"always\"], parserOptions: { ecmaVersion: 6 }, errors: [errorAt(1, 14)] },\n\n        { code: \"var foo, bar, baz = 0;\", output: \"var foo, bar, \\nbaz = 0;\", options: [\"initializations\"], errors: [{ line: 1, column: 15, endLine: 1, endColumn: 22 }] },\n        { code: \"var a, b, c = 0;\", output: \"var a, b, \\nc = 0;\", options: [\"initializations\"], errors: [errorAt(1, 11)] },\n        { code: \"var a, b,\\nc = 0, d;\", output: \"var a, b,\\nc = 0, \\nd;\", options: [\"initializations\"], errors: [errorAt(2, 8)] },\n        { code: \"var a, b,\\nc = 0, d = 0;\", output: \"var a, b,\\nc = 0, \\nd = 0;\", options: [\"initializations\"], errors: [errorAt(2, 8)] },\n        { code: \"var a\\n=0, b = 0;\", output: \"var a\\n=0, \\nb = 0;\", options: [\"initializations\"], errors: [errorAt(2, 5)] },\n        { code: \"var a = {\\n foo: bar\\n}, b;\", output: \"var a = {\\n foo: bar\\n}, \\nb;\", options: [\"initializations\"], errors: [errorAt(3, 4)] },\n\n        { code: \"for(var a = 0, b = 0;;){\\nvar c,d;}\", output: \"for(var a = 0, b = 0;;){\\nvar c,\\nd;}\", options: [\"always\"], errors: [errorAt(2, 7)] },\n        { code: \"export let a, b;\", output: \"export let a, \\nb;\", options: [\"always\"], parserOptions: { ecmaVersion: 6, sourceType: \"module\" }, errors: [errorAt(1, 15)] },\n        { code: \"export let a, b = 0;\", output: \"export let a, \\nb = 0;\", options: [\"initializations\"], parserOptions: { ecmaVersion: 6, sourceType: \"module\" }, errors: [errorAt(1, 15)] }\n    ]\n});\n"
+    }
+  ],
+  "allowed_mutation_paths": [
+    "lib/rules/one-var-declaration-per-line.js"
+  ],
+  "test_argv": [
+    "--timeout",
+    "30000",
+    "tests/lib/rules/one-var-declaration-per-line.js"
+  ],
+  "runtime_key": "eslint-v7",
+  "runtime_version": "7.0",
+  "provenance": {
+    "kind": "real-commit-derived",
+    "repository": "https://github.com/eslint/eslint",
+    "source_commit": "de0aab95005f172db72196fc3fd18e91ee9a5880",
+    "parent_commit": "1710296082083602a904b080908657bb431fb56c",
+    "source_paths": [
+      "lib/rules/one-var-declaration-per-line.js"
+    ],
+    "patch_fingerprint": "sha256:5bc2b1d335a830fe6a11887bef6e84807dc340267e51c9d7d17217d0c7a3c81e",
+    "visible_requirement_fingerprint": "sha256:7deaa173c3ca4a72c1650ae0f140d6e997027adabc802d4b429d66b78a874f80",
+    "license": "MIT",
+    "license_fingerprint": "sha256:73e2034fe7f17e603f7c3a4bb7f8b71db11a63f94907d08e756c9d4d72a35505"
+  },
+  "requirement_coverage": {
+    "schema_version": 1,
+    "contract_fingerprint": "sha256:1d3a1e85616eb25a26b175fe94de49bdeae8aef249acec05fa1fd65340c5d4c8",
+    "contract_completeness": "unverified",
+    "hidden_test_witnesses": [
+      {
+        "hidden_test_fingerprint": "sha256:954b90e0be566ebefbe65ffb0cb7814c75281669eeae9e1341f912f42c2ee945",
+        "clause_ids": [
+          "REQ-001",
+          "REQ-002"
+        ]
+      }
+    ],
+    "runner_witnesses": [
+      {
+        "witness_id": "closed-mutation-set",
+        "clause_ids": [
+          "REQ-003"
+        ]
+      }
+    ]
+  }
+}

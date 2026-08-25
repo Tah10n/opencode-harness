@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-development-high-18",
+  "split": "development",
+  "stratum": "high",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-development-high-18-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:8b9fd2e22d65a4414a5361b71a570b7e6fc65d11aed9fd79331c9bf848d25c6b"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-implied-eval.js",
+      "content": "/**\n * @fileoverview Rule to flag use of implied eval via setTimeout and setInterval\n * @author James Allardice\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst astUtils = require(\"./utils/ast-utils\");\nconst { getStaticValue } = require(\"@eslint-community/eslint-utils\");\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../types').Rule.RuleModule} */\nmodule.exports = {\n\tmeta: {\n\t\ttype: \"suggestion\",\n\n\t\tdocs: {\n\t\t\tdescription: \"Disallow the use of `eval()`-like methods\",\n\t\t\trecommended: false,\n\t\t\turl: \"https://eslint.org/docs/latest/rules/no-implied-eval\",\n\t\t},\n\n\t\tschema: [],\n\n\t\tmessages: {\n\t\t\timpliedEval:\n\t\t\t\t\"Implied eval. Consider passing a function instead of a string.\",\n\t\t\texecScript: \"Implied eval. Do not use execScript().\",\n\t\t},\n\t},\n\n\tcreate(context) {\n\t\tconst GLOBAL_CANDIDATES = Object.freeze([\n\t\t\t\"global\",\n\t\t\t\"window\",\n\t\t\t\"globalThis\",\n\t\t]);\n\t\tconst EVAL_LIKE_FUNC_PATTERN =\n\t\t\t/^(?:set(?:Interval|Timeout)|execScript)$/u;\n\t\tconst sourceCode = context.sourceCode;\n\n\t\t/**\n\t\t * Checks whether a node is evaluated as a string or not.\n\t\t * @param {ASTNode} node A node to check.\n\t\t * @returns {boolean} True if the node is evaluated as a string.\n\t\t */\n\t\tfunction isEvaluatedString(node) {\n\t\t\tif (\n\t\t\t\t(node.type === \"Literal\" && typeof node.value === \"string\") ||\n\t\t\t\tnode.type === \"TemplateLiteral\"\n\t\t\t) {\n\t\t\t\treturn true;\n\t\t\t}\n\t\t\tif (node.type === \"BinaryExpression\" && node.operator === \"+\") {\n\t\t\t\treturn (\n\t\t\t\t\tisEvaluatedString(node.left) ||\n\t\t\t\t\tisEvaluatedString(node.right)\n\t\t\t\t);\n\t\t\t}\n\t\t\treturn false;\n\t\t}\n\n\t\t/**\n\t\t * Reports if the `CallExpression` node has evaluated argument.\n\t\t * @param {ASTNode} node A CallExpression to check.\n\t\t * @returns {void}\n\t\t */\n\t\tfunction reportImpliedEvalCallExpression(node) {\n\t\t\tconst [firstArgument] = node.arguments;\n\n\t\t\tif (firstArgument) {\n\t\t\t\tconst staticValue = getStaticValue(\n\t\t\t\t\tfirstArgument,\n\t\t\t\t\tsourceCode.getScope(node),\n\t\t\t\t);\n\t\t\t\tconst isStaticString =\n\t\t\t\t\tstaticValue && typeof staticValue.value === \"string\";\n\t\t\t\tconst isString =\n\t\t\t\t\tisStaticString || isEvaluatedString(firstArgument);\n\n\t\t\t\tif (isString) {\n\t\t\t\t\tconst calleeName =\n\t\t\t\t\t\tnode.callee.type === \"Identifier\"\n\t\t\t\t\t\t\t? node.callee.name\n\t\t\t\t\t\t\t: astUtils.getStaticPropertyName(node.callee);\n\t\t\t\t\tconst isExecScript = calleeName === \"execScript\";\n\t\t\t\t\tcontext.report({\n\t\t\t\t\t\tnode,\n\t\t\t\t\t\tmessageId: isExecScript ? \"execScript\" : \"impliedEval\",\n\t\t\t\t\t});\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\n\t\t/**\n\t\t * Reports calls of `implied eval` via the global references.\n\t\t * @param {Variable} globalVar A global variable to check.\n\t\t * @returns {void}\n\t\t */\n\t\tfunction reportImpliedEvalViaGlobal(globalVar) {\n\t\t\tconst { references, name } = globalVar;\n\n\t\t\treferences.forEach(ref => {\n\t\t\t\tconst identifier = ref.identifier;\n\t\t\t\tlet node = identifier.parent;\n\n\t\t\t\twhile (astUtils.isSpecificMemberAccess(node, null, name)) {\n\t\t\t\t\tnode = node.parent;\n\t\t\t\t}\n\n\t\t\t\tif (\n\t\t\t\t\tastUtils.isSpecificMemberAccess(\n\t\t\t\t\t\tnode,\n\t\t\t\t\t\tnull,\n\t\t\t\t\t\tEVAL_LIKE_FUNC_PATTERN,\n\t\t\t\t\t)\n\t\t\t\t) {\n\t\t\t\t\tconst calleeNode =\n\t\t\t\t\t\tnode.parent.type === \"ChainExpression\"\n\t\t\t\t\t\t\t? node.parent\n\t\t\t\t\t\t\t: node;\n\t\t\t\t\tconst parent = calleeNode.parent;\n\n\t\t\t\t\tif (\n\t\t\t\t\t\tparent.type === \"CallExpression\" &&\n\t\t\t\t\t\tparent.callee === calleeNode\n\t\t\t\t\t) {\n\t\t\t\t\t\treportImpliedEvalCallExpression(parent);\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t});\n\t\t}\n\n\t\t//--------------------------------------------------------------------------\n\t\t// Public\n\t\t//--------------------------------------------------------------------------\n\n\t\treturn {\n\t\t\tCallExpression(node) {\n\t\t\t\tif (\n\t\t\t\t\tastUtils.isSpecificId(\n\t\t\t\t\t\tnode.callee,\n\t\t\t\t\t\tEVAL_LIKE_FUNC_PATTERN,\n\t\t\t\t\t) &&\n\t\t\t\t\tsourceCode.isGlobalReference(node.callee)\n\t\t\t\t) {\n\t\t\t\t\treportImpliedEvalCallExpression(node);\n\t\t\t\t}\n\t\t\t},\n\t\t\t\"Program:exit\"(node) {\n\t\t\t\tconst globalScope = sourceCode.getScope(node);\n\n\t\t\t\tGLOBAL_CANDIDATES.map(candidate =>\n\t\t\t\t\tastUtils.getVariableByName(globalScope, candidate),\n\t\t\t\t)\n\t\t\t\t\t.filter(\n\t\t\t\t\t\tglobalVar => !!globalVar && globalVar.defs.length === 0,\n\t\t\t\t\t)\n\t\t\t\t\t.forEach(reportImpliedEvalViaGlobal);\n\t\t\t},\n\t\t};\n\t},\n};\n"
+    }
+  ]
+}

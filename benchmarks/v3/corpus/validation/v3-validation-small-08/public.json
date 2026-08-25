@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-small-08",
+  "split": "validation",
+  "stratum": "small",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-validation-small-08-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:f013fecb0f3edd7a510b4b1902bfe4df6d258386011fe339c1d6a7ca5aa52a93"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-useless-concat.js",
+      "content": "/**\n * @fileoverview disallow unnecessary concatenation of template strings\n * @author Henry Zhu\n */\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst astUtils = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Helpers\n//------------------------------------------------------------------------------\n\n/**\n * Checks whether or not a given node is a concatenation.\n * @param {ASTNode} node A node to check.\n * @returns {boolean} `true` if the node is a concatenation.\n */\nfunction isConcatenation(node) {\n    return node.type === \"BinaryExpression\" && node.operator === \"+\";\n}\n\n/**\n * Checks if the given token is a `+` token or not.\n * @param {Token} token The token to check.\n * @returns {boolean} `true` if the token is a `+` token.\n */\nfunction isConcatOperatorToken(token) {\n    return token.value === \"+\" && token.type === \"Punctuator\";\n}\n\n/**\n * Get's the right most node on the left side of a BinaryExpression with + operator.\n * @param {ASTNode} node A BinaryExpression node to check.\n * @returns {ASTNode} node\n */\nfunction getLeft(node) {\n    let left = node.left;\n\n    while (isConcatenation(left)) {\n        left = left.right;\n    }\n    return left;\n}\n\n/**\n * Get's the left most node on the right side of a BinaryExpression with + operator.\n * @param {ASTNode} node A BinaryExpression node to check.\n * @returns {ASTNode} node\n */\nfunction getRight(node) {\n    let right = node.right;\n\n    while (isConcatenation(right)) {\n        right = right.left;\n    }\n    return right;\n}\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\nmodule.exports = {\n    meta: {\n        type: \"suggestion\",\n\n        docs: {\n            description: \"disallow unnecessary concatenation of literals or template literals\",\n            category: \"Best Practices\",\n            recommended: false,\n            url: \"https://eslint.org/docs/rules/no-useless-concat\"\n        },\n\n        schema: [],\n\n        messages: {\n            unexpectedConcat: \"Unexpected string concatenation of literals.\"\n        }\n    },\n\n    create(context) {\n        const sourceCode = context.getSourceCode();\n\n        return {\n            BinaryExpression(node) {\n\n                // check if not concatenation\n                if (node.operator !== \"+\") {\n                    return;\n                }\n\n                // account for the `foo + \"a\" + \"b\"` case\n                const left = getLeft(node);\n                const right = getRight(node);\n\n                if (astUtils.isStringLiteral(left) &&\n                    astUtils.isStringLiteral(right) &&\n                    astUtils.isTokenOnSameLine(left, right)\n                ) {\n                    const operatorToken = sourceCode.getFirstTokenBetween(left, right, isConcatOperatorToken);\n\n                    context.report({\n                        node,\n                        loc: operatorToken.loc.start,\n                        messageId: \"unexpectedConcat\"\n                    });\n                }\n            }\n        };\n    }\n};\n"
+    }
+  ]
+}

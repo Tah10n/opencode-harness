@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-holdout-high-27",
+  "split": "holdout",
+  "stratum": "high",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-holdout-high-27-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:d603aacda4b368f79254a2daf8e2096ec21ea6085b57b512848a14ac15906095"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-implicit-globals.js",
+      "content": "/**\n * @fileoverview Rule to check for implicit global variables and functions.\n * @author Joshua Peek\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\nmodule.exports = {\n    meta: {\n        type: \"suggestion\",\n\n        docs: {\n            description: \"disallow variable and `function` declarations in the global scope\",\n            category: \"Best Practices\",\n            recommended: false,\n            url: \"https://eslint.org/docs/rules/no-implicit-globals\"\n        },\n\n        schema: []\n    },\n\n    create(context) {\n        return {\n            Program() {\n                const scope = context.getScope();\n\n                scope.variables.forEach(variable => {\n                    if (variable.writeable) {\n                        return;\n                    }\n\n                    variable.defs.forEach(def => {\n                        if (def.type === \"FunctionName\" || (def.type === \"Variable\" && def.parent.kind === \"var\")) {\n                            context.report({ node: def.node, message: \"Implicit global variable, assign as global property instead.\" });\n                        }\n                    });\n                });\n\n                scope.implicit.variables.forEach(variable => {\n                    const scopeVariable = scope.set.get(variable.name);\n\n                    if (scopeVariable && scopeVariable.writeable) {\n                        return;\n                    }\n\n                    variable.defs.forEach(def => {\n                        context.report({ node: def.node, message: \"Implicit global variable, assign as global property instead.\" });\n                    });\n                });\n            }\n        };\n\n    }\n};\n"
+    }
+  ]
+}

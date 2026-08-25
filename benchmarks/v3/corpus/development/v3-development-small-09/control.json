@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-development-small-09",
+  "oracle": "upstream-eslint-rule-test-and-closed-mutation-set",
+  "defect_severity": "unclassified",
+  "reference_files": [
+    {
+      "path": "lib/rules/no-with.js",
+      "content": "/**\n * @fileoverview Rule to flag use of with statement\n * @author Nicholas C. Zakas\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../types').Rule.RuleModule} */\nmodule.exports = {\n\tmeta: {\n\t\ttype: \"suggestion\",\n\n\t\tdocs: {\n\t\t\tdescription: \"Disallow `with` statements\",\n\t\t\trecommended: true,\n\t\t\turl: \"https://eslint.org/docs/latest/rules/no-with\",\n\t\t},\n\n\t\tschema: [],\n\n\t\tmessages: {\n\t\t\tunexpectedWith: \"Unexpected use of 'with' statement.\",\n\t\t},\n\t},\n\n\tcreate(context) {\n\t\tconst sourceCode = context.sourceCode;\n\n\t\treturn {\n\t\t\tWithStatement(node) {\n\t\t\t\tcontext.report({\n\t\t\t\t\tnode,\n\t\t\t\t\tloc: sourceCode.getFirstToken(node).loc,\n\t\t\t\t\tmessageId: \"unexpectedWith\",\n\t\t\t\t});\n\t\t\t},\n\t\t};\n\t},\n};\n"
+    }
+  ],
+  "hidden_test_files": [
+    {
+      "path": "tests/lib/rules/no-with.js",
+      "content": "/**\n * @fileoverview Tests for no-with rule.\n * @author Nicholas C. Zakas\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst rule = require(\"../../../lib/rules/no-with\"),\n\tRuleTester = require(\"../../../lib/rule-tester/rule-tester\");\n\n//------------------------------------------------------------------------------\n// Tests\n//------------------------------------------------------------------------------\n\nconst ruleTester = new RuleTester({\n\tlanguageOptions: {\n\t\tecmaVersion: 5,\n\t\tsourceType: \"script\",\n\t},\n});\n\nruleTester.run(\"no-with\", rule, {\n\tvalid: [\"foo.bar()\"],\n\tinvalid: [\n\t\t{\n\t\t\tcode: \"with(foo) { bar() }\",\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"unexpectedWith\",\n\t\t\t\t\tline: 1,\n\t\t\t\t\tcolumn: 1,\n\t\t\t\t\tendLine: 1,\n\t\t\t\t\tendColumn: 5,\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t],\n});\n"
+    }
+  ],
+  "allowed_mutation_paths": [
+    "lib/rules/no-with.js"
+  ],
+  "test_argv": [
+    "--timeout",
+    "30000",
+    "tests/lib/rules/no-with.js"
+  ],
+  "runtime_key": "eslint-v10",
+  "runtime_version": "10.4",
+  "provenance": {
+    "kind": "real-commit-derived",
+    "repository": "https://github.com/eslint/eslint",
+    "source_commit": "b5657837604fa5e8cf1278074782025cadd34b6c",
+    "parent_commit": "2ce032fbc72a1a80c024c084a4f382fb6dece684",
+    "source_paths": [
+      "lib/rules/no-with.js"
+    ],
+    "patch_fingerprint": "sha256:73656d9db16996d52fb36587971eed8cca266a0461704694de10f4da19c2d3b7",
+    "visible_requirement_fingerprint": "sha256:efb51d43597c71094ed514a55558e4ae539a085ab426c57ea872f4228d98e061",
+    "license": "MIT",
+    "license_fingerprint": "sha256:73e2034fe7f17e603f7c3a4bb7f8b71db11a63f94907d08e756c9d4d72a35505"
+  },
+  "requirement_coverage": {
+    "schema_version": 1,
+    "contract_fingerprint": "sha256:e84599a2ad5e8aff9d6b3e7bf7d2778a672aaf580bf9305c4966dc9c8dbe64f8",
+    "contract_completeness": "unverified",
+    "hidden_test_witnesses": [
+      {
+        "hidden_test_fingerprint": "sha256:9ef852be99dbcaf9e09125b33cb9b61cde9dc5f3c0a937552c671bcf0a781461",
+        "clause_ids": [
+          "REQ-001",
+          "REQ-002"
+        ]
+      }
+    ],
+    "runner_witnesses": [
+      {
+        "witness_id": "closed-mutation-set",
+        "clause_ids": [
+          "REQ-003"
+        ]
+      }
+    ]
+  }
+}

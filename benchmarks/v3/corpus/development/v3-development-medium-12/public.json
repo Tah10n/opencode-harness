@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-development-medium-12",
+  "split": "development",
+  "stratum": "medium",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-development-medium-12-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:a455d1b88a46ed3c7999988c0842ff7b65c9a464f9b540fd2ee251828634f781"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-empty-character-class.js",
+      "content": "/**\n * @fileoverview Rule to flag the use of empty character classes in regular expressions\n * @author Ian Christian Myers\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Helpers\n//------------------------------------------------------------------------------\n\n/*\n * plain-English description of the following regexp:\n * 0. `^` fix the match at the beginning of the string\n * 1. `([^\\\\[]|\\\\.|\\[([^\\\\\\]]|\\\\.)+\\])*`: regexp contents; 0 or more of the following\n * 1.0. `[^\\\\[]`: any character that's not a `\\` or a `[` (anything but escape sequences and character classes)\n * 1.1. `\\\\.`: an escape sequence\n * 1.2. `\\[([^\\\\\\]]|\\\\.)+\\]`: a character class that isn't empty\n * 2. `$`: fix the match at the end of the string\n */\nconst regex = /^([^\\\\[]|\\\\.|\\[([^\\\\\\]]|\\\\.)+\\])*$/u;\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../shared/types').Rule} */\nmodule.exports = {\n    meta: {\n        type: \"problem\",\n\n        docs: {\n            description: \"Disallow empty character classes in regular expressions\",\n            recommended: true,\n            url: \"https://eslint.org/docs/latest/rules/no-empty-character-class\"\n        },\n\n        schema: [],\n\n        messages: {\n            unexpected: \"Empty class.\"\n        }\n    },\n\n    create(context) {\n        return {\n            \"Literal[regex]\"(node) {\n                if (!regex.test(node.regex.pattern)) {\n                    context.report({ node, messageId: \"unexpected\" });\n                }\n            }\n        };\n\n    }\n};\n"
+    }
+  ]
+}

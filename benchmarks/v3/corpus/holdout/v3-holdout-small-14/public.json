@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-holdout-small-14",
+  "split": "holdout",
+  "stratum": "small",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-holdout-small-14-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:78b5db5a05f4ae47d523e19350b0d011dd353967fb8b11fa45b4ca124f61aeca"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/linebreak-style.js",
+      "content": "/**\n * @fileoverview Rule to enforce a single linebreak style.\n * @author Erik Mueller\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst astUtils = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\nmodule.exports = {\n    meta: {\n        type: \"layout\",\n\n        docs: {\n            description: \"enforce consistent linebreak style\",\n            category: \"Stylistic Issues\",\n            recommended: false,\n            url: \"https://eslint.org/docs/rules/linebreak-style\"\n        },\n\n        fixable: \"whitespace\",\n\n        schema: [\n            {\n                enum: [\"unix\", \"windows\"]\n            }\n        ],\n        messages: {\n            expectedLF: \"Expected linebreaks to be 'LF' but found 'CRLF'.\",\n            expectedCRLF: \"Expected linebreaks to be 'CRLF' but found 'LF'.\"\n        }\n    },\n\n    create(context) {\n        const sourceCode = context.getSourceCode();\n\n        //--------------------------------------------------------------------------\n        // Helpers\n        //--------------------------------------------------------------------------\n\n        /**\n         * Builds a fix function that replaces text at the specified range in the source text.\n         * @param {int[]} range The range to replace\n         * @param {string} text The text to insert.\n         * @returns {Function} Fixer function\n         * @private\n         */\n        function createFix(range, text) {\n            return function(fixer) {\n                return fixer.replaceTextRange(range, text);\n            };\n        }\n\n        //--------------------------------------------------------------------------\n        // Public\n        //--------------------------------------------------------------------------\n\n        return {\n            Program: function checkForLinebreakStyle(node) {\n                const linebreakStyle = context.options[0] || \"unix\",\n                    expectedLF = linebreakStyle === \"unix\",\n                    expectedLFChars = expectedLF ? \"\\n\" : \"\\r\\n\",\n                    source = sourceCode.getText(),\n                    pattern = astUtils.createGlobalLinebreakMatcher();\n                let match;\n\n                let i = 0;\n\n                while ((match = pattern.exec(source)) !== null) {\n                    i++;\n                    if (match[0] === expectedLFChars) {\n                        continue;\n                    }\n\n                    const index = match.index;\n                    const range = [index, index + match[0].length];\n\n                    context.report({\n                        node,\n                        loc: {\n                            line: i,\n                            column: sourceCode.lines[i - 1].length\n                        },\n                        messageId: expectedLF ? \"expectedLF\" : \"expectedCRLF\",\n                        fix: createFix(range, expectedLFChars)\n                    });\n                }\n            }\n        };\n    }\n};\n"
+    }
+  ]
+}

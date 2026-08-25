@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-holdout-high-19",
+  "split": "holdout",
+  "stratum": "high",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-holdout-high-19-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:b1e1598da8fb65082006a43c2295692ab258c3b0934f2c2c75f97215852c9bc4"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/default-param-last.js",
+      "content": "/**\n * @fileoverview enforce default parameters to be last\n * @author Chiawen Chen\n */\n\n\"use strict\";\n\n/** @type {import('../shared/types').Rule} */\nmodule.exports = {\n    meta: {\n        type: \"suggestion\",\n\n        docs: {\n            description: \"Enforce default parameters to be last\",\n            recommended: false,\n            frozen: true,\n            url: \"https://eslint.org/docs/latest/rules/default-param-last\"\n        },\n\n        schema: [],\n\n        messages: {\n            shouldBeLast: \"Default parameters should be last.\"\n        }\n    },\n\n    create(context) {\n\n        /**\n         * Handler for function contexts.\n         * @param {ASTNode} node function node\n         * @returns {void}\n         */\n        function handleFunction(node) {\n            let hasSeenPlainParam = false;\n\n            for (let i = node.params.length - 1; i >= 0; i -= 1) {\n                const param = node.params[i];\n\n                if (\n                    param.type !== \"AssignmentPattern\" &&\n                    param.type !== \"RestElement\"\n                ) {\n                    hasSeenPlainParam = true;\n                    continue;\n                }\n\n                if (hasSeenPlainParam && param.type === \"AssignmentPattern\") {\n                    context.report({\n                        node: param,\n                        messageId: \"shouldBeLast\"\n                    });\n                }\n            }\n        }\n\n        return {\n            FunctionDeclaration: handleFunction,\n            FunctionExpression: handleFunction,\n            ArrowFunctionExpression: handleFunction\n        };\n    }\n};\n"
+    }
+  ]
+}

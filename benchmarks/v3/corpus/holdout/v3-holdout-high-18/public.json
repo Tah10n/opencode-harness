@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-holdout-high-18",
+  "split": "holdout",
+  "stratum": "high",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-holdout-high-18-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:ba7add1ba271b457ee0d6b3f7cfe961e7c0262a832b2d865ff0390df9a71873d"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/sort-keys.js",
+      "content": "/**\n * @fileoverview Rule to require object keys to be sorted\n * @author Toru Nagashima\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst astUtils = require(\"./utils/ast-utils\"),\n    naturalCompare = require(\"natural-compare\");\n\n//------------------------------------------------------------------------------\n// Helpers\n//------------------------------------------------------------------------------\n\n/**\n * Gets the property name of the given `Property` node.\n *\n * - If the property's key is an `Identifier` node, this returns the key's name\n *   whether it's a computed property or not.\n * - If the property has a static name, this returns the static name.\n * - Otherwise, this returns null.\n * @param {ASTNode} node The `Property` node to get.\n * @returns {string|null} The property name or null.\n * @private\n */\nfunction getPropertyName(node) {\n    const staticName = astUtils.getStaticPropertyName(node);\n\n    if (staticName !== null) {\n        return staticName;\n    }\n\n    return node.key.name || null;\n}\n\n/**\n * Functions which check that the given 2 names are in specific order.\n *\n * Postfix `I` is meant insensitive.\n * Postfix `N` is meant natural.\n * @private\n */\nconst isValidOrders = {\n    asc(a, b) {\n        return a <= b;\n    },\n    ascI(a, b) {\n        return a.toLowerCase() <= b.toLowerCase();\n    },\n    ascN(a, b) {\n        return naturalCompare(a, b) <= 0;\n    },\n    ascIN(a, b) {\n        return naturalCompare(a.toLowerCase(), b.toLowerCase()) <= 0;\n    },\n    desc(a, b) {\n        return isValidOrders.asc(b, a);\n    },\n    descI(a, b) {\n        return isValidOrders.ascI(b, a);\n    },\n    descN(a, b) {\n        return isValidOrders.ascN(b, a);\n    },\n    descIN(a, b) {\n        return isValidOrders.ascIN(b, a);\n    }\n};\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../shared/types').Rule} */\nmodule.exports = {\n    meta: {\n        type: \"suggestion\",\n\n        docs: {\n            description: \"Require object keys to be sorted\",\n            recommended: false,\n            url: \"https://eslint.org/docs/rules/sort-keys\"\n        },\n\n        schema: [\n            {\n                enum: [\"asc\", \"desc\"]\n            },\n            {\n                type: \"object\",\n                properties: {\n                    caseSensitive: {\n                        type: \"boolean\",\n                        default: true\n                    },\n                    natural: {\n                        type: \"boolean\",\n                        default: false\n                    },\n                    minKeys: {\n                        type: \"integer\",\n                        minimum: 2,\n                        default: 2\n                    }\n                },\n                additionalProperties: false\n            }\n        ],\n\n        messages: {\n            sortKeys: \"Expected object keys to be in {{natural}}{{insensitive}}{{order}}ending order. '{{thisName}}' should be before '{{prevName}}'.\"\n        }\n    },\n\n    create(context) {\n\n        // Parse options.\n        const order = context.options[0] || \"asc\";\n        const options = context.options[1];\n        const insensitive = options && options.caseSensitive === false;\n        const natural = options && options.natural;\n        const minKeys = options && options.minKeys;\n        const isValidOrder = isValidOrders[\n            order + (insensitive ? \"I\" : \"\") + (natural ? \"N\" : \"\")\n        ];\n\n        // The stack to save the previous property's name for each object literals.\n        let stack = null;\n\n        return {\n            ObjectExpression(node) {\n                stack = {\n                    upper: stack,\n                    prevName: null,\n                    numKeys: node.properties.length\n                };\n            },\n\n            \"ObjectExpression:exit\"() {\n                stack = stack.upper;\n            },\n\n            SpreadElement(node) {\n                if (node.parent.type === \"ObjectExpression\") {\n                    stack.prevName = null;\n                }\n            },\n\n            Property(node) {\n                if (node.parent.type === \"ObjectPattern\") {\n                    return;\n                }\n\n                const prevName = stack.prevName;\n                const numKeys = stack.numKeys;\n                const thisName = getPropertyName(node);\n\n                if (thisName !== null) {\n                    stack.prevName = thisName;\n                }\n\n                if (prevName === null || thisName === null || numKeys < minKeys) {\n                    return;\n                }\n\n                if (!isValidOrder(prevName, thisName)) {\n                    context.report({\n                        node,\n                        loc: node.key.loc,\n                        messageId: \"sortKeys\",\n                        data: {\n                            thisName,\n                            prevName,\n                            order,\n                            insensitive: insensitive ? \"insensitive \" : \"\",\n                            natural: natural ? \"natural \" : \"\"\n                        }\n                    });\n                }\n            }\n        };\n    }\n};\n"
+    }
+  ]
+}

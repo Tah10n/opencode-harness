@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-holdout-small-08",
+  "split": "holdout",
+  "stratum": "small",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-holdout-small-08-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:ab331749ba5e67908908e69fa261c70946d8dbf7d38a8f4e4abb55d13b9aa364"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/max-classes-per-file.js",
+      "content": "/**\n * @fileoverview Enforce a maximum number of classes per file\n * @author James Garbutt <https://github.com/43081j>\n */\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../types').Rule.RuleModule} */\nmodule.exports = {\n\tmeta: {\n\t\ttype: \"suggestion\",\n\n\t\tdocs: {\n\t\t\tdescription: \"Enforce a maximum number of classes per file\",\n\t\t\trecommended: false,\n\t\t\turl: \"https://eslint.org/docs/latest/rules/max-classes-per-file\",\n\t\t},\n\n\t\tschema: [\n\t\t\t{\n\t\t\t\toneOf: [\n\t\t\t\t\t{\n\t\t\t\t\t\ttype: \"integer\",\n\t\t\t\t\t\tminimum: 1,\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\ttype: \"object\",\n\t\t\t\t\t\tproperties: {\n\t\t\t\t\t\t\tignoreExpressions: {\n\t\t\t\t\t\t\t\ttype: \"boolean\",\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\tmax: {\n\t\t\t\t\t\t\t\ttype: \"integer\",\n\t\t\t\t\t\t\t\tminimum: 1,\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t},\n\t\t\t\t\t\tadditionalProperties: false,\n\t\t\t\t\t},\n\t\t\t\t],\n\t\t\t},\n\t\t],\n\n\t\tdefaultOptions: [1],\n\n\t\tmessages: {\n\t\t\tmaximumExceeded:\n\t\t\t\t\"File has too many classes ({{ classCount }}). Maximum allowed is {{ max }}.\",\n\t\t},\n\t},\n\tcreate(context) {\n\t\tconst option = context.options[0];\n\t\tconst [ignoreExpressions, max] =\n\t\t\ttypeof option === \"number\"\n\t\t\t\t? [false, option]\n\t\t\t\t: [option.ignoreExpressions, option.max || 1];\n\n\t\tlet classCount = 0;\n\n\t\treturn {\n\t\t\tProgram() {\n\t\t\t\tclassCount = 0;\n\t\t\t},\n\t\t\t\"Program:exit\"(node) {\n\t\t\t\tif (classCount > max) {\n\t\t\t\t\tcontext.report({\n\t\t\t\t\t\tnode,\n\t\t\t\t\t\tmessageId: \"maximumExceeded\",\n\t\t\t\t\t\tdata: {\n\t\t\t\t\t\t\tclassCount,\n\t\t\t\t\t\t\tmax,\n\t\t\t\t\t\t},\n\t\t\t\t\t});\n\t\t\t\t}\n\t\t\t},\n\t\t\tClassDeclaration() {\n\t\t\t\tclassCount++;\n\t\t\t},\n\t\t\tClassExpression() {\n\t\t\t\tif (!ignoreExpressions) {\n\t\t\t\t\tclassCount++;\n\t\t\t\t}\n\t\t\t},\n\t\t};\n\t},\n};\n"
+    }
+  ]
+}

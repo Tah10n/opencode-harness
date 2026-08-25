@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-medium-18",
+  "oracle": "upstream-eslint-rule-test-and-closed-mutation-set",
+  "defect_severity": "unclassified",
+  "reference_files": [
+    {
+      "path": "lib/rules/no-new-func.js",
+      "content": "/**\n * @fileoverview Rule to flag when using new Function\n * @author Ilya Volodin\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst astUtils = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Helpers\n//------------------------------------------------------------------------------\n\nconst callMethods = new Set([\"apply\", \"bind\", \"call\"]);\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\nmodule.exports = {\n    meta: {\n        type: \"suggestion\",\n\n        docs: {\n            description: \"disallow `new` operators with the `Function` object\",\n            recommended: false,\n            url: \"https://eslint.org/docs/rules/no-new-func\"\n        },\n\n        schema: [],\n\n        messages: {\n            noFunctionConstructor: \"The Function constructor is eval.\"\n        }\n    },\n\n    create(context) {\n\n        return {\n            \"Program:exit\"() {\n                const globalScope = context.getScope();\n                const variable = globalScope.set.get(\"Function\");\n\n                if (variable && variable.defs.length === 0) {\n                    variable.references.forEach(ref => {\n                        const node = ref.identifier;\n                        const { parent } = node;\n                        let evalNode;\n\n                        if (parent) {\n                            if (node === parent.callee && (\n                                parent.type === \"NewExpression\" ||\n                                parent.type === \"CallExpression\"\n                            )) {\n                                evalNode = parent;\n                            } else if (\n                                parent.type === \"MemberExpression\" &&\n                                node === parent.object &&\n                                callMethods.has(astUtils.getStaticPropertyName(parent))\n                            ) {\n                                const maybeCallee = parent.parent.type === \"ChainExpression\" ? parent.parent : parent;\n\n                                if (maybeCallee.parent.type === \"CallExpression\" && maybeCallee.parent.callee === maybeCallee) {\n                                    evalNode = maybeCallee.parent;\n                                }\n                            }\n                        }\n\n                        if (evalNode) {\n                            context.report({\n                                node: evalNode,\n                                messageId: \"noFunctionConstructor\"\n                            });\n                        }\n                    });\n                }\n            }\n        };\n\n    }\n};\n"
+    }
+  ],
+  "hidden_test_files": [
+    {
+      "path": "tests/lib/rules/no-new-func.js",
+      "content": "/**\n * @fileoverview Tests for no-new-func rule.\n * @author Ilya Volodin\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst rule = require(\"../../../lib/rules/no-new-func\"),\n    { RuleTester } = require(\"../../../lib/rule-tester\");\n\n//------------------------------------------------------------------------------\n// Tests\n//------------------------------------------------------------------------------\n\nconst ruleTester = new RuleTester();\n\nruleTester.run(\"no-new-func\", rule, {\n    valid: [\n        \"var a = new _function(\\\"b\\\", \\\"c\\\", \\\"return b+c\\\");\",\n        \"var a = _function(\\\"b\\\", \\\"c\\\", \\\"return b+c\\\");\",\n        {\n            code: \"class Function {}; new Function()\",\n            parserOptions: {\n                ecmaVersion: 2015\n            }\n        },\n        {\n            code: \"const fn = () => { class Function {}; new Function() }\",\n            parserOptions: {\n                ecmaVersion: 2015\n            }\n        },\n        \"function Function() {}; Function()\",\n        \"var fn = function () { function Function() {}; Function() }\",\n        \"var x = function Function() { Function(); }\",\n        \"call(Function)\",\n        \"new Class(Function)\",\n        \"foo[Function]()\",\n        \"foo(Function.bind)\",\n        \"Function.toString()\",\n        \"Function[call]()\"\n    ],\n    invalid: [\n        {\n            code: \"var a = new Function(\\\"b\\\", \\\"c\\\", \\\"return b+c\\\");\",\n            errors: [{\n                messageId: \"noFunctionConstructor\",\n                type: \"NewExpression\"\n            }]\n        },\n        {\n            code: \"var a = Function(\\\"b\\\", \\\"c\\\", \\\"return b+c\\\");\",\n            errors: [{\n                messageId: \"noFunctionConstructor\",\n                type: \"CallExpression\"\n            }]\n        },\n        {\n            code: \"var a = Function.call(null, \\\"b\\\", \\\"c\\\", \\\"return b+c\\\");\",\n            errors: [{\n                messageId: \"noFunctionConstructor\",\n                type: \"CallExpression\"\n            }]\n        },\n        {\n            code: \"var a = Function.apply(null, [\\\"b\\\", \\\"c\\\", \\\"return b+c\\\"]);\",\n            errors: [{\n                messageId: \"noFunctionConstructor\",\n                type: \"CallExpression\"\n            }]\n        },\n        {\n            code: \"var a = Function.bind(null, \\\"b\\\", \\\"c\\\", \\\"return b+c\\\")();\",\n            errors: [{\n                messageId: \"noFunctionConstructor\",\n                type: \"CallExpression\"\n            }]\n        },\n        {\n            code: \"var a = Function.bind(null, \\\"b\\\", \\\"c\\\", \\\"return b+c\\\");\",\n            errors: [{\n                messageId: \"noFunctionConstructor\",\n                type: \"CallExpression\"\n            }]\n        },\n        {\n            code: \"var a = Function[\\\"call\\\"](null, \\\"b\\\", \\\"c\\\", \\\"return b+c\\\");\",\n            errors: [{\n                messageId: \"noFunctionConstructor\",\n                type: \"CallExpression\"\n            }]\n        },\n        {\n            code: \"var a = (Function?.call)(null, \\\"b\\\", \\\"c\\\", \\\"return b+c\\\");\",\n            parserOptions: { ecmaVersion: 2021 },\n            errors: [{\n                messageId: \"noFunctionConstructor\",\n                type: \"CallExpression\"\n            }]\n        },\n        {\n            code: \"const fn = () => { class Function {} }; new Function('', '')\",\n            parserOptions: {\n                ecmaVersion: 2015\n            },\n            errors: [{\n                messageId: \"noFunctionConstructor\",\n                type: \"NewExpression\"\n            }]\n        },\n        {\n            code: \"var fn = function () { function Function() {} }; Function('', '')\",\n            errors: [{\n                messageId: \"noFunctionConstructor\",\n                type: \"CallExpression\"\n            }]\n        }\n    ]\n});\n"
+    }
+  ],
+  "allowed_mutation_paths": [
+    "lib/rules/no-new-func.js"
+  ],
+  "test_argv": [
+    "--timeout",
+    "30000",
+    "tests/lib/rules/no-new-func.js"
+  ],
+  "runtime_key": "eslint-v8.0",
+  "runtime_version": "8.0",
+  "provenance": {
+    "kind": "real-commit-derived",
+    "repository": "https://github.com/eslint/eslint",
+    "source_commit": "14a4739ab2233acef995a6dde233de05d067a0f3",
+    "parent_commit": "7f2346b40ffd0d470092e52b995d7ab2648089db",
+    "source_paths": [
+      "lib/rules/no-new-func.js"
+    ],
+    "patch_fingerprint": "sha256:695f866d835ac903876a925f9ade427a6cadfed625f3ac75559d28c4e6a83ab3",
+    "visible_requirement_fingerprint": "sha256:9e3a1160d5916d44d7549bbd894115afb4eaa9bafb2a002511fc572ccb89d273",
+    "license": "MIT",
+    "license_fingerprint": "sha256:73e2034fe7f17e603f7c3a4bb7f8b71db11a63f94907d08e756c9d4d72a35505"
+  },
+  "requirement_coverage": {
+    "schema_version": 1,
+    "contract_fingerprint": "sha256:1eb703d4c0dcc5982445fff065de7ad773f2db43d7f1f53d9315028738c27579",
+    "contract_completeness": "unverified",
+    "hidden_test_witnesses": [
+      {
+        "hidden_test_fingerprint": "sha256:de999414d163ad07feb5db4e7349a1c5312e0762231e6be81f3442c451ad644e",
+        "clause_ids": [
+          "REQ-001",
+          "REQ-002"
+        ]
+      }
+    ],
+    "runner_witnesses": [
+      {
+        "witness_id": "closed-mutation-set",
+        "clause_ids": [
+          "REQ-003"
+        ]
+      }
+    ]
+  }
+}

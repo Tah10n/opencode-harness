@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-medium-03",
+  "split": "validation",
+  "stratum": "medium",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-validation-medium-03-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:509830b0572ec59c616b0cb96956954a10d723248ef765e15b8297edba9ba0ce"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-void.js",
+      "content": "/**\n * @fileoverview Rule to disallow use of void operator.\n * @author Mike Sidorov\n */\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\nmodule.exports = {\n    meta: {\n        type: \"suggestion\",\n\n        docs: {\n            description: \"disallow `void` operators\",\n            category: \"Best Practices\",\n            recommended: false,\n            url: \"https://eslint.org/docs/rules/no-void\"\n        },\n\n        schema: []\n    },\n\n    create(context) {\n\n        //--------------------------------------------------------------------------\n        // Public\n        //--------------------------------------------------------------------------\n\n        return {\n            UnaryExpression(node) {\n                if (node.operator === \"void\") {\n                    context.report({ node, message: \"Expected 'undefined' and instead saw 'void'.\" });\n                }\n            }\n        };\n\n    }\n};\n"
+    }
+  ]
+}

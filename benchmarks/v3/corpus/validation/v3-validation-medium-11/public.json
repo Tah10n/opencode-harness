@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-medium-11",
+  "split": "validation",
+  "stratum": "medium",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-validation-medium-11-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:a8e03fa98adc454405ef76bfbf3ebf879b90e77f1dd3d9c76e92f4d9ce76f4b6"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-duplicate-case.js",
+      "content": "/**\n * @fileoverview Rule to disallow a duplicate case label.\n * @author Dieter Oberkofler\n * @author Burak Yigit Kaya\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\nmodule.exports = {\n    meta: {\n        type: \"problem\",\n\n        docs: {\n            description: \"disallow duplicate case labels\",\n            category: \"Possible Errors\",\n            recommended: true,\n            url: \"https://eslint.org/docs/rules/no-duplicate-case\"\n        },\n\n        schema: [],\n\n        messages: {\n            unexpected: \"Duplicate case label.\"\n        }\n    },\n\n    create(context) {\n        const sourceCode = context.getSourceCode();\n\n        return {\n            SwitchStatement(node) {\n                const previousKeys = new Set();\n\n                for (const switchCase of node.cases) {\n                    if (switchCase.test) {\n                        const key = sourceCode.getText(switchCase.test);\n\n                        if (previousKeys.has(key)) {\n                            context.report({ node: switchCase, messageId: \"unexpected\" });\n                        } else {\n                            previousKeys.add(key);\n                        }\n                    }\n                }\n            }\n        };\n    }\n};\n"
+    }
+  ]
+}

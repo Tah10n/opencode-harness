@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-medium-05",
+  "split": "validation",
+  "stratum": "medium",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-validation-medium-05-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:f257f35b9b9d89cdfb4ad1b2571d578c342c98ff81a95381203446ee3d09d21d"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/max-nested-callbacks.js",
+      "content": "/**\n * @fileoverview Rule to enforce a maximum number of nested callbacks.\n * @author Ian Christian Myers\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst astUtils = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../types').Rule.RuleModule} */\nmodule.exports = {\n\tmeta: {\n\t\ttype: \"suggestion\",\n\n\t\tdocs: {\n\t\t\tdescription: \"Enforce a maximum depth that callbacks can be nested\",\n\t\t\trecommended: false,\n\t\t\turl: \"https://eslint.org/docs/latest/rules/max-nested-callbacks\",\n\t\t},\n\n\t\tschema: [\n\t\t\t{\n\t\t\t\toneOf: [\n\t\t\t\t\t{\n\t\t\t\t\t\ttype: \"integer\",\n\t\t\t\t\t\tminimum: 0,\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\ttype: \"object\",\n\t\t\t\t\t\tproperties: {\n\t\t\t\t\t\t\tmaximum: {\n\t\t\t\t\t\t\t\ttype: \"integer\",\n\t\t\t\t\t\t\t\tminimum: 0,\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\tmax: {\n\t\t\t\t\t\t\t\ttype: \"integer\",\n\t\t\t\t\t\t\t\tminimum: 0,\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t},\n\t\t\t\t\t\tadditionalProperties: false,\n\t\t\t\t\t},\n\t\t\t\t],\n\t\t\t},\n\t\t],\n\n\t\tdefaultOptions: [10],\n\n\t\tmessages: {\n\t\t\texceed: \"Too many nested callbacks ({{num}}). Maximum allowed is {{max}}.\",\n\t\t},\n\t},\n\n\tcreate(context) {\n\t\tconst sourceCode = context.sourceCode;\n\n\t\t//--------------------------------------------------------------------------\n\t\t// Constants\n\t\t//--------------------------------------------------------------------------\n\t\tconst option = context.options[0];\n\t\tlet THRESHOLD = 10;\n\n\t\tif (\n\t\t\ttypeof option === \"object\" &&\n\t\t\t(Object.hasOwn(option, \"maximum\") || Object.hasOwn(option, \"max\"))\n\t\t) {\n\t\t\tTHRESHOLD = option.maximum || option.max;\n\t\t} else if (typeof option === \"number\") {\n\t\t\tTHRESHOLD = option;\n\t\t}\n\n\t\t//--------------------------------------------------------------------------\n\t\t// Helpers\n\t\t//--------------------------------------------------------------------------\n\n\t\tconst callbackStack = [];\n\n\t\t/**\n\t\t * Checks a given function node for too many callbacks.\n\t\t * @param {ASTNode} node The node to check.\n\t\t * @returns {void}\n\t\t * @private\n\t\t */\n\t\tfunction checkFunction(node) {\n\t\t\tconst parent = node.parent;\n\n\t\t\tif (parent.type !== \"CallExpression\" || parent.callee === node) {\n\t\t\t\treturn;\n\t\t\t}\n\n\t\t\tcallbackStack.push(node);\n\n\t\t\tif (callbackStack.length > THRESHOLD) {\n\t\t\t\tconst opts = { num: callbackStack.length, max: THRESHOLD };\n\n\t\t\t\tcontext.report({\n\t\t\t\t\tnode,\n\t\t\t\t\tloc: astUtils.getFunctionHeadLoc(node, sourceCode),\n\t\t\t\t\tmessageId: \"exceed\",\n\t\t\t\t\tdata: opts,\n\t\t\t\t});\n\t\t\t}\n\t\t}\n\n\t\t/**\n\t\t * Pops the call stack.\n\t\t * @param {ASTNode} node The node to check.\n\t\t * @returns {void}\n\t\t * @private\n\t\t */\n\t\tfunction popStack(node) {\n\t\t\tif (callbackStack.at(-1) === node) {\n\t\t\t\tcallbackStack.pop();\n\t\t\t}\n\t\t}\n\n\t\t//--------------------------------------------------------------------------\n\t\t// Public API\n\t\t//--------------------------------------------------------------------------\n\n\t\treturn {\n\t\t\tArrowFunctionExpression: checkFunction,\n\t\t\t\"ArrowFunctionExpression:exit\": popStack,\n\n\t\t\tFunctionExpression: checkFunction,\n\t\t\t\"FunctionExpression:exit\": popStack,\n\t\t};\n\t},\n};\n"
+    }
+  ]
+}

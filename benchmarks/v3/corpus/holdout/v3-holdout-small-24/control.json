@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-holdout-small-24",
+  "oracle": "upstream-eslint-rule-test-and-closed-mutation-set",
+  "defect_severity": "unclassified",
+  "reference_files": [
+    {
+      "path": "lib/rules/no-script-url.js",
+      "content": "/**\n * @fileoverview Rule to flag when using javascript: urls\n * @author Ilya Volodin\n */\n/* jshint scripturl: true */\n/* eslint no-script-url: 0 */\n\n\"use strict\";\n\nconst astUtils = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\nmodule.exports = {\n    meta: {\n        type: \"suggestion\",\n\n        docs: {\n            description: \"disallow `javascript:` urls\",\n            category: \"Best Practices\",\n            recommended: false,\n            url: \"https://eslint.org/docs/rules/no-script-url\"\n        },\n\n        schema: [],\n\n        messages: {\n            unexpectedScriptURL: \"Script URL is a form of eval.\"\n        }\n    },\n\n    create(context) {\n\n        /**\n         * Check whether a node's static value starts with \"javascript:\" or not.\n         * And report an error for unexpected script URL.\n         * @param {ASTNode} node node to check\n         * @returns {void}\n         */\n        function check(node) {\n            const value = astUtils.getStaticStringValue(node);\n\n            if (typeof value === \"string\" && value.toLowerCase().indexOf(\"javascript:\") === 0) {\n                context.report({ node, messageId: \"unexpectedScriptURL\" });\n            }\n        }\n        return {\n            Literal(node) {\n                if (node.value && typeof node.value === \"string\") {\n                    check(node);\n                }\n            },\n            TemplateLiteral(node) {\n                if (!(node.parent && node.parent.type === \"TaggedTemplateExpression\")) {\n                    check(node);\n                }\n            }\n        };\n    }\n};\n"
+    }
+  ],
+  "hidden_test_files": [
+    {
+      "path": "tests/lib/rules/no-script-url.js",
+      "content": "/**\n * @fileoverview Tests for no-script-url rule.\n * @author Ilya Volodin\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst rule = require(\"../../../lib/rules/no-script-url\"),\n    { RuleTester } = require(\"../../../lib/rule-tester\");\n\n//------------------------------------------------------------------------------\n// Tests\n//------------------------------------------------------------------------------\n\nconst ruleTester = new RuleTester();\n\nruleTester.run(\"no-script-url\", rule, {\n    valid: [\n        \"var a = 'Hello World!';\",\n        \"var a = 10;\",\n        \"var url = 'xjavascript:'\",\n        {\n            code: \"var url = `xjavascript:`\",\n            parserOptions: { ecmaVersion: 6 }\n        },\n        {\n            code: \"var url = `${foo}javascript:`\",\n            parserOptions: { ecmaVersion: 6 }\n        },\n        {\n            code: \"var a = foo`javaScript:`;\",\n            parserOptions: { ecmaVersion: 6 }\n        }\n    ],\n    invalid: [\n        {\n            code: \"var a = 'javascript:void(0);';\",\n            errors: [\n                { messageId: \"unexpectedScriptURL\", type: \"Literal\" }\n            ]\n        },\n        {\n            code: \"var a = 'javascript:';\",\n            errors: [\n                { messageId: \"unexpectedScriptURL\", type: \"Literal\" }\n            ]\n        },\n        {\n            code: \"var a = `javascript:`;\",\n            parserOptions: { ecmaVersion: 6 },\n            errors: [\n                { messageId: \"unexpectedScriptURL\", type: \"TemplateLiteral\" }\n            ]\n        },\n        {\n            code: \"var a = `JavaScript:`;\",\n            parserOptions: { ecmaVersion: 6 },\n            errors: [\n                { messageId: \"unexpectedScriptURL\", type: \"TemplateLiteral\" }\n            ]\n        }\n    ]\n});\n"
+    }
+  ],
+  "allowed_mutation_paths": [
+    "lib/rules/no-script-url.js"
+  ],
+  "test_argv": [
+    "--timeout",
+    "30000",
+    "tests/lib/rules/no-script-url.js"
+  ],
+  "runtime_key": "eslint-v7",
+  "runtime_version": "7.11",
+  "provenance": {
+    "kind": "real-commit-derived",
+    "repository": "https://github.com/eslint/eslint",
+    "source_commit": "5183b14a2420b42b4089fb134a61ae57142f31fd",
+    "parent_commit": "bfe97d2332e711ca76b1fd2e7f8548b0cc84cb1c",
+    "source_paths": [
+      "lib/rules/no-script-url.js"
+    ],
+    "patch_fingerprint": "sha256:56e5d02a29dc50c4c61843335cc9536f3506146b73956113e974a8e0fafdc653",
+    "visible_requirement_fingerprint": "sha256:db3c3d854f8cbac2abd31c8dc5775b3a3fce1e54ed3dd9e88d79bb17228cd448",
+    "license": "MIT",
+    "license_fingerprint": "sha256:73e2034fe7f17e603f7c3a4bb7f8b71db11a63f94907d08e756c9d4d72a35505"
+  },
+  "requirement_coverage": {
+    "schema_version": 1,
+    "contract_fingerprint": "sha256:4a70d55183c612b3cce34416c359acfc86c69d7a06bf36459bea68a10f661fb2",
+    "contract_completeness": "unverified",
+    "hidden_test_witnesses": [
+      {
+        "hidden_test_fingerprint": "sha256:456154b9c34424bd3a2c08f85ac3ae29f8892f340d1df357e0c8dee18e1c6e1f",
+        "clause_ids": [
+          "REQ-001",
+          "REQ-002"
+        ]
+      }
+    ],
+    "runner_witnesses": [
+      {
+        "witness_id": "closed-mutation-set",
+        "clause_ids": [
+          "REQ-003"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-holdout-high-03",
+  "split": "holdout",
+  "stratum": "high",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-holdout-high-03-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:fba4a6dbd729d2fac2556eecc8a448594af1c127739de07e229b6201e360d7a8"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/template-curly-spacing.js",
+      "content": "/**\n * @fileoverview Rule to enforce spacing around embedded expressions of template strings\n * @author Toru Nagashima\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst astUtils = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Helpers\n//------------------------------------------------------------------------------\n\nconst OPEN_PAREN = /\\$\\{$/u;\nconst CLOSE_PAREN = /^\\}/u;\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\nmodule.exports = {\n    meta: {\n        type: \"layout\",\n\n        docs: {\n            description: \"require or disallow spacing around embedded expressions of template strings\",\n            category: \"ECMAScript 6\",\n            recommended: false,\n            url: \"https://eslint.org/docs/rules/template-curly-spacing\"\n        },\n\n        fixable: \"whitespace\",\n\n        schema: [\n            { enum: [\"always\", \"never\"] }\n        ],\n        messages: {\n            expectedBefore: \"Expected space(s) before '}'.\",\n            expectedAfter: \"Expected space(s) after '${'.\",\n            unexpectedBefore: \"Unexpected space(s) before '}'.\",\n            unexpectedAfter: \"Unexpected space(s) after '${'.\"\n        }\n    },\n\n    create(context) {\n        const sourceCode = context.getSourceCode();\n        const always = context.options[0] === \"always\";\n        const prefix = always ? \"expected\" : \"unexpected\";\n\n        /**\n         * Checks spacing before `}` of a given token.\n         * @param {Token} token A token to check. This is a Template token.\n         * @returns {void}\n         */\n        function checkSpacingBefore(token) {\n            const prevToken = sourceCode.getTokenBefore(token, { includeComments: true });\n\n            if (prevToken &&\n                CLOSE_PAREN.test(token.value) &&\n                astUtils.isTokenOnSameLine(prevToken, token) &&\n                sourceCode.isSpaceBetweenTokens(prevToken, token) !== always\n            ) {\n                context.report({\n                    loc: token.loc.start,\n                    messageId: `${prefix}Before`,\n                    fix(fixer) {\n                        if (always) {\n                            return fixer.insertTextBefore(token, \" \");\n                        }\n                        return fixer.removeRange([\n                            prevToken.range[1],\n                            token.range[0]\n                        ]);\n                    }\n                });\n            }\n        }\n\n        /**\n         * Checks spacing after `${` of a given token.\n         * @param {Token} token A token to check. This is a Template token.\n         * @returns {void}\n         */\n        function checkSpacingAfter(token) {\n            const nextToken = sourceCode.getTokenAfter(token, { includeComments: true });\n\n            if (nextToken &&\n                OPEN_PAREN.test(token.value) &&\n                astUtils.isTokenOnSameLine(token, nextToken) &&\n                sourceCode.isSpaceBetweenTokens(token, nextToken) !== always\n            ) {\n                context.report({\n                    loc: {\n                        line: token.loc.end.line,\n                        column: token.loc.end.column - 2\n                    },\n                    messageId: `${prefix}After`,\n                    fix(fixer) {\n                        if (always) {\n                            return fixer.insertTextAfter(token, \" \");\n                        }\n                        return fixer.removeRange([\n                            token.range[1],\n                            nextToken.range[0]\n                        ]);\n                    }\n                });\n            }\n        }\n\n        return {\n            TemplateElement(node) {\n                const token = sourceCode.getFirstToken(node);\n\n                checkSpacingBefore(token);\n                checkSpacingAfter(token);\n            }\n        };\n    }\n};\n"
+    }
+  ]
+}

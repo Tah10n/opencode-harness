@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-development-small-17",
+  "split": "development",
+  "stratum": "small",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-development-small-17-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:df5b9f3ca18f29a7edb1e1e7ec8742d3642d3ae77fefa1ef86d49b0222b845fc"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-async-promise-executor.js",
+      "content": "/**\n * @fileoverview disallow using an async function as a Promise executor\n * @author Teddy Katz\n */\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../types').Rule.RuleModule} */\nmodule.exports = {\n\tmeta: {\n\t\ttype: \"problem\",\n\n\t\tdocs: {\n\t\t\tdescription:\n\t\t\t\t\"Disallow using an async function as a Promise executor\",\n\t\t\trecommended: true,\n\t\t\turl: \"https://eslint.org/docs/latest/rules/no-async-promise-executor\",\n\t\t},\n\n\t\tfixable: null,\n\t\tschema: [],\n\t\tmessages: {\n\t\t\tasync: \"Promise executor functions should not be async.\",\n\t\t},\n\t},\n\n\tcreate(context) {\n\t\treturn {\n\t\t\t\"NewExpression[callee.name='Promise'][arguments.0.async=true]\"(\n\t\t\t\tnode,\n\t\t\t) {\n\t\t\t\tcontext.report({\n\t\t\t\t\tnode: context.sourceCode.getFirstToken(\n\t\t\t\t\t\tnode.arguments[0],\n\t\t\t\t\t\ttoken => token.value === \"async\",\n\t\t\t\t\t),\n\t\t\t\t\tmessageId: \"async\",\n\t\t\t\t});\n\t\t\t},\n\t\t};\n\t},\n};\n"
+    }
+  ]
+}

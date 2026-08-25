@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-high-17",
+  "split": "validation",
+  "stratum": "high",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-validation-high-17-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:fa71657832feb6baaa169e3d802d3d252472a41d2adb23ce1dfe23bb06c8dad8"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-shadow-restricted-names.js",
+      "content": "/**\n * @fileoverview Disallow shadowing of NaN, undefined, and Infinity (ES5 section 15.1.1)\n * @author Michael Ficarra\n */\n\"use strict\";\n\n/**\n * Determines if a variable safely shadows undefined.\n * This is the case when a variable named `undefined` is never assigned to a value (i.e. it always shares the same value\n * as the global).\n * @param {eslintScope.Variable} variable The variable to check\n * @returns {boolean} true if this variable safely shadows `undefined`\n */\nfunction safelyShadowsUndefined(variable) {\n\treturn (\n\t\tvariable.name === \"undefined\" &&\n\t\tvariable.references.every(ref => !ref.isWrite()) &&\n\t\tvariable.defs.every(\n\t\t\tdef =>\n\t\t\t\tdef.node.type === \"VariableDeclarator\" &&\n\t\t\t\tdef.node.init === null,\n\t\t)\n\t);\n}\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../types').Rule.RuleModule} */\nmodule.exports = {\n\tmeta: {\n\t\ttype: \"suggestion\",\n\n\t\tdocs: {\n\t\t\tdescription: \"Disallow identifiers from shadowing restricted names\",\n\t\t\trecommended: true,\n\t\t\turl: \"https://eslint.org/docs/latest/rules/no-shadow-restricted-names\",\n\t\t},\n\n\t\tschema: [],\n\n\t\tmessages: {\n\t\t\tshadowingRestrictedName: \"Shadowing of global property '{{name}}'.\",\n\t\t},\n\t},\n\n\tcreate(context) {\n\t\tconst RESTRICTED = new Set([\n\t\t\t\"undefined\",\n\t\t\t\"NaN\",\n\t\t\t\"Infinity\",\n\t\t\t\"arguments\",\n\t\t\t\"eval\",\n\t\t]);\n\t\tconst sourceCode = context.sourceCode;\n\n\t\t// Track reported nodes to avoid duplicate reports. For example, on class declarations.\n\t\tconst reportedNodes = new Set();\n\n\t\treturn {\n\t\t\t\"VariableDeclaration, :function, CatchClause, ImportDeclaration, ClassDeclaration, ClassExpression\"(\n\t\t\t\tnode,\n\t\t\t) {\n\t\t\t\tfor (const variable of sourceCode.getDeclaredVariables(node)) {\n\t\t\t\t\tif (\n\t\t\t\t\t\tvariable.defs.length > 0 &&\n\t\t\t\t\t\tRESTRICTED.has(variable.name) &&\n\t\t\t\t\t\t!safelyShadowsUndefined(variable)\n\t\t\t\t\t) {\n\t\t\t\t\t\tfor (const def of variable.defs) {\n\t\t\t\t\t\t\tconst nodeToReport = def.name;\n\n\t\t\t\t\t\t\tif (!reportedNodes.has(nodeToReport)) {\n\t\t\t\t\t\t\t\treportedNodes.add(nodeToReport);\n\t\t\t\t\t\t\t\tcontext.report({\n\t\t\t\t\t\t\t\t\tnode: nodeToReport,\n\t\t\t\t\t\t\t\t\tmessageId: \"shadowingRestrictedName\",\n\t\t\t\t\t\t\t\t\tdata: {\n\t\t\t\t\t\t\t\t\t\tname: variable.name,\n\t\t\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t},\n\t\t};\n\t},\n};\n"
+    }
+  ]
+}

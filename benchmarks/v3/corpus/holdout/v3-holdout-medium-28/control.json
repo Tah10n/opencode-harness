@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-holdout-medium-28",
+  "oracle": "upstream-eslint-rule-test-and-closed-mutation-set",
+  "defect_severity": "unclassified",
+  "reference_files": [
+    {
+      "path": "lib/rules/no-plusplus.js",
+      "content": "/**\n * @fileoverview Rule to flag use of unary increment and decrement operators.\n * @author Ian Christian Myers\n * @author Brody McKee (github.com/mrmckeb)\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Helpers\n//------------------------------------------------------------------------------\n\n/**\n * Determines whether the given node is the update node of a `ForStatement`.\n * @param {ASTNode} node The node to check.\n * @returns {boolean} `true` if the node is `ForStatement` update.\n */\nfunction isForStatementUpdate(node) {\n    const parent = node.parent;\n\n    return parent.type === \"ForStatement\" && parent.update === node;\n}\n\n/**\n * Determines whether the given node is considered to be a for loop \"afterthought\" by the logic of this rule.\n * In particular, it returns `true` if the given node is either:\n *   - The update node of a `ForStatement`: for (;; i++) {}\n *   - An operand of a sequence expression that is the update node: for (;; foo(), i++) {}\n *   - An operand of a sequence expression that is child of another sequence expression, etc.,\n *     up to the sequence expression that is the update node: for (;; foo(), (bar(), (baz(), i++))) {}\n * @param {ASTNode} node The node to check.\n * @returns {boolean} `true` if the node is a for loop afterthought.\n */\nfunction isForLoopAfterthought(node) {\n    const parent = node.parent;\n\n    if (parent.type === \"SequenceExpression\") {\n        return isForLoopAfterthought(parent);\n    }\n\n    return isForStatementUpdate(node);\n}\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\nmodule.exports = {\n    meta: {\n        type: \"suggestion\",\n\n        docs: {\n            description: \"disallow the unary operators `++` and `--`\",\n            category: \"Stylistic Issues\",\n            recommended: false,\n            url: \"https://eslint.org/docs/rules/no-plusplus\"\n        },\n\n        schema: [\n            {\n                type: \"object\",\n                properties: {\n                    allowForLoopAfterthoughts: {\n                        type: \"boolean\",\n                        default: false\n                    }\n                },\n                additionalProperties: false\n            }\n        ],\n\n        messages: {\n            unexpectedUnaryOp: \"Unary operator '{{operator}}' used.\"\n        }\n    },\n\n    create(context) {\n\n        const config = context.options[0];\n        let allowForLoopAfterthoughts = false;\n\n        if (typeof config === \"object\") {\n            allowForLoopAfterthoughts = config.allowForLoopAfterthoughts === true;\n        }\n\n        return {\n\n            UpdateExpression(node) {\n                if (allowForLoopAfterthoughts && isForLoopAfterthought(node)) {\n                    return;\n                }\n\n                context.report({\n                    node,\n                    messageId: \"unexpectedUnaryOp\",\n                    data: {\n                        operator: node.operator\n                    }\n                });\n            }\n\n        };\n\n    }\n};\n"
+    }
+  ],
+  "hidden_test_files": [
+    {
+      "path": "tests/lib/rules/no-plusplus.js",
+      "content": "/**\n * @fileoverview Tests for no-plusplus.\n * @author Ian Christian Myers\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst rule = require(\"../../../lib/rules/no-plusplus\"),\n    { RuleTester } = require(\"../../../lib/rule-tester\");\n\n//------------------------------------------------------------------------------\n// Tests\n//------------------------------------------------------------------------------\n\nconst ruleTester = new RuleTester();\n\nruleTester.run(\"no-plusplus\", rule, {\n    valid: [\n        \"var foo = 0; foo=+1;\",\n\n        // With \"allowForLoopAfterthoughts\" allowed\n        { code: \"var foo = 0; foo=+1;\", options: [{ allowForLoopAfterthoughts: true }] },\n        { code: \"for (i = 0; i < l; i++) { console.log(i); }\", options: [{ allowForLoopAfterthoughts: true }] },\n        { code: \"for (var i = 0, j = i + 1; j < example.length; i++, j++) {}\", options: [{ allowForLoopAfterthoughts: true }] },\n        { code: \"for (;; i--, foo());\", options: [{ allowForLoopAfterthoughts: true }] },\n        { code: \"for (;; foo(), --i);\", options: [{ allowForLoopAfterthoughts: true }] },\n        { code: \"for (;; foo(), ++i, bar);\", options: [{ allowForLoopAfterthoughts: true }] },\n        { code: \"for (;; i++, (++j, k--));\", options: [{ allowForLoopAfterthoughts: true }] },\n        { code: \"for (;; foo(), (bar(), i++), baz());\", options: [{ allowForLoopAfterthoughts: true }] },\n        { code: \"for (;; (--i, j += 2), bar = j + 1);\", options: [{ allowForLoopAfterthoughts: true }] },\n        { code: \"for (;; a, (i--, (b, ++j, c)), d);\", options: [{ allowForLoopAfterthoughts: true }] }\n    ],\n\n    invalid: [\n        {\n            code: \"var foo = 0; foo++;\",\n            errors: [{\n                messageId: \"unexpectedUnaryOp\",\n                data: {\n                    operator: \"++\"\n                },\n                type: \"UpdateExpression\"\n            }]\n        },\n        {\n            code: \"var foo = 0; foo--;\",\n            errors: [{\n                messageId: \"unexpectedUnaryOp\",\n                data: {\n                    operator: \"--\"\n                },\n                type: \"UpdateExpression\"\n            }]\n        },\n        {\n            code: \"for (i = 0; i < l; i++) { console.log(i); }\",\n            errors: [{\n                messageId: \"unexpectedUnaryOp\",\n                data: {\n                    operator: \"++\"\n                },\n                type: \"UpdateExpression\"\n            }]\n        },\n        {\n            code: \"for (i = 0; i < l; foo, i++) { console.log(i); }\",\n            errors: [{\n                messageId: \"unexpectedUnaryOp\",\n                data: {\n                    operator: \"++\"\n                },\n                type: \"UpdateExpression\"\n            }]\n        },\n\n        // With \"allowForLoopAfterthoughts\" allowed\n        {\n            code: \"var foo = 0; foo++;\",\n            options: [{ allowForLoopAfterthoughts: true }],\n            errors: [{\n                messageId: \"unexpectedUnaryOp\",\n                data: {\n                    operator: \"++\"\n                },\n                type: \"UpdateExpression\"\n            }]\n        },\n        {\n            code: \"for (i = 0; i < l; i++) { v++; }\",\n            options: [{ allowForLoopAfterthoughts: true }],\n            errors: [{\n                messageId: \"unexpectedUnaryOp\",\n                data: {\n                    operator: \"++\"\n                },\n                type: \"UpdateExpression\"\n            }]\n        },\n        {\n            code: \"for (i++;;);\",\n            options: [{ allowForLoopAfterthoughts: true }],\n            errors: [{\n                messageId: \"unexpectedUnaryOp\",\n                data: {\n                    operator: \"++\"\n                },\n                type: \"UpdateExpression\"\n            }]\n        },\n        {\n            code: \"for (;--i;);\",\n            options: [{ allowForLoopAfterthoughts: true }],\n            errors: [{\n                messageId: \"unexpectedUnaryOp\",\n                data: {\n                    operator: \"--\"\n                },\n                type: \"UpdateExpression\"\n            }]\n        },\n        {\n            code: \"for (;;) ++i;\",\n            options: [{ allowForLoopAfterthoughts: true }],\n            errors: [{\n                messageId: \"unexpectedUnaryOp\",\n                data: {\n                    operator: \"++\"\n                },\n                type: \"UpdateExpression\"\n            }]\n        },\n        {\n            code: \"for (;; i = j++);\",\n            options: [{ allowForLoopAfterthoughts: true }],\n            errors: [{\n                messageId: \"unexpectedUnaryOp\",\n                data: {\n                    operator: \"++\"\n                },\n                type: \"UpdateExpression\"\n            }]\n        },\n        {\n            code: \"for (;; i++, f(--j));\",\n            options: [{ allowForLoopAfterthoughts: true }],\n            errors: [{\n                messageId: \"unexpectedUnaryOp\",\n                data: {\n                    operator: \"--\"\n                },\n                type: \"UpdateExpression\"\n            }]\n        },\n        {\n            code: \"for (;; foo + (i++, bar));\",\n            options: [{ allowForLoopAfterthoughts: true }],\n            errors: [{\n                messageId: \"unexpectedUnaryOp\",\n                data: {\n                    operator: \"++\"\n                },\n                type: \"UpdateExpression\"\n            }]\n        }\n    ]\n});\n"
+    }
+  ],
+  "allowed_mutation_paths": [
+    "lib/rules/no-plusplus.js"
+  ],
+  "test_argv": [
+    "--timeout",
+    "30000",
+    "tests/lib/rules/no-plusplus.js"
+  ],
+  "runtime_key": "eslint-v7",
+  "runtime_version": "7.0",
+  "provenance": {
+    "kind": "real-commit-derived",
+    "repository": "https://github.com/eslint/eslint",
+    "source_commit": "7224eee3ff4b4378d3439deb038bf34b116fa48b",
+    "parent_commit": "7598cf816bd854de1dd7d96cf00dec6ecc4564ac",
+    "source_paths": [
+      "lib/rules/no-plusplus.js"
+    ],
+    "patch_fingerprint": "sha256:138d2e45193747515e3e66861a2af0d7f54e95cbef720a1fd28ff1dc8866b537",
+    "visible_requirement_fingerprint": "sha256:03f74ed441c3f4eab8bcd3cb02e53ff47402de2d2096cc17554a4447a0fa4b90",
+    "license": "MIT",
+    "license_fingerprint": "sha256:73e2034fe7f17e603f7c3a4bb7f8b71db11a63f94907d08e756c9d4d72a35505"
+  },
+  "requirement_coverage": {
+    "schema_version": 1,
+    "contract_fingerprint": "sha256:4937e9ab1f87ae64aa5543f8fc20f96a36a0cd69d5994fbbb0dd7db9741897d7",
+    "contract_completeness": "unverified",
+    "hidden_test_witnesses": [
+      {
+        "hidden_test_fingerprint": "sha256:7788d4c8ea75822b2affea61a37aa8ffdea62807978892efe22458b796dc2b21",
+        "clause_ids": [
+          "REQ-001",
+          "REQ-002"
+        ]
+      }
+    ],
+    "runner_witnesses": [
+      {
+        "witness_id": "closed-mutation-set",
+        "clause_ids": [
+          "REQ-003"
+        ]
+      }
+    ]
+  }
+}

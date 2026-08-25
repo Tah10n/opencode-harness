@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-medium-05",
+  "split": "validation",
+  "stratum": "medium",
+  "semantic_kernel_id": "eslint-change-f8b873aae53610b80b5c1005606716e05ed3b91f",
+  "public_surface_fingerprint": "sha256:5642ac7fb82d8bcfa733f086ecc47e7e555f3b5f0e0b35cbd25d776314b9a610",
+  "control_surface_fingerprint": "sha256:42457d7e626fd1a9fcaeb11a50768a2d61c7f394292e3f57fab9355e1a7f050c",
+  "source_identity_fingerprint": "sha256:8ae99488c2d429e02c5fb472f9a684ca46bdf7e51e3854658ed98ce462e975af",
+  "family_fingerprint": "sha256:8bc0844a53752afda9398c28654b23e9f5645ac99d30980e484601ab7b82980f"
+}

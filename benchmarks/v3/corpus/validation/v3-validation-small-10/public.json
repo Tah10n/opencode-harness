@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-small-10",
+  "split": "validation",
+  "stratum": "small",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-validation-small-10-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:48274b0950bed1324a45f41339708661c2986d38020ddcbd1650e7ff730a1d11"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-unreachable-loop.js",
+      "content": "/**\n * @fileoverview Rule to disallow loops with a body that allows only one iteration\n * @author Milos Djermanovic\n */\n\n\"use strict\";\n\nconst { isAnySegmentReachable } = require(\"./utils/code-path-utils\");\n\n//------------------------------------------------------------------------------\n// Helpers\n//------------------------------------------------------------------------------\n\nconst allLoopTypes = [\n\t\"WhileStatement\",\n\t\"DoWhileStatement\",\n\t\"ForStatement\",\n\t\"ForInStatement\",\n\t\"ForOfStatement\",\n];\n\n/**\n * Determines whether the given node is the first node in the code path to which a loop statement\n * 'loops' for the next iteration.\n * @param {ASTNode} node The node to check.\n * @returns {boolean} `true` if the node is a looping target.\n */\nfunction isLoopingTarget(node) {\n\tconst parent = node.parent;\n\n\tif (parent) {\n\t\tswitch (parent.type) {\n\t\t\tcase \"WhileStatement\":\n\t\t\t\treturn node === parent.test;\n\t\t\tcase \"DoWhileStatement\":\n\t\t\t\treturn node === parent.body;\n\t\t\tcase \"ForStatement\":\n\t\t\t\treturn node === (parent.update || parent.test || parent.body);\n\t\t\tcase \"ForInStatement\":\n\t\t\tcase \"ForOfStatement\":\n\t\t\t\treturn node === parent.left;\n\n\t\t\t// no default\n\t\t}\n\t}\n\n\treturn false;\n}\n\n/**\n * Creates an array with elements from the first given array that are not included in the second given array.\n * @param {Array} arrA The array to compare from.\n * @param {Array} arrB The array to compare against.\n * @returns {Array} a new array that represents `arrA \\ arrB`.\n */\nfunction getDifference(arrA, arrB) {\n\treturn arrA.filter(a => !arrB.includes(a));\n}\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../types').Rule.RuleModule} */\nmodule.exports = {\n\tmeta: {\n\t\ttype: \"problem\",\n\n\t\tdefaultOptions: [{ ignore: [] }],\n\n\t\tdocs: {\n\t\t\tdescription:\n\t\t\t\t\"Disallow loops with a body that allows only one iteration\",\n\t\t\trecommended: false,\n\t\t\turl: \"https://eslint.org/docs/latest/rules/no-unreachable-loop\",\n\t\t},\n\n\t\tschema: [\n\t\t\t{\n\t\t\t\ttype: \"object\",\n\t\t\t\tproperties: {\n\t\t\t\t\tignore: {\n\t\t\t\t\t\ttype: \"array\",\n\t\t\t\t\t\titems: {\n\t\t\t\t\t\t\tenum: allLoopTypes,\n\t\t\t\t\t\t},\n\t\t\t\t\t\tuniqueItems: true,\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t\tadditionalProperties: false,\n\t\t\t},\n\t\t],\n\n\t\tmessages: {\n\t\t\tinvalid: \"Invalid loop. Its body allows only one iteration.\",\n\t\t},\n\t},\n\n\tcreate(context) {\n\t\tconst [{ ignore: ignoredLoopTypes }] = context.options;\n\t\tconst loopTypesToCheck = getDifference(allLoopTypes, ignoredLoopTypes),\n\t\t\tloopSelector = loopTypesToCheck.join(\",\"),\n\t\t\tloopsByTargetSegments = new Map(),\n\t\t\tloopsToReport = new Set();\n\n\t\tconst codePathSegments = [];\n\t\tlet currentCodePathSegments = new Set();\n\n\t\treturn {\n\t\t\tonCodePathStart() {\n\t\t\t\tcodePathSegments.push(currentCodePathSegments);\n\t\t\t\tcurrentCodePathSegments = new Set();\n\t\t\t},\n\n\t\t\tonCodePathEnd() {\n\t\t\t\tcurrentCodePathSegments = codePathSegments.pop();\n\t\t\t},\n\n\t\t\tonUnreachableCodePathSegmentStart(segment) {\n\t\t\t\tcurrentCodePathSegments.add(segment);\n\t\t\t},\n\n\t\t\tonUnreachableCodePathSegmentEnd(segment) {\n\t\t\t\tcurrentCodePathSegments.delete(segment);\n\t\t\t},\n\n\t\t\tonCodePathSegmentEnd(segment) {\n\t\t\t\tcurrentCodePathSegments.delete(segment);\n\t\t\t},\n\n\t\t\tonCodePathSegmentStart(segment, node) {\n\t\t\t\tcurrentCodePathSegments.add(segment);\n\n\t\t\t\tif (isLoopingTarget(node)) {\n\t\t\t\t\tconst loop = node.parent;\n\n\t\t\t\t\tloopsByTargetSegments.set(segment, loop);\n\t\t\t\t}\n\t\t\t},\n\n\t\t\tonCodePathSegmentLoop(_, toSegment, node) {\n\t\t\t\tconst loop = loopsByTargetSegments.get(toSegment);\n\n\t\t\t\t/**\n\t\t\t\t * The second iteration is reachable, meaning that the loop is valid by the logic of this rule,\n\t\t\t\t * only if there is at least one loop event with the appropriate target (which has been already\n\t\t\t\t * determined in the `loopsByTargetSegments` map), raised from either:\n\t\t\t\t *\n\t\t\t\t * - the end of the loop's body (in which case `node === loop`)\n\t\t\t\t * - a `continue` statement\n\t\t\t\t *\n\t\t\t\t * This condition skips loop events raised from `ForInStatement > .right` and `ForOfStatement > .right` nodes.\n\t\t\t\t */\n\t\t\t\tif (node === loop || node.type === \"ContinueStatement\") {\n\t\t\t\t\t// Removes loop if it exists in the set. Otherwise, `Set#delete` has no effect and doesn't throw.\n\t\t\t\t\tloopsToReport.delete(loop);\n\t\t\t\t}\n\t\t\t},\n\n\t\t\t[loopSelector](node) {\n\t\t\t\t/**\n\t\t\t\t * Ignore unreachable loop statements to avoid unnecessary complexity in the implementation, or false positives otherwise.\n\t\t\t\t * For unreachable segments, the code path analysis does not raise events required for this implementation.\n\t\t\t\t */\n\t\t\t\tif (isAnySegmentReachable(currentCodePathSegments)) {\n\t\t\t\t\tloopsToReport.add(node);\n\t\t\t\t}\n\t\t\t},\n\n\t\t\t\"Program:exit\"() {\n\t\t\t\tloopsToReport.forEach(node =>\n\t\t\t\t\tcontext.report({ node, messageId: \"invalid\" }),\n\t\t\t\t);\n\t\t\t},\n\t\t};\n\t},\n};\n"
+    }
+  ]
+}

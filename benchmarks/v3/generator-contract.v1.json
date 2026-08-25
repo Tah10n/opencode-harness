@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "generator_version": "benchmark-v3-generator/1",
+  "corpus_generation_seed": "benchmark-v3-corpus-2026-08-26-v1",
+  "model_sampling_seed": "optional-or-unsupported",
+  "seed_freeze": {
+    "development": "sha256:4de3995ed70e56a756973a864b736c61a5c6b70c32b8f34532c6dfe79c000ded",
+    "validation": "sha256:f37478b3ca509e2c0c999d34c35718e3d72645f8661013d25884fbc85ea346cd",
+    "holdout": "sha256:06d250e753eee0ab76991012253614af7224504b773fe0a17f159220472e6134",
+    "validation_and_holdout_frozen_before_first_candidate": true,
+    "baseline_outcomes_may_influence_generation_or_selection": false
+  },
+  "split_source_commitments": {
+    "development": "5634542be580750ffb1a5766470f9e9c72719696",
+    "validation": "5634542be580750ffb1a5766470f9e9c72719696",
+    "holdout": "5634542be580750ffb1a5766470f9e9c72719696"
+  },
+  "rendered_instance_requirements": [
+    "public_behavior_contract",
+    "hidden_oracle_contract",
+    "pre_fix_failure_witness",
+    "reference_fix_success_witness",
+    "license_provenance_record",
+    "family_cluster_identity"
+  ],
+  "promotion_policy": "all-model-free-oracle-checks-must-pass",
+  "current_rendered_instances": 210,
+  "current_promotion_eligible_instances": 0
+}

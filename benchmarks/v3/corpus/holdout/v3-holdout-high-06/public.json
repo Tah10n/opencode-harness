@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-holdout-high-06",
+  "split": "holdout",
+  "stratum": "high",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-holdout-high-06-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:db541cac3ddac9662f93fa072fd3e5d7b7073f7defc30ef514202baa270c8fce"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/block-spacing.js",
+      "content": "/**\n * @fileoverview A rule to disallow or enforce spaces inside of single line blocks.\n * @author Toru Nagashima\n */\n\n\"use strict\";\n\nconst util = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\nmodule.exports = {\n    meta: {\n        type: \"layout\",\n\n        docs: {\n            description: \"disallow or enforce spaces inside of blocks after opening block and before closing block\",\n            recommended: false,\n            url: \"https://eslint.org/docs/rules/block-spacing\"\n        },\n\n        fixable: \"whitespace\",\n\n        schema: [\n            { enum: [\"always\", \"never\"] }\n        ],\n\n        messages: {\n            missing: \"Requires a space {{location}} '{{token}}'.\",\n            extra: \"Unexpected space(s) {{location}} '{{token}}'.\"\n        }\n    },\n\n    create(context) {\n        const always = (context.options[0] !== \"never\"),\n            messageId = always ? \"missing\" : \"extra\",\n            sourceCode = context.getSourceCode();\n\n        /**\n         * Gets the open brace token from a given node.\n         * @param {ASTNode} node A BlockStatement/SwitchStatement node to get.\n         * @returns {Token} The token of the open brace.\n         */\n        function getOpenBrace(node) {\n            if (node.type === \"SwitchStatement\") {\n                if (node.cases.length > 0) {\n                    return sourceCode.getTokenBefore(node.cases[0]);\n                }\n                return sourceCode.getLastToken(node, 1);\n            }\n            return sourceCode.getFirstToken(node);\n        }\n\n        /**\n         * Checks whether or not:\n         *   - given tokens are on same line.\n         *   - there is/isn't a space between given tokens.\n         * @param {Token} left A token to check.\n         * @param {Token} right The token which is next to `left`.\n         * @returns {boolean}\n         *    When the option is `\"always\"`, `true` if there are one or more spaces between given tokens.\n         *    When the option is `\"never\"`, `true` if there are not any spaces between given tokens.\n         *    If given tokens are not on same line, it's always `true`.\n         */\n        function isValid(left, right) {\n            return (\n                !util.isTokenOnSameLine(left, right) ||\n                sourceCode.isSpaceBetweenTokens(left, right) === always\n            );\n        }\n\n        /**\n         * Reports invalid spacing style inside braces.\n         * @param {ASTNode} node A BlockStatement/SwitchStatement node to get.\n         * @returns {void}\n         */\n        function checkSpacingInsideBraces(node) {\n\n            // Gets braces and the first/last token of content.\n            const openBrace = getOpenBrace(node);\n            const closeBrace = sourceCode.getLastToken(node);\n            const firstToken = sourceCode.getTokenAfter(openBrace, { includeComments: true });\n            const lastToken = sourceCode.getTokenBefore(closeBrace, { includeComments: true });\n\n            // Skip if the node is invalid or empty.\n            if (openBrace.type !== \"Punctuator\" ||\n                openBrace.value !== \"{\" ||\n                closeBrace.type !== \"Punctuator\" ||\n                closeBrace.value !== \"}\" ||\n                firstToken === closeBrace\n            ) {\n                return;\n            }\n\n            // Skip line comments for option never\n            if (!always && firstToken.type === \"Line\") {\n                return;\n            }\n\n            // Check.\n            if (!isValid(openBrace, firstToken)) {\n                let loc = openBrace.loc;\n\n                if (messageId === \"extra\") {\n                    loc = {\n                        start: openBrace.loc.end,\n                        end: firstToken.loc.start\n                    };\n                }\n\n                context.report({\n                    node,\n                    loc,\n                    messageId,\n                    data: {\n                        location: \"after\",\n                        token: openBrace.value\n                    },\n                    fix(fixer) {\n                        if (always) {\n                            return fixer.insertTextBefore(firstToken, \" \");\n                        }\n\n                        return fixer.removeRange([openBrace.range[1], firstToken.range[0]]);\n                    }\n                });\n            }\n            if (!isValid(lastToken, closeBrace)) {\n                let loc = closeBrace.loc;\n\n                if (messageId === \"extra\") {\n                    loc = {\n                        start: lastToken.loc.end,\n                        end: closeBrace.loc.start\n                    };\n                }\n                context.report({\n                    node,\n                    loc,\n                    messageId,\n                    data: {\n                        location: \"before\",\n                        token: closeBrace.value\n                    },\n                    fix(fixer) {\n                        if (always) {\n                            return fixer.insertTextAfter(lastToken, \" \");\n                        }\n\n                        return fixer.removeRange([lastToken.range[1], closeBrace.range[0]]);\n                    }\n                });\n            }\n        }\n\n        return {\n            BlockStatement: checkSpacingInsideBraces,\n            SwitchStatement: checkSpacingInsideBraces\n        };\n    }\n};\n"
+    }
+  ]
+}

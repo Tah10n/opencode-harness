@@ -1,0 +1,24 @@
+#!/usr/bin/env node
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { loadBenchmarkV3Corpus } from "../lib/benchmark/v3-corpus.mjs";
+import { verifyBenchmarkV3ProductBundle } from "../lib/benchmark/v3-runner.mjs";
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const corpus = loadBenchmarkV3Corpus(root);
+const reasons = [];
+if (process.env.OPENCODE_QUALITY_PROCESS_CONTAINMENT_READY !== "1") reasons.push({ code: "PROCESS_CONTAINMENT_UNAVAILABLE", requirement: "real-process-containment" });
+if (process.env.BENCHMARK_V3_HIDDEN_NAMESPACE_ISOLATION_READY !== "1") reasons.push({ code: "HIDDEN_DATA_NAMESPACE_ISOLATION_UNAVAILABLE", requirement: "hidden-artifacts-never-mounted-during-model-execution" });
+if (process.env.BENCHMARK_V3_PROVIDER_ONLY_EGRESS_READY !== "1") reasons.push({ code: "SEALED_HOLDOUT_EGRESS_BOUNDARY_UNAVAILABLE", requirement: "provider-only-egress-or-proven-equivalent" });
+if (!corpus.promotion_eligible) reasons.push({ code: "CORPUS_INCOMPLETE", requirement: corpus.promotion_blocker });
+if (typeof process.env.BENCHMARK_V3_CANDIDATE_BUNDLE !== "string") reasons.push({ code: "CANDIDATE_PRODUCT_FINGERPRINT_EQUIVALENCE_UNPROVEN", requirement: "exact-product-candidate-fingerprint-equivalence" });
+else {
+  try { verifyBenchmarkV3ProductBundle(root, path.resolve(process.env.BENCHMARK_V3_CANDIDATE_BUNDLE)); }
+  catch { reasons.push({ code: "CANDIDATE_PRODUCT_FINGERPRINT_MISMATCH", requirement: "exact-product-candidate-fingerprint-equivalence" }); }
+}
+const result = { schema_version: 1, gate: "campaign-readiness", status: reasons.length === 0 ? "passed" : "blocked_environment",
+  foundation_publication: "in_progress", lab_infrastructure_publication: "in_progress", model_campaign: reasons.length === 0 ? "ready" : "blocked",
+  holdout_promotion: reasons.length === 0 ? "eligible-for-sealed-execution" : "blocked_environment", model_calls: 0, candidate_tokens: 0, reasons };
+process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+if (reasons.length > 0) process.exitCode = 2;

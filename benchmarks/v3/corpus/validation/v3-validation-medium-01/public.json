@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-medium-01",
+  "split": "validation",
+  "stratum": "medium",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-validation-medium-01-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:5ab9808770011f980045bae88aa25757ae390f6e2d65836390a58aceb7b6b58c"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-const-assign.js",
+      "content": "/**\n * @fileoverview A rule to disallow modifying variables that are declared using `const`\n * @author Toru Nagashima\n */\n\n\"use strict\";\n\nconst astUtils = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../types').Rule.RuleModule} */\nmodule.exports = {\n\tmeta: {\n\t\ttype: \"problem\",\n\n\t\tdocs: {\n\t\t\tdescription: \"Disallow reassigning `const` variables\",\n\t\t\trecommended: true,\n\t\t\turl: \"https://eslint.org/docs/latest/rules/no-const-assign\",\n\t\t},\n\n\t\tschema: [],\n\n\t\tmessages: {\n\t\t\tconst: \"'{{name}}' is constant.\",\n\t\t},\n\t},\n\n\tcreate(context) {\n\t\tconst sourceCode = context.sourceCode;\n\n\t\t/**\n\t\t * Finds and reports references that are non initializer and writable.\n\t\t * @param {Variable} variable A variable to check.\n\t\t * @returns {void}\n\t\t */\n\t\tfunction checkVariable(variable) {\n\t\t\tastUtils\n\t\t\t\t.getModifyingReferences(variable.references)\n\t\t\t\t.forEach(reference => {\n\t\t\t\t\tcontext.report({\n\t\t\t\t\t\tnode: reference.identifier,\n\t\t\t\t\t\tmessageId: \"const\",\n\t\t\t\t\t\tdata: { name: reference.identifier.name },\n\t\t\t\t\t});\n\t\t\t\t});\n\t\t}\n\n\t\treturn {\n\t\t\tVariableDeclaration(node) {\n\t\t\t\tif (node.kind === \"const\") {\n\t\t\t\t\tsourceCode\n\t\t\t\t\t\t.getDeclaredVariables(node)\n\t\t\t\t\t\t.forEach(checkVariable);\n\t\t\t\t}\n\t\t\t},\n\t\t};\n\t},\n};\n"
+    }
+  ]
+}

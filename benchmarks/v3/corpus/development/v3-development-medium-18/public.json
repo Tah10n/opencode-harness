@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-development-medium-18",
+  "split": "development",
+  "stratum": "medium",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-development-medium-18-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:5a1c68004ca8e4ac4eb297c34f921bbbc14dc1e5cac1fd7ae8dd6be0019bf19b"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-constant-condition.js",
+      "content": "/**\n * @fileoverview Rule to flag use constant conditions\n * @author Christian Schulz <http://rndm.de>\n */\n\n\"use strict\";\n\nconst { isConstant } = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Helpers\n//------------------------------------------------------------------------------\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../shared/types').Rule} */\nmodule.exports = {\n    meta: {\n        type: \"problem\",\n\n        docs: {\n            description: \"Disallow constant expressions in conditions\",\n            recommended: true,\n            url: \"https://eslint.org/docs/latest/rules/no-constant-condition\"\n        },\n\n        schema: [\n            {\n                type: \"object\",\n                properties: {\n                    checkLoops: {\n                        type: \"boolean\",\n                        default: true\n                    }\n                },\n                additionalProperties: false\n            }\n        ],\n\n        messages: {\n            unexpected: \"Unexpected constant condition.\"\n        }\n    },\n\n    create(context) {\n        const options = context.options[0] || {},\n            checkLoops = options.checkLoops !== false,\n            loopSetStack = [];\n        const sourceCode = context.sourceCode;\n\n        let loopsInCurrentScope = new Set();\n\n        //--------------------------------------------------------------------------\n        // Helpers\n        //--------------------------------------------------------------------------\n\n        /**\n         * Tracks when the given node contains a constant condition.\n         * @param {ASTNode} node The AST node to check.\n         * @returns {void}\n         * @private\n         */\n        function trackConstantConditionLoop(node) {\n            if (node.test && isConstant(sourceCode.getScope(node), node.test, true)) {\n                loopsInCurrentScope.add(node);\n            }\n        }\n\n        /**\n         * Reports when the set contains the given constant condition node\n         * @param {ASTNode} node The AST node to check.\n         * @returns {void}\n         * @private\n         */\n        function checkConstantConditionLoopInSet(node) {\n            if (loopsInCurrentScope.has(node)) {\n                loopsInCurrentScope.delete(node);\n                context.report({ node: node.test, messageId: \"unexpected\" });\n            }\n        }\n\n        /**\n         * Reports when the given node contains a constant condition.\n         * @param {ASTNode} node The AST node to check.\n         * @returns {void}\n         * @private\n         */\n        function reportIfConstant(node) {\n            if (node.test && isConstant(sourceCode.getScope(node), node.test, true)) {\n                context.report({ node: node.test, messageId: \"unexpected\" });\n            }\n        }\n\n        /**\n         * Stores current set of constant loops in loopSetStack temporarily\n         * and uses a new set to track constant loops\n         * @returns {void}\n         * @private\n         */\n        function enterFunction() {\n            loopSetStack.push(loopsInCurrentScope);\n            loopsInCurrentScope = new Set();\n        }\n\n        /**\n         * Reports when the set still contains stored constant conditions\n         * @returns {void}\n         * @private\n         */\n        function exitFunction() {\n            loopsInCurrentScope = loopSetStack.pop();\n        }\n\n        /**\n         * Checks node when checkLoops option is enabled\n         * @param {ASTNode} node The AST node to check.\n         * @returns {void}\n         * @private\n         */\n        function checkLoop(node) {\n            if (checkLoops) {\n                trackConstantConditionLoop(node);\n            }\n        }\n\n        //--------------------------------------------------------------------------\n        // Public\n        //--------------------------------------------------------------------------\n\n        return {\n            ConditionalExpression: reportIfConstant,\n            IfStatement: reportIfConstant,\n            WhileStatement: checkLoop,\n            \"WhileStatement:exit\": checkConstantConditionLoopInSet,\n            DoWhileStatement: checkLoop,\n            \"DoWhileStatement:exit\": checkConstantConditionLoopInSet,\n            ForStatement: checkLoop,\n            \"ForStatement > .test\": node => checkLoop(node.parent),\n            \"ForStatement:exit\": checkConstantConditionLoopInSet,\n            FunctionDeclaration: enterFunction,\n            \"FunctionDeclaration:exit\": exitFunction,\n            FunctionExpression: enterFunction,\n            \"FunctionExpression:exit\": exitFunction,\n            YieldExpression: () => loopsInCurrentScope.clear()\n        };\n\n    }\n};\n"
+    }
+  ]
+}

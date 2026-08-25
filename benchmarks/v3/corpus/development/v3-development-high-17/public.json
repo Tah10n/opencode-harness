@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-development-high-17",
+  "split": "development",
+  "stratum": "high",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-development-high-17-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:fc4b732b24b2107348b0de58d94644e22f351aed25d902613e74e7d73512651f"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-mixed-spaces-and-tabs.js",
+      "content": "/**\n * @fileoverview Disallow mixed spaces and tabs for indentation\n * @author Jary Niebur\n */\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\nmodule.exports = {\n    meta: {\n        type: \"layout\",\n\n        docs: {\n            description: \"disallow mixed spaces and tabs for indentation\",\n            category: \"Stylistic Issues\",\n            recommended: true,\n            url: \"https://eslint.org/docs/rules/no-mixed-spaces-and-tabs\"\n        },\n\n        schema: [\n            {\n                enum: [\"smart-tabs\", true, false]\n            }\n        ],\n\n        messages: {\n            mixedSpacesAndTabs: \"Mixed spaces and tabs.\"\n        }\n    },\n\n    create(context) {\n        const sourceCode = context.getSourceCode();\n\n        let smartTabs;\n\n        switch (context.options[0]) {\n            case true: // Support old syntax, maybe add deprecation warning here\n            case \"smart-tabs\":\n                smartTabs = true;\n                break;\n            default:\n                smartTabs = false;\n        }\n\n        //--------------------------------------------------------------------------\n        // Public\n        //--------------------------------------------------------------------------\n\n        return {\n\n            \"Program:exit\"(node) {\n                const lines = sourceCode.lines,\n                    comments = sourceCode.getAllComments(),\n                    ignoredCommentLines = new Set();\n\n                // Add all lines except the first ones.\n                comments.forEach(comment => {\n                    for (let i = comment.loc.start.line + 1; i <= comment.loc.end.line; i++) {\n                        ignoredCommentLines.add(i);\n                    }\n                });\n\n                /*\n                 * At least one space followed by a tab\n                 * or the reverse before non-tab/-space\n                 * characters begin.\n                 */\n                let regex = /^(?=[\\t ]*(\\t | \\t))/u;\n\n                if (smartTabs) {\n\n                    /*\n                     * At least one space followed by a tab\n                     * before non-tab/-space characters begin.\n                     */\n                    regex = /^(?=[\\t ]* \\t)/u;\n                }\n\n                lines.forEach((line, i) => {\n                    const match = regex.exec(line);\n\n                    if (match) {\n                        const lineNumber = i + 1,\n                            column = match.index + 1,\n                            loc = { line: lineNumber, column };\n\n                        if (!ignoredCommentLines.has(lineNumber)) {\n                            const containingNode = sourceCode.getNodeByRangeIndex(sourceCode.getIndexFromLoc(loc));\n\n                            if (!(containingNode && [\"Literal\", \"TemplateElement\"].includes(containingNode.type))) {\n                                context.report({\n                                    node,\n                                    loc,\n                                    messageId: \"mixedSpacesAndTabs\"\n                                });\n                            }\n                        }\n                    }\n                });\n            }\n        };\n    }\n};\n"
+    }
+  ]
+}

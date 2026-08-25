@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-holdout-medium-21",
+  "split": "holdout",
+  "stratum": "medium",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-holdout-medium-21-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:51e1173a82e574a065200c6eabeca97caf4390679499371d616753ca6ceaea6e"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-invalid-this.js",
+      "content": "/**\n * @fileoverview A rule to disallow `this` keywords outside of classes or class-like objects.\n * @author Toru Nagashima\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst astUtils = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../shared/types').Rule} */\nmodule.exports = {\n    meta: {\n        type: \"suggestion\",\n\n        docs: {\n            description: \"disallow `this` keywords outside of classes or class-like objects\",\n            recommended: false,\n            url: \"https://eslint.org/docs/rules/no-invalid-this\"\n        },\n\n        schema: [\n            {\n                type: \"object\",\n                properties: {\n                    capIsConstructor: {\n                        type: \"boolean\",\n                        default: true\n                    }\n                },\n                additionalProperties: false\n            }\n        ],\n\n        messages: {\n            unexpectedThis: \"Unexpected 'this'.\"\n        }\n    },\n\n    create(context) {\n        const options = context.options[0] || {};\n        const capIsConstructor = options.capIsConstructor !== false;\n        const stack = [],\n            sourceCode = context.getSourceCode();\n\n        /**\n         * Gets the current checking context.\n         *\n         * The return value has a flag that whether or not `this` keyword is valid.\n         * The flag is initialized when got at the first time.\n         * @returns {{valid: boolean}}\n         *   an object which has a flag that whether or not `this` keyword is valid.\n         */\n        stack.getCurrent = function() {\n            const current = this[this.length - 1];\n\n            if (!current.init) {\n                current.init = true;\n                current.valid = !astUtils.isDefaultThisBinding(\n                    current.node,\n                    sourceCode,\n                    { capIsConstructor }\n                );\n            }\n            return current;\n        };\n\n        /**\n         * Pushs new checking context into the stack.\n         *\n         * The checking context is not initialized yet.\n         * Because most functions don't have `this` keyword.\n         * When `this` keyword was found, the checking context is initialized.\n         * @param {ASTNode} node A function node that was entered.\n         * @returns {void}\n         */\n        function enterFunction(node) {\n\n            // `this` can be invalid only under strict mode.\n            stack.push({\n                init: !context.getScope().isStrict,\n                node,\n                valid: true\n            });\n        }\n\n        /**\n         * Pops the current checking context from the stack.\n         * @returns {void}\n         */\n        function exitFunction() {\n            stack.pop();\n        }\n\n        return {\n\n            /*\n             * `this` is invalid only under strict mode.\n             * Modules is always strict mode.\n             */\n            Program(node) {\n                const scope = context.getScope(),\n                    features = context.parserOptions.ecmaFeatures || {};\n\n                stack.push({\n                    init: true,\n                    node,\n                    valid: !(\n                        scope.isStrict ||\n                        node.sourceType === \"module\" ||\n                        (features.globalReturn && scope.childScopes[0].isStrict)\n                    )\n                });\n            },\n\n            \"Program:exit\"() {\n                stack.pop();\n            },\n\n            FunctionDeclaration: enterFunction,\n            \"FunctionDeclaration:exit\": exitFunction,\n            FunctionExpression: enterFunction,\n            \"FunctionExpression:exit\": exitFunction,\n\n            // Field initializers are implicit functions.\n            \"PropertyDefinition > *.value\": enterFunction,\n            \"PropertyDefinition > *.value:exit\": exitFunction,\n\n            // Class static blocks are implicit functions.\n            StaticBlock: enterFunction,\n            \"StaticBlock:exit\": exitFunction,\n\n            // Reports if `this` of the current context is invalid.\n            ThisExpression(node) {\n                const current = stack.getCurrent();\n\n                if (current && !current.valid) {\n                    context.report({\n                        node,\n                        messageId: \"unexpectedThis\"\n                    });\n                }\n            }\n        };\n    }\n};\n"
+    }
+  ]
+}

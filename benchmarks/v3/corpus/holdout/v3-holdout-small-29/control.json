@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-holdout-small-29",
+  "oracle": "upstream-eslint-rule-test-and-closed-mutation-set",
+  "defect_severity": "unclassified",
+  "reference_files": [
+    {
+      "path": "lib/rules/no-new-object.js",
+      "content": "/**\n * @fileoverview A rule to disallow calls to the Object constructor\n * @author Matt DuVall <http://www.mattduvall.com/>\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst astUtils = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\nmodule.exports = {\n    meta: {\n        type: \"suggestion\",\n\n        docs: {\n            description: \"disallow `Object` constructors\",\n            category: \"Stylistic Issues\",\n            recommended: false,\n            url: \"https://eslint.org/docs/rules/no-new-object\"\n        },\n\n        schema: [],\n\n        messages: {\n            preferLiteral: \"The object literal notation {} is preferrable.\"\n        }\n    },\n\n    create(context) {\n        return {\n            NewExpression(node) {\n                const variable = astUtils.getVariableByName(\n                    context.getScope(),\n                    node.callee.name\n                );\n\n                if (variable && variable.identifiers.length > 0) {\n                    return;\n                }\n\n                if (node.callee.name === \"Object\") {\n                    context.report({\n                        node,\n                        messageId: \"preferLiteral\"\n                    });\n                }\n            }\n        };\n    }\n};\n"
+    }
+  ],
+  "hidden_test_files": [
+    {
+      "path": "tests/lib/rules/no-new-object.js",
+      "content": "/**\n * @fileoverview Tests for the no-new-object rule\n * @author Matt DuVall <http://www.mattduvall.com/>\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst rule = require(\"../../../lib/rules/no-new-object\"),\n    { RuleTester } = require(\"../../../lib/rule-tester\");\n\n//------------------------------------------------------------------------------\n// Tests\n//------------------------------------------------------------------------------\n\nconst ruleTester = new RuleTester();\n\nruleTester.run(\"no-new-object\", rule, {\n    valid: [\n        \"var myObject = {};\",\n        \"var myObject = new CustomObject();\",\n        \"var foo = new foo.Object()\",\n        `var Object = function Object() {};\n            new Object();`,\n        `var x = something ? MyClass : Object;\n        var y = new x();`,\n        {\n            code: `\n        class Object {\n            constructor(){\n\n            }\n        }\n        new Object();\n        `,\n            parserOptions: { ecmaVersion: 6 }\n        },\n        {\n            code: `\n        import { Object } from './'\n        new Object();\n        `,\n            parserOptions: { ecmaVersion: 6, sourceType: \"module\" }\n        }\n    ],\n    invalid: [\n        {\n            code: \"var foo = new Object()\",\n            errors: [\n                {\n                    messageId: \"preferLiteral\",\n                    type: \"NewExpression\"\n                }\n            ]\n        },\n        {\n            code: \"new Object();\",\n            errors: [{ messageId: \"preferLiteral\", type: \"NewExpression\" }]\n        },\n        {\n            code: \"const a = new Object()\",\n            parserOptions: { ecmaVersion: 6 },\n            errors: [{ messageId: \"preferLiteral\", type: \"NewExpression\" }]\n        }\n    ]\n});\n"
+    }
+  ],
+  "allowed_mutation_paths": [
+    "lib/rules/no-new-object.js"
+  ],
+  "test_argv": [
+    "--timeout",
+    "30000",
+    "tests/lib/rules/no-new-object.js"
+  ],
+  "runtime_key": "eslint-v7",
+  "runtime_version": "7.0",
+  "provenance": {
+    "kind": "real-commit-derived",
+    "repository": "https://github.com/eslint/eslint",
+    "source_commit": "7551f0c6fd12f0295cc7d6377bf1899c092e79d8",
+    "parent_commit": "988d8428811934943ce13b2d8b833d795ac2bb4a",
+    "source_paths": [
+      "lib/rules/no-new-object.js"
+    ],
+    "patch_fingerprint": "sha256:ffd78ab7a98c7d00359c766663f116e6b9ca47e4b6d16583de0586c887b76d19",
+    "visible_requirement_fingerprint": "sha256:e1f47e3af155af22145427153665082d357a7e6d8e45ba2b0768ec94b7b46efb",
+    "license": "MIT",
+    "license_fingerprint": "sha256:73e2034fe7f17e603f7c3a4bb7f8b71db11a63f94907d08e756c9d4d72a35505"
+  },
+  "requirement_coverage": {
+    "schema_version": 1,
+    "contract_fingerprint": "sha256:5201282398aadef17ee266617e389e0929bf8fac8c9456120957ee1557d934c4",
+    "contract_completeness": "unverified",
+    "hidden_test_witnesses": [
+      {
+        "hidden_test_fingerprint": "sha256:4e6f5f04579093b1daabd11cf94c242238225d3128a224a93fee845b2d6281a1",
+        "clause_ids": [
+          "REQ-001",
+          "REQ-002"
+        ]
+      }
+    ],
+    "runner_witnesses": [
+      {
+        "witness_id": "closed-mutation-set",
+        "clause_ids": [
+          "REQ-003"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-development-small-20",
+  "split": "development",
+  "stratum": "small",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-development-small-20-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:ea417484091be1e5ba77b7f1f4f20a9e8e717d21aeb969df96a0766c955412a1"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/require-unicode-regexp.js",
+      "content": "/**\n * @fileoverview Rule to enforce the use of `u` flag on RegExp.\n * @author Toru Nagashima\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst {\n    CALL,\n    CONSTRUCT,\n    ReferenceTracker,\n    getStringIfConstant\n} = require(\"@eslint-community/eslint-utils\");\nconst astUtils = require(\"./utils/ast-utils.js\");\nconst { isValidWithUnicodeFlag } = require(\"./utils/regular-expressions\");\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../shared/types').Rule} */\nmodule.exports = {\n    meta: {\n        type: \"suggestion\",\n\n        docs: {\n            description: \"Enforce the use of `u` flag on RegExp\",\n            recommended: false,\n            url: \"https://eslint.org/docs/latest/rules/require-unicode-regexp\"\n        },\n\n        hasSuggestions: true,\n\n        messages: {\n            addUFlag: \"Add the 'u' flag.\",\n            requireUFlag: \"Use the 'u' flag.\"\n        },\n\n        schema: []\n    },\n\n    create(context) {\n\n        const sourceCode = context.sourceCode;\n\n        return {\n            \"Literal[regex]\"(node) {\n                const flags = node.regex.flags || \"\";\n\n                if (!flags.includes(\"u\")) {\n                    context.report({\n                        messageId: \"requireUFlag\",\n                        node,\n                        suggest: isValidWithUnicodeFlag(context.languageOptions.ecmaVersion, node.regex.pattern)\n                            ? [\n                                {\n                                    fix(fixer) {\n                                        return fixer.insertTextAfter(node, \"u\");\n                                    },\n                                    messageId: \"addUFlag\"\n                                }\n                            ]\n                            : null\n                    });\n                }\n            },\n\n            Program(node) {\n                const scope = sourceCode.getScope(node);\n                const tracker = new ReferenceTracker(scope);\n                const trackMap = {\n                    RegExp: { [CALL]: true, [CONSTRUCT]: true }\n                };\n\n                for (const { node: refNode } of tracker.iterateGlobalReferences(trackMap)) {\n                    const [patternNode, flagsNode] = refNode.arguments;\n\n                    if (patternNode && patternNode.type === \"SpreadElement\") {\n                        continue;\n                    }\n                    const pattern = getStringIfConstant(patternNode, scope);\n                    const flags = getStringIfConstant(flagsNode, scope);\n\n                    if (!flagsNode || (typeof flags === \"string\" && !flags.includes(\"u\"))) {\n                        context.report({\n                            messageId: \"requireUFlag\",\n                            node: refNode,\n                            suggest: typeof pattern === \"string\" && isValidWithUnicodeFlag(context.languageOptions.ecmaVersion, pattern)\n                                ? [\n                                    {\n                                        fix(fixer) {\n                                            if (flagsNode) {\n                                                if ((flagsNode.type === \"Literal\" && typeof flagsNode.value === \"string\") || flagsNode.type === \"TemplateLiteral\") {\n                                                    const flagsNodeText = sourceCode.getText(flagsNode);\n\n                                                    return fixer.replaceText(flagsNode, [\n                                                        flagsNodeText.slice(0, flagsNodeText.length - 1),\n                                                        flagsNodeText.slice(flagsNodeText.length - 1)\n                                                    ].join(\"u\"));\n                                                }\n\n                                                // We intentionally don't suggest concatenating + \"u\" to non-literals\n                                                return null;\n                                            }\n\n                                            const penultimateToken = sourceCode.getLastToken(refNode, { skip: 1 }); // skip closing parenthesis\n\n                                            return fixer.insertTextAfter(\n                                                penultimateToken,\n                                                astUtils.isCommaToken(penultimateToken)\n                                                    ? ' \"u\",'\n                                                    : ', \"u\"'\n                                            );\n                                        },\n                                        messageId: \"addUFlag\"\n                                    }\n                                ]\n                                : null\n                        });\n                    }\n                }\n            }\n        };\n    }\n};\n"
+    }
+  ]
+}

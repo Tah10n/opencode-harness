@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-high-06",
+  "split": "validation",
+  "stratum": "high",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-validation-high-06-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:80463f55a96afd6b7d83262a9c2da5b8f68997669e9fd89ca246d6d5a5dcac20"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/for-direction.js",
+      "content": "/**\n * @fileoverview enforce `for` loop update clause moving the counter in the right direction.(for-direction)\n * @author Aladdin-ADD<hh_2013@foxmail.com>\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst { getStaticValue } = require(\"@eslint-community/eslint-utils\");\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../types').Rule.RuleModule} */\nmodule.exports = {\n\tmeta: {\n\t\ttype: \"problem\",\n\n\t\tdocs: {\n\t\t\tdescription:\n\t\t\t\t\"Enforce `for` loop update clause moving the counter in the right direction\",\n\t\t\trecommended: true,\n\t\t\turl: \"https://eslint.org/docs/latest/rules/for-direction\",\n\t\t},\n\n\t\tfixable: null,\n\t\tschema: [],\n\n\t\tmessages: {\n\t\t\tincorrectDirection:\n\t\t\t\t\"The update clause in this loop moves the variable in the wrong direction.\",\n\t\t},\n\t},\n\n\tcreate(context) {\n\t\tconst { sourceCode } = context;\n\n\t\t/**\n\t\t * report an error.\n\t\t * @param {ASTNode} node the node to report.\n\t\t * @returns {void}\n\t\t */\n\t\tfunction report(node) {\n\t\t\tcontext.report({\n\t\t\t\tloc: {\n\t\t\t\t\tstart: node.loc.start,\n\t\t\t\t\tend: sourceCode.getTokenBefore(node.body).loc.end,\n\t\t\t\t},\n\t\t\t\tmessageId: \"incorrectDirection\",\n\t\t\t});\n\t\t}\n\n\t\t/**\n\t\t * check the right side of the assignment\n\t\t * @param {ASTNode} update UpdateExpression to check\n\t\t * @param {number} dir expected direction that could either be turned around or invalidated\n\t\t * @returns {number} return dir, the negated dir, or zero if the counter does not change or the direction is not clear\n\t\t */\n\t\tfunction getRightDirection(update, dir) {\n\t\t\tconst staticValue = getStaticValue(\n\t\t\t\tupdate.right,\n\t\t\t\tsourceCode.getScope(update),\n\t\t\t);\n\n\t\t\tif (\n\t\t\t\tstaticValue &&\n\t\t\t\t[\"bigint\", \"boolean\", \"number\"].includes(\n\t\t\t\t\ttypeof staticValue.value,\n\t\t\t\t)\n\t\t\t) {\n\t\t\t\tconst sign = Math.sign(Number(staticValue.value)) || 0; // convert NaN to 0\n\n\t\t\t\treturn dir * sign;\n\t\t\t}\n\t\t\treturn 0;\n\t\t}\n\n\t\t/**\n\t\t * check UpdateExpression add/sub the counter\n\t\t * @param {ASTNode} update UpdateExpression to check\n\t\t * @param {string} counter variable name to check\n\t\t * @returns {number} if add return 1, if sub return -1, if nochange, return 0\n\t\t */\n\t\tfunction getUpdateDirection(update, counter) {\n\t\t\tif (\n\t\t\t\tupdate.argument.type === \"Identifier\" &&\n\t\t\t\tupdate.argument.name === counter\n\t\t\t) {\n\t\t\t\tif (update.operator === \"++\") {\n\t\t\t\t\treturn 1;\n\t\t\t\t}\n\t\t\t\tif (update.operator === \"--\") {\n\t\t\t\t\treturn -1;\n\t\t\t\t}\n\t\t\t}\n\t\t\treturn 0;\n\t\t}\n\n\t\t/**\n\t\t * check AssignmentExpression add/sub the counter\n\t\t * @param {ASTNode} update AssignmentExpression to check\n\t\t * @param {string} counter variable name to check\n\t\t * @returns {number} if add return 1, if sub return -1, if nochange, return 0\n\t\t */\n\t\tfunction getAssignmentDirection(update, counter) {\n\t\t\tif (update.left.name === counter) {\n\t\t\t\tif (update.operator === \"+=\") {\n\t\t\t\t\treturn getRightDirection(update, 1);\n\t\t\t\t}\n\t\t\t\tif (update.operator === \"-=\") {\n\t\t\t\t\treturn getRightDirection(update, -1);\n\t\t\t\t}\n\t\t\t}\n\t\t\treturn 0;\n\t\t}\n\n\t\treturn {\n\t\t\tForStatement(node) {\n\t\t\t\tif (\n\t\t\t\t\tnode.test &&\n\t\t\t\t\tnode.test.type === \"BinaryExpression\" &&\n\t\t\t\t\tnode.update\n\t\t\t\t) {\n\t\t\t\t\tfor (const counterPosition of [\"left\", \"right\"]) {\n\t\t\t\t\t\tif (node.test[counterPosition].type !== \"Identifier\") {\n\t\t\t\t\t\t\tcontinue;\n\t\t\t\t\t\t}\n\n\t\t\t\t\t\tconst counter = node.test[counterPosition].name;\n\t\t\t\t\t\tconst operator = node.test.operator;\n\t\t\t\t\t\tconst update = node.update;\n\n\t\t\t\t\t\tlet wrongDirection;\n\n\t\t\t\t\t\tif (operator === \"<\" || operator === \"<=\") {\n\t\t\t\t\t\t\twrongDirection =\n\t\t\t\t\t\t\t\tcounterPosition === \"left\" ? -1 : 1;\n\t\t\t\t\t\t} else if (operator === \">\" || operator === \">=\") {\n\t\t\t\t\t\t\twrongDirection =\n\t\t\t\t\t\t\t\tcounterPosition === \"left\" ? 1 : -1;\n\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\treturn;\n\t\t\t\t\t\t}\n\n\t\t\t\t\t\tif (update.type === \"UpdateExpression\") {\n\t\t\t\t\t\t\tif (\n\t\t\t\t\t\t\t\tgetUpdateDirection(update, counter) ===\n\t\t\t\t\t\t\t\twrongDirection\n\t\t\t\t\t\t\t) {\n\t\t\t\t\t\t\t\treport(node);\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t} else if (\n\t\t\t\t\t\t\tupdate.type === \"AssignmentExpression\" &&\n\t\t\t\t\t\t\tgetAssignmentDirection(update, counter) ===\n\t\t\t\t\t\t\t\twrongDirection\n\t\t\t\t\t\t) {\n\t\t\t\t\t\t\treport(node);\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t},\n\t\t};\n\t},\n};\n"
+    }
+  ]
+}

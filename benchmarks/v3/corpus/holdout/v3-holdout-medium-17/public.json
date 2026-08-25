@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-holdout-medium-17",
+  "split": "holdout",
+  "stratum": "medium",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-holdout-medium-17-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:bde4f273404bac2ec0238edd8c5937b69d3cc675b203c8c074b43873389e546b"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/lines-between-class-members.js",
+      "content": "/**\n * @fileoverview Rule to check empty newline between class members\n * @author 薛定谔的猫<hh_2013@foxmail.com>\n */\n\"use strict\";\n\nconst astUtils = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\nmodule.exports = {\n    meta: {\n        type: \"layout\",\n\n        docs: {\n            description: \"require or disallow an empty line between class members\",\n            recommended: false,\n            url: \"https://eslint.org/docs/rules/lines-between-class-members\"\n        },\n\n        fixable: \"whitespace\",\n\n        schema: [\n            {\n                enum: [\"always\", \"never\"]\n            },\n            {\n                type: \"object\",\n                properties: {\n                    exceptAfterSingleLine: {\n                        type: \"boolean\",\n                        default: false\n                    }\n                },\n                additionalProperties: false\n            }\n        ],\n        messages: {\n            never: \"Unexpected blank line between class members.\",\n            always: \"Expected blank line between class members.\"\n        }\n    },\n\n    create(context) {\n\n        const options = [];\n\n        options[0] = context.options[0] || \"always\";\n        options[1] = context.options[1] || { exceptAfterSingleLine: false };\n\n        const sourceCode = context.getSourceCode();\n\n        /**\n         * Return the last token among the consecutive tokens that have no exceed max line difference in between, before the first token in the next member.\n         * @param {Token} prevLastToken The last token in the previous member node.\n         * @param {Token} nextFirstToken The first token in the next member node.\n         * @param {number} maxLine The maximum number of allowed line difference between consecutive tokens.\n         * @returns {Token} The last token among the consecutive tokens.\n         */\n        function findLastConsecutiveTokenAfter(prevLastToken, nextFirstToken, maxLine) {\n            const after = sourceCode.getTokenAfter(prevLastToken, { includeComments: true });\n\n            if (after !== nextFirstToken && after.loc.start.line - prevLastToken.loc.end.line <= maxLine) {\n                return findLastConsecutiveTokenAfter(after, nextFirstToken, maxLine);\n            }\n            return prevLastToken;\n        }\n\n        /**\n         * Return the first token among the consecutive tokens that have no exceed max line difference in between, after the last token in the previous member.\n         * @param {Token} nextFirstToken The first token in the next member node.\n         * @param {Token} prevLastToken The last token in the previous member node.\n         * @param {number} maxLine The maximum number of allowed line difference between consecutive tokens.\n         * @returns {Token} The first token among the consecutive tokens.\n         */\n        function findFirstConsecutiveTokenBefore(nextFirstToken, prevLastToken, maxLine) {\n            const before = sourceCode.getTokenBefore(nextFirstToken, { includeComments: true });\n\n            if (before !== prevLastToken && nextFirstToken.loc.start.line - before.loc.end.line <= maxLine) {\n                return findFirstConsecutiveTokenBefore(before, prevLastToken, maxLine);\n            }\n            return nextFirstToken;\n        }\n\n        /**\n         * Checks if there is a token or comment between two tokens.\n         * @param {Token} before The token before.\n         * @param {Token} after The token after.\n         * @returns {boolean} True if there is a token or comment between two tokens.\n         */\n        function hasTokenOrCommentBetween(before, after) {\n            return sourceCode.getTokensBetween(before, after, { includeComments: true }).length !== 0;\n        }\n\n        return {\n            ClassBody(node) {\n                const body = node.body;\n\n                for (let i = 0; i < body.length - 1; i++) {\n                    const curFirst = sourceCode.getFirstToken(body[i]);\n                    const curLast = sourceCode.getLastToken(body[i]);\n                    const nextFirst = sourceCode.getFirstToken(body[i + 1]);\n                    const isMulti = !astUtils.isTokenOnSameLine(curFirst, curLast);\n                    const skip = !isMulti && options[1].exceptAfterSingleLine;\n                    const beforePadding = findLastConsecutiveTokenAfter(curLast, nextFirst, 1);\n                    const afterPadding = findFirstConsecutiveTokenBefore(nextFirst, curLast, 1);\n                    const isPadded = afterPadding.loc.start.line - beforePadding.loc.end.line > 1;\n                    const hasTokenInPadding = hasTokenOrCommentBetween(beforePadding, afterPadding);\n                    const curLineLastToken = findLastConsecutiveTokenAfter(curLast, nextFirst, 0);\n\n                    if ((options[0] === \"always\" && !skip && !isPadded) ||\n                        (options[0] === \"never\" && isPadded)) {\n                        context.report({\n                            node: body[i + 1],\n                            messageId: isPadded ? \"never\" : \"always\",\n                            fix(fixer) {\n                                if (hasTokenInPadding) {\n                                    return null;\n                                }\n                                return isPadded\n                                    ? fixer.replaceTextRange([beforePadding.range[1], afterPadding.range[0]], \"\\n\")\n                                    : fixer.insertTextAfter(curLineLastToken, \"\\n\");\n                            }\n                        });\n                    }\n                }\n            }\n        };\n    }\n};\n"
+    }
+  ]
+}

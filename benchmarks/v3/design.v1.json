@@ -1,0 +1,107 @@
+{
+  "schema_version": 2,
+  "design_id": "opencode-harness-benchmark-v3-executable-v2",
+  "status": "executable-model-free-gated",
+  "execution_policy": {
+    "scope": "lab-only",
+    "model_execution": "forbidden-until-model-free-review-gate",
+    "previous_split_reuse": "forbidden",
+    "candidate_binding": "frozen-before-baseline",
+    "candidate_visibility": "visible-requirements-only-no-baseline-output-family-failure-or-hidden-finding",
+    "product_bundle_binding": "byte-identical-materialized-core",
+    "automatic_candidate_creation": "forbidden"
+  },
+  "stages": {
+    "development": { "minimum_registered_candidates": 1, "maximum_registered_candidates": 2, "current_registered_candidates": 1, "registrations_immutable": true, "runs_per_candidate": 1 },
+    "validation": { "candidate_count": 1, "runs_per_candidate": 1, "selection": "deterministic-development-winner" },
+    "holdout": { "candidate_count": 1, "runs_per_candidate": 1, "candidate_binding": "unchanged-validation-candidate" },
+    "selection_rule": "highest-development-paired-delta-then-lower-new-high-medium-upper-ci-then-lower-mean-duration-then-candidate-id"
+  },
+  "splits": {
+    "development": {
+      "status": "materialized-model-free",
+      "family_count": 60,
+      "strata": { "small": 20, "medium": 20, "high": 20 },
+      "candidate_selection": "one-preregistered",
+      "maximum_runs": 1
+    },
+    "validation": {
+      "status": "materialized-model-free",
+      "family_count": 60,
+      "strata": { "small": 20, "medium": 20, "high": 20 },
+      "candidate_selection": "one-deterministically-selected",
+      "maximum_runs": 1
+    },
+    "holdout": {
+      "status": "materialized-model-free",
+      "family_count": 90,
+      "strata": { "small": 30, "medium": 30, "high": 30 },
+      "candidate_selection": "same-unchanged-candidate",
+      "maximum_runs": 1
+    }
+  },
+  "opportunity_power_gate": {
+    "stage": "after-baseline-before-first-candidate",
+    "alpha": 0.05,
+    "familywise_alpha": 0.05,
+    "alpha_allocation": "familywise-alpha-divided-by-registered-candidates-before-baseline",
+    "minimum_practical_delta": 0.1,
+    "preregistered_fix_probability": 0.8,
+    "permitted_regression_probability": 0.02,
+    "minimum_power": 0.8,
+    "stratum_opportunity_rule": "ceiling-stratum-family-count-times-minimum-practical-delta",
+    "failure_disposition": "design-uninformative-candidate-tokens-zero"
+  },
+  "primary_inference": {
+    "independent_unit": "family-cluster",
+    "test": "one-sided-exact-binomial-on-discordant-family-clusters",
+    "confidence_method": "exact-conservative-bonferroni-binomial-difference",
+    "confidence_level": 0.95,
+    "conditional_power_witness": { "discordant_clusters": 20, "candidate_win_probability": 0.8 },
+    "actual_attainable_power": "computed-from-observed-baseline-opportunities-before-candidate"
+  },
+  "estimands": {
+    "representative_all_comers": "all-families-in-preregistered-split",
+    "challenge_opportunity_enriched": "baseline-failure-opportunities-only",
+    "reporting_boundary": "enriched-effect-must-not-be-labeled-repository-wide-lift"
+  },
+  "guardrails": {
+    "new_critical_regressions_maximum": 0,
+    "new_unclassified_semantic_regressions_maximum": 0,
+    "new_high_medium_regressions_maximum": 0,
+    "new_high_medium_regression_rate_upper_bound_maximum": 0.033,
+    "safety_independent_unit": "family-cluster",
+    "candidate_safety_comparison": "not-worse-than-baseline",
+    "small_delta_lower_ci_minimum": -0.03,
+    "timeout_delta_maximum": 0.02,
+    "median_duration_ratio_maximum": 2,
+    "mean_duration_ratio_maximum": 2.5,
+    "activation_minimum": 0.95
+  },
+  "retry_policy": {
+    "maximum_infrastructure_retries": 1,
+    "eligibility": "infrastructure-failure-before-scored-outcome-only",
+    "binding": "same-source-corpus-seed-and-model-bindings",
+    "architecture_slot_cost": 0,
+    "ledger_requirement": "both-attempts-preserved"
+  },
+  "ledger_policy": {
+    "event_types": ["acceptance-probe", "infrastructure-failure-before-scoring", "development-execution", "validation-execution", "holdout-execution"],
+    "relabel": "forbidden",
+    "reuse": "forbidden",
+    "stage_order": "acceptance-development-validation-holdout"
+  },
+  "derived": {
+    "conditional_power_witness": {
+      "critical_candidate_wins": 15,
+      "critical_baseline_wins": 5,
+      "exact_p": 0.020694732666015625,
+      "conditional_power": 0.8042077854595496,
+      "paired_delta": 0.16666666666666666
+    },
+    "minimum_baseline_failures_for_attainable_power": 11,
+    "minimum_baseline_failures_per_stratum": { "small": 2, "medium": 2, "high": 2 },
+    "attainable_power_at_minimum": 0.8512584537246037,
+    "safety_zero_regression_upper_bounds": { "development_60": 0.04870291331009752, "validation_60": 0.04870291331009752, "holdout_90": 0.03273803383353452, "minimum_149_for_two_percent": 0.01990481622068513, "required_maximum": 0.033, "holdout_attainable": true }
+  }
+}

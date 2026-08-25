@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-holdout-medium-06",
+  "split": "holdout",
+  "stratum": "medium",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-holdout-medium-06-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:ef3a71899b2ea57771c6f9e03603bdb87784555752de5da1a017c6e9cd701cd5"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-inner-declarations.js",
+      "content": "/**\n * @fileoverview Rule to enforce declarations in program or function body root.\n * @author Brandon Mills\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst astUtils = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\nconst validParent = new Set([\"Program\", \"ExportNamedDeclaration\", \"ExportDefaultDeclaration\"]);\nconst validBlockStatementParent = new Set([\"FunctionDeclaration\", \"FunctionExpression\", \"ArrowFunctionExpression\"]);\n\nmodule.exports = {\n    meta: {\n        type: \"problem\",\n\n        docs: {\n            description: \"disallow variable or `function` declarations in nested blocks\",\n            recommended: true,\n            url: \"https://eslint.org/docs/rules/no-inner-declarations\"\n        },\n\n        schema: [\n            {\n                enum: [\"functions\", \"both\"]\n            }\n        ],\n\n        messages: {\n            moveDeclToRoot: \"Move {{type}} declaration to {{body}} root.\"\n        }\n    },\n\n    create(context) {\n\n        /**\n         * Ensure that a given node is at a program or function body's root.\n         * @param {ASTNode} node Declaration node to check.\n         * @returns {void}\n         */\n        function check(node) {\n            const parent = node.parent;\n\n            if (\n                parent.type === \"BlockStatement\" && validBlockStatementParent.has(parent.parent.type)\n            ) {\n                return;\n            }\n\n            if (validParent.has(parent.type)) {\n                return;\n            }\n\n            const upperFunction = astUtils.getUpperFunction(parent);\n\n            context.report({\n                node,\n                messageId: \"moveDeclToRoot\",\n                data: {\n                    type: (node.type === \"FunctionDeclaration\" ? \"function\" : \"variable\"),\n                    body: (upperFunction === null ? \"program\" : \"function body\")\n                }\n            });\n        }\n\n\n        return {\n\n            FunctionDeclaration: check,\n            VariableDeclaration(node) {\n                if (context.options[0] === \"both\" && node.kind === \"var\") {\n                    check(node);\n                }\n            }\n\n        };\n\n    }\n};\n"
+    }
+  ]
+}

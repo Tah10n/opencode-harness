@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-holdout-small-04",
+  "split": "holdout",
+  "stratum": "small",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-holdout-small-04-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:97396803952b3a443c5f2f9b6d75b875e9a3d32bf59e2ae18ea4a3f1af416083"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-cond-assign.js",
+      "content": "/**\n * @fileoverview Rule to flag assignment in a conditional statement's test expression\n * @author Stephen Murray <spmurrayzzz>\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst astUtils = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Helpers\n//------------------------------------------------------------------------------\n\nconst TEST_CONDITION_PARENT_TYPES = new Set([\"IfStatement\", \"WhileStatement\", \"DoWhileStatement\", \"ForStatement\", \"ConditionalExpression\"]);\n\nconst NODE_DESCRIPTIONS = {\n    DoWhileStatement: \"a 'do...while' statement\",\n    ForStatement: \"a 'for' statement\",\n    IfStatement: \"an 'if' statement\",\n    WhileStatement: \"a 'while' statement\"\n};\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\nmodule.exports = {\n    meta: {\n        type: \"problem\",\n\n        docs: {\n            description: \"disallow assignment operators in conditional expressions\",\n            category: \"Possible Errors\",\n            recommended: true,\n            url: \"https://eslint.org/docs/rules/no-cond-assign\"\n        },\n\n        schema: [\n            {\n                enum: [\"except-parens\", \"always\"]\n            }\n        ],\n\n        messages: {\n            unexpected: \"Unexpected assignment within {{type}}.\",\n\n            // must match JSHint's error message\n            missing: \"Expected a conditional expression and instead saw an assignment.\"\n        }\n    },\n\n    create(context) {\n\n        const prohibitAssign = (context.options[0] || \"except-parens\");\n\n        const sourceCode = context.getSourceCode();\n\n        /**\n         * Check whether an AST node is the test expression for a conditional statement.\n         * @param {!Object} node The node to test.\n         * @returns {boolean} `true` if the node is the text expression for a conditional statement; otherwise, `false`.\n         */\n        function isConditionalTestExpression(node) {\n            return node.parent &&\n                TEST_CONDITION_PARENT_TYPES.has(node.parent.type) &&\n                node === node.parent.test;\n        }\n\n        /**\n         * Given an AST node, perform a bottom-up search for the first ancestor that represents a conditional statement.\n         * @param {!Object} node The node to use at the start of the search.\n         * @returns {?Object} The closest ancestor node that represents a conditional statement.\n         */\n        function findConditionalAncestor(node) {\n            let currentAncestor = node;\n\n            do {\n                if (isConditionalTestExpression(currentAncestor)) {\n                    return currentAncestor.parent;\n                }\n            } while ((currentAncestor = currentAncestor.parent) && !astUtils.isFunction(currentAncestor));\n\n            return null;\n        }\n\n        /**\n         * Check whether the code represented by an AST node is enclosed in two sets of parentheses.\n         * @param {!Object} node The node to test.\n         * @returns {boolean} `true` if the code is enclosed in two sets of parentheses; otherwise, `false`.\n         */\n        function isParenthesisedTwice(node) {\n            const previousToken = sourceCode.getTokenBefore(node, 1),\n                nextToken = sourceCode.getTokenAfter(node, 1);\n\n            return astUtils.isParenthesised(sourceCode, node) &&\n                previousToken && astUtils.isOpeningParenToken(previousToken) && previousToken.range[1] <= node.range[0] &&\n                astUtils.isClosingParenToken(nextToken) && nextToken.range[0] >= node.range[1];\n        }\n\n        /**\n         * Check a conditional statement's test expression for top-level assignments that are not enclosed in parentheses.\n         * @param {!Object} node The node for the conditional statement.\n         * @returns {void}\n         */\n        function testForAssign(node) {\n            if (node.test &&\n                (node.test.type === \"AssignmentExpression\") &&\n                (node.type === \"ForStatement\"\n                    ? !astUtils.isParenthesised(sourceCode, node.test)\n                    : !isParenthesisedTwice(node.test)\n                )\n            ) {\n\n                context.report({\n                    node,\n                    loc: node.test.loc.start,\n                    messageId: \"missing\"\n                });\n            }\n        }\n\n        /**\n         * Check whether an assignment expression is descended from a conditional statement's test expression.\n         * @param {!Object} node The node for the assignment expression.\n         * @returns {void}\n         */\n        function testForConditionalAncestor(node) {\n            const ancestor = findConditionalAncestor(node);\n\n            if (ancestor) {\n                context.report({\n                    node: ancestor,\n                    messageId: \"unexpected\",\n                    data: {\n                        type: NODE_DESCRIPTIONS[ancestor.type] || ancestor.type\n                    }\n                });\n            }\n        }\n\n        if (prohibitAssign === \"always\") {\n            return {\n                AssignmentExpression: testForConditionalAncestor\n            };\n        }\n\n        return {\n            DoWhileStatement: testForAssign,\n            ForStatement: testForAssign,\n            IfStatement: testForAssign,\n            WhileStatement: testForAssign,\n            ConditionalExpression: testForAssign\n        };\n\n    }\n};\n"
+    }
+  ]
+}

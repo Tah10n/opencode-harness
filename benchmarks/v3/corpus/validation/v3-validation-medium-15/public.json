@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-medium-15",
+  "split": "validation",
+  "stratum": "medium",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-validation-medium-15-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:3af732aba63efc2e72ce76afcc1f79aa97a358cac461ba95749dddab8bdad5e0"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-restricted-modules.js",
+      "content": "/**\n * @fileoverview Restrict usage of specified node modules.\n * @author Christian Schulz\n */\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\nconst ignore = require(\"ignore\");\n\nconst arrayOfStrings = {\n    type: \"array\",\n    items: { type: \"string\" },\n    uniqueItems: true\n};\n\nconst arrayOfStringsOrObjects = {\n    type: \"array\",\n    items: {\n        anyOf: [\n            { type: \"string\" },\n            {\n                type: \"object\",\n                properties: {\n                    name: { type: \"string\" },\n                    message: {\n                        type: \"string\",\n                        minLength: 1\n                    }\n                },\n                additionalProperties: false,\n                required: [\"name\"]\n            }\n        ]\n    },\n    uniqueItems: true\n};\n\nmodule.exports = {\n    meta: {\n        type: \"suggestion\",\n\n        docs: {\n            description: \"disallow specified modules when loaded by `require`\",\n            category: \"Node.js and CommonJS\",\n            recommended: false,\n            url: \"https://eslint.org/docs/rules/no-restricted-modules\"\n        },\n\n        schema: {\n            anyOf: [\n                arrayOfStringsOrObjects,\n                {\n                    type: \"array\",\n                    items: {\n                        type: \"object\",\n                        properties: {\n                            paths: arrayOfStringsOrObjects,\n                            patterns: arrayOfStrings\n                        },\n                        additionalProperties: false\n                    },\n                    additionalItems: false\n                }\n            ]\n        },\n\n        messages: {\n            defaultMessage: \"'{{name}}' module is restricted from being used.\",\n            // eslint-disable-next-line eslint-plugin/report-message-format\n            customMessage: \"'{{name}}' module is restricted from being used. {{customMessage}}\",\n            patternMessage: \"'{{name}}' module is restricted from being used by a pattern.\"\n        }\n    },\n\n    create(context) {\n        const options = Array.isArray(context.options) ? context.options : [];\n        const isPathAndPatternsObject =\n            typeof options[0] === \"object\" &&\n            (Object.prototype.hasOwnProperty.call(options[0], \"paths\") || Object.prototype.hasOwnProperty.call(options[0], \"patterns\"));\n\n        const restrictedPaths = (isPathAndPatternsObject ? options[0].paths : context.options) || [];\n        const restrictedPatterns = (isPathAndPatternsObject ? options[0].patterns : []) || [];\n\n        const restrictedPathMessages = restrictedPaths.reduce((memo, importName) => {\n            if (typeof importName === \"string\") {\n                memo[importName] = null;\n            } else {\n                memo[importName.name] = importName.message;\n            }\n            return memo;\n        }, {});\n\n        // if no imports are restricted we don\"t need to check\n        if (Object.keys(restrictedPaths).length === 0 && restrictedPatterns.length === 0) {\n            return {};\n        }\n\n        const ig = ignore().add(restrictedPatterns);\n\n\n        /**\n         * Function to check if a node is a string literal.\n         * @param {ASTNode} node The node to check.\n         * @returns {boolean} If the node is a string literal.\n         */\n        function isString(node) {\n            return node && node.type === \"Literal\" && typeof node.value === \"string\";\n        }\n\n        /**\n         * Function to check if a node is a require call.\n         * @param {ASTNode} node The node to check.\n         * @returns {boolean} If the node is a require call.\n         */\n        function isRequireCall(node) {\n            return node.callee.type === \"Identifier\" && node.callee.name === \"require\";\n        }\n\n        /**\n         * Report a restricted path.\n         * @param {node} node representing the restricted path reference\n         * @returns {void}\n         * @private\n         */\n        function reportPath(node) {\n            const name = node.arguments[0].value.trim();\n            const customMessage = restrictedPathMessages[name];\n            const messageId = customMessage\n                ? \"customMessage\"\n                : \"defaultMessage\";\n\n            context.report({\n                node,\n                messageId,\n                data: {\n                    name,\n                    customMessage\n                }\n            });\n        }\n\n        /**\n         * Check if the given name is a restricted path name\n         * @param {string} name name of a variable\n         * @returns {boolean} whether the variable is a restricted path or not\n         * @private\n         */\n        function isRestrictedPath(name) {\n            return Object.prototype.hasOwnProperty.call(restrictedPathMessages, name);\n        }\n\n        return {\n            CallExpression(node) {\n                if (isRequireCall(node)) {\n\n                    // node has arguments and first argument is string\n                    if (node.arguments.length && isString(node.arguments[0])) {\n                        const name = node.arguments[0].value.trim();\n\n                        // check if argument value is in restricted modules array\n                        if (isRestrictedPath(name)) {\n                            reportPath(node);\n                        }\n\n                        if (restrictedPatterns.length > 0 && ig.ignores(name)) {\n                            context.report({\n                                node,\n                                messageId: \"patternMessage\",\n                                data: { name }\n                            });\n                        }\n                    }\n                }\n            }\n        };\n    }\n};\n"
+    }
+  ]
+}

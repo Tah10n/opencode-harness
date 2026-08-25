@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-holdout-medium-16",
+  "split": "holdout",
+  "stratum": "medium",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-holdout-medium-16-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:06c37bd0698b162bc0282f5b4f6428d29c29709692be06dfe6746a93042aec73"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-empty-static-block.js",
+      "content": "/**\n * @fileoverview Rule to disallow empty static blocks.\n * @author Sosuke Suzuki\n */\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../types').Rule.RuleModule} */\nmodule.exports = {\n\tmeta: {\n\t\ttype: \"suggestion\",\n\n\t\tdocs: {\n\t\t\tdescription: \"Disallow empty static blocks\",\n\t\t\trecommended: true,\n\t\t\turl: \"https://eslint.org/docs/latest/rules/no-empty-static-block\",\n\t\t},\n\n\t\tschema: [],\n\n\t\tmessages: {\n\t\t\tunexpected: \"Unexpected empty static block.\",\n\t\t},\n\t},\n\n\tcreate(context) {\n\t\tconst sourceCode = context.sourceCode;\n\n\t\treturn {\n\t\t\tStaticBlock(node) {\n\t\t\t\tif (node.body.length === 0) {\n\t\t\t\t\tconst closingBrace = sourceCode.getLastToken(node);\n\n\t\t\t\t\tif (\n\t\t\t\t\t\tsourceCode.getCommentsBefore(closingBrace).length === 0\n\t\t\t\t\t) {\n\t\t\t\t\t\tcontext.report({\n\t\t\t\t\t\t\tnode,\n\t\t\t\t\t\t\tmessageId: \"unexpected\",\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t},\n\t\t};\n\t},\n};\n"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-small-14",
+  "split": "validation",
+  "stratum": "small",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-validation-small-14-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:7628a1452a95e9c6062f0022a797e3098c1d1ba0d4817ce1cbe64cde2ffc75fc"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/linter/source-code-fixer.js",
+      "content": "/**\n * @fileoverview An object that caches and applies source code fixes.\n * @author Nicholas C. Zakas\n */\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst debug = require(\"debug\")(\"eslint:source-code-fixer\");\n\n//------------------------------------------------------------------------------\n// Helpers\n//------------------------------------------------------------------------------\n\nconst BOM = \"\\uFEFF\";\n\n/**\n * Compares items in a messages array by range.\n * @param {Message} a The first message.\n * @param {Message} b The second message.\n * @returns {int} -1 if a comes before b, 1 if a comes after b, 0 if equal.\n * @private\n */\nfunction compareMessagesByFixRange(a, b) {\n    return a.fix.range[0] - b.fix.range[0] || a.fix.range[1] - b.fix.range[1];\n}\n\n/**\n * Compares items in a messages array by line and column.\n * @param {Message} a The first message.\n * @param {Message} b The second message.\n * @returns {int} -1 if a comes before b, 1 if a comes after b, 0 if equal.\n * @private\n */\nfunction compareMessagesByLocation(a, b) {\n    return a.line - b.line || a.column - b.column;\n}\n\n//------------------------------------------------------------------------------\n// Public Interface\n//------------------------------------------------------------------------------\n\n/**\n * Utility for apply fixes to source code.\n * @constructor\n */\nfunction SourceCodeFixer() {\n    Object.freeze(this);\n}\n\n/**\n * Applies the fixes specified by the messages to the given text. Tries to be\n * smart about the fixes and won't apply fixes over the same area in the text.\n * @param {string} sourceText The text to apply the changes to.\n * @param {Message[]} messages The array of messages reported by ESLint.\n * @param {boolean|Function} [shouldFix=true] Determines whether each message should be fixed\n * @returns {Object} An object containing the fixed text and any unfixed messages.\n */\nSourceCodeFixer.applyFixes = function(sourceText, messages, shouldFix) {\n    debug(\"Applying fixes\");\n\n    if (shouldFix === false) {\n        debug(\"shouldFix parameter was false, not attempting fixes\");\n        return {\n            fixed: false,\n            messages,\n            output: sourceText\n        };\n    }\n\n    // clone the array\n    const remainingMessages = [],\n        fixes = [],\n        bom = sourceText.startsWith(BOM) ? BOM : \"\",\n        text = bom ? sourceText.slice(1) : sourceText;\n    let lastPos = Number.NEGATIVE_INFINITY,\n        output = bom;\n\n    /**\n     * Try to use the 'fix' from a problem.\n     * @param {Message} problem The message object to apply fixes from\n     * @returns {boolean} Whether fix was successfully applied\n     */\n    function attemptFix(problem) {\n        const fix = problem.fix;\n        const start = fix.range[0];\n        const end = fix.range[1];\n\n        // Remain it as a problem if it's overlapped or it's a negative range\n        if (lastPos >= start || start > end) {\n            remainingMessages.push(problem);\n            return false;\n        }\n\n        // Remove BOM.\n        if ((start < 0 && end >= 0) || (start === 0 && fix.text.startsWith(BOM))) {\n            output = \"\";\n        }\n\n        // Make output to this fix.\n        output += text.slice(Math.max(0, lastPos), Math.max(0, start));\n        output += fix.text;\n        lastPos = end;\n        return true;\n    }\n\n    messages.forEach(problem => {\n        if (Object.hasOwn(problem, \"fix\")) {\n            fixes.push(problem);\n        } else {\n            remainingMessages.push(problem);\n        }\n    });\n\n    if (fixes.length) {\n        debug(\"Found fixes to apply\");\n        let fixesWereApplied = false;\n\n        for (const problem of fixes.sort(compareMessagesByFixRange)) {\n            if (typeof shouldFix !== \"function\" || shouldFix(problem)) {\n                attemptFix(problem);\n\n                /*\n                 * The only time attemptFix will fail is if a previous fix was\n                 * applied which conflicts with it.  So we can mark this as true.\n                 */\n                fixesWereApplied = true;\n            } else {\n                remainingMessages.push(problem);\n            }\n        }\n        output += text.slice(Math.max(0, lastPos));\n\n        return {\n            fixed: fixesWereApplied,\n            messages: remainingMessages.sort(compareMessagesByLocation),\n            output\n        };\n    }\n\n    debug(\"No fixes to apply\");\n    return {\n        fixed: false,\n        messages,\n        output: bom + text\n    };\n\n};\n\nmodule.exports = SourceCodeFixer;\n"
+    }
+  ]
+}

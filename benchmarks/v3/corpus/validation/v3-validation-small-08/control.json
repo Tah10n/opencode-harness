@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-small-08",
+  "oracle": "upstream-eslint-rule-test-and-closed-mutation-set",
+  "defect_severity": "unclassified",
+  "reference_files": [
+    {
+      "path": "lib/rules/no-useless-concat.js",
+      "content": "/**\n * @fileoverview disallow unnecessary concatenation of template strings\n * @author Henry Zhu\n */\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst astUtils = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Helpers\n//------------------------------------------------------------------------------\n\n/**\n * Checks whether or not a given node is a concatenation.\n * @param {ASTNode} node A node to check.\n * @returns {boolean} `true` if the node is a concatenation.\n */\nfunction isConcatenation(node) {\n    return node.type === \"BinaryExpression\" && node.operator === \"+\";\n}\n\n/**\n * Checks if the given token is a `+` token or not.\n * @param {Token} token The token to check.\n * @returns {boolean} `true` if the token is a `+` token.\n */\nfunction isConcatOperatorToken(token) {\n    return token.value === \"+\" && token.type === \"Punctuator\";\n}\n\n/**\n * Get's the right most node on the left side of a BinaryExpression with + operator.\n * @param {ASTNode} node A BinaryExpression node to check.\n * @returns {ASTNode} node\n */\nfunction getLeft(node) {\n    let left = node.left;\n\n    while (isConcatenation(left)) {\n        left = left.right;\n    }\n    return left;\n}\n\n/**\n * Get's the left most node on the right side of a BinaryExpression with + operator.\n * @param {ASTNode} node A BinaryExpression node to check.\n * @returns {ASTNode} node\n */\nfunction getRight(node) {\n    let right = node.right;\n\n    while (isConcatenation(right)) {\n        right = right.left;\n    }\n    return right;\n}\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\nmodule.exports = {\n    meta: {\n        type: \"suggestion\",\n\n        docs: {\n            description: \"disallow unnecessary concatenation of literals or template literals\",\n            category: \"Best Practices\",\n            recommended: false,\n            url: \"https://eslint.org/docs/rules/no-useless-concat\"\n        },\n\n        schema: [],\n\n        messages: {\n            unexpectedConcat: \"Unexpected string concatenation of literals.\"\n        }\n    },\n\n    create(context) {\n        const sourceCode = context.getSourceCode();\n\n        return {\n            BinaryExpression(node) {\n\n                // check if not concatenation\n                if (node.operator !== \"+\") {\n                    return;\n                }\n\n                // account for the `foo + \"a\" + \"b\"` case\n                const left = getLeft(node);\n                const right = getRight(node);\n\n                if (astUtils.isStringLiteral(left) &&\n                    astUtils.isStringLiteral(right) &&\n                    astUtils.isTokenOnSameLine(left, right)\n                ) {\n                    const operatorToken = sourceCode.getFirstTokenBetween(left, right, isConcatOperatorToken);\n\n                    context.report({\n                        node,\n                        loc: operatorToken.loc,\n                        messageId: \"unexpectedConcat\"\n                    });\n                }\n            }\n        };\n    }\n};\n"
+    }
+  ],
+  "hidden_test_files": [
+    {
+      "path": "tests/lib/rules/no-useless-concat.js",
+      "content": "/**\n * @fileoverview disallow unnecessary concatenation of literals or template literals\n * @author Henry Zhu\n */\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst rule = require(\"../../../lib/rules/no-useless-concat\"),\n\n    { RuleTester } = require(\"../../../lib/rule-tester\");\n\n\n//------------------------------------------------------------------------------\n// Tests\n//------------------------------------------------------------------------------\n\nconst ruleTester = new RuleTester();\n\nruleTester.run(\"no-useless-concat\", rule, {\n\n    valid: [\n        \"var a = 1 + 1;\",\n        \"var a = 1 * '2';\",\n        \"var a = 1 - 2;\",\n        \"var a = foo + bar;\",\n        \"var a = 'foo' + bar;\",\n        \"var foo = 'foo' +\\n 'bar';\",\n\n        // https://github.com/eslint/eslint/issues/3575\n        \"var string = (number + 1) + 'px';\",\n        \"'a' + 1\",\n        \"1 + '1'\",\n        { code: \"1 + `1`\", parserOptions: { ecmaVersion: 6 } },\n        { code: \"`1` + 1\", parserOptions: { ecmaVersion: 6 } },\n        { code: \"(1 + +2) + `b`\", parserOptions: { ecmaVersion: 6 } }\n    ],\n\n    invalid: [\n        {\n            code: \"'a' + 'b'\",\n            errors: [\n                {\n                    messageId: \"unexpectedConcat\",\n                    line: 1,\n                    column: 5,\n                    endLine: 1,\n                    endColumn: 6\n                }\n            ]\n        },\n        {\n            code: \"'a' +\\n'b' + 'c'\",\n            errors: [\n                {\n                    messageId: \"unexpectedConcat\",\n                    line: 2,\n                    column: 5,\n                    endLine: 2,\n                    endColumn: 6\n                }\n            ]\n        },\n        {\n            code: \"foo + 'a' + 'b'\",\n            errors: [\n                { messageId: \"unexpectedConcat\" }\n            ]\n        },\n        {\n            code: \"'a' + 'b' + 'c'\",\n            errors: [\n                {\n                    messageId: \"unexpectedConcat\",\n                    line: 1,\n                    column: 5,\n                    endLine: 1,\n                    endColumn: 6\n                },\n                {\n                    messageId: \"unexpectedConcat\",\n                    line: 1,\n                    column: 11,\n                    endLine: 1,\n                    endColumn: 12\n                }\n            ]\n        },\n        {\n            code: \"(foo + 'a') + ('b' + 'c')\",\n            errors: [\n                { column: 13, messageId: \"unexpectedConcat\" },\n                { column: 20, messageId: \"unexpectedConcat\" }\n            ]\n        },\n        {\n            code: \"`a` + 'b'\",\n            parserOptions: { ecmaVersion: 6 },\n            errors: [\n                { messageId: \"unexpectedConcat\" }\n            ]\n        },\n        {\n            code: \"`a` + `b`\",\n            parserOptions: { ecmaVersion: 6 },\n            errors: [\n                { messageId: \"unexpectedConcat\" }\n            ]\n        },\n        {\n            code: \"foo + `a` + `b`\",\n            parserOptions: { ecmaVersion: 6 },\n            errors: [\n                { messageId: \"unexpectedConcat\" }\n            ]\n        }\n    ]\n});\n"
+    }
+  ],
+  "allowed_mutation_paths": [
+    "lib/rules/no-useless-concat.js"
+  ],
+  "test_argv": [
+    "--timeout",
+    "30000",
+    "tests/lib/rules/no-useless-concat.js"
+  ],
+  "runtime_key": "eslint-v7",
+  "runtime_version": "7.0",
+  "provenance": {
+    "kind": "real-commit-derived",
+    "repository": "https://github.com/eslint/eslint",
+    "source_commit": "988d8428811934943ce13b2d8b833d795ac2bb4a",
+    "parent_commit": "0518ebb840b5bf2d646dbd8a9b3e246e7069eb79",
+    "source_paths": [
+      "lib/rules/no-useless-concat.js"
+    ],
+    "patch_fingerprint": "sha256:73e41a9dd14c53ea2cfb69b6042a884a2dc985da8cd5c6454611d98a5b83ab25",
+    "visible_requirement_fingerprint": "sha256:e9ad43976bb7e2fa397739d17d8e0b02c25d5f496b7eee22c20c21745362dbc1",
+    "license": "MIT",
+    "license_fingerprint": "sha256:73e2034fe7f17e603f7c3a4bb7f8b71db11a63f94907d08e756c9d4d72a35505"
+  },
+  "requirement_coverage": {
+    "schema_version": 1,
+    "contract_fingerprint": "sha256:f013fecb0f3edd7a510b4b1902bfe4df6d258386011fe339c1d6a7ca5aa52a93",
+    "contract_completeness": "unverified",
+    "hidden_test_witnesses": [
+      {
+        "hidden_test_fingerprint": "sha256:d30939eef206adfc9d72f52839b1db6ee14e6de2b5f06c804d3b9516cb51fdf2",
+        "clause_ids": [
+          "REQ-001",
+          "REQ-002"
+        ]
+      }
+    ],
+    "runner_witnesses": [
+      {
+        "witness_id": "closed-mutation-set",
+        "clause_ids": [
+          "REQ-003"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-development-medium-01",
+  "oracle": "upstream-eslint-rule-test-and-closed-mutation-set",
+  "defect_severity": "unclassified",
+  "reference_files": [
+    {
+      "path": "lib/rules/no-iterator.js",
+      "content": "/**\n * @fileoverview Rule to flag usage of __iterator__ property\n * @author Ian Christian Myers\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst { getStaticPropertyName } = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\nmodule.exports = {\n    meta: {\n        type: \"suggestion\",\n\n        docs: {\n            description: \"disallow the use of the `__iterator__` property\",\n            category: \"Best Practices\",\n            recommended: false,\n            url: \"https://eslint.org/docs/rules/no-iterator\"\n        },\n\n        schema: [],\n\n        messages: {\n            noIterator: \"Reserved name '__iterator__'.\"\n        }\n    },\n\n    create(context) {\n\n        return {\n\n            MemberExpression(node) {\n\n                if (getStaticPropertyName(node) === \"__iterator__\") {\n                    context.report({\n                        node,\n                        messageId: \"noIterator\"\n                    });\n                }\n            }\n        };\n\n    }\n};\n"
+    },
+    {
+      "path": "lib/rules/no-proto.js",
+      "content": "/**\n * @fileoverview Rule to flag usage of __proto__ property\n * @author Ilya Volodin\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst { getStaticPropertyName } = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\nmodule.exports = {\n    meta: {\n        type: \"suggestion\",\n\n        docs: {\n            description: \"disallow the use of the `__proto__` property\",\n            category: \"Best Practices\",\n            recommended: false,\n            url: \"https://eslint.org/docs/rules/no-proto\"\n        },\n\n        schema: []\n    },\n\n    create(context) {\n\n        return {\n\n            MemberExpression(node) {\n                if (getStaticPropertyName(node) === \"__proto__\") {\n                    context.report({ node, message: \"The '__proto__' property is deprecated.\" });\n                }\n            }\n        };\n\n    }\n};\n"
+    }
+  ],
+  "hidden_test_files": [
+    {
+      "path": "tests/lib/rules/no-iterator.js",
+      "content": "/**\n * @fileoverview Tests for no-iterator rule.\n * @author Ian Christian Myers\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst rule = require(\"../../../lib/rules/no-iterator\"),\n    { RuleTester } = require(\"../../../lib/rule-tester\");\n\n//------------------------------------------------------------------------------\n// Tests\n//------------------------------------------------------------------------------\n\nconst ruleTester = new RuleTester();\n\nruleTester.run(\"no-iterator\", rule, {\n    valid: [\n        \"var a = test[__iterator__];\",\n        \"var __iterator__ = null;\",\n        { code: \"foo[`__iterator`] = null;\", parserOptions: { ecmaVersion: 6 } },\n        { code: \"foo[`__iterator__\\n`] = null;\", parserOptions: { ecmaVersion: 6 } }\n    ],\n    invalid: [\n        {\n            code: \"var a = test.__iterator__;\",\n            errors: [{\n                messageId: \"noIterator\",\n                type: \"MemberExpression\"\n            }]\n        },\n        {\n            code: \"Foo.prototype.__iterator__ = function() {};\",\n            errors: [{\n                messageId: \"noIterator\",\n                type: \"MemberExpression\"\n            }]\n        },\n        {\n            code: \"var a = test['__iterator__'];\",\n            errors: [{\n                messageId: \"noIterator\",\n                type: \"MemberExpression\"\n            }]\n        },\n        {\n            code: \"var a = test[`__iterator__`];\",\n            parserOptions: { ecmaVersion: 6 },\n            errors: [{\n                messageId: \"noIterator\",\n                type: \"MemberExpression\"\n            }]\n        },\n        {\n            code: \"test[`__iterator__`] = function () {};\",\n            parserOptions: { ecmaVersion: 6 },\n            errors: [{\n                messageId: \"noIterator\",\n                type: \"MemberExpression\"\n            }]\n        }\n    ]\n});\n"
+    },
+    {
+      "path": "tests/lib/rules/no-proto.js",
+      "content": "/**\n * @fileoverview Tests for no-proto rule.\n * @author Ilya Volodin\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst rule = require(\"../../../lib/rules/no-proto\"),\n    { RuleTester } = require(\"../../../lib/rule-tester\");\n\n//------------------------------------------------------------------------------\n// Tests\n//------------------------------------------------------------------------------\n\nconst ruleTester = new RuleTester();\n\nruleTester.run(\"no-proto\", rule, {\n    valid: [\n        \"var a = test[__proto__];\",\n        \"var __proto__ = null;\",\n        { code: \"foo[`__proto`] = null;\", parserOptions: { ecmaVersion: 6 } },\n        { code: \"foo[`__proto__\\n`] = null;\", parserOptions: { ecmaVersion: 6 } }\n    ],\n    invalid: [\n        { code: \"var a = test.__proto__;\", errors: [{ message: \"The '__proto__' property is deprecated.\", type: \"MemberExpression\" }] },\n        { code: \"var a = test['__proto__'];\", errors: [{ message: \"The '__proto__' property is deprecated.\", type: \"MemberExpression\" }] },\n        { code: \"var a = test[`__proto__`];\", parserOptions: { ecmaVersion: 6 }, errors: [{ message: \"The '__proto__' property is deprecated.\", type: \"MemberExpression\" }] },\n        { code: \"test[`__proto__`] = function () {};\", parserOptions: { ecmaVersion: 6 }, errors: [{ message: \"The '__proto__' property is deprecated.\", type: \"MemberExpression\" }] }\n    ]\n});\n"
+    }
+  ],
+  "allowed_mutation_paths": [
+    "lib/rules/no-iterator.js",
+    "lib/rules/no-proto.js"
+  ],
+  "test_argv": [
+    "--timeout",
+    "30000",
+    "tests/lib/rules/no-iterator.js",
+    "tests/lib/rules/no-proto.js"
+  ],
+  "runtime_key": "eslint-v7",
+  "runtime_version": "7.0",
+  "provenance": {
+    "kind": "real-commit-derived",
+    "repository": "https://github.com/eslint/eslint",
+    "source_commit": "03a69dbe86d5b5768a310105416ae726822e3c1c",
+    "parent_commit": "562e7845946a490f2e173a0bcd1af631070a4eef",
+    "source_paths": [
+      "lib/rules/no-iterator.js",
+      "lib/rules/no-proto.js"
+    ],
+    "patch_fingerprint": "sha256:ba9bf57daa883655523002845824f2f141a62d49ae57109a709fe275bed42466",
+    "visible_requirement_fingerprint": "sha256:6cf31ef6b7fc6e8314c08b0304560aa2e2615a63ed091c0ac27c33faa4294c85",
+    "license": "MIT",
+    "license_fingerprint": "sha256:73e2034fe7f17e603f7c3a4bb7f8b71db11a63f94907d08e756c9d4d72a35505"
+  },
+  "requirement_coverage": {
+    "schema_version": 1,
+    "contract_fingerprint": "sha256:0e2f32847b1e93b121575d79a493c56cf60b74a25a8787591ce56b00cb7179ff",
+    "contract_completeness": "unverified",
+    "hidden_test_witnesses": [
+      {
+        "hidden_test_fingerprint": "sha256:3caf1a56b8a7895b6fac40826e502ae2693dd0cb904a26c3877531c567c2abb6",
+        "clause_ids": [
+          "REQ-001",
+          "REQ-002"
+        ]
+      },
+      {
+        "hidden_test_fingerprint": "sha256:e1c1bcc5a69231ed15e3527a7192be5104768d57df8183d6c4a04694c612ef48",
+        "clause_ids": [
+          "REQ-001",
+          "REQ-002"
+        ]
+      }
+    ],
+    "runner_witnesses": [
+      {
+        "witness_id": "closed-mutation-set",
+        "clause_ids": [
+          "REQ-003"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-holdout-small-29",
+  "split": "holdout",
+  "stratum": "small",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-holdout-small-29-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:5201282398aadef17ee266617e389e0929bf8fac8c9456120957ee1557d934c4"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-new-object.js",
+      "content": "/**\n * @fileoverview A rule to disallow calls to the Object constructor\n * @author Matt DuVall <http://www.mattduvall.com/>\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\nmodule.exports = {\n    meta: {\n        type: \"suggestion\",\n\n        docs: {\n            description: \"disallow `Object` constructors\",\n            category: \"Stylistic Issues\",\n            recommended: false,\n            url: \"https://eslint.org/docs/rules/no-new-object\"\n        },\n\n        schema: [],\n\n        messages: {\n            preferLiteral: \"The object literal notation {} is preferrable.\"\n        }\n    },\n\n    create(context) {\n\n        return {\n\n            NewExpression(node) {\n                if (node.callee.name === \"Object\") {\n                    context.report({\n                        node,\n                        messageId: \"preferLiteral\"\n                    });\n                }\n            }\n        };\n\n    }\n};\n"
+    }
+  ]
+}

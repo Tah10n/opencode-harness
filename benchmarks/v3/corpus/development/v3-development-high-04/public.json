@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-development-high-04",
+  "split": "development",
+  "stratum": "high",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-development-high-04-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:a3033406305049cff34f8b46b69acc4bf45d8c6fb07d6e2a73a21708021c8b46"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-empty-pattern.js",
+      "content": "/**\n * @fileoverview Rule to disallow an empty pattern\n * @author Alberto Rodríguez\n */\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../shared/types').Rule} */\nmodule.exports = {\n    meta: {\n        type: \"problem\",\n\n        docs: {\n            description: \"Disallow empty destructuring patterns\",\n            recommended: true,\n            url: \"https://eslint.org/docs/latest/rules/no-empty-pattern\"\n        },\n\n        schema: [],\n\n        messages: {\n            unexpected: \"Unexpected empty {{type}} pattern.\"\n        }\n    },\n\n    create(context) {\n        return {\n            ObjectPattern(node) {\n                if (node.properties.length === 0) {\n                    context.report({ node, messageId: \"unexpected\", data: { type: \"object\" } });\n                }\n            },\n            ArrayPattern(node) {\n                if (node.elements.length === 0) {\n                    context.report({ node, messageId: \"unexpected\", data: { type: \"array\" } });\n                }\n            }\n        };\n    }\n};\n"
+    }
+  ]
+}

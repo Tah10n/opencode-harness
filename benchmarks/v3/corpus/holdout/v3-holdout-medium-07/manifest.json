@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-holdout-medium-07",
+  "split": "holdout",
+  "stratum": "medium",
+  "semantic_kernel_id": "eslint-change-b67eba4514026ef7e489798fd883beb678817a46",
+  "public_surface_fingerprint": "sha256:97f43bd2c696f94c15bff097f7e522439f6c0377ed8dc777b6435745f75d1b11",
+  "control_surface_fingerprint": "sha256:ecaf6f9a62d801ee21c711c9bc056082355ebaf689ae4282529b9b24daea83eb",
+  "source_identity_fingerprint": "sha256:6bdc1f0f93f457b285a53b7772c72fc10b7eb28ce2ee6ec9bbb4d15fd216e4c0",
+  "family_fingerprint": "sha256:79a1e453e770136e7fedeefe8211add1ee791762e0f89992e15e2c535d905bb2"
+}

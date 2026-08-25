@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-small-20",
+  "split": "validation",
+  "stratum": "small",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-validation-small-20-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:1feed7b47ed45175f8e29f0aebc0a5bf0622121e60a8ccf1743aed50dee58be3"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/space-before-function-paren.js",
+      "content": "/**\n * @fileoverview Rule to validate spacing before function paren.\n * @author Mathias Schreck <https://github.com/lo1tuma>\n */\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst astUtils = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\nmodule.exports = {\n    meta: {\n        type: \"layout\",\n\n        docs: {\n            description: \"enforce consistent spacing before `function` definition opening parenthesis\",\n            category: \"Stylistic Issues\",\n            recommended: false,\n            url: \"https://eslint.org/docs/rules/space-before-function-paren\"\n        },\n\n        fixable: \"whitespace\",\n\n        schema: [\n            {\n                oneOf: [\n                    {\n                        enum: [\"always\", \"never\"]\n                    },\n                    {\n                        type: \"object\",\n                        properties: {\n                            anonymous: {\n                                enum: [\"always\", \"never\", \"ignore\"]\n                            },\n                            named: {\n                                enum: [\"always\", \"never\", \"ignore\"]\n                            },\n                            asyncArrow: {\n                                enum: [\"always\", \"never\", \"ignore\"]\n                            }\n                        },\n                        additionalProperties: false\n                    }\n                ]\n            }\n        ],\n\n        messages: {\n            unexpectedSpace: \"Unexpected space before function parentheses.\",\n            missingSpace: \"Missing space before function parentheses.\"\n        }\n    },\n\n    create(context) {\n        const sourceCode = context.getSourceCode();\n        const baseConfig = typeof context.options[0] === \"string\" ? context.options[0] : \"always\";\n        const overrideConfig = typeof context.options[0] === \"object\" ? context.options[0] : {};\n\n        /**\n         * Determines whether a function has a name.\n         * @param {ASTNode} node The function node.\n         * @returns {boolean} Whether the function has a name.\n         */\n        function isNamedFunction(node) {\n            if (node.id) {\n                return true;\n            }\n\n            const parent = node.parent;\n\n            return parent.type === \"MethodDefinition\" ||\n                (parent.type === \"Property\" &&\n                    (\n                        parent.kind === \"get\" ||\n                        parent.kind === \"set\" ||\n                        parent.method\n                    )\n                );\n        }\n\n        /**\n         * Gets the config for a given function\n         * @param {ASTNode} node The function node\n         * @returns {string} \"always\", \"never\", or \"ignore\"\n         */\n        function getConfigForFunction(node) {\n            if (node.type === \"ArrowFunctionExpression\") {\n\n                // Always ignore non-async functions and arrow functions without parens, e.g. async foo => bar\n                if (node.async && astUtils.isOpeningParenToken(sourceCode.getFirstToken(node, { skip: 1 }))) {\n                    return overrideConfig.asyncArrow || baseConfig;\n                }\n            } else if (isNamedFunction(node)) {\n                return overrideConfig.named || baseConfig;\n\n            // `generator-star-spacing` should warn anonymous generators. E.g. `function* () {}`\n            } else if (!node.generator) {\n                return overrideConfig.anonymous || baseConfig;\n            }\n\n            return \"ignore\";\n        }\n\n        /**\n         * Checks the parens of a function node\n         * @param {ASTNode} node A function node\n         * @returns {void}\n         */\n        function checkFunction(node) {\n            const functionConfig = getConfigForFunction(node);\n\n            if (functionConfig === \"ignore\") {\n                return;\n            }\n\n            const rightToken = sourceCode.getFirstToken(node, astUtils.isOpeningParenToken);\n            const leftToken = sourceCode.getTokenBefore(rightToken);\n            const hasSpacing = sourceCode.isSpaceBetweenTokens(leftToken, rightToken);\n\n            if (hasSpacing && functionConfig === \"never\") {\n                context.report({\n                    node,\n                    loc: leftToken.loc.end,\n                    messageId: \"unexpectedSpace\",\n                    fix(fixer) {\n                        const comments = sourceCode.getCommentsBefore(rightToken);\n\n                        // Don't fix anything if there's a single line comment between the left and the right token\n                        if (comments.some(comment => comment.type === \"Line\")) {\n                            return null;\n                        }\n                        return fixer.replaceTextRange(\n                            [leftToken.range[1], rightToken.range[0]],\n                            comments.reduce((text, comment) => text + sourceCode.getText(comment), \"\")\n                        );\n                    }\n                });\n            } else if (!hasSpacing && functionConfig === \"always\") {\n                context.report({\n                    node,\n                    loc: leftToken.loc.end,\n                    messageId: \"missingSpace\",\n                    fix: fixer => fixer.insertTextAfter(leftToken, \" \")\n                });\n            }\n        }\n\n        return {\n            ArrowFunctionExpression: checkFunction,\n            FunctionDeclaration: checkFunction,\n            FunctionExpression: checkFunction\n        };\n    }\n};\n"
+    }
+  ]
+}

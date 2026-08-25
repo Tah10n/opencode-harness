@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-holdout-high-12",
+  "split": "holdout",
+  "stratum": "high",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-holdout-high-12-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:e8a7a4988487bb41cfe9b041e44c27c18716e9b3a67b030787aebcfde8a852e4"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-compare-neg-zero.js",
+      "content": "/**\n * @fileoverview The rule should warn against code that tries to compare against -0.\n * @author Aladdin-ADD <hh_2013@foxmail.com>\n */\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../types').Rule.RuleModule} */\nmodule.exports = {\n\tmeta: {\n\t\ttype: \"problem\",\n\n\t\tdocs: {\n\t\t\tdescription: \"Disallow comparing against `-0`\",\n\t\t\trecommended: true,\n\t\t\turl: \"https://eslint.org/docs/latest/rules/no-compare-neg-zero\",\n\t\t},\n\n\t\tfixable: null,\n\t\tschema: [],\n\n\t\tmessages: {\n\t\t\tunexpected:\n\t\t\t\t\"Do not use the '{{operator}}' operator to compare against -0.\",\n\t\t},\n\t},\n\n\tcreate(context) {\n\t\t//--------------------------------------------------------------------------\n\t\t// Helpers\n\t\t//--------------------------------------------------------------------------\n\n\t\t/**\n\t\t * Checks a given node is -0\n\t\t * @param {ASTNode} node A node to check.\n\t\t * @returns {boolean} `true` if the node is -0.\n\t\t */\n\t\tfunction isNegZero(node) {\n\t\t\treturn (\n\t\t\t\tnode.type === \"UnaryExpression\" &&\n\t\t\t\tnode.operator === \"-\" &&\n\t\t\t\tnode.argument.type === \"Literal\" &&\n\t\t\t\tnode.argument.value === 0\n\t\t\t);\n\t\t}\n\t\tconst OPERATORS_TO_CHECK = new Set([\n\t\t\t\">\",\n\t\t\t\">=\",\n\t\t\t\"<\",\n\t\t\t\"<=\",\n\t\t\t\"==\",\n\t\t\t\"===\",\n\t\t\t\"!=\",\n\t\t\t\"!==\",\n\t\t]);\n\n\t\treturn {\n\t\t\tBinaryExpression(node) {\n\t\t\t\tif (OPERATORS_TO_CHECK.has(node.operator)) {\n\t\t\t\t\tif (isNegZero(node.left) || isNegZero(node.right)) {\n\t\t\t\t\t\tcontext.report({\n\t\t\t\t\t\t\tnode,\n\t\t\t\t\t\t\tmessageId: \"unexpected\",\n\t\t\t\t\t\t\tdata: { operator: node.operator },\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t},\n\t\t};\n\t},\n};\n"
+    }
+  ]
+}

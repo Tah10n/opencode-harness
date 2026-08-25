@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-medium-09",
+  "split": "validation",
+  "stratum": "medium",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-validation-medium-09-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:4247694d5f5dd457345115092826d06f3fdfa59d82a38664a0ecdf270d46dc02"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-empty.js",
+      "content": "/**\n * @fileoverview Rule to flag use of an empty block statement\n * @author Nicholas C. Zakas\n */\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst astUtils = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../types').Rule.RuleModule} */\nmodule.exports = {\n\tmeta: {\n\t\thasSuggestions: true,\n\t\ttype: \"suggestion\",\n\n\t\tdefaultOptions: [\n\t\t\t{\n\t\t\t\tallowEmptyCatch: false,\n\t\t\t},\n\t\t],\n\n\t\tdocs: {\n\t\t\tdescription: \"Disallow empty block statements\",\n\t\t\trecommended: true,\n\t\t\turl: \"https://eslint.org/docs/latest/rules/no-empty\",\n\t\t},\n\n\t\tschema: [\n\t\t\t{\n\t\t\t\ttype: \"object\",\n\t\t\t\tproperties: {\n\t\t\t\t\tallowEmptyCatch: {\n\t\t\t\t\t\ttype: \"boolean\",\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t\tadditionalProperties: false,\n\t\t\t},\n\t\t],\n\n\t\tmessages: {\n\t\t\tunexpected: \"Empty {{type}} statement.\",\n\t\t\tsuggestComment: \"Add comment inside empty {{type}} statement.\",\n\t\t},\n\t},\n\n\tcreate(context) {\n\t\tconst [{ allowEmptyCatch }] = context.options;\n\t\tconst sourceCode = context.sourceCode;\n\n\t\treturn {\n\t\t\tBlockStatement(node) {\n\t\t\t\t// if the body is not empty, we can just return immediately\n\t\t\t\tif (node.body.length !== 0) {\n\t\t\t\t\treturn;\n\t\t\t\t}\n\n\t\t\t\t// a function is generally allowed to be empty\n\t\t\t\tif (astUtils.isFunction(node.parent)) {\n\t\t\t\t\treturn;\n\t\t\t\t}\n\n\t\t\t\tif (allowEmptyCatch && node.parent.type === \"CatchClause\") {\n\t\t\t\t\treturn;\n\t\t\t\t}\n\n\t\t\t\t// any other block is only allowed to be empty, if it contains a comment\n\t\t\t\tif (sourceCode.getCommentsInside(node).length > 0) {\n\t\t\t\t\treturn;\n\t\t\t\t}\n\n\t\t\t\tcontext.report({\n\t\t\t\t\tnode,\n\t\t\t\t\tmessageId: \"unexpected\",\n\t\t\t\t\tdata: { type: \"block\" },\n\t\t\t\t\tsuggest: [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\tmessageId: \"suggestComment\",\n\t\t\t\t\t\t\tdata: { type: \"block\" },\n\t\t\t\t\t\t\tfix(fixer) {\n\t\t\t\t\t\t\t\tconst range = [\n\t\t\t\t\t\t\t\t\tnode.range[0] + 1,\n\t\t\t\t\t\t\t\t\tnode.range[1] - 1,\n\t\t\t\t\t\t\t\t];\n\n\t\t\t\t\t\t\t\treturn fixer.replaceTextRange(\n\t\t\t\t\t\t\t\t\trange,\n\t\t\t\t\t\t\t\t\t\" /* empty */ \",\n\t\t\t\t\t\t\t\t);\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t},\n\t\t\t\t\t],\n\t\t\t\t});\n\t\t\t},\n\n\t\t\tSwitchStatement(node) {\n\t\t\t\tif (\n\t\t\t\t\ttypeof node.cases === \"undefined\" ||\n\t\t\t\t\tnode.cases.length === 0\n\t\t\t\t) {\n\t\t\t\t\tcontext.report({\n\t\t\t\t\t\tnode,\n\t\t\t\t\t\tmessageId: \"unexpected\",\n\t\t\t\t\t\tdata: { type: \"switch\" },\n\t\t\t\t\t});\n\t\t\t\t}\n\t\t\t},\n\t\t};\n\t},\n};\n"
+    }
+  ]
+}

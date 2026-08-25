@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-small-06",
+  "split": "validation",
+  "stratum": "small",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-validation-small-06-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:619780295890b7c702c838a61764e62c421bc4f0d2182be37aa4026473af5662"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-undef-init.js",
+      "content": "/**\n * @fileoverview Rule to flag when initializing to undefined\n * @author Ilya Volodin\n */\n\n\"use strict\";\n\nconst astUtils = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../types').Rule.RuleModule} */\nmodule.exports = {\n\tmeta: {\n\t\ttype: \"suggestion\",\n\n\t\tdocs: {\n\t\t\tdescription: \"Disallow initializing variables to `undefined`\",\n\t\t\trecommended: false,\n\t\t\tfrozen: true,\n\t\t\turl: \"https://eslint.org/docs/latest/rules/no-undef-init\",\n\t\t},\n\n\t\tschema: [],\n\t\tfixable: \"code\",\n\n\t\tmessages: {\n\t\t\tunnecessaryUndefinedInit:\n\t\t\t\t\"It's not necessary to initialize '{{name}}' to undefined.\",\n\t\t},\n\t},\n\n\tcreate(context) {\n\t\tconst sourceCode = context.sourceCode;\n\n\t\treturn {\n\t\t\tVariableDeclarator(node) {\n\t\t\t\tconst name = sourceCode.getText(node.id),\n\t\t\t\t\tinit = node.init && node.init.name,\n\t\t\t\t\tscope = sourceCode.getScope(node),\n\t\t\t\t\tundefinedVar = astUtils.getVariableByName(\n\t\t\t\t\t\tscope,\n\t\t\t\t\t\t\"undefined\",\n\t\t\t\t\t),\n\t\t\t\t\tshadowed = undefinedVar && undefinedVar.defs.length > 0,\n\t\t\t\t\tlastToken = sourceCode.getLastToken(node);\n\n\t\t\t\tif (\n\t\t\t\t\tinit === \"undefined\" &&\n\t\t\t\t\tnode.parent.kind !== \"const\" &&\n\t\t\t\t\t!shadowed\n\t\t\t\t) {\n\t\t\t\t\tcontext.report({\n\t\t\t\t\t\tnode,\n\t\t\t\t\t\tmessageId: \"unnecessaryUndefinedInit\",\n\t\t\t\t\t\tdata: { name },\n\t\t\t\t\t\tfix(fixer) {\n\t\t\t\t\t\t\tif (node.parent.kind === \"var\") {\n\t\t\t\t\t\t\t\treturn null;\n\t\t\t\t\t\t\t}\n\n\t\t\t\t\t\t\tif (\n\t\t\t\t\t\t\t\tnode.id.type === \"ArrayPattern\" ||\n\t\t\t\t\t\t\t\tnode.id.type === \"ObjectPattern\"\n\t\t\t\t\t\t\t) {\n\t\t\t\t\t\t\t\t// Don't fix destructuring assignment to `undefined`.\n\t\t\t\t\t\t\t\treturn null;\n\t\t\t\t\t\t\t}\n\n\t\t\t\t\t\t\tif (\n\t\t\t\t\t\t\t\tsourceCode.commentsExistBetween(\n\t\t\t\t\t\t\t\t\tnode.id,\n\t\t\t\t\t\t\t\t\tlastToken,\n\t\t\t\t\t\t\t\t)\n\t\t\t\t\t\t\t) {\n\t\t\t\t\t\t\t\treturn null;\n\t\t\t\t\t\t\t}\n\n\t\t\t\t\t\t\treturn fixer.removeRange([\n\t\t\t\t\t\t\t\tnode.id.range[1],\n\t\t\t\t\t\t\t\tnode.range[1],\n\t\t\t\t\t\t\t]);\n\t\t\t\t\t\t},\n\t\t\t\t\t});\n\t\t\t\t}\n\t\t\t},\n\t\t};\n\t},\n};\n"
+    }
+  ]
+}

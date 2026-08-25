@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-high-08",
+  "split": "validation",
+  "stratum": "high",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-validation-high-08-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:eba6e4d5b08b2d70eabefc97daae3041c7694e2823a810b906e8a1d022b09d1c"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/semi-style.js",
+      "content": "/**\n * @fileoverview Rule to enforce location of semicolons.\n * @author Toru Nagashima\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst astUtils = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\nconst SELECTOR = [\n    \"BreakStatement\", \"ContinueStatement\", \"DebuggerStatement\",\n    \"DoWhileStatement\", \"ExportAllDeclaration\",\n    \"ExportDefaultDeclaration\", \"ExportNamedDeclaration\",\n    \"ExpressionStatement\", \"ImportDeclaration\", \"ReturnStatement\",\n    \"ThrowStatement\", \"VariableDeclaration\", \"PropertyDefinition\"\n].join(\",\");\n\n/**\n * Get the child node list of a given node.\n * This returns `Program#body`, `BlockStatement#body`, or `SwitchCase#consequent`.\n * This is used to check whether a node is the first/last child.\n * @param {Node} node A node to get child node list.\n * @returns {Node[]|null} The child node list.\n */\nfunction getChildren(node) {\n    const t = node.type;\n\n    if (t === \"BlockStatement\" || t === \"Program\" || t === \"ClassBody\") {\n        return node.body;\n    }\n    if (t === \"SwitchCase\") {\n        return node.consequent;\n    }\n    return null;\n}\n\n/**\n * Check whether a given node is the last statement in the parent block.\n * @param {Node} node A node to check.\n * @returns {boolean} `true` if the node is the last statement in the parent block.\n */\nfunction isLastChild(node) {\n    const t = node.parent.type;\n\n    if (t === \"IfStatement\" && node.parent.consequent === node && node.parent.alternate) { // before `else` keyword.\n        return true;\n    }\n    if (t === \"DoWhileStatement\") { // before `while` keyword.\n        return true;\n    }\n    const nodeList = getChildren(node.parent);\n\n    return nodeList !== null && nodeList[nodeList.length - 1] === node; // before `}` or etc.\n}\n\nmodule.exports = {\n    meta: {\n        type: \"layout\",\n\n        docs: {\n            description: \"enforce location of semicolons\",\n            recommended: false,\n            url: \"https://eslint.org/docs/rules/semi-style\"\n        },\n\n        schema: [{ enum: [\"last\", \"first\"] }],\n        fixable: \"whitespace\",\n\n        messages: {\n            expectedSemiColon: \"Expected this semicolon to be at {{pos}}.\"\n        }\n    },\n\n    create(context) {\n        const sourceCode = context.getSourceCode();\n        const option = context.options[0] || \"last\";\n\n        /**\n         * Check the given semicolon token.\n         * @param {Token} semiToken The semicolon token to check.\n         * @param {\"first\"|\"last\"} expected The expected location to check.\n         * @returns {void}\n         */\n        function check(semiToken, expected) {\n            const prevToken = sourceCode.getTokenBefore(semiToken);\n            const nextToken = sourceCode.getTokenAfter(semiToken);\n            const prevIsSameLine = !prevToken || astUtils.isTokenOnSameLine(prevToken, semiToken);\n            const nextIsSameLine = !nextToken || astUtils.isTokenOnSameLine(semiToken, nextToken);\n\n            if ((expected === \"last\" && !prevIsSameLine) || (expected === \"first\" && !nextIsSameLine)) {\n                context.report({\n                    loc: semiToken.loc,\n                    messageId: \"expectedSemiColon\",\n                    data: {\n                        pos: (expected === \"last\")\n                            ? \"the end of the previous line\"\n                            : \"the beginning of the next line\"\n                    },\n                    fix(fixer) {\n                        if (prevToken && nextToken && sourceCode.commentsExistBetween(prevToken, nextToken)) {\n                            return null;\n                        }\n\n                        const start = prevToken ? prevToken.range[1] : semiToken.range[0];\n                        const end = nextToken ? nextToken.range[0] : semiToken.range[1];\n                        const text = (expected === \"last\") ? \";\\n\" : \"\\n;\";\n\n                        return fixer.replaceTextRange([start, end], text);\n                    }\n                });\n            }\n        }\n\n        return {\n            [SELECTOR](node) {\n                if (option === \"first\" && isLastChild(node)) {\n                    return;\n                }\n\n                const lastToken = sourceCode.getLastToken(node);\n\n                if (astUtils.isSemicolonToken(lastToken)) {\n                    check(lastToken, option);\n                }\n            },\n\n            ForStatement(node) {\n                const firstSemi = node.init && sourceCode.getTokenAfter(node.init, astUtils.isSemicolonToken);\n                const secondSemi = node.test && sourceCode.getTokenAfter(node.test, astUtils.isSemicolonToken);\n\n                if (firstSemi) {\n                    check(firstSemi, \"last\");\n                }\n                if (secondSemi) {\n                    check(secondSemi, \"last\");\n                }\n            }\n        };\n    }\n};\n"
+    }
+  ]
+}

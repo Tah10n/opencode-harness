@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-small-03",
+  "split": "validation",
+  "stratum": "small",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-validation-small-03-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:f619e016b2ede2fe21de04e6405bff298acb04266d43c9f1357806d16e3ddba6"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/id-denylist.js",
+      "content": "/**\n * @fileoverview Rule that warns when identifier names that are\n * specified in the configuration are used.\n * @author Keith Cirkel (http://keithcirkel.co.uk)\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst astUtils = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Helpers\n//------------------------------------------------------------------------------\n\n/**\n * Checks whether the given node represents assignment target in a normal assignment or destructuring.\n * @param {ASTNode} node The node to check.\n * @returns {boolean} `true` if the node is assignment target.\n */\nfunction isAssignmentTarget(node) {\n\tconst parent = node.parent;\n\n\treturn (\n\t\t// normal assignment\n\t\t(parent.type === \"AssignmentExpression\" && parent.left === node) ||\n\t\t// destructuring\n\t\tparent.type === \"ArrayPattern\" ||\n\t\tparent.type === \"RestElement\" ||\n\t\t(parent.type === \"Property\" &&\n\t\t\tparent.value === node &&\n\t\t\tparent.parent.type === \"ObjectPattern\") ||\n\t\t(parent.type === \"AssignmentPattern\" && parent.left === node)\n\t);\n}\n\n/**\n * Checks whether the given node represents an imported name that is renamed in the same import/export specifier.\n *\n * Examples:\n * import { a as b } from 'mod'; // node `a` is renamed import\n * export { a as b } from 'mod'; // node `a` is renamed import\n * @param {ASTNode} node `Identifier` node to check.\n * @returns {boolean} `true` if the node is a renamed import.\n */\nfunction isRenamedImport(node) {\n\tconst parent = node.parent;\n\n\treturn (\n\t\t(parent.type === \"ImportSpecifier\" &&\n\t\t\tparent.imported !== parent.local &&\n\t\t\tparent.imported === node) ||\n\t\t(parent.type === \"ExportSpecifier\" &&\n\t\t\tparent.parent.source && // re-export\n\t\t\tparent.local !== parent.exported &&\n\t\t\tparent.local === node)\n\t);\n}\n\n/**\n * Checks whether the given node is an ObjectPattern destructuring.\n *\n * Examples:\n * const { a : b } = foo;\n * @param {ASTNode} node `Identifier` node to check.\n * @returns {boolean} `true` if the node is in an ObjectPattern destructuring.\n */\nfunction isPropertyNameInDestructuring(node) {\n\tconst parent = node.parent;\n\n\treturn (\n\t\t!parent.computed &&\n\t\tparent.type === \"Property\" &&\n\t\tparent.parent.type === \"ObjectPattern\" &&\n\t\tparent.key === node\n\t);\n}\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../types').Rule.RuleModule} */\nmodule.exports = {\n\tmeta: {\n\t\ttype: \"suggestion\",\n\n\t\tdefaultOptions: [],\n\n\t\tdocs: {\n\t\t\tdescription: \"Disallow specified identifiers\",\n\t\t\trecommended: false,\n\t\t\tfrozen: true,\n\t\t\turl: \"https://eslint.org/docs/latest/rules/id-denylist\",\n\t\t},\n\n\t\tschema: {\n\t\t\ttype: \"array\",\n\t\t\titems: {\n\t\t\t\ttype: \"string\",\n\t\t\t},\n\t\t\tuniqueItems: true,\n\t\t},\n\t\tmessages: {\n\t\t\trestricted: \"Identifier '{{name}}' is restricted.\",\n\t\t\trestrictedPrivate: \"Identifier '#{{name}}' is restricted.\",\n\t\t},\n\t},\n\n\tcreate(context) {\n\t\tconst denyList = new Set(context.options);\n\t\tconst reportedNodes = new Set();\n\t\tconst sourceCode = context.sourceCode;\n\n\t\tlet globalScope;\n\n\t\t/**\n\t\t * Checks whether the given name is restricted.\n\t\t * @param {string} name The name to check.\n\t\t * @returns {boolean} `true` if the name is restricted.\n\t\t * @private\n\t\t */\n\t\tfunction isRestricted(name) {\n\t\t\treturn denyList.has(name);\n\t\t}\n\n\t\t/**\n\t\t * Checks whether the given node represents a reference to a global variable that is not declared in the source code.\n\t\t * These identifiers will be allowed, as it is assumed that user has no control over the names of external global variables.\n\t\t * @param {ASTNode} node `Identifier` node to check.\n\t\t * @returns {boolean} `true` if the node is a reference to a global variable.\n\t\t */\n\t\tfunction isReferenceToGlobalVariable(node) {\n\t\t\tconst variable = globalScope.set.get(node.name);\n\n\t\t\treturn (\n\t\t\t\tvariable &&\n\t\t\t\tvariable.defs.length === 0 &&\n\t\t\t\tvariable.references.some(ref => ref.identifier === node)\n\t\t\t);\n\t\t}\n\n\t\t/**\n\t\t * Determines whether the given node should be checked.\n\t\t * @param {ASTNode} node `Identifier` node.\n\t\t * @returns {boolean} `true` if the node should be checked.\n\t\t */\n\t\tfunction shouldCheck(node) {\n\t\t\t// Import attributes are defined by environments, so naming conventions shouldn't apply to them\n\t\t\tif (astUtils.isImportAttributeKey(node)) {\n\t\t\t\treturn false;\n\t\t\t}\n\n\t\t\tconst parent = node.parent;\n\n\t\t\t/*\n\t\t\t * Member access has special rules for checking property names.\n\t\t\t * Read access to a property with a restricted name is allowed, because it can be on an object that user has no control over.\n\t\t\t * Write access isn't allowed, because it potentially creates a new property with a restricted name.\n\t\t\t */\n\t\t\tif (\n\t\t\t\tparent.type === \"MemberExpression\" &&\n\t\t\t\tparent.property === node &&\n\t\t\t\t!parent.computed\n\t\t\t) {\n\t\t\t\treturn isAssignmentTarget(parent);\n\t\t\t}\n\n\t\t\treturn (\n\t\t\t\tparent.type !== \"CallExpression\" &&\n\t\t\t\tparent.type !== \"NewExpression\" &&\n\t\t\t\t!isRenamedImport(node) &&\n\t\t\t\t!isPropertyNameInDestructuring(node) &&\n\t\t\t\t!isReferenceToGlobalVariable(node)\n\t\t\t);\n\t\t}\n\n\t\t/**\n\t\t * Reports an AST node as a rule violation.\n\t\t * @param {ASTNode} node The node to report.\n\t\t * @returns {void}\n\t\t * @private\n\t\t */\n\t\tfunction report(node) {\n\t\t\t/*\n\t\t\t * We used the range instead of the node because it's possible\n\t\t\t * for the same identifier to be represented by two different\n\t\t\t * nodes, with the most clear example being shorthand properties:\n\t\t\t * { foo }\n\t\t\t * In this case, \"foo\" is represented by one node for the name\n\t\t\t * and one for the value. The only way to know they are the same\n\t\t\t * is to look at the range.\n\t\t\t */\n\t\t\tif (!reportedNodes.has(node.range.toString())) {\n\t\t\t\tconst isPrivate = node.type === \"PrivateIdentifier\";\n\n\t\t\t\tcontext.report({\n\t\t\t\t\tnode,\n\t\t\t\t\tmessageId: isPrivate ? \"restrictedPrivate\" : \"restricted\",\n\t\t\t\t\tdata: {\n\t\t\t\t\t\tname: node.name,\n\t\t\t\t\t},\n\t\t\t\t});\n\t\t\t\treportedNodes.add(node.range.toString());\n\t\t\t}\n\t\t}\n\n\t\treturn {\n\t\t\tProgram(node) {\n\t\t\t\tglobalScope = sourceCode.getScope(node);\n\t\t\t},\n\n\t\t\t[[\"Identifier\", \"PrivateIdentifier\"]](node) {\n\t\t\t\tif (isRestricted(node.name) && shouldCheck(node)) {\n\t\t\t\t\treport(node);\n\t\t\t\t}\n\t\t\t},\n\t\t};\n\t},\n};\n"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-high-16",
+  "split": "validation",
+  "stratum": "high",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-validation-high-16-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:7bb9b8bd954bfe1c603ccc94f731279375e4850abdb592ec6b46359e893003bb"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-prototype-builtins.js",
+      "content": "/**\n * @fileoverview Rule to disallow use of Object.prototype builtins on objects\n * @author Andrew Levine\n */\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst astUtils = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../shared/types').Rule} */\nmodule.exports = {\n    meta: {\n        type: \"problem\",\n\n        docs: {\n            description: \"Disallow calling some `Object.prototype` methods directly on objects\",\n            recommended: true,\n            url: \"https://eslint.org/docs/latest/rules/no-prototype-builtins\"\n        },\n\n        schema: [],\n\n        messages: {\n            prototypeBuildIn: \"Do not access Object.prototype method '{{prop}}' from target object.\"\n        }\n    },\n\n    create(context) {\n        const DISALLOWED_PROPS = new Set([\n            \"hasOwnProperty\",\n            \"isPrototypeOf\",\n            \"propertyIsEnumerable\"\n        ]);\n\n        /**\n         * Reports if a disallowed property is used in a CallExpression\n         * @param {ASTNode} node The CallExpression node.\n         * @returns {void}\n         */\n        function disallowBuiltIns(node) {\n\n            const callee = astUtils.skipChainExpression(node.callee);\n\n            if (callee.type !== \"MemberExpression\") {\n                return;\n            }\n\n            const propName = astUtils.getStaticPropertyName(callee);\n\n            if (propName !== null && DISALLOWED_PROPS.has(propName)) {\n                context.report({\n                    messageId: \"prototypeBuildIn\",\n                    loc: callee.property.loc,\n                    data: { prop: propName },\n                    node\n                });\n            }\n        }\n\n        return {\n            CallExpression: disallowBuiltIns\n        };\n    }\n};\n"
+    }
+  ]
+}

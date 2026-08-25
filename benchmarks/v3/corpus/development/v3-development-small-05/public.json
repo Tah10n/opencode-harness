@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-development-small-05",
+  "split": "development",
+  "stratum": "small",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-development-small-05-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:4564af7bb44e83e49bdd90621f7d35c45b3e0b5511feda8496fa5a5e2ef7f511"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-throw-literal.js",
+      "content": "/**\n * @fileoverview Rule to restrict what can be thrown as an exception.\n * @author Dieter Oberkofler\n */\n\n\"use strict\";\n\nconst astUtils = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../types').Rule.RuleModule} */\nmodule.exports = {\n\tmeta: {\n\t\ttype: \"suggestion\",\n\n\t\tdocs: {\n\t\t\tdescription: \"Disallow throwing literals as exceptions\",\n\t\t\trecommended: false,\n\t\t\turl: \"https://eslint.org/docs/latest/rules/no-throw-literal\",\n\t\t},\n\n\t\tschema: [],\n\n\t\tmessages: {\n\t\t\tobject: \"Expected an error object to be thrown.\",\n\t\t\tundef: \"Do not throw undefined.\",\n\t\t},\n\t},\n\n\tcreate(context) {\n\t\treturn {\n\t\t\tThrowStatement(node) {\n\t\t\t\tif (!astUtils.couldBeError(node.argument)) {\n\t\t\t\t\tcontext.report({ node, messageId: \"object\" });\n\t\t\t\t} else if (node.argument.type === \"Identifier\") {\n\t\t\t\t\tif (node.argument.name === \"undefined\") {\n\t\t\t\t\t\tcontext.report({ node, messageId: \"undef\" });\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t},\n\t\t};\n\t},\n};\n"
+    }
+  ]
+}

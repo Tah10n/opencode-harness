@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-medium-04",
+  "split": "validation",
+  "stratum": "medium",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-validation-medium-04-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:1ab334f8cf1cac4ca8bb49764379909e2adcce64e0191b841cee43c5cf099450"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-useless-rename.js",
+      "content": "/**\n * @fileoverview Disallow renaming import, export, and destructured assignments to the same name.\n * @author Kai Cataldo\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst astUtils = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../shared/types').Rule} */\nmodule.exports = {\n    meta: {\n        type: \"suggestion\",\n\n        docs: {\n            description: \"disallow renaming import, export, and destructured assignments to the same name\",\n            recommended: false,\n            url: \"https://eslint.org/docs/rules/no-useless-rename\"\n        },\n\n        fixable: \"code\",\n\n        schema: [\n            {\n                type: \"object\",\n                properties: {\n                    ignoreDestructuring: { type: \"boolean\", default: false },\n                    ignoreImport: { type: \"boolean\", default: false },\n                    ignoreExport: { type: \"boolean\", default: false }\n                },\n                additionalProperties: false\n            }\n        ],\n\n        messages: {\n            unnecessarilyRenamed: \"{{type}} {{name}} unnecessarily renamed.\"\n        }\n    },\n\n    create(context) {\n        const sourceCode = context.getSourceCode(),\n            options = context.options[0] || {},\n            ignoreDestructuring = options.ignoreDestructuring === true,\n            ignoreImport = options.ignoreImport === true,\n            ignoreExport = options.ignoreExport === true;\n\n        //--------------------------------------------------------------------------\n        // Helpers\n        //--------------------------------------------------------------------------\n\n        /**\n         * Reports error for unnecessarily renamed assignments\n         * @param {ASTNode} node node to report\n         * @param {ASTNode} initial node with initial name value\n         * @param {string} type the type of the offending node\n         * @returns {void}\n         */\n        function reportError(node, initial, type) {\n            const name = initial.type === \"Identifier\" ? initial.name : initial.value;\n\n            return context.report({\n                node,\n                messageId: \"unnecessarilyRenamed\",\n                data: {\n                    name,\n                    type\n                },\n                fix(fixer) {\n                    const replacementNode = node.type === \"Property\" ? node.value : node.local;\n\n                    if (sourceCode.getCommentsInside(node).length > sourceCode.getCommentsInside(replacementNode).length) {\n                        return null;\n                    }\n\n                    // Don't autofix code such as `({foo: (foo) = a} = obj);`, parens are not allowed in shorthand properties.\n                    if (\n                        replacementNode.type === \"AssignmentPattern\" &&\n                        astUtils.isParenthesised(sourceCode, replacementNode.left)\n                    ) {\n                        return null;\n                    }\n\n                    return fixer.replaceText(node, sourceCode.getText(replacementNode));\n                }\n            });\n        }\n\n        /**\n         * Checks whether a destructured assignment is unnecessarily renamed\n         * @param {ASTNode} node node to check\n         * @returns {void}\n         */\n        function checkDestructured(node) {\n            if (ignoreDestructuring) {\n                return;\n            }\n\n            for (const property of node.properties) {\n\n                /**\n                 * Properties using shorthand syntax and rest elements can not be renamed.\n                 * If the property is computed, we have no idea if a rename is useless or not.\n                 */\n                if (property.type !== \"Property\" || property.shorthand || property.computed) {\n                    continue;\n                }\n\n                const key = (property.key.type === \"Identifier\" && property.key.name) || (property.key.type === \"Literal\" && property.key.value);\n                const renamedKey = property.value.type === \"AssignmentPattern\" ? property.value.left.name : property.value.name;\n\n                if (key === renamedKey) {\n                    reportError(property, property.key, \"Destructuring assignment\");\n                }\n            }\n        }\n\n        /**\n         * Checks whether an import is unnecessarily renamed\n         * @param {ASTNode} node node to check\n         * @returns {void}\n         */\n        function checkImport(node) {\n            if (ignoreImport) {\n                return;\n            }\n\n            if (node.imported.name === node.local.name &&\n                    node.imported.range[0] !== node.local.range[0]) {\n                reportError(node, node.imported, \"Import\");\n            }\n        }\n\n        /**\n         * Checks whether an export is unnecessarily renamed\n         * @param {ASTNode} node node to check\n         * @returns {void}\n         */\n        function checkExport(node) {\n            if (ignoreExport) {\n                return;\n            }\n\n            if (node.local.name === node.exported.name &&\n                    node.local.range[0] !== node.exported.range[0]) {\n                reportError(node, node.local, \"Export\");\n            }\n\n        }\n\n        //--------------------------------------------------------------------------\n        // Public\n        //--------------------------------------------------------------------------\n\n        return {\n            ObjectPattern: checkDestructured,\n            ImportSpecifier: checkImport,\n            ExportSpecifier: checkExport\n        };\n    }\n};\n"
+    }
+  ]
+}

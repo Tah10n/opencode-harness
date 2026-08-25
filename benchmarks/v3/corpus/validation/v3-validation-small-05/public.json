@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-small-05",
+  "split": "validation",
+  "stratum": "small",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-validation-small-05-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:fc79ed336030f1ea233002489373dc006cdb22258b2cf474cd69db4ce75b4eca"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/init-declarations.js",
+      "content": "/**\n * @fileoverview A rule to control the style of variable initializations.\n * @author Colin Ihrig\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Helpers\n//------------------------------------------------------------------------------\n\n/**\n * Checks whether or not a given node is a for loop.\n * @param {ASTNode} block A node to check.\n * @returns {boolean} `true` when the node is a for loop.\n */\nfunction isForLoop(block) {\n\treturn (\n\t\tblock.type === \"ForInStatement\" ||\n\t\tblock.type === \"ForOfStatement\" ||\n\t\tblock.type === \"ForStatement\"\n\t);\n}\n\n/**\n * Checks whether or not a given declarator node has its initializer.\n * @param {ASTNode} node A declarator node to check.\n * @returns {boolean} `true` when the node has its initializer.\n */\nfunction isInitialized(node) {\n\tconst declaration = node.parent;\n\tconst block = declaration.parent;\n\n\tif (isForLoop(block)) {\n\t\tif (block.type === \"ForStatement\") {\n\t\t\treturn block.init === declaration;\n\t\t}\n\t\treturn block.left === declaration;\n\t}\n\treturn Boolean(node.init);\n}\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../types').Rule.RuleModule} */\nmodule.exports = {\n\tmeta: {\n\t\ttype: \"suggestion\",\n\t\tdialects: [\"typescript\", \"javascript\"],\n\t\tlanguage: \"javascript\",\n\n\t\tdocs: {\n\t\t\tdescription:\n\t\t\t\t\"Require or disallow initialization in variable declarations\",\n\t\t\trecommended: false,\n\t\t\tfrozen: true,\n\t\t\turl: \"https://eslint.org/docs/latest/rules/init-declarations\",\n\t\t},\n\n\t\tschema: {\n\t\t\tanyOf: [\n\t\t\t\t{\n\t\t\t\t\ttype: \"array\",\n\t\t\t\t\titems: [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\tenum: [\"always\"],\n\t\t\t\t\t\t},\n\t\t\t\t\t],\n\t\t\t\t\tminItems: 0,\n\t\t\t\t\tmaxItems: 1,\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\ttype: \"array\",\n\t\t\t\t\titems: [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\tenum: [\"never\"],\n\t\t\t\t\t\t},\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\ttype: \"object\",\n\t\t\t\t\t\t\tproperties: {\n\t\t\t\t\t\t\t\tignoreForLoopInit: {\n\t\t\t\t\t\t\t\t\ttype: \"boolean\",\n\t\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\tadditionalProperties: false,\n\t\t\t\t\t\t},\n\t\t\t\t\t],\n\t\t\t\t\tminItems: 0,\n\t\t\t\t\tmaxItems: 2,\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t\tmessages: {\n\t\t\tinitialized:\n\t\t\t\t\"Variable '{{idName}}' should be initialized on declaration.\",\n\t\t\tnotInitialized:\n\t\t\t\t\"Variable '{{idName}}' should not be initialized on declaration.\",\n\t\t},\n\t},\n\n\tcreate(context) {\n\t\tconst MODE_ALWAYS = \"always\",\n\t\t\tMODE_NEVER = \"never\";\n\n\t\tconst mode = context.options[0] || MODE_ALWAYS;\n\t\tconst params = context.options[1] || {};\n\n\t\t// Track whether we're inside a declared namespace\n\t\tlet insideDeclaredNamespace = false;\n\n\t\t//--------------------------------------------------------------------------\n\t\t// Public API\n\t\t//--------------------------------------------------------------------------\n\n\t\treturn {\n\t\t\tTSModuleDeclaration(node) {\n\t\t\t\tif (node.declare) {\n\t\t\t\t\tinsideDeclaredNamespace = true;\n\t\t\t\t}\n\t\t\t},\n\n\t\t\t\"TSModuleDeclaration:exit\"(node) {\n\t\t\t\tif (node.declare) {\n\t\t\t\t\tinsideDeclaredNamespace = false;\n\t\t\t\t}\n\t\t\t},\n\n\t\t\t\"VariableDeclaration:exit\"(node) {\n\t\t\t\tconst kind = node.kind,\n\t\t\t\t\tdeclarations = node.declarations;\n\n\t\t\t\tif (node.declare || insideDeclaredNamespace) {\n\t\t\t\t\treturn;\n\t\t\t\t}\n\n\t\t\t\tfor (let i = 0; i < declarations.length; ++i) {\n\t\t\t\t\tconst declaration = declarations[i],\n\t\t\t\t\t\tid = declaration.id,\n\t\t\t\t\t\tinitialized = isInitialized(declaration),\n\t\t\t\t\t\tisIgnoredForLoop =\n\t\t\t\t\t\t\tparams.ignoreForLoopInit && isForLoop(node.parent);\n\t\t\t\t\tlet messageId = \"\";\n\n\t\t\t\t\tif (mode === MODE_ALWAYS && !initialized) {\n\t\t\t\t\t\tmessageId = \"initialized\";\n\t\t\t\t\t} else if (\n\t\t\t\t\t\tmode === MODE_NEVER &&\n\t\t\t\t\t\tkind !== \"const\" &&\n\t\t\t\t\t\tinitialized &&\n\t\t\t\t\t\t!isIgnoredForLoop\n\t\t\t\t\t) {\n\t\t\t\t\t\tmessageId = \"notInitialized\";\n\t\t\t\t\t}\n\n\t\t\t\t\tif (id.type === \"Identifier\" && messageId) {\n\t\t\t\t\t\tcontext.report({\n\t\t\t\t\t\t\tnode: declaration,\n\t\t\t\t\t\t\tmessageId,\n\t\t\t\t\t\t\tdata: {\n\t\t\t\t\t\t\t\tidName: id.name,\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t},\n\t\t};\n\t},\n};\n"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-medium-07",
+  "split": "validation",
+  "stratum": "medium",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-validation-medium-07-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:45f58e882764cd4ac2db469fb6ebc7f09e54d0144e3c5e175fbf1fd874bf8c87"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/max-params.js",
+      "content": "/**\n * @fileoverview Rule to flag when a function has too many parameters\n * @author Ilya Volodin\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst astUtils = require(\"./utils/ast-utils\");\nconst { upperCaseFirst } = require(\"../shared/string-utils\");\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../types').Rule.RuleModule} */\nmodule.exports = {\n\tmeta: {\n\t\ttype: \"suggestion\",\n\t\tdialects: [\"typescript\", \"javascript\"],\n\t\tlanguage: \"javascript\",\n\n\t\tdocs: {\n\t\t\tdescription:\n\t\t\t\t\"Enforce a maximum number of parameters in function definitions\",\n\t\t\trecommended: false,\n\t\t\turl: \"https://eslint.org/docs/latest/rules/max-params\",\n\t\t},\n\n\t\tschema: [\n\t\t\t{\n\t\t\t\toneOf: [\n\t\t\t\t\t{\n\t\t\t\t\t\ttype: \"integer\",\n\t\t\t\t\t\tminimum: 0,\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\ttype: \"object\",\n\t\t\t\t\t\tproperties: {\n\t\t\t\t\t\t\tmaximum: {\n\t\t\t\t\t\t\t\ttype: \"integer\",\n\t\t\t\t\t\t\t\tminimum: 0,\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\tmax: {\n\t\t\t\t\t\t\t\ttype: \"integer\",\n\t\t\t\t\t\t\t\tminimum: 0,\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\tcountVoidThis: {\n\t\t\t\t\t\t\t\ttype: \"boolean\",\n\t\t\t\t\t\t\t\tdescription:\n\t\t\t\t\t\t\t\t\t\"Whether to count a `this` declaration when the type is `void`.\",\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t},\n\t\t\t\t\t\tadditionalProperties: false,\n\t\t\t\t\t},\n\t\t\t\t],\n\t\t\t},\n\t\t],\n\t\tmessages: {\n\t\t\texceed: \"{{name}} has too many parameters ({{count}}). Maximum allowed is {{max}}.\",\n\t\t},\n\t},\n\n\tcreate(context) {\n\t\tconst sourceCode = context.sourceCode;\n\t\tconst option = context.options[0];\n\t\tlet numParams = 3;\n\t\tlet countVoidThis = false;\n\n\t\tif (typeof option === \"object\") {\n\t\t\tif (\n\t\t\t\tObject.hasOwn(option, \"maximum\") ||\n\t\t\t\tObject.hasOwn(option, \"max\")\n\t\t\t) {\n\t\t\t\tnumParams = option.maximum || option.max;\n\t\t\t}\n\t\t\tcountVoidThis = option.countVoidThis;\n\t\t}\n\t\tif (typeof option === \"number\") {\n\t\t\tnumParams = option;\n\t\t}\n\n\t\t/**\n\t\t * Checks a function to see if it has too many parameters.\n\t\t * @param {ASTNode} node The node to check.\n\t\t * @returns {void}\n\t\t * @private\n\t\t */\n\t\tfunction checkFunction(node) {\n\t\t\tconst hasVoidThisParam =\n\t\t\t\tnode.params.length > 0 &&\n\t\t\t\tnode.params[0].type === \"Identifier\" &&\n\t\t\t\tnode.params[0].name === \"this\" &&\n\t\t\t\tnode.params[0].typeAnnotation?.typeAnnotation.type ===\n\t\t\t\t\t\"TSVoidKeyword\";\n\n\t\t\tconst effectiveParamCount =\n\t\t\t\thasVoidThisParam && !countVoidThis\n\t\t\t\t\t? node.params.length - 1\n\t\t\t\t\t: node.params.length;\n\n\t\t\tif (effectiveParamCount > numParams) {\n\t\t\t\tcontext.report({\n\t\t\t\t\tloc: astUtils.getFunctionHeadLoc(node, sourceCode),\n\t\t\t\t\tnode,\n\t\t\t\t\tmessageId: \"exceed\",\n\t\t\t\t\tdata: {\n\t\t\t\t\t\tname: upperCaseFirst(\n\t\t\t\t\t\t\tastUtils.getFunctionNameWithKind(node),\n\t\t\t\t\t\t),\n\t\t\t\t\t\tcount: effectiveParamCount,\n\t\t\t\t\t\tmax: numParams,\n\t\t\t\t\t},\n\t\t\t\t});\n\t\t\t}\n\t\t}\n\n\t\treturn {\n\t\t\tFunctionDeclaration: checkFunction,\n\t\t\tArrowFunctionExpression: checkFunction,\n\t\t\tFunctionExpression: checkFunction,\n\t\t\tTSDeclareFunction: checkFunction,\n\t\t\tTSFunctionType: checkFunction,\n\t\t};\n\t},\n};\n"
+    }
+  ]
+}

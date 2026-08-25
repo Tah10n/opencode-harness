@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-development-small-12",
+  "split": "development",
+  "stratum": "small",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+    "Implement the intended upstream behavior for the supplied source.",
+    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Modify only the supplied source paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-development-small-12-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "required-behavior",
+        "text": "Implement the intended upstream behavior for the supplied source."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "preserved-behavior",
+        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "allowed-mutation",
+        "text": "Modify only the supplied source paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:1295ab349e4b9db99e42d4f4f6d877293aa41ddef9aa096ca0626690fe8d5ac2"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/unsupported-api.js",
+      "content": "/**\n * @fileoverview APIs that are not officially supported by ESLint.\n *      These APIs may change or be removed at any time. Use at your\n *      own risk.\n * @author Nicholas C. Zakas\n */\n\n\"use strict\";\n\n//-----------------------------------------------------------------------------\n// Requirements\n//-----------------------------------------------------------------------------\n\nconst { shouldUseFlatConfig } = require(\"./eslint/eslint\");\nconst builtinRules = require(\"./rules\");\n\n//-----------------------------------------------------------------------------\n// Exports\n//-----------------------------------------------------------------------------\n\nmodule.exports = {\n\tbuiltinRules,\n\tFlatESLint: null,\n\tLegacyESLint: null,\n\tshouldUseFlatConfig,\n};\n"
+    }
+  ]
+}
