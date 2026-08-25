@@ -194,6 +194,13 @@ export function snapshotCoreWorkspace(workspaceRoot) {
     relativePath(relative, "workspace path", { rootAllowed: false });
     const candidate = path.resolve(root, ...relative.split("/"));
     inside(root, candidate, "workspace path");
+    // `git ls-files -c` intentionally retains deleted tracked paths. Preserve
+    // that absence in the snapshot instead of dereferencing a path that no
+    // longer exists: deletion and the old side of a rename are mutations too.
+    if (!fs.existsSync(candidate)) {
+      files[relative] = null;
+      continue;
+    }
     const stat = fs.lstatSync(candidate);
     if (!stat.isFile() || stat.isSymbolicLink()) fail("CORE_RUNTIME_SNAPSHOT", "workspace contains an unsupported tracked path");
     const real = fs.realpathSync.native(candidate);

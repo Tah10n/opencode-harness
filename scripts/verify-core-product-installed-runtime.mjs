@@ -59,7 +59,7 @@ function finalChunks(model, sequence) {
   ];
 }
 
-async function fixtureProvider(content) {
+async function fixtureProvider(content, operation) {
   const model = "core-installed-fixture";
   let sequence = 0;
   const server = http.createServer(async (request, response) => {
@@ -78,15 +78,19 @@ async function fixtureProvider(content) {
     const toolResults = (parsed.messages ?? []).filter((entry) => entry.role === "tool");
     if (toolResults.length === 0) {
       const offered = (parsed.tools ?? []).map((entry) => entry.function?.name);
-      if (!offered.includes("write")) {
-        response.writeHead(500).end(`write tool unavailable: ${offered.join(",")}`);
+      const toolName = operation === "write" ? "write" : "bash";
+      if (!offered.includes(toolName)) {
+        response.writeHead(500).end(`${toolName} tool unavailable: ${offered.join(",")}`);
         return;
       }
       sequence += 1;
-      sse(response, toolChunks(model, "write", {
-        filePath: path.join(workspace, "src", "fixture.txt"),
-        content,
-      }, sequence));
+      const args = operation === "write" ? {
+        filePath: path.join(workspace, "src", "fixture.txt"), content,
+      } : {
+        command: operation === "delete" ? "rm src/fixture.txt" : "mv src/fixture.txt src/renamed.txt",
+        description: operation === "delete" ? "Delete the requested fixture file" : "Rename the requested fixture file",
+      };
+      sse(response, toolChunks(model, toolName, args, sequence));
       return;
     }
     sequence += 1;
@@ -142,16 +146,19 @@ function runtimeEnvironment(overlayPath) {
   };
 }
 
-async function installedRun({ content, checkArgv, expectedStatus, expectedReason }) {
+async function installedRun({ content, operation = "write", checkArgv, expectedStatus, expectedReason }) {
+  fs.rmSync(path.join(workspace, "src", "renamed.txt"), { force: true });
   fs.writeFileSync(path.join(workspace, "src", "fixture.txt"), "before\n", "utf8");
+  const stage = spawnSync("git", ["add", "-A", "src"], { cwd: workspace, encoding: "utf8", shell: false, windowsHide: true });
+  assert.equal(stage.status, 0, stage.stderr);
   writeCatalog(checkArgv);
-  const provider = await fixtureProvider(content);
+  const provider = await fixtureProvider(content, operation);
   try {
     const sourceConfig = JSON.parse(fs.readFileSync(path.join(materializedRoot, "opencode.json"), "utf8"));
     const overlayPath = path.join(temporaryRoot, `opencode-fixture-${content.trim()}.json`);
     const fixtureConfig = `${JSON.stringify({
       ...sourceConfig,
-      permission: { ...sourceConfig.permission, edit: "allow", external_directory: "allow" },
+      permission: { ...sourceConfig.permission, edit: "allow", bash: { "*": "allow" }, external_directory: "allow" },
       provider: {
         fixture: {
           npm: "@ai-sdk/openai-compatible",
@@ -198,7 +205,7 @@ async function installedRun({ content, checkArgv, expectedStatus, expectedReason
     const marker = stderr.split(/\r?\n/u).find((line) => line.startsWith("[opencode-harness-core] {") && line.includes('"decision"'));
     assert(marker, `launcher receipt missing\n${stderr}`);
     const receipt = JSON.parse(marker.slice("[opencode-harness-core] ".length));
-    assert.equal(receipt.decision.reason, expectedReason);
+    assert.equal(receipt.decision.reason, expectedReason, `launcher reason mismatch\nSTDOUT:\n${stdout}\nSTDERR:\n${stderr}`);
     assert.equal(receipt.activation.post_last_mutation_verification, expectedReason !== "verification_not_started");
     return receipt;
   } finally {
@@ -213,6 +220,10 @@ try {
     outputDirectory: materializedRoot,
     allowDirty: true,
   });
+  // The deterministic fixture must exercise delete/rename non-interactively.
+  // Only fixture permissions are relaxed; runtime bytes under test stay exact.
+  const fixtureAgentPath = path.join(materializedRoot, "agents", "core.md");
+  fs.writeFileSync(fixtureAgentPath, fs.readFileSync(fixtureAgentPath, "utf8").replaceAll(": ask", ": allow"), "utf8");
   fs.mkdirSync(path.join(workspace, "src"), { recursive: true });
   fs.writeFileSync(path.join(workspace, "src", "fixture.txt"), "before\n", "utf8");
   const gitInit = spawnSync("git", ["init", "--quiet"], { cwd: workspace, encoding: "utf8", shell: false });
@@ -245,12 +256,33 @@ try {
   assert.equal(stale.activation.mutation_revision, 2);
   assert.equal(fs.existsSync(path.join(workspace, ".oc_harness")), false);
 
+  const deleted = await installedRun({
+    content: "delete-check\n",
+    operation: "delete",
+    checkArgv: ["-e", "process.exit(0)"],
+    expectedStatus: 0,
+    expectedReason: "post_last_mutation_verification_passed",
+  });
+  assert.equal(deleted.decision.allowed, true);
+  assert.equal(fs.existsSync(path.join(workspace, "src", "fixture.txt")), false);
+
+  const renamed = await installedRun({
+    content: "rename-check\n",
+    operation: "rename",
+    checkArgv: ["-e", "process.exit(0)"],
+    expectedStatus: 0,
+    expectedReason: "post_last_mutation_verification_passed",
+  });
+  assert.equal(renamed.decision.allowed, true);
+  assert.equal(fs.existsSync(path.join(workspace, "src", "fixture.txt")), false);
+  assert.equal(fs.existsSync(path.join(workspace, "src", "renamed.txt")), true);
+
   process.stdout.write(`${JSON.stringify({
     status: "passed",
     evidence_class: "installed-materialized-core-runtime",
     model_execution: false,
     opencode_version: spawnSync(executable("opencode"), ["--version"], { encoding: "utf8", shell: false }).stdout.trim(),
-    cases: ["failed-blocked", "passed-allowed", "post-check-mutation-stale"],
+    cases: ["failed-blocked", "passed-allowed", "post-check-mutation-stale", "tracked-deletion-allowed", "tracked-rename-allowed"],
   }, null, 2)}\n`);
 } finally {
   fs.rmSync(temporaryRoot, { recursive: true, force: true });

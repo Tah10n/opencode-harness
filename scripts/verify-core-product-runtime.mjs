@@ -70,6 +70,24 @@ try {
   assert.equal(passed.decision.reason, "post_last_mutation_verification_passed");
   assert.equal(passed.observation.post_last_mutation_verification, true);
 
+  const beforeDeletion = snapshotCoreWorkspace(workspace);
+  fs.rmSync(path.join(workspace, "src", "feature.mjs"));
+  const afterDeletion = snapshotCoreWorkspace(workspace);
+  assert.equal(afterDeletion.files["src/feature.mjs"], null);
+  assert.deepEqual(changedCoreWorkspacePaths(beforeDeletion, afterDeletion), ["src/feature.mjs"]);
+  const deleted = verifyCoreWorkspaceMutation({ catalog, before: beforeDeletion, after: afterDeletion });
+  assert.equal(deleted.decision.allowed, true);
+  assert.equal(deleted.decision.reason, "post_last_mutation_verification_passed");
+  fs.writeFileSync(path.join(workspace, "src", "feature.mjs"), "export const value = 2;\n", "utf8");
+
+  const beforeRename = snapshotCoreWorkspace(workspace);
+  fs.renameSync(path.join(workspace, "src", "feature.mjs"), path.join(workspace, "src", "renamed.mjs"));
+  const afterRename = snapshotCoreWorkspace(workspace);
+  assert.equal(afterRename.files["src/feature.mjs"], null);
+  assert.match(afterRename.files["src/renamed.mjs"], /^sha256:/u);
+  assert.deepEqual(changedCoreWorkspacePaths(beforeRename, afterRename), ["src/feature.mjs", "src/renamed.mjs"]);
+  fs.renameSync(path.join(workspace, "src", "renamed.mjs"), path.join(workspace, "src", "feature.mjs"));
+
   for (const [status, reason] of [
     ["failed", "verification_failed"],
     ["unavailable", "verification_unavailable"],
