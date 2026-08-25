@@ -2791,6 +2791,7 @@ async function executionFixtures(root, plainProfile, instrumentedProfile) {
     });
     assert.equal(providerMismatch.status, "failed");
     assert.equal(providerMismatch.reason, "invalid_adapter_input");
+    assert.equal(providerMismatch.validation_error_code, "SYNTHETIC_ADAPTER_INPUT");
 
     const timedOut = await executeOpenCodeAdapter(baseInput, {
       executable: process.execPath,
