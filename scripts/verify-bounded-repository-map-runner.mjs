@@ -71,6 +71,7 @@ let editTaskNoMutationPrimaryCallCount = 0;
 let editTaskMutationPrimaryCallCount = 0;
 let repairedNoMutationPrimaryCallCount = 0;
 let repairedNoMutationNegativeControlCallCount = 0;
+let minimalDirectPrimaryCallCount = 0;
 let highRiskFinalDiffPrimaryCallCount = 0;
 let highRiskFinalDiffMediumCallCount = 0;
 let terminalFailureCheckPrimaryCallCount = 0;
@@ -595,6 +596,13 @@ async function repairedNoMutationNegativeControlAdapter(input) {
   return fixtureAdapter(input);
 }
 
+async function minimalDirectPrimaryAdapter(input) {
+  minimalDirectPrimaryCallCount += 1;
+  assert.equal(input.context.profileId, "P49");
+  assert.equal(input.context.agentId, "core-v7-build");
+  return fixtureAdapter(input);
+}
+
 async function highRiskFinalDiffPrimaryAdapter(input) {
   highRiskFinalDiffPrimaryCallCount += 1;
   assert.equal(input.context.profileId, "P45");
@@ -989,6 +997,12 @@ const withRepairedNoMutationNegativeControl = await attempt(
   "P48",
   null,
   repairedNoMutationNegativeControlAdapter,
+  commandRunner,
+);
+const withMinimalDirectProtocol = await attempt(
+  "P49",
+  null,
+  minimalDirectPrimaryAdapter,
   commandRunner,
 );
 const withHighRiskFinalDiffReconciliation = await attempt(
@@ -1561,6 +1575,28 @@ assert.equal(repairedNoMutationNegativeControlCallCount, 1);
 assert.equal(withRepairedNoMutationNegativeControl.result.vnext_verification_remediation_observation.eligible, false);
 assert.equal(withRepairedNoMutationNegativeControl.result.vnext_verification_remediation_observation.retry_started_count, 0);
 assert.equal(withRepairedNoMutationNegativeControl.result.vnext_verification_remediation_observation.retry_completed_count, 0);
+assert.equal(minimalDirectPrimaryCallCount, 1);
+assert.doesNotMatch(firstPrompts.get("P49"), /HOST_VISIBLE_CONTRACT_V[12]=/u);
+assert.doesNotMatch(firstPrompts.get("P49"), /HOST_REPOSITORY_MAP_V1=/u);
+assert.deepEqual(withMinimalDirectProtocol.result.vnext_primary_route_observation, {
+  eligible: true,
+  activated: true,
+  stratum: "medium",
+  agent_id: "core-v7-build",
+  visible_contract_version: "NONE",
+  reason: "host_route_bound",
+});
+assert.equal(withMinimalDirectProtocol.result.vnext_host_verification_observation.allowed, true);
+assert.equal(withMinimalDirectProtocol.result.vnext_host_verification_observation.activated, true);
+assert.equal(withMinimalDirectProtocol.result.vnext_verification_remediation_observation.eligible, false);
+assert.equal(withMinimalDirectProtocol.result.vnext_verification_remediation_observation.retry_started_count, 0);
+assert.equal(vnextInitialAgentId({ profile_id: "P49", stratum: "small" }), "core-v7-build");
+assert.equal(vnextInitialAgentId({ profile_id: "P49", stratum: "medium" }), "core-v7-build");
+assert.equal(vnextInitialAgentId({ profile_id: "P49", stratum: "high" }), "core-v7-build");
+assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P49", stratum: "small" }), false);
+assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P49", stratum: "medium" }), false);
+assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P49", stratum: "high" }), false);
+assert.equal(vnextCoreV2AuditTriggerPolicy("P49"), "disabled");
 assert.equal(highRiskFinalDiffPrimaryCallCount, 2);
 assert.equal(withHighRiskFinalDiffReconciliation.result.execution_status, "completed");
 assert.equal(withHighRiskFinalDiffReconciliation.result.vnext_verification_remediation_observation.eligible, true);
