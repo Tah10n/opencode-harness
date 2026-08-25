@@ -555,7 +555,7 @@ for (const forbiddenScript of ["assess:quality-candidate", "verify:model-profile
   }
 }
 const expectedDeterministicStages = [
-  "verify:v0.4", "verify:static", "verify:benchmark:model-free", "verify:benchmark:v3:design", "verify:evaluator:paired-defects", "verify:core-verification-gate", "verify:core-verification-runner", "verify:feedback-foundation", "verify:trace-store", "verify:report-history", "verify:adapter-worker",
+  "verify:v0.4", "verify:static", "verify:benchmark:model-free", "verify:evaluator:paired-defects", "verify:core-verification-gate", "verify:core-verification-runner", "verify:feedback-foundation", "verify:trace-store", "verify:report-history", "verify:adapter-worker",
   "eval", "verify:drift", "verify:adoption-bundle", "verify:package-boundary", "verify:runtime:fixture", "verify:runtime:quality-hooks:fixture",
   "verify:live-eval", "verify:acceptance",
   "verify:quality-contracts", "verify:engineering-dossier", "verify:architecture-policy", "verify:impact-graph",

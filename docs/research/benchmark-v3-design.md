@@ -44,6 +44,12 @@ These values are recomputed rather than trusted from the JSON contract.
 Changing the family count, alpha, candidate budget, effect floor, confidence
 method, or power assumption requires a new design version.
 
+The design verifier is intentionally invoked as
+`npm run verify:benchmark:v3:design` beside the existing aggregate gate. It is
+not inserted into the versioned v2 model-free report graph; doing so would
+silently change that historical report schema. A future executable v3 runner
+must introduce a new aggregate report version instead of rewriting v2.
+
 ## Baseline opportunity gate
 
 Candidate execution is forbidden until its already-bound baseline finishes and
