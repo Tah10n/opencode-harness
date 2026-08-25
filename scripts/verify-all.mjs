@@ -76,6 +76,7 @@ export const DETERMINISTIC_STAGE_REGISTRY = Object.freeze([
     timeout_ms: MODEL_FREE_AGGREGATE_STAGE_TIMEOUT_MS,
     execution_class: "model-free-coordinator",
   },
+  { command_id: "verify-benchmark-v3-design", npm_script: "verify:benchmark:v3:design", check_ids: [] },
   { command_id: "verify-paired-defect-evaluator", npm_script: "verify:evaluator:paired-defects", check_ids: [] },
   { command_id: "verify-core-verification-gate", npm_script: "verify:core-verification-gate", check_ids: [] },
   { command_id: "verify-core-verification-runner", npm_script: "verify:core-verification-runner", check_ids: [] },

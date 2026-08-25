@@ -303,6 +303,7 @@ const requiredFiles = [
   "docs/harness-map.md",
   "docs/harnessability.md",
   "docs/release.md",
+  "docs/research/benchmark-v3-design.md",
   "examples/minimal-opencode.json",
   "examples/agent-tool-permissions.md",
   "examples/high-assurance-project/WORKFLOW.md",
@@ -355,6 +356,7 @@ const requiredFiles = [
   "benchmarks/synthetic/schemas/replay-report.v3.schema.json",
   "benchmarks/synthetic/schemas/replay-report.v4.schema.json",
   "benchmarks/synthetic/templates.v1.json",
+  "benchmarks/v3/design.v1.json",
   "adoption/schemas/adoption-bundle.schema.json",
   "adoption/core.v1.json",
   "adoption/quality.v1.json",
@@ -379,6 +381,7 @@ const requiredFiles = [
   "lib/feedback/contracts.mjs",
   "lib/feedback/evidence.mjs",
   "lib/benchmark/paired-defect-evaluator.mjs",
+  "lib/benchmark/v3-design.mjs",
   "lib/quality/core-verification-gate.mjs",
   "lib/quality/milestone-dod.mjs",
   "lib/quality/normal-session-bridge.mjs",
@@ -417,6 +420,7 @@ const requiredFiles = [
   "scripts/verify-benchmark-model-free-contract.mjs",
   "scripts/verify-benchmark-model-free.mjs",
   "scripts/verify-benchmark-paired-defects.mjs",
+  "scripts/verify-benchmark-v3-design.mjs",
   "scripts/verify-core-verification-gate.mjs",
   "scripts/verify-core-verification-runner.mjs",
   "scripts/verify-benchmark-renderer.mjs",
@@ -551,7 +555,7 @@ for (const forbiddenScript of ["assess:quality-candidate", "verify:model-profile
   }
 }
 const expectedDeterministicStages = [
-  "verify:v0.4", "verify:static", "verify:benchmark:model-free", "verify:evaluator:paired-defects", "verify:core-verification-gate", "verify:core-verification-runner", "verify:feedback-foundation", "verify:trace-store", "verify:report-history", "verify:adapter-worker",
+  "verify:v0.4", "verify:static", "verify:benchmark:model-free", "verify:benchmark:v3:design", "verify:evaluator:paired-defects", "verify:core-verification-gate", "verify:core-verification-runner", "verify:feedback-foundation", "verify:trace-store", "verify:report-history", "verify:adapter-worker",
   "eval", "verify:drift", "verify:adoption-bundle", "verify:package-boundary", "verify:runtime:fixture", "verify:runtime:quality-hooks:fixture",
   "verify:live-eval", "verify:acceptance",
   "verify:quality-contracts", "verify:engineering-dossier", "verify:architecture-policy", "verify:impact-graph",
@@ -759,6 +763,7 @@ for (const [name, command] of Object.entries({
   "verify:benchmark:comparison-reporting": "node scripts/verify-benchmark-comparison-reporting.mjs",
   "verify:benchmark:isolation": "node scripts/verify-benchmark-isolation.mjs",
   "verify:benchmark:model-free": "node scripts/verify-benchmark-model-free.mjs",
+  "verify:benchmark:v3:design": "node scripts/verify-benchmark-v3-design.mjs",
   "verify:evaluator:paired-defects": "node scripts/verify-benchmark-paired-defects.mjs",
   "verify:core-verification-gate": "node scripts/verify-core-verification-gate.mjs",
   "verify:core-verification-runner": "node scripts/verify-core-verification-runner.mjs",

@@ -66,6 +66,7 @@
     "verify:benchmark:contracts": "node scripts/verify-benchmark-contracts.mjs",
     "verify:benchmark:isolation": "node scripts/verify-benchmark-isolation.mjs",
     "verify:benchmark:model-free": "node scripts/verify-benchmark-model-free.mjs",
+    "verify:benchmark:v3:design": "node scripts/verify-benchmark-v3-design.mjs",
     "verify:evaluator:paired-defects": "node scripts/verify-benchmark-paired-defects.mjs",
     "verify:core-verification-gate": "node scripts/verify-core-verification-gate.mjs",
     "verify:core-verification-runner": "node scripts/verify-core-verification-runner.mjs",
