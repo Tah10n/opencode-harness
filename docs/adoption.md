@@ -14,9 +14,36 @@ Legacy research reproduction may additionally materialize `assurance` with an
 explicit `--profile assurance`; it is not part of the product adoption path.
 
 Each target is an OpenCode configuration directory. Keep it disjoint from the
-project workspace, set `OPENCODE_CONFIG_DIR` to it, and run OpenCode from the
-project. Do not run an assurance profile with its configuration directory as
-the workspace: trusted host configuration must be outside the workspace.
+project workspace and set `OPENCODE_CONFIG_DIR` to it. The supported production
+entry point for `core` and `deep` is the materialized launcher, not a direct
+`opencode` invocation:
+
+```sh
+OPENCODE_CONFIG_DIR=/absolute/target \
+  node /absolute/target/runtime/opencode-core.mjs \
+  --workspace /absolute/project -- run
+```
+
+Arguments after `--` are passed directly to the installed `opencode` executable.
+Use `--opencode /absolute/path/to/opencode` when the host must bind an explicit
+CLI. OpenCode's plugin hooks do not provide a reliable pre-terminal enforcement
+point, so the launcher is the required product boundary: it snapshots the Git
+workspace, waits for OpenCode, runs the cheapest relevant runner-selected
+trusted check after the last mutation, and returns a non-zero status for a
+failed, unavailable, infrastructure-failed, or stale result. Do not run an
+assurance profile with its configuration directory as the workspace: trusted
+host configuration must be outside the workspace.
+
+Provision runner-owned core checks at
+`.git/opencode-harness/core/checks.json` in the project. The closed v1 catalog
+contains `schema_version`, `catalog_id`, and `checks`; each check contains
+`check_id`, repository-relative `scope_prefixes`, `cost_rank`, an absolute
+`executable_path`, bounded `argv`, repository-relative `cwd`, and `timeout_ms`.
+The launcher seals the catalog before OpenCode starts. A missing catalog or no
+relevant check is reported as `no_applicable_trusted_check` with activation
+false; it is not counted as verification activation. Check output is not
+persisted, and this runtime creates no Engineering Dossier, receipt store,
+assurance state, quality lifecycle, or learning state.
 
 Use `--dry-run` to inspect the deterministic manifest without writing. The
 materializer rejects links, traversal, non-portable paths, unmanaged
@@ -31,8 +58,10 @@ always-present atomic directory swap on every supported filesystem. A fresh
 invocation validates the active bundle/backup and restores the last verified
 bundle after an interrupted rename. A live owner remains busy; only a
 provably dead owner may be recovered, and an unknown or inconsistent lock
-remains a hard failure. Core needs Node.js only to run this source-repository materializer; its
-materialized OpenCode runtime does not.
+remains a hard failure. Core requires Node.js 24 both for materialization and
+for the small materialized verification launcher. The runtime uses only Node
+built-ins and the three files under `runtime/`; it does not depend on
+`lib/benchmark`, `lib/quality`, Engineering Dossier, assurance, or learning.
 
 `deep` requires no assurance plugin and falls back to ordinary bounded
 read/search if the optional context capability is absent. Legacy `assurance` is

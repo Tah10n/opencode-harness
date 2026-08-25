@@ -12,7 +12,7 @@ import {
   createCoreVerificationGate,
   recordCoreWorkspaceMutation,
   startCoreVerification,
-} from "../lib/quality/core-verification-gate.mjs";
+} from "../runtime/core-verification-gate.mjs";
 
 const fp = (value) => fingerprint({ value });
 const checks = [
@@ -105,8 +105,8 @@ const noApplicable = recordCoreWorkspaceMutation(
 assert.deepEqual(coreVerificationTerminalDecision(noApplicable), {
   allowed: true,
   reason: "no_applicable_trusted_check",
-  activation_eligible: true,
-  activated: true,
+  activation_eligible: false,
+  activated: false,
 });
 
 const spacedPath = recordCoreWorkspaceMutation(initial, {
@@ -122,7 +122,7 @@ assert.throws(() => createCoreVerificationGate({
 
 const standaloneRoot = fs.mkdtempSync(path.join(os.tmpdir(), "core-verification-standalone-"));
 try {
-  const source = fileURLToPath(new URL("../lib/quality/core-verification-gate.mjs", import.meta.url));
+  const source = fileURLToPath(new URL("../runtime/core-verification-gate.mjs", import.meta.url));
   const target = path.join(standaloneRoot, "core-verification-gate.mjs");
   fs.copyFileSync(source, target);
   const standalone = await import(`${pathToFileURL(target).href}?fixture=standalone`);

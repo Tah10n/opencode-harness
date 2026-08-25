@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 
 import { ProfileV3Error } from "../lib/profile-v3.mjs";
-import { evaluatePairedDefects } from "../lib/benchmark/paired-defect-evaluator.mjs";
+import {
+  classifySeverityTransition,
+  evaluatePairedDefects,
+} from "../lib/benchmark/paired-defect-evaluator.mjs";
 
 function finding({ id = "shared-defect", severity = "medium", contract = "output-contract" } = {}) {
   return {
@@ -22,39 +25,72 @@ function arm(findings, overrides = {}) {
   return { functional_task_success: true, scope_violation: false, findings, ...overrides };
 }
 
-const unchanged = evaluatePairedDefects({
-  baseline: arm([finding()]),
-  candidate: arm([finding({ id: "candidate-label-may-differ" })]),
-});
-assert.equal(unchanged.new_high_medium_regression, 0);
-assert.equal(unchanged.resolved_high_medium_defect, 0);
-assert.equal(unchanged.relations[0].relation, "unchanged-defect");
-assert.equal(unchanged.baseline.high_medium_defect_present, true);
-assert.equal(unchanged.candidate.high_medium_defect_present, true);
-assert.equal(unchanged.candidate.regression_free_task_success, false);
+const severities = ["none", "low", "medium", "high", "critical"];
+const rank = (severity) => severities.indexOf(severity);
+const expectedRelation = (baselineSeverity, candidateSeverity) => {
+  if (baselineSeverity === "none") return candidateSeverity === "none" ? null : "introduced-defect";
+  if (candidateSeverity === "none") return "resolved-defect";
+  if (rank(candidateSeverity) > rank(baselineSeverity)) return "severity-escalation";
+  if (rank(candidateSeverity) < rank(baselineSeverity)) return "severity-reduction";
+  return "unchanged-defect";
+};
 
-const improved = evaluatePairedDefects({
-  baseline: arm([finding()]),
-  candidate: arm([]),
-});
-assert.equal(improved.new_high_medium_regression, 0);
-assert.equal(improved.resolved_high_medium_defect, 1);
-assert.equal(improved.candidate.regression_free_task_success, true);
+for (const baselineSeverity of severities) {
+  for (const candidateSeverity of severities) {
+    const baselineFindings = baselineSeverity === "none" ? [] : [finding({ severity: baselineSeverity })];
+    const candidateFindings = candidateSeverity === "none"
+      ? []
+      : [finding({ id: "candidate-label-may-differ", severity: candidateSeverity })];
+    const evaluation = evaluatePairedDefects({
+      baseline: arm(baselineFindings),
+      candidate: arm(candidateFindings),
+    });
+    const expected = expectedRelation(baselineSeverity, candidateSeverity);
+    assert.equal(classifySeverityTransition(baselineSeverity, candidateSeverity), expected);
+    assert.equal(evaluation.relations.length, expected === null ? 0 : 1);
+    if (expected !== null) assert.equal(evaluation.relations[0].relation, expected);
+    assert.equal(
+      evaluation.new_critical_regression,
+      Number(candidateSeverity === "critical" && baselineSeverity !== "critical"),
+    );
+    assert.equal(
+      evaluation.new_high_medium_regression,
+      Number(["medium", "high", "critical"].includes(candidateSeverity)
+        && !["medium", "high", "critical"].includes(baselineSeverity)),
+    );
+    assert.equal(
+      evaluation.resolved_critical_defect,
+      Number(baselineSeverity === "critical" && candidateSeverity !== "critical"),
+    );
+    assert.equal(
+      evaluation.resolved_high_medium_defect,
+      Number(["medium", "high", "critical"].includes(baselineSeverity)
+        && !["medium", "high", "critical"].includes(candidateSeverity)),
+    );
+    assert.equal(
+      evaluation.unchanged_blocking_defect,
+      Number(["medium", "high", "critical"].includes(baselineSeverity)
+        && ["medium", "high", "critical"].includes(candidateSeverity)),
+    );
+  }
+}
 
-const regressed = evaluatePairedDefects({
-  baseline: arm([]),
-  candidate: arm([finding({ severity: "high" })]),
-});
-assert.equal(regressed.new_high_medium_regression, 1);
-assert.equal(regressed.resolved_high_medium_defect, 0);
-
-const critical = evaluatePairedDefects({
-  baseline: arm([finding({ severity: "high" })]),
-  candidate: arm([finding({ severity: "critical" })]),
-});
-assert.equal(critical.new_high_medium_regression, 0);
-assert.equal(critical.critical_regression, 1);
-assert.equal(critical.relations[0].relation, "critical-regression");
+for (const [baselineSeverity, candidateSeverity, relation, counters] of [
+  ["critical", "high", "severity-reduction", { newCritical: 0, newHighMedium: 0, resolvedCritical: 1 }],
+  ["critical", "none", "resolved-defect", { newCritical: 0, newHighMedium: 0, resolvedCritical: 1 }],
+  ["medium", "high", "severity-escalation", { newCritical: 0, newHighMedium: 0, resolvedCritical: 0 }],
+  ["high", "critical", "severity-escalation", { newCritical: 1, newHighMedium: 0, resolvedCritical: 0 }],
+  ["low", "medium", "severity-escalation", { newCritical: 0, newHighMedium: 1, resolvedCritical: 0 }],
+]) {
+  const evaluation = evaluatePairedDefects({
+    baseline: arm(baselineSeverity === "none" ? [] : [finding({ severity: baselineSeverity })]),
+    candidate: arm(candidateSeverity === "none" ? [] : [finding({ severity: candidateSeverity })]),
+  });
+  assert.equal(evaluation.relations[0].relation, relation);
+  assert.equal(evaluation.new_critical_regression, counters.newCritical);
+  assert.equal(evaluation.new_high_medium_regression, counters.newHighMedium);
+  assert.equal(evaluation.resolved_critical_defect, counters.resolvedCritical);
+}
 
 const scoped = evaluatePairedDefects({
   baseline: arm([]),
@@ -67,6 +103,11 @@ const functionalFailure = evaluatePairedDefects({
   candidate: arm([], { functional_task_success: false }),
 });
 assert.equal(functionalFailure.candidate.regression_free_task_success, false);
+
+assert.throws(
+  () => classifySeverityTransition("informational", "low"),
+  (error) => error instanceof ProfileV3Error && error.code === "PAIRED_DEFECT_SEVERITY",
+);
 
 assert.throws(() => evaluatePairedDefects({
   baseline: arm([finding(), finding({ id: "duplicate-display-id" })]),

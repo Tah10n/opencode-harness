@@ -404,7 +404,14 @@ function verifyCore() {
   for (const forbidden of ["lib/quality", "quality", "native", "lib/benchmark", "benchmarks", "evals", ".opencode/plugins"]) {
     assert(!pathPresent(manifest, forbidden), "V04_CORE_BUNDLE", `core contains forbidden path ${forbidden}`);
   }
-  assert(!pathPresent(manifest, "package.json"), "V04_CORE_NODE", "core bundle must not require Node.js at runtime");
+  for (const runtimePath of [
+    "runtime/core-verification-gate.mjs",
+    "runtime/core-verification-runtime.mjs",
+    "runtime/opencode-core.mjs",
+  ]) {
+    assert(pathPresent(manifest, runtimePath), "V04_CORE_RUNTIME", `core bundle is missing ${runtimePath}`);
+  }
+  assert(!pathPresent(manifest, "package.json"), "V04_CORE_NODE", "core runtime must remain dependency-free beyond Node built-ins");
   return {
     status: "passed",
     prompt_characters: combined,

@@ -33,8 +33,20 @@ fingerprint first. Existing output is refused unless it is an unchanged managed
 bundle and `--force` is explicit.
 
 The output is an OpenCode configuration directory, not a project workspace.
-Run OpenCode in the target project and point `OPENCODE_CONFIG_DIR` at the
-materialized directory. An assurance workspace keeps its project-owned
+Point `OPENCODE_CONFIG_DIR` at the materialized directory and start `core`
+through its required verification launcher:
+
+```sh
+OPENCODE_CONFIG_DIR=/path/to/profile \
+  node /path/to/profile/runtime/opencode-core.mjs \
+  --workspace /path/to/project -- run
+```
+
+The launcher seals the project-owned trusted-check catalog at
+`.git/opencode-harness/core/checks.json`, invalidates verification after each
+new mutation, and blocks a successful process status after failed, unavailable,
+infrastructure-failed, or stale verification. A missing applicable check is
+reported separately and is not verification activation. An assurance workspace keeps its project-owned
 `.opencode/quality/checks.json` and `toolchains.json`; the config directory
 keeps the host-owned `plugins/quality-toolchains.host.v1.json`. The materializer
 never invents machine identities and preserves that reserved host file across

@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "calibration_id": "paired-defect-archive-blinded-v1",
+  "evidence_use": "calibration-only-not-confirmatory",
+  "answers": {
+    "archive-example-a": {
+      "relation": "introduced-defect",
+      "new_critical_regression": 0,
+      "new_high_medium_regression": 1,
+      "resolved_critical_defect": 0,
+      "resolved_high_medium_defect": 0,
+      "unchanged_blocking_defect": 0
+    },
+    "archive-example-b": {
+      "relation": "resolved-defect",
+      "new_critical_regression": 0,
+      "new_high_medium_regression": 0,
+      "resolved_critical_defect": 0,
+      "resolved_high_medium_defect": 1,
+      "unchanged_blocking_defect": 0
+    }
+  }
+}
