@@ -71,6 +71,7 @@ let editTaskNoMutationPrimaryCallCount = 0;
 let editTaskMutationPrimaryCallCount = 0;
 let repairedNoMutationPrimaryCallCount = 0;
 let repairedNoMutationNegativeControlCallCount = 0;
+let minimalStratumNoMutationCallCount = 0;
 let minimalDirectPrimaryCallCount = 0;
 let highRiskFinalDiffPrimaryCallCount = 0;
 let highRiskFinalDiffMediumCallCount = 0;
@@ -570,6 +571,24 @@ async function minimalStratumProtocolSmallPrimaryAdapter(input) {
   return fixtureAdapterForInstance(smallInstance, input);
 }
 
+async function minimalStratumNoMutationPrimaryAdapter(input) {
+  minimalStratumNoMutationCallCount += 1;
+  assert.equal(input.context.profileId, "P52");
+  assert.equal(input.context.agentId, "core-v4-build");
+  if (minimalStratumNoMutationCallCount === 2) {
+    assert.match(input.context.prompt, /requires an edit.*made no workspace mutation/u);
+    assert.match(input.context.prompt, /RUNNER_SELECTED_PUBLIC_CHECK_V1=/u);
+    return fixtureAdapter(input);
+  }
+  const originals = instance.solution_files.map((file) => {
+    const target = path.join(input.context.repo, ...file.path.split("/"));
+    return { target, content: fs.readFileSync(target, "utf8") };
+  });
+  const result = await fixtureAdapter(input);
+  for (const original of originals) fs.writeFileSync(original.target, original.content, "utf8");
+  return result;
+}
+
 async function editTaskNoMutationPrimaryAdapter(input) {
   editTaskNoMutationPrimaryCallCount += 1;
   assert.equal(input.context.profileId, "P44");
@@ -1054,6 +1073,12 @@ const withMinimalStratumProtocolSmall = await attempt(
   minimalStratumProtocolSmallPrimaryAdapter,
   commandRunner,
   smallInstance,
+);
+const withMinimalStratumNoMutationRecovery = await attempt(
+  "P52",
+  null,
+  minimalStratumNoMutationPrimaryAdapter,
+  commandRunner,
 );
 const withHighRiskFinalDiffReconciliation = await attempt(
   "P45",
@@ -1706,6 +1731,34 @@ assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P51", stratum: "
 assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P51", stratum: "medium" }), false);
 assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P51", stratum: "high" }), false);
 assert.equal(vnextCoreV2AuditTriggerPolicy("P51"), "disabled");
+assert.equal(minimalStratumNoMutationCallCount, 2);
+assert.doesNotMatch(firstPrompts.get("P52"), /HOST_REPOSITORY_MAP_V1=/u);
+assert.doesNotMatch(firstPrompts.get("P52"), /HOST_VISIBLE_CONTRACT_V[12]=/u);
+assert.deepEqual(withMinimalStratumNoMutationRecovery.result.vnext_primary_route_observation, {
+  eligible: true,
+  activated: true,
+  stratum: "medium",
+  agent_id: "core-v4-build",
+  visible_contract_version: "NONE",
+  reason: "host_route_bound",
+});
+assert.equal(withMinimalStratumNoMutationRecovery.result.vnext_verification_remediation_observation.eligible, true);
+assert.equal(withMinimalStratumNoMutationRecovery.result.vnext_verification_remediation_observation.retry_started_count, 1);
+assert.equal(withMinimalStratumNoMutationRecovery.result.vnext_verification_remediation_observation.retry_completed_count, 1);
+assert.equal(withMinimalStratumNoMutationRecovery.result.vnext_verification_remediation_observation.retry_changed_count, 1);
+assert.equal(withMinimalStratumNoMutationRecovery.result.vnext_verification_remediation_observation.retry_reverified_count, 1);
+assert.equal(withMinimalStratumNoMutationRecovery.result.vnext_verification_remediation_observation.retry_verification_passed_count, 1);
+assert.deepEqual(
+  withMinimalStratumNoMutationRecovery.result.vnext_verification_remediation_observation.trigger_reasons,
+  ["edit-task-no-mutation"],
+);
+assert.equal(vnextInitialAgentId({ profile_id: "P52", stratum: "small" }), null);
+assert.equal(vnextInitialAgentId({ profile_id: "P52", stratum: "medium" }), "core-v4-build");
+assert.equal(vnextInitialAgentId({ profile_id: "P52", stratum: "high" }), "core-v4-build");
+assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P52", stratum: "small" }), false);
+assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P52", stratum: "medium" }), false);
+assert.equal(vnextVisibleContractManifestEnabled({ profile_id: "P52", stratum: "high" }), false);
+assert.equal(vnextCoreV2AuditTriggerPolicy("P52"), "disabled");
 assert.equal(highRiskFinalDiffPrimaryCallCount, 2);
 assert.equal(withHighRiskFinalDiffReconciliation.result.execution_status, "completed");
 assert.equal(withHighRiskFinalDiffReconciliation.result.vnext_verification_remediation_observation.eligible, true);
