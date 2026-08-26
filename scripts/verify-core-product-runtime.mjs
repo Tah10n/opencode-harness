@@ -208,14 +208,17 @@ try {
     argv: process.platform === "win32" ? ["/d", "/s", "/c", checkFile] : [checkFile] });
   writeCatalog([trustedInputCheck]);
   let trustedInputCatalog = loadCoreVerificationCatalog(workspace);
+  diagnosticExitCode = 21;
   fs.writeFileSync(path.join(workspace, "package.json"), "{\"scripts\":{\"test\":\"node changed.mjs\"}}\n", "utf8");
   assert.equal(runCoreTrustedCheck(trustedInputCatalog.checks[0]).detail_code, "trusted-input-identity-changed");
+  diagnosticExitCode = 22;
 
   fs.writeFileSync(path.join(workspace, "package.json"), "{\"scripts\":{\"test\":\"node check.mjs\"}}\n", "utf8");
   writeCatalog([trustedInputCheck]);
   trustedInputCatalog = loadCoreVerificationCatalog(workspace);
   fs.writeFileSync(path.join(workspace, checkFile), process.platform === "win32" ? "@exit /b 1\r\n" : "exit 1\n", "utf8");
   assert.equal(runCoreTrustedCheck(trustedInputCatalog.checks[0]).detail_code, "trusted-input-identity-changed");
+  diagnosticExitCode = 23;
 
   fs.writeFileSync(path.join(workspace, checkFile), process.platform === "win32" ? "@exit /b 0\r\n" : "exit 0\n", "utf8");
   writeCatalog([trustedInputCheck]);
@@ -224,6 +227,7 @@ try {
   fs.copyFileSync(trustedSystemExecutable, fixtureExecutable);
   if (process.platform !== "win32") fs.chmodSync(fixtureExecutable, 0o755);
   assert.equal(runCoreTrustedCheck(trustedInputCatalog.checks[0]).detail_code, "trusted-input-identity-changed");
+  diagnosticExitCode = 24;
 
   fs.rmSync(fixtureExecutable);
   fs.renameSync(`${fixtureExecutable}.old`, fixtureExecutable);
@@ -236,6 +240,7 @@ try {
     fs.rmSync(path.join(workspace, checkFile));
     fs.renameSync(path.join(workspace, "check-real.sh"), path.join(workspace, checkFile));
   }
+  diagnosticExitCode = 25;
 
   const trustedCwd = path.join(workspace, "trusted-cwd");
   fs.mkdirSync(trustedCwd);
@@ -248,6 +253,7 @@ try {
   fs.mkdirSync(trustedCwd);
   fs.writeFileSync(path.join(trustedCwd, checkFile), process.platform === "win32" ? "@exit /b 0\r\n" : "exit 0\n", "utf8");
   assert.equal(runCoreTrustedCheck(cwdCatalog.checks[0]).detail_code, "trusted-input-identity-changed");
+  diagnosticExitCode = 26;
   fs.rmSync(trustedCwd, { recursive: true });
   fs.renameSync(`${trustedCwd}-old`, trustedCwd);
 
