@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import http from "node:http";
+import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -9,7 +10,8 @@ import { materializeProfileBundleV3 } from "../lib/profile-v3.mjs";
 import { createInjectedTestContainmentFactory } from "./injected-test-containment.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const temporaryRoot = fs.realpathSync.native(fs.mkdtempSync(path.join(root, ".core-installed-runtime-")));
+const testTrustRoot = process.env.GITHUB_ACTIONS === "true" && process.platform !== "win32" ? os.homedir() : root;
+const temporaryRoot = fs.realpathSync.native(fs.mkdtempSync(path.join(testTrustRoot, ".core-installed-runtime-")));
 const materializedRoot = path.join(temporaryRoot, "config", "opencode-harness");
 const repositoryRoot = path.join(temporaryRoot, "repository");
 const workspace = path.join(temporaryRoot, "workspace");
