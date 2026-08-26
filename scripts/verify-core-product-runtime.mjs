@@ -81,6 +81,7 @@ try {
     "benchmark and product gate bytes must be identical",
   );
   fs.mkdirSync(path.join(workspace, "src"), { recursive: true });
+  if (process.platform !== "win32") fs.chmodSync(workspace, 0o700);
   fs.writeFileSync(path.join(workspace, "src", "feature.mjs"), "export const value = 1;\n", "utf8");
   run("git", ["init", "--quiet"], { cwd: workspace });
   run("git", ["add", "src/feature.mjs"], { cwd: workspace });
@@ -236,6 +237,7 @@ try {
 
   const trustedCwd = path.join(workspace, "trusted-cwd");
   fs.mkdirSync(trustedCwd);
+  if (process.platform !== "win32") fs.chmodSync(trustedCwd, 0o700);
   fs.writeFileSync(path.join(trustedCwd, checkFile), process.platform === "win32" ? "@exit /b 0\r\n" : "exit 0\n", "utf8");
   const cwdCheck = check({ executable_path: fixtureExecutable,
     argv: process.platform === "win32" ? ["/d", "/s", "/c", checkFile] : [checkFile], cwd: "trusted-cwd" });
@@ -243,6 +245,7 @@ try {
   const cwdCatalog = loadCoreVerificationCatalog(workspace);
   fs.renameSync(trustedCwd, `${trustedCwd}-old`);
   fs.mkdirSync(trustedCwd);
+  if (process.platform !== "win32") fs.chmodSync(trustedCwd, 0o700);
   fs.writeFileSync(path.join(trustedCwd, checkFile), process.platform === "win32" ? "@exit /b 0\r\n" : "exit 0\n", "utf8");
   assert.equal(runCoreTrustedCheck(cwdCatalog.checks[0]).detail_code, "trusted-input-identity-changed");
   fs.rmSync(trustedCwd, { recursive: true });
