@@ -74,6 +74,7 @@ function injectedProcessGroupContainment(worker) {
   });
 }
 
+let diagnosticExitCode = 11;
 try {
   assert.deepEqual(
     fs.readFileSync(path.join(root, "runtime", "core-verification-gate.mjs")),
@@ -97,6 +98,7 @@ try {
   assert.equal(passed.decision.allowed, true);
   assert.equal(passed.decision.reason, "post_last_mutation_verification_passed");
   assert.equal(passed.observation.post_last_mutation_verification, true);
+  diagnosticExitCode = 12;
 
   const beforeDeletion = snapshotCoreWorkspace(workspace);
   fs.rmSync(path.join(workspace, "src", "feature.mjs"));
@@ -196,6 +198,7 @@ try {
   assert.equal(fs.existsSync(path.join(workspace, ".oc_harness")), false);
 
   const fixtureExecutable = path.join(temporaryRoot, process.platform === "win32" ? "fixture-command.exe" : "fixture-command");
+  diagnosticExitCode = 15;
   if (process.platform === "win32") fs.copyFileSync(trustedSystemExecutable, fixtureExecutable);
   else fs.writeFileSync(fixtureExecutable, "#!/bin/sh\nexec /bin/sh \"$@\"\n", { mode: 0o755 });
   fs.writeFileSync(path.join(workspace, "package.json"), "{\"scripts\":{\"test\":\"node check.mjs\"}}\n", "utf8");
@@ -254,6 +257,7 @@ try {
   const catalogRace = verifyCoreWorkspaceMutation({ catalog: racedCatalog, before, after });
   assert.equal(catalogRace.check.detail_code, "catalog-identity-changed");
   assert.equal(catalogRace.decision.allowed, false);
+  diagnosticExitCode = 16;
 
   fs.rmSync(path.join(workspace, ".git", "opencode-harness", "core", "checks.json"));
   assert.throws(
@@ -272,12 +276,14 @@ try {
   run("git", ["add", "-A"], { cwd: workspace });
   run("git", ["commit", "--quiet", "-m", "fixture"], { cwd: workspace });
   const linkedWorktree = path.join(temporaryRoot, "linked-worktree");
+  diagnosticExitCode = 17;
   run("git", ["worktree", "add", "--quiet", "--detach", linkedWorktree, "HEAD"], { cwd: workspace });
   writeCatalog([check({ cwd: "." })], linkedWorktree);
   const linkedCatalog = loadCoreVerificationCatalog(linkedWorktree);
   assert.equal(linkedCatalog.catalog_status, "loaded");
   assert.equal(linkedCatalog.workspace_root, fs.realpathSync.native(linkedWorktree));
   assert.equal(linkedCatalog.catalog_path.includes(`${path.sep}worktrees${path.sep}`), true);
+  diagnosticExitCode = 18;
 
   if (process.platform !== "win32") {
     const delayedMarker = path.join(temporaryRoot, "delayed-background-marker.txt");
@@ -296,6 +302,7 @@ try {
   }
 
   const materializedRoot = path.join(temporaryRoot, "materialized-core");
+  diagnosticExitCode = 19;
   const materialized = materializeProfileBundleV3({
     repositoryRoot: root,
     bundleId: "core",
@@ -318,7 +325,7 @@ try {
   process.stdout.write("installed core product runtime verification passed\n");
 } catch (error) {
   process.stderr.write(`${sanitizeSyntheticModelFreeFailureDiagnostic(error?.stack ?? error?.message ?? String(error))}\n`);
-  process.exitCode = 1;
+  process.exitCode = diagnosticExitCode;
 } finally {
   fs.rmSync(temporaryRoot, { recursive: true, force: true });
 }
