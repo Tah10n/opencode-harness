@@ -185,12 +185,14 @@ try {
     outcome_fingerprint: fingerprint(firstOutcome) }));
   firstJournal.recordAttempt({ arm_id: "baseline", family_id: "family-one", attempt_index: 1,
     outcome: firstOutcome });
-  assert.throws(() => createBenchmarkV3CampaignJournal(output, { sourceRoot: registryFixture, campaignFingerprint, initialLedger }),
-    /already active/u, "one campaign must hold an exclusive long-lived lease");
-  firstJournal.close();
   const staleReusedPidLease = path.join(registryFixture, ".git", "opencode-harness", "benchmark-v3",
     `campaign-${campaignFingerprint.slice(7)}.lease`);
-  fs.writeFileSync(staleReusedPidLease, `${JSON.stringify({ schema_version: 2, pid: 1,
+  const liveLease = JSON.parse(fs.readFileSync(staleReusedPidLease, "utf8"));
+  fs.writeFileSync(staleReusedPidLease, `${JSON.stringify({ ...liveLease, heartbeat_at_ms: 1 })}\n`, { mode: 0o600 });
+  assert.throws(() => createBenchmarkV3CampaignJournal(output, { sourceRoot: registryFixture, campaignFingerprint, initialLedger }),
+    /already active/u, "an aged heartbeat must not displace a provably live PID/start owner");
+  firstJournal.close();
+  fs.writeFileSync(staleReusedPidLease, `${JSON.stringify({ schema_version: 2, pid: process.pid,
     process_start_fingerprint: fingerprint({ deliberately: "wrong-start-identity" }),
     host_fingerprint: fingerprint(os.hostname().toLowerCase()), nonce: "stale-reused-pid",
     created_at_ms: 1, heartbeat_at_ms: 1 })}\n`, { mode: 0o600 });

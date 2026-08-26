@@ -93,8 +93,10 @@ crash without repeating completed/scored families. A long-lived PID/start/host/n
 lease carries an atomic five-second heartbeat: a fresh lease rejects concurrent
 coordinators, while a stale heartbeat can be recovered even if the old PID has
 been reused. On Linux `/proc` start ticks and on an unrestricted macOS host `ps`
-start identity are compared in addition to heartbeat freshness; unavailable
-start inspection fails closed while the heartbeat is fresh. Stale short locks are recovered, every
+start identity are compared in addition to the heartbeat. A matching live
+PID/start owner is never displaced merely because its event loop delayed a
+heartbeat. Unavailable start inspection fails closed for every live PID; reclaim
+requires a dead PID or a proven start-identity mismatch. Stale short locks are recovered, every
 attempt is durably reserved before execution, and its fsynced completion is
 written before the coordinator can record it. A crash with no authentic durable
 completion fails closed instead of spending model tokens again. A retry consumes no extra architecture slot,
