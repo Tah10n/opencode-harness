@@ -30,10 +30,15 @@ function archivePaths(root) {
 }
 
 export function verifyBenchmarkV3NoRawBundles(root) {
-  const repository = git(root, ["rev-parse", "--is-inside-work-tree"]);
+  const repository = git(root, ["rev-parse", "--show-toplevel"]);
+  const realRoot = fs.realpathSync.native(root);
+  let repositoryRoot = null;
+  if (repository.status === 0) {
+    try { repositoryRoot = fs.realpathSync.native(repository.stdout.trim()); } catch { repositoryRoot = null; }
+  }
   let paths;
   let evidenceClass;
-  if (repository.status === 0 && repository.stdout.trim() === "true") {
+  if (repositoryRoot === realRoot) {
     const reachable = git(root, ["rev-list", "--objects", "HEAD"]);
     assert.equal(reachable.status, 0, reachable.stderr);
     paths = reachable.stdout.split("\n").filter(Boolean).map((entry) => entry.replace(/^[0-9a-f]{40,64}(?:\s+|$)/u, ""));
@@ -65,6 +70,18 @@ if (process.env.BENCHMARK_V3_NO_RAW_BUNDLES_CHILD !== "1") {
       env: { ...process.env, BENCHMARK_V3_NO_RAW_BUNDLES_CHILD: "1" },
     });
     assert.equal(archived.status, 0, archived.stderr);
+
+    const foreignRepository = path.join(temporary, "foreign-repository");
+    const nestedArchive = path.join(foreignRepository, "nested-source-archive");
+    fs.mkdirSync(nestedArchive, { recursive: true });
+    assert.equal(git(foreignRepository, ["init", "--quiet"]).status, 0);
+    fs.writeFileSync(path.join(foreignRepository, "tracked.txt"), "foreign head\n");
+    assert.equal(git(foreignRepository, ["add", "tracked.txt"]).status, 0);
+    assert.equal(git(foreignRepository, ["-c", "user.name=Portable verifier", "-c", "user.email=portable@example.invalid",
+      "commit", "--quiet", "-m", "foreign head"]).status, 0);
+    fs.writeFileSync(path.join(nestedArchive, "eslint-provenance.bundle"), "forbidden raw bundle\n");
+    assert.throws(() => verifyBenchmarkV3NoRawBundles(nestedArchive), /eslint-provenance\.bundle/u,
+      "a source archive nested under an unrelated Git checkout must be scanned as an archive");
 
     const branch = git(root, ["symbolic-ref", "--quiet", "--short", "HEAD"]);
     const clean = git(root, ["diff", "--quiet", "HEAD", "--"]);

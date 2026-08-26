@@ -3,9 +3,9 @@
   "family_id": "v3-development-high-13",
   "split": "development",
   "stratum": "high",
-  "semantic_kernel_id": "eslint-change-362713c04aa89092b2b98a77fa94a75b3c933fc6",
-  "public_surface_fingerprint": "sha256:d3e2eea5e285bf0259e4a556f6a5ee20a2c3a6f6d18b3e4c96e868a7a5d84b8a",
-  "control_surface_fingerprint": "sha256:5e50f46e58a8a733eefa1163562ec8f4f536fa06fe14971de631017954cf441f",
-  "source_identity_fingerprint": "sha256:88b53e928bb27ac15ba62589972caebad6cdf5ccc1ce8f69aa3d5d37785095bf",
-  "family_fingerprint": "sha256:11d9809798da2a61ab287eacd9c571b98e3e480acbca9a01039a3547af8abd9d"
+  "semantic_kernel_id": "eslint-change-069aa680c78b8516b9a1b568519f1d01e74fb2a2",
+  "public_surface_fingerprint": "sha256:9dd0a02ba11f9d1af5ba0b6cf68ab1b1e559b2b4201de8cb7be1485423a5c0bf",
+  "control_surface_fingerprint": "sha256:2f8987051f519261dec73d523a5d899004a9a6f69e718e72190e0d61aba54f83",
+  "source_identity_fingerprint": "sha256:3fb410ba9a36849b4b8197e06adeb40f92360fda08a78da5bd9485ee64e83875",
+  "family_fingerprint": "sha256:fefb3e0c3860eddb67b696a1784e4bdb23ab0ea72405879bb9ce68de7938a6b6"
 }

@@ -7,6 +7,7 @@ import { spawnSync } from "node:child_process";
 import { createHash, generateKeyPairSync, sign } from "node:crypto";
 import { canonicalJson, fingerprint } from "../lib/feedback/contracts.mjs";
 import { benchmarkV3ReadinessEnvironment, validateBenchmarkV3ReadinessReceipt } from "../lib/benchmark/v3-readiness.mjs";
+import { verifyBenchmarkV3SplitDistribution } from "../lib/benchmark/v3-split-assignment.mjs";
 
 import { materializeProfileBundleV3 } from "../lib/profile-v3.mjs";
 import { loadBenchmarkV3Corpus } from "../lib/benchmark/v3-corpus.mjs";
@@ -27,6 +28,17 @@ import {
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const { value: design } = loadBenchmarkV3Design(root);
 const corpus = loadBenchmarkV3Corpus(root);
+assert.equal(verifyBenchmarkV3SplitDistribution(corpus.split_assignment).passed, true);
+const staleDistributionAssignment = structuredClone(corpus.split_assignment);
+staleDistributionAssignment.entries[0].patch_size_bytes = Number.MAX_SAFE_INTEGER;
+assert.equal(verifyBenchmarkV3SplitDistribution(staleDistributionAssignment).passed, false,
+  "stale aggregate distribution must not conceal changed assignment metrics");
+const substitutedAssignment = structuredClone(corpus.split_assignment);
+const firstSplit = substitutedAssignment.entries[0].split;
+const replacement = substitutedAssignment.entries.find((entry) => entry.split !== firstSplit);
+[substitutedAssignment.entries[0].split, replacement.split] = [replacement.split, substitutedAssignment.entries[0].split];
+assert.equal(verifyBenchmarkV3SplitDistribution(substitutedAssignment).passed, false,
+  "substituted seeded split assignment must be rejected");
 const readinessRoot = fs.mkdtempSync(path.join(root, ".v3-readiness-receipt-"));
 try {
   if (process.platform === "win32") {
