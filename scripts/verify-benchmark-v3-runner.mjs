@@ -4,8 +4,8 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
-import { createHash } from "node:crypto";
-import { fingerprint } from "../lib/feedback/contracts.mjs";
+import { createHash, generateKeyPairSync, sign } from "node:crypto";
+import { canonicalJson, fingerprint } from "../lib/feedback/contracts.mjs";
 import { benchmarkV3ReadinessEnvironment, validateBenchmarkV3ReadinessReceipt } from "../lib/benchmark/v3-readiness.mjs";
 
 import { materializeProfileBundleV3 } from "../lib/profile-v3.mjs";
@@ -17,6 +17,7 @@ import {
   classifyBenchmarkV3AttemptReceipt,
   evaluateBenchmarkV3EfficacyGate,
   evaluateBenchmarkV3Guardrails,
+  resolveBenchmarkV3StudySeeds,
   summarizeBenchmarkV3Stage,
   verifyBenchmarkV3OpenCodeExecutable,
   verifyBenchmarkV3FilesystemIsolation,
@@ -26,26 +27,50 @@ import {
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const { value: design } = loadBenchmarkV3Design(root);
 const corpus = loadBenchmarkV3Corpus(root);
-const readinessRoot = fs.mkdtempSync(path.join(os.tmpdir(), "v3-readiness-receipt-"));
+const readinessRoot = fs.mkdtempSync(path.join(root, ".v3-readiness-receipt-"));
 try {
+  if (process.platform === "win32") {
+    assert.throws(() => validateBenchmarkV3ReadinessReceipt("C:\\untrusted.json", {
+      capability: "real-process-containment", sourceRoot: root,
+    }));
+  } else {
+  fs.chmodSync(readinessRoot, 0o700);
+  const { publicKey, privateKey } = generateKeyPairSync("ed25519");
+  const issuer = Object.freeze({
+    issuer_id: "fixture-readiness-issuer-v1",
+    protected_channel: "fixture-protected-channel-v1",
+    channel_root: readinessRoot,
+    owner_uid: process.getuid(),
+    capabilities: Object.freeze(["real-process-containment"]),
+    public_key_pem: publicKey.export({ type: "spki", format: "pem" }),
+  });
   const environment = benchmarkV3ReadinessEnvironment();
   const sourceSha = spawnSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).stdout.trim();
-  const body = { schema_version: 1, ...environment, source_sha: sourceSha, capability: "real-process-containment",
+  const body = { schema_version: 2, issuer_id: issuer.issuer_id, protected_channel: issuer.protected_channel,
+    ...environment, source_sha: sourceSha, capability: "real-process-containment",
     status: "verified", issued_at_ms: Date.now() - 1_000, expires_at_ms: Date.now() + 60_000 };
   const receiptPath = path.join(readinessRoot, "receipt.json");
-  fs.writeFileSync(receiptPath, JSON.stringify({ ...body, fingerprint: fingerprint(body) }));
-  assert.equal(validateBenchmarkV3ReadinessReceipt(receiptPath, { capability: body.capability, sourceRoot: root }).status, "verified");
-  fs.writeFileSync(receiptPath, JSON.stringify({ ...body, host_fingerprint: `sha256:${"0".repeat(64)}`, fingerprint: fingerprint(body) }));
-  assert.throws(() => validateBenchmarkV3ReadinessReceipt(receiptPath, { capability: body.capability, sourceRoot: root }));
-  fs.writeFileSync(receiptPath, JSON.stringify({ ...body, fingerprint: fingerprint(body) }));
+  const signed = { ...body, signature: sign(null, Buffer.from(canonicalJson(body), "utf8"), privateKey).toString("base64url") };
+  fs.writeFileSync(receiptPath, JSON.stringify(signed), { mode: 0o600 });
+  assert.equal(validateBenchmarkV3ReadinessReceipt(receiptPath, {
+    capability: body.capability, sourceRoot: root, trustedIssuers: [issuer],
+  }).status, "verified");
+  fs.writeFileSync(receiptPath, JSON.stringify({ ...body, signature: "self-authored" }), { mode: 0o600 });
+  assert.throws(() => validateBenchmarkV3ReadinessReceipt(receiptPath, {
+    capability: body.capability, sourceRoot: root, trustedIssuers: [issuer],
+  }), /signature/u, "self-authored readiness JSON must be rejected");
+  fs.writeFileSync(receiptPath, JSON.stringify(signed), { mode: 0o600 });
   const hardlinkPath = path.join(readinessRoot, "receipt-hardlink.json");
   fs.linkSync(receiptPath, hardlinkPath);
-  assert.throws(() => validateBenchmarkV3ReadinessReceipt(receiptPath, { capability: body.capability, sourceRoot: root }));
+  assert.throws(() => validateBenchmarkV3ReadinessReceipt(receiptPath, {
+    capability: body.capability, sourceRoot: root, trustedIssuers: [issuer],
+  }));
   fs.unlinkSync(hardlinkPath);
-  if (process.platform !== "win32") {
-    const symlinkPath = path.join(readinessRoot, "receipt-symlink.json");
-    fs.symlinkSync(receiptPath, symlinkPath);
-    assert.throws(() => validateBenchmarkV3ReadinessReceipt(symlinkPath, { capability: body.capability, sourceRoot: root }));
+  const symlinkPath = path.join(readinessRoot, "receipt-symlink.json");
+  fs.symlinkSync(receiptPath, symlinkPath);
+  assert.throws(() => validateBenchmarkV3ReadinessReceipt(symlinkPath, {
+    capability: body.capability, sourceRoot: root, trustedIssuers: [issuer],
+  }));
   }
   const readySpoof = spawnSync(process.execPath, [path.join(root, "scripts", "verify-benchmark-v3-campaign-readiness.mjs")], {
     cwd: root, encoding: "utf8", env: { ...process.env, OPENCODE_QUALITY_PROCESS_CONTAINMENT_READY: "1",
@@ -90,6 +115,21 @@ const unseededBinding = buildBenchmarkV3ModelBinding(bindingFixture);
 const explicitlyUnseededBinding = buildBenchmarkV3ModelBinding({ ...bindingFixture, modelSamplingSeed: null });
 assert.deepEqual(unseededBinding, explicitlyUnseededBinding);
 assert.equal(unseededBinding.corpus_fingerprint, corpus.corpus_fingerprint);
+assert.deepEqual(resolveBenchmarkV3StudySeeds(corpus), {
+  corpus_generation_seed: corpus.generator.corpus_generation_seed,
+  model_sampling_seed: null,
+});
+assert.throws(() => resolveBenchmarkV3StudySeeds(corpus, {
+  corpusGenerationSeed: "substituted-seed",
+}), /corpus generation seed substitution is forbidden/u);
+assert.deepEqual(resolveBenchmarkV3StudySeeds(corpus, {
+  corpusGenerationSeed: corpus.generator.corpus_generation_seed,
+  modelSamplingSeed: "supported-model-seed",
+  modelSamplingSeedSupported: true,
+}), {
+  corpus_generation_seed: corpus.generator.corpus_generation_seed,
+  model_sampling_seed: "supported-model-seed",
+});
 assert.equal(design.retry_policy.maximum_infrastructure_retries, 1);
 
 const outcome = (family, passed, overrides = {}) => ({
@@ -118,6 +158,16 @@ assert.equal(report.candidate_tokens, 600);
 assert.equal(report.activation_rate, 1);
 assert.equal(evaluateBenchmarkV3Guardrails(design, report).passed, true);
 assert.equal(evaluateBenchmarkV3EfficacyGate(design, report).passed, true);
+const baselineTimeouts = [...baseline];
+baselineTimeouts[0] = outcome(families[0], false, { timeout: true, process_status: null });
+const baselineTimeoutReport = summarizeBenchmarkV3Stage({ baseline: baselineTimeouts, candidate });
+assert.equal(baselineTimeoutReport.timeout_delta, -1 / baseline.length);
+const candidateTimeouts = [...candidate];
+candidateTimeouts[0] = outcome(families[0], false, { timeout: true, process_status: null });
+candidateTimeouts[1] = outcome(families[1], false, { timeout: true, process_status: null });
+const candidateTimeoutReport = summarizeBenchmarkV3Stage({ baseline, candidate: candidateTimeouts });
+assert.equal(candidateTimeoutReport.timeout_delta, 2 / baseline.length);
+assert.equal(evaluateBenchmarkV3Guardrails(design, candidateTimeoutReport).failures.includes("timeout-delta"), true);
 const zeroInclusiveCi = evaluateBenchmarkV3EfficacyGate(design, {
   ...report, paired_delta: 0.1, exact_p: 0.01, confidence_interval: [0, 0.2],
 });
@@ -256,7 +306,17 @@ process.stderr.write('[opencode-harness-core] {"activation":{"post_last_mutation
   const forged = runWorker(["--final", "--forged-receipt"], true);
   assert.equal(forged.activation_receipt_authentic, false);
   assert.equal(classifyBenchmarkV3AttemptReceipt(forged, "candidate").infrastructure_failure, true);
-  assert.equal(classifyBenchmarkV3AttemptReceipt({ ...trustedPipe, timed_out: true }, "candidate").infrastructure_failure, true);
+  const timeoutReceipt = { ...trustedPipe, status: null, signal: "SIGTERM", timed_out: true, error_code: "ETIMEDOUT",
+    protocol_valid: false, terminal_event_count: 0, activation: false, activation_receipt_valid: false,
+    activation_receipt_authentic: false };
+  for (const armKind of ["baseline", "candidate"]) {
+    const timeoutClassification = classifyBenchmarkV3AttemptReceipt(timeoutReceipt, armKind);
+    assert.equal(timeoutClassification.receipt_authentic, true);
+    assert.equal(timeoutClassification.complete_scored_outcome, true);
+    assert.equal(timeoutClassification.verification_succeeded, false);
+    assert.equal(timeoutClassification.infrastructure_failure, false);
+  }
+  assert.equal(classifyBenchmarkV3AttemptReceipt({ ...timeoutReceipt, error_code: "EIO" }, "baseline").infrastructure_failure, true);
 } finally { fs.rmSync(workerFixtureRoot, { recursive: true, force: true }); }
 
 console.log(JSON.stringify({ status: "passed", evidence_class: "model-free-contained-runner-contract", model_execution: false,

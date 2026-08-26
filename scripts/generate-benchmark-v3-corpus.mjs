@@ -5,11 +5,13 @@ import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
 
 import { canonicalJson, fingerprint } from "../lib/feedback/contracts.mjs";
+import { assignBenchmarkV3Splits, verifyBenchmarkV3SplitDistribution } from "../lib/benchmark/v3-split-assignment.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const sourceRepo = path.resolve(process.argv[2] ?? "");
 const semanticRuntimeRoot = process.argv[3] === undefined ? null : path.resolve(process.argv[3]);
 const outputRoot = path.join(root, "benchmarks", "v3", "corpus");
+const generatorContract = JSON.parse(fs.readFileSync(path.join(root, "benchmarks", "v3", "generator-contract.v1.json"), "utf8"));
 const repositoryUrl = "https://github.com/eslint/eslint";
 const quotas = Object.freeze({ development: 20, validation: 20, holdout: 30 });
 const codePath = /\.(?:cjs|js|mjs)$/u;
@@ -94,6 +96,7 @@ for (const line of git(["log", "--no-merges", "--format=%H%x09%P%x09%ct%x09%s"])
     runtime_version: `${runtimeMajor}.${runtimeMinor}`, subject, beforeFiles, afterFiles, hiddenTestFiles,
     patch_fingerprint: fingerprint(patch), requirement_text: requirementText,
     complexity: changedLines + (paths.length * 20) + Math.ceil(bytes / 4096),
+    patch_size_bytes: Buffer.byteLength(patch), file_count: paths.length + testPaths.length,
   }));
 }
 if (candidates.length < 210) throw new Error(`only ${candidates.length} eligible unique fix commits were found`);
@@ -145,15 +148,35 @@ if (viableCandidates.length < 210) throw new Error(`only ${viableCandidates.leng
 const recentWindow = viableCandidates
   .sort((left, right) => right.committed_at - left.committed_at || left.commit.localeCompare(right.commit))
   .slice(0, 210);
-const selected = recentWindow.sort((left, right) => left.complexity - right.complexity || left.commit.localeCompare(right.commit));
+const commitAgeRank = new Map(recentWindow.map((entry, index) => [entry.commit, index + 1]));
+const selected = [...recentWindow].sort((left, right) => left.complexity - right.complexity || left.commit.localeCompare(right.commit));
 const groups = Object.freeze({
   small: selected.slice(0, 70),
   medium: selected.slice(70, 140),
   high: selected.slice(140, 210),
 });
+const candidateByCommit = new Map(selected.map((entry) => [entry.commit, entry]));
+const assignment = assignBenchmarkV3Splits(Object.entries(groups).flatMap(([stratum, entries]) => entries.map((entry) => ({
+  source_commit: entry.commit, stratum, complexity_score: entry.complexity,
+  patch_size_bytes: entry.patch_size_bytes, file_count: entry.file_count,
+  runtime_version: entry.runtime_version, committed_at: entry.committed_at,
+  commit_age_rank: commitAgeRank.get(entry.commit),
+}))), generatorContract.corpus_generation_seed);
+const distribution = verifyBenchmarkV3SplitDistribution(assignment);
+if (!distribution.passed) throw new Error(`seeded split distribution failed: ${JSON.stringify(distribution)}`);
+if (assignment.assignment_fingerprint !== generatorContract.split_assignment_fingerprint) {
+  throw new Error("generated split assignment does not match the frozen generator contract");
+}
+const assignedGroups = Object.fromEntries(Object.keys(quotas).map((split) => [split, Object.fromEntries(Object.keys(groups).map((stratum) => [
+  stratum,
+  assignment.entries.filter((entry) => entry.split === split && entry.stratum === stratum)
+    .sort((left, right) => left.complexity_quantile - right.complexity_quantile || left.source_commit.localeCompare(right.source_commit))
+    .map((entry) => candidateByCommit.get(entry.source_commit)),
+]))]));
 
 fs.rmSync(outputRoot, { recursive: true, force: true });
 fs.mkdirSync(outputRoot, { recursive: true });
+fs.writeFileSync(path.join(root, "benchmarks", "v3", "split-assignment.v1.json"), `${JSON.stringify(assignment, null, 2)}\n`, "utf8");
 fs.writeFileSync(path.join(outputRoot, "SOURCE.json"), `${JSON.stringify({
   schema_version: 1,
   repository: repositoryUrl,
@@ -172,11 +195,9 @@ fs.writeFileSync(path.join(outputRoot, "SOURCE.json"), `${JSON.stringify({
 fs.writeFileSync(path.join(outputRoot, "THIRD_PARTY_LICENSE.txt"), licenseBytes);
 fs.writeFileSync(path.join(outputRoot, "THIRD_PARTY_NOTICES.md"), `# Third-party notices\n\nDerived from ${repositoryUrl} at ${sourceTip}. SPDX-License-Identifier: MIT. Raw provenance bundles are excluded from Git and release assets.\n`, "utf8");
 
-for (const [stratum, entries] of Object.entries(groups)) {
-  let offset = 0;
-  for (const [split, count] of Object.entries(quotas)) {
-    const splitEntries = entries.slice(offset, offset + count);
-    offset += count;
+for (const [stratum] of Object.entries(groups)) {
+  for (const [split] of Object.entries(quotas)) {
+    const splitEntries = assignedGroups[split][stratum];
     for (const [zeroIndex, entry] of splitEntries.entries()) {
       const index = zeroIndex + 1;
       const familyId = `v3-${split}-${stratum}-${String(index).padStart(2, "0")}`;

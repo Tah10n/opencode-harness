@@ -3,10 +3,12 @@
   "generator_version": "benchmark-v3-generator/1",
   "corpus_generation_seed": "benchmark-v3-corpus-2026-08-26-v1",
   "model_sampling_seed": "optional-or-unsupported",
+  "split_assignment_algorithm": "frozen-seeded-complexity-quantile-shuffle-v1",
+  "split_assignment_fingerprint": "sha256:b6443074f17bf31e5f81ce6bacbfe19668d87c0601b41edd7fc97a1afac8377d",
   "seed_freeze": {
-    "development": "sha256:4de3995ed70e56a756973a864b736c61a5c6b70c32b8f34532c6dfe79c000ded",
-    "validation": "sha256:f37478b3ca509e2c0c999d34c35718e3d72645f8661013d25884fbc85ea346cd",
-    "holdout": "sha256:06d250e753eee0ab76991012253614af7224504b773fe0a17f159220472e6134",
+    "development": "sha256:286f6ee75e7e9e70d33caff04fa7acfe4ff5e3ee9a0d7970a6d81fbf2f5860ae",
+    "validation": "sha256:8f8777e4b1b9addd435a2f6a0920278e1df983df811c1de71fd0832110b6faa6",
+    "holdout": "sha256:e9359ed77928e23fe764f159b19ac5c207b8b5fe8f390150024ef5a18a23568c",
     "validation_and_holdout_frozen_before_first_candidate": true,
     "baseline_outcomes_may_influence_generation_or_selection": false
   },

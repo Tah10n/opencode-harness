@@ -40,6 +40,7 @@ const result = await runBenchmarkV3Study({
   model: one("model"),
   provider: one("provider"),
   variant: one("variant"),
-  seed: one("corpus-generation-seed"),
+  corpusGenerationSeed: values.has("corpus-generation-seed") ? one("corpus-generation-seed") : null,
+  modelSamplingSeed: values.has("model-sampling-seed") ? one("model-sampling-seed") : null,
 });
 process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
