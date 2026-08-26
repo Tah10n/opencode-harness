@@ -7,6 +7,7 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { materializeProfileBundleV3 } from "../lib/profile-v3.mjs";
+import { sanitizeSyntheticModelFreeFailureDiagnostic } from "../lib/benchmark/self-test.mjs";
 import { createInjectedTestContainmentFactory } from "./injected-test-containment.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -17,6 +18,7 @@ const repositoryRoot = path.join(temporaryRoot, "repository");
 const workspace = path.join(temporaryRoot, "workspace");
 const trustedCheckExecutable = fs.realpathSync.native(process.platform === "win32" ? process.env.ComSpec : "/bin/sh");
 const checkArguments = (command) => process.platform === "win32" ? ["/d", "/s", "/c", command] : ["-c", command];
+let installedOpenCodeExecutable;
 
 function fail(message) {
   throw new Error(message);
@@ -186,7 +188,7 @@ async function installedRun({ content, operation = "write", checkCommand, expect
     const result = await installedLauncher.runCoreLauncher({
       workspace,
       catalog: ".git/opencode-harness/core/checks.json",
-      opencode: executable("opencode"),
+      opencode: installedOpenCodeExecutable,
       opencodeArgs: [
       "run", "--format", "json", "--model", `fixture/${provider.model}`,
       "--agent", "core", "--dir", workspace,
@@ -207,6 +209,7 @@ async function installedRun({ content, operation = "write", checkCommand, expect
   }
 }
 
+let diagnosticExitCode = 11;
 try {
   materializeProfileBundleV3({
     repositoryRoot: root,
@@ -214,6 +217,7 @@ try {
     outputDirectory: materializedRoot,
     allowDirty: true,
   });
+  diagnosticExitCode = 12;
   // The deterministic fixture must exercise delete/rename non-interactively.
   // Only fixture permissions are relaxed; runtime bytes under test stay exact.
   const fixtureAgentPath = path.join(materializedRoot, "agents", "core.md");
@@ -234,6 +238,9 @@ try {
     cwd: repositoryRoot, encoding: "utf8", shell: false,
   });
   assert.equal(worktree.status, 0, worktree.stderr);
+  diagnosticExitCode = 13;
+  installedOpenCodeExecutable = executable("opencode");
+  diagnosticExitCode = 14;
 
   const failed = await installedRun({
     content: "failed-check\n",
@@ -288,6 +295,9 @@ try {
     opencode_version: spawnSync(executable("opencode"), ["--version"], { encoding: "utf8", shell: false }).stdout.trim(),
     cases: ["failed-blocked", "passed-allowed", "post-check-mutation-stale", "tracked-deletion-allowed", "tracked-rename-allowed"],
   }, null, 2)}\n`);
+} catch (error) {
+  process.stderr.write(`${sanitizeSyntheticModelFreeFailureDiagnostic(error?.stack ?? error?.message ?? String(error))}\n`);
+  process.exitCode = diagnosticExitCode;
 } finally {
   fs.rmSync(temporaryRoot, { recursive: true, force: true });
 }
