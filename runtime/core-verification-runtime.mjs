@@ -13,6 +13,7 @@ import {
 } from "./core-verification-gate.mjs";
 
 export const CORE_CHECK_CATALOG_PATH = ".git/opencode-harness/core/checks.json";
+const CORE_CHECK_GIT_PATH = "opencode-harness/core/checks.json";
 const SAFE_ID = /^[a-z0-9][a-z0-9._-]{0,127}$/u;
 const MAX_CATALOG_BYTES = 256 * 1024;
 
@@ -76,6 +77,99 @@ function ordinaryFile(target, label) {
   return stat;
 }
 
+function sha256File(target) {
+  return `sha256:${createHash("sha256").update(fs.readFileSync(target)).digest("hex")}`;
+}
+
+function fileIdentity(target, label, { executable = false } = {}) {
+  const canonicalPath = fs.realpathSync.native(target);
+  const stat = ordinaryFile(canonicalPath, label);
+  if (executable && process.platform !== "win32" && (stat.mode & 0o111) === 0) {
+    fail("CORE_RUNTIME_UNTRUSTED_FILE", `${label} is not executable`);
+  }
+  return Object.freeze({
+    canonical_path: canonicalPath,
+    size: stat.size,
+    mode: stat.mode,
+    device: stat.dev,
+    inode: stat.ino,
+    sha256: sha256File(canonicalPath),
+  });
+}
+
+function directoryIdentity(target, label) {
+  const canonicalPath = fs.realpathSync.native(target);
+  const stat = fs.statSync(canonicalPath);
+  if (!stat.isDirectory()) fail("CORE_RUNTIME_UNTRUSTED_CWD", `${label} is not a directory`);
+  return Object.freeze({ canonical_path: canonicalPath, mode: stat.mode, device: stat.dev, inode: stat.ino });
+}
+
+function assertIdentityCurrent(expected, label, { directory = false } = {}) {
+  let current;
+  try {
+    current = directory ? directoryIdentity(expected.canonical_path, label) : fileIdentity(
+      expected.canonical_path,
+      label,
+      { executable: label.includes("executable") },
+    );
+  } catch {
+    fail("CORE_RUNTIME_IDENTITY_CHANGED", `${label} identity is unavailable`);
+  }
+  for (const key of Object.keys(expected)) {
+    if (current[key] !== expected[key]) fail("CORE_RUNTIME_IDENTITY_CHANGED", `${label} identity changed`);
+  }
+}
+
+function assertTrustedAncestry(target, label) {
+  let current = path.dirname(target);
+  while (true) {
+    const stat = fs.lstatSync(current);
+    if (!stat.isDirectory() || stat.isSymbolicLink()) fail("CORE_RUNTIME_UNTRUSTED_ANCESTRY", `${label} ancestry is not ordinary`);
+    const writableByOthers = (stat.mode & 0o002) !== 0;
+    const stickyDirectory = (stat.mode & 0o1000) !== 0;
+    if (writableByOthers && !stickyDirectory) {
+      fail("CORE_RUNTIME_UNTRUSTED_ANCESTRY", `${label} ancestry is writable by another principal`);
+    }
+    const parent = path.dirname(current);
+    if (parent === current) break;
+    current = parent;
+  }
+}
+
+function gitValue(root, args, label) {
+  const result = spawnSync("git", args, { cwd: root, encoding: "utf8", shell: false, windowsHide: true });
+  if (result.error || result.status !== 0 || result.signal !== null || result.stdout.includes("\0")) {
+    fail("CORE_RUNTIME_REPOSITORY", `${label} is unavailable`);
+  }
+  return result.stdout.trim();
+}
+
+function resolveDefaultCatalog(root) {
+  const topLevel = fs.realpathSync.native(gitValue(root, ["rev-parse", "--show-toplevel"], "repository top level"));
+  if (topLevel !== root) fail("CORE_RUNTIME_REPOSITORY", "workspace does not match the repository top level");
+  const gitDirectoryValue = gitValue(root, ["rev-parse", "--absolute-git-dir"], "repository Git directory");
+  const gitDirectory = fs.realpathSync.native(path.resolve(root, gitDirectoryValue));
+  const catalogValue = gitValue(root, ["rev-parse", "--git-path", CORE_CHECK_GIT_PATH], "core catalog Git path");
+  const candidate = path.resolve(root, catalogValue);
+  const relative = path.relative(gitDirectory, candidate);
+  if (relative === "" || relative.startsWith("..") || path.isAbsolute(relative)) {
+    fail("CORE_RUNTIME_REPOSITORY", "core catalog is outside the repository Git directory");
+  }
+  return Object.freeze({ candidate, git_directory: gitDirectory, top_level: topLevel });
+}
+
+function referencedInputIdentities(argv, cwdPath) {
+  const candidates = new Set();
+  const packageManifest = path.join(cwdPath, "package.json");
+  if (fs.existsSync(packageManifest)) candidates.add(packageManifest);
+  for (const argument of argv) {
+    if (argument.startsWith("-") || argument.length === 0) continue;
+    const candidate = path.isAbsolute(argument) ? argument : path.resolve(cwdPath, argument);
+    if (fs.existsSync(candidate) && fs.lstatSync(candidate).isFile()) candidates.add(candidate);
+  }
+  return Object.freeze([...candidates].sort().map((candidate) => fileIdentity(candidate, "argv input")));
+}
+
 function inside(root, target, label) {
   const relative = path.relative(root, target);
   if (relative === "" || (!relative.startsWith("..") && !path.isAbsolute(relative))) return target;
@@ -98,11 +192,9 @@ function normalizeCheck(value, index, workspaceRoot) {
   }
   if (typeof value.executable_path !== "string" || !path.isAbsolute(value.executable_path)
     || value.executable_path.includes("\0")) fail("CORE_RUNTIME_SCHEMA", `${label}.executable_path must be absolute`);
-  const executablePath = fs.realpathSync.native(value.executable_path);
-  const executableStat = ordinaryFile(executablePath, `${label}.executable_path`);
-  if (process.platform !== "win32" && (executableStat.mode & 0o111) === 0) {
-    fail("CORE_RUNTIME_UNTRUSTED_FILE", `${label}.executable_path is not executable`);
-  }
+  const executableIdentity = fileIdentity(value.executable_path, `${label}.executable_path`, { executable: true });
+  const executablePath = executableIdentity.canonical_path;
+  assertTrustedAncestry(executablePath, `${label}.executable_path`);
   if (!Array.isArray(value.argv) || value.argv.length > 64
     || value.argv.some((entry) => typeof entry !== "string" || entry.length > 4096 || entry.includes("\0"))) {
     fail("CORE_RUNTIME_SCHEMA", `${label}.argv is invalid`);
@@ -111,6 +203,8 @@ function normalizeCheck(value, index, workspaceRoot) {
   const cwdPath = fs.realpathSync.native(path.resolve(workspaceRoot, ...cwd.split("/")));
   inside(workspaceRoot, cwdPath, `${label}.cwd`);
   if (!fs.statSync(cwdPath).isDirectory()) fail("CORE_RUNTIME_SCHEMA", `${label}.cwd is not a directory`);
+  const cwdIdentity = directoryIdentity(cwdPath, `${label}.cwd`);
+  assertTrustedAncestry(cwdPath, `${label}.cwd`);
   if (!Number.isSafeInteger(value.timeout_ms) || value.timeout_ms < 1 || value.timeout_ms > 15 * 60 * 1000) {
     fail("CORE_RUNTIME_SCHEMA", `${label}.timeout_ms is invalid`);
   }
@@ -119,19 +213,27 @@ function normalizeCheck(value, index, workspaceRoot) {
     scope_prefixes: Object.freeze([...scopePrefixes].sort()),
     cost_rank: value.cost_rank,
     executable_path: executablePath,
+    executable_identity: executableIdentity,
     argv: Object.freeze([...value.argv]),
     cwd,
     cwd_path: cwdPath,
+    cwd_identity: cwdIdentity,
+    input_manifest: referencedInputIdentities(value.argv, cwdPath),
     timeout_ms: value.timeout_ms,
   });
 }
 
-export function loadCoreVerificationCatalog(workspaceRoot, { catalogPath = CORE_CHECK_CATALOG_PATH } = {}) {
+export function loadCoreVerificationCatalog(workspaceRoot, {
+  catalogPath = CORE_CHECK_CATALOG_PATH,
+  catalogRequired = true,
+} = {}) {
   const root = fs.realpathSync.native(path.resolve(workspaceRoot));
-  const relativeCatalog = relativePath(catalogPath, "catalogPath", { rootAllowed: false });
-  const candidate = path.resolve(root, ...relativeCatalog.split("/"));
-  inside(root, candidate, "catalogPath");
+  const resolvedCatalog = catalogPath === CORE_CHECK_CATALOG_PATH
+    ? resolveDefaultCatalog(root)
+    : { candidate: inside(root, path.resolve(root, ...relativePath(catalogPath, "catalogPath", { rootAllowed: false }).split("/")), "catalogPath"), git_directory: null, top_level: root };
+  const { candidate } = resolvedCatalog;
   if (!fs.existsSync(candidate)) {
+    if (catalogRequired) fail("CORE_RUNTIME_CATALOG_REQUIRED", "required core verification catalog is absent");
     const sealedSource = { schema_version: 1, catalog_id: "absent", checks: [] };
     return Object.freeze({
       workspace_root: root,
@@ -145,6 +247,10 @@ export function loadCoreVerificationCatalog(workspaceRoot, { catalogPath = CORE_
   if (stat.size > MAX_CATALOG_BYTES) fail("CORE_RUNTIME_SCHEMA", "core verification catalog is too large");
   const realCatalog = fs.realpathSync.native(candidate);
   if (realCatalog !== candidate) fail("CORE_RUNTIME_UNTRUSTED_FILE", "core verification catalog cannot traverse links");
+  if (resolvedCatalog.git_directory !== null) {
+    const relative = path.relative(resolvedCatalog.git_directory, realCatalog);
+    if (relative.startsWith("..") || path.isAbsolute(relative)) fail("CORE_RUNTIME_REPOSITORY", "core catalog escaped the repository Git directory");
+  }
   let value;
   try {
     value = JSON.parse(fs.readFileSync(realCatalog, "utf8").replace(/^\uFEFF/u, ""));
@@ -164,33 +270,76 @@ export function loadCoreVerificationCatalog(workspaceRoot, { catalogPath = CORE_
     catalog_id: value.catalog_id,
     checks: checks.map(({ cwd_path: _cwdPath, ...entry }) => entry),
   };
+  const catalogIdentity = fileIdentity(realCatalog, "core verification catalog");
   return Object.freeze({
     workspace_root: root,
     catalog_path: realCatalog,
     catalog_status: "loaded",
     catalog_fingerprint: fingerprint(sealedSource),
+    catalog_identity: catalogIdentity,
+    repository_identity: Object.freeze(resolvedCatalog),
     checks: Object.freeze(checks),
   });
 }
 
-function gitFiles(workspaceRoot) {
-  const result = spawnSync("git", ["ls-files", "-co", "--exclude-standard", "-z"], {
+const SNAPSHOT_EXCLUDED_PREFIXES = Object.freeze([".git", ".oc_harness", "node_modules", ".opencode/node_modules"]);
+
+function gitOutput(workspaceRoot, args, label) {
+  const result = spawnSync("git", args, {
     cwd: workspaceRoot,
     encoding: "buffer",
     shell: false,
     windowsHide: true,
-    maxBuffer: 16 * 1024 * 1024,
+    maxBuffer: 64 * 1024 * 1024,
   });
   if (result.error || result.status !== 0 || result.signal !== null) {
-    fail("CORE_RUNTIME_SNAPSHOT", "workspace file inventory is unavailable");
+    fail("CORE_RUNTIME_SNAPSHOT", `${label} is unavailable`);
   }
-  return result.stdout.toString("utf8").split("\0").filter(Boolean).sort();
+  return result.stdout.toString("utf8");
+}
+
+function snapshotPathExcluded(relative) {
+  return SNAPSHOT_EXCLUDED_PREFIXES.some((prefix) => relative === prefix || relative.startsWith(`${prefix}/`));
+}
+
+function gitSnapshotInventory(workspaceRoot) {
+  const visible = gitOutput(workspaceRoot, ["ls-files", "-co", "--exclude-standard", "-z"], "workspace file inventory")
+    .split("\0").filter(Boolean);
+  const ignored = gitOutput(workspaceRoot, ["ls-files", "--others", "--ignored", "--exclude-standard", "-z"], "ignored workspace inventory")
+    .split("\0").filter(Boolean);
+  const ignoredSet = new Set(ignored);
+  const stageEntries = new Map();
+  for (const record of gitOutput(workspaceRoot, ["ls-files", "--stage", "-z"], "workspace index inventory").split("\0").filter(Boolean)) {
+    const match = /^(\d{6}) ([0-9a-f]{40,64}) ([0-3])\t([\s\S]+)$/u.exec(record);
+    if (match === null || match[3] !== "0") fail("CORE_RUNTIME_REPOSITORY_SHAPE", "workspace index contains an unsupported entry");
+    stageEntries.set(match[4], Object.freeze({ mode: match[1], object: match[2] }));
+  }
+  const files = [...new Set([...visible, ...ignored])].filter((entry) => !snapshotPathExcluded(entry)).sort();
+  return Object.freeze({ files, ignored: ignoredSet, stage_entries: stageEntries });
+}
+
+function snapshotSubmodule(candidate, relative, indexEntry) {
+  if (!fs.existsSync(candidate)) return null;
+  const stat = fs.lstatSync(candidate);
+  if (stat.isSymbolicLink() || !stat.isDirectory()) fail("CORE_RUNTIME_REPOSITORY_SHAPE", `submodule ${relative} has an unsupported shape`);
+  const head = spawnSync("git", ["rev-parse", "HEAD"], { cwd: candidate, encoding: "utf8", shell: false, windowsHide: true });
+  const status = spawnSync("git", ["status", "--porcelain=v1", "--untracked-files=all"], { cwd: candidate, encoding: "utf8", shell: false, windowsHide: true });
+  if (head.status !== 0 || status.status !== 0 || !/^[0-9a-f]{40,64}\n?$/u.test(head.stdout)) {
+    fail("CORE_RUNTIME_REPOSITORY_SHAPE", `submodule ${relative} identity is unavailable`);
+  }
+  return Object.freeze({
+    kind: "submodule",
+    index_object: indexEntry.object,
+    head: head.stdout.trim(),
+    worktree_status: fingerprint(status.stdout),
+  });
 }
 
 export function snapshotCoreWorkspace(workspaceRoot) {
   const root = fs.realpathSync.native(path.resolve(workspaceRoot));
+  const inventory = gitSnapshotInventory(root);
   const files = {};
-  for (const relative of gitFiles(root)) {
+  for (const relative of inventory.files) {
     relativePath(relative, "workspace path", { rootAllowed: false });
     const candidate = path.resolve(root, ...relative.split("/"));
     inside(root, candidate, "workspace path");
@@ -201,25 +350,65 @@ export function snapshotCoreWorkspace(workspaceRoot) {
       files[relative] = null;
       continue;
     }
+    const indexEntry = inventory.stage_entries.get(relative);
+    if (indexEntry?.mode === "160000") {
+      files[relative] = snapshotSubmodule(candidate, relative, indexEntry);
+      continue;
+    }
     const stat = fs.lstatSync(candidate);
-    if (!stat.isFile() || stat.isSymbolicLink()) fail("CORE_RUNTIME_SNAPSHOT", "workspace contains an unsupported tracked path");
+    if (stat.isSymbolicLink()) {
+      files[relative] = Object.freeze({
+        kind: "symlink",
+        target: fs.readlinkSync(candidate),
+        ignored: inventory.ignored.has(relative),
+      });
+      continue;
+    }
+    if (!stat.isFile()) fail("CORE_RUNTIME_REPOSITORY_SHAPE", `workspace path ${relative} has an unsupported type`);
     const real = fs.realpathSync.native(candidate);
-    if (real !== candidate) fail("CORE_RUNTIME_SNAPSHOT", "workspace path traverses a link");
-    files[relative] = `sha256:${createHash("sha256").update(fs.readFileSync(real)).digest("hex")}`;
+    if (real !== candidate) fail("CORE_RUNTIME_REPOSITORY_SHAPE", `workspace path ${relative} traverses a link`);
+    files[relative] = Object.freeze({
+      kind: "file",
+      sha256: sha256File(real),
+      executable: process.platform === "win32" ? null : (stat.mode & 0o111) !== 0,
+      ignored: inventory.ignored.has(relative),
+    });
   }
   return Object.freeze({ files: Object.freeze(files), workspace_fingerprint: fingerprint(files) });
 }
 
 export function changedCoreWorkspacePaths(before, after) {
   const paths = [...new Set([...Object.keys(before.files), ...Object.keys(after.files)])].sort();
-  return Object.freeze(paths.filter((entry) => before.files[entry] !== after.files[entry]));
+  return Object.freeze(paths.filter((entry) => (
+    JSON.stringify(canonical(before.files[entry])) !== JSON.stringify(canonical(after.files[entry]))
+  )));
 }
 
 export function runCoreTrustedCheck(check) {
+  try {
+    assertIdentityCurrent(check.executable_identity, "check executable");
+    assertIdentityCurrent(check.cwd_identity, "check cwd", { directory: true });
+    for (const input of check.input_manifest) assertIdentityCurrent(input, "check argv input");
+    assertTrustedAncestry(check.executable_path, "check executable");
+    assertTrustedAncestry(check.cwd_path, "check cwd");
+  } catch (error) {
+    return Object.freeze({
+      status: "unavailable",
+      detail_code: error?.code === "CORE_RUNTIME_IDENTITY_CHANGED"
+        ? "trusted-input-identity-changed" : "trusted-input-untrusted",
+      command_fingerprint: fingerprint({
+        executable_identity: check.executable_identity,
+        cwd_identity: check.cwd_identity,
+        input_manifest: check.input_manifest,
+        argv: check.argv,
+      }),
+    });
+  }
   const commandFingerprint = fingerprint({
-    executable_path: check.executable_path,
+    executable_identity: check.executable_identity,
     argv: check.argv,
-    cwd: check.cwd,
+    cwd_identity: check.cwd_identity,
+    input_manifest: check.input_manifest,
     timeout_ms: check.timeout_ms,
   });
   const result = spawnSync(check.executable_path, check.argv, {
@@ -270,7 +459,18 @@ export function verifyCoreWorkspaceMutation({ catalog, before, after, checkRunne
   }
   const selected = catalog.checks.find((entry) => entry.check_id === state.selected_check_id);
   state = startCoreVerification(state, { check_id: selected.check_id });
-  const outcome = checkRunner(selected);
+  let outcome;
+  try {
+    if (catalog.catalog_identity !== undefined) assertIdentityCurrent(catalog.catalog_identity, "core verification catalog");
+    outcome = checkRunner(selected);
+  } catch (error) {
+    outcome = Object.freeze({
+      status: "unavailable",
+      detail_code: error?.code === "CORE_RUNTIME_IDENTITY_CHANGED"
+        ? "catalog-identity-changed" : "catalog-untrusted",
+      command_fingerprint: catalog.catalog_fingerprint,
+    });
+  }
   state = completeCoreVerification(state, {
     check_id: selected.check_id,
     mutation_revision: state.mutation_revision,

@@ -9,6 +9,7 @@ import { materializeProfileBundleV3 } from "../lib/profile-v3.mjs";
 import {
   changedCoreWorkspacePaths,
   loadCoreVerificationCatalog,
+  runCoreTrustedCheck,
   snapshotCoreWorkspace,
   verifyCoreWorkspaceMutation,
 } from "../runtime/core-verification-runtime.mjs";
@@ -23,10 +24,14 @@ function run(command, args, options = {}) {
   return result;
 }
 
-function writeCatalog(checks) {
-  const directory = path.join(workspace, ".git", "opencode-harness", "core");
+function writeCatalog(checks, targetWorkspace = workspace) {
+  const gitPath = run("git", ["rev-parse", "--git-path", "opencode-harness/core/checks.json"], {
+    cwd: targetWorkspace,
+  }).stdout.trim();
+  const catalogPath = path.resolve(targetWorkspace, gitPath);
+  const directory = path.dirname(catalogPath);
   fs.mkdirSync(directory, { recursive: true });
-  fs.writeFileSync(path.join(directory, "checks.json"), `${JSON.stringify({
+  fs.writeFileSync(catalogPath, `${JSON.stringify({
     schema_version: 1,
     catalog_id: "installed-core-fixture",
     checks,
@@ -84,9 +89,41 @@ try {
   fs.renameSync(path.join(workspace, "src", "feature.mjs"), path.join(workspace, "src", "renamed.mjs"));
   const afterRename = snapshotCoreWorkspace(workspace);
   assert.equal(afterRename.files["src/feature.mjs"], null);
-  assert.match(afterRename.files["src/renamed.mjs"], /^sha256:/u);
+  assert.match(afterRename.files["src/renamed.mjs"].sha256, /^sha256:/u);
   assert.deepEqual(changedCoreWorkspacePaths(beforeRename, afterRename), ["src/feature.mjs", "src/renamed.mjs"]);
   fs.renameSync(path.join(workspace, "src", "renamed.mjs"), path.join(workspace, "src", "feature.mjs"));
+
+  fs.writeFileSync(path.join(workspace, ".gitignore"), "relevant-ignored.txt\n", "utf8");
+  run("git", ["add", ".gitignore"], { cwd: workspace });
+  const beforeIgnored = snapshotCoreWorkspace(workspace);
+  fs.writeFileSync(path.join(workspace, "relevant-ignored.txt"), "ignored but relevant\n", "utf8");
+  const afterIgnored = snapshotCoreWorkspace(workspace);
+  assert.deepEqual(changedCoreWorkspacePaths(beforeIgnored, afterIgnored), ["relevant-ignored.txt"]);
+  assert.equal(afterIgnored.files["relevant-ignored.txt"].ignored, true);
+
+  fs.writeFileSync(path.join(workspace, "src", "mode-fixture.mjs"), "process.exit(0);\n", "utf8");
+  run("git", ["add", "src/mode-fixture.mjs"], { cwd: workspace });
+  if (process.platform !== "win32") {
+    fs.chmodSync(path.join(workspace, "src", "mode-fixture.mjs"), 0o644);
+    const beforeMode = snapshotCoreWorkspace(workspace);
+    fs.chmodSync(path.join(workspace, "src", "mode-fixture.mjs"), 0o755);
+    const afterMode = snapshotCoreWorkspace(workspace);
+    assert.deepEqual(changedCoreWorkspacePaths(beforeMode, afterMode), ["src/mode-fixture.mjs"]);
+  }
+
+  if (process.platform !== "win32") {
+    fs.symlinkSync("feature.mjs", path.join(workspace, "src", "feature-link.mjs"));
+    const beforeLink = snapshotCoreWorkspace(workspace);
+    fs.rmSync(path.join(workspace, "src", "feature-link.mjs"));
+    fs.symlinkSync("mode-fixture.mjs", path.join(workspace, "src", "feature-link.mjs"));
+    const afterLink = snapshotCoreWorkspace(workspace);
+    assert.deepEqual(changedCoreWorkspacePaths(beforeLink, afterLink), ["src/feature-link.mjs"]);
+    fs.rmSync(path.join(workspace, "src", "feature-link.mjs"));
+  }
+  fs.rmSync(path.join(workspace, "relevant-ignored.txt"));
+  run("git", ["rm", "--cached", "--quiet", "-f", ".gitignore", "src/mode-fixture.mjs"], { cwd: workspace });
+  fs.rmSync(path.join(workspace, ".gitignore"));
+  fs.rmSync(path.join(workspace, "src", "mode-fixture.mjs"));
 
   for (const [status, reason] of [
     ["failed", "verification_failed"],
@@ -135,13 +172,84 @@ try {
   assert.equal(stale.state.verification, null);
   assert.equal(fs.existsSync(path.join(workspace, ".oc_harness")), false);
 
+  const fixtureExecutable = path.join(temporaryRoot, process.platform === "win32" ? "fixture-node.exe" : "fixture-node");
+  fs.copyFileSync(process.execPath, fixtureExecutable);
+  if (process.platform !== "win32") fs.chmodSync(fixtureExecutable, 0o755);
+  fs.writeFileSync(path.join(workspace, "package.json"), "{\"scripts\":{\"test\":\"node check.mjs\"}}\n", "utf8");
+  fs.writeFileSync(path.join(workspace, "check.mjs"), "process.exit(0);\n", "utf8");
+  const trustedInputCheck = check({ executable_path: fixtureExecutable, argv: ["check.mjs"] });
+  writeCatalog([trustedInputCheck]);
+  let trustedInputCatalog = loadCoreVerificationCatalog(workspace);
+  fs.writeFileSync(path.join(workspace, "package.json"), "{\"scripts\":{\"test\":\"node changed.mjs\"}}\n", "utf8");
+  assert.equal(runCoreTrustedCheck(trustedInputCatalog.checks[0]).detail_code, "trusted-input-identity-changed");
+
+  fs.writeFileSync(path.join(workspace, "package.json"), "{\"scripts\":{\"test\":\"node check.mjs\"}}\n", "utf8");
+  writeCatalog([trustedInputCheck]);
+  trustedInputCatalog = loadCoreVerificationCatalog(workspace);
+  fs.writeFileSync(path.join(workspace, "check.mjs"), "process.exit(1);\n", "utf8");
+  assert.equal(runCoreTrustedCheck(trustedInputCatalog.checks[0]).detail_code, "trusted-input-identity-changed");
+
+  fs.writeFileSync(path.join(workspace, "check.mjs"), "process.exit(0);\n", "utf8");
+  writeCatalog([trustedInputCheck]);
+  trustedInputCatalog = loadCoreVerificationCatalog(workspace);
+  fs.renameSync(fixtureExecutable, `${fixtureExecutable}.old`);
+  fs.copyFileSync(process.execPath, fixtureExecutable);
+  if (process.platform !== "win32") fs.chmodSync(fixtureExecutable, 0o755);
+  assert.equal(runCoreTrustedCheck(trustedInputCatalog.checks[0]).detail_code, "trusted-input-identity-changed");
+
+  fs.rmSync(fixtureExecutable);
+  fs.renameSync(`${fixtureExecutable}.old`, fixtureExecutable);
+  writeCatalog([trustedInputCheck]);
+  trustedInputCatalog = loadCoreVerificationCatalog(workspace);
+  fs.renameSync(path.join(workspace, "check.mjs"), path.join(workspace, "check-real.mjs"));
+  fs.symlinkSync("check-real.mjs", path.join(workspace, "check.mjs"));
+  assert.equal(runCoreTrustedCheck(trustedInputCatalog.checks[0]).detail_code, "trusted-input-identity-changed");
+  fs.rmSync(path.join(workspace, "check.mjs"));
+  fs.renameSync(path.join(workspace, "check-real.mjs"), path.join(workspace, "check.mjs"));
+
+  const trustedCwd = path.join(workspace, "trusted-cwd");
+  fs.mkdirSync(trustedCwd);
+  fs.writeFileSync(path.join(trustedCwd, "check.mjs"), "process.exit(0);\n", "utf8");
+  const cwdCheck = check({ executable_path: fixtureExecutable, argv: ["check.mjs"], cwd: "trusted-cwd" });
+  writeCatalog([cwdCheck]);
+  const cwdCatalog = loadCoreVerificationCatalog(workspace);
+  fs.renameSync(trustedCwd, `${trustedCwd}-old`);
+  fs.mkdirSync(trustedCwd);
+  fs.writeFileSync(path.join(trustedCwd, "check.mjs"), "process.exit(0);\n", "utf8");
+  assert.equal(runCoreTrustedCheck(cwdCatalog.checks[0]).detail_code, "trusted-input-identity-changed");
+  fs.rmSync(trustedCwd, { recursive: true });
+  fs.renameSync(`${trustedCwd}-old`, trustedCwd);
+
+  writeCatalog([trustedInputCheck]);
+  const racedCatalog = loadCoreVerificationCatalog(workspace);
+  writeCatalog([{ ...trustedInputCheck, timeout_ms: 9_999 }]);
+  const catalogRace = verifyCoreWorkspaceMutation({ catalog: racedCatalog, before, after });
+  assert.equal(catalogRace.check.detail_code, "catalog-identity-changed");
+  assert.equal(catalogRace.decision.allowed, false);
+
   fs.rmSync(path.join(workspace, ".git", "opencode-harness", "core", "checks.json"));
-  const absentCatalog = loadCoreVerificationCatalog(workspace);
+  assert.throws(
+    () => loadCoreVerificationCatalog(workspace),
+    (error) => error?.code === "CORE_RUNTIME_CATALOG_REQUIRED",
+  );
+  const absentCatalog = loadCoreVerificationCatalog(workspace, { catalogRequired: false });
   assert.equal(absentCatalog.catalog_status, "absent");
   const absent = verifyCoreWorkspaceMutation({ catalog: absentCatalog, before, after });
   assert.equal(absent.decision.allowed, true);
   assert.equal(absent.decision.reason, "no_applicable_trusted_check");
   assert.equal(absent.observation.eligible, false);
+
+  run("git", ["config", "user.email", "fixture@example.test"], { cwd: workspace });
+  run("git", ["config", "user.name", "Fixture"], { cwd: workspace });
+  run("git", ["add", "-A"], { cwd: workspace });
+  run("git", ["commit", "--quiet", "-m", "fixture"], { cwd: workspace });
+  const linkedWorktree = path.join(temporaryRoot, "linked-worktree");
+  run("git", ["worktree", "add", "--quiet", "--detach", linkedWorktree, "HEAD"], { cwd: workspace });
+  writeCatalog([check({ cwd: "." })], linkedWorktree);
+  const linkedCatalog = loadCoreVerificationCatalog(linkedWorktree);
+  assert.equal(linkedCatalog.catalog_status, "loaded");
+  assert.equal(linkedCatalog.workspace_root, fs.realpathSync.native(linkedWorktree));
+  assert.equal(linkedCatalog.catalog_path.includes(`${path.sep}worktrees${path.sep}`), true);
 
   const materializedRoot = path.join(temporaryRoot, "materialized-core");
   const materialized = materializeProfileBundleV3({
