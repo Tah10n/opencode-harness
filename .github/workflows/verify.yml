@@ -7,7 +7,6 @@ on:
   pull_request:
     branches:
       - main
-      - cleanup/v0.5-foundation
   workflow_dispatch:
 
 permissions:

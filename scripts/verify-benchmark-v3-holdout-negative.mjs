@@ -9,6 +9,7 @@ import { fileURLToPath } from "node:url";
 
 import { canonicalJson } from "../lib/feedback/contracts.mjs";
 import { loadSignedExternalBenchmarkV3Holdout } from "../lib/benchmark/v3-holdout.mjs";
+import { BENCHMARK_V3_READINESS_ISSUERS } from "../lib/benchmark/v3-readiness.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const readiness = spawnSync(process.execPath, [path.join(root, "scripts", "verify-benchmark-v3-holdout-readiness.mjs")], {
@@ -24,6 +25,12 @@ for (const code of ["EXACT_CAMPAIGN_RESUME_UNAVAILABLE", "FROZEN_CANDIDATE_BUNDL
 }
 assert.equal(fs.existsSync(path.join(root, "benchmarks", "v3", "corpus", "holdout")), false,
   "public Git must not contain rendered holdout families");
+const holdoutIssuerKey = JSON.parse(fs.readFileSync(path.join(root, "benchmarks", "v3", "holdout-issuers.v1.json"), "utf8"))
+  .issuers[0].public_key_pem;
+const takeoverIssuerKey = JSON.parse(fs.readFileSync(path.join(root, "benchmarks", "v3", "lease-takeover-issuers.v1.json"), "utf8"))
+  .issuers[0].public_key_pem;
+assert.equal(new Set([BENCHMARK_V3_READINESS_ISSUERS[0].public_key_pem, holdoutIssuerKey, takeoverIssuerKey]).size, 3,
+  "host readiness, external holdout custody, and manual takeover audit require distinct signing principals");
 
 const custody = fs.mkdtempSync(path.join(os.tmpdir(), "benchmark-v3-private-holdout-"));
 try {
@@ -65,4 +72,4 @@ assert.equal(runnerSource.includes("reference_solutions_included"), false,
   "the execution runner must consume only the opaque validated external corpus object");
 process.stdout.write(`${JSON.stringify({ schema_version: 1, status: "passed", gate: "holdout-readiness-negative",
   model_calls: 0, public_holdout_paths_absent: true, unsigned_manifest_rejected: true,
-  reference_solution_manifest_rejected: true, exact_resume_required: true }, null, 2)}\n`);
+  reference_solution_manifest_rejected: true, exact_resume_required: true, distinct_custody_trust_roots: true }, null, 2)}\n`);

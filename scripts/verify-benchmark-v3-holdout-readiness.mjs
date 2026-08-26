@@ -3,19 +3,23 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { fingerprint } from "../lib/feedback/contracts.mjs";
+import { canonicalJson, fingerprint } from "../lib/feedback/contracts.mjs";
 import { loadBenchmarkV3Corpus } from "../lib/benchmark/v3-corpus.mjs";
 import { loadBenchmarkV3Design } from "../lib/benchmark/v3-design.mjs";
 import { loadSignedExternalBenchmarkV3Holdout } from "../lib/benchmark/v3-holdout.mjs";
+import { benchmarkV3CampaignRegistryPath } from "../lib/benchmark/v3-lease-takeover.mjs";
 import { validateBenchmarkV3Ledger } from "../lib/benchmark/v3-ledger.mjs";
 import { verifyBenchmarkV3ProductBundle } from "../lib/benchmark/v3-runner.mjs";
 import { validateBenchmarkV3ReadinessReceipt } from "../lib/benchmark/v3-readiness.mjs";
+import { buildProfileBundleManifest } from "../lib/profile-v3.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const { value: design, validation: designValidation } = loadBenchmarkV3Design(root);
 const corpus = loadBenchmarkV3Corpus(root);
 const reasons = [];
 let report = null;
+let checkpoint = null;
+let exactResume = false;
 const output = process.env.BENCHMARK_V3_CAMPAIGN_OUTPUT;
 if (typeof output !== "string" || !path.isAbsolute(output)) {
   reasons.push({ code: "EXACT_CAMPAIGN_RESUME_UNAVAILABLE", requirement: "absolute-existing-campaign-output" });
@@ -34,6 +38,34 @@ if (typeof output !== "string" || !path.isAbsolute(output)) {
     reasons.push({ code: "VALIDATION_OR_FREEZE_EVIDENCE_INVALID", requirement: "passed-validation-and-frozen-final-candidate" });
   }
 }
+if (report !== null) {
+  try {
+    const registry = JSON.parse(fs.readFileSync(benchmarkV3CampaignRegistryPath(root), "utf8"));
+    if (registry?.schema_version !== 1 || !Array.isArray(registry.entries)
+      || registry.registry_fingerprint !== fingerprint({ schema_version: registry.schema_version, entries: registry.entries })) {
+      throw new Error("registry integrity");
+    }
+    const entries = registry.entries.filter((entry) => entry.campaign_fingerprint === report.ledger.campaign_fingerprint);
+    checkpoint = JSON.parse(fs.readFileSync(path.join(output, "checkpoint.json"), "utf8"));
+    const checkpointBody = { schema_version: checkpoint.schema_version, campaign_fingerprint: checkpoint.campaign_fingerprint,
+      attempts: checkpoint.attempts, ledger: checkpoint.ledger };
+    validateBenchmarkV3Ledger(checkpoint.ledger, design);
+    const externalAttempts = Array.isArray(checkpoint.attempts)
+      && checkpoint.attempts.some((entry) => /^v3-external-holdout-/u.test(entry.family_id ?? ""));
+    if (entries.length !== 1 || entries[0].output_directory !== path.resolve(output) || entries[0].status !== "complete"
+      || entries[0].development_report_fingerprint !== fingerprint(report)
+      || checkpoint.schema_version !== 3 || checkpoint.campaign_fingerprint !== report.ledger.campaign_fingerprint
+      || checkpoint.checkpoint_fingerprint !== fingerprint(checkpointBody)
+      || canonicalJson(checkpoint.ledger) !== canonicalJson(report.ledger)
+      || !Array.isArray(checkpoint.attempts) || checkpoint.attempts.some((entry) => entry.state !== "completed")
+      || externalAttempts || fs.existsSync(path.join(output, "holdout-report.json"))) {
+      throw new Error("campaign was not resumed before holdout consumption");
+    }
+    exactResume = true;
+  } catch {
+    reasons.push({ code: "EXACT_CAMPAIGN_RESUME_INVALID", requirement: "registered-output-and-unused-exact-checkpoint" });
+  }
+}
 let candidate = null;
 if (typeof process.env.BENCHMARK_V3_CANDIDATE_BUNDLE !== "string") {
   reasons.push({ code: "FROZEN_CANDIDATE_BUNDLE_UNAVAILABLE", requirement: "exact-frozen-product-bundle" });
@@ -41,7 +73,13 @@ if (typeof process.env.BENCHMARK_V3_CANDIDATE_BUNDLE !== "string") {
   try {
     candidate = verifyBenchmarkV3ProductBundle(root, path.resolve(process.env.BENCHMARK_V3_CANDIDATE_BUNDLE));
     if (report !== null && (candidate.source_sha !== report.ledger.final_candidate_sha
-      || candidate.product_bundle_fingerprint !== report.product_bundle_fingerprint)) throw new Error("candidate drift");
+      || candidate.product_bundle_fingerprint !== report.product_bundle_fingerprint
+      || report.campaign_binding?.campaign_fingerprint !== report.ledger.campaign_fingerprint
+      || report.campaign_binding?.source_sha !== candidate.source_sha
+      || report.campaign_binding?.source_tree_fingerprint !== buildProfileBundleManifest(root, "lab").manifest.source_tree_fingerprint
+      || report.campaign_binding?.bindings_fingerprint !== fingerprint(report.campaign_binding?.model_binding))) {
+      throw new Error("candidate or exact campaign binding drift");
+    }
   } catch {
     candidate = null;
     reasons.push({ code: "FROZEN_CANDIDATE_BINDING_MISMATCH", requirement: "exact-frozen-product-bundle" });
@@ -70,10 +108,16 @@ if (report !== null && candidate !== null && typeof process.env.BENCHMARK_V3_EXT
 } else {
   reasons.push({ code: "SIGNED_EXTERNAL_HOLDOUT_UNAVAILABLE", requirement: "signed-private-disjoint-external-holdout-manifest" });
 }
-const priorExecution = report?.ledger?.events?.filter((entry) => entry.event_type === "holdout-execution").length ?? 0;
-if (priorExecution !== 0) reasons.push({ code: "CONFIRMATORY_EXECUTION_ALREADY_CONSUMED", requirement: "exactly-one-holdout-execution" });
+const priorExecution = checkpoint?.ledger?.events?.filter((entry) => entry.event_type === "holdout-execution").length
+  ?? report?.ledger?.events?.filter((entry) => entry.event_type === "holdout-execution").length ?? 0;
+const priorHoldoutReport = typeof output === "string" && path.isAbsolute(output)
+  && fs.existsSync(path.join(output, "holdout-report.json"));
+const priorHoldoutAttempt = checkpoint?.attempts?.some((entry) => /^v3-external-holdout-/u.test(entry.family_id ?? "")) === true
+  || priorHoldoutReport;
+if (priorExecution !== 0 || priorHoldoutAttempt) reasons.push({ code: "CONFIRMATORY_EXECUTION_ALREADY_CONSUMED",
+  requirement: "zero-prior-holdout-attempts-and-exactly-one-confirmatory-execution" });
 const result = { schema_version: 1, gate: "holdout-readiness", status: reasons.length === 0 ? "passed" : "blocked_environment",
-  exact_campaign_resume: report !== null, validation_efficacy_passed: report?.validation_efficacy?.passed === true,
+  exact_campaign_resume: exactResume, validation_efficacy_passed: report?.validation_efficacy?.passed === true,
   final_candidate_frozen: report?.ledger?.final_candidate_sha !== null && report?.ledger?.final_candidate_sha !== undefined,
   confirmatory_execution_count: priorExecution, confirmatory_claim_allowed: false, model_calls: 0, candidate_tokens: 0, reasons };
 process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);

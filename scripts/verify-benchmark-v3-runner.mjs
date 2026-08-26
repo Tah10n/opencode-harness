@@ -9,7 +9,7 @@ import { canonicalJson, fingerprint } from "../lib/feedback/contracts.mjs";
 import { assertBenchmarkV3CapabilityAuthorization, authorizeBenchmarkV3Capabilities,
   benchmarkV3ReadinessEnvironment, validateBenchmarkV3ReadinessReceipt } from "../lib/benchmark/v3-readiness.mjs";
 import { verifyBenchmarkV3SplitDistribution } from "../lib/benchmark/v3-split-assignment.mjs";
-import { benchmarkV3CampaignLeasePath, benchmarkV3LeaseTargetFingerprint,
+import { benchmarkV3CampaignLeasePath, benchmarkV3CampaignRegistryPath, benchmarkV3LeaseTargetFingerprint,
   performBenchmarkV3LeaseTakeover } from "../lib/benchmark/v3-lease-takeover.mjs";
 
 import { materializeProfileBundleV3 } from "../lib/profile-v3.mjs";
@@ -181,7 +181,10 @@ try {
   assert.equal(spawnSync("git", ["-c", "user.name=Benchmark V3", "-c", "user.email=benchmark-v3@example.invalid",
     "commit", "--quiet", "-m", "fixture"], { cwd: registryFixture }).status, 0);
   const campaignFingerprint = `sha256:${"c".repeat(64)}`;
-  const initialLedger = Object.freeze({ ledger_fingerprint: `sha256:${"d".repeat(64)}` });
+  const initialLedgerBody = Object.freeze({ schema_version: 2, design_fingerprint: `sha256:${"b".repeat(64)}`,
+    campaign_fingerprint: campaignFingerprint, registrations: Object.freeze([]), events: Object.freeze([]),
+    selected_candidate_id: null, final_candidate_sha: null });
+  const initialLedger = Object.freeze({ ...initialLedgerBody, ledger_fingerprint: fingerprint(initialLedgerBody) });
   const output = path.join(registryFixture, "outputs", "campaign-one");
   const firstJournal = createBenchmarkV3CampaignJournal(output, { sourceRoot: registryFixture, campaignFingerprint, initialLedger });
   const reservation = firstJournal.prepareAttempt("baseline", "family-one", 1);
@@ -222,8 +225,33 @@ try {
       signature: sign(null, Buffer.from(canonicalJson(takeoverBody), "utf8"), takeoverPrivateKey).toString("base64url") }), { mode: 0o600 });
     return receiptPath;
   };
-  assert.equal(performBenchmarkV3LeaseTakeover({ sourceRoot: registryFixture, campaignFingerprint,
-    receiptPath: signTakeover(), trustedIssuers: [takeoverIssuer] }).status, "taken-over");
+  const takeoverEvidenceDirectory = path.join(path.dirname(staleReusedPidLease), "takeover-evidence");
+  fs.mkdirSync(takeoverEvidenceDirectory, { mode: 0o700 });
+  fs.chmodSync(takeoverEvidenceDirectory, 0o770);
+  assert.throws(() => performBenchmarkV3LeaseTakeover({ sourceRoot: registryFixture, campaignFingerprint,
+    receiptPath: signTakeover(), trustedIssuers: [takeoverIssuer] }), /evidence directory identity/u,
+  "takeover must reject a group-writable evidence directory");
+  fs.chmodSync(takeoverEvidenceDirectory, 0o700);
+  const staleTakeoverReceipt = signTakeover();
+  const leaseBeforeRace = JSON.parse(fs.readFileSync(staleReusedPidLease, "utf8"));
+  const leaseAfterRace = `${JSON.stringify({ ...leaseBeforeRace, heartbeat_at_ms: leaseBeforeRace.heartbeat_at_ms + 1 })}\n`;
+  fs.writeFileSync(staleReusedPidLease, leaseAfterRace, { mode: 0o600 });
+  assert.throws(() => performBenchmarkV3LeaseTakeover({ sourceRoot: registryFixture, campaignFingerprint,
+    receiptPath: staleTakeoverReceipt, trustedIssuers: [takeoverIssuer] }), /changed after audit/u,
+  "a heartbeat race after signed observation must restore the current lease and reject takeover");
+  assert.equal(fs.readFileSync(staleReusedPidLease, "utf8"), leaseAfterRace,
+    "rejected takeover must restore the exact quarantined current lease");
+  const takeover = performBenchmarkV3LeaseTakeover({ sourceRoot: registryFixture, campaignFingerprint,
+    receiptPath: signTakeover(), trustedIssuers: [takeoverIssuer] });
+  assert.equal(takeover.status, "taken-over");
+  assert.equal(fs.readFileSync(takeover.raw_lease_path, "utf8"), leaseAfterRace,
+    "successful takeover must preserve the exact audited raw lease bytes");
+  fs.writeFileSync(`${staleReusedPidLease}.takeover-guard`, "manual recovery required\n", { mode: 0o600 });
+  assert.throws(() => createBenchmarkV3CampaignJournal(output, {
+    sourceRoot: registryFixture, campaignFingerprint, initialLedger,
+  }), /takeover is in progress or requires manual recovery/u,
+  "a leftover takeover guard must block automatic lease acquisition");
+  fs.unlinkSync(`${staleReusedPidLease}.takeover-guard`);
   const resumedJournal = createBenchmarkV3CampaignJournal(output, { sourceRoot: registryFixture, campaignFingerprint, initialLedger });
   assert.equal(resumedJournal.attemptsFor("baseline", "family-one").length, 1,
     "exact resume must preserve completed family execution");
@@ -253,15 +281,23 @@ try {
   });
   assert.deepEqual(recoveredDevelopment.prepareAttempt("candidate", "family-three", 1).outcome, recoveredOutcome,
     "an authentic late completion may close the exact reserved development attempt");
-  recoveredDevelopment.close();
   const developmentReportBody = { status: "sealed-holdout-required", ledger: initialLedger,
     ledger_fingerprint: initialLedger.ledger_fingerprint };
   const developmentReport = { ...developmentReportBody, study_fingerprint: fingerprint(developmentReportBody) };
   fs.writeFileSync(path.join(output, "report.json"), `${JSON.stringify(developmentReport)}\n`, { mode: 0o600 });
-  const completedDevelopment = createBenchmarkV3CampaignJournal(output, {
-    sourceRoot: registryFixture, campaignFingerprint, initialLedger,
-  });
-  completedDevelopment.markComplete(developmentReport);
+  recoveredDevelopment.markComplete(developmentReport);
+  const developmentReportPath = path.join(output, "report.json");
+  const tamperedDevelopmentBody = { ...developmentReportBody, validation_efficacy: { passed: true } };
+  fs.writeFileSync(developmentReportPath, JSON.stringify({ ...tamperedDevelopmentBody,
+    study_fingerprint: fingerprint(tamperedDevelopmentBody) }));
+  assert.throws(() => createBenchmarkV3CampaignJournal(output, {
+    sourceRoot: registryFixture, campaignFingerprint, initialLedger, phase: "holdout",
+  }), /registered report/u,
+  "a self-consistent rewritten development report must not replace the exact registered validation result");
+  assert.equal(JSON.parse(fs.readFileSync(benchmarkV3CampaignRegistryPath(registryFixture), "utf8"))
+    .entries.find((entry) => entry.campaign_fingerprint === campaignFingerprint).status, "complete",
+  "a rejected report substitution must not advance the registered campaign phase");
+  fs.writeFileSync(developmentReportPath, `${JSON.stringify(developmentReport)}\n`);
   const holdoutJournal = createBenchmarkV3CampaignJournal(output, {
     sourceRoot: registryFixture, campaignFingerprint, initialLedger, phase: "holdout",
   });
@@ -275,25 +311,49 @@ try {
     attempt_index: 1, outcome: holdoutOutcome, outcome_fingerprint: fingerprint(holdoutOutcome) }));
   holdoutJournal.recordAttempt({ arm_id: "candidate", family_id: "external-holdout-family-one", attempt_index: 1,
     outcome: holdoutOutcome });
+  const extendedLedgerBody = { ...initialLedgerBody, events: [{ event_id: "fixture-holdout-scored" }] };
+  const extendedLedger = { ...extendedLedgerBody, ledger_fingerprint: fingerprint(extendedLedgerBody) };
+  holdoutJournal.recordLedger(extendedLedger);
   holdoutJournal.close();
   const resumedHoldout = createBenchmarkV3CampaignJournal(output, {
     sourceRoot: registryFixture, campaignFingerprint, initialLedger, phase: "holdout",
   });
   assert.deepEqual(resumedHoldout.prepareAttempt("candidate", "external-holdout-family-one", 1).outcome, holdoutOutcome,
     "exact holdout resume must preserve a completed confirmatory family instead of executing it twice");
+  assert.equal(resumedHoldout.ledger.ledger_fingerprint, extendedLedger.ledger_fingerprint,
+    "holdout resume must accept only the exact ledger extension after a scored holdout event");
   resumedHoldout.close();
+  const holdoutCheckpointPath = path.join(output, "checkpoint.json");
+  const holdoutCheckpointBytes = fs.readFileSync(holdoutCheckpointPath, "utf8");
+  const holdoutCheckpoint = JSON.parse(holdoutCheckpointBytes);
+  const reboundLedgerBody = { ...holdoutCheckpoint.ledger, campaign_fingerprint: `sha256:${"8".repeat(64)}` };
+  delete reboundLedgerBody.ledger_fingerprint;
+  const reboundLedger = { ...reboundLedgerBody, ledger_fingerprint: fingerprint(reboundLedgerBody) };
+  const reboundCheckpointBody = { schema_version: holdoutCheckpoint.schema_version,
+    campaign_fingerprint: holdoutCheckpoint.campaign_fingerprint, attempts: holdoutCheckpoint.attempts, ledger: reboundLedger };
+  fs.writeFileSync(holdoutCheckpointPath, JSON.stringify({ ...reboundCheckpointBody,
+    checkpoint_fingerprint: fingerprint(reboundCheckpointBody) }));
+  assert.throws(() => createBenchmarkV3CampaignJournal(output, {
+    sourceRoot: registryFixture, campaignFingerprint, initialLedger, phase: "holdout",
+  }), /exact completed development\/validation campaign/u,
+  "holdout resume must reject a checkpoint ledger that is not an exact extension of the frozen development ledger");
+  fs.writeFileSync(holdoutCheckpointPath, holdoutCheckpointBytes);
   const secondWorktree = registryFixtureSecondWorktree;
   assert.equal(spawnSync("git", ["worktree", "add", "--quiet", "--detach", secondWorktree], { cwd: registryFixture }).status, 0);
-  const firstContainerJournal = createBenchmarkV3CampaignJournal(output, { sourceRoot: registryFixture, campaignFingerprint, initialLedger });
+  const firstContainerJournal = createBenchmarkV3CampaignJournal(output, {
+    sourceRoot: registryFixture, campaignFingerprint, initialLedger, phase: "holdout",
+  });
   const sharedLease = benchmarkV3CampaignLeasePath(secondWorktree, campaignFingerprint);
   const sharedLeaseValue = JSON.parse(fs.readFileSync(sharedLease, "utf8"));
   fs.writeFileSync(sharedLease, `${JSON.stringify({ ...sharedLeaseValue,
     host_fingerprint: fingerprint("independent-container-host") })}\n`, { mode: 0o600 });
-  assert.throws(() => createBenchmarkV3CampaignJournal(output, { sourceRoot: secondWorktree, campaignFingerprint, initialLedger }),
+  assert.throws(() => createBenchmarkV3CampaignJournal(output, {
+    sourceRoot: secondWorktree, campaignFingerprint, initialLedger, phase: "holdout",
+  }),
     /foreign-host lease is authoritative/u, "two containers sharing one Git common directory must fail closed on a foreign-host lease");
   firstContainerJournal.close();
   assert.throws(() => createBenchmarkV3CampaignJournal(path.join(registryFixture, "outputs", "campaign-copy"), {
-    sourceRoot: registryFixture, campaignFingerprint, initialLedger,
+    sourceRoot: registryFixture, campaignFingerprint, initialLedger, phase: "holdout",
   }), /already registered/u, "the same campaign bindings must not move to a new output directory");
 } finally {
   fs.rmSync(registryFixtureSecondWorktree, { recursive: true, force: true });

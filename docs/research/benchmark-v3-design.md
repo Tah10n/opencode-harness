@@ -86,6 +86,11 @@ observed lease bytes. The previous lease is preserved under
 `takeover-evidence/` before a new coordinator can acquire it. The two-worktree
 shared-Git negative test represents two containers mounting the same Git common
 directory and proves a foreign-host lease cannot be displaced.
+Takeover first installs a guard observed by lease acquisition, atomically moves
+the current lease to quarantine, and compares the quarantined bytes with the
+signed observation. A heartbeat race restores the current lease and rejects the
+receipt. A leftover guard after host failure is itself fail-closed and requires
+manual audited recovery.
 
 ## Readiness boundaries
 
@@ -106,6 +111,9 @@ holdout executions, and a signed external manifest from the configured private
 custodian channel. A plain directory, boolean environment variable, unsigned
 JSON, public-Git controls, reused public source identity, or manifest containing
 reference solutions fails closed.
+The host-readiness authority, external holdout custodian, and manual takeover
+auditor are three distinct Ed25519 signing principals; the verifier rejects a
+registry that collapses those trust roots.
 
 ## External holdout custody
 
@@ -170,6 +178,7 @@ Holdout readiness:
 
 ```sh
 BENCHMARK_V3_CAMPAIGN_OUTPUT=/private/campaigns/benchmark-v3-campaign-001 \
+BENCHMARK_V3_PROVENANCE_BUNDLE=/private/custody/eslint-provenance.bundle \
 BENCHMARK_V3_CANDIDATE_BUNDLE=/private/candidate/core \
 BENCHMARK_V3_EXTERNAL_HOLDOUT_MANIFEST=/var/run/opencode-harness/holdout/campaign-001/manifest.json \
 OPENCODE_QUALITY_PROCESS_CONTAINMENT_RECEIPT=/var/run/opencode-harness/readiness/process.json \
@@ -178,9 +187,10 @@ BENCHMARK_V3_PROVIDER_ONLY_EGRESS_RECEIPT=/var/run/opencode-harness/readiness/eg
 npm run verify:holdout-readiness
 ```
 
-The one confirmatory execution:
+The one confirmatory execution (the provenance bundle is required here too):
 
 ```sh
+BENCHMARK_V3_PROVENANCE_BUNDLE=/private/custody/eslint-provenance.bundle \
 npm run bench:v3:holdout -- \
   --source-root "$PWD" \
   --semantic-runtime /private/custody/eslint-runtime \
