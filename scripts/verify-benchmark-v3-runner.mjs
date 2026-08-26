@@ -67,6 +67,25 @@ try {
   assert.equal(validateBenchmarkV3ReadinessReceipt(receiptPath, {
     capability: body.capability, sourceRoot: root, trustedIssuers: [issuer],
   }).status, "verified");
+  const canonicalParent = path.join(readinessRoot, "canonical-parent");
+  const configuredParent = path.join(readinessRoot, "configured-parent");
+  const canonicalChannel = path.join(canonicalParent, "readiness");
+  fs.mkdirSync(canonicalChannel, { recursive: true, mode: 0o700 });
+  fs.symlinkSync(canonicalParent, configuredParent);
+  const aliasedIssuer = Object.freeze({ ...issuer, channel_root: path.join(configuredParent, "readiness") });
+  const canonicalReceiptPath = path.join(canonicalChannel, "receipt.json");
+  fs.writeFileSync(canonicalReceiptPath, JSON.stringify(signed), { mode: 0o600 });
+  assert.equal(validateBenchmarkV3ReadinessReceipt(path.join(aliasedIssuer.channel_root, "receipt.json"), {
+    capability: body.capability, sourceRoot: root, trustedIssuers: [aliasedIssuer],
+  }).status, "verified", "a configured channel beneath a system symlink ancestor must remain usable");
+  assert.equal(validateBenchmarkV3ReadinessReceipt(canonicalReceiptPath, {
+    capability: body.capability, sourceRoot: root, trustedIssuers: [aliasedIssuer],
+  }).status, "verified", "the canonical spelling of a protected channel must remain usable");
+  const alternateAlias = path.join(readinessRoot, "alternate-channel");
+  fs.symlinkSync(canonicalChannel, alternateAlias);
+  assert.throws(() => validateBenchmarkV3ReadinessReceipt(path.join(alternateAlias, "receipt.json"), {
+    capability: body.capability, sourceRoot: root, trustedIssuers: [aliasedIssuer],
+  }), /protected channel/u, "an unregistered alternate alias into the protected channel must be rejected");
   fs.writeFileSync(receiptPath, JSON.stringify({ ...body, signature: "self-authored" }), { mode: 0o600 });
   assert.throws(() => validateBenchmarkV3ReadinessReceipt(receiptPath, {
     capability: body.capability, sourceRoot: root, trustedIssuers: [issuer],
