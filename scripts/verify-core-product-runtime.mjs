@@ -1,6 +1,5 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -16,7 +15,7 @@ import {
 } from "../runtime/core-verification-runtime.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), "core-product-runtime-"));
+const temporaryRoot = fs.mkdtempSync(path.join(root, ".core-product-runtime-"));
 const workspace = path.join(temporaryRoot, "workspace");
 const trustedSystemExecutable = fs.realpathSync.native(process.platform === "win32" ? process.env.ComSpec : "/bin/sh");
 const shellArguments = (command) => process.platform === "win32" ? ["/d", "/s", "/c", command] : ["-c", command];
