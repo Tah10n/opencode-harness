@@ -142,6 +142,7 @@ same list can be checked mechanically against the isolated adoption smoke.
 
 <!-- portable-adoption-bundle:start -->
 ```text
+.opencode/assurance
 .opencode/plugins/engineering-dossier.mjs
 .opencode/quality/checks.json
 .opencode/quality/toolchains.json
@@ -165,6 +166,7 @@ examples
 fixtures
 lib/benchmark
 lib/feedback
+lib/profile-v3.mjs
 lib/quality
 native
 opencode.json
@@ -172,6 +174,7 @@ package-lock.json
 package.json
 profiles
 quality
+runtime
 scripts
 skills
 ```

@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { assertAdoptionBundleEntryPaths } from "../lib/benchmark/contracts.mjs";
 import { classifyProcessContainment } from "../lib/feedback/process-containment.mjs";
 import { runManagedCommand } from "../lib/feedback/process-tree.mjs";
+import { resolveProfileBundleV3, V3_BUNDLE_IDS } from "../lib/profile-v3.mjs";
 import { createInjectedTestContainmentFactory } from "./injected-test-containment.mjs";
 
 const sourceRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -16,6 +17,7 @@ const deterministicContainmentFactory = platformContainment.support_state === "v
   : createInjectedTestContainmentFactory("injected-adoption-test-containment-v1");
 
 const adoptionEntries = [
+  ".opencode/assurance",
   ".opencode/plugins/engineering-dossier.mjs",
   ".opencode/quality/checks.json",
   ".opencode/quality/toolchains.json",
@@ -39,6 +41,7 @@ const adoptionEntries = [
   "fixtures",
   "lib/benchmark",
   "lib/feedback",
+  "lib/profile-v3.mjs",
   "lib/quality",
   "native",
   "opencode.json",
@@ -46,11 +49,13 @@ const adoptionEntries = [
   "package.json",
   "profiles",
   "quality",
+  "runtime",
   "scripts",
   "skills",
 ];
 
 const requiredQualityDirectories = Object.freeze([
+  ".opencode/assurance",
   ".opencode/plugins",
   ".opencode/quality",
   "lib/quality",
@@ -93,6 +98,7 @@ const requiredQualityFiles = Object.freeze([
   "lib/quality/verification-targets.mjs",
   "lib/quality/whitespace.mjs",
   "lib/quality/whole-system-context-report.mjs",
+  ".opencode/assurance/assurance-plugin.mjs",
   ".opencode/plugins/engineering-dossier.mjs",
   ".opencode/quality/checks.json",
   ".opencode/quality/toolchains.json",
@@ -249,15 +255,18 @@ function assertPortableAdoptionDeclaration(entries) {
     throw new Error("portable adoption bundle entries must be unique");
   }
   for (const requiredEntry of [
+    ".opencode/assurance",
     ".opencode/plugins/engineering-dossier.mjs",
     ".opencode/quality/checks.json",
     "adoption",
     "benchmarks",
     "lib/benchmark",
     "lib/feedback",
+    "lib/profile-v3.mjs",
     "lib/quality",
     "profiles",
     "quality",
+    "runtime",
     "scripts",
     "evals",
     "package-lock.json",
@@ -408,7 +417,7 @@ try {
       throw new Error(`${documentationPath} portable adoption list drifted from adoptionEntries`);
     }
   }
-  for (const requiredEntry of ["adoption", "benchmarks", "lib/benchmark", "profiles"]) {
+  for (const requiredEntry of [".opencode/assurance", "adoption", "benchmarks", "lib/benchmark", "lib/profile-v3.mjs", "profiles", "runtime"]) {
     expectPortableAdoptionDeclarationFailure(`${requiredEntry} omission sensor`, adoptionEntries.filter(
       (entry) => entry !== requiredEntry,
     ));
@@ -465,6 +474,7 @@ try {
     "lib/benchmark",
     "lib/feedback",
     "profiles",
+    "runtime",
     "scripts",
   ]) {
     assertBundlePath(requiredDirectory, "directory");
@@ -482,6 +492,10 @@ try {
     "package-lock.json",
     "package.json",
     "profiles/inventory.v2.json",
+    "profiles/inventory.v3.json",
+    "runtime/core-verification-gate.mjs",
+    "runtime/core-verification-runtime.mjs",
+    "runtime/opencode-core.mjs",
     "scripts/assess-candidate.mjs",
     "scripts/capture-static-evidence.mjs",
     "scripts/evaluate-live.mjs",
@@ -493,6 +507,9 @@ try {
     fs.readFileSync(path.join(bundleRoot, "profiles/inventory.v2.json"), "utf8").replace(/^\uFEFF/u, ""),
   );
   assertAdoptionBundleEntryPaths(bundleRoot, bundledInventory, "complete");
+  for (const bundleId of V3_BUNDLE_IDS) {
+    resolveProfileBundleV3(bundleRoot, bundleId);
+  }
   const packageManifest = JSON.parse(fs.readFileSync(path.join(bundleRoot, "package.json"), "utf8").replace(/^\uFEFF/u, ""));
   const packageLock = JSON.parse(fs.readFileSync(path.join(bundleRoot, "package-lock.json"), "utf8").replace(/^\uFEFF/u, ""));
   const lockedRoot = packageLock.packages?.[""];
