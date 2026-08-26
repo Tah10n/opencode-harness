@@ -5,6 +5,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
+import { fingerprint } from "../lib/feedback/contracts.mjs";
+import { benchmarkV3ReadinessEnvironment, validateBenchmarkV3ReadinessReceipt } from "../lib/benchmark/v3-readiness.mjs";
 
 import { materializeProfileBundleV3 } from "../lib/profile-v3.mjs";
 import { loadBenchmarkV3Corpus } from "../lib/benchmark/v3-corpus.mjs";
@@ -12,6 +14,8 @@ import { loadBenchmarkV3Design } from "../lib/benchmark/v3-design.mjs";
 import {
   buildBenchmarkV3AttemptEnvelope,
   buildBenchmarkV3ModelBinding,
+  classifyBenchmarkV3AttemptReceipt,
+  evaluateBenchmarkV3EfficacyGate,
   evaluateBenchmarkV3Guardrails,
   summarizeBenchmarkV3Stage,
   verifyBenchmarkV3OpenCodeExecutable,
@@ -22,6 +26,24 @@ import {
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const { value: design } = loadBenchmarkV3Design(root);
 const corpus = loadBenchmarkV3Corpus(root);
+const readinessRoot = fs.mkdtempSync(path.join(os.tmpdir(), "v3-readiness-receipt-"));
+try {
+  const environment = benchmarkV3ReadinessEnvironment();
+  const sourceSha = spawnSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).stdout.trim();
+  const body = { schema_version: 1, ...environment, source_sha: sourceSha, capability: "real-process-containment",
+    status: "verified", issued_at_ms: Date.now() - 1_000, expires_at_ms: Date.now() + 60_000 };
+  const receiptPath = path.join(readinessRoot, "receipt.json");
+  fs.writeFileSync(receiptPath, JSON.stringify({ ...body, fingerprint: fingerprint(body) }));
+  assert.equal(validateBenchmarkV3ReadinessReceipt(receiptPath, { capability: body.capability, sourceRoot: root }).status, "verified");
+  fs.writeFileSync(receiptPath, JSON.stringify({ ...body, host_fingerprint: `sha256:${"0".repeat(64)}`, fingerprint: fingerprint(body) }));
+  assert.throws(() => validateBenchmarkV3ReadinessReceipt(receiptPath, { capability: body.capability, sourceRoot: root }));
+  const readySpoof = spawnSync(process.execPath, [path.join(root, "scripts", "verify-benchmark-v3-campaign-readiness.mjs")], {
+    cwd: root, encoding: "utf8", env: { ...process.env, OPENCODE_QUALITY_PROCESS_CONTAINMENT_READY: "1",
+      BENCHMARK_V3_HIDDEN_NAMESPACE_ISOLATION_READY: "1", BENCHMARK_V3_PROVIDER_ONLY_EGRESS_READY: "1" },
+  });
+  assert.equal(readySpoof.status, 2);
+  assert.equal(JSON.parse(readySpoof.stdout).reasons.some((entry) => entry.code === "PROCESS_CONTAINMENT_UNAVAILABLE"), true);
+} finally { fs.rmSync(readinessRoot, { recursive: true, force: true }); }
 const families = corpus.families.filter((entry) => entry.split === "development");
 const first = families[0];
 const envelope = buildBenchmarkV3AttemptEnvelope({
@@ -85,6 +107,14 @@ assert.equal(report.exact_p <= 0.025, true);
 assert.equal(report.candidate_tokens, 600);
 assert.equal(report.activation_rate, 1);
 assert.equal(evaluateBenchmarkV3Guardrails(design, report).passed, true);
+assert.equal(evaluateBenchmarkV3EfficacyGate(design, report).passed, true);
+const zeroInclusiveCi = evaluateBenchmarkV3EfficacyGate(design, {
+  ...report, paired_delta: 0.1, exact_p: 0.01, confidence_interval: [0, 0.2],
+});
+assert.equal(zeroInclusiveCi.criteria.paired_delta, true);
+assert.equal(zeroInclusiveCi.criteria.exact_p, true);
+assert.equal(zeroInclusiveCi.criteria.confidence_interval_lower, false);
+assert.equal(zeroInclusiveCi.passed, false);
 
 const regressed = [...candidate];
 const criticalFamilyIndex = 0;
@@ -127,10 +157,9 @@ for (const required of ["runManagedCommand", "reviewed_source_root", "semantic_r
   assert.equal(runnerSource.includes(required), true);
 }
 const allowedFinalStatuses = new Set([
-  "EVIDENCE-BACKED HARNESS READY — MODEL-SPECIFIC",
-  "EVIDENCE-BACKED HARNESS READY — REPLICATED",
-  "BOUNDED STUDY COMPLETE — NO PROMOTABLE HARNESS",
-  "STUDY STOPPED BEFORE CANDIDATE — INSUFFICIENT BASELINE OPPORTUNITY",
+  "POSITIVE HOLDOUT — PILOT REQUIRED",
+  "NO PROMOTABLE HARNESS",
+  "STUDY BLOCKED — INFRASTRUCTURE",
 ]);
 for (const match of runnerSource.matchAll(/final_status:\s*"([^"]+)"/gu)) assert.equal(allowedFinalStatuses.has(match[1]), true);
 const workerSource = fs.readFileSync(path.join(root, "scripts", "benchmark-v3-attempt-worker.mjs"), "utf8");
@@ -152,6 +181,9 @@ if (process.argv.includes("--terminal-tool-reuse")) { process.stdout.write(JSON.
 if (process.argv.includes("--final")) process.stdout.write(JSON.stringify({type:"text",part:{text:"done"}})+"\\n");
 if (process.argv.includes("--unfinished")) process.stdout.write(JSON.stringify({type:"step_start",part:{}})+"\\n");
 if (process.argv.includes("--valid-receipt")) require("node:fs").writeSync(3, JSON.stringify({schema_version:1,catalog_fingerprint:"sha256:${"a".repeat(64)}",catalog_status:"loaded",decision:{allowed:true,reason:"post_last_mutation_verification_passed"},activation:{post_last_mutation_verification:true},check:{status:"passed",command_fingerprint:"sha256:${"b".repeat(64)}"}})+"\\n");
+if (process.argv.includes("--failed-receipt")) { require("node:fs").writeSync(3, JSON.stringify({schema_version:1,catalog_fingerprint:"sha256:${"a".repeat(64)}",catalog_status:"loaded",decision:{allowed:false,reason:"verification_failed"},activation:{post_last_mutation_verification:false},check:{status:"failed",command_fingerprint:"sha256:${"b".repeat(64)}"}})+"\\n"); process.exitCode=20; }
+if (process.argv.includes("--unavailable-receipt")) { require("node:fs").writeSync(3, JSON.stringify({schema_version:1,catalog_fingerprint:"sha256:${"a".repeat(64)}",catalog_status:"loaded",decision:{allowed:false,reason:"verification_unavailable"},activation:{post_last_mutation_verification:false},check:{status:"unavailable",command_fingerprint:"sha256:${"b".repeat(64)}"}})+"\\n"); process.exitCode=20; }
+if (process.argv.includes("--forged-receipt")) require("node:fs").writeSync(3, JSON.stringify({schema_version:1,catalog_fingerprint:"sha256:${"f".repeat(64)}",catalog_status:"loaded",decision:{allowed:true,reason:"post_last_mutation_verification_passed"},activation:{post_last_mutation_verification:true},check:{status:"passed",command_fingerprint:"sha256:${"b".repeat(64)}"}})+"\\n");
 process.stderr.write('[opencode-harness-core] {"activation":{"post_last_mutation_verification":true}}\\n');
 `, { mode: 0o700 });
   const stat = fs.lstatSync(executable);
@@ -196,6 +228,23 @@ process.stderr.write('[opencode-harness-core] {"activation":{"post_last_mutation
   const trustedPipe = runWorker(["--final", "--valid-receipt"], true);
   assert.equal(trustedPipe.activation, true);
   assert.equal(trustedPipe.activation_receipt_valid, true);
+  assert.equal(trustedPipe.activation_receipt_authentic, true);
+  assert.equal(classifyBenchmarkV3AttemptReceipt(trustedPipe, "candidate").verification_succeeded, true);
+  for (const receiptFlag of ["--failed-receipt", "--unavailable-receipt"]) {
+    const negative = runWorker(["--final", receiptFlag], true);
+    assert.equal(negative.status, 20);
+    assert.equal(negative.activation_receipt_authentic, true);
+    assert.equal(negative.activation_receipt_valid, false);
+    const classified = classifyBenchmarkV3AttemptReceipt(negative, "candidate");
+    assert.equal(classified.receipt_authentic, true);
+    assert.equal(classified.complete_scored_outcome, true);
+    assert.equal(classified.verification_succeeded, false);
+    assert.equal(classified.infrastructure_failure, false);
+  }
+  const forged = runWorker(["--final", "--forged-receipt"], true);
+  assert.equal(forged.activation_receipt_authentic, false);
+  assert.equal(classifyBenchmarkV3AttemptReceipt(forged, "candidate").infrastructure_failure, true);
+  assert.equal(classifyBenchmarkV3AttemptReceipt({ ...trustedPipe, timed_out: true }, "candidate").infrastructure_failure, true);
 } finally { fs.rmSync(workerFixtureRoot, { recursive: true, force: true }); }
 
 console.log(JSON.stringify({ status: "passed", evidence_class: "model-free-contained-runner-contract", model_execution: false,

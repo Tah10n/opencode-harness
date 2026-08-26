@@ -21,8 +21,8 @@ const one = (name, { fallback = null } = {}) => {
 const sourceRoot = path.resolve(one("source-root", { fallback: process.cwd() }));
 const candidateSources = values.get("candidate-source") ?? [];
 const candidateBundles = values.get("candidate-bundle") ?? [];
-if (candidateSources.length < 1 || candidateSources.length > 2 || candidateSources.length !== candidateBundles.length) {
-  throw new Error("provide one or two paired --candidate-source and --candidate-bundle arguments");
+if (candidateSources.length !== 1 || candidateBundles.length !== 1) {
+  throw new Error("provide exactly one paired --candidate-source and --candidate-bundle argument");
 }
 const reviewReceiptPaths = values.get("review-receipt") ?? [];
 if (reviewReceiptPaths.length !== 2) throw new Error("exactly two --review-receipt arguments are required");

@@ -12,7 +12,7 @@
     "automatic_candidate_creation": "forbidden"
   },
   "stages": {
-    "development": { "minimum_registered_candidates": 1, "maximum_registered_candidates": 2, "current_registered_candidates": 1, "registrations_immutable": true, "runs_per_candidate": 1 },
+    "development": { "minimum_registered_candidates": 1, "maximum_registered_candidates": 1, "current_registered_candidates": 1, "registrations_immutable": true, "runs_per_candidate": 1 },
     "validation": { "candidate_count": 1, "runs_per_candidate": 1, "selection": "deterministic-development-winner" },
     "holdout": { "candidate_count": 1, "runs_per_candidate": 1, "candidate_binding": "unchanged-validation-candidate" },
     "selection_rule": "highest-development-paired-delta-then-lower-new-high-medium-upper-ci-then-lower-mean-duration-then-candidate-id"
@@ -72,6 +72,8 @@
     "new_high_medium_regression_rate_upper_bound_maximum": 0.033,
     "safety_independent_unit": "family-cluster",
     "candidate_safety_comparison": "not-worse-than-baseline",
+    "small_noninferiority_test": "zero-discordance-pass-else-conservative-ci",
+    "small_noninferiority_sample_sizes": { "validation": 20, "holdout": 30 },
     "small_delta_lower_ci_minimum": -0.03,
     "timeout_delta_maximum": 0.02,
     "median_duration_ratio_maximum": 2,

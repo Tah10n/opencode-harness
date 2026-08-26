@@ -3,10 +3,11 @@ import fs from "node:fs";
 import http from "node:http";
 import os from "node:os";
 import path from "node:path";
-import { spawn, spawnSync } from "node:child_process";
-import { fileURLToPath } from "node:url";
+import { spawnSync } from "node:child_process";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { materializeProfileBundleV3 } from "../lib/profile-v3.mjs";
+import { createInjectedTestContainmentFactory } from "./injected-test-containment.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const temporaryRoot = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), "core-installed-runtime-")));
@@ -178,40 +179,24 @@ async function installedRun({ content, operation = "write", checkArgv, expectedS
     // The installed fixture must grant its deterministic model write permission
     // non-interactively. Runtime bytes remain the materialized product bytes.
     fs.writeFileSync(path.join(materializedRoot, "opencode.json"), fixtureConfig, "utf8");
-    const child = spawn(process.execPath, [
-      path.join(materializedRoot, "runtime", "opencode-core.mjs"),
-      "--workspace", workspace,
-      "--opencode", executable("opencode"),
-      "--",
+    const installedLauncher = await import(`${pathToFileURL(path.join(materializedRoot, "runtime", "opencode-core.mjs")).href}?fixture=${Date.now()}`);
+    const result = await installedLauncher.runCoreLauncher({
+      workspace,
+      catalog: ".git/opencode-harness/core/checks.json",
+      opencode: executable("opencode"),
+      opencodeArgs: [
       "run", "--format", "json", "--model", `fixture/${provider.model}`,
       "--agent", "core", "--dir", workspace,
       "Replace src/fixture.txt with the requested fixture content.",
-    ], {
-      cwd: workspace,
+      ],
       env: runtimeEnvironment(overlayPath),
-      shell: false,
-      windowsHide: true,
-      stdio: ["ignore", "pipe", "pipe"],
+    }, {
+      processContainmentFactory: createInjectedTestContainmentFactory("injected-core-installed-test-containment-v1"),
     });
-    let stdout = "";
-    let stderr = "";
-    child.stdout.setEncoding("utf8");
-    child.stderr.setEncoding("utf8");
-    child.stdout.on("data", (chunk) => { stdout += chunk; });
-    child.stderr.on("data", (chunk) => { stderr += chunk; });
-    const status = await new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => {
-        child.kill("SIGKILL");
-        reject(new Error(`installed launcher timeout\nSTDOUT:\n${stdout}\nSTDERR:\n${stderr}`));
-      }, 60_000);
-      child.once("error", (error) => { clearTimeout(timeout); reject(error); });
-      child.once("exit", (code) => { clearTimeout(timeout); resolve(code); });
-    });
-    assert.equal(status, expectedStatus, `launcher status mismatch\nSTDOUT:\n${stdout}\nSTDERR:\n${stderr}`);
-    const marker = stderr.split(/\r?\n/u).find((line) => line.startsWith("[opencode-harness-core] {") && line.includes('"decision"'));
-    assert(marker, `launcher receipt missing\n${stderr}`);
-    const receipt = JSON.parse(marker.slice("[opencode-harness-core] ".length));
-    assert.equal(receipt.decision.reason, expectedReason, `launcher reason mismatch\nSTDOUT:\n${stdout}\nSTDERR:\n${stderr}`);
+    assert.equal(result.exit_code, expectedStatus, "launcher status mismatch");
+    const receipt = result.receipt;
+    assert(receipt, "launcher receipt missing");
+    assert.equal(receipt.decision.reason, expectedReason, "launcher reason mismatch");
     assert.equal(receipt.activation.post_last_mutation_verification, expectedReason !== "verification_not_started");
     return receipt;
   } finally {

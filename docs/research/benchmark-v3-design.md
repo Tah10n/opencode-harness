@@ -59,12 +59,11 @@ criterion ends the campaign as design-uninformative with candidate tokens zero.
 
 ## Frozen execution semantics
 
-The campaign is currently frozen as a one-candidate study: minimum registered
-candidates 1, maximum 2, current count 1, familywise alpha 0.05, and current
-per-candidate alpha 0.05. A legitimate second candidate may be registered only
-before baseline, must have a distinct architecture fingerprint, and makes the
-immutable per-candidate alpha 0.025. No second prompt or architecture is created
-automatically. Development permits one run per family per registered candidate.
+The campaign is frozen as a one-candidate study: minimum, maximum, and current
+registered candidate count are all 1, with familywise and per-candidate alpha
+0.05. Two-candidate execution is not implemented and is rejected; no second
+prompt or architecture is created. Development permits one run per family for
+the single registered candidate.
 Selection is deterministic: highest paired delta, then lower upper CI for new
 HIGH/MEDIUM regression delta, then lower mean duration, then candidate ID.
 Validation runs that candidate once. Holdout runs the unchanged validated
@@ -83,8 +82,10 @@ challenge estimand uses baseline-failure opportunities only and must never be
 reported as repository-wide lift. Frozen guardrails are: zero new critical
 regressions and zero new HIGH/MEDIUM regressions; the one-sided exact 95% upper
 bound for the new HIGH/MEDIUM regression rate must be <= 0.033; candidate safety
-must not be worse than baseline; small
-lower CI >= -0.03; timeout delta <= +0.02; median duration <= 2.0x; mean
+must not be worse than baseline; the small-stratum rule is frozen as
+`zero-discordance-pass-else-conservative-ci` at n=20 validation and n=30
+holdout with lower CI >= -0.03 whenever discordance is observed; timeout delta
+<= +0.02; median duration <= 2.0x; mean
 duration <= 2.5x; activation >= 0.95.
 Paired-delta intervals use conservative Bonferroni-combined exact binomial
 bounds. For zero observed regressions the one-sided exact bound is
@@ -110,7 +111,10 @@ the trusted wrapper to an anonymous pipe owned by the attempt worker. The
 OpenCode child receives `/dev/null` on the wrapper descriptor and has no receipt
 pathname to replace, so candidate-controlled stderr and descendants cannot
 forge activation. The receipt is bound to the normalized catalog and
-trusted-check command fingerprints. A scored completion also requires a
+trusted-check command fingerprints. Receipt authenticity is separate from
+verification success: authentic failed or unavailable status 20 is a complete
+scored negative outcome, while missing/forged observation or containment is an
+infrastructure failure. A scored completion also requires a
 non-empty final `text` event; `step_finish` is an intermediate usage event only.
 
 The production entry point accepts no attempt callbacks. Its unforgeable
@@ -118,12 +122,14 @@ same-process authorization is created only after the canonical deterministic
 gate, the installed real-OpenCode fixture, containment checks, exact product
 bundle validation, and two independent current-SHA review receipts pass. The
 runner then performs acceptance, baseline, the pre-candidate opportunity gate,
-development, ledger-derived deterministic selection, validation, exact-SHA
-freeze, and sealed holdout. A pre-scoring infrastructure failure retries only
+development, deterministic single-candidate selection, and validation. Holdout
+starts only when validation passes the frozen MDE, exact alpha, positive CI
+lower bound, and every guardrail; only then is the exact SHA frozen. A
+pre-scoring infrastructure failure retries only
 that unscored family once with identical bindings; a second failure terminates
-the study. Positive statistical results remain `pilot-required`; without the
-separately preregistered real-repository pilot the only completed-study status
-is `BOUNDED STUDY COMPLETE — NO PROMOTABLE HARNESS`.
+the study. A positive holdout reports `POSITIVE HOLDOUT — PILOT REQUIRED`;
+failed validation or holdout reports `NO PROMOTABLE HARNESS`. No study result
+reports ready before a separately preregistered real-repository pilot.
 
 ## Seed, binding, and staged verification
 
@@ -141,10 +147,13 @@ seed.
 core equivalence, provenance metadata, runner negative cases, and the
 fail-closed unavailable-containment contract without requiring privileged
 containment. A pass is not campaign readiness. `npm run
-verify:campaign-readiness` separately requires real process containment,
+verify:campaign-readiness` separately requires fresh, fingerprinted receipts
+bound to the current host, source SHA, environment, capability, and expiry for
+real process containment,
 hidden-data namespace isolation, complete eligible corpus, exact
 product/candidate fingerprint equivalence, and sealed-holdout provider-only
-egress (or a proven equivalent). Missing prerequisites return a typed
+egress (or a proven equivalent). Boolean `READY=1` variables have no authority.
+Missing prerequisites return a typed
 `blocked_environment` result. Canonical `npm run verify` does not imply that
 this separate campaign gate passed.
 

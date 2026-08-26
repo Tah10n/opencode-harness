@@ -73,27 +73,35 @@ const unfinishedToolCount = [...toolStates.values()].filter((status) => !["compl
 protocolValid &&= terminalEventCount >= 1 && usageObserved && openStepCount === 0 && unfinishedToolCount === 0;
 let activation = false;
 let activationReceiptValid = input.activation_binding === null;
+let activationReceiptAuthentic = input.activation_binding === null;
 if (input.activation_binding !== null) {
   try {
     const bytes = String(result.output?.[3] ?? "");
     const value = JSON.parse(bytes);
     const exact = (object, keys) => object && typeof object === "object" && !Array.isArray(object)
       && JSON.stringify(Object.keys(object).sort()) === JSON.stringify([...keys].sort());
-    activationReceiptValid = bytes.endsWith("\n") && bytes.indexOf("\n") === bytes.length - 1
+    activationReceiptAuthentic = bytes.endsWith("\n") && bytes.indexOf("\n") === bytes.length - 1
       && exact(value, ["schema_version", "catalog_fingerprint", "catalog_status", "decision", "activation", "check"])
       && value.schema_version === 1 && value.catalog_fingerprint === input.activation_binding.catalog_fingerprint
-      && value.catalog_status === "loaded" && value.decision?.allowed === true
-      && value.decision?.reason === "post_last_mutation_verification_passed"
-      && value.activation?.post_last_mutation_verification === true
-      && value.check?.status === "passed" && value.check?.command_fingerprint === input.activation_binding.command_fingerprint;
+      && value.catalog_status === "loaded" && typeof value.decision?.allowed === "boolean"
+      && typeof value.decision?.reason === "string"
+      && typeof value.activation?.post_last_mutation_verification === "boolean"
+      && ["passed", "failed", "unavailable", "unrelated_infrastructure_failure"].includes(value.check?.status)
+      && value.check?.command_fingerprint === input.activation_binding.command_fingerprint;
+    activationReceiptValid = activationReceiptAuthentic
+      && value.decision.allowed === true
+      && value.decision.reason === "post_last_mutation_verification_passed"
+      && value.activation.post_last_mutation_verification === true
+      && value.check.status === "passed";
     activation = activationReceiptValid;
-  } catch { activationReceiptValid = false; }
+  } catch { activationReceiptAuthentic = false; activationReceiptValid = false; }
 }
 const receipt = { schema_version: 1, status: Number.isInteger(result.status) ? result.status : null, signal: result.signal ?? null,
   timed_out: result.error?.code === "ETIMEDOUT", error_code: typeof result.error?.code === "string" ? result.error.code : null,
   tokens, activation, json_event_count: jsonEventCount, terminal_event_count: terminalEventCount,
   usage_observed: usageObserved, protocol_valid: protocolValid, open_step_count: openStepCount,
   unfinished_tool_count: unfinishedToolCount, activation_receipt_valid: activationReceiptValid,
+  activation_receipt_authentic: activationReceiptAuthentic,
   stdout_bytes: Buffer.byteLength(String(result.stdout ?? "")), stderr_bytes: Buffer.byteLength(String(result.stderr ?? "")) };
 fs.writeFileSync(outputFile, `${JSON.stringify(receipt)}\n`, { encoding: "utf8", flag: "wx", mode: 0o600 });
 process.stdout.write(marker);

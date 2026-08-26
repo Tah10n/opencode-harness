@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 
 import {
   assessBenchmarkV3BaselineOpportunity,
+  assessSmallNonInferiorityAttainability,
   computeBenchmarkV3PowerGate,
   criticalCandidateWins,
   exactBinomialUpperTail,
@@ -41,6 +42,14 @@ const conservativeInterval = exactConservativePairedDeltaInterval({
 });
 assert(conservativeInterval[0] < (1 / 30) && conservativeInterval[1] > 0.3);
 assert(exactConservativePairedDeltaInterval({ familyCount: 20, candidateOnly: 0, baselineOnly: 0, confidenceLevel: 0.95 })[0] < -0.1);
+for (const familyCount of [20, 30]) {
+  assert.equal(assessSmallNonInferiorityAttainability({
+    familyCount, margin: -0.03, test: "zero-discordance-pass-else-conservative-ci",
+  }).equal_arms_pass, true);
+  assert.equal(assessSmallNonInferiorityAttainability({
+    familyCount, margin: -0.03, test: "conservative-ci-lower-bound",
+  }).attainable, false);
+}
 
 const insufficient = computeBenchmarkV3PowerGate({
   familyCount: 60,
@@ -71,9 +80,7 @@ const opportunity = assessBenchmarkV3BaselineOpportunity(design, { small: 4, med
 assert.equal(opportunity.eligible, true);
 assert.equal(opportunity.total_baseline_failures, 12);
 assert.equal(opportunity.per_candidate_alpha, 0.05);
-const twoCandidateOpportunity = assessBenchmarkV3BaselineOpportunity(design, { small: 4, medium: 4, high: 4 }, 2);
-assert.equal(twoCandidateOpportunity.eligible, true);
-assert.equal(twoCandidateOpportunity.per_candidate_alpha, 0.025);
+assert.throws(() => assessBenchmarkV3BaselineOpportunity(design, { small: 4, medium: 4, high: 4 }, 2));
 
 const stratumBlocked = assessBenchmarkV3BaselineOpportunity(design, { small: 1, medium: 5, high: 6 });
 assert.equal(stratumBlocked.eligible, false);
@@ -100,17 +107,8 @@ const b = candidate("architecture-b", "b");
 assert.deepEqual(validateBenchmarkV3CandidateBudget(design, [a]), {
   status: "validated",
   registered_candidates: 1,
-  remaining_candidates: 1,
-  per_candidate_alpha: 0.05,
-  familywise_alpha: 0.05,
-  registrations_immutable: true,
-  development_executions: 0,
-});
-assert.deepEqual(validateBenchmarkV3CandidateBudget(design, [a, b]), {
-  status: "validated",
-  registered_candidates: 2,
   remaining_candidates: 0,
-  per_candidate_alpha: 0.025,
+  per_candidate_alpha: 0.05,
   familywise_alpha: 0.05,
   registrations_immutable: true,
   development_executions: 0,
@@ -145,8 +143,7 @@ rejects("impossible two-percent safety threshold cannot return at n=90", () => v
 rejects("derived attainable power cannot drift", () => validateBenchmarkV3Design(changed((copy) => {
   copy.derived.attainable_power_at_minimum = 0.9;
 })));
-rejects("candidate count is bounded", () => validateBenchmarkV3CandidateBudget(design, [a, b, candidate("architecture-c", "c")]));
-rejects("candidate architectures must differ", () => validateBenchmarkV3CandidateBudget(design, [a, { ...b, architecture_fingerprint: a.architecture_fingerprint }]));
+rejects("candidate count is bounded", () => validateBenchmarkV3CandidateBudget(design, [a, b]));
 rejects("late registration is forbidden", () => validateBenchmarkV3CandidateBudget(design, [{ ...a, registered_before_baseline: false }]));
 rejects("development rerun is forbidden", () => validateBenchmarkV3CandidateBudget(design, [{ ...a, development_execution_count: 2 }]));
 

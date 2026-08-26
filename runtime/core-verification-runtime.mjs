@@ -384,6 +384,16 @@ export function changedCoreWorkspacePaths(before, after) {
   )));
 }
 
+export function coreTrustedCheckCommandFingerprint(check) {
+  return fingerprint({
+    executable_identity: check.executable_identity,
+    argv: check.argv,
+    cwd_identity: check.cwd_identity,
+    input_manifest: check.input_manifest,
+    timeout_ms: check.timeout_ms,
+  });
+}
+
 export function runCoreTrustedCheck(check) {
   try {
     assertIdentityCurrent(check.executable_identity, "check executable");
@@ -396,21 +406,10 @@ export function runCoreTrustedCheck(check) {
       status: "unavailable",
       detail_code: error?.code === "CORE_RUNTIME_IDENTITY_CHANGED"
         ? "trusted-input-identity-changed" : "trusted-input-untrusted",
-      command_fingerprint: fingerprint({
-        executable_identity: check.executable_identity,
-        cwd_identity: check.cwd_identity,
-        input_manifest: check.input_manifest,
-        argv: check.argv,
-      }),
+      command_fingerprint: coreTrustedCheckCommandFingerprint(check),
     });
   }
-  const commandFingerprint = fingerprint({
-    executable_identity: check.executable_identity,
-    argv: check.argv,
-    cwd_identity: check.cwd_identity,
-    input_manifest: check.input_manifest,
-    timeout_ms: check.timeout_ms,
-  });
+  const commandFingerprint = coreTrustedCheckCommandFingerprint(check);
   const result = spawnSync(check.executable_path, check.argv, {
     cwd: check.cwd_path,
     encoding: "utf8",

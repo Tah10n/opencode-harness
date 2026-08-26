@@ -4,13 +4,19 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadBenchmarkV3Corpus } from "../lib/benchmark/v3-corpus.mjs";
 import { verifyBenchmarkV3ProductBundle } from "../lib/benchmark/v3-runner.mjs";
+import { validateBenchmarkV3ReadinessReceipt } from "../lib/benchmark/v3-readiness.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const corpus = loadBenchmarkV3Corpus(root);
 const reasons = [];
-if (process.env.OPENCODE_QUALITY_PROCESS_CONTAINMENT_READY !== "1") reasons.push({ code: "PROCESS_CONTAINMENT_UNAVAILABLE", requirement: "real-process-containment" });
-if (process.env.BENCHMARK_V3_HIDDEN_NAMESPACE_ISOLATION_READY !== "1") reasons.push({ code: "HIDDEN_DATA_NAMESPACE_ISOLATION_UNAVAILABLE", requirement: "hidden-artifacts-never-mounted-during-model-execution" });
-if (process.env.BENCHMARK_V3_PROVIDER_ONLY_EGRESS_READY !== "1") reasons.push({ code: "SEALED_HOLDOUT_EGRESS_BOUNDARY_UNAVAILABLE", requirement: "provider-only-egress-or-proven-equivalent" });
+for (const [environmentName, capability, code, requirement] of [
+  ["OPENCODE_QUALITY_PROCESS_CONTAINMENT_RECEIPT", "real-process-containment", "PROCESS_CONTAINMENT_UNAVAILABLE", "real-process-containment"],
+  ["BENCHMARK_V3_HIDDEN_NAMESPACE_ISOLATION_RECEIPT", "hidden-namespace-isolation", "HIDDEN_DATA_NAMESPACE_ISOLATION_UNAVAILABLE", "hidden-artifacts-never-mounted-during-model-execution"],
+  ["BENCHMARK_V3_PROVIDER_ONLY_EGRESS_RECEIPT", "provider-only-egress", "SEALED_HOLDOUT_EGRESS_BOUNDARY_UNAVAILABLE", "provider-only-egress-or-proven-equivalent"],
+]) {
+  try { validateBenchmarkV3ReadinessReceipt(process.env[environmentName], { capability, sourceRoot: root }); }
+  catch { reasons.push({ code, requirement }); }
+}
 if (!corpus.promotion_eligible) reasons.push({ code: "CORPUS_INCOMPLETE", requirement: corpus.promotion_blocker });
 if (typeof process.env.BENCHMARK_V3_CANDIDATE_BUNDLE !== "string") reasons.push({ code: "CANDIDATE_PRODUCT_FINGERPRINT_EQUIVALENCE_UNPROVEN", requirement: "exact-product-candidate-fingerprint-equivalence" });
 else {
