@@ -123,6 +123,18 @@ function parseArguments(values) {
 async function main() {
 try {
   const options = parseArguments(process.argv.slice(2));
+  const result = await runCoreLauncher(options);
+  if (result.receipt !== null) {
+    process.stderr.write(`[opencode-harness-core] ${JSON.stringify(result.receipt)}\n`);
+  }
+  process.exitCode = result.exit_code;
+} catch (error) {
+  process.stderr.write(`[opencode-harness-core] ${error.message}\n`);
+  process.exitCode = 21;
+}
+}
+
+export async function runCoreLauncher(options, { processContainmentFactory } = {}) {
   const workspace = path.resolve(options.workspace);
   const catalog = loadCoreVerificationCatalog(workspace, { catalogPath: options.catalog });
   const before = snapshotCoreWorkspace(workspace);
@@ -130,26 +142,18 @@ try {
     file: options.opencode,
     args: options.opencodeArgs,
     cwd: workspace,
-    env: process.env,
+    env: options.env ?? process.env,
+    ...(processContainmentFactory === undefined ? {} : { processContainmentFactory }),
   });
   if (child.error_code !== null || child.signal !== null || child.status !== 0) {
-    process.exitCode = Number.isSafeInteger(child.status) && child.status !== 0 ? child.status : 21;
-  } else {
-    const after = snapshotCoreWorkspace(workspace);
-    const verification = verifyCoreWorkspaceMutation({ catalog, before, after });
-    process.stderr.write(`[opencode-harness-core] ${JSON.stringify({
-      schema_version: 1,
-      catalog_status: catalog.catalog_status,
-      decision: verification.decision,
-      activation: verification.observation,
-      check: verification.check,
-    })}\n`);
-    process.exitCode = verification.decision.allowed ? 0 : 20;
+    return Object.freeze({ exit_code: Number.isSafeInteger(child.status) && child.status !== 0 ? child.status : 21, receipt: null });
   }
-} catch (error) {
-  process.stderr.write(`[opencode-harness-core] ${error.message}\n`);
-  process.exitCode = 21;
-}
+  const after = snapshotCoreWorkspace(workspace);
+  const verification = verifyCoreWorkspaceMutation({ catalog, before, after });
+  const receipt = Object.freeze({ schema_version: 1, catalog_fingerprint: catalog.catalog_fingerprint,
+    catalog_status: catalog.catalog_status, decision: verification.decision,
+    activation: verification.observation, check: verification.check });
+  return Object.freeze({ exit_code: verification.decision.allowed ? 0 : 20, receipt });
 }
 
 if (process.argv[1] !== undefined && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url) {

@@ -18,6 +18,8 @@ import {
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), "core-product-runtime-"));
 const workspace = path.join(temporaryRoot, "workspace");
+const trustedSystemExecutable = fs.realpathSync.native(process.platform === "win32" ? process.env.ComSpec : "/bin/sh");
+const shellArguments = (command) => process.platform === "win32" ? ["/d", "/s", "/c", command] : ["-c", command];
 
 function run(command, args, options = {}) {
   const result = spawnSync(command, args, { encoding: "utf8", shell: false, windowsHide: true, ...options });
@@ -44,8 +46,8 @@ function check(overrides = {}) {
     check_id: "source-check",
     scope_prefixes: ["src"],
     cost_rank: 1,
-    executable_path: fs.realpathSync.native(process.execPath),
-    argv: ["-e", "process.exit(0)"],
+    executable_path: trustedSystemExecutable,
+    argv: shellArguments("exit 0"),
     cwd: ".",
     timeout_ms: 10_000,
     ...overrides,
@@ -191,12 +193,14 @@ try {
   assert.equal(stale.state.verification, null);
   assert.equal(fs.existsSync(path.join(workspace, ".oc_harness")), false);
 
-  const fixtureExecutable = path.join(temporaryRoot, process.platform === "win32" ? "fixture-node.exe" : "fixture-node");
-  fs.copyFileSync(process.execPath, fixtureExecutable);
-  if (process.platform !== "win32") fs.chmodSync(fixtureExecutable, 0o755);
+  const fixtureExecutable = path.join(temporaryRoot, process.platform === "win32" ? "fixture-command.exe" : "fixture-command");
+  if (process.platform === "win32") fs.copyFileSync(trustedSystemExecutable, fixtureExecutable);
+  else fs.writeFileSync(fixtureExecutable, "#!/bin/sh\nexec /bin/sh \"$@\"\n", { mode: 0o755 });
   fs.writeFileSync(path.join(workspace, "package.json"), "{\"scripts\":{\"test\":\"node check.mjs\"}}\n", "utf8");
-  fs.writeFileSync(path.join(workspace, "check.mjs"), "process.exit(0);\n", "utf8");
-  const trustedInputCheck = check({ executable_path: fixtureExecutable, argv: ["check.mjs"] });
+  const checkFile = process.platform === "win32" ? "check.cmd" : "check.sh";
+  fs.writeFileSync(path.join(workspace, checkFile), process.platform === "win32" ? "@exit /b 0\r\n" : "exit 0\n", "utf8");
+  const trustedInputCheck = check({ executable_path: fixtureExecutable,
+    argv: process.platform === "win32" ? ["/d", "/s", "/c", checkFile] : [checkFile] });
   writeCatalog([trustedInputCheck]);
   let trustedInputCatalog = loadCoreVerificationCatalog(workspace);
   fs.writeFileSync(path.join(workspace, "package.json"), "{\"scripts\":{\"test\":\"node changed.mjs\"}}\n", "utf8");
@@ -205,14 +209,14 @@ try {
   fs.writeFileSync(path.join(workspace, "package.json"), "{\"scripts\":{\"test\":\"node check.mjs\"}}\n", "utf8");
   writeCatalog([trustedInputCheck]);
   trustedInputCatalog = loadCoreVerificationCatalog(workspace);
-  fs.writeFileSync(path.join(workspace, "check.mjs"), "process.exit(1);\n", "utf8");
+  fs.writeFileSync(path.join(workspace, checkFile), process.platform === "win32" ? "@exit /b 1\r\n" : "exit 1\n", "utf8");
   assert.equal(runCoreTrustedCheck(trustedInputCatalog.checks[0]).detail_code, "trusted-input-identity-changed");
 
-  fs.writeFileSync(path.join(workspace, "check.mjs"), "process.exit(0);\n", "utf8");
+  fs.writeFileSync(path.join(workspace, checkFile), process.platform === "win32" ? "@exit /b 0\r\n" : "exit 0\n", "utf8");
   writeCatalog([trustedInputCheck]);
   trustedInputCatalog = loadCoreVerificationCatalog(workspace);
   fs.renameSync(fixtureExecutable, `${fixtureExecutable}.old`);
-  fs.copyFileSync(process.execPath, fixtureExecutable);
+  fs.copyFileSync(trustedSystemExecutable, fixtureExecutable);
   if (process.platform !== "win32") fs.chmodSync(fixtureExecutable, 0o755);
   assert.equal(runCoreTrustedCheck(trustedInputCatalog.checks[0]).detail_code, "trusted-input-identity-changed");
 
@@ -220,21 +224,24 @@ try {
   fs.renameSync(`${fixtureExecutable}.old`, fixtureExecutable);
   writeCatalog([trustedInputCheck]);
   trustedInputCatalog = loadCoreVerificationCatalog(workspace);
-  fs.renameSync(path.join(workspace, "check.mjs"), path.join(workspace, "check-real.mjs"));
-  fs.symlinkSync("check-real.mjs", path.join(workspace, "check.mjs"));
-  assert.equal(runCoreTrustedCheck(trustedInputCatalog.checks[0]).detail_code, "trusted-input-identity-changed");
-  fs.rmSync(path.join(workspace, "check.mjs"));
-  fs.renameSync(path.join(workspace, "check-real.mjs"), path.join(workspace, "check.mjs"));
+  if (process.platform !== "win32") {
+    fs.renameSync(path.join(workspace, checkFile), path.join(workspace, "check-real.sh"));
+    fs.symlinkSync("check-real.sh", path.join(workspace, checkFile));
+    assert.equal(runCoreTrustedCheck(trustedInputCatalog.checks[0]).detail_code, "trusted-input-identity-changed");
+    fs.rmSync(path.join(workspace, checkFile));
+    fs.renameSync(path.join(workspace, "check-real.sh"), path.join(workspace, checkFile));
+  }
 
   const trustedCwd = path.join(workspace, "trusted-cwd");
   fs.mkdirSync(trustedCwd);
-  fs.writeFileSync(path.join(trustedCwd, "check.mjs"), "process.exit(0);\n", "utf8");
-  const cwdCheck = check({ executable_path: fixtureExecutable, argv: ["check.mjs"], cwd: "trusted-cwd" });
+  fs.writeFileSync(path.join(trustedCwd, checkFile), process.platform === "win32" ? "@exit /b 0\r\n" : "exit 0\n", "utf8");
+  const cwdCheck = check({ executable_path: fixtureExecutable,
+    argv: process.platform === "win32" ? ["/d", "/s", "/c", checkFile] : [checkFile], cwd: "trusted-cwd" });
   writeCatalog([cwdCheck]);
   const cwdCatalog = loadCoreVerificationCatalog(workspace);
   fs.renameSync(trustedCwd, `${trustedCwd}-old`);
   fs.mkdirSync(trustedCwd);
-  fs.writeFileSync(path.join(trustedCwd, "check.mjs"), "process.exit(0);\n", "utf8");
+  fs.writeFileSync(path.join(trustedCwd, checkFile), process.platform === "win32" ? "@exit /b 0\r\n" : "exit 0\n", "utf8");
   assert.equal(runCoreTrustedCheck(cwdCatalog.checks[0]).detail_code, "trusted-input-identity-changed");
   fs.rmSync(trustedCwd, { recursive: true });
   fs.renameSync(`${trustedCwd}-old`, trustedCwd);
