@@ -80,7 +80,6 @@ export const DETERMINISTIC_STAGE_REGISTRY = Object.freeze([
   { command_id: "verify-paired-defect-calibration", npm_script: "verify:calibration:paired-defects", check_ids: [] },
   { command_id: "verify-core-verification-gate", npm_script: "verify:core-verification-gate", check_ids: [] },
   { command_id: "verify-core-product-runtime", npm_script: "verify:core-product-runtime", check_ids: [] },
-  { command_id: "verify-core-product-installed-runtime", npm_script: "verify:core-product-installed-runtime", check_ids: [] },
   { command_id: "verify-core-verification-runner", npm_script: "verify:core-verification-runner", check_ids: [] },
   { command_id: "verify-feedback-foundation", npm_script: "verify:feedback-foundation", check_ids: [] },
   { command_id: "verify-trace-store", npm_script: "verify:trace-store", check_ids: [] },

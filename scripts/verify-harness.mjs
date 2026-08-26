@@ -573,7 +573,7 @@ for (const forbiddenScript of ["assess:quality-candidate", "verify:model-profile
   }
 }
 const expectedDeterministicStages = [
-  "verify:v0.4", "verify:static", "verify:benchmark:model-free", "verify:evaluator:paired-defects", "verify:calibration:paired-defects", "verify:core-verification-gate", "verify:core-product-runtime", "verify:core-product-installed-runtime", "verify:core-verification-runner", "verify:feedback-foundation", "verify:trace-store", "verify:report-history", "verify:adapter-worker",
+  "verify:v0.4", "verify:static", "verify:benchmark:model-free", "verify:evaluator:paired-defects", "verify:calibration:paired-defects", "verify:core-verification-gate", "verify:core-product-runtime", "verify:core-verification-runner", "verify:feedback-foundation", "verify:trace-store", "verify:report-history", "verify:adapter-worker",
   "eval", "verify:drift", "verify:adoption-bundle", "verify:package-boundary", "verify:runtime:fixture", "verify:runtime:quality-hooks:fixture",
   "verify:live-eval", "verify:acceptance",
   "verify:quality-contracts", "verify:engineering-dossier", "verify:architecture-policy", "verify:impact-graph",
@@ -592,6 +592,9 @@ if (JSON.stringify(DETERMINISTIC_STAGE_REGISTRY.map((stage) => stage.npm_script)
 }
 if (DETERMINISTIC_STAGE_REGISTRY.some((stage) => stage.npm_script === "probe:runtime:quality-plugin-api")) {
   fail("HARNESS-S008", "the machine-local installed API probe must not run inside npm run verify", "Keep the API probe as an explicit installed-runtime smoke only.");
+}
+if (DETERMINISTIC_STAGE_REGISTRY.some((stage) => stage.npm_script === "verify:core-product-installed-runtime")) {
+  fail("HARNESS-S008", "the installed OpenCode product verifier must not run inside npm run verify", "Keep installed-host evidence as an explicit operational check.");
 }
 if (new Set(DETERMINISTIC_STAGE_REGISTRY.map((stage) => stage.command_id)).size !== DETERMINISTIC_STAGE_REGISTRY.length) {
   fail("HARNESS-S008", "verify-all command IDs must be unique", "Give each deterministic stage one stable command_id.");
@@ -792,7 +795,6 @@ for (const [name, command] of Object.entries({
   "verify:calibration:paired-defects": "node scripts/verify-paired-defect-calibration.mjs",
   "verify:core-verification-gate": "node scripts/verify-core-verification-gate.mjs",
   "verify:core-product-runtime": "node scripts/verify-core-product-runtime.mjs",
-  "verify:core-product-installed-runtime": "node scripts/verify-core-product-installed-runtime.mjs",
   "verify:core-product-installed-runtime": "node scripts/verify-core-product-installed-runtime.mjs",
   "verify:core-verification-runner": "node scripts/verify-core-verification-runner.mjs",
   "verify:benchmark:contracts": "node scripts/verify-benchmark-contracts.mjs",
