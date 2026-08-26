@@ -74,7 +74,6 @@ function injectedProcessGroupContainment(worker) {
   });
 }
 
-let diagnosticExitCode = 11;
 try {
   assert.deepEqual(
     fs.readFileSync(path.join(root, "runtime", "core-verification-gate.mjs")),
@@ -82,6 +81,7 @@ try {
     "benchmark and product gate bytes must be identical",
   );
   fs.mkdirSync(path.join(workspace, "src"), { recursive: true });
+  if (process.platform !== "win32") fs.chmodSync(workspace, 0o700);
   fs.writeFileSync(path.join(workspace, "src", "feature.mjs"), "export const value = 1;\n", "utf8");
   run("git", ["init", "--quiet"], { cwd: workspace });
   run("git", ["add", "src/feature.mjs"], { cwd: workspace });
@@ -98,7 +98,6 @@ try {
   assert.equal(passed.decision.allowed, true);
   assert.equal(passed.decision.reason, "post_last_mutation_verification_passed");
   assert.equal(passed.observation.post_last_mutation_verification, true);
-  diagnosticExitCode = 12;
 
   const beforeDeletion = snapshotCoreWorkspace(workspace);
   fs.rmSync(path.join(workspace, "src", "feature.mjs"));
@@ -198,7 +197,6 @@ try {
   assert.equal(fs.existsSync(path.join(workspace, ".oc_harness")), false);
 
   const fixtureExecutable = path.join(temporaryRoot, process.platform === "win32" ? "fixture-command.exe" : "fixture-command");
-  diagnosticExitCode = 15;
   if (process.platform === "win32") fs.copyFileSync(trustedSystemExecutable, fixtureExecutable);
   else fs.writeFileSync(fixtureExecutable, "#!/bin/sh\nexec /bin/sh \"$@\"\n", { mode: 0o755 });
   fs.writeFileSync(path.join(workspace, "package.json"), "{\"scripts\":{\"test\":\"node check.mjs\"}}\n", "utf8");
@@ -208,17 +206,14 @@ try {
     argv: process.platform === "win32" ? ["/d", "/s", "/c", checkFile] : [checkFile] });
   writeCatalog([trustedInputCheck]);
   let trustedInputCatalog = loadCoreVerificationCatalog(workspace);
-  diagnosticExitCode = 21;
   fs.writeFileSync(path.join(workspace, "package.json"), "{\"scripts\":{\"test\":\"node changed.mjs\"}}\n", "utf8");
   assert.equal(runCoreTrustedCheck(trustedInputCatalog.checks[0]).detail_code, "trusted-input-identity-changed");
-  diagnosticExitCode = 22;
 
   fs.writeFileSync(path.join(workspace, "package.json"), "{\"scripts\":{\"test\":\"node check.mjs\"}}\n", "utf8");
   writeCatalog([trustedInputCheck]);
   trustedInputCatalog = loadCoreVerificationCatalog(workspace);
   fs.writeFileSync(path.join(workspace, checkFile), process.platform === "win32" ? "@exit /b 1\r\n" : "exit 1\n", "utf8");
   assert.equal(runCoreTrustedCheck(trustedInputCatalog.checks[0]).detail_code, "trusted-input-identity-changed");
-  diagnosticExitCode = 23;
 
   fs.writeFileSync(path.join(workspace, checkFile), process.platform === "win32" ? "@exit /b 0\r\n" : "exit 0\n", "utf8");
   writeCatalog([trustedInputCheck]);
@@ -227,7 +222,6 @@ try {
   fs.copyFileSync(trustedSystemExecutable, fixtureExecutable);
   if (process.platform !== "win32") fs.chmodSync(fixtureExecutable, 0o755);
   assert.equal(runCoreTrustedCheck(trustedInputCatalog.checks[0]).detail_code, "trusted-input-identity-changed");
-  diagnosticExitCode = 24;
 
   fs.rmSync(fixtureExecutable);
   fs.renameSync(`${fixtureExecutable}.old`, fixtureExecutable);
@@ -240,28 +234,20 @@ try {
     fs.rmSync(path.join(workspace, checkFile));
     fs.renameSync(path.join(workspace, "check-real.sh"), path.join(workspace, checkFile));
   }
-  diagnosticExitCode = 25;
 
   const trustedCwd = path.join(workspace, "trusted-cwd");
   fs.mkdirSync(trustedCwd);
-  diagnosticExitCode = 27;
   if (process.platform !== "win32") fs.chmodSync(trustedCwd, 0o700);
   fs.writeFileSync(path.join(trustedCwd, checkFile), process.platform === "win32" ? "@exit /b 0\r\n" : "exit 0\n", "utf8");
-  diagnosticExitCode = 28;
   const cwdCheck = check({ executable_path: fixtureExecutable,
     argv: process.platform === "win32" ? ["/d", "/s", "/c", checkFile] : [checkFile], cwd: "trusted-cwd" });
   writeCatalog([cwdCheck]);
-  diagnosticExitCode = 29;
   const cwdCatalog = loadCoreVerificationCatalog(workspace);
-  diagnosticExitCode = 30;
   fs.renameSync(trustedCwd, `${trustedCwd}-old`);
-  diagnosticExitCode = 31;
   fs.mkdirSync(trustedCwd);
   if (process.platform !== "win32") fs.chmodSync(trustedCwd, 0o700);
   fs.writeFileSync(path.join(trustedCwd, checkFile), process.platform === "win32" ? "@exit /b 0\r\n" : "exit 0\n", "utf8");
-  diagnosticExitCode = 32;
   assert.equal(runCoreTrustedCheck(cwdCatalog.checks[0]).detail_code, "trusted-input-identity-changed");
-  diagnosticExitCode = 26;
   fs.rmSync(trustedCwd, { recursive: true });
   fs.renameSync(`${trustedCwd}-old`, trustedCwd);
 
@@ -271,7 +257,6 @@ try {
   const catalogRace = verifyCoreWorkspaceMutation({ catalog: racedCatalog, before, after });
   assert.equal(catalogRace.check.detail_code, "catalog-identity-changed");
   assert.equal(catalogRace.decision.allowed, false);
-  diagnosticExitCode = 16;
 
   fs.rmSync(path.join(workspace, ".git", "opencode-harness", "core", "checks.json"));
   assert.throws(
@@ -290,14 +275,12 @@ try {
   run("git", ["add", "-A"], { cwd: workspace });
   run("git", ["commit", "--quiet", "-m", "fixture"], { cwd: workspace });
   const linkedWorktree = path.join(temporaryRoot, "linked-worktree");
-  diagnosticExitCode = 17;
   run("git", ["worktree", "add", "--quiet", "--detach", linkedWorktree, "HEAD"], { cwd: workspace });
   writeCatalog([check({ cwd: "." })], linkedWorktree);
   const linkedCatalog = loadCoreVerificationCatalog(linkedWorktree);
   assert.equal(linkedCatalog.catalog_status, "loaded");
   assert.equal(linkedCatalog.workspace_root, fs.realpathSync.native(linkedWorktree));
   assert.equal(linkedCatalog.catalog_path.includes(`${path.sep}worktrees${path.sep}`), true);
-  diagnosticExitCode = 18;
 
   if (process.platform !== "win32") {
     const delayedMarker = path.join(temporaryRoot, "delayed-background-marker.txt");
@@ -316,7 +299,6 @@ try {
   }
 
   const materializedRoot = path.join(temporaryRoot, "materialized-core");
-  diagnosticExitCode = 19;
   const materialized = materializeProfileBundleV3({
     repositoryRoot: root,
     bundleId: "core",
@@ -339,7 +321,7 @@ try {
   process.stdout.write("installed core product runtime verification passed\n");
 } catch (error) {
   process.stderr.write(`${sanitizeSyntheticModelFreeFailureDiagnostic(error?.stack ?? error?.message ?? String(error))}\n`);
-  process.exitCode = diagnosticExitCode;
+  process.exitCode = 1;
 } finally {
   fs.rmSync(temporaryRoot, { recursive: true, force: true });
 }
