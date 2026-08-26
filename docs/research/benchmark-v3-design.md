@@ -38,8 +38,14 @@ sent in the attempt envelope or mounted while the model runs. After model exit,
 the verifier copies the scored workspace into a separate runner-owned oracle
 namespace with an empty home, no network, read-only hidden/runtime inputs, and
 verified process-tree teardown. Its supervisor requires a structured Mocha test
-count receipt and rejects early `process.exit(0)` or post-test workspace
-mutation before accepting an oracle result. The verifier then mounts a
+count receipt calibrated through the same contained path. The expected count and
+one-use MAC key are delivered through an authority file that the supervisor
+unlinks before it starts evaluated code; unsigned or replaced receipt paths are
+rejected. A closed subject-capability preflight rejects newly introduced process,
+stdout, dynamic-module, reflection, and code-generation surfaces before hidden
+code execution, including early `process.exit(0)` report spoofs. Content, size,
+path, and mode changes all enter the closed mutation set. The verifier rejects
+post-test workspace mutation before accepting an oracle result, then mounts a
 fingerprinted historical dependency runtime and proves
 that all 210 parent states fail while all 210 reference states pass. Alternative
 repairs pass whenever the upstream semantic test passes and the mutation set is
@@ -158,6 +164,13 @@ the study. Failed validation reports `NO PROMOTABLE HARNESS`; passed validation
 reports the external sealed-holdout blocker, never a positive holdout claim.
 No study result reports ready before an external sealed holdout and a separately
 preregistered real-repository pilot.
+
+Baseline and candidate share the same model deadline. Candidate execution gives
+the trusted wrapper a separately bound outer budget for process-tree teardown,
+post-child verification, and FD3 receipt delivery; the attempt worker and
+managed-command deadlines cannot race the wrapper's child timeout. Capability
+freshness is reserved for the complete model, wrapper, and contained-oracle
+envelope before a paid attempt starts.
 
 ## Seed, binding, and staged verification
 

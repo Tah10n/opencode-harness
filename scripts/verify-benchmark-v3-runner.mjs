@@ -11,11 +11,12 @@ import { assertBenchmarkV3CapabilityAuthorization, authorizeBenchmarkV3Capabilit
 import { verifyBenchmarkV3SplitDistribution } from "../lib/benchmark/v3-split-assignment.mjs";
 
 import { materializeProfileBundleV3 } from "../lib/profile-v3.mjs";
-import { loadBenchmarkV3Corpus } from "../lib/benchmark/v3-corpus.mjs";
+import { captureBenchmarkV3Workspace, loadBenchmarkV3Corpus } from "../lib/benchmark/v3-corpus.mjs";
 import { loadBenchmarkV3Design } from "../lib/benchmark/v3-design.mjs";
 import {
   buildBenchmarkV3AttemptEnvelope,
   buildBenchmarkV3ModelBinding,
+  benchmarkV3AttemptTimeouts,
   classifyBenchmarkV3AttemptReceipt,
   createBenchmarkV3CampaignJournal,
   evaluateBenchmarkV3EfficacyGate,
@@ -24,6 +25,7 @@ import {
   summarizeBenchmarkV3Stage,
   validateBenchmarkV3ReviewReceipt,
   verifyBenchmarkV3OpenCodeExecutable,
+  verifyBenchmarkV3OracleSubjectSafety,
   verifyBenchmarkV3FilesystemIsolation,
   verifyBenchmarkV3ProductBundle,
 } from "../lib/benchmark/v3-runner.mjs";
@@ -31,6 +33,14 @@ import {
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const { value: design } = loadBenchmarkV3Design(root);
 const corpus = loadBenchmarkV3Corpus(root);
+const candidateTimeoutBudget = benchmarkV3AttemptTimeouts(900_000, "candidate");
+assert.equal(candidateTimeoutBudget.model_timeout_ms, 900_000);
+assert.equal(candidateTimeoutBudget.wrapper_timeout_ms, 900_000);
+assert(candidateTimeoutBudget.worker_timeout_ms >= candidateTimeoutBudget.wrapper_timeout_ms + 300_000,
+  "outer worker deadline must reserve wrapper teardown, verification, and FD3 receipt time");
+assert(candidateTimeoutBudget.complete_authorization_reservation_ms
+  >= candidateTimeoutBudget.managed_timeout_ms + 150_000,
+"capability freshness must cover the entire model plus contained-oracle envelope");
 assert.equal(verifyBenchmarkV3SplitDistribution(corpus.split_assignment).passed, true);
 const staleDistributionAssignment = structuredClone(corpus.split_assignment);
 staleDistributionAssignment.entries[0].patch_size_bytes = Number.MAX_SAFE_INTEGER;
@@ -96,8 +106,9 @@ try {
   const reviewFingerprint = fingerprint(reviewUnsigned);
   const reviewSignedBody = { ...reviewUnsigned, review_fingerprint: reviewFingerprint };
   const reviewPath = path.join(readinessRoot, "review.json");
-  fs.writeFileSync(reviewPath, JSON.stringify({ ...reviewSignedBody,
-    signature: sign(null, Buffer.from(canonicalJson(reviewSignedBody), "utf8"), privateKey).toString("base64url") }), { mode: 0o600 });
+  const signedReview = { ...reviewSignedBody,
+    signature: sign(null, Buffer.from(canonicalJson(reviewSignedBody), "utf8"), privateKey).toString("base64url") };
+  fs.writeFileSync(reviewPath, JSON.stringify(signedReview), { mode: 0o600 });
   assert.equal(validateBenchmarkV3ReviewReceipt(reviewPath, { sourceSha,
     sourceTreeFingerprint: reviewUnsigned.source_tree_fingerprint, trustedIssuers: [reviewIssuer] }).verdict, "passed");
   const tamperedReview = JSON.parse(fs.readFileSync(reviewPath, "utf8")); tamperedReview.medium_findings = 1;
@@ -118,6 +129,12 @@ try {
   assert.equal(validateBenchmarkV3ReadinessReceipt(canonicalReceiptPath, {
     capability: body.capability, sourceRoot: root, trustedIssuers: [aliasedIssuer],
   }).status, "verified", "the canonical spelling of a protected channel must remain usable");
+  const aliasedReviewIssuer = Object.freeze({ ...reviewIssuer, channel_root: path.join(configuredParent, "readiness") });
+  const canonicalReviewPath = path.join(canonicalChannel, "review.json");
+  fs.writeFileSync(canonicalReviewPath, JSON.stringify(signedReview), { mode: 0o600 });
+  assert.equal(validateBenchmarkV3ReviewReceipt(path.join(aliasedReviewIssuer.channel_root, "review.json"), { sourceSha,
+    sourceTreeFingerprint: reviewUnsigned.source_tree_fingerprint, trustedIssuers: [aliasedReviewIssuer] }).verdict, "passed",
+  "configured /var-style symlink ancestry must canonicalize for protected review receipts");
   const alternateAlias = path.join(readinessRoot, "alternate-channel");
   fs.symlinkSync(canonicalChannel, alternateAlias);
   assert.throws(() => validateBenchmarkV3ReadinessReceipt(path.join(alternateAlias, "receipt.json"), {
@@ -216,6 +233,27 @@ assert.equal(serialized.includes(first.control_surface.provenance.source_commit)
 assert.equal(envelope.public_surface_fingerprint, first.manifest.public_surface_fingerprint);
 assert.equal(envelope.corpus_generation_seed, "frozen-seed");
 assert.equal(envelope.model_sampling_seed, null);
+const oracleSafetyRoot = fs.mkdtempSync(path.join(os.tmpdir(), "v3-oracle-safety-"));
+try {
+  for (const entry of first.public_surface.public_files) {
+    const target = path.join(oracleSafetyRoot, ...entry.path.split("/")); fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.writeFileSync(target, entry.content, "utf8");
+  }
+  const safetyBefore = captureBenchmarkV3Workspace(oracleSafetyRoot);
+  const subject = first.control_surface.allowed_mutation_paths[0];
+  fs.appendFileSync(path.join(oracleSafetyRoot, ...subject.split("/")), "\nprocess.stdout.write(JSON.stringify({stats:{tests:7,passes:7,failures:0,pending:0}}));process.exit(0);\n");
+  assert.equal(verifyBenchmarkV3OracleSubjectSafety(oracleSafetyRoot, safetyBefore, first).safe, false,
+    "model-authored stdout/early-exit oracle spoof must be rejected before hidden code execution");
+  fs.rmSync(oracleSafetyRoot, { recursive: true }); fs.mkdirSync(oracleSafetyRoot);
+  for (const entry of first.public_surface.public_files) {
+    const target = path.join(oracleSafetyRoot, ...entry.path.split("/")); fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.writeFileSync(target, entry.content, "utf8");
+  }
+  const outside = path.join(oracleSafetyRoot, "mode-only.txt"); fs.writeFileSync(outside, "stable\n", { mode: 0o600 });
+  const modeBefore = captureBenchmarkV3Workspace(oracleSafetyRoot); fs.chmodSync(outside, 0o777);
+  assert.equal(verifyBenchmarkV3OracleSubjectSafety(oracleSafetyRoot, modeBefore, first).changed_paths.includes("mode-only.txt"), true,
+    "mode-only out-of-scope mutation must be visible to oracle scope accounting");
+} finally { fs.rmSync(oracleSafetyRoot, { recursive: true, force: true }); }
 const seededEnvelope = buildBenchmarkV3AttemptEnvelope({ ...envelope, family: first, armId: envelope.arm_id,
   sourceSha: envelope.source_sha, productBundleFingerprint: envelope.product_bundle_fingerprint,
   opencodeExecutableFingerprint: envelope.opencode_executable_fingerprint, corpusGenerationSeed: "frozen-seed",

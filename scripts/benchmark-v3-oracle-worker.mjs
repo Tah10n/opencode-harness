@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
-import { createHash } from "node:crypto";
+import { createHash, createHmac } from "node:crypto";
 import { spawnSync } from "node:child_process";
 
 function stop() { process.exit(64); }
@@ -13,7 +13,14 @@ if (input?.schema_version !== 1 || typeof input.workspace !== "string" || typeof
   || typeof input.runtime_key !== "string" || !Array.isArray(input.hidden_test_files)
   || !Array.isArray(input.test_argv) || !Array.isArray(input.allowed_mutation_paths)
   || !Array.isArray(input.before_entries) || !Array.isArray(input.model_entries)
-  || !Number.isSafeInteger(input.expected_test_count) || input.expected_test_count < 1) stop();
+  || typeof input.authority_file !== "string") stop();
+let authority;
+try {
+  authority = JSON.parse(fs.readFileSync(input.authority_file, "utf8"));
+  fs.unlinkSync(input.authority_file);
+} catch { stop(); }
+if (typeof authority?.mac_key !== "string"
+  || !(authority.expected_test_count === null || (Number.isSafeInteger(authority.expected_test_count) && authority.expected_test_count > 0))) stop();
 
 const hashFile = (file) => `sha256:${createHash("sha256").update(fs.readFileSync(file)).digest("hex")}`;
 function snapshot(root) {
@@ -28,7 +35,7 @@ function snapshot(root) {
       const stat = fs.lstatSync(target);
       if (stat.isDirectory() && !stat.isSymbolicLink()) visit(target, relative);
       else if (stat.isFile() && !stat.isSymbolicLink() && stat.nlink === 1) {
-        entries.push({ path: relative, sha256: hashFile(target), size: stat.size });
+        entries.push({ path: relative, sha256: hashFile(target), size: stat.size, mode: stat.mode & 0o7777 });
       } else stop();
     }
   };
@@ -36,9 +43,9 @@ function snapshot(root) {
   return entries;
 }
 const root = fs.realpathSync.native(input.workspace);
-const beforeMap = new Map(input.before_entries.map((entry) => [entry.path, `${entry.sha256}:${entry.size}`]));
+const beforeMap = new Map(input.before_entries.map((entry) => [entry.path, `${entry.sha256}:${entry.size}:${entry.mode}`]));
 const modelEntries = input.model_entries;
-const modelMap = new Map(modelEntries.map((entry) => [entry.path, `${entry.sha256}:${entry.size}`]));
+const modelMap = new Map(modelEntries.map((entry) => [entry.path, `${entry.sha256}:${entry.size}:${entry.mode}`]));
 const changedPaths = [...new Set([...beforeMap.keys(), ...modelMap.keys()])]
   .filter((entry) => beforeMap.get(entry) !== modelMap.get(entry)).sort();
 const allowed = new Set(input.allowed_mutation_paths);
@@ -61,12 +68,14 @@ const testCountAuthentic = Number.isSafeInteger(stats?.tests) && stats.tests > 0
 const oracleEntries = snapshot(root);
 const oracleMutation = JSON.stringify(oracleEntries) !== JSON.stringify(modelEntries);
 const semanticPassed = command.error === undefined && command.signal === null && command.status === 0
-  && testCountAuthentic && stats.tests === input.expected_test_count
+  && testCountAuthentic && (authority.expected_test_count === null || stats.tests === authority.expected_test_count)
   && stats.passes === stats.tests && stats.failures === 0 && stats.pending === 0;
-const receipt = { schema_version: 1, semantic_passed: semanticPassed,
+const receiptBody = { schema_version: 2, semantic_passed: semanticPassed,
   process_status: Number.isInteger(command.status) ? command.status : null, process_signal: command.signal ?? null,
   timed_out: command.error?.code === "ETIMEDOUT", test_count: testCountAuthentic ? stats.tests : null,
   changed_paths: changedPaths, scope_violations: scopeViolations, oracle_workspace_mutated: oracleMutation };
+const receipt = { ...receiptBody,
+  receipt_mac: createHmac("sha256", Buffer.from(authority.mac_key, "base64url")).update(JSON.stringify(receiptBody)).digest("base64url") };
 const descriptor = fs.openSync(outputFile, "wx", 0o600);
 try { fs.writeFileSync(descriptor, `${JSON.stringify(receipt)}\n`); fs.fsyncSync(descriptor); } finally { fs.closeSync(descriptor); }
 process.stdout.write(marker);

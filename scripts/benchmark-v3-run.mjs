@@ -31,7 +31,7 @@ const readinessReceiptPaths = {
   "hidden-namespace-isolation": path.resolve(one("namespace-receipt")),
   "provider-only-egress": path.resolve(one("egress-receipt")),
 };
-const gate = runBenchmarkV3ModelFreeGate({
+const gate = await runBenchmarkV3ModelFreeGate({
   sourceRoot,
   semanticRuntimeRoot: path.resolve(one("semantic-runtime")),
   opencodeExecutable: path.resolve(one("opencode")),

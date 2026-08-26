@@ -98,7 +98,9 @@ export async function runContainedOpenCode({
       && await terminateAndVerify(10_000);
     const workerClosed = await waitForClose(worker, 10_000);
     if (!teardownVerified || !workerClosed || containment.status?.().teardown_verified !== true) {
-      throw new Error("OpenCode process-tree teardown is unverified");
+      const error = new Error("OpenCode process-tree teardown is unverified");
+      error.childExecution = result;
+      throw error;
     }
     return result;
   } catch (error) {
@@ -156,14 +158,20 @@ export async function runCoreLauncher(options, { processContainmentFactory,
   const workspace = path.resolve(options.workspace);
   const catalog = loadCoreVerificationCatalog(workspace, { catalogPath: options.catalog });
   const before = snapshotCoreWorkspace(workspace);
-  const child = await runContainedOpenCode({
-    file: options.opencode,
-    args: options.opencodeArgs,
-    cwd: workspace,
-    env: options.env ?? process.env,
-    childTimeoutMs: options.childTimeoutMs,
-    ...(processContainmentFactory === undefined ? {} : { processContainmentFactory }),
-  });
+  let child;
+  try {
+    child = await runContainedOpenCode({
+      file: options.opencode,
+      args: options.opencodeArgs,
+      cwd: workspace,
+      env: options.env ?? process.env,
+      childTimeoutMs: options.childTimeoutMs,
+      ...(processContainmentFactory === undefined ? {} : { processContainmentFactory }),
+    });
+  } catch (error) {
+    if (!error?.childExecution) throw error;
+    child = { ...error.childExecution, error_code: "PROCESS_CONTAINMENT_UNVERIFIED" };
+  }
   const childExecution = Object.freeze({ schema_version: 1, status: Number.isSafeInteger(child.status) ? child.status : null,
     signal: child.signal ?? null, error_code: child.error_code ?? null });
   let verification;

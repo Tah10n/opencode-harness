@@ -476,6 +476,16 @@ try {
     assert.equal(postChildFailure.receipt.child_execution.status, 0);
     assert.equal(postChildFailure.receipt.decision.reason, "post_child_verification_failed",
       "post-child verification exceptions must preserve the authentic child-execution receipt");
+    const unverifiedContainment = await runCoreLauncher({ workspace, catalog: CORE_CHECK_CATALOG_PATH,
+      opencode: process.execPath, opencodeArgs: ["-e", "process.exit(0)"], childTimeoutMs: 5_000, env: process.env },
+    { processContainmentFactory: async (worker) => {
+      const base = injectedProcessGroupContainment(worker);
+      return Object.freeze({ ...base, terminateAndVerify: async () => { await base.terminateAndVerify(); return false; },
+        close: async () => true, status: () => Object.freeze({ teardown_verified: false }) });
+    } });
+    assert.equal(unverifiedContainment.receipt.child_execution.status, 0);
+    assert.equal(unverifiedContainment.receipt.child_execution.error_code, "PROCESS_CONTAINMENT_UNVERIFIED",
+      "post-child teardown failure must preserve child disposition while remaining infrastructure-invalid");
   }
 
   const materializedRoot = path.join(temporaryRoot, "materialized-core");
