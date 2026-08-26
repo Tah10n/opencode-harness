@@ -208,6 +208,8 @@ process.stderr.write('[opencode-harness-core] {"activation":{"post_last_mutation
   const missingFinal = runWorker(["--missing-final"]);
   assert.equal(missingFinal.protocol_valid, false);
   assert.equal(missingFinal.terminal_event_count, 0);
+  assert.equal(classifyBenchmarkV3AttemptReceipt(missingFinal, "baseline").infrastructure_failure, false);
+  assert.equal(classifyBenchmarkV3AttemptReceipt(missingFinal, "baseline").verification_succeeded, false);
   const complete = runWorker(["--final"]);
   assert.equal(complete.protocol_valid, true);
   assert.equal(complete.terminal_event_count, 1);

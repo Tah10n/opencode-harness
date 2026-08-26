@@ -77,24 +77,43 @@ function ordinaryFile(target, label) {
   return stat;
 }
 
-function sha256File(target) {
-  return `sha256:${createHash("sha256").update(fs.readFileSync(target)).digest("hex")}`;
+function readStableOrdinaryFile(target, label, { executable = false } = {}) {
+  const canonicalPath = fs.realpathSync.native(target);
+  let descriptor;
+  try {
+    descriptor = fs.openSync(canonicalPath, "r");
+    const before = fs.fstatSync(descriptor, { bigint: true });
+    if (!before.isFile() || before.nlink !== 1n
+      || (executable && process.platform !== "win32" && (before.mode & 0o111n) === 0n)) {
+      fail("CORE_RUNTIME_UNTRUSTED_FILE", `${label} is not a trusted ordinary file`);
+    }
+    const bytes = fs.readFileSync(descriptor);
+    const after = fs.fstatSync(descriptor, { bigint: true });
+    const pathAfter = fs.lstatSync(canonicalPath, { bigint: true });
+    for (const key of ["dev", "ino", "mode", "nlink", "size", "mtimeNs", "ctimeNs"]) {
+      if (before[key] !== after[key] || after[key] !== pathAfter[key]) {
+        fail("CORE_RUNTIME_IDENTITY_CHANGED", `${label} changed while it was read`);
+      }
+    }
+    return Object.freeze({ bytes, identity: Object.freeze({
+      canonical_path: canonicalPath,
+      size: Number(after.size),
+      mode: Number(after.mode),
+      device: after.dev.toString(10),
+      inode: after.ino.toString(10),
+      sha256: `sha256:${createHash("sha256").update(bytes).digest("hex")}`,
+    }) });
+  } finally {
+    if (descriptor !== undefined) fs.closeSync(descriptor);
+  }
 }
 
-function fileIdentity(target, label, { executable = false } = {}) {
-  const canonicalPath = fs.realpathSync.native(target);
-  const stat = ordinaryFile(canonicalPath, label);
-  if (executable && process.platform !== "win32" && (stat.mode & 0o111) === 0) {
-    fail("CORE_RUNTIME_UNTRUSTED_FILE", `${label} is not executable`);
-  }
-  return Object.freeze({
-    canonical_path: canonicalPath,
-    size: stat.size,
-    mode: stat.mode,
-    device: stat.dev,
-    inode: stat.ino,
-    sha256: sha256File(canonicalPath),
-  });
+function sha256File(target) {
+  return readStableOrdinaryFile(target, "workspace file").identity.sha256;
+}
+
+function fileIdentity(target, label, options = {}) {
+  return readStableOrdinaryFile(target, label, options).identity;
 }
 
 function directoryIdentity(target, label) {
@@ -125,7 +144,7 @@ function assertTrustedAncestry(target, label) {
   while (true) {
     const stat = fs.lstatSync(current);
     if (!stat.isDirectory() || stat.isSymbolicLink()) fail("CORE_RUNTIME_UNTRUSTED_ANCESTRY", `${label} ancestry is not ordinary`);
-    const writableByOthers = (stat.mode & 0o002) !== 0;
+    const writableByOthers = (stat.mode & 0o022) !== 0;
     const stickyDirectory = (stat.mode & 0o1000) !== 0;
     if (writableByOthers && !stickyDirectory) {
       fail("CORE_RUNTIME_UNTRUSTED_ANCESTRY", `${label} ancestry is writable by another principal`);
@@ -251,9 +270,10 @@ export function loadCoreVerificationCatalog(workspaceRoot, {
     const relative = path.relative(resolvedCatalog.git_directory, realCatalog);
     if (relative.startsWith("..") || path.isAbsolute(relative)) fail("CORE_RUNTIME_REPOSITORY", "core catalog escaped the repository Git directory");
   }
+  const observed = readStableOrdinaryFile(realCatalog, "core verification catalog");
   let value;
   try {
-    value = JSON.parse(fs.readFileSync(realCatalog, "utf8").replace(/^\uFEFF/u, ""));
+    value = JSON.parse(observed.bytes.toString("utf8").replace(/^\uFEFF/u, ""));
   } catch {
     fail("CORE_RUNTIME_SCHEMA", "core verification catalog must be valid JSON");
   }
@@ -270,7 +290,7 @@ export function loadCoreVerificationCatalog(workspaceRoot, {
     catalog_id: value.catalog_id,
     checks: checks.map(({ cwd_path: _cwdPath, ...entry }) => entry),
   };
-  const catalogIdentity = fileIdentity(realCatalog, "core verification catalog");
+  const catalogIdentity = observed.identity;
   return Object.freeze({
     workspace_root: root,
     catalog_path: realCatalog,

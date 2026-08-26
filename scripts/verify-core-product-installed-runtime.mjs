@@ -14,6 +14,8 @@ const temporaryRoot = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(
 const materializedRoot = path.join(temporaryRoot, "config", "opencode-harness");
 const repositoryRoot = path.join(temporaryRoot, "repository");
 const workspace = path.join(temporaryRoot, "workspace");
+const trustedCheckExecutable = fs.realpathSync.native(process.platform === "win32" ? process.env.ComSpec : "/bin/sh");
+const checkArguments = (command) => process.platform === "win32" ? ["/d", "/s", "/c", command] : ["-c", command];
 
 function fail(message) {
   throw new Error(message);
@@ -109,7 +111,7 @@ async function fixtureProvider(content, operation) {
   };
 }
 
-function writeCatalog(argv) {
+function writeCatalog(command) {
   const gitPath = spawnSync("git", ["rev-parse", "--git-path", "opencode-harness/core/checks.json"], {
     cwd: workspace, encoding: "utf8", shell: false, windowsHide: true,
   });
@@ -124,8 +126,8 @@ function writeCatalog(argv) {
       check_id: "fixture-check",
       scope_prefixes: ["src"],
       cost_rank: 1,
-      executable_path: fs.realpathSync.native(process.execPath),
-      argv,
+      executable_path: fs.realpathSync.native(trustedCheckExecutable),
+      argv: checkArguments(command),
       cwd: ".",
       timeout_ms: 10_000,
     }],
@@ -153,12 +155,12 @@ function runtimeEnvironment(overlayPath) {
   };
 }
 
-async function installedRun({ content, operation = "write", checkArgv, expectedStatus, expectedReason }) {
+async function installedRun({ content, operation = "write", checkCommand, expectedStatus, expectedReason }) {
   fs.rmSync(path.join(workspace, "src", "renamed.txt"), { force: true });
   fs.writeFileSync(path.join(workspace, "src", "fixture.txt"), "before\n", "utf8");
   const stage = spawnSync("git", ["add", "-A", "src"], { cwd: workspace, encoding: "utf8", shell: false, windowsHide: true });
   assert.equal(stage.status, 0, stage.stderr);
-  writeCatalog(checkArgv);
+  writeCatalog(checkCommand);
   const provider = await fixtureProvider(content, operation);
   try {
     const sourceConfig = JSON.parse(fs.readFileSync(path.join(materializedRoot, "opencode.json"), "utf8"));
@@ -234,7 +236,7 @@ try {
 
   const failed = await installedRun({
     content: "failed-check\n",
-    checkArgv: ["-e", "process.exit(1)"],
+    checkCommand: "exit 1",
     expectedStatus: 20,
     expectedReason: "verification_failed",
   });
@@ -242,7 +244,7 @@ try {
 
   const passed = await installedRun({
     content: "passed-check\n",
-    checkArgv: ["-e", "process.exit(0)"],
+    checkCommand: "exit 0",
     expectedStatus: 0,
     expectedReason: "post_last_mutation_verification_passed",
   });
@@ -250,7 +252,7 @@ try {
 
   const stale = await installedRun({
     content: "stale-check\n",
-    checkArgv: ["-e", "require('node:fs').writeFileSync('src/fixture.txt', 'mutated-by-check\\n')"],
+    checkCommand: process.platform === "win32" ? "echo mutated-by-check>src\\fixture.txt" : "printf 'mutated-by-check\\n' > src/fixture.txt",
     expectedStatus: 20,
     expectedReason: "verification_not_started",
   });
@@ -260,7 +262,7 @@ try {
   const deleted = await installedRun({
     content: "delete-check\n",
     operation: "delete",
-    checkArgv: ["-e", "process.exit(0)"],
+    checkCommand: "exit 0",
     expectedStatus: 0,
     expectedReason: "post_last_mutation_verification_passed",
   });
@@ -270,7 +272,7 @@ try {
   const renamed = await installedRun({
     content: "rename-check\n",
     operation: "rename",
-    checkArgv: ["-e", "process.exit(0)"],
+    checkCommand: "exit 0",
     expectedStatus: 0,
     expectedReason: "post_last_mutation_verification_passed",
   });
