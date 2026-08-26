@@ -244,16 +244,22 @@ try {
 
   const trustedCwd = path.join(workspace, "trusted-cwd");
   fs.mkdirSync(trustedCwd);
+  diagnosticExitCode = 27;
   if (process.platform !== "win32") fs.chmodSync(trustedCwd, 0o700);
   fs.writeFileSync(path.join(trustedCwd, checkFile), process.platform === "win32" ? "@exit /b 0\r\n" : "exit 0\n", "utf8");
+  diagnosticExitCode = 28;
   const cwdCheck = check({ executable_path: fixtureExecutable,
     argv: process.platform === "win32" ? ["/d", "/s", "/c", checkFile] : [checkFile], cwd: "trusted-cwd" });
   writeCatalog([cwdCheck]);
+  diagnosticExitCode = 29;
   const cwdCatalog = loadCoreVerificationCatalog(workspace);
+  diagnosticExitCode = 30;
   fs.renameSync(trustedCwd, `${trustedCwd}-old`);
+  diagnosticExitCode = 31;
   fs.mkdirSync(trustedCwd);
   if (process.platform !== "win32") fs.chmodSync(trustedCwd, 0o700);
   fs.writeFileSync(path.join(trustedCwd, checkFile), process.platform === "win32" ? "@exit /b 0\r\n" : "exit 0\n", "utf8");
+  diagnosticExitCode = 32;
   assert.equal(runCoreTrustedCheck(cwdCatalog.checks[0]).detail_code, "trusted-input-identity-changed");
   diagnosticExitCode = 26;
   fs.rmSync(trustedCwd, { recursive: true });
