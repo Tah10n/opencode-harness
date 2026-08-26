@@ -28,17 +28,16 @@ read-only unless the user explicitly asks for fixes.
   investigations, long logs, and tasks that do not fit bounded local context.
   It may use focused read-only exploration and at most three independent
   read-only children. The primary agent remains the integrator.
-- `assurance` is experimental and opt-in. Use it only through an explicit
-  assurance agent or `/assure`, or when project-local `WORKFLOW.md` requires it
-  for security, authorization, migrations, durable persistence, shared-state
-  concurrency, destructive data changes, or critical public contracts.
+- `assurance` is a deprecated research-only compatibility profile. Do not
+  recommend it for product work. A project-local `WORKFLOW.md` may still name
+  it for historical reproduction, but that does not establish release evidence.
 - `lab` is not a runtime profile. It contains benchmark, evaluation, replay,
   trace, fixture, and experimental infrastructure.
 
-Core or deep may recommend assurance but must not start its lifecycle without
-the explicit selection or project policy above. Missing optional context tools
-never block an ordinary task; fall back to bounded read/search and state the
-coverage gap.
+Core or deep must not start or recommend legacy assurance. For high-risk work,
+follow the project's own required controls or report that no promoted harness
+mode currently covers the risk. Missing optional context tools never block an ordinary task;
+fall back to bounded read/search and state the coverage gap.
 
 ## Engineering and verification
 

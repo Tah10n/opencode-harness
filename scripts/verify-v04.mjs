@@ -398,13 +398,20 @@ function verifyCore() {
   "V04_CORE_PERMISSIONS", "core must deny quality, context, and learning surfaces");
   assert(!core.includes("quality_assurance_start: allow")
     && !core.includes("context_outline: allow")
-    && coreBody.includes("Stay single-agent for small local work"),
+    && coreBody.includes("Stay single-agent."),
   "V04_CORE_AGENT", "core agent contains a heavy lifecycle or mandatory delegation");
   const manifest = buildProfileBundleManifest(root, "core").manifest;
   for (const forbidden of ["lib/quality", "quality", "native", "lib/benchmark", "benchmarks", "evals", ".opencode/plugins"]) {
     assert(!pathPresent(manifest, forbidden), "V04_CORE_BUNDLE", `core contains forbidden path ${forbidden}`);
   }
-  assert(!pathPresent(manifest, "package.json"), "V04_CORE_NODE", "core bundle must not require Node.js at runtime");
+  for (const runtimePath of [
+    "runtime/core-verification-gate.mjs",
+    "runtime/core-verification-runtime.mjs",
+    "runtime/opencode-core.mjs",
+  ]) {
+    assert(pathPresent(manifest, runtimePath), "V04_CORE_RUNTIME", `core bundle is missing ${runtimePath}`);
+  }
+  assert(!pathPresent(manifest, "package.json"), "V04_CORE_NODE", "core runtime must remain dependency-free beyond Node built-ins");
   return {
     status: "passed",
     prompt_characters: combined,
@@ -474,6 +481,12 @@ function verifyAssurance() {
     "V04_FACADE_SIZE", "assurance facade must expose three to five operations");
   assert(ASSURANCE_FACADE_TOOL_IDS.every((entry) => !LEGACY_TOOL_IDS.includes(entry)),
     "V04_FACADE_COLLISION", "facade collides with a legacy tool ID");
+  const assuranceAgent = read("agents/assurance.md");
+  for (const field of ["risk_class", "task_type", "user_visible_goal", "ownership_paths", "classification_rationale", "behavior_expectation", "expected_preserved_behavior", "known_local_edge_cases", "scope_facts", "unresolved_unknowns"]) {
+    assert(assuranceAgent.includes(`\`${field}\``), "V04_FACADE_START_GUIDANCE", `assurance start guidance omits ${field}`);
+  }
+  assert(assuranceAgent.includes("Never include runner-owned `required_check_ids`"),
+    "V04_FACADE_START_GUIDANCE", "assurance start guidance must protect runner-owned check IDs");
   const surface = createAssuranceFacadeToolSurface({
     toolFactory: fakeToolFactory(),
     bridge: Object.freeze({}),

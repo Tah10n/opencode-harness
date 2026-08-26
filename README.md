@@ -4,7 +4,7 @@
 
 Risk-adaptive OpenCode engineering profiles.
 
-`core` is the small production default: project-aware inspect, edit, targeted
+`core` is the small development default: project-aware inspect, edit, targeted
 verification, and final-diff review without a quality lifecycle or mandatory
 subagents. Install it from a clean tracked checkout with the deterministic
 materializer:
@@ -15,26 +15,40 @@ npm run profile:materialize -- --profile core --output /path/to/profile
 
 Choose `deep` explicitly for broad audits, large diffs, long logs, or
 multi-module investigations that benefit from bounded read-only context and up
-to three focused explorers. Choose experimental `assurance` explicitly with
-`/assure` only for security, authorization, migrations, durable state,
-shared-state concurrency, destructive data changes, or critical public
-contracts. Neither mode is silently activated by `core`.
+to three focused explorers. Legacy `assurance` is retained only for historical
+research and replay; it is not a recommended high-risk product workflow.
+Neither mode is silently activated by `core`.
 
 | Profile | Status | Adds | Excludes |
 | --- | --- | --- | --- |
 | `plain` | Benchmark baseline | Built-in coding agent | Harness prompts and lifecycle |
-| `core` | Production default | Compact rules and direct verification loop | Recursive context, quality state, learning writes, lab |
+| `core` | Unpromoted development default | Compact rules and host-owned verification gate | Recursive context, quality state, learning writes, lab |
 | `deep` | Optional | Bounded context and focused read-only exploration | Quality lifecycle and mutation gate |
-| `assurance` | Experimental opt-in | Four-operation facade over fail-closed v0.3 controls | Benchmark corpus and evaluation reports |
+| `assurance` | Deprecated research-only | Four-operation compatibility facade over v0.3 controls | Product recommendations and release claims |
 | `lab` | Developer bundle, not an agent | Profile-transition experiments, fixtures, statistics, replay, traces | User runtime claims |
 
-Materialize `deep` or `assurance` by changing `--profile`; add `--dry-run` to
-inspect the stable manifest and fingerprint first. Existing output is refused
-unless it is an unchanged managed bundle and `--force` is explicit.
+Materialize `deep`, or legacy `assurance` for research reproduction, by
+changing `--profile`; add `--dry-run` to inspect the stable manifest and
+fingerprint first. Existing output is refused unless it is an unchanged managed
+bundle and `--force` is explicit.
 
 The output is an OpenCode configuration directory, not a project workspace.
-Run OpenCode in the target project and point `OPENCODE_CONFIG_DIR` at the
-materialized directory. An assurance workspace keeps its project-owned
+Point `OPENCODE_CONFIG_DIR` at the materialized directory and start `core`
+through its required verification launcher:
+
+```sh
+OPENCODE_CONFIG_DIR=/path/to/profile \
+  node /path/to/profile/runtime/opencode-core.mjs \
+  --workspace /path/to/project -- run
+```
+
+The launcher resolves the required project-owned trusted-check catalog with
+`git rev-parse --git-path opencode-harness/core/checks.json` (including linked
+worktrees), seals its repository and file identity, invalidates verification after each
+new mutation, and blocks a successful process status after failed, unavailable,
+infrastructure-failed, stale verification, or unverified process-tree teardown.
+The final snapshot occurs only after verified zero-descendant containment. A missing applicable check is
+reported separately and is not verification activation. An assurance workspace keeps its project-owned
 `.opencode/quality/checks.json` and `toolchains.json`; the config directory
 keeps the host-owned `plugins/quality-toolchains.host.v1.json`. The materializer
 never invents machine identities and preserves that reserved host file across
@@ -64,9 +78,9 @@ runtime evidence remains `blocked-unproven` and is never scored.
 
 The source default changes from `orchestrator` to `core`. Historical
 `profile-only` and `instrumented` definitions and readers remain replay-only
-compatibility surfaces. Use `deep` for the former broad-context use case and
-explicit `assurance` for the latter high-risk lifecycle. The old complete
-portable bundle remains documented below as the legacy/lab source closure;
+compatibility surfaces. Use `deep` for the former broad-context use case; the
+legacy high-risk lifecycle is retained for research rather than recommended.
+The old complete portable bundle remains documented below as the legacy/lab source closure;
 new installations should use the v3 materializer.
 
 Development status: this checkout targets unreleased `0.4.0`. The latest
@@ -130,6 +144,7 @@ same list can be checked mechanically against the isolated adoption smoke.
 
 <!-- portable-adoption-bundle:start -->
 ```text
+.opencode/assurance
 .opencode/plugins/engineering-dossier.mjs
 .opencode/quality/checks.json
 .opencode/quality/toolchains.json
@@ -153,6 +168,7 @@ examples
 fixtures
 lib/benchmark
 lib/feedback
+lib/profile-v3.mjs
 lib/quality
 native
 opencode.json
@@ -160,6 +176,7 @@ package-lock.json
 package.json
 profiles
 quality
+runtime
 scripts
 skills
 ```

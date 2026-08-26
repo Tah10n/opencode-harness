@@ -6,9 +6,11 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 import {
   buildOpenCodeArgv,
+  buildSyntheticQualityContinuationPrompt,
   classifyOpenCodeStructuredProviderFailure,
   DEFAULT_OPENCODE_STDOUT_LIMIT,
   executeOpenCodeAdapter,
+  isSyntheticQualityProfileId,
   assertSyntheticOpenCodeExecutableIdentity,
   MINIMUM_SUPPORTED_OPENCODE_VERSION,
   parseOpenCodeJsonl,
@@ -64,6 +66,41 @@ import {
 import { createInjectedTestContainmentFactory } from "./injected-test-containment.mjs";
 
 const defaultRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+
+function qualityProfileIdentityFixtures() {
+  assert.equal(isSyntheticQualityProfileId("instrumented"), true);
+  assert.equal(isSyntheticQualityProfileId("P5"), true);
+  for (const profileId of ["plain", "profile-only", "P0", "P1", "P2", "P3", "P4"]) {
+    assert.equal(isSyntheticQualityProfileId(profileId), false, profileId);
+  }
+  const facadeContinuation = buildSyntheticQualityContinuationPrompt(
+    "started_incomplete",
+    0,
+    { recommended_action_tool_id: "quality_verification_record" },
+    "P5",
+  );
+  assert.match(facadeContinuation, /quality_assurance_advance/u);
+  assert.match(facadeContinuation, /never call quality_verification_record directly/u);
+  assert.doesNotMatch(facadeContinuation, /call quality_dossier_inspect/u);
+  const facadeRegistration = buildSyntheticQualityContinuationPrompt(
+    "registration_only",
+    0,
+    {},
+    "P5",
+  );
+  for (const field of ["risk_class", "task_type", "user_visible_goal", "ownership_paths", "classification_rationale", "behavior_expectation", "expected_preserved_behavior", "known_local_edge_cases", "scope_facts", "unresolved_unknowns"]) {
+    assert.match(facadeRegistration, new RegExp(field, "u"));
+  }
+  assert.match(facadeRegistration, /Do not include required_check_ids, dossier, or guessed fields/u);
+  const legacyContinuation = buildSyntheticQualityContinuationPrompt(
+    "started_incomplete",
+    0,
+    { recommended_action_tool_id: "quality_verification_record" },
+    "instrumented",
+  );
+  assert.match(legacyContinuation, /call quality_dossier_inspect once/u);
+  return 9;
+}
 
 function executableResolutionFixtures() {
   const fixtureRoot = createConfinedTemporaryDirectory("opencode-executable-resolution-", {
@@ -228,6 +265,7 @@ function fakeOpenCodeSource({
   stderrChunks = [],
   expectedAuthRefresh = null,
   rotateAuthRecord = null,
+  continuationStream = "",
 } = {}) {
   const descendantSource = descendantMarker === null
     ? null
@@ -251,6 +289,7 @@ function fakeOpenCodeSource({
     `const stderrChunks = ${JSON.stringify(stderrChunks)};`,
     `const expectedAuthRefresh = ${JSON.stringify(expectedAuthRefresh)};`,
     `const rotateAuthRecord = ${JSON.stringify(rotateAuthRecord)};`,
+    `const continuationStream = ${JSON.stringify(Buffer.from(continuationStream).toString("base64"))};`,
     "if (args[0] === '--version') {",
     versionMode === "timeout"
       ? "  setInterval(() => {}, 60_000);"
@@ -301,6 +340,10 @@ function fakeOpenCodeSource({
     "  writeNext();",
     "}",
     "else if (mode === 'stderr-limit') { process.stderr.write('x'.repeat(4096)); setInterval(() => {}, 60_000); }",
+    "else if (mode === 'missing-final-then-final') {",
+    "  const selected = args.includes('--session') ? continuationStream : " + JSON.stringify(Buffer.from(stream).toString("base64")) + ";",
+    "  process.stdout.write(Buffer.from(selected, 'base64'));",
+    "}",
     "else {",
     `  process.stdout.write(Buffer.from(${JSON.stringify(Buffer.from(stream).toString("base64"))}, 'base64'));`,
     "}",
@@ -708,6 +751,27 @@ function parserFixtures(root) {
   assert.equal(failedVerification.trace_summary.targeted_verification_observed, false);
   assert.equal(failedVerification.trace_events[0].status, "failed");
 
+  const failedPatchDiagnostic = parseOpenCodeJsonl(jsonl(
+    JSON.stringify({
+      type: "tool_use",
+      part: {
+        id: "patch-failed",
+        type: "tool",
+        tool: "apply_patch",
+        state: {
+          status: "error",
+          input: { patchText: "private patch content" },
+          error: "Failed to find expected lines in fixture source",
+        },
+      },
+    }),
+    finalEvent(),
+  ));
+  assert.deepEqual(failedPatchDiagnostic.trace_summary.tool_name_state_sequence[0].error_codes,
+    ["BENCHMARK_TOOL_PATCH_CONTEXT_MISMATCH"]);
+  assert.equal(JSON.stringify(failedPatchDiagnostic).includes("private patch content"), false);
+  assert.equal(JSON.stringify(failedPatchDiagnostic).includes("fixture source"), false);
+
   const staleVerification = parseOpenCodeJsonl(jsonl(
     toolEvent({ id: "verify-before", tool: "bash", input: { command: "node --test test/app.test.mjs" } }),
     toolEvent({ id: "edit-after", tool: "edit", input: { filePath: "src/app.mjs" } }),
@@ -803,6 +867,13 @@ function parserFixtures(root) {
   assert.equal(qualityMetadataIsNotTaskAction.transient_observations.observed_fix_command_count, 0);
   assert.equal(qualityMetadataIsNotTaskAction.transient_observations.observed_control_path_action_count, 0);
   assert.deepEqual(qualityMetadataIsNotTaskAction.transient_observations.accessed_path_fingerprints, []);
+  const unknownIdentifiers = parseOpenCodeJsonl(jsonl(
+    JSON.stringify({ type: "future_event", sessionID: "ses_unknown" }),
+    toolEvent({ id: "unknown-tool", tool: "future_tool", input: {} }),
+  ));
+  assert.equal(unknownIdentifiers.status, "unknown_event");
+  assert.deepEqual(unknownIdentifiers.trace_summary.unknown_event_types, ["future_event"]);
+  assert.deepEqual(unknownIdentifiers.trace_summary.unknown_tool_ids, ["future_tool"]);
   for (const toolId of SUPPORTED_SYNTHETIC_OPENCODE_TOOL_IDS) {
     const supported = parseOpenCodeJsonl(jsonl(
       toolEvent({ id: `supported-${toolId}`, tool: toolId }),
@@ -1820,6 +1891,30 @@ async function executionFixtures(root, plainProfile, instrumentedProfile) {
   const missingFinalCli = writeFakeOpenCode(fixtureRoot, "fake-opencode-missing-final", {
     stream: jsonl(JSON.stringify({ type: "step_finish", part: {} })),
   });
+  const finalContinuationSession = "ses_final_continuation_fixture";
+  const finalContinuationCli = writeFakeOpenCode(fixtureRoot, "fake-opencode-final-continuation", {
+    mode: "missing-final-then-final",
+    stream: jsonl(JSON.stringify({
+      type: "step_finish",
+      sessionID: finalContinuationSession,
+      part: {},
+    })),
+    continuationStream: jsonl(finalEvent(
+      "Completed the requested change; targeted checks passed.",
+      "final-after-continuation",
+      finalContinuationSession,
+    )),
+  });
+  const repeatedMissingFinalStream = jsonl(JSON.stringify({
+    type: "step_finish",
+    sessionID: finalContinuationSession,
+    part: {},
+  }));
+  const repeatedMissingFinalCli = writeFakeOpenCode(fixtureRoot, "fake-opencode-repeated-missing-final", {
+    mode: "missing-final-then-final",
+    stream: repeatedMissingFinalStream,
+    continuationStream: repeatedMissingFinalStream,
+  });
   const invalidFinalCli = writeFakeOpenCode(fixtureRoot, "fake-opencode-invalid-final", {
     stream: jsonl(finalEvent("ordinary prose")),
   });
@@ -2447,6 +2542,53 @@ async function executionFixtures(root, plainProfile, instrumentedProfile) {
     assert.equal(missingFinal.trace_summary.stream_complete, true);
     assert.equal(missingFinal.transient_observations.observation_complete, true);
 
+    const finalResponseInvocations = [];
+    const finalResponseSpawn = (executable, args, options) => {
+      finalResponseInvocations.push([...args]);
+      return spawn(executable, args, options);
+    };
+    const finalContinuation = await executeOpenCodeAdapter(baseInput, {
+      executable: process.execPath,
+      executableArgsPrefix: [finalContinuationCli],
+      spawnImpl: finalResponseSpawn,
+    });
+    assert.equal(finalContinuation.passed, true, JSON.stringify(finalContinuation, null, 2));
+    assert.equal(finalContinuation.status, "completed");
+    assert.equal(finalContinuation.parser_status, "valid");
+    assert.equal(finalContinuation.model_turn_count, 2);
+    assert.equal(finalContinuation.continuation_turn_count, 1);
+    const finalContinuationRuns = finalResponseInvocations
+      .filter((args) => args[0] === finalContinuationCli && args.includes("run"));
+    assert.equal(finalContinuationRuns.length, 2);
+    assert.equal(finalContinuationRuns[0].includes("--session"), false);
+    assert.equal(finalContinuationRuns[1].includes("--session"), true);
+    assert.equal(
+      finalContinuationRuns[1][finalContinuationRuns[1].indexOf("--session") + 1],
+      finalContinuationSession,
+    );
+    const finalContinuationPrompt = finalContinuationRuns[1][finalContinuationRuns[1].indexOf("run") + 1];
+    assert.match(finalContinuationPrompt, /Do not call tools or make further changes/u);
+    assert.match(finalContinuationPrompt, /truthful final response/u);
+    assert.equal(assertNeutralSyntheticModelVisibleValue(
+      finalContinuationPrompt,
+      "final response continuation prompt",
+    ), true);
+
+    const repeatedMissingFinalInvocationStart = finalResponseInvocations.length;
+    const repeatedMissingFinal = await executeOpenCodeAdapter(baseInput, {
+      executable: process.execPath,
+      executableArgsPrefix: [repeatedMissingFinalCli],
+      spawnImpl: finalResponseSpawn,
+    });
+    assert.equal(repeatedMissingFinal.passed, false);
+    assert.equal(repeatedMissingFinal.reason, "opencode_missing_final");
+    assert.equal(repeatedMissingFinal.model_turn_count, 2);
+    assert.equal(repeatedMissingFinal.continuation_turn_count, 1);
+    const repeatedMissingFinalRuns = finalResponseInvocations
+      .slice(repeatedMissingFinalInvocationStart)
+      .filter((args) => args[0] === repeatedMissingFinalCli && args.includes("run"));
+    assert.equal(repeatedMissingFinalRuns.length, 2, "missing final may receive exactly one continuation");
+
     const ordinaryJsonFinal = await executeOpenCodeAdapter(baseInput, {
       executable: process.execPath,
       executableArgsPrefix: [invalidFinalCli],
@@ -2649,6 +2791,7 @@ async function executionFixtures(root, plainProfile, instrumentedProfile) {
     });
     assert.equal(providerMismatch.status, "failed");
     assert.equal(providerMismatch.reason, "invalid_adapter_input");
+    assert.equal(providerMismatch.validation_error_code, "SYNTHETIC_ADAPTER_INPUT");
 
     const timedOut = await executeOpenCodeAdapter(baseInput, {
       executable: process.execPath,
@@ -3153,7 +3296,7 @@ export async function verifyBenchmarkAdapter({ root = defaultRoot } = {}) {
   await credentialBoundaryFixtures();
   await trustedCheckBrokerFixtures();
   const profiles = profileFixtures(root);
-  let lifecycleFixtureCount = executableResolutionFixtures();
+  let lifecycleFixtureCount = executableResolutionFixtures() + qualityProfileIdentityFixtures();
   try {
     lifecycleFixtureCount += await executionFixtures(root, profiles.plain, profiles.instrumented);
     lifecycleFixtureCount += await productionCompositionFixtures(root, profiles.plain);

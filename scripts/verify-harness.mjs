@@ -355,6 +355,8 @@ const requiredFiles = [
   "benchmarks/synthetic/schemas/replay-report.v3.schema.json",
   "benchmarks/synthetic/schemas/replay-report.v4.schema.json",
   "benchmarks/synthetic/templates.v1.json",
+  "benchmarks/calibration/paired-defects-p0-p52.blinded.v1.json",
+  "benchmarks/calibration/paired-defects-p0-p52.answers.v1.json",
   "adoption/schemas/adoption-bundle.schema.json",
   "adoption/core.v1.json",
   "adoption/quality.v1.json",
@@ -378,6 +380,11 @@ const requiredFiles = [
   "lib/benchmark/statistics.mjs",
   "lib/feedback/contracts.mjs",
   "lib/feedback/evidence.mjs",
+  "lib/benchmark/paired-defect-evaluator.mjs",
+  "runtime/core-verification-gate.mjs",
+  "runtime/core-verification-runtime.mjs",
+  "runtime/opencode-core.mjs",
+  "lib/quality/core-verification-gate.mjs",
   "lib/quality/milestone-dod.mjs",
   "lib/quality/normal-session-bridge.mjs",
   "lib/quality/normal-session-plugin.mjs",
@@ -414,6 +421,12 @@ const requiredFiles = [
   "scripts/verify-benchmark-isolation.mjs",
   "scripts/verify-benchmark-model-free-contract.mjs",
   "scripts/verify-benchmark-model-free.mjs",
+  "scripts/verify-benchmark-paired-defects.mjs",
+  "scripts/verify-paired-defect-calibration.mjs",
+  "scripts/verify-core-verification-gate.mjs",
+  "scripts/verify-core-product-runtime.mjs",
+  "scripts/verify-core-product-installed-runtime.mjs",
+  "scripts/verify-core-verification-runner.mjs",
   "scripts/verify-benchmark-renderer.mjs",
   "scripts/verify-benchmark-reporting.mjs",
   "scripts/verify-benchmark-runner.mjs",
@@ -546,7 +559,7 @@ for (const forbiddenScript of ["assess:quality-candidate", "verify:model-profile
   }
 }
 const expectedDeterministicStages = [
-  "verify:v0.4", "verify:static", "verify:benchmark:model-free", "verify:feedback-foundation", "verify:trace-store", "verify:report-history", "verify:adapter-worker",
+  "verify:v0.4", "verify:static", "verify:benchmark:model-free", "verify:evaluator:paired-defects", "verify:calibration:paired-defects", "verify:core-verification-gate", "verify:core-product-runtime", "verify:core-verification-runner", "verify:feedback-foundation", "verify:trace-store", "verify:report-history", "verify:adapter-worker",
   "eval", "verify:drift", "verify:adoption-bundle", "verify:package-boundary", "verify:runtime:fixture", "verify:runtime:quality-hooks:fixture",
   "verify:live-eval", "verify:acceptance",
   "verify:quality-contracts", "verify:engineering-dossier", "verify:architecture-policy", "verify:impact-graph",
@@ -754,6 +767,12 @@ for (const [name, command] of Object.entries({
   "verify:benchmark:comparison-reporting": "node scripts/verify-benchmark-comparison-reporting.mjs",
   "verify:benchmark:isolation": "node scripts/verify-benchmark-isolation.mjs",
   "verify:benchmark:model-free": "node scripts/verify-benchmark-model-free.mjs",
+  "verify:evaluator:paired-defects": "node scripts/verify-benchmark-paired-defects.mjs",
+  "verify:calibration:paired-defects": "node scripts/verify-paired-defect-calibration.mjs",
+  "verify:core-verification-gate": "node scripts/verify-core-verification-gate.mjs",
+  "verify:core-product-runtime": "node scripts/verify-core-product-runtime.mjs",
+  "verify:core-product-installed-runtime": "node scripts/verify-core-product-installed-runtime.mjs",
+  "verify:core-verification-runner": "node scripts/verify-core-verification-runner.mjs",
   "verify:benchmark:contracts": "node scripts/verify-benchmark-contracts.mjs",
   "verify:benchmark:renderer": "node scripts/verify-benchmark-renderer.mjs",
   "verify:benchmark:reporting": "node scripts/verify-benchmark-reporting.mjs",
@@ -900,7 +919,7 @@ if (configModelConfiguration.length > 0) {
   );
 }
 if (config.default_agent !== "core") {
-  fail("HARNESS-S016", "opencode.json default_agent must be core", "Restore the minimal production-default core agent.");
+  fail("HARNESS-S016", "opencode.json default_agent must be core", "Restore the minimal development-default core agent.");
 }
 for (const commandName of ["review-diff", "diagnose", "workflow", "harness-release-review"]) {
   if (!config.command?.[commandName]) {
@@ -1937,7 +1956,7 @@ const agentsPolicy = read("AGENTS.md");
 for (const needle of [
   "Small local tasks stay single-agent",
   "`deep` is optional",
-  "`assurance` is experimental and opt-in",
+  "`assurance` is a deprecated research-only compatibility profile",
   "Missing optional context tools",
   "never block an ordinary task",
   "Model-free and structural checks do not prove model-backed behavior",

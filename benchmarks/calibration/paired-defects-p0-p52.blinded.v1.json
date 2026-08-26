@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "calibration_id": "paired-defect-archive-blinded-v1",
+  "evidence_use": "calibration-only-not-confirmatory",
+  "cases": [
+    {
+      "case_id": "archive-example-a",
+      "baseline": {
+        "functional_task_success": true,
+        "scope_violation": false,
+        "findings": []
+      },
+      "candidate": {
+        "functional_task_success": false,
+        "scope_violation": false,
+        "findings": [
+          {
+            "finding_id": "candidate-display-a",
+            "family": "opaque-family-a",
+            "violated_contract": "opaque-contract-a",
+            "evidence_source": {
+              "kind": "manual-calibration",
+              "source_id": "preserved-example-a",
+              "path": null,
+              "summary": "A preserved blinded example records a candidate-only medium defect."
+            },
+            "severity": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "archive-example-b",
+      "baseline": {
+        "functional_task_success": false,
+        "scope_violation": false,
+        "findings": [
+          {
+            "finding_id": "baseline-display-b",
+            "family": "opaque-family-b",
+            "violated_contract": "opaque-contract-b",
+            "evidence_source": {
+              "kind": "manual-calibration",
+              "source_id": "preserved-example-b",
+              "path": null,
+              "summary": "A preserved blinded example records a baseline-only high defect."
+            },
+            "severity": "high"
+          }
+        ]
+      },
+      "candidate": {
+        "functional_task_success": true,
+        "scope_violation": false,
+        "findings": []
+      }
+    }
+  ]
+}

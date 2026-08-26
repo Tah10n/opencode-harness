@@ -4,9 +4,9 @@
 
 | Layer | Default? | Model-visible runtime | Primary responsibility |
 | --- | --- | --- | --- |
-| `core` | Yes | Compact rules, core agent, optional reviewer | Ordinary inspect/edit/verify/review work |
+| `core` | Yes; unpromoted | Compact rules, core agent, host-owned verification | Ordinary inspect/edit/verify/review work |
 | `deep` | No | Core plus bounded read-only context workflow | Broad discovery with one integrator |
-| `assurance` | No; experimental | Deep plus four high-level quality operations | Fail-closed high-risk mutation and attestation |
+| `assurance` | No; deprecated research-only | Legacy four-operation compatibility facade | Historical high-risk lifecycle reproduction |
 | `lab` | Never | None | Benchmarks, evaluation, replay, traces, and research |
 
 Controls in the legacy matrix below are inventories, not one mandatory

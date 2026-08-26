@@ -82,13 +82,13 @@ deep work and do not justify an unsupported completeness claim.
 
 `deep` does not include an Engineering Dossier, context-receipt chain,
 runner-computed context-sufficiency gate, mutation authorization, trusted-check
-lifecycle, reconciliation, or attestation. Those controls belong only to the
-explicit experimental `assurance` profile.
+lifecycle, reconciliation, or attestation. Those controls remain only in the
+deprecated research-only `assurance` compatibility profile.
 
-A deep investigation may recommend assurance when it finds security,
-authorization, migration, durable persistence, shared-state concurrency,
-destructive-data, or critical-public-contract risk. It may not start assurance
-automatically unless an explicit project-local policy already selected it.
+A deep investigation must not recommend legacy assurance for product work. If
+it finds security, authorization, migration, durable persistence, shared-state
+concurrency, destructive-data, or critical-public-contract risk, it follows
+project-owned controls or reports that no promoted harness mode covers the risk.
 
 The former v0.3 automatic orchestrator/instrumented workflow is preserved for
 historical replay in

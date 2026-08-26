@@ -15,8 +15,8 @@
       "AGENTS.md",
       "agents/core.md"
     ],
-    "hard_cap_characters": 16000,
-    "target_characters": 10000,
+    "hard_cap_characters": 8000,
+    "target_characters": 7000,
     "encoding": "utf-8-code-points"
   },
   "facades": [
@@ -83,7 +83,7 @@
   "components": [
     {
       "id": "core-rules",
-      "status": "production",
+      "status": "development-candidate",
       "target_metric": "functional_hidden_check_success",
       "intervention_path": "benchmarks/vnext/components/core-rules.md",
       "intervention_vector": {
@@ -95,18 +95,17 @@
     },
     {
       "id": "targeted-verification",
-      "status": "production",
+      "status": "development-candidate",
       "target_metric": "verification_omission",
       "intervention_path": "benchmarks/vnext/components/targeted-verification.md",
       "intervention_vector": {
         "prompt_fragments": [
           "benchmarks/vnext/components/targeted-verification.md",
-          "agents/core.md",
-          "agents/core-reviewer.md"
+          "agents/core.md"
         ],
-        "roles": ["primary-core", "read-only-reviewer"],
-        "tools": ["task"],
-        "permissions": ["task:read-only-reviewer"]
+        "roles": ["primary-core"],
+        "tools": [],
+        "permissions": ["host:trusted-project-check"]
       }
     },
     {
@@ -239,14 +238,14 @@
     },
     {
       "id": "core",
-      "status": "production-default",
+      "status": "development-default",
       "runtime": true,
       "primary_role_id": "core",
       "component_ids": [
         "core-rules",
         "targeted-verification"
       ],
-      "delegation_limit": 1,
+      "delegation_limit": 0,
       "quality_surface": "none"
     },
     {
@@ -265,7 +264,7 @@
     },
     {
       "id": "assurance",
-      "status": "experimental-opt-in",
+      "status": "deprecated-research-only",
       "runtime": true,
       "primary_role_id": "assurance",
       "component_ids": [
@@ -316,6 +315,8 @@
         { "source": "LICENSE", "target": "LICENSE" },
         { "source": "README.md", "target": "README.md" },
         { "source": "profiles/config/core.opencode.json", "target": "opencode.json" },
+        { "source": "runtime", "target": "runtime" },
+        { "source": "lib/feedback/process-containment.mjs", "target": "runtime/process-containment.mjs" },
         { "source": "agents/core.md", "target": "agents/core.md" },
         { "source": "agents/core-reviewer.md", "target": "agents/core-reviewer.md" },
         { "source": "skills/global-debugging", "target": "skills/global-debugging" },
@@ -346,6 +347,8 @@
         { "source": "LICENSE", "target": "LICENSE" },
         { "source": "README.md", "target": "README.md" },
         { "source": "profiles/config/deep.opencode.json", "target": "opencode.json" },
+        { "source": "runtime", "target": "runtime" },
+        { "source": "lib/feedback/process-containment.mjs", "target": "runtime/process-containment.mjs" },
         { "source": "agents/core.md", "target": "agents/core.md" },
         { "source": "agents/core-reviewer.md", "target": "agents/core-reviewer.md" },
         { "source": "agents/deep.md", "target": "agents/deep.md" },
@@ -380,6 +383,8 @@
         { "source": "LICENSE", "target": "LICENSE" },
         { "source": "README.md", "target": "README.md" },
         { "source": "profiles/config/assurance.opencode.json", "target": "opencode.json" },
+        { "source": "runtime", "target": "runtime" },
+        { "source": "lib/feedback/process-containment.mjs", "target": "runtime/process-containment.mjs" },
         { "source": "agents/core.md", "target": "agents/core.md" },
         { "source": "agents/core-reviewer.md", "target": "agents/core-reviewer.md" },
         { "source": "agents/deep.md", "target": "agents/deep.md" },
@@ -428,6 +433,8 @@
         { "source": "lib/feedback", "target": "lib/feedback" },
         { "source": "lib/quality", "target": "lib/quality" },
         { "source": "lib/profile-v3.mjs", "target": "lib/profile-v3.mjs" },
+        { "source": "runtime", "target": "runtime" },
+        { "source": "lib/feedback/process-containment.mjs", "target": "runtime/process-containment.mjs" },
         { "source": "native", "target": "native" },
         { "source": "profiles", "target": "profiles" },
         { "source": "quality", "target": "quality" },

@@ -1,5 +1,6 @@
-After the last mutation, run the narrowest relevant available project check.
-Report passed, failed, unavailable, and unverified checks separately.
-This arm is byte-bound to the production `core` agent and its already available
-read-only reviewer role. The reviewer remains optional here; reviewer
-availability is held constant for the next compound profile transition.
+Host-owned verification component. The runner tracks mutation revision,
+selects the narrowest applicable trusted project check by catalog-owned ID,
+invalidates prior verification after a new mutation, and blocks terminal
+success until the final workspace is passed or no trusted check applies.
+Executable and argv remain outside model control. Reviewer behavior is absent
+from this arm and evaluated separately.
