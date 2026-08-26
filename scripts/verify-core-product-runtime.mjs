@@ -6,6 +6,7 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { materializeProfileBundleV3 } from "../lib/profile-v3.mjs";
+import { runContainedOpenCode } from "../runtime/opencode-core.mjs";
 import {
   changedCoreWorkspacePaths,
   loadCoreVerificationCatalog,
@@ -49,6 +50,24 @@ function check(overrides = {}) {
     timeout_ms: 10_000,
     ...overrides,
   };
+}
+
+function injectedProcessGroupContainment(worker) {
+  let closed = false;
+  const terminateAndVerify = async () => {
+    if (!closed) {
+      try { process.kill(-worker.pid, "SIGKILL"); } catch (error) { if (error?.code !== "ESRCH") throw error; }
+      await new Promise((resolve) => worker.once("close", resolve));
+      closed = true;
+    }
+    return true;
+  };
+  return Object.freeze({
+    support_state: "verified",
+    status: () => Object.freeze({ teardown_verified: closed }),
+    terminateAndVerify,
+    close: terminateAndVerify,
+  });
 }
 
 try {
@@ -250,6 +269,22 @@ try {
   assert.equal(linkedCatalog.catalog_status, "loaded");
   assert.equal(linkedCatalog.workspace_root, fs.realpathSync.native(linkedWorktree));
   assert.equal(linkedCatalog.catalog_path.includes(`${path.sep}worktrees${path.sep}`), true);
+
+  if (process.platform !== "win32") {
+    const delayedMarker = path.join(temporaryRoot, "delayed-background-marker.txt");
+    const grandchildSource = `setTimeout(() => require("node:fs").writeFileSync(${JSON.stringify(delayedMarker)}, "late"), 500)`;
+    const parentSource = `const {spawn}=require("node:child_process"); const child=spawn(process.execPath,["-e",${JSON.stringify(grandchildSource)}],{stdio:"ignore"}); child.unref();`;
+    const contained = await runContainedOpenCode({
+      file: process.execPath,
+      args: ["-e", parentSource],
+      cwd: workspace,
+      env: process.env,
+      processContainmentFactory: async (worker) => injectedProcessGroupContainment(worker),
+    });
+    assert.equal(contained.status, 0);
+    await new Promise((resolve) => setTimeout(resolve, 750));
+    assert.equal(fs.existsSync(delayedMarker), false, "delayed descendant mutated after final teardown snapshot boundary");
+  }
 
   const materializedRoot = path.join(temporaryRoot, "materialized-core");
   const materialized = materializeProfileBundleV3({

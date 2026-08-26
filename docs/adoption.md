@@ -39,9 +39,11 @@ Provision runner-owned core checks at
 contains `schema_version`, `catalog_id`, and `checks`; each check contains
 `check_id`, repository-relative `scope_prefixes`, `cost_rank`, an absolute
 `executable_path`, bounded `argv`, repository-relative `cwd`, and `timeout_ms`.
-The launcher seals the catalog before OpenCode starts. A missing catalog or no
-relevant check is reported as `no_applicable_trusted_check` with activation
-false; it is not counted as verification activation. Check output is not
+The launcher resolves that path with trusted `git rev-parse --git-path`, binds
+the repository/worktree identity, and seals the catalog before OpenCode starts.
+A missing required catalog fails closed; only an explicitly optional catalog or
+no relevant check is reported as `no_applicable_trusted_check` with activation
+false. Check output is not
 persisted, and this runtime creates no Engineering Dossier, receipt store,
 assurance state, quality lifecycle, or learning state.
 
@@ -60,7 +62,11 @@ bundle after an interrupted rename. A live owner remains busy; only a
 provably dead owner may be recovered, and an unknown or inconsistent lock
 remains a hard failure. Core requires Node.js 24 both for materialization and
 for the small materialized verification launcher. The runtime uses only Node
-built-ins and the three files under `runtime/`; it does not depend on
+foundations and the four files materialized under `runtime/`; the fourth is the
+reviewed platform containment controller copied into the bundle. The launcher
+requires verified Windows Job Object, Linux cgroup-v2, or macOS exclusive-UID
+containment and proves zero descendants before its final workspace snapshot. It
+does not depend on
 `lib/benchmark`, `lib/quality`, Engineering Dossier, assurance, or learning.
 
 `deep` requires no assurance plugin and falls back to ordinary bounded
