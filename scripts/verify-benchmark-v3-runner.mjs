@@ -9,6 +9,8 @@ import { canonicalJson, fingerprint } from "../lib/feedback/contracts.mjs";
 import { assertBenchmarkV3CapabilityAuthorization, authorizeBenchmarkV3Capabilities,
   benchmarkV3ReadinessEnvironment, validateBenchmarkV3ReadinessReceipt } from "../lib/benchmark/v3-readiness.mjs";
 import { verifyBenchmarkV3SplitDistribution } from "../lib/benchmark/v3-split-assignment.mjs";
+import { benchmarkV3CampaignLeasePath, benchmarkV3LeaseTargetFingerprint,
+  performBenchmarkV3LeaseTakeover } from "../lib/benchmark/v3-lease-takeover.mjs";
 
 import { materializeProfileBundleV3 } from "../lib/profile-v3.mjs";
 import { captureBenchmarkV3Workspace, loadBenchmarkV3Corpus } from "../lib/benchmark/v3-corpus.mjs";
@@ -88,7 +90,7 @@ try {
       signature: sign(null, Buffer.from(canonicalJson(capabilityBody), "utf8"), privateKey).toString("base64url") }), { mode: 0o600 });
     capabilityPaths[capability] = capabilityPath;
   }
-  const authorization = authorizeBenchmarkV3Capabilities(capabilityPaths, { sourceRoot: root, trustedIssuers: [issuer] });
+  const authorization = authorizeBenchmarkV3Capabilities(capabilityPaths, { sourceRoot: root, trustedIssuers: [issuer], scope: "holdout" });
   assert.match(authorization.authorization_fingerprint, /^sha256:[0-9a-f]{64}$/u);
   assert.throws(() => assertBenchmarkV3CapabilityAuthorization(authorization, { now: authorization.expires_at_ms }), /fresh/u,
     "campaign attempts must not outlive capability evidence");
@@ -157,22 +159,27 @@ try {
     capability: body.capability, sourceRoot: root, trustedIssuers: [issuer],
   }));
   }
-  const readySpoof = spawnSync(process.execPath, [path.join(root, "scripts", "verify-benchmark-v3-campaign-readiness.mjs")], {
+  const readySpoof = spawnSync(process.execPath, [path.join(root, "scripts", "verify-benchmark-v3-development-readiness.mjs")], {
     cwd: root, encoding: "utf8", env: { ...process.env, OPENCODE_QUALITY_PROCESS_CONTAINMENT_READY: "1",
       BENCHMARK_V3_HIDDEN_NAMESPACE_ISOLATION_READY: "1", BENCHMARK_V3_PROVIDER_ONLY_EGRESS_READY: "1" },
   });
   assert.equal(readySpoof.status, 2);
   assert.equal(JSON.parse(readySpoof.stdout).reasons.some((entry) => entry.code === "PROCESS_CONTAINMENT_UNAVAILABLE"), true);
-  const holdoutPathSpoof = spawnSync(process.execPath, [path.join(root, "scripts", "verify-benchmark-v3-campaign-readiness.mjs")], {
+  const holdoutPathSpoof = spawnSync(process.execPath, [path.join(root, "scripts", "verify-benchmark-v3-holdout-readiness.mjs")], {
     cwd: root, encoding: "utf8", env: { ...process.env, BENCHMARK_V3_SEALED_HOLDOUT_ROOT: os.tmpdir() },
   });
   assert.equal(holdoutPathSpoof.status, 2);
-  assert.equal(JSON.parse(holdoutPathSpoof.stdout).reasons.some((entry) => entry.code === "EXTERNAL_SEALED_HOLDOUT_POST_FREEZE_REQUIRED"), true,
+  assert.equal(JSON.parse(holdoutPathSpoof.stdout).reasons.some((entry) => entry.code === "SIGNED_EXTERNAL_HOLDOUT_UNAVAILABLE"), true,
     "an arbitrary external directory must never satisfy the sealed holdout gate");
 } finally { fs.rmSync(readinessRoot, { recursive: true, force: true }); }
 const registryFixture = fs.mkdtempSync(path.join(os.tmpdir(), "v3-campaign-registry-"));
+const registryFixtureSecondWorktree = `${registryFixture}-container-two`;
 try {
   assert.equal(spawnSync("git", ["init", "--quiet"], { cwd: registryFixture }).status, 0);
+  fs.writeFileSync(path.join(registryFixture, "fixture.txt"), "shared git fixture\n");
+  assert.equal(spawnSync("git", ["add", "fixture.txt"], { cwd: registryFixture }).status, 0);
+  assert.equal(spawnSync("git", ["-c", "user.name=Benchmark V3", "-c", "user.email=benchmark-v3@example.invalid",
+    "commit", "--quiet", "-m", "fixture"], { cwd: registryFixture }).status, 0);
   const campaignFingerprint = `sha256:${"c".repeat(64)}`;
   const initialLedger = Object.freeze({ ledger_fingerprint: `sha256:${"d".repeat(64)}` });
   const output = path.join(registryFixture, "outputs", "campaign-one");
@@ -196,6 +203,27 @@ try {
     process_start_fingerprint: fingerprint({ deliberately: "wrong-start-identity" }),
     host_fingerprint: fingerprint(os.hostname().toLowerCase()), nonce: "stale-reused-pid",
     created_at_ms: 1, heartbeat_at_ms: 1 })}\n`, { mode: 0o600 });
+  assert.throws(() => createBenchmarkV3CampaignJournal(output, { sourceRoot: registryFixture, campaignFingerprint, initialLedger }),
+    /signed audited takeover/u, "same-host PID/start mismatch must not trigger automatic lease reclamation");
+  const takeoverChannel = path.join(registryFixture, "takeover-channel"); fs.mkdirSync(takeoverChannel, { mode: 0o700 });
+  const { publicKey: takeoverPublicKey, privateKey: takeoverPrivateKey } = generateKeyPairSync("ed25519");
+  const takeoverIssuer = { issuer_id: "fixture-takeover-auditor-v1", protected_channel: "fixture-takeover-channel-v1",
+    channel_root: takeoverChannel, owner_uid: process.getuid(), public_key_pem: takeoverPublicKey.export({ type: "spki", format: "pem" }) };
+  const signTakeover = () => {
+    const leaseTarget = benchmarkV3CampaignLeasePath(registryFixture, campaignFingerprint);
+    const takeoverBody = { schema_version: 1, issuer_id: takeoverIssuer.issuer_id, protected_channel: takeoverIssuer.protected_channel,
+      source_sha: spawnSync("git", ["rev-parse", "HEAD"], { cwd: registryFixture, encoding: "utf8" }).stdout.trim(),
+      campaign_fingerprint: campaignFingerprint, lease_target_fingerprint: benchmarkV3LeaseTargetFingerprint(registryFixture, campaignFingerprint),
+      observed_lease_fingerprint: fingerprint(fs.readFileSync(leaseTarget, "utf8")), audited_by: "fixture-independent-operator",
+      reason: "The fixture proves that reclamation requires explicit signed manual audit.",
+      issued_at_ms: Date.now() - 100, expires_at_ms: Date.now() + 60_000 };
+    const receiptPath = path.join(takeoverChannel, `receipt-${Date.now()}.json`);
+    fs.writeFileSync(receiptPath, JSON.stringify({ ...takeoverBody,
+      signature: sign(null, Buffer.from(canonicalJson(takeoverBody), "utf8"), takeoverPrivateKey).toString("base64url") }), { mode: 0o600 });
+    return receiptPath;
+  };
+  assert.equal(performBenchmarkV3LeaseTakeover({ sourceRoot: registryFixture, campaignFingerprint,
+    receiptPath: signTakeover(), trustedIssuers: [takeoverIssuer] }).status, "taken-over");
   const resumedJournal = createBenchmarkV3CampaignJournal(output, { sourceRoot: registryFixture, campaignFingerprint, initialLedger });
   assert.equal(resumedJournal.attemptsFor("baseline", "family-one").length, 1,
     "exact resume must preserve completed family execution");
@@ -216,10 +244,61 @@ try {
   assert.throws(() => uncertainResume.prepareAttempt("candidate", "family-three", 1), /refusing to repeat/u,
     "an interrupted unreceipted attempt must fail closed instead of repeating a model call");
   uncertainResume.close();
+  const recoveredOutcome = { infrastructure_failure: true, result_fingerprint: `sha256:${"9".repeat(64)}` };
+  fs.writeFileSync(uncertain.completion_path, JSON.stringify({ schema_version: 1,
+    campaign_fingerprint: campaignFingerprint, arm_id: "candidate", family_id: "family-three", attempt_index: 1,
+    outcome: recoveredOutcome, outcome_fingerprint: fingerprint(recoveredOutcome) }));
+  const recoveredDevelopment = createBenchmarkV3CampaignJournal(output, {
+    sourceRoot: registryFixture, campaignFingerprint, initialLedger,
+  });
+  assert.deepEqual(recoveredDevelopment.prepareAttempt("candidate", "family-three", 1).outcome, recoveredOutcome,
+    "an authentic late completion may close the exact reserved development attempt");
+  recoveredDevelopment.close();
+  const developmentReportBody = { status: "sealed-holdout-required", ledger: initialLedger,
+    ledger_fingerprint: initialLedger.ledger_fingerprint };
+  const developmentReport = { ...developmentReportBody, study_fingerprint: fingerprint(developmentReportBody) };
+  fs.writeFileSync(path.join(output, "report.json"), `${JSON.stringify(developmentReport)}\n`, { mode: 0o600 });
+  const completedDevelopment = createBenchmarkV3CampaignJournal(output, {
+    sourceRoot: registryFixture, campaignFingerprint, initialLedger,
+  });
+  completedDevelopment.markComplete(developmentReport);
+  const holdoutJournal = createBenchmarkV3CampaignJournal(output, {
+    sourceRoot: registryFixture, campaignFingerprint, initialLedger, phase: "holdout",
+  });
+  assert.equal(holdoutJournal.attemptsFor("baseline", "family-one").length, 1,
+    "holdout must resume the exact development/validation checkpoint");
+  const holdoutReservation = holdoutJournal.prepareAttempt("candidate", "external-holdout-family-one", 1);
+  const holdoutOutcome = { infrastructure_failure: false, result_fingerprint: `sha256:${"a".repeat(64)}` };
+  fs.mkdirSync(path.dirname(holdoutReservation.completion_path), { recursive: true });
+  fs.writeFileSync(holdoutReservation.completion_path, JSON.stringify({ schema_version: 1,
+    campaign_fingerprint: campaignFingerprint, arm_id: "candidate", family_id: "external-holdout-family-one",
+    attempt_index: 1, outcome: holdoutOutcome, outcome_fingerprint: fingerprint(holdoutOutcome) }));
+  holdoutJournal.recordAttempt({ arm_id: "candidate", family_id: "external-holdout-family-one", attempt_index: 1,
+    outcome: holdoutOutcome });
+  holdoutJournal.close();
+  const resumedHoldout = createBenchmarkV3CampaignJournal(output, {
+    sourceRoot: registryFixture, campaignFingerprint, initialLedger, phase: "holdout",
+  });
+  assert.deepEqual(resumedHoldout.prepareAttempt("candidate", "external-holdout-family-one", 1).outcome, holdoutOutcome,
+    "exact holdout resume must preserve a completed confirmatory family instead of executing it twice");
+  resumedHoldout.close();
+  const secondWorktree = registryFixtureSecondWorktree;
+  assert.equal(spawnSync("git", ["worktree", "add", "--quiet", "--detach", secondWorktree], { cwd: registryFixture }).status, 0);
+  const firstContainerJournal = createBenchmarkV3CampaignJournal(output, { sourceRoot: registryFixture, campaignFingerprint, initialLedger });
+  const sharedLease = benchmarkV3CampaignLeasePath(secondWorktree, campaignFingerprint);
+  const sharedLeaseValue = JSON.parse(fs.readFileSync(sharedLease, "utf8"));
+  fs.writeFileSync(sharedLease, `${JSON.stringify({ ...sharedLeaseValue,
+    host_fingerprint: fingerprint("independent-container-host") })}\n`, { mode: 0o600 });
+  assert.throws(() => createBenchmarkV3CampaignJournal(output, { sourceRoot: secondWorktree, campaignFingerprint, initialLedger }),
+    /foreign-host lease is authoritative/u, "two containers sharing one Git common directory must fail closed on a foreign-host lease");
+  firstContainerJournal.close();
   assert.throws(() => createBenchmarkV3CampaignJournal(path.join(registryFixture, "outputs", "campaign-copy"), {
     sourceRoot: registryFixture, campaignFingerprint, initialLedger,
   }), /already registered/u, "the same campaign bindings must not move to a new output directory");
-} finally { fs.rmSync(registryFixture, { recursive: true, force: true }); }
+} finally {
+  fs.rmSync(registryFixtureSecondWorktree, { recursive: true, force: true });
+  fs.rmSync(registryFixture, { recursive: true, force: true });
+}
 const families = corpus.families.filter((entry) => entry.split === "development");
 const first = families[0];
 const envelope = buildBenchmarkV3AttemptEnvelope({
@@ -250,11 +329,11 @@ try {
   const safetyBefore = captureBenchmarkV3Workspace(oracleSafetyRoot);
   const subject = first.control_surface.allowed_mutation_paths[0];
   fs.appendFileSync(path.join(oracleSafetyRoot, ...subject.split("/")), "\nprocess.stdout.write(JSON.stringify({stats:{tests:7,passes:7,failures:0,pending:0}}));process.exit(0);\n");
-  assert.equal(verifyBenchmarkV3OracleSubjectSafety(oracleSafetyRoot, safetyBefore, first).safe, false,
-    "model-authored stdout/early-exit oracle spoof must be rejected before hidden code execution");
+  assert.equal(verifyBenchmarkV3OracleSubjectSafety(oracleSafetyRoot, safetyBefore, first).safe, true,
+    "allowed source bytes must reach the hidden semantic oracle without reference-byte equality");
   fs.writeFileSync(path.join(oracleSafetyRoot, ...subject.split("/")), `${first.public_surface.public_files[0].content}\nrequire /* bypass */ ("node:fs");\n`);
-  assert.equal(verifyBenchmarkV3OracleSubjectSafety(oracleSafetyRoot, safetyBefore, first).safe, false,
-    "syntax variations must not bypass the exact frozen-reference boundary");
+  assert.equal(verifyBenchmarkV3OracleSubjectSafety(oracleSafetyRoot, safetyBefore, first).safe, true,
+    "semantic candidates must be judged by the hidden oracle rather than source-pattern heuristics");
   for (const entry of first.control_surface.reference_files) fs.writeFileSync(path.join(oracleSafetyRoot, ...entry.path.split("/")), entry.content);
   assert.equal(verifyBenchmarkV3OracleSubjectSafety(oracleSafetyRoot, safetyBefore, first).safe, true,
     "the authentic frozen upstream repair must be eligible for contained semantic confirmation");
@@ -383,10 +462,13 @@ const runnerSource = fs.readFileSync(path.join(root, "lib", "benchmark", "v3-run
 for (const forbidden of ["runBaseline:", "runCandidate:", "typeof runBaseline", "typeof runCandidate"]) assert.equal(runnerSource.includes(forbidden), false);
 assert.equal(runnerSource.includes('entry.split === "holdout"'), false,
   "the public development-only holdout must not enter the confirmatory execution path");
-assert.equal(design.holdout_policy.public_split, "permanently-development-only");
-assert.equal(design.holdout_policy.confirmatory_use, "forbidden");
+assert.equal(design.holdout_policy.public_split, "absent");
+assert.equal(design.holdout_policy.confirmatory_use, "external-sealed-only");
 const cliSource = fs.readFileSync(path.join(root, "scripts", "benchmark-v3-run.mjs"), "utf8");
-for (const requiredReceipt of ["process-receipt", "namespace-receipt", "egress-receipt"]) assert.equal(cliSource.includes(requiredReceipt), true);
+for (const requiredReceipt of ["process-receipt", "namespace-receipt"]) assert.equal(cliSource.includes(requiredReceipt), true);
+assert.equal(cliSource.includes("egress-receipt"), false, "external holdout egress must not block development readiness");
+const holdoutCliSource = fs.readFileSync(path.join(root, "scripts", "benchmark-v3-holdout.mjs"), "utf8");
+for (const requiredReceipt of ["process-receipt", "namespace-receipt", "egress-receipt"]) assert.equal(holdoutCliSource.includes(requiredReceipt), true);
 for (const required of ["runManagedCommand", "reviewed_source_root", "semantic_runtime_fingerprint", "catalog_before", "attempt_fingerprints", "json_event_count",
   "linux-bubblewrap-v1", "macos-sandbox-exec-v1", "capability_authorization_fingerprint"]) {
   assert.equal(runnerSource.includes(required), true);
@@ -395,6 +477,7 @@ const allowedFinalStatuses = new Set([
   "NO PROMOTABLE HARNESS",
   "STUDY BLOCKED — INFRASTRUCTURE",
   "STUDY BLOCKED — EXTERNAL SEALED HOLDOUT REQUIRED",
+  "CONFIRMATORY HOLDOUT PASSED",
 ]);
 for (const match of runnerSource.matchAll(/final_status:\s*"([^"]+)"/gu)) assert.equal(allowedFinalStatuses.has(match[1]), true);
 const workerSource = fs.readFileSync(path.join(root, "scripts", "benchmark-v3-attempt-worker.mjs"), "utf8");

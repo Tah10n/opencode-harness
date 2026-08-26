@@ -7,6 +7,7 @@ on:
   pull_request:
     branches:
       - main
+      - cleanup/v0.5-foundation
   workflow_dispatch:
 
 permissions:
@@ -113,6 +114,16 @@ jobs:
         env:
           GITHUB_BASE_SHA: ${{ github.event.pull_request.base.sha }}
           GITHUB_EVENT_BEFORE: ${{ github.event.before }}
+
+      - name: Run benchmark v3 portable gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo -u "$OPENCODE_QUALITY_RUN_USER" -- /usr/bin/env \
+            HOME="$OPENCODE_QUALITY_RUN_HOME" \
+            PATH="$PATH" \
+            CI=true \
+            npm run verify:portable
 
       - name: Upload deterministic receipt bundle
         if: always()

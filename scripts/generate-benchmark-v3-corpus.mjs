@@ -13,7 +13,7 @@ const semanticRuntimeRoot = process.argv[3] === undefined ? null : path.resolve(
 const outputRoot = path.join(root, "benchmarks", "v3", "corpus");
 const generatorContract = JSON.parse(fs.readFileSync(path.join(root, "benchmarks", "v3", "generator-contract.v1.json"), "utf8"));
 const repositoryUrl = "https://github.com/eslint/eslint";
-const quotas = Object.freeze({ development: 20, validation: 20, holdout: 30 });
+const publicQuotas = Object.freeze({ development: 20, validation: 20 });
 const codePath = /\.(?:cjs|js|mjs)$/u;
 
 function git(args, { encoding = "utf8" } = {}) {
@@ -167,7 +167,7 @@ if (!distribution.passed) throw new Error(`seeded split distribution failed: ${J
 if (assignment.assignment_fingerprint !== generatorContract.split_assignment_fingerprint) {
   throw new Error("generated split assignment does not match the frozen generator contract");
 }
-const assignedGroups = Object.fromEntries(Object.keys(quotas).map((split) => [split, Object.fromEntries(Object.keys(groups).map((stratum) => [
+const assignedGroups = Object.fromEntries(Object.keys(publicQuotas).map((split) => [split, Object.fromEntries(Object.keys(groups).map((stratum) => [
   stratum,
   assignment.entries.filter((entry) => entry.split === split && entry.stratum === stratum)
     .sort((left, right) => left.complexity_quantile - right.complexity_quantile || left.source_commit.localeCompare(right.source_commit))
@@ -190,21 +190,36 @@ fs.writeFileSync(path.join(outputRoot, "SOURCE.json"), `${JSON.stringify({
       local_environment_variable: "BENCHMARK_V3_PROVENANCE_BUNDLE" },
     third_party_notices: "THIRD_PARTY_NOTICES.md",
     materializer: "scripts/materialize-benchmark-v3-provenance.mjs",
-    derivation: "unique-real-eslint-source-lineages-with-development-only-reference-byte-contracts-and-hidden-upstream-tests",
+    derivation: "unique-real-eslint-development-validation-lineages-with-behavioral-contracts-and-hidden-semantic-oracles",
 }, null, 2)}\n`, "utf8");
 fs.writeFileSync(path.join(outputRoot, "THIRD_PARTY_LICENSE.txt"), licenseBytes);
 fs.writeFileSync(path.join(outputRoot, "THIRD_PARTY_NOTICES.md"), `# Third-party notices\n\nDerived from ${repositoryUrl} at ${sourceTip}. SPDX-License-Identifier: MIT. Raw provenance bundles are excluded from Git and release assets.\n`, "utf8");
 
+function publicTestDelta(entry) {
+  const result = git(["diff", "--no-ext-diff", "--unified=3", entry.parent, entry.commit, "--", ...entry.hiddenTestFiles.map((file) => file.path)]);
+  if (Buffer.byteLength(result, "utf8") > 64 * 1024) throw new Error(`${entry.commit} public behavioral test delta is too large`);
+  return result.trim();
+}
+
+function authoredBehavior(entry) {
+  return entry.requirement_text.replace(/\r/gu, "").trim();
+}
+
 for (const [stratum] of Object.entries(groups)) {
-  for (const [split] of Object.entries(quotas)) {
+  for (const [split] of Object.entries(publicQuotas)) {
     const splitEntries = assignedGroups[split][stratum];
     for (const [zeroIndex, entry] of splitEntries.entries()) {
       const index = zeroIndex + 1;
       const familyId = `v3-${split}-${stratum}-${String(index).padStart(2, "0")}`;
+      const behavior = authoredBehavior(entry);
+      const examples = publicTestDelta(entry);
+      const paths = entry.beforeFiles.map((file) => file.path);
       const clauses = Object.freeze([
-        Object.freeze({ clause_id: "REQ-001", kind: "required-behavior", text: "Reproduce the frozen upstream repair bytes for every supplied source path." }),
-        Object.freeze({ clause_id: "REQ-002", kind: "preserved-behavior", text: "Pass the runner-owned upstream test files without modifying them." }),
-        Object.freeze({ clause_id: "REQ-003", kind: "allowed-mutation", text: "Modify only the supplied source paths." }),
+        Object.freeze({ clause_id: "REQ-001", kind: "observed-bug", text: `Observed upstream behavior defect:\n${behavior}` }),
+        Object.freeze({ clause_id: "REQ-002", kind: "required-behavior", text: "Correct the observed defect so the documented behavioral examples and their semantic equivalents produce the expected ESLint behavior." }),
+        Object.freeze({ clause_id: "REQ-003", kind: "preserved-behavior", text: "Preserve all pre-existing behavior, diagnostics, options, and public APIs outside the observed defect; the full pre-existing upstream test suite remains authoritative." }),
+        Object.freeze({ clause_id: "REQ-004", kind: "boundary-error-cases", text: `Public behavioral examples (test-only diff, not implementation):\n${examples}` }),
+        Object.freeze({ clause_id: "REQ-005", kind: "allowed-mutation", text: `Modify only these supplied source paths: ${paths.join(", ")}. Do not add, delete, rename, or change modes of other paths.` }),
       ]);
       const contractBody = { schema_version: 1, contract_id: `${familyId}-public-contract`, clauses };
       const contract = Object.freeze({ ...contractBody, contract_fingerprint: fingerprint(contractBody) });
@@ -214,10 +229,7 @@ for (const [stratum] of Object.entries(groups)) {
         split,
         stratum,
         prompt: "Repair the supplied ESLint source according to the visible public contract.",
-        visible_requirements: Object.freeze([
-          "Development-only reconstruction: reproduce the frozen upstream repair bytes; semantic alternatives and confirmatory claims are out of scope.",
-          ...clauses.map((clause) => clause.text),
-        ]),
+        visible_requirements: Object.freeze(clauses.map((clause) => `${clause.kind}: ${clause.text}`)),
         contract,
         base_source_tip: sourceTip,
         public_files: Object.freeze(entry.beforeFiles),
@@ -245,9 +257,9 @@ for (const [stratum] of Object.entries(groups)) {
           license_fingerprint: licenseFingerprint,
         }),
         requirement_coverage: Object.freeze({ schema_version: 1, contract_fingerprint: contract.contract_fingerprint,
-          contract_completeness: "reference-byte-bound",
-          hidden_test_witnesses: Object.freeze(entry.hiddenTestFiles.map((file) => Object.freeze({ hidden_test_fingerprint: fingerprint(file.content), clause_ids: Object.freeze(["REQ-002"]) }))),
-          runner_witnesses: Object.freeze([{ witness_id: "frozen-reference-bytes-and-closed-mutation-set", clause_ids: Object.freeze(["REQ-001", "REQ-003"]) }]) }),
+          contract_completeness: "self-contained-behavioral-v1",
+          hidden_test_witnesses: Object.freeze(entry.hiddenTestFiles.map((file) => Object.freeze({ hidden_test_fingerprint: fingerprint(file.content), clause_ids: Object.freeze(["REQ-002", "REQ-003", "REQ-004"]) }))),
+          runner_witnesses: Object.freeze([{ witness_id: "semantic-oracle-and-closed-mutation-set", clause_ids: Object.freeze(["REQ-001", "REQ-002", "REQ-003", "REQ-004", "REQ-005"]) }]) }),
       });
       const manifestBody = {
         schema_version: 1,
@@ -269,8 +281,8 @@ for (const [stratum] of Object.entries(groups)) {
   }
 }
 
-const corpusIndex = [...Object.keys(quotas)].flatMap((split) => [...Object.keys(groups)].flatMap((stratum) => {
-  const count = quotas[split];
+const corpusIndex = [...Object.keys(publicQuotas)].flatMap((split) => [...Object.keys(groups)].flatMap((stratum) => {
+  const count = publicQuotas[split];
   return Array.from({ length: count }, (_, index) => `v3-${split}-${stratum}-${String(index + 1).padStart(2, "0")}`);
 }));
 fs.writeFileSync(path.join(outputRoot, "index.json"), `${JSON.stringify({

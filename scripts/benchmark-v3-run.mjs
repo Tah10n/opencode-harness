@@ -29,7 +29,6 @@ if (reviewReceiptPaths.length !== 2) throw new Error("exactly two --review-recei
 const readinessReceiptPaths = {
   "real-process-containment": path.resolve(one("process-receipt")),
   "hidden-namespace-isolation": path.resolve(one("namespace-receipt")),
-  "provider-only-egress": path.resolve(one("egress-receipt")),
 };
 const gate = await runBenchmarkV3ModelFreeGate({
   sourceRoot,

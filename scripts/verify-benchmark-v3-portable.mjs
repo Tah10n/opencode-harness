@@ -9,6 +9,7 @@ const checks = [
   "verify:benchmark:v3:corpus",
   "verify:benchmark:v3:ledger",
   "verify:benchmark:v3:runner",
+  "verify:benchmark:v3:holdout-negative",
   "verify:benchmark:v3:provenance",
   "verify:benchmark:v3:no-raw-bundles",
 ];

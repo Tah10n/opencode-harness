@@ -33,7 +33,7 @@
       "maximum_runs": 1
     },
     "holdout": {
-      "status": "materialized-model-free",
+      "status": "external-sealed-not-in-public-git",
       "family_count": 90,
       "strata": { "small": 30, "medium": 30, "high": 30 },
       "candidate_selection": "same-unchanged-candidate",
@@ -66,8 +66,8 @@
     "reporting_boundary": "enriched-effect-must-not-be-labeled-repository-wide-lift"
   },
   "holdout_policy": {
-    "public_split": "permanently-development-only",
-    "confirmatory_use": "forbidden",
+    "public_split": "absent",
+    "confirmatory_use": "external-sealed-only",
     "sealed_holdout_storage": "outside-public-git",
     "sealed_holdout_creation": "after-design-and-candidate-freeze",
     "execution_source": "external-sealed-receipt-only"

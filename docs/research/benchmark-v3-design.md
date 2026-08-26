@@ -1,225 +1,216 @@
-# Benchmark v3 executable bounded-study contract
+# Benchmark v3 development, validation, and sealed-holdout contract
 
-Benchmark v3 has executable model-free infrastructure, not model-backed
-evidence. Candidate execution remains forbidden until the complete deterministic
-gate, installed materialized-core runtime, containment and hidden-data
-isolation, and two independent read-only reviews pass. The runner never creates
-a prompt candidate automatically.
+Benchmark v3 is executable model-free infrastructure, not model-backed evidence.
+No model entry point may run until the deterministic gates, exact materialized
+candidate, containment and namespace evidence, and two independent current-HEAD
+reviews have passed. The harness never creates a candidate automatically.
 
-The public corpus uses 60 development, 60 validation, and 90 development-only
-holdout family clusters,
-balanced by small, medium, and high stratum. All 210 are derived from distinct,
-semantically discriminating rule-change commits in the MIT-licensed
-`eslint/eslint` history; source commit,
-semantic-kernel, source-identity, and family fingerprints are globally unique.
-The imported commit messages were not independent behavioral specifications and
-one independent review found reference-implementation leakage in that public
-surface. They have therefore been removed from model-visible artifacts. Every
-family now declares the narrower `reference-byte-bound` development contract:
-the only accepted repair is the exact frozen upstream source repair, followed by
-the upstream semantic test. Semantically equivalent alternative patches are not
-accepted, and this corpus can never authorize a confirmatory claim.
-The versioned generator contract freezes its generator version, deterministic
-`corpus_generation_seed`, split-specific source and seed commitments, public
-behavior contract, hidden oracle contract, pre-fix failure witness,
-reference-fix success witness, license/provenance record, and family-cluster
-identity. No public rendered instance is promotion-eligible. Validation and
-public development-holdout commitments are frozen before the first candidate
-run; baseline outcomes may not alter generation or selection. The current 210
-instances are permanently development-only. A real sealed holdout must be
-created after the design and exact candidate are frozen, stored outside public
-Git, and supplied through the external sealed-holdout boundary.
+## Public corpus and visible contracts
 
-The frozen exclusion manifest binds the archived v2/P0-P52 registries and
-forbids their real-commit repositories. Each model workspace is staged only
-from the commit parent plus `public.json`, after removing Git history and every
-hidden test. The runner-owned `control.json` contains the upstream hidden test,
-reference calibration bytes, closed mutation paths, and provenance; none is
-sent in the attempt envelope or mounted while the model runs. After model exit,
-the verifier copies the scored workspace into a separate runner-owned oracle
-namespace with an empty home, no network, read-only hidden/runtime inputs, and
-verified process-tree teardown. Its supervisor requires a structured Mocha test
-count receipt calibrated through the same contained path. The expected count and
-one-use MAC key are delivered through an authority file that the supervisor
-unlinks before it starts evaluated code; unsigned or replaced receipt paths are
-rejected. Before any model-authored bytes can share a process with hidden tests,
-the runner requires every allowed source path to match the frozen upstream
-reference bytes exactly, requires its file mode to remain unchanged, and rejects
-every out-of-scope content, size, path, or mode change. This byte equality is the
-gate; heuristic source scanning is not used as an execution boundary. The verifier rejects
-post-test workspace mutation before accepting an oracle result, then mounts a
-fingerprinted historical dependency runtime and proves
-that all 210 parent states fail while all 210 reference states pass.
+The public rendered corpus contains exactly 60 development and 60 validation
+family clusters, balanced as 20 small, 20 medium, and 20 high per split. It
+contains no rendered holdout family. The seeded allocation retains 90 additional
+source identities only as `reserved` exclusions, preventing accidental reuse by
+the public generator or external custodian. A reserved identity is not a task,
+control, solution, observation, or confirmatory split.
 
-## Power and opportunity
+Every development/validation family exposes a self-contained behavioral
+contract with five mandatory clauses:
 
-The conditional witness and attainable power are distinct. With 20 conditional
-discordances, candidate win probability 0.8, and current one-candidate alpha
-0.05, rejection requires
-15 wins; conditional power is 0.8042077854595496. This witness does not decide
-whether an observed baseline has enough opportunities.
+1. observed bug;
+2. required behavior;
+3. preserved behavior;
+4. boundary and error cases;
+5. allowed mutation scope.
 
-Before the first candidate call, the runner recomputes attainable power from
-family count, observed baseline failures, alpha, minimum practical delta,
-preregistered fix probability, and permitted regression probability. For the
-frozen 60-family development design (alpha 0.05, MDE 0.10, fix probability
-0.80, regression probability 0.02), the computed minimum is 11 baseline
-failures; attainable power at that boundary is 0.8512584537246037. Each stratum
-must also have at least `ceil(20 * 0.10) = 2` opportunities. Failure of any
-criterion ends the campaign as design-uninformative with candidate tokens zero.
+The authored upstream defect report and test-only behavioral delta are visible.
+Implementation diffs, reference source bytes, complete hidden tests, and oracle
+outcomes are not model-visible. The contract audit verifies that all five
+clauses and their witnesses are present, the visible surface does not disclose
+the source patch, every pre-fix state fails, every reference repair passes, and
+two independently authored byte-distinct alternatives—one development and one
+validation representative—pass the same hidden oracle.
 
-## Frozen execution semantics
+The runner-owned `control.json` retains reference bytes only for model-free
+oracle calibration. Scored outcomes never compare candidate bytes to a
+reference. After the model exits, changed entries must remain ordinary source
+files with their original modes and every changed path must be within the
+declared mutation scope. The copied workspace is then judged by a contained,
+no-network semantic oracle. Semantically equivalent repairs are accepted.
 
-The campaign is frozen as a one-candidate study: minimum, maximum, and current
-registered candidate count are all 1, with familywise and per-candidate alpha
-0.05. Two-candidate execution is not implemented and is rejected; no second
-prompt or architecture is created. Development permits one run per family for
-the single registered candidate.
-Selection is deterministic: highest paired delta, then lower upper CI for new
-HIGH/MEDIUM regression delta, then lower mean duration, then candidate ID.
-Validation runs that candidate once. The tracked public `holdout` split is a
-development diagnostic only and is never executed by the confirmatory path.
-After validation freezes the exact SHA, the runner stops with
-`STUDY BLOCKED — EXTERNAL SEALED HOLDOUT REQUIRED`; a separate externally
-sealed study is required for any confirmatory inference.
+The public corpus is always development/validation evidence. It is never
+promotion-eligible and cannot authorize a confirmatory claim.
 
-The ledger distinguishes acceptance probes, pre-scoring infrastructure
-failures, development, validation, and holdout executions. At most one exact
-per-family infrastructure retry is allowed before scoring; successful first
-attempts are retained and never rerun. A persistent Git-private campaign
-registry binds one campaign fingerprint to one output directory, rejects the
-same bindings in a new directory, and resumes the exact checkpoint after a
-crash without repeating completed/scored families. A long-lived PID/start/host/nonce
-lease carries an atomic five-second heartbeat: a fresh lease rejects concurrent
-coordinators, while a stale heartbeat can be recovered even if the old PID has
-been reused. On Linux `/proc` start ticks and on an unrestricted macOS host `ps`
-start identity are compared in addition to the heartbeat. A matching live
-PID/start owner is never displaced merely because its event loop delayed a
-heartbeat. Unavailable start inspection fails closed for every live PID; reclaim
-requires a dead PID or a proven start-identity mismatch. Stale short locks are recovered, every
-attempt is durably reserved before execution, and its fsynced completion is
-written before the coordinator can record it. A crash with no authentic durable
-completion fails closed instead of spending model tokens again. A retry consumes no extra architecture slot,
-and every sanitized attempt fingerprint, cost, status, and containment binding
-is persisted in the report alongside the sealed ledger. Relabel, reuse, extra
-retries, stage reordering, and changed retry bindings fail closed.
+## Frozen study semantics
 
-The representative estimand uses every preregistered family in a split. The
-challenge estimand uses baseline-failure opportunities only and must never be
-reported as repository-wide lift. Frozen guardrails are: zero new critical
-regressions and zero new HIGH/MEDIUM regressions; the one-sided exact 95% upper
-bound for the new HIGH/MEDIUM regression rate must be <= 0.033; candidate safety
-must not be worse than baseline; the small-stratum rule is frozen as
-`zero-discordance-pass-else-conservative-ci` at n=20 validation and n=30
-holdout with lower CI >= -0.03 whenever discordance is observed; timeout delta
-<= +0.02; median duration <= 2.0x; mean
-duration <= 2.5x; activation >= 0.95.
-Paired-delta intervals use conservative Bonferroni-combined exact binomial
-bounds. For zero observed regressions the one-sided exact bound is
-`1 - 0.05^(1/n)`: 0.0487029133 at n=60, 0.0327380338 at n=90, and
-0.0199048162 at n=149 (the minimum count that reaches 2%). If units are
-clustered, `n` is the independent family-cluster count, never the nominal row
-count. In particular, a zero-event small stratum no longer collapses to a
-misleading `[0, 0]` empirical-resampling interval.
+The study has exactly one preregistered candidate. Development runs the
+baseline before the candidate, evaluates the preregistered opportunity gate,
+and executes every development family at most once per arm. Selection is
+deterministic: highest paired delta, then lower new HIGH/MEDIUM upper confidence
+bound, then lower mean duration, then candidate ID. Validation runs only that
+candidate once. Passing validation freezes the exact candidate source SHA and
+product bundle and stops with `sealed-holdout-required`.
 
-Candidate registration binds the actual materialized core bundle fingerprint.
-The runner recomputes that binding from a clean source tree, the materialized
-manifest, its closed file set, and every installed byte; caller-supplied equal
-strings are insufficient. Candidate attempts execute the installed
-`runtime/opencode-core.mjs` in a separate process and receive only visible
-requirements and public files—never baseline outputs, family failures, hidden
-findings, hidden files, or reference repairs. The parent scores the resulting
-workspace after the process exits. The OpenCode worker and every descendant run
-inside the harness process-tree containment boundary; teardown and containment
-fingerprints are required. Raw stdout, stderr, prompts, provider errors, and
-credentials are discarded and never enter the durable artifacts.
-Candidate activation is accepted only from one exact-schema receipt written by
-the trusted wrapper to an anonymous pipe owned by the attempt worker. The
-OpenCode child receives `/dev/null` on the wrapper descriptor and has no receipt
-pathname to replace, so candidate-controlled stderr and descendants cannot
-forge activation. The receipt is bound to the normalized catalog and
-trusted-check command fingerprints. The catalog separates immutable host/check
-inputs from ordered mutable subject paths: executable identity, host program,
-ordered subjects, scope, cwd and timeout are bound, while subject bytes are not
-mistaken for immutable inputs. The wrapper always records the authentic child
-execution disposition after a child starts. Receipt authenticity is separate
-from verification success: provider errors, timeouts, protocol errors, coding
-failures, and authentic failed/unavailable checks use the same disposition
-rules for baseline and candidate; only missing/forged execution evidence or
-containment is infrastructure. A scored successful completion also requires a
-non-empty final `text` event; `step_finish` is an intermediate usage event only.
+The opportunity gate is evaluated after development baseline and before the
+first candidate call. At n=60, alpha 0.05, minimum practical delta 0.10,
+preregistered fix probability 0.80, and permitted regression probability 0.02,
+at least 11 baseline failures are required and every stratum needs at least two
+opportunities. Failure ends the campaign with candidate tokens zero.
 
-The production entry point accepts no attempt callbacks. Its unforgeable
-same-process authorization is created only after the canonical deterministic
-gate, the installed real-OpenCode fixture, exact product bundle validation,
-three signed current-host/current-SHA capability receipts (process containment,
-hidden namespace, and provider-only egress), and two independently signed
-current-SHA review receipts pass. Capability freshness is checked again before
-every model attempt and contained oracle; expiry stops the campaign. Review
-receipts must come from two distinct root-owned protected issuer channels in
-addition to carrying distinct valid signatures. Keys or self-hashes committed
-in the reviewed tree have no authority by themselves. The
-runner then performs acceptance, baseline, the pre-candidate opportunity gate,
-development, deterministic single-candidate selection, and validation. Only
-when validation passes the frozen MDE, exact alpha, positive CI lower bound,
-and every guardrail is the exact SHA frozen; the public holdout still cannot
-start a confirmatory claim. A
-pre-scoring infrastructure failure retries only
-that unscored family once with identical bindings; a second failure terminates
-the study. Failed validation reports `NO PROMOTABLE HARNESS`; passed validation
-reports the external sealed-holdout blocker, never a positive holdout claim.
-No study result reports ready before an external sealed holdout and a separately
-preregistered real-repository pilot.
+Frozen safety requirements include zero new critical, unclassified semantic,
+and HIGH/MEDIUM regressions; one-sided exact 95% upper bound at most 0.033;
+candidate safety not worse than baseline; small-stratum non-inferiority by
+`zero-discordance-pass-else-conservative-ci`; timeout delta at most +0.02;
+median duration at most 2.0x; mean duration at most 2.5x; and activation at
+least 0.95. At zero events the exact upper bounds are 0.0487029133 for n=60,
+0.0327380338 for n=90, and 0.0199048162 for n=149.
 
-Baseline and candidate share the same model deadline. Candidate execution gives
-the trusted wrapper a separately bound outer budget for process-tree teardown,
-post-child verification, and FD3 receipt delivery; the attempt worker and
-managed-command deadlines cannot race the wrapper's child timeout. Capability
-freshness is reserved for the complete model, wrapper, and contained-oracle
-envelope before a paid attempt starts.
+An attempt is durably reserved before execution. Successful completed families
+are never repeated. One retry is allowed only after a proven infrastructure
+failure before a scored outcome, with unchanged bindings. Missing or ambiguous
+completion evidence fails closed instead of spending model tokens again.
 
-## Seed, binding, and staged verification
+## Campaign lease and exact resume
 
-`corpus_generation_seed` is mandatory and deterministic.
-`model_sampling_seed` is optional and may be unsupported. OpenCode 1.18.21 is
-therefore not incompatible merely because it lacks `--seed`; the runner omits
-that argument and binds the unsupported capability explicitly. Model bindings
-retain the executable fingerprint, OpenCode version, provider, model, variant,
-supported sampling parameters, candidate bundle fingerprint, evaluator
-fingerprint, corpus fingerprint, and arm order. Retry/attempt budgets remain
-bound to the deterministic corpus seed whether or not model sampling accepts a
-seed.
+The Git-private registry binds one campaign fingerprint to one output directory.
+The checkpoint, ledger, candidate/product fingerprint, model binding, semantic
+runtime entries, review fingerprints, source SHA, and source-tree fingerprint
+must reproduce exactly on resume.
 
-`npm run verify:portable` checks deterministic contracts, product/materialized
-core equivalence, provenance metadata, runner negative cases, and the
-fail-closed unavailable-containment contract without requiring privileged
-containment. A pass is not campaign readiness. `npm run
-verify:campaign-readiness` separately requires fresh, fingerprinted receipts
-bound to the current host, source SHA, environment, capability, and expiry for
-real process containment,
-hidden-data namespace isolation, exact
-product/candidate fingerprint equivalence, and sealed-holdout provider-only
-egress (or a proven equivalent), plus the external post-freeze sealed holdout
-manifest. The pre-freeze readiness gate never treats a directory path as
-sealed-holdout evidence: the external custodian can create and sign that
-manifest only after the design and final candidate are frozen. These are actual
-external prerequisites; the permanent development-only
-status of the public holdout is a design invariant, not an environment blocker.
-Boolean `READY=1` variables have no authority.
-Missing prerequisites return a typed
-`blocked_environment` result. Canonical `npm run verify` does not imply that
-this separate campaign gate passed.
+Any existing campaign lease is authoritative. Same-host stale-looking leases
+and every foreign-host lease fail closed. PID death, heartbeat age, PID reuse,
+or start-identity mismatch never permits automatic reclamation. Reclamation is
+a separate manual operation requiring a fresh signed auditor receipt bound to
+the current source SHA, campaign fingerprint, exact lease target, and exact
+observed lease bytes. The previous lease is preserved under
+`takeover-evidence/` before a new coordinator can acquire it. The two-worktree
+shared-Git negative test represents two containers mounting the same Git common
+directory and proves a foreign-host lease cannot be displaced.
 
-During development/validation, hidden artifacts are never mounted during model
-execution, secrets are absent from the workspace, network-capable tools are
-denied and attempts are audited; evidence remains development-only unless
-hardened isolation is demonstrated. Sealed holdout additionally requires a
-provider-only egress boundary. Without it, holdout does not start and promotion
-remains `blocked_environment`.
+## Readiness boundaries
 
-Raw provenance bundles are intentionally excluded from Git and release assets.
-`SOURCE.json` records the exact repository and source commit, frozen SHA-256 and
-size, SPDX license and redistribution status; `THIRD_PARTY_NOTICES.md` carries
-the notice. `scripts/materialize-benchmark-v3-provenance.mjs` fetches the exact
-source commitment or verifies a locally supplied frozen bundle before trusted
-provenance/oracle checks.
+`npm run verify:portable` validates deterministic design, corpus, ledger,
+runner, provenance, lease, and holdout-negative contracts without privileged
+environment receipts. A portable pass does not authorize a campaign.
+
+`npm run verify:development-readiness` requires the frozen semantic runtime,
+the full contract audit, exact candidate/product equivalence, process
+containment, and hidden-namespace receipts. It does not require an external
+holdout directory, manifest, or holdout-only egress receipt. Therefore an
+external custodian cannot block a pre-freeze development/validation campaign.
+
+`npm run verify:holdout-readiness` is post-freeze. It requires exact resume of
+the completed campaign, passed validation efficacy, the frozen final candidate,
+all three capability receipts including provider-only egress, zero prior
+holdout executions, and a signed external manifest from the configured private
+custodian channel. A plain directory, boolean environment variable, unsigned
+JSON, public-Git controls, reused public source identity, or manifest containing
+reference solutions fails closed.
+
+## External holdout custody
+
+The external custodian creates the holdout only after validation and candidate
+freeze. It contains exactly 90 private families (30 per stratum), self-contained
+visible contracts, private hidden controls, expected test counts, and no
+reference solution. Its signed manifest binds the campaign, design, final
+candidate SHA, product bundle, index, private control fingerprints, calibration
+attestation, execution limit one, issuer, and expiry. The complete custody tree
+is outside public Git and owner-only.
+
+The holdout runner resumes the same checkpoint and ledger, uses the same model,
+runtime entries, source, and final candidate, and writes separate immutable
+`holdout-ledger.json` and `holdout-report.json`. The ledger permits at most one
+scored `holdout-execution`. Re-running a completed holdout returns the existing
+report; it never performs a second confirmatory execution.
+
+## Exact commands
+
+Until the contract audit, readiness split, lease negatives, two current-HEAD
+reviews, and exact-SHA CI are green, do not run either model entry point.
+
+Development/validation readiness:
+
+```sh
+BENCHMARK_V3_PROVENANCE_BUNDLE=/private/custody/eslint-provenance.bundle \
+BENCHMARK_V3_ESLINT_RUNTIME_ROOT=/private/custody/eslint-runtime \
+BENCHMARK_V3_CANDIDATE_BUNDLE=/private/candidate/core \
+OPENCODE_QUALITY_PROCESS_CONTAINMENT_RECEIPT=/var/run/opencode-harness/readiness/process.json \
+BENCHMARK_V3_HIDDEN_NAMESPACE_ISOLATION_RECEIPT=/var/run/opencode-harness/readiness/namespace.json \
+npm run verify:development-readiness
+```
+
+Development/validation execution:
+
+```sh
+npm run bench:v3 -- \
+  --source-root "$PWD" \
+  --semantic-runtime /private/custody/eslint-runtime \
+  --opencode /absolute/path/to/opencode \
+  --candidate-source "$PWD" \
+  --candidate-bundle /private/candidate/core \
+  --review-receipt /var/run/opencode-harness/reviews/reviewer-one/review.json \
+  --review-receipt /var/run/opencode-harness/reviews/reviewer-two/review.json \
+  --process-receipt /var/run/opencode-harness/readiness/process.json \
+  --namespace-receipt /var/run/opencode-harness/readiness/namespace.json \
+  --output /private/campaigns/benchmark-v3-campaign-001 \
+  --provider provider-id --model model-id --variant variant-id
+```
+
+After `report.json` says `sealed-holdout-required`, the custodian creates
+`/var/run/opencode-harness/holdout/<campaign>/` as owner-only `0700`, writes the
+manifest and private controls as owner-only `0600`, signs the manifest, and
+never commits or copies that directory into public Git. The custody directory
+contains only `manifest.json`, `index.json`, and the declared three files per
+family; undeclared files or directories fail closed. Every external commit is
+disjoint from all 210 preregistered public/reserved source identities, every
+external source path is disjoint from the public development/validation
+corpus, and each commit is an ancestor of the frozen provenance tip.
+
+Holdout readiness:
+
+```sh
+BENCHMARK_V3_CAMPAIGN_OUTPUT=/private/campaigns/benchmark-v3-campaign-001 \
+BENCHMARK_V3_CANDIDATE_BUNDLE=/private/candidate/core \
+BENCHMARK_V3_EXTERNAL_HOLDOUT_MANIFEST=/var/run/opencode-harness/holdout/campaign-001/manifest.json \
+OPENCODE_QUALITY_PROCESS_CONTAINMENT_RECEIPT=/var/run/opencode-harness/readiness/process.json \
+BENCHMARK_V3_HIDDEN_NAMESPACE_ISOLATION_RECEIPT=/var/run/opencode-harness/readiness/namespace.json \
+BENCHMARK_V3_PROVIDER_ONLY_EGRESS_RECEIPT=/var/run/opencode-harness/readiness/egress.json \
+npm run verify:holdout-readiness
+```
+
+The one confirmatory execution:
+
+```sh
+npm run bench:v3:holdout -- \
+  --source-root "$PWD" \
+  --semantic-runtime /private/custody/eslint-runtime \
+  --output /private/campaigns/benchmark-v3-campaign-001 \
+  --external-manifest /var/run/opencode-harness/holdout/campaign-001/manifest.json \
+  --opencode /absolute/path/to/opencode \
+  --candidate-source "$PWD" \
+  --candidate-bundle /private/candidate/core \
+  --process-receipt /var/run/opencode-harness/readiness/process.json \
+  --namespace-receipt /var/run/opencode-harness/readiness/namespace.json \
+  --egress-receipt /var/run/opencode-harness/readiness/egress.json
+```
+
+Audited lease takeover, only when needed:
+
+```sh
+npm run bench:v3:takeover -- \
+  --source-root "$PWD" \
+  --campaign-fingerprint sha256:<exact-campaign-fingerprint> \
+  --takeover-receipt /var/run/opencode-harness/takeovers/takeover.json
+```
+
+No improvement, promotion, or confirmatory claim is allowed from development,
+validation, readiness, or `report.json`. A claim becomes eligible only when
+`holdout-report.json` says `holdout-confirmed`, records exactly one
+confirmatory execution, passes all frozen efficacy and safety gates, and binds
+the signed external manifest and unchanged final candidate. Model-free and
+structural checks remain distinct from model-backed evidence.
+
+Raw provenance bundles are excluded from Git and release assets. `SOURCE.json`
+records repository, source tip, SHA-256, size, SPDX license, redistribution
+status, and deterministic materializer. The bundle is supplied only through
+`BENCHMARK_V3_PROVENANCE_BUNDLE` or the exact verified fetch flow.

@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generator_version": "benchmark-v3-generator/2",
+  "generator_version": "benchmark-v3-generator/3",
   "corpus_generation_seed": "benchmark-v3-corpus-2026-08-26-v1",
   "model_sampling_seed": "optional-or-unsupported",
-  "split_assignment_algorithm": "frozen-seeded-complexity-quantile-shuffle-v1",
-  "split_assignment_fingerprint": "sha256:405fd756f3395a121a39300818639647e39937b8fa2d68c9df3e287aaa728650",
+  "split_assignment_algorithm": "frozen-seeded-development-validation-reserve-v2",
+  "split_assignment_fingerprint": "sha256:3dbde37c2a8dbb8537270366356443ebafefb7bfdd1ab46ef76c4e9e47837e0c",
   "seed_freeze": {
-    "development": "sha256:8f8777e4b1b9addd435a2f6a0920278e1df983df811c1de71fd0832110b6faa6",
-    "validation": "sha256:286f6ee75e7e9e70d33caff04fa7acfe4ff5e3ee9a0d7970a6d81fbf2f5860ae",
-    "holdout": "sha256:e9359ed77928e23fe764f159b19ac5c207b8b5fe8f390150024ef5a18a23568c",
-    "validation_and_holdout_frozen_before_first_candidate": true,
+    "development": "sha256:286f6ee75e7e9e70d33caff04fa7acfe4ff5e3ee9a0d7970a6d81fbf2f5860ae",
+    "validation": "sha256:8f8777e4b1b9addd435a2f6a0920278e1df983df811c1de71fd0832110b6faa6",
+    "reserved": "sha256:e9359ed77928e23fe764f159b19ac5c207b8b5fe8f390150024ef5a18a23568c",
+    "development_and_validation_frozen_before_first_candidate": true,
     "baseline_outcomes_may_influence_generation_or_selection": false
   },
   "split_source_commitments": {
     "development": "5634542be580750ffb1a5766470f9e9c72719696",
     "validation": "5634542be580750ffb1a5766470f9e9c72719696",
-    "holdout": "5634542be580750ffb1a5766470f9e9c72719696"
+    "reserved": "5634542be580750ffb1a5766470f9e9c72719696"
   },
   "rendered_instance_requirements": [
     "public_behavior_contract",
@@ -26,9 +26,12 @@
     "family_cluster_identity"
   ],
   "promotion_policy": "public-instances-never-confirmatory",
-  "public_holdout_evidence_class": "permanently-development-only",
-  "public_holdout_confirmatory_eligible": false,
+  "public_corpus_splits": [
+    "development",
+    "validation"
+  ],
+  "external_holdout_family_count": 90,
   "sealed_holdout_policy": "outside-public-git-created-after-design-and-candidate-freeze",
-  "current_rendered_instances": 210,
+  "current_rendered_instances": 120,
   "current_promotion_eligible_instances": 0
 }

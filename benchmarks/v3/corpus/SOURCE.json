@@ -14,5 +14,5 @@
   },
   "third_party_notices": "THIRD_PARTY_NOTICES.md",
   "materializer": "scripts/materialize-benchmark-v3-provenance.mjs",
-  "derivation": "unique-real-eslint-source-lineages-with-development-only-reference-byte-contracts-and-hidden-upstream-tests"
+  "derivation": "unique-real-eslint-development-validation-lineages-with-behavioral-contracts-and-hidden-semantic-oracles"
 }
