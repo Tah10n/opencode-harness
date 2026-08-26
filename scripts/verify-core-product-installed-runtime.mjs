@@ -11,6 +11,7 @@ import { materializeProfileBundleV3 } from "../lib/profile-v3.mjs";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const temporaryRoot = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), "core-installed-runtime-")));
 const materializedRoot = path.join(temporaryRoot, "config", "opencode-harness");
+const repositoryRoot = path.join(temporaryRoot, "repository");
 const workspace = path.join(temporaryRoot, "workspace");
 
 function fail(message) {
@@ -108,9 +109,14 @@ async function fixtureProvider(content, operation) {
 }
 
 function writeCatalog(argv) {
-  const directory = path.join(workspace, ".git", "opencode-harness", "core");
+  const gitPath = spawnSync("git", ["rev-parse", "--git-path", "opencode-harness/core/checks.json"], {
+    cwd: workspace, encoding: "utf8", shell: false, windowsHide: true,
+  });
+  assert.equal(gitPath.status, 0, gitPath.stderr);
+  const catalogPath = path.resolve(workspace, gitPath.stdout.trim());
+  const directory = path.dirname(catalogPath);
   fs.mkdirSync(directory, { recursive: true });
-  fs.writeFileSync(path.join(directory, "checks.json"), `${JSON.stringify({
+  fs.writeFileSync(catalogPath, `${JSON.stringify({
     schema_version: 1,
     catalog_id: "real-opencode-installed-fixture",
     checks: [{
@@ -224,12 +230,22 @@ try {
   // Only fixture permissions are relaxed; runtime bytes under test stay exact.
   const fixtureAgentPath = path.join(materializedRoot, "agents", "core.md");
   fs.writeFileSync(fixtureAgentPath, fs.readFileSync(fixtureAgentPath, "utf8").replaceAll(": ask", ": allow"), "utf8");
-  fs.mkdirSync(path.join(workspace, "src"), { recursive: true });
-  fs.writeFileSync(path.join(workspace, "src", "fixture.txt"), "before\n", "utf8");
-  const gitInit = spawnSync("git", ["init", "--quiet"], { cwd: workspace, encoding: "utf8", shell: false });
+  fs.mkdirSync(path.join(repositoryRoot, "src"), { recursive: true });
+  fs.writeFileSync(path.join(repositoryRoot, "src", "fixture.txt"), "before\n", "utf8");
+  const gitInit = spawnSync("git", ["init", "--quiet"], { cwd: repositoryRoot, encoding: "utf8", shell: false });
   assert.equal(gitInit.status, 0, gitInit.stderr);
-  const gitAdd = spawnSync("git", ["add", "src/fixture.txt"], { cwd: workspace, encoding: "utf8", shell: false });
+  for (const [key, value] of [["user.email", "fixture@example.test"], ["user.name", "Fixture"]]) {
+    const configured = spawnSync("git", ["config", key, value], { cwd: repositoryRoot, encoding: "utf8", shell: false });
+    assert.equal(configured.status, 0, configured.stderr);
+  }
+  const gitAdd = spawnSync("git", ["add", "src/fixture.txt"], { cwd: repositoryRoot, encoding: "utf8", shell: false });
   assert.equal(gitAdd.status, 0, gitAdd.stderr);
+  const committed = spawnSync("git", ["commit", "--quiet", "-m", "fixture"], { cwd: repositoryRoot, encoding: "utf8", shell: false });
+  assert.equal(committed.status, 0, committed.stderr);
+  const worktree = spawnSync("git", ["worktree", "add", "--quiet", "--detach", workspace, "HEAD"], {
+    cwd: repositoryRoot, encoding: "utf8", shell: false,
+  });
+  assert.equal(worktree.status, 0, worktree.stderr);
 
   const failed = await installedRun({
     content: "failed-check\n",

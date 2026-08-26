@@ -42,10 +42,12 @@ OPENCODE_CONFIG_DIR=/path/to/profile \
   --workspace /path/to/project -- run
 ```
 
-The launcher seals the project-owned trusted-check catalog at
-`.git/opencode-harness/core/checks.json`, invalidates verification after each
+The launcher resolves the required project-owned trusted-check catalog with
+`git rev-parse --git-path opencode-harness/core/checks.json` (including linked
+worktrees), seals its repository and file identity, invalidates verification after each
 new mutation, and blocks a successful process status after failed, unavailable,
-infrastructure-failed, or stale verification. A missing applicable check is
+infrastructure-failed, stale verification, or unverified process-tree teardown.
+The final snapshot occurs only after verified zero-descendant containment. A missing applicable check is
 reported separately and is not verification activation. An assurance workspace keeps its project-owned
 `.opencode/quality/checks.json` and `toolchains.json`; the config directory
 keeps the host-owned `plugins/quality-toolchains.host.v1.json`. The materializer
@@ -142,6 +144,7 @@ same list can be checked mechanically against the isolated adoption smoke.
 
 <!-- portable-adoption-bundle:start -->
 ```text
+.opencode/assurance
 .opencode/plugins/engineering-dossier.mjs
 .opencode/quality/checks.json
 .opencode/quality/toolchains.json
@@ -165,6 +168,7 @@ examples
 fixtures
 lib/benchmark
 lib/feedback
+lib/profile-v3.mjs
 lib/quality
 native
 opencode.json
@@ -172,6 +176,7 @@ package-lock.json
 package.json
 profiles
 quality
+runtime
 scripts
 skills
 ```

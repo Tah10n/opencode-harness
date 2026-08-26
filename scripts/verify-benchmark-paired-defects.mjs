@@ -72,15 +72,24 @@ for (const baselineSeverity of severities) {
       Number(["medium", "high", "critical"].includes(baselineSeverity)
         && ["medium", "high", "critical"].includes(candidateSeverity)),
     );
+    assert.equal(
+      evaluation.blocking_severity_escalation,
+      Number(expected === "severity-escalation"
+        && ["medium", "high", "critical"].includes(candidateSeverity)),
+    );
+    assert.equal(
+      evaluation.critical_severity_escalation,
+      Number(expected === "severity-escalation" && candidateSeverity === "critical"),
+    );
   }
 }
 
 for (const [baselineSeverity, candidateSeverity, relation, counters] of [
-  ["critical", "high", "severity-reduction", { newCritical: 0, newHighMedium: 0, resolvedCritical: 1 }],
-  ["critical", "none", "resolved-defect", { newCritical: 0, newHighMedium: 0, resolvedCritical: 1 }],
-  ["medium", "high", "severity-escalation", { newCritical: 0, newHighMedium: 0, resolvedCritical: 0 }],
-  ["high", "critical", "severity-escalation", { newCritical: 1, newHighMedium: 0, resolvedCritical: 0 }],
-  ["low", "medium", "severity-escalation", { newCritical: 0, newHighMedium: 1, resolvedCritical: 0 }],
+  ["critical", "high", "severity-reduction", { newCritical: 0, newHighMedium: 0, resolvedCritical: 1, blockingEscalation: 0, criticalEscalation: 0 }],
+  ["critical", "none", "resolved-defect", { newCritical: 0, newHighMedium: 0, resolvedCritical: 1, blockingEscalation: 0, criticalEscalation: 0 }],
+  ["medium", "high", "severity-escalation", { newCritical: 0, newHighMedium: 0, resolvedCritical: 0, blockingEscalation: 1, criticalEscalation: 0 }],
+  ["high", "critical", "severity-escalation", { newCritical: 1, newHighMedium: 0, resolvedCritical: 0, blockingEscalation: 1, criticalEscalation: 1 }],
+  ["low", "medium", "severity-escalation", { newCritical: 0, newHighMedium: 1, resolvedCritical: 0, blockingEscalation: 1, criticalEscalation: 0 }],
 ]) {
   const evaluation = evaluatePairedDefects({
     baseline: arm(baselineSeverity === "none" ? [] : [finding({ severity: baselineSeverity })]),
@@ -90,6 +99,8 @@ for (const [baselineSeverity, candidateSeverity, relation, counters] of [
   assert.equal(evaluation.new_critical_regression, counters.newCritical);
   assert.equal(evaluation.new_high_medium_regression, counters.newHighMedium);
   assert.equal(evaluation.resolved_critical_defect, counters.resolvedCritical);
+  assert.equal(evaluation.blocking_severity_escalation, counters.blockingEscalation);
+  assert.equal(evaluation.critical_severity_escalation, counters.criticalEscalation);
 }
 
 const scoped = evaluatePairedDefects({
