@@ -108,8 +108,10 @@ if (input.activation_binding !== null) {
     activation = activationReceiptValid;
   } catch { activationReceiptAuthentic = false; activationReceiptValid = false; }
 }
+const childTimedOut = childExecution?.error_code === "ETIMEDOUT";
 const receipt = { schema_version: 2, status: Number.isInteger(result.status) ? result.status : null, signal: result.signal ?? null,
-  timed_out: result.error?.code === "ETIMEDOUT", error_code: typeof result.error?.code === "string" ? result.error.code : null,
+  timed_out: result.error?.code === "ETIMEDOUT" || childTimedOut,
+  error_code: childTimedOut ? "ETIMEDOUT" : (typeof result.error?.code === "string" ? result.error.code : null),
   child_execution: childExecution,
   tokens, activation, json_event_count: jsonEventCount, terminal_event_count: terminalEventCount,
   usage_observed: usageObserved, protocol_valid: protocolValid, open_step_count: openStepCount,

@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadBenchmarkV3Corpus } from "../lib/benchmark/v3-corpus.mjs";
@@ -25,15 +24,11 @@ else {
   try { verifyBenchmarkV3ProductBundle(root, path.resolve(process.env.BENCHMARK_V3_CANDIDATE_BUNDLE)); }
   catch { reasons.push({ code: "CANDIDATE_PRODUCT_FINGERPRINT_MISMATCH", requirement: "exact-product-candidate-fingerprint-equivalence" }); }
 }
-if (typeof process.env.BENCHMARK_V3_SEALED_HOLDOUT_ROOT !== "string") {
-  reasons.push({ code: "EXTERNAL_SEALED_HOLDOUT_UNAVAILABLE", requirement: "outside-public-git-created-after-design-and-candidate-freeze" });
-} else {
-  try {
-    const sealed = fs.realpathSync.native(path.resolve(process.env.BENCHMARK_V3_SEALED_HOLDOUT_ROOT));
-    const relative = path.relative(root, sealed);
-    if (relative === "" || (!relative.startsWith("..") && !path.isAbsolute(relative)) || !fs.statSync(sealed).isDirectory()) throw new Error("invalid sealed holdout root");
-  } catch { reasons.push({ code: "EXTERNAL_SEALED_HOLDOUT_INVALID", requirement: "outside-public-git-created-after-design-and-candidate-freeze" }); }
-}
+// This pre-freeze gate must never accept a path as evidence. A sealed holdout can
+// only be created and signed by the external custodian after design and final
+// candidate freeze, which is a later protocol state than current-head readiness.
+reasons.push({ code: "EXTERNAL_SEALED_HOLDOUT_POST_FREEZE_REQUIRED",
+  requirement: "signed-external-holdout-manifest-bound-after-design-and-final-candidate-freeze" });
 const result = { schema_version: 1, gate: "campaign-readiness", status: reasons.length === 0 ? "passed" : "blocked_environment",
   foundation_publication: "published", lab_infrastructure_publication: "pr-current-head", model_campaign: reasons.length === 0 ? "ready" : "blocked",
   holdout_promotion: reasons.length === 0 ? "eligible-for-sealed-execution" : "blocked_environment", model_calls: 0, candidate_tokens: 0, reasons };

@@ -18,9 +18,10 @@ let initialized = false;
 let child = null;
 let terminal = false;
 let challenged = false;
+let timeout = null;
 const keepAlive = setInterval(() => {}, 60_000);
 const send = (message) => { try { process.send?.(message); } catch {} };
-const finish = (result) => { if (!terminal) { terminal = true; send({ type: "result", result }); } };
+const finish = (result) => { if (!terminal) { terminal = true; if (timeout !== null) clearTimeout(timeout); send({ type: "result", result }); } };
 process.once("disconnect", () => { try { child?.kill(); } catch {} clearInterval(keepAlive); process.exit(1); });
 process.on("message", (message) => {
   if (message?.type === "containment_challenge") {
@@ -39,6 +40,10 @@ process.on("message", (message) => {
     child = spawn(message.file, message.args, {
       cwd: ".", env: message.env, shell: false, windowsHide: true, stdio: "inherit",
     });
+    if (Number.isSafeInteger(message.timeoutMs) && message.timeoutMs > 0) timeout = setTimeout(() => {
+      try { child.kill("SIGKILL"); } catch {}
+      finish({ status: null, signal: "SIGKILL", error_code: "ETIMEDOUT" });
+    }, message.timeoutMs);
   } catch (error) {
     finish({ status: null, signal: null, error_code: error?.code ?? "PROCESS_SPAWN_FAILED" });
     return;
@@ -67,6 +72,7 @@ export async function runContainedOpenCode({
   cwd,
   env,
   processContainmentFactory = defaultProcessContainmentFactory,
+  childTimeoutMs = null,
 }) {
   const worker = spawn(process.execPath, ["--input-type=module", "--eval", CONTAINED_WORKER_SOURCE], {
     cwd,
@@ -84,7 +90,7 @@ export async function runContainedOpenCode({
       worker.once("error", reject);
       worker.once("exit", () => reject(new Error("contained OpenCode worker exited before reporting")));
       worker.on("message", (message) => { if (message?.type === "result") resolve(message.result); });
-      worker.send({ type: "initialize", file, args, env });
+      worker.send({ type: "initialize", file, args, env, timeoutMs: childTimeoutMs });
     });
     const terminateAndVerify = containment.terminateAndVerify ?? containment.close;
     const teardownVerified = containment.support_state === "verified"
@@ -108,16 +114,20 @@ function parseArguments(values) {
   if (separator === -1 || separator === values.length - 1) {
     throw new Error("usage: opencode-core --workspace PATH [--catalog PATH] [--opencode PATH] -- OPENCODE_ARGS...");
   }
-  const options = { workspace: null, catalog: CORE_CHECK_CATALOG_PATH, opencode: "opencode", receiptFd: null };
+  const options = { workspace: null, catalog: CORE_CHECK_CATALOG_PATH, opencode: "opencode", receiptFd: null, childTimeoutMs: null };
   for (let index = 0; index < separator; index += 1) {
     const name = values[index];
-    if (!["--workspace", "--catalog", "--opencode", "--receipt-fd"].includes(name) || index + 1 >= separator) {
+    if (!["--workspace", "--catalog", "--opencode", "--receipt-fd", "--child-timeout-ms"].includes(name) || index + 1 >= separator) {
       throw new Error(`invalid launcher option: ${name}`);
     }
     if (name === "--receipt-fd") {
       const descriptor = Number(values[index + 1]);
       if (descriptor !== 3) throw new Error("--receipt-fd is invalid");
       options.receiptFd = descriptor;
+    } else if (name === "--child-timeout-ms") {
+      const timeout = Number(values[index + 1]);
+      if (!Number.isSafeInteger(timeout) || timeout < 1) throw new Error("--child-timeout-ms is invalid");
+      options.childTimeoutMs = timeout;
     } else options[name.slice(2)] = values[index + 1];
     index += 1;
   }
@@ -141,7 +151,8 @@ try {
 }
 }
 
-export async function runCoreLauncher(options, { processContainmentFactory } = {}) {
+export async function runCoreLauncher(options, { processContainmentFactory,
+  verifyCoreWorkspaceMutationFn = verifyCoreWorkspaceMutation } = {}) {
   const workspace = path.resolve(options.workspace);
   const catalog = loadCoreVerificationCatalog(workspace, { catalogPath: options.catalog });
   const before = snapshotCoreWorkspace(workspace);
@@ -150,17 +161,24 @@ export async function runCoreLauncher(options, { processContainmentFactory } = {
     args: options.opencodeArgs,
     cwd: workspace,
     env: options.env ?? process.env,
-    ...(processContainmentFactory === undefined ? {} : { processContainmentFactory }),
-  });
-  const after = snapshotCoreWorkspace(workspace);
-  const verification = await verifyCoreWorkspaceMutation({
-    catalog,
-    before,
-    after,
+    childTimeoutMs: options.childTimeoutMs,
     ...(processContainmentFactory === undefined ? {} : { processContainmentFactory }),
   });
   const childExecution = Object.freeze({ schema_version: 1, status: Number.isSafeInteger(child.status) ? child.status : null,
     signal: child.signal ?? null, error_code: child.error_code ?? null });
+  let verification;
+  try {
+    const after = snapshotCoreWorkspace(workspace);
+    verification = await verifyCoreWorkspaceMutationFn({
+      catalog,
+      before,
+      after,
+      ...(processContainmentFactory === undefined ? {} : { processContainmentFactory }),
+    });
+  } catch (error) {
+    verification = Object.freeze({ decision: Object.freeze({ allowed: false, reason: "post_child_verification_failed" }),
+      observation: Object.freeze({ post_last_mutation_verification: false }), check: null });
+  }
   const receipt = Object.freeze({ schema_version: 2, catalog_fingerprint: catalog.catalog_fingerprint,
     catalog_status: catalog.catalog_status, decision: verification.decision,
     activation: verification.observation, check: verification.check, child_execution: childExecution });

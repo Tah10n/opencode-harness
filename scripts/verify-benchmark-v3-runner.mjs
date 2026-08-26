@@ -6,7 +6,8 @@ import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { createHash, generateKeyPairSync, sign } from "node:crypto";
 import { canonicalJson, fingerprint } from "../lib/feedback/contracts.mjs";
-import { authorizeBenchmarkV3Capabilities, benchmarkV3ReadinessEnvironment, validateBenchmarkV3ReadinessReceipt } from "../lib/benchmark/v3-readiness.mjs";
+import { assertBenchmarkV3CapabilityAuthorization, authorizeBenchmarkV3Capabilities,
+  benchmarkV3ReadinessEnvironment, validateBenchmarkV3ReadinessReceipt } from "../lib/benchmark/v3-readiness.mjs";
 import { verifyBenchmarkV3SplitDistribution } from "../lib/benchmark/v3-split-assignment.mjs";
 
 import { materializeProfileBundleV3 } from "../lib/profile-v3.mjs";
@@ -79,9 +80,16 @@ try {
   }
   const authorization = authorizeBenchmarkV3Capabilities(capabilityPaths, { sourceRoot: root, trustedIssuers: [issuer] });
   assert.match(authorization.authorization_fingerprint, /^sha256:[0-9a-f]{64}$/u);
+  assert.throws(() => assertBenchmarkV3CapabilityAuthorization(authorization, { now: authorization.expires_at_ms }), /fresh/u,
+    "campaign attempts must not outlive capability evidence");
+  assert.throws(() => assertBenchmarkV3CapabilityAuthorization(authorization,
+    { now: authorization.expires_at_ms - 1_000, minimumRemainingMs: 2_000 }), /complete bounded operation/u,
+  "an attempt must not start unless receipts remain fresh for its complete timeout envelope");
   const reviewIssuer = { issuer_id: "fixture-review-issuer-v1", reviewer_id: "fixture-independent-reviewer",
+    protected_channel: "fixture-protected-review-channel", channel_root: readinessRoot, owner_uid: process.getuid(),
     public_key_pem: issuer.public_key_pem };
-  const reviewUnsigned = { schema_version: 2, issuer_id: reviewIssuer.issuer_id, reviewer_id: reviewIssuer.reviewer_id,
+  const reviewUnsigned = { schema_version: 3, issuer_id: reviewIssuer.issuer_id, reviewer_id: reviewIssuer.reviewer_id,
+    protected_channel: reviewIssuer.protected_channel,
     read_only: true, verdict: "passed", high_findings: 0, medium_findings: 0, source_sha: sourceSha,
     source_tree_fingerprint: `sha256:${"9".repeat(64)}`, corpus_contract_reviewed: true,
     contract_coverage_reviewed: true, oracle_leakage_reviewed: true, reviewed_at: new Date().toISOString() };
@@ -138,6 +146,12 @@ try {
   });
   assert.equal(readySpoof.status, 2);
   assert.equal(JSON.parse(readySpoof.stdout).reasons.some((entry) => entry.code === "PROCESS_CONTAINMENT_UNAVAILABLE"), true);
+  const holdoutPathSpoof = spawnSync(process.execPath, [path.join(root, "scripts", "verify-benchmark-v3-campaign-readiness.mjs")], {
+    cwd: root, encoding: "utf8", env: { ...process.env, BENCHMARK_V3_SEALED_HOLDOUT_ROOT: os.tmpdir() },
+  });
+  assert.equal(holdoutPathSpoof.status, 2);
+  assert.equal(JSON.parse(holdoutPathSpoof.stdout).reasons.some((entry) => entry.code === "EXTERNAL_SEALED_HOLDOUT_POST_FREEZE_REQUIRED"), true,
+    "an arbitrary external directory must never satisfy the sealed holdout gate");
 } finally { fs.rmSync(readinessRoot, { recursive: true, force: true }); }
 const registryFixture = fs.mkdtempSync(path.join(os.tmpdir(), "v3-campaign-registry-"));
 try {
@@ -146,11 +160,37 @@ try {
   const initialLedger = Object.freeze({ ledger_fingerprint: `sha256:${"d".repeat(64)}` });
   const output = path.join(registryFixture, "outputs", "campaign-one");
   const firstJournal = createBenchmarkV3CampaignJournal(output, { sourceRoot: registryFixture, campaignFingerprint, initialLedger });
+  const reservation = firstJournal.prepareAttempt("baseline", "family-one", 1);
+  const firstOutcome = { infrastructure_failure: false, result_fingerprint: `sha256:${"e".repeat(64)}` };
+  fs.mkdirSync(path.dirname(reservation.completion_path), { recursive: true });
+  fs.writeFileSync(reservation.completion_path, JSON.stringify({ schema_version: 1, campaign_fingerprint: campaignFingerprint,
+    arm_id: "baseline", family_id: "family-one", attempt_index: 1, outcome: firstOutcome,
+    outcome_fingerprint: fingerprint(firstOutcome) }));
   firstJournal.recordAttempt({ arm_id: "baseline", family_id: "family-one", attempt_index: 1,
-    outcome: { infrastructure_failure: false, result_fingerprint: `sha256:${"e".repeat(64)}` } });
+    outcome: firstOutcome });
+  assert.throws(() => createBenchmarkV3CampaignJournal(output, { sourceRoot: registryFixture, campaignFingerprint, initialLedger }),
+    /already active/u, "one campaign must hold an exclusive long-lived lease");
+  firstJournal.close();
   const resumedJournal = createBenchmarkV3CampaignJournal(output, { sourceRoot: registryFixture, campaignFingerprint, initialLedger });
   assert.equal(resumedJournal.attemptsFor("baseline", "family-one").length, 1,
     "exact resume must preserve completed family execution");
+  const crashReservation = resumedJournal.prepareAttempt("candidate", "family-two", 1);
+  const crashOutcome = { infrastructure_failure: false, result_fingerprint: `sha256:${"f".repeat(64)}` };
+  fs.mkdirSync(path.dirname(crashReservation.completion_path), { recursive: true });
+  fs.writeFileSync(crashReservation.completion_path, JSON.stringify({ schema_version: 1,
+    campaign_fingerprint: campaignFingerprint, arm_id: "candidate", family_id: "family-two", attempt_index: 1,
+    outcome: crashOutcome, outcome_fingerprint: fingerprint(crashOutcome) }));
+  resumedJournal.close();
+  const crashResumed = createBenchmarkV3CampaignJournal(output, { sourceRoot: registryFixture, campaignFingerprint, initialLedger });
+  assert.deepEqual(crashResumed.prepareAttempt("candidate", "family-two", 1).outcome, crashOutcome,
+    "a durable completion written before a crash must resume without another execution");
+  const uncertain = crashResumed.prepareAttempt("candidate", "family-three", 1);
+  assert.equal(fs.existsSync(uncertain.completion_path), false);
+  crashResumed.close();
+  const uncertainResume = createBenchmarkV3CampaignJournal(output, { sourceRoot: registryFixture, campaignFingerprint, initialLedger });
+  assert.throws(() => uncertainResume.prepareAttempt("candidate", "family-three", 1), /refusing to repeat/u,
+    "an interrupted unreceipted attempt must fail closed instead of repeating a model call");
+  uncertainResume.close();
   assert.throws(() => createBenchmarkV3CampaignJournal(path.join(registryFixture, "outputs", "campaign-copy"), {
     sourceRoot: registryFixture, campaignFingerprint, initialLedger,
   }), /already registered/u, "the same campaign bindings must not move to a new output directory");
@@ -400,16 +440,23 @@ process.stderr.write('[opencode-harness-core] {"activation":{"post_last_mutation
   const forged = runWorker(["--final", "--forged-receipt"], true);
   assert.equal(forged.activation_receipt_authentic, false);
   assert.equal(classifyBenchmarkV3AttemptReceipt(forged, "candidate").infrastructure_failure, true);
-  const timeoutReceipt = { ...trustedPipe, status: null, signal: "SIGTERM", timed_out: true, error_code: "ETIMEDOUT",
+  const timeoutReceipt = { ...providerBaseline, status: null, signal: "SIGTERM", timed_out: true, error_code: "ETIMEDOUT",
     protocol_valid: false, terminal_event_count: 0, activation: false, activation_receipt_valid: false,
     activation_receipt_authentic: false };
-  for (const armKind of ["baseline", "candidate"]) {
-    const timeoutClassification = classifyBenchmarkV3AttemptReceipt(timeoutReceipt, armKind);
-    assert.equal(timeoutClassification.receipt_authentic, true);
-    assert.equal(timeoutClassification.complete_scored_outcome, true);
-    assert.equal(timeoutClassification.verification_succeeded, false);
-    assert.equal(timeoutClassification.infrastructure_failure, false);
-  }
+  const baselineTimeout = classifyBenchmarkV3AttemptReceipt(timeoutReceipt, "baseline");
+  assert.equal(baselineTimeout.receipt_authentic, true);
+  assert.equal(baselineTimeout.infrastructure_failure, false);
+  const wrappedTimeoutReceipt = { ...trustedPipe, status: 21, signal: null, timed_out: true, error_code: "ETIMEDOUT",
+    protocol_valid: false, terminal_event_count: 0, activation: false, activation_receipt_valid: false,
+    activation_receipt_authentic: true,
+    child_execution: { schema_version: 1, status: null, signal: "SIGKILL", error_code: "ETIMEDOUT" } };
+  const candidateTimeout = classifyBenchmarkV3AttemptReceipt(wrappedTimeoutReceipt, "candidate");
+  assert.equal(candidateTimeout.receipt_authentic, true);
+  assert.equal(candidateTimeout.complete_scored_outcome, true);
+  assert.equal(candidateTimeout.verification_succeeded, false);
+  assert.equal(candidateTimeout.infrastructure_failure, false);
+  assert.equal(classifyBenchmarkV3AttemptReceipt(timeoutReceipt, "candidate").infrastructure_failure, true,
+    "a candidate timeout without the wrapper child receipt must fail closed");
   assert.equal(classifyBenchmarkV3AttemptReceipt({ ...timeoutReceipt, error_code: "EIO" }, "baseline").infrastructure_failure, true);
 } finally { fs.rmSync(workerFixtureRoot, { recursive: true, force: true }); }
 

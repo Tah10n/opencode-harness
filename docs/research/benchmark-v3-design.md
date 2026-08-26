@@ -35,7 +35,12 @@ from the commit parent plus `public.json`, after removing Git history and every
 hidden test. The runner-owned `control.json` contains the upstream hidden test,
 reference calibration bytes, closed mutation paths, and provenance; none is
 sent in the attempt envelope or mounted while the model runs. After model exit,
-the verifier mounts a fingerprinted historical dependency runtime and proves
+the verifier copies the scored workspace into a separate runner-owned oracle
+namespace with an empty home, no network, read-only hidden/runtime inputs, and
+verified process-tree teardown. Its supervisor requires a structured Mocha test
+count receipt and rejects early `process.exit(0)` or post-test workspace
+mutation before accepting an oracle result. The verifier then mounts a
+fingerprinted historical dependency runtime and proves
 that all 210 parent states fail while all 210 reference states pass. Alternative
 repairs pass whenever the upstream semantic test passes and the mutation set is
 closed.
@@ -78,7 +83,11 @@ per-family infrastructure retry is allowed before scoring; successful first
 attempts are retained and never rerun. A persistent Git-private campaign
 registry binds one campaign fingerprint to one output directory, rejects the
 same bindings in a new directory, and resumes the exact checkpoint after a
-crash without repeating completed/scored families. A retry consumes no extra architecture slot,
+crash without repeating completed/scored families. A long-lived PID/start/host/nonce
+lease rejects concurrent coordinators, stale short locks are recovered, every
+attempt is durably reserved before execution, and its fsynced completion is
+written before the coordinator can record it. A crash with no authentic durable
+completion fails closed instead of spending model tokens again. A retry consumes no extra architecture slot,
 and every sanitized attempt fingerprint, cost, status, and containment binding
 is persisted in the report alongside the sealed ledger. Relabel, reuse, extra
 retries, stage reordering, and changed retry bindings fail closed.
@@ -133,8 +142,11 @@ same-process authorization is created only after the canonical deterministic
 gate, the installed real-OpenCode fixture, exact product bundle validation,
 three signed current-host/current-SHA capability receipts (process containment,
 hidden namespace, and provider-only egress), and two independently signed
-current-SHA review receipts pass. Review self-hashes without a trusted issuer
-signature have no authority. The
+current-SHA review receipts pass. Capability freshness is checked again before
+every model attempt and contained oracle; expiry stops the campaign. Review
+receipts must come from two distinct root-owned protected issuer channels in
+addition to carrying distinct valid signatures. Keys or self-hashes committed
+in the reviewed tree have no authority by themselves. The
 runner then performs acceptance, baseline, the pre-candidate opportunity gate,
 development, deterministic single-candidate selection, and validation. Only
 when validation passes the frozen MDE, exact alpha, positive CI lower bound,
@@ -169,7 +181,10 @@ real process containment,
 hidden-data namespace isolation, exact
 product/candidate fingerprint equivalence, and sealed-holdout provider-only
 egress (or a proven equivalent), plus the external post-freeze sealed holdout
-root. These are actual external prerequisites; the permanent development-only
+manifest. The pre-freeze readiness gate never treats a directory path as
+sealed-holdout evidence: the external custodian can create and sign that
+manifest only after the design and final candidate are frozen. These are actual
+external prerequisites; the permanent development-only
 status of the public holdout is a design invariant, not an environment blocker.
 Boolean `READY=1` variables have no authority.
 Missing prerequisites return a typed

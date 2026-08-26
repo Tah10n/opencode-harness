@@ -7,8 +7,9 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { materializeProfileBundleV3 } from "../lib/profile-v3.mjs";
 import { sanitizeSyntheticModelFreeFailureDiagnostic } from "../lib/benchmark/self-test.mjs";
-import { runContainedOpenCode } from "../runtime/opencode-core.mjs";
+import { runContainedOpenCode, runCoreLauncher } from "../runtime/opencode-core.mjs";
 import {
+  CORE_CHECK_CATALOG_PATH,
   changedCoreWorkspacePaths,
   coreTrustedCheckCommandFingerprint,
   loadCoreVerificationCatalog,
@@ -459,6 +460,22 @@ try {
     assert.equal(contained.status, 0);
     await new Promise((resolve) => setTimeout(resolve, 750));
     assert.equal(fs.existsSync(delayedMarker), false, "delayed descendant mutated after final teardown snapshot boundary");
+    writeCatalog([check()]);
+    const timedLauncher = await runCoreLauncher({ workspace, catalog: CORE_CHECK_CATALOG_PATH,
+      opencode: process.execPath, opencodeArgs: ["-e", "setInterval(()=>{},1000)"], childTimeoutMs: 50,
+      env: process.env }, { processContainmentFactory: async (worker) => injectedProcessGroupContainment(worker) });
+    assert.equal(timedLauncher.receipt.child_execution.status, null);
+    assert.equal(timedLauncher.receipt.child_execution.error_code, "ETIMEDOUT",
+      "a wrapper-managed child timeout must still yield an authentic child-execution receipt");
+    assert.equal(timedLauncher.receipt.child_execution.signal, "SIGKILL");
+    const postChildFailure = await runCoreLauncher({ workspace, catalog: CORE_CHECK_CATALOG_PATH,
+      opencode: process.execPath, opencodeArgs: ["-e", "process.exit(0)"],
+      childTimeoutMs: 5_000, env: process.env },
+    { processContainmentFactory: async (worker) => injectedProcessGroupContainment(worker),
+      verifyCoreWorkspaceMutationFn: async () => { throw new Error("synthetic post-child verification failure"); } });
+    assert.equal(postChildFailure.receipt.child_execution.status, 0);
+    assert.equal(postChildFailure.receipt.decision.reason, "post_child_verification_failed",
+      "post-child verification exceptions must preserve the authentic child-execution receipt");
   }
 
   const materializedRoot = path.join(temporaryRoot, "materialized-core");
