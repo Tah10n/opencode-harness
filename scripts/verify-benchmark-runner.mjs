@@ -11,6 +11,7 @@ import {
   counterbalancedProfileSchedule,
   evaluateSyntheticCommonSafety,
   evaluateSyntheticWorkspacePolicy,
+  hostTargetedVerificationObserved,
   officialSyntheticAdapterConfigurationIsProfileNeutral,
   runSyntheticProfileAttempt,
   runSyntheticPair,
@@ -87,6 +88,31 @@ assert.throws(
   }),
   (error) => error?.code === "SYNTHETIC_RUNNER_TRUSTED_CHECK_CONTAINMENT",
 );
+
+assert.equal(hostTargetedVerificationObserved({
+  allowed: true,
+  reason: "no_workspace_mutation",
+  activation_eligible: false,
+  activated: false,
+}), false, "no workspace mutation is not targeted verification");
+assert.equal(hostTargetedVerificationObserved({
+  allowed: true,
+  reason: "no_applicable_trusted_check",
+  activation_eligible: false,
+  activated: false,
+}), false, "no applicable check is not targeted verification");
+assert.equal(hostTargetedVerificationObserved({
+  allowed: true,
+  reason: "post_last_mutation_verification_passed",
+  activation_eligible: true,
+  activated: true,
+}), true, "eligible activated passed verification must be observed");
+assert.equal(hostTargetedVerificationObserved({
+  allowed: false,
+  reason: "verification_failed",
+  activation_eligible: true,
+  activated: true,
+}), false, "failed verification is not targeted verification");
 assert.throws(
   () => syntheticTrustedCheckContainmentOptions({
     platform: "linux",

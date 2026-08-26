@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 
 import {
   completeCoreVerification,
@@ -77,8 +77,12 @@ function ordinaryFile(target, label) {
   return stat;
 }
 
-function readStableOrdinaryFile(target, label, { executable = false } = {}) {
+function readStableOrdinaryFile(target, label, { executable = false, rejectLinks = false } = {}) {
+  if (rejectLinks) ordinaryFile(target, label);
   const canonicalPath = fs.realpathSync.native(target);
+  if (rejectLinks && canonicalPath !== path.resolve(target)) {
+    fail("CORE_RUNTIME_UNTRUSTED_FILE", `${label} cannot traverse links`);
+  }
   let descriptor;
   try {
     descriptor = fs.openSync(canonicalPath, "r");
@@ -102,6 +106,7 @@ function readStableOrdinaryFile(target, label, { executable = false } = {}) {
       device: after.dev.toString(10),
       inode: after.ino.toString(10),
       sha256: `sha256:${createHash("sha256").update(bytes).digest("hex")}`,
+      ...(rejectLinks ? { link_policy: "reject" } : {}),
     }) });
   } finally {
     if (descriptor !== undefined) fs.closeSync(descriptor);
@@ -129,7 +134,7 @@ function assertIdentityCurrent(expected, label, { directory = false } = {}) {
     current = directory ? directoryIdentity(expected.canonical_path, label) : fileIdentity(
       expected.canonical_path,
       label,
-      { executable: label.includes("executable") },
+      { executable: label.includes("executable"), rejectLinks: expected.link_policy === "reject" },
     );
   } catch {
     fail("CORE_RUNTIME_IDENTITY_CHANGED", `${label} identity is unavailable`);
@@ -177,16 +182,31 @@ function resolveDefaultCatalog(root) {
   return Object.freeze({ candidate, git_directory: gitDirectory, top_level: topLevel });
 }
 
-function referencedInputIdentities(argv, cwdPath) {
+function referencedInputIdentities(argv, cwdPath, workspaceRoot) {
   const candidates = new Set();
   const packageManifest = path.join(cwdPath, "package.json");
   if (fs.existsSync(packageManifest)) candidates.add(packageManifest);
   for (const argument of argv) {
     if (argument.startsWith("-") || argument.length === 0) continue;
     const candidate = path.isAbsolute(argument) ? argument : path.resolve(cwdPath, argument);
-    if (fs.existsSync(candidate) && fs.lstatSync(candidate).isFile()) candidates.add(candidate);
+    let stat;
+    try {
+      stat = fs.lstatSync(candidate);
+    } catch (error) {
+      if (error?.code === "ENOENT") continue;
+      fail("CORE_RUNTIME_UNAVAILABLE", "argv input identity is unavailable");
+    }
+    if (stat.isSymbolicLink()) {
+      fail("CORE_RUNTIME_UNTRUSTED_FILE", "argv inputs must not be symbolic links");
+    }
+    if (stat.isFile()) {
+      inside(workspaceRoot, fs.realpathSync.native(candidate), "argv input");
+      candidates.add(candidate);
+    }
   }
-  return Object.freeze([...candidates].sort().map((candidate) => fileIdentity(candidate, "argv input")));
+  return Object.freeze([...candidates].sort().map((candidate) => (
+    fileIdentity(candidate, "argv input", { rejectLinks: true })
+  )));
 }
 
 function inside(root, target, label) {
@@ -237,7 +257,7 @@ function normalizeCheck(value, index, workspaceRoot) {
     cwd,
     cwd_path: cwdPath,
     cwd_identity: cwdIdentity,
-    input_manifest: referencedInputIdentities(value.argv, cwdPath),
+    input_manifest: referencedInputIdentities(value.argv, cwdPath, workspaceRoot),
     timeout_ms: value.timeout_ms,
   });
 }
@@ -347,6 +367,9 @@ function snapshotSubmodule(candidate, relative, indexEntry) {
   if (head.status !== 0 || status.status !== 0 || !/^[0-9a-f]{40,64}\n?$/u.test(head.stdout)) {
     fail("CORE_RUNTIME_REPOSITORY_SHAPE", `submodule ${relative} identity is unavailable`);
   }
+  if (status.stdout.length !== 0) {
+    fail("CORE_RUNTIME_DIRTY_SUBMODULE", `submodule ${relative} must be clean before model execution`);
+  }
   return Object.freeze({
     kind: "submodule",
     index_object: indexEntry.object,
@@ -414,7 +437,102 @@ export function coreTrustedCheckCommandFingerprint(check) {
   });
 }
 
-export function runCoreTrustedCheck(check) {
+const CONTAINED_CHECK_WORKER_SOURCE = String.raw`
+import { spawn } from "node:child_process";
+let initialized = false;
+let child = null;
+let terminal = false;
+let challenged = false;
+const keepAlive = setInterval(() => {}, 60_000);
+const send = (message) => { try { process.send?.(message); } catch {} };
+const finish = (result) => { if (!terminal) { terminal = true; send({ type: "result", result }); } };
+process.once("disconnect", () => { try { child?.kill(); } catch {} clearInterval(keepAlive); process.exit(1); });
+process.on("message", (message) => {
+  if (message?.type === "containment_challenge") {
+    const challenge = message.challenge;
+    if (initialized || challenged || typeof challenge !== "string" || !/^[A-Za-z0-9_-]{43}$/.test(challenge)) {
+      send({ type: "containment_challenge_rejected" });
+      return;
+    }
+    challenged = true;
+    send({ type: "containment_challenge_response", challenge });
+    return;
+  }
+  if (message?.type !== "initialize" || initialized) return;
+  initialized = true;
+  try {
+    child = spawn(message.file, message.args, {
+      cwd: message.cwd, env: message.env, shell: false, windowsHide: true,
+      stdio: ["ignore", "ignore", "ignore"],
+    });
+  } catch (error) {
+    finish({ status: null, signal: null, error_code: error?.code ?? "PROCESS_SPAWN_FAILED" });
+    return;
+  }
+  child.once("error", (error) => finish({ status: null, signal: null, error_code: error?.code ?? "PROCESS_SPAWN_FAILED" }));
+  child.once("exit", (status, signal) => finish({ status, signal, error_code: null }));
+});
+`;
+
+function waitForProcessClose(child, timeoutMs) {
+  if (child.exitCode !== null || child.signalCode !== null) return Promise.resolve(true);
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => resolve(false), timeoutMs);
+    child.once("close", () => { clearTimeout(timer); resolve(true); });
+  });
+}
+
+async function defaultCheckProcessContainmentFactory(worker, timeoutMs) {
+  const { preparePlatformProcessContainment } = await import("./process-containment.mjs");
+  return preparePlatformProcessContainment(worker, timeoutMs);
+}
+
+async function runContainedTrustedCheck(check, processContainmentFactory) {
+  const worker = spawn(process.execPath, ["--input-type=module", "--eval", CONTAINED_CHECK_WORKER_SOURCE], {
+    cwd: check.cwd_path,
+    env: process.env,
+    shell: false,
+    windowsHide: true,
+    detached: process.platform !== "win32",
+    serialization: "advanced",
+    stdio: ["ignore", "ignore", "ignore", "ipc"],
+  });
+  let containment;
+  try {
+    containment = await processContainmentFactory(worker, 10_000);
+    const resultPromise = new Promise((resolve, reject) => {
+      worker.once("error", reject);
+      worker.once("exit", () => reject(new Error("trusted-check worker exited before reporting")));
+      worker.on("message", (message) => { if (message?.type === "result") resolve(message.result); });
+      worker.send({ type: "initialize", file: check.executable_path, args: check.argv,
+        cwd: check.cwd_path, env: process.env });
+    });
+    let timeout;
+    const result = await Promise.race([
+      resultPromise,
+      new Promise((resolve) => { timeout = setTimeout(() => resolve({ timed_out: true }), check.timeout_ms); }),
+    ]);
+    clearTimeout(timeout);
+    const terminateAndVerify = containment.terminateAndVerify ?? containment.close;
+    const teardownVerified = containment.support_state === "verified"
+      && typeof terminateAndVerify === "function"
+      && await terminateAndVerify(10_000);
+    const workerClosed = await waitForProcessClose(worker, 10_000);
+    if (!teardownVerified || !workerClosed || containment.status?.().teardown_verified !== true) {
+      throw new Error("trusted-check process-tree teardown is unverified");
+    }
+    return result;
+  } catch (error) {
+    try { await containment?.close?.(10_000); } catch {}
+    try { worker.disconnect(); } catch {}
+    try { process.platform === "win32" ? worker.kill() : process.kill(-worker.pid, "SIGKILL"); } catch {}
+    throw error;
+  }
+}
+
+export async function runCoreTrustedCheck(check, {
+  processContainmentFactory = defaultCheckProcessContainmentFactory,
+} = {}) {
   try {
     assertIdentityCurrent(check.executable_identity, "check executable");
     assertIdentityCurrent(check.cwd_identity, "check cwd", { directory: true });
@@ -430,22 +548,21 @@ export function runCoreTrustedCheck(check) {
     });
   }
   const commandFingerprint = coreTrustedCheckCommandFingerprint(check);
-  const result = spawnSync(check.executable_path, check.argv, {
-    cwd: check.cwd_path,
-    encoding: "utf8",
-    shell: false,
-    windowsHide: true,
-    timeout: check.timeout_ms,
-    maxBuffer: 4 * 1024 * 1024,
-  });
+  let result;
+  try {
+    result = await runContainedTrustedCheck(check, processContainmentFactory);
+  } catch {
+    return Object.freeze({ status: "unavailable", detail_code: "process-containment-unverified",
+      command_fingerprint: commandFingerprint });
+  }
   let status;
   let detailCode;
-  if (result.error?.code === "ENOENT" || result.error?.code === "EACCES") {
+  if (result.error_code === "ENOENT" || result.error_code === "EACCES") {
     status = "unavailable";
     detailCode = "executable-unavailable";
-  } else if (result.error !== undefined || result.signal !== null) {
+  } else if (result.timed_out === true || result.error_code !== null || result.signal !== null) {
     status = "unrelated_infrastructure_failure";
-    detailCode = result.error?.code === "ETIMEDOUT" ? "check-timeout" : "check-infrastructure-failure";
+    detailCode = result.timed_out === true ? "check-timeout" : "check-infrastructure-failure";
   } else if (result.status === 0) {
     status = "passed";
     detailCode = "exit-zero";
@@ -456,7 +573,13 @@ export function runCoreTrustedCheck(check) {
   return Object.freeze({ status, detail_code: detailCode, command_fingerprint: commandFingerprint });
 }
 
-export function verifyCoreWorkspaceMutation({ catalog, before, after, checkRunner = runCoreTrustedCheck }) {
+export async function verifyCoreWorkspaceMutation({
+  catalog,
+  before,
+  after,
+  checkRunner = runCoreTrustedCheck,
+  processContainmentFactory,
+}) {
   const changedPaths = changedCoreWorkspacePaths(before, after);
   let state = createCoreVerificationGate({
     catalog_fingerprint: catalog.catalog_fingerprint,
@@ -481,7 +604,7 @@ export function verifyCoreWorkspaceMutation({ catalog, before, after, checkRunne
   let outcome;
   try {
     if (catalog.catalog_identity !== undefined) assertIdentityCurrent(catalog.catalog_identity, "core verification catalog");
-    outcome = checkRunner(selected);
+    outcome = await checkRunner(selected, { processContainmentFactory });
   } catch (error) {
     outcome = Object.freeze({
       status: "unavailable",

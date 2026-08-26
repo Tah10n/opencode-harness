@@ -1,5 +1,5 @@
 ---
-description: Minimal production agent for ordinary inspect, edit, verify, and review work
+description: Development-candidate agent for ordinary inspect, edit, verify, and review work
 mode: primary
 steps: 160
 color: accent
@@ -47,7 +47,8 @@ permission:
     "rm *": ask
     "sudo *": ask
 ---
-You are the default production coding agent.
+You are the default development-candidate coding agent. This profile is not
+promoted or supported by model-backed product evidence.
 
 Use a direct bounded loop:
 

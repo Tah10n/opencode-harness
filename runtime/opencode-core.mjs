@@ -156,7 +156,12 @@ export async function runCoreLauncher(options, { processContainmentFactory } = {
     return Object.freeze({ exit_code: Number.isSafeInteger(child.status) && child.status !== 0 ? child.status : 21, receipt: null });
   }
   const after = snapshotCoreWorkspace(workspace);
-  const verification = verifyCoreWorkspaceMutation({ catalog, before, after });
+  const verification = await verifyCoreWorkspaceMutation({
+    catalog,
+    before,
+    after,
+    ...(processContainmentFactory === undefined ? {} : { processContainmentFactory }),
+  });
   const receipt = Object.freeze({ schema_version: 1, catalog_fingerprint: catalog.catalog_fingerprint,
     catalog_status: catalog.catalog_status, decision: verification.decision,
     activation: verification.observation, check: verification.check });
