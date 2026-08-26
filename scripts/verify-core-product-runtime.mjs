@@ -6,6 +6,7 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { materializeProfileBundleV3 } from "../lib/profile-v3.mjs";
+import { sanitizeSyntheticModelFreeFailureDiagnostic } from "../lib/benchmark/self-test.mjs";
 import { runContainedOpenCode } from "../runtime/opencode-core.mjs";
 import {
   changedCoreWorkspacePaths,
@@ -315,6 +316,9 @@ try {
   assert.equal(materialized.manifest.bundle_id, "core");
 
   process.stdout.write("installed core product runtime verification passed\n");
+} catch (error) {
+  process.stderr.write(`${sanitizeSyntheticModelFreeFailureDiagnostic(error?.stack ?? error?.message ?? String(error))}\n`);
+  process.exitCode = 1;
 } finally {
   fs.rmSync(temporaryRoot, { recursive: true, force: true });
 }
