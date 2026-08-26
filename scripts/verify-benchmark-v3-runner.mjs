@@ -188,6 +188,12 @@ try {
   assert.throws(() => createBenchmarkV3CampaignJournal(output, { sourceRoot: registryFixture, campaignFingerprint, initialLedger }),
     /already active/u, "one campaign must hold an exclusive long-lived lease");
   firstJournal.close();
+  const staleReusedPidLease = path.join(registryFixture, ".git", "opencode-harness", "benchmark-v3",
+    `campaign-${campaignFingerprint.slice(7)}.lease`);
+  fs.writeFileSync(staleReusedPidLease, `${JSON.stringify({ schema_version: 2, pid: 1,
+    process_start_fingerprint: fingerprint({ deliberately: "wrong-start-identity" }),
+    host_fingerprint: fingerprint(os.hostname().toLowerCase()), nonce: "stale-reused-pid",
+    created_at_ms: 1, heartbeat_at_ms: 1 })}\n`, { mode: 0o600 });
   const resumedJournal = createBenchmarkV3CampaignJournal(output, { sourceRoot: registryFixture, campaignFingerprint, initialLedger });
   assert.equal(resumedJournal.attemptsFor("baseline", "family-one").length, 1,
     "exact resume must preserve completed family execution");
@@ -244,6 +250,12 @@ try {
   fs.appendFileSync(path.join(oracleSafetyRoot, ...subject.split("/")), "\nprocess.stdout.write(JSON.stringify({stats:{tests:7,passes:7,failures:0,pending:0}}));process.exit(0);\n");
   assert.equal(verifyBenchmarkV3OracleSubjectSafety(oracleSafetyRoot, safetyBefore, first).safe, false,
     "model-authored stdout/early-exit oracle spoof must be rejected before hidden code execution");
+  fs.writeFileSync(path.join(oracleSafetyRoot, ...subject.split("/")), `${first.public_surface.public_files[0].content}\nrequire /* bypass */ ("node:fs");\n`);
+  assert.equal(verifyBenchmarkV3OracleSubjectSafety(oracleSafetyRoot, safetyBefore, first).safe, false,
+    "syntax variations must not bypass the exact frozen-reference boundary");
+  for (const entry of first.control_surface.reference_files) fs.writeFileSync(path.join(oracleSafetyRoot, ...entry.path.split("/")), entry.content);
+  assert.equal(verifyBenchmarkV3OracleSubjectSafety(oracleSafetyRoot, safetyBefore, first).safe, true,
+    "the authentic frozen upstream repair must be eligible for contained semantic confirmation");
   fs.rmSync(oracleSafetyRoot, { recursive: true }); fs.mkdirSync(oracleSafetyRoot);
   for (const entry of first.public_surface.public_files) {
     const target = path.join(oracleSafetyRoot, ...entry.path.split("/")); fs.mkdirSync(path.dirname(target), { recursive: true });

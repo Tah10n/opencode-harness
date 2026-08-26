@@ -40,21 +40,21 @@
   },
   "requirement_coverage": {
     "schema_version": 1,
-    "contract_fingerprint": "sha256:a9f84358d606e678915cf41c5cf778645c6ea0417dd3bf6ef431149600cf2f53",
-    "contract_completeness": "unverified",
+    "contract_fingerprint": "sha256:e6a849e157cedfe4e673f2012ab162cc4f546b64aa7345f7debbb4493ce2a490",
+    "contract_completeness": "reference-byte-bound",
     "hidden_test_witnesses": [
       {
         "hidden_test_fingerprint": "sha256:05080765d4f323b29210b9b0f0807d3df2a19c6e7931cc4c2bd8c6da331c9830",
         "clause_ids": [
-          "REQ-001",
           "REQ-002"
         ]
       }
     ],
     "runner_witnesses": [
       {
-        "witness_id": "closed-mutation-set",
+        "witness_id": "frozen-reference-bytes-and-closed-mutation-set",
         "clause_ids": [
+          "REQ-001",
           "REQ-003"
         ]
       }

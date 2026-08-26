@@ -190,7 +190,7 @@ fs.writeFileSync(path.join(outputRoot, "SOURCE.json"), `${JSON.stringify({
       local_environment_variable: "BENCHMARK_V3_PROVENANCE_BUNDLE" },
     third_party_notices: "THIRD_PARTY_NOTICES.md",
     materializer: "scripts/materialize-benchmark-v3-provenance.mjs",
-    derivation: "unique-real-eslint-source-lineages-with-quarantined-unverified-public-contracts-and-hidden-upstream-tests",
+    derivation: "unique-real-eslint-source-lineages-with-development-only-reference-byte-contracts-and-hidden-upstream-tests",
 }, null, 2)}\n`, "utf8");
 fs.writeFileSync(path.join(outputRoot, "THIRD_PARTY_LICENSE.txt"), licenseBytes);
 fs.writeFileSync(path.join(outputRoot, "THIRD_PARTY_NOTICES.md"), `# Third-party notices\n\nDerived from ${repositoryUrl} at ${sourceTip}. SPDX-License-Identifier: MIT. Raw provenance bundles are excluded from Git and release assets.\n`, "utf8");
@@ -202,8 +202,8 @@ for (const [stratum] of Object.entries(groups)) {
       const index = zeroIndex + 1;
       const familyId = `v3-${split}-${stratum}-${String(index).padStart(2, "0")}`;
       const clauses = Object.freeze([
-        Object.freeze({ clause_id: "REQ-001", kind: "required-behavior", text: "Implement the intended upstream behavior for the supplied source." }),
-        Object.freeze({ clause_id: "REQ-002", kind: "preserved-behavior", text: "Preserve the pre-existing behavior exercised by the runner-owned upstream test files." }),
+        Object.freeze({ clause_id: "REQ-001", kind: "required-behavior", text: "Reproduce the frozen upstream repair bytes for every supplied source path." }),
+        Object.freeze({ clause_id: "REQ-002", kind: "preserved-behavior", text: "Pass the runner-owned upstream test files without modifying them." }),
         Object.freeze({ clause_id: "REQ-003", kind: "allowed-mutation", text: "Modify only the supplied source paths." }),
       ]);
       const contractBody = { schema_version: 1, contract_id: `${familyId}-public-contract`, clauses };
@@ -215,7 +215,7 @@ for (const [stratum] of Object.entries(groups)) {
         stratum,
         prompt: "Repair the supplied ESLint source according to the visible public contract.",
         visible_requirements: Object.freeze([
-          "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
+          "Development-only reconstruction: reproduce the frozen upstream repair bytes; semantic alternatives and confirmatory claims are out of scope.",
           ...clauses.map((clause) => clause.text),
         ]),
         contract,
@@ -245,9 +245,9 @@ for (const [stratum] of Object.entries(groups)) {
           license_fingerprint: licenseFingerprint,
         }),
         requirement_coverage: Object.freeze({ schema_version: 1, contract_fingerprint: contract.contract_fingerprint,
-          contract_completeness: "unverified",
-          hidden_test_witnesses: Object.freeze(entry.hiddenTestFiles.map((file) => Object.freeze({ hidden_test_fingerprint: fingerprint(file.content), clause_ids: Object.freeze(["REQ-001", "REQ-002"]) }))),
-          runner_witnesses: Object.freeze([{ witness_id: "closed-mutation-set", clause_ids: Object.freeze(["REQ-003"]) }]) }),
+          contract_completeness: "reference-byte-bound",
+          hidden_test_witnesses: Object.freeze(entry.hiddenTestFiles.map((file) => Object.freeze({ hidden_test_fingerprint: fingerprint(file.content), clause_ids: Object.freeze(["REQ-002"]) }))),
+          runner_witnesses: Object.freeze([{ witness_id: "frozen-reference-bytes-and-closed-mutation-set", clause_ids: Object.freeze(["REQ-001", "REQ-003"]) }]) }),
       });
       const manifestBody = {
         schema_version: 1,

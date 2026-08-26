@@ -12,12 +12,13 @@ balanced by small, medium, and high stratum. All 210 are derived from distinct,
 semantically discriminating rule-change commits in the MIT-licensed
 `eslint/eslint` history; source commit,
 semantic-kernel, source-identity, and family fingerprints are globally unique.
-The imported commit messages were not complete behavioral specifications and
+The imported commit messages were not independent behavioral specifications and
 one independent review found reference-implementation leakage in that public
 surface. They have therefore been removed from model-visible artifacts. Every
-family is explicitly marked `contract_completeness: unverified`. That boundary
-permits only exploratory development/validation execution; it can never
-authorize a confirmatory claim.
+family now declares the narrower `reference-byte-bound` development contract:
+the only accepted repair is the exact frozen upstream source repair, followed by
+the upstream semantic test. Semantically equivalent alternative patches are not
+accepted, and this corpus can never authorize a confirmatory claim.
 The versioned generator contract freezes its generator version, deterministic
 `corpus_generation_seed`, split-specific source and seed commitments, public
 behavior contract, hidden oracle contract, pre-fix failure witness,
@@ -41,15 +42,14 @@ verified process-tree teardown. Its supervisor requires a structured Mocha test
 count receipt calibrated through the same contained path. The expected count and
 one-use MAC key are delivered through an authority file that the supervisor
 unlinks before it starts evaluated code; unsigned or replaced receipt paths are
-rejected. A closed subject-capability preflight rejects newly introduced process,
-stdout, dynamic-module, reflection, and code-generation surfaces before hidden
-code execution, including early `process.exit(0)` report spoofs. Content, size,
-path, and mode changes all enter the closed mutation set. The verifier rejects
+rejected. Before any model-authored bytes can share a process with hidden tests,
+the runner requires every allowed source path to match the frozen upstream
+reference bytes exactly, requires its file mode to remain unchanged, and rejects
+every out-of-scope content, size, path, or mode change. This byte equality is the
+gate; heuristic source scanning is not used as an execution boundary. The verifier rejects
 post-test workspace mutation before accepting an oracle result, then mounts a
 fingerprinted historical dependency runtime and proves
-that all 210 parent states fail while all 210 reference states pass. Alternative
-repairs pass whenever the upstream semantic test passes and the mutation set is
-closed.
+that all 210 parent states fail while all 210 reference states pass.
 
 ## Power and opportunity
 
@@ -90,7 +90,11 @@ attempts are retained and never rerun. A persistent Git-private campaign
 registry binds one campaign fingerprint to one output directory, rejects the
 same bindings in a new directory, and resumes the exact checkpoint after a
 crash without repeating completed/scored families. A long-lived PID/start/host/nonce
-lease rejects concurrent coordinators, stale short locks are recovered, every
+lease carries an atomic five-second heartbeat: a fresh lease rejects concurrent
+coordinators, while a stale heartbeat can be recovered even if the old PID has
+been reused. On Linux `/proc` start ticks and on an unrestricted macOS host `ps`
+start identity are compared in addition to heartbeat freshness; unavailable
+start inspection fails closed while the heartbeat is fresh. Stale short locks are recovered, every
 attempt is durably reserved before execution, and its fsynced completion is
 written before the coordinator can record it. A crash with no authentic durable
 completion fails closed instead of spending model tokens again. A retry consumes no extra architecture slot,

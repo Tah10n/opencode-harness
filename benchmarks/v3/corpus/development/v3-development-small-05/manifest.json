@@ -4,8 +4,8 @@
   "split": "development",
   "stratum": "small",
   "semantic_kernel_id": "eslint-change-845a7af90ce03b383c8f09654ac049fc161dbb9f",
-  "public_surface_fingerprint": "sha256:52af9b0ef9115c952f2e2b4ed90c16553b48ebec4d7b06b127f10abde28b9420",
-  "control_surface_fingerprint": "sha256:35dbeb42e91e23c1d03fd8220d9ca3bec7aa180c7f4a34e743677902d30d3240",
+  "public_surface_fingerprint": "sha256:0b72ec0fd2d008cfa7ff810a07a543ec5e19eb7d52940e27b631e2ce7489ddc6",
+  "control_surface_fingerprint": "sha256:9f38052e27bf9625ecf554a0f91140e033bd05a51fa3f4c74a561bd45277328b",
   "source_identity_fingerprint": "sha256:d247d5ec5fbaa2a8d9055368f155620383f213094391cc570a257cd421db1fdd",
-  "family_fingerprint": "sha256:42b4b7744986db828910d028fc4c4c1d90597565d0bc31e1b93ae2f37504d6f2"
+  "family_fingerprint": "sha256:4bda0e5840b28a5d9c687d2b670a2323b2bbf09c87298058d938d07f6a79b94d"
 }

@@ -5,9 +5,9 @@
   "stratum": "medium",
   "prompt": "Repair the supplied ESLint source according to the visible public contract.",
   "visible_requirements": [
-    "Behavioral details are not yet independently specified; this family is ineligible for model execution.",
-    "Implement the intended upstream behavior for the supplied source.",
-    "Preserve the pre-existing behavior exercised by the runner-owned upstream test files.",
+    "Development-only reconstruction: reproduce the frozen upstream repair bytes; semantic alternatives and confirmatory claims are out of scope.",
+    "Reproduce the frozen upstream repair bytes for every supplied source path.",
+    "Pass the runner-owned upstream test files without modifying them.",
     "Modify only the supplied source paths."
   ],
   "contract": {
@@ -17,12 +17,12 @@
       {
         "clause_id": "REQ-001",
         "kind": "required-behavior",
-        "text": "Implement the intended upstream behavior for the supplied source."
+        "text": "Reproduce the frozen upstream repair bytes for every supplied source path."
       },
       {
         "clause_id": "REQ-002",
         "kind": "preserved-behavior",
-        "text": "Preserve the pre-existing behavior exercised by the runner-owned upstream test files."
+        "text": "Pass the runner-owned upstream test files without modifying them."
       },
       {
         "clause_id": "REQ-003",
@@ -30,7 +30,7 @@
         "text": "Modify only the supplied source paths."
       }
     ],
-    "contract_fingerprint": "sha256:5c19d2ea056713a95b3748b12f59acf979a4b2668fc53b326e2678cc794346be"
+    "contract_fingerprint": "sha256:cf4251b4e88f7398c6e1352b307945e7bc2c36e5e07983903a8002b0a47cdb7b"
   },
   "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
   "public_files": [

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generator_version": "benchmark-v3-generator/1",
+  "generator_version": "benchmark-v3-generator/2",
   "corpus_generation_seed": "benchmark-v3-corpus-2026-08-26-v1",
   "model_sampling_seed": "optional-or-unsupported",
   "split_assignment_algorithm": "frozen-seeded-complexity-quantile-shuffle-v1",
