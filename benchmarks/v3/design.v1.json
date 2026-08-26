@@ -1,6 +1,6 @@
 {
-  "schema_version": 2,
-  "design_id": "opencode-harness-benchmark-v3-executable-v2",
+  "schema_version": 3,
+  "design_id": "opencode-harness-benchmark-v3-executable-v3",
   "status": "executable-model-free-gated",
   "execution_policy": {
     "scope": "lab-only",
@@ -64,6 +64,13 @@
     "representative_all_comers": "all-families-in-preregistered-split",
     "challenge_opportunity_enriched": "baseline-failure-opportunities-only",
     "reporting_boundary": "enriched-effect-must-not-be-labeled-repository-wide-lift"
+  },
+  "holdout_policy": {
+    "public_split": "permanently-development-only",
+    "confirmatory_use": "forbidden",
+    "sealed_holdout_storage": "outside-public-git",
+    "sealed_holdout_creation": "after-design-and-candidate-freeze",
+    "execution_source": "external-sealed-receipt-only"
   },
   "guardrails": {
     "new_critical_regressions_maximum": 0,

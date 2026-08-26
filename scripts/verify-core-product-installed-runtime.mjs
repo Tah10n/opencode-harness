@@ -121,7 +121,7 @@ function writeCatalog(command) {
   const directory = path.dirname(catalogPath);
   fs.mkdirSync(directory, { recursive: true });
   fs.writeFileSync(catalogPath, `${JSON.stringify({
-    schema_version: 1,
+    schema_version: 2,
     catalog_id: "real-opencode-installed-fixture",
     checks: [{
       check_id: "fixture-check",
@@ -129,6 +129,8 @@ function writeCatalog(command) {
       cost_rank: 1,
       executable_path: fs.realpathSync.native(trustedCheckExecutable),
       argv: checkArguments(command),
+      immutable_input_paths: [],
+      subject_paths: ["src/fixture.txt"],
       cwd: ".",
       timeout_ms: 10_000,
     }],

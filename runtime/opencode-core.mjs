@@ -152,9 +152,6 @@ export async function runCoreLauncher(options, { processContainmentFactory } = {
     env: options.env ?? process.env,
     ...(processContainmentFactory === undefined ? {} : { processContainmentFactory }),
   });
-  if (child.error_code !== null || child.signal !== null || child.status !== 0) {
-    return Object.freeze({ exit_code: Number.isSafeInteger(child.status) && child.status !== 0 ? child.status : 21, receipt: null });
-  }
   const after = snapshotCoreWorkspace(workspace);
   const verification = await verifyCoreWorkspaceMutation({
     catalog,
@@ -162,10 +159,14 @@ export async function runCoreLauncher(options, { processContainmentFactory } = {
     after,
     ...(processContainmentFactory === undefined ? {} : { processContainmentFactory }),
   });
-  const receipt = Object.freeze({ schema_version: 1, catalog_fingerprint: catalog.catalog_fingerprint,
+  const childExecution = Object.freeze({ schema_version: 1, status: Number.isSafeInteger(child.status) ? child.status : null,
+    signal: child.signal ?? null, error_code: child.error_code ?? null });
+  const receipt = Object.freeze({ schema_version: 2, catalog_fingerprint: catalog.catalog_fingerprint,
     catalog_status: catalog.catalog_status, decision: verification.decision,
-    activation: verification.observation, check: verification.check });
-  return Object.freeze({ exit_code: verification.decision.allowed ? 0 : 20, receipt });
+    activation: verification.observation, check: verification.check, child_execution: childExecution });
+  const childSucceeded = childExecution.error_code === null && childExecution.signal === null && childExecution.status === 0;
+  const childExitCode = Number.isSafeInteger(childExecution.status) && childExecution.status !== 0 ? childExecution.status : 21;
+  return Object.freeze({ exit_code: childSucceeded ? (verification.decision.allowed ? 0 : 20) : childExitCode, receipt });
 }
 
 if (process.argv[1] !== undefined && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url) {

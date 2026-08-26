@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { createHash, generateKeyPairSync, sign } from "node:crypto";
 import { canonicalJson, fingerprint } from "../lib/feedback/contracts.mjs";
-import { benchmarkV3ReadinessEnvironment, validateBenchmarkV3ReadinessReceipt } from "../lib/benchmark/v3-readiness.mjs";
+import { authorizeBenchmarkV3Capabilities, benchmarkV3ReadinessEnvironment, validateBenchmarkV3ReadinessReceipt } from "../lib/benchmark/v3-readiness.mjs";
 import { verifyBenchmarkV3SplitDistribution } from "../lib/benchmark/v3-split-assignment.mjs";
 
 import { materializeProfileBundleV3 } from "../lib/profile-v3.mjs";
@@ -16,10 +16,12 @@ import {
   buildBenchmarkV3AttemptEnvelope,
   buildBenchmarkV3ModelBinding,
   classifyBenchmarkV3AttemptReceipt,
+  createBenchmarkV3CampaignJournal,
   evaluateBenchmarkV3EfficacyGate,
   evaluateBenchmarkV3Guardrails,
   resolveBenchmarkV3StudySeeds,
   summarizeBenchmarkV3Stage,
+  validateBenchmarkV3ReviewReceipt,
   verifyBenchmarkV3OpenCodeExecutable,
   verifyBenchmarkV3FilesystemIsolation,
   verifyBenchmarkV3ProductBundle,
@@ -53,7 +55,7 @@ try {
     protected_channel: "fixture-protected-channel-v1",
     channel_root: readinessRoot,
     owner_uid: process.getuid(),
-    capabilities: Object.freeze(["real-process-containment"]),
+    capabilities: Object.freeze(["real-process-containment", "hidden-namespace-isolation", "provider-only-egress"]),
     public_key_pem: publicKey.export({ type: "spki", format: "pem" }),
   });
   const environment = benchmarkV3ReadinessEnvironment();
@@ -67,6 +69,33 @@ try {
   assert.equal(validateBenchmarkV3ReadinessReceipt(receiptPath, {
     capability: body.capability, sourceRoot: root, trustedIssuers: [issuer],
   }).status, "verified");
+  const capabilityPaths = { "real-process-containment": receiptPath };
+  for (const capability of ["hidden-namespace-isolation", "provider-only-egress"]) {
+    const capabilityBody = { ...body, capability };
+    const capabilityPath = path.join(readinessRoot, `${capability}.json`);
+    fs.writeFileSync(capabilityPath, JSON.stringify({ ...capabilityBody,
+      signature: sign(null, Buffer.from(canonicalJson(capabilityBody), "utf8"), privateKey).toString("base64url") }), { mode: 0o600 });
+    capabilityPaths[capability] = capabilityPath;
+  }
+  const authorization = authorizeBenchmarkV3Capabilities(capabilityPaths, { sourceRoot: root, trustedIssuers: [issuer] });
+  assert.match(authorization.authorization_fingerprint, /^sha256:[0-9a-f]{64}$/u);
+  const reviewIssuer = { issuer_id: "fixture-review-issuer-v1", reviewer_id: "fixture-independent-reviewer",
+    public_key_pem: issuer.public_key_pem };
+  const reviewUnsigned = { schema_version: 2, issuer_id: reviewIssuer.issuer_id, reviewer_id: reviewIssuer.reviewer_id,
+    read_only: true, verdict: "passed", high_findings: 0, medium_findings: 0, source_sha: sourceSha,
+    source_tree_fingerprint: `sha256:${"9".repeat(64)}`, corpus_contract_reviewed: true,
+    contract_coverage_reviewed: true, oracle_leakage_reviewed: true, reviewed_at: new Date().toISOString() };
+  const reviewFingerprint = fingerprint(reviewUnsigned);
+  const reviewSignedBody = { ...reviewUnsigned, review_fingerprint: reviewFingerprint };
+  const reviewPath = path.join(readinessRoot, "review.json");
+  fs.writeFileSync(reviewPath, JSON.stringify({ ...reviewSignedBody,
+    signature: sign(null, Buffer.from(canonicalJson(reviewSignedBody), "utf8"), privateKey).toString("base64url") }), { mode: 0o600 });
+  assert.equal(validateBenchmarkV3ReviewReceipt(reviewPath, { sourceSha,
+    sourceTreeFingerprint: reviewUnsigned.source_tree_fingerprint, trustedIssuers: [reviewIssuer] }).verdict, "passed");
+  const tamperedReview = JSON.parse(fs.readFileSync(reviewPath, "utf8")); tamperedReview.medium_findings = 1;
+  fs.writeFileSync(reviewPath, JSON.stringify(tamperedReview), { mode: 0o600 });
+  assert.throws(() => validateBenchmarkV3ReviewReceipt(reviewPath, { sourceSha,
+    sourceTreeFingerprint: reviewUnsigned.source_tree_fingerprint, trustedIssuers: [reviewIssuer] }));
   const canonicalParent = path.join(readinessRoot, "canonical-parent");
   const configuredParent = path.join(readinessRoot, "configured-parent");
   const canonicalChannel = path.join(canonicalParent, "readiness");
@@ -110,6 +139,22 @@ try {
   assert.equal(readySpoof.status, 2);
   assert.equal(JSON.parse(readySpoof.stdout).reasons.some((entry) => entry.code === "PROCESS_CONTAINMENT_UNAVAILABLE"), true);
 } finally { fs.rmSync(readinessRoot, { recursive: true, force: true }); }
+const registryFixture = fs.mkdtempSync(path.join(os.tmpdir(), "v3-campaign-registry-"));
+try {
+  assert.equal(spawnSync("git", ["init", "--quiet"], { cwd: registryFixture }).status, 0);
+  const campaignFingerprint = `sha256:${"c".repeat(64)}`;
+  const initialLedger = Object.freeze({ ledger_fingerprint: `sha256:${"d".repeat(64)}` });
+  const output = path.join(registryFixture, "outputs", "campaign-one");
+  const firstJournal = createBenchmarkV3CampaignJournal(output, { sourceRoot: registryFixture, campaignFingerprint, initialLedger });
+  firstJournal.recordAttempt({ arm_id: "baseline", family_id: "family-one", attempt_index: 1,
+    outcome: { infrastructure_failure: false, result_fingerprint: `sha256:${"e".repeat(64)}` } });
+  const resumedJournal = createBenchmarkV3CampaignJournal(output, { sourceRoot: registryFixture, campaignFingerprint, initialLedger });
+  assert.equal(resumedJournal.attemptsFor("baseline", "family-one").length, 1,
+    "exact resume must preserve completed family execution");
+  assert.throws(() => createBenchmarkV3CampaignJournal(path.join(registryFixture, "outputs", "campaign-copy"), {
+    sourceRoot: registryFixture, campaignFingerprint, initialLedger,
+  }), /already registered/u, "the same campaign bindings must not move to a new output directory");
+} finally { fs.rmSync(registryFixture, { recursive: true, force: true }); }
 const families = corpus.families.filter((entry) => entry.split === "development");
 const first = families[0];
 const envelope = buildBenchmarkV3AttemptEnvelope({
@@ -237,20 +282,27 @@ try {
   fs.writeFileSync(executable, "#!/bin/sh\nprintf '1.18.21\\n'\n", { mode: 0o700 });
   const identity = verifyBenchmarkV3OpenCodeExecutable(executable);
   assert.equal(identity.version, "1.18.21");
-  assert.throws(() => verifyBenchmarkV3FilesystemIsolation(root, identity), /BENCHMARK_V3_RUNNER_(?:FILESYSTEM|NETWORK)_ISOLATION/u);
+  assert.throws(() => verifyBenchmarkV3FilesystemIsolation(root, identity, Object.freeze({})), /BENCHMARK_V3_READINESS_RECEIPT/u);
   fs.appendFileSync(executable, "# drift\n");
   assert.notEqual(verifyBenchmarkV3OpenCodeExecutable(executable).executable_fingerprint, identity.executable_fingerprint);
 } finally { fs.rmSync(executableRoot, { recursive: true, force: true }); }
 
 const runnerSource = fs.readFileSync(path.join(root, "lib", "benchmark", "v3-runner.mjs"), "utf8");
 for (const forbidden of ["runBaseline:", "runCandidate:", "typeof runBaseline", "typeof runCandidate"]) assert.equal(runnerSource.includes(forbidden), false);
-for (const required of ["runManagedCommand", "reviewed_source_root", "semantic_runtime_fingerprint", "catalog_before", "attempt_fingerprints", "json_event_count"]) {
+assert.equal(runnerSource.includes('entry.split === "holdout"'), false,
+  "the public development-only holdout must not enter the confirmatory execution path");
+assert.equal(design.holdout_policy.public_split, "permanently-development-only");
+assert.equal(design.holdout_policy.confirmatory_use, "forbidden");
+const cliSource = fs.readFileSync(path.join(root, "scripts", "benchmark-v3-run.mjs"), "utf8");
+for (const requiredReceipt of ["process-receipt", "namespace-receipt", "egress-receipt"]) assert.equal(cliSource.includes(requiredReceipt), true);
+for (const required of ["runManagedCommand", "reviewed_source_root", "semantic_runtime_fingerprint", "catalog_before", "attempt_fingerprints", "json_event_count",
+  "linux-bubblewrap-v1", "macos-sandbox-exec-v1", "capability_authorization_fingerprint"]) {
   assert.equal(runnerSource.includes(required), true);
 }
 const allowedFinalStatuses = new Set([
-  "POSITIVE HOLDOUT — PILOT REQUIRED",
   "NO PROMOTABLE HARNESS",
   "STUDY BLOCKED — INFRASTRUCTURE",
+  "STUDY BLOCKED — EXTERNAL SEALED HOLDOUT REQUIRED",
 ]);
 for (const match of runnerSource.matchAll(/final_status:\s*"([^"]+)"/gu)) assert.equal(allowedFinalStatuses.has(match[1]), true);
 const workerSource = fs.readFileSync(path.join(root, "scripts", "benchmark-v3-attempt-worker.mjs"), "utf8");
@@ -271,10 +323,12 @@ if (process.argv.includes("--running-tool-before-text")) process.stdout.write(JS
 if (process.argv.includes("--terminal-tool-reuse")) { process.stdout.write(JSON.stringify({type:"tool_use",part:{id:"tool-1",state:{status:"completed"}}})+"\\n"); process.stdout.write(JSON.stringify({type:"tool_use",part:{id:"tool-1",state:{status:"running"}}})+"\\n"); }
 if (process.argv.includes("--final")) process.stdout.write(JSON.stringify({type:"text",part:{text:"done"}})+"\\n");
 if (process.argv.includes("--unfinished")) process.stdout.write(JSON.stringify({type:"step_start",part:{}})+"\\n");
-if (process.argv.includes("--valid-receipt")) require("node:fs").writeSync(3, JSON.stringify({schema_version:1,catalog_fingerprint:"sha256:${"a".repeat(64)}",catalog_status:"loaded",decision:{allowed:true,reason:"post_last_mutation_verification_passed"},activation:{post_last_mutation_verification:true},check:{status:"passed",command_fingerprint:"sha256:${"b".repeat(64)}"}})+"\\n");
-if (process.argv.includes("--failed-receipt")) { require("node:fs").writeSync(3, JSON.stringify({schema_version:1,catalog_fingerprint:"sha256:${"a".repeat(64)}",catalog_status:"loaded",decision:{allowed:false,reason:"verification_failed"},activation:{post_last_mutation_verification:false},check:{status:"failed",command_fingerprint:"sha256:${"b".repeat(64)}"}})+"\\n"); process.exitCode=20; }
-if (process.argv.includes("--unavailable-receipt")) { require("node:fs").writeSync(3, JSON.stringify({schema_version:1,catalog_fingerprint:"sha256:${"a".repeat(64)}",catalog_status:"loaded",decision:{allowed:false,reason:"verification_unavailable"},activation:{post_last_mutation_verification:false},check:{status:"unavailable",command_fingerprint:"sha256:${"b".repeat(64)}"}})+"\\n"); process.exitCode=20; }
-if (process.argv.includes("--forged-receipt")) require("node:fs").writeSync(3, JSON.stringify({schema_version:1,catalog_fingerprint:"sha256:${"f".repeat(64)}",catalog_status:"loaded",decision:{allowed:true,reason:"post_last_mutation_verification_passed"},activation:{post_last_mutation_verification:true},check:{status:"passed",command_fingerprint:"sha256:${"b".repeat(64)}"}})+"\\n");
+const childExecution={schema_version:1,status:process.exitCode??0,signal:null,error_code:null};
+if (process.argv.includes("--valid-receipt")) require("node:fs").writeSync(3, JSON.stringify({schema_version:2,catalog_fingerprint:"sha256:${"a".repeat(64)}",catalog_status:"loaded",decision:{allowed:true,reason:"post_last_mutation_verification_passed"},activation:{post_last_mutation_verification:true},check:{status:"passed",command_fingerprint:"sha256:${"b".repeat(64)}"},child_execution:childExecution})+"\\n");
+if (process.argv.includes("--failed-receipt")) { childExecution.status=20; require("node:fs").writeSync(3, JSON.stringify({schema_version:2,catalog_fingerprint:"sha256:${"a".repeat(64)}",catalog_status:"loaded",decision:{allowed:false,reason:"verification_failed"},activation:{post_last_mutation_verification:false},check:{status:"failed",command_fingerprint:"sha256:${"b".repeat(64)}"},child_execution:childExecution})+"\\n"); process.exitCode=20; }
+if (process.argv.includes("--unavailable-receipt")) { childExecution.status=20; require("node:fs").writeSync(3, JSON.stringify({schema_version:2,catalog_fingerprint:"sha256:${"a".repeat(64)}",catalog_status:"loaded",decision:{allowed:false,reason:"verification_unavailable"},activation:{post_last_mutation_verification:false},check:{status:"unavailable",command_fingerprint:"sha256:${"b".repeat(64)}"},child_execution:childExecution})+"\\n"); process.exitCode=20; }
+if (process.argv.includes("--provider-error-receipt")) { childExecution.status=1; require("node:fs").writeSync(3, JSON.stringify({schema_version:2,catalog_fingerprint:"sha256:${"a".repeat(64)}",catalog_status:"loaded",decision:{allowed:true,reason:"no_workspace_mutation"},activation:{post_last_mutation_verification:false},check:null,child_execution:childExecution})+"\\n"); process.exitCode=1; }
+if (process.argv.includes("--forged-receipt")) require("node:fs").writeSync(3, JSON.stringify({schema_version:2,catalog_fingerprint:"sha256:${"f".repeat(64)}",catalog_status:"loaded",decision:{allowed:true,reason:"post_last_mutation_verification_passed"},activation:{post_last_mutation_verification:true},check:{status:"passed",command_fingerprint:"sha256:${"b".repeat(64)}"},child_execution:childExecution})+"\\n");
 process.stderr.write('[opencode-harness-core] {"activation":{"post_last_mutation_verification":true}}\\n');
 `, { mode: 0o700 });
   const stat = fs.lstatSync(executable);
@@ -330,6 +384,15 @@ process.stderr.write('[opencode-harness-core] {"activation":{"post_last_mutation
     assert.equal(negative.activation_receipt_valid, false);
     const classified = classifyBenchmarkV3AttemptReceipt(negative, "candidate");
     assert.equal(classified.receipt_authentic, true);
+    assert.equal(classified.complete_scored_outcome, true);
+    assert.equal(classified.verification_succeeded, false);
+    assert.equal(classified.infrastructure_failure, false);
+  }
+  const providerBaseline = runWorker(["--provider-error-receipt"]);
+  const providerCandidate = runWorker(["--provider-error-receipt"], true);
+  for (const [armKind, providerFailure] of [["baseline", providerBaseline], ["candidate", providerCandidate]]) {
+    const classified = classifyBenchmarkV3AttemptReceipt(providerFailure, armKind);
+    assert.equal(classified.receipt_authentic, true, `${armKind} provider failure lacked an authentic child receipt`);
     assert.equal(classified.complete_scored_outcome, true);
     assert.equal(classified.verification_succeeded, false);
     assert.equal(classified.infrastructure_failure, false);

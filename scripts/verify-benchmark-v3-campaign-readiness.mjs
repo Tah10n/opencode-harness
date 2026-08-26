@@ -8,6 +8,9 @@ import { validateBenchmarkV3ReadinessReceipt } from "../lib/benchmark/v3-readine
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const corpus = loadBenchmarkV3Corpus(root);
+if (corpus.development_execution_eligible !== true || corpus.confirmatory_eligible !== false) {
+  throw new Error("public corpus development/confirmatory boundary is invalid");
+}
 const reasons = [];
 for (const [environmentName, capability, code, requirement] of [
   ["OPENCODE_QUALITY_PROCESS_CONTAINMENT_RECEIPT", "real-process-containment", "PROCESS_CONTAINMENT_UNAVAILABLE", "real-process-containment"],
@@ -17,14 +20,22 @@ for (const [environmentName, capability, code, requirement] of [
   try { validateBenchmarkV3ReadinessReceipt(process.env[environmentName], { capability, sourceRoot: root }); }
   catch { reasons.push({ code, requirement }); }
 }
-if (!corpus.promotion_eligible) reasons.push({ code: "CORPUS_INCOMPLETE", requirement: corpus.promotion_blocker });
 if (typeof process.env.BENCHMARK_V3_CANDIDATE_BUNDLE !== "string") reasons.push({ code: "CANDIDATE_PRODUCT_FINGERPRINT_EQUIVALENCE_UNPROVEN", requirement: "exact-product-candidate-fingerprint-equivalence" });
 else {
   try { verifyBenchmarkV3ProductBundle(root, path.resolve(process.env.BENCHMARK_V3_CANDIDATE_BUNDLE)); }
   catch { reasons.push({ code: "CANDIDATE_PRODUCT_FINGERPRINT_MISMATCH", requirement: "exact-product-candidate-fingerprint-equivalence" }); }
 }
+if (typeof process.env.BENCHMARK_V3_SEALED_HOLDOUT_ROOT !== "string") {
+  reasons.push({ code: "EXTERNAL_SEALED_HOLDOUT_UNAVAILABLE", requirement: "outside-public-git-created-after-design-and-candidate-freeze" });
+} else {
+  try {
+    const sealed = fs.realpathSync.native(path.resolve(process.env.BENCHMARK_V3_SEALED_HOLDOUT_ROOT));
+    const relative = path.relative(root, sealed);
+    if (relative === "" || (!relative.startsWith("..") && !path.isAbsolute(relative)) || !fs.statSync(sealed).isDirectory()) throw new Error("invalid sealed holdout root");
+  } catch { reasons.push({ code: "EXTERNAL_SEALED_HOLDOUT_INVALID", requirement: "outside-public-git-created-after-design-and-candidate-freeze" }); }
+}
 const result = { schema_version: 1, gate: "campaign-readiness", status: reasons.length === 0 ? "passed" : "blocked_environment",
-  foundation_publication: "in_progress", lab_infrastructure_publication: "in_progress", model_campaign: reasons.length === 0 ? "ready" : "blocked",
+  foundation_publication: "published", lab_infrastructure_publication: "pr-current-head", model_campaign: reasons.length === 0 ? "ready" : "blocked",
   holdout_promotion: reasons.length === 0 ? "eligible-for-sealed-execution" : "blocked_environment", model_calls: 0, candidate_tokens: 0, reasons };
 process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
 if (reasons.length > 0) process.exitCode = 2;

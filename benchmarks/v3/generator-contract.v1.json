@@ -25,7 +25,10 @@
     "license_provenance_record",
     "family_cluster_identity"
   ],
-  "promotion_policy": "all-model-free-oracle-checks-must-pass",
+  "promotion_policy": "public-instances-never-confirmatory",
+  "public_holdout_evidence_class": "permanently-development-only",
+  "public_holdout_confirmatory_eligible": false,
+  "sealed_holdout_policy": "outside-public-git-created-after-design-and-candidate-freeze",
   "current_rendered_instances": 210,
   "current_promotion_eligible_instances": 0
 }

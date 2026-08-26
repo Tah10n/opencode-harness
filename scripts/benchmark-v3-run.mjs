@@ -26,12 +26,18 @@ if (candidateSources.length !== 1 || candidateBundles.length !== 1) {
 }
 const reviewReceiptPaths = values.get("review-receipt") ?? [];
 if (reviewReceiptPaths.length !== 2) throw new Error("exactly two --review-receipt arguments are required");
+const readinessReceiptPaths = {
+  "real-process-containment": path.resolve(one("process-receipt")),
+  "hidden-namespace-isolation": path.resolve(one("namespace-receipt")),
+  "provider-only-egress": path.resolve(one("egress-receipt")),
+};
 const gate = runBenchmarkV3ModelFreeGate({
   sourceRoot,
   semanticRuntimeRoot: path.resolve(one("semantic-runtime")),
   opencodeExecutable: path.resolve(one("opencode")),
   candidateBundles: candidateSources.map((entry, index) => ({ sourceRoot: path.resolve(entry), materializedCoreDirectory: path.resolve(candidateBundles[index]) })),
   reviewReceiptPaths: reviewReceiptPaths.map((entry) => path.resolve(entry)),
+  readinessReceiptPaths,
 });
 const result = await runBenchmarkV3Study({
   gate,

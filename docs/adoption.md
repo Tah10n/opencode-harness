@@ -35,10 +35,14 @@ assurance profile with its configuration directory as the workspace: trusted
 host configuration must be outside the workspace.
 
 Provision runner-owned core checks at
-`.git/opencode-harness/core/checks.json` in the project. The closed v1 catalog
+`.git/opencode-harness/core/checks.json` in the project. The closed v2 catalog
 contains `schema_version`, `catalog_id`, and `checks`; each check contains
 `check_id`, repository-relative `scope_prefixes`, `cost_rank`, an absolute
-`executable_path`, bounded `argv`, repository-relative `cwd`, and `timeout_ms`.
+`executable_path`, bounded host `argv`, explicit repository-relative
+`immutable_input_paths`, ordered repository-relative mutable `subject_paths`,
+repository-relative `cwd`, and `timeout_ms`. Subject paths are appended to the
+host argv at execution and are bound by name/order/scope, while their edited
+bytes are deliberately absent from the immutable input hash.
 The launcher resolves that path with trusted `git rev-parse --git-path`, binds
 the repository/worktree identity, and seals the catalog before OpenCode starts.
 A missing required catalog fails closed; only an explicitly optional catalog or

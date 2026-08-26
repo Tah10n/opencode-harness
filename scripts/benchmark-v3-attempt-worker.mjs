@@ -74,6 +74,12 @@ protocolValid &&= terminalEventCount >= 1 && usageObserved && openStepCount === 
 let activation = false;
 let activationReceiptValid = input.activation_binding === null;
 let activationReceiptAuthentic = input.activation_binding === null;
+let childExecution = input.activation_binding === null ? {
+  schema_version: 1,
+  status: Number.isInteger(result.status) ? result.status : null,
+  signal: result.signal ?? null,
+  error_code: typeof result.error?.code === "string" ? result.error.code : null,
+} : null;
 if (input.activation_binding !== null) {
   try {
     const bytes = String(result.output?.[3] ?? "");
@@ -81,23 +87,30 @@ if (input.activation_binding !== null) {
     const exact = (object, keys) => object && typeof object === "object" && !Array.isArray(object)
       && JSON.stringify(Object.keys(object).sort()) === JSON.stringify([...keys].sort());
     activationReceiptAuthentic = bytes.endsWith("\n") && bytes.indexOf("\n") === bytes.length - 1
-      && exact(value, ["schema_version", "catalog_fingerprint", "catalog_status", "decision", "activation", "check"])
-      && value.schema_version === 1 && value.catalog_fingerprint === input.activation_binding.catalog_fingerprint
+      && exact(value, ["schema_version", "catalog_fingerprint", "catalog_status", "decision", "activation", "check", "child_execution"])
+      && value.schema_version === 2 && value.catalog_fingerprint === input.activation_binding.catalog_fingerprint
       && value.catalog_status === "loaded" && typeof value.decision?.allowed === "boolean"
       && typeof value.decision?.reason === "string"
       && typeof value.activation?.post_last_mutation_verification === "boolean"
-      && ["passed", "failed", "unavailable", "unrelated_infrastructure_failure"].includes(value.check?.status)
-      && value.check?.command_fingerprint === input.activation_binding.command_fingerprint;
+      && (value.check === null || (["passed", "failed", "unavailable", "unrelated_infrastructure_failure"].includes(value.check?.status)
+        && value.check?.command_fingerprint === input.activation_binding.command_fingerprint))
+      && exact(value.child_execution, ["schema_version", "status", "signal", "error_code"])
+      && value.child_execution.schema_version === 1
+      && (value.child_execution.status === null || Number.isSafeInteger(value.child_execution.status))
+      && (value.child_execution.signal === null || typeof value.child_execution.signal === "string")
+      && (value.child_execution.error_code === null || typeof value.child_execution.error_code === "string");
+    if (activationReceiptAuthentic) childExecution = value.child_execution;
     activationReceiptValid = activationReceiptAuthentic
       && value.decision.allowed === true
       && value.decision.reason === "post_last_mutation_verification_passed"
       && value.activation.post_last_mutation_verification === true
-      && value.check.status === "passed";
+      && value.check?.status === "passed";
     activation = activationReceiptValid;
   } catch { activationReceiptAuthentic = false; activationReceiptValid = false; }
 }
-const receipt = { schema_version: 1, status: Number.isInteger(result.status) ? result.status : null, signal: result.signal ?? null,
+const receipt = { schema_version: 2, status: Number.isInteger(result.status) ? result.status : null, signal: result.signal ?? null,
   timed_out: result.error?.code === "ETIMEDOUT", error_code: typeof result.error?.code === "string" ? result.error.code : null,
+  child_execution: childExecution,
   tokens, activation, json_event_count: jsonEventCount, terminal_event_count: terminalEventCount,
   usage_observed: usageObserved, protocol_valid: protocolValid, open_step_count: openStepCount,
   unfinished_tool_count: unfinishedToolCount, activation_receipt_valid: activationReceiptValid,

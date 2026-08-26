@@ -47,6 +47,9 @@ The launcher resolves the required project-owned trusted-check catalog with
 worktrees), seals its repository and file identity, invalidates verification after each
 new mutation, and blocks a successful process status after failed, unavailable,
 infrastructure-failed, stale verification, or unverified process-tree teardown.
+Catalog v2 binds the executable, immutable host/check inputs, host argv,
+ordered mutable subject paths, scope, cwd, and timeout separately; subject
+bytes may change and are never included in the immutable input identity.
 The final snapshot occurs only after verified zero-descendant containment. A missing applicable check is
 reported separately and is not verification activation. An assurance workspace keeps its project-owned
 `.opencode/quality/checks.json` and `toolchains.json`; the config directory

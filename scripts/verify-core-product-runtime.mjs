@@ -10,6 +10,7 @@ import { sanitizeSyntheticModelFreeFailureDiagnostic } from "../lib/benchmark/se
 import { runContainedOpenCode } from "../runtime/opencode-core.mjs";
 import {
   changedCoreWorkspacePaths,
+  coreTrustedCheckCommandFingerprint,
   loadCoreVerificationCatalog,
   runCoreTrustedCheck,
   snapshotCoreWorkspace,
@@ -37,7 +38,7 @@ function writeCatalog(checks, targetWorkspace = workspace) {
   const directory = path.dirname(catalogPath);
   fs.mkdirSync(directory, { recursive: true });
   fs.writeFileSync(catalogPath, `${JSON.stringify({
-    schema_version: 1,
+    schema_version: 2,
     catalog_id: "installed-core-fixture",
     checks,
   }, null, 2)}\n`, "utf8");
@@ -50,6 +51,8 @@ function check(overrides = {}) {
     cost_rank: 1,
     executable_path: trustedSystemExecutable,
     argv: shellArguments("exit 0"),
+    immutable_input_paths: [],
+    subject_paths: ["src/feature.mjs"],
     cwd: ".",
     timeout_ms: 10_000,
     ...overrides,
@@ -116,10 +119,14 @@ try {
   writeCatalog([check()]);
   const catalog = loadCoreVerificationCatalog(workspace);
   assert.equal(catalog.catalog_status, "loaded");
+  assert.equal(catalog.checks[0].input_manifest.length, 0, "mutable check subject leaked into immutable inputs");
+  const commandBindingBeforeMutation = coreTrustedCheckCommandFingerprint(catalog.checks[0]);
   const before = snapshotCoreWorkspace(workspace);
   fs.writeFileSync(path.join(workspace, "src", "feature.mjs"), "export const value = 2;\n", "utf8");
   const after = snapshotCoreWorkspace(workspace);
   assert.deepEqual(changedCoreWorkspacePaths(before, after), ["src/feature.mjs"]);
+  assert.equal(coreTrustedCheckCommandFingerprint(catalog.checks[0]), commandBindingBeforeMutation,
+    "subject byte mutation changed the bound host/check identity");
 
   const passed = await verifyCoreWorkspaceMutation({
     catalog, before, after, processContainmentFactory: injectedProcessGroupContainment,
@@ -200,7 +207,7 @@ try {
     assert.equal(result.decision.reason, reason);
   }
 
-  writeCatalog([check({ check_id: "docs-check", scope_prefixes: ["docs"] })]);
+  writeCatalog([check({ check_id: "docs-check", scope_prefixes: ["docs"], subject_paths: ["docs/readme.md"] })]);
   const unrelatedCatalog = loadCoreVerificationCatalog(workspace);
   const unrelated = await verifyCoreWorkspaceMutation({ catalog: unrelatedCatalog, before, after });
   assert.equal(unrelated.decision.allowed, true);
@@ -235,7 +242,8 @@ try {
   const checkFile = process.platform === "win32" ? "check.cmd" : "check.sh";
   fs.writeFileSync(path.join(workspace, checkFile), process.platform === "win32" ? "@exit /b 0\r\n" : "exit 0\n", "utf8");
   const trustedInputCheck = check({ executable_path: fixtureExecutable,
-    argv: process.platform === "win32" ? ["/d", "/s", "/c", checkFile] : [checkFile] });
+    argv: process.platform === "win32" ? ["/d", "/s", "/c", checkFile] : [checkFile],
+    immutable_input_paths: ["package.json", checkFile] });
   if (process.platform !== "win32") {
     const insideTarget = path.join(workspace, "initial-link-target.sh");
     const outsideTarget = path.join(temporaryRoot, "outside-link-target.sh");
@@ -294,7 +302,8 @@ try {
   if (process.platform !== "win32") fs.chmodSync(trustedCwd, 0o700);
   fs.writeFileSync(path.join(trustedCwd, checkFile), process.platform === "win32" ? "@exit /b 0\r\n" : "exit 0\n", "utf8");
   const cwdCheck = check({ executable_path: fixtureExecutable,
-    argv: process.platform === "win32" ? ["/d", "/s", "/c", checkFile] : [checkFile], cwd: "trusted-cwd" });
+    argv: process.platform === "win32" ? ["/d", "/s", "/c", checkFile] : [checkFile], cwd: "trusted-cwd",
+    immutable_input_paths: [`trusted-cwd/${checkFile}`] });
   writeCatalog([cwdCheck]);
   const cwdCatalog = loadCoreVerificationCatalog(workspace);
   fs.renameSync(trustedCwd, `${trustedCwd}-old`);
@@ -397,6 +406,7 @@ try {
       writeCatalog([check({
         executable_path: nodeFixtureExecutable,
         argv: [path.basename(script), pidFile, marker, String(writerDelayMs)],
+        immutable_input_paths: [path.basename(script)],
         timeout_ms: timeoutMs,
       })], containedWorkspace);
       const containedCatalog = loadCoreVerificationCatalog(containedWorkspace);
