@@ -60,7 +60,9 @@ function injectedProcessGroupContainment(worker) {
   let closed = false;
   const terminateAndVerify = async () => {
     if (!closed) {
-      try { process.kill(-worker.pid, "SIGKILL"); } catch (error) { if (error?.code !== "ESRCH") throw error; }
+      try {
+        process.platform === "win32" ? worker.kill() : process.kill(-worker.pid, "SIGKILL");
+      } catch (error) { if (error?.code !== "ESRCH") throw error; }
       await new Promise((resolve) => worker.once("close", resolve));
       closed = true;
     }
@@ -72,6 +74,31 @@ function injectedProcessGroupContainment(worker) {
     terminateAndVerify,
     close: terminateAndVerify,
   });
+}
+
+function injectedDescendantContainmentFactory(pidFile) {
+  return async (worker) => {
+    let closed = false;
+    const terminateAndVerify = async () => {
+      if (closed) return true;
+      if (fs.existsSync(pidFile)) {
+        const pid = Number.parseInt(fs.readFileSync(pidFile, "utf8"), 10);
+        if (Number.isSafeInteger(pid) && pid > 1) {
+          try { process.kill(pid, "SIGKILL"); } catch (error) { if (error?.code !== "ESRCH") throw error; }
+        }
+      }
+      try { process.kill(-worker.pid, "SIGKILL"); } catch (error) { if (error?.code !== "ESRCH") throw error; }
+      await new Promise((resolve) => worker.once("close", resolve));
+      closed = true;
+      return true;
+    };
+    return Object.freeze({
+      support_state: "verified",
+      status: () => Object.freeze({ teardown_verified: closed }),
+      terminateAndVerify,
+      close: terminateAndVerify,
+    });
+  };
 }
 
 try {
@@ -94,7 +121,9 @@ try {
   const after = snapshotCoreWorkspace(workspace);
   assert.deepEqual(changedCoreWorkspacePaths(before, after), ["src/feature.mjs"]);
 
-  const passed = verifyCoreWorkspaceMutation({ catalog, before, after });
+  const passed = await verifyCoreWorkspaceMutation({
+    catalog, before, after, processContainmentFactory: injectedProcessGroupContainment,
+  });
   assert.equal(passed.decision.allowed, true);
   assert.equal(passed.decision.reason, "post_last_mutation_verification_passed");
   assert.equal(passed.observation.post_last_mutation_verification, true);
@@ -104,7 +133,10 @@ try {
   const afterDeletion = snapshotCoreWorkspace(workspace);
   assert.equal(afterDeletion.files["src/feature.mjs"], null);
   assert.deepEqual(changedCoreWorkspacePaths(beforeDeletion, afterDeletion), ["src/feature.mjs"]);
-  const deleted = verifyCoreWorkspaceMutation({ catalog, before: beforeDeletion, after: afterDeletion });
+  const deleted = await verifyCoreWorkspaceMutation({
+    catalog, before: beforeDeletion, after: afterDeletion,
+    processContainmentFactory: injectedProcessGroupContainment,
+  });
   assert.equal(deleted.decision.allowed, true);
   assert.equal(deleted.decision.reason, "post_last_mutation_verification_passed");
   fs.writeFileSync(path.join(workspace, "src", "feature.mjs"), "export const value = 2;\n", "utf8");
@@ -154,7 +186,7 @@ try {
     ["unavailable", "verification_unavailable"],
     ["unrelated_infrastructure_failure", "verification_unrelated_infrastructure_failure"],
   ]) {
-    const result = verifyCoreWorkspaceMutation({
+    const result = await verifyCoreWorkspaceMutation({
       catalog,
       before,
       after,
@@ -170,7 +202,7 @@ try {
 
   writeCatalog([check({ check_id: "docs-check", scope_prefixes: ["docs"] })]);
   const unrelatedCatalog = loadCoreVerificationCatalog(workspace);
-  const unrelated = verifyCoreWorkspaceMutation({ catalog: unrelatedCatalog, before, after });
+  const unrelated = await verifyCoreWorkspaceMutation({ catalog: unrelatedCatalog, before, after });
   assert.equal(unrelated.decision.allowed, true);
   assert.equal(unrelated.decision.reason, "no_applicable_trusted_check");
   assert.equal(unrelated.observation.eligible, false);
@@ -178,7 +210,7 @@ try {
 
   writeCatalog([check()]);
   const staleCatalog = loadCoreVerificationCatalog(workspace);
-  const stale = verifyCoreWorkspaceMutation({
+  const stale = await verifyCoreWorkspaceMutation({
     catalog: staleCatalog,
     before,
     after,
@@ -204,16 +236,38 @@ try {
   fs.writeFileSync(path.join(workspace, checkFile), process.platform === "win32" ? "@exit /b 0\r\n" : "exit 0\n", "utf8");
   const trustedInputCheck = check({ executable_path: fixtureExecutable,
     argv: process.platform === "win32" ? ["/d", "/s", "/c", checkFile] : [checkFile] });
+  if (process.platform !== "win32") {
+    const insideTarget = path.join(workspace, "initial-link-target.sh");
+    const outsideTarget = path.join(temporaryRoot, "outside-link-target.sh");
+    fs.renameSync(path.join(workspace, checkFile), insideTarget);
+    fs.writeFileSync(outsideTarget, "exit 0\n", "utf8");
+    fs.symlinkSync(path.basename(insideTarget), path.join(workspace, checkFile));
+    writeCatalog([trustedInputCheck]);
+    assert.throws(
+      () => loadCoreVerificationCatalog(workspace),
+      (error) => error?.code === "CORE_RUNTIME_UNTRUSTED_FILE",
+      "an initial argv symlink must be rejected",
+    );
+    fs.rmSync(path.join(workspace, checkFile));
+    fs.symlinkSync(outsideTarget, path.join(workspace, checkFile));
+    assert.throws(
+      () => loadCoreVerificationCatalog(workspace),
+      (error) => error?.code === "CORE_RUNTIME_UNTRUSTED_FILE",
+      "retargeting an argv symlink outside the workspace must remain rejected",
+    );
+    fs.rmSync(path.join(workspace, checkFile));
+    fs.renameSync(insideTarget, path.join(workspace, checkFile));
+  }
   writeCatalog([trustedInputCheck]);
   let trustedInputCatalog = loadCoreVerificationCatalog(workspace);
   fs.writeFileSync(path.join(workspace, "package.json"), "{\"scripts\":{\"test\":\"node changed.mjs\"}}\n", "utf8");
-  assert.equal(runCoreTrustedCheck(trustedInputCatalog.checks[0]).detail_code, "trusted-input-identity-changed");
+  assert.equal((await runCoreTrustedCheck(trustedInputCatalog.checks[0])).detail_code, "trusted-input-identity-changed");
 
   fs.writeFileSync(path.join(workspace, "package.json"), "{\"scripts\":{\"test\":\"node check.mjs\"}}\n", "utf8");
   writeCatalog([trustedInputCheck]);
   trustedInputCatalog = loadCoreVerificationCatalog(workspace);
   fs.writeFileSync(path.join(workspace, checkFile), process.platform === "win32" ? "@exit /b 1\r\n" : "exit 1\n", "utf8");
-  assert.equal(runCoreTrustedCheck(trustedInputCatalog.checks[0]).detail_code, "trusted-input-identity-changed");
+  assert.equal((await runCoreTrustedCheck(trustedInputCatalog.checks[0])).detail_code, "trusted-input-identity-changed");
 
   fs.writeFileSync(path.join(workspace, checkFile), process.platform === "win32" ? "@exit /b 0\r\n" : "exit 0\n", "utf8");
   writeCatalog([trustedInputCheck]);
@@ -221,7 +275,7 @@ try {
   fs.renameSync(fixtureExecutable, `${fixtureExecutable}.old`);
   fs.copyFileSync(trustedSystemExecutable, fixtureExecutable);
   if (process.platform !== "win32") fs.chmodSync(fixtureExecutable, 0o755);
-  assert.equal(runCoreTrustedCheck(trustedInputCatalog.checks[0]).detail_code, "trusted-input-identity-changed");
+  assert.equal((await runCoreTrustedCheck(trustedInputCatalog.checks[0])).detail_code, "trusted-input-identity-changed");
 
   fs.rmSync(fixtureExecutable);
   fs.renameSync(`${fixtureExecutable}.old`, fixtureExecutable);
@@ -230,7 +284,7 @@ try {
   if (process.platform !== "win32") {
     fs.renameSync(path.join(workspace, checkFile), path.join(workspace, "check-real.sh"));
     fs.symlinkSync("check-real.sh", path.join(workspace, checkFile));
-    assert.equal(runCoreTrustedCheck(trustedInputCatalog.checks[0]).detail_code, "trusted-input-identity-changed");
+    assert.equal((await runCoreTrustedCheck(trustedInputCatalog.checks[0])).detail_code, "trusted-input-identity-changed");
     fs.rmSync(path.join(workspace, checkFile));
     fs.renameSync(path.join(workspace, "check-real.sh"), path.join(workspace, checkFile));
   }
@@ -247,14 +301,14 @@ try {
   fs.mkdirSync(trustedCwd);
   if (process.platform !== "win32") fs.chmodSync(trustedCwd, 0o700);
   fs.writeFileSync(path.join(trustedCwd, checkFile), process.platform === "win32" ? "@exit /b 0\r\n" : "exit 0\n", "utf8");
-  assert.equal(runCoreTrustedCheck(cwdCatalog.checks[0]).detail_code, "trusted-input-identity-changed");
+  assert.equal((await runCoreTrustedCheck(cwdCatalog.checks[0])).detail_code, "trusted-input-identity-changed");
   fs.rmSync(trustedCwd, { recursive: true });
   fs.renameSync(`${trustedCwd}-old`, trustedCwd);
 
   writeCatalog([trustedInputCheck]);
   const racedCatalog = loadCoreVerificationCatalog(workspace);
   writeCatalog([{ ...trustedInputCheck, timeout_ms: 9_999 }]);
-  const catalogRace = verifyCoreWorkspaceMutation({ catalog: racedCatalog, before, after });
+  const catalogRace = await verifyCoreWorkspaceMutation({ catalog: racedCatalog, before, after });
   assert.equal(catalogRace.check.detail_code, "catalog-identity-changed");
   assert.equal(catalogRace.decision.allowed, false);
 
@@ -265,10 +319,49 @@ try {
   );
   const absentCatalog = loadCoreVerificationCatalog(workspace, { catalogRequired: false });
   assert.equal(absentCatalog.catalog_status, "absent");
-  const absent = verifyCoreWorkspaceMutation({ catalog: absentCatalog, before, after });
+  const absent = await verifyCoreWorkspaceMutation({ catalog: absentCatalog, before, after });
   assert.equal(absent.decision.allowed, true);
   assert.equal(absent.decision.reason, "no_applicable_trusted_check");
   assert.equal(absent.observation.eligible, false);
+
+  const submoduleSource = path.join(temporaryRoot, "submodule-source");
+  const submoduleWorkspace = path.join(temporaryRoot, "submodule-workspace");
+  fs.mkdirSync(submoduleSource);
+  fs.mkdirSync(submoduleWorkspace);
+  for (const repository of [submoduleSource, submoduleWorkspace]) {
+    run("git", ["init", "--quiet"], { cwd: repository });
+    run("git", ["config", "user.email", "fixture@example.test"], { cwd: repository });
+    run("git", ["config", "user.name", "Fixture"], { cwd: repository });
+  }
+  fs.writeFileSync(path.join(submoduleSource, "tracked.txt"), "one\n", "utf8");
+  run("git", ["add", "tracked.txt"], { cwd: submoduleSource });
+  run("git", ["commit", "--quiet", "-m", "submodule fixture"], { cwd: submoduleSource });
+  fs.writeFileSync(path.join(submoduleWorkspace, "root.txt"), "root\n", "utf8");
+  run("git", ["add", "root.txt"], { cwd: submoduleWorkspace });
+  run("git", ["commit", "--quiet", "-m", "root fixture"], { cwd: submoduleWorkspace });
+  run("git", ["-c", "protocol.file.allow=always", "submodule", "add", "--quiet", submoduleSource, "vendor/fixture"], {
+    cwd: submoduleWorkspace,
+  });
+  snapshotCoreWorkspace(submoduleWorkspace);
+  const dirtySubmoduleFile = path.join(submoduleWorkspace, "vendor", "fixture", "tracked.txt");
+  fs.writeFileSync(dirtySubmoduleFile, "two\n", "utf8");
+  const firstDirtyStatus = run("git", ["status", "--porcelain=v1", "--untracked-files=all"], {
+    cwd: path.dirname(dirtySubmoduleFile),
+  }).stdout;
+  assert.throws(
+    () => snapshotCoreWorkspace(submoduleWorkspace),
+    (error) => error?.code === "CORE_RUNTIME_DIRTY_SUBMODULE",
+  );
+  fs.writeFileSync(dirtySubmoduleFile, "three\n", "utf8");
+  const secondDirtyStatus = run("git", ["status", "--porcelain=v1", "--untracked-files=all"], {
+    cwd: path.dirname(dirtySubmoduleFile),
+  }).stdout;
+  assert.equal(secondDirtyStatus, firstDirtyStatus, "dirty submodule status text fixture must remain unchanged");
+  assert.throws(
+    () => snapshotCoreWorkspace(submoduleWorkspace),
+    (error) => error?.code === "CORE_RUNTIME_DIRTY_SUBMODULE",
+    "dirty submodule content must fail closed even when status text is unchanged",
+  );
 
   run("git", ["config", "user.email", "fixture@example.test"], { cwd: workspace });
   run("git", ["config", "user.name", "Fixture"], { cwd: workspace });
@@ -281,6 +374,64 @@ try {
   assert.equal(linkedCatalog.catalog_status, "loaded");
   assert.equal(linkedCatalog.workspace_root, fs.realpathSync.native(linkedWorktree));
   assert.equal(linkedCatalog.catalog_path.includes(`${path.sep}worktrees${path.sep}`), true);
+
+  if (process.platform !== "win32") {
+    const containedWorkspace = path.join(temporaryRoot, "contained-check-workspace");
+    const nodeFixtureExecutable = path.join(temporaryRoot, "fixture-node");
+    fs.writeFileSync(nodeFixtureExecutable, `#!/bin/sh\nexec ${JSON.stringify(process.execPath)} "$@"\n`, { mode: 0o755 });
+    fs.mkdirSync(path.join(containedWorkspace, "src"), { recursive: true });
+    fs.writeFileSync(path.join(containedWorkspace, "src", "feature.mjs"), "export const value = 1;\n", "utf8");
+    run("git", ["init", "--quiet"], { cwd: containedWorkspace });
+    run("git", ["add", "src/feature.mjs"], { cwd: containedWorkspace });
+    const detachedScript = path.join(containedWorkspace, "detached-check.mjs");
+    const timeoutScript = path.join(containedWorkspace, "timeout-check.mjs");
+    const childSource = `const fs=require("node:fs"); fs.writeFileSync(process.argv[1],String(process.pid)); setTimeout(()=>fs.writeFileSync(process.argv[2],"late"),500);`;
+    const parentPrefix = `import fs from "node:fs"; import {spawn} from "node:child_process"; const child=spawn(process.execPath,["-e",${JSON.stringify(childSource)},process.argv[2],process.argv[3]],{detached:true,stdio:"ignore"}); child.unref(); const until=Date.now()+2000; while(!fs.existsSync(process.argv[2])&&Date.now()<until) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)),0,0,10);`;
+    fs.writeFileSync(detachedScript, `${parentPrefix}\n`, "utf8");
+    fs.writeFileSync(timeoutScript, `${parentPrefix} setInterval(()=>{},1000);\n`, "utf8");
+    run("git", ["add", "detached-check.mjs", "timeout-check.mjs"], { cwd: containedWorkspace });
+
+    const runDescendantCase = async ({ script, timeoutMs, pidName, markerName }) => {
+      const pidFile = path.join(temporaryRoot, pidName);
+      const marker = path.join(temporaryRoot, markerName);
+      writeCatalog([check({
+        executable_path: nodeFixtureExecutable,
+        argv: [path.basename(script), pidFile, marker],
+        timeout_ms: timeoutMs,
+      })], containedWorkspace);
+      const containedCatalog = loadCoreVerificationCatalog(containedWorkspace);
+      const containedBefore = snapshotCoreWorkspace(containedWorkspace);
+      fs.writeFileSync(path.join(containedWorkspace, "src", "feature.mjs"), `export const value = ${Date.now()};\n`, "utf8");
+      const containedAfter = snapshotCoreWorkspace(containedWorkspace);
+      const result = await verifyCoreWorkspaceMutation({
+        catalog: containedCatalog,
+        before: containedBefore,
+        after: containedAfter,
+        processContainmentFactory: injectedDescendantContainmentFactory(pidFile),
+      });
+      await new Promise((resolve) => setTimeout(resolve, 750));
+      assert.equal(fs.existsSync(marker), false, `${markerName} survived verified descendant teardown`);
+      return result;
+    };
+
+    const detached = await runDescendantCase({
+      script: detachedScript,
+      timeoutMs: 5_000,
+      pidName: "detached-check.pid",
+      markerName: "detached-check-late.txt",
+    });
+    assert.equal(detached.check.status, "passed");
+    assert.equal(detached.decision.reason, "post_last_mutation_verification_passed");
+
+    const timedOut = await runDescendantCase({
+      script: timeoutScript,
+      timeoutMs: 100,
+      pidName: "timeout-check.pid",
+      markerName: "timeout-check-late.txt",
+    });
+    assert.equal(timedOut.check.detail_code, "check-timeout");
+    assert.equal(timedOut.decision.allowed, false);
+  }
 
   if (process.platform !== "win32") {
     const delayedMarker = path.join(temporaryRoot, "delayed-background-marker.txt");
