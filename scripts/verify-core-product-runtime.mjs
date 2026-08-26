@@ -385,18 +385,18 @@ try {
     run("git", ["add", "src/feature.mjs"], { cwd: containedWorkspace });
     const detachedScript = path.join(containedWorkspace, "detached-check.mjs");
     const timeoutScript = path.join(containedWorkspace, "timeout-check.mjs");
-    const childSource = `const fs=require("node:fs"); fs.writeFileSync(process.argv[1],String(process.pid)); setTimeout(()=>fs.writeFileSync(process.argv[2],"late"),500);`;
-    const parentPrefix = `import fs from "node:fs"; import {spawn} from "node:child_process"; const child=spawn(process.execPath,["-e",${JSON.stringify(childSource)},process.argv[2],process.argv[3]],{detached:true,stdio:"ignore"}); child.unref(); const until=Date.now()+2000; while(!fs.existsSync(process.argv[2])&&Date.now()<until) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)),0,0,10);`;
+    const childSource = `const fs=require("node:fs"); fs.writeFileSync(process.argv[1],String(process.pid)); setTimeout(()=>fs.writeFileSync(process.argv[2],"late"),Number(process.argv[3]));`;
+    const parentPrefix = `import fs from "node:fs"; import {spawn} from "node:child_process"; const child=spawn(process.execPath,["-e",${JSON.stringify(childSource)},process.argv[2],process.argv[3],process.argv[4]],{detached:true,stdio:"ignore"}); child.unref(); const until=Date.now()+2000; while(!fs.existsSync(process.argv[2])&&Date.now()<until) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)),0,0,10);`;
     fs.writeFileSync(detachedScript, `${parentPrefix}\n`, "utf8");
     fs.writeFileSync(timeoutScript, `${parentPrefix} setInterval(()=>{},1000);\n`, "utf8");
     run("git", ["add", "detached-check.mjs", "timeout-check.mjs"], { cwd: containedWorkspace });
 
-    const runDescendantCase = async ({ script, timeoutMs, pidName, markerName }) => {
+    const runDescendantCase = async ({ script, timeoutMs, writerDelayMs, pidName, markerName }) => {
       const pidFile = path.join(temporaryRoot, pidName);
       const marker = path.join(temporaryRoot, markerName);
       writeCatalog([check({
         executable_path: nodeFixtureExecutable,
-        argv: [path.basename(script), pidFile, marker],
+        argv: [path.basename(script), pidFile, marker, String(writerDelayMs)],
         timeout_ms: timeoutMs,
       })], containedWorkspace);
       const containedCatalog = loadCoreVerificationCatalog(containedWorkspace);
@@ -417,6 +417,7 @@ try {
     const detached = await runDescendantCase({
       script: detachedScript,
       timeoutMs: 5_000,
+      writerDelayMs: 500,
       pidName: "detached-check.pid",
       markerName: "detached-check-late.txt",
     });
@@ -425,7 +426,8 @@ try {
 
     const timedOut = await runDescendantCase({
       script: timeoutScript,
-      timeoutMs: 100,
+      timeoutMs: 3_000,
+      writerDelayMs: 3_500,
       pidName: "timeout-check.pid",
       markerName: "timeout-check-late.txt",
     });
