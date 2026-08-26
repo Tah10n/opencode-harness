@@ -37,6 +37,16 @@ try {
   assert.equal(validateBenchmarkV3ReadinessReceipt(receiptPath, { capability: body.capability, sourceRoot: root }).status, "verified");
   fs.writeFileSync(receiptPath, JSON.stringify({ ...body, host_fingerprint: `sha256:${"0".repeat(64)}`, fingerprint: fingerprint(body) }));
   assert.throws(() => validateBenchmarkV3ReadinessReceipt(receiptPath, { capability: body.capability, sourceRoot: root }));
+  fs.writeFileSync(receiptPath, JSON.stringify({ ...body, fingerprint: fingerprint(body) }));
+  const hardlinkPath = path.join(readinessRoot, "receipt-hardlink.json");
+  fs.linkSync(receiptPath, hardlinkPath);
+  assert.throws(() => validateBenchmarkV3ReadinessReceipt(receiptPath, { capability: body.capability, sourceRoot: root }));
+  fs.unlinkSync(hardlinkPath);
+  if (process.platform !== "win32") {
+    const symlinkPath = path.join(readinessRoot, "receipt-symlink.json");
+    fs.symlinkSync(receiptPath, symlinkPath);
+    assert.throws(() => validateBenchmarkV3ReadinessReceipt(symlinkPath, { capability: body.capability, sourceRoot: root }));
+  }
   const readySpoof = spawnSync(process.execPath, [path.join(root, "scripts", "verify-benchmark-v3-campaign-readiness.mjs")], {
     cwd: root, encoding: "utf8", env: { ...process.env, OPENCODE_QUALITY_PROCESS_CONTAINMENT_READY: "1",
       BENCHMARK_V3_HIDDEN_NAMESPACE_ISOLATION_READY: "1", BENCHMARK_V3_PROVIDER_ONLY_EGRESS_READY: "1" },
