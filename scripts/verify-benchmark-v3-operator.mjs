@@ -12,7 +12,7 @@ import { initializeBenchmarkV3OperatorCustody, loadBenchmarkV3OperatorPrivateKey
 import { commitBenchmarkV3HoldoutSelection, issueBenchmarkV3ExecutionAuthority,
   issueBenchmarkV3ReadinessReceipts, issueBenchmarkV3ReviewReceipt } from "../lib/benchmark/v3-operator-issue.mjs";
 import { runBenchmarkV3OperatorProbes } from "../lib/benchmark/v3-operator-probes.mjs";
-import { stratifyBenchmarkV3ExternalPool } from "../lib/benchmark/v3-operator-frame.mjs";
+import { matchBenchmarkV3SinglePathOptions, stratifyBenchmarkV3ExternalPool } from "../lib/benchmark/v3-operator-frame.mjs";
 import { verifyBenchmarkV3OperatorHoldoutPoolBinding } from "../lib/benchmark/v3-operator-holdout.mjs";
 import { loadSignedBenchmarkV3ExecutionAuthority } from "../lib/benchmark/v3-execution-authority.mjs";
 import { loadSignedBenchmarkV3HoldoutCommitment } from "../lib/benchmark/v3-holdout.mjs";
@@ -26,6 +26,13 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const temporary = fs.mkdtempSync(path.join(os.tmpdir(), "benchmark-v3-operator-"));
 const run = (file, args, options = {}) => spawnSync(file, args, { encoding: "utf8", shell: false, windowsHide: true, ...options });
 try {
+  const matchingFixture = matchBenchmarkV3SinglePathOptions([
+    [{ sourcePaths: ["lib/shared.js"] }, { sourcePaths: ["lib/alternative.js"] }],
+    [{ sourcePaths: ["lib/shared.js"] }],
+  ]);
+  assert.deepEqual(matchingFixture.map(([index, option]) => [index, option.sourcePaths[0]]),
+    [[0, "lib/alternative.js"], [1, "lib/shared.js"]],
+  "single-path matching must augment earlier choices to maximize disjoint identities");
   const launcher = path.join(root, "ops", "benchmark-v3", "operator-container.sh");
   const launcherEnvironment = { ...process.env, BENCHMARK_V3_SOURCE_ROOT: root,
     BENCHMARK_V3_CAMPAIGN_ROOT: fs.realpathSync.native(temporary) };
