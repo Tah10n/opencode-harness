@@ -8,6 +8,7 @@ import { buildBenchmarkV3ArmOrderSchedule } from "../lib/benchmark/v3-arm-order.
 import { loadBenchmarkV3Corpus } from "../lib/benchmark/v3-corpus.mjs";
 import { loadBenchmarkV3Design } from "../lib/benchmark/v3-design.mjs";
 import { loadSignedBenchmarkV3HoldoutCommitment, loadSignedExternalBenchmarkV3Holdout } from "../lib/benchmark/v3-holdout.mjs";
+import { validateBenchmarkV3IssuerRoleSeparation } from "../lib/benchmark/v3-issuer-separation.mjs";
 import { assessBenchmarkV3HoldoutContinuationReadiness, benchmarkV3ExecutionCloneBinding, inspectBenchmarkV3HoldoutExecutionAuthority,
   loadSignedBenchmarkV3ExecutionAuthority } from "../lib/benchmark/v3-execution-authority.mjs";
 import { benchmarkV3CampaignRegistryPath } from "../lib/benchmark/v3-lease-takeover.mjs";
@@ -17,6 +18,7 @@ import { validateBenchmarkV3ReadinessReceipt } from "../lib/benchmark/v3-readine
 import { buildProfileBundleManifest } from "../lib/profile-v3.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+validateBenchmarkV3IssuerRoleSeparation(root);
 function extendsDevelopmentLedger(development, current) {
   if (!development || !current || !Array.isArray(development.events) || !Array.isArray(current.events)
     || current.events.length < development.events.length) return false;

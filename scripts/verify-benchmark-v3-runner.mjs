@@ -13,11 +13,14 @@ import { benchmarkV3CampaignLeasePath, benchmarkV3CampaignRegistryPath, benchmar
   performBenchmarkV3LeaseTakeover } from "../lib/benchmark/v3-lease-takeover.mjs";
 
 import { materializeProfileBundleV3 } from "../lib/profile-v3.mjs";
-import { captureBenchmarkV3Workspace, loadBenchmarkV3Corpus } from "../lib/benchmark/v3-corpus.mjs";
+import { captureBenchmarkV3Workspace, fingerprintBenchmarkV3SemanticRuntimeKey,
+  loadBenchmarkV3Corpus } from "../lib/benchmark/v3-corpus.mjs";
 import { loadBenchmarkV3Design } from "../lib/benchmark/v3-design.mjs";
 import {
   buildBenchmarkV3AttemptEnvelope,
   buildBenchmarkV3CampaignComparisonEvidence,
+  buildBenchmarkV3DevelopmentComparisonEvidence,
+  buildBenchmarkV3ValidationInfrastructureEvidence,
   buildBenchmarkV3CampaignFingerprint,
   buildBenchmarkV3ModelBinding,
   benchmarkV3PreflightEnvironment,
@@ -40,6 +43,95 @@ import { BenchmarkV3CredentialBridgePlugin } from "../lib/benchmark/v3-opencode-
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const { value: design } = loadBenchmarkV3Design(root);
 const corpus = loadBenchmarkV3Corpus(root);
+const inventoryFixture = fs.mkdtempSync(path.join(os.tmpdir(), "benchmark-v3-inventory-env-"));
+try {
+  const runtime = path.join(inventoryFixture, "eslint-v7");
+  const dependency = path.join(runtime, "node_modules", "fixture-dependency");
+  const localDependencyTarget = path.join(runtime, "packages", "local-dependency");
+  const localDependency = path.join(runtime, "node_modules", "local-dependency");
+  const selfDependency = path.join(runtime, "node_modules", "eslint");
+  const mocha = path.join(runtime, "node_modules", "mocha");
+  fs.mkdirSync(path.join(mocha, "bin"), { recursive: true });
+  fs.mkdirSync(dependency, { recursive: true });
+  fs.mkdirSync(localDependencyTarget, { recursive: true });
+  fs.symlinkSync(path.relative(path.dirname(localDependency), localDependencyTarget), localDependency, "dir");
+  fs.symlinkSync("..", selfDependency, "dir");
+  fs.writeFileSync(path.join(runtime, "package.json"), JSON.stringify({ name: "eslint", version: "7.0.0",
+    dependencies: { "fixture-dependency": "1.0.0", "local-dependency": "file:packages/local-dependency" },
+    devDependencies: { eslint: "file:.", mocha: "1.0.0" } }));
+  fs.writeFileSync(path.join(runtime, "package-lock.json"), JSON.stringify({ name: "eslint", version: "7.0.0",
+    lockfileVersion: 3, packages: { "": { name: "eslint", version: "7.0.0",
+      dependencies: { "fixture-dependency": "1.0.0", "local-dependency": "file:packages/local-dependency" },
+      devDependencies: { eslint: "file:.", mocha: "1.0.0" } }, "node_modules/eslint": { resolved: "", link: true },
+      "node_modules/fixture-dependency": { version: "1.0.0" },
+      "node_modules/local-dependency": { resolved: "packages/local-dependency", link: true },
+      "packages/local-dependency": { name: "local-dependency", version: "3.0.0" },
+      "node_modules/mocha": { version: "1.0.0" } } }));
+  fs.writeFileSync(path.join(dependency, "package.json"), JSON.stringify({ name: "fixture-dependency", version: "1.0.0" }));
+  fs.writeFileSync(path.join(localDependencyTarget, "package.json"), JSON.stringify({ name: "local-dependency", version: "3.0.0" }));
+  fs.writeFileSync(path.join(mocha, "package.json"), JSON.stringify({ name: "mocha", version: "1.0.0" }));
+  fs.writeFileSync(path.join(mocha, "bin", "mocha.js"), "process.exit(0);\n");
+  const packageFile = path.join(runtime, "package.json");
+  const lockFile = path.join(runtime, "package-lock.json");
+  const validPackage = fs.readFileSync(packageFile, "utf8");
+  const validLock = fs.readFileSync(lockFile, "utf8");
+  const traversalPackage = JSON.parse(validPackage);
+  traversalPackage.dependencies["../../outside"] = "1.0.0";
+  const traversalLock = JSON.parse(validLock);
+  traversalLock.packages[""].dependencies["../../outside"] = "1.0.0";
+  traversalLock.packages["node_modules/../../outside"] = { version: "1.0.0" };
+  fs.writeFileSync(packageFile, JSON.stringify(traversalPackage));
+  fs.writeFileSync(lockFile, JSON.stringify(traversalLock));
+  assert.throws(() => fingerprintBenchmarkV3SemanticRuntimeKey(inventoryFixture, "eslint-v7"), /dependencies are invalid/u,
+    "semantic runtime inventory must reject dependency names that escape the node_modules tree");
+  fs.writeFileSync(packageFile, validPackage);
+  const lockWithoutRequiredEntry = JSON.parse(validLock);
+  delete lockWithoutRequiredEntry.packages["node_modules/fixture-dependency"];
+  fs.writeFileSync(lockFile, JSON.stringify(lockWithoutRequiredEntry));
+  assert.throws(() => fingerprintBenchmarkV3SemanticRuntimeKey(inventoryFixture, "eslint-v7"), /absent from the lockfile/u,
+    "semantic runtime inventory must reject an installed required dependency omitted from the lockfile");
+  const lockWithoutRootDeclaration = JSON.parse(validLock);
+  delete lockWithoutRootDeclaration.packages[""].dependencies["fixture-dependency"];
+  fs.writeFileSync(lockFile, JSON.stringify(lockWithoutRootDeclaration));
+  assert.throws(() => fingerprintBenchmarkV3SemanticRuntimeKey(inventoryFixture, "eslint-v7"), /declaration does not match/u,
+    "semantic runtime inventory must reject a required dependency omitted from the lockfile v3 root declaration");
+  const lockWithoutSelfEntry = JSON.parse(validLock);
+  delete lockWithoutSelfEntry.packages["node_modules/eslint"];
+  fs.writeFileSync(lockFile, JSON.stringify(lockWithoutSelfEntry));
+  fs.unlinkSync(selfDependency);
+  assert.throws(() => fingerprintBenchmarkV3SemanticRuntimeKey(inventoryFixture, "eslint-v7"), /self dependency/u,
+    "semantic runtime inventory must reject an absent self lock entry and root link");
+  fs.symlinkSync("..", selfDependency, "dir");
+  const mismatchedPackage = JSON.parse(validPackage);
+  mismatchedPackage.dependencies["fixture-dependency"] = "2.0.0";
+  const mismatchedLock = JSON.parse(validLock);
+  mismatchedLock.packages[""].dependencies["fixture-dependency"] = "2.0.0";
+  fs.writeFileSync(packageFile, JSON.stringify(mismatchedPackage));
+  fs.writeFileSync(lockFile, JSON.stringify(mismatchedLock));
+  assert.throws(() => fingerprintBenchmarkV3SemanticRuntimeKey(inventoryFixture, "eslint-v7"), /declaration and lockfile/u,
+    "semantic runtime inventory must reject an installed version outside its declared range");
+  fs.writeFileSync(packageFile, validPackage);
+  const validV1Lock = { name: "eslint", version: "7.0.0", lockfileVersion: 1,
+    dependencies: { "fixture-dependency": { version: "1.0.0" },
+      "local-dependency": { version: "file:packages/local-dependency" }, eslint: { version: "file:." },
+      mocha: { version: "1.0.0" } } };
+  fs.writeFileSync(lockFile, JSON.stringify(validV1Lock));
+  assert.match(fingerprintBenchmarkV3SemanticRuntimeKey(inventoryFixture, "eslint-v7").inventory_fingerprint, /^sha256:/u,
+    "semantic runtime inventory must retain child-free lockfile v1 compatibility");
+  fs.writeFileSync(lockFile, JSON.stringify({ ...validV1Lock, name: "not-eslint", version: "999.0.0" }));
+  assert.throws(() => fingerprintBenchmarkV3SemanticRuntimeKey(inventoryFixture, "eslint-v7"), /root package does not match/u,
+    "semantic runtime inventory must reject a lockfile v1 with substituted root identity");
+  fs.writeFileSync(lockFile, validLock);
+  const poisonMarker = path.join(inventoryFixture, "ambient-node-options-executed");
+  const poisonModule = path.join(inventoryFixture, "poison.cjs");
+  fs.writeFileSync(poisonModule, `require("node:fs").writeFileSync(${JSON.stringify(poisonMarker)}, "executed")`);
+  const previousNodeOptions = process.env.NODE_OPTIONS;
+  process.env.NODE_OPTIONS = `--require=${poisonModule}`;
+  try { assert.match(fingerprintBenchmarkV3SemanticRuntimeKey(inventoryFixture, "eslint-v7").inventory_fingerprint, /^sha256:/u); }
+  finally { if (previousNodeOptions === undefined) delete process.env.NODE_OPTIONS; else process.env.NODE_OPTIONS = previousNodeOptions; }
+  assert.equal(fs.existsSync(poisonMarker), false,
+    "semantic runtime inventory must not launch an ambient NODE_OPTIONS-poisonable npm child");
+} finally { fs.rmSync(inventoryFixture, { recursive: true, force: true }); }
 const preflightEnvironment = benchmarkV3PreflightEnvironment({ PATH: process.env.PATH ?? "", HOME: os.homedir(),
   OPENAI_API_KEY: "forbidden-openai-sentinel", GITHUB_TOKEN: "forbidden-github-sentinel",
   NODE_OPTIONS: "--require=/tmp/forbidden.js", CI: "true" }, {
@@ -201,6 +293,12 @@ try {
   assert.equal(spawnSync("git", ["add", "fixture.txt"], { cwd: registryFixture }).status, 0);
   assert.equal(spawnSync("git", ["-c", "user.name=Benchmark V3", "-c", "user.email=benchmark-v3@example.invalid",
     "commit", "--quiet", "-m", "fixture"], { cwd: registryFixture }).status, 0);
+  const fixtureIssuerDirectory = path.join(registryFixture, "benchmarks", "v3");
+  fs.mkdirSync(fixtureIssuerDirectory, { recursive: true });
+  for (const name of ["review-issuers.v1.json", "holdout-issuers.v1.json", "execution-authority-issuers.v1.json",
+    "lease-takeover-issuers.v1.json"]) {
+    fs.copyFileSync(path.join(root, "benchmarks", "v3", name), path.join(fixtureIssuerDirectory, name));
+  }
   const campaignFingerprint = `sha256:${"c".repeat(64)}`;
   const attemptBindingFingerprint = `sha256:${"1".repeat(64)}`;
   const initialLedgerBody = Object.freeze({ schema_version: 4, design_fingerprint: `sha256:${"b".repeat(64)}`,
@@ -551,6 +649,23 @@ assert.equal(comparisonEvidence.development_candidate_attempts[0].length, candid
 assert.equal(comparisonEvidence.validation_report.report_fingerprint, report.report_fingerprint);
 assert.equal(comparisonEvidence.validation_baseline_attempts.length, baseline.length);
 assert.equal(comparisonEvidence.validation_candidate_attempts.length, candidate.length);
+const developmentComparisonEvidence = buildBenchmarkV3DevelopmentComparisonEvidence({
+  developmentReports: [{ report, outcomes: candidate }], developmentBaseline: baseline,
+});
+assert.equal(developmentComparisonEvidence.development_reports[0].report_fingerprint, report.report_fingerprint);
+assert.equal(developmentComparisonEvidence.development_baseline_attempts.length, baseline.length);
+assert.equal(developmentComparisonEvidence.development_candidate_attempts[0].length, candidate.length);
+const validationInfrastructureEvidence = buildBenchmarkV3ValidationInfrastructureEvidence({
+  selected: { arm: { source_sha: "a".repeat(40), product_bundle_fingerprint: `sha256:${"b".repeat(64)}` } },
+  developmentReports: [{ report, outcomes: candidate }], developmentBaseline: baseline,
+  validationRun: { baseline: baseline.slice(0, 1), outcomes: candidate.slice(0, 1) },
+});
+assert.equal(validationInfrastructureEvidence.development_reports[0].report_fingerprint, report.report_fingerprint);
+assert.equal(validationInfrastructureEvidence.development_baseline_attempts.length, baseline.length);
+assert.equal(validationInfrastructureEvidence.development_candidate_attempts[0].length, candidate.length);
+assert.equal(validationInfrastructureEvidence.validation_baseline_attempts.length, 1);
+assert.equal(validationInfrastructureEvidence.validation_candidate_attempts.length, 1);
+assert.equal(validationInfrastructureEvidence.product_bundle_fingerprint, `sha256:${"b".repeat(64)}`);
 const baselineTimeouts = [...baseline];
 baselineTimeouts[0] = outcome(families[0], false, { timeout: true, process_status: null });
 const baselineTimeoutReport = summarizeBenchmarkV3Stage({ baseline: baselineTimeouts, candidate });
@@ -631,6 +746,13 @@ const validationFailureSource = runnerSource.slice(runnerSource.indexOf("if (!va
 for (const required of ["comparisonEvidence", "product_bundle_fingerprint", "validation_efficacy"]) {
   assert.equal(validationFailureSource.includes(required), true,
     `validation-failure terminal report must retain ${required}`);
+}
+const validationInfrastructureSource = runnerSource.slice(runnerSource.indexOf("if (validationRun.blocked)"),
+  runnerSource.indexOf("const validationReport", runnerSource.indexOf("if (validationRun.blocked)")));
+for (const required of ["buildBenchmarkV3ValidationInfrastructureEvidence", "developmentReports",
+  "developmentBaseline", "validationRun"]) {
+  assert.equal(validationInfrastructureSource.includes(required), true,
+    `validation-infrastructure terminal report must retain ${required}`);
 }
 assert.equal(runnerSource.includes("stageRetriedFamilyCount += execution.retried_family_count"), true,
   "counterbalanced retry evidence must include baseline and candidate arms");

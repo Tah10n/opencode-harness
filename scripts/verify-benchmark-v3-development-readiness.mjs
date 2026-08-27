@@ -7,11 +7,13 @@ import { loadBenchmarkV3Corpus } from "../lib/benchmark/v3-corpus.mjs";
 import { loadBenchmarkV3Design } from "../lib/benchmark/v3-design.mjs";
 import { loadSignedBenchmarkV3ExecutionAuthority } from "../lib/benchmark/v3-execution-authority.mjs";
 import { loadSignedBenchmarkV3HoldoutCommitment } from "../lib/benchmark/v3-holdout.mjs";
+import { validateBenchmarkV3IssuerRoleSeparation } from "../lib/benchmark/v3-issuer-separation.mjs";
 import { verifyBenchmarkV3ProductBundle } from "../lib/benchmark/v3-runner.mjs";
 import { validateBenchmarkV3ReadinessReceipt } from "../lib/benchmark/v3-readiness.mjs";
 import { buildProfileBundleManifest } from "../lib/profile-v3.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+validateBenchmarkV3IssuerRoleSeparation(root);
 const corpus = loadBenchmarkV3Corpus(root);
 const { validation: designValidation } = loadBenchmarkV3Design(root);
 if (corpus.families.length !== 120 || corpus.families.some((entry) => !["development", "validation"].includes(entry.split))
