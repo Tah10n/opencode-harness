@@ -70,8 +70,12 @@ try {
   "a cross-host replay of the same execution ID must be rejected");
   assert.equal(consumeBenchmarkV3Execution({ authority, phase: "campaign", campaignFingerprint,
     cloneBinding: cloneOneBinding }).disposition, "consumed");
-  assert.equal(inspectBenchmarkV3HoldoutExecutionAuthority({ authority, campaignFingerprint,
-    cloneBinding: cloneOneBinding }).holdout_status, "available");
+  const postCampaignStatus = inspectBenchmarkV3HoldoutExecutionAuthority({ authority, campaignFingerprint,
+    cloneBinding: cloneOneBinding });
+  assert.equal(postCampaignStatus.holdout_status, "available");
+  assert.equal(postCampaignStatus.continuation_available, false,
+    "readiness inspection must expose a continuation already spent by campaign resume");
+  assert.equal(postCampaignStatus.continuation_mode, "resume");
   assert.throws(() => inspectBenchmarkV3HoldoutExecutionAuthority({ authority: {
     ...authority, authority_fingerprint: `sha256:${"f".repeat(64)}` }, campaignFingerprint,
   cloneBinding: cloneOneBinding }), /another clone or binding/u,
@@ -84,8 +88,11 @@ try {
     cloneBinding: cloneOneBinding }).disposition, "reserved");
   assert.throws(() => reserveBenchmarkV3Continuation({ authority, phase: "holdout", mode: "retry", campaignFingerprint,
     cloneBinding: cloneOneBinding }), /campaign-wide/u, "a campaign resume must also consume the holdout retry allowance");
-  assert.equal(inspectBenchmarkV3HoldoutExecutionAuthority({ authority, campaignFingerprint,
-    cloneBinding: cloneOneBinding }).holdout_status, "exact-resume");
+  const incompleteHoldoutStatus = inspectBenchmarkV3HoldoutExecutionAuthority({ authority, campaignFingerprint,
+    cloneBinding: cloneOneBinding });
+  assert.equal(incompleteHoldoutStatus.holdout_status, "exact-resume");
+  assert.equal(incompleteHoldoutStatus.continuation_available, false,
+    "holdout readiness must not promise an exact resume after the shared continuation was consumed");
   assert.equal(consumeBenchmarkV3Execution({ authority, phase: "holdout", campaignFingerprint,
     cloneBinding: cloneOneBinding }).disposition, "consumed");
   assert.throws(() => inspectBenchmarkV3HoldoutExecutionAuthority({ authority, campaignFingerprint,

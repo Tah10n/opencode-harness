@@ -8,7 +8,7 @@ import { buildBenchmarkV3ArmOrderSchedule } from "../lib/benchmark/v3-arm-order.
 import { loadBenchmarkV3Corpus } from "../lib/benchmark/v3-corpus.mjs";
 import { loadBenchmarkV3Design } from "../lib/benchmark/v3-design.mjs";
 import { loadSignedBenchmarkV3HoldoutCommitment, loadSignedExternalBenchmarkV3Holdout } from "../lib/benchmark/v3-holdout.mjs";
-import { benchmarkV3ExecutionCloneBinding, inspectBenchmarkV3HoldoutExecutionAuthority,
+import { assessBenchmarkV3HoldoutContinuationReadiness, benchmarkV3ExecutionCloneBinding, inspectBenchmarkV3HoldoutExecutionAuthority,
   loadSignedBenchmarkV3ExecutionAuthority } from "../lib/benchmark/v3-execution-authority.mjs";
 import { benchmarkV3CampaignRegistryPath } from "../lib/benchmark/v3-lease-takeover.mjs";
 import { validateBenchmarkV3Ledger } from "../lib/benchmark/v3-ledger.mjs";
@@ -193,9 +193,10 @@ const priorExecution = checkpoint?.ledger?.events?.filter((entry) => entry.event
 const priorHoldoutReport = typeof output === "string" && path.isAbsolute(output)
   && fs.existsSync(path.join(output, "holdout-report.json"));
 const priorHoldoutAttempt = checkpoint?.attempts?.some((entry) => /^v3-external-holdout-/u.test(entry.family_id ?? "")) === true;
-const exactHoldoutResume = globalAuthorityStatus?.holdout_status === "exact-resume" && priorHoldoutAttempt && !priorHoldoutReport;
-if (priorExecution !== 0 || priorHoldoutReport || (priorHoldoutAttempt && !exactHoldoutResume)) reasons.push({ code: "CONFIRMATORY_EXECUTION_ALREADY_CONSUMED",
-  requirement: "zero-prior-holdout-attempts-and-exactly-one-confirmatory-execution" });
+const continuationReadiness = assessBenchmarkV3HoldoutContinuationReadiness({ globalAuthorityStatus,
+  priorHoldoutAttempt, priorHoldoutReport, priorExecution });
+const exactHoldoutResume = continuationReadiness.exact_holdout_resume;
+reasons.push(...continuationReadiness.reasons);
 const result = { schema_version: 1, gate: "holdout-readiness", status: reasons.length === 0 ? "passed" : "blocked_environment",
   exact_campaign_resume: exactResume, global_execution_authority_status: globalAuthorityStatus,
   exact_holdout_resume: exactHoldoutResume, validation_efficacy_passed: report?.validation_efficacy?.passed === true,

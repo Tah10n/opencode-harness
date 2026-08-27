@@ -9,6 +9,7 @@ import { fileURLToPath } from "node:url";
 
 import { canonicalJson, fingerprint } from "../lib/feedback/contracts.mjs";
 import { loadBenchmarkV3Design } from "../lib/benchmark/v3-design.mjs";
+import { assessBenchmarkV3HoldoutContinuationReadiness } from "../lib/benchmark/v3-execution-authority.mjs";
 import { loadBenchmarkV3HoldoutIssuers, loadSignedBenchmarkV3HoldoutCommitment, loadSignedExternalBenchmarkV3Holdout,
   revealBenchmarkV3HoldoutSelection } from "../lib/benchmark/v3-holdout.mjs";
 import { BENCHMARK_V3_READINESS_ISSUERS } from "../lib/benchmark/v3-readiness.mjs";
@@ -28,6 +29,20 @@ for (const code of ["EXACT_CAMPAIGN_RESUME_UNAVAILABLE", "FROZEN_CANDIDATE_BUNDL
   "SIGNED_HOLDOUT_COMMITMENT_UNAVAILABLE", "SIGNED_EXTERNAL_HOLDOUT_UNAVAILABLE"]) {
   assert.equal(blocked.reasons.some((entry) => entry.code === code), true, `${code} must fail closed`);
 }
+const reservedWithoutAttempt = assessBenchmarkV3HoldoutContinuationReadiness({
+  globalAuthorityStatus: { holdout_status: "exact-resume", continuation_available: false, continuation_mode: "resume" },
+  priorHoldoutAttempt: false, priorHoldoutReport: false, priorExecution: 0,
+});
+assert.equal(reservedWithoutAttempt.exact_holdout_resume, false);
+assert.equal(reservedWithoutAttempt.reasons.some((entry) => entry.code === "GLOBAL_CONTINUATION_ALREADY_CONSUMED"), true,
+  "a reserved holdout with no journaled attempt must fail closed after the global continuation is spent");
+const resumableWithoutAttempt = assessBenchmarkV3HoldoutContinuationReadiness({
+  globalAuthorityStatus: { holdout_status: "exact-resume", continuation_available: true, continuation_mode: null },
+  priorHoldoutAttempt: false, priorHoldoutReport: false, priorExecution: 0,
+});
+assert.equal(resumableWithoutAttempt.exact_holdout_resume, true,
+  "a reserved holdout may use the sole remaining exact resume before its first journaled attempt");
+assert.deepEqual(resumableWithoutAttempt.reasons, []);
 assert.equal(fs.existsSync(path.join(root, "benchmarks", "v3", "corpus", "holdout")), false,
   "public Git must not contain rendered holdout families");
 const holdoutIssuerKey = JSON.parse(fs.readFileSync(path.join(root, "benchmarks", "v3", "holdout-issuers.v1.json"), "utf8"))
