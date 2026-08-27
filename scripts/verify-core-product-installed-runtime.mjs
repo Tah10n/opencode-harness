@@ -143,8 +143,11 @@ function runtimeEnvironment(overlayPath) {
     fs.mkdirSync(directory, { recursive: true });
     return [name, directory];
   }));
+  const allowed = new Set(["PATH", "HOME", "TMPDIR", "TEMP", "TMP", "LANG", "LC_ALL", "TZ",
+    "SystemRoot", "WINDIR", "ComSpec", "PATHEXT", "USERPROFILE"]);
   return {
-    ...process.env,
+    ...Object.fromEntries(Object.entries(process.env)
+      .filter(([key, value]) => allowed.has(key) && typeof value === "string")),
     XDG_CONFIG_HOME: path.dirname(materializedRoot),
     XDG_DATA_HOME: directories.data,
     XDG_STATE_HOME: directories.state,
@@ -185,6 +188,12 @@ async function installedRun({ content, operation = "write", checkCommand, expect
     // non-interactively. Runtime bytes remain the materialized product bytes.
     fs.writeFileSync(path.join(materializedRoot, "opencode.json"), fixtureConfig, "utf8");
     const installedLauncher = await import(`${pathToFileURL(path.join(materializedRoot, "runtime", "opencode-core.mjs")).href}?fixture=${Date.now()}`);
+    const fixtureEnvironment = runtimeEnvironment(overlayPath);
+    for (const forbidden of ["OPENAI_API_KEY", "ANTHROPIC_API_KEY", "GITHUB_TOKEN", "GH_TOKEN", "NPM_TOKEN",
+      "NODE_OPTIONS", "BASH_ENV", "ENV", "BENCHMARK_V3_CREDENTIAL_FILE"]) {
+      assert.equal(Object.hasOwn(fixtureEnvironment, forbidden), false,
+        `installed-runtime fixture inherited forbidden host environment variable ${forbidden}`);
+    }
     const result = await installedLauncher.runCoreLauncher({
       workspace,
       catalog: ".git/opencode-harness/core/checks.json",
@@ -194,7 +203,7 @@ async function installedRun({ content, operation = "write", checkCommand, expect
       "--agent", "core", "--dir", workspace,
       "Replace src/fixture.txt with the requested fixture content.",
       ],
-      env: runtimeEnvironment(overlayPath),
+      env: fixtureEnvironment,
     }, {
       processContainmentFactory: createInjectedTestContainmentFactory("injected-core-installed-test-containment-v1"),
     });
@@ -210,6 +219,17 @@ async function installedRun({ content, operation = "write", checkCommand, expect
 }
 
 try {
+  const sentinelEnvironment = { OPENAI_API_KEY: process.env.OPENAI_API_KEY, GITHUB_TOKEN: process.env.GITHUB_TOKEN,
+    NODE_OPTIONS: process.env.NODE_OPTIONS };
+  process.env.OPENAI_API_KEY = "installed-runtime-forbidden-openai-sentinel";
+  process.env.GITHUB_TOKEN = "installed-runtime-forbidden-github-sentinel";
+  process.env.NODE_OPTIONS = "--no-warnings";
+  const sentinelOverlay = path.join(temporaryRoot, "sentinel-opencode.json");
+  const scrubbedSentinelEnvironment = runtimeEnvironment(sentinelOverlay);
+  for (const key of Object.keys(sentinelEnvironment)) assert.equal(Object.hasOwn(scrubbedSentinelEnvironment, key), false);
+  for (const [key, value] of Object.entries(sentinelEnvironment)) {
+    if (value === undefined) delete process.env[key]; else process.env[key] = value;
+  }
   materializeProfileBundleV3({
     repositoryRoot: root,
     bundleId: "core",

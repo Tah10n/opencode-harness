@@ -17,8 +17,10 @@ import { captureBenchmarkV3Workspace, loadBenchmarkV3Corpus } from "../lib/bench
 import { loadBenchmarkV3Design } from "../lib/benchmark/v3-design.mjs";
 import {
   buildBenchmarkV3AttemptEnvelope,
+  buildBenchmarkV3CampaignComparisonEvidence,
   buildBenchmarkV3CampaignFingerprint,
   buildBenchmarkV3ModelBinding,
+  benchmarkV3PreflightEnvironment,
   benchmarkV3AttemptTimeouts,
   classifyBenchmarkV3AttemptReceipt,
   createBenchmarkV3CampaignJournal,
@@ -27,6 +29,7 @@ import {
   resolveBenchmarkV3StudySeeds,
   summarizeBenchmarkV3Stage,
   validateBenchmarkV3ReviewReceipt,
+  validateBenchmarkV3ReviewIssuers,
   verifyBenchmarkV3OpenCodeExecutable,
   verifyBenchmarkV3OracleSubjectSafety,
   verifyBenchmarkV3FilesystemIsolation,
@@ -37,6 +40,17 @@ import { BenchmarkV3CredentialBridgePlugin } from "../lib/benchmark/v3-opencode-
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const { value: design } = loadBenchmarkV3Design(root);
 const corpus = loadBenchmarkV3Corpus(root);
+const preflightEnvironment = benchmarkV3PreflightEnvironment({ PATH: process.env.PATH ?? "", HOME: os.homedir(),
+  OPENAI_API_KEY: "forbidden-openai-sentinel", GITHUB_TOKEN: "forbidden-github-sentinel",
+  NODE_OPTIONS: "--require=/tmp/forbidden.js", CI: "true" }, {
+  semanticRuntimeRoot: path.join(root, "semantic-runtime"), provenanceBundle: path.join(root, "provenance.bundle"),
+});
+assert.equal(preflightEnvironment.CI, "true");
+assert.equal(preflightEnvironment.BENCHMARK_V3_GATE_CHILD, "1");
+for (const forbidden of ["OPENAI_API_KEY", "GITHUB_TOKEN", "NODE_OPTIONS"]) {
+  assert.equal(Object.hasOwn(preflightEnvironment, forbidden), false,
+    `model-free preflight inherited forbidden host credential ${forbidden}`);
+}
 const candidateTimeoutBudget = benchmarkV3AttemptTimeouts(900_000, "candidate");
 assert.equal(candidateTimeoutBudget.model_timeout_ms, 900_000);
 assert.equal(candidateTimeoutBudget.wrapper_timeout_ms, 900_000);
@@ -102,6 +116,11 @@ try {
   const reviewIssuer = { issuer_id: "fixture-review-issuer-v1", reviewer_id: "fixture-independent-reviewer",
     protected_channel: "fixture-protected-review-channel", channel_root: readinessRoot, owner_uid: process.getuid(),
     public_key_pem: issuer.public_key_pem };
+  const secondReviewIssuer = { ...reviewIssuer, issuer_id: "fixture-review-issuer-two-v1",
+    reviewer_id: "fixture-independent-reviewer-two", protected_channel: "fixture-protected-review-channel-two" };
+  assert.throws(() => validateBenchmarkV3ReviewIssuers({ schema_version: 1,
+    issuers: [reviewIssuer, secondReviewIssuer] }), /canonical signing keys must be independent/u,
+  "different reviewer IDs backed by the same signing key must not satisfy independence");
   const reviewUnsigned = { schema_version: 3, issuer_id: reviewIssuer.issuer_id, reviewer_id: reviewIssuer.reviewer_id,
     protected_channel: reviewIssuer.protected_channel,
     read_only: true, verdict: "passed", high_findings: 0, medium_findings: 0, source_sha: sourceSha,
@@ -522,6 +541,16 @@ assert.equal(report.candidate_tokens, 600);
 assert.equal(report.activation_rate, 1);
 assert.equal(evaluateBenchmarkV3Guardrails(design, report).passed, true);
 assert.equal(evaluateBenchmarkV3EfficacyGate(design, report).passed, true);
+const comparisonEvidence = buildBenchmarkV3CampaignComparisonEvidence({
+  developmentReports: [{ report, outcomes: candidate }], developmentBaseline: baseline,
+  validationRun: { report, baseline, outcomes: candidate },
+});
+assert.equal(comparisonEvidence.development_reports[0].report_fingerprint, report.report_fingerprint);
+assert.equal(comparisonEvidence.development_baseline_attempts.length, baseline.length);
+assert.equal(comparisonEvidence.development_candidate_attempts[0].length, candidate.length);
+assert.equal(comparisonEvidence.validation_report.report_fingerprint, report.report_fingerprint);
+assert.equal(comparisonEvidence.validation_baseline_attempts.length, baseline.length);
+assert.equal(comparisonEvidence.validation_candidate_attempts.length, candidate.length);
 const baselineTimeouts = [...baseline];
 baselineTimeouts[0] = outcome(families[0], false, { timeout: true, process_status: null });
 const baselineTimeoutReport = summarizeBenchmarkV3Stage({ baseline: baselineTimeouts, candidate });
@@ -594,10 +623,19 @@ const allowedFinalStatuses = new Set([
   "STUDY STOPPED BEFORE CANDIDATE — INSUFFICIENT BASELINE OPPORTUNITY",
   "BOUNDED STUDY COMPLETE — NO PROMOTABLE HARNESS",
   "STUDY BLOCKED — INFRASTRUCTURE",
-  "STUDY BLOCKED — EXTERNAL SEALED HOLDOUT REQUIRED",
   "CONFIRMATORY HOLDOUT PASSED",
 ]);
 for (const match of runnerSource.matchAll(/final_status:\s*"([^"]+)"/gu)) assert.equal(allowedFinalStatuses.has(match[1]), true);
+const validationFailureSource = runnerSource.slice(runnerSource.indexOf("if (!validationEfficacy.passed)"),
+  runnerSource.indexOf("if (ledger.final_candidate_sha", runnerSource.indexOf("if (!validationEfficacy.passed)")));
+for (const required of ["comparisonEvidence", "product_bundle_fingerprint", "validation_efficacy"]) {
+  assert.equal(validationFailureSource.includes(required), true,
+    `validation-failure terminal report must retain ${required}`);
+}
+assert.equal(runnerSource.includes("stageRetriedFamilyCount += execution.retried_family_count"), true,
+  "counterbalanced retry evidence must include baseline and candidate arms");
+assert.equal(runnerSource.includes("developmentBaselineRun.retried_family_count > 0"), true,
+  "successful development baseline retry must create infrastructure/retry ledger evidence");
 const workerSource = fs.readFileSync(path.join(root, "scripts", "benchmark-v3-attempt-worker.mjs"), "utf8");
 assert.equal(workerSource.includes("input.env"), true);
 assert.equal(workerSource.includes("input.env_overrides"), true);
