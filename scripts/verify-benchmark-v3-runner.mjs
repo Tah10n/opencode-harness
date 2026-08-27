@@ -295,7 +295,7 @@ try {
     "commit", "--quiet", "-m", "fixture"], { cwd: registryFixture }).status, 0);
   const fixtureIssuerDirectory = path.join(registryFixture, "benchmarks", "v3");
   fs.mkdirSync(fixtureIssuerDirectory, { recursive: true });
-  for (const name of ["review-issuers.v1.json", "holdout-issuers.v1.json", "execution-authority-issuers.v1.json",
+  for (const name of ["readiness-issuers.v1.json", "review-issuers.v1.json", "holdout-issuers.v1.json", "execution-authority-issuers.v1.json",
     "lease-takeover-issuers.v1.json"]) {
     fs.copyFileSync(path.join(root, "benchmarks", "v3", name), path.join(fixtureIssuerDirectory, name));
   }

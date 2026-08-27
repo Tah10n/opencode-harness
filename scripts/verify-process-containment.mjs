@@ -131,6 +131,30 @@ try {
   const fixtureIdentity = fs.lstatSync(validOutput, { bigint: true });
   assert(fixtureIdentity.isFile() && !fixtureIdentity.isSymbolicLink() && fixtureIdentity.nlink === 1n);
 
+  assert.throws(() => buildLinuxCgroupAttachHelper([
+    "--out", path.join(helperBuildFixtureRoot, "unauthorized-root-helper"),
+    "--uid", "0",
+    "--control", validControl,
+  ], {
+    platform: "linux",
+    resolveCompiler: () => path.join(helperBuildFixtureRoot, "trusted-cc"),
+    spawnCompiler: () => assert.fail("unauthorized uid 0 selected a compiler"),
+  }), /trusted-root-coordinator/u);
+  const authorizedRootOutput = path.join(helperBuildFixtureRoot, "authorized-root-helper");
+  assert.equal(buildLinuxCgroupAttachHelper([
+    "--out", authorizedRootOutput,
+    "--uid", "0",
+    "--trusted-root-coordinator",
+    "--control", validControl,
+  ], {
+    platform: "linux",
+    resolveCompiler: () => path.join(helperBuildFixtureRoot, "trusted-cc"),
+    spawnCompiler: () => {
+      fs.writeFileSync(authorizedRootOutput, "fixture root helper\n", "utf8");
+      return { error: undefined, signal: null, status: 0 };
+    },
+  }), authorizedRootOutput);
+
   const controlLabels = new Map([
     [0x00, "NUL"],
     [0x09, "TAB"],
