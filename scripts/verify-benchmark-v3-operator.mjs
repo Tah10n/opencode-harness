@@ -47,7 +47,9 @@ try {
   const launcherSource = fs.readFileSync(launcher, "utf8");
   for (const invariant of ["--network none --cap-drop ALL --security-opt no-new-privileges",
     "--env BENCHMARK_V3_CGROUP_REQUIRED=0", "provider authorization is accepted only for a canonical model runner",
-    "set -- node \"/workspace/source/$entrypoint\" \"$@\""]) {
+    "set -- node \"/workspace/source/$entrypoint\" \"$@\"",
+    "src=$external_bundle,dst=/opt/benchmark-v3/provenance.bundle,readonly",
+    "src=$external_runtime,dst=/opt/benchmark-v3/semantic-runtime,readonly"]) {
     assert.equal(launcherSource.includes(invariant), true, `operator launcher is missing invariant: ${invariant}`);
   }
   const stratifiedFixture = stratifyBenchmarkV3ExternalPool(Array.from({ length: 93 }, (_, index) => ({

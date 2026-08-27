@@ -13,6 +13,8 @@ source_root="${BENCHMARK_V3_SOURCE_ROOT:-$(pwd -P)}"
 campaign_root="${BENCHMARK_V3_CAMPAIGN_ROOT:-}"
 custody_volume="${BENCHMARK_V3_CUSTODY_VOLUME:-opencode-harness-benchmark-v3-custody}"
 channel_volume="${BENCHMARK_V3_CHANNEL_VOLUME:-opencode-harness-benchmark-v3-channels}"
+external_bundle="${BENCHMARK_V3_PROVENANCE_BUNDLE:-}"
+external_runtime="${BENCHMARK_V3_SEMANTIC_RUNTIME_ROOT:-}"
 
 case "$action" in
   build)
@@ -78,6 +80,22 @@ case "$action" in
         exit 69
       fi
     fi
+    if [ -n "$external_bundle" ] || [ -n "$external_runtime" ]; then
+      if [ -z "$external_bundle" ] || [ -z "$external_runtime" ]; then
+        echo "external provenance bundle and semantic runtime must be mounted together" >&2
+        exit 75
+      fi
+      case "$script" in
+        bench:v3:operator:verify|bench:v3:holdout:commit|bench:v3:holdout:materialize) ;;
+        *) echo "external calibration inputs are not accepted for this operator action" >&2; exit 76 ;;
+      esac
+      if [ ! -f "$external_bundle" ] || [ -L "$external_bundle" ] || [ ! -d "$external_runtime" ] \
+        || [ -L "$external_runtime" ] || [ "$(cd "$(dirname "$external_bundle")" && pwd -P)/$(basename "$external_bundle")" != "$external_bundle" ] \
+        || [ "$(cd "$external_runtime" && pwd -P)" != "$external_runtime" ]; then
+        echo "external calibration inputs must be canonical non-symlink file and directory paths" >&2
+        exit 77
+      fi
+    fi
     shift 3
     if [ "${1:-}" = "--" ]; then shift; fi
     set -- node "/workspace/source/$entrypoint" "$@"
@@ -91,6 +109,19 @@ case "$action" in
         --mount "type=volume,src=$custody_volume,dst=/var/lib/opencode-harness" \
         --mount "type=volume,src=$channel_volume,dst=/run/opencode-harness" \
         --env BENCHMARK_V3_CGROUP_REQUIRED=0 \
+        "$image" "$@"
+    fi
+    if [ -n "$external_bundle" ]; then
+      exec docker run --rm --privileged --cgroupns=host --hostname benchmark-v3-authority --read-only \
+        --tmpfs /tmp:rw,exec,nosuid,nodev,mode=1777 \
+        --tmpfs /usr/local/libexec:rw,exec,nosuid,nodev,mode=0755 \
+        --mount "type=bind,src=$source_root,dst=/workspace/source,readonly" \
+        --mount "type=bind,src=$campaign_root,dst=/campaign" \
+        --mount "type=bind,src=$external_bundle,dst=/opt/benchmark-v3/provenance.bundle,readonly" \
+        --mount "type=bind,src=$external_runtime,dst=/opt/benchmark-v3/semantic-runtime,readonly" \
+        --mount "type=volume,src=$custody_volume,dst=/var/lib/opencode-harness" \
+        --mount "type=volume,src=$channel_volume,dst=/run/opencode-harness" \
+        --env BENCHMARK_V3_CGROUP_REQUIRED=1 \
         "$image" "$@"
     fi
     if [ -n "${BENCHMARK_V3_OPENAI_KEY_FILE:-}" ]; then

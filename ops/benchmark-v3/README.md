@@ -56,19 +56,23 @@ probes:
 ```sh
 BENCHMARK_V3_REVIEWED_SOURCE_SHA=<exact-reviewed-sha> \
 BENCHMARK_V3_CAMPAIGN_ROOT=/absolute/private/campaign \
+BENCHMARK_V3_PROVENANCE_BUNDLE=/absolute/private/eslint-provenance.bundle \
+BENCHMARK_V3_SEMANTIC_RUNTIME_ROOT=/absolute/private/eslint-runtime \
 ops/benchmark-v3/operator-container.sh run \
   npm run bench:v3:operator:verify -- \
   --source-root /workspace/source \
   --custody-root /var/lib/opencode-harness/custody \
   --opencode /usr/local/bin/opencode \
-  --provenance-bundle /campaign/private/eslint-provenance.bundle \
-  --semantic-runtime /campaign/private/eslint-runtime
+  --provenance-bundle /opt/benchmark-v3/provenance.bundle \
+  --semantic-runtime /opt/benchmark-v3/semantic-runtime
 ```
 
-The two external-sampling arguments are optional only as a pair. When present,
-verification also performs the complete model-free external calibration and
-prints only the resulting counts and fingerprints; it does not reserve an
-authority or create a holdout commitment.
+The two external-sampling arguments and their two host environment paths are
+optional only as pairs. The launcher mounts those exact inputs read-only only
+for operator verification, commitment, and materialization. When present,
+verification performs the complete model-free external calibration and prints
+only the resulting counts and fingerprints; it does not reserve an authority
+or create a holdout commitment.
 
 On the final clean, frozen source, issue the execution authority without
 reserving it. Issuance first creates a fixed O_EXCL claim in the physical
@@ -101,14 +105,16 @@ neither a second salt nor a post-freeze pool substitution is accepted:
 ```sh
 BENCHMARK_V3_REVIEWED_SOURCE_SHA=<exact-reviewed-sha> \
 BENCHMARK_V3_CAMPAIGN_ROOT=/absolute/private/campaign \
+BENCHMARK_V3_PROVENANCE_BUNDLE=/absolute/private/eslint-provenance.bundle \
+BENCHMARK_V3_SEMANTIC_RUNTIME_ROOT=/absolute/private/eslint-runtime \
 ops/benchmark-v3/operator-container.sh run \
   npm run bench:v3:holdout:commit -- \
   --source-root /workspace/source \
   --custody-root /var/lib/opencode-harness/custody \
   --output /campaign/study \
   --execution-authority /var/run/opencode-harness/execution-authority/authority.json \
-  --provenance-bundle /campaign/private/eslint-provenance.bundle \
-  --semantic-runtime /campaign/private/eslint-runtime \
+  --provenance-bundle /opt/benchmark-v3/provenance.bundle \
+  --semantic-runtime /opt/benchmark-v3/semantic-runtime \
   --campaign-custody /var/run/opencode-harness/holdout/campaign-001
 ```
 
@@ -153,6 +159,8 @@ the external manifest, validate the closed inventory, and atomically rename it:
 ```sh
 BENCHMARK_V3_REVIEWED_SOURCE_SHA=<exact-reviewed-sha> \
 BENCHMARK_V3_CAMPAIGN_ROOT=/absolute/private/campaign \
+BENCHMARK_V3_PROVENANCE_BUNDLE=/absolute/private/eslint-provenance.bundle \
+BENCHMARK_V3_SEMANTIC_RUNTIME_ROOT=/absolute/private/eslint-runtime \
 ops/benchmark-v3/operator-container.sh run \
 npm run bench:v3:holdout:materialize -- \
   --source-root /workspace/source \
@@ -162,8 +170,8 @@ npm run bench:v3:holdout:materialize -- \
   --holdout-commitment /var/run/opencode-harness/holdout/campaign-001/commitment.json \
   --campaign-report /campaign/study/report.json \
   --family-pool /var/run/opencode-harness/holdout/campaign-001/family-pool.private.json \
-  --semantic-runtime /campaign/private/eslint-runtime \
-  --provenance-bundle /campaign/private/eslint-provenance.bundle \
+  --semantic-runtime /opt/benchmark-v3/semantic-runtime \
+  --provenance-bundle /opt/benchmark-v3/provenance.bundle \
   --holdout-root /var/run/opencode-harness/holdout/campaign-001/materialized
 ```
 
