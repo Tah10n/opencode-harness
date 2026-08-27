@@ -60,8 +60,15 @@ ops/benchmark-v3/operator-container.sh run \
   npm run bench:v3:operator:verify -- \
   --source-root /workspace/source \
   --custody-root /var/lib/opencode-harness/custody \
-  --opencode /usr/local/bin/opencode
+  --opencode /usr/local/bin/opencode \
+  --provenance-bundle /campaign/private/eslint-provenance.bundle \
+  --semantic-runtime /campaign/private/eslint-runtime
 ```
+
+The two external-sampling arguments are optional only as a pair. When present,
+verification also performs the complete model-free external calibration and
+prints only the resulting counts and fingerprints; it does not reserve an
+authority or create a holdout commitment.
 
 On the final clean, frozen source, issue the execution authority without
 reserving it. Issuance first creates a fixed O_EXCL claim in the physical
