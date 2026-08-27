@@ -4,7 +4,6 @@ import { spawnSync } from "node:child_process";
 const checks = [
   "verify:evaluator:paired-defects",
   "verify:core-product-runtime",
-  "verify:core-product-installed-runtime",
   "verify:benchmark:v3:design",
   "verify:benchmark:v3:corpus",
   "verify:benchmark:v3:ledger",
@@ -13,6 +12,9 @@ const checks = [
   "verify:benchmark:v3:provenance",
   "verify:benchmark:v3:no-raw-bundles",
 ];
+if (checks.includes("verify:core-product-installed-runtime")) {
+  throw new Error("the portable gate must not require host-installed opencode evidence");
+}
 const results = [];
 for (const npmScript of checks) {
   const result = spawnSync("npm", ["run", npmScript], { encoding: "utf8", shell: false, windowsHide: true, env: process.env });
