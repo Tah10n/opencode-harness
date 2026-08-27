@@ -9,7 +9,8 @@ import { fileURLToPath } from "node:url";
 
 import { canonicalJson, fingerprint } from "../lib/feedback/contracts.mjs";
 import { benchmarkV3ExecutionCloneBinding, consumeBenchmarkV3Execution,
-  loadSignedBenchmarkV3ExecutionAuthority, reserveBenchmarkV3Execution } from "../lib/benchmark/v3-execution-authority.mjs";
+  inspectBenchmarkV3HoldoutExecutionAuthority, loadSignedBenchmarkV3ExecutionAuthority,
+  reserveBenchmarkV3Execution } from "../lib/benchmark/v3-execution-authority.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const temporary = fs.mkdtempSync(path.join(os.tmpdir(), "benchmark-v3-global-authority-"));
@@ -48,6 +49,8 @@ try {
   const cloneOneBinding = benchmarkV3ExecutionCloneBinding(cloneOne, output, { host: "host-one" });
   const first = reserveBenchmarkV3Execution({ authority, phase: "campaign", campaignFingerprint, cloneBinding: cloneOneBinding });
   assert.equal(first.disposition, "reserved");
+  assert.throws(() => inspectBenchmarkV3HoldoutExecutionAuthority({ authority, campaignFingerprint,
+    cloneBinding: cloneOneBinding }), /not durably consumed/u);
   assert.equal(reserveBenchmarkV3Execution({ authority, phase: "campaign", campaignFingerprint,
     cloneBinding: cloneOneBinding }).disposition, "exact-resume");
   const cloneTwoBinding = benchmarkV3ExecutionCloneBinding(cloneTwo, output, { host: "host-one" });
@@ -60,14 +63,30 @@ try {
   "a cross-host replay of the same execution ID must be rejected");
   assert.equal(consumeBenchmarkV3Execution({ authority, phase: "campaign", campaignFingerprint,
     cloneBinding: cloneOneBinding }).disposition, "consumed");
+  assert.equal(inspectBenchmarkV3HoldoutExecutionAuthority({ authority, campaignFingerprint,
+    cloneBinding: cloneOneBinding }).holdout_status, "available");
+  assert.throws(() => inspectBenchmarkV3HoldoutExecutionAuthority({ authority: {
+    ...authority, authority_fingerprint: `sha256:${"f".repeat(64)}` }, campaignFingerprint,
+  cloneBinding: cloneOneBinding }), /another clone or binding/u,
+  "readiness inspection must reject an authority rebound over the consumed campaign ID");
   assert.equal(reserveBenchmarkV3Execution({ authority, phase: "campaign", campaignFingerprint,
     cloneBinding: cloneOneBinding }).disposition, "exact-consumed-resume");
   assert.throws(() => reserveBenchmarkV3Execution({ authority, phase: "campaign", campaignFingerprint,
     cloneBinding: cloneTwoBinding }), /another clone or binding/u);
   assert.equal(reserveBenchmarkV3Execution({ authority, phase: "holdout", campaignFingerprint,
     cloneBinding: cloneOneBinding }).disposition, "reserved");
+  assert.equal(inspectBenchmarkV3HoldoutExecutionAuthority({ authority, campaignFingerprint,
+    cloneBinding: cloneOneBinding }).holdout_status, "exact-resume");
   assert.equal(consumeBenchmarkV3Execution({ authority, phase: "holdout", campaignFingerprint,
     cloneBinding: cloneOneBinding }).disposition, "consumed");
+  assert.throws(() => inspectBenchmarkV3HoldoutExecutionAuthority({ authority, campaignFingerprint,
+    cloneBinding: cloneOneBinding }), /already globally consumed/u);
+  const expiredBody = { ...body, issued_at_ms: Date.now() - 20_000, expires_at_ms: Date.now() - 10_000 };
+  fs.writeFileSync(receiptPath, JSON.stringify({ ...expiredBody,
+    signature: sign(null, Buffer.from(canonicalJson(expiredBody), "utf8"), privateKey).toString("base64url") }), { mode: 0o600 });
+  assert.throws(() => loadSignedBenchmarkV3ExecutionAuthority({ sourceRoot: cloneOne, receiptPath, sourceSha,
+    sourceTreeFingerprint, designFingerprint, corpusFingerprint, outputDirectory: output, trustedIssuers: [issuer] }),
+  /expiry is invalid/u, "an expired unused authority must fail before reservation");
   const events = fs.readFileSync(registryPath, "utf8").trim().split("\n").map((line) => JSON.parse(line));
   assert.deepEqual(events.map((entry) => [entry.execution_id, entry.action]), [
     [body.campaign_execution_id, "reserve"], [body.campaign_execution_id, "consume"],
@@ -77,5 +96,7 @@ try {
     && entry.prior_event_fingerprint === (events[index - 1]?.event_fingerprint ?? null)), true);
   process.stdout.write(`${JSON.stringify({ schema_version: 1, status: "passed", gate: "benchmark-v3-global-execution-authority",
     model_calls: 0, independent_clones: 2, exact_resume_allowed: true, second_clone_rejected: true,
-    cross_host_rejected: true, append_only_events: events.length }, null, 2)}\n`);
+    cross_host_rejected: true, authority_rebound_rejected: true, expired_authority_rejected: true,
+    registry_readiness_inspected: true,
+    append_only_events: events.length }, null, 2)}\n`);
 } finally { fs.rmSync(temporary, { recursive: true, force: true }); }

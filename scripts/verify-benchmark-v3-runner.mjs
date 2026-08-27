@@ -182,11 +182,14 @@ try {
     "commit", "--quiet", "-m", "fixture"], { cwd: registryFixture }).status, 0);
   const campaignFingerprint = `sha256:${"c".repeat(64)}`;
   const attemptBindingFingerprint = `sha256:${"1".repeat(64)}`;
-  const initialLedgerBody = Object.freeze({ schema_version: 3, design_fingerprint: `sha256:${"b".repeat(64)}`,
+  const initialLedgerBody = Object.freeze({ schema_version: 4, design_fingerprint: `sha256:${"b".repeat(64)}`,
     campaign_fingerprint: campaignFingerprint, campaign_execution_id: "campaign-execution-fixture-001",
     holdout_execution_id: "holdout-execution-fixture-001",
     holdout_selection_commitment_fingerprint: `sha256:${"2".repeat(64)}`,
-    arm_order_policy_fingerprint: `sha256:${"3".repeat(64)}`, registrations: Object.freeze([]), events: Object.freeze([]),
+    arm_order_policy_fingerprint: `sha256:${"3".repeat(64)}`,
+    public_arm_order_schedule_fingerprints: Object.freeze({ development: `sha256:${"4".repeat(64)}`,
+      validation: `sha256:${"5".repeat(64)}` }), holdout_arm_order_schedule_fingerprint: null,
+    registrations: Object.freeze([]), events: Object.freeze([]),
     selected_candidate_id: null, final_candidate_sha: null });
   const initialLedger = Object.freeze({ ...initialLedgerBody, ledger_fingerprint: fingerprint(initialLedgerBody) });
   const output = path.join(registryFixture, "outputs", "campaign-one");

@@ -113,6 +113,14 @@ try {
     holdoutCommitment: commitment, armOrderPolicy: design.arm_order_schedule, trustedIssuers: [issuer] }),
   /selection reveal or proof/u, "a post-candidate cherry-picked selection must fail despite a valid custodian signature");
 
+  const expiredCommitmentBody = { ...commitmentBody, issued_at_ms: Date.now() - 20_000,
+    expires_at_ms: Date.now() - 10_000 };
+  fs.writeFileSync(commitmentPath, JSON.stringify({ ...expiredCommitmentBody,
+    signature: sign(null, Buffer.from(canonicalJson(expiredCommitmentBody), "utf8"), privateKey).toString("base64url") }), { mode: 0o600 });
+  assert.throws(() => loadSignedBenchmarkV3HoldoutCommitment({ sourceRoot: root, commitmentPath,
+    campaignExecutionId, holdoutExecutionId, sourceSha, sourceTreeFingerprint, designFingerprint, corpusFingerprint,
+    trustedIssuers: [issuer] }), /expiry is invalid/u, "an expired holdout commitment must fail before baseline");
+
   fs.writeFileSync(commitmentPath, JSON.stringify({ ...commitmentBody, signature: "self-authored" }), { mode: 0o600 });
   assert.throws(() => loadSignedBenchmarkV3HoldoutCommitment({ sourceRoot: root, commitmentPath,
     campaignExecutionId, holdoutExecutionId, sourceSha, sourceTreeFingerprint, designFingerprint, corpusFingerprint,
@@ -126,5 +134,6 @@ assert.equal(runnerSource.includes("reference_solutions_included"), false,
   "the execution runner must consume only the opaque validated external corpus object");
 process.stdout.write(`${JSON.stringify({ schema_version: 1, status: "passed", gate: "holdout-readiness-negative",
   model_calls: 0, public_holdout_paths_absent: true, unsigned_commitment_rejected: true,
+  expired_commitment_rejected: true,
   candidate_aware_cherry_pick_rejected: true, reference_solution_manifest_rejected: true,
   exact_resume_required: true, distinct_custody_trust_roots: true }, null, 2)}\n`);

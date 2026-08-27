@@ -143,6 +143,12 @@ holdout executions, and a signed external manifest from the configured private
 custodian channel. A plain directory, boolean environment variable, unsigned
 JSON, public-Git controls, reused public source identity, or manifest containing
 reference solutions fails closed.
+Readiness also recomputes the public split schedules, matches the report and
+ledger to the signed execution IDs and holdout commitment, and atomically
+inspects the external append-only registry. Only an unused holdout ID or the
+same clone's exact reserved resume can pass; a rebound authority, another clone,
+or a consumed ID cannot. Execution-authority and precommit receipts are valid
+for at most 30 days and must still be unexpired, including on exact resume.
 The host-readiness authority, external holdout custodian, and manual takeover
 auditor are three distinct Ed25519 signing principals; the verifier rejects a
 registry that collapses those trust roots.
