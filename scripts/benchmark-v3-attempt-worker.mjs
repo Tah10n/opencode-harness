@@ -32,6 +32,7 @@ let jsonEventCount = 0;
 let terminalEventCount = 0;
 let finalTextEligible = false;
 let openStepCount = 0;
+let turnCount = 0;
 const toolStates = new Map();
 let usageObserved = false;
 let protocolValid = true;
@@ -46,7 +47,7 @@ for (const line of String(result.stdout ?? "").split("\n")) {
     }
     jsonEventCount += 1;
     if (value.type === "error") protocolValid = false;
-    if (value.type === "step_start") openStepCount += 1;
+    if (value.type === "step_start") { openStepCount += 1; turnCount += 1; }
     if (value.type === "step_finish" && openStepCount > 0) openStepCount -= 1;
     if (value.type === "tool_use") {
       const id = value.part?.id;
@@ -114,6 +115,7 @@ const receipt = { schema_version: 2, status: Number.isInteger(result.status) ? r
   error_code: childTimedOut ? "ETIMEDOUT" : (typeof result.error?.code === "string" ? result.error.code : null),
   child_execution: childExecution,
   tokens, activation, json_event_count: jsonEventCount, terminal_event_count: terminalEventCount,
+  turn_count: turnCount, tool_call_count: toolStates.size,
   usage_observed: usageObserved, protocol_valid: protocolValid, open_step_count: openStepCount,
   unfinished_tool_count: unfinishedToolCount, activation_receipt_valid: activationReceiptValid,
   activation_receipt_authentic: activationReceiptAuthentic,

@@ -81,9 +81,11 @@ least 0.95. At zero events the exact upper bounds are 0.0487029133 for n=60,
 0.0327380338 for n=90, and 0.0199048162 for n=149.
 
 An attempt is durably reserved before execution. Successful completed families
-are never repeated. One retry is allowed only after a proven infrastructure
-failure before a scored outcome, with unchanged bindings. Missing or ambiguous
-completion evidence fails closed instead of spending model tokens again.
+are never repeated. Across development, validation, and holdout, the campaign
+has one durable continuation allowance: either one exact resume or one retry.
+The retry is allowed only after a proven infrastructure failure before a scored
+outcome, with unchanged bindings. Missing or ambiguous completion evidence
+fails closed instead of spending model tokens again.
 
 ## Campaign lease and exact resume
 
@@ -92,7 +94,9 @@ distinct `campaign_execution_id` and `holdout_execution_id` values and binds
 the current source, design, corpus, and output directory. A root-custodied
 registry outside every clone is an append-only hash chain. Under an atomic
 registry lock it records a `reserve` event before the first model call and a
-`consume` event at terminal completion. Exact resume from the same physical
+`consume` event at terminal completion. If used, a single `continuation` event
+records `resume` or `retry`; the authority rejects every second continuation,
+including one attempted later by the holdout. Exact resume from the same physical
 clone, host, output, authority, and campaign binding is allowed; a fresh clone,
 different host, moved output, or rebound ID is rejected before a model call,
 even when it has an independent Git common directory.
@@ -102,6 +106,22 @@ binds one campaign fingerprint to one output directory.
 The checkpoint, ledger, candidate/product fingerprint, model binding, semantic
 runtime entries, review fingerprints, source SHA, and source-tree fingerprint
 must reproduce exactly on resume.
+
+Provider credentials remain host-controlled. The attempt supervisor never
+places an authorizing credential in the worker or OpenCode process environment.
+For the supported OpenAI path, an identical runner-owned plugin in both arms
+consumes a private one-shot credential file before model dispatch, erases it,
+and injects authorization only inside the provider `fetch` closure after exact
+`https://api.openai.com/v1` origin/path validation; redirects fail closed. Agent shell
+environments contain only non-authorizing placeholders, Linux hides the host
+runner in a separate PID namespace, and macOS process inspection is limited to
+the same sandbox group.
+
+The one-shot file is owner-only inside a private attempt directory, but it is a
+regular file: an uncatchable crash before plugin startup can leave its plaintext
+bytes until host temporary-file cleanup, and overwrite plus unlink is not a
+secure-erasure guarantee on copy-on-write storage. A future anonymous
+pipe/socket or sealed-memory broker is required to remove that residual risk.
 
 Any existing campaign lease is authoritative. Same-host stale-looking leases
 and every foreign-host lease fail closed. PID death, heartbeat age, PID reuse,
@@ -190,6 +210,12 @@ runtime entries, source, and final candidate, and writes separate immutable
 scored `holdout-execution`. Re-running a completed holdout returns the existing
 report; it never performs a second confirmatory execution.
 
+Each scored stage report durably records baseline and candidate success counts
+and rates, absolute delta, relative lift when the baseline rate is nonzero,
+per-stratum breakdowns, and privacy-minimized attempt, token, duration, turn,
+and tool-call counts. Raw prompts, tool output, credentials, and provider
+responses are not report fields.
+
 ## Exact commands
 
 Until the contract audit, readiness split, lease negatives, two current-HEAD
@@ -225,7 +251,7 @@ npm run bench:v3 -- \
   --process-receipt /var/run/opencode-harness/readiness/process.json \
   --namespace-receipt /var/run/opencode-harness/readiness/namespace.json \
   --output /private/campaigns/benchmark-v3-campaign-001 \
-  --provider provider-id --model model-id --variant variant-id
+  --provider openai --model model-id --variant variant-id
 ```
 
 The custodian signs `commitment.json` before development baseline. After
