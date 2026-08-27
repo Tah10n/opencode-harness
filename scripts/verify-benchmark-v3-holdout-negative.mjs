@@ -10,12 +10,16 @@ import { fileURLToPath } from "node:url";
 import { canonicalJson, fingerprint } from "../lib/feedback/contracts.mjs";
 import { loadBenchmarkV3Design } from "../lib/benchmark/v3-design.mjs";
 import { assessBenchmarkV3HoldoutContinuationReadiness } from "../lib/benchmark/v3-execution-authority.mjs";
+import { validateBenchmarkV3IssuerRoleEntries, validateBenchmarkV3IssuerRoleSeparation } from "../lib/benchmark/v3-issuer-separation.mjs";
 import { loadBenchmarkV3HoldoutIssuers, loadSignedBenchmarkV3HoldoutCommitment, loadSignedExternalBenchmarkV3Holdout,
   revealBenchmarkV3HoldoutSelection } from "../lib/benchmark/v3-holdout.mjs";
 import { BENCHMARK_V3_READINESS_ISSUERS } from "../lib/benchmark/v3-readiness.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const { value: design } = loadBenchmarkV3Design(root);
+assert.deepEqual(validateBenchmarkV3IssuerRoleSeparation(root), {
+  role_count: 5, issuer_count: 6, canonical_key_count: 6,
+});
 assert.equal(loadBenchmarkV3HoldoutIssuers(root).length >= 1, true);
 const readiness = spawnSync(process.execPath, [path.join(root, "scripts", "verify-benchmark-v3-holdout-readiness.mjs")], {
   cwd: root, encoding: "utf8", shell: false, windowsHide: true, env: {},
@@ -55,6 +59,13 @@ assert.equal(new Set([BENCHMARK_V3_READINESS_ISSUERS[0].public_key_pem, holdoutI
   takeoverIssuerKey]).size, 3, "host readiness, holdout custodian, and takeover auditor require distinct signing principals");
 assert.equal(reviewerKeys.includes(holdoutIssuerKey), false,
   "the holdout custodian key must be separate from every reviewer key");
+assert.throws(() => validateBenchmarkV3IssuerRoleEntries([
+  ...Array.from({ length: 5 }, (_, index) => ({ role: `fixture-role-${index}`, issuer_id: `fixture-${index}`,
+    public_key_pem: generateKeyPairSync("ed25519").publicKey.export({ type: "spki", format: "pem" }) })),
+  { role: "fixture-duplicate-role", issuer_id: "fixture-duplicate",
+    public_key_pem: reviewerKeys[0].replace(/\n/gu, "\r\n") },
+  { role: "fixture-review-role", issuer_id: "fixture-review", public_key_pem: reviewerKeys[0] },
+]), /signing key is shared/u, "canonical key identity must reject alternate PEM encoding across roles");
 
 const custody = fs.mkdtempSync(path.join(os.tmpdir(), "benchmark-v3-private-holdout-"));
 try {
