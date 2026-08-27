@@ -128,12 +128,21 @@ rejects("retry cannot change temporal order binding", () => appendBenchmarkV3Led
 const reseal = (value) => { const { ledger_fingerprint: _ignored, ...body } = value; return { ...body, ledger_fingerprint: fingerprint(body) }; };
 rejects("ledger cannot rebind the frozen arm-order policy", () => validateBenchmarkV3Ledger(reseal({ ...ledger,
   arm_order_policy_fingerprint: fp("0") }), design));
+rejects("ledger cannot claim another design fingerprint", () => validateBenchmarkV3Ledger(reseal({ ...ledger,
+  design_fingerprint: fp("0") }), design));
+rejects("ledger creation cannot claim another design fingerprint", () => createBenchmarkV3Ledger({ design,
+  designFingerprint: fp("0"), campaignFingerprint: fp("c"), ...ledgerBinding, registrations }));
 const wrongPublicSchedules = { ...ledger, public_arm_order_schedule_fingerprints: {
   ...ledger.public_arm_order_schedule_fingerprints, validation: fp("0") } };
 rejects("ledger validation must reject a campaign schedule substitution", () => validateBenchmarkV3Ledger(reseal(wrongPublicSchedules), design, {
   development: ledger.public_arm_order_schedule_fingerprints.development,
   validation: ledger.public_arm_order_schedule_fingerprints.validation,
   holdout: holdoutScheduleFingerprint,
+}));
+rejects("completed holdout resume must match the signed manifest schedule", () => validateBenchmarkV3Ledger(ledger, design, {
+  development: ledger.public_arm_order_schedule_fingerprints.development,
+  validation: ledger.public_arm_order_schedule_fingerprints.validation,
+  holdout: fp("0"),
 }));
 
 console.log(JSON.stringify({ status: "passed", evidence_class: "model-free-ledger-verification", model_execution: false, negative_cases: negativeCount }, null, 2));

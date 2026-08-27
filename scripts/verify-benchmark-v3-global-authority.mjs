@@ -51,6 +51,9 @@ try {
   assert.equal(first.disposition, "reserved");
   assert.throws(() => inspectBenchmarkV3HoldoutExecutionAuthority({ authority, campaignFingerprint,
     cloneBinding: cloneOneBinding }), /not durably consumed/u);
+  assert.throws(() => reserveBenchmarkV3Execution({ authority, phase: "holdout", campaignFingerprint,
+    cloneBinding: cloneOneBinding }), /durably consumed/u,
+  "the actual holdout reservation must reject an incompletely consumed campaign");
   assert.equal(reserveBenchmarkV3Execution({ authority, phase: "campaign", campaignFingerprint,
     cloneBinding: cloneOneBinding }).disposition, "exact-resume");
   const cloneTwoBinding = benchmarkV3ExecutionCloneBinding(cloneTwo, output, { host: "host-one" });
@@ -96,7 +99,8 @@ try {
     && entry.prior_event_fingerprint === (events[index - 1]?.event_fingerprint ?? null)), true);
   process.stdout.write(`${JSON.stringify({ schema_version: 1, status: "passed", gate: "benchmark-v3-global-execution-authority",
     model_calls: 0, independent_clones: 2, exact_resume_allowed: true, second_clone_rejected: true,
-    cross_host_rejected: true, authority_rebound_rejected: true, expired_authority_rejected: true,
+    cross_host_rejected: true, incomplete_campaign_holdout_rejected: true,
+    authority_rebound_rejected: true, expired_authority_rejected: true,
     registry_readiness_inspected: true,
     append_only_events: events.length }, null, 2)}\n`);
 } finally { fs.rmSync(temporary, { recursive: true, force: true }); }
