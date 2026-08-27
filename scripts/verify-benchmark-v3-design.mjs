@@ -131,6 +131,15 @@ rejects("model gate cannot be weakened", () => validateBenchmarkV3Design(changed
 rejects("selection rule cannot change after baseline", () => validateBenchmarkV3Design(changed((copy) => {
   copy.stages.selection_rule = "manual";
 })));
+rejects("validation cannot regress to baseline-first", () => validateBenchmarkV3Design(changed((copy) => {
+  copy.arm_order_schedule.validation.mode = "baseline-first";
+})));
+rejects("holdout counterbalancing seed cannot drift", () => validateBenchmarkV3Design(changed((copy) => {
+  copy.arm_order_schedule.seed = "changed-after-results";
+})));
+rejects("host verification cannot be claimed as a lift source", () => validateBenchmarkV3Design(changed((copy) => {
+  copy.product_decision.expected_lift_source = "host-verification";
+})));
 rejects("fixed historical threshold cannot return", () => validateBenchmarkV3Design(changed((copy) => {
   copy.opportunity_power_gate.minimum_baseline_failures_total = 15;
 })));

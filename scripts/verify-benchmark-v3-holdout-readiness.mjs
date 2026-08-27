@@ -6,7 +6,8 @@ import { fileURLToPath } from "node:url";
 import { canonicalJson, fingerprint } from "../lib/feedback/contracts.mjs";
 import { loadBenchmarkV3Corpus } from "../lib/benchmark/v3-corpus.mjs";
 import { loadBenchmarkV3Design } from "../lib/benchmark/v3-design.mjs";
-import { loadSignedExternalBenchmarkV3Holdout } from "../lib/benchmark/v3-holdout.mjs";
+import { loadSignedBenchmarkV3HoldoutCommitment, loadSignedExternalBenchmarkV3Holdout } from "../lib/benchmark/v3-holdout.mjs";
+import { loadSignedBenchmarkV3ExecutionAuthority } from "../lib/benchmark/v3-execution-authority.mjs";
 import { benchmarkV3CampaignRegistryPath } from "../lib/benchmark/v3-lease-takeover.mjs";
 import { validateBenchmarkV3Ledger } from "../lib/benchmark/v3-ledger.mjs";
 import { verifyBenchmarkV3ProductBundle } from "../lib/benchmark/v3-runner.mjs";
@@ -21,6 +22,8 @@ let report = null;
 let checkpoint = null;
 let exactResume = false;
 const output = process.env.BENCHMARK_V3_CAMPAIGN_OUTPUT;
+let executionAuthority = null;
+let holdoutCommitment = null;
 if (typeof output !== "string" || !path.isAbsolute(output)) {
   reasons.push({ code: "EXACT_CAMPAIGN_RESUME_UNAVAILABLE", requirement: "absolute-existing-campaign-output" });
 } else {
@@ -54,7 +57,7 @@ if (report !== null) {
       && checkpoint.attempts.some((entry) => /^v3-external-holdout-/u.test(entry.family_id ?? ""));
     if (entries.length !== 1 || entries[0].output_directory !== path.resolve(output) || entries[0].status !== "complete"
       || entries[0].development_report_fingerprint !== fingerprint(report)
-      || checkpoint.schema_version !== 3 || checkpoint.campaign_fingerprint !== report.ledger.campaign_fingerprint
+      || checkpoint.schema_version !== 4 || checkpoint.campaign_fingerprint !== report.ledger.campaign_fingerprint
       || checkpoint.checkpoint_fingerprint !== fingerprint(checkpointBody)
       || canonicalJson(checkpoint.ledger) !== canonicalJson(report.ledger)
       || !Array.isArray(checkpoint.attempts) || checkpoint.attempts.some((entry) => entry.state !== "completed")
@@ -66,6 +69,27 @@ if (report !== null) {
     reasons.push({ code: "EXACT_CAMPAIGN_RESUME_INVALID", requirement: "registered-output-and-unused-exact-checkpoint" });
   }
 }
+if (typeof output === "string" && path.isAbsolute(output)
+  && typeof process.env.BENCHMARK_V3_EXECUTION_AUTHORITY === "string") {
+  try {
+    const prepared = buildProfileBundleManifest(root, "lab").manifest;
+    executionAuthority = loadSignedBenchmarkV3ExecutionAuthority({ sourceRoot: root,
+      receiptPath: path.resolve(process.env.BENCHMARK_V3_EXECUTION_AUTHORITY), sourceSha: prepared.source_sha,
+      sourceTreeFingerprint: prepared.source_tree_fingerprint, designFingerprint: designValidation.design_fingerprint,
+      corpusFingerprint: corpus.corpus_fingerprint, outputDirectory: path.resolve(output) });
+  } catch { reasons.push({ code: "SIGNED_EXECUTION_AUTHORITY_INVALID", requirement: "signed-global-campaign-and-holdout-execution-ids" }); }
+} else reasons.push({ code: "SIGNED_EXECUTION_AUTHORITY_UNAVAILABLE", requirement: "signed-global-campaign-and-holdout-execution-ids" });
+if (executionAuthority !== null && typeof process.env.BENCHMARK_V3_HOLDOUT_SELECTION_COMMITMENT === "string") {
+  try {
+    const prepared = buildProfileBundleManifest(root, "lab").manifest;
+    holdoutCommitment = loadSignedBenchmarkV3HoldoutCommitment({ sourceRoot: root,
+      commitmentPath: path.resolve(process.env.BENCHMARK_V3_HOLDOUT_SELECTION_COMMITMENT),
+      campaignExecutionId: executionAuthority.receipt.campaign_execution_id,
+      holdoutExecutionId: executionAuthority.receipt.holdout_execution_id, sourceSha: prepared.source_sha,
+      sourceTreeFingerprint: prepared.source_tree_fingerprint, designFingerprint: designValidation.design_fingerprint,
+      corpusFingerprint: corpus.corpus_fingerprint });
+  } catch { reasons.push({ code: "SIGNED_HOLDOUT_COMMITMENT_INVALID", requirement: "pre-baseline-sampling-frame-algorithm-salt-commitment" }); }
+} else reasons.push({ code: "SIGNED_HOLDOUT_COMMITMENT_UNAVAILABLE", requirement: "pre-baseline-sampling-frame-algorithm-salt-commitment" });
 let candidate = null;
 if (typeof process.env.BENCHMARK_V3_CANDIDATE_BUNDLE !== "string") {
   reasons.push({ code: "FROZEN_CANDIDATE_BUNDLE_UNAVAILABLE", requirement: "exact-frozen-product-bundle" });
@@ -93,7 +117,8 @@ for (const [environmentName, capability, code] of [
   try { validateBenchmarkV3ReadinessReceipt(process.env[environmentName], { capability, sourceRoot: root }); }
   catch { reasons.push({ code, requirement: capability }); }
 }
-if (report !== null && candidate !== null && typeof process.env.BENCHMARK_V3_EXTERNAL_HOLDOUT_MANIFEST === "string") {
+if (report !== null && candidate !== null && executionAuthority !== null && holdoutCommitment !== null
+  && typeof process.env.BENCHMARK_V3_EXTERNAL_HOLDOUT_MANIFEST === "string") {
   try {
     loadSignedExternalBenchmarkV3Holdout({ sourceRoot: root,
       manifestPath: path.resolve(process.env.BENCHMARK_V3_EXTERNAL_HOLDOUT_MANIFEST),
@@ -102,6 +127,9 @@ if (report !== null && candidate !== null && typeof process.env.BENCHMARK_V3_EXT
       finalCandidateSha: report.ledger.final_candidate_sha,
       productBundleFingerprint: candidate.product_bundle_fingerprint,
       candidateFrozenAtMs: report.final_candidate_frozen_at_ms,
+      campaignExecutionId: executionAuthority.receipt.campaign_execution_id,
+      holdoutExecutionId: executionAuthority.receipt.holdout_execution_id,
+      holdoutCommitment, armOrderPolicy: design.arm_order_schedule,
       publicSourceCommits: corpus.split_assignment.entries.map((entry) => entry.source_commit),
       publicSourcePaths: corpus.families.flatMap((entry) => entry.control_surface.provenance.source_paths) });
   } catch { reasons.push({ code: "SIGNED_EXTERNAL_HOLDOUT_INVALID", requirement: "signed-private-disjoint-external-holdout-manifest" }); }

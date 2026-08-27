@@ -32,6 +32,9 @@ const readinessReceiptPaths = {
 };
 const gate = await runBenchmarkV3ModelFreeGate({
   sourceRoot,
+  outputDirectory: path.resolve(one("output")),
+  executionAuthorityPath: path.resolve(one("execution-authority")),
+  holdoutCommitmentPath: path.resolve(one("holdout-commitment")),
   semanticRuntimeRoot: path.resolve(one("semantic-runtime")),
   opencodeExecutable: path.resolve(one("opencode")),
   candidateBundles: candidateSources.map((entry, index) => ({ sourceRoot: path.resolve(entry), materializedCoreDirectory: path.resolve(candidateBundles[index]) })),

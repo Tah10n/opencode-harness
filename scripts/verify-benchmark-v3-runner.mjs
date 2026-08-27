@@ -181,17 +181,22 @@ try {
   assert.equal(spawnSync("git", ["-c", "user.name=Benchmark V3", "-c", "user.email=benchmark-v3@example.invalid",
     "commit", "--quiet", "-m", "fixture"], { cwd: registryFixture }).status, 0);
   const campaignFingerprint = `sha256:${"c".repeat(64)}`;
-  const initialLedgerBody = Object.freeze({ schema_version: 2, design_fingerprint: `sha256:${"b".repeat(64)}`,
-    campaign_fingerprint: campaignFingerprint, registrations: Object.freeze([]), events: Object.freeze([]),
+  const attemptBindingFingerprint = `sha256:${"1".repeat(64)}`;
+  const initialLedgerBody = Object.freeze({ schema_version: 3, design_fingerprint: `sha256:${"b".repeat(64)}`,
+    campaign_fingerprint: campaignFingerprint, campaign_execution_id: "campaign-execution-fixture-001",
+    holdout_execution_id: "holdout-execution-fixture-001",
+    holdout_selection_commitment_fingerprint: `sha256:${"2".repeat(64)}`,
+    arm_order_policy_fingerprint: `sha256:${"3".repeat(64)}`, registrations: Object.freeze([]), events: Object.freeze([]),
     selected_candidate_id: null, final_candidate_sha: null });
   const initialLedger = Object.freeze({ ...initialLedgerBody, ledger_fingerprint: fingerprint(initialLedgerBody) });
   const output = path.join(registryFixture, "outputs", "campaign-one");
   const firstJournal = createBenchmarkV3CampaignJournal(output, { sourceRoot: registryFixture, campaignFingerprint, initialLedger });
-  const reservation = firstJournal.prepareAttempt("baseline", "family-one", 1);
+  const reservation = firstJournal.prepareAttempt("baseline", "family-one", 1, attemptBindingFingerprint);
   const firstOutcome = { infrastructure_failure: false, result_fingerprint: `sha256:${"e".repeat(64)}` };
   fs.mkdirSync(path.dirname(reservation.completion_path), { recursive: true });
   fs.writeFileSync(reservation.completion_path, JSON.stringify({ schema_version: 1, campaign_fingerprint: campaignFingerprint,
-    arm_id: "baseline", family_id: "family-one", attempt_index: 1, outcome: firstOutcome,
+    arm_id: "baseline", family_id: "family-one", attempt_index: 1,
+    attempt_binding_fingerprint: attemptBindingFingerprint, outcome: firstOutcome,
     outcome_fingerprint: fingerprint(firstOutcome) }));
   firstJournal.recordAttempt({ arm_id: "baseline", family_id: "family-one", attempt_index: 1,
     outcome: firstOutcome });
@@ -270,31 +275,35 @@ try {
   const resumedJournal = createBenchmarkV3CampaignJournal(output, { sourceRoot: registryFixture, campaignFingerprint, initialLedger });
   assert.equal(resumedJournal.attemptsFor("baseline", "family-one").length, 1,
     "exact resume must preserve completed family execution");
-  const crashReservation = resumedJournal.prepareAttempt("candidate", "family-two", 1);
+  assert.throws(() => resumedJournal.prepareAttempt("baseline", "family-one", 1, `sha256:${"0".repeat(64)}`),
+    /temporal-order binding/u, "exact resume must reject a changed temporal-order attempt binding");
+  const crashReservation = resumedJournal.prepareAttempt("candidate", "family-two", 1, attemptBindingFingerprint);
   const crashOutcome = { infrastructure_failure: false, result_fingerprint: `sha256:${"f".repeat(64)}` };
   fs.mkdirSync(path.dirname(crashReservation.completion_path), { recursive: true });
   fs.writeFileSync(crashReservation.completion_path, JSON.stringify({ schema_version: 1,
     campaign_fingerprint: campaignFingerprint, arm_id: "candidate", family_id: "family-two", attempt_index: 1,
+    attempt_binding_fingerprint: attemptBindingFingerprint,
     outcome: crashOutcome, outcome_fingerprint: fingerprint(crashOutcome) }));
   resumedJournal.close();
   const crashResumed = createBenchmarkV3CampaignJournal(output, { sourceRoot: registryFixture, campaignFingerprint, initialLedger });
-  assert.deepEqual(crashResumed.prepareAttempt("candidate", "family-two", 1).outcome, crashOutcome,
+  assert.deepEqual(crashResumed.prepareAttempt("candidate", "family-two", 1, attemptBindingFingerprint).outcome, crashOutcome,
     "a durable completion written before a crash must resume without another execution");
-  const uncertain = crashResumed.prepareAttempt("candidate", "family-three", 1);
+  const uncertain = crashResumed.prepareAttempt("candidate", "family-three", 1, attemptBindingFingerprint);
   assert.equal(fs.existsSync(uncertain.completion_path), false);
   crashResumed.close();
   const uncertainResume = createBenchmarkV3CampaignJournal(output, { sourceRoot: registryFixture, campaignFingerprint, initialLedger });
-  assert.throws(() => uncertainResume.prepareAttempt("candidate", "family-three", 1), /refusing to repeat/u,
+  assert.throws(() => uncertainResume.prepareAttempt("candidate", "family-three", 1, attemptBindingFingerprint), /refusing to repeat/u,
     "an interrupted unreceipted attempt must fail closed instead of repeating a model call");
   uncertainResume.close();
   const recoveredOutcome = { infrastructure_failure: true, result_fingerprint: `sha256:${"9".repeat(64)}` };
   fs.writeFileSync(uncertain.completion_path, JSON.stringify({ schema_version: 1,
     campaign_fingerprint: campaignFingerprint, arm_id: "candidate", family_id: "family-three", attempt_index: 1,
+    attempt_binding_fingerprint: attemptBindingFingerprint,
     outcome: recoveredOutcome, outcome_fingerprint: fingerprint(recoveredOutcome) }));
   const recoveredDevelopment = createBenchmarkV3CampaignJournal(output, {
     sourceRoot: registryFixture, campaignFingerprint, initialLedger,
   });
-  assert.deepEqual(recoveredDevelopment.prepareAttempt("candidate", "family-three", 1).outcome, recoveredOutcome,
+  assert.deepEqual(recoveredDevelopment.prepareAttempt("candidate", "family-three", 1, attemptBindingFingerprint).outcome, recoveredOutcome,
     "an authentic late completion may close the exact reserved development attempt");
   const developmentReportBody = { status: "sealed-holdout-required", ledger: initialLedger,
     ledger_fingerprint: initialLedger.ledger_fingerprint };
@@ -318,12 +327,13 @@ try {
   });
   assert.equal(holdoutJournal.attemptsFor("baseline", "family-one").length, 1,
     "holdout must resume the exact development/validation checkpoint");
-  const holdoutReservation = holdoutJournal.prepareAttempt("candidate", "external-holdout-family-one", 1);
+  const holdoutReservation = holdoutJournal.prepareAttempt("candidate", "external-holdout-family-one", 1, attemptBindingFingerprint);
   const holdoutOutcome = { infrastructure_failure: false, result_fingerprint: `sha256:${"a".repeat(64)}` };
   fs.mkdirSync(path.dirname(holdoutReservation.completion_path), { recursive: true });
   fs.writeFileSync(holdoutReservation.completion_path, JSON.stringify({ schema_version: 1,
     campaign_fingerprint: campaignFingerprint, arm_id: "candidate", family_id: "external-holdout-family-one",
-    attempt_index: 1, outcome: holdoutOutcome, outcome_fingerprint: fingerprint(holdoutOutcome) }));
+    attempt_index: 1, attempt_binding_fingerprint: attemptBindingFingerprint,
+    outcome: holdoutOutcome, outcome_fingerprint: fingerprint(holdoutOutcome) }));
   holdoutJournal.recordAttempt({ arm_id: "candidate", family_id: "external-holdout-family-one", attempt_index: 1,
     outcome: holdoutOutcome });
   const extendedLedgerBody = { ...initialLedgerBody, events: [{ event_id: "fixture-holdout-scored" }] };
@@ -333,7 +343,7 @@ try {
   const resumedHoldout = createBenchmarkV3CampaignJournal(output, {
     sourceRoot: registryFixture, campaignFingerprint, initialLedger, phase: "holdout",
   });
-  assert.deepEqual(resumedHoldout.prepareAttempt("candidate", "external-holdout-family-one", 1).outcome, holdoutOutcome,
+  assert.deepEqual(resumedHoldout.prepareAttempt("candidate", "external-holdout-family-one", 1, attemptBindingFingerprint).outcome, holdoutOutcome,
     "exact holdout resume must preserve a completed confirmatory family instead of executing it twice");
   assert.equal(resumedHoldout.ledger.ledger_fingerprint, extendedLedger.ledger_fingerprint,
     "holdout resume must accept only the exact ledger extension after a scored holdout event");
@@ -387,6 +397,11 @@ const envelope = buildBenchmarkV3AttemptEnvelope({
   variant: "fixture-variant",
   corpusGenerationSeed: "frozen-seed",
   modelSamplingSeed: null,
+  executionId: "campaign-execution-fixture-001",
+  armOrderScheduleFingerprint: `sha256:${"7".repeat(64)}`,
+  scheduleEntry: { family_id: first.family_id, arms: ["baseline", "candidate"], order: "baseline-first",
+    entry_fingerprint: `sha256:${"8".repeat(64)}` },
+  holdoutSelectionCommitmentFingerprint: `sha256:${"9".repeat(64)}`,
 });
 const serialized = JSON.stringify(envelope);
 assert.equal(serialized.includes("control_surface"), false);
@@ -425,14 +440,20 @@ try {
 const seededEnvelope = buildBenchmarkV3AttemptEnvelope({ ...envelope, family: first, armId: envelope.arm_id,
   sourceSha: envelope.source_sha, productBundleFingerprint: envelope.product_bundle_fingerprint,
   opencodeExecutableFingerprint: envelope.opencode_executable_fingerprint, corpusGenerationSeed: "frozen-seed",
-  modelSamplingSeed: "supported-model-seed" });
+  modelSamplingSeed: "supported-model-seed", executionId: envelope.execution_id,
+  armOrderScheduleFingerprint: envelope.arm_order_schedule_fingerprint,
+  scheduleEntry: { family_id: first.family_id, arms: ["baseline", "candidate"], order: envelope.scheduled_order,
+    entry_fingerprint: envelope.schedule_entry_fingerprint },
+  holdoutSelectionCommitmentFingerprint: envelope.holdout_selection_commitment_fingerprint });
 assert.equal(seededEnvelope.corpus_generation_seed, envelope.corpus_generation_seed);
 assert.equal(seededEnvelope.public_surface_fingerprint, envelope.public_surface_fingerprint);
 const bindingFixture = { executableFingerprint: `sha256:${"1".repeat(64)}`, opencodeVersion: "1.18.21",
   provider: "fixture-provider", model: "fixture-model", variant: "fixture-variant", variantSupported: true,
   modelSamplingSeedSupported: false, corpusGenerationSeed: "frozen-seed", candidateBundleFingerprints: [`sha256:${"2".repeat(64)}`],
   evaluatorFingerprint: `sha256:${"3".repeat(64)}`, corpusFingerprint: corpus.corpus_fingerprint,
-  designFingerprint: `sha256:${"4".repeat(64)}`, semanticRuntimeFingerprint: `sha256:${"5".repeat(64)}` };
+  designFingerprint: `sha256:${"4".repeat(64)}`, semanticRuntimeFingerprint: `sha256:${"5".repeat(64)}`,
+  armOrderPolicyFingerprint: `sha256:${"6".repeat(64)}`,
+  publicArmOrderScheduleFingerprints: { development: `sha256:${"7".repeat(64)}`, validation: `sha256:${"8".repeat(64)}` } };
 const unseededBinding = buildBenchmarkV3ModelBinding(bindingFixture);
 const explicitlyUnseededBinding = buildBenchmarkV3ModelBinding({ ...bindingFixture, modelSamplingSeed: null });
 assert.deepEqual(unseededBinding, explicitlyUnseededBinding);

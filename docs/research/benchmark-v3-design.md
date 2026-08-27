@@ -27,14 +27,19 @@ The authored upstream defect report and test-only behavioral delta are visible.
 Implementation diffs, reference source bytes, complete hidden tests, and oracle
 outcomes are not model-visible. Ordinary parent-revision source remains visible
 and may contain reusable code; it is part of the problem, not a disclosed answer.
-The contract audit verifies that all five clauses and their witnesses are
-present, the visible contract text does not disclose source-patch hunks, every
-pre-fix state fails, every reference repair passes, and two independently
-authored byte-distinct alternatives—one development and one validation
-representative—pass the same hidden oracle. For a representative multi-source
-family it also proves that a destructive mutation of every allowed source path
-is rejected, while corpus provenance requires every available upstream rule
-suite corresponding to an allowed rule path.
+The contract audit verifies structurally across all 120 public families that
+all five clauses and their witnesses are present, the visible contract text
+does not disclose source-patch hunks, every pre-fix state fails, and every
+reference repair passes. Two independently authored byte-distinct
+alternatives—one development and one validation representative—pass the same
+hidden oracle, and one representative multi-source family rejects a
+destructive mutation of every allowed source path. These representative
+alternatives are spot checks only: there is no 120-entry independently reviewed
+semantic contract ledger, so the audit sets
+`full_corpus_semantic_sufficiency_claimed:false` and must not be cited as proof
+that every visible contract is independently sufficient. Corpus provenance
+still requires every available upstream rule suite corresponding to an allowed
+rule path.
 
 The runner-owned `control.json` retains reference bytes only for model-free
 oracle calibration. Scored outcomes never compare candidate bytes to a
@@ -48,9 +53,14 @@ promotion-eligible and cannot authorize a confirmatory claim.
 
 ## Frozen study semantics
 
-The study has exactly one preregistered candidate. Development runs the
-baseline before the candidate, evaluates the preregistered opportunity gate,
-and executes every development family at most once per arm. Selection is
+The study has exactly one preregistered candidate. A frozen
+`stratum-balanced-hash-rank-v1` arm-order policy is part of the design.
+Development alone runs baseline-first because the preregistered opportunity
+gate must settle before any candidate call. Validation and holdout are balanced
+within every stratum: exactly half of families are baseline-first and half are
+candidate-first. The exact schedules and fingerprints are bound into the
+campaign, ledger events, external manifest, and every attempt envelope and
+checkpoint reservation. Selection is
 deterministic: highest paired delta, then lower new HIGH/MEDIUM upper confidence
 bound, then lower mean duration, then candidate ID. Validation runs only that
 candidate once. Passing validation freezes the exact candidate source SHA and
@@ -77,7 +87,18 @@ completion evidence fails closed instead of spending model tokens again.
 
 ## Campaign lease and exact resume
 
-The Git-private registry binds one campaign fingerprint to one output directory.
+Before baseline, an independently signed execution-authority receipt assigns
+distinct `campaign_execution_id` and `holdout_execution_id` values and binds
+the current source, design, corpus, and output directory. A root-custodied
+registry outside every clone is an append-only hash chain. Under an atomic
+registry lock it records a `reserve` event before the first model call and a
+`consume` event at terminal completion. Exact resume from the same physical
+clone, host, output, authority, and campaign binding is allowed; a fresh clone,
+different host, moved output, or rebound ID is rejected before a model call,
+even when it has an independent Git common directory.
+
+The Git-private registry remains a supplementary local checkpoint/lease and
+binds one campaign fingerprint to one output directory.
 The checkpoint, ledger, candidate/product fingerprint, model binding, semantic
 runtime entries, review fingerprints, source SHA, and source-tree fingerprint
 must reproduce exactly on resume.
@@ -108,10 +129,12 @@ runner, provenance, lease, and holdout-negative contracts without privileged
 environment receipts. A portable pass does not authorize a campaign.
 
 `npm run verify:development-readiness` requires the frozen semantic runtime,
-the full contract audit, exact candidate/product equivalence, process
-containment, and hidden-namespace receipts. It does not require an external
-holdout directory, manifest, or holdout-only egress receipt. Therefore an
-external custodian cannot block a pre-freeze development/validation campaign.
+the structural all-family contract audit with explicitly representative
+alternative witnesses, exact candidate/product equivalence, signed global
+execution authority, a signed pre-baseline holdout selection commitment,
+process containment, and hidden-namespace receipts. It does not require the
+post-freeze holdout reveal, rendered holdout directory, manifest, or
+holdout-only egress receipt.
 
 `npm run verify:holdout-readiness` is post-freeze. It requires exact resume of
 the completed campaign, passed validation efficacy, the frozen final candidate,
@@ -126,13 +149,34 @@ registry that collapses those trust roots.
 
 ## External holdout custody
 
-The external custodian creates the holdout only after validation and candidate
-freeze. It contains exactly 90 private families (30 per stratum), self-contained
+Before development baseline, the external custodian signs a commitment to the
+complete sampling-frame fingerprint, `stratified-sha256-lowest-30-v1`
+algorithm, salt commitment, frame counts, both execution IDs, current source,
+design, and public corpus. After validation and candidate freeze, the custodian
+reveals the exact frame and salt. The verifier deterministically recomputes the
+30 selected identities per stratum and rejects a signed but candidate-aware
+cherry-pick. The external custodian then materializes exactly those 90 private
+families, with self-contained
 visible contracts, private hidden controls, expected test counts, and no
 reference solution. Its signed manifest binds the campaign, design, final
-candidate SHA, product bundle, index, private control fingerprints, calibration
-attestation, execution limit one, issuer, and expiry. The complete custody tree
+candidate SHA, product bundle, both execution IDs, precommitment, reveal,
+selection proof, exact selected identities, balanced arm-order schedule, index,
+private control fingerprints, calibration attestation, execution limit one,
+issuer, and expiry. The complete custody tree
 is outside public Git and owner-only.
+
+The holdout custodian signing key is distinct from both current-HEAD reviewer
+keys. Reviewers cannot choose or reveal holdout identities, and the custodian
+cannot issue review receipts.
+
+## Product decision
+
+Host verification is a fail-closed safety filter only. It may reject unsafe or
+unverified candidate outcomes, but benchmark v3 does not treat it as an
+expected source of lift and does not add a remediation continuation to the
+candidate. Any measured lift must come from the frozen candidate architecture;
+adding a product-equivalent bounded remediation continuation would require a
+new preregistered design rather than a post-result adjustment.
 
 The holdout runner resumes the same checkpoint and ledger, uses the same model,
 runtime entries, source, and final candidate, and writes separate immutable
@@ -151,6 +195,9 @@ Development/validation readiness:
 BENCHMARK_V3_PROVENANCE_BUNDLE=/private/custody/eslint-provenance.bundle \
 BENCHMARK_V3_ESLINT_RUNTIME_ROOT=/private/custody/eslint-runtime \
 BENCHMARK_V3_CANDIDATE_BUNDLE=/private/candidate/core \
+BENCHMARK_V3_CAMPAIGN_OUTPUT=/private/campaigns/benchmark-v3-campaign-001 \
+BENCHMARK_V3_EXECUTION_AUTHORITY=/var/run/opencode-harness/execution-authority/campaign-001.json \
+BENCHMARK_V3_HOLDOUT_SELECTION_COMMITMENT=/var/run/opencode-harness/holdout/campaign-001/commitment.json \
 OPENCODE_QUALITY_PROCESS_CONTAINMENT_RECEIPT=/var/run/opencode-harness/readiness/process.json \
 BENCHMARK_V3_HIDDEN_NAMESPACE_ISOLATION_RECEIPT=/var/run/opencode-harness/readiness/namespace.json \
 npm run verify:development-readiness
@@ -165,6 +212,8 @@ npm run bench:v3 -- \
   --opencode /absolute/path/to/opencode \
   --candidate-source "$PWD" \
   --candidate-bundle /private/candidate/core \
+  --execution-authority /var/run/opencode-harness/execution-authority/campaign-001.json \
+  --holdout-commitment /var/run/opencode-harness/holdout/campaign-001/commitment.json \
   --review-receipt /var/run/opencode-harness/reviews/reviewer-one/review.json \
   --review-receipt /var/run/opencode-harness/reviews/reviewer-two/review.json \
   --process-receipt /var/run/opencode-harness/readiness/process.json \
@@ -173,7 +222,9 @@ npm run bench:v3 -- \
   --provider provider-id --model model-id --variant variant-id
 ```
 
-After `report.json` says `sealed-holdout-required`, the custodian creates
+The custodian signs `commitment.json` before development baseline. After
+`report.json` says `sealed-holdout-required`, the custodian reveals the committed
+frame and salt, deterministically selects the identities, and creates
 `/var/run/opencode-harness/holdout/<campaign>/` as owner-only `0700`, writes the
 manifest and private controls as owner-only `0600`, signs the manifest, and
 never commits or copies that directory into public Git. The custody directory
@@ -189,6 +240,8 @@ Holdout readiness:
 BENCHMARK_V3_CAMPAIGN_OUTPUT=/private/campaigns/benchmark-v3-campaign-001 \
 BENCHMARK_V3_PROVENANCE_BUNDLE=/private/custody/eslint-provenance.bundle \
 BENCHMARK_V3_CANDIDATE_BUNDLE=/private/candidate/core \
+BENCHMARK_V3_EXECUTION_AUTHORITY=/var/run/opencode-harness/execution-authority/campaign-001.json \
+BENCHMARK_V3_HOLDOUT_SELECTION_COMMITMENT=/var/run/opencode-harness/holdout/campaign-001/commitment.json \
 BENCHMARK_V3_EXTERNAL_HOLDOUT_MANIFEST=/var/run/opencode-harness/holdout/campaign-001/manifest.json \
 OPENCODE_QUALITY_PROCESS_CONTAINMENT_RECEIPT=/var/run/opencode-harness/readiness/process.json \
 BENCHMARK_V3_HIDDEN_NAMESPACE_ISOLATION_RECEIPT=/var/run/opencode-harness/readiness/namespace.json \
@@ -208,6 +261,8 @@ npm run bench:v3:holdout -- \
   --opencode /absolute/path/to/opencode \
   --candidate-source "$PWD" \
   --candidate-bundle /private/candidate/core \
+  --execution-authority /var/run/opencode-harness/execution-authority/campaign-001.json \
+  --holdout-commitment /var/run/opencode-harness/holdout/campaign-001/commitment.json \
   --process-receipt /var/run/opencode-harness/readiness/process.json \
   --namespace-receipt /var/run/opencode-harness/readiness/namespace.json \
   --egress-receipt /var/run/opencode-harness/readiness/egress.json

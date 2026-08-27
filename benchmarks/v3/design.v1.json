@@ -11,6 +11,19 @@
     "product_bundle_binding": "byte-identical-materialized-core",
     "automatic_candidate_creation": "forbidden"
   },
+  "arm_order_schedule": {
+    "schema_version": 1,
+    "algorithm": "stratum-balanced-hash-rank-v1",
+    "seed": "benchmark-v3-frozen-arm-order-2026-08-27",
+    "development": { "mode": "baseline-first", "reason": "opportunity-gate-before-candidate" },
+    "validation": { "mode": "balanced-counterbalanced", "balance_unit": "within-stratum" },
+    "holdout": { "mode": "balanced-counterbalanced", "balance_unit": "within-stratum" }
+  },
+  "product_decision": {
+    "host_verification_role": "fail-closed-safety-filter-only",
+    "expected_lift_source": "candidate-architecture-only",
+    "bounded_remediation_continuation": "not-part-of-benchmark-v3-candidate"
+  },
   "stages": {
     "development": { "minimum_registered_candidates": 1, "maximum_registered_candidates": 1, "current_registered_candidates": 1, "registrations_immutable": true, "runs_per_candidate": 1 },
     "validation": { "candidate_count": 1, "runs_per_candidate": 1, "selection": "deterministic-development-winner" },
@@ -69,7 +82,7 @@
     "public_split": "absent",
     "confirmatory_use": "external-sealed-only",
     "sealed_holdout_storage": "outside-public-git",
-    "sealed_holdout_creation": "after-design-and-candidate-freeze",
+    "sealed_holdout_creation": "sampling-frame-committed-before-baseline-materialized-after-candidate-freeze",
     "execution_source": "external-sealed-receipt-only"
   },
   "guardrails": {

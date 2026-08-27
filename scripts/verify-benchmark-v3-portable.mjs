@@ -7,6 +7,8 @@ const checks = [
   "verify:benchmark:v3:design",
   "verify:benchmark:v3:corpus",
   "verify:benchmark:v3:ledger",
+  "verify:benchmark:v3:counterbalancing",
+  "verify:benchmark:v3:global-authority",
   "verify:benchmark:v3:runner",
   "verify:benchmark:v3:holdout-negative",
   "verify:benchmark:v3:provenance",

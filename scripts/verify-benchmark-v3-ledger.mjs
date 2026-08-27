@@ -23,10 +23,17 @@ const registration = (id, fill) => ({
   development_execution_count: 0,
 });
 const registrations = [registration("candidate-a", "a")];
+const ledgerBinding = {
+  campaignExecutionId: "campaign-execution-fixture-001",
+  holdoutExecutionId: "holdout-execution-fixture-001",
+  holdoutSelectionCommitmentFingerprint: fp("f"),
+  armOrderPolicyFingerprint: fp("9"),
+};
 let ledger = createBenchmarkV3Ledger({
   design,
   designFingerprint: validation.design_fingerprint,
   campaignFingerprint: fp("c"),
+  ...ledgerBinding,
   registrations,
 });
 const metrics = (overrides = {}) => ({
@@ -60,6 +67,8 @@ const event = ({ id, candidate = registrations[0], type, stage, status, scored, 
   bindings_fingerprint: fp("d"),
   architecture_fingerprint: candidate.architecture_fingerprint,
   product_bundle_fingerprint: candidate.product_bundle_fingerprint,
+  execution_id: stage === "holdout" ? ledgerBinding.holdoutExecutionId : ledgerBinding.campaignExecutionId,
+  arm_order_schedule_fingerprint: stage === "acceptance" ? ledgerBinding.armOrderPolicyFingerprint : fp(stage === "validation" ? "7" : stage === "holdout" ? "8" : "6"),
   scored_outcome: scored,
   status,
   result_fingerprint: type === "infrastructure-failure-before-scoring" ? null : fp("e"),
@@ -86,7 +95,7 @@ assert.deepEqual(validateBenchmarkV3Ledger(ledger, design), {
 
 let negativeCount = 0;
 function rejects(label, operation) { assert.throws(operation, undefined, label); negativeCount += 1; }
-const afterInfra = ledger.events.slice(0, 2).reduce((state, current) => appendBenchmarkV3LedgerEvent(state, design, current), createBenchmarkV3Ledger({ design, designFingerprint: validation.design_fingerprint, campaignFingerprint: fp("c"), registrations }));
+const afterInfra = ledger.events.slice(0, 2).reduce((state, current) => appendBenchmarkV3LedgerEvent(state, design, current), createBenchmarkV3Ledger({ design, designFingerprint: validation.design_fingerprint, campaignFingerprint: fp("c"), ...ledgerBinding, registrations }));
 rejects("retry cannot change seed", () => appendBenchmarkV3LedgerEvent(afterInfra, design, { ...event({ id: "bad-seed", type: "development-execution", stage: "development", status: "scored", scored: true, retry: "attempt-infra-a" }), seed: "changed-seed" }));
 rejects("only one retry", () => appendBenchmarkV3LedgerEvent(appendBenchmarkV3LedgerEvent(afterInfra, design, event({ id: "retry-one", type: "development-execution", stage: "development", status: "scored", scored: true, retry: "attempt-infra-a" })), design, event({ id: "retry-two", type: "development-execution", stage: "development", status: "scored", scored: true, retry: "attempt-infra-a" })));
 rejects("retry chains are forbidden", () => appendBenchmarkV3LedgerEvent(appendBenchmarkV3LedgerEvent(afterInfra, design, event({ id: "retry-infra", type: "infrastructure-failure-before-scoring", stage: "development", status: "infrastructure-failure", scored: false, retry: "attempt-infra-a" })), design, event({ id: "retry-chain", type: "development-execution", stage: "development", status: "scored", scored: true, retry: "attempt-retry-infra" })));
@@ -96,5 +105,13 @@ rejects("candidate architecture cannot relabel", () => appendBenchmarkV3LedgerEv
 rejects("validation requires selection", () => appendBenchmarkV3LedgerEvent(afterInfra, design, event({ id: "early-validation", type: "validation-execution", stage: "validation", status: "scored", scored: true })));
 rejects("selection summaries cannot be caller supplied", () => selectBenchmarkV3Candidate(afterInfra, design, [{ candidate_id: "candidate-a", paired_delta: 1 }]));
 rejects("holdout requires exact frozen SHA", () => appendBenchmarkV3LedgerEvent(ledger, design, { ...event({ id: "reused-holdout", type: "holdout-execution", stage: "holdout", status: "scored", scored: true }), source_sha: "b".repeat(40) }));
+rejects("validation cannot bind the holdout execution ID", () => appendBenchmarkV3LedgerEvent(afterInfra, design, {
+  ...event({ id: "wrong-execution", type: "validation-execution", stage: "validation", status: "scored", scored: true }),
+  execution_id: ledgerBinding.holdoutExecutionId,
+}));
+rejects("retry cannot change temporal order binding", () => appendBenchmarkV3LedgerEvent(afterInfra, design, {
+  ...event({ id: "bad-order", type: "development-execution", stage: "development", status: "scored", scored: true, retry: "attempt-infra-a" }),
+  arm_order_schedule_fingerprint: fp("0"),
+}));
 
 console.log(JSON.stringify({ status: "passed", evidence_class: "model-free-ledger-verification", model_execution: false, negative_cases: negativeCount }, null, 2));

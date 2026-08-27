@@ -11,13 +11,15 @@ for (let index = 2; index < process.argv.length; index += 2) {
   values.set(key.slice(2), value);
 }
 const required = ["semantic-runtime", "output", "external-manifest", "opencode", "candidate-source", "candidate-bundle",
-  "process-receipt", "namespace-receipt", "egress-receipt"];
+  "execution-authority", "holdout-commitment", "process-receipt", "namespace-receipt", "egress-receipt"];
 for (const name of required) if (!values.has(name)) throw new Error(`--${name} is required`);
 const result = await runBenchmarkV3Holdout({
   sourceRoot: path.resolve(values.get("source-root") ?? process.cwd()),
   semanticRuntimeRoot: path.resolve(values.get("semantic-runtime")),
   outputDirectory: path.resolve(values.get("output")),
   externalManifestPath: path.resolve(values.get("external-manifest")),
+  executionAuthorityPath: path.resolve(values.get("execution-authority")),
+  holdoutCommitmentPath: path.resolve(values.get("holdout-commitment")),
   opencodeExecutable: path.resolve(values.get("opencode")),
   candidateSourceRoot: path.resolve(values.get("candidate-source")),
   candidateBundle: path.resolve(values.get("candidate-bundle")),

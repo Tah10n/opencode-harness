@@ -31,7 +31,7 @@
     "validation"
   ],
   "external_holdout_family_count": 90,
-  "sealed_holdout_policy": "outside-public-git-created-after-design-and-candidate-freeze",
+  "sealed_holdout_policy": "outside-public-git-sampling-frame-precommitted-before-baseline-materialized-after-candidate-freeze",
   "current_rendered_instances": 120,
   "current_promotion_eligible_instances": 0
 }

@@ -72,6 +72,8 @@
     "verify:benchmark:v3:semantic-oracles": "BENCHMARK_V3_ESLINT_RUNTIME_ROOT=${BENCHMARK_V3_ESLINT_RUNTIME_ROOT:?required} node scripts/verify-benchmark-v3-corpus.mjs",
     "verify:benchmark:v3:contract-audit": "BENCHMARK_V3_ESLINT_RUNTIME_ROOT=${BENCHMARK_V3_ESLINT_RUNTIME_ROOT:?required} node scripts/verify-benchmark-v3-contract-audit.mjs",
     "verify:benchmark:v3:holdout-negative": "node scripts/verify-benchmark-v3-holdout-negative.mjs",
+    "verify:benchmark:v3:counterbalancing": "node scripts/verify-benchmark-v3-counterbalancing.mjs",
+    "verify:benchmark:v3:global-authority": "node scripts/verify-benchmark-v3-global-authority.mjs",
     "verify:benchmark:v3:runner": "node scripts/verify-benchmark-v3-runner.mjs",
     "verify:benchmark:v3:provenance": "node scripts/verify-benchmark-v3-provenance.mjs",
     "verify:benchmark:v3:no-raw-bundles": "node scripts/verify-benchmark-v3-no-raw-bundles.mjs",

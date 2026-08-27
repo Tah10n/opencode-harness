@@ -1,0 +1,81 @@
+#!/usr/bin/env node
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import { generateKeyPairSync, sign } from "node:crypto";
+import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
+
+import { canonicalJson, fingerprint } from "../lib/feedback/contracts.mjs";
+import { benchmarkV3ExecutionCloneBinding, consumeBenchmarkV3Execution,
+  loadSignedBenchmarkV3ExecutionAuthority, reserveBenchmarkV3Execution } from "../lib/benchmark/v3-execution-authority.mjs";
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const temporary = fs.mkdtempSync(path.join(os.tmpdir(), "benchmark-v3-global-authority-"));
+try {
+  const cloneOne = path.join(temporary, "clone-one");
+  const cloneTwo = path.join(temporary, "clone-two");
+  for (const clone of [cloneOne, cloneTwo]) {
+    const result = spawnSync("git", ["clone", "--quiet", "--no-hardlinks", root, clone], { encoding: "utf8" });
+    assert.equal(result.status, 0, result.stderr);
+  }
+  const channel = path.join(temporary, "authority-channel");
+  const registryRoot = path.join(temporary, "external-registry");
+  fs.mkdirSync(channel, { mode: 0o700 });
+  fs.mkdirSync(registryRoot, { mode: 0o700 });
+  const registryPath = path.join(registryRoot, "registry.jsonl");
+  const output = path.join(temporary, "campaign-output");
+  const { publicKey, privateKey } = generateKeyPairSync("ed25519");
+  const issuer = { issuer_id: "fixture-global-execution-authority-v1", protected_channel: "fixture-authority-channel-v1",
+    channel_root: channel, registry_root: registryRoot, registry_path: registryPath, owner_uid: process.getuid(),
+    public_key_pem: publicKey.export({ type: "spki", format: "pem" }) };
+  const sourceSha = spawnSync("git", ["rev-parse", "HEAD"], { cwd: cloneOne, encoding: "utf8" }).stdout.trim();
+  const sourceTreeFingerprint = `sha256:${"1".repeat(64)}`;
+  const designFingerprint = `sha256:${"2".repeat(64)}`;
+  const corpusFingerprint = `sha256:${"3".repeat(64)}`;
+  const body = { schema_version: 1, issuer_id: issuer.issuer_id, protected_channel: issuer.protected_channel,
+    campaign_execution_id: "campaign-global-one-shot-0001", holdout_execution_id: "holdout-global-one-shot-0001",
+    source_sha: sourceSha, source_tree_fingerprint: sourceTreeFingerprint, design_fingerprint: designFingerprint,
+    corpus_fingerprint: corpusFingerprint, output_directory_fingerprint: fingerprint(path.resolve(output)),
+    issued_at_ms: Date.now() - 100, expires_at_ms: Date.now() + 60_000 };
+  const receiptPath = path.join(channel, "authority.json");
+  fs.writeFileSync(receiptPath, JSON.stringify({ ...body,
+    signature: sign(null, Buffer.from(canonicalJson(body), "utf8"), privateKey).toString("base64url") }), { mode: 0o600 });
+  const authority = loadSignedBenchmarkV3ExecutionAuthority({ sourceRoot: cloneOne, receiptPath, sourceSha,
+    sourceTreeFingerprint, designFingerprint, corpusFingerprint, outputDirectory: output, trustedIssuers: [issuer] });
+  const campaignFingerprint = `sha256:${"c".repeat(64)}`;
+  const cloneOneBinding = benchmarkV3ExecutionCloneBinding(cloneOne, output, { host: "host-one" });
+  const first = reserveBenchmarkV3Execution({ authority, phase: "campaign", campaignFingerprint, cloneBinding: cloneOneBinding });
+  assert.equal(first.disposition, "reserved");
+  assert.equal(reserveBenchmarkV3Execution({ authority, phase: "campaign", campaignFingerprint,
+    cloneBinding: cloneOneBinding }).disposition, "exact-resume");
+  const cloneTwoBinding = benchmarkV3ExecutionCloneBinding(cloneTwo, output, { host: "host-one" });
+  assert.throws(() => reserveBenchmarkV3Execution({ authority, phase: "campaign", campaignFingerprint,
+    cloneBinding: cloneTwoBinding }), /another clone or binding/u,
+  "a second independent clone must be rejected before model execution");
+  const crossHostBinding = benchmarkV3ExecutionCloneBinding(cloneOne, output, { host: "host-two" });
+  assert.throws(() => reserveBenchmarkV3Execution({ authority, phase: "campaign", campaignFingerprint,
+    cloneBinding: crossHostBinding }), /another clone or binding/u,
+  "a cross-host replay of the same execution ID must be rejected");
+  assert.equal(consumeBenchmarkV3Execution({ authority, phase: "campaign", campaignFingerprint,
+    cloneBinding: cloneOneBinding }).disposition, "consumed");
+  assert.equal(reserveBenchmarkV3Execution({ authority, phase: "campaign", campaignFingerprint,
+    cloneBinding: cloneOneBinding }).disposition, "exact-consumed-resume");
+  assert.throws(() => reserveBenchmarkV3Execution({ authority, phase: "campaign", campaignFingerprint,
+    cloneBinding: cloneTwoBinding }), /another clone or binding/u);
+  assert.equal(reserveBenchmarkV3Execution({ authority, phase: "holdout", campaignFingerprint,
+    cloneBinding: cloneOneBinding }).disposition, "reserved");
+  assert.equal(consumeBenchmarkV3Execution({ authority, phase: "holdout", campaignFingerprint,
+    cloneBinding: cloneOneBinding }).disposition, "consumed");
+  const events = fs.readFileSync(registryPath, "utf8").trim().split("\n").map((line) => JSON.parse(line));
+  assert.deepEqual(events.map((entry) => [entry.execution_id, entry.action]), [
+    [body.campaign_execution_id, "reserve"], [body.campaign_execution_id, "consume"],
+    [body.holdout_execution_id, "reserve"], [body.holdout_execution_id, "consume"],
+  ]);
+  assert.equal(events.every((entry, index) => entry.sequence === index + 1
+    && entry.prior_event_fingerprint === (events[index - 1]?.event_fingerprint ?? null)), true);
+  process.stdout.write(`${JSON.stringify({ schema_version: 1, status: "passed", gate: "benchmark-v3-global-execution-authority",
+    model_calls: 0, independent_clones: 2, exact_resume_allowed: true, second_clone_rejected: true,
+    cross_host_rejected: true, append_only_events: events.length }, null, 2)}\n`);
+} finally { fs.rmSync(temporary, { recursive: true, force: true }); }
