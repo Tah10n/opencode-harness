@@ -56,7 +56,7 @@ try {
     testArgv: ["test.js"], expectedTestCount: 1 });
 } finally { fs.rmSync(semanticFixture, { recursive: true, force: true }); }
 if (!semantic.passed || !semantic.isolated_non_root || !semantic.network_unshared) {
-  throw new Error("external semantic calibration isolation smoke failed");
+  throw new Error(`external semantic calibration isolation smoke failed (${semantic.failure_class ?? "semantic-failure"})`);
 }
 printOperatorResult({ schema_version: 1, status: "passed", private_keys_tracked: false, roles,
   issuer_separation: separation, probe_fingerprint: probes.probe_fingerprint,
