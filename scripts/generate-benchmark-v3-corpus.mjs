@@ -25,6 +25,12 @@ function git(args, { encoding = "utf8" } = {}) {
   }
   return result.stdout;
 }
+function gitPathExists(commit, sourcePath) {
+  const result = spawnSync("git", ["cat-file", "-e", `${commit}:${sourcePath}`], {
+    cwd: sourceRepo, encoding: "utf8", shell: false, windowsHide: true,
+  });
+  return result.status === 0 && result.signal === null && result.error === undefined;
+}
 
 if (!fs.existsSync(path.join(sourceRepo, ".git")) || semanticRuntimeRoot === null) {
   throw new Error("usage: node scripts/generate-benchmark-v3-corpus.mjs <full-eslint-git-clone> <semantic-runtime-root>");
@@ -34,9 +40,29 @@ if (remote !== repositoryUrl) throw new Error("source repository must be the off
 const licenseBytes = git(["show", "HEAD:LICENSE"], { encoding: "buffer" });
 const licenseFingerprint = fingerprint(licenseBytes.toString("utf8"));
 const sourceTip = git(["rev-parse", "HEAD"]).trim();
-const provenanceBundleFile = path.join(fs.realpathSync.native(process.env.TMPDIR ?? "/tmp"), `benchmark-v3-generator-${sourceTip.slice(0, 24)}.bundle`);
-if (!fs.existsSync(provenanceBundleFile)) git(["bundle", "create", provenanceBundleFile, sourceTip]);
+const suppliedProvenanceBundle = process.env.BENCHMARK_V3_PROVENANCE_BUNDLE;
+if (suppliedProvenanceBundle !== undefined && (typeof suppliedProvenanceBundle !== "string" || !path.isAbsolute(suppliedProvenanceBundle))) {
+  throw new Error("BENCHMARK_V3_PROVENANCE_BUNDLE must be an absolute path when supplied");
+}
+const provenanceBundleFile = typeof suppliedProvenanceBundle === "string" && path.isAbsolute(suppliedProvenanceBundle)
+  ? fs.realpathSync.native(suppliedProvenanceBundle)
+  : path.join(fs.realpathSync.native(process.env.TMPDIR ?? "/tmp"), `benchmark-v3-generator-${sourceTip.slice(0, 24)}.bundle`);
+if (!fs.existsSync(provenanceBundleFile)) git(["bundle", "create", provenanceBundleFile, "HEAD"]);
+const provenanceBundleStat = fs.lstatSync(provenanceBundleFile);
+if (!provenanceBundleStat.isFile() || provenanceBundleStat.isSymbolicLink()
+  || spawnSync("git", ["bundle", "verify", provenanceBundleFile], { cwd: sourceRepo }).status !== 0) {
+  throw new Error("provenance bundle is not an ordinary complete Git bundle");
+}
 const provenanceBundle = fs.readFileSync(provenanceBundleFile);
+const existingSourcePath = path.join(outputRoot, "SOURCE.json");
+if (fs.existsSync(existingSourcePath)) {
+  const existingSource = JSON.parse(fs.readFileSync(existingSourcePath, "utf8"));
+  const bundleSha256 = `sha256:${createHash("sha256").update(provenanceBundle).digest("hex")}`;
+  if (existingSource.source_tip !== sourceTip || existingSource.provenance_bundle?.sha256 !== bundleSha256
+    || existingSource.provenance_bundle?.size !== provenanceBundle.byteLength) {
+    throw new Error("generator source tip or provenance bundle differs from the frozen corpus custody identity");
+  }
+}
 
 const candidates = [];
 for (const line of git(["log", "--no-merges", "--format=%H%x09%P%x09%ct%x09%s"]).split("\n")) {
@@ -48,12 +74,18 @@ for (const line of git(["log", "--no-merges", "--format=%H%x09%P%x09%ct%x09%s"])
   const changedPaths = git(["diff-tree", "--no-commit-id", "--name-status", "-r", "--diff-filter=M", commit])
     .split("\n").filter(Boolean).map((entry) => entry.split("\t")[1]);
   const paths = changedPaths.filter((entry) => /^lib\/.+\.js$/u.test(entry)).slice(0, 4);
-  const testPaths = changedPaths.filter((entry) => /^tests\/lib\/.+\.js$/u.test(entry)).slice(0, 4);
-  if (paths.length === 0 || testPaths.length === 0) continue;
+  const changedTestPaths = changedPaths.filter((entry) => /^tests\/lib\/.+\.js$/u.test(entry)).slice(0, 4);
+  const preservationTestPaths = paths.filter((entry) => /^lib\/rules\/.+\.js$/u.test(entry))
+    .map((entry) => entry.replace(/^lib\/rules\//u, "tests/lib/rules/"))
+    .filter((entry) => gitPathExists(commit, entry));
+  const testPaths = [...new Set([...changedTestPaths, ...preservationTestPaths])];
+  if (paths.length === 0 || changedTestPaths.length === 0 || testPaths.length === 0) continue;
   const beforeFiles = [];
   const afterFiles = [];
   const hiddenTestFiles = [];
+  const changedTestPathSet = new Set(changedTestPaths);
   let bytes = 0;
+  let controlBytes = 0;
   let changedLines = 0;
   let usable = true;
   for (const sourcePath of paths) {
@@ -78,13 +110,15 @@ for (const line of git(["log", "--no-merges", "--format=%H%x09%P%x09%ct%x09%s"])
     const afterTest = git(["show", `${commit}:${testPath}`], { encoding: "buffer" });
     if (afterTest.includes(0) || afterTest.byteLength > 256 * 1024) { usable = false; break; }
     hiddenTestFiles.push(Object.freeze({ path: testPath, content: afterTest.toString("utf8") }));
-    bytes += afterTest.byteLength;
+    controlBytes += afterTest.byteLength;
+    if (changedTestPathSet.has(testPath)) bytes += afterTest.byteLength;
+    if (controlBytes > 1024 * 1024) { usable = false; break; }
   }
   if (!usable) continue;
   const parentPackage = JSON.parse(git(["show", `${parent}:package.json`]));
   const [runtimeMajor, runtimeMinor] = String(parentPackage.version).split(".").map(Number);
   if (!Number.isSafeInteger(runtimeMajor) || !Number.isSafeInteger(runtimeMinor) || runtimeMajor < 6 || runtimeMajor > 10) continue;
-  const patch = git(["diff", "--binary", parent, commit, "--", ...paths, ...testPaths]);
+  const patch = git(["diff", "--binary", parent, commit, "--", ...paths, ...changedTestPaths]);
   const requirementText = git(["show", "-s", "--format=%B", commit]).trim();
   if (requirementText.length < 20 || requirementText.length > 8_000) continue;
   const leakedCodeLines = patch.split("\n").filter((line) => /^\+(?!\+\+)/u.test(line))
@@ -94,9 +128,10 @@ for (const line of git(["log", "--no-merges", "--format=%H%x09%P%x09%ct%x09%s"])
   candidates.push(Object.freeze({
     commit, parent, committed_at: Number(committedAt), runtime_key: [7, 10].includes(runtimeMajor) ? `eslint-v${runtimeMajor}` : `eslint-v${runtimeMajor}.${runtimeMinor}`,
     runtime_version: `${runtimeMajor}.${runtimeMinor}`, subject, beforeFiles, afterFiles, hiddenTestFiles,
+    selectionTestFiles: Object.freeze(hiddenTestFiles.filter((entry) => changedTestPathSet.has(entry.path))),
     patch_fingerprint: fingerprint(patch), requirement_text: requirementText,
     complexity: changedLines + (paths.length * 20) + Math.ceil(bytes / 4096),
-    patch_size_bytes: Buffer.byteLength(patch), file_count: paths.length + testPaths.length,
+    patch_size_bytes: Buffer.byteLength(patch), file_count: paths.length + changedTestPaths.length,
   }));
 }
 if (candidates.length < 210) throw new Error(`only ${candidates.length} eligible unique fix commits were found`);
@@ -114,13 +149,13 @@ function semanticCandidatePasses(entry) {
     const runOracle = (sourceFiles) => {
       if (spawnSync("git", ["checkout", "--quiet", "--force", entry.parent], { cwd: workspace }).status !== 0) return false;
       spawnSync("git", ["clean", "-fdx", "--quiet"], { cwd: workspace });
-      for (const file of [...sourceFiles, ...entry.hiddenTestFiles]) {
+      for (const file of [...sourceFiles, ...entry.selectionTestFiles]) {
         const target = path.join(workspace, ...file.path.split("/"));
         fs.mkdirSync(path.dirname(target), { recursive: true });
         fs.writeFileSync(target, file.content, "utf8");
       }
       fs.symlinkSync(nodeModules, path.join(workspace, "node_modules"), "dir");
-      const result = spawnSync(process.execPath, [mocha, "--timeout", "30000", ...entry.hiddenTestFiles.map((file) => file.path)], {
+      const result = spawnSync(process.execPath, [mocha, "--timeout", "30000", ...entry.selectionTestFiles.map((file) => file.path)], {
         cwd: workspace, encoding: "utf8", timeout: 120_000, maxBuffer: 16 * 1024 * 1024,
         env: { PATH: process.env.PATH ?? "", HOME: process.env.HOME ?? "/tmp", LANG: "C", LC_ALL: "C", NODE_ENV: "test" },
       });
@@ -193,16 +228,29 @@ fs.writeFileSync(path.join(outputRoot, "SOURCE.json"), `${JSON.stringify({
     derivation: "unique-real-eslint-development-validation-lineages-with-behavioral-contracts-and-hidden-semantic-oracles",
 }, null, 2)}\n`, "utf8");
 fs.writeFileSync(path.join(outputRoot, "THIRD_PARTY_LICENSE.txt"), licenseBytes);
-fs.writeFileSync(path.join(outputRoot, "THIRD_PARTY_NOTICES.md"), `# Third-party notices\n\nDerived from ${repositoryUrl} at ${sourceTip}. SPDX-License-Identifier: MIT. Raw provenance bundles are excluded from Git and release assets.\n`, "utf8");
+fs.writeFileSync(path.join(outputRoot, "THIRD_PARTY_NOTICES.md"), `# Third-party notices
+
+Benchmark v3 corpus records are derived from the ESLint repository at commit
+\`${sourceTip}\`.
+
+- Source: ${repositoryUrl}
+- SPDX license identifier: \`MIT\`
+- License text: \`THIRD_PARTY_LICENSE.txt\`
+- Redistribution: metadata and derived contract records are included; the raw
+  ${provenanceBundle.byteLength.toLocaleString("en-US")}-byte Git provenance bundle is intentionally excluded from Git and
+  release assets.
+
+No model output is included in this corpus.
+`, "utf8");
 
 function publicTestDelta(entry) {
-  const result = git(["diff", "--no-ext-diff", "--unified=3", entry.parent, entry.commit, "--", ...entry.hiddenTestFiles.map((file) => file.path)]);
+  const result = git(["diff", "--no-ext-diff", "--unified=3", entry.parent, entry.commit, "--", ...entry.selectionTestFiles.map((file) => file.path)]);
   if (Buffer.byteLength(result, "utf8") > 64 * 1024) throw new Error(`${entry.commit} public behavioral test delta is too large`);
   return result.trim();
 }
 
 function authoredBehavior(entry) {
-  return entry.requirement_text.replace(/\r/gu, "").trim();
+  return entry.requirement_text.trim();
 }
 
 for (const [stratum] of Object.entries(groups)) {

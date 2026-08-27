@@ -232,6 +232,15 @@ try {
     receiptPath: signTakeover(), trustedIssuers: [takeoverIssuer] }), /evidence directory identity/u,
   "takeover must reject a group-writable evidence directory");
   fs.chmodSync(takeoverEvidenceDirectory, 0o700);
+  const heartbeatLockPath = `${staleReusedPidLease}.heartbeat-lock`;
+  fs.writeFileSync(heartbeatLockPath, `${JSON.stringify({ schema_version: 1, lease_nonce: "in-flight-heartbeat" })}\n`, { mode: 0o600 });
+  const leaseBeforeHeartbeatRace = fs.readFileSync(staleReusedPidLease, "utf8");
+  assert.throws(() => performBenchmarkV3LeaseTakeover({ sourceRoot: registryFixture, campaignFingerprint,
+    receiptPath: signTakeover(), trustedIssuers: [takeoverIssuer] }), /heartbeat update is in flight/u,
+  "takeover must reject an already in-flight heartbeat before quarantining the lease");
+  assert.equal(fs.readFileSync(staleReusedPidLease, "utf8"), leaseBeforeHeartbeatRace,
+    "rejected in-flight heartbeat race must preserve the exact live lease");
+  fs.unlinkSync(heartbeatLockPath);
   const staleTakeoverReceipt = signTakeover();
   const leaseBeforeRace = JSON.parse(fs.readFileSync(staleReusedPidLease, "utf8"));
   const leaseAfterRace = `${JSON.stringify({ ...leaseBeforeRace, heartbeat_at_ms: leaseBeforeRace.heartbeat_at_ms + 1 })}\n`;
@@ -249,9 +258,15 @@ try {
   fs.writeFileSync(`${staleReusedPidLease}.takeover-guard`, "manual recovery required\n", { mode: 0o600 });
   assert.throws(() => createBenchmarkV3CampaignJournal(output, {
     sourceRoot: registryFixture, campaignFingerprint, initialLedger,
-  }), /takeover is in progress or requires manual recovery/u,
+  }), /takeover or heartbeat recovery is in progress or requires manual recovery/u,
   "a leftover takeover guard must block automatic lease acquisition");
   fs.unlinkSync(`${staleReusedPidLease}.takeover-guard`);
+  fs.writeFileSync(heartbeatLockPath, "manual heartbeat recovery required\n", { mode: 0o600 });
+  assert.throws(() => createBenchmarkV3CampaignJournal(output, {
+    sourceRoot: registryFixture, campaignFingerprint, initialLedger,
+  }), /heartbeat recovery is in progress or requires manual recovery/u,
+  "a leftover heartbeat lock must block automatic lease acquisition");
+  fs.unlinkSync(heartbeatLockPath);
   const resumedJournal = createBenchmarkV3CampaignJournal(output, { sourceRoot: registryFixture, campaignFingerprint, initialLedger });
   assert.equal(resumedJournal.attemptsFor("baseline", "family-one").length, 1,
     "exact resume must preserve completed family execution");

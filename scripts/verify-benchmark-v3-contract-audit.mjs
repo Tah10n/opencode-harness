@@ -73,6 +73,28 @@ for (const alternative of alternatives) {
   }
 }
 
+const mutationCoverageFamily = corpus.families.find((entry) => entry.family_id === "v3-development-high-19");
+assert.ok(mutationCoverageFamily, "representative multi-source preservation family is missing");
+const allowedMutationNegativeWitnesses = [];
+for (const sourcePath of mutationCoverageFamily.control_surface.allowed_mutation_paths) {
+  const workspace = materializeBenchmarkV3Workspace(root, mutationCoverageFamily);
+  try {
+    const before = captureBenchmarkV3Workspace(workspace);
+    fs.writeFileSync(path.join(workspace, ...sourcePath.split("/")), '"use strict";\nmodule.exports = {};\n', "utf8");
+    const result = evaluateBenchmarkV3Workspace(workspace, mutationCoverageFamily.control_surface, {
+      beforeSnapshot: before,
+      semanticRuntimeRoot,
+      expectedRuntimeKeyFingerprint: runtimeByKey.get(mutationCoverageFamily.control_surface.runtime_key),
+      revalidateRuntimeKey: false,
+    });
+    assert.equal(result.passed, false, `${mutationCoverageFamily.family_id} oracle does not observe destructive mutation of ${sourcePath}`);
+    allowedMutationNegativeWitnesses.push(Object.freeze({ family_id: mutationCoverageFamily.family_id,
+      source_path: sourcePath, destructive_mutation_rejected: true, result_fingerprint: result.result_fingerprint }));
+  } finally {
+    fs.rmSync(workspace, { recursive: true, force: true });
+  }
+}
+
 process.stdout.write(`${JSON.stringify({
   schema_version: 1,
   audit: "benchmark-v3-visible-contracts",
@@ -81,8 +103,9 @@ process.stdout.write(`${JSON.stringify({
   public_family_count: corpus.families.length,
   public_splits: ["development", "validation"],
   requirements_sufficient_without_hidden_data: true,
-  reference_patch_disclosure_rejected: true,
+  contract_reference_patch_disclosure_rejected: true,
   pre_fix_failure_count: corpus.semantic_oracle_expectations.length,
   reference_fix_pass_count: corpus.semantic_oracle_expectations.length,
   independently_authored_alternative_witnesses: alternativeWitnesses,
+  allowed_mutation_negative_witnesses: allowedMutationNegativeWitnesses,
 }, null, 2)}\n`);

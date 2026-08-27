@@ -25,11 +25,16 @@ contract with five mandatory clauses:
 
 The authored upstream defect report and test-only behavioral delta are visible.
 Implementation diffs, reference source bytes, complete hidden tests, and oracle
-outcomes are not model-visible. The contract audit verifies that all five
-clauses and their witnesses are present, the visible surface does not disclose
-the source patch, every pre-fix state fails, every reference repair passes, and
-two independently authored byte-distinct alternatives—one development and one
-validation representative—pass the same hidden oracle.
+outcomes are not model-visible. Ordinary parent-revision source remains visible
+and may contain reusable code; it is part of the problem, not a disclosed answer.
+The contract audit verifies that all five clauses and their witnesses are
+present, the visible contract text does not disclose source-patch hunks, every
+pre-fix state fails, every reference repair passes, and two independently
+authored byte-distinct alternatives—one development and one validation
+representative—pass the same hidden oracle. For a representative multi-source
+family it also proves that a destructive mutation of every allowed source path
+is rejected, while corpus provenance requires every available upstream rule
+suite corresponding to an allowed rule path.
 
 The runner-owned `control.json` retains reference bytes only for model-free
 oracle calibration. Scored outcomes never compare candidate bytes to a
@@ -90,7 +95,11 @@ Takeover first installs a guard observed by lease acquisition, atomically moves
 the current lease to quarantine, and compares the quarantined bytes with the
 signed observation. A heartbeat race restores the current lease and rejects the
 receipt. A leftover guard after host failure is itself fail-closed and requires
-manual audited recovery.
+manual audited recovery. Heartbeat updates take a separate lock and re-check the
+takeover guard before writing; takeover rejects an already in-flight heartbeat.
+A leftover heartbeat lock is also fail-closed and requires manual audited
+recovery, so an old heartbeat can never recreate or overwrite a replacement
+coordinator lease.
 
 ## Readiness boundaries
 
