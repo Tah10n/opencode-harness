@@ -17,6 +17,7 @@ import { captureBenchmarkV3Workspace, loadBenchmarkV3Corpus } from "../lib/bench
 import { loadBenchmarkV3Design } from "../lib/benchmark/v3-design.mjs";
 import {
   buildBenchmarkV3AttemptEnvelope,
+  buildBenchmarkV3CampaignFingerprint,
   buildBenchmarkV3ModelBinding,
   benchmarkV3AttemptTimeouts,
   classifyBenchmarkV3AttemptReceipt,
@@ -31,6 +32,7 @@ import {
   verifyBenchmarkV3FilesystemIsolation,
   verifyBenchmarkV3ProductBundle,
 } from "../lib/benchmark/v3-runner.mjs";
+import { BenchmarkV3CredentialBridgePlugin } from "../lib/benchmark/v3-opencode-provider-bridge-plugin.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const { value: design } = loadBenchmarkV3Design(root);
@@ -461,6 +463,13 @@ const unseededBinding = buildBenchmarkV3ModelBinding(bindingFixture);
 const explicitlyUnseededBinding = buildBenchmarkV3ModelBinding({ ...bindingFixture, modelSamplingSeed: null });
 assert.deepEqual(unseededBinding, explicitlyUnseededBinding);
 assert.equal(unseededBinding.corpus_fingerprint, corpus.corpus_fingerprint);
+const campaignFingerprintFixture = { sourceSha: "a".repeat(40), sourceTreeFingerprint: `sha256:${"b".repeat(64)}`,
+  bindingsFingerprint: `sha256:${"c".repeat(64)}`,
+  reviewFingerprints: [`sha256:${"d".repeat(64)}`, `sha256:${"e".repeat(64)}`] };
+assert.notEqual(buildBenchmarkV3CampaignFingerprint(campaignFingerprintFixture),
+  buildBenchmarkV3CampaignFingerprint({ ...campaignFingerprintFixture,
+    reviewFingerprints: [`sha256:${"d".repeat(64)}`, `sha256:${"f".repeat(64)}`] }),
+"campaign identity must bind the exact independently signed reviews");
 assert.deepEqual(resolveBenchmarkV3StudySeeds(corpus), {
   corpus_generation_seed: corpus.generator.corpus_generation_seed,
   model_sampling_seed: null,
@@ -493,12 +502,21 @@ const outcome = (family, passed, overrides = {}) => ({
   ...overrides,
 });
 const baseline = families.map((family, index) => outcome(family, index >= 15));
-const candidate = families.map((family) => outcome(family, true, { tokens: 10 }));
+const candidate = families.map((family) => outcome(family, true, { tokens: 10, turn_count: 2, tool_call_count: 3 }));
 const report = summarizeBenchmarkV3Stage({ baseline, candidate });
 assert.equal(report.family_count, 60);
 assert.equal(report.candidate_only, 15);
 assert.equal(report.baseline_only, 0);
 assert.equal(report.paired_delta, 0.25);
+assert.equal(report.baseline_success_count, 45);
+assert.equal(report.candidate_success_count, 60);
+assert.equal(report.baseline_success_rate, 0.75);
+assert.equal(report.candidate_success_rate, 1);
+assert.equal(report.absolute_success_rate_delta, 0.25);
+assert.equal(report.relative_lift, 1 / 3);
+assert.deepEqual(Object.keys(report.stratum_breakdown), ["small", "medium", "high"]);
+assert.equal(report.candidate_turn_count, 120);
+assert.equal(report.candidate_tool_call_count, 180);
 assert.equal(report.exact_p <= 0.025, true);
 assert.equal(report.candidate_tokens, 600);
 assert.equal(report.activation_rate, 1);
@@ -573,7 +591,8 @@ for (const required of ["runManagedCommand", "reviewed_source_root", "semantic_r
   assert.equal(runnerSource.includes(required), true);
 }
 const allowedFinalStatuses = new Set([
-  "NO PROMOTABLE HARNESS",
+  "STUDY STOPPED BEFORE CANDIDATE — INSUFFICIENT BASELINE OPPORTUNITY",
+  "BOUNDED STUDY COMPLETE — NO PROMOTABLE HARNESS",
   "STUDY BLOCKED — INFRASTRUCTURE",
   "STUDY BLOCKED — EXTERNAL SEALED HOLDOUT REQUIRED",
   "CONFIRMATORY HOLDOUT PASSED",
@@ -584,6 +603,57 @@ assert.equal(workerSource.includes("input.env"), true);
 assert.equal(workerSource.includes("input.env_overrides"), true);
 assert.equal(workerSource.includes("input.opencode_identity"), true);
 assert.equal(workerSource.includes("stdout:"), false);
+
+const credentialFixtureRoot = fs.mkdtempSync(path.join(os.tmpdir(), "v3-credential-boundary-"));
+const credentialFile = path.join(credentialFixtureRoot, "credential.json");
+const fixtureSecret = "fixture-openai-secret-not-authorizing";
+const priorCredentialFile = process.env.BENCHMARK_V3_CREDENTIAL_FILE;
+const originalFetch = globalThis.fetch;
+try {
+  fs.writeFileSync(credentialFile, JSON.stringify({ schema_version: 1, provider: "openai", api_key: fixtureSecret }),
+    { mode: 0o600 });
+  process.env.BENCHMARK_V3_CREDENTIAL_FILE = credentialFile;
+  const plugin = await BenchmarkV3CredentialBridgePlugin();
+  assert.equal(fs.existsSync(credentialFile), false, "the bridge must erase its one-shot credential before model dispatch");
+  assert.equal(Object.hasOwn(process.env, "BENCHMARK_V3_CREDENTIAL_FILE"), false);
+  await assert.rejects(() => plugin.auth.loader(async () => ({ type: "api", key: "wrong-placeholder" })),
+    /authorization is invalid/u);
+  let observedAuthorization = null;
+  let observedRedirect = null;
+  let responseStatus = 200;
+  globalThis.fetch = async (_input, init) => {
+    observedAuthorization = new Headers(init.headers).get("authorization");
+    observedRedirect = init.redirect;
+    return new Response("", { status: responseStatus });
+  };
+  const providerOptions = await plugin.auth.loader(async () => ({ type: "api", key: "benchmark-v3-host-credential-bridge" }));
+  assert.equal(providerOptions.apiKey, "");
+  await assert.rejects(() => providerOptions.fetch("https://provider.invalid/v1/responses"), /approved OpenAI API origin/u);
+  assert.equal(observedAuthorization, null, "the bridge must reject a foreign origin before attaching authorization");
+  assert.equal((await providerOptions.fetch(new Request("https://api.openai.com/v1/responses"))).status, 200);
+  assert.equal(observedAuthorization, `Bearer ${fixtureSecret}`);
+  assert.equal(observedRedirect, "manual");
+  responseStatus = 302;
+  await assert.rejects(() => providerOptions.fetch("https://api.openai.com/v1/responses"), /redirect is forbidden/u);
+  await assert.rejects(() => providerOptions.fetch("http://api.openai.com/v1/responses"), /approved OpenAI API origin/u);
+  await assert.rejects(() => providerOptions.fetch("https://api.openai.com.evil.invalid/v1/responses"), /approved OpenAI API origin/u);
+  await assert.rejects(() => providerOptions.fetch("https://api.openai.com/not-v1"), /approved OpenAI API origin/u);
+  const shellOutput = { env: { OPENAI_API_KEY: fixtureSecret, OPENCODE_AUTH_CONTENT: "placeholder",
+    BENCHMARK_V3_CREDENTIAL_FILE: credentialFile } };
+  await plugin["shell.env"]({}, shellOutput);
+  assert.deepEqual(shellOutput.env, { OPENAI_API_KEY: "", OPENCODE_AUTH_CONTENT: "", BENCHMARK_V3_CREDENTIAL_FILE: "" });
+  await assert.rejects(() => plugin["shell.env"]({}, {}), /boundary is invalid/u);
+  await plugin.dispose();
+  await assert.rejects(() => providerOptions.fetch("https://provider.invalid/v1/responses"), /disposed/u);
+} finally {
+  globalThis.fetch = originalFetch;
+  if (priorCredentialFile === undefined) delete process.env.BENCHMARK_V3_CREDENTIAL_FILE;
+  else process.env.BENCHMARK_V3_CREDENTIAL_FILE = priorCredentialFile;
+  fs.rmSync(credentialFixtureRoot, { recursive: true, force: true });
+}
+const credentialPluginSource = fs.readFileSync(path.join(root, "lib", "benchmark", "v3-opencode-provider-bridge-plugin.mjs"), "utf8");
+assert.equal(credentialPluginSource.includes("process.env.OPENAI_API_KEY"), false);
+assert.equal(credentialPluginSource.includes("fs.unlinkSync(target)"), true);
 
 const workerFixtureRoot = fs.mkdtempSync(path.join(os.tmpdir(), "v3-worker-protocol-"));
 try {

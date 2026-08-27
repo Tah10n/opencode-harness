@@ -10,7 +10,7 @@ import { fileURLToPath } from "node:url";
 import { canonicalJson, fingerprint } from "../lib/feedback/contracts.mjs";
 import { benchmarkV3ExecutionCloneBinding, consumeBenchmarkV3Execution,
   inspectBenchmarkV3HoldoutExecutionAuthority, loadSignedBenchmarkV3ExecutionAuthority,
-  reserveBenchmarkV3Execution } from "../lib/benchmark/v3-execution-authority.mjs";
+  reserveBenchmarkV3Continuation, reserveBenchmarkV3Execution } from "../lib/benchmark/v3-execution-authority.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const temporary = fs.mkdtempSync(path.join(os.tmpdir(), "benchmark-v3-global-authority-"));
@@ -56,6 +56,10 @@ try {
   "the actual holdout reservation must reject an incompletely consumed campaign");
   assert.equal(reserveBenchmarkV3Execution({ authority, phase: "campaign", campaignFingerprint,
     cloneBinding: cloneOneBinding }).disposition, "exact-resume");
+  assert.equal(reserveBenchmarkV3Continuation({ authority, phase: "campaign", mode: "resume", campaignFingerprint,
+    cloneBinding: cloneOneBinding }).disposition, "reserved");
+  assert.throws(() => reserveBenchmarkV3Continuation({ authority, phase: "campaign", mode: "retry", campaignFingerprint,
+    cloneBinding: cloneOneBinding }), /continuation/u, "resume and retry must share one durable campaign-wide allowance");
   const cloneTwoBinding = benchmarkV3ExecutionCloneBinding(cloneTwo, output, { host: "host-one" });
   assert.throws(() => reserveBenchmarkV3Execution({ authority, phase: "campaign", campaignFingerprint,
     cloneBinding: cloneTwoBinding }), /another clone or binding/u,
@@ -78,12 +82,29 @@ try {
     cloneBinding: cloneTwoBinding }), /another clone or binding/u);
   assert.equal(reserveBenchmarkV3Execution({ authority, phase: "holdout", campaignFingerprint,
     cloneBinding: cloneOneBinding }).disposition, "reserved");
+  assert.throws(() => reserveBenchmarkV3Continuation({ authority, phase: "holdout", mode: "retry", campaignFingerprint,
+    cloneBinding: cloneOneBinding }), /campaign-wide/u, "a campaign resume must also consume the holdout retry allowance");
   assert.equal(inspectBenchmarkV3HoldoutExecutionAuthority({ authority, campaignFingerprint,
     cloneBinding: cloneOneBinding }).holdout_status, "exact-resume");
   assert.equal(consumeBenchmarkV3Execution({ authority, phase: "holdout", campaignFingerprint,
     cloneBinding: cloneOneBinding }).disposition, "consumed");
   assert.throws(() => inspectBenchmarkV3HoldoutExecutionAuthority({ authority, campaignFingerprint,
     cloneBinding: cloneOneBinding }), /already globally consumed/u);
+  const retryBody = { ...body, campaign_execution_id: "campaign-global-one-shot-0002",
+    holdout_execution_id: "holdout-global-one-shot-0002" };
+  fs.writeFileSync(receiptPath, JSON.stringify({ ...retryBody,
+    signature: sign(null, Buffer.from(canonicalJson(retryBody), "utf8"), privateKey).toString("base64url") }), { mode: 0o600 });
+  const retryAuthority = loadSignedBenchmarkV3ExecutionAuthority({ sourceRoot: cloneOne, receiptPath, sourceSha,
+    sourceTreeFingerprint, designFingerprint, corpusFingerprint, outputDirectory: output, trustedIssuers: [issuer] });
+  const retryCampaignFingerprint = `sha256:${"d".repeat(64)}`;
+  reserveBenchmarkV3Execution({ authority: retryAuthority, phase: "campaign",
+    campaignFingerprint: retryCampaignFingerprint, cloneBinding: cloneOneBinding });
+  reserveBenchmarkV3Continuation({ authority: retryAuthority, phase: "campaign", mode: "retry",
+    campaignFingerprint: retryCampaignFingerprint, cloneBinding: cloneOneBinding });
+  assert.throws(() => reserveBenchmarkV3Continuation({ authority: retryAuthority, phase: "campaign", mode: "resume",
+    campaignFingerprint: retryCampaignFingerprint, cloneBinding: cloneOneBinding }), /continuation/u);
+  consumeBenchmarkV3Execution({ authority: retryAuthority, phase: "campaign",
+    campaignFingerprint: retryCampaignFingerprint, cloneBinding: cloneOneBinding });
   const expiredBody = { ...body, issued_at_ms: Date.now() - 20_000, expires_at_ms: Date.now() - 10_000 };
   fs.writeFileSync(receiptPath, JSON.stringify({ ...expiredBody,
     signature: sign(null, Buffer.from(canonicalJson(expiredBody), "utf8"), privateKey).toString("base64url") }), { mode: 0o600 });
@@ -92,13 +113,16 @@ try {
   /expiry is invalid/u, "an expired unused authority must fail before reservation");
   const events = fs.readFileSync(registryPath, "utf8").trim().split("\n").map((line) => JSON.parse(line));
   assert.deepEqual(events.map((entry) => [entry.execution_id, entry.action]), [
-    [body.campaign_execution_id, "reserve"], [body.campaign_execution_id, "consume"],
+    [body.campaign_execution_id, "reserve"], [body.campaign_execution_id, "continuation"], [body.campaign_execution_id, "consume"],
     [body.holdout_execution_id, "reserve"], [body.holdout_execution_id, "consume"],
+    [retryBody.campaign_execution_id, "reserve"], [retryBody.campaign_execution_id, "continuation"],
+    [retryBody.campaign_execution_id, "consume"],
   ]);
   assert.equal(events.every((entry, index) => entry.sequence === index + 1
     && entry.prior_event_fingerprint === (events[index - 1]?.event_fingerprint ?? null)), true);
   process.stdout.write(`${JSON.stringify({ schema_version: 1, status: "passed", gate: "benchmark-v3-global-execution-authority",
-    model_calls: 0, independent_clones: 2, exact_resume_allowed: true, second_clone_rejected: true,
+    model_calls: 0, independent_clones: 2, exact_resume_allowed: true, campaign_wide_continuation_limit: 1,
+    second_clone_rejected: true,
     cross_host_rejected: true, incomplete_campaign_holdout_rejected: true,
     authority_rebound_rejected: true, expired_authority_rejected: true,
     registry_readiness_inspected: true,
