@@ -173,6 +173,14 @@ The host-readiness authority, external holdout custodian, and manual takeover
 auditor are three distinct Ed25519 signing principals; the verifier rejects a
 registry that collapses those trust roots.
 
+The reproducible Linux operator image and production issuer commands are
+documented in `ops/benchmark-v3/README.md`. The committed
+`operator-key-fingerprints.v1.json` ledger binds all six public SPKI values to
+the external custody inventory; it contains no private material. The 2026-08-27
+rotation replaced development-only placeholder roots after safe discovery
+confirmed that the readiness, execution-authority, and holdout private keys
+were unavailable. The retained keys live only in root-owned external custody.
+
 ## External holdout custody
 
 Before development baseline, the external custodian signs a commitment to the
@@ -190,6 +198,15 @@ selection proof, exact selected identities, balanced arm-order schedule, index,
 private control fingerprints, calibration attestation, execution limit one,
 issuer, and expiry. The complete custody tree
 is outside public Git and owner-only.
+
+The operator derives that complete frame from the frozen provenance bundle
+before baseline. It excludes every one of the 210 public split commitments and
+every public source path. Each eligible identity must show an authentic pre-fix
+failure, a passing source-commit reference, and a byte-distinct passing
+alternative made from real source bytes at the nearest later matching commit in
+the frozen upstream history. The full
+private pool and salt are written only to the custodian channel; the public
+commitment exposes counts and fingerprints only.
 
 The holdout custodian signing key is distinct from both current-HEAD reviewer
 keys. Reviewers cannot choose or reveal holdout identities, and the custodian

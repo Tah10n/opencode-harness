@@ -13,7 +13,7 @@ import { assessBenchmarkV3HoldoutContinuationReadiness } from "../lib/benchmark/
 import { validateBenchmarkV3IssuerRoleEntries, validateBenchmarkV3IssuerRoleSeparation } from "../lib/benchmark/v3-issuer-separation.mjs";
 import { loadBenchmarkV3HoldoutIssuers, loadSignedBenchmarkV3HoldoutCommitment, loadSignedExternalBenchmarkV3Holdout,
   revealBenchmarkV3HoldoutSelection } from "../lib/benchmark/v3-holdout.mjs";
-import { BENCHMARK_V3_READINESS_ISSUERS } from "../lib/benchmark/v3-readiness.mjs";
+import { loadBenchmarkV3ReadinessIssuers } from "../lib/benchmark/v3-readiness.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const { value: design } = loadBenchmarkV3Design(root);
@@ -55,7 +55,7 @@ const reviewerKeys = JSON.parse(fs.readFileSync(path.join(root, "benchmarks", "v
   .issuers.map((entry) => entry.public_key_pem);
 const takeoverIssuerKey = JSON.parse(fs.readFileSync(path.join(root, "benchmarks", "v3", "lease-takeover-issuers.v1.json"), "utf8"))
   .issuers[0].public_key_pem;
-assert.equal(new Set([BENCHMARK_V3_READINESS_ISSUERS[0].public_key_pem, holdoutIssuerKey,
+assert.equal(new Set([loadBenchmarkV3ReadinessIssuers(root)[0].public_key_pem, holdoutIssuerKey,
   takeoverIssuerKey]).size, 3, "host readiness, holdout custodian, and takeover auditor require distinct signing principals");
 assert.equal(reviewerKeys.includes(holdoutIssuerKey), false,
   "the holdout custodian key must be separate from every reviewer key");

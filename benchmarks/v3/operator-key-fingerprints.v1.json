@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "rotated_at": "2026-08-27T21:19:54Z",
+  "rotation_reason": "replace non-operational placeholder trust roots with externally-custodied benchmark-v3 operator keys",
+  "prior_source_sha": "0544b1d8d312c4a33cfe082cb0501e37863ca27c",
+  "custody_inventory_fingerprint": "sha256:2dd2d68b5f891d75ae563a341e01751540bc3278594a344d3bf7ba5f1ace254a",
+  "keys": [
+    {
+      "role": "readiness",
+      "registry": "readiness-issuers.v1.json",
+      "issuer_id": "opencode-harness-readiness-root-v1",
+      "spki_fingerprint": "sha256:59c7fedcf236b54747a02ed3eb8ebc09831bfef8fe2d06e0cfb07281288f2406"
+    },
+    {
+      "role": "reviewer-one",
+      "registry": "review-issuers.v1.json",
+      "issuer_id": "benchmark-v3-reviewer-one-v1",
+      "spki_fingerprint": "sha256:7642e64c2715869ada0907d8c127862761c18638b1e57d586c452b528716f264"
+    },
+    {
+      "role": "reviewer-two",
+      "registry": "review-issuers.v1.json",
+      "issuer_id": "benchmark-v3-reviewer-two-v1",
+      "spki_fingerprint": "sha256:08db5d0fdd61977e6461e6a2e7439daa785775167b91e172237b55431678611f"
+    },
+    {
+      "role": "execution-authority",
+      "registry": "execution-authority-issuers.v1.json",
+      "issuer_id": "benchmark-v3-global-execution-authority-v1",
+      "spki_fingerprint": "sha256:cb7faaa451f439b00b6a94ffb26afa986a4b9f28b7e5e47887c7f75c08adf17f"
+    },
+    {
+      "role": "holdout-custodian",
+      "registry": "holdout-issuers.v1.json",
+      "issuer_id": "opencode-harness-external-holdout-custodian-v1",
+      "spki_fingerprint": "sha256:035ab5d4b43a73f96533fc974ab0a568380038b90f0e2e3ea3e09efb70ead771"
+    },
+    {
+      "role": "lease-takeover-auditor",
+      "registry": "lease-takeover-issuers.v1.json",
+      "issuer_id": "opencode-harness-manual-takeover-auditor-v1",
+      "spki_fingerprint": "sha256:cf6af92ed5b81fb71d34a1017788017be5cbe15aa510bc34afcee08f87ec4a15"
+    }
+  ]
+}
