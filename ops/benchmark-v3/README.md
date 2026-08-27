@@ -20,6 +20,14 @@ of the source tree. `authority:init` creates six distinct Ed25519 keys once. A
 complete existing custody is verified, while a partial custody, mismatched
 inventory, weak mode, or key/registry mismatch fails closed.
 
+The launcher is an npm-script allowlist whose accepted names are mapped directly
+to fixed Node entrypoints, bypassing npm lifecycle hooks. `authority:init` runs
+with no network, all Linux capabilities dropped, and no host cgroup access.
+Every later command requires `BENCHMARK_V3_REVIEWED_SOURCE_SHA` to equal the
+exact clean mounted HEAD; only containment, calibration, readiness, and
+canonical runner commands receive the privileged host-cgroup environment.
+Provider authorization is accepted only for `bench:v3` or `bench:v3:holdout`.
+
 Build the image:
 
 ```sh
@@ -46,6 +54,7 @@ non-root Bubblewrap, hidden-read-denial, bounded-write, and executable-identity
 probes:
 
 ```sh
+BENCHMARK_V3_REVIEWED_SOURCE_SHA=<exact-reviewed-sha> \
 BENCHMARK_V3_CAMPAIGN_ROOT=/absolute/private/campaign \
 ops/benchmark-v3/operator-container.sh run \
   npm run bench:v3:operator:verify -- \
@@ -55,9 +64,12 @@ ops/benchmark-v3/operator-container.sh run \
 ```
 
 On the final clean, frozen source, issue the execution authority without
-reserving it:
+reserving it. Issuance first creates a fixed O_EXCL claim in the physical
+registry root, so a second authority cannot be minted while the model-execution
+registry itself remains empty until the canonical runner reserves it:
 
 ```sh
+BENCHMARK_V3_REVIEWED_SOURCE_SHA=<exact-reviewed-sha> \
 BENCHMARK_V3_CAMPAIGN_ROOT=/absolute/private/campaign \
 ops/benchmark-v3/operator-container.sh run \
   npm run bench:v3:authority:issue -- \
@@ -70,12 +82,17 @@ ops/benchmark-v3/operator-container.sh run \
 Before baseline, derive the complete external sampling frame from the exact
 frozen ESLint provenance bundle. The generator excludes all 210 public split
 commitments and every public source path, calibrates pre-fix failure and both
-the source-commit reference and a byte-distinct nearest-later real-Git semantic
-alternative from the frozen history, then stores the frame, family pool, and unpredictable salt only in
+the source-commit reference and the first byte-distinct later real-Git semantic
+alternative that passes from the frozen history, then stores the frame, family pool, and unpredictable salt only in
 private holdout custody. Stdout contains fingerprints and counts, never
-identities, controls, reference bytes, or salt:
+identities, controls, reference bytes, or salt. All upstream JavaScript
+calibration runs non-root in a no-network Bubblewrap namespace with the checkout
+and semantic runtime mounted read-only. A fixed one-shot pre-baseline binding
+also signs the exact private family-pool fingerprint and custody directory, so
+neither a second salt nor a post-freeze pool substitution is accepted:
 
 ```sh
+BENCHMARK_V3_REVIEWED_SOURCE_SHA=<exact-reviewed-sha> \
 BENCHMARK_V3_CAMPAIGN_ROOT=/absolute/private/campaign \
 ops/benchmark-v3/operator-container.sh run \
   npm run bench:v3:holdout:commit -- \
@@ -88,11 +105,17 @@ ops/benchmark-v3/operator-container.sh run \
   --campaign-custody /var/run/opencode-harness/holdout/campaign-001
 ```
 
-Each independent read-only reviewer supplies a structured result bound to the
-exact source SHA and tree. `review:issue` signs only zero-HIGH/zero-MEDIUM
-results with that reviewer's separate key and channel:
+Each independent read-only reviewer supplies a role-specific structured result
+bound to the exact source SHA and tree, a unique review execution ID, the fixed
+`independent-read-only-agent-v1` method, and a privacy-safe evidence
+fingerprint. The same result cannot be reused for both identities and each
+reviewer channel accepts only one issuance. `review:issue` signs only
+zero-HIGH/zero-MEDIUM results with that reviewer's separate key and channel:
 
 ```sh
+BENCHMARK_V3_REVIEWED_SOURCE_SHA=<exact-reviewed-sha> \
+BENCHMARK_V3_CAMPAIGN_ROOT=/absolute/private/campaign \
+ops/benchmark-v3/operator-container.sh run \
 npm run bench:v3:review:issue -- \
   --source-root /workspace/source \
   --custody-root /var/lib/opencode-harness/custody \
@@ -105,6 +128,9 @@ Use `--reviewer two` and the reviewer-two paths for the second receipt. Issue
 development readiness receipts only by running the real probes:
 
 ```sh
+BENCHMARK_V3_REVIEWED_SOURCE_SHA=<exact-reviewed-sha> \
+BENCHMARK_V3_CAMPAIGN_ROOT=/absolute/private/campaign \
+ops/benchmark-v3/operator-container.sh run \
 npm run bench:v3:readiness:issue -- \
   --source-root /workspace/source \
   --custody-root /var/lib/opencode-harness/custody \
@@ -118,6 +144,9 @@ precommitted identities into a staging directory, calibrate them again, sign
 the external manifest, validate the closed inventory, and atomically rename it:
 
 ```sh
+BENCHMARK_V3_REVIEWED_SOURCE_SHA=<exact-reviewed-sha> \
+BENCHMARK_V3_CAMPAIGN_ROOT=/absolute/private/campaign \
+ops/benchmark-v3/operator-container.sh run \
 npm run bench:v3:holdout:materialize -- \
   --source-root /workspace/source \
   --custody-root /var/lib/opencode-harness/custody \
@@ -137,7 +166,9 @@ command argument. The runner consumes the key through its one-shot credential
 bridge, and Bubblewrap does not mount `/run/secrets` into model workspaces.
 
 For the sealed holdout only, set `BENCHMARK_V3_PROVIDER_ONLY_EGRESS=1`. The
-entrypoint then installs a default-deny OUTPUT policy allowing DNS and HTTPS to
-the currently resolved `api.openai.com` addresses. `readiness:issue` verifies
-both the allowed provider origin and denied hostname/direct-IP controls before
-issuing the provider-only egress receipt.
+entrypoint resolves `api.openai.com` before installing a default-deny OUTPUT
+policy, pins only those addresses in a read-only hosts file, and then allows
+HTTPS only to those provider addresses. Runtime DNS and every other destination
+remain denied. `readiness:issue` verifies the allowed provider origin and denied
+hostname, DNS, and direct-IP controls before issuing the provider-only egress
+receipt.

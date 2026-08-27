@@ -104,13 +104,22 @@ try {
   const retryAuthority = loadSignedBenchmarkV3ExecutionAuthority({ sourceRoot: cloneOne, receiptPath, sourceSha,
     sourceTreeFingerprint, designFingerprint, corpusFingerprint, outputDirectory: output, trustedIssuers: [issuer] });
   const retryCampaignFingerprint = `sha256:${"d".repeat(64)}`;
-  reserveBenchmarkV3Execution({ authority: retryAuthority, phase: "campaign",
+  assert.throws(() => reserveBenchmarkV3Execution({ authority: retryAuthority, phase: "campaign",
+    campaignFingerprint: retryCampaignFingerprint, cloneBinding: cloneOneBinding }), /different execution authority/u,
+  "a second signed authority must not reuse a physical registry after the first campaign");
+  const retryRegistryRoot = path.join(temporary, "retry-registry");
+  fs.mkdirSync(retryRegistryRoot, { mode: 0o700 });
+  const retryRegistryPath = path.join(retryRegistryRoot, "registry.jsonl");
+  const isolatedRetryIssuer = { ...issuer, registry_root: retryRegistryRoot, registry_path: retryRegistryPath };
+  const isolatedRetryAuthority = loadSignedBenchmarkV3ExecutionAuthority({ sourceRoot: cloneOne, receiptPath, sourceSha,
+    sourceTreeFingerprint, designFingerprint, corpusFingerprint, outputDirectory: output, trustedIssuers: [isolatedRetryIssuer] });
+  reserveBenchmarkV3Execution({ authority: isolatedRetryAuthority, phase: "campaign",
     campaignFingerprint: retryCampaignFingerprint, cloneBinding: cloneOneBinding });
-  reserveBenchmarkV3Continuation({ authority: retryAuthority, phase: "campaign", mode: "retry",
+  reserveBenchmarkV3Continuation({ authority: isolatedRetryAuthority, phase: "campaign", mode: "retry",
     campaignFingerprint: retryCampaignFingerprint, cloneBinding: cloneOneBinding });
-  assert.throws(() => reserveBenchmarkV3Continuation({ authority: retryAuthority, phase: "campaign", mode: "resume",
+  assert.throws(() => reserveBenchmarkV3Continuation({ authority: isolatedRetryAuthority, phase: "campaign", mode: "resume",
     campaignFingerprint: retryCampaignFingerprint, cloneBinding: cloneOneBinding }), /continuation/u);
-  consumeBenchmarkV3Execution({ authority: retryAuthority, phase: "campaign",
+  consumeBenchmarkV3Execution({ authority: isolatedRetryAuthority, phase: "campaign",
     campaignFingerprint: retryCampaignFingerprint, cloneBinding: cloneOneBinding });
   const expiredBody = { ...body, issued_at_ms: Date.now() - 20_000, expires_at_ms: Date.now() - 10_000 };
   fs.writeFileSync(receiptPath, JSON.stringify({ ...expiredBody,
@@ -122,8 +131,6 @@ try {
   assert.deepEqual(events.map((entry) => [entry.execution_id, entry.action]), [
     [body.campaign_execution_id, "reserve"], [body.campaign_execution_id, "continuation"], [body.campaign_execution_id, "consume"],
     [body.holdout_execution_id, "reserve"], [body.holdout_execution_id, "consume"],
-    [retryBody.campaign_execution_id, "reserve"], [retryBody.campaign_execution_id, "continuation"],
-    [retryBody.campaign_execution_id, "consume"],
   ]);
   assert.equal(events.every((entry, index) => entry.sequence === index + 1
     && entry.prior_event_fingerprint === (events[index - 1]?.event_fingerprint ?? null)), true);
@@ -131,7 +138,7 @@ try {
     model_calls: 0, independent_clones: 2, exact_resume_allowed: true, campaign_wide_continuation_limit: 1,
     second_clone_rejected: true,
     cross_host_rejected: true, incomplete_campaign_holdout_rejected: true,
-    authority_rebound_rejected: true, expired_authority_rejected: true,
+    authority_rebound_rejected: true, second_authority_rejected: true, expired_authority_rejected: true,
     registry_readiness_inspected: true,
     append_only_events: events.length }, null, 2)}\n`);
 } finally { fs.rmSync(temporary, { recursive: true, force: true }); }

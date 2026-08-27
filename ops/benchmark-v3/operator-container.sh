@@ -29,7 +29,45 @@ case "$action" in
       echo "operator source and campaign roots must be canonical absolute directories" >&2
       exit 67
     fi
+    if [ "${1:-}" != "npm" ] || [ "${2:-}" != "run" ] || [ -z "${3:-}" ]; then
+      echo "operator run accepts only an allowlisted npm script" >&2
+      exit 70
+    fi
+    script="$3"
+    reviewed=1
+    privileged=0
+    entrypoint=""
+    case "$script" in
+      bench:v3:authority:init) reviewed=0; entrypoint="scripts/benchmark-v3-authority-init.mjs" ;;
+      bench:v3:authority:issue) entrypoint="scripts/benchmark-v3-authority-issue.mjs" ;;
+      bench:v3:review:issue) entrypoint="scripts/benchmark-v3-review-issue.mjs" ;;
+      bench:v3:operator:verify) privileged=1; entrypoint="scripts/benchmark-v3-operator-verify.mjs" ;;
+      bench:v3:readiness:issue) privileged=1; entrypoint="scripts/benchmark-v3-readiness-issue.mjs" ;;
+      bench:v3:holdout:commit) privileged=1; entrypoint="scripts/benchmark-v3-holdout-commit.mjs" ;;
+      bench:v3:holdout:materialize) privileged=1; entrypoint="scripts/benchmark-v3-holdout-materialize.mjs" ;;
+      verify:development-readiness) privileged=1; entrypoint="scripts/verify-benchmark-v3-development-readiness.mjs" ;;
+      verify:holdout-readiness) privileged=1; entrypoint="scripts/verify-benchmark-v3-holdout-readiness.mjs" ;;
+      bench:v3) privileged=1; entrypoint="scripts/benchmark-v3-run.mjs" ;;
+      bench:v3:holdout) privileged=1; entrypoint="scripts/benchmark-v3-holdout.mjs" ;;
+      bench:v3:takeover) privileged=1; entrypoint="scripts/benchmark-v3-takeover.mjs" ;;
+      *) echo "operator npm script is not allowlisted: $script" >&2; exit 71 ;;
+    esac
+    if [ "$reviewed" -eq 1 ]; then
+      reviewed_sha="${BENCHMARK_V3_REVIEWED_SOURCE_SHA:-}"
+      case "$reviewed_sha" in
+        ''|*[!0-9a-f]*) echo "BENCHMARK_V3_REVIEWED_SOURCE_SHA is required" >&2; exit 72 ;;
+      esac
+      if [ "${#reviewed_sha}" -ne 40 ] || [ "$(git -C "$source_root" rev-parse HEAD)" != "$reviewed_sha" ] \
+        || [ -n "$(git -C "$source_root" status --porcelain=v1 --untracked-files=all)" ]; then
+        echo "operator source is not the exact clean independently reviewed SHA" >&2
+        exit 73
+      fi
+    fi
     if [ -n "${BENCHMARK_V3_OPENAI_KEY_FILE:-}" ]; then
+      if [ "$script" != "bench:v3" ] && [ "$script" != "bench:v3:holdout" ]; then
+        echo "provider authorization is accepted only for a canonical model runner" >&2
+        exit 74
+      fi
       if [ ! -f "$BENCHMARK_V3_OPENAI_KEY_FILE" ] || [ -L "$BENCHMARK_V3_OPENAI_KEY_FILE" ]; then
         echo "BENCHMARK_V3_OPENAI_KEY_FILE must be a non-symlink regular file" >&2
         exit 68
@@ -39,6 +77,23 @@ case "$action" in
         echo "BENCHMARK_V3_OPENAI_KEY_FILE must have mode 0400 or 0600" >&2
         exit 69
       fi
+    fi
+    shift 3
+    if [ "${1:-}" = "--" ]; then shift; fi
+    set -- node "/workspace/source/$entrypoint" "$@"
+    if [ "$privileged" -eq 0 ]; then
+      exec docker run --rm --network none --cap-drop ALL --security-opt no-new-privileges \
+        --hostname benchmark-v3-authority --read-only \
+        --tmpfs /tmp:rw,exec,nosuid,nodev,mode=1777 \
+        --tmpfs /usr/local/libexec:rw,exec,nosuid,nodev,mode=0755 \
+        --mount "type=bind,src=$source_root,dst=/workspace/source,readonly" \
+        --mount "type=bind,src=$campaign_root,dst=/campaign" \
+        --mount "type=volume,src=$custody_volume,dst=/var/lib/opencode-harness" \
+        --mount "type=volume,src=$channel_volume,dst=/run/opencode-harness" \
+        --env BENCHMARK_V3_CGROUP_REQUIRED=0 \
+        "$image" "$@"
+    fi
+    if [ -n "${BENCHMARK_V3_OPENAI_KEY_FILE:-}" ]; then
       exec docker run --rm --privileged --cgroupns=host --hostname benchmark-v3-authority --read-only \
         --tmpfs /tmp:rw,exec,nosuid,nodev,mode=1777 \
         --tmpfs /usr/local/libexec:rw,exec,nosuid,nodev,mode=0755 \
@@ -48,6 +103,7 @@ case "$action" in
         --mount "type=volume,src=$custody_volume,dst=/var/lib/opencode-harness" \
         --mount "type=volume,src=$channel_volume,dst=/run/opencode-harness" \
         --env OPENAI_API_KEY_FILE=/run/secrets/openai_api_key \
+        --env BENCHMARK_V3_CGROUP_REQUIRED=1 \
         --env "BENCHMARK_V3_PROVIDER_ONLY_EGRESS=${BENCHMARK_V3_PROVIDER_ONLY_EGRESS:-0}" \
         "$image" "$@"
     fi
@@ -58,6 +114,7 @@ case "$action" in
       --mount "type=bind,src=$campaign_root,dst=/campaign" \
       --mount "type=volume,src=$custody_volume,dst=/var/lib/opencode-harness" \
       --mount "type=volume,src=$channel_volume,dst=/run/opencode-harness" \
+      --env BENCHMARK_V3_CGROUP_REQUIRED=1 \
       --env "BENCHMARK_V3_PROVIDER_ONLY_EGRESS=${BENCHMARK_V3_PROVIDER_ONLY_EGRESS:-0}" \
       "$image" "$@"
     ;;

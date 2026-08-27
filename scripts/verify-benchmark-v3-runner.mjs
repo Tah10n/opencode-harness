@@ -217,7 +217,10 @@ try {
     protected_channel: reviewIssuer.protected_channel,
     read_only: true, verdict: "passed", high_findings: 0, medium_findings: 0, source_sha: sourceSha,
     source_tree_fingerprint: `sha256:${"9".repeat(64)}`, corpus_contract_reviewed: true,
-    contract_coverage_reviewed: true, oracle_leakage_reviewed: true, reviewed_at: new Date().toISOString() };
+    contract_coverage_reviewed: true, oracle_leakage_reviewed: true,
+    review_execution_id: "review-fixture-execution-0001", review_method: "independent-read-only-agent-v1",
+    review_evidence_fingerprint: `sha256:${"7".repeat(64)}`,
+    review_result_fingerprint: `sha256:${"8".repeat(64)}`, reviewed_at: new Date().toISOString() };
   const reviewFingerprint = fingerprint(reviewUnsigned);
   const reviewSignedBody = { ...reviewUnsigned, review_fingerprint: reviewFingerprint };
   const reviewPath = path.join(readinessRoot, "review.json");

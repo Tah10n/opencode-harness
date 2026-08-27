@@ -396,6 +396,7 @@ const requiredFiles = [
   "lib/benchmark/v3-operator-holdout.mjs",
   "lib/benchmark/v3-operator-issue.mjs",
   "lib/benchmark/v3-operator-probes.mjs",
+  "lib/benchmark/v3-operator-semantic.mjs",
   "lib/benchmark/v3-split-assignment.mjs",
   "benchmarks/v3/holdout-issuers.v1.json",
   "benchmarks/v3/readiness-issuers.v1.json",
