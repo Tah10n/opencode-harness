@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-development-medium-06",
+  "split": "development",
+  "stratum": "medium",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "observed-bug: Observed upstream behavior defect:\nfeat: support explicit resource management in `no-const-assign` (#19892)\n\n* feat: support explicit resource management in `no-const-assign`\n\n* update When Not To Use It section\n\n* fix typo",
+    "required-behavior: Correct the observed defect so the documented behavioral examples and their semantic equivalents produce the expected ESLint behavior.",
+    "preserved-behavior: Preserve all pre-existing behavior, diagnostics, options, and public APIs outside the observed defect; the full pre-existing upstream test suite remains authoritative.",
+    "boundary-error-cases: Public behavioral examples (test-only diff, not implementation):\ndiff --git a/tests/lib/rules/no-const-assign.js b/tests/lib/rules/no-const-assign.js\nindex 59affb072..739f7d21f 100644\n--- a/tests/lib/rules/no-const-assign.js\n+++ b/tests/lib/rules/no-const-assign.js\n@@ -16,7 +16,7 @@ const RuleTester = require(\"../../../lib/rule-tester/rule-tester\");\n // Tests\n //------------------------------------------------------------------------------\n \n-const ruleTester = new RuleTester({ languageOptions: { ecmaVersion: 6 } });\n+const ruleTester = new RuleTester();\n \n ruleTester.run(\"no-const-assign\", rule, {\n \tvalid: [\n@@ -26,6 +26,10 @@ ruleTester.run(\"no-const-assign\", rule, {\n \t\t\"for (const x in [1,2,3]) { foo(x); }\",\n \t\t\"for (const x of [1,2,3]) { foo(x); }\",\n \t\t\"const x = {key: 0}; x.key = 1;\",\n+\t\t\"using x = foo();\",\n+\t\t\"await using x = foo();\",\n+\t\t\"using x = foo(); bar(x);\",\n+\t\t\"await using x = foo(); bar(x);\",\n \n \t\t// ignores non constant.\n \t\t\"var x = 0; x = 1;\",\n@@ -115,5 +119,71 @@ ruleTester.run(\"no-const-assign\", rule, {\n \t\t\t\t{ messageId: \"const\", data: { name: \"x\" }, type: \"Identifier\" },\n \t\t\t],\n \t\t},\n+\t\t{\n+\t\t\tcode: \"using x = foo(); x = 1;\",\n+\t\t\terrors: [\n+\t\t\t\t{\n+\t\t\t\t\tmessageId: \"const\",\n+\t\t\t\t\tdata: { name: \"x\" },\n+\t\t\t\t\ttype: \"Identifier\",\n+\t\t\t\t\tcolumn: 18,\n+\t\t\t\t},\n+\t\t\t],\n+\t\t},\n+\t\t{\n+\t\t\tcode: \"await using x = foo(); x = 1;\",\n+\t\t\terrors: [\n+\t\t\t\t{\n+\t\t\t\t\tmessageId: \"const\",\n+\t\t\t\t\tdata: { name: \"x\" },\n+\t\t\t\t\ttype: \"Identifier\",\n+\t\t\t\t\tcolumn: 24,\n+\t\t\t\t},\n+\t\t\t],\n+\t\t},\n+\t\t{\n+\t\t\tcode: \"using x = foo(); x ??= bar();\",\n+\t\t\terrors: [\n+\t\t\t\t{\n+\t\t\t\t\tmessageId: \"const\",\n+\t\t\t\t\tdata: { name: \"x\" },\n+\t\t\t\t\ttype: \"Identifier\",\n+\t\t\t\t\tcolumn: 18,\n+\t\t\t\t},\n+\t\t\t],\n+\t\t},\n+\t\t{\n+\t\t\tcode: \"await using x = foo(); x ||= bar();\",\n+\t\t\terrors: [\n+\t\t\t\t{\n+\t\t\t\t\tmessageId: \"const\",\n+\t\t\t\t\tdata: { name: \"x\" },\n+\t\t\t\t\ttype: \"Identifier\",\n+\t\t\t\t\tcolumn: 24,\n+\t\t\t\t},\n+\t\t\t],\n+\t\t},\n+\t\t{\n+\t\t\tcode: \"using x = foo(); [x, y] = bar();\",\n+\t\t\terrors: [\n+\t\t\t\t{\n+\t\t\t\t\tmessageId: \"const\",\n+\t\t\t\t\tdata: { name: \"x\" },\n+\t\t\t\t\ttype: \"Identifier\",\n+\t\t\t\t\tcolumn: 19,\n+\t\t\t\t},\n+\t\t\t],\n+\t\t},\n+\t\t{\n+\t\t\tcode: \"await using x = foo(); [x = baz, y] = bar();\",\n+\t\t\terrors: [\n+\t\t\t\t{\n+\t\t\t\t\tmessageId: \"const\",\n+\t\t\t\t\tdata: { name: \"x\" },\n+\t\t\t\t\ttype: \"Identifier\",\n+\t\t\t\t\tcolumn: 25,\n+\t\t\t\t},\n+\t\t\t],\n+\t\t},\n \t],\n });",
+    "allowed-mutation: Modify only these supplied source paths: lib/rules/no-const-assign.js. Do not add, delete, rename, or change modes of other paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-development-medium-06-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "observed-bug",
+        "text": "Observed upstream behavior defect:\nfeat: support explicit resource management in `no-const-assign` (#19892)\n\n* feat: support explicit resource management in `no-const-assign`\n\n* update When Not To Use It section\n\n* fix typo"
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "required-behavior",
+        "text": "Correct the observed defect so the documented behavioral examples and their semantic equivalents produce the expected ESLint behavior."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "preserved-behavior",
+        "text": "Preserve all pre-existing behavior, diagnostics, options, and public APIs outside the observed defect; the full pre-existing upstream test suite remains authoritative."
+      },
+      {
+        "clause_id": "REQ-004",
+        "kind": "boundary-error-cases",
+        "text": "Public behavioral examples (test-only diff, not implementation):\ndiff --git a/tests/lib/rules/no-const-assign.js b/tests/lib/rules/no-const-assign.js\nindex 59affb072..739f7d21f 100644\n--- a/tests/lib/rules/no-const-assign.js\n+++ b/tests/lib/rules/no-const-assign.js\n@@ -16,7 +16,7 @@ const RuleTester = require(\"../../../lib/rule-tester/rule-tester\");\n // Tests\n //------------------------------------------------------------------------------\n \n-const ruleTester = new RuleTester({ languageOptions: { ecmaVersion: 6 } });\n+const ruleTester = new RuleTester();\n \n ruleTester.run(\"no-const-assign\", rule, {\n \tvalid: [\n@@ -26,6 +26,10 @@ ruleTester.run(\"no-const-assign\", rule, {\n \t\t\"for (const x in [1,2,3]) { foo(x); }\",\n \t\t\"for (const x of [1,2,3]) { foo(x); }\",\n \t\t\"const x = {key: 0}; x.key = 1;\",\n+\t\t\"using x = foo();\",\n+\t\t\"await using x = foo();\",\n+\t\t\"using x = foo(); bar(x);\",\n+\t\t\"await using x = foo(); bar(x);\",\n \n \t\t// ignores non constant.\n \t\t\"var x = 0; x = 1;\",\n@@ -115,5 +119,71 @@ ruleTester.run(\"no-const-assign\", rule, {\n \t\t\t\t{ messageId: \"const\", data: { name: \"x\" }, type: \"Identifier\" },\n \t\t\t],\n \t\t},\n+\t\t{\n+\t\t\tcode: \"using x = foo(); x = 1;\",\n+\t\t\terrors: [\n+\t\t\t\t{\n+\t\t\t\t\tmessageId: \"const\",\n+\t\t\t\t\tdata: { name: \"x\" },\n+\t\t\t\t\ttype: \"Identifier\",\n+\t\t\t\t\tcolumn: 18,\n+\t\t\t\t},\n+\t\t\t],\n+\t\t},\n+\t\t{\n+\t\t\tcode: \"await using x = foo(); x = 1;\",\n+\t\t\terrors: [\n+\t\t\t\t{\n+\t\t\t\t\tmessageId: \"const\",\n+\t\t\t\t\tdata: { name: \"x\" },\n+\t\t\t\t\ttype: \"Identifier\",\n+\t\t\t\t\tcolumn: 24,\n+\t\t\t\t},\n+\t\t\t],\n+\t\t},\n+\t\t{\n+\t\t\tcode: \"using x = foo(); x ??= bar();\",\n+\t\t\terrors: [\n+\t\t\t\t{\n+\t\t\t\t\tmessageId: \"const\",\n+\t\t\t\t\tdata: { name: \"x\" },\n+\t\t\t\t\ttype: \"Identifier\",\n+\t\t\t\t\tcolumn: 18,\n+\t\t\t\t},\n+\t\t\t],\n+\t\t},\n+\t\t{\n+\t\t\tcode: \"await using x = foo(); x ||= bar();\",\n+\t\t\terrors: [\n+\t\t\t\t{\n+\t\t\t\t\tmessageId: \"const\",\n+\t\t\t\t\tdata: { name: \"x\" },\n+\t\t\t\t\ttype: \"Identifier\",\n+\t\t\t\t\tcolumn: 24,\n+\t\t\t\t},\n+\t\t\t],\n+\t\t},\n+\t\t{\n+\t\t\tcode: \"using x = foo(); [x, y] = bar();\",\n+\t\t\terrors: [\n+\t\t\t\t{\n+\t\t\t\t\tmessageId: \"const\",\n+\t\t\t\t\tdata: { name: \"x\" },\n+\t\t\t\t\ttype: \"Identifier\",\n+\t\t\t\t\tcolumn: 19,\n+\t\t\t\t},\n+\t\t\t],\n+\t\t},\n+\t\t{\n+\t\t\tcode: \"await using x = foo(); [x = baz, y] = bar();\",\n+\t\t\terrors: [\n+\t\t\t\t{\n+\t\t\t\t\tmessageId: \"const\",\n+\t\t\t\t\tdata: { name: \"x\" },\n+\t\t\t\t\ttype: \"Identifier\",\n+\t\t\t\t\tcolumn: 25,\n+\t\t\t\t},\n+\t\t\t],\n+\t\t},\n \t],\n });"
+      },
+      {
+        "clause_id": "REQ-005",
+        "kind": "allowed-mutation",
+        "text": "Modify only these supplied source paths: lib/rules/no-const-assign.js. Do not add, delete, rename, or change modes of other paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:ece6707e45dae5c55ae4843ac47e19e80940184f7481a6549bfed3c74741736b"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-const-assign.js",
+      "content": "/**\n * @fileoverview A rule to disallow modifying variables that are declared using `const`\n * @author Toru Nagashima\n */\n\n\"use strict\";\n\nconst astUtils = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../types').Rule.RuleModule} */\nmodule.exports = {\n\tmeta: {\n\t\ttype: \"problem\",\n\n\t\tdocs: {\n\t\t\tdescription: \"Disallow reassigning `const` variables\",\n\t\t\trecommended: true,\n\t\t\turl: \"https://eslint.org/docs/latest/rules/no-const-assign\",\n\t\t},\n\n\t\tschema: [],\n\n\t\tmessages: {\n\t\t\tconst: \"'{{name}}' is constant.\",\n\t\t},\n\t},\n\n\tcreate(context) {\n\t\tconst sourceCode = context.sourceCode;\n\n\t\t/**\n\t\t * Finds and reports references that are non initializer and writable.\n\t\t * @param {Variable} variable A variable to check.\n\t\t * @returns {void}\n\t\t */\n\t\tfunction checkVariable(variable) {\n\t\t\tastUtils\n\t\t\t\t.getModifyingReferences(variable.references)\n\t\t\t\t.forEach(reference => {\n\t\t\t\t\tcontext.report({\n\t\t\t\t\t\tnode: reference.identifier,\n\t\t\t\t\t\tmessageId: \"const\",\n\t\t\t\t\t\tdata: { name: reference.identifier.name },\n\t\t\t\t\t});\n\t\t\t\t});\n\t\t}\n\n\t\treturn {\n\t\t\tVariableDeclaration(node) {\n\t\t\t\tif (node.kind === \"const\") {\n\t\t\t\t\tsourceCode\n\t\t\t\t\t\t.getDeclaredVariables(node)\n\t\t\t\t\t\t.forEach(checkVariable);\n\t\t\t\t}\n\t\t\t},\n\t\t};\n\t},\n};\n"
+    }
+  ]
+}

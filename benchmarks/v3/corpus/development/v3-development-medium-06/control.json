@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-development-medium-06",
+  "oracle": "upstream-eslint-rule-test-and-closed-mutation-set",
+  "defect_severity": "unclassified",
+  "reference_files": [
+    {
+      "path": "lib/rules/no-const-assign.js",
+      "content": "/**\n * @fileoverview A rule to disallow modifying variables that are declared using `const`\n * @author Toru Nagashima\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst astUtils = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Helpers\n//------------------------------------------------------------------------------\n\nconst CONSTANT_BINDINGS = new Set([\"const\", \"using\", \"await using\"]);\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../types').Rule.RuleModule} */\nmodule.exports = {\n\tmeta: {\n\t\ttype: \"problem\",\n\n\t\tdocs: {\n\t\t\tdescription:\n\t\t\t\t\"Disallow reassigning `const`, `using`, and `await using` variables\",\n\t\t\trecommended: true,\n\t\t\turl: \"https://eslint.org/docs/latest/rules/no-const-assign\",\n\t\t},\n\n\t\tschema: [],\n\n\t\tmessages: {\n\t\t\tconst: \"'{{name}}' is constant.\",\n\t\t},\n\t},\n\n\tcreate(context) {\n\t\tconst sourceCode = context.sourceCode;\n\n\t\t/**\n\t\t * Finds and reports references that are non initializer and writable.\n\t\t * @param {Variable} variable A variable to check.\n\t\t * @returns {void}\n\t\t */\n\t\tfunction checkVariable(variable) {\n\t\t\tastUtils\n\t\t\t\t.getModifyingReferences(variable.references)\n\t\t\t\t.forEach(reference => {\n\t\t\t\t\tcontext.report({\n\t\t\t\t\t\tnode: reference.identifier,\n\t\t\t\t\t\tmessageId: \"const\",\n\t\t\t\t\t\tdata: { name: reference.identifier.name },\n\t\t\t\t\t});\n\t\t\t\t});\n\t\t}\n\n\t\treturn {\n\t\t\tVariableDeclaration(node) {\n\t\t\t\tif (CONSTANT_BINDINGS.has(node.kind)) {\n\t\t\t\t\tsourceCode\n\t\t\t\t\t\t.getDeclaredVariables(node)\n\t\t\t\t\t\t.forEach(checkVariable);\n\t\t\t\t}\n\t\t\t},\n\t\t};\n\t},\n};\n"
+    }
+  ],
+  "hidden_test_files": [
+    {
+      "path": "tests/lib/rules/no-const-assign.js",
+      "content": "/**\n * @fileoverview Tests for no-const-assign rule.\n * @author Toru Nagashima\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst rule = require(\"../../../lib/rules/no-const-assign\");\nconst RuleTester = require(\"../../../lib/rule-tester/rule-tester\");\n\n//------------------------------------------------------------------------------\n// Tests\n//------------------------------------------------------------------------------\n\nconst ruleTester = new RuleTester();\n\nruleTester.run(\"no-const-assign\", rule, {\n\tvalid: [\n\t\t\"const x = 0; { let x; x = 1; }\",\n\t\t\"const x = 0; function a(x) { x = 1; }\",\n\t\t\"const x = 0; foo(x);\",\n\t\t\"for (const x in [1,2,3]) { foo(x); }\",\n\t\t\"for (const x of [1,2,3]) { foo(x); }\",\n\t\t\"const x = {key: 0}; x.key = 1;\",\n\t\t\"using x = foo();\",\n\t\t\"await using x = foo();\",\n\t\t\"using x = foo(); bar(x);\",\n\t\t\"await using x = foo(); bar(x);\",\n\n\t\t// ignores non constant.\n\t\t\"var x = 0; x = 1;\",\n\t\t\"let x = 0; x = 1;\",\n\t\t\"function x() {} x = 1;\",\n\t\t\"function foo(x) { x = 1; }\",\n\t\t\"class X {} X = 1;\",\n\t\t\"try {} catch (x) { x = 1; }\",\n\t],\n\tinvalid: [\n\t\t{\n\t\t\tcode: \"const x = 0; x = 1;\",\n\t\t\terrors: [\n\t\t\t\t{ messageId: \"const\", data: { name: \"x\" }, type: \"Identifier\" },\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"const {a: x} = {a: 0}; x = 1;\",\n\t\t\terrors: [\n\t\t\t\t{ messageId: \"const\", data: { name: \"x\" }, type: \"Identifier\" },\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"const x = 0; ({x} = {x: 1});\",\n\t\t\terrors: [\n\t\t\t\t{ messageId: \"const\", data: { name: \"x\" }, type: \"Identifier\" },\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"const x = 0; ({a: x = 1} = {});\",\n\t\t\terrors: [\n\t\t\t\t{ messageId: \"const\", data: { name: \"x\" }, type: \"Identifier\" },\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"const x = 0; x += 1;\",\n\t\t\terrors: [\n\t\t\t\t{ messageId: \"const\", data: { name: \"x\" }, type: \"Identifier\" },\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"const x = 0; ++x;\",\n\t\t\terrors: [\n\t\t\t\t{ messageId: \"const\", data: { name: \"x\" }, type: \"Identifier\" },\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"for (const i = 0; i < 10; ++i) { foo(i); }\",\n\t\t\terrors: [\n\t\t\t\t{ messageId: \"const\", data: { name: \"i\" }, type: \"Identifier\" },\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"const x = 0; x = 1; x = 2;\",\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"const\",\n\t\t\t\t\tdata: { name: \"x\" },\n\t\t\t\t\ttype: \"Identifier\",\n\t\t\t\t\tline: 1,\n\t\t\t\t\tcolumn: 14,\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"const\",\n\t\t\t\t\tdata: { name: \"x\" },\n\t\t\t\t\ttype: \"Identifier\",\n\t\t\t\t\tline: 1,\n\t\t\t\t\tcolumn: 21,\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"const x = 0; function foo() { x = x + 1; }\",\n\t\t\terrors: [\n\t\t\t\t{ messageId: \"const\", data: { name: \"x\" }, type: \"Identifier\" },\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"const x = 0; function foo(a) { x = a; }\",\n\t\t\terrors: [\n\t\t\t\t{ messageId: \"const\", data: { name: \"x\" }, type: \"Identifier\" },\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"const x = 0; while (true) { x = x + 1; }\",\n\t\t\terrors: [\n\t\t\t\t{ messageId: \"const\", data: { name: \"x\" }, type: \"Identifier\" },\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"using x = foo(); x = 1;\",\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"const\",\n\t\t\t\t\tdata: { name: \"x\" },\n\t\t\t\t\ttype: \"Identifier\",\n\t\t\t\t\tcolumn: 18,\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"await using x = foo(); x = 1;\",\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"const\",\n\t\t\t\t\tdata: { name: \"x\" },\n\t\t\t\t\ttype: \"Identifier\",\n\t\t\t\t\tcolumn: 24,\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"using x = foo(); x ??= bar();\",\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"const\",\n\t\t\t\t\tdata: { name: \"x\" },\n\t\t\t\t\ttype: \"Identifier\",\n\t\t\t\t\tcolumn: 18,\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"await using x = foo(); x ||= bar();\",\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"const\",\n\t\t\t\t\tdata: { name: \"x\" },\n\t\t\t\t\ttype: \"Identifier\",\n\t\t\t\t\tcolumn: 24,\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"using x = foo(); [x, y] = bar();\",\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"const\",\n\t\t\t\t\tdata: { name: \"x\" },\n\t\t\t\t\ttype: \"Identifier\",\n\t\t\t\t\tcolumn: 19,\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"await using x = foo(); [x = baz, y] = bar();\",\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"const\",\n\t\t\t\t\tdata: { name: \"x\" },\n\t\t\t\t\ttype: \"Identifier\",\n\t\t\t\t\tcolumn: 25,\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t],\n});\n"
+    }
+  ],
+  "allowed_mutation_paths": [
+    "lib/rules/no-const-assign.js"
+  ],
+  "test_argv": [
+    "--timeout",
+    "30000",
+    "tests/lib/rules/no-const-assign.js"
+  ],
+  "runtime_key": "eslint-v9.30",
+  "runtime_version": "9.30",
+  "provenance": {
+    "kind": "real-commit-derived",
+    "repository": "https://github.com/eslint/eslint",
+    "source_commit": "bb370b8e79f65ee32d9d89ecf249fb74a141ad22",
+    "parent_commit": "5a0069d60815246cf24e1c96125540792c2507ef",
+    "source_paths": [
+      "lib/rules/no-const-assign.js"
+    ],
+    "patch_fingerprint": "sha256:b8d11fa838b5539478bff5e4affc430274daf1e5f31d085773d8f71f774946fb",
+    "visible_requirement_fingerprint": "sha256:3f10d655ea2c92f8e21af3bddcbfa908bc3e51a057cf2ee823a6b7db6060f7b5",
+    "license": "MIT",
+    "license_fingerprint": "sha256:73e2034fe7f17e603f7c3a4bb7f8b71db11a63f94907d08e756c9d4d72a35505"
+  },
+  "requirement_coverage": {
+    "schema_version": 1,
+    "contract_fingerprint": "sha256:ece6707e45dae5c55ae4843ac47e19e80940184f7481a6549bfed3c74741736b",
+    "contract_completeness": "self-contained-behavioral-v1",
+    "hidden_test_witnesses": [
+      {
+        "hidden_test_fingerprint": "sha256:a310b973a2ebbec8a2e49af8686fc359e785cfc230485f4342a24c40ac9bde52",
+        "clause_ids": [
+          "REQ-002",
+          "REQ-003",
+          "REQ-004"
+        ]
+      }
+    ],
+    "runner_witnesses": [
+      {
+        "witness_id": "semantic-oracle-and-closed-mutation-set",
+        "clause_ids": [
+          "REQ-001",
+          "REQ-002",
+          "REQ-003",
+          "REQ-004",
+          "REQ-005"
+        ]
+      }
+    ]
+  }
+}

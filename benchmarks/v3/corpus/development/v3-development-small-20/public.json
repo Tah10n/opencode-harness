@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-development-small-20",
+  "split": "development",
+  "stratum": "small",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "observed-bug: Observed upstream behavior defect:\nFix: no check for shadowed Object (fixes #12809) (#13115)",
+    "required-behavior: Correct the observed defect so the documented behavioral examples and their semantic equivalents produce the expected ESLint behavior.",
+    "preserved-behavior: Preserve all pre-existing behavior, diagnostics, options, and public APIs outside the observed defect; the full pre-existing upstream test suite remains authoritative.",
+    "boundary-error-cases: Public behavioral examples (test-only diff, not implementation):\ndiff --git a/tests/lib/rules/no-new-object.js b/tests/lib/rules/no-new-object.js\nindex 667da7c43..0e8f5eb99 100644\n--- a/tests/lib/rules/no-new-object.js\n+++ b/tests/lib/rules/no-new-object.js\n@@ -20,15 +20,50 @@ const ruleTester = new RuleTester();\n \n ruleTester.run(\"no-new-object\", rule, {\n     valid: [\n-        \"var foo = new foo.Object()\"\n+        \"var myObject = {};\",\n+        \"var myObject = new CustomObject();\",\n+        \"var foo = new foo.Object()\",\n+        `var Object = function Object() {};\n+            new Object();`,\n+        `var x = something ? MyClass : Object;\n+        var y = new x();`,\n+        {\n+            code: `\n+        class Object {\n+            constructor(){\n+\n+            }\n+        }\n+        new Object();\n+        `,\n+            parserOptions: { ecmaVersion: 6 }\n+        },\n+        {\n+            code: `\n+        import { Object } from './'\n+        new Object();\n+        `,\n+            parserOptions: { ecmaVersion: 6, sourceType: \"module\" }\n+        }\n     ],\n     invalid: [\n         {\n             code: \"var foo = new Object()\",\n-            errors: [{\n-                messageId: \"preferLiteral\",\n-                type: \"NewExpression\"\n-            }]\n+            errors: [\n+                {\n+                    messageId: \"preferLiteral\",\n+                    type: \"NewExpression\"\n+                }\n+            ]\n+        },\n+        {\n+            code: \"new Object();\",\n+            errors: [{ messageId: \"preferLiteral\", type: \"NewExpression\" }]\n+        },\n+        {\n+            code: \"const a = new Object()\",\n+            parserOptions: { ecmaVersion: 6 },\n+            errors: [{ messageId: \"preferLiteral\", type: \"NewExpression\" }]\n         }\n     ]\n });",
+    "allowed-mutation: Modify only these supplied source paths: lib/rules/no-new-object.js. Do not add, delete, rename, or change modes of other paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-development-small-20-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "observed-bug",
+        "text": "Observed upstream behavior defect:\nFix: no check for shadowed Object (fixes #12809) (#13115)"
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "required-behavior",
+        "text": "Correct the observed defect so the documented behavioral examples and their semantic equivalents produce the expected ESLint behavior."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "preserved-behavior",
+        "text": "Preserve all pre-existing behavior, diagnostics, options, and public APIs outside the observed defect; the full pre-existing upstream test suite remains authoritative."
+      },
+      {
+        "clause_id": "REQ-004",
+        "kind": "boundary-error-cases",
+        "text": "Public behavioral examples (test-only diff, not implementation):\ndiff --git a/tests/lib/rules/no-new-object.js b/tests/lib/rules/no-new-object.js\nindex 667da7c43..0e8f5eb99 100644\n--- a/tests/lib/rules/no-new-object.js\n+++ b/tests/lib/rules/no-new-object.js\n@@ -20,15 +20,50 @@ const ruleTester = new RuleTester();\n \n ruleTester.run(\"no-new-object\", rule, {\n     valid: [\n-        \"var foo = new foo.Object()\"\n+        \"var myObject = {};\",\n+        \"var myObject = new CustomObject();\",\n+        \"var foo = new foo.Object()\",\n+        `var Object = function Object() {};\n+            new Object();`,\n+        `var x = something ? MyClass : Object;\n+        var y = new x();`,\n+        {\n+            code: `\n+        class Object {\n+            constructor(){\n+\n+            }\n+        }\n+        new Object();\n+        `,\n+            parserOptions: { ecmaVersion: 6 }\n+        },\n+        {\n+            code: `\n+        import { Object } from './'\n+        new Object();\n+        `,\n+            parserOptions: { ecmaVersion: 6, sourceType: \"module\" }\n+        }\n     ],\n     invalid: [\n         {\n             code: \"var foo = new Object()\",\n-            errors: [{\n-                messageId: \"preferLiteral\",\n-                type: \"NewExpression\"\n-            }]\n+            errors: [\n+                {\n+                    messageId: \"preferLiteral\",\n+                    type: \"NewExpression\"\n+                }\n+            ]\n+        },\n+        {\n+            code: \"new Object();\",\n+            errors: [{ messageId: \"preferLiteral\", type: \"NewExpression\" }]\n+        },\n+        {\n+            code: \"const a = new Object()\",\n+            parserOptions: { ecmaVersion: 6 },\n+            errors: [{ messageId: \"preferLiteral\", type: \"NewExpression\" }]\n         }\n     ]\n });"
+      },
+      {
+        "clause_id": "REQ-005",
+        "kind": "allowed-mutation",
+        "text": "Modify only these supplied source paths: lib/rules/no-new-object.js. Do not add, delete, rename, or change modes of other paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:0cfe58bd96f70dfa405c51b0e1ba3fb7c314695ccd957094e0b7a34862219748"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-new-object.js",
+      "content": "/**\n * @fileoverview A rule to disallow calls to the Object constructor\n * @author Matt DuVall <http://www.mattduvall.com/>\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\nmodule.exports = {\n    meta: {\n        type: \"suggestion\",\n\n        docs: {\n            description: \"disallow `Object` constructors\",\n            category: \"Stylistic Issues\",\n            recommended: false,\n            url: \"https://eslint.org/docs/rules/no-new-object\"\n        },\n\n        schema: [],\n\n        messages: {\n            preferLiteral: \"The object literal notation {} is preferrable.\"\n        }\n    },\n\n    create(context) {\n\n        return {\n\n            NewExpression(node) {\n                if (node.callee.name === \"Object\") {\n                    context.report({\n                        node,\n                        messageId: \"preferLiteral\"\n                    });\n                }\n            }\n        };\n\n    }\n};\n"
+    }
+  ]
+}

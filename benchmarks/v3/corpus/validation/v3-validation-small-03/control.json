@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-small-03",
+  "oracle": "upstream-eslint-rule-test-and-closed-mutation-set",
+  "defect_severity": "unclassified",
+  "reference_files": [
+    {
+      "path": "lib/config-api.js",
+      "content": "/**\n * @fileoverview exports for config helpers\n * @author Nicholas C. Zakas\n */\n\n\"use strict\";\n\nconst {\n\tdefineConfig,\n\tglobalIgnores,\n\tincludeIgnoreFile,\n} = require(\"@eslint/config-helpers\");\n\nmodule.exports = {\n\tdefineConfig,\n\tglobalIgnores,\n\tincludeIgnoreFile,\n};\n"
+    }
+  ],
+  "hidden_test_files": [
+    {
+      "path": "tests/lib/config-api.js",
+      "content": "/**\n * @fileoverview Tests for config-api.\n * @author Milos Djermanovic\n */\n\n\"use strict\";\n\n//-----------------------------------------------------------------------------\n// Requirements\n//-----------------------------------------------------------------------------\n\nconst assert = require(\"chai\").assert,\n\tapi = require(\"../../lib/config-api\");\n\n//-----------------------------------------------------------------------------\n// Tests\n//-----------------------------------------------------------------------------\n\ndescribe(\"config-api\", () => {\n\tit(\"should have defineConfig exposed\", () => {\n\t\tassert.isFunction(api.defineConfig);\n\t});\n\n\tit(\"should have globalIgnores exposed\", () => {\n\t\tassert.isFunction(api.globalIgnores);\n\t});\n\n\tit(\"should have includeIgnoreFile()` exposed\", () => {\n\t\tassert.isFunction(api.includeIgnoreFile);\n\t});\n});\n"
+    }
+  ],
+  "allowed_mutation_paths": [
+    "lib/config-api.js"
+  ],
+  "test_argv": [
+    "--timeout",
+    "30000",
+    "tests/lib/config-api.js"
+  ],
+  "runtime_key": "eslint-v10",
+  "runtime_version": "10.3",
+  "provenance": {
+    "kind": "real-commit-derived",
+    "repository": "https://github.com/eslint/eslint",
+    "source_commit": "450040bd89b989b3531824c6be45feb5fe3d936b",
+    "parent_commit": "6799431203f2579632d0870f98ba132067f4040c",
+    "source_paths": [
+      "lib/config-api.js"
+    ],
+    "patch_fingerprint": "sha256:a6641c81693a1b8687906a8acfa3cad3424f3c10d433489b2fa8d496d67172b1",
+    "visible_requirement_fingerprint": "sha256:d10c27eadfbf82738a46450c90065a01a439960703fbc06d35668e1c196c16a6",
+    "license": "MIT",
+    "license_fingerprint": "sha256:73e2034fe7f17e603f7c3a4bb7f8b71db11a63f94907d08e756c9d4d72a35505"
+  },
+  "requirement_coverage": {
+    "schema_version": 1,
+    "contract_fingerprint": "sha256:848db35c0943a9f793250d427e999a39640fb8db30862b587e261050a3eed6a0",
+    "contract_completeness": "self-contained-behavioral-v1",
+    "hidden_test_witnesses": [
+      {
+        "hidden_test_fingerprint": "sha256:dee1f770d2751b0cd6ea22fc78f695346caeb769b2bd94087200622fda35d42c",
+        "clause_ids": [
+          "REQ-002",
+          "REQ-003",
+          "REQ-004"
+        ]
+      }
+    ],
+    "runner_witnesses": [
+      {
+        "witness_id": "semantic-oracle-and-closed-mutation-set",
+        "clause_ids": [
+          "REQ-001",
+          "REQ-002",
+          "REQ-003",
+          "REQ-004",
+          "REQ-005"
+        ]
+      }
+    ]
+  }
+}

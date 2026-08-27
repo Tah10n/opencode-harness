@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-small-01",
+  "split": "validation",
+  "stratum": "small",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "observed-bug: Observed upstream behavior defect:\nfix: don't report shadowed undefined in no-throw-literal (#21010)",
+    "required-behavior: Correct the observed defect so the documented behavioral examples and their semantic equivalents produce the expected ESLint behavior.",
+    "preserved-behavior: Preserve all pre-existing behavior, diagnostics, options, and public APIs outside the observed defect; the full pre-existing upstream test suite remains authoritative.",
+    "boundary-error-cases: Public behavioral examples (test-only diff, not implementation):\ndiff --git a/tests/lib/rules/no-throw-literal.js b/tests/lib/rules/no-throw-literal.js\nindex 93a1a1008..ca5247811 100644\n--- a/tests/lib/rules/no-throw-literal.js\n+++ b/tests/lib/rules/no-throw-literal.js\n@@ -24,6 +24,7 @@ ruleTester.run(\"no-throw-literal\", rule, {\n \t\t\"throw new Error('error');\",\n \t\t\"throw Error('error');\",\n \t\t\"var e = new Error(); throw e;\",\n+\t\t\"function foo(undefined) { throw undefined; }\",\n \t\t\"try {throw new Error();} catch (e) {throw e;};\",\n \t\t\"throw a;\", // Identifier\n \t\t\"throw foo();\", // CallExpression",
+    "allowed-mutation: Modify only these supplied source paths: lib/rules/no-throw-literal.js. Do not add, delete, rename, or change modes of other paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-validation-small-01-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "observed-bug",
+        "text": "Observed upstream behavior defect:\nfix: don't report shadowed undefined in no-throw-literal (#21010)"
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "required-behavior",
+        "text": "Correct the observed defect so the documented behavioral examples and their semantic equivalents produce the expected ESLint behavior."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "preserved-behavior",
+        "text": "Preserve all pre-existing behavior, diagnostics, options, and public APIs outside the observed defect; the full pre-existing upstream test suite remains authoritative."
+      },
+      {
+        "clause_id": "REQ-004",
+        "kind": "boundary-error-cases",
+        "text": "Public behavioral examples (test-only diff, not implementation):\ndiff --git a/tests/lib/rules/no-throw-literal.js b/tests/lib/rules/no-throw-literal.js\nindex 93a1a1008..ca5247811 100644\n--- a/tests/lib/rules/no-throw-literal.js\n+++ b/tests/lib/rules/no-throw-literal.js\n@@ -24,6 +24,7 @@ ruleTester.run(\"no-throw-literal\", rule, {\n \t\t\"throw new Error('error');\",\n \t\t\"throw Error('error');\",\n \t\t\"var e = new Error(); throw e;\",\n+\t\t\"function foo(undefined) { throw undefined; }\",\n \t\t\"try {throw new Error();} catch (e) {throw e;};\",\n \t\t\"throw a;\", // Identifier\n \t\t\"throw foo();\", // CallExpression"
+      },
+      {
+        "clause_id": "REQ-005",
+        "kind": "allowed-mutation",
+        "text": "Modify only these supplied source paths: lib/rules/no-throw-literal.js. Do not add, delete, rename, or change modes of other paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:1b5030698b6fab87ddfc3d73a461869e9223f2defb10cf68d00c6dc4c0b8970e"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-throw-literal.js",
+      "content": "/**\n * @fileoverview Rule to restrict what can be thrown as an exception.\n * @author Dieter Oberkofler\n */\n\n\"use strict\";\n\nconst astUtils = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../types').Rule.RuleModule} */\nmodule.exports = {\n\tmeta: {\n\t\ttype: \"suggestion\",\n\n\t\tdocs: {\n\t\t\tdescription: \"Disallow throwing literals as exceptions\",\n\t\t\trecommended: false,\n\t\t\turl: \"https://eslint.org/docs/latest/rules/no-throw-literal\",\n\t\t},\n\n\t\tschema: [],\n\n\t\tmessages: {\n\t\t\tobject: \"Expected an error object to be thrown.\",\n\t\t\tundef: \"Do not throw undefined.\",\n\t\t},\n\t},\n\n\tcreate(context) {\n\t\treturn {\n\t\t\tThrowStatement(node) {\n\t\t\t\tif (!astUtils.couldBeError(node.argument)) {\n\t\t\t\t\tcontext.report({ node, messageId: \"object\" });\n\t\t\t\t} else if (node.argument.type === \"Identifier\") {\n\t\t\t\t\tif (node.argument.name === \"undefined\") {\n\t\t\t\t\t\tcontext.report({ node, messageId: \"undef\" });\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t},\n\t\t};\n\t},\n};\n"
+    }
+  ]
+}

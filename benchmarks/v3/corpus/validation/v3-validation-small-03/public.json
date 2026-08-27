@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-small-03",
+  "split": "validation",
+  "stratum": "small",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "observed-bug: Observed upstream behavior defect:\nfeat: add `includeIgnoreFile()` to `eslint/config` (#20735)\n\n* add new reexports to eslint/config\n\n* update docs\n\n* tweak migration guide\n\n* update\n\n* dont export convertIgnorePatternToMinimatch\n\n* remove todo\n\n* gitignoreResolution: boolean\n\n* Update docs/src/use/configure/ignore.md\n\nCo-authored-by: Milos Djermanovic <milos.djermanovic@gmail.com>\n\n* defineConfig([\n\n* Update docs/src/use/configure/ignore.md\n\nCo-authored-by: Milos Djermanovic <milos.djermanovic@gmail.com>\n\n* Update docs/src/use/configure/migration-guide.md\n\nCo-authored-by: Milos Djermanovic <milos.djermanovic@gmail.com>\n\n* feedback\n\n* test export\n\n* add some type tests for includeIgnoreFile\n\n---------\n\nCo-authored-by: Milos Djermanovic <milos.djermanovic@gmail.com>",
+    "required-behavior: Correct the observed defect so the documented behavioral examples and their semantic equivalents produce the expected ESLint behavior.",
+    "preserved-behavior: Preserve all pre-existing behavior, diagnostics, options, and public APIs outside the observed defect; the full pre-existing upstream test suite remains authoritative.",
+    "boundary-error-cases: Public behavioral examples (test-only diff, not implementation):\ndiff --git a/tests/lib/config-api.js b/tests/lib/config-api.js\nindex c1e0f1982..3f14319d1 100644\n--- a/tests/lib/config-api.js\n+++ b/tests/lib/config-api.js\n@@ -24,4 +24,8 @@ describe(\"config-api\", () => {\n \tit(\"should have globalIgnores exposed\", () => {\n \t\tassert.isFunction(api.globalIgnores);\n \t});\n+\n+\tit(\"should have includeIgnoreFile()` exposed\", () => {\n+\t\tassert.isFunction(api.includeIgnoreFile);\n+\t});\n });",
+    "allowed-mutation: Modify only these supplied source paths: lib/config-api.js. Do not add, delete, rename, or change modes of other paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-validation-small-03-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "observed-bug",
+        "text": "Observed upstream behavior defect:\nfeat: add `includeIgnoreFile()` to `eslint/config` (#20735)\n\n* add new reexports to eslint/config\n\n* update docs\n\n* tweak migration guide\n\n* update\n\n* dont export convertIgnorePatternToMinimatch\n\n* remove todo\n\n* gitignoreResolution: boolean\n\n* Update docs/src/use/configure/ignore.md\n\nCo-authored-by: Milos Djermanovic <milos.djermanovic@gmail.com>\n\n* defineConfig([\n\n* Update docs/src/use/configure/ignore.md\n\nCo-authored-by: Milos Djermanovic <milos.djermanovic@gmail.com>\n\n* Update docs/src/use/configure/migration-guide.md\n\nCo-authored-by: Milos Djermanovic <milos.djermanovic@gmail.com>\n\n* feedback\n\n* test export\n\n* add some type tests for includeIgnoreFile\n\n---------\n\nCo-authored-by: Milos Djermanovic <milos.djermanovic@gmail.com>"
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "required-behavior",
+        "text": "Correct the observed defect so the documented behavioral examples and their semantic equivalents produce the expected ESLint behavior."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "preserved-behavior",
+        "text": "Preserve all pre-existing behavior, diagnostics, options, and public APIs outside the observed defect; the full pre-existing upstream test suite remains authoritative."
+      },
+      {
+        "clause_id": "REQ-004",
+        "kind": "boundary-error-cases",
+        "text": "Public behavioral examples (test-only diff, not implementation):\ndiff --git a/tests/lib/config-api.js b/tests/lib/config-api.js\nindex c1e0f1982..3f14319d1 100644\n--- a/tests/lib/config-api.js\n+++ b/tests/lib/config-api.js\n@@ -24,4 +24,8 @@ describe(\"config-api\", () => {\n \tit(\"should have globalIgnores exposed\", () => {\n \t\tassert.isFunction(api.globalIgnores);\n \t});\n+\n+\tit(\"should have includeIgnoreFile()` exposed\", () => {\n+\t\tassert.isFunction(api.includeIgnoreFile);\n+\t});\n });"
+      },
+      {
+        "clause_id": "REQ-005",
+        "kind": "allowed-mutation",
+        "text": "Modify only these supplied source paths: lib/config-api.js. Do not add, delete, rename, or change modes of other paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:848db35c0943a9f793250d427e999a39640fb8db30862b587e261050a3eed6a0"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/config-api.js",
+      "content": "/**\n * @fileoverview exports for config helpers\n * @author Nicholas C. Zakas\n */\n\n\"use strict\";\nconst { defineConfig, globalIgnores } = require(\"@eslint/config-helpers\");\n\nmodule.exports = {\n\tdefineConfig,\n\tglobalIgnores,\n};\n"
+    }
+  ]
+}

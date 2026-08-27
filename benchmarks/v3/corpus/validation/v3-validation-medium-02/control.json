@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-medium-02",
+  "oracle": "upstream-eslint-rule-test-and-closed-mutation-set",
+  "defect_severity": "unclassified",
+  "reference_files": [
+    {
+      "path": "lib/rules/no-sequences.js",
+      "content": "/**\n * @fileoverview Rule to flag use of comma operator\n * @author Brandon Mills\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst astUtils = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Helpers\n//------------------------------------------------------------------------------\n\nconst DEFAULT_OPTIONS = {\n    allowInParentheses: true\n};\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\nmodule.exports = {\n    meta: {\n        type: \"suggestion\",\n\n        docs: {\n            description: \"disallow comma operators\",\n            category: \"Best Practices\",\n            recommended: false,\n            url: \"https://eslint.org/docs/rules/no-sequences\"\n        },\n\n        schema: [{\n            properties: {\n                allowInParentheses: {\n                    type: \"boolean\",\n                    default: true\n                }\n            },\n            additionalProperties: false\n        }],\n\n        messages: {\n            unexpectedCommaExpression: \"Unexpected use of comma operator.\"\n        }\n    },\n\n    create(context) {\n        const options = Object.assign({}, DEFAULT_OPTIONS, context.options[0]);\n        const sourceCode = context.getSourceCode();\n\n        /**\n         * Parts of the grammar that are required to have parens.\n         */\n        const parenthesized = {\n            DoWhileStatement: \"test\",\n            IfStatement: \"test\",\n            SwitchStatement: \"discriminant\",\n            WhileStatement: \"test\",\n            WithStatement: \"object\",\n            ArrowFunctionExpression: \"body\"\n\n            /*\n             * Omitting CallExpression - commas are parsed as argument separators\n             * Omitting NewExpression - commas are parsed as argument separators\n             * Omitting ForInStatement - parts aren't individually parenthesised\n             * Omitting ForStatement - parts aren't individually parenthesised\n             */\n        };\n\n        /**\n         * Determines whether a node is required by the grammar to be wrapped in\n         * parens, e.g. the test of an if statement.\n         * @param {ASTNode} node The AST node\n         * @returns {boolean} True if parens around node belong to parent node.\n         */\n        function requiresExtraParens(node) {\n            return node.parent && parenthesized[node.parent.type] &&\n                    node === node.parent[parenthesized[node.parent.type]];\n        }\n\n        /**\n         * Check if a node is wrapped in parens.\n         * @param {ASTNode} node The AST node\n         * @returns {boolean} True if the node has a paren on each side.\n         */\n        function isParenthesised(node) {\n            return astUtils.isParenthesised(sourceCode, node);\n        }\n\n        /**\n         * Check if a node is wrapped in two levels of parens.\n         * @param {ASTNode} node The AST node\n         * @returns {boolean} True if two parens surround the node on each side.\n         */\n        function isParenthesisedTwice(node) {\n            const previousToken = sourceCode.getTokenBefore(node, 1),\n                nextToken = sourceCode.getTokenAfter(node, 1);\n\n            return isParenthesised(node) && previousToken && nextToken &&\n                astUtils.isOpeningParenToken(previousToken) && previousToken.range[1] <= node.range[0] &&\n                astUtils.isClosingParenToken(nextToken) && nextToken.range[0] >= node.range[1];\n        }\n\n        return {\n            SequenceExpression(node) {\n\n                // Always allow sequences in for statement update\n                if (node.parent.type === \"ForStatement\" &&\n                        (node === node.parent.init || node === node.parent.update)) {\n                    return;\n                }\n\n                // Wrapping a sequence in extra parens indicates intent\n                if (options.allowInParentheses) {\n                    if (requiresExtraParens(node)) {\n                        if (isParenthesisedTwice(node)) {\n                            return;\n                        }\n                    } else {\n                        if (isParenthesised(node)) {\n                            return;\n                        }\n                    }\n                }\n\n                const firstCommaToken = sourceCode.getTokenAfter(node.expressions[0], astUtils.isCommaToken);\n\n                context.report({ node, loc: firstCommaToken.loc, messageId: \"unexpectedCommaExpression\" });\n            }\n        };\n\n    }\n};\n"
+    }
+  ],
+  "hidden_test_files": [
+    {
+      "path": "tests/lib/rules/no-sequences.js",
+      "content": "/**\n * @fileoverview Tests for no-sequences rule.\n * @author Brandon Mills\n */\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst rule = require(\"../../../lib/rules/no-sequences\"),\n    { RuleTester } = require(\"../../../lib/rule-tester\");\n\n//------------------------------------------------------------------------------\n// Tests\n//------------------------------------------------------------------------------\n\n/**\n * Create error message object for failure cases\n * @param {int} column column of the error\n * @returns {Object} returns the error messages collection\n * @private\n */\nfunction errors(column) {\n    return [{\n        messageId: \"unexpectedCommaExpression\",\n        type: \"SequenceExpression\",\n        line: 1,\n        column\n    }];\n}\n\nconst ruleTester = new RuleTester();\n\nruleTester.run(\"no-sequences\", rule, {\n\n    // Examples of code that should not trigger the rule\n    valid: [\n        \"var arr = [1, 2];\",\n        \"var obj = {a: 1, b: 2};\",\n        \"var a = 1, b = 2;\",\n        \"var foo = (1, 2);\",\n        \"(0,eval)(\\\"foo()\\\");\",\n        \"for (i = 1, j = 2;; i++, j++);\",\n        \"foo(a, (b, c), d);\",\n        \"do {} while ((doSomething(), !!test));\",\n        \"for ((doSomething(), somethingElse()); (doSomething(), !!test); );\",\n        \"if ((doSomething(), !!test));\",\n        \"switch ((doSomething(), val)) {}\",\n        \"while ((doSomething(), !!test));\",\n        \"with ((doSomething(), val)) {}\",\n        { code: \"a => ((doSomething(), a))\", env: { es6: true } },\n\n        // options object without \"allowInParentheses\" property\n        { code: \"var foo = (1, 2);\", options: [{}] },\n\n        // explicitly set option \"allowInParentheses\" to default value\n        { code: \"var foo = (1, 2);\", options: [{ allowInParentheses: true }] },\n\n        // valid code with \"allowInParentheses\" set to `false`\n        { code: \"for ((i = 0, j = 0); test; );\", options: [{ allowInParentheses: false }] },\n        { code: \"for (; test; (i++, j++));\", options: [{ allowInParentheses: false }] }\n    ],\n\n    // Examples of code that should trigger the rule\n    invalid: [\n        {\n            code: \"1, 2;\",\n            errors: [{\n                messageId: \"unexpectedCommaExpression\",\n                type: \"SequenceExpression\",\n                line: 1,\n                column: 2,\n                endLine: 1,\n                endColumn: 3\n            }]\n        },\n        { code: \"a = 1, 2\", errors: errors(6) },\n        { code: \"do {} while (doSomething(), !!test);\", errors: errors(27) },\n        { code: \"for (; doSomething(), !!test; );\", errors: errors(21) },\n        { code: \"if (doSomething(), !!test);\", errors: errors(18) },\n        { code: \"switch (doSomething(), val) {}\", errors: errors(22) },\n        { code: \"while (doSomething(), !!test);\", errors: errors(21) },\n        { code: \"with (doSomething(), val) {}\", errors: errors(20) },\n        { code: \"a => (doSomething(), a)\", env: { es6: true }, errors: errors(20) },\n        { code: \"(1), 2\", errors: errors(4) },\n        { code: \"((1)) , (2)\", errors: errors(7) },\n        { code: \"while((1) , 2);\", errors: errors(11) },\n\n        // option \"allowInParentheses\": do not allow sequence in parentheses\n        { code: \"var foo = (1, 2);\", options: [{ allowInParentheses: false }], errors: errors(13) },\n        { code: \"(0,eval)(\\\"foo()\\\");\", options: [{ allowInParentheses: false }], errors: errors(3) },\n        { code: \"foo(a, (b, c), d);\", options: [{ allowInParentheses: false }], errors: errors(10) },\n        { code: \"do {} while ((doSomething(), !!test));\", options: [{ allowInParentheses: false }], errors: errors(28) },\n        { code: \"for (; (doSomething(), !!test); );\", options: [{ allowInParentheses: false }], errors: errors(22) },\n        { code: \"if ((doSomething(), !!test));\", options: [{ allowInParentheses: false }], errors: errors(19) },\n        { code: \"switch ((doSomething(), val)) {}\", options: [{ allowInParentheses: false }], errors: errors(23) },\n        { code: \"while ((doSomething(), !!test));\", options: [{ allowInParentheses: false }], errors: errors(22) },\n        { code: \"with ((doSomething(), val)) {}\", options: [{ allowInParentheses: false }], errors: errors(21) },\n        { code: \"a => ((doSomething(), a))\", options: [{ allowInParentheses: false }], env: { es6: true }, errors: errors(21) }\n    ]\n});\n"
+    }
+  ],
+  "allowed_mutation_paths": [
+    "lib/rules/no-sequences.js"
+  ],
+  "test_argv": [
+    "--timeout",
+    "30000",
+    "tests/lib/rules/no-sequences.js"
+  ],
+  "runtime_key": "eslint-v7",
+  "runtime_version": "7.22",
+  "provenance": {
+    "kind": "real-commit-derived",
+    "repository": "https://github.com/eslint/eslint",
+    "source_commit": "687ccae517b8b815cf21e948f80d22e2bf118a99",
+    "parent_commit": "dbf252964d9a2b8957cfe0aed5c87a6d4a5cce24",
+    "source_paths": [
+      "lib/rules/no-sequences.js"
+    ],
+    "patch_fingerprint": "sha256:751d17d8d7e8d27e509f40d43deebd941b5cffb5797379319babb8364e823851",
+    "visible_requirement_fingerprint": "sha256:e01a9016af8b17d52e06ff6af75d030ad199427facd69a619a0cd511ff114571",
+    "license": "MIT",
+    "license_fingerprint": "sha256:73e2034fe7f17e603f7c3a4bb7f8b71db11a63f94907d08e756c9d4d72a35505"
+  },
+  "requirement_coverage": {
+    "schema_version": 1,
+    "contract_fingerprint": "sha256:5e2300a3aff9fd87eb9feb37ab0c729c9ee6da60527988b3551836ec2cdf3ec2",
+    "contract_completeness": "self-contained-behavioral-v1",
+    "hidden_test_witnesses": [
+      {
+        "hidden_test_fingerprint": "sha256:0635138d88739115b0737643fc7b35308434d9d10c7f889428319fdb28f6bf8d",
+        "clause_ids": [
+          "REQ-002",
+          "REQ-003",
+          "REQ-004"
+        ]
+      }
+    ],
+    "runner_witnesses": [
+      {
+        "witness_id": "semantic-oracle-and-closed-mutation-set",
+        "clause_ids": [
+          "REQ-001",
+          "REQ-002",
+          "REQ-003",
+          "REQ-004",
+          "REQ-005"
+        ]
+      }
+    ]
+  }
+}

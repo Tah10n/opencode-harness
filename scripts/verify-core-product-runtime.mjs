@@ -7,9 +7,11 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { materializeProfileBundleV3 } from "../lib/profile-v3.mjs";
 import { sanitizeSyntheticModelFreeFailureDiagnostic } from "../lib/benchmark/self-test.mjs";
-import { runContainedOpenCode } from "../runtime/opencode-core.mjs";
+import { runContainedOpenCode, runCoreLauncher } from "../runtime/opencode-core.mjs";
 import {
+  CORE_CHECK_CATALOG_PATH,
   changedCoreWorkspacePaths,
+  coreTrustedCheckCommandFingerprint,
   loadCoreVerificationCatalog,
   runCoreTrustedCheck,
   snapshotCoreWorkspace,
@@ -37,7 +39,7 @@ function writeCatalog(checks, targetWorkspace = workspace) {
   const directory = path.dirname(catalogPath);
   fs.mkdirSync(directory, { recursive: true });
   fs.writeFileSync(catalogPath, `${JSON.stringify({
-    schema_version: 1,
+    schema_version: 2,
     catalog_id: "installed-core-fixture",
     checks,
   }, null, 2)}\n`, "utf8");
@@ -50,6 +52,8 @@ function check(overrides = {}) {
     cost_rank: 1,
     executable_path: trustedSystemExecutable,
     argv: shellArguments("exit 0"),
+    immutable_input_paths: [],
+    subject_paths: ["src/feature.mjs"],
     cwd: ".",
     timeout_ms: 10_000,
     ...overrides,
@@ -116,10 +120,14 @@ try {
   writeCatalog([check()]);
   const catalog = loadCoreVerificationCatalog(workspace);
   assert.equal(catalog.catalog_status, "loaded");
+  assert.equal(catalog.checks[0].input_manifest.length, 0, "mutable check subject leaked into immutable inputs");
+  const commandBindingBeforeMutation = coreTrustedCheckCommandFingerprint(catalog.checks[0]);
   const before = snapshotCoreWorkspace(workspace);
   fs.writeFileSync(path.join(workspace, "src", "feature.mjs"), "export const value = 2;\n", "utf8");
   const after = snapshotCoreWorkspace(workspace);
   assert.deepEqual(changedCoreWorkspacePaths(before, after), ["src/feature.mjs"]);
+  assert.equal(coreTrustedCheckCommandFingerprint(catalog.checks[0]), commandBindingBeforeMutation,
+    "subject byte mutation changed the bound host/check identity");
 
   const passed = await verifyCoreWorkspaceMutation({
     catalog, before, after, processContainmentFactory: injectedProcessGroupContainment,
@@ -200,7 +208,7 @@ try {
     assert.equal(result.decision.reason, reason);
   }
 
-  writeCatalog([check({ check_id: "docs-check", scope_prefixes: ["docs"] })]);
+  writeCatalog([check({ check_id: "docs-check", scope_prefixes: ["docs"], subject_paths: ["docs/readme.md"] })]);
   const unrelatedCatalog = loadCoreVerificationCatalog(workspace);
   const unrelated = await verifyCoreWorkspaceMutation({ catalog: unrelatedCatalog, before, after });
   assert.equal(unrelated.decision.allowed, true);
@@ -235,7 +243,8 @@ try {
   const checkFile = process.platform === "win32" ? "check.cmd" : "check.sh";
   fs.writeFileSync(path.join(workspace, checkFile), process.platform === "win32" ? "@exit /b 0\r\n" : "exit 0\n", "utf8");
   const trustedInputCheck = check({ executable_path: fixtureExecutable,
-    argv: process.platform === "win32" ? ["/d", "/s", "/c", checkFile] : [checkFile] });
+    argv: process.platform === "win32" ? ["/d", "/s", "/c", checkFile] : [checkFile],
+    immutable_input_paths: ["package.json", checkFile] });
   if (process.platform !== "win32") {
     const insideTarget = path.join(workspace, "initial-link-target.sh");
     const outsideTarget = path.join(temporaryRoot, "outside-link-target.sh");
@@ -294,7 +303,8 @@ try {
   if (process.platform !== "win32") fs.chmodSync(trustedCwd, 0o700);
   fs.writeFileSync(path.join(trustedCwd, checkFile), process.platform === "win32" ? "@exit /b 0\r\n" : "exit 0\n", "utf8");
   const cwdCheck = check({ executable_path: fixtureExecutable,
-    argv: process.platform === "win32" ? ["/d", "/s", "/c", checkFile] : [checkFile], cwd: "trusted-cwd" });
+    argv: process.platform === "win32" ? ["/d", "/s", "/c", checkFile] : [checkFile], cwd: "trusted-cwd",
+    immutable_input_paths: [`trusted-cwd/${checkFile}`] });
   writeCatalog([cwdCheck]);
   const cwdCatalog = loadCoreVerificationCatalog(workspace);
   fs.renameSync(trustedCwd, `${trustedCwd}-old`);
@@ -397,6 +407,7 @@ try {
       writeCatalog([check({
         executable_path: nodeFixtureExecutable,
         argv: [path.basename(script), pidFile, marker, String(writerDelayMs)],
+        immutable_input_paths: [path.basename(script)],
         timeout_ms: timeoutMs,
       })], containedWorkspace);
       const containedCatalog = loadCoreVerificationCatalog(containedWorkspace);
@@ -449,6 +460,32 @@ try {
     assert.equal(contained.status, 0);
     await new Promise((resolve) => setTimeout(resolve, 750));
     assert.equal(fs.existsSync(delayedMarker), false, "delayed descendant mutated after final teardown snapshot boundary");
+    writeCatalog([check()]);
+    const timedLauncher = await runCoreLauncher({ workspace, catalog: CORE_CHECK_CATALOG_PATH,
+      opencode: process.execPath, opencodeArgs: ["-e", "setInterval(()=>{},1000)"], childTimeoutMs: 50,
+      env: process.env }, { processContainmentFactory: async (worker) => injectedProcessGroupContainment(worker) });
+    assert.equal(timedLauncher.receipt.child_execution.status, null);
+    assert.equal(timedLauncher.receipt.child_execution.error_code, "ETIMEDOUT",
+      "a wrapper-managed child timeout must still yield an authentic child-execution receipt");
+    assert.equal(timedLauncher.receipt.child_execution.signal, "SIGKILL");
+    const postChildFailure = await runCoreLauncher({ workspace, catalog: CORE_CHECK_CATALOG_PATH,
+      opencode: process.execPath, opencodeArgs: ["-e", "process.exit(0)"],
+      childTimeoutMs: 5_000, env: process.env },
+    { processContainmentFactory: async (worker) => injectedProcessGroupContainment(worker),
+      verifyCoreWorkspaceMutationFn: async () => { throw new Error("synthetic post-child verification failure"); } });
+    assert.equal(postChildFailure.receipt.child_execution.status, 0);
+    assert.equal(postChildFailure.receipt.decision.reason, "post_child_verification_failed",
+      "post-child verification exceptions must preserve the authentic child-execution receipt");
+    const unverifiedContainment = await runCoreLauncher({ workspace, catalog: CORE_CHECK_CATALOG_PATH,
+      opencode: process.execPath, opencodeArgs: ["-e", "process.exit(0)"], childTimeoutMs: 5_000, env: process.env },
+    { processContainmentFactory: async (worker) => {
+      const base = injectedProcessGroupContainment(worker);
+      return Object.freeze({ ...base, terminateAndVerify: async () => { await base.terminateAndVerify(); return false; },
+        close: async () => true, status: () => Object.freeze({ teardown_verified: false }) });
+    } });
+    assert.equal(unverifiedContainment.receipt.child_execution.status, 0);
+    assert.equal(unverifiedContainment.receipt.child_execution.error_code, "PROCESS_CONTAINMENT_UNVERIFIED",
+      "post-child teardown failure must preserve child disposition while remaining infrastructure-invalid");
   }
 
   const materializedRoot = path.join(temporaryRoot, "materialized-core");

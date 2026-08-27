@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-small-16",
+  "oracle": "upstream-eslint-rule-test-and-closed-mutation-set",
+  "defect_severity": "unclassified",
+  "reference_files": [
+    {
+      "path": "lib/rules/linebreak-style.js",
+      "content": "/**\n * @fileoverview Rule to enforce a single linebreak style.\n * @author Erik Mueller\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst astUtils = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\nmodule.exports = {\n    meta: {\n        type: \"layout\",\n\n        docs: {\n            description: \"enforce consistent linebreak style\",\n            category: \"Stylistic Issues\",\n            recommended: false,\n            url: \"https://eslint.org/docs/rules/linebreak-style\"\n        },\n\n        fixable: \"whitespace\",\n\n        schema: [\n            {\n                enum: [\"unix\", \"windows\"]\n            }\n        ],\n        messages: {\n            expectedLF: \"Expected linebreaks to be 'LF' but found 'CRLF'.\",\n            expectedCRLF: \"Expected linebreaks to be 'CRLF' but found 'LF'.\"\n        }\n    },\n\n    create(context) {\n        const sourceCode = context.getSourceCode();\n\n        //--------------------------------------------------------------------------\n        // Helpers\n        //--------------------------------------------------------------------------\n\n        /**\n         * Builds a fix function that replaces text at the specified range in the source text.\n         * @param {int[]} range The range to replace\n         * @param {string} text The text to insert.\n         * @returns {Function} Fixer function\n         * @private\n         */\n        function createFix(range, text) {\n            return function(fixer) {\n                return fixer.replaceTextRange(range, text);\n            };\n        }\n\n        //--------------------------------------------------------------------------\n        // Public\n        //--------------------------------------------------------------------------\n\n        return {\n            Program: function checkForLinebreakStyle(node) {\n                const linebreakStyle = context.options[0] || \"unix\",\n                    expectedLF = linebreakStyle === \"unix\",\n                    expectedLFChars = expectedLF ? \"\\n\" : \"\\r\\n\",\n                    source = sourceCode.getText(),\n                    pattern = astUtils.createGlobalLinebreakMatcher();\n                let match;\n\n                let i = 0;\n\n                while ((match = pattern.exec(source)) !== null) {\n                    i++;\n                    if (match[0] === expectedLFChars) {\n                        continue;\n                    }\n\n                    const index = match.index;\n                    const range = [index, index + match[0].length];\n\n                    context.report({\n                        node,\n                        loc: {\n                            start: {\n                                line: i,\n                                column: sourceCode.lines[i - 1].length\n                            },\n                            end: {\n                                line: i + 1,\n                                column: 0\n                            }\n                        },\n                        messageId: expectedLF ? \"expectedLF\" : \"expectedCRLF\",\n                        fix: createFix(range, expectedLFChars)\n                    });\n                }\n            }\n        };\n    }\n};\n"
+    }
+  ],
+  "hidden_test_files": [
+    {
+      "path": "tests/lib/rules/linebreak-style.js",
+      "content": "/**\n * @fileoverview No mixed linebreaks\n * @author Erik Mueller\n */\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst rule = require(\"../../../lib/rules/linebreak-style\"),\n    { RuleTester } = require(\"../../../lib/rule-tester\");\n\n//------------------------------------------------------------------------------\n// Tests\n//------------------------------------------------------------------------------\n\nconst ruleTester = new RuleTester();\n\nruleTester.run(\"linebreak-style\", rule, {\n\n    valid: [\n        \"var a = 'a',\\n b = 'b';\\n\\n function foo(params) {\\n /* do stuff */ \\n }\\n\",\n        {\n            code: \"var a = 'a',\\n b = 'b';\\n\\n function foo(params) {\\n /* do stuff */ \\n }\\n\",\n            options: [\"unix\"]\n        },\n        {\n            code: \"var a = 'a',\\r\\n b = 'b';\\r\\n\\r\\n function foo(params) {\\r\\n /* do stuff */ \\r\\n }\\r\\n\",\n            options: [\"windows\"]\n        },\n        {\n            code: \"var b = 'b';\",\n            options: [\"unix\"]\n        },\n        {\n            code: \"var b = 'b';\",\n            options: [\"windows\"]\n        }\n    ],\n\n    invalid: [\n        {\n            code: \"var a = 'a';\\r\\n\",\n            output: \"var a = 'a';\\n\",\n            errors: [{\n                line: 1,\n                column: 13,\n                endLine: 2,\n                endColumn: 1,\n                messageId: \"expectedLF\"\n            }]\n        },\n        {\n            code: \"var a = 'a';\\r\\n\",\n            output: \"var a = 'a';\\n\",\n            options: [\"unix\"],\n            errors: [{\n                line: 1,\n                column: 13,\n                endLine: 2,\n                endColumn: 1,\n                messageId: \"expectedLF\"\n            }]\n        },\n        {\n            code: \"var a = 'a';\\n\",\n            output: \"var a = 'a';\\r\\n\",\n            options: [\"windows\"],\n            errors: [{\n                line: 1,\n                column: 13,\n                endLine: 2,\n                endColumn: 1,\n                messageId: \"expectedCRLF\"\n            }]\n        },\n        {\n            code: \"var a = 'a',\\n b = 'b';\\n\\n function foo(params) {\\r\\n /* do stuff */ \\n }\\r\\n\",\n            output: \"var a = 'a',\\n b = 'b';\\n\\n function foo(params) {\\n /* do stuff */ \\n }\\n\",\n            errors: [{\n                line: 4,\n                column: 24,\n                endLine: 5,\n                endColumn: 1,\n                messageId: \"expectedLF\"\n            },\n            {\n                line: 6,\n                column: 3,\n                endLine: 7,\n                endColumn: 1,\n                messageId: \"expectedLF\"\n            }]\n        },\n        {\n            code: \"var a = 'a',\\r\\n b = 'b';\\r\\n\\n function foo(params) {\\r\\n\\n /* do stuff */ \\n }\\r\\n\",\n            output: \"var a = 'a',\\r\\n b = 'b';\\r\\n\\r\\n function foo(params) {\\r\\n\\r\\n /* do stuff */ \\r\\n }\\r\\n\",\n            options: [\"windows\"],\n            errors: [{\n                line: 3,\n                column: 1,\n                endLine: 4,\n                endColumn: 1,\n                messageId: \"expectedCRLF\"\n            },\n            {\n                line: 5,\n                column: 1,\n                endLine: 6,\n                endColumn: 1,\n                messageId: \"expectedCRLF\"\n            },\n            {\n                line: 6,\n                column: 17,\n                endLine: 7,\n                endColumn: 1,\n                messageId: \"expectedCRLF\"\n            }]\n        },\n        {\n            code: \"\\r\\n\",\n            output: \"\\n\",\n            options: [\"unix\"],\n            errors: [{\n                line: 1,\n                column: 1,\n                endLine: 2,\n                endColumn: 1,\n                messageId: \"expectedLF\"\n            }]\n        },\n        {\n            code: \"\\n\",\n            output: \"\\r\\n\",\n            options: [\"windows\"],\n            errors: [{\n                line: 1,\n                column: 1,\n                endLine: 2,\n                endColumn: 1,\n                messageId: \"expectedCRLF\"\n            }]\n        }\n    ]\n});\n"
+    }
+  ],
+  "allowed_mutation_paths": [
+    "lib/rules/linebreak-style.js"
+  ],
+  "test_argv": [
+    "--timeout",
+    "30000",
+    "tests/lib/rules/linebreak-style.js"
+  ],
+  "runtime_key": "eslint-v7",
+  "runtime_version": "7.0",
+  "provenance": {
+    "kind": "real-commit-derived",
+    "repository": "https://github.com/eslint/eslint",
+    "source_commit": "89e10811c4df666216aae58bff5f855cd9df738b",
+    "parent_commit": "08913798b4ec420b261b8fbc470504f9f248c840",
+    "source_paths": [
+      "lib/rules/linebreak-style.js"
+    ],
+    "patch_fingerprint": "sha256:a02d0d9416cb07ade8b19110b82b21f8fee2bb47b284f79be63e7a1acfc388b7",
+    "visible_requirement_fingerprint": "sha256:8fd58cf798dce76d59da5a37a61b949c50cfdeec45b9ffaf8db77de0df9a5ba9",
+    "license": "MIT",
+    "license_fingerprint": "sha256:73e2034fe7f17e603f7c3a4bb7f8b71db11a63f94907d08e756c9d4d72a35505"
+  },
+  "requirement_coverage": {
+    "schema_version": 1,
+    "contract_fingerprint": "sha256:c4bf91141b7a847c878cab432eb90ebd0b6564a623ce175a60bf51cda6fcdad9",
+    "contract_completeness": "self-contained-behavioral-v1",
+    "hidden_test_witnesses": [
+      {
+        "hidden_test_fingerprint": "sha256:e8a7fd0c92655b6b379ffe4a47f47ca71b27b76e55a60a5ee2ef12084bff0b18",
+        "clause_ids": [
+          "REQ-002",
+          "REQ-003",
+          "REQ-004"
+        ]
+      }
+    ],
+    "runner_witnesses": [
+      {
+        "witness_id": "semantic-oracle-and-closed-mutation-set",
+        "clause_ids": [
+          "REQ-001",
+          "REQ-002",
+          "REQ-003",
+          "REQ-004",
+          "REQ-005"
+        ]
+      }
+    ]
+  }
+}

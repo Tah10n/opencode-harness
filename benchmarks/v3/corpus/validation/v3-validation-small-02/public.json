@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-small-02",
+  "split": "validation",
+  "stratum": "small",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "observed-bug: Observed upstream behavior defect:\nFix: report end loc in one-var-declaration-per-line (refs #12334) (#13326)",
+    "required-behavior: Correct the observed defect so the documented behavioral examples and their semantic equivalents produce the expected ESLint behavior.",
+    "preserved-behavior: Preserve all pre-existing behavior, diagnostics, options, and public APIs outside the observed defect; the full pre-existing upstream test suite remains authoritative.",
+    "boundary-error-cases: Public behavioral examples (test-only diff, not implementation):\ndiff --git a/tests/lib/rules/one-var-declaration-per-line.js b/tests/lib/rules/one-var-declaration-per-line.js\nindex 59af62054..3103ef2d7 100644\n--- a/tests/lib/rules/one-var-declaration-per-line.js\n+++ b/tests/lib/rules/one-var-declaration-per-line.js\n@@ -68,6 +68,7 @@ ruleTester.run(\"one-var-declaration-per-line\", rule, {\n     ],\n \n     invalid: [\n+        { code: \"var foo, bar;\", output: \"var foo, \\nbar;\", options: [\"always\"], errors: [{ line: 1, column: 10, endLine: 1, endColumn: 13 }] },\n         { code: \"var a, b;\", output: \"var a, \\nb;\", options: [\"always\"], errors: [errorAt(1, 8)] },\n         { code: \"let a, b;\", output: \"let a, \\nb;\", options: [\"always\"], parserOptions: { ecmaVersion: 6 }, errors: [errorAt(1, 8)] },\n         { code: \"var a, b = 0;\", output: \"var a, \\nb = 0;\", options: [\"always\"], errors: [errorAt(1, 8)] },\n@@ -76,6 +77,7 @@ ruleTester.run(\"one-var-declaration-per-line\", rule, {\n         { code: \"let a, b = 0;\", output: \"let a, \\nb = 0;\", options: [\"always\"], parserOptions: { ecmaVersion: 6 }, errors: [errorAt(1, 8)] },\n         { code: \"const a = 0, b = 0;\", output: \"const a = 0, \\nb = 0;\", options: [\"always\"], parserOptions: { ecmaVersion: 6 }, errors: [errorAt(1, 14)] },\n \n+        { code: \"var foo, bar, baz = 0;\", output: \"var foo, bar, \\nbaz = 0;\", options: [\"initializations\"], errors: [{ line: 1, column: 15, endLine: 1, endColumn: 22 }] },\n         { code: \"var a, b, c = 0;\", output: \"var a, b, \\nc = 0;\", options: [\"initializations\"], errors: [errorAt(1, 11)] },\n         { code: \"var a, b,\\nc = 0, d;\", output: \"var a, b,\\nc = 0, \\nd;\", options: [\"initializations\"], errors: [errorAt(2, 8)] },\n         { code: \"var a, b,\\nc = 0, d = 0;\", output: \"var a, b,\\nc = 0, \\nd = 0;\", options: [\"initializations\"], errors: [errorAt(2, 8)] },",
+    "allowed-mutation: Modify only these supplied source paths: lib/rules/one-var-declaration-per-line.js. Do not add, delete, rename, or change modes of other paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-validation-small-02-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "observed-bug",
+        "text": "Observed upstream behavior defect:\nFix: report end loc in one-var-declaration-per-line (refs #12334) (#13326)"
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "required-behavior",
+        "text": "Correct the observed defect so the documented behavioral examples and their semantic equivalents produce the expected ESLint behavior."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "preserved-behavior",
+        "text": "Preserve all pre-existing behavior, diagnostics, options, and public APIs outside the observed defect; the full pre-existing upstream test suite remains authoritative."
+      },
+      {
+        "clause_id": "REQ-004",
+        "kind": "boundary-error-cases",
+        "text": "Public behavioral examples (test-only diff, not implementation):\ndiff --git a/tests/lib/rules/one-var-declaration-per-line.js b/tests/lib/rules/one-var-declaration-per-line.js\nindex 59af62054..3103ef2d7 100644\n--- a/tests/lib/rules/one-var-declaration-per-line.js\n+++ b/tests/lib/rules/one-var-declaration-per-line.js\n@@ -68,6 +68,7 @@ ruleTester.run(\"one-var-declaration-per-line\", rule, {\n     ],\n \n     invalid: [\n+        { code: \"var foo, bar;\", output: \"var foo, \\nbar;\", options: [\"always\"], errors: [{ line: 1, column: 10, endLine: 1, endColumn: 13 }] },\n         { code: \"var a, b;\", output: \"var a, \\nb;\", options: [\"always\"], errors: [errorAt(1, 8)] },\n         { code: \"let a, b;\", output: \"let a, \\nb;\", options: [\"always\"], parserOptions: { ecmaVersion: 6 }, errors: [errorAt(1, 8)] },\n         { code: \"var a, b = 0;\", output: \"var a, \\nb = 0;\", options: [\"always\"], errors: [errorAt(1, 8)] },\n@@ -76,6 +77,7 @@ ruleTester.run(\"one-var-declaration-per-line\", rule, {\n         { code: \"let a, b = 0;\", output: \"let a, \\nb = 0;\", options: [\"always\"], parserOptions: { ecmaVersion: 6 }, errors: [errorAt(1, 8)] },\n         { code: \"const a = 0, b = 0;\", output: \"const a = 0, \\nb = 0;\", options: [\"always\"], parserOptions: { ecmaVersion: 6 }, errors: [errorAt(1, 14)] },\n \n+        { code: \"var foo, bar, baz = 0;\", output: \"var foo, bar, \\nbaz = 0;\", options: [\"initializations\"], errors: [{ line: 1, column: 15, endLine: 1, endColumn: 22 }] },\n         { code: \"var a, b, c = 0;\", output: \"var a, b, \\nc = 0;\", options: [\"initializations\"], errors: [errorAt(1, 11)] },\n         { code: \"var a, b,\\nc = 0, d;\", output: \"var a, b,\\nc = 0, \\nd;\", options: [\"initializations\"], errors: [errorAt(2, 8)] },\n         { code: \"var a, b,\\nc = 0, d = 0;\", output: \"var a, b,\\nc = 0, \\nd = 0;\", options: [\"initializations\"], errors: [errorAt(2, 8)] },"
+      },
+      {
+        "clause_id": "REQ-005",
+        "kind": "allowed-mutation",
+        "text": "Modify only these supplied source paths: lib/rules/one-var-declaration-per-line.js. Do not add, delete, rename, or change modes of other paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:0a49dcd251c162f0485f64937a86738233900bcc98809b15be81c75d7dab4e53"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/one-var-declaration-per-line.js",
+      "content": "/**\n * @fileoverview Rule to check multiple var declarations per line\n * @author Alberto Rodríguez\n */\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\nmodule.exports = {\n    meta: {\n        type: \"suggestion\",\n\n        docs: {\n            description: \"require or disallow newlines around variable declarations\",\n            category: \"Stylistic Issues\",\n            recommended: false,\n            url: \"https://eslint.org/docs/rules/one-var-declaration-per-line\"\n        },\n\n        schema: [\n            {\n                enum: [\"always\", \"initializations\"]\n            }\n        ],\n\n        fixable: \"whitespace\",\n\n        messages: {\n            expectVarOnNewline: \"Expected variable declaration to be on a new line.\"\n        }\n    },\n\n    create(context) {\n\n        const always = context.options[0] === \"always\";\n\n        //--------------------------------------------------------------------------\n        // Helpers\n        //--------------------------------------------------------------------------\n\n\n        /**\n         * Determine if provided keyword is a variant of for specifiers\n         * @private\n         * @param {string} keyword keyword to test\n         * @returns {boolean} True if `keyword` is a variant of for specifier\n         */\n        function isForTypeSpecifier(keyword) {\n            return keyword === \"ForStatement\" || keyword === \"ForInStatement\" || keyword === \"ForOfStatement\";\n        }\n\n        /**\n         * Checks newlines around variable declarations.\n         * @private\n         * @param {ASTNode} node `VariableDeclaration` node to test\n         * @returns {void}\n         */\n        function checkForNewLine(node) {\n            if (isForTypeSpecifier(node.parent.type)) {\n                return;\n            }\n\n            const declarations = node.declarations;\n            let prev;\n\n            declarations.forEach(current => {\n                if (prev && prev.loc.end.line === current.loc.start.line) {\n                    if (always || prev.init || current.init) {\n                        context.report({\n                            node,\n                            messageId: \"expectVarOnNewline\",\n                            loc: current.loc.start,\n                            fix: fixer => fixer.insertTextBefore(current, \"\\n\")\n                        });\n                    }\n                }\n                prev = current;\n            });\n        }\n\n        //--------------------------------------------------------------------------\n        // Public\n        //--------------------------------------------------------------------------\n\n        return {\n            VariableDeclaration: checkForNewLine\n        };\n\n    }\n};\n"
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-development-medium-15",
+  "oracle": "upstream-eslint-rule-test-and-closed-mutation-set",
+  "defect_severity": "unclassified",
+  "reference_files": [
+    {
+      "path": "lib/rules/no-empty-static-block.js",
+      "content": "/**\n * @fileoverview Rule to disallow empty static blocks.\n * @author Sosuke Suzuki\n */\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../types').Rule.RuleModule} */\nmodule.exports = {\n\tmeta: {\n\t\thasSuggestions: true,\n\t\ttype: \"suggestion\",\n\n\t\tdocs: {\n\t\t\tdescription: \"Disallow empty static blocks\",\n\t\t\trecommended: true,\n\t\t\turl: \"https://eslint.org/docs/latest/rules/no-empty-static-block\",\n\t\t},\n\n\t\tschema: [],\n\n\t\tmessages: {\n\t\t\tunexpected: \"Unexpected empty static block.\",\n\t\t\tsuggestComment: \"Add comment inside empty static block.\",\n\t\t},\n\t},\n\n\tcreate(context) {\n\t\tconst sourceCode = context.sourceCode;\n\n\t\treturn {\n\t\t\tStaticBlock(node) {\n\t\t\t\tif (node.body.length === 0) {\n\t\t\t\t\tconst openingBrace = sourceCode.getFirstToken(node, {\n\t\t\t\t\t\tskip: 1,\n\t\t\t\t\t});\n\t\t\t\t\tconst closingBrace = sourceCode.getLastToken(node);\n\n\t\t\t\t\tif (\n\t\t\t\t\t\tsourceCode.getCommentsBefore(closingBrace).length === 0\n\t\t\t\t\t) {\n\t\t\t\t\t\tcontext.report({\n\t\t\t\t\t\t\tloc: {\n\t\t\t\t\t\t\t\tstart: openingBrace.loc.start,\n\t\t\t\t\t\t\t\tend: closingBrace.loc.end,\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\tmessageId: \"unexpected\",\n\t\t\t\t\t\t\tsuggest: [\n\t\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\t\tmessageId: \"suggestComment\",\n\t\t\t\t\t\t\t\t\tfix(fixer) {\n\t\t\t\t\t\t\t\t\t\tconst range = [\n\t\t\t\t\t\t\t\t\t\t\topeningBrace.range[1],\n\t\t\t\t\t\t\t\t\t\t\tclosingBrace.range[0],\n\t\t\t\t\t\t\t\t\t\t];\n\n\t\t\t\t\t\t\t\t\t\treturn fixer.replaceTextRange(\n\t\t\t\t\t\t\t\t\t\t\trange,\n\t\t\t\t\t\t\t\t\t\t\t\" /* empty */ \",\n\t\t\t\t\t\t\t\t\t\t);\n\t\t\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t],\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t},\n\t\t};\n\t},\n};\n"
+    }
+  ],
+  "hidden_test_files": [
+    {
+      "path": "tests/lib/rules/no-empty-static-block.js",
+      "content": "/**\n * @fileoverview Tests for no-empty-static-block rule.\n * @author Sosuke Suzuki\n */\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst rule = require(\"../../../lib/rules/no-empty-static-block\"),\n\tRuleTester = require(\"../../../lib/rule-tester/rule-tester\");\n\n//------------------------------------------------------------------------------\n// Tests\n//------------------------------------------------------------------------------\n\nconst ruleTester = new RuleTester({\n\tlanguageOptions: { ecmaVersion: 2022 },\n});\n\nruleTester.run(\"no-empty-static-block\", rule, {\n\tvalid: [\n\t\t\"class Foo { static { bar(); } }\",\n\t\t\"class Foo { static { /* comments */ } }\",\n\t\t\"class Foo { static {\\n// comment\\n} }\",\n\t\t\"class Foo { static { bar(); } static { bar(); } }\",\n\t],\n\tinvalid: [\n\t\t{\n\t\t\tcode: \"class Foo { static {} }\",\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"unexpected\",\n\t\t\t\t\tline: 1,\n\t\t\t\t\tcolumn: 20,\n\t\t\t\t\tendLine: 1,\n\t\t\t\t\tendColumn: 22,\n\t\t\t\t\tsuggestions: [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\tmessageId: \"suggestComment\",\n\t\t\t\t\t\t\toutput: \"class Foo { static { /* empty */ } }\",\n\t\t\t\t\t\t},\n\t\t\t\t\t],\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"class Foo { static { } }\",\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"unexpected\",\n\t\t\t\t\tline: 1,\n\t\t\t\t\tcolumn: 20,\n\t\t\t\t\tendLine: 1,\n\t\t\t\t\tendColumn: 23,\n\t\t\t\t\tsuggestions: [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\tmessageId: \"suggestComment\",\n\t\t\t\t\t\t\toutput: \"class Foo { static { /* empty */ } }\",\n\t\t\t\t\t\t},\n\t\t\t\t\t],\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"class Foo { static { \\n\\n } }\",\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"unexpected\",\n\t\t\t\t\tline: 1,\n\t\t\t\t\tcolumn: 20,\n\t\t\t\t\tendLine: 3,\n\t\t\t\t\tendColumn: 3,\n\t\t\t\t\tsuggestions: [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\tmessageId: \"suggestComment\",\n\t\t\t\t\t\t\toutput: \"class Foo { static { /* empty */ } }\",\n\t\t\t\t\t\t},\n\t\t\t\t\t],\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"class Foo { static { bar(); } static {} }\",\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"unexpected\",\n\t\t\t\t\tline: 1,\n\t\t\t\t\tcolumn: 38,\n\t\t\t\t\tendLine: 1,\n\t\t\t\t\tendColumn: 40,\n\t\t\t\t\tsuggestions: [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\tmessageId: \"suggestComment\",\n\t\t\t\t\t\t\toutput: \"class Foo { static { bar(); } static { /* empty */ } }\",\n\t\t\t\t\t\t},\n\t\t\t\t\t],\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"class Foo { static // comment\\n {} }\",\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"unexpected\",\n\t\t\t\t\tline: 2,\n\t\t\t\t\tcolumn: 2,\n\t\t\t\t\tendLine: 2,\n\t\t\t\t\tendColumn: 4,\n\t\t\t\t\tsuggestions: [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\tmessageId: \"suggestComment\",\n\t\t\t\t\t\t\toutput: \"class Foo { static // comment\\n { /* empty */ } }\",\n\t\t\t\t\t\t},\n\t\t\t\t\t],\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"class Foo { static /* empty */ {} /* empty */ }\",\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"unexpected\",\n\t\t\t\t\tline: 1,\n\t\t\t\t\tcolumn: 32,\n\t\t\t\t\tendLine: 1,\n\t\t\t\t\tendColumn: 34,\n\t\t\t\t\tsuggestions: [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\tmessageId: \"suggestComment\",\n\t\t\t\t\t\t\toutput: \"class Foo { static /* empty */ { /* empty */ } /* empty */ }\",\n\t\t\t\t\t\t},\n\t\t\t\t\t],\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t],\n});\n"
+    }
+  ],
+  "allowed_mutation_paths": [
+    "lib/rules/no-empty-static-block.js"
+  ],
+  "test_argv": [
+    "--timeout",
+    "30000",
+    "tests/lib/rules/no-empty-static-block.js"
+  ],
+  "runtime_key": "eslint-v9.34",
+  "runtime_version": "9.34",
+  "provenance": {
+    "kind": "real-commit-derived",
+    "repository": "https://github.com/eslint/eslint",
+    "source_commit": "102f44442ac9bf1fcd4ba6ab9fae43ce09199df6",
+    "parent_commit": "84ffb9680b15e45bfd8c8a5db4731576ddd16fc4",
+    "source_paths": [
+      "lib/rules/no-empty-static-block.js"
+    ],
+    "patch_fingerprint": "sha256:aabc6b138d3bb87acb8f688d879af0cc5fba330a0a2fd9e46297ee0fcf9cd0a8",
+    "visible_requirement_fingerprint": "sha256:682a6ae93179d066115b5f212b76388de4a966fee3a8480c89fbfa3ed1bd5ad2",
+    "license": "MIT",
+    "license_fingerprint": "sha256:73e2034fe7f17e603f7c3a4bb7f8b71db11a63f94907d08e756c9d4d72a35505"
+  },
+  "requirement_coverage": {
+    "schema_version": 1,
+    "contract_fingerprint": "sha256:a1bcaee882b29fc23d4cde5866961e0b44749d1b41eeba9278099a517c2eae42",
+    "contract_completeness": "self-contained-behavioral-v1",
+    "hidden_test_witnesses": [
+      {
+        "hidden_test_fingerprint": "sha256:ee75e6580b9fd7c9701b28dc56095cf61ea8a1ce6094d22b114210371d80438d",
+        "clause_ids": [
+          "REQ-002",
+          "REQ-003",
+          "REQ-004"
+        ]
+      }
+    ],
+    "runner_witnesses": [
+      {
+        "witness_id": "semantic-oracle-and-closed-mutation-set",
+        "clause_ids": [
+          "REQ-001",
+          "REQ-002",
+          "REQ-003",
+          "REQ-004",
+          "REQ-005"
+        ]
+      }
+    ]
+  }
+}

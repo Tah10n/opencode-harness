@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-development-small-07",
+  "oracle": "upstream-eslint-rule-test-and-closed-mutation-set",
+  "defect_severity": "unclassified",
+  "reference_files": [
+    {
+      "path": "lib/rules/no-undef-init.js",
+      "content": "/**\n * @fileoverview Rule to flag when initializing to undefined\n * @author Ilya Volodin\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst astUtils = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Helpers\n//------------------------------------------------------------------------------\n\nconst CONSTANT_BINDINGS = new Set([\"const\", \"using\", \"await using\"]);\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../types').Rule.RuleModule} */\nmodule.exports = {\n\tmeta: {\n\t\ttype: \"suggestion\",\n\n\t\tdocs: {\n\t\t\tdescription: \"Disallow initializing variables to `undefined`\",\n\t\t\trecommended: false,\n\t\t\tfrozen: true,\n\t\t\turl: \"https://eslint.org/docs/latest/rules/no-undef-init\",\n\t\t},\n\n\t\tschema: [],\n\t\tfixable: \"code\",\n\n\t\tmessages: {\n\t\t\tunnecessaryUndefinedInit:\n\t\t\t\t\"It's not necessary to initialize '{{name}}' to undefined.\",\n\t\t},\n\t},\n\n\tcreate(context) {\n\t\tconst sourceCode = context.sourceCode;\n\n\t\treturn {\n\t\t\tVariableDeclarator(node) {\n\t\t\t\tconst name = sourceCode.getText(node.id),\n\t\t\t\t\tinit = node.init && node.init.name,\n\t\t\t\t\tscope = sourceCode.getScope(node),\n\t\t\t\t\tundefinedVar = astUtils.getVariableByName(\n\t\t\t\t\t\tscope,\n\t\t\t\t\t\t\"undefined\",\n\t\t\t\t\t),\n\t\t\t\t\tshadowed = undefinedVar && undefinedVar.defs.length > 0,\n\t\t\t\t\tlastToken = sourceCode.getLastToken(node);\n\n\t\t\t\tif (\n\t\t\t\t\tinit === \"undefined\" &&\n\t\t\t\t\t!CONSTANT_BINDINGS.has(node.parent.kind) &&\n\t\t\t\t\t!shadowed\n\t\t\t\t) {\n\t\t\t\t\tcontext.report({\n\t\t\t\t\t\tnode,\n\t\t\t\t\t\tmessageId: \"unnecessaryUndefinedInit\",\n\t\t\t\t\t\tdata: { name },\n\t\t\t\t\t\tfix(fixer) {\n\t\t\t\t\t\t\tif (node.parent.kind === \"var\") {\n\t\t\t\t\t\t\t\treturn null;\n\t\t\t\t\t\t\t}\n\n\t\t\t\t\t\t\tif (\n\t\t\t\t\t\t\t\tnode.id.type === \"ArrayPattern\" ||\n\t\t\t\t\t\t\t\tnode.id.type === \"ObjectPattern\"\n\t\t\t\t\t\t\t) {\n\t\t\t\t\t\t\t\t// Don't fix destructuring assignment to `undefined`.\n\t\t\t\t\t\t\t\treturn null;\n\t\t\t\t\t\t\t}\n\n\t\t\t\t\t\t\tif (\n\t\t\t\t\t\t\t\tsourceCode.commentsExistBetween(\n\t\t\t\t\t\t\t\t\tnode.id,\n\t\t\t\t\t\t\t\t\tlastToken,\n\t\t\t\t\t\t\t\t)\n\t\t\t\t\t\t\t) {\n\t\t\t\t\t\t\t\treturn null;\n\t\t\t\t\t\t\t}\n\n\t\t\t\t\t\t\treturn fixer.removeRange([\n\t\t\t\t\t\t\t\tnode.id.range[1],\n\t\t\t\t\t\t\t\tnode.range[1],\n\t\t\t\t\t\t\t]);\n\t\t\t\t\t\t},\n\t\t\t\t\t});\n\t\t\t\t}\n\t\t\t},\n\t\t};\n\t},\n};\n"
+    }
+  ],
+  "hidden_test_files": [
+    {
+      "path": "tests/lib/rules/no-undef-init.js",
+      "content": "/**\n * @fileoverview Tests for undefined rule.\n * @author Ilya Volodin\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst rule = require(\"../../../lib/rules/no-undef-init\"),\n\tRuleTester = require(\"../../../lib/rule-tester/rule-tester\");\n\n//------------------------------------------------------------------------------\n// Tests\n//------------------------------------------------------------------------------\n\nconst ruleTester = new RuleTester();\n\nruleTester.run(\"no-undef-init\", rule, {\n\tvalid: [\n\t\t\"var a;\",\n\t\t{ code: \"const foo = undefined\", languageOptions: { ecmaVersion: 6 } },\n\t\t{\n\t\t\tcode: \"using foo = undefined\",\n\t\t\tlanguageOptions: { ecmaVersion: 2026 },\n\t\t},\n\t\t{\n\t\t\tcode: \"await using foo = undefined\",\n\t\t\tlanguageOptions: { ecmaVersion: 2026 },\n\t\t},\n\t\t\"var undefined = 5; var foo = undefined;\",\n\n\t\t// doesn't apply to class fields\n\t\t{\n\t\t\tcode: \"class C { field = undefined; }\",\n\t\t\tlanguageOptions: { ecmaVersion: 2022 },\n\t\t},\n\t],\n\tinvalid: [\n\t\t{\n\t\t\tcode: \"var a = undefined;\",\n\t\t\toutput: null,\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"unnecessaryUndefinedInit\",\n\t\t\t\t\tdata: { name: \"a\" },\n\t\t\t\t\ttype: \"VariableDeclarator\",\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"var a = undefined, b = 1;\",\n\t\t\toutput: null,\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"unnecessaryUndefinedInit\",\n\t\t\t\t\tdata: { name: \"a\" },\n\t\t\t\t\ttype: \"VariableDeclarator\",\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"var a = 1, b = undefined, c = 5;\",\n\t\t\toutput: null,\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"unnecessaryUndefinedInit\",\n\t\t\t\t\tdata: { name: \"b\" },\n\t\t\t\t\ttype: \"VariableDeclarator\",\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"var [a] = undefined;\",\n\t\t\toutput: null,\n\t\t\tlanguageOptions: { ecmaVersion: 6 },\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"unnecessaryUndefinedInit\",\n\t\t\t\t\tdata: { name: \"[a]\" },\n\t\t\t\t\ttype: \"VariableDeclarator\",\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"var {a} = undefined;\",\n\t\t\toutput: null,\n\t\t\tlanguageOptions: { ecmaVersion: 6 },\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"unnecessaryUndefinedInit\",\n\t\t\t\t\tdata: { name: \"{a}\" },\n\t\t\t\t\ttype: \"VariableDeclarator\",\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"for(var i in [1,2,3]){var a = undefined; for(var j in [1,2,3]){}}\",\n\t\t\toutput: null,\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"unnecessaryUndefinedInit\",\n\t\t\t\t\tdata: { name: \"a\" },\n\t\t\t\t\ttype: \"VariableDeclarator\",\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"let a = undefined;\",\n\t\t\toutput: \"let a;\",\n\t\t\tlanguageOptions: { ecmaVersion: 6 },\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"unnecessaryUndefinedInit\",\n\t\t\t\t\tdata: { name: \"a\" },\n\t\t\t\t\ttype: \"VariableDeclarator\",\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"let a = undefined, b = 1;\",\n\t\t\toutput: \"let a, b = 1;\",\n\t\t\tlanguageOptions: { ecmaVersion: 6 },\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"unnecessaryUndefinedInit\",\n\t\t\t\t\tdata: { name: \"a\" },\n\t\t\t\t\ttype: \"VariableDeclarator\",\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"let a = 1, b = undefined, c = 5;\",\n\t\t\toutput: \"let a = 1, b, c = 5;\",\n\t\t\tlanguageOptions: { ecmaVersion: 6 },\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"unnecessaryUndefinedInit\",\n\t\t\t\t\tdata: { name: \"b\" },\n\t\t\t\t\ttype: \"VariableDeclarator\",\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"let [a] = undefined;\",\n\t\t\toutput: null,\n\t\t\tlanguageOptions: { ecmaVersion: 6 },\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"unnecessaryUndefinedInit\",\n\t\t\t\t\tdata: { name: \"[a]\" },\n\t\t\t\t\ttype: \"VariableDeclarator\",\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"let {a} = undefined;\",\n\t\t\toutput: null,\n\t\t\tlanguageOptions: { ecmaVersion: 6 },\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"unnecessaryUndefinedInit\",\n\t\t\t\t\tdata: { name: \"{a}\" },\n\t\t\t\t\ttype: \"VariableDeclarator\",\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"for(var i in [1,2,3]){let a = undefined; for(var j in [1,2,3]){}}\",\n\t\t\toutput: \"for(var i in [1,2,3]){let a; for(var j in [1,2,3]){}}\",\n\t\t\tlanguageOptions: { ecmaVersion: 6 },\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"unnecessaryUndefinedInit\",\n\t\t\t\t\tdata: { name: \"a\" },\n\t\t\t\t\ttype: \"VariableDeclarator\",\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\n\t\t// Should not autofix if it would remove comments\n\t\t{\n\t\t\tcode: \"let /* comment */a = undefined;\",\n\t\t\toutput: \"let /* comment */a;\",\n\t\t\tlanguageOptions: { ecmaVersion: 6 },\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"unnecessaryUndefinedInit\",\n\t\t\t\t\tdata: { name: \"a\" },\n\t\t\t\t\ttype: \"VariableDeclarator\",\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"let a/**/ = undefined;\",\n\t\t\toutput: null,\n\t\t\tlanguageOptions: { ecmaVersion: 6 },\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"unnecessaryUndefinedInit\",\n\t\t\t\t\tdata: { name: \"a\" },\n\t\t\t\t\ttype: \"VariableDeclarator\",\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"let a /**/ = undefined;\",\n\t\t\toutput: null,\n\t\t\tlanguageOptions: { ecmaVersion: 6 },\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"unnecessaryUndefinedInit\",\n\t\t\t\t\tdata: { name: \"a\" },\n\t\t\t\t\ttype: \"VariableDeclarator\",\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"let a//\\n= undefined;\",\n\t\t\toutput: null,\n\t\t\tlanguageOptions: { ecmaVersion: 6 },\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"unnecessaryUndefinedInit\",\n\t\t\t\t\tdata: { name: \"a\" },\n\t\t\t\t\ttype: \"VariableDeclarator\",\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"let a = /**/undefined;\",\n\t\t\toutput: null,\n\t\t\tlanguageOptions: { ecmaVersion: 6 },\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"unnecessaryUndefinedInit\",\n\t\t\t\t\tdata: { name: \"a\" },\n\t\t\t\t\ttype: \"VariableDeclarator\",\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"let a = //\\nundefined;\",\n\t\t\toutput: null,\n\t\t\tlanguageOptions: { ecmaVersion: 6 },\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"unnecessaryUndefinedInit\",\n\t\t\t\t\tdata: { name: \"a\" },\n\t\t\t\t\ttype: \"VariableDeclarator\",\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"let a = undefined/* comment */;\",\n\t\t\toutput: \"let a/* comment */;\",\n\t\t\tlanguageOptions: { ecmaVersion: 6 },\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"unnecessaryUndefinedInit\",\n\t\t\t\t\tdata: { name: \"a\" },\n\t\t\t\t\ttype: \"VariableDeclarator\",\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"let a = undefined/* comment */, b;\",\n\t\t\toutput: \"let a/* comment */, b;\",\n\t\t\tlanguageOptions: { ecmaVersion: 6 },\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"unnecessaryUndefinedInit\",\n\t\t\t\t\tdata: { name: \"a\" },\n\t\t\t\t\ttype: \"VariableDeclarator\",\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\tcode: \"let a = undefined//comment\\n, b;\",\n\t\t\toutput: \"let a//comment\\n, b;\",\n\t\t\tlanguageOptions: { ecmaVersion: 6 },\n\t\t\terrors: [\n\t\t\t\t{\n\t\t\t\t\tmessageId: \"unnecessaryUndefinedInit\",\n\t\t\t\t\tdata: { name: \"a\" },\n\t\t\t\t\ttype: \"VariableDeclarator\",\n\t\t\t\t},\n\t\t\t],\n\t\t},\n\t],\n});\n"
+    }
+  ],
+  "allowed_mutation_paths": [
+    "lib/rules/no-undef-init.js"
+  ],
+  "test_argv": [
+    "--timeout",
+    "30000",
+    "tests/lib/rules/no-undef-init.js"
+  ],
+  "runtime_key": "eslint-v9.30",
+  "runtime_version": "9.30",
+  "provenance": {
+    "kind": "real-commit-derived",
+    "repository": "https://github.com/eslint/eslint",
+    "source_commit": "4682cdc6960279ee17f23899fbab6f58d881eadf",
+    "parent_commit": "58482165eaf597cc5c58216a956c301ae87520b3",
+    "source_paths": [
+      "lib/rules/no-undef-init.js"
+    ],
+    "patch_fingerprint": "sha256:3adc3f479f2725bc11f0ee11dcef4baa867c7838c54ad070019c37c03ce61b68",
+    "visible_requirement_fingerprint": "sha256:fb796f476883e3633f9f3e5c87a89016b56ae52115424ad11ebcb38280f6fc07",
+    "license": "MIT",
+    "license_fingerprint": "sha256:73e2034fe7f17e603f7c3a4bb7f8b71db11a63f94907d08e756c9d4d72a35505"
+  },
+  "requirement_coverage": {
+    "schema_version": 1,
+    "contract_fingerprint": "sha256:b315133d52af4fdf33111a2504119fe3f77490fb1045995dc77f6d9dc6d0e12c",
+    "contract_completeness": "self-contained-behavioral-v1",
+    "hidden_test_witnesses": [
+      {
+        "hidden_test_fingerprint": "sha256:84c48217e9f76fa64976c0dda3da9da4692f4a37354e2e47d66bb4e1f2476a87",
+        "clause_ids": [
+          "REQ-002",
+          "REQ-003",
+          "REQ-004"
+        ]
+      }
+    ],
+    "runner_witnesses": [
+      {
+        "witness_id": "semantic-oracle-and-closed-mutation-set",
+        "clause_ids": [
+          "REQ-001",
+          "REQ-002",
+          "REQ-003",
+          "REQ-004",
+          "REQ-005"
+        ]
+      }
+    ]
+  }
+}

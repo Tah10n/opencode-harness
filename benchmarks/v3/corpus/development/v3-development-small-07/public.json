@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-development-small-07",
+  "split": "development",
+  "stratum": "small",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "observed-bug: Observed upstream behavior defect:\nfeat: support explicit resource management in `no-undef-init` (#19894)",
+    "required-behavior: Correct the observed defect so the documented behavioral examples and their semantic equivalents produce the expected ESLint behavior.",
+    "preserved-behavior: Preserve all pre-existing behavior, diagnostics, options, and public APIs outside the observed defect; the full pre-existing upstream test suite remains authoritative.",
+    "boundary-error-cases: Public behavioral examples (test-only diff, not implementation):\ndiff --git a/tests/lib/rules/no-undef-init.js b/tests/lib/rules/no-undef-init.js\nindex a201d2769..0fc937c27 100644\n--- a/tests/lib/rules/no-undef-init.js\n+++ b/tests/lib/rules/no-undef-init.js\n@@ -22,6 +22,14 @@ ruleTester.run(\"no-undef-init\", rule, {\n \tvalid: [\n \t\t\"var a;\",\n \t\t{ code: \"const foo = undefined\", languageOptions: { ecmaVersion: 6 } },\n+\t\t{\n+\t\t\tcode: \"using foo = undefined\",\n+\t\t\tlanguageOptions: { ecmaVersion: 2026 },\n+\t\t},\n+\t\t{\n+\t\t\tcode: \"await using foo = undefined\",\n+\t\t\tlanguageOptions: { ecmaVersion: 2026 },\n+\t\t},\n \t\t\"var undefined = 5; var foo = undefined;\",\n \n \t\t// doesn't apply to class fields",
+    "allowed-mutation: Modify only these supplied source paths: lib/rules/no-undef-init.js. Do not add, delete, rename, or change modes of other paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-development-small-07-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "observed-bug",
+        "text": "Observed upstream behavior defect:\nfeat: support explicit resource management in `no-undef-init` (#19894)"
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "required-behavior",
+        "text": "Correct the observed defect so the documented behavioral examples and their semantic equivalents produce the expected ESLint behavior."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "preserved-behavior",
+        "text": "Preserve all pre-existing behavior, diagnostics, options, and public APIs outside the observed defect; the full pre-existing upstream test suite remains authoritative."
+      },
+      {
+        "clause_id": "REQ-004",
+        "kind": "boundary-error-cases",
+        "text": "Public behavioral examples (test-only diff, not implementation):\ndiff --git a/tests/lib/rules/no-undef-init.js b/tests/lib/rules/no-undef-init.js\nindex a201d2769..0fc937c27 100644\n--- a/tests/lib/rules/no-undef-init.js\n+++ b/tests/lib/rules/no-undef-init.js\n@@ -22,6 +22,14 @@ ruleTester.run(\"no-undef-init\", rule, {\n \tvalid: [\n \t\t\"var a;\",\n \t\t{ code: \"const foo = undefined\", languageOptions: { ecmaVersion: 6 } },\n+\t\t{\n+\t\t\tcode: \"using foo = undefined\",\n+\t\t\tlanguageOptions: { ecmaVersion: 2026 },\n+\t\t},\n+\t\t{\n+\t\t\tcode: \"await using foo = undefined\",\n+\t\t\tlanguageOptions: { ecmaVersion: 2026 },\n+\t\t},\n \t\t\"var undefined = 5; var foo = undefined;\",\n \n \t\t// doesn't apply to class fields"
+      },
+      {
+        "clause_id": "REQ-005",
+        "kind": "allowed-mutation",
+        "text": "Modify only these supplied source paths: lib/rules/no-undef-init.js. Do not add, delete, rename, or change modes of other paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:b315133d52af4fdf33111a2504119fe3f77490fb1045995dc77f6d9dc6d0e12c"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-undef-init.js",
+      "content": "/**\n * @fileoverview Rule to flag when initializing to undefined\n * @author Ilya Volodin\n */\n\n\"use strict\";\n\nconst astUtils = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../types').Rule.RuleModule} */\nmodule.exports = {\n\tmeta: {\n\t\ttype: \"suggestion\",\n\n\t\tdocs: {\n\t\t\tdescription: \"Disallow initializing variables to `undefined`\",\n\t\t\trecommended: false,\n\t\t\tfrozen: true,\n\t\t\turl: \"https://eslint.org/docs/latest/rules/no-undef-init\",\n\t\t},\n\n\t\tschema: [],\n\t\tfixable: \"code\",\n\n\t\tmessages: {\n\t\t\tunnecessaryUndefinedInit:\n\t\t\t\t\"It's not necessary to initialize '{{name}}' to undefined.\",\n\t\t},\n\t},\n\n\tcreate(context) {\n\t\tconst sourceCode = context.sourceCode;\n\n\t\treturn {\n\t\t\tVariableDeclarator(node) {\n\t\t\t\tconst name = sourceCode.getText(node.id),\n\t\t\t\t\tinit = node.init && node.init.name,\n\t\t\t\t\tscope = sourceCode.getScope(node),\n\t\t\t\t\tundefinedVar = astUtils.getVariableByName(\n\t\t\t\t\t\tscope,\n\t\t\t\t\t\t\"undefined\",\n\t\t\t\t\t),\n\t\t\t\t\tshadowed = undefinedVar && undefinedVar.defs.length > 0,\n\t\t\t\t\tlastToken = sourceCode.getLastToken(node);\n\n\t\t\t\tif (\n\t\t\t\t\tinit === \"undefined\" &&\n\t\t\t\t\tnode.parent.kind !== \"const\" &&\n\t\t\t\t\t!shadowed\n\t\t\t\t) {\n\t\t\t\t\tcontext.report({\n\t\t\t\t\t\tnode,\n\t\t\t\t\t\tmessageId: \"unnecessaryUndefinedInit\",\n\t\t\t\t\t\tdata: { name },\n\t\t\t\t\t\tfix(fixer) {\n\t\t\t\t\t\t\tif (node.parent.kind === \"var\") {\n\t\t\t\t\t\t\t\treturn null;\n\t\t\t\t\t\t\t}\n\n\t\t\t\t\t\t\tif (\n\t\t\t\t\t\t\t\tnode.id.type === \"ArrayPattern\" ||\n\t\t\t\t\t\t\t\tnode.id.type === \"ObjectPattern\"\n\t\t\t\t\t\t\t) {\n\t\t\t\t\t\t\t\t// Don't fix destructuring assignment to `undefined`.\n\t\t\t\t\t\t\t\treturn null;\n\t\t\t\t\t\t\t}\n\n\t\t\t\t\t\t\tif (\n\t\t\t\t\t\t\t\tsourceCode.commentsExistBetween(\n\t\t\t\t\t\t\t\t\tnode.id,\n\t\t\t\t\t\t\t\t\tlastToken,\n\t\t\t\t\t\t\t\t)\n\t\t\t\t\t\t\t) {\n\t\t\t\t\t\t\t\treturn null;\n\t\t\t\t\t\t\t}\n\n\t\t\t\t\t\t\treturn fixer.removeRange([\n\t\t\t\t\t\t\t\tnode.id.range[1],\n\t\t\t\t\t\t\t\tnode.range[1],\n\t\t\t\t\t\t\t]);\n\t\t\t\t\t\t},\n\t\t\t\t\t});\n\t\t\t\t}\n\t\t\t},\n\t\t};\n\t},\n};\n"
+    }
+  ]
+}

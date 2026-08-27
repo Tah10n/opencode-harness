@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-small-04",
+  "split": "validation",
+  "stratum": "small",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "observed-bug: Observed upstream behavior defect:\nfix: remove fake `FlatESLint` and `LegacyESLint` exports (#20460)",
+    "required-behavior: Correct the observed defect so the documented behavioral examples and their semantic equivalents produce the expected ESLint behavior.",
+    "preserved-behavior: Preserve all pre-existing behavior, diagnostics, options, and public APIs outside the observed defect; the full pre-existing upstream test suite remains authoritative.",
+    "boundary-error-cases: Public behavioral examples (test-only diff, not implementation):\ndiff --git a/tests/lib/unsupported-api.js b/tests/lib/unsupported-api.js\nindex 7c97cbad6..df49853e0 100644\n--- a/tests/lib/unsupported-api.js\n+++ b/tests/lib/unsupported-api.js\n@@ -21,19 +21,19 @@ const assert = require(\"chai\").assert,\n \n describe(\"unsupported-api\", () => {\n \tit(\"should not have FileEnumerator exposed\", () => {\n-\t\tassert.isUndefined(api.FileEnumerator);\n+\t\tassert(!(\"FileEnumerator\" in api));\n \t});\n \n \tit(\"should not have FlatESLint exposed\", () => {\n-\t\tassert(!api.FlatESLint);\n+\t\tassert(!(\"FlatESLint\" in api));\n \t});\n \n \tit(\"should not have LegacyESLint exposed\", () => {\n-\t\tassert(!api.LegacyESLint);\n+\t\tassert(!(\"LegacyESLint\" in api));\n \t});\n \n \tit(\"should not have ESLint exposed\", () => {\n-\t\tassert.isUndefined(api.ESLint);\n+\t\tassert(!(\"ESLint\" in api));\n \t});\n \n \tit(\"should have shouldUseFlatConfig exposed\", () => {\n@@ -41,7 +41,7 @@ describe(\"unsupported-api\", () => {\n \t});\n \n \tit(\"should not have FlatRuleTester exposed\", () => {\n-\t\tassert.isUndefined(api.FlatRuleTester);\n+\t\tassert(!(\"FlatRuleTester\" in api));\n \t});\n \n \tit(\"should have builtinRules exposed\", () => {",
+    "allowed-mutation: Modify only these supplied source paths: lib/unsupported-api.js. Do not add, delete, rename, or change modes of other paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-validation-small-04-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "observed-bug",
+        "text": "Observed upstream behavior defect:\nfix: remove fake `FlatESLint` and `LegacyESLint` exports (#20460)"
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "required-behavior",
+        "text": "Correct the observed defect so the documented behavioral examples and their semantic equivalents produce the expected ESLint behavior."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "preserved-behavior",
+        "text": "Preserve all pre-existing behavior, diagnostics, options, and public APIs outside the observed defect; the full pre-existing upstream test suite remains authoritative."
+      },
+      {
+        "clause_id": "REQ-004",
+        "kind": "boundary-error-cases",
+        "text": "Public behavioral examples (test-only diff, not implementation):\ndiff --git a/tests/lib/unsupported-api.js b/tests/lib/unsupported-api.js\nindex 7c97cbad6..df49853e0 100644\n--- a/tests/lib/unsupported-api.js\n+++ b/tests/lib/unsupported-api.js\n@@ -21,19 +21,19 @@ const assert = require(\"chai\").assert,\n \n describe(\"unsupported-api\", () => {\n \tit(\"should not have FileEnumerator exposed\", () => {\n-\t\tassert.isUndefined(api.FileEnumerator);\n+\t\tassert(!(\"FileEnumerator\" in api));\n \t});\n \n \tit(\"should not have FlatESLint exposed\", () => {\n-\t\tassert(!api.FlatESLint);\n+\t\tassert(!(\"FlatESLint\" in api));\n \t});\n \n \tit(\"should not have LegacyESLint exposed\", () => {\n-\t\tassert(!api.LegacyESLint);\n+\t\tassert(!(\"LegacyESLint\" in api));\n \t});\n \n \tit(\"should not have ESLint exposed\", () => {\n-\t\tassert.isUndefined(api.ESLint);\n+\t\tassert(!(\"ESLint\" in api));\n \t});\n \n \tit(\"should have shouldUseFlatConfig exposed\", () => {\n@@ -41,7 +41,7 @@ describe(\"unsupported-api\", () => {\n \t});\n \n \tit(\"should not have FlatRuleTester exposed\", () => {\n-\t\tassert.isUndefined(api.FlatRuleTester);\n+\t\tassert(!(\"FlatRuleTester\" in api));\n \t});\n \n \tit(\"should have builtinRules exposed\", () => {"
+      },
+      {
+        "clause_id": "REQ-005",
+        "kind": "allowed-mutation",
+        "text": "Modify only these supplied source paths: lib/unsupported-api.js. Do not add, delete, rename, or change modes of other paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:dcbf10626680749b567c705eea4b54fdb5efaefcf33e015fe4597bc4a7eb2b19"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/unsupported-api.js",
+      "content": "/**\n * @fileoverview APIs that are not officially supported by ESLint.\n *      These APIs may change or be removed at any time. Use at your\n *      own risk.\n * @author Nicholas C. Zakas\n */\n\n\"use strict\";\n\n//-----------------------------------------------------------------------------\n// Requirements\n//-----------------------------------------------------------------------------\n\nconst { shouldUseFlatConfig } = require(\"./eslint/eslint\");\nconst builtinRules = require(\"./rules\");\n\n//-----------------------------------------------------------------------------\n// Exports\n//-----------------------------------------------------------------------------\n\nmodule.exports = {\n\tbuiltinRules,\n\tFlatESLint: null,\n\tLegacyESLint: null,\n\tshouldUseFlatConfig,\n};\n"
+    }
+  ]
+}

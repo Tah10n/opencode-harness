@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-development-small-01",
+  "split": "development",
+  "stratum": "small",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "observed-bug: Observed upstream behavior defect:\nFix: no-new-symbol false positive with Symbol as an argument (#13337)",
+    "required-behavior: Correct the observed defect so the documented behavioral examples and their semantic equivalents produce the expected ESLint behavior.",
+    "preserved-behavior: Preserve all pre-existing behavior, diagnostics, options, and public APIs outside the observed defect; the full pre-existing upstream test suite remains authoritative.",
+    "boundary-error-cases: Public behavioral examples (test-only diff, not implementation):\ndiff --git a/tests/lib/rules/no-new-symbol.js b/tests/lib/rules/no-new-symbol.js\nindex 4868592a2..198cc50e1 100644\n--- a/tests/lib/rules/no-new-symbol.js\n+++ b/tests/lib/rules/no-new-symbol.js\n@@ -22,7 +22,9 @@ ruleTester.run(\"no-new-symbol\", rule, {\n     valid: [\n         \"var foo = Symbol('foo');\",\n         \"function bar(Symbol) { var baz = new Symbol('baz');}\",\n-        \"function Symbol() {} new Symbol();\"\n+        \"function Symbol() {} new Symbol();\",\n+        \"new foo(Symbol);\",\n+        \"new foo(bar, Symbol);\"\n     ],\n     invalid: [\n         {",
+    "allowed-mutation: Modify only these supplied source paths: lib/rules/no-new-symbol.js. Do not add, delete, rename, or change modes of other paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-development-small-01-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "observed-bug",
+        "text": "Observed upstream behavior defect:\nFix: no-new-symbol false positive with Symbol as an argument (#13337)"
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "required-behavior",
+        "text": "Correct the observed defect so the documented behavioral examples and their semantic equivalents produce the expected ESLint behavior."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "preserved-behavior",
+        "text": "Preserve all pre-existing behavior, diagnostics, options, and public APIs outside the observed defect; the full pre-existing upstream test suite remains authoritative."
+      },
+      {
+        "clause_id": "REQ-004",
+        "kind": "boundary-error-cases",
+        "text": "Public behavioral examples (test-only diff, not implementation):\ndiff --git a/tests/lib/rules/no-new-symbol.js b/tests/lib/rules/no-new-symbol.js\nindex 4868592a2..198cc50e1 100644\n--- a/tests/lib/rules/no-new-symbol.js\n+++ b/tests/lib/rules/no-new-symbol.js\n@@ -22,7 +22,9 @@ ruleTester.run(\"no-new-symbol\", rule, {\n     valid: [\n         \"var foo = Symbol('foo');\",\n         \"function bar(Symbol) { var baz = new Symbol('baz');}\",\n-        \"function Symbol() {} new Symbol();\"\n+        \"function Symbol() {} new Symbol();\",\n+        \"new foo(Symbol);\",\n+        \"new foo(bar, Symbol);\"\n     ],\n     invalid: [\n         {"
+      },
+      {
+        "clause_id": "REQ-005",
+        "kind": "allowed-mutation",
+        "text": "Modify only these supplied source paths: lib/rules/no-new-symbol.js. Do not add, delete, rename, or change modes of other paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:70a3730ae6f8f5976d5bb356d60827c85af8745f5c738c72feb9413b89db137b"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-new-symbol.js",
+      "content": "/**\n * @fileoverview Rule to disallow use of the new operator with the `Symbol` object\n * @author Alberto Rodríguez\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\nmodule.exports = {\n    meta: {\n        type: \"problem\",\n\n        docs: {\n            description: \"disallow `new` operators with the `Symbol` object\",\n            category: \"ECMAScript 6\",\n            recommended: true,\n            url: \"https://eslint.org/docs/rules/no-new-symbol\"\n        },\n\n        schema: [],\n\n        messages: {\n            noNewSymbol: \"`Symbol` cannot be called as a constructor.\"\n        }\n    },\n\n    create(context) {\n\n        return {\n            \"Program:exit\"() {\n                const globalScope = context.getScope();\n                const variable = globalScope.set.get(\"Symbol\");\n\n                if (variable && variable.defs.length === 0) {\n                    variable.references.forEach(ref => {\n                        const node = ref.identifier;\n\n                        if (node.parent && node.parent.type === \"NewExpression\") {\n                            context.report({\n                                node,\n                                messageId: \"noNewSymbol\"\n                            });\n                        }\n                    });\n                }\n            }\n        };\n\n    }\n};\n"
+    }
+  ]
+}

@@ -182,31 +182,12 @@ function resolveDefaultCatalog(root) {
   return Object.freeze({ candidate, git_directory: gitDirectory, top_level: topLevel });
 }
 
-function referencedInputIdentities(argv, cwdPath, workspaceRoot) {
-  const candidates = new Set();
-  const packageManifest = path.join(cwdPath, "package.json");
-  if (fs.existsSync(packageManifest)) candidates.add(packageManifest);
-  for (const argument of argv) {
-    if (argument.startsWith("-") || argument.length === 0) continue;
-    const candidate = path.isAbsolute(argument) ? argument : path.resolve(cwdPath, argument);
-    let stat;
-    try {
-      stat = fs.lstatSync(candidate);
-    } catch (error) {
-      if (error?.code === "ENOENT") continue;
-      fail("CORE_RUNTIME_UNAVAILABLE", "argv input identity is unavailable");
-    }
-    if (stat.isSymbolicLink()) {
-      fail("CORE_RUNTIME_UNTRUSTED_FILE", "argv inputs must not be symbolic links");
-    }
-    if (stat.isFile()) {
-      inside(workspaceRoot, fs.realpathSync.native(candidate), "argv input");
-      candidates.add(candidate);
-    }
-  }
-  return Object.freeze([...candidates].sort().map((candidate) => (
-    fileIdentity(candidate, "argv input", { rejectLinks: true })
-  )));
+function referencedInputIdentities(inputPaths, workspaceRoot) {
+  return Object.freeze(inputPaths.map((entry, index) => {
+    const candidate = path.resolve(workspaceRoot, ...entry.split("/"));
+    inside(workspaceRoot, candidate, `immutable_input_paths[${index}]`);
+    return fileIdentity(candidate, `immutable_input_paths[${index}]`, { rejectLinks: true });
+  }));
 }
 
 function inside(root, target, label) {
@@ -217,7 +198,7 @@ function inside(root, target, label) {
 
 function normalizeCheck(value, index, workspaceRoot) {
   const label = `checks[${index}]`;
-  exact(value, ["check_id", "scope_prefixes", "cost_rank", "executable_path", "argv", "cwd", "timeout_ms"], label);
+  exact(value, ["check_id", "scope_prefixes", "cost_rank", "executable_path", "argv", "immutable_input_paths", "subject_paths", "cwd", "timeout_ms"], label);
   safeId(value.check_id, `${label}.check_id`);
   if (!Array.isArray(value.scope_prefixes) || value.scope_prefixes.length > 128) {
     fail("CORE_RUNTIME_SCHEMA", `${label}.scope_prefixes is invalid`);
@@ -244,6 +225,30 @@ function normalizeCheck(value, index, workspaceRoot) {
   if (!fs.statSync(cwdPath).isDirectory()) fail("CORE_RUNTIME_SCHEMA", `${label}.cwd is not a directory`);
   const cwdIdentity = directoryIdentity(cwdPath, `${label}.cwd`);
   assertTrustedAncestry(cwdPath, `${label}.cwd`);
+  if (!Array.isArray(value.immutable_input_paths) || value.immutable_input_paths.length > 64) {
+    fail("CORE_RUNTIME_SCHEMA", `${label}.immutable_input_paths is invalid`);
+  }
+  const immutableInputPaths = value.immutable_input_paths.map((entry, entryIndex) => (
+    relativePath(entry, `${label}.immutable_input_paths[${entryIndex}]`, { rootAllowed: false })
+  ));
+  if (new Set(immutableInputPaths).size !== immutableInputPaths.length) {
+    fail("CORE_RUNTIME_SCHEMA", `${label}.immutable_input_paths contains duplicates`);
+  }
+  if (!Array.isArray(value.subject_paths) || value.subject_paths.length < 1 || value.subject_paths.length > 256) {
+    fail("CORE_RUNTIME_SCHEMA", `${label}.subject_paths is invalid`);
+  }
+  const subjectPaths = value.subject_paths.map((entry, entryIndex) => (
+    relativePath(entry, `${label}.subject_paths[${entryIndex}]`, { rootAllowed: false })
+  ));
+  if (new Set(subjectPaths).size !== subjectPaths.length) fail("CORE_RUNTIME_SCHEMA", `${label}.subject_paths contains duplicates`);
+  if (immutableInputPaths.some((entry) => subjectPaths.includes(entry))) {
+    fail("CORE_RUNTIME_SCHEMA", `${label} immutable inputs and mutable subjects must be disjoint`);
+  }
+  for (const [entryIndex, subjectPath] of subjectPaths.entries()) {
+    if (scopePrefixes.length > 0 && !scopePrefixes.some((prefix) => subjectPath === prefix || subjectPath.startsWith(`${prefix}/`))) {
+      fail("CORE_RUNTIME_SCHEMA", `${label}.subject_paths[${entryIndex}] is outside the check scope`);
+    }
+  }
   if (!Number.isSafeInteger(value.timeout_ms) || value.timeout_ms < 1 || value.timeout_ms > 15 * 60 * 1000) {
     fail("CORE_RUNTIME_SCHEMA", `${label}.timeout_ms is invalid`);
   }
@@ -254,10 +259,13 @@ function normalizeCheck(value, index, workspaceRoot) {
     executable_path: executablePath,
     executable_identity: executableIdentity,
     argv: Object.freeze([...value.argv]),
+    immutable_input_paths: Object.freeze([...immutableInputPaths]),
+    subject_paths: Object.freeze([...subjectPaths]),
+    subject_argument_paths: Object.freeze(subjectPaths.map((entry) => path.resolve(workspaceRoot, ...entry.split("/")))),
     cwd,
     cwd_path: cwdPath,
     cwd_identity: cwdIdentity,
-    input_manifest: referencedInputIdentities(value.argv, cwdPath, workspaceRoot),
+    input_manifest: referencedInputIdentities(immutableInputPaths, workspaceRoot),
     timeout_ms: value.timeout_ms,
   });
 }
@@ -298,7 +306,7 @@ export function loadCoreVerificationCatalog(workspaceRoot, {
     fail("CORE_RUNTIME_SCHEMA", "core verification catalog must be valid JSON");
   }
   exact(value, ["schema_version", "catalog_id", "checks"], "catalog");
-  if (value.schema_version !== 1) fail("CORE_RUNTIME_SCHEMA", "core verification catalog version is unsupported");
+  if (value.schema_version !== 2) fail("CORE_RUNTIME_SCHEMA", "core verification catalog version is unsupported");
   safeId(value.catalog_id, "catalog.catalog_id");
   if (!Array.isArray(value.checks) || value.checks.length > 64) fail("CORE_RUNTIME_SCHEMA", "catalog.checks is invalid");
   const checks = value.checks.map((entry, index) => normalizeCheck(entry, index, root));
@@ -308,7 +316,7 @@ export function loadCoreVerificationCatalog(workspaceRoot, {
   const sealedSource = {
     schema_version: 1,
     catalog_id: value.catalog_id,
-    checks: checks.map(({ cwd_path: _cwdPath, ...entry }) => entry),
+    checks: checks.map(({ cwd_path: _cwdPath, subject_argument_paths: _subjectArgumentPaths, ...entry }) => entry),
   };
   const catalogIdentity = observed.identity;
   return Object.freeze({
@@ -427,6 +435,19 @@ export function changedCoreWorkspacePaths(before, after) {
   )));
 }
 
+export function coreTrustedCheckCommandFingerprint(check) {
+  return fingerprint({
+    executable_identity: check.executable_identity,
+    argv: check.argv,
+    immutable_input_paths: check.immutable_input_paths,
+    subject_paths: check.subject_paths,
+    scope_prefixes: check.scope_prefixes,
+    cwd_identity: check.cwd_identity,
+    input_manifest: check.input_manifest,
+    timeout_ms: check.timeout_ms,
+  });
+}
+
 const CONTAINED_CHECK_WORKER_SOURCE = String.raw`
 import { spawn } from "node:child_process";
 let initialized = false;
@@ -494,7 +515,7 @@ async function runContainedTrustedCheck(check, processContainmentFactory) {
       worker.once("error", reject);
       worker.once("exit", () => reject(new Error("trusted-check worker exited before reporting")));
       worker.on("message", (message) => { if (message?.type === "result") resolve(message.result); });
-      worker.send({ type: "initialize", file: check.executable_path, args: check.argv,
+      worker.send({ type: "initialize", file: check.executable_path, args: [...check.argv, ...check.subject_argument_paths],
         cwd: check.cwd_path, env: process.env });
     });
     let timeout;
@@ -527,6 +548,12 @@ export async function runCoreTrustedCheck(check, {
     assertIdentityCurrent(check.executable_identity, "check executable");
     assertIdentityCurrent(check.cwd_identity, "check cwd", { directory: true });
     for (const input of check.input_manifest) assertIdentityCurrent(input, "check argv input");
+    for (const [index, candidate] of check.subject_argument_paths.entries()) {
+      if (!fs.existsSync(candidate)) continue;
+      const stat = fs.lstatSync(candidate);
+      if (!stat.isFile() || stat.isSymbolicLink() || stat.nlink !== 1
+        || fs.realpathSync.native(candidate) !== candidate) fail("CORE_RUNTIME_UNTRUSTED_FILE", "check subject is not an ordinary workspace file");
+    }
     assertTrustedAncestry(check.executable_path, "check executable");
     assertTrustedAncestry(check.cwd_path, "check cwd");
   } catch (error) {
@@ -534,21 +561,10 @@ export async function runCoreTrustedCheck(check, {
       status: "unavailable",
       detail_code: error?.code === "CORE_RUNTIME_IDENTITY_CHANGED"
         ? "trusted-input-identity-changed" : "trusted-input-untrusted",
-      command_fingerprint: fingerprint({
-        executable_identity: check.executable_identity,
-        cwd_identity: check.cwd_identity,
-        input_manifest: check.input_manifest,
-        argv: check.argv,
-      }),
+      command_fingerprint: coreTrustedCheckCommandFingerprint(check),
     });
   }
-  const commandFingerprint = fingerprint({
-    executable_identity: check.executable_identity,
-    argv: check.argv,
-    cwd_identity: check.cwd_identity,
-    input_manifest: check.input_manifest,
-    timeout_ms: check.timeout_ms,
-  });
+  const commandFingerprint = coreTrustedCheckCommandFingerprint(check);
   let result;
   try {
     result = await runContainedTrustedCheck(check, processContainmentFactory);

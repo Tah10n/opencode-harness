@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-development-medium-10",
+  "split": "development",
+  "stratum": "medium",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "observed-bug: Observed upstream behavior defect:\nUpdate: Change no-duplicate-case to comparing tokens (fixes #13485) (#13494)\n\nChange `no-duplicate-case` rule to change from detecting duplicates comparing text to detecting duplicates comparing tokens, like `no-dupe-else-if` rule.",
+    "required-behavior: Correct the observed defect so the documented behavioral examples and their semantic equivalents produce the expected ESLint behavior.",
+    "preserved-behavior: Preserve all pre-existing behavior, diagnostics, options, and public APIs outside the observed defect; the full pre-existing upstream test suite remains authoritative.",
+    "boundary-error-cases: Public behavioral examples (test-only diff, not implementation):\ndiff --git a/tests/lib/rules/no-duplicate-case.js b/tests/lib/rules/no-duplicate-case.js\nindex a6e8e0ff3..42dbda3f1 100644\n--- a/tests/lib/rules/no-duplicate-case.js\n+++ b/tests/lib/rules/no-duplicate-case.js\n@@ -128,6 +128,66 @@ ruleTester.run(\"no-duplicate-case\", rule, {\n                     column: 74\n                 }\n             ]\n+        },\n+        {\n+            code: \"var a = 1, p = {p: {p1: 1, p2: 1}}; switch (a) {case p.p.p1: break; case p. p // comment\\n .p1: break; default: break;}\",\n+            errors: [{\n+                messageId: \"unexpected\",\n+                type: \"SwitchCase\",\n+                column: 69\n+            }]\n+        },\n+        {\n+            code: \"var a = 1, p = {p: {p1: 1, p2: 1}}; switch (a) {case p .p\\n/* comment */\\n.p1: break; case p.p.p1: break; default: break;}\",\n+            errors: [{\n+                messageId: \"unexpected\",\n+                type: \"SwitchCase\",\n+                line: 3,\n+                column: 13\n+            }]\n+        },\n+        {\n+            code: \"var a = 1, p = {p: {p1: 1, p2: 1}}; switch (a) {case p .p\\n/* comment */\\n.p1: break; case p. p // comment\\n .p1: break; default: break;}\",\n+            errors: [{\n+                messageId: \"unexpected\",\n+                type: \"SwitchCase\",\n+                line: 3,\n+                column: 13\n+            }]\n+        },\n+        {\n+            code: \"var a = 1, p = {p: {p1: 1, p2: 1}}; switch (a) {case p.p.p1: break; case p. p // comment\\n .p1: break; case p .p\\n/* comment */\\n.p1: break; default: break;}\",\n+            errors: [\n+                {\n+                    messageId: \"unexpected\",\n+                    type: \"SwitchCase\",\n+                    line: 1,\n+                    column: 69\n+                },\n+                {\n+                    messageId: \"unexpected\",\n+                    type: \"SwitchCase\",\n+                    line: 2,\n+                    column: 14\n+                }\n+            ]\n+        },\n+        {\n+            code: \"var a = 1, f = function(s) { return { p1: s } }; switch (a) {case f(a + 1).p1: break; case f(a+1).p1: break; default: break;}\",\n+            errors: [{\n+                messageId: \"unexpected\",\n+                type: \"SwitchCase\",\n+                column: 87\n+            }]\n+        },\n+        {\n+            code: \"var a = 1, f = function(s) { return { p1: s } }; switch (a) {case f(\\na + 1 // comment\\n).p1: break; case f(a+1)\\n.p1: break; default: break;}\",\n+            errors: [{\n+                messageId: \"unexpected\",\n+                type: \"SwitchCase\",\n+                line: 3,\n+                column: 14\n+            }]\n         }\n     ]\n });",
+    "allowed-mutation: Modify only these supplied source paths: lib/rules/no-duplicate-case.js. Do not add, delete, rename, or change modes of other paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-development-medium-10-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "observed-bug",
+        "text": "Observed upstream behavior defect:\nUpdate: Change no-duplicate-case to comparing tokens (fixes #13485) (#13494)\n\nChange `no-duplicate-case` rule to change from detecting duplicates comparing text to detecting duplicates comparing tokens, like `no-dupe-else-if` rule."
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "required-behavior",
+        "text": "Correct the observed defect so the documented behavioral examples and their semantic equivalents produce the expected ESLint behavior."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "preserved-behavior",
+        "text": "Preserve all pre-existing behavior, diagnostics, options, and public APIs outside the observed defect; the full pre-existing upstream test suite remains authoritative."
+      },
+      {
+        "clause_id": "REQ-004",
+        "kind": "boundary-error-cases",
+        "text": "Public behavioral examples (test-only diff, not implementation):\ndiff --git a/tests/lib/rules/no-duplicate-case.js b/tests/lib/rules/no-duplicate-case.js\nindex a6e8e0ff3..42dbda3f1 100644\n--- a/tests/lib/rules/no-duplicate-case.js\n+++ b/tests/lib/rules/no-duplicate-case.js\n@@ -128,6 +128,66 @@ ruleTester.run(\"no-duplicate-case\", rule, {\n                     column: 74\n                 }\n             ]\n+        },\n+        {\n+            code: \"var a = 1, p = {p: {p1: 1, p2: 1}}; switch (a) {case p.p.p1: break; case p. p // comment\\n .p1: break; default: break;}\",\n+            errors: [{\n+                messageId: \"unexpected\",\n+                type: \"SwitchCase\",\n+                column: 69\n+            }]\n+        },\n+        {\n+            code: \"var a = 1, p = {p: {p1: 1, p2: 1}}; switch (a) {case p .p\\n/* comment */\\n.p1: break; case p.p.p1: break; default: break;}\",\n+            errors: [{\n+                messageId: \"unexpected\",\n+                type: \"SwitchCase\",\n+                line: 3,\n+                column: 13\n+            }]\n+        },\n+        {\n+            code: \"var a = 1, p = {p: {p1: 1, p2: 1}}; switch (a) {case p .p\\n/* comment */\\n.p1: break; case p. p // comment\\n .p1: break; default: break;}\",\n+            errors: [{\n+                messageId: \"unexpected\",\n+                type: \"SwitchCase\",\n+                line: 3,\n+                column: 13\n+            }]\n+        },\n+        {\n+            code: \"var a = 1, p = {p: {p1: 1, p2: 1}}; switch (a) {case p.p.p1: break; case p. p // comment\\n .p1: break; case p .p\\n/* comment */\\n.p1: break; default: break;}\",\n+            errors: [\n+                {\n+                    messageId: \"unexpected\",\n+                    type: \"SwitchCase\",\n+                    line: 1,\n+                    column: 69\n+                },\n+                {\n+                    messageId: \"unexpected\",\n+                    type: \"SwitchCase\",\n+                    line: 2,\n+                    column: 14\n+                }\n+            ]\n+        },\n+        {\n+            code: \"var a = 1, f = function(s) { return { p1: s } }; switch (a) {case f(a + 1).p1: break; case f(a+1).p1: break; default: break;}\",\n+            errors: [{\n+                messageId: \"unexpected\",\n+                type: \"SwitchCase\",\n+                column: 87\n+            }]\n+        },\n+        {\n+            code: \"var a = 1, f = function(s) { return { p1: s } }; switch (a) {case f(\\na + 1 // comment\\n).p1: break; case f(a+1)\\n.p1: break; default: break;}\",\n+            errors: [{\n+                messageId: \"unexpected\",\n+                type: \"SwitchCase\",\n+                line: 3,\n+                column: 14\n+            }]\n         }\n     ]\n });"
+      },
+      {
+        "clause_id": "REQ-005",
+        "kind": "allowed-mutation",
+        "text": "Modify only these supplied source paths: lib/rules/no-duplicate-case.js. Do not add, delete, rename, or change modes of other paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:704950616c656fb8a1e98300771efd01ba60f2eda3603d3c77d655057dd0d48b"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-duplicate-case.js",
+      "content": "/**\n * @fileoverview Rule to disallow a duplicate case label.\n * @author Dieter Oberkofler\n * @author Burak Yigit Kaya\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\nmodule.exports = {\n    meta: {\n        type: \"problem\",\n\n        docs: {\n            description: \"disallow duplicate case labels\",\n            category: \"Possible Errors\",\n            recommended: true,\n            url: \"https://eslint.org/docs/rules/no-duplicate-case\"\n        },\n\n        schema: [],\n\n        messages: {\n            unexpected: \"Duplicate case label.\"\n        }\n    },\n\n    create(context) {\n        const sourceCode = context.getSourceCode();\n\n        return {\n            SwitchStatement(node) {\n                const previousKeys = new Set();\n\n                for (const switchCase of node.cases) {\n                    if (switchCase.test) {\n                        const key = sourceCode.getText(switchCase.test);\n\n                        if (previousKeys.has(key)) {\n                            context.report({ node: switchCase, messageId: \"unexpected\" });\n                        } else {\n                            previousKeys.add(key);\n                        }\n                    }\n                }\n            }\n        };\n    }\n};\n"
+    }
+  ]
+}

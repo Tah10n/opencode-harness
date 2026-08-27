@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-development-medium-03",
+  "split": "development",
+  "stratum": "medium",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "observed-bug: Observed upstream behavior defect:\nUpdate: Add ignorePattern to no-inline-comments (#13029)",
+    "required-behavior: Correct the observed defect so the documented behavioral examples and their semantic equivalents produce the expected ESLint behavior.",
+    "preserved-behavior: Preserve all pre-existing behavior, diagnostics, options, and public APIs outside the observed defect; the full pre-existing upstream test suite remains authoritative.",
+    "boundary-error-cases: Public behavioral examples (test-only diff, not implementation):\ndiff --git a/tests/lib/rules/no-inline-comments.js b/tests/lib/rules/no-inline-comments.js\nindex ecb475997..463c86eea 100644\n--- a/tests/lib/rules/no-inline-comments.js\n+++ b/tests/lib/rules/no-inline-comments.js\n@@ -88,7 +88,24 @@ ruleTester.run(\"no-inline-comments\", rule, {\n                comment\n             */}\n             </div>\n-        )`\n+        )`,\n+        {\n+            code: \"import(/* webpackChunkName: \\\"my-chunk-name\\\" */ './locale/en');\",\n+            options: [\n+                {\n+                    ignorePattern: \"(?:webpackChunkName):\\\\s.+\"\n+                }\n+            ],\n+            parserOptions: { ecmaVersion: 2020 }\n+        },\n+        {\n+            code: \"var foo = 2; // Note: This comment is legal.\",\n+            options: [\n+                {\n+                    ignorePattern: \"Note: \"\n+                }\n+            ]\n+        }\n     ],\n \n     invalid: [\n@@ -100,6 +117,15 @@ ruleTester.run(\"no-inline-comments\", rule, {\n             code: \"/*A block comment inline before code*/ var a = 2;\",\n             errors: [blockError]\n         },\n+        {\n+            code: \"/* something */ var a = 2;\",\n+            options: [\n+                {\n+                    ignorePattern: \"otherthing\"\n+                }\n+            ],\n+            errors: [blockError]\n+        },\n         {\n             code: \"var a = 3; //A comment inline with code\",\n             errors: [lineError]\n@@ -108,6 +134,15 @@ ruleTester.run(\"no-inline-comments\", rule, {\n             code: \"var a = 3; // someday use eslint-disable-line here\",\n             errors: [lineError]\n         },\n+        {\n+            code: \"var a = 3; // other line comment\",\n+            options: [\n+                {\n+                    ignorePattern: \"something\"\n+                }\n+            ],\n+            errors: [lineError]\n+        },\n         {\n             code: \"var a = 4;\\n/**A\\n * block\\n * comment\\n * inline\\n * between\\n * code*/ var foo = a;\",\n             errors: [blockError]",
+    "allowed-mutation: Modify only these supplied source paths: lib/rules/no-inline-comments.js. Do not add, delete, rename, or change modes of other paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-development-medium-03-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "observed-bug",
+        "text": "Observed upstream behavior defect:\nUpdate: Add ignorePattern to no-inline-comments (#13029)"
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "required-behavior",
+        "text": "Correct the observed defect so the documented behavioral examples and their semantic equivalents produce the expected ESLint behavior."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "preserved-behavior",
+        "text": "Preserve all pre-existing behavior, diagnostics, options, and public APIs outside the observed defect; the full pre-existing upstream test suite remains authoritative."
+      },
+      {
+        "clause_id": "REQ-004",
+        "kind": "boundary-error-cases",
+        "text": "Public behavioral examples (test-only diff, not implementation):\ndiff --git a/tests/lib/rules/no-inline-comments.js b/tests/lib/rules/no-inline-comments.js\nindex ecb475997..463c86eea 100644\n--- a/tests/lib/rules/no-inline-comments.js\n+++ b/tests/lib/rules/no-inline-comments.js\n@@ -88,7 +88,24 @@ ruleTester.run(\"no-inline-comments\", rule, {\n                comment\n             */}\n             </div>\n-        )`\n+        )`,\n+        {\n+            code: \"import(/* webpackChunkName: \\\"my-chunk-name\\\" */ './locale/en');\",\n+            options: [\n+                {\n+                    ignorePattern: \"(?:webpackChunkName):\\\\s.+\"\n+                }\n+            ],\n+            parserOptions: { ecmaVersion: 2020 }\n+        },\n+        {\n+            code: \"var foo = 2; // Note: This comment is legal.\",\n+            options: [\n+                {\n+                    ignorePattern: \"Note: \"\n+                }\n+            ]\n+        }\n     ],\n \n     invalid: [\n@@ -100,6 +117,15 @@ ruleTester.run(\"no-inline-comments\", rule, {\n             code: \"/*A block comment inline before code*/ var a = 2;\",\n             errors: [blockError]\n         },\n+        {\n+            code: \"/* something */ var a = 2;\",\n+            options: [\n+                {\n+                    ignorePattern: \"otherthing\"\n+                }\n+            ],\n+            errors: [blockError]\n+        },\n         {\n             code: \"var a = 3; //A comment inline with code\",\n             errors: [lineError]\n@@ -108,6 +134,15 @@ ruleTester.run(\"no-inline-comments\", rule, {\n             code: \"var a = 3; // someday use eslint-disable-line here\",\n             errors: [lineError]\n         },\n+        {\n+            code: \"var a = 3; // other line comment\",\n+            options: [\n+                {\n+                    ignorePattern: \"something\"\n+                }\n+            ],\n+            errors: [lineError]\n+        },\n         {\n             code: \"var a = 4;\\n/**A\\n * block\\n * comment\\n * inline\\n * between\\n * code*/ var foo = a;\",\n             errors: [blockError]"
+      },
+      {
+        "clause_id": "REQ-005",
+        "kind": "allowed-mutation",
+        "text": "Modify only these supplied source paths: lib/rules/no-inline-comments.js. Do not add, delete, rename, or change modes of other paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:e4dc76ceed67536923e029367b2d17e986b15389be9c78e05df0c79c156834b4"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-inline-comments.js",
+      "content": "/**\n * @fileoverview Enforces or disallows inline comments.\n * @author Greg Cochard\n */\n\"use strict\";\n\nconst astUtils = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\nmodule.exports = {\n    meta: {\n        type: \"suggestion\",\n\n        docs: {\n            description: \"disallow inline comments after code\",\n            category: \"Stylistic Issues\",\n            recommended: false,\n            url: \"https://eslint.org/docs/rules/no-inline-comments\"\n        },\n\n        schema: [],\n\n        messages: {\n            unexpectedInlineComment: \"Unexpected comment inline with code.\"\n        }\n    },\n\n    create(context) {\n        const sourceCode = context.getSourceCode();\n\n        /**\n         * Will check that comments are not on lines starting with or ending with code\n         * @param {ASTNode} node The comment node to check\n         * @private\n         * @returns {void}\n         */\n        function testCodeAroundComment(node) {\n\n            const startLine = String(sourceCode.lines[node.loc.start.line - 1]),\n                endLine = String(sourceCode.lines[node.loc.end.line - 1]),\n                preamble = startLine.slice(0, node.loc.start.column).trim(),\n                postamble = endLine.slice(node.loc.end.column).trim(),\n                isPreambleEmpty = !preamble,\n                isPostambleEmpty = !postamble;\n\n            // Nothing on both sides\n            if (isPreambleEmpty && isPostambleEmpty) {\n                return;\n            }\n\n            // JSX Exception\n            if (\n                (isPreambleEmpty || preamble === \"{\") &&\n                (isPostambleEmpty || postamble === \"}\")\n            ) {\n                const enclosingNode = sourceCode.getNodeByRangeIndex(node.range[0]);\n\n                if (enclosingNode && enclosingNode.type === \"JSXEmptyExpression\") {\n                    return;\n                }\n            }\n\n            // Don't report ESLint directive comments\n            if (astUtils.isDirectiveComment(node)) {\n                return;\n            }\n\n            context.report({\n                node,\n                messageId: \"unexpectedInlineComment\"\n            });\n        }\n\n        //--------------------------------------------------------------------------\n        // Public\n        //--------------------------------------------------------------------------\n\n        return {\n            Program() {\n                const comments = sourceCode.getAllComments();\n\n                comments.filter(token => token.type !== \"Shebang\").forEach(testCodeAroundComment);\n            }\n        };\n    }\n};\n"
+    }
+  ]
+}

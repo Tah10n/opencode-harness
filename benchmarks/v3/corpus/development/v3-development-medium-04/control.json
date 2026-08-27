@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-development-medium-04",
+  "oracle": "upstream-eslint-rule-test-and-closed-mutation-set",
+  "defect_severity": "unclassified",
+  "reference_files": [
+    {
+      "path": "lib/rules/no-new-wrappers.js",
+      "content": "/**\n * @fileoverview Rule to flag when using constructor for wrapper objects\n * @author Ilya Volodin\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst { getVariableByName } = require(\"./utils/ast-utils\");\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../shared/types').Rule} */\nmodule.exports = {\n    meta: {\n        type: \"suggestion\",\n\n        docs: {\n            description: \"Disallow `new` operators with the `String`, `Number`, and `Boolean` objects\",\n            recommended: false,\n            url: \"https://eslint.org/docs/latest/rules/no-new-wrappers\"\n        },\n\n        schema: [],\n\n        messages: {\n            noConstructor: \"Do not use {{fn}} as a constructor.\"\n        }\n    },\n\n    create(context) {\n        const { sourceCode } = context;\n\n        return {\n\n            NewExpression(node) {\n                const wrapperObjects = [\"String\", \"Number\", \"Boolean\"];\n                const { name } = node.callee;\n\n                if (wrapperObjects.includes(name)) {\n                    const variable = getVariableByName(sourceCode.getScope(node), name);\n\n                    if (variable && variable.identifiers.length === 0) {\n                        context.report({\n                            node,\n                            messageId: \"noConstructor\",\n                            data: { fn: name }\n                        });\n                    }\n                }\n            }\n        };\n\n    }\n};\n"
+    }
+  ],
+  "hidden_test_files": [
+    {
+      "path": "tests/lib/rules/no-new-wrappers.js",
+      "content": "/**\n * @fileoverview Tests for no-new-wrappers rule.\n * @author Ilya Volodin\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst rule = require(\"../../../lib/rules/no-new-wrappers\"),\n    { RuleTester } = require(\"../../../lib/rule-tester\");\n\n//------------------------------------------------------------------------------\n// Tests\n//------------------------------------------------------------------------------\n\nconst ruleTester = new RuleTester();\n\nruleTester.run(\"no-new-wrappers\", rule, {\n    valid: [\n        \"var a = new Object();\",\n        \"var a = String('test'), b = String.fromCharCode(32);\",\n        `\n        function test(Number) {\n            return new Number;\n        }\n        `,\n        {\n            code: `\n            import String from \"./string\";\n            const str = new String(42);\n            `,\n            parserOptions: { ecmaVersion: 6, sourceType: \"module\" }\n        },\n        `\n        if (foo) {\n            result = new Boolean(bar);\n        } else {\n            var Boolean = CustomBoolean;\n        }\n        `,\n        {\n            code: \"new String()\",\n            globals: {\n                String: \"off\"\n            }\n        },\n        `\n        /* global Boolean:off */\n        assert(new Boolean);\n        `\n    ],\n    invalid: [\n        {\n            code: \"var a = new String('hello');\",\n            errors: [{\n                messageId: \"noConstructor\",\n                data: {\n                    fn: \"String\"\n                },\n                type: \"NewExpression\"\n            }]\n        },\n        {\n            code: \"var a = new Number(10);\",\n            errors: [{\n                messageId: \"noConstructor\",\n                data: {\n                    fn: \"Number\"\n                },\n                type: \"NewExpression\"\n            }]\n        },\n        {\n            code: \"var a = new Boolean(false);\",\n            errors: [{\n                messageId: \"noConstructor\",\n                data: {\n                    fn: \"Boolean\"\n                },\n                type: \"NewExpression\"\n            }]\n        },\n        {\n            code: `\n            const a = new String('bar');\n            {\n                const String = CustomString;\n                const b = new String('foo');\n            }\n            `,\n            parserOptions: { ecmaVersion: 6 },\n            errors: [{\n                messageId: \"noConstructor\",\n                data: {\n                    fn: \"String\"\n                },\n                type: \"NewExpression\",\n                line: 2\n            }]\n        }\n    ]\n});\n"
+    }
+  ],
+  "allowed_mutation_paths": [
+    "lib/rules/no-new-wrappers.js"
+  ],
+  "test_argv": [
+    "--timeout",
+    "30000",
+    "tests/lib/rules/no-new-wrappers.js"
+  ],
+  "runtime_key": "eslint-v8.46",
+  "runtime_version": "8.46",
+  "provenance": {
+    "kind": "real-commit-derived",
+    "repository": "https://github.com/eslint/eslint",
+    "source_commit": "631648ee0b51a8951ce576ccd4430e09c9c8bcae",
+    "parent_commit": "757bfe1c35b5ddab7042d388f8d21e834875fff5",
+    "source_paths": [
+      "lib/rules/no-new-wrappers.js"
+    ],
+    "patch_fingerprint": "sha256:01c13b187ba577a5445dc2fc55b0dd0e8947ab69827df81ce320d9f4ed8036db",
+    "visible_requirement_fingerprint": "sha256:d5517d52ec0d91d3e9a51d1423e43d5687d518dc4f2efe06083ecd10c5208ce0",
+    "license": "MIT",
+    "license_fingerprint": "sha256:73e2034fe7f17e603f7c3a4bb7f8b71db11a63f94907d08e756c9d4d72a35505"
+  },
+  "requirement_coverage": {
+    "schema_version": 1,
+    "contract_fingerprint": "sha256:2f19a05b7b08d484f0b812d2a91ea358e49dcedb74ea26c3980eb3597542a24b",
+    "contract_completeness": "self-contained-behavioral-v1",
+    "hidden_test_witnesses": [
+      {
+        "hidden_test_fingerprint": "sha256:2aa7017ab2be2d7100926ac815f81451ed2304ef02445f3bf22cffe642e8743c",
+        "clause_ids": [
+          "REQ-002",
+          "REQ-003",
+          "REQ-004"
+        ]
+      }
+    ],
+    "runner_witnesses": [
+      {
+        "witness_id": "semantic-oracle-and-closed-mutation-set",
+        "clause_ids": [
+          "REQ-001",
+          "REQ-002",
+          "REQ-003",
+          "REQ-004",
+          "REQ-005"
+        ]
+      }
+    ]
+  }
+}

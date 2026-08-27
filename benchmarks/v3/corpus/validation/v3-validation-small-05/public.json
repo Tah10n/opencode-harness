@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-small-05",
+  "split": "validation",
+  "stratum": "small",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "observed-bug: Observed upstream behavior defect:\nfix: typo ocatal -> octal (#15940)",
+    "required-behavior: Correct the observed defect so the documented behavioral examples and their semantic equivalents produce the expected ESLint behavior.",
+    "preserved-behavior: Preserve all pre-existing behavior, diagnostics, options, and public APIs outside the observed defect; the full pre-existing upstream test suite remains authoritative.",
+    "boundary-error-cases: Public behavioral examples (test-only diff, not implementation):\ndiff --git a/tests/lib/rules/no-octal.js b/tests/lib/rules/no-octal.js\nindex dd2839e72..a48bf5a10 100644\n--- a/tests/lib/rules/no-octal.js\n+++ b/tests/lib/rules/no-octal.js\n@@ -31,77 +31,77 @@ ruleTester.run(\"no-octal\", rule, {\n         {\n             code: \"var a = 01234;\",\n             errors: [{\n-                messageId: \"noOcatal\",\n+                messageId: \"noOctal\",\n                 type: \"Literal\"\n             }]\n         },\n         {\n             code: \"a = 1 + 01234;\",\n             errors: [{\n-                messageId: \"noOcatal\",\n+                messageId: \"noOctal\",\n                 type: \"Literal\"\n             }]\n         },\n         {\n             code: \"00\",\n             errors: [{\n-                messageId: \"noOcatal\",\n+                messageId: \"noOctal\",\n                 type: \"Literal\"\n             }]\n         },\n         {\n             code: \"08\",\n             errors: [{\n-                messageId: \"noOcatal\",\n+                messageId: \"noOctal\",\n                 type: \"Literal\"\n             }]\n         },\n         {\n             code: \"09.1\",\n             errors: [{\n-                messageId: \"noOcatal\",\n+                messageId: \"noOctal\",\n                 type: \"Literal\"\n             }]\n         },\n         {\n             code: \"09e1\",\n             errors: [{\n-                messageId: \"noOcatal\",\n+                messageId: \"noOctal\",\n                 type: \"Literal\"\n             }]\n         },\n         {\n             code: \"09.1e1\",\n             errors: [{\n-                messageId: \"noOcatal\",\n+                messageId: \"noOctal\",\n                 type: \"Literal\"\n             }]\n         },\n         {\n             code: \"018\",\n             errors: [{\n-                messageId: \"noOcatal\",\n+                messageId: \"noOctal\",\n                 type: \"Literal\"\n             }]\n         },\n         {\n             code: \"019.1\",\n             errors: [{\n-                messageId: \"noOcatal\",\n+                messageId: \"noOctal\",\n                 type: \"Literal\"\n             }]\n         },\n         {\n             code: \"019e1\",\n             errors: [{\n-                messageId: \"noOcatal\",\n+                messageId: \"noOctal\",\n                 type: \"Literal\"\n             }]\n         },\n         {\n             code: \"019.1e1\",\n             errors: [{\n-                messageId: \"noOcatal\",\n+                messageId: \"noOctal\",\n                 type: \"Literal\"\n             }]\n         }",
+    "allowed-mutation: Modify only these supplied source paths: lib/rules/no-octal.js. Do not add, delete, rename, or change modes of other paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-validation-small-05-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "observed-bug",
+        "text": "Observed upstream behavior defect:\nfix: typo ocatal -> octal (#15940)"
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "required-behavior",
+        "text": "Correct the observed defect so the documented behavioral examples and their semantic equivalents produce the expected ESLint behavior."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "preserved-behavior",
+        "text": "Preserve all pre-existing behavior, diagnostics, options, and public APIs outside the observed defect; the full pre-existing upstream test suite remains authoritative."
+      },
+      {
+        "clause_id": "REQ-004",
+        "kind": "boundary-error-cases",
+        "text": "Public behavioral examples (test-only diff, not implementation):\ndiff --git a/tests/lib/rules/no-octal.js b/tests/lib/rules/no-octal.js\nindex dd2839e72..a48bf5a10 100644\n--- a/tests/lib/rules/no-octal.js\n+++ b/tests/lib/rules/no-octal.js\n@@ -31,77 +31,77 @@ ruleTester.run(\"no-octal\", rule, {\n         {\n             code: \"var a = 01234;\",\n             errors: [{\n-                messageId: \"noOcatal\",\n+                messageId: \"noOctal\",\n                 type: \"Literal\"\n             }]\n         },\n         {\n             code: \"a = 1 + 01234;\",\n             errors: [{\n-                messageId: \"noOcatal\",\n+                messageId: \"noOctal\",\n                 type: \"Literal\"\n             }]\n         },\n         {\n             code: \"00\",\n             errors: [{\n-                messageId: \"noOcatal\",\n+                messageId: \"noOctal\",\n                 type: \"Literal\"\n             }]\n         },\n         {\n             code: \"08\",\n             errors: [{\n-                messageId: \"noOcatal\",\n+                messageId: \"noOctal\",\n                 type: \"Literal\"\n             }]\n         },\n         {\n             code: \"09.1\",\n             errors: [{\n-                messageId: \"noOcatal\",\n+                messageId: \"noOctal\",\n                 type: \"Literal\"\n             }]\n         },\n         {\n             code: \"09e1\",\n             errors: [{\n-                messageId: \"noOcatal\",\n+                messageId: \"noOctal\",\n                 type: \"Literal\"\n             }]\n         },\n         {\n             code: \"09.1e1\",\n             errors: [{\n-                messageId: \"noOcatal\",\n+                messageId: \"noOctal\",\n                 type: \"Literal\"\n             }]\n         },\n         {\n             code: \"018\",\n             errors: [{\n-                messageId: \"noOcatal\",\n+                messageId: \"noOctal\",\n                 type: \"Literal\"\n             }]\n         },\n         {\n             code: \"019.1\",\n             errors: [{\n-                messageId: \"noOcatal\",\n+                messageId: \"noOctal\",\n                 type: \"Literal\"\n             }]\n         },\n         {\n             code: \"019e1\",\n             errors: [{\n-                messageId: \"noOcatal\",\n+                messageId: \"noOctal\",\n                 type: \"Literal\"\n             }]\n         },\n         {\n             code: \"019.1e1\",\n             errors: [{\n-                messageId: \"noOcatal\",\n+                messageId: \"noOctal\",\n                 type: \"Literal\"\n             }]\n         }"
+      },
+      {
+        "clause_id": "REQ-005",
+        "kind": "allowed-mutation",
+        "text": "Modify only these supplied source paths: lib/rules/no-octal.js. Do not add, delete, rename, or change modes of other paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:59c4cb857412bd36db8ffd0d055ff6caa4b85ae25f1873295a8b984c58dcc73c"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-octal.js",
+      "content": "/**\n * @fileoverview Rule to flag when initializing octal literal\n * @author Ilya Volodin\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../shared/types').Rule} */\nmodule.exports = {\n    meta: {\n        type: \"suggestion\",\n\n        docs: {\n            description: \"disallow octal literals\",\n            recommended: true,\n            url: \"https://eslint.org/docs/rules/no-octal\"\n        },\n\n        schema: [],\n\n        messages: {\n            noOcatal: \"Octal literals should not be used.\"\n        }\n    },\n\n    create(context) {\n\n        return {\n\n            Literal(node) {\n                if (typeof node.value === \"number\" && /^0[0-9]/u.test(node.raw)) {\n                    context.report({\n                        node,\n                        messageId: \"noOcatal\"\n                    });\n                }\n            }\n        };\n\n    }\n};\n"
+    }
+  ]
+}

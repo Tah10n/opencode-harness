@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-development-medium-15",
+  "split": "development",
+  "stratum": "medium",
+  "prompt": "Repair the supplied ESLint source according to the visible public contract.",
+  "visible_requirements": [
+    "observed-bug: Observed upstream behavior defect:\nfeat: implement suggestions for no-empty-static-block (#20056)",
+    "required-behavior: Correct the observed defect so the documented behavioral examples and their semantic equivalents produce the expected ESLint behavior.",
+    "preserved-behavior: Preserve all pre-existing behavior, diagnostics, options, and public APIs outside the observed defect; the full pre-existing upstream test suite remains authoritative.",
+    "boundary-error-cases: Public behavioral examples (test-only diff, not implementation):\ndiff --git a/tests/lib/rules/no-empty-static-block.js b/tests/lib/rules/no-empty-static-block.js\nindex e9631a469..4b5d15b0e 100644\n--- a/tests/lib/rules/no-empty-static-block.js\n+++ b/tests/lib/rules/no-empty-static-block.js\n@@ -29,23 +29,111 @@ ruleTester.run(\"no-empty-static-block\", rule, {\n \tinvalid: [\n \t\t{\n \t\t\tcode: \"class Foo { static {} }\",\n-\t\t\terrors: [{ messageId: \"unexpected\" }],\n+\t\t\terrors: [\n+\t\t\t\t{\n+\t\t\t\t\tmessageId: \"unexpected\",\n+\t\t\t\t\tline: 1,\n+\t\t\t\t\tcolumn: 20,\n+\t\t\t\t\tendLine: 1,\n+\t\t\t\t\tendColumn: 22,\n+\t\t\t\t\tsuggestions: [\n+\t\t\t\t\t\t{\n+\t\t\t\t\t\t\tmessageId: \"suggestComment\",\n+\t\t\t\t\t\t\toutput: \"class Foo { static { /* empty */ } }\",\n+\t\t\t\t\t\t},\n+\t\t\t\t\t],\n+\t\t\t\t},\n+\t\t\t],\n \t\t},\n \t\t{\n \t\t\tcode: \"class Foo { static { } }\",\n-\t\t\terrors: [{ messageId: \"unexpected\" }],\n+\t\t\terrors: [\n+\t\t\t\t{\n+\t\t\t\t\tmessageId: \"unexpected\",\n+\t\t\t\t\tline: 1,\n+\t\t\t\t\tcolumn: 20,\n+\t\t\t\t\tendLine: 1,\n+\t\t\t\t\tendColumn: 23,\n+\t\t\t\t\tsuggestions: [\n+\t\t\t\t\t\t{\n+\t\t\t\t\t\t\tmessageId: \"suggestComment\",\n+\t\t\t\t\t\t\toutput: \"class Foo { static { /* empty */ } }\",\n+\t\t\t\t\t\t},\n+\t\t\t\t\t],\n+\t\t\t\t},\n+\t\t\t],\n \t\t},\n \t\t{\n \t\t\tcode: \"class Foo { static { \\n\\n } }\",\n-\t\t\terrors: [{ messageId: \"unexpected\" }],\n+\t\t\terrors: [\n+\t\t\t\t{\n+\t\t\t\t\tmessageId: \"unexpected\",\n+\t\t\t\t\tline: 1,\n+\t\t\t\t\tcolumn: 20,\n+\t\t\t\t\tendLine: 3,\n+\t\t\t\t\tendColumn: 3,\n+\t\t\t\t\tsuggestions: [\n+\t\t\t\t\t\t{\n+\t\t\t\t\t\t\tmessageId: \"suggestComment\",\n+\t\t\t\t\t\t\toutput: \"class Foo { static { /* empty */ } }\",\n+\t\t\t\t\t\t},\n+\t\t\t\t\t],\n+\t\t\t\t},\n+\t\t\t],\n \t\t},\n \t\t{\n \t\t\tcode: \"class Foo { static { bar(); } static {} }\",\n-\t\t\terrors: [{ messageId: \"unexpected\" }],\n+\t\t\terrors: [\n+\t\t\t\t{\n+\t\t\t\t\tmessageId: \"unexpected\",\n+\t\t\t\t\tline: 1,\n+\t\t\t\t\tcolumn: 38,\n+\t\t\t\t\tendLine: 1,\n+\t\t\t\t\tendColumn: 40,\n+\t\t\t\t\tsuggestions: [\n+\t\t\t\t\t\t{\n+\t\t\t\t\t\t\tmessageId: \"suggestComment\",\n+\t\t\t\t\t\t\toutput: \"class Foo { static { bar(); } static { /* empty */ } }\",\n+\t\t\t\t\t\t},\n+\t\t\t\t\t],\n+\t\t\t\t},\n+\t\t\t],\n \t\t},\n \t\t{\n \t\t\tcode: \"class Foo { static // comment\\n {} }\",\n-\t\t\terrors: [{ messageId: \"unexpected\" }],\n+\t\t\terrors: [\n+\t\t\t\t{\n+\t\t\t\t\tmessageId: \"unexpected\",\n+\t\t\t\t\tline: 2,\n+\t\t\t\t\tcolumn: 2,\n+\t\t\t\t\tendLine: 2,\n+\t\t\t\t\tendColumn: 4,\n+\t\t\t\t\tsuggestions: [\n+\t\t\t\t\t\t{\n+\t\t\t\t\t\t\tmessageId: \"suggestComment\",\n+\t\t\t\t\t\t\toutput: \"class Foo { static // comment\\n { /* empty */ } }\",\n+\t\t\t\t\t\t},\n+\t\t\t\t\t],\n+\t\t\t\t},\n+\t\t\t],\n+\t\t},\n+\t\t{\n+\t\t\tcode: \"class Foo { static /* empty */ {} /* empty */ }\",\n+\t\t\terrors: [\n+\t\t\t\t{\n+\t\t\t\t\tmessageId: \"unexpected\",\n+\t\t\t\t\tline: 1,\n+\t\t\t\t\tcolumn: 32,\n+\t\t\t\t\tendLine: 1,\n+\t\t\t\t\tendColumn: 34,\n+\t\t\t\t\tsuggestions: [\n+\t\t\t\t\t\t{\n+\t\t\t\t\t\t\tmessageId: \"suggestComment\",\n+\t\t\t\t\t\t\toutput: \"class Foo { static /* empty */ { /* empty */ } /* empty */ }\",\n+\t\t\t\t\t\t},\n+\t\t\t\t\t],\n+\t\t\t\t},\n+\t\t\t],\n \t\t},\n \t],\n });",
+    "allowed-mutation: Modify only these supplied source paths: lib/rules/no-empty-static-block.js. Do not add, delete, rename, or change modes of other paths."
+  ],
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "v3-development-medium-15-public-contract",
+    "clauses": [
+      {
+        "clause_id": "REQ-001",
+        "kind": "observed-bug",
+        "text": "Observed upstream behavior defect:\nfeat: implement suggestions for no-empty-static-block (#20056)"
+      },
+      {
+        "clause_id": "REQ-002",
+        "kind": "required-behavior",
+        "text": "Correct the observed defect so the documented behavioral examples and their semantic equivalents produce the expected ESLint behavior."
+      },
+      {
+        "clause_id": "REQ-003",
+        "kind": "preserved-behavior",
+        "text": "Preserve all pre-existing behavior, diagnostics, options, and public APIs outside the observed defect; the full pre-existing upstream test suite remains authoritative."
+      },
+      {
+        "clause_id": "REQ-004",
+        "kind": "boundary-error-cases",
+        "text": "Public behavioral examples (test-only diff, not implementation):\ndiff --git a/tests/lib/rules/no-empty-static-block.js b/tests/lib/rules/no-empty-static-block.js\nindex e9631a469..4b5d15b0e 100644\n--- a/tests/lib/rules/no-empty-static-block.js\n+++ b/tests/lib/rules/no-empty-static-block.js\n@@ -29,23 +29,111 @@ ruleTester.run(\"no-empty-static-block\", rule, {\n \tinvalid: [\n \t\t{\n \t\t\tcode: \"class Foo { static {} }\",\n-\t\t\terrors: [{ messageId: \"unexpected\" }],\n+\t\t\terrors: [\n+\t\t\t\t{\n+\t\t\t\t\tmessageId: \"unexpected\",\n+\t\t\t\t\tline: 1,\n+\t\t\t\t\tcolumn: 20,\n+\t\t\t\t\tendLine: 1,\n+\t\t\t\t\tendColumn: 22,\n+\t\t\t\t\tsuggestions: [\n+\t\t\t\t\t\t{\n+\t\t\t\t\t\t\tmessageId: \"suggestComment\",\n+\t\t\t\t\t\t\toutput: \"class Foo { static { /* empty */ } }\",\n+\t\t\t\t\t\t},\n+\t\t\t\t\t],\n+\t\t\t\t},\n+\t\t\t],\n \t\t},\n \t\t{\n \t\t\tcode: \"class Foo { static { } }\",\n-\t\t\terrors: [{ messageId: \"unexpected\" }],\n+\t\t\terrors: [\n+\t\t\t\t{\n+\t\t\t\t\tmessageId: \"unexpected\",\n+\t\t\t\t\tline: 1,\n+\t\t\t\t\tcolumn: 20,\n+\t\t\t\t\tendLine: 1,\n+\t\t\t\t\tendColumn: 23,\n+\t\t\t\t\tsuggestions: [\n+\t\t\t\t\t\t{\n+\t\t\t\t\t\t\tmessageId: \"suggestComment\",\n+\t\t\t\t\t\t\toutput: \"class Foo { static { /* empty */ } }\",\n+\t\t\t\t\t\t},\n+\t\t\t\t\t],\n+\t\t\t\t},\n+\t\t\t],\n \t\t},\n \t\t{\n \t\t\tcode: \"class Foo { static { \\n\\n } }\",\n-\t\t\terrors: [{ messageId: \"unexpected\" }],\n+\t\t\terrors: [\n+\t\t\t\t{\n+\t\t\t\t\tmessageId: \"unexpected\",\n+\t\t\t\t\tline: 1,\n+\t\t\t\t\tcolumn: 20,\n+\t\t\t\t\tendLine: 3,\n+\t\t\t\t\tendColumn: 3,\n+\t\t\t\t\tsuggestions: [\n+\t\t\t\t\t\t{\n+\t\t\t\t\t\t\tmessageId: \"suggestComment\",\n+\t\t\t\t\t\t\toutput: \"class Foo { static { /* empty */ } }\",\n+\t\t\t\t\t\t},\n+\t\t\t\t\t],\n+\t\t\t\t},\n+\t\t\t],\n \t\t},\n \t\t{\n \t\t\tcode: \"class Foo { static { bar(); } static {} }\",\n-\t\t\terrors: [{ messageId: \"unexpected\" }],\n+\t\t\terrors: [\n+\t\t\t\t{\n+\t\t\t\t\tmessageId: \"unexpected\",\n+\t\t\t\t\tline: 1,\n+\t\t\t\t\tcolumn: 38,\n+\t\t\t\t\tendLine: 1,\n+\t\t\t\t\tendColumn: 40,\n+\t\t\t\t\tsuggestions: [\n+\t\t\t\t\t\t{\n+\t\t\t\t\t\t\tmessageId: \"suggestComment\",\n+\t\t\t\t\t\t\toutput: \"class Foo { static { bar(); } static { /* empty */ } }\",\n+\t\t\t\t\t\t},\n+\t\t\t\t\t],\n+\t\t\t\t},\n+\t\t\t],\n \t\t},\n \t\t{\n \t\t\tcode: \"class Foo { static // comment\\n {} }\",\n-\t\t\terrors: [{ messageId: \"unexpected\" }],\n+\t\t\terrors: [\n+\t\t\t\t{\n+\t\t\t\t\tmessageId: \"unexpected\",\n+\t\t\t\t\tline: 2,\n+\t\t\t\t\tcolumn: 2,\n+\t\t\t\t\tendLine: 2,\n+\t\t\t\t\tendColumn: 4,\n+\t\t\t\t\tsuggestions: [\n+\t\t\t\t\t\t{\n+\t\t\t\t\t\t\tmessageId: \"suggestComment\",\n+\t\t\t\t\t\t\toutput: \"class Foo { static // comment\\n { /* empty */ } }\",\n+\t\t\t\t\t\t},\n+\t\t\t\t\t],\n+\t\t\t\t},\n+\t\t\t],\n+\t\t},\n+\t\t{\n+\t\t\tcode: \"class Foo { static /* empty */ {} /* empty */ }\",\n+\t\t\terrors: [\n+\t\t\t\t{\n+\t\t\t\t\tmessageId: \"unexpected\",\n+\t\t\t\t\tline: 1,\n+\t\t\t\t\tcolumn: 32,\n+\t\t\t\t\tendLine: 1,\n+\t\t\t\t\tendColumn: 34,\n+\t\t\t\t\tsuggestions: [\n+\t\t\t\t\t\t{\n+\t\t\t\t\t\t\tmessageId: \"suggestComment\",\n+\t\t\t\t\t\t\toutput: \"class Foo { static /* empty */ { /* empty */ } /* empty */ }\",\n+\t\t\t\t\t\t},\n+\t\t\t\t\t],\n+\t\t\t\t},\n+\t\t\t],\n \t\t},\n \t],\n });"
+      },
+      {
+        "clause_id": "REQ-005",
+        "kind": "allowed-mutation",
+        "text": "Modify only these supplied source paths: lib/rules/no-empty-static-block.js. Do not add, delete, rename, or change modes of other paths."
+      }
+    ],
+    "contract_fingerprint": "sha256:a1bcaee882b29fc23d4cde5866961e0b44749d1b41eeba9278099a517c2eae42"
+  },
+  "base_source_tip": "5634542be580750ffb1a5766470f9e9c72719696",
+  "public_files": [
+    {
+      "path": "lib/rules/no-empty-static-block.js",
+      "content": "/**\n * @fileoverview Rule to disallow empty static blocks.\n * @author Sosuke Suzuki\n */\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../types').Rule.RuleModule} */\nmodule.exports = {\n\tmeta: {\n\t\ttype: \"suggestion\",\n\n\t\tdocs: {\n\t\t\tdescription: \"Disallow empty static blocks\",\n\t\t\trecommended: true,\n\t\t\turl: \"https://eslint.org/docs/latest/rules/no-empty-static-block\",\n\t\t},\n\n\t\tschema: [],\n\n\t\tmessages: {\n\t\t\tunexpected: \"Unexpected empty static block.\",\n\t\t},\n\t},\n\n\tcreate(context) {\n\t\tconst sourceCode = context.sourceCode;\n\n\t\treturn {\n\t\t\tStaticBlock(node) {\n\t\t\t\tif (node.body.length === 0) {\n\t\t\t\t\tconst closingBrace = sourceCode.getLastToken(node);\n\n\t\t\t\t\tif (\n\t\t\t\t\t\tsourceCode.getCommentsBefore(closingBrace).length === 0\n\t\t\t\t\t) {\n\t\t\t\t\t\tcontext.report({\n\t\t\t\t\t\t\tnode,\n\t\t\t\t\t\t\tmessageId: \"unexpected\",\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t},\n\t\t};\n\t},\n};\n"
+    }
+  ]
+}

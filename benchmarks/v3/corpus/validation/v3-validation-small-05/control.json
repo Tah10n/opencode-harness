@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "family_id": "v3-validation-small-05",
+  "oracle": "upstream-eslint-rule-test-and-closed-mutation-set",
+  "defect_severity": "unclassified",
+  "reference_files": [
+    {
+      "path": "lib/rules/no-octal.js",
+      "content": "/**\n * @fileoverview Rule to flag when initializing octal literal\n * @author Ilya Volodin\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Rule Definition\n//------------------------------------------------------------------------------\n\n/** @type {import('../shared/types').Rule} */\nmodule.exports = {\n    meta: {\n        type: \"suggestion\",\n\n        docs: {\n            description: \"disallow octal literals\",\n            recommended: true,\n            url: \"https://eslint.org/docs/rules/no-octal\"\n        },\n\n        schema: [],\n\n        messages: {\n            noOctal: \"Octal literals should not be used.\"\n        }\n    },\n\n    create(context) {\n\n        return {\n\n            Literal(node) {\n                if (typeof node.value === \"number\" && /^0[0-9]/u.test(node.raw)) {\n                    context.report({\n                        node,\n                        messageId: \"noOctal\"\n                    });\n                }\n            }\n        };\n\n    }\n};\n"
+    }
+  ],
+  "hidden_test_files": [
+    {
+      "path": "tests/lib/rules/no-octal.js",
+      "content": "/**\n * @fileoverview Tests for no-octal rule.\n * @author Ilya Volodin\n */\n\n\"use strict\";\n\n//------------------------------------------------------------------------------\n// Requirements\n//------------------------------------------------------------------------------\n\nconst rule = require(\"../../../lib/rules/no-octal\"),\n    { RuleTester } = require(\"../../../lib/rule-tester\");\n\n//------------------------------------------------------------------------------\n// Tests\n//------------------------------------------------------------------------------\n\nconst ruleTester = new RuleTester();\n\nruleTester.run(\"no-octal\", rule, {\n    valid: [\n        \"var a = 'hello world';\",\n        \"0x1234\",\n        \"0X5;\",\n        \"a = 0;\",\n        \"0.1\",\n        \"0.5e1\"\n    ],\n    invalid: [\n        {\n            code: \"var a = 01234;\",\n            errors: [{\n                messageId: \"noOctal\",\n                type: \"Literal\"\n            }]\n        },\n        {\n            code: \"a = 1 + 01234;\",\n            errors: [{\n                messageId: \"noOctal\",\n                type: \"Literal\"\n            }]\n        },\n        {\n            code: \"00\",\n            errors: [{\n                messageId: \"noOctal\",\n                type: \"Literal\"\n            }]\n        },\n        {\n            code: \"08\",\n            errors: [{\n                messageId: \"noOctal\",\n                type: \"Literal\"\n            }]\n        },\n        {\n            code: \"09.1\",\n            errors: [{\n                messageId: \"noOctal\",\n                type: \"Literal\"\n            }]\n        },\n        {\n            code: \"09e1\",\n            errors: [{\n                messageId: \"noOctal\",\n                type: \"Literal\"\n            }]\n        },\n        {\n            code: \"09.1e1\",\n            errors: [{\n                messageId: \"noOctal\",\n                type: \"Literal\"\n            }]\n        },\n        {\n            code: \"018\",\n            errors: [{\n                messageId: \"noOctal\",\n                type: \"Literal\"\n            }]\n        },\n        {\n            code: \"019.1\",\n            errors: [{\n                messageId: \"noOctal\",\n                type: \"Literal\"\n            }]\n        },\n        {\n            code: \"019e1\",\n            errors: [{\n                messageId: \"noOctal\",\n                type: \"Literal\"\n            }]\n        },\n        {\n            code: \"019.1e1\",\n            errors: [{\n                messageId: \"noOctal\",\n                type: \"Literal\"\n            }]\n        }\n    ]\n});\n"
+    }
+  ],
+  "allowed_mutation_paths": [
+    "lib/rules/no-octal.js"
+  ],
+  "test_argv": [
+    "--timeout",
+    "30000",
+    "tests/lib/rules/no-octal.js"
+  ],
+  "runtime_key": "eslint-v8.16",
+  "runtime_version": "8.16",
+  "provenance": {
+    "kind": "real-commit-derived",
+    "repository": "https://github.com/eslint/eslint",
+    "source_commit": "845a7af90ce03b383c8f09654ac049fc161dbb9f",
+    "parent_commit": "10249ad1a961463b6b347be71c074951ab8e2652",
+    "source_paths": [
+      "lib/rules/no-octal.js"
+    ],
+    "patch_fingerprint": "sha256:e40531ee565a76982e7c07fe7fa9001bc054d54a07ee18f3848176ba4ac7ad26",
+    "visible_requirement_fingerprint": "sha256:1572e2574e9d4bd876454e5da74b8ca764fa86a53a8ca79d8066f0baa445545b",
+    "license": "MIT",
+    "license_fingerprint": "sha256:73e2034fe7f17e603f7c3a4bb7f8b71db11a63f94907d08e756c9d4d72a35505"
+  },
+  "requirement_coverage": {
+    "schema_version": 1,
+    "contract_fingerprint": "sha256:59c4cb857412bd36db8ffd0d055ff6caa4b85ae25f1873295a8b984c58dcc73c",
+    "contract_completeness": "self-contained-behavioral-v1",
+    "hidden_test_witnesses": [
+      {
+        "hidden_test_fingerprint": "sha256:ae8e04dc895ead77c3ee5c2fd6ba3dcd9015a08fc574f7eb4b5a31d84bb4cbb2",
+        "clause_ids": [
+          "REQ-002",
+          "REQ-003",
+          "REQ-004"
+        ]
+      }
+    ],
+    "runner_witnesses": [
+      {
+        "witness_id": "semantic-oracle-and-closed-mutation-set",
+        "clause_ids": [
+          "REQ-001",
+          "REQ-002",
+          "REQ-003",
+          "REQ-004",
+          "REQ-005"
+        ]
+      }
+    ]
+  }
+}
