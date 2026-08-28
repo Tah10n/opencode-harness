@@ -38,6 +38,14 @@ for (const [key, tag] of [["eslint-v5.0", "v5.0.1"], ["eslint-v5.1", "v5.1.0"],
     runtime_version: key.slice("eslint-v".length), provenance: { parent_commit: tag },
   } });
 }
+for (const [key, tag] of [["eslint-v5.7", "v5.7.0"], ["eslint-v5.8", "v5.8.0"],
+  ["eslint-v5.9", "v5.9.0"], ["eslint-v5.10", "v5.10.0"], ["eslint-v5.11", "v5.11.1"],
+  ["eslint-v5.12", "v5.12.1"], ["eslint-v5.13", "v5.13.0"], ["eslint-v5.14", "v5.14.1"],
+  ["eslint-v5.15", "v5.15.3"], ["eslint-v5.16", "v5.16.0"]]) {
+  if (!representatives.has(key)) representatives.set(key, { control_surface: {
+    runtime_version: key.slice("eslint-v".length), provenance: { parent_commit: tag },
+  } });
+}
 if (!extendExisting) fs.mkdirSync(output, { recursive: false, mode: 0o700 });
 for (const [key, family] of [...representatives].sort()) {
   const directory = path.join(output, key);

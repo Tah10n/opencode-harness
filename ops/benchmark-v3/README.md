@@ -35,7 +35,7 @@ ops/benchmark-v3/operator-container.sh build
 ```
 
 Prepare a new semantic runtime with the public keys plus deterministic ESLint
-5.0--5.6 and 6.0--6.4 representatives, or extend an existing pre-freeze runtime in place:
+5.0--5.16 and 6.0--6.4 representatives, or extend an existing pre-freeze runtime in place:
 
 ```sh
 BENCHMARK_V3_PROVENANCE_BUNDLE=/absolute/private/eslint-provenance.bundle \
