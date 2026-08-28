@@ -106,7 +106,7 @@ ops/benchmark-v3/operator-container.sh run \
 
 Before baseline, derive the complete external sampling frame from the exact
 frozen ESLint provenance bundle. The versioned
-`semantic-private-path-matching-frozen-eslint-history-v5` policy excludes all
+`semantic-private-subset-packing-frozen-eslint-history-v6` policy excludes all
 210 public split commitments, removes every public source path from mixed
 commits, and recalibrates only the remaining private ESLint runtime JavaScript
 surface without relying on commit-subject keywords. For multi-file commits it
@@ -114,6 +114,9 @@ independently calibrates single-file witnesses and deterministically
 maximum-matches commits to unique paths before considering remaining
 whole-commit identities of at most four paths. Each single-file alternative is
 byte-distinct and comes from the first passing later commit for that exact path.
+For still-unmatched commits, it then calibrates the first minimal lexicographic
+2--4 path subset composed only of paths unused by the single matching; this
+second layer cannot evict or reuse a prior identity.
 It calibrates pre-fix failure and both
 the source-commit reference and the first byte-distinct later real-Git semantic
 alternative that passes from the frozen history, then stores the frame, family pool, and unpredictable salt only in
