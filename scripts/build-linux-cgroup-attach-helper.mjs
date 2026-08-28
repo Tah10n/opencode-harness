@@ -9,12 +9,15 @@ export function containsAsciiControlCharacter(value) {
 }
 
 export function parseArguments(argv, { platform = process.platform } = {}) {
-  const result = { out: null, uid: null, control: null };
+  const result = { out: null, uid: null, control: null, trustedRootCoordinator: false };
   for (let index = 0; index < argv.length; index += 1) {
     const option = argv[index];
     if (option === "--out" && result.out === null) result.out = argv[++index] ?? null;
     else if (option === "--uid" && result.uid === null) result.uid = argv[++index] ?? null;
     else if (option === "--control" && result.control === null) result.control = argv[++index] ?? null;
+    else if (option === "--trusted-root-coordinator" && result.trustedRootCoordinator === false) {
+      result.trustedRootCoordinator = true;
+    }
     else throw new Error(`unsupported Linux helper build argument: ${option}`);
   }
   if (platform !== "linux") throw new Error("Linux cgroup attach helper can only be built on Linux");
@@ -33,9 +36,9 @@ export function parseArguments(argv, { platform = process.platform } = {}) {
     || containsAsciiControlCharacter(result.control) || Buffer.byteLength(result.control, "utf8") > 4096) {
     throw new Error("--control must be a bounded canonical absolute path");
   }
-  if (typeof result.uid !== "string" || !/^[1-9][0-9]*$/u.test(result.uid)
-    || Number(result.uid) > 0x7fffffff) {
-    throw new Error("--uid must be a positive 32-bit integer");
+  if (typeof result.uid !== "string" || !/^(?:0|[1-9][0-9]*)$/u.test(result.uid)
+    || Number(result.uid) > 0x7fffffff || (result.uid === "0" && !result.trustedRootCoordinator)) {
+    throw new Error("--uid must be a positive 32-bit integer unless --trusted-root-coordinator explicitly authorizes uid 0");
   }
   return result;
 }

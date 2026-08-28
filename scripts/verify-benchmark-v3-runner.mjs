@@ -122,6 +122,16 @@ try {
   assert.throws(() => fingerprintBenchmarkV3SemanticRuntimeKey(inventoryFixture, "eslint-v7"), /root package does not match/u,
     "semantic runtime inventory must reject a lockfile v1 with substituted root identity");
   fs.writeFileSync(lockFile, validLock);
+  const wrongVersionPackage = { ...JSON.parse(validPackage), version: "8.0.0" };
+  const wrongVersionLock = JSON.parse(validLock);
+  wrongVersionLock.version = "8.0.0";
+  wrongVersionLock.packages[""].version = "8.0.0";
+  fs.writeFileSync(packageFile, JSON.stringify(wrongVersionPackage));
+  fs.writeFileSync(lockFile, JSON.stringify(wrongVersionLock));
+  assert.throws(() => fingerprintBenchmarkV3SemanticRuntimeKey(inventoryFixture, "eslint-v7"), /declared key/u,
+    "semantic runtime inventory must reject a root version that does not match its directory key");
+  fs.writeFileSync(packageFile, validPackage);
+  fs.writeFileSync(lockFile, validLock);
   const poisonMarker = path.join(inventoryFixture, "ambient-node-options-executed");
   const poisonModule = path.join(inventoryFixture, "poison.cjs");
   fs.writeFileSync(poisonModule, `require("node:fs").writeFileSync(${JSON.stringify(poisonMarker)}, "executed")`);
@@ -217,7 +227,10 @@ try {
     protected_channel: reviewIssuer.protected_channel,
     read_only: true, verdict: "passed", high_findings: 0, medium_findings: 0, source_sha: sourceSha,
     source_tree_fingerprint: `sha256:${"9".repeat(64)}`, corpus_contract_reviewed: true,
-    contract_coverage_reviewed: true, oracle_leakage_reviewed: true, reviewed_at: new Date().toISOString() };
+    contract_coverage_reviewed: true, oracle_leakage_reviewed: true,
+    review_execution_id: "review-fixture-execution-0001", review_method: "independent-read-only-agent-v1",
+    review_evidence_fingerprint: `sha256:${"7".repeat(64)}`,
+    review_result_fingerprint: `sha256:${"8".repeat(64)}`, reviewed_at: new Date().toISOString() };
   const reviewFingerprint = fingerprint(reviewUnsigned);
   const reviewSignedBody = { ...reviewUnsigned, review_fingerprint: reviewFingerprint };
   const reviewPath = path.join(readinessRoot, "review.json");
@@ -295,7 +308,7 @@ try {
     "commit", "--quiet", "-m", "fixture"], { cwd: registryFixture }).status, 0);
   const fixtureIssuerDirectory = path.join(registryFixture, "benchmarks", "v3");
   fs.mkdirSync(fixtureIssuerDirectory, { recursive: true });
-  for (const name of ["review-issuers.v1.json", "holdout-issuers.v1.json", "execution-authority-issuers.v1.json",
+  for (const name of ["readiness-issuers.v1.json", "review-issuers.v1.json", "holdout-issuers.v1.json", "execution-authority-issuers.v1.json",
     "lease-takeover-issuers.v1.json"]) {
     fs.copyFileSync(path.join(root, "benchmarks", "v3", name), path.join(fixtureIssuerDirectory, name));
   }

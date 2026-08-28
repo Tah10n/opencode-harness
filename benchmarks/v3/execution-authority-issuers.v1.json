@@ -8,7 +8,7 @@
       "registry_root": "/var/lib/opencode-harness/benchmark-v3-executions",
       "registry_path": "/var/lib/opencode-harness/benchmark-v3-executions/registry.jsonl",
       "owner_uid": 0,
-      "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAkIF9pPKDbIqrM0F7pBd5j/nPDWnTHONOxjtI8NRB+Uk=\n-----END PUBLIC KEY-----\n"
+      "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAoZjD8riVGv2pWlZmoo5kHM7cQDjDxyMWm6oVdE7BdSU=\n-----END PUBLIC KEY-----\n"
     }
   ]
 }

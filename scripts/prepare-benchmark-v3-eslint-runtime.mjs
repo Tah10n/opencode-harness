@@ -4,13 +4,32 @@ import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-import { fingerprintBenchmarkV3SemanticRuntime, loadBenchmarkV3Corpus, materializeBenchmarkV3ProvenanceBundle } from "../lib/benchmark/v3-corpus.mjs";
+import { discoverBenchmarkV3SemanticRuntimeKeys, fingerprintBenchmarkV3SemanticRuntime,
+  loadBenchmarkV3Corpus, materializeBenchmarkV3ProvenanceBundle } from "../lib/benchmark/v3-corpus.mjs";
 
 const sourceRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const output = path.resolve(process.argv[2] ?? "");
-if (process.argv.length !== 3 || fs.existsSync(output)) throw new Error("usage: node scripts/prepare-benchmark-v3-eslint-runtime.mjs <new-output-directory>");
+const extendExisting = process.argv[2] === "--extend-existing";
+const output = path.resolve(process.argv[extendExisting ? 3 : 2] ?? "");
+if ((!extendExisting && process.argv.length !== 3) || (extendExisting && process.argv.length !== 4)
+  || (!extendExisting && fs.existsSync(output)) || (extendExisting && !fs.statSync(output).isDirectory())) {
+  throw new Error("usage: node scripts/prepare-benchmark-v3-eslint-runtime.mjs [--extend-existing] <output-directory>");
+}
 const corpus = loadBenchmarkV3Corpus(sourceRoot);
 const provenanceBundle = materializeBenchmarkV3ProvenanceBundle(sourceRoot, corpus.source);
+if (extendExisting) {
+  const stat = fs.lstatSync(output);
+  const manifestPath = path.join(output, "RUNTIME.json");
+  let manifest;
+  try { manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8")); }
+  catch { throw new Error("existing semantic runtime manifest is unavailable"); }
+  const keys = discoverBenchmarkV3SemanticRuntimeKeys(output);
+  const frozen = fingerprintBenchmarkV3SemanticRuntime(output, keys);
+  if (!stat.isDirectory() || stat.isSymbolicLink() || stat.uid !== process.getuid() || (stat.mode & 0o077) !== 0
+    || manifest?.schema_version !== 1 || manifest.runtime_fingerprint !== frozen.runtime_fingerprint
+    || JSON.stringify(manifest.entries) !== JSON.stringify(frozen.entries)) {
+    throw new Error("existing semantic runtime does not match its protected frozen manifest");
+  }
+}
 const npmCache = path.join(output, ".npm-cache");
 const representatives = new Map();
 for (const family of corpus.families) {
@@ -20,9 +39,42 @@ for (const family of corpus.families) {
     representatives.set(key, family);
   }
 }
-fs.mkdirSync(output, { recursive: false, mode: 0o700 });
+for (const [key, tag] of [["eslint-v6.0", "v6.0.1"], ["eslint-v6.1", "v6.1.0"],
+  ["eslint-v6.2", "v6.2.2"], ["eslint-v6.3", "v6.3.0"], ["eslint-v6.4", "v6.4.0"]]) {
+  if (!representatives.has(key)) representatives.set(key, { control_surface: {
+    runtime_version: key.slice("eslint-v".length), provenance: { parent_commit: tag },
+  } });
+}
+for (const [key, tag] of [["eslint-v4.0", "v4.0.0"], ["eslint-v4.1", "v4.1.1"],
+  ["eslint-v4.2", "v4.2.0"], ["eslint-v4.3", "v4.3.0"], ["eslint-v4.4", "v4.4.1"],
+  ["eslint-v4.5", "v4.5.0"], ["eslint-v4.6", "v4.6.1"], ["eslint-v4.7", "v4.7.2"],
+  ["eslint-v4.8", "v4.8.0"], ["eslint-v4.10", "v4.10.0"], ["eslint-v4.11", "v4.11.0"],
+  ["eslint-v4.12", "v4.12.1"], ["eslint-v4.13", "v4.13.1"], ["eslint-v4.14", "v4.14.0"],
+  ["eslint-v4.15", "v4.15.0"], ["eslint-v4.16", "v4.16.0"], ["eslint-v4.17", "v4.17.0"],
+  ["eslint-v4.18", "v4.18.2"], ["eslint-v4.19", "v4.19.1"]]) {
+  if (!representatives.has(key)) representatives.set(key, { control_surface: {
+    runtime_version: key.slice("eslint-v".length), provenance: { parent_commit: tag },
+  } });
+}
+for (const [key, tag] of [["eslint-v5.0", "v5.0.1"], ["eslint-v5.1", "v5.1.0"],
+  ["eslint-v5.2", "v5.2.0"], ["eslint-v5.3", "v5.3.0"], ["eslint-v5.4", "v5.4.0"],
+  ["eslint-v5.5", "v5.5.0"], ["eslint-v5.6", "v5.6.1"]]) {
+  if (!representatives.has(key)) representatives.set(key, { control_surface: {
+    runtime_version: key.slice("eslint-v".length), provenance: { parent_commit: tag },
+  } });
+}
+for (const [key, tag] of [["eslint-v5.7", "v5.7.0"], ["eslint-v5.8", "v5.8.0"],
+  ["eslint-v5.9", "v5.9.0"], ["eslint-v5.10", "v5.10.0"], ["eslint-v5.11", "v5.11.1"],
+  ["eslint-v5.12", "v5.12.1"], ["eslint-v5.13", "v5.13.0"], ["eslint-v5.14", "v5.14.1"],
+  ["eslint-v5.15", "v5.15.3"], ["eslint-v5.16", "v5.16.0"]]) {
+  if (!representatives.has(key)) representatives.set(key, { control_surface: {
+    runtime_version: key.slice("eslint-v".length), provenance: { parent_commit: tag },
+  } });
+}
+if (!extendExisting) fs.mkdirSync(output, { recursive: false, mode: 0o700 });
 for (const [key, family] of [...representatives].sort()) {
   const directory = path.join(output, key);
+  if (fs.existsSync(directory)) continue;
   const clone = spawnSync("git", ["clone", "--quiet", "--no-checkout", provenanceBundle, directory], { encoding: "utf8" });
   if (clone.status !== 0) throw new Error(`${key} clone failed`);
   const checkout = spawnSync("git", ["checkout", "--quiet", family.control_surface.provenance.parent_commit], { cwd: directory, encoding: "utf8" });
@@ -34,6 +86,10 @@ for (const [key, family] of [...representatives].sort()) {
   });
   if (install.status !== 0) throw new Error(`${key} dependency installation failed`);
 }
-const result = fingerprintBenchmarkV3SemanticRuntime(output, [...representatives.keys()]);
-fs.writeFileSync(path.join(output, "RUNTIME.json"), `${JSON.stringify({ schema_version: 1, runtime_fingerprint: result.runtime_fingerprint, entries: result.entries }, null, 2)}\n`, "utf8");
-process.stdout.write(`${JSON.stringify({ status: "prepared", runtime_fingerprint: result.runtime_fingerprint, keys: [...representatives.keys()].sort() })}\n`);
+const runtimeKeys = discoverBenchmarkV3SemanticRuntimeKeys(output);
+const result = fingerprintBenchmarkV3SemanticRuntime(output, runtimeKeys);
+const runtimeManifest = path.join(output, "RUNTIME.json");
+const temporaryManifest = `${runtimeManifest}.tmp-${process.pid}`;
+fs.writeFileSync(temporaryManifest, `${JSON.stringify({ schema_version: 1, runtime_fingerprint: result.runtime_fingerprint, entries: result.entries }, null, 2)}\n`, "utf8");
+fs.renameSync(temporaryManifest, runtimeManifest);
+process.stdout.write(`${JSON.stringify({ status: "prepared", runtime_fingerprint: result.runtime_fingerprint, keys: runtimeKeys })}\n`);

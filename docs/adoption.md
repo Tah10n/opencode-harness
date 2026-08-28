@@ -158,6 +158,7 @@ lib/profile-v3.mjs
 lib/quality
 native
 opencode.json
+ops
 package-lock.json
 package.json
 profiles
@@ -170,8 +171,8 @@ skills
 
 The exact plugin file depends on `lib/quality/` and the checked `quality/`
 schemas, policies, prompt inventory, and live sidecars. The package boundary
-also needs `lib/feedback/`. The `adoption/`, `benchmarks/`, `profiles/`, and
-`lib/benchmark/` entries close the executable synthetic-benchmark contract;
+also needs `lib/feedback/`. The `adoption/`, `benchmarks/`, `profiles/`,
+`lib/benchmark/`, and `ops/` entries close the executable benchmark contract;
 the scripts, eval manifests, fixtures, and metadata above are deterministic
 verification inputs.
 `fixtures/sample-project/` and `fixtures/live/` remain required subsets of the

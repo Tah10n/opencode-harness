@@ -60,6 +60,19 @@ static bool parse_unsigned(const char *text, unsigned long long maximum, unsigne
   return true;
 }
 
+static bool parse_uid(const char *text, unsigned long long *result) {
+  if (text == NULL || text[0] == '\0') return false;
+  for (const unsigned char *cursor = (const unsigned char *)text; *cursor != '\0'; cursor += 1U) {
+    if (!isdigit(*cursor)) return false;
+  }
+  errno = 0;
+  char *end = NULL;
+  const unsigned long long parsed = strtoull(text, &end, 10);
+  if (errno != 0 || end == text || *end != '\0' || parsed > UINT_MAX) return false;
+  *result = parsed;
+  return true;
+}
+
 static bool valid_challenge(const char *value) {
   if (value == NULL || strlen(value) != CHALLENGE_BYTES) return false;
   for (size_t index = 0; index < CHALLENGE_BYTES; index += 1U) {
@@ -122,7 +135,7 @@ static int read_process_identity(pid_t pid, struct process_identity *result) {
   const char saved = *uid_end;
   *uid_end = '\0';
   unsigned long long uid_value = 0;
-  const bool uid_valid = parse_unsigned(uid_line, UINT_MAX, &uid_value);
+  const bool uid_valid = parse_uid(uid_line, &uid_value);
   *uid_end = saved;
   if (!uid_valid) {
     errno = EPROTO;
@@ -201,7 +214,7 @@ int main(int argc, char **argv) {
   unsigned long long sudo_uid = 0;
   unsigned long long parsed_pid = 0;
   unsigned long long expected_start_ticks = 0;
-  if (!parse_unsigned(getenv("SUDO_UID"), UINT_MAX, &sudo_uid)
+  if (!parse_uid(getenv("SUDO_UID"), &sudo_uid)
       || sudo_uid != (unsigned long long)OPENCODE_EXPECTED_UID
       || !parse_unsigned(argv[1], INT_MAX, &parsed_pid)
       || !parse_unsigned(argv[2], ULLONG_MAX, &expected_start_ticks)) return 77;

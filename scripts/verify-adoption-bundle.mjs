@@ -45,6 +45,7 @@ const adoptionEntries = [
   "lib/quality",
   "native",
   "opencode.json",
+  "ops",
   "package-lock.json",
   "package.json",
   "profiles",
@@ -264,6 +265,7 @@ function assertPortableAdoptionDeclaration(entries) {
     "lib/feedback",
     "lib/profile-v3.mjs",
     "lib/quality",
+    "ops",
     "profiles",
     "quality",
     "runtime",
@@ -417,7 +419,7 @@ try {
       throw new Error(`${documentationPath} portable adoption list drifted from adoptionEntries`);
     }
   }
-  for (const requiredEntry of [".opencode/assurance", "adoption", "benchmarks", "lib/benchmark", "lib/profile-v3.mjs", "profiles", "runtime"]) {
+  for (const requiredEntry of [".opencode/assurance", "adoption", "benchmarks", "lib/benchmark", "lib/profile-v3.mjs", "ops", "profiles", "runtime"]) {
     expectPortableAdoptionDeclarationFailure(`${requiredEntry} omission sensor`, adoptionEntries.filter(
       (entry) => entry !== requiredEntry,
     ));
@@ -473,6 +475,7 @@ try {
     "fixtures/sample-project",
     "lib/benchmark",
     "lib/feedback",
+    "ops/benchmark-v3",
     "profiles",
     "runtime",
     "scripts",

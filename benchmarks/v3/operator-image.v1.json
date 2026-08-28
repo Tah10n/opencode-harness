@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "images": {
+    "arm64": {
+      "runtime_fingerprint": "sha256:ee8d8f57d9bd65abc7a345b297a0d3d6d9da27ae154a39587775b4eb8a973b27"
+    }
+  }
+}
