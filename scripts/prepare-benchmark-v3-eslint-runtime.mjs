@@ -4,7 +4,8 @@ import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-import { fingerprintBenchmarkV3SemanticRuntime, loadBenchmarkV3Corpus, materializeBenchmarkV3ProvenanceBundle } from "../lib/benchmark/v3-corpus.mjs";
+import { discoverBenchmarkV3SemanticRuntimeKeys, fingerprintBenchmarkV3SemanticRuntime,
+  loadBenchmarkV3Corpus, materializeBenchmarkV3ProvenanceBundle } from "../lib/benchmark/v3-corpus.mjs";
 
 const sourceRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const extendExisting = process.argv[2] === "--extend-existing";
@@ -45,9 +46,10 @@ for (const [key, family] of [...representatives].sort()) {
   });
   if (install.status !== 0) throw new Error(`${key} dependency installation failed`);
 }
-const result = fingerprintBenchmarkV3SemanticRuntime(output, [...representatives.keys()]);
+const runtimeKeys = discoverBenchmarkV3SemanticRuntimeKeys(output);
+const result = fingerprintBenchmarkV3SemanticRuntime(output, runtimeKeys);
 const runtimeManifest = path.join(output, "RUNTIME.json");
 const temporaryManifest = `${runtimeManifest}.tmp-${process.pid}`;
 fs.writeFileSync(temporaryManifest, `${JSON.stringify({ schema_version: 1, runtime_fingerprint: result.runtime_fingerprint, entries: result.entries }, null, 2)}\n`, "utf8");
 fs.renameSync(temporaryManifest, runtimeManifest);
-process.stdout.write(`${JSON.stringify({ status: "prepared", runtime_fingerprint: result.runtime_fingerprint, keys: [...representatives.keys()].sort() })}\n`);
+process.stdout.write(`${JSON.stringify({ status: "prepared", runtime_fingerprint: result.runtime_fingerprint, keys: runtimeKeys })}\n`);
