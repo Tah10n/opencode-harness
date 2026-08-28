@@ -18,19 +18,28 @@ placeholders on 2026-08-27. Public SPKI fingerprints and the custody-inventory
 binding are committed in
 `benchmarks/v3/operator-key-fingerprints.v1.json`; private keys are never part
 of the source tree. `authority:init` creates the four authority keys once, and
-each `reviewer:init` creates exactly one reviewer key. A complete existing custody is verified, while a partial custody, mismatched
-inventory, weak mode, or key/registry mismatch fails closed.
+each reviewer `init` creates exactly one reviewer key. A complete existing
+custody is verified, while a partial custody, mismatched inventory, weak mode,
+or key/registry mismatch fails closed.
 
-The launcher resolves the built image to its immutable image ID and requires
-its embedded source label to equal the exact reviewed SHA. It is also an npm-script allowlist whose accepted names are mapped directly
-to fixed Node entrypoints, bypassing npm lifecycle hooks. `authority:init` runs
+The source-independent toolchain image contains no repository bytes and its
+architecture-specific immutable image ID is committed in
+`benchmarks/v3/operator-image.v1.json`. The launchers require that exact image
+ID and execute the entrypoint from the exact clean reviewed source mount. The
+authority launcher is also an npm-script allowlist whose accepted names are
+mapped directly to fixed Node entrypoints, bypassing npm lifecycle hooks.
+`authority:init` runs
 with no network, all Linux capabilities dropped, and no host cgroup access.
-Every command, including bootstrap, requires `BENCHMARK_V3_REVIEWED_SOURCE_SHA` to equal the
-exact clean mounted HEAD; only containment, calibration, readiness, and
+Every command, including bootstrap, requires
+`BENCHMARK_V3_REVIEWED_SOURCE_SHA` to equal the exact clean mounted HEAD; only
+containment, calibration, readiness, and
 canonical runner commands receive the privileged host-cgroup environment.
 Provider authorization is accepted only for `bench:v3` or `bench:v3:holdout`.
 
-Build the image from a clean tree; the launcher embeds that exact SHA:
+Build the source-independent toolchain image from a clean tree, record its
+immutable architecture-specific image ID in the image registry, and have both
+independent reviewer administrators provision that exact image in their own
+Docker contexts:
 
 ```sh
 ops/benchmark-v3/operator-container.sh build
@@ -150,11 +159,37 @@ Each independent read-only reviewer supplies a role-specific structured result
 bound to the exact source SHA and tree, a unique review execution ID, the fixed
 `independent-read-only-agent-v1` method, and a privacy-safe evidence
 fingerprint. The same result cannot be reused for both identities and each
-reviewer channel accepts only one issuance. First provision each isolated
-single-key custody with `bench:v3:reviewer:init`. The matching reviewer then
-uses `bench:v3:review:sign` to sign the exact evidence bytes and structured
+reviewer channel accepts only one issuance. Reviewer custody cannot be mounted
+by the authority launcher. Each reviewer administrator uses
+`reviewer-container.sh` through a separately administered Docker context, an
+opaque role-private volume name, and a private review root. The reviewer first
+runs `init`, then `sign` to sign the exact evidence bytes and structured
 zero-HIGH/zero-MEDIUM result. The authority-side `review:issue` has no reviewer
-private key; it only verifies and imports the signed receipt into its protected channel:
+private key; it only verifies and imports the signed receipt into its protected
+channel:
+
+```sh
+BENCHMARK_V3_REVIEWER_DOCKER_CONTEXT=<reviewer-administered-context> \
+BENCHMARK_V3_REVIEWER_CUSTODY_VOLUME=<opaque-role-private-volume> \
+BENCHMARK_V3_REVIEW_ROOT=/absolute/private/reviewer-one \
+BENCHMARK_V3_REVIEWED_SOURCE_SHA=<exact-reviewed-sha> \
+ops/benchmark-v3/reviewer-container.sh one init \
+  --registry-output /review/reviewer-one-registry.json
+
+BENCHMARK_V3_REVIEWER_DOCKER_CONTEXT=<reviewer-administered-context> \
+BENCHMARK_V3_REVIEWER_CUSTODY_VOLUME=<opaque-role-private-volume> \
+BENCHMARK_V3_REVIEW_ROOT=/absolute/private/reviewer-one \
+BENCHMARK_V3_REVIEWED_SOURCE_SHA=<exact-reviewed-sha> \
+ops/benchmark-v3/reviewer-container.sh one sign \
+  --result /review/reviewer-one-result.json \
+  --evidence /review/reviewer-one-evidence.md \
+  --output /review/reviewer-one-signed.json
+```
+
+The two reviewer administrators must not share Docker-context credentials,
+custody volume names, or private review roots with the authority operator or
+with each other. Only their public registry bundles and signed review evidence
+cross that boundary. The authority operator imports a signed result as follows:
 
 ```sh
 BENCHMARK_V3_REVIEWED_SOURCE_SHA=<exact-reviewed-sha> \

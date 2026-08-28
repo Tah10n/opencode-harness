@@ -65,13 +65,38 @@ try {
   for (const invariant of ["--network none --cap-drop ALL --security-opt no-new-privileges",
     "--env BENCHMARK_V3_CGROUP_REQUIRED=0", "provider authorization is accepted only for a canonical model runner",
     "set -- node \"/workspace/source/$entrypoint\" \"$@\"",
-    "operator image is not built from the exact reviewed source SHA",
+    "operator image does not match the committed immutable image ID",
     "--env \"BENCHMARK_V3_PROVIDER_ONLY_EGRESS=$provider_only\"",
-    "src=$reviewer_volume,dst=/var/lib/opencode-harness-reviewer",
     "src=$external_bundle,dst=/opt/benchmark-v3/provenance.bundle,readonly",
     "src=$external_runtime,dst=/opt/benchmark-v3/semantic-runtime,readonly"]) {
     assert.equal(launcherSource.includes(invariant), true, `operator launcher is missing invariant: ${invariant}`);
   }
+  for (const forbidden of ["bench:v3:reviewer:init", "bench:v3:review:sign",
+    "dst=/var/lib/opencode-harness-reviewer"]) {
+    assert.equal(launcherSource.includes(forbidden), false,
+      `authority launcher must not expose reviewer custody: ${forbidden}`);
+  }
+  const reviewerLauncher = path.join(root, "ops", "benchmark-v3", "reviewer-container.sh");
+  const reviewerLauncherSource = fs.readFileSync(reviewerLauncher, "utf8");
+  for (const invariant of ["BENCHMARK_V3_REVIEWER_DOCKER_CONTEXT", "BENCHMARK_V3_REVIEWER_CUSTODY_VOLUME",
+    "BENCHMARK_V3_REVIEW_ROOT", "docker --context \"$docker_context\"",
+    "--tmpfs /run:rw,nosuid,nodev,mode=0755",
+    "--tmpfs /var/lib/opencode-harness:rw,nosuid,nodev,noexec,mode=0700",
+    "src=$custody_volume,dst=/var/lib/opencode-harness-reviewer",
+    "reviewer image does not match the committed immutable image ID"]) {
+    assert.equal(reviewerLauncherSource.includes(invariant), true,
+      `reviewer launcher is missing invariant: ${invariant}`);
+  }
+  const imageRegistry = JSON.parse(fs.readFileSync(path.join(root, "benchmarks", "v3", "operator-image.v1.json"), "utf8"));
+  assert.equal(imageRegistry.schema_version, 1);
+  assert.deepEqual(Object.keys(imageRegistry.images), ["arm64"]);
+  assert.match(imageRegistry.images.arm64.image_id, /^sha256:[0-9a-f]{64}$/u);
+  assert.notEqual(imageRegistry.images.arm64.image_id, `sha256:${"0".repeat(64)}`,
+    "operator image registry must contain a provisioned immutable image ID");
+  const dockerfileSource = fs.readFileSync(path.join(root, "ops", "benchmark-v3", "Dockerfile"), "utf8");
+  assert.equal(dockerfileSource.includes("COPY "), false, "toolchain image must not copy repository bytes");
+  assert.equal(dockerfileSource.includes("benchmark-v3.source-sha"), false,
+    "toolchain image identity must not rely on a self-asserted source label");
   const stratifiedFixture = stratifyBenchmarkV3ExternalPool(Array.from({ length: 93 }, (_, index) => ({
     complexity: index, commit: String(index).padStart(40, "0"),
   })));

@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "images": {
+    "arm64": {
+      "image_id": "sha256:cbf7d3bf5b215c1cfe881e9aafe73e2ca8b863464c6b355ea994cd2cf5ca84d3"
+    }
+  }
+}
