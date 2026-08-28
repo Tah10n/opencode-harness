@@ -64,6 +64,7 @@ try {
   const launcherSource = fs.readFileSync(launcher, "utf8");
   for (const invariant of ["--network none --cap-drop ALL --security-opt no-new-privileges",
     "--env BENCHMARK_V3_CGROUP_REQUIRED=0", "provider authorization is accepted only for a canonical model runner",
+    "docker build --provenance=false",
     "set -- node \"/workspace/source/$entrypoint\" \"$@\"",
     "operator image does not match the committed immutable image ID",
     "--env \"BENCHMARK_V3_PROVIDER_ONLY_EGRESS=$provider_only\"",

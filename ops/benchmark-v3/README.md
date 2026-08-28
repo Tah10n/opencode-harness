@@ -36,10 +36,10 @@ containment, calibration, readiness, and
 canonical runner commands receive the privileged host-cgroup environment.
 Provider authorization is accepted only for `bench:v3` or `bench:v3:holdout`.
 
-Build the source-independent toolchain image from a clean tree, record its
-immutable architecture-specific image ID in the image registry, and have both
-independent reviewer administrators provision that exact image in their own
-Docker contexts:
+Build the source-independent toolchain image without BuildKit's nondeterministic
+attestation wrapper, record its immutable architecture-specific platform image
+ID in the image registry, and have both independent reviewer administrators
+load that exact image rather than rebuilding it in their own Docker contexts:
 
 ```sh
 ops/benchmark-v3/operator-container.sh build

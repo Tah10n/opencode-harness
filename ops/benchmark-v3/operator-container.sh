@@ -23,7 +23,8 @@ case "$action" in
       echo "operator image requires an exact clean source tree" >&2
       exit 78
     fi
-    exec docker build --file "$canonical_source/ops/benchmark-v3/Dockerfile" --tag "$image" "$canonical_source"
+    exec docker build --provenance=false --file "$canonical_source/ops/benchmark-v3/Dockerfile" \
+      --tag "$image" "$canonical_source"
     ;;
   run)
     if [ -z "$campaign_root" ] || [ ! -d "$campaign_root" ]; then

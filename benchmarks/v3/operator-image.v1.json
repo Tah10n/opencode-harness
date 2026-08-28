@@ -2,7 +2,7 @@
   "schema_version": 1,
   "images": {
     "arm64": {
-      "image_id": "sha256:cbf7d3bf5b215c1cfe881e9aafe73e2ca8b863464c6b355ea994cd2cf5ca84d3"
+      "image_id": "sha256:d46c23dfae7baa39e615f5522bd1568422a12ac3ee8a7ac868acf96cfb202d1b"
     }
   }
 }
