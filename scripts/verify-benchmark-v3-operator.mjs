@@ -84,6 +84,7 @@ try {
     "--tmpfs /run/opencode-harness:rw,nosuid,nodev,noexec,mode=0700",
     "--tmpfs /var/lib/opencode-harness:rw,nosuid,nodev,noexec,mode=0700",
     "src=$custody_volume,dst=/var/lib/opencode-harness-reviewer",
+    "--env \"BENCHMARK_V3_REVIEWER_ONLY=$reviewer\"",
     "reviewer image does not match the committed immutable image ID"]) {
     assert.equal(reviewerLauncherSource.includes(invariant), true,
       `reviewer launcher is missing invariant: ${invariant}`);
@@ -98,6 +99,11 @@ try {
   assert.equal(dockerfileSource.includes("COPY "), false, "toolchain image must not copy repository bytes");
   assert.equal(dockerfileSource.includes("benchmark-v3.source-sha"), false,
     "toolchain image identity must not rely on a self-asserted source label");
+  const entrypointSource = fs.readFileSync(path.join(root, "ops", "benchmark-v3", "entrypoint.sh"), "utf8");
+  for (const invariant of ["BENCHMARK_V3_REVIEWER_ONLY", "chown root:root /var/lib/opencode-harness-reviewer",
+    "chmod 0700 /var/lib/opencode-harness-reviewer"]) {
+    assert.equal(entrypointSource.includes(invariant), true, `operator entrypoint is missing reviewer invariant: ${invariant}`);
+  }
   const stratifiedFixture = stratifyBenchmarkV3ExternalPool(Array.from({ length: 93 }, (_, index) => ({
     complexity: index, commit: String(index).padStart(40, "0"),
   })));

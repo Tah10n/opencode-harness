@@ -16,6 +16,19 @@ fi
 
 chmod 0700 /var/lib/opencode-harness
 chmod 0700 /var/run/opencode-harness
+case "${BENCHMARK_V3_REVIEWER_ONLY:-}" in
+  '') ;;
+  one|two)
+    if [ "${BENCHMARK_V3_CGROUP_REQUIRED:-1}" != "0" ] \
+      || [ ! -d /var/lib/opencode-harness-reviewer ]; then
+      echo "reviewer custody bootstrap requires the isolated model-free mount" >&2
+      exit 78
+    fi
+    chown root:root /var/lib/opencode-harness-reviewer
+    chmod 0700 /var/lib/opencode-harness-reviewer
+    ;;
+  *) echo "BENCHMARK_V3_REVIEWER_ONLY must be one or two" >&2; exit 79 ;;
+esac
 if [ "${BENCHMARK_V3_CGROUP_REQUIRED:-1}" = "1" ]; then
   case "${BENCHMARK_V3_OPERATOR_IMAGE_ID:-}" in
     sha256:????????????????????????????????????????????????????????????????) ;;

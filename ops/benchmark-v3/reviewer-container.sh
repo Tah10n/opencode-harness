@@ -52,6 +52,7 @@ exec docker --context "$docker_context" run --rm --network none --cap-drop ALL -
   --mount "type=bind,src=$source_root,dst=/workspace/source,readonly" \
   --mount "type=bind,src=$review_root,dst=/review" \
   --mount "type=volume,src=$custody_volume,dst=/var/lib/opencode-harness-reviewer" \
-  --env BENCHMARK_V3_CGROUP_REQUIRED=0 --env "BENCHMARK_V3_OPERATOR_IMAGE_ID=$image_id" \
+  --env BENCHMARK_V3_CGROUP_REQUIRED=0 --env "BENCHMARK_V3_REVIEWER_ONLY=$reviewer" \
+  --env "BENCHMARK_V3_OPERATOR_IMAGE_ID=$image_id" \
   "$image_id" node "/workspace/source/$entrypoint" --source-root /workspace/source \
   --custody-root /var/lib/opencode-harness-reviewer --reviewer "$reviewer" "$@"
