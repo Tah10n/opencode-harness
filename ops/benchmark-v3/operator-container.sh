@@ -15,6 +15,8 @@ custody_volume="${BENCHMARK_V3_CUSTODY_VOLUME:-opencode-harness-benchmark-v3-aut
 channel_volume="${BENCHMARK_V3_CHANNEL_VOLUME:-opencode-harness-benchmark-v3-channels}"
 external_bundle="${BENCHMARK_V3_PROVENANCE_BUNDLE:-}"
 external_runtime="${BENCHMARK_V3_SEMANTIC_RUNTIME_ROOT:-}"
+oauth_state_file="${BENCHMARK_V3_OPENAI_OAUTH_FILE:-}"
+provider_auth_mode="${BENCHMARK_V3_PROVIDER_AUTH_MODE:-api}"
 
 case "$action" in
   build)
@@ -82,6 +84,11 @@ case "$action" in
       echo "operator image does not match the committed immutable runtime fingerprint" >&2
       exit 79
     fi
+    case "$provider_auth_mode" in api|oauth) ;; *) echo "BENCHMARK_V3_PROVIDER_AUTH_MODE must be api or oauth" >&2; exit 80 ;; esac
+    if [ -n "${BENCHMARK_V3_OPENAI_KEY_FILE:-}" ] && [ -n "$oauth_state_file" ]; then
+      echo "API key and OAuth state credentials are mutually exclusive" >&2
+      exit 81
+    fi
     if [ -n "${BENCHMARK_V3_OPENAI_KEY_FILE:-}" ]; then
       if [ "$script" != "bench:v3" ] && [ "$script" != "bench:v3:holdout" ]; then
         echo "provider authorization is accepted only for a canonical model runner" >&2
@@ -95,6 +102,42 @@ case "$action" in
       if [ "$key_mode" != "400" ] && [ "$key_mode" != "600" ]; then
         echo "BENCHMARK_V3_OPENAI_KEY_FILE must have mode 0400 or 0600" >&2
         exit 69
+      fi
+      if [ "$provider_auth_mode" != "api" ]; then
+        echo "API key authorization requires BENCHMARK_V3_PROVIDER_AUTH_MODE=api" >&2
+        exit 82
+      fi
+    fi
+    if [ -n "$oauth_state_file" ]; then
+      if [ "$script" != "bench:v3" ] && [ "$script" != "bench:v3:holdout" ]; then
+        echo "provider authorization is accepted only for a canonical model runner" >&2
+        exit 74
+      fi
+      if [ ! -f "$oauth_state_file" ] || [ -L "$oauth_state_file" ]; then
+        echo "BENCHMARK_V3_OPENAI_OAUTH_FILE must be a non-symlink regular file" >&2
+        exit 83
+      fi
+      oauth_parent="$(cd "$(dirname "$oauth_state_file")" && pwd -P)"
+      if [ "$oauth_parent/$(basename "$oauth_state_file")" != "$oauth_state_file" ] \
+        || [ "$(basename "$oauth_state_file")" != "openai-oauth-state.jsonl" ]; then
+        echo "BENCHMARK_V3_OPENAI_OAUTH_FILE must be a canonical absolute path" >&2
+        exit 86
+      fi
+      oauth_parent_mode="$(stat -f '%Lp' "$oauth_parent" 2>/dev/null || stat -c '%a' "$oauth_parent")"
+      oauth_parent_uid="$(stat -f '%u' "$oauth_parent" 2>/dev/null || stat -c '%u' "$oauth_parent")"
+      if [ "$oauth_parent_mode" != "700" ] || [ "$oauth_parent_uid" != "$(id -u)" ]; then
+        echo "BENCHMARK_V3_OPENAI_OAUTH_FILE parent must be private and owner-controlled" >&2
+        exit 87
+      fi
+      oauth_mode="$(stat -f '%Lp' "$oauth_state_file" 2>/dev/null || stat -c '%a' "$oauth_state_file")"
+      if [ "$oauth_mode" != "600" ]; then
+        echo "BENCHMARK_V3_OPENAI_OAUTH_FILE must have mode 0600" >&2
+        exit 84
+      fi
+      oauth_size="$(stat -f '%z' "$oauth_state_file" 2>/dev/null || stat -c '%s' "$oauth_state_file")"
+      if [ "$oauth_size" -lt 1 ] || [ "$oauth_size" -gt 262144 ] || [ "$provider_auth_mode" != "oauth" ]; then
+        echo "OAuth state authorization is invalid or not bound to oauth mode" >&2
+        exit 85
       fi
     fi
     if [ -n "$external_bundle" ] || [ -n "$external_runtime" ]; then
@@ -126,6 +169,7 @@ case "$action" in
         --mount "type=volume,src=$custody_volume,dst=/var/lib/opencode-harness" \
         --mount "type=volume,src=$channel_volume,dst=/run/opencode-harness" \
         --env BENCHMARK_V3_CGROUP_REQUIRED=0 \
+        --env "BENCHMARK_V3_PROVIDER_AUTH_MODE=$provider_auth_mode" \
         --env "BENCHMARK_V3_OPERATOR_IMAGE_ID=$image_fingerprint" \
         "$image_id" "$@"
     fi
@@ -142,6 +186,23 @@ case "$action" in
         --env BENCHMARK_V3_CGROUP_REQUIRED=1 \
         --env "BENCHMARK_V3_OPERATOR_IMAGE_ID=$image_fingerprint" \
         --env "BENCHMARK_V3_PROVIDER_ONLY_EGRESS=$provider_only" \
+        --env "BENCHMARK_V3_PROVIDER_AUTH_MODE=$provider_auth_mode" \
+        "$image_id" "$@"
+    fi
+    if [ -n "$oauth_state_file" ]; then
+      exec docker run --rm --privileged --cgroupns=host --hostname benchmark-v3-authority --read-only \
+        --tmpfs /tmp:rw,exec,nosuid,nodev,mode=1777 \
+        --tmpfs /usr/local/libexec:rw,exec,nosuid,nodev,mode=0755 \
+        --mount "type=bind,src=$source_root,dst=/workspace/source,readonly" \
+        --mount "type=bind,src=$campaign_root,dst=/campaign" \
+        --mount "type=bind,src=$oauth_parent,dst=/run/secrets/openai-oauth" \
+        --mount "type=volume,src=$custody_volume,dst=/var/lib/opencode-harness" \
+        --mount "type=volume,src=$channel_volume,dst=/run/opencode-harness" \
+        --env OPENAI_OAUTH_STATE_FILE=/run/secrets/openai-oauth/openai-oauth-state.jsonl \
+        --env BENCHMARK_V3_CGROUP_REQUIRED=1 \
+        --env "BENCHMARK_V3_OPERATOR_IMAGE_ID=$image_fingerprint" \
+        --env "BENCHMARK_V3_PROVIDER_ONLY_EGRESS=$provider_only" \
+        --env "BENCHMARK_V3_PROVIDER_AUTH_MODE=$provider_auth_mode" \
         "$image_id" "$@"
     fi
     if [ -n "${BENCHMARK_V3_OPENAI_KEY_FILE:-}" ]; then
@@ -157,6 +218,7 @@ case "$action" in
         --env BENCHMARK_V3_CGROUP_REQUIRED=1 \
         --env "BENCHMARK_V3_OPERATOR_IMAGE_ID=$image_fingerprint" \
         --env "BENCHMARK_V3_PROVIDER_ONLY_EGRESS=$provider_only" \
+        --env "BENCHMARK_V3_PROVIDER_AUTH_MODE=$provider_auth_mode" \
         "$image_id" "$@"
     fi
     exec docker run --rm --privileged --cgroupns=host --hostname benchmark-v3-authority --read-only \
@@ -169,6 +231,7 @@ case "$action" in
       --env BENCHMARK_V3_CGROUP_REQUIRED=1 \
       --env "BENCHMARK_V3_OPERATOR_IMAGE_ID=$image_fingerprint" \
       --env "BENCHMARK_V3_PROVIDER_ONLY_EGRESS=$provider_only" \
+      --env "BENCHMARK_V3_PROVIDER_AUTH_MODE=$provider_auth_mode" \
       "$image_id" "$@"
     ;;
   *)

@@ -241,17 +241,56 @@ npm run bench:v3:holdout:materialize -- \
   --holdout-root /var/run/opencode-harness/holdout/campaign-001/materialized
 ```
 
-Provider authorization is mounted as a root-only Docker secret file and named
-with `OPENAI_API_KEY_FILE`; never pass the key as a Docker environment value or
-command argument. The runner consumes the key through its one-shot credential
-bridge, and Bubblewrap does not mount `/run/secrets` into model workspaces.
+Provider authorization supports two mutually exclusive modes. API authorization
+is mounted as a root-only Docker secret file and named with
+`OPENAI_API_KEY_FILE`; never pass the key as a Docker environment value or
+command argument. Subscription authorization uses an exact OpenAI OAuth entry
+created by OpenCode. Create that entry under a dedicated private OpenCode data
+root rather than copying the actively used desktop/CLI auth store: refresh-token
+rotation must not leave the user's ordinary OpenCode session with stale custody.
+Import the dedicated entry once into a private append-only state journal; the
+initializer prints only a state fingerprint:
+
+```sh
+install -d -m 0700 /absolute/private/campaign/opencode-data
+XDG_DATA_HOME=/absolute/private/campaign/opencode-data \
+  opencode auth login --pure --provider openai --method "ChatGPT Pro/Plus (browser)"
+chmod 0700 /absolute/private/campaign/opencode-data/opencode
+install -d -m 0700 /absolute/private/campaign/oauth-custody
+npm run bench:v3:oauth:init -- \
+  --input /absolute/private/campaign/opencode-data/opencode/auth.json \
+  --output /absolute/private/campaign/oauth-custody/openai-oauth-state.jsonl
+```
+
+Both the input and output parents must be owner-controlled, the input must not
+be group/world accessible, and the new state journal is created with mode
+`0600`. Initialization creates a random, non-secret custody epoch and reports
+only its fingerprint; that stable fingerprint is bound across campaign resume
+and holdout while token rotations retain the same epoch. Run the canonical model
+command with
+`BENCHMARK_V3_PROVIDER_AUTH_MODE=oauth` and
+`BENCHMARK_V3_OPENAI_OAUTH_FILE` naming that journal. The launcher mounts only
+the dedicated custody directory that contains the journal and its rotation lock,
+never the user's complete OpenCode data directory. Each attempt
+receives a one-shot credential payload which is erased before dispatch. OAuth
+refresh stays in a host-side loopback broker and rotations are appended directly
+to the external state journal. Bubblewrap receives neither the refresh token nor
+the journal; the model process receives only a per-attempt loopback capability,
+which its plugin consumes and erases before dispatch. Raw OAuth state is absent
+from the workspace, shell environment, receipts, stdout, and stderr.
+
+In either mode Bubblewrap does not mount `/run/secrets` into model workspaces.
+The API and OAuth credential inputs are accepted only for `bench:v3` or
+`bench:v3:holdout` and cannot be supplied together.
 
 For the sealed holdout, the launcher unconditionally enables provider-only
 egress for both readiness verification and execution; there is no permissive
 default or operator override. The
-entrypoint resolves `api.openai.com` before installing a default-deny OUTPUT
-policy, pins only those addresses in a read-only hosts file, and then allows
-HTTPS only to those provider addresses. Runtime DNS and every other destination
-remain denied. `readiness:issue` verifies the allowed provider origin and denied
+entrypoint resolves only `api.openai.com` for API mode, or only
+`auth.openai.com` and `chatgpt.com` for OAuth mode, before installing a
+default-deny OUTPUT policy. It pins only those addresses in a read-only hosts
+file and allows HTTPS only to those provider addresses. Runtime DNS and every
+other destination remain denied. Readiness receipts bind the authorization
+mode, and `readiness:issue` verifies every allowed provider origin plus denied
 hostname, DNS, and direct-IP controls before issuing the provider-only egress
 receipt.

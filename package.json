@@ -82,6 +82,7 @@
     "verify:development-readiness": "node scripts/verify-benchmark-v3-development-readiness.mjs",
     "verify:holdout-readiness": "node scripts/verify-benchmark-v3-holdout-readiness.mjs",
     "bench:v3": "node scripts/benchmark-v3-run.mjs",
+    "bench:v3:oauth:init": "node scripts/benchmark-v3-oauth-init.mjs",
     "bench:v3:holdout": "node scripts/benchmark-v3-holdout.mjs",
     "bench:v3:takeover": "node scripts/benchmark-v3-takeover.mjs",
     "bench:v3:prepare-eslint-runtime": "node scripts/prepare-benchmark-v3-eslint-runtime.mjs",
