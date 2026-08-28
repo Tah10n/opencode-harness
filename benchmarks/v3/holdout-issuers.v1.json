@@ -6,7 +6,7 @@
       "protected_channel": "external-private-holdout-custody-v1",
       "channel_root": "/var/run/opencode-harness/holdout",
       "owner_uid": 0,
-      "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAW3xqurhme3TeTq81080OukM4jQWQRTHrR1jaRta4mTQ=\n-----END PUBLIC KEY-----\n"
+      "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAYxkekME7qeu/iCUCcdxfXA9WdN0o48+cwtB2U88BOM8=\n-----END PUBLIC KEY-----\n"
     }
   ]
 }
