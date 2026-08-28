@@ -175,6 +175,7 @@ lib/profile-v3.mjs
 lib/quality
 native
 opencode.json
+ops
 package-lock.json
 package.json
 profiles
@@ -187,8 +188,8 @@ skills
 
 The plugin is not a standalone file: it imports the `lib/quality/` boundary,
 and the package smoke imports both `opencode-harness/feedback` and
-`opencode-harness/quality`. The `adoption/`, `benchmarks/`, `profiles/`, and
-`lib/benchmark/` entries are the executable synthetic-benchmark contract
+`opencode-harness/quality`. The `adoption/`, `benchmarks/`, `profiles/`,
+`lib/benchmark/`, and `ops/` entries are the executable benchmark contract
 closure. Do not replace the explicit plugin path with all of `.opencode/`, and
 do not copy `.opencode/node_modules`,
 `.opencode/package.json`, `.opencode/package-lock.json`, runtime state, or
