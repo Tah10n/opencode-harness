@@ -843,13 +843,18 @@ const oauthFixtureRoot = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpd
 const oauthInput = path.join(oauthFixtureRoot, "opencode-auth.json");
 const oauthState = path.join(oauthFixtureRoot, "oauth-state.jsonl");
 const otherOauthState = path.join(oauthFixtureRoot, "other-oauth-state.jsonl");
+const substitutionOauthState = path.join(oauthFixtureRoot, "substitution-oauth-state.jsonl");
+const changedAccountOauthState = path.join(oauthFixtureRoot, "changed-account-oauth-state.jsonl");
 const oauthCredentialFile = path.join(oauthFixtureRoot, "credential.json");
 const oauthRefreshCanary = "oauth-refresh-secret-canary-000001";
 const oauthAccessCanary = "oauth-access-secret-canary-0000001";
 const oauthAccountCanary = "account-private-canary";
+const changedAccountCanary = "changed-account-private-canary";
 const refreshedRefresh = "oauth-refreshed-refresh-secret-00001";
 const jwt = (claims) => [Buffer.from("{}").toString("base64url"), Buffer.from(JSON.stringify(claims)).toString("base64url"), "signature-value-long"].join(".");
 const refreshedJwt = jwt({ chatgpt_account_id: oauthAccountCanary,
+  "https://api.openai.com/auth": { chatgpt_compute_residency: "eu" } });
+const changedAccountJwt = jwt({ chatgpt_account_id: changedAccountCanary,
   "https://api.openai.com/auth": { chatgpt_compute_residency: "eu" } });
 let oauthBroker = null;
 try {
@@ -857,6 +862,8 @@ try {
     access: oauthAccessCanary, expires: Date.now() - 1, accountId: oauthAccountCanary } }), { mode: 0o600 });
   const initialized = initializeBenchmarkV3OpenAIOAuthState({ inputPath: oauthInput, outputPath: oauthState });
   const otherInitialized = initializeBenchmarkV3OpenAIOAuthState({ inputPath: oauthInput, outputPath: otherOauthState });
+  initializeBenchmarkV3OpenAIOAuthState({ inputPath: oauthInput, outputPath: substitutionOauthState });
+  initializeBenchmarkV3OpenAIOAuthState({ inputPath: oauthInput, outputPath: changedAccountOauthState });
   assert.equal(initialized.auth_mode, "oauth");
   assert.match(initialized.state_fingerprint, /^sha256:[0-9a-f]{64}$/u);
   assert.match(initialized.custody_epoch_fingerprint, /^sha256:[0-9a-f]{64}$/u);
@@ -881,6 +888,34 @@ try {
       return new Response(JSON.stringify({ access_token: refreshedJwt, refresh_token: refreshedRefresh, expires_in: 3600 }),
         { status: 200, headers: { "content-type": "application/json" } });
     };
+  const substitutionStore = createBenchmarkV3ProviderCredentialStore({ OPENAI_OAUTH_STATE_FILE: substitutionOauthState });
+  const pinnedSubstitutionSnapshot = substitutionStore.snapshot();
+  fs.copyFileSync(otherOauthState, substitutionOauthState);
+  fs.chmodSync(substitutionOauthState, 0o600);
+  let substitutionIssuerCalls = 0;
+  await assert.rejects(() => preflightBenchmarkV3ProviderCredentialStore(substitutionStore, { fetchImpl: async () => {
+    substitutionIssuerCalls += 1;
+    throw new Error("issuer must not be reached after custody substitution");
+  } }), /custody epoch or account identity changed/u,
+  "a substituted OAuth journal must be rejected before issuer access or cached-state replacement");
+  assert.equal(substitutionIssuerCalls, 0);
+  assert.deepEqual(substitutionStore.snapshot(), pinnedSubstitutionSnapshot);
+
+  const changedAccountStore = createBenchmarkV3ProviderCredentialStore({ OPENAI_OAUTH_STATE_FILE: changedAccountOauthState });
+  const beforeChangedAccount = loadBenchmarkV3OpenAIOAuthState(changedAccountOauthState);
+  let changedAccountIssuerCalls = 0;
+  await assert.rejects(() => preflightBenchmarkV3ProviderCredentialStore(changedAccountStore, { fetchImpl: async () => {
+    changedAccountIssuerCalls += 1;
+    return new Response(JSON.stringify({ access_token: changedAccountJwt,
+      refresh_token: refreshedRefresh, expires_in: 3600 }),
+    { status: 200, headers: { "content-type": "application/json" } });
+  } }), /refresh changed the bound account identity/u,
+  "an issuer response for another ChatGPT account must not rotate the bound custody journal");
+  assert.equal(changedAccountIssuerCalls, 1);
+  assert.equal(loadBenchmarkV3OpenAIOAuthState(changedAccountOauthState).sequence, beforeChangedAccount.sequence);
+  assert.equal(loadBenchmarkV3OpenAIOAuthState(changedAccountOauthState).state_fingerprint,
+    beforeChangedAccount.state_fingerprint);
+
   const beforeRejectedContinuation = loadBenchmarkV3OpenAIOAuthState(oauthState);
   await assert.rejects(() => prepareBenchmarkV3ProviderExecution({ credentialStore: store, authority: {},
     phase: "campaign", campaignFingerprint: `sha256:${"c".repeat(64)}`,
