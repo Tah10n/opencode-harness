@@ -81,7 +81,7 @@ try {
   const reviewerLauncherSource = fs.readFileSync(reviewerLauncher, "utf8");
   for (const invariant of ["BENCHMARK_V3_REVIEWER_DOCKER_CONTEXT", "BENCHMARK_V3_REVIEWER_CUSTODY_VOLUME",
     "BENCHMARK_V3_REVIEW_ROOT", "docker --context \"$docker_context\"",
-    "--tmpfs /run:rw,nosuid,nodev,mode=0755",
+    "--tmpfs /run/opencode-harness:rw,nosuid,nodev,noexec,mode=0700",
     "--tmpfs /var/lib/opencode-harness:rw,nosuid,nodev,noexec,mode=0700",
     "src=$custody_volume,dst=/var/lib/opencode-harness-reviewer",
     "reviewer image does not match the committed immutable image ID"]) {

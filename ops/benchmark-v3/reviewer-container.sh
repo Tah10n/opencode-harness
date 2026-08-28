@@ -46,7 +46,8 @@ esac
 
 exec docker --context "$docker_context" run --rm --network none --cap-drop ALL --security-opt no-new-privileges \
   --hostname "benchmark-v3-external-reviewer-$reviewer" --read-only \
-  --tmpfs /tmp:rw,exec,nosuid,nodev,mode=1777 --tmpfs /run:rw,nosuid,nodev,mode=0755 \
+  --tmpfs /tmp:rw,exec,nosuid,nodev,mode=1777 \
+  --tmpfs /run/opencode-harness:rw,nosuid,nodev,noexec,mode=0700 \
   --tmpfs /var/lib/opencode-harness:rw,nosuid,nodev,noexec,mode=0700 \
   --mount "type=bind,src=$source_root,dst=/workspace/source,readonly" \
   --mount "type=bind,src=$review_root,dst=/review" \
