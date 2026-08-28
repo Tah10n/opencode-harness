@@ -31,6 +31,7 @@ import {
   createBenchmarkV3CampaignJournal,
   evaluateBenchmarkV3EfficacyGate,
   evaluateBenchmarkV3Guardrails,
+  prepareBenchmarkV3ProviderExecution,
   preflightBenchmarkV3ProviderCredentialStore,
   resolveBenchmarkV3StudySeeds,
   summarizeBenchmarkV3Stage,
@@ -590,16 +591,22 @@ assert.deepEqual(unseededBinding, explicitlyUnseededBinding);
 assert.equal(unseededBinding.corpus_fingerprint, corpus.corpus_fingerprint);
 assert.equal(Object.hasOwn(unseededBinding, "provider_auth_mode"), false,
   "operational authorization transport must not alter the frozen experimental model-binding schema");
-const operationalBinding = (mode, environment = `sha256:${"9".repeat(64)}`) => {
+const operationalBinding = (mode, environment = `sha256:${"9".repeat(64)}`,
+  custodyEpoch = mode === "oauth" ? `sha256:${"a".repeat(64)}` : null) => {
   const body = { schema_version: 1, provider: "openai", provider_auth_mode: mode,
+    provider_custody_epoch_fingerprint: custodyEpoch,
     readiness_environment_fingerprint: environment };
   return { ...body, operational_binding_fingerprint: fingerprint(body) };
 };
 assert.equal(validateBenchmarkV3OperationalExecutionBinding(operationalBinding("oauth"), operationalBinding("oauth")).provider_auth_mode,
   "oauth");
 assert.throws(() => validateBenchmarkV3OperationalExecutionBinding(operationalBinding("oauth"), operationalBinding("api")),
-  /authorization mode or readiness environment differs/u,
+  /authorization mode, custody epoch, or readiness environment differs/u,
 "holdout must reject OAuth to API and API to OAuth transport drift outside the frozen model binding");
+assert.throws(() => validateBenchmarkV3OperationalExecutionBinding(operationalBinding("oauth"),
+  operationalBinding("oauth", `sha256:${"9".repeat(64)}`, `sha256:${"b".repeat(64)}`)),
+  /authorization mode, custody epoch, or readiness environment differs/u,
+"holdout must reject substitution of a different OAuth custody epoch in the same auth mode");
 const campaignFingerprintFixture = { sourceSha: "a".repeat(40), sourceTreeFingerprint: `sha256:${"b".repeat(64)}`,
   bindingsFingerprint: `sha256:${"c".repeat(64)}`,
   reviewFingerprints: [`sha256:${"d".repeat(64)}`, `sha256:${"e".repeat(64)}`] };
@@ -835,6 +842,7 @@ try {
 const oauthFixtureRoot = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), "v3-oauth-boundary-")));
 const oauthInput = path.join(oauthFixtureRoot, "opencode-auth.json");
 const oauthState = path.join(oauthFixtureRoot, "oauth-state.jsonl");
+const otherOauthState = path.join(oauthFixtureRoot, "other-oauth-state.jsonl");
 const oauthCredentialFile = path.join(oauthFixtureRoot, "credential.json");
 const oauthRefreshCanary = "oauth-refresh-secret-canary-000001";
 const oauthAccessCanary = "oauth-access-secret-canary-0000001";
@@ -848,8 +856,12 @@ try {
   fs.writeFileSync(oauthInput, JSON.stringify({ openai: { type: "oauth", refresh: oauthRefreshCanary,
     access: oauthAccessCanary, expires: Date.now() - 1, accountId: oauthAccountCanary } }), { mode: 0o600 });
   const initialized = initializeBenchmarkV3OpenAIOAuthState({ inputPath: oauthInput, outputPath: oauthState });
+  const otherInitialized = initializeBenchmarkV3OpenAIOAuthState({ inputPath: oauthInput, outputPath: otherOauthState });
   assert.equal(initialized.auth_mode, "oauth");
   assert.match(initialized.state_fingerprint, /^sha256:[0-9a-f]{64}$/u);
+  assert.match(initialized.custody_epoch_fingerprint, /^sha256:[0-9a-f]{64}$/u);
+  assert.notEqual(initialized.custody_epoch_fingerprint, otherInitialized.custody_epoch_fingerprint,
+    "independently initialized journals must define distinct operational custody epochs");
   const loaded = loadBenchmarkV3OpenAIOAuthState(oauthState);
   assert.equal(loaded.auth.refresh, oauthRefreshCanary);
   const store = createBenchmarkV3ProviderCredentialStore({ OPENAI_OAUTH_STATE_FILE: oauthState });
@@ -869,6 +881,16 @@ try {
       return new Response(JSON.stringify({ access_token: refreshedJwt, refresh_token: refreshedRefresh, expires_in: 3600 }),
         { status: 200, headers: { "content-type": "application/json" } });
     };
+  const beforeRejectedContinuation = loadBenchmarkV3OpenAIOAuthState(oauthState);
+  await assert.rejects(() => prepareBenchmarkV3ProviderExecution({ credentialStore: store, authority: {},
+    phase: "campaign", campaignFingerprint: `sha256:${"c".repeat(64)}`,
+    cloneBinding: { clone_binding_fingerprint: `sha256:${"d".repeat(64)}` },
+    reservationDisposition: "exact-resume", fetchImpl: refreshFetch }), /continuation reservation binding is invalid/u,
+  "a denied or exhausted continuation must fail before OAuth issuer access");
+  assert.deepEqual(refreshUrls, []);
+  assert.equal(loadBenchmarkV3OpenAIOAuthState(oauthState).sequence, beforeRejectedContinuation.sequence);
+  assert.equal(loadBenchmarkV3OpenAIOAuthState(oauthState).state_fingerprint,
+    beforeRejectedContinuation.state_fingerprint);
   const providerPreflights = await Promise.all([
     preflightBenchmarkV3ProviderCredentialStore(store, { fetchImpl: refreshFetch }),
     preflightBenchmarkV3ProviderCredentialStore(concurrentStore, { fetchImpl: refreshFetch }),

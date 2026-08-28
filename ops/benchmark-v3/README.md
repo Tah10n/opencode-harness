@@ -264,7 +264,10 @@ npm run bench:v3:oauth:init -- \
 
 Both the input and output parents must be owner-controlled, the input must not
 be group/world accessible, and the new state journal is created with mode
-`0600`. Run the canonical model command with
+`0600`. Initialization creates a random, non-secret custody epoch and reports
+only its fingerprint; that stable fingerprint is bound across campaign resume
+and holdout while token rotations retain the same epoch. Run the canonical model
+command with
 `BENCHMARK_V3_PROVIDER_AUTH_MODE=oauth` and
 `BENCHMARK_V3_OPENAI_OAUTH_FILE` naming that journal. The launcher mounts only
 the dedicated custody directory that contains the journal and its rotation lock,
