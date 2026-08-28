@@ -16,6 +16,20 @@ if ((!extendExisting && process.argv.length !== 3) || (extendExisting && process
 }
 const corpus = loadBenchmarkV3Corpus(sourceRoot);
 const provenanceBundle = materializeBenchmarkV3ProvenanceBundle(sourceRoot, corpus.source);
+if (extendExisting) {
+  const stat = fs.lstatSync(output);
+  const manifestPath = path.join(output, "RUNTIME.json");
+  let manifest;
+  try { manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8")); }
+  catch { throw new Error("existing semantic runtime manifest is unavailable"); }
+  const keys = discoverBenchmarkV3SemanticRuntimeKeys(output);
+  const frozen = fingerprintBenchmarkV3SemanticRuntime(output, keys);
+  if (!stat.isDirectory() || stat.isSymbolicLink() || stat.uid !== process.getuid() || (stat.mode & 0o077) !== 0
+    || manifest?.schema_version !== 1 || manifest.runtime_fingerprint !== frozen.runtime_fingerprint
+    || JSON.stringify(manifest.entries) !== JSON.stringify(frozen.entries)) {
+    throw new Error("existing semantic runtime does not match its protected frozen manifest");
+  }
+}
 const npmCache = path.join(output, ".npm-cache");
 const representatives = new Map();
 for (const family of corpus.families) {

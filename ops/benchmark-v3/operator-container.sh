@@ -11,14 +11,21 @@ shift
 image="${BENCHMARK_V3_OPERATOR_IMAGE:-opencode-harness-benchmark-v3-operator:1.0.0}"
 source_root="${BENCHMARK_V3_SOURCE_ROOT:-$(pwd -P)}"
 campaign_root="${BENCHMARK_V3_CAMPAIGN_ROOT:-}"
-custody_volume="${BENCHMARK_V3_CUSTODY_VOLUME:-opencode-harness-benchmark-v3-custody}"
+custody_volume="${BENCHMARK_V3_CUSTODY_VOLUME:-opencode-harness-benchmark-v3-authority-v2}"
 channel_volume="${BENCHMARK_V3_CHANNEL_VOLUME:-opencode-harness-benchmark-v3-channels}"
 external_bundle="${BENCHMARK_V3_PROVENANCE_BUNDLE:-}"
 external_runtime="${BENCHMARK_V3_SEMANTIC_RUNTIME_ROOT:-}"
 
 case "$action" in
   build)
-    exec docker build --file "$source_root/ops/benchmark-v3/Dockerfile" --tag "$image" "$source_root"
+    canonical_source="$(cd "$source_root" && pwd -P)"
+    source_sha="$(git -C "$canonical_source" rev-parse HEAD)"
+    if [ -n "$(git -C "$canonical_source" status --porcelain=v1 --untracked-files=all)" ]; then
+      echo "operator image requires an exact clean source tree" >&2
+      exit 78
+    fi
+    exec docker build --build-arg "BENCHMARK_V3_IMAGE_SOURCE_SHA=$source_sha" \
+      --file "$canonical_source/ops/benchmark-v3/Dockerfile" --tag "$image" "$canonical_source"
     ;;
   run)
     if [ -z "$campaign_root" ] || [ ! -d "$campaign_root" ]; then
@@ -38,19 +45,23 @@ case "$action" in
     script="$3"
     reviewed=1
     privileged=0
+    provider_only=1
+    reviewer_mode=0
     entrypoint=""
     case "$script" in
-      bench:v3:authority:init) reviewed=0; entrypoint="scripts/benchmark-v3-authority-init.mjs" ;;
+      bench:v3:authority:init) entrypoint="scripts/benchmark-v3-authority-init.mjs" ;;
+      bench:v3:reviewer:init) reviewer_mode=1; entrypoint="scripts/benchmark-v3-reviewer-init.mjs" ;;
+      bench:v3:review:sign) reviewer_mode=1; entrypoint="scripts/benchmark-v3-review-sign.mjs" ;;
       bench:v3:authority:issue) entrypoint="scripts/benchmark-v3-authority-issue.mjs" ;;
       bench:v3:review:issue) entrypoint="scripts/benchmark-v3-review-issue.mjs" ;;
       bench:v3:operator:verify) privileged=1; entrypoint="scripts/benchmark-v3-operator-verify.mjs" ;;
-      bench:v3:readiness:issue) privileged=1; entrypoint="scripts/benchmark-v3-readiness-issue.mjs" ;;
+      bench:v3:readiness:issue) privileged=1; provider_only=1; entrypoint="scripts/benchmark-v3-readiness-issue.mjs" ;;
       bench:v3:holdout:commit) privileged=1; entrypoint="scripts/benchmark-v3-holdout-commit.mjs" ;;
       bench:v3:holdout:materialize) privileged=1; entrypoint="scripts/benchmark-v3-holdout-materialize.mjs" ;;
       verify:development-readiness) privileged=1; entrypoint="scripts/verify-benchmark-v3-development-readiness.mjs" ;;
-      verify:holdout-readiness) privileged=1; entrypoint="scripts/verify-benchmark-v3-holdout-readiness.mjs" ;;
+      verify:holdout-readiness) privileged=1; provider_only=1; entrypoint="scripts/verify-benchmark-v3-holdout-readiness.mjs" ;;
       bench:v3) privileged=1; entrypoint="scripts/benchmark-v3-run.mjs" ;;
-      bench:v3:holdout) privileged=1; entrypoint="scripts/benchmark-v3-holdout.mjs" ;;
+      bench:v3:holdout) privileged=1; provider_only=1; entrypoint="scripts/benchmark-v3-holdout.mjs" ;;
       bench:v3:takeover) privileged=1; entrypoint="scripts/benchmark-v3-takeover.mjs" ;;
       *) echo "operator npm script is not allowlisted: $script" >&2; exit 71 ;;
     esac
@@ -64,6 +75,12 @@ case "$action" in
         echo "operator source is not the exact clean independently reviewed SHA" >&2
         exit 73
       fi
+    fi
+    image_id="$(docker image inspect --format '{{.Id}}' "$image")"
+    image_source_sha="$(docker image inspect --format '{{index .Config.Labels "io.opencode-harness.benchmark-v3.source-sha"}}' "$image_id")"
+    if [ "$image_source_sha" != "$reviewed_sha" ]; then
+      echo "operator image is not built from the exact reviewed source SHA" >&2
+      exit 79
     fi
     if [ -n "${BENCHMARK_V3_OPENAI_KEY_FILE:-}" ]; then
       if [ "$script" != "bench:v3" ] && [ "$script" != "bench:v3:holdout" ]; then
@@ -96,9 +113,26 @@ case "$action" in
         exit 77
       fi
     fi
+    if [ "$reviewer_mode" -eq 1 ]; then
+      case "${BENCHMARK_V3_REVIEWER:-}" in
+        one|two) reviewer_volume="opencode-harness-benchmark-v3-reviewer-${BENCHMARK_V3_REVIEWER}-v1" ;;
+        *) echo "BENCHMARK_V3_REVIEWER must be one or two for reviewer custody" >&2; exit 80 ;;
+      esac
+    fi
     shift 3
     if [ "${1:-}" = "--" ]; then shift; fi
     set -- node "/workspace/source/$entrypoint" "$@"
+    if [ "$reviewer_mode" -eq 1 ]; then
+      exec docker run --rm --network none --cap-drop ALL --security-opt no-new-privileges \
+        --hostname "benchmark-v3-reviewer-${BENCHMARK_V3_REVIEWER}" --read-only \
+        --tmpfs /tmp:rw,exec,nosuid,nodev,mode=1777 \
+        --mount "type=bind,src=$source_root,dst=/workspace/source,readonly" \
+        --mount "type=bind,src=$campaign_root,dst=/campaign" \
+        --mount "type=volume,src=$reviewer_volume,dst=/var/lib/opencode-harness-reviewer" \
+        --env BENCHMARK_V3_CGROUP_REQUIRED=0 \
+        --env "BENCHMARK_V3_OPERATOR_IMAGE_ID=$image_id" \
+        "$image_id" "$@"
+    fi
     if [ "$privileged" -eq 0 ]; then
       exec docker run --rm --network none --cap-drop ALL --security-opt no-new-privileges \
         --hostname benchmark-v3-authority --read-only \
@@ -109,7 +143,8 @@ case "$action" in
         --mount "type=volume,src=$custody_volume,dst=/var/lib/opencode-harness" \
         --mount "type=volume,src=$channel_volume,dst=/run/opencode-harness" \
         --env BENCHMARK_V3_CGROUP_REQUIRED=0 \
-        "$image" "$@"
+        --env "BENCHMARK_V3_OPERATOR_IMAGE_ID=$image_id" \
+        "$image_id" "$@"
     fi
     if [ -n "$external_bundle" ]; then
       exec docker run --rm --privileged --cgroupns=host --hostname benchmark-v3-authority --read-only \
@@ -122,7 +157,9 @@ case "$action" in
         --mount "type=volume,src=$custody_volume,dst=/var/lib/opencode-harness" \
         --mount "type=volume,src=$channel_volume,dst=/run/opencode-harness" \
         --env BENCHMARK_V3_CGROUP_REQUIRED=1 \
-        "$image" "$@"
+        --env "BENCHMARK_V3_OPERATOR_IMAGE_ID=$image_id" \
+        --env "BENCHMARK_V3_PROVIDER_ONLY_EGRESS=$provider_only" \
+        "$image_id" "$@"
     fi
     if [ -n "${BENCHMARK_V3_OPENAI_KEY_FILE:-}" ]; then
       exec docker run --rm --privileged --cgroupns=host --hostname benchmark-v3-authority --read-only \
@@ -135,8 +172,9 @@ case "$action" in
         --mount "type=volume,src=$channel_volume,dst=/run/opencode-harness" \
         --env OPENAI_API_KEY_FILE=/run/secrets/openai_api_key \
         --env BENCHMARK_V3_CGROUP_REQUIRED=1 \
-        --env "BENCHMARK_V3_PROVIDER_ONLY_EGRESS=${BENCHMARK_V3_PROVIDER_ONLY_EGRESS:-0}" \
-        "$image" "$@"
+        --env "BENCHMARK_V3_OPERATOR_IMAGE_ID=$image_id" \
+        --env "BENCHMARK_V3_PROVIDER_ONLY_EGRESS=$provider_only" \
+        "$image_id" "$@"
     fi
     exec docker run --rm --privileged --cgroupns=host --hostname benchmark-v3-authority --read-only \
       --tmpfs /tmp:rw,exec,nosuid,nodev,mode=1777 \
@@ -146,8 +184,9 @@ case "$action" in
       --mount "type=volume,src=$custody_volume,dst=/var/lib/opencode-harness" \
       --mount "type=volume,src=$channel_volume,dst=/run/opencode-harness" \
       --env BENCHMARK_V3_CGROUP_REQUIRED=1 \
-      --env "BENCHMARK_V3_PROVIDER_ONLY_EGRESS=${BENCHMARK_V3_PROVIDER_ONLY_EGRESS:-0}" \
-      "$image" "$@"
+      --env "BENCHMARK_V3_OPERATOR_IMAGE_ID=$image_id" \
+      --env "BENCHMARK_V3_PROVIDER_ONLY_EGRESS=$provider_only" \
+      "$image_id" "$@"
     ;;
   *)
     echo "unknown operator container action: $action" >&2

@@ -86,6 +86,8 @@
     "bench:v3:takeover": "node scripts/benchmark-v3-takeover.mjs",
     "bench:v3:prepare-eslint-runtime": "node scripts/prepare-benchmark-v3-eslint-runtime.mjs",
     "bench:v3:authority:init": "node scripts/benchmark-v3-authority-init.mjs",
+    "bench:v3:reviewer:init": "node scripts/benchmark-v3-reviewer-init.mjs",
+    "bench:v3:review:sign": "node scripts/benchmark-v3-review-sign.mjs",
     "bench:v3:authority:issue": "node scripts/benchmark-v3-authority-issue.mjs",
     "bench:v3:review:issue": "node scripts/benchmark-v3-review-issue.mjs",
     "bench:v3:readiness:issue": "node scripts/benchmark-v3-readiness-issue.mjs",

@@ -4,10 +4,11 @@ This image is the operational authority host for one benchmark-v3 campaign. It
 pins Node 24.11.1 by multi-platform image digest and OpenCode 1.18.21 by the
 published Linux asset SHA-256 for arm64 and x64.
 
-The source tree is mounted read-only at `/workspace/source`. Root-only private
-keys, protected channels, and the one physical append-only execution registry
-live in two separate named volumes: `opencode-harness-benchmark-v3-custody`
-for keys and the physical registry, and
+The source tree is mounted read-only at `/workspace/source`. Four authority
+keys and the one physical append-only execution registry live in
+`opencode-harness-benchmark-v3-authority-v2`; reviewer one and reviewer two each
+have a separate single-key volume that is never mounted into the authority
+container. Protected channels live in
 `opencode-harness-benchmark-v3-channels` for persistent root-owned
 `/var/run/opencode-harness` receipts and private holdout custody. Campaign
 outputs live only in the external directory mounted at `/campaign`.
@@ -16,19 +17,20 @@ The operational trust roots were rotated from non-operational development
 placeholders on 2026-08-27. Public SPKI fingerprints and the custody-inventory
 binding are committed in
 `benchmarks/v3/operator-key-fingerprints.v1.json`; private keys are never part
-of the source tree. `authority:init` creates six distinct Ed25519 keys once. A
-complete existing custody is verified, while a partial custody, mismatched
+of the source tree. `authority:init` creates the four authority keys once, and
+each `reviewer:init` creates exactly one reviewer key. A complete existing custody is verified, while a partial custody, mismatched
 inventory, weak mode, or key/registry mismatch fails closed.
 
-The launcher is an npm-script allowlist whose accepted names are mapped directly
+The launcher resolves the built image to its immutable image ID and requires
+its embedded source label to equal the exact reviewed SHA. It is also an npm-script allowlist whose accepted names are mapped directly
 to fixed Node entrypoints, bypassing npm lifecycle hooks. `authority:init` runs
 with no network, all Linux capabilities dropped, and no host cgroup access.
-Every later command requires `BENCHMARK_V3_REVIEWED_SOURCE_SHA` to equal the
+Every command, including bootstrap, requires `BENCHMARK_V3_REVIEWED_SOURCE_SHA` to equal the
 exact clean mounted HEAD; only containment, calibration, readiness, and
 canonical runner commands receive the privileged host-cgroup environment.
 Provider authorization is accepted only for `bench:v3` or `bench:v3:holdout`.
 
-Build the image:
+Build the image from a clean tree; the launcher embeds that exact SHA:
 
 ```sh
 ops/benchmark-v3/operator-container.sh build
@@ -107,7 +109,7 @@ ops/benchmark-v3/operator-container.sh run \
 
 Before baseline, derive the complete external sampling frame from the exact
 frozen ESLint provenance bundle. The versioned
-`semantic-private-subset-packing-frozen-eslint-history-v7` policy excludes all
+`semantic-private-subset-packing-frozen-eslint-history-v8` policy excludes all
 210 public split commitments, removes every public source path from mixed
 commits, and recalibrates only the remaining private ESLint runtime JavaScript
 surface without relying on commit-subject keywords. For multi-file commits it
@@ -148,8 +150,11 @@ Each independent read-only reviewer supplies a role-specific structured result
 bound to the exact source SHA and tree, a unique review execution ID, the fixed
 `independent-read-only-agent-v1` method, and a privacy-safe evidence
 fingerprint. The same result cannot be reused for both identities and each
-reviewer channel accepts only one issuance. `review:issue` signs only
-zero-HIGH/zero-MEDIUM results with that reviewer's separate key and channel:
+reviewer channel accepts only one issuance. First provision each isolated
+single-key custody with `bench:v3:reviewer:init`. The matching reviewer then
+uses `bench:v3:review:sign` to sign the exact evidence bytes and structured
+zero-HIGH/zero-MEDIUM result. The authority-side `review:issue` has no reviewer
+private key; it only verifies and imports the signed receipt into its protected channel:
 
 ```sh
 BENCHMARK_V3_REVIEWED_SOURCE_SHA=<exact-reviewed-sha> \
@@ -157,9 +162,8 @@ BENCHMARK_V3_CAMPAIGN_ROOT=/absolute/private/campaign \
 ops/benchmark-v3/operator-container.sh run \
 npm run bench:v3:review:issue -- \
   --source-root /workspace/source \
-  --custody-root /var/lib/opencode-harness/custody \
   --reviewer one \
-  --result /campaign/reviews/reviewer-one-result.json \
+  --result /campaign/reviews/reviewer-one-signed.json \
   --receipt /var/run/opencode-harness/reviews/reviewer-one/review.json
 ```
 
@@ -206,7 +210,9 @@ with `OPENAI_API_KEY_FILE`; never pass the key as a Docker environment value or
 command argument. The runner consumes the key through its one-shot credential
 bridge, and Bubblewrap does not mount `/run/secrets` into model workspaces.
 
-For the sealed holdout only, set `BENCHMARK_V3_PROVIDER_ONLY_EGRESS=1`. The
+For the sealed holdout, the launcher unconditionally enables provider-only
+egress for both readiness verification and execution; there is no permissive
+default or operator override. The
 entrypoint resolves `api.openai.com` before installing a default-deny OUTPUT
 policy, pins only those addresses in a read-only hosts file, and then allows
 HTTPS only to those provider addresses. Runtime DNS and every other destination

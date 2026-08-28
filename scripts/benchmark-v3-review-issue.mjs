@@ -8,6 +8,6 @@ import { absoluteOperatorArgument, parseBenchmarkV3OperatorArguments, printOpera
 const values = parseBenchmarkV3OperatorArguments(process.argv.slice(2));
 printOperatorResult(issueBenchmarkV3ReviewReceipt({
   sourceRoot: path.resolve(values.get("source-root") ?? process.cwd()),
-  custodyRoot: absoluteOperatorArgument(values, "custody-root"), reviewer: requiredOperatorArgument(values, "reviewer"),
-  resultPath: absoluteOperatorArgument(values, "result"), receiptPath: absoluteOperatorArgument(values, "receipt"), ownerUid: 0,
+  reviewer: requiredOperatorArgument(values, "reviewer"), resultPath: absoluteOperatorArgument(values, "result"),
+  receiptPath: absoluteOperatorArgument(values, "receipt"),
 }));

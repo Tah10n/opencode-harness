@@ -122,6 +122,16 @@ try {
   assert.throws(() => fingerprintBenchmarkV3SemanticRuntimeKey(inventoryFixture, "eslint-v7"), /root package does not match/u,
     "semantic runtime inventory must reject a lockfile v1 with substituted root identity");
   fs.writeFileSync(lockFile, validLock);
+  const wrongVersionPackage = { ...JSON.parse(validPackage), version: "8.0.0" };
+  const wrongVersionLock = JSON.parse(validLock);
+  wrongVersionLock.version = "8.0.0";
+  wrongVersionLock.packages[""].version = "8.0.0";
+  fs.writeFileSync(packageFile, JSON.stringify(wrongVersionPackage));
+  fs.writeFileSync(lockFile, JSON.stringify(wrongVersionLock));
+  assert.throws(() => fingerprintBenchmarkV3SemanticRuntimeKey(inventoryFixture, "eslint-v7"), /declared key/u,
+    "semantic runtime inventory must reject a root version that does not match its directory key");
+  fs.writeFileSync(packageFile, validPackage);
+  fs.writeFileSync(lockFile, validLock);
   const poisonMarker = path.join(inventoryFixture, "ambient-node-options-executed");
   const poisonModule = path.join(inventoryFixture, "poison.cjs");
   fs.writeFileSync(poisonModule, `require("node:fs").writeFileSync(${JSON.stringify(poisonMarker)}, "executed")`);

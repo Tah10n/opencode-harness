@@ -2,15 +2,16 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { createPrivateKey, sign } from "node:crypto";
+import { createHash, createPrivateKey, sign } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 import { canonicalJson } from "../lib/feedback/contracts.mjs";
-import { initializeBenchmarkV3OperatorCustody, loadBenchmarkV3OperatorPrivateKey,
+import { initializeBenchmarkV3OperatorCustody, initializeBenchmarkV3ReviewerCustody, loadBenchmarkV3OperatorPrivateKey,
   verifyBenchmarkV3OperatorRegistryKeys } from "../lib/benchmark/v3-operator-custody.mjs";
 import { commitBenchmarkV3HoldoutSelection, issueBenchmarkV3ExecutionAuthority,
-  issueBenchmarkV3ReadinessReceipts, issueBenchmarkV3ReviewReceipt } from "../lib/benchmark/v3-operator-issue.mjs";
+  issueBenchmarkV3ReadinessReceipts, issueBenchmarkV3ReviewReceipt,
+  signBenchmarkV3ReviewEvidence } from "../lib/benchmark/v3-operator-issue.mjs";
 import { runBenchmarkV3OperatorProbes } from "../lib/benchmark/v3-operator-probes.mjs";
 import { matchBenchmarkV3SinglePathOptions, stratifyBenchmarkV3ExternalPool } from "../lib/benchmark/v3-operator-frame.mjs";
 import { verifyBenchmarkV3OperatorHoldoutPoolBinding } from "../lib/benchmark/v3-operator-holdout.mjs";
@@ -58,11 +59,15 @@ try {
   fs.writeFileSync(fakeProviderKey, "not-a-real-provider-secret\n", { mode: 0o600 });
   const rejectsBootstrapSecret = run(launcher, ["run", "npm", "run", "bench:v3:authority:init"],
     { env: { ...launcherEnvironment, BENCHMARK_V3_OPENAI_KEY_FILE: fakeProviderKey } });
-  assert.equal(rejectsBootstrapSecret.status, 74, "authority bootstrap must reject provider authorization");
+  assert.equal(rejectsBootstrapSecret.status, 72,
+    "authority bootstrap must require an exact reviewed source before it can access any external input");
   const launcherSource = fs.readFileSync(launcher, "utf8");
   for (const invariant of ["--network none --cap-drop ALL --security-opt no-new-privileges",
     "--env BENCHMARK_V3_CGROUP_REQUIRED=0", "provider authorization is accepted only for a canonical model runner",
     "set -- node \"/workspace/source/$entrypoint\" \"$@\"",
+    "operator image is not built from the exact reviewed source SHA",
+    "--env \"BENCHMARK_V3_PROVIDER_ONLY_EGRESS=$provider_only\"",
+    "src=$reviewer_volume,dst=/var/lib/opencode-harness-reviewer",
     "src=$external_bundle,dst=/opt/benchmark-v3/provenance.bundle,readonly",
     "src=$external_runtime,dst=/opt/benchmark-v3/semantic-runtime,readonly"]) {
     assert.equal(launcherSource.includes(invariant), true, `operator launcher is missing invariant: ${invariant}`);
@@ -103,8 +108,8 @@ try {
   assert.equal(run("git", ["-c", "user.name=Operator Test", "-c", "user.email=operator@example.invalid", "commit", "--quiet", "-m", "test layout"], { cwd: source }).status, 0);
   const custody = path.join(temporary, "custody");
   const initialized = initializeBenchmarkV3OperatorCustody({ sourceRoot: source, custodyRoot: custody, ownerUid, provision: true });
-  assert.equal(initialized.roles.length, 6);
-  assert.equal(new Set(initialized.roles.map((entry) => entry.spki_fingerprint)).size, 6);
+  assert.equal(initialized.roles.length, 4);
+  assert.equal(new Set(initialized.roles.map((entry) => entry.spki_fingerprint)).size, 4);
   assert.equal(JSON.stringify(initialized).includes("PRIVATE KEY"), false, "authority:init output must not contain private PEM fragments");
   const existingCustody = initializeBenchmarkV3OperatorCustody({ sourceRoot: source, custodyRoot: custody,
     ownerUid, provision: true, now: "2099-01-01T00:00:00.000Z" });
@@ -114,13 +119,27 @@ try {
   for (const [file, value] of Object.entries(initialized.registry_bundle)) {
     fs.writeFileSync(path.join(source, "benchmarks", "v3", file), `${JSON.stringify(value, null, 2)}\n`);
   }
+  const reviewerCustodies = [];
+  for (const reviewer of ["one", "two"]) {
+    const custodyRoot = path.join(temporary, `reviewer-${reviewer}-custody`);
+    const reviewerInitialized = initializeBenchmarkV3ReviewerCustody({ sourceRoot: source, custodyRoot,
+      reviewer, ownerUid });
+    reviewerCustodies.push({ custodyRoot, initialized: reviewerInitialized });
+    for (const [file, value] of Object.entries(reviewerInitialized.registry_bundle)) {
+      fs.writeFileSync(path.join(source, "benchmarks", "v3", file), `${JSON.stringify(value, null, 2)}\n`);
+    }
+  }
+  const allRoles = [...initialized.roles, ...reviewerCustodies.flatMap((entry) => entry.initialized.roles)];
+  assert.equal(new Set(allRoles.map((entry) => entry.spki_fingerprint)).size, 6);
   const fingerprintLedger = {
-    schema_version: 1,
+    schema_version: 2,
     rotated_at: new Date().toISOString(),
     rotation_reason: "isolated model-free operator verification fixture key rotation",
     prior_source_sha: run("git", ["rev-parse", "HEAD"], { cwd: source }).stdout.trim(),
-    custody_inventory_fingerprint: initialized.inventory_fingerprint,
-    keys: initialized.roles.map((entry) => {
+    custody_inventory_fingerprints: { authority: initialized.inventory_fingerprint,
+      reviewer_one: reviewerCustodies[0].initialized.inventory_fingerprint,
+      reviewer_two: reviewerCustodies[1].initialized.inventory_fingerprint },
+    keys: allRoles.map((entry) => {
       const spec = {
         readiness: ["readiness-issuers.v1.json", 0],
         "reviewer-one": ["review-issuers.v1.json", 0],
@@ -130,6 +149,7 @@ try {
         "lease-takeover-auditor": ["lease-takeover-issuers.v1.json", 0],
       }[entry.role];
       return { role: entry.role, registry: spec[0], issuer_id: entry.issuer_id,
+        custody_class: entry.role.startsWith("reviewer-") ? entry.role : "authority",
         spki_fingerprint: entry.spki_fingerprint };
     }),
   };
@@ -150,8 +170,8 @@ try {
   fs.chmodSync(weakKey, 0o644);
   assert.throws(() => loadBenchmarkV3OperatorPrivateKey({ custodyRoot: weakCustody, role: "readiness", ownerUid }), /owner-only/u);
   fs.chmodSync(weakKey, 0o600);
-  fs.copyFileSync(path.join(weakCustody, "keys", "reviewer-two.private.pem"),
-    path.join(weakCustody, "keys", "reviewer-one.private.pem"));
+  fs.copyFileSync(path.join(weakCustody, "keys", "execution-authority.private.pem"),
+    path.join(weakCustody, "keys", "readiness.private.pem"));
   assert.throws(() => verifyBenchmarkV3OperatorRegistryKeys({ sourceRoot: source, custodyRoot: weakCustody, ownerUid }), /does not match/u);
 
   const output = path.join(temporary, "campaign-output");
@@ -187,19 +207,25 @@ try {
   const reviewPaths = [path.join(channels, "reviewer-one", "review.json"), path.join(channels, "reviewer-two", "review.json")];
   for (const [index, reviewer] of ["one", "two"].entries()) {
     const reviewResult = path.join(temporary, `review-result-${reviewer}.json`);
+    const reviewEvidence = path.join(temporary, `review-evidence-${reviewer}.md`);
+    fs.writeFileSync(reviewEvidence, `Independent read-only reviewer ${reviewer}: no HIGH or MEDIUM findings.\n`);
+    const reviewEvidenceFingerprint = `sha256:${createHash("sha256").update(fs.readFileSync(reviewEvidence)).digest("hex")}`;
     fs.writeFileSync(reviewResult, JSON.stringify({ schema_version: 1,
       reviewer_id: reviewIssuers[index].reviewer_id, review_execution_id: `independent-review-${reviewer}-0001`,
-      review_method: "independent-read-only-agent-v1", review_evidence_fingerprint: `sha256:${String(index + 7).repeat(64)}`,
+      review_method: "independent-read-only-agent-v1", review_evidence_fingerprint: reviewEvidenceFingerprint,
       read_only: true, source_sha: prepared.source_sha,
       source_tree_fingerprint: prepared.source_tree_fingerprint, high_findings: 0, medium_findings: 0,
       corpus_contract_reviewed: true, contract_coverage_reviewed: true, oracle_leakage_reviewed: true }));
+    const signedReview = path.join(temporary, `signed-review-${reviewer}.json`);
+    signBenchmarkV3ReviewEvidence({ sourceRoot: source, custodyRoot: reviewerCustodies[index].custodyRoot,
+      reviewer, resultPath: reviewResult, evidencePath: reviewEvidence, outputPath: signedReview, ownerUid });
     if (index === 0) {
-      assert.throws(() => issueBenchmarkV3ReviewReceipt({ sourceRoot: source, custodyRoot: custody, reviewer: "two",
-        resultPath: reviewResult, receiptPath: reviewPaths[1], ownerUid }), /review result/u,
+      assert.throws(() => issueBenchmarkV3ReviewReceipt({ sourceRoot: source, reviewer: "two",
+        resultPath: signedReview, receiptPath: reviewPaths[1] }), /review result/u,
       "one reviewer result must not be reusable as the other reviewer identity");
     }
-    issueBenchmarkV3ReviewReceipt({ sourceRoot: source, custodyRoot: custody, reviewer,
-      resultPath: reviewResult, receiptPath: reviewPaths[index], ownerUid });
+    issueBenchmarkV3ReviewReceipt({ sourceRoot: source, reviewer,
+      resultPath: signedReview, receiptPath: reviewPaths[index] });
     assert.equal(validateBenchmarkV3ReviewReceipt(reviewPaths[index], { sourceSha: prepared.source_sha,
       sourceTreeFingerprint: prepared.source_tree_fingerprint, trustedIssuers: reviewIssuers }).verdict, "passed");
   }

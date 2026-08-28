@@ -17,6 +17,14 @@ fi
 chmod 0700 /var/lib/opencode-harness
 chmod 0700 /var/run/opencode-harness
 if [ "${BENCHMARK_V3_CGROUP_REQUIRED:-1}" = "1" ]; then
+  case "${BENCHMARK_V3_OPERATOR_IMAGE_ID:-}" in
+    sha256:????????????????????????????????????????????????????????????????) ;;
+    *) echo "privileged operator image identity is invalid" >&2; exit 76 ;;
+  esac
+  if [ "${BENCHMARK_V3_PROVIDER_ONLY_EGRESS:-0}" != "1" ]; then
+    echo "privileged operator requires provider-only egress" >&2
+    exit 77
+  fi
   chown root:root /var/lib/opencode-harness /var/run/opencode-harness
 else
   test "$(stat -c '%u:%g' /var/lib/opencode-harness)" = "0:0"
