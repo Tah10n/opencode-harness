@@ -73,11 +73,13 @@ case "$action" in
       fi
     fi
     image_id="$(docker image inspect --format '{{.Id}}' "$image")"
-    image_arch="$(docker image inspect --format '{{.Architecture}}' "$image_id")"
-    expected_image_id="$(node -e 'const fs=require("fs");const [f,a]=process.argv.slice(1);const v=JSON.parse(fs.readFileSync(f));process.stdout.write(v.images[a]?.image_id||"")' \
+    image_identity="$(docker image inspect "$image" | node "$source_root/scripts/benchmark-v3-image-fingerprint.mjs")"
+    image_arch="${image_identity%% *}"
+    image_fingerprint="${image_identity#* }"
+    expected_image_fingerprint="$(node -e 'const fs=require("fs");const [f,a]=process.argv.slice(1);const v=JSON.parse(fs.readFileSync(f));process.stdout.write(v.images[a]?.runtime_fingerprint||"")' \
       "$source_root/benchmarks/v3/operator-image.v1.json" "$image_arch")"
-    if [ "$image_id" != "$expected_image_id" ]; then
-      echo "operator image does not match the committed immutable image ID" >&2
+    if [ "$image_fingerprint" != "$expected_image_fingerprint" ]; then
+      echo "operator image does not match the committed immutable runtime fingerprint" >&2
       exit 79
     fi
     if [ -n "${BENCHMARK_V3_OPENAI_KEY_FILE:-}" ]; then
@@ -124,7 +126,7 @@ case "$action" in
         --mount "type=volume,src=$custody_volume,dst=/var/lib/opencode-harness" \
         --mount "type=volume,src=$channel_volume,dst=/run/opencode-harness" \
         --env BENCHMARK_V3_CGROUP_REQUIRED=0 \
-        --env "BENCHMARK_V3_OPERATOR_IMAGE_ID=$image_id" \
+        --env "BENCHMARK_V3_OPERATOR_IMAGE_ID=$image_fingerprint" \
         "$image_id" "$@"
     fi
     if [ -n "$external_bundle" ]; then
@@ -138,7 +140,7 @@ case "$action" in
         --mount "type=volume,src=$custody_volume,dst=/var/lib/opencode-harness" \
         --mount "type=volume,src=$channel_volume,dst=/run/opencode-harness" \
         --env BENCHMARK_V3_CGROUP_REQUIRED=1 \
-        --env "BENCHMARK_V3_OPERATOR_IMAGE_ID=$image_id" \
+        --env "BENCHMARK_V3_OPERATOR_IMAGE_ID=$image_fingerprint" \
         --env "BENCHMARK_V3_PROVIDER_ONLY_EGRESS=$provider_only" \
         "$image_id" "$@"
     fi
@@ -153,7 +155,7 @@ case "$action" in
         --mount "type=volume,src=$channel_volume,dst=/run/opencode-harness" \
         --env OPENAI_API_KEY_FILE=/run/secrets/openai_api_key \
         --env BENCHMARK_V3_CGROUP_REQUIRED=1 \
-        --env "BENCHMARK_V3_OPERATOR_IMAGE_ID=$image_id" \
+        --env "BENCHMARK_V3_OPERATOR_IMAGE_ID=$image_fingerprint" \
         --env "BENCHMARK_V3_PROVIDER_ONLY_EGRESS=$provider_only" \
         "$image_id" "$@"
     fi
@@ -165,7 +167,7 @@ case "$action" in
       --mount "type=volume,src=$custody_volume,dst=/var/lib/opencode-harness" \
       --mount "type=volume,src=$channel_volume,dst=/run/opencode-harness" \
       --env BENCHMARK_V3_CGROUP_REQUIRED=1 \
-      --env "BENCHMARK_V3_OPERATOR_IMAGE_ID=$image_id" \
+      --env "BENCHMARK_V3_OPERATOR_IMAGE_ID=$image_fingerprint" \
       --env "BENCHMARK_V3_PROVIDER_ONLY_EGRESS=$provider_only" \
       "$image_id" "$@"
     ;;

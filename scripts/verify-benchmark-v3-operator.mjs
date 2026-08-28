@@ -22,6 +22,7 @@ import { validateBenchmarkV3ReadinessReceipt } from "../lib/benchmark/v3-readine
 import { buildProfileBundleManifest } from "../lib/profile-v3.mjs";
 import { discoverBenchmarkV3SemanticRuntimeKeys, loadBenchmarkV3Corpus } from "../lib/benchmark/v3-corpus.mjs";
 import { loadBenchmarkV3Design } from "../lib/benchmark/v3-design.mjs";
+import { benchmarkV3OperatorImageIdentity } from "../lib/benchmark/v3-operator-image.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const temporary = fs.mkdtempSync(path.join(os.tmpdir(), "benchmark-v3-operator-"));
@@ -66,7 +67,7 @@ try {
     "--env BENCHMARK_V3_CGROUP_REQUIRED=0", "provider authorization is accepted only for a canonical model runner",
     "docker build --provenance=false",
     "set -- node \"/workspace/source/$entrypoint\" \"$@\"",
-    "operator image does not match the committed immutable image ID",
+    "operator image does not match the committed immutable runtime fingerprint",
     "--env \"BENCHMARK_V3_PROVIDER_ONLY_EGRESS=$provider_only\"",
     "src=$external_bundle,dst=/opt/benchmark-v3/provenance.bundle,readonly",
     "src=$external_runtime,dst=/opt/benchmark-v3/semantic-runtime,readonly"]) {
@@ -85,16 +86,25 @@ try {
     "--tmpfs /var/lib/opencode-harness:rw,nosuid,nodev,noexec,mode=0700",
     "src=$custody_volume,dst=/var/lib/opencode-harness-reviewer",
     "--env \"BENCHMARK_V3_REVIEWER_ONLY=$reviewer\"",
-    "reviewer image does not match the committed immutable image ID"]) {
+    "reviewer image does not match the committed immutable runtime fingerprint"]) {
     assert.equal(reviewerLauncherSource.includes(invariant), true,
       `reviewer launcher is missing invariant: ${invariant}`);
   }
   const imageRegistry = JSON.parse(fs.readFileSync(path.join(root, "benchmarks", "v3", "operator-image.v1.json"), "utf8"));
   assert.equal(imageRegistry.schema_version, 1);
   assert.deepEqual(Object.keys(imageRegistry.images), ["arm64"]);
-  assert.match(imageRegistry.images.arm64.image_id, /^sha256:[0-9a-f]{64}$/u);
-  assert.notEqual(imageRegistry.images.arm64.image_id, `sha256:${"0".repeat(64)}`,
-    "operator image registry must contain a provisioned immutable image ID");
+  assert.match(imageRegistry.images.arm64.runtime_fingerprint, /^sha256:[0-9a-f]{64}$/u);
+  assert.notEqual(imageRegistry.images.arm64.runtime_fingerprint, `sha256:${"0".repeat(64)}`,
+    "operator image registry must contain a provisioned immutable runtime fingerprint");
+  const imageFixture = { Architecture: "arm64", Os: "linux", RootFS: { Type: "layers",
+    Layers: [`sha256:${"a".repeat(64)}`] }, Config: { Entrypoint: ["/entrypoint"], Env: ["A=B"] } };
+  const imageIdentity = benchmarkV3OperatorImageIdentity(imageFixture);
+  assert.equal(imageIdentity.runtime_fingerprint,
+    benchmarkV3OperatorImageIdentity({ ...imageFixture, Id: `sha256:${"b".repeat(64)}` }).runtime_fingerprint,
+  "storage-specific Docker image IDs must not change the runtime fingerprint");
+  assert.notEqual(imageIdentity.runtime_fingerprint,
+    benchmarkV3OperatorImageIdentity({ ...imageFixture, Config: { ...imageFixture.Config, User: "65534" } }).runtime_fingerprint,
+  "runtime configuration changes must change the image fingerprint");
   const dockerfileSource = fs.readFileSync(path.join(root, "ops", "benchmark-v3", "Dockerfile"), "utf8");
   assert.equal(dockerfileSource.includes("COPY "), false, "toolchain image must not copy repository bytes");
   assert.equal(dockerfileSource.includes("benchmark-v3.source-sha"), false,

@@ -465,6 +465,8 @@ const requiredFiles = [
   "scripts/benchmark-v3-holdout-commit.mjs",
   "scripts/benchmark-v3-holdout-materialize.mjs",
   "scripts/benchmark-v3-operator-verify.mjs",
+  "scripts/benchmark-v3-image-fingerprint.mjs",
+  "lib/benchmark/v3-operator-image.mjs",
   "benchmarks/v3/operator-image.v1.json",
   "ops/benchmark-v3/Dockerfile",
   "ops/benchmark-v3/entrypoint.sh",

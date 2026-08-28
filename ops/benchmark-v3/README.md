@@ -23,10 +23,10 @@ custody is verified, while a partial custody, mismatched inventory, weak mode,
 or key/registry mismatch fails closed.
 
 The source-independent toolchain image contains no repository bytes and its
-architecture-specific immutable image ID is committed in
+architecture-specific immutable runtime fingerprint is committed in
 `benchmarks/v3/operator-image.v1.json`. The launchers require that exact image
-ID and execute the entrypoint from the exact clean reviewed source mount. The
-authority launcher is also an npm-script allowlist whose accepted names are
+identity and execute the entrypoint from the exact clean reviewed source mount.
+The authority launcher is also an npm-script allowlist whose accepted names are
 mapped directly to fixed Node entrypoints, bypassing npm lifecycle hooks.
 `authority:init` runs
 with no network, all Linux capabilities dropped, and no host cgroup access.
@@ -37,9 +37,10 @@ canonical runner commands receive the privileged host-cgroup environment.
 Provider authorization is accepted only for `bench:v3` or `bench:v3:holdout`.
 
 Build the source-independent toolchain image without BuildKit's nondeterministic
-attestation wrapper, record its immutable architecture-specific platform image
-ID in the image registry, and have both independent reviewer administrators
-load that exact image rather than rebuilding it in their own Docker contexts:
+attestation wrapper, record its content-derived architecture-specific runtime
+fingerprint in the image registry, and have both independent reviewer
+administrators load that exact image rather than rebuilding it in their own
+Docker contexts:
 
 ```sh
 ops/benchmark-v3/operator-container.sh build

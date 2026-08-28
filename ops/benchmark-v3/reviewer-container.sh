@@ -32,11 +32,14 @@ if [ "$source_root" != "$canonical_source" ] || [ "$review_root" != "$canonical_
   exit 66
 fi
 image_id="$(docker --context "$docker_context" image inspect --format '{{.Id}}' "$image")"
-image_arch="$(docker --context "$docker_context" image inspect --format '{{.Architecture}}' "$image_id")"
-expected_image_id="$(node -e 'const fs=require("fs");const [f,a]=process.argv.slice(1);const v=JSON.parse(fs.readFileSync(f));process.stdout.write(v.images[a]?.image_id||"")' \
+image_identity="$(docker --context "$docker_context" image inspect "$image" \
+  | node "$source_root/scripts/benchmark-v3-image-fingerprint.mjs")"
+image_arch="${image_identity%% *}"
+image_fingerprint="${image_identity#* }"
+expected_image_fingerprint="$(node -e 'const fs=require("fs");const [f,a]=process.argv.slice(1);const v=JSON.parse(fs.readFileSync(f));process.stdout.write(v.images[a]?.runtime_fingerprint||"")' \
   "$source_root/benchmarks/v3/operator-image.v1.json" "$image_arch")"
-if [ "$image_id" != "$expected_image_id" ]; then
-  echo "reviewer image does not match the committed immutable image ID" >&2
+if [ "$image_fingerprint" != "$expected_image_fingerprint" ]; then
+  echo "reviewer image does not match the committed immutable runtime fingerprint" >&2
   exit 67
 fi
 case "$action" in
@@ -53,6 +56,6 @@ exec docker --context "$docker_context" run --rm --network none --cap-drop ALL -
   --mount "type=bind,src=$review_root,dst=/review" \
   --mount "type=volume,src=$custody_volume,dst=/var/lib/opencode-harness-reviewer" \
   --env BENCHMARK_V3_CGROUP_REQUIRED=0 --env "BENCHMARK_V3_REVIEWER_ONLY=$reviewer" \
-  --env "BENCHMARK_V3_OPERATOR_IMAGE_ID=$image_id" \
+  --env "BENCHMARK_V3_OPERATOR_IMAGE_ID=$image_fingerprint" \
   "$image_id" node "/workspace/source/$entrypoint" --source-root /workspace/source \
   --custody-root /var/lib/opencode-harness-reviewer --reviewer "$reviewer" "$@"
