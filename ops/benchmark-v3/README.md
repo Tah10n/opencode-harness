@@ -35,7 +35,8 @@ ops/benchmark-v3/operator-container.sh build
 ```
 
 Prepare a new semantic runtime with the public keys plus deterministic ESLint
-5.0--5.16 and 6.0--6.4 representatives, or extend an existing pre-freeze runtime in place:
+4.0--4.19 (excluding the unreleased 4.9), 5.0--5.16, and 6.0--6.4
+representatives, or extend an existing pre-freeze runtime in place:
 
 ```sh
 BENCHMARK_V3_PROVENANCE_BUNDLE=/absolute/private/eslint-provenance.bundle \
@@ -106,7 +107,7 @@ ops/benchmark-v3/operator-container.sh run \
 
 Before baseline, derive the complete external sampling frame from the exact
 frozen ESLint provenance bundle. The versioned
-`semantic-private-subset-packing-frozen-eslint-history-v6` policy excludes all
+`semantic-private-subset-packing-frozen-eslint-history-v7` policy excludes all
 210 public split commitments, removes every public source path from mixed
 commits, and recalibrates only the remaining private ESLint runtime JavaScript
 surface without relying on commit-subject keywords. For multi-file commits it

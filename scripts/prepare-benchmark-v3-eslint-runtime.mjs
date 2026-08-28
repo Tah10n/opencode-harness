@@ -31,6 +31,17 @@ for (const [key, tag] of [["eslint-v6.0", "v6.0.1"], ["eslint-v6.1", "v6.1.0"],
     runtime_version: key.slice("eslint-v".length), provenance: { parent_commit: tag },
   } });
 }
+for (const [key, tag] of [["eslint-v4.0", "v4.0.0"], ["eslint-v4.1", "v4.1.1"],
+  ["eslint-v4.2", "v4.2.0"], ["eslint-v4.3", "v4.3.0"], ["eslint-v4.4", "v4.4.1"],
+  ["eslint-v4.5", "v4.5.0"], ["eslint-v4.6", "v4.6.1"], ["eslint-v4.7", "v4.7.2"],
+  ["eslint-v4.8", "v4.8.0"], ["eslint-v4.10", "v4.10.0"], ["eslint-v4.11", "v4.11.0"],
+  ["eslint-v4.12", "v4.12.1"], ["eslint-v4.13", "v4.13.1"], ["eslint-v4.14", "v4.14.0"],
+  ["eslint-v4.15", "v4.15.0"], ["eslint-v4.16", "v4.16.0"], ["eslint-v4.17", "v4.17.0"],
+  ["eslint-v4.18", "v4.18.2"], ["eslint-v4.19", "v4.19.1"]]) {
+  if (!representatives.has(key)) representatives.set(key, { control_surface: {
+    runtime_version: key.slice("eslint-v".length), provenance: { parent_commit: tag },
+  } });
+}
 for (const [key, tag] of [["eslint-v5.0", "v5.0.1"], ["eslint-v5.1", "v5.1.0"],
   ["eslint-v5.2", "v5.2.0"], ["eslint-v5.3", "v5.3.0"], ["eslint-v5.4", "v5.4.0"],
   ["eslint-v5.5", "v5.5.0"], ["eslint-v5.6", "v5.6.1"]]) {

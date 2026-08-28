@@ -29,8 +29,9 @@ try {
   const runtimeDiscoveryFixture = path.join(temporary, "runtime-discovery");
   fs.mkdirSync(path.join(runtimeDiscoveryFixture, "eslint-v6.0"), { recursive: true });
   fs.mkdirSync(path.join(runtimeDiscoveryFixture, "eslint-v10"));
-  assert.deepEqual(discoverBenchmarkV3SemanticRuntimeKeys(runtimeDiscoveryFixture), ["eslint-v10", "eslint-v6.0"]);
   fs.mkdirSync(path.join(runtimeDiscoveryFixture, "eslint-v4.0"));
+  assert.deepEqual(discoverBenchmarkV3SemanticRuntimeKeys(runtimeDiscoveryFixture), ["eslint-v10", "eslint-v4.0", "eslint-v6.0"]);
+  fs.mkdirSync(path.join(runtimeDiscoveryFixture, "eslint-v4"));
   assert.throws(() => discoverBenchmarkV3SemanticRuntimeKeys(runtimeDiscoveryFixture), /invalid named runtime/u,
     "campaign runtime discovery must fail closed on an unsupported named runtime");
   const matchingFixture = matchBenchmarkV3SinglePathOptions([
