@@ -36,6 +36,7 @@ import {
   summarizeBenchmarkV3Stage,
   validateBenchmarkV3ReviewReceipt,
   validateBenchmarkV3ReviewIssuers,
+  validateBenchmarkV3OperationalExecutionBinding,
   verifyBenchmarkV3OpenCodeExecutable,
   verifyBenchmarkV3OracleSubjectSafety,
   verifyBenchmarkV3FilesystemIsolation,
@@ -329,7 +330,11 @@ try {
     selected_candidate_id: null, final_candidate_sha: null });
   const initialLedger = Object.freeze({ ...initialLedgerBody, ledger_fingerprint: fingerprint(initialLedgerBody) });
   const output = path.join(registryFixture, "outputs", "campaign-one");
-  const firstJournal = createBenchmarkV3CampaignJournal(output, { sourceRoot: registryFixture, campaignFingerprint, initialLedger });
+  const operationalBindingFingerprint = `sha256:${"6".repeat(64)}`;
+  const createJournal = (target, options = {}) => createBenchmarkV3CampaignJournal(target, {
+    sourceRoot: registryFixture, campaignFingerprint, initialLedger, operationalBindingFingerprint, ...options,
+  });
+  const firstJournal = createJournal(output);
   const reservation = firstJournal.prepareAttempt("baseline", "family-one", 1, attemptBindingFingerprint);
   const firstOutcome = { infrastructure_failure: false, result_fingerprint: `sha256:${"e".repeat(64)}` };
   fs.mkdirSync(path.dirname(reservation.completion_path), { recursive: true });
@@ -343,14 +348,17 @@ try {
     `campaign-${campaignFingerprint.slice(7)}.lease`);
   const liveLease = JSON.parse(fs.readFileSync(staleReusedPidLease, "utf8"));
   fs.writeFileSync(staleReusedPidLease, `${JSON.stringify({ ...liveLease, heartbeat_at_ms: 1 })}\n`, { mode: 0o600 });
-  assert.throws(() => createBenchmarkV3CampaignJournal(output, { sourceRoot: registryFixture, campaignFingerprint, initialLedger }),
+  assert.throws(() => createJournal(output),
     /already active/u, "an aged heartbeat must not displace a provably live PID/start owner");
   firstJournal.close();
+  assert.throws(() => createJournal(output, { operationalBindingFingerprint: `sha256:${"7".repeat(64)}` }),
+    /operational provider environment/u,
+  "partial resume must reject API to OAuth or OAuth to API operational transport drift");
   fs.writeFileSync(staleReusedPidLease, `${JSON.stringify({ schema_version: 2, pid: process.pid,
     process_start_fingerprint: fingerprint({ deliberately: "wrong-start-identity" }),
     host_fingerprint: fingerprint(os.hostname().toLowerCase()), nonce: "stale-reused-pid",
     created_at_ms: 1, heartbeat_at_ms: 1 })}\n`, { mode: 0o600 });
-  assert.throws(() => createBenchmarkV3CampaignJournal(output, { sourceRoot: registryFixture, campaignFingerprint, initialLedger }),
+  assert.throws(() => createJournal(output),
     /signed audited takeover/u, "same-host PID/start mismatch must not trigger automatic lease reclamation");
   const takeoverChannel = path.join(registryFixture, "takeover-channel"); fs.mkdirSync(takeoverChannel, { mode: 0o700 });
   const { publicKey: takeoverPublicKey, privateKey: takeoverPrivateKey } = generateKeyPairSync("ed25519");
@@ -400,18 +408,14 @@ try {
   assert.equal(fs.readFileSync(takeover.raw_lease_path, "utf8"), leaseAfterRace,
     "successful takeover must preserve the exact audited raw lease bytes");
   fs.writeFileSync(`${staleReusedPidLease}.takeover-guard`, "manual recovery required\n", { mode: 0o600 });
-  assert.throws(() => createBenchmarkV3CampaignJournal(output, {
-    sourceRoot: registryFixture, campaignFingerprint, initialLedger,
-  }), /takeover or heartbeat recovery is in progress or requires manual recovery/u,
+  assert.throws(() => createJournal(output), /takeover or heartbeat recovery is in progress or requires manual recovery/u,
   "a leftover takeover guard must block automatic lease acquisition");
   fs.unlinkSync(`${staleReusedPidLease}.takeover-guard`);
   fs.writeFileSync(heartbeatLockPath, "manual heartbeat recovery required\n", { mode: 0o600 });
-  assert.throws(() => createBenchmarkV3CampaignJournal(output, {
-    sourceRoot: registryFixture, campaignFingerprint, initialLedger,
-  }), /heartbeat recovery is in progress or requires manual recovery/u,
+  assert.throws(() => createJournal(output), /heartbeat recovery is in progress or requires manual recovery/u,
   "a leftover heartbeat lock must block automatic lease acquisition");
   fs.unlinkSync(heartbeatLockPath);
-  const resumedJournal = createBenchmarkV3CampaignJournal(output, { sourceRoot: registryFixture, campaignFingerprint, initialLedger });
+  const resumedJournal = createJournal(output);
   assert.equal(resumedJournal.attemptsFor("baseline", "family-one").length, 1,
     "exact resume must preserve completed family execution");
   assert.throws(() => resumedJournal.prepareAttempt("baseline", "family-one", 1, `sha256:${"0".repeat(64)}`),
@@ -424,13 +428,13 @@ try {
     attempt_binding_fingerprint: attemptBindingFingerprint,
     outcome: crashOutcome, outcome_fingerprint: fingerprint(crashOutcome) }));
   resumedJournal.close();
-  const crashResumed = createBenchmarkV3CampaignJournal(output, { sourceRoot: registryFixture, campaignFingerprint, initialLedger });
+  const crashResumed = createJournal(output);
   assert.deepEqual(crashResumed.prepareAttempt("candidate", "family-two", 1, attemptBindingFingerprint).outcome, crashOutcome,
     "a durable completion written before a crash must resume without another execution");
   const uncertain = crashResumed.prepareAttempt("candidate", "family-three", 1, attemptBindingFingerprint);
   assert.equal(fs.existsSync(uncertain.completion_path), false);
   crashResumed.close();
-  const uncertainResume = createBenchmarkV3CampaignJournal(output, { sourceRoot: registryFixture, campaignFingerprint, initialLedger });
+  const uncertainResume = createJournal(output);
   assert.throws(() => uncertainResume.prepareAttempt("candidate", "family-three", 1, attemptBindingFingerprint), /refusing to repeat/u,
     "an interrupted unreceipted attempt must fail closed instead of repeating a model call");
   uncertainResume.close();
@@ -439,9 +443,7 @@ try {
     campaign_fingerprint: campaignFingerprint, arm_id: "candidate", family_id: "family-three", attempt_index: 1,
     attempt_binding_fingerprint: attemptBindingFingerprint,
     outcome: recoveredOutcome, outcome_fingerprint: fingerprint(recoveredOutcome) }));
-  const recoveredDevelopment = createBenchmarkV3CampaignJournal(output, {
-    sourceRoot: registryFixture, campaignFingerprint, initialLedger,
-  });
+  const recoveredDevelopment = createJournal(output);
   assert.deepEqual(recoveredDevelopment.prepareAttempt("candidate", "family-three", 1, attemptBindingFingerprint).outcome, recoveredOutcome,
     "an authentic late completion may close the exact reserved development attempt");
   const developmentReportBody = { status: "sealed-holdout-required", ledger: initialLedger,
@@ -453,17 +455,13 @@ try {
   const tamperedDevelopmentBody = { ...developmentReportBody, validation_efficacy: { passed: true } };
   fs.writeFileSync(developmentReportPath, JSON.stringify({ ...tamperedDevelopmentBody,
     study_fingerprint: fingerprint(tamperedDevelopmentBody) }));
-  assert.throws(() => createBenchmarkV3CampaignJournal(output, {
-    sourceRoot: registryFixture, campaignFingerprint, initialLedger, phase: "holdout",
-  }), /registered report/u,
+  assert.throws(() => createJournal(output, { phase: "holdout" }), /registered report/u,
   "a self-consistent rewritten development report must not replace the exact registered validation result");
   assert.equal(JSON.parse(fs.readFileSync(benchmarkV3CampaignRegistryPath(registryFixture), "utf8"))
     .entries.find((entry) => entry.campaign_fingerprint === campaignFingerprint).status, "complete",
   "a rejected report substitution must not advance the registered campaign phase");
   fs.writeFileSync(developmentReportPath, `${JSON.stringify(developmentReport)}\n`);
-  const holdoutJournal = createBenchmarkV3CampaignJournal(output, {
-    sourceRoot: registryFixture, campaignFingerprint, initialLedger, phase: "holdout",
-  });
+  const holdoutJournal = createJournal(output, { phase: "holdout" });
   assert.equal(holdoutJournal.attemptsFor("baseline", "family-one").length, 1,
     "holdout must resume the exact development/validation checkpoint");
   const holdoutReservation = holdoutJournal.prepareAttempt("candidate", "external-holdout-family-one", 1, attemptBindingFingerprint);
@@ -479,9 +477,7 @@ try {
   const extendedLedger = { ...extendedLedgerBody, ledger_fingerprint: fingerprint(extendedLedgerBody) };
   holdoutJournal.recordLedger(extendedLedger);
   holdoutJournal.close();
-  const resumedHoldout = createBenchmarkV3CampaignJournal(output, {
-    sourceRoot: registryFixture, campaignFingerprint, initialLedger, phase: "holdout",
-  });
+  const resumedHoldout = createJournal(output, { phase: "holdout" });
   assert.deepEqual(resumedHoldout.prepareAttempt("candidate", "external-holdout-family-one", 1, attemptBindingFingerprint).outcome, holdoutOutcome,
     "exact holdout resume must preserve a completed confirmatory family instead of executing it twice");
   assert.equal(resumedHoldout.ledger.ledger_fingerprint, extendedLedger.ledger_fingerprint,
@@ -494,31 +490,26 @@ try {
   delete reboundLedgerBody.ledger_fingerprint;
   const reboundLedger = { ...reboundLedgerBody, ledger_fingerprint: fingerprint(reboundLedgerBody) };
   const reboundCheckpointBody = { schema_version: holdoutCheckpoint.schema_version,
-    campaign_fingerprint: holdoutCheckpoint.campaign_fingerprint, attempts: holdoutCheckpoint.attempts, ledger: reboundLedger };
+    campaign_fingerprint: holdoutCheckpoint.campaign_fingerprint,
+    operational_binding_fingerprint: holdoutCheckpoint.operational_binding_fingerprint,
+    attempts: holdoutCheckpoint.attempts, ledger: reboundLedger };
   fs.writeFileSync(holdoutCheckpointPath, JSON.stringify({ ...reboundCheckpointBody,
     checkpoint_fingerprint: fingerprint(reboundCheckpointBody) }));
-  assert.throws(() => createBenchmarkV3CampaignJournal(output, {
-    sourceRoot: registryFixture, campaignFingerprint, initialLedger, phase: "holdout",
-  }), /exact completed development\/validation campaign/u,
+  assert.throws(() => createJournal(output, { phase: "holdout" }), /exact completed development\/validation campaign/u,
   "holdout resume must reject a checkpoint ledger that is not an exact extension of the frozen development ledger");
   fs.writeFileSync(holdoutCheckpointPath, holdoutCheckpointBytes);
   const secondWorktree = registryFixtureSecondWorktree;
   assert.equal(spawnSync("git", ["worktree", "add", "--quiet", "--detach", secondWorktree], { cwd: registryFixture }).status, 0);
-  const firstContainerJournal = createBenchmarkV3CampaignJournal(output, {
-    sourceRoot: registryFixture, campaignFingerprint, initialLedger, phase: "holdout",
-  });
+  const firstContainerJournal = createJournal(output, { phase: "holdout" });
   const sharedLease = benchmarkV3CampaignLeasePath(secondWorktree, campaignFingerprint);
   const sharedLeaseValue = JSON.parse(fs.readFileSync(sharedLease, "utf8"));
   fs.writeFileSync(sharedLease, `${JSON.stringify({ ...sharedLeaseValue,
     host_fingerprint: fingerprint("independent-container-host") })}\n`, { mode: 0o600 });
-  assert.throws(() => createBenchmarkV3CampaignJournal(output, {
-    sourceRoot: secondWorktree, campaignFingerprint, initialLedger, phase: "holdout",
-  }),
+  assert.throws(() => createJournal(output, { sourceRoot: secondWorktree, phase: "holdout" }),
     /foreign-host lease is authoritative/u, "two containers sharing one Git common directory must fail closed on a foreign-host lease");
   firstContainerJournal.close();
-  assert.throws(() => createBenchmarkV3CampaignJournal(path.join(registryFixture, "outputs", "campaign-copy"), {
-    sourceRoot: registryFixture, campaignFingerprint, initialLedger, phase: "holdout",
-  }), /already registered/u, "the same campaign bindings must not move to a new output directory");
+  assert.throws(() => createJournal(path.join(registryFixture, "outputs", "campaign-copy"), { phase: "holdout" }),
+    /already registered/u, "the same campaign bindings must not move to a new output directory");
 } finally {
   fs.rmSync(registryFixtureSecondWorktree, { recursive: true, force: true });
   fs.rmSync(registryFixture, { recursive: true, force: true });
@@ -599,6 +590,16 @@ assert.deepEqual(unseededBinding, explicitlyUnseededBinding);
 assert.equal(unseededBinding.corpus_fingerprint, corpus.corpus_fingerprint);
 assert.equal(Object.hasOwn(unseededBinding, "provider_auth_mode"), false,
   "operational authorization transport must not alter the frozen experimental model-binding schema");
+const operationalBinding = (mode, environment = `sha256:${"9".repeat(64)}`) => {
+  const body = { schema_version: 1, provider: "openai", provider_auth_mode: mode,
+    readiness_environment_fingerprint: environment };
+  return { ...body, operational_binding_fingerprint: fingerprint(body) };
+};
+assert.equal(validateBenchmarkV3OperationalExecutionBinding(operationalBinding("oauth"), operationalBinding("oauth")).provider_auth_mode,
+  "oauth");
+assert.throws(() => validateBenchmarkV3OperationalExecutionBinding(operationalBinding("oauth"), operationalBinding("api")),
+  /authorization mode or readiness environment differs/u,
+"holdout must reject OAuth to API and API to OAuth transport drift outside the frozen model binding");
 const campaignFingerprintFixture = { sourceSha: "a".repeat(40), sourceTreeFingerprint: `sha256:${"b".repeat(64)}`,
   bindingsFingerprint: `sha256:${"c".repeat(64)}`,
   reviewFingerprints: [`sha256:${"d".repeat(64)}`, `sha256:${"e".repeat(64)}`] };
@@ -852,6 +853,7 @@ try {
   const loaded = loadBenchmarkV3OpenAIOAuthState(oauthState);
   assert.equal(loaded.auth.refresh, oauthRefreshCanary);
   const store = createBenchmarkV3ProviderCredentialStore({ OPENAI_OAUTH_STATE_FILE: oauthState });
+  const concurrentStore = createBenchmarkV3ProviderCredentialStore({ OPENAI_OAUTH_STATE_FILE: oauthState });
   assert.equal(store.mode, "oauth");
   assert.throws(() => createBenchmarkV3ProviderCredentialStore({ OPENAI_API_KEY: fixtureSecret,
     OPENAI_OAUTH_STATE_FILE: oauthState }), /exactly one OpenAI API or OAuth credential source/u);
@@ -859,17 +861,25 @@ try {
   const refreshFetch = async (input, init = {}) => {
       const url = String(input instanceof Request ? input.url : input);
       refreshUrls.push(url);
+      const expectedRefresh = refreshUrls.length === 1 ? oauthRefreshCanary : refreshedRefresh;
       assert.equal(url, "https://auth.openai.com/oauth/token");
       assert.equal(init.redirect, "manual");
       assert.match(String(init.body), /grant_type=refresh_token/u);
-      assert.match(String(init.body), new RegExp(oauthRefreshCanary, "u"));
+      assert.match(String(init.body), new RegExp(expectedRefresh, "u"));
       return new Response(JSON.stringify({ access_token: refreshedJwt, refresh_token: refreshedRefresh, expires_in: 3600 }),
         { status: 200, headers: { "content-type": "application/json" } });
     };
-  const providerPreflight = await preflightBenchmarkV3ProviderCredentialStore(store, { fetchImpl: refreshFetch });
-  assert.equal(providerPreflight.auth_mode, "oauth");
-  assert.match(providerPreflight.state_fingerprint, /^sha256:[0-9a-f]{64}$/u);
-  oauthBroker = await createBenchmarkV3OAuthCredentialBroker({ credentialStore: store, fetchImpl: refreshFetch });
+  const providerPreflights = await Promise.all([
+    preflightBenchmarkV3ProviderCredentialStore(store, { fetchImpl: refreshFetch }),
+    preflightBenchmarkV3ProviderCredentialStore(concurrentStore, { fetchImpl: refreshFetch }),
+  ]);
+  assert.deepEqual(providerPreflights.map((entry) => entry.auth_mode), ["oauth", "oauth"]);
+  assert.equal(providerPreflights[0].state_fingerprint, providerPreflights[1].state_fingerprint);
+  assert.match(providerPreflights[0].state_fingerprint, /^sha256:[0-9a-f]{64}$/u);
+  assert.deepEqual(refreshUrls, ["https://auth.openai.com/oauth/token"],
+    "independent credential stores must serialize refresh and append exactly one state rotation");
+  oauthBroker = await createBenchmarkV3OAuthCredentialBroker({ credentialStore: store, fetchImpl: refreshFetch,
+    now: () => Date.now() + 2 * 60 * 60 * 1000 });
   const wrongCapability = await originalFetch(oauthBroker.payload.broker_url, { method: "POST",
     headers: { authorization: `Bearer ${"x".repeat(43)}` } });
   assert.equal(wrongCapability.status, 403);
@@ -902,13 +912,14 @@ try {
     oauthOptions.fetch("https://api.openai.com/v1/responses"),
   ]);
   assert.deepEqual(concurrentResponses.map((response) => response.status), [200, 200]);
-  assert.deepEqual(refreshUrls, ["https://auth.openai.com/oauth/token"]);
+  assert.deepEqual(refreshUrls, ["https://auth.openai.com/oauth/token", "https://auth.openai.com/oauth/token"],
+    "concurrent broker requests must coalesce one issuer refresh");
   assert.deepEqual(observedUrls,
     ["https://chatgpt.com/backend-api/codex/responses", "https://chatgpt.com/backend-api/codex/responses"]);
   assert.equal(observedProviderHeaders.get("authorization"), `Bearer ${refreshedJwt}`);
   assert.equal(observedProviderHeaders.get("chatgpt-account-id"), oauthAccountCanary);
   assert.equal(observedProviderHeaders.get("x-openai-internal-codex-residency"), "eu");
-  assert.equal(loadBenchmarkV3OpenAIOAuthState(oauthState).sequence, 2);
+  assert.equal(loadBenchmarkV3OpenAIOAuthState(oauthState).sequence, 3);
   assert.equal(loadBenchmarkV3OpenAIOAuthState(oauthState).auth.access, refreshedJwt);
   const oauthShell = { env: { OPENAI_API_KEY: fixtureSecret, OPENCODE_AUTH_CONTENT: "oauth-secret",
     BENCHMARK_V3_CREDENTIAL_FILE: oauthCredentialFile } };

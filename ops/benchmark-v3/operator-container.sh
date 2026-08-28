@@ -118,9 +118,16 @@ case "$action" in
         exit 83
       fi
       oauth_parent="$(cd "$(dirname "$oauth_state_file")" && pwd -P)"
-      if [ "$oauth_parent/$(basename "$oauth_state_file")" != "$oauth_state_file" ]; then
+      if [ "$oauth_parent/$(basename "$oauth_state_file")" != "$oauth_state_file" ] \
+        || [ "$(basename "$oauth_state_file")" != "openai-oauth-state.jsonl" ]; then
         echo "BENCHMARK_V3_OPENAI_OAUTH_FILE must be a canonical absolute path" >&2
         exit 86
+      fi
+      oauth_parent_mode="$(stat -f '%Lp' "$oauth_parent" 2>/dev/null || stat -c '%a' "$oauth_parent")"
+      oauth_parent_uid="$(stat -f '%u' "$oauth_parent" 2>/dev/null || stat -c '%u' "$oauth_parent")"
+      if [ "$oauth_parent_mode" != "700" ] || [ "$oauth_parent_uid" != "$(id -u)" ]; then
+        echo "BENCHMARK_V3_OPENAI_OAUTH_FILE parent must be private and owner-controlled" >&2
+        exit 87
       fi
       oauth_mode="$(stat -f '%Lp' "$oauth_state_file" 2>/dev/null || stat -c '%a' "$oauth_state_file")"
       if [ "$oauth_mode" != "600" ]; then
@@ -188,10 +195,10 @@ case "$action" in
         --tmpfs /usr/local/libexec:rw,exec,nosuid,nodev,mode=0755 \
         --mount "type=bind,src=$source_root,dst=/workspace/source,readonly" \
         --mount "type=bind,src=$campaign_root,dst=/campaign" \
-        --mount "type=bind,src=$oauth_state_file,dst=/run/secrets/openai_oauth_state.jsonl" \
+        --mount "type=bind,src=$oauth_parent,dst=/run/secrets/openai-oauth" \
         --mount "type=volume,src=$custody_volume,dst=/var/lib/opencode-harness" \
         --mount "type=volume,src=$channel_volume,dst=/run/opencode-harness" \
-        --env OPENAI_OAUTH_STATE_FILE=/run/secrets/openai_oauth_state.jsonl \
+        --env OPENAI_OAUTH_STATE_FILE=/run/secrets/openai-oauth/openai-oauth-state.jsonl \
         --env BENCHMARK_V3_CGROUP_REQUIRED=1 \
         --env "BENCHMARK_V3_OPERATOR_IMAGE_ID=$image_fingerprint" \
         --env "BENCHMARK_V3_PROVIDER_ONLY_EGRESS=$provider_only" \

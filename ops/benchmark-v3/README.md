@@ -255,9 +255,11 @@ initializer prints only a state fingerprint:
 install -d -m 0700 /absolute/private/campaign/opencode-data
 XDG_DATA_HOME=/absolute/private/campaign/opencode-data \
   opencode auth login --pure --provider openai --method "ChatGPT Pro/Plus (browser)"
+chmod 0700 /absolute/private/campaign/opencode-data/opencode
+install -d -m 0700 /absolute/private/campaign/oauth-custody
 npm run bench:v3:oauth:init -- \
   --input /absolute/private/campaign/opencode-data/opencode/auth.json \
-  --output /absolute/private/campaign/openai-oauth-state.jsonl
+  --output /absolute/private/campaign/oauth-custody/openai-oauth-state.jsonl
 ```
 
 Both the input and output parents must be owner-controlled, the input must not
@@ -265,7 +267,8 @@ be group/world accessible, and the new state journal is created with mode
 `0600`. Run the canonical model command with
 `BENCHMARK_V3_PROVIDER_AUTH_MODE=oauth` and
 `BENCHMARK_V3_OPENAI_OAUTH_FILE` naming that journal. The launcher mounts only
-the journal, never the user's complete OpenCode data directory. Each attempt
+the dedicated custody directory that contains the journal and its rotation lock,
+never the user's complete OpenCode data directory. Each attempt
 receives a one-shot credential payload which is erased before dispatch. OAuth
 refresh stays in a host-side loopback broker and rotations are appended directly
 to the external state journal. Bubblewrap receives neither the refresh token nor

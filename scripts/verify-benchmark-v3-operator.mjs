@@ -72,7 +72,8 @@ try {
     "--env \"BENCHMARK_V3_PROVIDER_ONLY_EGRESS=$provider_only\"",
     "BENCHMARK_V3_OPENAI_OAUTH_FILE", "API key and OAuth state credentials are mutually exclusive",
     "BENCHMARK_V3_OPENAI_OAUTH_FILE must be a canonical absolute path",
-    "dst=/run/secrets/openai_oauth_state.jsonl", "OPENAI_OAUTH_STATE_FILE=/run/secrets/openai_oauth_state.jsonl",
+    "dst=/run/secrets/openai-oauth", "OPENAI_OAUTH_STATE_FILE=/run/secrets/openai-oauth/openai-oauth-state.jsonl",
+    "parent must be private and owner-controlled",
     "--env \"BENCHMARK_V3_PROVIDER_AUTH_MODE=$provider_auth_mode\"",
     "src=$external_bundle,dst=/opt/benchmark-v3/provenance.bundle,readonly",
     "src=$external_runtime,dst=/opt/benchmark-v3/semantic-runtime,readonly"]) {
