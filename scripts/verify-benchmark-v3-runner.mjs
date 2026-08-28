@@ -26,9 +26,12 @@ import {
   benchmarkV3PreflightEnvironment,
   benchmarkV3AttemptTimeouts,
   classifyBenchmarkV3AttemptReceipt,
+  createBenchmarkV3OAuthCredentialBroker,
+  createBenchmarkV3ProviderCredentialStore,
   createBenchmarkV3CampaignJournal,
   evaluateBenchmarkV3EfficacyGate,
   evaluateBenchmarkV3Guardrails,
+  preflightBenchmarkV3ProviderCredentialStore,
   resolveBenchmarkV3StudySeeds,
   summarizeBenchmarkV3Stage,
   validateBenchmarkV3ReviewReceipt,
@@ -39,6 +42,7 @@ import {
   verifyBenchmarkV3ProductBundle,
 } from "../lib/benchmark/v3-runner.mjs";
 import { BenchmarkV3CredentialBridgePlugin } from "../lib/benchmark/v3-opencode-provider-bridge-plugin.mjs";
+import { initializeBenchmarkV3OpenAIOAuthState, loadBenchmarkV3OpenAIOAuthState } from "../lib/benchmark/v3-provider-auth-state.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const { value: design } = loadBenchmarkV3Design(root);
@@ -593,6 +597,8 @@ const unseededBinding = buildBenchmarkV3ModelBinding(bindingFixture);
 const explicitlyUnseededBinding = buildBenchmarkV3ModelBinding({ ...bindingFixture, modelSamplingSeed: null });
 assert.deepEqual(unseededBinding, explicitlyUnseededBinding);
 assert.equal(unseededBinding.corpus_fingerprint, corpus.corpus_fingerprint);
+assert.equal(Object.hasOwn(unseededBinding, "provider_auth_mode"), false,
+  "operational authorization transport must not alter the frozen experimental model-binding schema");
 const campaignFingerprintFixture = { sourceSha: "a".repeat(40), sourceTreeFingerprint: `sha256:${"b".repeat(64)}`,
   bindingsFingerprint: `sha256:${"c".repeat(64)}`,
   reviewFingerprints: [`sha256:${"d".repeat(64)}`, `sha256:${"e".repeat(64)}`] };
@@ -824,9 +830,113 @@ try {
   else process.env.BENCHMARK_V3_CREDENTIAL_FILE = priorCredentialFile;
   fs.rmSync(credentialFixtureRoot, { recursive: true, force: true });
 }
+
+const oauthFixtureRoot = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), "v3-oauth-boundary-")));
+const oauthInput = path.join(oauthFixtureRoot, "opencode-auth.json");
+const oauthState = path.join(oauthFixtureRoot, "oauth-state.jsonl");
+const oauthCredentialFile = path.join(oauthFixtureRoot, "credential.json");
+const oauthRefreshCanary = "oauth-refresh-secret-canary-000001";
+const oauthAccessCanary = "oauth-access-secret-canary-0000001";
+const oauthAccountCanary = "account-private-canary";
+const refreshedRefresh = "oauth-refreshed-refresh-secret-00001";
+const jwt = (claims) => [Buffer.from("{}").toString("base64url"), Buffer.from(JSON.stringify(claims)).toString("base64url"), "signature-value-long"].join(".");
+const refreshedJwt = jwt({ chatgpt_account_id: oauthAccountCanary,
+  "https://api.openai.com/auth": { chatgpt_compute_residency: "eu" } });
+let oauthBroker = null;
+try {
+  fs.writeFileSync(oauthInput, JSON.stringify({ openai: { type: "oauth", refresh: oauthRefreshCanary,
+    access: oauthAccessCanary, expires: Date.now() - 1, accountId: oauthAccountCanary } }), { mode: 0o600 });
+  const initialized = initializeBenchmarkV3OpenAIOAuthState({ inputPath: oauthInput, outputPath: oauthState });
+  assert.equal(initialized.auth_mode, "oauth");
+  assert.match(initialized.state_fingerprint, /^sha256:[0-9a-f]{64}$/u);
+  const loaded = loadBenchmarkV3OpenAIOAuthState(oauthState);
+  assert.equal(loaded.auth.refresh, oauthRefreshCanary);
+  const store = createBenchmarkV3ProviderCredentialStore({ OPENAI_OAUTH_STATE_FILE: oauthState });
+  assert.equal(store.mode, "oauth");
+  assert.throws(() => createBenchmarkV3ProviderCredentialStore({ OPENAI_API_KEY: fixtureSecret,
+    OPENAI_OAUTH_STATE_FILE: oauthState }), /exactly one OpenAI API or OAuth credential source/u);
+  const refreshUrls = [];
+  const refreshFetch = async (input, init = {}) => {
+      const url = String(input instanceof Request ? input.url : input);
+      refreshUrls.push(url);
+      assert.equal(url, "https://auth.openai.com/oauth/token");
+      assert.equal(init.redirect, "manual");
+      assert.match(String(init.body), /grant_type=refresh_token/u);
+      assert.match(String(init.body), new RegExp(oauthRefreshCanary, "u"));
+      return new Response(JSON.stringify({ access_token: refreshedJwt, refresh_token: refreshedRefresh, expires_in: 3600 }),
+        { status: 200, headers: { "content-type": "application/json" } });
+    };
+  const providerPreflight = await preflightBenchmarkV3ProviderCredentialStore(store, { fetchImpl: refreshFetch });
+  assert.equal(providerPreflight.auth_mode, "oauth");
+  assert.match(providerPreflight.state_fingerprint, /^sha256:[0-9a-f]{64}$/u);
+  oauthBroker = await createBenchmarkV3OAuthCredentialBroker({ credentialStore: store, fetchImpl: refreshFetch });
+  const wrongCapability = await originalFetch(oauthBroker.payload.broker_url, { method: "POST",
+    headers: { authorization: `Bearer ${"x".repeat(43)}` } });
+  assert.equal(wrongCapability.status, 403);
+  const wrongCapabilityBody = await wrongCapability.text();
+  assert.equal([oauthRefreshCanary, oauthAccessCanary, oauthAccountCanary].some((secret) => wrongCapabilityBody.includes(secret)), false);
+  const oneShotPayload = { schema_version: 2, provider: "openai", ...oauthBroker.payload };
+  const serializedOneShot = JSON.stringify(oneShotPayload);
+  assert.equal([oauthRefreshCanary, oauthAccessCanary, oauthAccountCanary, refreshedRefresh, refreshedJwt]
+    .some((secret) => serializedOneShot.includes(secret)), false,
+  "OAuth one-shot file must contain only the loopback capability, never tokens or account state");
+  fs.writeFileSync(oauthCredentialFile, serializedOneShot, { mode: 0o600 });
+  process.env.BENCHMARK_V3_CREDENTIAL_FILE = oauthCredentialFile;
+  const oauthPlugin = await BenchmarkV3CredentialBridgePlugin();
+  assert.equal(fs.existsSync(oauthCredentialFile), false, "OAuth bridge must erase its one-shot credential before dispatch");
+  const observedUrls = [];
+  let observedProviderHeaders;
+  globalThis.fetch = async (input, init = {}) => {
+    const url = String(input instanceof Request ? input.url : input);
+    if (url === oauthBroker.payload.broker_url) return originalFetch(input, init);
+    observedUrls.push(url);
+    observedProviderHeaders = new Headers(init.headers);
+    return new Response("", { status: 200 });
+  };
+  const oauthOptions = await oauthPlugin.auth.loader(async () => ({ type: "api", key: "benchmark-v3-host-credential-bridge" }));
+  assert.equal(oauthOptions.apiKey, "benchmark-v3-oauth-dummy-key");
+  await assert.rejects(() => oauthOptions.fetch("https://provider.invalid/v1/responses"), /approved OpenAI API origin/u);
+  await assert.rejects(() => oauthOptions.fetch("https://api.openai.com/v1/models"), /approved OpenAI response paths/u);
+  const concurrentResponses = await Promise.all([
+    oauthOptions.fetch("https://api.openai.com/v1/responses"),
+    oauthOptions.fetch("https://api.openai.com/v1/responses"),
+  ]);
+  assert.deepEqual(concurrentResponses.map((response) => response.status), [200, 200]);
+  assert.deepEqual(refreshUrls, ["https://auth.openai.com/oauth/token"]);
+  assert.deepEqual(observedUrls,
+    ["https://chatgpt.com/backend-api/codex/responses", "https://chatgpt.com/backend-api/codex/responses"]);
+  assert.equal(observedProviderHeaders.get("authorization"), `Bearer ${refreshedJwt}`);
+  assert.equal(observedProviderHeaders.get("chatgpt-account-id"), oauthAccountCanary);
+  assert.equal(observedProviderHeaders.get("x-openai-internal-codex-residency"), "eu");
+  assert.equal(loadBenchmarkV3OpenAIOAuthState(oauthState).sequence, 2);
+  assert.equal(loadBenchmarkV3OpenAIOAuthState(oauthState).auth.access, refreshedJwt);
+  const oauthShell = { env: { OPENAI_API_KEY: fixtureSecret, OPENCODE_AUTH_CONTENT: "oauth-secret",
+    BENCHMARK_V3_CREDENTIAL_FILE: oauthCredentialFile } };
+  await oauthPlugin["shell.env"]({}, oauthShell);
+  assert.deepEqual(oauthShell.env, { OPENAI_API_KEY: "", OPENCODE_AUTH_CONTENT: "", BENCHMARK_V3_CREDENTIAL_FILE: "" });
+  await oauthPlugin.dispose();
+  await assert.rejects(() => oauthOptions.fetch("https://api.openai.com/v1/responses"), /disposed/u);
+  await oauthBroker.close();
+
+  const cliOutput = path.join(oauthFixtureRoot, "cli-state.jsonl");
+  const cli = spawnSync(process.execPath, [path.join(root, "scripts", "benchmark-v3-oauth-init.mjs"),
+    "--input", oauthInput, "--output", cliOutput], { encoding: "utf8", shell: false, windowsHide: true });
+  assert.equal(cli.status, 0, cli.stderr);
+  assert.equal([oauthRefreshCanary, oauthAccessCanary, oauthAccountCanary].some((secret) => `${cli.stdout}${cli.stderr}`.includes(secret)), false,
+    "OAuth initializer output must not expose credential fragments");
+  assert.equal(fs.statSync(cliOutput).mode & 0o777, 0o600);
+} finally {
+  globalThis.fetch = originalFetch;
+  await oauthBroker?.close();
+  if (priorCredentialFile === undefined) delete process.env.BENCHMARK_V3_CREDENTIAL_FILE;
+  else process.env.BENCHMARK_V3_CREDENTIAL_FILE = priorCredentialFile;
+  fs.rmSync(oauthFixtureRoot, { recursive: true, force: true });
+}
 const credentialPluginSource = fs.readFileSync(path.join(root, "lib", "benchmark", "v3-opencode-provider-bridge-plugin.mjs"), "utf8");
 assert.equal(credentialPluginSource.includes("process.env.OPENAI_API_KEY"), false);
 assert.equal(credentialPluginSource.includes("fs.unlinkSync(target)"), true);
+assert.equal(credentialPluginSource.includes("refresh_token"), false);
+assert.equal(runnerSource.includes("BENCHMARK_V3_CREDENTIAL_UPDATE_FILE"), false);
 
 const workerFixtureRoot = fs.mkdtempSync(path.join(os.tmpdir(), "v3-worker-protocol-"));
 try {

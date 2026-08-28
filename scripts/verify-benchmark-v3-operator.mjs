@@ -12,7 +12,8 @@ import { initializeBenchmarkV3OperatorCustody, initializeBenchmarkV3ReviewerCust
 import { commitBenchmarkV3HoldoutSelection, issueBenchmarkV3ExecutionAuthority,
   issueBenchmarkV3ReadinessReceipts, issueBenchmarkV3ReviewReceipt,
   signBenchmarkV3ReviewEvidence } from "../lib/benchmark/v3-operator-issue.mjs";
-import { runBenchmarkV3OperatorProbes } from "../lib/benchmark/v3-operator-probes.mjs";
+import { runBenchmarkV3OperatorProbes, runBenchmarkV3ProviderOnlyEgressProbe,
+  verifyBenchmarkV3ProviderOnlyEgressEvidence } from "../lib/benchmark/v3-operator-probes.mjs";
 import { matchBenchmarkV3SinglePathOptions, stratifyBenchmarkV3ExternalPool } from "../lib/benchmark/v3-operator-frame.mjs";
 import { verifyBenchmarkV3OperatorHoldoutPoolBinding } from "../lib/benchmark/v3-operator-holdout.mjs";
 import { loadSignedBenchmarkV3ExecutionAuthority } from "../lib/benchmark/v3-execution-authority.mjs";
@@ -69,6 +70,10 @@ try {
     "set -- node \"/workspace/source/$entrypoint\" \"$@\"",
     "operator image does not match the committed immutable runtime fingerprint",
     "--env \"BENCHMARK_V3_PROVIDER_ONLY_EGRESS=$provider_only\"",
+    "BENCHMARK_V3_OPENAI_OAUTH_FILE", "API key and OAuth state credentials are mutually exclusive",
+    "BENCHMARK_V3_OPENAI_OAUTH_FILE must be a canonical absolute path",
+    "dst=/run/secrets/openai_oauth_state.jsonl", "OPENAI_OAUTH_STATE_FILE=/run/secrets/openai_oauth_state.jsonl",
+    "--env \"BENCHMARK_V3_PROVIDER_AUTH_MODE=$provider_auth_mode\"",
     "src=$external_bundle,dst=/opt/benchmark-v3/provenance.bundle,readonly",
     "src=$external_runtime,dst=/opt/benchmark-v3/semantic-runtime,readonly"]) {
     assert.equal(launcherSource.includes(invariant), true, `operator launcher is missing invariant: ${invariant}`);
@@ -77,6 +82,26 @@ try {
     "dst=/var/lib/opencode-harness-reviewer"]) {
     assert.equal(launcherSource.includes(forbidden), false,
       `authority launcher must not expose reviewer custody: ${forbidden}`);
+  }
+  const priorProviderAuthMode = process.env.BENCHMARK_V3_PROVIDER_AUTH_MODE;
+  try {
+    process.env.BENCHMARK_V3_PROVIDER_AUTH_MODE = "oauth";
+    const egress = runBenchmarkV3ProviderOnlyEgressProbe({ sourceRoot: root, platform: "linux",
+      curlExecutable: "/usr/bin/true", resolverExecutable: "/usr/bin/true",
+      runner: (_file, args) => {
+        const target = args.at(-1);
+        if (["https://auth.openai.com/oauth/token", "https://chatgpt.com/backend-api/codex/responses"].includes(target)) {
+          return { status: 0, stdout: "401", stderr: "", signal: null };
+        }
+        return { status: 1, stdout: "", stderr: "denied", signal: null };
+      } });
+    assert.equal(verifyBenchmarkV3ProviderOnlyEgressEvidence(egress), egress);
+    assert.equal(egress.provider_auth_mode, "oauth");
+    assert.deepEqual(egress.provider_origins,
+      ["https://auth.openai.com/oauth/token", "https://chatgpt.com/backend-api/codex/responses"]);
+  } finally {
+    if (priorProviderAuthMode === undefined) delete process.env.BENCHMARK_V3_PROVIDER_AUTH_MODE;
+    else process.env.BENCHMARK_V3_PROVIDER_AUTH_MODE = priorProviderAuthMode;
   }
   const reviewerLauncher = path.join(root, "ops", "benchmark-v3", "reviewer-container.sh");
   const reviewerLauncherSource = fs.readFileSync(reviewerLauncher, "utf8");
@@ -111,7 +136,8 @@ try {
     "toolchain image identity must not rely on a self-asserted source label");
   const entrypointSource = fs.readFileSync(path.join(root, "ops", "benchmark-v3", "entrypoint.sh"), "utf8");
   for (const invariant of ["BENCHMARK_V3_REVIEWER_ONLY", "chown root:root /var/lib/opencode-harness-reviewer",
-    "chmod 0700 /var/lib/opencode-harness-reviewer"]) {
+    "chmod 0700 /var/lib/opencode-harness-reviewer", "OPENAI_OAUTH_STATE_FILE", "auth.openai.com", "chatgpt.com",
+    "BENCHMARK_V3_PROVIDER_AUTH_MODE"]) {
     assert.equal(entrypointSource.includes(invariant), true, `operator entrypoint is missing reviewer invariant: ${invariant}`);
   }
   const stratifiedFixture = stratifyBenchmarkV3ExternalPool(Array.from({ length: 93 }, (_, index) => ({
