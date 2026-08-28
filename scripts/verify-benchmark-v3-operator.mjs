@@ -19,13 +19,20 @@ import { loadSignedBenchmarkV3HoldoutCommitment } from "../lib/benchmark/v3-hold
 import { validateBenchmarkV3ReviewReceipt } from "../lib/benchmark/v3-runner.mjs";
 import { validateBenchmarkV3ReadinessReceipt } from "../lib/benchmark/v3-readiness.mjs";
 import { buildProfileBundleManifest } from "../lib/profile-v3.mjs";
-import { loadBenchmarkV3Corpus } from "../lib/benchmark/v3-corpus.mjs";
+import { discoverBenchmarkV3SemanticRuntimeKeys, loadBenchmarkV3Corpus } from "../lib/benchmark/v3-corpus.mjs";
 import { loadBenchmarkV3Design } from "../lib/benchmark/v3-design.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const temporary = fs.mkdtempSync(path.join(os.tmpdir(), "benchmark-v3-operator-"));
 const run = (file, args, options = {}) => spawnSync(file, args, { encoding: "utf8", shell: false, windowsHide: true, ...options });
 try {
+  const runtimeDiscoveryFixture = path.join(temporary, "runtime-discovery");
+  fs.mkdirSync(path.join(runtimeDiscoveryFixture, "eslint-v6.0"), { recursive: true });
+  fs.mkdirSync(path.join(runtimeDiscoveryFixture, "eslint-v10"));
+  assert.deepEqual(discoverBenchmarkV3SemanticRuntimeKeys(runtimeDiscoveryFixture), ["eslint-v10", "eslint-v6.0"]);
+  fs.mkdirSync(path.join(runtimeDiscoveryFixture, "eslint-v5.0"));
+  assert.throws(() => discoverBenchmarkV3SemanticRuntimeKeys(runtimeDiscoveryFixture), /invalid named runtime/u,
+    "campaign runtime discovery must fail closed on an unsupported named runtime");
   const matchingFixture = matchBenchmarkV3SinglePathOptions([
     [{ sourcePaths: ["lib/shared.js"] }, { sourcePaths: ["lib/alternative.js"] }],
     [{ sourcePaths: ["lib/shared.js"] }],

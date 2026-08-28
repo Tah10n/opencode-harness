@@ -34,6 +34,20 @@ Build the image:
 ops/benchmark-v3/operator-container.sh build
 ```
 
+Prepare a new semantic runtime with the public keys plus deterministic ESLint
+6.0--6.4 representatives, or extend an existing pre-freeze runtime in place:
+
+```sh
+BENCHMARK_V3_PROVENANCE_BUNDLE=/absolute/private/eslint-provenance.bundle \
+npm run bench:v3:prepare-eslint-runtime -- \
+  --extend-existing /absolute/private/eslint-runtime
+```
+
+The development gate fingerprints every valid named runtime directory, not
+only keys exercised by the public corpus. The official study rechecks that exact
+key set, and the holdout can use only a key with the same pre-baseline frozen
+fingerprint.
+
 Initialize custody once and copy only the generated public registry bundle to
 the external campaign directory:
 
