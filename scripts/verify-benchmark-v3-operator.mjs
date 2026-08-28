@@ -154,8 +154,11 @@ try {
   const reviewerCustodies = [];
   for (const reviewer of ["one", "two"]) {
     const custodyRoot = path.join(temporary, `reviewer-${reviewer}-custody`);
+    if (reviewer === "one") fs.mkdirSync(custodyRoot, { mode: 0o700 });
     const reviewerInitialized = initializeBenchmarkV3ReviewerCustody({ sourceRoot: source, custodyRoot,
       reviewer, ownerUid });
+    assert.equal(reviewerInitialized.status, "initialized",
+      "an empty owner-only Docker volume root must support first-use custody initialization");
     reviewerCustodies.push({ custodyRoot, initialized: reviewerInitialized });
     for (const [file, value] of Object.entries(reviewerInitialized.registry_bundle)) {
       fs.writeFileSync(path.join(source, "benchmarks", "v3", file), `${JSON.stringify(value, null, 2)}\n`);
