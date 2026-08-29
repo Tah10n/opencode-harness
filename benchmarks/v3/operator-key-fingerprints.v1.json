@@ -1,12 +1,12 @@
 {
   "schema_version": 2,
-  "rotated_at": "2026-08-28T14:39:47Z",
-  "rotation_reason": "start a separate post-OAuth operational epoch while retaining the prior epoch for audit",
-  "prior_source_sha": "dd61a123f97dcecf190480b369536aa34bfde1f8",
+  "rotated_at": "2026-08-29T08:45:01Z",
+  "rotation_reason": "start a separate contained-oracle corrective epoch while retaining the prior epoch for audit",
+  "prior_source_sha": "53f0618265458413b69ed1ea8c9f0f7b172a0457",
   "custody_inventory_fingerprints": {
-    "authority": "sha256:5cac4382436ab8506001d06a255f295956570cd5e4d3ece98cd358dda2306ec1",
-    "reviewer_one": "sha256:bd7bf4cd024d331b29cd4776395dc0248e1288eaf8889d3d317981d60e1d3120",
-    "reviewer_two": "sha256:0e4fa9c60e40c37572a67c2bd770e9faf528c540cecd431a8caa55639d320bdf"
+    "authority": "sha256:3a204ae11a9c8614ff91a9988ac81fddd3cb617165759fcd19ad334f3c99993a",
+    "reviewer_one": "sha256:4fcaaf85e674b3ec43234c5f5720da8a236538a16cbcf4abe74bb8cdabf8729b",
+    "reviewer_two": "sha256:bef1e7bf153b8a74eda013c6ca8606391ce5b9b6b7b12efa285fa2cd9c807e50"
   },
   "keys": [
     {
@@ -14,42 +14,42 @@
       "registry": "readiness-issuers.v1.json",
       "issuer_id": "opencode-harness-readiness-root-v1",
       "custody_class": "authority",
-      "spki_fingerprint": "sha256:630343f2aa3bca9d7d46eee4b7e37856e9ed9985ad04408304b8c5ecf25e3d0f"
+      "spki_fingerprint": "sha256:34a93aa8eb2d711d2c2bf19a1ac9e20fbbb559652298518c4d210865dfbcacd2"
     },
     {
       "role": "reviewer-one",
       "registry": "review-issuers.v1.json",
       "issuer_id": "benchmark-v3-reviewer-one-v1",
       "custody_class": "reviewer-one",
-      "spki_fingerprint": "sha256:802fa209bab124382bc72326821f15bb4317a33213330bb8f32a8853906c0624"
+      "spki_fingerprint": "sha256:75dbd8285bfb67a51e6be627d48c7143948174cc2fc44708acafc9fa78e9413d"
     },
     {
       "role": "reviewer-two",
       "registry": "review-issuers.v1.json",
       "issuer_id": "benchmark-v3-reviewer-two-v1",
       "custody_class": "reviewer-two",
-      "spki_fingerprint": "sha256:6d5b22dd538d00027f769f3651c9cf506152d3f79244a8e4755ea860729e921c"
+      "spki_fingerprint": "sha256:dec61eb22c04b1ab83ac17a9a4842b1e5066cf66cd470e166be86c7a42607010"
     },
     {
       "role": "execution-authority",
       "registry": "execution-authority-issuers.v1.json",
       "issuer_id": "benchmark-v3-global-execution-authority-v1",
       "custody_class": "authority",
-      "spki_fingerprint": "sha256:9c29f0b4985a61462e3cfc7e9f826c69f0a4275c75ef952ba07ca055b9ce68fd"
+      "spki_fingerprint": "sha256:da16603de77816ba3f38f8f1231e90067f0afcbe62d4f32b123369a480c04c7d"
     },
     {
       "role": "holdout-custodian",
       "registry": "holdout-issuers.v1.json",
       "issuer_id": "opencode-harness-external-holdout-custodian-v1",
       "custody_class": "authority",
-      "spki_fingerprint": "sha256:97498df5a55e593876dbd7a78cd5c0756f57b277e5560f0d2a9a57291133e703"
+      "spki_fingerprint": "sha256:0547849ad89d3ee082986601a5bcfe23c4b0f61dc77fcf65b7fe57965b063d43"
     },
     {
       "role": "lease-takeover-auditor",
       "registry": "lease-takeover-issuers.v1.json",
       "issuer_id": "opencode-harness-manual-takeover-auditor-v1",
       "custody_class": "authority",
-      "spki_fingerprint": "sha256:cf5d94912e83d004faf160904defe9a6b01f0fb10090cc16478bb3bb51c16af0"
+      "spki_fingerprint": "sha256:f73ce0150e9be1184cbe653ee48ed0959be03472a9861ce70d6313c03ae5a8d2"
     }
   ]
 }
