@@ -63,6 +63,37 @@ case "$action" in
       bench:v3:takeover) privileged=1; entrypoint="scripts/benchmark-v3-takeover.mjs" ;;
       *) echo "operator npm script is not allowlisted: $script" >&2; exit 71 ;;
     esac
+    shift 3
+    if [ "${1:-}" = "--" ]; then shift; fi
+    if [ -n "$external_runtime" ]; then
+      semantic_runtime_arguments=0
+      semantic_runtime_value_pending=0
+      for argument in "$@"; do
+        if [ "$semantic_runtime_value_pending" -eq 1 ]; then
+          if [ "$argument" != "/opt/benchmark-v3/semantic-runtime" ]; then
+            echo "external semantic runtime must use the protected operator mount" >&2
+            exit 88
+          fi
+          semantic_runtime_arguments=$((semantic_runtime_arguments + 1))
+          semantic_runtime_value_pending=0
+        else
+          case "$argument" in
+            --semantic-runtime) semantic_runtime_value_pending=1 ;;
+            --semantic-runtime=*)
+              if [ "${argument#--semantic-runtime=}" != "/opt/benchmark-v3/semantic-runtime" ]; then
+                echo "external semantic runtime must use the protected operator mount" >&2
+                exit 88
+              fi
+              semantic_runtime_arguments=$((semantic_runtime_arguments + 1))
+              ;;
+          esac
+        fi
+      done
+      if [ "$semantic_runtime_value_pending" -ne 0 ] || [ "$semantic_runtime_arguments" -ne 1 ]; then
+        echo "external semantic runtime requires exactly one protected --semantic-runtime binding" >&2
+        exit 88
+      fi
+    fi
     if [ "$reviewed" -eq 1 ]; then
       reviewed_sha="${BENCHMARK_V3_REVIEWED_SOURCE_SHA:-}"
       case "$reviewed_sha" in
@@ -156,8 +187,6 @@ case "$action" in
         exit 77
       fi
     fi
-    shift 3
-    if [ "${1:-}" = "--" ]; then shift; fi
     set -- node "/workspace/source/$entrypoint" "$@"
     if [ "$privileged" -eq 0 ]; then
       exec docker run --rm --network none --cap-drop ALL --security-opt no-new-privileges \

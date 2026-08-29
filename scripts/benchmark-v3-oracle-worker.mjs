@@ -42,6 +42,21 @@ function snapshot(root) {
   visit(root);
   return entries;
 }
+function hiddenControlSnapshot(root) {
+  const entries = [];
+  try {
+    for (const hidden of input.hidden_test_files) {
+      const target = path.resolve(root, ...hidden.path.split("/"));
+      const relative = path.relative(root, target);
+      if (relative === ".." || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) return null;
+      const stat = fs.lstatSync(target);
+      if (!stat.isFile() || stat.isSymbolicLink() || stat.nlink !== 1) return null;
+      entries.push({ path: hidden.path, sha256: hashFile(target), size: stat.size, mode: stat.mode & 0o7777,
+        link_count: stat.nlink, device: String(stat.dev), inode: String(stat.ino) });
+    }
+  } catch { return null; }
+  return entries;
+}
 const root = fs.realpathSync.native(input.workspace);
 const beforeMap = new Map(input.before_entries.map((entry) => [entry.path, `${entry.sha256}:${entry.size}:${entry.mode}`]));
 const modelEntries = input.model_entries;
@@ -50,6 +65,14 @@ const changedPaths = [...new Set([...beforeMap.keys(), ...modelMap.keys()])]
   .filter((entry) => beforeMap.get(entry) !== modelMap.get(entry)).sort();
 const allowed = new Set(input.allowed_mutation_paths);
 const scopeViolations = changedPaths.filter((entry) => !allowed.has(entry));
+const hiddenControlsBefore = hiddenControlSnapshot(root);
+const expectedHiddenControls = input.hidden_test_files.map((entry) => ({ path: entry.path,
+  sha256: `sha256:${createHash("sha256").update(entry.content).digest("hex")}`,
+  size: Buffer.byteLength(entry.content), mode: 0o400, link_count: 1 }));
+if (hiddenControlsBefore === null || hiddenControlsBefore.some((entry, index) => {
+  const { device: _device, inode: _inode, ...stable } = entry;
+  return JSON.stringify(stable) !== JSON.stringify(expectedHiddenControls[index]);
+})) stop();
 const nodeModulesSource = path.join(fs.realpathSync.native(input.runtime_root), input.runtime_key, "node_modules");
 const mocha = [path.join(nodeModulesSource, "mocha", "bin", "mocha.js"), path.join(nodeModulesSource, "mocha", "bin", "mocha")]
   .find((entry) => fs.existsSync(entry));
@@ -66,7 +89,9 @@ const testCountAuthentic = Number.isSafeInteger(stats?.tests) && stats.tests > 0
   && Number.isSafeInteger(stats?.passes) && Number.isSafeInteger(stats?.failures) && Number.isSafeInteger(stats?.pending)
   && stats.passes + stats.failures + stats.pending === stats.tests;
 const oracleEntries = snapshot(root);
-const oracleMutation = JSON.stringify(oracleEntries) !== JSON.stringify(modelEntries);
+const hiddenControlsAfter = hiddenControlSnapshot(root);
+const oracleMutation = JSON.stringify(oracleEntries) !== JSON.stringify(modelEntries)
+  || hiddenControlsAfter === null || JSON.stringify(hiddenControlsAfter) !== JSON.stringify(hiddenControlsBefore);
 const semanticPassed = command.error === undefined && command.signal === null && command.status === 0
   && testCountAuthentic && (authority.expected_test_count === null || stats.tests === authority.expected_test_count)
   && stats.passes === stats.tests && stats.failures === 0 && stats.pending === 0;

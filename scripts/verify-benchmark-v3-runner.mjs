@@ -754,6 +754,8 @@ assert.equal(runnerSource.includes('"--ro-bind", semanticRuntimeRoot, semanticRu
   "Linux containment must keep the oracle root read-only before narrowly rebinding the isolated workspace");
 assert.equal(runnerSource.includes("receipt.oracle_workspace_mutated === true"), true,
   "authenticated post-oracle mutation evidence must remain a fail-closed scope violation");
+assert.equal(runnerSource.split("readOnlyFiles: hiddenControlFiles").length - 1, 2,
+  "both supported containment backends must keep staged hidden controls read-only inside the writable oracle copy");
 assert.equal(runnerSource.includes('entry.split === "holdout"'), false,
   "the public development-only holdout must not enter the confirmatory execution path");
 assert.equal(design.holdout_policy.public_split, "absent");
@@ -818,21 +820,28 @@ const path = require("node:path");
 const temporary = path.join(process.cwd(), "oracle-temporary-write");
 fs.writeFileSync(temporary, "ephemeral");
 if (!process.argv.includes("--persist")) fs.unlinkSync(temporary);
+if (process.argv.includes("--mutate-hidden")) {
+  const hidden = path.join(process.cwd(), "hidden-hidden.js");
+  fs.chmodSync(hidden, 0o600);
+  fs.writeFileSync(hidden, "tampered\\n");
+}
 process.stdout.write(JSON.stringify({stats:{tests:1,passes:1,failures:0,pending:0}}));
 `);
   const beforeSnapshot = captureBenchmarkV3Workspace(workspace);
-  const runOracleWorker = (persist) => {
-    const suffix = persist ? "persist" : "ephemeral";
+  const runOracleWorker = (mode) => {
+    const persist = mode === "persist";
+    const suffix = mode;
     const hiddenPath = `hidden-${suffix}.js`;
     fs.writeFileSync(path.join(workspace, hiddenPath), "// hidden test fixture\n", { mode: 0o400 });
     const authorityFile = path.join(outputDirectory, `authority-${suffix}.json`);
     const inputFile = path.join(oracleWorkerFixture, `input-${suffix}.json`);
     const outputFile = path.join(outputDirectory, `result-${suffix}.json`);
-    fs.writeFileSync(authorityFile, JSON.stringify({ mac_key: Buffer.alloc(32, persist ? 2 : 1).toString("base64url"),
+    fs.writeFileSync(authorityFile, JSON.stringify({ mac_key: Buffer.alloc(32, mode === "ephemeral" ? 1 : 2).toString("base64url"),
       expected_test_count: null }), { mode: 0o600 });
     fs.writeFileSync(inputFile, JSON.stringify({ schema_version: 1, workspace, runtime_root: runtimeRoot,
       runtime_key: runtimeKey, hidden_test_files: [{ path: hiddenPath, content: "// hidden test fixture\n" }],
-      test_argv: persist ? ["--persist"] : ["--ephemeral"], allowed_mutation_paths: ["subject.js"],
+      test_argv: mode === "hidden" ? ["--mutate-hidden"] : (persist ? ["--persist"] : ["--ephemeral"]),
+      allowed_mutation_paths: ["subject.js"],
       before_entries: beforeSnapshot.entries, model_entries: beforeSnapshot.entries, authority_file: authorityFile,
       empty_home: oracleWorkerFixture, empty_tmp: oracleWorkerFixture }));
     const result = spawnSync(process.execPath,
@@ -845,17 +854,22 @@ process.stdout.write(JSON.stringify({stats:{tests:1,passes:1,failures:0,pending:
     fs.rmSync(path.join(workspace, "oracle-temporary-write"), { force: true });
     return receipt;
   };
-  const ephemeral = runOracleWorker(false);
-  assert.equal(ephemeral.semantic_passed, true);
+  const ephemeral = runOracleWorker("ephemeral");
+  assert.equal(ephemeral.semantic_passed, true, JSON.stringify(ephemeral));
   assert.equal(ephemeral.test_count, 1,
     "a semantic oracle that legitimately writes and cleans up inside its isolated workspace must retain an authentic test count");
   assert.equal(ephemeral.oracle_workspace_mutated, false,
     "cleaned-up oracle scratch writes must not be misclassified as subject mutation");
-  const persistent = runOracleWorker(true);
+  const persistent = runOracleWorker("persist");
   assert.equal(persistent.semantic_passed, true);
   assert.equal(persistent.test_count, 1);
   assert.equal(persistent.oracle_workspace_mutated, true,
     "persistent oracle writes must remain visible to the mandatory post-run mutation sensor");
+  const hiddenMutation = runOracleWorker("hidden");
+  assert.equal(hiddenMutation.semantic_passed, true);
+  assert.equal(hiddenMutation.test_count, 1);
+  assert.equal(hiddenMutation.oracle_workspace_mutated, true,
+    "hidden-control byte substitution must remain visible to the mandatory post-run mutation sensor");
 } finally { fs.rmSync(oracleWorkerFixture, { recursive: true, force: true }); }
 
 const credentialFixtureRoot = fs.mkdtempSync(path.join(os.tmpdir(), "v3-credential-boundary-"));
