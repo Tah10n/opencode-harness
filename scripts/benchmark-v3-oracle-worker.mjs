@@ -10,7 +10,8 @@ if (![inputFile, outputFile, marker].every((entry) => typeof entry === "string" 
 let input;
 try { input = JSON.parse(fs.readFileSync(inputFile, "utf8")); } catch { stop(); }
 if (input?.schema_version !== 1 || typeof input.workspace !== "string" || typeof input.runtime_root !== "string"
-  || typeof input.runtime_key !== "string" || !Array.isArray(input.hidden_test_files)
+  || typeof input.runtime_key !== "string" || !["direct-bind", "symlink"].includes(input.runtime_selector_kind)
+  || !Array.isArray(input.hidden_test_files)
   || !Array.isArray(input.test_argv) || !Array.isArray(input.allowed_mutation_paths)
   || !Array.isArray(input.before_entries) || !Array.isArray(input.model_entries)
   || typeof input.authority_file !== "string") stop();
@@ -57,6 +58,21 @@ function hiddenControlSnapshot(root) {
   } catch { return null; }
   return entries;
 }
+function runtimeSelectorSnapshot(root, expectedSource) {
+  try {
+    const selector = path.join(root, "node_modules");
+    const sourceStat = fs.statSync(expectedSource);
+    const selectorStat = fs.lstatSync(selector);
+    if (input.runtime_selector_kind === "symlink") {
+      if (!selectorStat.isSymbolicLink() || fs.realpathSync.native(selector) !== expectedSource) return null;
+    } else if (!selectorStat.isDirectory() || selectorStat.isSymbolicLink()
+      || selectorStat.dev !== sourceStat.dev || selectorStat.ino !== sourceStat.ino) return null;
+    return { kind: input.runtime_selector_kind, link_target: selectorStat.isSymbolicLink() ? fs.readlinkSync(selector) : null,
+      resolved: fs.realpathSync.native(selector), mode: selectorStat.mode & 0o7777, link_count: selectorStat.nlink,
+      device: String(selectorStat.dev), inode: String(selectorStat.ino),
+      target_device: String(sourceStat.dev), target_inode: String(sourceStat.ino) };
+  } catch { return null; }
+}
 const root = fs.realpathSync.native(input.workspace);
 const beforeMap = new Map(input.before_entries.map((entry) => [entry.path, `${entry.sha256}:${entry.size}:${entry.mode}`]));
 const modelEntries = input.model_entries;
@@ -74,9 +90,10 @@ if (hiddenControlsBefore === null || hiddenControlsBefore.some((entry, index) =>
   return JSON.stringify(stable) !== JSON.stringify(expectedHiddenControls[index]);
 })) stop();
 const nodeModulesSource = path.join(fs.realpathSync.native(input.runtime_root), input.runtime_key, "node_modules");
+const runtimeSelectorBefore = runtimeSelectorSnapshot(root, nodeModulesSource);
 const mocha = [path.join(nodeModulesSource, "mocha", "bin", "mocha.js"), path.join(nodeModulesSource, "mocha", "bin", "mocha")]
   .find((entry) => fs.existsSync(entry));
-if (mocha === undefined || !fs.lstatSync(path.join(root, "node_modules")).isSymbolicLink()) stop();
+if (mocha === undefined || runtimeSelectorBefore === null) stop();
 const command = spawnSync(process.execPath, [mocha, "--reporter", "json", ...input.test_argv], {
     cwd: root, env: { PATH: "/usr/bin:/bin", HOME: input.empty_home, TMPDIR: input.empty_tmp,
       LANG: "C", LC_ALL: "C", NODE_ENV: "test" }, encoding: "utf8", shell: false, windowsHide: true,
@@ -90,8 +107,10 @@ const testCountAuthentic = Number.isSafeInteger(stats?.tests) && stats.tests > 0
   && stats.passes + stats.failures + stats.pending === stats.tests;
 const oracleEntries = snapshot(root);
 const hiddenControlsAfter = hiddenControlSnapshot(root);
+const runtimeSelectorAfter = runtimeSelectorSnapshot(root, nodeModulesSource);
 const oracleMutation = JSON.stringify(oracleEntries) !== JSON.stringify(modelEntries)
-  || hiddenControlsAfter === null || JSON.stringify(hiddenControlsAfter) !== JSON.stringify(hiddenControlsBefore);
+  || hiddenControlsAfter === null || JSON.stringify(hiddenControlsAfter) !== JSON.stringify(hiddenControlsBefore)
+  || runtimeSelectorAfter === null || JSON.stringify(runtimeSelectorAfter) !== JSON.stringify(runtimeSelectorBefore);
 const semanticPassed = command.error === undefined && command.signal === null && command.status === 0
   && testCountAuthentic && (authority.expected_test_count === null || stats.tests === authority.expected_test_count)
   && stats.passes === stats.tests && stats.failures === 0 && stats.pending === 0;
