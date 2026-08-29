@@ -18,6 +18,7 @@ import { captureBenchmarkV3Workspace, fingerprintBenchmarkV3SemanticRuntimeKey,
 import { loadBenchmarkV3Design } from "../lib/benchmark/v3-design.mjs";
 import {
   buildBenchmarkV3AttemptEnvelope,
+  buildBenchmarkV3OracleWriteProtectionPaths,
   buildBenchmarkV3CampaignComparisonEvidence,
   buildBenchmarkV3DevelopmentComparisonEvidence,
   buildBenchmarkV3ValidationInfrastructureEvidence,
@@ -756,8 +757,8 @@ assert.equal(runnerSource.includes("receipt.oracle_workspace_mutated === true"),
   "authenticated post-oracle mutation evidence must remain a fail-closed scope violation");
 assert.equal(runnerSource.split("readOnlyFiles: hiddenControlFiles").length - 1, 1,
   "Linux containment must keep staged hidden controls read-only inside the writable oracle copy");
-assert.equal(runnerSource.split("readOnlyFiles: [...hiddenControlFiles, runtimeSelectorPath]").length - 1, 1,
-  "macOS containment must keep staged hidden controls and the runtime selector read-only inside the writable oracle copy");
+assert.equal(runnerSource.split("readOnlyFiles: oracleWriteProtectionPaths").length - 1, 1,
+  "macOS containment must keep hidden controls, their ancestors, and the runtime selector read-only inside the writable oracle copy");
 assert.equal(runnerSource.includes('entry.split === "holdout"'), false,
   "the public development-only holdout must not enter the confirmatory execution path");
 assert.equal(design.holdout_policy.public_split, "absent");
@@ -809,13 +810,28 @@ for (const invariant of [
   "protectedReadFiles.map((entry) => `(literal ${sandboxPathLiteral(entry)})`)",
   "protectedReadDirectories.map((entry) => `(subpath ${sandboxPathLiteral(entry)})`)",
   "readOnlyBindings: [{ source: runtimeNodeModules, target: runtimeSelectorPath }]",
-  "readOnlyFiles: [...hiddenControlFiles, runtimeSelectorPath]",
+  "readOnlyFiles: oracleWriteProtectionPaths",
 ]) assert.equal(runnerSource.includes(invariant), true,
   `nested containment is missing the protected provenance/runtime invariant: ${invariant}`);
 for (const invariant of ["runtimeSelectorBefore", "runtimeSelectorAfter", "runtime_selector_kind"]) {
   assert.equal(oracleWorkerSource.includes(invariant), true,
     `the authenticated oracle worker is missing runtime-selector mutation evidence: ${invariant}`);
 }
+const protectedOracleRoot = path.join(path.sep, "oracle", "workspace");
+const protectedHiddenFiles = [path.join(protectedOracleRoot, "tests", "lib", "rules", "first.js"),
+  path.join(protectedOracleRoot, "tests", "lib", "rules", "second.js")];
+const protectedRuntimeSelector = path.join(protectedOracleRoot, "node_modules");
+assert.deepEqual(buildBenchmarkV3OracleWriteProtectionPaths(protectedOracleRoot,
+  protectedHiddenFiles, protectedRuntimeSelector), [
+  protectedRuntimeSelector,
+  path.join(protectedOracleRoot, "tests"),
+  path.join(protectedOracleRoot, "tests", "lib"),
+  path.join(protectedOracleRoot, "tests", "lib", "rules"),
+  ...protectedHiddenFiles,
+].sort(), "macOS policy must freeze every hidden-control ancestor without freezing the writable oracle root");
+assert.equal(buildBenchmarkV3OracleWriteProtectionPaths(protectedOracleRoot,
+  protectedHiddenFiles, protectedRuntimeSelector).includes(protectedOracleRoot), false,
+  "legitimate oracle scratch writes must remain available at the isolated workspace root");
 
 const oracleWorkerFixture = fs.mkdtempSync(path.join(os.tmpdir(), "v3-oracle-worker-write-"));
 try {
