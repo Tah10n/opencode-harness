@@ -63,6 +63,37 @@ case "$action" in
       bench:v3:takeover) privileged=1; entrypoint="scripts/benchmark-v3-takeover.mjs" ;;
       *) echo "operator npm script is not allowlisted: $script" >&2; exit 71 ;;
     esac
+    shift 3
+    if [ "${1:-}" = "--" ]; then shift; fi
+    if [ -n "$external_runtime" ]; then
+      semantic_runtime_arguments=0
+      semantic_runtime_value_pending=0
+      for argument in "$@"; do
+        if [ "$semantic_runtime_value_pending" -eq 1 ]; then
+          if [ "$argument" != "/opt/benchmark-v3/semantic-runtime" ]; then
+            echo "external semantic runtime must use the protected operator mount" >&2
+            exit 88
+          fi
+          semantic_runtime_arguments=$((semantic_runtime_arguments + 1))
+          semantic_runtime_value_pending=0
+        else
+          case "$argument" in
+            --semantic-runtime) semantic_runtime_value_pending=1 ;;
+            --semantic-runtime=*)
+              if [ "${argument#--semantic-runtime=}" != "/opt/benchmark-v3/semantic-runtime" ]; then
+                echo "external semantic runtime must use the protected operator mount" >&2
+                exit 88
+              fi
+              semantic_runtime_arguments=$((semantic_runtime_arguments + 1))
+              ;;
+          esac
+        fi
+      done
+      if [ "$semantic_runtime_value_pending" -ne 0 ] || [ "$semantic_runtime_arguments" -ne 1 ]; then
+        echo "external semantic runtime requires exactly one protected --semantic-runtime binding" >&2
+        exit 88
+      fi
+    fi
     if [ "$reviewed" -eq 1 ]; then
       reviewed_sha="${BENCHMARK_V3_REVIEWED_SOURCE_SHA:-}"
       case "$reviewed_sha" in
@@ -146,7 +177,7 @@ case "$action" in
         exit 75
       fi
       case "$script" in
-        bench:v3:operator:verify|bench:v3:holdout:commit|bench:v3:holdout:materialize) ;;
+        bench:v3:operator:verify|bench:v3:holdout:commit|bench:v3:holdout:materialize|bench:v3|bench:v3:holdout) ;;
         *) echo "external calibration inputs are not accepted for this operator action" >&2; exit 76 ;;
       esac
       if [ ! -f "$external_bundle" ] || [ -L "$external_bundle" ] || [ ! -d "$external_runtime" ] \
@@ -156,8 +187,6 @@ case "$action" in
         exit 77
       fi
     fi
-    shift 3
-    if [ "${1:-}" = "--" ]; then shift; fi
     set -- node "/workspace/source/$entrypoint" "$@"
     if [ "$privileged" -eq 0 ]; then
       exec docker run --rm --network none --cap-drop ALL --security-opt no-new-privileges \
@@ -173,6 +202,44 @@ case "$action" in
         --env "BENCHMARK_V3_OPERATOR_IMAGE_ID=$image_fingerprint" \
         "$image_id" "$@"
     fi
+    if [ -n "$external_bundle" ] && [ -n "$oauth_state_file" ]; then
+      exec docker run --rm --privileged --cgroupns=host --hostname benchmark-v3-authority --read-only \
+        --tmpfs /tmp:rw,exec,nosuid,nodev,mode=1777 \
+        --tmpfs /usr/local/libexec:rw,exec,nosuid,nodev,mode=0755 \
+        --mount "type=bind,src=$source_root,dst=/workspace/source,readonly" \
+        --mount "type=bind,src=$campaign_root,dst=/campaign" \
+        --mount "type=bind,src=$external_bundle,dst=/opt/benchmark-v3/provenance.bundle,readonly" \
+        --mount "type=bind,src=$external_runtime,dst=/opt/benchmark-v3/semantic-runtime,readonly" \
+        --mount "type=bind,src=$oauth_parent,dst=/run/secrets/openai-oauth" \
+        --mount "type=volume,src=$custody_volume,dst=/var/lib/opencode-harness" \
+        --mount "type=volume,src=$channel_volume,dst=/run/opencode-harness" \
+        --env OPENAI_OAUTH_STATE_FILE=/run/secrets/openai-oauth/openai-oauth-state.jsonl \
+        --env BENCHMARK_V3_PROVENANCE_BUNDLE=/opt/benchmark-v3/provenance.bundle \
+        --env BENCHMARK_V3_CGROUP_REQUIRED=1 \
+        --env "BENCHMARK_V3_OPERATOR_IMAGE_ID=$image_fingerprint" \
+        --env "BENCHMARK_V3_PROVIDER_ONLY_EGRESS=$provider_only" \
+        --env "BENCHMARK_V3_PROVIDER_AUTH_MODE=$provider_auth_mode" \
+        "$image_id" "$@"
+    fi
+    if [ -n "$external_bundle" ] && [ -n "${BENCHMARK_V3_OPENAI_KEY_FILE:-}" ]; then
+      exec docker run --rm --privileged --cgroupns=host --hostname benchmark-v3-authority --read-only \
+        --tmpfs /tmp:rw,exec,nosuid,nodev,mode=1777 \
+        --tmpfs /usr/local/libexec:rw,exec,nosuid,nodev,mode=0755 \
+        --mount "type=bind,src=$source_root,dst=/workspace/source,readonly" \
+        --mount "type=bind,src=$campaign_root,dst=/campaign" \
+        --mount "type=bind,src=$external_bundle,dst=/opt/benchmark-v3/provenance.bundle,readonly" \
+        --mount "type=bind,src=$external_runtime,dst=/opt/benchmark-v3/semantic-runtime,readonly" \
+        --mount "type=bind,src=$BENCHMARK_V3_OPENAI_KEY_FILE,dst=/run/secrets/openai_api_key,readonly" \
+        --mount "type=volume,src=$custody_volume,dst=/var/lib/opencode-harness" \
+        --mount "type=volume,src=$channel_volume,dst=/run/opencode-harness" \
+        --env OPENAI_API_KEY_FILE=/run/secrets/openai_api_key \
+        --env BENCHMARK_V3_PROVENANCE_BUNDLE=/opt/benchmark-v3/provenance.bundle \
+        --env BENCHMARK_V3_CGROUP_REQUIRED=1 \
+        --env "BENCHMARK_V3_OPERATOR_IMAGE_ID=$image_fingerprint" \
+        --env "BENCHMARK_V3_PROVIDER_ONLY_EGRESS=$provider_only" \
+        --env "BENCHMARK_V3_PROVIDER_AUTH_MODE=$provider_auth_mode" \
+        "$image_id" "$@"
+    fi
     if [ -n "$external_bundle" ]; then
       exec docker run --rm --privileged --cgroupns=host --hostname benchmark-v3-authority --read-only \
         --tmpfs /tmp:rw,exec,nosuid,nodev,mode=1777 \
@@ -183,6 +250,7 @@ case "$action" in
         --mount "type=bind,src=$external_runtime,dst=/opt/benchmark-v3/semantic-runtime,readonly" \
         --mount "type=volume,src=$custody_volume,dst=/var/lib/opencode-harness" \
         --mount "type=volume,src=$channel_volume,dst=/run/opencode-harness" \
+        --env BENCHMARK_V3_PROVENANCE_BUNDLE=/opt/benchmark-v3/provenance.bundle \
         --env BENCHMARK_V3_CGROUP_REQUIRED=1 \
         --env "BENCHMARK_V3_OPERATOR_IMAGE_ID=$image_fingerprint" \
         --env "BENCHMARK_V3_PROVIDER_ONLY_EGRESS=$provider_only" \

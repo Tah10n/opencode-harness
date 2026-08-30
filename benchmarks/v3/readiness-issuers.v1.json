@@ -11,7 +11,7 @@
         "hidden-namespace-isolation",
         "provider-only-egress"
       ],
-      "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAQg2VSfP1YpxEhzeWG5XW5sND3zPkIxLqJRQBbZpAOXI=\n-----END PUBLIC KEY-----\n"
+      "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAJD2qJrno6g54Fcc+HhqPT/jJPe4G+ILwwEP3Ra8MI10=\n-----END PUBLIC KEY-----\n"
     }
   ]
 }

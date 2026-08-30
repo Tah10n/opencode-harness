@@ -79,6 +79,44 @@ try {
     "src=$external_runtime,dst=/opt/benchmark-v3/semantic-runtime,readonly"]) {
     assert.equal(launcherSource.includes(invariant), true, `operator launcher is missing invariant: ${invariant}`);
   }
+  assert.equal(launcherSource.includes(
+    "bench:v3:operator:verify|bench:v3:holdout:commit|bench:v3:holdout:materialize|bench:v3|bench:v3:holdout)"), true,
+  "canonical development and holdout runners must accept their frozen provenance bundle and semantic runtime");
+  assert.equal(launcherSource.includes('[ -n "$external_bundle" ] && [ -n "$oauth_state_file" ]'), true,
+    "OAuth runners must compose frozen calibration mounts with isolated OAuth custody");
+  assert.equal(launcherSource.includes('[ -n "$external_bundle" ] && [ -n "${BENCHMARK_V3_OPENAI_KEY_FILE:-}" ]'), true,
+    "API-key runners must compose frozen calibration mounts with isolated credential custody");
+  assert.equal(launcherSource.split("src=$external_bundle,dst=/opt/benchmark-v3/provenance.bundle,readonly").length - 1, 3,
+    "external provenance must be mounted for OAuth, API-key, and credential-free operator paths");
+  assert.equal(launcherSource.split("src=$external_runtime,dst=/opt/benchmark-v3/semantic-runtime,readonly").length - 1, 3,
+    "semantic runtime must be mounted for OAuth, API-key, and credential-free operator paths");
+  assert.equal(launcherSource.split("--env BENCHMARK_V3_PROVENANCE_BUNDLE=/opt/benchmark-v3/provenance.bundle").length - 1, 3,
+    "every frozen provenance mount must be visible to the runner and its same-process model-free preflight");
+  for (const invariant of ["semantic_runtime_arguments", "semantic_runtime_value_pending",
+    "external semantic runtime must use the protected operator mount",
+    "external semantic runtime requires exactly one protected --semantic-runtime binding"]) {
+    assert.equal(launcherSource.includes(invariant), true,
+      `operator launcher is missing protected semantic-runtime binding invariant: ${invariant}`);
+  }
+  const externalBundle = path.join(temporary, "provenance.bundle");
+  const externalRuntime = path.join(temporary, "semantic-runtime");
+  fs.writeFileSync(externalBundle, "fixture\n");
+  fs.mkdirSync(externalRuntime);
+  const externalLauncherEnvironment = { ...launcherEnvironment,
+    BENCHMARK_V3_PROVENANCE_BUNDLE: externalBundle, BENCHMARK_V3_SEMANTIC_RUNTIME_ROOT: externalRuntime };
+  const substitutedRuntime = run(launcher, ["run", "npm", "run", "bench:v3", "--",
+    "--semantic-runtime", "/campaign/substituted-runtime"], { env: externalLauncherEnvironment });
+  assert.equal(substitutedRuntime.status, 88,
+    "canonical runner must reject a semantic runtime outside the protected read-only operator mount");
+  const missingRuntimeBinding = run(launcher, ["run", "npm", "run", "bench:v3", "--", "--provider", "openai"],
+    { env: externalLauncherEnvironment });
+  assert.equal(missingRuntimeBinding.status, 88,
+    "canonical runner must require exactly one protected semantic-runtime binding when external calibration is mounted");
+  const duplicateRuntimeBinding = run(launcher, ["run", "npm", "run", "bench:v3", "--",
+    "--semantic-runtime=/opt/benchmark-v3/semantic-runtime", "--semantic-runtime", "/opt/benchmark-v3/semantic-runtime"],
+  { env: externalLauncherEnvironment });
+  assert.equal(duplicateRuntimeBinding.status, 88,
+    "canonical runner must reject duplicate semantic-runtime bindings");
   for (const forbidden of ["bench:v3:reviewer:init", "bench:v3:review:sign",
     "dst=/var/lib/opencode-harness-reviewer"]) {
     assert.equal(launcherSource.includes(forbidden), false,

@@ -18,6 +18,7 @@ import { captureBenchmarkV3Workspace, fingerprintBenchmarkV3SemanticRuntimeKey,
 import { loadBenchmarkV3Design } from "../lib/benchmark/v3-design.mjs";
 import {
   buildBenchmarkV3AttemptEnvelope,
+  buildBenchmarkV3OracleWriteProtectionPaths,
   buildBenchmarkV3CampaignComparisonEvidence,
   buildBenchmarkV3DevelopmentComparisonEvidence,
   buildBenchmarkV3ValidationInfrastructureEvidence,
@@ -748,6 +749,16 @@ try {
 
 const runnerSource = fs.readFileSync(path.join(root, "lib", "benchmark", "v3-runner.mjs"), "utf8");
 for (const forbidden of ["runBaseline:", "runCandidate:", "typeof runBaseline", "typeof runCandidate"]) assert.equal(runnerSource.includes(forbidden), false);
+assert.equal(runnerSource.split("writableDirectories: [oracleWorkspace, emptyHome, emptyTmp, outputDirectory]").length - 1, 2,
+  "both supported containment backends must make only the isolated oracle workspace and supervisor outputs writable");
+assert.equal(runnerSource.includes('"--ro-bind", semanticRuntimeRoot, semanticRuntimeRoot, "--ro-bind", oracleDirectory, oracleDirectory,\n    ...writableDirectories.flatMap'), true,
+  "Linux containment must keep the oracle root read-only before narrowly rebinding the isolated workspace");
+assert.equal(runnerSource.includes("receipt.oracle_workspace_mutated === true"), true,
+  "authenticated post-oracle mutation evidence must remain a fail-closed scope violation");
+assert.equal(runnerSource.split("readOnlyFiles: hiddenControlFiles").length - 1, 1,
+  "Linux containment must keep staged hidden controls read-only inside the writable oracle copy");
+assert.equal(runnerSource.split("readOnlyFiles: oracleWriteProtectionPaths").length - 1, 1,
+  "macOS containment must keep hidden controls, their ancestors, and the runtime selector read-only inside the writable oracle copy");
 assert.equal(runnerSource.includes('entry.split === "holdout"'), false,
   "the public development-only holdout must not enter the confirmatory execution path");
 assert.equal(design.holdout_policy.public_split, "absent");
@@ -790,6 +801,123 @@ assert.equal(workerSource.includes("input.env"), true);
 assert.equal(workerSource.includes("input.env_overrides"), true);
 assert.equal(workerSource.includes("input.opencode_identity"), true);
 assert.equal(workerSource.includes("stdout:"), false);
+const oracleWorkerSource = fs.readFileSync(path.join(root, "scripts", "benchmark-v3-oracle-worker.mjs"), "utf8");
+assert.equal(oracleWorkerSource.includes("oracle_workspace_mutated: oracleMutation"), true,
+  "the authenticated oracle worker must retain the post-run workspace mutation sensor");
+for (const invariant of [
+  'protectedMounts.flatMap((entry) => ["--ro-bind", "/dev/null", entry])',
+  'protectedDirectoryMounts.flatMap((entry) => ["--tmpfs", entry])',
+  "protectedReadFiles.map((entry) => `(literal ${sandboxPathLiteral(entry)})`)",
+  "protectedReadDirectories.map((entry) => `(subpath ${sandboxPathLiteral(entry)})`)",
+  "readOnlyBindings: [{ source: runtimeNodeModules, target: runtimeSelectorPath }]",
+  "readOnlyFiles: oracleWriteProtectionPaths",
+]) assert.equal(runnerSource.includes(invariant), true,
+  `nested containment is missing the protected provenance/runtime invariant: ${invariant}`);
+for (const invariant of ["runtimeSelectorBefore", "runtimeSelectorAfter", "runtime_selector_kind"]) {
+  assert.equal(oracleWorkerSource.includes(invariant), true,
+    `the authenticated oracle worker is missing runtime-selector mutation evidence: ${invariant}`);
+}
+const protectedOracleRoot = path.join(path.sep, "oracle", "workspace");
+const protectedHiddenFiles = [path.join(protectedOracleRoot, "tests", "lib", "rules", "first.js"),
+  path.join(protectedOracleRoot, "tests", "lib", "rules", "second.js")];
+const protectedRuntimeSelector = path.join(protectedOracleRoot, "node_modules");
+assert.deepEqual(buildBenchmarkV3OracleWriteProtectionPaths(protectedOracleRoot,
+  protectedHiddenFiles, protectedRuntimeSelector), [
+  protectedRuntimeSelector,
+  path.join(protectedOracleRoot, "tests"),
+  path.join(protectedOracleRoot, "tests", "lib"),
+  path.join(protectedOracleRoot, "tests", "lib", "rules"),
+  ...protectedHiddenFiles,
+].sort(), "macOS policy must freeze every hidden-control ancestor without freezing the writable oracle root");
+assert.equal(buildBenchmarkV3OracleWriteProtectionPaths(protectedOracleRoot,
+  protectedHiddenFiles, protectedRuntimeSelector).includes(protectedOracleRoot), false,
+  "legitimate oracle scratch writes must remain available at the isolated workspace root");
+
+const oracleWorkerFixture = fs.mkdtempSync(path.join(os.tmpdir(), "v3-oracle-worker-write-"));
+try {
+  const workspace = path.join(oracleWorkerFixture, "workspace");
+  const runtimeRoot = path.join(oracleWorkerFixture, "runtime");
+  const runtimeKey = "eslint-v7";
+  const mochaDirectory = path.join(runtimeRoot, runtimeKey, "node_modules", "mocha", "bin");
+  const outputDirectory = path.join(oracleWorkerFixture, "output");
+  fs.mkdirSync(workspace, { recursive: true });
+  fs.mkdirSync(mochaDirectory, { recursive: true });
+  fs.mkdirSync(outputDirectory, { recursive: true });
+  fs.writeFileSync(path.join(workspace, "subject.js"), "module.exports = true;\n");
+  fs.symlinkSync(path.join(runtimeRoot, runtimeKey, "node_modules"), path.join(workspace, "node_modules"), "dir");
+  const fakeMocha = path.join(mochaDirectory, "mocha.js");
+  fs.writeFileSync(fakeMocha, `const fs = require("node:fs");
+const path = require("node:path");
+const temporary = path.join(process.cwd(), "oracle-temporary-write");
+fs.writeFileSync(temporary, "ephemeral");
+if (!process.argv.includes("--persist")) fs.unlinkSync(temporary);
+if (process.argv.includes("--mutate-hidden")) {
+  const hidden = path.join(process.cwd(), "hidden-hidden.js");
+  fs.chmodSync(hidden, 0o600);
+  fs.writeFileSync(hidden, "tampered\\n");
+}
+if (process.argv.includes("--mutate-runtime")) {
+  const selector = path.join(process.cwd(), "node_modules");
+  fs.unlinkSync(selector);
+  fs.symlinkSync(path.join(process.cwd(), "substituted-runtime"), selector, "dir");
+}
+process.stdout.write(JSON.stringify({stats:{tests:1,passes:1,failures:0,pending:0}}));
+`);
+  const beforeSnapshot = captureBenchmarkV3Workspace(workspace);
+  const runOracleWorker = (mode) => {
+    const persist = mode === "persist";
+    const suffix = mode;
+    const hiddenPath = `hidden-${suffix}.js`;
+    fs.writeFileSync(path.join(workspace, hiddenPath), "// hidden test fixture\n", { mode: 0o400 });
+    const authorityFile = path.join(outputDirectory, `authority-${suffix}.json`);
+    const inputFile = path.join(oracleWorkerFixture, `input-${suffix}.json`);
+    const outputFile = path.join(outputDirectory, `result-${suffix}.json`);
+    fs.writeFileSync(authorityFile, JSON.stringify({ mac_key: Buffer.alloc(32, mode === "ephemeral" ? 1 : 2).toString("base64url"),
+      expected_test_count: null }), { mode: 0o600 });
+    fs.writeFileSync(inputFile, JSON.stringify({ schema_version: 1, workspace, runtime_root: runtimeRoot,
+      runtime_key: runtimeKey, runtime_selector_kind: "symlink",
+      hidden_test_files: [{ path: hiddenPath, content: "// hidden test fixture\n" }],
+      test_argv: mode === "hidden" ? ["--mutate-hidden"]
+        : (mode === "runtime" ? ["--mutate-runtime"] : (persist ? ["--persist"] : ["--ephemeral"])),
+      allowed_mutation_paths: ["subject.js"],
+      before_entries: beforeSnapshot.entries, model_entries: beforeSnapshot.entries, authority_file: authorityFile,
+      empty_home: oracleWorkerFixture, empty_tmp: oracleWorkerFixture }));
+    const result = spawnSync(process.execPath,
+      [path.join(root, "scripts", "benchmark-v3-oracle-worker.mjs"), inputFile, outputFile, `ORACLE_${suffix}`],
+      { encoding: "utf8", shell: false, windowsHide: true });
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.stdout, `ORACLE_${suffix}`);
+    const receipt = JSON.parse(fs.readFileSync(outputFile, "utf8"));
+    fs.rmSync(path.join(workspace, hiddenPath), { force: true });
+    fs.rmSync(path.join(workspace, "oracle-temporary-write"), { force: true });
+    if (mode === "runtime") {
+      fs.unlinkSync(path.join(workspace, "node_modules"));
+      fs.symlinkSync(path.join(runtimeRoot, runtimeKey, "node_modules"), path.join(workspace, "node_modules"), "dir");
+    }
+    return receipt;
+  };
+  const ephemeral = runOracleWorker("ephemeral");
+  assert.equal(ephemeral.semantic_passed, true, JSON.stringify(ephemeral));
+  assert.equal(ephemeral.test_count, 1,
+    "a semantic oracle that legitimately writes and cleans up inside its isolated workspace must retain an authentic test count");
+  assert.equal(ephemeral.oracle_workspace_mutated, false,
+    "cleaned-up oracle scratch writes must not be misclassified as subject mutation");
+  const persistent = runOracleWorker("persist");
+  assert.equal(persistent.semantic_passed, true);
+  assert.equal(persistent.test_count, 1);
+  assert.equal(persistent.oracle_workspace_mutated, true,
+    "persistent oracle writes must remain visible to the mandatory post-run mutation sensor");
+  const hiddenMutation = runOracleWorker("hidden");
+  assert.equal(hiddenMutation.semantic_passed, true);
+  assert.equal(hiddenMutation.test_count, 1);
+  assert.equal(hiddenMutation.oracle_workspace_mutated, true,
+    "hidden-control byte substitution must remain visible to the mandatory post-run mutation sensor");
+  const runtimeMutation = runOracleWorker("runtime");
+  assert.equal(runtimeMutation.semantic_passed, true);
+  assert.equal(runtimeMutation.test_count, 1);
+  assert.equal(runtimeMutation.oracle_workspace_mutated, true,
+    "runtime-selector substitution must remain visible to the mandatory post-run mutation sensor");
+} finally { fs.rmSync(oracleWorkerFixture, { recursive: true, force: true }); }
 
 const credentialFixtureRoot = fs.mkdtempSync(path.join(os.tmpdir(), "v3-credential-boundary-"));
 const credentialFile = path.join(credentialFixtureRoot, "credential.json");
