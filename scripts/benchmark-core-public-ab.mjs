@@ -798,13 +798,19 @@ function verifyOpenCodeSeatbeltStartup(opencode) {
     const profile = path.join(root, "model.sb");
     fs.writeFileSync(profile, modelSandboxProfile({ workspace, attemptDirectory: attempt,
       opencodePath: opencode.path, providerProxySocket: socketPath, trustedNodePath: process.execPath }), { mode: 0o600 });
+    const environment = modelEnvironment(attempt, configuration, {
+      placeholder_auth_content: "{}", credential_file: credentialFile,
+    });
     const result = run("/usr/bin/sandbox-exec", ["-f", profile, opencode.path, "--version"], {
-      cwd: workspace, env: modelEnvironment(attempt, configuration, {
-        placeholder_auth_content: "{}", credential_file: credentialFile,
-      }), timeout: 30_000,
+      cwd: workspace, env: environment, timeout: 30_000,
     });
     expect(passed(result) && result.stdout.trim() === opencode.version,
       "MEASUREMENT_CONTAINMENT", `OpenCode Seatbelt startup failed: status=${result.status} signal=${result.signal}`);
+    const debug = run("/usr/bin/sandbox-exec", ["-f", profile, opencode.path, "debug", "paths"], {
+      cwd: workspace, env: environment, timeout: 30_000,
+    });
+    expect(passed(debug), "MEASUREMENT_CONTAINMENT",
+      `OpenCode Seatbelt debug startup failed: status=${debug.status} signal=${debug.signal}`);
     return Object.freeze({ status: "passed", version: opencode.version });
   } finally { fs.rmSync(root, { recursive: true, force: true }); }
 }
@@ -1078,16 +1084,29 @@ function isolateHiddenOracleWorkspace(modelWorkspace) {
 }
 
 function sandboxLiteral(value) { return JSON.stringify(fs.realpathSync.native(value)); }
+function sandboxDirectoryAncestors(values) {
+  const ancestors = new Set();
+  for (const value of values) {
+    let current = path.dirname(fs.realpathSync.native(value));
+    while (current !== path.dirname(current)) { ancestors.add(current); current = path.dirname(current); }
+  }
+  return [...ancestors].sort();
+}
 function modelSandboxProfile({ workspace, attemptDirectory, opencodePath, providerProxySocket, trustedNodePath }) {
   expect(process.platform === "darwin" && fs.existsSync("/usr/bin/sandbox-exec"),
     "MEASUREMENT_CONTAINMENT", "macOS Seatbelt is required for this frozen runner");
   const system = ["/System", "/usr", "/Library", "/opt/homebrew", "/private/var/db/timezone",
     path.dirname(process.execPath), trustedNodePath ? path.dirname(trustedNodePath) : null]
     .filter((entry, index, values) => entry !== null && fs.existsSync(entry) && values.indexOf(entry) === index);
+  const ancestorReads = sandboxDirectoryAncestors([workspace, attemptDirectory, opencodePath,
+    ...(trustedNodePath ? [trustedNodePath] : [])]);
   return ["(version 1)", "(deny default)", "(allow process-exec process-fork)",
     "(allow signal (target same-sandbox))", "(allow process-info* (target same-sandbox))",
     `(allow network-outbound (literal ${JSON.stringify(path.resolve(providerProxySocket))}))`,
-    "(allow mach-lookup)", "(allow sysctl-read)", "(allow file-read-metadata)", "(allow file-read-data (literal \"/\"))",
+    "(allow mach-lookup)", "(allow sysctl-read)",
+    "(allow ipc-posix-shm-read-data (literal \"apple.shm.notification_center\"))",
+    "(allow file-read-metadata)",
+    `(allow file-read-data (literal \"/\") (literal \"/dev/null\") ${ancestorReads.map((entry) => `(literal ${JSON.stringify(entry)})`).join(" ")})`,
     `(allow file-read* ${system.map((entry) => `(subpath ${sandboxLiteral(entry)})`).join(" ")}`,
     `  (subpath ${sandboxLiteral(workspace)}) (subpath ${sandboxLiteral(attemptDirectory)}) (literal ${sandboxLiteral(opencodePath)}))`,
     `(allow file-write* (subpath ${sandboxLiteral(workspace)}) (subpath ${sandboxLiteral(attemptDirectory)}) (literal "/dev/null"))`,
