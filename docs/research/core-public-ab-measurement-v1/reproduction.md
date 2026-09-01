@@ -33,9 +33,16 @@ gh pr checks --watch
 test "$(gh pr view --json headRefOid --jq .headRefOid)" = "$(git rev-parse HEAD)"
 test -z "$(git status --porcelain=v1 --untracked-files=all)"
 
+node scripts/benchmark-core-public-ab.mjs --mode acceptance-probe \
+  --manifest research/measurements/core-public-ab-v1/measurement-manifest.json \
+  --core-bundle "$EXACT_CORE_BUNDLE" \
+  --opencode "$OPENCODE_EXECUTABLE" \
+  --acceptance-output "$PRIVATE_ACCEPTANCE_RECEIPT"
+
 node scripts/benchmark-core-public-ab.mjs --mode run \
   --manifest research/measurements/core-public-ab-v1/measurement-manifest.json \
   --pilot-manifest "$PRIVATE_PILOT_MANIFEST" \
+  --acceptance-receipt "$PRIVATE_ACCEPTANCE_RECEIPT" \
   --product-source-root "$EXACT_PRODUCT_SOURCE_ROOT" \
   --core-bundle "$EXACT_CORE_BUNDLE" \
   --opencode "$OPENCODE_EXECUTABLE" \
@@ -68,8 +75,15 @@ identical. The `run` command also requires a clean tree and is exact-resumable
 against the same campaign directory. A different manifest, runner, task
 binding, candidate, executable, runtime, or pilot artifact is rejected.
 
-An earlier preflight attempt under the superseded manifest reached two
-OpenCode process starts but zero proxy requests and zero provider submissions.
-It was invalidated as a critical pre-model runner defect; none of its synthetic
-process outcomes may be imported into, or retried within, the frozen
+After the manifest commit passes exact-head CI, `acceptance-probe` executes one
+full `opencode run` startup path for each arm through the same provider-only
+Unix-socket bridge and the real core wrapper. The bridge returns a deterministic
+local synthetic response and makes zero external provider submissions and zero
+model calls, so the frozen 196-call ceiling remains unchanged. The campaign
+refuses to start without the content-bound two-arm acceptance receipt.
+
+The two superseded preflight epochs reached two and eight OpenCode process
+starts respectively, but zero proxy requests and zero provider submissions.
+Both were invalidated as critical pre-model runner defects; none of their
+synthetic process outcomes may be imported into, or retried within, the frozen
 model-backed campaign.

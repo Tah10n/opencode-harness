@@ -35,14 +35,23 @@ measurement Node executable so that Homebrew's group-writable package-store
 ancestry cannot invalidate the trusted executable identity. Neither preflight
 submits a provider request.
 
+After freeze and its exact-head CI, one unscored full-path acceptance probe is
+run for plain and one for core. Each uses the exact OpenCode executable,
+configuration, provider-proxy plugin, Seatbelt profile, and core wrapper, but a
+deterministic local proxy response makes zero external provider submissions and
+zero model calls. A content-bound receipt for both arms is mandatory before the
+official campaign can create its first model-process ledger event.
+
 ## Metric and safety observability
 
 For both arms, `oracle_validated_task_success` is true only when authentic
-terminal completion, no timeout, intact process containment, valid mutation
-scope, and the task-specific hidden semantic oracle all hold. Core additionally
-requires an authentic current passing post-mutation verification receipt. A
-failed, stale, unavailable, or unauthentic core verification is a scored
-candidate failure. Plain has no core verification gate. The hidden semantic
+terminal completion, no timeout, intact process containment, no surviving
+descendants, valid mutation scope, successful syntax verification, at least one
+changed allowed path, no hidden-data leakage, and the task-specific hidden
+semantic oracle all hold. Core additionally requires an authentic current
+passing post-mutation verification receipt. A failed, stale, unavailable, or
+unauthentic core verification is a scored candidate failure. Plain has no core
+verification gate. The hidden semantic
 oracle is applied identically after both arms finish.
 
 The runner does not compute `regression_free_task_success`. The frozen public
@@ -104,10 +113,21 @@ response body remains reconciliation-owned. A timeout is still a scored,
 non-retryable task failure, but an ambiguous provider disposition is durably
 recorded and stops continuation until reconciled.
 
+An HTTP 5xx received after the physical provider submission boundary is a
+non-retryable scored model-protocol failure; it is never treated as proof that
+the provider rejected the request before execution. Only an explicit 429
+rejection or a proven zero-submission host failure is infrastructure-retry
+eligible.
+
 Malformed or unobservable candidate child-process receipts are infrastructure
 failures rather than task failures. They remain retryable only under the same
 bounded disposition and campaign budgets. A scored task-arm outcome may occur
 exactly once.
+
+If the host crashes after the content-bound receipt is fsynced but before its
+completion event reaches the ledger, exact resume validates the orphan receipt
+and appends a recovery completion event without another model call. An orphan
+model-process start without a valid receipt remains reconciliation-blocking.
 
 A process signal before any provider submission, with no task mutation and an
 established zero-submission disposition, is likewise a proven host
@@ -117,7 +137,8 @@ a host incompatibility from being mistaken for a scored model outcome.
 Raw stdout, stderr, task workspaces, private controls, credentials, and OAuth
 state are not published. Private receipts retain bounded counts, provider
 status evidence, and content hashes; the committed attempt-hash ledger binds
-the private receipt archive.
+the private receipt archive with receipt SHA-256, size, attempt ID, arm, family
+ID, and final disposition.
 
 ## Scoring, guardrails, and inference
 

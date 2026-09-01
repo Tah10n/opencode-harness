@@ -45,6 +45,9 @@ const MODEL_BINDING = Object.freeze({ provider: "openai", model: "gpt-5.6-luna",
 const DEFAULT_TIMEOUT_MS = 900_000;
 const BOOTSTRAP_RESAMPLES = 100_000;
 const SCHEDULE_SEED = "core-public-ab-counterbalanced-v1";
+const ACCEPTANCE_PROMPT = "Return exactly acceptance-probe-complete. Do not edit files and do not use tools.";
+const ACCEPTANCE_TEXT = "acceptance-probe-complete";
+const PILOT_REPOSITORY_COUNTS = Object.freeze({ eslint: 8, express: 1, axios: 12, fastify: 8 });
 const MEASUREMENT_CONTRACT_PATH = path.join(SOURCE_ROOT,
   "research", "measurements", "core-public-ab-v1", "measurement-contract.v1.json");
 const PRIMARY_SCORED_CALLS = 120;
@@ -82,6 +85,8 @@ const BENCHMARK_INPUT_PATHS = Object.freeze([
   "lib/benchmark/statistics.mjs",
 ]);
 const MEASUREMENT_SOURCE_ALLOWED_PATHS = Object.freeze([
+  ".github/workflows/verify.yml",
+  "package.json",
   "scripts/benchmark-core-public-ab.mjs",
   "research/measurements/core-public-ab-v1/measurement-contract.v1.json",
   "research/measurements/core-public-ab-v1/measurement-manifest.json",
@@ -210,12 +215,16 @@ function loadMeasurementContract() {
       "authentic_terminal_completion",
       "timed_out_equals_false",
       "process_containment_intact",
+      "no_surviving_descendants",
       "mutation_scope_valid",
+      "syntax_verification_passed",
+      "changed_paths_nonempty",
       "task_specific_semantic_oracle_passed",
+      "hidden_data_leakage_equals_false",
     ])
     && contract.primary_metric.definition?.candidate_additional_requirement === "authentic_current_core_verification_passed"
     && contract.excluded_metrics?.regression_free_task_success?.status === "not_computed"
-    && contract.excluded_metrics.regression_free_task_success.reason === "no_frozen_independent_severity_oracle"
+    && contract.excluded_metrics.regression_free_task_success.reason === "no frozen independent severity oracle"
     && contract.safety_observability?.severe_regression_oracle?.status === "not_available"
     && contract.safety_observability?.high_medium_critical_regressions?.status === "not_observable"
     && contract.safety_observability.high_medium_critical_regressions.count === null
@@ -257,8 +266,12 @@ function classifyAttemptSignals(signals) {
   const success = signals.authentic_terminal_completion === true
     && signals.timed_out === false
     && signals.process_containment_intact === true
+    && signals.no_surviving_descendants === true
     && signals.mutation_scope_valid === true
+    && signals.syntax_verification_success === true
+    && signals.no_change === false
     && signals.task_specific_semantic_oracle_passed === true
+    && signals.hidden_data_leakage_observed === false
     && (signals.arm !== "core" || signals.authentic_current_core_verification_passed === true);
   return Object.freeze({ oracle_validated_task_success: success, scored_outcome: true,
     infrastructure_failure_before_scoring: false, reconciliation_required: false });
@@ -497,6 +510,104 @@ async function createProviderProxy(credentialStore, socketPath) {
     await new Promise((resolve) => server.close(() => resolve())); await credentialBroker.close();
     try { fs.unlinkSync(socketPath); } catch {} throw error;
   }
+}
+
+function syntheticAcceptanceProviderBody(url) {
+  const text = ACCEPTANCE_TEXT;
+  if (url.endsWith("/v1/chat/completions")) {
+    const base = { id: "chatcmpl-core-public-ab-acceptance", object: "chat.completion.chunk",
+      created: 1, model: MODEL_BINDING.model };
+    return Buffer.from([
+      `data: ${JSON.stringify({ ...base, choices: [{ index: 0, delta: { role: "assistant", content: text }, finish_reason: null }] })}\n\n`,
+      `data: ${JSON.stringify({ ...base, choices: [{ index: 0, delta: {}, finish_reason: "stop" }] })}\n\n`,
+      "data: [DONE]\n\n",
+    ].join(""), "utf8");
+  }
+  const message = { id: "msg_core_public_ab_acceptance", type: "message", status: "completed",
+    role: "assistant", content: [{ type: "output_text", annotations: [], logprobs: [], text }] };
+  const completed = { id: "resp_core_public_ab_acceptance", object: "response", created_at: 1,
+    status: "completed", error: null, incomplete_details: null, instructions: null,
+    max_output_tokens: null, model: MODEL_BINDING.model, output: [message], parallel_tool_calls: true,
+    previous_response_id: null, reasoning: { effort: MODEL_BINDING.variant, summary: null }, store: false,
+    temperature: 1, text: { format: { type: "text" } }, tool_choice: "auto", tools: [], top_p: 1,
+    truncation: "disabled", usage: { input_tokens: 1, input_tokens_details: { cached_tokens: 0 },
+      output_tokens: 1, output_tokens_details: { reasoning_tokens: 0 }, total_tokens: 2 }, metadata: {} };
+  const events = [
+    { type: "response.created", sequence_number: 0, response: { ...completed, status: "in_progress", output: [] } },
+    { type: "response.output_item.added", sequence_number: 1, output_index: 0,
+      item: { ...message, status: "in_progress", content: [] } },
+    { type: "response.content_part.added", sequence_number: 2, item_id: message.id, output_index: 0,
+      content_index: 0, part: { type: "output_text", annotations: [], logprobs: [], text: "" } },
+    { type: "response.output_text.delta", sequence_number: 3, item_id: message.id, output_index: 0,
+      content_index: 0, delta: text, logprobs: [] },
+    { type: "response.output_text.done", sequence_number: 4, item_id: message.id, output_index: 0,
+      content_index: 0, text, logprobs: [] },
+    { type: "response.content_part.done", sequence_number: 5, item_id: message.id, output_index: 0,
+      content_index: 0, part: message.content[0] },
+    { type: "response.output_item.done", sequence_number: 6, output_index: 0, item: message },
+    { type: "response.completed", sequence_number: 7, response: completed },
+  ];
+  return Buffer.from(`${events.map((event) => `data: ${JSON.stringify(event)}\n\n`).join("")}data: [DONE]\n\n`, "utf8");
+}
+
+function jsonContainsExactString(value, expected) {
+  if (typeof value === "string") return value === expected;
+  if (Array.isArray(value)) return value.some((entry) => jsonContainsExactString(entry, expected));
+  return value !== null && typeof value === "object"
+    && Object.values(value).some((entry) => jsonContainsExactString(entry, expected));
+}
+
+async function createSyntheticAcceptanceProxy(socketPath) {
+  let capability = randomBytes(32).toString("base64url"); let closed = false; let acceptedRequests = 0;
+  const sockets = new Set();
+  const server = createServer((request, response) => {
+    const reject = (status, code) => {
+      response.writeHead(status, { "cache-control": "no-store", "content-type": "application/json" });
+      response.end(`${JSON.stringify({ error: code })}\n`);
+    };
+    if (closed || request.method !== "POST" || request.url !== "/proxy"
+      || !secureEqualAuthorization(request.headers.authorization, capability)) { reject(403, "forbidden"); return; }
+    const length = Number(request.headers["content-length"] ?? -1);
+    if (!Number.isSafeInteger(length) || length < 2 || length > 44 * 1024 * 1024) { reject(413, "request_too_large"); return; }
+    const chunks = []; let bytes = 0;
+    request.on("data", (chunk) => { bytes += chunk.length; if (bytes <= length) chunks.push(chunk); else request.destroy(); });
+    request.on("end", () => {
+      try {
+        expect(bytes === length, "MEASUREMENT_ACCEPTANCE", "synthetic provider request length differs");
+        const value = JSON.parse(Buffer.concat(chunks).toString("utf8"));
+        expect(value?.schema_version === 1 && value.method === "POST"
+          && ["https://api.openai.com/v1/responses", "https://api.openai.com/v1/chat/completions"].includes(value.url),
+        "MEASUREMENT_ACCEPTANCE", "synthetic provider request escaped frozen OpenAI endpoints");
+        const providerRequest = JSON.parse(Buffer.from(value.body_base64, "base64").toString("utf8"));
+        expect(providerRequest?.model === MODEL_BINDING.model
+          && jsonContainsExactString(providerRequest, ACCEPTANCE_PROMPT),
+        "MEASUREMENT_ACCEPTANCE", "synthetic provider request differs from the frozen model and acceptance prompt");
+        acceptedRequests += 1;
+        const providerBody = syntheticAcceptanceProviderBody(value.url);
+        const envelope = JSON.stringify({ schema_version: 1, status: 200,
+          headers: [["content-type", "text/event-stream"]], body_base64: providerBody.toString("base64") });
+        response.writeHead(200, { "cache-control": "no-store", "content-type": "application/json",
+          "content-length": Buffer.byteLength(envelope) }); response.end(envelope);
+      } catch (error) { reject(503, error?.code ?? "acceptance_proxy_failure"); }
+    });
+  });
+  server.on("connection", (socket) => { sockets.add(socket); socket.once("close", () => sockets.delete(socket)); });
+  await new Promise((resolve, reject) => {
+    const failed = (error) => { server.off("listening", ready); reject(error); };
+    const ready = () => { server.off("error", failed); resolve(); };
+    server.once("error", failed); server.once("listening", ready); server.listen(socketPath);
+  });
+  fs.chmodSync(socketPath, 0o600);
+  return Object.freeze({ socket_path: socketPath,
+    payload: Object.freeze({ schema_version: 1, provider: "openai", proxy_socket: socketPath,
+      proxy_capability: capability }),
+    status() { return Object.freeze({ accepted_request_count: acceptedRequests,
+      provider_submission_count: 0, synthetic_response_count: acceptedRequests }); },
+    async close() {
+      if (closed) return; closed = true; capability = ""; for (const socket of sockets) socket.destroy();
+      await new Promise((resolve) => server.close(() => resolve()));
+      try { fs.unlinkSync(socketPath); } catch (error) { if (error?.code !== "ENOENT") throw error; }
+    } });
 }
 
 function xorshift(seedText) {
@@ -857,16 +968,23 @@ async function freezeManifests(options) {
   const corpus = loadBenchmarkV3Corpus(productSourceRoot);
   const validation = corpus.families.filter((family) => family.split === "validation");
   expect(validation.length === 60
+    && new Set(validation.map((family) => family.family_id)).size === 60
     && STRATA.every((stratum) => validation.filter((family) => family.stratum === stratum).length === 20),
   "MEASUREMENT_CORPUS", "public validation split counts differ");
   const schedules = Object.freeze({
     validation: buildSchedule("validation", validation.map((family) => ({ id: family.family_id, stratum: family.stratum }))),
     pilot: pilotManifest.schedule,
   });
+  expect(DATASETS.every((dataset) => STRATA.every((stratum) => {
+    const entries = schedules[dataset].entries.filter((entry) => entry.stratum === stratum);
+    const expectedPlainFirst = Math.ceil(entries.length / 2);
+    return entries.filter((entry) => entry.order[0] === "plain").length === expectedPlainFirst
+      && entries.filter((entry) => entry.order[0] === "core").length === entries.length - expectedPlainFirst;
+  })), "MEASUREMENT_SCHEDULE", "frozen arm-order schedule is not counterbalanced by dataset and stratum");
   const bundleManifest = readJson(path.join(product.materialized_core_directory, ".opencode-profile-manifest.json"), "core bundle manifest");
   const body = {
     schema_version: 1,
-    measurement_id: "core-public-ab-measurement-v1",
+    measurement_id: "core-public-ab-v1",
     runner_sha256: runnerSha256,
     runner_source_sha: gitSha(SOURCE_ROOT),
     measurement_contract_fingerprint: measurementContract.fingerprint,
@@ -875,36 +993,53 @@ async function freezeManifests(options) {
     product_tree_fingerprint: bundleManifest.source_tree_fingerprint,
     core_bundle_fingerprint: product.product_bundle_fingerprint,
     public_corpus_fingerprint: corpus.corpus_fingerprint,
+    corpus_fingerprint: corpus.corpus_fingerprint,
     published_benchmark_input_fingerprint: publishedInputs.fingerprint,
     published_benchmark_input_files: publishedInputs.files,
     validation_family_ids: validation.map((family) => family.family_id),
     real_pilot_identity_ids: pilotManifest.tasks.map((task) => task.identity_id),
+    primary_dataset: Object.freeze({ split: "validation", family_count: 60, small: 20, medium: 20, high: 20,
+      family_ids: validation.map((family) => family.family_id) }),
+    pilot_dataset: Object.freeze({ family_count: 29, small: 10, medium: 10, high: 9,
+      repositories: pilotManifest.counts.by_repository,
+      identity_ids: pilotManifest.tasks.map((task) => task.identity_id) }),
     task_binding_fingerprints: Object.freeze({
       validation: Object.freeze(Object.fromEntries(validation.map((family) => [family.family_id, family.manifest.public_surface_fingerprint]))),
       pilot: Object.freeze(Object.fromEntries(pilotManifest.tasks.map((task) => [task.identity_id, task.task_binding_fingerprint]))),
     }),
     primary_metric_definition: measurementContract.contract.primary_metric,
+    primary_metric: "oracle_validated_task_success",
     explicitly_excluded_metric: Object.freeze({ name: "regression_free_task_success",
       ...measurementContract.contract.excluded_metrics.regression_free_task_success }),
     safety_observability: measurementContract.contract.safety_observability,
+    excluded_metrics: measurementContract.contract.excluded_metrics,
+    severe_regression_safety: Object.freeze({ status: "not_observable" }),
     real_pilot_manifest_fingerprint: pilotManifest.pilot_manifest_fingerprint,
     model: MODEL_BINDING.model,
     provider: MODEL_BINDING.provider,
     variant: MODEL_BINDING.variant,
+    model_binding: MODEL_BINDING,
     opencode_version: opencode.version,
     opencode_executable_sha256: opencode.sha256,
+    opencode_executable_fingerprint: opencode.executable_fingerprint,
     ...measurementNode,
     opencode_seatbelt_startup_preflight: opencodeSeatbeltStartup,
     trusted_measurement_node_catalog_preflight: trustedNodeCatalogPreflight,
     timeout_ms: Number(options.timeoutMs),
     parallel_pairs: Number(options.parallelPairs),
     arm_order_schedule: schedules,
-    retry_policy: Object.freeze({ exact_resume: true, maximum_infrastructure_retries_per_task_arm: 1,
+    arm_order_schedule_fingerprint: fingerprint(schedules),
+    retry_policy: "one retry only for proven pre-scoring infrastructure failure",
+    retry_policy_detail: Object.freeze({ exact_resume: true, maximum_infrastructure_retries_per_task_arm: 1,
       retry_eligible: "proven-infrastructure-failure-before-scored-outcome-only",
       forbidden: Object.freeze(["timeout", "bad-solution", "model-protocol-failure", "failed-hidden-test", "failed-core-verification", "already-scored-outcome"]) }),
     model_call_budget: Object.freeze({ primary_scored: PRIMARY_SCORED_CALLS, pilot_scored: PILOT_SCORED_CALLS,
       total_scored: TOTAL_SCORED_CALLS, maximum_infrastructure_retries: MAXIMUM_INFRASTRUCTURE_RETRIES,
       hard_maximum: MAXIMUM_MODEL_CALLS }),
+    bootstrap_resamples: BOOTSTRAP_RESAMPLES,
+    statistics: Object.freeze({ primary: "paired delta, exact McNemar, deterministic paired bootstrap" }),
+    maximum_scored_model_calls: TOTAL_SCORED_CALLS,
+    maximum_total_model_calls: MAXIMUM_MODEL_CALLS,
     evaluator_fingerprint: evaluatorFingerprint(),
     public_semantic_runtime_fingerprint: publicRuntime.runtime.runtime_fingerprint,
     pilot_runtime_universe_fingerprint: pilotRuntime.manifest.runtime_universe_fingerprint,
@@ -914,10 +1049,14 @@ async function freezeManifests(options) {
       resamples: BOOTSTRAP_RESAMPLES, seed: "measurement-manifest-fingerprint", confidence_level: 0.95,
       primary_test: "exact-mcnemar", one_sided_direction: "core-greater-than-plain" }),
     development_sensitivity: Object.freeze({ included: false,
-      reason: "bounded campaign uses validation primary plus real-repository pilot" }),
+      reason: "bounded measurement uses validation primary plus frozen real-commit pilot" }),
     execution_policy: Object.freeze({ dataset_order: Object.freeze(["validation", "pilot"]), opportunity_gate: false,
       model_network: "provider-only-through-host-isolated-credential-bridge",
       model_tools: Object.freeze({ local_read_edit: "allow", shell: "deny", web: "deny", external_directory: "deny", delegation: "deny" }) }),
+    acceptance_probe: Object.freeze({ required_before_campaign: true, arms: ARMS,
+      provider_mode: "deterministic-local-proxy-no-external-submission", model_calls: 0, provider_calls: 0,
+      prompt_sha256: sha256Bytes(Buffer.from(ACCEPTANCE_PROMPT, "utf8")),
+      expected_text_sha256: sha256Bytes(Buffer.from(ACCEPTANCE_TEXT, "utf8")) }),
     created_at: new Date().toISOString(),
   };
   expect(Number.isSafeInteger(body.timeout_ms) && body.timeout_ms >= 60_000
@@ -936,27 +1075,56 @@ function validateMeasurementManifest(file) {
   const manifest = validateFingerprint(readJson(manifestFile.path, "measurement manifest"),
     "manifest_fingerprint", "measurement manifest");
   const measurementContract = loadMeasurementContract();
-  expect(manifest.schema_version === 1 && manifest.measurement_id === "core-public-ab-measurement-v1"
+  expect(manifest.schema_version === 1 && manifest.measurement_id === "core-public-ab-v1"
     && manifest.runner_sha256 === sha256File(RUNNER_PATH) && manifest.product_source_sha === PRODUCT_SOURCE_SHA
     && SHA.test(manifest.runner_source_sha ?? "")
     && manifest.measurement_contract_fingerprint === measurementContract.fingerprint
     && manifest.measurement_contract_sha256 === measurementContract.sha256
+    && FP.test(manifest.product_tree_fingerprint ?? "")
     && manifest.core_bundle_fingerprint === CORE_BUNDLE_FINGERPRINT
+    && FP.test(manifest.corpus_fingerprint ?? "") && manifest.corpus_fingerprint === manifest.public_corpus_fingerprint
+    && manifest.primary_dataset?.split === "validation" && manifest.primary_dataset?.family_count === 60
+    && manifest.primary_dataset?.small === 20 && manifest.primary_dataset?.medium === 20 && manifest.primary_dataset?.high === 20
+    && canonicalJson(manifest.primary_dataset?.family_ids) === canonicalJson(manifest.validation_family_ids)
+    && manifest.pilot_dataset?.family_count === 29 && manifest.pilot_dataset?.small === 10
+    && manifest.pilot_dataset?.medium === 10 && manifest.pilot_dataset?.high === 9
+    && canonicalJson(manifest.pilot_dataset?.repositories) === canonicalJson(PILOT_REPOSITORY_COUNTS)
+    && canonicalJson(manifest.pilot_dataset?.identity_ids) === canonicalJson(manifest.real_pilot_identity_ids)
+    && manifest.primary_metric === "oracle_validated_task_success"
+    && manifest.excluded_metrics?.regression_free_task_success?.status === "not_computed"
+    && manifest.excluded_metrics.regression_free_task_success.reason === "no frozen independent severity oracle"
+    && manifest.severe_regression_safety?.status === "not_observable"
     && manifest.provider === MODEL_BINDING.provider && manifest.model === MODEL_BINDING.model
-    && manifest.variant === MODEL_BINDING.variant && manifest.evaluator_fingerprint === evaluatorFingerprint()
+    && manifest.variant === MODEL_BINDING.variant && canonicalJson(manifest.model_binding) === canonicalJson(MODEL_BINDING)
+    && manifest.evaluator_fingerprint === evaluatorFingerprint()
+    && FP.test(manifest.opencode_executable_fingerprint ?? "")
+    && manifest.arm_order_schedule_fingerprint === fingerprint(manifest.arm_order_schedule)
+    && manifest.retry_policy === "one retry only for proven pre-scoring infrastructure failure"
+    && manifest.retry_policy_detail?.exact_resume === true
+    && manifest.retry_policy_detail?.maximum_infrastructure_retries_per_task_arm === 1
+    && manifest.bootstrap_resamples === BOOTSTRAP_RESAMPLES
+    && manifest.statistics?.primary === "paired delta, exact McNemar, deterministic paired bootstrap"
+    && manifest.maximum_scored_model_calls === TOTAL_SCORED_CALLS
+    && manifest.maximum_total_model_calls === MAXIMUM_MODEL_CALLS
     && manifest.measurement_node_version === process.version
     && manifest.measurement_node_executable_sha256 === sha256File(process.execPath)
     && manifest.opencode_seatbelt_startup_preflight?.status === "passed"
     && manifest.trusted_measurement_node_catalog_preflight?.status === "passed"
     && manifest.published_benchmark_input_fingerprint === fingerprint({ schema_version: 1,
       files: canonicalFileInventory(SOURCE_ROOT, BENCHMARK_INPUT_PATHS) })
-    && manifest.validation_family_ids.length === 60 && manifest.real_pilot_identity_ids.length === 29
+    && manifest.validation_family_ids.length === 60 && new Set(manifest.validation_family_ids).size === 60
+    && manifest.real_pilot_identity_ids.length === 29 && new Set(manifest.real_pilot_identity_ids).size === 29
     && manifest.primary_metric_definition?.name === "oracle_validated_task_success"
     && manifest.explicitly_excluded_metric?.status === "not_computed"
     && manifest.safety_observability?.high_medium_critical_regressions?.count === null
     && manifest.development_sensitivity?.included === false
     && canonicalJson(manifest.execution_policy?.dataset_order) === canonicalJson(DATASETS)
     && manifest.execution_policy?.opportunity_gate === false
+    && manifest.acceptance_probe?.required_before_campaign === true
+    && canonicalJson(manifest.acceptance_probe?.arms) === canonicalJson(ARMS)
+    && manifest.acceptance_probe?.model_calls === 0 && manifest.acceptance_probe?.provider_calls === 0
+    && manifest.acceptance_probe?.prompt_sha256 === sha256Bytes(Buffer.from(ACCEPTANCE_PROMPT, "utf8"))
+    && manifest.acceptance_probe?.expected_text_sha256 === sha256Bytes(Buffer.from(ACCEPTANCE_TEXT, "utf8"))
     && manifest.statistical_method?.seed === "measurement-manifest-fingerprint"
     && manifest.model_call_budget?.hard_maximum === MAXIMUM_MODEL_CALLS,
   "MEASUREMENT_MANIFEST", "measurement manifest differs from the frozen runner contract");
@@ -1138,29 +1306,145 @@ function modelEnvironment(attemptDirectory, configuration, credential) {
     CORE_PUBLIC_AB_PROVIDER_PROXY_FILE: credential.credential_file });
 }
 
+function installProviderBridgeFiles({ attemptDirectory, configuration, proxy }) {
+  const credentialFile = path.join(attemptDirectory, "host-credential.json");
+  fs.writeFileSync(credentialFile, JSON.stringify(proxy.payload), { encoding: "utf8", flag: "wx", mode: 0o600 });
+  const plugins = path.join(configuration, "plugins"); fs.mkdirSync(plugins, { recursive: true, mode: 0o700 });
+  const plugin = path.join(plugins, "core-public-ab-provider-proxy.mjs");
+  fs.writeFileSync(plugin, PROVIDER_PROXY_PLUGIN, { encoding: "utf8", flag: "wx", mode: 0o400 });
+  return Object.freeze({ credential_file: credentialFile, provider_proxy_socket: proxy.socket_path,
+    placeholder_auth_content: JSON.stringify({ openai: { type: "api", key: "core-public-ab-host-provider-proxy" } }),
+    status() { return proxy.status(); }, async close() { await proxy.close(); } });
+}
+
 async function installCredentialBridge({ attemptDirectory, configuration, credentialStore }) {
   let proxy = null;
-  const credentialFile = path.join(attemptDirectory, "host-credential.json");
   try {
     proxy = await createProviderProxy(credentialStore,
       `/private/tmp/core-ab-${process.pid}-${randomBytes(12).toString("base64url")}.sock`);
-    fs.writeFileSync(credentialFile, JSON.stringify(proxy.payload), { encoding: "utf8", flag: "wx", mode: 0o600 });
-    const plugins = path.join(configuration, "plugins"); fs.mkdirSync(plugins, { recursive: true, mode: 0o700 });
-    const plugin = path.join(plugins, "core-public-ab-provider-proxy.mjs");
-    fs.writeFileSync(plugin, PROVIDER_PROXY_PLUGIN, { encoding: "utf8", flag: "wx", mode: 0o400 });
-    return Object.freeze({ credential_file: credentialFile, provider_proxy_socket: proxy.socket_path,
-      placeholder_auth_content: JSON.stringify({ openai: { type: "api", key: "core-public-ab-host-provider-proxy" } }),
-      status() { return proxy.status(); },
-      async close() { await proxy.close(); } });
+    return installProviderBridgeFiles({ attemptDirectory, configuration, proxy });
   } catch (error) {
     await proxy?.close(); throw error;
   }
 }
 
+async function executeAcceptanceArm({ arm, coreBundle, opencode, trustedNodePath }) {
+  const root = fs.mkdtempSync(path.join(fs.realpathSync.native(os.tmpdir()), `core-public-ab-acceptance-${arm}-`));
+  let bridge = null;
+  try {
+    const workspace = path.join(root, "workspace"); const attemptDirectory = path.join(root, "attempt");
+    const configuration = path.join(attemptDirectory, "configuration");
+    fs.mkdirSync(workspace, { recursive: true, mode: 0o700 }); fs.mkdirSync(attemptDirectory, { recursive: true, mode: 0o700 });
+    fs.writeFileSync(path.join(workspace, "probe.js"), "export default true;\n", { mode: 0o600 });
+    expect(passed(run("git", ["init", "--quiet"], { cwd: workspace }))
+      && passed(run("git", ["add", "."], { cwd: workspace })),
+    "MEASUREMENT_ACCEPTANCE", `${arm} acceptance workspace initialization failed`);
+    const task = Object.freeze({ allowed_mutation_paths: ["probe.js"], subject_paths: ["probe.js"] });
+    const before = captureWorkspace(workspace);
+    const catalogBefore = arm === "core" ? await installCatalog(workspace, task, coreBundle, trustedNodePath) : null;
+    copyConfiguration(arm === "core" ? coreBundle : null, configuration);
+    const configurationBefore = directoryFingerprint(configuration);
+    const proxy = await createSyntheticAcceptanceProxy(
+      `/private/tmp/core-ab-${process.pid}-${randomBytes(12).toString("base64url")}.sock`);
+    bridge = installProviderBridgeFiles({ attemptDirectory, configuration, proxy });
+    const profile = path.join(attemptDirectory, "model.sb");
+    fs.writeFileSync(profile, modelSandboxProfile({ workspace, attemptDirectory, opencodePath: opencode.path,
+      providerProxySocket: bridge.provider_proxy_socket, trustedNodePath }), { mode: 0o600 });
+    const opencodeArgs = ["run", "--format", "json", "--model", `${MODEL_BINDING.provider}/${MODEL_BINDING.model}`,
+      "--variant", MODEL_BINDING.variant, "--agent", arm === "core" ? "core" : "build", "--dir", workspace,
+      ACCEPTANCE_PROMPT];
+    const file = arm === "core" ? process.execPath : opencode.path;
+    const args = arm === "core" ? [path.join(configuration, "runtime", "opencode-core.mjs"), "--workspace", workspace,
+      "--opencode", opencode.path, "--receipt-fd", "3", "--child-timeout-ms", "120000", "--", ...opencodeArgs]
+      : opencodeArgs;
+    const managed = await runManagedProcess({ file, args, cwd: workspace,
+      env: modelEnvironment(attemptDirectory, configuration, bridge), profile, timeoutMs: 120_000,
+      candidate: arm === "core" });
+    await bridge.close(); const proxyEvidence = bridge.status(); bridge = null;
+    const events = parseOpenCodeEvents(managed.stdout);
+    const activation = arm === "core" ? parseActivation(managed.activation, catalogBefore) : null;
+    const changed = changedPaths(before, captureWorkspace(workspace));
+    const configurationDrift = configurationBefore !== directoryFingerprint(configuration);
+    const catalogDrift = arm === "core"
+      && catalogBefore.sha256 !== sha256File(path.join(workspace, ".git", "opencode-harness", "core", "checks.json"));
+    expect(managed.status === 0 && managed.signal === null && managed.timed_out === false
+      && managed.teardown_verified === true && events.protocol_valid === true
+      && proxyEvidence.accepted_request_count === 1 && proxyEvidence.synthetic_response_count === 1
+      && proxyEvidence.provider_submission_count === 0 && changed.length === 0
+      && configurationDrift === false && catalogDrift === false
+      && events.final_text_sha256 === sha256Bytes(Buffer.from(ACCEPTANCE_TEXT, "utf8"))
+      && (arm !== "core" || (activation?.process_receipt_observable === true
+        && activation.verification_authentic === true && activation.passed === true)),
+    "MEASUREMENT_ACCEPTANCE", `${arm} full OpenCode acceptance path failed`);
+    return Object.freeze({ arm, status: "passed", full_opencode_run: true,
+      provider_proxy_requests: proxyEvidence.accepted_request_count, provider_submissions: 0, model_calls: 0,
+      process_containment_intact: true, no_surviving_descendants: true,
+      core_verification_receipt_authentic: arm === "core" ? true : null,
+      output_text_sha256: events.final_text_sha256,
+      stdout_sha256: sha256Bytes(Buffer.from(managed.stdout, "utf8")),
+      stderr_sha256: sha256Bytes(Buffer.from(managed.stderr, "utf8")) });
+  } finally {
+    await bridge?.close(); fs.rmSync(root, { recursive: true, force: true });
+  }
+}
+
+async function runAcceptanceProbes(options) {
+  assertClean(SOURCE_ROOT);
+  const frozen = validateMeasurementManifest(options.manifest);
+  const coreBundle = statDirectory(options.coreBundle, "core bundle");
+  const bundleManifest = readJson(path.join(coreBundle, ".opencode-profile-manifest.json"), "core bundle manifest");
+  expect(bundleManifest.source_sha === PRODUCT_SOURCE_SHA && bundleManifest.bundle_fingerprint === CORE_BUNDLE_FINGERPRINT
+    && bundleManifest.source_tree_fingerprint === frozen.manifest.product_tree_fingerprint,
+    "MEASUREMENT_ACCEPTANCE", "acceptance core bundle differs from frozen candidate");
+  const opencode = verifyBenchmarkV3OpenCodeExecutable(path.resolve(options.opencode));
+  expect(opencode.sha256 === frozen.manifest.opencode_executable_sha256 && opencode.version === frozen.manifest.opencode_version
+    && opencode.executable_fingerprint === frozen.manifest.opencode_executable_fingerprint,
+    "MEASUREMENT_ACCEPTANCE", "acceptance OpenCode executable differs from manifest");
+  const trustedRoot = fs.mkdtempSync(path.join(fs.realpathSync.native(os.tmpdir()), "core-public-ab-acceptance-node-"));
+  try {
+    const trustedNodePath = prepareTrustedMeasurementNode(trustedRoot, {
+      measurement_node_version: frozen.manifest.measurement_node_version,
+      measurement_node_executable_sha256: frozen.manifest.measurement_node_executable_sha256,
+    });
+    const arms = [];
+    for (const arm of ARMS) arms.push(await executeAcceptanceArm({ arm, coreBundle, opencode, trustedNodePath }));
+    const body = { schema_version: 1, measurement_id: frozen.manifest.measurement_id,
+      manifest_fingerprint: frozen.manifest.manifest_fingerprint, runner_sha256: sha256File(RUNNER_PATH),
+      opencode_executable_sha256: opencode.sha256, core_bundle_fingerprint: CORE_BUNDLE_FINGERPRINT,
+      probe_mode: "deterministic-local-proxy-no-external-submission", model_calls: 0, provider_calls: 0,
+      arms, created_at: new Date().toISOString() };
+    const receipt = Object.freeze({ ...body, acceptance_receipt_fingerprint: fingerprint(body) });
+    durableJson(path.resolve(options.acceptanceOutput), receipt);
+    return Object.freeze({ status: "passed", acceptance_receipt_fingerprint: receipt.acceptance_receipt_fingerprint,
+      model_calls: 0, provider_calls: 0 });
+  } finally { fs.rmSync(trustedRoot, { recursive: true, force: true }); }
+}
+
+function validateAcceptanceReceipt(file, manifest) {
+  const receiptFile = statRegular(file, "acceptance receipt");
+  const receipt = validateFingerprint(readJson(receiptFile.path, "acceptance receipt"),
+    "acceptance_receipt_fingerprint", "acceptance receipt");
+  expect(receipt.schema_version === 1 && receipt.measurement_id === manifest.measurement_id
+    && receipt.manifest_fingerprint === manifest.manifest_fingerprint
+    && receipt.runner_sha256 === sha256File(RUNNER_PATH)
+    && receipt.opencode_executable_sha256 === manifest.opencode_executable_sha256
+    && receipt.core_bundle_fingerprint === manifest.core_bundle_fingerprint
+    && receipt.probe_mode === "deterministic-local-proxy-no-external-submission"
+    && receipt.model_calls === 0 && receipt.provider_calls === 0
+    && Array.isArray(receipt.arms) && receipt.arms.length === 2
+    && ARMS.every((arm) => receipt.arms.some((entry) => entry.arm === arm && entry.status === "passed"
+      && entry.full_opencode_run === true && entry.provider_submissions === 0 && entry.model_calls === 0
+      && entry.process_containment_intact === true && entry.no_surviving_descendants === true
+      && entry.output_text_sha256 === manifest.acceptance_probe.expected_text_sha256)),
+  "MEASUREMENT_ACCEPTANCE", "plain/core acceptance receipt is invalid or incomplete");
+  return Object.freeze({ receipt, sha256: sha256File(receiptFile.path) });
+}
+
 function parseOpenCodeEvents(stdout) {
   let jsonEventCount = 0; let terminalEventCount = 0; let openSteps = 0; let turns = 0;
   let finalTextEligible = false; let protocolValid = true; let tokens = 0; let usageObserved = false;
-  const toolStates = new Map(); const known = new Set(["step_start", "step_finish", "tool_use", "text", "reasoning", "error"]);
+  const textFragments = []; const toolStates = new Map();
+  const known = new Set(["step_start", "step_finish", "tool_use", "text", "reasoning", "error"]);
   for (const line of stdout.split("\n")) {
     if (line.trim().length === 0) continue;
     let value; try { value = JSON.parse(line); } catch { protocolValid = false; continue; }
@@ -1175,7 +1459,10 @@ function parseOpenCodeEvents(stdout) {
       else { const previous = toolStates.get(id); if (["completed", "error", "failed"].includes(previous)) protocolValid = false; toolStates.set(id, status); }
     }
     if (["step_start", "tool_use", "reasoning", "error"].includes(value.type)) finalTextEligible = false;
-    if (value.type === "text") { if (typeof value.part?.text !== "string") protocolValid = false; else if (value.part.text.trim()) finalTextEligible = true; }
+    if (value.type === "text") {
+      if (typeof value.part?.text !== "string") protocolValid = false;
+      else { textFragments.push(value.part.text); if (value.part.text.trim()) finalTextEligible = true; }
+    }
     const usage = value.usage ?? value.part?.usage ?? value.data?.usage;
     const total = usage?.total_tokens ?? usage?.totalTokens;
     if (Number.isSafeInteger(total) && total >= 0) { tokens += total; usageObserved = true; }
@@ -1185,6 +1472,7 @@ function parseOpenCodeEvents(stdout) {
   protocolValid &&= jsonEventCount > 0 && terminalEventCount === 1 && openSteps === 0 && unfinished === 0;
   return Object.freeze({ protocol_valid: protocolValid, json_event_count: jsonEventCount,
     terminal_event_count: terminalEventCount, open_step_count: openSteps, unfinished_tool_count: unfinished,
+    final_text_sha256: sha256Bytes(Buffer.from(textFragments.join("").trim(), "utf8")),
     turn_count: turns, tool_call_count: toolStates.size, tokens: usageObserved ? tokens : "not_observable",
     usage_observed: usageObserved });
 }
@@ -1192,7 +1480,7 @@ function classifyError(stderr) {
   const text = stderr.toLowerCase();
   if (/model.+(?:not found|unavailable|access|permission)|unknown model|does not have access/u.test(text)) return "model-access";
   if (/unauthorized|forbidden|oauth|credential|token.+expired|status 401|status 403/u.test(text)) return "model-access";
-  if (/rate.?limit|status 429|temporarily unavailable|status 5[0-9][0-9]/u.test(text)) return "provider-infrastructure";
+  if (/rate.?limit|status 429/u.test(text)) return "provider-infrastructure";
   if (/sandbox|operation not permitted|spawn|enoent|eacces/u.test(text)) return "host-infrastructure";
   return "model-protocol";
 }
@@ -1253,6 +1541,13 @@ function parseActivation(bytes, expected) {
     && receipt.activation.post_last_mutation_verification === true && receipt.check?.status === "passed";
   return Object.freeze({ authentic: verificationAuthentic, verification_authentic: verificationAuthentic,
     process_receipt_observable: processReceiptObservable, passed: passedActivation, receipt });
+}
+
+function coreVerificationStatus(activation, { configurationDrift = false, catalogDrift = false } = {}) {
+  if (activation?.verification_authentic !== true || activation?.process_receipt_observable !== true) return "unavailable";
+  if (configurationDrift || catalogDrift) return "failed";
+  if (activation.passed === true) return "passed";
+  return /stale/iu.test(activation.receipt?.decision?.reason ?? "") ? "stale" : "failed";
 }
 
 function syntaxVerification(workspace, subjectPaths) {
@@ -1445,9 +1740,13 @@ function validateOutcomeReceipt(value, file, { manifest, pilotManifest, dataset,
   expect(value?.schema_version === 1 && value.dataset === dataset && value.identity_id === identityId && value.arm === arm
     && typeof value.oracle_validated_task_success === "boolean"
     && !Object.hasOwn(value, "regression_free_task_success") && !Object.hasOwn(value, "severity")
+    && typeof value.reconciliation_required === "boolean"
+    && (arm !== "core" || ["passed", "failed", "stale", "unavailable"].includes(value.core_verification_status))
     && (value.scored_outcome !== true || (typeof value.authentic_terminal_completion === "boolean"
       && typeof value.timed_out === "boolean" && typeof value.process_containment_intact === "boolean"
-      && typeof value.mutation_scope_valid === "boolean"
+      && value.no_surviving_descendants === true
+      && typeof value.mutation_scope_valid === "boolean" && typeof value.syntax_verification_success === "boolean"
+      && typeof value.no_change === "boolean"
       && typeof value.task_specific_semantic_oracle_passed === "boolean"
       && value.hidden_data_leakage_observed === false && FP.test(value.hidden_data_preflight_fingerprint ?? "")))
     && Number.isSafeInteger(value.attempt_index) && value.attempt_index >= 1 && value.attempt_index <= 2
@@ -1532,13 +1831,14 @@ async function executeAttempt(context, task, arm, attemptIndex, retryOf = null) 
       : publicOracle(task, workspace, context.publicRuntime.root,
         context.publicRuntime.runtime.entries.find((entry) => entry.key === task.runtime_key)?.key_fingerprint ?? "missing");
     const coreVerificationBlocked = arm === "core" && (!activation?.verification_authentic || !activation.passed || catalogDrift || configurationDrift);
+    const verificationStatus = arm === "core" ? coreVerificationStatus(activation, { configurationDrift, catalogDrift }) : null;
     const timedOut = managed.timed_out || child?.error_code === "ETIMEDOUT" || oracle.oracle_timeout;
     const authenticTerminalCompletion = ordinaryCompletion && events.json_event_count > 0 && events.protocol_valid;
     const hostEnvironmentIntegrity = !configurationDrift && !catalogDrift;
     const processContainmentIntact = managed.teardown_verified === true && hostEnvironmentIntegrity;
     const errorClass = authenticTerminalCompletion ? null : classifyError(`${managed.stderr}\n${managed.stdout}\n${managed.activation}`);
     const providerAccessFailure = providerEvidence.provider_response_statuses.some((status) => status === 401 || status === 403);
-    const providerInfrastructureFailure = providerEvidence.provider_response_statuses.some((status) => status === 429 || status >= 500);
+    const providerRejectedBeforeExecution = providerEvidence.provider_response_statuses.some((status) => status === 429);
     const modelAccessRequired = errorClass === "model-access" || providerAccessFailure;
     if (providerEvidence.ambiguous_submission_count > 0 && !timedOut) {
       fail("MEASUREMENT_RECONCILIATION_REQUIRED",
@@ -1554,7 +1854,7 @@ async function executeAttempt(context, task, arm, attemptIndex, retryOf = null) 
       || (!timedOut && changed.length === 0 && !oracle.semantic_passed
       && !authenticTerminalCompletion && !configurationDrift && !catalogDrift
       && providerEvidence.ambiguous_submission_count === 0 && !modelAccessRequired
-      && (preProviderHostTermination || providerInfrastructureFailure || (providerEvidence.provider_submission_count === 0
+      && (preProviderHostTermination || providerRejectedBeforeExecution || (providerEvidence.provider_submission_count === 0
         && ["host-infrastructure", "provider-infrastructure"].includes(errorClass))));
     const classification = modelAccessRequired ? Object.freeze({ oracle_validated_task_success: false,
       scored_outcome: false, infrastructure_failure_before_scoring: false, reconciliation_required: false })
@@ -1563,14 +1863,16 @@ async function executeAttempt(context, task, arm, attemptIndex, retryOf = null) 
       authentic_terminal_completion: authenticTerminalCompletion,
       timed_out: timedOut,
       process_containment_intact: processContainmentIntact,
+      no_surviving_descendants: managed.teardown_verified === true,
       mutation_scope_valid: violations.length === 0,
+      syntax_verification_success: syntaxPassed,
+      no_change: changed.length === 0,
       task_specific_semantic_oracle_passed: oracle.semantic_passed,
+      hidden_data_leakage_observed: hiddenDataPreflight.leakage_observed,
       authentic_current_core_verification_passed: arm === "core" ? !coreVerificationBlocked : null,
       explicit_infrastructure_failure: explicitInfrastructureFailure,
       provider_submission_disposition_established: providerSubmissionDispositionEstablished,
     });
-    if (classification.reconciliation_required) fail("MEASUREMENT_RECONCILIATION_REQUIRED",
-      `${attemptId} provider submission disposition is unresolved; retry is forbidden`);
     const outcomeBody = { schema_version: 1, attempt_id: attemptId, retry_of_attempt_id: retryOf,
       attempt_binding_fingerprint: attemptBinding, dataset: task.dataset, identity_id: task.id, stratum: task.stratum,
       arm, attempt_index: attemptIndex,
@@ -1579,16 +1881,19 @@ async function executeAttempt(context, task, arm, attemptIndex, retryOf = null) 
       mutation_scope_valid: violations.length === 0, scope_violations: violations, changed_paths: changed,
       timed_out: timedOut, no_change: changed.length === 0, authentic_terminal_completion: authenticTerminalCompletion,
       process_containment_intact: processContainmentIntact,
+      no_surviving_descendants: managed.teardown_verified === true,
       hidden_data_leakage_observed: hiddenDataPreflight.leakage_observed,
       hidden_data_preflight_fingerprint: hiddenDataPreflight.preflight_fingerprint,
       model_protocol_valid: events.protocol_valid, core_activation: arm === "core" ? activation?.passed === true : null,
       core_verification_blocked: coreVerificationBlocked,
       core_verification_receipt_authentic: arm === "core" ? activation?.verification_authentic === true : null,
+      core_verification_status: verificationStatus,
       process_receipt_observable: arm === "plain" || activation?.process_receipt_observable === true,
       configuration_drift: configurationDrift, catalog_drift: catalogDrift,
       process_status: child?.status ?? managed.status, process_signal: child?.signal ?? managed.signal,
       infrastructure_failure_before_scoring: classification.infrastructure_failure_before_scoring,
       provider_submission_disposition_established: providerSubmissionDispositionEstablished,
+      reconciliation_required: classification.reconciliation_required,
       model_access_required: modelAccessRequired, scored_outcome: classification.scored_outcome,
       error_class: errorClass, duration_ms: managed.duration_ms, turn_count: events.turn_count,
       tool_call_count: events.tool_call_count, tokens: events.tokens, usage_observed: events.usage_observed,
@@ -1637,13 +1942,15 @@ async function executeAttempt(context, task, arm, attemptIndex, retryOf = null) 
       arm, attempt_index: attemptIndex, oracle_validated_task_success: false,
       task_specific_semantic_oracle_passed: false, syntax_verification_success: false, mutation_scope_valid: true,
       scope_violations: [], changed_paths: [], timed_out: false, no_change: true,
-      authentic_terminal_completion: false, process_containment_intact: true,
+      authentic_terminal_completion: false, process_containment_intact: true, no_surviving_descendants: true,
       hidden_data_leakage_observed: null, hidden_data_preflight_fingerprint: null,
       model_protocol_valid: false, core_activation: null,
       core_verification_blocked: false, core_verification_receipt_authentic: null, process_receipt_observable: false,
+      core_verification_status: arm === "core" ? "unavailable" : null,
       configuration_drift: false, catalog_drift: false, process_status: null, process_signal: null,
       infrastructure_failure_before_scoring: !modelAccessRequired, model_access_required: modelAccessRequired,
       provider_submission_disposition_established: true,
+      reconciliation_required: false,
       scored_outcome: false, error_class: modelAccessRequired ? "model-access" : "host-infrastructure",
       duration_ms: 0, turn_count: 0, tool_call_count: 0, tokens: "not_observable", usage_observed: false,
       stdout_sha256: sha256Bytes(Buffer.alloc(0)), stderr_sha256: sha256Bytes(Buffer.from(error?.message ?? String(error), "utf8")),
@@ -1678,21 +1985,6 @@ function completedOutcomes(context, task, arm) {
       dataset: task.dataset, identityId: task.id, arm, attemptIndex: index + 1,
       retryOf: index === 0 ? null : starts[index - 1].attempt_id })),
   "MEASUREMENT_RETRY", `${task.id}/${arm} attempt chain is invalid`);
-  expect(!records.some((record) => ["attempt-reconciliation-required", "attempt-critical-runner-defect"].includes(record.event_type)
-    && starts.some((started) => started.attempt_id === record.attempt_id)),
-  "MEASUREMENT_RECONCILIATION_REQUIRED", `${task.id}/${arm} has an unresolved reconciliation or critical runner-defect obligation`);
-  for (const started of starts) {
-    const terminal = records.filter((record) => ["attempt-completed", "attempt-aborted-before-model-process"].includes(record.event_type)
-      && record.attempt_id === started.attempt_id);
-    if (terminal.length === 0) {
-      const modelStarted = records.some((record) => record.event_type === "model-process-started" && record.attempt_id === started.attempt_id);
-      const reconciliation = records.some((record) => record.event_type === "attempt-reconciliation-required" && record.attempt_id === started.attempt_id);
-      expect(!modelStarted && !reconciliation, "MEASUREMENT_RECONCILIATION_REQUIRED",
-        `${started.attempt_id} has no terminal receipt after model process start; retry is forbidden`);
-      context.ledger.append({ event_type: "attempt-aborted-before-model-process", attempt_id: started.attempt_id,
-        attempt_binding_fingerprint: started.attempt_binding_fingerprint, recorded_at: new Date().toISOString() });
-    } else expect(terminal.length === 1, "MEASUREMENT_LEDGER", `${started.attempt_id} has multiple terminal events`);
-  }
   const outcomes = fs.existsSync(directory)
     ? fs.readdirSync(directory).filter((name) => name.startsWith(`${arm}-attempt-`) && name.endsWith(".json"))
       .map((name) => validateOutcomeReceipt(readJson(path.join(directory, name)), path.join(directory, name), {
@@ -1700,6 +1992,44 @@ function completedOutcomes(context, task, arm) {
       .sort((left, right) => left.value.attempt_index - right.value.attempt_index)
     : [];
   expect(outcomes.length <= 2, "MEASUREMENT_RETRY", `${task.id}/${arm} has too many receipts`);
+  const receiptByAttempt = new Map(outcomes.map((receipt) => [receipt.value.attempt_id, receipt]));
+  for (const started of starts) {
+    const terminal = context.ledger.records().filter((record) => ["attempt-completed", "attempt-aborted-before-model-process"].includes(record.event_type)
+      && record.attempt_id === started.attempt_id);
+    if (terminal.length === 0) {
+      const durableReceipt = receiptByAttempt.get(started.attempt_id);
+      if (durableReceipt !== undefined) {
+        const outcome = durableReceipt.value;
+        context.ledger.append({ event_type: "attempt-completed", attempt_id: started.attempt_id,
+          retry_of_attempt_id: outcome.retry_of_attempt_id ?? null, dataset: task.dataset, identity_id: task.id,
+          stratum: started.stratum, arm, attempt_index: outcome.attempt_index,
+          attempt_binding_fingerprint: outcome.attempt_binding_fingerprint,
+          outcome_fingerprint: outcome.outcome_fingerprint, receipt_sha256: durableReceipt.sha256,
+          scored_outcome: outcome.scored_outcome,
+          infrastructure_failure_before_scoring: outcome.infrastructure_failure_before_scoring,
+          model_access_required: outcome.model_access_required, recovered_from_durable_receipt: true,
+          recorded_at: new Date().toISOString() });
+        if (outcome.reconciliation_required === true) {
+          context.ledger.append({ event_type: "attempt-reconciliation-required", attempt_id: started.attempt_id,
+            attempt_binding_fingerprint: outcome.attempt_binding_fingerprint,
+            reason_code: "recovered-durable-receipt-requires-provider-reconciliation",
+            scored_outcome: outcome.scored_outcome, recorded_at: new Date().toISOString() });
+        }
+        continue;
+      }
+      const currentRecords = context.ledger.records();
+      const modelStarted = currentRecords.some((record) => record.event_type === "model-process-started" && record.attempt_id === started.attempt_id);
+      const reconciliation = currentRecords.some((record) => record.event_type === "attempt-reconciliation-required" && record.attempt_id === started.attempt_id);
+      expect(!modelStarted && !reconciliation, "MEASUREMENT_RECONCILIATION_REQUIRED",
+        `${started.attempt_id} has no terminal receipt after model process start; retry is forbidden`);
+      context.ledger.append({ event_type: "attempt-aborted-before-model-process", attempt_id: started.attempt_id,
+        attempt_binding_fingerprint: started.attempt_binding_fingerprint, recorded_at: new Date().toISOString() });
+    } else expect(terminal.length === 1, "MEASUREMENT_LEDGER", `${started.attempt_id} has multiple terminal events`);
+  }
+  const reconciledRecords = context.ledger.records();
+  expect(!reconciledRecords.some((record) => ["attempt-reconciliation-required", "attempt-critical-runner-defect"].includes(record.event_type)
+    && starts.some((started) => started.attempt_id === record.attempt_id)),
+  "MEASUREMENT_RECONCILIATION_REQUIRED", `${task.id}/${arm} has an unresolved reconciliation or critical runner-defect obligation`);
   for (const receipt of outcomes) {
     const completed = context.ledger.records().filter((record) => record.event_type === "attempt-completed"
       && record.attempt_id === receipt.value.attempt_id);
@@ -1712,6 +2042,10 @@ function completedOutcomes(context, task, arm) {
       && completed[0].model_access_required === receipt.value.model_access_required,
     "MEASUREMENT_RECEIPT", `${receipt.value.attempt_id} receipt does not match the append-only ledger`);
   }
+  const completedRecords = context.ledger.records().filter((record) => record.event_type === "attempt-completed"
+    && starts.some((started) => started.attempt_id === record.attempt_id));
+  expect(completedRecords.every((record) => receiptByAttempt.has(record.attempt_id)),
+    "MEASUREMENT_RECEIPT", `${task.id}/${arm} ledger completion lacks a durable receipt`);
   return Object.freeze({ outcomes: Object.freeze(outcomes.map((entry) => entry.value)),
     starts: Object.freeze(context.ledger.records().filter((record) => record.event_type === "attempt-started"
       && record.dataset === task.dataset && record.identity_id === task.id && record.arm === arm)
@@ -1784,6 +2118,7 @@ function campaignContext(options) {
     "pilot_manifest_fingerprint", "pilot manifest");
   expect(pilotManifest.pilot_manifest_fingerprint === frozen.manifest.real_pilot_manifest_fingerprint,
     "MEASUREMENT_PILOT", "pilot manifest differs from measurement manifest");
+  const acceptance = validateAcceptanceReceipt(options.acceptanceReceipt, frozen.manifest);
   const verifiedPilot = verifyPilotArtifact(options.pilotArtifact, options.pilotPublicKey);
   expect(verifiedPilot.artifact_sha256 === pilotManifest.private_calibration_artifact_sha256
     && verifiedPilot.artifact_size === pilotManifest.private_calibration_artifact_size
@@ -1798,9 +2133,13 @@ function campaignContext(options) {
   const product = verifyBenchmarkV3ProductBundle(productSourceRoot, options.coreBundle);
   expect(product.product_bundle_fingerprint === frozen.manifest.core_bundle_fingerprint
     && product.product_bundle_fingerprint === CORE_BUNDLE_FINGERPRINT,
-    "MEASUREMENT_PRODUCT", "core bundle differs from frozen manifest");
+  "MEASUREMENT_PRODUCT", "core bundle differs from frozen manifest");
+  const bundleManifest = readJson(path.join(product.materialized_core_directory, ".opencode-profile-manifest.json"), "core bundle manifest");
+  expect(bundleManifest.source_tree_fingerprint === frozen.manifest.product_tree_fingerprint,
+    "MEASUREMENT_PRODUCT", "product tree differs from frozen manifest");
   const opencode = verifyBenchmarkV3OpenCodeExecutable(path.resolve(options.opencode));
-  expect(opencode.version === frozen.manifest.opencode_version && opencode.sha256 === frozen.manifest.opencode_executable_sha256,
+  expect(opencode.version === frozen.manifest.opencode_version && opencode.sha256 === frozen.manifest.opencode_executable_sha256
+    && opencode.executable_fingerprint === frozen.manifest.opencode_executable_fingerprint,
     "MEASUREMENT_MODEL", "OpenCode executable differs from frozen manifest");
   verifyExactModelCatalog(opencode.path);
   const publicRuntime = loadAndVerifyPublicRuntime(options.publicRuntime);
@@ -1814,6 +2153,8 @@ function campaignContext(options) {
   const campaignBindingPath = path.join(campaignRoot, "campaign-binding.json");
   const campaignBinding = { schema_version: 1, manifest_fingerprint: frozen.manifest.manifest_fingerprint,
     manifest_sha256: frozen.sha256, pilot_manifest_fingerprint: pilotManifest.pilot_manifest_fingerprint,
+    acceptance_receipt_fingerprint: acceptance.receipt.acceptance_receipt_fingerprint,
+    acceptance_receipt_sha256: acceptance.sha256,
     runner_sha256: frozen.manifest.runner_sha256, created_at: frozen.manifest.created_at };
   if (!fs.existsSync(campaignBindingPath)) durableJson(campaignBindingPath, campaignBinding);
   else expect(canonicalJson(readJson(campaignBindingPath)) === canonicalJson(campaignBinding),
@@ -1838,7 +2179,12 @@ async function runCampaign(options) {
   const lease = acquireCampaignLease(campaignRoot, frozen.manifest.manifest_fingerprint);
   try {
     const context = campaignContext(options);
-    const corpus = loadBenchmarkV3Corpus(context.productSourceRoot); const publicTasks = buildPublicTasks(corpus);
+    const corpus = loadBenchmarkV3Corpus(context.productSourceRoot);
+    const validationIds = corpus.families.filter((family) => family.split === "validation").map((family) => family.family_id);
+    expect(corpus.corpus_fingerprint === context.manifest.corpus_fingerprint
+      && canonicalJson(validationIds) === canonicalJson(context.manifest.validation_family_ids),
+    "MEASUREMENT_CORPUS", "runtime validation corpus differs from the frozen manifest");
+    const publicTasks = buildPublicTasks(corpus);
     const pilotTasks = buildPilotTasks(context.pilotManifest, context.pilotArtifact, context.repositories);
     const byDataset = new Map([
       ["validation", publicTasks.filter((task) => task.dataset === "validation")],
@@ -1900,17 +2246,30 @@ function loadPairs(campaignRoot, dataset, ids, manifest, pilotManifest, ledgerRe
 function armOverhead(pairs, arm) {
   const outcomes = pairs.map((pair) => pair[arm]); const durations = outcomes.map((entry) => entry.duration_ms);
   const observableTokens = outcomes.every((entry) => Number.isSafeInteger(entry.tokens));
+  const count = (predicate) => outcomes.filter(predicate).length;
   return Object.freeze({ median_duration_ms: median(durations), mean_duration_ms: mean(durations), p90_duration_ms: p90(durations),
     model_turns: outcomes.reduce((sum, entry) => sum + entry.turn_count, 0),
     tool_calls: outcomes.reduce((sum, entry) => sum + entry.tool_call_count, 0),
     tokens: observableTokens ? outcomes.reduce((sum, entry) => sum + entry.tokens, 0) : "not_observable",
-    timeout_rate: outcomes.filter((entry) => entry.timed_out).length / outcomes.length,
-    authentic_terminal_completion_rate: outcomes.filter((entry) => entry.authentic_terminal_completion).length / outcomes.length,
-    process_failures: outcomes.filter((entry) => !entry.authentic_terminal_completion).length,
-    core_activation_rate: arm === "core" ? outcomes.filter((entry) => entry.core_activation).length / outcomes.length : null,
-    verification: arm === "core" ? Object.freeze({ pass: outcomes.filter((entry) => entry.core_activation).length,
-      fail: outcomes.filter((entry) => entry.core_verification_blocked && entry.core_verification_receipt_authentic).length,
-      unavailable: outcomes.filter((entry) => entry.core_verification_blocked && !entry.core_verification_receipt_authentic).length }) : null });
+    timeout_count: count((entry) => entry.timed_out), timeout_rate: count((entry) => entry.timed_out) / outcomes.length,
+    authentic_terminal_completion_count: count((entry) => entry.authentic_terminal_completion),
+    authentic_terminal_completion_rate: count((entry) => entry.authentic_terminal_completion) / outcomes.length,
+    process_failures: count((entry) => !entry.authentic_terminal_completion),
+    no_change_count: count((entry) => entry.no_change), no_change_rate: count((entry) => entry.no_change) / outcomes.length,
+    scope_violation_count: count((entry) => !entry.mutation_scope_valid),
+    scope_violation_rate: count((entry) => !entry.mutation_scope_valid) / outcomes.length,
+    semantic_oracle_failure_count: count((entry) => !entry.task_specific_semantic_oracle_passed),
+    semantic_oracle_failure_rate: count((entry) => !entry.task_specific_semantic_oracle_passed) / outcomes.length,
+    syntax_failure_count: count((entry) => !entry.syntax_verification_success),
+    syntax_failure_rate: count((entry) => !entry.syntax_verification_success) / outcomes.length,
+    core_activation_count: arm === "core" ? count((entry) => entry.core_activation) : null,
+    core_activation_rate: arm === "core" ? count((entry) => entry.core_activation) / outcomes.length : null,
+    verification: arm === "core" ? Object.freeze({
+      passed: count((entry) => entry.core_verification_status === "passed"),
+      failed: count((entry) => entry.core_verification_status === "failed"),
+      stale: count((entry) => entry.core_verification_status === "stale"),
+      unavailable: count((entry) => entry.core_verification_status === "unavailable"),
+    }) : null });
 }
 function derivedBootstrapSeed(manifestFingerprint, label) {
   expect(FP.test(manifestFingerprint ?? ""), "MEASUREMENT_STATISTICS", "manifest fingerprint is not a bootstrap seed");
@@ -1963,7 +2322,8 @@ function summarizePairs(pairs, label, manifestFingerprint, { primary = false } =
     plain_success_rate: plainSuccess / pairs.length, core_success_rate: coreSuccess / pairs.length,
     absolute_paired_delta: (coreSuccess - plainSuccess) / pairs.length,
     relative_lift: plainSuccess === 0 ? null : (coreSuccess - plainSuccess) / plainSuccess,
-    candidate_only_wins: candidateOnly, baseline_only_wins: baselineOnly, ties: pairs.length - discordant,
+    candidate_only_wins: candidateOnly, plain_only_wins: baselineOnly,
+    baseline_only_wins: baselineOnly, ties: pairs.length - discordant,
     exact_two_sided_mcnemar_p: exactTwoSidedMcNemar(baselineOnly, candidateOnly),
     exact_one_sided_core_greater_p: binomialUpperTail(discordant, candidateOnly),
     paired_95_ci: interval, strata, safety_observability: observability,
@@ -1987,7 +2347,8 @@ function summarizePairsDescriptive(pairs, label, manifestFingerprint) {
   return Object.freeze({ family_count: pairs.length, plain_successes: plain, core_successes: core,
     plain_success_rate: plain / pairs.length, core_success_rate: core / pairs.length,
     absolute_paired_delta: (core - plain) / pairs.length, relative_lift: plain === 0 ? null : (core - plain) / plain,
-    candidate_only_wins: candidateOnly, baseline_only_wins: baselineOnly, ties: pairs.length - candidateOnly - baselineOnly,
+    candidate_only_wins: candidateOnly, plain_only_wins: baselineOnly,
+    baseline_only_wins: baselineOnly, ties: pairs.length - candidateOnly - baselineOnly,
     paired_95_ci: pairedBootstrapInterval(pairs, BOOTSTRAP_RESAMPLES, derivedBootstrapSeed(manifestFingerprint, label)) });
 }
 function decisionLabel(primary) {
@@ -2018,7 +2379,7 @@ function renderReport(summary) {
     `- Core: ${value.core_successes}/${value.family_count} (${percentage(value.core_success_rate)})`,
     `- Absolute paired delta: ${points(value.absolute_paired_delta)}`,
     `- Relative lift: ${value.relative_lift === null ? "undefined (plain rate is zero)" : percentage(value.relative_lift)}`,
-    `- Candidate-only / baseline-only / ties: ${value.candidate_only_wins} / ${value.baseline_only_wins} / ${value.ties}`,
+    `- Candidate-only / plain-only / ties: ${value.candidate_only_wins} / ${value.plain_only_wins} / ${value.ties}`,
     `- Paired 95% CI: [${points(value.paired_95_ci[0])}, ${points(value.paired_95_ci[1])}]`,
     `- Exact two-sided McNemar p: ${value.exact_two_sided_mcnemar_p}`,
     `- Exact one-sided p (core > plain): ${value.exact_one_sided_core_greater_p}`,
@@ -2035,11 +2396,13 @@ function renderReport(summary) {
     `- Containment violations: ${value.objective_guardrails.containment_violations.count}`,
     `- Hidden-data leakage: ${value.objective_guardrails.hidden_data_leakage.count}`,
     `- Out-of-scope mutation rate plain / core: ${percentage(value.objective_guardrails.out_of_scope_mutation.plain_rate)} / ${percentage(value.objective_guardrails.out_of_scope_mutation.core_rate)}`,
+    `- Out-of-scope mutation count plain / core: ${value.overhead.plain.scope_violation_count} / ${value.overhead.core.scope_violation_count}`,
     `- Timeout-rate delta candidate minus plain: ${points(value.objective_guardrails.timeout.candidate_minus_plain)}`,
     `- Authentic-terminal-completion-rate delta candidate minus plain: ${points(value.objective_guardrails.authentic_terminal_completion.candidate_minus_plain)}`,
     `- Candidate verification receipts authentic / required: ${value.objective_guardrails.candidate_verification_receipts.authentic} / ${value.objective_guardrails.candidate_verification_receipts.required}`,
     `- All objective guardrails passed: ${value.objective_guardrails.all_passed}`,
     `- Semantic test successes plain / core: ${value.outcomes.semantic_success_plain} / ${value.outcomes.semantic_success_core}`,
+    `- Semantic oracle failures plain / core: ${value.overhead.plain.semantic_oracle_failure_count} / ${value.overhead.core.semantic_oracle_failure_count}`,
     `- Syntax verification successes plain / core: ${value.outcomes.syntax_success_plain} / ${value.outcomes.syntax_success_core}`,
     `- Timeouts plain / core: ${value.outcomes.timeouts_plain} / ${value.outcomes.timeouts_core}`,
     `- No-change outcomes plain / core: ${value.outcomes.no_change_plain} / ${value.outcomes.no_change_core}`,
@@ -2055,7 +2418,7 @@ function renderReport(summary) {
     `- Timeout rate plain / core: ${percentage(value.overhead.plain.timeout_rate)} / ${percentage(value.overhead.core.timeout_rate)}`,
     `- Process failures plain / core: ${value.overhead.plain.process_failures} / ${value.overhead.core.process_failures}`,
     `- Core activation rate: ${percentage(value.overhead.core.core_activation_rate)}`,
-    `- Core verification pass / fail / unavailable: ${value.overhead.core.verification.pass} / ${value.overhead.core.verification.fail} / ${value.overhead.core.verification.unavailable}`,
+    `- Core verification passed / failed / stale / unavailable: ${value.overhead.core.verification.passed} / ${value.overhead.core.verification.failed} / ${value.overhead.core.verification.stale} / ${value.overhead.core.verification.unavailable}`,
     "",
   ];
   return [
@@ -2074,7 +2437,7 @@ function renderReport(summary) {
     "",
     "- Severe regression oracle: not_available",
     "- HIGH/MEDIUM/CRITICAL regressions: not_observable; count and rate are null",
-    "- regression_free_task_success: not_computed (no_frozen_independent_severity_oracle)",
+    "- regression_free_task_success: not_computed (no frozen independent severity oracle)",
     "",
     "Severe regressions outside the frozen task-specific semantic oracles were not independently observable in this measurement.",
     "",
@@ -2096,6 +2459,8 @@ function reportCampaign(options) {
   const pilotManifest = validateFingerprint(readJson(path.resolve(options.pilotManifest)), "pilot_manifest_fingerprint", "pilot manifest");
   const ledgerFile = statRegular(path.join(campaignRoot, "attempt-ledger.jsonl"), "attempt ledger");
   const ledgerRecords = loadLedger(ledgerFile.path);
+  expect(!ledgerRecords.some((record) => ["attempt-reconciliation-required", "attempt-critical-runner-defect"].includes(record.event_type)),
+    "MEASUREMENT_RECONCILIATION_REQUIRED", "campaign has an unresolved reconciliation or critical runner-defect obligation");
   const datasets = {
     validation: loadPairs(campaignRoot, "validation", frozen.manifest.validation_family_ids, frozen.manifest, pilotManifest, ledgerRecords),
     pilot: loadPairs(campaignRoot, "pilot", frozen.manifest.real_pilot_identity_ids, frozen.manifest, pilotManifest, ledgerRecords),
@@ -2147,7 +2512,18 @@ function reportCampaign(options) {
     receipt_hashes: DATASETS.flatMap((dataset) => {
       const root = path.join(campaignRoot, "receipts", dataset);
       return fs.readdirSync(root, { recursive: true }).filter((entry) => String(entry).endsWith(".json"))
-        .map((entry) => ({ path: `${dataset}/${entry}`, sha256: sha256File(path.join(root, entry)) }));
+        .map((entry) => {
+          const target = path.join(root, entry); const stat = fs.lstatSync(target); const receipt = readJson(target, "attempt receipt");
+          expect(stat.isFile() && !stat.isSymbolicLink() && stat.nlink === 1,
+            "MEASUREMENT_REPORT", "attempt receipt archive contains an unsupported entry");
+          const disposition = receipt.scored_outcome === true
+            ? receipt.oracle_validated_task_success === true ? "scored_success" : "scored_failure"
+            : receipt.model_access_required === true ? "model_access_required"
+              : receipt.infrastructure_failure_before_scoring === true ? "infrastructure_failure_before_scoring"
+                : "unresolved_non_scored";
+          return { path: `${dataset}/${entry}`, sha256: sha256File(target), size: stat.size,
+            attempt_id: receipt.attempt_id, arm: receipt.arm, family_id: receipt.identity_id, disposition };
+        });
     }).sort((left, right) => left.path.localeCompare(right.path)) };
   durableJson(path.resolve(options.ledgerOutput), { ...ledgerHashBody, ledger_fingerprint: fingerprint(ledgerHashBody) });
   return Object.freeze({ status: "reported", decision_label: summary.decision_label,
@@ -2211,7 +2587,9 @@ async function selfTest({ containment = true } = {}) {
   }), "MEASUREMENT_SELF_TEST", "counterbalancing failed");
   const validSignals = Object.freeze({ arm: "plain", process_receipt_observable: true,
     authentic_terminal_completion: true, timed_out: false, process_containment_intact: true,
-    mutation_scope_valid: true, task_specific_semantic_oracle_passed: true,
+    no_surviving_descendants: true,
+    mutation_scope_valid: true, syntax_verification_success: true, no_change: false,
+    task_specific_semantic_oracle_passed: true, hidden_data_leakage_observed: false,
     authentic_current_core_verification_passed: null, explicit_infrastructure_failure: false,
     provider_submission_disposition_established: true });
   const observedSafety = safetyObservability();
@@ -2236,6 +2614,10 @@ async function selfTest({ containment = true } = {}) {
     "MEASUREMENT_SELF_TEST", "ambiguous timed-out submission lost its reconciliation obligation");
   expect(classifyAttemptSignals({ ...validSignals, mutation_scope_valid: false }).oracle_validated_task_success === false,
     "MEASUREMENT_SELF_TEST", "scope violation did not score failure");
+  expect(classifyAttemptSignals({ ...validSignals, syntax_verification_success: false }).oracle_validated_task_success === false,
+    "MEASUREMENT_SELF_TEST", "syntax failure did not score failure");
+  expect(classifyAttemptSignals({ ...validSignals, no_change: true }).oracle_validated_task_success === false,
+    "MEASUREMENT_SELF_TEST", "no-change result did not score failure");
   expect(classifyAttemptSignals({ ...validSignals, arm: "core",
     authentic_current_core_verification_passed: false }).oracle_validated_task_success === false,
   "MEASUREMENT_SELF_TEST", "core verification block did not score candidate failure");
@@ -2245,6 +2627,12 @@ async function selfTest({ containment = true } = {}) {
   expect(provenPreProviderHostTermination({ providerSubmissionCount: 0, signal: "SIGTRAP", spawnErrorCode: null })
     && !provenPreProviderHostTermination({ providerSubmissionCount: 1, signal: "SIGTRAP", spawnErrorCode: null }),
   "MEASUREMENT_SELF_TEST", "pre-provider host termination classification drifted");
+  expect(classifyError("provider returned status 503") === "model-protocol"
+    && classifyError("provider returned status 429") === "provider-infrastructure",
+  "MEASUREMENT_SELF_TEST", "post-submission 5xx response remained retry eligible");
+  expect(coreVerificationStatus({ verification_authentic: true, process_receipt_observable: true, passed: false,
+    receipt: { decision: { reason: "verification_stale_after_mutation" } } }) === "stale",
+  "MEASUREMENT_SELF_TEST", "stale core verification status was not preserved");
   const pairs = Array.from({ length: 60 }, (_entry, index) => ({ stratum: STRATA[Math.floor(index / 20)],
     plain: { oracle_validated_task_success: index < 30 }, core: { oracle_validated_task_success: index < 36 } }));
   const selfTestSeed = fingerprint({ schema_version: 1, seed: "self-test" });
@@ -2271,16 +2659,30 @@ async function selfTest({ containment = true } = {}) {
       attempt_index: 1, attempt_id: "validation-self-test-plain-1", retry_of_attempt_id: null,
       attempt_binding_fingerprint: binding, oracle_validated_task_success: true, scored_outcome: true,
       authentic_terminal_completion: true, timed_out: false, process_containment_intact: true,
-      mutation_scope_valid: true, task_specific_semantic_oracle_passed: true,
+      no_surviving_descendants: true,
+      mutation_scope_valid: true, syntax_verification_success: true, no_change: false,
+      task_specific_semantic_oracle_passed: true,
       hidden_data_leakage_observed: false,
-      hidden_data_preflight_fingerprint: fingerprint({ schema_version: 1, hidden: "absent" }) };
+      hidden_data_preflight_fingerprint: fingerprint({ schema_version: 1, hidden: "absent" }),
+      infrastructure_failure_before_scoring: false, model_access_required: false,
+      provider_submission_disposition_established: true, reconciliation_required: false };
     const receipt = { ...outcomeBody, outcome_fingerprint: fingerprint(outcomeBody) };
-    const receiptFile = path.join(receiptRoot, "receipt.json"); durableJson(receiptFile, receipt);
+    const receiptFile = receiptPath(receiptRoot, "validation", "self-test", "plain", 1); durableJson(receiptFile, receipt);
     validateOutcomeReceipt(receipt, receiptFile, { manifest, pilotManifest, dataset: "validation", identityId: "self-test", arm: "plain" });
     let receiptRejected = false;
     try { validateOutcomeReceipt({ ...receipt, scored_outcome: false }, receiptFile,
       { manifest, pilotManifest, dataset: "validation", identityId: "self-test", arm: "plain" }); } catch { receiptRejected = true; }
     expect(receiptRejected, "MEASUREMENT_SELF_TEST", "tampered outcome receipt was accepted");
+    const recoveryLedger = ledgerAppender(path.join(receiptRoot, "attempt-ledger.jsonl"));
+    recoveryLedger.append({ event_type: "attempt-started", attempt_id: receipt.attempt_id,
+      retry_of_attempt_id: null, dataset: "validation", identity_id: "self-test", stratum: "small", arm: "plain",
+      attempt_index: 1, attempt_binding_fingerprint: binding, recorded_at: new Date().toISOString() });
+    const recovered = completedOutcomes({ campaignRoot: receiptRoot, manifest, pilotManifest, ledger: recoveryLedger },
+      { dataset: "validation", id: "self-test" }, "plain");
+    expect(recovered.outcomes.length === 1 && recovered.outcomes[0].outcome_fingerprint === receipt.outcome_fingerprint
+      && recoveryLedger.records().some((entry) => entry.event_type === "attempt-completed"
+        && entry.recovered_from_durable_receipt === true),
+    "MEASUREMENT_SELF_TEST", "durable orphan receipt was not recovered into the append-only ledger");
   } finally { fs.rmSync(receiptRoot, { recursive: true, force: true }); }
   const leaseRoot = fs.mkdtempSync(path.join(fs.realpathSync.native(os.tmpdir()), "core-public-ab-lease-test-"));
   try {
@@ -2296,11 +2698,13 @@ async function selfTest({ containment = true } = {}) {
   } finally { fs.rmSync(leaseRoot, { recursive: true, force: true }); }
   const syntheticOutcome = (arm, success, overrides = {}) => Object.freeze({ oracle_validated_task_success: success,
     duration_ms: 1, turn_count: 1, tool_call_count: 0, tokens: 1, timed_out: false,
-    authentic_terminal_completion: true, process_containment_intact: true, hidden_data_leakage_observed: false,
+    authentic_terminal_completion: true, process_containment_intact: true, no_surviving_descendants: true,
+    hidden_data_leakage_observed: false,
     hidden_data_preflight_fingerprint: fingerprint({ schema_version: 1, hidden: "absent" }),
     mutation_scope_valid: true, task_specific_semantic_oracle_passed: success,
     syntax_verification_success: true, no_change: false, core_activation: arm === "core",
     core_verification_blocked: false, core_verification_receipt_authentic: arm === "core" ? true : null,
+    core_verification_status: arm === "core" ? "passed" : null,
     ...overrides });
   const reportPairs = Array.from({ length: 60 }, (_entry, index) => Object.freeze({ stratum: STRATA[Math.floor(index / 20)],
     plain: syntheticOutcome("plain", index < 30), core: syntheticOutcome("core", index < 36) }));
@@ -2324,7 +2728,7 @@ async function selfTest({ containment = true } = {}) {
     "MEASUREMENT_SELF_TEST", "plain-only absolute guardrail failure was falsely attributed as a core regression");
   return Object.freeze({ status: "passed", schedule_fingerprint: schedule.schedule_fingerprint,
     bootstrap_interval: first, exact_two_sided_0_6: exactTwoSidedMcNemar(0, 6), exact_one_sided_6_6: binomialUpperTail(6, 6),
-    measurement_contract_fingerprint: loadMeasurementContract().fingerprint, model_free_contract_tests: 10,
+    measurement_contract_fingerprint: loadMeasurementContract().fingerprint, model_free_contract_tests: 14,
     seatbelt_containment: containment ? "passed" : "not_run" });
 }
 
@@ -2335,6 +2739,7 @@ const { values } = parseArgs({ options: {
   "pilot-root": { type: "string" }, "pilot-artifact": { type: "string" }, "pilot-public-key": { type: "string" },
   "pilot-runtime-manifest": { type: "string" }, "pilot-manifest": { type: "string" },
   "pilot-manifest-output": { type: "string" }, "manifest": { type: "string" }, "manifest-output": { type: "string" },
+  "acceptance-output": { type: "string" }, "acceptance-receipt": { type: "string" },
   "campaign-root": { type: "string" }, "opencode-auth": { type: "string" },
   "summary-output": { type: "string" }, "report-output": { type: "string" }, "ledger-output": { type: "string" },
   "timeout-ms": { type: "string", default: String(DEFAULT_TIMEOUT_MS) }, "parallel-pairs": { type: "string", default: "4" },
@@ -2356,7 +2761,10 @@ try {
     pilotManifestOutput: required("pilot-manifest-output"), manifestOutput: required("manifest-output"),
     timeoutMs: required("timeout-ms"), parallelPairs: required("parallel-pairs"),
   });
+  else if (values.mode === "acceptance-probe") result = await runAcceptanceProbes({ manifest: required("manifest"),
+    coreBundle: required("core-bundle"), opencode: required("opencode"), acceptanceOutput: required("acceptance-output") });
   else if (values.mode === "run") result = await runCampaign({ manifest: required("manifest"), pilotManifest: required("pilot-manifest"),
+    acceptanceReceipt: required("acceptance-receipt"),
     productSourceRoot: required("product-source-root"), coreBundle: required("core-bundle"), opencode: required("opencode"),
     opencodeAuth: required("opencode-auth"), publicRepository: required("public-repository"), publicRuntime: required("public-runtime"),
     pilotRoot: required("pilot-root"), pilotArtifact: required("pilot-artifact"), pilotPublicKey: required("pilot-public-key"),
@@ -2364,7 +2772,7 @@ try {
   else if (values.mode === "report") result = reportCampaign({ manifest: required("manifest"), pilotManifest: required("pilot-manifest"),
     campaignRoot: required("campaign-root"), summaryOutput: required("summary-output"), reportOutput: required("report-output"),
     ledgerOutput: required("ledger-output") });
-  else fail("MEASUREMENT_ARGUMENT", "--mode must be contract-self-test, self-test, prepare-public-runtime, freeze, run, or report");
+  else fail("MEASUREMENT_ARGUMENT", "--mode must be contract-self-test, self-test, prepare-public-runtime, freeze, acceptance-probe, run, or report");
   process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
 } catch (error) {
   if (error?.code === "MODEL_ACCESS_REQUIRED") {

@@ -124,6 +124,22 @@ jobs:
             CI=true \
             npm run verify:portable
 
+      - name: Run core public A/B measurement contract tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo -u "$OPENCODE_QUALITY_RUN_USER" -- /usr/bin/env \
+            HOME="$OPENCODE_QUALITY_RUN_HOME" \
+            PATH="$PATH" \
+            CI=true \
+            GITHUB_ACTIONS=true \
+            GITHUB_SHA="$GITHUB_SHA" \
+            GITHUB_RUN_ID="$GITHUB_RUN_ID" \
+            GITHUB_RUN_ATTEMPT="$GITHUB_RUN_ATTEMPT" \
+            GITHUB_JOB="$GITHUB_JOB" \
+            GITHUB_REPOSITORY="$GITHUB_REPOSITORY" \
+            npm run verify:measurement:core-public-ab:contract
+
       - name: Upload deterministic receipt bundle
         if: always()
         shell: bash
@@ -617,6 +633,22 @@ jobs:
             OPENCODE_QUALITY_MACOS_WORKLOAD_UID="$OPENCODE_QUALITY_RUN_UID" \
             OPENCODE_QUALITY_MACOS_UID_MARKER="$OPENCODE_QUALITY_MACOS_UID_MARKER" \
             npm run verify
+
+      - name: Run provider-only core public A/B Seatbelt self-test
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo -u "$OPENCODE_QUALITY_RUN_USER" -- /usr/bin/env \
+            HOME="$OPENCODE_QUALITY_RUN_HOME" \
+            PATH="$PATH" \
+            CI=true \
+            GITHUB_ACTIONS=true \
+            GITHUB_SHA="$GITHUB_SHA" \
+            GITHUB_RUN_ID="$GITHUB_RUN_ID" \
+            GITHUB_RUN_ATTEMPT="$GITHUB_RUN_ATTEMPT" \
+            GITHUB_JOB="$GITHUB_JOB" \
+            GITHUB_REPOSITORY="$GITHUB_REPOSITORY" \
+            npm run verify:measurement:core-public-ab:seatbelt
 
       - name: Run macOS operational verifier
         shell: bash

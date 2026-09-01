@@ -78,6 +78,8 @@
     "verify:benchmark:v3:runner": "node scripts/verify-benchmark-v3-runner.mjs",
     "verify:benchmark:v3:provenance": "node scripts/verify-benchmark-v3-provenance.mjs",
     "verify:benchmark:v3:no-raw-bundles": "node scripts/verify-benchmark-v3-no-raw-bundles.mjs",
+    "verify:measurement:core-public-ab:contract": "node scripts/benchmark-core-public-ab.mjs --mode contract-self-test",
+    "verify:measurement:core-public-ab:seatbelt": "node scripts/benchmark-core-public-ab.mjs --mode self-test",
     "verify:portable": "node scripts/verify-benchmark-v3-portable.mjs",
     "verify:development-readiness": "node scripts/verify-benchmark-v3-development-readiness.mjs",
     "verify:holdout-readiness": "node scripts/verify-benchmark-v3-holdout-readiness.mjs",

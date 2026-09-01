@@ -12,8 +12,12 @@
         "authentic_terminal_completion",
         "timed_out_equals_false",
         "process_containment_intact",
+        "no_surviving_descendants",
         "mutation_scope_valid",
-        "task_specific_semantic_oracle_passed"
+        "syntax_verification_passed",
+        "changed_paths_nonempty",
+        "task_specific_semantic_oracle_passed",
+        "hidden_data_leakage_equals_false"
       ],
       "candidate_additional_requirement": "authentic_current_core_verification_passed",
       "candidate_verification_block_is_scored_failure": true,
@@ -23,7 +27,7 @@
   "excluded_metrics": {
     "regression_free_task_success": {
       "status": "not_computed",
-      "reason": "no_frozen_independent_severity_oracle"
+      "reason": "no frozen independent severity oracle"
     }
   },
   "safety_observability": {
@@ -77,7 +81,7 @@
     },
     "development_sensitivity": {
       "included": false,
-      "reason": "bounded campaign uses validation primary plus real-repository pilot"
+      "reason": "bounded measurement uses validation primary plus frozen real-commit pilot"
     }
   },
   "model_call_budget": {
