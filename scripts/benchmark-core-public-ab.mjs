@@ -67,11 +67,26 @@ const PILOT_ADAPTERS = Object.freeze({
 const FP = /^sha256:[0-9a-f]{64}$/u;
 const SHA = /^[0-9a-f]{40}$/u;
 const BENCHMARK_INPUT_PATHS = Object.freeze([
+  "lib/feedback/contracts.mjs",
   "lib/benchmark/v3-corpus.mjs",
   "lib/benchmark/v3-design.mjs",
+  "lib/benchmark/v3-provider-auth-state.mjs",
+  "lib/benchmark/v3-runner.mjs",
   "lib/benchmark/statistics.mjs",
 ]);
+const MEASUREMENT_SOURCE_ALLOWED_PATHS = Object.freeze([
+  "measurement-manifest.json",
+  "scripts/benchmark-core-public-ab.mjs",
+]);
+const MEASUREMENT_SOURCE_ALLOWED_PREFIXES = Object.freeze([
+  "benchmarks/results/core-public-ab-measurement-v1/",
+  "docs/research/core-public-ab-measurement-v1/",
+]);
 const PROVIDER_RESPONSE_LIMIT = 64 * 1024 * 1024;
+const FROZEN_SAFETY_ORACLE = Object.freeze({
+  independent_new_regression_classification: false,
+  reason: "published benchmark v3 has task-specific semantic oracles and unclassified defect severity, but no frozen oracle for new HIGH/MEDIUM/CRITICAL regressions",
+});
 
 const PROVIDER_PROXY_PLUGIN = String.raw`import fs from "node:fs";
 import path from "node:path";
@@ -223,9 +238,14 @@ function durableJson(target, value, { exclusive = true } = {}) {
 }
 function appendDurableLine(target, value) {
   fs.mkdirSync(path.dirname(target), { recursive: true, mode: 0o700 });
+  const existed = fs.existsSync(target);
   const descriptor = fs.openSync(target, fs.constants.O_WRONLY | fs.constants.O_CREAT | fs.constants.O_APPEND, 0o600);
   try { fs.writeFileSync(descriptor, `${JSON.stringify(value)}\n`); fs.fsyncSync(descriptor); }
   finally { fs.closeSync(descriptor); }
+  if (!existed) {
+    const parent = fs.openSync(path.dirname(target), fs.constants.O_RDONLY);
+    try { fs.fsyncSync(parent); } finally { fs.closeSync(parent); }
+  }
 }
 function bodyFingerprint(value, fingerprintKey) {
   const body = { ...value }; delete body[fingerprintKey];
@@ -245,6 +265,12 @@ function canonicalFileInventory(root, relativePaths) {
 function verifyPublishedBenchmarkInputs(productSourceRoot) {
   const ancestor = git(SOURCE_ROOT, ["merge-base", "--is-ancestor", PRODUCT_SOURCE_SHA, "HEAD"]);
   expect(passed(ancestor), "MEASUREMENT_SOURCE", "measurement runner branch does not descend from the published source SHA");
+  const delta = git(SOURCE_ROOT, ["diff", "--name-only", `${PRODUCT_SOURCE_SHA}...HEAD`]);
+  expect(passed(delta), "MEASUREMENT_SOURCE", "measurement source delta is unavailable");
+  const changed = delta.stdout.trim().split("\n").filter(Boolean);
+  expect(changed.every((entry) => MEASUREMENT_SOURCE_ALLOWED_PATHS.includes(entry)
+    || MEASUREMENT_SOURCE_ALLOWED_PREFIXES.some((prefix) => entry.startsWith(prefix))),
+  "MEASUREMENT_SOURCE", "measurement branch changes a published product or benchmark dependency");
   const published = canonicalFileInventory(productSourceRoot, BENCHMARK_INPUT_PATHS);
   const measurement = canonicalFileInventory(SOURCE_ROOT, BENCHMARK_INPUT_PATHS);
   expect(canonicalJson(published) === canonicalJson(measurement), "MEASUREMENT_SOURCE",
@@ -272,7 +298,9 @@ async function createProviderProxy(credentialStore, socketPath) {
   if (snapshot.auth.expires <= Date.now() + 30_000) await preflightBenchmarkV3ProviderCredentialStore(credentialStore);
   const credentialBroker = await createBenchmarkV3OAuthCredentialBroker({ credentialStore });
   let capability = randomBytes(32).toString("base64url"); let closed = false;
-  const sockets = new Set(); const providerControllers = new Set();
+  const sockets = new Set(); const providerControllers = new Set(); const operations = new Set();
+  let acceptedRequests = 0; let providerSubmissions = 0; let ambiguousSubmissions = 0;
+  const providerResponseStatuses = [];
   const server = createServer((request, response) => {
     const reject = (status, code) => {
       if (!response.headersSent) response.writeHead(status, { "cache-control": "no-store", "content-type": "application/json" });
@@ -282,13 +310,15 @@ async function createProviderProxy(credentialStore, socketPath) {
       || request.headers["transfer-encoding"] !== undefined || !secureEqualAuthorization(request.headers.authorization, capability)) {
       reject(403, "forbidden"); return;
     }
+    acceptedRequests += 1;
     const length = Number(request.headers["content-length"] ?? -1);
     if (!Number.isSafeInteger(length) || length < 2 || length > 44 * 1024 * 1024) { reject(413, "request_too_large"); return; }
     const chunks = []; let bytes = 0;
     request.on("data", (chunk) => { bytes += chunk.length; if (bytes <= length) chunks.push(chunk); else request.destroy(); });
-    request.on("end", async () => {
-      let body = Buffer.concat(chunks); let providerBody = null; let credentialBody = null;
-      try {
+    request.on("end", () => {
+      const operation = (async () => {
+        let body = Buffer.concat(chunks); let providerBody = null; let credentialBody = null;
+        try {
         expect(body.length === length, "MEASUREMENT_PROVIDER_PROXY", "provider proxy request length differs");
         const value = JSON.parse(body.toString("utf8"));
         expect(value?.schema_version === 1 && value.method === "POST"
@@ -313,15 +343,23 @@ async function createProviderProxy(credentialStore, socketPath) {
         const controller = new AbortController(); providerControllers.add(controller);
         let provider;
         try {
+          providerSubmissions += 1;
           provider = await fetch("https://chatgpt.com/backend-api/codex/responses", {
             method: "POST", redirect: "manual", headers, body: providerBody, signal: controller.signal,
           });
+          providerResponseStatuses.push(provider.status);
+        } catch (error) {
+          ambiguousSubmissions += 1; providerControllers.delete(controller); throw error;
+        }
+        let responseBytes;
+        try {
+          expect(!(provider.status >= 300 && provider.status < 400), "MEASUREMENT_PROVIDER_PROXY", "provider redirect is forbidden");
+          const declared = Number(provider.headers.get("content-length") ?? 0);
+          expect(!Number.isFinite(declared) || declared <= PROVIDER_RESPONSE_LIMIT,
+            "MEASUREMENT_PROVIDER_PROXY", "provider response exceeds the frozen bound");
+          try { responseBytes = Buffer.from(await provider.arrayBuffer()); }
+          catch (error) { ambiguousSubmissions += 1; throw error; }
         } finally { providerControllers.delete(controller); }
-        expect(!(provider.status >= 300 && provider.status < 400), "MEASUREMENT_PROVIDER_PROXY", "provider redirect is forbidden");
-        const declared = Number(provider.headers.get("content-length") ?? 0);
-        expect(!Number.isFinite(declared) || declared <= PROVIDER_RESPONSE_LIMIT,
-          "MEASUREMENT_PROVIDER_PROXY", "provider response exceeds the frozen bound");
-        const responseBytes = Buffer.from(await provider.arrayBuffer());
         expect(responseBytes.length <= PROVIDER_RESPONSE_LIMIT, "MEASUREMENT_PROVIDER_PROXY", "provider response is too large");
         const responseHeaders = [];
         for (const name of ["content-type", "x-request-id", "openai-processing-ms"]) {
@@ -332,12 +370,14 @@ async function createProviderProxy(credentialStore, socketPath) {
         response.writeHead(200, { "cache-control": "no-store", "content-type": "application/json",
           "content-length": Buffer.byteLength(envelope) }); response.end(envelope);
         responseBytes.fill(0);
-      } catch (error) {
-        reject(error?.code === "MODEL_ACCESS_REQUIRED" ? 401 : 503,
-          error?.code === "MODEL_ACCESS_REQUIRED" ? "model_access_required" : "provider_proxy_failure");
-      } finally {
-        body.fill(0); providerBody?.fill(0); credentialBody?.fill(0);
-      }
+        } catch (error) {
+          reject(error?.code === "MODEL_ACCESS_REQUIRED" ? 401 : 503,
+            error?.code === "MODEL_ACCESS_REQUIRED" ? "model_access_required" : "provider_proxy_failure");
+        } finally {
+          body.fill(0); providerBody?.fill(0); credentialBody?.fill(0);
+        }
+      })();
+      operations.add(operation); operation.then(() => operations.delete(operation), () => operations.delete(operation));
     });
   });
   server.on("connection", (socket) => { sockets.add(socket); socket.once("close", () => sockets.delete(socket)); });
@@ -352,15 +392,20 @@ async function createProviderProxy(credentialStore, socketPath) {
     return Object.freeze({ socket_path: socketPath,
       payload: Object.freeze({ schema_version: 1, provider: "openai", proxy_socket: socketPath,
         proxy_capability: capability }),
+      status() { return Object.freeze({ accepted_request_count: acceptedRequests,
+        provider_submission_count: providerSubmissions, provider_response_statuses: Object.freeze(providerResponseStatuses.slice()),
+        ambiguous_submission_count: ambiguousSubmissions }); },
       async close() {
         if (closed) return; closed = true; capability = ""; for (const controller of providerControllers) controller.abort();
         for (const socket of sockets) socket.destroy();
+        await Promise.allSettled([...operations]);
         await new Promise((resolve) => server.close(() => resolve())); await credentialBroker.close();
         try { fs.unlinkSync(socketPath); } catch (error) { if (error?.code !== "ENOENT") throw error; }
       } });
   } catch (error) {
     closed = true; capability = ""; for (const controller of providerControllers) controller.abort();
     for (const socket of sockets) socket.destroy();
+    await Promise.allSettled([...operations]);
     await new Promise((resolve) => server.close(() => resolve())); await credentialBroker.close();
     try { fs.unlinkSync(socketPath); } catch {} throw error;
   }
@@ -459,6 +504,10 @@ function verifyPilotArtifact(artifactPath, publicKeyPath) {
     && Array.isArray(artifact.payload.independent_pool) && artifact.payload.independent_pool.length === 29,
   "MEASUREMENT_PILOT", "pilot calibration artifact shape is invalid");
   const payload = artifact.payload;
+  const identityIds = payload.independent_pool.map((identity) => identity?.identity_id);
+  expect(identityIds.every((identityId) => typeof identityId === "string" && /^[A-Za-z0-9._-]+$/u.test(identityId))
+    && new Set(identityIds).size === 29,
+  "MEASUREMENT_PILOT", "pilot calibration artifact does not contain 29 unique path-safe identity IDs");
   expect(payload.receipt_fingerprint === fingerprint(Object.fromEntries(Object.entries(payload)
     .filter(([key]) => key !== "receipt_fingerprint"))), "MEASUREMENT_PILOT", "pilot receipt fingerprint is invalid");
   const keyBytes = fs.readFileSync(keyFile.path);
@@ -621,9 +670,24 @@ function evaluatorFingerprint() {
 function verifyExactModelCatalog(opencodePath) {
   const result = run(opencodePath, ["models", MODEL_BINDING.provider, "--verbose"], { timeout: 30_000 });
   const output = `${result.stdout}\n${result.stderr}`;
-  if (!passed(result) || !output.includes(`${MODEL_BINDING.provider}/${MODEL_BINDING.model}`)
-    || !output.includes(`"id": "${MODEL_BINDING.model}"`)
-    || !output.includes(`"${MODEL_BINDING.variant}":`)) {
+  const entries = [];
+  if (passed(result)) {
+    const lines = output.split("\n");
+    for (let index = 0; index < lines.length; index += 1) {
+      const label = lines[index].trim();
+      if (!/^[A-Za-z0-9._-]+\/[A-Za-z0-9._-]+$/u.test(label) || lines[index + 1]?.trim() !== "{") continue;
+      let source = ""; let parsed = null;
+      for (index += 1; index < lines.length; index += 1) {
+        source += `${lines[index]}\n`;
+        try { parsed = JSON.parse(source); } catch { continue; }
+        entries.push(Object.freeze({ label, value: parsed })); break;
+      }
+    }
+  }
+  const target = entries.filter((entry) => entry.label === `${MODEL_BINDING.provider}/${MODEL_BINDING.model}`
+    && entry.value?.id === MODEL_BINDING.model && entry.value?.providerID === MODEL_BINDING.provider
+    && entry.value?.api?.id === MODEL_BINDING.model && entry.value?.status === "active");
+  if (target.length !== 1 || target[0].value?.variants?.[MODEL_BINDING.variant]?.reasoningEffort !== MODEL_BINDING.variant) {
     fail("MODEL_ACCESS_REQUIRED", "exact openai/gpt-5.6-luna/low binding is absent from the OpenCode model catalog");
   }
   return Object.freeze({ model_catalog_entry: `${MODEL_BINDING.provider}/${MODEL_BINDING.model}`,
@@ -652,6 +716,8 @@ function freezeManifests(options) {
     && STRATA.every((stratum) => validation.filter((family) => family.stratum === stratum).length === 20)
     && STRATA.every((stratum) => development.filter((family) => family.stratum === stratum).length === 20),
   "MEASUREMENT_CORPUS", "public benchmark split counts differ");
+  expect(FROZEN_SAFETY_ORACLE.independent_new_regression_classification === true,
+    "MEASUREMENT_SAFETY_ORACLE_REQUIRED", FROZEN_SAFETY_ORACLE.reason);
   const schedules = Object.freeze({
     validation: buildSchedule("validation", validation.map((family) => ({ id: family.family_id, stratum: family.stratum }))),
     development: buildSchedule("development", development.map((family) => ({ id: family.family_id, stratum: family.stratum }))),
@@ -880,6 +946,7 @@ async function installCredentialBridge({ attemptDirectory, configuration, creden
     fs.writeFileSync(plugin, PROVIDER_PROXY_PLUGIN, { encoding: "utf8", flag: "wx", mode: 0o400 });
     return Object.freeze({ credential_file: credentialFile, provider_proxy_socket: proxy.socket_path,
       placeholder_auth_content: JSON.stringify({ openai: { type: "api", key: "core-public-ab-host-provider-proxy" } }),
+      status() { return proxy.status(); },
       async close() { await proxy.close(); } });
   } catch (error) {
     await proxy?.close(); throw error;
@@ -1105,6 +1172,48 @@ function ledgerAppender(file) {
     records = [...records, record]; previous = record.event_hash; return record;
   } });
 }
+function processAlive(pid) {
+  try { process.kill(pid, 0); return true; }
+  catch (error) { return error?.code !== "ESRCH"; }
+}
+function acquireCampaignLease(campaignRoot, manifestFingerprint) {
+  fs.mkdirSync(campaignRoot, { recursive: true, mode: 0o700 });
+  const leasePath = path.join(campaignRoot, "campaign-run.lock");
+  const nonce = randomBytes(32).toString("base64url");
+  const value = Object.freeze({ schema_version: 1, hostname: os.hostname(), pid: process.pid, nonce,
+    manifest_fingerprint: manifestFingerprint, acquired_at: new Date().toISOString() });
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      const descriptor = fs.openSync(leasePath, fs.constants.O_WRONLY | fs.constants.O_CREAT | fs.constants.O_EXCL, 0o600);
+      try { fs.writeFileSync(descriptor, `${JSON.stringify(value)}\n`); fs.fsyncSync(descriptor); }
+      finally { fs.closeSync(descriptor); }
+      const parent = fs.openSync(campaignRoot, fs.constants.O_RDONLY); try { fs.fsyncSync(parent); } finally { fs.closeSync(parent); }
+      return Object.freeze({ async close() {
+        let current; try { current = readJson(leasePath, "campaign lease"); } catch {
+          fail("MEASUREMENT_CAMPAIGN_LEASE", "campaign lease disappeared or became invalid");
+        }
+        expect(current.nonce === nonce && current.pid === process.pid && current.hostname === os.hostname(),
+          "MEASUREMENT_CAMPAIGN_LEASE", "campaign lease ownership changed");
+        fs.unlinkSync(leasePath);
+        const directory = fs.openSync(campaignRoot, fs.constants.O_RDONLY);
+        try { fs.fsyncSync(directory); } finally { fs.closeSync(directory); }
+      } });
+    } catch (error) {
+      if (error?.code !== "EEXIST") throw error;
+      let current; try { current = readJson(leasePath, "campaign lease"); }
+      catch { fail("MEASUREMENT_CAMPAIGN_BUSY", "campaign lease is invalid and requires operator reconciliation"); }
+      if (current?.hostname !== os.hostname()) {
+        fail("MEASUREMENT_CAMPAIGN_BUSY", "campaign is leased on another host and cannot be proven stale");
+      }
+      if (Number.isSafeInteger(current.pid) && current.pid > 0 && processAlive(current.pid)) {
+        fail("MEASUREMENT_CAMPAIGN_BUSY", `campaign is already running under pid ${current.pid}`);
+      }
+      const stale = path.join(campaignRoot, `campaign-run.stale-${fingerprint(current).slice(7, 23)}.json`);
+      try { fs.renameSync(leasePath, stale); } catch (renameError) { if (renameError?.code !== "ENOENT") throw renameError; }
+    }
+  }
+  fail("MEASUREMENT_CAMPAIGN_BUSY", "campaign lease could not be acquired without a race");
+}
 
 function attemptIdentifier(dataset, identityId, arm, attemptIndex) {
   return `${dataset}-${identityId.replace(/[^A-Za-z0-9._-]+/gu, "-")}-${arm}-${attemptIndex}`;
@@ -1164,9 +1273,9 @@ async function executeAttempt(context, task, arm, attemptIndex, retryOf = null) 
     modelProcessStarted = true;
     const managed = await runManagedProcess({ file, args, cwd: workspace,
       env: modelEnvironment(attemptDirectory, configuration, credential), profile,
-      timeoutMs: arm === "core" ? context.manifest.timeout_ms + 330_000 : context.manifest.timeout_ms,
+      timeoutMs: context.manifest.timeout_ms,
       candidate: arm === "core" });
-    await credential.close(); credential = null;
+    await credential.close(); const providerEvidence = credential.status(); credential = null;
     expect(managed.teardown_verified === true, "MEASUREMENT_RECONCILIATION_REQUIRED",
       `${attemptId} model process tree teardown is unverified; hidden oracle remains sealed`);
     const events = parseOpenCodeEvents(managed.stdout);
@@ -1195,8 +1304,19 @@ async function executeAttempt(context, task, arm, attemptIndex, retryOf = null) 
       && !timeout && authenticProcessCompletion && !coreVerificationBlocked
       && hostEnvironmentIntegrity;
     const errorClass = authenticProcessCompletion ? null : classifyError(`${managed.stderr}\n${managed.stdout}\n${managed.activation}`);
-    const modelAccessRequired = errorClass === "model-access";
-    const scoredOutcome = true;
+    const providerAccessFailure = providerEvidence.provider_response_statuses.some((status) => status === 401 || status === 403);
+    const providerInfrastructureFailure = providerEvidence.provider_response_statuses.some((status) => status === 429 || status >= 500);
+    const modelAccessRequired = errorClass === "model-access" || providerAccessFailure;
+    if (providerEvidence.ambiguous_submission_count > 0 && !timeout) {
+      fail("MEASUREMENT_RECONCILIATION_REQUIRED",
+        `${attemptId} has an ambiguous provider submission after the model boundary; retry is forbidden`);
+    }
+    const infrastructureFailureBeforeScoring = !timeout && changed.length === 0 && !oracle.semantic_passed
+      && !authenticProcessCompletion && !configurationDrift && !catalogDrift
+      && providerEvidence.ambiguous_submission_count === 0 && !modelAccessRequired
+      && (providerInfrastructureFailure || (providerEvidence.provider_submission_count === 0
+        && ["host-infrastructure", "provider-infrastructure"].includes(errorClass)));
+    const scoredOutcome = !infrastructureFailureBeforeScoring;
     const outcomeBody = { schema_version: 1, attempt_id: attemptId, retry_of_attempt_id: retryOf,
       attempt_binding_fingerprint: attemptBinding, dataset: task.dataset, identity_id: task.id, stratum: task.stratum,
       arm, attempt_index: attemptIndex, severity: task.severity,
@@ -1208,10 +1328,11 @@ async function executeAttempt(context, task, arm, attemptIndex, retryOf = null) 
       core_verification_blocked: coreVerificationBlocked, core_verification_authentic: arm === "core" ? activation?.authentic === true : null,
       configuration_drift: configurationDrift, catalog_drift: catalogDrift,
       process_status: child?.status ?? managed.status, process_signal: child?.signal ?? managed.signal,
-      infrastructure_failure_before_scoring: false,
+      infrastructure_failure_before_scoring: infrastructureFailureBeforeScoring,
       model_access_required: modelAccessRequired, scored_outcome: scoredOutcome || regressionFreeSuccess,
       error_class: errorClass, duration_ms: managed.duration_ms, turn_count: events.turn_count,
       tool_call_count: events.tool_call_count, tokens: events.tokens, usage_observed: events.usage_observed,
+      provider_evidence: providerEvidence,
       stdout_sha256: sha256Bytes(Buffer.from(managed.stdout, "utf8")), stderr_sha256: sha256Bytes(Buffer.from(managed.stderr, "utf8")),
       stdout_bytes: Buffer.byteLength(managed.stdout), stderr_bytes: Buffer.byteLength(managed.stderr),
       oracle_result_fingerprint: oracle.result_fingerprint,
@@ -1375,8 +1496,8 @@ function initializeCredentialState(campaignRoot, authPath) {
 function campaignContext(options) {
   const frozen = validateMeasurementManifest(options.manifest);
   assertClean(SOURCE_ROOT);
-  expect(gitSha(SOURCE_ROOT) === frozen.manifest.runner_source_commit,
-    "MEASUREMENT_SOURCE", "runner source commit differs from manifest");
+  expect(passed(git(SOURCE_ROOT, ["merge-base", "--is-ancestor", frozen.manifest.runner_source_commit, "HEAD"])),
+    "MEASUREMENT_SOURCE", "runner source commit is not an ancestor of the current evidence branch");
   const pilotManifestFile = statRegular(options.pilotManifest, "pilot manifest");
   const pilotManifest = validateFingerprint(readJson(pilotManifestFile.path, "pilot manifest"),
     "pilot_manifest_fingerprint", "pilot manifest");
@@ -1384,7 +1505,9 @@ function campaignContext(options) {
     "MEASUREMENT_PILOT", "pilot manifest differs from measurement manifest");
   const verifiedPilot = verifyPilotArtifact(options.pilotArtifact, options.pilotPublicKey);
   expect(verifiedPilot.artifact_sha256 === pilotManifest.private_calibration_artifact_sha256
-    && verifiedPilot.artifact_size === pilotManifest.private_calibration_artifact_size,
+    && verifiedPilot.artifact_size === pilotManifest.private_calibration_artifact_size
+    && verifiedPilot.public_key_sha256 === pilotManifest.issuer_spki_sha256
+    && verifiedPilot.artifact.payload.receipt_fingerprint === pilotManifest.private_calibration_receipt_fingerprint,
   "MEASUREMENT_PILOT", "pilot calibration artifact differs from frozen manifest");
   const productSourceRoot = statDirectory(options.productSourceRoot, "product source root"); assertClean(productSourceRoot);
   expect(gitSha(productSourceRoot) === PRODUCT_SOURCE_SHA, "MEASUREMENT_SOURCE", "product source changed");
@@ -1427,24 +1550,29 @@ function campaignContext(options) {
 }
 
 async function runCampaign(options) {
-  const context = campaignContext(options);
-  const corpus = loadBenchmarkV3Corpus(context.productSourceRoot); const publicTasks = buildPublicTasks(corpus);
-  const pilotTasks = buildPilotTasks(context.pilotManifest, context.pilotArtifact, context.repositories);
-  const byDataset = new Map([
-    ["validation", publicTasks.filter((task) => task.dataset === "validation")],
-    ["development", publicTasks.filter((task) => task.dataset === "development")],
-    ["pilot", pilotTasks],
-  ]);
-  for (const dataset of context.manifest.execution_policy.dataset_order) {
-    const tasks = byDataset.get(dataset);
-    await runPool(tasks, context.manifest.parallel_pairs, async (task, index) => {
-      const pair = await runPair(context, task);
-      process.stderr.write(`[${dataset}] ${index + 1}/${tasks.length} ${task.id} plain=${Number(pair.plain.regression_free_task_success)} core=${Number(pair.core.regression_free_task_success)}\n`);
-      return pair;
-    });
-  }
-  return Object.freeze({ status: "campaign-complete", receipt_count: DATASETS.reduce((sum, dataset) => sum
-    + fs.readdirSync(path.join(context.campaignRoot, "receipts", dataset), { recursive: true }).filter((entry) => String(entry).endsWith(".json")).length, 0) });
+  const frozen = validateMeasurementManifest(options.manifest);
+  const campaignRoot = path.resolve(options.campaignRoot);
+  const lease = acquireCampaignLease(campaignRoot, frozen.manifest.manifest_fingerprint);
+  try {
+    const context = campaignContext(options);
+    const corpus = loadBenchmarkV3Corpus(context.productSourceRoot); const publicTasks = buildPublicTasks(corpus);
+    const pilotTasks = buildPilotTasks(context.pilotManifest, context.pilotArtifact, context.repositories);
+    const byDataset = new Map([
+      ["validation", publicTasks.filter((task) => task.dataset === "validation")],
+      ["development", publicTasks.filter((task) => task.dataset === "development")],
+      ["pilot", pilotTasks],
+    ]);
+    for (const dataset of context.manifest.execution_policy.dataset_order) {
+      const tasks = byDataset.get(dataset);
+      await runPool(tasks, context.manifest.parallel_pairs, async (task, index) => {
+        const pair = await runPair(context, task);
+        process.stderr.write(`[${dataset}] ${index + 1}/${tasks.length} ${task.id} plain=${Number(pair.plain.regression_free_task_success)} core=${Number(pair.core.regression_free_task_success)}\n`);
+        return pair;
+      });
+    }
+    return Object.freeze({ status: "campaign-complete", receipt_count: DATASETS.reduce((sum, dataset) => sum
+      + fs.readdirSync(path.join(context.campaignRoot, "receipts", dataset), { recursive: true }).filter((entry) => String(entry).endsWith(".json")).length, 0) });
+  } finally { await lease.close(); }
 }
 
 function loadPairs(campaignRoot, dataset, ids, manifest, pilotManifest, ledgerRecords) {
@@ -1567,8 +1695,9 @@ function decisionLabel(primary) {
     || primary.safety.new_unclassified_semantic_regressions > 0
     || primary.safety.scope_violations_core > primary.safety.scope_violations_plain
     || primary.safety.core_verification_blocked > 0;
+  const safetyObservable = primary.safety.high_medium_task_count > 0;
   if (primary.absolute_paired_delta >= 0.05 && primary.paired_95_ci[0] > 0
-    && primary.exact_one_sided_core_greater_p < 0.05 && !safetyWorse && timeoutDelta <= 0.05) {
+    && primary.exact_one_sided_core_greater_p < 0.05 && safetyObservable && !safetyWorse && timeoutDelta <= 0.05) {
     return "CORE IMPROVES ON PUBLIC VALIDATION BENCHMARK";
   }
   if (primary.absolute_paired_delta < 0 || safetyWorse || timeoutDelta > 0.05 || processFailureDelta > 0.05) return "CORE REGRESSES";
@@ -1786,6 +1915,18 @@ async function selfTest() {
       { manifest, pilotManifest, dataset: "validation", identityId: "self-test", arm: "plain" }); } catch { receiptRejected = true; }
     expect(receiptRejected, "MEASUREMENT_SELF_TEST", "tampered outcome receipt was accepted");
   } finally { fs.rmSync(receiptRoot, { recursive: true, force: true }); }
+  const leaseRoot = fs.mkdtempSync(path.join(fs.realpathSync.native(os.tmpdir()), "core-public-ab-lease-test-"));
+  try {
+    const leaseFingerprint = fingerprint({ schema_version: 1, lease: "self-test" });
+    const firstLease = acquireCampaignLease(leaseRoot, leaseFingerprint);
+    let concurrentRejected = false;
+    try { acquireCampaignLease(leaseRoot, leaseFingerprint); } catch (error) {
+      concurrentRejected = error?.code === "MEASUREMENT_CAMPAIGN_BUSY";
+    }
+    expect(concurrentRejected, "MEASUREMENT_SELF_TEST", "concurrent campaign lease was accepted");
+    await firstLease.close();
+    const secondLease = acquireCampaignLease(leaseRoot, leaseFingerprint); await secondLease.close();
+  } finally { fs.rmSync(leaseRoot, { recursive: true, force: true }); }
   return Object.freeze({ status: "passed", schedule_fingerprint: schedule.schedule_fingerprint,
     bootstrap_interval: first, exact_two_sided_0_6: exactTwoSidedMcNemar(0, 6), exact_one_sided_6_6: binomialUpperTail(6, 6) });
 }

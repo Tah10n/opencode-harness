@@ -21,6 +21,17 @@ The manifest binds the runner, published benchmark input bytes, candidate,
 OpenCode executable, runtimes, tasks, pilot controls, schedule, timeout, retry
 policy, evaluator, and statistical method before the first model call.
 
+## Pre-execution safety block
+
+The published benchmark v3 controls contain task-specific hidden semantic
+oracles and frozen `unclassified` defect severity, but no independent frozen
+oracle that detects and classifies new HIGH/MEDIUM/CRITICAL regressions. A zero
+classified-regression count would therefore be absence of evidence, not the
+required `no new HIGH/MEDIUM/CRITICAL regression` evidence. The runner refuses
+to freeze a campaign while this surface is unavailable, before any model call.
+Replacing the requested primary metric with a narrower semantic-oracle proxy
+would require an explicit contract change and is not performed here.
+
 ## Arm equivalence and isolation
 
 Both arms receive identical task bytes, prompt, model, provider, variant,
@@ -51,14 +62,17 @@ receipt fingerprints and requires exact agreement with the ledger receipt
 hashes.
 
 One retry is allowed only for a durable, proven infrastructure failure before
-the model process starts and before any scored outcome. A missing terminal
-event after model-process start is reconciliation-owned and cannot be retried.
-Timeouts, model protocol failures, failed oracles, core verification failures,
-and every scored outcome are final.
+any scored outcome: either a host failure before physical provider submission,
+or an observed provider 429/5xx response that produced no task mutation or
+passing oracle. An uncertain provider submission is reconciliation-owned and
+cannot be retried. Timeouts, model protocol failures, failed oracles, core
+verification failures, and every scored outcome are final. An owner-bound
+campaign lease prevents concurrent resume against one campaign ledger.
 
 Raw stdout, stderr, task workspaces, private controls, credentials, and OAuth
-state are not published. Public receipts retain bounded counts and content
-hashes; the committed attempt-hash ledger binds the private receipt archive.
+state are not published. Private receipts retain bounded counts, provider
+status evidence, and content hashes; the committed attempt-hash ledger binds
+the private receipt archive.
 
 ## Scoring and inference
 
@@ -70,7 +84,9 @@ post-mutation verification. Host verification failure is a core failure.
 Public benchmark severities remain unchanged. They are `unclassified`, so
 HIGH/MEDIUM/CRITICAL rates are reported as not observable rather than inferred.
 Any plain-only success in an unclassified family is conservatively reported as
-an unclassified semantic regression and prevents an improvement label.
+an unclassified semantic regression and prevents an improvement label. A
+positive primary effect also cannot receive the improvement label when no
+HIGH/MEDIUM/CRITICAL safety coverage is observable; reporting fails closed.
 
 Primary inference uses exact two-sided McNemar, a predeclared one-sided exact
 test in the core-greater direction, and a deterministic 100,000-resample paired
@@ -81,4 +97,3 @@ The allowed labels and thresholds are those recorded in the frozen goal:
 `CORE IMPROVES ON PUBLIC VALIDATION BENCHMARK`, `NO CLEAR MEASURABLE
 DIFFERENCE`, or `CORE REGRESSES`. If the observed result matches none of the
 predeclared conditions, reporting fails closed instead of inventing a label.
-
