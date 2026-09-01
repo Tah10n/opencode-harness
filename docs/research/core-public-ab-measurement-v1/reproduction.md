@@ -87,3 +87,10 @@ starts respectively, but zero proxy requests and zero provider submissions.
 Both were invalidated as critical pre-model runner defects; none of their
 synthetic process outcomes may be imported into, or retried within, the frozen
 model-backed campaign.
+
+The first committed manifest freeze was also invalidated before any model or
+provider call. Its provider-free plain acceptance path showed that the proxy
+plugin file had been copied but was absent from OpenCode's effective `plugin`
+array. The failed probe and one retained-root diagnostic probe each made zero
+proxy requests and zero provider submissions. Their manifest and private
+acceptance artifacts are superseded and must not be reused.

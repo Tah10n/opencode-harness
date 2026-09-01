@@ -1321,13 +1321,20 @@ function modelEnvironment(attemptDirectory, configuration, credential) {
   const isolatedHome = path.join(attemptDirectory, "home"); const isolatedTmp = path.join(attemptDirectory, "tmp");
   const data = path.join(attemptDirectory, "xdg-data"); const cache = path.join(attemptDirectory, "xdg-cache");
   for (const directory of [isolatedHome, isolatedTmp, data, cache]) fs.mkdirSync(directory, { mode: 0o700 });
+  const attemptRoot = fs.realpathSync.native(attemptDirectory);
+  const pluginFile = statRegular(credential.plugin_file, "provider proxy plugin").path;
+  const pluginRelative = path.relative(attemptRoot, pluginFile);
+  expect(pluginRelative.length > 0 && pluginRelative !== ".." && !pluginRelative.startsWith(`..${path.sep}`)
+    && !path.isAbsolute(pluginRelative),
+  "MEASUREMENT_CREDENTIAL_BOUNDARY", "provider proxy plugin escaped the private attempt directory");
+  const effectiveOverlay = { ...OVERLAY, plugin: [pathToFileURL(pluginFile).href] };
   return Object.freeze({ PATH: process.env.PATH ?? "/usr/bin:/bin", HOME: isolatedHome, TMPDIR: isolatedTmp,
     LANG: "C", LC_ALL: "C", TZ: "UTC", XDG_DATA_HOME: data, XDG_CACHE_HOME: cache,
     OPENCODE_AUTO_SHARE: "false", OPENCODE_DISABLE_AUTOUPDATE: "true", OPENCODE_DISABLE_CLAUDE_CODE: "true",
     OPENCODE_DISABLE_CLAUDE_CODE_PROMPT: "true", OPENCODE_DISABLE_CLAUDE_CODE_SKILLS: "true",
     OPENCODE_DISABLE_DEFAULT_PLUGINS: "false", OPENCODE_DISABLE_LSP_DOWNLOAD: "true",
     OPENCODE_DISABLE_MODELS_FETCH: "true", OPENCODE_ENABLE_EXA: "false",
-    OPENCODE_CONFIG_DIR: configuration, OPENCODE_CONFIG_CONTENT: JSON.stringify(OVERLAY),
+    OPENCODE_CONFIG_DIR: configuration, OPENCODE_CONFIG_CONTENT: JSON.stringify(effectiveOverlay),
     OPENCODE_AUTH_CONTENT: credential.placeholder_auth_content,
     CORE_PUBLIC_AB_PROVIDER_PROXY_FILE: credential.credential_file });
 }
@@ -1338,7 +1345,8 @@ function installProviderBridgeFiles({ attemptDirectory, configuration, proxy }) 
   const plugins = path.join(configuration, "plugins"); fs.mkdirSync(plugins, { recursive: true, mode: 0o700 });
   const plugin = path.join(plugins, "core-public-ab-provider-proxy.mjs");
   fs.writeFileSync(plugin, PROVIDER_PROXY_PLUGIN, { encoding: "utf8", flag: "wx", mode: 0o400 });
-  return Object.freeze({ credential_file: credentialFile, provider_proxy_socket: proxy.socket_path,
+  return Object.freeze({ credential_file: credentialFile, plugin_file: plugin,
+    provider_proxy_socket: proxy.socket_path,
     placeholder_auth_content: JSON.stringify({ openai: { type: "api", key: "core-public-ab-host-provider-proxy" } }),
     status() { return proxy.status(); }, async close() { await proxy.close(); } });
 }
@@ -2708,6 +2716,19 @@ async function selfTest({ containment = true } = {}) {
       receipt: { ...acceptanceActivation.receipt, decision: { ...acceptanceActivation.receipt.decision,
         reason: "verification_passed" } } }, acceptanceExpected),
   "MEASUREMENT_SELF_TEST", "no-mutation core acceptance receipt contract drifted");
+  const pluginRoot = fs.mkdtempSync(path.join(fs.realpathSync.native(os.tmpdir()), "core-public-ab-plugin-test-"));
+  try {
+    const configuration = path.join(pluginRoot, "configuration"); fs.mkdirSync(configuration, { mode: 0o700 });
+    const pluginFile = path.join(pluginRoot, "provider-proxy.mjs"); fs.writeFileSync(pluginFile, "export default {};\n", { mode: 0o400 });
+    const environment = modelEnvironment(pluginRoot, configuration, {
+      plugin_file: pluginFile, credential_file: path.join(pluginRoot, "credential.json"),
+      placeholder_auth_content: "{}",
+    });
+    const effective = JSON.parse(environment.OPENCODE_CONFIG_CONTENT);
+    expect(Array.isArray(effective.plugin) && effective.plugin.length === 1
+      && effective.plugin[0] === pathToFileURL(fs.realpathSync.native(pluginFile)).href,
+    "MEASUREMENT_SELF_TEST", "provider proxy plugin is absent from the effective OpenCode configuration");
+  } finally { fs.rmSync(pluginRoot, { recursive: true, force: true }); }
   expect(ledgerRecordRequiresReconciliation({ event_type: "attempt-completed", reconciliation_required: true })
     && !ledgerRecordRequiresReconciliation({ event_type: "attempt-completed", reconciliation_required: false }),
   "MEASUREMENT_SELF_TEST", "durable completion lost its reconciliation obligation");
@@ -2806,7 +2827,7 @@ async function selfTest({ containment = true } = {}) {
     "MEASUREMENT_SELF_TEST", "plain-only absolute guardrail failure was falsely attributed as a core regression");
   return Object.freeze({ status: "passed", schedule_fingerprint: schedule.schedule_fingerprint,
     bootstrap_interval: first, exact_two_sided_0_6: exactTwoSidedMcNemar(0, 6), exact_one_sided_6_6: binomialUpperTail(6, 6),
-    measurement_contract_fingerprint: loadMeasurementContract().fingerprint, model_free_contract_tests: 17,
+    measurement_contract_fingerprint: loadMeasurementContract().fingerprint, model_free_contract_tests: 18,
     seatbelt_containment: containment ? "passed" : "not_run" });
 }
 

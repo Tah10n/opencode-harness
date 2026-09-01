@@ -75,8 +75,10 @@ block the oracle-validated measurement.
 
 Both arms receive identical task bytes, prompt, model, provider, variant,
 OpenCode executable, model-execution timeout, evaluator, attempt environment,
-and hidden oracle. The plain arm receives an empty standard configuration. The
-core arm receives only the exact materialized core configuration.
+and hidden oracle. The plain arm begins with an empty standard configuration,
+and the core arm begins with only the exact materialized core configuration.
+The runner then explicitly registers the same attempt-private provider-proxy
+plugin by file URL in both effective OpenCode configurations.
 
 Shell, web, delegation, external-directory access, and question tools are
 denied in both arms. Provider traffic is mediated by a host-side proxy over one
