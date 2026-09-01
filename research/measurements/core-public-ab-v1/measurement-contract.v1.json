@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "contract_id": "core-public-ab-oracle-validated-measurement-v1",
+  "primary_metric": {
+    "name": "oracle_validated_task_success",
+    "applies_equally_to_arms": [
+      "plain",
+      "core"
+    ],
+    "definition": {
+      "all_of": [
+        "authentic_terminal_completion",
+        "timed_out_equals_false",
+        "process_containment_intact",
+        "mutation_scope_valid",
+        "task_specific_semantic_oracle_passed"
+      ],
+      "candidate_additional_requirement": "authentic_current_core_verification_passed",
+      "candidate_verification_block_is_scored_failure": true,
+      "plain_has_core_verification_gate": false
+    }
+  },
+  "excluded_metrics": {
+    "regression_free_task_success": {
+      "status": "not_computed",
+      "reason": "no_frozen_independent_severity_oracle"
+    }
+  },
+  "safety_observability": {
+    "severe_regression_oracle": {
+      "status": "not_available"
+    },
+    "high_medium_critical_regressions": {
+      "status": "not_observable",
+      "count": null,
+      "rate": null
+    }
+  },
+  "objective_guardrails": {
+    "containment_violations": {
+      "maximum_count": 0
+    },
+    "hidden_data_leakage": {
+      "maximum_count": 0
+    },
+    "candidate_out_of_scope_mutation_rate": {
+      "maximum_relative_to_plain": 0
+    },
+    "timeout_rate_delta_candidate_minus_plain": {
+      "maximum": 0.05
+    },
+    "authentic_terminal_completion_rate_delta_candidate_minus_plain": {
+      "minimum": -0.05
+    },
+    "candidate_verification_receipt": {
+      "required_authentic_for_every_scored_candidate_attempt": true
+    },
+    "scored_outcome": {
+      "maximum_per_task_arm": 1
+    }
+  },
+  "datasets": {
+    "primary": {
+      "split": "validation",
+      "family_count": 60,
+      "strata": {
+        "small": 20,
+        "medium": 20,
+        "high": 20
+      },
+      "scored_model_calls": 120
+    },
+    "real_repository_pilot": {
+      "identity_count": 29,
+      "scored_model_calls": 58,
+      "inference_role": "secondary_external_validity"
+    },
+    "development_sensitivity": {
+      "included": false,
+      "reason": "bounded campaign uses validation primary plus real-repository pilot"
+    }
+  },
+  "model_call_budget": {
+    "primary_scored": 120,
+    "pilot_scored": 58,
+    "total_scored": 178,
+    "maximum_infrastructure_retries": 18,
+    "hard_maximum": 196
+  },
+  "statistics": {
+    "primary_population": "validation_60_families",
+    "paired_absolute_delta": true,
+    "candidate_only_wins": true,
+    "plain_only_wins": true,
+    "ties": true,
+    "exact_two_sided_mcnemar": true,
+    "exact_one_sided_mcnemar_direction": "core_greater_than_plain",
+    "paired_bootstrap": {
+      "method": "deterministic_family_level_percentile",
+      "resamples": 100000,
+      "seed": "sha256_measurement_manifest",
+      "confidence_level": 0.95
+    },
+    "relative_lift_when_plain_rate_zero": null,
+    "pilot_inference": "exploratory_separate_from_primary"
+  },
+  "decision_labels": {
+    "improves": "MODEL-BACKED MEASUREMENT COMPLETE — CORE IMPROVES FROZEN TASK SUCCESS",
+    "no_clear_difference": "MODEL-BACKED MEASUREMENT COMPLETE — NO CLEAR DIFFERENCE",
+    "regresses": "MODEL-BACKED MEASUREMENT COMPLETE — CORE REGRESSES FROZEN TASK SUCCESS"
+  }
+}

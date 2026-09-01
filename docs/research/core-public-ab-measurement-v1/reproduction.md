@@ -5,6 +5,7 @@ private local custody paths. Do not commit their values.
 
 ```sh
 git switch research/core-public-ab-measurement-v1
+node scripts/benchmark-core-public-ab.mjs --mode contract-self-test
 node scripts/benchmark-core-public-ab.mjs --mode self-test
 
 node scripts/benchmark-core-public-ab.mjs --mode prepare-public-runtime \
@@ -21,12 +22,19 @@ node scripts/benchmark-core-public-ab.mjs --mode freeze \
   --pilot-public-key "$EPOCH2_CALIBRATION_PUBLIC_KEY" \
   --pilot-runtime-manifest "$EPOCH2_RUNTIME_MANIFEST" \
   --pilot-manifest-output "$PRIVATE_PILOT_MANIFEST" \
-  --manifest-output measurement-manifest.json \
+  --manifest-output research/measurements/core-public-ab-v1/measurement-manifest.json \
   --timeout-ms 900000 \
   --parallel-pairs 4
 
+git add -- research/measurements/core-public-ab-v1/measurement-manifest.json
+git commit -m "research: freeze oracle-validated measurement manifest"
+git push
+gh pr checks --watch
+test "$(gh pr view --json headRefOid --jq .headRefOid)" = "$(git rev-parse HEAD)"
+test -z "$(git status --porcelain=v1 --untracked-files=all)"
+
 node scripts/benchmark-core-public-ab.mjs --mode run \
-  --manifest measurement-manifest.json \
+  --manifest research/measurements/core-public-ab-v1/measurement-manifest.json \
   --pilot-manifest "$PRIVATE_PILOT_MANIFEST" \
   --product-source-root "$EXACT_PRODUCT_SOURCE_ROOT" \
   --core-bundle "$EXACT_CORE_BUNDLE" \
@@ -41,7 +49,7 @@ node scripts/benchmark-core-public-ab.mjs --mode run \
   --campaign-root "$PRIVATE_CAMPAIGN_ROOT"
 
 node scripts/benchmark-core-public-ab.mjs --mode report \
-  --manifest measurement-manifest.json \
+  --manifest research/measurements/core-public-ab-v1/measurement-manifest.json \
   --pilot-manifest "$PRIVATE_PILOT_MANIFEST" \
   --campaign-root "$PRIVATE_CAMPAIGN_ROOT" \
   --summary-output benchmarks/results/core-public-ab-measurement-v1/summary.json \
@@ -49,7 +57,11 @@ node scripts/benchmark-core-public-ab.mjs --mode report \
   --ledger-output benchmarks/results/core-public-ab-measurement-v1/attempt-hash-ledger.json
 ```
 
-The `run` command is exact-resumable against the same campaign directory. A
-different manifest, runner, task binding, candidate, executable, runtime, or
-pilot artifact is rejected.
-
+The manifest is created only after the runner commit has passed exact-head CI.
+It is then committed without changing the runner, pushed to the existing draft
+PR, and required to pass exact-head CI again before the first model call. The
+manifest binds the earlier runner source SHA and exact runner SHA-256; the
+runner requires that source SHA to remain an ancestor and its bytes to remain
+identical. The `run` command also requires a clean tree and is exact-resumable
+against the same campaign directory. A different manifest, runner, task
+binding, candidate, executable, runtime, or pilot artifact is rejected.

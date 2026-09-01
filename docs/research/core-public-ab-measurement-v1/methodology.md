@@ -1,52 +1,62 @@
-# Core versus plain model-backed measurement methodology
+# Core versus plain oracle-validated measurement methodology
 
-This measurement estimates the paired change in regression-free task success
-for the already-published materialized `core` profile. It is not a promotion
-authority, a new benchmark epoch, or a model-independent evaluation.
+This measurement estimates the paired change in
+`oracle_validated_task_success` for the already-published materialized `core`
+profile. It is not a safety certification, promotion authority, new benchmark
+epoch, or model-independent evaluation.
 
 ## Frozen surfaces
 
 - Product source: `89f1f7f1980a829d7da162fcd737d0c52613225d`.
-- Candidate: the byte-verified materialized core bundle from that source.
+- Candidate bundle fingerprint:
+  `sha256:688ddc642bf694d7ab110915d5a101722b13ba6eeebde1b0788814575e3e8d21`.
 - Model binding: `openai/gpt-5.6-luna`, variant `low`.
 - Primary data: the existing 60 validation families, balanced 20/20/20 across
   small, medium, and high.
-- Sensitivity data: the existing 60 development families.
 - Real-repository pilot: the exact 29 independent epoch-2 identities, with
   repository counts 8/1/12/8 and strata counts 10/10/9.
+- Development sensitivity is excluded before model calls because this bounded
+  campaign uses validation primary plus the real-repository pilot.
 - One deterministic counterbalanced schedule is frozen independently within
   each dataset and stratum.
 
-The manifest binds the runner, published benchmark input bytes, candidate,
-OpenCode executable, runtimes, tasks, pilot controls, schedule, timeout, retry
-policy, evaluator, and statistical method before the first model call.
+The versioned contract is
+`research/measurements/core-public-ab-v1/measurement-contract.v1.json`. The
+immutable manifest binds its fingerprint, the runner commit and bytes,
+published benchmark inputs, candidate, OpenCode executable, runtimes, exact
+tasks, pilot controls, schedule, timeout, retry policy, evaluator, statistics,
+and call budget before the first model call.
 
-## Pre-execution safety block
+## Metric and safety observability
 
-The published benchmark v3 controls contain task-specific hidden semantic
-oracles and frozen `unclassified` defect severity, but no independent frozen
-oracle that detects and classifies new HIGH/MEDIUM/CRITICAL regressions. A zero
-classified-regression count would therefore be absence of evidence, not the
-required `no new HIGH/MEDIUM/CRITICAL regression` evidence. The runner refuses
-to freeze a campaign while this surface is unavailable, before any model call.
-Replacing the requested primary metric with a narrower semantic-oracle proxy
-would require an explicit contract change and is not performed here.
+For both arms, `oracle_validated_task_success` is true only when authentic
+terminal completion, no timeout, intact process containment, valid mutation
+scope, and the task-specific hidden semantic oracle all hold. Core additionally
+requires an authentic current passing post-mutation verification receipt. A
+failed, stale, unavailable, or unauthentic core verification is a scored
+candidate failure. Plain has no core verification gate. The hidden semantic
+oracle is applied identically after both arms finish.
 
-The source audit is exhaustive for the frozen inputs: all 120 public controls
-have `defect_severity: unclassified`; their only runner witness is the
-task-specific semantic oracle plus closed mutation set. The 29 signed pilot
-identities contain no severity, finding, regression, safety-oracle, or other
-classification field. The repository's paired-defect evaluator only compares
-already-supplied structured findings; it does not discover them. Its blinded
-archive is explicitly calibration-only and non-confirmatory, so it cannot be
-substituted as campaign safety evidence.
+The runner does not compute `regression_free_task_success`. The frozen public
+controls have `defect_severity: unclassified`, and the 29 pilot identities have
+no independent severity oracle. Consequently the report fixes these fields:
+
+- `severe_regression_oracle.status = not_available`;
+- `high_medium_critical_regressions.status = not_observable`;
+- `high_medium_critical_regressions.count = null`;
+- `high_medium_critical_regressions.rate = null`;
+- `regression_free_task_success.status = not_computed` with reason
+  `no_frozen_independent_severity_oracle`.
+
+Unclassified severity is never converted to no-defect evidence and does not
+block the oracle-validated measurement.
 
 ## Arm equivalence and isolation
 
 Both arms receive identical task bytes, prompt, model, provider, variant,
-OpenCode executable, model-execution timeout, evaluator, and hidden oracle.
-The plain arm receives an empty standard configuration. The core arm receives
-only the exact materialized core configuration.
+OpenCode executable, model-execution timeout, evaluator, attempt environment,
+and hidden oracle. The plain arm receives an empty standard configuration. The
+core arm receives only the exact materialized core configuration.
 
 Shell, web, delegation, external-directory access, and question tools are
 denied in both arms. Provider traffic is mediated by a host-side proxy over one
@@ -59,8 +69,14 @@ Hidden tests, reference repairs, paired-arm output, evaluator results, and
 provenance history are never placed in the model-visible workspace. After the
 model process group is terminated and verified absent, the model workspace is
 copied to a fresh random oracle workspace that was never present in the model
-sandbox profile; the original workspace and provider proxy are removed before
+sandbox profile. The original workspace and provider proxy are removed before
 hidden controls are staged. The oracle runs without network access.
+
+Before every model process, the runner directly checks that every frozen hidden
+path is absent, that no model-visible workspace file has a hidden-control
+content hash, and that the visible prompt does not contain hidden-control
+bytes. The content-bound preflight fingerprint is retained in the private
+outcome receipt and is required for the published zero-leakage guardrail.
 
 ## Attempts, resume, and evidence
 
@@ -68,41 +84,52 @@ Every attempt has a content-bound start event and terminal event in a durable
 hash-chained append-only ledger. Receipts bind the frozen manifest, pilot
 manifest, task, arm, attempt index, and retry predecessor. Reporting recomputes
 receipt fingerprints and requires exact agreement with the ledger receipt
-hashes.
+hashes. An owner-bound exclusive lease prevents concurrent resume.
 
-One retry is allowed only for a durable, proven infrastructure failure before
-any scored outcome: either a host failure before physical provider submission,
-or an observed provider 429/5xx response that produced no task mutation or
-passing oracle. An uncertain provider submission is reconciliation-owned and
-cannot be retried. Timeouts, model protocol failures, failed oracles, core
-verification failures, and every scored outcome are final. An owner-bound
-campaign lease prevents concurrent resume against one campaign ledger.
+There are exactly 178 scored task-arm calls: 120 primary and 58 pilot. At most
+18 additional calls are permitted for explicit infrastructure failures with no
+scored outcome and an established provider-submission disposition. The hard
+maximum is 196. A task-arm can have at most one such retry. Timeouts, bad code,
+failed semantic oracles, verification blocks, protocol failures, and already
+scored outcomes are not retried. Ambiguous provider submission or an interrupted
+response body remains reconciliation-owned. A timeout is still a scored,
+non-retryable task failure, but an ambiguous provider disposition is durably
+recorded and stops continuation until reconciled.
+
+Malformed or unobservable candidate child-process receipts are infrastructure
+failures rather than task failures. They remain retryable only under the same
+bounded disposition and campaign budgets. A scored task-arm outcome may occur
+exactly once.
 
 Raw stdout, stderr, task workspaces, private controls, credentials, and OAuth
 state are not published. Private receipts retain bounded counts, provider
 status evidence, and content hashes; the committed attempt-hash ledger binds
 the private receipt archive.
 
-## Scoring and inference
+## Scoring, guardrails, and inference
 
-Regression-free task success requires a passing behavioral hidden oracle, no
-scope violation, passing syntax verification, no timeout, authentic exit-zero
-process completion, valid model protocol, and (for core) authentic passing
-post-mutation verification. Host verification failure is a core failure.
+The directly observed operational guardrails are zero containment violations,
+zero hidden-data leakage, candidate out-of-scope mutation rate no higher than
+plain, timeout-rate delta no greater than +0.05, authentic-terminal-completion
+rate delta no lower than -0.05, and an authentic verification receipt for each
+scored candidate attempt. Absence of classified defects is not a guardrail.
 
-Public benchmark severities remain unchanged. They are `unclassified`, so
-HIGH/MEDIUM/CRITICAL rates are reported as not observable rather than inferred.
-Any plain-only success in an unclassified family is conservatively reported as
-an unclassified semantic regression and prevents an improvement label. A
-positive primary effect also cannot receive the improvement label when no
-HIGH/MEDIUM/CRITICAL safety coverage is observable; reporting fails closed.
+Primary inference uses only the 60 validation families: paired absolute delta,
+candidate-only wins, plain-only wins, ties, exact two-sided McNemar, the frozen
+one-sided exact McNemar test in the core-greater direction, and a deterministic
+100,000-resample family-level percentile bootstrap. The primary bootstrap seed
+is the SHA-256 measurement manifest fingerprint. If the plain rate is zero,
+relative lift is `null`. Strata remain descriptive without post-hoc gates.
 
-Primary inference uses exact two-sided McNemar, a predeclared one-sided exact
-test in the core-greater direction, and a deterministic 100,000-resample paired
-bootstrap with a frozen seed. Development and pilot statistics are descriptive
-and are never pooled with primary inference.
+The 29-task pilot receives separate descriptive paired statistics, CI, and
+p-values marked exploratory. It is never pooled with primary inference.
 
-The allowed labels and thresholds are those recorded in the frozen goal:
-`CORE IMPROVES ON PUBLIC VALIDATION BENCHMARK`, `NO CLEAR MEASURABLE
-DIFFERENCE`, or `CORE REGRESSES`. If the observed result matches none of the
-predeclared conditions, reporting fails closed instead of inventing a label.
+The only result labels are:
+
+- `MODEL-BACKED MEASUREMENT COMPLETE — CORE IMPROVES FROZEN TASK SUCCESS`;
+- `MODEL-BACKED MEASUREMENT COMPLETE — NO CLEAR DIFFERENCE`;
+- `MODEL-BACKED MEASUREMENT COMPLETE — CORE REGRESSES FROZEN TASK SUCCESS`.
+
+They apply only to the exact frozen model, validation benchmark, product source,
+and materialized core. They do not claim production quality or independently
+observable HIGH/MEDIUM/CRITICAL regression safety.
