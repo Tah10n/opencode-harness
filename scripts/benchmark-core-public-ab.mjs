@@ -505,9 +505,12 @@ function verifyPilotArtifact(artifactPath, publicKeyPath) {
   "MEASUREMENT_PILOT", "pilot calibration artifact shape is invalid");
   const payload = artifact.payload;
   const identityIds = payload.independent_pool.map((identity) => identity?.identity_id);
-  expect(identityIds.every((identityId) => typeof identityId === "string" && /^[A-Za-z0-9._-]+$/u.test(identityId))
-    && new Set(identityIds).size === 29,
-  "MEASUREMENT_PILOT", "pilot calibration artifact does not contain 29 unique path-safe identity IDs");
+  const storageIds = identityIds.map((identityId) => typeof identityId === "string"
+    ? identityId.replace(/[^A-Za-z0-9._-]+/gu, "-") : "");
+  expect(identityIds.every((identityId) => typeof identityId === "string" && identityId.length >= 1 && identityId.length <= 256)
+    && new Set(identityIds).size === 29 && storageIds.every((identityId) => identityId.length >= 1)
+    && new Set(storageIds).size === 29,
+  "MEASUREMENT_PILOT", "pilot calibration artifact does not contain 29 unique collision-free identity IDs");
   expect(payload.receipt_fingerprint === fingerprint(Object.fromEntries(Object.entries(payload)
     .filter(([key]) => key !== "receipt_fingerprint"))), "MEASUREMENT_PILOT", "pilot receipt fingerprint is invalid");
   const keyBytes = fs.readFileSync(keyFile.path);
