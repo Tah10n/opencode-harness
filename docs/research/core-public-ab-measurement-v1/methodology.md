@@ -32,6 +32,15 @@ to freeze a campaign while this surface is unavailable, before any model call.
 Replacing the requested primary metric with a narrower semantic-oracle proxy
 would require an explicit contract change and is not performed here.
 
+The source audit is exhaustive for the frozen inputs: all 120 public controls
+have `defect_severity: unclassified`; their only runner witness is the
+task-specific semantic oracle plus closed mutation set. The 29 signed pilot
+identities contain no severity, finding, regression, safety-oracle, or other
+classification field. The repository's paired-defect evaluator only compares
+already-supplied structured findings; it does not discover them. Its blinded
+archive is explicitly calibration-only and non-confirmatory, so it cannot be
+substituted as campaign safety evidence.
+
 ## Arm equivalence and isolation
 
 Both arms receive identical task bytes, prompt, model, provider, variant,
