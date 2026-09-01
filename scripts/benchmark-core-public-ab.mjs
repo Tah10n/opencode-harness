@@ -663,6 +663,26 @@ function buildSchedule(dataset, identities) {
   return Object.freeze({ ...body, schedule_fingerprint: fingerprint(body) });
 }
 
+function frozenScheduleValid(schedule, dataset, expectedIds, expectedStratumCounts) {
+  if (schedule?.schema_version !== 1 || schedule.dataset !== dataset
+    || schedule.algorithm !== "stratum-balanced-hash-rank-v1" || schedule.seed !== SCHEDULE_SEED
+    || !Array.isArray(schedule.entries) || schedule.schedule_fingerprint !== bodyFingerprint(schedule, "schedule_fingerprint")) return false;
+  const entries = schedule.entries;
+  if (canonicalJson(entries.map((entry) => entry.identity_id).sort()) !== canonicalJson(expectedIds.slice().sort())
+    || new Set(entries.map((entry) => entry.identity_id)).size !== expectedIds.length) return false;
+  return STRATA.every((stratum) => {
+    const stratumEntries = entries.filter((entry) => entry.stratum === stratum);
+    const expectedCount = expectedStratumCounts[stratum];
+    return stratumEntries.length === expectedCount
+      && stratumEntries.every((entry) => (canonicalJson(entry.order) === canonicalJson(["plain", "core"])
+        || canonicalJson(entry.order) === canonicalJson(["core", "plain"])))
+      && stratumEntries.every((entry) => entry.rank_hash === sha256Bytes(
+        Buffer.from(`${SCHEDULE_SEED}\0${dataset}\0${entry.identity_id}`, "utf8")))
+      && stratumEntries.filter((entry) => entry.order[0] === "plain").length === Math.ceil(expectedCount / 2)
+      && stratumEntries.filter((entry) => entry.order[0] === "core").length === Math.floor(expectedCount / 2);
+  });
+}
+
 function runtimeDirectoryFingerprint(directory, confinementRoot) {
   const root = fs.realpathSync.native(directory);
   const confinement = fs.realpathSync.native(confinementRoot);
@@ -1106,6 +1126,8 @@ function validateMeasurementManifest(file) {
     && manifest.statistics?.primary === "paired delta, exact McNemar, deterministic paired bootstrap"
     && manifest.maximum_scored_model_calls === TOTAL_SCORED_CALLS
     && manifest.maximum_total_model_calls === MAXIMUM_MODEL_CALLS
+    && Number.isSafeInteger(manifest.timeout_ms) && manifest.timeout_ms >= 60_000
+    && Number.isSafeInteger(manifest.parallel_pairs) && manifest.parallel_pairs >= 1 && manifest.parallel_pairs <= 8
     && manifest.measurement_node_version === process.version
     && manifest.measurement_node_executable_sha256 === sha256File(process.execPath)
     && manifest.opencode_seatbelt_startup_preflight?.status === "passed"
@@ -1114,6 +1136,10 @@ function validateMeasurementManifest(file) {
       files: canonicalFileInventory(SOURCE_ROOT, BENCHMARK_INPUT_PATHS) })
     && manifest.validation_family_ids.length === 60 && new Set(manifest.validation_family_ids).size === 60
     && manifest.real_pilot_identity_ids.length === 29 && new Set(manifest.real_pilot_identity_ids).size === 29
+    && frozenScheduleValid(manifest.arm_order_schedule?.validation, "validation", manifest.validation_family_ids,
+      { small: 20, medium: 20, high: 20 })
+    && frozenScheduleValid(manifest.arm_order_schedule?.pilot, "pilot", manifest.real_pilot_identity_ids,
+      { small: 10, medium: 10, high: 9 })
     && manifest.primary_metric_definition?.name === "oracle_validated_task_success"
     && manifest.explicitly_excluded_metric?.status === "not_computed"
     && manifest.safety_observability?.high_medium_critical_regressions?.count === null
@@ -1363,6 +1389,9 @@ async function executeAcceptanceArm({ arm, coreBundle, opencode, trustedNodePath
     await bridge.close(); const proxyEvidence = bridge.status(); bridge = null;
     const events = parseOpenCodeEvents(managed.stdout);
     const activation = arm === "core" ? parseActivation(managed.activation, catalogBefore) : null;
+    const coreAcceptanceReceiptAuthentic = arm === "core"
+      ? noMutationAcceptanceReceiptAuthentic(activation, catalogBefore)
+      : null;
     const changed = changedPaths(before, captureWorkspace(workspace));
     const configurationDrift = configurationBefore !== directoryFingerprint(configuration);
     const catalogDrift = arm === "core"
@@ -1373,13 +1402,13 @@ async function executeAcceptanceArm({ arm, coreBundle, opencode, trustedNodePath
       && proxyEvidence.provider_submission_count === 0 && changed.length === 0
       && configurationDrift === false && catalogDrift === false
       && events.final_text_sha256 === sha256Bytes(Buffer.from(ACCEPTANCE_TEXT, "utf8"))
-      && (arm !== "core" || (activation?.process_receipt_observable === true
-        && activation.verification_authentic === true && activation.passed === true)),
+      && (arm !== "core" || coreAcceptanceReceiptAuthentic === true),
     "MEASUREMENT_ACCEPTANCE", `${arm} full OpenCode acceptance path failed`);
     return Object.freeze({ arm, status: "passed", full_opencode_run: true,
       provider_proxy_requests: proxyEvidence.accepted_request_count, provider_submissions: 0, model_calls: 0,
       process_containment_intact: true, no_surviving_descendants: true,
-      core_verification_receipt_authentic: arm === "core" ? true : null,
+      core_verification_receipt_authentic: coreAcceptanceReceiptAuthentic,
+      core_terminal_reason: arm === "core" ? activation.receipt.decision.reason : null,
       output_text_sha256: events.final_text_sha256,
       stdout_sha256: sha256Bytes(Buffer.from(managed.stdout, "utf8")),
       stderr_sha256: sha256Bytes(Buffer.from(managed.stderr, "utf8")) });
@@ -1433,9 +1462,12 @@ function validateAcceptanceReceipt(file, manifest) {
     && receipt.model_calls === 0 && receipt.provider_calls === 0
     && Array.isArray(receipt.arms) && receipt.arms.length === 2
     && ARMS.every((arm) => receipt.arms.some((entry) => entry.arm === arm && entry.status === "passed"
-      && entry.full_opencode_run === true && entry.provider_submissions === 0 && entry.model_calls === 0
+      && entry.full_opencode_run === true && entry.provider_proxy_requests === 1
+      && entry.provider_submissions === 0 && entry.model_calls === 0
       && entry.process_containment_intact === true && entry.no_surviving_descendants === true
-      && entry.output_text_sha256 === manifest.acceptance_probe.expected_text_sha256)),
+      && entry.output_text_sha256 === manifest.acceptance_probe.expected_text_sha256
+      && (arm !== "core" || (entry.core_verification_receipt_authentic === true
+        && entry.core_terminal_reason === "no_workspace_mutation")))),
   "MEASUREMENT_ACCEPTANCE", "plain/core acceptance receipt is invalid or incomplete");
   return Object.freeze({ receipt, sha256: sha256File(receiptFile.path) });
 }
@@ -1541,6 +1573,20 @@ function parseActivation(bytes, expected) {
     && receipt.activation.post_last_mutation_verification === true && receipt.check?.status === "passed";
   return Object.freeze({ authentic: verificationAuthentic, verification_authentic: verificationAuthentic,
     process_receipt_observable: processReceiptObservable, passed: passedActivation, receipt });
+}
+
+function noMutationAcceptanceReceiptAuthentic(activation, expected) {
+  const receipt = activation?.receipt;
+  return activation?.process_receipt_observable === true && receipt?.schema_version === 2
+    && receipt.catalog_fingerprint === expected.catalog_fingerprint && receipt.catalog_status === "loaded"
+    && receipt.decision?.allowed === true && receipt.decision.reason === "no_workspace_mutation"
+    && receipt.decision.activation_eligible === false && receipt.decision.activated === false
+    && receipt.activation?.eligible === false
+    && receipt.activation?.post_last_mutation_verification === false
+    && receipt.activation?.terminal_success_allowed === true && receipt.activation?.mutation_revision === 0
+    && receipt.activation?.selected_check_id === null && receipt.activation?.terminal_reason === "no_workspace_mutation"
+    && receipt.activation?.verification_started_count === 0 && receipt.activation?.verification_completed_count === 0
+    && receipt.check === null;
 }
 
 function coreVerificationStatus(activation, { configurationDrift = false, catalogDrift = false } = {}) {
@@ -1910,7 +1956,8 @@ async function executeAttempt(context, task, arm, attemptIndex, retryOf = null) 
       attempt_binding_fingerprint: attemptBinding, outcome_fingerprint: outcome.outcome_fingerprint,
       receipt_sha256: sha256File(targetReceipt), scored_outcome: outcome.scored_outcome,
       infrastructure_failure_before_scoring: outcome.infrastructure_failure_before_scoring,
-      model_access_required: outcome.model_access_required, recorded_at: outcome.recorded_at });
+      model_access_required: outcome.model_access_required,
+      reconciliation_required: outcome.reconciliation_required, recorded_at: outcome.recorded_at });
     terminalOutcomeRecorded = true;
     if (classification.reconciliation_required) {
       context.ledger.append({ event_type: "attempt-reconciliation-required", attempt_id: attemptId,
@@ -1964,13 +2011,19 @@ async function executeAttempt(context, task, arm, attemptIndex, retryOf = null) 
       attempt_binding_fingerprint: attemptBinding, outcome_fingerprint: outcome.outcome_fingerprint,
       receipt_sha256: sha256File(targetReceipt), scored_outcome: false,
       infrastructure_failure_before_scoring: outcome.infrastructure_failure_before_scoring,
-      model_access_required: outcome.model_access_required, recorded_at: outcome.recorded_at });
+      model_access_required: outcome.model_access_required,
+      reconciliation_required: outcome.reconciliation_required, recorded_at: outcome.recorded_at });
     return outcome;
   } finally {
     await credential?.close();
     if (attemptDirectory !== null) fs.rmSync(attemptDirectory, { recursive: true, force: true });
     if (workspace !== null) fs.rmSync(workspace, { recursive: true, force: true });
   }
+}
+
+function ledgerRecordRequiresReconciliation(record) {
+  return ["attempt-reconciliation-required", "attempt-critical-runner-defect"].includes(record.event_type)
+    || (record.event_type === "attempt-completed" && record.reconciliation_required === true);
 }
 
 function completedOutcomes(context, task, arm) {
@@ -2007,7 +2060,8 @@ function completedOutcomes(context, task, arm) {
           outcome_fingerprint: outcome.outcome_fingerprint, receipt_sha256: durableReceipt.sha256,
           scored_outcome: outcome.scored_outcome,
           infrastructure_failure_before_scoring: outcome.infrastructure_failure_before_scoring,
-          model_access_required: outcome.model_access_required, recovered_from_durable_receipt: true,
+          model_access_required: outcome.model_access_required,
+          reconciliation_required: outcome.reconciliation_required, recovered_from_durable_receipt: true,
           recorded_at: new Date().toISOString() });
         if (outcome.reconciliation_required === true) {
           context.ledger.append({ event_type: "attempt-reconciliation-required", attempt_id: started.attempt_id,
@@ -2027,7 +2081,7 @@ function completedOutcomes(context, task, arm) {
     } else expect(terminal.length === 1, "MEASUREMENT_LEDGER", `${started.attempt_id} has multiple terminal events`);
   }
   const reconciledRecords = context.ledger.records();
-  expect(!reconciledRecords.some((record) => ["attempt-reconciliation-required", "attempt-critical-runner-defect"].includes(record.event_type)
+  expect(!reconciledRecords.some((record) => ledgerRecordRequiresReconciliation(record)
     && starts.some((started) => started.attempt_id === record.attempt_id)),
   "MEASUREMENT_RECONCILIATION_REQUIRED", `${task.id}/${arm} has an unresolved reconciliation or critical runner-defect obligation`);
   for (const receipt of outcomes) {
@@ -2039,7 +2093,8 @@ function completedOutcomes(context, task, arm) {
       && completed[0].receipt_sha256 === receipt.sha256
       && completed[0].scored_outcome === receipt.value.scored_outcome
       && completed[0].infrastructure_failure_before_scoring === receipt.value.infrastructure_failure_before_scoring
-      && completed[0].model_access_required === receipt.value.model_access_required,
+      && completed[0].model_access_required === receipt.value.model_access_required
+      && completed[0].reconciliation_required === receipt.value.reconciliation_required,
     "MEASUREMENT_RECEIPT", `${receipt.value.attempt_id} receipt does not match the append-only ledger`);
   }
   const completedRecords = context.ledger.records().filter((record) => record.event_type === "attempt-completed"
@@ -2072,7 +2127,8 @@ async function runArm(context, task, arm) {
 }
 async function runPair(context, task) {
   const schedule = context.manifest.arm_order_schedule[task.dataset].entries.find((entry) => entry.identity_id === task.id);
-  expect(schedule !== undefined, "MEASUREMENT_SCHEDULE", `${task.id} is absent from frozen schedule`);
+  expect(schedule !== undefined && schedule.stratum === task.stratum,
+    "MEASUREMENT_SCHEDULE", `${task.id} is absent from or changes stratum in the frozen schedule`);
   const outcomes = {};
   for (const arm of schedule.order) outcomes[arm] = await runArm(context, task, arm);
   return Object.freeze({ identity_id: task.id, dataset: task.dataset, stratum: task.stratum,
@@ -2229,12 +2285,15 @@ function loadPairs(campaignRoot, dataset, ids, manifest, pilotManifest, ledgerRe
           && completed[0].attempt_binding_fingerprint === receipt.value.attempt_binding_fingerprint
           && completed[0].outcome_fingerprint === receipt.value.outcome_fingerprint
           && completed[0].receipt_sha256 === receipt.sha256
-          && completed[0].scored_outcome === receipt.value.scored_outcome,
+          && completed[0].scored_outcome === receipt.value.scored_outcome
+          && completed[0].reconciliation_required === receipt.value.reconciliation_required,
         "MEASUREMENT_REPORT", `${receipt.value.attempt_id} receipt and ledger differ`);
       });
       const scored = values.find((entry) => entry.scored_outcome === true);
       expect(scored !== undefined && values.filter((entry) => entry.scored_outcome === true).length === 1,
         "MEASUREMENT_REPORT", `${dataset}/${id}/${arm} lacks exactly one scored outcome`);
+      expect(scored.reconciliation_required === false,
+        "MEASUREMENT_RECONCILIATION_REQUIRED", `${dataset}/${id}/${arm} scored outcome still requires reconciliation`);
       return scored;
     };
     const plain = outcome("plain"); const core = outcome("core");
@@ -2459,7 +2518,7 @@ function reportCampaign(options) {
   const pilotManifest = validateFingerprint(readJson(path.resolve(options.pilotManifest)), "pilot_manifest_fingerprint", "pilot manifest");
   const ledgerFile = statRegular(path.join(campaignRoot, "attempt-ledger.jsonl"), "attempt ledger");
   const ledgerRecords = loadLedger(ledgerFile.path);
-  expect(!ledgerRecords.some((record) => ["attempt-reconciliation-required", "attempt-critical-runner-defect"].includes(record.event_type)),
+  expect(!ledgerRecords.some((record) => ledgerRecordRequiresReconciliation(record)),
     "MEASUREMENT_RECONCILIATION_REQUIRED", "campaign has an unresolved reconciliation or critical runner-defect obligation");
   const datasets = {
     validation: loadPairs(campaignRoot, "validation", frozen.manifest.validation_family_ids, frozen.manifest, pilotManifest, ledgerRecords),
@@ -2585,6 +2644,9 @@ async function selfTest({ containment = true } = {}) {
     return entries.filter((entry) => entry.order[0] === "plain").length === 10
       && entries.filter((entry) => entry.order[0] === "core").length === 10;
   }), "MEASUREMENT_SELF_TEST", "counterbalancing failed");
+  expect(frozenScheduleValid(schedule, "validation", schedule.entries.map((entry) => entry.identity_id),
+    { small: 20, medium: 20, high: 20 }),
+  "MEASUREMENT_SELF_TEST", "frozen schedule semantic validation rejected the canonical schedule");
   const validSignals = Object.freeze({ arm: "plain", process_receipt_observable: true,
     authentic_terminal_completion: true, timed_out: false, process_containment_intact: true,
     no_surviving_descendants: true,
@@ -2633,6 +2695,22 @@ async function selfTest({ containment = true } = {}) {
   expect(coreVerificationStatus({ verification_authentic: true, process_receipt_observable: true, passed: false,
     receipt: { decision: { reason: "verification_stale_after_mutation" } } }) === "stale",
   "MEASUREMENT_SELF_TEST", "stale core verification status was not preserved");
+  const acceptanceExpected = { catalog_fingerprint: fingerprint({ catalog: "self-test" }) };
+  const acceptanceActivation = { process_receipt_observable: true, receipt: { schema_version: 2,
+    catalog_fingerprint: acceptanceExpected.catalog_fingerprint, catalog_status: "loaded",
+    decision: { allowed: true, reason: "no_workspace_mutation", activation_eligible: false, activated: false },
+    activation: { eligible: false, post_last_mutation_verification: false, terminal_success_allowed: true,
+      mutation_revision: 0, selected_check_id: null, verification_started_count: 0,
+      verification_completed_count: 0, terminal_reason: "no_workspace_mutation" },
+    check: null } };
+  expect(noMutationAcceptanceReceiptAuthentic(acceptanceActivation, acceptanceExpected)
+    && !noMutationAcceptanceReceiptAuthentic({ ...acceptanceActivation,
+      receipt: { ...acceptanceActivation.receipt, decision: { ...acceptanceActivation.receipt.decision,
+        reason: "verification_passed" } } }, acceptanceExpected),
+  "MEASUREMENT_SELF_TEST", "no-mutation core acceptance receipt contract drifted");
+  expect(ledgerRecordRequiresReconciliation({ event_type: "attempt-completed", reconciliation_required: true })
+    && !ledgerRecordRequiresReconciliation({ event_type: "attempt-completed", reconciliation_required: false }),
+  "MEASUREMENT_SELF_TEST", "durable completion lost its reconciliation obligation");
   const pairs = Array.from({ length: 60 }, (_entry, index) => ({ stratum: STRATA[Math.floor(index / 20)],
     plain: { oracle_validated_task_success: index < 30 }, core: { oracle_validated_task_success: index < 36 } }));
   const selfTestSeed = fingerprint({ schema_version: 1, seed: "self-test" });
@@ -2728,7 +2806,7 @@ async function selfTest({ containment = true } = {}) {
     "MEASUREMENT_SELF_TEST", "plain-only absolute guardrail failure was falsely attributed as a core regression");
   return Object.freeze({ status: "passed", schedule_fingerprint: schedule.schedule_fingerprint,
     bootstrap_interval: first, exact_two_sided_0_6: exactTwoSidedMcNemar(0, 6), exact_one_sided_6_6: binomialUpperTail(6, 6),
-    measurement_contract_fingerprint: loadMeasurementContract().fingerprint, model_free_contract_tests: 14,
+    measurement_contract_fingerprint: loadMeasurementContract().fingerprint, model_free_contract_tests: 17,
     seatbelt_containment: containment ? "passed" : "not_run" });
 }
 

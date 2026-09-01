@@ -40,7 +40,10 @@ run for plain and one for core. Each uses the exact OpenCode executable,
 configuration, provider-proxy plugin, Seatbelt profile, and core wrapper, but a
 deterministic local proxy response makes zero external provider submissions and
 zero model calls. A content-bound receipt for both arms is mandatory before the
-official campaign can create its first model-process ledger event.
+official campaign can create its first model-process ledger event. The core
+probe intentionally makes no mutation and requires the authentic
+`no_workspace_mutation` terminal decision; it does not misrepresent that
+receipt as a post-mutation verification pass.
 
 ## Metric and safety observability
 
@@ -128,6 +131,9 @@ If the host crashes after the content-bound receipt is fsynced but before its
 completion event reaches the ledger, exact resume validates the orphan receipt
 and appends a recovery completion event without another model call. An orphan
 model-process start without a valid receipt remains reconciliation-blocking.
+Every completion event also carries the receipt's `reconciliation_required`
+bit, so a crash before the later explanatory reconciliation event still fails
+closed during resume and reporting.
 
 A process signal before any provider submission, with no task mutation and an
 established zero-submission disposition, is likewise a proven host
