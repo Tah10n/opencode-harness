@@ -926,19 +926,22 @@ function verifyOpenCodeSeatbeltStartup(opencode) {
     for (const directory of [workspace, attempt, configuration]) fs.mkdirSync(directory, { recursive: true, mode: 0o700 });
     const socketPath = path.join(root, "provider.sock"); fs.writeFileSync(socketPath, "preflight", { mode: 0o600 });
     const credentialFile = path.join(attempt, "credential.json"); fs.writeFileSync(credentialFile, "{}", { mode: 0o600 });
+    const plugins = path.join(configuration, "plugins"); fs.mkdirSync(plugins, { mode: 0o700 });
+    const pluginFile = path.join(plugins, "startup-preflight.mjs");
+    fs.writeFileSync(pluginFile, "export default async () => ({});\n", { mode: 0o400 });
     const profile = path.join(root, "model.sb");
     fs.writeFileSync(profile, modelSandboxProfile({ workspace, attemptDirectory: attempt,
       opencodePath: opencode.path, providerProxySocket: socketPath, trustedNodePath: process.execPath }), { mode: 0o600 });
-    const environment = modelEnvironment(attempt, configuration, {
-      placeholder_auth_content: "{}", credential_file: credentialFile,
+    const binding = providerExecutionBinding(attempt, configuration, {
+      placeholder_auth_content: "{}", credential_file: credentialFile, plugin_file: pluginFile,
     });
     const result = run("/usr/bin/sandbox-exec", ["-f", profile, opencode.path, "--version"], {
-      cwd: workspace, env: environment, timeout: 30_000,
+      cwd: workspace, env: binding.environment, timeout: 30_000,
     });
     expect(passed(result) && result.stdout.trim() === opencode.version,
       "MEASUREMENT_CONTAINMENT", `OpenCode Seatbelt startup failed: status=${result.status} signal=${result.signal}`);
     const debug = run("/usr/bin/sandbox-exec", ["-f", profile, opencode.path, "debug", "paths"], {
-      cwd: workspace, env: environment, timeout: 30_000,
+      cwd: workspace, env: binding.environment, timeout: 30_000,
     });
     expect(passed(debug), "MEASUREMENT_CONTAINMENT",
       `OpenCode Seatbelt debug startup failed: status=${debug.status} signal=${debug.signal}`);
@@ -1317,16 +1320,25 @@ function oracleSandboxProfile({ workspace, runtime, temporary }) {
     `(allow file-write* (subpath ${sandboxLiteral(workspace)}) (subpath ${sandboxLiteral(temporary)}) (literal "/dev/null"))`,
   ].join("\n");
 }
+function boundProviderPluginFile(attemptDirectory, configuration, credential) {
+  const attemptRoot = fs.realpathSync.native(attemptDirectory);
+  const pluginRoot = fs.realpathSync.native(path.join(configuration, "plugins"));
+  const pluginFile = statRegular(credential.plugin_file, "provider proxy plugin").path;
+  const pluginRelative = path.relative(attemptRoot, pluginFile);
+  expect(pluginRelative.length > 0 && pluginRelative !== ".." && !pluginRelative.startsWith(`..${path.sep}`)
+    && !path.isAbsolute(pluginRelative) && path.dirname(pluginFile) === pluginRoot,
+  "MEASUREMENT_CREDENTIAL_BOUNDARY", "provider proxy plugin escaped the private attempt directory");
+  return pluginFile;
+}
+function providerConfigurationBaseline(attemptDirectory, configuration, credential) {
+  boundProviderPluginFile(attemptDirectory, configuration, credential);
+  return directoryFingerprint(configuration);
+}
 function modelEnvironment(attemptDirectory, configuration, credential) {
   const isolatedHome = path.join(attemptDirectory, "home"); const isolatedTmp = path.join(attemptDirectory, "tmp");
   const data = path.join(attemptDirectory, "xdg-data"); const cache = path.join(attemptDirectory, "xdg-cache");
   for (const directory of [isolatedHome, isolatedTmp, data, cache]) fs.mkdirSync(directory, { mode: 0o700 });
-  const attemptRoot = fs.realpathSync.native(attemptDirectory);
-  const pluginFile = statRegular(credential.plugin_file, "provider proxy plugin").path;
-  const pluginRelative = path.relative(attemptRoot, pluginFile);
-  expect(pluginRelative.length > 0 && pluginRelative !== ".." && !pluginRelative.startsWith(`..${path.sep}`)
-    && !path.isAbsolute(pluginRelative),
-  "MEASUREMENT_CREDENTIAL_BOUNDARY", "provider proxy plugin escaped the private attempt directory");
+  const pluginFile = boundProviderPluginFile(attemptDirectory, configuration, credential);
   const effectiveOverlay = { ...OVERLAY, plugin: [pathToFileURL(pluginFile).href] };
   return Object.freeze({ PATH: process.env.PATH ?? "/usr/bin:/bin", HOME: isolatedHome, TMPDIR: isolatedTmp,
     LANG: "C", LC_ALL: "C", TZ: "UTC", XDG_DATA_HOME: data, XDG_CACHE_HOME: cache,
@@ -1337,6 +1349,13 @@ function modelEnvironment(attemptDirectory, configuration, credential) {
     OPENCODE_CONFIG_DIR: configuration, OPENCODE_CONFIG_CONTENT: JSON.stringify(effectiveOverlay),
     OPENCODE_AUTH_CONTENT: credential.placeholder_auth_content,
     CORE_PUBLIC_AB_PROVIDER_PROXY_FILE: credential.credential_file });
+}
+function providerExecutionBinding(attemptDirectory, configuration, credential) {
+  const configurationFingerprint = providerConfigurationBaseline(attemptDirectory, configuration, credential);
+  const environment = modelEnvironment(attemptDirectory, configuration, credential);
+  expect(configurationFingerprint === directoryFingerprint(configuration),
+    "MEASUREMENT_CONFIGURATION_DRIFT", "provider environment construction changed the frozen configuration");
+  return Object.freeze({ configuration_fingerprint: configurationFingerprint, environment });
 }
 
 function installProviderBridgeFiles({ attemptDirectory, configuration, proxy }) {
@@ -1377,10 +1396,11 @@ async function executeAcceptanceArm({ arm, coreBundle, opencode, trustedNodePath
     const before = captureWorkspace(workspace);
     const catalogBefore = arm === "core" ? await installCatalog(workspace, task, coreBundle, trustedNodePath) : null;
     copyConfiguration(arm === "core" ? coreBundle : null, configuration);
-    const configurationBefore = directoryFingerprint(configuration);
     const proxy = await createSyntheticAcceptanceProxy(
       `/private/tmp/core-ab-${process.pid}-${randomBytes(12).toString("base64url")}.sock`);
     bridge = installProviderBridgeFiles({ attemptDirectory, configuration, proxy });
+    const providerBinding = providerExecutionBinding(attemptDirectory, configuration, bridge);
+    const configurationBefore = providerBinding.configuration_fingerprint;
     const profile = path.join(attemptDirectory, "model.sb");
     fs.writeFileSync(profile, modelSandboxProfile({ workspace, attemptDirectory, opencodePath: opencode.path,
       providerProxySocket: bridge.provider_proxy_socket, trustedNodePath }), { mode: 0o600 });
@@ -1392,7 +1412,7 @@ async function executeAcceptanceArm({ arm, coreBundle, opencode, trustedNodePath
       "--opencode", opencode.path, "--receipt-fd", "3", "--child-timeout-ms", "120000", "--", ...opencodeArgs]
       : opencodeArgs;
     const managed = await runManagedProcess({ file, args, cwd: workspace,
-      env: modelEnvironment(attemptDirectory, configuration, bridge), profile, timeoutMs: 120_000,
+      env: providerBinding.environment, profile, timeoutMs: 120_000,
       candidate: arm === "core" });
     await bridge.close(); const proxyEvidence = bridge.status(); bridge = null;
     const events = parseOpenCodeEvents(managed.stdout);
@@ -1842,7 +1862,8 @@ async function executeAttempt(context, task, arm, attemptIndex, retryOf = null) 
     copyConfiguration(arm === "core" ? context.coreBundle : null, configuration);
     credential = await installCredentialBridge({ attemptDirectory, configuration,
       credentialStore: context.credentialStore });
-    const configurationBefore = directoryFingerprint(configuration);
+    const providerBinding = providerExecutionBinding(attemptDirectory, configuration, credential);
+    const configurationBefore = providerBinding.configuration_fingerprint;
     const profile = path.join(attemptDirectory, "model.sb");
     fs.writeFileSync(profile, modelSandboxProfile({ workspace, attemptDirectory, opencodePath: context.opencode.path,
       providerProxySocket: credential.provider_proxy_socket, trustedNodePath: context.trustedNodePath }), { mode: 0o600 });
@@ -1857,7 +1878,7 @@ async function executeAttempt(context, task, arm, attemptIndex, retryOf = null) 
       attempt_binding_fingerprint: attemptBinding, recorded_at: new Date().toISOString() });
     modelProcessStarted = true;
     const managed = await runManagedProcess({ file, args, cwd: workspace,
-      env: modelEnvironment(attemptDirectory, configuration, credential), profile,
+      env: providerBinding.environment, profile,
       timeoutMs: context.manifest.timeout_ms,
       candidate: arm === "core" });
     await credential.close(); const providerEvidence = credential.status(); credential = null;
@@ -2719,15 +2740,17 @@ async function selfTest({ containment = true } = {}) {
   const pluginRoot = fs.mkdtempSync(path.join(fs.realpathSync.native(os.tmpdir()), "core-public-ab-plugin-test-"));
   try {
     const configuration = path.join(pluginRoot, "configuration"); fs.mkdirSync(configuration, { mode: 0o700 });
-    const pluginFile = path.join(pluginRoot, "provider-proxy.mjs"); fs.writeFileSync(pluginFile, "export default {};\n", { mode: 0o400 });
-    const environment = modelEnvironment(pluginRoot, configuration, {
+    const plugins = path.join(configuration, "plugins"); fs.mkdirSync(plugins, { mode: 0o700 });
+    const pluginFile = path.join(plugins, "provider-proxy.mjs"); fs.writeFileSync(pluginFile, "export default {};\n", { mode: 0o400 });
+    const binding = providerExecutionBinding(pluginRoot, configuration, {
       plugin_file: pluginFile, credential_file: path.join(pluginRoot, "credential.json"),
       placeholder_auth_content: "{}",
     });
-    const effective = JSON.parse(environment.OPENCODE_CONFIG_CONTENT);
+    const effective = JSON.parse(binding.environment.OPENCODE_CONFIG_CONTENT);
     expect(Array.isArray(effective.plugin) && effective.plugin.length === 1
-      && effective.plugin[0] === pathToFileURL(fs.realpathSync.native(pluginFile)).href,
-    "MEASUREMENT_SELF_TEST", "provider proxy plugin is absent from the effective OpenCode configuration");
+      && effective.plugin[0] === pathToFileURL(fs.realpathSync.native(pluginFile)).href
+      && binding.configuration_fingerprint === directoryFingerprint(configuration),
+    "MEASUREMENT_SELF_TEST", "provider plugin binding or post-install configuration baseline drifted");
   } finally { fs.rmSync(pluginRoot, { recursive: true, force: true }); }
   expect(ledgerRecordRequiresReconciliation({ event_type: "attempt-completed", reconciliation_required: true })
     && !ledgerRecordRequiresReconciliation({ event_type: "attempt-completed", reconciliation_required: false }),
