@@ -303,6 +303,27 @@ function durableJson(target, value, { exclusive = true } = {}) {
   const parent = fs.openSync(path.dirname(target), fs.constants.O_RDONLY);
   try { fs.fsyncSync(parent); } finally { fs.closeSync(parent); }
 }
+function prepareTrustedMeasurementNode(root, expected) {
+  const directory = path.join(root, "trusted-runtime");
+  fs.mkdirSync(directory, { recursive: true, mode: 0o700 });
+  const target = path.join(directory, "node");
+  if (!fs.existsSync(target)) {
+    const temporary = `${target}.tmp-${process.pid}-${randomBytes(6).toString("hex")}`;
+    fs.copyFileSync(process.execPath, temporary, fs.constants.COPYFILE_EXCL);
+    fs.chmodSync(temporary, 0o500);
+    const descriptor = fs.openSync(temporary, fs.constants.O_RDONLY);
+    try { fs.fsyncSync(descriptor); } finally { fs.closeSync(descriptor); }
+    fs.renameSync(temporary, target);
+    const parent = fs.openSync(directory, fs.constants.O_RDONLY);
+    try { fs.fsyncSync(parent); } finally { fs.closeSync(parent); }
+  }
+  const executable = statRegular(target, "trusted measurement Node executable");
+  expect((executable.stat.mode & 0o077) === 0 && (executable.stat.mode & 0o111) !== 0
+    && (typeof process.getuid !== "function" || executable.stat.uid === process.getuid())
+    && sha256File(executable.path) === expected.measurement_node_executable_sha256,
+  "MEASUREMENT_RUNTIME", "trusted measurement Node executable differs from the frozen binding");
+  return executable.path;
+}
 function appendDurableLine(target, value) {
   fs.mkdirSync(path.dirname(target), { recursive: true, mode: 0o700 });
   const existed = fs.existsSync(target);
@@ -766,7 +787,45 @@ function verifyExactModelCatalog(opencodePath) {
     variant: MODEL_BINDING.variant });
 }
 
-function freezeManifests(options) {
+function verifyOpenCodeSeatbeltStartup(opencode) {
+  const root = fs.mkdtempSync(path.join(fs.realpathSync.native(os.tmpdir()), "core-public-ab-opencode-preflight-"));
+  try {
+    const workspace = path.join(root, "workspace"); const attempt = path.join(root, "attempt");
+    const configuration = path.join(attempt, "configuration");
+    for (const directory of [workspace, attempt, configuration]) fs.mkdirSync(directory, { recursive: true, mode: 0o700 });
+    const socketPath = path.join(root, "provider.sock"); fs.writeFileSync(socketPath, "preflight", { mode: 0o600 });
+    const credentialFile = path.join(attempt, "credential.json"); fs.writeFileSync(credentialFile, "{}", { mode: 0o600 });
+    const profile = path.join(root, "model.sb");
+    fs.writeFileSync(profile, modelSandboxProfile({ workspace, attemptDirectory: attempt,
+      opencodePath: opencode.path, providerProxySocket: socketPath, trustedNodePath: process.execPath }), { mode: 0o600 });
+    const result = run("/usr/bin/sandbox-exec", ["-f", profile, opencode.path, "--version"], {
+      cwd: workspace, env: modelEnvironment(attempt, configuration, {
+        placeholder_auth_content: "{}", credential_file: credentialFile,
+      }), timeout: 30_000,
+    });
+    expect(passed(result) && result.stdout.trim() === opencode.version,
+      "MEASUREMENT_CONTAINMENT", `OpenCode Seatbelt startup failed: status=${result.status} signal=${result.signal}`);
+    return Object.freeze({ status: "passed", version: opencode.version });
+  } finally { fs.rmSync(root, { recursive: true, force: true }); }
+}
+
+async function verifyTrustedNodeCatalogPreflight(coreBundle, expected) {
+  const root = fs.mkdtempSync(path.join(fs.realpathSync.native(os.tmpdir()), "core-public-ab-node-preflight-"));
+  try {
+    const workspace = path.join(root, "workspace"); fs.mkdirSync(workspace, { mode: 0o700 });
+    expect(passed(run("git", ["init", "--quiet"], { cwd: workspace })),
+      "MEASUREMENT_RUNTIME", "trusted Node preflight Git initialization failed");
+    fs.writeFileSync(path.join(workspace, "probe.js"), "export default true;\n", { mode: 0o600 });
+    expect(passed(run("git", ["add", "."], { cwd: workspace })),
+      "MEASUREMENT_RUNTIME", "trusted Node preflight index creation failed");
+    const trustedNodePath = prepareTrustedMeasurementNode(root, expected);
+    await installCatalog(workspace, { allowed_mutation_paths: ["probe.js"], subject_paths: ["probe.js"] },
+      coreBundle, trustedNodePath);
+    return Object.freeze({ status: "passed" });
+  } finally { fs.rmSync(root, { recursive: true, force: true }); }
+}
+
+async function freezeManifests(options) {
   assertClean(SOURCE_ROOT);
   const measurementContract = loadMeasurementContract();
   const runnerSha256 = sha256File(RUNNER_PATH);
@@ -780,6 +839,11 @@ function freezeManifests(options) {
   const opencode = verifyBenchmarkV3OpenCodeExecutable(path.resolve(options.opencode));
   expect(opencode.variant_supported, "MEASUREMENT_MODEL", "OpenCode lacks --variant support");
   verifyExactModelCatalog(opencode.path);
+  const opencodeSeatbeltStartup = verifyOpenCodeSeatbeltStartup(opencode);
+  const measurementNode = Object.freeze({ measurement_node_version: process.version,
+    measurement_node_executable_sha256: sha256File(process.execPath) });
+  const trustedNodeCatalogPreflight = await verifyTrustedNodeCatalogPreflight(
+    product.materialized_core_directory, measurementNode);
   const publicRuntime = loadAndVerifyPublicRuntime(options.publicRuntime);
   const pilotRuntime = loadAndVerifyPilotRuntime(options.pilotRoot, options.pilotRuntimeManifest);
   const pilotManifest = createPilotManifest({ artifactPath: options.pilotArtifact,
@@ -823,6 +887,9 @@ function freezeManifests(options) {
     variant: MODEL_BINDING.variant,
     opencode_version: opencode.version,
     opencode_executable_sha256: opencode.sha256,
+    ...measurementNode,
+    opencode_seatbelt_startup_preflight: opencodeSeatbeltStartup,
+    trusted_measurement_node_catalog_preflight: trustedNodeCatalogPreflight,
     timeout_ms: Number(options.timeoutMs),
     parallel_pairs: Number(options.parallelPairs),
     arm_order_schedule: schedules,
@@ -871,6 +938,10 @@ function validateMeasurementManifest(file) {
     && manifest.core_bundle_fingerprint === CORE_BUNDLE_FINGERPRINT
     && manifest.provider === MODEL_BINDING.provider && manifest.model === MODEL_BINDING.model
     && manifest.variant === MODEL_BINDING.variant && manifest.evaluator_fingerprint === evaluatorFingerprint()
+    && manifest.measurement_node_version === process.version
+    && manifest.measurement_node_executable_sha256 === sha256File(process.execPath)
+    && manifest.opencode_seatbelt_startup_preflight?.status === "passed"
+    && manifest.trusted_measurement_node_catalog_preflight?.status === "passed"
     && manifest.published_benchmark_input_fingerprint === fingerprint({ schema_version: 1,
       files: canonicalFileInventory(SOURCE_ROOT, BENCHMARK_INPUT_PATHS) })
     && manifest.validation_family_ids.length === 60 && manifest.real_pilot_identity_ids.length === 29
@@ -962,16 +1033,16 @@ function directoryFingerprint(directory) {
   };
   visit(directory); return fingerprint(entries);
 }
-function candidateCheck(task) {
+function candidateCheck(task, trustedNodePath) {
   const syntaxProgram = "const{spawnSync}=require('node:child_process');for(const f of process.argv.slice(1)){const r=spawnSync(process.execPath,['--check',f],{stdio:'inherit'});if(r.status!==0)process.exit(r.status??1)}";
   return Object.freeze({ check_id: "core-public-ab-syntax-all", scope_prefixes: task.allowed_mutation_paths.slice().sort(),
-    cost_rank: 1, executable_path: fs.realpathSync.native(process.execPath), argv: ["-e", syntaxProgram],
+    cost_rank: 1, executable_path: fs.realpathSync.native(trustedNodePath), argv: ["-e", syntaxProgram],
     immutable_input_paths: [], subject_paths: task.subject_paths, cwd: ".", timeout_ms: 30_000 });
 }
-async function installCatalog(workspace, task, coreBundle) {
+async function installCatalog(workspace, task, coreBundle, trustedNodePath) {
   const target = path.join(workspace, ".git", "opencode-harness", "core", "checks.json");
   fs.mkdirSync(path.dirname(target), { recursive: true });
-  fs.writeFileSync(target, `${JSON.stringify({ schema_version: 2, catalog_id: "core-public-ab-public", checks: [candidateCheck(task)] })}\n`);
+  fs.writeFileSync(target, `${JSON.stringify({ schema_version: 2, catalog_id: "core-public-ab-public", checks: [candidateCheck(task, trustedNodePath)] })}\n`);
   const runtime = await import(pathToFileURL(path.join(coreBundle, "runtime", "core-verification-runtime.mjs")).href);
   const catalog = runtime.loadCoreVerificationCatalog(workspace);
   expect(catalog.catalog_status === "loaded" && catalog.checks.length === 1,
@@ -1007,11 +1078,12 @@ function isolateHiddenOracleWorkspace(modelWorkspace) {
 }
 
 function sandboxLiteral(value) { return JSON.stringify(fs.realpathSync.native(value)); }
-function modelSandboxProfile({ workspace, attemptDirectory, opencodePath, providerProxySocket }) {
+function modelSandboxProfile({ workspace, attemptDirectory, opencodePath, providerProxySocket, trustedNodePath }) {
   expect(process.platform === "darwin" && fs.existsSync("/usr/bin/sandbox-exec"),
     "MEASUREMENT_CONTAINMENT", "macOS Seatbelt is required for this frozen runner");
-  const system = ["/System", "/usr", "/Library", "/opt/homebrew", path.dirname(process.execPath)]
-    .filter((entry, index, values) => fs.existsSync(entry) && values.indexOf(entry) === index);
+  const system = ["/System", "/usr", "/Library", "/opt/homebrew", "/private/var/db/timezone",
+    path.dirname(process.execPath), trustedNodePath ? path.dirname(trustedNodePath) : null]
+    .filter((entry, index, values) => entry !== null && fs.existsSync(entry) && values.indexOf(entry) === index);
   return ["(version 1)", "(deny default)", "(allow process-exec process-fork)",
     "(allow signal (target same-sandbox))", "(allow process-info* (target same-sandbox))",
     `(allow network-outbound (literal ${JSON.stringify(path.resolve(providerProxySocket))}))`,
@@ -1104,6 +1176,9 @@ function classifyError(stderr) {
   if (/rate.?limit|status 429|temporarily unavailable|status 5[0-9][0-9]/u.test(text)) return "provider-infrastructure";
   if (/sandbox|operation not permitted|spawn|enoent|eacces/u.test(text)) return "host-infrastructure";
   return "model-protocol";
+}
+function provenPreProviderHostTermination({ providerSubmissionCount, signal, spawnErrorCode }) {
+  return providerSubmissionCount === 0 && (signal !== null || spawnErrorCode !== null);
 }
 async function terminateAndVerifyProcessGroup(pid) {
   if (!Number.isSafeInteger(pid) || pid < 1) return false;
@@ -1388,7 +1463,8 @@ async function executeAttempt(context, task, arm, attemptIndex, retryOf = null) 
     expect(hiddenDataPreflight.leakage_observed === false, "MEASUREMENT_HIDDEN_DATA_LEAKAGE",
       `${attemptId} hidden control bytes or paths entered model-visible inputs`);
     const before = captureWorkspace(workspace);
-    const catalogBefore = arm === "core" ? await installCatalog(workspace, task, context.coreBundle) : null;
+    const catalogBefore = arm === "core" ? await installCatalog(workspace, task, context.coreBundle,
+      context.trustedNodePath) : null;
     attemptDirectory = fs.mkdtempSync(path.join(context.campaignRoot, "attempt-private-"));
     const configuration = path.join(attemptDirectory, "configuration");
     copyConfiguration(arm === "core" ? context.coreBundle : null, configuration);
@@ -1397,7 +1473,7 @@ async function executeAttempt(context, task, arm, attemptIndex, retryOf = null) 
     const configurationBefore = directoryFingerprint(configuration);
     const profile = path.join(attemptDirectory, "model.sb");
     fs.writeFileSync(profile, modelSandboxProfile({ workspace, attemptDirectory, opencodePath: context.opencode.path,
-      providerProxySocket: credential.provider_proxy_socket }), { mode: 0o600 });
+      providerProxySocket: credential.provider_proxy_socket, trustedNodePath: context.trustedNodePath }), { mode: 0o600 });
     const opencodeArgs = ["run", "--format", "json", "--model", `${MODEL_BINDING.provider}/${MODEL_BINDING.model}`,
       "--variant", MODEL_BINDING.variant, "--agent", arm === "core" ? "core" : "build", "--dir", workspace, task.prompt];
     const file = arm === "core" ? process.execPath : context.opencode.path;
@@ -1450,11 +1526,16 @@ async function executeAttempt(context, task, arm, attemptIndex, retryOf = null) 
         `${attemptId} has an ambiguous provider submission after the model boundary; retry is forbidden`);
     }
     const providerSubmissionDispositionEstablished = providerEvidence.ambiguous_submission_count === 0;
+    const preProviderHostTermination = provenPreProviderHostTermination({
+      providerSubmissionCount: providerEvidence.provider_submission_count,
+      signal: managed.signal,
+      spawnErrorCode: managed.spawn_error_code,
+    });
     const explicitInfrastructureFailure = (arm === "core" && activation?.process_receipt_observable !== true)
       || (!timedOut && changed.length === 0 && !oracle.semantic_passed
       && !authenticTerminalCompletion && !configurationDrift && !catalogDrift
       && providerEvidence.ambiguous_submission_count === 0 && !modelAccessRequired
-      && (providerInfrastructureFailure || (providerEvidence.provider_submission_count === 0
+      && (preProviderHostTermination || providerInfrastructureFailure || (providerEvidence.provider_submission_count === 0
         && ["host-infrastructure", "provider-infrastructure"].includes(errorClass))));
     const classification = modelAccessRequired ? Object.freeze({ oracle_validated_task_success: false,
       scored_outcome: false, infrastructure_failure_before_scoring: false, reconciliation_required: false })
@@ -1718,6 +1799,7 @@ function campaignContext(options) {
   if (!fs.existsSync(campaignBindingPath)) durableJson(campaignBindingPath, campaignBinding);
   else expect(canonicalJson(readJson(campaignBindingPath)) === canonicalJson(campaignBinding),
     "MEASUREMENT_RESUME", "campaign directory is bound to another manifest");
+  const trustedNodePath = prepareTrustedMeasurementNode(campaignRoot, frozen.manifest);
   const oauthState = initializeCredentialState(campaignRoot, options.opencodeAuth);
   const credentialStore = createBenchmarkV3ProviderCredentialStore({ OPENAI_OAUTH_STATE_FILE: oauthState,
     BENCHMARK_V3_PROVIDER_AUTH_MODE: "oauth" });
@@ -1727,7 +1809,7 @@ function campaignContext(options) {
   const pilotRuntimeByRepository = new Map(pilotRuntime.relevant.map((entry) => [entry.repository_id, entry]));
   return Object.freeze({ manifest: frozen.manifest, pilotManifest, pilotArtifact: verifiedPilot.artifact,
     productSourceRoot, coreBundle: product.materialized_core_directory, opencode, publicRuntime,
-    pilotRuntimeByRepository, pilotRoot: pilotRuntime.root, campaignRoot, credentialStore, repositories,
+    pilotRuntimeByRepository, pilotRoot: pilotRuntime.root, campaignRoot, credentialStore, repositories, trustedNodePath,
     ledger: ledgerAppender(path.join(campaignRoot, "attempt-ledger.jsonl")) });
 }
 
@@ -2095,7 +2177,7 @@ async function selfTest({ containment = true } = {}) {
       const socketPath = `/private/tmp/core-ab-${process.pid}-${randomBytes(12).toString("base64url")}.sock`;
       const profile = path.join(containmentRoot, "model.sb");
       fs.writeFileSync(profile, modelSandboxProfile({ workspace, attemptDirectory: attempt,
-        opencodePath: process.execPath, providerProxySocket: socketPath }), { mode: 0o600 });
+        opencodePath: process.execPath, providerProxySocket: socketPath, trustedNodePath: process.execPath }), { mode: 0o600 });
       const compiled = run("/usr/bin/sandbox-exec", ["-f", profile, "/usr/bin/true"]);
       expect(passed(compiled), "MEASUREMENT_SELF_TEST",
         `provider-only model Seatbelt profile does not apply: status=${compiled.status} signal=${compiled.signal} ${compiled.stderr.trim()}`);
@@ -2141,6 +2223,9 @@ async function selfTest({ containment = true } = {}) {
   const malformedProcess = classifyAttemptSignals({ ...validSignals, arm: "core", process_receipt_observable: false });
   expect(malformedProcess.scored_outcome === false && malformedProcess.infrastructure_failure_before_scoring === true,
     "MEASUREMENT_SELF_TEST", "malformed or unobservable process receipt was not an infrastructure failure");
+  expect(provenPreProviderHostTermination({ providerSubmissionCount: 0, signal: "SIGTRAP", spawnErrorCode: null })
+    && !provenPreProviderHostTermination({ providerSubmissionCount: 1, signal: "SIGTRAP", spawnErrorCode: null }),
+  "MEASUREMENT_SELF_TEST", "pre-provider host termination classification drifted");
   const pairs = Array.from({ length: 60 }, (_entry, index) => ({ stratum: STRATA[Math.floor(index / 20)],
     plain: { oracle_validated_task_success: index < 30 }, core: { oracle_validated_task_success: index < 36 } }));
   const selfTestSeed = fingerprint({ schema_version: 1, seed: "self-test" });
@@ -2245,7 +2330,7 @@ try {
   if (values.mode === "self-test") result = await selfTest();
   else if (values.mode === "contract-self-test") result = await selfTest({ containment: false });
   else if (values.mode === "prepare-public-runtime") result = preparePublicRuntime(required("public-repository"), required("output"));
-  else if (values.mode === "freeze") result = freezeManifests({
+  else if (values.mode === "freeze") result = await freezeManifests({
     productSourceRoot: required("product-source-root"), coreBundle: required("core-bundle"), opencode: required("opencode"),
     publicRuntime: required("public-runtime"), pilotRoot: required("pilot-root"), pilotArtifact: required("pilot-artifact"),
     pilotPublicKey: required("pilot-public-key"), pilotRuntimeManifest: required("pilot-runtime-manifest"),

@@ -58,6 +58,8 @@ node scripts/benchmark-core-public-ab.mjs --mode report \
 ```
 
 The manifest is created only after the runner commit has passed exact-head CI.
+Freeze itself must pass both the real OpenCode Seatbelt startup probe and the
+private trusted-Node core-catalog probe; both are provider-free.
 It is then committed without changing the runner, pushed to the existing draft
 PR, and required to pass exact-head CI again before the first model call. The
 manifest binds the earlier runner source SHA and exact runner SHA-256; the
@@ -65,3 +67,9 @@ runner requires that source SHA to remain an ancestor and its bytes to remain
 identical. The `run` command also requires a clean tree and is exact-resumable
 against the same campaign directory. A different manifest, runner, task
 binding, candidate, executable, runtime, or pilot artifact is rejected.
+
+An earlier preflight attempt under the superseded manifest reached two
+OpenCode process starts but zero proxy requests and zero provider submissions.
+It was invalidated as a critical pre-model runner defect; none of its synthetic
+process outcomes may be imported into, or retried within, the frozen
+model-backed campaign.

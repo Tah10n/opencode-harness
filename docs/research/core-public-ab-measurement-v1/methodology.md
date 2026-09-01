@@ -27,6 +27,14 @@ published benchmark inputs, candidate, OpenCode executable, runtimes, exact
 tasks, pilot controls, schedule, timeout, retry policy, evaluator, statistics,
 and call budget before the first model call.
 
+Freeze also executes the exact OpenCode binary under the provider-only
+Seatbelt profile with a non-networking `--version` probe. The profile grants
+read-only access to the macOS timezone database required by the embedded Bun
+runtime. Core trusted checks use an owner-private, content-bound copy of the
+measurement Node executable so that Homebrew's group-writable package-store
+ancestry cannot invalidate the trusted executable identity. Neither preflight
+submits a provider request.
+
 ## Metric and safety observability
 
 For both arms, `oracle_validated_task_success` is true only when authentic
@@ -100,6 +108,11 @@ Malformed or unobservable candidate child-process receipts are infrastructure
 failures rather than task failures. They remain retryable only under the same
 bounded disposition and campaign budgets. A scored task-arm outcome may occur
 exactly once.
+
+A process signal before any provider submission, with no task mutation and an
+established zero-submission disposition, is likewise a proven host
+infrastructure failure. The real OpenCode Seatbelt startup probe prevents such
+a host incompatibility from being mistaken for a scored model outcome.
 
 Raw stdout, stderr, task workspaces, private controls, credentials, and OAuth
 state are not published. Private receipts retain bounded counts, provider

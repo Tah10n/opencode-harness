@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "measurement_id": "core-public-ab-measurement-v1",
+  "status": "invalidated_before_first_provider_submission",
+  "superseded_manifest_fingerprint": "sha256:ccad143e541ba18ff3ceb05fb0ecd1edb19cb32d19ca83d80195474d81266a40",
+  "superseded_runner_sha256": "sha256:e48ced8b6fea4e0fb67789ee14d51e6eb76a8d0d81caf7bbc34c1ebe2fa259b8",
+  "observed_accounting": {
+    "model_process_started_events": 2,
+    "provider_proxy_requests": 0,
+    "provider_submissions": 0,
+    "provider_usage_observed": false,
+    "superseded_scored_process_outcomes": 2,
+    "core_infrastructure_attempts": 8
+  },
+  "validated_pre_model_defects": [
+    {
+      "code": "CORE_RUNTIME_UNTRUSTED_ANCESTRY",
+      "scope": "core_trusted_check_executable",
+      "evidence_sha256": "sha256:91adf608aedbcff2158e6773114dada1dbcbd0bbf8e16f291d715bb45e3ab3c5"
+    },
+    {
+      "code": "OPENCODE_SEATBELT_SIGTRAP",
+      "scope": "plain_and_core_model_process_startup",
+      "provider_submission_disposition": "zero_submissions_established"
+    }
+  ],
+  "disposition": {
+    "outcomes_retained_for_measurement": 0,
+    "provider_calls_retained_for_measurement": 0,
+    "reason": "critical runner and containment defects were proven before any provider submission"
+  }
+}
