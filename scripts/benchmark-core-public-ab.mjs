@@ -39,6 +39,8 @@ const SOURCE_ROOT = path.resolve(path.dirname(RUNNER_PATH), "..");
 const STRATA = Object.freeze(["small", "medium", "high"]);
 const DATASETS = Object.freeze(["validation", "pilot"]);
 const ARMS = Object.freeze(["plain", "core"]);
+const MEASUREMENT_ID = "core-public-ab-v2";
+const PAIR_CONCURRENCY_POLICY = "serial-single-user-seatbelt";
 const PRODUCT_SOURCE_SHA = "89f1f7f1980a829d7da162fcd737d0c52613225d";
 const CORE_BUNDLE_FINGERPRINT = "sha256:688ddc642bf694d7ab110915d5a101722b13ba6eeebde1b0788814575e3e8d21";
 const MODEL_BINDING = Object.freeze({ provider: "openai", model: "gpt-5.6-luna", variant: "low" });
@@ -91,11 +93,15 @@ const MEASUREMENT_SOURCE_ALLOWED_PATHS = Object.freeze([
   "scripts/benchmark-core-public-ab.mjs",
   "research/measurements/core-public-ab-v1/measurement-contract.v1.json",
   "research/measurements/core-public-ab-v1/measurement-manifest.json",
+  "research/measurements/core-public-ab-v2/measurement-manifest.json",
 ]);
 const MEASUREMENT_SOURCE_ALLOWED_PREFIXES = Object.freeze([
   "benchmarks/results/core-public-ab-measurement-v1/",
   "docs/research/core-public-ab-measurement-v1/",
   "research/measurements/core-public-ab-v1/",
+  "benchmarks/results/core-public-ab-measurement-v2/",
+  "docs/research/core-public-ab-measurement-v2/",
+  "research/measurements/core-public-ab-v2/",
 ]);
 const PROVIDER_RESPONSE_LIMIT = 64 * 1024 * 1024;
 
@@ -657,7 +663,7 @@ function quantile(values, probability) {
   if (lower === upper) return ordered[lower];
   return ordered[lower] + (ordered[upper] - ordered[lower]) * (index - lower);
 }
-function exclusiveUidParallelismValid(value) {
+function serialPairParallelismValid(value) {
   return Number.isSafeInteger(value) && value === 1;
 }
 function pairedBootstrapInterval(pairs, resamples, seed) {
@@ -1002,6 +1008,7 @@ async function verifyTrustedNodeCatalogPreflight(coreBundle, expected) {
 
 async function freezeManifests(options) {
   assertClean(SOURCE_ROOT);
+  const hostExecution = currentUserHostExecutionBinding();
   const measurementContract = loadMeasurementContract();
   const runnerSha256 = sha256File(RUNNER_PATH);
   const productSourceRoot = statDirectory(options.productSourceRoot, "product source root");
@@ -1042,7 +1049,7 @@ async function freezeManifests(options) {
   const bundleManifest = readJson(path.join(product.materialized_core_directory, ".opencode-profile-manifest.json"), "core bundle manifest");
   const body = {
     schema_version: 1,
-    measurement_id: "core-public-ab-v1",
+    measurement_id: MEASUREMENT_ID,
     runner_sha256: runnerSha256,
     runner_source_sha: gitSha(SOURCE_ROOT),
     measurement_contract_fingerprint: measurementContract.fingerprint,
@@ -1080,6 +1087,7 @@ async function freezeManifests(options) {
     opencode_version: opencode.version,
     opencode_executable_sha256: opencode.sha256,
     opencode_executable_fingerprint: opencode.executable_fingerprint,
+    host_execution: hostExecution,
     ...measurementNode,
     opencode_seatbelt_startup_preflight: opencodeSeatbeltStartup,
     trusted_measurement_node_catalog_preflight: trustedNodeCatalogPreflight,
@@ -1109,7 +1117,9 @@ async function freezeManifests(options) {
     development_sensitivity: Object.freeze({ included: false,
       reason: "bounded measurement uses validation primary plus frozen real-commit pilot" }),
     execution_policy: Object.freeze({ dataset_order: Object.freeze(["validation", "pilot"]), opportunity_gate: false,
-      pair_concurrency: "serial-single-exclusive-uid",
+      pair_concurrency: PAIR_CONCURRENCY_POLICY,
+      host_process_identity: "manifest-bound-invoking-user", dedicated_uid_required: false,
+      same_user_cross_process_isolation: "not_observable",
       model_network: "provider-only-through-host-isolated-credential-bridge",
       model_tools: Object.freeze({ local_read_edit: "allow", shell: "deny", web: "deny", external_directory: "deny", delegation: "deny" }) }),
     acceptance_probe: Object.freeze({ required_before_campaign: true, arms: ARMS,
@@ -1119,8 +1129,8 @@ async function freezeManifests(options) {
     created_at: new Date().toISOString(),
   };
   expect(Number.isSafeInteger(body.timeout_ms) && body.timeout_ms >= 60_000
-    && exclusiveUidParallelismValid(body.parallel_pairs),
-    "MEASUREMENT_MANIFEST", "timeout or exclusive-UID serial pair execution is invalid");
+    && serialPairParallelismValid(body.parallel_pairs),
+    "MEASUREMENT_MANIFEST", "timeout or serial pair execution is invalid");
   const manifest = Object.freeze({ ...body, manifest_fingerprint: fingerprint(body) });
   durableJson(path.resolve(options.pilotManifestOutput), pilotManifest);
   durableJson(path.resolve(options.manifestOutput), manifest);
@@ -1134,7 +1144,7 @@ function validateMeasurementManifest(file) {
   const manifest = validateFingerprint(readJson(manifestFile.path, "measurement manifest"),
     "manifest_fingerprint", "measurement manifest");
   const measurementContract = loadMeasurementContract();
-  expect(manifest.schema_version === 1 && manifest.measurement_id === "core-public-ab-v1"
+  expect(manifest.schema_version === 1 && manifest.measurement_id === MEASUREMENT_ID
     && manifest.runner_sha256 === sha256File(RUNNER_PATH) && manifest.product_source_sha === PRODUCT_SOURCE_SHA
     && SHA.test(manifest.runner_source_sha ?? "")
     && manifest.measurement_contract_fingerprint === measurementContract.fingerprint
@@ -1155,6 +1165,10 @@ function validateMeasurementManifest(file) {
     && manifest.severe_regression_safety?.status === "not_observable"
     && manifest.provider === MODEL_BINDING.provider && manifest.model === MODEL_BINDING.model
     && manifest.variant === MODEL_BINDING.variant && canonicalJson(manifest.model_binding) === canonicalJson(MODEL_BINDING)
+    && manifest.host_execution?.mode === "current-user-seatbelt"
+    && Number.isSafeInteger(manifest.host_execution?.uid) && manifest.host_execution.uid > 0
+    && manifest.host_execution.dedicated_uid_required === false
+    && manifest.host_execution.same_user_cross_process_isolation === "not_observable"
     && manifest.evaluator_fingerprint === evaluatorFingerprint()
     && FP.test(manifest.opencode_executable_fingerprint ?? "")
     && manifest.arm_order_schedule_fingerprint === fingerprint(manifest.arm_order_schedule)
@@ -1166,8 +1180,12 @@ function validateMeasurementManifest(file) {
     && manifest.maximum_scored_model_calls === TOTAL_SCORED_CALLS
     && manifest.maximum_total_model_calls === MAXIMUM_MODEL_CALLS
     && Number.isSafeInteger(manifest.timeout_ms) && manifest.timeout_ms >= 60_000
-    && exclusiveUidParallelismValid(manifest.parallel_pairs)
-    && manifest.execution_policy?.pair_concurrency === "serial-single-exclusive-uid"
+    && serialPairParallelismValid(manifest.parallel_pairs)
+    && manifest.execution_policy?.pair_concurrency === PAIR_CONCURRENCY_POLICY
+    && manifest.execution_policy.host_process_identity === "manifest-bound-invoking-user"
+    && manifest.execution_policy.dedicated_uid_required === false
+    && manifest.execution_policy.same_user_cross_process_isolation === "not_observable"
+    && manifest.execution_policy.model_network === "provider-only-through-host-isolated-credential-bridge"
     && manifest.measurement_node_version === process.version
     && manifest.measurement_node_executable_sha256 === sha256File(process.execPath)
     && manifest.opencode_seatbelt_startup_preflight?.status === "passed"
@@ -1376,6 +1394,17 @@ function providerConfigurationBaseline(attemptDirectory, configuration, credenti
   boundProviderPluginFile(attemptDirectory, configuration, credential);
   return directoryFingerprint(configuration);
 }
+function currentUserHostExecutionBinding(source = process.env, uid = process.getuid?.()) {
+  const dedicatedUidNames = ["OPENCODE_QUALITY_MACOS_CONTROLLER", "OPENCODE_QUALITY_MACOS_WORKLOAD_UID",
+    "OPENCODE_QUALITY_MACOS_UID_MARKER"];
+  const present = dedicatedUidNames.filter((name) => typeof source[name] === "string" && source[name].length > 0);
+  expect(present.length === 0, "MEASUREMENT_CONTAINMENT",
+    "core-public-ab-v2 official execution must not use the superseded dedicated-UID environment");
+  expect(Number.isSafeInteger(uid) && uid > 0, "MEASUREMENT_CONTAINMENT",
+    "current-user execution identity is unavailable");
+  return Object.freeze({ mode: "current-user-seatbelt", uid, dedicated_uid_required: false,
+    same_user_cross_process_isolation: "not_observable" });
+}
 function hostMacosContainmentBinding() {
   const names = ["OPENCODE_QUALITY_MACOS_CONTROLLER", "OPENCODE_QUALITY_MACOS_WORKLOAD_UID",
     "OPENCODE_QUALITY_MACOS_UID_MARKER"];
@@ -1525,6 +1554,9 @@ async function executeAcceptanceArm({ arm, coreBundle, opencode, trustedNodePath
 async function runAcceptanceProbes(options) {
   assertClean(SOURCE_ROOT);
   const frozen = validateMeasurementManifest(options.manifest);
+  const hostExecution = currentUserHostExecutionBinding();
+  expect(canonicalJson(hostExecution) === canonicalJson(frozen.manifest.host_execution),
+    "MEASUREMENT_CONTAINMENT", "acceptance host execution differs from the frozen manifest");
   const coreBundle = statDirectory(options.coreBundle, "core bundle");
   const bundleManifest = readJson(path.join(coreBundle, ".opencode-profile-manifest.json"), "core bundle manifest");
   expect(bundleManifest.source_sha === PRODUCT_SOURCE_SHA && bundleManifest.bundle_fingerprint === CORE_BUNDLE_FINGERPRINT
@@ -1545,6 +1577,7 @@ async function runAcceptanceProbes(options) {
     const body = { schema_version: 1, measurement_id: frozen.manifest.measurement_id,
       manifest_fingerprint: frozen.manifest.manifest_fingerprint, runner_sha256: sha256File(RUNNER_PATH),
       opencode_executable_sha256: opencode.sha256, core_bundle_fingerprint: CORE_BUNDLE_FINGERPRINT,
+      host_execution: hostExecution,
       probe_mode: "deterministic-local-proxy-no-external-submission", model_calls: 0, provider_calls: 0,
       arms, created_at: new Date().toISOString() };
     const receipt = Object.freeze({ ...body, acceptance_receipt_fingerprint: fingerprint(body) });
@@ -1563,6 +1596,7 @@ function validateAcceptanceReceipt(file, manifest) {
     && receipt.runner_sha256 === sha256File(RUNNER_PATH)
     && receipt.opencode_executable_sha256 === manifest.opencode_executable_sha256
     && receipt.core_bundle_fingerprint === manifest.core_bundle_fingerprint
+    && canonicalJson(receipt.host_execution) === canonicalJson(manifest.host_execution)
     && receipt.probe_mode === "deterministic-local-proxy-no-external-submission"
     && receipt.model_calls === 0 && receipt.provider_calls === 0
     && Array.isArray(receipt.arms) && receipt.arms.length === 2
@@ -2274,6 +2308,9 @@ function initializeCredentialState(campaignRoot, authPath) {
 function campaignContext(options) {
   const frozen = validateMeasurementManifest(options.manifest);
   assertClean(SOURCE_ROOT);
+  const hostExecution = currentUserHostExecutionBinding();
+  expect(canonicalJson(hostExecution) === canonicalJson(frozen.manifest.host_execution),
+    "MEASUREMENT_CONTAINMENT", "campaign host execution differs from the frozen manifest");
   expect(passed(git(SOURCE_ROOT, ["merge-base", "--is-ancestor", frozen.manifest.runner_source_sha, "HEAD"])),
     "MEASUREMENT_SOURCE", "runner source commit is not an ancestor of the current evidence branch");
   const pilotManifestFile = statRegular(options.pilotManifest, "pilot manifest");
@@ -2318,7 +2355,8 @@ function campaignContext(options) {
     manifest_sha256: frozen.sha256, pilot_manifest_fingerprint: pilotManifest.pilot_manifest_fingerprint,
     acceptance_receipt_fingerprint: acceptance.receipt.acceptance_receipt_fingerprint,
     acceptance_receipt_sha256: acceptance.sha256,
-    runner_sha256: frozen.manifest.runner_sha256, created_at: frozen.manifest.created_at };
+    runner_sha256: frozen.manifest.runner_sha256, host_execution: hostExecution,
+    created_at: frozen.manifest.created_at };
   if (!fs.existsSync(campaignBindingPath)) durableJson(campaignBindingPath, campaignBinding);
   else expect(canonicalJson(readJson(campaignBindingPath)) === canonicalJson(campaignBinding),
     "MEASUREMENT_RESUME", "campaign directory is bound to another manifest");
@@ -2760,8 +2798,18 @@ async function selfTest({ containment = true } = {}) {
   expect(frozenScheduleValid(schedule, "validation", schedule.entries.map((entry) => entry.identity_id),
     { small: 20, medium: 20, high: 20 }),
   "MEASUREMENT_SELF_TEST", "frozen schedule semantic validation rejected the canonical schedule");
-  expect(exclusiveUidParallelismValid(1) && !exclusiveUidParallelismValid(4),
-    "MEASUREMENT_SELF_TEST", "exclusive-UID campaign parallelism is not frozen to one pair");
+  expect(serialPairParallelismValid(1) && !serialPairParallelismValid(4),
+    "MEASUREMENT_SELF_TEST", "campaign parallelism is not frozen to one serial pair");
+  const currentUserBinding = currentUserHostExecutionBinding({}, 42);
+  expect(currentUserBinding.mode === "current-user-seatbelt" && currentUserBinding.uid === 42
+    && currentUserBinding.dedicated_uid_required === false
+    && currentUserBinding.same_user_cross_process_isolation === "not_observable",
+  "MEASUREMENT_SELF_TEST", "current-user host execution binding is invalid");
+  let dedicatedUidEnvironmentRejected = false;
+  try { currentUserHostExecutionBinding({ OPENCODE_QUALITY_MACOS_WORKLOAD_UID: "550" }, 42); }
+  catch (error) { dedicatedUidEnvironmentRejected = error?.code === "MEASUREMENT_CONTAINMENT"; }
+  expect(dedicatedUidEnvironmentRejected, "MEASUREMENT_SELF_TEST",
+    "v2 accepted the superseded dedicated-UID environment");
   expect(jsonStringFragmentCount({ input: `${ACCEPTANCE_PROMPT}\n${ACCEPTANCE_PROMPT}` }, ACCEPTANCE_PROMPT) === 2,
     "MEASUREMENT_SELF_TEST", "acceptance prompt binding counts fields instead of occurrences");
   const proxyRoot = fs.mkdtempSync(path.join(fs.realpathSync.native(os.tmpdir()), "core-public-ab-proxy-test-"));
