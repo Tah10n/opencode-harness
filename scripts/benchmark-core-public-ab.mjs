@@ -5,7 +5,7 @@ import os from "node:os";
 import path from "node:path";
 import process from "node:process";
 import { spawn, spawnSync } from "node:child_process";
-import { createServer } from "node:http";
+import { createServer, request as httpRequest } from "node:http";
 import { createServer as createNetServer } from "node:net";
 import {
   createHash,
@@ -552,7 +552,14 @@ function syntheticAcceptanceProviderBody(url) {
 }
 
 function jsonStringFragmentCount(value, expected) {
-  if (typeof value === "string") return value.includes(expected) ? 1 : 0;
+  if (typeof value === "string") {
+    let count = 0; let offset = 0;
+    while (true) {
+      const index = value.indexOf(expected, offset);
+      if (index === -1) return count;
+      count += 1; offset = index + expected.length;
+    }
+  }
   if (Array.isArray(value)) return value.reduce((count, entry) => count + jsonStringFragmentCount(entry, expected), 0);
   return value !== null && typeof value === "object"
     ? Object.values(value).reduce((count, entry) => count + jsonStringFragmentCount(entry, expected), 0)
@@ -565,6 +572,7 @@ async function createSyntheticAcceptanceProxy(socketPath) {
   const sockets = new Set();
   const server = createServer((request, response) => {
     const reject = (status, code) => {
+      rejectedRequests += 1; rejectionCodes.set(code, (rejectionCodes.get(code) ?? 0) + 1);
       response.writeHead(status, { "cache-control": "no-store", "content-type": "application/json" });
       response.end(`${JSON.stringify({ error: code })}\n`);
     };
@@ -594,7 +602,6 @@ async function createSyntheticAcceptanceProxy(socketPath) {
           "content-length": Buffer.byteLength(envelope) }); response.end(envelope);
       } catch (error) {
         const code = error?.code ?? "acceptance_proxy_failure";
-        rejectedRequests += 1; rejectionCodes.set(code, (rejectionCodes.get(code) ?? 0) + 1);
         reject(503, code);
       }
     });
@@ -620,6 +627,20 @@ async function createSyntheticAcceptanceProxy(socketPath) {
     } });
 }
 
+async function syntheticAcceptanceRequest(socketPath, { authorization = null, body = "{}" } = {}) {
+  return await new Promise((resolve, reject) => {
+    const headers = { "content-length": Buffer.byteLength(body) };
+    if (authorization !== null) headers.authorization = `Bearer ${authorization}`;
+    const request = httpRequest({ socketPath, path: "/proxy", method: "POST", headers }, (response) => {
+      const chunks = [];
+      response.on("data", (chunk) => chunks.push(chunk));
+      response.once("end", () => resolve(Object.freeze({ status: response.statusCode,
+        body: Buffer.concat(chunks).toString("utf8") })));
+    });
+    request.once("error", reject); request.end(body);
+  });
+}
+
 function xorshift(seedText) {
   let state = Number.parseInt(createHash("sha256").update(seedText).digest("hex").slice(0, 8), 16) >>> 0;
   return () => {
@@ -635,6 +656,9 @@ function quantile(values, probability) {
   const lower = Math.floor(index); const upper = Math.ceil(index);
   if (lower === upper) return ordered[lower];
   return ordered[lower] + (ordered[upper] - ordered[lower]) * (index - lower);
+}
+function exclusiveUidParallelismValid(value) {
+  return Number.isSafeInteger(value) && value === 1;
 }
 function pairedBootstrapInterval(pairs, resamples, seed) {
   expect(Array.isArray(pairs) && pairs.length > 0 && Number.isSafeInteger(resamples) && resamples >= 10_000,
@@ -1085,6 +1109,7 @@ async function freezeManifests(options) {
     development_sensitivity: Object.freeze({ included: false,
       reason: "bounded measurement uses validation primary plus frozen real-commit pilot" }),
     execution_policy: Object.freeze({ dataset_order: Object.freeze(["validation", "pilot"]), opportunity_gate: false,
+      pair_concurrency: "serial-single-exclusive-uid",
       model_network: "provider-only-through-host-isolated-credential-bridge",
       model_tools: Object.freeze({ local_read_edit: "allow", shell: "deny", web: "deny", external_directory: "deny", delegation: "deny" }) }),
     acceptance_probe: Object.freeze({ required_before_campaign: true, arms: ARMS,
@@ -1094,8 +1119,8 @@ async function freezeManifests(options) {
     created_at: new Date().toISOString(),
   };
   expect(Number.isSafeInteger(body.timeout_ms) && body.timeout_ms >= 60_000
-    && Number.isSafeInteger(body.parallel_pairs) && body.parallel_pairs >= 1 && body.parallel_pairs <= 8,
-  "MEASUREMENT_MANIFEST", "timeout or parallelism is invalid");
+    && exclusiveUidParallelismValid(body.parallel_pairs),
+    "MEASUREMENT_MANIFEST", "timeout or exclusive-UID serial pair execution is invalid");
   const manifest = Object.freeze({ ...body, manifest_fingerprint: fingerprint(body) });
   durableJson(path.resolve(options.pilotManifestOutput), pilotManifest);
   durableJson(path.resolve(options.manifestOutput), manifest);
@@ -1141,7 +1166,8 @@ function validateMeasurementManifest(file) {
     && manifest.maximum_scored_model_calls === TOTAL_SCORED_CALLS
     && manifest.maximum_total_model_calls === MAXIMUM_MODEL_CALLS
     && Number.isSafeInteger(manifest.timeout_ms) && manifest.timeout_ms >= 60_000
-    && Number.isSafeInteger(manifest.parallel_pairs) && manifest.parallel_pairs >= 1 && manifest.parallel_pairs <= 8
+    && exclusiveUidParallelismValid(manifest.parallel_pairs)
+    && manifest.execution_policy?.pair_concurrency === "serial-single-exclusive-uid"
     && manifest.measurement_node_version === process.version
     && manifest.measurement_node_executable_sha256 === sha256File(process.execPath)
     && manifest.opencode_seatbelt_startup_preflight?.status === "passed"
@@ -2711,8 +2737,14 @@ async function selfTest({ containment = true } = {}) {
       fs.mkdirSync(workspace); fs.mkdirSync(attempt);
       const socketPath = `/private/tmp/core-ab-${process.pid}-${randomBytes(12).toString("base64url")}.sock`;
       const profile = path.join(containmentRoot, "model.sb");
-      fs.writeFileSync(profile, modelSandboxProfile({ workspace, attemptDirectory: attempt,
-        opencodePath: process.execPath, providerProxySocket: socketPath, trustedNodePath: process.execPath }), { mode: 0o600 });
+      const macosContainment = hostMacosContainmentBinding();
+      const profileText = modelSandboxProfile({ workspace, attemptDirectory: attempt,
+        opencodePath: process.execPath, providerProxySocket: socketPath, trustedNodePath: process.execPath,
+        macosContainment });
+      fs.writeFileSync(profile, profileText, { mode: 0o600 });
+      expect(macosContainment === null || [macosContainment.controller_file, macosContainment.uid_marker,
+        macosContainment.uid_lease].every((entry) => profileText.includes(`(literal ${sandboxLiteral(entry)})`)),
+      "MEASUREMENT_SELF_TEST", "macOS exclusive-UID paths are absent from the provider Seatbelt profile");
       const compiled = run("/usr/bin/sandbox-exec", ["-f", profile, "/usr/bin/true"]);
       expect(passed(compiled), "MEASUREMENT_SELF_TEST",
         `provider-only model Seatbelt profile does not apply: status=${compiled.status} signal=${compiled.signal} ${compiled.stderr.trim()}`);
@@ -2728,6 +2760,26 @@ async function selfTest({ containment = true } = {}) {
   expect(frozenScheduleValid(schedule, "validation", schedule.entries.map((entry) => entry.identity_id),
     { small: 20, medium: 20, high: 20 }),
   "MEASUREMENT_SELF_TEST", "frozen schedule semantic validation rejected the canonical schedule");
+  expect(exclusiveUidParallelismValid(1) && !exclusiveUidParallelismValid(4),
+    "MEASUREMENT_SELF_TEST", "exclusive-UID campaign parallelism is not frozen to one pair");
+  expect(jsonStringFragmentCount({ input: `${ACCEPTANCE_PROMPT}\n${ACCEPTANCE_PROMPT}` }, ACCEPTANCE_PROMPT) === 2,
+    "MEASUREMENT_SELF_TEST", "acceptance prompt binding counts fields instead of occurrences");
+  const proxyRoot = fs.mkdtempSync(path.join(fs.realpathSync.native(os.tmpdir()), "core-public-ab-proxy-test-"));
+  let syntheticProxy = null;
+  try {
+    const socketPath = path.join(proxyRoot, "provider.sock"); syntheticProxy = await createSyntheticAcceptanceProxy(socketPath);
+    const unauthorized = await syntheticAcceptanceRequest(socketPath);
+    const oversized = await syntheticAcceptanceRequest(socketPath, {
+      authorization: syntheticProxy.payload.proxy_capability, body: "x",
+    });
+    const evidence = syntheticProxy.status();
+    expect(unauthorized.status === 403 && oversized.status === 413
+      && evidence.accepted_request_count === 0 && evidence.rejected_request_count === 2
+      && evidence.rejection_codes.forbidden === 1 && evidence.rejection_codes.request_too_large === 1,
+    "MEASUREMENT_SELF_TEST", "early synthetic proxy rejections are absent from acceptance accounting");
+  } finally {
+    await syntheticProxy?.close(); fs.rmSync(proxyRoot, { recursive: true, force: true });
+  }
   const validSignals = Object.freeze({ arm: "plain", process_receipt_observable: true,
     authentic_terminal_completion: true, timed_out: false, process_containment_intact: true,
     no_surviving_descendants: true,
@@ -2902,7 +2954,7 @@ async function selfTest({ containment = true } = {}) {
     "MEASUREMENT_SELF_TEST", "plain-only absolute guardrail failure was falsely attributed as a core regression");
   return Object.freeze({ status: "passed", schedule_fingerprint: schedule.schedule_fingerprint,
     bootstrap_interval: first, exact_two_sided_0_6: exactTwoSidedMcNemar(0, 6), exact_one_sided_6_6: binomialUpperTail(6, 6),
-    measurement_contract_fingerprint: loadMeasurementContract().fingerprint, model_free_contract_tests: 18,
+    measurement_contract_fingerprint: loadMeasurementContract().fingerprint, model_free_contract_tests: 21,
     seatbelt_containment: containment ? "passed" : "not_run" });
 }
 
@@ -2916,7 +2968,7 @@ const { values } = parseArgs({ options: {
   "acceptance-output": { type: "string" }, "acceptance-receipt": { type: "string" },
   "campaign-root": { type: "string" }, "opencode-auth": { type: "string" },
   "summary-output": { type: "string" }, "report-output": { type: "string" }, "ledger-output": { type: "string" },
-  "timeout-ms": { type: "string", default: String(DEFAULT_TIMEOUT_MS) }, "parallel-pairs": { type: "string", default: "4" },
+  "timeout-ms": { type: "string", default: String(DEFAULT_TIMEOUT_MS) }, "parallel-pairs": { type: "string", default: "1" },
 }, strict: true });
 
 const required = (name) => {

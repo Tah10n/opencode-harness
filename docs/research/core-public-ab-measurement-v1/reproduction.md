@@ -24,7 +24,7 @@ node scripts/benchmark-core-public-ab.mjs --mode freeze \
   --pilot-manifest-output "$PRIVATE_PILOT_MANIFEST" \
   --manifest-output research/measurements/core-public-ab-v1/measurement-manifest.json \
   --timeout-ms 900000 \
-  --parallel-pairs 4
+  --parallel-pairs 1
 
 git add -- research/measurements/core-public-ab-v1/measurement-manifest.json
 git commit -m "research: freeze oracle-validated measurement manifest"
@@ -74,6 +74,9 @@ runner requires that source SHA to remain an ancestor and its bytes to remain
 identical. The `run` command also requires a clean tree and is exact-resumable
 against the same campaign directory. A different manifest, runner, task
 binding, candidate, executable, runtime, or pilot artifact is rejected.
+Pair execution is frozen to one because the macOS containment boundary owns one
+exclusive workload UID and one lease. Running sibling attempts concurrently
+under that UID would violate the controller's process-exclusivity contract.
 
 After the manifest commit passes exact-head CI, `acceptance-probe` executes one
 full `opencode run` startup path for each arm through the same provider-only

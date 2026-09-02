@@ -648,6 +648,9 @@ jobs:
             GITHUB_RUN_ATTEMPT="$GITHUB_RUN_ATTEMPT" \
             GITHUB_JOB="$GITHUB_JOB" \
             GITHUB_REPOSITORY="$GITHUB_REPOSITORY" \
+            OPENCODE_QUALITY_MACOS_CONTROLLER="$OPENCODE_QUALITY_MACOS_CONTROLLER" \
+            OPENCODE_QUALITY_MACOS_WORKLOAD_UID="$OPENCODE_QUALITY_RUN_UID" \
+            OPENCODE_QUALITY_MACOS_UID_MARKER="$OPENCODE_QUALITY_MACOS_UID_MARKER" \
             npm run verify:measurement:core-public-ab:seatbelt
 
       - name: Run macOS operational verifier
