@@ -551,11 +551,12 @@ function syntheticAcceptanceProviderBody(url) {
   return Buffer.from(`${events.map((event) => `data: ${JSON.stringify(event)}\n\n`).join("")}data: [DONE]\n\n`, "utf8");
 }
 
-function jsonContainsExactString(value, expected) {
-  if (typeof value === "string") return value === expected;
-  if (Array.isArray(value)) return value.some((entry) => jsonContainsExactString(entry, expected));
+function jsonStringFragmentCount(value, expected) {
+  if (typeof value === "string") return value.includes(expected) ? 1 : 0;
+  if (Array.isArray(value)) return value.reduce((count, entry) => count + jsonStringFragmentCount(entry, expected), 0);
   return value !== null && typeof value === "object"
-    && Object.values(value).some((entry) => jsonContainsExactString(entry, expected));
+    ? Object.values(value).reduce((count, entry) => count + jsonStringFragmentCount(entry, expected), 0)
+    : 0;
 }
 
 async function createSyntheticAcceptanceProxy(socketPath) {
@@ -583,7 +584,7 @@ async function createSyntheticAcceptanceProxy(socketPath) {
         const providerRequest = JSON.parse(Buffer.from(value.body_base64, "base64").toString("utf8"));
         expect(providerRequest?.model === MODEL_BINDING.model,
           "MEASUREMENT_ACCEPTANCE_MODEL", "synthetic provider request differs from the frozen model");
-        expect(jsonContainsExactString(providerRequest, ACCEPTANCE_PROMPT),
+        expect(jsonStringFragmentCount(providerRequest, ACCEPTANCE_PROMPT) === 1,
           "MEASUREMENT_ACCEPTANCE_PROMPT", "synthetic provider request differs from the frozen acceptance prompt");
         acceptedRequests += 1;
         const providerBody = syntheticAcceptanceProviderBody(value.url);
