@@ -35,5 +35,10 @@ workspace, hidden-control, credential-custody, and provider-submission checks.
 The v1 manifest and evidence remain immutable historical records. A v2 manifest
 has a new measurement identity and fingerprint and cannot import v1 outcomes.
 The measurement still has exactly 178 scored calls and at most 18 eligible
-pre-scoring infrastructure retries, for a hard maximum of 196 provider calls.
-Timeouts and scored failures remain non-retryable.
+pre-scoring infrastructure retries, for a hard maximum of 196 task-arm agent
+runs. The accounting unit is one `model-process-started` task-arm attempt, as
+defined by `scored_model_calls` in the frozen measurement contract; it is not
+each internal multi-turn provider HTTP submission made within that agent run.
+The credential bridge audits those HTTP submissions separately for disposition
+and reconciliation, but the frozen contract does not assert a fixed HTTP-request
+count. Timeouts and scored failures remain non-retryable.
