@@ -47,6 +47,7 @@ const BOOTSTRAP_RESAMPLES = 100_000;
 const SCHEDULE_SEED = "core-public-ab-counterbalanced-v1";
 const ACCEPTANCE_PROMPT = "Return exactly acceptance-probe-complete. Do not edit files and do not use tools.";
 const ACCEPTANCE_TEXT = "acceptance-probe-complete";
+const OPENCODE_BOOTSTRAP_GITIGNORE = "node_modules\npackage.json\npackage-lock.json\nbun.lock\n.gitignore";
 const PILOT_REPOSITORY_COUNTS = Object.freeze({ eslint: 8, express: 1, axios: 12, fastify: 8 });
 const MEASUREMENT_CONTRACT_PATH = path.join(SOURCE_ROOT,
   "research", "measurements", "core-public-ab-v1", "measurement-contract.v1.json");
@@ -574,15 +575,16 @@ async function createSyntheticAcceptanceProxy(socketPath) {
     request.on("data", (chunk) => { bytes += chunk.length; if (bytes <= length) chunks.push(chunk); else request.destroy(); });
     request.on("end", () => {
       try {
-        expect(bytes === length, "MEASUREMENT_ACCEPTANCE", "synthetic provider request length differs");
+        expect(bytes === length, "MEASUREMENT_ACCEPTANCE_ENVELOPE", "synthetic provider request length differs");
         const value = JSON.parse(Buffer.concat(chunks).toString("utf8"));
         expect(value?.schema_version === 1 && value.method === "POST"
           && ["https://api.openai.com/v1/responses", "https://api.openai.com/v1/chat/completions"].includes(value.url),
-        "MEASUREMENT_ACCEPTANCE", "synthetic provider request escaped frozen OpenAI endpoints");
+        "MEASUREMENT_ACCEPTANCE_ENDPOINT", "synthetic provider request escaped frozen OpenAI endpoints");
         const providerRequest = JSON.parse(Buffer.from(value.body_base64, "base64").toString("utf8"));
-        expect(providerRequest?.model === MODEL_BINDING.model
-          && jsonContainsExactString(providerRequest, ACCEPTANCE_PROMPT),
-        "MEASUREMENT_ACCEPTANCE", "synthetic provider request differs from the frozen model and acceptance prompt");
+        expect(providerRequest?.model === MODEL_BINDING.model,
+          "MEASUREMENT_ACCEPTANCE_MODEL", "synthetic provider request differs from the frozen model");
+        expect(jsonContainsExactString(providerRequest, ACCEPTANCE_PROMPT),
+          "MEASUREMENT_ACCEPTANCE_PROMPT", "synthetic provider request differs from the frozen acceptance prompt");
         acceptedRequests += 1;
         const providerBody = syntheticAcceptanceProviderBody(value.url);
         const envelope = JSON.stringify({ schema_version: 1, status: 200,
@@ -1368,6 +1370,11 @@ function providerExecutionBinding(attemptDirectory, configuration, credential) {
 function installProviderBridgeFiles({ attemptDirectory, configuration, proxy }) {
   const credentialFile = path.join(attemptDirectory, "host-credential.json");
   fs.writeFileSync(credentialFile, JSON.stringify(proxy.payload), { encoding: "utf8", flag: "wx", mode: 0o600 });
+  const bootstrapIgnore = path.join(configuration, ".gitignore");
+  if (fs.existsSync(bootstrapIgnore)) statRegular(bootstrapIgnore, "OpenCode bootstrap .gitignore");
+  else {
+    fs.writeFileSync(bootstrapIgnore, OPENCODE_BOOTSTRAP_GITIGNORE, { encoding: "utf8", flag: "wx", mode: 0o644 });
+  }
   const plugins = path.join(configuration, "plugins"); fs.mkdirSync(plugins, { recursive: true, mode: 0o700 });
   const plugin = path.join(plugins, "core-public-ab-provider-proxy.mjs");
   fs.writeFileSync(plugin, PROVIDER_PROXY_PLUGIN, { encoding: "utf8", flag: "wx", mode: 0o400 });
