@@ -939,12 +939,13 @@ function verifyOpenCodeSeatbeltStartup(opencode) {
     const plugins = path.join(configuration, "plugins"); fs.mkdirSync(plugins, { mode: 0o700 });
     const pluginFile = path.join(plugins, "startup-preflight.mjs");
     fs.writeFileSync(pluginFile, "export default async () => ({});\n", { mode: 0o400 });
-    const profile = path.join(root, "model.sb");
-    fs.writeFileSync(profile, modelSandboxProfile({ workspace, attemptDirectory: attempt,
-      opencodePath: opencode.path, providerProxySocket: socketPath, trustedNodePath: process.execPath }), { mode: 0o600 });
     const binding = providerExecutionBinding(attempt, configuration, {
       placeholder_auth_content: "{}", credential_file: credentialFile, plugin_file: pluginFile,
     });
+    const profile = path.join(root, "model.sb");
+    fs.writeFileSync(profile, modelSandboxProfile({ workspace, attemptDirectory: attempt,
+      opencodePath: opencode.path, providerProxySocket: socketPath, trustedNodePath: process.execPath,
+      macosContainment: binding.macos_containment }), { mode: 0o600 });
     const result = run("/usr/bin/sandbox-exec", ["-f", profile, opencode.path, "--version"], {
       cwd: workspace, env: binding.environment, timeout: 30_000,
     });
@@ -1299,14 +1300,17 @@ function sandboxDirectoryAncestors(values) {
   }
   return [...ancestors].sort();
 }
-function modelSandboxProfile({ workspace, attemptDirectory, opencodePath, providerProxySocket, trustedNodePath }) {
+function modelSandboxProfile({ workspace, attemptDirectory, opencodePath, providerProxySocket, trustedNodePath,
+  macosContainment = null }) {
   expect(process.platform === "darwin" && fs.existsSync("/usr/bin/sandbox-exec"),
     "MEASUREMENT_CONTAINMENT", "macOS Seatbelt is required for this frozen runner");
   const system = ["/System", "/usr", "/Library", "/opt/homebrew", "/private/var/db/timezone",
     path.dirname(process.execPath), trustedNodePath ? path.dirname(trustedNodePath) : null]
     .filter((entry, index, values) => entry !== null && fs.existsSync(entry) && values.indexOf(entry) === index);
+  const containmentReads = macosContainment === null ? []
+    : [macosContainment.controller_file, macosContainment.uid_marker, macosContainment.uid_lease];
   const ancestorReads = sandboxDirectoryAncestors([workspace, attemptDirectory, opencodePath,
-    ...(trustedNodePath ? [trustedNodePath] : [])]);
+    ...(trustedNodePath ? [trustedNodePath] : []), ...containmentReads]);
   return ["(version 1)", "(deny default)", "(allow process-exec process-fork)",
     "(allow signal (target same-sandbox))", "(allow process-info* (target same-sandbox))",
     `(allow network-outbound (literal ${JSON.stringify(path.resolve(providerProxySocket))}))`,
@@ -1315,8 +1319,10 @@ function modelSandboxProfile({ workspace, attemptDirectory, opencodePath, provid
     "(allow file-read-metadata)",
     `(allow file-read-data (literal \"/\") (literal \"/dev/null\") ${ancestorReads.map((entry) => `(literal ${JSON.stringify(entry)})`).join(" ")})`,
     `(allow file-read* ${system.map((entry) => `(subpath ${sandboxLiteral(entry)})`).join(" ")}`,
-    `  (subpath ${sandboxLiteral(workspace)}) (subpath ${sandboxLiteral(attemptDirectory)}) (literal ${sandboxLiteral(opencodePath)}))`,
-    `(allow file-write* (subpath ${sandboxLiteral(workspace)}) (subpath ${sandboxLiteral(attemptDirectory)}) (literal "/dev/null"))`,
+    `  (subpath ${sandboxLiteral(workspace)}) (subpath ${sandboxLiteral(attemptDirectory)}) (literal ${sandboxLiteral(opencodePath)})`,
+    `  ${containmentReads.map((entry) => `(literal ${sandboxLiteral(entry)})`).join(" ")})`,
+    `(allow file-write* (subpath ${sandboxLiteral(workspace)}) (subpath ${sandboxLiteral(attemptDirectory)}) (literal "/dev/null")`,
+    `  ${macosContainment === null ? "" : `(literal ${sandboxLiteral(macosContainment.uid_lease)})`})`,
   ].join("\n");
 }
 function oracleSandboxProfile({ workspace, runtime, temporary }) {
@@ -1344,7 +1350,24 @@ function providerConfigurationBaseline(attemptDirectory, configuration, credenti
   boundProviderPluginFile(attemptDirectory, configuration, credential);
   return directoryFingerprint(configuration);
 }
-function modelEnvironment(attemptDirectory, configuration, credential) {
+function hostMacosContainmentBinding() {
+  const names = ["OPENCODE_QUALITY_MACOS_CONTROLLER", "OPENCODE_QUALITY_MACOS_WORKLOAD_UID",
+    "OPENCODE_QUALITY_MACOS_UID_MARKER"];
+  const present = names.filter((name) => typeof process.env[name] === "string" && process.env[name].length > 0);
+  if (present.length === 0) return null;
+  expect(present.length === names.length, "MEASUREMENT_CONTAINMENT", "macOS exclusive-UID environment is incomplete");
+  const workloadUid = Number(process.env.OPENCODE_QUALITY_MACOS_WORKLOAD_UID);
+  expect(Number.isSafeInteger(workloadUid) && workloadUid > 0 && process.getuid?.() === workloadUid,
+    "MEASUREMENT_CONTAINMENT", "runner is not the configured macOS exclusive workload UID");
+  const controller = statRegular(process.env.OPENCODE_QUALITY_MACOS_CONTROLLER, "macOS containment controller");
+  const marker = statRegular(process.env.OPENCODE_QUALITY_MACOS_UID_MARKER, "macOS containment UID marker");
+  const lease = statRegular(`${marker.path}.lease`, "macOS containment UID lease");
+  return Object.freeze({ controller_file: controller.path, uid_marker: marker.path, uid_lease: lease.path,
+    environment: Object.freeze({ OPENCODE_QUALITY_MACOS_CONTROLLER: controller.path,
+      OPENCODE_QUALITY_MACOS_WORKLOAD_UID: String(workloadUid),
+      OPENCODE_QUALITY_MACOS_UID_MARKER: marker.path }) });
+}
+function modelEnvironment(attemptDirectory, configuration, credential, macosContainment = null) {
   const isolatedHome = path.join(attemptDirectory, "home"); const isolatedTmp = path.join(attemptDirectory, "tmp");
   const data = path.join(attemptDirectory, "xdg-data"); const cache = path.join(attemptDirectory, "xdg-cache");
   for (const directory of [isolatedHome, isolatedTmp, data, cache]) fs.mkdirSync(directory, { mode: 0o700 });
@@ -1358,14 +1381,17 @@ function modelEnvironment(attemptDirectory, configuration, credential) {
     OPENCODE_DISABLE_MODELS_FETCH: "true", OPENCODE_ENABLE_EXA: "false",
     OPENCODE_CONFIG_DIR: configuration, OPENCODE_CONFIG_CONTENT: JSON.stringify(effectiveOverlay),
     OPENCODE_AUTH_CONTENT: credential.placeholder_auth_content,
-    CORE_PUBLIC_AB_PROVIDER_PROXY_FILE: credential.credential_file });
+    CORE_PUBLIC_AB_PROVIDER_PROXY_FILE: credential.credential_file,
+    ...(macosContainment?.environment ?? {}) });
 }
 function providerExecutionBinding(attemptDirectory, configuration, credential) {
   const configurationFingerprint = providerConfigurationBaseline(attemptDirectory, configuration, credential);
-  const environment = modelEnvironment(attemptDirectory, configuration, credential);
+  const macosContainment = hostMacosContainmentBinding();
+  const environment = modelEnvironment(attemptDirectory, configuration, credential, macosContainment);
   expect(configurationFingerprint === directoryFingerprint(configuration),
     "MEASUREMENT_CONFIGURATION_DRIFT", "provider environment construction changed the frozen configuration");
-  return Object.freeze({ configuration_fingerprint: configurationFingerprint, environment });
+  return Object.freeze({ configuration_fingerprint: configurationFingerprint, environment,
+    macos_containment: macosContainment });
 }
 
 function installProviderBridgeFiles({ attemptDirectory, configuration, proxy }) {
@@ -1418,7 +1444,8 @@ async function executeAcceptanceArm({ arm, coreBundle, opencode, trustedNodePath
     const configurationBefore = providerBinding.configuration_fingerprint;
     const profile = path.join(attemptDirectory, "model.sb");
     fs.writeFileSync(profile, modelSandboxProfile({ workspace, attemptDirectory, opencodePath: opencode.path,
-      providerProxySocket: bridge.provider_proxy_socket, trustedNodePath }), { mode: 0o600 });
+      providerProxySocket: bridge.provider_proxy_socket, trustedNodePath,
+      macosContainment: providerBinding.macos_containment }), { mode: 0o600 });
     const opencodeArgs = ["run", "--format", "json", "--model", `${MODEL_BINDING.provider}/${MODEL_BINDING.model}`,
       "--variant", MODEL_BINDING.variant, "--agent", arm === "core" ? "core" : "build", "--dir", workspace,
       "--title", "core-public-ab-acceptance", ACCEPTANCE_PROMPT];
@@ -1890,7 +1917,8 @@ async function executeAttempt(context, task, arm, attemptIndex, retryOf = null) 
     const configurationBefore = providerBinding.configuration_fingerprint;
     const profile = path.join(attemptDirectory, "model.sb");
     fs.writeFileSync(profile, modelSandboxProfile({ workspace, attemptDirectory, opencodePath: context.opencode.path,
-      providerProxySocket: credential.provider_proxy_socket, trustedNodePath: context.trustedNodePath }), { mode: 0o600 });
+      providerProxySocket: credential.provider_proxy_socket, trustedNodePath: context.trustedNodePath,
+      macosContainment: providerBinding.macos_containment }), { mode: 0o600 });
     const opencodeArgs = ["run", "--format", "json", "--model", `${MODEL_BINDING.provider}/${MODEL_BINDING.model}`,
       "--variant", MODEL_BINDING.variant, "--agent", arm === "core" ? "core" : "build", "--dir", workspace, task.prompt];
     const file = arm === "core" ? process.execPath : context.opencode.path;
