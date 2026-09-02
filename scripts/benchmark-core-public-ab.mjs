@@ -201,6 +201,90 @@ export const CorePublicAbProviderProxyPlugin = async () => {
 };
 `;
 
+const CURRENT_USER_CORE_LAUNCHER = String.raw`import fs from "node:fs";
+import process from "node:process";
+import { randomBytes } from "node:crypto";
+
+function waitForWorkerExit(worker, timeoutMs) {
+  if (worker.exitCode !== null || worker.signalCode !== null) return Promise.resolve(true);
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => resolve(false), timeoutMs);
+    worker.once("exit", () => { clearTimeout(timer); resolve(true); });
+  });
+}
+
+function challengeWorker(worker, timeoutMs) {
+  return new Promise((resolve, reject) => {
+    const challenge = randomBytes(32).toString("base64url");
+    const cleanup = () => {
+      clearTimeout(timer);
+      worker.off("message", onMessage);
+      worker.off("error", onError);
+      worker.off("exit", onExit);
+    };
+    const finish = (error) => { cleanup(); if (error) reject(error); else resolve(); };
+    const onMessage = (message) => {
+      if (message?.type === "containment_challenge_response" && message.challenge === challenge) finish();
+      else if (message?.type === "containment_challenge_rejected") finish(new Error("worker identity challenge rejected"));
+    };
+    const onError = (error) => finish(error);
+    const onExit = () => finish(new Error("worker exited before identity challenge"));
+    const timer = setTimeout(() => finish(new Error("worker identity challenge timed out")), timeoutMs);
+    worker.on("message", onMessage);
+    worker.once("error", onError);
+    worker.once("exit", onExit);
+    try { worker.send({ type: "containment_challenge", challenge }); }
+    catch (error) { finish(error); }
+  });
+}
+
+async function currentUserProcessGroupContainment(worker, timeoutMs) {
+  if (process.platform !== "darwin" || !Number.isSafeInteger(worker?.pid) || worker.pid < 1) {
+    throw new Error("current-user process-group containment is unavailable");
+  }
+  await challengeWorker(worker, timeoutMs);
+  let teardownVerified = false;
+  let groupSignal = null;
+  let leaderSignal = null;
+  let workerExited = null;
+  const terminateAndVerify = async (confirmationMs) => {
+    if (teardownVerified) return true;
+    try { process.kill(-worker.pid, "SIGKILL"); groupSignal = "sent"; }
+    catch (error) { groupSignal = error?.code ?? "error"; if (error?.code !== "ESRCH") return false; }
+    try { leaderSignal = worker.kill("SIGKILL") ? "sent" : "not-sent"; }
+    catch (error) { leaderSignal = error?.code ?? "error"; }
+    try { worker.disconnect(); } catch {}
+    workerExited = await waitForWorkerExit(worker, confirmationMs);
+    if (!workerExited) return false;
+    teardownVerified = true;
+    return true;
+  };
+  return Object.freeze({ support_state: "verified", kind: "macos-current-user-process-group-v1",
+    terminateAndVerify, close: terminateAndVerify,
+    status: () => Object.freeze({ teardown_verified: teardownVerified, group_signal: groupSignal,
+      leader_signal: leaderSignal, worker_exited: workerExited, worker_exit_code: worker.exitCode,
+      worker_signal_code: worker.signalCode }) });
+}
+
+async function main() {
+  const encoded = process.argv[2];
+  if (typeof encoded !== "string" || !/^[A-Za-z0-9_-]+$/u.test(encoded)) throw new Error("launcher payload is invalid");
+  const payload = JSON.parse(Buffer.from(encoded, "base64url").toString("utf8"));
+  if (payload?.schema_version !== 1 || typeof payload.runtime_url !== "string" || !payload.options) {
+    throw new Error("launcher payload is incomplete");
+  }
+  const runtime = await import(payload.runtime_url);
+  if (typeof runtime.runCoreLauncher !== "function") throw new Error("core launcher export is unavailable");
+  const result = await runtime.runCoreLauncher(payload.options,
+    { processContainmentFactory: currentUserProcessGroupContainment });
+  if (result.receipt !== null) fs.writeSync(3, JSON.stringify(result.receipt) + "\n", null, "utf8");
+  process.exitCode = result.exit_code;
+}
+
+try { await main(); }
+catch (error) { process.stderr.write("[core-public-ab-current-user] " + error.message + "\n"); process.exitCode = 21; }
+`;
+
 class MeasurementError extends Error {
   constructor(code, message) { super(message); this.name = "MeasurementError"; this.code = code; }
 }
@@ -1120,6 +1204,7 @@ async function freezeManifests(options) {
       pair_concurrency: PAIR_CONCURRENCY_POLICY,
       host_process_identity: "manifest-bound-invoking-user", dedicated_uid_required: false,
       same_user_cross_process_isolation: "not_observable",
+      core_nested_process_containment: "macos-process-group-inside-seatbelt",
       model_network: "provider-only-through-host-isolated-credential-bridge",
       model_tools: Object.freeze({ local_read_edit: "allow", shell: "deny", web: "deny", external_directory: "deny", delegation: "deny" }) }),
     acceptance_probe: Object.freeze({ required_before_campaign: true, arms: ARMS,
@@ -1169,6 +1254,7 @@ function validateMeasurementManifest(file) {
     && Number.isSafeInteger(manifest.host_execution?.uid) && manifest.host_execution.uid > 0
     && manifest.host_execution.dedicated_uid_required === false
     && manifest.host_execution.same_user_cross_process_isolation === "not_observable"
+    && manifest.host_execution.core_nested_process_containment === "macos-process-group-inside-seatbelt"
     && manifest.evaluator_fingerprint === evaluatorFingerprint()
     && FP.test(manifest.opencode_executable_fingerprint ?? "")
     && manifest.arm_order_schedule_fingerprint === fingerprint(manifest.arm_order_schedule)
@@ -1185,6 +1271,7 @@ function validateMeasurementManifest(file) {
     && manifest.execution_policy.host_process_identity === "manifest-bound-invoking-user"
     && manifest.execution_policy.dedicated_uid_required === false
     && manifest.execution_policy.same_user_cross_process_isolation === "not_observable"
+    && manifest.execution_policy.core_nested_process_containment === "macos-process-group-inside-seatbelt"
     && manifest.execution_policy.model_network === "provider-only-through-host-isolated-credential-bridge"
     && manifest.measurement_node_version === process.version
     && manifest.measurement_node_executable_sha256 === sha256File(process.execPath)
@@ -1403,7 +1490,8 @@ function currentUserHostExecutionBinding(source = process.env, uid = process.get
   expect(Number.isSafeInteger(uid) && uid > 0, "MEASUREMENT_CONTAINMENT",
     "current-user execution identity is unavailable");
   return Object.freeze({ mode: "current-user-seatbelt", uid, dedicated_uid_required: false,
-    same_user_cross_process_isolation: "not_observable" });
+    same_user_cross_process_isolation: "not_observable",
+    core_nested_process_containment: "macos-process-group-inside-seatbelt" });
 }
 function hostMacosContainmentBinding() {
   const names = ["OPENCODE_QUALITY_MACOS_CONTROLLER", "OPENCODE_QUALITY_MACOS_WORKLOAD_UID",
@@ -1447,6 +1535,18 @@ function providerExecutionBinding(attemptDirectory, configuration, credential) {
     "MEASUREMENT_CONFIGURATION_DRIFT", "provider environment construction changed the frozen configuration");
   return Object.freeze({ configuration_fingerprint: configurationFingerprint, environment,
     macos_containment: macosContainment });
+}
+
+function currentUserCoreInvocation({ attemptDirectory, configuration, workspace, opencodePath, opencodeArgs,
+  childTimeoutMs }) {
+  const launcher = path.join(attemptDirectory, "current-user-core-launcher.mjs");
+  fs.writeFileSync(launcher, CURRENT_USER_CORE_LAUNCHER, { encoding: "utf8", flag: "wx", mode: 0o400 });
+  const runtime = statRegular(path.join(configuration, "runtime", "opencode-core.mjs"), "core launcher runtime");
+  const payload = Object.freeze({ schema_version: 1, runtime_url: pathToFileURL(runtime.path).href,
+    options: Object.freeze({ workspace, catalog: ".git/opencode-harness/core/checks.json", opencode: opencodePath,
+      childTimeoutMs, opencodeArgs }) });
+  return Object.freeze({ file: process.execPath,
+    args: Object.freeze([launcher, Buffer.from(JSON.stringify(payload), "utf8").toString("base64url")]) });
 }
 
 function installProviderBridgeFiles({ attemptDirectory, configuration, proxy }) {
@@ -1504,10 +1604,10 @@ async function executeAcceptanceArm({ arm, coreBundle, opencode, trustedNodePath
     const opencodeArgs = ["run", "--format", "json", "--model", `${MODEL_BINDING.provider}/${MODEL_BINDING.model}`,
       "--variant", MODEL_BINDING.variant, "--agent", arm === "core" ? "core" : "build", "--dir", workspace,
       "--title", "core-public-ab-acceptance", ACCEPTANCE_PROMPT];
-    const file = arm === "core" ? process.execPath : opencode.path;
-    const args = arm === "core" ? [path.join(configuration, "runtime", "opencode-core.mjs"), "--workspace", workspace,
-      "--opencode", opencode.path, "--receipt-fd", "3", "--child-timeout-ms", "120000", "--", ...opencodeArgs]
-      : opencodeArgs;
+    const coreInvocation = arm === "core" ? currentUserCoreInvocation({ attemptDirectory, configuration, workspace,
+      opencodePath: opencode.path, opencodeArgs, childTimeoutMs: 120_000 }) : null;
+    const file = coreInvocation?.file ?? opencode.path;
+    const args = coreInvocation?.args ?? opencodeArgs;
     const managed = await runManagedProcess({ file, args, cwd: workspace,
       env: providerBinding.environment, profile, timeoutMs: 120_000,
       candidate: arm === "core" });
@@ -1981,9 +2081,10 @@ async function executeAttempt(context, task, arm, attemptIndex, retryOf = null) 
       macosContainment: providerBinding.macos_containment }), { mode: 0o600 });
     const opencodeArgs = ["run", "--format", "json", "--model", `${MODEL_BINDING.provider}/${MODEL_BINDING.model}`,
       "--variant", MODEL_BINDING.variant, "--agent", arm === "core" ? "core" : "build", "--dir", workspace, task.prompt];
-    const file = arm === "core" ? process.execPath : context.opencode.path;
-    const args = arm === "core" ? [path.join(configuration, "runtime", "opencode-core.mjs"), "--workspace", workspace,
-      "--opencode", context.opencode.path, "--receipt-fd", "3", "--child-timeout-ms", String(context.manifest.timeout_ms), "--", ...opencodeArgs] : opencodeArgs;
+    const coreInvocation = arm === "core" ? currentUserCoreInvocation({ attemptDirectory, configuration, workspace,
+      opencodePath: context.opencode.path, opencodeArgs, childTimeoutMs: context.manifest.timeout_ms }) : null;
+    const file = coreInvocation?.file ?? context.opencode.path;
+    const args = coreInvocation?.args ?? opencodeArgs;
     expect(context.ledger.records().filter((record) => record.event_type === "model-process-started").length < MAXIMUM_MODEL_CALLS,
       "MEASUREMENT_MODEL_CALL_BUDGET", "hard maximum of 196 model calls is exhausted");
     context.ledger.append({ event_type: "model-process-started", attempt_id: attemptId,
@@ -2767,6 +2868,38 @@ async function seatbeltSocketRoundTrip(profile, socketPath, cwd) {
   }
 }
 
+function currentUserCoreLauncherRoundTrip(profile, attemptDirectory) {
+  const launcher = path.join(attemptDirectory, "current-user-core-launcher-self-test.mjs");
+  const fixture = path.join(attemptDirectory, "current-user-core-runtime-fixture.mjs");
+  fs.writeFileSync(launcher, CURRENT_USER_CORE_LAUNCHER, { mode: 0o400, flag: "wx" });
+  fs.writeFileSync(fixture, String.raw`import { spawn } from "node:child_process";
+export async function runCoreLauncher(_options, { processContainmentFactory }) {
+  const source = 'process.on("message",m=>{if(m?.type==="containment_challenge")process.send?.({type:"containment_challenge_response",challenge:m.challenge})});setInterval(()=>{},60000)';
+  const worker = spawn(process.execPath, ["--input-type=module", "--eval", source], {
+    detached: true, serialization: "advanced", stdio: ["ignore", "ignore", "pipe", "ipc"]
+  });
+  let stderr = "";
+  worker.stderr.setEncoding("utf8"); worker.stderr.on("data", (chunk) => { stderr += chunk; });
+  let containment;
+  try { containment = await processContainmentFactory(worker, 5000); }
+  catch (error) { throw new Error(error.message + "; worker stderr: " + stderr.trim()); }
+  const terminated = containment.support_state === "verified" && await containment.terminateAndVerify(5000);
+  const passed = terminated && containment.status().teardown_verified === true;
+  return { exit_code: passed ? 0 : 1, receipt: { schema_version: 1, passed, containment: containment.status() } };
+}
+`, { mode: 0o400, flag: "wx" });
+  const payload = Buffer.from(JSON.stringify({ schema_version: 1, runtime_url: pathToFileURL(fixture).href,
+    options: Object.freeze({}) }), "utf8").toString("base64url");
+  const result = spawnSync("/usr/bin/sandbox-exec", ["-f", profile, process.execPath, launcher, payload],
+    { cwd: attemptDirectory, timeout: 15_000, stdio: ["ignore", "pipe", "pipe", "pipe"] });
+  let receipt = null;
+  try { receipt = JSON.parse(result.output?.[3]?.toString("utf8") ?? ""); } catch {}
+  expect(result.status === 0 && result.signal === null && receipt?.passed === true,
+    "MEASUREMENT_SELF_TEST", `current-user nested core containment failed: ${canonicalJson({ status: result.status,
+      signal: result.signal, error: result.error?.code ?? null, receipt,
+      stderr: result.stderr?.toString("utf8").trim() ?? "" })}`);
+}
+
 async function selfTest({ containment = true } = {}) {
   if (containment) {
     const containmentRoot = fs.mkdtempSync(path.join(fs.realpathSync.native(os.tmpdir()), "core-public-ab-self-test-"));
@@ -2787,6 +2920,7 @@ async function selfTest({ containment = true } = {}) {
       expect(passed(compiled), "MEASUREMENT_SELF_TEST",
         `provider-only model Seatbelt profile does not apply: status=${compiled.status} signal=${compiled.signal} ${compiled.stderr.trim()}`);
       await seatbeltSocketRoundTrip(profile, socketPath, workspace);
+      currentUserCoreLauncherRoundTrip(profile, attempt);
     } finally { fs.rmSync(containmentRoot, { recursive: true, force: true }); }
   }
   const schedule = buildSchedule("validation", STRATA.flatMap((stratum) => Array.from({ length: 20 }, (_entry, index) => ({ id: `${stratum}-${index + 1}`, stratum }))));
@@ -2803,7 +2937,8 @@ async function selfTest({ containment = true } = {}) {
   const currentUserBinding = currentUserHostExecutionBinding({}, 42);
   expect(currentUserBinding.mode === "current-user-seatbelt" && currentUserBinding.uid === 42
     && currentUserBinding.dedicated_uid_required === false
-    && currentUserBinding.same_user_cross_process_isolation === "not_observable",
+    && currentUserBinding.same_user_cross_process_isolation === "not_observable"
+    && currentUserBinding.core_nested_process_containment === "macos-process-group-inside-seatbelt",
   "MEASUREMENT_SELF_TEST", "current-user host execution binding is invalid");
   let dedicatedUidEnvironmentRejected = false;
   try { currentUserHostExecutionBinding({ OPENCODE_QUALITY_MACOS_WORKLOAD_UID: "550" }, 42); }

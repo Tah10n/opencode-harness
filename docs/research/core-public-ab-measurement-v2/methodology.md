@@ -18,6 +18,14 @@ socket to the host-side credential bridge. OAuth material remains in the host
 process; the model receives a single-use capability through an owner-private
 file that is erased before task execution.
 
+The core arm retains nested descendant teardown by launching its OpenCode and
+trusted-check workers in challenged, detached macOS process groups inside the
+same Seatbelt sandbox. The nested launcher sends `SIGKILL` to the whole process
+group and requires its challenged leader to exit; the host runner separately
+requires verified teardown of the enclosing model process before accepting the
+core receipt. This replaces only the product wrapper's dedicated-UID controller
+dependency; it does not bypass the core post-mutation verification gate.
+
 This change deliberately weakens one claim: v2 does not establish isolation
 from unrelated processes running under the same macOS user. The manifest records
 `same_user_cross_process_isolation: not_observable`. It continues to require

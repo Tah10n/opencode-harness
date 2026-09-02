@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "measurement_id": "core-public-ab-v2",
+  "status": "invalidated_before_first_provider_submission",
+  "superseded_manifest_fingerprint": "sha256:20e9341196f406d5f5d55510695033031eeba0825679c1832d1b26bdd9d1961c",
+  "superseded_runner_sha256": "sha256:6e25eb3720baff18f4b6ab75e3482249e239cad347f9d5ae69b3f5a177b8a7bd",
+  "observed_accounting": {
+    "external_model_calls": 0,
+    "provider_proxy_requests": 1,
+    "synthetic_acceptance_responses": 1,
+    "provider_submissions": 0,
+    "scored_outcomes": 0
+  },
+  "validated_pre_model_defect": {
+    "code": "CORE_WRAPPER_DEDICATED_UID_DEPENDENCY",
+    "scope": "current_user_core_acceptance_startup",
+    "observed_exit_status": 21,
+    "provider_submission_disposition": "zero_submissions_established"
+  },
+  "remediation_contract": {
+    "dedicated_uid_required": false,
+    "seatbelt_required": true,
+    "credential_bridge_required": true,
+    "nested_core_process_containment": "macos-process-group-inside-seatbelt",
+    "same_user_cross_process_isolation": "not_observable"
+  },
+  "disposition": {
+    "outcomes_retained_for_measurement": 0,
+    "provider_calls_retained_for_measurement": 0,
+    "reason": "the core wrapper attempted the superseded dedicated-UID containment path before reaching the local synthetic provider bridge"
+  }
+}
