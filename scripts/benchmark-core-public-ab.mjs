@@ -559,6 +559,7 @@ function jsonContainsExactString(value, expected) {
 
 async function createSyntheticAcceptanceProxy(socketPath) {
   let capability = randomBytes(32).toString("base64url"); let closed = false; let acceptedRequests = 0;
+  let rejectedRequests = 0; const rejectionCodes = new Map();
   const sockets = new Set();
   const server = createServer((request, response) => {
     const reject = (status, code) => {
@@ -588,7 +589,11 @@ async function createSyntheticAcceptanceProxy(socketPath) {
           headers: [["content-type", "text/event-stream"]], body_base64: providerBody.toString("base64") });
         response.writeHead(200, { "cache-control": "no-store", "content-type": "application/json",
           "content-length": Buffer.byteLength(envelope) }); response.end(envelope);
-      } catch (error) { reject(503, error?.code ?? "acceptance_proxy_failure"); }
+      } catch (error) {
+        const code = error?.code ?? "acceptance_proxy_failure";
+        rejectedRequests += 1; rejectionCodes.set(code, (rejectionCodes.get(code) ?? 0) + 1);
+        reject(503, code);
+      }
     });
   });
   server.on("connection", (socket) => { sockets.add(socket); socket.once("close", () => sockets.delete(socket)); });
@@ -602,6 +607,8 @@ async function createSyntheticAcceptanceProxy(socketPath) {
     payload: Object.freeze({ schema_version: 1, provider: "openai", proxy_socket: socketPath,
       proxy_capability: capability }),
     status() { return Object.freeze({ accepted_request_count: acceptedRequests,
+      rejected_request_count: rejectedRequests,
+      rejection_codes: Object.freeze(Object.fromEntries([...rejectionCodes].sort(([left], [right]) => left.localeCompare(right)))),
       provider_submission_count: 0, synthetic_response_count: acceptedRequests }); },
     async close() {
       if (closed) return; closed = true; capability = ""; for (const socket of sockets) socket.destroy();
@@ -1406,7 +1413,7 @@ async function executeAcceptanceArm({ arm, coreBundle, opencode, trustedNodePath
       providerProxySocket: bridge.provider_proxy_socket, trustedNodePath }), { mode: 0o600 });
     const opencodeArgs = ["run", "--format", "json", "--model", `${MODEL_BINDING.provider}/${MODEL_BINDING.model}`,
       "--variant", MODEL_BINDING.variant, "--agent", arm === "core" ? "core" : "build", "--dir", workspace,
-      ACCEPTANCE_PROMPT];
+      "--title", "core-public-ab-acceptance", ACCEPTANCE_PROMPT];
     const file = arm === "core" ? process.execPath : opencode.path;
     const args = arm === "core" ? [path.join(configuration, "runtime", "opencode-core.mjs"), "--workspace", workspace,
       "--opencode", opencode.path, "--receipt-fd", "3", "--child-timeout-ms", "120000", "--", ...opencodeArgs]
@@ -1427,13 +1434,22 @@ async function executeAcceptanceArm({ arm, coreBundle, opencode, trustedNodePath
     expect(managed.status === 0 && managed.signal === null && managed.timed_out === false
       && managed.teardown_verified === true && events.protocol_valid === true
       && proxyEvidence.accepted_request_count === 1 && proxyEvidence.synthetic_response_count === 1
-      && proxyEvidence.provider_submission_count === 0 && changed.length === 0
+      && proxyEvidence.rejected_request_count === 0 && proxyEvidence.provider_submission_count === 0 && changed.length === 0
       && configurationDrift === false && catalogDrift === false
       && events.final_text_sha256 === sha256Bytes(Buffer.from(ACCEPTANCE_TEXT, "utf8"))
       && (arm !== "core" || coreAcceptanceReceiptAuthentic === true),
-    "MEASUREMENT_ACCEPTANCE", `${arm} full OpenCode acceptance path failed`);
+    "MEASUREMENT_ACCEPTANCE", `${arm} full OpenCode acceptance path failed: ${canonicalJson({
+      status: managed.status, signal: managed.signal, timed_out: managed.timed_out,
+      teardown_verified: managed.teardown_verified, protocol_valid: events.protocol_valid,
+      proxy_requests: proxyEvidence.accepted_request_count, proxy_rejections: proxyEvidence.rejected_request_count,
+      rejection_codes: proxyEvidence.rejection_codes, provider_submissions: proxyEvidence.provider_submission_count,
+      changed_path_count: changed.length, configuration_drift: configurationDrift, catalog_drift: catalogDrift,
+      expected_text_observed: events.final_text_sha256 === sha256Bytes(Buffer.from(ACCEPTANCE_TEXT, "utf8")),
+      core_receipt_authentic: coreAcceptanceReceiptAuthentic,
+    })}`);
     return Object.freeze({ arm, status: "passed", full_opencode_run: true,
-      provider_proxy_requests: proxyEvidence.accepted_request_count, provider_submissions: 0, model_calls: 0,
+      provider_proxy_requests: proxyEvidence.accepted_request_count, provider_proxy_rejections: 0,
+      provider_submissions: 0, model_calls: 0,
       process_containment_intact: true, no_surviving_descendants: true,
       core_verification_receipt_authentic: coreAcceptanceReceiptAuthentic,
       core_terminal_reason: arm === "core" ? activation.receipt.decision.reason : null,
@@ -1491,7 +1507,7 @@ function validateAcceptanceReceipt(file, manifest) {
     && Array.isArray(receipt.arms) && receipt.arms.length === 2
     && ARMS.every((arm) => receipt.arms.some((entry) => entry.arm === arm && entry.status === "passed"
       && entry.full_opencode_run === true && entry.provider_proxy_requests === 1
-      && entry.provider_submissions === 0 && entry.model_calls === 0
+      && entry.provider_proxy_rejections === 0 && entry.provider_submissions === 0 && entry.model_calls === 0
       && entry.process_containment_intact === true && entry.no_surviving_descendants === true
       && entry.output_text_sha256 === manifest.acceptance_probe.expected_text_sha256
       && (arm !== "core" || (entry.core_verification_receipt_authentic === true
