@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "measurement_id": "core-public-ab-v2",
+  "status": "incomplete_after_non_retryable_timeout",
+  "manifest_fingerprint": "sha256:497bca0d2fc09b247709c131ade1bbc88fee53448a13fe27ec2fc25117ff8f19",
+  "runner_sha256": "sha256:6f0214648904a1e3b225c80a659c4aacc36e31f2e78fe31cf523974085d14296",
+  "runner_source_sha": "944efc55d207c8c7d5a2becf8c2c5aa68b2f0006",
+  "product_source_sha": "89f1f7f1980a829d7da162fcd737d0c52613225d",
+  "model_binding": {
+    "provider": "openai",
+    "model": "gpt-5.6-luna",
+    "variant": "low"
+  },
+  "observed_accounting": {
+    "model_process_starts": 145,
+    "completed_attempts": 145,
+    "scored_outcomes": 144,
+    "unscored_outcomes": 1,
+    "infrastructure_retries": 0,
+    "maximum_scored_model_calls": 178,
+    "maximum_total_model_calls": 196,
+    "validation_scored_outcomes": 120,
+    "pilot_scored_outcomes": 24,
+    "provider_http_submissions": 1534,
+    "provider_http_status_counts": {
+      "200": 1389,
+      "400": 145
+    },
+    "ambiguous_provider_submissions": 1,
+    "accounting_note": "model_process_starts are frozen task-arm measurement calls; provider_http_submissions are the multi-turn HTTP requests made inside those calls"
+  },
+  "terminal_attempt": {
+    "dataset": "pilot",
+    "identity_id": "sha256:adb8697dcd5078cd4fbe491b800613fc3ff4c8bb5754c96c1654ff96125d48fb",
+    "arm": "core",
+    "attempt_index": 1,
+    "timed_out": true,
+    "timeout_ms": 900000,
+    "observed_duration_ms": 900026.335625,
+    "process_signal": "SIGKILL",
+    "error_class": "model-access",
+    "model_access_required": true,
+    "authentic_terminal_completion": false,
+    "model_protocol_valid": false,
+    "scored_outcome": false,
+    "provider_submissions": 9,
+    "provider_response_status_counts": {
+      "200": 8,
+      "400": 1
+    },
+    "ambiguous_provider_submissions": 1,
+    "provider_submission_disposition_established": false,
+    "reconciliation_required": false,
+    "process_containment_intact": true,
+    "no_surviving_descendants": true,
+    "recorded_at": "2026-09-02T18:53:36.948Z"
+  },
+  "frozen_disposition": {
+    "retry_allowed": false,
+    "retry_forbidden_by": [
+      "timeout",
+      "model-protocol-failure"
+    ],
+    "exact_resume_audit_exit_code": 78,
+    "exact_resume_audit_result": "MODEL_ACCESS_REQUIRED",
+    "exact_resume_audit_added_model_processes": 0,
+    "attempt_ledger_sha256": "sha256:9969bd18cf5160ef12a4c074f265b7e2b240ddecbc6f6fffc832ab72fd1a0e66",
+    "attempt_ledger_event_count": 435,
+    "campaign_report_generated": false,
+    "campaign_report_gate": "MEASUREMENT_REPORT",
+    "campaign_report_reason": "the terminal pilot pair lacks a plain attempt chain and its core arm lacks a scored outcome",
+    "efficacy_claim": "not_available",
+    "reason": "the frozen campaign is incomplete and the non-scored timeout cannot be retried or converted into a scored failure after observing campaign outcomes"
+  },
+  "safety_observability": {
+    "high_medium_critical_regressions": "not_observable",
+    "severe_regression_safety": "not_observable"
+  },
+  "observed_at": "2026-09-02T22:13:33Z"
+}
