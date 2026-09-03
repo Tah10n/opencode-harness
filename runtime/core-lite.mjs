@@ -225,7 +225,7 @@ function remediationMessage(checkResult) {
 }
 
 function openCodeArgs(options, message, sessionId = null) {
-  return ["run", "--format", "json", ...(options.auto ? ["--auto"] : []),
+  return ["run", "--pure", "--format", "json", ...(options.auto ? ["--auto"] : []),
     ...(options.model === null ? [] : ["--model", options.model]),
     ...(options.variant === null ? [] : ["--variant", options.variant]),
     "--agent", options.agent, "--dir", options.workspace,
@@ -302,4 +302,5 @@ async function main() {
   }
 }
 
-if (process.argv[1] !== undefined && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url) await main();
+if (process.argv[1] !== undefined
+  && pathToFileURL(fs.realpathSync.native(path.resolve(process.argv[1]))).href === import.meta.url) await main();

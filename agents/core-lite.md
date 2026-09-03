@@ -3,9 +3,10 @@ description: Minimal development agent with one host-owned verification remediat
 mode: primary
 steps: 80
 permission:
-  question: allow
-  task:
-    "*": deny
+  question: deny
+  task: deny
+  webfetch: deny
+  websearch: deny
   "oc_learning_*": deny
 ---
 Understand the requested behavior and inspect only the files needed to change it.

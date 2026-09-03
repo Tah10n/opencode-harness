@@ -3,6 +3,10 @@
   "default_agent": "core-lite",
   "permission": {
     "external_directory": "deny",
+    "question": "deny",
+    "task": "deny",
+    "webfetch": "deny",
+    "websearch": "deny",
     "oc_learning_*": "deny"
   },
   "watcher": {

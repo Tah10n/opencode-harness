@@ -43,6 +43,7 @@ try {
   assert.equal(recovered.receipt.remediation_recovered, true);
   assert.equal(recovered.receipt.verification_passed, true);
   assert.equal(recovered.calls.length, 2);
+  assert(recovered.calls.every((call) => call.args.includes("--pure")));
   assert.equal(recovered.calls[1].session, true);
   assert(recovered.calls[1].args.includes("ses_core_lite_fixture"));
 
