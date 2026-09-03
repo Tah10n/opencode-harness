@@ -8,13 +8,5 @@
     "webfetch": "deny",
     "websearch": "deny",
     "oc_learning_*": "deny"
-  },
-  "watcher": {
-    "ignore": [
-      "node_modules/**",
-      ".git/**",
-      ".cache/**",
-      "coverage/**"
-    ]
   }
 }

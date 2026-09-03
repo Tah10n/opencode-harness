@@ -1,10 +1,11 @@
 ---
 description: Minimal development agent with one host-owned verification remediation
 mode: primary
-steps: 80
 permission:
+  external_directory: deny
   question: deny
-  task: deny
+  task:
+    "*": deny
   webfetch: deny
   websearch: deny
   "oc_learning_*": deny

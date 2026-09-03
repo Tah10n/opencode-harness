@@ -12,16 +12,16 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const corpusPath = path.join(root, "benchmarks/core-lite/corpus.json");
 const checkerPath = path.join(root, "benchmarks/core-lite/check-task.mjs");
 const materializerPath = path.join(root, "scripts/materialize-core-lite.mjs");
-const MODEL = "openai/gpt-5.6-luna";
-const VARIANT = "low";
+export const MODEL = "openai/gpt-5.6-luna";
+export const VARIANT = "low";
 const MAX_OUTPUT_BYTES = 32 * 1024 * 1024;
 const MAX_STDERR_BYTES = 8 * 1024;
 
-function hash(value) {
+export function hash(value) {
   return `sha256:${createHash("sha256").update(value).digest("hex")}`;
 }
 
-function canonical(value) {
+export function canonical(value) {
   if (Array.isArray(value)) return value.map(canonical);
   if (value !== null && typeof value === "object") {
     return Object.fromEntries(Object.keys(value).sort().map((key) => [key, canonical(value[key])]));
@@ -29,18 +29,18 @@ function canonical(value) {
   return value;
 }
 
-function fingerprint(value) {
+export function fingerprint(value) {
   return hash(Buffer.from(JSON.stringify(canonical(value)), "utf8"));
 }
 
-function writeJson(target, value, mode = 0o600) {
+export function writeJson(target, value, mode = 0o600) {
   fs.mkdirSync(path.dirname(target), { recursive: true });
   const temporary = `${target}.tmp-${process.pid}`;
   fs.writeFileSync(temporary, `${JSON.stringify(value, null, 2)}\n`, { mode });
   fs.renameSync(temporary, target);
 }
 
-function readJson(target) {
+export function readJson(target) {
   return JSON.parse(fs.readFileSync(target, "utf8"));
 }
 
@@ -134,6 +134,27 @@ function materialize(workspace, files) {
   }
 }
 
+export function verifyMaterializedBundle(bundle) {
+  const manifestPath = path.join(bundle, ".opencode-profile-manifest.json");
+  const manifest = readJson(manifestPath);
+  const expected = new Set([".opencode-profile-manifest.json", ...manifest.files.map((entry) => entry.path)]);
+  const actual = [];
+  function visit(directory) {
+    for (const name of fs.readdirSync(directory).sort()) {
+      const target = path.join(directory, name); const listed = fs.lstatSync(target);
+      assert(!listed.isSymbolicLink(), `materialized bundle contains a link: ${target}`);
+      if (listed.isDirectory()) visit(target);
+      else { assert(listed.isFile()); actual.push(path.relative(bundle, target)); }
+    }
+  }
+  visit(bundle);
+  assert.deepEqual(new Set(actual), expected, "materialized bundle inventory drifted");
+  for (const entry of manifest.files) assert.equal(hash(fs.readFileSync(path.join(bundle, entry.path))), entry.sha256,
+    `materialized bundle file drifted: ${entry.path}`);
+  assert.equal(manifest.file_count, actual.length);
+  return manifest;
+}
+
 function snapshot(workspace) {
   const files = new Map(); let links = false;
   function visit(directory) {
@@ -172,11 +193,19 @@ function plainConfig(coreConfig) {
   return { ...coreConfig, default_agent: "build" };
 }
 
-function parseCoreReceipt(result) {
-  try { return JSON.parse(result.receipt.trim()); } catch { return null; }
+function parseCoreReceipt(result, taskId) {
+  try {
+    const value = JSON.parse(result.receipt.trim());
+    const body = { ...value }; delete body.receipt_fingerprint;
+    if (value.receipt_fingerprint !== fingerprint(body) || value.schema_version !== 1
+      || value.profile !== "core-lite" || value.check_id !== taskId) return null;
+    return value;
+  } catch { return null; }
 }
 
-export async function executeAttempt({ task, arm, campaignRoot, opencode, timeoutMs, authContent, bundle }) {
+export async function executeAttempt({ task, arm, campaignRoot, opencode, timeoutMs, authContent, bundle,
+  dataset = "development", evidenceBinding = null }) {
+  verifyMaterializedBundle(bundle);
   const attempt = path.join(campaignRoot, "attempts", task.id, arm);
   const workspace = path.join(attempt, "workspace");
   const host = path.join(attempt, "host");
@@ -207,7 +236,8 @@ export async function executeAttempt({ task, arm, campaignRoot, opencode, timeou
       "--agent", "build", "--dir", workspace, message];
   const result = await runProcess(command, args, { cwd: workspace, env: environment,
     timeoutMs: arm === "core-lite" ? timeoutMs * 2 + 30_000 : timeoutMs, receipt: arm === "core-lite" });
-  const coreReceipt = arm === "core-lite" ? parseCoreReceipt(result) : null;
+  verifyMaterializedBundle(bundle);
+  const coreReceipt = arm === "core-lite" ? parseCoreReceipt(result, task.id) : null;
   const after = snapshot(workspace);
   const scope = scopeResult(before, after, task.allowed_mutation_paths);
   const coreTimedOut = coreReceipt?.initial_process?.timed_out === true
@@ -226,7 +256,8 @@ export async function executeAttempt({ task, arm, campaignRoot, opencode, timeou
   const infrastructureFailure = ["host_failure", "model_access_failure", "provider_failure"].includes(processCategory);
   const taskSuccess = !infrastructureFailure && hiddenCheck.passed && scope.valid && modelCompleted
     && !result.timed_out && !coreTimedOut && (arm !== "core-lite" || coreReceipt?.verification_passed === true);
-  const body = { schema_version: 1, dataset: "development", task_id: task.id, stratum: task.stratum, arm,
+  const body = { schema_version: 1, dataset, evidence_binding: evidenceBinding,
+    task_id: task.id, stratum: task.stratum, arm,
     model: MODEL, variant: VARIANT, timeout_ms: timeoutMs, scored_outcome: !infrastructureFailure,
     task_success: taskSuccess, process_category: processCategory, model_process_completed: modelCompleted,
     process_exit_code: result.status, process_signal: result.signal,
@@ -241,6 +272,20 @@ export async function executeAttempt({ task, arm, campaignRoot, opencode, timeou
     remediation_recovered: arm === "core-lite" ? coreReceipt?.remediation_recovered ?? false : null,
     core_receipt_fingerprint: coreReceipt?.receipt_fingerprint ?? null };
   return { ...body, receipt_fingerprint: fingerprint(body) };
+}
+
+export function validateReceipt(value, { dataset, taskId, arm, evidenceBinding }) {
+  assert(value !== null && typeof value === "object" && !Array.isArray(value));
+  const body = { ...value }; delete body.receipt_fingerprint;
+  assert.equal(value.receipt_fingerprint, fingerprint(body), `${taskId}/${arm} receipt fingerprint drifted`);
+  assert.equal(value.schema_version, 1);
+  assert.equal(value.dataset, dataset);
+  assert.equal(value.task_id, taskId);
+  assert.equal(value.arm, arm);
+  assert.equal(value.evidence_binding, evidenceBinding);
+  assert.equal(value.model, MODEL);
+  assert.equal(value.variant, VARIANT);
+  return value;
 }
 
 export function calibrationSummary(receipts) {
@@ -285,7 +330,7 @@ async function main() {
     const materialized = spawnSync(process.execPath, [materializerPath, "--output", bundle], { cwd: root, encoding: "utf8" });
     if (materialized.status !== 0) throw new Error(`materialization failed: ${materialized.stderr}`);
   }
-  const bundleManifest = readJson(path.join(bundle, ".opencode-profile-manifest.json"));
+  const bundleManifest = verifyMaterializedBundle(bundle);
   const coreConfig = readJson(path.join(bundle, "opencode.json"));
   for (const denied of ["external_directory", "question", "task", "webfetch", "websearch", "oc_learning_*"]) {
     assert.equal(coreConfig.permission?.[denied], "deny", `core-lite must deny ${denied}`);
@@ -306,6 +351,7 @@ async function main() {
   assert.equal(modelEntry.providerID, "openai");
   assert.equal(modelEntry.status, "active");
   assert.equal(modelEntry.variants?.low?.reasoningEffort, "low");
+  verifyMaterializedBundle(bundle);
   const metadataBody = { schema_version: 1, dataset: "development", product_sha: productSha,
     corpus_sha256: hash(fs.readFileSync(corpusPath)), bundle_fingerprint: bundleManifest.bundle_fingerprint,
     bundle_file_count: bundleManifest.file_count, bundle_total_bytes: bundleManifest.total_bytes_without_manifest
@@ -325,13 +371,19 @@ async function main() {
     const task = tasks.find((entry) => entry.id === scheduled.task_id);
     const receiptPath = path.join(campaignRoot, "receipts", task.id, `${scheduled.arm}.json`);
     const startedPath = path.join(campaignRoot, "started", task.id, `${scheduled.arm}.json`);
-    if (fs.existsSync(receiptPath)) { receipts.push(readJson(receiptPath)); continue; }
+    if (fs.existsSync(receiptPath)) {
+      receipts.push(validateReceipt(readJson(receiptPath), { dataset: "development", taskId: task.id,
+        arm: scheduled.arm, evidenceBinding: metadata.metadata_fingerprint }));
+      continue;
+    }
     if (fs.existsSync(startedPath)) throw new Error(`${task.id}/${scheduled.arm} is ambiguous after process start; refusing a retry`);
     writeJson(startedPath, { schema_version: 1, task_id: task.id, arm: scheduled.arm,
       metadata_fingerprint: metadata.metadata_fingerprint, started_at: new Date().toISOString() });
     process.stdout.write(`${JSON.stringify({ event: "attempt_started", task_id: task.id, arm: scheduled.arm })}\n`);
     const receipt = await executeAttempt({ task, arm: scheduled.arm, campaignRoot, opencode, timeoutMs,
-      authContent, bundle });
+      authContent, bundle, dataset: "development", evidenceBinding: metadata.metadata_fingerprint });
+    validateReceipt(receipt, { dataset: "development", taskId: task.id, arm: scheduled.arm,
+      evidenceBinding: metadata.metadata_fingerprint });
     writeJson(receiptPath, receipt); receipts.push(receipt);
     process.stdout.write(`${JSON.stringify({ event: "attempt_completed", task_id: task.id, arm: scheduled.arm,
       scored_outcome: receipt.scored_outcome, task_success: receipt.task_success,
