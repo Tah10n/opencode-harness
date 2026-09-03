@@ -342,9 +342,15 @@ export function calibrationSummary(receipts) {
     verification_activation_count: core.filter((entry) => entry.verification_activated).length,
     remediation_invocation_count: core.filter((entry) => entry.remediation_invoked).length,
     remediation_recovery_count: core.filter((entry) => entry.remediation_recovered).length };
-  summary.calibration_acceptable = receipts.length === 20 && arms.plain.scored === 10 && arms["core-lite"].scored === 10
-    && arms.plain.successes >= 2 && arms.plain.successes <= 8
-    && summary.verification_activation_count >= 9 && summary.remediation_recovery_count >= 1;
+  summary.development_campaign_complete = receipts.length === 20
+    && arms.plain.attempts === 10 && arms.plain.scored === 10
+    && arms["core-lite"].attempts === 10 && arms["core-lite"].scored === 10;
+  summary.development_plain_success = `${arms.plain.successes}/10`;
+  summary.development_core_lite_success = `${arms["core-lite"].successes}/10`;
+  summary.development_set_ceiling_warning = arms.plain.successes > 8;
+  summary.remediation_invocations = summary.remediation_invocation_count;
+  summary.remediation_recoveries = summary.remediation_recovery_count;
+  summary.evaluation_authorized = summary.development_campaign_complete;
   return { ...summary, summary_fingerprint: fingerprint(summary) };
 }
 

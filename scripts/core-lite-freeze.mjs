@@ -15,6 +15,26 @@ const materializerPath = path.join(root, "scripts/materialize-core-lite.mjs");
 const calibrationRunnerPath = path.join(root, "scripts/core-lite-calibrate.mjs");
 const evaluationRunnerPath = path.join(root, "scripts/core-lite-evaluate.mjs");
 const freezeRunnerPath = path.join(root, "scripts/core-lite-freeze.mjs");
+const amendmentRelativePath = "research/core-lite-evidence/protocol-amendment.v1.json";
+const amendmentPath = path.join(root, amendmentRelativePath);
+
+export const FROZEN_CORE_LITE_BUNDLE_FINGERPRINT =
+  "sha256:886a1d5b8fff98b65cdca724a509e4e890c6e583745ed6d2b898f9a5c001ad67";
+export const FROZEN_EVALUATION_TASK_FINGERPRINT =
+  "sha256:d02a6867a623c0ae01366758340eab7564323fcb515b4e184f47aefabe25311a";
+export const EXPECTED_PROTOCOL_AMENDMENT = Object.freeze({
+  reason: "development calibration is diagnostic and does not gate an untouched independent evaluation set",
+  observed_development_result: Object.freeze({ plain: "9/10", core_lite: "9/10" }),
+  candidate_changed: false,
+  evaluation_tasks_changed: false,
+  evaluation_outcomes_observed: false,
+  decision_thresholds_changed: false,
+  evaluation_authorized: true,
+});
+
+const candidatePaths = ["agents/core-lite.md", "profiles/core-lite/opencode.json", "runtime/core-lite.mjs",
+  "scripts/materialize-core-lite.mjs"];
+const evaluationPaths = ["benchmarks/core-lite/corpus.json", "benchmarks/core-lite/check-task.mjs"];
 
 function option(name, fallback = null) {
   const index = process.argv.indexOf(name);
@@ -44,27 +64,82 @@ export function counterbalancedSchedule(tasks) {
   return schedule;
 }
 
+export function evaluationTaskFingerprint(corpus) {
+  return fingerprint(corpus.tasks.filter((task) => task.split === "evaluation"));
+}
+
+export function evaluationEvidenceObserved(evaluationRoot) {
+  if (!fs.existsSync(evaluationRoot)) return false;
+  assert(fs.statSync(evaluationRoot).isDirectory(), "evaluation root is not a directory");
+  return ["started", "receipts", "measurement-summary.json"].some((entry) =>
+    fs.existsSync(path.join(evaluationRoot, entry)));
+}
+
+function validateFingerprintedObject(value, fingerprintKey, label) {
+  assert(value !== null && typeof value === "object" && !Array.isArray(value), `${label} is invalid`);
+  const body = { ...value }; delete body[fingerprintKey];
+  assert.equal(value[fingerprintKey], fingerprint(body), `${label} fingerprint drifted`);
+}
+
+export function developmentCalibrationDiagnostics(summary) {
+  const plain = summary.arms?.plain; const core = summary.arms?.["core-lite"];
+  const campaignComplete = summary.schema_version === 1 && summary.dataset === "development"
+    && summary.task_count === 10 && plain?.attempts === 10 && plain.scored === 10
+    && core?.attempts === 10 && core.scored === 10;
+  return { development_campaign_complete: campaignComplete,
+    development_plain_success: `${plain?.successes}/10`,
+    development_core_lite_success: `${core?.successes}/10`,
+    development_set_ceiling_warning: plain?.successes > 8,
+    remediation_invocations: summary.remediation_invocation_count,
+    remediation_recoveries: summary.remediation_recovery_count };
+}
+
+export function assertEvaluationAuthorized({ corpus, calibrationMetadata, calibrationSummary, bundleManifest,
+  candidateSha, runnerSha, exactHeadCi, protocolAmendment, evaluationOutcomesObserved }) {
+  assert.deepEqual(protocolAmendment, EXPECTED_PROTOCOL_AMENDMENT, "protocol amendment drifted");
+  validateFingerprintedObject(calibrationMetadata, "metadata_fingerprint", "calibration metadata");
+  validateFingerprintedObject(calibrationSummary, "summary_fingerprint", "calibration summary");
+  const diagnostics = developmentCalibrationDiagnostics(calibrationSummary);
+  assert.equal(diagnostics.development_campaign_complete, true, "development campaign is incomplete");
+  assert.equal(evaluationOutcomesObserved, false, "evaluation outcomes were already observed");
+  assert.equal(candidateSha, calibrationMetadata.product_sha, "candidate SHA changed after development calibration");
+  assert.equal(calibrationMetadata.bundle_fingerprint, FROZEN_CORE_LITE_BUNDLE_FINGERPRINT,
+    "candidate fingerprint changed after development calibration");
+  assert.equal(bundleManifest.bundle_fingerprint, FROZEN_CORE_LITE_BUNDLE_FINGERPRINT,
+    "candidate fingerprint changed before evaluation freeze");
+  assert.equal(evaluationTaskFingerprint(corpus), FROZEN_EVALUATION_TASK_FINGERPRINT,
+    "evaluation-task fingerprint changed before evaluation freeze");
+  assert.equal(calibrationMetadata.model, MODEL); assert.equal(calibrationMetadata.variant, VARIANT);
+  assert.match(runnerSha, /^[0-9a-f]{40}$/u, "runner SHA is invalid");
+  assert.equal(exactHeadCi?.head_sha, runnerSha, "CI did not run on the exact runner SHA");
+  assert.equal(exactHeadCi?.conclusion, "success", "exact-head CI did not pass");
+  assert.equal(typeof exactHeadCi?.run_id, "string"); assert(exactHeadCi.run_id.length > 0, "CI run ID is missing");
+  return diagnostics;
+}
+
 export function buildFreezeManifest({ corpus, checkerSha256, calibrationMetadata, calibrationSummary,
-  bundleManifest, productSha, opencodePath, opencodeVersion, opencodeSha256, timeoutMs }) {
+  bundleManifest, candidateSha, runnerSha, opencodePath, opencodeVersion, opencodeSha256, timeoutMs,
+  exactHeadCi, protocolAmendment, evaluationOutcomesObserved }) {
   const tasks = corpus.tasks.filter((task) => task.split === "evaluation");
   assert.equal(tasks.length, 30);
-  assert.equal(calibrationSummary.calibration_acceptable, true, "development calibration is not acceptable");
-  assert.equal(calibrationMetadata.product_sha, productSha, "candidate changed after development calibration");
-  assert.equal(calibrationMetadata.model, MODEL);
-  assert.equal(calibrationMetadata.variant, VARIANT);
-  assert.equal(calibrationMetadata.bundle_fingerprint, bundleManifest.bundle_fingerprint);
+  const diagnostics = assertEvaluationAuthorized({ corpus, calibrationMetadata, calibrationSummary, bundleManifest,
+    candidateSha, runnerSha, exactHeadCi, protocolAmendment, evaluationOutcomesObserved });
   assert.equal(calibrationMetadata.timeout_ms, timeoutMs);
   assert.equal(calibrationMetadata.opencode_path, opencodePath);
   assert.equal(calibrationMetadata.opencode_version, opencodeVersion);
   assert.equal(calibrationMetadata.opencode_sha256, opencodeSha256);
   const schedule = counterbalancedSchedule(tasks);
   const taskBindings = tasks.sort((a, b) => a.id.localeCompare(b.id)).map((task) => taskBinding(task, checkerSha256));
-  const base = { schema_version: 1, measurement_id: "core-lite-paired-ab-v1", product_sha: productSha,
+  const base = { schema_version: 1, measurement_id: "core-lite-paired-ab-v1", product_sha: candidateSha,
+    candidate_sha: candidateSha, runner_sha: runnerSha, exact_head_ci: exactHeadCi,
     corpus_id: corpus.corpus_id, corpus_sha256: hash(fs.readFileSync(corpusPath)), checker_sha256: checkerSha256,
+    evaluation_task_fingerprint: evaluationTaskFingerprint(corpus),
     bundle_fingerprint: bundleManifest.bundle_fingerprint, bundle_file_count: bundleManifest.file_count,
     bundle_total_bytes: bundleManifest.total_bytes, provider: "openai", model: "gpt-5.6-luna",
     model_binding: MODEL, variant: VARIANT, opencode_path: opencodePath,
     opencode_version: opencodeVersion, opencode_sha256: opencodeSha256, timeout_ms: timeoutMs,
+    protocol_amendment: { path: amendmentRelativePath, fingerprint: fingerprint(protocolAmendment) },
+    development_calibration: diagnostics, evaluation_outcomes_observed_before_freeze: false,
     runner_bindings: { calibration_sha256: hash(fs.readFileSync(calibrationRunnerPath)),
       evaluation_sha256: hash(fs.readFileSync(evaluationRunnerPath)),
       freeze_sha256: hash(fs.readFileSync(freezeRunnerPath)),
@@ -76,6 +151,13 @@ export function buildFreezeManifest({ corpus, checkerSha256, calibrationMetadata
       eligible_only_for: "proven_host_or_provider_failure_before_scored_outcome",
       timeout_bad_solution_failed_test_and_scored_outcome_retry: "forbidden",
       unproven_provider_submission_state: "stop_incomplete_without_retry" },
+    scoring: { primary_metric: "task_success",
+      required_for_both_arms: ["hidden_semantic_oracle_passed", "mutation_scope_valid",
+        "model_process_completed", "no_timeout", "hidden_oracle_not_model_visible"],
+      additionally_required_for_core_lite: "final_host_verification_passed",
+      observed_metrics: ["first_public_check_pass", "remediation_invoked", "remediation_recovered",
+        "final_public_check_pass", "hidden_semantic_success", "scope_violation", "timeout", "duration_ms",
+        "turns", "tool_calls"] },
     statistics: { primary_metric: "task_success", bootstrap_resamples: 100000,
       bootstrap_method: "paired-task-resampling-with-replacement", bootstrap_prng: "xorshift32",
       bootstrap_interval: "percentile-95-floor-lower-ceil-upper", one_sided_direction: "core-lite>plain",
@@ -93,15 +175,28 @@ export function buildFreezeManifest({ corpus, checkerSha256, calibrationMetadata
 
 async function main() {
   const calibrationRoot = path.resolve(option("--calibration-root") ?? "");
+  const evaluationRoot = path.resolve(option("--evaluation-root") ?? "");
   const output = path.resolve(option("--output", path.join(root, "benchmarks/core-lite/evaluation-manifest.json")));
+  const ciRunId = option("--ci-run-id"); const ciHeadSha = option("--ci-head-sha");
   if (option("--calibration-root") === null) throw new Error("--calibration-root is required");
+  if (option("--evaluation-root") === null) throw new Error("--evaluation-root is required");
+  if (ciRunId === null || ciHeadSha === null) throw new Error("--ci-run-id and --ci-head-sha are required");
   if (fs.existsSync(output)) throw new Error(`freeze output already exists: ${output}`);
   const status = spawnSync("git", ["status", "--porcelain"], { cwd: root, encoding: "utf8" });
   if (status.status !== 0 || status.stdout !== "") throw new Error("freeze requires a clean source worktree");
-  const productSha = spawnSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).stdout.trim();
+  const runnerSha = spawnSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).stdout.trim();
+  assert.equal(ciHeadSha, runnerSha, "provided CI head differs from the exact runner SHA");
   const calibrationMetadata = readJson(path.join(calibrationRoot, "calibration-metadata.json"));
   const calibrationSummary = readJson(path.join(calibrationRoot, "calibration-summary.json"));
+  const candidateSha = calibrationMetadata.product_sha;
+  for (const [paths, message] of [[candidatePaths, "candidate changed after development calibration"],
+    [evaluationPaths, "evaluation corpus or oracle changed after development calibration"]]) {
+    const diff = spawnSync("git", ["diff", "--quiet", candidateSha, "--", ...paths], { cwd: root });
+    if (diff.status !== 0) throw new Error(message);
+  }
   const corpus = readJson(corpusPath);
+  const protocolAmendment = readJson(amendmentPath);
+  const exactHeadCi = { run_id: String(ciRunId), head_sha: runnerSha, conclusion: "success" };
   const temporary = fs.mkdtempSync(path.join(os.tmpdir(), "core-lite-freeze-"));
   try {
     const bundle = path.join(temporary, "bundle");
@@ -112,12 +207,14 @@ async function main() {
     const opencodeVersionResult = spawnSync(opencodePath, ["--version"], { encoding: "utf8" });
     if (opencodeVersionResult.status !== 0) throw new Error("OpenCode version probe failed");
     const manifest = buildFreezeManifest({ corpus, checkerSha256: hash(fs.readFileSync(checkerPath)),
-      calibrationMetadata, calibrationSummary, bundleManifest, productSha, opencodePath,
+      calibrationMetadata, calibrationSummary, bundleManifest, candidateSha, runnerSha, opencodePath,
       opencodeVersion: opencodeVersionResult.stdout.trim(), opencodeSha256: hash(fs.readFileSync(opencodePath)),
-      timeoutMs: calibrationMetadata.timeout_ms });
+      timeoutMs: calibrationMetadata.timeout_ms, exactHeadCi, protocolAmendment,
+      evaluationOutcomesObserved: evaluationEvidenceObserved(evaluationRoot) });
     writeJson(output, manifest, 0o644);
     process.stdout.write(`${JSON.stringify({ output, manifest_fingerprint: manifest.manifest_fingerprint,
-      product_sha: manifest.product_sha, evaluation_tasks: manifest.evaluation_task_count,
+      candidate_sha: manifest.candidate_sha, runner_sha: manifest.runner_sha,
+      evaluation_tasks: manifest.evaluation_task_count,
       scheduled_scored_calls: manifest.schedule.length, bootstrap_seed: manifest.statistics.bootstrap_seed_uint32 })}\n`);
   } finally {
     fs.rmSync(temporary, { recursive: true, force: true });

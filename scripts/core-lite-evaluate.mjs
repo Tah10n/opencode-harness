@@ -7,7 +7,7 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { MODEL, VARIANT, executeAttempt, fingerprint, hash, readJson, validateReceipt,
   verifyMaterializedBundle, writeJson } from "./core-lite-calibrate.mjs";
-import { counterbalancedSchedule, taskBinding } from "./core-lite-freeze.mjs";
+import { counterbalancedSchedule, evaluationTaskFingerprint, taskBinding } from "./core-lite-freeze.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const corpusPath = path.join(root, "benchmarks/core-lite/corpus.json");
@@ -152,8 +152,13 @@ function validateManifest(manifest, corpus, opencodePath) {
   assert.equal(manifest.manifest_fingerprint, fingerprint(body), "manifest fingerprint drifted");
   assert.equal(manifest.measurement_id, "core-lite-paired-ab-v1");
   assert.equal(manifest.model_binding, MODEL); assert.equal(manifest.variant, VARIANT);
+  assert.equal(manifest.product_sha, manifest.candidate_sha);
+  assert.match(manifest.candidate_sha, /^[0-9a-f]{40}$/u); assert.match(manifest.runner_sha, /^[0-9a-f]{40}$/u);
+  assert.equal(manifest.exact_head_ci?.head_sha, manifest.runner_sha);
+  assert.equal(manifest.exact_head_ci?.conclusion, "success");
   assert.equal(manifest.evaluation_task_count, 30); assert.equal(manifest.schedule.length, 60);
   assert.equal(manifest.corpus_sha256, hash(fs.readFileSync(corpusPath)));
+  assert.equal(manifest.evaluation_task_fingerprint, evaluationTaskFingerprint(corpus));
   assert.equal(manifest.checker_sha256, hash(fs.readFileSync(checkerPath)));
   assert.equal(manifest.opencode_path, opencodePath);
   assert.equal(manifest.opencode_sha256, hash(fs.readFileSync(opencodePath)));
@@ -189,11 +194,20 @@ async function main() {
   }
   const status = spawnSync("git", ["status", "--porcelain"], { cwd: root, encoding: "utf8" });
   if (status.status !== 0 || status.stdout !== "") throw new Error("official evaluation requires a clean source worktree");
-  const protectedPaths = ["agents/core-lite.md", "profiles/core-lite/opencode.json", "runtime/core-lite.mjs",
-    "scripts/materialize-core-lite.mjs", "scripts/core-lite-calibrate.mjs", "scripts/core-lite-evaluate.mjs",
-    "scripts/core-lite-freeze.mjs", "benchmarks/core-lite/corpus.json", "benchmarks/core-lite/check-task.mjs"];
-  const productDiff = spawnSync("git", ["diff", "--quiet", manifest.product_sha, "--", ...protectedPaths], { cwd: root });
-  if (productDiff.status !== 0) throw new Error("frozen product or corpus differs from product SHA");
+  const currentHead = spawnSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" });
+  if (currentHead.status !== 0 || currentHead.stdout.trim() !== manifest.runner_sha) {
+    throw new Error("official evaluation runner differs from the exact frozen SHA");
+  }
+  const protectedGroups = [
+    [["agents/core-lite.md", "profiles/core-lite/opencode.json", "runtime/core-lite.mjs",
+      "scripts/materialize-core-lite.mjs"], "frozen candidate differs from candidate SHA"],
+    [["benchmarks/core-lite/corpus.json", "benchmarks/core-lite/check-task.mjs"],
+      "frozen evaluation corpus or oracle differs from candidate SHA"],
+  ];
+  for (const [paths, message] of protectedGroups) {
+    const diff = spawnSync("git", ["diff", "--quiet", manifest.candidate_sha, "--", ...paths], { cwd: root });
+    if (diff.status !== 0) throw new Error(message);
+  }
   const authContent = fs.readFileSync(authPath, "utf8"); JSON.parse(authContent);
   fs.mkdirSync(campaignRoot, { recursive: true });
   const bundle = path.join(campaignRoot, "bundle");

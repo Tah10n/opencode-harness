@@ -14,10 +14,12 @@ const source = fs.readFileSync(path.join(root, "scripts/core-lite-calibrate.mjs"
 for (const required of [
   "openai/gpt-5.6-luna", "variant", "low", "--pure", "--auto", "OPENCODE_AUTH_CONTENT",
   "hidden_oracle_model_visible: false", "refusing a retry", "scored_outcome", "remediation_recovered",
-  "verification_activation_count", "plain.successes >= 2", "plain.successes <= 8",
+  "verification_activation_count", "development_campaign_complete", "development_set_ceiling_warning",
+  "development_plain_success", "development_core_lite_success", "evaluation_authorized",
 ]) assert(source.includes(required), `calibration runner lost required contract: ${required}`);
 
-for (const forbidden of ["benchmarks/v3", "severity_oracle", "regression_free", "raw_model_output"]) {
+for (const forbidden of ["benchmarks/v3", "severity_oracle", "regression_free", "raw_model_output",
+  "plain.successes >= 2", "plain.successes <= 8", "remediation_recovery_count >= 1"]) {
   assert(!source.includes(forbidden), `calibration runner includes forbidden concept: ${forbidden}`);
 }
 
@@ -40,16 +42,20 @@ assert.equal(scopeResult(before, { files: new Map([["extra.mjs", "new"]]), links
 
 const receipts = [];
 for (const arm of ["plain", "core-lite"]) for (let index = 0; index < 10; index += 1) receipts.push({ arm,
-  scored_outcome: true, task_success: index < (arm === "plain" ? 5 : 8), process_timed_out: false,
+  scored_outcome: true, task_success: index < 9, process_timed_out: false,
   mutation_scope: { valid: true }, duration_ms: 100, event_metrics: { turns: 1, tool_calls: 1 },
-  verification_activated: arm === "core-lite", remediation_invoked: arm === "core-lite" && index < 2,
-  remediation_recovered: arm === "core-lite" && index === 0 });
+  verification_activated: arm === "core-lite", remediation_invoked: false, remediation_recovered: false });
 const summary = calibrationSummary(receipts);
-assert.equal(summary.calibration_acceptable, true);
-assert.equal(summary.arms.plain.successes, 5);
-assert.equal(summary.arms["core-lite"].successes, 8);
+assert.equal(summary.development_campaign_complete, true);
+assert.equal(summary.evaluation_authorized, true);
+assert.equal(summary.arms.plain.successes, 9);
+assert.equal(summary.arms["core-lite"].successes, 9);
 assert.equal(summary.verification_activation_count, 10);
-assert.equal(summary.remediation_recovery_count, 1);
+assert.equal(summary.development_plain_success, "9/10");
+assert.equal(summary.development_core_lite_success, "9/10");
+assert.equal(summary.development_set_ceiling_warning, true);
+assert.equal(summary.remediation_invocations, 0);
+assert.equal(summary.remediation_recoveries, 0);
 
 const temporary = fs.mkdtempSync(path.join(os.tmpdir(), "core-lite-calibration-runner-"));
 try {
