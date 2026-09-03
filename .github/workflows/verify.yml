@@ -140,6 +140,16 @@ jobs:
             GITHUB_REPOSITORY="$GITHUB_REPOSITORY" \
             npm run verify:measurement:core-public-ab:contract
 
+      - name: Run core public A/B primary reporting tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo -u "$OPENCODE_QUALITY_RUN_USER" -- /usr/bin/env \
+            HOME="$OPENCODE_QUALITY_RUN_HOME" \
+            PATH="$PATH" \
+            CI=true \
+            npm run verify:measurement:core-public-ab:report-primary
+
       - name: Upload deterministic receipt bundle
         if: always()
         shell: bash

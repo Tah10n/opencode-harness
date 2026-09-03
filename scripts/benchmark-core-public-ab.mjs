@@ -367,6 +367,27 @@ function classifyAttemptSignals(signals) {
   return Object.freeze({ oracle_validated_task_success: success, scored_outcome: true,
     infrastructure_failure_before_scoring: false, reconciliation_required: false });
 }
+function providerAccessFailedBeforeSuccess(statuses) {
+  for (const status of statuses) {
+    if (status >= 200 && status < 300) return false;
+    if (status === 401 || status === 403) return true;
+  }
+  return false;
+}
+function classifyCompletedAttempt(signals) {
+  const timedOut = signals.timed_out === true;
+  const modelAccessRequired = !timedOut && (signals.error_class === "model-access"
+    || providerAccessFailedBeforeSuccess(signals.provider_response_statuses ?? []));
+  if (modelAccessRequired) {
+    return Object.freeze({ oracle_validated_task_success: false, scored_outcome: false,
+      infrastructure_failure_before_scoring: false, reconciliation_required: false,
+      model_access_required: true, retry_allowed: false });
+  }
+  const classification = classifyAttemptSignals(signals);
+  return Object.freeze({ ...classification, model_access_required: false,
+    retry_allowed: classification.infrastructure_failure_before_scoring === true
+      && classification.reconciliation_required === false });
+}
 function statRegular(file, label) {
   const resolved = fs.realpathSync.native(path.resolve(file));
   const stat = fs.lstatSync(resolved);
@@ -2125,9 +2146,9 @@ async function executeAttempt(context, task, arm, attemptIndex, retryOf = null) 
     const hostEnvironmentIntegrity = !configurationDrift && !catalogDrift;
     const processContainmentIntact = managed.teardown_verified === true && hostEnvironmentIntegrity;
     const errorClass = authenticTerminalCompletion ? null : classifyError(`${managed.stderr}\n${managed.stdout}\n${managed.activation}`);
-    const providerAccessFailure = providerEvidence.provider_response_statuses.some((status) => status === 401 || status === 403);
     const providerRejectedBeforeExecution = providerEvidence.provider_response_statuses.some((status) => status === 429);
-    const modelAccessRequired = errorClass === "model-access" || providerAccessFailure;
+    const providerAccessFailure = providerAccessFailedBeforeSuccess(providerEvidence.provider_response_statuses);
+    const modelAccessRequired = !timedOut && (errorClass === "model-access" || providerAccessFailure);
     if (providerEvidence.ambiguous_submission_count > 0 && !timedOut) {
       fail("MEASUREMENT_RECONCILIATION_REQUIRED",
         `${attemptId} has an ambiguous provider submission after the model boundary; retry is forbidden`);
@@ -2144,9 +2165,7 @@ async function executeAttempt(context, task, arm, attemptIndex, retryOf = null) 
       && providerEvidence.ambiguous_submission_count === 0 && !modelAccessRequired
       && (preProviderHostTermination || providerRejectedBeforeExecution || (providerEvidence.provider_submission_count === 0
         && ["host-infrastructure", "provider-infrastructure"].includes(errorClass))));
-    const classification = modelAccessRequired ? Object.freeze({ oracle_validated_task_success: false,
-      scored_outcome: false, infrastructure_failure_before_scoring: false, reconciliation_required: false })
-      : classifyAttemptSignals({ arm,
+    const classification = classifyCompletedAttempt({ arm,
       process_receipt_observable: arm === "plain" || activation?.process_receipt_observable === true,
       authentic_terminal_completion: authenticTerminalCompletion,
       timed_out: timedOut,
@@ -2160,6 +2179,8 @@ async function executeAttempt(context, task, arm, attemptIndex, retryOf = null) 
       authentic_current_core_verification_passed: arm === "core" ? !coreVerificationBlocked : null,
       explicit_infrastructure_failure: explicitInfrastructureFailure,
       provider_submission_disposition_established: providerSubmissionDispositionEstablished,
+      error_class: errorClass,
+      provider_response_statuses: providerEvidence.provider_response_statuses,
     });
     const outcomeBody = { schema_version: 1, attempt_id: attemptId, retry_of_attempt_id: retryOf,
       attempt_binding_fingerprint: attemptBinding, dataset: task.dataset, identity_id: task.id, stratum: task.stratum,
@@ -2182,7 +2203,8 @@ async function executeAttempt(context, task, arm, attemptIndex, retryOf = null) 
       infrastructure_failure_before_scoring: classification.infrastructure_failure_before_scoring,
       provider_submission_disposition_established: providerSubmissionDispositionEstablished,
       reconciliation_required: classification.reconciliation_required,
-      model_access_required: modelAccessRequired, scored_outcome: classification.scored_outcome,
+      model_access_required: classification.model_access_required, retry_allowed: classification.retry_allowed,
+      scored_outcome: classification.scored_outcome,
       error_class: errorClass, duration_ms: managed.duration_ms, turn_count: events.turn_count,
       tool_call_count: events.tool_call_count, tokens: events.tokens, usage_observed: events.usage_observed,
       provider_evidence: providerEvidence,
@@ -2986,6 +3008,21 @@ async function selfTest({ containment = true } = {}) {
   expect(timeoutOutcome.oracle_validated_task_success === false && timeoutOutcome.scored_outcome === true
     && timeoutOutcome.infrastructure_failure_before_scoring === false,
   "MEASUREMENT_SELF_TEST", "timeout did not score failure");
+  for (const providerResponseStatuses of [[], [200], [200, 400]]) {
+    const classified = classifyCompletedAttempt({ ...validSignals, timed_out: true,
+      process_receipt_observable: false, error_class: "model-access",
+      provider_response_statuses: providerResponseStatuses });
+    expect(classified.oracle_validated_task_success === false && classified.scored_outcome === true
+      && classified.model_access_required === false && classified.retry_allowed === false,
+    "MEASUREMENT_SELF_TEST", "timed-out attempt was reclassified by provider or model text");
+  }
+  for (const status of [401, 403]) {
+    const preSuccessAccessFailure = classifyCompletedAttempt({ ...validSignals,
+      authentic_terminal_completion: false, error_class: null, provider_response_statuses: [status, 200] });
+    expect(preSuccessAccessFailure.scored_outcome === false && preSuccessAccessFailure.model_access_required === true
+      && preSuccessAccessFailure.retry_allowed === false,
+    "MEASUREMENT_SELF_TEST", "explicit pre-success 401/403 did not remain a model access failure");
+  }
   const ambiguousTimeout = classifyAttemptSignals({ ...validSignals, timed_out: true,
     process_receipt_observable: false, provider_submission_disposition_established: false });
   expect(ambiguousTimeout.scored_outcome === true && ambiguousTimeout.reconciliation_required === true,
