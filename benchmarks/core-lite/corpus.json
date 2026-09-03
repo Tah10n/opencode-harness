@@ -443,6 +443,12 @@
             "a": 5,
             "b": 1
           }
+        },
+        {
+          "args": [
+            null
+          ],
+          "expected": {}
         }
       ],
       "hidden_cases": [
@@ -472,12 +478,6 @@
               },
               null
             ]
-          ],
-          "expected": {}
-        },
-        {
-          "args": [
-            null
           ],
           "expected": {}
         }
@@ -537,6 +537,38 @@
             "lint",
             "build",
             "test"
+          ]
+        },
+        {
+          "args": [
+            [
+              {
+                "id": "x",
+                "deps": [
+                  "a"
+                ]
+              },
+              {
+                "id": "y",
+                "deps": [
+                  "b"
+                ]
+              },
+              {
+                "id": "a",
+                "deps": []
+              },
+              {
+                "id": "b",
+                "deps": []
+              }
+            ]
+          ],
+          "expected": [
+            "a",
+            "x",
+            "b",
+            "y"
           ]
         }
       ],
@@ -610,7 +642,7 @@
       "id": "core-lite-development-high-02",
       "split": "development",
       "stratum": "high",
-      "visible_requirement": "Allocate a non-negative integer total proportionally across non-negative finite weights using largest remainder. Return integer shares summing to total; fractional ties go to the lower index. Return null for invalid input or zero total weight when total is positive.\n\nThe exported API is `apportion(total, weights)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "visible_requirement": "Schedule {id,cost,deps} tasks into dependency-ordered batches. IDs are unique non-empty strings, costs are positive safe integers not exceeding positive safe-integer capacity, and deps are unique string IDs. At each batch, scan currently ready tasks in original input order, include every task that fits the remaining capacity, and continue past ready tasks that do not fit. Tasks completed in a batch enable dependents only in the next batch. Return arrays of IDs, or null for malformed input, unknown dependencies, or cycles.\n\nThe exported API is `scheduleBatches(tasks, capacity)`. Do not mutate input values. Modify only `src/task.mjs`.",
       "entry_path": "src/task.mjs",
       "allowed_mutation_paths": [
         "src/task.mjs"
@@ -618,73 +650,131 @@
       "files": [
         {
           "path": "src/task.mjs",
-          "content": "export function apportion(total, weights) {\n  return null;\n}\n"
+          "content": "export function scheduleBatches(tasks, capacity) {\n  return null;\n}\n"
         }
       ],
       "public_cases": [
         {
           "args": [
-            10,
             [
-              1,
-              1,
-              1
-            ]
+              {
+                "id": "x",
+                "cost": 2,
+                "deps": [
+                  "a"
+                ]
+              },
+              {
+                "id": "a",
+                "cost": 2,
+                "deps": []
+              },
+              {
+                "id": "b",
+                "cost": 2,
+                "deps": []
+              },
+              {
+                "id": "c",
+                "cost": 1,
+                "deps": []
+              }
+            ],
+            3
           ],
           "expected": [
-            4,
-            3,
-            3
+            [
+              "a",
+              "c"
+            ],
+            [
+              "x"
+            ],
+            [
+              "b"
+            ]
           ]
         },
         {
           "args": [
-            5,
             [
-              0,
-              1
-            ]
+              {
+                "id": "a",
+                "cost": 1,
+                "deps": []
+              },
+              {
+                "id": "b",
+                "cost": 1,
+                "deps": [
+                  "a"
+                ]
+              }
+            ],
+            2
           ],
           "expected": [
-            0,
-            5
+            [
+              "a"
+            ],
+            [
+              "b"
+            ]
           ]
         }
       ],
       "hidden_cases": [
         {
           "args": [
-            0,
             [
-              0,
-              0
-            ]
-          ],
-          "expected": [
-            0,
-            0
-          ]
-        },
-        {
-          "args": [
-            7,
-            [
-              2,
-              1
-            ]
-          ],
-          "expected": [
-            5,
+              {
+                "id": "a",
+                "cost": 1,
+                "deps": []
+              }
+            ],
             2
+          ],
+          "expected": [
+            [
+              "a"
+            ]
           ]
         },
         {
           "args": [
-            1,
             [
-              0,
-              0
-            ]
+              {
+                "id": "a",
+                "cost": 1,
+                "deps": [
+                  "b"
+                ]
+              },
+              {
+                "id": "b",
+                "cost": 1,
+                "deps": [
+                  "a"
+                ]
+              }
+            ],
+            2
+          ],
+          "expected": null
+        },
+        {
+          "args": [
+            [
+              {
+                "id": "a",
+                "cost": 1,
+                "deps": [
+                  "missing"
+                ]
+              }
+            ],
+            2
           ],
           "expected": null
         }
@@ -692,13 +782,13 @@
       "reference_files": [
         {
           "path": "src/task.mjs",
-          "content": "export function apportion(total, weights) {\n  if (!Number.isSafeInteger(total) || total < 0 || !Array.isArray(weights) || weights.some(w => !Number.isFinite(w) || w < 0)) return null; const sum = weights.reduce((a, b) => a + b, 0); if (total > 0 && sum === 0) return null; if (sum === 0) return weights.map(() => 0);\n  const quotas = weights.map(w => total * w / sum), shares = quotas.map(Math.floor); let left = total - shares.reduce((a, b) => a + b, 0);\n  const order = quotas.map((q, i) => [q - shares[i], i]).sort((a, b) => b[0] - a[0] || a[1] - b[1]); for (let i = 0; i < left; i++) shares[order[i][1]]++; return shares;\n}\n"
+          "content": "export function scheduleBatches(tasks, capacity) {\n  if (!Array.isArray(tasks) || !Number.isSafeInteger(capacity) || capacity < 1) return null; const byId = new Map();\n  for (const task of tasks) { if (!task || typeof task.id !== \"string\" || task.id === \"\" || byId.has(task.id) || !Number.isSafeInteger(task.cost) || task.cost < 1 || task.cost > capacity || !Array.isArray(task.deps) || task.deps.some(dep => typeof dep !== \"string\") || new Set(task.deps).size !== task.deps.length) return null; byId.set(task.id, task); }\n  if (tasks.some(task => task.deps.some(dep => !byId.has(dep)))) return null; const done = new Set(), batches = [];\n  while (done.size < tasks.length) { const ready = tasks.filter(task => !done.has(task.id) && task.deps.every(dep => done.has(dep))); if (ready.length === 0) return null; let remaining = capacity; const batch = []; for (const task of ready) if (task.cost <= remaining) { batch.push(task.id); remaining -= task.cost; } if (batch.length === 0) return null; batch.forEach(id => done.add(id)); batches.push(batch); }\n  return batches;\n}\n"
         }
       ],
       "alternative_files": [
         {
           "path": "src/task.mjs",
-          "content": "function implementation(total, weights) {\n  if (!Number.isSafeInteger(total) || total < 0 || !Array.isArray(weights) || weights.some(w => !Number.isFinite(w) || w < 0)) return null; const sum = weights.reduce((a, b) => a + b, 0); if (total > 0 && sum === 0) return null; if (sum === 0) return weights.map(() => 0);\n  const quotas = weights.map(w => total * w / sum), shares = quotas.map(Math.floor); let left = total - shares.reduce((a, b) => a + b, 0);\n  const order = quotas.map((q, i) => [q - shares[i], i]).sort((a, b) => b[0] - a[0] || a[1] - b[1]); for (let i = 0; i < left; i++) shares[order[i][1]]++; return shares;\n}\n\nexport function apportion(...args) {\n  return implementation(...args);\n}\n"
+          "content": "function implementation(tasks, capacity) {\n  if (!Array.isArray(tasks) || !Number.isSafeInteger(capacity) || capacity < 1) return null; const byId = new Map();\n  for (const task of tasks) { if (!task || typeof task.id !== \"string\" || task.id === \"\" || byId.has(task.id) || !Number.isSafeInteger(task.cost) || task.cost < 1 || task.cost > capacity || !Array.isArray(task.deps) || task.deps.some(dep => typeof dep !== \"string\") || new Set(task.deps).size !== task.deps.length) return null; byId.set(task.id, task); }\n  if (tasks.some(task => task.deps.some(dep => !byId.has(dep)))) return null; const done = new Set(), batches = [];\n  while (done.size < tasks.length) { const ready = tasks.filter(task => !done.has(task.id) && task.deps.every(dep => done.has(dep))); if (ready.length === 0) return null; let remaining = capacity; const batch = []; for (const task of ready) if (task.cost <= remaining) { batch.push(task.id); remaining -= task.cost; } if (batch.length === 0) return null; batch.forEach(id => done.add(id)); batches.push(batch); }\n  return batches;\n}\n\nexport function scheduleBatches(...args) {\n  return implementation(...args);\n}\n"
         }
       ]
     },
@@ -742,9 +832,7 @@
           "expected": {
             "a": 3
           }
-        }
-      ],
-      "hidden_cases": [
+        },
         {
           "args": [
             {},
@@ -763,7 +851,9 @@
             ]
           ],
           "expected": {}
-        },
+        }
+      ],
+      "hidden_cases": [
         {
           "args": [
             {
@@ -805,7 +895,7 @@
       "id": "core-lite-development-high-04",
       "split": "development",
       "stratum": "high",
-      "visible_requirement": "Replace {{ dotted.path }} placeholders with own-property values from nested objects. Convert found values with String, leave missing placeholders unchanged, and never read inherited properties. Return an empty string for non-string templates.\n\nThe exported API is `interpolate(template, values)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "visible_requirement": "Apply idempotent transfers to an account-balance object without mutating inputs. Balances must be non-negative finite numbers under non-empty account IDs, and transfers must be an array. Scan transfers in order. Ignore entries without a non-empty string id. The first occurrence of each such id consumes that id even when the transfer is rejected. Apply it only when from/to are distinct existing account IDs, amount is positive and finite, and the current source balance is sufficient. Return {balances,accepted} with accepted transfer IDs in order, or null for invalid top-level input.\n\nThe exported API is `settleTransfers(balances, transfers)`. Do not mutate input values. Modify only `src/task.mjs`.",
       "entry_path": "src/task.mjs",
       "allowed_mutation_paths": [
         "src/task.mjs"
@@ -813,67 +903,139 @@
       "files": [
         {
           "path": "src/task.mjs",
-          "content": "export function interpolate(template, values) {\n  return null;\n}\n"
+          "content": "export function settleTransfers(balances, transfers) {\n  return null;\n}\n"
         }
       ],
       "public_cases": [
         {
           "args": [
-            "Hi {{ user.name }}!",
             {
-              "user": {
-                "name": "Ada"
+              "a": 5,
+              "b": 0,
+              "c": 1
+            },
+            [
+              {
+                "id": "x",
+                "from": "a",
+                "to": "b",
+                "amount": 3
+              },
+              {
+                "id": "x",
+                "from": "a",
+                "to": "c",
+                "amount": 1
+              },
+              {
+                "id": "y",
+                "from": "a",
+                "to": "c",
+                "amount": 3
+              },
+              {
+                "id": "z",
+                "from": "c",
+                "to": "b",
+                "amount": 1
               }
-            }
+            ]
           ],
-          "expected": "Hi Ada!"
+          "expected": {
+            "balances": {
+              "a": 2,
+              "b": 4,
+              "c": 0
+            },
+            "accepted": [
+              "x",
+              "z"
+            ]
+          }
         },
         {
           "args": [
-            "{{missing}}",
-            {}
+            {
+              "a": 1,
+              "b": 0
+            },
+            [
+              {
+                "id": "x",
+                "from": "a",
+                "to": "b",
+                "amount": 2
+              },
+              {
+                "id": "x",
+                "from": "a",
+                "to": "b",
+                "amount": 1
+              }
+            ]
           ],
-          "expected": "{{missing}}"
+          "expected": {
+            "balances": {
+              "a": 1,
+              "b": 0
+            },
+            "accepted": []
+          }
         }
       ],
       "hidden_cases": [
         {
           "args": [
-            "{{ a.b }} {{a.c}}",
             {
-              "a": {
-                "b": 0,
-                "c": false
+              "a": 2,
+              "b": 0
+            },
+            [
+              {
+                "id": "x",
+                "from": "a",
+                "to": "b",
+                "amount": 2
               }
-            }
+            ]
           ],
-          "expected": "0 false"
-        },
-        {
-          "args": [
-            "{{toString}}",
-            {}
-          ],
-          "expected": "{{toString}}"
+          "expected": {
+            "balances": {
+              "a": 0,
+              "b": 2
+            },
+            "accepted": [
+              "x"
+            ]
+          }
         },
         {
           "args": [
             null,
-            {}
+            []
           ],
-          "expected": ""
+          "expected": null
+        },
+        {
+          "args": [
+            {
+              "a": -1
+            },
+            []
+          ],
+          "expected": null
         }
       ],
       "reference_files": [
         {
           "path": "src/task.mjs",
-          "content": "export function interpolate(template, values) {\n  if (typeof template !== \"string\") return \"\"; return template.replace(/\\{\\{\\s*([A-Za-z_$][\\w$]*(?:\\.[A-Za-z_$][\\w$]*)*)\\s*\\}\\}/gu, (whole, key) => { let current = values; for (const part of key.split(\".\")) { if (current === null || typeof current !== \"object\" || !Object.prototype.hasOwnProperty.call(current, part)) return whole; current = current[part]; } return String(current); });\n}\n"
+          "content": "export function settleTransfers(balances, transfers) {\n  if (!balances || typeof balances !== \"object\" || Array.isArray(balances) || !Array.isArray(transfers) || Object.entries(balances).some(([id, value]) => id === \"\" || !Number.isFinite(value) || value < 0)) return null; const next = { ...balances }, accepted = [], seen = new Set();\n  for (const transfer of transfers) { if (!transfer || typeof transfer.id !== \"string\" || transfer.id === \"\" || seen.has(transfer.id)) continue; seen.add(transfer.id); if (typeof transfer.from !== \"string\" || typeof transfer.to !== \"string\" || transfer.from === transfer.to || !Object.prototype.hasOwnProperty.call(next, transfer.from) || !Object.prototype.hasOwnProperty.call(next, transfer.to) || !Number.isFinite(transfer.amount) || transfer.amount <= 0 || next[transfer.from] < transfer.amount) continue; next[transfer.from] -= transfer.amount; next[transfer.to] += transfer.amount; accepted.push(transfer.id); }\n  return { balances: next, accepted };\n}\n"
         }
       ],
       "alternative_files": [
         {
           "path": "src/task.mjs",
-          "content": "function implementation(template, values) {\n  if (typeof template !== \"string\") return \"\"; return template.replace(/\\{\\{\\s*([A-Za-z_$][\\w$]*(?:\\.[A-Za-z_$][\\w$]*)*)\\s*\\}\\}/gu, (whole, key) => { let current = values; for (const part of key.split(\".\")) { if (current === null || typeof current !== \"object\" || !Object.prototype.hasOwnProperty.call(current, part)) return whole; current = current[part]; } return String(current); });\n}\n\nexport function interpolate(...args) {\n  return implementation(...args);\n}\n"
+          "content": "function implementation(balances, transfers) {\n  if (!balances || typeof balances !== \"object\" || Array.isArray(balances) || !Array.isArray(transfers) || Object.entries(balances).some(([id, value]) => id === \"\" || !Number.isFinite(value) || value < 0)) return null; const next = { ...balances }, accepted = [], seen = new Set();\n  for (const transfer of transfers) { if (!transfer || typeof transfer.id !== \"string\" || transfer.id === \"\" || seen.has(transfer.id)) continue; seen.add(transfer.id); if (typeof transfer.from !== \"string\" || typeof transfer.to !== \"string\" || transfer.from === transfer.to || !Object.prototype.hasOwnProperty.call(next, transfer.from) || !Object.prototype.hasOwnProperty.call(next, transfer.to) || !Number.isFinite(transfer.amount) || transfer.amount <= 0 || next[transfer.from] < transfer.amount) continue; next[transfer.from] -= transfer.amount; next[transfer.to] += transfer.amount; accepted.push(transfer.id); }\n  return { balances: next, accepted };\n}\n\nexport function settleTransfers(...args) {\n  return implementation(...args);\n}\n"
         }
       ]
     },
