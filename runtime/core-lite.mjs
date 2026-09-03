@@ -55,11 +55,11 @@ function fileIdentity(target, label, { executable = false } = {}) {
   const resolved = path.resolve(target);
   let descriptor;
   try {
-    const listed = fs.lstatSync(resolved);
-    if (!listed.isFile() || listed.isSymbolicLink() || listed.nlink !== 1) {
-      fail("CORE_LITE_UNTRUSTED_INPUT", `${label} must be a singly-linked ordinary file`);
-    }
     const real = fs.realpathSync.native(resolved);
+    const listed = fs.lstatSync(real);
+    if (!listed.isFile() || listed.isSymbolicLink()) {
+      fail("CORE_LITE_UNTRUSTED_INPUT", `${label} must resolve to an ordinary file`);
+    }
     descriptor = fs.openSync(real, "r");
     const before = fs.fstatSync(descriptor, { bigint: true });
     if (executable && process.platform !== "win32" && (before.mode & 0o111n) === 0n) {
