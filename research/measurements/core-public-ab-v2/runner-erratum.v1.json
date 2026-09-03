@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "measurement_id": "core-public-ab-v2",
+  "scope": "future_attempt_classification_only",
+  "historical_attempt_145_changed": false,
+  "historical_ledger_changed": false,
+  "primary_calculation_changed_by_erratum": false,
+  "corrected_precedence": [
+    "timed_out=true",
+    "scored_outcome=true",
+    "oracle_validated_task_success=false",
+    "retry_allowed=false"
+  ],
+  "clarification": "A timeout cannot become MODEL ACCESS REQUIRED from stdout, stderr, model text, activation output, or a provider response observed after a successful provider response.",
+  "frozen_terminal_attempt": {
+    "historical_scored_outcome": false,
+    "historical_model_access_required": true,
+    "retry_allowed": false
+  },
+  "runner_erratum_fingerprint": "sha256:9f902d440ef275fc10e7d743a0cdbad8ada76054d3aaca1e3f6ed449b60cbc5c"
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "measurement_id": "core-public-ab-v2",
+  "primary_status": "complete",
+  "pilot_status": "incomplete_after_non_retryable_timeout",
+  "overall_status": "primary_complete_pilot_incomplete",
+  "completed_pairs": 12,
+  "total_pairs": 29,
+  "used_in_primary": false,
+  "efficacy": {
+    "status": "not_computed",
+    "reason": "incomplete_after_non_retryable_timeout"
+  },
+  "terminal_attempt": {
+    "arm": "core",
+    "timed_out": true,
+    "retry_allowed": false,
+    "scored_outcome_historical": false
+  },
+  "new_model_provider_calls": 0,
+  "pilot_status_fingerprint": "sha256:6f125676b39023ac0ba5b562623150c82bdbdc28d752036ce04daea45eacd6dd"
+}
