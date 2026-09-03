@@ -72,7 +72,8 @@ try {
   assert(inventory.file_count <= 20);
   assert(inventory.total_bytes <= 300 * 1024);
   assert.equal(inventory.main_runtime_entrypoint, "runtime/core-lite.mjs");
-  assert.deepEqual(fs.readdirSync(bundle).sort(), [".opencode-profile-manifest.json", "agents", "opencode.json", "runtime"]);
+  assert.deepEqual(fs.readdirSync(bundle).sort(),
+    [".gitignore", ".opencode-profile-manifest.json", "agents", "opencode.json", "runtime"]);
   process.stdout.write(`${JSON.stringify({ status: "passed", scenarios: 3,
     prompt_bytes: Buffer.byteLength(prompt), bundle_file_count: inventory.file_count,
     bundle_total_bytes: inventory.total_bytes, bundle_fingerprint: inventory.bundle_fingerprint })}\n`);
