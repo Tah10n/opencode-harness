@@ -28,6 +28,9 @@ jobs:
         with:
           node-version: "24"
 
+      - name: Verify and publish core-lite bundle inventory
+        run: npm run verify:core-lite
+
       - name: Harden trusted Node distribution permissions
         shell: bash
         run: |

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "default_agent": "core-lite",
+  "permission": {
+    "external_directory": "deny",
+    "oc_learning_*": "deny"
+  },
+  "watcher": {
+    "ignore": [
+      "node_modules/**",
+      ".git/**",
+      ".cache/**",
+      "coverage/**"
+    ]
+  }
+}
