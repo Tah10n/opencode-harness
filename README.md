@@ -695,7 +695,7 @@ particular,
 `probe:runtime:quality-plugin-api` is intentionally excluded from this default
 chain because it resolves a machine-local `@opencode-ai/plugin` installation.
 These commands validate contracts, schemas, failure
-cases, corpus structure, and evaluation logic. The prompt inventory covers 18 agent prompts and nine
+cases, corpus structure, and evaluation logic. The prompt inventory covers 19 agent prompts and nine
 skill entrypoints. These checks do not prove an installed model profile or
 actual model behaviour.
 

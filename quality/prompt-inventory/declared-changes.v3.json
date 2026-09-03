@@ -47,6 +47,13 @@
       "rationale": "Add the bounded read-only independent reviewer used only after integrated core or deep changes."
     },
     {
+      "path": "agents/core-lite.md",
+      "aspects": [
+        "content"
+      ],
+      "rationale": "Add the measured minimal product prompt with one host-owned verification remediation and no delegated or research workflow."
+    },
+    {
       "path": "agents/core.md",
       "aspects": [
         "content"
