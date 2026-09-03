@@ -895,7 +895,7 @@
       "id": "core-lite-development-high-04",
       "split": "development",
       "stratum": "high",
-      "visible_requirement": "Apply idempotent transfers to an account-balance object without mutating inputs. Balances must be non-negative finite numbers under non-empty account IDs, and transfers must be an array. Scan transfers in order. Ignore entries without a non-empty string id. The first occurrence of each such id consumes that id even when the transfer is rejected. Apply it only when from/to are distinct existing account IDs, amount is positive and finite, and the current source balance is sufficient. Return {balances,accepted} with accepted transfer IDs in order, or null for invalid top-level input.\n\nThe exported API is `settleTransfers(balances, transfers)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "visible_requirement": "Apply idempotent atomic transfer batches without mutating inputs. Balances must be non-negative finite numbers under non-empty account IDs, and batches must be an array; otherwise return null. Ignore non-array batches. Within each batch, scan entries in order: ignore entries without a non-empty string id and globally repeated ids, while the first occurrence of every non-empty id consumes that id even if its batch is later rejected. The remaining fresh entries form a candidate batch. Accept a candidate only when it is non-empty and every entry has distinct existing string from/to accounts, a positive finite amount, and can be applied sequentially to a draft without an overdraft. If any fresh entry fails, reject and roll back the entire batch, but keep all its fresh ids consumed. Accepted batches commit atomically. Return {balances,acceptedBatches,acceptedTransfers}, where acceptedBatches contains original zero-based batch indexes and acceptedTransfers contains committed ids in order.\n\nThe exported API is `settleTransferBatches(balances, batches)`. Do not mutate input values. Modify only `src/task.mjs`.",
       "entry_path": "src/task.mjs",
       "allowed_mutation_paths": [
         "src/task.mjs"
@@ -903,7 +903,7 @@
       "files": [
         {
           "path": "src/task.mjs",
-          "content": "export function settleTransfers(balances, transfers) {\n  return null;\n}\n"
+          "content": "export function settleTransferBatches(balances, batches) {\n  return null;\n}\n"
         }
       ],
       "public_cases": [
@@ -912,74 +912,124 @@
             {
               "a": 5,
               "b": 0,
-              "c": 1
+              "c": 2
             },
             [
-              {
-                "id": "x",
-                "from": "a",
-                "to": "b",
-                "amount": 3
-              },
-              {
-                "id": "x",
-                "from": "a",
-                "to": "c",
-                "amount": 1
-              },
-              {
-                "id": "y",
-                "from": "a",
-                "to": "c",
-                "amount": 3
-              },
-              {
-                "id": "z",
-                "from": "c",
-                "to": "b",
-                "amount": 1
-              }
+              [
+                {
+                  "id": "x",
+                  "from": "a",
+                  "to": "b",
+                  "amount": 3
+                },
+                {
+                  "id": "y",
+                  "from": "b",
+                  "to": "c",
+                  "amount": 2
+                }
+              ],
+              [
+                {
+                  "id": "z",
+                  "from": "a",
+                  "to": "b",
+                  "amount": 3
+                },
+                {
+                  "id": "q",
+                  "from": "c",
+                  "to": "a",
+                  "amount": 1
+                }
+              ],
+              [
+                {
+                  "id": "z",
+                  "from": "a",
+                  "to": "b",
+                  "amount": 1
+                },
+                {
+                  "id": "q",
+                  "from": "c",
+                  "to": "a",
+                  "amount": 1
+                }
+              ],
+              [
+                {
+                  "id": "r",
+                  "from": "c",
+                  "to": "a",
+                  "amount": 1
+                }
+              ]
             ]
           ],
           "expected": {
             "balances": {
-              "a": 2,
-              "b": 4,
-              "c": 0
+              "a": 3,
+              "b": 1,
+              "c": 3
             },
-            "accepted": [
+            "acceptedBatches": [
+              0,
+              3
+            ],
+            "acceptedTransfers": [
               "x",
-              "z"
+              "y",
+              "r"
             ]
           }
         },
         {
           "args": [
             {
-              "a": 1,
+              "a": 2,
               "b": 0
             },
             [
-              {
-                "id": "x",
-                "from": "a",
-                "to": "b",
-                "amount": 2
-              },
-              {
-                "id": "x",
-                "from": "a",
-                "to": "b",
-                "amount": 1
-              }
+              [
+                {
+                  "id": "x",
+                  "from": "a",
+                  "to": "b",
+                  "amount": 3
+                }
+              ],
+              [
+                {
+                  "id": "x",
+                  "from": "a",
+                  "to": "b",
+                  "amount": 1
+                }
+              ],
+              [
+                {
+                  "id": "y",
+                  "from": "a",
+                  "to": "b",
+                  "amount": 1
+                },
+                {
+                  "id": "z",
+                  "from": "a",
+                  "to": "b",
+                  "amount": 2
+                }
+              ]
             ]
           ],
           "expected": {
             "balances": {
-              "a": 1,
+              "a": 2,
               "b": 0
             },
-            "accepted": []
+            "acceptedBatches": [],
+            "acceptedTransfers": []
           }
         }
       ],
@@ -991,12 +1041,14 @@
               "b": 0
             },
             [
-              {
-                "id": "x",
-                "from": "a",
-                "to": "b",
-                "amount": 2
-              }
+              [
+                {
+                  "id": "x",
+                  "from": "a",
+                  "to": "b",
+                  "amount": 2
+                }
+              ]
             ]
           ],
           "expected": {
@@ -1004,7 +1056,41 @@
               "a": 0,
               "b": 2
             },
-            "accepted": [
+            "acceptedBatches": [
+              0
+            ],
+            "acceptedTransfers": [
+              "x"
+            ]
+          }
+        },
+        {
+          "args": [
+            {
+              "a": 1,
+              "b": 0
+            },
+            [
+              null,
+              [
+                {
+                  "id": "x",
+                  "from": "a",
+                  "to": "b",
+                  "amount": 1
+                }
+              ]
+            ]
+          ],
+          "expected": {
+            "balances": {
+              "a": 0,
+              "b": 1
+            },
+            "acceptedBatches": [
+              1
+            ],
+            "acceptedTransfers": [
               "x"
             ]
           }
@@ -1029,13 +1115,13 @@
       "reference_files": [
         {
           "path": "src/task.mjs",
-          "content": "export function settleTransfers(balances, transfers) {\n  if (!balances || typeof balances !== \"object\" || Array.isArray(balances) || !Array.isArray(transfers) || Object.entries(balances).some(([id, value]) => id === \"\" || !Number.isFinite(value) || value < 0)) return null; const next = { ...balances }, accepted = [], seen = new Set();\n  for (const transfer of transfers) { if (!transfer || typeof transfer.id !== \"string\" || transfer.id === \"\" || seen.has(transfer.id)) continue; seen.add(transfer.id); if (typeof transfer.from !== \"string\" || typeof transfer.to !== \"string\" || transfer.from === transfer.to || !Object.prototype.hasOwnProperty.call(next, transfer.from) || !Object.prototype.hasOwnProperty.call(next, transfer.to) || !Number.isFinite(transfer.amount) || transfer.amount <= 0 || next[transfer.from] < transfer.amount) continue; next[transfer.from] -= transfer.amount; next[transfer.to] += transfer.amount; accepted.push(transfer.id); }\n  return { balances: next, accepted };\n}\n"
+          "content": "export function settleTransferBatches(balances, batches) {\n  if (!balances || typeof balances !== \"object\" || Array.isArray(balances) || !Array.isArray(batches) || Object.entries(balances).some(([id, value]) => id === \"\" || !Number.isFinite(value) || value < 0)) return null;\n  let next = { ...balances }; const seen = new Set(), acceptedBatches = [], acceptedTransfers = [];\n  for (const [batchIndex, batch] of batches.entries()) { if (!Array.isArray(batch)) continue; const fresh = []; for (const transfer of batch) { if (!transfer || typeof transfer.id !== \"string\" || transfer.id === \"\" || seen.has(transfer.id)) continue; seen.add(transfer.id); fresh.push(transfer); } if (fresh.length === 0) continue; const draft = { ...next }; let valid = true; for (const transfer of fresh) { if (typeof transfer.from !== \"string\" || typeof transfer.to !== \"string\" || transfer.from === transfer.to || !Object.prototype.hasOwnProperty.call(draft, transfer.from) || !Object.prototype.hasOwnProperty.call(draft, transfer.to) || !Number.isFinite(transfer.amount) || transfer.amount <= 0 || draft[transfer.from] < transfer.amount) { valid = false; break; } draft[transfer.from] -= transfer.amount; draft[transfer.to] += transfer.amount; } if (!valid) continue; next = draft; acceptedBatches.push(batchIndex); acceptedTransfers.push(...fresh.map(transfer => transfer.id)); }\n  return { balances: next, acceptedBatches, acceptedTransfers };\n}\n"
         }
       ],
       "alternative_files": [
         {
           "path": "src/task.mjs",
-          "content": "function implementation(balances, transfers) {\n  if (!balances || typeof balances !== \"object\" || Array.isArray(balances) || !Array.isArray(transfers) || Object.entries(balances).some(([id, value]) => id === \"\" || !Number.isFinite(value) || value < 0)) return null; const next = { ...balances }, accepted = [], seen = new Set();\n  for (const transfer of transfers) { if (!transfer || typeof transfer.id !== \"string\" || transfer.id === \"\" || seen.has(transfer.id)) continue; seen.add(transfer.id); if (typeof transfer.from !== \"string\" || typeof transfer.to !== \"string\" || transfer.from === transfer.to || !Object.prototype.hasOwnProperty.call(next, transfer.from) || !Object.prototype.hasOwnProperty.call(next, transfer.to) || !Number.isFinite(transfer.amount) || transfer.amount <= 0 || next[transfer.from] < transfer.amount) continue; next[transfer.from] -= transfer.amount; next[transfer.to] += transfer.amount; accepted.push(transfer.id); }\n  return { balances: next, accepted };\n}\n\nexport function settleTransfers(...args) {\n  return implementation(...args);\n}\n"
+          "content": "function implementation(balances, batches) {\n  if (!balances || typeof balances !== \"object\" || Array.isArray(balances) || !Array.isArray(batches) || Object.entries(balances).some(([id, value]) => id === \"\" || !Number.isFinite(value) || value < 0)) return null;\n  let next = { ...balances }; const seen = new Set(), acceptedBatches = [], acceptedTransfers = [];\n  for (const [batchIndex, batch] of batches.entries()) { if (!Array.isArray(batch)) continue; const fresh = []; for (const transfer of batch) { if (!transfer || typeof transfer.id !== \"string\" || transfer.id === \"\" || seen.has(transfer.id)) continue; seen.add(transfer.id); fresh.push(transfer); } if (fresh.length === 0) continue; const draft = { ...next }; let valid = true; for (const transfer of fresh) { if (typeof transfer.from !== \"string\" || typeof transfer.to !== \"string\" || transfer.from === transfer.to || !Object.prototype.hasOwnProperty.call(draft, transfer.from) || !Object.prototype.hasOwnProperty.call(draft, transfer.to) || !Number.isFinite(transfer.amount) || transfer.amount <= 0 || draft[transfer.from] < transfer.amount) { valid = false; break; } draft[transfer.from] -= transfer.amount; draft[transfer.to] += transfer.amount; } if (!valid) continue; next = draft; acceptedBatches.push(batchIndex); acceptedTransfers.push(...fresh.map(transfer => transfer.id)); }\n  return { balances: next, acceptedBatches, acceptedTransfers };\n}\n\nexport function settleTransferBatches(...args) {\n  return implementation(...args);\n}\n"
         }
       ]
     },
