@@ -12,6 +12,9 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const corpusPath = path.join(root, "benchmarks/core-lite/corpus.json");
 const checkerPath = path.join(root, "benchmarks/core-lite/check-task.mjs");
 const materializerPath = path.join(root, "scripts/materialize-core-lite.mjs");
+const calibrationRunnerPath = path.join(root, "scripts/core-lite-calibrate.mjs");
+const evaluationRunnerPath = path.join(root, "scripts/core-lite-evaluate.mjs");
+const freezeRunnerPath = path.join(root, "scripts/core-lite-freeze.mjs");
 
 function option(name, fallback = null) {
   const index = process.argv.indexOf(name);
@@ -62,6 +65,10 @@ export function buildFreezeManifest({ corpus, checkerSha256, calibrationMetadata
     bundle_total_bytes: bundleManifest.total_bytes, provider: "openai", model: "gpt-5.6-luna",
     model_binding: MODEL, variant: VARIANT, opencode_path: opencodePath,
     opencode_version: opencodeVersion, opencode_sha256: opencodeSha256, timeout_ms: timeoutMs,
+    runner_bindings: { calibration_sha256: hash(fs.readFileSync(calibrationRunnerPath)),
+      evaluation_sha256: hash(fs.readFileSync(evaluationRunnerPath)),
+      freeze_sha256: hash(fs.readFileSync(freezeRunnerPath)),
+      materializer_sha256: hash(fs.readFileSync(materializerPath)) },
     evaluation_task_count: 30, task_bindings: taskBindings, schedule,
     permissions: { auto_approve_local_tools: true, external_directory: "deny", question: "deny",
       delegation: "deny", webfetch: "deny", websearch: "deny" },

@@ -157,6 +157,12 @@ function validateManifest(manifest, corpus, opencodePath) {
   assert.equal(manifest.checker_sha256, hash(fs.readFileSync(checkerPath)));
   assert.equal(manifest.opencode_path, opencodePath);
   assert.equal(manifest.opencode_sha256, hash(fs.readFileSync(opencodePath)));
+  assert.deepEqual(manifest.runner_bindings, {
+    calibration_sha256: hash(fs.readFileSync(path.join(root, "scripts/core-lite-calibrate.mjs"))),
+    evaluation_sha256: hash(fs.readFileSync(path.join(root, "scripts/core-lite-evaluate.mjs"))),
+    freeze_sha256: hash(fs.readFileSync(path.join(root, "scripts/core-lite-freeze.mjs"))),
+    materializer_sha256: hash(fs.readFileSync(materializerPath)),
+  }, "frozen runner source binding drifted");
   const tasks = corpus.tasks.filter((task) => task.split === "evaluation").sort((a, b) => a.id.localeCompare(b.id));
   assert.deepEqual(manifest.task_bindings, tasks.map((task) => taskBinding(task, manifest.checker_sha256)));
   assert.deepEqual(manifest.schedule, counterbalancedSchedule(tasks), "counterbalanced schedule drifted");
@@ -184,7 +190,8 @@ async function main() {
   const status = spawnSync("git", ["status", "--porcelain"], { cwd: root, encoding: "utf8" });
   if (status.status !== 0 || status.stdout !== "") throw new Error("official evaluation requires a clean source worktree");
   const protectedPaths = ["agents/core-lite.md", "profiles/core-lite/opencode.json", "runtime/core-lite.mjs",
-    "scripts/materialize-core-lite.mjs", "benchmarks/core-lite/corpus.json", "benchmarks/core-lite/check-task.mjs"];
+    "scripts/materialize-core-lite.mjs", "scripts/core-lite-calibrate.mjs", "scripts/core-lite-evaluate.mjs",
+    "scripts/core-lite-freeze.mjs", "benchmarks/core-lite/corpus.json", "benchmarks/core-lite/check-task.mjs"];
   const productDiff = spawnSync("git", ["diff", "--quiet", manifest.product_sha, "--", ...protectedPaths], { cwd: root });
   if (productDiff.status !== 0) throw new Error("frozen product or corpus differs from product SHA");
   const authContent = fs.readFileSync(authPath, "utf8"); JSON.parse(authContent);

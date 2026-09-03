@@ -5,8 +5,8 @@ import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { calibrationSummary, eventMetrics, executeAttempt, scopeResult,
-  verifyMaterializedBundle } from "./core-lite-calibrate.mjs";
+import { calibrationSummary, eventMetrics, executeAttempt, materializeOperationalConfig,
+  scopeResult, verifyMaterializedBundle, verifyOperationalConfig } from "./core-lite-calibrate.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const source = fs.readFileSync(path.join(root, "scripts/core-lite-calibrate.mjs"), "utf8");
@@ -57,11 +57,19 @@ try {
   const materialized = spawnSync(process.execPath, [path.join(root, "scripts/materialize-core-lite.mjs"),
     "--output", bundle], { cwd: root, encoding: "utf8" });
   assert.equal(materialized.status, 0, materialized.stderr);
-  const bundleManifest = verifyMaterializedBundle(bundle);
-  assert(bundleManifest.files.some((entry) => entry.path === ".gitignore"),
-    "bundle must pre-materialize OpenCode's deterministic config ignore file");
-  assert.equal(fs.readFileSync(path.join(bundle, ".gitignore"), "utf8"),
-    "node_modules\npackage.json\npackage-lock.json\nbun.lock\n.gitignore\n");
+  verifyMaterializedBundle(bundle);
+  const operational = path.join(temporary, "operational", "opencode");
+  materializeOperationalConfig(bundle, operational);
+  fs.writeFileSync(path.join(operational, "package.json"), "{}\n", "utf8");
+  fs.mkdirSync(path.join(operational, "node_modules", ".bin"), { recursive: true });
+  fs.symlinkSync(process.execPath, path.join(operational, "node_modules", ".bin", "opencode-runtime"));
+  verifyOperationalConfig(bundle, operational);
+  verifyMaterializedBundle(bundle);
+  const linkedProduct = path.join(temporary, "linked-product", "opencode");
+  materializeOperationalConfig(bundle, linkedProduct);
+  fs.unlinkSync(path.join(linkedProduct, "opencode.json"));
+  fs.symlinkSync(path.join(bundle, "opencode.json"), path.join(linkedProduct, "opencode.json"));
+  assert.throws(() => verifyOperationalConfig(bundle, linkedProduct), /contains a link/u);
   const task = corpus.tasks.find((entry) => entry.split === "development");
   const reference = task.reference_files.find((file) => file.path === task.entry_path).content;
 

@@ -7,7 +7,6 @@ import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const files = Object.freeze([
-  ["profiles/core-lite/.gitignore", ".gitignore"],
   ["agents/core-lite.md", "agents/core-lite.md"],
   ["profiles/core-lite/opencode.json", "opencode.json"],
   ["runtime/core-lite.mjs", "runtime/core-lite.mjs"],

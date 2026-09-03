@@ -155,6 +155,40 @@ export function verifyMaterializedBundle(bundle) {
   return manifest;
 }
 
+export function verifyOperationalConfig(bundle, configDirectory) {
+  const manifest = verifyMaterializedBundle(bundle);
+  const configStat = fs.lstatSync(configDirectory);
+  assert(configStat.isDirectory() && !configStat.isSymbolicLink(),
+    "operational config root is not a regular directory");
+  for (const relative of [".opencode-profile-manifest.json", ...manifest.files.map((entry) => entry.path)]) {
+    const source = path.join(bundle, relative);
+    let operational = configDirectory;
+    const components = relative.split("/");
+    for (const [index, component] of components.entries()) {
+      operational = path.join(operational, component);
+      const listed = fs.lstatSync(operational);
+      assert(!listed.isSymbolicLink(), `operational config product path contains a link: ${relative}`);
+      if (index < components.length - 1) {
+        assert(listed.isDirectory(), `operational config product parent is not a directory: ${relative}`);
+      } else {
+        assert(listed.isFile(), `operational config product path is not a regular file: ${relative}`);
+      }
+    }
+    const listed = fs.lstatSync(operational);
+    assert(listed.isFile());
+    assert.equal(hash(fs.readFileSync(operational)), hash(fs.readFileSync(source)),
+      `operational config product path drifted: ${relative}`);
+  }
+  return manifest;
+}
+
+export function materializeOperationalConfig(bundle, configDirectory) {
+  assert(!fs.existsSync(configDirectory), `operational config already exists: ${configDirectory}`);
+  fs.mkdirSync(path.dirname(configDirectory), { recursive: true });
+  fs.cpSync(bundle, configDirectory, { recursive: true, errorOnExist: true, force: false });
+  return verifyOperationalConfig(bundle, configDirectory);
+}
+
 function snapshot(workspace) {
   const files = new Map(); let links = false;
   function visit(directory) {
@@ -214,7 +248,10 @@ export async function executeAttempt({ task, arm, campaignRoot, opencode, timeou
   const before = snapshot(workspace);
   const coreConfig = readJson(path.join(bundle, "opencode.json"));
   let configDirectory;
-  if (arm === "core-lite") configDirectory = bundle;
+  if (arm === "core-lite") {
+    configDirectory = path.join(attempt, "config", "opencode");
+    materializeOperationalConfig(bundle, configDirectory);
+  }
   else {
     configDirectory = path.join(attempt, "config", "opencode");
     fs.mkdirSync(configDirectory, { recursive: true });
@@ -237,6 +274,7 @@ export async function executeAttempt({ task, arm, campaignRoot, opencode, timeou
   const result = await runProcess(command, args, { cwd: workspace, env: environment,
     timeoutMs: arm === "core-lite" ? timeoutMs * 2 + 30_000 : timeoutMs, receipt: arm === "core-lite" });
   verifyMaterializedBundle(bundle);
+  if (arm === "core-lite") verifyOperationalConfig(bundle, configDirectory);
   const coreReceipt = arm === "core-lite" ? parseCoreReceipt(result, task.id) : null;
   const after = snapshot(workspace);
   const scope = scopeResult(before, after, task.allowed_mutation_paths);
@@ -335,8 +373,10 @@ async function main() {
   for (const denied of ["external_directory", "question", "task", "webfetch", "websearch", "oc_learning_*"]) {
     assert.equal(coreConfig.permission?.[denied], "deny", `core-lite must deny ${denied}`);
   }
-  const preflightRoot = path.join(campaignRoot, "preflight");
-  const preflightEnvironment = isolatedEnvironment(preflightRoot, bundle, authContent);
+  const preflightRoot = path.join(campaignRoot, "preflight", String(process.pid));
+  const preflightConfig = path.join(preflightRoot, "config", "opencode");
+  materializeOperationalConfig(bundle, preflightConfig);
+  const preflightEnvironment = isolatedEnvironment(preflightRoot, preflightConfig, authContent);
   const version = spawnSync(opencode, ["--version"], { cwd: preflightRoot,
     env: preflightEnvironment, encoding: "utf8" });
   if (version.status !== 0) throw new Error("OpenCode version probe failed");
@@ -352,6 +392,7 @@ async function main() {
   assert.equal(modelEntry.status, "active");
   assert.equal(modelEntry.variants?.low?.reasoningEffort, "low");
   verifyMaterializedBundle(bundle);
+  verifyOperationalConfig(bundle, preflightConfig);
   const metadataBody = { schema_version: 1, dataset: "development", product_sha: productSha,
     corpus_sha256: hash(fs.readFileSync(corpusPath)), bundle_fingerprint: bundleManifest.bundle_fingerprint,
     bundle_file_count: bundleManifest.file_count, bundle_total_bytes: bundleManifest.total_bytes_without_manifest
