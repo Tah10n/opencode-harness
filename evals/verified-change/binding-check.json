@@ -1,0 +1,25 @@
+{
+  "purpose": "pre-freeze binding availability, not a task outcome",
+  "at": "2026-09-04T23:11:54.539Z",
+  "model": "openai/gpt-5.6-luna",
+  "variant": "low",
+  "elapsedMs": 3248,
+  "structuredCompletion": true,
+  "steps": 1,
+  "toolCalls": 0,
+  "usage": [
+    {
+      "tokens": {
+        "total": 2145,
+        "input": 604,
+        "output": 5,
+        "reasoning": 0,
+        "cache": {
+          "write": 0,
+          "read": 1536
+        }
+      },
+      "cost": 0
+    }
+  ]
+}

@@ -1,0 +1,1567 @@
+{
+  "purpose": "pre-freeze model-free fixture validation, no model outcomes",
+  "candidateCommit": "173a853c984044fc4543d05e5df2b18ee7135dfa",
+  "bundleSha256": "dd8d668cce09a157c3106888923063f3cc6a65fa5bbc8c3fe8ec9fac122fec11",
+  "tasks": [
+    {
+      "id": "archive-parent-segments",
+      "family": "archive-plan",
+      "stratum": "public-reproducer",
+      "definitionSha256": "177d893bdd8bc8b19104c2481d6ce0aa765e0d63d5f99ff82791d13004eb8a21",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "assertion_failed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "archive-normalized-collisions",
+      "family": "archive-plan",
+      "stratum": "uncovered-requirement",
+      "definitionSha256": "0d150729d4edc8e2a149f4b47a55828f4257370ac5afbe95c563a6293b9dd1a4",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "archive-exclusive-rollback",
+      "family": "archive-plan",
+      "stratum": "multi-file-obligation",
+      "definitionSha256": "f107348ea08f68c163c190172c8e4ad204899d8dd30aeb218e530988b1df0135",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "ranges-explicit-zero-end",
+      "family": "byte-ranges",
+      "stratum": "public-reproducer",
+      "definitionSha256": "bd11bfdd0e65b2b449a8df385f84246e3c8c779d2a73162e1ddc12e5ed7e5e15",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "assertion_failed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "ranges-normalized-multiple",
+      "family": "byte-ranges",
+      "stratum": "uncovered-requirement",
+      "definitionSha256": "24f6fe0450a08a3371d7d044363454293aa8d8a6e02ce41c3b99e2ba5800be79",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "ranges-response-consumer",
+      "family": "byte-ranges",
+      "stratum": "multi-file-obligation",
+      "definitionSha256": "26111eab828e73faf17b1b904e04d46d380638983e13de08e82e213f368d7057",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "calendar-monday-week",
+      "family": "calendar-windows",
+      "stratum": "public-reproducer",
+      "definitionSha256": "60e774e2244f10974c2b7baec617c3fe5cf45cac44cc405ff450acfe1712a8de",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "assertion_failed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "calendar-quarter-year",
+      "family": "calendar-windows",
+      "stratum": "uncovered-requirement",
+      "definitionSha256": "488954bfce485b7fbb9e9a5a7aa178fee2ebf9ff895f4386d25d1c0396ea1cf9",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "calendar-ranged-report",
+      "family": "calendar-windows",
+      "stratum": "multi-file-obligation",
+      "definitionSha256": "23fc5c59df1c486237a5c9b1571c08b44c24149b52d682561e400cedfa690a85",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "catalog-empty-own-keys",
+      "family": "catalog",
+      "stratum": "public-reproducer",
+      "definitionSha256": "1526963ba79cffdb1f528e2a979ece9813280ab3f6e6f4f0e8f9a45f46e0b5cd",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "assertion_failed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "catalog-language-fallback",
+      "family": "catalog",
+      "stratum": "uncovered-requirement",
+      "definitionSha256": "8e5b07e9b48cda3e30f0c6d81d3f6fddfc5dc1fa32a9d388de18937719e14462",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "catalog-template-consumer",
+      "family": "catalog",
+      "stratum": "multi-file-obligation",
+      "definitionSha256": "df14b071542f114826893f3653f93ed0a0a369fed8166bf53c3fa16800cfbf16",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "upload-offset-order",
+      "family": "chunk-upload",
+      "stratum": "public-reproducer",
+      "definitionSha256": "9f1a675bf1dad1f466237da5dbbbbdd1aabe2b8fd0aee3c639d401eb1950fb9e",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "assertion_failed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "upload-idempotent-chunks",
+      "family": "chunk-upload",
+      "stratum": "uncovered-requirement",
+      "definitionSha256": "e2a58b84fcee87814196f7ac411cc5e012489f84f6803d6a3dbb5b2ef87b2387",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "upload-checksum-consumer",
+      "family": "chunk-upload",
+      "stratum": "multi-file-obligation",
+      "definitionSha256": "2decfe1eb6f7d1961ac0c658aee2bb2ec4d900ea260a92cb3b3ceff179a78abf",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "csv-doubled-quote-data",
+      "family": "csv-table",
+      "stratum": "public-reproducer",
+      "definitionSha256": "c01980519d3ed840c1cb2c1618f6e4f9295b745f4a0db70c1f8650470efb2212",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "assertion_failed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "csv-roundtrip-writer",
+      "family": "csv-table",
+      "stratum": "uncovered-requirement",
+      "definitionSha256": "c2ce8894d9f9a395c54b5f2b9d10471765c2b36e4325add2eb58a1f1522abcae",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "csv-table-schema-validation",
+      "family": "csv-table",
+      "stratum": "multi-file-obligation",
+      "definitionSha256": "3a90051cae5f09517762d2cd7b04f99272f2320bc4b0f09de002f626fab8c78f",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "amount-decimal-exactness",
+      "family": "decimal-ledger",
+      "stratum": "public-reproducer",
+      "definitionSha256": "7bfa449834140db90cb7edb3f6741e8720c630df188e7f20ea09f40f644e6fd5",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "assertion_failed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "amount-format-roundtrip",
+      "family": "decimal-ledger",
+      "stratum": "uncovered-requirement",
+      "definitionSha256": "3ba4c0a5d262560b673ad0437ba2864bccd409fa1c554b2b8eafa477d246ffc3",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "ledger-atomic-invoice",
+      "family": "decimal-ledger",
+      "stratum": "multi-file-obligation",
+      "definitionSha256": "10602797b38eb12e2c70c19052ca0a8bfe8e93a833fef4415419b15263e4bb7c",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "graph-duplicate-edges",
+      "family": "dependency-graph",
+      "stratum": "public-reproducer",
+      "definitionSha256": "c9a6a45a1bdfccd1c62293e5db129463bb33ff418f73304d7316f913ca6cbc5b",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "assertion_failed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "graph-execution-layers",
+      "family": "dependency-graph",
+      "stratum": "uncovered-requirement",
+      "definitionSha256": "e4a2f861d6b72e47edd2510b917003e77d4e185cc0487c0727fe6623b50af9f5",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "graph-settled-consumers",
+      "family": "dependency-graph",
+      "stratum": "multi-file-obligation",
+      "definitionSha256": "9f06ceb1363c942be3836435417fa700530a38eae6f5353bfbcf63111ebdd5de",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "due-fifo-ties",
+      "family": "due-jobs",
+      "stratum": "public-reproducer",
+      "definitionSha256": "36a378819b2d9642d33b5269bebd6ee3b64280abe15abba556bf6bafe86eb406",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "assertion_failed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "due-handle-cancellation",
+      "family": "due-jobs",
+      "stratum": "uncovered-requirement",
+      "definitionSha256": "5dd2f117c114e7a9c48e8c160dfafb06095158b9528728ef00c8b5e05ba789b0",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "due-failure-preserves-pending",
+      "family": "due-jobs",
+      "stratum": "multi-file-obligation",
+      "definitionSha256": "d66ecb6097b6fde40e7d0e7c818bf2bfc781c6fc2f5fc17a1d8d06e54b6010ed",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "env-first-equals",
+      "family": "env-config",
+      "stratum": "public-reproducer",
+      "definitionSha256": "7876c9d54050989dfee7266bc7de3ab194a90205c6e672a635041605f0b85244",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "assertion_failed",
+          "hidden": "infrastructure_error",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "env-recursive-expansion",
+      "family": "env-config",
+      "stratum": "uncovered-requirement",
+      "definitionSha256": "17ddfb02e06af16187e8923eabfd909177b47665f145b0e8f009ccd0e5b09c2f",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "env-ordered-includes",
+      "family": "env-config",
+      "stratum": "multi-file-obligation",
+      "definitionSha256": "36bae65e61858cfceb4148de75236f2261fc7acfa90060b0634bcd10fcbfa5aa",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "infrastructure_error",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "jsonl-split-utf8",
+      "family": "json-lines",
+      "stratum": "public-reproducer",
+      "definitionSha256": "2c266ba7e603fa46375843556026347da1fa03c04496c32a5a8cf1585e2e0d57",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "assertion_failed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "jsonl-record-byte-limit",
+      "family": "json-lines",
+      "stratum": "uncovered-requirement",
+      "definitionSha256": "86cd5169fc0dcc4d9b1117255c04d7ec7a98ff79070355e4086acae3132183b8",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "jsonl-stream-transform",
+      "family": "json-lines",
+      "stratum": "multi-file-obligation",
+      "definitionSha256": "0e995acbfdfcda64ea9e9a540b4585258943119d0b6ce96860c6d5dcb501754d",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "pointer-single-pass-escapes",
+      "family": "json-pointer",
+      "stratum": "public-reproducer",
+      "definitionSha256": "e9a457a20bfa9be937c2b5b70a47f38900f07257a496b0c473ee837997f3a3e0",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "assertion_failed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "pointer-array-index-policy",
+      "family": "json-pointer",
+      "stratum": "uncovered-requirement",
+      "definitionSha256": "0c2aa7b0bc1bacd67eddafbe8a14dbbdd0f5e66e86aa3f2008b65af981a29d50",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "pointer-immutable-replace",
+      "family": "json-pointer",
+      "stratum": "multi-file-obligation",
+      "definitionSha256": "717c70aa0c5914443bb4aef2111810211ecea3378763d471d5e7194fc44d9470",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "lease-stale-release",
+      "family": "leases",
+      "stratum": "public-reproducer",
+      "definitionSha256": "eed49eca77461adebdb2f47fe655d53e1ddf3a4382fb92e88d6bfdbf0df84d6b",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "assertion_failed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "lease-renewal",
+      "family": "leases",
+      "stratum": "uncovered-requirement",
+      "definitionSha256": "da76c4ece4c1574ab1b0d1d9fbcf1868c91001214fc19592a1652cc1e651d91a",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "lease-worker-cleanup",
+      "family": "leases",
+      "stratum": "multi-file-obligation",
+      "definitionSha256": "65b1a6b2e54962cfef2ee94bf5a233494a03ba3f6ac8523d7bedf244a11d462b",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "metrics-prototype-names",
+      "family": "metric-series",
+      "stratum": "public-reproducer",
+      "definitionSha256": "b8ea555690ec53b94ca5cae000bd9633fa6858eda7b1650838cfb293815a50b9",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "assertion_failed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "metrics-cancellation-precision",
+      "family": "metric-series",
+      "stratum": "uncovered-requirement",
+      "definitionSha256": "3c8bfdc8cd9ca9d07733073c0244a604e39a334b45e87f4be64353690b02a9f0",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "metrics-report-window-fill",
+      "family": "metric-series",
+      "stratum": "multi-file-obligation",
+      "definitionSha256": "45333d870c297e44764cb8d0e47051a9671b6f0e94d738efc6a4ca818f806262",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "orders-unknown-state-totality",
+      "family": "order-state",
+      "stratum": "public-reproducer",
+      "definitionSha256": "09eb842c5a3453b7cc06213328b5d1caa5911f3456b0a2bcb303c25131420577",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "assertion_failed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "orders-version-precondition",
+      "family": "order-state",
+      "stratum": "uncovered-requirement",
+      "definitionSha256": "132bc6aeeb06851a7e0184cb83a6e6869bb42f012061b6e4e91dead342191c9a",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "orders-command-idempotency",
+      "family": "order-state",
+      "stratum": "multi-file-obligation",
+      "definitionSha256": "84588d9aff1b1de5aadc06eedd4083f9c8a7ad2b529a2224d8c4db1e94e5fab1",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "versions-numeric-components",
+      "family": "package-versions",
+      "stratum": "public-reproducer",
+      "definitionSha256": "87b720d36d9fa1f726a6dd94135e2d5f29da3c1beb153d01f2a8172bdb83bc2a",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "assertion_failed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "versions-prerelease-precedence",
+      "family": "package-versions",
+      "stratum": "uncovered-requirement",
+      "definitionSha256": "d53bbd83c5a40548529720beaf32723268be65beb44cc512989e5730f0a31c7c",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "infrastructure_error",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "versions-bounded-plan",
+      "family": "package-versions",
+      "stratum": "multi-file-obligation",
+      "definitionSha256": "7745f9077ffe8979805c0aef4c86614099f0982a7b352086d5f455f41991bc09",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "route-malformed-parameter",
+      "family": "route-table",
+      "stratum": "public-reproducer",
+      "definitionSha256": "983f868adffb025fbbdd5d2f5df8d46772088e109474cd3328a249b57ef4363a",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "assertion_failed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "route-head-fallback",
+      "family": "route-table",
+      "stratum": "uncovered-requirement",
+      "definitionSha256": "80d373d68f6d47f6635576f212dfe85a1eacec29d6199f44ca28f9872cb838ec",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "route-request-context",
+      "family": "route-table",
+      "stratum": "multi-file-obligation",
+      "definitionSha256": "d2f330cbd741aa97d34b20862734afcbf6c9b6958654a40d01d0e38cc6b83215",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "search-replacement-postings",
+      "family": "search-index",
+      "stratum": "public-reproducer",
+      "definitionSha256": "b6d763410b67b56e2ad1c6eead99b3181abe9f1072b0802310cd9978f90079cc",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "assertion_failed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "search-contiguous-phrase",
+      "family": "search-index",
+      "stratum": "uncovered-requirement",
+      "definitionSha256": "5ade838efb851e3d6089474974426a31e74b0b90e06aec3535072fedbd64c5f6",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "search-atomic-import",
+      "family": "search-index",
+      "stratum": "multi-file-obligation",
+      "definitionSha256": "88c21f5a9bd2d817f6e22a7e442c10f5c9f6064dcb8dc290ade4f83c68b3e262",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "edits-original-offsets",
+      "family": "text-edits",
+      "stratum": "public-reproducer",
+      "definitionSha256": "fb35f98faef11ea67aa859b235989a760d5af1d9c352d40602ed261b04594dd1",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "assertion_failed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "edits-validation",
+      "family": "text-edits",
+      "stratum": "uncovered-requirement",
+      "definitionSha256": "1c4409b1b9a99d3f47a97950368297e4aff2aee3188226915862cb4370b5dabc",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "edits-atomic-batch",
+      "family": "text-edits",
+      "stratum": "multi-file-obligation",
+      "definitionSha256": "a561de1a6cc1baae48b7b86ec4e8d9fbe81661fad86c9ebd3fdcd4963efb39d9",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "quota-zero-clock",
+      "family": "window-quota",
+      "stratum": "public-reproducer",
+      "definitionSha256": "c919d35604c5bb394b835b343681d25fd96a48f8fca9a8fe2601b90ead8fac39",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "assertion_failed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "quota-weighted-cost",
+      "family": "window-quota",
+      "stratum": "uncovered-requirement",
+      "definitionSha256": "dcb2a3cb0820f4f4212889a94c3cbab30312bf8f8860ab55dc525a5ef2818240",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    },
+    {
+      "id": "quota-policy-consumer",
+      "family": "window-quota",
+      "stratum": "multi-file-obligation",
+      "definitionSha256": "3ee438e48e141c5321e813cba9cc51477bac360fd41ad880fbaff03ae6e26bef",
+      "variants": [
+        {
+          "variant": "baseline",
+          "public": "passed",
+          "hidden": "assertion_failed",
+          "scope": true
+        },
+        {
+          "variant": "reference",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        },
+        {
+          "variant": "alternative",
+          "public": "passed",
+          "hidden": "passed",
+          "scope": true
+        }
+      ]
+    }
+  ]
+}

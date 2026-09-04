@@ -148,10 +148,11 @@ node development/verified-change/run.mjs /absolute/install/node_modules/.bin/ope
 an interrupted request. It keeps its plan, attempts, reports and patches privately
 under a temporary directory; it does not supply hidden tests or compute lift.
 
-Status: three initial model-backed runs across two distinct development tasks.
-The third and final substantive implementation revision is implemented. Remaining
-model-backed development, fresh 60-task frozen A/B/C evaluation, statistical
-analysis, final independent review and PR remain pending.
+Status: development execution is complete across 24 unique scenarios, including
+the initial queue run and 23 distinct revision-3 scenarios. Earlier config runs
+remain diagnostic history and are not additional unique tasks. All three allowed
+substantive implementation revisions have been used. The fresh fixed60 A/B/C
+evaluation, statistical analysis, final review and PR remain pending.
 
 ## Initial real outcomes on revision 3
 
@@ -177,5 +178,12 @@ says update resolves to the mutator's return value, so this decision does not
 establish correctness and may have suppressed a valid defect. Keep the failing
 test, original D0 and assessment unchanged; do not count the exclusion as a fix.
 
-The remaining predefined development cases are running sequentially on the same
-bundle, with no retries and no fourth substantive implementation revision.
+The remaining predefined cases completed sequentially on the same bundle, with
+no retries and no fourth substantive implementation revision. All 23 revision-3
+runs selected D0, applied it and reported checks_passed with zero repairs. The
+public summary in revision3-outcomes.json retains every check ID, unverified
+reason and wall time; private artifacts retain full patches and diagnostics.
+This high rate of already-green drafts does not establish semantic correctness
+or benefit from the mechanism. Admission left several assertions unverified;
+the transactional-store dispute above may itself be incorrect. No final corpus
+task was sent to a model during development.

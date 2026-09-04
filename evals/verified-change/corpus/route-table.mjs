@@ -6,7 +6,7 @@ const matcher = `export function match(pattern, pathname) {
  if(expected.length!==actual.length)return null;
  const params={};
  for(let i=0;i<expected.length;i++) {
-  if(expected[i].startsWith(':'))params[expected[i].slice(1)]=decodeURIComponent(actual[i]);
+  if(expected[i].startsWith(':'))Object.defineProperty(params,expected[i].slice(1),{value:decodeURIComponent(actual[i]),enumerable:true,writable:true,configurable:true});
   else if(expected[i]!==actual[i])return null;
  }
  return params;
@@ -37,7 +37,7 @@ test('dispatch, parameters and adapter',()=>{const t=new RouteTable();assert.equ
 test('first registration and root',()=>{const t=new RouteTable().add('GET','/',()=>1).add('GET','/',()=>2);assert.equal(t.dispatch('GET','/').body,1);});
 `;
 const base = {
- 'README.md':'RouteTable.add(method, pattern, handler) registers a synchronous route and returns this. dispatch(method, url) returns {status:200,body:handler(params)} or {status:404,body:null}. Method names are case-sensitive. The first matching registration wins. Paths split on / and ignore empty segments; query text is ignored. A :name segment binds a decoded parameter. Static segments are literal. Handler exceptions propagate. serve(table, request) is the adapter; src/index.mjs is the public entrypoint.\n',
+ 'README.md':'RouteTable.add(method, pattern, handler) registers a synchronous route and returns this. dispatch(method, url) returns {status:200,body:handler(params)} or {status:404,body:null}. Method names are case-sensitive. The first matching registration wins. Paths split on / and ignore empty segments; query text is ignored. A :name segment binds a decoded own parameter property, including special names such as __proto__. Static segments are literal. Handler exceptions propagate. serve(table, request) is the adapter; src/index.mjs is the public entrypoint.\n',
  'src/match.mjs':matcher,'src/router.mjs':router,'src/adapter.mjs':adapter,'src/index.mjs':index,
  'test/public.test.mjs':publicTest,
 };
@@ -49,6 +49,7 @@ export const tasks = [
   files:{...base,'test/public.test.mjs':publicTest+`test('malformed parameter is a non-match',()=>{const t=new RouteTable().add('GET','/users/:id',p=>p.id);let result;assert.doesNotThrow(()=>{result=t.dispatch('GET','/users/%ZZ');});assert.deepEqual(result,{status:404,body:null});});\n`},
   hidden:imports+`test('bad encodings never invoke dynamic handlers and permit literal fallback',()=>{for(const value of ['%','%ZZ','%E0%A4%A']){let called=0;const t=new RouteTable().add('GET','/x/:value',()=>{called++;}).add('GET','/x/'+value,()=> 'literal');let result;assert.doesNotThrow(()=>{result=serve(t,{method:'GET',url:'/x/'+value});});assert.deepEqual(result,{status:200,body:'literal'});assert.equal(called,0);}});
 test('decode once and retain segment boundaries',()=>{const t=new RouteTable().add('GET','/x/:v',p=>p.v);for(const [raw,want] of [['a%2Fb','a/b'],['%252F','%2F'],['a+b','a+b'],['caf%C3%A9','café']])assert.equal(t.dispatch('GET','/x/'+raw+'?ignored=%ZZ').body,want);});
+test('special parameter names bind own decoded values',()=>{const t=new RouteTable().add('GET','/x/:__proto__',p=>{assert.equal(Object.hasOwn(p,'__proto__'),true);return p.__proto__;});assert.equal(t.dispatch('GET','/x/a%20b').body,'a b');});
 test('do not swallow handler errors or change method selection',()=>{const reason={sentinel:true};const t=new RouteTable().add('GET','/x/:v',()=>{throw reason;});assert.throws(()=>t.dispatch('GET','/x/valid'),e=>e===reason);assert.deepEqual(t.dispatch('POST','/x/%'),{status:404,body:null});});
 `,
   reference:{'src/match.mjs':`export function match(pattern, pathname) {
@@ -56,7 +57,7 @@ test('do not swallow handler errors or change method selection',()=>{const reaso
  if(expected.length!==actual.length)return null;
  const params={};
  for(let i=0;i<expected.length;i++) {
-  if(expected[i].startsWith(':')) { let value;try{value=decodeURIComponent(actual[i]);}catch{return null;}params[expected[i].slice(1)]=value; }
+  if(expected[i].startsWith(':')) { let value;try{value=decodeURIComponent(actual[i]);}catch{return null;}Object.defineProperty(params,expected[i].slice(1),{value,enumerable:true,writable:true,configurable:true}); }
   else if(expected[i]!==actual[i])return null;
  }
  return params;

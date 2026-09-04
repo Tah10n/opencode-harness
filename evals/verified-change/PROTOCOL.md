@@ -48,11 +48,14 @@ Planned limits are 300 seconds for D0 and 600 seconds of additional work for eac
 of B/C. C's 600 seconds includes authorship, its audit, host checks, assessment and
 up to two repairs; it is not 600 seconds per role. The product's per-prompt limit
 will be no larger than the arm deadline. B receives the same upper wall-time
-allowance. Preflight and post-deadline process/container cleanup are recorded
-separately. The installed runtime does not enforce an equivalent hard token or
+allowance. The C deadline starts after product preflight; B starts before its clone/session
+preparation. Total arm wall time includes preflight and process/container cleanup,
+but these phases are not separately timed. Report this small setup asymmetry
+explicitly rather than claiming exactly equal end-to-end deadlines. The installed runtime does not enforce an equivalent hard token or
 monetary cap: do not describe spending as equal. Record actual wall time, steps,
 tool calls, tokens/cache tokens and provider cost metadata where available;
-zero cost metadata does not establish free execution.
+zero cost metadata does not establish free execution. Interrupted prompt usage
+may be unavailable; completed-prompt totals are then only observed partial usage.
 
 Balance B-before-C / C-before-B at 30 tasks each using a fixed order committed in
 the manifest. No concurrent mutable sessions/workspaces; B never sees C outputs.
@@ -71,7 +74,11 @@ Retain private patches and bounded actual failing diagnostics, not only hashes.
 Every arm has a binary operational success: only an established success is 1;
 timeout, scope violation, incomplete response, unavailable upstream draft and
 grader infrastructure failure are 0 with their distinct original causes. A grader
-infrastructure error is not attributed to candidate semantics. Any unavailable
+infrastructure error is not attributed to candidate semantics. Validated frozen
+Node test imports that fail to parse/link candidate source, or structured test
+callback failures whose stack originates in /workspace/src, count as measured
+candidate failures. Preserve the original product check status and separate
+evaluator interpretation. Other unresolved runtime/grader failures stay unavailable. Any unavailable
 required grading or isolation verification keeps an efficacy claim unproven, even
 if aggregate thresholds would otherwise pass. There is no exclusion or retry.
 
