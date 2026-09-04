@@ -28,6 +28,15 @@ jobs:
         with:
           node-version: "24"
 
+      - name: Verify and publish core-lite bundle inventory
+        run: npm run verify:core-lite
+      - name: Verify core-lite evidence corpus
+        run: npm run verify:core-lite:corpus
+      - name: Verify core-lite calibration runner without model calls
+        run: npm run verify:core-lite:calibration-runner
+      - name: Verify frozen core-lite evaluation machinery without model calls
+        run: npm run verify:core-lite:evaluation
+
       - name: Harden trusted Node distribution permissions
         shell: bash
         run: |

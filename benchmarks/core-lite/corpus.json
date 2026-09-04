@@ -1,0 +1,3459 @@
+{
+  "schema_version": 1,
+  "corpus_id": "core-lite-ab-v1",
+  "tasks": [
+    {
+      "schema_version": 1,
+      "id": "core-lite-development-small-01",
+      "split": "development",
+      "stratum": "small",
+      "visible_requirement": "Return value constrained to the inclusive minimum/maximum range. Return null when an argument is not a finite number or minimum is greater than maximum.\n\nThe exported API is `clamp(value, minimum, maximum)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function clamp(value, minimum, maximum) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            9,
+            0,
+            5
+          ],
+          "expected": 5
+        },
+        {
+          "args": [
+            -2,
+            0,
+            5
+          ],
+          "expected": 0
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            3,
+            0,
+            5
+          ],
+          "expected": 3
+        },
+        {
+          "args": [
+            1,
+            5,
+            0
+          ],
+          "expected": null
+        },
+        {
+          "args": [
+            null,
+            0,
+            5
+          ],
+          "expected": null
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function clamp(value, minimum, maximum) {\n  if (![value, minimum, maximum].every(Number.isFinite) || minimum > maximum) return null;\n  return Math.min(maximum, Math.max(minimum, value));\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(value, minimum, maximum) {\n  if (![value, minimum, maximum].every(Number.isFinite) || minimum > maximum) return null;\n  return Math.min(maximum, Math.max(minimum, value));\n}\n\nexport function clamp(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-development-small-02",
+      "split": "development",
+      "stratum": "small",
+      "visible_requirement": "Convert an ASCII identifier or phrase to lowercase kebab-case: split camel-case boundaries, treat non-alphanumeric runs as separators, trim separators, and return an empty string for non-string input.\n\nThe exported API is `toKebab(text)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function toKebab(text) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            "HelloWorld"
+          ],
+          "expected": "hello-world"
+        },
+        {
+          "args": [
+            "  red__fox  "
+          ],
+          "expected": "red-fox"
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            "API client"
+          ],
+          "expected": "api-client"
+        },
+        {
+          "args": [
+            "---"
+          ],
+          "expected": ""
+        },
+        {
+          "args": [
+            42
+          ],
+          "expected": ""
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function toKebab(text) {\n  if (typeof text !== \"string\") return \"\";\n  return text.replace(/([a-z0-9])([A-Z])/gu, \"$1-$2\").replace(/[^A-Za-z0-9]+/gu, \"-\").replace(/^-+|-+$/gu, \"\").toLowerCase();\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(text) {\n  if (typeof text !== \"string\") return \"\";\n  return text.replace(/([a-z0-9])([A-Z])/gu, \"$1-$2\").replace(/[^A-Za-z0-9]+/gu, \"-\").replace(/^-+|-+$/gu, \"\").toLowerCase();\n}\n\nexport function toKebab(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-development-small-03",
+      "split": "development",
+      "stratum": "small",
+      "visible_requirement": "Return the first occurrence of each value in original order using JavaScript SameValueZero equality. Return an empty array for non-array input.\n\nThe exported API is `uniqueStable(values)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function uniqueStable(values) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            [
+              3,
+              1,
+              3,
+              2,
+              1
+            ]
+          ],
+          "expected": [
+            3,
+            1,
+            2
+          ]
+        },
+        {
+          "args": [
+            []
+          ],
+          "expected": []
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            [
+              "a",
+              "a",
+              "b"
+            ]
+          ],
+          "expected": [
+            "a",
+            "b"
+          ]
+        },
+        {
+          "args": [
+            null
+          ],
+          "expected": []
+        },
+        {
+          "args": [
+            [
+              0,
+              0,
+              false
+            ]
+          ],
+          "expected": [
+            0,
+            false
+          ]
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function uniqueStable(values) {\n  if (!Array.isArray(values)) return [];\n  return [...new Set(values)];\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(values) {\n  if (!Array.isArray(values)) return [];\n  return [...new Set(values)];\n}\n\nexport function uniqueStable(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-development-medium-01",
+      "split": "development",
+      "stratum": "medium",
+      "visible_requirement": "Given inclusive integer [start,end] pairs with start <= end, return a sorted copy merging overlapping or directly adjacent ranges. Return [] for non-array input.\n\nThe exported API is `mergeRanges(ranges)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function mergeRanges(ranges) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            [
+              [
+                5,
+                7
+              ],
+              [
+                1,
+                2
+              ],
+              [
+                3,
+                4
+              ]
+            ]
+          ],
+          "expected": [
+            [
+              1,
+              7
+            ]
+          ]
+        },
+        {
+          "args": [
+            [
+              [
+                1,
+                3
+              ],
+              [
+                8,
+                9
+              ]
+            ]
+          ],
+          "expected": [
+            [
+              1,
+              3
+            ],
+            [
+              8,
+              9
+            ]
+          ]
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            [
+              [
+                1,
+                5
+              ],
+              [
+                2,
+                3
+              ],
+              [
+                5,
+                8
+              ]
+            ]
+          ],
+          "expected": [
+            [
+              1,
+              8
+            ]
+          ]
+        },
+        {
+          "args": [
+            []
+          ],
+          "expected": []
+        },
+        {
+          "args": [
+            null
+          ],
+          "expected": []
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function mergeRanges(ranges) {\n  if (!Array.isArray(ranges)) return [];\n  const sorted = ranges.map(([start, end]) => [start, end]).sort((a, b) => a[0] - b[0] || a[1] - b[1]);\n  const result = [];\n  for (const range of sorted) { const last = result.at(-1); if (last && range[0] <= last[1] + 1) last[1] = Math.max(last[1], range[1]); else result.push(range); }\n  return result;\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(ranges) {\n  if (!Array.isArray(ranges)) return [];\n  const sorted = ranges.map(([start, end]) => [start, end]).sort((a, b) => a[0] - b[0] || a[1] - b[1]);\n  const result = [];\n  for (const range of sorted) { const last = result.at(-1); if (last && range[0] <= last[1] + 1) last[1] = Math.max(last[1], range[1]); else result.push(range); }\n  return result;\n}\n\nexport function mergeRanges(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-development-medium-02",
+      "split": "development",
+      "stratum": "medium",
+      "visible_requirement": "Parse one or more positive integer duration tokens separated by whitespace. Supported suffixes are ms, s, m, h and tokens may appear in any order. Return total milliseconds, or null for empty, malformed, duplicate-unit, or non-string input.\n\nThe exported API is `parseDuration(text)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function parseDuration(text) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            "1h 30m"
+          ],
+          "expected": 5400000
+        },
+        {
+          "args": [
+            "250ms 2s"
+          ],
+          "expected": 2250
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            "2m 1h"
+          ],
+          "expected": 3720000
+        },
+        {
+          "args": [
+            "1h 2h"
+          ],
+          "expected": null
+        },
+        {
+          "args": [
+            "3 days"
+          ],
+          "expected": null
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function parseDuration(text) {\n  if (typeof text !== \"string\" || text.trim() === \"\") return null;\n  const units = { ms: 1, s: 1000, m: 60000, h: 3600000 }; const seen = new Set(); let total = 0; let cursor = 0;\n  const pattern = /\\s*(\\d+)\\s*(ms|s|m|h)\\s*/gy; let match;\n  while ((match = pattern.exec(text)) !== null) { if (match.index !== cursor || seen.has(match[2])) return null; seen.add(match[2]); total += Number(match[1]) * units[match[2]]; cursor = pattern.lastIndex; }\n  return cursor === text.length && seen.size > 0 ? total : null;\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(text) {\n  if (typeof text !== \"string\" || text.trim() === \"\") return null;\n  const units = { ms: 1, s: 1000, m: 60000, h: 3600000 }; const seen = new Set(); let total = 0; let cursor = 0;\n  const pattern = /\\s*(\\d+)\\s*(ms|s|m|h)\\s*/gy; let match;\n  while ((match = pattern.exec(text)) !== null) { if (match.index !== cursor || seen.has(match[2])) return null; seen.add(match[2]); total += Number(match[1]) * units[match[2]]; cursor = pattern.lastIndex; }\n  return cursor === text.length && seen.size > 0 ? total : null;\n}\n\nexport function parseDuration(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-development-medium-03",
+      "split": "development",
+      "stratum": "medium",
+      "visible_requirement": "For an array of {group, amount} rows, return an object whose keys follow first-seen group order and whose values sum finite numeric amounts. Ignore malformed rows and rows with non-string groups.\n\nThe exported API is `groupTotals(rows)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function groupTotals(rows) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            [
+              {
+                "group": "a",
+                "amount": 2
+              },
+              {
+                "group": "b",
+                "amount": 1
+              },
+              {
+                "group": "a",
+                "amount": 3
+              }
+            ]
+          ],
+          "expected": {
+            "a": 5,
+            "b": 1
+          }
+        },
+        {
+          "args": [
+            null
+          ],
+          "expected": {}
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            [
+              {
+                "group": "x",
+                "amount": -2
+              },
+              {
+                "group": "x",
+                "amount": 2
+              }
+            ]
+          ],
+          "expected": {
+            "x": 0
+          }
+        },
+        {
+          "args": [
+            [
+              {
+                "group": 1,
+                "amount": 4
+              },
+              null
+            ]
+          ],
+          "expected": {}
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function groupTotals(rows) {\n  if (!Array.isArray(rows)) return {}; const result = {};\n  for (const row of rows) if (row && typeof row.group === \"string\" && Number.isFinite(row.amount)) result[row.group] = (result[row.group] ?? 0) + row.amount;\n  return result;\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(rows) {\n  if (!Array.isArray(rows)) return {}; const result = {};\n  for (const row of rows) if (row && typeof row.group === \"string\" && Number.isFinite(row.amount)) result[row.group] = (result[row.group] ?? 0) + row.amount;\n  return result;\n}\n\nexport function groupTotals(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-development-high-01",
+      "split": "development",
+      "stratum": "high",
+      "visible_requirement": "Each node is {id,deps}. Return IDs in a valid dependency-first order, choosing the earliest original input position whenever several nodes are ready. Return null for duplicate IDs, unknown dependencies, cycles, or malformed input.\n\nThe exported API is `topologicalOrder(nodes)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function topologicalOrder(nodes) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            [
+              {
+                "id": "build",
+                "deps": [
+                  "lint"
+                ]
+              },
+              {
+                "id": "lint",
+                "deps": []
+              },
+              {
+                "id": "test",
+                "deps": [
+                  "build"
+                ]
+              }
+            ]
+          ],
+          "expected": [
+            "lint",
+            "build",
+            "test"
+          ]
+        },
+        {
+          "args": [
+            [
+              {
+                "id": "x",
+                "deps": [
+                  "a"
+                ]
+              },
+              {
+                "id": "y",
+                "deps": [
+                  "b"
+                ]
+              },
+              {
+                "id": "a",
+                "deps": []
+              },
+              {
+                "id": "b",
+                "deps": []
+              }
+            ]
+          ],
+          "expected": [
+            "a",
+            "x",
+            "b",
+            "y"
+          ]
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            [
+              {
+                "id": "a",
+                "deps": []
+              },
+              {
+                "id": "b",
+                "deps": []
+              }
+            ]
+          ],
+          "expected": [
+            "a",
+            "b"
+          ]
+        },
+        {
+          "args": [
+            [
+              {
+                "id": "a",
+                "deps": [
+                  "b"
+                ]
+              }
+            ]
+          ],
+          "expected": null
+        },
+        {
+          "args": [
+            [
+              {
+                "id": "a",
+                "deps": [
+                  "b"
+                ]
+              },
+              {
+                "id": "b",
+                "deps": [
+                  "a"
+                ]
+              }
+            ]
+          ],
+          "expected": null
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function topologicalOrder(nodes) {\n  if (!Array.isArray(nodes)) return null; const byId = new Map();\n  for (const node of nodes) { if (!node || typeof node.id !== \"string\" || !Array.isArray(node.deps) || byId.has(node.id)) return null; byId.set(node.id, node); }\n  if (nodes.some(node => node.deps.some(dep => !byId.has(dep)))) return null;\n  const done = new Set(), result = [];\n  while (result.length < nodes.length) { const next = nodes.find(node => !done.has(node.id) && node.deps.every(dep => done.has(dep))); if (!next) return null; done.add(next.id); result.push(next.id); }\n  return result;\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(nodes) {\n  if (!Array.isArray(nodes)) return null; const byId = new Map();\n  for (const node of nodes) { if (!node || typeof node.id !== \"string\" || !Array.isArray(node.deps) || byId.has(node.id)) return null; byId.set(node.id, node); }\n  if (nodes.some(node => node.deps.some(dep => !byId.has(dep)))) return null;\n  const done = new Set(), result = [];\n  while (result.length < nodes.length) { const next = nodes.find(node => !done.has(node.id) && node.deps.every(dep => done.has(dep))); if (!next) return null; done.add(next.id); result.push(next.id); }\n  return result;\n}\n\nexport function topologicalOrder(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-development-high-02",
+      "split": "development",
+      "stratum": "high",
+      "visible_requirement": "Schedule {id,cost,deps} tasks into dependency-ordered batches. IDs are unique non-empty strings, costs are positive safe integers not exceeding positive safe-integer capacity, and deps are unique string IDs. At each batch, scan currently ready tasks in original input order, include every task that fits the remaining capacity, and continue past ready tasks that do not fit. Tasks completed in a batch enable dependents only in the next batch. Return arrays of IDs, or null for malformed input, unknown dependencies, or cycles.\n\nThe exported API is `scheduleBatches(tasks, capacity)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function scheduleBatches(tasks, capacity) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            [
+              {
+                "id": "x",
+                "cost": 2,
+                "deps": [
+                  "a"
+                ]
+              },
+              {
+                "id": "a",
+                "cost": 2,
+                "deps": []
+              },
+              {
+                "id": "b",
+                "cost": 2,
+                "deps": []
+              },
+              {
+                "id": "c",
+                "cost": 1,
+                "deps": []
+              }
+            ],
+            3
+          ],
+          "expected": [
+            [
+              "a",
+              "c"
+            ],
+            [
+              "x"
+            ],
+            [
+              "b"
+            ]
+          ]
+        },
+        {
+          "args": [
+            [
+              {
+                "id": "a",
+                "cost": 1,
+                "deps": []
+              },
+              {
+                "id": "b",
+                "cost": 1,
+                "deps": [
+                  "a"
+                ]
+              }
+            ],
+            2
+          ],
+          "expected": [
+            [
+              "a"
+            ],
+            [
+              "b"
+            ]
+          ]
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            [
+              {
+                "id": "a",
+                "cost": 1,
+                "deps": []
+              }
+            ],
+            2
+          ],
+          "expected": [
+            [
+              "a"
+            ]
+          ]
+        },
+        {
+          "args": [
+            [
+              {
+                "id": "a",
+                "cost": 1,
+                "deps": [
+                  "b"
+                ]
+              },
+              {
+                "id": "b",
+                "cost": 1,
+                "deps": [
+                  "a"
+                ]
+              }
+            ],
+            2
+          ],
+          "expected": null
+        },
+        {
+          "args": [
+            [
+              {
+                "id": "a",
+                "cost": 1,
+                "deps": [
+                  "missing"
+                ]
+              }
+            ],
+            2
+          ],
+          "expected": null
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function scheduleBatches(tasks, capacity) {\n  if (!Array.isArray(tasks) || !Number.isSafeInteger(capacity) || capacity < 1) return null; const byId = new Map();\n  for (const task of tasks) { if (!task || typeof task.id !== \"string\" || task.id === \"\" || byId.has(task.id) || !Number.isSafeInteger(task.cost) || task.cost < 1 || task.cost > capacity || !Array.isArray(task.deps) || task.deps.some(dep => typeof dep !== \"string\") || new Set(task.deps).size !== task.deps.length) return null; byId.set(task.id, task); }\n  if (tasks.some(task => task.deps.some(dep => !byId.has(dep)))) return null; const done = new Set(), batches = [];\n  while (done.size < tasks.length) { const ready = tasks.filter(task => !done.has(task.id) && task.deps.every(dep => done.has(dep))); if (ready.length === 0) return null; let remaining = capacity; const batch = []; for (const task of ready) if (task.cost <= remaining) { batch.push(task.id); remaining -= task.cost; } if (batch.length === 0) return null; batch.forEach(id => done.add(id)); batches.push(batch); }\n  return batches;\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(tasks, capacity) {\n  if (!Array.isArray(tasks) || !Number.isSafeInteger(capacity) || capacity < 1) return null; const byId = new Map();\n  for (const task of tasks) { if (!task || typeof task.id !== \"string\" || task.id === \"\" || byId.has(task.id) || !Number.isSafeInteger(task.cost) || task.cost < 1 || task.cost > capacity || !Array.isArray(task.deps) || task.deps.some(dep => typeof dep !== \"string\") || new Set(task.deps).size !== task.deps.length) return null; byId.set(task.id, task); }\n  if (tasks.some(task => task.deps.some(dep => !byId.has(dep)))) return null; const done = new Set(), batches = [];\n  while (done.size < tasks.length) { const ready = tasks.filter(task => !done.has(task.id) && task.deps.every(dep => done.has(dep))); if (ready.length === 0) return null; let remaining = capacity; const batch = []; for (const task of ready) if (task.cost <= remaining) { batch.push(task.id); remaining -= task.cost; } if (batch.length === 0) return null; batch.forEach(id => done.add(id)); batches.push(batch); }\n  return batches;\n}\n\nexport function scheduleBatches(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-development-high-03",
+      "split": "development",
+      "stratum": "high",
+      "visible_requirement": "Apply versioned {id,version,op,value?} events to an initial object. Higher versions win; equal or older versions are ignored. delete creates a tombstone so older later sets cannot resurrect an ID. Return active values only, in initial/insertion order. Invalid events are ignored.\n\nThe exported API is `reconcile(initial, events)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function reconcile(initial, events) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            {
+              "a": 1
+            },
+            [
+              {
+                "id": "a",
+                "version": 2,
+                "op": "set",
+                "value": 3
+              },
+              {
+                "id": "a",
+                "version": 1,
+                "op": "set",
+                "value": 2
+              }
+            ]
+          ],
+          "expected": {
+            "a": 3
+          }
+        },
+        {
+          "args": [
+            {},
+            [
+              {
+                "id": "x",
+                "version": 2,
+                "op": "delete"
+              },
+              {
+                "id": "x",
+                "version": 1,
+                "op": "set",
+                "value": 1
+              }
+            ]
+          ],
+          "expected": {}
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            {
+              "a": 1
+            },
+            [
+              {
+                "id": "a",
+                "version": 1,
+                "op": "delete"
+              }
+            ]
+          ],
+          "expected": {}
+        },
+        {
+          "args": [
+            null,
+            null
+          ],
+          "expected": {}
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function reconcile(initial, events) {\n  const values = initial && typeof initial === \"object\" && !Array.isArray(initial) ? { ...initial } : {}; const versions = new Map(Object.keys(values).map(id => [id, 0]));\n  if (!Array.isArray(events)) return values; for (const event of events) { if (!event || typeof event.id !== \"string\" || !Number.isSafeInteger(event.version) || event.version <= (versions.get(event.id) ?? -1) || ![\"set\", \"delete\"].includes(event.op)) continue; versions.set(event.id, event.version); if (event.op === \"delete\") delete values[event.id]; else values[event.id] = event.value; } return values;\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(initial, events) {\n  const values = initial && typeof initial === \"object\" && !Array.isArray(initial) ? { ...initial } : {}; const versions = new Map(Object.keys(values).map(id => [id, 0]));\n  if (!Array.isArray(events)) return values; for (const event of events) { if (!event || typeof event.id !== \"string\" || !Number.isSafeInteger(event.version) || event.version <= (versions.get(event.id) ?? -1) || ![\"set\", \"delete\"].includes(event.op)) continue; versions.set(event.id, event.version); if (event.op === \"delete\") delete values[event.id]; else values[event.id] = event.value; } return values;\n}\n\nexport function reconcile(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-development-high-04",
+      "split": "development",
+      "stratum": "high",
+      "visible_requirement": "Apply idempotent atomic transfer batches without mutating inputs. Balances must be non-negative finite numbers under non-empty account IDs, and batches must be an array; otherwise return null. Ignore non-array batches. Within each batch, scan entries in order: ignore entries without a non-empty string id and globally repeated ids, while the first occurrence of every non-empty id consumes that id even if its batch is later rejected. The remaining fresh entries form a candidate batch. Accept a candidate only when it is non-empty and every entry has distinct existing string from/to accounts, a positive finite amount, and can be applied sequentially to a draft without an overdraft. If any fresh entry fails, reject and roll back the entire batch, but keep all its fresh ids consumed. Accepted batches commit atomically. Return {balances,acceptedBatches,acceptedTransfers}, where acceptedBatches contains original zero-based batch indexes and acceptedTransfers contains committed ids in order.\n\nThe exported API is `settleTransferBatches(balances, batches)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function settleTransferBatches(balances, batches) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            {
+              "a": 5,
+              "b": 0,
+              "c": 2
+            },
+            [
+              [
+                {
+                  "id": "x",
+                  "from": "a",
+                  "to": "b",
+                  "amount": 3
+                },
+                {
+                  "id": "y",
+                  "from": "b",
+                  "to": "c",
+                  "amount": 2
+                }
+              ],
+              [
+                {
+                  "id": "z",
+                  "from": "a",
+                  "to": "b",
+                  "amount": 3
+                },
+                {
+                  "id": "q",
+                  "from": "c",
+                  "to": "a",
+                  "amount": 1
+                }
+              ],
+              [
+                {
+                  "id": "z",
+                  "from": "a",
+                  "to": "b",
+                  "amount": 1
+                },
+                {
+                  "id": "q",
+                  "from": "c",
+                  "to": "a",
+                  "amount": 1
+                }
+              ],
+              [
+                {
+                  "id": "r",
+                  "from": "c",
+                  "to": "a",
+                  "amount": 1
+                }
+              ]
+            ]
+          ],
+          "expected": {
+            "balances": {
+              "a": 3,
+              "b": 1,
+              "c": 3
+            },
+            "acceptedBatches": [
+              0,
+              3
+            ],
+            "acceptedTransfers": [
+              "x",
+              "y",
+              "r"
+            ]
+          }
+        },
+        {
+          "args": [
+            {
+              "a": 2,
+              "b": 0
+            },
+            [
+              [
+                {
+                  "id": "x",
+                  "from": "a",
+                  "to": "b",
+                  "amount": 3
+                }
+              ],
+              [
+                {
+                  "id": "x",
+                  "from": "a",
+                  "to": "b",
+                  "amount": 1
+                }
+              ],
+              [
+                {
+                  "id": "y",
+                  "from": "a",
+                  "to": "b",
+                  "amount": 1
+                },
+                {
+                  "id": "z",
+                  "from": "a",
+                  "to": "b",
+                  "amount": 2
+                }
+              ]
+            ]
+          ],
+          "expected": {
+            "balances": {
+              "a": 2,
+              "b": 0
+            },
+            "acceptedBatches": [],
+            "acceptedTransfers": []
+          }
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            {
+              "a": 2,
+              "b": 0
+            },
+            [
+              [
+                {
+                  "id": "x",
+                  "from": "a",
+                  "to": "b",
+                  "amount": 2
+                }
+              ]
+            ]
+          ],
+          "expected": {
+            "balances": {
+              "a": 0,
+              "b": 2
+            },
+            "acceptedBatches": [
+              0
+            ],
+            "acceptedTransfers": [
+              "x"
+            ]
+          }
+        },
+        {
+          "args": [
+            {
+              "a": 1,
+              "b": 0
+            },
+            [
+              null,
+              [
+                {
+                  "id": "x",
+                  "from": "a",
+                  "to": "b",
+                  "amount": 1
+                }
+              ]
+            ]
+          ],
+          "expected": {
+            "balances": {
+              "a": 0,
+              "b": 1
+            },
+            "acceptedBatches": [
+              1
+            ],
+            "acceptedTransfers": [
+              "x"
+            ]
+          }
+        },
+        {
+          "args": [
+            null,
+            []
+          ],
+          "expected": null
+        },
+        {
+          "args": [
+            {
+              "a": -1
+            },
+            []
+          ],
+          "expected": null
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function settleTransferBatches(balances, batches) {\n  if (!balances || typeof balances !== \"object\" || Array.isArray(balances) || !Array.isArray(batches) || Object.entries(balances).some(([id, value]) => id === \"\" || !Number.isFinite(value) || value < 0)) return null;\n  let next = { ...balances }; const seen = new Set(), acceptedBatches = [], acceptedTransfers = [];\n  for (const [batchIndex, batch] of batches.entries()) { if (!Array.isArray(batch)) continue; const fresh = []; for (const transfer of batch) { if (!transfer || typeof transfer.id !== \"string\" || transfer.id === \"\" || seen.has(transfer.id)) continue; seen.add(transfer.id); fresh.push(transfer); } if (fresh.length === 0) continue; const draft = { ...next }; let valid = true; for (const transfer of fresh) { if (typeof transfer.from !== \"string\" || typeof transfer.to !== \"string\" || transfer.from === transfer.to || !Object.prototype.hasOwnProperty.call(draft, transfer.from) || !Object.prototype.hasOwnProperty.call(draft, transfer.to) || !Number.isFinite(transfer.amount) || transfer.amount <= 0 || draft[transfer.from] < transfer.amount) { valid = false; break; } draft[transfer.from] -= transfer.amount; draft[transfer.to] += transfer.amount; } if (!valid) continue; next = draft; acceptedBatches.push(batchIndex); acceptedTransfers.push(...fresh.map(transfer => transfer.id)); }\n  return { balances: next, acceptedBatches, acceptedTransfers };\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(balances, batches) {\n  if (!balances || typeof balances !== \"object\" || Array.isArray(balances) || !Array.isArray(batches) || Object.entries(balances).some(([id, value]) => id === \"\" || !Number.isFinite(value) || value < 0)) return null;\n  let next = { ...balances }; const seen = new Set(), acceptedBatches = [], acceptedTransfers = [];\n  for (const [batchIndex, batch] of batches.entries()) { if (!Array.isArray(batch)) continue; const fresh = []; for (const transfer of batch) { if (!transfer || typeof transfer.id !== \"string\" || transfer.id === \"\" || seen.has(transfer.id)) continue; seen.add(transfer.id); fresh.push(transfer); } if (fresh.length === 0) continue; const draft = { ...next }; let valid = true; for (const transfer of fresh) { if (typeof transfer.from !== \"string\" || typeof transfer.to !== \"string\" || transfer.from === transfer.to || !Object.prototype.hasOwnProperty.call(draft, transfer.from) || !Object.prototype.hasOwnProperty.call(draft, transfer.to) || !Number.isFinite(transfer.amount) || transfer.amount <= 0 || draft[transfer.from] < transfer.amount) { valid = false; break; } draft[transfer.from] -= transfer.amount; draft[transfer.to] += transfer.amount; } if (!valid) continue; next = draft; acceptedBatches.push(batchIndex); acceptedTransfers.push(...fresh.map(transfer => transfer.id)); }\n  return { balances: next, acceptedBatches, acceptedTransfers };\n}\n\nexport function settleTransferBatches(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-evaluation-small-01",
+      "split": "evaluation",
+      "stratum": "small",
+      "visible_requirement": "Truncate a finite number toward zero and clamp it to inclusive integer bounds. Return null for invalid bounds or non-finite input.\n\nThe exported API is `truncateClamp(value, minimum, maximum)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function truncateClamp(value, minimum, maximum) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            3.9,
+            0,
+            3
+          ],
+          "expected": 3
+        },
+        {
+          "args": [
+            -2.8,
+            -2,
+            5
+          ],
+          "expected": -2
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            1.9,
+            0,
+            5
+          ],
+          "expected": 1
+        },
+        {
+          "args": [
+            1,
+            3,
+            2
+          ],
+          "expected": null
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function truncateClamp(value, minimum, maximum) {\n  if (![value, minimum, maximum].every(Number.isFinite) || !Number.isInteger(minimum) || !Number.isInteger(maximum) || minimum > maximum) return null; return Math.min(maximum, Math.max(minimum, Math.trunc(value)));\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(value, minimum, maximum) {\n  if (![value, minimum, maximum].every(Number.isFinite) || !Number.isInteger(minimum) || !Number.isInteger(maximum) || minimum > maximum) return null; return Math.min(maximum, Math.max(minimum, Math.trunc(value)));\n}\n\nexport function truncateClamp(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-evaluation-small-02",
+      "split": "evaluation",
+      "stratum": "small",
+      "visible_requirement": "Trim a string, collapse whitespace, and uppercase the first ASCII letter of each word while lowercasing the remaining letters. Return an empty string for non-string input.\n\nThe exported API is `titleWords(text)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function titleWords(text) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            "  hELLO   wORLD "
+          ],
+          "expected": "Hello World"
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            "a"
+          ],
+          "expected": "A"
+        },
+        {
+          "args": [
+            42
+          ],
+          "expected": ""
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function titleWords(text) {\n  if (typeof text !== \"string\") return \"\"; return text.trim().split(/\\s+/u).filter(Boolean).map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(\" \");\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(text) {\n  if (typeof text !== \"string\") return \"\"; return text.trim().split(/\\s+/u).filter(Boolean).map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(\" \");\n}\n\nexport function titleWords(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-evaluation-small-03",
+      "split": "evaluation",
+      "stratum": "small",
+      "visible_requirement": "Split an array into copied chunks of positive integer size. The final chunk may be shorter. Return [] for non-array input and null for invalid size.\n\nThe exported API is `chunk(values, size)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function chunk(values, size) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            [
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            2
+          ],
+          "expected": [
+            [
+              1,
+              2
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              5
+            ]
+          ]
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            [],
+            3
+          ],
+          "expected": []
+        },
+        {
+          "args": [
+            [
+              1
+            ],
+            0
+          ],
+          "expected": null
+        },
+        {
+          "args": [
+            null,
+            2
+          ],
+          "expected": []
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function chunk(values, size) {\n  if (!Number.isSafeInteger(size) || size < 1) return null; if (!Array.isArray(values)) return []; const result=[]; for(let i=0;i<values.length;i+=size) result.push(values.slice(i,i+size)); return result;\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(values, size) {\n  if (!Number.isSafeInteger(size) || size < 1) return null; if (!Array.isArray(values)) return []; const result=[]; for(let i=0;i<values.length;i+=size) result.push(values.slice(i,i+size)); return result;\n}\n\nexport function chunk(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-evaluation-small-04",
+      "split": "evaluation",
+      "stratum": "small",
+      "visible_requirement": "Accept booleans unchanged and the case-insensitive trimmed strings true/yes/1 and false/no/0. Return null for every other value.\n\nThe exported API is `parseBoolean(value)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function parseBoolean(value) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            " YES "
+          ],
+          "expected": true
+        },
+        {
+          "args": [
+            "false"
+          ],
+          "expected": false
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            true
+          ],
+          "expected": true
+        },
+        {
+          "args": [
+            "on"
+          ],
+          "expected": null
+        },
+        {
+          "args": [
+            1
+          ],
+          "expected": null
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function parseBoolean(value) {\n  if (typeof value === \"boolean\") return value; if (typeof value !== \"string\") return null; const key=value.trim().toLowerCase(); if ([\"true\",\"yes\",\"1\"].includes(key)) return true; if ([\"false\",\"no\",\"0\"].includes(key)) return false; return null;\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(value) {\n  if (typeof value === \"boolean\") return value; if (typeof value !== \"string\") return null; const key=value.trim().toLowerCase(); if ([\"true\",\"yes\",\"1\"].includes(key)) return true; if ([\"false\",\"no\",\"0\"].includes(key)) return false; return null;\n}\n\nexport function parseBoolean(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-evaluation-small-05",
+      "split": "evaluation",
+      "stratum": "small",
+      "visible_requirement": "Convert input with String and HTML-escape &, <, >, double quote, and single quote, in that order, using standard named entities.\n\nThe exported API is `escapeHtml(text)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function escapeHtml(text) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            "<a&b>"
+          ],
+          "expected": "&lt;a&amp;b&gt;"
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            "\"x\" 'y'"
+          ],
+          "expected": "&quot;x&quot; &#39;y&#39;"
+        },
+        {
+          "args": [
+            0
+          ],
+          "expected": "0"
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function escapeHtml(text) {\n  return String(text).replace(/&/gu,\"&amp;\").replace(/</gu,\"&lt;\").replace(/>/gu,\"&gt;\").replace(/\"/gu,\"&quot;\").replace(/'/gu,\"&#39;\");\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(text) {\n  return String(text).replace(/&/gu,\"&amp;\").replace(/</gu,\"&lt;\").replace(/>/gu,\"&gt;\").replace(/\"/gu,\"&quot;\").replace(/'/gu,\"&#39;\");\n}\n\nexport function escapeHtml(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-evaluation-small-06",
+      "split": "evaluation",
+      "stratum": "small",
+      "visible_requirement": "Return the numeric median of a non-empty array of finite numbers without sorting the input in place. Return null for invalid or empty input.\n\nThe exported API is `median(values)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function median(values) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            [
+              5,
+              1,
+              3
+            ]
+          ],
+          "expected": 3
+        },
+        {
+          "args": [
+            [
+              1,
+              4,
+              2,
+              3
+            ]
+          ],
+          "expected": 2.5
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            [
+              -5,
+              10
+            ]
+          ],
+          "expected": 2.5
+        },
+        {
+          "args": [
+            []
+          ],
+          "expected": null
+        },
+        {
+          "args": [
+            [
+              1,
+              null
+            ]
+          ],
+          "expected": null
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function median(values) {\n  if (!Array.isArray(values) || values.length===0 || values.some(value=>!Number.isFinite(value))) return null; const sorted=[...values].sort((a,b)=>a-b), middle=Math.floor(sorted.length/2); return sorted.length%2 ? sorted[middle] : (sorted[middle-1]+sorted[middle])/2;\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(values) {\n  if (!Array.isArray(values) || values.length===0 || values.some(value=>!Number.isFinite(value))) return null; const sorted=[...values].sort((a,b)=>a-b), middle=Math.floor(sorted.length/2); return sorted.length%2 ? sorted[middle] : (sorted[middle-1]+sorted[middle])/2;\n}\n\nexport function median(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-evaluation-small-07",
+      "split": "evaluation",
+      "stratum": "small",
+      "visible_requirement": "Normalize CRLF and CR to LF, remove trailing spaces and tabs on each line, and remove exactly one final empty line. Return an empty string for non-string input.\n\nThe exported API is `normalizeLines(text)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function normalizeLines(text) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            "a  \r\nb\r\n"
+          ],
+          "expected": "a\nb"
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            "a\n\n"
+          ],
+          "expected": "a\n"
+        },
+        {
+          "args": [
+            null
+          ],
+          "expected": ""
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function normalizeLines(text) {\n  if (typeof text!==\"string\") return \"\"; const normalized=text.replace(/\\r\\n?|\\n/gu,\"\\n\").split(\"\\n\").map(line=>line.replace(/[ \\t]+$/gu,\"\")).join(\"\\n\"); return normalized.endsWith(\"\\n\") ? normalized.slice(0,-1) : normalized;\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(text) {\n  if (typeof text!==\"string\") return \"\"; const normalized=text.replace(/\\r\\n?|\\n/gu,\"\\n\").split(\"\\n\").map(line=>line.replace(/[ \\t]+$/gu,\"\")).join(\"\\n\"); return normalized.endsWith(\"\\n\") ? normalized.slice(0,-1) : normalized;\n}\n\nexport function normalizeLines(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-evaluation-small-08",
+      "split": "evaluation",
+      "stratum": "small",
+      "visible_requirement": "Split a trimmed string on whitespace or hyphens and return the uppercase first character of at most the first two non-empty parts. Return an empty string for non-string input.\n\nThe exported API is `initials(name)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function initials(name) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            "ada lovelace"
+          ],
+          "expected": "AL"
+        },
+        {
+          "args": [
+            "Jean-Luc Picard"
+          ],
+          "expected": "JL"
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            " prince "
+          ],
+          "expected": "P"
+        },
+        {
+          "args": [
+            null
+          ],
+          "expected": ""
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function initials(name) {\n  if (typeof name!==\"string\") return \"\"; return name.trim().split(/[\\s-]+/u).filter(Boolean).slice(0,2).map(part=>part[0].toUpperCase()).join(\"\");\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(name) {\n  if (typeof name!==\"string\") return \"\"; return name.trim().split(/[\\s-]+/u).filter(Boolean).slice(0,2).map(part=>part[0].toUpperCase()).join(\"\");\n}\n\nexport function initials(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-evaluation-small-09",
+      "split": "evaluation",
+      "stratum": "small",
+      "visible_requirement": "For an array, discard non-finite entries and return each remaining number multiplied by a finite factor. Return [] for non-array input and null for a non-finite factor.\n\nThe exported API is `compactScale(values, factor)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function compactScale(values, factor) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            [
+              1,
+              null,
+              2,
+              "3"
+            ],
+            3
+          ],
+          "expected": [
+            3,
+            6
+          ]
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            [],
+            2
+          ],
+          "expected": []
+        },
+        {
+          "args": [
+            [
+              1
+            ],
+            null
+          ],
+          "expected": null
+        },
+        {
+          "args": [
+            null,
+            2
+          ],
+          "expected": []
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function compactScale(values, factor) {\n  if (!Number.isFinite(factor)) return null; if (!Array.isArray(values)) return []; return values.filter(Number.isFinite).map(value=>value*factor);\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(values, factor) {\n  if (!Number.isFinite(factor)) return null; if (!Array.isArray(values)) return []; return values.filter(Number.isFinite).map(value=>value*factor);\n}\n\nexport function compactScale(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-evaluation-small-10",
+      "split": "evaluation",
+      "stratum": "small",
+      "visible_requirement": "Format a non-negative finite byte count using B, KiB, MiB, or GiB. Choose the largest unit not exceeding the value, round to at most one decimal, and omit .0. Return null for invalid input.\n\nThe exported API is `formatBytes(bytes)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function formatBytes(bytes) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            1024
+          ],
+          "expected": "1 KiB"
+        },
+        {
+          "args": [
+            1536
+          ],
+          "expected": "1.5 KiB"
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            0
+          ],
+          "expected": "0 B"
+        },
+        {
+          "args": [
+            1048576
+          ],
+          "expected": "1 MiB"
+        },
+        {
+          "args": [
+            -1
+          ],
+          "expected": null
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function formatBytes(bytes) {\n  if (!Number.isFinite(bytes)||bytes<0) return null; const units=[\"B\",\"KiB\",\"MiB\",\"GiB\"]; let value=bytes,index=0; while(value>=1024&&index<units.length-1){value/=1024;index++;} const rounded=Math.round(value*10)/10; return String(rounded)+\" \"+units[index];\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(bytes) {\n  if (!Number.isFinite(bytes)||bytes<0) return null; const units=[\"B\",\"KiB\",\"MiB\",\"GiB\"]; let value=bytes,index=0; while(value>=1024&&index<units.length-1){value/=1024;index++;} const rounded=Math.round(value*10)/10; return String(rounded)+\" \"+units[index];\n}\n\nexport function formatBytes(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-evaluation-medium-01",
+      "split": "evaluation",
+      "stratum": "medium",
+      "visible_requirement": "Read own properties along a non-empty dot-separated path. Empty segments are invalid. Return fallback when traversal fails, and never read inherited properties.\n\nThe exported API is `deepGet(value, dottedPath, fallback)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function deepGet(value, dottedPath, fallback) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            {
+              "a": {
+                "b": 2
+              }
+            },
+            "a.b",
+            0
+          ],
+          "expected": 2
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            {
+              "a": {
+                "b": 0
+              }
+            },
+            "a.b",
+            9
+          ],
+          "expected": 0
+        },
+        {
+          "args": [
+            {},
+            "toString",
+            "x"
+          ],
+          "expected": "x"
+        },
+        {
+          "args": [
+            {},
+            "a..b",
+            "x"
+          ],
+          "expected": "x"
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function deepGet(value, dottedPath, fallback) {\n  if (typeof dottedPath!==\"string\"||dottedPath===\"\"||dottedPath.split(\".\").some(part=>part===\"\")) return fallback; let current=value; for(const part of dottedPath.split(\".\")){if(current===null||typeof current!==\"object\"||!Object.prototype.hasOwnProperty.call(current,part)) return fallback; current=current[part];} return current;\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(value, dottedPath, fallback) {\n  if (typeof dottedPath!==\"string\"||dottedPath===\"\"||dottedPath.split(\".\").some(part=>part===\"\")) return fallback; let current=value; for(const part of dottedPath.split(\".\")){if(current===null||typeof current!==\"object\"||!Object.prototype.hasOwnProperty.call(current,part)) return fallback; current=current[part];} return current;\n}\n\nexport function deepGet(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-evaluation-medium-02",
+      "split": "evaluation",
+      "stratum": "medium",
+      "visible_requirement": "Return sorted [start,end] numeric ranges with overlaps merged. Touching ranges whose end equals the next start are merged; separated ranges remain distinct. Return null for malformed ranges.\n\nThe exported API is `coalesceRanges(ranges)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function coalesceRanges(ranges) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            [
+              [
+                5,
+                8
+              ],
+              [
+                1,
+                3
+              ],
+              [
+                3,
+                6
+              ]
+            ]
+          ],
+          "expected": [
+            [
+              1,
+              8
+            ]
+          ]
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            [
+              [
+                1,
+                2
+              ],
+              [
+                3,
+                4
+              ]
+            ]
+          ],
+          "expected": [
+            [
+              1,
+              2
+            ],
+            [
+              3,
+              4
+            ]
+          ]
+        },
+        {
+          "args": [
+            []
+          ],
+          "expected": []
+        },
+        {
+          "args": [
+            [
+              [
+                2,
+                1
+              ]
+            ]
+          ],
+          "expected": null
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function coalesceRanges(ranges) {\n  if(!Array.isArray(ranges)||ranges.some(r=>!Array.isArray(r)||r.length!==2||!r.every(Number.isFinite)||r[0]>r[1])) return null; const sorted=ranges.map(r=>[...r]).sort((a,b)=>a[0]-b[0]||a[1]-b[1]),out=[]; for(const r of sorted){const last=out.at(-1); if(last&&r[0]<=last[1]) last[1]=Math.max(last[1],r[1]); else out.push(r);} return out;\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(ranges) {\n  if(!Array.isArray(ranges)||ranges.some(r=>!Array.isArray(r)||r.length!==2||!r.every(Number.isFinite)||r[0]>r[1])) return null; const sorted=ranges.map(r=>[...r]).sort((a,b)=>a[0]-b[0]||a[1]-b[1]),out=[]; for(const r of sorted){const last=out.at(-1); if(last&&r[0]<=last[1]) last[1]=Math.max(last[1],r[1]); else out.push(r);} return out;\n}\n\nexport function coalesceRanges(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-evaluation-medium-03",
+      "split": "evaluation",
+      "stratum": "medium",
+      "visible_requirement": "Use one-based positive integer page and pageSize. Return {items,total,page,pageSize,pages}; out-of-range pages have empty items. Return null for invalid input.\n\nThe exported API is `paginate(items, page, pageSize)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function paginate(items, page, pageSize) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            [
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            2,
+            2
+          ],
+          "expected": {
+            "items": [
+              3,
+              4
+            ],
+            "total": 5,
+            "page": 2,
+            "pageSize": 2,
+            "pages": 3
+          }
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            [],
+            1,
+            10
+          ],
+          "expected": {
+            "items": [],
+            "total": 0,
+            "page": 1,
+            "pageSize": 10,
+            "pages": 0
+          }
+        },
+        {
+          "args": [
+            [
+              1
+            ],
+            3,
+            1
+          ],
+          "expected": {
+            "items": [],
+            "total": 1,
+            "page": 3,
+            "pageSize": 1,
+            "pages": 1
+          }
+        },
+        {
+          "args": [
+            [
+              1
+            ],
+            0,
+            1
+          ],
+          "expected": null
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function paginate(items, page, pageSize) {\n  if(!Array.isArray(items)||!Number.isSafeInteger(page)||page<1||!Number.isSafeInteger(pageSize)||pageSize<1)return null; const total=items.length,pages=Math.ceil(total/pageSize),start=(page-1)*pageSize; return {items:items.slice(start,start+pageSize),total,page,pageSize,pages};\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(items, page, pageSize) {\n  if(!Array.isArray(items)||!Number.isSafeInteger(page)||page<1||!Number.isSafeInteger(pageSize)||pageSize<1)return null; const total=items.length,pages=Math.ceil(total/pageSize),start=(page-1)*pageSize; return {items:items.slice(start,start+pageSize),total,page,pageSize,pages};\n}\n\nexport function paginate(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-evaluation-medium-04",
+      "split": "evaluation",
+      "stratum": "medium",
+      "visible_requirement": "Group array entries by their own string-valued property named by key. Preserve row order and first-seen group order. Ignore non-object rows and rows without a string group; return {} for invalid input.\n\nThe exported API is `groupBy(rows, key)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function groupBy(rows, key) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            [
+              {
+                "k": "a",
+                "v": 1
+              },
+              {
+                "k": "b",
+                "v": 2
+              },
+              {
+                "k": "a",
+                "v": 3
+              }
+            ],
+            "k"
+          ],
+          "expected": {
+            "a": [
+              {
+                "k": "a",
+                "v": 1
+              },
+              {
+                "k": "a",
+                "v": 3
+              }
+            ],
+            "b": [
+              {
+                "k": "b",
+                "v": 2
+              }
+            ]
+          }
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            [
+              null,
+              {
+                "x": 1
+              }
+            ],
+            "k"
+          ],
+          "expected": {}
+        },
+        {
+          "args": [
+            null,
+            "k"
+          ],
+          "expected": {}
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function groupBy(rows, key) {\n  if(!Array.isArray(rows)||typeof key!==\"string\")return {}; const result={}; for(const row of rows){if(!row||typeof row!==\"object\"||!Object.prototype.hasOwnProperty.call(row,key)||typeof row[key]!==\"string\")continue;(result[row[key]]??=[]).push(row);}return result;\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(rows, key) {\n  if(!Array.isArray(rows)||typeof key!==\"string\")return {}; const result={}; for(const row of rows){if(!row||typeof row!==\"object\"||!Object.prototype.hasOwnProperty.call(row,key)||typeof row[key]!==\"string\")continue;(result[row[key]]??=[]).push(row);}return result;\n}\n\nexport function groupBy(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-evaluation-medium-05",
+      "split": "evaluation",
+      "stratum": "medium",
+      "visible_requirement": "For each case-insensitive key, replace the value in key=value tokens and JSON-style \"key\":\"value\" pairs with [REDACTED]. Values end at whitespace/comma for assignments and at the closing quote for JSON. Return input unchanged for invalid keys.\n\nThe exported API is `redactAssignments(text, keys)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function redactAssignments(text, keys) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            "token=abc user=x",
+            [
+              "token"
+            ]
+          ],
+          "expected": "token=[REDACTED] user=x"
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            "{\"Password\":\"secret\"}",
+            [
+              "password"
+            ]
+          ],
+          "expected": "{\"Password\":\"[REDACTED]\"}"
+        },
+        {
+          "args": [
+            "x=1",
+            null
+          ],
+          "expected": "x=1"
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function redactAssignments(text, keys) {\n  if(typeof text!==\"string\"||!Array.isArray(keys))return text; let result=text; for(const key of keys){if(typeof key!==\"string\"||key===\"\")continue; const escaped=[...key].map(ch=>\"\\\\^$.*+?()[]{}|\".includes(ch)?\"\\\\\\\\\"+ch:ch).join(\"\"); result=result.replace(new RegExp(\"(\"+escaped+\"\\\\s*=\\\\s*)[^\\\\s,]+\",\"giu\"),\"$1[REDACTED]\"); result=result.replace(new RegExp(\"(\\\"\"+escaped+\"\\\"\\\\s*:\\s*\\\")[^\\\"]*(\\\")\",\"giu\"),\"$1[REDACTED]$2\");} return result;\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(text, keys) {\n  if(typeof text!==\"string\"||!Array.isArray(keys))return text; let result=text; for(const key of keys){if(typeof key!==\"string\"||key===\"\")continue; const escaped=[...key].map(ch=>\"\\\\^$.*+?()[]{}|\".includes(ch)?\"\\\\\\\\\"+ch:ch).join(\"\"); result=result.replace(new RegExp(\"(\"+escaped+\"\\\\s*=\\\\s*)[^\\\\s,]+\",\"giu\"),\"$1[REDACTED]\"); result=result.replace(new RegExp(\"(\\\"\"+escaped+\"\\\"\\\\s*:\\s*\\\")[^\\\"]*(\\\")\",\"giu\"),\"$1[REDACTED]$2\");} return result;\n}\n\nexport function redactAssignments(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-evaluation-medium-06",
+      "split": "evaluation",
+      "stratum": "medium",
+      "visible_requirement": "Build a query string from an object using sorted keys. Omit null values, repeat array values in order, encode keys and values with encodeURIComponent, and stringify other primitives. Return an empty string for invalid input.\n\nThe exported API is `buildQuery(params)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function buildQuery(params) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            {
+              "b": 2,
+              "a": "x y"
+            }
+          ],
+          "expected": "a=x%20y&b=2"
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            {
+              "tag": [
+                "a",
+                "b"
+              ],
+              "x": null
+            }
+          ],
+          "expected": "tag=a&tag=b"
+        },
+        {
+          "args": [
+            null
+          ],
+          "expected": ""
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function buildQuery(params) {\n  if(!params||typeof params!==\"object\"||Array.isArray(params))return \"\"; const pairs=[]; for(const key of Object.keys(params).sort()){const raw=params[key],values=Array.isArray(raw)?raw:[raw]; for(const value of values)if(value!==null)pairs.push(encodeURIComponent(key)+\"=\"+encodeURIComponent(String(value)));}return pairs.join(\"&\");\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(params) {\n  if(!params||typeof params!==\"object\"||Array.isArray(params))return \"\"; const pairs=[]; for(const key of Object.keys(params).sort()){const raw=params[key],values=Array.isArray(raw)?raw:[raw]; for(const value of values)if(value!==null)pairs.push(encodeURIComponent(key)+\"=\"+encodeURIComponent(String(value)));}return pairs.join(\"&\");\n}\n\nexport function buildQuery(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-evaluation-medium-07",
+      "split": "evaluation",
+      "stratum": "medium",
+      "visible_requirement": "Return a stable copy sorted by the named own property. direction is asc or desc. Numeric values compare numerically, other values by String; null/missing values always sort last. Return null for invalid input.\n\nThe exported API is `stableSortBy(items, key, direction)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function stableSortBy(items, key, direction) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            [
+              {
+                "n": 2,
+                "id": "a"
+              },
+              {
+                "n": 1,
+                "id": "b"
+              },
+              {
+                "n": 2,
+                "id": "c"
+              }
+            ],
+            "n",
+            "asc"
+          ],
+          "expected": [
+            {
+              "n": 1,
+              "id": "b"
+            },
+            {
+              "n": 2,
+              "id": "a"
+            },
+            {
+              "n": 2,
+              "id": "c"
+            }
+          ]
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            [
+              {
+                "n": null
+              },
+              {
+                "n": 1
+              }
+            ],
+            "n",
+            "desc"
+          ],
+          "expected": [
+            {
+              "n": 1
+            },
+            {
+              "n": null
+            }
+          ]
+        },
+        {
+          "args": [
+            [],
+            "x",
+            "up"
+          ],
+          "expected": null
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function stableSortBy(items, key, direction) {\n  if(!Array.isArray(items)||typeof key!==\"string\"||![\"asc\",\"desc\"].includes(direction))return null; return items.map((value,index)=>({value,index})).sort((a,b)=>{const x=a.value?.[key],y=b.value?.[key];if(x==null||y==null)return x==null?(y==null?a.index-b.index:1):-1;const cmp=typeof x===\"number\"&&typeof y===\"number\"?x-y:String(x).localeCompare(String(y));return (direction===\"asc\"?cmp:-cmp)||a.index-b.index;}).map(entry=>entry.value);\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(items, key, direction) {\n  if(!Array.isArray(items)||typeof key!==\"string\"||![\"asc\",\"desc\"].includes(direction))return null; return items.map((value,index)=>({value,index})).sort((a,b)=>{const x=a.value?.[key],y=b.value?.[key];if(x==null||y==null)return x==null?(y==null?a.index-b.index:1):-1;const cmp=typeof x===\"number\"&&typeof y===\"number\"?x-y:String(x).localeCompare(String(y));return (direction===\"asc\"?cmp:-cmp)||a.index-b.index;}).map(entry=>entry.value);\n}\n\nexport function stableSortBy(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-evaluation-medium-08",
+      "split": "evaluation",
+      "stratum": "medium",
+      "visible_requirement": "Given finite numbers and strictly increasing finite upper bounds, return counts for (-Infinity,b0], (b0,b1], ... and (last,Infinity). Return null for malformed input.\n\nThe exported API is `histogram(values, upperBounds)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function histogram(values, upperBounds) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            [
+              1,
+              2,
+              5,
+              10
+            ],
+            [
+              2,
+              5
+            ]
+          ],
+          "expected": [
+            2,
+            1,
+            1
+          ]
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            [],
+            [
+              0
+            ]
+          ],
+          "expected": [
+            0,
+            0
+          ]
+        },
+        {
+          "args": [
+            [
+              1
+            ],
+            [
+              2,
+              2
+            ]
+          ],
+          "expected": null
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function histogram(values, upperBounds) {\n  if(!Array.isArray(values)||values.some(v=>!Number.isFinite(v))||!Array.isArray(upperBounds)||upperBounds.some((v,i)=>!Number.isFinite(v)||(i>0&&v<=upperBounds[i-1])))return null; const counts=Array(upperBounds.length+1).fill(0); for(const value of values){let i=0;while(i<upperBounds.length&&value>upperBounds[i])i++;counts[i]++;}return counts;\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(values, upperBounds) {\n  if(!Array.isArray(values)||values.some(v=>!Number.isFinite(v))||!Array.isArray(upperBounds)||upperBounds.some((v,i)=>!Number.isFinite(v)||(i>0&&v<=upperBounds[i-1])))return null; const counts=Array(upperBounds.length+1).fill(0); for(const value of values){let i=0;while(i<upperBounds.length&&value>upperBounds[i])i++;counts[i]++;}return counts;\n}\n\nexport function histogram(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-evaluation-medium-09",
+      "split": "evaluation",
+      "stratum": "medium",
+      "visible_requirement": "Match requested against available case-insensitively: first exact tag, then first same primary-language tag in available order, then fallback if it exists case-insensitively, otherwise null. Return the original available spelling.\n\nThe exported API is `resolveLocale(requested, available, fallback)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function resolveLocale(requested, available, fallback) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            "en-GB",
+            [
+              "fr-FR",
+              "en-US"
+            ],
+            "fr-FR"
+          ],
+          "expected": "en-US"
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            "EN-us",
+            [
+              "en-US"
+            ],
+            "x"
+          ],
+          "expected": "en-US"
+        },
+        {
+          "args": [
+            "de",
+            [
+              "fr"
+            ],
+            "FR"
+          ],
+          "expected": "fr"
+        },
+        {
+          "args": [
+            "de",
+            [],
+            "en"
+          ],
+          "expected": null
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function resolveLocale(requested, available, fallback) {\n  if(typeof requested!==\"string\"||!Array.isArray(available)||available.some(v=>typeof v!==\"string\")||typeof fallback!==\"string\")return null; const lower=requested.toLowerCase(),exact=available.find(v=>v.toLowerCase()===lower);if(exact)return exact;const language=lower.split(\"-\")[0],partial=available.find(v=>v.toLowerCase().split(\"-\")[0]===language);if(partial)return partial;return available.find(v=>v.toLowerCase()===fallback.toLowerCase())??null;\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(requested, available, fallback) {\n  if(typeof requested!==\"string\"||!Array.isArray(available)||available.some(v=>typeof v!==\"string\")||typeof fallback!==\"string\")return null; const lower=requested.toLowerCase(),exact=available.find(v=>v.toLowerCase()===lower);if(exact)return exact;const language=lower.split(\"-\")[0],partial=available.find(v=>v.toLowerCase().split(\"-\")[0]===language);if(partial)return partial;return available.find(v=>v.toLowerCase()===fallback.toLowerCase())??null;\n}\n\nexport function resolveLocale(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-evaluation-medium-10",
+      "split": "evaluation",
+      "stratum": "medium",
+      "visible_requirement": "Return attempts non-negative integer delays starting at baseMs and multiplying by factor, each capped at maximumMs and rounded to the nearest integer. Return null unless inputs are finite, non-negative, factor >= 1, and attempts is a non-negative safe integer.\n\nThe exported API is `retrySchedule(baseMs, factor, maximumMs, attempts)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function retrySchedule(baseMs, factor, maximumMs, attempts) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            100,
+            2,
+            350,
+            4
+          ],
+          "expected": [
+            100,
+            200,
+            350,
+            350
+          ]
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            50,
+            1.5,
+            500,
+            3
+          ],
+          "expected": [
+            50,
+            75,
+            113
+          ]
+        },
+        {
+          "args": [
+            1,
+            2,
+            3,
+            0
+          ],
+          "expected": []
+        },
+        {
+          "args": [
+            1,
+            0,
+            3,
+            2
+          ],
+          "expected": null
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function retrySchedule(baseMs, factor, maximumMs, attempts) {\n  if(![baseMs,factor,maximumMs].every(Number.isFinite)||baseMs<0||factor<1||maximumMs<0||!Number.isSafeInteger(attempts)||attempts<0)return null;return Array.from({length:attempts},(_,i)=>Math.round(Math.min(maximumMs,baseMs*factor**i)));\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(baseMs, factor, maximumMs, attempts) {\n  if(![baseMs,factor,maximumMs].every(Number.isFinite)||baseMs<0||factor<1||maximumMs<0||!Number.isSafeInteger(attempts)||attempts<0)return null;return Array.from({length:attempts},(_,i)=>Math.round(Math.min(maximumMs,baseMs*factor**i)));\n}\n\nexport function retrySchedule(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-evaluation-high-01",
+      "split": "evaluation",
+      "stratum": "high",
+      "visible_requirement": "Each node is {id,deps}. Return dependency layers; preserve input order within each layer. Return null for duplicate IDs, unknown dependencies, cycles, or malformed input.\n\nThe exported API is `topologicalLayers(nodes)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function topologicalLayers(nodes) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            [
+              {
+                "id": "a",
+                "deps": []
+              },
+              {
+                "id": "b",
+                "deps": [
+                  "a"
+                ]
+              },
+              {
+                "id": "c",
+                "deps": [
+                  "a"
+                ]
+              }
+            ]
+          ],
+          "expected": [
+            [
+              "a"
+            ],
+            [
+              "b",
+              "c"
+            ]
+          ]
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            [
+              {
+                "id": "x",
+                "deps": []
+              },
+              {
+                "id": "y",
+                "deps": []
+              }
+            ]
+          ],
+          "expected": [
+            [
+              "x",
+              "y"
+            ]
+          ]
+        },
+        {
+          "args": [
+            [
+              {
+                "id": "a",
+                "deps": [
+                  "b"
+                ]
+              },
+              {
+                "id": "b",
+                "deps": [
+                  "a"
+                ]
+              }
+            ]
+          ],
+          "expected": null
+        },
+        {
+          "args": [
+            [
+              {
+                "id": "a",
+                "deps": []
+              },
+              {
+                "id": "a",
+                "deps": []
+              }
+            ]
+          ],
+          "expected": null
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function topologicalLayers(nodes) {\n  if(!Array.isArray(nodes))return null;const map=new Map();for(const n of nodes){if(!n||typeof n.id!==\"string\"||!Array.isArray(n.deps)||map.has(n.id))return null;map.set(n.id,n);}if(nodes.some(n=>n.deps.some(d=>!map.has(d))))return null;const done=new Set(),layers=[];while(done.size<nodes.length){const layer=nodes.filter(n=>!done.has(n.id)&&n.deps.every(d=>done.has(d))).map(n=>n.id);if(!layer.length)return null;layers.push(layer);layer.forEach(id=>done.add(id));}return layers;\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(nodes) {\n  if(!Array.isArray(nodes))return null;const map=new Map();for(const n of nodes){if(!n||typeof n.id!==\"string\"||!Array.isArray(n.deps)||map.has(n.id))return null;map.set(n.id,n);}if(nodes.some(n=>n.deps.some(d=>!map.has(d))))return null;const done=new Set(),layers=[];while(done.size<nodes.length){const layer=nodes.filter(n=>!done.has(n.id)&&n.deps.every(d=>done.has(d))).map(n=>n.id);if(!layer.length)return null;layers.push(layer);layer.forEach(id=>done.add(id));}return layers;\n}\n\nexport function topologicalLayers(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-evaluation-high-02",
+      "split": "evaluation",
+      "stratum": "high",
+      "visible_requirement": "Allocate an integer total across {weight,cap} entries. Repeatedly use largest-remainder proportional allocation among entries below their non-negative integer caps; fractional ties use lower index. Return null if invalid or total exceeds total caps.\n\nThe exported API is `apportionCapped(total, entries)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function apportionCapped(total, entries) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            7,
+            [
+              {
+                "weight": 1,
+                "cap": 2
+              },
+              {
+                "weight": 1,
+                "cap": 10
+              }
+            ]
+          ],
+          "expected": [
+            2,
+            5
+          ]
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            3,
+            [
+              {
+                "weight": 1,
+                "cap": 5
+              },
+              {
+                "weight": 1,
+                "cap": 5
+              }
+            ]
+          ],
+          "expected": [
+            2,
+            1
+          ]
+        },
+        {
+          "args": [
+            3,
+            [
+              {
+                "weight": 0,
+                "cap": 3
+              }
+            ]
+          ],
+          "expected": null
+        },
+        {
+          "args": [
+            5,
+            [
+              {
+                "weight": 1,
+                "cap": 2
+              }
+            ]
+          ],
+          "expected": null
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function apportionCapped(total, entries) {\n  if(!Number.isSafeInteger(total)||total<0||!Array.isArray(entries)||entries.some(e=>!e||!Number.isFinite(e.weight)||e.weight<0||!Number.isSafeInteger(e.cap)||e.cap<0)||total>entries.reduce((s,e)=>s+e.cap,0))return null;const out=entries.map(()=>0);let left=total;while(left>0){const active=entries.map((e,i)=>({e,i,room:e.cap-out[i]})).filter(x=>x.room>0);const sum=active.reduce((s,x)=>s+x.e.weight,0);if(sum===0)return null;const quotas=active.map(x=>Math.min(x.room,left*x.e.weight/sum)),floors=quotas.map(Math.floor);let used=0;floors.forEach((n,j)=>{out[active[j].i]+=n;used+=n;});left-=used;if(left===0)break;const order=quotas.map((q,j)=>[q-floors[j],active[j].i,j]).filter(([,i])=>out[i]<entries[i].cap).sort((a,b)=>b[0]-a[0]||a[1]-b[1]);if(!order.length)return null;for(const item of order){if(left===0)break;out[item[1]]++;left--;}}return out;\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(total, entries) {\n  if(!Number.isSafeInteger(total)||total<0||!Array.isArray(entries)||entries.some(e=>!e||!Number.isFinite(e.weight)||e.weight<0||!Number.isSafeInteger(e.cap)||e.cap<0)||total>entries.reduce((s,e)=>s+e.cap,0))return null;const out=entries.map(()=>0);let left=total;while(left>0){const active=entries.map((e,i)=>({e,i,room:e.cap-out[i]})).filter(x=>x.room>0);const sum=active.reduce((s,x)=>s+x.e.weight,0);if(sum===0)return null;const quotas=active.map(x=>Math.min(x.room,left*x.e.weight/sum)),floors=quotas.map(Math.floor);let used=0;floors.forEach((n,j)=>{out[active[j].i]+=n;used+=n;});left-=used;if(left===0)break;const order=quotas.map((q,j)=>[q-floors[j],active[j].i,j]).filter(([,i])=>out[i]<entries[i].cap).sort((a,b)=>b[0]-a[0]||a[1]-b[1]);if(!order.length)return null;for(const item of order){if(left===0)break;out[item[1]]++;left--;}}return out;\n}\n\nexport function apportionCapped(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-evaluation-high-03",
+      "split": "evaluation",
+      "stratum": "high",
+      "visible_requirement": "For records {id,version,source,value}, choose one per id: higher integer version wins, then lexicographically smaller source on a version tie. Preserve first-seen id order and return chosen records. Ignore malformed records.\n\nThe exported API is `reconcileRecords(records)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function reconcileRecords(records) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            [
+              {
+                "id": "x",
+                "version": 1,
+                "source": "b",
+                "value": 1
+              },
+              {
+                "id": "x",
+                "version": 2,
+                "source": "z",
+                "value": 2
+              }
+            ]
+          ],
+          "expected": [
+            {
+              "id": "x",
+              "version": 2,
+              "source": "z",
+              "value": 2
+            }
+          ]
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            [
+              {
+                "id": "x",
+                "version": 2,
+                "source": "b",
+                "value": 1
+              },
+              {
+                "id": "x",
+                "version": 2,
+                "source": "a",
+                "value": 2
+              }
+            ]
+          ],
+          "expected": [
+            {
+              "id": "x",
+              "version": 2,
+              "source": "a",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "args": [
+            null
+          ],
+          "expected": []
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function reconcileRecords(records) {\n  if(!Array.isArray(records))return [];const order=[],best=new Map();for(const r of records){if(!r||typeof r.id!==\"string\"||!Number.isSafeInteger(r.version)||typeof r.source!==\"string\")continue;if(!best.has(r.id))order.push(r.id);const old=best.get(r.id);if(!old||r.version>old.version||(r.version===old.version&&r.source<old.source))best.set(r.id,{...r});}return order.filter(id=>best.has(id)).map(id=>best.get(id));\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(records) {\n  if(!Array.isArray(records))return [];const order=[],best=new Map();for(const r of records){if(!r||typeof r.id!==\"string\"||!Number.isSafeInteger(r.version)||typeof r.source!==\"string\")continue;if(!best.has(r.id))order.push(r.id);const old=best.get(r.id);if(!old||r.version>old.version||(r.version===old.version&&r.source<old.source))best.set(r.id,{...r});}return order.filter(id=>best.has(id)).map(id=>best.get(id));\n}\n\nexport function reconcileRecords(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-evaluation-high-04",
+      "split": "evaluation",
+      "stratum": "high",
+      "visible_requirement": "Schedule {id,duration,deps} jobs on identical slots. At each time, start ready jobs in input order until slots fill; completions at that time happen before starts. Return [{id,start,end}] in start order. Return null for invalid graphs, durations, or concurrency.\n\nThe exported API is `scheduleJobs(jobs, concurrency)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function scheduleJobs(jobs, concurrency) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            [
+              {
+                "id": "a",
+                "duration": 2,
+                "deps": []
+              },
+              {
+                "id": "b",
+                "duration": 1,
+                "deps": []
+              },
+              {
+                "id": "c",
+                "duration": 1,
+                "deps": [
+                  "a"
+                ]
+              }
+            ],
+            2
+          ],
+          "expected": [
+            {
+              "id": "a",
+              "start": 0,
+              "end": 2
+            },
+            {
+              "id": "b",
+              "start": 0,
+              "end": 1
+            },
+            {
+              "id": "c",
+              "start": 2,
+              "end": 3
+            }
+          ]
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            [
+              {
+                "id": "a",
+                "duration": 1,
+                "deps": [
+                  "b"
+                ]
+              },
+              {
+                "id": "b",
+                "duration": 1,
+                "deps": [
+                  "a"
+                ]
+              }
+            ],
+            1
+          ],
+          "expected": null
+        },
+        {
+          "args": [
+            [],
+            2
+          ],
+          "expected": []
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function scheduleJobs(jobs, concurrency) {\n  if(!Array.isArray(jobs)||!Number.isSafeInteger(concurrency)||concurrency<1)return null;const map=new Map();for(const j of jobs){if(!j||typeof j.id!==\"string\"||!Number.isFinite(j.duration)||j.duration<0||!Array.isArray(j.deps)||map.has(j.id))return null;map.set(j.id,j);}if(jobs.some(j=>j.deps.some(d=>!map.has(d))))return null;let time=0;const done=new Set(),started=new Set(),running=[],result=[];while(done.size<jobs.length){for(let i=running.length-1;i>=0;i--)if(running[i].end===time){done.add(running[i].id);running.splice(i,1);}let changed=true;while(changed&&running.length<concurrency){changed=false;const next=jobs.find(j=>!started.has(j.id)&&j.deps.every(d=>done.has(d)));if(next){started.add(next.id);const item={id:next.id,start:time,end:time+next.duration};running.push(item);result.push(item);changed=true;}}if(done.size===jobs.length)break;if(!running.length)return null;time=Math.min(...running.map(j=>j.end));}return result;\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(jobs, concurrency) {\n  if(!Array.isArray(jobs)||!Number.isSafeInteger(concurrency)||concurrency<1)return null;const map=new Map();for(const j of jobs){if(!j||typeof j.id!==\"string\"||!Number.isFinite(j.duration)||j.duration<0||!Array.isArray(j.deps)||map.has(j.id))return null;map.set(j.id,j);}if(jobs.some(j=>j.deps.some(d=>!map.has(d))))return null;let time=0;const done=new Set(),started=new Set(),running=[],result=[];while(done.size<jobs.length){for(let i=running.length-1;i>=0;i--)if(running[i].end===time){done.add(running[i].id);running.splice(i,1);}let changed=true;while(changed&&running.length<concurrency){changed=false;const next=jobs.find(j=>!started.has(j.id)&&j.deps.every(d=>done.has(d)));if(next){started.add(next.id);const item={id:next.id,start:time,end:time+next.duration};running.push(item);result.push(item);changed=true;}}if(done.size===jobs.length)break;if(!running.length)return null;time=Math.min(...running.map(j=>j.end));}return result;\n}\n\nexport function scheduleJobs(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-evaluation-high-05",
+      "split": "evaluation",
+      "stratum": "high",
+      "visible_requirement": "Apply immutable operations {op,path,value?} to a JSON object. Paths are slash-separated own-property keys with ~1 and ~0 decoding. Support add/replace/remove; replace/remove require an existing key. Return null on any invalid operation, otherwise the new document.\n\nThe exported API is `applyOperations(document, operations)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function applyOperations(document, operations) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            {
+              "a": {
+                "b": 1
+              }
+            },
+            [
+              {
+                "op": "replace",
+                "path": "/a/b",
+                "value": 2
+              },
+              {
+                "op": "add",
+                "path": "/x",
+                "value": 3
+              }
+            ]
+          ],
+          "expected": {
+            "a": {
+              "b": 2
+            },
+            "x": 3
+          }
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            {
+              "a": 1
+            },
+            [
+              {
+                "op": "remove",
+                "path": "/a"
+              }
+            ]
+          ],
+          "expected": {}
+        },
+        {
+          "args": [
+            {
+              "a/b": 1
+            },
+            [
+              {
+                "op": "replace",
+                "path": "/a~1b",
+                "value": 2
+              }
+            ]
+          ],
+          "expected": {
+            "a/b": 2
+          }
+        },
+        {
+          "args": [
+            {},
+            [
+              {
+                "op": "remove",
+                "path": "/x"
+              }
+            ]
+          ],
+          "expected": null
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function applyOperations(document, operations) {\n  if(!document||typeof document!==\"object\"||Array.isArray(document)||!Array.isArray(operations))return null;const root=structuredClone(document);for(const op of operations){if(!op||![\"add\",\"replace\",\"remove\"].includes(op.op)||typeof op.path!==\"string\"||!op.path.startsWith(\"/\")||op.path===\"/\")return null;const parts=op.path.slice(1).split(\"/\").map(p=>p.replace(/~1/gu,\"/\").replace(/~0/gu,\"~\"));let target=root;for(const part of parts.slice(0,-1)){if(!target||typeof target!==\"object\"||Array.isArray(target)||!Object.prototype.hasOwnProperty.call(target,part))return null;target=target[part];}const key=parts.at(-1),exists=Object.prototype.hasOwnProperty.call(target,key);if((op.op===\"replace\"||op.op===\"remove\")&&!exists)return null;if(op.op===\"remove\")delete target[key];else target[key]=structuredClone(op.value);}return root;\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(document, operations) {\n  if(!document||typeof document!==\"object\"||Array.isArray(document)||!Array.isArray(operations))return null;const root=structuredClone(document);for(const op of operations){if(!op||![\"add\",\"replace\",\"remove\"].includes(op.op)||typeof op.path!==\"string\"||!op.path.startsWith(\"/\")||op.path===\"/\")return null;const parts=op.path.slice(1).split(\"/\").map(p=>p.replace(/~1/gu,\"/\").replace(/~0/gu,\"~\"));let target=root;for(const part of parts.slice(0,-1)){if(!target||typeof target!==\"object\"||Array.isArray(target)||!Object.prototype.hasOwnProperty.call(target,part))return null;target=target[part];}const key=parts.at(-1),exists=Object.prototype.hasOwnProperty.call(target,key);if((op.op===\"replace\"||op.op===\"remove\")&&!exists)return null;if(op.op===\"remove\")delete target[key];else target[key]=structuredClone(op.value);}return root;\n}\n\nexport function applyOperations(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-evaluation-high-06",
+      "split": "evaluation",
+      "stratum": "high",
+      "visible_requirement": "Parse comma-separated text with LF or CRLF rows. Double-quoted fields may contain commas/newlines and escape quotes as doubled quotes. Empty input returns []; malformed unclosed quotes return null. Preserve empty fields and omit one final empty row.\n\nThe exported API is `parseCsv(text)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function parseCsv(text) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            "a,b\n1,2\n"
+          ],
+          "expected": [
+            [
+              "a",
+              "b"
+            ],
+            [
+              "1",
+              "2"
+            ]
+          ]
+        },
+        {
+          "args": [
+            "\"a,b\",c"
+          ],
+          "expected": [
+            [
+              "a,b",
+              "c"
+            ]
+          ]
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            "\"a\"\"b\",x"
+          ],
+          "expected": [
+            [
+              "a\"b",
+              "x"
+            ]
+          ]
+        },
+        {
+          "args": [
+            "\"a\nb\",c"
+          ],
+          "expected": [
+            [
+              "a\nb",
+              "c"
+            ]
+          ]
+        },
+        {
+          "args": [
+            "\"open"
+          ],
+          "expected": null
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function parseCsv(text) {\n  if(typeof text!==\"string\")return null;if(text===\"\")return [];const rows=[],row=[];let field=\"\",quoted=false;for(let i=0;i<text.length;i++){const c=text[i];if(quoted){if(c==='\"'&&text[i+1]==='\"'){field+='\"';i++;}else if(c==='\"')quoted=false;else field+=c;}else if(c==='\"'&&field===\"\")quoted=true;else if(c===','){row.push(field);field=\"\";}else if(c==='\\n'){row.push(field);rows.push([...row]);row.length=0;field=\"\";}else if(c==='\\r'&&text[i+1]==='\\n'){}else field+=c;}if(quoted)return null;row.push(field);if(!(row.length===1&&row[0]===\"\"&&text.endsWith(\"\\n\")))rows.push(row);return rows;\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(text) {\n  if(typeof text!==\"string\")return null;if(text===\"\")return [];const rows=[],row=[];let field=\"\",quoted=false;for(let i=0;i<text.length;i++){const c=text[i];if(quoted){if(c==='\"'&&text[i+1]==='\"'){field+='\"';i++;}else if(c==='\"')quoted=false;else field+=c;}else if(c==='\"'&&field===\"\")quoted=true;else if(c===','){row.push(field);field=\"\";}else if(c==='\\n'){row.push(field);rows.push([...row]);row.length=0;field=\"\";}else if(c==='\\r'&&text[i+1]==='\\n'){}else field+=c;}if(quoted)return null;row.push(field);if(!(row.length===1&&row[0]===\"\"&&text.endsWith(\"\\n\")))rows.push(row);return rows;\n}\n\nexport function parseCsv(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-evaluation-high-07",
+      "split": "evaluation",
+      "stratum": "high",
+      "visible_requirement": "From valid x.y.z numeric versions choose the greatest matching range. Supported ranges are exact x.y.z, ^x.y.z (same major and >= base), and >=x.y.z <x.y.z. Ignore invalid versions; return null for invalid range or no match.\n\nThe exported API is `selectVersion(versions, range)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function selectVersion(versions, range) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            [
+              "1.2.0",
+              "1.9.0",
+              "2.0.0"
+            ],
+            "^1.2.0"
+          ],
+          "expected": "1.9.0"
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            [
+              "1.0.0",
+              "1.5.0",
+              "2.0.0"
+            ],
+            ">=1.0.0 <2.0.0"
+          ],
+          "expected": "1.5.0"
+        },
+        {
+          "args": [
+            [
+              "1.0.0"
+            ],
+            "1.0.0"
+          ],
+          "expected": "1.0.0"
+        },
+        {
+          "args": [
+            [
+              "bad"
+            ],
+            "^1.0.0"
+          ],
+          "expected": null
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function selectVersion(versions, range) {\n  const parse=v=>/^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$/u.exec(v)?.slice(1).map(Number)??null,cmp=(a,b)=>a[0]-b[0]||a[1]-b[1]||a[2]-b[2];if(!Array.isArray(versions)||typeof range!==\"string\")return null;let test;if(range.startsWith(\"^\")){const base=parse(range.slice(1));if(!base)return null;test=v=>v[0]===base[0]&&cmp(v,base)>=0;}else if(/^>=\\S+ <\\S+$/u.test(range)){const [lower,upper]=range.split(\" \"),lo=parse(lower.slice(2)),hi=parse(upper.slice(1));if(!lo||!hi)return null;test=v=>cmp(v,lo)>=0&&cmp(v,hi)<0;}else{const exact=parse(range);if(!exact)return null;test=v=>cmp(v,exact)===0;}return versions.map(v=>[v,parse(v)]).filter(([,p])=>p&&test(p)).sort((a,b)=>cmp(b[1],a[1]))[0]?.[0]??null;\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(versions, range) {\n  const parse=v=>/^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$/u.exec(v)?.slice(1).map(Number)??null,cmp=(a,b)=>a[0]-b[0]||a[1]-b[1]||a[2]-b[2];if(!Array.isArray(versions)||typeof range!==\"string\")return null;let test;if(range.startsWith(\"^\")){const base=parse(range.slice(1));if(!base)return null;test=v=>v[0]===base[0]&&cmp(v,base)>=0;}else if(/^>=\\S+ <\\S+$/u.test(range)){const [lower,upper]=range.split(\" \"),lo=parse(lower.slice(2)),hi=parse(upper.slice(1));if(!lo||!hi)return null;test=v=>cmp(v,lo)>=0&&cmp(v,hi)<0;}else{const exact=parse(range);if(!exact)return null;test=v=>cmp(v,exact)===0;}return versions.map(v=>[v,parse(v)]).filter(([,p])=>p&&test(p)).sort((a,b)=>cmp(b[1],a[1]))[0]?.[0]??null;\n}\n\nexport function selectVersion(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-evaluation-high-08",
+      "split": "evaluation",
+      "stratum": "high",
+      "visible_requirement": "Process finite timestamps in given order. Return booleans indicating acceptance. A timestamp is accepted when fewer than limit previously accepted timestamps are greater than timestamp-windowMs and <= timestamp. Inputs are nondecreasing; return null if invalid.\n\nThe exported API is `acceptWithinWindow(timestamps, limit, windowMs)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function acceptWithinWindow(timestamps, limit, windowMs) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            [
+              0,
+              1,
+              2,
+              11
+            ],
+            2,
+            10
+          ],
+          "expected": [
+            true,
+            true,
+            false,
+            true
+          ]
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            [
+              0,
+              10
+            ],
+            1,
+            10
+          ],
+          "expected": [
+            true,
+            true
+          ]
+        },
+        {
+          "args": [
+            [],
+            2,
+            10
+          ],
+          "expected": []
+        },
+        {
+          "args": [
+            [
+              2,
+              1
+            ],
+            1,
+            10
+          ],
+          "expected": null
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function acceptWithinWindow(timestamps, limit, windowMs) {\n  if(!Array.isArray(timestamps)||timestamps.some((t,i)=>!Number.isFinite(t)||(i&&t<timestamps[i-1]))||!Number.isSafeInteger(limit)||limit<1||!Number.isFinite(windowMs)||windowMs<0)return null;const accepted=[],result=[];for(const t of timestamps){while(accepted.length&&accepted[0]<=t-windowMs)accepted.shift();const ok=accepted.length<limit;result.push(ok);if(ok)accepted.push(t);}return result;\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(timestamps, limit, windowMs) {\n  if(!Array.isArray(timestamps)||timestamps.some((t,i)=>!Number.isFinite(t)||(i&&t<timestamps[i-1]))||!Number.isSafeInteger(limit)||limit<1||!Number.isFinite(windowMs)||windowMs<0)return null;const accepted=[],result=[];for(const t of timestamps){while(accepted.length&&accepted[0]<=t-windowMs)accepted.shift();const ok=accepted.length<limit;result.push(ok);if(ok)accepted.push(t);}return result;\n}\n\nexport function acceptWithinWindow(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-evaluation-high-09",
+      "split": "evaluation",
+      "stratum": "high",
+      "visible_requirement": "Given [name,value] pairs, lowercase and trim names, trim String(value), combine duplicate ordinary headers with comma+space, and keep set-cookie as an array. Preserve first-seen header order. Return null for malformed input.\n\nThe exported API is `normalizeHeaders(entries)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function normalizeHeaders(entries) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            [
+              [
+                "Accept",
+                " text/plain "
+              ],
+              [
+                "ACCEPT",
+                "application/json"
+              ]
+            ]
+          ],
+          "expected": {
+            "accept": "text/plain, application/json"
+          }
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            [
+              [
+                "Set-Cookie",
+                "a=1"
+              ],
+              [
+                "set-cookie",
+                "b=2"
+              ]
+            ]
+          ],
+          "expected": {
+            "set-cookie": [
+              "a=1",
+              "b=2"
+            ]
+          }
+        },
+        {
+          "args": [
+            [
+              [
+                "",
+                1
+              ]
+            ]
+          ],
+          "expected": null
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function normalizeHeaders(entries) {\n  if(!Array.isArray(entries)||entries.some(e=>!Array.isArray(e)||e.length!==2||typeof e[0]!==\"string\"||e[0].trim()===\"\"))return null;const out={};for(const [raw,value] of entries){const name=raw.trim().toLowerCase(),text=String(value).trim();if(name===\"set-cookie\"){if(!Object.prototype.hasOwnProperty.call(out,name))out[name]=[];out[name].push(text);}else if(Object.prototype.hasOwnProperty.call(out,name))out[name]+=', '+text;else out[name]=text;}return out;\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(entries) {\n  if(!Array.isArray(entries)||entries.some(e=>!Array.isArray(e)||e.length!==2||typeof e[0]!==\"string\"||e[0].trim()===\"\"))return null;const out={};for(const [raw,value] of entries){const name=raw.trim().toLowerCase(),text=String(value).trim();if(name===\"set-cookie\"){if(!Object.prototype.hasOwnProperty.call(out,name))out[name]=[];out[name].push(text);}else if(Object.prototype.hasOwnProperty.call(out,name))out[name]+=', '+text;else out[name]=text;}return out;\n}\n\nexport function normalizeHeaders(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "core-lite-evaluation-high-10",
+      "split": "evaluation",
+      "stratum": "high",
+      "visible_requirement": "Render {{path}} with HTML-escaped own-property values and {{{path}}} with raw String values. Dotted paths are supported; missing values leave the original token. Triple braces must be recognized before double braces. Return an empty string for non-string templates.\n\nThe exported API is `renderTemplate(template, values)`. Do not mutate input values. Modify only `src/task.mjs`.",
+      "entry_path": "src/task.mjs",
+      "allowed_mutation_paths": [
+        "src/task.mjs"
+      ],
+      "files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function renderTemplate(template, values) {\n  return null;\n}\n"
+        }
+      ],
+      "public_cases": [
+        {
+          "args": [
+            "Hi {{user.name}}",
+            {
+              "user": {
+                "name": "<Ada>"
+              }
+            }
+          ],
+          "expected": "Hi &lt;Ada&gt;"
+        }
+      ],
+      "hidden_cases": [
+        {
+          "args": [
+            "{{{html}}}",
+            {
+              "html": "<b>"
+            }
+          ],
+          "expected": "<b>"
+        },
+        {
+          "args": [
+            "{{missing}}",
+            {}
+          ],
+          "expected": "{{missing}}"
+        },
+        {
+          "args": [
+            null,
+            {}
+          ],
+          "expected": ""
+        }
+      ],
+      "reference_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "export function renderTemplate(template, values) {\n  if(typeof template!==\"string\")return \"\";const get=key=>{let value=values;for(const part of key.split(\".\")){if(value===null||typeof value!==\"object\"||!Object.prototype.hasOwnProperty.call(value,part))return undefined;value=value[part];}return value;},escape=value=>String(value).replace(/&/gu,\"&amp;\").replace(/</gu,\"&lt;\").replace(/>/gu,\"&gt;\").replace(/\"/gu,\"&quot;\").replace(/'/gu,\"&#39;\");return template.replace(/\\{\\{\\{\\s*([\\w$.]+)\\s*\\}\\}\\}|\\{\\{\\s*([\\w$.]+)\\s*\\}\\}/gu,(whole,raw,safe)=>{const value=get(raw??safe);return value===undefined?whole:raw?String(value):escape(value);});\n}\n"
+        }
+      ],
+      "alternative_files": [
+        {
+          "path": "src/task.mjs",
+          "content": "function implementation(template, values) {\n  if(typeof template!==\"string\")return \"\";const get=key=>{let value=values;for(const part of key.split(\".\")){if(value===null||typeof value!==\"object\"||!Object.prototype.hasOwnProperty.call(value,part))return undefined;value=value[part];}return value;},escape=value=>String(value).replace(/&/gu,\"&amp;\").replace(/</gu,\"&lt;\").replace(/>/gu,\"&gt;\").replace(/\"/gu,\"&quot;\").replace(/'/gu,\"&#39;\");return template.replace(/\\{\\{\\{\\s*([\\w$.]+)\\s*\\}\\}\\}|\\{\\{\\s*([\\w$.]+)\\s*\\}\\}/gu,(whole,raw,safe)=>{const value=get(raw??safe);return value===undefined?whole:raw?String(value):escape(value);});\n}\n\nexport function renderTemplate(...args) {\n  return implementation(...args);\n}\n"
+        }
+      ]
+    }
+  ]
+}

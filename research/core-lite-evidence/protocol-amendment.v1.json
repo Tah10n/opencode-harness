@@ -1,0 +1,12 @@
+{
+  "reason": "development calibration is diagnostic and does not gate an untouched independent evaluation set",
+  "observed_development_result": {
+    "plain": "9/10",
+    "core_lite": "9/10"
+  },
+  "candidate_changed": false,
+  "evaluation_tasks_changed": false,
+  "evaluation_outcomes_observed": false,
+  "decision_thresholds_changed": false,
+  "evaluation_authorized": true
+}
