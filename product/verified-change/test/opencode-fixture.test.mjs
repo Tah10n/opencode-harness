@@ -20,6 +20,7 @@ const scenarios = [
   { name: "cancellation terminates descendants", cancel: true, draft: 1, applied: false },
   { name: "wrapped requirement citation still triggers repair", wrapped: true, draft: 1, repair: 2, repairs: 1, reason: "checks_passed", applied: true },
   { name: "shared ambiguous assertions quarantined", shared: true, draft: 1, repairs: 0, reason: "checks_passed", applied: true },
+  { name: "accepted tests visible only during repair", readAcceptance: true, draft: 1, repair: 2, repairs: 1, reason: "checks_passed", applied: true },
 ];
 for (const scenario of scenarios) test(`installed OpenCode CLI: ${scenario.name}`, { skip: !enabled, timeout: 180_000 }, async () => {
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), "verified-change-opencode-"));
@@ -49,6 +50,10 @@ for (const scenario of scenarios) test(`installed OpenCode CLI: ${scenario.name}
     `node -e ${shellQuote(`require('fs').writeFileSync('/workspace/src/${scenario.consumer ? "consumer" : "api"}.mjs',${JSON.stringify(`export const value = ${scenario.repair};\n`)})`)}`,
   ];
   if (scenario.timeout || scenario.cancel) commands[1] = `node -e ${shellQuote("require('child_process').spawn('node',['-e','setInterval(()=>{},100)'],{detached:true,stdio:'ignore'});setInterval(()=>{},100)")}`;
+  if (scenario.readAcceptance) {
+    commands[1] = `node -e ${shellQuote("if(require('fs').existsSync('/acceptance'))throw Error('acceptance leaked into initial draft')")} && ${commands[1]}`;
+    commands[2] = `node -e ${shellQuote("const fs=require('fs');fs.readFileSync('/acceptance/value.test.mjs');fs.readFileSync('/harness/node-reporter.mjs');try{fs.writeFileSync('/acceptance/value.test.mjs','weakened');throw Error('test was writable')}catch(e){if(e.message==='test was writable')throw e}")} && ${commands[2]}`;
+  }
   let requests = 0;
   let cliProcess;
   const requestSummary = [];
@@ -57,7 +62,8 @@ for (const scenario of scenarios) test(`installed OpenCode CLI: ${scenario.name}
     if (!req.url?.endsWith("/chat/completions")) { res.writeHead(404).end(); return; }
     const body = JSON.parse(raw);
     requestSummary.push({ tools: body.tools?.map((tool) => tool.function?.name), stream: body.stream, messages: body.messages?.map((m) => m.role) });
-    if (!body.tools?.length) {
+    const audit = JSON.stringify(body.messages?.filter((m) => m.role === "user").at(-1)).includes("Audit your acceptance assertions");
+    if (!body.tools?.length || audit) {
       res.writeHead(200, { "content-type": "text/event-stream" });
       res.write(`data: ${JSON.stringify({ id: "fixture-title", object: "chat.completion.chunk", created: 1, model: "fixture", choices: [{ index: 0, delta: { role: "assistant", content: "Fixture task" }, finish_reason: "stop" }] })}\n\n`);
       res.end("data: [DONE]\n\n");
@@ -84,6 +90,11 @@ for (const scenario of scenarios) test(`installed OpenCode CLI: ${scenario.name}
   fs.writeFileSync(configFile, JSON.stringify({ provider: { "verified-fixture": { npm: "@ai-sdk/openai-compatible", name: "Local fixture", options: { baseURL: `http://127.0.0.1:${server.address().port}/v1`, apiKey: "fixture-local-only" }, models: { fixture: { name: "fixture", limit: { context: 100000, output: 10000 } } } } } }));
   try {
     const cli = path.join(temp, "installed/node_modules/.bin/opencode-harness");
+    if (scenario.name === "correct draft unchanged" || scenario.broken) {
+      const doctor = spawnSync(cli, ["doctor", "--workspace", repo], { encoding: "utf8" });
+      assert.equal(doctor.status, scenario.broken ? 2 : 0, doctor.stderr);
+      assert.equal(JSON.parse(doctor.stdout).status, scenario.broken ? "check_infrastructure_unavailable" : "execution_path_checked");
+    }
     const result = await new Promise((resolve) => {
       const child = spawn(cli, ["run", "--workspace", repo, "--model", "verified-fixture/fixture", "--", task], { env: { ...process.env, OPENCODE_CONFIG: configFile }, stdio: ["ignore", "pipe", "pipe"] });
       cliProcess = child;

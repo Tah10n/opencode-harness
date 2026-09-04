@@ -8,7 +8,7 @@ export async function resolveImage(image) {
   const result = await command(["docker", "image", "inspect", "--format", "{{.Id}}", image]);
   const id = result.stdout.trim();
   if (result.exitCode !== 0 || !/^sha256:[a-f0-9]{64}$/.test(id)) {
-    throw new Error(`SANDBOX_IMAGE_UNAVAILABLE: install the configured runtime image first: ${image}`);
+    throw new Error(`SANDBOX_IMAGE_UNAVAILABLE: ${image}: ${(result.spawnError ?? result.stderr).trim().slice(0, 2048) || "the configured runtime image is not installed"}`);
   }
   return id;
 }

@@ -7,13 +7,14 @@ It has no imports from historical lab, benchmark, assurance, or profile code.
 The CLI, independent acceptance author, OpenCode session adapter, snapshot
 controller, Docker executor, and structured Node test reporter are implemented.
 The installed command has completed an acceptance-failure-repair cycle using real
-OpenCode and a local scripted provider. **Model-backed development and the full
-requested scenario suite are still pending; this is not a release-ready tool.**
+OpenCode and a local scripted provider. **The complete development program and
+frozen evaluation are still pending; this is not a release-ready tool.**
 
 Install this package into a local prefix without sudo:
 
 ```sh
-npm install --prefix ./harness-install ./product/verified-change
+npm pack ./product/verified-change
+npm install --prefix ./harness-install ./opencode-harness-verified-change-0.1.0.tgz
 ./harness-install/node_modules/.bin/opencode-harness doctor --workspace /absolute/repository
 ./harness-install/node_modules/.bin/opencode-harness run --workspace /absolute/repository -- "Your task"
 ```
@@ -35,11 +36,13 @@ as CLI options or configuration fields; when omitted, OpenCode selects its usual
 defaults. Provider authentication remains in OpenCode's existing storage.
 The agent's repository tools run in isolated containers with only the designated
 source paths writable. The acceptance author gets the initial repository read-only
-and a separate writable output directory. No provider client or credential copy
+and a separate writable output directory, then audits its assertions before D0.
+Only during repair does the primary agent receive a read-only mount of accepted
+tests, with the command's cwd and reporter. No provider client or credential copy
 is introduced. Version 1 rejects dirty worktrees, symlinks, submodules, and hidden
 index flags, and does not currently install project dependencies automatically.
 
-Private artifacts (D0/D1/D2 patches, snapshots, report, assertions, bounded tool
+Private artifacts (D0/D1/D2 patches, snapshots, report, attempt journal, assertions, bounded tool
 diagnostics) are retained in the temporary run directory printed by the CLI.
 Only a fully checked selected patch is applied, after rechecking user HEAD and
 cleanliness. Other outcomes retain their patches for manual inspection.
@@ -83,11 +86,12 @@ actual OpenCode and a localhost scripted provider (no paid model requests):
 VERIFIED_CHANGE_OPENCODE_TEST=1 node --test test/opencode-fixture.test.mjs
 ```
 
-This is mechanism evidence, not product lift. No model-backed development or
-official evaluation has been run for this candidate. `doctor` currently reports
-preflight checks only, explicitly leaving model access and repair unverified.
+This is mechanism evidence, not product lift. Two initial model-backed development
+runs exposed admission and repair-diagnostic defects; their findings are described
+in `development/verified-change/README.md` in the source repository. No official
+evaluation has been run. `doctor` checks the configured project's actual commands
+on an isolated clone, explicitly leaving model access and repair unverified.
 
-Remaining work: all requested installed end-to-end scenarios; full-path doctor;
-hardening/review of the new CLI and adapter; model-backed
+Remaining work: further hardening/review of the new CLI and adapter; model-backed
 development; one preregistered 60-task A/B/C evaluation; independent code/statistics
 review; one PR. No merge, release, or default switch is authorized.

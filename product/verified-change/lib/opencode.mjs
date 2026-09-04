@@ -30,6 +30,13 @@ export async function createOpenCodeSession({ controlDirectory, sandbox, model, 
   const config = { plugin: [pluginPath], permission: { "*": "deny", repository_read: "allow", repository_write: "allow", repository_shell: "allow" } };
   let sessionID;
   return {
+    exposeAcceptedChecks(directory) {
+      const reporter = fileURLToPath(new URL("./node-reporter.mjs", import.meta.url));
+      fs.writeFileSync(configurationPath, JSON.stringify({ sandbox: { ...sandbox, sessionLabel: label,
+        extraMounts: [...(sandbox.extraMounts ?? []),
+          { source: directory, target: "/acceptance", readonly: true },
+          { source: reporter, target: "/harness/node-reporter.mjs", readonly: true }] } }), { mode: 0o600 });
+    },
     async prompt(text, signal) {
       const argv = ["opencode", "run", "--format", "json", "--dir", controlDirectory, "--title", "Verified change"];
       if (model) argv.push("--model", model);

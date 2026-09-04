@@ -11,7 +11,9 @@ export async function runCheck(check, sandbox, signal) {
   const execution = await sandboxCommand({ ...sandbox, readonly: true, argv,
     cwd: check.cwd ? `${sandbox.checkRoot ?? "/workspace"}/${check.cwd}` : (sandbox.checkRoot ?? "/workspace"), timeoutMs: check.timeoutMs ?? 60_000, signal,
     extraMounts: [...(sandbox.extraMounts ?? []), { source: reporter, target: "/harness/node-reporter.mjs" }] });
-  const result = { id: check.id, command: argv, stdout: execution.stdout, stderr: execution.stderr,
+  const result = { id: check.id, command: argv,
+    cwd: check.cwd ? `${sandbox.checkRoot ?? "/workspace"}/${check.cwd}` : (sandbox.checkRoot ?? "/workspace"),
+    stdout: execution.stdout, stderr: execution.stderr,
     truncated: execution.truncated, exitCode: execution.exitCode, status: "infrastructure_error" };
   if (execution.timedOut) return { ...result, status: "timeout" };
   if (execution.cancelled || execution.spawnError || execution.truncated) return result;

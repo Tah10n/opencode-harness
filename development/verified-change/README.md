@@ -47,3 +47,37 @@ Both admission regressions passed through the installed CLI with actual OpenCode
 and a localhost scripted provider. They do not constitute a second model-backed
 development outcome. A real requirement-failure-to-repair cycle is still to be
 demonstrated before a larger model campaign.
+
+## Second actual model run
+
+The config-propagation scenario used the installed bundle from `c19e467`, with
+the same model, variant and per-session timeout. All six generated checks were
+admitted. D0 passed public regression checks and failed three acceptance checks.
+Two repair passes changed two of those outcomes to passing, but the third still
+failed; the command stopped at `repair_limit`, retained D0, and applied no patch.
+
+Manual diagnosis identified two different problems. The normalization checks
+chose disputed interpretations of the relationship between legacy/new fields;
+those changed outcomes are not evidence of two corrected product defects. The
+validation check did expose a clear requirement violation: fractional `delayMs`
+was accepted even though the request explicitly prohibited it. However, the
+failure only said that a TypeError was missing at a loop's assertion line. The
+repair agent could not read the acceptance file to identify the failing input,
+and both repairs missed that error. Original patches, tests and diagnostics remain
+unchanged in private artifacts.
+
+## Development revision 2: actionable, qualified diagnostics
+
+Before implementation, the same independent author audits its assertions for
+alternative valid interpretations and marks uncertain checks ambiguous. This
+does not make generated tests infallible and does not expose D0 to the author.
+After D0, accepted test files and their reporter become read-only inputs to the
+repair session. Diagnostics include cwd, so the exact failing check can be read
+and rerun. Unverified test files are not exposed through this repair mount.
+
+Each model attempt and completed host check is recorded in a small private
+per-run journal, preserving assertions even if a later model request times out.
+Doctor now runs the configured project's checks on an isolated clone and reports
+missing libraries with their actual diagnostics; model access remains explicitly
+unverified by this model-free command. Installed regression tests cover these
+paths. A real successful repair cycle remains pending.
