@@ -6,8 +6,9 @@ It has no imports from historical lab, benchmark, assurance, or profile code.
 
 The CLI, independent acceptance author, OpenCode session adapter, snapshot
 controller, Docker executor, and structured Node test reporter are implemented.
-The installed command has completed an acceptance-failure-repair cycle using real
-OpenCode and a local scripted provider. **The complete development program and
+The installed command has completed acceptance-failure-repair cycles with both a
+local scripted provider and a real model. The real run also exposed unresolved
+ambiguity in another generated assertion. **The complete development program and
 frozen evaluation are still pending; this is not a release-ready tool.**
 
 Install this package into a local prefix without sudo:
@@ -86,8 +87,8 @@ actual OpenCode and a localhost scripted provider (no paid model requests):
 VERIFIED_CHANGE_OPENCODE_TEST=1 node --test test/opencode-fixture.test.mjs
 ```
 
-This is mechanism evidence, not product lift. Two initial model-backed development
-runs exposed admission and repair-diagnostic defects; their findings are described
+This is mechanism evidence, not product lift. Three initial model-backed development
+runs exposed admission, repair-diagnostic and assertion-ambiguity issues; their findings are described
 in `development/verified-change/README.md` in the source repository. No official
 evaluation has been run. `doctor` checks the configured project's actual commands
 on an isolated clone, explicitly leaving model access and repair unverified.

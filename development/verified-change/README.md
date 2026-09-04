@@ -7,10 +7,11 @@ a model request:
 ```sh
 node development/verified-change/materialize.mjs queue-cancellation
 node development/verified-change/materialize.mjs config-propagation
+node development/verified-change/materialize.mjs transactional-store
 ```
 
 The planned development set is approximately 24 repository scenarios. Only these
-initial two have been authored so far. No official evaluation has started.
+initial three have been authored so far. No official evaluation has started.
 
 ## First actual model run
 
@@ -80,4 +81,30 @@ per-run journal, preserving assertions even if a later model request times out.
 Doctor now runs the configured project's checks on an isolated clone and reports
 missing libraries with their actual diagnostics; model access remains explicitly
 unverified by this model-free command. Installed regression tests cover these
-paths. A real successful repair cycle remains pending.
+paths. The following replay tests this revision with the real model.
+
+## Third actual model run: first real successful repair cycle
+
+A fresh config-propagation repository ran with the installed bundle from
+`0fe2e151218672c9abdf764daed15a6b95574ff1`, retaining the previous run unchanged.
+The same Luna/low binding and per-session limits were used. D0 passed public
+regressions but failed normalization and fractional-delay validation. One repair
+produced D1, which passed public checks and all six admitted acceptance checks;
+the selected patch was applied to the disposable development repository.
+
+Inspection of D0/D1 confirms a real requirement correction: the original
+nonnegative-number check for delayMs became the integer check required by the
+task. This demonstrates a model-backed requirement failure, reproducible test,
+repair and checked result through the installed product path.
+
+It does **not** establish product lift or complete semantic correctness. The
+repair also changed the returned legacy retries field to match the author's
+disputed interpretation. The author's self-audit had not marked that assertion
+ambiguous. This unresolved uncertainty-handling limitation must remain visible;
+do not count both changed assertions as two validated fixes or rewrite these
+development outcomes as benchmark evidence.
+
+Status: three model-backed runs across two distinct development tasks, two
+substantive implementation revisions used, one remaining under the requested
+limit. The approximately 24-case development set, fresh 60-task frozen A/B/C
+evaluation, statistical analysis, final independent review and PR remain pending.

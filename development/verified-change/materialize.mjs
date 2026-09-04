@@ -4,8 +4,9 @@ import path from "node:path";
 import { spawnSync } from "node:child_process";
 import * as queue from "./queue-cancellation.mjs";
 import * as config from "./config-propagation.mjs";
+import * as store from "./transactional-store.mjs";
 
-const cases = { "queue-cancellation": queue, "config-propagation": config };
+const cases = { "queue-cancellation": queue, "config-propagation": config, "transactional-store": store };
 const selected = process.argv[2] ?? "queue-cancellation";
 if (!Object.hasOwn(cases, selected)) throw new Error("Unknown development case");
 const { task, files } = cases[selected];
