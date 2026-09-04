@@ -75,6 +75,22 @@ test("unsupported and ambiguous assertions remain unverified", () => {
   assert.deepEqual(result.unverified.map((h) => h.reason), ["ambiguous_requirement", "unsupported_citation"]);
 });
 
+test("line-wrapped prose citations remain grounded without changing inline literals", () => {
+  const wrapped = { ...acceptance, basis: { source: "task", quote: "Reject negative timeouts." } };
+  assert.equal(acceptHypotheses([wrapped], { task: "Reject negative\ntimeouts." }).accepted.length, 1);
+  const spaces = { ...acceptance, basis: { source: "task", quote: 'Return " ".' } };
+  assert.equal(acceptHypotheses([spaces], { task: 'Return "  ".' }).accepted.length, 0);
+});
+
+test("an accepted entry cannot execute ambiguous assertions through a shared file", () => {
+  const result = acceptHypotheses([
+    { ...acceptance, files: ["shared.test.mjs"] },
+    { ...acceptance, id: "unsupported", confidence: "ambiguous", files: ["shared.test.mjs"] },
+  ], { task });
+  assert.equal(result.accepted.length, 0);
+  assert.equal(result.unverified.find((h) => h.id === acceptance.id).reason, "shares_file_with_unverified_assertions");
+});
+
 test("flaky assertions do not cause code changes", async () => {
   let calls = 0;
   const f = fixture({}, { verify: async (_snapshot, checks) => checks.map((c) => ({ id: c.id, status: ++calls <= 2 ? "assertion_failed" : "passed" })) });

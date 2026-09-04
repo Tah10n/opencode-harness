@@ -8,7 +8,20 @@ import { fileURLToPath } from "node:url";
 import test from "node:test";
 
 const enabled = process.env.VERIFIED_CHANGE_OPENCODE_TEST === "1";
-test("installed CLI uses actual OpenCode to repair a missed requirement with a local provider", { skip: !enabled, timeout: 180_000 }, async () => {
+const scenarios = [
+  { name: "missed requirement repaired", draft: 1, repair: 2, repairs: 1, reason: "checks_passed", applied: true },
+  { name: "correct draft unchanged", draft: 2, repairs: 0, reason: "checks_passed", applied: true },
+  { name: "missed consumer repaired", draft: 2, repair: 2, consumer: true, repairs: 1, reason: "checks_passed", applied: true },
+  { name: "unsupported assertion ignored", draft: 1, ambiguous: true, repairs: 0, reason: "checks_passed", applied: true },
+  { name: "broken runtime does not trigger repair", draft: 1, broken: true, repairs: 0, reason: "verification_unavailable", applied: false },
+  { name: "regressing repair rejected", draft: 1, repair: -1, repairs: 1, reason: "repair_regression", applied: false },
+  { name: "concurrent user changes preserved", draft: 2, concurrent: true, repairs: 0, reason: "checks_passed", applied: false },
+  { name: "session timeout terminates descendants", timeout: true, draft: 1, applied: false },
+  { name: "cancellation terminates descendants", cancel: true, draft: 1, applied: false },
+  { name: "wrapped requirement citation still triggers repair", wrapped: true, draft: 1, repair: 2, repairs: 1, reason: "checks_passed", applied: true },
+  { name: "shared ambiguous assertions quarantined", shared: true, draft: 1, repairs: 0, reason: "checks_passed", applied: true },
+];
+for (const scenario of scenarios) test(`installed OpenCode CLI: ${scenario.name}`, { skip: !enabled, timeout: 180_000 }, async () => {
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), "verified-change-opencode-"));
   const root = fileURLToPath(new URL("..", import.meta.url));
   const pack = spawnSync("npm", ["pack", "--json", "--ignore-scripts", "--cache", path.join(temp, "cache"), "--pack-destination", temp], { cwd: root, encoding: "utf8" });
@@ -19,21 +32,25 @@ test("installed CLI uses actual OpenCode to repair a missed requirement with a l
   assert.equal(install.status, 0, install.stderr);
   const repo = path.join(temp, "repo"); fs.mkdirSync(repo); fs.mkdirSync(path.join(repo, "src"));
   fs.writeFileSync(path.join(repo, "src/api.mjs"), "export const value = 0;\n");
-  fs.writeFileSync(path.join(repo, "regression.test.mjs"), "import test from 'node:test';import assert from 'node:assert/strict';import {value} from './src/api.mjs';test('public type',()=>assert.equal(typeof value,'number'));\n");
-  fs.writeFileSync(path.join(repo, ".opencode-harness.json"), JSON.stringify({ version: 1, image: "node:24.19.0-bookworm-slim", sourcePaths: ["src"], protectedPaths: ["regression.test.mjs", ".opencode-harness.json"], checks: [{ id: "public", kind: "node-test", files: ["regression.test.mjs"] }], sessionTimeoutMs: 40_000 }));
+  if (scenario.consumer) fs.writeFileSync(path.join(repo, "src/consumer.mjs"), "export const value = 0;\n");
+  fs.writeFileSync(path.join(repo, "regression.test.mjs"), scenario.broken ? "import 'nonexistent-runtime-library';\n" : "import test from 'node:test';import assert from 'node:assert/strict';import {value} from './src/api.mjs';test('public contract',()=>{assert.equal(typeof value,'number');assert.ok(value>=0)});\n");
+  fs.writeFileSync(path.join(repo, ".opencode-harness.json"), JSON.stringify({ version: 1, image: "node:24.19.0-bookworm-slim", sourcePaths: ["src"], protectedPaths: ["regression.test.mjs", ".opencode-harness.json"], checks: [{ id: "public", kind: "node-test", files: ["regression.test.mjs"] }], sessionTimeoutMs: scenario.timeout ? 5000 : 40_000 }));
   for (const args of [["init"], ["add", "."], ["-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid", "commit", "-m", "fixture"]]) {
     const r = spawnSync("git", ["-c", "core.hooksPath=/dev/null", ...args], { cwd: repo, encoding: "utf8" });
     assert.equal(r.status, 0, r.stderr);
   }
-  const task = "The exported value must equal 2. Preserve the public numeric API.";
-  const testBytes = "import test from 'node:test';import assert from 'node:assert/strict';import {value} from '/workspace/src/api.mjs';test('new requirement',()=>assert.equal(value,2));\n";
-  const manifest = [{ id: "value", kind: "node-test", files: ["value.test.mjs"], confidence: "unambiguous", basis: { source: "task", quote: "The exported value must equal 2." } }];
+  const task = scenario.wrapped ? "The exported value\nmust equal 2. Preserve the public numeric API." : "The exported value must equal 2. Preserve the public numeric API.";
+  const testBytes = `import test from 'node:test';import assert from 'node:assert/strict';import {value} from '/workspace/src/${scenario.consumer ? "consumer" : "api"}.mjs';test('new requirement',()=>assert.equal(value,${scenario.ambiguous ? 77 : 2}));\n${scenario.shared ? "test('unsupported assertion',()=>assert.equal(value,77));" : ""}`;
+  const manifest = [{ id: "value", kind: "node-test", files: ["value.test.mjs"], confidence: scenario.ambiguous ? "ambiguous" : "unambiguous", basis: { source: "task", quote: scenario.ambiguous ? "The value must equal 77." : "The exported value must equal 2." } }];
+  if (scenario.shared) manifest.push({ ...manifest[0], id: "uncertain", confidence: "ambiguous", basis: { source: "task", quote: "The value must equal 77." } });
   const commands = [
     `node -e ${shellQuote(`const fs=require('fs');fs.writeFileSync('/acceptance/value.test.mjs',${JSON.stringify(testBytes)});fs.writeFileSync('/acceptance/manifest.json',${JSON.stringify(JSON.stringify(manifest))});`)}`,
-    `node -e ${shellQuote("require('fs').writeFileSync('/workspace/src/api.mjs','export const value = 1;\\n')")}`,
-    `node -e ${shellQuote("require('fs').writeFileSync('/workspace/src/api.mjs','export const value = 2;\\n')")}`,
+    `node -e ${shellQuote(`require('fs').writeFileSync('/workspace/src/api.mjs',${JSON.stringify(`export const value = ${scenario.draft};\n`)});process.stdout.write('oauth credential permission')`)}`,
+    `node -e ${shellQuote(`require('fs').writeFileSync('/workspace/src/${scenario.consumer ? "consumer" : "api"}.mjs',${JSON.stringify(`export const value = ${scenario.repair};\n`)})`)}`,
   ];
+  if (scenario.timeout || scenario.cancel) commands[1] = `node -e ${shellQuote("require('child_process').spawn('node',['-e','setInterval(()=>{},100)'],{detached:true,stdio:'ignore'});setInterval(()=>{},100)")}`;
   let requests = 0;
+  let cliProcess;
   const requestSummary = [];
   const server = http.createServer(async (req, res) => {
     let raw = ""; for await (const chunk of req) raw += chunk;
@@ -48,6 +65,8 @@ test("installed CLI uses actual OpenCode to repair a missed requirement with a l
     }
     const index = Math.floor(requests / 2), toolTurn = requests % 2 === 0;
     requests += 1;
+    if (scenario.cancel && index === 1 && toolTurn) setTimeout(() => cliProcess.kill("SIGINT"), 1500);
+    if (scenario.concurrent && index === 1 && !toolTurn) fs.writeFileSync(path.join(repo, "src/api.mjs"), "export const value = 99; // user change\n");
     if (toolTurn && !body.tools?.some((tool) => tool.function?.name === "repository_shell")) {
       res.writeHead(500).end("isolated tools missing"); return;
     }
@@ -67,19 +86,35 @@ test("installed CLI uses actual OpenCode to repair a missed requirement with a l
     const cli = path.join(temp, "installed/node_modules/.bin/opencode-harness");
     const result = await new Promise((resolve) => {
       const child = spawn(cli, ["run", "--workspace", repo, "--model", "verified-fixture/fixture", "--", task], { env: { ...process.env, OPENCODE_CONFIG: configFile }, stdio: ["ignore", "pipe", "pipe"] });
+      cliProcess = child;
       let stdout = "", stderr = "";
       child.stdout.on("data", (c) => { stdout += c; }); child.stderr.on("data", (c) => { stderr += c; });
       child.on("error", (error) => resolve({ code: -1, stdout, stderr: error.message }));
       child.on("close", (code) => resolve({ code, stdout, stderr }));
     });
-    assert.equal(result.code, 0, `${result.stderr}\n${result.stdout}\n${JSON.stringify(requestSummary)}`);
+    assert.equal(result.code, scenario.applied ? 0 : 2, `${result.stderr}\n${result.stdout}\n${JSON.stringify(requestSummary)}`);
+    if (scenario.timeout || scenario.cancel) {
+      if (scenario.timeout) assert.match(result.stderr, /OPENCODE_SESSION_TIMEOUT/);
+      else assert.equal(JSON.parse(result.stdout).stopReason, "cancelled");
+      const output = result.stderr.split("\n").find((line) => line.startsWith("Private run artifacts: ")).slice("Private run artifacts: ".length);
+      const session = JSON.parse(fs.readFileSync(path.join(output, "primary-control/session.json"), "utf8"));
+      const remaining = spawnSync("docker", ["ps", "-aq", "--filter", `label=verified-change.session=${session.sandbox.sessionLabel}`], { encoding: "utf8" });
+      assert.equal(remaining.status, 0, remaining.stderr);
+      assert.equal(remaining.stdout.trim(), "", "all session containers and detached descendants must be gone");
+      assert.match(fs.readFileSync(path.join(repo, "src/api.mjs"), "utf8"), /value = 0/);
+      return;
+    }
     const report = JSON.parse(result.stdout);
-    assert.equal(report.stopReason, "checks_passed");
-    assert.equal(report.repairs, 1);
-    assert.equal(report.selected.name, "D1");
-    assert.equal(report.application.applied, true);
-    assert.equal(requests, 6);
-    assert.match(fs.readFileSync(path.join(repo, "src/api.mjs"), "utf8"), /value = 2/);
+    assert.equal(report.stopReason, scenario.reason);
+    assert.equal(report.repairs, scenario.repairs);
+    assert.equal(report.selected.name, scenario.repairs && scenario.applied ? "D1" : "D0");
+    assert.equal(report.application.applied, scenario.applied);
+    assert.equal(requests, 4 + 2 * scenario.repairs);
+    if (scenario.ambiguous) assert.equal(report.unverified.length, 1);
+    if (scenario.shared) assert.equal(report.unverified.length, 2);
+    const expectedValue = scenario.concurrent ? 99 : scenario.applied ? scenario.consumer ? scenario.draft : scenario.repair ?? scenario.draft : 0;
+    assert.match(fs.readFileSync(path.join(repo, "src/api.mjs"), "utf8"), new RegExp(`value = ${expectedValue}`));
+    if (scenario.consumer) assert.match(fs.readFileSync(path.join(repo, "src/consumer.mjs"), "utf8"), /value = 2/);
   } finally { await new Promise((resolve) => server.close(resolve)); }
 });
 function shellQuote(value) { return `'${value.replaceAll("'", "'\\''")}'`; }

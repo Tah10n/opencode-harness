@@ -46,15 +46,26 @@ export function acceptHypotheses(hypotheses, contracts) {
     ids.add(hypothesis.id);
     const citation = hypothesis.basis;
     const source = citation && contracts[citation.source];
+    // Prose may be line-wrapped by the user or the author. Preserve inline
+    // whitespace and punctuation while allowing equivalent wrapped quotations.
+    const unwrap = (text) => text.replace(/[ \t]*\r?\n[ \t]*/g, " ");
     const grounded = typeof source === "string" && typeof citation.quote === "string"
-      && citation.quote.trim().length > 0 && source.includes(citation.quote);
+      && citation.quote.trim().length > 0 && unwrap(source).includes(unwrap(citation.quote));
     if (!grounded || hypothesis.confidence !== "unambiguous") {
       unverified.push({ ...hypothesis, reason: grounded ? "ambiguous_requirement" : "unsupported_citation" });
     } else {
       accepted.push(hypothesis);
     }
   }
-  return { accepted, unverified };
+  const fileKeys = (check) => (check.files ?? []).map((file) => `${check.cwd ?? ""}/${file}`);
+  const quarantined = new Set(unverified.flatMap(fileKeys));
+  const executable = [];
+  for (const check of accepted) {
+    if (fileKeys(check).some((file) => quarantined.has(file))) {
+      unverified.push({ ...check, reason: "shares_file_with_unverified_assertions" });
+    } else executable.push(check);
+  }
+  return { accepted: executable, unverified };
 }
 
 /**
