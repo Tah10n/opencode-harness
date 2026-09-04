@@ -15,6 +15,7 @@ function fixture(states, options = {}) {
       return checks.map((c) => ({ id: c.id, status: states[snapshot][c.id], stderr: "actual assertion detail" }));
     },
     repair: async (diagnostic) => { repairs.push(diagnostic); },
+    assess: async () => ({ disputed: [] }),
     ...options,
   };
   return { repairs, verified, run: () => runController({ task, checks: [{ id: "regression" }], hypotheses: [acceptance], contracts: { task }, host }) };
@@ -122,4 +123,66 @@ test("AbortError during repair retains D0 and accumulated diagnostics", async ()
   assert.equal(result.stopReason, "cancelled");
   assert.equal(result.selected, "D0");
   assert.equal(result.snapshots[0].checks[0].stderr, "assertion");
+});
+
+test("disputed assertions cannot drive repairs or be reported confirmed", async () => {
+  const f = fixture({ D0: { regression: "passed", negative: "assertion_failed" } }, {
+    assess: async () => ({ disputed: [{ id: "negative", basis: acceptance.basis, reason: "The assertion chooses an unspecified return representation." }] }),
+  });
+  const result = await f.run();
+  assert.equal(f.repairs.length, 0);
+  assert.equal(result.selected, "D0");
+  assert.equal(result.confirmed.length, 0);
+  assert.equal(result.unverified[0].reason, "disputed_assertion");
+});
+
+test("a dispute cannot remove an existing regression or cite invented requirements", async () => {
+  for (const dispute of [
+    { id: "regression", basis: acceptance.basis, reason: "disagree" },
+    { id: "negative", basis: { source: "task", quote: "Always return 42" }, reason: "disagree" },
+  ]) {
+    const f = fixture({ D0: { regression: "assertion_failed", negative: "assertion_failed" } }, { assess: async () => ({ disputed: [dispute] }) });
+    await assert.rejects(f.run, /ASSESSMENT_/);
+    assert.equal(f.repairs.length, 0);
+  }
+});
+
+test("a disputed expectation does not prevent repair of a separate confirmed defect", async () => {
+  let repair;
+  const result = await runController({ task, checks: [{ id: "regression" }], contracts: { task },
+    hypotheses: [acceptance, { ...acceptance, id: "representation" }],
+    host: {
+      draft: async () => {}, snapshot: async name => name, scope: async () => ({ passed: true }),
+      verify: async (snapshot, checks) => checks.map(c => ({ id: c.id, status: snapshot === "D0" && c.id !== "regression" ? "assertion_failed" : "passed", stderr: "stable assertion" })),
+      assess: async () => ({ disputed: [{ id: "representation", basis: acceptance.basis, reason: "Return shape is unspecified." }] }),
+      repair: async input => { repair = input; },
+    } });
+  assert.deepEqual(repair.diagnostics.map(d => d.check.id), ["negative"]);
+  assert.equal(result.selected, "D1");
+  assert.deepEqual(result.confirmed.map(c => c.id), ["negative"]);
+  assert.equal(result.unverified[0].id, "representation");
+});
+
+test('quarantine treats cwd aliases as the same file and follows shared-file chains', () => {
+  const result = acceptHypotheses([
+    {...acceptance,id:'tail',files:['b.test.mjs']},
+    {...acceptance,id:'bridge',files:['group/shared.test.mjs','b.test.mjs']},
+    {...acceptance,id:'disputed',cwd:'group',files:['shared.test.mjs'],confidence:'ambiguous'},
+  ], {task});
+  assert.equal(result.accepted.length,0);
+  assert.equal(result.unverified.length,3);
+});
+
+test('assessment quarantines aliases before another repair', async () => {
+  let repairs=0;
+  const result=await runController({task,checks:[{id:'regression'}],contracts:{task},
+    hypotheses:[{...acceptance,id:'a',cwd:'group',files:['shared.test.mjs']},{...acceptance,id:'b',files:['group/shared.test.mjs']}],
+    host:{draft:async()=>{},snapshot:async name=>name,scope:async()=>({passed:true}),
+      verify:async(_,checks)=>checks.map(c=>({id:c.id,status:c.id==='regression'?'passed':'assertion_failed',stderr:'stable'})),
+      assess:async()=>({disputed:[{id:'a',basis:acceptance.basis,reason:'Competing valid interpretation.'}]}),
+      repair:async()=>{repairs++;},
+    }});
+  assert.equal(repairs,0);
+  assert.equal(result.confirmed.length,0);
+  assert.deepEqual(result.unverified.map(c=>c.id).sort(),['a','b']);
 });

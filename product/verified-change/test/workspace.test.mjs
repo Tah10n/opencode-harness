@@ -116,3 +116,17 @@ test("a non-overlapping user edit during publication is not merged into a suppos
     assert.doesNotMatch(after, /candidate change/);
   } finally { watcher.close(); }
 });
+
+test('draft import ignores inherited Git redirection and preserves the user worktree', async () => {
+  const f=fixture();
+  const original=await inspectWorkspace(f.repo);
+  const candidate=await createCandidate(original,path.join(f.root,'candidate'));
+  const patch=path.join(f.root,'input.patch');
+  fs.writeFileSync(patch,'diff --git a/src/api.mjs b/src/api.mjs\n--- a/src/api.mjs\n+++ b/src/api.mjs\n@@ -1 +1 @@\n-export const value = 1;\n+export const value = 2;\n');
+  const modulePath=new URL('../lib/workspace.mjs',import.meta.url).href;
+  const run=spawnSync(process.execPath,['--input-type=module','-e',`import {importDraft} from ${JSON.stringify(modulePath)}; await importDraft(${JSON.stringify(candidate)},${JSON.stringify(patch)});`],{encoding:'utf8',env:{...process.env,GIT_DIR:path.join(f.repo,'.git'),GIT_WORK_TREE:f.repo,GIT_CONFIG_COUNT:'1',GIT_CONFIG_KEY_0:'core.worktree',GIT_CONFIG_VALUE_0:f.repo}});
+  assert.equal(run.status,0,run.stderr);
+  assert.match(fs.readFileSync(path.join(candidate,'src/api.mjs'),'utf8'),/value = 2/);
+  assert.match(fs.readFileSync(path.join(f.repo,'src/api.mjs'),'utf8'),/value = 1/);
+  assert.equal(f.git('status','--porcelain'),'');
+});

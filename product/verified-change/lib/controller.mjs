@@ -57,14 +57,20 @@ export function acceptHypotheses(hypotheses, contracts) {
       accepted.push(hypothesis);
     }
   }
-  const fileKeys = (check) => (check.files ?? []).map((file) => `${check.cwd ?? ""}/${file}`);
+  const fileKeys = (check) => (check.files ?? []).map((file) => check.cwd ? `${check.cwd}/${file}` : file);
   const quarantined = new Set(unverified.flatMap(fileKeys));
-  const executable = [];
-  for (const check of accepted) {
-    if (fileKeys(check).some((file) => quarantined.has(file))) {
+  let executable = accepted;
+  let changed;
+  do {
+    changed = false;
+    executable = executable.filter((check) => {
+      if (!fileKeys(check).some((file) => quarantined.has(file))) return true;
       unverified.push({ ...check, reason: "shares_file_with_unverified_assertions" });
-    } else executable.push(check);
-  }
+      fileKeys(check).forEach((file) => quarantined.add(file));
+      changed = true;
+      return false;
+    });
+  } while (changed);
   return { accepted: executable, unverified };
 }
 
@@ -76,7 +82,8 @@ export function acceptHypotheses(hypotheses, contracts) {
 export async function runController({ task, checks, hypotheses, contracts, host, signal }) {
   if (typeof task !== "string" || !task.trim()) throw new Error("TASK_REQUIRED");
   const { accepted, unverified } = acceptHypotheses(hypotheses, contracts);
-  const allChecks = [...checks, ...accepted];
+  let allChecks = [...checks, ...accepted];
+  const assessed = new Set();
   if (new Set(allChecks.map((c) => c.id)).size !== allChecks.length) throw new Error("DUPLICATE_CHECK_ID");
   const report = {
     snapshots: [], selected: null, repairs: 0, stopReason: null,
@@ -108,16 +115,16 @@ export async function runController({ task, checks, hypotheses, contracts, host,
     if (environmentFailure(current.checks)) return stop("verification_unavailable");
     if (complete(current.checks, allChecks)) {
       report.selected = current.snapshot;
-      report.confirmed = accepted.map((c) => ({ id: c.id, basis: c.basis }));
+      report.confirmed = accepted.filter((c) => allChecks.includes(c)).map((c) => ({ id: c.id, basis: c.basis }));
       return stop("checks_passed");
     }
     // A repair that loses a check known to pass in D0 is rejected, even if it
     // fixes another requirement. Hidden regressions remain evaluator-owned.
-    const passedBefore = report.snapshots[0].checks.filter((r) => r.status === "passed");
+    const passedBefore = report.snapshots[0].checks.filter((r) => r.status === "passed" && allChecks.some((c) => c.id === r.id));
     if (attempt > 0 && passedBefore.some((r) => current.checks.find((c) => c.id === r.id)?.status !== "passed")) {
       return stop("repair_regression");
     }
-    const failures = current.checks.filter((r) => r.status === "assertion_failed");
+    let failures = current.checks.filter((r) => r.status === "assertion_failed" && allChecks.some((c) => c.id === r.id));
     if (failures.length === 0) return stop("requirements_unverified");
     if (attempt === 2) return stop("repair_limit");
     // Reproduce before spending a model call. Infrastructure failures are not
@@ -129,11 +136,45 @@ export async function runController({ task, checks, hypotheses, contracts, host,
     if (environmentFailure(repeated)) return stop("verification_unavailable");
     if (!repeated.every((r) => r.status === "assertion_failed"
       && failureIdentity(r) === failureIdentity(failures.find((f) => f.id === r.id)))) return stop("failure_not_reproducible");
+    const pending = accepted.filter((c) => failures.some((f) => f.id === c.id) && !assessed.has(c.id));
+    if (pending.length) {
+      if (!host.assess) throw new Error("ASSESSMENT_REQUIRED");
+      const decision = await host.assess({ task, snapshot: current.snapshot, checks: pending,
+        failures: failures.filter((f) => pending.some((c) => c.id === f.id)), attempt: attempt + 1 }, signal);
+      if (signal?.aborted) return stop("cancelled");
+      if (!decision || !Array.isArray(decision.disputed)) throw new Error("ASSESSMENT_INVALID");
+      const seen = new Set();
+      for (const dispute of decision.disputed) {
+        if (!pending.some((c) => c.id === dispute.id) || seen.has(dispute.id)
+          || typeof dispute.reason !== "string" || !dispute.reason.trim()) throw new Error("ASSESSMENT_INVALID");
+        seen.add(dispute.id);
+        const grounded = acceptHypotheses([{ id: dispute.id, confidence: "unambiguous", basis: dispute.basis }], contracts);
+        if (!grounded.accepted.length) throw new Error("ASSESSMENT_UNGROUNDED");
+      }
+      current.assessment = decision;
+      pending.forEach((c) => assessed.add(c.id));
+      const reconsidered = acceptHypotheses(accepted.map((c) => seen.has(c.id)
+        ? { ...c, confidence: "ambiguous" } : c), contracts);
+      const removed = new Set(reconsidered.unverified.map((c) => c.id));
+      for (const check of reconsidered.unverified) {
+        if (!report.unverified.some((c) => c.id === check.id)) report.unverified.push({ ...check,
+          reason: seen.has(check.id) ? "disputed_assertion" : check.reason,
+          dispute: decision.disputed.find((d) => d.id === check.id) });
+      }
+      allChecks = allChecks.filter((c) => !removed.has(c.id));
+      failures = failures.filter((f) => allChecks.some((c) => c.id === f.id));
+      if (!failures.length) {
+        if (!allChecks.length || !complete(current.checks, allChecks)) return stop("requirements_unverified");
+        report.selected = current.snapshot;
+        report.confirmed = accepted.filter((c) => allChecks.includes(c)).map((c) => ({ id: c.id, basis: c.basis }));
+        return stop("checks_passed");
+      }
+    }
     const diagnostics = failures.map((failure) => ({
       check: allChecks.find((c) => c.id === failure.id), first: failure,
       reproduced: repeated.find((r) => r.id === failure.id),
     }));
-    await host.repair({ task, snapshot: current.snapshot, diagnostics, attempt: attempt + 1 }, signal);
+    await host.repair({ task, snapshot: current.snapshot, diagnostics, checks: allChecks, unverified: report.unverified, attempt: attempt + 1 }, signal);
     report.repairs += 1;
     const name = `D${attempt + 1}`;
     const snapshot = await host.snapshot(name);

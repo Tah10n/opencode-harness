@@ -6,12 +6,22 @@ import { relativePath } from "./config.mjs";
 
 const gitEnv = { PATH: process.env.PATH, HOME: process.env.HOME, TMPDIR: process.env.TMPDIR,
   GIT_CONFIG_NOSYSTEM: "1", GIT_CONFIG_GLOBAL: "/dev/null", GIT_TERMINAL_PROMPT: "0" };
-async function git(workspace, args, maxBytes = 8 * 1024 * 1024, extraEnv = {}) {
-  const result = await command(["git", "-c", "core.hooksPath=/dev/null", "-c", "core.autocrlf=false", ...args], { cwd: workspace, env: { ...gitEnv, ...extraEnv }, maxBytes });
+async function git(workspace, args, maxBytes = 8 * 1024 * 1024, extraEnv = {}, signal) {
+  const result = await command(["git", "-c", "core.hooksPath=/dev/null", "-c", "core.autocrlf=false", ...args], { cwd: workspace, env: { ...gitEnv, ...extraEnv }, maxBytes, signal });
   if (result.exitCode !== 0 || result.truncated || result.timedOut || result.spawnError) {
     throw new Error(`GIT_OPERATION_FAILED: ${args[0]}: ${result.stderr}`);
   }
   return result.stdout;
+}
+
+export async function importDraft(candidate, patch, signal) {
+  if (signal?.aborted) throw new DOMException("cancelled", "AbortError");
+  if (fs.statSync(patch).size) {
+    await git(candidate, ["apply", "--check", "--", patch], undefined, {}, signal);
+    await git(candidate, ["apply", "--", patch], undefined, {}, signal);
+  }
+  if (signal?.aborted) throw new DOMException("cancelled", "AbortError");
+  return treeFingerprint(candidate);
 }
 
 export async function inspectWorkspace(directory) {

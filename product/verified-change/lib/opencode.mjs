@@ -30,12 +30,14 @@ export async function createOpenCodeSession({ controlDirectory, sandbox, model, 
   const config = { plugin: [pluginPath], permission: { "*": "deny", repository_read: "allow", repository_write: "allow", repository_shell: "allow" } };
   let sessionID;
   return {
-    exposeAcceptedChecks(directory) {
+    exposeAcceptedChecks(directory, { assessmentDirectory } = {}) {
       const reporter = fileURLToPath(new URL("./node-reporter.mjs", import.meta.url));
       fs.writeFileSync(configurationPath, JSON.stringify({ sandbox: { ...sandbox, sessionLabel: label,
+        ...(assessmentDirectory ? { writablePaths: [] } : {}),
         extraMounts: [...(sandbox.extraMounts ?? []),
           { source: directory, target: "/acceptance", readonly: true },
-          { source: reporter, target: "/harness/node-reporter.mjs", readonly: true }] } }), { mode: 0o600 });
+          { source: reporter, target: "/harness/node-reporter.mjs", readonly: true },
+          ...(assessmentDirectory ? [{ source: assessmentDirectory, target: "/assessment", readonly: false }] : [])] } }), { mode: 0o600 });
     },
     async prompt(text, signal) {
       const argv = ["opencode", "run", "--format", "json", "--dir", controlDirectory, "--title", "Verified change"];

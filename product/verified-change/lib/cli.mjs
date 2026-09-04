@@ -5,9 +5,9 @@ import path from "node:path";
 import { validateConfig, validateCheck } from "./config.mjs";
 import { command } from "./process.mjs";
 import { resolveImage, sandboxCommand } from "./sandbox.mjs";
-import { inspectWorkspace, createCandidate, snapshotCandidate, checkScope, publishSnapshot, treeFingerprint } from "./workspace.mjs";
+import { inspectWorkspace, createCandidate, snapshotCandidate, checkScope, publishSnapshot, treeFingerprint, importDraft } from "./workspace.mjs";
 import { createOpenCodeSession } from "./opencode.mjs";
-import { runController, acceptHypotheses } from "./controller.mjs";
+import { runController } from "./controller.mjs";
 import { runCheck } from "./checks.mjs";
 
 function argumentsFor(argv) {
@@ -15,11 +15,12 @@ function argumentsFor(argv) {
   while (argv.length) {
     const arg = argv.shift();
     if (arg === "--") { args.task = argv.join(" "); break; }
-    if (!["--workspace", "--model", "--variant"].includes(arg) || !argv.length) throw new Error("USAGE: opencode-harness run|doctor --workspace <repository> [--model provider/model] [--variant variant] -- <task>");
+    if (!["--workspace", "--model", "--variant", "--draft-patch", "--time-limit-ms"].includes(arg) || !argv.length) throw new Error("USAGE: opencode-harness run|doctor --workspace <repository> [--model provider/model] [--variant variant] [--draft-patch file] [--time-limit-ms milliseconds] -- <task>");
     args[arg.slice(2)] = argv.shift();
   }
   if (!["run", "doctor"].includes(args.command) || !args.workspace) throw new Error("USAGE: opencode-harness run|doctor --workspace <repository> -- <task>");
   if (args.command === "run" && !args.task?.trim()) throw new Error("TASK_REQUIRED");
+  if (args["time-limit-ms"] !== undefined && (!/^\d+$/.test(args["time-limit-ms"]) || !Number.isSafeInteger(Number(args["time-limit-ms"])) || Number(args["time-limit-ms"]) < 1 || Number(args["time-limit-ms"]) > 2_147_483_647)) throw new Error("TIME_LIMIT_INVALID");
   return args;
 }
 
@@ -48,6 +49,8 @@ async function main() {
   fs.chmodSync(output, 0o700);
   console.error(`Private run artifacts: ${output}`);
   const abort = new AbortController();
+  let deadlineExceeded = false;
+  const deadline = args["time-limit-ms"] ? setTimeout(() => { deadlineExceeded = true; abort.abort(); }, Number(args["time-limit-ms"])) : null;
   const cancel = () => abort.abort();
   process.once("SIGINT", cancel); process.once("SIGTERM", cancel);
   const usage = [];
@@ -92,21 +95,35 @@ async function main() {
       if (hypothesis.kind !== "node-test") throw new Error("ACCEPTANCE_KIND_INVALID");
       if (config.checks.some((check) => check.id === hypothesis.id)) throw new Error("ACCEPTANCE_ID_COLLIDES_WITH_EXISTING_CHECK");
     }
-    const repairChecks = path.join(output, "repair-checks");
-    fs.mkdirSync(repairChecks);
-    const { accepted } = acceptHypotheses(hypotheses, contracts);
-    for (const check of accepted) {
+    const prepareChecks = (checks, name) => {
+      const directory = path.join(output, name);
+      fs.mkdirSync(directory);
+      for (const check of checks.filter((c) => hypotheses.includes(c))) {
       for (const file of check.files) {
         const relative = check.cwd ? `${check.cwd}/${file}` : file;
-        const target = path.join(repairChecks, relative);
+        const target = path.join(directory, relative);
         fs.mkdirSync(path.dirname(target), { recursive: true });
         if (!fs.existsSync(target)) fs.copyFileSync(path.join(acceptance, relative), target);
       }
-    }
+      }
+      return directory;
+    };
     const primary = await createOpenCodeSession({ ...sessionOptions, controlDirectory: path.join(output, "primary-control"),
       sandbox: { image, workspace: candidate, readonly: true, writablePaths: config.sourcePaths } });
     const host = {
       draft: async (task, signal) => {
+        if (args["draft-patch"]) {
+          // The author has completed against the original repository. Import
+          // only now, without exposing the patch or its path to that session.
+          const source = path.resolve(args["draft-patch"]);
+          const stat = fs.lstatSync(source);
+          if (!stat.isFile() || stat.size > 8 * 1024 * 1024) throw new Error("DRAFT_PATCH_INVALID");
+          const saved = path.join(output, "input-draft.patch");
+          fs.copyFileSync(source, saved, fs.constants.COPYFILE_EXCL);
+          fs.chmodSync(saved, 0o600);
+          record({ phase: "draft_imported", fingerprint: await importDraft(candidate, saved, signal) });
+          return;
+        }
         await prompt("draft", primary, `Work on this task in /workspace using the isolated repository tools. Read relevant project instructions and consumers. Run available tests as needed. Authorized source paths: ${JSON.stringify(config.sourcePaths)}.\n\n${task}\n\n${instructions.join("\n\n")}`, signal);
       },
       snapshot: (name) => snapshotCandidate(candidate, output, name),
@@ -124,27 +141,44 @@ async function main() {
         }
         return results;
       },
+      assess: async (diagnostics, signal) => {
+        const directory = path.join(output, `assessment-${diagnostics.attempt}`);
+        fs.mkdirSync(directory);
+        primary.exposeAcceptedChecks(prepareChecks(diagnostics.checks, `assessment-checks-${diagnostics.attempt}`), { assessmentDirectory: directory });
+        await prompt("assessment", primary, `Assess reproduced acceptance failures BEFORE changing code. Source is read-only in this turn. Read each failing test. A passing old implementation does not refute a clearly requested change. However, do not impose a test author's preferred interpretation when the original request permits alternatives. Write /assessment/decision.json as {"disputed":[]} if all listed expectations follow from the contract, or list {id,basis:{source,quote},reason} for disputed checks. Quote the original task or supplied public documentation, explain the competing valid interpretation, and never justify a dispute solely by what your candidate currently does. Only the listed acceptance IDs can be disputed; existing regressions cannot. Do not edit source or tests.\nOriginal task:\n${args.task}\n${instructions.join("\n\n")}\nReproduced failures:\n${JSON.stringify(diagnostics)}`, signal);
+        if (treeFingerprint(candidate) !== diagnostics.snapshot.fingerprint) throw new Error("ASSESSMENT_MUTATED_SOURCE");
+        const file = path.join(directory, "decision.json"), stat = fs.lstatSync(file);
+        if (!stat.isFile() || stat.size > 16_384) throw new Error("ASSESSMENT_FILE_INVALID");
+        const decision = JSON.parse(fs.readFileSync(file, "utf8"));
+        record({ phase: "assessment_finished", snapshot: diagnostics.snapshot.name, decision });
+        return decision;
+      },
       repair: async (diagnostics, signal) => {
-        primary.exposeAcceptedChecks(repairChecks);
+        primary.exposeAcceptedChecks(prepareChecks(diagnostics.checks, `repair-checks-${diagnostics.attempt}`));
         await prompt("repair", primary, `Fix only the reproduced requirement failures below. The accepted test sources are now mounted read-only at /acceptance and their reporter at /harness/node-reporter.mjs. Read the failing test to identify its exact input and expectation, and reproduce the command in its reported cwd. Keep existing behavior and test expectations. Do not weaken checks. Inspect affected consumers.\n${JSON.stringify(diagnostics)}`, signal);
       },
     };
     const report = await runController({ task: args.task, checks: config.checks, hypotheses, contracts, host, signal: abort.signal });
+    if (deadlineExceeded) report.stopReason = "timeout";
     report.base = original; report.usage = usage; report.output = output;
+    report.timeLimitMs = args["time-limit-ms"] ? Number(args["time-limit-ms"]) : null;
+    report.draftImported = Boolean(args["draft-patch"]);
     // Failed/unverified drafts remain downloadable patches, never automatic edits.
     report.application = report.stopReason === "checks_passed"
       ? await publishSnapshot(original, report.selected, abort.signal) : { applied: false, reason: report.stopReason };
     application = report.application;
+    if (deadlineExceeded) report.stopReason = "timeout";
     fs.writeFileSync(path.join(output, "report.json"), JSON.stringify(report, null, 2), { mode: 0o600 });
     console.log(JSON.stringify(report, null, 2));
     if (report.stopReason !== "checks_passed" || !report.application.applied || report.application.cancelledAfterApplyStarted) process.exitCode = 2;
   } catch (error) {
     fs.writeFileSync(path.join(output, "error.json"), JSON.stringify({ error: error.message, usage, cancelled: abort.signal.aborted }), { mode: 0o600 });
-    console.log(JSON.stringify({ stopReason: abort.signal.aborted ? "cancelled" : error.message === "OPENCODE_SESSION_TIMEOUT" ? "timeout" : "execution_error",
+    console.log(JSON.stringify({ stopReason: deadlineExceeded || error.message === "OPENCODE_SESSION_TIMEOUT" ? "timeout" : abort.signal.aborted ? "cancelled" : "execution_error",
       output, selectedPatch: fs.existsSync(path.join(output, "D0.patch")) ? path.join(output, "D0.patch") : null,
       diagnostics: path.join(output, "attempts.jsonl"), application }));
     throw error;
   } finally {
+    if (deadline) clearTimeout(deadline);
     process.removeListener("SIGINT", cancel); process.removeListener("SIGTERM", cancel);
   }
 }

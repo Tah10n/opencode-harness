@@ -10,8 +10,13 @@ node development/verified-change/materialize.mjs config-propagation
 node development/verified-change/materialize.mjs transactional-store
 ```
 
-The planned development set is approximately 24 repository scenarios. Only these
-initial three have been authored so far. No official evaluation has started.
+The development set now contains 24 repository scenarios. List them with
+`node development/verified-change/materialize.mjs --list`. The additional 21
+requests span cache, events, HTTP, pagination, batch workers, records and settings.
+Each family has several source modules and a public consumer; its three requests
+exercise different obligations on a shared baseline. These are dependent
+development examples, not independent evaluation observations. All 24 original
+public fixtures passed their Node tests. No official evaluation has started.
 
 ## First actual model run
 
@@ -104,7 +109,46 @@ ambiguous. This unresolved uncertainty-handling limitation must remain visible;
 do not count both changed assertions as two validated fixes or rewrite these
 development outcomes as benchmark evidence.
 
-Status: three model-backed runs across two distinct development tasks, two
-substantive implementation revisions used, one remaining under the requested
-limit. The approximately 24-case development set, fresh 60-task frozen A/B/C
-evaluation, statistical analysis, final independent review and PR remain pending.
+## Development revision 3: challenge assertions before changing source
+
+After reproduction, the primary session reads generated assertions in a turn with
+source mounted read-only. It may dispute an expectation only with an original
+public-contract quotation and an explanation of the alternative interpretation.
+Disputed checks and shared files become unverified; mandatory existing checks
+cannot be removed. Separate confirmed failures still receive repairs. This is a
+fallible semantic assessment, not proof that all false assertions are detected.
+
+The installed scripted-provider test now includes an author confidently requiring
+2 when the public request permits any numeric value. The primary disputes it
+before any code edit, and the source-write denial is checked in the real sandbox.
+The full suite passed 44/44 at this stage. The subsequently added imported-D0 and
+total-deadline paths passed three installed tests: no second draft call, original
+source only for the author, retained correct D0 and descendant cleanup on deadline.
+
+The optional imported-draft path is needed to compare B/C from a single D0 in the
+future evaluation. The optional whole-run deadline includes authorship and all
+repairs. Neither option claims equal token expenditure across arms.
+
+Independent review found and the bounded remediation fixed cwd aliases bypassing
+quarantine, obsolete disputed files remaining in repair mounts, inherited Git
+environment redirecting draft import, and a deadline-report race during patch
+publication. The reviewer found no further actionable defects in that pass.
+The complete installed Docker/OpenCode suite then passed **51/51, zero skipped**.
+A separate unprivileged watcher test had reported EMFILE; the full execution with
+the permissions required for Docker passed that same test. These are deterministic
+mechanism checks, not real-model or lift evidence.
+
+Run selected cases through a freshly installed bundle with:
+
+```sh
+node development/verified-change/run.mjs /absolute/install/node_modules/.bin/opencode-harness config-propagation
+```
+
+`--all` selects the 24 named cases. This development-only launcher never retries
+an interrupted request. It keeps its plan, attempts, reports and patches privately
+under a temporary directory; it does not supply hidden tests or compute lift.
+
+Status: three initial model-backed runs across two distinct development tasks.
+The third and final substantive implementation revision is implemented. Remaining
+model-backed development, fresh 60-task frozen A/B/C evaluation, statistical
+analysis, final independent review and PR remain pending.

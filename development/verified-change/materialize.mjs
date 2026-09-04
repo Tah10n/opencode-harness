@@ -5,9 +5,11 @@ import { spawnSync } from "node:child_process";
 import * as queue from "./queue-cancellation.mjs";
 import * as config from "./config-propagation.mjs";
 import * as store from "./transactional-store.mjs";
+import { cases as additional } from "./additional-cases.mjs";
 
-const cases = { "queue-cancellation": queue, "config-propagation": config, "transactional-store": store };
+const cases = { "queue-cancellation": queue, "config-propagation": config, "transactional-store": store, ...additional };
 const selected = process.argv[2] ?? "queue-cancellation";
+if (selected === "--list") { console.log(JSON.stringify(Object.keys(cases))); process.exit(0); }
 if (!Object.hasOwn(cases, selected)) throw new Error("Unknown development case");
 const { task, files } = cases[selected];
 

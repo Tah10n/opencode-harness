@@ -21,6 +21,11 @@ const scenarios = [
   { name: "wrapped requirement citation still triggers repair", wrapped: true, draft: 1, repair: 2, repairs: 1, reason: "checks_passed", applied: true },
   { name: "shared ambiguous assertions quarantined", shared: true, draft: 1, repairs: 0, reason: "checks_passed", applied: true },
   { name: "accepted tests visible only during repair", readAcceptance: true, draft: 1, repair: 2, repairs: 1, reason: "checks_passed", applied: true },
+  { name: "confident but unsupported assertion disputed before edits", disputed: true, draft: 1, repairs: 0, reason: "checks_passed", applied: true },
+  { name: "imported draft repaired without a second draft call", imported: true, draft: 1, repair: 2, repairs: 1, reason: "checks_passed", applied: true },
+  { name: "imported correct draft retained", imported: true, draft: 2, repairs: 0, reason: "checks_passed", applied: true },
+  { name: "total deadline terminates descendants", deadline: true, draft: 1, applied: false },
+  { name: "disputed file unavailable during confirmed repair", mixed: true, draft: 1, repair: 2, repairs: 1, reason: "checks_passed", applied: true },
 ];
 for (const scenario of scenarios) test(`installed OpenCode CLI: ${scenario.name}`, { skip: !enabled, timeout: 180_000 }, async () => {
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), "verified-change-opencode-"));
@@ -40,21 +45,41 @@ for (const scenario of scenarios) test(`installed OpenCode CLI: ${scenario.name}
     const r = spawnSync("git", ["-c", "core.hooksPath=/dev/null", ...args], { cwd: repo, encoding: "utf8" });
     assert.equal(r.status, 0, r.stderr);
   }
-  const task = scenario.wrapped ? "The exported value\nmust equal 2. Preserve the public numeric API." : "The exported value must equal 2. Preserve the public numeric API.";
+  const task = scenario.disputed ? "Return a numeric value. Preserve the public numeric API." : scenario.wrapped ? "The exported value\nmust equal 2. Preserve the public numeric API." : "The exported value must equal 2. Preserve the public numeric API.";
   const testBytes = `import test from 'node:test';import assert from 'node:assert/strict';import {value} from '/workspace/src/${scenario.consumer ? "consumer" : "api"}.mjs';test('new requirement',()=>assert.equal(value,${scenario.ambiguous ? 77 : 2}));\n${scenario.shared ? "test('unsupported assertion',()=>assert.equal(value,77));" : ""}`;
   const manifest = [{ id: "value", kind: "node-test", files: ["value.test.mjs"], confidence: scenario.ambiguous ? "ambiguous" : "unambiguous", basis: { source: "task", quote: scenario.ambiguous ? "The value must equal 77." : "The exported value must equal 2." } }];
+  if (scenario.disputed) manifest[0].basis.quote = "Return a numeric value.";
   if (scenario.shared) manifest.push({ ...manifest[0], id: "uncertain", confidence: "ambiguous", basis: { source: "task", quote: "The value must equal 77." } });
+  if (scenario.mixed) manifest.push({ ...manifest[0], id: 'uncertain', files:['uncertain.test.mjs'], basis:{source:'task',quote:'Preserve the public numeric API.'} });
   const commands = [
     `node -e ${shellQuote(`const fs=require('fs');fs.writeFileSync('/acceptance/value.test.mjs',${JSON.stringify(testBytes)});fs.writeFileSync('/acceptance/manifest.json',${JSON.stringify(JSON.stringify(manifest))});`)}`,
     `node -e ${shellQuote(`require('fs').writeFileSync('/workspace/src/api.mjs',${JSON.stringify(`export const value = ${scenario.draft};\n`)});process.stdout.write('oauth credential permission')`)}`,
     `node -e ${shellQuote(`require('fs').writeFileSync('/workspace/src/${scenario.consumer ? "consumer" : "api"}.mjs',${JSON.stringify(`export const value = ${scenario.repair};\n`)})`)}`,
   ];
-  if (scenario.timeout || scenario.cancel) commands[1] = `node -e ${shellQuote("require('child_process').spawn('node',['-e','setInterval(()=>{},100)'],{detached:true,stdio:'ignore'});setInterval(()=>{},100)")}`;
+  if (scenario.mixed) {
+    commands[0] += ` && node -e ${shellQuote(`require('fs').writeFileSync('/acceptance/uncertain.test.mjs',${JSON.stringify(testBytes.replace('value,2','value,77'))})`)}`;
+    commands[2] = `node -e ${shellQuote("const fs=require('fs');if(fs.existsSync('/acceptance/uncertain.test.mjs'))throw Error('disputed test leaked');fs.readFileSync('/acceptance/value.test.mjs')")} && ${commands[2]}`;
+  }
+  if (scenario.timeout || scenario.cancel || scenario.deadline) commands[1] = `node -e ${shellQuote("require('child_process').spawn('node',['-e','setInterval(()=>{},100)'],{detached:true,stdio:'ignore'});setInterval(()=>{},100)")}`;
+  const draftFile = path.join(temp, 'draft.patch');
+  if (scenario.imported) {
+    fs.writeFileSync(path.join(repo, 'src/api.mjs'), `export const value = ${scenario.draft};\n`);
+    const diff = spawnSync('git', ['diff', '--binary'], { cwd: repo, encoding: 'utf8' });
+    assert.equal(diff.status, 0, diff.stderr);
+    fs.writeFileSync(draftFile, diff.stdout);
+    fs.writeFileSync(path.join(repo, 'src/api.mjs'), 'export const value = 0;\n');
+    commands[0] = `node -e ${shellQuote("if(!require('fs').readFileSync('/workspace/src/api.mjs','utf8').includes('value = 0'))throw Error('draft leaked to author')")} && ${commands[0]}`;
+    commands.splice(1, 1);
+  }
   if (scenario.readAcceptance) {
     commands[1] = `node -e ${shellQuote("if(require('fs').existsSync('/acceptance'))throw Error('acceptance leaked into initial draft')")} && ${commands[1]}`;
     commands[2] = `node -e ${shellQuote("const fs=require('fs');fs.readFileSync('/acceptance/value.test.mjs');fs.readFileSync('/harness/node-reporter.mjs');try{fs.writeFileSync('/acceptance/value.test.mjs','weakened');throw Error('test was writable')}catch(e){if(e.message==='test was writable')throw e}")} && ${commands[2]}`;
   }
   let requests = 0;
+  let assessmentRequests = 0;
+  const decision = { disputed: scenario.disputed ? [{ id: "value", basis: { source: "task", quote: "Return a numeric value." }, reason: "The request permits any numeric value; it does not mandate 2." }] : [] };
+  if (scenario.mixed) decision.disputed.push({id:'uncertain',basis:{source:'task',quote:'Preserve the public numeric API.'},reason:'Numeric compatibility does not require value 77; the explicit new requirement is 2.'});
+  const assessmentCommand = `node -e ${shellQuote(`const fs=require('fs');let denied=false;try{fs.writeFileSync('/workspace/src/api.mjs','must not change')}catch(e){if(['EROFS','EACCES'].includes(e.code))denied=true;else throw e;}if(!denied)throw Error('assessment source writable');fs.writeFileSync('/assessment/decision.json',${JSON.stringify(JSON.stringify(decision))});`)}`;
   let cliProcess;
   const requestSummary = [];
   const server = http.createServer(async (req, res) => {
@@ -69,17 +94,18 @@ for (const scenario of scenarios) test(`installed OpenCode CLI: ${scenario.name}
       res.end("data: [DONE]\n\n");
       return;
     }
-    const index = Math.floor(requests / 2), toolTurn = requests % 2 === 0;
-    requests += 1;
+    const assessment = JSON.stringify(body.messages?.filter((m) => m.role === "user").at(-1)).includes("Assess reproduced acceptance failures");
+    const index = Math.floor(requests / 2), toolTurn = (assessment ? assessmentRequests : requests) % 2 === 0;
+    if (assessment) assessmentRequests += 1; else requests += 1;
     if (scenario.cancel && index === 1 && toolTurn) setTimeout(() => cliProcess.kill("SIGINT"), 1500);
     if (scenario.concurrent && index === 1 && !toolTurn) fs.writeFileSync(path.join(repo, "src/api.mjs"), "export const value = 99; // user change\n");
     if (toolTurn && !body.tools?.some((tool) => tool.function?.name === "repository_shell")) {
       res.writeHead(500).end("isolated tools missing"); return;
     }
     res.writeHead(200, { "content-type": "text/event-stream" });
-    const base = { id: `fixture-${requests}`, object: "chat.completion.chunk", created: 1, model: "fixture" };
+    const base = { id: `fixture-${requests}-${assessmentRequests}`, object: "chat.completion.chunk", created: 1, model: "fixture" };
     const deltas = toolTurn ? [
-      { role: "assistant", tool_calls: [{ index: 0, id: `call-${requests}`, type: "function", function: { name: "repository_shell", arguments: JSON.stringify({ command: commands[index] }) } }] },
+      { role: "assistant", tool_calls: [{ index: 0, id: `call-${requests}-${assessmentRequests}`, type: "function", function: { name: "repository_shell", arguments: JSON.stringify({ command: assessment ? assessmentCommand : commands[index] }) } }] },
     ] : [{ role: "assistant", content: "Completed. oauth credential permission." }];
     for (const delta of deltas) res.write(`data: ${JSON.stringify({ ...base, choices: [{ index: 0, delta, finish_reason: null }] })}\n\n`);
     res.write(`data: ${JSON.stringify({ ...base, choices: [{ index: 0, delta: {}, finish_reason: toolTurn ? "tool_calls" : "stop" }] })}\n\n`);
@@ -96,7 +122,7 @@ for (const scenario of scenarios) test(`installed OpenCode CLI: ${scenario.name}
       assert.equal(JSON.parse(doctor.stdout).status, scenario.broken ? "check_infrastructure_unavailable" : "execution_path_checked");
     }
     const result = await new Promise((resolve) => {
-      const child = spawn(cli, ["run", "--workspace", repo, "--model", "verified-fixture/fixture", "--", task], { env: { ...process.env, OPENCODE_CONFIG: configFile }, stdio: ["ignore", "pipe", "pipe"] });
+      const child = spawn(cli, ["run", "--workspace", repo, "--model", "verified-fixture/fixture", ...(scenario.imported ? ['--draft-patch', draftFile] : []), ...(scenario.deadline ? ['--time-limit-ms', '12000'] : []), "--", task], { env: { ...process.env, OPENCODE_CONFIG: configFile }, stdio: ["ignore", "pipe", "pipe"] });
       cliProcess = child;
       let stdout = "", stderr = "";
       child.stdout.on("data", (c) => { stdout += c; }); child.stderr.on("data", (c) => { stderr += c; });
@@ -104,8 +130,9 @@ for (const scenario of scenarios) test(`installed OpenCode CLI: ${scenario.name}
       child.on("close", (code) => resolve({ code, stdout, stderr }));
     });
     assert.equal(result.code, scenario.applied ? 0 : 2, `${result.stderr}\n${result.stdout}\n${JSON.stringify(requestSummary)}`);
-    if (scenario.timeout || scenario.cancel) {
+    if (scenario.timeout || scenario.cancel || scenario.deadline) {
       if (scenario.timeout) assert.match(result.stderr, /OPENCODE_SESSION_TIMEOUT/);
+      else if (scenario.deadline) assert.equal(JSON.parse(result.stdout).stopReason, "timeout");
       else assert.equal(JSON.parse(result.stdout).stopReason, "cancelled");
       const output = result.stderr.split("\n").find((line) => line.startsWith("Private run artifacts: ")).slice("Private run artifacts: ".length);
       const session = JSON.parse(fs.readFileSync(path.join(output, "primary-control/session.json"), "utf8"));
@@ -120,9 +147,21 @@ for (const scenario of scenarios) test(`installed OpenCode CLI: ${scenario.name}
     assert.equal(report.repairs, scenario.repairs);
     assert.equal(report.selected.name, scenario.repairs && scenario.applied ? "D1" : "D0");
     assert.equal(report.application.applied, scenario.applied);
-    assert.equal(requests, 4 + 2 * scenario.repairs);
+    assert.equal(requests, (scenario.imported ? 2 : 4) + 2 * scenario.repairs);
+    if (scenario.imported) {
+      assert.equal(report.draftImported, true);
+      assert.equal(fs.readFileSync(report.snapshots[0].snapshot.patchPath, 'utf8'), fs.readFileSync(draftFile, 'utf8'));
+    }
     if (scenario.ambiguous) assert.equal(report.unverified.length, 1);
     if (scenario.shared) assert.equal(report.unverified.length, 2);
+    if (scenario.disputed) {
+      assert.equal(report.unverified[0].reason, "disputed_assertion");
+      assert.equal(assessmentRequests, 2);
+    }
+    if (scenario.mixed) {
+      assert.deepEqual(report.unverified.map(c=>c.id),['uncertain']);
+      assert.deepEqual(report.confirmed.map(c=>c.id),['value']);
+    }
     const expectedValue = scenario.concurrent ? 99 : scenario.applied ? scenario.consumer ? scenario.draft : scenario.repair ?? scenario.draft : 0;
     assert.match(fs.readFileSync(path.join(repo, "src/api.mjs"), "utf8"), new RegExp(`value = ${expectedValue}`));
     if (scenario.consumer) assert.match(fs.readFileSync(path.join(repo, "src/consumer.mjs"), "utf8"), /value = 2/);

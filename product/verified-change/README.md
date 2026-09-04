@@ -38,8 +38,14 @@ defaults. Provider authentication remains in OpenCode's existing storage.
 The agent's repository tools run in isolated containers with only the designated
 source paths writable. The acceptance author gets the initial repository read-only
 and a separate writable output directory, then audits its assertions before D0.
-Only during repair does the primary agent receive a read-only mount of accepted
-tests, with the command's cwd and reporter. No provider client or credential copy
+After D0, the primary agent receives accepted tests read-only, with the command's
+cwd and reporter. Before repairing a reproduced generated failure, it assesses
+whether the assertion admits a competing valid interpretation. This turn cannot
+write source. A disputed assertion needs an original-contract quote and rationale;
+it becomes unverified, and shared test files are quarantined. Existing regression
+checks cannot be removed. Remaining confirmed failures still receive bounded
+repair. This model judgment can itself be wrong; it is not an independent oracle.
+No provider client or credential copy
 is introduced. Version 1 rejects dirty worktrees, symlinks, submodules, and hidden
 index flags, and does not currently install project dependencies automatically.
 
@@ -52,6 +58,22 @@ The controller retains D0 when bounded repairs fail, reproduces assertions befor
 repair, excludes explicitly ambiguous or ungrounded generated hypotheses, and
 reruns all mandatory checks after each repair. A literal citation validates
 provenance, not semantic correctness: generated tests remain fallible hypotheses.
+
+To check an already prepared draft without another draft-generation call, use
+`--draft-patch /absolute/draft.patch`. The repository must still be the clean
+original base. The acceptance author completes against that original base before
+the patch is imported into the private candidate. Ordinary source scope and
+regression checks still apply. D0 is saved and subsequent repairs use a fresh
+primary session; prior authoring-session history is not imported.
+
+`--time-limit-ms 900000` optionally caps the entire private run after preflight,
+including test authorship, its audit, checks, assessment and repairs. Each model
+prompt also retains the configured `sessionTimeoutMs` limit. Cancellation and
+container cleanup can add wall time after the deadline. An expired deadline
+prevents starting publication. If it expires after Git application has started,
+the host lets Git finish instead of interrupting a file write; the report retains
+both the timeout and the actual application result. This is a wall-time limit,
+not a token or monetary budget.
 
 Checks execute in a locally available Docker image resolved to its immutable
 image ID. Containers have no network, no host credentials, a read-only root,
