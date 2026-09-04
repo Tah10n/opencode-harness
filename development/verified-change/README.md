@@ -152,3 +152,30 @@ Status: three initial model-backed runs across two distinct development tasks.
 The third and final substantive implementation revision is implemented. Remaining
 model-backed development, fresh 60-task frozen A/B/C evaluation, statistical
 analysis, final independent review and PR remain pending.
+
+## Initial real outcomes on revision 3
+
+The immutable installed tarball from `173a853c984044fc4543d05e5df2b18ee7135dfa`
+has SHA-256 `dd8d668cce09a157c3106888923063f3cc6a65fa5bbc8c3fe8ec9fac122fec11`.
+Runs use Luna/low, 240 seconds per prompt and a 900-second whole-run deadline.
+
+| Case | Wall time | Selected | Repairs | Admitted checks | Unverified |
+| --- | ---: | --- | ---: | ---: | ---: |
+| config-propagation | 191.8 s | D0 | 0 | 2 passed | 3 author-ambiguous |
+| transactional-store | 224.8 s | D0 | 0 | 5 passed | 1 primary-disputed |
+| cache-coalescing | 181.0 s | D0 | 0 | 6 passed | 0 |
+| cache-invalidation | 147.8 s | D0 | 0 | 4 passed | 0 |
+| cache-bypass | 169.7 s | D0 | 0 | 5 passed | 0 |
+
+These are host-check outcomes, not independent task-success measurements. The
+config draft already rejected fractional delay and propagated policy, so no
+repair was needed. Transactional-store exposed a potentially incorrect dispute:
+the mutator returned an ordinary object, but the candidate cloned it into a
+null-prototype object. The test asserted deep equality of the returned value;
+the primary dismissed the prototype expectation as ambiguous. The public request
+says update resolves to the mutator's return value, so this decision does not
+establish correctness and may have suppressed a valid defect. Keep the failing
+test, original D0 and assessment unchanged; do not count the exclusion as a fix.
+
+The remaining predefined development cases are running sequentially on the same
+bundle, with no retries and no fourth substantive implementation revision.
