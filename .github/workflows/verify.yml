@@ -28,6 +28,9 @@ jobs:
         with:
           node-version: "24"
 
+      - name: Run verified-change product regressions (no model requests)
+        run: npm test --prefix product/verified-change
+
       - name: Harden trusted Node distribution permissions
         shell: bash
         run: |

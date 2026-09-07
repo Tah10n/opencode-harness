@@ -1,0 +1,12 @@
+{
+  "name": "@opencode-harness/verified-change",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "bin": { "opencode-harness": "lib/cli.mjs" },
+  "engines": { "node": ">=24" },
+  "files": ["lib", "README.md"],
+  "exports": { "./controller": "./lib/controller.mjs" },
+  "scripts": { "test": "node --test test/*.test.mjs" },
+  "dependencies": { "zod": "4.1.8" }
+}

@@ -1,0 +1,482 @@
+{
+  "purpose": "development host-check outcomes; not independent task success or lift",
+  "candidateCommit": "173a853c984044fc4543d05e5df2b18ee7135dfa",
+  "bundleSha256": "dd8d668cce09a157c3106888923063f3cc6a65fa5bbc8c3fe8ec9fac122fec11",
+  "model": "openai/gpt-5.6-luna",
+  "variant": "low",
+  "perPromptMs": 240000,
+  "wholeRunMs": 900000,
+  "rows": [
+    {
+      "case": "config-propagation",
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 191780,
+      "stopReason": "checks_passed",
+      "repairs": 0,
+      "selected": "D0",
+      "applied": true,
+      "confirmed": [
+        "validate-policy",
+        "public-exports"
+      ],
+      "unverified": [
+        {
+          "id": "normalize-policy",
+          "reason": "ambiguous_requirement"
+        },
+        {
+          "id": "transport-policy",
+          "reason": "ambiguous_requirement"
+        },
+        {
+          "id": "client-policy",
+          "reason": "ambiguous_requirement"
+        }
+      ]
+    },
+    {
+      "case": "transactional-store",
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 224800,
+      "stopReason": "checks_passed",
+      "repairs": 0,
+      "selected": "D0",
+      "applied": true,
+      "confirmed": [
+        "serialized-queue",
+        "failure-recovery",
+        "concurrent-increment",
+        "value-and-key-isolation",
+        "file-atomicity"
+      ],
+      "unverified": [
+        {
+          "id": "transactional-update",
+          "reason": "disputed_assertion"
+        }
+      ]
+    },
+    {
+      "case": "batch-cancel",
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 176023,
+      "stopReason": "checks_passed",
+      "repairs": 0,
+      "selected": "D0",
+      "applied": true,
+      "confirmed": [
+        "map-batch-signal",
+        "run-jobs-adapter",
+        "already-aborted",
+        "abort-current-worker"
+      ],
+      "unverified": [
+        {
+          "id": "rejection-semantics",
+          "reason": "unsupported_citation"
+        }
+      ]
+    },
+    {
+      "case": "batch-concurrency",
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 186608,
+      "stopReason": "checks_passed",
+      "repairs": 0,
+      "selected": "D0",
+      "applied": true,
+      "confirmed": [
+        "map-batch-concurrency",
+        "run-jobs-options",
+        "default-concurrency",
+        "rejection-cleanup"
+      ],
+      "unverified": [
+        {
+          "id": "options-validation",
+          "reason": "ambiguous_requirement"
+        }
+      ]
+    },
+    {
+      "case": "batch-settled",
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 167603,
+      "stopReason": "checks_passed",
+      "repairs": 0,
+      "selected": "D0",
+      "applied": true,
+      "confirmed": [
+        "map-batch-settled-records",
+        "run-jobs-settled-index",
+        "legacy-fail-fast-raw-values",
+        "empty-inputs"
+      ],
+      "unverified": []
+    },
+    {
+      "case": "cache-bypass",
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 169720,
+      "stopReason": "checks_passed",
+      "repairs": 0,
+      "selected": "D0",
+      "applied": true,
+      "confirmed": [
+        "cache-bypass",
+        "cache-bypass-rejection",
+        "load-user-options",
+        "cache-ttl-validation",
+        "cache-zero-ttl"
+      ],
+      "unverified": []
+    },
+    {
+      "case": "cache-coalescing",
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 181047,
+      "stopReason": "checks_passed",
+      "repairs": 0,
+      "selected": "D0",
+      "applied": true,
+      "confirmed": [
+        "same-key-coalescing",
+        "different-key-independence",
+        "rejection-retry",
+        "completion-based-ttl",
+        "undefined-cache-value",
+        "public-api"
+      ],
+      "unverified": []
+    },
+    {
+      "case": "cache-invalidation",
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 147772,
+      "stopReason": "checks_passed",
+      "repairs": 0,
+      "selected": "D0",
+      "applied": true,
+      "confirmed": [
+        "cache-delete-stored",
+        "cache-delete-inflight",
+        "cache-delete-race",
+        "invalidate-user"
+      ],
+      "unverified": []
+    },
+    {
+      "case": "events-cancellation",
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 181724,
+      "stopReason": "checks_passed",
+      "repairs": 0,
+      "selected": "D0",
+      "applied": true,
+      "confirmed": [
+        "subscribe-signal",
+        "watch-signal",
+        "already-aborted",
+        "duplicate-abort",
+        "emit-mutation"
+      ],
+      "unverified": []
+    },
+    {
+      "case": "events-once",
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 165268,
+      "stopReason": "checks_passed",
+      "repairs": 0,
+      "selected": "D0",
+      "applied": true,
+      "confirmed": [
+        "once-recursive",
+        "once-throw",
+        "independent-same-function",
+        "watch-options",
+        "emit-mutation-count",
+        "sync-exception-unsubscribe"
+      ],
+      "unverified": []
+    },
+    {
+      "case": "events-wildcard",
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 162058,
+      "stopReason": "checks_passed",
+      "repairs": 0,
+      "selected": "D0",
+      "applied": true,
+      "confirmed": [
+        "api-order-count",
+        "snapshot",
+        "all-unsubscribe",
+        "literal-star"
+      ],
+      "unverified": [
+        {
+          "id": "exception-propagation",
+          "reason": "ambiguous_requirement"
+        },
+        {
+          "id": "ordinary-unsubscribe-count",
+          "reason": "unsupported_citation"
+        }
+      ]
+    },
+    {
+      "case": "http-abort",
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 159095,
+      "stopReason": "checks_passed",
+      "repairs": 0,
+      "selected": "D0",
+      "applied": true,
+      "confirmed": [
+        "signal-forwarding",
+        "pre-aborted-signal",
+        "http-errors"
+      ],
+      "unverified": [
+        {
+          "id": "pending-abort",
+          "reason": "ambiguous_requirement"
+        },
+        {
+          "id": "late-transport-rejection",
+          "reason": "ambiguous_requirement"
+        }
+      ]
+    },
+    {
+      "case": "http-headers",
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 187456,
+      "stopReason": "checks_passed",
+      "repairs": 0,
+      "selected": "D0",
+      "applied": true,
+      "confirmed": [
+        "get-header-merge",
+        "fresh-request-headers",
+        "post-forwarding",
+        "get-method-url",
+        "public-exports"
+      ],
+      "unverified": []
+    },
+    {
+      "case": "http-retry",
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 191631,
+      "stopReason": "checks_passed",
+      "repairs": 0,
+      "selected": "D0",
+      "applied": true,
+      "confirmed": [
+        "retry-transient-get",
+        "retry-last-status",
+        "retry-validation",
+        "retry-exclusions",
+        "client-get-forwarding"
+      ],
+      "unverified": [
+        {
+          "id": "retry-preserves-options",
+          "reason": "ambiguous_requirement"
+        }
+      ]
+    },
+    {
+      "case": "pages-cycles",
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 134841,
+      "stopReason": "checks_passed",
+      "repairs": 0,
+      "selected": "D0",
+      "applied": true,
+      "confirmed": [
+        "pagination-cycle",
+        "empty-cursor-order",
+        "malformed-items",
+        "malformed-next",
+        "report-error-identity"
+      ],
+      "unverified": []
+    },
+    {
+      "case": "pages-stream",
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 197840,
+      "stopReason": "checks_passed",
+      "repairs": 0,
+      "selected": "D0",
+      "applied": true,
+      "confirmed": [
+        "iterate-exports-and-empty-pages",
+        "lazy-iteration",
+        "collect-order",
+        "bounded-report",
+        "zero-limit",
+        "source-errors"
+      ],
+      "unverified": []
+    },
+    {
+      "case": "pages-unique",
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 154242,
+      "stopReason": "checks_passed",
+      "repairs": 0,
+      "selected": "D0",
+      "applied": true,
+      "confirmed": [
+        "collect-unique-order",
+        "collect-duplicates-without-unique-by",
+        "report-unique-by",
+        "collect-does-not-mutate-pages"
+      ],
+      "unverified": [
+        {
+          "id": "collect-invalid-unique-by",
+          "reason": "unsupported_citation"
+        }
+      ]
+    },
+    {
+      "case": "records-isolation",
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 161544,
+      "stopReason": "checks_passed",
+      "repairs": 0,
+      "selected": "D0",
+      "applied": true,
+      "confirmed": [
+        "special-string-ids",
+        "clone-values",
+        "missing-and-remove",
+        "api-behavior",
+        "invalid-ids"
+      ],
+      "unverified": []
+    },
+    {
+      "case": "records-rename",
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 171832,
+      "stopReason": "checks_passed",
+      "repairs": 0,
+      "selected": "D0",
+      "applied": true,
+      "confirmed": [
+        "rename-moves-value",
+        "rename-missing-atomic",
+        "rename-conflict-atomic",
+        "non-string-ids"
+      ],
+      "unverified": [
+        {
+          "id": "rename-self-special-ids",
+          "reason": "unsupported_citation"
+        },
+        {
+          "id": "api-and-ordinary-behavior",
+          "reason": "unsupported_citation"
+        }
+      ]
+    },
+    {
+      "case": "records-update",
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 163291,
+      "stopReason": "checks_passed",
+      "repairs": 0,
+      "selected": "D0",
+      "applied": true,
+      "confirmed": [
+        "update-success-isolation",
+        "update-missing-not-found",
+        "update-throw-preserves",
+        "put-get-isolation",
+        "api-update-exposed",
+        "string-id-collisions"
+      ],
+      "unverified": []
+    },
+    {
+      "case": "settings-layering",
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 144534,
+      "stopReason": "checks_passed",
+      "repairs": 0,
+      "selected": "D0",
+      "applied": true,
+      "confirmed": [
+        "resolve-layering",
+        "falsy-and-arrays",
+        "clone-and-immutability",
+        "service-integration",
+        "null-rejection"
+      ],
+      "unverified": []
+    },
+    {
+      "case": "settings-snapshot",
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 168179,
+      "stopReason": "checks_passed",
+      "repairs": 0,
+      "selected": "D0",
+      "applied": true,
+      "confirmed": [
+        "resolve-defaults-independent-tags",
+        "create-service-input-snapshot",
+        "create-service-options-independent",
+        "create-service-fresh-tags",
+        "create-service-disabled"
+      ],
+      "unverified": []
+    },
+    {
+      "case": "settings-validation",
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 143649,
+      "stopReason": "checks_passed",
+      "repairs": 0,
+      "selected": "D0",
+      "applied": true,
+      "confirmed": [
+        "defaults-and-values",
+        "tags-clone",
+        "input-shape-validation",
+        "property-validation",
+        "service-validation"
+      ],
+      "unverified": []
+    }
+  ]
+}

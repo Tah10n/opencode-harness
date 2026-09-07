@@ -1,0 +1,93 @@
+{
+  "origin": "catalog-language-fallback",
+  "contracts": {
+    "README.md": "Catalog(messages,fallback=\"en\") reads a locale-to-key dictionary whose own entries are strings, including the empty string. get(locale,key) looks in the exact locale, then configured fallback, and returns key if absent. Lookup is case-sensitive. Locale and translation keys are arbitrary strings; inherited properties are not entries. translate(catalog,locale,key) is the public consumer. src/index.mjs exports Catalog and translate. Inputs are read-only to the library.\n",
+    "task": "try the requested locale, then repeatedly remove its final hyphen segment\nthen apply the same progressively shortened chain to the configured fallback locale\nEmpty-string translations stop lookup.\nEnsure translate inherits the behavior without mutating messages or arguments."
+  },
+  "baseline": {
+    "src/catalog.mjs": "export class Catalog {\n constructor(messages,fallback='en'){this.messages=messages;this.fallback=fallback;}\n get(locale,key){for(const candidate of [locale,this.fallback]){if(!Object.hasOwn(this.messages,candidate))continue;const entries=this.messages[candidate];if(Object.hasOwn(entries,key))return entries[key];}return key;}\n}\n",
+    "src/index.mjs": "export {Catalog} from './catalog.mjs';export {translate} from './translate.mjs';\n",
+    "src/translate.mjs": "export function translate(catalog,locale,key){return catalog.get(locale,key);}\n",
+    "test/public.test.mjs": "import test from 'node:test';import assert from 'node:assert/strict';import {Catalog,translate} from '../src/index.mjs';\ntest('exact lookup and configured fallback',()=>{const c=new Catalog({en:{hello:'Hello',bye:'Bye'},fr:{hello:'Bonjour'}});assert.equal(translate(c,'fr','hello'),'Bonjour');assert.equal(c.get('fr','bye'),'Bye');assert.equal(c.get('fr','missing'),'missing');});\n"
+  },
+  "hypotheses": [
+    {
+      "id": "requested-locale-chain",
+      "kind": "node-test",
+      "files": [
+        "requested-locale-chain.test.mjs"
+      ],
+      "confidence": "unambiguous",
+      "basis": {
+        "source": "task",
+        "quote": "try the requested locale, then repeatedly remove its final hyphen segment"
+      }
+    },
+    {
+      "id": "fallback-locale-chain",
+      "kind": "node-test",
+      "files": [
+        "fallback-locale-chain.test.mjs"
+      ],
+      "confidence": "unambiguous",
+      "basis": {
+        "source": "task",
+        "quote": "then apply the same progressively shortened chain to the configured fallback locale"
+      }
+    },
+    {
+      "id": "empty-translation",
+      "kind": "node-test",
+      "files": [
+        "empty-translation.test.mjs"
+      ],
+      "confidence": "unambiguous",
+      "basis": {
+        "source": "task",
+        "quote": "Empty-string translations stop lookup."
+      }
+    },
+    {
+      "id": "ownership-and-case",
+      "kind": "node-test",
+      "files": [
+        "ownership-and-case.test.mjs"
+      ],
+      "confidence": "unambiguous",
+      "basis": {
+        "source": "README.md",
+        "quote": "Lookup is case-sensitive. Locale and translation keys are arbitrary strings; inherited properties are not entries."
+      }
+    },
+    {
+      "id": "translate-readonly",
+      "kind": "node-test",
+      "files": [
+        "translate-readonly.test.mjs"
+      ],
+      "confidence": "unambiguous",
+      "basis": {
+        "source": "task",
+        "quote": "Ensure translate inherits the behavior without mutating messages or arguments."
+      }
+    }
+  ],
+  "generated": {
+    "ownership-and-case.test.mjs": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport {Catalog} from '/workspace/src/index.mjs';\n\ntest('locale and key lookup is case-sensitive and ignores inherited properties', () => {\n  const localePrototype = {inheritedLocale: {label: 'inherited'}};\n  const messages = Object.create(localePrototype);\n  messages.EN = Object.assign(Object.create({inheritedKey: 'inherited'}), {Label: 'upper'});\n  messages.en = {label: 'lower'};\n  const catalog = new Catalog(messages, 'en');\n\n  assert.equal(catalog.get('EN', 'Label'), 'upper');\n  assert.equal(catalog.get('en', 'Label'), 'Label');\n  assert.equal(catalog.get('en', 'inheritedKey'), 'inheritedKey');\n  assert.equal(catalog.get('inheritedLocale', 'label'), 'label');\n});\n",
+    "fallback-locale-chain.test.mjs": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport {Catalog} from '/workspace/src/index.mjs';\n\ntest('get applies the progressively shortened chain to the configured fallback', () => {\n  const catalog = new Catalog({\n    'en-US': {other: 'specific fallback'},\n    en: {label: 'base fallback'},\n  }, 'en-US');\n\n  assert.equal(catalog.get('fr-CA', 'label'), 'base fallback');\n  assert.equal(catalog.get('fr-CA', 'other'), 'specific fallback');\n});\n",
+    "empty-translation.test.mjs": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport {Catalog} from '/workspace/src/index.mjs';\n\ntest('an own empty-string translation stops the locale fallback chain', () => {\n  const catalog = new Catalog({\n    'fr-CA': {label: ''},\n    fr: {label: 'French'},\n    en: {label: 'English'},\n  });\n\n  assert.equal(catalog.get('fr-CA', 'label'), '');\n});\n",
+    "requested-locale-chain.test.mjs": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport {Catalog} from '/workspace/src/index.mjs';\n\ntest('get tries the requested locale and its progressively shortened parents before fallback', () => {\n  const catalog = new Catalog({\n    en: {label: 'fallback'},\n    pt: {label: 'root'},\n    'pt-BR': {label: 'parent'},\n    'pt-BR-x-private': {label: 'exact'},\n  }, 'en');\n\n  assert.equal(catalog.get('pt-BR-x-private', 'label'), 'exact');\n  assert.equal(catalog.get('pt-BR-x-other', 'label'), 'parent');\n  assert.equal(catalog.get('pt-BR-y-other', 'label'), 'parent');\n  assert.equal(catalog.get('pt-ZZ-x', 'label'), 'root');\n});\n",
+    "translate-readonly.test.mjs": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport {Catalog, translate} from '/workspace/src/index.mjs';\n\ntest('translate inherits get behavior without mutating catalog inputs or arguments', () => {\n  const messages = {\n    'de-DE': {title: ''},\n    de: {title: 'Deutsch'},\n  };\n  const beforeMessages = JSON.stringify(messages);\n  const catalog = new Catalog(messages, 'de');\n  const locale = 'de-DE';\n  const key = 'title';\n\n  assert.equal(translate(catalog, locale, key), '');\n  assert.equal(JSON.stringify(messages), beforeMessages);\n  assert.equal(locale, 'de-DE');\n  assert.equal(key, 'title');\n});\n"
+  },
+  "decision": {
+    "disputed": []
+  },
+  "patches": {
+    "D0": "diff --git a/src/catalog.mjs b/src/catalog.mjs\nindex a65b35d..b7864b1 100644\n--- a/src/catalog.mjs\n+++ b/src/catalog.mjs\n@@ -1,4 +1,21 @@\n export class Catalog {\n  constructor(messages,fallback='en'){this.messages=messages;this.fallback=fallback;}\n- get(locale,key){for(const candidate of [locale,this.fallback]){if(!Object.hasOwn(this.messages,candidate))continue;const entries=this.messages[candidate];if(Object.hasOwn(entries,key))return entries[key];}return key;}\n+ get(locale,key){\n+  const candidates=[];\n+  for(const value of [locale,this.fallback]){\n+   let candidate=value;\n+   while(true){\n+    if(!candidates.includes(candidate))candidates.push(candidate);\n+    const separator=candidate.lastIndexOf('-');\n+    if(separator<0)break;\n+    candidate=candidate.slice(0,separator);\n+   }\n+  }\n+  for(const candidate of candidates){\n+   if(!Object.hasOwn(this.messages,candidate))continue;\n+   const entries=this.messages[candidate];\n+   if(Object.hasOwn(entries,key))return entries[key];\n+  }\n+  return key;\n+ }\n }\n",
+    "D1": "diff --git a/src/catalog.mjs b/src/catalog.mjs\nindex a65b35d..282afd9 100644\n--- a/src/catalog.mjs\n+++ b/src/catalog.mjs\n@@ -1,4 +1,22 @@\n export class Catalog {\n  constructor(messages,fallback='en'){this.messages=messages;this.fallback=fallback;}\n- get(locale,key){for(const candidate of [locale,this.fallback]){if(!Object.hasOwn(this.messages,candidate))continue;const entries=this.messages[candidate];if(Object.hasOwn(entries,key))return entries[key];}return key;}\n+ get(locale,key){\n+  if(!Object.hasOwn(this.messages,locale) && locale in this.messages)return key;\n+  const candidates=[];\n+  for(const value of [locale,this.fallback]){\n+   let candidate=value;\n+   while(true){\n+    if(!candidates.includes(candidate))candidates.push(candidate);\n+    const separator=candidate.lastIndexOf('-');\n+    if(separator<0)break;\n+    candidate=candidate.slice(0,separator);\n+   }\n+  }\n+  for(const candidate of candidates){\n+   if(!Object.hasOwn(this.messages,candidate))continue;\n+   const entries=this.messages[candidate];\n+   if(Object.hasOwn(entries,key))return entries[key];\n+  }\n+  return key;\n+ }\n }\n"
+  },
+  "patchSha256": {
+    "D0": "e3ac73c724250eb8eb16b4e1a9b941df2bdbb3dc4e2e388049d05223098c474d",
+    "D1": "c3399580d38be1150fd014aa1f8cfb1374444d66e72aceac92c9c4248ad7ddeb"
+  }
+}

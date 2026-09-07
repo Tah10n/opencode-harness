@@ -1,0 +1,5 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {readCorpus,requireCompleteCorpus,canonical} from './inputs.mjs';
+test('partial corpus cannot be frozen or submitted',async()=>{const tasks=await readCorpus();const partial=tasks.slice(0,59);assert.throws(()=>requireCompleteCorpus(partial),/CORPUS_NOT_COMPLETE/);});
+test('balance requires twenty families with one task in every stratum',()=>{const strata=['public-reproducer','uncovered-requirement','multi-file-obligation'];const tasks=Array.from({length:60},(_,i)=>({id:String(i),family:String(Math.floor(i/3)),stratum:strata[i%3],task:'request',hidden:'test',reference:{},alternative:{}}));assert.doesNotThrow(()=>requireCompleteCorpus(tasks));tasks[0].stratum=strata[1];assert.throws(()=>requireCompleteCorpus(tasks),/BALANCE|STRATA/);});
+test('definition hashing is stable across object key order and sensitive to array order',()=>{assert.equal(canonical({a:1,b:{x:2,y:3}}),canonical({b:{y:3,x:2},a:1}));assert.notEqual(canonical([1,2]),canonical([2,1]));});
