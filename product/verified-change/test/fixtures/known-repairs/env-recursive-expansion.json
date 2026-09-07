@@ -1,0 +1,107 @@
+{
+  "origin": "env-recursive-expansion",
+  "contracts": {
+    "README.md": "Env-style config: KEY=value lines, optional surrounding whitespace, or full-line # comments. Keys match [A-Za-z_][A-Za-z0-9_]*. Values are strings trimmed at edges but otherwise literal, including equals signs and inline #. Duplicate keys use the last value. Empty values are allowed; malformed lines throw ENV_SYNTAX. parseEnv returns an ordinary object with own data properties; __proto__ is valid. resolveEnv returns a copy. loadConfig(entry,read) uses an injected async reader returning text. Exports are src/index.mjs.\n",
+    "task": "Extend resolveEnv(values) to recursively expand ${KEY} references to other own keys, including forward references.\n$$ produces one literal dollar and prevents that pair from beginning an expansion; replacement text is not rescanned after its referenced value is resolved.\nUnknown referenced keys throw ENV_UNDEFINED with .key\ncycles throw ENV_CYCLE\nloadConfig must expand after parsing, while parseEnv remains literal."
+  },
+  "baseline": {
+    "src/resolve.mjs": "export function resolveEnv(values){return {...values};}",
+    "src/parse.mjs": "export function parseEnv(text){const entries=[];for(const line of text.split(/\\r?\\n/)){const trimmed=line.trim();if(!trimmed||trimmed.startsWith('#'))continue;const at=trimmed.indexOf('='),key=trimmed.slice(0,at).trim(),value=at<0?undefined:trimmed.slice(at+1);if(!/^[A-Za-z_][A-Za-z0-9_]*$/.test(key)||value===undefined)throw Object.assign(new Error('syntax'),{code:'ENV_SYNTAX'});entries.push([key,value.trim()]);}return Object.fromEntries(entries);}",
+    "src/load.mjs": "import {parseEnv} from './parse.mjs';import {resolveEnv} from './resolve.mjs';export async function loadConfig(entry,read){return resolveEnv(parseEnv(await read(entry)));}",
+    "src/index.mjs": "export {parseEnv} from './parse.mjs';export {resolveEnv} from './resolve.mjs';export {loadConfig} from './load.mjs';",
+    "test/public.test.mjs": "import test from 'node:test';import assert from 'node:assert/strict';import {parseEnv,resolveEnv,loadConfig} from '../src/index.mjs';test('key/value config',async()=>{assert.deepEqual(parseEnv('# comment\\nA=one\\nB=two'),{A:'one',B:'two'});assert.deepEqual(resolveEnv({A:'one'}),{A:'one'});assert.deepEqual(await loadConfig('main.env',async()=> 'A=one'),{A:'one'});});"
+  },
+  "hypotheses": [
+    {
+      "id": "resolve-recursive",
+      "kind": "node-test",
+      "files": [
+        "resolve-recursive.test.mjs"
+      ],
+      "confidence": "unambiguous",
+      "basis": {
+        "source": "task",
+        "quote": "Extend resolveEnv(values) to recursively expand ${KEY} references to other own keys, including forward references."
+      }
+    },
+    {
+      "id": "resolve-dollar",
+      "kind": "node-test",
+      "files": [
+        "resolve-dollar.test.mjs"
+      ],
+      "confidence": "unambiguous",
+      "basis": {
+        "source": "task",
+        "quote": "$$ produces one literal dollar and prevents that pair from beginning an expansion; replacement text is not rescanned after its referenced value is resolved."
+      }
+    },
+    {
+      "id": "resolve-undefined",
+      "kind": "node-test",
+      "files": [
+        "resolve-undefined.test.mjs"
+      ],
+      "confidence": "unambiguous",
+      "basis": {
+        "source": "task",
+        "quote": "Unknown referenced keys throw ENV_UNDEFINED with .key"
+      }
+    },
+    {
+      "id": "resolve-cycle",
+      "kind": "node-test",
+      "files": [
+        "resolve-cycle.test.mjs"
+      ],
+      "confidence": "unambiguous",
+      "basis": {
+        "source": "task",
+        "quote": "cycles throw ENV_CYCLE"
+      }
+    },
+    {
+      "id": "parse-env",
+      "kind": "node-test",
+      "files": [
+        "parse-env.test.mjs"
+      ],
+      "confidence": "unambiguous",
+      "basis": {
+        "source": "README.md",
+        "quote": "Values are strings trimmed at edges but otherwise literal, including equals signs and inline #. Duplicate keys use the last value. Empty values are allowed; malformed lines throw ENV_SYNTAX. parseEnv returns an ordinary object with own data properties; __proto__ is valid."
+      }
+    },
+    {
+      "id": "load-config",
+      "kind": "node-test",
+      "files": [
+        "load-config.test.mjs"
+      ],
+      "confidence": "unambiguous",
+      "basis": {
+        "source": "task",
+        "quote": "loadConfig must expand after parsing, while parseEnv remains literal."
+      }
+    }
+  ],
+  "generated": {
+    "resolve-dollar.test.mjs": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { resolveEnv } from '/workspace/src/index.mjs';\n\ntest('resolveEnv handles dollar escaping and does not rescan replacement text', () => {\n  const result = resolveEnv({\n    VALUE: 'literal',\n    REF: '${VALUE}',\n    TEXT: '$$VALUE $$${VALUE} ${REF}',\n  });\n\n  assert.equal(result.TEXT, '$VALUE $literal ${VALUE}');\n});\n",
+    "resolve-undefined.test.mjs": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { resolveEnv } from '/workspace/src/index.mjs';\n\ntest('resolveEnv rejects an unknown referenced key with ENV_UNDEFINED and key', () => {\n  assert.throws(\n    () => resolveEnv({ VALUE: '${MISSING}' }),\n    (error) => {\n      assert.equal(error.code, 'ENV_UNDEFINED');\n      assert.equal(error.key, 'MISSING');\n      return true;\n    },\n  );\n});\n",
+    "parse-env.test.mjs": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { parseEnv } from '/workspace/src/index.mjs';\n\ntest('parseEnv parses literal env lines, duplicate keys, empty values, and __proto__', () => {\n  const result = parseEnv(`\n    # comment\n    KEY = value=with=equals # inline hash\n    KEY=last\n    INLINE=value # remains literal\n    EMPTY=\n    __proto__=safe\n    REF=${'${OTHER}'}\n  `);\n\n  assert.equal(Object.getPrototypeOf(result), Object.prototype);\n  assert.equal(Object.prototype.hasOwnProperty.call(result, '__proto__'), true);\n  assert.equal(result.KEY, 'last');\n  assert.equal(result.INLINE, 'value # remains literal');\n  assert.equal(result.EMPTY, '');\n  assert.equal(result.__proto__, 'safe');\n  assert.equal(result.REF, '${OTHER}');\n  assert.deepEqual(Object.keys(result), ['KEY', 'INLINE', 'EMPTY', '__proto__', 'REF']);\n});\n\ntest('parseEnv rejects malformed lines with ENV_SYNTAX', () => {\n  assert.throws(\n    () => parseEnv('not a key=value line'),\n    (error) => error.code === 'ENV_SYNTAX',\n  );\n});\n",
+    "resolve-recursive.test.mjs": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { resolveEnv } from '/workspace/src/index.mjs';\n\ntest('resolveEnv recursively expands forward references and returns a copy', () => {\n  const input = { MESSAGE: '${GREETING}, ${NAME}!', NAME: 'Ada', GREETING: 'Hello' };\n  const result = resolveEnv(input);\n\n  assert.deepEqual(result, { MESSAGE: 'Hello, Ada!', NAME: 'Ada', GREETING: 'Hello' });\n  assert.notStrictEqual(result, input);\n  assert.equal(Object.getPrototypeOf(result), Object.prototype);\n  assert.deepEqual(input, { MESSAGE: '${GREETING}, ${NAME}!', NAME: 'Ada', GREETING: 'Hello' });\n});\n",
+    "resolve-cycle.test.mjs": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { resolveEnv } from '/workspace/src/index.mjs';\n\ntest('resolveEnv rejects cycles with ENV_CYCLE', () => {\n  assert.throws(\n    () => resolveEnv({ FIRST: '${SECOND}', SECOND: '${FIRST}' }),\n    (error) => {\n      assert.equal(error.code, 'ENV_CYCLE');\n      return true;\n    },\n  );\n});\n",
+    "load-config.test.mjs": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { loadConfig } from '/workspace/src/index.mjs';\n\ntest('loadConfig reads injected text, parses it, then expands references', async () => {\n  let requested;\n  const result = await loadConfig('/config.env', async (entry) => {\n    requested = entry;\n    return 'NAME=Ada\\nMESSAGE=Hello ${NAME}';\n  });\n\n  assert.equal(requested, '/config.env');\n  assert.deepEqual(result, { NAME: 'Ada', MESSAGE: 'Hello Ada' });\n});\n"
+  },
+  "decision": {
+    "disputed": []
+  },
+  "patches": {
+    "D0": "diff --git a/src/resolve.mjs b/src/resolve.mjs\nindex 1d3362c..877ee4e 100644\n--- a/src/resolve.mjs\n+++ b/src/resolve.mjs\n@@ -1 +1,40 @@\n-export function resolveEnv(values){return {...values};}\n\\ No newline at end of file\n+export function resolveEnv(values){\n+  const resolved={};\n+  const state=new Map();\n+  const pattern=/\\$\\{([A-Za-z_][A-Za-z0-9_]*)\\}/g;\n+\n+  function resolve(key){\n+    if(state.get(key)==='done')return resolved[key];\n+    if(state.get(key)==='active')throw Object.assign(new Error('cycle'),{code:'ENV_CYCLE',key});\n+    state.set(key,'active');\n+    const value=String(values[key]);\n+    let output='',position=0;\n+    for(let index=0;index<value.length;index++){\n+      if(value[index]!=='$')continue;\n+      if(value[index+1]==='$'){\n+        output+=value.slice(position,index)+'$';\n+        position=index+2;\n+        index++;\n+      }else{\n+        pattern.lastIndex=index;\n+        const match=pattern.exec(value);\n+        if(match&&match.index===index){\n+          const referenced=match[1];\n+          const end=pattern.lastIndex;\n+          if(!Object.prototype.hasOwnProperty.call(values,referenced))\n+            throw Object.assign(new Error('undefined'),{code:'ENV_UNDEFINED',key:referenced});\n+          output+=value.slice(position,index)+resolve(referenced);\n+          position=end;\n+          index=end-1;\n+        }\n+      }\n+    }\n+    output+=value.slice(position);\n+    Object.defineProperty(resolved,key,{value:output,enumerable:true,writable:true,configurable:true});\n+    state.set(key,'done');\n+    return output;\n+  }\n+\n+  for(const key of Object.keys(values))resolve(key);\n+  return resolved;\n+}\n",
+    "D1": "diff --git a/src/resolve.mjs b/src/resolve.mjs\nindex 1d3362c..dfd226d 100644\n--- a/src/resolve.mjs\n+++ b/src/resolve.mjs\n@@ -1 +1,41 @@\n-export function resolveEnv(values){return {...values};}\n\\ No newline at end of file\n+export function resolveEnv(values){\n+  const resolved={};\n+  const state=new Map();\n+  const pattern=/\\$\\{([A-Za-z_][A-Za-z0-9_]*)\\}/g;\n+\n+  function resolve(key){\n+    if(state.get(key)==='done')return resolved[key];\n+    if(state.get(key)==='active')throw Object.assign(new Error('cycle'),{code:'ENV_CYCLE',key});\n+    state.set(key,'active');\n+    const value=String(values[key]);\n+    let output='',position=0;\n+    for(let index=0;index<value.length;index++){\n+      if(value[index]!=='$')continue;\n+      if(value[index+1]==='$'){\n+        output+=value.slice(position,index)+'$';\n+        position=index+2;\n+        index++;\n+      }else{\n+        pattern.lastIndex=index;\n+        const match=pattern.exec(value);\n+        if(match&&match.index===index){\n+          const referenced=match[1];\n+          const end=pattern.lastIndex;\n+          if(!Object.prototype.hasOwnProperty.call(values,referenced))\n+            throw Object.assign(new Error('undefined'),{code:'ENV_UNDEFINED',key:referenced});\n+          resolve(referenced);\n+          output+=value.slice(position,index)+String(values[referenced]);\n+          position=end;\n+          index=end-1;\n+        }\n+      }\n+    }\n+    output+=value.slice(position);\n+    Object.defineProperty(resolved,key,{value:output,enumerable:true,writable:true,configurable:true});\n+    state.set(key,'done');\n+    return output;\n+  }\n+\n+  for(const key of Object.keys(values))resolve(key);\n+  return resolved;\n+}\n"
+  },
+  "patchSha256": {
+    "D0": "4d619fbd0955878d370f362a55c9fea4475480847f0dd40165f64f5b0793d3f4",
+    "D1": "31948bfde5f93eff1e7b94f3f5143582787a3a30036ebcc549b5822b1b13f709"
+  }
+}

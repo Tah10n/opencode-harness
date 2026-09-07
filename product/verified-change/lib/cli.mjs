@@ -2,7 +2,7 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { validateConfig, validateCheck } from "./config.mjs";
+import { validateConfig, validateCheck, verifyExpectedResults } from "./config.mjs";
 import { command } from "./process.mjs";
 import { resolveImage, sandboxCommand } from "./sandbox.mjs";
 import { inspectWorkspace, createCandidate, snapshotCandidate, checkScope, publishSnapshot, treeFingerprint, importDraft } from "./workspace.mjs";
@@ -36,6 +36,7 @@ async function main() {
   if (args.command === "doctor") {
     const output = fs.mkdtempSync(path.join(os.tmpdir(), "verified-change-doctor-"));
     const baseline = await createCandidate(original, path.join(output, "baseline"));
+    verifyExpectedResults(config, baseline);
     const checks = [];
     for (const check of config.checks) checks.push(await runCheck(check, { image, workspace: baseline }));
     const available = checks.every((check) => ["passed", "assertion_failed"].includes(check.status));
@@ -69,6 +70,7 @@ async function main() {
   };
   try {
     const baseline = await createCandidate(original, path.join(output, "baseline"));
+    verifyExpectedResults(config, baseline);
     const candidate = await createCandidate(original, path.join(output, "candidate"));
     const acceptance = path.join(output, "acceptance");
     fs.mkdirSync(acceptance);
@@ -84,7 +86,7 @@ async function main() {
     const sessionOptions = { model: args.model ?? config.model, variant: args.variant ?? config.variant, timeoutMs: config.sessionTimeoutMs };
     const author = await createOpenCodeSession({ ...sessionOptions, controlDirectory: path.join(output, "author-control"),
       sandbox: { image, workspace: baseline, readonly: true, extraMounts: [{ source: acceptance, target: "/acceptance", readonly: false }] } });
-    const authorPrompt = `Prepare a small independent set of acceptance tests BEFORE implementation. You can read the initial repository at /workspace and its docs/tests. Only /acceptance is writable.\nTask:\n${args.task}\n\n${instructions.join("\n\n")}\n\nWrite Node built-in test runner files under /acceptance, importing candidate code from absolute /workspace paths. Use node:assert/strict. Use assertion errors (including assert.fail for bounded wait guards) for requirement violations, not generic Error. Do not use unbounded waits. Do not infer expected results from current implementation. Do not invent requirements or require a particular internal implementation: for example, correct cleanup does not require a positive addEventListener call count if another correct subscription mechanism is possible. Write /acceptance/manifest.json as a JSON array. Each entry: {id,kind:"node-test",files:["relative.test.mjs"],confidence:"unambiguous" or "ambiguous",basis:{source:"task" or "AGENTS.md" or "WORKFLOW.md" or "README.md",quote:"exact public requirement quote"}}. Prefer a separate file for each check. Never mix ambiguous assertions into a file used by an unambiguous check. Mark doubtful assertions ambiguous. You cannot see the future implementation. No more than 6 checks. Do not modify existing tests or source.`;
+    const authorPrompt = `Prepare a small independent set of acceptance tests BEFORE implementation. You can read the initial repository at /workspace and its docs/tests. Only /acceptance is writable.\nTask:\n${args.task}\n\n${instructions.join("\n\n")}\n\nWrite Node built-in test runner files under /acceptance, importing candidate code from absolute /workspace paths. Use node:assert/strict. Use assertion errors (including assert.fail for bounded wait guards) for requirement violations, not generic Error. Do not use unbounded waits. Do not infer expected results from current implementation. Do not invent requirements or require a particular internal implementation: for example, correct cleanup does not require a positive addEventListener call count if another correct subscription mechanism is possible. Write /acceptance/manifest.json as a JSON array. Each entry: {id,kind:"node-test",files:["relative.test.mjs"],confidence:"unambiguous" or "ambiguous",basis:{source:"task" or "AGENTS.md" or "WORKFLOW.md" or "README.md",quote:"exact public requirement quote"}}. Prefer a separate file for each check. These are diagnostic hypotheses; confidence and a citation never authorize production repair. Never mix ambiguous assertions into a file used by an unambiguous check. Mark doubtful assertions ambiguous. You cannot see the future implementation. No more than 6 checks. Do not modify existing tests or source.`;
     await prompt("acceptance", author, authorPrompt, abort.signal);
     await prompt("acceptance_audit", author, "Audit your acceptance assertions before implementation. You still have only the original repository and request. For each asserted expectation, consider whether another reasonable interpretation of the request or another valid implementation would fail it. Mark such checks ambiguous in manifest.json rather than choosing your preferred interpretation. Check field precedence, defaults, timing and internal-observation assumptions particularly carefully. Keep test files self-contained apart from Node builtins and /workspace imports. Do not weaken a clearly stated requirement. Do not inspect or request a candidate solution. Update manifest.json if needed.", abort.signal);
     const acceptanceHash = treeFingerprint(acceptance); // Reject symlinks before host manifest reads.
@@ -145,17 +147,35 @@ async function main() {
         const directory = path.join(output, `assessment-${diagnostics.attempt}`);
         fs.mkdirSync(directory);
         primary.exposeAcceptedChecks(prepareChecks(diagnostics.checks, `assessment-checks-${diagnostics.attempt}`), { assessmentDirectory: directory });
-        await prompt("assessment", primary, `Assess reproduced acceptance failures BEFORE changing code. Source is read-only in this turn. Read each failing test. A passing old implementation does not refute a clearly requested change. However, do not impose a test author's preferred interpretation when the original request permits alternatives. Write /assessment/decision.json as {"disputed":[]} if all listed expectations follow from the contract, or list {id,basis:{source,quote},reason} for disputed checks. Quote the original task or supplied public documentation, explain the competing valid interpretation, and never justify a dispute solely by what your candidate currently does. Only the listed acceptance IDs can be disputed; existing regressions cannot. Do not edit source or tests.\nOriginal task:\n${args.task}\n${instructions.join("\n\n")}\nReproduced failures:\n${JSON.stringify(diagnostics)}`, signal);
+        let promptError;
+        try {
+          await prompt("assessment", primary, `Assess reproduced acceptance failures for the final selected snapshot. The repair decision is already complete; these generated expectations cannot authorize further source changes. Source is read-only in this turn. Read each failing test. A passing old implementation does not refute a clearly requested change. However, do not impose a test author's preferred interpretation when the original request permits alternatives. Write /assessment/decision.json as {"disputed":[]} if all listed expectations follow from the contract, or list {id,basis:{source,quote},reason} for disputed checks. Quote the original task or supplied public documentation, explain the competing valid interpretation, and never justify a dispute solely by what your candidate currently does. Only the listed acceptance IDs can be disputed; existing regressions cannot. Do not edit source or tests.\nOriginal task:\n${args.task}\n${instructions.join("\n\n")}\nReproduced failures:\n${JSON.stringify(diagnostics)}`, signal);
+        } catch (error) { promptError = error; }
         if (treeFingerprint(candidate) !== diagnostics.snapshot.fingerprint) throw new Error("ASSESSMENT_MUTATED_SOURCE");
-        const file = path.join(directory, "decision.json"), stat = fs.lstatSync(file);
-        if (!stat.isFile() || stat.size > 16_384) throw new Error("ASSESSMENT_FILE_INVALID");
-        const decision = JSON.parse(fs.readFileSync(file, "utf8"));
+        const unavailable = (reason) => {
+          const decision = { unavailable: String(reason).slice(0, 4096) };
+          record({ phase: "assessment_finished", snapshot: diagnostics.snapshot.name, decision });
+          return decision;
+        };
+        if (promptError) {
+          // Session.prompt has already performed teardown. Only known ordinary
+          // session/response failures are diagnostic; cleanup and scope errors
+          // are never converted to availability results.
+          if (!signal?.aborted && /^(OPENCODE_SESSION_(TIMEOUT|INCOMPLETE|ERROR|ID_INVALID|CHANGED)|OPENCODE_EXECUTION_FAILED)(:|$)/.test(promptError.message)) return unavailable(promptError.message);
+          throw promptError;
+        }
+        let decision;
+        try {
+          const file = path.join(directory, "decision.json"), stat = fs.lstatSync(file);
+          if (!stat.isFile() || stat.size > 16_384) return unavailable("ASSESSMENT_FILE_INVALID");
+          decision = JSON.parse(fs.readFileSync(file, "utf8"));
+        } catch (error) { return unavailable(`ASSESSMENT_RESPONSE_INVALID: ${error.code ?? error.name}`); }
         record({ phase: "assessment_finished", snapshot: diagnostics.snapshot.name, decision });
         return decision;
       },
       repair: async (diagnostics, signal) => {
         primary.exposeAcceptedChecks(prepareChecks(diagnostics.checks, `repair-checks-${diagnostics.attempt}`));
-        await prompt("repair", primary, `Fix only the reproduced requirement failures below. The accepted test sources are now mounted read-only at /acceptance and their reporter at /harness/node-reporter.mjs. Read the failing test to identify its exact input and expectation, and reproduce the command in its reported cwd. Keep existing behavior and test expectations. Do not weaken checks. Inspect affected consumers.\n${JSON.stringify(diagnostics)}`, signal);
+        await prompt("repair", primary, `Fix only the reproduced requirement failures below. Only project-owned checks listed below authorize repair. Their test sources are in /workspace; generated hypotheses are not repair requirements. An empty /acceptance directory is mounted read-only and their reporter at /harness/node-reporter.mjs. Read the failing test to identify its exact input and expectation, and reproduce the command in its reported cwd. Keep existing behavior and test expectations. Do not weaken checks. Inspect affected consumers.\n${JSON.stringify(diagnostics)}`, signal);
       },
     };
     const report = await runController({ task: args.task, checks: config.checks, hypotheses, contracts, host, signal: abort.signal });
@@ -163,7 +183,8 @@ async function main() {
     report.base = original; report.usage = usage; report.output = output;
     report.timeLimitMs = args["time-limit-ms"] ? Number(args["time-limit-ms"]) : null;
     report.draftImported = Boolean(args["draft-patch"]);
-    // Failed/unverified drafts remain downloadable patches, never automatic edits.
+    // Passing trusted checks permits publication, not a semantic-correctness claim.
+    // Generated hypotheses remain separately unresolved in the report.
     report.application = report.stopReason === "checks_passed"
       ? await publishSnapshot(original, report.selected, abort.signal) : { applied: false, reason: report.stopReason };
     application = report.application;
@@ -172,9 +193,9 @@ async function main() {
     console.log(JSON.stringify(report, null, 2));
     if (report.stopReason !== "checks_passed" || !report.application.applied || report.application.cancelledAfterApplyStarted) process.exitCode = 2;
   } catch (error) {
-    fs.writeFileSync(path.join(output, "error.json"), JSON.stringify({ error: error.message, usage, cancelled: abort.signal.aborted }), { mode: 0o600 });
+    fs.writeFileSync(path.join(output, "error.json"), JSON.stringify({ error: error.message, cleanup: error.cleanup, execution: error.execution, usage, cancelled: abort.signal.aborted }), { mode: 0o600 });
     console.log(JSON.stringify({ stopReason: deadlineExceeded || error.message === "OPENCODE_SESSION_TIMEOUT" ? "timeout" : abort.signal.aborted ? "cancelled" : "execution_error",
-      output, selectedPatch: fs.existsSync(path.join(output, "D0.patch")) ? path.join(output, "D0.patch") : null,
+      output, cleanup: error.cleanup, selectedPatch: fs.existsSync(path.join(output, "D0.patch")) ? path.join(output, "D0.patch") : null,
       diagnostics: path.join(output, "attempts.jsonl"), application }));
     throw error;
   } finally {

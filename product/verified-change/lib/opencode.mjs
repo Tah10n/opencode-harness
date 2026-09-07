@@ -50,6 +50,7 @@ export async function createOpenCodeSession({ controlDirectory, sandbox, model, 
         execution = await command(argv, { cwd: controlDirectory, timeoutMs, signal, maxBytes: 8 * 1024 * 1024,
           env: { ...process.env, OPENCODE_CONFIG_CONTENT: JSON.stringify(config), VERIFIED_CHANGE_SESSION_CONFIG: configurationPath } });
       } finally {
+        try {
         // If OpenCode was killed during a tool call, its plugin's finally block
         // may not run. The host still removes every container owned by this session.
         const listed = await command(["docker", "ps", "-aq", "--filter", `label=verified-change.session=${label}`]);
@@ -59,6 +60,16 @@ export async function createOpenCodeSession({ controlDirectory, sandbox, model, 
         for (const id of ids) {
           const removed = await command(["docker", "rm", "--force", id]);
           if (removed.exitCode !== 0) throw new Error("SESSION_CLEANUP_UNVERIFIED");
+        }
+        } finally {
+          // OpenCode may surface a plugin exception as a recoverable tool error.
+          // Preserve the host-owned refusal even if its later census is empty.
+          const failure = path.join(controlDirectory, "cleanup-error.json");
+          if (fs.existsSync(failure)) {
+            const error = new Error("SANDBOX_CLEANUP_UNVERIFIED");
+            Object.assign(error, JSON.parse(fs.readFileSync(failure, "utf8")));
+            throw error;
+          }
         }
       }
       if (execution.cancelled) throw new DOMException("cancelled", "AbortError");

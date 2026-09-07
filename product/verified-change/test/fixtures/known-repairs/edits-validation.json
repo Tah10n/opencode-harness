@@ -1,0 +1,100 @@
+{
+  "origin": "edits-validation",
+  "contracts": {
+    "README.md": "Text offsets are JavaScript UTF-16 code unit positions in the original text. An edit is {start,end,text}, replacing the half-open original interval [start,end). Valid edits do not overlap; zero-width insertions may be at replacement boundaries, and multiple insertions at one position preserve their input order. applyEdits(text,edits) returns a string and does not mutate the array. applyDocument(document,edits) updates an ordinary writable {text,version} object in place, increments version once and returns that object. The public entrypoint is src/index.mjs.\n",
+    "task": "Add validateEdits(text,edits) exported from edits.mjs and index.mjs; it returns a newly allocated, sorted copy of valid edits.\nNon-string text, non-array edits, missing/non-integer offsets, null edit objects or non-string replacement text throw TypeError.\nNegative, reversed or out-of-bounds ranges and overlapping replacements throw RangeError."
+  },
+  "baseline": {
+    "src/document.mjs": "import {applyEdits} from './edits.mjs';export function applyDocument(document,edits){document.version++;document.text=applyEdits(document.text,edits);return document;}\n",
+    "src/index.mjs": "export {applyEdits} from './edits.mjs';export {applyDocument} from './document.mjs';\n",
+    "src/edits.mjs": "export function applyEdits(text,edits){let cursor=0,output='';const sorted=edits.map((edit,index)=>({...edit,index})).sort((a,b)=>a.start-b.start||a.end-b.end||a.index-b.index);for(const edit of sorted){output+=text.slice(cursor,edit.start)+edit.text;cursor=edit.end;}return output+text.slice(cursor);}\n",
+    "test/public.test.mjs": "import test from 'node:test';import assert from 'node:assert/strict';import {applyEdits,applyDocument} from '../src/index.mjs';\ntest('single edit and document API',()=>{assert.equal(applyEdits('abcd',[{start:1,end:3,text:'X'}]),'aXd');const doc={text:'abc',version:4};assert.equal(applyDocument(doc,[{start:0,end:1,text:'A'}]),doc);assert.deepEqual(doc,{text:'Abc',version:5});});\n"
+  },
+  "hypotheses": [
+    {
+      "id": "exports-and-validation",
+      "kind": "node-test",
+      "files": [
+        "exports-and-validation.test.mjs"
+      ],
+      "confidence": "unambiguous",
+      "basis": {
+        "source": "task",
+        "quote": "Add validateEdits(text,edits) exported from edits.mjs and index.mjs; it returns a newly allocated, sorted copy of valid edits."
+      }
+    },
+    {
+      "id": "type-errors",
+      "kind": "node-test",
+      "files": [
+        "type-errors.test.mjs"
+      ],
+      "confidence": "unambiguous",
+      "basis": {
+        "source": "task",
+        "quote": "Non-string text, non-array edits, missing/non-integer offsets, null edit objects or non-string replacement text throw TypeError."
+      }
+    },
+    {
+      "id": "range-and-overlap",
+      "kind": "node-test",
+      "files": [
+        "range-and-overlap.test.mjs"
+      ],
+      "confidence": "unambiguous",
+      "basis": {
+        "source": "task",
+        "quote": "Negative, reversed or out-of-bounds ranges and overlapping replacements throw RangeError."
+      }
+    },
+    {
+      "id": "application-order-and-utf16",
+      "kind": "node-test",
+      "files": [
+        "application-order-and-utf16.test.mjs"
+      ],
+      "confidence": "unambiguous",
+      "basis": {
+        "source": "README.md",
+        "quote": "Text offsets are JavaScript UTF-16 code unit positions in the original text."
+      }
+    },
+    {
+      "id": "document-update",
+      "kind": "node-test",
+      "files": [
+        "document-update.test.mjs"
+      ],
+      "confidence": "unambiguous",
+      "basis": {
+        "source": "README.md",
+        "quote": "applyDocument(document,edits) updates an ordinary writable {text,version} object in place, increments version once and returns that object."
+      }
+    }
+  ],
+  "generated": {
+    "application-order-and-utf16.test.mjs": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { validateEdits, applyEdits } from '/workspace/src/index.mjs';\n\ntest('preserves UTF-16 offsets, boundary insertions, and equal-position input order', () => {\n  const edits = [\n    { start: 3, end: 3, text: 'A' },\n    { start: 1, end: 3, text: 'X' },\n    { start: 3, end: 3, text: 'B' },\n  ];\n  assert.doesNotThrow(() => validateEdits('\ud83d\ude00bc', edits));\n  assert.equal(applyEdits('\ud83d\ude00bc', edits), 'XABc');\n});\n",
+    "exports-and-validation.test.mjs": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { validateEdits as directValidate } from '/workspace/src/edits.mjs';\nimport { validateEdits } from '/workspace/src/index.mjs';\n\ntest('exports validateEdits and returns a sorted, newly allocated valid copy', () => {\n  assert.equal(typeof directValidate, 'function');\n  assert.equal(typeof validateEdits, 'function');\n  const edits = [\n    { start: 4, end: 5, text: '!' },\n    { start: 1, end: 1, text: 'a' },\n    { start: 1, end: 1, text: 'b' },\n  ];\n  const result = validateEdits('hello', edits);\n  assert.deepEqual(result, [\n    { start: 1, end: 1, text: 'a' },\n    { start: 1, end: 1, text: 'b' },\n    { start: 4, end: 5, text: '!' },\n  ]);\n  assert.notStrictEqual(result, edits);\n  assert.deepEqual(edits, [\n    { start: 4, end: 5, text: '!' },\n    { start: 1, end: 1, text: 'a' },\n    { start: 1, end: 1, text: 'b' },\n  ]);\n});\n",
+    "document-update.test.mjs": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { applyDocument } from '/workspace/src/index.mjs';\n\ntest('updates an ordinary writable document in place and increments once', () => {\n  const document = { text: 'hello', version: 7 };\n  const edits = [{ start: 0, end: 5, text: 'hi' }];\n  const result = applyDocument(document, edits);\n  assert.strictEqual(result, document);\n  assert.deepEqual(document, { text: 'hi', version: 8 });\n  assert.deepEqual(edits, [{ start: 0, end: 5, text: 'hi' }]);\n});\n",
+    "type-errors.test.mjs": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { validateEdits, applyEdits } from '/workspace/src/index.mjs';\n\ntest('rejects invalid input and edit field types with TypeError', () => {\n  const invalidEdits = [\n    null,\n    { start: 0, end: 1, text: 1 },\n    { start: 0, end: 1 },\n    { end: 1, text: '' },\n    { start: 0, text: '' },\n    { start: 0.5, end: 1, text: '' },\n    { start: 0, end: '1', text: '' },\n  ];\n  for (const edits of invalidEdits) assert.throws(() => validateEdits('x', edits), TypeError);\n  assert.throws(() => validateEdits(1, []), TypeError);\n  assert.throws(() => validateEdits('x', [null]), TypeError);\n  assert.throws(() => applyEdits(1, []), TypeError);\n});\n",
+    "range-and-overlap.test.mjs": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { validateEdits, applyEdits } from '/workspace/src/index.mjs';\n\ntest('rejects invalid ranges and overlapping replacements, including interior insertions', () => {\n  for (const edit of [\n    { start: -1, end: 0, text: '' },\n    { start: 2, end: 1, text: '' },\n    { start: 0, end: 4, text: '' },\n  ]) assert.throws(() => validateEdits('abc', [edit]), RangeError);\n  assert.throws(() => validateEdits('abcd', [\n    { start: 1, end: 3, text: 'x' },\n    { start: 2, end: 4, text: 'y' },\n  ]), RangeError);\n  assert.throws(() => applyEdits('abcd', [\n    { start: 1, end: 3, text: 'x' },\n    { start: 2, end: 2, text: 'y' },\n  ]), RangeError);\n});\n"
+  },
+  "decision": {
+    "disputed": [
+      {
+        "id": "application-order-and-utf16",
+        "basis": {
+          "source": "README.md",
+          "quote": "Text offsets are JavaScript UTF-16 code unit positions in the original text."
+        },
+        "reason": "The reproduced expectation is `XABc`, while the actual result retains a leading high surrogate (`\\ud83dXABc`). With UTF-16 code-unit indexing, an edit boundary at code-unit offset 1 can leave the high surrogate at offset 0; removing the whole supplementary character requires covering both code units. The acceptance expectation therefore reflects a competing code-point interpretation, which is not required by the original task or README. The supplied failure output does not include the test source, so this dispute is limited to the reported assertion."
+      }
+    ]
+  },
+  "patches": {
+    "D0": "diff --git a/src/document.mjs b/src/document.mjs\nindex c50d823..0396809 100644\n--- a/src/document.mjs\n+++ b/src/document.mjs\n@@ -1 +1 @@\n-import {applyEdits} from './edits.mjs';export function applyDocument(document,edits){document.version++;document.text=applyEdits(document.text,edits);return document;}\n+import {applyEdits} from './edits.mjs';export function applyDocument(document,edits){const text=applyEdits(document.text,edits);document.text=text;document.version++;return document;}\ndiff --git a/src/edits.mjs b/src/edits.mjs\nindex ce6bba3..b4d972b 100644\n--- a/src/edits.mjs\n+++ b/src/edits.mjs\n@@ -1 +1,39 @@\n-export function applyEdits(text,edits){let cursor=0,output='';const sorted=edits.map((edit,index)=>({...edit,index})).sort((a,b)=>a.start-b.start||a.end-b.end||a.index-b.index);for(const edit of sorted){output+=text.slice(cursor,edit.start)+edit.text;cursor=edit.end;}return output+text.slice(cursor);}\n+export function validateEdits(text, edits) {\n+  if (typeof text !== 'string' || !Array.isArray(edits)) {\n+    throw new TypeError('text must be a string and edits must be an array');\n+  }\n+\n+  const sorted = edits.map((edit, index) => {\n+    if (edit === null || typeof edit !== 'object' ||\n+        !Number.isInteger(edit.start) || !Number.isInteger(edit.end) ||\n+        typeof edit.text !== 'string') {\n+      throw new TypeError('edits must contain integer start/end offsets and string text');\n+    }\n+    if (edit.start < 0 || edit.end < edit.start || edit.end > text.length) {\n+      throw new RangeError('edit range is out of bounds');\n+    }\n+    return {...edit, index};\n+  }).sort((a, b) => a.start - b.start || a.end - b.end || a.index - b.index);\n+\n+  let previous;\n+  for (const edit of sorted) {\n+    if (previous && (edit.start < previous.end ||\n+        (edit.start === edit.end && edit.start > previous.start && edit.start < previous.end))) {\n+      throw new RangeError('edits overlap');\n+    }\n+    if (!previous || edit.end > previous.end) previous = edit;\n+  }\n+\n+  return sorted.map(({index, ...edit}) => edit);\n+}\n+\n+export function applyEdits(text, edits) {\n+  const sorted = validateEdits(text, edits);\n+  let cursor = 0;\n+  let output = '';\n+  for (const edit of sorted) {\n+    output += text.slice(cursor, edit.start) + edit.text;\n+    cursor = edit.end;\n+  }\n+  return output + text.slice(cursor);\n+}\ndiff --git a/src/index.mjs b/src/index.mjs\nindex 4facfd1..79cd237 100644\n--- a/src/index.mjs\n+++ b/src/index.mjs\n@@ -1 +1 @@\n-export {applyEdits} from './edits.mjs';export {applyDocument} from './document.mjs';\n+export {applyEdits, validateEdits} from './edits.mjs';export {applyDocument} from './document.mjs';\n"
+  },
+  "patchSha256": {
+    "D0": "064144caebd448509e03a9f111807c30861fc3e579f61393eb80b90c89b27f66"
+  }
+}

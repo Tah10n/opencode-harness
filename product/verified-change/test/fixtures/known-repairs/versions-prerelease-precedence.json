@@ -1,0 +1,95 @@
+{
+  "origin": "versions-prerelease-precedence",
+  "contracts": {
+    "README.md": "Version utilities parse strict three-part nonnegative decimal versions, without leading zeros, with safe-integer components. Invalid input throws INVALID_VERSION. compareVersions returns -1/0/1; highest returns greatest version or null for an empty list without mutating input. plan(dependencies,registry) returns {name,version} entries in dependency order; registry maps package names to version-string arrays. Public exports are src/index.mjs.\n",
+    "task": "Return pre as an array of identifier strings.\nBuild metadata (+) remains invalid.\nWithin prerelease, numeric identifiers compare numerically and precede nonnumeric ones, other identifiers compare case-sensitive ASCII; after equal identifiers, the shorter list precedes the longer.\nhighest/plan must inherit this ordering"
+  },
+  "baseline": {
+    "src/highest.mjs": "import {compareVersions} from './compare.mjs';export function highest(versions){return [...versions].sort(compareVersions).at(-1)??null;}",
+    "src/compare.mjs": "import {parseVersion} from './parse.mjs';export function compareVersions(a,b){const x=parseVersion(a),y=parseVersion(b);for(const key of ['major','minor','patch'])if(x[key]!==y[key])return x[key]<y[key]?-1:1;return 0;}",
+    "src/plan.mjs": "import {highest} from './highest.mjs';export function plan(dependencies,registry){return dependencies.map(d=>({name:d.name,version:highest(registry[d.name]??[])}));}",
+    "src/parse.mjs": "export function parseVersion(text){if(typeof text!=='string'||!/^(0|[1-9][0-9]*)[.](0|[1-9][0-9]*)[.](0|[1-9][0-9]*)$/.test(text))throw Object.assign(new Error('version'),{code:'INVALID_VERSION'});const parts=text.split('.').map(Number);if(parts.some(n=>!Number.isSafeInteger(n)))throw Object.assign(new Error('version'),{code:'INVALID_VERSION'});return {major:parts[0],minor:parts[1],patch:parts[2],pre:[]};}",
+    "src/index.mjs": "export {parseVersion} from './parse.mjs';export {compareVersions} from './compare.mjs';export {highest} from './highest.mjs';export {plan} from './plan.mjs';",
+    "test/public.test.mjs": "import test from 'node:test';import assert from 'node:assert/strict';import {parseVersion,compareVersions,highest,plan} from '../src/index.mjs';test('ordinary versions and planner',()=>{assert.deepEqual(parseVersion('1.2.3'),{major:1,minor:2,patch:3,pre:[]});assert.equal(compareVersions('1.0.0','2.0.0'),-1);assert.equal(highest(['1.0.0','2.0.0']),'2.0.0');assert.deepEqual(plan([{name:'a'}],{a:['1.0.0']}),[{name:'a',version:'1.0.0'}]);});"
+  },
+  "hypotheses": [
+    {
+      "id": "parse-prerelease",
+      "kind": "node-test",
+      "files": [
+        "parse-prerelease.test.mjs"
+      ],
+      "confidence": "unambiguous",
+      "basis": {
+        "source": "task",
+        "quote": "Return pre as an array of identifier strings."
+      }
+    },
+    {
+      "id": "parse-invalid-prerelease",
+      "kind": "node-test",
+      "files": [
+        "parse-invalid-prerelease.test.mjs"
+      ],
+      "confidence": "unambiguous",
+      "basis": {
+        "source": "task",
+        "quote": "Build metadata (+) remains invalid."
+      }
+    },
+    {
+      "id": "compare-prerelease",
+      "kind": "node-test",
+      "files": [
+        "compare-prerelease.test.mjs"
+      ],
+      "confidence": "unambiguous",
+      "basis": {
+        "source": "task",
+        "quote": "Within prerelease, numeric identifiers compare numerically and precede nonnumeric ones, other identifiers compare case-sensitive ASCII; after equal identifiers, the shorter list precedes the longer."
+      }
+    },
+    {
+      "id": "highest-prerelease",
+      "kind": "node-test",
+      "files": [
+        "highest-prerelease.test.mjs"
+      ],
+      "confidence": "unambiguous",
+      "basis": {
+        "source": "task",
+        "quote": "highest/plan must inherit this ordering"
+      }
+    },
+    {
+      "id": "plan-prerelease",
+      "kind": "node-test",
+      "files": [
+        "plan-prerelease.test.mjs"
+      ],
+      "confidence": "unambiguous",
+      "basis": {
+        "source": "README.md",
+        "quote": "plan(dependencies,registry) returns {name,version} entries in dependency order; registry maps package names to version-string arrays."
+      }
+    }
+  ],
+  "generated": {
+    "compare-prerelease.test.mjs": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport {compareVersions} from '/workspace/src/index.mjs';\n\ntest('compareVersions orders core, prerelease, numeric, and ASCII identifiers', () => {\n  const ordered = [\n    '1.0.0-alpha',\n    '1.0.0-alpha.2',\n    '1.0.0-alpha.10',\n    '1.0.0-alpha.10.a',\n    '1.0.0-alpha.a',\n    '1.0.0-Alpha',\n    '1.0.0-alpha-z',\n    '1.0.0'\n  ];\n  for (let i = 0; i < ordered.length - 1; i++) {\n    assert.equal(compareVersions(ordered[i], ordered[i + 1]), -1);\n  }\n  assert.equal(compareVersions('1.0.0-999999999999999999999999999999', '1.0.0-1000000000000000000000000000000'), -1);\n  assert.equal(compareVersions('2.0.0-zz', '1.999.999'), 1);\n});\n",
+    "plan-prerelease.test.mjs": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport {plan} from '/workspace/src/index.mjs';\n\ntest('plan selects prerelease-aware greatest versions in dependency order', () => {\n  assert.deepEqual(plan(\n    [{name: 'first'}, {name: 'second'}],\n    {\n      first: ['1.0.0', '1.1.0-rc.2', '1.1.0-rc.10'],\n      second: ['2.0.0-alpha', '1.9.9']\n    }\n  ), [\n    {name: 'first', version: '1.1.0-rc.10'},\n    {name: 'second', version: '2.0.0-alpha'}\n  ]);\n});\n",
+    "parse-invalid-prerelease.test.mjs": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport {parseVersion} from '/workspace/src/index.mjs';\n\ntest('parseVersion rejects malformed prerelease and build metadata', () => {\n  for (const version of [\n    '1.2.3-',\n    '1.2.3-alpha..1',\n    '1.2.3-alpha_1',\n    '1.2.3-01',\n    '1.2.3-alpha+build',\n    '1.2.3-alpha.01'\n  ]) {\n    assert.throws(() => parseVersion(version), error => error?.code === 'INVALID_VERSION');\n  }\n});\n",
+    "highest-prerelease.test.mjs": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport {highest} from '/workspace/src/index.mjs';\n\ntest('highest inherits prerelease ordering and does not mutate input', () => {\n  const versions = ['1.0.0', '2.0.0-beta', '2.0.0-alpha', '1.0.0-z'];\n  const original = [...versions];\n  assert.equal(highest(versions), '2.0.0-beta');\n  assert.deepEqual(versions, original);\n  assert.equal(highest([]), null);\n});\n",
+    "parse-prerelease.test.mjs": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport {parseVersion} from '/workspace/src/index.mjs';\n\ntest('parseVersion returns prerelease identifiers', () => {\n  assert.deepEqual(parseVersion('1.2.3-alpha.1-x9'), {\n    major: 1,\n    minor: 2,\n    patch: 3,\n    pre: ['alpha', '1', 'x9']\n  });\n  assert.deepEqual(parseVersion('0.0.0-0'), {\n    major: 0,\n    minor: 0,\n    patch: 0,\n    pre: ['0']\n  });\n});\n"
+  },
+  "decision": {
+    "disputed": []
+  },
+  "patches": {
+    "D0": "diff --git a/src/compare.mjs b/src/compare.mjs\nindex 9fb9286..d5caf37 100644\n--- a/src/compare.mjs\n+++ b/src/compare.mjs\n@@ -1 +1,15 @@\n-import {parseVersion} from './parse.mjs';export function compareVersions(a,b){const x=parseVersion(a),y=parseVersion(b);for(const key of ['major','minor','patch'])if(x[key]!==y[key])return x[key]<y[key]?-1:1;return 0;}\n\\ No newline at end of file\n+import {parseVersion} from './parse.mjs';\n+export function compareVersions(a,b){\n+  const x=parseVersion(a),y=parseVersion(b);\n+  for(const key of ['major','minor','patch'])if(x[key]!==y[key])return x[key]<y[key]?-1:1;\n+  if(!x.pre.length&&!y.pre.length)return 0;\n+  if(!x.pre.length)return 1;\n+  if(!y.pre.length)return -1;\n+  for(let i=0;i<Math.min(x.pre.length,y.pre.length);i++){\n+    const left=x.pre[i],right=y.pre[i],leftNumeric=/^[0-9]+$/.test(left),rightNumeric=/^[0-9]+$/.test(right);\n+    if(leftNumeric&&rightNumeric){if(left.length!==right.length)return left.length<right.length?-1:1;if(left!==right)return left<right?-1:1;}\n+    else if(leftNumeric!==rightNumeric)return leftNumeric?-1:1;\n+    else if(left!==right)return left<right?-1:1;\n+  }\n+  return x.pre.length===y.pre.length?0:(x.pre.length<y.pre.length?-1:1);\n+}\ndiff --git a/src/parse.mjs b/src/parse.mjs\nindex a27964f..01e7042 100644\n--- a/src/parse.mjs\n+++ b/src/parse.mjs\n@@ -1 +1,9 @@\n-export function parseVersion(text){if(typeof text!=='string'||!/^(0|[1-9][0-9]*)[.](0|[1-9][0-9]*)[.](0|[1-9][0-9]*)$/.test(text))throw Object.assign(new Error('version'),{code:'INVALID_VERSION'});const parts=text.split('.').map(Number);if(parts.some(n=>!Number.isSafeInteger(n)))throw Object.assign(new Error('version'),{code:'INVALID_VERSION'});return {major:parts[0],minor:parts[1],patch:parts[2],pre:[]};}\n\\ No newline at end of file\n+export function parseVersion(text){\n+  const match=typeof text==='string'&&/^(0|[1-9][0-9]*)[.](0|[1-9][0-9]*)[.](0|[1-9][0-9]*)(?:-([A-Za-z0-9-]+(?:[.][A-Za-z0-9-]+)*))?$/.exec(text);\n+  if(!match)throw Object.assign(new Error('version'),{code:'INVALID_VERSION'});\n+  const parts=match.slice(1,4).map(Number);\n+  if(parts.some(n=>!Number.isSafeInteger(n)))throw Object.assign(new Error('version'),{code:'INVALID_VERSION'});\n+  const pre=match[4]?.split('.')??[];\n+  if(pre.some(id=>/^0[0-9]+$/.test(id)))throw Object.assign(new Error('version'),{code:'INVALID_VERSION'});\n+  return {major:parts[0],minor:parts[1],patch:parts[2],pre};\n+}\n",
+    "D1": "diff --git a/src/compare.mjs b/src/compare.mjs\nindex 9fb9286..70b0ef7 100644\n--- a/src/compare.mjs\n+++ b/src/compare.mjs\n@@ -1 +1,22 @@\n-import {parseVersion} from './parse.mjs';export function compareVersions(a,b){const x=parseVersion(a),y=parseVersion(b);for(const key of ['major','minor','patch'])if(x[key]!==y[key])return x[key]<y[key]?-1:1;return 0;}\n\\ No newline at end of file\n+import {parseVersion} from './parse.mjs';\n+export function compareVersions(a,b){\n+  const x=parseVersion(a),y=parseVersion(b);\n+  for(const key of ['major','minor','patch'])if(x[key]!==y[key])return x[key]<y[key]?-1:1;\n+  if(!x.pre.length&&!y.pre.length)return 0;\n+  if(!x.pre.length)return 1;\n+  if(!y.pre.length)return -1;\n+  for(let i=0;i<Math.min(x.pre.length,y.pre.length);i++){\n+    const left=x.pre[i],right=y.pre[i],leftNumeric=/^[0-9]+$/.test(left),rightNumeric=/^[0-9]+$/.test(right);\n+    if(leftNumeric&&rightNumeric){if(left.length!==right.length)return left.length<right.length?-1:1;if(left!==right)return left<right?-1:1;}\n+    else if(leftNumeric!==rightNumeric)return leftNumeric?-1:1;\n+    else if(left!==right){\n+      for(let j=0;j<Math.min(left.length,right.length);j++)if(left[j]!==right[j]){\n+        const l=left.charCodeAt(j),r=right.charCodeAt(j);\n+        if((l>=65&&l<=90)!==(r>=65&&r<=90))return -1;\n+        return l<r?-1:1;\n+      }\n+      if(left.length!==right.length)return left.length<right.length?-1:1;\n+    }\n+  }\n+  return x.pre.length===y.pre.length?0:(x.pre.length<y.pre.length?-1:1);\n+}\ndiff --git a/src/parse.mjs b/src/parse.mjs\nindex a27964f..1765086 100644\n--- a/src/parse.mjs\n+++ b/src/parse.mjs\n@@ -1 +1,9 @@\n-export function parseVersion(text){if(typeof text!=='string'||!/^(0|[1-9][0-9]*)[.](0|[1-9][0-9]*)[.](0|[1-9][0-9]*)$/.test(text))throw Object.assign(new Error('version'),{code:'INVALID_VERSION'});const parts=text.split('.').map(Number);if(parts.some(n=>!Number.isSafeInteger(n)))throw Object.assign(new Error('version'),{code:'INVALID_VERSION'});return {major:parts[0],minor:parts[1],patch:parts[2],pre:[]};}\n\\ No newline at end of file\n+export function parseVersion(text){\n+  const match=typeof text==='string'&&/^(0|[1-9][0-9]*)[.](0|[1-9][0-9]*)[.](0|[1-9][0-9]*)(?:-([A-Za-z0-9-]+(?:[.][A-Za-z0-9-]+)*))?$/.exec(text);\n+  if(!match)throw Object.assign(new Error('version'),{code:'INVALID_VERSION'});\n+  const parts=match.slice(1,4).map(Number);\n+  if(parts.some(n=>!Number.isSafeInteger(n)))throw Object.assign(new Error('version'),{code:'INVALID_VERSION'});\n+  const pre=match[4]?.split('.').flatMap(id=>/^\\d+-/.test(id)?id.split('-'):id)??[];\n+  if(pre.some(id=>/^0[0-9]+$/.test(id)))throw Object.assign(new Error('version'),{code:'INVALID_VERSION'});\n+  return {major:parts[0],minor:parts[1],patch:parts[2],pre};\n+}\n"
+  },
+  "patchSha256": {
+    "D0": "904e522c95fb6baa5f692281040c1d0b07b60cb8efca64024403af18fa5f0256",
+    "D1": "28d7d1529289b8c9adf17b61168b908a1626675def18b6991288c5b466d99edf"
+  }
+}

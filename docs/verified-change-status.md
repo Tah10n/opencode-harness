@@ -1,5 +1,9 @@
 # Verified-change delivery status — 2026-09-07
 
+> Historical delivery record for the frozen product. For the subsequent 0.2.0
+> product fixes and current installation instructions, see
+> [next-version changes](verified-change-next-version.md). The record below is preserved.
+
 The installed requirement-checking and bounded-repair mechanism and its single
 60-task final run are complete. **No product advantage was established.** The
 frozen outcomes are A=59/60, B=58/60 and C=56/60; C−A is −5.00 percentage points

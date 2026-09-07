@@ -1,26 +1,25 @@
-# Verified change harness — implementation in progress
+# Verified change harness — next product version 0.2.0
 
-This package is being developed on `feat/verified-change-harness`, based on
-`origin/main` at `89f1f7f1980a829d7da162fcd737d0c52613225d`.
-It has no imports from historical lab, benchmark, assurance, or profile code.
+Experimental OpenCode wrapper with private D0/D1/D2 patches, project checks,
+diagnostic generated tests, and at most two repairs. It has no dependency on lab,
+benchmark, evaluation, or profile code. No product quality advantage is proven.
+The previous version's frozen 60-task study is preserved in the repository at
+`docs/verified-change-results.md`; this version fixes known product defects and
+has not been evaluated in a new model campaign.
 
-The CLI, independent acceptance author, OpenCode session adapter, snapshot
-controller, Docker executor, and structured Node test reporter are implemented.
-The installed command has completed acceptance-failure-repair cycles with both a
-local scripted provider and a real model. The real run also exposed unresolved
-ambiguity in another generated assertion. **The complete development program and
-frozen evaluation are still pending; this is not a release-ready tool.**
+## Install and run
 
-Install this package into a local prefix without sudo:
+With Node 24+, the existing OpenCode installation, Docker, and an already local
+Node image (the product never pulls an image):
 
 ```sh
-npm pack ./product/verified-change
-npm install --prefix ./harness-install ./opencode-harness-verified-change-0.1.0.tgz
+npm pack ./product/verified-change --ignore-scripts
+npm install --prefix ./harness-install --ignore-scripts --no-audit --no-fund ./opencode-harness-verified-change-0.2.0.tgz
 ./harness-install/node_modules/.bin/opencode-harness doctor --workspace /absolute/repository
 ./harness-install/node_modules/.bin/opencode-harness run --workspace /absolute/repository -- "Your task"
 ```
 
-The target repository needs a committed `.opencode-harness.json`, for example:
+The target repository needs a clean Git worktree and a committed config:
 
 ```json
 {
@@ -32,89 +31,116 @@ The target repository needs a committed `.opencode-harness.json`, for example:
 }
 ```
 
-The configured image must already be installed. Model and variant can be supplied
-as CLI options or configuration fields; when omitted, OpenCode selects its usual
-defaults. Provider authentication remains in OpenCode's existing storage.
-The agent's repository tools run in isolated containers with only the designated
-source paths writable. The acceptance author gets the initial repository read-only
-and a separate writable output directory, then audits its assertions before D0.
-After D0, the primary agent receives accepted tests read-only, with the command's
-cwd and reporter. Before repairing a reproduced generated failure, it assesses
-whether the assertion admits a competing valid interpretation. This turn cannot
-write source. A disputed assertion needs an original-contract quote and rationale;
-it becomes unverified, and shared test files are quarantined. Existing regression
-checks cannot be removed. Remaining confirmed failures still receive bounded
-repair. This model judgment can itself be wrong; it is not an independent oracle.
-No provider client or credential copy
-is introduced. Version 1 rejects dirty worktrees, symlinks, submodules, and hidden
-index flags, and does not currently install project dependencies automatically.
+Project dependencies must already be available. `--model provider/model` and
+`--variant variant` override project config; otherwise OpenCode selects its usual
+defaults. Authentication stays in OpenCode's existing storage. The package does
+not introduce a provider client or credential copy.
 
-Private artifacts (D0/D1/D2 patches, snapshots, report, attempt journal, assertions, bounded tool
-diagnostics) are retained in the temporary run directory printed by the CLI.
-Only a fully checked selected patch is applied, after rechecking user HEAD and
-cleanliness. Other outcomes retain their patches for manual inspection.
+## Which failures can cause repair
 
-The controller retains D0 when bounded repairs fail, reproduces assertions before
-repair, excludes explicitly ambiguous or ungrounded generated hypotheses, and
-reruns all mandatory checks after each repair. A literal citation validates
-provenance, not semantic correctness: generated tests remain fallible hypotheses.
+The controller records three sources:
 
-To check an already prepared draft without another draft-generation call, use
-`--draft-patch /absolute/draft.patch`. The repository must still be the clean
-original base. The acceptance author completes against that original base before
-the patch is imported into the private candidate. Ordinary source scope and
-regression checks still apply. D0 is saved and subsequent repairs use a fresh
-primary session; prior authoring-session history is not imported.
+- `existing_project_check`: configured project checks (the default for existing
+  configs). Reproduced assertions can trigger bounded repair.
+- `independently_validated_acceptance`: a project-owned Node test with explicit
+  confirmation of its expected result in the committed config. Its exact test
+  bytes must match the confirmation and live in protected paths. Reproduced
+  assertions can trigger bounded repair.
+- `generated_hypothesis`: all output from the acceptance author, regardless of
+  confidence, exact quote, claimed source, or a model's agreement. These tests
+  execute as diagnostics, retain assertions and test files, and never independently
+  authorize production repair or block a draft that passes trusted checks.
 
-`--time-limit-ms 900000` optionally caps the entire private run after preflight,
-including test authorship, its audit, checks, assessment and repairs. Each model
-prompt also retains the configured `sessionTimeoutMs` limit. Cancellation and
-container cleanup can add wall time after the deadline. An expired deadline
-prevents starting publication. If it expires after Git application has started,
-the host lets Git finish instead of interrupting a file write; the report retains
-both the timeout and the actual application result. This is a wall-time limit,
-not a token or monetary budget.
+The currently supported confirmation basis is **project-owner confirmation**.
+The owner reviews the expected output and test, then commits a check such as:
 
-Checks execute in a locally available Docker image resolved to its immutable
-image ID. Containers have no network, no host credentials, a read-only root,
-bounded resources, and a read-only repository for host verification. Container
-removal terminates detached descendants on timeout and cancellation. No image is
-automatically pulled, no sudo is used, and no executable is copied out of its
-runtime installation.
+```json
+{
+  "id": "negative-timeout",
+  "kind": "node-test",
+  "files": ["test/negative-timeout.test.mjs"],
+  "source": "independently_validated_acceptance",
+  "expectedResult": {
+    "kind": "project_owner_confirmation",
+    "confirmed": true,
+    "expectation": "Calling delay(-1) throws RangeError before scheduling a timer.",
+    "rationale": "The owner confirmed this boundary example against the task's explicit input/output requirement.",
+    "fileSha256": { "test/negative-timeout.test.mjs": "<SHA-256 of the reviewed file>" }
+  }
+}
+```
 
-The initial assertion adapter supports Node's built-in test runner. It uses
-structured reporter events and identifies `ERR_ASSERTION` failures. Other test
-errors and nonzero generic build commands are conservatively infrastructure
-errors; additional language/framework adapters remain to be implemented.
-Truncated or malformed diagnostics cannot be treated as passing verification.
+Replace the placeholder with the actual 64-character SHA-256. Hash keys include
+`cwd` when configured; every listed test file needs its own digest. Changed test
+bytes require renewed owner confirmation. Existing workspace ownership, committed
+configuration, protected files and snapshot checks establish the trust boundary;
+this is not a signing service or a new reviewer role. A hash binds bytes, not
+semantic truth. The owner must actually confirm the expectation. A model-written
+paraphrase, boolean or hash inside an author manifest cannot grant this status.
+Explicit task examples and reference API behavior may inform that owner review;
+this version does not automatically infer or validate expectations from prose or
+call external reference APIs.
 
-Run the deterministic controller/configuration checks:
+The acceptance author sees the initial repository, never D0. Generated tests are
+run against snapshots, but remain hidden from the primary session during draft
+and repair. Only trusted failures and checks enter repair prompts. After the
+repair decision is final, the existing primary session may explain/dispute
+reproduced diagnostic failures in a read-only turn. Correct grounded disputes
+remain in the report; an empty dispute list never promotes a test. No new model
+reviewer is added.
+
+Reports separate `passedProjectChecks`, owner-confirmed acceptance checks and
+`unresolvedHypotheses`, including failing assertions and explanations. Even a
+passing generated test stays a hypothesis. `checks_passed` means trusted checks
+passed; `semanticCorrectness` remains `unproven`. Keeping D0 is not proof that it
+satisfies every aspect of the task. Generic runtime failures in diagnostic tests
+are recorded as unresolved; containment failures still stop publication.
+
+## Execution, patches and cleanup
+
+The host reproduces trusted assertion failures before repair and reruns all
+checks after each repair. It rejects repairs that break a trusted check passing
+in D0, stops after two unsuccessful repairs and retains the original D0 patch.
+Existing tests cannot be weakened. Nonzero generic commands, broken test runtime
+and timeouts in trusted checks are unavailable verification, not repair evidence.
+The initial assertion adapter supports Node's built-in test runner.
+
+All repository tools execute in containers with no network or host credentials,
+a read-only root, restricted mounts and bounded resources. Source scope,
+protected tests and original user HEAD/cleanliness are checked before publication.
+Version 1 config still rejects dirty worktrees, symlinks, submodules and hidden
+index flags. Concurrent user edits are preserved.
+
+Private artifacts are retained in the printed temporary run directory: patches,
+snapshots, generated tests, report and `attempts.jsonl`. Cleanup errors include
+exact container name/observed ID, bounded rm/inspect/list outputs, command exits,
+timeouts and before/after state in `error.json`. Plugin cleanup refusals also
+persist in the session control directory. A later empty inventory cannot erase
+an uncertain cleanup result. Such runs never apply a patch to the user worktree
+or repeat the model task. Already absent auto-removed containers are accepted
+only with a precise missing-container response and immediate verified absence.
+
+`--draft-patch /absolute/draft.patch` imports an existing D0 after authorship,
+without a second draft call. `--time-limit-ms 900000` caps the private run after
+preflight; model prompts also retain `sessionTimeoutMs`. Cancellation cleanup can
+add bounded wall time. An expired deadline prevents starting publication; Git
+application already started is allowed to finish, and the report records its
+actual result. This is not a token or monetary budget.
+
+## Tests
+
+From this package directory:
 
 ```sh
 npm test
-```
-
-Run the installed-package Docker check (requires the existing local image
-`node:24.19.0-bookworm-slim`):
-
-```sh
-VERIFIED_CHANGE_DOCKER_TEST=1 npm test
-```
-
-The latter packs and installs the package into a temporary directory and executes
-the installed modules in real containers. To exercise the installed CLI with
-actual OpenCode and a localhost scripted provider (no paid model requests):
-
-```sh
+VERIFIED_CHANGE_DOCKER_TEST=1 node --test test/installed-sandbox.test.mjs
 VERIFIED_CHANGE_OPENCODE_TEST=1 node --test test/opencode-fixture.test.mjs
 ```
 
-This is mechanism evidence, not product lift. Three initial model-backed development
-runs exposed admission, repair-diagnostic and assertion-ambiguity issues; their findings are described
-in `development/verified-change/README.md` in the source repository. No official
-evaluation has been run. `doctor` checks the configured project's actual commands
-on an isolated clone, explicitly leaving model access and repair unverified.
-
-Remaining work: further hardening/review of the new CLI and adapter; model-backed
-development; one preregistered 60-task A/B/C evaluation; independent code/statistics
-review; one PR. No merge, release, or default switch is authorized.
+The installed tests pack into fresh temporary prefixes and use the existing
+Docker image. OpenCode CLI tests use only a localhost scripted provider, not a
+live model. Saved fallback, expansion, prerelease and UTF-16 cases are ordinary
+product regressions in `test/known-repairs.test.mjs`, also run against the installed
+bundle. They test controller decisions, exact selected patches and concrete
+behavior. They do not run the historical grader, change any prior scores, or
+establish a general quality improvement.

@@ -1,188 +1,141 @@
-import assert from "node:assert/strict";
-import test from "node:test";
-import { runController, acceptHypotheses } from "../lib/controller.mjs";
+import assert from 'node:assert/strict';
+import test from 'node:test';
+import { runController, acceptHypotheses, groundedCitation } from '../lib/controller.mjs';
 
-const task = "Preserve old callers. Reject negative timeouts.";
-const acceptance = { id: "negative", confidence: "unambiguous", basis: { source: "task", quote: "Reject negative timeouts." } };
-function fixture(states, options = {}) {
-  const repairs = [];
-  const verified = [];
+const task = 'Preserve old callers. Reject negative timeouts.';
+const hypothesis = { id: 'negative', confidence: 'unambiguous', basis: { source: 'task', quote: 'Reject negative timeouts.' } };
+const acceptance = { id: 'negative', kind: 'node-test', files: ['test/negative.test.mjs'], source: 'independently_validated_acceptance',
+  expectedResult: { kind: 'project_owner_confirmation', confirmed: true, expectation: 'timeout -1 throws RangeError',
+    rationale: 'Project owner confirmed the boundary case in the protected test.', fileSha256: { 'test/negative.test.mjs': 'a'.repeat(64) } } };
+function fixture(states, { generated = false, ...options } = {}) {
+  const repairs = [], verified = [];
   const host = {
-    draft: async () => {}, snapshot: async (name) => name,
-    scope: async () => ({ passed: true }),
+    draft: async () => {}, snapshot: async name => name, scope: async () => ({ passed: true }),
     verify: async (snapshot, checks) => {
-      verified.push([snapshot, checks.map((c) => c.id)]);
-      return checks.map((c) => ({ id: c.id, status: states[snapshot][c.id], stderr: "actual assertion detail" }));
+      verified.push([snapshot, checks.map(c => c.id)]);
+      return checks.map(c => ({ id: c.id, status: states[snapshot][c.id], stderr: 'actual assertion detail' }));
     },
-    repair: async (diagnostic) => { repairs.push(diagnostic); },
-    assess: async () => ({ disputed: [] }),
-    ...options,
+    repair: async diagnostic => { repairs.push(diagnostic); }, assess: async () => ({ disputed: [] }), ...options,
   };
-  return { repairs, verified, run: () => runController({ task, checks: [{ id: "regression" }], hypotheses: [acceptance], contracts: { task }, host }) };
+  return { repairs, verified, run: () => runController({ task,
+    checks: [{ id: 'regression' }, ...(generated ? [] : [acceptance])], hypotheses: generated ? [hypothesis] : [], contracts: { task }, host }) };
 }
-
-test("green draft is retained with no cosmetic repair", async () => {
-  const f = fixture({ D0: { regression: "passed", negative: "passed" } });
-  const result = await f.run();
-  assert.equal(result.selected, "D0");
-  assert.equal(result.stopReason, "checks_passed");
-  assert.equal(f.repairs.length, 0);
-  assert.deepEqual(result.confirmed.map((c) => c.id), ["negative"]);
+test('green trusted checks retain D0; passed checks are not semantic proof', async () => {
+  const f = fixture({ D0: { regression: 'passed', negative: 'passed' } });
+  const r = await f.run();
+  assert.equal(r.selected, 'D0'); assert.equal(r.repairs, 0); assert.equal(r.stopReason, 'checks_passed');
+  assert.equal(r.semanticCorrectness, 'unproven');
+  assert.deepEqual(r.passedProjectChecks, ['regression']); assert.deepEqual(r.confirmed.map(c => c.id), ['negative']);
+  assert.deepEqual(r.checkSources, { regression: 'existing_project_check', negative: 'independently_validated_acceptance' });
 });
-
-test("green old tests plus missed requirement causes reproducible repair", async () => {
-  const f = fixture({ D0: { regression: "passed", negative: "assertion_failed" }, D1: { regression: "passed", negative: "passed" } });
-  const result = await f.run();
-  assert.equal(result.selected, "D1");
-  assert.equal(result.repairs, 1);
-  assert.deepEqual(f.verified, [["D0", ["regression", "negative"]], ["D0", ["negative"]], ["D1", ["regression", "negative"]]]);
-  assert.equal(f.repairs[0].diagnostics[0].first.stderr, "actual assertion detail");
-  assert.deepEqual(f.repairs[0].diagnostics[0].check.basis, acceptance.basis);
+test('owner-confirmed acceptance reproduces failure and authorizes bounded repair', async () => {
+  const f = fixture({ D0: { regression: 'passed', negative: 'assertion_failed' }, D1: { regression: 'passed', negative: 'passed' } });
+  const r = await f.run();
+  assert.equal(r.selected, 'D1'); assert.equal(r.repairs, 1);
+  assert.deepEqual(f.verified, [['D0', ['regression', 'negative']], ['D0', ['negative']], ['D1', ['regression', 'negative']]]);
+  assert.equal(f.repairs[0].diagnostics[0].first.stderr, 'actual assertion detail');
+  assert.deepEqual(f.repairs[0].diagnostics[0].check.expectedResult, acceptance.expectedResult);
 });
-
-test("repair breaking an existing consumer is rejected", async () => {
-  const f = fixture({ D0: { regression: "passed", negative: "assertion_failed" }, D1: { regression: "assertion_failed", negative: "passed" } });
-  const result = await f.run();
-  assert.equal(result.selected, "D0");
-  assert.equal(result.stopReason, "repair_regression");
-  assert.equal(f.repairs.length, 1);
+test('repair breaking a previously passing project consumer is rejected', async () => {
+  const f = fixture({ D0: { regression: 'passed', negative: 'assertion_failed' }, D1: { regression: 'assertion_failed', negative: 'passed' } });
+  const r = await f.run(); assert.equal(r.selected, 'D0'); assert.equal(r.stopReason, 'repair_regression'); assert.equal(r.repairs, 1);
 });
-
-test("two unsuccessful repairs retain D0 and report failure", async () => {
-  const state = { regression: "passed", negative: "assertion_failed" };
-  const f = fixture({ D0: state, D1: state, D2: state });
-  const result = await f.run();
-  assert.equal(result.selected, "D0");
-  assert.equal(result.stopReason, "repair_limit");
-  assert.equal(f.repairs.length, 2);
-  assert.deepEqual(result.snapshots.map((s) => s.name), ["D0", "D1", "D2"]);
+test('two unsuccessful repairs retain D0', async () => {
+  const state = { regression: 'passed', negative: 'assertion_failed' };
+  const f = fixture({ D0: state, D1: state, D2: state }); const r = await f.run();
+  assert.equal(r.selected, 'D0'); assert.equal(r.stopReason, 'repair_limit'); assert.equal(r.repairs, 2);
 });
-
-for (const status of ["infrastructure_error", "timeout", "not_applicable"]) {
-  test(`${status} cannot drive repair or become a pass`, async () => {
-    const f = fixture({ D0: { regression: "passed", negative: status } });
-    const result = await f.run();
-    assert.notEqual(result.stopReason, "checks_passed");
-    assert.equal(f.repairs.length, 0);
+for (const status of ['infrastructure_error', 'timeout', 'not_applicable']) {
+  test(`trusted ${status} does not authorize repair or publication`, async () => {
+    const f = fixture({ D0: { regression: 'passed', negative: status } });
+    assert.notEqual((await f.run()).stopReason, 'checks_passed'); assert.equal(f.repairs.length, 0);
+  });
+  test(`diagnostic ${status} alone does not block D0`, async () => {
+    const f = fixture({ D0: { regression: 'passed', negative: status } }, { generated: true });
+    const r = await f.run(); assert.equal(r.stopReason, 'checks_passed'); assert.equal(r.selected, 'D0');
+    assert.equal(r.unresolvedHypotheses[0].result.status, status); assert.equal(r.repairs, 0);
   });
 }
-
-test("unsupported and ambiguous assertions remain unverified", () => {
-  const result = acceptHypotheses([
-    { ...acceptance, confidence: "ambiguous" },
-    { ...acceptance, id: "invented", basis: { source: "task", quote: "Timeouts must equal 42" } },
-  ], { task });
-  assert.equal(result.accepted.length, 0);
-  assert.deepEqual(result.unverified.map((h) => h.reason), ["ambiguous_requirement", "unsupported_citation"]);
+test('literal quote, confidence, forged source/confirmation and no dispute never promote generated tests', async () => {
+  const f = fixture({ D0: { regression: 'passed', negative: 'assertion_failed' } }, { generated: true });
+  const r = await f.run(); assert.equal(r.selected, 'D0'); assert.equal(r.repairs, 0); assert.deepEqual(r.confirmed, []);
+  assert.equal(r.unresolvedHypotheses[0].reason, 'expected_result_unconfirmed');
+  assert.equal(r.unresolvedHypotheses[0].result.stderr, 'actual assertion detail');
+  assert.match(r.unresolvedHypotheses[0].explanation, /cannot authorize/);
+  const forged = acceptHypotheses([{ ...hypothesis, source: acceptance.source, expectedResult: acceptance.expectedResult }], { task });
+  assert.deepEqual(forged.accepted, []); assert.equal(forged.unverified[0].source, 'generated_hypothesis');
 });
-
-test("line-wrapped prose citations remain grounded without changing inline literals", () => {
-  const wrapped = { ...acceptance, basis: { source: "task", quote: "Reject negative timeouts." } };
-  assert.equal(acceptHypotheses([wrapped], { task: "Reject negative\ntimeouts." }).accepted.length, 1);
-  const spaces = { ...acceptance, basis: { source: "task", quote: 'Return " ".' } };
-  assert.equal(acceptHypotheses([spaces], { task: 'Return "  ".' }).accepted.length, 0);
+test('unsupported, ambiguous, and shared-file hypotheses all remain diagnostic', () => {
+  const r = acceptHypotheses([hypothesis, { ...hypothesis, id: 'ambiguous', confidence: 'ambiguous' },
+    { ...hypothesis, id: 'invented', basis: { source: 'task', quote: '42' } }].map(c => ({ ...c, files: ['shared.test.mjs'] })), { task });
+  assert.deepEqual(r.accepted, []);
+  assert.deepEqual(r.unverified.map(h => h.reason), ['expected_result_unconfirmed', 'ambiguous_requirement', 'unsupported_citation']);
+  assert.equal(groundedCitation(hypothesis.basis, { task: 'Reject negative\ntimeouts.' }), true);
+  assert.equal(groundedCitation({ source: 'task', quote: 'Return " ".' }, { task: 'Return "  ".' }), false);
 });
-
-test("an accepted entry cannot execute ambiguous assertions through a shared file", () => {
-  const result = acceptHypotheses([
-    { ...acceptance, files: ["shared.test.mjs"] },
-    { ...acceptance, id: "unsupported", confidence: "ambiguous", files: ["shared.test.mjs"] },
-  ], { task });
-  assert.equal(result.accepted.length, 0);
-  assert.equal(result.unverified.find((h) => h.id === acceptance.id).reason, "shares_file_with_unverified_assertions");
-});
-
-test("flaky assertions do not cause code changes", async () => {
+for (const different of [false, true]) test(`unstable trusted assertion cannot drive repair (${different})`, async () => {
   let calls = 0;
-  const f = fixture({}, { verify: async (_snapshot, checks) => checks.map((c) => ({ id: c.id, status: ++calls <= 2 ? "assertion_failed" : "passed" })) });
-  assert.equal((await f.run()).stopReason, "failure_not_reproducible");
-  assert.equal(f.repairs.length, 0);
+  const f = fixture({}, { verify: async (_, checks) => {
+    calls++;
+    return checks.map(c => ({ id: c.id, status: calls === 1 || different ? 'assertion_failed' : 'passed',
+      assertions: [{ name: different ? `assertion-${calls}` : 'assertion', code: 'ERR_ASSERTION' }] }));
+  } });
+  assert.equal((await f.run()).stopReason, 'failure_not_reproducible'); assert.equal(f.repairs.length, 0);
 });
-
-test("incomplete host result cannot hide missing regressions", async () => {
-  const f = fixture({}, { verify: async () => [{ id: "negative", status: "passed" }] });
+test('incomplete host results cannot hide checks', async () => {
+  const f = fixture({}, { verify: async () => [{ id: 'negative', status: 'passed' }] });
   await assert.rejects(f.run, /CHECK_RESULTS_INCOMPLETE/);
 });
-
-test("different failing assertions do not count as a reproduction", async () => {
-  let count = 0;
-  const f = fixture({}, { verify: async (_snapshot, checks) => {
-    count += 1;
-    return checks.map((c) => ({ id: c.id, status: "assertion_failed", assertions: [{ name: `assertion-${count}`, code: "ERR_ASSERTION" }] }));
-  } });
-  assert.equal((await f.run()).stopReason, "failure_not_reproducible");
-  assert.equal(f.repairs.length, 0);
+test('AbortError during repair retains D0 and diagnostics', async () => {
+  const abort = new AbortController();
+  const r = await runController({ task, checks: [{ id: 'regression' }], hypotheses: [], contracts: { task }, signal: abort.signal,
+    host: { draft: async () => {}, snapshot: async name => name, scope: async () => ({ passed: true }),
+      verify: async () => [{ id: 'regression', status: 'assertion_failed', stderr: 'assertion' }],
+      repair: async () => { abort.abort(); throw new DOMException('cancelled', 'AbortError'); } } });
+  assert.equal(r.stopReason, 'cancelled'); assert.equal(r.selected, 'D0'); assert.equal(r.snapshots[0].checks[0].stderr, 'assertion');
 });
-
-test("AbortError during repair retains D0 and accumulated diagnostics", async () => {
-  const control = new AbortController();
-  const result = await runController({ task, checks: [{ id: "regression" }], hypotheses: [], contracts: { task }, signal: control.signal,
-    host: { draft: async () => {}, snapshot: async (name) => name, scope: async () => ({ passed: true }),
-      verify: async () => [{ id: "regression", status: "assertion_failed", stderr: "assertion" }],
-      repair: async () => { control.abort(); throw new DOMException("cancelled", "AbortError"); } } });
-  assert.equal(result.stopReason, "cancelled");
-  assert.equal(result.selected, "D0");
-  assert.equal(result.snapshots[0].checks[0].stderr, "assertion");
+test('valid disputes still explain erroneous hypotheses', async () => {
+  const f = fixture({ D0: { regression: 'passed', negative: 'assertion_failed' } }, { generated: true,
+    assess: async () => ({ disputed: [{ id: 'negative', basis: hypothesis.basis, reason: 'Return representation is unspecified.' }] }) });
+  const r = await f.run(); assert.equal(r.repairs, 0); assert.equal(r.unverified[0].reason, 'disputed_assertion');
 });
-
-test("disputed assertions cannot drive repairs or be reported confirmed", async () => {
-  const f = fixture({ D0: { regression: "passed", negative: "assertion_failed" } }, {
-    assess: async () => ({ disputed: [{ id: "negative", basis: acceptance.basis, reason: "The assertion chooses an unspecified return representation." }] }),
-  });
-  const result = await f.run();
-  assert.equal(f.repairs.length, 0);
-  assert.equal(result.selected, "D0");
-  assert.equal(result.confirmed.length, 0);
-  assert.equal(result.unverified[0].reason, "disputed_assertion");
-});
-
-test("a dispute cannot remove an existing regression or cite invented requirements", async () => {
-  for (const dispute of [
-    { id: "regression", basis: acceptance.basis, reason: "disagree" },
-    { id: "negative", basis: { source: "task", quote: "Always return 42" }, reason: "disagree" },
-  ]) {
-    const f = fixture({ D0: { regression: "assertion_failed", negative: "assertion_failed" } }, { assess: async () => ({ disputed: [dispute] }) });
-    await assert.rejects(f.run, /ASSESSMENT_/);
-    assert.equal(f.repairs.length, 0);
+test('invalid disputes cannot remove trusted checks or promote a hypothesis', async () => {
+  for (const dispute of [{ id: 'regression', basis: hypothesis.basis, reason: 'disagree' },
+    { id: 'negative', basis: { source: 'task', quote: '42' }, reason: 'disagree' }]) {
+    const f = fixture({ D0: { regression: 'passed', negative: 'assertion_failed' } }, { generated: true, assess: async () => ({ disputed: [dispute] }) });
+    const r = await f.run(); assert.equal(r.repairs, 0); assert.equal(r.unverified[0].reason, 'expected_result_unconfirmed');
+    assert.equal(r.snapshots[0].assessment.error, 'ASSESSMENT_INVALID_OR_UNGROUNDED');
   }
 });
-
-test("a disputed expectation does not prevent repair of a separate confirmed defect", async () => {
-  let repair;
-  const result = await runController({ task, checks: [{ id: "regression" }], contracts: { task },
-    hypotheses: [acceptance, { ...acceptance, id: "representation" }],
-    host: {
-      draft: async () => {}, snapshot: async name => name, scope: async () => ({ passed: true }),
-      verify: async (snapshot, checks) => checks.map(c => ({ id: c.id, status: snapshot === "D0" && c.id !== "regression" ? "assertion_failed" : "passed", stderr: "stable assertion" })),
-      assess: async () => ({ disputed: [{ id: "representation", basis: acceptance.basis, reason: "Return shape is unspecified." }] }),
-      repair: async input => { repair = input; },
-    } });
-  assert.deepEqual(repair.diagnostics.map(d => d.check.id), ["negative"]);
-  assert.equal(result.selected, "D1");
-  assert.deepEqual(result.confirmed.map(c => c.id), ["negative"]);
-  assert.equal(result.unverified[0].id, "representation");
+test('trusted repair precedes assessment and never receives generated failures or files', async () => {
+  const events = [];
+  const f = fixture({ D0: { regression: 'assertion_failed', negative: 'assertion_failed' }, D1: { regression: 'passed', negative: 'assertion_failed' } },
+    { generated: true, repair: async input => { events.push('repair'); assert.deepEqual(input.checks.map(c => c.id), ['regression']);
+      assert.deepEqual(input.diagnostics.map(d => d.check.id), ['regression']); assert.ok(!Object.hasOwn(input, 'unverified')); },
+      assess: async () => { events.push('assess'); return { disputed: [] }; } });
+  const r = await f.run(); assert.deepEqual(events, ['repair', 'assess']); assert.equal(r.selected, 'D1'); assert.equal(r.repairs, 1);
+  assert.equal(r.unresolvedHypotheses[0].result.status, 'assertion_failed');
 });
 
-test('quarantine treats cwd aliases as the same file and follows shared-file chains', () => {
-  const result = acceptHypotheses([
-    {...acceptance,id:'tail',files:['b.test.mjs']},
-    {...acceptance,id:'bridge',files:['group/shared.test.mjs','b.test.mjs']},
-    {...acceptance,id:'disputed',cwd:'group',files:['shared.test.mjs'],confidence:'ambiguous'},
-  ], {task});
-  assert.equal(result.accepted.length,0);
-  assert.equal(result.unverified.length,3);
-});
-
-test('assessment quarantines aliases before another repair', async () => {
-  let repairs=0;
-  const result=await runController({task,checks:[{id:'regression'}],contracts:{task},
-    hypotheses:[{...acceptance,id:'a',cwd:'group',files:['shared.test.mjs']},{...acceptance,id:'b',files:['group/shared.test.mjs']}],
-    host:{draft:async()=>{},snapshot:async name=>name,scope:async()=>({passed:true}),
-      verify:async(_,checks)=>checks.map(c=>({id:c.id,status:c.id==='regression'?'passed':'assertion_failed',stderr:'stable'})),
-      assess:async()=>({disputed:[{id:'a',basis:acceptance.basis,reason:'Competing valid interpretation.'}]}),
-      repair:async()=>{repairs++;},
-    }});
-  assert.equal(repairs,0);
-  assert.equal(result.confirmed.length,0);
-  assert.deepEqual(result.unverified.map(c=>c.id).sort(),['a','b']);
+for (const decision of [{ unavailable: 'Missing or malformed response' }, { disputed: [null] }, null]) {
+  test(`diagnostic response ${JSON.stringify(decision)} does not block checked D0`, async () => {
+    const f = fixture({ D0: { regression: 'passed', negative: 'assertion_failed' } }, { generated: true, assess: async () => decision });
+    const r = await f.run(); assert.equal(r.stopReason, 'checks_passed'); assert.equal(r.selected, 'D0');
+    assert.equal(r.repairs, 0); assert.equal(r.confirmed.length, 0); assert.ok(r.snapshots[0].assessment.error);
+  });
+}
+for (const message of ['SANDBOX_CLEANUP_UNVERIFIED', 'SESSION_CLEANUP_UNVERIFIED', 'ASSESSMENT_MUTATED_SOURCE']) {
+  test(`${message} during diagnostic assessment remains fatal`, async () => {
+    const f = fixture({ D0: { regression: 'passed', negative: 'assertion_failed' } }, { generated: true,
+      assess: async () => { throw new Error(message); } });
+    await assert.rejects(f.run, { message }); assert.equal(f.repairs.length, 0);
+  });
+}
+test('cancellation during diagnostic assessment still stops publication', async () => {
+  const abort = new AbortController();
+  const r = await runController({ task, contracts: { task }, checks: [{ id: 'public' }], hypotheses: [hypothesis], signal: abort.signal,
+    host: { draft: async () => {}, snapshot: async name => name, scope: async () => ({ passed: true }),
+      verify: async (_, checks) => checks.map(c => ({ id: c.id, status: c.id === 'public' ? 'passed' : 'assertion_failed', stderr: 'stable' })),
+      assess: async () => { abort.abort(); throw new DOMException('cancelled', 'AbortError'); }, repair: async () => assert.fail('unexpected repair') } });
+  assert.equal(r.stopReason, 'cancelled'); assert.equal(r.selected, 'D0');
 });

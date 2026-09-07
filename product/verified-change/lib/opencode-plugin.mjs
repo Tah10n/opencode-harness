@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import path from "node:path";
 import { z } from "zod";
 import { sandboxCommand } from "./sandbox.mjs";
 
@@ -7,9 +8,19 @@ import { sandboxCommand } from "./sandbox.mjs";
 // credential store, session database, another candidate, or acceptance snapshots.
 export default async function plugin() {
   const configuration = JSON.parse(fs.readFileSync(process.env.VERIFIED_CHANGE_SESSION_CONFIG, "utf8"));
+  const cleanupFailure = path.join(path.dirname(process.env.VERIFIED_CHANGE_SESSION_CONFIG), "cleanup-error.json");
   const execute = async (argv, context) => {
-    const result = await sandboxCommand({ ...configuration.sandbox, argv,
-      timeoutMs: Math.min(configuration.toolTimeoutMs ?? 60_000, 60_000), signal: context.abort });
+    if (fs.existsSync(cleanupFailure)) throw new Error("SANDBOX_CLEANUP_UNVERIFIED");
+    let result;
+    try {
+      result = await sandboxCommand({ ...configuration.sandbox, argv,
+        timeoutMs: Math.min(configuration.toolTimeoutMs ?? 60_000, 60_000), signal: context.abort });
+    } catch (error) {
+      if (error.cleanup && !fs.existsSync(cleanupFailure)) {
+        fs.writeFileSync(cleanupFailure, JSON.stringify({ cleanup: error.cleanup, execution: error.execution }), { mode: 0o600, flag: "wx" });
+      }
+      throw error;
+    }
     return JSON.stringify({ exitCode: result.exitCode, stdout: result.stdout, stderr: result.stderr,
       truncated: result.truncated, timedOut: result.timedOut, cancelled: result.cancelled });
   };

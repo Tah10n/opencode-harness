@@ -17,6 +17,11 @@ test("installed bundle runs real contained checks and preserves assertion diagno
   const install = spawnSync("npm", ["install", "--prefix", path.join(temp, "installed"), "--cache", path.join(temp, "cache"), "--ignore-scripts", "--no-audit", "--no-fund", path.join(temp, archive)], { encoding: "utf8" });
   assert.equal(install.status, 0, install.stderr);
   const bundle = path.join(temp, "installed/node_modules/@opencode-harness/verified-change");
+  const replay = spawnSync(process.execPath, ['--test', path.join(root, 'test/known-repairs.test.mjs')], {
+    encoding: 'utf8', env: { ...Object.fromEntries(Object.entries(process.env).filter(([key]) => key !== 'NODE_TEST_CONTEXT')),
+      VERIFIED_CHANGE_TEST_BUNDLE: bundle },
+  });
+  assert.equal(replay.status, 0, replay.stdout + replay.stderr);
   const { resolveImage, sandboxCommand } = await import(pathToFileURL(path.join(bundle, "lib/sandbox.mjs")));
   const { runCheck } = await import(pathToFileURL(path.join(bundle, "lib/checks.mjs")));
   const image = await resolveImage("node:24.19.0-bookworm-slim");

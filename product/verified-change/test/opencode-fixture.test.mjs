@@ -6,10 +6,16 @@ import path from "node:path";
 import { spawn, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
+import { createHash } from "node:crypto";
 
 const enabled = process.env.VERIFIED_CHANGE_OPENCODE_TEST === "1";
 const scenarios = [
-  { name: "missed requirement repaired", draft: 1, repair: 2, repairs: 1, reason: "checks_passed", applied: true },
+  { name: "missing diagnostic response retains D0", assessmentResponse: 'missing', draft: 1, repairs: 0, reason: 'checks_passed', applied: true },
+  { name: "malformed diagnostic response retains D0", assessmentResponse: 'malformed', draft: 1, repairs: 0, reason: 'checks_passed', applied: true },
+  { name: "null diagnostic dispute retains D0", assessmentResponse: 'null', draft: 1, repairs: 0, reason: 'checks_passed', applied: true },
+  { name: "host cleanup refusal preserves D0 patch and user worktree", cleanup: true, draft: 2, applied: false },
+  { name: "plugin cleanup refusal survives empty session census", cleanup: true, cleanupTool: true, draft: 2, applied: false },
+  { name: "owner-confirmed requirement repaired", draft: 1, repair: 2, repairs: 1, reason: "checks_passed", applied: true },
   { name: "correct draft unchanged", draft: 2, repairs: 0, reason: "checks_passed", applied: true },
   { name: "missed consumer repaired", draft: 2, repair: 2, consumer: true, repairs: 1, reason: "checks_passed", applied: true },
   { name: "unsupported assertion ignored", draft: 1, ambiguous: true, repairs: 0, reason: "checks_passed", applied: true },
@@ -18,14 +24,14 @@ const scenarios = [
   { name: "concurrent user changes preserved", draft: 2, concurrent: true, repairs: 0, reason: "checks_passed", applied: false },
   { name: "session timeout terminates descendants", timeout: true, draft: 1, applied: false },
   { name: "cancellation terminates descendants", cancel: true, draft: 1, applied: false },
-  { name: "wrapped requirement citation still triggers repair", wrapped: true, draft: 1, repair: 2, repairs: 1, reason: "checks_passed", applied: true },
+  { name: "wrapped quote alone cannot authorize repair", wrapped: true, draft: 1, repairs: 0, reason: "checks_passed", applied: true },
   { name: "shared ambiguous assertions quarantined", shared: true, draft: 1, repairs: 0, reason: "checks_passed", applied: true },
-  { name: "accepted tests visible only during repair", readAcceptance: true, draft: 1, repair: 2, repairs: 1, reason: "checks_passed", applied: true },
+  { name: "only owner-confirmed tests inform repair", readAcceptance: true, draft: 1, repair: 2, repairs: 1, reason: "checks_passed", applied: true },
   { name: "confident but unsupported assertion disputed before edits", disputed: true, draft: 1, repairs: 0, reason: "checks_passed", applied: true },
   { name: "imported draft repaired without a second draft call", imported: true, draft: 1, repair: 2, repairs: 1, reason: "checks_passed", applied: true },
   { name: "imported correct draft retained", imported: true, draft: 2, repairs: 0, reason: "checks_passed", applied: true },
   { name: "total deadline terminates descendants", deadline: true, draft: 1, applied: false },
-  { name: "disputed file unavailable during confirmed repair", mixed: true, draft: 1, repair: 2, repairs: 1, reason: "checks_passed", applied: true },
+  { name: "generated files unavailable during confirmed repair", mixed: true, draft: 1, repair: 2, repairs: 1, reason: "checks_passed", applied: true },
 ];
 for (const scenario of scenarios) test(`installed OpenCode CLI: ${scenario.name}`, { skip: !enabled, timeout: 180_000 }, async () => {
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), "verified-change-opencode-"));
@@ -36,11 +42,33 @@ for (const scenario of scenarios) test(`installed OpenCode CLI: ${scenario.name}
   const archive = (Array.isArray(packed) ? packed[0] : packed["@opencode-harness/verified-change"]).filename;
   const install = spawnSync("npm", ["install", "--ignore-scripts", "--no-audit", "--no-fund", "--prefix", path.join(temp, "installed"), path.join(temp, archive)], { encoding: "utf8" });
   assert.equal(install.status, 0, install.stderr);
+  let fixturePath = process.env.PATH;
+  const cleanupTrigger = path.join(temp, 'fail-cleanup');
+  if (scenario.cleanup) {
+    const docker = spawnSync('which', ['docker'], { encoding: 'utf8' }).stdout.trim();
+    assert.ok(path.isAbsolute(docker));
+    const bin = path.join(temp, 'bin'); fs.mkdirSync(bin);
+    const shim = `#!${process.execPath}\nconst fs=require('fs'),cp=require('child_process');const args=process.argv.slice(2);if(args[0]==='rm'&&fs.existsSync(${JSON.stringify(cleanupTrigger)})){process.stderr.write('scripted Docker daemon cleanup failure');process.exit(1);}const r=cp.spawnSync(${JSON.stringify(docker)},args,{stdio:'inherit'});process.exit(r.status??1);\n`;
+    fs.writeFileSync(path.join(bin, 'docker'), shim, { mode: 0o755 });
+    fixturePath = `${bin}${path.delimiter}${fixturePath}`;
+  }
   const repo = path.join(temp, "repo"); fs.mkdirSync(repo); fs.mkdirSync(path.join(repo, "src"));
   fs.writeFileSync(path.join(repo, "src/api.mjs"), "export const value = 0;\n");
   if (scenario.consumer) fs.writeFileSync(path.join(repo, "src/consumer.mjs"), "export const value = 0;\n");
   fs.writeFileSync(path.join(repo, "regression.test.mjs"), scenario.broken ? "import 'nonexistent-runtime-library';\n" : "import test from 'node:test';import assert from 'node:assert/strict';import {value} from './src/api.mjs';test('public contract',()=>{assert.equal(typeof value,'number');assert.ok(value>=0)});\n");
-  fs.writeFileSync(path.join(repo, ".opencode-harness.json"), JSON.stringify({ version: 1, image: "node:24.19.0-bookworm-slim", sourcePaths: ["src"], protectedPaths: ["regression.test.mjs", ".opencode-harness.json"], checks: [{ id: "public", kind: "node-test", files: ["regression.test.mjs"] }], sessionTimeoutMs: scenario.timeout ? 5000 : 40_000 }));
+  const projectChecks = [{ id: "public", kind: "node-test", files: ["regression.test.mjs"] }];
+  const protectedPaths = ["regression.test.mjs", ".opencode-harness.json"];
+  if (scenario.repairs) {
+    const ownerFile = "owner-acceptance.test.mjs";
+    const bytes = `import test from 'node:test';import assert from 'node:assert/strict';import {value} from './src/${scenario.consumer ? "consumer" : "api"}.mjs';test('owner-confirmed expected value',()=>assert.equal(value,2));\n`;
+    fs.writeFileSync(path.join(repo, ownerFile), bytes);
+    protectedPaths.push(ownerFile);
+    projectChecks.push({ id: 'owner-value', kind: 'node-test', files: [ownerFile], source: 'independently_validated_acceptance',
+      expectedResult: { kind: 'project_owner_confirmation', confirmed: true, expectation: 'The exported value is exactly 2.',
+        rationale: 'Fixture project owner explicitly confirmed the value and consumer expectation.',
+        fileSha256: { [ownerFile]: createHash('sha256').update(bytes).digest('hex') } } });
+  }
+  fs.writeFileSync(path.join(repo, ".opencode-harness.json"), JSON.stringify({ version: 1, image: "node:24.19.0-bookworm-slim", sourcePaths: ["src"], protectedPaths, checks: projectChecks, sessionTimeoutMs: scenario.timeout ? 5000 : 40_000 }));
   for (const args of [["init"], ["add", "."], ["-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid", "commit", "-m", "fixture"]]) {
     const r = spawnSync("git", ["-c", "core.hooksPath=/dev/null", ...args], { cwd: repo, encoding: "utf8" });
     assert.equal(r.status, 0, r.stderr);
@@ -58,7 +86,7 @@ for (const scenario of scenarios) test(`installed OpenCode CLI: ${scenario.name}
   ];
   if (scenario.mixed) {
     commands[0] += ` && node -e ${shellQuote(`require('fs').writeFileSync('/acceptance/uncertain.test.mjs',${JSON.stringify(testBytes.replace('value,2','value,77'))})`)}`;
-    commands[2] = `node -e ${shellQuote("const fs=require('fs');if(fs.existsSync('/acceptance/uncertain.test.mjs'))throw Error('disputed test leaked');fs.readFileSync('/acceptance/value.test.mjs')")} && ${commands[2]}`;
+    commands[2] = `node -e ${shellQuote("const fs=require('fs');if(fs.existsSync('/acceptance/uncertain.test.mjs'))throw Error('disputed test leaked');fs.readFileSync('/workspace/owner-acceptance.test.mjs')")} && ${commands[2]}`;
   }
   if (scenario.timeout || scenario.cancel || scenario.deadline) commands[1] = `node -e ${shellQuote("require('child_process').spawn('node',['-e','setInterval(()=>{},100)'],{detached:true,stdio:'ignore'});setInterval(()=>{},100)")}`;
   const draftFile = path.join(temp, 'draft.patch');
@@ -73,13 +101,18 @@ for (const scenario of scenarios) test(`installed OpenCode CLI: ${scenario.name}
   }
   if (scenario.readAcceptance) {
     commands[1] = `node -e ${shellQuote("if(require('fs').existsSync('/acceptance'))throw Error('acceptance leaked into initial draft')")} && ${commands[1]}`;
-    commands[2] = `node -e ${shellQuote("const fs=require('fs');fs.readFileSync('/acceptance/value.test.mjs');fs.readFileSync('/harness/node-reporter.mjs');try{fs.writeFileSync('/acceptance/value.test.mjs','weakened');throw Error('test was writable')}catch(e){if(e.message==='test was writable')throw e}")} && ${commands[2]}`;
+    commands[2] = `node -e ${shellQuote("const fs=require('fs');fs.readFileSync('/workspace/owner-acceptance.test.mjs');fs.readFileSync('/harness/node-reporter.mjs');try{fs.writeFileSync('/workspace/owner-acceptance.test.mjs','weakened');throw Error('test was writable')}catch(e){if(e.message==='test was writable')throw e}")} && ${commands[2]}`;
   }
   let requests = 0;
   let assessmentRequests = 0;
   const decision = { disputed: scenario.disputed ? [{ id: "value", basis: { source: "task", quote: "Return a numeric value." }, reason: "The request permits any numeric value; it does not mandate 2." }] : [] };
   if (scenario.mixed) decision.disputed.push({id:'uncertain',basis:{source:'task',quote:'Preserve the public numeric API.'},reason:'Numeric compatibility does not require value 77; the explicit new requirement is 2.'});
-  const assessmentCommand = `node -e ${shellQuote(`const fs=require('fs');let denied=false;try{fs.writeFileSync('/workspace/src/api.mjs','must not change')}catch(e){if(['EROFS','EACCES'].includes(e.code))denied=true;else throw e;}if(!denied)throw Error('assessment source writable');fs.writeFileSync('/assessment/decision.json',${JSON.stringify(JSON.stringify(decision))});`)}`;
+  let assessmentCommand = `node -e ${shellQuote(`const fs=require('fs');let denied=false;try{fs.writeFileSync('/workspace/src/api.mjs','must not change')}catch(e){if(['EROFS','EACCES'].includes(e.code))denied=true;else throw e;}if(!denied)throw Error('assessment source writable');fs.writeFileSync('/assessment/decision.json',${JSON.stringify(JSON.stringify(decision))});`)}`;
+  if (scenario.assessmentResponse) {
+    const bytes = scenario.assessmentResponse === 'malformed' ? '{bad json' : '{"disputed":[null]}';
+    assessmentCommand = scenario.assessmentResponse === 'missing' ? 'true'
+      : `node -e ${shellQuote(`require('fs').writeFileSync('/assessment/decision.json',${JSON.stringify(bytes)})`)}`;
+  }
   let cliProcess;
   const requestSummary = [];
   const server = http.createServer(async (req, res) => {
@@ -97,6 +130,7 @@ for (const scenario of scenarios) test(`installed OpenCode CLI: ${scenario.name}
     const assessment = JSON.stringify(body.messages?.filter((m) => m.role === "user").at(-1)).includes("Assess reproduced acceptance failures");
     const index = Math.floor(requests / 2), toolTurn = (assessment ? assessmentRequests : requests) % 2 === 0;
     if (assessment) assessmentRequests += 1; else requests += 1;
+    if (scenario.cleanup && !assessment && index === 1 && toolTurn === Boolean(scenario.cleanupTool)) fs.writeFileSync(cleanupTrigger, 'fail rm only');
     if (scenario.cancel && index === 1 && toolTurn) setTimeout(() => cliProcess.kill("SIGINT"), 1500);
     if (scenario.concurrent && index === 1 && !toolTurn) fs.writeFileSync(path.join(repo, "src/api.mjs"), "export const value = 99; // user change\n");
     if (toolTurn && !body.tools?.some((tool) => tool.function?.name === "repository_shell")) {
@@ -122,7 +156,7 @@ for (const scenario of scenarios) test(`installed OpenCode CLI: ${scenario.name}
       assert.equal(JSON.parse(doctor.stdout).status, scenario.broken ? "check_infrastructure_unavailable" : "execution_path_checked");
     }
     const result = await new Promise((resolve) => {
-      const child = spawn(cli, ["run", "--workspace", repo, "--model", "verified-fixture/fixture", ...(scenario.imported ? ['--draft-patch', draftFile] : []), ...(scenario.deadline ? ['--time-limit-ms', '12000'] : []), "--", task], { env: { ...process.env, OPENCODE_CONFIG: configFile }, stdio: ["ignore", "pipe", "pipe"] });
+      const child = spawn(cli, ["run", "--workspace", repo, "--model", "verified-fixture/fixture", ...(scenario.imported ? ['--draft-patch', draftFile] : []), ...(scenario.deadline ? ['--time-limit-ms', '12000'] : []), "--", task], { env: { ...Object.fromEntries(Object.entries(process.env).filter(([k]) => k !== "NODE_TEST_CONTEXT")), OPENCODE_CONFIG: configFile, PATH: fixturePath }, stdio: ["ignore", "pipe", "pipe"] });
       cliProcess = child;
       let stdout = "", stderr = "";
       child.stdout.on("data", (c) => { stdout += c; }); child.stderr.on("data", (c) => { stderr += c; });
@@ -130,6 +164,20 @@ for (const scenario of scenarios) test(`installed OpenCode CLI: ${scenario.name}
       child.on("close", (code) => resolve({ code, stdout, stderr }));
     });
     assert.equal(result.code, scenario.applied ? 0 : 2, `${result.stderr}\n${result.stdout}\n${JSON.stringify(requestSummary)}`);
+    if (scenario.cleanup) {
+      const report = JSON.parse(result.stdout);
+      assert.equal(report.stopReason, 'execution_error'); assert.equal(report.application.applied, false);
+      const error = JSON.parse(fs.readFileSync(path.join(report.output, 'error.json')));
+      assert.equal(error.error, 'SANDBOX_CLEANUP_UNVERIFIED');
+      assert.equal(error.cleanup.verified, false); assert.equal(error.cleanup.after.state, 'absent');
+      assert.equal(error.cleanup.rm.exitCode, 1); assert.match(error.cleanup.rm.stderr, /scripted Docker daemon/);
+      assert.match(error.cleanup.container.name, /^verified-change-/);
+      if (scenario.cleanupTool) assert.ok(fs.existsSync(path.join(report.output, 'primary-control/cleanup-error.json')));
+      else assert.match(fs.readFileSync(report.selectedPatch, 'utf8'), /\+export const value = 2;/);
+      assert.equal(fs.readFileSync(path.join(repo, 'src/api.mjs'), 'utf8'), 'export const value = 0;\n');
+      assert.equal(requests, 4, 'no model task retry for cleanup');
+      return;
+    }
     if (scenario.timeout || scenario.cancel || scenario.deadline) {
       if (scenario.timeout) assert.match(result.stderr, /OPENCODE_SESSION_TIMEOUT/);
       else if (scenario.deadline) assert.equal(JSON.parse(result.stdout).stopReason, "timeout");
@@ -152,6 +200,12 @@ for (const scenario of scenarios) test(`installed OpenCode CLI: ${scenario.name}
       assert.equal(report.draftImported, true);
       assert.equal(fs.readFileSync(report.snapshots[0].snapshot.patchPath, 'utf8'), fs.readFileSync(draftFile, 'utf8'));
     }
+    if (scenario.assessmentResponse) {
+      assert.ok(report.snapshots[0].assessment.error);
+      assert.equal(report.unresolvedHypotheses[0].result.status, 'assertion_failed');
+      assert.equal(report.unresolvedHypotheses[0].reason, 'expected_result_unconfirmed');
+      assert.equal(assessmentRequests, 2);
+    }
     if (scenario.ambiguous) assert.equal(report.unverified.length, 1);
     if (scenario.shared) assert.equal(report.unverified.length, 2);
     if (scenario.disputed) {
@@ -159,9 +213,12 @@ for (const scenario of scenarios) test(`installed OpenCode CLI: ${scenario.name}
       assert.equal(assessmentRequests, 2);
     }
     if (scenario.mixed) {
-      assert.deepEqual(report.unverified.map(c=>c.id),['uncertain']);
-      assert.deepEqual(report.confirmed.map(c=>c.id),['value']);
+      assert.deepEqual(report.unverified.map(c=>c.id),['value','uncertain']);
+      assert.equal(report.unverified.find(c => c.id === 'uncertain').reason, 'disputed_assertion');
+      assert.deepEqual(report.confirmed.map(c=>c.id),['owner-value']);
     }
+    assert.equal(report.semanticCorrectness, 'unproven');
+    assert.ok(report.unresolvedHypotheses.every(h => h.source === 'generated_hypothesis'));
     const expectedValue = scenario.concurrent ? 99 : scenario.applied ? scenario.consumer ? scenario.draft : scenario.repair ?? scenario.draft : 0;
     assert.match(fs.readFileSync(path.join(repo, "src/api.mjs"), "utf8"), new RegExp(`value = ${expectedValue}`));
     if (scenario.consumer) assert.match(fs.readFileSync(path.join(repo, "src/consumer.mjs"), "utf8"), /value = 2/);

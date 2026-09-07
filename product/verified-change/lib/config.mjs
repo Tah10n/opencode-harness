@@ -1,4 +1,34 @@
 import path from "node:path";
+import fs from "node:fs";
+import { createHash } from "node:crypto";
+
+// Only host-loaded project checks use this classification. Author manifests
+// cannot promote themselves by supplying these same fields.
+export function checkSource(check) {
+  const source = check.source ?? "existing_project_check";
+  if (source === "existing_project_check") return source;
+  const basis = check.expectedResult;
+  const files = (check.files ?? []).map((f) => check.cwd ? `${check.cwd}/${f}` : f);
+  if (source !== "independently_validated_acceptance" || check.kind !== "node-test"
+    || basis?.kind !== "project_owner_confirmation" || basis.confirmed !== true
+    || ![basis.expectation, basis.rationale].every((s) => typeof s === "string" && s.trim())
+    || !basis.fileSha256 || typeof basis.fileSha256 !== "object" || !files.length
+    || Object.keys(basis.fileSha256).length !== new Set(files).size
+    || !files.every((f) => /^[a-f0-9]{64}$/.test(basis.fileSha256[f]))) {
+    throw new Error("EXPECTED_RESULT_CONFIRMATION_REQUIRED");
+  }
+  return source;
+}
+
+export function verifyExpectedResults(config, baseline) {
+  for (const check of config.checks) {
+    if (checkSource(check) !== "independently_validated_acceptance") continue;
+    for (const [file, expected] of Object.entries(check.expectedResult.fileSha256)) {
+      const actual = createHash("sha256").update(fs.readFileSync(path.join(baseline, file))).digest("hex");
+      if (actual !== expected) throw new Error("EXPECTED_RESULT_TEST_CHANGED");
+    }
+  }
+}
 
 export function relativePath(value) {
   return typeof value === "string" && value.length > 0 && !path.isAbsolute(value)
@@ -34,6 +64,7 @@ export function validateConfig(input) {
   }
   if (!Array.isArray(input.checks) || !input.checks.length) throw new Error("CONFIG_CHECKS_REQUIRED");
   input.checks.forEach(validateCheck);
+  input.checks.forEach(checkSource);
   if (new Set(input.checks.map((check) => check.id)).size !== input.checks.length) throw new Error("DUPLICATE_CHECK_ID");
   for (const check of input.checks.filter((c) => c.kind === "node-test")) {
     for (const file of check.files) {

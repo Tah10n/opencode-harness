@@ -19,6 +19,51 @@ function mount(source, target, readonly) {
   return ["--mount", `type=bind,src=${real},dst=${target}${readonly ? ",readonly" : ""}`];
 }
 
+const healthy = (r) => !r.timedOut && !r.cancelled && !r.spawnError && !r.exitSignal && !r.truncated;
+const succeeded = (r) => healthy(r) && r.exitCode === 0;
+function missing(result, container) {
+  return healthy(result) && result.exitCode === 1 && !result.stdout.trim()
+    && [`Error response from daemon: No such container: ${container}`, `Error: No such object: ${container}`,
+      `Error response from daemon: No such object: ${container}`].includes(result.stderr.trim());
+}
+
+// One cleanup transaction per invocation. Repeated/concurrent callers see the
+// same receipt or refusal; a later empty inventory cannot erase an earlier error.
+export function createContainerCleanup(container, execute = command) {
+  if (!/^verified-change-[a-f0-9-]{36}$/.test(container)) throw new Error("CONTAINER_NAME_INVALID");
+  let pending;
+  return () => pending ??= (async () => {
+    const run = async (argv) => {
+      let result;
+      try { result = await execute(argv, { timeoutMs: 10_000, maxBytes: 4096 }); }
+      catch (error) { result = { exitCode: null, spawnError: String(error.message), stdout: "", stderr: "" }; }
+      return { ...result, argv, stdout: String(result.stdout ?? "").slice(0, 4096),
+        stderr: String(result.stderr ?? "").slice(0, 4096),
+        spawnError: result.spawnError == null ? null : String(result.spawnError).slice(0, 4096),
+        truncated: Boolean(result.truncated || String(result.stdout ?? "").length > 4096 || String(result.stderr ?? "").length > 4096) };
+    };
+    const observe = async () => {
+      const inspect = await run(["docker", "container", "inspect", "--format", "{{.Id}} {{.Name}} {{.State.Status}}", container]);
+      const list = await run(["docker", "container", "ls", "--all", "--no-trunc", "--filter", `name=^/${container}$`, "--format", "{{.ID}} {{.Names}} {{.State}}"]);
+      return { inspect, list, state: missing(inspect, container) && succeeded(list) && !list.stdout.trim() ? "absent"
+        : succeeded(inspect) && succeeded(list) ? "present" : "unknown" };
+    };
+    const before = await observe();
+    // Independent of cancellation: force removal kills detached descendants.
+    const rm = await run(["docker", "rm", "--force", container]);
+    const after = await observe();
+    const id = [before, after].map((s) => s.inspect.stdout.match(/^([a-f0-9]{64}) /)?.[1]).find(Boolean) ?? null;
+    const receipt = { container: { name: container, id }, before, rm, after,
+      verified: before.state !== "unknown" && (succeeded(rm) || missing(rm, container)) && after.state === "absent" };
+    if (!receipt.verified) {
+      const error = new Error("SANDBOX_CLEANUP_UNVERIFIED");
+      error.cleanup = receipt;
+      throw error;
+    }
+    return receipt;
+  })();
+}
+
 export async function sandboxCommand({ image, workspace, readonly = true, protectedPaths = [], writablePaths = [],
   extraMounts = [], argv, cwd = "/workspace", timeoutMs = 60_000, signal, sessionLabel }) {
   if (!/^sha256:[a-f0-9]{64}$/.test(image)) throw new Error("SANDBOX_IMAGE_NOT_RESOLVED");
@@ -48,15 +93,18 @@ export async function sandboxCommand({ image, workspace, readonly = true, protec
   for (const entry of extraMounts) args.push(...mount(entry.source, entry.target, entry.readonly !== false));
   args.push(image, ...argv);
   let result;
+  const cleanup = createContainerCleanup(container);
   try {
     result = await command(args, { timeoutMs, signal });
   } finally {
-    // Removing the container kills *all* descendants, including detached ones.
-    // This is deliberately independent of the cancelled signal.
-    const cleanup = await command(["docker", "rm", "--force", container], { timeoutMs: 10_000 });
-    if (cleanup.exitCode !== 0) {
-      const inspect = await command(["docker", "container", "ls", "--all", "--filter", `name=^/${container}$`, "--format", "{{.ID}}"], { timeoutMs: 10_000 });
-      if (inspect.exitCode !== 0 || inspect.stdout.trim()) throw new Error("SANDBOX_CLEANUP_UNVERIFIED");
+    try {
+      const receipt = await cleanup();
+      if (result) result.cleanup = receipt;
+    } catch (error) {
+      error.execution = result && { exitCode: result.exitCode, exitSignal: result.exitSignal,
+        timedOut: result.timedOut, cancelled: result.cancelled, spawnError: result.spawnError,
+        stderr: result.stderr.slice(0, 4096) };
+      throw error;
     }
   }
   return result;

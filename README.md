@@ -7,7 +7,7 @@ Risk-adaptive OpenCode engineering profiles.
 This branch also contains an experimental installed repair CLI,
 `opencode-harness run --workspace <repository> -- "<task>"`, in
 `product/verified-change`. Its single frozen 60-task evaluation did not establish
-a quality improvement. See [installation and current status](docs/verified-change-status.md)
+a quality improvement. See [next-version fixes and installation](docs/verified-change-next-version.md)
 and [the complete results and limitations](docs/verified-change-results.md).
 
 `core` is the small development default: project-aware inspect, edit, targeted
