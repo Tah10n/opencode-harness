@@ -10,6 +10,15 @@ import { createHash } from "node:crypto";
 
 const enabled = process.env.VERIFIED_CHANGE_OPENCODE_TEST === "1";
 const scenarios = [
+  { name: "preparation protected workspace mutation remains blocking", preparation: 'integrity', draft: 2, applied: false },
+  { name: "preparation user cancellation remains blocking", preparation: 'cancel', draft: 2, applied: false },
+  { name: "preparation missing manifest preserves imported D0", preparation: 'missing', imported: true, draft: 2, repairs: 0, reason: 'checks_passed', applied: true },
+  { name: "preparation invalid JSON preserves imported D0", preparation: 'json', imported: true, draft: 2, repairs: 0, reason: 'checks_passed', applied: true },
+  { name: "preparation invalid element preserves draft and project checks", preparation: 'element', draft: 2, repairs: 0, reason: 'checks_passed', applied: true },
+  { name: "preparation duplicate ID excludes diagnostic set", preparation: 'duplicate', draft: 2, repairs: 0, reason: 'checks_passed', applied: true },
+  { name: "preparation failure still repairs real project assertion", preparation: 'session', projectFailure: true, draft: -1, repair: 2, repairs: 1, reason: 'checks_passed', applied: true },
+  { name: "preparation audit failure preserves imported D0", preparation: 'audit', imported: true, draft: 2, repairs: 0, reason: 'checks_passed', applied: true },
+  { name: "preparation cleanup failure remains blocking", preparation: 'cleanup', cleanup: true, cleanupTool: true, draft: 2, applied: false },
   { name: "missing diagnostic response retains D0", assessmentResponse: 'missing', draft: 1, repairs: 0, reason: 'checks_passed', applied: true },
   { name: "malformed diagnostic response retains D0", assessmentResponse: 'malformed', draft: 1, repairs: 0, reason: 'checks_passed', applied: true },
   { name: "null diagnostic dispute retains D0", assessmentResponse: 'null', draft: 1, repairs: 0, reason: 'checks_passed', applied: true },
@@ -52,13 +61,22 @@ for (const scenario of scenarios) test(`installed OpenCode CLI: ${scenario.name}
     fs.writeFileSync(path.join(bin, 'docker'), shim, { mode: 0o755 });
     fixturePath = `${bin}${path.delimiter}${fixturePath}`;
   }
+  if (['session', 'audit'].includes(scenario.preparation)) {
+    const realOpenCode = spawnSync('which', ['opencode'], { encoding: 'utf8' }).stdout.trim();
+    assert.ok(path.isAbsolute(realOpenCode));
+    const bin = path.join(temp, 'session-bin'); fs.mkdirSync(bin);
+    const trigger = scenario.preparation === 'audit' ? 'Audit your acceptance assertions' : 'Prepare a small independent set';
+    const shim = `#!${process.execPath}\nconst cp=require('child_process');const args=process.argv.slice(2);const r=cp.spawnSync(${JSON.stringify(realOpenCode)},args,{stdio:'inherit'});if(r.status===0&&args.at(-1)?.startsWith(${JSON.stringify(trigger)})){process.stderr.write('scripted diagnostic session failure');process.exit(1);}process.exit(r.status??1);\n`;
+    fs.writeFileSync(path.join(bin, 'opencode'), shim, { mode: 0o755 });
+    fixturePath = `${bin}${path.delimiter}${fixturePath}`;
+  }
   const repo = path.join(temp, "repo"); fs.mkdirSync(repo); fs.mkdirSync(path.join(repo, "src"));
   fs.writeFileSync(path.join(repo, "src/api.mjs"), "export const value = 0;\n");
   if (scenario.consumer) fs.writeFileSync(path.join(repo, "src/consumer.mjs"), "export const value = 0;\n");
   fs.writeFileSync(path.join(repo, "regression.test.mjs"), scenario.broken ? "import 'nonexistent-runtime-library';\n" : "import test from 'node:test';import assert from 'node:assert/strict';import {value} from './src/api.mjs';test('public contract',()=>{assert.equal(typeof value,'number');assert.ok(value>=0)});\n");
   const projectChecks = [{ id: "public", kind: "node-test", files: ["regression.test.mjs"] }];
   const protectedPaths = ["regression.test.mjs", ".opencode-harness.json"];
-  if (scenario.repairs) {
+  if (scenario.repairs && !scenario.projectFailure) {
     const ownerFile = "owner-acceptance.test.mjs";
     const bytes = `import test from 'node:test';import assert from 'node:assert/strict';import {value} from './src/${scenario.consumer ? "consumer" : "api"}.mjs';test('owner-confirmed expected value',()=>assert.equal(value,2));\n`;
     fs.writeFileSync(path.join(repo, ownerFile), bytes);
@@ -84,6 +102,13 @@ for (const scenario of scenarios) test(`installed OpenCode CLI: ${scenario.name}
     `node -e ${shellQuote(`require('fs').writeFileSync('/workspace/src/api.mjs',${JSON.stringify(`export const value = ${scenario.draft};\n`)});process.stdout.write('oauth credential permission')`)}`,
     `node -e ${shellQuote(`require('fs').writeFileSync('/workspace/src/${scenario.consumer ? "consumer" : "api"}.mjs',${JSON.stringify(`export const value = ${scenario.repair};\n`)})`)}`,
   ];
+  if (['missing', 'json', 'element', 'duplicate'].includes(scenario.preparation)) {
+    const bytes = scenario.preparation === 'json' ? '{invalid JSON'
+      : scenario.preparation === 'element' ? '[null]'
+      : JSON.stringify([manifest[0], manifest[0]]);
+    commands[0] = scenario.preparation === 'missing' ? 'true'
+      : `node -e ${shellQuote(`const fs=require('fs');fs.writeFileSync('/acceptance/value.test.mjs',${JSON.stringify(testBytes)});fs.writeFileSync('/acceptance/manifest.json',${JSON.stringify(bytes)})`)}`;
+  }
   if (scenario.mixed) {
     commands[0] += ` && node -e ${shellQuote(`require('fs').writeFileSync('/acceptance/uncertain.test.mjs',${JSON.stringify(testBytes.replace('value,2','value,77'))})`)}`;
     commands[2] = `node -e ${shellQuote("const fs=require('fs');if(fs.existsSync('/acceptance/uncertain.test.mjs'))throw Error('disputed test leaked');fs.readFileSync('/workspace/owner-acceptance.test.mjs')")} && ${commands[2]}`;
@@ -105,6 +130,7 @@ for (const scenario of scenarios) test(`installed OpenCode CLI: ${scenario.name}
   }
   let requests = 0;
   let assessmentRequests = 0;
+  let auditRequests = 0;
   const decision = { disputed: scenario.disputed ? [{ id: "value", basis: { source: "task", quote: "Return a numeric value." }, reason: "The request permits any numeric value; it does not mandate 2." }] : [] };
   if (scenario.mixed) decision.disputed.push({id:'uncertain',basis:{source:'task',quote:'Preserve the public numeric API.'},reason:'Numeric compatibility does not require value 77; the explicit new requirement is 2.'});
   let assessmentCommand = `node -e ${shellQuote(`const fs=require('fs');let denied=false;try{fs.writeFileSync('/workspace/src/api.mjs','must not change')}catch(e){if(['EROFS','EACCES'].includes(e.code))denied=true;else throw e;}if(!denied)throw Error('assessment source writable');fs.writeFileSync('/assessment/decision.json',${JSON.stringify(JSON.stringify(decision))});`)}`;
@@ -114,6 +140,7 @@ for (const scenario of scenarios) test(`installed OpenCode CLI: ${scenario.name}
       : `node -e ${shellQuote(`require('fs').writeFileSync('/assessment/decision.json',${JSON.stringify(bytes)})`)}`;
   }
   let cliProcess;
+  let runOutput;
   const requestSummary = [];
   const server = http.createServer(async (req, res) => {
     let raw = ""; for await (const chunk of req) raw += chunk;
@@ -121,6 +148,7 @@ for (const scenario of scenarios) test(`installed OpenCode CLI: ${scenario.name}
     const body = JSON.parse(raw);
     requestSummary.push({ tools: body.tools?.map((tool) => tool.function?.name), stream: body.stream, messages: body.messages?.map((m) => m.role) });
     const audit = JSON.stringify(body.messages?.filter((m) => m.role === "user").at(-1)).includes("Audit your acceptance assertions");
+    if (audit) auditRequests++;
     if (!body.tools?.length || audit) {
       res.writeHead(200, { "content-type": "text/event-stream" });
       res.write(`data: ${JSON.stringify({ id: "fixture-title", object: "chat.completion.chunk", created: 1, model: "fixture", choices: [{ index: 0, delta: { role: "assistant", content: "Fixture task" }, finish_reason: "stop" }] })}\n\n`);
@@ -130,7 +158,12 @@ for (const scenario of scenarios) test(`installed OpenCode CLI: ${scenario.name}
     const assessment = JSON.stringify(body.messages?.filter((m) => m.role === "user").at(-1)).includes("Assess reproduced acceptance failures");
     const index = Math.floor(requests / 2), toolTurn = (assessment ? assessmentRequests : requests) % 2 === 0;
     if (assessment) assessmentRequests += 1; else requests += 1;
-    if (scenario.cleanup && !assessment && index === 1 && toolTurn === Boolean(scenario.cleanupTool)) fs.writeFileSync(cleanupTrigger, 'fail rm only');
+    if (scenario.cleanup && !assessment && index === (scenario.preparation === 'cleanup' ? 0 : 1) && toolTurn === Boolean(scenario.cleanupTool)) fs.writeFileSync(cleanupTrigger, 'fail rm only');
+    if (index === 0 && !toolTurn && !assessment && ['integrity', 'cancel'].includes(scenario.preparation)) {
+      assert.ok(runOutput);
+      if (scenario.preparation === 'integrity') fs.appendFileSync(path.join(runOutput, 'baseline/regression.test.mjs'), '\n// scripted protected-file mutation');
+      else cliProcess.kill('SIGINT');
+    }
     if (scenario.cancel && index === 1 && toolTurn) setTimeout(() => cliProcess.kill("SIGINT"), 1500);
     if (scenario.concurrent && index === 1 && !toolTurn) fs.writeFileSync(path.join(repo, "src/api.mjs"), "export const value = 99; // user change\n");
     if (toolTurn && !body.tools?.some((tool) => tool.function?.name === "repository_shell")) {
@@ -159,11 +192,20 @@ for (const scenario of scenarios) test(`installed OpenCode CLI: ${scenario.name}
       const child = spawn(cli, ["run", "--workspace", repo, "--model", "verified-fixture/fixture", ...(scenario.imported ? ['--draft-patch', draftFile] : []), ...(scenario.deadline ? ['--time-limit-ms', '12000'] : []), "--", task], { env: { ...Object.fromEntries(Object.entries(process.env).filter(([k]) => k !== "NODE_TEST_CONTEXT")), OPENCODE_CONFIG: configFile, PATH: fixturePath }, stdio: ["ignore", "pipe", "pipe"] });
       cliProcess = child;
       let stdout = "", stderr = "";
-      child.stdout.on("data", (c) => { stdout += c; }); child.stderr.on("data", (c) => { stderr += c; });
+      child.stdout.on("data", (c) => { stdout += c; }); child.stderr.on("data", (c) => { stderr += c; runOutput = stderr.match(/Private run artifacts: (.+)/)?.[1]; });
       child.on("error", (error) => resolve({ code: -1, stdout, stderr: error.message }));
       child.on("close", (code) => resolve({ code, stdout, stderr }));
     });
     assert.equal(result.code, scenario.applied ? 0 : 2, `${result.stderr}\n${result.stdout}\n${JSON.stringify(requestSummary)}`);
+    if (['integrity', 'cancel'].includes(scenario.preparation)) {
+      const report = JSON.parse(result.stdout);
+      assert.equal(report.stopReason, scenario.preparation === 'cancel' ? 'cancelled' : 'execution_error');
+      if (scenario.preparation === 'integrity') assert.match(result.stderr, /DIAGNOSTIC_WORKSPACE_CHANGED/);
+      assert.equal(report.selectedPatch, null); assert.equal(report.application.applied, false);
+      assert.equal(fs.readFileSync(path.join(repo, 'src/api.mjs'), 'utf8'), 'export const value = 0;\n');
+      assert.equal(auditRequests, 0); assert.equal(requests, 2);
+      return;
+    }
     if (scenario.cleanup) {
       const report = JSON.parse(result.stdout);
       assert.equal(report.stopReason, 'execution_error'); assert.equal(report.application.applied, false);
@@ -172,10 +214,11 @@ for (const scenario of scenarios) test(`installed OpenCode CLI: ${scenario.name}
       assert.equal(error.cleanup.verified, false); assert.equal(error.cleanup.after.state, 'absent');
       assert.equal(error.cleanup.rm.exitCode, 1); assert.match(error.cleanup.rm.stderr, /scripted Docker daemon/);
       assert.match(error.cleanup.container.name, /^verified-change-/);
-      if (scenario.cleanupTool) assert.ok(fs.existsSync(path.join(report.output, 'primary-control/cleanup-error.json')));
+      if (scenario.cleanupTool) assert.ok(fs.existsSync(path.join(report.output, scenario.preparation === 'cleanup' ? 'author-control/cleanup-error.json' : 'primary-control/cleanup-error.json')));
       else assert.match(fs.readFileSync(report.selectedPatch, 'utf8'), /\+export const value = 2;/);
       assert.equal(fs.readFileSync(path.join(repo, 'src/api.mjs'), 'utf8'), 'export const value = 0;\n');
-      assert.equal(requests, 4, 'no model task retry for cleanup');
+      assert.equal(requests, scenario.preparation === 'cleanup' ? 2 : 4, 'no model task retry for cleanup');
+      if (scenario.preparation === 'cleanup') { assert.equal(report.selectedPatch, null); assert.equal(auditRequests, 0); }
       return;
     }
     if (scenario.timeout || scenario.cancel || scenario.deadline) {
@@ -199,6 +242,20 @@ for (const scenario of scenarios) test(`installed OpenCode CLI: ${scenario.name}
     if (scenario.imported) {
       assert.equal(report.draftImported, true);
       assert.equal(fs.readFileSync(report.snapshots[0].snapshot.patchPath, 'utf8'), fs.readFileSync(draftFile, 'utf8'));
+    }
+    if (scenario.preparation) {
+      assert.equal(report.diagnosticPreparation.status, 'diagnostic_unavailable');
+      const reasons = { missing: /ACCEPTANCE_MANIFEST_MISSING/, json: /ACCEPTANCE_JSON_INVALID/, element: /CHECK_ID_INVALID/, duplicate: /ACCEPTANCE_ENTRY_INVALID/, session: /OPENCODE_EXECUTION_FAILED/, audit: /OPENCODE_EXECUTION_FAILED/ };
+      assert.match(report.diagnosticPreparation.reason, reasons[scenario.preparation]);
+      assert.deepEqual(report.diagnosticPreparation.hypotheses, []);
+      assert.deepEqual(report.checkSources, { public: 'existing_project_check' });
+      assert.deepEqual(report.passedProjectChecks, ['public']);
+      assert.equal(assessmentRequests, 0);
+      assert.equal(auditRequests, scenario.preparation === 'session' ? 0 : 1, 'diagnostic session is not retried');
+      const events = fs.readFileSync(path.join(report.output, 'attempts.jsonl'), 'utf8').trim().split('\n').map(JSON.parse);
+      assert.equal(events.filter(e => e.phase === 'diagnostic_unavailable').length, 1);
+      assert.ok(events.filter(e => e.phase === 'check_finished').every(e => e.result.id === 'public'));
+      if (scenario.projectFailure) assert.equal(report.snapshots[0].checks[0].status, 'assertion_failed');
     }
     if (scenario.assessmentResponse) {
       assert.ok(report.snapshots[0].assessment.error);

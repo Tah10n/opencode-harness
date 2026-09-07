@@ -24,6 +24,80 @@ function argumentsFor(argv) {
   return args;
 }
 
+// Only these ordinary session outcomes may disable optional diagnostics, and
+// only when the host session adapter has verified process/container termination.
+function ordinaryDiagnosticFailure(error) {
+  return error?.terminationVerified === true
+    && /^(OPENCODE_SESSION_(TIMEOUT|INCOMPLETE|ERROR|ID_INVALID|CHANGED|EVENTS_INVALID)|OPENCODE_EXECUTION_FAILED)(:|$)/.test(error.message);
+}
+
+async function prepareAcceptance({ phases, acceptance, checks, baseline, candidate, signal, record }) {
+  const baselineHash = treeFingerprint(baseline), candidateHash = treeFingerprint(candidate);
+  const integrity = () => {
+    if (treeFingerprint(baseline) !== baselineHash || treeFingerprint(candidate) !== candidateHash) throw new Error("DIAGNOSTIC_WORKSPACE_CHANGED");
+    return treeFingerprint(acceptance); // Symlinks and unsupported entries remain fatal.
+  };
+  const unavailable = (phase, reason, acceptanceHash) => {
+    const result = { status: "diagnostic_unavailable", phase, reason, hypotheses: [], acceptanceHash };
+    record({ phase: "diagnostic_unavailable", diagnosticPhase: phase, reason });
+    return result;
+  };
+  for (const [phase, run] of phases) {
+    let failure;
+    try { await run(); }
+    catch (error) {
+      if (signal.aborted || !ordinaryDiagnosticFailure(error)) throw error;
+      failure = error;
+    }
+    const hash = integrity();
+    if (signal.aborted) throw new DOMException("cancelled", "AbortError");
+    if (failure) return unavailable(phase, failure.message.slice(0, 4096), hash);
+  }
+  const acceptanceHash = integrity();
+  const file = path.join(acceptance, "manifest.json");
+  let bytes;
+  try {
+    const stat = fs.lstatSync(file);
+    if (!stat.isFile() || stat.size > 65_536) return unavailable("manifest", "ACCEPTANCE_MANIFEST_INVALID", acceptanceHash);
+    bytes = fs.readFileSync(file, "utf8");
+  } catch (error) {
+    if (error.code !== "ENOENT") throw error;
+    return unavailable("manifest", "ACCEPTANCE_MANIFEST_MISSING", acceptanceHash);
+  }
+  let hypotheses;
+  try { hypotheses = JSON.parse(bytes); }
+  catch (error) {
+    if (!(error instanceof SyntaxError)) throw error;
+    return unavailable("manifest", "ACCEPTANCE_JSON_INVALID", acceptanceHash);
+  }
+  if (!Array.isArray(hypotheses) || hypotheses.length > 6) return unavailable("manifest", "ACCEPTANCE_MANIFEST_INVALID", acceptanceHash);
+  const ids = new Set(checks.map(c => c.id));
+  for (const [index, hypothesis] of hypotheses.entries()) {
+    let reason;
+    try { validateCheck(hypothesis); }
+    catch (error) {
+      if (!/^CHECK_(ID_INVALID|CWD_INVALID|TIMEOUT_INVALID|FILES_INVALID|ARGV_INVALID|KIND_UNSUPPORTED)$/.test(error.message)) throw error;
+      reason = error.message;
+    }
+    if (!reason && (hypothesis.kind !== "node-test" || ids.has(hypothesis.id)
+      || !["ambiguous", "unambiguous"].includes(hypothesis.confidence)
+      || typeof hypothesis.basis?.source !== "string" || typeof hypothesis.basis?.quote !== "string")) reason = "ACCEPTANCE_ENTRY_INVALID";
+    if (!reason) for (const name of hypothesis.files) {
+      try {
+        if (!fs.lstatSync(path.join(acceptance, hypothesis.cwd ?? "", name)).isFile()) reason = "ACCEPTANCE_TEST_INVALID";
+      } catch (error) {
+        if (error.code !== "ENOENT" && error.code !== "ENOTDIR") throw error;
+        reason = "ACCEPTANCE_TEST_MISSING";
+      }
+    }
+    // Reject the entire diagnostic set: a valid entry may share an invalid
+    // entry's file. No generated assertion is necessary for project verification.
+    if (reason) return unavailable("manifest", `${reason}: entry ${index}`, acceptanceHash);
+    ids.add(hypothesis.id);
+  }
+  return { status: "ready", hypotheses, acceptanceHash };
+}
+
 async function main() {
   const args = argumentsFor(process.argv.slice(2));
   const original = await inspectWorkspace(args.workspace);
@@ -87,16 +161,12 @@ async function main() {
     const author = await createOpenCodeSession({ ...sessionOptions, controlDirectory: path.join(output, "author-control"),
       sandbox: { image, workspace: baseline, readonly: true, extraMounts: [{ source: acceptance, target: "/acceptance", readonly: false }] } });
     const authorPrompt = `Prepare a small independent set of acceptance tests BEFORE implementation. You can read the initial repository at /workspace and its docs/tests. Only /acceptance is writable.\nTask:\n${args.task}\n\n${instructions.join("\n\n")}\n\nWrite Node built-in test runner files under /acceptance, importing candidate code from absolute /workspace paths. Use node:assert/strict. Use assertion errors (including assert.fail for bounded wait guards) for requirement violations, not generic Error. Do not use unbounded waits. Do not infer expected results from current implementation. Do not invent requirements or require a particular internal implementation: for example, correct cleanup does not require a positive addEventListener call count if another correct subscription mechanism is possible. Write /acceptance/manifest.json as a JSON array. Each entry: {id,kind:"node-test",files:["relative.test.mjs"],confidence:"unambiguous" or "ambiguous",basis:{source:"task" or "AGENTS.md" or "WORKFLOW.md" or "README.md",quote:"exact public requirement quote"}}. Prefer a separate file for each check. These are diagnostic hypotheses; confidence and a citation never authorize production repair. Never mix ambiguous assertions into a file used by an unambiguous check. Mark doubtful assertions ambiguous. You cannot see the future implementation. No more than 6 checks. Do not modify existing tests or source.`;
-    await prompt("acceptance", author, authorPrompt, abort.signal);
-    await prompt("acceptance_audit", author, "Audit your acceptance assertions before implementation. You still have only the original repository and request. For each asserted expectation, consider whether another reasonable interpretation of the request or another valid implementation would fail it. Mark such checks ambiguous in manifest.json rather than choosing your preferred interpretation. Check field precedence, defaults, timing and internal-observation assumptions particularly carefully. Keep test files self-contained apart from Node builtins and /workspace imports. Do not weaken a clearly stated requirement. Do not inspect or request a candidate solution. Update manifest.json if needed.", abort.signal);
-    const acceptanceHash = treeFingerprint(acceptance); // Reject symlinks before host manifest reads.
-    const hypotheses = JSON.parse(fs.readFileSync(path.join(acceptance, "manifest.json"), "utf8"));
-    if (!Array.isArray(hypotheses) || hypotheses.length > 6) throw new Error("ACCEPTANCE_MANIFEST_INVALID");
-    for (const hypothesis of hypotheses) {
-      validateCheck(hypothesis);
-      if (hypothesis.kind !== "node-test") throw new Error("ACCEPTANCE_KIND_INVALID");
-      if (config.checks.some((check) => check.id === hypothesis.id)) throw new Error("ACCEPTANCE_ID_COLLIDES_WITH_EXISTING_CHECK");
-    }
+    const diagnosticPreparation = await prepareAcceptance({ acceptance, checks: config.checks, baseline, candidate,
+      signal: abort.signal, record, phases: [
+        ["acceptance", () => prompt("acceptance", author, authorPrompt, abort.signal)],
+        ["acceptance_audit", () => prompt("acceptance_audit", author, "Audit your acceptance assertions before implementation. You still have only the original repository and request. For each asserted expectation, consider whether another reasonable interpretation of the request or another valid implementation would fail it. Mark such checks ambiguous in manifest.json rather than choosing your preferred interpretation. Check field precedence, defaults, timing and internal-observation assumptions particularly carefully. Keep test files self-contained apart from Node builtins and /workspace imports. Do not weaken a clearly stated requirement. Do not inspect or request a candidate solution. Update manifest.json if needed.", abort.signal)],
+      ] });
+    const { acceptanceHash, hypotheses } = diagnosticPreparation;
     const prepareChecks = (checks, name) => {
       const directory = path.join(output, name);
       fs.mkdirSync(directory);
@@ -180,6 +250,7 @@ async function main() {
     };
     const report = await runController({ task: args.task, checks: config.checks, hypotheses, contracts, host, signal: abort.signal });
     if (deadlineExceeded) report.stopReason = "timeout";
+    report.diagnosticPreparation = diagnosticPreparation;
     report.base = original; report.usage = usage; report.output = output;
     report.timeLimitMs = args["time-limit-ms"] ? Number(args["time-limit-ms"]) : null;
     report.draftImported = Boolean(args["draft-patch"]);

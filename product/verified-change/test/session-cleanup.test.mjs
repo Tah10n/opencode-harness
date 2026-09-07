@@ -23,3 +23,29 @@ test('a plugin cleanup refusal survives a later empty session inventory', async 
     assert.deepEqual(JSON.parse(fs.readFileSync(path.join(temp, 'control/cleanup-error.json'))).cleanup, receipt);
   } finally { process.env.PATH = previous; }
 });
+
+for (const mode of ['absent', 'residual', 'truncated', 'interrupted', 'cancelled']) test(`ordinary session failure requires verified termination: ${mode}`, async () => {
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'verified-change-termination-'));
+  const bin = path.join(temp, 'bin'); fs.mkdirSync(bin);
+  fs.writeFileSync(path.join(bin, 'opencode'), `#!${process.execPath}\nprocess.stderr.write('scripted session failure');process.exit(1);\n`, { mode: 0o755 });
+  const script = mode === 'residual' ? `process.stdout.write('${'a'.repeat(64)}\\n');`
+    : mode === 'truncated' ? "process.stdout.write('x'.repeat(100000));"
+    : mode === 'interrupted' ? "process.kill(process.pid,'SIGTERM');" : '';
+  fs.writeFileSync(path.join(bin, 'docker'), `#!${process.execPath}\n${script}\n`, { mode: 0o755 });
+  const previous = process.env.PATH;
+  try {
+    process.env.PATH = `${bin}${path.delimiter}${previous}`;
+    const session = await createOpenCodeSession({ controlDirectory: path.join(temp, 'control'), sandbox: {} });
+    const abort = new AbortController(); if (mode === 'cancelled') abort.abort();
+    await assert.rejects(() => session.prompt('fixture only', abort.signal), error => {
+      if (mode === 'absent') {
+        assert.match(error.message, /^OPENCODE_EXECUTION_FAILED/); assert.equal(error.terminationVerified, true);
+      } else {
+        assert.equal(error.terminationVerified, undefined);
+        if (mode === 'cancelled') assert.equal(error.name, 'AbortError');
+        else assert.equal(error.message, 'SESSION_CLEANUP_UNVERIFIED');
+      }
+      return true;
+    });
+  } finally { process.env.PATH = previous; }
+});

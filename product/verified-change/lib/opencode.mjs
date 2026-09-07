@@ -29,6 +29,8 @@ export async function createOpenCodeSession({ controlDirectory, sandbox, model, 
   const pluginPath = fileURLToPath(new URL("./opencode-plugin.mjs", import.meta.url));
   const config = { plugin: [pluginPath], permission: { "*": "deny", repository_read: "allow", repository_write: "allow", repository_shell: "allow" } };
   let sessionID;
+  const completed = r => r.exitCode === 0 && !r.timedOut && !r.cancelled && !r.truncated && !r.spawnError && !r.exitSignal;
+  const terminatedFailure = message => Object.assign(new Error(message), { terminationVerified: true });
   return {
     exposeAcceptedChecks(directory, { assessmentDirectory } = {}) {
       const reporter = fileURLToPath(new URL("./node-reporter.mjs", import.meta.url));
@@ -54,12 +56,16 @@ export async function createOpenCodeSession({ controlDirectory, sandbox, model, 
         // If OpenCode was killed during a tool call, its plugin's finally block
         // may not run. The host still removes every container owned by this session.
         const listed = await command(["docker", "ps", "-aq", "--filter", `label=verified-change.session=${label}`]);
-        if (listed.exitCode !== 0) throw new Error("SESSION_CLEANUP_UNVERIFIED");
+        if (!completed(listed)) throw new Error("SESSION_CLEANUP_UNVERIFIED");
         const ids = listed.stdout.split(/\s+/).filter(Boolean);
         if (ids.some((id) => !/^[a-f0-9]{12,64}$/.test(id))) throw new Error("SESSION_CONTAINER_ID_INVALID");
         for (const id of ids) {
           const removed = await command(["docker", "rm", "--force", id]);
-          if (removed.exitCode !== 0) throw new Error("SESSION_CLEANUP_UNVERIFIED");
+          if (!completed(removed)) throw new Error("SESSION_CLEANUP_UNVERIFIED");
+        }
+        if (ids.length) {
+          const remaining = await command(["docker", "ps", "-aq", "--filter", `label=verified-change.session=${label}`]);
+          if (!completed(remaining) || remaining.stdout.trim()) throw new Error("SESSION_CLEANUP_UNVERIFIED");
         }
         } finally {
           // OpenCode may surface a plugin exception as a recoverable tool error.
@@ -73,10 +79,16 @@ export async function createOpenCodeSession({ controlDirectory, sandbox, model, 
         }
       }
       if (execution.cancelled) throw new DOMException("cancelled", "AbortError");
-      if (execution.timedOut) throw new Error("OPENCODE_SESSION_TIMEOUT");
-      if (execution.exitCode !== 0 || execution.truncated || execution.spawnError) throw new Error(`OPENCODE_EXECUTION_FAILED: ${execution.stderr.slice(0, 4096)}`);
-      const summary = parseSessionEvents(execution.stdout);
-      if (sessionID && summary.sessionID !== sessionID) throw new Error("OPENCODE_SESSION_CHANGED");
+      if (execution.timedOut) throw terminatedFailure("OPENCODE_SESSION_TIMEOUT");
+      if (execution.exitCode !== 0 || execution.truncated || execution.spawnError) throw terminatedFailure(`OPENCODE_EXECUTION_FAILED: ${execution.stderr.slice(0, 4096)}`);
+      let summary;
+      try { summary = parseSessionEvents(execution.stdout); }
+      catch (error) {
+        if (error instanceof SyntaxError) throw terminatedFailure("OPENCODE_SESSION_EVENTS_INVALID");
+        if (/^OPENCODE_SESSION_(ID_INVALID|ERROR|INCOMPLETE)(:|$)/.test(error.message)) error.terminationVerified = true;
+        throw error;
+      }
+      if (sessionID && summary.sessionID !== sessionID) throw terminatedFailure("OPENCODE_SESSION_CHANGED");
       sessionID = summary.sessionID;
       return summary;
     },

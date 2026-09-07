@@ -89,6 +89,13 @@ reproduced diagnostic failures in a read-only turn. Correct grounded disputes
 remain in the report; an empty dispute list never promotes a test. No new model
 reviewer is added.
 
+Preparation is optional too: missing/malformed diagnostic manifests, invalid
+entries and ordinary author/audit failures after verified process termination
+produce `diagnosticPreparation.status = "diagnostic_unavailable"` with a reason.
+The unusable diagnostic set is excluded; draft/import and trusted project checks
+continue without automatically retrying preparation. Cleanup uncertainty,
+workspace/protected-file mutations and user cancellation remain blocking.
+
 Reports separate `passedProjectChecks`, owner-confirmed acceptance checks and
 `unresolvedHypotheses`, including failing assertions and explanations. Even a
 passing generated test stays a hypothesis. `checks_passed` means trusted checks
