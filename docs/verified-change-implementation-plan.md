@@ -34,3 +34,13 @@ The remaining delivery work is bounded:
 No further development revision, replacement corpus, new evaluation, merge or
 release is part of this continuation. A positive result must satisfy the frozen
 analysis and retain all 60 observations; mechanism tests cannot establish lift.
+
+## Completion record — 2026-09-07
+
+Direct authorization was provided and the single frozen 60-task run completed.
+The intended improvement was not established: A=59/60, B=58/60, C=56/60, with
+one isolation-unverified arm and the previously disclosed comparison gaps.
+All 60 rows and measured costs are reported; the private artifacts are retained.
+See [the final report](verified-change-results.md) and [delivery status](verified-change-status.md).
+The existing draft PR #23 is the sole delivery PR. The candidate and frozen
+inputs were not revised after evaluation, and no new campaign was created.

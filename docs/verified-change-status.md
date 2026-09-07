@@ -1,18 +1,21 @@
 # Verified-change delivery status — 2026-09-07
 
-The installed requirement-checking and bounded-repair mechanism is implemented.
-The final model evaluation has not started. This is an experimental draft, with
-no established product advantage and no evidence-backed designation.
+The installed requirement-checking and bounded-repair mechanism and its single
+60-task final run are complete. **No product advantage was established.** The
+frozen outcomes are A=59/60, B=58/60 and C=56/60; C−A is −5.00 percentage points
+and C−B is −3.33 percentage points. Full statistics, every task, observed costs,
+regressions and design limitations are in [the final report](verified-change-results.md)
+and [the public structured results](verified-change-results/results.json).
 
-The current manifest is frozen, despite the pre-freeze wording retained in its
-hashed README and protocol. Those files are preserved byte-for-byte. The
-authoritative binding is `evals/verified-change/manifest.json`, committed in
-`8c620ccf41f4c0e1339fef5818c6f256aae7599b`, SHA-256
-`68c28c91608f71b9f83b305f98fa3e821cff2bbe25f819510f830debed0ececa`.
+The product remains experimental. A generated-test admission failure caused two
+scored code regressions, a further static diagnosis found a regression missed
+by the grader, and one arm could not verify container cleanup. The latter leaves
+the frozen evidence gate unavailable. There is no evidence-backed designation,
+merge, release or default switch.
 
 ## Install and run
 
-From the repository checkout, with Node 24+, installed OpenCode and Docker:
+From this repository checkout, with Node 24+, installed OpenCode and Docker:
 
 ```sh
 npm pack ./product/verified-change --ignore-scripts
@@ -22,94 +25,74 @@ npm install --prefix ./harness-install --ignore-scripts --no-audit --no-fund ./o
 ```
 
 The target must be a clean Git worktree with a committed `.opencode-harness.json`.
-See [package instructions](../product/verified-change/README.md) for the small
-configuration and supported Node test adapter. The configured Docker image must
-already exist locally; the product does not pull images or install project
-dependencies. Model/provider selection is delegated to installed OpenCode when
-no override is supplied. Authentication is not copied or replaced.
+For example, adapting paths and checks to the target repository:
 
-The CLI prints its private artifact directory, containing D0/D1/D2 patches,
-check diagnostics, structured outcomes and unverified requirements. An accepted
-patch is applied only after checking the original worktree state again.
+```json
+{
+  "version": 1,
+  "image": "node:24.19.0-bookworm-slim",
+  "sourcePaths": ["src"],
+  "protectedPaths": ["test", "package.json", ".opencode-harness.json"],
+  "checks": [{"id": "regression", "kind": "node-test", "files": ["test/api.test.mjs"]}]
+}
+```
 
-## Verified preparation
+The image and project dependencies must already be installed. The product does
+not pull images or install project dependencies. Without a model/variant
+override, installed OpenCode selects its normal provider and model; no specific
+model is hardcoded into the product and authentication remains with OpenCode.
 
-On 2026-09-07, remote main still matched the branch base, installed OpenCode
-reported version 1.18.26, and its `run --help` exposed the adapter's actual options.
-The local Docker image matched the frozen immutable image ID. The installed
-archive matched the candidate, all 40 frozen runner files matched, and all 60
-task definitions matched their frozen fingerprints. The arm order remains 30 BC
-and 30 CB, with 20 families and 20 tasks per stratum.
+The CLI reports its private artifact directory, D0/D1/D2 patches, diagnostics,
+check outcomes and unverified assertions. It applies a selected passing patch
+only after checking the original user worktree again. Concurrent user changes,
+failed verification or operational failures retain patches for inspection.
+See the [unchanged package instructions](../product/verified-change/README.md)
+for supported flags and the Node test adapter. Its old pre-freeze status text is
+retained as a hashed input; this delivery status and the final report supersede
+that status wording.
 
-The installed runner suite passed 23/23 with no skips on 2026-09-07. Its
-OpenCode/localhost-provider fixture verifies identical D0 copies, an author who
-sees only the original source, one C repair and independent grades `[0,1,1]`.
-This is deterministic mechanism evidence, not a scored evaluation observation.
+## Validation and development record
 
-The product suite also passed 51/51 with no skips on 2026-09-07 (164.6 seconds),
-including freshly packed and prefix-installed CLI scenarios for correct D0,
-missed requirements and consumers, unsupported assertions, broken test runtime,
-regressing repair, concurrent user edits, cancellation and timeout cleanup.
-The runner suite took 15.0 seconds. Reproduction commands:
+Fresh checks on 2026-09-07 passed **51/51 product tests** (164.6 seconds) and
+**23/23 runner tests** (15.0 seconds), with no skips. They used the actual
+installed OpenCode executable, Docker, a freshly packed/prefix-installed bundle
+and a localhost scripted provider. They verify the controller and installed
+scenario, including missed requirements, consumers, disputed assertions,
+broken test runtime, rejected regressions, concurrent user edits and cleanup.
+They do not establish real-model semantic accuracy. Commands:
 
 ```sh
 (cd product/verified-change && VERIFIED_CHANGE_DOCKER_TEST=1 VERIFIED_CHANGE_OPENCODE_TEST=1 npm test)
 VERIFIED_CHANGE_EVAL_INSTALLED=/absolute/installed/package node --test evals/verified-change/*.test.mjs
 ```
 
-These runs use the installed OpenCode executable and a localhost scripted
-provider; they do not send evaluation tasks to an external model. Historical
-files are unchanged and the product runtime has no lab imports. Full repository
-CI and live external-provider evaluation were not run in this continuation.
+All five repository CI jobs passed on delivery head
+`15e056867b399ed23116441fa6db45593e3e2517` before the final report-only update;
+current exact-head CI is attached to [the existing draft PR](https://github.com/Tah10n/opencode-harness/pull/23).
+After the official run, independent checks also verified frozen inputs, all
+60 preserved original workspaces, paired D0 identity, snapshot/patch references,
+180 single arm attempts and the prespecified numerical analysis.
 
-The development record contains 24 unique repository scenarios and all three
-allowed substantive revisions. It documents one real-model correction of the
-explicit integer `delayMs` requirement, together with an unresolved spurious
-assertion in the same run. The final 23 revision-3 cases all selected D0 without
-repair; a transactional-store dispute may have suppressed a valid defect.
-See [the unchanged development record](../development/verified-change/README.md).
-Those outcomes do not establish semantic success or measured lift.
+The unchanged [development record](../development/verified-change/README.md)
+contains 24 unique scenarios and all three allowed substantive revisions. One
+real-model integer `delayMs` correction coexisted with an unresolved spurious
+assertion. Final development runs mostly retained D0. Those observations do
+not establish broad learned accuracy or several independently validated real
+recovery cycles.
 
-## Measurements unavailable
+## Frozen comparison limitations
 
-No final task has an official scored result. The planned denominator is 60;
-absence of observations is not 0/60 success.
+The runner has equal 600-second extra allowances for B/C but no equivalent hard
+model/token/currency cap, and their setup clock boundaries differ. A/B use the
+same isolated repository-tool adapter as C. The corpus is synthetic; nine of
+20 nominal multi-file tasks have one-file reference and alternative solutions.
+The cluster paired t analysis is approximate and exact task-level McNemar is
+nominal under family dependence. Interrupted usage can be incomplete. The final
+report records these gaps, the grader's finite coverage and the cleanup failure.
 
-| Requested result | Current value |
-| --- | --- |
-| A/N, B/N, C/N | Unavailable; 0 of 60 tasks scored |
-| C−A and C−B absolute delta | Unavailable |
-| Paired 95% confidence intervals and p-values | Unavailable |
-| Recovered unsuccessful D0 / regressed successful D0 | Unavailable |
-| Final-run time, turns, tool calls, observed tokens | Unavailable; evaluation unstarted |
-
-The prior execution approval review rejected the official run because it would
-transmit the synthetic repository files and task prompts to an external model
-and could consume substantial account quota. It required direct confirmation
-of the frozen `openai/gpt-5.6-luna`, `low` binding, payload and quota use. That
-confirmation is pending. No alternative route around that rejection is used.
-
-## Material limitations against the requested comparison
-
-- The frozen runner provides 300 seconds for D0 and 600 extra seconds each for
-  B/C, but **does not implement equivalent hard model/token/currency budgets**.
-  C includes authorship in its internal deadline. B starts its clock before
-  preparation, whereas C starts after preflight. Actual elapsed time includes
-  setup and cleanup. This does not fully meet the requested equal-budget design.
-- A/B use ordinary fresh OpenCode sessions through the same isolated repository
-  tool adapter as C. This controls containment, but differs from unrestricted
-  default OpenCode tools and project-local context discovery. Any result concerns
-  this comparison, not every configuration of plain OpenCode.
-- Generated assertions and the primary agent's disputes remain fallible. Passing
-  admitted checks is not proof that all requested behavior is correct.
-- Evaluation tasks are synthetic and clustered in 20 families. The frozen
-  primary analysis uses a cluster-level paired t interval/test; task-level exact
-  McNemar is only a nominal diagnostic because task pairs are dependent.
-- Interrupted usage may be incomplete, and zero provider cost metadata is not
-  evidence of free execution. Product support currently centers on Node's test
-  runner and already-installed dependencies.
-
-Candidate, runner, tasks, evaluator and thresholds remain frozen. These gaps are
-reported rather than silently fixed by a fourth development revision or a new
-campaign. The draft remains incomplete until authorized execution and reporting;
-an eventual result cannot erase the equal-model-budget limitation.
+Manifest SHA-256:
+`68c28c91608f71b9f83b305f98fa3e821cff2bbe25f819510f830debed0ececa`.
+It was committed before the first official call and remains authoritative even
+where frozen README/protocol files say draft. Candidate, tasks, evaluator,
+thresholds and order were not changed. No scored outcome was retried, no task was
+excluded and no replacement evaluation or fourth development revision was made.
