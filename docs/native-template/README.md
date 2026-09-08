@@ -53,3 +53,8 @@ installed bundle. No new evaluation, merge, release or default switch is implied
 [Second development batch on the published revision](REVISION-DEVELOPMENT-RESULTS.md):
 six new observations, no complete-delivery improvement; instruction bytes remain
 unchanged after the result. The original evidence above remains historical.
+
+[Separate review and one repair on the saved on-patches](REVIEW-REPAIR-RESULTS.md):
+six reviews and three repairs found and fixed specific defects, but original
+obligations remain incomplete and one repair introduced a state-validation
+regression. No plugin or runtime is added; the effectiveness goal stays open.
