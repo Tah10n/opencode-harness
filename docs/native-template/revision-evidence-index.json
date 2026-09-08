@@ -1,0 +1,135 @@
+{
+  "kind": "development-observations-not-independent-lift",
+  "candidateCommit": "1d79ce9e87b43c156f132e59acd5fce1df706814",
+  "coreSha256": "9adcc862446ac6c0e5a407ec89e2f65fe4a249aedcc34ba36f143f3589edd4f7",
+  "hostMaterializedConfigSha256": "925dca028027332d4558e7f0d22bffa42caadabbb75b805983108d78e2299a00",
+  "runtimeConfigSha256": "1fc620fd4c5a248b0b172dadbaf15408c3ad1e464c8179160ab23905404c75a8",
+  "runConfigSha256": "ddf1a2888f68d2765382f21e143790f07eff670a277aa3317b9c894c37e1f5f1",
+  "model": "openai/gpt-5.6-luna",
+  "variant": "low",
+  "openCode": "1.18.26",
+  "limitMs": 900000,
+  "attemptsInActualOrder": [
+    {
+      "task": "collectors-preserve-state",
+      "arm": "off",
+      "sourceTree": "e0904f981651246baaed21099dcb42c38ef28962",
+      "taskSha256": "048d797738d2b92fafee8b4421bf3381dcbb82c205693d5254ba7b7c3c4706c2",
+      "projectInstructionsSha256": "7d874ef6d70b4256eabb503d040264689008a31de5c9c7983d42d4e285f27854",
+      "patchSha256": "defd91d6f9cd6293201b4efd85562f0782d0735ab16dceffae004f0ea992060d",
+      "eventsSha256": "7a9592c3d73a01e12432cdcb9b23dbfb112b598a89c984895113a5aae2da9dcc",
+      "seconds": 191.966,
+      "tools": 40,
+      "providerRequests": 29,
+      "recordedUsage": {
+        "input": 871902,
+        "output": 3964,
+        "reasoning": 1467,
+        "cacheRead": 286720,
+        "cacheWrite": 0,
+        "reportedTotal": 1164053
+      }
+    },
+    {
+      "task": "collectors-preserve-state",
+      "arm": "on",
+      "sourceTree": "e0904f981651246baaed21099dcb42c38ef28962",
+      "taskSha256": "048d797738d2b92fafee8b4421bf3381dcbb82c205693d5254ba7b7c3c4706c2",
+      "projectInstructionsSha256": "7d874ef6d70b4256eabb503d040264689008a31de5c9c7983d42d4e285f27854",
+      "patchSha256": "28b6738570951904120de8295ee36c908b56ed06f7929a74b51e9cc6a170d8be",
+      "eventsSha256": "5be0a2f2c1f6975c23f3f35827a71de39c1cdcc5dffbf03d204f2f8d1a0c3ef9",
+      "seconds": 148.32,
+      "tools": 33,
+      "providerRequests": 23,
+      "recordedUsage": {
+        "input": 541213,
+        "output": 3996,
+        "reasoning": 1189,
+        "cacheRead": 329216,
+        "cacheWrite": 0,
+        "reportedTotal": 875614
+      }
+    },
+    {
+      "task": "account-switch-ledger",
+      "arm": "on",
+      "sourceTree": "b5cdfc0db3d8abefc03554fa19f41a0ed090a93f",
+      "taskSha256": "c855e75f5b4705f703f5c4c39e01d05c73505854c32a4ff97dd5d564e82573eb",
+      "projectInstructionsSha256": "7d874ef6d70b4256eabb503d040264689008a31de5c9c7983d42d4e285f27854",
+      "patchSha256": "9ccf6966bab8f29234954c0da5d6c243fa780fbeca6bbe038393c427ad456801",
+      "eventsSha256": "fea09bf13cc6eb31d42f574931ae4ff2b3c0ca50cefa3d3f94e64b2db6285089",
+      "seconds": 273.889,
+      "tools": 46,
+      "providerRequests": 39,
+      "recordedUsage": {
+        "input": 988179,
+        "output": 4306,
+        "reasoning": 2263,
+        "cacheRead": 610304,
+        "cacheWrite": 0,
+        "reportedTotal": 1605052
+      }
+    },
+    {
+      "task": "account-switch-ledger",
+      "arm": "off",
+      "sourceTree": "b5cdfc0db3d8abefc03554fa19f41a0ed090a93f",
+      "taskSha256": "c855e75f5b4705f703f5c4c39e01d05c73505854c32a4ff97dd5d564e82573eb",
+      "projectInstructionsSha256": "7d874ef6d70b4256eabb503d040264689008a31de5c9c7983d42d4e285f27854",
+      "patchSha256": "5919384a1d2ff32c107e64793ab4e573a09811595ceb48df3b4e8579acbabedc",
+      "eventsSha256": "05ad482fa840f55ae504dc0bb8745d2fa98f97663d6b2e883092b90155fcaa88",
+      "seconds": 244.592,
+      "tools": 42,
+      "providerRequests": 33,
+      "recordedUsage": {
+        "input": 846887,
+        "output": 3781,
+        "reasoning": 2150,
+        "cacheRead": 448000,
+        "cacheWrite": 0,
+        "reportedTotal": 1300818
+      }
+    },
+    {
+      "task": "cursor-compatible-versions",
+      "arm": "off",
+      "sourceTree": "9d5c174313c31620213257ce03fdac8ef970a33e",
+      "taskSha256": "e323e0dbf4617f581f59783055994424f4a4f411edf2ec5ce43ab31cb19f77bd",
+      "projectInstructionsSha256": "7d874ef6d70b4256eabb503d040264689008a31de5c9c7983d42d4e285f27854",
+      "patchSha256": "b58557e6afb7bcf77ab7ccf0dfb1a0fb8834b1f8a27b41ecd6d062e0d286d39e",
+      "eventsSha256": "a1c209e172e7d39c9b74782e54d02e68a05cb5ed4d700ee60b073ed37e0caa6b",
+      "seconds": 155.302,
+      "tools": 24,
+      "providerRequests": 15,
+      "recordedUsage": {
+        "input": 222031,
+        "output": 2924,
+        "reasoning": 657,
+        "cacheRead": 84480,
+        "cacheWrite": 0,
+        "reportedTotal": 310092
+      }
+    },
+    {
+      "task": "cursor-compatible-versions",
+      "arm": "on",
+      "sourceTree": "9d5c174313c31620213257ce03fdac8ef970a33e",
+      "taskSha256": "e323e0dbf4617f581f59783055994424f4a4f411edf2ec5ce43ab31cb19f77bd",
+      "projectInstructionsSha256": "7d874ef6d70b4256eabb503d040264689008a31de5c9c7983d42d4e285f27854",
+      "patchSha256": "e952f3093414919041b332b3830e5f5ba82199f43766da2ff1e41cffd9f617ad",
+      "eventsSha256": "28d4e136442b938fbe05fcbc6ec64e363a9478171fbfea1d1c14e8c2e1ae7966",
+      "seconds": 264.593,
+      "tools": 45,
+      "providerRequests": 31,
+      "recordedUsage": {
+        "input": 581096,
+        "output": 4581,
+        "reasoning": 1209,
+        "cacheRead": 355328,
+        "cacheWrite": 0,
+        "reportedTotal": 942214
+      }
+    }
+  ],
+  "usageCoverage": "step_finish only; auxiliary requests incompletely covered; not billing"
+}

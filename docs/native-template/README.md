@@ -32,7 +32,8 @@ Historical materialization, default profile and launchers remain unchanged.
 The workflow makes a behavior regression part of implementation and checks that
 required tests ship. It scales down for nonbehavioral changes. A failing new test
 is evidence of sensitivity, not proof of a correct expectation or authority to
-change compatibility. This revision has **zero model/provider calls**.
+change compatibility. Initial local validation used zero model/provider calls;
+the later six-session development comparison is reported below.
 
 ```sh
 npm run verify:native-template
@@ -48,3 +49,7 @@ request or prove delivery in a model prompt, compliance or quality improvement.
 [Development outcomes, exact old bytes and trace diagnosis](DEVELOPMENT.md) and
 [portable diagnostic examples](diagnostics/README.md) are evidence outside the
 installed bundle. No new evaluation, merge, release or default switch is implied.
+
+[Second development batch on the published revision](REVISION-DEVELOPMENT-RESULTS.md):
+six new observations, no complete-delivery improvement; instruction bytes remain
+unchanged after the result. The original evidence above remains historical.
