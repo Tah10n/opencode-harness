@@ -44,3 +44,21 @@ assert.equal(determineOutcome({...valid,evidenceLimitations:['Reviewer did not r
 assert.equal(determineOutcome({...valid,unverified:['Consumer not verified']},[check],{snapshotSha256:'S'}).status,'incomplete');
 assert.throws(()=>conserveFormat(JSON.stringify({...valid,findings:[{id:'F',classification:'concrete',basis:'uncertain'}]}),{...valid,findings:[{id:'F',classification:'concrete',kind:'behavior',basis:'uncertain',expected:'invented'}]},reviewSchema));
 console.log(JSON.stringify({passed:true,retainedPilotResponses:5,formatRepairBound:1,missingMeaningFails:true,provenanceSeparated:true,realProviderRequests:0}));
+
+const {probeSchema,prepareFormatSession}=await import('../lib/native-task-workflow.mjs');
+const uncertain={...valid,unverified:['Consumer compatibility was not checked']};
+assert.throws(()=>conserveFormat(JSON.stringify(uncertain),{...uncertain,unverified:[],evidenceLimitations:uncertain.unverified},reviewSchema));
+const behaviorFinding={id:'F',classification:'concrete',kind:'behavior',basis:'public requirement',affectedFiles:['src/value.mjs'],verification:'project test',expected:'2'};
+assert.throws(()=>conserveFormat(JSON.stringify({...valid,findings:[behaviorFinding]}),{...valid,findings:[{...behaviorFinding,kind:'test'}]},reviewSchema));
+const dispositions={dispositions:[{id:'F',decision:'grounded',basis:'public',expectedReason:'literal requirement',explanation:'observed',kind:'behavior',evidenceCallID:'missing'}],limitations:['unverified consumer']};
+for(const altered of [{...dispositions,limitations:[]},{...dispositions,dispositions:[{...dispositions.dispositions[0],evidenceCallID:'real-failed-call'}]},{...dispositions,dispositions:[{...dispositions.dispositions[0],kind:'test'}]}])assert.throws(()=>conserveFormat(JSON.stringify(dispositions),altered,probeSchema));
+for(const boundary of ['create','tools']){
+ let cancelled=false,modelRequests=0,registered=false,enter,release;
+ const entered=new Promise(r=>enter=r),barrier=new Promise(r=>release=r);
+ const checkActive=()=>{if(cancelled)throw Error('cancelled');};
+ const pending=(async()=>{await prepareFormatSession({checkActive,create:async()=>{if(boundary==='create'){enter();await barrier;}return{id:'fixture'};},register:()=>registered=true,tools:async()=>{if(boundary==='tools'){enter();await barrier;}return[];}});checkActive();modelRequests++;})();
+ await entered;cancelled=true;release();await assert.rejects(pending,/cancelled/);assert.equal(modelRequests,0);assert.equal(registered,true);
+}
+console.log(JSON.stringify({passed:true,formatCannotReclassifyUncertainty:true,admissionEvidenceConserved:true,cancellationBarriers:['session.create','tool.ids'],realProviderRequests:0}));
+
+assert.equal(determineOutcome({...valid,checks:[...valid.checks,{callID:'failed',purpose:'discriminating',basis:'required regression'}]},[check,{...check,callID:'failed',exit:1}],{snapshotSha256:'S'}).status,'incomplete');
