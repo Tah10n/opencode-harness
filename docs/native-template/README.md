@@ -58,3 +58,7 @@ unchanged after the result. The original evidence above remains historical.
 six reviews and three repairs found and fixed specific defects, but original
 obligations remain incomplete and one repair introduced a state-validation
 regression. No plugin or runtime is added; the effectiveness goal stays open.
+
+[Enable the optional `/harness-review` command](NATIVE-REVIEW.md) with
+`--native --review`. Use a new native session; review is diagnostic and never
+schedules repair. Omitting `--review` preserves the two-file mode above.

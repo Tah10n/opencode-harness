@@ -9,10 +9,11 @@ function argumentError(message) {
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 function parseArguments(values) {
-  const result = { profile: null, output: null, dryRun: false, force: false, allowDirty: false, native: false };
+  const result = { profile: null, output: null, dryRun: false, force: false, allowDirty: false, native: false, review: false };
   for (let index = 0; index < values.length; index += 1) {
     const value = values[index];
-    if (value === "--native") result.native = true;
+    if (value === "--review") result.review = true;
+    else if (value === "--native") result.native = true;
     else if (value === "--dry-run") result.dryRun = true;
     else if (value === "--force") result.force = true;
     else if (value === "--allow-dirty") result.allowDirty = true;
@@ -35,6 +36,7 @@ function parseArguments(values) {
 
 try {
   const options = parseArguments(process.argv.slice(2));
+  if (options.review && !options.native) throw argumentError('--review requires --native');
   if (options.native && (options.profile !== 'core' || options.force || options.allowDirty)) {
     throw argumentError('--native supports core only, without --force or --allow-dirty');
   }
@@ -42,6 +44,7 @@ try {
     repositoryRoot: root,
     outputDirectory: options.output,
     dryRun: options.dryRun,
+    review: options.review,
   }) : (await import("../lib/profile-v3.mjs")).materializeProfileBundleV3({
     repositoryRoot: root,
     bundleId: options.profile,
