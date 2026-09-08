@@ -51,3 +51,43 @@ matching the versioned schema. The workflow uses ordinary native text output and
 strict local shape validation instead; malformed output remains incomplete.
 The bootstrap's final visible text is bound to the actual workflow result, so a
 missing invocation or model-written summary cannot synthesize task completion.
+
+## Development revision after the frozen pilot
+
+The installed reproduction now distinguishes transports. On pinned OpenCode and
+SDK 1.18.26, raw HTTP and the external installed SDK accept `format: {type:
+"json_schema", schema, retryCount: 0}` and return `info.structured` with
+`finish: "tool-calls"`. The same child prompt through the plugin's injected SDK
+still fails with `Expected OutputFormatJsonSchema`. The runnable model-free
+`scripts/verify-native-task-format.mjs` verifies both paths and records their
+actual request/result shapes. HTTP success does not establish embedded-client
+compatibility, so the command retains text output without starting another server
+or introducing a provider transport.
+
+A structured stage may make one format-only correction. It uses a fresh native
+session with all registered tools disabled, a deny-all permission boundary and a
+host tool-hook denial. Its only task input is the original response, schema and
+specific validation error. Original and corrected replies and stage timing are
+retained; the request shares the original deadline. Strict schema validation and
+semantic conservation prohibit replacing missing obligations/findings with empty
+success or inventing expected behavior. No received text is executed. A second
+invalid response stops the stage.
+
+Review findings now distinguish behavior defects from missing test/document
+material. `affectedFiles` carries information; host preparation policy independently
+selects conventional test/document paths, rejects symlinks and explicit edit denies,
+and preserves native permission asks. A rejected write proposal does not discard
+the review. Actual non-preparation changes still stop the workflow. Passing tests
+on correct D0 can deliver missing coverage without a production repair. Grounded
+behavior defects still require an observed assertion failure before production
+repair, followed by final discriminating and preservation checks.
+
+`determineOutcome` applies after ordinary, disposition and post-repair review.
+`evidenceLimitations` records provenance caveats; `unverified` retains concrete
+unresolved consumers/checks/requirements. Missing obligations, hypotheses, failed
+or stale required checks cannot be cleared by an empty finding list.
+
+The controller's internal retained-review option skips initial implementation for
+installed development diagnostics. The public command has no new flag, argument
+or mode. Historical twelve-run sources, grader, results and costs remain frozen;
+this revision is evaluated separately.

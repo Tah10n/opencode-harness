@@ -31,6 +31,9 @@ jobs:
       - name: Verify native template materialization
         run: node scripts/verify-native-template.mjs
 
+      - name: Verify native task controller regressions
+        run: node scripts/verify-native-task.mjs
+
       - name: Verify native review materialization and snapshot
         run: node scripts/verify-native-review.mjs
 
@@ -764,7 +767,7 @@ jobs:
           if-no-files-found: error
 
   native-review:
-    name: Native review installed wiring (model-free)
+    name: Native review and task installed wiring (model-free)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -782,3 +785,5 @@ jobs:
         run: |
           node scripts/verify-native-template-config.mjs --review
           node scripts/verify-native-review-fixture.mjs
+          node scripts/verify-native-task-format.mjs
+          node scripts/verify-native-task-fixture.mjs

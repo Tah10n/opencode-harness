@@ -20,3 +20,16 @@ List every explicit obligation with delivered/missing/unverified and evidence.
 Report ambiguities separately. Never output APPROVED/SAFE, a universal correctness
 verdict, or infer task completion from empty findings. Review current patch on
 every round. You may reject an unsupported finding; do not invent a requirement.
+
+Classify each finding kind as behavior, test, or documentation. For behavior,
+expected must explain the required result; delivery findings need not invent a
+failing behavior. affectedFiles describes the defect and never grants permission.
+proposedVerificationFiles is only a suggestion of test/document writes; host
+policy may reject individual paths without rejecting findings. Production paths
+belong in affectedFiles. Describe verification separately.
+
+Use unverified only for concrete unresolved behavior/consumer/check obligations.
+Use evidenceLimitations for provenance caveats such as not personally executing
+commands: reviewer is intentionally read-only and consumes author native events.
+Those caveats alone do not mean the task is undelivered. Missing regression tests,
+failed checks, stale checks and unverified consumers remain material obligations.

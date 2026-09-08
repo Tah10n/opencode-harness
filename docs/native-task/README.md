@@ -104,3 +104,13 @@ save in the original checkout. Scripted fixtures establish workflow control, not
 model quality. The corpus preflight establishes diagnostic task/reference/check
 consistency, not improvement. See [implementation/API notes](IMPLEMENTATION.md)
 and the [six-task pilot](../../development/native-task-pilot/README.md).
+
+### Development revision
+
+The next development controller distinguishes provenance caveats from unresolved
+requirements, and affected source paths from host-approved preparation paths.
+One isolated format-only correction is permitted per structured stage. Missing
+meaning is not filled with successful defaults. Missing tests/docs can be delivered
+without forcing a failing behavior test or unnecessary production repair. The
+historical [six-task pilot](../../development/native-task-pilot/RESULTS.md) remains
+unchanged and does not measure this revision.
