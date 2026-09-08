@@ -775,10 +775,10 @@ jobs:
         with:
           node-version: "24"
       - name: Install pinned native OpenCode without lifecycle scripts
-        run: npm install --ignore-scripts --no-audit --no-fund --prefix "$RUNNER_TEMP/native-opencode" opencode-ai@1.18.26
+        run: npm install --ignore-scripts --no-audit --no-fund --prefix "$RUNNER_TEMP/native-opencode" opencode-linux-x64@1.18.26
       - name: Verify installed config and local scripted fixture
         env:
-          OPENCODE_BIN: ${{ runner.temp }}/native-opencode/node_modules/.bin/opencode
+          OPENCODE_BIN: ${{ runner.temp }}/native-opencode/node_modules/opencode-linux-x64/bin/opencode
         run: |
           node scripts/verify-native-template-config.mjs --review
           node scripts/verify-native-review-fixture.mjs
