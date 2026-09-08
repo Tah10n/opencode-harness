@@ -1,0 +1,24 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import {DatabaseSync} from 'node:sqlite';
+import {adapterFor} from '../lib/readers.mjs';
+test('OpenCode retains accepted usage after database deletion and counts new events once',async t=>{
+  const directory=await fs.mkdtemp(path.join(os.tmpdir(),'opencode-ledger-'));
+  t.after(()=>fs.rm(directory,{recursive:true,force:true}));
+  const file=path.join(directory,'opencode.db'),db=new DatabaseSync(file);
+  t.after(()=>db.close());db.exec('CREATE TABLE message (id TEXT, time_created INTEGER, data TEXT)');
+  const insert=(id,date,input,output)=>db.prepare('INSERT INTO message VALUES (?,?,?)').run(id,Date.parse(date+'T12:00:00Z'),JSON.stringify({role:'assistant',tokens:{input,output,cache:{read:0,write:0},reasoning:0}}));
+  insert('first-private-id','2026-08-10',10,5);
+  const adapter=adapterFor('opencode'),source={dataPath:file},range={rangeStart:'2026-07-15',rangeEnd:'2026-08-14'};
+  const first=await adapter.collect(source,range,{});
+  assert.equal(first.completeness,'complete');assert.equal(first.entries[0].totalTokens,'15');
+  db.exec('DELETE FROM message');insert('second-private-id','2026-08-11',4,3);
+  const second=await adapter.collect(source,range,JSON.parse(JSON.stringify(first.nextState)));
+  assert.deepEqual(second.entries.map(e=>[e.date,e.totalTokens]),[['2026-08-10','15'],['2026-08-11','7']]);
+  assert.doesNotMatch(JSON.stringify(second.nextState),/first-private-id|second-private-id/);
+  const repeated=await adapter.collect(source,range,JSON.parse(JSON.stringify(second.nextState)));
+  assert.deepEqual(repeated.entries,second.entries);
+});

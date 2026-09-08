@@ -1,0 +1,25 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import {adapterFor} from '../lib/readers.mjs';
+test('unsupported Gemini usage preserves accepted data across state reload',async t=>{
+  const directory=await fs.mkdtemp(path.join(os.tmpdir(),'gemini-preservation-'));
+  t.after(()=>fs.rm(directory,{recursive:true,force:true}));
+  const file=path.join(directory,'session-usage.jsonl');
+  const fixture=JSON.parse(await fs.readFile(new URL('./fixtures/gemini.json',import.meta.url),'utf8'))[0];
+  await fs.writeFile(file,JSON.stringify(fixture)+'\n');
+  const adapter=adapterFor('gemini_cli'),range={rangeStart:'2026-07-15',rangeEnd:'2026-08-14'};
+  const first=await adapter.collect({dataPath:directory},range,{});
+  assert.equal(first.completeness,'complete');assert.ok(first.entries.length);
+  await fs.writeFile(file,JSON.stringify({type:'gemini.v2',id:'unsupported',timestamp:'2026-08-11T00:00:00Z',usageMetadata:null})+'\n');
+  const state=JSON.parse(JSON.stringify(first.nextState));
+  const result=await adapter.collect({dataPath:directory},range,state);
+  assert.equal(result.completeness,'partial');
+  assert.deepEqual(result.entries,first.entries);
+  assert.deepEqual(result.nextState,state);
+  await fs.writeFile(file,JSON.stringify({type:'metadata',timestamp:'2026-08-11'})+'\n');
+  const irrelevant=await adapter.collect({dataPath:directory},range,{});
+  assert.equal(irrelevant.completeness,'complete');assert.deepEqual(irrelevant.entries,[]);
+});

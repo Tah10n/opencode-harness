@@ -1,0 +1,47 @@
+{
+  "kind": "development-only-artifact-identities",
+  "entries": [
+    {
+      "task": "collectors-preserve-state",
+      "arm": "off",
+      "eventsSha256": "05a3afc874021dacd17379c3f31c14f9feac9d0557b5cf8836b8a4ab03b0bafb",
+      "eventLines": 78,
+      "patchSha256": "c2f9f61f985bc327ac368a9824b2d8b16a33a7f6569b5da251ac3f9fd9a2940e"
+    },
+    {
+      "task": "collectors-preserve-state",
+      "arm": "on",
+      "eventsSha256": "74d2429a0bf5bbf88067bc3aa1cb9867590941fbd91007f2f24145dabb65d386",
+      "eventLines": 85,
+      "patchSha256": "c67464a332ab83ca80846ac8623516a1abe1bdd41f68d980ba4db42dc649ffdc"
+    },
+    {
+      "task": "account-switch-ledger",
+      "arm": "off",
+      "eventsSha256": "adeec7f6195c869397bd55b8e8107f3d7eb42b9930178dddc221d21dbdd3ab4f",
+      "eventLines": 108,
+      "patchSha256": "45b846f79ec788db1728b8a7cedac99acd4ca37311f4a8572a3e00c269ec74a7"
+    },
+    {
+      "task": "account-switch-ledger",
+      "arm": "on",
+      "eventsSha256": "240f31cddb91672502dff0e9d7cbb22122360a66aa70800542b8d5a44ed3e90a",
+      "eventLines": 120,
+      "patchSha256": "01798f476306fc95be8ae8cc4b45e72a17160430cee277f709a85ddad7fe8b85"
+    },
+    {
+      "task": "cursor-compatible-versions",
+      "arm": "off",
+      "eventsSha256": "5fbfef0b7d6c0b9071230028a605a0b0ddc9a41a546a31d6155b03bea229c469",
+      "eventLines": 76,
+      "patchSha256": "75944556ecb91cf18bd5f4df1d7247cb73485f497bfcc6b31ac7b31e66f1b20f"
+    },
+    {
+      "task": "cursor-compatible-versions",
+      "arm": "on",
+      "eventsSha256": "5688d7fe95852c77f14abc455ad432cca2f303d5f990b271eaafbf642727e779",
+      "eventLines": 108,
+      "patchSha256": "2fe9bb0531ff5ba995b9e59986da04d376e4e94f2ba8863208abb412c1c5b999"
+    }
+  ]
+}

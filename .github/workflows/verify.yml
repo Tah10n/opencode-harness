@@ -28,6 +28,9 @@ jobs:
         with:
           node-version: "24"
 
+      - name: Verify native template materialization
+        run: node scripts/verify-native-template.mjs
+
       - name: Harden trusted Node distribution permissions
         shell: bash
         run: |

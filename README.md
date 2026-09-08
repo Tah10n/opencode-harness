@@ -2,6 +2,10 @@
 
 [![Verify](https://github.com/Tah10n/opencode-harness/actions/workflows/verify.yml/badge.svg)](https://github.com/Tah10n/opencode-harness/actions/workflows/verify.yml)
 
+An opt-in [native template](docs/native-template/README.md) runs in ordinary
+OpenCode with only an instruction file and config. Its current revision has no
+model-backed effectiveness result; [six development outcomes and trace audit](docs/native-template/DEVELOPMENT.md) remain diagnostic.
+
 Risk-adaptive OpenCode engineering profiles.
 
 `core` is the small development default: project-aware inspect, edit, targeted
