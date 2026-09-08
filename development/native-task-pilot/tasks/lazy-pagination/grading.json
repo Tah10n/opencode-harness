@@ -1,0 +1,15 @@
+{
+  "behavior": "All independent acceptance tests must pass. Execute original project tests unchanged against final source as preservation checks.",
+  "testDelivery": [
+    "lazy/early break",
+    "empty pages and repeated cursor",
+    "signal identity and between-item abort",
+    "eager and export consumers"
+  ],
+  "docDelivery": [
+    "lazy versus eager",
+    "cancellation"
+  ],
+  "coverage": "Inspect final test diff against original: necessary old cases must remain, even when refactored. A removed case without equivalent coverage fails test delivery.",
+  "complete": "Behavior, preservation, all explicit test and documentation delivery, and normal project checks must all pass. Environment/unverified is not complete."
+}

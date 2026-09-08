@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import { finalChecks, productionDiff, reproducedFailure, validateOutput, reviewSchema } from '../lib/native-task-workflow.mjs';
+const check={tool:'bash',state:'completed',exit:0,before:'S',after:'S',callID:'check'};
+assert.equal(finalChecks([check,{before:'S',after:'T'},{before:'T',after:'S'}],{snapshotSha256:'S'}).length,0,'restoring bytes does not restore old verification');
+assert.equal(finalChecks([{before:'S',after:'T'}, {...check,before:'T',after:'T'}],{snapshotSha256:'T'}).length,1);
+for(const event of [{tool:'bash',state:'completed',exit:127,output:'command not found'},{tool:'bash',state:'completed',exit:1,output:'Error: Cannot find module test.mjs'},{tool:'bash',state:'completed',exit:1,output:'SyntaxError: not ok'}]) assert.equal(reproducedFailure(event),false);
+assert.equal(reproducedFailure({tool:'bash',state:'completed',exit:1,output:'not ok 1 - public behavior\nAssertionError: expected 2 actual 1'}),true);
+const source='diff --git a/src/a.mjs b/src/a.mjs\n-source\n+changed\n';
+const test='diff --git a/test/a.test.mjs b/test/a.test.mjs\n-old test\n+new test\n';
+assert.equal(productionDiff({diff:source+test},['test/a.test.mjs']),source);
+assert.throws(()=>productionDiff({diff:source},['src/a.mjs']));
+assert.throws(()=>productionDiff({diff:source},['../private/test/a.test.mjs']));
+assert.throws(()=>validateOutput({findings:[]},reviewSchema));
+assert.throws(()=>validateOutput({findings:[],obligations:[{requirement:'x',status:'safe',evidence:'yes'}],unverified:[],coverageLost:[],checks:[],verificationFiles:[]},reviewSchema));
+console.log(JSON.stringify({passed:true,checks:['verification after final mutation, including reverted bytes','environment failure is not reproduction','production immutable during probe','restricted verification paths','malformed report cannot complete'],providerRequests:0}));

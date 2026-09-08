@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {createRequire} from 'node:module';import configure,{configure as named} from '../index.mjs';import {render} from '../consumer.mjs';const require=createRequire(import.meta.url);
+test('legacy CJS and ESM entry points',()=>{assert.deepEqual(configure('pretty'),named('pretty'));assert.deepEqual(require('../index.cjs')('pretty'),{mode:'pretty',indent:2});assert.equal(render({x:1},'compact'),'\u007b"x":1}');assert.throws(()=>configure('wide'),RangeError);});

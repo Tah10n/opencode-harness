@@ -1,0 +1,18 @@
+{
+  "behavior": "All independent acceptance tests must pass. Execute original project tests unchanged against final source as preservation checks.",
+  "testDelivery": [
+    "actual CJS and ESM entry points",
+    "legacy and object options including zero",
+    "invalid indent/missing mode",
+    "both render consumers"
+  ],
+  "docDelivery": [
+    "two forms",
+    "error rules"
+  ],
+  "coverage": "Inspect final test diff against original: necessary old cases must remain, even when refactored. A removed case without equivalent coverage fails test delivery.",
+  "complete": "Behavior, preservation, all explicit test and documentation delivery, and normal project checks must all pass. Environment/unverified is not complete.",
+  "sourceReview": [
+    "Both formats route through one normalization implementation; function reference identity is not required."
+  ]
+}
