@@ -178,3 +178,10 @@ All nine portable diagnostic combinations matched their expected pass/fail
 classification. Existing archives and 39 checked historical result/event/patch
 artifacts remained byte-identical; all 36 original freeze and seven capture
 amendment digests still match. Remote CI is separate from these local results.
+
+A final compatibility check caught the new CLI's eager native import in historical
+portable source layouts that omit the opt-in native library. The named argument
+error instead became module-not-found. Both materializers now load only in their
+selected branch; a regression runs the CLI without native files. That regression
+and `verify:adoption` pass. This packaging correction does not change either the
+frozen development instructions or the proposed instruction revision.

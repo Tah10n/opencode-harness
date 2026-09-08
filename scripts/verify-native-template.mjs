@@ -40,4 +40,13 @@ for (const extra of [['--force'], ['--allow-dirty'], ['--profile', 'deep']]) {
   assert.match(refused.stderr, /PROFILE_V3_ARGUMENT/);
   assert.equal(fs.existsSync(path.join(temporary, 'refused')), false);
 }
+// Existing portable source bundles may omit the opt-in native implementation.
+const legacyOnly = path.join(temporary, 'legacy-only');
+fs.mkdirSync(path.join(legacyOnly, 'scripts'), { recursive: true });
+fs.mkdirSync(path.join(legacyOnly, 'lib'));
+fs.copyFileSync(path.join(repositoryRoot, 'lib/profile-v3.mjs'), path.join(legacyOnly, 'lib/profile-v3.mjs'));
+fs.copyFileSync(path.join(repositoryRoot, 'scripts/profile-materialize.mjs'), path.join(legacyOnly, 'scripts/profile-materialize.mjs'));
+const oldArguments = spawnSync(process.execPath, [path.join(legacyOnly, 'scripts/profile-materialize.mjs'), '--unknown'], { encoding: 'utf8' });
+assert.equal(oldArguments.status, 1);
+assert.match(oldArguments.stderr, /PROFILE_V3_ARGUMENT:.*unknown argument/);
 console.log(JSON.stringify({ passed: true, temporary, checks: ['two-file bundle', 'settings preserved', 'dry run', 'collision refusal', 'symlink refusal', 'absolute path', 'native CLI without historical code', 'unsupported flags refused'] }));

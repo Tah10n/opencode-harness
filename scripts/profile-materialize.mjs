@@ -2,8 +2,6 @@ import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 
-import { materializeNativeTemplate } from "../lib/native-template.mjs";
-
 function argumentError(message) {
   return Object.assign(new Error(`PROFILE_V3_ARGUMENT: ${message}`), { code: "PROFILE_V3_ARGUMENT" });
 }
@@ -40,7 +38,7 @@ try {
   if (options.native && (options.profile !== 'core' || options.force || options.allowDirty)) {
     throw argumentError('--native supports core only, without --force or --allow-dirty');
   }
-  const result = options.native ? materializeNativeTemplate({
+  const result = options.native ? (await import("../lib/native-template.mjs")).materializeNativeTemplate({
     repositoryRoot: root,
     outputDirectory: options.output,
     dryRun: options.dryRun,
