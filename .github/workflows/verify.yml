@@ -28,6 +28,12 @@ jobs:
         with:
           node-version: "24"
 
+      - name: Verify native template materialization
+        run: node scripts/verify-native-template.mjs
+
+      - name: Verify native review materialization and snapshot
+        run: node scripts/verify-native-review.mjs
+
       - name: Harden trusted Node distribution permissions
         shell: bash
         run: |
@@ -756,3 +762,23 @@ jobs:
           name: milestone-2-aggregate
           path: .oc_harness/milestone-2-aggregate.json
           if-no-files-found: error
+
+  native-review:
+    name: Native review installed wiring (model-free)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+      - name: Install pinned native OpenCode without lifecycle scripts
+        run: npm install --ignore-scripts --no-audit --no-fund --prefix "$RUNNER_TEMP/native-opencode" opencode-linux-x64@1.18.26
+      - name: Verify installed config and local scripted fixture
+        env:
+          OPENCODE_BIN: ${{ runner.temp }}/native-opencode/node_modules/opencode-linux-x64/bin/opencode
+        run: |
+          node scripts/verify-native-template-config.mjs --review
+          node scripts/verify-native-review-fixture.mjs

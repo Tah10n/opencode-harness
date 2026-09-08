@@ -1,0 +1,586 @@
+{
+  "kind": "development-mechanism-observations-not-general-lift",
+  "sourceReport": "42af300a5bcf17da7c542879d7a20a61305b556d",
+  "reviewFreezeSha256": "06537c7a8364ad70ca87ea1bd26dcfcb74c4f9c667909e5e0a5745c2b2d45424",
+  "repairFreezeSha256": "f5621c836a936fe0958c68e948de12794436028480f24ecbe9252cc57f812b54",
+  "planSha256": "a6427d2147893e5d2b816b51369569d79b96485f35e3c6be5ab99506e36bba00",
+  "nativeCoreSha256": "9adcc862446ac6c0e5a407ec89e2f65fe4a249aedcc34ba36f143f3589edd4f7",
+  "model": "openai/gpt-5.6-luna",
+  "variant": "low",
+  "openCode": "1.18.26",
+  "node": "24.19.0",
+  "sessionLimitMs": 900000,
+  "initialImplementations": 0,
+  "historicalRevisionFrozenFilesVerified": 30,
+  "nativeTaskDelegation": "denied",
+  "attempts": [
+    {
+      "label": "R01",
+      "task": "collectors-preserve-state",
+      "kind": "candidate",
+      "publicSource": "4913b05975dcfdec9a37adba5a0c5ea5c3e8a88f",
+      "preparedBaseTree": "e0904f981651246baaed21099dcb42c38ef28962",
+      "tree": "6fba969b4385602c9b9e66448a50f0fae1404540",
+      "patchSha256": "28b6738570951904120de8295ee36c908b56ed06f7929a74b51e9cc6a170d8be",
+      "taskSha256": "048d797738d2b92fafee8b4421bf3381dcbb82c205693d5254ba7b7c3c4706c2",
+      "checks": [
+        "readers",
+        "diagnostics"
+      ],
+      "controlCommit": null,
+      "review": {
+        "phase": "reviews",
+        "label": "R01",
+        "seconds": 78.181,
+        "tools": 25,
+        "requests": 10,
+        "usage": {
+          "input": 276610,
+          "output": 2154,
+          "reasoning": 939,
+          "cacheRead": 0,
+          "cacheWrite": 0
+        },
+        "normalizedTotal": 279703,
+        "exitCode": 0,
+        "timedOut": false,
+        "eventsSha256": "236dd0ef56cd615ba40aad816c37b09528d50f8d1f6c6d940771024f241930e8",
+        "reviewTextSha256": "12e30d3b26a07af10ca6a4f5b91f6638fe9f37c82d5be9641f24028d34c2694d"
+      },
+      "independentSupplied": {
+        "preservation": {
+          "tests": 88,
+          "pass": 88,
+          "fail": 0,
+          "skipped": 0
+        },
+        "shipped": {
+          "tests": 88,
+          "pass": 88,
+          "fail": 0,
+          "skipped": 0
+        },
+        "functional": {
+          "tests": 2,
+          "pass": 0,
+          "fail": 2,
+          "skipped": 0
+        }
+      },
+      "repair": {
+        "phase": "repairs",
+        "label": "R01",
+        "seconds": 132.956,
+        "tools": 32,
+        "requests": 23,
+        "usage": {
+          "input": 248681,
+          "output": 3123,
+          "reasoning": 613,
+          "cacheRead": 109568,
+          "cacheWrite": 0
+        },
+        "normalizedTotal": 361985,
+        "exitCode": 0,
+        "timedOut": false,
+        "repairPatchSha256": "21544fde2e60dadd94d42e8b5eb586979becd3f5786f13087c75a3fe569b88dc",
+        "finalPatchSha256": "55cb0869fb91c84551ecf3e1b7cd14fdf94d4a1889c4af3c07b33b01647b6afd",
+        "eventsSha256": "71819f005ea2c129a706823dea895558eebfdb7d9c059e1888df9aaef393ae5b"
+      },
+      "independentRepaired": {
+        "preservation": {
+          "tests": 88,
+          "pass": 88,
+          "fail": 0,
+          "skipped": 0
+        },
+        "shipped": {
+          "tests": 90,
+          "pass": 90,
+          "fail": 0,
+          "skipped": 0
+        },
+        "functional": {
+          "tests": 2,
+          "pass": 0,
+          "fail": 2,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "label": "R02",
+      "task": "account-switch-ledger",
+      "kind": "control",
+      "publicSource": "2b16b6a8ad75b6b852adc5e2189e6d4a8d93eabd",
+      "preparedBaseTree": "b5cdfc0db3d8abefc03554fa19f41a0ed090a93f",
+      "tree": "42b1534442ceddcf4521f8abb4dd7d2ad1e19573",
+      "patchSha256": "bcfbe537709fe26c4d9d522cdb23709b13a433d45c1211719afaa5f4d314842a",
+      "taskSha256": "c855e75f5b4705f703f5c4c39e01d05c73505854c32a4ff97dd5d564e82573eb",
+      "checks": [
+        "readers",
+        "config",
+        "protocol"
+      ],
+      "controlCommit": "9e389a6dbc1b0c9813599fb61eceb6958d8c4de4",
+      "review": {
+        "phase": "reviews",
+        "label": "R02",
+        "seconds": 148.064,
+        "tools": 31,
+        "requests": 16,
+        "usage": {
+          "input": 328679,
+          "output": 2556,
+          "reasoning": 664,
+          "cacheRead": 73728,
+          "cacheWrite": 0
+        },
+        "normalizedTotal": 405627,
+        "exitCode": 0,
+        "timedOut": false,
+        "eventsSha256": "3f9853ac9a9ecad49af57b7d67fd9ae6d73da72cab368ede4d5c34def2e1480a",
+        "reviewTextSha256": "38d76bb695e51216730605a7ce85def276f0acf812158da66ccdea54193e883d"
+      },
+      "independentSupplied": {
+        "preservation": {
+          "tests": 203,
+          "pass": 201,
+          "fail": 2,
+          "skipped": 0
+        },
+        "shipped": {
+          "tests": 212,
+          "pass": 210,
+          "fail": 2,
+          "skipped": 0
+        },
+        "functional": {
+          "tests": 6,
+          "pass": 6,
+          "fail": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "label": "R03",
+      "task": "cursor-compatible-versions",
+      "kind": "candidate",
+      "publicSource": "f2fdbf718c72ca4c27ea7dd225481b111e01f800",
+      "preparedBaseTree": "9d5c174313c31620213257ce03fdac8ef970a33e",
+      "tree": "30a058d574fb3137a772ead8204aff9f44b088b4",
+      "patchSha256": "e952f3093414919041b332b3830e5f5ba82199f43766da2ff1e41cffd9f617ad",
+      "taskSha256": "e323e0dbf4617f581f59783055994424f4a4f411edf2ec5ce43ab31cb19f77bd",
+      "checks": [
+        "cursor-events",
+        "cursor-cli",
+        "cursor-sync"
+      ],
+      "controlCommit": null,
+      "review": {
+        "phase": "reviews",
+        "label": "R03",
+        "seconds": 129.184,
+        "tools": 23,
+        "requests": 9,
+        "usage": {
+          "input": 119683,
+          "output": 1980,
+          "reasoning": 813,
+          "cacheRead": 65024,
+          "cacheWrite": 0
+        },
+        "normalizedTotal": 187500,
+        "exitCode": 0,
+        "timedOut": false,
+        "eventsSha256": "3ca0f3f0b132f588faffb78a535dab9b725e918be12b7cb534a2f2fd90656293",
+        "reviewTextSha256": "ad1861432520774c0a5073f360db167aa00d8a435e8098d203a2471f81d98635"
+      },
+      "independentSupplied": {
+        "preservation": {
+          "tests": 20,
+          "pass": 20,
+          "fail": 0,
+          "skipped": 0
+        },
+        "shipped": {
+          "tests": 21,
+          "pass": 21,
+          "fail": 0,
+          "skipped": 0
+        },
+        "functional": {
+          "tests": 2,
+          "pass": 2,
+          "fail": 0,
+          "skipped": 0
+        },
+        "date-boundary": {
+          "tests": 11,
+          "pass": 1,
+          "fail": 10,
+          "skipped": 0
+        }
+      },
+      "repair": {
+        "phase": "repairs",
+        "label": "R03",
+        "seconds": 149.611,
+        "tools": 25,
+        "requests": 14,
+        "usage": {
+          "input": 209943,
+          "output": 3072,
+          "reasoning": 363,
+          "cacheRead": 83456,
+          "cacheWrite": 0
+        },
+        "normalizedTotal": 296834,
+        "exitCode": 0,
+        "timedOut": false,
+        "repairPatchSha256": "934e84b6c4bb982f471dad1ee39ef8474aa50b892c490de77bb46882b85b7d83",
+        "finalPatchSha256": "044eb5bf91bcdd145cda3e5fb07c2308b2d27cae3066f1d3f6b85f5252d29874",
+        "eventsSha256": "a55e06d38f7465da642e5ad36f5441c2472e0eaf773d3a14a93b741edfcbb8cc"
+      },
+      "independentRepaired": {
+        "preservation": {
+          "tests": 20,
+          "pass": 20,
+          "fail": 0,
+          "skipped": 0
+        },
+        "shipped": {
+          "tests": 22,
+          "pass": 22,
+          "fail": 0,
+          "skipped": 0
+        },
+        "functional": {
+          "tests": 2,
+          "pass": 2,
+          "fail": 0,
+          "skipped": 0
+        },
+        "date-boundary": {
+          "tests": 11,
+          "pass": 11,
+          "fail": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "label": "R04",
+      "task": "collectors-preserve-state",
+      "kind": "control",
+      "publicSource": "4913b05975dcfdec9a37adba5a0c5ea5c3e8a88f",
+      "preparedBaseTree": "e0904f981651246baaed21099dcb42c38ef28962",
+      "tree": "ee435d66b2b6cc46c29ce05b69a69818016acf73",
+      "patchSha256": "02558cfa8644ae17bb6b6647572a78941be50decc4a8fc8c16ef8463924e5818",
+      "taskSha256": "048d797738d2b92fafee8b4421bf3381dcbb82c205693d5254ba7b7c3c4706c2",
+      "checks": [
+        "readers",
+        "diagnostics"
+      ],
+      "controlCommit": "0f8b1c7e1e502bb27ee01fc647e6b618035ca42c",
+      "review": {
+        "phase": "reviews",
+        "label": "R04",
+        "seconds": 89.104,
+        "tools": 22,
+        "requests": 12,
+        "usage": {
+          "input": 224298,
+          "output": 2061,
+          "reasoning": 1029,
+          "cacheRead": 16896,
+          "cacheWrite": 0
+        },
+        "normalizedTotal": 244284,
+        "exitCode": 0,
+        "timedOut": false,
+        "eventsSha256": "4d8c8a0921bebc4d8ea35fd163f4549d88975f8d7766f4e9728e45d7a31baa98",
+        "reviewTextSha256": "eb4efdfe2a5a1304f12a759f03c33b45847d53193d5aa7c43659bc2d6fb76146"
+      },
+      "independentSupplied": {
+        "preservation": {
+          "tests": 88,
+          "pass": 86,
+          "fail": 2,
+          "skipped": 0
+        },
+        "shipped": {
+          "tests": 93,
+          "pass": 93,
+          "fail": 0,
+          "skipped": 0
+        },
+        "functional": {
+          "tests": 2,
+          "pass": 2,
+          "fail": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "label": "R05",
+      "task": "account-switch-ledger",
+      "kind": "candidate",
+      "publicSource": "2b16b6a8ad75b6b852adc5e2189e6d4a8d93eabd",
+      "preparedBaseTree": "b5cdfc0db3d8abefc03554fa19f41a0ed090a93f",
+      "tree": "3e551d048b7aeb5232bc19466d2250314bed97c3",
+      "patchSha256": "9ccf6966bab8f29234954c0da5d6c243fa780fbeca6bbe038393c427ad456801",
+      "taskSha256": "c855e75f5b4705f703f5c4c39e01d05c73505854c32a4ff97dd5d564e82573eb",
+      "checks": [
+        "readers",
+        "config",
+        "protocol"
+      ],
+      "controlCommit": null,
+      "review": {
+        "phase": "reviews",
+        "label": "R05",
+        "seconds": 148.619,
+        "tools": 23,
+        "requests": 12,
+        "usage": {
+          "input": 245307,
+          "output": 2502,
+          "reasoning": 1167,
+          "cacheRead": 46080,
+          "cacheWrite": 0
+        },
+        "normalizedTotal": 295056,
+        "exitCode": 0,
+        "timedOut": false,
+        "eventsSha256": "c8757e20023ac44d438a393b6fffc1afb1fa36dc127cf1e50dc03699f1127f8f",
+        "reviewTextSha256": "63f2df775a9a3a7b9607290d2f3a960280dc2c9fe9221e904ec47f4a03d08a37"
+      },
+      "independentSupplied": {
+        "preservation": {
+          "tests": 203,
+          "pass": 202,
+          "fail": 1,
+          "skipped": 0
+        },
+        "shipped": {
+          "tests": 203,
+          "pass": 202,
+          "fail": 1,
+          "skipped": 0
+        },
+        "functional": {
+          "tests": 6,
+          "pass": 0,
+          "fail": 6,
+          "skipped": 0
+        }
+      },
+      "repair": {
+        "phase": "repairs",
+        "label": "R05",
+        "seconds": 275.851,
+        "tools": 39,
+        "requests": 25,
+        "usage": {
+          "input": 417159,
+          "output": 3844,
+          "reasoning": 1707,
+          "cacheRead": 181248,
+          "cacheWrite": 0
+        },
+        "normalizedTotal": 603958,
+        "exitCode": 0,
+        "timedOut": false,
+        "repairPatchSha256": "dd125f9ddf83ec8ac373cc9de793a765270d269e63580de848f8c02e7b66b0b2",
+        "finalPatchSha256": "5d4ab334b9e649709b36cfce441c7fa6d1518211410a6f100b0ffcf9a32091bb",
+        "eventsSha256": "4bc2bd3b5cc204b99397c388cee6fbb963a81e4703540de3e24bf1d40a647fea"
+      },
+      "independentRepaired": {
+        "preservation": {
+          "tests": 203,
+          "pass": 203,
+          "fail": 0,
+          "skipped": 0
+        },
+        "shipped": {
+          "tests": 203,
+          "pass": 203,
+          "fail": 0,
+          "skipped": 0
+        },
+        "functional": {
+          "tests": 6,
+          "pass": 0,
+          "fail": 6,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "label": "R06",
+      "task": "cursor-compatible-versions",
+      "kind": "control",
+      "publicSource": "f2fdbf718c72ca4c27ea7dd225481b111e01f800",
+      "preparedBaseTree": "9d5c174313c31620213257ce03fdac8ef970a33e",
+      "tree": "20aa6378937d1ae2bfaf247e8270a5e80af2b8db",
+      "patchSha256": "c650ec68999ffabe438a00af9f6d3696aac8a3e1580d876c442879c4f5087617",
+      "taskSha256": "e323e0dbf4617f581f59783055994424f4a4f411edf2ec5ce43ab31cb19f77bd",
+      "checks": [
+        "cursor-events",
+        "cursor-cli",
+        "cursor-sync"
+      ],
+      "controlCommit": "bbff8e4fa90497ba411c6487e07a004bcb8b84c3",
+      "review": {
+        "phase": "reviews",
+        "label": "R06",
+        "seconds": 127.64,
+        "tools": 21,
+        "requests": 10,
+        "usage": {
+          "input": 113850,
+          "output": 1702,
+          "reasoning": 881,
+          "cacheRead": 41984,
+          "cacheWrite": 0
+        },
+        "normalizedTotal": 158417,
+        "exitCode": 0,
+        "timedOut": false,
+        "eventsSha256": "d18451505bcc9be40ce91b3ef78afbb62adcd4ade19d7215d6598db8c9c5b25b",
+        "reviewTextSha256": "24094eb94408473d9c39a48bfba71510967dd999ccf6774227e8b88688125afd"
+      },
+      "independentSupplied": {
+        "preservation": {
+          "tests": 20,
+          "pass": 20,
+          "fail": 0,
+          "skipped": 0
+        },
+        "shipped": {
+          "tests": 23,
+          "pass": 23,
+          "fail": 0,
+          "skipped": 0
+        },
+        "functional": {
+          "tests": 2,
+          "pass": 2,
+          "fail": 0,
+          "skipped": 0
+        },
+        "date-boundary": {
+          "tests": 11,
+          "pass": 11,
+          "fail": 0,
+          "skipped": 0
+        }
+      }
+    }
+  ],
+  "adjudication": {
+    "rubric": "unchanged REVIEW-REPAIR-PLAN.md",
+    "findings": [
+      {
+        "id": "R01.1",
+        "classification": "confirmed-defect",
+        "scope": "new cross-file schemaInvalid contamination; order-dependent, reproduced with both file assignments"
+      },
+      {
+        "id": "R01.2",
+        "classification": "confirmed-defect",
+        "scope": "pre-existing Antigravity nested result.usage append replay doubles 3 to 6 on both baseline and candidate; not introduced by patch"
+      },
+      {
+        "id": "R02.1",
+        "classification": "confirmed-defect",
+        "scope": "control Qwen migration components missing; repeated ordinary preservation failure"
+      },
+      {
+        "id": "R02.2",
+        "classification": "confirmed-defect",
+        "scope": "control cutover pending not retained; repeated ordinary config failure"
+      },
+      {
+        "id": "R03.1",
+        "classification": "confirmed-defect",
+        "scope": "numeric date concatenation rejects later valid date; independent October CLI/sync 1/11"
+      },
+      {
+        "id": "R03.2",
+        "classification": "confirmed-missing-obligation",
+        "scope": "explicit CLI/account-routing test deliverable absent from diff"
+      },
+      {
+        "id": "R04.1",
+        "classification": "unsupported-assumption",
+        "scope": "metadata becomes partial, but supported dedicated capture format does not establish arbitrary metadata as irrelevant; do not weaken schema gate"
+      },
+      {
+        "id": "R04.2",
+        "classification": "unsupported-assumption",
+        "scope": "schema-less metadata becomes partial, but no evidence it is valid irrelevant input in dedicated Qwen usage log; old silent skip alone does not justify fail-open change"
+      },
+      {
+        "id": "R05.1",
+        "classification": "confirmed-defect",
+        "scope": "hash-only ledger cannot reconstruct accepted tuples after file rewrite; independent lifecycle failures"
+      },
+      {
+        "id": "R05.2",
+        "classification": "confirmed-defect",
+        "scope": "writer clientSourceId versus cutover reader sourceId; preserved config test fails"
+      },
+      {
+        "id": "R05.3",
+        "classification": "confirmed-defect",
+        "scope": "legacy accounting not migrated; three public 0.4.3 sequences fail on diagnostic copy"
+      },
+      {
+        "id": "R05.4",
+        "classification": "unsupported-assumption",
+        "scope": "no demonstrated double count caused specifically by out-of-range observation; retaining every observed event beyond report range is not independently established and overlaps rewrite loss"
+      },
+      {
+        "id": "R06.1",
+        "classification": "confirmed-defect",
+        "scope": "control documentation says 0.7.1 while supplied package and version remain 0.7.0; partial public-commit extraction artifact, not runtime defect"
+      }
+    ],
+    "confirmedFalseRequirements": 0,
+    "unsupportedAssumptions": 3,
+    "repairEligible": [
+      "R01",
+      "R03",
+      "R05"
+    ],
+    "repairPayloadRule": "Original review and its tool diagnostics only; this adjudication and external checks are NOT passed to repair. Writer must validate assumptions independently."
+  },
+  "usageCoverage": "step_finish only; auxiliary usage incomplete; monetary cost unavailable",
+  "newNormalizationProbe": {
+    "before": {
+      "completeness": "complete",
+      "nextStateBytes": 76,
+      "retainsUnexpectedPrivateField": false,
+      "diagnostics": []
+    },
+    "after": {
+      "completeness": "complete",
+      "nextStateBytes": 1048954,
+      "retainsUnexpectedPrivateField": true,
+      "diagnostics": []
+    }
+  },
+  "independentArtifactSha256": {
+    "adjudication/cross-file.mjs": "092ebc162c9d02bca67e9d0f4a8163b89fe935a50c0d15938ca2ecc66890d779",
+    "adjudication/antigravity.mjs": "15665764a454e38380819accf60f854474526972d0baf7622bafac0f140d2216",
+    "adjudication/ledger-state.mjs": "b6ff218f85ee3c17130a78144507de948b8751132798db26a4bc267dc3b51f1b",
+    "adjudication/R05-migration.json": "e0e2005044bb5f174c4de8ca0e8361c7bc50d18c25c1092f032f9f3d6777bf28",
+    "adjudication/R05-repaired-migration.json": "5cfea7102a8ffb96fb67111b4d0ac8796b6617a23529edb3fb34a45eee65e17f",
+    "adjudication/R05-before-state.json": "00084d5a7a69da67db3139796450f6f577b425abbe15fd36570e59e01f4acccb",
+    "adjudication/R05-after-state.json": "c7c80a59e5070d4988f64f62d95128ab9764da8e5f0d57a5ce19720b9d74fa41"
+  }
+}
