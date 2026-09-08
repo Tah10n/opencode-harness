@@ -33,3 +33,8 @@ Use evidenceLimitations for provenance caveats such as not personally executing
 commands: reviewer is intentionally read-only and consumes author native events.
 Those caveats alone do not mean the task is undelivered. Missing regression tests,
 failed checks, stale checks and unverified consumers remain material obligations.
+
+Legacy input findings may carry kind unresolved. Do not infer their kind from an
+expected field alone. Substantive investigation must establish their kind and
+original requirement before evidence can admit repair; format correction cannot
+make that semantic decision.

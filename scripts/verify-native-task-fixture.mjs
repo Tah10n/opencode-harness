@@ -26,6 +26,7 @@ const response = (res, call, content = '') => {
   res.writeHead(200, { 'content-type': 'text/event-stream' });
   res.end(`data: ${JSON.stringify({ ...base, choices: [{ index: 0, delta, finish_reason: null }] })}\n\ndata: ${JSON.stringify({ ...base, choices: [{ index: 0, delta: {}, finish_reason: call ? 'tool_calls' : 'stop' }] })}\n\ndata: [DONE]\n\n`);
 };
+const legacyReview = fs.readFileSync(path.join(root, 'scripts/fixtures/native-task-review/bookmark-migration.txt'), 'utf8');
 const finding = { id: 'F1', classification: 'concrete', kind: 'behavior', basis: 'Original task requires value 2', affectedFiles: ['value.mjs'], verification: 'node --test value.test.mjs', expected: '2' };
 const fixture = http.createServer(async (req, res) => {
   const chunks = []; for await (const x of req) chunks.push(x);
@@ -33,6 +34,7 @@ const fixture = http.createServer(async (req, res) => {
   const user = body.messages.findLast(m => m.role === 'user');
   const userText = typeof user?.content === 'string' ? user.content : user?.content?.map(p => p.text ?? '').join('\n') ?? '';
   if (userText.startsWith('FORMAT_ONLY:')) {
+    assert.notEqual(mode,'legacy-bookmark','Supported legacy must never request format correction');
     requests.push({mode,stage:'format',tools:(body.tools??[]).map(t=>t.function.name)});
     assert.equal(body.tools?.length??0,0,'Format correction must not expose tools: '+JSON.stringify(body.tools));
     if(mode==='format-fails'){response(res,null,'{broken again');return;}
@@ -58,6 +60,7 @@ const fixture = http.createServer(async (req, res) => {
     const info = JSON.parse(userText.split('\nReturn only')[0]);
     const lastCheck = info.toolEvidence?.findLast(e => e.args?.command?.includes('node --test value.test.mjs') && e.exit === 0);
     if (mode === 'coverage-loss') assert.ok(info.current.diff.includes('replacement only'));
+    if(mode==='legacy-bookmark'){response(res,null,legacyReview);return;}
     const hasDefect = ['defect','src-affected','probe-production'].includes(mode) && !requests.some(r => r.mode === mode && r.stage === 'repair');
     const unsupported = mode === 'unsupported' && n === 0;
     lastReport = {
@@ -71,6 +74,16 @@ const fixture = http.createServer(async (req, res) => {
     response(res,null,JSON.stringify(lastReport)); return;
   }
   if (stage === 'reproduce') {
+    if(mode==='legacy-bookmark'){
+      const info=JSON.parse(userText.split('\nReturn only')[0]),old=JSON.parse(legacyReview);
+      assert.deepEqual(info.review.proposedVerificationFiles,old.verificationFiles);
+      assert.deepEqual([info.review.findings.length,info.review.obligations.length,info.review.unverified.length],[2,7,4]);
+      assert.ok(info.review.findings.every(f=>f.kind==='unresolved'));
+      assert.ok(info.rejectedWriteProposals.includes('src/schema.mjs'));
+      assert.ok(info.allowedVerificationFiles.includes('test/storage.test.mjs'));
+      response(res,null,JSON.stringify({dispositions:old.findings.map(f=>({id:f.id,decision:'unverified',basis:f.basis,explanation:'Routing fixture does not establish bookmark behavior'})),limitations:['Scripted routing only']}));return;
+    }
+
     if (mode === 'probe-production' && n === 0) { response(res,bash("printf 'export const value = 2;\\n' > value.mjs"));return;}
     if (mode === 'missing-test' && n===0) {response(res,bash('cp value.test.mjs extra.test.mjs'));return;}
     if (mode === 'missing-test' && n===1) {const call=bash("node --test value.test.mjs extra.test.mjs");call.id=`test-delivery-${requests.length}`;reproductionID=call.id;response(res,call);return;}
@@ -93,7 +106,7 @@ const api = async (method, route, body) => { const r = await fetch(`http://127.0
 try {
   let ready = false; for (let n = 0; n < 150; n++) { try { await api('GET', '/global/health'); ready = true; break; } catch { await new Promise(r => setTimeout(r, 100)); } } assert.ok(ready, stderr);
   const commands = await api('GET', '/command'); assert.ok(commands.some(c => c.name === 'harness-task'));
-  for (mode of ['correct', 'defect', 'unsupported', 'coverage-loss', 'last-mutation', 'cancel', 'incomplete', 'concurrent-save', 'staged-work','trailing-comma','missing-semantic','format-fails','src-affected','probe-production','missing-test','provenance','unverified','budget']) {
+  for (mode of ['correct', 'defect', 'unsupported', 'coverage-loss', 'last-mutation', 'cancel', 'incomplete', 'concurrent-save', 'staged-work','trailing-comma','missing-semantic','format-fails','src-affected','probe-production','missing-test','provenance','unverified','legacy-bookmark','budget']) {
     fs.writeFileSync(path.join(project, 'value.mjs'), 'export const value = 2;\n');
     fs.writeFileSync(path.join(project, 'value.test.mjs'), git('show','HEAD:value.test.mjs') + '\n');
     fs.writeFileSync(task, 'ORIGINAL_TASK_FIXTURE: Deliver value 2 from value.mjs and preserve the existing public test. Run node --test value.test.mjs.');
@@ -129,10 +142,19 @@ try {
     if(['missing-semantic','format-fails','probe-production','unverified'].includes(mode)) assert.equal(report.status,'incomplete',JSON.stringify(report));
     if(['trailing-comma','missing-semantic','format-fails'].includes(mode)) assert.equal(requests.filter(r=>r.mode===mode&&r.stage==='format').length,1);
     if(mode==='missing-test'){assert.ok(fs.existsSync(path.join(report.executionDirectory,'extra.test.mjs')));assert.equal(fs.readFileSync(path.join(report.executionDirectory,'value.mjs'),'utf8'),'export const value = 2;\n');}
+    if(mode==='legacy-bookmark'){
+      assert.equal(report.status,'incomplete');assert.equal(report.repairs,0);
+      assert.ok(requests.some(r=>r.mode===mode&&r.stage==='reproduce'));
+      assert.equal(requests.filter(r=>r.mode===mode&&r.stage==='format').length,0);
+      assert.equal(JSON.parse(fs.readFileSync(path.join(report.artifacts,'review-0-original.json'))).parts.filter(p=>p.type==='text').map(p=>p.text).join('\n'),legacyReview);
+      const adapted=JSON.parse(fs.readFileSync(path.join(report.artifacts,'review-0-adapted.json')));
+      assert.deepEqual(adapted.proposedVerificationFiles,JSON.parse(legacyReview).verificationFiles);
+      assert.deepEqual(adapted.unverified,JSON.parse(legacyReview).unverified);
+    }
     if(mode==='src-affected')assert.ok(report.rejectedWriteProposals.includes('value.mjs'));
     console.log(JSON.stringify({ mode, status: report.status, repairs: report.repairs, artifacts: report.artifacts }));
   }
-  console.log(JSON.stringify({ passed: true, installedWorkflow: true, scenarios: 18, realProviderRequests: 0, scriptedRequests: requests.length, temp }));
+  console.log(JSON.stringify({ passed: true, installedWorkflow: true, scenarios: 19, realProviderRequests: 0, scriptedRequests: requests.length, temp }));
 } finally {
   if (child.exitCode === null) await new Promise(resolve => { const timer = setTimeout(() => child.kill('SIGKILL'), 3000); child.once('exit', () => { clearTimeout(timer); resolve(); }); child.kill('SIGTERM'); });
   fixture.closeAllConnections(); await new Promise(r => fixture.close(r));

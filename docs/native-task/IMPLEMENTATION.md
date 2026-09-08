@@ -64,6 +64,36 @@ actual request/result shapes. HTTP success does not establish embedded-client
 compatibility, so the command retains text output without starting another server
 or introducing a provider transport.
 
+Supported legacy reviews are adapted deterministically before schema validation.
+The adapter renames `files` to `affectedFiles`, `reproduction` to `verification`,
+and `verificationFiles` to `proposedVerificationFiles`, preserving array order and
+all original strings. Conflicting old/new aliases fail explicitly. The original
+response is retained in `review-N-original.json`; the separate object is saved in
+`review-N-adapted.json`. Current-schema objects are unchanged on repeated adaptation.
+The existing non-executing scanner tolerates trailing commas in legacy text only;
+other corrupt or ambiguous input still fails or uses the existing bounded format
+correction. There is no extra retry.
+
+Absent legacy finding kinds become `unresolved`, never inferred from `expected`.
+An absent verification method remains absent for an unresolved finding. Only the
+substantive reproduction stage can resolve a kind with task/contract basis and
+actual native evidence; behavior repair still requires a failing assertion.
+Legacy `evidenceLimitations: []` means there were no separate category entries;
+all existing `unverified` entries remain material, including provenance-like text.
+Format correction cannot decide kind or remove findings, obligations, uncertainty
+or proposed paths. All eight bookmark review paths reach host scope policy as
+proposals, including rejected production and instruction paths.
+
+Controller regressions consume all five unchanged retained response files with
+`io.format` forbidden. Bookmark's two findings, seven obligations, four unverified
+entries and eight paths reach reproduction without a format request. Expense's
+empty findings and delivered obligations do not trigger artificial reproduction;
+its remaining uncertainty still prevents completion. The installed scripted
+fixture also sends bookmark's original text through the production controller and
+reaches reproduction with zero format calls. These are model-free routing checks,
+not evidence that a model supplies a correct repair. The prior unsuccessful real
+continuation and historical A 5/6, B 4/6 are unchanged; no real run is repeated.
+
 A structured stage may make one format-only correction. It uses a fresh native
 session with all registered tools disabled, a deny-all permission boundary and a
 host tool-hook denial. Its only task input is the original response, schema and
