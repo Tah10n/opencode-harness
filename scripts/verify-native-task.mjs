@@ -57,7 +57,7 @@ for(const mode of ['no-evidence','production-mutation','grounded-behavior']){
  io.prompt=async(role,prompt)=>{const p=JSON.parse(prompt);if(p.instruction.startsWith('Investigate')){
   if(mode==='production-mutation')mutated=true;
   if(mode==='grounded-behavior')events.push({...check,callID:'failure',exit:1,output:'AssertionError: expected 2 actual 1'});
-  return result({dispositions:[{id:'F-001',decision:'grounded',kind:'behavior',basis:'original requirement',expectedReason:'literal requirement',explanation:'investigated',evidenceCallID:'failure'}],limitations:[]});
+  return result({dispositions:[{id:'F-001',decision:'grounded',kind:'behavior',basis:'original requirement',expectedReason:'literal requirement',explanation:'investigated',evidenceCallID:'failure'},...['F-002','obligation-0'].map(id=>({id,decision:'unverified',basis:'remaining obligation',explanation:'not resolved'}))],limitations:[]});
  }if(p.instruction.startsWith('Repair ONLY')){repair=true;throw Error('Reached admitted repair');}return result(valid);};
  const report=await runWorkflow(io,{initialReview:result(legacyRaw),maxRepairs:1});assert.equal(repair,mode==='grounded-behavior');
  if(mode==='production-mutation')assert.match(report.failure.message,/Production changed before reproduction/);
@@ -94,3 +94,43 @@ assert.equal(determineOutcome({...valid,checks:[...valid.checks,{callID:'failed'
 
 const unclearProbe={dispositions:[{id:'F',decision:'unverified',basis:'unclear requirement',explanation:'No expected result established'}],limitations:['Expected behavior unknown']};
 assert.throws(()=>conserveFormat(JSON.stringify(unclearProbe),{...unclearProbe,dispositions:[{...unclearProbe.dispositions[0],decision:'grounded',kind:'behavior',expectedReason:'invented',evidenceCallID:'fiction'}]},probeSchema));
+
+const {assessDispositions}=await import('../lib/native-task-workflow.mjs');
+const rawDisposition=fs.readFileSync(new URL('./fixtures/native-task-review/bookmark-reproduction.txt',import.meta.url),'utf8');
+for(const mode of ['correct-once','omit-other','immediate','wrong-again','print-only','unknown','cancel','budget','permission']) {
+ const io=fake();let events=[],state='S',repairs=0,corrections=0,reviews=0,stop=false;
+ const originalCapture=io.capture;io.capture=()=>({...originalCapture(),snapshotSha256:state});io.events=()=>events;
+ io.format=async()=>assert.fail('Unexpected format request');
+ io.checkActive=()=>{if(stop)throw Error(mode==='budget'?'budget exhausted':'cancelled');};io.aborted=()=>stop;
+ const failed=()=>{events.push({tool:'write',before:state,after:'T'});state='T';events.push({...check,before:state,after:state,callID:'actual-failure',exit:1,output:'AssertionError: expected 2 actual 1'});};
+ const dispositions=()=>({dispositions:[{id:'F-001',decision:'grounded',kind:'behavior',basis:'original no data loss requirement',expectedReason:'input fields are data',explanation:'observed failing assertion',evidenceCallID:'actual-failure'},{id:'F-002',decision:'unverified',basis:'test delivery pending',explanation:'not addressed'},{id:'obligation-0',decision:'unverified',basis:'tests pending',explanation:'not addressed'}],limitations:[]});
+ io.prompt=async(role,prompt)=>{
+  const p=JSON.parse(prompt);
+  if(p.instruction.startsWith('Investigate')){
+   if(mode==='immediate'){failed();return result(dispositions());}
+   events.push({...check,callID:'current-print',output:'{"sameBytes":true}'});
+   if(mode==='permission')events.push({tool:'bash',state:'error',before:state,after:state,callID:'denied',output:'permission denied'});
+   if(['cancel','budget'].includes(mode))stop=true;
+   const d=JSON.parse(rawDisposition);if(mode==='unknown')d.dispositions[0]={...d.dispositions[0],decision:'unverified',expectedReason:''};
+   if(mode==='print-only')d.dispositions.forEach(d=>d.evidenceCallID='current-print');return result(d);
+  }
+  if(p.instruction.startsWith('Correct reproduction evidence')){
+   corrections++;assert.equal(role,'author');assert.equal(p.originalTask,'Keep public behavior');
+   assert.ok(p.admissionDecisions.some(d=>d.reasons.includes(mode==='print-only'?'no_executed_failing_assertion':'evidence_not_in_current_stage')));
+   assert.equal(p.currentEvents[0].callID,'current-print');
+   if(mode==='wrong-again'||mode==='print-only')return result(rawDisposition);
+   failed();const corrected=dispositions();if(mode==='omit-other')corrected.dispositions=corrected.dispositions.slice(0,1);return result(corrected);
+  }
+  if(p.instruction.startsWith('Repair ONLY')){repairs++;events.push({tool:'write',before:state,after:'U'});state='U';events.push({...check,before:state,after:state});return result('repaired');}
+  reviews++;return result({...valid,checks:[{callID:'check',purpose:'discriminating',basis:'final assertion'},{callID:'check',purpose:'preservation',basis:'old tests'}]});
+ };
+ const report=await runWorkflow(io,{initialReview:result(legacyRaw),maxRepairs:1});
+ assert.equal(repairs,['correct-once','immediate'].includes(mode)?1:0,mode);
+ assert.equal(corrections,['correct-once','omit-other','wrong-again','print-only'].includes(mode)?1:0,mode);
+ if(repairs)assert.equal(report.status,'reviewed_delivery',JSON.stringify(report));
+ assert.ok(report.evidenceCorrections<=1);assert.equal(io.saved.get('D0.json').snapshotSha256,'S');
+}
+for(const [event,reason]of [[{...check,callID:'e',before:'OLD'},'evidence_wrong_file_state'],[{...check,callID:'e',state:'error'},'command_not_completed'],[{...check,callID:'e',exit:1,output:'ENOENT'},'environment_failure'],[{...check,callID:'e',output:'grounded expected AssertionError'},'no_executed_failing_assertion']]){
+ const a=assessDispositions([behaviorFinding],[{id:'F',decision:'grounded',kind:'behavior',basis:'task',expectedReason:'task',evidenceCallID:'e'}],[event],{snapshotSha256:'S'});assert.ok(a[0].reasons.includes(reason));assert.equal(a[0].admitted,false);
+}
+console.log(JSON.stringify({passed:true,evidenceCorrectionLimit:1,replayRepairAndFinalChecks:true,currentEvidenceReasons:true,realProviderRequests:0}));

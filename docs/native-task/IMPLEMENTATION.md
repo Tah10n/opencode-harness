@@ -121,3 +121,32 @@ The controller's internal retained-review option skips initial implementation fo
 installed development diagnostics. The public command has no new flag, argument
 or mode. Historical twelve-run sources, grader, results and costs remain frozen;
 this revision is evaluated separately.
+
+## Correcting reproduction evidence
+
+`assessDispositions` records admission, explicit rejection reasons and the actual
+native event reference for every candidate. Missing current-stage IDs, stale file
+states, incomplete/environment-failed commands, absent failing assertions,
+unresolved expected basis/kind and scope/permission violations remain distinct.
+No historical ID is substituted by command similarity.
+
+During reproduction the native bash result includes `HOST_NATIVE_EVIDENCE` with
+its actual callID, state, exit and snapshot bindings. The raw event output is saved
+before this context-only supplement is appended; admission never treats the
+supplement as assertion output. Saved-review check IDs are explicitly historical.
+
+One evidence-correction turn at most is allowed per workflow, counted separately
+from JSON format correction and production repairs. It uses the same author
+session, task, preparation permissions and total deadline. It receives rejection
+reasons and compact current-stage events, and can add/run a grounded regression.
+It is only eligible when every rejected candidate has a correctable evidence
+problem; unresolved expectations, permissions/protected mutations or other
+non-correctable failures prevent it. Cancellation and deadline checks precede
+further requests. A second unsuitable response never receives another correction.
+Test-only delivery still accepts a passing current test without production repair.
+
+The replay input is the unchanged final text of the previous real reproduction
+response. Controller and installed scripted checks cover the historical-ID/print
+failure, visible current event reference, corrective assertion, one production
+repair and checks after the final mutation. They establish program routing, not
+model quality. No real continuation is run or changed by this revision.

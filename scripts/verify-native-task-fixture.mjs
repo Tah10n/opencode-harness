@@ -27,6 +27,7 @@ const response = (res, call, content = '') => {
   res.end(`data: ${JSON.stringify({ ...base, choices: [{ index: 0, delta, finish_reason: null }] })}\n\ndata: ${JSON.stringify({ ...base, choices: [{ index: 0, delta: {}, finish_reason: call ? 'tool_calls' : 'stop' }] })}\n\ndata: [DONE]\n\n`);
 };
 const legacyReview = fs.readFileSync(path.join(root, 'scripts/fixtures/native-task-review/bookmark-migration.txt'), 'utf8');
+const replayDisposition = fs.readFileSync(path.join(root, 'scripts/fixtures/native-task-review/bookmark-reproduction.txt'), 'utf8');
 const finding = { id: 'F1', classification: 'concrete', kind: 'behavior', basis: 'Original task requires value 2', affectedFiles: ['value.mjs'], verification: 'node --test value.test.mjs', expected: '2' };
 const fixture = http.createServer(async (req, res) => {
   const chunks = []; for await (const x of req) chunks.push(x);
@@ -34,20 +35,21 @@ const fixture = http.createServer(async (req, res) => {
   const user = body.messages.findLast(m => m.role === 'user');
   const userText = typeof user?.content === 'string' ? user.content : user?.content?.map(p => p.text ?? '').join('\n') ?? '';
   if (userText.startsWith('FORMAT_ONLY:')) {
-    assert.notEqual(mode,'legacy-bookmark','Supported legacy must never request format correction');
+    assert.ok(!['legacy-bookmark','evidence-replay'].includes(mode),'Supported legacy must never request format correction');
     requests.push({mode,stage:'format',tools:(body.tools??[]).map(t=>t.function.name)});
     assert.equal(body.tools?.length??0,0,'Format correction must not expose tools: '+JSON.stringify(body.tools));
     if(mode==='format-fails'){response(res,null,'{broken again');return;}
     response(res,null,JSON.stringify(lastReport));return;
   }
   if (!body.tools?.length) { response(res, null, 'Task fixture'); return; }
-  const stage = userText.includes('Investigate the concrete') ? 'reproduce' : userText.includes('Repair ONLY') ? 'repair' : (userText.includes('Review current delivery') || userText.includes('Re-review the ACTUAL')) ? 'review' : userText.includes('Implement the complete original') ? 'implementation' : 'bootstrap';
+  const stage = userText.includes('Correct reproduction evidence') ? 'evidence-correction' : userText.includes('Investigate the concrete') ? 'reproduce' : userText.includes('Repair ONLY') ? 'repair' : (userText.includes('Review current delivery') || userText.includes('Re-review the ACTUAL')) ? 'review' : userText.includes('Implement the complete original') ? 'implementation' : 'bootstrap';
   const key = mode + stage, n = counts.get(key) ?? 0; counts.set(key, n + 1);
   requests.push({ mode, stage, n, tools: body.tools.map(t => t.function.name) });
   const bash = command => ({ name: 'bash', args: { command, description: 'Installed workflow fixture command' } });
   if (stage === 'bootstrap') { response(res, n === 0 ? { name: 'harness_task', args: {} } : null, 'Workflow result retained; see tool output.'); return; }
   if (stage === 'implementation') {
-    if (n === 0) { response(res, bash(['defect','src-affected','probe-production'].includes(mode) ? "printf 'export const value = 1;\\n' > value.mjs" : 'node --test value.test.mjs')); return; }
+    if(mode==='evidence-permission'){response(res,null,'No initial implementation required for permission fixture');return;}
+    if (n === 0) { response(res, bash(['defect','src-affected','probe-production','evidence-replay'].includes(mode) ? "printf 'export const value = 1;\\n' > value.mjs" : 'node --test value.test.mjs')); return; }
     if (mode === 'coverage-loss' && n === 1) { response(res, bash("printf 'import {test} from \"node:test\"; test(\"replacement only\",()=>{});\\n' > value.test.mjs")); return; }
     if (mode === 'last-mutation' && n === 1) { response(res, bash("printf 'export const value = 2; // later mutation\\n' > value.mjs")); return; }
     if (mode === 'concurrent-save' && n === 1) { response(res, bash("sleep 1; printf 'export const value = 2;\\n' > value.mjs; node --test value.test.mjs")); return; }
@@ -60,7 +62,7 @@ const fixture = http.createServer(async (req, res) => {
     const info = JSON.parse(userText.split('\nReturn only')[0]);
     const lastCheck = info.toolEvidence?.findLast(e => e.args?.command?.includes('node --test value.test.mjs') && e.exit === 0);
     if (mode === 'coverage-loss') assert.ok(info.current.diff.includes('replacement only'));
-    if(mode==='legacy-bookmark'){response(res,null,legacyReview);return;}
+    if(mode==='legacy-bookmark'||['evidence-replay','evidence-permission'].includes(mode)&&n===0){response(res,null,legacyReview);return;}
     const hasDefect = ['defect','src-affected','probe-production'].includes(mode) && !requests.some(r => r.mode === mode && r.stage === 'repair');
     const unsupported = mode === 'unsupported' && n === 0;
     lastReport = {
@@ -73,7 +75,25 @@ const fixture = http.createServer(async (req, res) => {
     if(mode==='missing-semantic'&&n===0){const missing={...lastReport};delete missing.obligations;response(res,null,JSON.stringify(missing));return;}
     response(res,null,JSON.stringify(lastReport)); return;
   }
+  if(stage==='evidence-correction'){
+    assert.equal(mode,'evidence-replay');
+    const info=JSON.parse(userText.split('\nReturn only')[0]);
+    assert.ok(info.admissionDecisions.some(d=>d.reasons.includes('evidence_not_in_current_stage')));
+    assert.ok(info.currentEvents.some(e=>e.command?.includes('console.log')));
+    if(n===0){response(res,bash("mkdir -p test; printf 'import {value} from \"../value.mjs\"; import assert from \"node:assert/strict\"; import {test} from \"node:test\"; test(\"new grounded regression\",()=>assert.equal(value,2));\\n' > test/storage.test.mjs"));return;}
+    if(n===1){response(res,bash('node --test value.test.mjs test/storage.test.mjs'));return;}
+    // Consume only the host reference actually visible in tool-response context.
+    const wire=body.messages.map(m=>typeof m.content==='string'?m.content:JSON.stringify(m.content)).join('\n');
+    const refs=[...wire.matchAll(/HOST_NATIVE_EVIDENCE (\{[^\n]*\})/g)].map(m=>JSON.parse(m[1]));
+    const ref=refs.findLast(r=>r.exit===1&&r.state==='completed');assert.ok(ref,'Current failing command reference must be visible to author');
+    response(res,null,JSON.stringify({dispositions:[{id:'F-001',decision:'grounded',kind:'behavior',basis:'Original fixture task requires value 2',expectedReason:'Literal task expectation',explanation:'New assertion fails on current production',evidenceCallID:ref.callID},...['F-002','obligation-0'].map(id=>({id,decision:'rejected',basis:'Original fixture task only requires value 2 and preserving its tests',explanation:'Saved bookmark-specific delivery obligation does not apply to this scripted project'}))],limitations:[]}));return;
+  }
   if (stage === 'reproduce') {
+    if(['evidence-replay','evidence-permission'].includes(mode)){
+      if(n===0){response(res,bash('node --input-type=module -e "import {value} from \"./value.mjs\"; console.log(value)"'));return;}
+      response(res,null,replayDisposition);return;
+    }
+
     if(mode==='legacy-bookmark'){
       const info=JSON.parse(userText.split('\nReturn only')[0]),old=JSON.parse(legacyReview);
       assert.deepEqual(info.review.proposedVerificationFiles,old.verificationFiles);
@@ -88,11 +108,11 @@ const fixture = http.createServer(async (req, res) => {
     if (mode === 'missing-test' && n===0) {response(res,bash('cp value.test.mjs extra.test.mjs'));return;}
     if (mode === 'missing-test' && n===1) {const call=bash("node --test value.test.mjs extra.test.mjs");call.id=`test-delivery-${requests.length}`;reproductionID=call.id;response(res,call);return;}
     if (['defect','src-affected'].includes(mode) && n === 0) { const call = bash('node --test value.test.mjs'); call.id = `reproduce-${requests.length}`; reproductionID = call.id; response(res, call); return; }
-    response(res, { name: 'StructuredOutput', args: { dispositions: [{ id: 'F1', decision: mode === 'unsupported' ? 'rejected' : 'grounded', basis: 'Task explicitly requires 2', expectedReason: 'Literal public requirement, not model confidence', evidenceCallID: reproductionID, kind: mode==='missing-test'?'test':'behavior', explanation: 'Observed the native command result' }], limitations: [] } }); return;
+    response(res, { name: 'StructuredOutput', args: { dispositions: [{ id: 'F1', decision: mode === 'unsupported' ? 'rejected' : 'grounded', basis: 'Task explicitly requires 2', expectedReason: 'Literal public requirement, not model confidence', evidenceCallID: reproductionID, kind: mode==='missing-test'?'test':'behavior', explanation: 'Observed the native command result' },...(['defect','src-affected','probe-production'].includes(mode)?[{id:'obligation-0',decision:'unverified',basis:'Return 2 and preserve test',explanation:'Requires production repair first'}]:[])], limitations: [] } }); return;
   }
   if (stage === 'repair') {
     if (n === 0) { response(res, bash("printf 'export const value = 2;\\n' > value.mjs")); return; }
-    if (n === 1) { response(res, bash('node --test value.test.mjs')); return; }
+    if (n === 1) { response(res, bash(mode==='evidence-replay'?'node --test value.test.mjs test/storage.test.mjs':'node --test value.test.mjs')); return; }
     response(res, null, 'Repair finished after final checks.');
   }
 });
@@ -106,7 +126,10 @@ const api = async (method, route, body) => { const r = await fetch(`http://127.0
 try {
   let ready = false; for (let n = 0; n < 150; n++) { try { await api('GET', '/global/health'); ready = true; break; } catch { await new Promise(r => setTimeout(r, 100)); } } assert.ok(ready, stderr);
   const commands = await api('GET', '/command'); assert.ok(commands.some(c => c.name === 'harness-task'));
-  for (mode of ['correct', 'defect', 'unsupported', 'coverage-loss', 'last-mutation', 'cancel', 'incomplete', 'concurrent-save', 'staged-work','trailing-comma','missing-semantic','format-fails','src-affected','probe-production','missing-test','provenance','unverified','legacy-bookmark','budget']) {
+  const allModes = ['correct', 'defect', 'unsupported', 'coverage-loss', 'last-mutation', 'cancel', 'incomplete', 'concurrent-save', 'staged-work','trailing-comma','missing-semantic','format-fails','src-affected','probe-production','missing-test','provenance','unverified','legacy-bookmark','evidence-replay','evidence-permission','budget'];
+  const selectedModes = process.env.NATIVE_TASK_FIXTURE_CASES?.split(',') ?? allModes;
+  assert.ok(selectedModes.every(m=>allModes.includes(m)));
+  for (mode of selectedModes) {
     fs.writeFileSync(path.join(project, 'value.mjs'), 'export const value = 2;\n');
     fs.writeFileSync(path.join(project, 'value.test.mjs'), git('show','HEAD:value.test.mjs') + '\n');
     fs.writeFileSync(task, 'ORIGINAL_TASK_FIXTURE: Deliver value 2 from value.mjs and preserve the existing public test. Run node --test value.test.mjs.');
@@ -114,7 +137,7 @@ try {
     if (mode === 'staged-work') { fs.writeFileSync(path.join(project,'value.mjs'),'export const value = 2; // staged\n');git('add','value.mjs');fs.writeFileSync(path.join(project,'value.mjs'),'export const value = 2; // partial user work\n'); }
     // Native OpenCode may refresh index stat metadata; compare staged entries/contents.
     const originalIndex=git('ls-files','--stage','-z');
-    const session = await api('POST', '/session', {});
+    const session = await api('POST', '/session', mode==='evidence-permission'?{permission:[{permission:'bash',pattern:'node *',action:'deny'}]}:{});
     const pending = api('POST', `/session/${session.id}/command`, { command: 'harness-task', arguments: '', model: 'local-fixture/fixture' });
     if (mode === 'concurrent-save') {
       for (let n = 0; n < 150 && !requests.some(r => r.mode === mode && r.stage === 'implementation' && r.n === 1); n++) await new Promise(r => setTimeout(r, 100));
@@ -151,10 +174,29 @@ try {
       assert.deepEqual(adapted.proposedVerificationFiles,JSON.parse(legacyReview).verificationFiles);
       assert.deepEqual(adapted.unverified,JSON.parse(legacyReview).unverified);
     }
+    if(mode==='evidence-permission'){
+      assert.equal(report.status,'incomplete',JSON.stringify(report));assert.equal(report.repairs,0);assert.equal(report.evidenceCorrections,0);
+      assert.ok(!requests.some(r=>r.mode===mode&&['evidence-correction','repair'].includes(r.stage)));
+      assert.ok(fs.existsSync(path.join(report.artifacts,'permission-violation.json')),'Actual native permission error must be retained');
+    }
+    if(mode==='evidence-replay'){
+      assert.equal(report.repairs,1,JSON.stringify(report));assert.equal(report.evidenceCorrections,1);assert.equal(report.status,'reviewed_delivery');
+      assert.equal(requests.filter(r=>r.mode===mode&&r.stage==='format').length,0);
+      const first=JSON.parse(fs.readFileSync(path.join(report.artifacts,'reproduce-1-original.json')));
+      const correction=JSON.parse(fs.readFileSync(path.join(report.artifacts,'reproduce-1-evidence-correction-original.json')));
+      assert.equal(first.info.sessionID,correction.info.sessionID,'Same author session');
+      assert.equal(first.parts.filter(p=>p.type==='text').map(p=>p.text).join('\n'),replayDisposition);
+      const events=JSON.parse(fs.readFileSync(path.join(report.artifacts,'tool-events.json')));
+      assert.ok(!events.some(e=>e.output?.includes('HOST_NATIVE_EVIDENCE')),'Host supplement must not become assertion evidence');
+      assert.ok(events.some(e=>e.exit===1&&e.args.command.includes('test/storage.test.mjs')));
+      assert.ok(events.some(e=>e.exit===0&&e.args.command.includes('test/storage.test.mjs')&&e.args.command.startsWith('node --test')));
+      assert.equal(fs.readFileSync(path.join(project,'value.mjs'),'utf8'),'export const value = 2;\n');
+    }
+    if(['defect','missing-test'].includes(mode))assert.equal(report.evidenceCorrections,0);
     if(mode==='src-affected')assert.ok(report.rejectedWriteProposals.includes('value.mjs'));
     console.log(JSON.stringify({ mode, status: report.status, repairs: report.repairs, artifacts: report.artifacts }));
   }
-  console.log(JSON.stringify({ passed: true, installedWorkflow: true, scenarios: 19, realProviderRequests: 0, scriptedRequests: requests.length, temp }));
+  console.log(JSON.stringify({ passed: true, installedWorkflow: true, scenarios: selectedModes.length, realProviderRequests: 0, scriptedRequests: requests.length, temp }));
 } finally {
   if (child.exitCode === null) await new Promise(resolve => { const timer = setTimeout(() => child.kill('SIGKILL'), 3000); child.once('exit', () => { clearTimeout(timer); resolve(); }); child.kill('SIGTERM'); });
   fixture.closeAllConnections(); await new Promise(r => fixture.close(r));
