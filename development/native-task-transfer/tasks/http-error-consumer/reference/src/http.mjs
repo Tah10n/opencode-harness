@@ -1,0 +1,2 @@
+export class HttpError extends Error{constructor(status,url,body){super('HTTP '+status);this.name='HttpError';this.status=status;this.url=url;this.body=body;}}
+export async function request(fetcher,url,options={}){const r=await fetcher(url,options);if(r.status<200||r.status>=300){let body=null;try{body=await r.json();}catch{}throw new HttpError(r.status,url,body);}if(r.status===204)return null;return r.json();}

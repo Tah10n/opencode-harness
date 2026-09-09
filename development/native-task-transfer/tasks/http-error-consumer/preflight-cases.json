@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/http.mjs": "export class HttpError extends Error{constructor(status,url,body){super('HTTP '+status);this.name='HttpError';this.status=status;this.url=url;this.body=body;}}\nexport async function request(fetcher,url,options={}){const r=await fetcher(url,options);if(!(r.status>=200&&r.status<=299)){let body=null;try{body=await r.json();}catch{}throw new HttpError(r.status,url,body);}if(r.status===204)return null;return r.json();}\n"
+  },
+  "mutants": [
+    {
+      "name": "swallow-parse-on-success",
+      "file": "src/http.mjs",
+      "replacement": "export class HttpError extends Error{constructor(status,url,body){super('HTTP '+status);this.name='HttpError';this.status=status;this.url=url;this.body=body;}}\nexport async function request(fetcher,url,options={}){const r=await fetcher(url,options);if(r.status<200||r.status>=300){let body=null;try{body=await r.json();}catch{}throw new HttpError(r.status,url,body);}if(r.status===204)return null;return r.json().catch(()=>null);}\n"
+    },
+    {
+      "name": "broad-consumer-catch",
+      "file": "src/users.mjs",
+      "replacement": "import {request,HttpError} from './http.mjs';export async function findUser(fetcher,base,id,options={}){try{return await request(fetcher,base+'/users/'+encodeURIComponent(id),options);}catch(e){if(e.status===404)return null;throw e;}}\n"
+    }
+  ]
+}

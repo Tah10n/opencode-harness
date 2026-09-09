@@ -1,0 +1,88 @@
+diff --git a/README.md b/README.md
+--- a/README.md
++++ b/README.md
+@@ -1,3 +1,7 @@
+ # document-backup
+ 
+ Small local library. Run `npm test`.
++
++Documents must be JSON objects with a string `text` field; other fields are preserved. `load(file)` always prefers the primary file and falls back to `file.bak` when the primary cannot be read, parsed, or validated. A corrupt existing primary is rejected by `save` rather than silently repaired.
++
++Saving a valid existing document preserves its exact previous primary bytes in `file.bak` before replacing the primary. The backup and primary are separate files, so a power loss can still leave their update incomplete; this library does not provide a two-file transaction.
+diff --git a/src/documents.mjs b/src/documents.mjs
+--- a/src/documents.mjs
++++ b/src/documents.mjs
+@@ -1 +1,57 @@
+-import fs from 'node:fs';export function load(file){return JSON.parse(fs.readFileSync(file,'utf8'));}export function save(file,value){fs.writeFileSync(file,JSON.stringify(value));}
++import fs from 'node:fs';
++import crypto from 'node:crypto';
++
++function parseDocument(contents) {
++  const value = JSON.parse(contents);
++  if (value === null || typeof value !== 'object' || Array.isArray(value) || typeof value.text !== 'string') {
++    throw new TypeError('Invalid document');
++  }
++  return value;
++}
++
++export function load(file) {
++  try {
++    return parseDocument(fs.readFileSync(file, 'utf8'));
++  } catch (primaryError) {
++    try {
++      return parseDocument(fs.readFileSync(`${file}.bak`, 'utf8'));
++    } catch {
++      throw primaryError;
++    }
++  }
++}
++
++export function save(file, value) {
++  if (value === null || typeof value !== 'object' || Array.isArray(value) || typeof value.text !== 'string') {
++    throw new TypeError('Invalid document');
++  }
++  const serialized = JSON.stringify(value);
++  const backup = `${file}.bak`;
++  let primary;
++
++  try {
++    primary = fs.readFileSync(file);
++    parseDocument(primary.toString('utf8'));
++  } catch (error) {
++    if (error.code !== 'ENOENT') {
++      throw error;
++    }
++  }
++
++  const temporary = `${file}.${crypto.randomUUID()}.tmp`;
++  try {
++    if (primary !== undefined) {
++      fs.writeFileSync(backup, primary);
++    }
++    fs.writeFileSync(temporary, serialized);
++    fs.renameSync(temporary, file);
++  } finally {
++    try {
++      fs.unlinkSync(temporary);
++    } catch (error) {
++      if (error.code !== 'ENOENT') {
++        throw error;
++      }
++    }
++  }
++}
+diff --git a/test/document.test.mjs b/test/document.test.mjs
+--- a/test/document.test.mjs
++++ b/test/document.test.mjs
+@@ -1,2 +1,10 @@
+ import {test} from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import os from 'node:os';import path from 'node:path';
+-import {save,load} from '../src/documents.mjs';test('legacy save/load',()=>{const f=path.join(fs.mkdtempSync(path.join(os.tmpdir(),'docs-')),'d');save(f,{text:'é',color:'red'});assert.deepEqual(load(f),{text:'é',color:'red'});});
++import {save,load} from '../src/documents.mjs';
++
++test('legacy save/load',()=>{const f=path.join(fs.mkdtempSync(path.join(os.tmpdir(),'docs-')),'d');save(f,{text:'é',color:'red'});assert.deepEqual(load(f),{text:'é',color:'red'});});
++
++test('loads a valid backup without changing either file',()=>{const dir=fs.mkdtempSync(path.join(os.tmpdir(),'docs-'));const f=path.join(dir,'d');const backup=Buffer.from('{"text":"recovered","version":1}');fs.writeFileSync(f,'not json');fs.writeFileSync(`${f}.bak`,backup);assert.deepEqual(load(f),{text:'recovered',version:1});assert.equal(fs.readFileSync(f,'utf8'),'not json');assert.deepEqual(fs.readFileSync(`${f}.bak`),backup);});
++
++test('preserves exact previous primary bytes as backup',()=>{const f=path.join(fs.mkdtempSync(path.join(os.tmpdir(),'docs-')),'d');save(f,{text:'one',extra:true});const previous=fs.readFileSync(f);save(f,{text:'two'});assert.deepEqual(fs.readFileSync(`${f}.bak`),previous);assert.deepEqual(load(f),{text:'two'});});
++
++test('invalid save leaves primary and backup unchanged',()=>{const f=path.join(fs.mkdtempSync(path.join(os.tmpdir(),'docs-')),'d');save(f,{text:'one'});const primary=fs.readFileSync(f);fs.writeFileSync(`${f}.bak`,'old backup');const backup=fs.readFileSync(`${f}.bak`);assert.throws(()=>save(f,{text:3}),TypeError);assert.deepEqual(fs.readFileSync(f),primary);assert.deepEqual(fs.readFileSync(`${f}.bak`),backup);});

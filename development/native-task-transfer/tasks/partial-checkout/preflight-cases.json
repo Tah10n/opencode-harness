@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/plan.mjs": "export function plan(stock,lines){\n if(!Array.isArray(lines)||lines.some(x=>!x||typeof x.sku!=='string'||!x.sku||!Number.isSafeInteger(x.qty)||x.qty<=0))throw new TypeError('Invalid lines');\n const left=Object.fromEntries(Object.entries(stock)),accepted=[],rejected=[];\n lines.forEach((x,index)=>{if(!Object.hasOwn(left,x.sku)||left[x.sku]<x.qty)rejected.push({index,sku:x.sku,qty:x.qty,reason:'unavailable'});else{left[x.sku]-=x.qty;accepted.push({index,sku:x.sku,qty:x.qty});}});\n return {accepted,rejected};\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "charge-rejected",
+      "file": "src/receipt.mjs",
+      "replacement": "import {checkout} from './checkout.mjs';export function purchase(stock,lines,prices){const result=checkout(stock,lines);return {...result,totalCents:lines.reduce((n,x)=>n+prices[x.sku]*x.qty,0)};}\n"
+    },
+    {
+      "name": "skip-validation",
+      "file": "src/plan.mjs",
+      "replacement": "export function plan(stock,lines){\n\n const left={...stock},accepted=[],rejected=[];\n lines.forEach((x,index)=>{if(!Object.hasOwn(left,x.sku)||left[x.sku]<x.qty)rejected.push({index,sku:x.sku,qty:x.qty,reason:'unavailable'});else{left[x.sku]-=x.qty;accepted.push({index,sku:x.sku,qty:x.qty});}});\n return {accepted,rejected};\n}\n"
+    }
+  ]
+}

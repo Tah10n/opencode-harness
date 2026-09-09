@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import os from 'node:os';import path from 'node:path';
+import {createLookup} from '../src/lookup.mjs';import {listNames} from '../src/names.mjs';test('legacy callback consumer',async()=>{const lookup=createLookup({get(id,cb){cb(null,{name:id.toUpperCase()});}});assert.deepEqual(await new Promise((resolve,reject)=>listNames(lookup,['a','b'],(e,x)=>e?reject(e):resolve(x))),['A','B']);});

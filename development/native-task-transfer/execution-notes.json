@@ -1,0 +1,20 @@
+{
+  "reason": "Prior provider HTTP503 caused original runner to stop after completed slot11. Only preassigned never-started slot12 is selected; no rerun of previous attempts, no model/candidate/evaluator/authorization/environment change.",
+  "originalRunnerSha256": "09d9f78743c23ee485d6c24ff6942d6ebceb53534cbc6d8e2c22f6e8a7ebe1bc",
+  "remainingRunnerSha256": "34688eaf6aea54ededbe27d9b33ce5d401f3949a89aa6e17502b7546afca224c",
+  "onlyDifference": {
+    "before": "for(const attempt of f.attempts){",
+    "after": "for(const attempt of f.attempts.filter(a=>a.task==='quoted-contact-import'&&a.arm==='A')){"
+  },
+  "remaining": [
+    {
+      "task": "quoted-contact-import",
+      "arm": "A"
+    }
+  ],
+  "originalFreezeUnchanged": "47b67d90adc0795c75b591574035300150b87b1248a3e4fa397386692addc67f",
+  "frozenFilesVerifiedAfterRuns": 7434,
+  "historicalFilesVerifiedAfterRuns": 432,
+  "startedSlots": 12,
+  "finishedSlots": 12
+}
