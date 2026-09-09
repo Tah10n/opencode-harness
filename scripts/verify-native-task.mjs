@@ -146,3 +146,32 @@ for(const name of ['permissions.mjs','rejected-events.test.mjs','protected-field
 assert.equal(nativePermissionDenial('The user rejected permission to use this specific tool call.'),true);
 assert.equal(nativePermissionDenial('The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules [{"permission":"bash","pattern":"node *","action":"deny"}]'),true);
 assert.equal(nativePermissionDenial('File not found: The user rejected permission to use this specific tool call.'),false);
+
+// State continuity replay: original null endpoints are never rewritten.
+const {stateTransition}=await import('../lib/native-task-workflow.mjs');
+for(const name of ['transactional-settings','document-backup']){
+ const retained=JSON.parse(fs.readFileSync(new URL(`./fixtures/native-task-state/${name}.json`,import.meta.url)));
+ const original=JSON.stringify(retained);
+ const current={snapshotSha256:retained.snapshotSha256};
+ assert.equal(determineOutcome(retained.review,retained.events,current).status,'incomplete','Old logs alone cannot prove rejection provenance');
+ // This augmentation simulates the independently tested current host path;
+ // it is explicitly separate from immutable historical events.
+ const replay=retained.events.map(e=>e.before===null&&e.state==='error'&&e.output==='Mutation/check tools must execute sequentially; source reads may run together'
+   ? {...e,stateObservation:{basis:'host-rejected-before-execution',snapshot:e.after}} : e);
+ assert.equal(determineOutcome(retained.review,replay,current).status,'reviewed_delivery');
+ assert.equal(JSON.stringify(retained),original);
+}
+const rejected={callID:'blocked',tool:'bash',state:'error',before:null,after:'S',stateObservation:{basis:'host-rejected-before-execution',snapshot:'S'}};
+for(const kind of ['behavior','test','documentation']){
+ const e={...check,callID:'current',...(kind==='behavior'?{exit:1,output:'AssertionError: expected 2 actual 1'}:kind==='documentation'?{tool:'read',output:'Required docs'}:{})};
+ const f={...behaviorFinding,kind},d={id:'F',kind,decision:'grounded',basis:'Original task',expectedReason:'Original task',evidenceCallID:e.callID};
+ for(const [tail,ok]of [[[rejected],true],[[{...rejected,stateObservation:undefined}],false],[[{...rejected,stateObservation:{basis:'model-says-unchanged',snapshot:'S'}}],false],[[{...rejected,after:'T'}],false],[[{before:'S',after:'T'},{before:'T',after:'S'}],false],[[{before:'S',after:'T'}],false],[[{...rejected,permissionDenied:true}],false],[[{...rejected,scopeViolation:true}],false],[[{...rejected,cancelled:true}],false]]){
+  const events=[e,...tail];assert.equal(assessDispositions([f],[d],events,{snapshotSha256:'S'})[0].admitted,ok,kind+JSON.stringify(tail));
+  const report={...valid,checks:[{callID:e.callID,purpose:kind==='documentation'?'documentation':'preservation',basis:'Task check'}]};
+  if(kind!=='behavior')assert.equal(determineOutcome(report,events,{snapshotSha256:'S'}).status,ok?'reviewed_delivery':'incomplete');
+ }
+ assert.equal(assessDispositions([f],[{...d,evidenceCallID:'blocked'}],[e,rejected],{snapshotSha256:'S'})[0].admitted,false,'Error cannot itself be evidence');
+}
+assert.equal(stateTransition(rejected),'unchanged');assert.equal(stateTransition({...rejected,stateObservation:undefined}),'unknown');assert.equal(stateTransition({before:'S',after:'T'}),'changed');
+assert.equal(assessDispositions([behaviorFinding],[{id:'F',kind:'behavior',decision:'grounded',basis:'Task',expectedReason:'Task',evidenceCallID:'print'}],[{...check,callID:'print',output:'2'},rejected],{snapshotSha256:'S'})[0].admitted,false);
+console.log(JSON.stringify({stateContinuityReplay:true,retainedHistoricalForms:2,realProviderRequests:0}));

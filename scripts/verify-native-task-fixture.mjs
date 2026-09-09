@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import http from 'node:http';
 import { spawn, spawnSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { materializeNativeTemplate } from '../lib/native-template.mjs';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'native-task-fixture-'));
@@ -16,12 +16,21 @@ git('init', '-q');
 fs.writeFileSync(path.join(project, 'value.mjs'), 'export const value = 2;\n');
 fs.writeFileSync(path.join(project, 'value.test.mjs'), "import {value} from './value.mjs'; import assert from 'node:assert/strict'; import {test} from 'node:test'; test('public requirement',()=>assert.equal(value,2));\n");
 fs.writeFileSync(path.join(project, 'opencode.json'), JSON.stringify({ permission: { task: 'allow', bash: 'allow' } }));
+fs.writeFileSync(path.join(project, 'package.json'), JSON.stringify({private:true,scripts:{test:'node --test value.test.mjs'}}));
 git('add', '.'); git('-c', 'core.hooksPath=/dev/null', '-c', 'user.name=Fixture', '-c', 'user.email=fixture@localhost', 'commit', '-qm', 'base');
 materializeNativeTemplate({ repositoryRoot: root, outputDirectory: bundle, task: true, review: true });
+// Fixture-only external actor: place a user save exactly after the production
+// before-hook rejects, before OpenCode publishes the failed event.
+const externalControl=path.join(temp,'external-control.json');
+fs.writeFileSync(externalControl,'{}');
+fs.writeFileSync(path.join(bundle,'fixture-wrapper.mjs'),`import fs from 'node:fs';import plugin from './native-task-plugin.mjs';export default async input=>{const hooks=await plugin(input);const before=hooks['tool.execute.before'];hooks['tool.execute.before']=async(...args)=>{const c0=JSON.parse(fs.readFileSync(${JSON.stringify(externalControl)},'utf8'));if(c0.unknown){fs.writeFileSync(${JSON.stringify(externalControl)},'{}');throw Error('Fixture upstream rejection without a host before snapshot');}try{return await before(...args);}catch(error){const c=JSON.parse(fs.readFileSync(${JSON.stringify(externalControl)},'utf8'));if(c.target&&error.message==='Mutation/check tools must execute sequentially; source reads may run together'){fs.writeFileSync(c.target,'export const value = 99; // external save\\n');fs.writeFileSync(${JSON.stringify(externalControl)},'{}');}throw error;}};return hooks;};`);
+const installedConfig=JSON.parse(fs.readFileSync(path.join(bundle,'opencode.json')));
+installedConfig.plugin=[pathToFileURL(path.join(bundle,'fixture-wrapper.mjs')).href];
+fs.writeFileSync(path.join(bundle,'opencode.json'),JSON.stringify(installedConfig));
 let lastReport, mode = 'correct', counts = new Map(), requests = [], reproductionID = '', priorArtifacts = new Set();
 const response = (res, call, content = '') => {
   if (call?.name === 'StructuredOutput') { content = JSON.stringify(call.args); call = null; }
-  const delta = call ? { role: 'assistant', tool_calls: [{ index: 0, id: call.id ?? `fixture-${requests.length}`, type: 'function', function: { name: call.name, arguments: JSON.stringify(call.args) } }] } : { role: 'assistant', content };
+  const delta = call ? { role: 'assistant', tool_calls: (Array.isArray(call)?call:[call]).map((c,index)=>({ index, id: c.id ?? `fixture-${requests.length}-${index}`, type: 'function', function: { name: c.name, arguments: JSON.stringify(c.args) } })) } : { role: 'assistant', content };
   const base = { id: `response-${requests.length}`, object: 'chat.completion.chunk', created: 1, model: 'fixture' };
   res.writeHead(200, { 'content-type': 'text/event-stream' });
   res.end(`data: ${JSON.stringify({ ...base, choices: [{ index: 0, delta, finish_reason: null }] })}\n\ndata: ${JSON.stringify({ ...base, choices: [{ index: 0, delta: {}, finish_reason: call ? 'tool_calls' : 'stop' }] })}\n\ndata: [DONE]\n\n`);
@@ -48,6 +57,21 @@ const fixture = http.createServer(async (req, res) => {
   const bash = command => ({ name: 'bash', args: { command, description: 'Installed workflow fixture command' } });
   if (stage === 'bootstrap') { response(res, n === 0 ? { name: 'harness_task', args: {} } : null, 'Workflow result retained; see tool output.'); return; }
   if (stage === 'implementation') {
+    if(mode.startsWith('state-')&&mode!=='state-reproduce'){
+      if(n===0){response(res,mode==='state-documentation'?{name:'read',args:{filePath:'value.test.mjs'}}:bash('npm test'));return;}
+      if(n===1){
+        if(mode==='state-unknown'){fs.writeFileSync(externalControl,JSON.stringify({unknown:true}));response(res,{name:'read',args:{filePath:'value.mjs'}});return;}
+        if(mode==='state-revert'){response(res,bash("printf 'export const value = 3;\\n' > value.mjs"));return;}
+        if(mode==='state-external'){
+          const base=path.join(project,'.git/harness-task'),fresh=fs.readdirSync(base).filter(n=>!priorArtifacts.has(n));assert.equal(fresh.length,1);
+          fs.writeFileSync(externalControl,JSON.stringify({target:path.join(base,fresh[0],'worktree/value.mjs')}));
+        }
+        response(res,[bash('sleep 0.1'),bash('printf forbidden-execution')]);return;
+      }
+      if(mode==='state-revert'&&n===2){response(res,bash("printf 'export const value = 2;\\n' > value.mjs"));return;}
+      response(res,null,'Finished after failed call');return;
+    }
+
     if(mode==='external-before-error'){
       const base=path.join(project,'.git/harness-task'),fresh=fs.readdirSync(base).filter(n=>!priorArtifacts.has(n));assert.equal(fresh.length,1);
       if(n===0){fs.writeFileSync(path.join(base,fresh[0],'worktree/value.mjs'),'export const value = 99; // external save\n');response(res,bash('node --test value.test.mjs'));return;}
@@ -56,7 +80,7 @@ const fixture = http.createServer(async (req, res) => {
     }
 
     if(['evidence-permission','evidence-user-reject'].includes(mode)){response(res,null,'No initial implementation required for permission fixture');return;}
-    if (n === 0) { response(res, bash(['defect','src-affected','probe-production','evidence-replay','missing-error-paths'].includes(mode) ? "printf 'export const value = 1;\\n' > value.mjs" : 'node --test value.test.mjs')); return; }
+    if (n === 0) { response(res, bash(['defect','src-affected','probe-production','evidence-replay','missing-error-paths','state-reproduce'].includes(mode) ? "printf 'export const value = 1;\\n' > value.mjs" : 'node --test value.test.mjs')); return; }
     if (mode === 'coverage-loss' && n === 1) { response(res, bash("printf 'import {test} from \"node:test\"; test(\"replacement only\",()=>{});\\n' > value.test.mjs")); return; }
     if (mode === 'last-mutation' && n === 1) { response(res, bash("printf 'export const value = 2; // later mutation\\n' > value.mjs")); return; }
     if (mode === 'concurrent-save' && n === 1) { response(res, bash("sleep 1; printf 'export const value = 2;\\n' > value.mjs; node --test value.test.mjs")); return; }
@@ -67,10 +91,10 @@ const fixture = http.createServer(async (req, res) => {
     assert.ok(!body.tools.some(t => ['bash', 'edit', 'write', 'task', 'todowrite', 'harness_task'].includes(t.function.name)));
     assert.ok(userText.includes('ORIGINAL_TASK_FIXTURE'));
     const info = JSON.parse(userText.split('\nReturn only')[0]);
-    const lastCheck = info.toolEvidence?.findLast(e => e.args?.command?.includes('node --test value.test.mjs') && e.exit === 0);
+    const lastCheck = info.toolEvidence?.findLast(e => (e.args?.command?.includes('node --test value.test.mjs') || e.args?.command === 'npm test') && e.exit === 0);
     if (mode === 'coverage-loss') assert.ok(info.current.diff.includes('replacement only'));
     if(mode==='legacy-bookmark'||['evidence-replay','evidence-permission','evidence-user-reject'].includes(mode)&&n===0){response(res,null,legacyReview);return;}
-    const hasDefect = ['defect','src-affected','probe-production','missing-error-paths'].includes(mode) && !requests.some(r => r.mode === mode && r.stage === 'repair');
+    const hasDefect = ['defect','src-affected','probe-production','missing-error-paths','state-reproduce'].includes(mode) && !requests.some(r => r.mode === mode && r.stage === 'repair');
     const unsupported = mode === 'unsupported' && n === 0;
     lastReport = {
       findings: mode==='missing-test' && !requests.some(r=>r.mode===mode&&r.stage==='reproduce') ? [{...finding,kind:'test',basis:'Task explicitly requires an additional project regression',verification:'Add extra.test.mjs'}] : hasDefect || unsupported ? [{ ...finding, ...(unsupported ? { expected: '3', basis: 'Unsubstantiated reviewer assumption' } : {}) }] : [],
@@ -78,6 +102,10 @@ const fixture = http.createServer(async (req, res) => {
       checks: lastCheck ? [{callID:lastCheck.callID,purpose:'preservation',basis:'Runs the existing public Node test'}, {callID:lastCheck.callID,purpose:'discriminating',basis:'The same suite asserts value 2 and failed on D0'}] : [], proposedVerificationFiles: mode==='missing-test'?['extra.test.mjs']:mode==='src-affected'?['value.mjs','value.test.mjs']:['value.test.mjs'],
       unverified: mode==='unverified'?['Consumer behavior remains unverified']:[], evidenceLimitations: mode==='provenance'?['Reviewer did not independently run shell commands']:[], coverageLost: mode === 'coverage-loss' ? ['Old fixture was replaced; requirement not preserved'] : [],
     };
+    if(mode==='state-documentation'){
+      const read=info.toolEvidence.find(e=>e.tool==='read'&&e.state==='completed');assert.ok(read);
+      lastReport.checks=[{callID:read.callID,purpose:'documentation',basis:'Read the supplied project verification documentation'}];
+    }
     if(['trailing-comma','format-fails'].includes(mode)&&n===0){response(res,null,JSON.stringify(lastReport).replace(/}$/,',}'));return;}
     if(mode==='missing-semantic'&&n===0){const missing={...lastReport};delete missing.obligations;response(res,null,JSON.stringify(missing));return;}
     response(res,null,JSON.stringify(lastReport)); return;
@@ -96,6 +124,11 @@ const fixture = http.createServer(async (req, res) => {
     response(res,null,JSON.stringify({dispositions:[{id:'F-001',decision:'grounded',kind:'behavior',basis:'Original fixture task requires value 2',expectedReason:'Literal task expectation',explanation:'New assertion fails on current production',evidenceCallID:ref.callID},...['F-002','obligation-0'].map(id=>({id,decision:'rejected',basis:'Original fixture task only requires value 2 and preserving its tests',explanation:'Saved bookmark-specific delivery obligation does not apply to this scripted project'}))],limitations:[]}));return;
   }
   if (stage === 'reproduce') {
+    if(mode==='state-reproduce'){
+      if(n===0){const call=bash('node --test value.test.mjs');call.id=`state-failure-${requests.length}`;reproductionID=call.id;response(res,call);return;}
+      if(n===1){response(res,[bash('sleep 0.1'),bash('printf forbidden-execution')]);return;}
+    }
+
     if(mode==='missing-error-paths'){
       if(n<3){response(res,{name:'read',args:{filePath:['src/permissions.mjs','test/rejected-events.test.mjs','src/protected-fields.mjs'][n]}});return;}
       if(n===3){response(res,{name:'read',args:{filePath:'value.mjs'}});return;}
@@ -121,7 +154,7 @@ const fixture = http.createServer(async (req, res) => {
     if (mode === 'missing-test' && n===0) {response(res,bash('cp value.test.mjs extra.test.mjs'));return;}
     if (mode === 'missing-test' && n===1) {const call=bash("node --test value.test.mjs extra.test.mjs");call.id=`test-delivery-${requests.length}`;reproductionID=call.id;response(res,call);return;}
     if (['defect','src-affected'].includes(mode) && n === 0) { const call = bash('node --test value.test.mjs'); call.id = `reproduce-${requests.length}`; reproductionID = call.id; response(res, call); return; }
-    response(res, { name: 'StructuredOutput', args: { dispositions: [{ id: 'F1', decision: mode === 'unsupported' ? 'rejected' : 'grounded', basis: 'Task explicitly requires 2', expectedReason: 'Literal public requirement, not model confidence', evidenceCallID: reproductionID, kind: mode==='missing-test'?'test':'behavior', explanation: 'Observed the native command result' },...(['defect','src-affected','probe-production','missing-error-paths'].includes(mode)?[{id:'obligation-0',decision:'unverified',basis:'Return 2 and preserve test',explanation:'Requires production repair first'}]:[])], limitations: [] } }); return;
+    response(res, { name: 'StructuredOutput', args: { dispositions: [{ id: 'F1', decision: mode === 'unsupported' ? 'rejected' : 'grounded', basis: 'Task explicitly requires 2', expectedReason: 'Literal public requirement, not model confidence', evidenceCallID: reproductionID, kind: mode==='missing-test'?'test':'behavior', explanation: 'Observed the native command result' },...(['defect','src-affected','probe-production','missing-error-paths','state-reproduce'].includes(mode)?[{id:'obligation-0',decision:'unverified',basis:'Return 2 and preserve test',explanation:'Requires production repair first'}]:[])], limitations: [] } }); return;
   }
   if (stage === 'repair') {
     if (n === 0) { response(res, bash("printf 'export const value = 2;\\n' > value.mjs")); return; }
@@ -139,7 +172,7 @@ const api = async (method, route, body) => { const r = await fetch(`http://127.0
 try {
   let ready = false; for (let n = 0; n < 150; n++) { try { await api('GET', '/global/health'); ready = true; break; } catch { await new Promise(r => setTimeout(r, 100)); } } assert.ok(ready, stderr);
   const commands = await api('GET', '/command'); assert.ok(commands.some(c => c.name === 'harness-task'));
-  const allModes = ['correct', 'defect', 'unsupported', 'coverage-loss', 'last-mutation', 'cancel', 'incomplete', 'concurrent-save', 'staged-work','trailing-comma','missing-semantic','format-fails','src-affected','probe-production','missing-test','provenance','unverified','legacy-bookmark','evidence-replay','evidence-permission','evidence-user-reject','missing-error-paths','external-before-error','budget'];
+  const allModes = ['correct', 'defect', 'unsupported', 'coverage-loss', 'last-mutation', 'cancel', 'incomplete', 'concurrent-save', 'staged-work','trailing-comma','missing-semantic','format-fails','src-affected','probe-production','missing-test','provenance','unverified','legacy-bookmark','evidence-replay','evidence-permission','evidence-user-reject','missing-error-paths','external-before-error','state-unchanged','state-external','state-unknown','state-revert','state-documentation','state-reproduce','budget'];
   const selectedModes = process.env.NATIVE_TASK_FIXTURE_CASES?.split(',') ?? allModes;
   assert.ok(selectedModes.every(m=>allModes.includes(m)));
   for (mode of selectedModes) {
@@ -202,6 +235,21 @@ try {
       assert.equal(report.status,'incomplete',JSON.stringify(report));assert.equal(report.repairs,0);assert.equal(report.evidenceCorrections,0);
       assert.ok(!requests.some(r=>r.mode===mode&&['evidence-correction','repair'].includes(r.stage)));
       assert.ok(fs.existsSync(path.join(report.artifacts,'permission-violation.json')),'Actual native permission error must be retained');
+    }
+    if(mode.startsWith('state-')){
+      const events=JSON.parse(fs.readFileSync(path.join(report.artifacts,'tool-events.json')));
+      assert.equal(report.status,['state-unchanged','state-documentation','state-reproduce'].includes(mode)?'reviewed_delivery':'incomplete',JSON.stringify(report));
+      if(['state-unchanged','state-documentation','state-reproduce'].includes(mode)){
+        const denied=events.find(e=>e.stateObservation);assert.ok(denied,JSON.stringify(events));assert.equal(denied.before,null);assert.equal(denied.state,'error');
+        assert.equal(denied.stateObservation.snapshot,denied.after);
+      }
+      if(mode==='state-reproduce'){assert.equal(report.repairs,1);assert.equal(report.evidenceCorrections,0);}
+      if(mode==='state-external'){
+        assert.equal(fs.readFileSync(path.join(report.executionDirectory,'value.mjs'),'utf8'),'export const value = 99; // external save\n');
+        assert.ok(events.some(e=>e.before===null&&e.scopeViolation));assert.ok(!requests.some(r=>r.mode===mode&&['review','repair'].includes(r.stage)));
+      }
+      if(mode==='state-unknown')assert.ok(events.some(e=>e.before===null&&!e.stateObservation));
+      if(mode==='state-revert')assert.equal(fs.readFileSync(path.join(report.executionDirectory,'value.mjs'),'utf8'),'export const value = 2;\n');
     }
     if(mode==='external-before-error'){
       assert.equal(report.status,'incomplete');assert.equal(report.repairs,0);assert.equal(report.evidenceCorrections,0);

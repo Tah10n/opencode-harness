@@ -1,0 +1,712 @@
+{
+  "measuredRuntime": "db99470ab3517b741e0452613a9ff04f68a49bc1",
+  "method": "Provider request start timestamps matched to nonoverlapping child-stage user-to-final-assistant windows. Correlation, not causal provider IDs. D0 timestamp is bracketed, not invented. Totals include cache and reasoning; neither is added again. Unknown usage remains unknown.",
+  "realProviderCalls": 0,
+  "tasks": [
+    {
+      "task": "document-backup",
+      "historicalStatus": "incomplete",
+      "repairs": 0,
+      "D0TimeBracket": {
+        "earliest": 1788947159081,
+        "latest": 1788947159161
+      },
+      "beforeD0": {
+        "requests": 18,
+        "observedTokens": 163243,
+        "unknownUsageRequests": 0
+      },
+      "afterD0": {
+        "requests": 2,
+        "observedTokens": 21701,
+        "unknownUsageRequests": 0
+      },
+      "withinD0Bracket": {
+        "requests": 0,
+        "observedTokens": 0,
+        "unknownUsageRequests": 0
+      },
+      "stages": [
+        {
+          "label": "implementation",
+          "start": 1788947064194,
+          "end": 1788947159081,
+          "elapsedMs": 94970,
+          "requests": 16,
+          "observedTokens": 156149,
+          "unknownUsageRequests": 0
+        },
+        {
+          "label": "review-0",
+          "start": 1788947159161,
+          "end": 1788947174449,
+          "elapsedMs": 15331,
+          "requests": 1,
+          "observedTokens": 14337,
+          "unknownUsageRequests": 0
+        }
+      ],
+      "overhead": {
+        "requests": 3,
+        "observedTokens": 14458,
+        "unknownUsageRequests": 0
+      },
+      "elapsedMs": 120148,
+      "outsideStageElapsedMs": 9847,
+      "savedChecks": {
+        "acceptance": {
+          "passed": true,
+          "counts": {
+            "tests": 4,
+            "pass": 4,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "passed": true,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "ordinary": {
+          "passed": true,
+          "counts": {
+            "tests": 4,
+            "pass": 4,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "d0-acceptance": {
+          "passed": true,
+          "counts": {
+            "tests": 4,
+            "pass": 4,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "d0-preservation": {
+          "passed": true,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "d0-ordinary": {
+          "passed": true,
+          "counts": {
+            "tests": 4,
+            "pass": 4,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      }
+    },
+    {
+      "task": "dual-lookup",
+      "historicalStatus": "incomplete",
+      "repairs": 0,
+      "D0TimeBracket": {
+        "earliest": 1788947465602,
+        "latest": 1788947465691
+      },
+      "beforeD0": {
+        "requests": 17,
+        "observedTokens": 162731,
+        "unknownUsageRequests": 0
+      },
+      "afterD0": {
+        "requests": 9,
+        "observedTokens": 176930,
+        "unknownUsageRequests": 0
+      },
+      "withinD0Bracket": {
+        "requests": 0,
+        "observedTokens": 0,
+        "unknownUsageRequests": 0
+      },
+      "stages": [
+        {
+          "label": "implementation",
+          "start": 1788947356460,
+          "end": 1788947465602,
+          "elapsedMs": 109234,
+          "requests": 15,
+          "observedTokens": 155641,
+          "unknownUsageRequests": 0
+        },
+        {
+          "label": "review-0",
+          "start": 1788947465691,
+          "end": 1788947487028,
+          "elapsedMs": 21380,
+          "requests": 1,
+          "observedTokens": 18772,
+          "unknownUsageRequests": 0
+        },
+        {
+          "label": "reproduce-1",
+          "start": 1788947487128,
+          "end": 1788947529918,
+          "elapsedMs": 42833,
+          "requests": 6,
+          "observedTokens": 115146,
+          "unknownUsageRequests": 0
+        },
+        {
+          "label": "disposition-review-1",
+          "start": 1788947530053,
+          "end": 1788947552785,
+          "elapsedMs": 22772,
+          "requests": 1,
+          "observedTokens": 34679,
+          "unknownUsageRequests": 0
+        }
+      ],
+      "overhead": {
+        "requests": 3,
+        "observedTokens": 15423,
+        "unknownUsageRequests": 0
+      },
+      "elapsedMs": 204706,
+      "outsideStageElapsedMs": 8487,
+      "savedChecks": {
+        "acceptance": {
+          "passed": true,
+          "counts": {
+            "tests": 3,
+            "pass": 3,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "passed": true,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "ordinary": {
+          "passed": true,
+          "counts": {
+            "tests": 6,
+            "pass": 6,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "d0-acceptance": {
+          "passed": true,
+          "counts": {
+            "tests": 3,
+            "pass": 3,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "d0-preservation": {
+          "passed": true,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "d0-ordinary": {
+          "passed": true,
+          "counts": {
+            "tests": 6,
+            "pass": 6,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      }
+    },
+    {
+      "task": "http-error-consumer",
+      "historicalStatus": "incomplete",
+      "repairs": 0,
+      "D0TimeBracket": {
+        "earliest": 1788946693421,
+        "latest": 1788946693501
+      },
+      "beforeD0": {
+        "requests": 14,
+        "observedTokens": 121889,
+        "unknownUsageRequests": 0
+      },
+      "afterD0": {
+        "requests": 7,
+        "observedTokens": 104452,
+        "unknownUsageRequests": 0
+      },
+      "withinD0Bracket": {
+        "requests": 0,
+        "observedTokens": 0,
+        "unknownUsageRequests": 0
+      },
+      "stages": [
+        {
+          "label": "implementation",
+          "start": 1788946614428,
+          "end": 1788946693421,
+          "elapsedMs": 79059,
+          "requests": 12,
+          "observedTokens": 114798,
+          "unknownUsageRequests": 0
+        },
+        {
+          "label": "review-0",
+          "start": 1788946693501,
+          "end": 1788946717649,
+          "elapsedMs": 24191,
+          "requests": 1,
+          "observedTokens": 14093,
+          "unknownUsageRequests": 0
+        },
+        {
+          "label": "reproduce-1",
+          "start": 1788946717756,
+          "end": 1788946749778,
+          "elapsedMs": 32065,
+          "requests": 5,
+          "observedTokens": 82014,
+          "unknownUsageRequests": 0
+        }
+      ],
+      "overhead": {
+        "requests": 3,
+        "observedTokens": 15436,
+        "unknownUsageRequests": 0
+      },
+      "elapsedMs": 142349,
+      "outsideStageElapsedMs": 7034,
+      "savedChecks": {
+        "acceptance": {
+          "passed": true,
+          "counts": {
+            "tests": 3,
+            "pass": 3,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "passed": true,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "ordinary": {
+          "passed": true,
+          "counts": {
+            "tests": 4,
+            "pass": 4,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "d0-acceptance": {
+          "passed": true,
+          "counts": {
+            "tests": 3,
+            "pass": 3,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "d0-preservation": {
+          "passed": true,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "d0-ordinary": {
+          "passed": true,
+          "counts": {
+            "tests": 4,
+            "pass": 4,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      }
+    },
+    {
+      "task": "partial-checkout",
+      "historicalStatus": "reviewed_delivery",
+      "repairs": 0,
+      "D0TimeBracket": {
+        "earliest": 1788946580279,
+        "latest": 1788946580356
+      },
+      "beforeD0": {
+        "requests": 21,
+        "observedTokens": 212503,
+        "unknownUsageRequests": 0
+      },
+      "afterD0": {
+        "requests": 3,
+        "observedTokens": 43388,
+        "unknownUsageRequests": 0
+      },
+      "withinD0Bracket": {
+        "requests": 0,
+        "observedTokens": 0,
+        "unknownUsageRequests": 0
+      },
+      "stages": [
+        {
+          "label": "implementation",
+          "start": 1788946470221,
+          "end": 1788946580279,
+          "elapsedMs": 110139,
+          "requests": 19,
+          "observedTokens": 205417,
+          "unknownUsageRequests": 0
+        },
+        {
+          "label": "review-0",
+          "start": 1788946580356,
+          "end": 1788946603755,
+          "elapsedMs": 23439,
+          "requests": 2,
+          "observedTokens": 35893,
+          "unknownUsageRequests": 0
+        }
+      ],
+      "overhead": {
+        "requests": 3,
+        "observedTokens": 14581,
+        "unknownUsageRequests": 0
+      },
+      "elapsedMs": 141933,
+      "outsideStageElapsedMs": 8355,
+      "savedChecks": {
+        "acceptance": {
+          "passed": true,
+          "counts": {
+            "tests": 3,
+            "pass": 3,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "passed": true,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "ordinary": {
+          "passed": true,
+          "counts": {
+            "tests": 3,
+            "pass": 3,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "d0-acceptance": {
+          "passed": true,
+          "counts": {
+            "tests": 3,
+            "pass": 3,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "d0-preservation": {
+          "passed": true,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "d0-ordinary": {
+          "passed": true,
+          "counts": {
+            "tests": 3,
+            "pass": 3,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      }
+    },
+    {
+      "task": "quoted-contact-import",
+      "historicalStatus": "reviewed_delivery",
+      "repairs": 0,
+      "D0TimeBracket": {
+        "earliest": 1788947658632,
+        "latest": 1788947658715
+      },
+      "beforeD0": {
+        "requests": 15,
+        "observedTokens": 132115,
+        "unknownUsageRequests": 1
+      },
+      "afterD0": {
+        "requests": 2,
+        "observedTokens": 26191,
+        "unknownUsageRequests": 0
+      },
+      "withinD0Bracket": {
+        "requests": 0,
+        "observedTokens": 0,
+        "unknownUsageRequests": 0
+      },
+      "stages": [
+        {
+          "label": "implementation",
+          "start": 1788947564027,
+          "end": 1788947658632,
+          "elapsedMs": 94679,
+          "requests": 13,
+          "observedTokens": 125022,
+          "unknownUsageRequests": 1
+        },
+        {
+          "label": "review-0",
+          "start": 1788947658715,
+          "end": 1788947674926,
+          "elapsedMs": 16256,
+          "requests": 1,
+          "observedTokens": 18902,
+          "unknownUsageRequests": 0
+        }
+      ],
+      "overhead": {
+        "requests": 3,
+        "observedTokens": 14382,
+        "unknownUsageRequests": 0
+      },
+      "elapsedMs": 117971,
+      "outsideStageElapsedMs": 7036,
+      "savedChecks": {
+        "acceptance": {
+          "passed": true,
+          "counts": {
+            "tests": 3,
+            "pass": 3,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "passed": true,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "ordinary": {
+          "passed": true,
+          "counts": {
+            "tests": 6,
+            "pass": 6,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "d0-acceptance": {
+          "passed": true,
+          "counts": {
+            "tests": 3,
+            "pass": 3,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "d0-preservation": {
+          "passed": true,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "d0-ordinary": {
+          "passed": true,
+          "counts": {
+            "tests": 6,
+            "pass": 6,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      }
+    },
+    {
+      "task": "transactional-settings",
+      "historicalStatus": "incomplete",
+      "repairs": 0,
+      "D0TimeBracket": {
+        "earliest": 1788947028018,
+        "latest": 1788947028098
+      },
+      "beforeD0": {
+        "requests": 17,
+        "observedTokens": 146423,
+        "unknownUsageRequests": 0
+      },
+      "afterD0": {
+        "requests": 3,
+        "observedTokens": 36525,
+        "unknownUsageRequests": 0
+      },
+      "withinD0Bracket": {
+        "requests": 0,
+        "observedTokens": 0,
+        "unknownUsageRequests": 0
+      },
+      "stages": [
+        {
+          "label": "implementation",
+          "start": 1788946941317,
+          "end": 1788947028018,
+          "elapsedMs": 86778,
+          "requests": 15,
+          "observedTokens": 139334,
+          "unknownUsageRequests": 0
+        },
+        {
+          "label": "review-0",
+          "start": 1788947028098,
+          "end": 1788947055727,
+          "elapsedMs": 27671,
+          "requests": 2,
+          "observedTokens": 28998,
+          "unknownUsageRequests": 0
+        }
+      ],
+      "overhead": {
+        "requests": 3,
+        "observedTokens": 14616,
+        "unknownUsageRequests": 0
+      },
+      "elapsedMs": 120615,
+      "outsideStageElapsedMs": 6166,
+      "savedChecks": {
+        "acceptance": {
+          "passed": true,
+          "counts": {
+            "tests": 3,
+            "pass": 3,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "passed": true,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "ordinary": {
+          "passed": true,
+          "counts": {
+            "tests": 4,
+            "pass": 4,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "d0-acceptance": {
+          "passed": true,
+          "counts": {
+            "tests": 3,
+            "pass": 3,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "d0-preservation": {
+          "passed": true,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "d0-ordinary": {
+          "passed": true,
+          "counts": {
+            "tests": 4,
+            "pass": 4,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      }
+    }
+  ]
+}

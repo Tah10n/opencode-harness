@@ -1,0 +1,286 @@
+{
+  "provenance": "Selected historical event fields from db99470 transfer pilot, original values and order retained. Synthetic provenance augmentation is regression replay, not a historical rescore.",
+  "events": [
+    {
+      "tool": "todowrite",
+      "callID": "call_SnxxUJqR1zJTkHVYeLEGaDK6",
+      "before": "366c2d6e11dbf36591be8802863824a43df5a31fc74ba0026e81b8ab4d1f5352",
+      "after": "366c2d6e11dbf36591be8802863824a43df5a31fc74ba0026e81b8ab4d1f5352",
+      "state": "completed"
+    },
+    {
+      "scopeViolation": false,
+      "tool": "glob",
+      "callID": "call_GUs9fla6IgHGrMqFBhjioahk",
+      "before": "366c2d6e11dbf36591be8802863824a43df5a31fc74ba0026e81b8ab4d1f5352",
+      "permissionDenied": false,
+      "after": "366c2d6e11dbf36591be8802863824a43df5a31fc74ba0026e81b8ab4d1f5352",
+      "output": "ripgrep execution failed",
+      "state": "error"
+    },
+    {
+      "tool": "read",
+      "callID": "call_dMIjDgZJ1nXQ0RYbAG1r6N3R",
+      "before": "366c2d6e11dbf36591be8802863824a43df5a31fc74ba0026e81b8ab4d1f5352",
+      "after": "366c2d6e11dbf36591be8802863824a43df5a31fc74ba0026e81b8ab4d1f5352",
+      "state": "completed"
+    },
+    {
+      "tool": "read",
+      "callID": "call_kuALCkAHOxpPawm4qDuxdPwA",
+      "before": "366c2d6e11dbf36591be8802863824a43df5a31fc74ba0026e81b8ab4d1f5352",
+      "after": "366c2d6e11dbf36591be8802863824a43df5a31fc74ba0026e81b8ab4d1f5352",
+      "state": "completed"
+    },
+    {
+      "scopeViolation": false,
+      "tool": "bash",
+      "callID": "call_gxTgFR7mSnCthNMSliif9hsD",
+      "before": null,
+      "permissionDenied": false,
+      "after": "366c2d6e11dbf36591be8802863824a43df5a31fc74ba0026e81b8ab4d1f5352",
+      "output": "Mutation/check tools must execute sequentially; source reads may run together",
+      "state": "error"
+    },
+    {
+      "scopeViolation": false,
+      "tool": "glob",
+      "callID": "call_oleyLIXh7HDoA9FRDpxZHmzR",
+      "before": "366c2d6e11dbf36591be8802863824a43df5a31fc74ba0026e81b8ab4d1f5352",
+      "permissionDenied": false,
+      "after": "366c2d6e11dbf36591be8802863824a43df5a31fc74ba0026e81b8ab4d1f5352",
+      "output": "ripgrep execution failed",
+      "state": "error"
+    },
+    {
+      "scopeViolation": false,
+      "tool": "glob",
+      "callID": "call_k0mNagupgDHro0RPrtQTBvkH",
+      "before": "366c2d6e11dbf36591be8802863824a43df5a31fc74ba0026e81b8ab4d1f5352",
+      "permissionDenied": false,
+      "after": "366c2d6e11dbf36591be8802863824a43df5a31fc74ba0026e81b8ab4d1f5352",
+      "output": "ripgrep execution failed",
+      "state": "error"
+    },
+    {
+      "tool": "bash",
+      "callID": "call_WNDm6IByISUj0YjWBTEact87",
+      "before": "366c2d6e11dbf36591be8802863824a43df5a31fc74ba0026e81b8ab4d1f5352",
+      "after": "366c2d6e11dbf36591be8802863824a43df5a31fc74ba0026e81b8ab4d1f5352",
+      "exit": 0,
+      "state": "completed"
+    },
+    {
+      "scopeViolation": false,
+      "tool": "bash",
+      "callID": "call_uLhQfkgpvjRGL68V5de9Kek9",
+      "before": null,
+      "permissionDenied": false,
+      "after": "366c2d6e11dbf36591be8802863824a43df5a31fc74ba0026e81b8ab4d1f5352",
+      "output": "Mutation/check tools must execute sequentially; source reads may run together",
+      "state": "error"
+    },
+    {
+      "scopeViolation": false,
+      "tool": "read",
+      "callID": "call_LLPIiqBLRhKb2r5wFyQmQi6r",
+      "before": null,
+      "permissionDenied": false,
+      "after": "366c2d6e11dbf36591be8802863824a43df5a31fc74ba0026e81b8ab4d1f5352",
+      "output": "Mutation/check tools must execute sequentially; source reads may run together",
+      "state": "error"
+    },
+    {
+      "tool": "bash",
+      "callID": "call_CTAof0fWgAQ0pJiHxapHAn4H",
+      "before": "366c2d6e11dbf36591be8802863824a43df5a31fc74ba0026e81b8ab4d1f5352",
+      "after": "366c2d6e11dbf36591be8802863824a43df5a31fc74ba0026e81b8ab4d1f5352",
+      "exit": 0,
+      "state": "completed"
+    },
+    {
+      "tool": "read",
+      "callID": "call_TnbMZDm345MWHhc2EnhJRWjk",
+      "before": "366c2d6e11dbf36591be8802863824a43df5a31fc74ba0026e81b8ab4d1f5352",
+      "after": "366c2d6e11dbf36591be8802863824a43df5a31fc74ba0026e81b8ab4d1f5352",
+      "state": "completed"
+    },
+    {
+      "tool": "bash",
+      "callID": "call_w2YvbzNWyohGddcBCw2DnvT5",
+      "before": "366c2d6e11dbf36591be8802863824a43df5a31fc74ba0026e81b8ab4d1f5352",
+      "after": "366c2d6e11dbf36591be8802863824a43df5a31fc74ba0026e81b8ab4d1f5352",
+      "exit": 0,
+      "state": "completed"
+    },
+    {
+      "tool": "read",
+      "callID": "call_tvzUoYYhPUyX2j3sg9GEcnz0",
+      "before": "366c2d6e11dbf36591be8802863824a43df5a31fc74ba0026e81b8ab4d1f5352",
+      "after": "366c2d6e11dbf36591be8802863824a43df5a31fc74ba0026e81b8ab4d1f5352",
+      "state": "completed"
+    },
+    {
+      "tool": "todowrite",
+      "callID": "call_ip6ZXkLfcH6gZcYaDDRNvKf4",
+      "before": "366c2d6e11dbf36591be8802863824a43df5a31fc74ba0026e81b8ab4d1f5352",
+      "after": "366c2d6e11dbf36591be8802863824a43df5a31fc74ba0026e81b8ab4d1f5352",
+      "state": "completed"
+    },
+    {
+      "tool": "apply_patch",
+      "callID": "call_EbXWmFiUDP4nJ7ZbMMBXsIXS",
+      "before": "366c2d6e11dbf36591be8802863824a43df5a31fc74ba0026e81b8ab4d1f5352",
+      "after": "60969079023af7936ff14e4dc62b524733a7cd2a16d536aba86fb89c006854cc",
+      "state": "completed"
+    },
+    {
+      "tool": "todowrite",
+      "callID": "call_U5Ul19I5i0M0V66DCUlXJIgx",
+      "before": "60969079023af7936ff14e4dc62b524733a7cd2a16d536aba86fb89c006854cc",
+      "after": "60969079023af7936ff14e4dc62b524733a7cd2a16d536aba86fb89c006854cc",
+      "state": "completed"
+    },
+    {
+      "tool": "bash",
+      "callID": "call_ycMDEl6VfwtlWXJH2nSfE2aN",
+      "before": "60969079023af7936ff14e4dc62b524733a7cd2a16d536aba86fb89c006854cc",
+      "after": "60969079023af7936ff14e4dc62b524733a7cd2a16d536aba86fb89c006854cc",
+      "exit": 0,
+      "state": "completed"
+    },
+    {
+      "scopeViolation": false,
+      "tool": "bash",
+      "callID": "call_7Ov60IKcqgiL3FoPothwq7v0",
+      "before": null,
+      "permissionDenied": false,
+      "after": "60969079023af7936ff14e4dc62b524733a7cd2a16d536aba86fb89c006854cc",
+      "output": "Mutation/check tools must execute sequentially; source reads may run together",
+      "state": "error"
+    },
+    {
+      "tool": "bash",
+      "callID": "call_GbvDbWuWCsMedZykMTlORgRy",
+      "before": "60969079023af7936ff14e4dc62b524733a7cd2a16d536aba86fb89c006854cc",
+      "after": "60969079023af7936ff14e4dc62b524733a7cd2a16d536aba86fb89c006854cc",
+      "exit": 0,
+      "state": "completed"
+    },
+    {
+      "tool": "bash",
+      "callID": "call_b6QjGO87CGXytuQZ3eWiQqTZ",
+      "before": "60969079023af7936ff14e4dc62b524733a7cd2a16d536aba86fb89c006854cc",
+      "after": "60969079023af7936ff14e4dc62b524733a7cd2a16d536aba86fb89c006854cc",
+      "exit": 0,
+      "state": "completed"
+    },
+    {
+      "tool": "todowrite",
+      "callID": "call_h8EIIl9TMueYHjkt7aQ5z9JB",
+      "before": "60969079023af7936ff14e4dc62b524733a7cd2a16d536aba86fb89c006854cc",
+      "after": "60969079023af7936ff14e4dc62b524733a7cd2a16d536aba86fb89c006854cc",
+      "state": "completed"
+    },
+    {
+      "tool": "read",
+      "callID": "call_EvUogJ6qjvq26HmVoN0YPAob",
+      "before": "60969079023af7936ff14e4dc62b524733a7cd2a16d536aba86fb89c006854cc",
+      "after": "60969079023af7936ff14e4dc62b524733a7cd2a16d536aba86fb89c006854cc",
+      "state": "completed"
+    },
+    {
+      "tool": "read",
+      "callID": "call_5hoJFHKm9WZz7XfsU9NdhTCK",
+      "before": "60969079023af7936ff14e4dc62b524733a7cd2a16d536aba86fb89c006854cc",
+      "after": "60969079023af7936ff14e4dc62b524733a7cd2a16d536aba86fb89c006854cc",
+      "state": "completed"
+    },
+    {
+      "tool": "read",
+      "callID": "call_Bt7ia2uuC9XOom3bcDrlvql2",
+      "before": "60969079023af7936ff14e4dc62b524733a7cd2a16d536aba86fb89c006854cc",
+      "after": "60969079023af7936ff14e4dc62b524733a7cd2a16d536aba86fb89c006854cc",
+      "state": "completed"
+    }
+  ],
+  "review": {
+    "findings": [],
+    "obligations": [
+      {
+        "requirement": "Retain read(file) behavior",
+        "status": "delivered",
+        "evidence": "src/store.mjs:11-13 preserves synchronous read and JSON parse error propagation."
+      },
+      {
+        "requirement": "Implement transact and ConflictError",
+        "status": "delivered",
+        "evidence": "src/store.mjs:4-41 exports both and implements synchronous transactions."
+      },
+      {
+        "requirement": "Conflict prevents callback and preserves bytes",
+        "status": "delivered",
+        "evidence": "src/store.mjs:17-19; test/store.test.mjs:5."
+      },
+      {
+        "requirement": "Isolated draft, single callback, revision increment, nested changes",
+        "status": "delivered",
+        "evidence": "src/store.mjs:21-29; test/store.test.mjs:4,7."
+      },
+      {
+        "requirement": "Callback errors, thenables, and serialization failures do not commit",
+        "status": "delivered",
+        "evidence": "Callback invocation precedes serialization at src/store.mjs:22-29; thenables rejected at 23-26."
+      },
+      {
+        "requirement": "Atomic sibling temporary-file replacement and cleanup",
+        "status": "delivered",
+        "evidence": "src/store.mjs:30-39 writes sibling temp, renames, and cleans up."
+      },
+      {
+        "requirement": "Preserve object isolation across reads and returned state",
+        "status": "delivered",
+        "evidence": "src/store.mjs:21 clones data; test/store.test.mjs:7 checks prior read remains unchanged."
+      },
+      {
+        "requirement": "Add requested regression tests",
+        "status": "delivered",
+        "evidence": "test/store.test.mjs:5-7 covers conflict, callback exception, and nested update/deletion."
+      },
+      {
+        "requirement": "Document synchronous callback, conflict behavior, and atomic replacement",
+        "status": "delivered",
+        "evidence": "README.md:5-9."
+      },
+      {
+        "requirement": "Run npm test after final change",
+        "status": "delivered",
+        "evidence": "Native command call_ycMDEl6VfwtlWXJH2nSfE2aN passed all 4 tests."
+      }
+    ],
+    "unverified": [],
+    "evidenceLimitations": [
+      "Review is read-only and relies on supplied native command events; no additional commands were executed."
+    ],
+    "coverageLost": [],
+    "checks": [
+      {
+        "callID": "call_ycMDEl6VfwtlWXJH2nSfE2aN",
+        "purpose": "discriminating",
+        "basis": "npm test passed the delivered transaction regression and preservation tests."
+      },
+      {
+        "callID": "call_GbvDbWuWCsMedZykMTlORgRy",
+        "purpose": "preservation",
+        "basis": "git diff --check reported no whitespace errors."
+      },
+      {
+        "callID": "call_b6QjGO87CGXytuQZ3eWiQqTZ",
+        "purpose": "preservation",
+        "basis": "git status confirmed the intended README, source, and test changes."
+      }
+    ],
+    "proposedVerificationFiles": []
+  },
+  "snapshotSha256": "60969079023af7936ff14e4dc62b524733a7cd2a16d536aba86fb89c006854cc"
+}
