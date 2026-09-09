@@ -109,7 +109,7 @@ for(const mode of ['correct-once','omit-other','immediate','wrong-again','print-
   if(p.instruction.startsWith('Investigate')){
    if(mode==='immediate'){failed();return result(dispositions());}
    events.push({...check,callID:'current-print',output:'{"sameBytes":true}'});
-   if(mode==='permission')events.push({tool:'bash',state:'error',before:state,after:state,callID:'denied',output:'permission denied'});
+   if(mode==='permission')events.push({tool:'bash',state:'error',before:state,after:state,callID:'denied',output:'permission denied',permissionDenied:true});
    if(['cancel','budget'].includes(mode))stop=true;
    const d=JSON.parse(rawDisposition);if(mode==='unknown')d.dispositions[0]={...d.dispositions[0],decision:'unverified',expectedReason:''};
    if(mode==='print-only')d.dispositions.forEach(d=>d.evidenceCallID='current-print');return result(d);
@@ -134,3 +134,15 @@ for(const [event,reason]of [[{...check,callID:'e',before:'OLD'},'evidence_wrong_
  const a=assessDispositions([behaviorFinding],[{id:'F',decision:'grounded',kind:'behavior',basis:'task',expectedReason:'task',evidenceCallID:'e'}],[event],{snapshotSha256:'S'});assert.ok(a[0].reasons.includes(reason));assert.equal(a[0].admitted,false);
 }
 console.log(JSON.stringify({passed:true,evidenceCorrectionLimit:1,replayRepairAndFinalChecks:true,currentEvidenceReasons:true,realProviderRequests:0}));
+
+const {nativePermissionDenial}=await import('../lib/native-task-workflow.mjs');
+for(const name of ['permissions.mjs','rejected-events.test.mjs','protected-fields.mjs']) {
+ const output=`File not found: /repo/src/${name}`;
+ assert.equal(nativePermissionDenial(output),false);
+ const io=fake();let calls=0;const events=[{tool:'read',state:'error',callID:'missing',before:'S',after:'S',output}, {...check,callID:'failure',exit:1,output:'AssertionError: expected 2 actual 1'}];
+ io.events=()=>events;io.format=async()=>assert.fail('No format');io.prompt=async(role,prompt)=>{const p=JSON.parse(prompt);if(p.instruction.startsWith('Investigate')){events.push({...events[0],callID:'missing-current'},{...events[1],callID:'failure-current'});return result({dispositions:[{id:'F',decision:'grounded',kind:'behavior',basis:'task',expectedReason:'literal task',explanation:'assertion',evidenceCallID:'failure-current'}],limitations:[]});}if(p.instruction.startsWith('Repair ONLY')){calls++;events.push(check);return result('done');}return result({...valid,checks:[...valid.checks,{callID:'check',purpose:'discriminating',basis:'final assertion'}]});};
+ const report=await runWorkflow(io,{initialReview:result({...valid,findings:[behaviorFinding] }),maxRepairs:1});assert.equal(calls,1);assert.equal(report.evidenceCorrections,0);assert.equal(report.status,'reviewed_delivery');
+}
+assert.equal(nativePermissionDenial('The user rejected permission to use this specific tool call.'),true);
+assert.equal(nativePermissionDenial('The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules [{"permission":"bash","pattern":"node *","action":"deny"}]'),true);
+assert.equal(nativePermissionDenial('File not found: The user rejected permission to use this specific tool call.'),false);

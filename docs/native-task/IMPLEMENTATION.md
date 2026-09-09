@@ -150,3 +150,16 @@ response. Controller and installed scripted checks cover the historical-ID/print
 failure, visible current event reference, corrective assertion, one production
 repair and checks after the final mutation. They establish program routing, not
 model quality. No real continuation is run or changed by this revision.
+
+Permission classification uses the installed OpenCode 1.18.26 contract: the
+`permission.replied` event with `reply: reject`, or the exact native
+PermissionRejected/Corrected/Denied error envelopes. Tool error parts expose a
+string, not an invented error-code field; the automatic-deny envelope must carry
+its JSON rules array with a deny rule. Ordinary filenames containing permission,
+rejected or protected are not classified as denials. The plugin records an
+explicit `permissionDenied` flag; the controller consumes that flag and actual
+scope violations without reparsing arbitrary error output. Errors without a
+before-hook entry are retained with an unknown (`null`) before-snapshot and can
+never serve as successful command evidence. Installed checks exercise native
+ask/reject, automatic deny, missing paths followed by a valid read/assertion and
+the complete evidence-correction replay.
