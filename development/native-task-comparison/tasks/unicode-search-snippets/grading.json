@@ -1,0 +1,16 @@
+{
+  "category": "integration",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Astral characters before/inside matches with correct code-point context.",
+    "Non-overlapping matches and empty-query rejection."
+  ],
+  "docDelivery": [
+    "Code-point offsets and exclusive end, including excerpt context semantics.",
+    "Exact case-sensitive non-overlapping search with no normalization."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Well-formed Unicode strings (no lone surrogates), nonempty query; empty query throws TypeError. Case-sensitive, no normalization. Context integer 0..10000.",
+  "independence": "Integrate Unicode code-point offsets, nonoverlapping search matches and bounded context snippets."
+}

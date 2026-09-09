@@ -1,0 +1,16 @@
+{
+  "category": "compatibility",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert quoted/unquoted concatenation and preserved empty quoted words.",
+    "Assert single/double escape differences and SyntaxError for malformed input."
+  ],
+  "docDelivery": [
+    "Document exact delimiter/backslash grammar, including escaped newline and non-ASCII whitespace.",
+    "State no shell execution/expansion/comments and malformed-input behavior."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Bounded UTF16 strings, explicit literal quote/escape grammar, only ASCII space/tab/CR/LF separators; malformed quotes/escapes reject.",
+  "independence": "Add quoted/escaped word tokenization to a legacy whitespace splitter under explicit literal grammar without command execution."
+}

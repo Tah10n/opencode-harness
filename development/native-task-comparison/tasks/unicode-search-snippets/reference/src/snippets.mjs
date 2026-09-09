@@ -1,0 +1,1 @@
+import {findMatches} from './matches.mjs';export function snippets(text,query,context=0){const points=Array.from(text);return findMatches(text,query).map(({start,end})=>({start,end,excerpt:points.slice(Math.max(0,start-context),end+context).join('')}));}

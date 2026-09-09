@@ -1,0 +1,1 @@
+export function createStore(chunkSize){const files=new Map();return {put(name,bytes){files.set(name,Uint8Array.from(bytes));},get(name){return files.has(name)?Uint8Array.from(files.get(name)):null;},remove(name){return files.delete(name);},stats(){return {files:[...files.keys()].map(name=>({name,chunks:[]})),chunks:[]};}};}

@@ -1,0 +1,16 @@
+{
+  "category": "compatibility",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert source changes remain visible and mutators are rejected.",
+    "Assert forEach passes the view with correct receiver and preserves key/value identity."
+  ],
+  "docDelivery": [
+    "Explain live Map-like methods, ordering and shallow read-only scope.",
+    "Document forbidden mutators, safe forEach third argument, owner changes and no source exposure."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Native same-realm Maps and finite live iteration; shallow identity; frozen view; no proxies/subclasses/borrowed methods.",
+  "independence": "Introduce read-only Map-like views preserving iteration and live-source updates while denying mutator escape."
+}

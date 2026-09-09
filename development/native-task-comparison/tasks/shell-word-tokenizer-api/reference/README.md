@@ -1,0 +1,3 @@
+# shell-word-tokenizer-api
+
+words uses ASCII space/tab/CR/LF separators outside quotes. Single/double quotes remove delimiters and concatenate with adjacent segments; empty quotes preserve an empty word. Single quotes make backslashes literal. Elsewhere backslash copies the next UTF16 unit literally, including a newline (not deleted). Double quotes otherwise preserve all text until their closing delimiter. Non-ASCII whitespace is literal. Unclosed quotes/dangling applicable escapes throw SyntaxError, with independent later calls. This is a local literal tokenizer: no shell execution, variable expansion, globbing, comments or command grammar. Run npm test.

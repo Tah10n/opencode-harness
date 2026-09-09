@@ -1,0 +1,16 @@
+{
+  "category": "state",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Touching/overlapping ranges merge then interior removal splits.",
+    "Empty interval handling and detached snapshot."
+  ],
+  "docDelivery": [
+    "Half-open membership and canonical merging including touching endpoints.",
+    "Subtraction splitting, empty no-ops and ownership of helper/state results."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Integer endpoints -100000..100000 with start<=end, half-open intervals, empty intervals harmless; contains integer in same domain, dense range arrays.",
+  "independence": "Implement integer interval insertion/removal, canonical adjacency merging and membership round-trip."
+}

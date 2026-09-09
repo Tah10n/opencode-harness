@@ -1,0 +1,3 @@
+# parser-diagnostic-locations
+
+scanAssignments exposes ordered fresh {key,value,line,keyColumn,valueColumn}; 1-based original UTF16 columns, tabs count one. LF/CRLF lines, space/tab only. ASCII identifier key, =, nonempty ASCII letters/digits/underscore/dot/slash/hyphen value, optional # comment. No quoting/escapes; bare CR invalid outside comments. Scanner retains duplicates. parseConfig delegates then assembles ordinary own-property result, safely including __proto__/constructor. Full lexical scan precedes duplicate checks; Invalid assignment at L:C identifies first unexpected/missing character; Duplicate key at L:C identifies second key. Non-string TypeError, source<=10000 units. Run npm test.

@@ -1,0 +1,16 @@
+{
+  "category": "state",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Undo capacity, redo and commit-after-undo branch invalidation.",
+    "Deep snapshot isolation from caller mutation."
+  ],
+  "docDelivery": [
+    "Capacity counts prior states and every commit counts, including equality.",
+    "Branch/redo rules and detached JSON ownership across all returned values."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "JSON initial/committed values: acyclic plain own-data records/dense arrays/primitives, finite numbers excluding -0, no undefined/symbols/getters/custom methods. limit integer 1..100. Every commit counts even equal value.",
+  "independence": "Implement isolated undo/redo history with branch truncation, capacity limits and no-op updates."
+}

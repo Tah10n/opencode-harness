@@ -1,0 +1,16 @@
+{
+  "category": "integration",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Unsorted width candidates and density boundary selection.",
+    "Mixed and numerically duplicate descriptor rejection."
+  ],
+  "docDelivery": [
+    "Explicit simplified grammar and unsupported implicit/data URL forms.",
+    "Selection target differs for width and density; largest and empty fallbacks."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Text is a bounded simplified srcset: URLs nonempty ASCII excluding commas/whitespace, each explicit positive numeric descriptor w/x; width integer; density decimal digits optional decimal point with digits. ASCII spaces separate URL/descriptor, outer whitespace permitted. cssWidth/dpr finite positive <=10000.",
+  "independence": "Integrate density/width srcset parsing, candidate selection and duplicate-descriptor errors."
+}

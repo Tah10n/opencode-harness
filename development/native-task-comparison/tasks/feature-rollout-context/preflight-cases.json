@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/rollout.mjs": "export function bucket(text){let h=2166136261n;for(const c of text)h=((h^BigInt(c.charCodeAt(0)))*16777619n)&0xffffffffn;return Number(h%10000n);}export function evaluate(f,u){return f.enabled&&(Object.hasOwn(f.overrides,u)?f.overrides[u]:bucket(`${f.seed}:${u}`)<f.basisPoints);}\n"
+  },
+  "mutants": [
+    {
+      "name": "inclusive-boundary",
+      "file": "src/rollout.mjs",
+      "replacement": "export function bucket(text){let h=2166136261;for(const c of text){h^=c.charCodeAt(0);h=Math.imul(h,16777619)>>>0;}return h%10000;}export function evaluate(flag,user){if(!flag.enabled)return false;if(Object.hasOwn(flag.overrides,user))return flag.overrides[user];return bucket(flag.seed+':'+user)<=flag.basisPoints;}\n"
+    },
+    {
+      "name": "ignore-overrides",
+      "file": "src/rollout.mjs",
+      "replacement": "export function bucket(text){let h=2166136261;for(const c of text){h^=c.charCodeAt(0);h=Math.imul(h,16777619)>>>0;}return h%10000;}export function evaluate(flag,user){if(!flag.enabled)return false;return bucket(flag.seed+':'+user)<flag.basisPoints;}\n"
+    }
+  ]
+}

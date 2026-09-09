@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/scopes.mjs": "export function matches(pattern,resource){const p=pattern.split('/'),r=resource.split('/');for(let i=0;i<p.length;i++){if(p[i]==='**')return true;if(i>=r.length||(p[i]!=='*'&&p[i]!==r[i]))return false;}return p.length===r.length;}\n"
+  },
+  "mutants": [
+    {
+      "name": "deny-loses-to-allow",
+      "file": "src/authorize.mjs",
+      "replacement": "import {matches} from './scopes.mjs';export function authorize(roles,action,resource){const grants=[],denies=[];for(const role of roles)for(const rule of role.rules)if((rule.action==='*'||rule.action===action)&&matches(rule.resource,resource))(rule.effect==='deny'?denies:grants).push(role.name);const unique=a=>[...new Set(a)];return denies.length&&!grants.length?{allowed:false,reason:'explicit-deny',roles:unique(denies)}:grants.length?{allowed:true,reason:'grant',roles:unique(grants)}:{allowed:false,reason:'no-grant',roles:[]};}\n"
+    },
+    {
+      "name": "recursive-wildcard-requires-child",
+      "file": "src/scopes.mjs",
+      "replacement": "export function matches(pattern,resource){const p=pattern.split('/'),r=resource.split('/');if(p.at(-1)==='**'){p.pop();if(r.length<=p.length)return false;}else if(p.length!==r.length)return false;return p.every((s,i)=>s==='*'||s===r[i]);}\n"
+    }
+  ]
+}

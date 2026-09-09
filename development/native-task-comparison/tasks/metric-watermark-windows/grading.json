@@ -1,0 +1,16 @@
+{
+  "category": "integration",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Out-of-order event accepted before its window closes and rejected after closure.",
+    "Repeated flush emits nothing; decreasing watermark rejects without corrupting queued data."
+  ],
+  "docDelivery": [
+    "Half-open windows, close-at-end watermark boundary and sorted grouping.",
+    "Late rejection is based on closed window; monotone watermark and independent instances."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "width positive integer; event time nonnegative integer, key arbitrary ASCII string, value integer. watermark nonnegative monotone integer; decreasing rejected. All numeric intermediate sums and bounds safe integers.",
+  "independence": "Integrate event-time windows, late-event policy and watermark flushing with grouped metric summaries."
+}

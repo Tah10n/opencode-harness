@@ -1,0 +1,19 @@
+{
+  "category": "refactoring",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert preorder, pruning and node identities.",
+    "Assert yield/resume side-effect timing, early close, thrown identity and a deeply nested tree without stack overflow."
+  ],
+  "docDelivery": [
+    "Document lazy timing and pruning/children access ordering.",
+    "Explain eager compatibility wrapper, stable-tree domain and depth safety."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Finite stable acyclic trees, lazy preorder traversal, observable getter/prune timing, stack-safe depth<=100000.",
+  "manualBehavior": [
+    "collectTree delegates traversal to walkTree; iterative traversal avoids recursive JS stack depth."
+  ],
+  "independence": "Replace recursive materialized traversal with lazy generator preserving preorder, pruning and early-termination behavior."
+}

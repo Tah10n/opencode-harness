@@ -1,0 +1,16 @@
+{
+  "category": "state",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Leaf selection makes ancestors indeterminate and parent toggle selects all descendant leaves.",
+    "Invalid restore preserves selected leaves."
+  ],
+  "docDelivery": [
+    "Leaf-only selection, checked/indeterminate propagation and subtree toggles.",
+    "Frozen input topology, sorted snapshots and atomic leaf-only restore with duplicate normalization."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Finite acyclic forest of <=1000 nodes, depth<=100, unique nonempty ASCII IDs, nodes exact {id,children}, dense arrays. checked boolean; restore dense string IDs with duplicate leaves allowed, invalid unknown/nonleaf IDs rejected.",
+  "independence": "Implement hierarchical checkbox state propagation, indeterminate ancestors and snapshot restore."
+}

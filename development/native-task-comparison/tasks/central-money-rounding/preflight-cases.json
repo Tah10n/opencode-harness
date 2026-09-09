@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/money-core.mjs": "export function roundRatio(numerator,denominator){\n if(!Number.isInteger(numerator)||Math.abs(numerator)>1000000000000000||!Number.isInteger(denominator)||denominator<1||denominator>1000000)throw new RangeError('ratio');\n const top=2n*BigInt(numerator)+BigInt(denominator),bottom=2n*BigInt(denominator);\n let floor=top/bottom;if(top<0n&&top%bottom!==0n)floor--;return Number(floor);\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "negative-half-away-from-zero",
+      "file": "src/money-core.mjs",
+      "replacement": "export function roundRatio(numerator,denominator){\n if(!Number.isInteger(numerator)||Math.abs(numerator)>1000000000000000||!Number.isInteger(denominator)||denominator<1||denominator>1000000)throw new RangeError('ratio');\n const n=BigInt(numerator),d=BigInt(denominator);let q=n/d;const remainder=n%d;\n if(remainder>0n&&2n*remainder>=d)q++;\n if(remainder<0n&&-2n*remainder>=d)q--;\n return Number(q);\n}\n"
+    },
+    {
+      "name": "aggregate-tax-rounding",
+      "file": "src/totals.mjs",
+      "replacement": "import {taxCents} from './tax.mjs';export function invoiceTotal(lines,basisPoints){const subtotal=lines.reduce((a,b)=>a+b,0),tax=taxCents(subtotal,basisPoints);return {subtotal,tax,total:subtotal+tax};}\n"
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+# header-multimap-api
+
+headers snapshots a legacy own-field object (string/string[] values) or finite [name,value] iterable. Names use ASCII HTTP-token characters, normalized lowercase; lookups validate likewise. String values reject CR/LF/NUL and trim only outer spaces/tabs. get returns first or undefined; getAll returns all or []; entries/iteration emit fresh normalized pairs. Repeats and global arrival order are retained without comma joining, including Set-Cookie. Empty arrays add no entries; inherited fields are ignored. Source/returned-array changes cannot modify the snapshot. Invalid names/values/tuples throw TypeError. Run npm test.

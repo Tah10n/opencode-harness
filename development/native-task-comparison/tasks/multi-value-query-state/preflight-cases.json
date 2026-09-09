@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/query.mjs": "export function createQuery(text=''){const p=new URLSearchParams(text);return {append(k,v){p.append(k,v);},set(k,v){p.set(k,v);},delete(k){p.delete(k);},getAll(k){return p.getAll(k);},entries(){return [...p.entries()];},serialize(){return p.toString();}};}\n"
+  },
+  "mutants": [
+    {
+      "name": "set-moves-key-to-end",
+      "file": "src/query.mjs",
+      "replacement": "const encode=s=>encodeURIComponent(s).replace(/[!'()~]/g,c=>'%'+c.charCodeAt(0).toString(16).toUpperCase()).replace(/%20/g,'+');const decode=s=>decodeURIComponent(s.split('+').join(' '));export function createQuery(text=''){let pairs=[];if(text.startsWith('?'))text=text.slice(1);for(const part of text.split('&')){if(part==='')continue;const at=part.indexOf('=');pairs.push([decode(at<0?part:part.slice(0,at)),decode(at<0?'':part.slice(at+1))]);}return {append(key,value){pairs.push([key,value]);},set(key,value){const at=pairs.findIndex(p=>p[0]===key);if(at<0){pairs.push([key,value]);return;}pairs=pairs.filter(p=>p[0]!==key);pairs.push([key,value]);},delete(key){pairs=pairs.filter(p=>p[0]!==key);},getAll(key){return pairs.filter(p=>p[0]===key).map(p=>p[1]);},entries(){return pairs.map(p=>[...p]);},serialize(){return pairs.map(([k,v])=>encode(k)+'='+encode(v)).join('&');}};}\n"
+    },
+    {
+      "name": "plus-is-literal",
+      "file": "src/query.mjs",
+      "replacement": "const encode=s=>encodeURIComponent(s).replace(/[!'()~]/g,c=>'%'+c.charCodeAt(0).toString(16).toUpperCase()).replace(/%20/g,'+');const decode=s=>decodeURIComponent(s);export function createQuery(text=''){let pairs=[];if(text.startsWith('?'))text=text.slice(1);for(const part of text.split('&')){if(part==='')continue;const at=part.indexOf('=');pairs.push([decode(at<0?part:part.slice(0,at)),decode(at<0?'':part.slice(at+1))]);}return {append(key,value){pairs.push([key,value]);},set(key,value){const at=pairs.findIndex(p=>p[0]===key);if(at<0){pairs.push([key,value]);return;}pairs=pairs.filter((p,i)=>p[0]!==key||i===at);pairs[at]=[key,value];},delete(key){pairs=pairs.filter(p=>p[0]!==key);},getAll(key){return pairs.filter(p=>p[0]===key).map(p=>p[1]);},entries(){return pairs.map(p=>[...p]);},serialize(){return pairs.map(([k,v])=>encode(k)+'='+encode(v)).join('&');}};}\n"
+    }
+  ]
+}

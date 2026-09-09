@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {createReader} from '../src/reader.mjs';test('legacy callback',()=>{const value={x:1};let called=false;const read=createReader((path,cb)=>{assert.equal(path,'file');cb(null,value);});assert.equal(read('file',(error,data)=>{called=true;assert.equal(error,null);assert.equal(data,value);}),undefined);assert.equal(called,true);});

@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/intervals.mjs": "export function blocked(rs,b){return rs.map(x=>[x[0]-b,x[1]+b]);}export function earliest(xs,start,d){let t=start;for(;;){const hit=xs.find(([a,b])=>t<b&&t+d>a);if(!hit)return t;t=hit[1];}}\n"
+  },
+  "mutants": [
+    {
+      "name": "ignore-buffer",
+      "file": "src/intervals.mjs",
+      "replacement": "export function blocked(reservations,buffer){return reservations.map(([a,b])=>[a,b]);}export function earliest(intervals,start,duration){let t=start;for(const [a,b]of [...intervals].sort((x,y)=>x[0]-y[0])){if(t+duration<=a)break;if(t<b&&t+duration>a)t=b;}return t;}\n"
+    },
+    {
+      "name": "unsorted-scan",
+      "file": "src/intervals.mjs",
+      "replacement": "export function blocked(reservations,buffer){return reservations.map(([a,b])=>[a-buffer,b+buffer]);}export function earliest(intervals,start,duration){let t=start;for(const [a,b]of intervals){if(t+duration<=a)break;if(t<b&&t+duration>a)t=b;}return t;}\n"
+    }
+  ]
+}

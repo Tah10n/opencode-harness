@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/search.mjs": "export function bounds(values,target,options={}){\n const compare=options.compare===undefined?(a,b)=>a-b:options.compare,key=options.key===undefined?x=>x:options.key;\n function search(low,high,after){if(low===high)return low;const mid=Math.floor((low+high)/2);const c=compare(key(values[mid]),target);return c<0||(c===0&&after)?search(mid+1,high,after):search(low,mid,after);}\n return {lower:search(0,values.length,false),upper:search(0,values.length,true)};\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "consumer-drops-options",
+      "file": "src/lookup.mjs",
+      "replacement": "import {bounds} from './search.mjs';\nexport function locate(values,target,options){const {lower,upper}=bounds(values,target);return {found:upper>lower,index:lower,count:upper-lower};}\n"
+    },
+    {
+      "name": "upper-is-lower",
+      "file": "src/search.mjs",
+      "replacement": "export function bounds(values,target,{compare=(a,b)=>a-b,key=x=>x}={}){\n function boundary(upper){let low=0,high=values.length;while(low<high){const mid=low+Math.floor((high-low)/2),c=compare(key(values[mid]),target);if(c<0||(upper&&c===0))low=mid+1;else high=mid;}return low;}\n return {lower:boundary(false),upper:boundary(false)};\n}\n"
+    }
+  ]
+}

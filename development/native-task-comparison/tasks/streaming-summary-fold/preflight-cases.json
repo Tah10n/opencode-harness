@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/summary.mjs": "export function createSummary(){\n const state={n:0,total:0,low:Infinity,high:-Infinity};\n return {add(value){if(typeof value!=='number'||!Number.isInteger(value)||value < -1000000000||value>1000000000||state.n>=100000)throw new RangeError('summary bounds');state.n++;state.total+=value;state.low=Math.min(state.low,value);state.high=Math.max(state.high,value);},\n snapshot(){return {count:state.n,sum:state.total,min:state.n?state.low:null,max:state.n?state.high:null,mean:state.n?state.total/state.n:null};}};\n}\nexport function summarize(values){const accumulator=createSummary();for(const value of values)accumulator.add(value);return accumulator.snapshot();}\n"
+  },
+  "mutants": [
+    {
+      "name": "invalid-add-increments-count",
+      "file": "src/summary.mjs",
+      "replacement": "export function createSummary(){\n let count=0,sum=0,min=null,max=null;\n return {add(value){\n  if(!Number.isInteger(value)||Math.abs(value)>1000000000||count===100000){count++;throw new RangeError('summary bounds');}\n  count++;sum+=value;min=min===null?value:Math.min(min,value);max=max===null?value:Math.max(max,value);\n },snapshot(){return {count,sum,min,max,mean:count?sum/count:null};}};\n}\nexport function summarize(values){const state=createSummary();for(const value of values)state.add(value);return state.snapshot();}\n"
+    },
+    {
+      "name": "rounded-mean",
+      "file": "src/summary.mjs",
+      "replacement": "export function createSummary(){\n let count=0,sum=0,min=null,max=null;\n return {add(value){\n  if(!Number.isInteger(value)||Math.abs(value)>1000000000||count===100000)throw new RangeError('summary bounds');\n  count++;sum+=value;min=min===null?value:Math.min(min,value);max=max===null?value:Math.max(max,value);\n },snapshot(){return {count,sum,min,max,mean:count?Math.round(sum/count):null};}};\n}\nexport function summarize(values){const state=createSummary();for(const value of values)state.add(value);return state.snapshot();}\n"
+    }
+  ]
+}

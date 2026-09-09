@@ -1,0 +1,1 @@
+export function valueAt(values,path){let value=values;for(const part of path){if(value===null||typeof value!=='object'||!Object.hasOwn(value,part))return undefined;value=value[part];}return value;}export function missing(value){return value===undefined||value===null||value==='';}

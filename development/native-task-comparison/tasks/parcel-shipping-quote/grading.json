@@ -1,0 +1,16 @@
+{
+  "category": "integration",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Dimensional weight needs rounding and affects the billed step.",
+    "An oversize parcel is rejected while other batch entries still quote."
+  ],
+  "docDelivery": [
+    "Units and the two ceiling operations.",
+    "Strict side limit, per-parcel rejection and stable order."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Parcels {id,length,width,height,grams}, dimensions positive integer mm, grams positive integer, unique string ids; zone has positive integer divisor/stepGrams/maxSide and nonnegative integer base/stepCents. All arithmetic safe.",
+  "independence": "Integrate dimensional weight rounding, per-zone tariffs and oversize rejection into parcel quote batches."
+}

@@ -1,0 +1,1 @@
+import {orderHooks} from './order.mjs';export async function runHooks(hooks,input){const ordered=orderHooks(hooks),trace=[];let value=input;for(const h of ordered){const result=await h.run(value);trace.push(h.id);value=result.value;if(result.stop)return {value,trace,stopped:true};}return {value,trace,stopped:false};}

@@ -1,0 +1,16 @@
+{
+  "category": "state",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Sequential array insert/remove and nested set use updated positions.",
+    "A later invalid edit leaves source and operations unchanged."
+  ],
+  "docDelivery": [
+    "Set/insert/remove path rules, own-only traversal and root replacement.",
+    "Atomic failure, deep-copy ownership and special object keys as data."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Ordinary acyclic JSON values/dense arrays excluding undefined/getters/custom methods/symbols/nonfinite/-0. Operations dense array exact op,path,value(for set/insert); paths string object keys or numeric array indices. Invalid op/path/indices included. Up to100 operations/depth100.",
+  "independence": "Implement atomic plain-JSON path operation lists with array index validation and rollback on invalid operation."
+}

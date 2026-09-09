@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/quote.mjs": "import {billable,oversize} from './weight.mjs';export function quote(items,z){const out=[];for(const p of items){if(oversize(p,z.maxSide)){out.push({id:p.id,status:'rejected',reason:'oversize'});continue;}const grams=billable(p,z.divisor),steps=Math.floor((grams+z.stepGrams-1)/z.stepGrams);out.push({id:p.id,status:'quoted',grams,cents:z.base+steps*z.stepCents});}return out;}\n"
+  },
+  "mutants": [
+    {
+      "name": "floor-dimensional",
+      "file": "src/weight.mjs",
+      "replacement": "export function billable(parcel,divisor){const dimensional=Math.floor(parcel.length*parcel.width*parcel.height/divisor);return Math.max(parcel.grams,dimensional);}export function oversize(p,maxSide){return [p.length,p.width,p.height].some(n=>n>maxSide);}\n"
+    },
+    {
+      "name": "reject-exact-bound",
+      "file": "src/weight.mjs",
+      "replacement": "export function billable(parcel,divisor){const dimensional=Math.ceil(parcel.length*parcel.width*parcel.height/divisor);return Math.max(parcel.grams,dimensional);}export function oversize(p,maxSide){return [p.length,p.width,p.height].some(n=>n>=maxSide);}\n"
+    }
+  ]
+}

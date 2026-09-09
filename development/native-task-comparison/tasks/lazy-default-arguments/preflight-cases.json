@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/settings.mjs": "export function getSetting(settings,key,fallback,{lazy=false}={}){\n const descriptor=Object.getOwnPropertyDescriptor(settings,key);\n if(descriptor!==undefined)return Reflect.get(settings,key);\n return lazy?Reflect.apply(fallback,undefined,[key]):fallback;\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "undefined-is-missing",
+      "file": "src/settings.mjs",
+      "replacement": "export function getSetting(settings,key,fallback,options={}){\n if(Object.hasOwn(settings,key)&&settings[key]!==undefined)return settings[key];\n if(options.lazy===true)return fallback(key);\n return fallback;\n}\n"
+    },
+    {
+      "name": "eager-factory",
+      "file": "src/settings.mjs",
+      "replacement": "export function getSetting(settings,key,fallback,options={}){\n if(options.lazy===true){const original=fallback;const value=original(key);fallback=()=>value;}\n if(Object.hasOwn(settings,key))return settings[key];\n if(options.lazy===true)return fallback(key);\n return fallback;\n}\n"
+    }
+  ]
+}

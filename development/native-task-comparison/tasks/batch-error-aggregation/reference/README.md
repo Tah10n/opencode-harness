@@ -1,0 +1,3 @@
+# batch-error-aggregation
+
+collectErrors runs ordered synchronous rules once each. Null/undefined pass; all other results including falsey values are errors with identity preserved. It returns a fresh array, short-circuits for firstOnly and propagates thrown errors without later rules. validate and validateAll share this collector/rule list; first returns error/null, all returns ordered errors. Name required/trimmed max40, age integer18..120, optional email unless newsletter true; present email uses the published ASCII local pattern, not full RFC validation. Inputs are unchanged and errors fresh. Run npm test.

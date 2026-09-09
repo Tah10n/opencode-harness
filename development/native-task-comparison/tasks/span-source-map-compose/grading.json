@@ -1,0 +1,16 @@
+{
+  "category": "integration",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert insertion of inner boundaries, unmapped/remapped spans and exact mapped diagnostic coordinates.",
+    "Assert outer-end precedence, one-hop behavior, missing line/anchor, snapshots and malformed map ordering."
+  ],
+  "docDelivery": [
+    "Document anchor span/coordinate semantics and boundary insertion.",
+    "Explain one-hop source lookup, unmapped diagnostics, validation and snapshot behavior."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Piecewise same-line mapping composition with split spans, unmapped intervals, one-hop semantics and diagnostic consumer snapshot.",
+  "independence": "Compose generated-to-intermediate and intermediate-to-source mapping anchors with unmapped segments and diagnostic consumers."
+}

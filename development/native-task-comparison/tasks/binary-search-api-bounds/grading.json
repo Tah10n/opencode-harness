@@ -1,0 +1,16 @@
+{
+  "category": "compatibility",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert duplicate lower/upper bounds and absent insertion points.",
+    "Assert key/comparator options through locate, including descending order and source preservation."
+  ],
+  "docDelivery": [
+    "Document both APIs, default/overloaded callbacks and already-extracted target.",
+    "Explain duplicate/insertion boundaries, sorted-input assumptions and logarithmic work."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Sorted dense arrays <=100000, pure total-order comparator (no NaN), target already key, bounded logarithmic comparisons.",
+  "independence": "Extend binary-search API with comparator/key-extractor overloads and explicit first/last duplicate insertion bounds."
+}

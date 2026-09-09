@@ -1,0 +1,3 @@
+# stable-sort-comparator
+
+sorted returns a fresh shallow sorted array; the original is never changed. The default is lexicographic String conversion; a custom comparator uses negative/positive signs, with zero or NaN tying. Ties are stable and references preserved. Present undefined values go after defined elements without comparator calls; holes remain holes at the end. Comparator errors retain identity. Supported inputs are ordinary bounded sparse/frozen arrays without inherited indices or accessors and pure consistent numeric comparators. No fixed comparison count or algorithm is promised. Run npm test.

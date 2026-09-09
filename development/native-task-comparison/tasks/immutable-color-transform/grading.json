@@ -1,0 +1,19 @@
+{
+  "category": "refactoring",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert shorthand/long uppercase parsing, canonical output and nonopaque alpha.",
+    "Assert positive/negative/endpoint shifts, rounding, frozen nonmutation and validation order."
+  ],
+  "docDelivery": [
+    "Document supported hex syntax, byte alpha and canonical output.",
+    "Explain interpolation/rounding, amount range and pure core composition."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Hex RGBA byte colors with immutable interpolation toward black/white, exact rounding and alpha preservation.",
+  "manualBehavior": [
+    "adjustColor composes shared parse/shift/format helpers without duplicate policy."
+  ],
+  "independence": "Separate color parsing, transformation and output formatting preserving clamping, rounding and alpha behavior."
+}

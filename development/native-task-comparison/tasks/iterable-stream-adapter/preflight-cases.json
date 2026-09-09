@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/collect.mjs": "export async function collect(source,options={}){\n const limit=options.limit===undefined?Infinity:options.limit, map=options.map===undefined?x=>x:options.map;\n if(limit!==Infinity&&(!Number.isSafeInteger(limit)||limit<0))throw new RangeError('limit');\n if(limit===0)return [];\n async function* converted(){let index=0;for await(const value of source)yield await map(value,index++);}\n const result=[];for await(const value of converted()){result.push(value);if(result.length>=limit)break;}return result;\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "ignores-limit",
+      "file": "src/collect.mjs",
+      "replacement": "export async function collect(source,{limit=Infinity,map=x=>x}={}){\n if(limit!==Infinity&&(!Number.isSafeInteger(limit)||limit<0))throw new RangeError('limit');\n const result=[];if(limit===0)return result;\n for await(const value of source){result.push(await map(value,result.length));if(result.length===limit+1)break;}\n return result;\n}\n"
+    },
+    {
+      "name": "skips-await-mapper",
+      "file": "src/collect.mjs",
+      "replacement": "export async function collect(source,{limit=Infinity,map=x=>x}={}){\n if(limit!==Infinity&&(!Number.isSafeInteger(limit)||limit<0))throw new RangeError('limit');\n const result=[];if(limit===0)return result;\n for await(const value of source){result.push(map(value,result.length));if(result.length===limit)break;}\n return result;\n}\n"
+    }
+  ]
+}

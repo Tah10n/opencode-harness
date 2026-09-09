@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/shuffle-core.mjs": "export function shuffleWithRandom(values,random){\n const result=Array.from(values);let remaining=result.length;\n while(remaining>1){\n  const value=random();if(typeof value!=='number'||!(value>=0&&value<1))throw new RangeError('random draw');\n  const selected=Math.floor(value*remaining);remaining--;const last=result[remaining];result[remaining]=result[selected];result[selected]=last;\n }\n return result;\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "excludes-current-index",
+      "file": "src/shuffle-core.mjs",
+      "replacement": "export function shuffleWithRandom(values,random){\n const result=values.slice();\n for(let i=result.length-1;i>0;i--){\n  const draw=random();if(typeof draw!=='number'||!Number.isFinite(draw)||draw<0||draw>=1)throw new RangeError('random draw');\n  const j=Math.floor(draw*i);[result[i],result[j]]=[result[j],result[i]];\n }\n return result;\n}\n"
+    },
+    {
+      "name": "mutates-input",
+      "file": "src/shuffle-core.mjs",
+      "replacement": "export function shuffleWithRandom(values,random){\n const result=values;\n for(let i=result.length-1;i>0;i--){\n  const draw=random();if(typeof draw!=='number'||!Number.isFinite(draw)||draw<0||draw>=1)throw new RangeError('random draw');\n  const j=Math.floor(draw*(i+1));[result[i],result[j]]=[result[j],result[i]];\n }\n return result;\n}\n"
+    }
+  ]
+}

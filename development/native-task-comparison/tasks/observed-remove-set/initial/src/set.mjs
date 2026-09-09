@@ -1,0 +1,1 @@
+export function createSet(){const items=new Set();return {add(value,tag){items.add(value);},remove(value){items.delete(value);},merge(state){for(const [value]of state.adds)items.add(value);},values(){return [...items].sort();},snapshot(){return {adds:[...items].map(v=>[v,v]),removed:[]};}};}

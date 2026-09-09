@@ -1,0 +1,1 @@
+import {headings,anchors} from './headings.mjs';export function toc(text){const roots=[],stack=[];for(const h of anchors(headings(text))){const node={...h,children:[]};while(stack.length&&stack.at(-1).level>=node.level)stack.pop();(stack.length?stack.at(-1).children:roots).push(node);stack.push(node);}return roots;}

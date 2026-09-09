@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "controls": 10,
+  "power": {
+    "n": 100,
+    "bOnlyProbability": 0.2,
+    "aOnlyProbability": 0.05,
+    "alpha": 0.05,
+    "twoSided": 0.8367351211564439,
+    "positive": 0.8367350635371915
+  },
+  "zeroDiscordance": [
+    -0.03699349820698568,
+    0.03699349820698568
+  ],
+  "realProviderRequests": 0
+}

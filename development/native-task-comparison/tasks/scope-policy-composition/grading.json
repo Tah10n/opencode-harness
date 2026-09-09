@@ -1,0 +1,16 @@
+{
+  "category": "integration",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "A later explicit deny overrides an earlier wildcard grant.",
+    "Difference between * and terminal ** at zero and multiple remaining segments."
+  ],
+  "docDelivery": [
+    "Wildcard segment grammar and action wildcard.",
+    "Deny precedence, default denial and deduplicated role explanation order."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Resource nonempty slash-separated segments [A-Za-z0-9_.-]+, no empty segments. Pattern same with whole-segment * and optional terminal **. Actions nonempty ASCII identifiers, pattern action may be *. Roles finite unique nonempty names; effects allow/deny.",
+  "independence": "Integrate role grants, explicit resource denies and wildcard scope matching into authorization explanation."
+}

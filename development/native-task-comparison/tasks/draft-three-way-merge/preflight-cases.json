@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/merge.mjs": "import {isDeepStrictEqual as equal} from 'node:util';export function mergeDraft(base,local,remote){const fields=[...new Set([...Object.keys(base),...Object.keys(local),...Object.keys(remote)])].sort(),entries=[],conflicts=[];const read=(o,k)=>Object.hasOwn(o,k)?{present:true,value:o[k]}:{present:false};const same=(a,b)=>a.present===b.present&&(!a.present||equal(a.value,b.value));for(const key of fields){const b=read(base,key),l=read(local,key),r=read(remote,key);let chosen;if(same(l,r))chosen=l;else if(same(l,b))chosen=r;else if(same(r,b))chosen=l;else{conflicts.push(structuredClone({key,base:b,local:l,remote:r}));continue;}if(chosen.present)entries.push([key,structuredClone(chosen.value)]);}return {merged:Object.fromEntries(entries),conflicts};}\n"
+  },
+  "mutants": [
+    {
+      "name": "silently-pick-local-conflict",
+      "file": "src/merge.mjs",
+      "replacement": "function equal(a,b){if(a===b)return true;if(a===null||b===null||typeof a!=='object'||typeof b!=='object'||Array.isArray(a)!==Array.isArray(b))return false;const ak=Object.keys(a).sort(),bk=Object.keys(b).sort();return ak.length===bk.length&&ak.every((k,i)=>k===bk[i]&&equal(a[k],b[k]));}export function mergeDraft(base,local,remote){const fields=[...new Set([...Object.keys(base),...Object.keys(local),...Object.keys(remote)])].sort(),entries=[],conflicts=[];const read=(o,k)=>Object.hasOwn(o,k)?{present:true,value:o[k]}:{present:false};const same=(a,b)=>a.present===b.present&&(!a.present||equal(a.value,b.value));for(const key of fields){const b=read(base,key),l=read(local,key),r=read(remote,key);let chosen;if(same(l,r))chosen=l;else if(same(l,b))chosen=r;else if(same(r,b))chosen=l;else{chosen=l;}if(chosen.present)entries.push([key,structuredClone(chosen.value)]);}return {merged:Object.fromEntries(entries),conflicts};}\n"
+    },
+    {
+      "name": "absent-null-conflated",
+      "file": "src/merge.mjs",
+      "replacement": "function equal(a,b){if(a===b)return true;if(a===null||b===null||typeof a!=='object'||typeof b!=='object'||Array.isArray(a)!==Array.isArray(b))return false;const ak=Object.keys(a).sort(),bk=Object.keys(b).sort();return ak.length===bk.length&&ak.every((k,i)=>k===bk[i]&&equal(a[k],b[k]));}export function mergeDraft(base,local,remote){const fields=[...new Set([...Object.keys(base),...Object.keys(local),...Object.keys(remote)])].sort(),entries=[],conflicts=[];const read=(o,k)=>({present:true,value:Object.hasOwn(o,k)?o[k]:null});const same=(a,b)=>a.present===b.present&&(!a.present||equal(a.value,b.value));for(const key of fields){const b=read(base,key),l=read(local,key),r=read(remote,key);let chosen;if(same(l,r))chosen=l;else if(same(l,b))chosen=r;else if(same(r,b))chosen=l;else{conflicts.push(structuredClone({key,base:b,local:l,remote:r}));continue;}if(chosen.present)entries.push([key,structuredClone(chosen.value)]);}return {merged:Object.fromEntries(entries),conflicts};}\n"
+    }
+  ]
+}

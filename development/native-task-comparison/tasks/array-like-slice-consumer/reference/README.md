@@ -1,0 +1,3 @@
+# array-like-slice-consumer
+
+batches accepts ordinary array-like objects/arrays and primitive strings. Size must be integer1..10000 and is checked before input access; invalid type input throws TypeError. Length is read once and must be integer0..10000 or RangeError. Fresh shallow chunks cover positions without an empty tail. Inherited indexed properties count as present; getters read once in ascending order with original receiver. Holes remain holes, distinct from present undefined. Strings use UTF16 code units. Inputs stay unchanged and getter errors propagate unchanged, stopping further reads. Structures must remain stable during access. Run npm test.

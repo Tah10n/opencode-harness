@@ -1,0 +1,1 @@
+export function occurrences(start,end,weekdays){const out=[];for(let t=Date.parse(start+'T00:00:00Z');t<Date.parse(end+'T00:00:00Z');t+=86400000)out.push(new Date(t).toISOString().slice(0,10));return out;}

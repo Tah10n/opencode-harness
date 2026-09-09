@@ -1,0 +1,1 @@
+import {createHash} from 'node:crypto';export function canonical(value){return JSON.stringify(value);}export function digest(value){return createHash('sha256').update(canonical(value),'utf8').digest('hex');}

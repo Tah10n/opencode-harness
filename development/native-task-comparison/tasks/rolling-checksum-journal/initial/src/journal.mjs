@@ -1,0 +1,1 @@
+export function replay(records){return {values:records.map(r=>r.value),checkpoint:records.at(-1)?.checksum??'00000000'};}export function append(records,value){const previous=records.at(-1)?.checksum??'00000000';return [...records,{sequence:records.length+1,previous,value,checksum:'00000000'}];}

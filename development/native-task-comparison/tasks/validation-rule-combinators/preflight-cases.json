@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/rules.mjs": "export function allOf(rules){return value=>{let i=0;while(i<rules.length){const result=Reflect.apply(rules[i++],undefined,[value]);if(result.ok===false)return{ok:false,errors:Array.from(result.errors)};}return{ok:true,errors:[]};};}\nexport function anyOf(rules){return value=>{let i=0,collected=[];while(i<rules.length){const result=Reflect.apply(rules[i++],undefined,[value]);if(result.ok===true)return{ok:true,errors:[]};collected=collected.concat(result.errors);}return{ok:false,errors:collected};};}\n"
+  },
+  "mutants": [
+    {
+      "name": "aliases-rule-errors",
+      "file": "src/rules.mjs",
+      "replacement": "export function allOf(rules){\n return value=>{for(const rule of rules){const result=Reflect.apply(rule,undefined,[value]);if(!result.ok)return{ok:false,errors:result.errors};}return{ok:true,errors:[]};};\n}\nexport function anyOf(rules){\n return value=>{const errors=[];for(const rule of rules){const result=Reflect.apply(rule,undefined,[value]);if(result.ok)return{ok:true,errors:[]};for(const error of result.errors)errors.push(error);}return{ok:false,errors};};\n}\n"
+    },
+    {
+      "name": "retains-failed-or-errors",
+      "file": "src/rules.mjs",
+      "replacement": "export function allOf(rules){\n return value=>{for(const rule of rules){const result=Reflect.apply(rule,undefined,[value]);if(!result.ok)return{ok:false,errors:[...result.errors]};}return{ok:true,errors:[]};};\n}\nexport function anyOf(rules){\n return value=>{const errors=[];for(const rule of rules){const result=Reflect.apply(rule,undefined,[value]);if(result.ok)return{ok:true,errors};for(const error of result.errors)errors.push(error);}return{ok:false,errors};};\n}\n"
+    }
+  ]
+}

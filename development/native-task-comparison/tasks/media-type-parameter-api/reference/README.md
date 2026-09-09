@@ -1,0 +1,3 @@
+# media-type-parameter-api
+
+parseMediaType accepts type/subtype and semicolon-separated name=value parameters with optional outer/parameter spaces or tabs, never around slash. Nonempty tokens use ASCII letters/digits and !#$%&'*+-.^_|~ plus backtick. Double-quoted values permit printable ASCII/tab, with backslash escaping the next permitted character; quotes/backslashes must be escaped. Semicolons/equals inside quotes are literal; empty quotes work. Names/type/subtype lowercase, values preserve case and quoted whitespace. Last normalized parameter name wins, including safe own __proto__ data. CR/LF/NUL/non-ASCII quoted text and malformed syntax reject TypeError. No registry/charset/extended-parameter decoding. Run npm test.

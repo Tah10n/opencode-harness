@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/range.mjs": "export function formatRange(first,last,stride){\n const object=first!==null&&typeof first==='object'&&!Array.isArray(first);\n const start=object?(first.start===undefined?0:first.start):first;\n const end=object?first.end:last;\n const rawStep=object?first.step:stride,step=rawStep===undefined?1:rawStep;\n const separator=object&&first.separator!==undefined?first.separator:',';\n if(!Number.isInteger(start)||start < -10000||start>10000||!Number.isInteger(end)||end < -10000||end>10000||!Number.isInteger(step)||!step||Math.abs(step)>20000)throw new RangeError('range');\n if(typeof separator!=='string')throw new TypeError('separator');\n const count=Math.max(0,Math.floor((end-start)/step)+1);\n return Array.from({length:count},(_,i)=>String(start+i*step)).join(separator);\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "truthy-separator-default",
+      "file": "src/range.mjs",
+      "replacement": "export function formatRange(start,end,step=1){\n let separator=',';\n if(start!==null&&typeof start==='object'&&!Array.isArray(start)){const options=start;start=options.start===undefined?0:options.start;end=options.end;step=options.step===undefined?1:options.step;separator=options.separator||',';}\n if(!Number.isInteger(start)||Math.abs(start)>10000||!Number.isInteger(end)||Math.abs(end)>10000||!Number.isInteger(step)||step===0||Math.abs(step)>20000)throw new RangeError('range');\n if(typeof separator!=='string')throw new TypeError('separator');\n const result=[];for(let value=start;step>0?value<=end:value>=end;value+=step)result.push(String(value===0?0:value));\n return result.join(separator);\n}\n"
+    },
+    {
+      "name": "exclusive-endpoint",
+      "file": "src/range.mjs",
+      "replacement": "export function formatRange(start,end,step=1){\n let separator=',';\n if(start!==null&&typeof start==='object'&&!Array.isArray(start)){const options=start;start=options.start===undefined?0:options.start;end=options.end;step=options.step===undefined?1:options.step;separator=options.separator===undefined?',':options.separator;}\n if(!Number.isInteger(start)||Math.abs(start)>10000||!Number.isInteger(end)||Math.abs(end)>10000||!Number.isInteger(step)||step===0||Math.abs(step)>20000)throw new RangeError('range');\n if(typeof separator!=='string')throw new TypeError('separator');\n const result=[];for(let value=start;step>0?value<end:value>end;value+=step)result.push(String(value===0?0:value));\n return result.join(separator);\n}\n"
+    }
+  ]
+}

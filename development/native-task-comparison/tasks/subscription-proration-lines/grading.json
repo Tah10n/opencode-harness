@@ -1,0 +1,16 @@
+{
+  "category": "integration",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Unordered changes produce chronological prorated lines and a negative credit adjustment.",
+    "Redundant same-plan/same-price changes merge before rounding."
+  ],
+  "docDelivery": [
+    "Half-open period, start/end changes and price is for whole period.",
+    "Merge condition, floor per merged line without residual redistribution, signed adjustment."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Integer day indices start<end within 0..100000; initial/changed plan {id,price}, id nonempty ASCII, price nonnegative integer cents per whole period; change days unique in [start,end], arrays unordered; alreadyCharged nonnegative integer, intermediate arithmetic safe.",
+  "independence": "Integrate day-count proration, plan-change boundaries and invoice adjustment line aggregation."
+}

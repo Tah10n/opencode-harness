@@ -1,0 +1,1 @@
+export function edit(value,operations){const result=structuredClone(value);for(const op of operations){let p=result;for(const k of op.path.slice(0,-1))p=p[k];p[op.path.at(-1)]=op.value;}return result;}

@@ -1,0 +1,16 @@
+{
+  "category": "compatibility",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert repeated case-insensitive iterable headers with preserved order, including Set-Cookie.",
+    "Assert legacy object arrays and snapshot/returned-array independence."
+  ],
+  "docDelivery": [
+    "Document input forms, token validation, lowercase names and space/tab trimming.",
+    "Explain first/all values, duplicate order, no joining and immutable snapshot reads."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Ordinary header object or finite pair iterable; ASCII token names; bounded strings, CR/LF/NUL rejected; snapshot semantics.",
+  "independence": "Support repeated case-insensitive HTTP headers through legacy object and iterable input forms."
+}

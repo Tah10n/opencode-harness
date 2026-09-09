@@ -1,0 +1,16 @@
+{
+  "category": "compatibility",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert exact large/root/nested BigInt round trip without altering ordinary lookalikes or unmarked strings.",
+    "Assert own special keys and invalid version/path/decimal rejection."
+  ],
+  "docDelivery": [
+    "Describe plain JSON compatibility and exact prefixed data/paths representation.",
+    "Document explicit conversion boundary, canonical decimals, supported data domain and rejection rules."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Explicit prefixed data/path BigInt extension, ordinary JSON bytes preserved; finite acyclic own-data JSON+BigInt domain, strict malformed-wire validation. parse input is primitive string only; non-string coercion is outside scope.",
+  "independence": "Add explicit BigInt wire representation to a JSON API without confusing ordinary lookalike objects."
+}

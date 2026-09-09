@@ -1,0 +1,16 @@
+{
+  "category": "integration",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Dependency ordering with asynchronous transformation and a stop that preserves its transformed value.",
+    "Invalid dependency graph rejects before any hook side effect."
+  ],
+  "docDelivery": [
+    "Earliest currently eligible input hook selection and validation errors.",
+    "Sequential await, stop after adopting value and unchanged error propagation."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Hooks {id,after,run}; id nonempty string unique except rejection case; after dense string array (duplicates harmless). run async/sync returns {value,stop:boolean optional} or throws/rejects; values finite numbers. Unknown dependencies/cycles invalid and must reject before effects.",
+  "independence": "Integrate hook dependency order, value transformations and early stop semantics into plugin execution."
+}

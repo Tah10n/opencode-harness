@@ -1,0 +1,16 @@
+{
+  "category": "compatibility",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert repeated entries with global/sticky expressions and unchanged caller lastIndex.",
+    "Assert literal string compatibility and a frozen RegExp."
+  ],
+  "docDelivery": [
+    "Explain literal strings versus native RegExp including flags and sticky-at-zero semantics.",
+    "Explain fresh output, preserved order/duplicates and no caller state mutation."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Dense bounded string arrays; literal strings or genuine same-realm native RegExp, frozen supported, unsupported filters rejected.",
+  "independence": "Accept RegExp filters without leaking lastIndex across entries or mutating caller-owned patterns."
+}

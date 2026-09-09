@@ -1,0 +1,16 @@
+{
+  "category": "integration",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Hidden ancestor is omitted but a hidden current node is retained without a link.",
+    "Unknown target yields empty breadcrumbs."
+  ],
+  "docDelivery": [
+    "Traversal includes hidden nodes; filtering only hides ancestors.",
+    "Current-node null link and plain labels, missing targets and input preservation."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Finite forest <=100 depth, nodes {id,label,href,hidden,children}, unique nonempty ASCII ids, string label/href, boolean hidden, dense acyclic children. Labels opaque plain text. No rendering/HTML required.",
+  "independence": "Integrate tree traversal, hidden ancestors and current-node labels into accessible breadcrumb output."
+}

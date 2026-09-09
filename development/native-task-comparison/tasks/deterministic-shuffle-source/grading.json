@@ -1,0 +1,19 @@
+{
+  "category": "refactoring",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert deterministic known draw sequence, n-1 calls and no input/identity loss.",
+    "Assert zero/singleton no draws, invalid/throwing source and dynamic default source behavior."
+  ],
+  "docDelivery": [
+    "Describe injected core/default wrapper and exact draw sequence.",
+    "Explain valid random range, no retries, shallow permutation and no cryptographic guarantee."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Dense shallow arrays and synchronous injected draw source, exact descending Fisher-Yates and bounded draw validation.",
+  "manualBehavior": [
+    "Verify legacy shuffle wrapper delegates to exported shuffleWithRandom core; no duplicate shuffle algorithm or ambient RNG calls remain in injected core."
+  ],
+  "independence": "Inject random-number source into shuffle preserving permutation, bounds validation and legacy entry point."
+}

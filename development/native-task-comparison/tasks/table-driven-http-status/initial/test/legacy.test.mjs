@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {isRetryable} from '../src/retry.mjs';import {statusLabel} from '../src/labels.mjs';import {needsAuthRefresh} from '../src/auth.mjs';test('status helpers',()=>{assert.equal(isRetryable(503),true);assert.equal(isRetryable(501),false);assert.equal(statusLabel(404),'Not Found');assert.equal(statusLabel(599),'Unknown status');assert.equal(needsAuthRefresh(401),true);assert.equal(needsAuthRefresh(403),false);});

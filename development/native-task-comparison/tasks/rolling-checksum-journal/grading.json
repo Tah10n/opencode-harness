@@ -1,0 +1,16 @@
+{
+  "category": "state",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Two appended records replay in order and returned records do not alias input.",
+    "A corrupt tail rejects both replay and further append."
+  ],
+  "docDelivery": [
+    "Exact UTF-8 FNV chain, sequence/link rules and initial checkpoint.",
+    "Fail on corruption, valid-prefix limitation and no cryptographic authentication claim."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Dense array up to1000 ordinary records with exact sequence,previous,value,checksum fields. Valid values well-formed Unicode strings; invalid metadata/checksum/value types included for corruption rejection. Append value well-formed Unicode string. No cryptographic authenticity claim.",
+  "independence": "Implement append-only checkpoint replay with verified checksum chain and explicit corrupt-tail rejection."
+}

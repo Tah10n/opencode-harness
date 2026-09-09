@@ -1,0 +1,3 @@
+# normalization-once-pipeline
+
+processName normalizes once (optional injected function, default normalizeName) and reuses the string in shared name-core validation/display. Raw validateName/displayName independently normalize once, preserving their API. Core functions never normalize. Default normalization uses trim then ASCII A-Z lowercase only. Validation priority: empty, length>20, then [a-z][a-z0-9_-]*; display always prefixes@. Pipeline gives ok/name/label or ok:false/error. Injected errors retain identity and invalid results still normalize once. No global hooks or duplicate rules. Run npm test.

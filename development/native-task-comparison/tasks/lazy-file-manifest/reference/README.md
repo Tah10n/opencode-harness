@@ -1,0 +1,3 @@
+# lazy-file-manifest
+
+selectPaths validates every relative input/exclude before IO: nonempty segments, no dot/dotdot/backslash/NUL or leading/trailing slash. Deduplicate, UTF16-sort; exclude exact path or slash descendant, never sibling prefix. Arrays<=10000, strings<=500. buildManifest delegates then serially stat each selected path under absolute root, read only files, record visible byte count and lowercase SHA256. Inject fs or use node:fs/promises default, preserve method receivers; first exact error stops with no retry/later IO. Empty selection no IO, no symbolic links/stable filesystem domain. Run npm test.

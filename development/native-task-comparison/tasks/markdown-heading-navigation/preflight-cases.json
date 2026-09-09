@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/toc.mjs": "import {headings,anchors} from './headings.mjs';export function toc(text){const flat=anchors(headings(text)).map(h=>({...h,children:[]})),roots=[];for(let i=0;i<flat.length;i++){let p=i-1;while(p>=0&&flat[p].level>=flat[i].level)p--;if(p<0)roots.push(flat[i]);else flat[p].children.push(flat[i]);}return roots;}\n"
+  },
+  "mutants": [
+    {
+      "name": "ignore-fences",
+      "file": "src/headings.mjs",
+      "replacement": "export function headings(text){const out=[];let fenced=false;for(const line of text.split(/\\r?\\n/)){if(/^\\s*`{3}/.test(line)){fenced=!fenced;continue;}const m=/^(#{1,6}) +(.+)$/.exec(line);if(m){const title=m[2].replace(/ *#+ *$/,'').trim();if(title)out.push({level:m[1].length,title});}}return out;}export function anchors(items){const seen=new Map();return items.map(item=>{const base=item.title.toLowerCase().replace(/[^a-z0-9 -]/g,'').trim().replace(/ +/g,'-')||'section';const n=seen.get(base)||0;seen.set(base,n+1);return {...item,id:base+(n?'-'+n:'')};});}\n"
+    },
+    {
+      "name": "flat-navigation",
+      "file": "src/toc.mjs",
+      "replacement": "import {headings,anchors} from './headings.mjs';export function toc(text){return anchors(headings(text)).map(x=>({...x,children:[]}));}\n"
+    }
+  ]
+}

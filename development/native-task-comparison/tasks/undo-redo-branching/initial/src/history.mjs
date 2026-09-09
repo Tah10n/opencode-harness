@@ -1,0 +1,1 @@
+export function createHistory(initial,limit){let value=initial;return {commit(next){value=next;return value;},undo(){return {changed:false,value};},redo(){return {changed:false,value};},snapshot(){return {value,undo:0,redo:0};}};}

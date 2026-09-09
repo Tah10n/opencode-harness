@@ -1,0 +1,19 @@
+{
+  "category": "refactoring",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert reserved ASCII/Unicode encoding, literal plus and round-trip.",
+    "Assert ordered repeated/empty query pairs and malformed Unicode/percent/segment errors."
+  ],
+  "docDelivery": [
+    "Document UTF8 uppercase percent policy and difference from form encoding.",
+    "Explain pair preservation, first-equals parse rule and error classes."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "UTF8 percent component codec and ordered query pairs with literal-plus compatibility and explicit malformed input errors.",
+  "manualBehavior": [
+    "Both query consumer functions use extracted codec without duplicated encoding/decoding policy."
+  ],
+  "independence": "Separate percent-encoding policy from query rendering preserving UTF-8 escapes and reserved-character behavior."
+}

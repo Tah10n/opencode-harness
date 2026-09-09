@@ -1,0 +1,3 @@
+# deterministic-shuffle-source
+
+shuffleWithRandom is the extracted core; shuffle delegates with optional {random}, defaulting to Math.random at call time. Descending Fisher-Yates draws once for i=n-1..1, j=floor(r*(i+1)), swaps then continues. Draws must be finite Numbers in[0,1); invalid draws throw RangeError without retry, source errors retain identity. Empty/singleton copies need no draws. Source is unchanged, identities/duplicates preserved in a fresh shallow permutation. No global mutation, random sort, extra draws or cryptographic guarantee. Dense arrays and synchronous nonmutating sources only. Run npm test.

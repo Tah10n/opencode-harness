@@ -1,0 +1,1 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {toc} from '../src/toc.mjs';test('fences hierarchy and duplicates',()=>{const t=toc('# A\n```\n# Hidden\n```\n### Child\n# A');assert.equal(t.length,2);assert.equal(t[0].children[0].title,'Child');assert.equal(t[1].id,'a-1');});

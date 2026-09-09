@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/component-codec.mjs": "export function encodeComponent(text){\n if(typeof text!=='string')throw new TypeError('component');encodeURIComponent(text);\n return Array.from(new TextEncoder().encode(text),byte=>byte>=65&&byte<=90||byte>=97&&byte<=122||byte>=48&&byte<=57||[45,46,95,126].includes(byte)?String.fromCharCode(byte):'%'+byte.toString(16).padStart(2,'0').toUpperCase()).join('');\n}\nexport function decodeComponent(text){if(typeof text!=='string')throw new TypeError('component');return decodeURIComponent(text);}\n"
+  },
+  "mutants": [
+    {
+      "name": "underencoded-reserved-characters",
+      "file": "src/component-codec.mjs",
+      "replacement": "export function encodeComponent(text){\n if(typeof text!=='string')throw new TypeError('component');return encodeURIComponent(text);\n}\nexport function decodeComponent(text){if(typeof text!=='string')throw new TypeError('component');return decodeURIComponent(text);}\n"
+    },
+    {
+      "name": "form-plus-decoding",
+      "file": "src/component-codec.mjs",
+      "replacement": "export function encodeComponent(text){\n if(typeof text!=='string')throw new TypeError('component');return encodeURIComponent(text).replace(/[!'()*]/g,ch=>'%'+ch.charCodeAt(0).toString(16).toUpperCase());\n}\nexport function decodeComponent(text){if(typeof text!=='string')throw new TypeError('component');return decodeURIComponent(text.replaceAll('+',' '));}\n"
+    }
+  ]
+}
