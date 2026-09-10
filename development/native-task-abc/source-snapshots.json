@@ -1,0 +1,22 @@
+[
+  {
+    "task": "protocol-error-api",
+    "fileCount": 219,
+    "snapshotManifestSha256": "4d76ca86d76b9e106ca6779bbb93ab15c76e1a3e70e6a2b46364e39f575cf080"
+  },
+  {
+    "task": "legacy-runtime-reload",
+    "fileCount": 219,
+    "snapshotManifestSha256": "7cd53988a3b5fe839b86867bee0ae05076fd012abe12227e5e90b573db141383"
+  },
+  {
+    "task": "reconnect-revoked",
+    "fileCount": 223,
+    "snapshotManifestSha256": "20bd5b14609e6420da3a541bda0ea2793da50de0a4f639b51b3e0c4bde83db54"
+  },
+  {
+    "task": "request-module-extraction",
+    "fileCount": 219,
+    "snapshotManifestSha256": "825e9f5e142d6d0440884daac039b718e312a31947f435ee1722d740b583b20e"
+  }
+]
