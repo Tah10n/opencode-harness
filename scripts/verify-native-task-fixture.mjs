@@ -33,6 +33,9 @@ const exceptionTests=fs.readFileSync(path.join(exceptionFixture,'complete.test.m
 const exceptionSplit=exceptionTests.indexOf("test('invokes callable functions");
 const exceptionLegacy=exceptionTests.slice(0,exceptionSplit);
 const exceptionRegression="import {test} from 'node:test';import assert from 'node:assert/strict';import {timed} from '../src/timing.mjs';\n"+exceptionTests.slice(exceptionSplit);
+const namedNestedRegression=exceptionRegression
+  .replace("import {test} from 'node:test';", "import {describe,it} from 'node:test';")
+  .replace("test('invokes callable functions with an overridden apply property',()=>{", "describe('ordinary callable contract',()=>{it('invokes callable functions with an overridden apply property',function namedInvocation(){")+'\n});\n';
 const exceptionInline=`node --input-type=module -e 'import {timed} from "./src/timing.mjs";function target(){return 42;}target.apply=null;try{console.log(timed(target,{now:()=>0,record:()=>{}})());}catch(error){console.log(error.name,error.message)}'`;
 const exceptionFinding=JSON.parse(fs.readFileSync(path.join(exceptionFixture,'finding.json')));
 const writeFixture=(file,bytes)=>`node -e 'require("fs").writeFileSync(${JSON.stringify(file)},Buffer.from(${JSON.stringify(Buffer.from(bytes).toString('base64'))},"base64"))'`;
@@ -71,7 +74,7 @@ const fixture = http.createServer(async (req, res) => {
     if(stage==='implementation'){response(res,n===0?bash('npm test'):null,'Saved candidate ready');return;}
     if(stage==='reproduce'||stage==='evidence-correction'){
       if(stage==='evidence-correction')assert.ok(userText.includes('ordinary project test callback'));
-      if(n===0){response(res,bash(stage==='reproduce'||mode==='exception-reject'?exceptionInline:writeFixture('test/exception.test.mjs',exceptionRegression)));return;}
+      if(n===0){response(res,bash(stage==='reproduce'||mode==='exception-reject'?exceptionInline:writeFixture('test/exception.test.mjs',mode==='exception-named-nested'?namedNestedRegression:exceptionRegression)));return;}
       if(n===1&&stage==='evidence-correction'&&mode!=='exception-reject'){response(res,bash('npm test'));return;}
       const ref=refs.at(-1);assert.ok(ref);
       response(res,null,JSON.stringify({dispositions:[{id:exceptionFinding.id,decision:'grounded',kind:'behavior',basis:exceptionFinding.basis,expectedReason:'The original ordinary-callable domain includes callable functions with their own properties',explanation:'Invoke the permitted public scenario through the current project regression',evidenceCallID:ref.callID}],limitations:[]}));return;
@@ -206,7 +209,7 @@ const api = async (method, route, body) => { const r = await fetch(`http://127.0
 try {
   let ready = false; for (let n = 0; n < 150; n++) { try { await api('GET', '/global/health'); ready = true; break; } catch { await new Promise(r => setTimeout(r, 100)); } } assert.ok(ready, stderr);
   const commands = await api('GET', '/command'); assert.ok(commands.some(c => c.name === 'harness-task'));
-  const allModes = ['exception-repair','exception-reject','exception-correct','correct', 'defect', 'unsupported', 'coverage-loss', 'last-mutation', 'cancel', 'incomplete', 'concurrent-save', 'staged-work','trailing-comma','missing-semantic','format-fails','src-affected','probe-production','missing-test','provenance','unverified','legacy-bookmark','evidence-replay','evidence-permission','evidence-user-reject','missing-error-paths','external-before-error','state-unchanged','state-external','state-unknown','state-revert','state-documentation','state-reproduce','budget'];
+  const allModes = ['exception-named-nested','exception-repair','exception-reject','exception-correct','correct', 'defect', 'unsupported', 'coverage-loss', 'last-mutation', 'cancel', 'incomplete', 'concurrent-save', 'staged-work','trailing-comma','missing-semantic','format-fails','src-affected','probe-production','missing-test','provenance','unverified','legacy-bookmark','evidence-replay','evidence-permission','evidence-user-reject','missing-error-paths','external-before-error','state-unchanged','state-external','state-unknown','state-revert','state-documentation','state-reproduce','budget'];
   const selectedModes = process.env.NATIVE_TASK_FIXTURE_CASES?.split(',') ?? allModes;
   assert.ok(selectedModes.every(m=>allModes.includes(m)));
   for (mode of selectedModes) {
@@ -221,7 +224,7 @@ try {
       fs.writeFileSync(path.join(project,'src/timing.mjs'),mode==='exception-correct'?exceptionSource.replace('fn.apply(this,args)','Reflect.apply(fn,this,args)'):exceptionSource);
       fs.writeFileSync(path.join(project,'test/legacy.test.mjs'),exceptionLegacy);
       if(mode==='exception-correct')fs.writeFileSync(path.join(project,'test/exception.test.mjs'),exceptionRegression);
-      fs.writeFileSync(path.join(project,'package.json'),JSON.stringify({private:true,scripts:{test:'node --test test/*.test.mjs'}}));
+      fs.writeFileSync(path.join(project,'package.json'),JSON.stringify({private:true,scripts:{test:mode==='exception-named-nested'?'node --test --test-reporter=tap test/*.test.mjs':'node --test test/*.test.mjs'}}));
       fs.writeFileSync(task,fs.readFileSync(path.join(exceptionFixture,'task.txt')));
     }
     if (mode === 'missing-test') fs.appendFileSync(task,' Add an additional project regression in extra.test.mjs.');
@@ -259,13 +262,14 @@ try {
     assert.equal(git('ls-files','--stage','-z'),originalIndex);
     if(mode.startsWith('exception-')){
       const events=JSON.parse(fs.readFileSync(path.join(report.artifacts,'tool-events.json')));
-      assert.equal(report.repairs,mode==='exception-repair'?1:0,JSON.stringify(report));
+      assert.equal(report.repairs,['exception-repair','exception-named-nested'].includes(mode)?1:0,JSON.stringify(report));
       assert.equal(report.evidenceCorrections,mode==='exception-correct'?0:1);
       assert.equal(report.status,mode==='exception-reject'?'incomplete':'reviewed_delivery',JSON.stringify(report));
       assert.equal(fs.readFileSync(path.join(report.executionDirectory,'test/legacy.test.mjs'),'utf8'),exceptionLegacy);
-      if(mode==='exception-repair'){
+      if(['exception-repair','exception-named-nested'].includes(mode)){
         assert.ok(events.some(e=>e.exit===0&&e.args?.command===exceptionInline&&e.output.includes('TypeError')));
         const failure=events.find(e=>e.nodeTest?.failure==='product-exception'&&e.exit===1);assert.ok(failure,JSON.stringify(events));
+        if(mode==='exception-named-nested'){assert.ok(failure.output.includes('TestContext.namedInvocation'));assert.equal(fs.readFileSync(path.join(report.executionDirectory,'test/exception.test.mjs'),'utf8'),namedNestedRegression);}
         assert.equal(failure.args.command,'npm test');assert.ok(failure.output.includes('TypeError'));
         const passed=events.findLast(e=>e.args?.command==='npm test'&&e.exit===0);assert.ok(passed);
         assert.equal(passed.before,passed.after);assert.ok(events.indexOf(passed)>events.indexOf(failure));

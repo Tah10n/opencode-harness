@@ -187,12 +187,38 @@ console.log(JSON.stringify({stateContinuityReplay:true,retainedHistoricalForms:2
   fs.mkdirSync(path.join(dir,'test'));fs.writeFileSync(path.join(dir,'package.json'),JSON.stringify({scripts:{test:'node --test test/*.test.mjs'}}));
   const run=(source,test,command='npm test')=>{
    fs.writeFileSync(path.join(dir,'service.mjs'),source);
-   fs.writeFileSync(path.join(dir,'test','behavior.test.mjs'),"import {test} from 'node:test'; import assert from 'node:assert/strict'; import {lookup} from '../service.mjs';\n"+test);
+   fs.writeFileSync(path.join(dir,'test','behavior.test.mjs'),"import {test,it,describe} from 'node:test'; import assert from 'node:assert/strict'; import {lookup} from '../service.mjs';\n"+test);
    const r=spawnSync('bash',['-c',command],{cwd:dir,encoding:'utf8'});
    const e={tool:'bash',state:'completed',exit:r.status,args:{command,workdir:dir},output:r.stdout+r.stderr,callID:'now',before:'S',after:'S'};
    e.nodeTest=observeNodeTest(e,dir);return e;
   };
   const positive=[['export const lookup=()=>{throw Object.assign(Error("domain operation failed"),{code:"ENOENT"});};',"test('contract',()=>assert.equal(lookup(),2));"],['export const lookup=()=>1;',"test('contract',()=>assert.equal(lookup(),2));"],['export const lookup=()=>null.value;',"test('contract',()=>assert.equal(lookup(),2));"],['export const lookup=async()=>{throw Error("rejected");};',"test('contract',async()=>assert.equal(await lookup(),2));"]];
+  for(const named of [false,true])for(const nested of [false,true])for(const defect of ['assertion','exception','rejection']){
+   const source=defect==='assertion'?'export const lookup=()=>1;':defect==='exception'?'export const lookup=()=>null.value;':'export const lookup=async()=>{await Promise.resolve();throw Error("rejected");};';
+   const async=defect==='rejection';
+   const callback=`${async?'async ':''}${named?'function namedContract()':'() =>'} { assert.equal(${async?'await ':''}lookup(),2); }`;
+   const test=nested?`describe('group',()=>{it('contract',${callback});});`:`test('contract',${callback});`;
+   for(const reporter of ['tap','spec']){
+    const command=`node --test --test-reporter=${reporter} test/behavior.test.mjs`;
+    const event=run(source,test,command);assert.equal(reproducedFailure(event),true,JSON.stringify({named,nested,defect,reporter,event}));
+    assert.equal(event.nodeTest.failure,defect==='assertion'?'assertion':'product-exception');
+    assert.equal(event.nodeTest.origin,defect==='assertion'?'test/behavior.test.mjs':'service.mjs');
+    const fixed=run('export const lookup=()=>2;',test,command);assert.equal(fixed.exit,0);assert.equal(reproducedFailure(fixed),false);
+   }
+  }
+  for(const reporter of ['tap','spec']){
+   const command=`node --test --test-reporter=${reporter} test/behavior.test.mjs`;
+   // Different failures in separate results: a hook's assertion/source stack
+   // must not validate the unrelated artificial throw, in either order.
+   const hook=`describe('setup',()=>{before(()=>assert.equal(lookup(),99));it('never reached',()=>{});});`;
+   const artificial=`it('artificial',function unrelated(){throw Error('not behavior');});`;
+   for(const suite of [hook+artificial,artificial+hook]){
+    const event=run('export const lookup=()=>2;',`import {before} from 'node:test';describe('mixed',()=>{it('passing',()=>assert.equal(2,2));${suite}});`,command);
+    assert.equal(event.exit,1);assert.equal(reproducedFailure(event),false,JSON.stringify(event));
+   }
+   const mixed=run('export const lookup=()=>null.value;',`describe('mixed',()=>{it('passing',()=>assert.equal(2,2));it('artificial',()=>{throw Error('not behavior');});it('real defect',function checkProduct(){lookup();});});`,command);
+   assert.equal(reproducedFailure(mixed),true,JSON.stringify(mixed));assert.equal(mixed.nodeTest.origin,'service.mjs');
+  }
   for(const [source,test]of positive)for(const command of ['npm test','node --test --test-reporter=tap test/behavior.test.mjs']){
    const event=run(source,test,command);assert.equal(reproducedFailure(event),true,JSON.stringify(event));
    const d={id:'F',decision:'grounded',kind:'behavior',basis:'Public contract requires lookup to return 2',expectedReason:'Original requirement',evidenceCallID:'now'};
@@ -208,9 +234,10 @@ console.log(JSON.stringify({stateContinuityReplay:true,retainedHistoricalForms:2
    ['export const lookup=()=>2;',"test('bad test',()=>{throw Error('ERR_ASSERTION');});"],
    ['export const lookup=()=>2;',"throw Error('setup'); test('contract',()=>lookup());"],
    ['export const lookup=()=>{throw Error("bad setup");};',"import {beforeEach} from 'node:test';beforeEach(()=>lookup());test('contract',()=>assert.equal(1,1));"],
+   ['export const lookup=async()=>{await Promise.resolve();throw Error("async setup");};',"import {beforeEach} from 'node:test';beforeEach(async function namedSetup(){await lookup();});test('contract',()=>assert.equal(1,1));"],
    ["import 'missing-dependency';export const lookup=()=>2;","test('contract',()=>lookup());"]
-  ]){const e=run(source,test);assert.equal(reproducedFailure(e),false,JSON.stringify(e));}
+  ] )for(const reporter of ['tap','spec']){const e=run(source,test,`node --test --test-reporter=${reporter} test/behavior.test.mjs`);assert.equal(reproducedFailure(e),false,JSON.stringify(e));}
   for(const command of ["node -e \"console.log('TypeError AssertionError FAIL not ok')\"","node -e \"console.log('AssertionError');process.exit(1)\"",'missing-native-executable'])assert.equal(reproducedFailure(run('export const lookup=()=>2;',"test('ok',()=>lookup());",command)),false);
-  console.log(JSON.stringify({realNodeTestFailures:true,assertion:true,productException:true,rejectedPromise:true,setupAndUnsupportedEvidenceRejected:true,realProviderCalls:0}));
+  console.log(JSON.stringify({realNodeTestFailures:true,callbackReporterCases:24,mixedResultBoundaries:true,assertion:true,productException:true,rejectedPromise:true,setupAndUnsupportedEvidenceRejected:true,realProviderCalls:0}));
  }finally{fs.rmSync(dir,{recursive:true,force:true});}
 }
