@@ -1,337 +1,74 @@
 import assert from 'node:assert/strict';
-import { finalChecks, productionDiff, reproducedFailure, validateOutput, reviewSchema } from '../lib/native-task-workflow.mjs';
-const check={tool:'bash',state:'completed',exit:0,before:'S',after:'S',callID:'check'};
-assert.equal(finalChecks([check,{before:'S',after:'T'},{before:'T',after:'S'}],{snapshotSha256:'S'}).length,0,'restoring bytes does not restore old verification');
-assert.equal(finalChecks([{before:'S',after:'T'}, {...check,before:'T',after:'T'}],{snapshotSha256:'T'}).length,1);
-for(const event of [{tool:'bash',state:'completed',exit:127,output:'command not found'},{tool:'bash',state:'completed',exit:1,output:'Error: Cannot find module test.mjs'},{tool:'bash',state:'completed',exit:1,output:'SyntaxError: not ok'}]) assert.equal(reproducedFailure(event),false);
-assert.equal(reproducedFailure({tool:'bash',state:'completed',exit:1,output:'not ok 1 - public behavior\nAssertionError: expected 2 actual 1'}),false);
-const source='diff --git a/src/a.mjs b/src/a.mjs\n-source\n+changed\n';
-const test='diff --git a/test/a.test.mjs b/test/a.test.mjs\n-old test\n+new test\n';
-assert.equal(productionDiff({diff:source+test},['test/a.test.mjs']),source);
-assert.throws(()=>productionDiff({diff:source},['src/a.mjs']));
-assert.throws(()=>productionDiff({diff:source},['../private/test/a.test.mjs']));
-assert.throws(()=>validateOutput({findings:[]},reviewSchema));
-assert.throws(()=>validateOutput({findings:[],obligations:[{requirement:'x',status:'safe',evidence:'yes'}],unverified:[],coverageLost:[],checks:[],verificationFiles:[]},reviewSchema));
-console.log(JSON.stringify({passed:true,checks:['verification after final mutation, including reverted bytes','environment failure is not reproduction','production immutable during probe','restricted verification paths','malformed report cannot complete'],providerRequests:0}));
-
-// Exact retained reviewer text is a development regression input, not a new
-// evaluation or rewritten historical result.
-const {runWorkflow, formatSource, conserveFormat, determineOutcome, adaptReview} = await import('../lib/native-task-workflow.mjs');
-const fs = await import('node:fs');
-const result = value => ({info:{finish:'stop'},parts:[{type:'text',text:typeof value==='string'?value:JSON.stringify(value)}]});
-const valid = {findings:[],obligations:[{requirement:'Keep public behavior',status:'delivered',evidence:'actual check'}],unverified:[],evidenceLimitations:[],coverageLost:[],checks:[{callID:'check',purpose:'preservation',basis:'public check'}],proposedVerificationFiles:[]};
-function fake() {
- const saved=new Map(), calls=[];let cancelled=false;
- return {saved,calls,cancel:()=>cancelled=true,capture:()=>({status:'captured',snapshotSha256:'S',diff:'',task:'Keep public behavior'}),save:(n,v)=>saved.set(n,v),checkActive:()=>{if(cancelled)throw Error('cancelled');},aborted:()=>cancelled,events:()=>[check],messages:async()=>[],verificationScope:()=>({allowed:[],rejected:[]}),prompt:async()=>{throw Error('Unexpected research/implementation');}};
-}
-for(const name of ['catalog-cache','dual-config','bookmark-migration','expense-export','lazy-pagination']) {
- const raw=fs.readFileSync(new URL(`./fixtures/native-task-review/${name}.txt`,import.meta.url),'utf8');
- const old=formatSource(raw), before=JSON.stringify(old), io=fake();let scopeCalled=false, reproduction=false, formatCalls=0;
- io.format=async()=>{formatCalls++;throw Error('Forbidden format call for supported legacy');};
- io.verificationScope=paths=>{scopeCalled=true;assert.deepEqual(paths,old.verificationFiles);return{allowed:paths.filter(p=>p.startsWith('test/')),rejected:paths.filter(p=>!p.startsWith('test/'))};};
- io.prompt=async(role,prompt)=>{const payload=JSON.parse(prompt);assert.equal(role,'author');assert.ok(payload.instruction.startsWith('Investigate the concrete'));reproduction=true;assert.deepEqual(payload.review.unverified,old.unverified);throw Error('Reached reproduction boundary');};
- const report=await runWorkflow(io,{initialReview:result(raw),maxRepairs:1});
- const converted=io.saved.get('review-0-adapted.json');
- assert.equal(JSON.stringify(old),before);assert.deepEqual(adaptReview(converted),converted);
- assert.equal(converted.findings.length,old.findings.length);assert.deepEqual(converted.obligations,old.obligations);assert.deepEqual(converted.unverified,old.unverified);assert.deepEqual(converted.proposedVerificationFiles,old.verificationFiles);
- old.findings.forEach((f,i)=>{const c=converted.findings[i];for(const k of ['id','classification','basis','expected'])assert.deepEqual(c[k],f[k]);assert.deepEqual(c.affectedFiles,f.files);assert.equal(c.verification,f.reproduction);assert.equal(c.kind,'unresolved');});
- assert.equal(io.saved.get('review-0-original.json').parts[0].text,raw);
- assert.equal(scopeCalled,old.findings.some(f=>f.classification==='concrete')||old.obligations.some(o=>o.status==='missing')||old.coverageLost.length>0);
- assert.equal(formatCalls,0);assert.equal(reproduction,scopeCalled);assert.ok(!report.stages.some(s=>s.formatOnly));
- if(name==='bookmark-migration'){assert.deepEqual([converted.findings.length,converted.obligations.length,converted.unverified.length,converted.proposedVerificationFiles.length],[2,7,4,8]);assert.equal(reproduction,true);}
-}
-assert.strictEqual(adaptReview(valid),valid);
-const legacyRaw=fs.readFileSync(new URL('./fixtures/native-task-review/bookmark-migration.txt',import.meta.url),'utf8'),legacy=JSON.parse(legacyRaw), adapted=adaptReview(legacy);
-for(const conflict of [{...legacy,proposedVerificationFiles:[]},{...legacy,findings:[{...legacy.findings[0],affectedFiles:[]},legacy.findings[1]]},{...legacy,findings:[{...legacy.findings[0],verification:'different'},legacy.findings[1]]}]){
- const io=fake();io.format=async()=>{assert.fail('Conflict must not call format');};
- const report=await runWorkflow(io,{initialReview:result(conflict)});assert.match(report.failure.message,/Review compatibility conflict/);
-}
-for(const changed of [{...adapted,findings:adapted.findings.slice(1)},{...adapted,unverified:[]},{...adapted,proposedVerificationFiles:[]},{...adapted,findings:adapted.findings.map(f=>({...f,kind:'behavior'}))}])assert.throws(()=>conserveFormat(legacyRaw,changed,reviewSchema));
-// Substantive resolution may establish kind, but unresolved findings cannot
-// admit production repair without actual failing native evidence.
-for(const mode of ['no-evidence','production-mutation','grounded-behavior']){
- const io=fake();let events=[check],mutated=false,repair=false;
- io.events=()=>events;io.format=async()=>{assert.fail('Legacy input must not call format');};
- io.capture=()=>({status:'captured',snapshotSha256:mutated?'T':'S',diff:mutated?source:'',task:'Keep public behavior'});
- io.verificationScope=()=>({allowed:['test/a.test.mjs'],rejected:legacy.verificationFiles});
- io.prompt=async(role,prompt)=>{const p=JSON.parse(prompt);if(p.instruction.startsWith('Investigate')){
-  if(mode==='production-mutation')mutated=true;
-  if(mode==='grounded-behavior')events.push({...check,callID:'failure',exit:1,nodeTest:{runner:'node:test',failed:true},output:'AssertionError: expected 2 actual 1'});
-  return result({dispositions:[{id:'F-001',decision:'grounded',kind:'behavior',basis:'original requirement',expectedReason:'literal requirement',explanation:'investigated',evidenceCallID:'failure'},...['F-002','obligation-0'].map(id=>({id,decision:'unverified',basis:'remaining obligation',explanation:'not resolved'}))],limitations:[]});
- }if(p.instruction.startsWith('Repair ONLY')){repair=true;throw Error('Reached admitted repair');}return result(valid);};
- const report=await runWorkflow(io,{initialReview:result(legacyRaw),maxRepairs:1});assert.equal(repair,mode==='grounded-behavior');
- if(mode==='production-mutation')assert.match(report.failure.message,/Production changed before reproduction/);
-}
-for(const mode of ['missing','repeated','cancel']) {
- const io=fake();const raw=mode==='missing'?JSON.stringify({findings:[]}):JSON.stringify(valid).replace(/}$/,',}');
- io.format=async()=>{io.calls.push('format');if(mode==='cancel')io.cancel();return result(mode==='repeated'?'{broken':valid);};
- const report=await runWorkflow(io,{initialReview:result(raw)});
- assert.equal(io.calls.length,1);assert.notEqual(report.status,'reviewed_delivery');assert.equal(report.status,mode==='cancel'?'cancelled':'incomplete');
- assert.ok(!report.stages.some(s=>s.label.startsWith('repair')||s.label.startsWith('reproduce')));
-}
-assert.equal(determineOutcome({...valid,evidenceLimitations:['Reviewer did not run commands']},[check],{snapshotSha256:'S'}).status,'reviewed_delivery');
-assert.equal(determineOutcome({...valid,unverified:['Consumer not verified']},[check],{snapshotSha256:'S'}).status,'incomplete');
-assert.throws(()=>conserveFormat(JSON.stringify({...valid,findings:[{id:'F',classification:'concrete',basis:'uncertain'}]}),{...valid,findings:[{id:'F',classification:'concrete',kind:'behavior',basis:'uncertain',expected:'invented'}]},reviewSchema));
-console.log(JSON.stringify({passed:true,retainedPilotResponses:5,legacyFormatCalls:0,bookmarkReachesReproduction:true,formatRepairBound:1,missingMeaningFails:true,provenanceSeparated:true,realProviderRequests:0}));
-
-const {probeSchema,prepareFormatSession}=await import('../lib/native-task-workflow.mjs');
-const uncertain={...valid,unverified:['Consumer compatibility was not checked']};
-assert.throws(()=>conserveFormat(JSON.stringify(uncertain),{...uncertain,unverified:[],evidenceLimitations:uncertain.unverified},reviewSchema));
-const behaviorFinding={id:'F',classification:'concrete',kind:'behavior',basis:'public requirement',affectedFiles:['src/value.mjs'],verification:'project test',expected:'2'};
-assert.throws(()=>conserveFormat(JSON.stringify({...valid,findings:[behaviorFinding]}),{...valid,findings:[{...behaviorFinding,kind:'test'}]},reviewSchema));
-const dispositions={dispositions:[{id:'F',decision:'grounded',basis:'public',expectedReason:'literal requirement',explanation:'observed',kind:'behavior',evidenceCallID:'missing'}],limitations:['unverified consumer']};
-for(const altered of [{...dispositions,limitations:[]},{...dispositions,dispositions:[{...dispositions.dispositions[0],evidenceCallID:'real-failed-call'}]},{...dispositions,dispositions:[{...dispositions.dispositions[0],kind:'test'}]}])assert.throws(()=>conserveFormat(JSON.stringify(dispositions),altered,probeSchema));
-for(const boundary of ['create','tools']){
- let cancelled=false,modelRequests=0,registered=false,enter,release;
- const entered=new Promise(r=>enter=r),barrier=new Promise(r=>release=r);
- const checkActive=()=>{if(cancelled)throw Error('cancelled');};
- const pending=(async()=>{await prepareFormatSession({checkActive,create:async()=>{if(boundary==='create'){enter();await barrier;}return{id:'fixture'};},register:()=>registered=true,tools:async()=>{if(boundary==='tools'){enter();await barrier;}return[];}});checkActive();modelRequests++;})();
- await entered;cancelled=true;release();await assert.rejects(pending,/cancelled/);assert.equal(modelRequests,0);assert.equal(registered,true);
-}
-console.log(JSON.stringify({passed:true,formatCannotReclassifyUncertainty:true,admissionEvidenceConserved:true,cancellationBarriers:['session.create','tool.ids'],realProviderRequests:0}));
-
-assert.equal(determineOutcome({...valid,checks:[...valid.checks,{callID:'failed',purpose:'discriminating',basis:'required regression'}]},[check,{...check,callID:'failed',exit:1}],{snapshotSha256:'S'}).status,'incomplete');
-
-const unclearProbe={dispositions:[{id:'F',decision:'unverified',basis:'unclear requirement',explanation:'No expected result established'}],limitations:['Expected behavior unknown']};
-assert.throws(()=>conserveFormat(JSON.stringify(unclearProbe),{...unclearProbe,dispositions:[{...unclearProbe.dispositions[0],decision:'grounded',kind:'behavior',expectedReason:'invented',evidenceCallID:'fiction'}]},probeSchema));
-
-const {assessDispositions}=await import('../lib/native-task-workflow.mjs');
-const rawDisposition=fs.readFileSync(new URL('./fixtures/native-task-review/bookmark-reproduction.txt',import.meta.url),'utf8');
-for(const mode of ['correct-once','omit-other','immediate','wrong-again','print-only','unknown','cancel','budget','permission']) {
- const io=fake();let events=[],state='S',repairs=0,corrections=0,reviews=0,stop=false;
- const originalCapture=io.capture;io.capture=()=>({...originalCapture(),snapshotSha256:state});io.events=()=>events;
- io.format=async()=>assert.fail('Unexpected format request');
- io.checkActive=()=>{if(stop)throw Error(mode==='budget'?'budget exhausted':'cancelled');};io.aborted=()=>stop;
- const failed=()=>{events.push({tool:'write',before:state,after:'T'});state='T';events.push({...check,before:state,after:state,callID:'actual-failure',exit:1,nodeTest:{runner:'node:test',failed:true},output:'AssertionError: expected 2 actual 1'});};
- const dispositions=()=>({dispositions:[{id:'F-001',decision:'grounded',kind:'behavior',basis:'original no data loss requirement',expectedReason:'input fields are data',explanation:'observed failing assertion',evidenceCallID:'actual-failure'},{id:'F-002',decision:'unverified',basis:'test delivery pending',explanation:'not addressed'},{id:'obligation-0',decision:'unverified',basis:'tests pending',explanation:'not addressed'}],limitations:[]});
- io.prompt=async(role,prompt)=>{
-  const p=JSON.parse(prompt);
-  if(p.instruction.startsWith('Investigate')){
-   if(mode==='immediate'){failed();return result(dispositions());}
-   events.push({...check,callID:'current-print',output:'{"sameBytes":true}'});
-   if(mode==='permission')events.push({tool:'bash',state:'error',before:state,after:state,callID:'denied',output:'permission denied',permissionDenied:true});
-   if(['cancel','budget'].includes(mode))stop=true;
-   const d=JSON.parse(rawDisposition);if(mode==='unknown')d.dispositions[0]={...d.dispositions[0],decision:'unverified',expectedReason:''};
-   if(mode==='print-only')d.dispositions.forEach(d=>d.evidenceCallID='current-print');return result(d);
-  }
-  if(p.instruction.startsWith('Correct reproduction evidence')){
-   corrections++;assert.equal(role,'author');assert.equal(p.originalTask,'Keep public behavior');
-   assert.ok(p.admissionDecisions.some(d=>d.reasons.includes(mode==='print-only'?'no_executed_failing_assertion':'evidence_not_in_current_stage')));
-   assert.equal(p.currentEvents[0].callID,'current-print');
-   if(mode==='wrong-again'||mode==='print-only')return result(rawDisposition);
-   failed();const corrected=dispositions();if(mode==='omit-other')corrected.dispositions=corrected.dispositions.slice(0,1);return result(corrected);
-  }
-  if(p.instruction.startsWith('Repair ONLY')){repairs++;events.push({tool:'write',before:state,after:'U'});state='U';events.push({...check,before:state,after:state});return result('repaired');}
-  reviews++;return result({...valid,checks:[{callID:'check',purpose:'discriminating',basis:'final assertion'},{callID:'check',purpose:'preservation',basis:'old tests'}]});
- };
- const report=await runWorkflow(io,{initialReview:result(legacyRaw),maxRepairs:1});
- assert.equal(repairs,['correct-once','immediate','omit-other'].includes(mode)?1:0,mode);
- assert.equal(corrections,['correct-once','omit-other','wrong-again','print-only'].includes(mode)?1:0,mode);
- if(repairs)assert.equal(report.status,mode==='omit-other'?'incomplete':'reviewed_delivery',JSON.stringify(report));
- if(mode==='omit-other')assert.equal(report.unresolvedDispositions.length,2);
- assert.ok(report.evidenceCorrections<=1);assert.equal(io.saved.get('D0.json').snapshotSha256,'S');
-}
-for(const [event,reason]of [[{...check,callID:'e',before:'OLD'},'evidence_wrong_file_state'],[{...check,callID:'e',state:'error'},'command_not_completed'],[{...check,callID:'e',exit:1,output:'ENOENT'},'environment_failure'],[{...check,callID:'e',output:'grounded expected AssertionError'},'no_executed_failing_assertion']]){
- const a=assessDispositions([behaviorFinding],[{id:'F',decision:'grounded',kind:'behavior',basis:'task',expectedReason:'task',evidenceCallID:'e'}],[event],{snapshotSha256:'S'});assert.ok(a[0].reasons.includes(reason));assert.equal(a[0].admitted,false);
-}
-console.log(JSON.stringify({passed:true,evidenceCorrectionLimit:1,replayRepairAndFinalChecks:true,currentEvidenceReasons:true,realProviderRequests:0}));
-
-const {nativePermissionDenial}=await import('../lib/native-task-workflow.mjs');
-for(const name of ['permissions.mjs','rejected-events.test.mjs','protected-fields.mjs']) {
- const output=`File not found: /repo/src/${name}`;
- assert.equal(nativePermissionDenial(output),false);
- const io=fake();let calls=0;const originalCapture=io.capture;io.capture=()=>({...originalCapture(),snapshotSha256:calls?'T':'S'});const events=[{tool:'read',state:'error',callID:'missing',before:'S',after:'S',output}, {...check,callID:'failure',exit:1,nodeTest:{runner:'node:test',failed:true},output:'AssertionError: expected 2 actual 1'}];
- io.events=()=>events;io.format=async()=>assert.fail('No format');io.prompt=async(role,prompt)=>{const p=JSON.parse(prompt);if(p.instruction.startsWith('Investigate')){events.push({...events[0],callID:'missing-current'},{...events[1],callID:'failure-current'});return result({dispositions:[{id:'F',decision:'grounded',kind:'behavior',basis:'task',expectedReason:'literal task',explanation:'assertion',evidenceCallID:'failure-current'}],limitations:[]});}if(p.instruction.startsWith('Repair ONLY')){calls++;events.push({tool:'write',before:'S',after:'T'},{...check,before:'T',after:'T'});return result('done');}return result({...valid,checks:[...valid.checks,{callID:'check',purpose:'discriminating',basis:'final assertion'}]});};
- const report=await runWorkflow(io,{initialReview:result({...valid,findings:[behaviorFinding] }),maxRepairs:1});assert.equal(calls,1);assert.equal(report.evidenceCorrections,0);assert.equal(report.status,'reviewed_delivery');
-}
-assert.equal(nativePermissionDenial('The user rejected permission to use this specific tool call.'),true);
-assert.equal(nativePermissionDenial('The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules [{"permission":"bash","pattern":"node *","action":"deny"}]'),true);
-assert.equal(nativePermissionDenial('File not found: The user rejected permission to use this specific tool call.'),false);
-
-// State continuity replay: original null endpoints are never rewritten.
-const {stateTransition}=await import('../lib/native-task-workflow.mjs');
-for(const name of ['transactional-settings','document-backup']){
- const retained=JSON.parse(fs.readFileSync(new URL(`./fixtures/native-task-state/${name}.json`,import.meta.url)));
- const original=JSON.stringify(retained);
- const current={snapshotSha256:retained.snapshotSha256};
- assert.equal(determineOutcome(retained.review,retained.events,current).status,'incomplete','Old logs alone cannot prove rejection provenance');
- // This augmentation simulates the independently tested current host path;
- // it is explicitly separate from immutable historical events.
- const replay=retained.events.map(e=>e.before===null&&e.state==='error'&&e.output==='Mutation/check tools must execute sequentially; source reads may run together'
-   ? {...e,stateObservation:{basis:'host-rejected-before-execution',snapshot:e.after}} : e);
- assert.equal(determineOutcome(retained.review,replay,current).status,'reviewed_delivery');
- assert.equal(JSON.stringify(retained),original);
-}
-const rejected={callID:'blocked',tool:'bash',state:'error',before:null,after:'S',stateObservation:{basis:'host-rejected-before-execution',snapshot:'S'}};
-for(const kind of ['behavior','test','documentation']){
- const e={...check,callID:'current',...(kind==='behavior'?{exit:1,nodeTest:{runner:'node:test',failed:true},output:'AssertionError: expected 2 actual 1'}:kind==='documentation'?{tool:'read',output:'Required docs'}:{})};
- const f={...behaviorFinding,kind},d={id:'F',kind,decision:'grounded',basis:'Original task',expectedReason:'Original task',evidenceCallID:e.callID};
- for(const [tail,ok]of [[[rejected],true],[[{...rejected,stateObservation:undefined}],false],[[{...rejected,stateObservation:{basis:'model-says-unchanged',snapshot:'S'}}],false],[[{...rejected,after:'T'}],false],[[{before:'S',after:'T'},{before:'T',after:'S'}],false],[[{before:'S',after:'T'}],false],[[{...rejected,permissionDenied:true}],false],[[{...rejected,scopeViolation:true}],false],[[{...rejected,cancelled:true}],false]]){
-  const events=[e,...tail];assert.equal(assessDispositions([f],[d],events,{snapshotSha256:'S'})[0].admitted,ok,kind+JSON.stringify(tail));
-  const report={...valid,checks:[{callID:e.callID,purpose:kind==='documentation'?'documentation':'preservation',basis:'Task check'}]};
-  if(kind!=='behavior')assert.equal(determineOutcome(report,events,{snapshotSha256:'S'}).status,ok?'reviewed_delivery':'incomplete');
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import {spawnSync} from 'node:child_process';
+import {prepareObservations,commandWords} from '../lib/native-task-observations.mjs';
+import {runWorkflow,nativePermissionDenial,stateTransition} from '../lib/native-task-workflow.mjs';
+import {reviewContext} from '../lib/native-review-context.mjs';
+import {materializeNativeTemplate} from '../lib/native-template.mjs';
+const temp=fs.mkdtempSync(path.join(os.tmpdir(),'native-d-check-'));
+const rules=[{permission:'read',pattern:'*',action:'allow'}];
+const run=(cwd,args)=>{const r=spawnSync('git',args,{cwd,encoding:'utf8'});assert.equal(r.status,0,r.stderr);return r.stdout.trim();};
+try {
+ const bundle=path.join(temp,'bundle');materializeNativeTemplate({repositoryRoot:path.resolve('.'),outputDirectory:bundle,task:true,review:true});
+ const config=JSON.parse(fs.readFileSync(path.join(bundle,'opencode.json')));
+ assert.ok(config.command['harness-review']);assert.ok(config.command['harness-task']);assert.equal(config.agent['harness-task-reviewer'],undefined);
+ for(const mode of ['correct','fail','stale','revert','unknown','echo','coverage','move','deny','cancel','unavailable']){
+  const dir=path.join(temp,mode);fs.mkdirSync(dir);const artifacts=path.join(dir,'.artifacts');
+  const original="import {test} from 'node:test';import assert from 'node:assert/strict';test('kept name',()=>{assert.equal(1,1);assert.equal(2,2);});\n";
+  fs.writeFileSync(path.join(dir,'legacy.test.mjs'),original);fs.writeFileSync(path.join(dir,'package.json'),JSON.stringify({scripts:{test:'node --test'}}));fs.writeFileSync(path.join(dir,'.gitignore'),'.artifacts\n');
+  run(dir,['init','-q']);run(dir,['add','.']);run(dir,['-c','core.hooksPath=/dev/null','-c','user.name=Fixture','-c','user.email=fixture@local','commit','-qm','base']);fs.mkdirSync(artifacts);
+  const observe=prepareObservations({directory:dir,artifacts,permissionRules:rules});let state='S',events=[],prompts=[],aborted=false;
+  const capture=()=>({...reviewContext({cwd:dir,base:'HEAD',permissionRules:rules}),snapshotSha256:state,task:'Keep independent scenarios; replace only explicitly requested expectation.'});
+  const check=()=>{const r=spawnSync(process.execPath,['--test'],{cwd:dir,encoding:'utf8'});events.push({tool:'bash',callID:'call-'+events.length,state:'completed',args:{command:'node --test'},exit:r.status,output:r.stdout+r.stderr,before:state,after:state});};
+  const mutate=bytes=>{fs.writeFileSync(path.join(dir,'legacy.test.mjs'),bytes);const before=state;state+='T';events.push({tool:'write',state:'completed',before,after:state});};
+  const io={capture,observe:s=>observe(events,s),save:(n,v)=>fs.writeFileSync(path.join(artifacts,n),typeof v==='string'?v:JSON.stringify(v)),aborted:()=>aborted,
+   checkActive:()=>{if(aborted)throw Error('cancelled');if(events.some(e=>e.permissionDenied))throw Error('permission denied');},messages:async()=>[],
+   prompt:async(role,prompt)=>{assert.equal(role,'author');prompts.push(prompt);
+    if(prompts.length===1){
+     if(mode==='fail')mutate(original.replace('1,1','1,2'));
+     if(mode==='coverage')mutate(original.replace('assert.equal(2,2);',''));
+     if(mode==='move'){fs.renameSync(path.join(dir,'legacy.test.mjs'),path.join(dir,'new.test.mjs'));events.push({tool:'bash',before:state,after:'T'});state='T';}
+     if(mode==='deny')events.push({permissionDenied:true});
+     if(mode==='cancel')aborted=true;
+     if(mode==='echo')events.push({tool:'bash',args:{command:'echo ok'},state:'completed',exit:0,before:state,after:state});
+     else if(mode!=='unavailable')check();
+     if(mode==='stale')mutate(original+'// edit\n');
+     if(mode==='revert'){mutate(original+'// edit\n');mutate(original);state='S';}
+     if(mode==='unknown')events.push({tool:'read',state:'error',before:null,after:state});
+    }else {
+     const feedback=JSON.parse(prompt);assert.ok(feedback.observations.reasons.length);assert.ok(feedback.originalTask);
+     if(mode==='fail'){assert.equal(feedback.observations.latestChecks[0].exit,1);mutate(original);check();}
+     if(mode==='coverage'){assert.ok(feedback.observations.testChanges[0].before.includes('2,2'));assert.ok(feedback.observations.checksCurrent);mutate(original);check();}
+     if(mode==='move'){assert.equal(feedback.observations.testChanges[0].after,null);assert.equal(feedback.observations.addedTests[0].content,original);}
+     if(['stale','revert','unknown'].includes(mode))check();
+    }
+    return {info:{finish:'stop',id:'message-'+prompts.length},parts:[{type:'text',text:'Ordinary prose; no JSON IDs'}]};
+   }};
+  const result=await runWorkflow(io);assert.ok(prompts.length<=2);
+  assert.equal(result.repairs,['correct','deny','cancel'].includes(mode)?0:1,mode);
+  assert.equal(result.status,mode==='cancel'?'cancelled':['echo','unavailable','deny'].includes(mode)?'incomplete':'checks_passed',JSON.stringify(result));
  }
- assert.equal(assessDispositions([f],[{...d,evidenceCallID:'blocked'}],[e,rejected],{snapshotSha256:'S'})[0].admitted,false,'Error cannot itself be evidence');
-}
-assert.equal(stateTransition(rejected),'unchanged');assert.equal(stateTransition({...rejected,stateObservation:undefined}),'unknown');assert.equal(stateTransition({before:'S',after:'T'}),'changed');
-assert.equal(assessDispositions([behaviorFinding],[{id:'F',kind:'behavior',decision:'grounded',basis:'Task',expectedReason:'Task',evidenceCallID:'print'}],[{...check,callID:'print',output:'2'},rejected],{snapshotSha256:'S'})[0].admitted,false);
-console.log(JSON.stringify({stateContinuityReplay:true,retainedHistoricalForms:2,realProviderRequests:0}));
-
-// Real Node child processes: output is collected from the runner, never a
-// hand-labelled failure. Synthetic journal tests above cover the state machine.
-{
- const fs=await import('node:fs'),os=await import('node:os'),path=await import('node:path');
- const {spawnSync}=await import('node:child_process');
- const {observeNodeTest,assessDispositions}=await import('../lib/native-task-workflow.mjs');
- const dir=fs.mkdtempSync(path.join(os.tmpdir(),'node-failure-evidence-'));
- try{
-  fs.mkdirSync(path.join(dir,'test'));fs.writeFileSync(path.join(dir,'package.json'),JSON.stringify({scripts:{test:'node --test test/*.test.mjs'}}));
-  const run=(source,test,command='npm test')=>{
-   fs.writeFileSync(path.join(dir,'service.mjs'),source);
-   fs.writeFileSync(path.join(dir,'test','behavior.test.mjs'),"import {test,it,describe} from 'node:test'; import assert from 'node:assert/strict'; import {lookup} from '../service.mjs';\n"+test);
-   const r=spawnSync('bash',['-c',command],{cwd:dir,encoding:'utf8'});
-   const e={tool:'bash',state:'completed',exit:r.status,args:{command,workdir:dir},output:r.stdout+r.stderr,callID:'now',before:'S',after:'S'};
-   e.nodeTest=observeNodeTest(e,dir);return e;
-  };
-  const positive=[['export const lookup=()=>{throw Object.assign(Error("domain operation failed"),{code:"ENOENT"});};',"test('contract',()=>assert.equal(lookup(),2));"],['export const lookup=()=>1;',"test('contract',()=>assert.equal(lookup(),2));"],['export const lookup=()=>null.value;',"test('contract',()=>assert.equal(lookup(),2));"],['export const lookup=async()=>{throw Error("rejected");};',"test('contract',async()=>assert.equal(await lookup(),2));"]];
-  for(const named of [false,true])for(const nested of [false,true])for(const defect of ['assertion','exception','rejection']){
-   const source=defect==='assertion'?'export const lookup=()=>1;':defect==='exception'?'export const lookup=()=>null.value;':'export const lookup=async()=>{await Promise.resolve();throw Error("rejected");};';
-   const async=defect==='rejection';
-   const callback=`${async?'async ':''}${named?'function namedContract()':'() =>'} { assert.equal(${async?'await ':''}lookup(),2); }`;
-   const test=nested?`describe('group',()=>{it('contract',${callback});});`:`test('contract',${callback});`;
-   for(const reporter of ['tap','spec']){
-    const command=`node --test --test-reporter=${reporter} test/behavior.test.mjs`;
-    const event=run(source,test,command);assert.equal(reproducedFailure(event),true,JSON.stringify({named,nested,defect,reporter,event}));
-    assert.equal(event.nodeTest.failure,defect==='assertion'?'assertion':'product-exception');
-    assert.equal(event.nodeTest.origin,defect==='assertion'?'test/behavior.test.mjs':'service.mjs');
-    const fixed=run('export const lookup=()=>2;',test,command);assert.equal(fixed.exit,0);assert.equal(reproducedFailure(fixed),false);
-   }
-  }
-  for(const reporter of ['tap','spec']){
-   const command=`node --test --test-reporter=${reporter} test/behavior.test.mjs`;
-   // Different failures in separate results: a hook's assertion/source stack
-   // must not validate the unrelated artificial throw, in either order.
-   const hook=`describe('setup',()=>{before(()=>assert.equal(lookup(),99));it('never reached',()=>{});});`;
-   const artificial=`it('artificial',function unrelated(){throw Error('not behavior');});`;
-   for(const suite of [hook+artificial,artificial+hook]){
-    const event=run('export const lookup=()=>2;',`import {before} from 'node:test';describe('mixed',()=>{it('passing',()=>assert.equal(2,2));${suite}});`,command);
-    assert.equal(event.exit,1);assert.equal(reproducedFailure(event),false,JSON.stringify(event));
-   }
-   const mixed=run('export const lookup=()=>null.value;',`describe('mixed',()=>{it('passing',()=>assert.equal(2,2));it('artificial',()=>{throw Error('not behavior');});it('real defect',function checkProduct(){lookup();});});`,command);
-   assert.equal(reproducedFailure(mixed),true,JSON.stringify(mixed));assert.equal(mixed.nodeTest.origin,'service.mjs');
-  }
-  for(const [source,test]of positive)for(const command of ['npm test','node --test --test-reporter=tap test/behavior.test.mjs']){
-   const event=run(source,test,command);assert.equal(reproducedFailure(event),true,JSON.stringify(event));
-   const d={id:'F',decision:'grounded',kind:'behavior',basis:'Public contract requires lookup to return 2',expectedReason:'Original requirement',evidenceCallID:'now'};
-   assert.equal(assessDispositions([{id:'F',kind:'behavior'}],[d],[event],{snapshotSha256:'S'})[0].admitted,true);
-   for(const changed of [{...d,decision:'unverified'},{...d,basis:''},{...d,evidenceCallID:'historical'}])assert.equal(assessDispositions([{id:'F',kind:'behavior'}],[changed],[event],{snapshotSha256:'S'})[0].admitted,false);
-   for(const changed of [{...event,after:'OLD'},{...event,permissionDenied:true},{...event,state:'error'}])assert.equal(assessDispositions([{id:'F',kind:'behavior'}],[d],[changed],{snapshotSha256:'S'})[0].admitted,false);
-   assert.equal(reproducedFailure(run('export const lookup=()=>2;',test,command)),false);
-  }
-  for(const [source,test]of [
-   ['export const lookup=()=>{throw TypeError("documented");};',"test('contract',()=>assert.throws(lookup,TypeError));"],
-   ['export const lookup=async()=>{throw Error("documented");};',"test('contract',async()=>assert.rejects(lookup));"],
-   ['export const lookup=()=>2;',"test('bad test',()=>{throw TypeError('artificial');});"],
-   ['export const lookup=()=>2;',"test('bad test',()=>{throw Error('ERR_ASSERTION');});"],
-   ['export const lookup=()=>2;',"throw Error('setup'); test('contract',()=>lookup());"],
-   ['export const lookup=()=>{throw Error("bad setup");};',"import {beforeEach} from 'node:test';beforeEach(()=>lookup());test('contract',()=>assert.equal(1,1));"],
-   ['export const lookup=async()=>{await Promise.resolve();throw Error("async setup");};',"import {beforeEach} from 'node:test';beforeEach(async function namedSetup(){await lookup();});test('contract',()=>assert.equal(1,1));"],
-   ["import 'missing-dependency';export const lookup=()=>2;","test('contract',()=>lookup());"]
-  ] )for(const reporter of ['tap','spec']){const e=run(source,test,`node --test --test-reporter=${reporter} test/behavior.test.mjs`);assert.equal(reproducedFailure(e),false,JSON.stringify(e));}
-  for(const command of ["node -e \"console.log('TypeError AssertionError FAIL not ok')\"","node -e \"console.log('AssertionError');process.exit(1)\"",'missing-native-executable'])assert.equal(reproducedFailure(run('export const lookup=()=>2;',"test('ok',()=>lookup());",command)),false);
-  console.log(JSON.stringify({realNodeTestFailures:true,callbackReporterCases:24,mixedResultBoundaries:true,assertion:true,productException:true,rejectedPromise:true,setupAndUnsupportedEvidenceRejected:true,realProviderCalls:0}));
- }finally{fs.rmSync(dir,{recursive:true,force:true});}
-}
-
-// Missing original production work shares the same two correcting rounds.
-for(const mode of ['delivery','unsupported','complete','no-progress','limit','permission','cancel']){
- const io=fake();let state='S',events=[check],continuations=0,reviews=0;
- io.capture=()=>({status:'captured',snapshotSha256:state,diff:state==='S'?'':source,task:'Connect the CLI to the parser; add a consumer regression. Preserve legacy behavior.'});
- io.events=()=>events;
- const missing={...valid,obligations:[{requirement:'Connect CLI to parser',status:'missing',evidence:'cli.mjs still uses its old implementation'}]};
- io.prompt=async(role,prompt)=>{
-  const p=JSON.parse(prompt);
-  if(p.instruction.startsWith('Investigate')){
-   const read={tool:'read',state:'completed',before:state,after:state,callID:'inspect-'+state,output:'CLI still disconnected'};events.push(read);
-   if(mode==='permission')events.push({...read,permissionDenied:true});
-   if(mode==='cancel')io.cancel();
-   return result({dispositions:[{id:'obligation-0',decision:mode==='unsupported'?'rejected':'grounded',kind:'implementation',basis:'Original task explicitly requires the CLI consumer',expectedReason:'Finish the existing requested entry point',explanation:'Parser exists; CLI still calls old code',affectedFiles:['cli.mjs'],evidenceCallID:read.callID}],limitations:[]});
-  }
-  if(p.instruction.startsWith('Continue ONLY')){
-   continuations++;assert.equal(role,'author');assert.ok(p.originalTask.includes('Connect the CLI'));assert.equal(p.missingImplementation[0].affectedFiles[0],'cli.mjs');assert.equal(p.current.snapshotSha256,state);assert.ok(p.toolEvidence.length);
-   if(mode!=='no-progress'){const before=state;state='T'+continuations;events.push({tool:'write',before,after:state});events.push({...check,callID:'check-'+state,before:state,after:state});}
-   return result('Continued implementation');
-  }
-  reviews++;return result(mode==='limit'?missing:{...valid,checks:[{callID:p.executedChecks.findLast(e=>e.current&&e.exit===0).ref,purpose:'discriminating',basis:'consumer regression'},{callID:p.executedChecks.findLast(e=>e.current&&e.exit===0).ref,purpose:'preservation',basis:'legacy coverage'}]});
- };
- const report=await runWorkflow(io,{initialReview:result(mode==='complete'?valid:missing)});
- assert.equal(continuations,mode==='limit'?2:['delivery','no-progress'].includes(mode)?1:0,mode);
- assert.equal(report.implementationContinuations,continuations);assert.ok(report.repairs<=2);
- if(mode==='delivery')assert.equal(report.status,'reviewed_delivery',JSON.stringify(report));
- if(mode==='no-progress')assert.ok(report.limits.some(x=>x.includes('No file progress')));
- if(mode==='limit'){assert.equal(report.status,'incomplete');assert.ok(report.remaining.length);}
- if(mode==='cancel')assert.equal(report.status,'cancelled');
-}
-{
- const d={id:'F',decision:'grounded',kind:'implementation',basis:'original task',expectedReason:'basis',explanation:'missing path',affectedFiles:['cli.mjs'],evidenceCallID:'read'};
- const e={tool:'read',state:'completed',callID:'read',before:'S',after:'S'};
- for(const kind of ['behavior','unresolved'])assert.equal(assessDispositions([{id:'F',kind}],[d],[e],{snapshotSha256:'S'})[0].admitted,false);
- assert.equal(assessDispositions([{id:'F',kind:'delivery'}],[{...d,affectedFiles:[]}],[e],{snapshotSha256:'S'})[0].admitted,false);
-}
-console.log(JSON.stringify({originalImplementationContinuation:true,commonTwoCycleLimit:true,behaviorCannotRelabel:true,missingDispositionsRetained:true,realProviderCalls:0}));
-
-// Review selections are a view of native events, never replacement execution.
-const {reviewEvidence, resolveReviewEvidence} = await import('../lib/native-task-workflow.mjs');
-{
- const events=[{...check,args:{command:'npm test'}},{...check,callID:'again',args:{command:'npm test'}}];
- const catalog=reviewEvidence(events,{snapshotSha256:'S'},'workflow-one-review-zero');
- const selection=ref=>({...valid,checks:[{callID:ref,purpose:'preservation',basis:'Public suite'}]});
- const bind=(ref,rows=catalog)=>resolveReviewEvidence(selection(ref),rows);
- assert.notEqual(catalog[0].ref,catalog[1].ref);
- assert.equal(bind(catalog[1].ref).review.checks[0].callID,'again');
- assert.equal(bind(catalog[1].ref).bindings[0].eventIndex,1);
- assert.equal(determineOutcome(bind(catalog[1].ref).review,events,{snapshotSha256:'S'}).status,'reviewed_delivery');
- for(const ref of ['unknown',catalog[1].ref+'x',reviewEvidence(events,{snapshotSha256:'S'},'other-workflow')[1].ref]) {
-  assert.equal(bind(ref).bindings[0].eventIndex,null);
-  assert.equal(determineOutcome(bind(ref).review,events,{snapshotSha256:'S'}).status,'incomplete');
+ // Independent review counterexamples: a new smoke is not the required route,
+ // Node root names and pure additions still receive scenario assessment.
+ for(const filename of ['test.js','test-legacy.js','legacy.test.mjs']) {
+  const dir=path.join(temp,'counter-'+filename);fs.mkdirSync(dir);const artifacts=path.join(dir,'.artifacts');fs.mkdirSync(artifacts);
+  const original="import {test} from 'node:test';import assert from 'node:assert/strict';\ntest('two independent scenarios',()=>{\nassert.equal(1,1);\nassert.equal(2,2);\n});\n";
+  fs.writeFileSync(path.join(dir,filename),original);fs.writeFileSync(path.join(dir,'package.json'),JSON.stringify({type:'module',scripts:{test:'node --test '+filename}}));fs.writeFileSync(path.join(dir,'.gitignore'),'.artifacts\n');
+  run(dir,['init','-q']);run(dir,['add','.']);
+  const observe=prepareObservations({directory:dir,artifacts,permissionRules:rules});
+  fs.writeFileSync(path.join(dir,'scratch.test.mjs'),"import {test} from 'node:test';test('smoke',()=>{});");
+  const executed=command=>{const r=spawnSync(process.execPath,command.split(' ').slice(1),{cwd:dir,encoding:'utf8'});return{tool:'bash',state:'completed',args:{command},exit:r.status,output:r.stdout+r.stderr,before:'S',after:'S'};};
+  assert.equal(observe([executed('node --test scratch.test.mjs')],{snapshotSha256:'S'}).checksCurrent,false);
+  fs.writeFileSync(path.join(dir,filename),original.replace('assert.equal(2,2);','return;\nassert.equal(2,2);'));
+  const facts=observe([executed('node --test '+filename)],{snapshotSha256:'S'});
+  assert.equal(facts.checksCurrent,true);assert.ok(facts.testChanges.length);assert.equal(facts.testChanges[0].removedOrChangedLines,false);assert.ok(facts.reasons.some(r=>r.includes('test/fixture')));
  }
- for(const changed of [events.map(e=>({...e,exit:1})),events.map(e=>({...e,state:'running'})),[...events,{before:'S',after:'T'},{before:'T',after:'S'}]]) {
-  const rows=reviewEvidence(changed,{snapshotSha256:'S'},'new-review');
-  assert.equal(determineOutcome(bind(rows[0].ref,rows).review,changed,{snapshotSha256:'S'}).status,'incomplete');
- }
- assert.equal(determineOutcome(bind(catalog[0].ref).review,[...events,{before:'S',after:'T'}],{snapshotSha256:'T'}).status,'incomplete');
- const missing={...selection(catalog[0].ref),obligations:[{requirement:'Required consumer',status:'missing',evidence:'Not delivered'}]};
- assert.equal(determineOutcome(resolveReviewEvidence(missing,catalog).review,events,{snapshotSha256:'S'}).status,'incomplete');
- const io=fake();let authorCalls=0,reviewCalls=0;
- io.events=()=>events;
- io.prompt=async(role,prompt)=>{if(role==='author'){authorCalls++;return result('Done');}reviewCalls++;const p=JSON.parse(prompt);assert.ok(p.executedChecks.length===2);return result(selection(p.executedChecks[1].ref));};
- const report=await runWorkflow(io,{maxRepairs:0});
- assert.equal(report.status,'reviewed_delivery');assert.equal(authorCalls,1);assert.equal(reviewCalls,1);
- assert.equal(report.review.checks[0].callID,'again');
- const original=JSON.parse(io.saved.get('review-0-original.json').parts[0].text);
- assert.notEqual(original.checks[0].callID,'again');
- assert.equal(io.saved.get('review-0-bindings.json').bindings[0].callID,'again');
- assert.equal(events.length,2,'Selecting a reference must not execute the command again');
-}
-console.log(JSON.stringify({passed:true,reviewEvidenceReferences:true,realProviderRequests:0}));
-
-// Retained seat/Map events: new choices are a separate implementation replay.
-for (const replay of JSON.parse(fs.readFileSync(new URL('./fixtures/native-task-review/evidence-selection.json',import.meta.url)))) {
- const original=JSON.stringify(replay.review);
- assert.equal(determineOutcome(replay.review,replay.events,replay.snapshot).status,replay.historicalStatus);
- const catalog=reviewEvidence(replay.events,replay.snapshot,'new-selection-replay');
- const selected={...replay.review,checks:replay.review.checks.map((check,i)=>({...check,callID:catalog.find(row=>row.eventIndex===replay.newSelectionEventIndices[i]).ref}))};
- const binding=resolveReviewEvidence(selected,catalog);
- assert.equal(determineOutcome(binding.review,replay.events,replay.snapshot).status,'reviewed_delivery');
- assert.deepEqual(binding.bindings.map(b=>b.eventIndex),replay.newSelectionEventIndices);
- assert.equal(JSON.stringify(replay.review),original,'Historical answer and status stay unchanged');
-}
-console.log(JSON.stringify({passed:true,retainedSeatAndMapSelectionReplay:2,realProviderRequests:0}));
-
-{
- const duplicate=reviewEvidence([check,{...check,exit:1}],{snapshotSha256:'S'},'duplicate');
- assert.equal(resolveReviewEvidence({...valid,checks:[{...valid.checks[0],callID:duplicate[1].ref}]},duplicate).bindings[0].resolved,false);
- const io=fake(),events=[check];io.events=()=>events;
- io.prompt=async(role)=>{if(role==='author')return result('Done');events.push({...check,tool:'read',callID:'review-doc'});return result({...valid,checks:[{callID:'review-doc',purpose:'documentation',basis:'Read delivered documentation in this review'}]});};
- assert.equal((await runWorkflow(io,{maxRepairs:0})).status,'reviewed_delivery');
-}
+ {let captured=0;const report=await runWorkflow({checkActive:()=>{},save:()=>{},aborted:()=>false,messages:async()=>[],prompt:async()=>({info:{finish:'stop'},parts:[]}),capture:()=>({status:'captured',snapshotSha256:++captured<3?'checked':'changed',diff:'',task:'task'}),observe:()=>({reasons:[],limits:[],testChanges:[],checksCurrent:true})});assert.equal(report.status,'incomplete');assert.ok(report.limits.some(l=>l.includes('Final snapshot changed')));}
+ assert.equal(nativePermissionDenial('The user rejected permission to use this specific tool call.'),true);
+ assert.equal(nativePermissionDenial('File not found: The user rejected permission to use this specific tool call.'),false);
+ assert.equal(stateTransition({state:'error',before:null,after:'S',stateObservation:{basis:'host-rejected-before-execution',snapshot:'S'}}),'unchanged');
+ for(const cmd of ['echo hi','node --test; echo ok','node --test $(whoami)','node --test `pwd`'])if(cmd!=='echo hi')assert.equal(commandWords(cmd),null);
+ console.log(JSON.stringify({passed:true,realTemporaryFiles:true,nativeStateAndPermissions:true,oneCorrectionBound:true,realProviderRequests:0}));
+} finally {fs.rmSync(temp,{recursive:true,force:true});}

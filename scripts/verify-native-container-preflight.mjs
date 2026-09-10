@@ -24,9 +24,9 @@ try{
  const result=await runOpenCode(session,{config,task:fs.readFileSync(path.join(info.project,'TASK.md'),'utf8'),enabled:true,model:'local-fixture/fixture',variant:'low',limitMs:900000,command:'harness-task'});
  assert.equal(result.exitCode,0,result.stderr);assert.equal(result.termination.terminationVerified,true);
  const evidence=session.exec(['node','-e',"const fs=require('fs'),p='/work/repo/.git/harness-task';const ids=fs.readdirSync(p);if(ids.length!==1)throw Error('Expected one workflow');const dir=p+'/'+ids[0];console.log(JSON.stringify({report:JSON.parse(fs.readFileSync(dir+'/result.json')),files:fs.readdirSync(dir),events:JSON.parse(fs.readFileSync(dir+'/tool-events.json'))}));"]);assert.equal(evidence.status,0,evidence.stderr);
- const saved=JSON.parse(evidence.stdout);assert.equal(saved.report.status,'reviewed_delivery',JSON.stringify(saved.report));assert.ok(saved.files.includes('D0.patch'));assert.ok(saved.files.includes('terminal.patch'));
+ const saved=JSON.parse(evidence.stdout);assert.equal(saved.report.status,'checks_passed',JSON.stringify(saved.report));assert.ok(saved.files.includes('D0.patch'));assert.ok(saved.files.includes('terminal.patch'));
  for(const tool of ['read','glob','edit','bash'])assert.ok(saved.events.some(e=>e.tool===tool&&e.state==='completed'),tool);
- assert.ok(saved.events.some(e=>e.tool==='bash'&&e.exit===0));assert.ok(saved.report.stages.some(s=>s.role==='author'));assert.ok(saved.report.stages.some(s=>s.role==='reviewer'));
+ assert.ok(saved.events.some(e=>e.tool==='bash'&&e.exit===0));assert.ok(saved.report.stages.some(s=>s.role==='author'));assert.ok(saved.report.stages.every(s=>s.role==='author'));assert.equal(saved.report.repairs,0);
  assert.equal(captureCandidate(session,root).status,0);
  fs.writeFileSync(path.join(root,'preflight-result.json'),JSON.stringify({status:'passed',requests,realProviderCalls:0,elapsedMs:result.elapsedMs,terminationVerified:true,report:saved.report},null,2));
  console.log(JSON.stringify({containerPreflight:'passed',scriptedRequests:requests,realProviderCalls:0,elapsedMs:result.elapsedMs}));

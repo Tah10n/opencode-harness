@@ -1,165 +1,30 @@
-# Native task workflow implementation notes
+# Native task D implementation
 
-Base: PR #24, `1e54e21018e340191e69a8f9427ccf8e3330bfcd`.
+The installed path targets the verified OpenCode 1.18.26 native plugin/session API.
+`command.execute.before` cannot complete a command by itself, so a bootstrap turn
+invokes the single armed `harness_task` tool. Its child is one native author
+session, reused only when a factual corrective pass is warranted. Bootstrap and
+summary requests count in the total task deadline.
 
-The implementation targets installed OpenCode 1.18.26. Its versioned
-`packages/plugin/src/index.ts`, `tool.ts`, `packages/opencode/src/session/prompt.ts`
-and `tool/task.ts` were inspected before implementation. A command hook cannot
-return a completed command: native command execution always calls prompt after
-`command.execute.before`. The hook also runs after command argument shell
-expansion. Consequently the entry point takes no command arguments; the original
-requirement is supplied once in `HARNESS_TASK_FILE`, as with diagnostic review.
+`native-task-plugin.mjs` retains native permissions, sequential mutation/check
+admission, before/after snapshots, cancellation and isolated Git worktree creation.
+It no longer creates reviewer, reproduction or format sessions. Project-absolute
+permission patterns that cannot be safely relocated are refused. The captured
+original task is reused rather than reread from an external path by the child.
 
-An opt-in plugin exposes one workflow-control tool. It does not expose repository
-operations, a check runner, provider transport, or a repair CLI. The command's
-initial native turn must invoke this tool; other parent tools are refused while
-that command is armed. A missing invocation is an incomplete workflow, not a
-successful task. This bootstrap and final summarization consume native requests
-and count in the B budget.
+`native-task-observations.mjs` performs bounded, permission-checked file reads and
+Git diffs only. It retains initial tests/fixtures and package configuration, binds
+native check events to supported initial routes and final snapshots, and exposes
+exact changes without deciding semantic equivalence. Unsupported commands remain
+unverified. New verification is performed through the author's existing native
+tools; the host does not run candidate code or execute model report strings.
 
-The tool invokes native session APIs sequentially for implementation, separate
-review, reproduction and repair. The tool's native abort signal propagates to
-active child sessions. There are no idle listeners, background triggers or default
-changes. The author uses the command's native agent/model/variant. Review uses
-the existing reviewer permission restrictions, with a task-specific output
-contract; the diagnostic command and its role remain unchanged.
+`runWorkflow` captures D0, constructs factual observations, optionally sends one
+feedback payload to the same author, then captures D1/final. Final and terminal
+states must match the observed delivery. Check status is separate from coverage
+assessment and complete-task evaluation. Legacy report parsing exports remain
+available for historical artifact readers; the D path does not call them.
 
-Snapshots and native tool evidence are local private run artifacts. They are
-not signatures or correctness certificates. Source-only snapshot binding cannot
-prove that an arbitrary shell command is a meaningful preservation test; review
-must examine the source and command evidence. Model reports never manufacture
-command passes. Scripted installed tests establish control flow only.
-
-Source references:
-- https://github.com/anomalyco/opencode/blob/v1.18.26/packages/plugin/src/index.ts
-- https://github.com/anomalyco/opencode/blob/v1.18.26/packages/plugin/src/tool.ts
-- https://github.com/anomalyco/opencode/blob/v1.18.26/packages/opencode/src/session/prompt.ts
-- https://github.com/anomalyco/opencode/blob/v1.18.26/packages/opencode/src/tool/task.ts
-
-The native worktree API was also inspected. In this version it creates from the
-project worktree HEAD, does not accept an exact base ref, and returns before its
-checkout/startup jobs complete. The task therefore uses standard Git plumbing
-only to create a new detached worktree at the captured base and seed its initial
-patch. Native SDK session calls target that directory. There is no automatic
-patch application to the original checkout, no cleanup/reset of user work, and
-no custom repository operation exposed to the model. Scripted concurrent saves
-and staged/partially staged input exercise this boundary.
-
-The installed 1.18.26 server rejected a child prompt's `json_schema` format with
-`Expected OutputFormatJsonSchema` before reviewer generation, despite the shape
-matching the versioned schema. The workflow uses ordinary native text output and
-strict local shape validation instead; malformed output remains incomplete.
-The bootstrap's final visible text is bound to the actual workflow result, so a
-missing invocation or model-written summary cannot synthesize task completion.
-
-## Development revision after the frozen pilot
-
-The installed reproduction now distinguishes transports. On pinned OpenCode and
-SDK 1.18.26, raw HTTP and the external installed SDK accept `format: {type:
-"json_schema", schema, retryCount: 0}` and return `info.structured` with
-`finish: "tool-calls"`. The same child prompt through the plugin's injected SDK
-still fails with `Expected OutputFormatJsonSchema`. The runnable model-free
-`scripts/verify-native-task-format.mjs` verifies both paths and records their
-actual request/result shapes. HTTP success does not establish embedded-client
-compatibility, so the command retains text output without starting another server
-or introducing a provider transport.
-
-Supported legacy reviews are adapted deterministically before schema validation.
-The adapter renames `files` to `affectedFiles`, `reproduction` to `verification`,
-and `verificationFiles` to `proposedVerificationFiles`, preserving array order and
-all original strings. Conflicting old/new aliases fail explicitly. The original
-response is retained in `review-N-original.json`; the separate object is saved in
-`review-N-adapted.json`. Current-schema objects are unchanged on repeated adaptation.
-The existing non-executing scanner tolerates trailing commas in legacy text only;
-other corrupt or ambiguous input still fails or uses the existing bounded format
-correction. There is no extra retry.
-
-Absent legacy finding kinds become `unresolved`, never inferred from `expected`.
-An absent verification method remains absent for an unresolved finding. Only the
-substantive reproduction stage can resolve a kind with task/contract basis and
-actual native evidence; behavior repair still requires a failing assertion.
-Legacy `evidenceLimitations: []` means there were no separate category entries;
-all existing `unverified` entries remain material, including provenance-like text.
-Format correction cannot decide kind or remove findings, obligations, uncertainty
-or proposed paths. All eight bookmark review paths reach host scope policy as
-proposals, including rejected production and instruction paths.
-
-Controller regressions consume all five unchanged retained response files with
-`io.format` forbidden. Bookmark's two findings, seven obligations, four unverified
-entries and eight paths reach reproduction without a format request. Expense's
-empty findings and delivered obligations do not trigger artificial reproduction;
-its remaining uncertainty still prevents completion. The installed scripted
-fixture also sends bookmark's original text through the production controller and
-reaches reproduction with zero format calls. These are model-free routing checks,
-not evidence that a model supplies a correct repair. The prior unsuccessful real
-continuation and historical A 5/6, B 4/6 are unchanged; no real run is repeated.
-
-A structured stage may make one format-only correction. It uses a fresh native
-session with all registered tools disabled, a deny-all permission boundary and a
-host tool-hook denial. Its only task input is the original response, schema and
-specific validation error. Original and corrected replies and stage timing are
-retained; the request shares the original deadline. Strict schema validation and
-semantic conservation prohibit replacing missing obligations/findings with empty
-success or inventing expected behavior. No received text is executed. A second
-invalid response stops the stage.
-
-Review findings now distinguish behavior defects from missing test/document
-material. `affectedFiles` carries information; host preparation policy independently
-selects conventional test/document paths, rejects symlinks and explicit edit denies,
-and preserves native permission asks. A rejected write proposal does not discard
-the review. Actual non-preparation changes still stop the workflow. Passing tests
-on correct D0 can deliver missing coverage without a production repair. Grounded
-behavior defects still require an observed assertion failure before production
-repair, followed by final discriminating and preservation checks.
-
-`determineOutcome` applies after ordinary, disposition and post-repair review.
-`evidenceLimitations` records provenance caveats; `unverified` retains concrete
-unresolved consumers/checks/requirements. Missing obligations, hypotheses, failed
-or stale required checks cannot be cleared by an empty finding list.
-
-The controller's internal retained-review option skips initial implementation for
-installed development diagnostics. The public command has no new flag, argument
-or mode. Historical twelve-run sources, grader, results and costs remain frozen;
-this revision is evaluated separately.
-
-## Correcting reproduction evidence
-
-`assessDispositions` records admission, explicit rejection reasons and the actual
-native event reference for every candidate. Missing current-stage IDs, stale file
-states, incomplete/environment-failed commands, absent failing assertions,
-unresolved expected basis/kind and scope/permission violations remain distinct.
-No historical ID is substituted by command similarity.
-
-During reproduction the native bash result includes `HOST_NATIVE_EVIDENCE` with
-its actual callID, state, exit and snapshot bindings. The raw event output is saved
-before this context-only supplement is appended; admission never treats the
-supplement as assertion output. Saved-review check IDs are explicitly historical.
-
-One evidence-correction turn at most is allowed per workflow, counted separately
-from JSON format correction and production repairs. It uses the same author
-session, task, preparation permissions and total deadline. It receives rejection
-reasons and compact current-stage events, and can add/run a grounded regression.
-It is only eligible when every rejected candidate has a correctable evidence
-problem; unresolved expectations, permissions/protected mutations or other
-non-correctable failures prevent it. Cancellation and deadline checks precede
-further requests. A second unsuitable response never receives another correction.
-Test-only delivery still accepts a passing current test without production repair.
-
-The replay input is the unchanged final text of the previous real reproduction
-response. Controller and installed scripted checks cover the historical-ID/print
-failure, visible current event reference, corrective assertion, one production
-repair and checks after the final mutation. They establish program routing, not
-model quality. No real continuation is run or changed by this revision.
-
-Permission classification uses the installed OpenCode 1.18.26 contract: the
-`permission.replied` event with `reply: reject`, or the exact native
-PermissionRejected/Corrected/Denied error envelopes. Tool error parts expose a
-string, not an invented error-code field; the automatic-deny envelope must carry
-its JSON rules array with a deny rule. Ordinary filenames containing permission,
-rejected or protected are not classified as denials. The plugin records an
-explicit `permissionDenied` flag; the controller consumes that flag and actual
-scope violations without reparsing arbitrary error output. Errors without a
-before-hook entry are retained with an unknown (`null`) before-snapshot and can
-never serve as successful command evidence. Installed checks exercise native
-ask/reject, automatic deny, missing paths followed by a valid read/assertion and
-the complete evidence-correction replay.
+The diagnostic `/harness-review` materialization and ordinary default OpenCode
+configuration are unchanged. Versioned C behavior and results remain at their
+original commits. No C controller is copied into another runtime framework.
