@@ -1,8 +1,8 @@
 # Explicit native task workflow
 
 `/harness-task` executes a task in a separate Git delivery worktree using ordinary
-OpenCode author tools, a separate read-only reviewer, and at most two repair
-cycles. It is opt-in and does not change the default agent, model, provider,
+OpenCode author tools, a separate read-only reviewer, and at most two correcting
+cycles shared by missing implementation and behavior repair. It is opt-in and does not change the default agent, model, provider,
 variant, authentication, or `/harness-review` behavior.
 
 ## Install and invoke
@@ -58,7 +58,7 @@ refused; workspace-relative rules retain their native meaning. Missing/denied,
 oversized or unsupported snapshots stop the workflow rather than exporting a
 partial task/diff. The existing 1 MiB snapshot limit remains.
 
-## Review and bounded repair
+## Review and bounded completion
 
 The author receives the complete task. The reviewer receives the original task,
 initial state, current patch including new files, source-reading tools, and
@@ -74,7 +74,22 @@ Unsupported runner failure formats remain unverified. Documentation grounding ma
 use observed native read/search evidence; executable tests are not mandatory for
 documentation changes.
 
-After repair the author executes discriminating and preservation checks, and the
+A missing explicit original production requirement can instead proceed through
+ordinary implementation continuation. The author must inspect its current
+consumer/entry point with native tools, explain the missing work and its original
+task basis, and identify the affected paths. This does not grant preparation write
+permissions or relabel an existing behavior defect. The next author turn receives
+the full task, current patch, inspected paths, outstanding requirement and actual
+checks. Reviewer inventions remain rejected or unresolved.
+
+Implementation continuation and behavior repair share the same two-cycle limit
+(`repairs` counts this shared total; `implementationContinuations` is its subset).
+A cycle with no file progress stops instead of repeating. Missing/duplicate
+dispositions remain explicit unresolved records: other admitted work can proceed,
+but the protocol omission prevents successful completion.
+
+After a correcting cycle the author executes consumer/discriminating and
+preservation checks after the last edit, and the
 same reviewer checks the current patch and test diff. Only commands after the
 last observed mutation qualify, even if later edits restore identical bytes.
 The reviewer identifies relevant command IDs and their purposes. This binds

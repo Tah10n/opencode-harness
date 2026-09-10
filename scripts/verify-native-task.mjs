@@ -125,9 +125,10 @@ for(const mode of ['correct-once','omit-other','immediate','wrong-again','print-
   reviews++;return result({...valid,checks:[{callID:'check',purpose:'discriminating',basis:'final assertion'},{callID:'check',purpose:'preservation',basis:'old tests'}]});
  };
  const report=await runWorkflow(io,{initialReview:result(legacyRaw),maxRepairs:1});
- assert.equal(repairs,['correct-once','immediate'].includes(mode)?1:0,mode);
+ assert.equal(repairs,['correct-once','immediate','omit-other'].includes(mode)?1:0,mode);
  assert.equal(corrections,['correct-once','omit-other','wrong-again','print-only'].includes(mode)?1:0,mode);
- if(repairs)assert.equal(report.status,'reviewed_delivery',JSON.stringify(report));
+ if(repairs)assert.equal(report.status,mode==='omit-other'?'incomplete':'reviewed_delivery',JSON.stringify(report));
+ if(mode==='omit-other')assert.equal(report.unresolvedDispositions.length,2);
  assert.ok(report.evidenceCorrections<=1);assert.equal(io.saved.get('D0.json').snapshotSha256,'S');
 }
 for(const [event,reason]of [[{...check,callID:'e',before:'OLD'},'evidence_wrong_file_state'],[{...check,callID:'e',state:'error'},'command_not_completed'],[{...check,callID:'e',exit:1,output:'ENOENT'},'environment_failure'],[{...check,callID:'e',output:'grounded expected AssertionError'},'no_executed_failing_assertion']]){
@@ -139,8 +140,8 @@ const {nativePermissionDenial}=await import('../lib/native-task-workflow.mjs');
 for(const name of ['permissions.mjs','rejected-events.test.mjs','protected-fields.mjs']) {
  const output=`File not found: /repo/src/${name}`;
  assert.equal(nativePermissionDenial(output),false);
- const io=fake();let calls=0;const events=[{tool:'read',state:'error',callID:'missing',before:'S',after:'S',output}, {...check,callID:'failure',exit:1,nodeTest:{runner:'node:test',failed:true},output:'AssertionError: expected 2 actual 1'}];
- io.events=()=>events;io.format=async()=>assert.fail('No format');io.prompt=async(role,prompt)=>{const p=JSON.parse(prompt);if(p.instruction.startsWith('Investigate')){events.push({...events[0],callID:'missing-current'},{...events[1],callID:'failure-current'});return result({dispositions:[{id:'F',decision:'grounded',kind:'behavior',basis:'task',expectedReason:'literal task',explanation:'assertion',evidenceCallID:'failure-current'}],limitations:[]});}if(p.instruction.startsWith('Repair ONLY')){calls++;events.push(check);return result('done');}return result({...valid,checks:[...valid.checks,{callID:'check',purpose:'discriminating',basis:'final assertion'}]});};
+ const io=fake();let calls=0;const originalCapture=io.capture;io.capture=()=>({...originalCapture(),snapshotSha256:calls?'T':'S'});const events=[{tool:'read',state:'error',callID:'missing',before:'S',after:'S',output}, {...check,callID:'failure',exit:1,nodeTest:{runner:'node:test',failed:true},output:'AssertionError: expected 2 actual 1'}];
+ io.events=()=>events;io.format=async()=>assert.fail('No format');io.prompt=async(role,prompt)=>{const p=JSON.parse(prompt);if(p.instruction.startsWith('Investigate')){events.push({...events[0],callID:'missing-current'},{...events[1],callID:'failure-current'});return result({dispositions:[{id:'F',decision:'grounded',kind:'behavior',basis:'task',expectedReason:'literal task',explanation:'assertion',evidenceCallID:'failure-current'}],limitations:[]});}if(p.instruction.startsWith('Repair ONLY')){calls++;events.push({tool:'write',before:'S',after:'T'},{...check,before:'T',after:'T'});return result('done');}return result({...valid,checks:[...valid.checks,{callID:'check',purpose:'discriminating',basis:'final assertion'}]});};
  const report=await runWorkflow(io,{initialReview:result({...valid,findings:[behaviorFinding] }),maxRepairs:1});assert.equal(calls,1);assert.equal(report.evidenceCorrections,0);assert.equal(report.status,'reviewed_delivery');
 }
 assert.equal(nativePermissionDenial('The user rejected permission to use this specific tool call.'),true);
@@ -241,3 +242,40 @@ console.log(JSON.stringify({stateContinuityReplay:true,retainedHistoricalForms:2
   console.log(JSON.stringify({realNodeTestFailures:true,callbackReporterCases:24,mixedResultBoundaries:true,assertion:true,productException:true,rejectedPromise:true,setupAndUnsupportedEvidenceRejected:true,realProviderCalls:0}));
  }finally{fs.rmSync(dir,{recursive:true,force:true});}
 }
+
+// Missing original production work shares the same two correcting rounds.
+for(const mode of ['delivery','unsupported','complete','no-progress','limit','permission','cancel']){
+ const io=fake();let state='S',events=[check],continuations=0,reviews=0;
+ io.capture=()=>({status:'captured',snapshotSha256:state,diff:state==='S'?'':source,task:'Connect the CLI to the parser; add a consumer regression. Preserve legacy behavior.'});
+ io.events=()=>events;
+ const missing={...valid,obligations:[{requirement:'Connect CLI to parser',status:'missing',evidence:'cli.mjs still uses its old implementation'}]};
+ io.prompt=async(role,prompt)=>{
+  const p=JSON.parse(prompt);
+  if(p.instruction.startsWith('Investigate')){
+   const read={tool:'read',state:'completed',before:state,after:state,callID:'inspect-'+state,output:'CLI still disconnected'};events.push(read);
+   if(mode==='permission')events.push({...read,permissionDenied:true});
+   if(mode==='cancel')io.cancel();
+   return result({dispositions:[{id:'obligation-0',decision:mode==='unsupported'?'rejected':'grounded',kind:'implementation',basis:'Original task explicitly requires the CLI consumer',expectedReason:'Finish the existing requested entry point',explanation:'Parser exists; CLI still calls old code',affectedFiles:['cli.mjs'],evidenceCallID:read.callID}],limitations:[]});
+  }
+  if(p.instruction.startsWith('Continue ONLY')){
+   continuations++;assert.equal(role,'author');assert.ok(p.originalTask.includes('Connect the CLI'));assert.equal(p.missingImplementation[0].affectedFiles[0],'cli.mjs');assert.equal(p.current.snapshotSha256,state);assert.ok(p.toolEvidence.length);
+   if(mode!=='no-progress'){const before=state;state='T'+continuations;events.push({tool:'write',before,after:state});events.push({...check,before:state,after:state});}
+   return result('Continued implementation');
+  }
+  reviews++;return result(mode==='limit'?missing:{...valid,checks:[{callID:'check',purpose:'discriminating',basis:'consumer regression'},{callID:'check',purpose:'preservation',basis:'legacy coverage'}]});
+ };
+ const report=await runWorkflow(io,{initialReview:result(mode==='complete'?valid:missing)});
+ assert.equal(continuations,mode==='limit'?2:['delivery','no-progress'].includes(mode)?1:0,mode);
+ assert.equal(report.implementationContinuations,continuations);assert.ok(report.repairs<=2);
+ if(mode==='delivery')assert.equal(report.status,'reviewed_delivery',JSON.stringify(report));
+ if(mode==='no-progress')assert.ok(report.limits.some(x=>x.includes('No file progress')));
+ if(mode==='limit'){assert.equal(report.status,'incomplete');assert.ok(report.remaining.length);}
+ if(mode==='cancel')assert.equal(report.status,'cancelled');
+}
+{
+ const d={id:'F',decision:'grounded',kind:'implementation',basis:'original task',expectedReason:'basis',explanation:'missing path',affectedFiles:['cli.mjs'],evidenceCallID:'read'};
+ const e={tool:'read',state:'completed',callID:'read',before:'S',after:'S'};
+ for(const kind of ['behavior','unresolved'])assert.equal(assessDispositions([{id:'F',kind}],[d],[e],{snapshotSha256:'S'})[0].admitted,false);
+ assert.equal(assessDispositions([{id:'F',kind:'delivery'}],[{...d,affectedFiles:[]}],[e],{snapshotSha256:'S'})[0].admitted,false);
+}
+console.log(JSON.stringify({originalImplementationContinuation:true,commonTwoCycleLimit:true,behaviorCannotRelabel:true,missingDispositionsRetained:true,realProviderCalls:0}));

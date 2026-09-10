@@ -63,11 +63,38 @@ const fixture = http.createServer(async (req, res) => {
     response(res,null,JSON.stringify(lastReport));return;
   }
   if (!body.tools?.length) { response(res, null, 'Task fixture'); return; }
-  const stage = userText.includes('Correct reproduction evidence') ? 'evidence-correction' : userText.includes('Investigate the concrete') ? 'reproduce' : userText.includes('Repair ONLY') ? 'repair' : (userText.includes('Review current delivery') || userText.includes('Re-review the ACTUAL')) ? 'review' : userText.includes('Implement the complete original') ? 'implementation' : 'bootstrap';
+  const stage = userText.includes('Correct reproduction evidence') ? 'evidence-correction' : userText.includes('Investigate the concrete') ? 'reproduce' : userText.includes('Continue ONLY') ? 'continuation' : userText.includes('Repair ONLY') ? 'repair' : (userText.includes('Review current delivery') || userText.includes('Re-review the ACTUAL')) ? 'review' : userText.includes('Implement the complete original') ? 'implementation' : 'bootstrap';
   const key = mode + stage, n = counts.get(key) ?? 0; counts.set(key, n + 1);
   requests.push({ mode, stage, n, tools: body.tools.map(t => t.function.name) });
   const bash = command => ({ name: 'bash', args: { command, description: 'Installed workflow fixture command' } });
   if (stage === 'bootstrap') { response(res, n === 0 ? { name: 'harness_task', args: {} } : null, 'Workflow result retained; see tool output.'); return; }
+  if(mode.startsWith('obligation-')){
+    const wire=body.messages.map(m=>typeof m.content==='string'?m.content:JSON.stringify(m.content)).join('\n');
+    const refs=[...wire.matchAll(/HOST_NATIVE_EVIDENCE (\{[^\n]*\})/g)].map(m=>JSON.parse(m[1]));
+    const testBytes="import {test} from 'node:test';import assert from 'node:assert/strict';import {run} from './consumer.mjs';test('consumer requirement',()=>assert.equal(run(),2));\n";
+    if(stage==='implementation'){response(res,n===0?bash(mode==='obligation-complete'?'node --test value.test.mjs consumer.test.mjs':'node --test value.test.mjs'):null,'Initial helper implementation');return;}
+    if(stage==='reproduce'){
+      if(mode==='obligation-test'){
+        if(n===0){response(res,bash(writeFixture('consumer.test.mjs',testBytes)));return;}
+        if(n===1){response(res,bash('node --test value.test.mjs consumer.test.mjs'));return;}
+      }else if(n===0){response(res,{name:'read',args:{filePath:'consumer.mjs'}});return;}
+      const ref=refs.at(-1);assert.ok(ref);
+      response(res,null,JSON.stringify({dispositions:[{id:'obligation-0',decision:mode==='obligation-extra'?'rejected':'grounded',kind:mode==='obligation-test'?'test':'implementation',basis:mode==='obligation-extra'?'Original task only asks for value 2, not network access':'Original task explicitly requires run() consumer integration and its project regression',expectedReason:'Original task scope',explanation:'Helper returns 2 but the consumer still returns 1; complete this path rather than changing the helper',affectedFiles:['consumer.mjs','consumer.test.mjs'],evidenceCallID:ref.callID}],limitations:[]}));return;
+    }
+    if(stage==='continuation'){
+      const payload=JSON.parse(userText.split('\nReturn only')[0]);assert.ok(payload.current.diff!==undefined);assert.ok(payload.originalTask.includes('consumer'));assert.equal(payload.missingImplementation[0].kind,'implementation');assert.ok(payload.toolEvidence.some(e=>e.tool==='read'));
+      if(mode==='obligation-no-progress'){response(res,null,'No progress');return;}
+      if(n===0){response(res,bash(writeFixture('consumer.mjs',"import {value} from './value.mjs';export const run=()=>value;\n")));return;}
+      if(n===1){response(res,bash(writeFixture('consumer.test.mjs',testBytes)));return;}
+      if(n===2){response(res,bash('node --test value.test.mjs consumer.test.mjs'));return;}
+      response(res,null,'Integrated and checked the consumer');return;
+    }
+    if(stage==='review'){
+      const info=JSON.parse(userText.split('\nReturn only')[0]);const last=info.toolEvidence.filter(e=>e.tool==='bash'&&e.exit===0).at(-1);
+      const delivered=mode==='obligation-complete'||mode==='obligation-extra'&&n>0||mode==='obligation-test'&&counts.get(mode+'reproduce')>0||requests.some(r=>r.mode===mode&&r.stage==='continuation');
+      response(res,null,JSON.stringify({findings:[],obligations:[{requirement:mode==='obligation-extra'?(delivered?'Deliver original value 2; network upload was not requested':'Add unrequested network upload'):mode==='obligation-test'?'Deliver requested consumer regression':'Connect run() to the helper and deliver its consumer regression',status:delivered?'delivered':'missing',evidence:'Inspect consumer.mjs and consumer.test.mjs relative to original task'}],unverified:[],evidenceLimitations:[],coverageLost:[],proposedVerificationFiles:['consumer.test.mjs'],checks:last?[{callID:last.callID,purpose:'preservation',basis:'Legacy test after last edit'},{callID:last.callID,purpose:'discriminating',basis:'Current consumer project check'}]:[]}));return;
+    }
+  }
   if(mode.startsWith('exception-')){
     const wire=body.messages.map(m=>typeof m.content==='string'?m.content:JSON.stringify(m.content)).join('\n');
     const refs=[...wire.matchAll(/HOST_NATIVE_EVIDENCE (\{[^\n]*\})/g)].map(m=>JSON.parse(m[1]));
@@ -209,16 +236,22 @@ const api = async (method, route, body) => { const r = await fetch(`http://127.0
 try {
   let ready = false; for (let n = 0; n < 150; n++) { try { await api('GET', '/global/health'); ready = true; break; } catch { await new Promise(r => setTimeout(r, 100)); } } assert.ok(ready, stderr);
   const commands = await api('GET', '/command'); assert.ok(commands.some(c => c.name === 'harness-task'));
-  const allModes = ['exception-named-nested','exception-repair','exception-reject','exception-correct','correct', 'defect', 'unsupported', 'coverage-loss', 'last-mutation', 'cancel', 'incomplete', 'concurrent-save', 'staged-work','trailing-comma','missing-semantic','format-fails','src-affected','probe-production','missing-test','provenance','unverified','legacy-bookmark','evidence-replay','evidence-permission','evidence-user-reject','missing-error-paths','external-before-error','state-unchanged','state-external','state-unknown','state-revert','state-documentation','state-reproduce','budget'];
+  const allModes = ['obligation-integration','obligation-test','obligation-extra','obligation-complete','obligation-no-progress','obligation-deny','exception-named-nested','exception-repair','exception-reject','exception-correct','correct', 'defect', 'unsupported', 'coverage-loss', 'last-mutation', 'cancel', 'incomplete', 'concurrent-save', 'staged-work','trailing-comma','missing-semantic','format-fails','src-affected','probe-production','missing-test','provenance','unverified','legacy-bookmark','evidence-replay','evidence-permission','evidence-user-reject','missing-error-paths','external-before-error','state-unchanged','state-external','state-unknown','state-revert','state-documentation','state-reproduce','budget'];
   const selectedModes = process.env.NATIVE_TASK_FIXTURE_CASES?.split(',') ?? allModes;
   assert.ok(selectedModes.every(m=>allModes.includes(m)));
   for (mode of selectedModes) {
+    for(const file of ['consumer.mjs','consumer.test.mjs'])fs.rmSync(path.join(project,file),{force:true});
     for(const name of ['src','test'])fs.rmSync(path.join(project,name),{recursive:true,force:true});
     fs.writeFileSync(path.join(project,'package.json'),git('show','HEAD:package.json'));
 
     fs.writeFileSync(path.join(project, 'value.mjs'), 'export const value = 2;\n');
     fs.writeFileSync(path.join(project, 'value.test.mjs'), git('show','HEAD:value.test.mjs') + '\n');
     fs.writeFileSync(task, 'ORIGINAL_TASK_FIXTURE: Deliver value 2 from value.mjs and preserve the existing public test. Run node --test value.test.mjs.');
+    if(mode.startsWith('obligation-')){
+      fs.writeFileSync(path.join(project,'consumer.mjs'),['obligation-test','obligation-complete'].includes(mode)?"import {value} from './value.mjs';export const run=()=>value;\n":"export const run=()=>1;\n");
+      if(mode==='obligation-complete')fs.writeFileSync(path.join(project,'consumer.test.mjs'),"import {test} from 'node:test';import assert from 'node:assert/strict';import {run} from './consumer.mjs';test('consumer requirement',()=>assert.equal(run(),2));\n");
+      if(mode!=='obligation-extra')fs.appendFileSync(task,' Connect consumer.mjs run() to the value helper and add a consumer project regression; run both project tests after edits.');
+    }
     if(mode.startsWith('exception-')){
       fs.mkdirSync(path.join(project,'src'));fs.mkdirSync(path.join(project,'test'));
       fs.writeFileSync(path.join(project,'src/timing.mjs'),mode==='exception-correct'?exceptionSource.replace('fn.apply(this,args)','Reflect.apply(fn,this,args)'):exceptionSource);
@@ -231,7 +264,7 @@ try {
     if (mode === 'staged-work') { fs.writeFileSync(path.join(project,'value.mjs'),'export const value = 2; // staged\n');git('add','value.mjs');fs.writeFileSync(path.join(project,'value.mjs'),'export const value = 2; // partial user work\n'); }
     // Native OpenCode may refresh index stat metadata; compare staged entries/contents.
     const originalIndex=git('ls-files','--stage','-z');
-    const session = await api('POST', '/session', ['evidence-permission','evidence-user-reject'].includes(mode)?{permission:[{permission:'bash',pattern:'node *',action:mode==='evidence-user-reject'?'ask':'deny'}]}:{});
+    const session = await api('POST', '/session', mode==='obligation-deny'?{permission:[{permission:'bash',pattern:'node -e *',action:'deny'}]}:['evidence-permission','evidence-user-reject'].includes(mode)?{permission:[{permission:'bash',pattern:'node *',action:mode==='evidence-user-reject'?'ask':'deny'}]}:{});
     priorArtifacts = new Set(fs.existsSync(path.join(project,'.git/harness-task'))?fs.readdirSync(path.join(project,'.git/harness-task')):[]);
     const pending = api('POST', `/session/${session.id}/command`, { command: 'harness-task', arguments: '', model: 'local-fixture/fixture' });
     if(mode==='evidence-user-reject'){
@@ -260,6 +293,19 @@ try {
     assert.equal(toolResult?.state.status, 'completed', JSON.stringify({ result, toolResult, temp }));
     const report = JSON.parse(toolResult.state.output);
     assert.equal(git('ls-files','--stage','-z'),originalIndex);
+    if(mode.startsWith('obligation-')){
+      const count=requests.filter(r=>r.mode===mode&&r.stage==='continuation'&&r.n===0).length;
+      assert.equal(count,['obligation-integration','obligation-no-progress','obligation-deny'].includes(mode)?1:0,JSON.stringify(report));
+      assert.equal(report.status,['obligation-no-progress','obligation-deny'].includes(mode)?'incomplete':'reviewed_delivery',JSON.stringify(report));
+      assert.equal(report.evidenceCorrections,0);
+      assert.equal(fs.readFileSync(path.join(report.executionDirectory,'value.mjs'),'utf8'),'export const value = 2;\n');
+      if(['obligation-integration','obligation-test'].includes(mode)){
+        const check=spawnSync(process.execPath,['--test','value.test.mjs','consumer.test.mjs'],{cwd:report.executionDirectory,encoding:'utf8'});assert.equal(check.status,0,check.stdout+check.stderr);
+        assert.ok(fs.readFileSync(path.join(report.executionDirectory,'consumer.test.mjs'),'utf8').includes('assert.equal(run(),2)'));
+        assert.equal(report.implementationContinuations,mode==='obligation-integration'?1:0);
+      }
+      if(mode==='obligation-deny')assert.equal(report.repairs,0);
+    }
     if(mode.startsWith('exception-')){
       const events=JSON.parse(fs.readFileSync(path.join(report.artifacts,'tool-events.json')));
       assert.equal(report.repairs,['exception-repair','exception-named-nested'].includes(mode)?1:0,JSON.stringify(report));

@@ -29,3 +29,21 @@ async function scenario(status,body){
 }
 await scenario(429,quota);await scenario(429,{error:{type:'rate_limit',message:'Temporary rate limit'}});await scenario(200,{output:'Wrong answer mentioning usage_limit_reached'});
 console.log('Scripted external launcher: quota/unknown pause, no next slot, no retry forwarding, retained partial and prior records; real provider calls = 0');
+
+// New bounded schedules use the same runner entry point and freeze verification.
+for(const kind of ['original-requirement-development','fixed-20-pair-full-native-comparison']){
+ const root=fs.mkdtempSync(path.join(os.tmpdir(),'launcher-plan-'));
+ try{
+  const dev=kind==='original-requirement-development';
+  const attempts=Array.from({length:dev?4:40},(_,i)=>({slot:i+1,task:'task'+(dev?i:Math.floor(i/2)),arm:dev?'B':i%2?'B':'A'}));
+  const manifest={kind,version:1,files:{},attempts,preflightPassed:true,candidateCommit:'a'.repeat(40),model:'openai/gpt-5.6-luna',variant:'low',budgetMs:900000};
+  fs.writeFileSync(path.join(root,'freeze.json'),JSON.stringify(manifest));
+  // Existing pause gate is reached only after a valid schedule. Never launch a tool.
+  fs.writeFileSync(path.join(root,'scheduling-paused.json'),'{}');
+  await assert.rejects(runPilot({root}),/Scheduling is paused/);
+  if(dev)manifest.attempts[0].arm='A';else manifest.attempts.pop();
+  fs.writeFileSync(path.join(root,'freeze.json'),JSON.stringify(manifest));
+  await assert.rejects(runPilot({root}),/Invalid (development schedule|freeze)/);
+ }finally{fs.rmSync(root,{recursive:true,force:true});}
+}
+console.log('Bounded development/comparison schedule validation passed; provider calls = 0');

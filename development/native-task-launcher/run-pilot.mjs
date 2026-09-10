@@ -4,7 +4,19 @@ import fs from 'node:fs';import path from 'node:path';import {createHash} from '
 export async function runPilot({root,startContainer,captureCandidate,runOpenCode,stopWorkload,readAuth,fetchImpl=fetch}) {
 const f=JSON.parse(fs.readFileSync(path.join(root,'freeze.json')));
 const sha=x=>createHash('sha256').update(x).digest('hex');
-function verify(){for(const [file,digest]of Object.entries(f.files))if(sha(fs.readFileSync(file))!==digest)throw Error('Frozen file changed: '+file);if(f.attempts.length!==200||!f.preflightPassed||f.candidateCommit!=='3750b0d448fbfa7db80c459029a98fd221e86f94'||f.model!=='openai/gpt-5.6-luna'||f.variant!=='low'||f.budgetMs!==900000)throw Error('Invalid freeze');const pairs=new Map();for(const a of f.attempts){if(!['A','B'].includes(a.arm))throw Error('Invalid arm');const arms=pairs.get(a.task)??[];arms.push(a.arm);pairs.set(a.task,arms);}if(pairs.size!==100||[...pairs.values()].some(arms=>arms.sort().join('')!=='AB'))throw Error('Invalid paired schedule');}
+function verify(){
+ for(const [file,digest]of Object.entries(f.files))if(sha(fs.readFileSync(file))!==digest)throw Error('Frozen file changed: '+file);
+ const development=f.kind==='original-requirement-development';
+ const comparison=f.kind==='fixed-20-pair-full-native-comparison';
+ const count=development?4:comparison?40:200;
+ if(f.attempts.length!==count||!f.preflightPassed||!(/^[a-f0-9]{40}$/.test(f.candidateCommit))||
+   (!development&&!comparison&&f.candidateCommit!=='3750b0d448fbfa7db80c459029a98fd221e86f94')||
+   development&&![1,2].includes(f.version)||f.model!=='openai/gpt-5.6-luna'||f.variant!=='low'||f.budgetMs!==900000)throw Error('Invalid freeze');
+ const pairs=new Map();for(const a of f.attempts){if(!['A','B'].includes(a.arm))throw Error('Invalid arm');const arms=pairs.get(a.task)??[];arms.push(a.arm);pairs.set(a.task,arms);}
+ if(development){if(pairs.size!==4||[...pairs.values()].some(arms=>arms.join('')!=='B'))throw Error('Invalid development schedule');}
+ else if(pairs.size!==count/2||[...pairs.values()].some(arms=>arms.sort().join('')!=='AB'))throw Error('Invalid paired schedule');
+}
+
 verify();
 if(fs.existsSync(path.join(root,'scheduling-paused.json')))throw Error('Scheduling is paused; no automatic resume');
 let pause=null;

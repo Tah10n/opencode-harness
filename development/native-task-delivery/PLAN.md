@@ -1,0 +1,44 @@
+# Original-requirement completion: bounded development
+
+This stage starts from ca68c72d07761c2aca964837df1276ae1f6f3f72. The closed
+100-pair series stays incomplete_quota. Its reviewed outcomes are development
+material only; no old slot, patch, grader or outcome is changed or resumed.
+
+Selection, before new provider calls:
+
+| Role | Task | Already assessed reason for selection | Independent evaluation |
+| --- | --- | --- | --- |
+| Missing production integration | portable-path-core | CLI still imports platform-default normalize; new POSIX core is disconnected | Frozen acceptance/preservation; inspect actual CLI delegation and requested CLI test/docs |
+| Missing production integration | weighted-ballot-tabulation | tabulate still returns a single plurality round; integrated transfer policy absent | Frozen acceptance/preservation; inspect runElection/tabulate/renderReport and delivered transfer/round tests |
+| Correct behavior, missing delivery | url-resolver-consumers | Behavior passed; project tests failed to assert original item immutability through buildMenu | Frozen acceptance/preservation; inspect consumer regression including original item fields and docs |
+| Correct control | abortable-delay-consumer | Prior B final satisfied behavior, tests, docs and preservation | Same frozen checks and delivery rubric; inspect for introduced regressions |
+
+Use the original initial trees and full TASK.md from native-task-comparison/tasks.
+Only initial source, ordinary tests/instructions and the current harness enter
+the native author environment. No saved D0/review, reference or independent
+acceptance test enters while the model is active. Each is a fresh complete B run.
+Existing offline evaluator runs only after verified model termination.
+
+Version 1: one run per selected task. At most one substantive mechanism revision
+and one further run of each task are permitted, with the decision/diff recorded
+before results. Maximum 8 development runs. All started outcomes remain retained.
+Do not interpret a fresh successful D0 as proof the continuation stage caused it.
+
+Gate: at least two distinct previously incomplete tasks reach independently
+verified complete delivery, and the control has no found regression. Otherwise
+stop before comparison; do not create version 3. On confirmed quota exhaustion
+stop all new provider requests and slots, retain partial work and leave unstarted
+slots pending. No separate paid quota probe.
+
+Only after this gate may a single runtime be frozen for 20 new tasks (5 each:
+integration, state, API/consumer compatibility, behavior-preserving refactoring).
+Before their 40 scored runs, record balanced AB/BA order, task/reference/check
+validation, acceptable alternatives and the existing paired statistical method.
+Primary endpoint is complete behavior + preservation + explicitly required
+tests/docs; assess B/D0 separately. Keep this sample separate from development
+and historical pilots. No scored retry or post-result rubric change.
+
+Measurement binding: OpenCode 1.18.26, openai/gpt-5.6-luna, variant low, original
+native tools and container boundary, 900 seconds including all stages per task.
+The reusable runtime has no model binding. At most 48 total full runs. No manual
+Actions, matrix run, merge, release, new branch archive or default change.
