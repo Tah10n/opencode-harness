@@ -1,0 +1,20 @@
+--- a/packages/connector/test/protocol.test.mjs
++++ b/packages/connector/test/protocol.test.mjs
+@@ -91,12 +91,11 @@
+ });
+ 
+ test("protocol errors are snake_case and terminal output strips control characters", async () => {
+-  assert.deepEqual(
+-    await parseProtocolResponse(json({ error: "source_disconnected" }, 400), {
+-      kind: "usage",
+-      sourceIds: [sourceId],
+-    }),
+-    { error: "source_disconnected" },
++  await assert.rejects(
++    parseProtocolResponse(json({ error: "source_disconnected" }, 400), {
++      kind: "usage", sourceIds: [sourceId],
++    }),
++    error => error instanceof Error && error.status === 400 && error.code === "source_disconnected",
+   );
+   for (const error of ["InvalidRequest", "invalid-request", "invalid__request", "bad\ncode"]) {
+     await assert.rejects(

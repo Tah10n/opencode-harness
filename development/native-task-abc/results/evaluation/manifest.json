@@ -1,0 +1,51 @@
+[
+  {
+    "task": "protocol-error-api",
+    "frozenSourceName": "acceptance.test.mjs",
+    "frozenSourceSha256": "c80aca8d52c348989bed54e636e7c173213868de800224435d0e455affeb0729",
+    "publicFile": "evaluation/protocol-error-api/acceptance.test.mjs",
+    "publicSha256": "c80aca8d52c348989bed54e636e7c173213868de800224435d0e455affeb0729"
+  },
+  {
+    "task": "protocol-error-api",
+    "frozenSourceName": "compat-protocol.test.mjs",
+    "frozenSourceSha256": "7b921d57728518ca2b972a87266ea4d8b0e94667330349547e055f9fadb612dc",
+    "publicFile": "evaluation/protocol-error-api/compat-protocol.test.mjs.patch",
+    "publicSha256": "6ad5685f7c0dc373311e6f4ea82fec686ccfbfc2922ef9646e9ae9b39c62d956"
+  },
+  {
+    "task": "legacy-runtime-reload",
+    "frozenSourceName": "acceptance.test.mjs",
+    "frozenSourceSha256": "806f45b777130a9e49e9da485bd4fdbe49f82a14626b7e84632abc10c80b0e35",
+    "publicFile": "evaluation/legacy-runtime-reload/acceptance.test.mjs",
+    "publicSha256": "806f45b777130a9e49e9da485bd4fdbe49f82a14626b7e84632abc10c80b0e35"
+  },
+  {
+    "task": "legacy-runtime-reload",
+    "frozenSourceName": "reference-state-security.test.mjs",
+    "frozenSourceSha256": "e39f8f749c3665c650ff0c6cc49c3fde81841d7c6ef08332751f8b6849886441",
+    "publicFile": "evaluation/legacy-runtime-reload/reference-state-security.test.mjs.patch",
+    "publicSha256": "6c6a6fd35410e4aae219862ebe7e453f6a27b933f45eecd2063b47c057f1a0e5"
+  },
+  {
+    "task": "reconnect-revoked",
+    "frozenSourceName": "reference-config.test.mjs",
+    "frozenSourceSha256": "bf024b4d2402ef5452def7f2db80172af49202de52842fc705dff83de3ef37d7",
+    "publicFile": "evaluation/reconnect-revoked/reference-config.test.mjs.patch",
+    "publicSha256": "01e87b237ba9e0e148b03328ef7bee969b0e27ed861bc3bda39885da2d607a0b"
+  },
+  {
+    "task": "reconnect-revoked",
+    "frozenSourceName": "reference-config-403.test.mjs",
+    "frozenSourceSha256": "3df135c38805074f8eefa9e21962f4bfecfc901d0ea4bd39746cb527619781c9",
+    "publicFile": "evaluation/reconnect-revoked/reference-config-403.test.mjs.patch",
+    "publicSha256": "062c0ac23bcaf05ee31b4b3a1cfcb8112dd84aebc5c92aa8520b4c2819e725b1"
+  },
+  {
+    "task": "request-module-extraction",
+    "frozenSourceName": "acceptance.test.mjs",
+    "frozenSourceSha256": "452b9abd364b08ffcd5a354072db839025e21ff3aaa0f721dea01ee0ee7efb31",
+    "publicFile": "evaluation/request-module-extraction/acceptance.test.mjs",
+    "publicSha256": "452b9abd364b08ffcd5a354072db839025e21ff3aaa0f721dea01ee0ee7efb31"
+  }
+]

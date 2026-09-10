@@ -1,0 +1,235 @@
+{
+  "slot": 4,
+  "task": "legacy-runtime-reload",
+  "arm": "B",
+  "exitCode": 0,
+  "timedOut": false,
+  "elapsedMs": 245270,
+  "phaseCount": 2,
+  "continuationApplied": true,
+  "requests": 34,
+  "requestsWithoutUsage": 0,
+  "workflowStatus": null,
+  "repairs": null,
+  "toolCalls": 45,
+  "sessions": 1,
+  "usage": {
+    "input_tokens": 1729836,
+    "cached_tokens": 612352,
+    "output_tokens": 7146,
+    "reasoning_tokens": 1873,
+    "total_tokens": 1736982
+  },
+  "requestEfforts": {
+    "none": 1,
+    "low": 33
+  },
+  "httpStatuses": {
+    "200": 34
+  },
+  "terminationVerified": true,
+  "phases": {
+    "first": {
+      "exitCode": 0,
+      "signal": null,
+      "termination": {
+        "terminationVerified": true,
+        "killed": []
+      },
+      "timedOut": false,
+      "elapsedMs": 173955,
+      "parseErrors": 0
+    },
+    "continuation": {
+      "exitCode": 0,
+      "signal": null,
+      "termination": {
+        "terminationVerified": true,
+        "killed": []
+      },
+      "timedOut": false,
+      "elapsedMs": 71234,
+      "parseErrors": 0
+    }
+  },
+  "packet": "D4",
+  "delivery": {
+    "patchApplies": true,
+    "changedFiles": [
+      "packages/connector/README.md",
+      "packages/connector/lib/config.mjs",
+      "packages/connector/test/state-security.test.mjs"
+    ],
+    "patchSha256": "3ab71a8233f62011c1f6bf8593485ef71fd5ff0ced665d0c076bc80a7fa251c4"
+  },
+  "sourceReview": {
+    "packet": "D4",
+    "sourceReview": {
+      "implementation": "Adds only known flat legacy paths to ownership inspection and retains file-type/link/identity checks. Existing isInstalledRuntimeExecutable already covers flat bin/viberacing.mjs and remains intact. Adds a whole-file-set guard for unmarked layouts as well as per-path allowlists.",
+      "tests": "Adds a complete legacy file-set fixture, prepares the runtime, reloads state in another process and checks all old bytes plus the marker. Existing state-security assertions are preserved. Installed runtime execution is covered independently.",
+      "documentation": "README describes flat migration, versioned runtime and strict unknown-entry rejection.",
+      "D0ToFinal": "Only indentation of three lines in config.mjs changed during the continuation. No semantic repair was delivered.",
+      "concerns": [
+        "The whole-set guard uses path.relative results without separator normalization, unlike ownedStatePath. On Windows bin/lib child names contain backslashes and cannot match the slash-based full set. This is a static portability concern; no Windows runtime was run.",
+        "The frozen supplemental reload test uses a subset of recognized old files. This implementation rejects that subset. The task specified the exact historical path list but did not explicitly say incomplete known subsets must be accepted. Report the raw result and this specification ambiguity rather than treating reference behavior as the only valid implementation. Do not change the task or frozen test after observing results."
+      ],
+      "staticDefects": [
+        "New hasValidLegacyRuntime compares raw path.relative output with slash-only paths. Exact helper probe accepts a complete POSIX legacy tree and rejects the same Windows tree. secureStateDirectory calls this for unmarked legacy state on all platforms; existing ownedStatePath normalizes separators, this new helper does not. Full Windows runtime not executed."
+      ],
+      "partialLayoutBoundary": "Frozen fresh-process independent test uses recognized subset, while task says exact known paths without explicitly requiring missing files to be accepted. Preserve raw failure if observed; do not use this ambiguous condition alone as a task failure. The Windows defect is independent."
+    },
+    "behaviorVerdict": "Full historical-layout and preservation checks passed; frozen partial-known-layout fresh-process check failed. Boundary is ambiguous in task wording and not sole reason for incompleteness.",
+    "completenessVerdict": "incomplete: new Windows path-separator defect; partial-layout raw failure reported separately"
+  },
+  "grading": {
+    "final": {
+      "packet": "D4",
+      "phase": "final",
+      "checks": {
+        "ordinary": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 25,
+            "pass": 24,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 2,
+            "pass": 2,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 24,
+            "pass": 23,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "preserved-consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 2,
+            "pass": 2,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "legacy-acceptance": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 9,
+            "pass": 9,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "acceptance": {
+          "code": 1,
+          "timedOut": false,
+          "counts": {
+            "tests": 1,
+            "pass": 0,
+            "fail": 1,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      },
+      "passed": false,
+      "cleanup": 0
+    },
+    "D0": {
+      "packet": "D4",
+      "phase": "D0",
+      "checks": {
+        "ordinary": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 25,
+            "pass": 24,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 2,
+            "pass": 2,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 24,
+            "pass": 23,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "preserved-consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 2,
+            "pass": 2,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "legacy-acceptance": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 9,
+            "pass": 9,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "acceptance": {
+          "code": 1,
+          "timedOut": false,
+          "counts": {
+            "tests": 1,
+            "pass": 0,
+            "fail": 1,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      },
+      "passed": false,
+      "cleanup": 0
+    }
+  },
+  "evidenceSelections": []
+}

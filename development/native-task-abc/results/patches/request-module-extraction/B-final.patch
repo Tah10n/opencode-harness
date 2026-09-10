@@ -1,0 +1,259 @@
+diff --git a/packages/connector/README.md b/packages/connector/README.md
+index 5a1e8c6..0bfd853 100644
+--- a/packages/connector/README.md
++++ b/packages/connector/README.md
+@@ -30,6 +30,11 @@ best-effort per source: one damaged settings file is reported without blocking h
+ initial sync. The final token/config swap is serialized behind any active sync, so an older request
+ cannot restore superseded authorization.
+ 
++The CLI transport is implemented in `lib/transport.mjs` and is installed with the runtime. It owns
++HTTP method/body/header forwarding, timeout and redirect policy, transient retries, exponential
++backoff, and bounded `Retry-After` handling. Response schema and protocol validation remain in
++`lib/protocol.mjs`.
++
+ ## Commands
+ 
+ ```text
+diff --git a/packages/connector/bin/viberacing.mjs b/packages/connector/bin/viberacing.mjs
+index 5fde3a9..f025bc1 100755
+--- a/packages/connector/bin/viberacing.mjs
++++ b/packages/connector/bin/viberacing.mjs
+@@ -7,7 +7,7 @@ import { createInterface } from "node:readline";
+ import { setTimeout as delay } from "node:timers/promises";
+ import { fileURLToPath } from "node:url";
+ import { connectorVersion } from "../lib/version.mjs";
+-import { parseProtocolResponse } from "../lib/protocol.mjs";
++import { request } from "../lib/transport.mjs";
+ import { normalizeOrigin } from "../lib/origin.mjs";
+ import {
+   adapters,
+@@ -158,74 +158,6 @@ async function readConnectedConfig() {
+   }
+ }
+ 
+-function retryAfterMilliseconds(response) {
+-  const value = response.headers.get("retry-after")?.trim();
+-  if (!value) return null;
+-  let milliseconds;
+-  if (/^\d+$/.test(value)) milliseconds = Number(value) * 1_000;
+-  else {
+-    const date = Date.parse(value);
+-    if (Number.isNaN(date)) return null;
+-    milliseconds = Math.max(0, date - Date.now());
+-  }
+-  const maximum =
+-    process.env.NODE_ENV === "test" &&
+-    /^\d+$/.test(process.env.VIBERACING_TEST_MAX_RETRY_AFTER_MS ?? "")
+-      ? Number(process.env.VIBERACING_TEST_MAX_RETRY_AFTER_MS)
+-      : 300_000;
+-  return Math.min(maximum, milliseconds);
+-}
+-
+-async function request(origin, path, options = {}, attempts = 1, responseContext) {
+-  let lastError;
+-  for (let attempt = 0; attempt < attempts; attempt += 1) {
+-    try {
+-      const response = await fetch(`${origin}${path}`, {
+-        ...options,
+-        signal: AbortSignal.timeout(15_000),
+-        redirect: "error",
+-      });
+-      let payload;
+-      try {
+-        payload = await parseProtocolResponse(response, responseContext);
+-      } catch (error) {
+-        if (
+-          error?.code === "invalid_server_response" &&
+-          (response.status >= 500 || response.status === 429)
+-        ) {
+-          error.status = response.status;
+-          error.retryAfterMs = retryAfterMilliseconds(response);
+-        }
+-        throw error;
+-      }
+-      if (!response.ok) {
+-        const error = new Error(
+-          `Vibe Racing returned ${response.status}: ${payload.error ?? "request failed"}`,
+-        );
+-        error.status = response.status;
+-        error.code = payload.error;
+-        error.retryAfterMs = retryAfterMilliseconds(response);
+-        if (response.status < 500 && response.status !== 429) throw error;
+-        lastError = error;
+-      } else return payload;
+-    } catch (error) {
+-      lastError = error;
+-      if (
+-        error?.code === "invalid_server_response" &&
+-        !(error?.status >= 500 || error?.status === 429)
+-      )
+-        throw error;
+-      if (error?.status && error.status < 500 && error.status !== 429) throw error;
+-    }
+-    if (attempt + 1 < attempts) {
+-      const retryAfter = Number.isFinite(lastError?.retryAfterMs) ? lastError.retryAfterMs : 0;
+-      const backoff = Math.min(8_000, 500 * 2 ** attempt) + Math.floor(Math.random() * 250);
+-      await delay(Math.max(retryAfter, backoff));
+-    }
+-  }
+-  throw lastError;
+-}
+-
+ async function cancelPairingAttempt(attempt) {
+   if (
+     attempt === null ||
+diff --git a/packages/connector/lib/config.mjs b/packages/connector/lib/config.mjs
+index bf11763..4563957 100644
+--- a/packages/connector/lib/config.mjs
++++ b/packages/connector/lib/config.mjs
+@@ -1244,6 +1244,7 @@ const installedRuntimeFiles = [
+   "registry.mjs",
+   "runtime.mjs",
+   "protocol.mjs",
++  "transport.mjs",
+   "terminal.mjs",
+   "version.mjs",
+   "windows-security.mjs",
+diff --git a/packages/connector/lib/transport.mjs b/packages/connector/lib/transport.mjs
+new file mode 100644
+index 0000000..8902ec3
+--- /dev/null
++++ b/packages/connector/lib/transport.mjs
+@@ -0,0 +1,63 @@
++import { setTimeout as delay } from "node:timers/promises";
++import { parseProtocolResponse } from "./protocol.mjs";
++
++export function retryAfterMilliseconds(response, environment = process.env, now = Date.now()) {
++  const value = response.headers.get("retry-after")?.trim();
++  if (!value) return null;
++  let milliseconds;
++  if (/^\d+$/.test(value)) milliseconds = Number(value) * 1_000;
++  else {
++    const date = Date.parse(value);
++    if (Number.isNaN(date)) return null;
++    milliseconds = Math.max(0, date - now);
++  }
++  const maximum =
++    environment.NODE_ENV === "test" && /^\d+$/.test(environment.VIBERACING_TEST_MAX_RETRY_AFTER_MS ?? "")
++      ? Number(environment.VIBERACING_TEST_MAX_RETRY_AFTER_MS)
++      : 300_000;
++  return Math.min(maximum, milliseconds);
++}
++
++export async function request(origin, path, options = {}, attempts = 1, responseContext) {
++  let lastError;
++  for (let attempt = 0; attempt < attempts; attempt += 1) {
++    try {
++      const response = await fetch(`${origin}${path}`, {
++        ...options,
++        signal: AbortSignal.timeout(15_000),
++        redirect: "error",
++      });
++      let payload;
++      try {
++        payload = await parseProtocolResponse(response, responseContext);
++      } catch (error) {
++        if (error?.code === "invalid_server_response" && (response.status >= 500 || response.status === 429)) {
++          error.status = response.status;
++          error.retryAfterMs = retryAfterMilliseconds(response);
++        }
++        throw error;
++      }
++      if (!response.ok) {
++        const error = new Error(
++          `Vibe Racing returned ${response.status}: ${payload.error ?? "request failed"}`,
++        );
++        error.status = response.status;
++        error.code = payload.error;
++        error.retryAfterMs = retryAfterMilliseconds(response);
++        if (response.status < 500 && response.status !== 429) throw error;
++        lastError = error;
++      } else return payload;
++    } catch (error) {
++      lastError = error;
++      if (error?.code === "invalid_server_response" && !(error?.status >= 500 || error?.status === 429))
++        throw error;
++      if (error?.status && error.status < 500 && error.status !== 429) throw error;
++    }
++    if (attempt + 1 < attempts) {
++      const retryAfter = Number.isFinite(lastError?.retryAfterMs) ? lastError.retryAfterMs : 0;
++      const backoff = Math.min(8_000, 500 * 2 ** attempt) + Math.floor(Math.random() * 250);
++      await delay(Math.max(retryAfter, backoff));
++    }
++  }
++  throw lastError;
++}
+diff --git a/packages/connector/test/config.test.mjs b/packages/connector/test/config.test.mjs
+index 20f2a6f..eaaa787 100644
+--- a/packages/connector/test/config.test.mjs
++++ b/packages/connector/test/config.test.mjs
+@@ -267,6 +267,7 @@ test("installs a runnable connector copy and additive, owned hooks", async () =>
+       "readers.mjs",
+       "registry.mjs",
+       "runtime.mjs",
++      "transport.mjs",
+     ])
+       await access(join(installedLibrary, name));
+     await access(join(installedLibrary, "adapters", "codex.mjs"));
+diff --git a/packages/connector/test/transport.test.mjs b/packages/connector/test/transport.test.mjs
+new file mode 100644
+index 0000000..b0522c2
+--- /dev/null
++++ b/packages/connector/test/transport.test.mjs
+@@ -0,0 +1,56 @@
++import test from "node:test";
++import assert from "node:assert/strict";
++import { createServer } from "node:http";
++import { request, retryAfterMilliseconds } from "../lib/transport.mjs";
++
++async function fixtureServer(handler) {
++  const server = createServer(handler);
++  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
++  return { server, origin: `http://127.0.0.1:${server.address().port}` };
++}
++
++test("transport preserves request shape and retries transient protocol responses", async () => {
++  const requests = [];
++  let count = 0;
++  const fixture = await fixtureServer((req, res) => {
++    const chunks = [];
++    req.on("data", (chunk) => chunks.push(chunk));
++    req.on("end", () => {
++      requests.push({ method: req.method, headers: req.headers, body: Buffer.concat(chunks).toString() });
++      count += 1;
++      res.writeHead(count === 1 ? 503 : 204, { "content-type": "application/json" });
++      res.end(count === 1 ? JSON.stringify({ error: "temporarily_unavailable" }) : undefined);
++    });
++  });
++  try {
++    assert.equal(
++      await request(
++        fixture.origin,
++        "/api/upload",
++        { method: "POST", headers: { "Content-Type": "application/json" }, body: '{"total":3}' },
++        2,
++        { kind: "empty" },
++      ),
++      null,
++    );
++    assert.equal(requests.length, 2);
++    assert.deepEqual(requests[0], requests[1]);
++    assert.equal(requests[0].body, '{"total":3}');
++  } finally {
++    await new Promise((resolve) => fixture.server.close(resolve));
++  }
++});
++
++test("transport bounds Retry-After and refuses redirects", async () => {
++  const response = new Response(null, { headers: { "retry-after": "999" } });
++  assert.equal(retryAfterMilliseconds(response, { NODE_ENV: "test", VIBERACING_TEST_MAX_RETRY_AFTER_MS: "1000" }), 1000);
++  const fixture = await fixtureServer((_req, res) => {
++    res.writeHead(302, { location: "http://127.0.0.1/elsewhere" });
++    res.end();
++  });
++  try {
++    await assert.rejects(request(fixture.origin, "/redirect", {}, 1, { kind: "empty" }));
++  } finally {
++    await new Promise((resolve) => fixture.server.close(resolve));
++  }
++});

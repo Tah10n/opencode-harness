@@ -1,0 +1,209 @@
+{
+  "slot": 12,
+  "task": "request-module-extraction",
+  "arm": "B",
+  "exitCode": 0,
+  "timedOut": false,
+  "elapsedMs": 293837,
+  "phaseCount": 2,
+  "continuationApplied": true,
+  "requests": 20,
+  "requestsWithoutUsage": 0,
+  "workflowStatus": null,
+  "repairs": null,
+  "toolCalls": 40,
+  "sessions": 1,
+  "usage": {
+    "input_tokens": 526579,
+    "cached_tokens": 182272,
+    "output_tokens": 6359,
+    "reasoning_tokens": 1019,
+    "total_tokens": 532938
+  },
+  "requestEfforts": {
+    "none": 1,
+    "low": 19
+  },
+  "httpStatuses": {
+    "200": 20
+  },
+  "terminationVerified": true,
+  "phases": {
+    "first": {
+      "exitCode": 0,
+      "signal": null,
+      "termination": {
+        "terminationVerified": true,
+        "killed": []
+      },
+      "timedOut": false,
+      "elapsedMs": 232693,
+      "parseErrors": 0
+    },
+    "continuation": {
+      "exitCode": 0,
+      "signal": null,
+      "termination": {
+        "terminationVerified": true,
+        "killed": []
+      },
+      "timedOut": false,
+      "elapsedMs": 61063,
+      "parseErrors": 0
+    }
+  },
+  "packet": "N4",
+  "delivery": {
+    "patchApplies": true,
+    "changedFiles": [
+      "packages/connector/README.md",
+      "packages/connector/bin/viberacing.mjs",
+      "packages/connector/lib/config.mjs",
+      "packages/connector/lib/transport.mjs",
+      "packages/connector/test/config.test.mjs",
+      "packages/connector/test/transport.test.mjs"
+    ],
+    "patchSha256": "dcb5035a18b82fab62b02065f7fc54e4be2809c760302309e749db5503a1edcc"
+  },
+  "sourceReview": {
+    "packet": "N4",
+    "sourceReview": {
+      "implementation": "Extracts shared transport, updates all callers by replacing the lexical request binding with an import, retains parsing and retry behavior and installed runtime copying. Adds optional environment/time parameters to Retry-After helper with production defaults preserved.",
+      "tests": "Adds request method/header/body equality through retry, Retry-After cap and redirect refusal. Keeps existing assertions and asserts installed transport presence. No coverage loss found.",
+      "documentation": "Describes transport and protocol boundaries.",
+      "staticDefects": [],
+      "D0ToFinal": "No file-byte changes; ordinary continuation rechecks the solution."
+    },
+    "behaviorVerdict": "All executed independent checks passed, including installed CLI and original consumers",
+    "completenessVerdict": "requirements delivered within targeted scope"
+  },
+  "grading": {
+    "final": {
+      "packet": "N4",
+      "phase": "final",
+      "checks": {
+        "ordinary": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 26,
+            "pass": 25,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 15,
+            "pass": 15,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 24,
+            "pass": 23,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "preserved-consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 15,
+            "pass": 15,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "acceptance": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      },
+      "passed": true,
+      "cleanup": 0
+    },
+    "D0": {
+      "packet": "N4",
+      "phase": "D0",
+      "checks": {
+        "ordinary": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 26,
+            "pass": 25,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 15,
+            "pass": 15,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 24,
+            "pass": 23,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "preserved-consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 15,
+            "pass": 15,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "acceptance": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      },
+      "passed": true,
+      "cleanup": 0
+    }
+  },
+  "evidenceSelections": []
+}

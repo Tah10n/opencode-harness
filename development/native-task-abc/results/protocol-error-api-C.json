@@ -1,0 +1,328 @@
+{
+  "slot": 3,
+  "task": "protocol-error-api",
+  "arm": "C",
+  "exitCode": 0,
+  "timedOut": false,
+  "elapsedMs": 261161,
+  "phaseCount": 1,
+  "continuationApplied": false,
+  "requests": 26,
+  "requestsWithoutUsage": 0,
+  "workflowStatus": "incomplete",
+  "repairs": 0,
+  "toolCalls": 35,
+  "sessions": 3,
+  "usage": {
+    "input_tokens": 697681,
+    "cached_tokens": 86528,
+    "output_tokens": 7179,
+    "reasoning_tokens": 1452,
+    "total_tokens": 704860
+  },
+  "requestEfforts": {
+    "none": 1,
+    "low": 25
+  },
+  "httpStatuses": {
+    "200": 26
+  },
+  "terminationVerified": true,
+  "stages": [
+    {
+      "label": "implementation",
+      "role": "author",
+      "elapsedMs": 118975
+    },
+    {
+      "label": "review-0",
+      "role": "reviewer",
+      "elapsedMs": 33176
+    },
+    {
+      "label": "reproduce-1",
+      "role": "author",
+      "elapsedMs": 79315
+    },
+    {
+      "label": "disposition-review-1",
+      "role": "reviewer",
+      "elapsedMs": 21040
+    }
+  ],
+  "packet": "Q9",
+  "delivery": {
+    "patchApplies": true,
+    "changedFiles": [
+      "packages/connector/README.md",
+      "packages/connector/bin/viberacing.mjs",
+      "packages/connector/lib/protocol.mjs",
+      "packages/connector/test/protocol.test.mjs"
+    ],
+    "patchSha256": "1ed24e9d95c052bd32ca84d07270efe507f4ccdbdd16af98a9cbf97d949bd784"
+  },
+  "sourceReview": {
+    "packet": "Q9",
+    "sourceReview": {
+      "implementation": "Parser rejects validated errors with Error/status/code and retains success and invalid-response paths. Central CLI removes obsolete resolved-error branch; retryable responses retain Retry-After, with invalid_server_response receiving HTTP status. No static consumer integration defect found.",
+      "tests": "The valid-400 expectation is adapted without deleting malformed-code/terminal assertions. Existing real CLI suites remain unchanged and will independently exercise retry/auth behavior. No extra 503-specific assertion here, but protocol status propagation is general and independently checked for six statuses.",
+      "documentation": "README describes valid-error rejection and untrusted-response distinction.",
+      "scope": "Four relevant connector files; no dependency or runtime packaging change.",
+      "staticDefects": []
+    },
+    "behaviorVerdict": "All executed independent checks passed",
+    "completenessVerdict": "requirements delivered within targeted scope"
+  },
+  "grading": {
+    "final": {
+      "packet": "Q9",
+      "phase": "final",
+      "checks": {
+        "ordinary": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 24,
+            "pass": 23,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 14,
+            "pass": 14,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 24,
+            "pass": 23,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "preserved-consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 14,
+            "pass": 14,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "acceptance": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 12,
+            "pass": 12,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      },
+      "passed": true,
+      "cleanup": 0
+    },
+    "D0": {
+      "packet": "Q9",
+      "phase": "D0",
+      "checks": {
+        "ordinary": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 24,
+            "pass": 23,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 14,
+            "pass": 14,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 24,
+            "pass": 23,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "preserved-consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 14,
+            "pass": 14,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "acceptance": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 12,
+            "pass": 12,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      },
+      "passed": true,
+      "cleanup": 0
+    }
+  },
+  "evidenceSelections": [
+    {
+      "review": "review-0-bindings.json",
+      "selections": [
+        {
+          "selected": "E12-bea98da3f7cc-0",
+          "ref": "E12-bea98da3f7cc-0",
+          "scope": "bea98da3f7cc-0",
+          "eventIndex": 11,
+          "callID": "call_cUSsVyLnDTqbBXVXJ8XwOmxk",
+          "state": "completed",
+          "exit": 0,
+          "before": "744b273533558f77db7cf6a0eee824da6c89a6c9ebbee0440304c2a878907142",
+          "after": "744b273533558f77db7cf6a0eee824da6c89a6c9ebbee0440304c2a878907142",
+          "snapshotSha256": "744b273533558f77db7cf6a0eee824da6c89a6c9ebbee0440304c2a878907142",
+          "current": true,
+          "resolved": true
+        },
+        {
+          "selected": "E14-bea98da3f7cc-0",
+          "ref": "E14-bea98da3f7cc-0",
+          "scope": "bea98da3f7cc-0",
+          "eventIndex": 13,
+          "callID": "call_dhsufZ6JbX3HWWttZHje4z59",
+          "state": "completed",
+          "exit": 0,
+          "before": "744b273533558f77db7cf6a0eee824da6c89a6c9ebbee0440304c2a878907142",
+          "after": "744b273533558f77db7cf6a0eee824da6c89a6c9ebbee0440304c2a878907142",
+          "snapshotSha256": "744b273533558f77db7cf6a0eee824da6c89a6c9ebbee0440304c2a878907142",
+          "current": true,
+          "resolved": true
+        },
+        {
+          "selected": "E16-bea98da3f7cc-0",
+          "ref": "E16-bea98da3f7cc-0",
+          "scope": "bea98da3f7cc-0",
+          "eventIndex": 15,
+          "callID": "call_VW5aJTJ4YITbxnWzK1pHzOvv",
+          "state": "completed",
+          "exit": 0,
+          "before": "744b273533558f77db7cf6a0eee824da6c89a6c9ebbee0440304c2a878907142",
+          "after": "744b273533558f77db7cf6a0eee824da6c89a6c9ebbee0440304c2a878907142",
+          "snapshotSha256": "744b273533558f77db7cf6a0eee824da6c89a6c9ebbee0440304c2a878907142",
+          "current": true,
+          "resolved": true
+        },
+        {
+          "selected": "E18-bea98da3f7cc-0",
+          "ref": "E18-bea98da3f7cc-0",
+          "scope": "bea98da3f7cc-0",
+          "eventIndex": 17,
+          "callID": "call_B2d1Kwv8HLjQtHGx5mzeLAc8",
+          "state": "completed",
+          "exit": 1,
+          "before": "744b273533558f77db7cf6a0eee824da6c89a6c9ebbee0440304c2a878907142",
+          "after": "744b273533558f77db7cf6a0eee824da6c89a6c9ebbee0440304c2a878907142",
+          "snapshotSha256": "744b273533558f77db7cf6a0eee824da6c89a6c9ebbee0440304c2a878907142",
+          "current": true,
+          "resolved": true
+        }
+      ]
+    },
+    {
+      "review": "disposition-review-1-bindings.json",
+      "selections": [
+        {
+          "selected": "E12-bea98da3f7cc-1",
+          "ref": "E12-bea98da3f7cc-1",
+          "scope": "bea98da3f7cc-1",
+          "eventIndex": 11,
+          "callID": "call_cUSsVyLnDTqbBXVXJ8XwOmxk",
+          "state": "completed",
+          "exit": 0,
+          "before": "744b273533558f77db7cf6a0eee824da6c89a6c9ebbee0440304c2a878907142",
+          "after": "744b273533558f77db7cf6a0eee824da6c89a6c9ebbee0440304c2a878907142",
+          "snapshotSha256": "744b273533558f77db7cf6a0eee824da6c89a6c9ebbee0440304c2a878907142",
+          "current": false,
+          "resolved": true
+        },
+        {
+          "selected": "E14-bea98da3f7cc-1",
+          "ref": "E14-bea98da3f7cc-1",
+          "scope": "bea98da3f7cc-1",
+          "eventIndex": 13,
+          "callID": "call_dhsufZ6JbX3HWWttZHje4z59",
+          "state": "completed",
+          "exit": 0,
+          "before": "744b273533558f77db7cf6a0eee824da6c89a6c9ebbee0440304c2a878907142",
+          "after": "744b273533558f77db7cf6a0eee824da6c89a6c9ebbee0440304c2a878907142",
+          "snapshotSha256": "744b273533558f77db7cf6a0eee824da6c89a6c9ebbee0440304c2a878907142",
+          "current": false,
+          "resolved": true
+        },
+        {
+          "selected": "E16-bea98da3f7cc-1",
+          "ref": "E16-bea98da3f7cc-1",
+          "scope": "bea98da3f7cc-1",
+          "eventIndex": 15,
+          "callID": "call_VW5aJTJ4YITbxnWzK1pHzOvv",
+          "state": "completed",
+          "exit": 0,
+          "before": "744b273533558f77db7cf6a0eee824da6c89a6c9ebbee0440304c2a878907142",
+          "after": "744b273533558f77db7cf6a0eee824da6c89a6c9ebbee0440304c2a878907142",
+          "snapshotSha256": "744b273533558f77db7cf6a0eee824da6c89a6c9ebbee0440304c2a878907142",
+          "current": false,
+          "resolved": true
+        },
+        {
+          "selected": "E34-bea98da3f7cc-1",
+          "ref": "E34-bea98da3f7cc-1",
+          "scope": "bea98da3f7cc-1",
+          "eventIndex": 33,
+          "callID": "call_sbP144wluWgrPdfVby9YcbC7",
+          "state": "completed",
+          "exit": 1,
+          "before": "744b273533558f77db7cf6a0eee824da6c89a6c9ebbee0440304c2a878907142",
+          "after": "744b273533558f77db7cf6a0eee824da6c89a6c9ebbee0440304c2a878907142",
+          "snapshotSha256": "744b273533558f77db7cf6a0eee824da6c89a6c9ebbee0440304c2a878907142",
+          "current": true,
+          "resolved": true
+        }
+      ]
+    }
+  ]
+}
