@@ -85,15 +85,6 @@ jobs:
         with:
           node-version: "24"
 
-      - name: Verify native template materialization
-        run: node scripts/verify-native-template.mjs
-
-      - name: Verify native task controller regressions
-        run: node scripts/verify-native-task.mjs
-
-      - name: Verify native review materialization and snapshot
-        run: node scripts/verify-native-review.mjs
-
       - name: Harden trusted Node distribution permissions
         shell: bash
         run: |
@@ -843,6 +834,15 @@ jobs:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: "24"
+      - name: Verify native template materialization
+        run: node scripts/verify-native-template.mjs
+
+      - name: Verify native task controller regressions
+        run: node scripts/verify-native-task.mjs
+
+      - name: Verify native review materialization and snapshot
+        run: node scripts/verify-native-review.mjs
+
       - name: Install pinned native OpenCode without lifecycle scripts
         run: npm install --ignore-scripts --no-audit --no-fund --prefix "$RUNNER_TEMP/native-opencode" opencode-linux-x64@1.18.26
       - name: Verify installed config and local scripted fixture
