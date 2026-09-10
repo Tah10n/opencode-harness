@@ -1,0 +1,5206 @@
+{
+  "status": "complete_fixed_sample",
+  "runtime": "328728b3ff1a416fb267d7de1b2b36b2b19cfbff",
+  "preparation": "08688642f9441b9b18d9ef31403fde748e1471a0",
+  "dataset": "2f870ca025d711887f9a5bff5e2bc4ed5bd8b1ef",
+  "totals": {
+    "A": {
+      "started": 20,
+      "retained": 20,
+      "elapsedMs": 1219100,
+      "requests": 214,
+      "toolCalls": 295,
+      "requestsWithoutObservedUsage": 0,
+      "usage": {
+        "input_tokens": 1621649,
+        "output_tokens": 41247,
+        "total_tokens": 1662896
+      }
+    },
+    "B": {
+      "started": 20,
+      "retained": 20,
+      "elapsedMs": 2201471,
+      "requests": 326,
+      "toolCalls": 399,
+      "requestsWithoutObservedUsage": 0,
+      "usage": {
+        "input_tokens": 3079891,
+        "output_tokens": 74471,
+        "total_tokens": 3154362
+      }
+    }
+  },
+  "pairs": [
+    {
+      "task": "css-layer-bundle",
+      "A": {
+        "slot": 1,
+        "task": "css-layer-bundle",
+        "arm": "A",
+        "category": "integration",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": null,
+        "d0EqualsFinal": null,
+        "workflowStatus": null,
+        "elapsedMs": 57775,
+        "requests": 10,
+        "toolCalls": 15,
+        "usage": {
+          "input_tokens": 73448,
+          "output_tokens": 2087,
+          "total_tokens": 75535
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "basis": "Current-ready topological sort integrated into bundle; cycle and frozen block/edge input regression; old assertion preserved; docs cover full contract. Unused names assertion not treated as evidence."
+        },
+        "artifactHashes": {
+          "candidate.tar": "0b3b3ead22ffaf3810f6ea0d753216c16519d5d65f2b4754ed49a937ff1e769a",
+          "provider-metadata.json": "623084a67d56a1cda6b5064ed1d5c847576231399214270005ee53f7604d9a44",
+          "native-evidence.json": "64fed838e6ed4b932001a7041ca4f4f006a7130b65f0f98fe8d5ff16be02a4f0",
+          "result.json": "702d434bea729416703d44f0d507e0a86a8d616c655549a0b28a7d63c4335617",
+          "behavior-grading.json": "2db815f0659a574cd55173b6e7aed6fc533cb839728e1a7444c1468bb32967dd",
+          "completed.json": "20e773e37b251fc855bfd1da987b4b2869f353786ac61deb15f0a7911a43819f"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 1,
+        "modelFinalNpmEvidence": {
+          "run": "css-layer-bundle-A",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_CTzT45rNBHh6N4HxjIfpC7WM"
+        }
+      },
+      "B": {
+        "slot": 2,
+        "task": "css-layer-bundle",
+        "arm": "B",
+        "category": "integration",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": true,
+        "d0EqualsFinal": true,
+        "workflowStatus": "reviewed_delivery",
+        "elapsedMs": 139167,
+        "requests": 15,
+        "toolCalls": 18,
+        "usage": {
+          "input_tokens": 136522,
+          "output_tokens": 3433,
+          "total_tokens": 139955
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "d0Complete": true,
+          "basis": "Dynamic ready sorting handles duplicate edges; bundle delegates. New tests cover dependency output, frozen arrays/records and cycle failure, old test unchanged, docs cover policy. D0 equals final."
+        },
+        "artifactHashes": {
+          "candidate.tar": "e51dfbc425e03dfe146fc6ba83166cf4628ab1829567fcc376a45f0c2aaa568c",
+          "provider-metadata.json": "bde8e1a510c4e6bb13239145e24d83b68265a40397986df4d19b38847ba252bc",
+          "native-evidence.json": "caca729dec2b604427d057c4415f30e605167c8a33d7d8ae8598bdf99acfeed8",
+          "result.json": "fb622e70124475e9f29be17f840e4e11269a33cbbbbacc498ff1a9d3e59200f6",
+          "behavior-grading.json": "a6bc8d6006390c7e3cc1da60b0af8aa5db5824eac90f1f769416c57ffb0d3593",
+          "completed.json": "e6e8cd97e749c5285f7745f5be8437dbcc2129ecb3d94d5dc122e739aa20f173",
+          "D0.patch": "e4746b26ff91e8c76e034929421f56f8dd903536ea5d6ee5311082bbce5a920c",
+          "terminal.patch": "e4746b26ff91e8c76e034929421f56f8dd903536ea5d6ee5311082bbce5a920c"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 3,
+        "workflow": {
+          "status": "reviewed_delivery",
+          "stages": [
+            {
+              "label": "implementation",
+              "role": "author",
+              "supplied": false,
+              "elapsedMs": 116637,
+              "messageID": "msg_08bc8c7d9001UrssBhsh4O7wAw"
+            },
+            {
+              "label": "review-0",
+              "role": "reviewer",
+              "supplied": false,
+              "elapsedMs": 13745,
+              "messageID": "msg_08bc8d2bb001gWJrj02cBP3Z16"
+            }
+          ],
+          "limits": [],
+          "repairs": 0,
+          "implementationContinuations": 0,
+          "evidenceCorrections": 0,
+          "remaining": [],
+          "unresolvedDispositions": [],
+          "failure": null
+        },
+        "stageCosts": {
+          "native_auxiliary_none": {
+            "requests": 1,
+            "input_tokens": 577,
+            "output_tokens": 8,
+            "total_tokens": 585,
+            "missingUsage": 0
+          },
+          "unattributed": {
+            "requests": 2,
+            "input_tokens": 13851,
+            "output_tokens": 90,
+            "total_tokens": 13941,
+            "missingUsage": 0
+          },
+          "implementation": {
+            "requests": 11,
+            "input_tokens": 107327,
+            "output_tokens": 2645,
+            "total_tokens": 109972,
+            "missingUsage": 0
+          },
+          "review-0": {
+            "requests": 1,
+            "input_tokens": 14767,
+            "output_tokens": 690,
+            "total_tokens": 15457,
+            "missingUsage": 0
+          }
+        },
+        "clarifications": [],
+        "modelFinalNpmEvidence": {
+          "run": "css-layer-bundle-B",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_JDGkCeLveUtP57356pNiLvpj"
+        }
+      }
+    },
+    {
+      "task": "inventory-kit-availability",
+      "A": {
+        "slot": 4,
+        "task": "inventory-kit-availability",
+        "arm": "A",
+        "category": "integration",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": null,
+        "d0EqualsFinal": null,
+        "workflowStatus": null,
+        "elapsedMs": 51525,
+        "requests": 10,
+        "toolCalls": 14,
+        "usage": {
+          "input_tokens": 72018,
+          "output_tokens": 1713,
+          "total_tokens": 73731
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "basis": "Own-key aggregate capacity integrated through quote; duplicate-parts and same-SKU independent frozen-stock tests; legacy retained; requested documentation complete."
+        },
+        "artifactHashes": {
+          "candidate.tar": "7edbd12d37df078fa83412a90da6486d7b7605cc3900f530113e3e64871e37be",
+          "provider-metadata.json": "22e0405126de50a80407c5e2c2841c810834b6d575570e08b025c407f4a90115",
+          "native-evidence.json": "ed399158c5dbee956a05aaa6a8f5a361a3c1fbdde33c26ea833bb8b215fa4b09",
+          "result.json": "0d28abbf2314552d1a7bb29b53e5ed628dcfb9dba0ad9030abbf9f10d4584ece",
+          "behavior-grading.json": "2db815f0659a574cd55173b6e7aed6fc533cb839728e1a7444c1468bb32967dd",
+          "completed.json": "6777b7881f592571d560c06c4b40a2683c60eb0d5c56ec70ded413e904026721"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 1,
+        "modelFinalNpmEvidence": {
+          "run": "inventory-kit-availability-A",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_AaAisdH7MXsWdhz1LLjubN0A"
+        }
+      },
+      "B": {
+        "slot": 3,
+        "task": "inventory-kit-availability",
+        "arm": "B",
+        "category": "integration",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": false,
+        "d0EqualsFinal": false,
+        "workflowStatus": "incomplete",
+        "elapsedMs": 143405,
+        "requests": 19,
+        "toolCalls": 20,
+        "usage": {
+          "input_tokens": 215761,
+          "output_tokens": 5758,
+          "total_tokens": 221519
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "d0Complete": false,
+          "basis": "kitCapacity sums repeated own-key requirements and quote delegates. Final same-SKU frozen-stock two-kit regression proves non-reservation; D0 used different SKUs and did not discriminate reservation. Only this new test changed after D0; initial legacy assertion retained. Missing duplicate obligation disposition keeps workflow incomplete."
+        },
+        "artifactHashes": {
+          "candidate.tar": "2e4af50df665fadb1a3b1d95b21ed9c62beab1ad95f6f7ec3b095c8125479b21",
+          "provider-metadata.json": "8f19e5a275293295fcdf0986faf10c57258ad88bde681ca611e0b606145ccf02",
+          "native-evidence.json": "6dd8c7fef05cde25d9de0ed27e409045bd214eac0e42577b301e1befe437e34c",
+          "result.json": "dda1088b029582e92c7faf54e2de0378ac2406cf7dbb56221e34ead60bcbe8ee",
+          "behavior-grading.json": "a6bc8d6006390c7e3cc1da60b0af8aa5db5824eac90f1f769416c57ffb0d3593",
+          "completed.json": "2c56dba4d74c8b680bb739a93b0f4fdd2fecb44d8f02be13cbd2ed5d802f22ec",
+          "D0.patch": "142a2244f6bce83465eacfd20b1c4176696297518552f441ed50113860f6b912",
+          "terminal.patch": "0e12be764cd4cdb4ef3ffc9e027c64db4da214637a7929324643e68a36211a6c"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 3,
+        "workflow": {
+          "status": "incomplete",
+          "stages": [
+            {
+              "label": "implementation",
+              "role": "author",
+              "supplied": false,
+              "elapsedMs": 63117,
+              "messageID": "msg_08bca2145001Cfa6wqV13x2QMF"
+            },
+            {
+              "label": "review-0",
+              "role": "reviewer",
+              "supplied": false,
+              "elapsedMs": 24969,
+              "messageID": "msg_08bca2b58001o3ZTjKSumF093g"
+            },
+            {
+              "label": "reproduce-1",
+              "role": "author",
+              "supplied": false,
+              "elapsedMs": 26501,
+              "messageID": "msg_08bcae15f001piZ2jBISvvyh5q"
+            },
+            {
+              "label": "disposition-review-1",
+              "role": "reviewer",
+              "supplied": false,
+              "elapsedMs": 19829,
+              "messageID": "msg_08bcaf510001Fc232m4iJWWV09"
+            }
+          ],
+          "limits": [
+            "A reviewer-identified required check is failed, missing or stale.",
+            "Missing or duplicate dispositions remain unresolved; other admitted work was retained."
+          ],
+          "repairs": 0,
+          "implementationContinuations": 0,
+          "evidenceCorrections": 0,
+          "remaining": [],
+          "unresolvedDispositions": [
+            {
+              "round": 1,
+              "candidate": {
+                "id": "obligation-0",
+                "kind": "delivery",
+                "basis": "Add regressions for repeated parts through quote and independent quotes with frozen stock.",
+                "verification": "Repeated-part coverage exists at test/legacy.test.mjs:5-9, but the independence test at lines 11-20 uses different SKUs, so it does not demonstrate non-reservation of shared inventory.",
+                "origin": "missing-original-obligation"
+              },
+              "reasons": [
+                "missing_or_duplicate_disposition",
+                "expected_basis_unresolved",
+                "evidence_not_in_current_stage"
+              ]
+            }
+          ],
+          "failure": null
+        },
+        "stageCosts": {
+          "native_auxiliary_none": {
+            "requests": 1,
+            "input_tokens": 577,
+            "output_tokens": 8,
+            "total_tokens": 585,
+            "missingUsage": 0
+          },
+          "unattributed": {
+            "requests": 2,
+            "input_tokens": 14688,
+            "output_tokens": 113,
+            "total_tokens": 14801,
+            "missingUsage": 0
+          },
+          "implementation": {
+            "requests": 10,
+            "input_tokens": 94936,
+            "output_tokens": 2414,
+            "total_tokens": 97350,
+            "missingUsage": 0
+          },
+          "review-0": {
+            "requests": 1,
+            "input_tokens": 14006,
+            "output_tokens": 1294,
+            "total_tokens": 15300,
+            "missingUsage": 0
+          },
+          "reproduce-1": {
+            "requests": 4,
+            "input_tokens": 65119,
+            "output_tokens": 1007,
+            "total_tokens": 66126,
+            "missingUsage": 0
+          },
+          "disposition-review-1": {
+            "requests": 1,
+            "input_tokens": 26435,
+            "output_tokens": 922,
+            "total_tokens": 27357,
+            "missingUsage": 0
+          }
+        },
+        "clarifications": [],
+        "modelFinalNpmEvidence": {
+          "run": "inventory-kit-availability-B",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_kfOnu5lw3fkBc0apwzFLGxTM"
+        }
+      }
+    },
+    {
+      "task": "terminal-table-render",
+      "A": {
+        "slot": 5,
+        "task": "terminal-table-render",
+        "arm": "A",
+        "category": "integration",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": null,
+        "d0EqualsFinal": null,
+        "workflowStatus": null,
+        "elapsedMs": 61982,
+        "requests": 11,
+        "toolCalls": 15,
+        "usage": {
+          "input_tokens": 84712,
+          "output_tokens": 2126,
+          "total_tokens": 86838
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "basis": "render uses visibleWidth for sizing/padding; SGR/code-point and rendered original-color-string assertions, non-SGR width, legacy preserved; full requested docs. No input mutation in inspected code."
+        },
+        "artifactHashes": {
+          "candidate.tar": "8412b5a2803073e5ba632b10e78f93fa42d1a219a4358c63b2a071855fc72c60",
+          "provider-metadata.json": "51ffbac894e999cbaffccfb148cad960f07f62943fd2b506c375aa662436ac45",
+          "native-evidence.json": "0bf4aa502c8a761487080958e674056c6df55b5f786bc75c88efabb53b51a765",
+          "result.json": "b95b851e6e67eb0f0e93b8286e692ad7f9e1c35f8c001364f213cfa691fc0911",
+          "behavior-grading.json": "2db815f0659a574cd55173b6e7aed6fc533cb839728e1a7444c1468bb32967dd",
+          "completed.json": "d554bde95a46ca5f29641d6d888ea38584a629635c45b256f8d7f23fc77ef23f"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 1,
+        "modelFinalNpmEvidence": {
+          "run": "terminal-table-render-A",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_CYVTwv1ehA1isVZCMOTenjAT"
+        }
+      },
+      "B": {
+        "slot": 6,
+        "task": "terminal-table-render",
+        "arm": "B",
+        "category": "integration",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": true,
+        "d0EqualsFinal": true,
+        "workflowStatus": "reviewed_delivery",
+        "elapsedMs": 113762,
+        "requests": 16,
+        "toolCalls": 25,
+        "usage": {
+          "input_tokens": 157755,
+          "output_tokens": 4279,
+          "total_tokens": 162034
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 4,
+              "pass": 4,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 4,
+              "pass": 4,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "d0Complete": true,
+          "basis": "Correct SGR/code-point width integrated into table sizing/padding, rendered colored Unicode assertions and non-SGR controls, empty shapes, original test retained; required docs. D0 equals final."
+        },
+        "artifactHashes": {
+          "candidate.tar": "4eb1a4525eca73c051116f3be432437dff43b9b37c497bde58c14cfbde6896ff",
+          "provider-metadata.json": "1913ba96ecde81edfeab040ac18216e73cc37491d911b48259fbe0821e231811",
+          "native-evidence.json": "4573650ad62f1229a971a14f29cb599ec44ff63e6c79f8bad37825d101fe8297",
+          "result.json": "d0d82236a1896d38da3f729b045ffe23ca2e1a6ae97a2fdeb834dba612b2f8e4",
+          "behavior-grading.json": "07f0a3f5e330fbf3bb0a015d2aa7024512e3a3b1c3c655b09e42ccf6e04782b9",
+          "completed.json": "4cd7dabd999832e0b18d67703e830a2e74d63a1b3102dc80b35b26c1f05f958a",
+          "D0.patch": "2e938a75b8f97511343e82fe09bbec145a013e6f28053f270effb7662a87f0df",
+          "terminal.patch": "2e938a75b8f97511343e82fe09bbec145a013e6f28053f270effb7662a87f0df"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 3,
+        "workflow": {
+          "status": "reviewed_delivery",
+          "stages": [
+            {
+              "label": "implementation",
+              "role": "author",
+              "supplied": false,
+              "elapsedMs": 84353,
+              "messageID": "msg_08bce7797001AH6AY5aQVfsxne"
+            },
+            {
+              "label": "review-0",
+              "role": "reviewer",
+              "supplied": false,
+              "elapsedMs": 22199,
+              "messageID": "msg_08bce9fa8001kVCA1KrynG2Jx3"
+            }
+          ],
+          "limits": [],
+          "repairs": 0,
+          "implementationContinuations": 0,
+          "evidenceCorrections": 0,
+          "remaining": [],
+          "unresolvedDispositions": [],
+          "failure": null
+        },
+        "stageCosts": {
+          "native_auxiliary_none": {
+            "requests": 1,
+            "input_tokens": 577,
+            "output_tokens": 8,
+            "total_tokens": 585,
+            "missingUsage": 0
+          },
+          "unattributed": {
+            "requests": 2,
+            "input_tokens": 13843,
+            "output_tokens": 81,
+            "total_tokens": 13924,
+            "missingUsage": 0
+          },
+          "implementation": {
+            "requests": 11,
+            "input_tokens": 113460,
+            "output_tokens": 3198,
+            "total_tokens": 116658,
+            "missingUsage": 0
+          },
+          "review-0": {
+            "requests": 2,
+            "input_tokens": 29875,
+            "output_tokens": 992,
+            "total_tokens": 30867,
+            "missingUsage": 0
+          }
+        },
+        "clarifications": [],
+        "modelFinalNpmEvidence": {
+          "run": "terminal-table-render-B",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_hbbdsCsL8A7nbQgmn44cuaou"
+        }
+      }
+    },
+    {
+      "task": "calendar-week-summary",
+      "A": {
+        "slot": 8,
+        "task": "calendar-week-summary",
+        "arm": "A",
+        "category": "integration",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": null,
+        "d0EqualsFinal": null,
+        "workflowStatus": null,
+        "elapsedMs": 57609,
+        "requests": 11,
+        "toolCalls": 15,
+        "usage": {
+          "input_tokens": 81406,
+          "output_tokens": 2021,
+          "total_tokens": 83427
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "basis": "UTC Monday core integrated into sorted weekly summation; week boundary, leap/year and frozen-input preservation tests; legacy and docs complete."
+        },
+        "artifactHashes": {
+          "candidate.tar": "1b6d0a25911dc25192b84b23a9bb82ad0d5e73fe481e366249d21d6618b89048",
+          "provider-metadata.json": "7f85ef1c83dade804da2b6425b16a73f47d522fe98af2be256e47e90972db98c",
+          "native-evidence.json": "a99440af6b88bb768c7656e325690be2b42a410c63845049b5eb1460a0faef3f",
+          "result.json": "36c0403d229101f3c83f5d86e25ab8e12d2a8380451f9ab3a37c35a617aa85ad",
+          "behavior-grading.json": "2db815f0659a574cd55173b6e7aed6fc533cb839728e1a7444c1468bb32967dd",
+          "completed.json": "a1e1cdf13c1b64cdfb23f06cc2d18846b97e94ee6676316759246e88443081e1"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 1,
+        "modelFinalNpmEvidence": {
+          "run": "calendar-week-summary-A",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_DErvb7Y5CygUkqEmpfMCE418"
+        }
+      },
+      "B": {
+        "slot": 7,
+        "task": "calendar-week-summary",
+        "arm": "B",
+        "category": "integration",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": null,
+        "d0EqualsFinal": null,
+        "workflowStatus": "incomplete",
+        "elapsedMs": 95990,
+        "requests": 17,
+        "toolCalls": 21,
+        "usage": {
+          "input_tokens": 162402,
+          "output_tokens": 3231,
+          "total_tokens": 165633
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "d0Complete": null,
+          "basis": "UTC weekStart used by aggregator; correct week/year/leap cases and frozen-input assertions, legacy retained, requested docs. Terminal independently passes; genuine permission denial halted workflow before D0/review."
+        },
+        "artifactHashes": {
+          "candidate.tar": "835be7c0000a1dbcce86ad21a10b0927823de5fbfbf21911de763c930c6492f5",
+          "provider-metadata.json": "8499a38b36bb29b827781f23ba8bd01c4844ef7eedde177e37de68101a665a0f",
+          "native-evidence.json": "aebbdc9046a56cbcd8fdccc8d1a986f36103c6cbc47b74ddd708c1c5403b56a0",
+          "result.json": "d795ade671adbd3bb134809c175c8d43f98f1ac97ee30e156a2a267dea6247cf",
+          "behavior-grading.json": "2db815f0659a574cd55173b6e7aed6fc533cb839728e1a7444c1468bb32967dd",
+          "completed.json": "972241bf9d12eb2dc41a4299c3804efb13d52de5ab7026342dfa911c9424745a",
+          "terminal.patch": "08f9e7b7b68411413bafa8c051f5b3f212e65286209ed07c263c2843edb5acc0"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 2,
+        "workflow": {
+          "status": "incomplete",
+          "stages": [],
+          "limits": [
+            "Native permission boundary rejected a tool; no evidence correction admitted"
+          ],
+          "repairs": 0,
+          "implementationContinuations": 0,
+          "evidenceCorrections": 0,
+          "remaining": [],
+          "unresolvedDispositions": [],
+          "failure": {
+            "category": "workflow_protocol",
+            "message": "Native permission boundary rejected a tool; no evidence correction admitted"
+          }
+        },
+        "stageCosts": {
+          "native_auxiliary_none": {
+            "requests": 1,
+            "input_tokens": 577,
+            "output_tokens": 10,
+            "total_tokens": 587,
+            "missingUsage": 0
+          },
+          "unattributed": {
+            "requests": 16,
+            "input_tokens": 161825,
+            "output_tokens": 3221,
+            "total_tokens": 165046,
+            "missingUsage": 0
+          }
+        },
+        "clarifications": [],
+        "modelFinalNpmEvidence": {
+          "run": "calendar-week-summary-B",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_8F3hBafzEDtxcyRYr9P38oeR"
+        }
+      }
+    },
+    {
+      "task": "redirect-chain-report",
+      "A": {
+        "slot": 9,
+        "task": "redirect-chain-report",
+        "arm": "A",
+        "category": "integration",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": null,
+        "d0EqualsFinal": null,
+        "workflowStatus": null,
+        "elapsedMs": 60586,
+        "requests": 12,
+        "toolCalls": 17,
+        "usage": {
+          "input_tokens": 93302,
+          "output_tokens": 2169,
+          "total_tokens": 95471
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "basis": "Own-property traversal integrated into report; chain/cycle and own special-key/empty-target project assertions, legacy retained, requested docs. Inherited start is shadowed in project fixture and not counted as a direct inherited-ignore test; independent acceptance and inspected hasOwnProperty establish that behavior."
+        },
+        "artifactHashes": {
+          "candidate.tar": "dca5c0a48ff279237544d51f51e6cf9e351879303c7feaf1a6dd7d6eea5a8b6d",
+          "provider-metadata.json": "83863d9911550fcfadabfa15b97fc338a2ba7f3de4ae2a5e4ce01bdaffb44da5",
+          "native-evidence.json": "dafbaa7b19cea9a480a29175993caae154a7a4608548e3f221aafe46d4998fb3",
+          "result.json": "a7ec4a3ca9676f728931d74609f58b724601321d108b8dc1a84f82ff904e0b3c",
+          "behavior-grading.json": "2db815f0659a574cd55173b6e7aed6fc533cb839728e1a7444c1468bb32967dd",
+          "completed.json": "56c5c54be9df67f10ec44f99652ce5846be9da1248a2fbe2206fd77a768d22e0"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 1,
+        "modelFinalNpmEvidence": {
+          "run": "redirect-chain-report-A",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_c3PDK0RzOnKBxb8L0jtxEPsn"
+        }
+      },
+      "B": {
+        "slot": 10,
+        "task": "redirect-chain-report",
+        "arm": "B",
+        "category": "integration",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": true,
+        "d0EqualsFinal": true,
+        "workflowStatus": "reviewed_delivery",
+        "elapsedMs": 102510,
+        "requests": 17,
+        "toolCalls": 22,
+        "usage": {
+          "input_tokens": 161312,
+          "output_tokens": 3745,
+          "total_tokens": 165057
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "d0Complete": true,
+          "basis": "follow uses own keys and per-walk visited state, report delegates. Tests directly cover chains/cycles, inherited-ignore, own special-key and empty target; legacy/docs retained. D0 equals final."
+        },
+        "artifactHashes": {
+          "candidate.tar": "e9fe7c250d209cc1978dcdf8ec5375f1c9318421452549a168cdd8a34f4d3695",
+          "provider-metadata.json": "d743721aba489a1db5320c8c19e810ed6d5d17cf29c93abde4531e6127586ec5",
+          "native-evidence.json": "8ce9d67fa7d67a74d706d600e94ac71e64dfdc80acb2206e3f95324cc3938e24",
+          "result.json": "18bfbf46ac3ab092720cd5be5eb5e474b4ea6b609e584af353adf4cda481b10d",
+          "behavior-grading.json": "a6bc8d6006390c7e3cc1da60b0af8aa5db5824eac90f1f769416c57ffb0d3593",
+          "completed.json": "e56bd8254b22a4c9f6df63b69e43979f71f6bfdb73eda852c4873a4389d5a9d5",
+          "D0.patch": "950a34976f6e8d4de2217f0968bd01614b436e10b321ef9b808c5d1e5b2a31a5",
+          "terminal.patch": "950a34976f6e8d4de2217f0968bd01614b436e10b321ef9b808c5d1e5b2a31a5"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 3,
+        "workflow": {
+          "status": "reviewed_delivery",
+          "stages": [
+            {
+              "label": "implementation",
+              "role": "author",
+              "supplied": false,
+              "elapsedMs": 77488,
+              "messageID": "msg_08bd386f2001dRlhEM7m9TsxVe"
+            },
+            {
+              "label": "review-0",
+              "role": "reviewer",
+              "supplied": false,
+              "elapsedMs": 15074,
+              "messageID": "msg_08bd393d7001GXqta4wY6iLMpr"
+            }
+          ],
+          "limits": [],
+          "repairs": 0,
+          "implementationContinuations": 0,
+          "evidenceCorrections": 0,
+          "remaining": [],
+          "unresolvedDispositions": [],
+          "failure": null
+        },
+        "stageCosts": {
+          "native_auxiliary_none": {
+            "requests": 1,
+            "input_tokens": 577,
+            "output_tokens": 8,
+            "total_tokens": 585,
+            "missingUsage": 0
+          },
+          "unattributed": {
+            "requests": 2,
+            "input_tokens": 13834,
+            "output_tokens": 118,
+            "total_tokens": 13952,
+            "missingUsage": 0
+          },
+          "implementation": {
+            "requests": 13,
+            "input_tokens": 131474,
+            "output_tokens": 2940,
+            "total_tokens": 134414,
+            "missingUsage": 0
+          },
+          "review-0": {
+            "requests": 1,
+            "input_tokens": 15427,
+            "output_tokens": 679,
+            "total_tokens": 16106,
+            "missingUsage": 0
+          }
+        },
+        "clarifications": [],
+        "modelFinalNpmEvidence": {
+          "run": "redirect-chain-report-B",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_b4kd1LjQduH2zEf83vYCGYZ5"
+        }
+      }
+    },
+    {
+      "task": "seat-reservation-snapshot",
+      "A": {
+        "slot": 12,
+        "task": "seat-reservation-snapshot",
+        "arm": "A",
+        "category": "state",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": null,
+        "d0EqualsFinal": null,
+        "workflowStatus": null,
+        "elapsedMs": 68835,
+        "requests": 10,
+        "toolCalls": 13,
+        "usage": {
+          "input_tokens": 71864,
+          "output_tokens": 1812,
+          "total_tokens": 73676
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "basis": "Atomic Set reservation and numeric detached snapshots; tests cover conflict/duplicate/empty, sorted snapshot and independent restore/release, legacy/docs retained. Independent numeric multi-digit case passes; project sorting example itself uses single-digit IDs."
+        },
+        "artifactHashes": {
+          "candidate.tar": "2c4637e17f62ad3e2f350fff97b39bde48ac8735dfd8dfa662cd794a23c4ffe7",
+          "provider-metadata.json": "c03713cfb9f179b2e9b1c3449316d3fbfd5d48bfce25da55553f78c50e4df26f",
+          "native-evidence.json": "49bea95902ca29ba17bb7b289d7ce41099c7e569a7d06aa3de026621be2d0893",
+          "result.json": "dbbb7dad7fb8319d8e003bf6f2c2f8f518b37189ef1f2684b5699659e1f2af1c",
+          "behavior-grading.json": "2db815f0659a574cd55173b6e7aed6fc533cb839728e1a7444c1468bb32967dd",
+          "completed.json": "f6647410e73b4f082e1b8cf36e9bb48f62aa72ed888be3e86c11084eba004174"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 1,
+        "modelFinalNpmEvidence": {
+          "run": "seat-reservation-snapshot-A",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_1geH1mM0Re2p6odSZbtFFTU6"
+        }
+      },
+      "B": {
+        "slot": 11,
+        "task": "seat-reservation-snapshot",
+        "arm": "B",
+        "category": "state",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": true,
+        "d0EqualsFinal": true,
+        "workflowStatus": "incomplete",
+        "elapsedMs": 96810,
+        "requests": 17,
+        "toolCalls": 23,
+        "usage": {
+          "input_tokens": 157295,
+          "output_tokens": 3532,
+          "total_tokens": 160827
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "d0Complete": true,
+          "basis": "Atomic duplicate/conflict validation, idempotent release and copied numeric snapshots. Tests detect partial conflict, duplicate request, snapshot/restore isolation and numeric sorting; legacy/docs complete. D0 equals final; reviewer check accounting remains incomplete."
+        },
+        "artifactHashes": {
+          "candidate.tar": "9686e91326a38c7e1b30e042c3aaa92e91e5238475518342908acfdf63ae4ed5",
+          "provider-metadata.json": "99fbe402e807dcca973dafc1d9813c5147496a63737d0d9c1690022c89658d00",
+          "native-evidence.json": "59294bf9c92831623042fb69dfd7ee9d13e7394f1085b3022406f19cc239cdb0",
+          "result.json": "6ffdc74e444b4abee22f467ea3e52021d797c5de0b3972745dc9a176aa831a5b",
+          "behavior-grading.json": "a6bc8d6006390c7e3cc1da60b0af8aa5db5824eac90f1f769416c57ffb0d3593",
+          "completed.json": "c1042239456f32b2bd21e6ed50cda1ae23fbc491e9c3e608fd859338db7f90bd",
+          "D0.patch": "47a25c66007fa38a7003ed7a77b89afc039fcb5ac0d336c813c145d4df6026e6",
+          "terminal.patch": "47a25c66007fa38a7003ed7a77b89afc039fcb5ac0d336c813c145d4df6026e6"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 3,
+        "workflow": {
+          "status": "incomplete",
+          "stages": [
+            {
+              "label": "implementation",
+              "role": "author",
+              "supplied": false,
+              "elapsedMs": 70069,
+              "messageID": "msg_08bd50165001LxvHhzN927EjAz"
+            },
+            {
+              "label": "review-0",
+              "role": "reviewer",
+              "supplied": false,
+              "elapsedMs": 19121,
+              "messageID": "msg_08bd51e960019ksJP0dzp5yRR4"
+            }
+          ],
+          "limits": [
+            "A reviewer-identified required check is failed, missing or stale."
+          ],
+          "repairs": 0,
+          "implementationContinuations": 0,
+          "evidenceCorrections": 0,
+          "remaining": [],
+          "unresolvedDispositions": [],
+          "failure": null
+        },
+        "stageCosts": {
+          "native_auxiliary_none": {
+            "requests": 1,
+            "input_tokens": 577,
+            "output_tokens": 9,
+            "total_tokens": 586,
+            "missingUsage": 0
+          },
+          "unattributed": {
+            "requests": 2,
+            "input_tokens": 13761,
+            "output_tokens": 95,
+            "total_tokens": 13856,
+            "missingUsage": 0
+          },
+          "implementation": {
+            "requests": 12,
+            "input_tokens": 115387,
+            "output_tokens": 2650,
+            "total_tokens": 118037,
+            "missingUsage": 0
+          },
+          "review-0": {
+            "requests": 2,
+            "input_tokens": 27570,
+            "output_tokens": 778,
+            "total_tokens": 28348,
+            "missingUsage": 0
+          }
+        },
+        "clarifications": [],
+        "modelFinalNpmEvidence": {
+          "run": "seat-reservation-snapshot-B",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_UAjS7IzrDipGPSeBhEPH0l0A"
+        }
+      }
+    },
+    {
+      "task": "inventory-count-delta",
+      "A": {
+        "slot": 13,
+        "task": "inventory-count-delta",
+        "arm": "A",
+        "category": "state",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": null,
+        "d0EqualsFinal": null,
+        "workflowStatus": null,
+        "elapsedMs": 63917,
+        "requests": 11,
+        "toolCalls": 14,
+        "usage": {
+          "input_tokens": 83653,
+          "output_tokens": 2406,
+          "total_tokens": 86059
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "basis": "Sorted own-key signed deltas, sequential negative validation and safe defineProperty writes. Project round-trip includes removals; intermediate-negative test checks input unchanged. Legacy and specified docs retained."
+        },
+        "artifactHashes": {
+          "candidate.tar": "ea0239cf9083a9c2761c40975859de7783c93304468919a60834591c9924027f",
+          "provider-metadata.json": "462b59680d75538ead65993cf602a38bbdb92b3587354eef08c568848657010d",
+          "native-evidence.json": "357eab5f3de988df6949cb4263309d84f0748275256923b08995d26c7dd2f3a2",
+          "result.json": "0dbb85301565209bdc53c5f5daf7d64461bb0a0af04326878b9714ba2a65c6e2",
+          "behavior-grading.json": "2db815f0659a574cd55173b6e7aed6fc533cb839728e1a7444c1468bb32967dd",
+          "completed.json": "84f189add6893559609f08ce4799b44bc1d2f3223d29515ad9fc1bca9697ba65"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 1,
+        "modelFinalNpmEvidence": {
+          "run": "inventory-count-delta-A",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_lTqOotHhOQMsPQZJ5LthVIgo"
+        }
+      },
+      "B": {
+        "slot": 14,
+        "task": "inventory-count-delta",
+        "arm": "B",
+        "category": "state",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": true,
+        "d0EqualsFinal": true,
+        "workflowStatus": "reviewed_delivery",
+        "elapsedMs": 98450,
+        "requests": 14,
+        "toolCalls": 16,
+        "usage": {
+          "input_tokens": 123916,
+          "output_tokens": 3798,
+          "total_tokens": 127714
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 4,
+              "pass": 4,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 4,
+              "pass": 4,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "d0Complete": true,
+          "basis": "Correct signed own-key delta and safe sequential apply; round-trip/removal, intermediate negative/input preservation and special-key assertions; old test/docs retained. D0 equals final."
+        },
+        "artifactHashes": {
+          "candidate.tar": "dae79850b80575f6c3c4085b31037388f7350e827225e7580c089546a4650879",
+          "provider-metadata.json": "0da3f4289e2b3a5f6030ce2d26169f43443c3c185852430d65c6d377fb81a7a7",
+          "native-evidence.json": "45382cc7fcf9313b904ecc3a23a28b815de36e6c3694da52f6f25e921a0daa9d",
+          "result.json": "129a252665498608f0eb35c7756d9ce099395af7d2c8e0512a7f2a4a833cf405",
+          "behavior-grading.json": "07f0a3f5e330fbf3bb0a015d2aa7024512e3a3b1c3c655b09e42ccf6e04782b9",
+          "completed.json": "852e20188db2442ba1f3621550cdd651a962eb1b1a117c0bac4602153de512de",
+          "D0.patch": "3d73728401c5fdb406d14c688fdda4ae654397d5f85ee0fd9f75fb8341ca1e9a",
+          "terminal.patch": "3d73728401c5fdb406d14c688fdda4ae654397d5f85ee0fd9f75fb8341ca1e9a"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 3,
+        "workflow": {
+          "status": "reviewed_delivery",
+          "stages": [
+            {
+              "label": "implementation",
+              "role": "author",
+              "supplied": false,
+              "elapsedMs": 66481,
+              "messageID": "msg_08bd88881001NCU6WHJ2UZY8lt"
+            },
+            {
+              "label": "review-0",
+              "role": "reviewer",
+              "supplied": false,
+              "elapsedMs": 22124,
+              "messageID": "msg_08bd897fc001pNgpihrsS37WM4"
+            }
+          ],
+          "limits": [],
+          "repairs": 0,
+          "implementationContinuations": 0,
+          "evidenceCorrections": 0,
+          "remaining": [],
+          "unresolvedDispositions": [],
+          "failure": null
+        },
+        "stageCosts": {
+          "native_auxiliary_none": {
+            "requests": 1,
+            "input_tokens": 577,
+            "output_tokens": 9,
+            "total_tokens": 586,
+            "missingUsage": 0
+          },
+          "unattributed": {
+            "requests": 2,
+            "input_tokens": 14012,
+            "output_tokens": 80,
+            "total_tokens": 14092,
+            "missingUsage": 0
+          },
+          "implementation": {
+            "requests": 10,
+            "input_tokens": 95107,
+            "output_tokens": 2557,
+            "total_tokens": 97664,
+            "missingUsage": 0
+          },
+          "review-0": {
+            "requests": 1,
+            "input_tokens": 14220,
+            "output_tokens": 1152,
+            "total_tokens": 15372,
+            "missingUsage": 0
+          }
+        },
+        "clarifications": [],
+        "modelFinalNpmEvidence": {
+          "run": "inventory-count-delta-B",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_evQLiDgu15vrL1cJL1xTnFnX"
+        }
+      }
+    },
+    {
+      "task": "quiz-progress-migration",
+      "A": {
+        "slot": 16,
+        "task": "quiz-progress-migration",
+        "arm": "A",
+        "category": "state",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": null,
+        "d0EqualsFinal": null,
+        "workflowStatus": null,
+        "elapsedMs": 60630,
+        "requests": 10,
+        "toolCalls": 13,
+        "usage": {
+          "input_tokens": 74483,
+          "output_tokens": 2164,
+          "total_tokens": 76647
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "basis": "Codec delegates migration; preregistered JSON-copy alternative preserves allowed values. Project tests cover v1 extras/encounter order and v2 nonrenumbering/deep identity, original assertion and docs retained."
+        },
+        "artifactHashes": {
+          "candidate.tar": "e8df61f83115d8e696313ad2c05ab00444cd24b96e31c8d4ce5c20971ad4b08b",
+          "provider-metadata.json": "0c8bd7e8626d55c4fc0265518c780a261a681a4fb775002363010a60b3bec27b",
+          "native-evidence.json": "df7e6852b493cc18aeaf790b40f3f58bff7cd25238f6e010b67d3969024f66f5",
+          "result.json": "bce0cfe469aff81f75763f812bdffa68892fff3bbb0e4ae359fd176d2c98483e",
+          "behavior-grading.json": "2db815f0659a574cd55173b6e7aed6fc533cb839728e1a7444c1468bb32967dd",
+          "completed.json": "354afcf06cea2b6ae1741f553b3f545718098e032a2e06849ae3cfbd08266d6e"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 1,
+        "modelFinalNpmEvidence": {
+          "run": "quiz-progress-migration-A",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_pK9zQXo0MozqnsV2CEY3D6s8"
+        }
+      },
+      "B": {
+        "slot": 15,
+        "task": "quiz-progress-migration",
+        "arm": "B",
+        "category": "state",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": true,
+        "d0EqualsFinal": true,
+        "workflowStatus": "reviewed_delivery",
+        "elapsedMs": 141743,
+        "requests": 13,
+        "toolCalls": 14,
+        "usage": {
+          "input_tokens": 110285,
+          "output_tokens": 2972,
+          "total_tokens": 113257
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "d0Complete": true,
+          "basis": "Migration used by encode/decode, extras retained, v2 values preserved with independent JSON copies (preregistered allowed alternative). Tests verify codec v1 ordering/extras and nested v2 ownership, old assertion/docs retained. D0 equals final."
+        },
+        "artifactHashes": {
+          "candidate.tar": "63c92a2ab1341144f539bd161c6ff4c912d28cdf57a4e6558c9d3eb750ca4ddb",
+          "provider-metadata.json": "224f6a3e299b6f4a49fa7479176601a26a2a0a29efa1cf849a8d34411aa6de53",
+          "native-evidence.json": "f853a4bb716544e5dd9329625a543a2a5f58634688630a452f2fd4717a135fc8",
+          "result.json": "222cc6372314344d58f786ed3c1f8e5f00e04cb93174ecb373313b71b025842e",
+          "behavior-grading.json": "a6bc8d6006390c7e3cc1da60b0af8aa5db5824eac90f1f769416c57ffb0d3593",
+          "completed.json": "eadb817795d62a915c976bcdb2726039f66b5d2d36f38e0ac610c34ddc54976e",
+          "D0.patch": "34bef7c76406c40033caed9fd5155279aa1ffd097b61cc93c76c71423b3e590e",
+          "terminal.patch": "34bef7c76406c40033caed9fd5155279aa1ffd097b61cc93c76c71423b3e590e"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 3,
+        "workflow": {
+          "status": "reviewed_delivery",
+          "stages": [
+            {
+              "label": "implementation",
+              "role": "author",
+              "supplied": false,
+              "elapsedMs": 121489,
+              "messageID": "msg_08bda0aad001ONsHf8Ddv1WIUP"
+            },
+            {
+              "label": "review-0",
+              "role": "reviewer",
+              "supplied": false,
+              "elapsedMs": 13217,
+              "messageID": "msg_08bdaf9ba001z8ga9jO57QkDd7"
+            }
+          ],
+          "limits": [],
+          "repairs": 0,
+          "implementationContinuations": 0,
+          "evidenceCorrections": 0,
+          "remaining": [],
+          "unresolvedDispositions": [],
+          "failure": null
+        },
+        "stageCosts": {
+          "native_auxiliary_none": {
+            "requests": 1,
+            "input_tokens": 577,
+            "output_tokens": 8,
+            "total_tokens": 585,
+            "missingUsage": 0
+          },
+          "unattributed": {
+            "requests": 2,
+            "input_tokens": 13843,
+            "output_tokens": 74,
+            "total_tokens": 13917,
+            "missingUsage": 0
+          },
+          "implementation": {
+            "requests": 9,
+            "input_tokens": 82726,
+            "output_tokens": 2236,
+            "total_tokens": 84962,
+            "missingUsage": 0
+          },
+          "review-0": {
+            "requests": 1,
+            "input_tokens": 13139,
+            "output_tokens": 654,
+            "total_tokens": 13793,
+            "missingUsage": 0
+          }
+        },
+        "clarifications": [],
+        "modelFinalNpmEvidence": {
+          "run": "quiz-progress-migration-B",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_Frk0Jaz0dmuWtfFozIGPFDOk"
+        }
+      }
+    },
+    {
+      "task": "event-cursor-compaction",
+      "A": {
+        "slot": 17,
+        "task": "event-cursor-compaction",
+        "arm": "A",
+        "category": "state",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": null,
+        "d0EqualsFinal": null,
+        "workflowStatus": null,
+        "elapsedMs": 65218,
+        "requests": 10,
+        "toolCalls": 13,
+        "usage": {
+          "input_tokens": 74503,
+          "output_tokens": 2123,
+          "total_tokens": 76626
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 4,
+              "pass": 4,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "basis": "Cumulative compaction preserves next and validates before mutation; structuredClone at append/restore/snapshot. Project tests cover compaction restore, invalid ack state, nested ownership; legacy and docs retained."
+        },
+        "artifactHashes": {
+          "candidate.tar": "9c28482d3c4bccdff7c751696f22301905b633f5695e5480f9a1225f0a4b9713",
+          "provider-metadata.json": "59cb1c3dbea5f99876a310b3401bbd38431ce45d74b731565edd2cfd944946e1",
+          "native-evidence.json": "fe9be2f556e12bfaa2dbf532ed10f5d7550c372d80fe1b099313fadfb0b09424",
+          "result.json": "fdd52c2876f463447daf9552d86b559ffa1313c35165367f8416606065ca308b",
+          "behavior-grading.json": "ac614ca970503d1d7fdff35360f4c06a75be55bfb20c253bf54b108b47813148",
+          "completed.json": "3050b9bd8345cd077d7294943dc06582d9221cc0fd31bbceef8410762ff11ad0"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 1,
+        "modelFinalNpmEvidence": {
+          "run": "event-cursor-compaction-A",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_3q13fpv0QB168hTvV93eR48p"
+        }
+      },
+      "B": {
+        "slot": 18,
+        "task": "event-cursor-compaction",
+        "arm": "B",
+        "category": "state",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": true,
+        "d0EqualsFinal": true,
+        "workflowStatus": "reviewed_delivery",
+        "elapsedMs": 99520,
+        "requests": 16,
+        "toolCalls": 18,
+        "usage": {
+          "input_tokens": 146164,
+          "output_tokens": 3666,
+          "total_tokens": 149830
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 4,
+              "pass": 4,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 4,
+              "pass": 4,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "d0Complete": true,
+          "basis": "Correct cumulative cursor and cloned state. Delivered compaction/restore, invalid ack unchanged state and nested ownership tests; legacy/docs preserved. D0 equals final."
+        },
+        "artifactHashes": {
+          "candidate.tar": "128f112ba14182692f72fa30085ecb04389b0000eab0a716db851daa08f7a6a0",
+          "provider-metadata.json": "fcd2bf91535980160b7949f1ef0d0cb82fad3f595b5307beea26748f10ad23a3",
+          "native-evidence.json": "c23dc7db42c6b5a5d13a3f2de4ada96bb737667cc410ef80d6e1d5300d303101",
+          "result.json": "857663133d1474f63c57a0d2c6d6d4ebc45a20780a9c32f2f264e5e98c90382b",
+          "behavior-grading.json": "07f0a3f5e330fbf3bb0a015d2aa7024512e3a3b1c3c655b09e42ccf6e04782b9",
+          "completed.json": "fd3f2469c518cf9345f1e8f984716902d61e2679bfa58675cf0055e170bd88fd",
+          "D0.patch": "aa656f8d12efa698796dcdfa305532384328723038d69eae14a767c5f8b2ff78",
+          "terminal.patch": "aa656f8d12efa698796dcdfa305532384328723038d69eae14a767c5f8b2ff78"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 3,
+        "workflow": {
+          "status": "reviewed_delivery",
+          "stages": [
+            {
+              "label": "implementation",
+              "role": "author",
+              "supplied": false,
+              "elapsedMs": 74002,
+              "messageID": "msg_08bde69ca001PuJS4CislQSdDI"
+            },
+            {
+              "label": "review-0",
+              "role": "reviewer",
+              "supplied": false,
+              "elapsedMs": 17367,
+              "messageID": "msg_08bde7639001SCwfeE4mdICj3W"
+            }
+          ],
+          "limits": [],
+          "repairs": 0,
+          "implementationContinuations": 0,
+          "evidenceCorrections": 0,
+          "remaining": [],
+          "unresolvedDispositions": [],
+          "failure": null
+        },
+        "stageCosts": {
+          "native_auxiliary_none": {
+            "requests": 1,
+            "input_tokens": 577,
+            "output_tokens": 8,
+            "total_tokens": 585,
+            "missingUsage": 0
+          },
+          "unattributed": {
+            "requests": 2,
+            "input_tokens": 13867,
+            "output_tokens": 95,
+            "total_tokens": 13962,
+            "missingUsage": 0
+          },
+          "implementation": {
+            "requests": 12,
+            "input_tokens": 117919,
+            "output_tokens": 2733,
+            "total_tokens": 120652,
+            "missingUsage": 0
+          },
+          "review-0": {
+            "requests": 1,
+            "input_tokens": 13801,
+            "output_tokens": 830,
+            "total_tokens": 14631,
+            "missingUsage": 0
+          }
+        },
+        "clarifications": [],
+        "modelFinalNpmEvidence": {
+          "run": "event-cursor-compaction-B",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_CpjcGS2DQUCtkf4hSv7gUvQP"
+        }
+      }
+    },
+    {
+      "task": "preference-tombstone-overlay",
+      "A": {
+        "slot": 20,
+        "task": "preference-tombstone-overlay",
+        "arm": "A",
+        "category": "state",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": null,
+        "d0EqualsFinal": null,
+        "workflowStatus": null,
+        "elapsedMs": 78725,
+        "requests": 11,
+        "toolCalls": 15,
+        "usage": {
+          "input_tokens": 85392,
+          "output_tokens": 2255,
+          "total_tokens": 87647
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "basis": "Recursive own-key copying and safe property definition implement owned overlay and tombstone-preserving composition. Project tests cover sequential equivalence, preserved nulls, special keys and mutation independence; original scalar assertion preserved. Required semantics documented."
+        },
+        "artifactHashes": {
+          "candidate.tar": "c09d928ed129f348d04e150248b54ffab7a14d8b0cffd7131468d90935d2bba9",
+          "provider-metadata.json": "e6d76279b8f4f19203cebbbdab434684889d3140708c3806696a46652f508543",
+          "native-evidence.json": "d082f4ff3ff02085267ea2bad45a937ee6081dc833d06d8702790dcc68b5fe97",
+          "result.json": "3b42e669ebcb5666e53417d3de79e1568f8e98dc644d90ebe998c961d6cce59e",
+          "behavior-grading.json": "2db815f0659a574cd55173b6e7aed6fc533cb839728e1a7444c1468bb32967dd",
+          "completed.json": "6a2428caf3eec192d3322b0f3be44219e24dfb0af267428e80538fd3edcb28c0"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 1,
+        "modelFinalNpmEvidence": {
+          "run": "preference-tombstone-overlay-A",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_KeeERHavHZM5SKujxo5xrF7J"
+        }
+      },
+      "B": {
+        "slot": 19,
+        "task": "preference-tombstone-overlay",
+        "arm": "B",
+        "category": "state",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": true,
+        "d0EqualsFinal": true,
+        "workflowStatus": "reviewed_delivery",
+        "elapsedMs": 116651,
+        "requests": 17,
+        "toolCalls": 21,
+        "usage": {
+          "input_tokens": 161774,
+          "output_tokens": 4015,
+          "total_tokens": 165789
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "d0Complete": true,
+          "basis": "D0 equals final. Own-key overlay, deep ownership and retained composition tombstones implement the contract. Project regressions exercise sequential composition, replacement ownership and special keys; original scalar assertion preserved. JSON copy is within the frozen domain. Documentation explains shallow replacement and tombstones."
+        },
+        "artifactHashes": {
+          "candidate.tar": "960c346314dc053ef65d5a8728e4e411cbd739d76a2e861690a0d98f695d41b6",
+          "provider-metadata.json": "813766cb06dd7f400e3764dd86391cbd20a5e605d284fcb40bfb9995a16bc6e9",
+          "native-evidence.json": "9536bdff169459c266e8d30f34f739f5010a31f54fe389f38a84a539479b8c13",
+          "result.json": "77caedee772cfa0893eba56dc5c02709c3cf6a63f0b2084d915a07c91963d327",
+          "behavior-grading.json": "a6bc8d6006390c7e3cc1da60b0af8aa5db5824eac90f1f769416c57ffb0d3593",
+          "completed.json": "8326b1104c888f7e4068972485a376c546dd7159cc9ca9df967bc2ea510d1e62",
+          "D0.patch": "81ea922f9bb31aacac4e6a9cadf4f714b99f8e90a1f6fe2275b4f202e86fc537",
+          "terminal.patch": "81ea922f9bb31aacac4e6a9cadf4f714b99f8e90a1f6fe2275b4f202e86fc537"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 3,
+        "workflow": {
+          "status": "reviewed_delivery",
+          "stages": [
+            {
+              "label": "implementation",
+              "role": "author",
+              "supplied": false,
+              "elapsedMs": 84859,
+              "messageID": "msg_08be01cbb001OxU5IvTbQn436h"
+            },
+            {
+              "label": "review-0",
+              "role": "reviewer",
+              "supplied": false,
+              "elapsedMs": 23558,
+              "messageID": "msg_08be0483a001WpwovUoryI75L9"
+            }
+          ],
+          "limits": [],
+          "repairs": 0,
+          "implementationContinuations": 0,
+          "evidenceCorrections": 0,
+          "remaining": [],
+          "unresolvedDispositions": [],
+          "failure": null
+        },
+        "stageCosts": {
+          "native_auxiliary_none": {
+            "requests": 1,
+            "input_tokens": 577,
+            "output_tokens": 8,
+            "total_tokens": 585,
+            "missingUsage": 0
+          },
+          "unattributed": {
+            "requests": 2,
+            "input_tokens": 13868,
+            "output_tokens": 80,
+            "total_tokens": 13948,
+            "missingUsage": 0
+          },
+          "implementation": {
+            "requests": 12,
+            "input_tokens": 117389,
+            "output_tokens": 2910,
+            "total_tokens": 120299,
+            "missingUsage": 0
+          },
+          "review-0": {
+            "requests": 2,
+            "input_tokens": 29940,
+            "output_tokens": 1017,
+            "total_tokens": 30957,
+            "missingUsage": 0
+          }
+        },
+        "clarifications": [],
+        "modelFinalNpmEvidence": {
+          "run": "preference-tombstone-overlay-B",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_4eg6pjs8X9eqQXNS7s8Bbyfv"
+        }
+      }
+    },
+    {
+      "task": "percentile-method-options",
+      "A": {
+        "slot": 21,
+        "task": "percentile-method-options",
+        "arm": "A",
+        "category": "compatibility",
+        "state": "retained",
+        "complete": false,
+        "d0Complete": null,
+        "d0EqualsFinal": null,
+        "workflowStatus": null,
+        "elapsedMs": 55157,
+        "requests": 10,
+        "toolCalls": 16,
+        "usage": {
+          "input_tokens": 72295,
+          "output_tokens": 2119,
+          "total_tokens": 74414
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 2,
+              "pass": 2,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": false,
+          "tests": false,
+          "docs": true,
+          "integration": true,
+          "complete": false,
+          "basis": "Frozen automated acceptance/preservation/ordinary checks pass, but explicit TASK domain says missing method defaults. Source sets method=options.method whenever options is supplied and then rejects undefined, so percentile([30,10,20],0.5,{}) throws TypeError(method). This is a pre-existing written requirement absent from frozen acceptance, not a new rubric. Delivered default test uses sorted values and removed the original unsorted-input assertion, losing its sorting coverage. Required interpolation and empty-validation regressions and documentation are otherwise delivered. No evaluator or candidate changed."
+        },
+        "artifactHashes": {
+          "candidate.tar": "5b681cfbebcc49f572f8f6b677b6fbc27e8cd251a92c1ec8ef0e4b33a25e65fc",
+          "provider-metadata.json": "48391c827047ad2751072d76a53eff15022b2b3208eae9f32230329a657d5810",
+          "native-evidence.json": "14198d2651d924ea11282042db4e7ef1e9a73df7709504add56a1db826b25e31",
+          "result.json": "14c48207d8306e052d4dce4b1407d195eab50ae285b0289f2b58fe9f6f2fb9ca",
+          "behavior-grading.json": "ae9bd0471646c2e6468cef8e58b75cf05d562f13ce49327d6ba1cefdbf581819",
+          "completed.json": "3f1b96eaac5662b228d7597aa9034d9a4c47c7c304586b765a257106b486735f"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 1,
+        "modelFinalNpmEvidence": {
+          "run": "percentile-method-options-A",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_iKnBtW93ARyGG3Dog4Z2Q9Vc"
+        }
+      },
+      "B": {
+        "slot": 22,
+        "task": "percentile-method-options",
+        "arm": "B",
+        "category": "compatibility",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": true,
+        "d0EqualsFinal": true,
+        "workflowStatus": "reviewed_delivery",
+        "elapsedMs": 157089,
+        "requests": 24,
+        "toolCalls": 27,
+        "usage": {
+          "input_tokens": 260696,
+          "output_tokens": 5796,
+          "total_tokens": 266492
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "d0Complete": true,
+          "basis": "D0 equals final. Missing method explicitly defaults, numeric copy sorting and interpolation implement the written domain. Original unsorted nearest assertion is intact; separate meaningful interpolation and empty-validation tests and required documentation are delivered."
+        },
+        "artifactHashes": {
+          "candidate.tar": "3cc3a1d96a7fb15649b02bae21af7387e6c970eb00fd238adffc924b940e95e6",
+          "provider-metadata.json": "eba17fdbd5078fdb02a296c7e4c4a4c8086b62261f7d5a80c1487e77e535feff",
+          "native-evidence.json": "9fd4971f6e512fd9350934dbea5f584f4c92b2ca44350113da01ebce3c63c5f9",
+          "result.json": "ef3158111ed02eeed0d9a8b2bb9f505bfa0a2e3b5de0b9e46c14bf286ee47bab",
+          "behavior-grading.json": "a6bc8d6006390c7e3cc1da60b0af8aa5db5824eac90f1f769416c57ffb0d3593",
+          "completed.json": "99fe4451aa86801f5e8e233dac8c6ebcfb2cdf66c7345b46f2b9ff0649e2c383",
+          "D0.patch": "f0c1750cf23fa7294d6d0d0950fccf88a277e587eb0e6c0cdfb1d0e7163b4d4a",
+          "terminal.patch": "f0c1750cf23fa7294d6d0d0950fccf88a277e587eb0e6c0cdfb1d0e7163b4d4a"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 3,
+        "workflow": {
+          "status": "reviewed_delivery",
+          "stages": [
+            {
+              "label": "implementation",
+              "role": "author",
+              "supplied": false,
+              "elapsedMs": 92266,
+              "messageID": "msg_08be42d22001b9X15Cs66MQjAS"
+            },
+            {
+              "label": "review-0",
+              "role": "reviewer",
+              "supplied": false,
+              "elapsedMs": 26280,
+              "messageID": "msg_08be4584e001puXrfq0idwe8kh"
+            },
+            {
+              "label": "reproduce-1",
+              "role": "author",
+              "supplied": false,
+              "elapsedMs": 14656,
+              "messageID": "msg_08be4c390001VeXv8vz3YFkOmS"
+            },
+            {
+              "label": "disposition-review-1",
+              "role": "reviewer",
+              "supplied": false,
+              "elapsedMs": 15890,
+              "messageID": "msg_08be4db71001Gts0EypRW43vkD"
+            }
+          ],
+          "limits": [],
+          "repairs": 0,
+          "implementationContinuations": 0,
+          "evidenceCorrections": 0,
+          "remaining": [],
+          "unresolvedDispositions": [],
+          "failure": null
+        },
+        "stageCosts": {
+          "native_auxiliary_none": {
+            "requests": 1,
+            "input_tokens": 577,
+            "output_tokens": 8,
+            "total_tokens": 585,
+            "missingUsage": 0
+          },
+          "unattributed": {
+            "requests": 2,
+            "input_tokens": 14626,
+            "output_tokens": 95,
+            "total_tokens": 14721,
+            "missingUsage": 0
+          },
+          "implementation": {
+            "requests": 16,
+            "input_tokens": 156624,
+            "output_tokens": 3207,
+            "total_tokens": 159831,
+            "missingUsage": 0
+          },
+          "review-0": {
+            "requests": 2,
+            "input_tokens": 28558,
+            "output_tokens": 1268,
+            "total_tokens": 29826,
+            "missingUsage": 0
+          },
+          "reproduce-1": {
+            "requests": 2,
+            "input_tokens": 31920,
+            "output_tokens": 476,
+            "total_tokens": 32396,
+            "missingUsage": 0
+          },
+          "disposition-review-1": {
+            "requests": 1,
+            "input_tokens": 28391,
+            "output_tokens": 742,
+            "total_tokens": 29133,
+            "missingUsage": 0
+          }
+        },
+        "clarifications": [],
+        "modelFinalNpmEvidence": {
+          "run": "percentile-method-options-B",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_qXC2j2YCgqT24SvvN79vTBgu"
+        }
+      }
+    },
+    {
+      "task": "duration-bigint-adapter",
+      "A": {
+        "slot": 24,
+        "task": "duration-bigint-adapter",
+        "arm": "A",
+        "category": "compatibility",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": null,
+        "d0EqualsFinal": null,
+        "workflowStatus": null,
+        "elapsedMs": 67773,
+        "requests": 13,
+        "toolCalls": 18,
+        "usage": {
+          "input_tokens": 106753,
+          "output_tokens": 2183,
+          "total_tokens": 108936
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "basis": "Exact bigint quotient/remainder and display preserve numeric public types. Original numeric assertions are unchanged; regression tests cover large precision, errors through both exports and zero bigint. Documentation specifies types, precision and no coercion."
+        },
+        "artifactHashes": {
+          "candidate.tar": "b6a8dfcb2e127859fb9f08690cbe103f597e6f28dfc6cb45923872c2f88d2c3d",
+          "provider-metadata.json": "ca7b3bd83f72c07f36727ee5bc6b2e19ede8f2d0af5b8f1209dabdba41a6088f",
+          "native-evidence.json": "af5b1e027ac179dfd20dea6b7cef5755162d8a1c50284cc774683b67eb7796a0",
+          "result.json": "46843fcf83f3d583795ad6435f9605a5b1e0d80ca99e4d82f690bc559ea38e35",
+          "behavior-grading.json": "2db815f0659a574cd55173b6e7aed6fc533cb839728e1a7444c1468bb32967dd",
+          "completed.json": "7de598f046bcf966f876faf0dcdd353537376b160df012c9cf8853576cf7ef34"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 1,
+        "modelFinalNpmEvidence": {
+          "run": "duration-bigint-adapter-A",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_gfWJi0DWCJSTC8HRkGbVsY8a"
+        }
+      },
+      "B": {
+        "slot": 23,
+        "task": "duration-bigint-adapter",
+        "arm": "B",
+        "category": "compatibility",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": null,
+        "d0EqualsFinal": null,
+        "workflowStatus": "incomplete",
+        "elapsedMs": 80040,
+        "requests": 14,
+        "toolCalls": 17,
+        "usage": {
+          "input_tokens": 117849,
+          "output_tokens": 2549,
+          "total_tokens": 120398
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "basis": "Terminal delivery passes frozen acceptance, original preservation and ordinary checks. Numeric/bigint split and exact display preserve result types; original assertions, large bigint precision and type/range validation tests retained. Required docs delivered. Workflow stopped on true native permission denial before D0; D0 is unavailable and no continuation or repair occurred."
+        },
+        "artifactHashes": {
+          "candidate.tar": "fb5d29e1dc06fe59c083e106518df8ee6140a62ee53b01f18441565e0fba991a",
+          "provider-metadata.json": "7150c7f2ab10089a5187eeab38af0629eaf533b05ee095b42a6ebe0cf81df355",
+          "native-evidence.json": "66054a3e4829519754eed1b1ee6238f5021e8ef1c53229fcf9e6f30e88982736",
+          "result.json": "c515b55c2a6abb95804337923221822e1e565906a59ed0b75dbdf16da6f42c48",
+          "behavior-grading.json": "2db815f0659a574cd55173b6e7aed6fc533cb839728e1a7444c1468bb32967dd",
+          "completed.json": "687de9c7908df84b030917adc196353c5b12257bb8ba8864961c235cb3b81ac6",
+          "terminal.patch": "efbfd31408b67d9e0bbbac41710f833052483382f1741c079a0b36c7b0e97b03"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 2,
+        "workflow": {
+          "status": "incomplete",
+          "stages": [],
+          "limits": [
+            "Native permission boundary rejected a tool; no evidence correction admitted"
+          ],
+          "repairs": 0,
+          "implementationContinuations": 0,
+          "evidenceCorrections": 0,
+          "remaining": [],
+          "unresolvedDispositions": [],
+          "failure": {
+            "category": "workflow_protocol",
+            "message": "Native permission boundary rejected a tool; no evidence correction admitted"
+          }
+        },
+        "stageCosts": {
+          "native_auxiliary_none": {
+            "requests": 1,
+            "input_tokens": 577,
+            "output_tokens": 8,
+            "total_tokens": 585,
+            "missingUsage": 0
+          },
+          "unattributed": {
+            "requests": 13,
+            "input_tokens": 117272,
+            "output_tokens": 2541,
+            "total_tokens": 119813,
+            "missingUsage": 0
+          }
+        },
+        "clarifications": [],
+        "modelFinalNpmEvidence": {
+          "run": "duration-bigint-adapter-B",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_1PLMIRdPUdzyV0xEj9egkhaE"
+        }
+      }
+    },
+    {
+      "task": "map-record-catalog",
+      "A": {
+        "slot": 25,
+        "task": "map-record-catalog",
+        "arm": "A",
+        "category": "compatibility",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": null,
+        "d0EqualsFinal": null,
+        "workflowStatus": null,
+        "elapsedMs": 61627,
+        "requests": 11,
+        "toolCalls": 16,
+        "usage": {
+          "input_tokens": 85121,
+          "output_tokens": 2130,
+          "total_tokens": 87251
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "basis": "Source validates each record/Map entry and returns fresh rows in native order; total delegates to rows. Original record assertions retained. Map ordering/totals and invalid-key/nonfinite-price regressions are meaningful. The result-mutation regression checks a fresh equivalent record through total, so it does not directly test the original input identity; frozen independent checks and source establish actual ownership. Required ordering/type/ownership documentation delivered."
+        },
+        "artifactHashes": {
+          "candidate.tar": "1a2db6e12a10fc57009b2ba3e55999d234f48a63c6778db73e27f108e9f4c87c",
+          "provider-metadata.json": "71439fbee7ce443e382bcf9c87606b26b8ec3a49b3b4a089b9cc2d7f16a03945",
+          "native-evidence.json": "c31a569345c4b7141b4951834a0c93bb000f76927a260bebd1b00cd58efedf1f",
+          "result.json": "48196479204af02062b8766e8b5ad17ee06cc24305fe34442ed56e07e79c94ac",
+          "behavior-grading.json": "2db815f0659a574cd55173b6e7aed6fc533cb839728e1a7444c1468bb32967dd",
+          "completed.json": "cec2d6aa0fe75dad8f704e394f344069f25969e114ad066f486833598922baab"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 1,
+        "modelFinalNpmEvidence": {
+          "run": "map-record-catalog-A",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_HiKCHsRusA99dqREG2xw1QMN"
+        }
+      },
+      "B": {
+        "slot": 26,
+        "task": "map-record-catalog",
+        "arm": "B",
+        "category": "compatibility",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": true,
+        "d0EqualsFinal": true,
+        "workflowStatus": "incomplete",
+        "elapsedMs": 107165,
+        "requests": 16,
+        "toolCalls": 19,
+        "usage": {
+          "input_tokens": 149688,
+          "output_tokens": 3656,
+          "total_tokens": 153344
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "d0Complete": true,
+          "basis": "D0 equals final. Both exports share entry validation and preserve record/Map ordering; rows owns new records. Original assertions retained; project tests exercise Map order/totals, invalid entries and independence on the same input. Docs delivered. Workflow incomplete on reviewer-required check: reviewer labels final git diff as discriminating evidence, which does not establish behavioral execution."
+        },
+        "artifactHashes": {
+          "candidate.tar": "3e7175c68da6612a2e8003040aad0c4997c10cdedbd182cb996d6386f891ddf6",
+          "provider-metadata.json": "dddd027cf06ad8ffeb242e81d407058fe66e556b84cfe9ea1497c4acd65410d3",
+          "native-evidence.json": "0765d061a1e76a6fa5712739c64395e4bdecf8b246b28d3902a8f09b6044cac6",
+          "result.json": "4ffdce042bd89c887947a7eae1757b23378fbe13125b92872db93fcec97085d0",
+          "behavior-grading.json": "a6bc8d6006390c7e3cc1da60b0af8aa5db5824eac90f1f769416c57ffb0d3593",
+          "completed.json": "7967cdaa83bb32dd7e5909e8806a461baa20fa2f104599a00963fddd19864117",
+          "D0.patch": "a0cb7bb7e3f0fd5b98784aca8b131234fc60859513398b2d9b4882eeb545c2b9",
+          "terminal.patch": "a0cb7bb7e3f0fd5b98784aca8b131234fc60859513398b2d9b4882eeb545c2b9"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 3,
+        "workflow": {
+          "status": "incomplete",
+          "stages": [
+            {
+              "label": "implementation",
+              "role": "author",
+              "supplied": false,
+              "elapsedMs": 77695,
+              "messageID": "msg_08be9afaf001tCeohx4Tmw7icN"
+            },
+            {
+              "label": "review-0",
+              "role": "reviewer",
+              "supplied": false,
+              "elapsedMs": 14442,
+              "messageID": "msg_08be9bcfa001VDNf3zINYRH5YV"
+            }
+          ],
+          "limits": [
+            "A reviewer-identified required check is failed, missing or stale."
+          ],
+          "repairs": 0,
+          "implementationContinuations": 0,
+          "evidenceCorrections": 0,
+          "remaining": [],
+          "unresolvedDispositions": [],
+          "failure": null
+        },
+        "stageCosts": {
+          "native_auxiliary_none": {
+            "requests": 1,
+            "input_tokens": 577,
+            "output_tokens": 8,
+            "total_tokens": 585,
+            "missingUsage": 0
+          },
+          "unattributed": {
+            "requests": 2,
+            "input_tokens": 13796,
+            "output_tokens": 66,
+            "total_tokens": 13862,
+            "missingUsage": 0
+          },
+          "implementation": {
+            "requests": 12,
+            "input_tokens": 120747,
+            "output_tokens": 2912,
+            "total_tokens": 123659,
+            "missingUsage": 0
+          },
+          "review-0": {
+            "requests": 1,
+            "input_tokens": 14568,
+            "output_tokens": 670,
+            "total_tokens": 15238,
+            "missingUsage": 0
+          }
+        },
+        "clarifications": [
+          "Primary concrete mismatch: review cites call_9TvgJwTjHhCxYyf6COpAR13, absent from journal. Actual completed git diff ID is call_9Tvg2JwTjHhCxYyf6COpAR13. Prior assessment note about a diff not proving behavior remains valid, but the missing ID already explains rejection."
+        ],
+        "modelFinalNpmEvidence": {
+          "run": "map-record-catalog-B",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_Lu54J0RkMiokF0jOqjpZ1DdP"
+        }
+      }
+    },
+    {
+      "task": "set-query-consumer",
+      "A": {
+        "slot": 28,
+        "task": "set-query-consumer",
+        "arm": "A",
+        "category": "compatibility",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": null,
+        "d0EqualsFinal": null,
+        "workflowStatus": null,
+        "elapsedMs": 58605,
+        "requests": 10,
+        "toolCalls": 13,
+        "usage": {
+          "input_tokens": 73821,
+          "output_tokens": 1902,
+          "total_tokens": 75723
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "basis": "Required Set conversion and AND matching reach existing names through select. Original array test intact. Tests distinguish partial matches, retain strict row identity and frozen inputs, and cover empty requirements; documentation covers duplicate-array semantics as requested. No new requirements for every negative case beyond the listed regression categories."
+        },
+        "artifactHashes": {
+          "candidate.tar": "9a76497e144543de6a51487feb70f233624a50dd64dc82b665df1b85da0ba837",
+          "provider-metadata.json": "a05cfc7bec9277031d1d1b3b80e2c53233869e611ab5e0f13106fe042010d074",
+          "native-evidence.json": "2aef45f9802a16594a8fd13bb2197cbe5d58bd270379ee7d2c159f2096c8c721",
+          "result.json": "22ddd5c17bacfbbd7bd7b35b1cfff1fb7a3c62bb40468d84105da1643a96cab4",
+          "behavior-grading.json": "2db815f0659a574cd55173b6e7aed6fc533cb839728e1a7444c1468bb32967dd",
+          "completed.json": "ddeca05be7606c6c50a2cee347812f9a69a7a7b0eec6c4ec6397f6f8bf7e3ca2"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 1,
+        "modelFinalNpmEvidence": {
+          "run": "set-query-consumer-A",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_ZCQr60jX93COYjs70kIpbhzF"
+        }
+      },
+      "B": {
+        "slot": 27,
+        "task": "set-query-consumer",
+        "arm": "B",
+        "category": "compatibility",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": true,
+        "d0EqualsFinal": true,
+        "workflowStatus": "reviewed_delivery",
+        "elapsedMs": 104746,
+        "requests": 14,
+        "toolCalls": 17,
+        "usage": {
+          "input_tokens": 116016,
+          "output_tokens": 3151,
+          "total_tokens": 119167
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 4,
+              "pass": 4,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 4,
+              "pass": 4,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "d0Complete": true,
+          "basis": "D0 equals final. Set and array AND selection reaches names, preserving original objects and order. Original array assertion retained; meaningful Set contrast, frozen inputs, strict identity, duplicate and empty regressions delivered. Required semantics documented."
+        },
+        "artifactHashes": {
+          "candidate.tar": "ccd741df8e694a518216c3844178b46127a76974a73b589ebd55e144c612e7a1",
+          "provider-metadata.json": "18e08cc3027ea2aa7b0669c8c6f953df0cb58c742dbfb79eedb15a3775989c2a",
+          "native-evidence.json": "d8cc2943654baedf6f05e22dd4cac0e14bb06e5af9e48b65495682df2d8e3fdd",
+          "result.json": "4a724be5d937aff957a3dd596f5e8a48eff0e8ec81c87245a05d50d47ebffa18",
+          "behavior-grading.json": "07f0a3f5e330fbf3bb0a015d2aa7024512e3a3b1c3c655b09e42ccf6e04782b9",
+          "completed.json": "b7784ed8aeecddfffab400b38c919f62f4bb15e30df5d05c20812df0a16fcdc7",
+          "D0.patch": "b039793ca48f16887e1a65d5adc24cee2a29828fe649b372a6b3dec3646e6e85",
+          "terminal.patch": "b039793ca48f16887e1a65d5adc24cee2a29828fe649b372a6b3dec3646e6e85"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 3,
+        "workflow": {
+          "status": "reviewed_delivery",
+          "stages": [
+            {
+              "label": "implementation",
+              "role": "author",
+              "supplied": false,
+              "elapsedMs": 81920,
+              "messageID": "msg_08beb4adf001DbayoMqzErkRmS"
+            },
+            {
+              "label": "review-0",
+              "role": "reviewer",
+              "supplied": false,
+              "elapsedMs": 14118,
+              "messageID": "msg_08beb794d001Naik8qnr0SlQ4x"
+            }
+          ],
+          "limits": [],
+          "repairs": 0,
+          "implementationContinuations": 0,
+          "evidenceCorrections": 0,
+          "remaining": [],
+          "unresolvedDispositions": [],
+          "failure": null
+        },
+        "stageCosts": {
+          "native_auxiliary_none": {
+            "requests": 1,
+            "input_tokens": 577,
+            "output_tokens": 9,
+            "total_tokens": 586,
+            "missingUsage": 0
+          },
+          "unattributed": {
+            "requests": 2,
+            "input_tokens": 13899,
+            "output_tokens": 82,
+            "total_tokens": 13981,
+            "missingUsage": 0
+          },
+          "implementation": {
+            "requests": 10,
+            "input_tokens": 89950,
+            "output_tokens": 2371,
+            "total_tokens": 92321,
+            "missingUsage": 0
+          },
+          "review-0": {
+            "requests": 1,
+            "input_tokens": 11590,
+            "output_tokens": 689,
+            "total_tokens": 12279,
+            "missingUsage": 0
+          }
+        },
+        "clarifications": [],
+        "modelFinalNpmEvidence": {
+          "run": "set-query-consumer-B",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_eiDBzCjXEj6ITEKHT6JMf2GU"
+        }
+      }
+    },
+    {
+      "task": "tuple-point-distance",
+      "A": {
+        "slot": 29,
+        "task": "tuple-point-distance",
+        "arm": "A",
+        "category": "compatibility",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": null,
+        "d0EqualsFinal": null,
+        "workflowStatus": null,
+        "elapsedMs": 56628,
+        "requests": 10,
+        "toolCalls": 14,
+        "usage": {
+          "input_tokens": 74685,
+          "output_tokens": 1996,
+          "total_tokens": 76681
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "basis": "Both exports validate mixed tuples/records with finite coordinates and exact tuple size, including singleton length. Original record assertion preserved; project tests exercise mixed polyline, unchanged singleton and invalid singleton. Independent frozen checks additionally cover frozen inputs. Required Euclidean and validation docs delivered."
+        },
+        "artifactHashes": {
+          "candidate.tar": "ab5e76320ebc2fa8fa26c173972cb9778ac0cdc42e4b3d9c6a93ebf5b7a07921",
+          "provider-metadata.json": "9d5430844d86110ddc36f8b65bb54af489e27bd1e12d067419577b79459b4dcd",
+          "native-evidence.json": "d9e370583d2a2b4f82cdc83e8cc2650bbf8b7237a622398cef1e63c98065c196",
+          "result.json": "ee42e08e452edc676055612543fb1b0ab1e935d4b5dbe7621f2a2328f44e879e",
+          "behavior-grading.json": "2db815f0659a574cd55173b6e7aed6fc533cb839728e1a7444c1468bb32967dd",
+          "completed.json": "ffef7ecedb850114c21803e8c6e43c91b71108f4022281ef8b3dbf3c6bdc1d54"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 1,
+        "modelFinalNpmEvidence": {
+          "run": "tuple-point-distance-A",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_KSunF3dQKN1R29fesfli6w7n"
+        }
+      },
+      "B": {
+        "slot": 30,
+        "task": "tuple-point-distance",
+        "arm": "B",
+        "category": "compatibility",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": true,
+        "d0EqualsFinal": true,
+        "workflowStatus": "reviewed_delivery",
+        "elapsedMs": 109774,
+        "requests": 17,
+        "toolCalls": 23,
+        "usage": {
+          "input_tokens": 165033,
+          "output_tokens": 3950,
+          "total_tokens": 168983
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 4,
+              "pass": 4,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 4,
+              "pass": 4,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "d0Complete": true,
+          "basis": "D0 equals final. Mixed tuple/record finite validation and Math.hypot length implement domain, including singleton. Original record assertion intact; additional tests cover mixed paths, frozen tuple/record ownership, nonfinite singleton and bad tuple shapes. Required docs delivered."
+        },
+        "artifactHashes": {
+          "candidate.tar": "e57233bde1a32961d3b96a3e9ba193d76c01b181c14a94d26cf7b1be3a3832a3",
+          "provider-metadata.json": "63e381b8da5f95a95cc49a8260430df5b24fb62faa60dc5b31b1710ea2cb7b32",
+          "native-evidence.json": "7190764dcf45d45dbdca7212e9e7980afcab78d302f5ab3e5b3e0da3c391297a",
+          "result.json": "aabea424c59547903fbd88c4ee2feeddc8ca21fb692ca3424d5137adb80c3943",
+          "behavior-grading.json": "07f0a3f5e330fbf3bb0a015d2aa7024512e3a3b1c3c655b09e42ccf6e04782b9",
+          "completed.json": "1a887aa13fd9c8e2fc2ea3e4ea3d9ba92061dc92af7a3a172f16d731a94942df",
+          "D0.patch": "753d79fb91616eca6b59502797120130d09443655a5cf37a26bca4bbed8b1fc3",
+          "terminal.patch": "753d79fb91616eca6b59502797120130d09443655a5cf37a26bca4bbed8b1fc3"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 3,
+        "workflow": {
+          "status": "reviewed_delivery",
+          "stages": [
+            {
+              "label": "implementation",
+              "role": "author",
+              "supplied": false,
+              "elapsedMs": 82602,
+              "messageID": "msg_08beee7da0013tGS84j9jIEhb8"
+            },
+            {
+              "label": "review-0",
+              "role": "reviewer",
+              "supplied": false,
+              "elapsedMs": 19111,
+              "messageID": "msg_08bef09cb001AVagPJVdsyF09x"
+            }
+          ],
+          "limits": [],
+          "repairs": 0,
+          "implementationContinuations": 0,
+          "evidenceCorrections": 0,
+          "remaining": [],
+          "unresolvedDispositions": [],
+          "failure": null
+        },
+        "stageCosts": {
+          "native_auxiliary_none": {
+            "requests": 1,
+            "input_tokens": 577,
+            "output_tokens": 8,
+            "total_tokens": 585,
+            "missingUsage": 0
+          },
+          "unattributed": {
+            "requests": 2,
+            "input_tokens": 13796,
+            "output_tokens": 111,
+            "total_tokens": 13907,
+            "missingUsage": 0
+          },
+          "implementation": {
+            "requests": 12,
+            "input_tokens": 120668,
+            "output_tokens": 2974,
+            "total_tokens": 123642,
+            "missingUsage": 0
+          },
+          "review-0": {
+            "requests": 2,
+            "input_tokens": 29992,
+            "output_tokens": 857,
+            "total_tokens": 30849,
+            "missingUsage": 0
+          }
+        },
+        "clarifications": [],
+        "modelFinalNpmEvidence": {
+          "run": "tuple-point-distance-B",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_N7I9XLviokYD7SZ4RcljBGhu"
+        }
+      }
+    },
+    {
+      "task": "roman-format-core",
+      "A": {
+        "slot": 32,
+        "task": "roman-format-core",
+        "arm": "A",
+        "category": "refactoring",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": null,
+        "d0EqualsFinal": null,
+        "workflowStatus": null,
+        "elapsedMs": 53985,
+        "requests": 10,
+        "toolCalls": 13,
+        "usage": {
+          "input_tokens": 73191,
+          "output_tokens": 1720,
+          "total_tokens": 74911
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 4,
+              "pass": 4,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "basis": "Existing label delegates directly to pure extracted roman; duplicate algorithm removed. Original assertion unchanged; direct subtractive cases, default/custom/empty prefixes and rejection through both exports exercise integration. Required docs delivered."
+        },
+        "artifactHashes": {
+          "candidate.tar": "b5860e7d7c6a0283af509b6472877dadb6a81365986dd15b1c26eba61e7c2c80",
+          "provider-metadata.json": "995c4220a012ec495da8b028262198ea5a64e5b6a2117e2c059dd74d5a7e9052",
+          "native-evidence.json": "6c21b79bc99bbec54faa0bc2d5664dbd715ea053f598c976e33aad2200663620",
+          "result.json": "e8353b0edb9dbc696cbc03d968851936ee09e82838c183992bd8347b5e6be49f",
+          "behavior-grading.json": "ac614ca970503d1d7fdff35360f4c06a75be55bfb20c253bf54b108b47813148",
+          "completed.json": "a17864ee31ca349804e12962893ce9c149af91a542c5ea3526efdcadab1255c4"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 1,
+        "modelFinalNpmEvidence": {
+          "run": "roman-format-core-A",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_1pDoL6Ch7ENOpEui9h26HRty"
+        }
+      },
+      "B": {
+        "slot": 31,
+        "task": "roman-format-core",
+        "arm": "B",
+        "category": "refactoring",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": true,
+        "d0EqualsFinal": true,
+        "workflowStatus": "reviewed_delivery",
+        "elapsedMs": 95650,
+        "requests": 14,
+        "toolCalls": 18,
+        "usage": {
+          "input_tokens": 125506,
+          "output_tokens": 3197,
+          "total_tokens": 128703
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 4,
+              "pass": 4,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 4,
+              "pass": 4,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "d0Complete": true,
+          "basis": "D0 equals final. label directly calls the extracted pure roman core; no parallel conversion remains. Original chapter assertion intact. Direct subtractive/boundary core checks, custom/empty consumer prefixes and errors through both exports are tested and documented."
+        },
+        "artifactHashes": {
+          "candidate.tar": "6caefac813e8d4050aa90b6d5de5640463c7c62b00af147a28277f3f53ff56c1",
+          "provider-metadata.json": "fa561cba40e6088a1f4f4caf23659e2c8be6d4096899e99ebf5284f62ff35008",
+          "native-evidence.json": "207e93b99b6fd48036390337b9b0e44e26b2ab978667812b389443a205145cd4",
+          "result.json": "d1b70d811bcb2b358c493a4e14fa1176f98383b57df3147225b0c763f2282073",
+          "behavior-grading.json": "07f0a3f5e330fbf3bb0a015d2aa7024512e3a3b1c3c655b09e42ccf6e04782b9",
+          "completed.json": "9c1b6b267773a4360b7e7eacb8461abf6264821475cdc888d68f33ad37ae56ca",
+          "D0.patch": "f42e85d2d18e53d3ffc26f8c68a77c632df114b289418f64fbfd4af09c841fc0",
+          "terminal.patch": "f42e85d2d18e53d3ffc26f8c68a77c632df114b289418f64fbfd4af09c841fc0"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 3,
+        "workflow": {
+          "status": "reviewed_delivery",
+          "stages": [
+            {
+              "label": "implementation",
+              "role": "author",
+              "supplied": false,
+              "elapsedMs": 76341,
+              "messageID": "msg_08bf06d4f001VZMLyvINiCUSJq"
+            },
+            {
+              "label": "review-0",
+              "role": "reviewer",
+              "supplied": false,
+              "elapsedMs": 12207,
+              "messageID": "msg_08bf09372001IwGypZva3rB7Pd"
+            }
+          ],
+          "limits": [],
+          "repairs": 0,
+          "implementationContinuations": 0,
+          "evidenceCorrections": 0,
+          "remaining": [],
+          "unresolvedDispositions": [],
+          "failure": null
+        },
+        "stageCosts": {
+          "native_auxiliary_none": {
+            "requests": 1,
+            "input_tokens": 577,
+            "output_tokens": 8,
+            "total_tokens": 585,
+            "missingUsage": 0
+          },
+          "unattributed": {
+            "requests": 2,
+            "input_tokens": 13736,
+            "output_tokens": 90,
+            "total_tokens": 13826,
+            "missingUsage": 0
+          },
+          "implementation": {
+            "requests": 10,
+            "input_tokens": 97531,
+            "output_tokens": 2522,
+            "total_tokens": 100053,
+            "missingUsage": 0
+          },
+          "review-0": {
+            "requests": 1,
+            "input_tokens": 13662,
+            "output_tokens": 577,
+            "total_tokens": 14239,
+            "missingUsage": 0
+          }
+        },
+        "clarifications": [],
+        "modelFinalNpmEvidence": {
+          "run": "roman-format-core-B",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_0iuKPJX8yBjWhm1UbOuBDdGI"
+        }
+      }
+    },
+    {
+      "task": "bracket-check-core",
+      "A": {
+        "slot": 33,
+        "task": "bracket-check-core",
+        "arm": "A",
+        "category": "refactoring",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": null,
+        "d0EqualsFinal": null,
+        "workflowStatus": null,
+        "elapsedMs": 63973,
+        "requests": 12,
+        "toolCalls": 15,
+        "usage": {
+          "input_tokens": 91989,
+          "output_tokens": 2126,
+          "total_tokens": 94115
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "basis": "Pure inspect maintains UTF16-indexed bracket stack and earliest remaining opener; check delegates without duplicate balancing. Original balanced assertion intact. Project regressions cover astral-prefix mismatch through consumer and ignored text/earliest opener through core. Required semantics documented."
+        },
+        "artifactHashes": {
+          "candidate.tar": "22259ce8601fc60acab4699132f494bcbb01f70bbcdfe4bb27efd22bb3b10ac3",
+          "provider-metadata.json": "4e0e41915a9fc5b0597772b4bb90a2998496ddcde3bb4486c03278ee82d5da54",
+          "native-evidence.json": "e609b5f94ec19e1d44e19452b8c3460570c8db61b494fe1d73a14ac07abd4f85",
+          "result.json": "dc84893da87d807b718694d99e12a6061c1f6136f856bb9a0e9cf8a13c216b57",
+          "behavior-grading.json": "2db815f0659a574cd55173b6e7aed6fc533cb839728e1a7444c1468bb32967dd",
+          "completed.json": "636affab1a7ec506d9816b9174ecb03ff1ba4a8e5437576e812afd56d39111a6"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 1,
+        "modelFinalNpmEvidence": {
+          "run": "bracket-check-core-A",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_aNozr4UKbbsJ8j8MnVFw4yy5"
+        }
+      },
+      "B": {
+        "slot": 34,
+        "task": "bracket-check-core",
+        "arm": "B",
+        "category": "refactoring",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": true,
+        "d0EqualsFinal": true,
+        "workflowStatus": "reviewed_delivery",
+        "elapsedMs": 94181,
+        "requests": 16,
+        "toolCalls": 18,
+        "usage": {
+          "input_tokens": 141919,
+          "output_tokens": 3193,
+          "total_tokens": 145112
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "d0Complete": true,
+          "basis": "D0 equals final. Existing check calls extracted pure inspect with UTF16 indexing and earliest remaining opener; no duplicated stack logic. Original balanced assertion retained; meaningful astral-prefix mismatch and quoted-but-not-special ignored-text regressions delivered with required docs."
+        },
+        "artifactHashes": {
+          "candidate.tar": "0e0b4d585be605772579893018290d73a6ad0f8c5d03cba416ad156a08ac5d35",
+          "provider-metadata.json": "7674b90eb586466739596401c2427aaf81cec92496e6a5ec2423372c9516ea0f",
+          "native-evidence.json": "e8f5ad56f823cf5eedc2a76b9d0306cc6341881cbf322a1e72a7f6a3ce0d8569",
+          "result.json": "217e44eb8862c73e503fa7286f9e2f0561a904ffbe1c07dd3ffba1c731518781",
+          "behavior-grading.json": "a6bc8d6006390c7e3cc1da60b0af8aa5db5824eac90f1f769416c57ffb0d3593",
+          "completed.json": "c6f4127440e72da03488828b4594cea73c4064b3bdaffabf37fd2a6dd5ea96f9",
+          "D0.patch": "86e08c26e0b293126e5d19bfa34cdce51785b8e5d91ef24a57aa07a819106b03",
+          "terminal.patch": "86e08c26e0b293126e5d19bfa34cdce51785b8e5d91ef24a57aa07a819106b03"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 3,
+        "workflow": {
+          "status": "reviewed_delivery",
+          "stages": [
+            {
+              "label": "implementation",
+              "role": "author",
+              "supplied": false,
+              "elapsedMs": 71729,
+              "messageID": "msg_08bf3d341001XWePyMk1ZjygFl"
+            },
+            {
+              "label": "review-0",
+              "role": "reviewer",
+              "supplied": false,
+              "elapsedMs": 14779,
+              "messageID": "msg_08bf3e1a4001FKl4oGXYD0WnpD"
+            }
+          ],
+          "limits": [],
+          "repairs": 0,
+          "implementationContinuations": 0,
+          "evidenceCorrections": 0,
+          "remaining": [],
+          "unresolvedDispositions": [],
+          "failure": null
+        },
+        "stageCosts": {
+          "native_auxiliary_none": {
+            "requests": 1,
+            "input_tokens": 577,
+            "output_tokens": 8,
+            "total_tokens": 585,
+            "missingUsage": 0
+          },
+          "unattributed": {
+            "requests": 2,
+            "input_tokens": 13790,
+            "output_tokens": 92,
+            "total_tokens": 13882,
+            "missingUsage": 0
+          },
+          "implementation": {
+            "requests": 12,
+            "input_tokens": 114688,
+            "output_tokens": 2374,
+            "total_tokens": 117062,
+            "missingUsage": 0
+          },
+          "review-0": {
+            "requests": 1,
+            "input_tokens": 12864,
+            "output_tokens": 719,
+            "total_tokens": 13583,
+            "missingUsage": 0
+          }
+        },
+        "clarifications": [],
+        "modelFinalNpmEvidence": {
+          "run": "bracket-check-core-B",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_AlC4vkHAhTzNW9Ecg0WcoSnv"
+        }
+      }
+    },
+    {
+      "task": "slug-token-policy",
+      "A": {
+        "slot": 36,
+        "task": "slug-token-policy",
+        "arm": "A",
+        "category": "refactoring",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": null,
+        "d0EqualsFinal": null,
+        "workflowStatus": null,
+        "elapsedMs": 61515,
+        "requests": 12,
+        "toolCalls": 17,
+        "usage": {
+          "input_tokens": 96816,
+          "output_tokens": 2101,
+          "total_tokens": 98917
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "basis": "Existing slug calls the extracted pure token function; tokenization is not duplicated. Original assertion retained. Project tests cover ASCII/lowercase/separators, consumer truncation then hyphen stripping, empty fallback and repeat ownership. Required docs delivered."
+        },
+        "artifactHashes": {
+          "candidate.tar": "441787eaab2f9b378637cc979fb96f2c909ef97cdce369129a20f9d5e21d68f6",
+          "provider-metadata.json": "36c2409957835bb5ca898617a6730b82fa6220b809044400816d5a1824d6df17",
+          "native-evidence.json": "4726ae86e6fec2cf8eaceebf310fce0cb46a51a39fa53b98fe7675a71d2fedbc",
+          "result.json": "18b6ff0c5e1e2231719b80d25d04ed9b0277245b0ca4b5fd650a4af535250780",
+          "behavior-grading.json": "2db815f0659a574cd55173b6e7aed6fc533cb839728e1a7444c1468bb32967dd",
+          "completed.json": "9b3e627ca8c374dfcfb1e0818422c34532e193cca05bdddab5d9c43e242a2b28"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 1,
+        "modelFinalNpmEvidence": {
+          "run": "slug-token-policy-A",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_GpkBOfI47bMNGSx8tPxVBZDV"
+        }
+      },
+      "B": {
+        "slot": 35,
+        "task": "slug-token-policy",
+        "arm": "B",
+        "category": "refactoring",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": true,
+        "d0EqualsFinal": true,
+        "workflowStatus": "reviewed_delivery",
+        "elapsedMs": 98687,
+        "requests": 17,
+        "toolCalls": 19,
+        "usage": {
+          "input_tokens": 151622,
+          "output_tokens": 3276,
+          "total_tokens": 154898
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "d0Complete": true,
+          "basis": "D0 equals final. Existing slug calls pure tokens and preserves truncation-before-trailing-hyphen removal and fallback. Original hello-world assertion intact. Direct ASCII/underscore/non-ASCII token checks, consumer truncation, max-zero fallback and repeat ownership are tested. Required policy docs delivered."
+        },
+        "artifactHashes": {
+          "candidate.tar": "93b7344d2980091e83e5ff40eef50f78edd9534bede7dd6bad4eaa70a73e23f7",
+          "provider-metadata.json": "f99a86aed8a6ce9e18a2924095e5d2c17a476882a959fac2e247e40e4cc47937",
+          "native-evidence.json": "1eeb415726596d5e4246a63ffc79dc4f4fc2290371d2ca42d03d722e296b1e39",
+          "result.json": "a795dc729d3c9f4fede97b7d37676093147f8ba131aedcf38cb8c754d61ee2a2",
+          "behavior-grading.json": "a6bc8d6006390c7e3cc1da60b0af8aa5db5824eac90f1f769416c57ffb0d3593",
+          "completed.json": "b3b4c5a9951e93f42a1b12fa690f2c36f1b3ffb680237a369cf3b289fedb109c",
+          "D0.patch": "aa00b83fac27b856210632d8da35be619ad95275f6474e36794bb598311ca601",
+          "terminal.patch": "aa00b83fac27b856210632d8da35be619ad95275f6474e36794bb598311ca601"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 3,
+        "workflow": {
+          "status": "reviewed_delivery",
+          "stages": [
+            {
+              "label": "implementation",
+              "role": "author",
+              "supplied": false,
+              "elapsedMs": 74447,
+              "messageID": "msg_08bf557b1001Qq3lEbXDLTXv4C"
+            },
+            {
+              "label": "review-0",
+              "role": "reviewer",
+              "supplied": false,
+              "elapsedMs": 15634,
+              "messageID": "msg_08bf5659a001t1uaEeadBbO3K9"
+            }
+          ],
+          "limits": [],
+          "repairs": 0,
+          "implementationContinuations": 0,
+          "evidenceCorrections": 0,
+          "remaining": [],
+          "unresolvedDispositions": [],
+          "failure": null
+        },
+        "stageCosts": {
+          "native_auxiliary_none": {
+            "requests": 1,
+            "input_tokens": 577,
+            "output_tokens": 8,
+            "total_tokens": 585,
+            "missingUsage": 0
+          },
+          "unattributed": {
+            "requests": 2,
+            "input_tokens": 13896,
+            "output_tokens": 86,
+            "total_tokens": 13982,
+            "missingUsage": 0
+          },
+          "implementation": {
+            "requests": 13,
+            "input_tokens": 124013,
+            "output_tokens": 2412,
+            "total_tokens": 126425,
+            "missingUsage": 0
+          },
+          "review-0": {
+            "requests": 1,
+            "input_tokens": 13136,
+            "output_tokens": 770,
+            "total_tokens": 13906,
+            "missingUsage": 0
+          }
+        },
+        "clarifications": [],
+        "modelFinalNpmEvidence": {
+          "run": "slug-token-policy-B",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_gmIA229htlineMAZ5FRsufxg"
+        }
+      }
+    },
+    {
+      "task": "histogram-pure-core",
+      "A": {
+        "slot": 37,
+        "task": "histogram-pure-core",
+        "arm": "A",
+        "category": "refactoring",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": null,
+        "d0EqualsFinal": null,
+        "workflowStatus": null,
+        "elapsedMs": 56731,
+        "requests": 10,
+        "toolCalls": 14,
+        "usage": {
+          "input_tokens": 75170,
+          "output_tokens": 2035,
+          "total_tokens": 77205
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "basis": "summary directly consumes fresh pure counts output; Map preserves core first occurrence and consumer applies numeric frequency/UTF16 tie sorting to its own fresh array. Original summary assertion intact. Project regressions contrast core/consumer order and test frozen input and special strings through both exports. Stateless/ownership semantics documented."
+        },
+        "artifactHashes": {
+          "candidate.tar": "63a7913e2e818c31ad2dc9c066ae5dd16b81ad644de5d077512e2f5fdb29ceab",
+          "provider-metadata.json": "1bb0809428dde6f7ebdef1cf558afb67d0169ef9700061c671a66759a840ea4c",
+          "native-evidence.json": "808c86bd97ca3760841e149d1336915b1cfa9c4c126d05f7a5a0ceed968d12c7",
+          "result.json": "ef16ac3241e12fc572ff8c21970ff38a995e8369ade829d131e67c7a8c17f98c",
+          "behavior-grading.json": "2db815f0659a574cd55173b6e7aed6fc533cb839728e1a7444c1468bb32967dd",
+          "completed.json": "637439f80346b05cc28622ddaea1c4522a700d787183de6bb9107a02b9e1e074"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 1,
+        "modelFinalNpmEvidence": {
+          "run": "histogram-pure-core-A",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_WwBooUfiYwn9v6U4WJCtnTa9"
+        }
+      },
+      "B": {
+        "slot": 38,
+        "task": "histogram-pure-core",
+        "arm": "B",
+        "category": "refactoring",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": true,
+        "d0EqualsFinal": true,
+        "workflowStatus": "reviewed_delivery",
+        "elapsedMs": 108518,
+        "requests": 17,
+        "toolCalls": 23,
+        "usage": {
+          "input_tokens": 170466,
+          "output_tokens": 3852,
+          "total_tokens": 174318
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 4,
+              "pass": 4,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 4,
+              "pass": 4,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "d0Complete": true,
+          "basis": "D0 equals final. summary calls stateless counts and ranks its fresh results without shared mutable state. Original assertion intact; project tests contrast first-order/ranked results, special keys, frozen inputs and repeated-result ownership. Required ordering/type semantics documented."
+        },
+        "artifactHashes": {
+          "candidate.tar": "d37107a1cb597801c312e4d21c71d4334d002e1f3b0d362af1e14af945373290",
+          "provider-metadata.json": "9cbef53c6d66a0248c8bbde6a722c9ddd621763f3eb7a444738dac167b135dbb",
+          "native-evidence.json": "296f57c8dd439ca9f73efa330bc6e753976bc5c11921a4b3b182639c6f70c9a7",
+          "result.json": "894bc395d17259187fd7d898051cbcefb838084131edaaf26afe5febcab913fd",
+          "behavior-grading.json": "07f0a3f5e330fbf3bb0a015d2aa7024512e3a3b1c3c655b09e42ccf6e04782b9",
+          "completed.json": "962dff1ec7f4b47432c4c71e212bb117c4b254aa1ffc194c2914323643284858",
+          "D0.patch": "908fb921a837a184d6915cd54ced009d78b202f0cf6015803479e929e64f603c",
+          "terminal.patch": "908fb921a837a184d6915cd54ced009d78b202f0cf6015803479e929e64f603c"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 3,
+        "workflow": {
+          "status": "reviewed_delivery",
+          "stages": [
+            {
+              "label": "implementation",
+              "role": "author",
+              "supplied": false,
+              "elapsedMs": 77656,
+              "messageID": "msg_08bf8cb5c001c1CZWwvId1v7WO"
+            },
+            {
+              "label": "review-0",
+              "role": "reviewer",
+              "supplied": false,
+              "elapsedMs": 23546,
+              "messageID": "msg_08bf8f71d001Q9AP0fPCarl09c"
+            }
+          ],
+          "limits": [],
+          "repairs": 0,
+          "implementationContinuations": 0,
+          "evidenceCorrections": 0,
+          "remaining": [],
+          "unresolvedDispositions": [],
+          "failure": null
+        },
+        "stageCosts": {
+          "native_auxiliary_none": {
+            "requests": 1,
+            "input_tokens": 577,
+            "output_tokens": 8,
+            "total_tokens": 585,
+            "missingUsage": 0
+          },
+          "unattributed": {
+            "requests": 2,
+            "input_tokens": 13904,
+            "output_tokens": 87,
+            "total_tokens": 13991,
+            "missingUsage": 0
+          },
+          "implementation": {
+            "requests": 12,
+            "input_tokens": 123476,
+            "output_tokens": 2741,
+            "total_tokens": 126217,
+            "missingUsage": 0
+          },
+          "review-0": {
+            "requests": 2,
+            "input_tokens": 32509,
+            "output_tokens": 1016,
+            "total_tokens": 33525,
+            "missingUsage": 0
+          }
+        },
+        "clarifications": [],
+        "modelFinalNpmEvidence": {
+          "run": "histogram-pure-core-B",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_MB1p29SQQZgCrF4xD6k41dAW"
+        }
+      }
+    },
+    {
+      "task": "luhn-checksum-core",
+      "A": {
+        "slot": 40,
+        "task": "luhn-checksum-core",
+        "arm": "A",
+        "category": "refactoring",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": null,
+        "d0EqualsFinal": null,
+        "workflowStatus": null,
+        "elapsedMs": 56304,
+        "requests": 10,
+        "toolCalls": 15,
+        "usage": {
+          "input_tokens": 77027,
+          "output_tokens": 2059,
+          "total_tokens": 79086
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "basis": "describe directly uses pure extracted validDigits and preserves UTF16 masking even for invalid strings. Original known-digits assertion intact. Correct parity, all-zero/strict ASCII cases and consumer masking tested; requirements documented. Numeric inputs are outside the frozen string domain and do not create a new criterion."
+        },
+        "artifactHashes": {
+          "candidate.tar": "95beaeee62c2bc5468e27c2340cee55f643ef72d1b71a2af7ea33edade675fcc",
+          "provider-metadata.json": "eec4cd569498b8b13a6bf9337356f496077ab060ec24c732ff3bed0ae0522a2b",
+          "native-evidence.json": "4c198581a46aa977eacf414352791994ed93e9e167786ba63022651add149276",
+          "result.json": "8cab53e9cd0c05247cc5426d7546aee117b43ef23c35a23d063266faf8aa3460",
+          "behavior-grading.json": "2db815f0659a574cd55173b6e7aed6fc533cb839728e1a7444c1468bb32967dd",
+          "completed.json": "fda918c7bd90108118fa11dfc682519ff9ad60fb35e617c83cf38ce7f96dad6e"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 1,
+        "modelFinalNpmEvidence": {
+          "run": "luhn-checksum-core-A",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_vyDLnhhBE8ma4PrriTvOqD56"
+        }
+      },
+      "B": {
+        "slot": 39,
+        "task": "luhn-checksum-core",
+        "arm": "B",
+        "category": "refactoring",
+        "state": "retained",
+        "complete": true,
+        "d0Complete": true,
+        "d0EqualsFinal": true,
+        "workflowStatus": "reviewed_delivery",
+        "elapsedMs": 97613,
+        "requests": 16,
+        "toolCalls": 20,
+        "usage": {
+          "input_tokens": 147910,
+          "output_tokens": 3422,
+          "total_tokens": 151332
+        },
+        "requestsWithoutObservedUsage": 0,
+        "grades": {
+          "acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-acceptance": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-preservation": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          },
+          "d0-ordinary": {
+            "exitCode": 0,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            },
+            "passed": true
+          }
+        },
+        "manual": {
+          "behavior": true,
+          "tests": true,
+          "docs": true,
+          "integration": true,
+          "complete": true,
+          "d0Complete": true,
+          "basis": "D0 equals final. describe delegates to extracted pure ASCII-digit Luhn core; correct right-to-left parity and original UTF16 suffix masking remain. Original known-digits assertion preserved. New tests cover valid/invalid checksum, invalid-input masking, zero strings, whitespace and non-ASCII digits; exact semantics and non-payment scope documented."
+        },
+        "artifactHashes": {
+          "candidate.tar": "784138feca3fb29ff27446bda22ebe786bf6376d7ab19f93a64e954dbf9f8a52",
+          "provider-metadata.json": "139c4c03e2b16f5734e313839dd8efdff692a3fda9f0a575aa409d34af3f2a2a",
+          "native-evidence.json": "54da4dc738818d0d69e4e14e7eb3822864ea09ed32766a98c74de1902afa3655",
+          "result.json": "aa2fd5af675a3aa7e8a43cf65242d956c09b20bc6c7db40c4cbb79a430107227",
+          "behavior-grading.json": "a6bc8d6006390c7e3cc1da60b0af8aa5db5824eac90f1f769416c57ffb0d3593",
+          "completed.json": "d4cc7f6788fcb72888869f2c0c21e59cfe11a902c10946c8964e730b326c4023",
+          "D0.patch": "e01113a8e0e36c4c15d398f122b9bac875713727b1506ac013d518635a46af86",
+          "terminal.patch": "e01113a8e0e36c4c15d398f122b9bac875713727b1506ac013d518635a46af86"
+        },
+        "terminationVerified": true,
+        "elapsedBudgetMs": 900000,
+        "timedOut": false,
+        "modelSessions": 3,
+        "workflow": {
+          "status": "reviewed_delivery",
+          "stages": [
+            {
+              "label": "implementation",
+              "role": "author",
+              "supplied": false,
+              "elapsedMs": 75042,
+              "messageID": "msg_08bfa731a001gaz1CtS2xKiexe"
+            },
+            {
+              "label": "review-0",
+              "role": "reviewer",
+              "supplied": false,
+              "elapsedMs": 15355,
+              "messageID": "msg_08bfa82d8001661eNXsqk13fLI"
+            }
+          ],
+          "limits": [],
+          "repairs": 0,
+          "implementationContinuations": 0,
+          "evidenceCorrections": 0,
+          "remaining": [],
+          "unresolvedDispositions": [],
+          "failure": null
+        },
+        "stageCosts": {
+          "native_auxiliary_none": {
+            "requests": 1,
+            "input_tokens": 577,
+            "output_tokens": 8,
+            "total_tokens": 585,
+            "missingUsage": 0
+          },
+          "unattributed": {
+            "requests": 2,
+            "input_tokens": 13879,
+            "output_tokens": 78,
+            "total_tokens": 13957,
+            "missingUsage": 0
+          },
+          "implementation": {
+            "requests": 12,
+            "input_tokens": 119373,
+            "output_tokens": 2675,
+            "total_tokens": 122048,
+            "missingUsage": 0
+          },
+          "review-0": {
+            "requests": 1,
+            "input_tokens": 14081,
+            "output_tokens": 661,
+            "total_tokens": 14742,
+            "missingUsage": 0
+          }
+        },
+        "clarifications": [],
+        "modelFinalNpmEvidence": {
+          "run": "luhn-checksum-core-B",
+          "finalNpmAfterAllWrites": true,
+          "testCallID": "call_5LK1LOn5KkHO1ZBm5F6xcGhJ"
+        }
+      }
+    }
+  ],
+  "statistics": {
+    "n": 20,
+    "both": 19,
+    "bOnly": 1,
+    "aOnly": 0,
+    "neither": 0,
+    "aComplete": 19,
+    "bComplete": 20,
+    "difference": 0.05,
+    "pExactTwoSided": 1,
+    "ci95": [
+      -0.11918141595546036,
+      0.236131193446742
+    ]
+  },
+  "directObservation": {
+    "purpose": "Existing explicit requirement checked after model termination, without changing frozen evaluator or any candidate",
+    "percentile": [
+      {
+        "arm": "A",
+        "label": "omitted",
+        "result": 20
+      },
+      {
+        "arm": "A",
+        "label": "empty-options",
+        "error": {
+          "name": "TypeError",
+          "message": "method"
+        }
+      },
+      {
+        "arm": "A",
+        "label": "undefined-method",
+        "error": {
+          "name": "TypeError",
+          "message": "method"
+        }
+      },
+      {
+        "arm": "B",
+        "label": "omitted",
+        "result": 20
+      },
+      {
+        "arm": "B",
+        "label": "empty-options",
+        "result": 20
+      },
+      {
+        "arm": "B",
+        "label": "undefined-method",
+        "result": 20
+      }
+    ]
+  },
+  "limitations": [
+    "Selected synthetic 20-task domain; not pooled with any prior pilot.",
+    "All frozen automated suites are reported separately from manual full delivery; coverage gaps in acceptance remain visible.",
+    "Observed stage attribution uses unique native timestamp windows; ambiguous or missing windows remain unattributed.",
+    "tool-less effort none auxiliary requests are included in costs, while configured working variant remained low.",
+    "Review status does not determine the primary full-delivery endpoint."
+  ],
+  "frozenFilesVerified": {
+    "verifiedAt": "2026-09-10T15:43:14.505326+00:00",
+    "frozenFiles": 4013,
+    "allFrozenHashesMatch": true,
+    "completedSlots": 40,
+    "allModelTerminationVerified": true,
+    "allCleanupRecordsSuccessful": true,
+    "allWithinBudget": true,
+    "allFinalNpmAfterAllSuccessfulWrites": true,
+    "providerResponsesWithUsage": 540,
+    "quotaStop": false,
+    "runtimeChanged": false,
+    "allTaskContainersAbsent": true
+  },
+  "workflowCounts": {
+    "reviewed_delivery": 15,
+    "incomplete": 5,
+    "repairs": 0,
+    "implementationContinuations": 0,
+    "evidenceCorrections": 0,
+    "D0Available": 18,
+    "D0EqualsFinal": 17
+  }
+}

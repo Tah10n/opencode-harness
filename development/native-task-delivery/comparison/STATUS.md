@@ -1,4 +1,24 @@
-# Comparison prepared; execution blocked before startup
+# Comparison completed after explicit confirmation
+
+The user explicitly confirmed the prepared 20 projects / 40 paired sessions after
+the refusal below. Automatic approval then admitted the same launch command;
+the access route, account, model and environment restrictions were unchanged.
+All 40 scheduled slots executed once and are retained. There was no quota stop,
+retry of a scored outcome or continuation beyond the fixed schedule.
+
+The independent full-delivery result is A 19/20, B 20/20, with one B-only pair,
+19 both-complete pairs and exact two-sided McNemar p=1. No statistically supported
+positive effect is claimed. See [RESULTS.md](RESULTS.md) and
+[RESULTS.json](RESULTS.json) for all deliveries, protocol outcomes, D0 differences,
+costs and evidence fingerprints. The runtime and frozen dataset were unchanged.
+
+## Historical snapshot before confirmation
+
+The following records the original pre-start refusal and the state at that time.
+Its zero-request/pending statements describe that historical phase only; they are
+not the current result. The original local refusal record is preserved unchanged.
+
+### Comparison prepared; execution blocked before startup
 
 Dataset and preregistration were published at
 `2f870ca025d711887f9a5bff5e2bc4ed5bd8b1ef` before the attempted launch.
