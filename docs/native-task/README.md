@@ -92,7 +92,13 @@ After a correcting cycle the author executes consumer/discriminating and
 preservation checks after the last edit, and the
 same reviewer checks the current patch and test diff. Only commands after the
 last observed mutation qualify, even if later edits restore identical bytes.
-The reviewer identifies relevant command IDs and their purposes. This binds
+The reviewer selects short references from the supplied executed-check list and
+explains their purposes. Each reference names one existing native event in that
+workflow and review; repeated command text never merges events. Unknown, failed,
+incomplete and stale selections remain unverified. The host retains the original
+review response, the evidence projection, and the resolved bindings separately
+(`review-*-original.json`, `review-*-evidence.json`, `review-*-bindings.json`).
+Selecting a reference does not execute a command again. This binds
 actual execution; it cannot mechanically prove the semantic adequacy of an
 arbitrary test. A final disposition review also follows rejected/unverified
 findings when no repair is admitted. There is no second reviewer or unbounded

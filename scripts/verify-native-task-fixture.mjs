@@ -168,7 +168,7 @@ const fixture = http.createServer(async (req, res) => {
     lastReport = {
       findings: mode==='missing-test' && !requests.some(r=>r.mode===mode&&r.stage==='reproduce') ? [{...finding,kind:'test',basis:'Task explicitly requires an additional project regression',verification:'Add extra.test.mjs'}] : hasDefect || unsupported ? [{ ...finding, ...(unsupported ? { expected: '3', basis: 'Unsubstantiated reviewer assumption' } : {}) }] : [],
       obligations: [{ requirement: 'Return 2 and preserve test', status: mode === 'incomplete' || hasDefect ? 'missing' : 'delivered', evidence: 'Inspected source and supplied native tool events' }],
-      checks: lastCheck ? [{callID:lastCheck.callID,purpose:'preservation',basis:'Runs the existing public Node test'}, {callID:lastCheck.callID,purpose:'discriminating',basis:'The same suite asserts value 2 and failed on D0'}] : [], proposedVerificationFiles: mode==='missing-test'?['extra.test.mjs']:mode==='src-affected'?['value.mjs','value.test.mjs']:['value.test.mjs'],
+      checks: lastCheck ? [{callID:info.executedChecks.find(e=>e.ref.startsWith(`E${info.toolEvidence.indexOf(lastCheck)+1}-`)).ref,purpose:'preservation',basis:'Runs the existing public Node test'}, {callID:info.executedChecks.find(e=>e.ref.startsWith(`E${info.toolEvidence.indexOf(lastCheck)+1}-`)).ref,purpose:'discriminating',basis:'The same suite asserts value 2 and failed on D0'}] : [], proposedVerificationFiles: mode==='missing-test'?['extra.test.mjs']:mode==='src-affected'?['value.mjs','value.test.mjs']:['value.test.mjs'],
       unverified: mode==='unverified'?['Consumer behavior remains unverified']:[], evidenceLimitations: mode==='provenance'?['Reviewer did not independently run shell commands']:[], coverageLost: mode === 'coverage-loss' ? ['Old fixture was replaced; requirement not preserved'] : [],
     };
     if(mode==='state-documentation'){
@@ -308,6 +308,18 @@ try {
     if (['cancel','budget'].includes(mode)) { assert.ok(!requests.some(r => r.mode === mode && ['review','format','repair'].includes(r.stage))); continue; }
     assert.equal(toolResult?.state.status, 'completed', JSON.stringify({ result, toolResult, temp }));
     const report = JSON.parse(toolResult.state.output);
+    if (['correct', 'last-mutation', 'incomplete', 'defect', 'unsupported'].includes(mode)) {
+      const original=JSON.parse(fs.readFileSync(path.join(report.artifacts,'review-0-original.json')));
+      const selected=JSON.parse(original.parts.filter(p=>p.type==='text').map(p=>p.text).join('\n'));
+      const binding=JSON.parse(fs.readFileSync(path.join(report.artifacts,'review-0-bindings.json')));
+      const events=JSON.parse(fs.readFileSync(path.join(report.artifacts,'tool-events.json')));
+      for(let i=0;i<selected.checks.length;i++) {
+        assert.match(selected.checks[i].callID,/^E[0-9]+-/);
+        const b=binding.bindings[i];assert.equal(b.selected,selected.checks[i].callID);
+        assert.equal(b.callID,events[b.eventIndex].callID);assert.equal(b.command,events[b.eventIndex].args.command);
+      }
+      assert.equal(requests.filter(r=>r.mode===mode&&r.stage==='implementation').length,mode==='last-mutation'?3:2,'Reference selection adds no author execution');
+    }
     assert.equal(git('ls-files','--stage','-z'),originalIndex);
     if(mode.startsWith('obligation-')){
       const count=requests.filter(r=>r.mode===mode&&r.stage==='continuation'&&r.n===0).length;

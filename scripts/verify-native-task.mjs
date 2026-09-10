@@ -259,10 +259,10 @@ for(const mode of ['delivery','unsupported','complete','no-progress','limit','pe
   }
   if(p.instruction.startsWith('Continue ONLY')){
    continuations++;assert.equal(role,'author');assert.ok(p.originalTask.includes('Connect the CLI'));assert.equal(p.missingImplementation[0].affectedFiles[0],'cli.mjs');assert.equal(p.current.snapshotSha256,state);assert.ok(p.toolEvidence.length);
-   if(mode!=='no-progress'){const before=state;state='T'+continuations;events.push({tool:'write',before,after:state});events.push({...check,before:state,after:state});}
+   if(mode!=='no-progress'){const before=state;state='T'+continuations;events.push({tool:'write',before,after:state});events.push({...check,callID:'check-'+state,before:state,after:state});}
    return result('Continued implementation');
   }
-  reviews++;return result(mode==='limit'?missing:{...valid,checks:[{callID:'check',purpose:'discriminating',basis:'consumer regression'},{callID:'check',purpose:'preservation',basis:'legacy coverage'}]});
+  reviews++;return result(mode==='limit'?missing:{...valid,checks:[{callID:p.executedChecks.findLast(e=>e.current&&e.exit===0).ref,purpose:'discriminating',basis:'consumer regression'},{callID:p.executedChecks.findLast(e=>e.current&&e.exit===0).ref,purpose:'preservation',basis:'legacy coverage'}]});
  };
  const report=await runWorkflow(io,{initialReview:result(mode==='complete'?valid:missing)});
  assert.equal(continuations,mode==='limit'?2:['delivery','no-progress'].includes(mode)?1:0,mode);
@@ -279,3 +279,59 @@ for(const mode of ['delivery','unsupported','complete','no-progress','limit','pe
  assert.equal(assessDispositions([{id:'F',kind:'delivery'}],[{...d,affectedFiles:[]}],[e],{snapshotSha256:'S'})[0].admitted,false);
 }
 console.log(JSON.stringify({originalImplementationContinuation:true,commonTwoCycleLimit:true,behaviorCannotRelabel:true,missingDispositionsRetained:true,realProviderCalls:0}));
+
+// Review selections are a view of native events, never replacement execution.
+const {reviewEvidence, resolveReviewEvidence} = await import('../lib/native-task-workflow.mjs');
+{
+ const events=[{...check,args:{command:'npm test'}},{...check,callID:'again',args:{command:'npm test'}}];
+ const catalog=reviewEvidence(events,{snapshotSha256:'S'},'workflow-one-review-zero');
+ const selection=ref=>({...valid,checks:[{callID:ref,purpose:'preservation',basis:'Public suite'}]});
+ const bind=(ref,rows=catalog)=>resolveReviewEvidence(selection(ref),rows);
+ assert.notEqual(catalog[0].ref,catalog[1].ref);
+ assert.equal(bind(catalog[1].ref).review.checks[0].callID,'again');
+ assert.equal(bind(catalog[1].ref).bindings[0].eventIndex,1);
+ assert.equal(determineOutcome(bind(catalog[1].ref).review,events,{snapshotSha256:'S'}).status,'reviewed_delivery');
+ for(const ref of ['unknown',catalog[1].ref+'x',reviewEvidence(events,{snapshotSha256:'S'},'other-workflow')[1].ref]) {
+  assert.equal(bind(ref).bindings[0].eventIndex,null);
+  assert.equal(determineOutcome(bind(ref).review,events,{snapshotSha256:'S'}).status,'incomplete');
+ }
+ for(const changed of [events.map(e=>({...e,exit:1})),events.map(e=>({...e,state:'running'})),[...events,{before:'S',after:'T'},{before:'T',after:'S'}]]) {
+  const rows=reviewEvidence(changed,{snapshotSha256:'S'},'new-review');
+  assert.equal(determineOutcome(bind(rows[0].ref,rows).review,changed,{snapshotSha256:'S'}).status,'incomplete');
+ }
+ assert.equal(determineOutcome(bind(catalog[0].ref).review,[...events,{before:'S',after:'T'}],{snapshotSha256:'T'}).status,'incomplete');
+ const missing={...selection(catalog[0].ref),obligations:[{requirement:'Required consumer',status:'missing',evidence:'Not delivered'}]};
+ assert.equal(determineOutcome(resolveReviewEvidence(missing,catalog).review,events,{snapshotSha256:'S'}).status,'incomplete');
+ const io=fake();let authorCalls=0,reviewCalls=0;
+ io.events=()=>events;
+ io.prompt=async(role,prompt)=>{if(role==='author'){authorCalls++;return result('Done');}reviewCalls++;const p=JSON.parse(prompt);assert.ok(p.executedChecks.length===2);return result(selection(p.executedChecks[1].ref));};
+ const report=await runWorkflow(io,{maxRepairs:0});
+ assert.equal(report.status,'reviewed_delivery');assert.equal(authorCalls,1);assert.equal(reviewCalls,1);
+ assert.equal(report.review.checks[0].callID,'again');
+ const original=JSON.parse(io.saved.get('review-0-original.json').parts[0].text);
+ assert.notEqual(original.checks[0].callID,'again');
+ assert.equal(io.saved.get('review-0-bindings.json').bindings[0].callID,'again');
+ assert.equal(events.length,2,'Selecting a reference must not execute the command again');
+}
+console.log(JSON.stringify({passed:true,reviewEvidenceReferences:true,realProviderRequests:0}));
+
+// Retained seat/Map events: new choices are a separate implementation replay.
+for (const replay of JSON.parse(fs.readFileSync(new URL('./fixtures/native-task-review/evidence-selection.json',import.meta.url)))) {
+ const original=JSON.stringify(replay.review);
+ assert.equal(determineOutcome(replay.review,replay.events,replay.snapshot).status,replay.historicalStatus);
+ const catalog=reviewEvidence(replay.events,replay.snapshot,'new-selection-replay');
+ const selected={...replay.review,checks:replay.review.checks.map((check,i)=>({...check,callID:catalog.find(row=>row.eventIndex===replay.newSelectionEventIndices[i]).ref}))};
+ const binding=resolveReviewEvidence(selected,catalog);
+ assert.equal(determineOutcome(binding.review,replay.events,replay.snapshot).status,'reviewed_delivery');
+ assert.deepEqual(binding.bindings.map(b=>b.eventIndex),replay.newSelectionEventIndices);
+ assert.equal(JSON.stringify(replay.review),original,'Historical answer and status stay unchanged');
+}
+console.log(JSON.stringify({passed:true,retainedSeatAndMapSelectionReplay:2,realProviderRequests:0}));
+
+{
+ const duplicate=reviewEvidence([check,{...check,exit:1}],{snapshotSha256:'S'},'duplicate');
+ assert.equal(resolveReviewEvidence({...valid,checks:[{...valid.checks[0],callID:duplicate[1].ref}]},duplicate).bindings[0].resolved,false);
+ const io=fake(),events=[check];io.events=()=>events;
+ io.prompt=async(role)=>{if(role==='author')return result('Done');events.push({...check,tool:'read',callID:'review-doc'});return result({...valid,checks:[{callID:'review-doc',purpose:'documentation',basis:'Read delivered documentation in this review'}]});};
+ assert.equal((await runWorkflow(io,{maxRepairs:0})).status,'reviewed_delivery');
+}

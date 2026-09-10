@@ -40,3 +40,27 @@ also fixed source-review criteria in each task's grading description.
 Zero real provider requests were used for these validations. Scripted fixtures
 establish workflow control only. No model lift or complete-task result follows
 from installation, these checks, or a reviewer status.
+
+## Review evidence selection candidate (2026-09-10)
+
+The reviewer receives short, review-scoped references to existing native events.
+The original response and resolved bindings are retained separately. Direct
+controller regressions cover current selection, unknown/foreign references,
+failed/incomplete/stale events, changes and restored bytes, duplicate command
+text, ambiguous native IDs, missing obligations, and no extra author execution.
+Two retained seat/Map event replays keep their historical incorrect responses and
+`incomplete` outcomes unchanged; separate explicit new selections exercise this
+implementation. These are not new model outcomes or regraded comparison slots.
+
+Local direct native task, format, template, review and configuration checks
+passed on OpenCode 1.18.26. Seven affected installed scenarios passed with 54
+scripted requests. One bounded diff review then preserved native document-read
+compatibility during review and rejected ambiguous native IDs. After that final
+runtime change, direct controller regressions and the three affected installed
+paths (correct delivery, documentation, disposition review) passed with 18
+scripted requests. Zero real provider requests were used. No historical
+255-state audit, completed comparison or platform matrix was rerun.
+
+The runtime and prompts at the next candidate commit are frozen for the separate
+four-task A/B/C diagnostic. Its real-project tasks, full prompts and fixed order
+live under `development/native-task-abc`; these checks establish wiring only.
