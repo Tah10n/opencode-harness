@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {planChanges,assessJobs} from './ci-scope.mjs';
+const report=planChanges(['development/native-task-comparison/RESULTS.md']);assert.equal(report.full,false);
+for(const p of ['AGENTS.md','core.md','agents/core.md','development/unknown-runner.mjs','unknown.txt','lib/feedback/process-containment.mjs','.github/workflows/verify.yml'])assert.equal(planChanges([p]).full,true,p);
+assert.equal(planChanges(['lib/native-task-workflow.mjs']).native,true);
+assert.equal(planChanges(['lib/native-task-workflow.mjs']).full,false);
+assert.deepEqual(planChanges(['scripts/build-macos-containment.mjs']),{full:false,native:false,linux:false,windows:false,macos:true,diagnostic:false});
+const full=planChanges(['lib/feedback/process-containment.mjs']);assert(full.macos&&full.windows&&full.linux);
+assert.equal(assessJobs(report,{scope:'success'}).passed,true);
+assert.equal(assessJobs(report,{scope:'failure'}).passed,false);
+const results=Object.fromEntries(['scope','verify','milestone-2-status','native-review','linux-containment','windows-containment','macos-containment'].map(k=>[k,'success']));
+assert.equal(assessJobs(full,results).passed,true);
+for(const status of ['failure','skipped','cancelled',undefined])assert.equal(assessJobs(full,{...results,'macos-containment':status}).passed,false);
+assert.equal(assessJobs(planChanges(['unknown'],'targeted'),results).passed,false);
+const yaml=fs.readFileSync(new URL('../.github/workflows/verify.yml',import.meta.url),'utf8');
+assert(yaml.includes("|| 'Harness verification'"));assert(yaml.includes("needs.scope.outputs.full == 'true'"));assert(!yaml.includes('continue-on-error:'));
+console.log('CI routing and fail-closed gate: passed; real provider calls = 0');

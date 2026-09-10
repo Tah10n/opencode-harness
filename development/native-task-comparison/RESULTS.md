@@ -1,10 +1,21 @@
-# Fixed native-task comparison: incomplete after quota exhaustion
+# Fixed native-task comparison: incomplete_quota
 
 The intended 100-pair model-backed comparison was **not completed successfully**. All 200 assigned slots have terminal records, but provider quota exhaustion interrupted slot 167 and prevented model work in slots 168–200. No scored slot was restarted, replaced or rerun. No confirmatory effect estimate, McNemar p-value, confidence interval, or positive/negative quality verdict is published.
 
 The recorded failure is HTTP 429, `usage_limit_reached`, with the message **“The usage limit has been reached”**. This is not a model-quality failure or an unknown provider flake. The frozen runner stopped scheduling on relay rejection and HTTP 401/403, but did not stop on HTTP 429. It therefore attempted the remaining assigned slots after the quota refusal. That is an execution-control deviation from the requested stop boundary, not successful completion of the series. The runner and authorization were not changed to bypass the refusal. OpenCode's internal retries remained inside each original slot; there were no additional scored attempts.
 
 All 200 schedule identities, saved process-termination records and container cleanup results were verified. No evaluation process or container remained at the final check. Sixteen B slots have no trustworthy delivery; they remain unavailable and are not substituted with the initial project. Slot 167 retained a patch whose executable checks pass, but its completed manual review found insufficient identity assertions and source contract violations. Missing usage is preserved as unknown.
+
+## Spending decision: experimental subtask closed as incomplete_quota
+
+The completed inspection of 255 available states is retained; it will not be repeated.
+No remaining slot is resumed. The original product goal remains unfinished.
+The first 83 pairs contain A=50 and B=42 complete outcomes. Changing only the
+remaining 17 pairs, even awarding every one to B and none to A, can produce
+at most B=59, A=50: +9 percentage points over the original 100-pair denominator.
+This is an upper bound for the spending decision, **not an effect estimate**.
+The frozen +10 percentage-point criterion, historical outcomes, rubric and grader
+remain unchanged. Closing this experimental subtask does not establish success.
 
 ## Available evidence and remaining review
 

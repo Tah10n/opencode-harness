@@ -26,3 +26,8 @@ for(const p of review.originalDiscordantPairsChecked){const actual=r.pairs.find(
 assert.equal(review.sourceAdjudicationsChecked.length,68);assert.equal(new Set(review.sourceAdjudicationsChecked.map(x=>x.endpoint)).size,68);
 assert.deepEqual(review.accounting.arms,r.armCosts);assert.equal(review.accounting.slotsVerified,200);assert.equal(review.accounting.endpointChecksVerified,255);assert.equal(review.statistics.samplePValueComputed,false);assert.equal(review.statistics.sampleCIComputed,false);
 console.log(JSON.stringify({passed:true,pairs:100,slots:200,manualPending,missingDeliveries:missing,confirmatoryVerdict:'withheld',providerCalls:0}));
+
+const first83=r.pairs.filter(p=>p.pair<=83);assert.equal(first83.length,83);
+assert.equal(first83.filter(p=>p.A.final.complete).length,50);
+assert.equal(first83.filter(p=>p.B.final.complete).length,42);
+assert.equal((42+17)-50,9); // Spending bound only; no effect estimate.
