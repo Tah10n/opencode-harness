@@ -85,4 +85,7 @@ coverage and regressions.
 The earlier C revision remains reproducible at
 `66b7b33fc6bd66201ee24ec84d6e6fcae9daaf28`; its A/B/C results, earlier 20 pairs and
 stopped incomplete-quota series are historical and unchanged. See
-[the D development plan](../../development/native-task-ad/plan.json).
+[the D development plan](../../development/native-task-ad/plan.json) and
+[all eight D/A development outcomes](../../development/native-task-ad/results/README.md).
+Both arms delivered 2/4 complete patches under the scoped external assessment;
+the candidate showed no complete-delivery gain and remains experimental.

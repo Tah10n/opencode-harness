@@ -32,7 +32,12 @@ Node filename and final snapshot binding gaps. The bounded remediation adds
 regressions for all four. The final executed check results are recorded with the
 D development artifacts; this document describes coverage, not a synthetic pass.
 
-Scripted providers establish mechanism and containment only. Model effectiveness
-requires the eight fixed A/D development outcomes, with D0/final patches graded
-separately using the unchanged external evaluator. Four reused tasks cannot
-establish general lift. No further series is automatically authorized.
+Scripted providers establish mechanism and containment only. The
+[eight fixed A/D development outcomes](../../development/native-task-ad/results/README.md)
+are complete, with eight final patches and three available D0 patches graded
+separately using the unchanged external evaluator. A and D each delivered 2/4
+complete patches; no observed correction converted an incomplete D0 into a
+complete final. API D has no D0 because native permission denial stopped the
+stage before capture. All four native D statuses remain incomplete, separately
+from external patch acceptance. Four reused tasks cannot establish general lift.
+No further series is automatically authorized.

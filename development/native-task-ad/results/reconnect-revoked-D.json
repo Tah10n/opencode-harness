@@ -1,0 +1,368 @@
+{
+  "slot": 5,
+  "task": "reconnect-revoked",
+  "arm": "D",
+  "exitCode": 0,
+  "timedOut": false,
+  "elapsedMs": 195452,
+  "requests": 33,
+  "requestsWithoutUsage": 0,
+  "workflowStatus": "incomplete",
+  "repairs": 1,
+  "toolCalls": 34,
+  "sessions": 2,
+  "phaseCount": 1,
+  "execution": "completed",
+  "terminationVerified": true,
+  "cleanupVerified": true,
+  "observedUsage": {
+    "input_tokens": 946263,
+    "cached_tokens": 281088,
+    "output_tokens": 7239,
+    "reasoning_tokens": 2507,
+    "total_tokens": 953502
+  },
+  "usageComplete": true,
+  "requestEfforts": {
+    "none": 1,
+    "low": 32
+  },
+  "httpStatuses": {
+    "200": 33
+  },
+  "artifactWorkflowStatus": "incomplete",
+  "artifactRepairs": 1,
+  "nativeToolOutputParsed": true,
+  "stages": [
+    {
+      "label": "implementation",
+      "role": "author",
+      "elapsedMs": 143170
+    },
+    {
+      "label": "correction",
+      "role": "author",
+      "elapsedMs": 45134
+    }
+  ],
+  "correctionReasons": [
+    "Missing final verification after the last mutation: node --test --test-name-pattern='reconnect retires only an explicitly disconnected unavailable source before pairing' packages/connector/test/config.test.mjs"
+  ],
+  "coverageObservation": "changed_scenarios_require_assessment",
+  "limits": [
+    "Some observed project checks failed, lacked test results or were not repeated after the last mutation."
+  ],
+  "phaseChecks": {
+    "D0": {
+      "checksCurrent": false,
+      "changedTestFiles": [],
+      "latestChecks": [
+        {
+          "command": "node --test --test-name-pattern='reconnect retires only an explicitly disconnected unavailable source before pairing' packages/connector/test/config.test.mjs",
+          "workdir": ".",
+          "provenance": "initial Node test workflow",
+          "exit": 1,
+          "state": "completed",
+          "current": false,
+          "tests": 1,
+          "successful": false
+        },
+        {
+          "command": "node --test packages/connector/test/lifecycle-lock.test.mjs packages/connector/test/owned-lock.test.mjs packages/connector/test/state-security.test.mjs",
+          "workdir": ".",
+          "provenance": "initial Node test workflow",
+          "exit": 0,
+          "state": "completed",
+          "current": true,
+          "tests": 17,
+          "successful": true
+        },
+        {
+          "command": "git diff --check",
+          "workdir": "<delivery-worktree>",
+          "provenance": "explicit original task",
+          "exit": 0,
+          "state": "completed",
+          "current": true,
+          "tests": null,
+          "successful": true
+        }
+      ]
+    },
+    "final": {
+      "checksCurrent": false,
+      "changedTestFiles": [
+        "packages/connector/test/config.test.mjs"
+      ],
+      "latestChecks": [
+        {
+          "command": "node --test --test-name-pattern='reconnect retires only an explicitly disconnected unavailable source before pairing' packages/connector/test/config.test.mjs",
+          "workdir": ".",
+          "provenance": "initial Node test workflow",
+          "exit": 1,
+          "state": "completed",
+          "current": true,
+          "tests": 1,
+          "successful": false
+        },
+        {
+          "command": "node --test packages/connector/test/lifecycle-lock.test.mjs packages/connector/test/owned-lock.test.mjs packages/connector/test/state-security.test.mjs",
+          "workdir": ".",
+          "provenance": "initial Node test workflow",
+          "exit": 0,
+          "state": "completed",
+          "current": true,
+          "tests": 17,
+          "successful": true
+        },
+        {
+          "command": "git diff --check",
+          "workdir": "<delivery-worktree>",
+          "provenance": "explicit original task",
+          "exit": 0,
+          "state": "completed",
+          "current": true,
+          "tests": null,
+          "successful": true
+        }
+      ]
+    }
+  },
+  "packet": "M3",
+  "delivery": {
+    "patchApplies": true,
+    "changedFiles": [
+      "packages/connector/README.md",
+      "packages/connector/bin/viberacing.mjs",
+      "packages/connector/test/config.test.mjs"
+    ],
+    "patchSha256": "5578826a04112f1c92d826d171bd365f6c09d99f40f14f4a1140a62d09a5e01e"
+  },
+  "grading": {
+    "final": {
+      "packet": "M3",
+      "phase": "final",
+      "checks": {
+        "ordinary": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 25,
+            "pass": 24,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "consumers": {
+          "code": 1,
+          "timedOut": false,
+          "counts": {
+            "tests": 5,
+            "pass": 4,
+            "fail": 1,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 25,
+            "pass": 24,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "preserved-consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "lifecycle-preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 5,
+            "pass": 5,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "acceptance-403": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      },
+      "passed": false,
+      "cleanup": 0
+    },
+    "D0": {
+      "packet": "M3",
+      "phase": "D0",
+      "checks": {
+        "ordinary": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 25,
+            "pass": 24,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "consumers": {
+          "code": 1,
+          "timedOut": false,
+          "counts": {
+            "tests": 5,
+            "pass": 4,
+            "fail": 1,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 25,
+            "pass": 24,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "preserved-consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "lifecycle-preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 5,
+            "pass": 5,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "acceptance-403": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      },
+      "passed": false,
+      "cleanup": 0
+    }
+  },
+  "sourceReview": {
+    "packet": "M3",
+    "assessmentScope": "Final source and delivered tests/README inspection by the integrator who knows the schedule; independent frozen executable checks are reported separately.",
+    "phases": {
+      "D0": {
+        "sourceConformsToTask": true,
+        "necessaryCoverageDelivered": false,
+        "oldCoveragePreserved": false,
+        "newRequiredCoverageDelivered": false,
+        "documentationDelivered": true,
+        "newRegressionFound": false,
+        "evidence": [
+          "packages/connector/bin/viberacing.mjs reconcilePreviousConnectionBeforePairing and connect",
+          "packages/connector/test/config.test.mjs reconnect retirement fixture",
+          "packages/connector/README.md revoked authorization paragraph"
+        ],
+        "notes": [
+          "Production now clears revoked authorization through the existing lifecycle cleanup, warns about auxiliary failures, and permits fresh pairing while preserving the original nonrevoked error path.",
+          "The old integration test is unchanged, including its now-obsolete expectation that 401 rejects requiring manual disconnect. That intended API behavior change is not a product regression, but the delivered suite has not been adapted and cannot execute the subsequent disconnected-source scenario.",
+          "README describes the resulting behavior. No completed new 401/403 project regressions are delivered."
+        ]
+      },
+      "final": {
+        "sourceConformsToTask": true,
+        "necessaryCoverageDelivered": false,
+        "oldCoveragePreserved": false,
+        "newRequiredCoverageDelivered": false,
+        "documentationDelivered": true,
+        "newRegressionFound": true,
+        "evidence": [
+          "packages/connector/bin/viberacing.mjs reconcilePreviousConnectionBeforePairing and connect",
+          "packages/connector/test/config.test.mjs reconnect retirement fixture",
+          "packages/connector/README.md revoked authorization paragraph"
+        ],
+        "notes": [
+          "Production behavior is unchanged from D0 except removal of the unused abandonedAttempt binding.",
+          "The correction removes the obsolete 401 rejection and adds a 401 recovery call with installation/token assertions, then runs the old disconnected mode in the same mutated state.",
+          "After 401 pairing, config.sources contains only activeMapping. The following disconnected response still contains retiredMapping plus activeMapping, without restoring the old two-source configuration. This no longer supplies the separate old unavailable-source retirement scenario and fails protocol reconciliation; the native check remains red.",
+          "Keeping the original test name and a mode = disconnected line does not restore its necessary state and behavior. The 403 recovery path also has no delivered dedicated regression.",
+          "No second correction occurs after the failing final test. Original production behavior is evaluated separately with the unchanged external checks.",
+          "The frozen delivered-consumers check confirms invalid protocol response on the old disconnected branch. The frozen observer 401 and 403 scenarios and lifecycle checks pass in D0 and final. This is a delivered-test regression, not evidence that the production disconnected behavior broke."
+        ]
+      }
+    }
+  },
+  "D0Available": true,
+  "D0FinalPatchEqual": false,
+  "publicPathNormalization": "Delivery-worktree runtime prefix normalized; raw local evidence is unchanged.",
+  "assessment": {
+    "final": {
+      "workingBehaviorObserved": true,
+      "deliveredChecksPassed": false,
+      "allFrozenChecksPassed": false,
+      "necessaryCoverageDelivered": false,
+      "oldCoveragePreserved": false,
+      "newRequiredCoverageDelivered": false,
+      "documentationDelivered": true,
+      "completePatchDelivery": false,
+      "newRegressionFound": true
+    },
+    "D0": {
+      "workingBehaviorObserved": true,
+      "deliveredChecksPassed": false,
+      "allFrozenChecksPassed": false,
+      "necessaryCoverageDelivered": false,
+      "oldCoveragePreserved": false,
+      "newRequiredCoverageDelivered": false,
+      "documentationDelivered": true,
+      "completePatchDelivery": false,
+      "newRegressionFound": false
+    }
+  },
+  "D0FinalChangedPaths": [
+    "packages/connector/bin/viberacing.mjs",
+    "packages/connector/test/config.test.mjs"
+  ],
+  "D0FinalTreeEqual": false
+}

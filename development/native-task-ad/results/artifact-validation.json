@@ -1,0 +1,16 @@
+{
+  "outcomesVerified": 8,
+  "gradedEndpointsVerified": 11,
+  "patchHashesVerified": 11,
+  "requestUsageRowsVerified": 220,
+  "effortCounts": {
+    "low": 212,
+    "none": 8
+  },
+  "relativeReportLinksResolve": true,
+  "publicFieldsHaveNoPrivateHostPathsOrCredentialMarkers": true,
+  "historicalABCAndPriorCampaignPathsUnchanged": true,
+  "candidateRuntimeNotChangedAfterFreeze": true,
+  "sourceAndReportWhitespaceCheck": "passed; stored .patch files checked by git apply --check --whitespace=error-all instead",
+  "rawOuterDiffWarnings": "Stored unified patches contain space-prefixed blank context lines. Unfiltered git diff --cached --check reports these; original patch bytes are intentionally preserved."
+}

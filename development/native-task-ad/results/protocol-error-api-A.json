@@ -1,0 +1,149 @@
+{
+  "slot": 1,
+  "task": "protocol-error-api",
+  "arm": "A",
+  "exitCode": 0,
+  "timedOut": false,
+  "elapsedMs": 117792,
+  "requests": 15,
+  "requestsWithoutUsage": 0,
+  "workflowStatus": null,
+  "repairs": null,
+  "toolCalls": 21,
+  "sessions": 1,
+  "phaseCount": 1,
+  "execution": "completed",
+  "terminationVerified": true,
+  "cleanupVerified": true,
+  "observedUsage": {
+    "input_tokens": 316675,
+    "cached_tokens": 94208,
+    "output_tokens": 2949,
+    "reasoning_tokens": 719,
+    "total_tokens": 319624
+  },
+  "usageComplete": true,
+  "requestEfforts": {
+    "none": 1,
+    "low": 14
+  },
+  "httpStatuses": {
+    "200": 15
+  },
+  "packet": "L8",
+  "delivery": {
+    "patchApplies": true,
+    "changedFiles": [
+      "packages/connector/README.md",
+      "packages/connector/bin/viberacing.mjs",
+      "packages/connector/lib/protocol.mjs",
+      "packages/connector/test/protocol.test.mjs"
+    ],
+    "patchSha256": "c91fc661a9755b67640c8c423cd5ae6b54827197448c52649abe04a637c71b9b"
+  },
+  "grading": {
+    "final": {
+      "packet": "L8",
+      "phase": "final",
+      "checks": {
+        "ordinary": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 24,
+            "pass": 23,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 14,
+            "pass": 14,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 24,
+            "pass": 23,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "preserved-consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 14,
+            "pass": 14,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "acceptance": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 12,
+            "pass": 12,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      },
+      "passed": true,
+      "cleanup": 0
+    }
+  },
+  "sourceReview": {
+    "packet": "L8",
+    "assessmentScope": "Final source and delivered tests/README inspection by the integrator who knows the schedule; independent frozen executable checks are reported separately.",
+    "phases": {
+      "final": {
+        "sourceConformsToTask": true,
+        "necessaryCoverageDelivered": true,
+        "documentationDelivered": true,
+        "newRegressionFound": false,
+        "notes": [
+          "parseProtocolResponse validates the body before throwing the new status/code Error; successful parsing and invalid_server_response validation are unchanged.",
+          "The real request path now returns successful parse results and catches thrown valid errors; 429/5xx attach Retry-After metadata before existing backoff. Nonretryable 4xx, timeout and redirect controls remain.",
+          "The old valid-error assertion is adapted to rejection/status/code rather than removed; malformed code and terminal sanitization assertions remain. Existing CLI integration suites still exercise pairing/reconciliation/usage consumers; no redundant new CLI test is demanded solely because its file did not change.",
+          "README explains the public protocol contract."
+        ],
+        "evidence": [
+          "packages/connector/lib/protocol.mjs parseProtocolResponse",
+          "packages/connector/bin/viberacing.mjs request",
+          "packages/connector/test/protocol.test.mjs valid error and invalid code assertions",
+          "packages/connector/test/config.test.mjs existing consumer regressions"
+        ],
+        "oldCoveragePreserved": true,
+        "newRequiredCoverageDelivered": true
+      }
+    }
+  },
+  "publicPathNormalization": "Delivery-worktree runtime prefix normalized; raw local evidence is unchanged.",
+  "assessment": {
+    "final": {
+      "workingBehaviorObserved": true,
+      "deliveredChecksPassed": true,
+      "allFrozenChecksPassed": true,
+      "necessaryCoverageDelivered": true,
+      "oldCoveragePreserved": true,
+      "newRequiredCoverageDelivered": true,
+      "documentationDelivered": true,
+      "completePatchDelivery": true,
+      "newRegressionFound": false
+    }
+  }
+}

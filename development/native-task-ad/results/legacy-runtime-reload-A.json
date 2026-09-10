@@ -1,0 +1,160 @@
+{
+  "slot": 4,
+  "task": "legacy-runtime-reload",
+  "arm": "A",
+  "exitCode": 0,
+  "timedOut": false,
+  "elapsedMs": 167544,
+  "requests": 21,
+  "requestsWithoutUsage": 0,
+  "workflowStatus": null,
+  "repairs": null,
+  "toolCalls": 30,
+  "sessions": 1,
+  "phaseCount": 1,
+  "execution": "completed",
+  "terminationVerified": true,
+  "cleanupVerified": true,
+  "observedUsage": {
+    "input_tokens": 777755,
+    "cached_tokens": 104960,
+    "output_tokens": 4727,
+    "reasoning_tokens": 1283,
+    "total_tokens": 782482
+  },
+  "usageComplete": true,
+  "requestEfforts": {
+    "none": 1,
+    "low": 20
+  },
+  "httpStatuses": {
+    "200": 21
+  },
+  "packet": "V7",
+  "delivery": {
+    "patchApplies": true,
+    "changedFiles": [
+      "packages/connector/README.md",
+      "packages/connector/lib/config.mjs",
+      "packages/connector/test/state-security.test.mjs"
+    ],
+    "patchSha256": "627b6a3bf0950cae60ac4f34ee75e4f0f18f1e37de4bdd48569f5871427c57c2"
+  },
+  "grading": {
+    "final": {
+      "packet": "V7",
+      "phase": "final",
+      "checks": {
+        "ordinary": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 24,
+            "pass": 23,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 2,
+            "pass": 2,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 24,
+            "pass": 23,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "preserved-consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 2,
+            "pass": 2,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "legacy-acceptance": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 9,
+            "pass": 9,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "acceptance": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      },
+      "passed": true,
+      "cleanup": 0
+    }
+  },
+  "sourceReview": {
+    "packet": "V7",
+    "assessmentScope": "Final source and delivered tests/README inspection by the integrator who knows the schedule; independent frozen executable checks are reported separately.",
+    "phases": {
+      "final": {
+        "sourceConformsToTask": true,
+        "necessaryCoverageDelivered": false,
+        "oldCoveragePreserved": true,
+        "newRequiredCoverageDelivered": false,
+        "documentationDelivered": true,
+        "newRegressionFound": false,
+        "notes": [
+          "The existing ownership predicate gains a normalized, explicit allowlist for known legacy files/directories. Existing link, file type, identity, executable and migration safeguards remain.",
+          "The existing positive state migration fixture is extended with the full legacy file set and mode assertions; prior assertions remain.",
+          "The new legacy fixture initializes only once. No delivered legacy-layout scenario calls prepareRuntime, executes the newly installed launcher and then repeats preparation/reloads the migrated state. Existing normal-layout runtime tests do not cover this combined new path. The external reload evaluator cannot substitute this explicitly requested project regression.",
+          "The task wording does not unambiguously require all known files to exist; accepting a known subset is not automatically a defect. This preserves the historical evaluation boundary.",
+          "README describes the behavior and cursor ownership-only boundary."
+        ],
+        "evidence": [
+          "packages/connector/lib/config.mjs ownedStatePath",
+          "packages/connector/test/state-security.test.mjs first migration case",
+          "packages/connector/test/config.test.mjs installs runnable and incomplete runtime cases",
+          "packages/connector/README.md legacy layout paragraph"
+        ]
+      }
+    }
+  },
+  "publicPathNormalization": "Delivery-worktree runtime prefix normalized; raw local evidence is unchanged.",
+  "assessment": {
+    "final": {
+      "workingBehaviorObserved": true,
+      "deliveredChecksPassed": true,
+      "allFrozenChecksPassed": true,
+      "necessaryCoverageDelivered": false,
+      "oldCoveragePreserved": true,
+      "newRequiredCoverageDelivered": false,
+      "documentationDelivered": true,
+      "completePatchDelivery": false,
+      "newRegressionFound": false
+    }
+  }
+}
