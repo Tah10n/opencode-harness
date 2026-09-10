@@ -84,23 +84,23 @@ Complete means the unchanged full delivery rubric; native status is a separate c
 | 78 | function-receiver-wrapper | compatibility | AB | not complete | not complete | not complete | incomplete | 61.5/150.0 | 11/21 | 14/22 | 89173/281024 |
 | 79 | tiered-meter-invoice | integration | BA | not complete | complete | complete | reviewed_delivery | 63.3/100.4 | 11/16 | 16/20 | 85940/155501 |
 | 80 | fractional-order-keys | state | BA | complete | complete | complete | reviewed_delivery | 68.7/115.7 | 11/18 | 16/25 | 93136/188539 |
-| 81 | iterable-stream-adapter | compatibility | AB | not complete | complete | complete | reviewed_delivery | 90.3/117.5 | 14/16 | 19/20 | 132706/163789 |
+| 81 | iterable-stream-adapter | compatibility | AB | not complete | not complete | not complete | reviewed_delivery | 90.3/117.5 | 14/16 | 19/20 | 132706/163789 |
 | 82 | generator-tree-walk | refactoring | BA | complete | unassessed/unavailable | complete | incomplete | 69.9/94.2 | 12/18 | 16/21 | 100974/176393 |
-| 83 | weighted-ballot-tabulation | integration | BA | unassessed/unavailable | unassessed/unavailable | not complete | incomplete | 113.4/55.4 | 15/16 | 21/19 | 159624/126821 |
-| 84 | readonly-collection-view | compatibility | BA | unassessed/unavailable | unassessed/unavailable | unassessed/unavailable | environment_error | 76.8/206.3 | 9/22 | 0/14 | 0/84966 |
-| 85 | observed-remove-set | state | BA | unassessed/unavailable | unassessed/unavailable | unavailable (not complete) | incomplete | 75.8/71.5 | 9/9 | 0/0 | 0/0 |
-| 86 | range-set-canonicalization | state | BA | unassessed/unavailable | unassessed/unavailable | unavailable (not complete) | incomplete | 74.5/78.5 | 9/9 | 0/0 | 0/0 |
-| 87 | recurrence-exclusion-calendar | integration | AB | unassessed/unavailable | unassessed/unavailable | unavailable (not complete) | incomplete | 70.7/78.1 | 9/9 | 0/0 | 0/0 |
-| 88 | binary-search-api-bounds | compatibility | BA | unassessed/unavailable | unassessed/unavailable | unavailable (not complete) | incomplete | 70.9/78.0 | 9/9 | 0/0 | 0/0 |
-| 89 | fragmented-message-decoder | integration | BA | unassessed/unavailable | unassessed/unavailable | unavailable (not complete) | incomplete | 77.6/75.9 | 9/9 | 0/0 | 0/0 |
-| 90 | finite-state-transition-log | state | AB | unassessed/unavailable | unassessed/unavailable | unavailable (not complete) | incomplete | 78.1/76.2 | 9/9 | 0/0 | 0/0 |
-| 91 | central-money-rounding | refactoring | BA | unassessed/unavailable | unassessed/unavailable | unavailable (not complete) | incomplete | 78.4/74.9 | 9/9 | 0/0 | 0/0 |
-| 92 | batch-error-aggregation | refactoring | BA | unassessed/unavailable | unassessed/unavailable | unavailable (not complete) | incomplete | 79.3/71.2 | 9/9 | 0/0 | 0/0 |
-| 93 | stable-sort-comparator | compatibility | AB | unassessed/unavailable | unassessed/unavailable | unavailable (not complete) | incomplete | 74.4/76.9 | 9/9 | 0/0 | 0/0 |
-| 94 | regexp-filter-state | compatibility | BA | unassessed/unavailable | unassessed/unavailable | unavailable (not complete) | incomplete | 74.5/72.2 | 9/9 | 0/0 | 0/0 |
-| 95 | positional-options-overload | compatibility | BA | unassessed/unavailable | unassessed/unavailable | unavailable (not complete) | incomplete | 72.0/76.4 | 9/9 | 0/0 | 0/0 |
-| 96 | visitor-expression-printer | refactoring | AB | unassessed/unavailable | unassessed/unavailable | unavailable (not complete) | incomplete | 78.0/77.8 | 9/9 | 0/0 | 0/0 |
-| 97 | transport-injected-uploader | refactoring | AB | unassessed/unavailable | unassessed/unavailable | unavailable (not complete) | incomplete | 74.0/80.2 | 9/9 | 0/0 | 0/0 |
-| 98 | tree-selection-propagation | state | BA | unassessed/unavailable | unassessed/unavailable | unavailable (not complete) | incomplete | 80.4/72.0 | 9/9 | 0/0 | 0/0 |
-| 99 | unicode-search-snippets | integration | BA | unassessed/unavailable | unassessed/unavailable | unavailable (not complete) | incomplete | 73.7/77.4 | 9/9 | 0/0 | 0/0 |
-| 100 | metric-watermark-windows | integration | BA | unassessed/unavailable | unassessed/unavailable | unavailable (not complete) | incomplete | 80.3/74.4 | 9/9 | 0/0 | 0/0 |
+| 83 | weighted-ballot-tabulation | integration | BA | not complete | unassessed/unavailable | not complete | incomplete | 113.4/55.4 | 15/16 | 21/19 | 159624/126821 |
+| 84 | readonly-collection-view | compatibility | BA | not complete | unassessed/unavailable | not complete | environment_error | 76.8/206.3 | 9/22 | 0/14 | 0/84966 |
+| 85 | observed-remove-set | state | BA | not complete | unassessed/unavailable | unavailable (not complete) | incomplete | 75.8/71.5 | 9/9 | 0/0 | 0/0 |
+| 86 | range-set-canonicalization | state | BA | not complete | unassessed/unavailable | unavailable (not complete) | incomplete | 74.5/78.5 | 9/9 | 0/0 | 0/0 |
+| 87 | recurrence-exclusion-calendar | integration | AB | not complete | unassessed/unavailable | unavailable (not complete) | incomplete | 70.7/78.1 | 9/9 | 0/0 | 0/0 |
+| 88 | binary-search-api-bounds | compatibility | BA | not complete | unassessed/unavailable | unavailable (not complete) | incomplete | 70.9/78.0 | 9/9 | 0/0 | 0/0 |
+| 89 | fragmented-message-decoder | integration | BA | not complete | unassessed/unavailable | unavailable (not complete) | incomplete | 77.6/75.9 | 9/9 | 0/0 | 0/0 |
+| 90 | finite-state-transition-log | state | AB | not complete | unassessed/unavailable | unavailable (not complete) | incomplete | 78.1/76.2 | 9/9 | 0/0 | 0/0 |
+| 91 | central-money-rounding | refactoring | BA | not complete | unassessed/unavailable | unavailable (not complete) | incomplete | 78.4/74.9 | 9/9 | 0/0 | 0/0 |
+| 92 | batch-error-aggregation | refactoring | BA | not complete | unassessed/unavailable | unavailable (not complete) | incomplete | 79.3/71.2 | 9/9 | 0/0 | 0/0 |
+| 93 | stable-sort-comparator | compatibility | AB | not complete | unassessed/unavailable | unavailable (not complete) | incomplete | 74.4/76.9 | 9/9 | 0/0 | 0/0 |
+| 94 | regexp-filter-state | compatibility | BA | not complete | unassessed/unavailable | unavailable (not complete) | incomplete | 74.5/72.2 | 9/9 | 0/0 | 0/0 |
+| 95 | positional-options-overload | compatibility | BA | not complete | unassessed/unavailable | unavailable (not complete) | incomplete | 72.0/76.4 | 9/9 | 0/0 | 0/0 |
+| 96 | visitor-expression-printer | refactoring | AB | not complete | unassessed/unavailable | unavailable (not complete) | incomplete | 78.0/77.8 | 9/9 | 0/0 | 0/0 |
+| 97 | transport-injected-uploader | refactoring | AB | not complete | unassessed/unavailable | unavailable (not complete) | incomplete | 74.0/80.2 | 9/9 | 0/0 | 0/0 |
+| 98 | tree-selection-propagation | state | BA | not complete | unassessed/unavailable | unavailable (not complete) | incomplete | 80.4/72.0 | 9/9 | 0/0 | 0/0 |
+| 99 | unicode-search-snippets | integration | BA | not complete | unassessed/unavailable | unavailable (not complete) | incomplete | 73.7/77.4 | 9/9 | 0/0 | 0/0 |
+| 100 | metric-watermark-windows | integration | BA | not complete | unassessed/unavailable | unavailable (not complete) | incomplete | 80.3/74.4 | 9/9 | 0/0 | 0/0 |

@@ -14,17 +14,17 @@
   "frozenInputsUnchanged": true,
   "startUTC": "2026-09-09T16:50:38.870Z",
   "endUTC": "2026-09-09T22:23:05.904Z",
-  "independentManualReviews": 236,
+  "independentManualReviews": 255,
   "availableInspectionPackets": 255,
-  "manualReviewsPending": 19,
+  "manualReviewsPending": 0,
   "unavailableFinalDeliveries": 16,
   "availableD0": 71,
-  "independentFinalDiscordantRecheck": "not completed: independent reviewer reached quota limit; no retry or alternate model",
+  "independentFinalDiscordantRecheck": "completed: same reviewer checked all25 original discordant pairs, all68 source adjudications, saved accounting and frozen arithmetic controls; see independent-review.json",
   "confirmatoryStatistics": {
     "effect": null,
     "pValue": null,
     "confidenceInterval": null,
-    "reason": "Incomplete model-backed comparison and unfinished independent review; no confirmatory verdict"
+    "reason": "Model-backed series was interrupted by quota failure; completed offline review does not restore missing model work. No confirmatory verdict."
   },
   "nativeStatuses": {
     "reviewed_delivery": 53,

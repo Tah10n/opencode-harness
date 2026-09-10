@@ -4,10 +4,10 @@
   "primary": {
     "n": 100,
     "both": 34,
-    "bOnly": 9,
+    "bOnly": 8,
     "aOnly": 16,
-    "neither": 23,
-    "unassessedPairs": 18,
+    "neither": 42,
+    "unassessedPairs": 0,
     "status": "descriptive operational dispositions only; confirmatory comparison withheld after quota failure",
     "difference": null,
     "pExactTwoSided": null,
@@ -23879,7 +23879,7 @@
       "B": {
         "slot": 162,
         "D0": {
-          "complete": true,
+          "complete": false,
           "frozenChecklistComplete": true,
           "testsDelivered": true,
           "docsDelivered": true,
@@ -23920,13 +23920,18 @@
               }
             }
           },
-          "contractAdjudication": null,
+          "contractAdjudication": {
+            "requiredBehaviorViolated": true,
+            "requirement": "TASK.md requires well-formed JavaScript sync/async iterator protocols; it does not exclude own properties of callable iterator methods.",
+            "sourceEvidence": "project/src/collect.mjs:11 calls asyncMethod.call(source) or syncMethod.call(source). A valid iterator method function with own call=null therefore throws TypeError before returning its iterator. Native protocol invocation would call the callable itself.",
+            "basis": "Final independent review finding verified by primary against unchanged TASK and source. Both saved endpoints contain the same line. No candidate execution, changed criterion or evaluator modification."
+          },
           "unmetManualItems": []
         },
         "final": {
           "deliveryAvailable": true,
           "assessmentStatus": "independently reviewed",
-          "complete": true,
+          "complete": false,
           "frozenChecklistComplete": true,
           "testsDelivered": true,
           "docsDelivered": true,
@@ -23967,7 +23972,12 @@
               }
             }
           },
-          "contractAdjudication": null,
+          "contractAdjudication": {
+            "requiredBehaviorViolated": true,
+            "requirement": "TASK.md requires well-formed JavaScript sync/async iterator protocols; it does not exclude own properties of callable iterator methods.",
+            "sourceEvidence": "project/src/collect.mjs:11 calls asyncMethod.call(source) or syncMethod.call(source). A valid iterator method function with own call=null therefore throws TypeError before returning its iterator. Native protocol invocation would call the callable itself.",
+            "basis": "Final independent review finding verified by primary against unchanged TASK and source. Both saved endpoints contain the same line. No candidate execution, changed criterion or evaluator modification."
+          },
           "unmetManualItems": []
         },
         "cost": {
@@ -24279,13 +24289,13 @@
         "slot": 166,
         "final": {
           "deliveryAvailable": true,
-          "assessmentStatus": "independent manual review unavailable after reviewer quota limit",
-          "complete": null,
-          "frozenChecklistComplete": null,
-          "testsDelivered": null,
-          "docsDelivered": null,
-          "manualBehaviorSatisfied": null,
-          "coveragePreserved": null,
+          "assessmentStatus": "independently reviewed",
+          "complete": false,
+          "frozenChecklistComplete": false,
+          "testsDelivered": false,
+          "docsDelivered": true,
+          "manualBehaviorSatisfied": true,
+          "coveragePreserved": true,
           "checks": {
             "acceptance": {
               "passed": true,
@@ -24323,7 +24333,12 @@
           },
           "contractAdjudication": null,
           "unmetManualItems": [
-            "Independent manual review pending; do not infer complete delivery from executable checks alone."
+            {
+              "category": "testDelivery",
+              "item": "Assert exhaustion-adjusted majority, deterministic tie elimination, zero active weight, empty and invalid ballots.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:25-29 checks winner A plus round1 active7/exhausted3, but does not assert that round is terminal or only two rounds exist. Using original total10 for majority still yields winner A after eliminating B in round1 and a third round; all these assertions pass. Thus exhaustion-adjusted majority is not meaningfully distinguished. Tie, zero, empty and invalid cases at32-44 are present."
+            }
           ]
         },
         "cost": {
@@ -24515,13 +24530,13 @@
         "slot": 168,
         "final": {
           "deliveryAvailable": true,
-          "assessmentStatus": "independent manual review unavailable after reviewer quota limit",
-          "complete": null,
-          "frozenChecklistComplete": null,
-          "testsDelivered": null,
-          "docsDelivered": null,
-          "manualBehaviorSatisfied": null,
-          "coveragePreserved": null,
+          "assessmentStatus": "independently reviewed",
+          "complete": false,
+          "frozenChecklistComplete": false,
+          "testsDelivered": false,
+          "docsDelivered": false,
+          "manualBehaviorSatisfied": true,
+          "coveragePreserved": true,
           "checks": {
             "acceptance": {
               "passed": false,
@@ -24557,9 +24572,37 @@
               }
             }
           },
-          "contractAdjudication": null,
+          "contractAdjudication": {
+            "requiredBehaviorViolated": true,
+            "requirement": "Change viewMap(source) from a detached Map copy into a live read-only Map-like view.",
+            "sourceEvidence": "project/src/view.mjs:1 returns mutable detached new Map(source); later owner changes are invisible and set/delete/clear succeed.",
+            "basis": "Primary agent independently read the unchanged TASK and all delivered src modules after blind review. The stated missing API, delegation or behavior directly follows from these bytes; no candidate execution, evaluator modification or new requirement."
+          },
           "unmetManualItems": [
-            "Independent manual review pending; do not infer complete delivery from executable checks alone."
+            {
+              "category": "testDelivery",
+              "item": "Assert source changes remain visible and mutators are rejected.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:1-2 is only original suite; listed new behavior assertions absent."
+            },
+            {
+              "category": "testDelivery",
+              "item": "Assert forEach passes the view with correct receiver and preserves key/value identity.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:1-2 is only original suite; listed new behavior assertions absent."
+            },
+            {
+              "category": "docDelivery",
+              "item": "Explain live Map-like methods, ordering and shallow read-only scope.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 only title/run instruction; required explanation absent."
+            },
+            {
+              "category": "docDelivery",
+              "item": "Document forbidden mutators, safe forEach third argument, owner changes and no source exposure.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 only title/run instruction; required explanation absent."
+            }
           ]
         },
         "cost": {
@@ -24607,13 +24650,13 @@
         "D0": null,
         "final": {
           "deliveryAvailable": true,
-          "assessmentStatus": "independent manual review unavailable after reviewer quota limit",
-          "complete": null,
-          "frozenChecklistComplete": null,
-          "testsDelivered": null,
-          "docsDelivered": null,
-          "manualBehaviorSatisfied": null,
-          "coveragePreserved": null,
+          "assessmentStatus": "independently reviewed",
+          "complete": false,
+          "frozenChecklistComplete": false,
+          "testsDelivered": false,
+          "docsDelivered": true,
+          "manualBehaviorSatisfied": true,
+          "coveragePreserved": true,
           "checks": {
             "acceptance": {
               "passed": true,
@@ -24649,9 +24692,19 @@
               }
             }
           },
-          "contractAdjudication": null,
+          "contractAdjudication": {
+            "requiredBehaviorViolated": true,
+            "requirement": "source must be a same-realm native Map with unmodified built-in methods (non-Map input rejects TypeError). forEach(callback,thisArg) must use native Map iteration semantics, call callback(value,key,view) with the supplied thisArg, return undefined and propagate callback errors unchanged.",
+            "sourceEvidence": "project/src/view.mjs:8-11 validates only prototype. Object.create(Map.prototype) is not a native Map but accepted through returning frozen view; rejection is deferred until later read. project/src/view.mjs:33 invokes callback.call. Ordinary callable with own call=null causes helper TypeError rather than callback invocation; callback domain does not exclude such own properties.",
+            "basis": "Primary agent independently read the unchanged TASK and all delivered src modules after blind review. The stated missing API, delegation or behavior directly follows from these bytes; no candidate execution, evaluator modification or new requirement."
+          },
           "unmetManualItems": [
-            "Independent manual review pending; do not infer complete delivery from executable checks alone."
+            {
+              "category": "testDelivery",
+              "item": "Assert forEach passes the view with correct receiver and preserves key/value identity.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:13-20 uses deepEqual(calls, [[receiver,value,key,view]]) with empty receiver/key/value objects. Structurally equal clones or a different empty receiver pass; no strict identity assertions for key/value/this. notEqual checks only view versus source."
+            }
           ]
         },
         "cost": {
@@ -24738,13 +24791,13 @@
         "slot": 170,
         "final": {
           "deliveryAvailable": true,
-          "assessmentStatus": "independent manual review unavailable after reviewer quota limit",
-          "complete": null,
-          "frozenChecklistComplete": null,
-          "testsDelivered": null,
-          "docsDelivered": null,
-          "manualBehaviorSatisfied": null,
-          "coveragePreserved": null,
+          "assessmentStatus": "independently reviewed",
+          "complete": false,
+          "frozenChecklistComplete": false,
+          "testsDelivered": false,
+          "docsDelivered": false,
+          "manualBehaviorSatisfied": true,
+          "coveragePreserved": true,
           "checks": {
             "acceptance": {
               "passed": false,
@@ -24780,9 +24833,37 @@
               }
             }
           },
-          "contractAdjudication": null,
+          "contractAdjudication": {
+            "requiredBehaviorViolated": true,
+            "requirement": "Tombstones may arrive before their add and must prevent later resurrection.",
+            "sourceEvidence": "project/src/set.mjs:1 ignores supplied tags, stores only values, exports value as tag and no tombstones; merge ignores removed tags and resurrects removed values.",
+            "basis": "Primary agent independently read the unchanged TASK and all delivered src modules after blind review. The stated missing API, delegation or behavior directly follows from these bytes; no candidate execution, evaluator modification or new requirement."
+          },
           "unmetManualItems": [
-            "Independent manual review pending; do not infer complete delivery from executable checks alone."
+            {
+              "category": "testDelivery",
+              "item": "An unseen concurrent addition survives an observed removal and replicas converge.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:1-2 contains only original case; complete listed new assertions absent."
+            },
+            {
+              "category": "testDelivery",
+              "item": "Tombstone arriving before addition prevents resurrection.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:1-2 contains only original case; complete listed new assertions absent."
+            },
+            {
+              "category": "docDelivery",
+              "item": "Addition tags identify values and remove only observes local tags.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 contains only title/run instruction; required explanation absent."
+            },
+            {
+              "category": "docDelivery",
+              "item": "Union merge, retained tombstones, atomic conflict rejection and detached sorted snapshots.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 contains only title/run instruction; required explanation absent."
+            }
           ]
         },
         "cost": {
@@ -24926,13 +25007,13 @@
         "slot": 172,
         "final": {
           "deliveryAvailable": true,
-          "assessmentStatus": "independent manual review unavailable after reviewer quota limit",
-          "complete": null,
-          "frozenChecklistComplete": null,
-          "testsDelivered": null,
-          "docsDelivered": null,
-          "manualBehaviorSatisfied": null,
-          "coveragePreserved": null,
+          "assessmentStatus": "independently reviewed",
+          "complete": false,
+          "frozenChecklistComplete": false,
+          "testsDelivered": false,
+          "docsDelivered": false,
+          "manualBehaviorSatisfied": true,
+          "coveragePreserved": true,
           "checks": {
             "acceptance": {
               "passed": false,
@@ -24968,9 +25049,37 @@
               }
             }
           },
-          "contractAdjudication": null,
+          "contractAdjudication": {
+            "requiredBehaviorViolated": true,
+            "requirement": "Canonical form sorts by start and merges overlapping OR touching ranges; omit empty intervals.",
+            "sourceEvidence": "project/src/ranges.mjs:1 canonical only clones, subtract only clones and remove is empty. Touching intervals stay separate and interior removal changes nothing.",
+            "basis": "Primary agent independently read the unchanged TASK and all delivered src modules after blind review. The stated missing API, delegation or behavior directly follows from these bytes; no candidate execution, evaluator modification or new requirement."
+          },
           "unmetManualItems": [
-            "Independent manual review pending; do not infer complete delivery from executable checks alone."
+            {
+              "category": "testDelivery",
+              "item": "Touching/overlapping ranges merge then interior removal splits.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:1-2 retains only original assertions; it does not exercise the complete listed new obligation."
+            },
+            {
+              "category": "testDelivery",
+              "item": "Empty interval handling and detached snapshot.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:1-2 retains only original assertions; it does not exercise the complete listed new obligation."
+            },
+            {
+              "category": "docDelivery",
+              "item": "Half-open membership and canonical merging including touching endpoints.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 only title/run instruction; required explanation absent."
+            },
+            {
+              "category": "docDelivery",
+              "item": "Subtraction splitting, empty no-ops and ownership of helper/state results.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 only title/run instruction; required explanation absent."
+            }
           ]
         },
         "cost": {
@@ -25114,13 +25223,13 @@
         "slot": 173,
         "final": {
           "deliveryAvailable": true,
-          "assessmentStatus": "independent manual review unavailable after reviewer quota limit",
-          "complete": null,
-          "frozenChecklistComplete": null,
-          "testsDelivered": null,
-          "docsDelivered": null,
-          "manualBehaviorSatisfied": null,
-          "coveragePreserved": null,
+          "assessmentStatus": "independently reviewed",
+          "complete": false,
+          "frozenChecklistComplete": false,
+          "testsDelivered": false,
+          "docsDelivered": false,
+          "manualBehaviorSatisfied": true,
+          "coveragePreserved": true,
           "checks": {
             "acceptance": {
               "passed": false,
@@ -25156,9 +25265,37 @@
               }
             }
           },
-          "contractAdjudication": null,
+          "contractAdjudication": {
+            "requiredBehaviorViolated": true,
+            "requirement": "Implement occurrences(start,end,weekdays) using UTC dates with start inclusive/end exclusive, selecting each matching weekday once even if weekdays contains duplicates.",
+            "sourceEvidence": "project/src/weekly.mjs:1 returns every date regardless of weekdays; calendar.mjs:1 ignores exclusions/replacements. Empty weekday selection still returns all dates.",
+            "basis": "Primary agent independently read the unchanged TASK and all delivered src modules after blind review. The stated missing API, delegation or behavior directly follows from these bytes; no candidate execution, evaluator modification or new requirement."
+          },
           "unmetManualItems": [
-            "Independent manual review pending; do not infer complete delivery from executable checks alone."
+            {
+              "category": "testDelivery",
+              "item": "Weekday selection with duplicate weekday and exclusion that also has a replacement.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:1-2 contains only original case; complete listed new assertions absent."
+            },
+            {
+              "category": "testDelivery",
+              "item": "Replacement outside bounds with deterministic output ordering.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:1-2 contains only original case; complete listed new assertions absent."
+            },
+            {
+              "category": "docDelivery",
+              "item": "UTC, half-open date range and original-date exclusion precedence.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 contains only title/run instruction; required explanation absent."
+            },
+            {
+              "category": "docDelivery",
+              "item": "Distinct occurrences may share a replacement date; output sort and ignored unused replacement keys.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 contains only title/run instruction; required explanation absent."
+            }
           ]
         },
         "cost": {
@@ -25302,13 +25439,13 @@
         "slot": 176,
         "final": {
           "deliveryAvailable": true,
-          "assessmentStatus": "independent manual review unavailable after reviewer quota limit",
-          "complete": null,
-          "frozenChecklistComplete": null,
-          "testsDelivered": null,
-          "docsDelivered": null,
-          "manualBehaviorSatisfied": null,
-          "coveragePreserved": null,
+          "assessmentStatus": "independently reviewed",
+          "complete": false,
+          "frozenChecklistComplete": false,
+          "testsDelivered": false,
+          "docsDelivered": false,
+          "manualBehaviorSatisfied": true,
+          "coveragePreserved": true,
           "checks": {
             "acceptance": {
               "passed": false,
@@ -25344,9 +25481,31 @@
               }
             }
           },
-          "contractAdjudication": null,
+          "contractAdjudication": {
+            "requiredBehaviorViolated": true,
+            "requirement": "Extend bounds(values,target,options?) and its locate consumer with optional {compare,key}.",
+            "sourceEvidence": "project/src/lookup.mjs:1 and search.mjs:1 have no options parameters, discard key/comparator and directly compare elements. Descending/object option calls cannot meet the contract.",
+            "basis": "Primary agent independently read the unchanged TASK and all delivered src modules after blind review. The stated missing API, delegation or behavior directly follows from these bytes; no candidate execution, evaluator modification or new requirement."
+          },
           "unmetManualItems": [
-            "Independent manual review pending; do not infer complete delivery from executable checks alone."
+            {
+              "category": "testDelivery",
+              "item": "Assert key/comparator options through locate, including descending order and source preservation.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:1-2 is only original suite; listed new behavior assertions absent."
+            },
+            {
+              "category": "docDelivery",
+              "item": "Document both APIs, default/overloaded callbacks and already-extracted target.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 only title/run instruction; required explanation absent."
+            },
+            {
+              "category": "docDelivery",
+              "item": "Explain duplicate/insertion boundaries, sorted-input assumptions and logarithmic work.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 only title/run instruction; required explanation absent."
+            }
           ]
         },
         "cost": {
@@ -25490,13 +25649,13 @@
         "slot": 178,
         "final": {
           "deliveryAvailable": true,
-          "assessmentStatus": "independent manual review unavailable after reviewer quota limit",
-          "complete": null,
-          "frozenChecklistComplete": null,
-          "testsDelivered": null,
-          "docsDelivered": null,
-          "manualBehaviorSatisfied": null,
-          "coveragePreserved": null,
+          "assessmentStatus": "independently reviewed",
+          "complete": false,
+          "frozenChecklistComplete": false,
+          "testsDelivered": false,
+          "docsDelivered": false,
+          "manualBehaviorSatisfied": true,
+          "coveragePreserved": true,
           "checks": {
             "acceptance": {
               "passed": false,
@@ -25532,9 +25691,37 @@
               }
             }
           },
-          "contractAdjudication": null,
+          "contractAdjudication": {
+            "requiredBehaviorViolated": true,
+            "requirement": "Decode UTF-8 only after final reassembly with fatal invalid-byte detection; preserve a leading UTF-8 BOM as U+FEFF.",
+            "sourceEvidence": "project/src/decoder.mjs:1 emits message for every frame regardless of type/fin; utf8.mjs:1 decodes each chunk independently with nonfatal decoder and strips BOM. No pending reassembly, ping or reset logic.",
+            "basis": "Primary agent independently read the unchanged TASK and all delivered src modules after blind review. The stated missing API, delegation or behavior directly follows from these bytes; no candidate execution, evaluator modification or new requirement."
+          },
           "unmetManualItems": [
-            "Independent manual review pending; do not infer complete delivery from executable checks alone."
+            {
+              "category": "testDelivery",
+              "item": "Multibyte UTF-8 split over fragments with an interleaved ping.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:1-2 retains only original assertions; it does not exercise the complete listed new obligation."
+            },
+            {
+              "category": "testDelivery",
+              "item": "Protocol failure followed by successful fresh message.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:1-2 retains only original assertions; it does not exercise the complete listed new obligation."
+            },
+            {
+              "category": "docDelivery",
+              "item": "Message reassembly, fatal complete UTF-8 validation and BOM preservation.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 only title/run instruction; required explanation absent."
+            },
+            {
+              "category": "docDelivery",
+              "item": "Ping behavior, snapshot ownership and reset on errors.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 only title/run instruction; required explanation absent."
+            }
           ]
         },
         "cost": {
@@ -25678,13 +25865,13 @@
         "slot": 179,
         "final": {
           "deliveryAvailable": true,
-          "assessmentStatus": "independent manual review unavailable after reviewer quota limit",
-          "complete": null,
-          "frozenChecklistComplete": null,
-          "testsDelivered": null,
-          "docsDelivered": null,
-          "manualBehaviorSatisfied": null,
-          "coveragePreserved": null,
+          "assessmentStatus": "independently reviewed",
+          "complete": false,
+          "frozenChecklistComplete": false,
+          "testsDelivered": false,
+          "docsDelivered": false,
+          "manualBehaviorSatisfied": true,
+          "coveragePreserved": true,
           "checks": {
             "acceptance": {
               "passed": false,
@@ -25720,9 +25907,37 @@
               }
             }
           },
-          "contractAdjudication": null,
+          "contractAdjudication": {
+            "requiredBehaviorViolated": true,
+            "requirement": "A previously applied ID with the same type is idempotent: return {applied:false,state:current}, regardless of current state, without replaying it.",
+            "sourceEvidence": "project/src/machine.mjs:1 keeps live edges, has no ID memory/config validation, and restore blindly assigns records/current. After successful a->b id1, repeat id1/go throws RangeError instead of idempotent result; invalid replay is accepted.",
+            "basis": "Primary agent independently read the unchanged TASK and all delivered src modules after blind review. The stated missing API, delegation or behavior directly follows from these bytes; no candidate execution, evaluator modification or new requirement."
+          },
           "unmetManualItems": [
-            "Independent manual review pending; do not infer complete delivery from executable checks alone."
+            {
+              "category": "testDelivery",
+              "item": "Duplicate event ID is idempotent after later transitions and changed-type reuse rejects.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:1-2 is only original suite; listed new behavior assertions absent."
+            },
+            {
+              "category": "testDelivery",
+              "item": "Valid replay rebuilds state; invalid replay preserves previous state and history.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:1-2 is only original suite; listed new behavior assertions absent."
+            },
+            {
+              "category": "docDelivery",
+              "item": "Graph validation, frozen configuration, event-ID behavior and failed-ID reuse.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 only title/run instruction; required explanation absent."
+            },
+            {
+              "category": "docDelivery",
+              "item": "Detached history and full-chain atomic replay including duplicate rejection and empty reset.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 only title/run instruction; required explanation absent."
+            }
           ]
         },
         "cost": {
@@ -25866,13 +26081,13 @@
         "slot": 182,
         "final": {
           "deliveryAvailable": true,
-          "assessmentStatus": "independent manual review unavailable after reviewer quota limit",
-          "complete": null,
-          "frozenChecklistComplete": null,
-          "testsDelivered": null,
-          "docsDelivered": null,
-          "manualBehaviorSatisfied": null,
-          "coveragePreserved": null,
+          "assessmentStatus": "independently reviewed",
+          "complete": false,
+          "frozenChecklistComplete": false,
+          "testsDelivered": false,
+          "docsDelivered": false,
+          "manualBehaviorSatisfied": false,
+          "coveragePreserved": true,
           "checks": {
             "acceptance": {
               "passed": false,
@@ -25908,9 +26123,43 @@
               }
             }
           },
-          "contractAdjudication": null,
+          "contractAdjudication": {
+            "requiredBehaviorViolated": true,
+            "requirement": "Extract exported roundRatio(numerator,denominator) into src/money-core.mjs and make taxCents in src/tax.mjs and shareCents in src/share.mjs use that one rounding policy, removing duplicated rounding formulas.",
+            "sourceEvidence": "project/src/tax.mjs:3 and share.mjs:3 retain separate Math.round formulas; public src/money-core.mjs/roundRatio absent.",
+            "basis": "Primary agent independently read the unchanged TASK and all delivered src modules after blind review. The stated missing API, delegation or behavior directly follows from these bytes; no candidate execution, evaluator modification or new requirement."
+          },
           "unmetManualItems": [
-            "Independent manual review pending; do not infer complete delivery from executable checks alone."
+            {
+              "category": "testDelivery",
+              "item": "Assert positive/negative half ties and positive zero at core and consumer level.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:1-2 retains only original assertions; it does not exercise the complete listed new obligation."
+            },
+            {
+              "category": "testDelivery",
+              "item": "Assert per-line invoice tax totals and preserved helper validation/bounds.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:1-2 retains only original assertions; it does not exercise the complete listed new obligation."
+            },
+            {
+              "category": "docDelivery",
+              "item": "Document one common rounding policy, negative ties and zero normalization.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 only title/run instruction; required explanation absent."
+            },
+            {
+              "category": "docDelivery",
+              "item": "Explain helper bounds and per-line invoice totals versus aggregate rounding.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 only title/run instruction; required explanation absent."
+            },
+            {
+              "category": "manualBehavior",
+              "item": "Verify taxCents and shareCents delegate rounding to exported roundRatio instead of retaining separate rounding policies; totals must still use per-line taxCents.",
+              "status": "fail",
+              "reason": "project/src/tax.mjs:3 and share.mjs:3 retain separate Math.round formulas; public src/money-core.mjs/roundRatio absent."
+            }
           ]
         },
         "cost": {
@@ -26054,13 +26303,13 @@
         "slot": 184,
         "final": {
           "deliveryAvailable": true,
-          "assessmentStatus": "independent manual review unavailable after reviewer quota limit",
-          "complete": null,
-          "frozenChecklistComplete": null,
-          "testsDelivered": null,
-          "docsDelivered": null,
-          "manualBehaviorSatisfied": null,
-          "coveragePreserved": null,
+          "assessmentStatus": "independently reviewed",
+          "complete": false,
+          "frozenChecklistComplete": false,
+          "testsDelivered": false,
+          "docsDelivered": false,
+          "manualBehaviorSatisfied": false,
+          "coveragePreserved": true,
           "checks": {
             "acceptance": {
               "passed": false,
@@ -26096,9 +26345,43 @@
               }
             }
           },
-          "contractAdjudication": null,
+          "contractAdjudication": {
+            "requiredBehaviorViolated": true,
+            "requirement": "Extract reusable collectErrors(value,rules,{firstOnly=false}?) in src/collect.mjs and refactor src/validation.mjs so existing validate(record) and new validateAll(record) both use the same ordered rules and collector, without duplicated field validation.",
+            "sourceEvidence": "project/src/validation.mjs:8-9 contains only validate; public collectErrors module and validateAll API are absent.",
+            "basis": "Primary agent independently read the unchanged TASK and all delivered src modules after blind review. The stated missing API, delegation or behavior directly follows from these bytes; no candidate execution, evaluator modification or new requirement."
+          },
           "unmetManualItems": [
-            "Independent manual review pending; do not infer complete delivery from executable checks alone."
+            {
+              "category": "testDelivery",
+              "item": "Assert generic error order/identity, falsey errors and first-only short circuit.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:1-2 retains only original assertions; it does not exercise the complete listed new obligation."
+            },
+            {
+              "category": "testDelivery",
+              "item": "Assert legacy first field error and new full errors with accepted/boundary records unchanged.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:1-2 retains only original assertions; it does not exercise the complete listed new obligation."
+            },
+            {
+              "category": "docDelivery",
+              "item": "Explain collector pass/error values, order, short circuit and thrown errors.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 only title/run instruction; required explanation absent."
+            },
+            {
+              "category": "docDelivery",
+              "item": "Document shared record rule order, local grammar and first/all API behavior.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 only title/run instruction; required explanation absent."
+            },
+            {
+              "category": "manualBehavior",
+              "item": "Verify both record APIs share one ordered rule set and collectErrors; validate must request actual first-error short circuit, not evaluate all then select first.",
+              "status": "fail",
+              "reason": "project/src/validation.mjs:8-9 contains only validate; public collectErrors module and validateAll API are absent."
+            }
           ]
         },
         "cost": {
@@ -26242,13 +26525,13 @@
         "slot": 185,
         "final": {
           "deliveryAvailable": true,
-          "assessmentStatus": "independent manual review unavailable after reviewer quota limit",
-          "complete": null,
-          "frozenChecklistComplete": null,
-          "testsDelivered": null,
-          "docsDelivered": null,
-          "manualBehaviorSatisfied": null,
-          "coveragePreserved": null,
+          "assessmentStatus": "independently reviewed",
+          "complete": false,
+          "frozenChecklistComplete": false,
+          "testsDelivered": false,
+          "docsDelivered": false,
+          "manualBehaviorSatisfied": true,
+          "coveragePreserved": true,
           "checks": {
             "acceptance": {
               "passed": false,
@@ -26284,9 +26567,37 @@
               }
             }
           },
-          "contractAdjudication": null,
+          "contractAdjudication": {
+            "requiredBehaviorViolated": true,
+            "requirement": "Extend sorted(values, compare?) to accept an optional custom comparator while preserving default JavaScript lexicographic sort.",
+            "sourceEvidence": "project/src/sort.mjs:1 ignores supplied comparator and always uses default sort. Numeric custom ascending comparator on [2,10] still produces [10,2].",
+            "basis": "Primary agent independently read the unchanged TASK and all delivered src modules after blind review. The stated missing API, delegation or behavior directly follows from these bytes; no candidate execution, evaluator modification or new requirement."
+          },
           "unmetManualItems": [
-            "Independent manual review pending; do not infer complete delivery from executable checks alone."
+            {
+              "category": "testDelivery",
+              "item": "Assert custom comparator stable object ties and original input/identity preservation.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:1-2 contains only original case; complete listed new assertions absent."
+            },
+            {
+              "category": "testDelivery",
+              "item": "Assert explicit undefined versus holes with comparator excluding undefined.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:1-2 contains only original case; complete listed new assertions absent."
+            },
+            {
+              "category": "docDelivery",
+              "item": "Explain default lexicographic versus custom sign comparator and NaN ties.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 contains only title/run instruction; required explanation absent."
+            },
+            {
+              "category": "docDelivery",
+              "item": "Explain stable order, shallow fresh output, undefined/hole placement and errors.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 contains only title/run instruction; required explanation absent."
+            }
           ]
         },
         "cost": {
@@ -26430,13 +26741,13 @@
         "slot": 188,
         "final": {
           "deliveryAvailable": true,
-          "assessmentStatus": "independent manual review unavailable after reviewer quota limit",
-          "complete": null,
-          "frozenChecklistComplete": null,
-          "testsDelivered": null,
-          "docsDelivered": null,
-          "manualBehaviorSatisfied": null,
-          "coveragePreserved": null,
+          "assessmentStatus": "independently reviewed",
+          "complete": false,
+          "frozenChecklistComplete": false,
+          "testsDelivered": false,
+          "docsDelivered": false,
+          "manualBehaviorSatisfied": true,
+          "coveragePreserved": true,
           "checks": {
             "acceptance": {
               "passed": false,
@@ -26472,9 +26783,37 @@
               }
             }
           },
-          "contractAdjudication": null,
+          "contractAdjudication": {
+            "requiredBehaviorViolated": true,
+            "requirement": "Extend filterNames(names, filter) to accept either the existing literal case-sensitive substring string or a RegExp.",
+            "sourceEvidence": "project/src/filter.mjs:1 passes RegExp directly to String.includes, which rejects native RegExp; no pattern cloning or per-entry matching implemented.",
+            "basis": "Primary agent independently read the unchanged TASK and all delivered src modules after blind review. The stated missing API, delegation or behavior directly follows from these bytes; no candidate execution, evaluator modification or new requirement."
+          },
           "unmetManualItems": [
-            "Independent manual review pending; do not infer complete delivery from executable checks alone."
+            {
+              "category": "testDelivery",
+              "item": "Assert repeated entries with global/sticky expressions and unchanged caller lastIndex.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:1-2 contains only original case; complete listed new assertions absent."
+            },
+            {
+              "category": "testDelivery",
+              "item": "Assert literal string compatibility and a frozen RegExp.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:1-2 contains only original case; complete listed new assertions absent."
+            },
+            {
+              "category": "docDelivery",
+              "item": "Explain literal strings versus native RegExp including flags and sticky-at-zero semantics.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 contains only title/run instruction; required explanation absent."
+            },
+            {
+              "category": "docDelivery",
+              "item": "Explain fresh output, preserved order/duplicates and no caller state mutation.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 contains only title/run instruction; required explanation absent."
+            }
           ]
         },
         "cost": {
@@ -26618,13 +26957,13 @@
         "slot": 190,
         "final": {
           "deliveryAvailable": true,
-          "assessmentStatus": "independent manual review unavailable after reviewer quota limit",
-          "complete": null,
-          "frozenChecklistComplete": null,
-          "testsDelivered": null,
-          "docsDelivered": null,
-          "manualBehaviorSatisfied": null,
-          "coveragePreserved": null,
+          "assessmentStatus": "independently reviewed",
+          "complete": false,
+          "frozenChecklistComplete": false,
+          "testsDelivered": false,
+          "docsDelivered": false,
+          "manualBehaviorSatisfied": true,
+          "coveragePreserved": true,
           "checks": {
             "acceptance": {
               "passed": false,
@@ -26660,9 +26999,37 @@
               }
             }
           },
-          "contractAdjudication": null,
+          "contractAdjudication": {
+            "requiredBehaviorViolated": true,
+            "requirement": "Add formatRange(options) alongside existing formatRange(start,end,step?).",
+            "sourceEvidence": "project/src/range.mjs:1 supports positional arguments only; options call returns empty instead of progression, and step0 is not rejected.",
+            "basis": "Primary agent independently read the unchanged TASK and all delivered src modules after blind review. The stated missing API, delegation or behavior directly follows from these bytes; no candidate execution, evaluator modification or new requirement."
+          },
           "unmetManualItems": [
-            "Independent manual review pending; do not infer complete delivery from executable checks alone."
+            {
+              "category": "testDelivery",
+              "item": "Assert positional/options equivalence including descending ranges.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:1-2 retains only original assertions; it does not exercise the complete listed new obligation."
+            },
+            {
+              "category": "testDelivery",
+              "item": "Assert undefined-only defaults, empty separator, zero-step rejection and frozen options.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:1-2 retains only original assertions; it does not exercise the complete listed new obligation."
+            },
+            {
+              "category": "docDelivery",
+              "item": "Document both signatures and inclusive directional progression.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 only title/run instruction; required explanation absent."
+            },
+            {
+              "category": "docDelivery",
+              "item": "Explain bounded validation, undefined-only defaults, empty separator and no mutation.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 only title/run instruction; required explanation absent."
+            }
           ]
         },
         "cost": {
@@ -26806,13 +27173,13 @@
         "slot": 191,
         "final": {
           "deliveryAvailable": true,
-          "assessmentStatus": "independent manual review unavailable after reviewer quota limit",
-          "complete": null,
-          "frozenChecklistComplete": null,
-          "testsDelivered": null,
-          "docsDelivered": null,
-          "manualBehaviorSatisfied": null,
-          "coveragePreserved": null,
+          "assessmentStatus": "independently reviewed",
+          "complete": false,
+          "frozenChecklistComplete": false,
+          "testsDelivered": false,
+          "docsDelivered": false,
+          "manualBehaviorSatisfied": false,
+          "coveragePreserved": true,
           "checks": {
             "acceptance": {
               "passed": false,
@@ -26848,9 +27215,43 @@
               }
             }
           },
-          "contractAdjudication": null,
+          "contractAdjudication": {
+            "requiredBehaviorViolated": true,
+            "requirement": "Add general postorder visitExpression(node,visitor) in src/visitor.mjs, and refactor existing printExpression in src/printer.mjs to use it without a duplicate tree walk.",
+            "sourceEvidence": "project/src/printer.mjs:1-4 retains recursive local render; src/visitor.mjs and public visitExpression are absent.",
+            "basis": "Primary agent independently read the unchanged TASK and all delivered src modules after blind review. The stated missing API, delegation or behavior directly follows from these bytes; no candidate execution, evaluator modification or new requirement."
+          },
           "unmetManualItems": [
-            "Independent manual review pending; do not infer complete delivery from executable checks alone."
+            {
+              "category": "testDelivery",
+              "item": "Assert precedence, left/right associativity and JSON string escaping.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:1-2 is only original suite; listed new behavior assertions absent."
+            },
+            {
+              "category": "testDelivery",
+              "item": "Assert visitor order/receiver, shared-node occurrences and stopping at first thrown value.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:1-2 is only original suite; listed new behavior assertions absent."
+            },
+            {
+              "category": "docDelivery",
+              "item": "Document visitor handlers/results/ordering and shared-node behavior.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 only title/run instruction; required explanation absent."
+            },
+            {
+              "category": "docDelivery",
+              "item": "Explain exact-tree minimal parentheses and literal escaping.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 only title/run instruction; required explanation absent."
+            },
+            {
+              "category": "manualBehavior",
+              "item": "Printer uses visitor and contains only rendering/parenthesis policy, not a second tree traversal.",
+              "status": "fail",
+              "reason": "project/src/printer.mjs:1-4 retains recursive local render; src/visitor.mjs and public visitExpression are absent."
+            }
           ]
         },
         "cost": {
@@ -26994,13 +27395,13 @@
         "slot": 193,
         "final": {
           "deliveryAvailable": true,
-          "assessmentStatus": "independent manual review unavailable after reviewer quota limit",
-          "complete": null,
-          "frozenChecklistComplete": null,
-          "testsDelivered": null,
-          "docsDelivered": null,
-          "manualBehaviorSatisfied": null,
-          "coveragePreserved": null,
+          "assessmentStatus": "independently reviewed",
+          "complete": false,
+          "frozenChecklistComplete": false,
+          "testsDelivered": false,
+          "docsDelivered": false,
+          "manualBehaviorSatisfied": false,
+          "coveragePreserved": true,
           "checks": {
             "acceptance": {
               "passed": false,
@@ -27036,9 +27437,43 @@
               }
             }
           },
-          "contractAdjudication": null,
+          "contractAdjudication": {
+            "requiredBehaviorViolated": true,
+            "requirement": "Separate byte chunk formation from existing upload in src/upload.mjs into public chunkBytes(bytes,size) in src/chunks.mjs.",
+            "sourceEvidence": "project/src/upload.mjs:1-4 retains private chunkBytes; public src/chunks.mjs absent and wrapper has not been refactored to exported core.",
+            "basis": "Primary agent independently read the unchanged TASK and all delivered src modules after blind review. The stated missing API, delegation or behavior directly follows from these bytes; no candidate execution, evaluator modification or new requirement."
+          },
           "unmetManualItems": [
-            "Independent manual review pending; do not infer complete delivery from executable checks alone."
+            {
+              "category": "testDelivery",
+              "item": "Assert subview byte boundaries and copy isolation.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:1-2 retains only original assertions; it does not exercise the complete listed new obligation."
+            },
+            {
+              "category": "testDelivery",
+              "item": "Assert serial awaiting, source snapshot before first await, exact metadata and stop on first failure.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:1-2 retains only original assertions; it does not exercise the complete listed new obligation."
+            },
+            {
+              "category": "docDelivery",
+              "item": "Document core byte-copy boundaries and domain.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 only title/run instruction; required explanation absent."
+            },
+            {
+              "category": "docDelivery",
+              "item": "Describe transport injection, eager snapshot, ordering and error/no-retry semantics.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 only title/run instruction; required explanation absent."
+            },
+            {
+              "category": "manualBehavior",
+              "item": "upload delegates byte chunk formation to core; no duplicate chunk algorithm or ambient transport.",
+              "status": "fail",
+              "reason": "project/src/upload.mjs:1-4 retains private chunkBytes; public src/chunks.mjs absent and wrapper has not been refactored to exported core."
+            }
           ]
         },
         "cost": {
@@ -27182,13 +27617,13 @@
         "slot": 196,
         "final": {
           "deliveryAvailable": true,
-          "assessmentStatus": "independent manual review unavailable after reviewer quota limit",
-          "complete": null,
-          "frozenChecklistComplete": null,
-          "testsDelivered": null,
-          "docsDelivered": null,
-          "manualBehaviorSatisfied": null,
-          "coveragePreserved": null,
+          "assessmentStatus": "independently reviewed",
+          "complete": false,
+          "frozenChecklistComplete": false,
+          "testsDelivered": false,
+          "docsDelivered": false,
+          "manualBehaviorSatisfied": true,
+          "coveragePreserved": true,
           "checks": {
             "acceptance": {
               "passed": false,
@@ -27224,9 +27659,37 @@
               }
             }
           },
-          "contractAdjudication": null,
+          "contractAdjudication": {
+            "requiredBehaviorViolated": true,
+            "requirement": "Selection is stored only for leaves.",
+            "sourceEvidence": "project/src/selection.mjs:1 ignores forest topology, toggles literal IDs including parents/unknowns and reports no indeterminate state; restore clears then accepts arbitrary IDs.",
+            "basis": "Primary agent independently read the unchanged TASK and all delivered src modules after blind review. The stated missing API, delegation or behavior directly follows from these bytes; no candidate execution, evaluator modification or new requirement."
+          },
           "unmetManualItems": [
-            "Independent manual review pending; do not infer complete delivery from executable checks alone."
+            {
+              "category": "testDelivery",
+              "item": "Leaf selection makes ancestors indeterminate and parent toggle selects all descendant leaves.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:1-2 contains only original case; complete listed new assertions absent."
+            },
+            {
+              "category": "testDelivery",
+              "item": "Invalid restore preserves selected leaves.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:1-2 contains only original case; complete listed new assertions absent."
+            },
+            {
+              "category": "docDelivery",
+              "item": "Leaf-only selection, checked/indeterminate propagation and subtree toggles.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 contains only title/run instruction; required explanation absent."
+            },
+            {
+              "category": "docDelivery",
+              "item": "Frozen input topology, sorted snapshots and atomic leaf-only restore with duplicate normalization.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 contains only title/run instruction; required explanation absent."
+            }
           ]
         },
         "cost": {
@@ -27370,13 +27833,13 @@
         "slot": 198,
         "final": {
           "deliveryAvailable": true,
-          "assessmentStatus": "independent manual review unavailable after reviewer quota limit",
-          "complete": null,
-          "frozenChecklistComplete": null,
-          "testsDelivered": null,
-          "docsDelivered": null,
-          "manualBehaviorSatisfied": null,
-          "coveragePreserved": null,
+          "assessmentStatus": "independently reviewed",
+          "complete": false,
+          "frozenChecklistComplete": false,
+          "testsDelivered": false,
+          "docsDelivered": false,
+          "manualBehaviorSatisfied": true,
+          "coveragePreserved": true,
           "checks": {
             "acceptance": {
               "passed": false,
@@ -27412,9 +27875,37 @@
               }
             }
           },
-          "contractAdjudication": null,
+          "contractAdjudication": {
+            "requiredBehaviorViolated": true,
+            "requirement": "Fix findMatches(text,query) in src/matches.mjs and snippets(text,query,context=0) in src/snippets.mjs so offsets and context lengths count Unicode code points, not UTF-16 code units.",
+            "sourceEvidence": "project/src/matches.mjs:1 reports UTF16 indexOf/query.length offsets; snippets.mjs:1 slices UTF16 units. For text astral+ASCII a and query a, start2 is returned instead of code-point start1.",
+            "basis": "Primary agent independently read the unchanged TASK and all delivered src modules after blind review. The stated missing API, delegation or behavior directly follows from these bytes; no candidate execution, evaluator modification or new requirement."
+          },
           "unmetManualItems": [
-            "Independent manual review pending; do not infer complete delivery from executable checks alone."
+            {
+              "category": "testDelivery",
+              "item": "Astral characters before/inside matches with correct code-point context.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:1-2 contains only original case; complete listed new assertions absent."
+            },
+            {
+              "category": "testDelivery",
+              "item": "Non-overlapping matches and empty-query rejection.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:1-2 contains only original case; complete listed new assertions absent."
+            },
+            {
+              "category": "docDelivery",
+              "item": "Code-point offsets and exclusive end, including excerpt context semantics.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 contains only title/run instruction; required explanation absent."
+            },
+            {
+              "category": "docDelivery",
+              "item": "Exact case-sensitive non-overlapping search with no normalization.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 contains only title/run instruction; required explanation absent."
+            }
           ]
         },
         "cost": {
@@ -27558,13 +28049,13 @@
         "slot": 200,
         "final": {
           "deliveryAvailable": true,
-          "assessmentStatus": "independent manual review unavailable after reviewer quota limit",
-          "complete": null,
-          "frozenChecklistComplete": null,
-          "testsDelivered": null,
-          "docsDelivered": null,
-          "manualBehaviorSatisfied": null,
-          "coveragePreserved": null,
+          "assessmentStatus": "independently reviewed",
+          "complete": false,
+          "frozenChecklistComplete": false,
+          "testsDelivered": false,
+          "docsDelivered": false,
+          "manualBehaviorSatisfied": true,
+          "coveragePreserved": true,
           "checks": {
             "acceptance": {
               "passed": false,
@@ -27600,9 +28091,37 @@
               }
             }
           },
-          "contractAdjudication": null,
+          "contractAdjudication": {
+            "requiredBehaviorViolated": true,
+            "requirement": "advance(next) rejects decreasing watermarks with RangeError without state change, otherwise sets watermark and emits/removes all nonempty windows with end<=next.",
+            "sourceEvidence": "project/src/metrics.mjs:1 discards every added event, always returns true and every advance returns []; no watermark/group state or decreasing rejection.",
+            "basis": "Primary agent independently read the unchanged TASK and all delivered src modules after blind review. The stated missing API, delegation or behavior directly follows from these bytes; no candidate execution, evaluator modification or new requirement."
+          },
           "unmetManualItems": [
-            "Independent manual review pending; do not infer complete delivery from executable checks alone."
+            {
+              "category": "testDelivery",
+              "item": "Out-of-order event accepted before its window closes and rejected after closure.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:1-2 contains only original case; complete listed new assertions absent."
+            },
+            {
+              "category": "testDelivery",
+              "item": "Repeated flush emits nothing; decreasing watermark rejects without corrupting queued data.",
+              "status": "fail",
+              "reason": "project/test/legacy.test.mjs:1-2 contains only original case; complete listed new assertions absent."
+            },
+            {
+              "category": "docDelivery",
+              "item": "Half-open windows, close-at-end watermark boundary and sorted grouping.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 contains only title/run instruction; required explanation absent."
+            },
+            {
+              "category": "docDelivery",
+              "item": "Late rejection is based on closed window; monotone watermark and independent instances.",
+              "status": "fail",
+              "reason": "project/README.md:1-3 contains only title/run instruction; required explanation absent."
+            }
           ]
         },
         "cost": {
