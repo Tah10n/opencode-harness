@@ -115,6 +115,12 @@ for(const attempt of f.attempts){
    fs.writeFileSync(path.join(out,'behavior-grading.json'),JSON.stringify(Object.fromEntries(['acceptance','preservation','ordinary'].map(name=>[name,{exitCode:null,counts:null,passed:false,unavailable:true,reason:error.message}])),null,2));
    const summary={...attempt,...finished,requests:requests.filter(x=>x.forwarded).length,relayRequests:requests.length,requestsWithoutObservedUsage:requests.filter(x=>x.forwarded&&!x.usage).length,toolCalls:evidence.tools.length,sessions:evidence.sessions.length,workflowStatus:'incomplete',protocolError:error.message,repairs:0,delivery:null};
    fs.writeFileSync(path.join(out,'result.json'),JSON.stringify(summary,null,2));console.log(JSON.stringify(summary));
+   // A confirmed pre-session startup failure affects the shared environment.
+   // Preserve this slot and stop issuing others; never infer this from model text.
+   if(!pause&&requests.length===0&&evidence.sessions.length===0&&evidence.tools.length===0&&Number.isInteger(finished.exitCode)&&finished.exitCode!==0){
+    pause={kind:'paused_startup_failure',slot:attempt.slot,reason:'Native process exited before any session or relay request; see retained stderr'};
+    fs.writeFileSync(path.join(root,'scheduling-paused.json'),JSON.stringify(pause,null,2),{flag:'wx',mode:0o600});
+   }
    if(requests.some(x=>x.rejected||[401,403].includes(x.status)))throw error;completed=true;
   }else throw error;
  }

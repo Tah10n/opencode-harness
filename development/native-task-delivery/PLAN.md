@@ -42,3 +42,33 @@ Measurement binding: OpenCode 1.18.26, openai/gpt-5.6-luna, variant low, origina
 native tools and container boundary, 900 seconds including all stages per task.
 The reusable runtime has no model binding. At most 48 total full runs. No manual
 Actions, matrix run, merge, release, new branch archive or default change.
+
+## Authorized preparation correction after pre-session failures
+
+The four retained v1 startup failures remain immutable. The user explicitly
+permits one fresh full run of each same task, in the same order, after correcting
+container preparation. This exception applies only to those confirmed zero-session,
+zero-request failures; no sent/uncertain request, timeout or model outcome is retried.
+There is no additional mechanism revision or automatic development repeat.
+
+Runtime source remains `328728b3ff1a416fb267d7de1b2b36b2b19cfbff` (runtime bytes
+unchanged in published `1b0d144a40df8add9a22c81a0361c8b3d5358779`). Preparation is
+recorded at its own commit before execution. The existing installation-control
+preparation is promoted to `prepare-container-bundle.mjs`: copy the bundle,
+pre-create `.gitignore`, map/validate config references under `/template`, preserve
+runtime bytes and read-only mount. Record new config, runtime hashes and actual
+container mounts before the first provider request. Old bundle/freeze is untouched.
+
+The existing fixture provider/project now also supports the existing container
+and native CLI adapters. Container preflight must observe real read/search/edit/test,
+D0, review, terminal patch and verified cleanup, with no authentication read or
+external provider forwarding. It is not a model-backed result.
+
+New runs are recorded separately under `local/native-task-delivery/prepared`, linked
+to the corresponding v1 failures. Shared startup failure pauses the remaining slots;
+ordinary model failure does not. Existing quota pause still stops all new requests.
+Each run retains the original 900-second whole-task budget and correction limits.
+
+The full-delivery gate and conditional 20-task/40-run comparison remain unchanged.
+Total limit: four retained failed starts + four new development runs + at most
+40 conditional comparison runs. Scripted preflight is counted separately.

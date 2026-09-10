@@ -121,6 +121,11 @@ const fixture = http.createServer(async (req, res) => {
     }
   }
   if (stage === 'implementation') {
+    if(mode==='container-preflight'){
+      const calls=[{name:'read',args:{filePath:'value.mjs'}},{name:'glob',args:{pattern:'*.mjs'}},{name:'edit',args:{filePath:'value.mjs',oldString:'export const value = 2;',newString:'export const value = 2; // installed container check'}},bash('node --test value.test.mjs')];
+      response(res,calls[n]??null,'Installed container implementation checked');return;
+    }
+
     if(mode.startsWith('state-')&&mode!=='state-reproduce'){
       if(n===0){response(res,mode==='state-documentation'?{name:'read',args:{filePath:'value.test.mjs'}}:bash('npm test'));return;}
       if(n===1){
@@ -227,6 +232,17 @@ const fixture = http.createServer(async (req, res) => {
   }
 });
 await new Promise(r => fixture.listen(0, '127.0.0.1', r));
+// Expose this same scripted provider/project to the container execution adapter.
+// No OpenCode process or real credentials are used in this provider-only mode.
+if(process.env.NATIVE_TASK_FIXTURE_PROVIDER_ONLY==='1'){
+  mode='container-preflight';
+  fs.writeFileSync(path.join(project,'TASK.md'),'ORIGINAL_TASK_FIXTURE: Deliver value 2 from value.mjs and preserve the existing public test. Read and inspect the project, then run node --test value.test.mjs.');
+  console.log(JSON.stringify({fixtureURL:`http://127.0.0.1:${fixture.address().port}`,project}));
+  await new Promise(resolve=>process.once('SIGTERM',()=>fixture.close(resolve)));
+  fs.rmSync(temp,{recursive:true,force:true});
+  process.exit(0);
+}
+
 const probe = http.createServer(); await new Promise(r => probe.listen(0, '127.0.0.1', r)); const port = probe.address().port; await new Promise(r => probe.close(r));
 const config = { model: 'local-fixture/fixture', small_model: 'local-fixture/fixture', provider: { 'local-fixture': { npm: '@ai-sdk/openai-compatible', name: 'Scripted fixture', options: { baseURL: `http://127.0.0.1:${fixture.address().port}/v1`, apiKey: 'not-a-credential' }, models: { fixture: { name: 'fixture', limit: { context: 200000, output: 10000 } } } } } };
 const env = { PATH: process.env.PATH, HOME: path.join(temp, 'home'), TMPDIR: os.tmpdir(), ...Object.fromEntries(['config', 'data', 'cache', 'state'].map(n => [`XDG_${n.toUpperCase()}_HOME`, path.join(temp, n)])), OPENCODE_DISABLE_MODELS_FETCH: 'true', OPENCODE_DISABLE_AUTOUPDATE: 'true', OPENCODE_CONFIG_DIR: bundle, OPENCODE_CONFIG_CONTENT: JSON.stringify(config), HARNESS_TASK_FILE: task, HARNESS_TASK_TIMEOUT_MS: '45000' };

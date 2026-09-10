@@ -47,3 +47,32 @@ for(const kind of ['original-requirement-development','fixed-20-pair-full-native
  }finally{fs.rmSync(root,{recursive:true,force:true});}
 }
 console.log('Bounded development/comparison schedule validation passed; provider calls = 0');
+
+// Confirmed startup failure stops the shared environment before slot two.
+{
+ const root=fs.mkdtempSync(path.join(os.tmpdir(),'launcher-startup-'));let started=0,closed=0;
+ try{
+  fs.writeFileSync(path.join(root,'run-config.json'),'{}');fs.writeFileSync(path.join(root,'TASK.md'),'Original task');
+  const attempts=Array.from({length:4},(_,i)=>({slot:i+1,task:'startup'+i,arm:'B',source:root}));
+  fs.writeFileSync(path.join(root,'freeze.json'),JSON.stringify({kind:'original-requirement-development',version:1,files:{},attempts,preflightPassed:true,candidateCommit:'a'.repeat(40),model:'openai/gpt-5.6-luna',variant:'low',budgetMs:900000}));
+  const result=await runPilot({root,readAuth:()=>assert.fail('No auth'),fetchImpl:()=>assert.fail('No provider'),
+   startContainer:async({output})=>{started++;fs.mkdirSync(output);return {output,close:()=>{closed++;return 0;},exec:argv=>{const text=argv.join(' ');if(text.includes('--version'))return {status:0,stdout:'1.18.26'};if(text.includes('DatabaseSync'))return {status:0,stdout:JSON.stringify({sessions:[],messages:[],tools:[]})};if(text.includes('readdirSync(p)'))return {status:0,stdout:'[]'};return {status:0,stdout:''};}};},
+   runOpenCode:async session=>{const result={exitCode:1,elapsedMs:1,termination:{terminationVerified:true}};fs.writeFileSync(path.join(session.output,'finished.json'),JSON.stringify(result));return result;},
+   captureCandidate:(_session,out)=>{fs.mkdirSync(path.join(out,'candidate'));return {status:0};}});
+  assert.equal(result.status,'paused_startup_failure');assert.equal(started,1);assert.equal(closed,1);assert(!fs.existsSync(path.join(root,'runs/startup1-B')));assert(fs.existsSync(path.join(root,'runs/startup0-B/result.json')));
+ }finally{fs.rmSync(root,{recursive:true,force:true});}
+}
+const {prepareContainerBundle}=await import('../development/native-task-launcher/prepare-container-bundle.mjs');
+{
+ const root=fs.mkdtempSync(path.join(os.tmpdir(),'container-bundle-'));const source=path.join(root,'source');fs.mkdirSync(source);
+ try{
+  for(const n of ['core.md','plugin.mjs','package.json','package-lock.json','rg'])fs.writeFileSync(path.join(source,n),'fixture');fs.mkdirSync(path.join(source,'node_modules'));
+  const config={instructions:[path.join(source,'core.md')],plugin:['file://'+path.join(source,'plugin.mjs')],permission:{edit:'deny'}};
+  const bytes=JSON.stringify(config);fs.writeFileSync(path.join(source,'opencode.json'),bytes);
+  const dest=path.join(root,'copy'),converted=prepareContainerBundle(source,dest);
+  assert.deepEqual(converted,{...config,instructions:['/template/core.md'],plugin:['file:///template/plugin.mjs']});assert.equal(fs.readFileSync(path.join(source,'opencode.json'),'utf8'),bytes);assert(!fs.existsSync(path.join(source,'.gitignore')));assert(fs.existsSync(path.join(dest,'.gitignore')));
+  assert.throws(()=>prepareContainerBundle(source,dest),/already exists/);
+  fs.writeFileSync(path.join(source,'opencode.json'),JSON.stringify({...config,instructions:['/missing/host-path']}));assert.throws(()=>prepareContainerBundle(source,path.join(root,'bad')),/outside source bundle/);
+ }finally{fs.rmSync(root,{recursive:true,force:true});}
+}
+console.log('Startup stop and immutable container preparation regressions passed; provider calls = 0');
