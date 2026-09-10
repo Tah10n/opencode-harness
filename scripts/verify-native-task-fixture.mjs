@@ -27,6 +27,15 @@ fs.writeFileSync(path.join(bundle,'fixture-wrapper.mjs'),`import fs from 'node:f
 const installedConfig=JSON.parse(fs.readFileSync(path.join(bundle,'opencode.json')));
 installedConfig.plugin=[pathToFileURL(path.join(bundle,'fixture-wrapper.mjs')).href];
 fs.writeFileSync(path.join(bundle,'opencode.json'),JSON.stringify(installedConfig));
+const exceptionFixture=path.join(root,'scripts/fixtures/native-task-exception');
+const exceptionSource=fs.readFileSync(path.join(exceptionFixture,'timing.mjs'),'utf8');
+const exceptionTests=fs.readFileSync(path.join(exceptionFixture,'complete.test.mjs'),'utf8');
+const exceptionSplit=exceptionTests.indexOf("test('invokes callable functions");
+const exceptionLegacy=exceptionTests.slice(0,exceptionSplit);
+const exceptionRegression="import {test} from 'node:test';import assert from 'node:assert/strict';import {timed} from '../src/timing.mjs';\n"+exceptionTests.slice(exceptionSplit);
+const exceptionInline=`node --input-type=module -e 'import {timed} from "./src/timing.mjs";function target(){return 42;}target.apply=null;try{console.log(timed(target,{now:()=>0,record:()=>{}})());}catch(error){console.log(error.name,error.message)}'`;
+const exceptionFinding=JSON.parse(fs.readFileSync(path.join(exceptionFixture,'finding.json')));
+const writeFixture=(file,bytes)=>`node -e 'require("fs").writeFileSync(${JSON.stringify(file)},Buffer.from(${JSON.stringify(Buffer.from(bytes).toString('base64'))},"base64"))'`;
 let lastReport, mode = 'correct', counts = new Map(), requests = [], reproductionID = '', priorArtifacts = new Set();
 const response = (res, call, content = '') => {
   if (call?.name === 'StructuredOutput') { content = JSON.stringify(call.args); call = null; }
@@ -56,6 +65,31 @@ const fixture = http.createServer(async (req, res) => {
   requests.push({ mode, stage, n, tools: body.tools.map(t => t.function.name) });
   const bash = command => ({ name: 'bash', args: { command, description: 'Installed workflow fixture command' } });
   if (stage === 'bootstrap') { response(res, n === 0 ? { name: 'harness_task', args: {} } : null, 'Workflow result retained; see tool output.'); return; }
+  if(mode.startsWith('exception-')){
+    const wire=body.messages.map(m=>typeof m.content==='string'?m.content:JSON.stringify(m.content)).join('\n');
+    const refs=[...wire.matchAll(/HOST_NATIVE_EVIDENCE (\{[^\n]*\})/g)].map(m=>JSON.parse(m[1]));
+    if(stage==='implementation'){response(res,n===0?bash('npm test'):null,'Saved candidate ready');return;}
+    if(stage==='reproduce'||stage==='evidence-correction'){
+      if(stage==='evidence-correction')assert.ok(userText.includes('ordinary project test callback'));
+      if(n===0){response(res,bash(stage==='reproduce'||mode==='exception-reject'?exceptionInline:writeFixture('test/exception.test.mjs',exceptionRegression)));return;}
+      if(n===1&&stage==='evidence-correction'&&mode!=='exception-reject'){response(res,bash('npm test'));return;}
+      const ref=refs.at(-1);assert.ok(ref);
+      response(res,null,JSON.stringify({dispositions:[{id:exceptionFinding.id,decision:'grounded',kind:'behavior',basis:exceptionFinding.basis,expectedReason:'The original ordinary-callable domain includes callable functions with their own properties',explanation:'Invoke the permitted public scenario through the current project regression',evidenceCallID:ref.callID}],limitations:[]}));return;
+    }
+    if(stage==='repair'){
+      if(n===0){response(res,bash(writeFixture('src/timing.mjs',exceptionSource.replace('fn.apply(this,args)','Reflect.apply(fn,this,args)'))));return;}
+      if(n===1){response(res,bash('node --test test/exception.test.mjs'));return;}
+      if(n===2){response(res,bash('npm test'));return;}
+      response(res,null,'Scripted repair and checks finished');return;
+    }
+    if(stage==='review'){
+      const info=JSON.parse(userText.split('\nReturn only')[0]);
+      const checks=info.toolEvidence.filter(e=>e.tool==='bash'&&e.exit===0);
+      const good=mode==='exception-correct'||requests.some(r=>r.mode===mode&&r.stage==='repair');
+      const last=checks.at(-1);
+      response(res,null,JSON.stringify({findings:good?[]:[exceptionFinding],obligations:[{requirement:'Preserve all prior timing assertions',status:'delivered',evidence:'Current source and native project checks'}],unverified:[],evidenceLimitations:[],coverageLost:[],proposedVerificationFiles:['test/exception.test.mjs'],checks:last?[{callID:last.callID,purpose:'preservation',basis:'Project suite after the latest edit'},...(good?[{callID:last.callID,purpose:'discriminating',basis:'Project suite includes the saved sensitive regression'}]:[])]:[]}));return;
+    }
+  }
   if (stage === 'implementation') {
     if(mode.startsWith('state-')&&mode!=='state-reproduce'){
       if(n===0){response(res,mode==='state-documentation'?{name:'read',args:{filePath:'value.test.mjs'}}:bash('npm test'));return;}
@@ -172,13 +206,24 @@ const api = async (method, route, body) => { const r = await fetch(`http://127.0
 try {
   let ready = false; for (let n = 0; n < 150; n++) { try { await api('GET', '/global/health'); ready = true; break; } catch { await new Promise(r => setTimeout(r, 100)); } } assert.ok(ready, stderr);
   const commands = await api('GET', '/command'); assert.ok(commands.some(c => c.name === 'harness-task'));
-  const allModes = ['correct', 'defect', 'unsupported', 'coverage-loss', 'last-mutation', 'cancel', 'incomplete', 'concurrent-save', 'staged-work','trailing-comma','missing-semantic','format-fails','src-affected','probe-production','missing-test','provenance','unverified','legacy-bookmark','evidence-replay','evidence-permission','evidence-user-reject','missing-error-paths','external-before-error','state-unchanged','state-external','state-unknown','state-revert','state-documentation','state-reproduce','budget'];
+  const allModes = ['exception-repair','exception-reject','exception-correct','correct', 'defect', 'unsupported', 'coverage-loss', 'last-mutation', 'cancel', 'incomplete', 'concurrent-save', 'staged-work','trailing-comma','missing-semantic','format-fails','src-affected','probe-production','missing-test','provenance','unverified','legacy-bookmark','evidence-replay','evidence-permission','evidence-user-reject','missing-error-paths','external-before-error','state-unchanged','state-external','state-unknown','state-revert','state-documentation','state-reproduce','budget'];
   const selectedModes = process.env.NATIVE_TASK_FIXTURE_CASES?.split(',') ?? allModes;
   assert.ok(selectedModes.every(m=>allModes.includes(m)));
   for (mode of selectedModes) {
+    for(const name of ['src','test'])fs.rmSync(path.join(project,name),{recursive:true,force:true});
+    fs.writeFileSync(path.join(project,'package.json'),git('show','HEAD:package.json'));
+
     fs.writeFileSync(path.join(project, 'value.mjs'), 'export const value = 2;\n');
     fs.writeFileSync(path.join(project, 'value.test.mjs'), git('show','HEAD:value.test.mjs') + '\n');
     fs.writeFileSync(task, 'ORIGINAL_TASK_FIXTURE: Deliver value 2 from value.mjs and preserve the existing public test. Run node --test value.test.mjs.');
+    if(mode.startsWith('exception-')){
+      fs.mkdirSync(path.join(project,'src'));fs.mkdirSync(path.join(project,'test'));
+      fs.writeFileSync(path.join(project,'src/timing.mjs'),mode==='exception-correct'?exceptionSource.replace('fn.apply(this,args)','Reflect.apply(fn,this,args)'):exceptionSource);
+      fs.writeFileSync(path.join(project,'test/legacy.test.mjs'),exceptionLegacy);
+      if(mode==='exception-correct')fs.writeFileSync(path.join(project,'test/exception.test.mjs'),exceptionRegression);
+      fs.writeFileSync(path.join(project,'package.json'),JSON.stringify({private:true,scripts:{test:'node --test test/*.test.mjs'}}));
+      fs.writeFileSync(task,fs.readFileSync(path.join(exceptionFixture,'task.txt')));
+    }
     if (mode === 'missing-test') fs.appendFileSync(task,' Add an additional project regression in extra.test.mjs.');
     if (mode === 'staged-work') { fs.writeFileSync(path.join(project,'value.mjs'),'export const value = 2; // staged\n');git('add','value.mjs');fs.writeFileSync(path.join(project,'value.mjs'),'export const value = 2; // partial user work\n'); }
     // Native OpenCode may refresh index stat metadata; compare staged entries/contents.
@@ -212,6 +257,23 @@ try {
     assert.equal(toolResult?.state.status, 'completed', JSON.stringify({ result, toolResult, temp }));
     const report = JSON.parse(toolResult.state.output);
     assert.equal(git('ls-files','--stage','-z'),originalIndex);
+    if(mode.startsWith('exception-')){
+      const events=JSON.parse(fs.readFileSync(path.join(report.artifacts,'tool-events.json')));
+      assert.equal(report.repairs,mode==='exception-repair'?1:0,JSON.stringify(report));
+      assert.equal(report.evidenceCorrections,mode==='exception-correct'?0:1);
+      assert.equal(report.status,mode==='exception-reject'?'incomplete':'reviewed_delivery',JSON.stringify(report));
+      assert.equal(fs.readFileSync(path.join(report.executionDirectory,'test/legacy.test.mjs'),'utf8'),exceptionLegacy);
+      if(mode==='exception-repair'){
+        assert.ok(events.some(e=>e.exit===0&&e.args?.command===exceptionInline&&e.output.includes('TypeError')));
+        const failure=events.find(e=>e.nodeTest?.failure==='product-exception'&&e.exit===1);assert.ok(failure,JSON.stringify(events));
+        assert.equal(failure.args.command,'npm test');assert.ok(failure.output.includes('TypeError'));
+        const passed=events.findLast(e=>e.args?.command==='npm test'&&e.exit===0);assert.ok(passed);
+        assert.equal(passed.before,passed.after);assert.ok(events.indexOf(passed)>events.indexOf(failure));
+        assert.ok(passed.output.includes('tests 4'));assert.ok(passed.output.includes('pass 4'));
+        assert.equal(fs.readFileSync(path.join(report.executionDirectory,'src/timing.mjs'),'utf8'),exceptionSource.replace('fn.apply(this,args)','Reflect.apply(fn,this,args)'));
+        assert.ok(fs.readFileSync(path.join(report.artifacts,'D1.patch'),'utf8').includes('Reflect.apply'));
+      }else assert.ok(!requests.some(r=>r.mode===mode&&r.stage==='repair'));
+    }
     if (mode === 'staged-work') { assert.equal(report.status,'reviewed_delivery',JSON.stringify(report));assert.equal(fs.readFileSync(path.join(project,'value.mjs'),'utf8'),'export const value = 2; // partial user work\n');git('restore','--staged','value.mjs'); }
     if (mode === 'concurrent-save') assert.equal(fs.readFileSync(path.join(project,'value.mjs'),'utf8'),'export const value = 99; // USER_SAVE\n');
     if (['correct','trailing-comma','provenance','missing-test'].includes(mode)) { assert.equal(report.repairs, 0); assert.equal(report.status, 'reviewed_delivery'); }

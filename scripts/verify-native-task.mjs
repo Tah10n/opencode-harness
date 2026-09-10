@@ -4,7 +4,7 @@ const check={tool:'bash',state:'completed',exit:0,before:'S',after:'S',callID:'c
 assert.equal(finalChecks([check,{before:'S',after:'T'},{before:'T',after:'S'}],{snapshotSha256:'S'}).length,0,'restoring bytes does not restore old verification');
 assert.equal(finalChecks([{before:'S',after:'T'}, {...check,before:'T',after:'T'}],{snapshotSha256:'T'}).length,1);
 for(const event of [{tool:'bash',state:'completed',exit:127,output:'command not found'},{tool:'bash',state:'completed',exit:1,output:'Error: Cannot find module test.mjs'},{tool:'bash',state:'completed',exit:1,output:'SyntaxError: not ok'}]) assert.equal(reproducedFailure(event),false);
-assert.equal(reproducedFailure({tool:'bash',state:'completed',exit:1,output:'not ok 1 - public behavior\nAssertionError: expected 2 actual 1'}),true);
+assert.equal(reproducedFailure({tool:'bash',state:'completed',exit:1,output:'not ok 1 - public behavior\nAssertionError: expected 2 actual 1'}),false);
 const source='diff --git a/src/a.mjs b/src/a.mjs\n-source\n+changed\n';
 const test='diff --git a/test/a.test.mjs b/test/a.test.mjs\n-old test\n+new test\n';
 assert.equal(productionDiff({diff:source+test},['test/a.test.mjs']),source);
@@ -56,7 +56,7 @@ for(const mode of ['no-evidence','production-mutation','grounded-behavior']){
  io.verificationScope=()=>({allowed:['test/a.test.mjs'],rejected:legacy.verificationFiles});
  io.prompt=async(role,prompt)=>{const p=JSON.parse(prompt);if(p.instruction.startsWith('Investigate')){
   if(mode==='production-mutation')mutated=true;
-  if(mode==='grounded-behavior')events.push({...check,callID:'failure',exit:1,output:'AssertionError: expected 2 actual 1'});
+  if(mode==='grounded-behavior')events.push({...check,callID:'failure',exit:1,nodeTest:{runner:'node:test',failed:true},output:'AssertionError: expected 2 actual 1'});
   return result({dispositions:[{id:'F-001',decision:'grounded',kind:'behavior',basis:'original requirement',expectedReason:'literal requirement',explanation:'investigated',evidenceCallID:'failure'},...['F-002','obligation-0'].map(id=>({id,decision:'unverified',basis:'remaining obligation',explanation:'not resolved'}))],limitations:[]});
  }if(p.instruction.startsWith('Repair ONLY')){repair=true;throw Error('Reached admitted repair');}return result(valid);};
  const report=await runWorkflow(io,{initialReview:result(legacyRaw),maxRepairs:1});assert.equal(repair,mode==='grounded-behavior');
@@ -102,7 +102,7 @@ for(const mode of ['correct-once','omit-other','immediate','wrong-again','print-
  const originalCapture=io.capture;io.capture=()=>({...originalCapture(),snapshotSha256:state});io.events=()=>events;
  io.format=async()=>assert.fail('Unexpected format request');
  io.checkActive=()=>{if(stop)throw Error(mode==='budget'?'budget exhausted':'cancelled');};io.aborted=()=>stop;
- const failed=()=>{events.push({tool:'write',before:state,after:'T'});state='T';events.push({...check,before:state,after:state,callID:'actual-failure',exit:1,output:'AssertionError: expected 2 actual 1'});};
+ const failed=()=>{events.push({tool:'write',before:state,after:'T'});state='T';events.push({...check,before:state,after:state,callID:'actual-failure',exit:1,nodeTest:{runner:'node:test',failed:true},output:'AssertionError: expected 2 actual 1'});};
  const dispositions=()=>({dispositions:[{id:'F-001',decision:'grounded',kind:'behavior',basis:'original no data loss requirement',expectedReason:'input fields are data',explanation:'observed failing assertion',evidenceCallID:'actual-failure'},{id:'F-002',decision:'unverified',basis:'test delivery pending',explanation:'not addressed'},{id:'obligation-0',decision:'unverified',basis:'tests pending',explanation:'not addressed'}],limitations:[]});
  io.prompt=async(role,prompt)=>{
   const p=JSON.parse(prompt);
@@ -139,7 +139,7 @@ const {nativePermissionDenial}=await import('../lib/native-task-workflow.mjs');
 for(const name of ['permissions.mjs','rejected-events.test.mjs','protected-fields.mjs']) {
  const output=`File not found: /repo/src/${name}`;
  assert.equal(nativePermissionDenial(output),false);
- const io=fake();let calls=0;const events=[{tool:'read',state:'error',callID:'missing',before:'S',after:'S',output}, {...check,callID:'failure',exit:1,output:'AssertionError: expected 2 actual 1'}];
+ const io=fake();let calls=0;const events=[{tool:'read',state:'error',callID:'missing',before:'S',after:'S',output}, {...check,callID:'failure',exit:1,nodeTest:{runner:'node:test',failed:true},output:'AssertionError: expected 2 actual 1'}];
  io.events=()=>events;io.format=async()=>assert.fail('No format');io.prompt=async(role,prompt)=>{const p=JSON.parse(prompt);if(p.instruction.startsWith('Investigate')){events.push({...events[0],callID:'missing-current'},{...events[1],callID:'failure-current'});return result({dispositions:[{id:'F',decision:'grounded',kind:'behavior',basis:'task',expectedReason:'literal task',explanation:'assertion',evidenceCallID:'failure-current'}],limitations:[]});}if(p.instruction.startsWith('Repair ONLY')){calls++;events.push(check);return result('done');}return result({...valid,checks:[...valid.checks,{callID:'check',purpose:'discriminating',basis:'final assertion'}]});};
  const report=await runWorkflow(io,{initialReview:result({...valid,findings:[behaviorFinding] }),maxRepairs:1});assert.equal(calls,1);assert.equal(report.evidenceCorrections,0);assert.equal(report.status,'reviewed_delivery');
 }
@@ -163,7 +163,7 @@ for(const name of ['transactional-settings','document-backup']){
 }
 const rejected={callID:'blocked',tool:'bash',state:'error',before:null,after:'S',stateObservation:{basis:'host-rejected-before-execution',snapshot:'S'}};
 for(const kind of ['behavior','test','documentation']){
- const e={...check,callID:'current',...(kind==='behavior'?{exit:1,output:'AssertionError: expected 2 actual 1'}:kind==='documentation'?{tool:'read',output:'Required docs'}:{})};
+ const e={...check,callID:'current',...(kind==='behavior'?{exit:1,nodeTest:{runner:'node:test',failed:true},output:'AssertionError: expected 2 actual 1'}:kind==='documentation'?{tool:'read',output:'Required docs'}:{})};
  const f={...behaviorFinding,kind},d={id:'F',kind,decision:'grounded',basis:'Original task',expectedReason:'Original task',evidenceCallID:e.callID};
  for(const [tail,ok]of [[[rejected],true],[[{...rejected,stateObservation:undefined}],false],[[{...rejected,stateObservation:{basis:'model-says-unchanged',snapshot:'S'}}],false],[[{...rejected,after:'T'}],false],[[{before:'S',after:'T'},{before:'T',after:'S'}],false],[[{before:'S',after:'T'}],false],[[{...rejected,permissionDenied:true}],false],[[{...rejected,scopeViolation:true}],false],[[{...rejected,cancelled:true}],false]]){
   const events=[e,...tail];assert.equal(assessDispositions([f],[d],events,{snapshotSha256:'S'})[0].admitted,ok,kind+JSON.stringify(tail));
@@ -175,3 +175,42 @@ for(const kind of ['behavior','test','documentation']){
 assert.equal(stateTransition(rejected),'unchanged');assert.equal(stateTransition({...rejected,stateObservation:undefined}),'unknown');assert.equal(stateTransition({before:'S',after:'T'}),'changed');
 assert.equal(assessDispositions([behaviorFinding],[{id:'F',kind:'behavior',decision:'grounded',basis:'Task',expectedReason:'Task',evidenceCallID:'print'}],[{...check,callID:'print',output:'2'},rejected],{snapshotSha256:'S'})[0].admitted,false);
 console.log(JSON.stringify({stateContinuityReplay:true,retainedHistoricalForms:2,realProviderRequests:0}));
+
+// Real Node child processes: output is collected from the runner, never a
+// hand-labelled failure. Synthetic journal tests above cover the state machine.
+{
+ const fs=await import('node:fs'),os=await import('node:os'),path=await import('node:path');
+ const {spawnSync}=await import('node:child_process');
+ const {observeNodeTest,assessDispositions}=await import('../lib/native-task-workflow.mjs');
+ const dir=fs.mkdtempSync(path.join(os.tmpdir(),'node-failure-evidence-'));
+ try{
+  fs.mkdirSync(path.join(dir,'test'));fs.writeFileSync(path.join(dir,'package.json'),JSON.stringify({scripts:{test:'node --test test/*.test.mjs'}}));
+  const run=(source,test,command='npm test')=>{
+   fs.writeFileSync(path.join(dir,'service.mjs'),source);
+   fs.writeFileSync(path.join(dir,'test','behavior.test.mjs'),"import {test} from 'node:test'; import assert from 'node:assert/strict'; import {lookup} from '../service.mjs';\n"+test);
+   const r=spawnSync('bash',['-c',command],{cwd:dir,encoding:'utf8'});
+   const e={tool:'bash',state:'completed',exit:r.status,args:{command,workdir:dir},output:r.stdout+r.stderr,callID:'now',before:'S',after:'S'};
+   e.nodeTest=observeNodeTest(e,dir);return e;
+  };
+  const positive=[['export const lookup=()=>{throw Object.assign(Error("domain operation failed"),{code:"ENOENT"});};',"test('contract',()=>assert.equal(lookup(),2));"],['export const lookup=()=>1;',"test('contract',()=>assert.equal(lookup(),2));"],['export const lookup=()=>null.value;',"test('contract',()=>assert.equal(lookup(),2));"],['export const lookup=async()=>{throw Error("rejected");};',"test('contract',async()=>assert.equal(await lookup(),2));"]];
+  for(const [source,test]of positive)for(const command of ['npm test','node --test --test-reporter=tap test/behavior.test.mjs']){
+   const event=run(source,test,command);assert.equal(reproducedFailure(event),true,JSON.stringify(event));
+   const d={id:'F',decision:'grounded',kind:'behavior',basis:'Public contract requires lookup to return 2',expectedReason:'Original requirement',evidenceCallID:'now'};
+   assert.equal(assessDispositions([{id:'F',kind:'behavior'}],[d],[event],{snapshotSha256:'S'})[0].admitted,true);
+   for(const changed of [{...d,decision:'unverified'},{...d,basis:''},{...d,evidenceCallID:'historical'}])assert.equal(assessDispositions([{id:'F',kind:'behavior'}],[changed],[event],{snapshotSha256:'S'})[0].admitted,false);
+   for(const changed of [{...event,after:'OLD'},{...event,permissionDenied:true},{...event,state:'error'}])assert.equal(assessDispositions([{id:'F',kind:'behavior'}],[d],[changed],{snapshotSha256:'S'})[0].admitted,false);
+   assert.equal(reproducedFailure(run('export const lookup=()=>2;',test,command)),false);
+  }
+  for(const [source,test]of [
+   ['export const lookup=()=>{throw TypeError("documented");};',"test('contract',()=>assert.throws(lookup,TypeError));"],
+   ['export const lookup=async()=>{throw Error("documented");};',"test('contract',async()=>assert.rejects(lookup));"],
+   ['export const lookup=()=>2;',"test('bad test',()=>{throw TypeError('artificial');});"],
+   ['export const lookup=()=>2;',"test('bad test',()=>{throw Error('ERR_ASSERTION');});"],
+   ['export const lookup=()=>2;',"throw Error('setup'); test('contract',()=>lookup());"],
+   ['export const lookup=()=>{throw Error("bad setup");};',"import {beforeEach} from 'node:test';beforeEach(()=>lookup());test('contract',()=>assert.equal(1,1));"],
+   ["import 'missing-dependency';export const lookup=()=>2;","test('contract',()=>lookup());"]
+  ]){const e=run(source,test);assert.equal(reproducedFailure(e),false,JSON.stringify(e));}
+  for(const command of ["node -e \"console.log('TypeError AssertionError FAIL not ok')\"","node -e \"console.log('AssertionError');process.exit(1)\"",'missing-native-executable'])assert.equal(reproducedFailure(run('export const lookup=()=>2;',"test('ok',()=>lookup());",command)),false);
+  console.log(JSON.stringify({realNodeTestFailures:true,assertion:true,productException:true,rejectedPromise:true,setupAndUnsupportedEvidenceRejected:true,realProviderCalls:0}));
+ }finally{fs.rmSync(dir,{recursive:true,force:true});}
+}
