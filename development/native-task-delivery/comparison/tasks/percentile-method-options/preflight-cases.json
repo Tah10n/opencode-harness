@@ -1,0 +1,12 @@
+{
+  "alternative": {
+    "src/percentile.mjs": "export function percentile(values,p,options={}){const method=options.method??'nearest';if(method!=='nearest'&&method!=='linear')throw new TypeError('method');if(!Number.isFinite(p)||p<0||p>1)throw new RangeError('p');if(!values.length)return null;const a=[...values].sort((a,b)=>a-b);if(method==='nearest')return a[Math.max(0,Math.ceil(p*a.length)-1)];const x=p*(a.length-1),i=Math.floor(x);return a[i]*(1-(x-i))+a[Math.ceil(x)]*(x-i);}"
+  },
+  "mutants": [
+    {
+      "name": "linear-default",
+      "file": "src/percentile.mjs",
+      "replacement": "export function percentile(values,p,options={}){const method=options.method??'linear';if(method!=='nearest'&&method!=='linear')throw new TypeError('method');if(!Number.isFinite(p)||p<0||p>1)throw new RangeError('p');if(!values.length)return null;const a=[...values].sort((a,b)=>a-b);if(method==='nearest')return a[Math.max(0,Math.ceil(p*a.length)-1)];const x=p*(a.length-1),i=Math.floor(x);return a[i]+(a[Math.ceil(x)]-a[i])*(x-i);}"
+    }
+  ]
+}

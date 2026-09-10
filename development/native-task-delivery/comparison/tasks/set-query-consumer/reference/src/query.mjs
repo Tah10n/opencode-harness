@@ -1,0 +1,1 @@
+export function select(tags,required){const need=required instanceof Set?[...required]:required;return tags.filter(row=>need.every(t=>row.tags.includes(t)));}export function names(tags,required){return select(tags,required).map(x=>x.name);}

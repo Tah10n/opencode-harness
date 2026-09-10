@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {summary} from '../src/summary.mjs';test('summary',()=>assert.deepEqual(summary(['a','a']),{entries:[{value:'a',count:2}],total:2}));

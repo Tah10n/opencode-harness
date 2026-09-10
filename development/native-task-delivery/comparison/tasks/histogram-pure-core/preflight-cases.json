@@ -1,0 +1,12 @@
+{
+  "alternative": {
+    "src/counts.mjs": "export function counts(values){return [...new Set(values)].map(value=>({value,count:values.filter(x=>x===value).length}));}"
+  },
+  "mutants": [
+    {
+      "name": "sort-core",
+      "file": "src/counts.mjs",
+      "replacement": "export function counts(values){const m=new Map();for(const x of values)m.set(x,(m.get(x)??0)+1);return [...m].sort().map(([value,count])=>({value,count}));}"
+    }
+  ]
+}

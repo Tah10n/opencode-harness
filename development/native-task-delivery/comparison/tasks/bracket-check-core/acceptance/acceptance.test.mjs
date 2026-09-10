@@ -1,0 +1,5 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import path from 'node:path';const root=process.env.PILOT_SOURCE;
+const m0=await import(path.join(root,"src/brackets.mjs"));const m1=await import(path.join(root,"src/check.mjs"));
+test("mismatch offset through consumer",()=>{assert.deepEqual(m0.inspect('😀([)]'),{ok:false,index:4});assert.equal(m1.check('😀([)]'),'unbalanced at 4');});
+test("remaining earliest opener and ignored text",()=>{assert.deepEqual(m0.inspect('x([a'),{ok:false,index:1});assert.deepEqual(m0.inspect('text'),{ok:true,index:null});assert.equal(m1.check(']'),'unbalanced at 0');});
+test("nested and empty",()=>{assert.equal(m1.check('{a[b(c)]}'),'ok');assert.deepEqual(m0.inspect(''),{ok:true,index:null});});

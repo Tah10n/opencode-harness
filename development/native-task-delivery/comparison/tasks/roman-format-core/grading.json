@@ -1,0 +1,18 @@
+{
+  "category": "refactoring",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "subtractive core and consumer prefix",
+    "invalid input consistently rejects"
+  ],
+  "docDelivery": [
+    "Document pure Roman core, 1..3999 subtractive range, unchanged label/prefix and RangeError."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Extract pure roman(n) into src/roman.mjs and have existing label(n,prefix=\"Chapter \") in src/label.mjs delegate to it, without parallel Roman conversion logic. Preserve uppercase standard subtractive Roman numerals for integers1..3999 and RangeError(\"roman\") for other numeric inputs including NaN/fractional, plus all existing prefix behavior (string including empty). Core must not use I/O/global mutable state. Domain numeric n, string prefix. Add direct core and consumer tests, preserve old assertions. This is refactoring, no extended number notation.",
+  "manualBehavior": [
+    "label imports and calls pure roman from src/roman.mjs; no duplicate converter"
+  ],
+  "independence": "Explicit synthetic library contract; alternatives judged by observable exports and required integration, not reference-source matching."
+}

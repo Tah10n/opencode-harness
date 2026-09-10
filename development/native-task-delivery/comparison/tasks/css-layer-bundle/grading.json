@@ -1,0 +1,18 @@
+{
+  "category": "integration",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "dependency ordering reaches bundle",
+    "cycle and immutable input"
+  ],
+  "docDelivery": [
+    "Describe dependency ordering, smallest ready name, cycle error, exact layer output and input preservation."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Implement orderLayers(names,edges) and integrate bundle(blocks,edges) through it. Names are unique ASCII letters, edges [before,after] reference names, duplicates allowed; blocks {name,css} correspond one-to-one. Return a deterministic topological order, each step choosing lexicographically smallest currently available name (not a once-sorted depth-first order). A cycle including self-edge throws RangeError(\"cycle\"). bundle orders blocks accordingly and joins exact @layer NAME { CSS } lines with LF, no trailing LF. Empty inputs return empty order/text. Preserve input arrays/records, support frozen inputs. No CSS parsing. Domain <=100 blocks/1000 edges.",
+  "manualBehavior": [
+    "bundle delegates ordering to orderLayers; no parallel dependency sorter in consumer"
+  ],
+  "independence": "Explicit synthetic library contract; alternatives judged by observable exports and required integration, not reference-source matching."
+}

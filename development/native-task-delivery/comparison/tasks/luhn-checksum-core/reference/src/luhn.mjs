@@ -1,0 +1,1 @@
+export function validDigits(text){if(!/^[0-9]+$/.test(text))return false;let sum=0,double=false;for(let i=text.length-1;i>=0;i--){let n=Number(text[i]);if(double){n*=2;if(n>9)n-=9;}sum+=n;double=!double;}return sum%10===0;}

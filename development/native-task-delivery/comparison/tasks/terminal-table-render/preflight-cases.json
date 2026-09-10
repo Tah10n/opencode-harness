@@ -1,0 +1,12 @@
+{
+  "alternative": {
+    "src/width.mjs": "export function visibleWidth(text){let n=0;for(const c of text.replace(/\u001b\\[[0-9;]*m/g,''))n++;return n;}"
+  },
+  "mutants": [
+    {
+      "name": "utf16-width",
+      "file": "src/width.mjs",
+      "replacement": "export function visibleWidth(text){return text.length;}"
+    }
+  ]
+}

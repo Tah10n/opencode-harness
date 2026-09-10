@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {createLog} from '../src/cursor.mjs';test('append',()=>{const l=createLog();assert.equal(l.append('x'),1);assert.deepEqual(l.snapshot(),{next:2,acked:0,events:[{id:1,value:'x'}]});});

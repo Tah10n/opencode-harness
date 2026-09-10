@@ -1,0 +1,1 @@
+export function visibleWidth(text){return text.length;}

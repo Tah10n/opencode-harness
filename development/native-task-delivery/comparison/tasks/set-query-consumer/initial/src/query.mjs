@@ -1,0 +1,1 @@
+export function select(rows,required){return rows.filter(row=>required.every(t=>row.tags.includes(t)));}export function names(rows,required){return select(rows,required).map(x=>x.name);}

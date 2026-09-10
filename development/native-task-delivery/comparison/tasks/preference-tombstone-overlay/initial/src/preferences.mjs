@@ -1,0 +1,1 @@
+export function overlay(defaults,patch){return {...defaults,...patch};}export function compose(first,second){return {...first,...second};}

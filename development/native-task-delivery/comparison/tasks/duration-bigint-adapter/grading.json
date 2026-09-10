@@ -1,0 +1,15 @@
+{
+  "category": "compatibility",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "bigint precision through display",
+    "validation preserves type contract"
+  ],
+  "docDelivery": [
+    "Describe number/bigint result types, exact formatting and type/range errors without coercion."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Extend splitMillis(ms) and display(ms) from nonnegative safe-integer numbers to nonnegative bigint of arbitrary size. Number returns {seconds:number floor(ms/1000),millis:number remainder}; bigint returns {seconds:bigint quotient,millis:number0..999}. display works for both without precision loss: decimal seconds + dot + exactly3 remainder digits + s. Negative/inexact/unsafe number or negative bigint RangeError(\"duration\"); other types TypeError(\"duration\"). Preserve numeric output/types and accept0/0n. No coercion, timers or unit-library dependencies.",
+  "independence": "Explicit synthetic library contract; alternatives judged by observable exports and required integration, not reference-source matching."
+}

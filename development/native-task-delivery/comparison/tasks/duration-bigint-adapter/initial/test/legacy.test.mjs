@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {splitMillis,display} from '../src/duration.mjs';test('numeric',()=>{assert.deepEqual(splitMillis(1234),{seconds:1,millis:234});assert.equal(display(1234),'1.234s');});

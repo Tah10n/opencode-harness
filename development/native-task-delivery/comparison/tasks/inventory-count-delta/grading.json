@@ -1,0 +1,15 @@
+{
+  "category": "state",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "sorted delta round trip with removal",
+    "negative transition is atomic to input"
+  ],
+  "docDelivery": [
+    "Explain sorted signed deltas, sequential intermediate validation, zero removal, own-key safety and immutable inputs."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Implement diffCounts(before,after) and applyCounts(before,changes). before/after own-data records of positive integer counts, missing=0, safe totals. diff returns only nonzero {key,delta}, sorted by default JS string order over union of own keys. apply sequentially adds signed safe integer deltas (repeated keys allowed), removes zero entries, throws RangeError(\"negative\") at first intermediate negative even if later delta would recover; never mutate input. Keys arbitrary strings including __proto__/constructor; inherited properties ignored. Changes/domain <=1000. Returned record ordinary object with enumerable own data fields; empty diff/no-op still returns new object.",
+  "independence": "Explicit synthetic library contract; alternatives judged by observable exports and required integration, not reference-source matching."
+}

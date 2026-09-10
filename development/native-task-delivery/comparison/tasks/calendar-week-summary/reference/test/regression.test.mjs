@@ -1,0 +1,5 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import path from 'node:path';import {fileURLToPath} from 'node:url';const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const m0=await import(path.join(root,"src/week.mjs"));const m1=await import(path.join(root,"src/summary.mjs"));
+test("week boundaries reach aggregation",()=>{assert.deepEqual(m1.summarize([{day:'2024-01-07',minutes:3},{day:'2024-01-01',minutes:4},{day:'2024-01-08',minutes:5}]),[{week:'2024-01-01',minutes:7},{week:'2024-01-08',minutes:5}]);});
+test("year leap and input preservation",()=>{assert.equal(m0.weekStart('2023-01-01'),'2022-12-26');assert.equal(m0.weekStart('2024-02-29'),'2024-02-26');const e=Object.freeze([Object.freeze({day:'2024-01-02',minutes:1})]);assert.deepEqual(m1.summarize(e),[{week:'2024-01-01',minutes:1}]);assert.equal(e[0].day,'2024-01-02');});
+test("sorted duplicates and empty",()=>{assert.deepEqual(m1.summarize([]),[]);assert.deepEqual(m1.summarize([{day:'2024-01-08',minutes:0},{day:'2024-01-01',minutes:1},{day:'2024-01-01',minutes:2}]),[{week:'2024-01-01',minutes:3},{week:'2024-01-08',minutes:0}]);});

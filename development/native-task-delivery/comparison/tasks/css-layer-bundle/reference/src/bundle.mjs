@@ -1,0 +1,1 @@
+import {orderLayers} from './layers.mjs';export function bundle(blocks,edges){const names=blocks.map(b=>b.name);return orderLayers(names,edges).map(n=>{const b=blocks.find(b=>b.name===n);return '@layer '+n+' { '+b.css+' }';}).join('\n');}

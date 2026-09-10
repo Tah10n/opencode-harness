@@ -1,0 +1,1 @@
+export function rows(input){return Object.entries(input).map(([key,price])=>({key,price}));}export function total(input){return rows(input).reduce((n,r)=>n+r.price,0);}

@@ -1,0 +1,5 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import path from 'node:path';import {fileURLToPath} from 'node:url';const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const m0=await import(path.join(root,"src/cursor.mjs"));
+test("compaction and restore keep next id",()=>{const l=m0.createLog();l.append('a');l.append('b');l.ack(2);const saved=l.snapshot();assert.deepEqual(saved,{next:3,acked:2,events:[]});const r=m0.createLog(saved);assert.equal(r.append('c'),3);assert.equal(l.snapshot().next,3);});
+test("invalid ack and deep ownership",()=>{const l=m0.createLog(),v={x:[]};l.append(v);v.x.push(1);assert.throws(()=>l.ack(2),{name:'RangeError',message:'ack'});const s=l.snapshot();assert.deepEqual(s.events[0].value,{x:[]});s.events[0].value.x.push(2);assert.deepEqual(l.snapshot().events[0].value,{x:[]});l.ack(1);assert.throws(()=>l.ack(0),RangeError);l.ack(1);});
+test("partial cursor",()=>{const l=m0.createLog();l.ack(0);l.append(1);l.append(2);l.ack(1);assert.deepEqual(l.snapshot(),{next:3,acked:1,events:[{id:2,value:2}]});});

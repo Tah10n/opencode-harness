@@ -1,0 +1,1 @@
+export function createLog(saved={next:1,acked:0,events:[]}){let s=structuredClone(saved);return {append(value){const id=s.next++;s.events.push({id,value:structuredClone(value)});return id;},ack(id){s.acked=id;},snapshot(){return structuredClone(s);}};}

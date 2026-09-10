@@ -1,0 +1,12 @@
+{
+  "alternative": {
+    "src/layers.mjs": "export function orderLayers(names,edges){const done=[],pending=[...names];while(pending.length){pending.sort();const i=pending.findIndex(n=>edges.every(([a,b])=>b!==n||done.includes(a)));if(i<0)throw new RangeError('cycle');done.push(...pending.splice(i,1));}return done;}\n"
+  },
+  "mutants": [
+    {
+      "name": "ignore-dependencies",
+      "file": "src/layers.mjs",
+      "replacement": "export function orderLayers(names){return [...names].sort();}"
+    }
+  ]
+}

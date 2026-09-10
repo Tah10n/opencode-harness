@@ -1,0 +1,1 @@
+export function quote(stock,kits){return kits.map(k=>({id:k.id,available:0}));}
