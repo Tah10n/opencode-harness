@@ -1,0 +1,272 @@
+[
+  {
+    "command": "node --test --test-concurrency=1 packages/connector/test/state-security.test.mjs packages/connector/test/executables.test.mjs packages/connector/test/protocol.test.mjs && node --test --test-name-pattern=runtime packages/connector/test/config.test.mjs && git diff --check",
+    "status": "completed",
+    "exit": 0,
+    "counts": {
+      "tests": 24,
+      "pass": 23,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 1
+    },
+    "failures": []
+  },
+  {
+    "command": "node --test --test-concurrency=1 packages/connector/test/state-security.test.mjs packages/connector/test/executables.test.mjs packages/connector/test/protocol.test.mjs",
+    "status": "completed",
+    "exit": 1,
+    "counts": {
+      "tests": 25,
+      "pass": 23,
+      "fail": 1,
+      "cancelled": 0,
+      "skipped": 1
+    },
+    "failures": [
+      "legacy ownership recognition rejects every non-flat or ambiguous variant unchanged (187.646875ms)",
+      "failing tests:"
+    ]
+  },
+  {
+    "command": "node --test --test-name-pattern=runtime packages/connector/test/config.test.mjs",
+    "status": "completed",
+    "exit": 1,
+    "counts": {
+      "tests": 3,
+      "pass": 2,
+      "fail": 1,
+      "cancelled": 0,
+      "skipped": 0
+    },
+    "failures": [
+      "migrates the exact historical flat runtime without replacing it (9.866625ms)",
+      "failing tests:"
+    ]
+  },
+  {
+    "command": "git diff --check && git diff --stat",
+    "status": "completed",
+    "exit": 0,
+    "counts": {
+      "tests": null,
+      "pass": null,
+      "fail": null,
+      "cancelled": null,
+      "skipped": null
+    },
+    "failures": []
+  },
+  {
+    "command": "node --test --test-name-pattern='migrates the exact historical flat runtime' packages/connector/test/config.test.mjs",
+    "status": "completed",
+    "exit": 1,
+    "counts": {
+      "tests": 1,
+      "pass": 0,
+      "fail": 1,
+      "cancelled": 0,
+      "skipped": 0
+    },
+    "failures": [
+      "migrates the exact historical flat runtime without replacing it (15.007375ms)",
+      "failing tests:"
+    ]
+  },
+  {
+    "command": "node --test --test-name-pattern='migrates the exact historical flat runtime' packages/connector/test/config.test.mjs",
+    "status": "completed",
+    "exit": 1,
+    "counts": {
+      "tests": 1,
+      "pass": 0,
+      "fail": 1,
+      "cancelled": 0,
+      "skipped": 0
+    },
+    "failures": [
+      "migrates the exact historical flat runtime without replacing it (18.917791ms)",
+      "failing tests:"
+    ]
+  },
+  {
+    "command": "node --test --test-name-pattern='legacy ownership recognition' packages/connector/test/state-security.test.mjs",
+    "status": "completed",
+    "exit": 0,
+    "counts": {
+      "tests": 1,
+      "pass": 1,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0
+    },
+    "failures": []
+  },
+  {
+    "command": "node --test --test-name-pattern='migrates the exact historical flat runtime' packages/connector/test/config.test.mjs",
+    "status": "completed",
+    "exit": 1,
+    "counts": {
+      "tests": 1,
+      "pass": 0,
+      "fail": 1,
+      "cancelled": 0,
+      "skipped": 0
+    },
+    "failures": [
+      "migrates the exact historical flat runtime without replacing it (32.120084ms)",
+      "failing tests:"
+    ]
+  },
+  {
+    "command": "node --test --test-name-pattern='legacy ownership recognition' packages/connector/test/state-security.test.mjs",
+    "status": "completed",
+    "exit": 0,
+    "counts": {
+      "tests": 1,
+      "pass": 1,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0
+    },
+    "failures": []
+  },
+  {
+    "command": "node --test --test-name-pattern='migrates the exact historical flat runtime' packages/connector/test/config.test.mjs",
+    "status": "completed",
+    "exit": 0,
+    "counts": {
+      "tests": 1,
+      "pass": 1,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0
+    },
+    "failures": []
+  },
+  {
+    "command": "node --test --test-name-pattern='legacy ownership recognition' packages/connector/test/state-security.test.mjs",
+    "status": "completed",
+    "exit": 0,
+    "counts": {
+      "tests": 1,
+      "pass": 1,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0
+    },
+    "failures": []
+  },
+  {
+    "command": "git diff --check && git diff --stat && git status --short",
+    "status": "completed",
+    "exit": 0,
+    "counts": {
+      "tests": null,
+      "pass": null,
+      "fail": null,
+      "cancelled": null,
+      "skipped": null
+    },
+    "failures": []
+  },
+  {
+    "command": "node --test --test-concurrency=1 packages/connector/test/state-security.test.mjs packages/connector/test/executables.test.mjs packages/connector/test/protocol.test.mjs",
+    "status": "completed",
+    "exit": 0,
+    "counts": {
+      "tests": 25,
+      "pass": 24,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 1
+    },
+    "failures": []
+  },
+  {
+    "command": "node --test --test-name-pattern=runtime packages/connector/test/config.test.mjs",
+    "status": "completed",
+    "exit": 0,
+    "counts": {
+      "tests": 3,
+      "pass": 3,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0
+    },
+    "failures": []
+  },
+  {
+    "command": "node --test packages/connector/test/*.test.mjs",
+    "status": "completed",
+    "exit": 1,
+    "counts": {
+      "tests": 164,
+      "pass": 157,
+      "fail": 2,
+      "cancelled": 0,
+      "skipped": 5
+    },
+    "failures": [
+      "the detached scheduler child owns its lock and later launchers exit (5156.881835ms)",
+      "a hook persists its event while another hook holds the scheduler launch gate (5182.800544ms)",
+      "failing tests:"
+    ]
+  },
+  {
+    "command": "corepack pnpm exec prettier --check packages/connector/lib/config.mjs packages/connector/test/config.test.mjs packages/connector/test/state-security.test.mjs packages/connector/README.md",
+    "status": "completed",
+    "exit": 1,
+    "counts": {
+      "tests": null,
+      "pass": null,
+      "fail": null,
+      "cancelled": null,
+      "skipped": null
+    },
+    "failures": []
+  },
+  {
+    "command": "node --test --test-concurrency=1 packages/connector/test/*.test.mjs",
+    "status": "completed",
+    "exit": 1,
+    "counts": {
+      "tests": 164,
+      "pass": 157,
+      "fail": 2,
+      "cancelled": 0,
+      "skipped": 5
+    },
+    "failures": [
+      "the detached scheduler child owns its lock and later launchers exit (5161.468502ms)",
+      "a hook persists its event while another hook holds the scheduler launch gate (5179.846502ms)",
+      "failing tests:"
+    ]
+  },
+  {
+    "command": "git diff --check && git diff -- packages/connector/README.md packages/connector/lib/config.mjs",
+    "status": "completed",
+    "exit": 0,
+    "counts": {
+      "tests": null,
+      "pass": null,
+      "fail": null,
+      "cancelled": null,
+      "skipped": null
+    },
+    "failures": []
+  },
+  {
+    "command": "git diff --check && node --test --test-concurrency=1 packages/connector/test/state-security.test.mjs packages/connector/test/executables.test.mjs packages/connector/test/protocol.test.mjs && node --test --test-name-pattern=runtime packages/connector/test/config.test.mjs",
+    "status": "completed",
+    "exit": 0,
+    "counts": {
+      "tests": 25,
+      "pass": 24,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 1
+    },
+    "failures": []
+  }
+]

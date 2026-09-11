@@ -1,0 +1,318 @@
+{
+  "candidateCommit": "44f6a4b1a73ed8347b852247bbc533fa04497080",
+  "kind": "luna-high-four-run-development-diagnostics",
+  "model": "openai/gpt-5.6-luna",
+  "variant": "high",
+  "budgetMs": 900000,
+  "config": {
+    "model": "openai/gpt-5.6-luna",
+    "small_model": "openai/gpt-5.6-luna",
+    "provider": {
+      "openai": {
+        "options": {
+          "baseURL": "http://127.0.0.1:4099/v1",
+          "apiKey": "development-no-credential"
+        },
+        "models": {
+          "gpt-5.6-luna": {
+            "options": {
+              "reasoningEffort": "high"
+            },
+            "variants": {
+              "high": {
+                "reasoningEffort": "high"
+              }
+            }
+          }
+        }
+      }
+    },
+    "permission": {
+      "external_directory": "deny"
+    }
+  },
+  "schedule": [
+    {
+      "slot": 1,
+      "task": "legacy-runtime-reload",
+      "arm": "P"
+    },
+    {
+      "slot": 2,
+      "task": "legacy-runtime-reload",
+      "arm": "H"
+    },
+    {
+      "slot": 3,
+      "task": "reconnect-revoked",
+      "arm": "H"
+    },
+    {
+      "slot": 4,
+      "task": "reconnect-revoked",
+      "arm": "P"
+    }
+  ],
+  "inputProof": {
+    "legacy-runtime-reload": {
+      "patchSha256": "89c7c137cb1e27ed175c10af24d89492b891eda2a07463cfa839a72d01f08748",
+      "files": 218,
+      "bytesAndModesMatch": true
+    },
+    "reconnect-revoked": {
+      "patchSha256": "5578826a04112f1c92d826d171bd365f6c09d99f40f14f4a1140a62d09a5e01e",
+      "files": 222,
+      "bytesAndModesMatch": true
+    }
+  },
+  "frozenFiles": 8223,
+  "historicalFiles": 78,
+  "evaluatorHashes": {
+    "evaluator/reconnect.test.mjs": "56aa779f774bfa8de09af6a24d86064e0bd497b792d62a1d1a595699bbf7cebd",
+    "evaluator/runtime.test.mjs": "01c280ced03ac09e3ea1bdc89719afec28c94995e4160008a4bf26d8c428d413",
+    "evaluator/state-security.test.mjs": "ad31c2228522919ccb51c7a1a9a873aa48214564586b975badd7a5bc87bf9245"
+  },
+  "scriptedProviderRequests": [
+    {
+      "arm": "P",
+      "stage": "title",
+      "path": "/v1/responses",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "arm": "P",
+      "stage": "plain",
+      "path": "/v1/responses",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "arm": "P",
+      "stage": "plain",
+      "path": "/v1/responses",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "arm": "P",
+      "stage": "plain",
+      "path": "/v1/responses",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "arm": "H",
+      "stage": "title",
+      "path": "/v1/responses",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "arm": "H",
+      "stage": "bootstrap",
+      "path": "/v1/responses",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "arm": "H",
+      "stage": "author",
+      "path": "/v1/responses",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "arm": "H",
+      "stage": "author",
+      "path": "/v1/responses",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "arm": "H",
+      "stage": "correction",
+      "path": "/v1/responses",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "arm": "H",
+      "stage": "correction",
+      "path": "/v1/responses",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "arm": "H",
+      "stage": "correction",
+      "path": "/v1/responses",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "arm": "H",
+      "stage": "bootstrap",
+      "path": "/v1/responses",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    }
+  ],
+  "realProviderCallsBeforeSeries": 0,
+  "controls": [
+    {
+      "name": "runtime-correct",
+      "expected": true,
+      "result": {
+        "task": "legacy-runtime-reload",
+        "passed": true,
+        "checks": {
+          "fresh-process-migration": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "legacy-preservation": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 9,
+              "pass": 9,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "cleanup": 0
+        }
+      }
+    },
+    {
+      "name": "runtime-directory-link-bug",
+      "expected": false,
+      "result": {
+        "task": "legacy-runtime-reload",
+        "passed": false,
+        "checks": {
+          "fresh-process-migration": {
+            "code": 1,
+            "timedOut": false,
+            "counts": {
+              "tests": 1,
+              "pass": 0,
+              "fail": 1,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "legacy-preservation": {
+            "code": 1,
+            "timedOut": false,
+            "counts": {
+              "tests": 9,
+              "pass": 8,
+              "fail": 1,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "cleanup": 0
+        }
+      }
+    },
+    {
+      "name": "reconnect-correct",
+      "expected": true,
+      "result": {
+        "task": "reconnect-revoked",
+        "passed": true,
+        "checks": {
+          "independent-reconnect": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 4,
+              "pass": 4,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "cleanup": 0
+        }
+      }
+    },
+    {
+      "name": "reconnect-swallowed-removal",
+      "expected": false,
+      "result": {
+        "task": "reconnect-revoked",
+        "passed": false,
+        "checks": {
+          "independent-reconnect": {
+            "code": 1,
+            "timedOut": false,
+            "counts": {
+              "tests": 4,
+              "pass": 3,
+              "fail": 1,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "cleanup": 0
+        }
+      }
+    },
+    {
+      "name": "reconnect-skipped-disconnected",
+      "expected": false,
+      "result": {
+        "task": "reconnect-revoked",
+        "passed": false,
+        "checks": {
+          "independent-reconnect": {
+            "code": 1,
+            "timedOut": false,
+            "counts": {
+              "tests": 4,
+              "pass": 3,
+              "fail": 1,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "cleanup": 0
+        }
+      }
+    },
+    {
+      "name": "reconnect-stale-pending",
+      "expected": false,
+      "result": {
+        "task": "reconnect-revoked",
+        "passed": false,
+        "checks": {
+          "independent-reconnect": {
+            "code": 1,
+            "timedOut": false,
+            "counts": {
+              "tests": 4,
+              "pass": 2,
+              "fail": 2,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "cleanup": 0
+        }
+      }
+    }
+  ]
+}
