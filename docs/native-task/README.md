@@ -26,8 +26,10 @@ The ordinary OpenCode default is unchanged.
 
 The total timeout includes native bootstrap, author work, checks, the bounded
 corrections and summary. Its default is 600000 ms, supported range 1000–3600000 ms.
-Native permission rejection, cancellation, quota/native errors and uncertain
-process completion prevent new workflow stages. A native task permission grants
+User permission rejection, repeated policy denial, cancellation, quota/native errors
+and uncertain process completion prevent new workflow stages. One confirmed native
+bash permission denial before execution may return to the same author normally,
+with unchanged permissions and deadline (see below). A native task permission grants
 entry; the author cannot recursively delegate or start another harness workflow.
 
 ## Factual feedback and scope
@@ -122,6 +124,31 @@ After separate authorization, the [four corrected-input P/H continuations](../..
 ran from the actual saved D-final patches. Neither arm delivered a fully acceptable
 patch on either selected task. Two H corrections made no substantive delivery
 progress; the added bound has no demonstrated benefit and remains experimental.
+
+OpenCode 1.18.26 may continue the ordinary author session after one automatic
+`PermissionDeniedError` from native bash preflight. The matching tool call must
+have reached the host before hook but not `shell.env`, which follows native
+permission checks and precedes process spawn. The captured worktree must still
+match its expected state, with no other pending/live tool, cancellation, user
+reject or terminal cause. The host does not infer a denied path or a winning rule:
+external workdir and external command arguments receive the same treatment.
+
+The original tool error and arguments remain unchanged. The author receives a
+reminder through the ordinary system hook: the operation was forbidden and not
+executed, permissions are unchanged, and accessing the same forbidden resource
+through another path or tool is not permitted. Only independent allowed work may
+continue. The host neither replays nor rewrites the command and creates no extra
+session, recovery prompt or correction pass. A necessary forbidden resource
+remains an unmet requirement; the reminder does not authorize a substitute.
+
+`permission-continuations.json` and the result's `permissionContinuations` record
+the allowed continuation separately, including the next completed tool call when
+one exists. The original event stays `error` with preflight nonexecution evidence;
+it is neither a test pass nor repair evidence. It does not invalidate unchanged
+state or become a permanent test failure. Actual failures, missing checks and
+delivery uncertainty remain. Duplicate events for one call do not spend another
+allowance. Another denial, an explicit reject (including a nearby reject event),
+cancellation, unknown execution state or an external edit prevents continuation.
 
 A fatal native permission denial records its primary `permission_denied` cause
 before requesting native session cancellation. It stops further author/correction

@@ -5,7 +5,7 @@ import path from 'node:path';
 import {spawn,spawnSync} from 'node:child_process';
 import nativeTaskPlugin from '../lib/native-task-plugin.mjs';
 import {prepareObservations,commandWords} from '../lib/native-task-observations.mjs';
-import {runWorkflow,nativePermissionDenial,stateTransition} from '../lib/native-task-workflow.mjs';
+import {runWorkflow,nativePermissionDenial,nativePermissionKind,stateTransition} from '../lib/native-task-workflow.mjs';
 import {reviewContext} from '../lib/native-review-context.mjs';
 import {materializeNativeTemplate} from '../lib/native-template.mjs';
 const temp=fs.mkdtempSync(path.join(os.tmpdir(),'native-d-check-'));
@@ -198,6 +198,109 @@ try {
   }
  }
  {let captured=0;const report=await runWorkflow({checkActive:()=>{},save:()=>{},aborted:()=>false,messages:async()=>[],prompt:async()=>({info:{finish:'stop'},parts:[]}),capture:()=>({status:'captured',snapshotSha256:++captured<3?'checked':'changed',diff:'',task:'task'}),observe:()=>({reasons:[],limits:[],testChanges:[],checksCurrent:true})});assert.equal(report.status,'incomplete');assert.ok(report.limits.some(l=>l.includes('Final snapshot changed')));}
+ // Admission is per workflow/call, not global error text. These hook cases use
+ // real worktrees and commands; installed fixtures below own native provenance.
+ {
+  const dir=path.join(temp,'continuation-cases');fs.mkdirSync(dir);
+  fs.writeFileSync(path.join(dir,'package.json'),JSON.stringify({scripts:{test:'node --test'}}));
+  fs.writeFileSync(path.join(dir,'value.test.mjs'),"import {test} from 'node:test';import assert from 'node:assert/strict';test('kept',()=>assert.equal(1,1));\n");
+  const taskFile=path.join(dir,'TASK.md');fs.writeFileSync(taskFile,'Preserve the project and run `node --test`.');
+  run(dir,['init','-q']);run(dir,['add','.']);run(dir,['-c','core.hooksPath=/dev/null','-c','user.name=Fixture','-c','user.email=fixture@local','commit','-qm','base']);
+  const automatic='The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules '+JSON.stringify([{permission:'*',pattern:'*',action:'allow'},{permission:'external_directory',pattern:'*',action:'deny'}]);
+  assert.equal(nativePermissionKind(automatic),'automatic');
+  for(const text of ['permission denied','File not found: '+automatic,automatic+' trailing',automatic.replace('"deny"','"bogus"')])assert.equal(nativePermissionKind(text),'unknown');
+  async function scenario(name,mode,barrier=async()=>{}) {
+   const parent='continuation-parent-'+name,childID='continuation-child-'+name,controller=new AbortController();
+   let hooks,worktree,abortCalls=0,promptCalls=0;const parts=new Map();
+   const input=(id,tool='bash')=>({sessionID:childID,callID:id,tool});
+   const event=async(id,state,tool='bash')=>{
+    const part={type:'tool',...input(id,tool),state};parts.set(id,part);
+    await hooks.event({event:{type:'message.part.updated',properties:{part}}});
+   };
+   const error=(id='denied',text=automatic,tool='bash')=>event(id,{status:'error',input:{command:'node --test',workdir:'..'},error:text},tool);
+   const reject=()=>hooks.event({event:{type:'permission.replied',properties:{sessionID:childID,requestID:'request',reply:'reject'}}});
+   const execute=async(id,args)=>{
+    await hooks['tool.execute.before'](input(id));await hooks['shell.env']({sessionID:childID,callID:id,cwd:worktree});
+    const result=spawnSync(process.execPath,args,{cwd:worktree,encoding:'utf8'});
+    await hooks['tool.execute.after']({...input(id),args:{command:'node '+args.join(' ')}},{output:result.stdout+result.stderr,metadata:{exit:result.status}});
+   };
+   const client={app:{agents:async()=>({data:[{name:'build',permission:[{permission:'*',pattern:'*',action:'allow'}]}]})},session:{
+    get:async()=>({data:{permission:[]}}),create:async({query})=>{worktree=query.directory;return{data:{id:childID}};},
+    abort:async()=>{abortCalls++;for(const [id,part] of parts)if(['pending','running'].includes(part.state.status))await event(id,{status:'error',input:{},error:'Cancelled'},part.tool);return{data:true};},
+    messages:async()=>({data:[{parts:[...parts.values()]}]}),
+    prompt:async()=>{
+     promptCalls++;
+     if(promptCalls>1){assert.ok(['missing-check','real-failure'].includes(mode));if(mode==='real-failure')await execute('check-'+promptCalls,['--test']);return{data:{info:{finish:'stop'},parts:[]}};}
+     await barrier();
+     if(mode==='no-denial'){await execute('check',['--test']);return{data:{info:{finish:'stop'},parts:[]}};}
+     if(mode==='preserve-check')await execute('earlier-check',['--test']);
+     if(mode!=='missing-before')await hooks['tool.execute.before'](input('denied',mode==='other-tool'?'read':'bash'));
+     if(mode==='after-start'){
+      await hooks['shell.env']({sessionID:childID,callID:'denied',cwd:worktree});
+      const r=spawnSync(process.execPath,['-e',"require('fs').writeFileSync('executed.txt','ran')"],{cwd:worktree});assert.equal(r.status,0);
+     }
+     if(mode==='outside-change')fs.writeFileSync(path.join(worktree,'external.txt'),'user save');
+     if(mode==='parallel-tool')await event('untracked',{status:'running',input:{}},'unknown');
+     if(mode==='reject-before')await reject();
+     if(mode==='cancel-before')controller.abort();
+     await error('denied',mode==='unknown'?'Unknown native tool error':automatic,mode==='other-tool'?'read':'bash');
+     if(mode==='duplicate')await error();
+     if(mode==='reject-after')await reject();
+     if(mode==='cancel-after')controller.abort();
+     if(mode==='conflicting-tool')await error('denied',automatic,'read');
+     if(mode==='conflicting-duplicate')await error('denied','Different native error');
+     const admitted=['continued','duplicate','second-denial','preserve-check','missing-check','real-failure'].includes(mode);
+     if(!admitted){await assert.rejects(hooks['chat.params']({sessionID:childID}));return{data:{info:{finish:'stop'},parts:[]}};}
+     await hooks['chat.params']({sessionID:childID});
+     const system={system:[]};await hooks['experimental.chat.system.transform']({sessionID:childID},system);
+     assert.match(system.system.join('\n'),/Do not repeat the forbidden operation/);assert.ok(system.system[0].includes(worktree));
+     if(mode==='second-denial'){
+      await hooks['tool.execute.before'](input('second'));await error('second');
+      await assert.rejects(hooks['chat.params']({sessionID:childID}));
+     }else if(!['preserve-check','missing-check'].includes(mode)){
+      if(mode==='real-failure'){
+       await hooks['tool.execute.before'](input('edit','edit'));
+       fs.writeFileSync(path.join(worktree,'value.test.mjs'),"import {test} from 'node:test';import assert from 'node:assert/strict';test('kept',()=>assert.equal(1,2));\n");
+       await hooks['tool.execute.after']({...input('edit','edit'),args:{}},{output:'changed',metadata:{}});
+      }
+      await execute('check',['--test']);
+     }
+     return{data:{info:{finish:'stop'},parts:[]}};
+    },
+   }};
+   hooks=await nativeTaskPlugin({client,directory:dir});
+   const previous=process.env.HARNESS_TASK_FILE;process.env.HARNESS_TASK_FILE=taskFile;
+   try{await hooks['command.execute.before']({command:'harness-task',arguments:'',sessionID:parent});}
+   finally{if(previous===undefined)delete process.env.HARNESS_TASK_FILE;else process.env.HARNESS_TASK_FILE=previous;}
+   try{
+    await hooks['chat.message']({sessionID:parent},{message:{agent:'build',model:{providerID:'fixture',modelID:'fixture'}}});
+    const result=JSON.parse(await hooks.tool.harness_task.execute({}, {sessionID:parent,abort:controller.signal,ask:async()=>{},metadata:async()=>{}}));
+    const log=JSON.parse(fs.readFileSync(path.join(result.artifacts,'tool-events.json')));
+    const passing=['continued','duplicate','preserve-check','no-denial'].includes(mode);
+    assert.equal(result.status,passing?'checks_passed':mode.startsWith('cancel-')?'cancelled':'incomplete',name);
+    const allowed=['continued','duplicate','second-denial','reject-after','cancel-after','conflicting-duplicate','conflicting-tool','preserve-check','missing-check','real-failure'].includes(mode);
+    assert.equal(result.permissionContinuations.length,allowed?1:0,name);
+    assert.equal(result.termination.verified,true,name);
+    assert.equal(result.repairs,['missing-check','real-failure'].includes(mode)?2:0,name);
+    if(passing||['missing-check','real-failure'].includes(mode))assert.equal(abortCalls,0,name);else assert.equal(abortCalls,1,name);
+    if(mode==='second-denial')assert.equal(log.filter(e=>e.permissionDenied).length,2);
+    if(mode==='duplicate')assert.equal(log.filter(e=>e.callID==='denied').length,1);
+    if(mode==='after-start'){assert.equal(fs.readFileSync(path.join(worktree,'executed.txt'),'utf8'),'ran');assert.equal(log[0].execution,undefined);}
+    if(mode==='outside-change'){assert.equal(result.terminalReason.kind,'scope_violation');assert.equal(fs.readFileSync(path.join(worktree,'external.txt'),'utf8'),'user save');}
+    if(mode==='preserve-check'){assert.equal(result.observations.checks[0].current,true);assert.equal(result.observations.checks.length,1);assert.equal(result.permissionContinuations[0].continuedWith,undefined);}
+    if(mode==='real-failure')assert.ok(result.observations.unresolvedFailures.some(e=>e.exit===1));
+    if(result.observations)assert.ok(!result.observations.checks.some(e=>e.callID==='denied'));
+    return result;
+   }finally{await hooks.event({event:{type:'command.executed',properties:{name:'harness-task',sessionID:parent}}});}
+  }
+  for(const mode of ['continued','duplicate','second-denial','reject-before','reject-after','cancel-before','cancel-after','unknown','after-start','outside-change','parallel-tool','missing-before','other-tool','conflicting-duplicate','conflicting-tool','preserve-check','missing-check','real-failure','no-denial'])await scenario(mode,mode);
+  // Both native workflows coexist before either emits its first denial; the
+  // same callID in each must consume only that workflow's own allowance.
+  let entered=0,release;const ready=new Promise(resolve=>{release=resolve;});
+  const barrier=async()=>{if(++entered===2)release();await ready;};
+  const concurrent=await Promise.all([scenario('concurrent-a','second-denial',barrier),scenario('concurrent-b','continued',barrier)]);
+  assert.notEqual(concurrent[0].permissionContinuations[0].sessionID,concurrent[1].permissionContinuations[0].sessionID);
+ }
  assert.equal(nativePermissionDenial('The user rejected permission to use this specific tool call.'),true);
  assert.equal(nativePermissionDenial('File not found: The user rejected permission to use this specific tool call.'),false);
  assert.equal(stateTransition({state:'error',before:null,after:'S',stateObservation:{basis:'host-rejected-before-execution',snapshot:'S'}}),'unchanged');

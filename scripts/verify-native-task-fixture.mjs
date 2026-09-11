@@ -24,6 +24,9 @@ fs.writeFileSync(path.join(project,'package.json'),JSON.stringify({private:true,
 fs.writeFileSync(path.join(project,'opencode.json'),JSON.stringify({$schema:'https://opencode.ai/config.json',permission:{task:'allow',bash:'allow'}}));
 git('add','.');git('-c','core.hooksPath=/dev/null','-c','user.name=Fixture','-c','user.email=fixture@localhost','commit','-qm','base');
 materializeNativeTemplate({repositoryRoot:root,outputDirectory:bundle,task:true,review:true});
+const continuationModes=['external-path','external-argument','bash-denial','second-denial'];
+const forbiddenContent='UNREAD_NATIVE_DENIAL_SENTINEL';
+const denialText='The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules '+JSON.stringify([{permission:'bash',pattern:'*',action:'deny'}]);
 let mode='correct',requests=[],auxiliaryRequests=[],providerRequests=0,counts=new Map(),priorArtifacts=new Set();
 const writeFixture=(file,bytes)=>`node -e 'require("fs").writeFileSync(${JSON.stringify(file)},Buffer.from(${JSON.stringify(Buffer.from(bytes).toString('base64'))},"base64"))'`;
 const response = (res, call, content = '') => {
@@ -41,6 +44,7 @@ const fixture=http.createServer(async(req,res)=>{
   const body=JSON.parse(Buffer.concat(chunks)), user=body.messages.findLast(m=>m.role==='user');
   const text=typeof user?.content==='string'?user.content:user?.content?.map(p=>p.text??'').join('\n')??'';
   if(!body.tools?.length){auxiliaryRequests.push({mode});response(res,null,'Fixture title');return;}
+  assert.ok(!JSON.stringify(body).includes(forbiddenContent),'Forbidden resource content must never reach the provider');
   const stage=text.includes('Corrective pass')?'correction':text.includes('Implement the complete original task')?'implementation':'bootstrap';
   const pass=stage==='correction'?JSON.parse(text).pass:0;
   const key=mode+stage+pass,n=counts.get(key)??0;counts.set(key,n+1);requests.push({mode,stage,n});
@@ -62,12 +66,24 @@ const fixture=http.createServer(async(req,res)=>{
    else if(mode==='unresolved')calls=[bash(writeFixture('value.mjs',source.replace('value = 2','value = 1'))),bash('node --test value.test.mjs')];
    else if(['variant','both-required'].includes(mode))calls=[bash('node --test --test-concurrency=1 value.test.mjs'),bash(writeFixture('value.mjs',source+'// edit\n')),bash('node --test value.test.mjs')];
    else if(mode==='narrow')calls=[bash('node --test --test-name-pattern=public value.test.mjs')];
-   else if(['worktree-path','external-path'].includes(mode)) {
+   else if(['worktree-path',...continuationModes].includes(mode)) {
     const artifacts=path.join(project,'.git/harness-task'),id=fs.readdirSync(artifacts).find(id=>!priorArtifacts.has(id)),worktree=fs.realpathSync(path.join(artifacts,id,'worktree'));
     calls=[{...bash(writeFixture('value.mjs',source+'// allowed worktree\n')),args:{...bash('').args,command:writeFixture('value.mjs',source+'// allowed worktree\n'),workdir:worktree}}, {...bash('node --test'),args:{...bash('').args,command:'node --test',workdir:worktree}}];
-    if(mode==='external-path')calls.push({name:'bash',args:{command:writeFixture('forbidden.txt','forbidden'),description:'Must remain denied',workdir:path.dirname(worktree)}});
+    if(continuationModes.includes(mode)) {
+     const parent=path.dirname(worktree),secret=path.join(parent,'forbidden-input.txt');
+     if(n===0)fs.writeFileSync(secret,forbiddenContent);
+     const denied=mode==='bash-denial'?bash('printf forbidden'):{name:'bash',args:{command:mode==='external-argument'?'cat '+JSON.stringify(secret)+' && '+writeFixture('forbidden.txt','forbidden'):writeFixture('forbidden.txt','forbidden'),description:'Must remain denied',workdir:mode==='external-argument'?worktree:parent}};
+     calls=[denied,bash(writeFixture('value.mjs',source.replace('value = 2','value = 3'))),bash(writeFixture('value.test.mjs',originalTest.replace('value,2','value,3'))),bash('npm test'),bash('git diff --check')];
+     if(mode==='second-denial')calls.splice(1,0,denied);
+     if(n===1){
+      assert.ok(JSON.stringify(body.messages).includes('The user has specified a rule which prevents'));
+      assert.ok(body.messages.some(m=>m.role==='system'&&JSON.stringify(m.content).includes('Do not repeat the forbidden operation')));
+     }
+    }
    }
    else if(mode==='permission')calls=[bash('printf forbidden')];
+   else if(mode==='unknown-error')calls=[{name:'bash',args:{command:writeFixture('forbidden.txt','bad'),timeout:-1,description:'Native validation error'}}];
+   else if(['stdout-denial','runtime-error'].includes(mode))calls=[bash('node -e '+JSON.stringify('console.log('+JSON.stringify(denialText)+');process.exit('+(mode==='runtime-error'?1:0)+')')),bash('npm test')];
    else if(mode==='cancel'||mode==='budget')calls=[bash('node --test'),bash("sleep 30 & sleeper=$!; printf '%s' \"$sleeper\" > sleeper.pid; wait \"$sleeper\"")];
    else if(mode==='concurrent-save')calls=[bash('sleep 0.5'),bash('node --test')];
    else if(mode==='external-save') {
@@ -110,18 +126,30 @@ const api = async (method, route, body) => { const r = await fetch(`http://127.0
 
 try {
  let ready=false;for(let n=0;n<150;n++){try{await api('GET','/global/health');ready=true;break;}catch{await new Promise(r=>setTimeout(r,100));}}assert.ok(ready,stderr);
- const allModes=['stateful','variant','both-required','narrow','worktree-path','external-path','diagnostic','unresolved','correct','two-fixes','comment-only','defect','coverage-loss','intentional','relocation','late-check','final-stale','no-progress','permission','cancel','budget','concurrent-save','staged-work','external-save'];
+ const allModes=['stateful','variant','both-required','narrow','worktree-path','external-path','external-argument','bash-denial','second-denial','stdout-denial','runtime-error','unknown-error','diagnostic','unresolved','correct','two-fixes','comment-only','defect','coverage-loss','intentional','relocation','late-check','final-stale','no-progress','permission','cancel','budget','concurrent-save','staged-work','external-save'];
  const selectedModes=process.env.NATIVE_TASK_FIXTURE_MODES?.split(',')??allModes;
  for(mode of selectedModes){
   git('reset','--hard','HEAD');git('clean','-fd');
   const artifactRoot=path.join(project,'.git/harness-task');priorArtifacts=new Set(fs.existsSync(artifactRoot)?fs.readdirSync(artifactRoot):[]);
   fs.writeFileSync(task,'ORIGINAL_TASK_FIXTURE: Deliver value '+(mode==='intentional'?'3 instead of 2':'2')+'; preserve the independent legacy() = 7 scenario. Run node --test after the last edit.');
+  if(continuationModes.includes(mode))fs.writeFileSync(task,'ORIGINAL_TASK_FIXTURE: Change value from 2 to 3 and update its public test expectation, preserving the independent legacy() = 7 scenario. Run `npm test` and `git diff --check`.');
+  if(['stdout-denial','runtime-error'].includes(mode))fs.writeFileSync(task,'ORIGINAL_TASK_FIXTURE: Preserve value 2 and legacy() = 7; run `npm test`.');
   if(['variant','both-required','narrow'].includes(mode))fs.appendFileSync(task,' Required: `node --test value.test.mjs`.'+(mode==='both-required'?' Also required: `node --test --test-concurrency=1 value.test.mjs`.':''));
   if(mode==='stateful'){fs.copyFileSync(path.join(root,'fixtures/native-stateful/example.mjs'),path.join(project,'example.mjs'));fs.writeFileSync(path.join(project,'example.test.mjs'),stale);fs.appendFileSync(task,' Preserve the clear scenario and test consumption of an existing item through consume plus empty idempotency.');}
   if(mode==='staged-work'){fs.writeFileSync(path.join(project,'value.mjs'),source+'// staged user bytes\n');git('add','value.mjs');fs.appendFileSync(path.join(project,'value.mjs'),'// unstaged user bytes\n');}
   const userBytes=fs.readFileSync(path.join(project,'value.mjs'),'utf8'),index=git('ls-files','--stage','-z');
-  const session=await api('POST','/session',{permission:mode==='permission'?[{permission:'bash',pattern:'printf forbidden',action:'deny'}]:mode==='external-path'?[{permission:'external_directory',pattern:'*',action:'deny'}]:[]});
+  const session=await api('POST','/session',{permission:['permission','bash-denial'].includes(mode)?[{permission:'bash',pattern:'printf forbidden',action:mode==='permission'?'ask':'deny'}]:continuationModes.includes(mode)?[{permission:'external_directory',pattern:'*',action:'deny'}]:[]});
   const pending=api('POST',`/session/${session.id}/command`,{command:'harness-task',arguments:'',agent:'build',model:'local-fixture/fixture'});
+  if(mode==='permission'){
+   pending.catch(()=>{});let asks=[],denialDirectory;
+   for(let i=0;i<200&&!asks.length;i++){
+    const ids=fs.existsSync(artifactRoot)?fs.readdirSync(artifactRoot).filter(id=>!priorArtifacts.has(id)):[];
+    if(ids.length===1){denialDirectory=path.join(artifactRoot,ids[0],'worktree');asks=await api('GET','/permission?directory='+encodeURIComponent(denialDirectory));}
+    if(!asks.length)await new Promise(r=>setTimeout(r,30));
+   }
+   assert.equal(asks.length,1);assert.equal(asks[0].permission,'bash');
+   await api('POST',`/permission/${asks[0].id}/reply?directory=${encodeURIComponent(denialDirectory)}`,{reply:'reject'});
+  }
   let sleeperPID;
   if(['cancel','budget','concurrent-save'].includes(mode)){
    if(mode==='concurrent-save'){
@@ -159,7 +187,7 @@ try {
   assert.equal(fs.readFileSync(path.join(project,'value.mjs'),'utf8'),mode==='concurrent-save'?source+'// concurrent USER_SAVE\n':userBytes);
   const corrected=['stateful','both-required','narrow','defect','two-fixes','comment-only','late-check','final-stale','no-progress'].includes(mode);
   assert.equal(report.repairs,['two-fixes','comment-only','no-progress','unresolved'].includes(mode)?2:mode==='final-stale'?2:corrected?1:0,JSON.stringify(report));assert.deepEqual(Object.keys(report.sessions),['author']);
-  assert.equal(report.status,['diagnostic','no-progress','comment-only','unresolved','final-stale','permission','external-path','external-save'].includes(mode)?'incomplete':'checks_passed',JSON.stringify(report));
+  assert.equal(report.status,['diagnostic','no-progress','comment-only','unresolved','final-stale','permission','second-denial','unknown-error','runtime-error','external-save'].includes(mode)?'incomplete':'checks_passed',JSON.stringify(report));
   if(corrected){const impl=JSON.parse(fs.readFileSync(path.join(report.artifacts,'implementation-original.json'))),cor=JSON.parse(fs.readFileSync(path.join(report.artifacts,'correction-original.json')));assert.equal(impl.info.sessionID,cor.info.sessionID);}
   if(mode==='stateful'){assert.equal(fs.readFileSync(path.join(report.executionDirectory,'example.test.mjs'),'utf8'),repaired);assert.match(fs.readFileSync(path.join(report.artifacts,'final.patch'),'utf8'),/read\('item'\)/);assert.ok(report.observations.checks.some(c=>c.exit===0&&c.current));}
   if(mode==='coverage-loss'){assert.equal(fs.readFileSync(path.join(report.executionDirectory,'value.test.mjs'),'utf8'),reducedTest);assert.ok(report.observations.coverageWarnings.length);}
@@ -167,11 +195,42 @@ try {
   if(mode==='relocation')assert.equal(fs.readFileSync(path.join(report.executionDirectory,'moved.test.mjs'),'utf8'),originalTest);
   if(mode==='diagnostic'){const c=report.observations.latestChecks.at(-1);assert.equal(c.requirement,'diagnostic');assert.equal(c.exit,1);}
   if(mode==='unresolved')assert.ok(report.limits.some(l=>l.includes('unresolved task relevance')));
-  if(['permission','external-path'].includes(mode)){assert.ok(fs.existsSync(path.join(report.artifacts,'permission-violation.json')));assert.equal(report.terminalReason.kind,'permission_denied');assert.equal(report.termination.verified,true);assert.equal(report.termination.abortRequests,1);assert.equal(requests.filter(r=>r.mode===mode&&r.stage==='implementation').length,mode==='permission'?1:3);assert.equal(requests.filter(r=>r.mode===mode).length,mode==='permission'?2:4);}
+  if(['permission','second-denial'].includes(mode)){assert.ok(fs.existsSync(path.join(report.artifacts,mode==='permission'?'permission-reply-violation.json':'permission-violation.json')));assert.equal(report.terminalReason.kind,'permission_denied');assert.equal(report.termination.verified,true);assert.equal(report.termination.abortRequests,1);assert.equal(requests.filter(r=>r.mode===mode&&r.stage==='implementation').length,mode==='permission'?1:2);assert.equal(requests.filter(r=>r.mode===mode).length,mode==='permission'?2:3);}
   if(mode==='external-save')assert.equal(fs.readFileSync(path.join(report.executionDirectory,'value.mjs'),'utf8'),source+'// external edit\n');
-  assert.ok(fs.existsSync(path.join(report.artifacts,'D0.patch'))||['external-save','permission','external-path'].includes(mode));
-  if(mode==='external-path'){assert.equal(fs.existsSync(path.join(report.artifacts,'forbidden.txt')),false);assert.equal(report.termination.verified,true);}
-  if(['external-path','worktree-path'].includes(mode))assert.equal(fs.readFileSync(path.join(report.executionDirectory,'value.mjs'),'utf8'),source+'// allowed worktree\n');
+  assert.ok(fs.existsSync(path.join(report.artifacts,'D0.patch'))||['external-save','permission','second-denial','unknown-error'].includes(mode));
+  const events=JSON.parse(fs.readFileSync(path.join(report.artifacts,'tool-events.json')));
+  if(continuationModes.includes(mode)){
+   assert.equal(fs.existsSync(path.join(report.artifacts,'forbidden.txt')),false);
+   assert.equal(fs.existsSync(path.join(report.executionDirectory,'forbidden.txt')),false);
+   assert.equal(fs.readFileSync(path.join(report.artifacts,'forbidden-input.txt'),'utf8'),forbiddenContent);
+   assert.equal(report.termination.verified,true);
+   const denied=events.filter(e=>e.permissionDenied);assert.equal(denied.length,mode==='second-denial'?2:1);
+   assert.ok(denied.every(e=>e.state==='error'&&e.execution==='native-bash-permission-preflight'&&e.before===e.after&&e.executionAdmitted===false));
+   assert.equal(report.permissionContinuations.length,1);assert.equal(report.permissionContinuations[0].sessionID,report.sessions.author);
+   const native=await api('GET',`/session/${report.sessions.author}/message?directory=${encodeURIComponent(report.executionDirectory)}`);
+   const nativeDenied=native.flatMap(m=>m.parts).filter(p=>p.type==='tool'&&denied.some(e=>e.callID===p.callID));
+   assert.equal(nativeDenied.length,denied.length);
+   assert.ok(nativeDenied.every(p=>p.state.status==='error'&&p.state.error===denied.find(e=>e.callID===p.callID).output&&JSON.stringify(p.state.input)===JSON.stringify(denied.find(e=>e.callID===p.callID).args)));
+   if(mode!=='second-denial'){
+    assert.equal(report.termination.abortRequests,0);
+    assert.equal(requests.filter(r=>r.mode===mode&&r.stage==='implementation').length,6);
+    assert.equal(requests.filter(r=>r.mode===mode&&r.stage==='correction').length,0);
+    assert.ok(report.observations.checks.some(c=>c.command==='npm test'&&c.successful&&c.current));
+    assert.equal(report.observations.unclassifiedFailures.length,0);
+    assert.ok(!report.observations.checks.some(c=>denied.some(e=>e.callID===c.callID)));
+    assert.equal(report.permissionContinuations[0].continuedWith.callID,events[1].callID);
+    assert.equal(fs.readFileSync(path.join(report.executionDirectory,'value.mjs'),'utf8'),source.replace('value = 2','value = 3'));
+    assert.equal(fs.readFileSync(path.join(report.executionDirectory,'value.test.mjs'),'utf8'),originalTest.replace('value,2','value,3'));
+    const patch=path.join(report.artifacts,'final.patch');assert.match(fs.readFileSync(patch,'utf8'),/value = 3/);git('apply','--check',patch);
+   }
+  }else assert.deepEqual(report.permissionContinuations,[]);
+  if(mode==='unknown-error'){assert.equal(report.terminalReason.kind,'tool_error');assert.equal(report.termination.verified,true);assert.equal(events[0].execution,undefined);}
+  if(['stdout-denial','runtime-error'].includes(mode)){
+   assert.equal(events[0].state,'completed');assert.equal(events[0].permissionDenied,undefined);assert.equal(events[0].executionAdmitted,true);
+   if(mode==='runtime-error')assert.ok(report.observations.unclassifiedFailures.some(f=>f.exit===1&&f.output.includes(denialText)));
+  }
+  if(mode==='correct'){assert.equal(requests.filter(r=>r.mode===mode&&r.stage==='implementation').length,2);assert.equal(report.termination.abortRequests,0);}
+  if(mode==='worktree-path')assert.equal(fs.readFileSync(path.join(report.executionDirectory,'value.mjs'),'utf8'),source+'// allowed worktree\n');
   if(mode==='variant')assert.equal(requests.filter(r=>r.mode===mode&&r.stage==='implementation').length,4);
   console.log(JSON.stringify({mode,status:report.status,repairs:report.repairs,termination:report.termination,scriptedRequests:requests.filter(r=>r.mode===mode).length}));
  }
