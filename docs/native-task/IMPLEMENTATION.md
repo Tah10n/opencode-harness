@@ -19,8 +19,10 @@ exact changes without deciding semantic equivalence. Unsupported commands remain
 unverified. New verification is performed through the author's existing native
 tools; the host does not run candidate code or execute model report strings.
 
-`runWorkflow` captures D0, constructs factual observations, optionally sends one
-feedback payload to the same author, then captures D1/final. Final and terminal
+`runWorkflow` captures D0, constructs factual observations, sends at most three updated
+feedback payloads to the same author, and captures each D1–D3/final state. Two
+consecutive replies without changed check problems or new check evidence stop the
+loop. Changed test bytes alone are a warning, not a scheduling trigger. Final and terminal
 states must match the observed delivery. Check status is separate from coverage
 assessment and complete-task evaluation. Legacy report parsing exports remain
 available for historical artifact readers; the D path does not call them.

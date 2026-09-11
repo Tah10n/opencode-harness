@@ -7,8 +7,8 @@ node scripts/verify-native-template.mjs
 node scripts/verify-native-review.mjs
 node scripts/verify-native-task.mjs
 node scripts/verify-native-task-fixture.mjs
-node development/native-task-ad/replay-reconnect.mjs
-node scripts/verify-native-container-preflight.mjs local/native-task-ad/container-preflight
+node development/native-task-ph/replay-reconnect.mjs
+node scripts/verify-native-container-preflight.mjs local/native-task-ph/container-preflight
 ```
 
 The direct D regression uses real temporary Git repositories, test files and Node
@@ -17,7 +17,8 @@ Node filenames, pure-addition coverage changes, stale/reverted/unknown states,
 permission/cancellation boundaries and final snapshot mismatch.
 
 The installed fixture exercises correct D0 without correction, real failed check
-and one repair, coverage loss with a green suite, intentional expectation change,
+and two successive repairs with updated failures, two unchanged replies, diagnostic
+failures and unresolved relevance, coverage loss with a green suite, intentional expectation change,
 equivalent move, missing final check, repeated failure, stale corrective output,
 actual native permission denial, cancellation/deadline child process termination,
 staged/unstaged user bytes, concurrent original saves and external delivery edits.
@@ -27,10 +28,11 @@ Retained B/C reconnect replay distinguishes removal of the obsolete 401 rejectio
 from replacement of the separate disconnected-source scenario. It asserts that
 both diffs reach feedback. Historical patches and outcomes remain unchanged.
 
-One independent read-only review found route provenance, pure-addition coverage,
-Node filename and final snapshot binding gaps. The bounded remediation adds
-regressions for all four. The final executed check results are recorded with the
-D development artifacts; this document describes coverage, not a synthetic pass.
+The final diff review checks source retention and scheduling against actual
+events. A later full suite must not retrospectively reclassify an earlier
+unresolved failure. Direct regressions also exercise a third correction for
+verification after a real edit, quota errors and uncertain native completion.
+This document describes coverage; executed results accompany the P/H report.
 
 Scripted providers establish mechanism and containment only. The
 [eight fixed A/D development outcomes](../../development/native-task-ad/results/README.md)

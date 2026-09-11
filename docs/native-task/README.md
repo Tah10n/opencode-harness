@@ -3,8 +3,8 @@
 `/harness-task` delivers a patch in a separate Git worktree using one native
 OpenCode author session. After initial completion it observes project checks and
 changes to existing tests/fixtures. A concrete reason can return the task and
-factual feedback to the same author once. A checked initial patch with no changed
-existing tests needs no additional model stage. This revision is experimental;
+updated factual feedback to the same author up to three times within one deadline.
+A checked initial patch needs no additional model stage merely because a test changed. This revision is experimental;
 its development results do not establish a recommended production mode.
 
 ## Install and use
@@ -24,8 +24,8 @@ model and variant; the reusable harness fixes neither. Add `--review` during
 materialization to retain the independent diagnostic `/harness-review` command.
 The ordinary OpenCode default is unchanged.
 
-The total timeout includes native bootstrap, author work, checks, the optional
-correction and summary. Its default is 600000 ms, supported range 1000–3600000 ms.
+The total timeout includes native bootstrap, author work, checks, the bounded
+corrections and summary. Its default is 600000 ms, supported range 1000–3600000 ms.
 Native permission rejection, cancellation, quota/native errors and uncertain
 process completion prevent new workflow stages. A native task permission grants
 entry; the author cannot recursively delegate or start another harness workflow.
@@ -41,17 +41,28 @@ check; it cannot replace tests. Echo, Git status and prose are not test evidence
 Other runners, shell compound commands and unavailable execution remain explicitly
 unverified. The host does not execute arbitrary strings from model reports.
 
+Required checks retain their initial task/project source and every execution result.
+The observer binds literal supported task/instruction commands and complete initial
+Node package test routes. A targeted projection of an already required complete
+package route is diagnostic, not another mandatory rerun. Other recognized targeted
+checks have unresolved relevance: their material failures remain limitations.
+Unsupported commands and prose scope cannot be classified automatically. This is
+not a universal relevance analyzer; the author must justify the selected checks
+against the original task, including new behavior and preservation obligations.
+A baseline/environment exception requires actual corresponding initial-state evidence.
+
 Previously executed checks are reused only when current after the last observed
 mutation, including mutations subsequently reverted to identical bytes. Missing
-or failed checks, or changes to existing tests/fixtures, provide a concrete reason
-for one corrective pass. The same author investigates and uses normal native tools
-to run necessary checks within the remaining deadline. After that pass the host
-observes the final state; there is no second correction.
+or failed required/unresolved verification triggers updated factual feedback.
+Up to three corrective replies reuse the same session, directory, edits and tool
+history. Two consecutive replies with the same check problem and no new substantive
+check evidence stop for lack of progress; comments, changed hashes and rephrased
+completion claims alone do not count. Exhausting the bound is not completion.
 
 Original test/fixture bytes, including the user's uncommitted input, are retained.
 Feedback includes exact changed hunks with old/new context and newly added tests.
-Every change to an existing test can require assessment, including additions that
-skip an old branch. Renames and intentional expectation changes are not
+Changed tests carry a coverage warning, including additions that skip an old
+branch; the warning alone never schedules another correction. Renames and intentional expectation changes are not
 mechanically classified as lost coverage. The author must distinguish those from
 separate scenarios that still belong in the delivered suite. No original tests
 are automatically restored over any checkout.
@@ -71,13 +82,14 @@ Evaluation executes candidate code only in the existing isolated containers.
 
 The returned delivery worktree and private artifacts live under the original Git
 administrative directory at `harness-task/<run-id>/`. Retained artifacts include
-original input, initial test bytes, D0, optional D1, final and terminal patches,
-actual tool events, observations and the one feedback message. Adopt the patch
+original input, initial test bytes, D0, D1–D3 when reached, final and terminal patches,
+actual tool events, observations and each updated feedback message. Adopt the patch
 through normal review; the workflow does not apply it to the original checkout.
 Do not publish private task/source/tool artifacts automatically.
 
-`checks_passed` means the supported observed project checks passed on the final
-snapshot. It does not certify all task requirements, test equivalence or complete
+`checks_passed` means the supported required checks passed on the final snapshot
+and no observed required/unresolved failure remains. Diagnostic failures stay in
+the observations; they are not reported as passes. It does not certify all task requirements, test equivalence or complete
 delivery. `incomplete` and `cancelled` preserve the patch and limitations. The
 independent evaluator separately assesses working behavior, necessary delivered
 coverage and regressions.

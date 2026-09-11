@@ -8,7 +8,7 @@ model-backed effectiveness result; [six development outcomes and trace audit](do
 
 Optional native diagnostic review: see [the explicit review command](docs/native-template/NATIVE-REVIEW.md).
 
-For experimental delivery with factual checks and at most one corrective pass, use the
+For experimental delivery with factual checks and up to three corrective replies in one session, use the
 explicit [`/harness-task` workflow](docs/native-task/README.md). Install with
 `--native --task`; delivery stays in its own retained Git worktree so concurrent
 user changes in the original checkout are preserved. Its diagnostic pilot and

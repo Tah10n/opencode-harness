@@ -39,18 +39,21 @@ const fixture=http.createServer(async(req,res)=>{
   const body=JSON.parse(Buffer.concat(chunks)), user=body.messages.findLast(m=>m.role==='user');
   const text=typeof user?.content==='string'?user.content:user?.content?.map(p=>p.text??'').join('\n')??'';
   if(!body.tools?.length){response(res,null,'Fixture title');return;}
-  const stage=text.includes('One corrective pass')?'correction':text.includes('Implement the complete original task')?'implementation':'bootstrap';
-  const key=mode+stage,n=counts.get(key)??0;counts.set(key,n+1);requests.push({mode,stage,n});
+  const stage=text.includes('Corrective pass')?'correction':text.includes('Implement the complete original task')?'implementation':'bootstrap';
+  const pass=stage==='correction'?JSON.parse(text).pass:0;
+  const key=mode+stage+pass,n=counts.get(key)??0;counts.set(key,n+1);requests.push({mode,stage,n});
   const bash=command=>({name:'bash',args:{command,description:'Installed scripted fixture'}});
   if(stage==='bootstrap'){response(res,n===0?{name:'harness_task',args:{}}:null,'Actual workflow result retained');return;}
   let calls=[];
   if(stage==='implementation') {
    if(mode==='container-preflight')calls=[{name:'read',args:{filePath:'value.mjs'}},{name:'glob',args:{pattern:'*.mjs'}},{name:'edit',args:{filePath:'value.mjs',oldString:'export const value = 2;',newString:'export const value = 2; // container\n'}},bash('node --test')];
-   else if(['defect','no-progress'].includes(mode))calls=[bash(writeFixture('value.mjs',source.replace('value = 2','value = 1'))),bash('node --test')];
+   else if(['defect','two-fixes','no-progress','comment-only'].includes(mode))calls=[bash(writeFixture('value.mjs',(mode==='two-fixes'?source.replace('value = 2','value = 1').replace('() => 7','() => 8'):source.replace('value = 2','value = 1')))),bash('node --test')];
    else if(mode==='coverage-loss')calls=[bash(writeFixture('value.test.mjs',reducedTest)),bash('node --test')];
    else if(mode==='intentional')calls=[bash(writeFixture('value.mjs',source.replace('value = 2','value = 3'))),bash(writeFixture('value.test.mjs',originalTest.replace('value,2','value,3'))),bash('node --test')];
    else if(mode==='relocation')calls=[bash('mv value.test.mjs moved.test.mjs'),bash('node --test')];
    else if(['late-check','final-stale'].includes(mode))calls=[bash('node --test'),bash(writeFixture('value.mjs',source+'// last edit\n'))];
+   else if(mode==='diagnostic')calls=[bash('node --test'),bash('node --test --test-name-pattern="[" value.test.mjs')];
+   else if(mode==='unresolved')calls=[bash(writeFixture('value.mjs',source.replace('value = 2','value = 1'))),bash('node --test value.test.mjs')];
    else if(mode==='permission')calls=[bash('printf forbidden')];
    else if(mode==='cancel'||mode==='budget')calls=[bash('node --test'),bash("sleep 30 & sleeper=$!; printf '%s' \"$sleeper\" > sleeper.pid; wait \"$sleeper\"")];
    else if(mode==='concurrent-save')calls=[bash('sleep 0.5'),bash('node --test')];
@@ -66,8 +69,11 @@ const fixture=http.createServer(async(req,res)=>{
    else if(mode==='relocation'){assert.equal(feedback.observations.testChanges[0].assessment,'not_automatically_classified');assert.ok(feedback.observations.addedTests.some(t=>t.content===originalTest));calls=[];}
    else if(mode==='defect'){assert.ok(feedback.observations.checks.some(c=>c.exit===1&&/not ok|✖/.test(c.output)));calls=[bash(writeFixture('value.mjs',source)),bash('node --test')];}
    else if(mode==='late-check')calls=[bash('node --test')];
-   else if(mode==='final-stale')calls=[bash('node --test'),bash(writeFixture('value.mjs',source+'// still stale\n'))];
+   else if(mode==='final-stale')calls=[bash('node --test'),bash(writeFixture('value.mjs',source+'// still stale '+pass+'\n'))];
    else if(mode==='no-progress')calls=[bash('node --test')];
+   else if(mode==='unresolved')calls=[bash('node --test value.test.mjs')];
+   else if(mode==='comment-only')calls=[bash(writeFixture('value.mjs',source.replace('value = 2','value = 1')+'// comment '+pass+'\n')),bash('node --test')];
+   else if(mode==='two-fixes'){assert.ok(feedback.observations.latestChecks.some(c=>c.exit===1));if(pass===2)assert.ok(feedback.observations.latestChecks.some(c=>c.output.includes('8')));calls=[bash(writeFixture('value.mjs',pass===1?source.replace('() => 7','() => 8'):source)),bash('node --test')];}
    else assert.fail('Unexpected corrective stage '+mode);
   }
   response(res,calls[n]??null,stage==='correction'?'Investigated factual feedback; exact result is in the project and native events.':'Implementation finished.');
@@ -88,7 +94,7 @@ const api = async (method, route, body) => { const r = await fetch(`http://127.0
 
 try {
  let ready=false;for(let n=0;n<150;n++){try{await api('GET','/global/health');ready=true;break;}catch{await new Promise(r=>setTimeout(r,100));}}assert.ok(ready,stderr);
- const allModes=['correct','defect','coverage-loss','intentional','relocation','late-check','final-stale','no-progress','permission','cancel','budget','concurrent-save','staged-work','external-save'];
+ const allModes=['diagnostic','unresolved','correct','two-fixes','comment-only','defect','coverage-loss','intentional','relocation','late-check','final-stale','no-progress','permission','cancel','budget','concurrent-save','staged-work','external-save'];
  const selectedModes=process.env.NATIVE_TASK_FIXTURE_MODES?.split(',')??allModes;
  for(mode of selectedModes){
   git('reset','--hard','HEAD');git('clean','-fd');
@@ -127,13 +133,15 @@ try {
   assert.equal(part?.state.status,'completed',JSON.stringify({mode,part,result,temp}));const report=JSON.parse(part.state.output);
   assert.equal(git('ls-files','--stage','-z'),index);
   assert.equal(fs.readFileSync(path.join(project,'value.mjs'),'utf8'),mode==='concurrent-save'?source+'// concurrent USER_SAVE\n':userBytes);
-  const corrected=['defect','coverage-loss','intentional','relocation','late-check','final-stale','no-progress'].includes(mode);
-  assert.equal(report.repairs,corrected?1:0,JSON.stringify(report));assert.deepEqual(Object.keys(report.sessions),['author']);
-  assert.equal(report.status,['no-progress','final-stale','permission','external-save'].includes(mode)?'incomplete':'checks_passed',JSON.stringify(report));
+  const corrected=['defect','two-fixes','comment-only','late-check','final-stale','no-progress'].includes(mode);
+  assert.equal(report.repairs,['two-fixes','comment-only','no-progress','unresolved'].includes(mode)?2:mode==='final-stale'?2:corrected?1:0,JSON.stringify(report));assert.deepEqual(Object.keys(report.sessions),['author']);
+  assert.equal(report.status,['no-progress','comment-only','unresolved','final-stale','permission','external-save'].includes(mode)?'incomplete':'checks_passed',JSON.stringify(report));
   if(corrected){const impl=JSON.parse(fs.readFileSync(path.join(report.artifacts,'implementation-original.json'))),cor=JSON.parse(fs.readFileSync(path.join(report.artifacts,'correction-original.json')));assert.equal(impl.info.sessionID,cor.info.sessionID);}
-  if(mode==='coverage-loss')assert.equal(fs.readFileSync(path.join(report.executionDirectory,'value.test.mjs'),'utf8'),originalTest);
+  if(mode==='coverage-loss'){assert.equal(fs.readFileSync(path.join(report.executionDirectory,'value.test.mjs'),'utf8'),reducedTest);assert.ok(report.observations.coverageWarnings.length);}
   if(mode==='intentional')assert.ok(fs.readFileSync(path.join(report.executionDirectory,'value.test.mjs'),'utf8').includes('value,3'));
   if(mode==='relocation')assert.equal(fs.readFileSync(path.join(report.executionDirectory,'moved.test.mjs'),'utf8'),originalTest);
+  if(mode==='diagnostic'){const c=report.observations.latestChecks.at(-1);assert.equal(c.requirement,'diagnostic');assert.equal(c.exit,1);}
+  if(mode==='unresolved')assert.ok(report.limits.some(l=>l.includes('unresolved task relevance')));
   if(mode==='permission')assert.ok(fs.existsSync(path.join(report.artifacts,'permission-violation.json')));
   if(mode==='external-save')assert.equal(fs.readFileSync(path.join(report.executionDirectory,'value.mjs'),'utf8'),source+'// external edit\n');
   assert.ok(fs.existsSync(path.join(report.artifacts,'D0.patch'))||['external-save','permission'].includes(mode));
