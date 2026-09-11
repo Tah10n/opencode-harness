@@ -1,0 +1,139 @@
+{
+  "passed": true,
+  "scenarios": [
+    {
+      "mode": "unattributed-timeout",
+      "startedSlots": [
+        2
+      ],
+      "scriptedProviderRequests": 0,
+      "realProviderRequests": 0,
+      "status": "paused",
+      "error": null,
+      "lateResponsesForwarded": 0,
+      "latePacketsAttempted": 0,
+      "closedSessions": 1
+    },
+    {
+      "mode": "managed-deadline",
+      "startedSlots": [
+        2,
+        3,
+        4
+      ],
+      "scriptedProviderRequests": 1,
+      "realProviderRequests": 0,
+      "status": "finished",
+      "error": null,
+      "lateResponsesForwarded": 0,
+      "latePacketsAttempted": 0,
+      "closedSessions": 3
+    },
+    {
+      "mode": "late-response",
+      "startedSlots": [
+        2,
+        3,
+        4
+      ],
+      "scriptedProviderRequests": 1,
+      "realProviderRequests": 0,
+      "status": "finished",
+      "error": null,
+      "lateResponsesForwarded": 0,
+      "latePacketsAttempted": 1,
+      "closedSessions": 3
+    },
+    {
+      "mode": "foreign-abort-near-deadline",
+      "startedSlots": [
+        2
+      ],
+      "scriptedProviderRequests": 1,
+      "realProviderRequests": 0,
+      "status": "paused",
+      "error": null,
+      "lateResponsesForwarded": 0,
+      "latePacketsAttempted": 0,
+      "closedSessions": 1
+    },
+    {
+      "mode": "unknown-execution",
+      "startedSlots": [
+        2
+      ],
+      "scriptedProviderRequests": 1,
+      "realProviderRequests": 0,
+      "status": "paused",
+      "error": null,
+      "lateResponsesForwarded": 0,
+      "latePacketsAttempted": 0,
+      "closedSessions": 1
+    },
+    {
+      "mode": "unexplained-disconnect",
+      "startedSlots": [
+        2
+      ],
+      "scriptedProviderRequests": 1,
+      "realProviderRequests": 0,
+      "status": "paused",
+      "error": null,
+      "lateResponsesForwarded": 0,
+      "latePacketsAttempted": 0,
+      "closedSessions": 1
+    },
+    {
+      "mode": "quota",
+      "startedSlots": [
+        2
+      ],
+      "scriptedProviderRequests": 1,
+      "realProviderRequests": 0,
+      "status": "paused",
+      "error": null,
+      "lateResponsesForwarded": 0,
+      "latePacketsAttempted": 0,
+      "closedSessions": 1
+    },
+    {
+      "mode": "authorization",
+      "startedSlots": [
+        2
+      ],
+      "scriptedProviderRequests": 1,
+      "realProviderRequests": 0,
+      "status": "paused",
+      "error": null,
+      "lateResponsesForwarded": 0,
+      "latePacketsAttempted": 0,
+      "closedSessions": 1
+    },
+    {
+      "mode": "capture-failure",
+      "startedSlots": [
+        2
+      ],
+      "scriptedProviderRequests": 0,
+      "realProviderRequests": 0,
+      "status": "paused",
+      "error": null,
+      "lateResponsesForwarded": 0,
+      "latePacketsAttempted": 0,
+      "closedSessions": 1
+    },
+    {
+      "mode": "cleanup-failure",
+      "startedSlots": [
+        2
+      ],
+      "scriptedProviderRequests": 0,
+      "realProviderRequests": 0,
+      "status": "thrown-stop",
+      "error": "Container cleanup failed",
+      "lateResponsesForwarded": 0,
+      "latePacketsAttempted": 0,
+      "closedSessions": 1
+    }
+  ]
+}

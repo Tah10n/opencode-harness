@@ -1,0 +1,951 @@
+{
+  "seriesStatus": "all-four-original-slots-executed",
+  "originalFirstSlotCopiedUnchanged": true,
+  "slots": [
+    {
+      "slot": 1,
+      "task": "legacy-runtime-reload",
+      "arm": "P",
+      "execution": "timeout-and-unknown-submission",
+      "metrics": {
+        "label": "F6",
+        "slot": 1,
+        "task": "legacy-runtime-reload",
+        "arm": "P",
+        "elapsedMs": 900107,
+        "exitCode": null,
+        "timedOut": true,
+        "toolCalls": 99,
+        "sessions": 2,
+        "termination": {
+          "terminationVerified": true,
+          "killed": []
+        },
+        "requests": 51,
+        "requestsWithoutUsage": 1,
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "usage": {
+          "input_tokens": 4494812,
+          "output_tokens": 34160,
+          "total_tokens": 4528972,
+          "cached_tokens": 1521152,
+          "reasoning_tokens": 22755
+        },
+        "requestGroups": {
+          "work": {
+            "requests": 50,
+            "usage": {
+              "input_tokens": 4493703,
+              "output_tokens": 34084,
+              "total_tokens": 4527787,
+              "cached_tokens": 1521152,
+              "reasoning_tokens": 22693
+            }
+          },
+          "title": {
+            "requests": 1,
+            "usage": {
+              "input_tokens": 1109,
+              "output_tokens": 76,
+              "total_tokens": 1185,
+              "cached_tokens": 0,
+              "reasoning_tokens": 62
+            }
+          }
+        },
+        "workflowStatus": null,
+        "repairs": null,
+        "workflowStopReason": null,
+        "workflowLimits": null,
+        "stages": [],
+        "billedAmount": null,
+        "usageCompleteness": "lower-bound; one forwarded request has no terminal response or usage"
+      },
+      "frozenEvaluation": [
+        {
+          "label": "F6",
+          "slot": 1,
+          "task": "legacy-runtime-reload",
+          "arm": "P",
+          "phase": "final",
+          "passed": true,
+          "checks": {
+            "ordinary": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 25,
+                "pass": 24,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 1
+              }
+            },
+            "consumers": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 3,
+                "pass": 3,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 0
+              }
+            },
+            "preservation": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 24,
+                "pass": 23,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 1
+              }
+            },
+            "preserved-consumers": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 2,
+                "pass": 2,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 0
+              }
+            },
+            "fresh-process-migration": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 1,
+                "pass": 1,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 0
+              }
+            },
+            "legacy-preservation": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 9,
+                "pass": 9,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 0
+              }
+            },
+            "cleanup": 0
+          }
+        }
+      ],
+      "completeDelivery": false,
+      "assessment": {
+        "fixed": [
+          "Directory link counts no longer reject the full historical layout.",
+          "Added migration/repeat-loading regression with a fresh child process; ordinary relevant tests pass."
+        ],
+        "remaining": [
+          "When prepareRuntime receives the retained old launcher URL, current libraries are selected but the old launcher bytes are copied into the versioned runtime. Separate post-run CLI diagnosis fails."
+        ],
+        "coverageLimitations": [
+          "Authored migration fixture copies the current launcher into its historical tree, masking the old-launcher/current-library mismatch.",
+          "Authored invalid-layout cases all use nonempty custom state directories, which have an independent fail-closed rule; they lack a valid positive control in that same starting location."
+        ],
+        "harnessEffect": null
+      }
+    },
+    {
+      "slot": 2,
+      "task": "legacy-runtime-reload",
+      "arm": "H",
+      "execution": "process-exited",
+      "metrics": {
+        "label": "J3",
+        "slot": 2,
+        "task": "legacy-runtime-reload",
+        "arm": "H",
+        "elapsedMs": 341348,
+        "exitCode": 0,
+        "timedOut": false,
+        "toolCalls": 48,
+        "sessions": 2,
+        "termination": {
+          "terminationVerified": true,
+          "killed": []
+        },
+        "requests": 32,
+        "requestsWithoutUsage": 0,
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "usage": {
+          "input_tokens": 1658022,
+          "output_tokens": 12371,
+          "total_tokens": 1670393,
+          "cached_tokens": 591360,
+          "reasoning_tokens": 8722
+        },
+        "requestGroups": {
+          "work": {
+            "requests": 31,
+            "usage": {
+              "input_tokens": 1657445,
+              "output_tokens": 12273,
+              "total_tokens": 1669718,
+              "cached_tokens": 591360,
+              "reasoning_tokens": 8635
+            }
+          },
+          "title": {
+            "requests": 1,
+            "usage": {
+              "input_tokens": 577,
+              "output_tokens": 98,
+              "total_tokens": 675,
+              "cached_tokens": 0,
+              "reasoning_tokens": 87
+            }
+          }
+        },
+        "ownTaskDeadlineTriggered": false,
+        "workflowStatus": "incomplete",
+        "workflowResultAvailable": true,
+        "repairs": 0,
+        "workflowStopReason": null,
+        "workflowLimits": [
+          "Native permission boundary rejected a tool; no evidence correction admitted",
+          "Terminal state or processes differ from the observed delivery"
+        ],
+        "stages": [
+          {
+            "phase": "D0",
+            "role": "implementation",
+            "elapsedMs": 332521,
+            "completed": true,
+            "snapshotAvailable": false,
+            "requests": 29,
+            "requestsWithoutUsage": 0,
+            "usage": {
+              "input_tokens": 1643816,
+              "output_tokens": 12125,
+              "total_tokens": 1655941,
+              "cached_tokens": 591360,
+              "reasoning_tokens": 8571
+            },
+            "remaining": null,
+            "attribution": "forwarded work requests within native author-session user-turn windows"
+          },
+          {
+            "phase": "bootstrap-return-and-title",
+            "requests": 3,
+            "requestsWithoutUsage": 0,
+            "usage": {
+              "input_tokens": 14206,
+              "output_tokens": 246,
+              "total_tokens": 14452,
+              "cached_tokens": 0,
+              "reasoning_tokens": 151
+            }
+          }
+        ],
+        "billedAmount": null,
+        "usageCompleteness": "all forwarded requests have reported usage"
+      },
+      "frozenEvaluation": [
+        {
+          "label": "J3",
+          "slot": 2,
+          "task": "legacy-runtime-reload",
+          "arm": "H",
+          "phase": "final",
+          "sourceDigest": "legacy-runtime-reload:5c747334fea0006c049e639d53fb8392cf782d8d87cf98fa8c700082d7f8af11",
+          "passed": false,
+          "checks": {
+            "ordinary": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 24,
+                "pass": 23,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 1
+              }
+            },
+            "consumers": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 2,
+                "pass": 2,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 0
+              }
+            },
+            "preservation": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 24,
+                "pass": 23,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 1
+              }
+            },
+            "preserved-consumers": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 2,
+                "pass": 2,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 0
+              }
+            },
+            "fresh-process-migration": {
+              "code": 1,
+              "timedOut": false,
+              "counts": {
+                "tests": 1,
+                "pass": 0,
+                "fail": 1,
+                "cancelled": 0,
+                "skipped": 0
+              }
+            },
+            "legacy-preservation": {
+              "code": 1,
+              "timedOut": false,
+              "counts": {
+                "tests": 9,
+                "pass": 8,
+                "fail": 1,
+                "cancelled": 0,
+                "skipped": 0
+              }
+            },
+            "cleanup": 0
+          }
+        }
+      ],
+      "completeDelivery": false,
+      "assessment": {
+        "fixed": [],
+        "remaining": [
+          "Final public snapshot equals supplied input; no author fix or D0 patch.",
+          "Migration and legacy-acceptance tests fail at unrelated entry lib."
+        ],
+        "coverageLimitations": [
+          "Native permission boundary denied tools; no correction admitted."
+        ]
+      }
+    },
+    {
+      "slot": 3,
+      "task": "reconnect-revoked",
+      "arm": "H",
+      "execution": "controlled-task-timeout",
+      "metrics": {
+        "label": "N8",
+        "slot": 3,
+        "task": "reconnect-revoked",
+        "arm": "H",
+        "elapsedMs": 900157,
+        "exitCode": null,
+        "timedOut": true,
+        "toolCalls": 103,
+        "sessions": 2,
+        "termination": {
+          "terminationVerified": true,
+          "killed": []
+        },
+        "requests": 90,
+        "requestsWithoutUsage": 1,
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "usage": {
+          "input_tokens": 9221268,
+          "output_tokens": 32715,
+          "total_tokens": 9253983,
+          "cached_tokens": 5479936,
+          "reasoning_tokens": 18351
+        },
+        "requestGroups": {
+          "work": {
+            "requests": 89,
+            "usage": {
+              "input_tokens": 9220691,
+              "output_tokens": 32614,
+              "total_tokens": 9253305,
+              "cached_tokens": 5479936,
+              "reasoning_tokens": 18262
+            }
+          },
+          "title": {
+            "requests": 1,
+            "usage": {
+              "input_tokens": 577,
+              "output_tokens": 101,
+              "total_tokens": 678,
+              "cached_tokens": 0,
+              "reasoning_tokens": 89
+            }
+          }
+        },
+        "ownTaskDeadlineTriggered": true,
+        "workflowStatus": "incomplete",
+        "workflowResultAvailable": true,
+        "repairs": 3,
+        "workflowStopReason": null,
+        "workflowLimits": [],
+        "stages": [
+          {
+            "phase": "D0",
+            "role": "implementation",
+            "elapsedMs": 462868,
+            "completed": true,
+            "snapshotAvailable": true,
+            "requests": 47,
+            "requestsWithoutUsage": 0,
+            "usage": {
+              "input_tokens": 3661571,
+              "output_tokens": 17068,
+              "total_tokens": 3678639,
+              "cached_tokens": 1662976,
+              "reasoning_tokens": 9797
+            },
+            "remaining": [
+              "Explicit project/task check not observed: node --test --test-name-pattern=reconnect packages/connector/test/config.test.mjs"
+            ],
+            "attribution": "forwarded work requests within native author-session user-turn windows"
+          },
+          {
+            "phase": "D1",
+            "role": "correction",
+            "elapsedMs": 407435,
+            "completed": true,
+            "snapshotAvailable": true,
+            "requests": 39,
+            "requestsWithoutUsage": 0,
+            "usage": {
+              "input_tokens": 5374195,
+              "output_tokens": 14858,
+              "total_tokens": 5389053,
+              "cached_tokens": 3667968,
+              "reasoning_tokens": 7943
+            },
+            "remaining": [
+              "Missing final verification after the last mutation: node --test --test-concurrency=1 --test-name-pattern=reconnect packages/connector/test/config.test.mjs"
+            ],
+            "attribution": "forwarded work requests within native author-session user-turn windows"
+          },
+          {
+            "phase": "D2",
+            "role": "correction-2",
+            "elapsedMs": 20023,
+            "completed": true,
+            "snapshotAvailable": true,
+            "requests": 1,
+            "requestsWithoutUsage": 0,
+            "usage": {
+              "input_tokens": 178261,
+              "output_tokens": 649,
+              "total_tokens": 178910,
+              "cached_tokens": 148992,
+              "reasoning_tokens": 500
+            },
+            "remaining": [
+              "Missing final verification after the last mutation: node --test --test-concurrency=1 --test-name-pattern=reconnect packages/connector/test/config.test.mjs"
+            ],
+            "attribution": "forwarded work requests within native author-session user-turn windows"
+          },
+          {
+            "phase": "D3",
+            "role": "correction-3-unfinished",
+            "elapsedMs": null,
+            "completed": false,
+            "snapshotAvailable": false,
+            "requests": 1,
+            "requestsWithoutUsage": 1,
+            "usage": {
+              "input_tokens": null,
+              "output_tokens": null,
+              "total_tokens": null,
+              "cached_tokens": null,
+              "reasoning_tokens": null
+            },
+            "remaining": null,
+            "attribution": "forwarded work requests within native author-session user-turn windows"
+          },
+          {
+            "phase": "bootstrap-return-and-title",
+            "requests": 2,
+            "requestsWithoutUsage": 0,
+            "usage": {
+              "input_tokens": 7241,
+              "output_tokens": 140,
+              "total_tokens": 7381,
+              "cached_tokens": 0,
+              "reasoning_tokens": 111
+            }
+          }
+        ],
+        "billedAmount": null,
+        "usageCompleteness": "lower-bound; missing request usage"
+      },
+      "frozenEvaluation": [
+        {
+          "label": "N8",
+          "slot": 3,
+          "task": "reconnect-revoked",
+          "arm": "H",
+          "phase": "final",
+          "sourceDigest": "reconnect-revoked:774b8544a59fae62c823b9db97989939ad1dc0b93f1f640e766382fd7770d360",
+          "passed": true,
+          "checks": {
+            "ordinary": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 25,
+                "pass": 24,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 1
+              }
+            },
+            "consumers": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 6,
+                "pass": 6,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 0
+              }
+            },
+            "preservation": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 25,
+                "pass": 24,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 1
+              }
+            },
+            "independent-reconnect": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 4,
+                "pass": 4,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 0
+              }
+            },
+            "lifecycle-preservation": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 5,
+                "pass": 5,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 0
+              }
+            },
+            "cleanup": 0
+          }
+        },
+        {
+          "label": "N8",
+          "slot": 3,
+          "task": "reconnect-revoked",
+          "arm": "H",
+          "phase": "D0",
+          "sourceDigest": "reconnect-revoked:40b943758f928b26571d64cf2104f428ef4da7e1fe016f669c38f5f7cba9f04f",
+          "passed": true,
+          "checks": {
+            "ordinary": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 25,
+                "pass": 24,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 1
+              }
+            },
+            "consumers": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 5,
+                "pass": 5,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 0
+              }
+            },
+            "preservation": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 25,
+                "pass": 24,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 1
+              }
+            },
+            "independent-reconnect": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 4,
+                "pass": 4,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 0
+              }
+            },
+            "lifecycle-preservation": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 5,
+                "pass": 5,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 0
+              }
+            },
+            "cleanup": 0
+          }
+        },
+        {
+          "label": "N8",
+          "slot": 3,
+          "task": "reconnect-revoked",
+          "arm": "H",
+          "phase": "D1",
+          "sourceDigest": "reconnect-revoked:56a9414b4034619577194b647144441e19895c1f52b8898f4a794bfbc1364cb2",
+          "passed": true,
+          "checks": {
+            "ordinary": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 25,
+                "pass": 24,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 1
+              }
+            },
+            "consumers": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 6,
+                "pass": 6,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 0
+              }
+            },
+            "preservation": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 25,
+                "pass": 24,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 1
+              }
+            },
+            "independent-reconnect": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 4,
+                "pass": 4,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 0
+              }
+            },
+            "lifecycle-preservation": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 5,
+                "pass": 5,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 0
+              }
+            },
+            "cleanup": 0
+          }
+        },
+        {
+          "label": "N8",
+          "slot": 3,
+          "task": "reconnect-revoked",
+          "arm": "H",
+          "phase": "D2",
+          "sourceDigest": "reconnect-revoked:56a9414b4034619577194b647144441e19895c1f52b8898f4a794bfbc1364cb2",
+          "passed": true,
+          "checks": {
+            "ordinary": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 25,
+                "pass": 24,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 1
+              }
+            },
+            "consumers": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 6,
+                "pass": 6,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 0
+              }
+            },
+            "preservation": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 25,
+                "pass": 24,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 1
+              }
+            },
+            "independent-reconnect": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 4,
+                "pass": 4,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 0
+              }
+            },
+            "lifecycle-preservation": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 5,
+                "pass": 5,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 0
+              }
+            },
+            "cleanup": 0
+          },
+          "reusedFromPhase": "D1",
+          "identicalSourceBytesAndModes": true
+        }
+      ],
+      "completeDelivery": false,
+      "assessment": {
+        "fixed": [
+          "D0 propagates malformed 401/403 status and adds auxiliary cleanup assertions.",
+          "D1 adds and executes a separate connected-installation 403 regression without an abandoned pairing."
+        ],
+        "remaining": [
+          "Combined disconnected regression follows 401/403 without restoring retired mapping; the scenario has lost its required starting state."
+        ],
+        "coverageLimitations": [
+          "Workflow timed out during correction 3; no completed D3 snapshot."
+        ],
+        "D0CompleteDelivery": false,
+        "D1CompleteDelivery": false,
+        "D2CompleteDelivery": false,
+        "newRegressionsBetweenD0AndFinal": []
+      }
+    },
+    {
+      "slot": 4,
+      "task": "reconnect-revoked",
+      "arm": "P",
+      "execution": "process-exited",
+      "metrics": {
+        "label": "T2",
+        "slot": 4,
+        "task": "reconnect-revoked",
+        "arm": "P",
+        "elapsedMs": 404761,
+        "exitCode": 0,
+        "timedOut": false,
+        "toolCalls": 69,
+        "sessions": 1,
+        "termination": {
+          "terminationVerified": true,
+          "killed": []
+        },
+        "requests": 39,
+        "requestsWithoutUsage": 0,
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "usage": {
+          "input_tokens": 3683434,
+          "output_tokens": 15348,
+          "total_tokens": 3698782,
+          "cached_tokens": 1248768,
+          "reasoning_tokens": 9078
+        },
+        "requestGroups": {
+          "work": {
+            "requests": 38,
+            "usage": {
+              "input_tokens": 3682393,
+              "output_tokens": 15257,
+              "total_tokens": 3697650,
+              "cached_tokens": 1248768,
+              "reasoning_tokens": 9001
+            }
+          },
+          "title": {
+            "requests": 1,
+            "usage": {
+              "input_tokens": 1041,
+              "output_tokens": 91,
+              "total_tokens": 1132,
+              "cached_tokens": 0,
+              "reasoning_tokens": 77
+            }
+          }
+        },
+        "ownTaskDeadlineTriggered": false,
+        "workflowStatus": null,
+        "workflowResultAvailable": false,
+        "repairs": null,
+        "workflowStopReason": null,
+        "workflowLimits": null,
+        "stages": [],
+        "billedAmount": null,
+        "usageCompleteness": "all forwarded requests have reported usage"
+      },
+      "frozenEvaluation": [
+        {
+          "label": "T2",
+          "slot": 4,
+          "task": "reconnect-revoked",
+          "arm": "P",
+          "phase": "final",
+          "sourceDigest": "reconnect-revoked:3f27c69c0d220d9749a2c17d61f2334995bb6562e61466d66507c5f1d4a13cb9",
+          "passed": true,
+          "checks": {
+            "ordinary": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 25,
+                "pass": 24,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 1
+              }
+            },
+            "consumers": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 5,
+                "pass": 5,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 0
+              }
+            },
+            "preservation": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 25,
+                "pass": 24,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 1
+              }
+            },
+            "independent-reconnect": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 4,
+                "pass": 4,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 0
+              }
+            },
+            "lifecycle-preservation": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 5,
+                "pass": 5,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 0
+              }
+            },
+            "cleanup": 0
+          }
+        }
+      ],
+      "completeDelivery": true,
+      "assessment": {
+        "fixed": [
+          "Disconnected scenario executes before revocation while both source mappings remain.",
+          "401/403 tests inspect mandatory authorization/auxiliary removal before pairing, preserve stable identity, and assert cleanup warning."
+        ],
+        "remaining": [],
+        "coverageLimitations": [
+          "Scoped Linux/container evidence; no full platform matrix."
+        ]
+      }
+    }
+  ],
+  "wholeDeliveryCounts": {
+    "P": {
+      "complete": 1,
+      "total": 2
+    },
+    "H": {
+      "complete": 0,
+      "total": 2
+    }
+  },
+  "claim": "Selected known-task development diagnosis; no demonstrated general harness improvement; execution and delivery separate.",
+  "unknownUsageRequests": 2,
+  "billedAmount": null,
+  "manualActionsRuns": 0,
+  "fullPlatformMatrixExecutions": 0,
+  "modelRetries": 0
+}

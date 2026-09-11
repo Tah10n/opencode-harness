@@ -1,0 +1,175 @@
+diff --git a/packages/connector/README.md b/packages/connector/README.md
+index 5a1e8c6..474e479 100644
+--- a/packages/connector/README.md
++++ b/packages/connector/README.md
+@@ -106,6 +106,12 @@ runtime and owned hooks; its server reconciliation shares the sync lock, and it
+ usage unless the user separately runs `viberacing sync`. A successful compatible reconnect,
+ authenticated sync, or doctor server check clears a prior version-upgrade automatic-sync disable.
+ 
++An older connector state directory is migrated when it contains the exact historical flat runtime:
++`bin/viberacing.mjs`, the seven supported files under `lib/`, and the ten historical adapter files
++under `lib/adapters/`. Those files are retained for ownership and identity recognition while the
++current runtime is installed under the versioned `runtime/` directory. Unknown entries, nesting,
++executables, or symlinks are rejected rather than treated as connector state.
++
+ Codex, Claude Code, Kimi Code, Qwen Code, and Gemini CLI install supported lifecycle triggers.
+ Qwen's trigger currently covers interactive TUI and ACP lifecycle events, not headless `qwen -p`
+ exits. OpenCode uses its read-only SQLite store and a documented `sync`; Antigravity requires the
+diff --git a/packages/connector/lib/config.mjs b/packages/connector/lib/config.mjs
+index bf11763..779873c 100644
+--- a/packages/connector/lib/config.mjs
++++ b/packages/connector/lib/config.mjs
+@@ -73,6 +73,27 @@ const legacyCollectionMethods = new Set([
+   "opencode\0opencode_sqlite",
+   "qwen_code\0qwen_stats_jsonl",
+ ]);
++const legacyRuntimeFiles = new Set([
++  "bin/viberacing.mjs",
++  "lib/browser.mjs",
++  "lib/config.mjs",
++  "lib/executables.mjs",
++  "lib/readers.mjs",
++  "lib/registry.mjs",
++  "lib/runtime.mjs",
++  ...[
++    "antigravity",
++    "claude",
++    "codex",
++    "cursor",
++    "gemini",
++    "kimi",
++    "opencode",
++    "qwen-settings",
++    "qwen",
++    "shared",
++  ].map((name) => `lib/adapters/${name}.mjs`),
++]);
+ 
+ function isStateMigrationArtifact(relativePath) {
+   return (
+@@ -96,8 +117,9 @@ function isInstalledRuntimeExecutable(path) {
+   );
+ }
+ 
+-function ownedStatePath(path, info) {
++function ownedStatePath(path, info, legacyPaths = new Set()) {
+   const parts = relative(stateDirectory, path).split(/[\\/]/);
++  if (legacyPaths.has(relative(stateDirectory, path))) return info.isFile() || info.isDirectory();
+   const [top] = parts;
+   if (parts.length === 1) {
+     if (top === ".viberacing-state") return info.isFile();
+@@ -160,7 +182,7 @@ function ownedTopLevelName(name) {
+   );
+ }
+ 
+-async function inspectOwnedStateTree(path, paths = [stateDirectory]) {
++async function inspectOwnedStateTree(path, paths = [stateDirectory], legacyPaths = new Set()) {
+   for (const entry of await readdir(path, { withFileTypes: true })) {
+     const child = join(path, entry.name);
+     const info = await lstat(child);
+@@ -172,7 +194,7 @@ async function inspectOwnedStateTree(path, paths = [stateDirectory]) {
+       throw new Error(
+         `Vibe Racing state contains an unsupported entry: ${relative(stateDirectory, child)}`,
+       );
+-    if (!ownedStatePath(child, info))
++    if (!ownedStatePath(child, info, legacyPaths))
+       throw new Error(
+         `Vibe Racing state contains an unrelated entry: ${relative(stateDirectory, child)}`,
+       );
+@@ -185,8 +207,42 @@ async function inspectOwnedStateTree(path, paths = [stateDirectory]) {
+         `Vibe Racing state contains an entry owned by another user: ${relative(stateDirectory, child)}`,
+       );
+     paths.push(child);
+-    if (info.isDirectory()) await inspectOwnedStateTree(child, paths);
++    if (info.isDirectory()) await inspectOwnedStateTree(child, paths, legacyPaths);
++  }
++  return paths;
++}
++
++async function recognizedLegacyRuntimePaths() {
++  const paths = new Set(["bin", "lib", "lib/adapters"]);
++  let entries;
++  try {
++    entries = await readdir(stateDirectory, { withFileTypes: true });
++  } catch (error) {
++    if (error?.code === "ENOENT") return new Set();
++    throw error;
+   }
++  const names = new Set(entries.map((entry) => entry.name));
++  if (!names.has("bin") || !names.has("lib")) return new Set();
++  const expected = new Set(["bin", "lib", "lib/adapters", ...legacyRuntimeFiles]);
++  const visit = async (directory, prefix = "") => {
++    for (const entry of await readdir(directory, { withFileTypes: true })) {
++      const relativePath = `${prefix}${entry.name}`;
++      if (!expected.has(relativePath)) return false;
++      const info = await lstat(join(directory, entry.name));
++      if (info.isSymbolicLink() || (!info.isDirectory() && !info.isFile()) || info.nlink !== 1)
++        return false;
++      if (info.isDirectory()) {
++        if (!(await visit(join(directory, entry.name), `${relativePath}/`))) return false;
++      } else paths.add(relativePath);
++    }
++    return true;
++  };
++  if (
++    !(await visit(join(stateDirectory, "bin"), "bin/")) ||
++    !(await visit(join(stateDirectory, "lib"), "lib/")) ||
++    paths.size !== legacyRuntimeFiles.size + 3
++  )
++    return new Set();
+   return paths;
+ }
+ 
+@@ -313,19 +369,22 @@ async function markedStatePaths() {
+   }
+   if (marker?.format !== 1 || Object.keys(marker).length !== 1)
+     throw new Error("Vibe Racing state marker is invalid");
++  const legacyPaths = await recognizedLegacyRuntimePaths();
+   const paths = [stateDirectory, stateMarkerPath];
+   for (const entry of await readdir(stateDirectory, { withFileTypes: true })) {
+     if (entry.name === ".viberacing-state") continue;
+     const child = join(stateDirectory, entry.name);
+     const info = await lstat(child);
+-    if (!ownedTopLevelName(entry.name)) continue;
++    if (!ownedTopLevelName(entry.name) && !legacyPaths.has(entry.name)) continue;
+     if (
+       info.isSymbolicLink() ||
+       (info.isFile() && info.nlink !== 1) ||
+-      !ownedStatePath(child, info)
++      !ownedStatePath(child, info, legacyPaths)
+     )
+       throw new Error(`Vibe Racing state contains an unsafe owned entry: ${entry.name}`);
+     paths.push(child);
++    if (info.isDirectory() && legacyPaths.has(entry.name))
++      paths.push(...(await inspectOwnedStateTree(child, [child], legacyPaths)).slice(1));
+   }
+   return paths;
+ }
+@@ -396,7 +455,8 @@ async function secureStateDirectory() {
+   const marked = await markedStatePaths();
+   if (marked) return secureStatePaths(marked);
+ 
+-  const preflightPaths = await inspectOwnedStateTree(stateDirectory);
++  const legacyPaths = await recognizedLegacyRuntimePaths();
++  const preflightPaths = await inspectOwnedStateTree(stateDirectory, [stateDirectory], legacyPaths);
+   const substantivePreflightPaths = substantiveStatePaths(preflightPaths);
+   const nonempty = substantivePreflightPaths.length > 1;
+   if (nonempty && stateDirectory !== defaultStateDirectory)
+@@ -415,12 +475,14 @@ async function secureStateDirectory() {
+     await removeOrphanedStateMigrationArtifacts();
+     const alreadyMarked = await markedStatePaths();
+     if (alreadyMarked) return secureStatePaths(alreadyMarked);
+-    const legacyPaths = substantiveStatePaths(await inspectOwnedStateTree(stateDirectory));
+-    if (JSON.stringify(migrationSnapshot(legacyPaths)) !== JSON.stringify(preflightSnapshot))
++    const migratedPaths = substantiveStatePaths(
++      await inspectOwnedStateTree(stateDirectory, [stateDirectory], legacyPaths),
++    );
++    if (JSON.stringify(migrationSnapshot(migratedPaths)) !== JSON.stringify(preflightSnapshot))
+       throw new Error("Vibe Racing state changed during migration");
+     if (nonempty && !(await validLegacyStateEvidence()))
+       throw new Error("Legacy Vibe Racing state changed during migration");
+-    await secureStatePaths(legacyPaths);
++    await secureStatePaths(migratedPaths);
+     if (nonempty && !(await validLegacyStateEvidence()))
+       throw new Error("Legacy Vibe Racing state changed while being secured");
+     await writeStateMarker();

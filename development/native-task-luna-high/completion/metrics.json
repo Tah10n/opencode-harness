@@ -1,0 +1,353 @@
+[
+  {
+    "label": "F6",
+    "slot": 1,
+    "task": "legacy-runtime-reload",
+    "arm": "P",
+    "elapsedMs": 900107,
+    "exitCode": null,
+    "timedOut": true,
+    "toolCalls": 99,
+    "sessions": 2,
+    "termination": {
+      "terminationVerified": true,
+      "killed": []
+    },
+    "requests": 51,
+    "requestsWithoutUsage": 1,
+    "model": "gpt-5.6-luna",
+    "effort": "high",
+    "usage": {
+      "input_tokens": 4494812,
+      "output_tokens": 34160,
+      "total_tokens": 4528972,
+      "cached_tokens": 1521152,
+      "reasoning_tokens": 22755
+    },
+    "requestGroups": {
+      "work": {
+        "requests": 50,
+        "usage": {
+          "input_tokens": 4493703,
+          "output_tokens": 34084,
+          "total_tokens": 4527787,
+          "cached_tokens": 1521152,
+          "reasoning_tokens": 22693
+        }
+      },
+      "title": {
+        "requests": 1,
+        "usage": {
+          "input_tokens": 1109,
+          "output_tokens": 76,
+          "total_tokens": 1185,
+          "cached_tokens": 0,
+          "reasoning_tokens": 62
+        }
+      }
+    },
+    "workflowStatus": null,
+    "repairs": null,
+    "workflowStopReason": null,
+    "workflowLimits": null,
+    "stages": [],
+    "billedAmount": null,
+    "usageCompleteness": "lower-bound; one forwarded request has no terminal response or usage"
+  },
+  {
+    "label": "J3",
+    "slot": 2,
+    "task": "legacy-runtime-reload",
+    "arm": "H",
+    "elapsedMs": 341348,
+    "exitCode": 0,
+    "timedOut": false,
+    "toolCalls": 48,
+    "sessions": 2,
+    "termination": {
+      "terminationVerified": true,
+      "killed": []
+    },
+    "requests": 32,
+    "requestsWithoutUsage": 0,
+    "model": "gpt-5.6-luna",
+    "effort": "high",
+    "usage": {
+      "input_tokens": 1658022,
+      "output_tokens": 12371,
+      "total_tokens": 1670393,
+      "cached_tokens": 591360,
+      "reasoning_tokens": 8722
+    },
+    "requestGroups": {
+      "work": {
+        "requests": 31,
+        "usage": {
+          "input_tokens": 1657445,
+          "output_tokens": 12273,
+          "total_tokens": 1669718,
+          "cached_tokens": 591360,
+          "reasoning_tokens": 8635
+        }
+      },
+      "title": {
+        "requests": 1,
+        "usage": {
+          "input_tokens": 577,
+          "output_tokens": 98,
+          "total_tokens": 675,
+          "cached_tokens": 0,
+          "reasoning_tokens": 87
+        }
+      }
+    },
+    "ownTaskDeadlineTriggered": false,
+    "workflowStatus": "incomplete",
+    "workflowResultAvailable": true,
+    "repairs": 0,
+    "workflowStopReason": null,
+    "workflowLimits": [
+      "Native permission boundary rejected a tool; no evidence correction admitted",
+      "Terminal state or processes differ from the observed delivery"
+    ],
+    "stages": [
+      {
+        "phase": "D0",
+        "role": "implementation",
+        "elapsedMs": 332521,
+        "completed": true,
+        "snapshotAvailable": false,
+        "requests": 29,
+        "requestsWithoutUsage": 0,
+        "usage": {
+          "input_tokens": 1643816,
+          "output_tokens": 12125,
+          "total_tokens": 1655941,
+          "cached_tokens": 591360,
+          "reasoning_tokens": 8571
+        },
+        "remaining": null,
+        "attribution": "forwarded work requests within native author-session user-turn windows"
+      },
+      {
+        "phase": "bootstrap-return-and-title",
+        "requests": 3,
+        "requestsWithoutUsage": 0,
+        "usage": {
+          "input_tokens": 14206,
+          "output_tokens": 246,
+          "total_tokens": 14452,
+          "cached_tokens": 0,
+          "reasoning_tokens": 151
+        }
+      }
+    ],
+    "billedAmount": null,
+    "usageCompleteness": "all forwarded requests have reported usage"
+  },
+  {
+    "label": "N8",
+    "slot": 3,
+    "task": "reconnect-revoked",
+    "arm": "H",
+    "elapsedMs": 900157,
+    "exitCode": null,
+    "timedOut": true,
+    "toolCalls": 103,
+    "sessions": 2,
+    "termination": {
+      "terminationVerified": true,
+      "killed": []
+    },
+    "requests": 90,
+    "requestsWithoutUsage": 1,
+    "model": "gpt-5.6-luna",
+    "effort": "high",
+    "usage": {
+      "input_tokens": 9221268,
+      "output_tokens": 32715,
+      "total_tokens": 9253983,
+      "cached_tokens": 5479936,
+      "reasoning_tokens": 18351
+    },
+    "requestGroups": {
+      "work": {
+        "requests": 89,
+        "usage": {
+          "input_tokens": 9220691,
+          "output_tokens": 32614,
+          "total_tokens": 9253305,
+          "cached_tokens": 5479936,
+          "reasoning_tokens": 18262
+        }
+      },
+      "title": {
+        "requests": 1,
+        "usage": {
+          "input_tokens": 577,
+          "output_tokens": 101,
+          "total_tokens": 678,
+          "cached_tokens": 0,
+          "reasoning_tokens": 89
+        }
+      }
+    },
+    "ownTaskDeadlineTriggered": true,
+    "workflowStatus": "incomplete",
+    "workflowResultAvailable": true,
+    "repairs": 3,
+    "workflowStopReason": null,
+    "workflowLimits": [],
+    "stages": [
+      {
+        "phase": "D0",
+        "role": "implementation",
+        "elapsedMs": 462868,
+        "completed": true,
+        "snapshotAvailable": true,
+        "requests": 47,
+        "requestsWithoutUsage": 0,
+        "usage": {
+          "input_tokens": 3661571,
+          "output_tokens": 17068,
+          "total_tokens": 3678639,
+          "cached_tokens": 1662976,
+          "reasoning_tokens": 9797
+        },
+        "remaining": [
+          "Explicit project/task check not observed: node --test --test-name-pattern=reconnect packages/connector/test/config.test.mjs"
+        ],
+        "attribution": "forwarded work requests within native author-session user-turn windows"
+      },
+      {
+        "phase": "D1",
+        "role": "correction",
+        "elapsedMs": 407435,
+        "completed": true,
+        "snapshotAvailable": true,
+        "requests": 39,
+        "requestsWithoutUsage": 0,
+        "usage": {
+          "input_tokens": 5374195,
+          "output_tokens": 14858,
+          "total_tokens": 5389053,
+          "cached_tokens": 3667968,
+          "reasoning_tokens": 7943
+        },
+        "remaining": [
+          "Missing final verification after the last mutation: node --test --test-concurrency=1 --test-name-pattern=reconnect packages/connector/test/config.test.mjs"
+        ],
+        "attribution": "forwarded work requests within native author-session user-turn windows"
+      },
+      {
+        "phase": "D2",
+        "role": "correction-2",
+        "elapsedMs": 20023,
+        "completed": true,
+        "snapshotAvailable": true,
+        "requests": 1,
+        "requestsWithoutUsage": 0,
+        "usage": {
+          "input_tokens": 178261,
+          "output_tokens": 649,
+          "total_tokens": 178910,
+          "cached_tokens": 148992,
+          "reasoning_tokens": 500
+        },
+        "remaining": [
+          "Missing final verification after the last mutation: node --test --test-concurrency=1 --test-name-pattern=reconnect packages/connector/test/config.test.mjs"
+        ],
+        "attribution": "forwarded work requests within native author-session user-turn windows"
+      },
+      {
+        "phase": "D3",
+        "role": "correction-3-unfinished",
+        "elapsedMs": null,
+        "completed": false,
+        "snapshotAvailable": false,
+        "requests": 1,
+        "requestsWithoutUsage": 1,
+        "usage": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "total_tokens": null,
+          "cached_tokens": null,
+          "reasoning_tokens": null
+        },
+        "remaining": null,
+        "attribution": "forwarded work requests within native author-session user-turn windows"
+      },
+      {
+        "phase": "bootstrap-return-and-title",
+        "requests": 2,
+        "requestsWithoutUsage": 0,
+        "usage": {
+          "input_tokens": 7241,
+          "output_tokens": 140,
+          "total_tokens": 7381,
+          "cached_tokens": 0,
+          "reasoning_tokens": 111
+        }
+      }
+    ],
+    "billedAmount": null,
+    "usageCompleteness": "lower-bound; missing request usage"
+  },
+  {
+    "label": "T2",
+    "slot": 4,
+    "task": "reconnect-revoked",
+    "arm": "P",
+    "elapsedMs": 404761,
+    "exitCode": 0,
+    "timedOut": false,
+    "toolCalls": 69,
+    "sessions": 1,
+    "termination": {
+      "terminationVerified": true,
+      "killed": []
+    },
+    "requests": 39,
+    "requestsWithoutUsage": 0,
+    "model": "gpt-5.6-luna",
+    "effort": "high",
+    "usage": {
+      "input_tokens": 3683434,
+      "output_tokens": 15348,
+      "total_tokens": 3698782,
+      "cached_tokens": 1248768,
+      "reasoning_tokens": 9078
+    },
+    "requestGroups": {
+      "work": {
+        "requests": 38,
+        "usage": {
+          "input_tokens": 3682393,
+          "output_tokens": 15257,
+          "total_tokens": 3697650,
+          "cached_tokens": 1248768,
+          "reasoning_tokens": 9001
+        }
+      },
+      "title": {
+        "requests": 1,
+        "usage": {
+          "input_tokens": 1041,
+          "output_tokens": 91,
+          "total_tokens": 1132,
+          "cached_tokens": 0,
+          "reasoning_tokens": 77
+        }
+      }
+    },
+    "ownTaskDeadlineTriggered": false,
+    "workflowStatus": null,
+    "workflowResultAvailable": false,
+    "repairs": null,
+    "workflowStopReason": null,
+    "workflowLimits": null,
+    "stages": [],
+    "billedAmount": null,
+    "usageCompleteness": "all forwarded requests have reported usage"
+  }
+]
