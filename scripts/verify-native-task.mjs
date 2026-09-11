@@ -233,6 +233,19 @@ try {
      if(promptCalls>1){assert.ok(['missing-check','real-failure'].includes(mode));if(mode==='real-failure')await execute('check-'+promptCalls,['--test']);return{data:{info:{finish:'stop'},parts:[]}};}
      await barrier();
      if(mode==='no-denial'){await execute('check',['--test']);return{data:{info:{finish:'stop'},parts:[]}};}
+     if(mode.startsWith('read-')){
+      await hooks['tool.execute.before'](input('read-error','read'));
+      const start=Date.now();let message;
+      try{fs.readFileSync(path.join(worktree,'missing.mjs'));assert.fail('Missing file unexpectedly exists');}catch(e){assert.equal(e.code,'ENOENT');message=e.message;}
+      if(mode==='read-changed')fs.writeFileSync(path.join(worktree,'external.txt'),'user save');
+      if(mode==='read-live')await event('untracked',{status:'running',input:{}},'unknown');
+      await event('read-error',{status:'error',input:{filePath:'missing.mjs'},error:message,time:{start,...(mode==='read-no-end'?{}:{end:Date.now()})}},'read');
+      if(['read-no-end','read-changed','read-live'].includes(mode)){
+       await assert.rejects(hooks['chat.params']({sessionID:childID}));return{data:{info:{finish:'stop'},parts:[]}};
+      }
+      await hooks['chat.params']({sessionID:childID});
+      if(mode==='read-terminal'){await execute('check',['--test']);return{data:{info:{finish:'stop'},parts:[]}};}
+     }
      if(mode==='preserve-check')await execute('earlier-check',['--test']);
      if(mode!=='missing-before')await hooks['tool.execute.before'](input('denied',mode==='other-tool'?'read':'bash'));
      if(mode==='after-start'){
@@ -249,7 +262,7 @@ try {
      if(mode==='cancel-after')controller.abort();
      if(mode==='conflicting-tool')await error('denied',automatic,'read');
      if(mode==='conflicting-duplicate')await error('denied','Different native error');
-     const admitted=['continued','duplicate','second-denial','preserve-check','missing-check','real-failure'].includes(mode);
+     const admitted=['read-before-denial','continued','duplicate','second-denial','preserve-check','missing-check','real-failure'].includes(mode);
      if(!admitted){await assert.rejects(hooks['chat.params']({sessionID:childID}));return{data:{info:{finish:'stop'},parts:[]}};}
      await hooks['chat.params']({sessionID:childID});
      const system={system:[]};await hooks['experimental.chat.system.transform']({sessionID:childID},system);
@@ -276,13 +289,19 @@ try {
     await hooks['chat.message']({sessionID:parent},{message:{agent:'build',model:{providerID:'fixture',modelID:'fixture'}}});
     const result=JSON.parse(await hooks.tool.harness_task.execute({}, {sessionID:parent,abort:controller.signal,ask:async()=>{},metadata:async()=>{}}));
     const log=JSON.parse(fs.readFileSync(path.join(result.artifacts,'tool-events.json')));
-    const passing=['continued','duplicate','preserve-check','no-denial'].includes(mode);
+    const passing=['read-terminal','read-before-denial','continued','duplicate','preserve-check','no-denial'].includes(mode);
     assert.equal(result.status,passing?'checks_passed':mode.startsWith('cancel-')?'cancelled':'incomplete',name);
-    const allowed=['continued','duplicate','second-denial','reject-after','cancel-after','conflicting-duplicate','conflicting-tool','preserve-check','missing-check','real-failure'].includes(mode);
+    const allowed=['read-before-denial','continued','duplicate','second-denial','reject-after','cancel-after','conflicting-duplicate','conflicting-tool','preserve-check','missing-check','real-failure'].includes(mode);
     assert.equal(result.permissionContinuations.length,allowed?1:0,name);
     assert.equal(result.termination.verified,true,name);
     assert.equal(result.repairs,['missing-check','real-failure'].includes(mode)?2:0,name);
     if(passing||['missing-check','real-failure'].includes(mode))assert.equal(abortCalls,0,name);else assert.equal(abortCalls,1,name);
+    if(mode.startsWith('read-')){
+     const failedRead=log.find(e=>e.callID==='read-error');
+     assert.equal(failedRead.state,'error');assert.equal(failedRead.permissionDenied,false);assert.equal(failedRead.args.filePath,'missing.mjs');
+     if(mode==='read-changed')assert.equal(result.terminalReason.kind,'scope_violation');
+     if(mode==='read-terminal')assert.deepEqual(result.permissionContinuations,[]);
+    }
     if(mode==='second-denial')assert.equal(log.filter(e=>e.permissionDenied).length,2);
     if(mode==='duplicate')assert.equal(log.filter(e=>e.callID==='denied').length,1);
     if(mode==='after-start'){assert.equal(fs.readFileSync(path.join(worktree,'executed.txt'),'utf8'),'ran');assert.equal(log[0].execution,undefined);}
@@ -293,7 +312,7 @@ try {
     return result;
    }finally{await hooks.event({event:{type:'command.executed',properties:{name:'harness-task',sessionID:parent}}});}
   }
-  for(const mode of ['continued','duplicate','second-denial','reject-before','reject-after','cancel-before','cancel-after','unknown','after-start','outside-change','parallel-tool','missing-before','other-tool','conflicting-duplicate','conflicting-tool','preserve-check','missing-check','real-failure','no-denial'])await scenario(mode,mode);
+  for(const mode of ['read-terminal','read-before-denial','read-no-end','read-changed','read-live','continued','duplicate','second-denial','reject-before','reject-after','cancel-before','cancel-after','unknown','after-start','outside-change','parallel-tool','missing-before','other-tool','conflicting-duplicate','conflicting-tool','preserve-check','missing-check','real-failure','no-denial'])await scenario(mode,mode);
   // Both native workflows coexist before either emits its first denial; the
   // same callID in each must consume only that workflow's own allowance.
   let entered=0,release;const ready=new Promise(resolve=>{release=resolve;});

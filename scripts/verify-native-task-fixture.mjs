@@ -24,6 +24,7 @@ fs.writeFileSync(path.join(project,'package.json'),JSON.stringify({private:true,
 fs.writeFileSync(path.join(project,'opencode.json'),JSON.stringify({$schema:'https://opencode.ai/config.json',permission:{task:'allow',bash:'allow'}}));
 git('add','.');git('-c','core.hooksPath=/dev/null','-c','user.name=Fixture','-c','user.email=fixture@localhost','commit','-qm','base');
 materializeNativeTemplate({repositoryRoot:root,outputDirectory:bundle,task:true,review:true});
+const ordinaryErrorModes=['missing-read','edit-context'];
 const continuationModes=['external-path','external-argument','bash-denial','second-denial'];
 const forbiddenContent='UNREAD_NATIVE_DENIAL_SENTINEL';
 const denialText='The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules '+JSON.stringify([{permission:'bash',pattern:'*',action:'deny'}]);
@@ -81,6 +82,14 @@ const fixture=http.createServer(async(req,res)=>{
      }
     }
    }
+   else if(ordinaryErrorModes.includes(mode)){
+    const read=filePath=>({name:'read',args:{filePath}});
+    const edit=(filePath,oldString,newString)=>({name:'edit',args:{filePath,oldString,newString}});
+    calls=[read('value.mjs'),edit('value.mjs','value = 2','value = 3'),read('value.test.mjs'),edit('value.test.mjs','value,2','value,3'),bash('npm test'),bash('git diff --check')];
+    if(mode==='missing-read')calls.unshift(read('missing-source.mjs'));
+    else calls.splice(1,0,edit('value.mjs','value = 999','value = 3'),read('value.mjs'));
+    if(n===(mode==='missing-read'?1:2))assert.ok(body.messages.some(m=>m.role==='tool'&&JSON.stringify(m.content).includes(mode==='missing-read'?'File not found:':'Could not find oldString')), 'Author must receive the native error before choosing the next action');
+   }
    else if(mode==='permission')calls=[bash('printf forbidden')];
    else if(mode==='unknown-error')calls=[{name:'bash',args:{command:writeFixture('forbidden.txt','bad'),timeout:-1,description:'Native validation error'}}];
    else if(['stdout-denial','runtime-error'].includes(mode))calls=[bash('node -e '+JSON.stringify('console.log('+JSON.stringify(denialText)+');process.exit('+(mode==='runtime-error'?1:0)+')')),bash('npm test')];
@@ -126,13 +135,13 @@ const api = async (method, route, body) => { const r = await fetch(`http://127.0
 
 try {
  let ready=false;for(let n=0;n<150;n++){try{await api('GET','/global/health');ready=true;break;}catch{await new Promise(r=>setTimeout(r,100));}}assert.ok(ready,stderr);
- const allModes=['stateful','variant','both-required','narrow','worktree-path','external-path','external-argument','bash-denial','second-denial','stdout-denial','runtime-error','unknown-error','diagnostic','unresolved','correct','two-fixes','comment-only','defect','coverage-loss','intentional','relocation','late-check','final-stale','no-progress','permission','cancel','budget','concurrent-save','staged-work','external-save'];
+ const allModes=[...ordinaryErrorModes,'stateful','variant','both-required','narrow','worktree-path','external-path','external-argument','bash-denial','second-denial','stdout-denial','runtime-error','unknown-error','diagnostic','unresolved','correct','two-fixes','comment-only','defect','coverage-loss','intentional','relocation','late-check','final-stale','no-progress','permission','cancel','budget','concurrent-save','staged-work','external-save'];
  const selectedModes=process.env.NATIVE_TASK_FIXTURE_MODES?.split(',')??allModes;
  for(mode of selectedModes){
   git('reset','--hard','HEAD');git('clean','-fd');
   const artifactRoot=path.join(project,'.git/harness-task');priorArtifacts=new Set(fs.existsSync(artifactRoot)?fs.readdirSync(artifactRoot):[]);
   fs.writeFileSync(task,'ORIGINAL_TASK_FIXTURE: Deliver value '+(mode==='intentional'?'3 instead of 2':'2')+'; preserve the independent legacy() = 7 scenario. Run node --test after the last edit.');
-  if(continuationModes.includes(mode))fs.writeFileSync(task,'ORIGINAL_TASK_FIXTURE: Change value from 2 to 3 and update its public test expectation, preserving the independent legacy() = 7 scenario. Run `npm test` and `git diff --check`.');
+  if(continuationModes.includes(mode)||ordinaryErrorModes.includes(mode))fs.writeFileSync(task,'ORIGINAL_TASK_FIXTURE: Change value from 2 to 3 and update its public test expectation, preserving the independent legacy() = 7 scenario. Run `npm test` and `git diff --check`.');
   if(['stdout-denial','runtime-error'].includes(mode))fs.writeFileSync(task,'ORIGINAL_TASK_FIXTURE: Preserve value 2 and legacy() = 7; run `npm test`.');
   if(['variant','both-required','narrow'].includes(mode))fs.appendFileSync(task,' Required: `node --test value.test.mjs`.'+(mode==='both-required'?' Also required: `node --test --test-concurrency=1 value.test.mjs`.':''));
   if(mode==='stateful'){fs.copyFileSync(path.join(root,'fixtures/native-stateful/example.mjs'),path.join(project,'example.mjs'));fs.writeFileSync(path.join(project,'example.test.mjs'),stale);fs.appendFileSync(task,' Preserve the clear scenario and test consumption of an existing item through consume plus empty idempotency.');}
@@ -224,6 +233,33 @@ try {
     const patch=path.join(report.artifacts,'final.patch');assert.match(fs.readFileSync(patch,'utf8'),/value = 3/);git('apply','--check',patch);
    }
   }else assert.deepEqual(report.permissionContinuations,[]);
+  if(ordinaryErrorModes.includes(mode)){
+   const failureIndex=mode==='missing-read'?0:1,failed=events[failureIndex];
+   assert.equal(failed.state,'error');assert.equal(failed.tool,mode==='missing-read'?'read':'edit');
+   assert.equal(failed.permissionDenied,false);assert.equal(failed.before,failed.after);
+   assert.ok(failed.nativeTime.end>=failed.nativeTime.start);
+   assert.equal(git('status','--porcelain=v1','--untracked-files=all'),'');
+   assert.ok(failed.output.length>0);assert.equal(failed.execution,undefined);
+   if(mode==='missing-read')assert.equal(failed.args.filePath,'missing-source.mjs');
+   else assert.equal(failed.args.oldString,'value = 999');
+   const native=await api('GET',`/session/${report.sessions.author}/message?directory=${encodeURIComponent(report.executionDirectory)}`);
+   const nativeTools=native.flatMap(m=>m.parts).filter(p=>p.type==='tool');
+   assert.equal(nativeTools.length,mode==='missing-read'?7:8);
+   assert.equal(new Set(nativeTools.map(p=>p.callID)).size,nativeTools.length);
+   const nativeFailed=nativeTools.filter(p=>p.callID===failed.callID);assert.equal(nativeFailed.length,1);
+   assert.equal(nativeFailed[0].state.status,'error');assert.equal(nativeFailed[0].state.error,failed.output);
+   assert.deepEqual(nativeFailed[0].state.input,failed.args);
+   assert.equal(events.filter(e=>e.state==='error').length,1);
+   assert.equal(events[failureIndex+1].tool,'read');assert.equal(events[failureIndex+1].state,'completed');
+   assert.equal(report.termination.abortRequests,0);assert.equal(report.termination.verified,true);
+   assert.equal(fs.existsSync(path.join(report.artifacts,'permission-continuations.json')),false);
+   assert.equal(requests.filter(r=>r.mode===mode&&r.stage==='implementation').length,nativeTools.length+1);
+   assert.equal(requests.filter(r=>r.mode===mode&&r.stage==='correction').length,0);
+   assert.equal(fs.readFileSync(path.join(report.executionDirectory,'value.mjs'),'utf8'),source.replace('value = 2','value = 3'));
+   assert.equal(fs.readFileSync(path.join(report.executionDirectory,'value.test.mjs'),'utf8'),originalTest.replace('value,2','value,3'));
+   assert.ok(report.observations.checks.some(c=>c.command==='npm test'&&c.successful&&c.current));
+   const patch=path.join(report.artifacts,'final.patch');assert.match(fs.readFileSync(patch,'utf8'),/value = 3/);git('apply','--check',patch);
+  }
   if(mode==='unknown-error'){assert.equal(report.terminalReason.kind,'tool_error');assert.equal(report.termination.verified,true);assert.equal(events[0].execution,undefined);}
   if(['stdout-denial','runtime-error'].includes(mode)){
    assert.equal(events[0].state,'completed');assert.equal(events[0].permissionDenied,undefined);assert.equal(events[0].executionAdmitted,true);
