@@ -1,0 +1,72 @@
+{
+  "candidateCommit": "ce862219a7d493804c0f69d25e0df569218d9eb9",
+  "controller": {
+    "passed": true,
+    "realTemporaryFiles": true,
+    "nativeStateAndPermissions": true,
+    "threeCorrectionBound": true,
+    "realProviderRequests": 0
+  },
+  "installed": {
+    "passed": true,
+    "installedWorkflow": true,
+    "scenarios": 18,
+    "scriptedRequests": 114,
+    "realProviderRequests": 0
+  },
+  "containerPreflight": {
+    "status": "passed",
+    "requests": 8,
+    "realProviderCalls": 0,
+    "elapsedMs": 3728,
+    "terminationVerified": true
+  },
+  "nativeTemplate": "passed",
+  "nativeReview": "passed",
+  "diffCheck": "passed before freeze",
+  "finalDiffReview": "Performed once; source classification retention was corrected and the affected checks repeated.",
+  "manualActionsDispatches": 0,
+  "platformMatrixRuns": 0,
+  "sharedInputChecks": {
+    "legacy-runtime-reload": [
+      {
+        "command": "node --test --test-concurrency=1 packages/connector/test/state-security.test.mjs packages/connector/test/executables.test.mjs packages/connector/test/protocol.test.mjs",
+        "code": 0,
+        "timedOut": false,
+        "tests": 24
+      },
+      {
+        "command": "node --test --test-name-pattern=runtime packages/connector/test/config.test.mjs",
+        "code": 0,
+        "timedOut": false,
+        "tests": 2
+      }
+    ],
+    "reconnect-revoked": [
+      {
+        "command": "node --test --test-concurrency=1 packages/connector/test/state-security.test.mjs packages/connector/test/executables.test.mjs packages/connector/test/protocol.test.mjs",
+        "code": 0,
+        "timedOut": false,
+        "tests": 25
+      },
+      {
+        "command": "node --test --test-name-pattern=reconnect packages/connector/test/config.test.mjs",
+        "code": 0,
+        "timedOut": false,
+        "tests": 5
+      }
+    ]
+  },
+  "postRunCaptionChange": {
+    "description": "Only native permission description updated from one to up to three corrective replies after all frozen runs stopped.",
+    "syntax": "passed",
+    "installedScenarios": [
+      "two-fixes",
+      "permission"
+    ],
+    "passed": true,
+    "scriptedRequests": 15,
+    "realProviderRequests": 0
+  },
+  "inputVerificationFailed": "Preflight verified execution path, not successful D-final application; see input-incident.json."
+}

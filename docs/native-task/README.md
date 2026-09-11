@@ -101,3 +101,7 @@ stopped incomplete-quota series are historical and unchanged. See
 [all eight D/A development outcomes](../../development/native-task-ad/results/README.md).
 Both arms delivered 2/4 complete patches under the scoped external assessment;
 the candidate showed no complete-delivery gain and remains experimental.
+
+The subsequent [four attempted P/H continuations](../../development/native-task-ph/results/README.md)
+have an invalid-input preparation incident and cannot establish the requested
+D-final continuation result or any benefit of the added correction bound.

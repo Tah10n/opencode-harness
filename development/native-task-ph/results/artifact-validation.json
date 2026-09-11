@@ -1,0 +1,43 @@
+{
+  "frozenFilesVerified": 7774,
+  "historicalFilesVerified": 9099,
+  "unchanged": true,
+  "patches": [
+    {
+      "task": "legacy-runtime-reload",
+      "arm": "P",
+      "patchSha256": "f1cd82d139439cb5be4e679fdd2796f7eb970965c3aa0b0fd700abed928858b2",
+      "reappliedBytesAndModesMatch": true,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "originalHCheckoutUnchanged": false
+    },
+    {
+      "task": "legacy-runtime-reload",
+      "arm": "H",
+      "patchSha256": "86a3165577284918d3412bb2257ff051d809e1252a2754696ba03334635ebd7f",
+      "reappliedBytesAndModesMatch": true,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "originalHCheckoutUnchanged": true
+    },
+    {
+      "task": "reconnect-revoked",
+      "arm": "H",
+      "patchSha256": "b67bdb4591719aa184a97092c316b59d03b6b7cfe31313ccfcbb13d02b84eb0c",
+      "reappliedBytesAndModesMatch": true,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "originalHCheckoutUnchanged": true
+    },
+    {
+      "task": "reconnect-revoked",
+      "arm": "P",
+      "patchSha256": "8aa81a2235f46a1881e67c1b62d1f73d3ccd8569e867682ce97abae1ac77f6ec",
+      "reappliedBytesAndModesMatch": true,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "originalHCheckoutUnchanged": false
+    }
+  ]
+}
