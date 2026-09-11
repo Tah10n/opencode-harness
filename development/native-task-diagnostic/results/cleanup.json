@@ -1,0 +1,79 @@
+{
+  "verified": true,
+  "createdContainers": 14,
+  "allAbsent": true,
+  "containers": [
+    {
+      "name": "template-dev-ea512cc7-9c88-4e37-b095-342d5f5470c4",
+      "role": "scripted-preflight",
+      "cleanupExit": 0
+    },
+    {
+      "name": "template-dev-122f09ba-07b1-4c71-9966-d5cfa792a9d0",
+      "role": "scripted-preflight",
+      "cleanupExit": 0
+    },
+    {
+      "name": "template-dev-e56a38c1-c934-4947-946b-f8b9623c65ac",
+      "role": "model",
+      "cleanupExit": 0
+    },
+    {
+      "name": "template-dev-11109b14-864b-4665-86f6-2f9eef073662",
+      "role": "model",
+      "cleanupExit": 0
+    },
+    {
+      "name": "template-dev-440a5aa4-f898-4404-9c07-56401bcb4335",
+      "role": "model",
+      "cleanupExit": 0
+    },
+    {
+      "name": "template-dev-8f7382ee-fd1d-483f-ab40-805571d5ac77",
+      "role": "model",
+      "cleanupExit": 0
+    },
+    {
+      "name": "template-dev-e33fbbe9-396a-4091-88af-7f21a219f2af",
+      "role": "model",
+      "cleanupExit": 0
+    },
+    {
+      "name": "template-dev-d7a7212e-7646-4ad7-8be7-326bf4562eb3",
+      "role": "model",
+      "cleanupExit": 0
+    },
+    {
+      "name": "template-dev-9d88b256-7a26-42b4-b517-9f14a7ac730c",
+      "role": "offline-grade",
+      "cleanupExit": 0
+    },
+    {
+      "name": "template-dev-7916ca9c-cf28-4217-ab1d-ea3fbfe1ef3e",
+      "role": "offline-grade",
+      "cleanupExit": 0
+    },
+    {
+      "name": "template-dev-b9ba6ca7-0f80-4317-a9fe-49882914223b",
+      "role": "offline-grade",
+      "cleanupExit": 0
+    },
+    {
+      "name": "template-dev-15b0ea50-6e98-4acc-bc0b-cfedea1bd024",
+      "role": "offline-grade",
+      "cleanupExit": 0
+    },
+    {
+      "name": "template-dev-1f87f49f-0dce-4cbf-9a7f-e57fdec539b1",
+      "role": "offline-grade",
+      "cleanupExit": 0
+    },
+    {
+      "name": "template-dev-ae04f0f0-02d3-4e61-91df-5d2c702a6408",
+      "role": "offline-grade",
+      "cleanupExit": 0
+    }
+  ],
+  "remainingProviderHandlers": 0,
+  "localEvidenceRetained": true
+}

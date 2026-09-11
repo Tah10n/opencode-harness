@@ -1,0 +1,44 @@
+{
+  "totals": {
+    "H0": {
+      "taskRuns": 3,
+      "elapsedMs": 317611,
+      "requests": 41,
+      "requestsWithoutUsage": 0,
+      "toolCalls": 57,
+      "usage": {
+        "input_tokens": 383285,
+        "output_tokens": 13128,
+        "total_tokens": 396413,
+        "cached_tokens": 81920,
+        "reasoning_tokens": 5268
+      }
+    },
+    "H1": {
+      "taskRuns": 3,
+      "elapsedMs": 380794,
+      "requests": 52,
+      "requestsWithoutUsage": 0,
+      "toolCalls": 73,
+      "usage": {
+        "input_tokens": 583766,
+        "output_tokens": 15314,
+        "total_tokens": 599080,
+        "cached_tokens": 169984,
+        "reasoning_tokens": 5480
+      }
+    }
+  },
+  "frozenFilesUnchanged": true,
+  "frozenFiles": 11113,
+  "completedTaskRuns": 6,
+  "retries": 0,
+  "model": "openai/gpt-5.6-luna",
+  "variant": "high",
+  "budgetMs": 900000,
+  "usageMeaning": "Observed provider tokens include cached input and repeated context. Missing usage is null with known partial totals separately. Reasoning is a subset of output. Monetary cost not exposed; no paid quota probes.",
+  "extraCompute": {
+    "H1minusH0Ms": 63183,
+    "H1minusH0Requests": 11
+  }
+}

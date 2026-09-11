@@ -1,0 +1,272 @@
+[
+  {
+    "slot": 1,
+    "task": "queue-lost-retry",
+    "arm": "H0",
+    "seededDefect": true,
+    "problemDetection": {
+      "confirmedByDeliveredSemanticRepair": 1,
+      "explicitOriginalCauseDiagnosis": "not established from retained prose",
+      "unknownDueToEarlyDenial": false,
+      "note": "Detection count is inferred from the actual delivered coverage repair, not claimed access to model reasoning. Control has no seeded problem."
+    },
+    "correctRepairs": 1,
+    "newRegressions": 0,
+    "completeTaskPatch": true,
+    "necessaryStateRestored": true,
+    "realEntryPointExercised": true,
+    "meaningfulTargetPostcondition": true,
+    "adaptiveMockMerelyFollowsWrongState": false,
+    "existingWeakOrPrecompletedSetupRetained": false,
+    "productionUnchanged": true,
+    "preservedWorkingBehavior": true,
+    "controlContractPreserved": null,
+    "artificialNonemptiness": false,
+    "documentationDelivered": true,
+    "repairInFinalPatch": true,
+    "actualStatePreconditionInDeliveredTest": false,
+    "setupFailureCaughtByAddedPrecondition": false,
+    "sensitivity": {
+      "disabledExit": 1,
+      "semanticAssertionFailure": true,
+      "basis": "Frozen public-entry-point diagnostic wrapper; ordinary suite and behavior contract pass before mutation."
+    },
+    "internalStatus": "incomplete",
+    "internalLimitations": [
+      "Uninterpreted command failures are retained; their relevance and any baseline/environment exception remain unverified."
+    ],
+    "details": "Fresh independent populated queue reaches work with a failure callback; result and ready/leased state after work are checked, unrelated work is preserved, and subsequent successful processing is exercised. Idle remains empty and does not invoke send.",
+    "patch": "patches/queue-lost-retry-H0/final.patch",
+    "testEvidence": {
+      "file": "test/worker.test.mjs",
+      "realEntryPointLine": 9,
+      "statePostconditionLine": 11,
+      "note": "Read the linked whole patch: the first state assertion can be a precondition in H1; substantive offline failures are described in the report."
+    }
+  },
+  {
+    "slot": 2,
+    "task": "queue-lost-retry",
+    "arm": "H1",
+    "seededDefect": true,
+    "problemDetection": {
+      "confirmedByDeliveredSemanticRepair": 1,
+      "explicitOriginalCauseDiagnosis": "not established from retained prose",
+      "unknownDueToEarlyDenial": false,
+      "note": "Detection count is inferred from the actual delivered coverage repair, not claimed access to model reasoning. Control has no seeded problem."
+    },
+    "correctRepairs": 1,
+    "newRegressions": 0,
+    "completeTaskPatch": true,
+    "necessaryStateRestored": true,
+    "realEntryPointExercised": true,
+    "meaningfulTargetPostcondition": true,
+    "adaptiveMockMerelyFollowsWrongState": false,
+    "existingWeakOrPrecompletedSetupRetained": false,
+    "productionUnchanged": true,
+    "preservedWorkingBehavior": true,
+    "controlContractPreserved": null,
+    "artificialNonemptiness": false,
+    "documentationDelivered": true,
+    "repairInFinalPatch": true,
+    "actualStatePreconditionInDeliveredTest": true,
+    "setupFailureCaughtByAddedPrecondition": false,
+    "sensitivity": {
+      "disabledExit": 1,
+      "semanticAssertionFailure": true,
+      "basis": "Frozen public-entry-point diagnostic wrapper; ordinary suite and behavior contract pass before mutation."
+    },
+    "internalStatus": "incomplete",
+    "internalLimitations": [
+      "Uninterpreted command failures are retained; their relevance and any baseline/environment exception remain unverified."
+    ],
+    "details": "Fresh independent populated queue reaches work with a failure callback; result and ready/leased state after work are checked, unrelated work is preserved, and subsequent successful processing is exercised. Idle remains empty and does not invoke send.",
+    "patch": "patches/queue-lost-retry-H1/final.patch",
+    "testEvidence": {
+      "file": "test/worker.test.mjs",
+      "realEntryPointLine": 20,
+      "statePostconditionLine": 13,
+      "note": "Read the linked whole patch: the first state assertion can be a precondition in H1; substantive offline failures are described in the report."
+    }
+  },
+  {
+    "slot": 3,
+    "task": "editor-precompleted",
+    "arm": "H1",
+    "seededDefect": true,
+    "problemDetection": {
+      "confirmedByDeliveredSemanticRepair": null,
+      "explicitOriginalCauseDiagnosis": "not established from retained prose",
+      "unknownDueToEarlyDenial": true,
+      "note": "Detection count is inferred from the actual delivered coverage repair, not claimed access to model reasoning. Control has no seeded problem."
+    },
+    "correctRepairs": 0,
+    "newRegressions": 0,
+    "completeTaskPatch": false,
+    "necessaryStateRestored": false,
+    "realEntryPointExercised": true,
+    "meaningfulTargetPostcondition": false,
+    "adaptiveMockMerelyFollowsWrongState": false,
+    "existingWeakOrPrecompletedSetupRetained": true,
+    "productionUnchanged": true,
+    "preservedWorkingBehavior": true,
+    "controlContractPreserved": null,
+    "artificialNonemptiness": false,
+    "documentationDelivered": false,
+    "repairInFinalPatch": false,
+    "actualStatePreconditionInDeliveredTest": false,
+    "setupFailureCaughtByAddedPrecondition": false,
+    "sensitivity": {
+      "disabledExit": 0,
+      "semanticAssertionFailure": false,
+      "basis": "Frozen public-entry-point diagnostic wrapper; ordinary suite and behavior contract pass before mutation."
+    },
+    "internalStatus": "incomplete",
+    "internalLimitations": [
+      "Native permission boundary rejected a tool; no evidence correction admitted"
+    ],
+    "details": "Empty delivered patch. Setup still calls s.cancel before apply; the consumer sees x already absent, ignores its result and checks only the precreated final state. The disabled-cancel suite passes.",
+    "patch": "patches/editor-precompleted-H1/final.patch",
+    "testEvidence": {
+      "file": "test/editor.test.mjs",
+      "realEntryPointLine": 6,
+      "statePostconditionLine": 7,
+      "note": "Read the linked whole patch: the first state assertion can be a precondition in H1; substantive offline failures are described in the report."
+    }
+  },
+  {
+    "slot": 4,
+    "task": "editor-precompleted",
+    "arm": "H0",
+    "seededDefect": true,
+    "problemDetection": {
+      "confirmedByDeliveredSemanticRepair": null,
+      "explicitOriginalCauseDiagnosis": "not established from retained prose",
+      "unknownDueToEarlyDenial": true,
+      "note": "Detection count is inferred from the actual delivered coverage repair, not claimed access to model reasoning. Control has no seeded problem."
+    },
+    "correctRepairs": 0,
+    "newRegressions": 0,
+    "completeTaskPatch": false,
+    "necessaryStateRestored": false,
+    "realEntryPointExercised": true,
+    "meaningfulTargetPostcondition": false,
+    "adaptiveMockMerelyFollowsWrongState": false,
+    "existingWeakOrPrecompletedSetupRetained": true,
+    "productionUnchanged": true,
+    "preservedWorkingBehavior": true,
+    "controlContractPreserved": null,
+    "artificialNonemptiness": false,
+    "documentationDelivered": false,
+    "repairInFinalPatch": false,
+    "actualStatePreconditionInDeliveredTest": false,
+    "setupFailureCaughtByAddedPrecondition": false,
+    "sensitivity": {
+      "disabledExit": 0,
+      "semanticAssertionFailure": false,
+      "basis": "Frozen public-entry-point diagnostic wrapper; ordinary suite and behavior contract pass before mutation."
+    },
+    "internalStatus": "incomplete",
+    "internalLimitations": [
+      "Native permission boundary rejected a tool; no evidence correction admitted"
+    ],
+    "details": "Empty delivered patch. Setup still calls s.cancel before apply; the consumer sees x already absent, ignores its result and checks only the precreated final state. The disabled-cancel suite passes.",
+    "patch": "patches/editor-precompleted-H0/final.patch",
+    "testEvidence": {
+      "file": "test/editor.test.mjs",
+      "realEntryPointLine": 6,
+      "statePostconditionLine": 7,
+      "note": "Read the linked whole patch: the first state assertion can be a precondition in H1; substantive offline failures are described in the report."
+    }
+  },
+  {
+    "slot": 5,
+    "task": "queue-valid-empty",
+    "arm": "H0",
+    "seededDefect": false,
+    "problemDetection": {
+      "confirmedByDeliveredSemanticRepair": 0,
+      "explicitOriginalCauseDiagnosis": "not established from retained prose",
+      "unknownDueToEarlyDenial": false,
+      "note": "Detection count is inferred from the actual delivered coverage repair, not claimed access to model reasoning. Control has no seeded problem."
+    },
+    "correctRepairs": 0,
+    "newRegressions": 0,
+    "completeTaskPatch": true,
+    "necessaryStateRestored": null,
+    "realEntryPointExercised": true,
+    "meaningfulTargetPostcondition": true,
+    "adaptiveMockMerelyFollowsWrongState": false,
+    "existingWeakOrPrecompletedSetupRetained": false,
+    "productionUnchanged": true,
+    "preservedWorkingBehavior": true,
+    "controlContractPreserved": true,
+    "artificialNonemptiness": false,
+    "documentationDelivered": true,
+    "repairInFinalPatch": false,
+    "actualStatePreconditionInDeliveredTest": false,
+    "setupFailureCaughtByAddedPrecondition": false,
+    "sensitivity": {
+      "disabledExit": 1,
+      "semanticAssertionFailure": true,
+      "basis": "Frozen public-entry-point diagnostic wrapper; ordinary suite and behavior contract pass before mutation."
+    },
+    "internalStatus": "incomplete",
+    "internalLimitations": [
+      "Uninterpreted command failures are retained; their relevance and any baseline/environment exception remain unverified."
+    ],
+    "details": "Fresh independent populated queue reaches work with a failure callback; result and ready/leased state after work are checked, unrelated work is preserved, and subsequent successful processing is exercised. Idle remains empty and does not invoke send.",
+    "patch": "patches/queue-valid-empty-H0/final.patch",
+    "testEvidence": {
+      "file": "test/worker.test.mjs",
+      "realEntryPointLine": 10,
+      "statePostconditionLine": 15,
+      "note": "Read the linked whole patch: the first state assertion can be a precondition in H1; substantive offline failures are described in the report."
+    }
+  },
+  {
+    "slot": 6,
+    "task": "queue-valid-empty",
+    "arm": "H1",
+    "seededDefect": false,
+    "problemDetection": {
+      "confirmedByDeliveredSemanticRepair": 0,
+      "explicitOriginalCauseDiagnosis": "not established from retained prose",
+      "unknownDueToEarlyDenial": false,
+      "note": "Detection count is inferred from the actual delivered coverage repair, not claimed access to model reasoning. Control has no seeded problem."
+    },
+    "correctRepairs": 0,
+    "newRegressions": 0,
+    "completeTaskPatch": true,
+    "necessaryStateRestored": null,
+    "realEntryPointExercised": true,
+    "meaningfulTargetPostcondition": true,
+    "adaptiveMockMerelyFollowsWrongState": false,
+    "existingWeakOrPrecompletedSetupRetained": false,
+    "productionUnchanged": true,
+    "preservedWorkingBehavior": true,
+    "controlContractPreserved": true,
+    "artificialNonemptiness": false,
+    "documentationDelivered": true,
+    "repairInFinalPatch": false,
+    "actualStatePreconditionInDeliveredTest": true,
+    "setupFailureCaughtByAddedPrecondition": false,
+    "sensitivity": {
+      "disabledExit": 1,
+      "semanticAssertionFailure": true,
+      "basis": "Frozen public-entry-point diagnostic wrapper; ordinary suite and behavior contract pass before mutation."
+    },
+    "internalStatus": "incomplete",
+    "internalLimitations": [
+      "Uninterpreted command failures are retained; their relevance and any baseline/environment exception remain unverified."
+    ],
+    "details": "Fresh independent populated queue reaches work with a failure callback; result and ready/leased state after work are checked, unrelated work is preserved, and subsequent successful processing is exercised. Idle remains empty and does not invoke send.",
+    "patch": "patches/queue-valid-empty-H1/final.patch",
+    "testEvidence": {
+      "file": "test/worker.test.mjs",
+      "realEntryPointLine": 11,
+      "statePostconditionLine": 10,
+      "note": "Read the linked whole patch: the first state assertion can be a precondition in H1; substantive offline failures are described in the report."
+    }
+  }
+]

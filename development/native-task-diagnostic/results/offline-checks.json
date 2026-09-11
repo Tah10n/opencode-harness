@@ -1,0 +1,398 @@
+[
+  {
+    "slot": 1,
+    "task": "queue-lost-retry",
+    "arm": "H0",
+    "checks": {
+      "ordinary": {
+        "exit": 0,
+        "signal": null,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": false,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "contract": {
+        "passed": true
+      },
+      "disabled": {
+        "exit": 1,
+        "signal": null,
+        "counts": {
+          "tests": 3,
+          "pass": 2,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": true,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "semanticFailure": true,
+      "preservation": {
+        "exit": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": false,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "npm": {
+        "exit": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": false,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "cleanup": 0
+    }
+  },
+  {
+    "slot": 2,
+    "task": "queue-lost-retry",
+    "arm": "H1",
+    "checks": {
+      "ordinary": {
+        "exit": 0,
+        "signal": null,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": false,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "contract": {
+        "passed": true
+      },
+      "disabled": {
+        "exit": 1,
+        "signal": null,
+        "counts": {
+          "tests": 3,
+          "pass": 2,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": true,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "semanticFailure": true,
+      "preservation": {
+        "exit": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": false,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "npm": {
+        "exit": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": false,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "cleanup": 0
+    }
+  },
+  {
+    "slot": 3,
+    "task": "editor-precompleted",
+    "arm": "H1",
+    "checks": {
+      "ordinary": {
+        "exit": 0,
+        "signal": null,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": false,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "contract": {
+        "passed": true
+      },
+      "disabled": {
+        "exit": 0,
+        "signal": null,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": false,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "semanticFailure": false,
+      "preservation": {
+        "exit": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": false,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "npm": {
+        "exit": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": false,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "cleanup": 0
+    }
+  },
+  {
+    "slot": 4,
+    "task": "editor-precompleted",
+    "arm": "H0",
+    "checks": {
+      "ordinary": {
+        "exit": 0,
+        "signal": null,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": false,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "contract": {
+        "passed": true
+      },
+      "disabled": {
+        "exit": 0,
+        "signal": null,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": false,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "semanticFailure": false,
+      "preservation": {
+        "exit": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": false,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "npm": {
+        "exit": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": false,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "cleanup": 0
+    }
+  },
+  {
+    "slot": 5,
+    "task": "queue-valid-empty",
+    "arm": "H0",
+    "checks": {
+      "ordinary": {
+        "exit": 0,
+        "signal": null,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": false,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "contract": {
+        "passed": true
+      },
+      "disabled": {
+        "exit": 1,
+        "signal": null,
+        "counts": {
+          "tests": 4,
+          "pass": 2,
+          "fail": 2,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": true,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "semanticFailure": true,
+      "preservation": {
+        "exit": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": false,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "npm": {
+        "exit": 0,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": false,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "cleanup": 0
+    }
+  },
+  {
+    "slot": 6,
+    "task": "queue-valid-empty",
+    "arm": "H1",
+    "checks": {
+      "ordinary": {
+        "exit": 0,
+        "signal": null,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": false,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "contract": {
+        "passed": true
+      },
+      "disabled": {
+        "exit": 1,
+        "signal": null,
+        "counts": {
+          "tests": 4,
+          "pass": 2,
+          "fail": 2,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": true,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "semanticFailure": true,
+      "preservation": {
+        "exit": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": false,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "npm": {
+        "exit": 0,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": false,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "cleanup": 0
+    }
+  }
+]

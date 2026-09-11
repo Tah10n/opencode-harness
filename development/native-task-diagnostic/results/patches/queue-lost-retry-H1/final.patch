@@ -1,0 +1,128 @@
+diff --git a/README.md b/README.md
+index 96cd0da..87399a6 100644
+--- a/README.md
++++ b/README.md
+@@ -1,3 +1,17 @@
+ # queue-lost-retry
+ 
+ A compact stateful single-job queue project. Run `npm test` with Node 24 or newer.
++
++The queue exposes ready and leased jobs through `snapshot()`. `work(q, send)`
++takes at most one ready job and calls `send(job)` when work is available:
++
++- A truthy send result acknowledges the job. The worker returns its ID in
++  `sent`, and the job is removed without leaving a lease.
++- A falsy send result retries the job with its ID and payload intact. The ID is
++  returned in `retried`, the job is ready again, and unrelated ready jobs are
++  preserved.
++- A later successful call can consume the retried job.
++- An empty queue returns `{sent: [], retried: []}` and does not call `send`.
++
++The regression suite covers each of these independent flows, including the
++observable ready and leased state before and after processing.
+diff --git a/test/worker.test.mjs b/test/worker.test.mjs
+index ff03349..b87193b 100644
+--- a/test/worker.test.mjs
++++ b/test/worker.test.mjs
+@@ -1,11 +1,91 @@
+-import {test} from 'node:test';import assert from 'node:assert/strict';
+-import {queue} from '../src/queue.mjs';import {work} from '../src/worker.mjs';
+-test('success, retry and idle',()=>{
+- const q=queue([{id:'a',payload:1}]);
+- assert.deepEqual(work(q,()=>true),{sent:['a'],retried:[]});
+- assert.deepEqual(q.snapshot(),{ready:[],leased:[]});
+- const expected=q.snapshot().ready.map(x=>x.id);
+- assert.deepEqual(work(q,job=>!expected.includes(job.id)).retried,expected);
+- assert.deepEqual(q.snapshot().ready.map(x=>x.id),expected);
+- assert.deepEqual(work(q,()=>true),{sent:[],retried:[]});
++import {test} from 'node:test';
++import assert from 'node:assert/strict';
++import {queue} from '../src/queue.mjs';
++import {work} from '../src/worker.mjs';
++
++test('successfully sends one job and removes it', () => {
++  const q = queue([
++    {id: 'first', payload: {value: 1}},
++    {id: 'later', payload: {value: 2}},
++  ]);
++  const sent = [];
++
++  assert.deepEqual(q.snapshot(), {
++    ready: [
++      {id: 'first', payload: {value: 1}},
++      {id: 'later', payload: {value: 2}},
++    ],
++    leased: [],
++  });
++  assert.deepEqual(work(q, (job) => {
++    sent.push(job);
++    return true;
++  }), {sent: ['first'], retried: []});
++
++  assert.deepEqual(sent, [{id: 'first', payload: {value: 1}}]);
++  assert.deepEqual(q.snapshot(), {
++    ready: [{id: 'later', payload: {value: 2}}],
++    leased: [],
++  });
++});
++
++test('failed delivery retries the job and a later attempt can succeed', () => {
++  const q = queue([
++    {id: 'failed', payload: {value: 1}},
++    {id: 'unrelated', payload: {value: 2}},
++  ]);
++  const attempted = [];
++
++  assert.deepEqual(q.snapshot(), {
++    ready: [
++      {id: 'failed', payload: {value: 1}},
++      {id: 'unrelated', payload: {value: 2}},
++    ],
++    leased: [],
++  });
++  assert.deepEqual(work(q, (job) => {
++    attempted.push(job);
++    return false;
++  }), {sent: [], retried: ['failed']});
++  assert.deepEqual(q.snapshot(), {
++    ready: [
++      {id: 'unrelated', payload: {value: 2}},
++      {id: 'failed', payload: {value: 1}},
++    ],
++    leased: [],
++  });
++
++  assert.deepEqual(work(q, (job) => {
++    attempted.push(job);
++    return true;
++  }), {sent: ['unrelated'], retried: []});
++  assert.deepEqual(q.snapshot(), {
++    ready: [{id: 'failed', payload: {value: 1}}],
++    leased: [],
++  });
++
++  assert.deepEqual(work(q, (job) => {
++    attempted.push(job);
++    return true;
++  }), {sent: ['failed'], retried: []});
++  assert.deepEqual(attempted, [
++    {id: 'failed', payload: {value: 1}},
++    {id: 'unrelated', payload: {value: 2}},
++    {id: 'failed', payload: {value: 1}},
++  ]);
++  assert.deepEqual(q.snapshot(), {ready: [], leased: []});
++});
++
++test('idle processing returns empty results without calling send', () => {
++  const q = queue([]);
++  let sendCalls = 0;
++
++  assert.deepEqual(q.snapshot(), {ready: [], leased: []});
++  assert.deepEqual(work(q, () => {
++    sendCalls += 1;
++    return true;
++  }), {sent: [], retried: []});
++
++  assert.equal(sendCalls, 0);
++  assert.deepEqual(q.snapshot(), {ready: [], leased: []});
+ });
