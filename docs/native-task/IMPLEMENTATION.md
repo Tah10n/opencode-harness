@@ -8,6 +8,9 @@ summary requests count in the total task deadline.
 
 `native-task-plugin.mjs` retains native permissions, sequential mutation/check
 admission, before/after snapshots, cancellation and isolated Git worktree creation.
+Fatal denial is latched before native abort; `chat.params` prevents further provider
+requests for both child and parent. Prompt settlement, abort acknowledgement and
+terminal native tool states precede terminal capture; late callbacks are ignored.
 It no longer creates reviewer, reproduction or format sessions. Project-absolute
 permission patterns that cannot be safely relocated are refused. The captured
 original task is reused rather than reread from an external path by the child.
@@ -15,7 +18,10 @@ original task is reused rather than reread from an external path by the child.
 `native-task-observations.mjs` performs bounded, permission-checked file reads and
 Git diffs only. It retains initial tests/fixtures and package configuration, binds
 native check events to supported initial routes and final snapshots, and exposes
-exact changes without deciding semantic equivalence. Unsupported commands remain
+exact changes without deciding semantic equivalence. Literal check obligations are
+separate from execution history and unresolved additional failures. A stale optional
+command creates no obligation; distinct explicit commands remain distinct.
+Unsupported commands remain
 unverified. New verification is performed through the author's existing native
 tools; the host does not run candidate code or execute model report strings.
 

@@ -23,7 +23,7 @@ fs.writeFileSync(path.join(project,'package.json'),JSON.stringify({private:true,
 fs.writeFileSync(path.join(project,'opencode.json'),JSON.stringify({$schema:'https://opencode.ai/config.json',permission:{task:'allow',bash:'allow'}}));
 git('add','.');git('-c','core.hooksPath=/dev/null','-c','user.name=Fixture','-c','user.email=fixture@localhost','commit','-qm','base');
 materializeNativeTemplate({repositoryRoot:root,outputDirectory:bundle,task:true,review:true});
-let mode='correct',requests=[],counts=new Map(),priorArtifacts=new Set();
+let mode='correct',requests=[],auxiliaryRequests=[],providerRequests=0,counts=new Map(),priorArtifacts=new Set();
 const writeFixture=(file,bytes)=>`node -e 'require("fs").writeFileSync(${JSON.stringify(file)},Buffer.from(${JSON.stringify(Buffer.from(bytes).toString('base64'))},"base64"))'`;
 const response = (res, call, content = '') => {
   if (call?.name === 'StructuredOutput') { content = JSON.stringify(call.args); call = null; }
@@ -36,9 +36,10 @@ const response = (res, call, content = '') => {
 const fixture=http.createServer(async(req,res)=>{
  try {
   const chunks=[];for await(const x of req)chunks.push(x);
+  providerRequests++;
   const body=JSON.parse(Buffer.concat(chunks)), user=body.messages.findLast(m=>m.role==='user');
   const text=typeof user?.content==='string'?user.content:user?.content?.map(p=>p.text??'').join('\n')??'';
-  if(!body.tools?.length){response(res,null,'Fixture title');return;}
+  if(!body.tools?.length){auxiliaryRequests.push({mode});response(res,null,'Fixture title');return;}
   const stage=text.includes('Corrective pass')?'correction':text.includes('Implement the complete original task')?'implementation':'bootstrap';
   const pass=stage==='correction'?JSON.parse(text).pass:0;
   const key=mode+stage+pass,n=counts.get(key)??0;counts.set(key,n+1);requests.push({mode,stage,n});
@@ -54,6 +55,13 @@ const fixture=http.createServer(async(req,res)=>{
    else if(['late-check','final-stale'].includes(mode))calls=[bash('node --test'),bash(writeFixture('value.mjs',source+'// last edit\n'))];
    else if(mode==='diagnostic')calls=[bash('node --test'),bash('node --test --test-name-pattern="[" value.test.mjs')];
    else if(mode==='unresolved')calls=[bash(writeFixture('value.mjs',source.replace('value = 2','value = 1'))),bash('node --test value.test.mjs')];
+   else if(['variant','both-required'].includes(mode))calls=[bash('node --test --test-concurrency=1 value.test.mjs'),bash(writeFixture('value.mjs',source+'// edit\n')),bash('node --test value.test.mjs')];
+   else if(mode==='narrow')calls=[bash('node --test --test-name-pattern=public value.test.mjs')];
+   else if(['worktree-path','external-path'].includes(mode)) {
+    const artifacts=path.join(project,'.git/harness-task'),id=fs.readdirSync(artifacts).find(id=>!priorArtifacts.has(id)),worktree=fs.realpathSync(path.join(artifacts,id,'worktree'));
+    calls=[{...bash(writeFixture('value.mjs',source+'// allowed worktree\n')),args:{...bash('').args,command:writeFixture('value.mjs',source+'// allowed worktree\n'),workdir:worktree}}, {...bash('node --test'),args:{...bash('').args,command:'node --test',workdir:worktree}}];
+    if(mode==='external-path')calls.push({name:'bash',args:{command:writeFixture('forbidden.txt','forbidden'),description:'Must remain denied',workdir:path.dirname(worktree)}});
+   }
    else if(mode==='permission')calls=[bash('printf forbidden')];
    else if(mode==='cancel'||mode==='budget')calls=[bash('node --test'),bash("sleep 30 & sleeper=$!; printf '%s' \"$sleeper\" > sleeper.pid; wait \"$sleeper\"")];
    else if(mode==='concurrent-save')calls=[bash('sleep 0.5'),bash('node --test')];
@@ -68,6 +76,8 @@ const fixture=http.createServer(async(req,res)=>{
    else if(mode==='intentional'){assert.ok(feedback.instruction.includes('Do not restore an old expectation'));assert.ok(feedback.observations.testChanges[0].after.includes('value,3'));calls=[];}
    else if(mode==='relocation'){assert.equal(feedback.observations.testChanges[0].assessment,'not_automatically_classified');assert.ok(feedback.observations.addedTests.some(t=>t.content===originalTest));calls=[];}
    else if(mode==='defect'){assert.ok(feedback.observations.checks.some(c=>c.exit===1&&/not ok|✖/.test(c.output)));calls=[bash(writeFixture('value.mjs',source)),bash('node --test')];}
+   else if(mode==='both-required')calls=[bash('node --test --test-concurrency=1 value.test.mjs')];
+   else if(mode==='narrow')calls=[bash('node --test value.test.mjs')];
    else if(mode==='late-check')calls=[bash('node --test')];
    else if(mode==='final-stale')calls=[bash('node --test'),bash(writeFixture('value.mjs',source+'// still stale '+pass+'\n'))];
    else if(mode==='no-progress')calls=[bash('node --test')];
@@ -94,15 +104,16 @@ const api = async (method, route, body) => { const r = await fetch(`http://127.0
 
 try {
  let ready=false;for(let n=0;n<150;n++){try{await api('GET','/global/health');ready=true;break;}catch{await new Promise(r=>setTimeout(r,100));}}assert.ok(ready,stderr);
- const allModes=['diagnostic','unresolved','correct','two-fixes','comment-only','defect','coverage-loss','intentional','relocation','late-check','final-stale','no-progress','permission','cancel','budget','concurrent-save','staged-work','external-save'];
+ const allModes=['variant','both-required','narrow','worktree-path','external-path','diagnostic','unresolved','correct','two-fixes','comment-only','defect','coverage-loss','intentional','relocation','late-check','final-stale','no-progress','permission','cancel','budget','concurrent-save','staged-work','external-save'];
  const selectedModes=process.env.NATIVE_TASK_FIXTURE_MODES?.split(',')??allModes;
  for(mode of selectedModes){
   git('reset','--hard','HEAD');git('clean','-fd');
   const artifactRoot=path.join(project,'.git/harness-task');priorArtifacts=new Set(fs.existsSync(artifactRoot)?fs.readdirSync(artifactRoot):[]);
   fs.writeFileSync(task,'ORIGINAL_TASK_FIXTURE: Deliver value '+(mode==='intentional'?'3 instead of 2':'2')+'; preserve the independent legacy() = 7 scenario. Run node --test after the last edit.');
+  if(['variant','both-required','narrow'].includes(mode))fs.appendFileSync(task,' Required: `node --test value.test.mjs`.'+(mode==='both-required'?' Also required: `node --test --test-concurrency=1 value.test.mjs`.':''));
   if(mode==='staged-work'){fs.writeFileSync(path.join(project,'value.mjs'),source+'// staged user bytes\n');git('add','value.mjs');fs.appendFileSync(path.join(project,'value.mjs'),'// unstaged user bytes\n');}
   const userBytes=fs.readFileSync(path.join(project,'value.mjs'),'utf8'),index=git('ls-files','--stage','-z');
-  const session=await api('POST','/session',{permission:mode==='permission'?[{permission:'bash',pattern:'printf forbidden',action:'deny'}]:[]});
+  const session=await api('POST','/session',{permission:mode==='permission'?[{permission:'bash',pattern:'printf forbidden',action:'deny'}]:mode==='external-path'?[{permission:'external_directory',pattern:'*',action:'deny'}]:[]});
   const pending=api('POST',`/session/${session.id}/command`,{command:'harness-task',arguments:'',agent:'build',model:'local-fixture/fixture'});
   let sleeperPID;
   if(['cancel','budget','concurrent-save'].includes(mode)){
@@ -128,26 +139,35 @@ try {
    let stopped=false;
    for(let i=0;i<100&&!stopped;i++){try{process.kill(sleeperPID,0);await new Promise(r=>setTimeout(r,30));}catch(e){assert.equal(e.code,'ESRCH');stopped=true;}}
    assert.ok(stopped,'Native abort must terminate the observed child process');
-   console.log(JSON.stringify({mode,cancelled:true,processTerminated:true}));continue;
+   const ids=fs.readdirSync(artifactRoot).filter(id=>!priorArtifacts.has(id));assert.equal(ids.length,1);
+   const artifacts=path.join(artifactRoot,ids[0]),terminationFile=path.join(artifacts,'termination.json');
+   for(let i=0;i<100&&!fs.existsSync(terminationFile);i++)await new Promise(resolve=>setTimeout(resolve,30));
+   assert.equal(JSON.parse(fs.readFileSync(terminationFile)).verified,true);
+   const terminal=path.join(artifacts,'terminal.patch'),bytes=fs.readFileSync(terminal,'utf8');
+   await new Promise(resolve=>setTimeout(resolve,100));assert.equal(fs.readFileSync(terminal,'utf8'),bytes);
+   console.log(JSON.stringify({mode,cancelled:true,processTerminated:true,terminalPatchStable:true}));continue;
   }
   assert.equal(part?.state.status,'completed',JSON.stringify({mode,part,result,temp}));const report=JSON.parse(part.state.output);
   assert.equal(git('ls-files','--stage','-z'),index);
   assert.equal(fs.readFileSync(path.join(project,'value.mjs'),'utf8'),mode==='concurrent-save'?source+'// concurrent USER_SAVE\n':userBytes);
-  const corrected=['defect','two-fixes','comment-only','late-check','final-stale','no-progress'].includes(mode);
+  const corrected=['both-required','narrow','defect','two-fixes','comment-only','late-check','final-stale','no-progress'].includes(mode);
   assert.equal(report.repairs,['two-fixes','comment-only','no-progress','unresolved'].includes(mode)?2:mode==='final-stale'?2:corrected?1:0,JSON.stringify(report));assert.deepEqual(Object.keys(report.sessions),['author']);
-  assert.equal(report.status,['no-progress','comment-only','unresolved','final-stale','permission','external-save'].includes(mode)?'incomplete':'checks_passed',JSON.stringify(report));
+  assert.equal(report.status,['diagnostic','no-progress','comment-only','unresolved','final-stale','permission','external-path','external-save'].includes(mode)?'incomplete':'checks_passed',JSON.stringify(report));
   if(corrected){const impl=JSON.parse(fs.readFileSync(path.join(report.artifacts,'implementation-original.json'))),cor=JSON.parse(fs.readFileSync(path.join(report.artifacts,'correction-original.json')));assert.equal(impl.info.sessionID,cor.info.sessionID);}
   if(mode==='coverage-loss'){assert.equal(fs.readFileSync(path.join(report.executionDirectory,'value.test.mjs'),'utf8'),reducedTest);assert.ok(report.observations.coverageWarnings.length);}
   if(mode==='intentional')assert.ok(fs.readFileSync(path.join(report.executionDirectory,'value.test.mjs'),'utf8').includes('value,3'));
   if(mode==='relocation')assert.equal(fs.readFileSync(path.join(report.executionDirectory,'moved.test.mjs'),'utf8'),originalTest);
   if(mode==='diagnostic'){const c=report.observations.latestChecks.at(-1);assert.equal(c.requirement,'diagnostic');assert.equal(c.exit,1);}
   if(mode==='unresolved')assert.ok(report.limits.some(l=>l.includes('unresolved task relevance')));
-  if(mode==='permission')assert.ok(fs.existsSync(path.join(report.artifacts,'permission-violation.json')));
+  if(['permission','external-path'].includes(mode)){assert.ok(fs.existsSync(path.join(report.artifacts,'permission-violation.json')));assert.equal(report.terminalReason.kind,'permission_denied');assert.equal(report.termination.verified,true);assert.equal(report.termination.abortRequests,1);assert.equal(requests.filter(r=>r.mode===mode&&r.stage==='implementation').length,mode==='permission'?1:3);assert.equal(requests.filter(r=>r.mode===mode).length,mode==='permission'?2:4);}
   if(mode==='external-save')assert.equal(fs.readFileSync(path.join(report.executionDirectory,'value.mjs'),'utf8'),source+'// external edit\n');
-  assert.ok(fs.existsSync(path.join(report.artifacts,'D0.patch'))||['external-save','permission'].includes(mode));
-  console.log(JSON.stringify({mode,status:report.status,repairs:report.repairs}));
+  assert.ok(fs.existsSync(path.join(report.artifacts,'D0.patch'))||['external-save','permission','external-path'].includes(mode));
+  if(mode==='external-path'){assert.equal(fs.existsSync(path.join(report.artifacts,'forbidden.txt')),false);assert.equal(report.termination.verified,true);}
+  if(['external-path','worktree-path'].includes(mode))assert.equal(fs.readFileSync(path.join(report.executionDirectory,'value.mjs'),'utf8'),source+'// allowed worktree\n');
+  if(mode==='variant')assert.equal(requests.filter(r=>r.mode===mode&&r.stage==='implementation').length,4);
+  console.log(JSON.stringify({mode,status:report.status,repairs:report.repairs,termination:report.termination,scriptedRequests:requests.filter(r=>r.mode===mode).length}));
  }
- console.log(JSON.stringify({passed:true,installedWorkflow:true,scenarios:selectedModes.length,scriptedRequests:requests.length,realProviderRequests:0,temp}));
+ console.log(JSON.stringify({passed:true,installedWorkflow:true,scenarios:selectedModes.length,scriptedRequests:providerRequests,workflowRequests:requests.length,auxiliaryRequests:auxiliaryRequests.length,realProviderRequests:0,temp}));
 } finally {
  if(child.exitCode===null)await new Promise(resolve=>{const timer=setTimeout(()=>child.kill('SIGKILL'),3000);child.once('exit',()=>{clearTimeout(timer);resolve();});child.kill('SIGTERM');});
  fixture.closeAllConnections();await new Promise(r=>fixture.close(r));

@@ -41,19 +41,28 @@ check; it cannot replace tests. Echo, Git status and prose are not test evidence
 Other runners, shell compound commands and unavailable execution remain explicitly
 unverified. The host does not execute arbitrary strings from model reports.
 
-Required checks retain their initial task/project source and every execution result.
-The observer binds literal supported task/instruction commands and complete initial
-Node package test routes. A targeted projection of an already required complete
-package route is diagnostic, not another mandatory rerun. Other recognized targeted
-checks have unresolved relevance: their material failures remain limitations.
-Unsupported commands and prose scope cannot be classified automatically. This is
-not a universal relevance analyzer; the author must justify the selected checks
-against the original task, including new behavior and preservation obligations.
+Required checks come from supported literal commands in the original task or
+project instructions, with their original source and working directory retained.
+Initial package scripts establish which Node routes can be observed; running a
+route does not create a new obligation. All supported executions remain in history.
+An extra passing command becoming stale does not require another author reply when
+the actual required check is current. Two explicitly required forms remain separate;
+concurrency, test filters, environment and file selection are not erased from identity.
+Environment-prefixed commands remain unsupported evidence and cannot be satisfied
+by a plain command. Unsupported runners and prose scope remain unverified.
+
+Additional failures remain visible independently of whether the command is required.
+A later different command passing does not resolve them. An actual later pass of
+the same route resolves the earlier failure, without making that route mandatory
+forever. Repeated failures stay in history but do not multiply the same correction
+reason. Diagnostic execution errors remain limitations; substantive test failures
+can still request correction. Classification never depends on whether a check passed.
 A baseline/environment exception requires actual corresponding initial-state evidence.
 
-Previously executed checks are reused only when current after the last observed
-mutation, including mutations subsequently reverted to identical bytes. Missing
-or failed required/unresolved verification triggers updated factual feedback.
+Required checks must be current after the last observed mutation, including edits
+subsequently reverted to identical bytes. Missing or failed required verification,
+unresolved additional test failures or lack of any current successful project check
+trigger updated factual feedback.
 Up to three corrective replies reuse the same session, directory, edits and tool
 history. Two consecutive replies with the same check problem and no new substantive
 check evidence stop for lack of progress; comments, changed hashes and rephrased
@@ -83,13 +92,16 @@ Evaluation executes candidate code only in the existing isolated containers.
 The returned delivery worktree and private artifacts live under the original Git
 administrative directory at `harness-task/<run-id>/`. Retained artifacts include
 original input, initial test bytes, D0, D1–D3 when reached, final and terminal patches,
-actual tool events, observations and each updated feedback message. Adopt the patch
+actual tool events, observations and each updated feedback message. Terminal patches
+are saved only after native prompt/tool termination is confirmed. An unacknowledged
+abort or an active/pending tool keeps termination unverified and withholds that patch;
+the worktree is retained. Adopt the patch
 through normal review; the workflow does not apply it to the original checkout.
 Do not publish private task/source/tool artifacts automatically.
 
 `checks_passed` means the supported required checks passed on the final snapshot
 and no observed required/unresolved failure remains. Diagnostic failures stay in
-the observations; they are not reported as passes. It does not certify all task requirements, test equivalence or complete
+the observations and limitations; they are not reported as passes. It does not certify all task requirements, test equivalence or complete
 delivery. `incomplete` and `cancelled` preserve the patch and limitations. The
 independent evaluator separately assesses working behavior, necessary delivered
 coverage and regressions.
@@ -110,3 +122,12 @@ After separate authorization, the [four corrected-input P/H continuations](../..
 ran from the actual saved D-final patches. Neither arm delivered a fully acceptable
 patch on either selected task. Two H corrections made no substantive delivery
 progress; the added bound has no demonstrated benefit and remains experimental.
+
+A fatal native permission denial records its primary `permission_denied` cause
+before requesting native session cancellation. It stops further author/correction
+requests and the parent's model summary request. Cancellation is idempotent, including
+a session created concurrently with cancellation. Late events cannot rewrite the
+sealed terminal result. A denial remains `incomplete`, not an ordinary user
+cancellation; local cancellation does not establish the server usage of an already
+submitted provider request. Native permissions and the delivery worktree boundary
+are unchanged.
