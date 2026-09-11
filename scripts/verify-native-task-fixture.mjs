@@ -57,6 +57,8 @@ const fixture=http.createServer(async(req,res)=>{
     assert.ok(text.includes('state the action will actually use immediately before'));
     calls=[bash(writeFixture('example.test.mjs',guarded)),bash('node --test')];
    }
+   else if(['container-parallel-read-error','container-parallel-denial'].includes(mode))calls=[[{name:'read',args:{filePath:'value.mjs'}},{name:'glob',args:{pattern:'*.mjs'}}],[mode==='container-parallel-read-error'?{name:'read',args:{filePath:'missing-source.mjs'}}:{name:'bash',args:{command:'pwd',workdir:'/work',description:'Outside project permission preflight'}},{name:'edit',args:{filePath:'value.mjs',oldString:'export const value = 2;',newString:'export const value = 2; // queued after error\n'}},bash('node --test'),bash('git diff --check')]];
+   else if(mode==='container-parallel')calls=[[{name:'read',args:{filePath:'value.mjs'}},{name:'glob',args:{pattern:'*.mjs'}}],[{name:'edit',args:{filePath:'value.mjs',oldString:'export const value = 2;',newString:'export const value = 2; // queued container\n'}},bash('node --test'),bash('git diff --check')]];
    else if(mode==='container-preflight')calls=[{name:'read',args:{filePath:'value.mjs'}},{name:'glob',args:{pattern:'*.mjs'}},{name:'edit',args:{filePath:'value.mjs',oldString:'export const value = 2;',newString:'export const value = 2; // container\n'}},bash('node --test')];
    else if(['defect','two-fixes','no-progress','comment-only'].includes(mode))calls=[bash(writeFixture('value.mjs',(mode==='two-fixes'?source.replace('value = 2','value = 1').replace('() => 7','() => 8'):source.replace('value = 2','value = 1')))),bash('node --test')];
    else if(mode==='coverage-loss')calls=[bash(writeFixture('value.test.mjs',reducedTest)),bash('node --test')];
@@ -122,7 +124,7 @@ const fixture=http.createServer(async(req,res)=>{
 });
 await new Promise(r=>fixture.listen(0,'127.0.0.1',r));
 if(process.env.NATIVE_TASK_FIXTURE_PROVIDER_ONLY==='1'){
- mode='container-preflight';fs.writeFileSync(path.join(project,'TASK.md'),'ORIGINAL_TASK_FIXTURE: Deliver value 2 and preserve legacy scenario; run node --test.');
+ mode=({'1':'container-parallel','read-error':'container-parallel-read-error','denial':'container-parallel-denial'})[process.env.NATIVE_TASK_FIXTURE_PARALLEL]??'container-preflight';fs.writeFileSync(path.join(project,'TASK.md'),'ORIGINAL_TASK_FIXTURE: Deliver value 2 and preserve legacy scenario; run node --test.');
  console.log(JSON.stringify({fixtureURL:`http://127.0.0.1:${fixture.address().port}`,project}));
  await new Promise(resolve=>process.once('SIGTERM',()=>fixture.close(resolve)));fs.rmSync(temp,{recursive:true,force:true});process.exit(0);
 }

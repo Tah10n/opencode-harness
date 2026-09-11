@@ -6,7 +6,7 @@ const f=JSON.parse(fs.readFileSync(path.join(root,'freeze.json')));
 const {startContainer}=await import(f.containerAdapter);
 const {captureCandidate}=await import(f.captureAdapter);
 const {runOpenCode}=await import(f.nativeAdapter);
-const fixture=spawn(process.execPath,['scripts/verify-native-task-fixture.mjs'],{cwd:base,env:{PATH:process.env.PATH,NATIVE_TASK_FIXTURE_PROVIDER_ONLY:'1'},stdio:['ignore','pipe','pipe']});
+const fixture=spawn(process.execPath,['scripts/verify-native-task-fixture.mjs'],{cwd:base,env:{PATH:process.env.PATH,NATIVE_TASK_FIXTURE_PROVIDER_ONLY:'1',...(process.env.NATIVE_TASK_FIXTURE_PARALLEL?{NATIVE_TASK_FIXTURE_PARALLEL:process.env.NATIVE_TASK_FIXTURE_PARALLEL}:{})},stdio:['ignore','pipe','pipe']});
 let stderr='';fixture.stderr.on('data',x=>stderr+=x);
 let session,requests=0;
 try{
@@ -26,6 +26,8 @@ try{
  const evidence=session.exec(['node','-e',"const fs=require('fs'),p='/work/repo/.git/harness-task';const ids=fs.readdirSync(p);if(ids.length!==1)throw Error('Expected one workflow');const dir=p+'/'+ids[0];console.log(JSON.stringify({report:JSON.parse(fs.readFileSync(dir+'/result.json')),files:fs.readdirSync(dir),events:JSON.parse(fs.readFileSync(dir+'/tool-events.json'))}));"]);assert.equal(evidence.status,0,evidence.stderr);
  const saved=JSON.parse(evidence.stdout);assert.equal(saved.report.status,'checks_passed',JSON.stringify(saved.report));assert.ok(saved.files.includes('D0.patch'));assert.ok(saved.files.includes('terminal.patch'));
  for(const tool of ['read','glob','edit','bash'])assert.ok(saved.events.some(e=>e.tool===tool&&e.state==='completed'),tool);
+ if(process.env.NATIVE_TASK_FIXTURE_PARALLEL){assert.equal(saved.events.filter(e=>e.state==='error').length,process.env.NATIVE_TASK_FIXTURE_PARALLEL==='1'?0:1);const edit=saved.events.find(e=>e.tool==='edit'),check=saved.events.find(e=>e.args?.command==='node --test');assert.ok(edit.completedAt<=check.startedAt);assert.equal(check.before,edit.after);}
+ if(process.env.NATIVE_TASK_FIXTURE_PARALLEL==='denial')assert.equal(saved.report.permissionContinuations.length,1);
  assert.ok(saved.events.some(e=>e.tool==='bash'&&e.exit===0));assert.ok(saved.report.stages.some(s=>s.role==='author'));assert.ok(saved.report.stages.every(s=>s.role==='author'));assert.equal(saved.report.repairs,0);
  assert.equal(captureCandidate(session,root).status,0);
  fs.writeFileSync(path.join(root,'preflight-result.json'),JSON.stringify({status:'passed',requests,realProviderCalls:0,elapsedMs:result.elapsedMs,terminationVerified:true,report:saved.report},null,2));

@@ -232,6 +232,46 @@ try {
      promptCalls++;
      if(promptCalls>1){assert.ok(['missing-check','real-failure'].includes(mode));if(mode==='real-failure')await execute('check-'+promptCalls,['--test']);return{data:{info:{finish:'stop'},parts:[]}};}
      await barrier();
+     if (['queued-read-error','queued-preflight'].includes(mode)) {
+      const tool=mode==='queued-read-error'?'read':'bash';
+      await hooks['tool.execute.before'](input('failed',tool));
+      const start=Date.now();
+      await event('queued-check',{status:'running',input:{command:'node --test'}},'bash');
+      const waiting=hooks['tool.execute.before'](input('queued-check'));
+      await new Promise(resolve=>setImmediate(resolve));
+      await event('failed',{status:'error',input:tool==='read'?{filePath:'missing.mjs'}:{command:'forbidden'},error:tool==='read'?'File not found: missing.mjs':automatic,time:{start,end:Date.now()}},tool);
+      await waiting;
+      await hooks['shell.env']({sessionID:childID,callID:'queued-check',cwd:worktree});
+      const check=spawnSync(process.execPath,['--test'],{cwd:worktree,encoding:'utf8'});
+      await hooks['tool.execute.after']({...input('queued-check'),args:{command:'node --test'}},{output:check.stdout+check.stderr,metadata:{exit:check.status}});
+      await event('queued-check',{status:'completed',input:{command:'node --test'},output:check.stdout,metadata:{exit:check.status}});
+      return{data:{info:{finish:'stop'},parts:[]}};
+     }
+     if (['queued-tools','cancel-queued'].includes(mode)) {
+      await hooks['tool.execute.before'](input('first'));
+      await hooks['shell.env']({sessionID:childID,callID:'first',cwd:worktree});
+      let secondAdmitted=false,thirdAdmitted=false;
+      const second=hooks['tool.execute.before'](input('second')).then(()=>{secondAdmitted=true;});
+      const third=hooks['tool.execute.before'](input('third','read')).then(()=>{thirdAdmitted=true;});
+      const settled=Promise.allSettled([second,third]);
+      await new Promise(resolve=>setImmediate(resolve));
+      assert.equal(secondAdmitted,false);assert.equal(thirdAdmitted,false);
+      if(mode==='cancel-queued') {
+       controller.abort();
+       assert.ok((await settled).every(r=>r.status==='rejected'));
+       assert.equal(secondAdmitted,false);assert.equal(thirdAdmitted,false);
+      } else fs.writeFileSync(path.join(worktree,'delivered.txt'),'first tool finished');
+      await hooks['tool.execute.after']({...input('first'),args:{command:'native fixture write'}},{output:'done',metadata:{exit:0}});
+      if(mode==='cancel-queued')return{data:{info:{finish:'stop'},parts:[]}};
+      await second;assert.equal(thirdAdmitted,false);
+      await hooks['shell.env']({sessionID:childID,callID:'second',cwd:worktree});
+      const check=spawnSync(process.execPath,['--test'],{cwd:worktree,encoding:'utf8'});
+      await hooks['tool.execute.after']({...input('second'),args:{command:'node --test'}},{output:check.stdout+check.stderr,metadata:{exit:check.status}});
+      await third;
+      assert.equal(fs.readFileSync(path.join(worktree,'delivered.txt'),'utf8'),'first tool finished');
+      await hooks['tool.execute.after']({...input('third','read'),args:{filePath:'delivered.txt'}},{output:'first tool finished',metadata:{}});
+      await settled;return{data:{info:{finish:'stop'},parts:[]}};
+     }
      if(mode==='no-denial'){await execute('check',['--test']);return{data:{info:{finish:'stop'},parts:[]}};}
      if(mode.startsWith('read-')){
       await hooks['tool.execute.before'](input('read-error','read'));
@@ -289,9 +329,9 @@ try {
     await hooks['chat.message']({sessionID:parent},{message:{agent:'build',model:{providerID:'fixture',modelID:'fixture'}}});
     const result=JSON.parse(await hooks.tool.harness_task.execute({}, {sessionID:parent,abort:controller.signal,ask:async()=>{},metadata:async()=>{}}));
     const log=JSON.parse(fs.readFileSync(path.join(result.artifacts,'tool-events.json')));
-    const passing=['read-terminal','read-before-denial','continued','duplicate','preserve-check','no-denial'].includes(mode);
+    const passing=['read-terminal','read-before-denial','continued','duplicate','preserve-check','no-denial','queued-tools','queued-read-error','queued-preflight'].includes(mode);
     assert.equal(result.status,passing?'checks_passed':mode.startsWith('cancel-')?'cancelled':'incomplete',name);
-    const allowed=['read-before-denial','continued','duplicate','second-denial','reject-after','cancel-after','conflicting-duplicate','conflicting-tool','preserve-check','missing-check','real-failure'].includes(mode);
+    const allowed=['read-before-denial','continued','duplicate','second-denial','reject-after','cancel-after','conflicting-duplicate','conflicting-tool','preserve-check','missing-check','real-failure','queued-preflight'].includes(mode);
     assert.equal(result.permissionContinuations.length,allowed?1:0,name);
     assert.equal(result.termination.verified,true,name);
     assert.equal(result.repairs,['missing-check','real-failure'].includes(mode)?2:0,name);
@@ -302,6 +342,8 @@ try {
      if(mode==='read-changed')assert.equal(result.terminalReason.kind,'scope_violation');
      if(mode==='read-terminal')assert.deepEqual(result.permissionContinuations,[]);
     }
+    if(mode==='queued-tools'){assert.deepEqual(log.map(e=>e.callID),['first','second','third']);assert.notEqual(log[0].before,log[0].after);assert.equal(log[1].before,log[0].after);assert.equal(log[1].after,log[2].before);assert.equal(result.observations.checksCurrent,true);}
+    if(mode==='cancel-queued')assert.deepEqual(log.map(e=>e.callID),['first']);
     if(mode==='second-denial')assert.equal(log.filter(e=>e.permissionDenied).length,2);
     if(mode==='duplicate')assert.equal(log.filter(e=>e.callID==='denied').length,1);
     if(mode==='after-start'){assert.equal(fs.readFileSync(path.join(worktree,'executed.txt'),'utf8'),'ran');assert.equal(log[0].execution,undefined);}
@@ -312,7 +354,7 @@ try {
     return result;
    }finally{await hooks.event({event:{type:'command.executed',properties:{name:'harness-task',sessionID:parent}}});}
   }
-  for(const mode of ['read-terminal','read-before-denial','read-no-end','read-changed','read-live','continued','duplicate','second-denial','reject-before','reject-after','cancel-before','cancel-after','unknown','after-start','outside-change','parallel-tool','missing-before','other-tool','conflicting-duplicate','conflicting-tool','preserve-check','missing-check','real-failure','no-denial'])await scenario(mode,mode);
+  for(const mode of ['read-terminal','read-before-denial','read-no-end','read-changed','read-live','continued','duplicate','second-denial','reject-before','reject-after','cancel-before','cancel-after','unknown','after-start','outside-change','parallel-tool','missing-before','other-tool','conflicting-duplicate','conflicting-tool','preserve-check','missing-check','real-failure','no-denial','queued-tools','cancel-queued','queued-read-error','queued-preflight'])await scenario(mode,mode);
   // Both native workflows coexist before either emits its first denial; the
   // same callID in each must consume only that workflow's own allowance.
   let entered=0,release;const ready=new Promise(resolve=>{release=resolve;});

@@ -1,0 +1,226 @@
+diff --git a/packages/connector/README.md b/packages/connector/README.md
+index 5a1e8c6..0088582 100644
+--- a/packages/connector/README.md
++++ b/packages/connector/README.md
+@@ -106,6 +106,12 @@ runtime and owned hooks; its server reconciliation shares the sync lock, and it
+ usage unless the user separately runs `viberacing sync`. A successful compatible reconnect,
+ authenticated sync, or doctor server check clears a prior version-upgrade automatic-sync disable.
+ 
++The connector's protocol module validates the complete bounded response before exposing it to the
++CLI. A valid JSON server error rejects with an `Error` carrying its HTTP `status` and validated
++server error `code`; malformed, oversized, non-JSON, or terminal-control-containing responses stay
++`invalid_server_response`. The request path preserves the status-specific cleanup and retry rules,
++including `Retry-After` and exponential backoff.
++
+ Codex, Claude Code, Kimi Code, Qwen Code, and Gemini CLI install supported lifecycle triggers.
+ Qwen's trigger currently covers interactive TUI and ACP lifecycle events, not headless `qwen -p`
+ exits. OpenCode uses its read-only SQLite store and a documented `sync`; Antigravity requires the
+diff --git a/packages/connector/bin/viberacing.mjs b/packages/connector/bin/viberacing.mjs
+index 5fde3a9..4ef83ba 100755
+--- a/packages/connector/bin/viberacing.mjs
++++ b/packages/connector/bin/viberacing.mjs
+@@ -189,25 +189,13 @@ async function request(origin, path, options = {}, attempts = 1, responseContext
+       try {
+         payload = await parseProtocolResponse(response, responseContext);
+       } catch (error) {
+-        if (
+-          error?.code === "invalid_server_response" &&
+-          (response.status >= 500 || response.status === 429)
+-        ) {
+-          error.status = response.status;
++        if (response.status >= 500 || response.status === 429) {
++          if (error.status === undefined) error.status = response.status;
+           error.retryAfterMs = retryAfterMilliseconds(response);
+         }
+         throw error;
+       }
+-      if (!response.ok) {
+-        const error = new Error(
+-          `Vibe Racing returned ${response.status}: ${payload.error ?? "request failed"}`,
+-        );
+-        error.status = response.status;
+-        error.code = payload.error;
+-        error.retryAfterMs = retryAfterMilliseconds(response);
+-        if (response.status < 500 && response.status !== 429) throw error;
+-        lastError = error;
+-      } else return payload;
++      return payload;
+     } catch (error) {
+       lastError = error;
+       if (
+diff --git a/packages/connector/lib/protocol.mjs b/packages/connector/lib/protocol.mjs
+index f1ceba9..87d9123 100644
+--- a/packages/connector/lib/protocol.mjs
++++ b/packages/connector/lib/protocol.mjs
+@@ -292,7 +292,10 @@ export async function parseProtocolResponse(response, context) {
+       !errorCodePattern.test(value.error)
+     )
+       throw invalid();
+-    return { error: value.error };
++    const error = new Error(`Vibe Racing returned ${response.status}: ${value.error}`);
++    error.status = response.status;
++    error.code = value.error;
++    throw error;
+   }
+   if (context.kind === "pairingStart") return parsePairingStart(value, context);
+   if (context.kind === "pairingPoll") return parsePairingPoll(value, context);
+diff --git a/packages/connector/test/config.test.mjs b/packages/connector/test/config.test.mjs
+index 20f2a6f..d0265b6 100644
+--- a/packages/connector/test/config.test.mjs
++++ b/packages/connector/test/config.test.mjs
+@@ -2665,6 +2665,45 @@ test("connect pairs only exact sources and keeps every local path out of its pay
+     assert.equal(JSON.stringify(pairingBody).includes(forbidden), false);
+ });
+ 
++test("connect reports a validated pairing error without treating it as a successful payload", async (context) => {
++  let pairingStarts = 0;
++  const server = createServer((request, response) => {
++    request.resume();
++    request.on("end", () => {
++      if (request.url === "/api/pairing/start") {
++        pairingStarts += 1;
++        response.writeHead(400, { "content-type": "application/json" });
++        response.end(JSON.stringify({ error: "pairing_unavailable" }));
++        return;
++      }
++      response.writeHead(204);
++      response.end();
++    });
++  });
++  server.listen(0, "127.0.0.1");
++  await once(server, "listening");
++  context.after(() => server.close());
++  const address = server.address();
++  assert.notEqual(address, null);
++  assert.equal(typeof address, "object");
++  const home = await mkdtemp(join(tmpdir(), "viberacing-pairing-error-"));
++  context.after(() => rm(home, { recursive: true, force: true }));
++  const origin = `http://127.0.0.1:${address.port}`;
++  await writeCaptureInstallation(home, origin);
++
++  await assert.rejects(
++    execFileAsync(process.execPath, [connectorPath, "connect", "--origin", origin], {
++      env: connectorEnvironment(home, { NODE_ENV: "test", PATH: "" }),
++    }),
++    (error) => {
++      assert.equal(error.code, 1);
++      assert.match(error.stderr, /Vibe Racing returned 400: pairing_unavailable/);
++      return true;
++    },
++  );
++  assert.equal(pairingStarts, 1);
++});
++
+ test("connect replaces a legacy OpenCode filename label before pairing and local commit", async (context) => {
+   let pairingBody;
+   const sourceId = "53535353-5353-4353-8353-535353535353";
+@@ -3433,7 +3472,7 @@ test("reconnect retires only an explicitly disconnected unavailable source befor
+ 
+   for (const failure of [
+     ["malformed", /invalid protocol response/],
+-    ["transient", /server_error/],
++    ["transient", /Vibe Racing returned 503: server_error/],
+     [
+       "unauthorized",
+       /Existing installation authorization cannot be reconciled; run `viberacing disconnect`/,
+@@ -4666,6 +4705,7 @@ test("retries transient uploads at most three times and clears the compact pendi
+ 
+ test("retries transient malformed proxy responses without accepting them", async (context) => {
+   let requests = 0;
++  const requestTimes = [];
+   const server = createServer((request, response) => {
+     if (request.method === "POST" && request.url === "/api/installations/current") {
+       response.writeHead(200, { "content-type": "application/json" });
+@@ -4673,8 +4713,9 @@ test("retries transient malformed proxy responses without accepting them", async
+       return;
+     }
+     requests += 1;
++    requestTimes.push(Date.now());
+     if (requests < 3) {
+-      response.writeHead(503, { "content-type": "text/html" });
++      response.writeHead(503, { "content-type": "text/html", "retry-after": "1" });
+       response.end("<html>temporary proxy failure</html>");
+       return;
+     }
+@@ -4699,9 +4740,14 @@ test("retries transient malformed proxy responses without accepting them", async
+   const installation = await writeCaptureInstallation(home, `http://127.0.0.1:${address.port}`);
+ 
+   await execFileAsync(process.execPath, [connectorPath, "sync"], {
+-    env: connectorEnvironment(home),
++    env: connectorEnvironment(home, {
++      NODE_ENV: "test",
++      VIBERACING_TEST_MAX_RETRY_AFTER_MS: "1000",
++    }),
+   });
+   assert.equal(requests, 3);
++  assert.ok(requestTimes[1] - requestTimes[0] >= 900);
++  assert.ok(requestTimes[2] - requestTimes[1] >= 900);
+ });
+ 
+ test("honors Retry-After before retrying a rate-limited upload", async (context) => {
+diff --git a/packages/connector/test/protocol.test.mjs b/packages/connector/test/protocol.test.mjs
+index bfdb3e9..1140b3d 100644
+--- a/packages/connector/test/protocol.test.mjs
++++ b/packages/connector/test/protocol.test.mjs
+@@ -91,12 +91,17 @@ test("rejects server attempts to add local paths, executables, or unknown mappin
+ });
+ 
+ test("protocol errors are snake_case and terminal output strips control characters", async () => {
+-  assert.deepEqual(
+-    await parseProtocolResponse(json({ error: "source_disconnected" }, 400), {
++  await assert.rejects(
++    parseProtocolResponse(json({ error: "source_disconnected" }, 400), {
+       kind: "usage",
+       sourceIds: [sourceId],
+     }),
+-    { error: "source_disconnected" },
++    (error) => {
++      assert.equal(error.message, "Vibe Racing returned 400: source_disconnected");
++      assert.equal(error.status, 400);
++      assert.equal(error.code, "source_disconnected");
++      return true;
++    },
+   );
+   for (const error of ["InvalidRequest", "invalid-request", "invalid__request", "bad\ncode"]) {
+     await assert.rejects(
+@@ -107,6 +112,13 @@ test("protocol errors are snake_case and terminal output strips control characte
+       /invalid protocol response/,
+     );
+   }
++  await assert.rejects(
++    parseProtocolResponse(json({ error: "bad\u001b[2Jcode" }, 400), {
++      kind: "usage",
++      sourceIds: [sourceId],
++    }),
++    (error) => error?.code === "invalid_server_response",
++  );
+   assert.equal(sanitizeTerminalText("safe\u001b[2J\r\nnext"), "safe�[2J��next");
+ });
+ 
+@@ -169,7 +181,25 @@ test("rejects oversized, incomplete, and reconciliation responses without source
+       }),
+       { kind: "pairingPoll", localSources: [local] },
+     ),
+-    /too large/,
++    (error) => {
++      assert.match(error.message, /too large/);
++      assert.equal(error.code, "invalid_server_response");
++      return true;
++    },
++  );
++  await assert.rejects(
++    parseProtocolResponse(new Response("{", { headers: { "content-type": "application/json" } }), {
++      kind: "usage",
++      sourceIds: [sourceId],
++    }),
++    { code: "invalid_server_response" },
++  );
++  await assert.rejects(
++    parseProtocolResponse(new Response("{}", { headers: { "content-type": "text/plain" } }), {
++      kind: "usage",
++      sourceIds: [sourceId],
++    }),
++    { code: "invalid_server_response" },
+   );
+   await assert.rejects(
+     parseProtocolResponse(json({ status: "active" }), {

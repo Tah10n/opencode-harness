@@ -24,6 +24,11 @@ model and variant; the reusable harness fixes neither. Add `--review` during
 materialization to retain the independent diagnostic `/harness-review` command.
 The ordinary OpenCode default is unchanged.
 
+Conflicting native tool calls wait for admission in their original order. Safe source
+reads may still run together. Waiting consumes the same total deadline; cancellation
+or a fatal permission decision prevents queued calls from executing. Each tool is
+checked against the actual worktree snapshot when admitted.
+
 The total timeout includes native bootstrap, author work, checks, the bounded
 corrections and summary. Its default is 600000 ms, supported range 1000–3600000 ms.
 User permission rejection, repeated policy denial, cancellation, quota/native errors
@@ -101,12 +106,33 @@ the worktree is retained. Adopt the patch
 through normal review; the workflow does not apply it to the original checkout.
 Do not publish private task/source/tool artifacts automatically.
 
+To inspect and apply a completed terminal patch in an ordinary copy at the captured
+base (with its required dependencies), use the artifact path returned by the run:
+
+```sh
+git -C /absolute/ordinary-copy apply --check /absolute/artifacts/terminal.patch
+git -C /absolute/ordinary-copy apply /absolute/artifacts/terminal.patch
+# Run that project's required checks in the ordinary copy.
+```
+
+Review existing local changes before adoption: the patch includes the captured
+starting changes as well as workflow edits. It does not require the administrative
+harness directory after application. A missing terminal patch is not a successful
+delivery; inspect the retained termination report before using other snapshots.
+
+
 `checks_passed` means the supported required checks passed on the final snapshot
 and no observed required/unresolved failure remains. Diagnostic failures stay in
 the observations and limitations; they are not reported as passes. It does not certify all task requirements, test equivalence or complete
 delivery. `incomplete` and `cancelled` preserve the patch and limitations. The
 independent evaluator separately assesses working behavior, necessary delivered
 coverage and regressions.
+
+The current [six-pair utility study](../../development/native-task-utility/README.md)
+starts from the recovery baseline and retains every measured version. The first
+series produced P 6/6 versus H 2/6 complete patches, so no independent benchmark
+was admitted. A single native-admission revision is undergoing the authorized
+fresh development comparison; no effectiveness claim is established.
 
 The earlier C revision remains reproducible at
 `66b7b33fc6bd66201ee24ec84d6e6fcae9daaf28`; its A/B/C results, earlier 20 pairs and

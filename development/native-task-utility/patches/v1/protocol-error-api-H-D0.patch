@@ -1,0 +1,163 @@
+diff --git a/packages/connector/README.md b/packages/connector/README.md
+index 5a1e8c684bc8007a1c7ce110cb2114691c06d0af..f1fdead7d288e9c288f73a33c2845d335cd40a30 100644
+--- a/packages/connector/README.md
++++ b/packages/connector/README.md
+@@ -55,6 +55,13 @@ Pairing configuration contains the server mapping but never a path or path hash.
+ accounts require separate `--data-dir` profile roots; each App Server launch gets that source's
+ `CODEX_HOME`, so one profile is never collected twice as two local sources.
+ 
++The protocol module is the boundary for server responses. It returns only validated successful
++payloads; a valid non-success response rejects with an `Error` carrying the HTTP `status` and
++validated server error `code`. Invalid, oversized, malformed, non-JSON, or terminal-control-
++containing responses reject as `invalid_server_response` instead. The CLI request path uses those
++fields for pairing, reconciliation, and usage-sync cleanup and retry decisions without treating an
++unvalidated response as a trusted server error.
++
+ Current Kimi discovery prefers `$KIMI_CODE_HOME` (default `~/.kimi-code`) and does not automatically
+ add the default legacy `~/.kimi` when both exist. A deliberately retained or archived Python-format
+ root can be added with `source add ... --legacy` without re-enabling automatic double counting. On
+diff --git a/packages/connector/bin/viberacing.mjs b/packages/connector/bin/viberacing.mjs
+index 5fde3a9b656377e0266fbde7eda922c752933bdf..85c7bf3655877acc2ba53def43c3d8a07e21e488 100755
+--- a/packages/connector/bin/viberacing.mjs
++++ b/packages/connector/bin/viberacing.mjs
+@@ -189,25 +189,13 @@ async function request(origin, path, options = {}, attempts = 1, responseContext
+       try {
+         payload = await parseProtocolResponse(response, responseContext);
+       } catch (error) {
+-        if (
+-          error?.code === "invalid_server_response" &&
+-          (response.status >= 500 || response.status === 429)
+-        ) {
+-          error.status = response.status;
++        if (response.status >= 500 || response.status === 429) {
++          if (error?.code === "invalid_server_response") error.status = response.status;
+           error.retryAfterMs = retryAfterMilliseconds(response);
+         }
+         throw error;
+       }
+-      if (!response.ok) {
+-        const error = new Error(
+-          `Vibe Racing returned ${response.status}: ${payload.error ?? "request failed"}`,
+-        );
+-        error.status = response.status;
+-        error.code = payload.error;
+-        error.retryAfterMs = retryAfterMilliseconds(response);
+-        if (response.status < 500 && response.status !== 429) throw error;
+-        lastError = error;
+-      } else return payload;
++      return payload;
+     } catch (error) {
+       lastError = error;
+       if (
+diff --git a/packages/connector/lib/protocol.mjs b/packages/connector/lib/protocol.mjs
+index f1ceba9e22799e19036840d8e4b68db7e747c869..87d91231f60fc163498ab4b964aaf491f077cbda 100644
+--- a/packages/connector/lib/protocol.mjs
++++ b/packages/connector/lib/protocol.mjs
+@@ -292,7 +292,10 @@ export async function parseProtocolResponse(response, context) {
+       !errorCodePattern.test(value.error)
+     )
+       throw invalid();
+-    return { error: value.error };
++    const error = new Error(`Vibe Racing returned ${response.status}: ${value.error}`);
++    error.status = response.status;
++    error.code = value.error;
++    throw error;
+   }
+   if (context.kind === "pairingStart") return parsePairingStart(value, context);
+   if (context.kind === "pairingPoll") return parsePairingPoll(value, context);
+diff --git a/packages/connector/test/config.test.mjs b/packages/connector/test/config.test.mjs
+index 20f2a6f98d1c565539340c4dc77c80c0fdd0a348..d25f015b5b4e20adaea508ce89b73e227560f50b 100644
+--- a/packages/connector/test/config.test.mjs
++++ b/packages/connector/test/config.test.mjs
+@@ -2771,6 +2771,63 @@ test("connect replaces a legacy OpenCode filename label before pairing and local
+   assert.equal(JSON.stringify(config).includes("custom-channel"), false);
+ });
+ 
++test("connect reports a valid pairing error without changing local pairing state", async (context) => {
++  let pairingRequests = 0;
++  let pollRequests = 0;
++  const server = createServer((request, response) => {
++    request.resume();
++    request.on("end", () => {
++      if (request.url === "/api/pairing/start") {
++        pairingRequests += 1;
++        response.writeHead(400, { "content-type": "application/json" });
++        response.end(JSON.stringify({ error: "pairing_denied" }));
++        return;
++      }
++      if (request.url === "/api/pairing/poll") pollRequests += 1;
++      response.writeHead(404, { "content-type": "application/json" });
++      response.end(JSON.stringify({ error: "unexpected_request" }));
++    });
++  });
++  server.listen(0, "127.0.0.1");
++  await once(server, "listening");
++  context.after(() => server.close());
++  const address = server.address();
++  assert.notEqual(address, null);
++  assert.equal(typeof address, "object");
++
++  const home = await mkdtemp(join(tmpdir(), "viberacing-pairing-error-"));
++  context.after(() => rm(home, { recursive: true, force: true }));
++  const directory = join(home, ".viberacing");
++  const localSource = {
++    clientSourceId: "12121212-1212-4212-8212-121212121212",
++    agentId: "antigravity",
++    dataPath: join(home, "capture.jsonl"),
++    collectionMethod: "antigravity_cli_capture",
++    supportedSurface: "cli",
++    suggestedLabel: "Antigravity",
++  };
++  await writeLocalSources(directory, [localSource]);
++  const environment = connectorEnvironment(home, {
++    NODE_ENV: "test",
++    PATH: "",
++    VIBERACING_TEST_PAIRING_POLL_INTERVAL_MS: "10",
++  });
++  assert.deepEqual(await readLocalSources(directory), [localSource]);
++
++  const result = await execFileAsync(
++    process.execPath,
++    [connectorPath, "connect", "--origin", `http://127.0.0.1:${address.port}`],
++    { env: environment },
++  ).catch((error) => error);
++  assert.equal(result.code, 1);
++  assert.match(result.stderr, /Vibe Racing returned 400: pairing_denied/);
++  assert.equal(pairingRequests, 1);
++  assert.equal(pollRequests, 0);
++  assert.deepEqual(await readLocalSources(directory), [localSource]);
++  await assert.rejects(access(join(directory, "config.json")));
++  await assert.rejects(access(join(directory, "connect-attempt.json")));
++});
++
+ test("later disconnect defeats pending, active-polled, and interrupted connect attempts", async (context) => {
+   const installationId = "19191919-1919-4191-8191-191919191919";
+   const clientSourceId = "20202020-2020-4202-8202-202020202020";
+diff --git a/packages/connector/test/protocol.test.mjs b/packages/connector/test/protocol.test.mjs
+index bfdb3e923820e683a2f30c3947dd2136dda6cb63..174481553c7f2208592c405eb31051118941ea34 100644
+--- a/packages/connector/test/protocol.test.mjs
++++ b/packages/connector/test/protocol.test.mjs
+@@ -90,13 +90,19 @@ test("rejects server attempts to add local paths, executables, or unknown mappin
+   );
+ });
+ 
+-test("protocol errors are snake_case and terminal output strips control characters", async () => {
+-  assert.deepEqual(
+-    await parseProtocolResponse(json({ error: "source_disconnected" }, 400), {
++test("valid protocol errors reject with status and validated code while terminal output strips control characters", async () => {
++  await assert.rejects(
++    parseProtocolResponse(json({ error: "source_disconnected" }, 400), {
+       kind: "usage",
+       sourceIds: [sourceId],
+     }),
+-    { error: "source_disconnected" },
++    (error) => {
++      assert.ok(error instanceof Error);
++      assert.equal(error.message, "Vibe Racing returned 400: source_disconnected");
++      assert.equal(error.status, 400);
++      assert.equal(error.code, "source_disconnected");
++      return true;
++    },
+   );
+   for (const error of ["InvalidRequest", "invalid-request", "invalid__request", "bad\ncode"]) {
+     await assert.rejects(

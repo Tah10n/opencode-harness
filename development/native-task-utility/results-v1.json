@@ -1,0 +1,991 @@
+{
+  "candidate": "cac39a0050189f2ddf01d4b88888494457b578a7",
+  "kind": "development-v1",
+  "rows": [
+    {
+      "task": "protocol-error-api",
+      "arm": "P",
+      "phase": "final",
+      "frozenExecutableChecksPassed": true,
+      "fullPatchAccepted": true,
+      "behaviorAccepted": true,
+      "necessaryTestsComplete": true,
+      "docsComplete": true,
+      "patchApplied": true,
+      "patchSha256": "9456cee7c00428aebfd3ac247b434179f961a6bd14cb534f689483ab3a022e30",
+      "reasons": [],
+      "patch": "patches/v1/protocol-error-api-P-final.patch"
+    },
+    {
+      "task": "protocol-error-api",
+      "arm": "H",
+      "phase": "final",
+      "frozenExecutableChecksPassed": true,
+      "fullPatchAccepted": true,
+      "behaviorAccepted": true,
+      "necessaryTestsComplete": true,
+      "docsComplete": true,
+      "patchApplied": true,
+      "patchSha256": "5f8d8b79c57774eeb80c66665e76efebb290e75e1e712e88691d3069b9e4fd38",
+      "reasons": [],
+      "patch": "patches/v1/protocol-error-api-H-final.patch"
+    },
+    {
+      "task": "protocol-error-api",
+      "arm": "H",
+      "phase": "D0",
+      "frozenExecutableChecksPassed": true,
+      "fullPatchAccepted": true,
+      "behaviorAccepted": true,
+      "necessaryTestsComplete": true,
+      "docsComplete": true,
+      "patchApplied": true,
+      "patchSha256": "992cad8d769e30f157e49371e41e4f678caaf3d87c42ef13db1606cedd224da3",
+      "reasons": [],
+      "patch": "patches/v1/protocol-error-api-H-D0.patch"
+    },
+    {
+      "task": "catalog-cache",
+      "arm": "H",
+      "phase": "final",
+      "frozenExecutableChecksPassed": true,
+      "fullPatchAccepted": false,
+      "behaviorAccepted": false,
+      "necessaryTestsComplete": false,
+      "docsComplete": true,
+      "patchApplied": true,
+      "patchSha256": "ab5605aac1642e4ac6d6a434375a78275557dff9af2d374293f716afc5f60bb2",
+      "reasons": [
+        "Legacy one-argument client returns an object on 304 instead of preserving legacy rejection/array contract."
+      ],
+      "patch": "patches/v1/catalog-cache-H-final.patch"
+    },
+    {
+      "task": "catalog-cache",
+      "arm": "H",
+      "phase": "D0",
+      "frozenExecutableChecksPassed": true,
+      "fullPatchAccepted": false,
+      "behaviorAccepted": false,
+      "necessaryTestsComplete": false,
+      "docsComplete": true,
+      "patchApplied": true,
+      "patchSha256": "ab5605aac1642e4ac6d6a434375a78275557dff9af2d374293f716afc5f60bb2",
+      "reasons": [
+        "Legacy one-argument client returns an object on 304 instead of preserving legacy rejection/array contract."
+      ],
+      "patch": "patches/v1/catalog-cache-H-D0.patch"
+    },
+    {
+      "task": "catalog-cache",
+      "arm": "P",
+      "phase": "final",
+      "frozenExecutableChecksPassed": true,
+      "fullPatchAccepted": true,
+      "behaviorAccepted": true,
+      "necessaryTestsComplete": true,
+      "docsComplete": true,
+      "patchApplied": true,
+      "patchSha256": "f995f1c00f8914b02889b132ffcbcd73e1f8f1a502d3b671f8b0d2a811f44325",
+      "reasons": [],
+      "patch": "patches/v1/catalog-cache-P-final.patch"
+    },
+    {
+      "task": "legacy-runtime-reload",
+      "arm": "P",
+      "phase": "final",
+      "frozenExecutableChecksPassed": true,
+      "fullPatchAccepted": true,
+      "behaviorAccepted": true,
+      "necessaryTestsComplete": true,
+      "docsComplete": true,
+      "patchApplied": true,
+      "patchSha256": "e410f27036b72d0db66b897e7cdd3b840b8915e23d307bf98bd13456395ff9ba",
+      "reasons": [],
+      "patch": "patches/v1/legacy-runtime-reload-P-final.patch"
+    },
+    {
+      "task": "legacy-runtime-reload",
+      "arm": "H",
+      "phase": "final",
+      "frozenExecutableChecksPassed": true,
+      "fullPatchAccepted": false,
+      "behaviorAccepted": false,
+      "necessaryTestsComplete": false,
+      "docsComplete": true,
+      "patchApplied": true,
+      "patchSha256": "645de531d7fc7373707c505af355e3362c6f6a12f01ea92dfc6dbd5af7c19186",
+      "reasons": [
+        "Preparing from the old launcher copies old executable bytes into the current runtime; delivered fixture copies current bytes and masks this."
+      ],
+      "patch": "patches/v1/legacy-runtime-reload-H-final.patch"
+    },
+    {
+      "task": "legacy-runtime-reload",
+      "arm": "H",
+      "phase": "D0",
+      "frozenExecutableChecksPassed": true,
+      "fullPatchAccepted": false,
+      "behaviorAccepted": false,
+      "necessaryTestsComplete": false,
+      "docsComplete": true,
+      "patchApplied": true,
+      "patchSha256": "ac3317e56be4e7197771a9a1326d1df4cefa700a2e3d7f20cb2b950c54e0a1d8",
+      "reasons": [
+        "Preparing from the old launcher copies old executable bytes into the current runtime; delivered fixture copies current bytes and masks this."
+      ],
+      "patch": "patches/v1/legacy-runtime-reload-H-D0.patch"
+    },
+    {
+      "task": "reconnect-revoked",
+      "arm": "H",
+      "phase": "final",
+      "frozenExecutableChecksPassed": false,
+      "fullPatchAccepted": false,
+      "behaviorAccepted": false,
+      "necessaryTestsComplete": false,
+      "docsComplete": true,
+      "patchApplied": true,
+      "patchSha256": "a5d26b19c0650f52534875d8e48b8dde87bb0e73d81aceb601f000191fbc3cc3",
+      "reasons": [
+        "Revoked recovery leaves pending payloads because established cleanup is called without clearPending=true."
+      ],
+      "patch": "patches/v1/reconnect-revoked-H-final.patch"
+    },
+    {
+      "task": "reconnect-revoked",
+      "arm": "H",
+      "phase": "D0",
+      "frozenExecutableChecksPassed": false,
+      "fullPatchAccepted": false,
+      "behaviorAccepted": false,
+      "necessaryTestsComplete": false,
+      "docsComplete": true,
+      "patchApplied": true,
+      "patchSha256": "635fd1fb3952ff07db4a826ef7a2ec39d8c00ea5730f3a7524da02a7744ebc82",
+      "reasons": [
+        "Revoked recovery leaves pending payloads because established cleanup is called without clearPending=true."
+      ],
+      "patch": "patches/v1/reconnect-revoked-H-D0.patch"
+    },
+    {
+      "task": "reconnect-revoked",
+      "arm": "P",
+      "phase": "final",
+      "frozenExecutableChecksPassed": true,
+      "fullPatchAccepted": true,
+      "behaviorAccepted": true,
+      "necessaryTestsComplete": true,
+      "docsComplete": true,
+      "patchApplied": true,
+      "patchSha256": "36074a4ca260344b5fd22a87af22df82d4a5c2709d57750e39464bedd777c364",
+      "reasons": [],
+      "patch": "patches/v1/reconnect-revoked-P-final.patch"
+    },
+    {
+      "task": "request-module-extraction",
+      "arm": "P",
+      "phase": "final",
+      "frozenExecutableChecksPassed": true,
+      "fullPatchAccepted": true,
+      "behaviorAccepted": true,
+      "necessaryTestsComplete": true,
+      "docsComplete": true,
+      "patchApplied": true,
+      "patchSha256": "1cc10803fd503bfcab17f770687157c124d4452f476efbe4ab7ee88892c50f57",
+      "reasons": [],
+      "patch": "patches/v1/request-module-extraction-P-final.patch"
+    },
+    {
+      "task": "request-module-extraction",
+      "arm": "H",
+      "phase": "final",
+      "frozenExecutableChecksPassed": true,
+      "fullPatchAccepted": true,
+      "behaviorAccepted": true,
+      "necessaryTestsComplete": true,
+      "docsComplete": true,
+      "patchApplied": true,
+      "patchSha256": "912c700a1415e47b9afa615e71171751ad9a44d3efed0d2097396a2cea558b75",
+      "reasons": [],
+      "patch": "patches/v1/request-module-extraction-H-final.patch"
+    },
+    {
+      "task": "request-module-extraction",
+      "arm": "H",
+      "phase": "D0",
+      "frozenExecutableChecksPassed": true,
+      "fullPatchAccepted": true,
+      "behaviorAccepted": true,
+      "necessaryTestsComplete": true,
+      "docsComplete": true,
+      "patchApplied": true,
+      "patchSha256": "2d680e6cbc8c1b4fda7e0d38f58bdcb4238da2e38a8d2df81f8550b47d5f7215",
+      "reasons": [],
+      "patch": "patches/v1/request-module-extraction-H-D0.patch"
+    },
+    {
+      "task": "dual-config",
+      "arm": "H",
+      "phase": "final",
+      "frozenExecutableChecksPassed": true,
+      "fullPatchAccepted": false,
+      "behaviorAccepted": true,
+      "necessaryTestsComplete": false,
+      "docsComplete": true,
+      "patchApplied": true,
+      "patchSha256": "0f9adf9001e86094850015c39a69b4d53dec5fa09885f81d9444848f9ed37058",
+      "reasons": [
+        "Required invalid-indent/missing-mode regressions are absent through both actual render consumers; ESM pretty+indent:0 is also missing."
+      ],
+      "patch": "patches/v1/dual-config-H-final.patch"
+    },
+    {
+      "task": "dual-config",
+      "arm": "H",
+      "phase": "D0",
+      "frozenExecutableChecksPassed": true,
+      "fullPatchAccepted": false,
+      "behaviorAccepted": true,
+      "necessaryTestsComplete": false,
+      "docsComplete": true,
+      "patchApplied": true,
+      "patchSha256": "0f9adf9001e86094850015c39a69b4d53dec5fa09885f81d9444848f9ed37058",
+      "reasons": [
+        "Required invalid-indent/missing-mode regressions are absent through both actual render consumers; ESM pretty+indent:0 is also missing."
+      ],
+      "patch": "patches/v1/dual-config-H-D0.patch"
+    },
+    {
+      "task": "dual-config",
+      "arm": "P",
+      "phase": "final",
+      "frozenExecutableChecksPassed": true,
+      "fullPatchAccepted": true,
+      "behaviorAccepted": true,
+      "necessaryTestsComplete": true,
+      "docsComplete": true,
+      "patchApplied": true,
+      "patchSha256": "51655e1f66f1a75d0ec1f19983b8414c987794321c7d138b0720ceaf8efb05be",
+      "reasons": [],
+      "patch": "patches/v1/dual-config-P-final.patch"
+    }
+  ],
+  "metrics": [
+    {
+      "slot": 1,
+      "task": "protocol-error-api",
+      "arm": "P",
+      "state": "terminated",
+      "requests": 36,
+      "requestsWithUsage": 36,
+      "requestsWithoutUsage": 0,
+      "usage": {
+        "input_tokens": {
+          "observed": 2883230,
+          "records": 36,
+          "complete": true
+        },
+        "output_tokens": {
+          "observed": 18058,
+          "records": 36,
+          "complete": true
+        },
+        "total_tokens": {
+          "observed": 2901288,
+          "records": 36,
+          "complete": true
+        },
+        "cached_tokens": {
+          "observed": 1221632,
+          "records": 36,
+          "complete": true
+        },
+        "reasoning_tokens": {
+          "observed": 10060,
+          "records": 36,
+          "complete": true
+        }
+      },
+      "elapsedMs": 486349,
+      "toolCalls": 84,
+      "sessions": 1,
+      "rawRunnerWorkflowStatus": null,
+      "workflowStatus": null,
+      "workflowStatusSource": "runner",
+      "repairs": null,
+      "exitCode": 0,
+      "timedOut": false,
+      "terminationVerified": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "refusals": [],
+      "error": null,
+      "modelEffortBoundary": true
+    },
+    {
+      "slot": 2,
+      "task": "protocol-error-api",
+      "arm": "H",
+      "state": "terminated",
+      "requests": 52,
+      "requestsWithUsage": 52,
+      "requestsWithoutUsage": 0,
+      "usage": {
+        "input_tokens": {
+          "observed": 5281429,
+          "records": 52,
+          "complete": true
+        },
+        "output_tokens": {
+          "observed": 25041,
+          "records": 52,
+          "complete": true
+        },
+        "total_tokens": {
+          "observed": 5306470,
+          "records": 52,
+          "complete": true
+        },
+        "cached_tokens": {
+          "observed": 2129920,
+          "records": 52,
+          "complete": true
+        },
+        "reasoning_tokens": {
+          "observed": 13318,
+          "records": 52,
+          "complete": true
+        }
+      },
+      "elapsedMs": 658659,
+      "toolCalls": 79,
+      "sessions": 2,
+      "rawRunnerWorkflowStatus": null,
+      "workflowStatus": "incomplete",
+      "workflowStatusSource": "retained-result.json",
+      "repairs": 3,
+      "exitCode": 0,
+      "timedOut": false,
+      "terminationVerified": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "refusals": [],
+      "error": null,
+      "modelEffortBoundary": true
+    },
+    {
+      "slot": 3,
+      "task": "catalog-cache",
+      "arm": "H",
+      "state": "terminated",
+      "requests": 23,
+      "requestsWithUsage": 23,
+      "requestsWithoutUsage": 0,
+      "usage": {
+        "input_tokens": {
+          "observed": 347881,
+          "records": 23,
+          "complete": true
+        },
+        "output_tokens": {
+          "observed": 10144,
+          "records": 23,
+          "complete": true
+        },
+        "total_tokens": {
+          "observed": 358025,
+          "records": 23,
+          "complete": true
+        },
+        "cached_tokens": {
+          "observed": 116736,
+          "records": 23,
+          "complete": true
+        },
+        "reasoning_tokens": {
+          "observed": 3858,
+          "records": 23,
+          "complete": true
+        }
+      },
+      "elapsedMs": 224342,
+      "toolCalls": 32,
+      "sessions": 2,
+      "rawRunnerWorkflowStatus": "incomplete",
+      "workflowStatus": "incomplete",
+      "workflowStatusSource": "retained-result.json",
+      "repairs": 0,
+      "exitCode": 0,
+      "timedOut": false,
+      "terminationVerified": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "refusals": [],
+      "error": null,
+      "modelEffortBoundary": true
+    },
+    {
+      "slot": 4,
+      "task": "catalog-cache",
+      "arm": "P",
+      "state": "terminated",
+      "requests": 12,
+      "requestsWithUsage": 12,
+      "requestsWithoutUsage": 0,
+      "usage": {
+        "input_tokens": {
+          "observed": 128644,
+          "records": 12,
+          "complete": true
+        },
+        "output_tokens": {
+          "observed": 8118,
+          "records": 12,
+          "complete": true
+        },
+        "total_tokens": {
+          "observed": 136762,
+          "records": 12,
+          "complete": true
+        },
+        "cached_tokens": {
+          "observed": 47104,
+          "records": 12,
+          "complete": true
+        },
+        "reasoning_tokens": {
+          "observed": 4819,
+          "records": 12,
+          "complete": true
+        }
+      },
+      "elapsedMs": 187827,
+      "toolCalls": 18,
+      "sessions": 1,
+      "rawRunnerWorkflowStatus": null,
+      "workflowStatus": null,
+      "workflowStatusSource": "runner",
+      "repairs": null,
+      "exitCode": 0,
+      "timedOut": false,
+      "terminationVerified": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "refusals": [],
+      "error": null,
+      "modelEffortBoundary": true
+    },
+    {
+      "slot": 5,
+      "task": "legacy-runtime-reload",
+      "arm": "P",
+      "state": "terminated",
+      "requests": 39,
+      "requestsWithUsage": 39,
+      "requestsWithoutUsage": 0,
+      "usage": {
+        "input_tokens": {
+          "observed": 3325328,
+          "records": 39,
+          "complete": true
+        },
+        "output_tokens": {
+          "observed": 31343,
+          "records": 39,
+          "complete": true
+        },
+        "total_tokens": {
+          "observed": 3356671,
+          "records": 39,
+          "complete": true
+        },
+        "cached_tokens": {
+          "observed": 1485312,
+          "records": 39,
+          "complete": true
+        },
+        "reasoning_tokens": {
+          "observed": 20633,
+          "records": 39,
+          "complete": true
+        }
+      },
+      "elapsedMs": 720245,
+      "toolCalls": 70,
+      "sessions": 1,
+      "rawRunnerWorkflowStatus": null,
+      "workflowStatus": null,
+      "workflowStatusSource": "runner",
+      "repairs": null,
+      "exitCode": 0,
+      "timedOut": false,
+      "terminationVerified": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "refusals": [],
+      "error": null,
+      "modelEffortBoundary": true
+    },
+    {
+      "slot": 6,
+      "task": "legacy-runtime-reload",
+      "arm": "H",
+      "state": "terminated",
+      "requests": 43,
+      "requestsWithUsage": 42,
+      "requestsWithoutUsage": 1,
+      "usage": {
+        "input_tokens": {
+          "observed": 4024229,
+          "records": 42,
+          "complete": false
+        },
+        "output_tokens": {
+          "observed": 30953,
+          "records": 42,
+          "complete": false
+        },
+        "total_tokens": {
+          "observed": 4055182,
+          "records": 42,
+          "complete": false
+        },
+        "cached_tokens": {
+          "observed": 1992192,
+          "records": 42,
+          "complete": false
+        },
+        "reasoning_tokens": {
+          "observed": 17953,
+          "records": 42,
+          "complete": false
+        }
+      },
+      "elapsedMs": 900088,
+      "toolCalls": 68,
+      "sessions": 2,
+      "rawRunnerWorkflowStatus": null,
+      "workflowStatus": "incomplete",
+      "workflowStatusSource": "retained-result.json",
+      "repairs": 1,
+      "exitCode": null,
+      "timedOut": true,
+      "terminationVerified": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": true,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": true
+      },
+      "refusals": [],
+      "error": null,
+      "modelEffortBoundary": true
+    },
+    {
+      "slot": 7,
+      "task": "reconnect-revoked",
+      "arm": "H",
+      "state": "terminated",
+      "requests": 73,
+      "requestsWithUsage": 73,
+      "requestsWithoutUsage": 0,
+      "usage": {
+        "input_tokens": {
+          "observed": 7562270,
+          "records": 73,
+          "complete": true
+        },
+        "output_tokens": {
+          "observed": 28893,
+          "records": 73,
+          "complete": true
+        },
+        "total_tokens": {
+          "observed": 7591163,
+          "records": 73,
+          "complete": true
+        },
+        "cached_tokens": {
+          "observed": 3636224,
+          "records": 73,
+          "complete": true
+        },
+        "reasoning_tokens": {
+          "observed": 14190,
+          "records": 73,
+          "complete": true
+        }
+      },
+      "elapsedMs": 753555,
+      "toolCalls": 104,
+      "sessions": 2,
+      "rawRunnerWorkflowStatus": null,
+      "workflowStatus": "incomplete",
+      "workflowStatusSource": "retained-result.json",
+      "repairs": 3,
+      "exitCode": 0,
+      "timedOut": false,
+      "terminationVerified": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "refusals": [],
+      "error": null,
+      "modelEffortBoundary": true
+    },
+    {
+      "slot": 8,
+      "task": "reconnect-revoked",
+      "arm": "P",
+      "state": "terminated",
+      "requests": 38,
+      "requestsWithUsage": 38,
+      "requestsWithoutUsage": 0,
+      "usage": {
+        "input_tokens": {
+          "observed": 3187739,
+          "records": 38,
+          "complete": true
+        },
+        "output_tokens": {
+          "observed": 16854,
+          "records": 38,
+          "complete": true
+        },
+        "total_tokens": {
+          "observed": 3204593,
+          "records": 38,
+          "complete": true
+        },
+        "cached_tokens": {
+          "observed": 1553920,
+          "records": 38,
+          "complete": true
+        },
+        "reasoning_tokens": {
+          "observed": 10098,
+          "records": 38,
+          "complete": true
+        }
+      },
+      "elapsedMs": 449920,
+      "toolCalls": 65,
+      "sessions": 1,
+      "rawRunnerWorkflowStatus": null,
+      "workflowStatus": null,
+      "workflowStatusSource": "runner",
+      "repairs": null,
+      "exitCode": 0,
+      "timedOut": false,
+      "terminationVerified": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "refusals": [],
+      "error": null,
+      "modelEffortBoundary": true
+    },
+    {
+      "slot": 9,
+      "task": "request-module-extraction",
+      "arm": "P",
+      "state": "terminated",
+      "requests": 25,
+      "requestsWithUsage": 25,
+      "requestsWithoutUsage": 0,
+      "usage": {
+        "input_tokens": {
+          "observed": 1621560,
+          "records": 25,
+          "complete": true
+        },
+        "output_tokens": {
+          "observed": 14109,
+          "records": 25,
+          "complete": true
+        },
+        "total_tokens": {
+          "observed": 1635669,
+          "records": 25,
+          "complete": true
+        },
+        "cached_tokens": {
+          "observed": 809984,
+          "records": 25,
+          "complete": true
+        },
+        "reasoning_tokens": {
+          "observed": 7064,
+          "records": 25,
+          "complete": true
+        }
+      },
+      "elapsedMs": 373392,
+      "toolCalls": 52,
+      "sessions": 1,
+      "rawRunnerWorkflowStatus": null,
+      "workflowStatus": null,
+      "workflowStatusSource": "runner",
+      "repairs": null,
+      "exitCode": 0,
+      "timedOut": false,
+      "terminationVerified": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "refusals": [],
+      "error": null,
+      "modelEffortBoundary": true
+    },
+    {
+      "slot": 10,
+      "task": "request-module-extraction",
+      "arm": "H",
+      "state": "terminated",
+      "requests": 47,
+      "requestsWithUsage": 47,
+      "requestsWithoutUsage": 0,
+      "usage": {
+        "input_tokens": {
+          "observed": 4138281,
+          "records": 47,
+          "complete": true
+        },
+        "output_tokens": {
+          "observed": 24253,
+          "records": 47,
+          "complete": true
+        },
+        "total_tokens": {
+          "observed": 4162534,
+          "records": 47,
+          "complete": true
+        },
+        "cached_tokens": {
+          "observed": 1651200,
+          "records": 47,
+          "complete": true
+        },
+        "reasoning_tokens": {
+          "observed": 11824,
+          "records": 47,
+          "complete": true
+        }
+      },
+      "elapsedMs": 633477,
+      "toolCalls": 80,
+      "sessions": 2,
+      "rawRunnerWorkflowStatus": null,
+      "workflowStatus": "incomplete",
+      "workflowStatusSource": "retained-result.json",
+      "repairs": 3,
+      "exitCode": 0,
+      "timedOut": false,
+      "terminationVerified": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "refusals": [],
+      "error": null,
+      "modelEffortBoundary": true
+    },
+    {
+      "slot": 11,
+      "task": "dual-config",
+      "arm": "H",
+      "state": "terminated",
+      "requests": 19,
+      "requestsWithUsage": 19,
+      "requestsWithoutUsage": 0,
+      "usage": {
+        "input_tokens": {
+          "observed": 213750,
+          "records": 19,
+          "complete": true
+        },
+        "output_tokens": {
+          "observed": 7159,
+          "records": 19,
+          "complete": true
+        },
+        "total_tokens": {
+          "observed": 220909,
+          "records": 19,
+          "complete": true
+        },
+        "cached_tokens": {
+          "observed": 88576,
+          "records": 19,
+          "complete": true
+        },
+        "reasoning_tokens": {
+          "observed": 3131,
+          "records": 19,
+          "complete": true
+        }
+      },
+      "elapsedMs": 155019,
+      "toolCalls": 29,
+      "sessions": 2,
+      "rawRunnerWorkflowStatus": "incomplete",
+      "workflowStatus": "incomplete",
+      "workflowStatusSource": "retained-result.json",
+      "repairs": 0,
+      "exitCode": 0,
+      "timedOut": false,
+      "terminationVerified": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "refusals": [],
+      "error": null,
+      "modelEffortBoundary": true
+    },
+    {
+      "slot": 12,
+      "task": "dual-config",
+      "arm": "P",
+      "state": "terminated",
+      "requests": 14,
+      "requestsWithUsage": 14,
+      "requestsWithoutUsage": 0,
+      "usage": {
+        "input_tokens": {
+          "observed": 159974,
+          "records": 14,
+          "complete": true
+        },
+        "output_tokens": {
+          "observed": 7285,
+          "records": 14,
+          "complete": true
+        },
+        "total_tokens": {
+          "observed": 167259,
+          "records": 14,
+          "complete": true
+        },
+        "cached_tokens": {
+          "observed": 70656,
+          "records": 14,
+          "complete": true
+        },
+        "reasoning_tokens": {
+          "observed": 3840,
+          "records": 14,
+          "complete": true
+        }
+      },
+      "elapsedMs": 154467,
+      "toolCalls": 25,
+      "sessions": 1,
+      "rawRunnerWorkflowStatus": null,
+      "workflowStatus": null,
+      "workflowStatusSource": "runner",
+      "repairs": null,
+      "exitCode": 0,
+      "timedOut": false,
+      "terminationVerified": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "refusals": [],
+      "error": null,
+      "modelEffortBoundary": true
+    }
+  ],
+  "gate": {
+    "plainFull": 6,
+    "harnessFull": 2,
+    "wins": 0,
+    "losses": 4,
+    "ties": 2,
+    "passed": false
+  },
+  "interpretationChanges": [
+    "Frozen evaluator missed legacy preparation via preserved old launcher and the legacy catalog 304 boundary. Raw outcomes remain unchanged; supplemental source and executable checks applied equally to both arms and H D0/final. Legacy reference and alternative also fail old-launcher path.",
+    "Combined invalid mode/indent exception precedence is unspecified and not scored. Same-version cached runtime replacement in extraction is a conditional out-of-scope concern, not a scored failure."
+  ],
+  "limitations": [
+    "Four public VibeRacing tasks and two small fixtures; development selection only.",
+    "POSIX container checks do not establish Windows behavior; full platform/web/pnpm matrix excluded.",
+    "State reviewer performed a bounded memory search before packet-only review, without reading arm mapping/outcomes/references. Findings were reproduced independently.",
+    "H final legacy patch reconstructed by observer after managed timeout, not delivered terminal.patch.",
+    "Internal incomplete is not itself code failure. All six H incomplete; five terminal patches, one timeout."
+  ]
+}
