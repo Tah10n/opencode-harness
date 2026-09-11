@@ -1,0 +1,109 @@
+diff --git a/README.md b/README.md
+index a532daad382712d98a6a341870608f74d70bc7f7..17bb2f22b597802343bb4a4648b79ce6e3b219da 100644
+--- a/README.md
++++ b/README.md
+@@ -1,2 +1,9 @@
+ # invite-single-use
+-A small Node library. Run npm test.
++
++A small Node library for accepting team invitations. Run `npm test`.
++
++`accept(book, request, clock)` accepts an invitation at most once. A valid
++invitation is removed from pending and returns `{status: 'joined', team}`. An
++invitation whose `expiresAt` is equal to or earlier than the clock value returns
++`{status: 'expired'}` and remains pending. Replayed or missing tokens return
++`{status: 'missing'}` without adding a member.
+diff --git a/src/redeem.mjs b/src/redeem.mjs
+index 56534c7c155099ea61e3d372081f3e8951a3439c..a0ed440e705ca8cdc559fe8908e6740ab28647e9 100644
+--- a/src/redeem.mjs
++++ b/src/redeem.mjs
+@@ -1 +1,8 @@
+-export function redeem(book,token,now){const invite=book.peek(token);if(!invite)return {status:'missing'};book.join(invite.team,invite.email);return {status:'joined',team:invite.team};}
++export function redeem(book, token, now) {
++  const invite = book.peek(token);
++  if (!invite) return {status: 'missing'};
++  if (invite.expiresAt <= now) return {status: 'expired'};
++  book.remove(token);
++  book.join(invite.team, invite.email);
++  return {status: 'joined', team: invite.team};
++}
+diff --git a/test/invite.test.mjs b/test/invite.test.mjs
+index 8d641a2355d6b14155ca6ef4dc75392ad68634b8..41312b015691c5108e562d54c89103b9a239634b 100644
+--- a/test/invite.test.mjs
++++ b/test/invite.test.mjs
+@@ -1,2 +1,73 @@
+-import {test} from 'node:test';import assert from 'node:assert/strict';import {ledger} from '../src/ledger.mjs';import {accept} from '../src/route.mjs';
+-test('join, remove pending invitation, missing token',()=>{const b=ledger([{token:'t',team:'red',email:'a@b',expiresAt:50}]);assert.deepEqual(accept(b,{token:'t'},()=>1),{status:'joined',team:'red'});assert.deepEqual(b.members(),[{team:'red',email:'a@b'}]);const selected=b.list().filter(x=>x.token==='t');for(const x of selected)b.remove(x.token);assert.equal(b.peek('t'),undefined);assert.deepEqual(accept(b,{token:'unknown'},()=>1),{status:'missing'});});
++import {test} from 'node:test';
++import assert from 'node:assert/strict';
++import {ledger} from '../src/ledger.mjs';
++import {accept} from '../src/route.mjs';
++
++test('join, remove pending invitation, missing token', () => {
++  const b = ledger([{token: 't', team: 'red', email: 'a@b', expiresAt: 50}]);
++  assert.deepEqual(accept(b, {token: 't'}, () => 1), {status: 'joined', team: 'red'});
++  assert.deepEqual(b.members(), [{team: 'red', email: 'a@b'}]);
++  const selected = b.list().filter(x => x.token === 't');
++  for (const x of selected) b.remove(x.token);
++  assert.equal(b.peek('t'), undefined);
++  assert.deepEqual(accept(b, {token: 'unknown'}, () => 1), {status: 'missing'});
++});
++
++test('a valid invitation is single-use and preserves unrelated invitations', () => {
++  const b = ledger([
++    {token: 't', team: 'red', email: 'a@b', expiresAt: 50},
++    {token: 'other', team: 'blue', email: 'c@d', expiresAt: 50},
++  ]);
++  let clockCalls = 0;
++  const clock = () => {
++    clockCalls++;
++    return 1;
++  };
++
++  assert.deepEqual(b.peek('t'), {token: 't', team: 'red', email: 'a@b', expiresAt: 50});
++  assert.deepEqual(accept(b, {token: 't'}, clock), {status: 'joined', team: 'red'});
++  assert.equal(clockCalls, 1);
++  assert.equal(b.peek('t'), undefined);
++  assert.deepEqual(b.list(), [{token: 'other', team: 'blue', email: 'c@d', expiresAt: 50}]);
++  assert.deepEqual(b.members(), [{team: 'red', email: 'a@b'}]);
++
++  assert.equal(b.peek('t'), undefined);
++  assert.deepEqual(accept(b, {token: 't'}, clock), {status: 'missing'});
++  assert.equal(clockCalls, 2);
++  assert.deepEqual(b.list(), [{token: 'other', team: 'blue', email: 'c@d', expiresAt: 50}]);
++  assert.deepEqual(b.members(), [{team: 'red', email: 'a@b'}]);
++});
++
++test('expired invitations at the equality and past boundaries are retained', () => {
++  for (const expiresAt of [10, 9]) {
++    const b = ledger([{token: 't', team: 'red', email: 'a@b', expiresAt}]);
++    let clockCalls = 0;
++    const clock = () => {
++      clockCalls++;
++      return 10;
++    };
++
++    assert.deepEqual(b.peek('t'), {token: 't', team: 'red', email: 'a@b', expiresAt});
++    assert.deepEqual(accept(b, {token: 't'}, clock), {status: 'expired'});
++    assert.equal(clockCalls, 1);
++    assert.deepEqual(b.peek('t'), {token: 't', team: 'red', email: 'a@b', expiresAt});
++    assert.deepEqual(b.members(), []);
++  }
++});
++
++test('missing and independently removed invitations are no-ops', () => {
++  const b = ledger([{token: 't', team: 'red', email: 'a@b', expiresAt: 50}]);
++  b.remove('t');
++  assert.equal(b.peek('t'), undefined);
++  let clockCalls = 0;
++  const clock = () => {
++    clockCalls++;
++    return 1;
++  };
++  assert.deepEqual(accept(b, {token: 't'}, clock), {status: 'missing'});
++  assert.equal(clockCalls, 1);
++  assert.deepEqual(b.members(), []);
++  assert.deepEqual(accept(b, {token: 'unknown'}, clock), {status: 'missing'});
++  assert.equal(clockCalls, 2);
++  assert.deepEqual(b.members(), []);
++});

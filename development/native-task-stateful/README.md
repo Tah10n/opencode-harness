@@ -29,7 +29,7 @@ checks use separate copies after model termination and never change author patch
 
 Materialized bytes, exact instruction diff and task/evaluator hashes are retained
 with the freeze. Private native events and runtime state stay under ignored local
-artifacts. Public results will retain patches, assessments, usage and limitations.
+artifacts. [Completed results](results/README.md) retain all nine patches, assessments, usage and limitations.
 Three development tasks cannot establish durable general superiority.
 
 Historical correction: the earlier statement in

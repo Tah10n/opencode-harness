@@ -1,0 +1,857 @@
+[
+  {
+    "slot": 1,
+    "task": "queue-batch",
+    "arm": "P",
+    "originalRequirementMet": true,
+    "previousBehaviorPreserved": true,
+    "necessaryProjectRegressionsDelivered": true,
+    "testsExerciseTransition": true,
+    "newRegressionsObserved": false,
+    "wholePatchSuitableUnderTaskContract": true,
+    "rawFrozenEvaluatorPassed": false,
+    "evaluatorLimitation": "Unspecified exception subtype; retained raw failure and separate task-contract supplement",
+    "workflowStatus": null,
+    "corrections": null,
+    "mechanism": {
+      "observed": false,
+      "scope": "No executable assertion of required actual state immediately before the populated transition; correct fresh setup and postconditions are present.",
+      "setupFailureDetected": false,
+      "postconditionPreserved": true,
+      "expectationFittedToWrongState": false
+    },
+    "authorExecutedChecks": [
+      {
+        "command": "npm test",
+        "exit": 0,
+        "counts": {
+          "tests": 5,
+          "pass": 5,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      }
+    ],
+    "sensitivity": {
+      "method": "Target store transition disabled only in offline copy, success-shaped return retained",
+      "exit": 1,
+      "failedTests": [
+        "legacy successful, retry and idle behavior",
+        "processes a mixed batch in FIFO order and preserves retry payloads",
+        "bounds all-failure retry to the ready jobs present at call start"
+      ],
+      "postconditionFailureConfirmed": true
+    },
+    "coverageBasis": "Independent legacy success/retry/idle, bounded all-failure batch, mixed FIFO/payload invariants, invalid/zero no mutation all exercised."
+  },
+  {
+    "slot": 2,
+    "task": "queue-batch",
+    "arm": "H0",
+    "originalRequirementMet": true,
+    "previousBehaviorPreserved": true,
+    "necessaryProjectRegressionsDelivered": true,
+    "testsExerciseTransition": true,
+    "newRegressionsObserved": false,
+    "wholePatchSuitableUnderTaskContract": true,
+    "rawFrozenEvaluatorPassed": false,
+    "evaluatorLimitation": "Unspecified exception subtype; retained raw failure and separate task-contract supplement",
+    "workflowStatus": "incomplete",
+    "corrections": 3,
+    "mechanism": {
+      "observed": false,
+      "scope": "No executable assertion of required actual state immediately before the populated transition; correct fresh setup and postconditions are present.",
+      "setupFailureDetected": false,
+      "postconditionPreserved": true,
+      "expectationFittedToWrongState": false
+    },
+    "authorExecutedChecks": [
+      {
+        "command": "node --test test/worker.test.mjs",
+        "exit": 1,
+        "counts": {
+          "tests": 7,
+          "pass": 3,
+          "fail": 4,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "node --test --test-name-pattern='bounded mixed|all failed|zero limit|invalid limit' test/worker.test.mjs",
+        "exit": 0,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "node --test --test-name-pattern='legacy successful|legacy failed|idle queue' test/worker.test.mjs",
+        "exit": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "npm test",
+        "exit": 0,
+        "counts": {
+          "tests": 7,
+          "pass": 7,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "node --test --test-name-pattern='bounded mixed|all failed|zero limit|invalid limit' test/worker.test.mjs",
+        "exit": 0,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "node --test --test-name-pattern='legacy successful|default limit|legacy failed|idle queue' test/worker.test.mjs",
+        "exit": 0,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "npm test",
+        "exit": 0,
+        "counts": {
+          "tests": 8,
+          "pass": 8,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      }
+    ],
+    "sensitivity": {
+      "method": "Target store transition disabled only in offline copy, success-shaped return retained",
+      "exit": 1,
+      "failedTests": [
+        "legacy failed job is retried",
+        "processes a bounded mixed batch in FIFO order and preserves payloads",
+        "all failed batch retries only the jobs present at call start"
+      ],
+      "postconditionFailureConfirmed": true
+    },
+    "coverageBasis": "Independent legacy success/retry/idle, bounded all-failure batch, mixed FIFO/payload invariants, invalid/zero no mutation all exercised."
+  },
+  {
+    "slot": 3,
+    "task": "queue-batch",
+    "arm": "H1",
+    "originalRequirementMet": true,
+    "previousBehaviorPreserved": true,
+    "necessaryProjectRegressionsDelivered": true,
+    "testsExerciseTransition": true,
+    "newRegressionsObserved": false,
+    "wholePatchSuitableUnderTaskContract": true,
+    "rawFrozenEvaluatorPassed": false,
+    "evaluatorLimitation": "Unspecified exception subtype; retained raw failure and separate task-contract supplement",
+    "workflowStatus": "incomplete",
+    "corrections": 0,
+    "mechanism": {
+      "observed": false,
+      "scope": "No executable assertion of required actual state immediately before the populated transition; correct fresh setup and postconditions are present.",
+      "setupFailureDetected": false,
+      "postconditionPreserved": true,
+      "expectationFittedToWrongState": false
+    },
+    "authorExecutedChecks": [
+      {
+        "command": "npm test",
+        "exit": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "node --test --test-name-pattern='(mixed batch|each initially ready|invalid limits|zero limit|empty queue)'",
+        "exit": 0,
+        "counts": {
+          "tests": 5,
+          "pass": 5,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "node --test --test-name-pattern='preserves the legacy'",
+        "exit": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "npm test",
+        "exit": 0,
+        "counts": {
+          "tests": 8,
+          "pass": 8,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      }
+    ],
+    "sensitivity": {
+      "method": "Target store transition disabled only in offline copy, success-shaped return retained",
+      "exit": 1,
+      "failedTests": [
+        "processes a mixed batch in FIFO order and preserves payloads",
+        "retries each initially ready job at most once when all jobs fail",
+        "preserves the legacy retry behavior"
+      ],
+      "postconditionFailureConfirmed": true
+    },
+    "coverageBasis": "Independent legacy success/retry/idle, bounded all-failure batch, mixed FIFO/payload invariants, invalid/zero no mutation all exercised."
+  },
+  {
+    "slot": 4,
+    "task": "editor-cancel",
+    "arm": "H0",
+    "originalRequirementMet": true,
+    "previousBehaviorPreserved": true,
+    "necessaryProjectRegressionsDelivered": true,
+    "testsExerciseTransition": true,
+    "newRegressionsObserved": false,
+    "wholePatchSuitableUnderTaskContract": true,
+    "rawFrozenEvaluatorPassed": true,
+    "evaluatorLimitation": null,
+    "workflowStatus": "incomplete",
+    "corrections": 0,
+    "mechanism": {
+      "observed": false,
+      "scope": "No executable assertion of required actual state immediately before the populated transition; correct fresh setup and postconditions are present.",
+      "setupFailureDetected": false,
+      "postconditionPreserved": true,
+      "expectationFittedToWrongState": false
+    },
+    "authorExecutedChecks": [
+      {
+        "command": "node --test --test-name-pattern='cancel|mixed|invalid|empty' test/editor.test.mjs",
+        "exit": 0,
+        "counts": {
+          "tests": 6,
+          "pass": 6,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "node --test --test-name-pattern='^publish, cancel, absent$' test/editor.test.mjs",
+        "exit": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "npm test",
+        "exit": 0,
+        "counts": {
+          "tests": 6,
+          "pass": 6,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      }
+    ],
+    "sensitivity": {
+      "method": "Target store transition disabled only in offline copy, success-shaped return retained",
+      "exit": 1,
+      "failedTests": [
+        "cancel removes a staged replacement without removing its published revision",
+        "repeated and missing cancellation returns false after the first cancellation",
+        "mixed actions execute in input order"
+      ],
+      "postconditionFailureConfirmed": true
+    },
+    "coverageBasis": "Existing staged cancellation via consumer, published/unrelated preservation, repeated/missing cancellation, ordered mixed actions, invalid later action atomicity and empty batches. Old vacuous fragment may remain, but independent equivalent coverage is delivered."
+  },
+  {
+    "slot": 5,
+    "task": "editor-cancel",
+    "arm": "H1",
+    "originalRequirementMet": true,
+    "previousBehaviorPreserved": true,
+    "necessaryProjectRegressionsDelivered": true,
+    "testsExerciseTransition": true,
+    "newRegressionsObserved": false,
+    "wholePatchSuitableUnderTaskContract": true,
+    "rawFrozenEvaluatorPassed": true,
+    "evaluatorLimitation": null,
+    "workflowStatus": "incomplete",
+    "corrections": 1,
+    "mechanism": {
+      "observed": true,
+      "scope": "Populated transition and valid no-work cases",
+      "setupFailureDetected": false,
+      "postconditionPreserved": true,
+      "expectationFittedToWrongState": false,
+      "selectedFromTaskAndCode": true,
+      "observesActualState": true,
+      "preconditionAPI": "read()",
+      "setupRepairAttributedToPrecondition": false,
+      "scenarioMeaningPreserved": true
+    },
+    "authorExecutedChecks": [
+      {
+        "command": "node --test test/editor.test.mjs",
+        "exit": 1,
+        "counts": {
+          "tests": 5,
+          "pass": 0,
+          "fail": 5,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "node --test --test-name-pattern='cancels an existing|preserves unrelated|repeated and missing|mixed actions|invalid later' test/editor.test.mjs",
+        "exit": 0,
+        "counts": {
+          "tests": 5,
+          "pass": 5,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "node --test --test-name-pattern='preserves publish semantics and no-work cases' test/editor.test.mjs",
+        "exit": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "npm test",
+        "exit": 0,
+        "counts": {
+          "tests": 6,
+          "pass": 6,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "node --test test/editor.test.mjs",
+        "exit": 0,
+        "counts": {
+          "tests": 7,
+          "pass": 7,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "node --test --test-name-pattern='cancels an existing|preserves unrelated|repeated and missing|mixed actions|invalid later' test/editor.test.mjs",
+        "exit": 0,
+        "counts": {
+          "tests": 5,
+          "pass": 5,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "node --test --test-name-pattern='publish, cancel, absent|preserves publish semantics and no-work cases' test/editor.test.mjs",
+        "exit": 0,
+        "counts": {
+          "tests": 2,
+          "pass": 2,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "npm test",
+        "exit": 0,
+        "counts": {
+          "tests": 7,
+          "pass": 7,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      }
+    ],
+    "sensitivity": {
+      "method": "Target store transition disabled only in offline copy, success-shaped return retained",
+      "exit": 1,
+      "failedTests": [
+        "cancels an existing staged replacement without removing its publication",
+        "preserves unrelated staged drafts when canceling a published id",
+        "repeated and missing cancellation return false",
+        "executes mixed actions in input order and supports an empty batch"
+      ],
+      "postconditionFailureConfirmed": true
+    },
+    "coverageBasis": "Existing staged cancellation via consumer, published/unrelated preservation, repeated/missing cancellation, ordered mixed actions, invalid later action atomicity and empty batches. Old vacuous fragment may remain, but independent equivalent coverage is delivered."
+  },
+  {
+    "slot": 6,
+    "task": "editor-cancel",
+    "arm": "P",
+    "originalRequirementMet": true,
+    "previousBehaviorPreserved": true,
+    "necessaryProjectRegressionsDelivered": true,
+    "testsExerciseTransition": true,
+    "newRegressionsObserved": false,
+    "wholePatchSuitableUnderTaskContract": true,
+    "rawFrozenEvaluatorPassed": true,
+    "evaluatorLimitation": null,
+    "workflowStatus": null,
+    "corrections": null,
+    "mechanism": {
+      "observed": false,
+      "scope": "No executable assertion of required actual state immediately before the populated transition; correct fresh setup and postconditions are present.",
+      "setupFailureDetected": false,
+      "postconditionPreserved": true,
+      "expectationFittedToWrongState": false
+    },
+    "authorExecutedChecks": [
+      {
+        "command": "npm test",
+        "exit": 0,
+        "counts": {
+          "tests": 5,
+          "pass": 5,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      }
+    ],
+    "sensitivity": {
+      "method": "Target store transition disabled only in offline copy, success-shaped return retained",
+      "exit": 1,
+      "failedTests": [
+        "cancel removes a staged replacement without removing its published revision or unrelated drafts",
+        "repeated and missing cancellation return false",
+        "mixed actions execute in input order and return store results"
+      ],
+      "postconditionFailureConfirmed": true
+    },
+    "coverageBasis": "Existing staged cancellation via consumer, published/unrelated preservation, repeated/missing cancellation, ordered mixed actions, invalid later action atomicity and empty batches. Old vacuous fragment may remain, but independent equivalent coverage is delivered."
+  },
+  {
+    "slot": 7,
+    "task": "invite-single-use",
+    "arm": "H1",
+    "originalRequirementMet": true,
+    "previousBehaviorPreserved": true,
+    "necessaryProjectRegressionsDelivered": true,
+    "testsExerciseTransition": true,
+    "newRegressionsObserved": false,
+    "wholePatchSuitableUnderTaskContract": true,
+    "rawFrozenEvaluatorPassed": true,
+    "evaluatorLimitation": null,
+    "workflowStatus": "incomplete",
+    "corrections": 2,
+    "mechanism": {
+      "observed": true,
+      "scope": "Populated transition and valid no-work cases",
+      "setupFailureDetected": false,
+      "postconditionPreserved": true,
+      "expectationFittedToWrongState": false,
+      "selectedFromTaskAndCode": true,
+      "observesActualState": true,
+      "preconditionAPI": "peek()",
+      "setupRepairAttributedToPrecondition": false,
+      "scenarioMeaningPreserved": true
+    },
+    "authorExecutedChecks": [
+      {
+        "command": "node --test --test-name-pattern='single-use|expired|independently' test/invite.test.mjs",
+        "exit": 1,
+        "counts": {
+          "tests": 3,
+          "pass": 1,
+          "fail": 2,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "node --test --test-name-pattern='single-use|expired' test/invite.test.mjs",
+        "exit": 0,
+        "counts": {
+          "tests": 2,
+          "pass": 2,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "node --test --test-name-pattern='join, remove|independently removed' test/invite.test.mjs",
+        "exit": 0,
+        "counts": {
+          "tests": 2,
+          "pass": 2,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "npm test",
+        "exit": 0,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "node --test --test-name-pattern='single-use|expired' test/invite.test.mjs",
+        "exit": 0,
+        "counts": {
+          "tests": 2,
+          "pass": 2,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "node --test --test-name-pattern='join, remove|independently removed' test/invite.test.mjs",
+        "exit": 0,
+        "counts": {
+          "tests": 2,
+          "pass": 2,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "npm test",
+        "exit": 0,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "node --test --test-name-pattern='single-use|expired' test/invite.test.mjs",
+        "exit": 0,
+        "counts": {
+          "tests": 2,
+          "pass": 2,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "node --test --test-name-pattern='join, remove|independently removed' test/invite.test.mjs",
+        "exit": 0,
+        "counts": {
+          "tests": 2,
+          "pass": 2,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "npm test",
+        "exit": 0,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "node --test --test-name-pattern='single-use|expired' test/invite.test.mjs",
+        "exit": 0,
+        "counts": {
+          "tests": 2,
+          "pass": 2,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "node --test --test-name-pattern='join, remove|independently removed' test/invite.test.mjs",
+        "exit": 0,
+        "counts": {
+          "tests": 2,
+          "pass": 2,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "npm test",
+        "exit": 0,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      }
+    ],
+    "sensitivity": {
+      "method": "Target store transition disabled only in offline copy, success-shaped return retained",
+      "exit": 1,
+      "failedTests": [
+        "join, remove pending invitation, missing token",
+        "a valid invitation is single-use and preserves unrelated invitations",
+        "missing and independently removed invitations are no-ops"
+      ],
+      "postconditionFailureConfirmed": true
+    },
+    "coverageBasis": "Valid accept/replay, exactly one membership, unrelated pending record, equality and past expiry retention, independent removal and missing no-ops. The old shared fragment may become vacuous but independent coverage supplies its behavior."
+  },
+  {
+    "slot": 8,
+    "task": "invite-single-use",
+    "arm": "P",
+    "originalRequirementMet": true,
+    "previousBehaviorPreserved": true,
+    "necessaryProjectRegressionsDelivered": true,
+    "testsExerciseTransition": true,
+    "newRegressionsObserved": false,
+    "wholePatchSuitableUnderTaskContract": true,
+    "rawFrozenEvaluatorPassed": true,
+    "evaluatorLimitation": null,
+    "workflowStatus": null,
+    "corrections": null,
+    "mechanism": {
+      "observed": false,
+      "scope": "No executable assertion of required actual state immediately before the populated transition; correct fresh setup and postconditions are present.",
+      "setupFailureDetected": false,
+      "postconditionPreserved": true,
+      "expectationFittedToWrongState": false
+    },
+    "authorExecutedChecks": [
+      {
+        "command": "npm test",
+        "exit": 0,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "npm test",
+        "exit": 0,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      }
+    ],
+    "sensitivity": {
+      "method": "Target store transition disabled only in offline copy, success-shaped return retained",
+      "exit": 1,
+      "failedTests": [
+        "join, remove pending invitation, missing token",
+        "a valid invitation is single-use and preserves unrelated invitations",
+        "manual removal and missing acceptance remain no-ops"
+      ],
+      "postconditionFailureConfirmed": true
+    },
+    "coverageBasis": "Valid accept/replay, exactly one membership, unrelated pending record, equality and past expiry retention, independent removal and missing no-ops. The old shared fragment may become vacuous but independent coverage supplies its behavior."
+  },
+  {
+    "slot": 9,
+    "task": "invite-single-use",
+    "arm": "H0",
+    "originalRequirementMet": true,
+    "previousBehaviorPreserved": true,
+    "necessaryProjectRegressionsDelivered": true,
+    "testsExerciseTransition": true,
+    "newRegressionsObserved": false,
+    "wholePatchSuitableUnderTaskContract": true,
+    "rawFrozenEvaluatorPassed": true,
+    "evaluatorLimitation": null,
+    "workflowStatus": "incomplete",
+    "corrections": 3,
+    "mechanism": {
+      "observed": true,
+      "scope": "Valid empty-state no-op after independent removal: peek(token) is undefined before accept; no populated-transition precondition.",
+      "setupFailureDetected": false,
+      "postconditionPreserved": true,
+      "expectationFittedToWrongState": false,
+      "observesActualState": true
+    },
+    "authorExecutedChecks": [
+      {
+        "command": "npm test",
+        "exit": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "node --test test/invite.test.mjs",
+        "exit": 1,
+        "counts": {
+          "tests": 5,
+          "pass": 2,
+          "fail": 3,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "node --test --test-name-pattern='valid invitation|at its expiration|past its expiration' test/invite.test.mjs",
+        "exit": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "node --test --test-name-pattern='join, remove pending invitation, missing token|missing invitation is a no-op' test/invite.test.mjs",
+        "exit": 0,
+        "counts": {
+          "tests": 2,
+          "pass": 2,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "npm test",
+        "exit": 0,
+        "counts": {
+          "tests": 5,
+          "pass": 5,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "node --test --test-name-pattern='valid invitation|at its expiration|past its expiration' test/invite.test.mjs",
+        "exit": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "node --test --test-name-pattern='join, remove pending invitation, missing token|missing invitation is a no-op|separately removed invitation' test/invite.test.mjs",
+        "exit": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "npm test",
+        "exit": 0,
+        "counts": {
+          "tests": 6,
+          "pass": 6,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "command": "node --test test/invite.test.mjs",
+        "exit": 0,
+        "counts": {
+          "tests": 6,
+          "pass": 6,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      }
+    ],
+    "sensitivity": {
+      "method": "Target store transition disabled only in offline copy, success-shaped return retained",
+      "exit": 1,
+      "failedTests": [
+        "join, remove pending invitation, missing token",
+        "a valid invitation is consumed and replay is missing",
+        "a separately removed invitation remains missing"
+      ],
+      "postconditionFailureConfirmed": true
+    },
+    "coverageBasis": "Valid accept/replay, exactly one membership, unrelated pending record, equality and past expiry retention, independent removal and missing no-ops. The old shared fragment may become vacuous but independent coverage supplies its behavior."
+  }
+]

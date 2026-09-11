@@ -1,0 +1,168 @@
+diff --git a/README.md b/README.md
+index 1295c94d3e0ab7f81c651d9ae269e2c2c77088c7..14320ada1f26a2405e51ed57fb69d481ce961db2 100644
+--- a/README.md
++++ b/README.md
+@@ -1,2 +1,19 @@
+ # editor-cancel
+-A small Node library. Run npm test.
++A small Node library for staging and publishing drafts. Run `npm test`.
++
++Use `apply(store, actions)` to execute an ordered batch of publish and cancel
++actions:
++
++```js
++apply(store, [
++ {type: 'publish', id: 'article'},
++ {type: 'cancel', id: 'article-draft'}
++]);
++```
++
++Every action must have type `publish` or `cancel` and a nonempty string `id`.
++The complete batch is validated before any action runs, and the result is an
++array of booleans from the store operations. Cancel removes only the staged
++revision, so an existing published revision and unrelated staged drafts stay
++intact. Canceling an absent revision returns `false`; an empty batch returns
++`[]`.
+diff --git a/src/editor.mjs b/src/editor.mjs
+index 83e0918f062770be66c465b4ea6c16593d3d4ee7..d19e14e26d4717024df4787a761c14ad91b2785f 100644
+--- a/src/editor.mjs
++++ b/src/editor.mjs
+@@ -1,3 +1,13 @@
+ export function apply(store, actions) {
+- return actions.map(a=>a.type==='publish'?store.publish(a.id):false);
++ if (!Array.isArray(actions)) throw new TypeError('actions must be an array');
++ for (const action of actions) {
++  if (action === null || typeof action !== 'object' ||
++      (action.type !== 'publish' && action.type !== 'cancel') ||
++      typeof action.id !== 'string' || action.id.length === 0) {
++   throw new TypeError('each action must have a valid type and id');
++  }
++ }
++ return actions.map(action => action.type === 'publish'
++  ? store.publish(action.id)
++  : store.cancel(action.id));
+ }
+diff --git a/test/editor.test.mjs b/test/editor.test.mjs
+index 7741d275088f13d1c9cbbbba6f83da3a6c9cfd77..779ba525426ee75c3ce253c3415f85cf0734d2ce 100644
+--- a/test/editor.test.mjs
++++ b/test/editor.test.mjs
+@@ -1,2 +1,117 @@
+-import {test} from 'node:test';import assert from 'node:assert/strict';import {drafts} from '../src/drafts.mjs';import {apply} from '../src/editor.mjs';
+-test('publish, cancel, absent',()=>{const s=drafts();s.stage('x','draft');assert.deepEqual(apply(s,[{type:'publish',id:'x'}]),[true]);assert.deepEqual(s.read().published,{x:'draft'});const selected=Object.keys(s.read().staged).filter(id=>id==='x');for(const id of selected)s.cancel(id);assert.deepEqual(s.read().staged,{});assert.equal(s.cancel('missing'),false);});
++import {test} from 'node:test';
++import assert from 'node:assert/strict';
++import {drafts} from '../src/drafts.mjs';
++import {apply} from '../src/editor.mjs';
++
++test('publish, cancel, absent', () => {
++ const s = drafts();
++ s.stage('x', 'draft');
++ assert.deepEqual(apply(s, [{type: 'publish', id: 'x'}]), [true]);
++ assert.deepEqual(s.read().published, {x: 'draft'});
++ const selected = Object.keys(s.read().staged).filter(id => id === 'x');
++ for (const id of selected) s.cancel(id);
++ assert.deepEqual(s.read().staged, {});
++ assert.equal(s.cancel('missing'), false);
++});
++
++test('preserves publish semantics and no-work cases', () => {
++ const s = drafts();
++ assert.deepEqual(apply(s, []), []);
++ assert.deepEqual(apply(s, [{type: 'publish', id: 'missing'}]), [false]);
++ s.stage('x', 'draft');
++ assert.deepEqual(apply(s, [{type: 'publish', id: 'x'}]), [true]);
++ assert.deepEqual(apply(s, [{type: 'cancel', id: 'x'}]), [false]);
++ assert.deepEqual(s.read(), {staged: {}, published: {x: 'draft'}});
++});
++
++test('cancels an existing staged replacement without removing its publication', () => {
++ const s = drafts();
++ s.stage('x', 'original');
++ assert.deepEqual(s.read(), {staged: {x: 'original'}, published: {}});
++ assert.deepEqual(apply(s, [{type: 'publish', id: 'x'}]), [true]);
++ s.stage('x', 'replacement');
++ assert.deepEqual(s.read(), {staged: {x: 'replacement'}, published: {x: 'original'}});
++
++ assert.deepEqual(apply(s, [{type: 'cancel', id: 'x'}]), [true]);
++ assert.deepEqual(s.read(), {staged: {}, published: {x: 'original'}});
++});
++
++test('preserves unrelated staged drafts when canceling a published id', () => {
++ const s = drafts();
++ s.stage('published', 'first');
++ s.stage('unrelated', 'keep');
++ assert.deepEqual(s.read(), {
++  staged: {published: 'first', unrelated: 'keep'},
++  published: {}
++ });
++ assert.deepEqual(apply(s, [{type: 'publish', id: 'published'}]), [true]);
++ s.stage('published', 'replacement');
++ assert.deepEqual(s.read(), {
++  staged: {unrelated: 'keep', published: 'replacement'},
++  published: {published: 'first'}
++ });
++
++ assert.deepEqual(apply(s, [{type: 'cancel', id: 'published'}]), [true]);
++ assert.deepEqual(s.read(), {
++  staged: {unrelated: 'keep'},
++  published: {published: 'first'}
++ });
++});
++
++test('repeated and missing cancellation return false', () => {
++ const s = drafts();
++ s.stage('x', 'draft');
++ assert.deepEqual(s.read(), {staged: {x: 'draft'}, published: {}});
++ assert.deepEqual(apply(s, [{type: 'cancel', id: 'x'}]), [true]);
++ assert.deepEqual(s.read(), {staged: {}, published: {}});
++ assert.deepEqual(apply(s, [{type: 'cancel', id: 'x'}]), [false]);
++ assert.deepEqual(apply(s, [{type: 'cancel', id: 'missing'}]), [false]);
++ assert.deepEqual(s.read(), {staged: {}, published: {}});
++});
++
++test('executes mixed actions in input order and supports an empty batch', () => {
++ const s = drafts();
++ s.stage('published', 'publish me');
++ s.stage('cancelled', 'cancel me');
++ assert.deepEqual(s.read(), {
++  staged: {published: 'publish me', cancelled: 'cancel me'},
++  published: {}
++ });
++ assert.deepEqual(apply(s, []), []);
++ assert.deepEqual(s.read(), {
++  staged: {published: 'publish me', cancelled: 'cancel me'},
++  published: {}
++ });
++
++ assert.deepEqual(apply(s, [
++  {type: 'publish', id: 'published'},
++  {type: 'cancel', id: 'cancelled'},
++  {type: 'cancel', id: 'published'}
++ ]), [true, true, false]);
++ assert.deepEqual(s.read(), {
++  staged: {},
++  published: {published: 'publish me'}
++ });
++});
++
++test('rejects an invalid later action without mutating earlier valid actions', () => {
++ const s = drafts();
++ s.stage('first', 'first draft');
++ s.stage('second', 'second draft');
++ assert.deepEqual(s.read(), {
++  staged: {first: 'first draft', second: 'second draft'},
++  published: {}
++ });
++
++ assert.throws(
++  () => apply(s, [
++   {type: 'publish', id: 'first'},
++   {type: 'archive', id: 'second'}
++  ]),
++  TypeError
++ );
++ assert.deepEqual(s.read(), {
++  staged: {first: 'first draft', second: 'second draft'},
++  published: {}
++ });
++});

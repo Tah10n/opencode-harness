@@ -1,0 +1,130 @@
+diff --git a/README.md b/README.md
+index 20c054d158a9889731b4ea4fe0297a766c021250..5477b01e02075d933a2efba0ea3d66f7352646f2 100644
+--- a/README.md
++++ b/README.md
+@@ -1,2 +1,9 @@
+ # queue-batch
+-A small Node library. Run npm test.
++A small Node library. Run `npm test`.
++
++`work(q, send, limit = 1)` sends up to `limit` jobs that were ready when the
++call began, in FIFO order. `limit` must be a nonnegative safe integer. A
++successful job is acknowledged; a failed job is retried once at the ready
++queue tail and is not processed again during the same call. The result has
++`sent` and `retried` ID arrays in processing order. A zero limit or an empty
++queue does nothing.
+diff --git a/src/worker.mjs b/src/worker.mjs
+index 92d2351b9d7ba4d0c7e1eed4eb5e87a1223a2034..6ec49ef5dfaada8e4c20dc852d084143f2c4eb7a 100644
+--- a/src/worker.mjs
++++ b/src/worker.mjs
+@@ -1,5 +1,16 @@
+-export function work(q, send) {
+- const job=q.take();if(!job)return {sent:[],retried:[]};
+- const ok=send(job);if(ok)q.ack(job.id);else q.retry(job.id);
+- return {sent:ok?[job.id]:[],retried:ok?[]:[job.id]};
++export function work(q, send, limit=1) {
++ if(!Number.isSafeInteger(limit)||limit<0)throw new RangeError('limit must be a nonnegative safe integer');
++ const jobs=[];
++ for(let i=0;i<limit;i++){
++  const job=q.take();
++  if(!job)break;
++  jobs.push(job);
++ }
++ const sent=[],retried=[];
++ for(const job of jobs){
++  const ok=send(job);
++  if(ok){q.ack(job.id);sent.push(job.id);}
++  else{q.retry(job.id);retried.push(job.id);}
++ }
++ return {sent,retried};
+ }
+diff --git a/test/worker.test.mjs b/test/worker.test.mjs
+index ff033496e5a2f6351e2ad1739681b6bd324defb7..6245e419033b6095d932f28df69302c7f11e5791 100644
+--- a/test/worker.test.mjs
++++ b/test/worker.test.mjs
+@@ -1,11 +1,80 @@
+ import {test} from 'node:test';import assert from 'node:assert/strict';
+ import {queue} from '../src/queue.mjs';import {work} from '../src/worker.mjs';
+-test('success, retry and idle',()=>{
++
++test('legacy successful job is acknowledged',()=>{
+  const q=queue([{id:'a',payload:1}]);
+  assert.deepEqual(work(q,()=>true),{sent:['a'],retried:[]});
+  assert.deepEqual(q.snapshot(),{ready:[],leased:[]});
+- const expected=q.snapshot().ready.map(x=>x.id);
+- assert.deepEqual(work(q,job=>!expected.includes(job.id)).retried,expected);
+- assert.deepEqual(q.snapshot().ready.map(x=>x.id),expected);
+- assert.deepEqual(work(q,()=>true),{sent:[],retried:[]});
++});
++
++test('default limit still processes one job',()=>{
++ const jobs=[{id:'a',payload:1},{id:'b',payload:2}];
++ const q=queue(jobs);
++ assert.deepEqual(work(q,job=>job.payload===1),{sent:['a'],retried:[]});
++ assert.deepEqual(q.snapshot(),{ready:[jobs[1]],leased:[]});
++});
++
++test('legacy failed job is retried',()=>{
++ const q=queue([{id:'a',payload:1}]);
++ assert.deepEqual(work(q,()=>false),{sent:[],retried:['a']});
++ assert.deepEqual(q.snapshot(),{ready:[{id:'a',payload:1}],leased:[]});
++});
++
++test('idle queue is a no-op',()=>{
++ const q=queue([]);
++ assert.deepEqual(work(q,()=>{throw new Error('send should not run');}),{sent:[],retried:[]});
++ assert.deepEqual(q.snapshot(),{ready:[],leased:[]});
++});
++
++test('processes a bounded mixed batch in FIFO order and preserves payloads',()=>{
++ const jobs=[
++  {id:'a',payload:{value:1}},
++  {id:'b',payload:{value:2}},
++  {id:'c',payload:{value:3}},
++  {id:'d',payload:{value:4}}
++ ];
++ const q=queue(jobs);
++ const seen=[];
++ const result=work(q,job=>{
++  seen.push(job);
++  return job.id !== 'b';
++ },3);
++ assert.deepEqual(seen,jobs.slice(0,3));
++ assert.deepEqual(result,{sent:['a','c'],retried:['b']});
++ assert.deepEqual(q.snapshot(),{
++  ready:[jobs[3],jobs[1]],
++  leased:[]
++ });
++});
++
++test('all failed batch retries only the jobs present at call start',()=>{
++ const jobs=[{id:'a',payload:1},{id:'b',payload:2}];
++ const q=queue(jobs);
++ const seen=[];
++ assert.deepEqual(work(q,job=>{
++  seen.push(job.id);
++  return false;
++ },10),{sent:[],retried:['a','b']});
++ assert.deepEqual(seen,['a','b']);
++ assert.deepEqual(q.snapshot(),{ready:jobs,leased:[]});
++});
++
++test('zero limit is a no-op',()=>{
++ const jobs=[{id:'a',payload:1}];
++ const q=queue(jobs);
++ const before=q.snapshot();
++ assert.deepEqual(work(q,()=>{throw new Error('send should not run');},0),{sent:[],retried:[]});
++ assert.deepEqual(q.snapshot(),before);
++});
++
++test('invalid limit throws before mutation or send',()=>{
++ const invalidLimits=[-1,1.5,Number.MAX_SAFE_INTEGER+1,NaN,Infinity,'1',null];
++ for(const limit of invalidLimits){
++  const q=queue([{id:'a',payload:1},{id:'b',payload:2}]);
++  const before=q.snapshot();
++  let sends=0;
++  assert.throws(()=>work(q,()=>{sends++;},limit),RangeError);
++  assert.equal(sends,0);
++  assert.deepEqual(q.snapshot(),before);
++ }
+ });

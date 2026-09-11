@@ -1,0 +1,105 @@
+diff --git a/README.md b/README.md
+index 20c054d158a9889731b4ea4fe0297a766c021250..cb666269ff6230bfbc8be37171fa7ba7dd665314 100644
+--- a/README.md
++++ b/README.md
+@@ -1,2 +1,9 @@
+ # queue-batch
+-A small Node library. Run npm test.
++A small Node library. Run `npm test`.
++
++`work(q, send, limit = 1)` processes up to `limit` jobs that are ready when
++the call starts, in FIFO order. `limit` must be a nonnegative safe integer.
++Successful jobs are acknowledged; failed jobs are retried once at the ready
++queue's tail and are not processed again during the same call. It returns
++`{sent, retried}`, with IDs in processing order. A zero limit or an empty queue
++does nothing.
+diff --git a/src/worker.mjs b/src/worker.mjs
+index 92d2351b9d7ba4d0c7e1eed4eb5e87a1223a2034..9bf79e5cc171f92e39f48f7339accd83c0c25c23 100644
+--- a/src/worker.mjs
++++ b/src/worker.mjs
+@@ -1,5 +1,10 @@
+-export function work(q, send) {
+- const job=q.take();if(!job)return {sent:[],retried:[]};
+- const ok=send(job);if(ok)q.ack(job.id);else q.retry(job.id);
+- return {sent:ok?[job.id]:[],retried:ok?[]:[job.id]};
++export function work(q, send, limit=1) {
++ if(!Number.isSafeInteger(limit)||limit<0)throw new RangeError('limit must be a nonnegative safe integer');
++ const count=Math.min(limit,q.snapshot().ready.length),sent=[],retried=[];
++ for(let i=0;i<count;i++){
++  const job=q.take();
++  const ok=send(job);
++  if(ok){q.ack(job.id);sent.push(job.id);}else{q.retry(job.id);retried.push(job.id);}
++ }
++ return {sent,retried};
+ }
+diff --git a/test/worker.test.mjs b/test/worker.test.mjs
+index ff033496e5a2f6351e2ad1739681b6bd324defb7..24cb3fd190f0a738eca455a7209cdabd77ec1952 100644
+--- a/test/worker.test.mjs
++++ b/test/worker.test.mjs
+@@ -1,11 +1,62 @@
+ import {test} from 'node:test';import assert from 'node:assert/strict';
+ import {queue} from '../src/queue.mjs';import {work} from '../src/worker.mjs';
+-test('success, retry and idle',()=>{
++
++test('processes a mixed batch in FIFO order and preserves payloads',()=>{
++ const jobs=[{id:'a',payload:{value:1}},{id:'b',payload:{value:2}},{id:'c',payload:{value:3}},{id:'d',payload:{value:4}}];
++ const q=queue(jobs),received=[];
++ const result=work(q,job=>{received.push(job);return job.id!=='b';},3);
++ assert.deepEqual(received,jobs.slice(0,3));
++ assert.deepEqual(result,{sent:['a','c'],retried:['b']});
++ assert.deepEqual(q.snapshot(),{ready:[jobs[3],jobs[1]],leased:[]});
++});
++
++test('retries each initially ready job at most once when all jobs fail',()=>{
++ const jobs=[{id:'a',payload:1},{id:'b',payload:2}],q=queue(jobs),received=[];
++ const result=work(q,job=>{received.push(job.id);return false;},5);
++ assert.deepEqual(received,['a','b']);
++ assert.deepEqual(result,{sent:[],retried:['a','b']});
++ assert.deepEqual(q.snapshot(),{ready:jobs,leased:[]});
++});
++
++test('rejects invalid limits without mutation or sending',()=>{
++ const invalid=[-1,1.5,Number.MAX_SAFE_INTEGER+1,Infinity,NaN,'1'];
++ for(const limit of invalid){
++  const q=queue([{id:'a',payload:1}]),before=q.snapshot();
++  let sends=0;
++  assert.throws(()=>work(q,()=>{sends++;return true;},limit),RangeError);
++  assert.equal(sends,0);
++  assert.deepEqual(q.snapshot(),before);
++ }
++});
++
++test('zero limit is a no-op',()=>{
++ const q=queue([{id:'a',payload:1}]),before=q.snapshot();
++ let sends=0;
++ assert.deepEqual(work(q,()=>{sends++;return true;},0),{sent:[],retried:[]});
++ assert.equal(sends,0);
++ assert.deepEqual(q.snapshot(),before);
++});
++
++test('empty queue is a no-op',()=>{
++ const q=queue([]);
++ assert.deepEqual(work(q,()=>{throw new Error('should not send');},3),{sent:[],retried:[]});
++ assert.deepEqual(q.snapshot(),{ready:[],leased:[]});
++});
++
++test('preserves the legacy successful behavior',()=>{
+  const q=queue([{id:'a',payload:1}]);
+  assert.deepEqual(work(q,()=>true),{sent:['a'],retried:[]});
+  assert.deepEqual(q.snapshot(),{ready:[],leased:[]});
+- const expected=q.snapshot().ready.map(x=>x.id);
+- assert.deepEqual(work(q,job=>!expected.includes(job.id)).retried,expected);
+- assert.deepEqual(q.snapshot().ready.map(x=>x.id),expected);
++});
++
++test('preserves the legacy retry behavior',()=>{
++ const q=queue([{id:'a',payload:1}]);
++ assert.deepEqual(work(q,()=>false),{sent:[],retried:['a']});
++ assert.deepEqual(q.snapshot(),{ready:[{id:'a',payload:1}],leased:[]});
++});
++
++test('preserves the legacy idle behavior',()=>{
++ const q=queue([]);
+  assert.deepEqual(work(q,()=>true),{sent:[],retried:[]});
++ assert.deepEqual(q.snapshot(),{ready:[],leased:[]});
+ });
