@@ -1,0 +1,52 @@
+[
+  {
+    "task": "legacy-runtime-reload",
+    "stages": [
+      {
+        "phase": "D0",
+        "role": "implementation",
+        "elapsedMs": 251309,
+        "requests": 33,
+        "totalTokens": 1518397,
+        "patchSha256": "b342bb6c16bda2936d7ce3bdbfef38af99ba85591ccbc885c2b57de881de7190",
+        "attribution": "provider forwarding timestamps within newly added native message time windows"
+      }
+    ],
+    "unattributedAuxiliaryRequests": 3,
+    "unattributedAuxiliaryTokens": 23972
+  },
+  {
+    "task": "reconnect-revoked",
+    "stages": [
+      {
+        "phase": "D0",
+        "role": "implementation",
+        "elapsedMs": 212114,
+        "requests": 30,
+        "totalTokens": 1073328,
+        "patchSha256": "dcce4e6da699477a089d215532762e6f45359f8986c20a093574a941bfb523de",
+        "attribution": "provider forwarding timestamps within newly added native message time windows"
+      },
+      {
+        "phase": "D1",
+        "role": "correction",
+        "elapsedMs": 61013,
+        "requests": 8,
+        "totalTokens": 500755,
+        "patchSha256": "1858c0b550edefd1bfbce73091eb066a899c9b8e1ebf7aa3d06215ada945930d",
+        "attribution": "provider forwarding timestamps within newly added native message time windows"
+      },
+      {
+        "phase": "D2",
+        "role": "correction-2",
+        "elapsedMs": 39111,
+        "requests": 3,
+        "totalTokens": 236327,
+        "patchSha256": "1858c0b550edefd1bfbce73091eb066a899c9b8e1ebf7aa3d06215ada945930d",
+        "attribution": "provider forwarding timestamps within newly added native message time windows"
+      }
+    ],
+    "unattributedAuxiliaryRequests": 3,
+    "unattributedAuxiliaryTokens": 25633
+  }
+]

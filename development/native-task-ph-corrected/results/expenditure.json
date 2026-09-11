@@ -1,0 +1,20 @@
+{
+  "correctedAuthorizedSeries": {
+    "elapsedMs": 964515,
+    "requests": 137,
+    "toolCalls": 180,
+    "totalTokens": 5492634,
+    "missingUsageRequests": 0,
+    "billedAmount": null
+  },
+  "priorInvalidInputSeries": {
+    "elapsedMs": 841851,
+    "requests": 133,
+    "toolCalls": 162,
+    "totalTokens": 4625290,
+    "billedAmount": null
+  },
+  "bothSeriesObservedTokens": 10117924,
+  "bothSeriesRequests": 270,
+  "claim": "Observed provider tokens include cached inputs and native auxiliary requests; token totals are not equal compute budgets or billed monetary amounts."
+}

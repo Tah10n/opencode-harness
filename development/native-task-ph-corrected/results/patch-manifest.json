@@ -1,0 +1,66 @@
+[
+  {
+    "task": "legacy-runtime-reload",
+    "arm": "P",
+    "phase": "final",
+    "base": "original public task snapshot",
+    "file": "patches/legacy-runtime-reload/P-final.patch",
+    "sha256": "165bc1767a0c2b76b52947fae38d7247150c57dbdc4bb9f6002522e366911129"
+  },
+  {
+    "task": "legacy-runtime-reload",
+    "arm": "H",
+    "phase": "D0",
+    "base": "supplied D-final input",
+    "file": "patches/legacy-runtime-reload/H-D0-from-input.patch",
+    "sha256": "b342bb6c16bda2936d7ce3bdbfef38af99ba85591ccbc885c2b57de881de7190"
+  },
+  {
+    "task": "legacy-runtime-reload",
+    "arm": "H",
+    "phase": "final",
+    "base": "original public task snapshot",
+    "file": "patches/legacy-runtime-reload/H-final.patch",
+    "sha256": "db2f479a1ecf5ad87d8ce356b41d7635828162715820db00ecf6157fbafe3c4a"
+  },
+  {
+    "task": "reconnect-revoked",
+    "arm": "H",
+    "phase": "D0",
+    "base": "supplied D-final input",
+    "file": "patches/reconnect-revoked/H-D0-from-input.patch",
+    "sha256": "dcce4e6da699477a089d215532762e6f45359f8986c20a093574a941bfb523de"
+  },
+  {
+    "task": "reconnect-revoked",
+    "arm": "H",
+    "phase": "D1",
+    "base": "supplied D-final input",
+    "file": "patches/reconnect-revoked/H-D1-from-input.patch",
+    "sha256": "1858c0b550edefd1bfbce73091eb066a899c9b8e1ebf7aa3d06215ada945930d"
+  },
+  {
+    "task": "reconnect-revoked",
+    "arm": "H",
+    "phase": "D2",
+    "base": "supplied D-final input",
+    "file": "patches/reconnect-revoked/H-D2-from-input.patch",
+    "sha256": "1858c0b550edefd1bfbce73091eb066a899c9b8e1ebf7aa3d06215ada945930d"
+  },
+  {
+    "task": "reconnect-revoked",
+    "arm": "H",
+    "phase": "final",
+    "base": "original public task snapshot",
+    "file": "patches/reconnect-revoked/H-final.patch",
+    "sha256": "3871db1fe52d0af8ff1e668e76aa9f94629c1b2b600c25fdbf75c57bec031663"
+  },
+  {
+    "task": "reconnect-revoked",
+    "arm": "P",
+    "phase": "final",
+    "base": "original public task snapshot",
+    "file": "patches/reconnect-revoked/P-final.patch",
+    "sha256": "5c10c1b016448467a5f6f9fc7da7798442ce7907ff1b6d5c8640408bd3b6e816"
+  }
+]

@@ -105,3 +105,8 @@ the candidate showed no complete-delivery gain and remains experimental.
 The subsequent [four attempted P/H continuations](../../development/native-task-ph/results/README.md)
 have an invalid-input preparation incident and cannot establish the requested
 D-final continuation result or any benefit of the added correction bound.
+
+After separate authorization, the [four corrected-input P/H continuations](../../development/native-task-ph-corrected/results/README.md)
+ran from the actual saved D-final patches. Neither arm delivered a fully acceptable
+patch on either selected task. Two H corrections made no substantive delivery
+progress; the added bound has no demonstrated benefit and remains experimental.

@@ -43,3 +43,10 @@ complete final. API D has no D0 because native permission denial stopped the
 stage before capture. All four native D statuses remain incomplete, separately
 from external patch acceptance. Four reused tasks cannot establish general lift.
 No further series is automatically authorized.
+
+The [corrected-input P/H report](../../development/native-task-ph-corrected/results/README.md)
+records the separately authorized four D-final continuations and current-candidate
+container preflight (8 scripted requests, zero real). Candidate runtime code stayed
+frozen. It distinguishes frozen scoped checks, delivered regression obligations and
+a disclosed supplemental exact-layout diagnosis; neither P nor H delivered a fully
+acceptable patch on the two selected tasks. Earlier invalid attempts remain separate.
