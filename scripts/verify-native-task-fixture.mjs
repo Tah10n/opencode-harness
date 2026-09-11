@@ -6,6 +6,7 @@ import path from 'node:path';
 import http from 'node:http';
 import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { stale, guarded, repaired } from '../fixtures/native-stateful/tests.mjs';
 import { materializeNativeTemplate } from '../lib/native-template.mjs';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'native-task-fixture-'));
@@ -47,7 +48,11 @@ const fixture=http.createServer(async(req,res)=>{
   if(stage==='bootstrap'){response(res,n===0?{name:'harness_task',args:{}}:null,'Actual workflow result retained');return;}
   let calls=[];
   if(stage==='implementation') {
-   if(mode==='container-preflight')calls=[{name:'read',args:{filePath:'value.mjs'}},{name:'glob',args:{pattern:'*.mjs'}},{name:'edit',args:{filePath:'value.mjs',oldString:'export const value = 2;',newString:'export const value = 2; // container\n'}},bash('node --test')];
+   if(mode==='stateful') {
+    assert.ok(text.includes('state the action will actually use immediately before'));
+    calls=[bash(writeFixture('example.test.mjs',guarded)),bash('node --test')];
+   }
+   else if(mode==='container-preflight')calls=[{name:'read',args:{filePath:'value.mjs'}},{name:'glob',args:{pattern:'*.mjs'}},{name:'edit',args:{filePath:'value.mjs',oldString:'export const value = 2;',newString:'export const value = 2; // container\n'}},bash('node --test')];
    else if(['defect','two-fixes','no-progress','comment-only'].includes(mode))calls=[bash(writeFixture('value.mjs',(mode==='two-fixes'?source.replace('value = 2','value = 1').replace('() => 7','() => 8'):source.replace('value = 2','value = 1')))),bash('node --test')];
    else if(mode==='coverage-loss')calls=[bash(writeFixture('value.test.mjs',reducedTest)),bash('node --test')];
    else if(mode==='intentional')calls=[bash(writeFixture('value.mjs',source.replace('value = 2','value = 3'))),bash(writeFixture('value.test.mjs',originalTest.replace('value,2','value,3'))),bash('node --test')];
@@ -72,7 +77,8 @@ const fixture=http.createServer(async(req,res)=>{
    else calls=[bash('node --test')];
   } else {
    const feedback=JSON.parse(text);assert.ok(feedback.originalTask.includes('ORIGINAL_TASK_FIXTURE'));assert.ok(feedback.current.diff!==undefined);
-   if(mode==='coverage-loss'){assert.ok(feedback.observations.checks.some(c=>c.successful&&c.current));assert.ok(feedback.observations.testChanges[0].before.includes('legacy(),7'));assert.ok(feedback.observations.testChanges[0].diff.includes('-test'));calls=[bash(writeFixture('value.test.mjs',originalTest)),bash('node --test')];}
+   if(mode==='stateful'){assert.ok(feedback.observations.checks.some(c=>c.exit===1&&c.output.includes('undefined')));calls=[bash(writeFixture('example.test.mjs',repaired)),bash('node --test')];}
+   else if(mode==='coverage-loss'){assert.ok(feedback.observations.checks.some(c=>c.successful&&c.current));assert.ok(feedback.observations.testChanges[0].before.includes('legacy(),7'));assert.ok(feedback.observations.testChanges[0].diff.includes('-test'));calls=[bash(writeFixture('value.test.mjs',originalTest)),bash('node --test')];}
    else if(mode==='intentional'){assert.ok(feedback.instruction.includes('Do not restore an old expectation'));assert.ok(feedback.observations.testChanges[0].after.includes('value,3'));calls=[];}
    else if(mode==='relocation'){assert.equal(feedback.observations.testChanges[0].assessment,'not_automatically_classified');assert.ok(feedback.observations.addedTests.some(t=>t.content===originalTest));calls=[];}
    else if(mode==='defect'){assert.ok(feedback.observations.checks.some(c=>c.exit===1&&/not ok|✖/.test(c.output)));calls=[bash(writeFixture('value.mjs',source)),bash('node --test')];}
@@ -104,13 +110,14 @@ const api = async (method, route, body) => { const r = await fetch(`http://127.0
 
 try {
  let ready=false;for(let n=0;n<150;n++){try{await api('GET','/global/health');ready=true;break;}catch{await new Promise(r=>setTimeout(r,100));}}assert.ok(ready,stderr);
- const allModes=['variant','both-required','narrow','worktree-path','external-path','diagnostic','unresolved','correct','two-fixes','comment-only','defect','coverage-loss','intentional','relocation','late-check','final-stale','no-progress','permission','cancel','budget','concurrent-save','staged-work','external-save'];
+ const allModes=['stateful','variant','both-required','narrow','worktree-path','external-path','diagnostic','unresolved','correct','two-fixes','comment-only','defect','coverage-loss','intentional','relocation','late-check','final-stale','no-progress','permission','cancel','budget','concurrent-save','staged-work','external-save'];
  const selectedModes=process.env.NATIVE_TASK_FIXTURE_MODES?.split(',')??allModes;
  for(mode of selectedModes){
   git('reset','--hard','HEAD');git('clean','-fd');
   const artifactRoot=path.join(project,'.git/harness-task');priorArtifacts=new Set(fs.existsSync(artifactRoot)?fs.readdirSync(artifactRoot):[]);
   fs.writeFileSync(task,'ORIGINAL_TASK_FIXTURE: Deliver value '+(mode==='intentional'?'3 instead of 2':'2')+'; preserve the independent legacy() = 7 scenario. Run node --test after the last edit.');
   if(['variant','both-required','narrow'].includes(mode))fs.appendFileSync(task,' Required: `node --test value.test.mjs`.'+(mode==='both-required'?' Also required: `node --test --test-concurrency=1 value.test.mjs`.':''));
+  if(mode==='stateful'){fs.copyFileSync(path.join(root,'fixtures/native-stateful/example.mjs'),path.join(project,'example.mjs'));fs.writeFileSync(path.join(project,'example.test.mjs'),stale);fs.appendFileSync(task,' Preserve the clear scenario and test consumption of an existing item through consume plus empty idempotency.');}
   if(mode==='staged-work'){fs.writeFileSync(path.join(project,'value.mjs'),source+'// staged user bytes\n');git('add','value.mjs');fs.appendFileSync(path.join(project,'value.mjs'),'// unstaged user bytes\n');}
   const userBytes=fs.readFileSync(path.join(project,'value.mjs'),'utf8'),index=git('ls-files','--stage','-z');
   const session=await api('POST','/session',{permission:mode==='permission'?[{permission:'bash',pattern:'printf forbidden',action:'deny'}]:mode==='external-path'?[{permission:'external_directory',pattern:'*',action:'deny'}]:[]});
@@ -150,10 +157,11 @@ try {
   assert.equal(part?.state.status,'completed',JSON.stringify({mode,part,result,temp}));const report=JSON.parse(part.state.output);
   assert.equal(git('ls-files','--stage','-z'),index);
   assert.equal(fs.readFileSync(path.join(project,'value.mjs'),'utf8'),mode==='concurrent-save'?source+'// concurrent USER_SAVE\n':userBytes);
-  const corrected=['both-required','narrow','defect','two-fixes','comment-only','late-check','final-stale','no-progress'].includes(mode);
+  const corrected=['stateful','both-required','narrow','defect','two-fixes','comment-only','late-check','final-stale','no-progress'].includes(mode);
   assert.equal(report.repairs,['two-fixes','comment-only','no-progress','unresolved'].includes(mode)?2:mode==='final-stale'?2:corrected?1:0,JSON.stringify(report));assert.deepEqual(Object.keys(report.sessions),['author']);
   assert.equal(report.status,['diagnostic','no-progress','comment-only','unresolved','final-stale','permission','external-path','external-save'].includes(mode)?'incomplete':'checks_passed',JSON.stringify(report));
   if(corrected){const impl=JSON.parse(fs.readFileSync(path.join(report.artifacts,'implementation-original.json'))),cor=JSON.parse(fs.readFileSync(path.join(report.artifacts,'correction-original.json')));assert.equal(impl.info.sessionID,cor.info.sessionID);}
+  if(mode==='stateful'){assert.equal(fs.readFileSync(path.join(report.executionDirectory,'example.test.mjs'),'utf8'),repaired);assert.match(fs.readFileSync(path.join(report.artifacts,'final.patch'),'utf8'),/read\('item'\)/);assert.ok(report.observations.checks.some(c=>c.exit===0&&c.current));}
   if(mode==='coverage-loss'){assert.equal(fs.readFileSync(path.join(report.executionDirectory,'value.test.mjs'),'utf8'),reducedTest);assert.ok(report.observations.coverageWarnings.length);}
   if(mode==='intentional')assert.ok(fs.readFileSync(path.join(report.executionDirectory,'value.test.mjs'),'utf8').includes('value,3'));
   if(mode==='relocation')assert.equal(fs.readFileSync(path.join(report.executionDirectory,'moved.test.mjs'),'utf8'),originalTest);

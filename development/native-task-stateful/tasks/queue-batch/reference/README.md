@@ -1,0 +1,3 @@
+# queue-batch
+A small Node library. Run npm test.
+Extend work(q, send, limit=1) to process at most limit jobs present in ready at call start, in FIFO order. limit must be a nonnegative safe integer, validated before any mutation or send. Return sent/retried ID arrays in processing order. Failed jobs go to the ready tail once; do not process a requeued job again during this call, even when limit exceeds the starting ready count. Preserve payloads, remove successful leases and leave unselected work intact. Zero/empty are no-ops; preserve default single-job behavior. Tests must cover mixed batch success/retry, bounded all-failure retry, invalid/zero no mutation and the legacy successful, retry and idle scenarios.

@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {drafts} from '../src/drafts.mjs';import {apply} from '../src/editor.mjs';
+test('publish, cancel, absent',()=>{const s=drafts();s.stage('x','draft');assert.deepEqual(apply(s,[{type:'publish',id:'x'}]),[true]);assert.deepEqual(s.read().published,{x:'draft'});const selected=Object.keys(s.read().staged).filter(id=>id==='x');for(const id of selected)s.cancel(id);assert.deepEqual(s.read().staged,{});assert.equal(s.cancel('missing'),false);});

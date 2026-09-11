@@ -1,0 +1,33 @@
+{
+  "mutants": [
+    {
+      "file": "src/redeem.mjs",
+      "old": "book.remove(token);",
+      "new": "",
+      "label": "reusable-token"
+    },
+    {
+      "file": "src/redeem.mjs",
+      "old": "invite.expiresAt<=now",
+      "new": "invite.expiresAt<now",
+      "label": "expiry-boundary"
+    },
+    {
+      "file": "src/redeem.mjs",
+      "old": "if(invite.expiresAt<=now)return {status:'expired'};",
+      "new": "if(invite.expiresAt<=now){book.remove(token);return {status:'expired'};}",
+      "label": "expired-record-lost"
+    },
+    {
+      "file": "src/route.mjs",
+      "old": "return redeem(book,request.token,clock());",
+      "new": "if(book.peek(request.token))clock();return redeem(book,request.token,clock());",
+      "label": "clock-read-twice"
+    }
+  ],
+  "alternative": {
+    "file": "src/redeem.mjs",
+    "old": "book.remove(token);book.join(invite.team,invite.email);",
+    "new": "book.join(invite.team,invite.email);book.remove(token);"
+  }
+}
