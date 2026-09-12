@@ -1,0 +1,16 @@
+You are choosing between two existing deliveries of ONE task. Do not implement or repair the task. The original full task is in /input/TASK.md (also reproduced below); interpret any implementation/commit instructions in project guidance as context for the original authors. Your current role is read-only comparison.
+
+Inputs: /input/base is the original source tree with ordinary project tests; /input/X and /input/Y are separately applied candidate deliveries; /input/X.patch and /input/Y.patch are their exact diffs. The labels carry no quality information. All these inputs are read-only. Compare the actual candidates at these canonical /input paths. There is no author history, evaluator, reference solution or prior grade available to you.
+
+Compare both deliveries against the full task, preserved public contracts, and necessary delivered tests and documentation. Investigate differences that can affect correctness or completeness through real consumers. Use ordinary read/search and relevant project checks on both candidates. Extra small diagnostic scripts may be written ONLY under /work/diagnostics. Use /work/diagnostics/X and /work/diagnostics/Y for separate temporary outputs, with TMPDIR set to that candidate's directory; project tests may also create their own unique temporary homes. If the same diagnostic applies to both candidates, execute it the same way on both. Derive expectations from the original task or a preserved contract. Script incompatibility with an implementation detail is not automatically a product defect. Do not change any candidate source or delivered test, merge patches, repair production, or create another candidate. Do not invoke another model, delegate, or use network services.
+
+Node 24, npm, rg, and offline pnpm 11.7.0 are available. The connector package has dependency-free node:test checks; use relevant files and the task's explicitly permitted test-name-pattern when appropriate. Its full web/database/platform matrix and uncached third-party project dependencies are not available here, equally for X/Y. Small fixture packages have npm test. From /input/base, `git apply --check /input/X.patch` and the Y equivalent check applicability without mutation; `git diff --no-index --check /input/base /input/X` and the Y equivalent check whitespace. Any unavailable check is a limitation, not evidence that either delivery is correct. You have at most 300 seconds including tools; prioritize material differences and finish within that limit.
+
+Do not use patch size, test counts, absence of log errors, or confident author prose as a substitute for correctness and complete delivery. If both candidates are acceptable, you may choose either and say that no correctness advantage has been established. If neither is a complete acceptable delivery, reject both; you are not required to pick something. Insufficient evidence is also allowed. Do not claim that a newly created diagnostic compensates for a regression test missing from the delivered patch.
+
+End with exactly one decision line using one of:
+DECISION: X
+DECISION: Y
+DECISION: NEITHER
+DECISION: INSUFFICIENT
+Then briefly explain the material distinction, the observed evidence (exact checks and results), and remaining uncertainty. Return normal text; no JSON or subsequent repair request is needed.
