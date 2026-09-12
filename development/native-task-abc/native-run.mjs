@@ -1,9 +1,9 @@
 // Experiment-only native continuation control. Not a harness controller or product mode.
 import fs from 'node:fs';import path from 'node:path';import {spawn} from 'node:child_process';import readline from 'node:readline';
-export async function runNativePhase(session,{config,task,enabled,model,variant,limitMs,sessionID,stopWorkload,researchMs,researchStopped,signal,deadline=Date.now()+limitMs},{spawnProcess=spawn}={}) {
+export async function runNativePhase(session,{config,task,enabled,model,variant,limitMs,sessionID,stopWorkload,researchMs,researchStopped,signal,strategy,deadline=Date.now()+limitMs},{spawnProcess=spawn}={}) {
  const started=Date.now();
  const argv=['exec','--workdir','/work/repo','--env','PATH=/work/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin','--env',`OPENCODE_CONFIG_CONTENT=${JSON.stringify(config)}`,
- ...(enabled?['--env','OPENCODE_CONFIG_DIR=/template','--env','HARNESS_TASK_FILE=/work/repo/TASK.md','--env',`HARNESS_TASK_TIMEOUT_MS=${limitMs}`]:[]),session.name,'/opt/opencode','run','--format','json','--agent','build','--model',model,...(variant?['--variant',variant]:[]),...(sessionID?['--session',sessionID]:[]),...(enabled?['--command','harness-task']:['--',task])];
+ ...(enabled?['--env','OPENCODE_CONFIG_DIR=/template','--env','HARNESS_TASK_FILE=/work/repo/TASK.md','--env',`HARNESS_TASK_TIMEOUT_MS=${limitMs}`,...(strategy?['--env',`HARNESS_TASK_STRATEGY=${strategy}`]:[])]:[]),session.name,'/opt/opencode','run','--format','json','--agent','build','--model',model,...(variant?['--variant',variant]:[]),...(sessionID?['--session',sessionID]:[]),...(enabled?['--command','harness-task']:['--',task])];
  const stream=fs.createWriteStream(path.join(session.output,'events.jsonl'),{flags:'wx',mode:0o600});
  const events=[];let stderr='',parseErrors=0,timedOut=false,stopReason=null;
  let child,closed=false,fixed=false,result={},completedAt=null,researchBoundary='not-reached';

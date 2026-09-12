@@ -2,14 +2,15 @@
 // Candidate product bytes are unchanged; no continuation is added to plain.
 import fs from 'node:fs';import path from 'node:path';import {createHash} from 'node:crypto';
 import {runTask} from '../native-task-abc/native-run.mjs';
-export async function runComparison({root,startContainer,captureCandidate,stopWorkload,readAuth,fetchImpl=fetch,runTaskImplementation=runTask}) {
+export async function runComparison({root,startContainer,captureCandidate,stopWorkload,readAuth,fetchImpl=fetch,runTaskImplementation=runTask,developmentPairs=6}) {
+if(!Number.isSafeInteger(developmentPairs)||developmentPairs<1||developmentPairs>12)throw Error('Invalid bounded development batch');
 const f=JSON.parse(fs.readFileSync(path.join(root,'freeze.json')));
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 function verify(){
- if(f.attempts.length!==12||f.model!=='openai/gpt-5.6-luna'||f.variant!=='high'||f.budgetMs!==900000||!f.preflightPassed)throw Error('Invalid development configuration');
+ if(f.attempts.length!==2*developmentPairs||f.model!=='openai/gpt-5.6-luna'||f.variant!=='high'||f.budgetMs!==900000||!f.preflightPassed)throw Error('Invalid development configuration');
  for(const [file,digest] of Object.entries(f.files))if(sha(fs.readFileSync(file))!==digest)throw Error('Frozen file changed: '+file);
  const groups=new Map();for(const a of f.attempts){const group=groups.get(a.task)??[];group.push(a.arm);groups.set(a.task,group);}
- if(groups.size!==6||[...groups.values()].some(x=>x.slice().sort().join('')!=='HP'))throw Error('Invalid pair schedule');
+ if(groups.size!==developmentPairs||[...groups.values()].some(x=>x.slice().sort().join('')!=='HP'))throw Error('Invalid pair schedule');
 }
 
 verify();if(fs.existsSync(path.join(root,'scheduling-paused.json')))throw Error('Continuation paused; no automatic resume');
@@ -62,7 +63,7 @@ for(const attempt of f.attempts){
   fs.writeFileSync(path.join(out,'input-verification.json'),JSON.stringify({matched:true,files:Object.keys(got).length,providerRequestsBeforeStart:requests.length}));
   const version=session.exec(['/opt/opencode','--version']);if(version.status!==0||version.stdout.trim()!=='1.18.26')throw Error('Runtime mismatch');
   deadline=Date.now()+f.budgetMs;timer=setTimeout(()=>{deadlineTriggered=true;forwardingOpen=false;abort.abort(deadlineReason);},f.budgetMs);
-  result=await runTaskImplementation(session,{config:f.config,task:fs.readFileSync(path.join(attempt.source,'TASK.md'),'utf8'),enabled:attempt.arm==='H',arm:attempt.arm,model:f.model,variant:f.variant,limitMs:f.budgetMs,continuation:f.continuation,canContinue:()=>!pause&&!abort.signal.aborted,stopWorkload});
+  result=await runTaskImplementation(session,{config:f.config,task:fs.readFileSync(path.join(attempt.source,'TASK.md'),'utf8'),enabled:attempt.arm==='H',arm:attempt.arm,model:f.model,variant:f.variant,limitMs:f.budgetMs,strategy:f.strategy,continuation:f.continuation,canContinue:()=>!pause&&!abort.signal.aborted,stopWorkload});
   if(result.timedOut&&!deadlineTriggered)pauseScheduling('unattributed_timeout',attempt.slot);
   terminationVerified=result.termination?.terminationVerified===true;if(!terminationVerified)throw Error('Termination not verified');
   clearTimeout(timer);forwardingOpen=false;abort.abort();await Promise.allSettled([...active]);save();

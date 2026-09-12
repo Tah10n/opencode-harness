@@ -64,11 +64,16 @@ const fixture=http.createServer(async(req,res)=>{
   }
   if(!body.tools?.length){auxiliaryRequests.push({mode});response(res,null,'Fixture title');return;}
   assert.ok(!JSON.stringify(body).includes(forbiddenContent),'Forbidden resource content must never reach the provider');
-  const stage=text.includes('Corrective pass')?'correction':text.includes('Implement the complete original task')?'implementation':'bootstrap';
+  const stage=text.includes('Complete the original task below from the current worktree')?'finisher':text.includes('Corrective pass')?'correction':text.includes('Implement the complete original task')?'implementation':'bootstrap';
   const pass=stage==='correction'?JSON.parse(text).pass:0;
   const key=mode+stage+pass,n=counts.get(key)??0;counts.set(key,n+1);requests.push({mode,stage,n});
   const bash=command=>({name:'bash',args:{command,description:'Installed scripted fixture'}});
   if(stage==='bootstrap'){response(res,n===0?{name:'harness_task',args:{}}:null,'Actual workflow result retained');return;}
+  if(stage==='finisher') {
+   assert.ok(text.includes('ORIGINAL_TASK_FIXTURE'));
+   const calls=[{name:'read',args:{filePath:'value.mjs'}},bash('node --test')];
+   response(res,calls[n]??null,'Fresh completion inspected the code and executed the public regression.');return;
+  }
   let calls=[];
   if(stage==='implementation') {
    if(mode==='stateful') {

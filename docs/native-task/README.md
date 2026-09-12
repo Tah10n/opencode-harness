@@ -9,11 +9,20 @@ its development results do not establish a recommended production mode.
 
 ## Install and use
 
+The new development candidate adds `HARNESS_TASK_STRATEGY=finish`: one initial
+implementation followed by a fresh session of the same selected model that inspects
+and completes the patch against the entire original task. It uses the same shared
+deadline and permissions. This path omits mandatory H1 guidance and the D correction
+loop; actual checks and safe terminal patch capture remain. It is experimental;
+quality results belong to the [fresh completion development cycle](../../development/native-task-finish/README.md).
+Omitting the variable retains D and does not change the user's default.
+
 ```sh
 node scripts/profile-materialize.mjs --native --profile core --task \
   --output /absolute/task-config
 
 HARNESS_TASK_FILE=/absolute/original-task.txt \
+HARNESS_TASK_STRATEGY=finish \
 HARNESS_TASK_TIMEOUT_MS=900000 \
 OPENCODE_CONFIG_DIR=/absolute/task-config opencode
 ```
