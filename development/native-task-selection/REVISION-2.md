@@ -1,5 +1,7 @@
 # Acceptance before preference: development revision 2
 
+**Measured result: failed.** The six-run revision delivered 1/6 acceptable selections and again accepted an incomplete patch; see the [full negative result and lifecycle limitations](REPORT-REVISION-2.md). The protocol below records the pre-run design and local evidence, not proof of model quality.
+
 This revision targets two observed selector failures: incomplete mandatory delivery accepted as relatively preferable, and research ending without a timely decision. It is one development revision on the same six known V3 pairs, not independent evidence of general harness lift. The historical series and its report remain in README.md/results.json; baseline selector source is retained in commit 25a6d4a2.
 
 The original full task remains authoritative. Before ranking, the selector records concrete required behavior, preserved contracts, and explicitly delivered tests/docs for both candidates as confirmed, missing or unverified. In particular it must inspect the actual delivered consumer invocation and asserted case. Filled records and successful suites do not certify those judgments. The small decision reader checks only syntax and consistency, and always marks semantic validity unverified. A terminated answer that makes an inconsistent decision is retained without repair.
