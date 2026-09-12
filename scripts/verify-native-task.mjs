@@ -8,6 +8,7 @@ import {prepareObservations,commandWords} from '../lib/native-task-observations.
 import {runWorkflow,nativePermissionDenial,nativePermissionKind,stateTransition} from '../lib/native-task-workflow.mjs';
 import {reviewContext} from '../lib/native-review-context.mjs';
 import {materializeNativeTemplate} from '../lib/native-template.mjs';
+import {verifyCheckFirst} from './verify-native-task-check-first.mjs';
 const temp=fs.mkdtempSync(path.join(os.tmpdir(),'native-d-check-'));
 const rules=[{permission:'read',pattern:'*',action:'allow'}];
 const run=(cwd,args)=>{const r=spawnSync('git',args,{cwd,encoding:'utf8'});assert.equal(r.status,0,r.stderr);return r.stdout.trim();};
@@ -366,5 +367,6 @@ try {
  assert.equal(nativePermissionDenial('File not found: The user rejected permission to use this specific tool call.'),false);
  assert.equal(stateTransition({state:'error',before:null,after:'S',stateObservation:{basis:'host-rejected-before-execution',snapshot:'S'}}),'unchanged');
  for(const cmd of ['echo hi','node --test; echo ok','node --test $(whoami)','node --test `pwd`'])if(cmd!=='echo hi')assert.equal(commandWords(cmd),null);
- console.log(JSON.stringify({passed:true,realTemporaryFiles:true,nativeStateAndPermissions:true,threeCorrectionBound:true,realProviderRequests:0}));
+ await verifyCheckFirst();
+ console.log(JSON.stringify({passed:true,checkFirst:true,realTemporaryFiles:true,nativeStateAndPermissions:true,threeCorrectionBound:true,realProviderRequests:0}));
 } finally {fs.rmSync(temp,{recursive:true,force:true});}

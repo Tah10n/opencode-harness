@@ -1,30 +1,61 @@
-# Fresh completion development cycle
+# Native task development cycle
 
-This new development cycle starts at PR #25 head `97b384134b16c5e38fdbae6054fd938c74049d88`.
-Historical campaigns remain closed. The allowance is 48 new complete development
-runs, including paid smokes, and conditionally one independent 40-pair evaluation.
-OpenCode 1.18.26, `openai/gpt-5.6-luna`, high, 900 seconds for every stage combined.
+This new cycle starts at PR #25 head `97b384134b16c5e38fdbae6054fd938c74049d88`.
+Historical campaigns remain closed. The allowance is 48 development runs, including
+paid smokes, and conditionally one independent 40-pair evaluation. All scored stages
+use OpenCode 1.18.26, `openai/gpt-5.6-luna`, high, 900 seconds for the entire task.
 
-The first hypothesis is fresh-context completion: a second native session inspects
-the first patch against the full original request and repairs concrete omissions
-directly. Earlier status-driven returns did not recover missing consumer regressions
-or prevent API compatibility failures. This approach changes the patch with a fresh
-implementation context; it does not select verdicts or require evidence JSON.
-Both sessions use the caller's model. Extra compute is counted, not attributed
-exclusively to architecture.
+## First candidate: fresh completion
 
-Select with `HARNESS_TASK_STRATEGY=finish` when invoking the existing installed
-`/harness-task` command. Default D is unchanged. The finish path excludes mandatory
-H1 guidance and the three report-driven corrections. Native tool permissions,
-worktree isolation, cancellation, hard deadline, factual observations and terminal
-patch transfer remain shared. Runtime imports no development/evaluator code.
+Candidate `db7f374f56f2828f6372bf72ae1841ca71ae54fd` used an initial author followed
+by a fresh finisher. Twelve new runs covered six tasks: catalog caching, dual-module
+configuration, atomic queue batching, lazy bounded draining, connector protocol
+error integration and extraction of the installed HTTP transport.
 
-Development requires 8–12 tasks across integration, state, API and refactoring,
-with requirements and acceptance fixed before each batch. All attempts are retained;
-candidate bytes stay fixed within a batch. Broader comparison follows small probes
-only when full patches justify it. The final evaluation is conditional on positive
-development balance across tasks and a repeat check of the same candidate, with no
-known serious regression. No legacy numerical promotion gate is inherited.
+Independent patch assessment accepted H 6/6 and P 5/6. The one P failure omitted
+explicitly required invalid-input regressions through both rendering consumers;
+its behavior checks passed. All six H initial-author patches were already complete.
+The finisher added some useful assertions and documentation but did not change any
+full-patch outcome. Total time was H 3173.582 seconds versus P 1216.365 seconds;
+provider requests were H 222 versus P 110. Extra compute is not an architecture-only
+comparison. These small development results do not establish superiority.
 
-Private inputs, execution records and budget ledger live under
-`local/native-task-finish-20260912/`. No new paid run has been performed yet.
+Operational outcomes differ from patch suitability. The last H run timed out in
+the finisher: all local processes stopped, but its complete final code was captured
+by the observer rather than delivered as a native terminal patch. One interrupted
+request has unknown usage. A public P capture initially failed on supplied dependency
+links; its stopped output was recovered offline by excluding only supplied root
+node_modules, with the original archive and failure retained and no paid retry.
+A large H native report was truncated by OpenCode; full artifacts remained intact.
+
+This candidate is not promoted. A single winning task, a redundant costly phase and
+one missing native delivery do not meet the readiness conditions. No independent
+run has started and no old campaign has been revived.
+
+## Current hypothesis: checks before implementation
+
+`HARNESS_TASK_STRATEGY=check-first` replaces the fresh finisher with regression
+preparation followed by implementation in the same author session. The original
+request reaches both phases verbatim. The first phase exercises the intended change
+or establishes preserved consumer behavior; the second implements all code, tests
+and documentation while treating generated expectations as hypotheses. There is
+no verdict schema, selector, mandatory H1 prompt or report-driven correction loop.
+Default D remains unchanged. Native tools, worktree isolation, cancellation and
+shared deadline remain the existing implementation.
+
+Separately, the native return is compacted to avoid the observed output truncation.
+Full reports stay in artifacts; the displayed result includes actual successful
+native commands, limitations and the terminal patch path when safely available.
+This reporting fix is not counted as a code-quality gain.
+
+The eight selected development tasks also include two public p-limit API/state
+changes. Requirements and acceptance are fixed before each batch; inputs and
+candidate bytes remain fixed within a batch. Every outcome is retained. Promotion
+requires useful full deliveries across different tasks and a small repeat of the
+same candidate, with no ignored serious regression. No required repair count or
+plain-success interval is imposed.
+
+Private inputs, captures, preparation incidents, grades and the complete accounting
+remain under `local/native-task-finish-20260912/`. They are excluded from installation.
+Runtime imports no development/evaluator code. Local/model-free validation, measured
+patch suitability, operational completion and independent evidence remain separate.

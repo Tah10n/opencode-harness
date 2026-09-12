@@ -7,7 +7,7 @@ const f=JSON.parse(fs.readFileSync(path.join(root,'freeze.json')));
 const {startContainer}=await import(f.containerAdapter);
 const {captureCandidate}=await import(f.captureAdapter);
 const {runOpenCode}=await import(f.nativeAdapter);
-const fixture=spawn(process.execPath,['scripts/verify-native-task-fixture.mjs'],{cwd:base,env:{PATH:process.env.PATH,NATIVE_TASK_FIXTURE_PROVIDER_ONLY:'1',...(process.env.NATIVE_TASK_FIXTURE_PARALLEL?{NATIVE_TASK_FIXTURE_PARALLEL:process.env.NATIVE_TASK_FIXTURE_PARALLEL}:{})},stdio:['ignore','pipe','pipe']});
+const fixture=spawn(process.execPath,['scripts/verify-native-task-fixture.mjs'],{cwd:base,env:{PATH:process.env.PATH,NATIVE_TASK_FIXTURE_PROVIDER_ONLY:'1',...(f.strategy==='check-first'?{NATIVE_TASK_FIXTURE_CHECK_FIRST:'1'}:{}),...(process.env.NATIVE_TASK_FIXTURE_PARALLEL?{NATIVE_TASK_FIXTURE_PARALLEL:process.env.NATIVE_TASK_FIXTURE_PARALLEL}:{})},stdio:['ignore','pipe','pipe']});
 let stderr='';fixture.stderr.on('data',x=>stderr+=x);
 let session,requests=0;
 try{
@@ -29,7 +29,8 @@ try{
  for(const tool of ['read','glob','edit','bash'])assert.ok(saved.events.some(e=>e.tool===tool&&e.state==='completed'),tool);
  if(process.env.NATIVE_TASK_FIXTURE_PARALLEL){assert.equal(saved.events.filter(e=>e.state==='error').length,process.env.NATIVE_TASK_FIXTURE_PARALLEL==='1'?0:1);const edit=saved.events.find(e=>e.tool==='edit'),check=saved.events.find(e=>e.args?.command==='node --test');assert.ok(edit.completedAt<=check.startedAt);assert.equal(check.before,edit.after);}
  if(process.env.NATIVE_TASK_FIXTURE_PARALLEL==='denial')assert.equal(saved.report.permissionContinuations.length,1);
- assert.ok(saved.events.some(e=>e.tool==='bash'&&e.exit===0));assert.ok(saved.report.stages.some(s=>s.role==='author'));assert.deepEqual([...new Set(saved.report.stages.map(s=>s.role))],f.strategy==='finish'?['author','finisher']:['author']);assert.equal(saved.report.repairs,0);
+ assert.ok(saved.events.some(e=>e.tool==='bash'&&e.exit===0));assert.ok(saved.report.stages.some(s=>s.role==='author'));assert.deepEqual([...new Set(saved.report.stages.map(s=>s.role))],['author']);assert.equal(saved.report.repairs,0);
+ if(f.strategy==='check-first') { assert.deepEqual(saved.report.stages.map(s=>s.label),['regressions','implementation']); const checks=saved.events.filter(e=>e.args?.command==='node --test'); assert.equal(checks[0].exit,1); assert.equal(checks.at(-1).exit,0); assert.ok(saved.files.includes('regressions.patch')); }
  assert.equal(captureCandidate(session,root).status,0);
  fs.writeFileSync(path.join(root,'preflight-result.json'),JSON.stringify({status:'passed',requests,realProviderCalls:0,elapsedMs:result.elapsedMs,terminationVerified:true,report:saved.report},null,2));
  console.log(JSON.stringify({containerPreflight:'passed',scriptedRequests:requests,realProviderCalls:0,elapsedMs:result.elapsedMs}));

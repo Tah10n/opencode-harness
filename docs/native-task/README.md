@@ -1,4 +1,4 @@
-# Experimental native task workflow D
+# Experimental native task delivery
 
 `/harness-task` delivers a patch in a separate Git worktree using one native
 OpenCode author session. After initial completion it observes project checks and
@@ -9,20 +9,24 @@ its development results do not establish a recommended production mode.
 
 ## Install and use
 
-The new development candidate adds `HARNESS_TASK_STRATEGY=finish`: one initial
-implementation followed by a fresh session of the same selected model that inspects
-and completes the patch against the entire original task. It uses the same shared
-deadline and permissions. This path omits mandatory H1 guidance and the D correction
-loop; actual checks and safe terminal patch capture remain. It is experimental;
-quality results belong to the [fresh completion development cycle](../../development/native-task-finish/README.md).
+The opt-in development candidate `HARNESS_TASK_STRATEGY=check-first` uses one native
+author session in two phases. It first prepares and executes project regressions
+against the full original task, then implements the change using those observations.
+The same model, permissions and total deadline apply to both phases. Generated test
+expectations remain hypotheses to check against the task and preserved contracts.
+This path omits the mandatory H1 prompt, fresh finisher and D correction loop.
 Omitting the variable retains D and does not change the user's default.
+
+The earlier fresh-finisher experiment remains reproducible at
+`db7f374f56f2828f6372bf72ae1841ca71ae54fd`. It did not justify its added stage;
+see the [development record](../../development/native-task-finish/README.md).
 
 ```sh
 node scripts/profile-materialize.mjs --native --profile core --task \
   --output /absolute/task-config
 
 HARNESS_TASK_FILE=/absolute/original-task.txt \
-HARNESS_TASK_STRATEGY=finish \
+HARNESS_TASK_STRATEGY=check-first \
 HARNESS_TASK_TIMEOUT_MS=900000 \
 OPENCODE_CONFIG_DIR=/absolute/task-config opencode
 ```
@@ -38,8 +42,8 @@ reads may still run together. Waiting consumes the same total deadline; cancella
 or a fatal permission decision prevents queued calls from executing. Each tool is
 checked against the actual worktree snapshot when admitted.
 
-The total timeout includes native bootstrap, author work, checks, the bounded
-corrections and summary. Its default is 600000 ms, supported range 1000–3600000 ms.
+The total timeout includes native bootstrap, author work, checks, the selected phases,
+corrections when using D, and summary. Its default is 600000 ms, supported range 1000–3600000 ms.
 User permission rejection, repeated policy denial, cancellation, quota/native errors
 and uncertain process completion prevent new workflow stages. One confirmed native
 bash permission denial before execution may return to the same author normally,
@@ -108,12 +112,20 @@ Evaluation executes candidate code only in the existing isolated containers.
 The returned delivery worktree and private artifacts live under the original Git
 administrative directory at `harness-task/<run-id>/`. Retained artifacts include
 original input, initial test bytes, D0, D1–D3 when reached, final and terminal patches,
-actual tool events, observations and each updated feedback message. Terminal patches
+actual tool events, observations and each updated feedback message. Check-first also
+retains the pre-implementation regression patch and both phase replies. Terminal patches
 are saved only after native prompt/tool termination is confirmed. An unacknowledged
 abort or an active/pending tool keeps termination unverified and withholds that patch;
 the worktree is retained. Adopt the patch
 through normal review; the workflow does not apply it to the original checkout.
 Do not publish private task/source/tool artifacts automatically.
+
+The native response includes the terminal patch path, successful native commands
+on the final captured state, and explicit limitations. Command success is not a
+correctness certificate. Full command outputs, test hunks and model explanations
+remain in the artifact files; large reports are summarized before OpenCode can
+truncate the delivery information. The caller does not need to select command IDs
+or repair report JSON.
 
 To inspect and apply a completed terminal patch in an ordinary copy at the captured
 base (with its required dependencies), use the artifact path returned by the run:

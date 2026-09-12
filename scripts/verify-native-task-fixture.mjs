@@ -64,19 +64,20 @@ const fixture=http.createServer(async(req,res)=>{
   }
   if(!body.tools?.length){auxiliaryRequests.push({mode});response(res,null,'Fixture title');return;}
   assert.ok(!JSON.stringify(body).includes(forbiddenContent),'Forbidden resource content must never reach the provider');
-  const stage=text.includes('Complete the original task below from the current worktree')?'finisher':text.includes('Corrective pass')?'correction':text.includes('Implement the complete original task')?'implementation':'bootstrap';
+  const stage=text.includes('Prepare executable project regressions')?'regressions':text.includes('Corrective pass')?'correction':text.includes('Implement the complete original task')?'implementation':'bootstrap';
   const pass=stage==='correction'?JSON.parse(text).pass:0;
   const key=mode+stage+pass,n=counts.get(key)??0;counts.set(key,n+1);requests.push({mode,stage,n});
   const bash=command=>({name:'bash',args:{command,description:'Installed scripted fixture'}});
   if(stage==='bootstrap'){response(res,n===0?{name:'harness_task',args:{}}:null,'Actual workflow result retained');return;}
-  if(stage==='finisher') {
+  if(stage==='regressions') {
    assert.ok(text.includes('ORIGINAL_TASK_FIXTURE'));
-   const calls=[{name:'read',args:{filePath:'value.mjs'}},bash('node --test')];
-   response(res,calls[n]??null,'Fresh completion inspected the code and executed the public regression.');return;
+   const calls=[{name:'read',args:{filePath:'value.mjs'}},{name:'glob',args:{pattern:'*.test.mjs'}},{name:'edit',args:{filePath:'value.test.mjs',oldString:'value,1',newString:'value,2'}},bash('node --test')];
+   response(res,calls[n]??null,'The requested value regression fails on initial value 1; legacy remains covered.');return;
   }
   let calls=[];
   if(stage==='implementation') {
-   if(mode==='stateful') {
+   if(mode==='container-check-first') calls=[{name:'read',args:{filePath:'value.mjs'}},{name:'edit',args:{filePath:'value.mjs',oldString:'value = 1',newString:'value = 2'}},bash('node --test')];
+   else if(mode==='stateful') {
     assert.ok(text.includes('state the action will actually use immediately before'));
     calls=[bash(writeFixture('example.test.mjs',guarded)),bash('node --test')];
    }
@@ -147,7 +148,13 @@ const fixture=http.createServer(async(req,res)=>{
 });
 await new Promise(r=>fixture.listen(0,'127.0.0.1',r));
 if(process.env.NATIVE_TASK_FIXTURE_PROVIDER_ONLY==='1'){
- mode=({'1':'container-parallel','read-error':'container-parallel-read-error','denial':'container-parallel-denial'})[process.env.NATIVE_TASK_FIXTURE_PARALLEL]??'container-preflight';fs.writeFileSync(path.join(project,'TASK.md'),'ORIGINAL_TASK_FIXTURE: Deliver value 2 and preserve legacy scenario; run node --test.');
+ mode=({'1':'container-parallel','read-error':'container-parallel-read-error','denial':'container-parallel-denial'})[process.env.NATIVE_TASK_FIXTURE_PARALLEL]??'container-preflight';
+ if(process.env.NATIVE_TASK_FIXTURE_CHECK_FIRST==='1') {
+  mode='container-check-first';
+  fs.writeFileSync(path.join(project,'value.mjs'),source.replace('value = 2','value = 1'));
+  fs.writeFileSync(path.join(project,'value.test.mjs'),originalTest.replace('value,2','value,1'));
+ }
+ fs.writeFileSync(path.join(project,'TASK.md'),'ORIGINAL_TASK_FIXTURE: Change value to 2 and preserve legacy() = 7 scenario; run node --test.');
  console.log(JSON.stringify({fixtureURL:`http://127.0.0.1:${fixture.address().port}`,project}));
  await new Promise(resolve=>process.once('SIGTERM',()=>fixture.close(resolve)));fs.rmSync(temp,{recursive:true,force:true});process.exit(0);
 }
