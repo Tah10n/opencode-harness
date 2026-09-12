@@ -18,8 +18,9 @@ test suite. The first passing or failing test cannot certify the full task.
 The same model, permissions and total deadline apply to both phases. Generated test
 expectations remain hypotheses to check against the task and preserved contracts.
 The author receives guidance to use native repository-relative read/edit paths and
-the delivery worktree defaults for tool directories. The exact root remains available
-when needed; paths and permissions are resolved by the existing native tools.
+an explicit `workdir: "."` for native Bash commands at the project root. Native
+glob/grep may omit their directory. The standard native context still supplies
+the exact root; paths and permissions are resolved by the existing native tools.
 This path omits the mandatory H1 prompt, fresh finisher and D correction loop.
 Omitting the variable retains D and does not change the user's default.
 

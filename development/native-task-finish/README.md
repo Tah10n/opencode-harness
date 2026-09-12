@@ -85,6 +85,23 @@ the author's guidance to avoid copying the UUID. It changes no task identifiers,
 path aliases, native tools or denial rules. The failed runs and interrupted
 requests remain in the development record.
 
+The subsequent relative-path guidance revision was measured on one fresh iterator
+pair. P delivered a complete patch with AVA regressions and README coverage in
+499.624 seconds (39 requests, 56 tools). H delivered only a focused regression
+before another UUID typo in an explicitly supplied Bash workdir caused native
+permission termination, after 92.977 seconds (9 requests, 19 tools). Usage was
+known for both. Relative reads worked, but suggesting an omitted Bash workdir
+did not prevent the model from copying an absolute one. All 34 attempts remain
+counted; the prepared following batch was not started. This revision had one
+loss and no win, so it was not promoted.
+
+A zero-provider installed check confirmed that native Bash also accepts the
+explicit relative `workdir: "."` and runs the delivered project check there.
+The next guidance revision requests that form for root commands and relative
+subdirectory paths when needed. It removes the redundant absolute root from
+the additional prompt; the standard native cwd and workspace context remain.
+No tool arguments are rewritten and no denied call is retried.
+
 ## Current hypothesis: focused observation with native relative paths
 
 `HARNESS_TASK_STRATEGY=check-first` replaces the fresh finisher with regression
@@ -93,8 +110,8 @@ request reaches both phases verbatim. Preparation obtains one meaningful observa
 through an affected public path, then yields to implementation instead of preparing
 the full regression suite. The second phase implements all code, consumer coverage,
 tests and documentation while treating generated expectations as hypotheses. The
-author is guided to use repository-relative native paths and default tool directories;
-the exact delivery root is also supplied. Native permissions remain unchanged. There is
+author is guided to use repository-relative native paths and an explicit dot Bash
+workdir at the project root. Native permissions remain unchanged. There is
 no verdict schema, selector, mandatory H1 prompt or report-driven correction loop.
 Default D remains unchanged. Native tools, worktree isolation, cancellation and
 shared deadline remain the existing implementation.

@@ -76,7 +76,7 @@ const fixture=http.createServer(async(req,res)=>{
   }
   let calls=[];
   if(stage==='implementation') {
-   if(mode==='container-check-first') calls=[{name:'read',args:{filePath:'value.mjs'}},{name:'edit',args:{filePath:'value.mjs',oldString:'value = 1',newString:'value = 2'}},bash('node --test')];
+   if(mode==='container-check-first') calls=[{name:'read',args:{filePath:'value.mjs'}},{name:'edit',args:{filePath:'value.mjs',oldString:'value = 1',newString:'value = 2'}},{name:'bash',args:{command:'node --test',workdir:'.',description:'Installed scripted fixture from relative project root'}}];
    else if(mode==='stateful') {
     assert.ok(text.includes('state the action will actually use immediately before'));
     calls=[bash(writeFixture('example.test.mjs',guarded)),bash('node --test')];

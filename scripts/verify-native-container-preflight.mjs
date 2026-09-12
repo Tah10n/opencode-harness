@@ -35,7 +35,8 @@ try{
   const checks=saved.events.filter(e=>e.args?.command==='node --test'); assert.equal(checks[0].exit,1); assert.equal(checks.at(-1).exit,0); assert.ok(saved.files.includes('regressions.patch'));
   for(const tool of ['read','edit'])assert.ok(saved.events.some(e=>e.tool===tool&&e.state==='completed'&&!path.isAbsolute(e.args.filePath)),tool+' relative path');
   for(const tool of ['glob','grep'])assert.ok(saved.events.some(e=>e.tool===tool&&e.state==='completed'&&e.args.path===undefined),tool+' default directory');
-  assert.ok(checks.every(e=>e.args.workdir===undefined),'Bash uses the delivery directory default');
+  assert.equal(checks[0].args.workdir,undefined,'Preparation uses the native delivery directory default');
+  assert.equal(checks.at(-1).args.workdir,'.','Implementation uses the native relative project root');
  }
  assert.equal(captureCandidate(session,root).status,0);
  fs.writeFileSync(path.join(root,'preflight-result.json'),JSON.stringify({status:'passed',requests,realProviderCalls:0,elapsedMs:result.elapsedMs,terminationVerified:true,report:saved.report},null,2));
