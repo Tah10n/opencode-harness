@@ -30,7 +30,13 @@ try{
  if(process.env.NATIVE_TASK_FIXTURE_PARALLEL){assert.equal(saved.events.filter(e=>e.state==='error').length,process.env.NATIVE_TASK_FIXTURE_PARALLEL==='1'?0:1);const edit=saved.events.find(e=>e.tool==='edit'),check=saved.events.find(e=>e.args?.command==='node --test');assert.ok(edit.completedAt<=check.startedAt);assert.equal(check.before,edit.after);}
  if(process.env.NATIVE_TASK_FIXTURE_PARALLEL==='denial')assert.equal(saved.report.permissionContinuations.length,1);
  assert.ok(saved.events.some(e=>e.tool==='bash'&&e.exit===0));assert.ok(saved.report.stages.some(s=>s.role==='author'));assert.deepEqual([...new Set(saved.report.stages.map(s=>s.role))],['author']);assert.equal(saved.report.repairs,0);
- if(f.strategy==='check-first') { assert.deepEqual(saved.report.stages.map(s=>s.label),['regressions','implementation']); const checks=saved.events.filter(e=>e.args?.command==='node --test'); assert.equal(checks[0].exit,1); assert.equal(checks.at(-1).exit,0); assert.ok(saved.files.includes('regressions.patch')); }
+ if(f.strategy==='check-first') {
+  assert.deepEqual(saved.report.stages.map(s=>s.label),['regressions','implementation']);
+  const checks=saved.events.filter(e=>e.args?.command==='node --test'); assert.equal(checks[0].exit,1); assert.equal(checks.at(-1).exit,0); assert.ok(saved.files.includes('regressions.patch'));
+  for(const tool of ['read','edit'])assert.ok(saved.events.some(e=>e.tool===tool&&e.state==='completed'&&!path.isAbsolute(e.args.filePath)),tool+' relative path');
+  for(const tool of ['glob','grep'])assert.ok(saved.events.some(e=>e.tool===tool&&e.state==='completed'&&e.args.path===undefined),tool+' default directory');
+  assert.ok(checks.every(e=>e.args.workdir===undefined),'Bash uses the delivery directory default');
+ }
  assert.equal(captureCandidate(session,root).status,0);
  fs.writeFileSync(path.join(root,'preflight-result.json'),JSON.stringify({status:'passed',requests,realProviderCalls:0,elapsedMs:result.elapsedMs,terminationVerified:true,report:saved.report},null,2));
  console.log(JSON.stringify({containerPreflight:'passed',scriptedRequests:requests,realProviderCalls:0,elapsedMs:result.elapsedMs}));

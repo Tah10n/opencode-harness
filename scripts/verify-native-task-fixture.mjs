@@ -71,7 +71,7 @@ const fixture=http.createServer(async(req,res)=>{
   if(stage==='bootstrap'){response(res,n===0?{name:'harness_task',args:{}}:null,'Actual workflow result retained');return;}
   if(stage==='regressions') {
    assert.ok(text.includes('ORIGINAL_TASK_FIXTURE'));
-   const calls=[{name:'read',args:{filePath:'value.mjs'}},{name:'glob',args:{pattern:'*.test.mjs'}},{name:'edit',args:{filePath:'value.test.mjs',oldString:'value,1',newString:'value,2'}},bash('node --test')];
+   const calls=[{name:'read',args:{filePath:'value.mjs'}},{name:'glob',args:{pattern:'*.test.mjs'}},{name:'grep',args:{pattern:'legacy',include:'value.mjs'}},{name:'edit',args:{filePath:'value.test.mjs',oldString:'value,1',newString:'value,2'}},bash('node --test')];
    response(res,calls[n]??null,'The requested value regression fails on initial value 1; legacy remains covered.');return;
   }
   let calls=[];

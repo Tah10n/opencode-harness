@@ -57,7 +57,35 @@ exceeding the entire P run's 467.779 seconds; both final patches were complete.
 The broad preparation stage has not justified its cost or met independent-evaluation
 readiness. Twenty-two development runs have completed across both candidates.
 
-## Current hypothesis: a focused check before implementation
+## Third candidate: focused preparation and absolute root guidance
+
+Candidate `c962d30ad495357df40e5bb3295f8d5bec093008` completed five development
+pairs: legacy runtime migration, dual-module configuration, catalog caching,
+HTTP transport extraction and early iterator closure in public p-map. H and P
+each supplied 3/5 full patches: one win, one loss and three ties. The H win
+rejected explicitly supplied undefined indentation as required; P accepted it.
+Two H attempts stopped after the model mistyped the random worktree identifier
+in a native read path. Their permission denials remain terminal. P on the
+iterator task stopped on a transport error before applying any code. Neither
+iterator attempt supplied a patch. No failed attempt was replaced.
+
+H used 1271.391 seconds and 111 requests; P used 1653.730 seconds and 102
+requests. Each arm has two requests with unknown usage. These totals include
+early failures and a P migration timeout whose saved patch was complete; they
+are not evidence that H solves complete tasks more cheaply. H delivered three
+native terminal patches. The full task comparison remains tied and does not
+meet independent-evaluation readiness. Thirty-two development runs have
+completed; no independent run has started.
+
+The existing installed preflight already used native relative read/edit paths,
+an omitted glob directory and Bash's delivery-root default. It recorded a real
+red-to-green test transition, left the original source unchanged and delivered
+an applicable patch. The next revision uses this verified native capability in
+the author's guidance to avoid copying the UUID. It changes no task identifiers,
+path aliases, native tools or denial rules. The failed runs and interrupted
+requests remain in the development record.
+
+## Current hypothesis: focused observation with native relative paths
 
 `HARNESS_TASK_STRATEGY=check-first` replaces the fresh finisher with regression
 preparation followed by implementation in the same author session. The original
@@ -65,7 +93,8 @@ request reaches both phases verbatim. Preparation obtains one meaningful observa
 through an affected public path, then yields to implementation instead of preparing
 the full regression suite. The second phase implements all code, consumer coverage,
 tests and documentation while treating generated expectations as hypotheses. The
-exact delivery root is supplied as tool context; native permissions remain unchanged. There is
+author is guided to use repository-relative native paths and default tool directories;
+the exact delivery root is also supplied. Native permissions remain unchanged. There is
 no verdict schema, selector, mandatory H1 prompt or report-driven correction loop.
 Default D remains unchanged. Native tools, worktree isolation, cancellation and
 shared deadline remain the existing implementation.
