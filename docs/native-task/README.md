@@ -10,8 +10,11 @@ its development results do not establish a recommended production mode.
 ## Install and use
 
 The opt-in development candidate `HARNESS_TASK_STRATEGY=check-first` uses one native
-author session in two phases. It first prepares and executes project regressions
-against the full original task, then implements the change using those observations.
+author session in two phases. It first obtains a focused regression observation
+through an affected public path, then implements the complete original task and
+finishes the remaining consumer coverage, project regressions and documentation.
+Preparation ends after that useful observation; it does not front-load the entire
+test suite. The first passing or failing test cannot certify the full task.
 The same model, permissions and total deadline apply to both phases. Generated test
 expectations remain hypotheses to check against the task and preserved contracts.
 This path omits the mandatory H1 prompt, fresh finisher and D correction loop.
