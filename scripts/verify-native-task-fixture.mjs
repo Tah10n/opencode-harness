@@ -44,6 +44,12 @@ const fixture=http.createServer(async(req,res)=>{
   providerRequests++;
   const body=JSON.parse(Buffer.concat(chunks)), user=body.messages.findLast(m=>m.role==='user');
   const text=typeof user?.content==='string'?user.content:user?.content?.map(p=>p.text??'').join('\n')??'';
+  if(process.env.NATIVE_SELECTION_LIFECYCLE==='1'){
+   fs.appendFileSync(path.join(project,'lifecycle-requests.jsonl'),JSON.stringify({text})+'\n');
+   const content='RESULT behavior | required public behavior | X=confirmed | Y=missing | X: scripted consumer evidence; Y: scripted missing behavior\nDECISION: X';
+   if(text.includes('partial')){res.writeHead(200,{'content-type':'text/event-stream'});res.write('data: '+JSON.stringify({choices:[{delta:{content},finish_reason:null}]})+'\n\n');return;}
+   response(res,null,text.includes('no-decision')?'Research observations only':content);return;
+  }
   if(process.env.NATIVE_SELECTION_FIXTURE==='1'){
    const all=JSON.stringify(body.messages),final=text.includes('Planned decision stage');
    requests.push({selection:true,final});
@@ -54,7 +60,7 @@ const fixture=http.createServer(async(req,res)=>{
    const calls=[{name:'apply_patch',args:{patchText:'*** Begin Patch\n*** Add File: /work/diagnostics/native-probe.txt\n+native scratch\n*** End Patch'}},bash('X',probe('X')),bash('Y',probe('Y')),bash('X',"node -e 'setInterval(()=>{},1000)' ")];
    if(n>=3)assert.ok(all.includes('STATE_X_OK')&&all.includes('STATE_Y_OK'));
    if(n===4&&process.env.NATIVE_SELECTION_DELAY==='1')await new Promise(r=>setTimeout(r,2500));
-   response(res,calls[n]??null,'Research complete; proceed to planned decision.');return;
+   response(res,calls[n]??null,n===4&&process.env.NATIVE_SELECTION_DECISION==='1'?'RESULT public | public consumer behavior | X=confirmed | Y=confirmed | X: actual node diagnostic STATE_X_OK; Y: actual node diagnostic STATE_Y_OK\nDECISION: X':'Research complete; proceed to planned decision.');return;
   }
   if(!body.tools?.length){auxiliaryRequests.push({mode});response(res,null,'Fixture title');return;}
   assert.ok(!JSON.stringify(body).includes(forbiddenContent),'Forbidden resource content must never reach the provider');

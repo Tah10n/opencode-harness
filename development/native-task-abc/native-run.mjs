@@ -1,16 +1,62 @@
 // Experiment-only native continuation control. Not a harness controller or product mode.
 import fs from 'node:fs';import path from 'node:path';import {spawn} from 'node:child_process';import readline from 'node:readline';
-export async function runNativePhase(session,{config,task,enabled,model,variant,limitMs,sessionID,stopWorkload,onTimeout}) {
+export async function runNativePhase(session,{config,task,enabled,model,variant,limitMs,sessionID,stopWorkload,researchMs,researchStopped,signal,deadline=Date.now()+limitMs},{spawnProcess=spawn}={}) {
+ const started=Date.now();
  const argv=['exec','--workdir','/work/repo','--env','PATH=/work/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin','--env',`OPENCODE_CONFIG_CONTENT=${JSON.stringify(config)}`,
  ...(enabled?['--env','OPENCODE_CONFIG_DIR=/template','--env','HARNESS_TASK_FILE=/work/repo/TASK.md','--env',`HARNESS_TASK_TIMEOUT_MS=${limitMs}`]:[]),session.name,'/opt/opencode','run','--format','json','--agent','build','--model',model,...(variant?['--variant',variant]:[]),...(sessionID?['--session',sessionID]:[]),...(enabled?['--command','harness-task']:['--',task])];
- const child=spawn('docker',argv,{stdio:['ignore','pipe','pipe']});
- const stream=fs.createWriteStream(path.join(session.output,'events.jsonl'),{flags:'wx',mode:0o600});const events=[];let stderr='',parseErrors=0,timedOut=false;
- child.stderr.on('data',x=>stderr+=x);readline.createInterface({input:child.stdout}).on('line',line=>{try{const event=JSON.parse(line);if(event.type==='reasoning')return;events.push(event);stream.write(JSON.stringify(event)+'\n');}catch{parseErrors++;}});
- let closed=false;
- const started=Date.now(),timer=setTimeout(async()=>{await onTimeout?.();if(!closed){timedOut=true;child.kill('SIGKILL');}},limitMs);
- const result=await new Promise(resolve=>{child.once('error',e=>resolve({error:e.message}));child.once('close',(exitCode,signal)=>resolve({exitCode,signal}));});
- closed=true;clearTimeout(timer);const termination=stopWorkload(session);await new Promise(r=>stream.end(r));fs.writeFileSync(path.join(session.output,'stderr.txt'),stderr);
- const summary={...result,termination,timedOut,elapsedMs:Date.now()-started,parseErrors};fs.writeFileSync(path.join(session.output,'finished.json'),JSON.stringify(summary,null,2),{flag:'wx'});return {...summary,events,stderr};
+ const stream=fs.createWriteStream(path.join(session.output,'events.jsonl'),{flags:'wx',mode:0o600});
+ const events=[];let stderr='',parseErrors=0,timedOut=false,stopReason=null;
+ let child,closed=false,fixed=false,result={},completedAt=null,researchBoundary='not-reached';
+ let researchTimer,hardTimer,resolveDone;
+ const done=new Promise(resolve=>{resolveDone=resolve;});
+ const settle=()=>{
+  if(fixed||!closed||(researchBoundary==='pending'&&!stopReason))return;
+  fixed=true;clearTimeout(hardTimer);clearTimeout(researchTimer);signal?.removeEventListener('abort',cancel);
+  resolveDone();
+ };
+ const stop=(kind,error)=>{
+  if(fixed||stopReason)return;
+  stopReason={kind,...(error?{name:error.name??'Error',message:error.message??String(error)}:{})};
+  timedOut=kind==='hard_deadline';
+  if(!closed)child?.kill('SIGKILL');
+  settle();
+ };
+ const cancel=()=>stop(Date.now()>=deadline?'hard_deadline':'cancelled',signal.reason);
+ // The hard deadline never waits for researchStopped or provider stream completion.
+ hardTimer=setTimeout(()=>stop('hard_deadline'),Math.max(0,deadline-Date.now()));
+ if(signal?.aborted||Date.now()>=deadline){closed=true;if(signal?.aborted)cancel();else stop('hard_deadline');}
+ else {
+  child=spawnProcess('docker',argv,{stdio:['ignore','pipe','pipe']});
+  child.stderr.on('data',x=>stderr+=x);
+  readline.createInterface({input:child.stdout}).on('line',line=>{
+   try{const event=JSON.parse(line);if(event.type==='reasoning')return;events.push(event);stream.write(JSON.stringify(event)+'\n');}catch{parseErrors++;}
+  });
+  child.once('error',error=>{result.error=error.message;stop('process_error',error);});
+  child.once('close',(exitCode,signal)=>{
+   result={...result,exitCode,signal};closed=true;completedAt=Date.now();
+   if(completedAt>=deadline&&!stopReason)stop('hard_deadline');
+   settle();
+  });
+  signal?.addEventListener('abort',cancel,{once:true});
+  if(signal?.aborted)cancel();
+  if(researchMs!==undefined)researchTimer=setTimeout(()=>{
+   if(fixed||stopReason)return;
+   researchBoundary='pending';
+   // Closing research admission does not terminate the native consumer of that response.
+   Promise.resolve().then(()=>researchStopped?.()).then(()=>{
+    if(fixed)return;researchBoundary='settled';settle();
+   },error=>{
+    if(fixed)return;researchBoundary='failed';stop('research_boundary_error',error);
+   });
+  },Math.max(0,started+researchMs-Date.now()));
+ }
+ await done;
+ const executionElapsedMs=Date.now()-started,cleanupStarted=Date.now();
+ let termination;
+ try{termination=await stopWorkload(session);}catch(error){termination={terminationVerified:false,error:error.message};}
+ await new Promise(r=>stream.end(r));fs.writeFileSync(path.join(session.output,'stderr.txt'),stderr);
+ const summary={...result,termination,timedOut,stopReason,researchBoundary,completedAt,executionElapsedMs,cleanupElapsedMs:Date.now()-cleanupStarted,elapsedMs:Date.now()-started,parseErrors};
+ fs.writeFileSync(path.join(session.output,'finished.json'),JSON.stringify(summary,null,2),{flag:'wx'});return {...summary,events,stderr};
 }
 export async function runTask(session,options){
  const started=Date.now(),deadline=started+options.limitMs,phases=[];
