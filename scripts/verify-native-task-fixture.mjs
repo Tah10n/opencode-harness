@@ -44,6 +44,18 @@ const fixture=http.createServer(async(req,res)=>{
   providerRequests++;
   const body=JSON.parse(Buffer.concat(chunks)), user=body.messages.findLast(m=>m.role==='user');
   const text=typeof user?.content==='string'?user.content:user?.content?.map(p=>p.text??'').join('\n')??'';
+  if(process.env.NATIVE_SELECTION_FIXTURE==='1'){
+   const all=JSON.stringify(body.messages),final=text.includes('Planned decision stage');
+   requests.push({selection:true,final});
+   if(final){assert.ok(!body.tools?.length,'Final request must be tool free');assert.ok(all.includes('STATE_X_OK')&&all.includes('STATE_Y_OK'),'Real native command results reach final session');response(res,null,'RESULT public | public consumer behavior | X=confirmed | Y=confirmed | X: actual node diagnostic STATE_X_OK; Y: actual node diagnostic STATE_Y_OK\nDECISION: X\nBoth scripted fixture candidates satisfy the fixture contract.');return;}
+   const n=counts.get('selection')??0;counts.set('selection',n+1);
+   const bash=(label,command)=>({name:'bash',args:{command,workdir:'/input/'+label,timeout:120000,description:'Selection fixture '+label}});
+   const probe=label=>`node -e 'const fs=require("fs"),assert=require("assert/strict");for(const key of ["HOME","TMPDIR","XDG_CONFIG_HOME","XDG_DATA_HOME","XDG_CACHE_HOME","XDG_STATE_HOME"])assert.ok(process.env[key].startsWith("/work/diagnostics/${label}/"),key);assert.equal(fs.readFileSync("/work/diagnostics/native-probe.txt","utf8").trim(),"native scratch");fs.writeFileSync(process.env.HOME+"/state","${label}");assert.equal(require("./consumer.cjs").render(),7);console.log("STATE_${label}_OK");'`;
+   const calls=[{name:'apply_patch',args:{patchText:'*** Begin Patch\n*** Add File: /work/diagnostics/native-probe.txt\n+native scratch\n*** End Patch'}},bash('X',probe('X')),bash('Y',probe('Y')),bash('X',"node -e 'setInterval(()=>{},1000)' ")];
+   if(n>=3)assert.ok(all.includes('STATE_X_OK')&&all.includes('STATE_Y_OK'));
+   if(n===4&&process.env.NATIVE_SELECTION_DELAY==='1')await new Promise(r=>setTimeout(r,2500));
+   response(res,calls[n]??null,'Research complete; proceed to planned decision.');return;
+  }
   if(!body.tools?.length){auxiliaryRequests.push({mode});response(res,null,'Fixture title');return;}
   assert.ok(!JSON.stringify(body).includes(forbiddenContent),'Forbidden resource content must never reach the provider');
   const stage=text.includes('Corrective pass')?'correction':text.includes('Implement the complete original task')?'implementation':'bootstrap';

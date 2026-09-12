@@ -1,4 +1,5 @@
 import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';import {spawn} from 'node:child_process';import readline from 'node:readline';
+if(process.argv.includes('--selection')){await (await import('../development/native-task-selection/verify-container.mjs')).verifySelectionContainer(path.resolve(process.argv[2]));process.exit(0);}
 // Uses the existing external native execution adapters and installed fixture.
 // This process never reads authorization and forwards only to its local fixture.
 const base=path.resolve('.'),root=path.resolve(process.argv[2]);

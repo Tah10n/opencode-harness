@@ -1,14 +1,15 @@
 // Experiment-only native continuation control. Not a harness controller or product mode.
 import fs from 'node:fs';import path from 'node:path';import {spawn} from 'node:child_process';import readline from 'node:readline';
-export async function runNativePhase(session,{config,task,enabled,model,variant,limitMs,sessionID,stopWorkload}) {
+export async function runNativePhase(session,{config,task,enabled,model,variant,limitMs,sessionID,stopWorkload,onTimeout}) {
  const argv=['exec','--workdir','/work/repo','--env','PATH=/work/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin','--env',`OPENCODE_CONFIG_CONTENT=${JSON.stringify(config)}`,
  ...(enabled?['--env','OPENCODE_CONFIG_DIR=/template','--env','HARNESS_TASK_FILE=/work/repo/TASK.md','--env',`HARNESS_TASK_TIMEOUT_MS=${limitMs}`]:[]),session.name,'/opt/opencode','run','--format','json','--agent','build','--model',model,...(variant?['--variant',variant]:[]),...(sessionID?['--session',sessionID]:[]),...(enabled?['--command','harness-task']:['--',task])];
  const child=spawn('docker',argv,{stdio:['ignore','pipe','pipe']});
  const stream=fs.createWriteStream(path.join(session.output,'events.jsonl'),{flags:'wx',mode:0o600});const events=[];let stderr='',parseErrors=0,timedOut=false;
  child.stderr.on('data',x=>stderr+=x);readline.createInterface({input:child.stdout}).on('line',line=>{try{const event=JSON.parse(line);if(event.type==='reasoning')return;events.push(event);stream.write(JSON.stringify(event)+'\n');}catch{parseErrors++;}});
- const started=Date.now(),timer=setTimeout(()=>{timedOut=true;child.kill('SIGKILL');},limitMs);
+ let closed=false;
+ const started=Date.now(),timer=setTimeout(async()=>{await onTimeout?.();if(!closed){timedOut=true;child.kill('SIGKILL');}},limitMs);
  const result=await new Promise(resolve=>{child.once('error',e=>resolve({error:e.message}));child.once('close',(exitCode,signal)=>resolve({exitCode,signal}));});
- clearTimeout(timer);const termination=stopWorkload(session);await new Promise(r=>stream.end(r));fs.writeFileSync(path.join(session.output,'stderr.txt'),stderr);
+ closed=true;clearTimeout(timer);const termination=stopWorkload(session);await new Promise(r=>stream.end(r));fs.writeFileSync(path.join(session.output,'stderr.txt'),stderr);
  const summary={...result,termination,timedOut,elapsedMs:Date.now()-started,parseErrors};fs.writeFileSync(path.join(session.output,'finished.json'),JSON.stringify(summary,null,2),{flag:'wx'});return {...summary,events,stderr};
 }
 export async function runTask(session,options){

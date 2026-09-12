@@ -1,14 +1,14 @@
 // Six frozen pair selections. Provider relay/deadline/stop rules retained from utility/run-comparison.mjs.
-// No author stage, continuation, candidate mutation, or response repair.
+// One preplanned tool-free decision stage in the same session; no author or repair.
 import fs from 'node:fs';import path from 'node:path';import {createHash} from 'node:crypto';
 import assert from 'node:assert/strict';
-import {runNativePhase} from '../native-task-abc/native-run.mjs';
+import {runSelector} from './phases.mjs';
 import {prepareSelector,inputManifest} from './container-setup.mjs';
 export async function runSelection({root,startContainer,stopWorkload,readAuth,fetchImpl=fetch}) {
 const f=JSON.parse(fs.readFileSync(path.join(root,'freeze.json')));
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 function verify(){
- if(f.attempts.length!==6||f.model!=='openai/gpt-5.6-luna'||f.variant!=='high'||f.budgetMs!==300000||!f.preflightPassed)throw Error('Invalid development configuration');
+ if(f.attempts.length!==6||f.model!=='openai/gpt-5.6-luna'||f.variant!=='high'||f.budgetMs!==300000||f.researchMs!==240000||!f.preflightPassed)throw Error('Invalid development configuration');
  for(const [file,digest] of Object.entries(f.files))if(sha(fs.readFileSync(file))!==digest)throw Error('Frozen file changed: '+file);
  if(new Set(f.attempts.map(a=>a.task)).size!==6||f.attempts.some((a,i)=>a.slot!==i+1))throw Error('Invalid six-task schedule');
 }
@@ -22,6 +22,7 @@ for(const attempt of f.attempts){
  if(fs.existsSync(out))throw Error('Previously created slot must never be retried: '+out);
  fs.mkdirSync(out,{recursive:true,mode:0o700});fs.writeFileSync(path.join(out,'started.json'),JSON.stringify({...attempt,at:new Date().toISOString()},null,2),{flag:'wx'});
  const requests=[],active=new Set(),abort=new AbortController();let session,deadline=null,timer,result,terminationVerified=false,forwardingOpen=true,deadlineTriggered=false,inputsVerified=false,relayRemoved=false;
+ let researchClosing=false;
  const deadlineReason=Object.assign(new Error('Own task deadline reached'),{name:'AbortError'});
  const save=()=>fs.writeFileSync(path.join(out,'provider-metadata.json'),JSON.stringify(requests,null,2));
  try{
@@ -31,11 +32,11 @@ for(const attempt of f.attempts){
     const requestKind=frame.body?.tools?.length?'work':'title';
     let requestSignal;
     const record={requestKind,at:new Date().toISOString(),path:frame.path,model:frame.body?.model,effort:frame.body?.reasoning?.effort??null,forwarded:false,usage:null};requests.push(record);save();
-    if(pause||abort.signal.aborted||!deadline||Date.now()>=deadline){record.notForwardedReason='paused-or-deadline';save();send({type:'headers',status:408,contentType:'text/plain'});send({type:'end'});return;}
+    if(pause||researchClosing||abort.signal.aborted||!deadline||Date.now()>=deadline){record.notForwardedReason='paused-or-deadline';save();send({type:'headers',status:408,contentType:'text/plain'});send({type:'end'});return;}
     if(frame.path!=='/v1/responses'||frame.body?.model!=='gpt-5.6-luna'||frame.body.stream!==true||frame.body?.reasoning?.effort!=='high'){pauseScheduling('boundary_refusal',attempt.slot);record.rejected=true;save();send({type:'headers',status:403,contentType:'text/plain'});send({type:'end'});return;}
     try{
      const a=readAuth();record.forwarded=true;record.forwardedAt=new Date().toISOString();save();
-     requestSignal=AbortSignal.any([signal,abort.signal,AbortSignal.timeout(180000)]);
+     requestSignal=AbortSignal.any([signal,abort.signal,AbortSignal.timeout(Math.max(1,Math.min(180000,deadline-Date.now())))]);
      const response=await fetchImpl('https://chatgpt.com/backend-api/codex/responses',{method:'POST',redirect:'error',headers:{'content-type':'application/json',authorization:`Bearer ${a.access}`,'ChatGPT-Account-Id':a.accountId},body:JSON.stringify({...frame.body,store:false}),signal:requestSignal});record.status=response.status;save();
      if([401,403,429].includes(response.status)){
       
@@ -58,19 +59,17 @@ for(const attempt of f.attempts){
   const preparation=prepareSelector(session,f.inputManifests[attempt.task]);
   fs.writeFileSync(path.join(out,'input-verification.json'),JSON.stringify({...preparation,providerRequestsBeforeStart:requests.length},null,2));
   deadline=Date.now()+f.budgetMs;timer=setTimeout(()=>{deadlineTriggered=true;forwardingOpen=false;abort.abort(deadlineReason);},f.budgetMs);
-  result=await runNativePhase(session,{config:f.config,task:fs.readFileSync(f.prompt,'utf8')+'\n\nORIGINAL FULL TASK:\n'+fs.readFileSync(path.join(attempt.source,'TASK.md'),'utf8'),enabled:false,model:f.model,variant:f.variant,limitMs:Math.max(1,deadline-Date.now()),stopWorkload});
+  result=await runSelector(session,{researchMs:f.researchMs,researchStopped:async()=>{researchClosing=true;await Promise.allSettled([...active]);},beforeFinal:async()=>{await Promise.allSettled([...active]);researchClosing=false;},canFinalize:()=>!pause&&!abort.signal.aborted,setClock:clock=>{const r=session.exec(['node','-e',"require('fs').writeFileSync('/work/selection-clock.json',process.argv[1])",JSON.stringify(clock)]);assert.equal(r.status,0,r.stderr);},config:f.config,task:fs.readFileSync(f.prompt,'utf8')+'\n\nORIGINAL FULL TASK:\n'+fs.readFileSync(path.join(attempt.source,'TASK.md'),'utf8'),enabled:false,model:f.model,variant:f.variant,limitMs:Math.max(1,deadline-Date.now()),stopWorkload});
   if(result.timedOut&&!deadlineTriggered)pauseScheduling('unattributed_timeout',attempt.slot);
   terminationVerified=result.termination?.terminationVerified===true;if(!terminationVerified)throw Error('Termination not verified');
   clearTimeout(timer);forwardingOpen=false;abort.abort();await Promise.allSettled([...active]);save();
   const native=session.exec(['node','-e',"const {DatabaseSync}=require('node:sqlite');const db=new DatabaseSync('/work/data/opencode/opencode.db',{readOnly:true});console.log(JSON.stringify({sessions:db.prepare('SELECT id,parent_id,directory,agent,model,tokens_input,tokens_output,tokens_reasoning,tokens_cache_read,tokens_cache_write FROM session').all(),messages:db.prepare('SELECT id,session_id,data FROM message').all().map(x=>({...x,data:JSON.parse(x.data)})),tools:db.prepare('SELECT id,message_id,session_id,data FROM part').all().map(x=>({...x,data:JSON.parse(x.data)})).filter(x=>x.data.type==='tool')}));db.close();"]);if(native.status!==0)throw Error('Native accounting extraction failed');fs.writeFileSync(path.join(out,'native-evidence.json'),native.stdout);
   assert.deepEqual(inputManifest(session),f.inputManifests[attempt.task],'Candidate inputs changed');inputsVerified=true;
   const evidence=JSON.parse(native.stdout);
-  const text=result.events.filter(e=>e.type==='text').map(e=>e.part?.text??'').join('\n');
+  const text=result.answer;
   fs.writeFileSync(path.join(out,'answer.txt'),text);
-  const decisions=[...text.matchAll(/^DECISION: (X|Y|NEITHER|INSUFFICIENT)\s*$/gm)];
-  const terminal=result.exitCode===0&&!result.timedOut&&!result.parseErrors&&!result.events.some(e=>e.type==='error')&&result.events.some(e=>e.type==='step_finish'&&e.part?.reason==='stop');
-  const decision=terminal&&decisions.length===1?decisions[0][1]:null;
-  const {events,stderr,...phase}=result;
+  const decision=result.decision;
+  const {events,stderr,answer,...phase}=result;
   const summary={slot:attempt.slot,task:attempt.task,...phase,decision,selectionCompleted:decision!==null,requests:requests.filter(r=>r.forwarded).length,requestsWithoutUsage:requests.filter(r=>r.forwarded&&!r.usage).length,toolCalls:evidence.tools.length,sessions:evidence.sessions.length,ownTaskDeadlineTriggered:deadlineTriggered,inputsUnchanged:true};
   fs.writeFileSync(path.join(out,'result.json'),JSON.stringify(summary,null,2));console.log(JSON.stringify(summary));
  }catch(error){fs.writeFileSync(path.join(out,'error.json'),JSON.stringify({message:error.message},null,2));pauseScheduling('execution_or_capture_error',attempt.slot,{message:error.message});if(session)stopWorkload(session);}

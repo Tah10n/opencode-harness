@@ -38,11 +38,13 @@ fs.cpSync('/Users/tahion/.cache/node/corepack/v1/pnpm/11.7.0',path.join(dependen
 fs.writeFileSync(path.join(dependencies,'corepack/lastKnownGood.json'),JSON.stringify({pnpm:'11.7.0'}));
 const prompt=path.resolve('development/native-task-selection/PROMPT.md');
 for(const file of [prompt,path.resolve('development/native-task-selection/run-selection.mjs'),path.resolve('development/native-task-selection/container-setup.mjs'),path.resolve('development/native-task-selection/prepare.mjs'),old.containerAdapter,path.resolve('development/native-task-abc/native-run.mjs'),path.resolve('development/native-task-utility/container/container-relay.mjs'),path.resolve('development/native-task-utility/container/stop-workload.mjs'),path.join(old.toolchain,'package/bin/opencode')])freezeFile(file);
+for(const name of ['selection-plugin.mjs','phases.mjs','decision.mjs'])freezeFile(path.resolve('development/native-task-selection',name));
 for(const rel of Object.keys(manifest(dependencies)))freezeFile(path.join(dependencies,rel));
 const config=structuredClone(old.config);
-config.permission={external_directory:{'*':'deny','/input/**':'allow','/work/diagnostics/**':'allow'},edit:{'*':'deny','/work/diagnostics/**':'allow'},task:'deny',webfetch:'deny',websearch:'deny'};
+config.permission={external_directory:{'*':'deny','/input/**':'allow','/work/diagnostics/**':'allow'},edit:{'*':'deny','/work/diagnostics/**':'allow','../diagnostics/**':'allow'},task:'deny',webfetch:'deny',websearch:'deny'};
+config.plugin=['file:///work/config/opencode/plugins/selection.mjs'];
 config.agent={title:{disable:true},summary:{disable:true}};
-const f={candidate:'ea6cf2ab5260077e92df30d4a945c24146df9244',model:old.model,variant:'high',budgetMs:300000,openCode:'1.18.26',toolchain:old.toolchain,dependencies,containerAdapter:old.containerAdapter,config,prompt,promptSha256:sha(fs.readFileSync(prompt)),attempts,inputManifests,files,preflightPassed:false,createdAt:new Date().toISOString()};
+const f={candidate:git(base,['rev-parse','HEAD']).trim(),model:old.model,variant:'high',budgetMs:300000,researchMs:240000,openCode:'1.18.26',toolchain:old.toolchain,dependencies,containerAdapter:old.containerAdapter,config,prompt,promptSha256:sha(fs.readFileSync(prompt)),attempts,inputManifests,files,preflightPassed:false,createdAt:new Date().toISOString()};
 fs.writeFileSync(path.join(root,'mapping.json'),JSON.stringify(mapping,null,2),{flag:'wx',mode:0o600});
 fs.writeFileSync(path.join(root,'freeze.json'),JSON.stringify(f,null,2),{flag:'wx',mode:0o600});
 fs.mkdirSync(path.join(root,'scripted-preflight'));
