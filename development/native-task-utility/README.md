@@ -1,15 +1,21 @@
 # Native task utility development
 
-The best tested implementation is **v2, `afa20bff3283fad5aeacf7b840f8e6affa7396f8`**: conflicting native tool calls wait in order instead of failing admission. It remains experimental. **The requested useful autonomous advantage was not achieved.** Both allowed development series are complete; neither qualifies for the independent benchmark.
+The best tested implementation is **v2, `afa20bff3283fad5aeacf7b840f8e6affa7396f8`**: conflicting native tool calls wait in order instead of failing admission. It remains experimental. **The requested useful autonomous advantage was not achieved.** Both original development series are complete; neither qualifies for the independent benchmark.
 
 | Version | P full patches | H full patches | H wins / losses / ties | H autonomous complete delivery |
 | --- | --- | --- | --- | --- |
 | v1 recovery baseline `cac39a00` | 6/6 | 2/6 | 0 / 4 / 2 | 0/6 |
 | v2 admission queue `afa20bff` | 5/6 | 4/6 | 0 / 1 / 5 | 2/6 |
 
-The difference H minus P is −66.7 percentage points in v1 and −16.7 in v2. These are six-case development observations, not independent estimates or a causal attribution to the queue. All **24/24 development runs** were used, with no model retries. Independent pairs: **0**. H never reached five complete patches or two wins, and v2 still has a confirmed reverse loss on reconnect. No third version was created.
+The difference H minus P is −66.7 percentage points in v1 and −16.7 in v2. These are six-case development observations, not independent estimates or a causal attribution to the queue. All **24/24 development runs** were used, with no model retries. Independent pairs: **0**. H never reached five complete patches or two wins, and v2 still has a confirmed reverse loss on reconnect. The original authorization ended after these two versions.
 
 [Install, invoke `/harness-task`, and apply its terminal patch](../../docs/native-task/README.md#install-and-use). The model and effort remain caller choices. The [revision rationale](REVISION.md) was recorded before editing; the runtime and H1 instruction bytes then remained frozen throughout v2. See [method and acceptance](METHOD.md), [v1 plan](plan.json), [v2 plan](plan-v2.json), [v1 results](results-v1.json), [v2 results and counters](results-v2.json), [revision checks](revision-validation.json), and [v2 preservation/application checks](validation-v2.json).
+
+## Authorized follow-up
+
+After the original stop, the user authorized **one additional revision and twelve fresh development runs**, raising the total development allowance to 36. The next comparison corrects a reproduced container defect: the relay ran as PID 1 and left exited scheduler descendants as zombies. Docker `--init` now reaps them; termination retains only the exact relay PID reported at trusted startup and still stops every workload. A process-state parser regression found during the one review is fixed with an executable regression.
+
+The native harness runtime, H1, author/correction prompts, model, effort, 900-second deadline, tasks, order and gate remain unchanged. Both P and H receive the corrected environment. This is an execution-environment revision, not evidence of a semantic harness improvement. The [rationale](REVISION-V3.md) preceded the edit; [local validation](revision-v3-validation.json) is separate from the upcoming model comparison. Original v1/v2 outcomes stay intact. A previously disclosed legacy reference defect is corrected only in new private calibration copies before scoring; author snapshots and acceptance contracts are unchanged.
 
 ## Patch results
 
