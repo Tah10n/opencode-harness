@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/resources.mjs": "export async function withResources(resources,body){\n const stack=resources.filter(r=>r!=null).map(r=>[r,r[Symbol.asyncDispose]??r[Symbol.dispose]??r.dispose]);\n const outcome=await Promise.resolve().then(()=>body()).then(value=>({ok:true,value}),error=>({ok:false,error}));\n const failures=[];\n await stack.reduceRight((prior,[resource,dispose])=>prior.then(()=>Promise.resolve().then(()=>Reflect.apply(dispose,resource,[])).catch(error=>{failures.push(error);})),Promise.resolve());\n if(!outcome.ok)throw outcome.error;if(failures.length)throw failures[0];return outcome.value;\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "cleanup-overrides-body",
+      "file": "src/resources.mjs",
+      "replacement": "export async function withResources(resources,body){\n const stack=resources.filter(r=>r!==null&&r!==undefined).map(resource=>({resource,method:resource[Symbol.asyncDispose]??resource[Symbol.dispose]??resource.dispose}));\n let value,bodyFailed=false,bodyError,cleanupFailed=false,cleanupError;\n try{value=await body();}catch(error){bodyFailed=true;bodyError=error;}\n for(let i=stack.length-1;i>=0;i--){const {resource,method}=stack[i];try{await Reflect.apply(method,resource,[]);}catch(error){if(!cleanupFailed){cleanupFailed=true;cleanupError=error;}}}\n if(cleanupFailed)throw cleanupError;if(bodyFailed)throw bodyError;return value;\n}\n"
+    },
+    {
+      "name": "forward-cleanup-order",
+      "file": "src/resources.mjs",
+      "replacement": "export async function withResources(resources,body){\n const stack=resources.filter(r=>r!==null&&r!==undefined).map(resource=>({resource,method:resource[Symbol.asyncDispose]??resource[Symbol.dispose]??resource.dispose}));\n let value,bodyFailed=false,bodyError,cleanupFailed=false,cleanupError;\n try{value=await body();}catch(error){bodyFailed=true;bodyError=error;}\n for(let i=0;i<stack.length;i++){const {resource,method}=stack[i];try{await Reflect.apply(method,resource,[]);}catch(error){if(!cleanupFailed){cleanupFailed=true;cleanupError=error;}}}\n if(bodyFailed)throw bodyError;if(cleanupFailed)throw cleanupError;return value;\n}\n"
+    }
+  ]
+}

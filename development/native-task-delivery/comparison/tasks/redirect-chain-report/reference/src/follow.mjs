@@ -1,0 +1,1 @@
+export function follow(start,links){const chain=[],seen=new Set();let x=start;while(true){if(seen.has(x))return {chain,terminal:x,cycle:true};seen.add(x);chain.push(x);if(!Object.hasOwn(links,x))return {chain,terminal:x,cycle:false};x=links[x];}}

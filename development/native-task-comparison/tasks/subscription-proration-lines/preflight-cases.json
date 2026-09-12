@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/invoice.mjs": "import {segments} from './segments.mjs';export function invoice(start,end,initial,changes,alreadyCharged){let total=0;const lines=[];for(const s of segments(start,end,initial,changes)){const cents=Number(BigInt(s.price)*BigInt(s.end-s.start)/BigInt(end-start));total+=cents;lines.push({plan:s.plan,start:s.start,end:s.end,cents});}return {lines,total,adjustment:total-alreadyCharged};}\n"
+  },
+  "mutants": [
+    {
+      "name": "merge-id-ignoring-price",
+      "file": "src/segments.mjs",
+      "replacement": "export function segments(start,end,initial,changes){const sorted=[...changes].sort((a,b)=>a.day-b.day),out=[];let at=start,plan=initial;const add=until=>{if(until===at)return;const last=out.at(-1);if(last&&last.plan===plan.id)last.end=until;else out.push({plan:plan.id,price:plan.price,start:at,end:until});at=until;};for(const c of sorted){add(c.day);plan=c.plan;}add(end);return out;}\n"
+    },
+    {
+      "name": "round-instead-of-floor",
+      "file": "src/invoice.mjs",
+      "replacement": "import {segments} from './segments.mjs';export function invoice(start,end,initial,changes,alreadyCharged){const days=end-start,lines=segments(start,end,initial,changes).map(s=>({plan:s.plan,start:s.start,end:s.end,cents:Math.round(s.price*(s.end-s.start)/days)}));const total=lines.reduce((n,l)=>n+l.cents,0);return {lines,total,adjustment:total-alreadyCharged};}\n"
+    }
+  ]
+}

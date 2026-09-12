@@ -853,6 +853,46 @@ expectCode(() => runSynthetic({
   },
 }), "QUALITY_TOOLCHAIN_MAP_DRIFT");
 
+// Post-command diagnostics must survive without relaxing the external refusal.
+for (const failure of ["classification", "verification", "identity_comparison", "unsafe_metadata"]) {
+  let classifications = 0;
+  const preflight = containmentDescriptor();
+  const post = containmentDescriptor(failure === "identity_comparison"
+    ? { mechanism: { fixture_controller: "changed" } }
+    : { supportState: "unavailable", reason: failure === "unsafe_metadata" ? "secret / arbitrary output " .repeat(1000) : "uid_preparation_failed" });
+  let savedError;
+  assert.throws(() => runSynthetic({
+    containmentClassifier: () => {
+      if (classifications++ === 0) return preflight;
+      if (failure === "classification") {
+        const error = new Error("private exception text must not be retained");
+        error.code = "MACOS_CONTROLLER_PROTOCOL_FAILED";
+        throw error;
+      }
+      return post;
+    },
+  }), error => {
+    savedError = error;
+    assert.equal(error.code, "QUALITY_CHECK_CONTAINMENT_DRIFT");
+    assert.ok(error.message.length < 900);
+    assert.ok(!error.message.includes("private exception text"));
+    assert.ok(!error.message.includes("secret / arbitrary"));
+    const d = JSON.parse(error.message.split("diagnostic=")[1]);
+    assert.equal(d.stage, failure === "unsafe_metadata" ? "verification" : failure);
+    assert.equal(d.preflight_fingerprint, preflight.fingerprint);
+    assert.equal(d.post_check_fingerprint, failure === "classification" ? null : post.fingerprint);
+    assert.equal(d.original_code, failure === "classification" ? "MACOS_CONTROLLER_PROTOCOL_FAILED"
+      : failure === "verification" ? "QUALITY_CHECK_CONTAINMENT_UNAVAILABLE"
+      : failure === "unsafe_metadata" ? "QUALITY_CHECK_CONTAINMENT_INVALID" : null);
+    if (failure === "verification") assert.equal(d.reason, "uid_preparation_failed");
+    if (failure === "unsafe_metadata") assert.equal(d.reason, null);
+    return true;
+  });
+  const originalDiagnostic = savedError.message;
+  assert.equal(runSynthetic().status, "passed", "A later healthy check may pass independently");
+  assert.equal(savedError.message, originalDiagnostic, "Later success cannot erase a retained failure");
+}
+
 let containmentLoads = 0;
 expectCode(() => runSynthetic({
   containmentClassifier: () => containmentDescriptor({

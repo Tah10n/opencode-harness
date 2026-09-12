@@ -1,0 +1,16 @@
+{
+  "category": "compatibility and consumers",
+  "behavior": "All independent public-behavior checks pass; original tests pass unchanged against final sources; ordinary project tests pass.",
+  "testDelivery": [
+    "quoted escaped quote comma newline",
+    "reordered headers ignoring extras",
+    "malformed quotes and wrong row width"
+  ],
+  "docDelivery": [
+    "CSV quote and whitespace grammar",
+    "header mapping",
+    "SyntaxError vs TypeError"
+  ],
+  "coverage": "Retain old assertions or equivalent exercised coverage. Judge tests by actual executed behavior, not file names or source substrings. Do not add required cases after results.",
+  "complete": "Behavior, preservation, ordinary suite, every listed project test and docs obligation must pass. Workflow status is separate."
+}

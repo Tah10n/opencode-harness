@@ -1,0 +1,285 @@
+{
+  "runtimeSource": "328728b3ff1a416fb267d7de1b2b36b2b19cfbff",
+  "preparationCommit": "08688642f9441b9b18d9ef31403fde748e1471a0",
+  "tasks": [
+    {
+      "task": "portable-path-core",
+      "behavior": true,
+      "preservation": true,
+      "requiredTests": true,
+      "requiredDocs": true,
+      "complete": true,
+      "d0Complete": true,
+      "postD0Change": false,
+      "basis": [
+        "CLI imports and delegates to normalizePosix; direct Node entry retained",
+        "Delivered root/dot/trailing slash/literal backslash assertions",
+        "Delivered actual CLI stdout/status and invalid input no-write assertions",
+        "README covers host-independent core and CLI/trailing/filesystem contract",
+        "Original CLI test assertions retained; independent checks pass for D0/final"
+      ],
+      "limitations": [
+        "Finite original rubric coverage; no causal claim about continuation (none executed)"
+      ],
+      "workflowStatus": "reviewed_delivery",
+      "elapsedMs": 114699,
+      "requests": 19,
+      "tools": 26,
+      "usage": {
+        "input_tokens": 193763,
+        "output_tokens": 4138,
+        "total_tokens": 197901
+      },
+      "requestsWithoutUsage": 0,
+      "grades": {
+        "acceptance": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "preservation": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "ordinary": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "d0-acceptance": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "d0-preservation": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "d0-ordinary": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "task": "weighted-ballot-tabulation",
+      "behavior": true,
+      "preservation": true,
+      "requiredTests": true,
+      "requiredDocs": true,
+      "complete": true,
+      "d0Complete": true,
+      "postD0Change": false,
+      "basis": [
+        "tabulate validates and executes transfer rounds; existing runElection/report consumer uses result",
+        "Project tests assert plurality-changing transfers and full rounds/report",
+        "Exhaustion-adjusted majority, deterministic tie elimination, zero/empty/invalid cases delivered",
+        "README states exact policy, input domain, audit/report and non-legal scope",
+        "Existing majority assertions retained; independent D0/final checks pass"
+      ],
+      "limitations": [
+        "Finite original rubric coverage; no continuation occurred"
+      ],
+      "workflowStatus": "reviewed_delivery",
+      "elapsedMs": 161915,
+      "requests": 17,
+      "tools": 21,
+      "usage": {
+        "input_tokens": 188612,
+        "output_tokens": 6279,
+        "total_tokens": 194891
+      },
+      "requestsWithoutUsage": 0,
+      "grades": {
+        "acceptance": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "preservation": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "ordinary": {
+          "tests": 6,
+          "pass": 6,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "d0-acceptance": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "d0-preservation": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "d0-ordinary": {
+          "tests": 6,
+          "pass": 6,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "task": "url-resolver-consumers",
+      "behavior": false,
+      "preservation": true,
+      "requiredTests": true,
+      "requiredDocs": true,
+      "complete": false,
+      "d0Complete": false,
+      "postD0Change": false,
+      "basis": [
+        "Consumer delegates each item but skips base validation for empty menu",
+        "Frozen independent acceptance: 4/5; empty-menu invalid-base TypeError assertion fails",
+        "Project regression compares URL hrefs, freezes original item/array, asserts fresh returned item, covers relative query/fragment and URL consumer",
+        "Original string-only assertions retained; ordinary/preservation checks pass",
+        "README covers requested input/protocol/resolution/encoding/no-mutation/no-network contract"
+      ],
+      "limitations": [
+        "In empty-menu acceptance test, first disallowed file base failure stops later invalid-base assertions; those are not credited as executed",
+        "Reviewed_delivery did not identify existing rubric defect; no correcting cycle occurred"
+      ],
+      "workflowStatus": "reviewed_delivery",
+      "elapsedMs": 121276,
+      "requests": 15,
+      "tools": 22,
+      "usage": {
+        "input_tokens": 146495,
+        "output_tokens": 4385,
+        "total_tokens": 150880
+      },
+      "requestsWithoutUsage": 0,
+      "grades": {
+        "acceptance": {
+          "tests": 5,
+          "pass": 4,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "preservation": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "ordinary": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "d0-acceptance": {
+          "tests": 5,
+          "pass": 4,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "d0-preservation": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "d0-ordinary": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "task": "abortable-delay-consumer",
+      "behavior": true,
+      "preservation": true,
+      "requiredTests": true,
+      "requiredDocs": true,
+      "complete": true,
+      "d0Complete": null,
+      "postD0Change": null,
+      "basis": [
+        "Acceptance 5/5, preservation 1/1, ordinary 4/4",
+        "Old no-signal timer assertions retained; active/pre-abort reason identity and timer/listener cleanup and normal completion delivered",
+        "README covers requested validation/defaults/cleanup/no-retry contract",
+        "Author npm test completed on final source state before denial"
+      ],
+      "limitations": [
+        "No D0/review: native external_directory deny for git diff --check with parent cwd halted author stage",
+        "Terminal delivery independently assessed; not a completed workflow"
+      ],
+      "workflowStatus": "incomplete",
+      "elapsedMs": 88230,
+      "requests": 14,
+      "tools": 17,
+      "usage": {
+        "input_tokens": 123743,
+        "output_tokens": 3142,
+        "total_tokens": 126885
+      },
+      "requestsWithoutUsage": 0,
+      "grades": {
+        "acceptance": {
+          "tests": 5,
+          "pass": 5,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "preservation": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "ordinary": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      }
+    }
+  ],
+  "complete": 3,
+  "total": 4,
+  "comparisonGate": true
+}

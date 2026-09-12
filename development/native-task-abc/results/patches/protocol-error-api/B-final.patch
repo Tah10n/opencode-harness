@@ -1,0 +1,104 @@
+diff --git a/packages/connector/README.md b/packages/connector/README.md
+index 5a1e8c6..f66d2d5 100644
+--- a/packages/connector/README.md
++++ b/packages/connector/README.md
+@@ -4,6 +4,12 @@ The Node 24 LTS connector collects exact aggregate token counters from supported
+ sources and pairs them with Vibe Racing agent accounts. It never uploads raw sessions or local
+ paths.
+ 
++The connector protocol module validates response size, content type, JSON shape, terminal safety,
++and endpoint-specific fields before trusting a response. A valid non-success response rejects with
++an `Error` carrying its HTTP `status` and validated server `code`; malformed or unsafe responses
++use `invalid_server_response` instead. The CLI uses those fields for the existing pairing,
++reconciliation, and usage-sync cleanup and retry rules.
++
+ ```bash
+ npx --yes --prefer-online --package https://viberacing.example/downloads/viberacing-connector.tgz -- \
+   viberacing connect --origin https://viberacing.example
+diff --git a/packages/connector/bin/viberacing.mjs b/packages/connector/bin/viberacing.mjs
+index 5fde3a9..2fde848 100755
+--- a/packages/connector/bin/viberacing.mjs
++++ b/packages/connector/bin/viberacing.mjs
+@@ -189,25 +189,13 @@ async function request(origin, path, options = {}, attempts = 1, responseContext
+       try {
+         payload = await parseProtocolResponse(response, responseContext);
+       } catch (error) {
+-        if (
+-          error?.code === "invalid_server_response" &&
+-          (response.status >= 500 || response.status === 429)
+-        ) {
++        if (response.status >= 500 || response.status === 429) {
+           error.status = response.status;
+           error.retryAfterMs = retryAfterMilliseconds(response);
+         }
+         throw error;
+       }
+-      if (!response.ok) {
+-        const error = new Error(
+-          `Vibe Racing returned ${response.status}: ${payload.error ?? "request failed"}`,
+-        );
+-        error.status = response.status;
+-        error.code = payload.error;
+-        error.retryAfterMs = retryAfterMilliseconds(response);
+-        if (response.status < 500 && response.status !== 429) throw error;
+-        lastError = error;
+-      } else return payload;
++      return payload;
+     } catch (error) {
+       lastError = error;
+       if (
+diff --git a/packages/connector/lib/protocol.mjs b/packages/connector/lib/protocol.mjs
+index f1ceba9..87d9123 100644
+--- a/packages/connector/lib/protocol.mjs
++++ b/packages/connector/lib/protocol.mjs
+@@ -292,7 +292,10 @@ export async function parseProtocolResponse(response, context) {
+       !errorCodePattern.test(value.error)
+     )
+       throw invalid();
+-    return { error: value.error };
++    const error = new Error(`Vibe Racing returned ${response.status}: ${value.error}`);
++    error.status = response.status;
++    error.code = value.error;
++    throw error;
+   }
+   if (context.kind === "pairingStart") return parsePairingStart(value, context);
+   if (context.kind === "pairingPoll") return parsePairingPoll(value, context);
+diff --git a/packages/connector/test/protocol.test.mjs b/packages/connector/test/protocol.test.mjs
+index bfdb3e9..3e80ea2 100644
+--- a/packages/connector/test/protocol.test.mjs
++++ b/packages/connector/test/protocol.test.mjs
+@@ -91,12 +91,17 @@ test("rejects server attempts to add local paths, executables, or unknown mappin
+ });
+ 
+ test("protocol errors are snake_case and terminal output strips control characters", async () => {
+-  assert.deepEqual(
+-    await parseProtocolResponse(json({ error: "source_disconnected" }, 400), {
++  await assert.rejects(
++    parseProtocolResponse(json({ error: "source_disconnected" }, 400), {
+       kind: "usage",
+       sourceIds: [sourceId],
+     }),
+-    { error: "source_disconnected" },
++    (error) => {
++      assert.equal(error.message, "Vibe Racing returned 400: source_disconnected");
++      assert.equal(error.status, 400);
++      assert.equal(error.code, "source_disconnected");
++      return true;
++    },
+   );
+   for (const error of ["InvalidRequest", "invalid-request", "invalid__request", "bad\ncode"]) {
+     await assert.rejects(
+@@ -107,6 +112,13 @@ test("protocol errors are snake_case and terminal output strips control characte
+       /invalid protocol response/,
+     );
+   }
++  await assert.rejects(
++    parseProtocolResponse(json({ error: "server_error" }, 503, { "retry-after": "2" }), {
++      kind: "usage",
++      sourceIds: [sourceId],
++    }),
++    (error) => error.code === "server_error" && error.status === 503,
++  );
+   assert.equal(sanitizeTerminalText("safe\u001b[2J\r\nnext"), "safe�[2J��next");
+ });
+ 

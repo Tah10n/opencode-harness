@@ -1,0 +1,1 @@
+import fs from 'node:fs';export function read(file){return JSON.parse(fs.readFileSync(file,'utf8'));}export function transact(file,fn,expectedRevision){const current=read(file);const result=fn(current.data);current.revision++;fs.writeFileSync(file,JSON.stringify(current));return {state:current,result};}

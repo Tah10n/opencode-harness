@@ -1,0 +1,121 @@
+{
+  "slot": 10,
+  "task": "request-module-extraction",
+  "arm": "A",
+  "exitCode": 0,
+  "timedOut": false,
+  "elapsedMs": 195391,
+  "phaseCount": 1,
+  "continuationApplied": false,
+  "requests": 17,
+  "requestsWithoutUsage": 0,
+  "workflowStatus": null,
+  "repairs": null,
+  "toolCalls": 30,
+  "sessions": 1,
+  "usage": {
+    "input_tokens": 401827,
+    "cached_tokens": 125440,
+    "output_tokens": 4884,
+    "reasoning_tokens": 526,
+    "total_tokens": 406711
+  },
+  "requestEfforts": {
+    "none": 1,
+    "low": 16
+  },
+  "httpStatuses": {
+    "200": 17
+  },
+  "terminationVerified": true,
+  "packet": "V8",
+  "delivery": {
+    "patchApplies": true,
+    "changedFiles": [
+      "packages/connector/README.md",
+      "packages/connector/bin/viberacing.mjs",
+      "packages/connector/lib/config.mjs",
+      "packages/connector/lib/transport.mjs",
+      "packages/connector/test/config.test.mjs",
+      "packages/connector/test/transport.test.mjs"
+    ],
+    "patchSha256": "60e5be51c2fe7ce235708e3aa442851b718d76abf1931bd9567443856b895eb9"
+  },
+  "sourceReview": {
+    "packet": "V8",
+    "sourceReview": {
+      "implementation": "Moves request and Retry-After implementations verbatim to lib/transport.mjs with explicit delay/protocol imports. CLI imports the shared request; all existing callers continue through it. Config installedRuntimeFiles includes transport.mjs, and package already ships lib. No static semantic change found.",
+      "tests": "Retains original assertions, adds transport retry/options/body equivalence and numeric Retry-After cap tests, adds installed library presence assertion. Existing CLI preservation tests exercise the imported transport.",
+      "documentation": "Describes transport and protocol responsibilities and installed copying.",
+      "staticDefects": []
+    },
+    "behaviorVerdict": "All executed independent checks passed, including installed CLI and original consumers",
+    "completenessVerdict": "requirements delivered within targeted scope"
+  },
+  "grading": {
+    "final": {
+      "packet": "V8",
+      "phase": "final",
+      "checks": {
+        "ordinary": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 26,
+            "pass": 25,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 15,
+            "pass": 15,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 24,
+            "pass": 23,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "preserved-consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 15,
+            "pass": 15,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "acceptance": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      },
+      "passed": true,
+      "cleanup": 0
+    }
+  },
+  "evidenceSelections": []
+}

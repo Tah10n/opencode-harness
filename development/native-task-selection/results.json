@@ -1,0 +1,984 @@
+{
+  "kind": "known-v3-pair-selection",
+  "baseCommit": "ea6cf2ab5260077e92df30d4a945c24146df9244",
+  "model": "openai/gpt-5.6-luna",
+  "effort": "high",
+  "openCode": "1.18.26",
+  "budgetMs": 300000,
+  "freeze": {
+    "at": "2026-09-12T12:53:03.865Z",
+    "freezeSha256": "79f2f154316aca667e033c1ce416a6495602c562d58f6f5523a3d5698265fcf0",
+    "promptSha256": "81210ad6503bed13f8118fb936ca703f9bbda1167f6cf13d6582c6408cb7a690",
+    "mappingSha256": "007c3c4fc0543a12c5c199813cc1d3bd382adf31fcf703ccbafda8e0e4a00471",
+    "slots": 6,
+    "budgetMs": 300000
+  },
+  "prompt": "PROMPT.md",
+  "outcome": {
+    "status": "finished",
+    "pause": null
+  },
+  "aggregate": {
+    "available": 6,
+    "decisions": 5,
+    "acceptedSelections": 4,
+    "pairsWithAcceptable": 5,
+    "elapsedMs": 1485940,
+    "requests": 85,
+    "tools": 297
+  },
+  "rows": [
+    {
+      "task": "protocol-error-api",
+      "slot": 1,
+      "candidates": {
+        "X": {
+          "arm": "P",
+          "patch": "development/native-task-utility/patches/v3/protocol-error-api-P-final.patch",
+          "patchSha256": "402ae70699edac9b32cebd746e5594caa6a00577ce4fc09873b005bb53274fe1",
+          "treeSha256": "36400f8bf254ab228b321a554291db1d0d96d511e432806e4fe82dd8b8131148",
+          "fullPatchAccepted": true,
+          "reasons": []
+        },
+        "Y": {
+          "arm": "H",
+          "patch": "development/native-task-utility/patches/v3/protocol-error-api-H-final.patch",
+          "patchSha256": "200d0fe5c4001550aaba1ff556758a0e36c25f15cb7a2b119ca34178523904e2",
+          "treeSha256": "6e47b07ce432818803998e92897986cca2bb786d9494424f397b2f4c3263c916",
+          "fullPatchAccepted": true,
+          "reasons": []
+        }
+      },
+      "decision": "X",
+      "selectionCompleted": true,
+      "selectedArm": "P",
+      "selectedPatchSha256": "402ae70699edac9b32cebd746e5594caa6a00577ce4fc09873b005bb53274fe1",
+      "selectedPatchAccepted": true,
+      "pairHasAcceptable": true,
+      "elapsedMs": 246572,
+      "requests": 13,
+      "requestsWithoutUsage": 0,
+      "usage": {
+        "input_tokens": {
+          "observed": 626485,
+          "missingRequests": 0
+        },
+        "output_tokens": {
+          "observed": 9793,
+          "missingRequests": 0
+        },
+        "total_tokens": {
+          "observed": 636278,
+          "missingRequests": 0
+        },
+        "cached_tokens": {
+          "observed": 155648,
+          "missingRequests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 7053,
+          "missingRequests": 0
+        }
+      },
+      "tools": 59,
+      "sessions": 1,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "inputsVerified": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "toolErrors": [],
+      "checks": [
+        {
+          "command": "git apply --check /input/X.patch",
+          "workdir": "/input/base",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "git apply --check /input/Y.patch",
+          "workdir": "/input/base",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "git diff --no-index --check /input/base /input/X",
+          "workdir": "/input/base",
+          "status": "completed",
+          "exit": 1
+        },
+        {
+          "command": "git diff --no-index --check /input/base /input/Y",
+          "workdir": "/input/base",
+          "status": "completed",
+          "exit": 1
+        },
+        {
+          "command": "npm test",
+          "workdir": "/input/X/packages/connector",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "npm test",
+          "workdir": "/input/Y/packages/connector",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "node --test --test-name-pattern='connect reports a validated pairing error|retries transient malformed proxy responses|honors Retry-After|quarantines a permanent 400|reconnect retires only' test/config.test.mjs",
+          "workdir": "/input/X/packages/connector",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "node --test --test-name-pattern='connect reports a validated pairing error|retries transient malformed proxy responses|honors Retry-After|quarantines a permanent 400|reconnect retires only' test/config.test.mjs",
+          "workdir": "/input/Y/packages/connector",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "git status --short",
+          "workdir": "/input/base",
+          "status": "completed",
+          "exit": 128
+        },
+        {
+          "command": "git status --short",
+          "workdir": "/input/X",
+          "status": "completed",
+          "exit": 128
+        },
+        {
+          "command": "git status --short",
+          "workdir": "/input/Y",
+          "status": "completed",
+          "exit": 128
+        }
+      ]
+    },
+    {
+      "task": "catalog-cache",
+      "slot": 2,
+      "candidates": {
+        "X": {
+          "arm": "H",
+          "patch": "development/native-task-utility/patches/v3/catalog-cache-H-final.patch",
+          "patchSha256": "82c11e80076389719d55cec19e77f74a33d2e2f218c054dc55276561c1a3f269",
+          "treeSha256": "f30b07df92975140b68cc5e759b153d710857cb1d48fb8e0b9f73b0564ea9ad4",
+          "fullPatchAccepted": false,
+          "reasons": [
+            "The existing exported selectCatalog(catalog) call filters out region-bearing items when its optional argument is omitted. Initial, reference, alternative and P preserve the all-items copy; both H endpoints fail the same preservation check."
+          ]
+        },
+        "Y": {
+          "arm": "P",
+          "patch": "development/native-task-utility/patches/v3/catalog-cache-P-final.patch",
+          "patchSha256": "9b5b2a7395d0dfe68a3446c98e4f2589ba1e2d4fa7d0e9cd935f48ed2be703f1",
+          "treeSha256": "e8055d6bdc9461c889371213bb1f5e1e7890f68153398a7660ee9b905c3e95b8",
+          "fullPatchAccepted": true,
+          "reasons": []
+        }
+      },
+      "decision": "Y",
+      "selectionCompleted": true,
+      "selectedArm": "P",
+      "selectedPatchSha256": "9b5b2a7395d0dfe68a3446c98e4f2589ba1e2d4fa7d0e9cd935f48ed2be703f1",
+      "selectedPatchAccepted": true,
+      "pairHasAcceptable": true,
+      "elapsedMs": 213204,
+      "requests": 11,
+      "requestsWithoutUsage": 0,
+      "usage": {
+        "input_tokens": {
+          "observed": 177703,
+          "missingRequests": 0
+        },
+        "output_tokens": {
+          "observed": 10297,
+          "missingRequests": 0
+        },
+        "total_tokens": {
+          "observed": 188000,
+          "missingRequests": 0
+        },
+        "cached_tokens": {
+          "observed": 31744,
+          "missingRequests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 5958,
+          "missingRequests": 0
+        }
+      },
+      "tools": 41,
+      "sessions": 1,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "inputsVerified": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "toolErrors": [
+        {
+          "tool": "apply_patch",
+          "error": "The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules [{\"permission\":\"*\",\"action\":\"allow\",\"pattern\":\"*\"},{\"permission\":\"edit\",\"pattern\":\"*\",\"action\":\"deny\"},{\"permission\":\"edit\",\"pattern\":\"/work/diagnostics/**\",\"action\":\"allow\"}]"
+        }
+      ],
+      "checks": [
+        {
+          "command": "git diff --no-index --stat /input/base /input/X; git diff --no-index --stat /input/base /input/Y",
+          "workdir": "/work/repo",
+          "status": "completed",
+          "exit": 1
+        },
+        {
+          "command": "git apply --check /input/X.patch",
+          "workdir": "/input/base",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "git apply --check /input/Y.patch",
+          "workdir": "/input/base",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "git diff --no-index --check /input/base /input/X",
+          "workdir": "/work/repo",
+          "status": "completed",
+          "exit": 1
+        },
+        {
+          "command": "git diff --no-index --check /input/base /input/Y",
+          "workdir": "/work/repo",
+          "status": "completed",
+          "exit": 1
+        },
+        {
+          "command": "npm test",
+          "workdir": "/input/X",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "npm test",
+          "workdir": "/input/Y",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "git diff --no-index -- /input/base/src/handler.mjs /input/X/src/handler.mjs; git diff --no-index -- /input/base/src/client.mjs /input/X/src/client.mjs; git diff --no-index -- /input/base/src/select.mjs /input/X/src/select.mjs",
+          "workdir": "/work/repo",
+          "status": "completed",
+          "exit": 1
+        },
+        {
+          "command": "git diff --no-index -- /input/base/src/handler.mjs /input/Y/src/handler.mjs; git diff --no-index -- /input/base/src/client.mjs /input/Y/src/client.mjs; git diff --no-index -- /input/base/src/select.mjs /input/Y/src/select.mjs",
+          "workdir": "/work/repo",
+          "status": "completed",
+          "exit": 1
+        },
+        {
+          "command": "git diff --no-index -- /input/base/test/catalog.test.mjs /input/X/test/catalog.test.mjs; git diff --no-index -- /input/base/test/catalog.test.mjs /input/Y/test/catalog.test.mjs",
+          "workdir": "/work/repo",
+          "status": "completed",
+          "exit": 1
+        },
+        {
+          "command": "ls /work/diagnostics",
+          "workdir": "/work/repo",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "CAND=/input/X TMPDIR=/work/diagnostics/X node --input-type=module -e 'import assert from \"node:assert/strict\"; import {createHash} from \"node:crypto\"; const {selectCatalog}=await import(`${process.env.CAND}/src/select.mjs`); const {handle}=await import(`${process.env.CAND}/src/handler.mjs`); const {loadCatalog}=await import(`${process.env.CAND}/src/client.mjs`); const catalog=[{id:1,region:\"north\"},{id:2,region:\"south\"},{id:3,region:\"north\"}]; assert.deepEqual(selectCatalog(catalog),catalog); function responseFor(req){const r={status:0,headers:{},body:undefined}; handle(req,{writeHead(s,h){r.status=s;r.headers=h},end(b=\"\"){r.body=b}},catalog); return r} const regional=responseFor({method:\"GET\",url:\"/catalog?region=north\",headers:{}}); const body=JSON.stringify([catalog[0],catalog[2]]); assert.equal(regional.body,body); assert.equal(regional.headers.ETag,`\"${createHash(\"sha256\").update(body).digest(\"hex\")}\"`); assert.equal(regional.headers[\"Cache-Control\"],\"private, max-age=0\"); assert.equal(responseFor({method:\"GET\",url:\"/catalog\",headers:{}}).body,JSON.stringify(catalog)); assert.equal(responseFor({method:\"GET\",url:\"/catalog?region=\",headers:{}}).body,\"[]\"); assert.equal(responseFor({method:\"GET\",url:\"/catalog?region=north\",headers:{\"if-none-match\":\"*\"}}).status,200); assert.equal(responseFor({method:\"GET\",url:\"/catalog?region=north\",headers:{\"if-none-match\":regional.headers.ETag}}).status,304); let parsed=false; const result=await loadCatalog(async(url,options)=>{assert.equal(url,\"/catalog?region=north%20%26%20west%2F\"); assert.deepEqual(options,{headers:{\"If-None-Match\":\"\\\"tag\\\"\"}}); return {status:304,headers:new Headers({ETag:\"\\\"tag\\\"\"}),json:async()=>{parsed=true;throw Error(\"must not parse\")}}},{region:\"north & west/\",etag:\"\\\"tag\\\"\"}); assert.deepEqual(result,{status:\"not-modified\",etag:\"\\\"tag\\\"\"}); assert.equal(parsed,false); console.log(\"contract checks passed\")'",
+          "workdir": "/work/repo",
+          "status": "completed",
+          "exit": 1
+        },
+        {
+          "command": "CAND=/input/Y TMPDIR=/work/diagnostics/Y node --input-type=module -e 'import assert from \"node:assert/strict\"; import {createHash} from \"node:crypto\"; const {selectCatalog}=await import(`${process.env.CAND}/src/select.mjs`); const {handle}=await import(`${process.env.CAND}/src/handler.mjs`); const {loadCatalog}=await import(`${process.env.CAND}/src/client.mjs`); const catalog=[{id:1,region:\"north\"},{id:2,region:\"south\"},{id:3,region:\"north\"}]; assert.deepEqual(selectCatalog(catalog),catalog); function responseFor(req){const r={status:0,headers:{},body:undefined}; handle(req,{writeHead(s,h){r.status=s;r.headers=h},end(b=\"\"){r.body=b}},catalog); return r} const regional=responseFor({method:\"GET\",url:\"/catalog?region=north\",headers:{}}); const body=JSON.stringify([catalog[0],catalog[2]]); assert.equal(regional.body,body); assert.equal(regional.headers.ETag,`\"${createHash(\"sha256\").update(body).digest(\"hex\")}\"`); assert.equal(regional.headers[\"Cache-Control\"],\"private, max-age=0\"); assert.equal(responseFor({method:\"GET\",url:\"/catalog\",headers:{}}).body,JSON.stringify(catalog)); assert.equal(responseFor({method:\"GET\",url:\"/catalog?region=\",headers:{}}).body,\"[]\"); assert.equal(responseFor({method:\"GET\",url:\"/catalog?region=north\",headers:{\"if-none-match\":\"*\"}}).status,200); assert.equal(responseFor({method:\"GET\",url:\"/catalog?region=north\",headers:{\"if-none-match\":regional.headers.ETag}}).status,304); let parsed=false; const result=await loadCatalog(async(url,options)=>{assert.equal(url,\"/catalog?region=north%20%26%20west%2F\"); assert.deepEqual(options,{headers:{\"If-None-Match\":\"\\\"tag\\\"\"}}); return {status:304,headers:new Headers({ETag:\"\\\"tag\\\"\"}),json:async()=>{parsed=true;throw Error(\"must not parse\")}}},{region:\"north & west/\",etag:\"\\\"tag\\\"\"}); assert.deepEqual(result,{status:\"not-modified\",etag:\"\\\"tag\\\"\"}); assert.equal(parsed,false); console.log(\"contract checks passed\")'",
+          "workdir": "/work/repo",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "npm test",
+          "workdir": "/input/base",
+          "status": "completed",
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "task": "legacy-runtime-reload",
+      "slot": 3,
+      "candidates": {
+        "X": {
+          "arm": "P",
+          "patch": "development/native-task-utility/patches/v3/legacy-runtime-reload-P-final.patch",
+          "patchSha256": "ffd899cc9fc9e2ae6344947916d58e91ca21400b02539bac15a1ff7b273b7ebf",
+          "treeSha256": "5d782b40ad1b99cdba373fd04c9fbac4bad49b9967724596f607abb31b4a8416",
+          "fullPatchAccepted": false,
+          "reasons": [
+            "prepareRuntime(retainedLegacyLauncherURL) still sources current libraries from the old tree and fails on absent connection-lifecycle.mjs.",
+            "Delivered migration tests use the current launcher URL; malformed-layout tests can fail at the unrelated custom-directory gate."
+          ]
+        },
+        "Y": {
+          "arm": "H",
+          "patch": "development/native-task-utility/patches/v3/legacy-runtime-reload-H-final.patch",
+          "patchSha256": "e5b549e4a8c1be00a8c77d51042f7648808e1570493e7431ff14da5a5c615fb1",
+          "treeSha256": "14ea423a3792274798a3271c53c38807608c7db1e75941c2782f7f518c35a6fd",
+          "fullPatchAccepted": true,
+          "reasons": []
+        }
+      },
+      "decision": null,
+      "selectionCompleted": false,
+      "selectedArm": null,
+      "selectedPatchSha256": null,
+      "selectedPatchAccepted": null,
+      "pairHasAcceptable": true,
+      "elapsedMs": 300155,
+      "requests": 15,
+      "requestsWithoutUsage": 1,
+      "usage": {
+        "input_tokens": {
+          "observed": 776320,
+          "missingRequests": 1
+        },
+        "output_tokens": {
+          "observed": 11364,
+          "missingRequests": 1
+        },
+        "total_tokens": {
+          "observed": 787684,
+          "missingRequests": 1
+        },
+        "cached_tokens": {
+          "observed": 153600,
+          "missingRequests": 1
+        },
+        "reasoning_tokens": {
+          "observed": 6631,
+          "missingRequests": 1
+        }
+      },
+      "tools": 51,
+      "sessions": 1,
+      "stop": {
+        "ownTaskDeadlineTriggered": true,
+        "terminationVerified": true,
+        "inputsVerified": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": true
+      },
+      "toolErrors": [
+        {
+          "tool": "apply_patch",
+          "error": "The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules [{\"permission\":\"*\",\"action\":\"allow\",\"pattern\":\"*\"},{\"permission\":\"edit\",\"pattern\":\"*\",\"action\":\"deny\"},{\"permission\":\"edit\",\"pattern\":\"/work/diagnostics/**\",\"action\":\"allow\"}]"
+        }
+      ],
+      "checks": [
+        {
+          "command": "ls /work/diagnostics /input/base /input/X /input/Y",
+          "workdir": "/work/repo",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "TMPDIR=/work/diagnostics/X node --test test/config.test.mjs test/state-security.test.mjs test/executables.test.mjs test/hook-security.test.mjs",
+          "workdir": "/input/X/packages/connector",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "TMPDIR=/work/diagnostics/Y node --test test/config.test.mjs test/state-security.test.mjs test/executables.test.mjs test/hook-security.test.mjs",
+          "workdir": "/input/Y/packages/connector",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "git apply --check /input/X.patch",
+          "workdir": "/input/base",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "git apply --check /input/Y.patch",
+          "workdir": "/input/base",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "git diff --no-index --check /input/base /input/X",
+          "workdir": "/input/base",
+          "status": "completed",
+          "exit": 1
+        },
+        {
+          "command": "git diff --no-index --check /input/base /input/Y",
+          "workdir": "/input/base",
+          "status": "completed",
+          "exit": 1
+        },
+        {
+          "command": "CANDIDATE=/input/X TMPDIR=/work/diagnostics/X node --input-type=module --eval 'import {mkdtemp,mkdir,writeFile,readFile,rm} from \"node:fs/promises\"; import {tmpdir} from \"node:os\"; import {join} from \"node:path\"; import {pathToFileURL} from \"node:url\"; const root=await mkdtemp(join(tmpdir(),\"legacy-prepare-diagnostic-\")); const state=join(root,\".viberacing\"); process.env.HOME=root; process.env.USERPROFILE=root; process.env.VIBERACING_STATE_DIR=state; const files=[\"browser.mjs\",\"config.mjs\",\"executables.mjs\",\"readers.mjs\",\"registry.mjs\",\"runtime.mjs\"]; const adapters=[\"antigravity.mjs\",\"claude.mjs\",\"codex.mjs\",\"cursor.mjs\",\"gemini.mjs\",\"kimi.mjs\",\"opencode.mjs\",\"qwen-settings.mjs\",\"qwen.mjs\",\"shared.mjs\"]; try { await mkdir(join(state,\"bin\"),{recursive:true}); await mkdir(join(state,\"lib\",\"adapters\"),{recursive:true}); await writeFile(join(state,\"bin\",\"viberacing.mjs\"),\"legacy launcher\\\\n\"); for (const name of files) await writeFile(join(state,\"lib\",name),name+\"\\\\n\"); for (const name of adapters) await writeFile(join(state,\"lib\",\"adapters\",name),name+\"\\\\n\"); await writeFile(join(state,\"installation.json\"),JSON.stringify({version:1,id:\"12345678-1234-4123-8123-123456789abc\",secret:\"legacy_installation_secret_that_is_long_enough\"})); const config=await import(pathToFileURL(join(process.env.CANDIDATE,\"packages/connector/lib/config.mjs\")).href); const installed=await config.prepareRuntime(pathToFileURL(join(state,\"bin/viberacing.mjs\"))); if (await readFile(join(state,\"bin/viberacing.mjs\"),\"utf8\")!==\"legacy launcher\\\\n\") throw new Error(\"legacy launcher changed\"); console.log(\"SUCCESS\",installed); } finally { await rm(root,{recursive:true,force:true}); }'",
+          "workdir": "/input/X",
+          "status": "completed",
+          "exit": 1
+        },
+        {
+          "command": "CANDIDATE=/input/Y TMPDIR=/work/diagnostics/Y node --input-type=module --eval 'import {mkdtemp,mkdir,writeFile,readFile,rm} from \"node:fs/promises\"; import {tmpdir} from \"node:os\"; import {join} from \"node:path\"; import {pathToFileURL} from \"node:url\"; const root=await mkdtemp(join(tmpdir(),\"legacy-prepare-diagnostic-\")); const state=join(root,\".viberacing\"); process.env.HOME=root; process.env.USERPROFILE=root; process.env.VIBERACING_STATE_DIR=state; const files=[\"browser.mjs\",\"config.mjs\",\"executables.mjs\",\"readers.mjs\",\"registry.mjs\",\"runtime.mjs\"]; const adapters=[\"antigravity.mjs\",\"claude.mjs\",\"codex.mjs\",\"cursor.mjs\",\"gemini.mjs\",\"kimi.mjs\",\"opencode.mjs\",\"qwen-settings.mjs\",\"qwen.mjs\",\"shared.mjs\"]; try { await mkdir(join(state,\"bin\"),{recursive:true}); await mkdir(join(state,\"lib\",\"adapters\"),{recursive:true}); await writeFile(join(state,\"bin\",\"viberacing.mjs\"),\"legacy launcher\\\\n\"); for (const name of files) await writeFile(join(state,\"lib\",name),name+\"\\\\n\"); for (const name of adapters) await writeFile(join(state,\"lib\",\"adapters\",name),name+\"\\\\n\"); await writeFile(join(state,\"installation.json\"),JSON.stringify({version:1,id:\"12345678-1234-4123-8123-123456789abc\",secret:\"legacy_installation_secret_that_is_long_enough\"})); const config=await import(pathToFileURL(join(process.env.CANDIDATE,\"packages/connector/lib/config.mjs\")).href); const installed=await config.prepareRuntime(pathToFileURL(join(state,\"bin/viberacing.mjs\"))); if (await readFile(join(state,\"bin/viberacing.mjs\"),\"utf8\")!==\"legacy launcher\\\\n\") throw new Error(\"legacy launcher changed\"); console.log(\"SUCCESS\",installed); } finally { await rm(root,{recursive:true,force:true}); }'",
+          "workdir": "/input/Y",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "CANDIDATE=/input/X TMPDIR=/work/diagnostics/X node --input-type=module --eval 'import {mkdtemp,rm,lstat} from \"node:fs/promises\"; import {tmpdir} from \"node:os\"; import {join} from \"node:path\"; import {pathToFileURL} from \"node:url\"; const root=await mkdtemp(join(tmpdir(),\"runtime-modes-\")); process.env.HOME=root; process.env.USERPROFILE=root; process.env.VIBERACING_STATE_DIR=join(root,\".viberacing\"); try { const c=await import(pathToFileURL(join(process.env.CANDIDATE,\"packages/connector/lib/config.mjs\")).href); const p=await c.prepareRuntime(pathToFileURL(join(process.env.CANDIDATE,\"packages/connector/bin/viberacing.mjs\"))); for (const x of [join(root,\".viberacing\"),join(root,\".viberacing\",\"runtime\",\"0.2.1\"),join(root,\".viberacing\",\"runtime\",\"0.2.1\",\"lib\"),join(root,\".viberacing\",\"runtime\",\"0.2.1\",\"lib\",\"adapters\"),join(root,\".viberacing\",\"runtime\",\"0.2.1\",\"lib\",\"config.mjs\")]) console.log(x,(await lstat(x)).mode.toString(8).slice(-3)); } finally { await rm(root,{recursive:true,force:true}); }'",
+          "workdir": "/input/X/packages/connector",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "CANDIDATE=/input/Y TMPDIR=/work/diagnostics/Y node --input-type=module --eval 'import {mkdtemp,rm,lstat} from \"node:fs/promises\"; import {tmpdir} from \"node:os\"; import {join} from \"node:path\"; import {pathToFileURL} from \"node:url\"; const root=await mkdtemp(join(tmpdir(),\"runtime-modes-\")); process.env.HOME=root; process.env.USERPROFILE=root; process.env.VIBERACING_STATE_DIR=join(root,\".viberacing\"); try { const c=await import(pathToFileURL(join(process.env.CANDIDATE,\"packages/connector/lib/config.mjs\")).href); const p=await c.prepareRuntime(pathToFileURL(join(process.env.CANDIDATE,\"packages/connector/bin/viberacing.mjs\"))); for (const x of [join(root,\".viberacing\"),join(root,\".viberacing\",\"runtime\",\"0.2.1\"),join(root,\".viberacing\",\"runtime\",\"0.2.1\",\"lib\"),join(root,\".viberacing\",\"runtime\",\"0.2.1\",\"lib\",\"adapters\"),join(root,\".viberacing\",\"runtime\",\"0.2.1\",\"lib\",\"config.mjs\")]) console.log(x,(await lstat(x)).mode.toString(8).slice(-3)); } finally { await rm(root,{recursive:true,force:true}); }'",
+          "workdir": "/input/Y/packages/connector",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "TMPDIR=/work/diagnostics/X npm test",
+          "workdir": "/input/X/packages/connector",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "TMPDIR=/work/diagnostics/Y npm test",
+          "workdir": "/input/Y/packages/connector",
+          "status": "completed",
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "task": "reconnect-revoked",
+      "slot": 4,
+      "candidates": {
+        "X": {
+          "arm": "H",
+          "patch": "development/native-task-utility/patches/v3/reconnect-revoked-H-final.patch",
+          "patchSha256": "629d47a8d089934e26128a2466875ac530b7373dda2af50b3eaadb65fdb22b02",
+          "treeSha256": "3f8f4ab34f52f1e26db002d44ff66eba857d6997d803a22065fc7280c3d87a70",
+          "fullPatchAccepted": true,
+          "reasons": []
+        },
+        "Y": {
+          "arm": "P",
+          "patch": "development/native-task-utility/patches/v3/reconnect-revoked-P-final.patch",
+          "patchSha256": "c4381e6c20fe0cf3aac8c19d24e8874a907da24972ff8bc7cfb1998705b9f58a",
+          "treeSha256": "0e8e52d47c68efac81b1f8a5adfcc142988f45a41e9d2d2feb434e970cdf3923",
+          "fullPatchAccepted": true,
+          "reasons": []
+        }
+      },
+      "decision": "X",
+      "selectionCompleted": true,
+      "selectedArm": "H",
+      "selectedPatchSha256": "629d47a8d089934e26128a2466875ac530b7373dda2af50b3eaadb65fdb22b02",
+      "selectedPatchAccepted": true,
+      "pairHasAcceptable": true,
+      "elapsedMs": 233892,
+      "requests": 18,
+      "requestsWithoutUsage": 0,
+      "usage": {
+        "input_tokens": {
+          "observed": 945956,
+          "missingRequests": 0
+        },
+        "output_tokens": {
+          "observed": 7370,
+          "missingRequests": 0
+        },
+        "total_tokens": {
+          "observed": 953326,
+          "missingRequests": 0
+        },
+        "cached_tokens": {
+          "observed": 198656,
+          "missingRequests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 4603,
+          "missingRequests": 0
+        }
+      },
+      "tools": 57,
+      "sessions": 1,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "inputsVerified": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "toolErrors": [],
+      "checks": [
+        {
+          "command": "git apply --check /input/X.patch",
+          "workdir": "/input/base",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "git apply --check /input/Y.patch",
+          "workdir": "/input/base",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "git diff --no-index --check /input/base /input/X",
+          "workdir": "/work/repo",
+          "status": "completed",
+          "exit": 1
+        },
+        {
+          "command": "git diff --no-index --check /input/base /input/Y",
+          "workdir": "/work/repo",
+          "status": "completed",
+          "exit": 1
+        },
+        {
+          "command": "ls /work/diagnostics",
+          "workdir": "/work/repo",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "TMPDIR=/work/diagnostics/X node --test packages/connector/test/config.test.mjs --test-name-pattern='reconnect|revoked authorization|revoked with'",
+          "workdir": "/input/X",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "TMPDIR=/work/diagnostics/Y node --test packages/connector/test/config.test.mjs --test-name-pattern='reconnect|revoked authorization|revoked with'",
+          "workdir": "/input/Y",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "TMPDIR=/work/diagnostics/X npm test",
+          "workdir": "/input/X/packages/connector",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "TMPDIR=/work/diagnostics/Y npm test",
+          "workdir": "/input/Y/packages/connector",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "git diff --no-index --stat /input/base /input/X",
+          "workdir": "/work/repo",
+          "status": "completed",
+          "exit": 1
+        },
+        {
+          "command": "git diff --no-index --stat /input/base /input/Y",
+          "workdir": "/work/repo",
+          "status": "completed",
+          "exit": 1
+        },
+        {
+          "command": "TMPDIR=/work/diagnostics/X node --test --test-name-pattern='connect replaces authorization revoked' packages/connector/test/config.test.mjs",
+          "workdir": "/input/X",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "TMPDIR=/work/diagnostics/Y node --test --test-name-pattern='connect recovers revoked authorization' packages/connector/test/config.test.mjs",
+          "workdir": "/input/Y",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "git diff --no-index --check /input/base /input/X",
+          "workdir": "/work/repo",
+          "status": "completed",
+          "exit": 1
+        },
+        {
+          "command": "git diff --no-index --check /input/base /input/Y",
+          "workdir": "/work/repo",
+          "status": "completed",
+          "exit": 1
+        }
+      ]
+    },
+    {
+      "task": "request-module-extraction",
+      "slot": 5,
+      "candidates": {
+        "X": {
+          "arm": "P",
+          "patch": "development/native-task-utility/patches/v3/request-module-extraction-P-final.patch",
+          "patchSha256": "689a8842914942e92b478be31e8d4c6e687523ddf767a0f1317013eb7cfac0f2",
+          "treeSha256": "f005edc66f6fe91f71cb06af081d0d29c1d93dd630ff5d7f78d985ace54e633d",
+          "fullPatchAccepted": true,
+          "reasons": []
+        },
+        "Y": {
+          "arm": "H",
+          "patch": "development/native-task-utility/patches/v3/request-module-extraction-H-final.patch",
+          "patchSha256": "a603de216742b906fa5337077453baeafe7f9f1088e4925e8227500780104779",
+          "treeSha256": "ba6975a986d1ff1f66ff9c7a57758e8e7dbe61f4875b303a81342a4d25fc265c",
+          "fullPatchAccepted": true,
+          "reasons": []
+        }
+      },
+      "decision": "X",
+      "selectionCompleted": true,
+      "selectedArm": "P",
+      "selectedPatchSha256": "689a8842914942e92b478be31e8d4c6e687523ddf767a0f1317013eb7cfac0f2",
+      "selectedPatchAccepted": true,
+      "pairHasAcceptable": true,
+      "elapsedMs": 295384,
+      "requests": 18,
+      "requestsWithoutUsage": 0,
+      "usage": {
+        "input_tokens": {
+          "observed": 935912,
+          "missingRequests": 0
+        },
+        "output_tokens": {
+          "observed": 11492,
+          "missingRequests": 0
+        },
+        "total_tokens": {
+          "observed": 947404,
+          "missingRequests": 0
+        },
+        "cached_tokens": {
+          "observed": 222720,
+          "missingRequests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 6720,
+          "missingRequests": 0
+        }
+      },
+      "tools": 54,
+      "sessions": 1,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "inputsVerified": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "toolErrors": [
+        {
+          "tool": "read",
+          "error": "File not found: /input/base/packages/connector/AGENTS.md"
+        },
+        {
+          "tool": "apply_patch",
+          "error": "The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules [{\"permission\":\"*\",\"action\":\"allow\",\"pattern\":\"*\"},{\"permission\":\"edit\",\"pattern\":\"*\",\"action\":\"deny\"},{\"permission\":\"edit\",\"pattern\":\"/work/diagnostics/**\",\"action\":\"allow\"}]"
+        },
+        {
+          "tool": "apply_patch",
+          "error": "The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules [{\"permission\":\"*\",\"action\":\"allow\",\"pattern\":\"*\"},{\"permission\":\"edit\",\"pattern\":\"*\",\"action\":\"deny\"},{\"permission\":\"edit\",\"pattern\":\"/work/diagnostics/**\",\"action\":\"allow\"}]"
+        }
+      ],
+      "checks": [
+        {
+          "command": "git apply --check \"/input/X.patch\"",
+          "workdir": "/input/base",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "git apply --check \"/input/Y.patch\"",
+          "workdir": "/input/base",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "git diff --no-index --check \"/input/base\" \"/input/X\"",
+          "workdir": "/input/base",
+          "status": "completed",
+          "exit": 1
+        },
+        {
+          "command": "git diff --no-index --check \"/input/base\" \"/input/Y\"",
+          "workdir": "/input/base",
+          "status": "completed",
+          "exit": 1
+        },
+        {
+          "command": "npm test",
+          "workdir": "/input/X/packages/connector",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "npm test",
+          "workdir": "/input/Y/packages/connector",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "ls /work/diagnostics",
+          "workdir": "/work/repo",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "node --input-type=module --eval 'import assert from \"node:assert/strict\"; import { execFile } from \"node:child_process\"; import { promisify } from \"node:util\"; import { join } from \"node:path\"; import { pathToFileURL } from \"node:url\"; const candidate = process.argv[1]; const config = await import(`${pathToFileURL(join(candidate, \"packages/connector/lib/config.mjs\"))}?diagnostic=${Date.now()}`); const installed = await config.prepareRuntime(pathToFileURL(join(candidate, \"packages/connector/bin/viberacing.mjs\"))); const result = await promisify(execFile)(process.execPath, [installed, \"--version\"], { env: process.env }); assert.match(result.stdout, /^\\\\d+\\\\.\\\\d+\\\\.\\\\d+\\\\n$/); assert.equal(result.stderr, \"\"); process.stdout.write(`${installed}\\\\n${result.stdout}`);' /input/X",
+          "workdir": "/input/X",
+          "status": "completed",
+          "exit": 1
+        },
+        {
+          "command": "node --input-type=module --eval 'import assert from \"node:assert/strict\"; import { execFile } from \"node:child_process\"; import { promisify } from \"node:util\"; import { join } from \"node:path\"; import { pathToFileURL } from \"node:url\"; const candidate = process.argv[1]; const config = await import(`${pathToFileURL(join(candidate, \"packages/connector/lib/config.mjs\"))}?diagnostic=${Date.now()}`); const installed = await config.prepareRuntime(pathToFileURL(join(candidate, \"packages/connector/bin/viberacing.mjs\"))); const result = await promisify(execFile)(process.execPath, [installed, \"--version\"], { env: process.env }); assert.match(result.stdout, /^\\\\d+\\\\.\\\\d+\\\\.\\\\d+\\\\n$/); assert.equal(result.stderr, \"\"); process.stdout.write(`${installed}\\\\n${result.stdout}`);' /input/Y",
+          "workdir": "/input/Y",
+          "status": "completed",
+          "exit": 1
+        },
+        {
+          "command": "TMPDIR=/work/diagnostics/X VIBERACING_STATE_DIR=/work/diagnostics/X/state HOME=/work/diagnostics/X/home node --input-type=module --eval 'import assert from \"node:assert/strict\"; import { execFile } from \"node:child_process\"; import { promisify } from \"node:util\"; import { join } from \"node:path\"; import { pathToFileURL } from \"node:url\"; const candidate = process.argv[1]; const config = await import(`${pathToFileURL(join(candidate, \"packages/connector/lib/config.mjs\"))}?diagnostic=${Date.now()}`); const installed = await config.prepareRuntime(pathToFileURL(join(candidate, \"packages/connector/bin/viberacing.mjs\"))); const result = await promisify(execFile)(process.execPath, [installed, \"--version\"], { env: process.env }); assert.equal(result.stdout, \"0.2.1\\\\n\"); assert.equal(result.stderr, \"\"); process.stdout.write(`${installed}\\\\n${result.stdout}`);' /input/X",
+          "workdir": "/input/X",
+          "status": "completed",
+          "exit": 1
+        },
+        {
+          "command": "TMPDIR=/work/diagnostics/Y VIBERACING_STATE_DIR=/work/diagnostics/Y/state HOME=/work/diagnostics/Y/home node --input-type=module --eval 'import assert from \"node:assert/strict\"; import { execFile } from \"node:child_process\"; import { promisify } from \"node:util\"; import { join } from \"node:path\"; import { pathToFileURL } from \"node:url\"; const candidate = process.argv[1]; const config = await import(`${pathToFileURL(join(candidate, \"packages/connector/lib/config.mjs\"))}?diagnostic=${Date.now()}`); const installed = await config.prepareRuntime(pathToFileURL(join(candidate, \"packages/connector/bin/viberacing.mjs\"))); const result = await promisify(execFile)(process.execPath, [installed, \"--version\"], { env: process.env }); assert.equal(result.stdout, \"0.2.1\\\\n\"); assert.equal(result.stderr, \"\"); process.stdout.write(`${installed}\\\\n${result.stdout}`);' /input/Y",
+          "workdir": "/input/Y",
+          "status": "completed",
+          "exit": 1
+        },
+        {
+          "command": "TMPDIR=/work/diagnostics/X VIBERACING_STATE_DIR=/work/diagnostics/X/state-2 HOME=/work/diagnostics/X/home-2 node --input-type=module --eval 'import assert from \"node:assert/strict\"; import { execFile } from \"node:child_process\"; import { promisify } from \"node:util\"; import { join } from \"node:path\"; import { pathToFileURL } from \"node:url\"; const candidate = process.argv[1]; const config = await import(`${pathToFileURL(join(candidate, \"packages/connector/lib/config.mjs\"))}?diagnostic=${Date.now()}`); const installed = await config.prepareRuntime(pathToFileURL(join(candidate, \"packages/connector/bin/viberacing.mjs\"))); const result = await promisify(execFile)(process.execPath, [installed, \"--version\"], { env: process.env }); assert.equal(result.stdout.trim(), \"0.2.1\"); assert.equal(result.stderr, \"\"); process.stdout.write(`${installed}\\\\n${result.stdout}`);' /input/X",
+          "workdir": "/input/X",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "TMPDIR=/work/diagnostics/Y VIBERACING_STATE_DIR=/work/diagnostics/Y/state-2 HOME=/work/diagnostics/Y/home-2 node --input-type=module --eval 'import assert from \"node:assert/strict\"; import { execFile } from \"node:child_process\"; import { promisify } from \"node:util\"; import { join } from \"node:path\"; import { pathToFileURL } from \"node:url\"; const candidate = process.argv[1]; const config = await import(`${pathToFileURL(join(candidate, \"packages/connector/lib/config.mjs\"))}?diagnostic=${Date.now()}`); const installed = await config.prepareRuntime(pathToFileURL(join(candidate, \"packages/connector/bin/viberacing.mjs\"))); const result = await promisify(execFile)(process.execPath, [installed, \"--version\"], { env: process.env }); assert.equal(result.stdout.trim(), \"0.2.1\"); assert.equal(result.stderr, \"\"); process.stdout.write(`${installed}\\\\n${result.stdout}`);' /input/Y",
+          "workdir": "/input/Y",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "node --test --test-name-pattern='installs a runnable connector copy|retries transient malformed proxy responses|honors Retry-After before retrying a rate-limited upload' test/config.test.mjs test/transport.test.mjs",
+          "workdir": "/input/X/packages/connector",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "node --test --test-name-pattern='installs a runnable connector copy|retries transient malformed proxy responses|honors Retry-After before retrying a rate-limited upload' test/config.test.mjs test/http.test.mjs",
+          "workdir": "/input/Y/packages/connector",
+          "status": "completed",
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "task": "dual-config",
+      "slot": 6,
+      "candidates": {
+        "X": {
+          "arm": "H",
+          "patch": "development/native-task-utility/patches/v3/dual-config-H-final.patch",
+          "patchSha256": "817603704265e5c23c143d574002ce1b19bd5a3c76c15f7524a78e1a078285a9",
+          "treeSha256": "b45c372e069a49f67c5539b39918135251959148a77b4d241a40e255e6739747",
+          "fullPatchAccepted": false,
+          "reasons": [
+            "The actual ESM consumer lacks the explicitly required pretty+indent:0 regression.",
+            "The previous ESM render compact-string assertion was removed despite the explicit requirement to keep old tests."
+          ]
+        },
+        "Y": {
+          "arm": "P",
+          "patch": "development/native-task-utility/patches/v3/dual-config-P-final.patch",
+          "patchSha256": "d9ac74b6cd8980c8dcd4477e154331c649d1aa3048418ed1dfeff288d62033d6",
+          "treeSha256": "b8c7f66c36f7e79651ffaa13bf1c2fa0abb4f182d097c77def6bfd754736d84b",
+          "fullPatchAccepted": false,
+          "reasons": [
+            "Negative tests exercise configure only, not both real render consumers as explicitly required."
+          ]
+        }
+      },
+      "decision": "X",
+      "selectionCompleted": true,
+      "selectedArm": "H",
+      "selectedPatchSha256": "817603704265e5c23c143d574002ce1b19bd5a3c76c15f7524a78e1a078285a9",
+      "selectedPatchAccepted": false,
+      "pairHasAcceptable": false,
+      "elapsedMs": 196733,
+      "requests": 10,
+      "requestsWithoutUsage": 0,
+      "usage": {
+        "input_tokens": {
+          "observed": 141327,
+          "missingRequests": 0
+        },
+        "output_tokens": {
+          "observed": 9271,
+          "missingRequests": 0
+        },
+        "total_tokens": {
+          "observed": 150598,
+          "missingRequests": 0
+        },
+        "cached_tokens": {
+          "observed": 49152,
+          "missingRequests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 6872,
+          "missingRequests": 0
+        }
+      },
+      "tools": 35,
+      "sessions": 1,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "inputsVerified": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "toolErrors": [],
+      "checks": [
+        {
+          "command": "npm test",
+          "workdir": "/input/X",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "npm test",
+          "workdir": "/input/Y",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "git apply --check /input/X.patch",
+          "workdir": "/input/base",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "git apply --check /input/Y.patch",
+          "workdir": "/input/base",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "git diff --no-index --check /input/base /input/X",
+          "workdir": "/input/base",
+          "status": "completed",
+          "exit": 1
+        },
+        {
+          "command": "git diff --no-index --check /input/base /input/Y",
+          "workdir": "/input/base",
+          "status": "completed",
+          "exit": 1
+        },
+        {
+          "command": "ls /work/diagnostics",
+          "workdir": "/work/repo",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "TMPDIR=/work/diagnostics/X node --input-type=module -e 'import assert from \"node:assert/strict\"; import configure, {configure as named} from \"/input/X/index.mjs\"; import {render as renderEsm} from \"/input/X/consumer.mjs\"; import {createRequire} from \"node:module\"; const cjs=createRequire(import.meta.url)(\"/input/X/index.cjs\"); const renderCjs=createRequire(import.meta.url)(\"/input/X/consumer.cjs\").render; for (const fn of [configure,named,cjs]) { assert.deepEqual(fn(\"compact\"),{mode:\"compact\",indent:0}); assert.deepEqual(fn(\"pretty\"),{mode:\"pretty\",indent:2}); for (let indent=0; indent<=8; indent++) assert.deepEqual(fn({mode:\"pretty\",indent}),{mode:\"pretty\",indent}); for (const value of [null,[],{},undefined,1,true]) assert.throws(()=>fn(value),TypeError); for (const value of [\"\", \"wide\", {mode:\"wide\"}]) assert.throws(()=>fn(value),RangeError); for (const indent of [undefined,null,\"2\",NaN,1.5,-1,9,Infinity]) assert.throws(()=>fn({mode:\"pretty\",indent}),TypeError); assert.throws(()=>fn({}),TypeError); } const options=Object.freeze({mode:\"pretty\",indent:0}); assert.deepEqual(configure(options),{mode:\"pretty\",indent:0}); assert.deepEqual(options,{mode:\"pretty\",indent:0}); const value={a:1,b:[2,{c:3}]}; assert.equal(renderCjs(value,{mode:\"pretty\",indent:0}),JSON.stringify(value,null,0)); assert.equal(renderEsm(value,{mode:\"pretty\",indent:8}),JSON.stringify(value,null,8)); assert.equal(renderCjs(value,\"compact\"),JSON.stringify(value,null,0)); assert.equal(renderEsm(value,\"pretty\"),JSON.stringify(value,null,2)); console.log(\"X diagnostic matrix passed\");'",
+          "workdir": "/work/repo",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "TMPDIR=/work/diagnostics/Y node --input-type=module -e 'import assert from \"node:assert/strict\"; import configure, {configure as named} from \"/input/Y/index.mjs\"; import {render as renderEsm} from \"/input/Y/consumer.mjs\"; import {createRequire} from \"node:module\"; const cjs=createRequire(import.meta.url)(\"/input/Y/index.cjs\"); const renderCjs=createRequire(import.meta.url)(\"/input/Y/consumer.cjs\").render; for (const fn of [configure,named,cjs]) { assert.deepEqual(fn(\"compact\"),{mode:\"compact\",indent:0}); assert.deepEqual(fn(\"pretty\"),{mode:\"pretty\",indent:2}); for (let indent=0; indent<=8; indent++) assert.deepEqual(fn({mode:\"pretty\",indent}),{mode:\"pretty\",indent}); for (const value of [null,[],{},undefined,1,true]) assert.throws(()=>fn(value),TypeError); for (const value of [\"\", \"wide\", {mode:\"wide\"}]) assert.throws(()=>fn(value),RangeError); for (const indent of [undefined,null,\"2\",NaN,1.5,-1,9,Infinity]) assert.throws(()=>fn({mode:\"pretty\",indent}),TypeError); assert.throws(()=>fn({}),TypeError); } const options=Object.freeze({mode:\"pretty\",indent:0}); assert.deepEqual(configure(options),{mode:\"pretty\",indent:0}); assert.deepEqual(options,{mode:\"pretty\",indent:0}); const value={a:1,b:[2,{c:3}]}; assert.equal(renderCjs(value,{mode:\"pretty\",indent:0}),JSON.stringify(value,null,0)); assert.equal(renderEsm(value,{mode:\"pretty\",indent:8}),JSON.stringify(value,null,8)); assert.equal(renderCjs(value,\"compact\"),JSON.stringify(value,null,0)); assert.equal(renderEsm(value,\"pretty\"),JSON.stringify(value,null,2)); console.log(\"Y diagnostic matrix passed\");'",
+          "workdir": "/work/repo",
+          "status": "completed",
+          "exit": 0
+        },
+        {
+          "command": "node -e 'const {spawnSync}=require(\"node:child_process\"); for (const candidate of [\"X\",\"Y\"]) { const r=spawnSync(\"git\",[\"diff\",\"--no-index\",\"--check\",\"/input/base\",\"/input/\"+candidate],{encoding:\"utf8\"}); process.stdout.write(candidate+\" diff-check exit \"+r.status+\" output=\"+JSON.stringify(r.stdout+r.stderr)+\"\\n\"); }'",
+          "workdir": "/input/base",
+          "status": "completed",
+          "exit": 0
+        }
+      ]
+    }
+  ],
+  "historicalAcceptance": {
+    "P": 4,
+    "H": 4,
+    "denominator": 6,
+    "recomputed": false
+  },
+  "frozenFilesUnchanged": 7743,
+  "preparation": {
+    "scriptedRequests": 8,
+    "realProviderRequests": 0,
+    "allSixInputsVerified": true,
+    "allSixOfflinePnpmVerified": true,
+    "readOnlyWriteRefusalsPerTask": 12,
+    "diagnosticDirectoriesSeparate": true
+  },
+  "validation": {
+    "frozenFilesUnchanged": 7743,
+    "nativeSessions": 6,
+    "allRequestsLunaHigh": true,
+    "allContainersAbsent": [
+      {
+        "slot": 1,
+        "containerAbsent": true
+      },
+      {
+        "slot": 2,
+        "containerAbsent": true
+      },
+      {
+        "slot": 3,
+        "containerAbsent": true
+      },
+      {
+        "slot": 4,
+        "containerAbsent": true
+      },
+      {
+        "slot": 5,
+        "containerAbsent": true
+      },
+      {
+        "slot": 6,
+        "containerAbsent": true
+      }
+    ],
+    "pairedDiagnosticsMatched": true,
+    "extractionInitialProbeExcludedForSharedState": true
+  },
+  "monetaryPrice": null
+}

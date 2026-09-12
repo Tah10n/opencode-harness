@@ -1,0 +1,19 @@
+{
+  "category": "refactoring",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert exact/subtree exclusions versus sibling prefix, deduplication/order and invalid-path no-IO.",
+    "Assert serial selected-only stat/read calls, directory skips, hashes and exact first-error stop."
+  ],
+  "docDelivery": [
+    "Document relative-path domain, validation, sorting and exclusion boundaries.",
+    "Explain injected/default fs, lazy selected-file reads and first-error behavior."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Pure relative-path selection with segment exclusions and ordered injected filesystem adapter; hashing visible bytes only.",
+  "manualBehavior": [
+    "Selection is pure and shared; filesystem adapter does not duplicate filter policy or pre-read excluded entries."
+  ],
+  "independence": "Separate manifest path filtering from filesystem adapter preserving ordering, excluded paths and no unnecessary reads."
+}

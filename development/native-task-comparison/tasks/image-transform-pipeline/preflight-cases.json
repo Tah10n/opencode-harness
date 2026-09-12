@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/pipeline.mjs": "import {geometry} from './geometry.mjs';export function transform(image,operations){const size=operations.reduce((s,o)=>geometry(s,o),{width:image.width,height:image.height});return Object.fromEntries([...Object.entries(image),...Object.entries(size)]);}\n"
+  },
+  "mutants": [
+    {
+      "name": "reverse-operations",
+      "file": "src/pipeline.mjs",
+      "replacement": "import {geometry} from './geometry.mjs';export function transform(image,operations){let size={width:image.width,height:image.height};for(const op of [...operations].reverse())size=geometry(size,op);return {...image,...size};}\n"
+    },
+    {
+      "name": "upscale-fit",
+      "file": "src/geometry.mjs",
+      "replacement": "export function geometry(size,op){let {width,height}=size;if(op.type==='rotate'){if(op.turns%2)[width,height]=[height,width];}else if(op.type==='crop'){if(op.x+op.width>width||op.y+op.height>height)throw new RangeError('crop bounds');width=op.width;height=op.height;}else if(op.type==='fit'){const scale=Math.min(op.width/width,op.height/height);width=Math.max(1,Math.floor(width*scale));height=Math.max(1,Math.floor(height*scale));}return {width,height};}\n"
+    }
+  ]
+}

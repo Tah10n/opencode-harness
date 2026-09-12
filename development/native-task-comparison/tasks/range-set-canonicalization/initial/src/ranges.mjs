@@ -1,0 +1,1 @@
+export function canonical(ranges){return ranges.map(r=>[...r]);}export function subtract(ranges,start,end){return canonical(ranges);}export function createRanges(initial=[]){let ranges=canonical(initial);return {add(a,b){ranges.push([a,b]);},remove(a,b){},contains(n){return ranges.some(([a,b])=>a<=n&&n<b);},snapshot(){return canonical(ranges);}};}

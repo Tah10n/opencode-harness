@@ -1,0 +1,3 @@
+# sync-async-disposal
+
+withResources snapshots non-nullish resource occurrences before body and chooses asyncDispose symbol, dispose symbol, then legacy dispose by first non-nullish priority. Body is awaited; cleanup runs serially in LIFO order with resource receiver/no args. Every occurrence is cleaned, even duplicates, and every method return is awaited, including sync/legacy names. All cleanups run after failures. Original body reason wins unchanged; otherwise first cleanup failure in LIFO order wins. Successful body value identity is preserved. No extra error/resource mutation, acquisition or SuppressedError emulation. Stable callable methods and unchanged resource list are assumed. Run npm test.

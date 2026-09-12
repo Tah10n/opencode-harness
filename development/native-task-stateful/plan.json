@@ -1,0 +1,60 @@
+{
+  "kind": "stateful-precondition-nine-run-development",
+  "baseCommit": "1f554ee4fbc705b31bc0f6d4f96b0a92cd6026c7",
+  "model": "openai/gpt-5.6-luna",
+  "reasoningEffort": "high",
+  "openCodeVersion": "1.18.26",
+  "budgetMs": 900000,
+  "maximumCorrections": 3,
+  "retries": 0,
+  "schedule": [
+    {
+      "slot": 1,
+      "task": "queue-batch",
+      "arm": "P"
+    },
+    {
+      "slot": 2,
+      "task": "queue-batch",
+      "arm": "H0"
+    },
+    {
+      "slot": 3,
+      "task": "queue-batch",
+      "arm": "H1"
+    },
+    {
+      "slot": 4,
+      "task": "editor-cancel",
+      "arm": "H0"
+    },
+    {
+      "slot": 5,
+      "task": "editor-cancel",
+      "arm": "H1"
+    },
+    {
+      "slot": 6,
+      "task": "editor-cancel",
+      "arm": "P"
+    },
+    {
+      "slot": 7,
+      "task": "invite-single-use",
+      "arm": "H1"
+    },
+    {
+      "slot": 8,
+      "task": "invite-single-use",
+      "arm": "P"
+    },
+    {
+      "slot": 9,
+      "task": "invite-single-use",
+      "arm": "H0"
+    }
+  ],
+  "stop": "Existing quota, access refusal and uncertain execution stops; no retries or alternate access. All harness stages share task deadline.",
+  "grading": "Grade behavior, preservation, delivered project regressions, transition sensitivity, docs and complete patch separately from workflow status. Inspect H1 precondition selection, actual state, setup failure, repair, expectation validity and postcondition from delivered bytes and executed tools. Same mechanism in P/H0 remains credited. No keyword heuristic. Evaluator/reference remain outside model environment. Offline sensitivity copies only after models stop.",
+  "claimBoundary": "Three development tasks establish neither durable product superiority nor general instruction benefit. No second revision or series based on outcomes."
+}

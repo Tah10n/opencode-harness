@@ -1,0 +1,16 @@
+{
+  "category": "compatibility",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert object array-like batching preserves holes separately from explicit undefined.",
+    "Assert length/getter read counts and string UTF16 behavior."
+  ],
+  "docDelivery": [
+    "Explain accepted forms, bounds and validation order.",
+    "Explain shallow chunks, holes/inherited properties, UTF16 strings and getter failures."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Bounded array-like stable length/index properties with ordinary inherited lookup; UTF16 strings, sparse/frozen arrays; no mutation during getters.",
+  "independence": "Accept bounded array-like collections in a batching consumer while retaining holes and index order semantics."
+}

@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/headers.mjs": "import {parseParent,filterBaggage} from './context.mjs';export function childHeaders(incoming,allowed,newTraceId,newSpanId){const parent=parseParent(incoming.traceparent??''),parts=['00',parent?parent.traceId:newTraceId,newSpanId,parent?parent.flags:'00'];const baggage=filterBaggage(incoming.baggage??'',allowed);return Object.fromEntries([['traceparent',parts.join('-')],...(baggage?[['baggage',baggage]]:[])]);}\n"
+  },
+  "mutants": [
+    {
+      "name": "reuse-parent-span",
+      "file": "src/headers.mjs",
+      "replacement": "import {parseParent,filterBaggage} from './context.mjs';export function childHeaders(incoming,allowed,newTraceId,newSpanId){const p=parseParent(incoming.traceparent??'');const baggage=filterBaggage(incoming.baggage??'',allowed);const out={traceparent:'00-'+(p?.traceId??newTraceId)+'-'+(p?.parentId??newSpanId)+'-'+(p?.flags??'00')};if(baggage)out.baggage=baggage;return out;}\n"
+    },
+    {
+      "name": "forward-all-baggage",
+      "file": "src/context.mjs",
+      "replacement": "export function parseParent(text){const m=/^00-([0-9a-f]{32})-([0-9a-f]{16})-(00|01)$/.exec(text);return m&&!/^0+$/.test(m[1])&&!/^0+$/.test(m[2])?{traceId:m[1],parentId:m[2],flags:m[3]}:null;}export function filterBaggage(text,allowed){const out=[],seen=new Set();for(const item of text.split(',')){const m=/^ *([A-Za-z0-9_-]+)=([A-Za-z0-9_.%-]*) *$/.exec(item);if(m&&!seen.has(m[1])){seen.add(m[1]);out.push(m[1]+'='+m[2]);}}return out.join(',');}\n"
+    }
+  ]
+}

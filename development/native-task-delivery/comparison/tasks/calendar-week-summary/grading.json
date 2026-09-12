@@ -1,0 +1,18 @@
+{
+  "category": "integration",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "week boundaries reach aggregation",
+    "year leap and input preservation"
+  ],
+  "docDelivery": [
+    "Document UTC Monday grouping, year boundaries, summation/sorting and no mutation."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Implement weekStart(day) returning Monday of containing UTC calendar week, and integrate summarize(entries) aggregating {day,minutes} into sorted {week,minutes}. Domain valid Gregorian YYYY-MM-DD dates years2000..2099 and nonnegative integer minutes, <=1000 entries, safe totals; dates at year edges may map into prior year. Calendar arithmetic must not depend on host timezone. Duplicate days sum; preserve source entries/frozen arrays. Sort output by ascending week date, no empty weeks. No ISO week-number calculation or locale week conventions.",
+  "manualBehavior": [
+    "summarize delegates date grouping to weekStart"
+  ],
+  "independence": "Explicit synthetic library contract; alternatives judged by observable exports and required integration, not reference-source matching."
+}

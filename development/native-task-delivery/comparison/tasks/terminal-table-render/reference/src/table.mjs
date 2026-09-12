@@ -1,0 +1,1 @@
+import {visibleWidth} from './width.mjs';export function render(rows){if(!rows.length)return '';const widths=rows[0].map((_,i)=>Math.max(...rows.map(r=>visibleWidth(r[i]))));return rows.map(r=>r.map((s,i)=>s+' '.repeat(widths[i]-visibleWidth(s))).join(' | ')).join('\n');}

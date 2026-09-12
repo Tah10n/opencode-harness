@@ -1,0 +1,44 @@
+{
+  "kind": "selected-incomplete-D-final-development-diagnostics",
+  "schedule": [
+    {
+      "slot": 1,
+      "task": "legacy-runtime-reload",
+      "arm": "P"
+    },
+    {
+      "slot": 2,
+      "task": "legacy-runtime-reload",
+      "arm": "H"
+    },
+    {
+      "slot": 3,
+      "task": "reconnect-revoked",
+      "arm": "H"
+    },
+    {
+      "slot": 4,
+      "task": "reconnect-revoked",
+      "arm": "P"
+    }
+  ],
+  "model": "openai/gpt-5.6-luna",
+  "variant": "low",
+  "openCodeVersion": "1.18.26",
+  "budgetMs": 900000,
+  "attempts": 4,
+  "retries": 0,
+  "maximumCorrectionsH": 3,
+  "input": "Two identical fresh copies of each preserved public D-final patch; original task and same ordinary project check results. No grader or reference fixes.",
+  "rubric": [
+    "Correct requested behavior through public entry points",
+    "Required regression delivered and actually executed",
+    "Independent stateful scenarios initialized correctly, including disconnected reconnect",
+    "Legacy runtime acceptance and repeat preparation/fresh loading delivered",
+    "Other ownership, permissions, rejection and preservation requirements retained",
+    "Required README and scope respected",
+    "Full patch acceptable only when all applicable obligations and checks supported"
+  ],
+  "claimBoundary": "Selected known failures, not an independent lift benchmark. Extra H compute recorded. No retries or rubric changes. Historical artifacts immutable.",
+  "stop": "Quota, authorization refusal or uncertain provider/process completion stops scheduling. No alternate access."
+}

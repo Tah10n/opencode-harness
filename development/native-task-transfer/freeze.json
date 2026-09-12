@@ -1,0 +1,193 @@
+{
+  "model": "openai/gpt-5.6-luna",
+  "variant": "low",
+  "budgetMs": 900000,
+  "kind": "six-pair-full-native-transfer-pilot",
+  "candidateCommit": "db99470ab3517b741e0452613a9ff04f68a49bc1",
+  "maxProductionRepairs": 2,
+  "maxEvidenceCorrections": 1,
+  "preflightPassed": true,
+  "expectedAcceptanceTests": {
+    "partial-checkout": 3,
+    "http-error-consumer": 3,
+    "transactional-settings": 3,
+    "document-backup": 4,
+    "dual-lookup": 3,
+    "quoted-contact-import": 3
+  },
+  "expectedPreservationTests": {
+    "partial-checkout": 1,
+    "http-error-consumer": 1,
+    "transactional-settings": 1,
+    "document-backup": 1,
+    "dual-lookup": 1,
+    "quoted-contact-import": 1
+  },
+  "authorization": "User attachment 8df7e313-bfd3-432e-9785-fe813bbf22b6: exactly twelve fresh full task-runs, existing OpenCode OAuth/quota, only prepared initial projects/tasks/workflow/tool outputs to OpenAI, 900 seconds each, no retries; reference/grader withheld until termination.",
+  "attempts": [
+    {
+      "task": "partial-checkout",
+      "arm": "A"
+    },
+    {
+      "task": "partial-checkout",
+      "arm": "B"
+    },
+    {
+      "task": "http-error-consumer",
+      "arm": "B"
+    },
+    {
+      "task": "http-error-consumer",
+      "arm": "A"
+    },
+    {
+      "task": "transactional-settings",
+      "arm": "A"
+    },
+    {
+      "task": "transactional-settings",
+      "arm": "B"
+    },
+    {
+      "task": "document-backup",
+      "arm": "B"
+    },
+    {
+      "task": "document-backup",
+      "arm": "A"
+    },
+    {
+      "task": "dual-lookup",
+      "arm": "A"
+    },
+    {
+      "task": "dual-lookup",
+      "arm": "B"
+    },
+    {
+      "task": "quoted-contact-import",
+      "arm": "B"
+    },
+    {
+      "task": "quoted-contact-import",
+      "arm": "A"
+    }
+  ],
+  "corpusHashes": {
+    "tasks/document-backup/grading.json": "c651e5472dacb2f2f9c871674a32fdf50c32373b359fdb3ff0d0bc1c77f370cf",
+    "tasks/document-backup/preflight-cases.json": "66005886c849bef71dd2612e8407a79be52202dec1c8b51ba6f16724c2eb8df9",
+    "tasks/document-backup/initial/README.md": "8730a15efa9330aae81e09cd10abd93114964110bb78430f3551090845e76e51",
+    "tasks/document-backup/initial/package.json": "60e042dbbf970b8449c3bb37df2faae7fafaf9846da3830994a0695a4e2fac8f",
+    "tasks/document-backup/initial/TASK.md": "3c8bfeab25ef04bc9b91ce0aaae41f83486ede695e293a7354eb17a7481fdc72",
+    "tasks/document-backup/initial/AGENTS.md": "7358ea82e296d467dd5c9d2836888fa5a6f30e8e737d4203ddb7b3162225f23b",
+    "tasks/document-backup/initial/test/document.test.mjs": "38df6c28e8a6f96a1321c18d9d085fc1274b01d25e77c73749284d36882ac186",
+    "tasks/document-backup/initial/src/documents.mjs": "f88b40923a40bae0e9cf849fc7bb8ab7470fcef11049ea8021498533e0546506",
+    "tasks/document-backup/acceptance/acceptance.test.mjs": "ae412b9985c6affb9b33d0016542b848525d90a5485405277b2aaf15e5884bdb",
+    "tasks/document-backup/reference/README.md": "b8f471052053c57d0b1936de1eb346e4236ada75a848fba5c90a25c5eb7130b0",
+    "tasks/document-backup/reference/package.json": "60e042dbbf970b8449c3bb37df2faae7fafaf9846da3830994a0695a4e2fac8f",
+    "tasks/document-backup/reference/TASK.md": "3c8bfeab25ef04bc9b91ce0aaae41f83486ede695e293a7354eb17a7481fdc72",
+    "tasks/document-backup/reference/AGENTS.md": "7358ea82e296d467dd5c9d2836888fa5a6f30e8e737d4203ddb7b3162225f23b",
+    "tasks/document-backup/reference/test/document.test.mjs": "38df6c28e8a6f96a1321c18d9d085fc1274b01d25e77c73749284d36882ac186",
+    "tasks/document-backup/reference/test/new-requirements.test.mjs": "2c091104f34b7ae65ab0294a91f32aa6bb9280da2dd149519d30216a0c9407bd",
+    "tasks/document-backup/reference/src/documents.mjs": "ace07a3583d062b506a861313909869654b33095d18e6a96eb9ab41b52c7cf42",
+    "tasks/dual-lookup/grading.json": "82c65f756c264cd3a647ddfdb66c0b93207f0db0abbda5a4c2b6b07b28963074",
+    "tasks/dual-lookup/preflight-cases.json": "369e18cc0464c42b94708ce87fd9fa83ddbb2be0bbbf96324687f433b22b4604",
+    "tasks/dual-lookup/initial/README.md": "75d5f9cabc929b75f957975279acc8c86703911f95914a21f54b565551770397",
+    "tasks/dual-lookup/initial/package.json": "a1ecf6a82cbdb23319542f7c30a6d85906ec79efd0b977a0601843b4284fde67",
+    "tasks/dual-lookup/initial/TASK.md": "54f9e561d046a5c68b3705125e381693980bdf95e0bc853524c281e86af5bf9f",
+    "tasks/dual-lookup/initial/AGENTS.md": "7358ea82e296d467dd5c9d2836888fa5a6f30e8e737d4203ddb7b3162225f23b",
+    "tasks/dual-lookup/initial/test/lookup.test.mjs": "d8d1ee52f84a4c563d39df528bae360516660e9b459033125c1cbefc2efe580b",
+    "tasks/dual-lookup/initial/src/lookup.mjs": "cf5ca04fb4a98ed8c1072d034b3e532968f60ad20739d801ea154bd387128a12",
+    "tasks/dual-lookup/initial/src/names.mjs": "01fdf286c357bb30feb0e92be19b16f9d47e049b692019336cc6b0052b703969",
+    "tasks/dual-lookup/acceptance/acceptance.test.mjs": "d207222622d94eeb0d94db7cdb260707b87d9356698f7422d46220a7c7a1c1f5",
+    "tasks/dual-lookup/reference/README.md": "2ea79f73e3f9bc1eb990caa4951d10ab5f2bb13a3478684d2fb64f4987151142",
+    "tasks/dual-lookup/reference/package.json": "a1ecf6a82cbdb23319542f7c30a6d85906ec79efd0b977a0601843b4284fde67",
+    "tasks/dual-lookup/reference/TASK.md": "54f9e561d046a5c68b3705125e381693980bdf95e0bc853524c281e86af5bf9f",
+    "tasks/dual-lookup/reference/AGENTS.md": "7358ea82e296d467dd5c9d2836888fa5a6f30e8e737d4203ddb7b3162225f23b",
+    "tasks/dual-lookup/reference/test/lookup.test.mjs": "d8d1ee52f84a4c563d39df528bae360516660e9b459033125c1cbefc2efe580b",
+    "tasks/dual-lookup/reference/test/new-requirements.test.mjs": "e61a5eef9f48c36dea063aaa0aa202ed630290daff59f4c8df4c5dfc6f08d89b",
+    "tasks/dual-lookup/reference/src/lookup.mjs": "56d21984c80bea2f007fd0e0ac649b565f99d1cec6230b9dfa75344a1a60ea70",
+    "tasks/dual-lookup/reference/src/names.mjs": "07f4db7dbdf1ddcc083299f79038441bbe83cfe5d67aefa3cdc746edd8d63a6c",
+    "tasks/http-error-consumer/grading.json": "ef269c21d86fb6c98acd8f138d3c8e6e02c33f02450f77b09f2369cf6f984316",
+    "tasks/http-error-consumer/preflight-cases.json": "55e27ce09ba7b416ddec91ae0d927149c35ced0ee3ab60cde4596fdf6ce76bd5",
+    "tasks/http-error-consumer/initial/README.md": "2bdfcf795701d019e309df40516465284e4016cab8c21c19af36c53a1fa6a1fa",
+    "tasks/http-error-consumer/initial/package.json": "bc79f7058684cb16a1980c14cff861ae5b938311082259415a602aa4275344fc",
+    "tasks/http-error-consumer/initial/TASK.md": "b2dded321a56bc1692cda795a6f8bb1dce216aa43cd3c4b78385d3d9d6d0a20a",
+    "tasks/http-error-consumer/initial/AGENTS.md": "7358ea82e296d467dd5c9d2836888fa5a6f30e8e737d4203ddb7b3162225f23b",
+    "tasks/http-error-consumer/initial/test/http.test.mjs": "a6f0235c131fcde40a34f7f9355553574d8657f56f609598c6894490914ccb79",
+    "tasks/http-error-consumer/initial/src/users.mjs": "840002c35c905ae328c01c0173e51ae62c2a16a1cb59636b4d7a1101c733d05a",
+    "tasks/http-error-consumer/initial/src/http.mjs": "2ec926d42392c3e98553c868a40e514be6c47570ab8987d9e02a8f6d1c032546",
+    "tasks/http-error-consumer/acceptance/acceptance.test.mjs": "344d634044ac89690992340420c7b1478ced299820835ef49859796cbff06fb8",
+    "tasks/http-error-consumer/reference/README.md": "2a85e55cf9d6e13dfc36470eca559291b78c211c98bac63d7e53841f0641baf4",
+    "tasks/http-error-consumer/reference/package.json": "bc79f7058684cb16a1980c14cff861ae5b938311082259415a602aa4275344fc",
+    "tasks/http-error-consumer/reference/TASK.md": "b2dded321a56bc1692cda795a6f8bb1dce216aa43cd3c4b78385d3d9d6d0a20a",
+    "tasks/http-error-consumer/reference/AGENTS.md": "7358ea82e296d467dd5c9d2836888fa5a6f30e8e737d4203ddb7b3162225f23b",
+    "tasks/http-error-consumer/reference/test/http.test.mjs": "a6f0235c131fcde40a34f7f9355553574d8657f56f609598c6894490914ccb79",
+    "tasks/http-error-consumer/reference/test/new-requirements.test.mjs": "a6b775536eb0eb91e5778043dc7fb6533269a8e0d726b1711419ca1753c53add",
+    "tasks/http-error-consumer/reference/src/users.mjs": "67898fd43ef734bd05587a181898015a00fc16075dfe6a69dffc84ce5abf082c",
+    "tasks/http-error-consumer/reference/src/http.mjs": "22b11caaaa2f0494a3eae2d5aae5a812cc0424baa227efaac37161937a5d788a",
+    "tasks/quoted-contact-import/grading.json": "9b99a4092d6b67a4a1db7f5850084db259fe824bdd8a2f3b05f9294cce0746a1",
+    "tasks/quoted-contact-import/preflight-cases.json": "a6eac290d9242dc9a15a9dc8fd9cf10472076b2ba30465259b0f2b7457437845",
+    "tasks/quoted-contact-import/initial/README.md": "cda52977884aca25344dafc2e8c0cd9cbf69f05cf7e80bee0f51e7b1cdc55509",
+    "tasks/quoted-contact-import/initial/package.json": "78a7ddcbea2063dd80b34afe85e4d7c44e141a7c1365bc23e39baf7dd877e81d",
+    "tasks/quoted-contact-import/initial/TASK.md": "f8ca371689cc2f4d9dbfd479648139893f69253abce76df420acc15348157dfa",
+    "tasks/quoted-contact-import/initial/AGENTS.md": "7358ea82e296d467dd5c9d2836888fa5a6f30e8e737d4203ddb7b3162225f23b",
+    "tasks/quoted-contact-import/initial/test/contacts.test.mjs": "035e64bc1536d7392110f08cf9cd556264cd14e99df840789bece9857cd376f2",
+    "tasks/quoted-contact-import/initial/src/contacts.mjs": "af25822ef48ea232c7ced8809b266f6bbb768300b145494ae3900cc832a432d1",
+    "tasks/quoted-contact-import/initial/src/csv.mjs": "96020c6bac98bfb08e2703a0be55f87709e99353303be2c7cdc9b7da9d4ed72e",
+    "tasks/quoted-contact-import/acceptance/acceptance.test.mjs": "0a1aca609af0c5ba7d8f31e276bf6392a2a38dbf9b66fb8c7501bad034034169",
+    "tasks/quoted-contact-import/reference/README.md": "bdc9af125509b9d624cd8d243cb014632cc27a76efb7ff29e5a4021fad8d3155",
+    "tasks/quoted-contact-import/reference/package.json": "78a7ddcbea2063dd80b34afe85e4d7c44e141a7c1365bc23e39baf7dd877e81d",
+    "tasks/quoted-contact-import/reference/TASK.md": "f8ca371689cc2f4d9dbfd479648139893f69253abce76df420acc15348157dfa",
+    "tasks/quoted-contact-import/reference/AGENTS.md": "7358ea82e296d467dd5c9d2836888fa5a6f30e8e737d4203ddb7b3162225f23b",
+    "tasks/quoted-contact-import/reference/test/contacts.test.mjs": "035e64bc1536d7392110f08cf9cd556264cd14e99df840789bece9857cd376f2",
+    "tasks/quoted-contact-import/reference/test/new-requirements.test.mjs": "eb13ea768b7a1cab0eb1d3fc53464493aeebbef7389ae55daa7d6b0ea5ee27fb",
+    "tasks/quoted-contact-import/reference/src/contacts.mjs": "9b1949f4f057c0b8b929e0ee026447257a467d0dc9040953fbc72dd07f98609a",
+    "tasks/quoted-contact-import/reference/src/csv.mjs": "7991725c08a5113e5988d09af282725c0570b0ff3a9e8a216e0c932dafcc0cd3",
+    "tasks/partial-checkout/grading.json": "7099a41f6646bae2d85ebacbc341adf181f5997b194113f802edb4d5cc248e7c",
+    "tasks/partial-checkout/preflight-cases.json": "dd7aaac15a79a2a21d16a0357f54ed56484829d74c15fb6a4ad800f2688744b7",
+    "tasks/partial-checkout/initial/README.md": "9d20606145f57faca7d3359db1126a8c14652bb2f549372ad96f4f190504d434",
+    "tasks/partial-checkout/initial/package.json": "1d5b7206f6c25af1fd66f4787b1c012765120bb61369b4c42b26a0e29572d7b4",
+    "tasks/partial-checkout/initial/TASK.md": "03cee42071cd75755d59790b9ee7ebe4c97b553e4e00fc3ff56b921b47c32095",
+    "tasks/partial-checkout/initial/AGENTS.md": "7358ea82e296d467dd5c9d2836888fa5a6f30e8e737d4203ddb7b3162225f23b",
+    "tasks/partial-checkout/initial/test/checkout.test.mjs": "dfb46ede6a05b6fd5e568e6034b7ee4d9f3aeb8a0e7fa0b2cc9e0c10aaa8e70e",
+    "tasks/partial-checkout/initial/src/plan.mjs": "053b240ea12f47165b12cae8a6b9bc7ed157042737492f192379de58b76f2dfd",
+    "tasks/partial-checkout/initial/src/checkout.mjs": "6190f4161ebcc8e0014bb976121819dcdee703b8d69d1e218b5500edb8abc942",
+    "tasks/partial-checkout/initial/src/receipt.mjs": "a4030ecbbcf26bf582b8c0e8a46dd9b382b6f6053999a6fbdc71dc80765925a5",
+    "tasks/partial-checkout/acceptance/acceptance.test.mjs": "0c1ef98b793c80aa8af41e461e8e7e93355430f4d54de1bd5cf0a79eb77f2be5",
+    "tasks/partial-checkout/reference/README.md": "4c742c04b04a995c09c17478dcee9421291670dd78fa98481e7894c7a2974085",
+    "tasks/partial-checkout/reference/package.json": "1d5b7206f6c25af1fd66f4787b1c012765120bb61369b4c42b26a0e29572d7b4",
+    "tasks/partial-checkout/reference/TASK.md": "03cee42071cd75755d59790b9ee7ebe4c97b553e4e00fc3ff56b921b47c32095",
+    "tasks/partial-checkout/reference/AGENTS.md": "7358ea82e296d467dd5c9d2836888fa5a6f30e8e737d4203ddb7b3162225f23b",
+    "tasks/partial-checkout/reference/test/new-requirements.test.mjs": "0db5bccafe9af78f9420950a4157bec4fab557cfe57fc03433abe26fd4fe4ab8",
+    "tasks/partial-checkout/reference/test/checkout.test.mjs": "dfb46ede6a05b6fd5e568e6034b7ee4d9f3aeb8a0e7fa0b2cc9e0c10aaa8e70e",
+    "tasks/partial-checkout/reference/src/plan.mjs": "e881e06e88864a209307060cee6ba603436eefa1582eff3b56d37c8672059b5e",
+    "tasks/partial-checkout/reference/src/checkout.mjs": "6190f4161ebcc8e0014bb976121819dcdee703b8d69d1e218b5500edb8abc942",
+    "tasks/partial-checkout/reference/src/receipt.mjs": "55f4642612fbf5204c176c5258bdde8700c7f5e85ebcdb2332ba3d76c2de0d43",
+    "tasks/transactional-settings/grading.json": "96eede0bbde6cfaf19ef0421fbfcef34914ee60d7426e4c50a90b7e7128dae03",
+    "tasks/transactional-settings/preflight-cases.json": "d5b04fcc293c1ba24fdacd842b9b7df5f666944e7b003a01f6b4e323b96e26a2",
+    "tasks/transactional-settings/initial/README.md": "4ebd064c55163768ba02078acb3142dcf9e78146c62a2a0b4c05862aa059bf75",
+    "tasks/transactional-settings/initial/package.json": "0f5bc3a376b3911d6856b428152282b33a477a23f4bfc6d0c057dcf7bf007fac",
+    "tasks/transactional-settings/initial/TASK.md": "8031874b2e52d271acb4e9cfcd525b5e5136cd96ba8ea325194bf92fe88470ab",
+    "tasks/transactional-settings/initial/AGENTS.md": "7358ea82e296d467dd5c9d2836888fa5a6f30e8e737d4203ddb7b3162225f23b",
+    "tasks/transactional-settings/initial/test/store.test.mjs": "91422c7793b142c97429d61ad5474fe40963bc9fb8d9d6504bba6b9ecfcb5223",
+    "tasks/transactional-settings/initial/src/store.mjs": "92face61bd48582e90a982df3302f1095360ef7baeafefd0c2522c6a251ff0bf",
+    "tasks/transactional-settings/acceptance/acceptance.test.mjs": "7e9e93181ddb0df2b1a4967005225988420867338ab8adab927c694e55920fd6",
+    "tasks/transactional-settings/reference/README.md": "93602e7029c20777500b6be13ad73aaba190e4ff97f168187e6387a29cafb094",
+    "tasks/transactional-settings/reference/package.json": "0f5bc3a376b3911d6856b428152282b33a477a23f4bfc6d0c057dcf7bf007fac",
+    "tasks/transactional-settings/reference/TASK.md": "8031874b2e52d271acb4e9cfcd525b5e5136cd96ba8ea325194bf92fe88470ab",
+    "tasks/transactional-settings/reference/AGENTS.md": "7358ea82e296d467dd5c9d2836888fa5a6f30e8e737d4203ddb7b3162225f23b",
+    "tasks/transactional-settings/reference/test/store.test.mjs": "91422c7793b142c97429d61ad5474fe40963bc9fb8d9d6504bba6b9ecfcb5223",
+    "tasks/transactional-settings/reference/test/new-requirements.test.mjs": "9ef7f030c1959376842ad88a145eb8dd70552418bb2e2ae1faba5bf75cdef842",
+    "tasks/transactional-settings/reference/src/store.mjs": "65e140c6022db55583b87f47599eacbb437f176b39029e33df60a8a20529c66e"
+  },
+  "localFreezeSha256": "47b67d90adc0795c75b591574035300150b87b1248a3e4fa397386692addc67f",
+  "bundleHashes": {
+    "native-task-plugin.mjs": "06d4d02238996180d0158c3ece79393f51560d79b4ad2701e6f0829b9f6aaaf5",
+    "native-task-workflow.mjs": "b43aeb1bb6a5004812fa59cdecb0a4075d804dd24fa4bcd96116702ab22fcdc5",
+    "native-review-context.mjs": "8775ae59ef3d3b5b432798f909f94869d43b7561b4b5f144f972e5bcce20e312",
+    "core.md": "9adcc862446ac6c0e5a407ec89e2f65fe4a249aedcc34ba36f143f3589edd4f7",
+    "opencode.json": "20b7421bb8d7471090bfdb719cf27e122bb6b71d64ae5dcd8bc694ea794c0f0f"
+  }
+}

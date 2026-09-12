@@ -1,0 +1,3 @@
+# unit-conversion-graph
+
+compileUnitGraph snapshots multiplicative directed ratios with implicit reverse edges; createConverter delegates. Multi-hop connects units, disconnected components stay separate. All cycles/duplicate/self edges must agree exactly as rationals, otherwise construction RangeError('inconsistent conversions'); no epsilon masking.<=100 edges/50 lowercase units1..30, factors positive integer<=1000000, invalid TypeError('edge'). convert value finite abs<=1000000 validated first (TypeError), unknown unit RangeError then disconnected RangeError; same known unit identity incl -0. JS numeric outputs tolerance1e-12*max(1,abs(expected)), no affine offsets/inferred dimensions. Frozen inputs supported, later changes irrelevant. Run npm test.

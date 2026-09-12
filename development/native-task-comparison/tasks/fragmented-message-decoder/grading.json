@@ -1,0 +1,16 @@
+{
+  "category": "integration",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Multibyte UTF-8 split over fragments with an interleaved ping.",
+    "Protocol failure followed by successful fresh message."
+  ],
+  "docDelivery": [
+    "Message reassembly, fatal complete UTF-8 validation and BOM preservation.",
+    "Ping behavior, snapshot ownership and reset on errors."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Frames {type:text/continuation/ping,fin:boolean,data:Uint8Array including subviews}, finite stream <=1MB total per message. May violate sequencing, ping limit, or final UTF8. UTF8 decoder preserves BOM as U+FEFF. No binary or network I/O.",
+  "independence": "Integrate byte-fragment reassembly, UTF-8 decoding and interleaved control frames into message consumer."
+}

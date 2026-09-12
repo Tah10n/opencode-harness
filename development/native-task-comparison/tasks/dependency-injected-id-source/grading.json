@@ -1,0 +1,16 @@
+{
+  "category": "refactoring",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert invalid names allocate nothing and valid names allocate exactly once.",
+    "Assert collision/invalid ID/allocator failure preserve Set and do not retry."
+  ],
+  "docDelivery": [
+    "Document old/new call forms and default UUID source.",
+    "Explain validation-before-allocation, allowed IDs, uniqueness commit and failure behavior."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Validated trimmed names, injected single synchronous ID source, native Set uniqueness, default UUID preserved.",
+  "independence": "Extract ID allocation dependency from record creation preserving uniqueness checks and no allocation on validation failure."
+}

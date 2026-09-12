@@ -1,0 +1,83 @@
+[
+  {
+    "task": "legacy-runtime-reload",
+    "arm": "P",
+    "phase": "final",
+    "base": "actual original task baseline (D-final was not applied)",
+    "file": "patches/legacy-runtime-reload/P-final.patch",
+    "sha256": "f1cd82d139439cb5be4e679fdd2796f7eb970965c3aa0b0fd700abed928858b2",
+    "experimentValidity": "invalid_input_preparation"
+  },
+  {
+    "task": "legacy-runtime-reload",
+    "arm": "H",
+    "phase": "D0",
+    "base": "actual original task baseline (D-final was not applied)",
+    "file": "patches/legacy-runtime-reload/H-D0-from-input.patch",
+    "sha256": "1f5b94a206abc0e94c8517dc2de753aa43eb47121372a0572b10eb9d0d0af300",
+    "experimentValidity": "invalid_input_preparation"
+  },
+  {
+    "task": "legacy-runtime-reload",
+    "arm": "H",
+    "phase": "final",
+    "base": "actual original task baseline (D-final was not applied)",
+    "file": "patches/legacy-runtime-reload/H-final.patch",
+    "sha256": "86a3165577284918d3412bb2257ff051d809e1252a2754696ba03334635ebd7f",
+    "experimentValidity": "invalid_input_preparation"
+  },
+  {
+    "task": "reconnect-revoked",
+    "arm": "H",
+    "phase": "D0",
+    "base": "actual original task baseline (D-final was not applied)",
+    "file": "patches/reconnect-revoked/H-D0-from-input.patch",
+    "sha256": "f35b8bab23b46b4bd8ec905e189928f4790d0be5183d9c4eefda67fd0a8766f2",
+    "experimentValidity": "invalid_input_preparation"
+  },
+  {
+    "task": "reconnect-revoked",
+    "arm": "H",
+    "phase": "D1",
+    "base": "actual original task baseline (D-final was not applied)",
+    "file": "patches/reconnect-revoked/H-D1-from-input.patch",
+    "sha256": "baf4d1320001d58a92b8db83d1dd3993363db448069dbcf77773e6cf88966c7e",
+    "experimentValidity": "invalid_input_preparation"
+  },
+  {
+    "task": "reconnect-revoked",
+    "arm": "H",
+    "phase": "D2",
+    "base": "actual original task baseline (D-final was not applied)",
+    "file": "patches/reconnect-revoked/H-D2-from-input.patch",
+    "sha256": "e4dde0d491015099aee74c05e33ee3dc29bdc4dbab6472a2249ae85665c7f89c",
+    "experimentValidity": "invalid_input_preparation"
+  },
+  {
+    "task": "reconnect-revoked",
+    "arm": "H",
+    "phase": "D3",
+    "base": "actual original task baseline (D-final was not applied)",
+    "file": "patches/reconnect-revoked/H-D3-from-input.patch",
+    "sha256": "e4dde0d491015099aee74c05e33ee3dc29bdc4dbab6472a2249ae85665c7f89c",
+    "experimentValidity": "invalid_input_preparation"
+  },
+  {
+    "task": "reconnect-revoked",
+    "arm": "H",
+    "phase": "final",
+    "base": "actual original task baseline (D-final was not applied)",
+    "file": "patches/reconnect-revoked/H-final.patch",
+    "sha256": "b67bdb4591719aa184a97092c316b59d03b6b7cfe31313ccfcbb13d02b84eb0c",
+    "experimentValidity": "invalid_input_preparation"
+  },
+  {
+    "task": "reconnect-revoked",
+    "arm": "P",
+    "phase": "final",
+    "base": "actual original task baseline (D-final was not applied)",
+    "file": "patches/reconnect-revoked/P-final.patch",
+    "sha256": "8aa81a2235f46a1881e67c1b62d1f73d3ccd8569e867682ce97abae1ac77f6ec",
+    "experimentValidity": "invalid_input_preparation"
+  }
+]

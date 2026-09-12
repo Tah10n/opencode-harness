@@ -1,0 +1,700 @@
+{
+  "kind": "completed independent saved-result review",
+  "sameReviewerResumed": true,
+  "blindEndpointReviews": 255,
+  "originalDiscordantPairsChecked": [
+    {
+      "pair": 1,
+      "task": "span-source-map-compose",
+      "originalDisposition": "B-only",
+      "currentDisposition": "B-only",
+      "status": "checked; no additional assessment error found"
+    },
+    {
+      "pair": 3,
+      "task": "conditional-form-errors",
+      "originalDisposition": "A-only",
+      "currentDisposition": "A-only",
+      "status": "checked; no additional assessment error found"
+    },
+    {
+      "pair": 4,
+      "task": "reservoir-sample-resume",
+      "originalDisposition": "A-only",
+      "currentDisposition": "A-only",
+      "status": "checked; no additional assessment error found"
+    },
+    {
+      "pair": 7,
+      "task": "path-edit-transaction",
+      "originalDisposition": "A-only",
+      "currentDisposition": "A-only",
+      "status": "checked; no additional assessment error found"
+    },
+    {
+      "pair": 9,
+      "task": "feature-rollout-context",
+      "originalDisposition": "A-only",
+      "currentDisposition": "A-only",
+      "status": "checked; no additional assessment error found"
+    },
+    {
+      "pair": 12,
+      "task": "bounded-lru-persistence",
+      "originalDisposition": "A-only",
+      "currentDisposition": "A-only",
+      "status": "checked; no additional assessment error found"
+    },
+    {
+      "pair": 13,
+      "task": "clock-injected-reminders",
+      "originalDisposition": "A-only",
+      "currentDisposition": "A-only",
+      "status": "checked; no additional assessment error found"
+    },
+    {
+      "pair": 15,
+      "task": "lazy-default-arguments",
+      "originalDisposition": "B-only",
+      "currentDisposition": "B-only",
+      "status": "checked; no additional assessment error found"
+    },
+    {
+      "pair": 20,
+      "task": "parcel-shipping-quote",
+      "originalDisposition": "B-only",
+      "currentDisposition": "B-only",
+      "status": "checked; no additional assessment error found"
+    },
+    {
+      "pair": 25,
+      "task": "casefold-command-aliases",
+      "originalDisposition": "B-only",
+      "currentDisposition": "B-only",
+      "status": "checked; no additional assessment error found"
+    },
+    {
+      "pair": 28,
+      "task": "binary-tlv-stream",
+      "originalDisposition": "A-only",
+      "currentDisposition": "A-only",
+      "status": "checked; no additional assessment error found"
+    },
+    {
+      "pair": 32,
+      "task": "geographic-antimeridian-viewport",
+      "originalDisposition": "A-only",
+      "currentDisposition": "A-only",
+      "status": "checked; no additional assessment error found"
+    },
+    {
+      "pair": 34,
+      "task": "text-diff-patch-state",
+      "originalDisposition": "B-only",
+      "currentDisposition": "B-only",
+      "status": "checked; no additional assessment error found"
+    },
+    {
+      "pair": 36,
+      "task": "token-bucket-admission",
+      "originalDisposition": "A-only",
+      "currentDisposition": "A-only",
+      "status": "checked; no additional assessment error found"
+    },
+    {
+      "pair": 45,
+      "task": "portable-path-core",
+      "originalDisposition": "A-only",
+      "currentDisposition": "A-only",
+      "status": "checked; no additional assessment error found"
+    },
+    {
+      "pair": 49,
+      "task": "sparse-grid-persistence",
+      "originalDisposition": "B-only",
+      "currentDisposition": "B-only",
+      "status": "checked; no additional assessment error found"
+    },
+    {
+      "pair": 52,
+      "task": "run-length-bitmap-codec",
+      "originalDisposition": "A-only",
+      "currentDisposition": "A-only",
+      "status": "checked; no additional assessment error found"
+    },
+    {
+      "pair": 54,
+      "task": "iterative-deep-flatten",
+      "originalDisposition": "A-only",
+      "currentDisposition": "A-only",
+      "status": "checked; no additional assessment error found"
+    },
+    {
+      "pair": 59,
+      "task": "plugin-hook-composition",
+      "originalDisposition": "A-only",
+      "currentDisposition": "A-only",
+      "status": "checked; no additional assessment error found"
+    },
+    {
+      "pair": 66,
+      "task": "bloom-filter-union-state",
+      "originalDisposition": "A-only",
+      "currentDisposition": "A-only",
+      "status": "checked; no additional assessment error found"
+    },
+    {
+      "pair": 68,
+      "task": "streaming-summary-fold",
+      "originalDisposition": "A-only",
+      "currentDisposition": "A-only",
+      "status": "checked; no additional assessment error found"
+    },
+    {
+      "pair": 72,
+      "task": "normalization-once-pipeline",
+      "originalDisposition": "B-only",
+      "currentDisposition": "B-only",
+      "status": "checked; no additional assessment error found"
+    },
+    {
+      "pair": 74,
+      "task": "media-type-parameter-api",
+      "originalDisposition": "A-only",
+      "currentDisposition": "A-only",
+      "status": "checked; no additional assessment error found"
+    },
+    {
+      "pair": 79,
+      "task": "tiered-meter-invoice",
+      "originalDisposition": "B-only",
+      "currentDisposition": "B-only",
+      "status": "checked; no additional assessment error found"
+    },
+    {
+      "pair": 81,
+      "task": "iterable-stream-adapter",
+      "originalDisposition": "B-only",
+      "currentDisposition": "neither",
+      "status": "checked; iterable B corrected through separate source adjudication"
+    }
+  ],
+  "sourceAdjudicationsChecked": [
+    {
+      "endpoint": "conditional-form-errors/B/D0",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "conditional-form-errors/B/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "unit-conversion-graph/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "path-edit-transaction/B/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "sliding-session-expiry/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "sliding-session-expiry/B/D0",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "sliding-session-expiry/B/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "header-multimap-api/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "lazy-default-arguments/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "url-resolver-consumers/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "zoned-time-offset-records/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "zoned-time-offset-records/B/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "zoned-time-offset-records/B/D0",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "casefold-command-aliases/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "markdown-heading-navigation/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "markdown-heading-navigation/B/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "markdown-heading-navigation/B/D0",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "rolling-checksum-journal/B/D0",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "rolling-checksum-journal/B/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "rolling-checksum-journal/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "text-diff-patch-state/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "bounded-lru-persistence/B/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "reservoir-sample-resume/B/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "multi-value-query-state/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "unit-conversion-graph/B/D0",
+      "requiredBehaviorViolated": false,
+      "status": "retain documented frozen wording ambiguity; no new failure"
+    },
+    {
+      "endpoint": "unit-conversion-graph/B/final",
+      "requiredBehaviorViolated": false,
+      "status": "retain documented frozen wording ambiguity; no new failure"
+    },
+    {
+      "endpoint": "responsive-image-candidates/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "responsive-image-candidates/B/D0",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "responsive-image-candidates/B/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "portable-path-core/B/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "portable-path-core/B/D0",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "run-length-bitmap-codec/B/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "canonical-json-digest/B/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "canonical-json-digest/B/D0",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "validation-rule-combinators/B/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "validation-rule-combinators/B/D0",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "sync-async-disposal/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "sync-async-disposal/B/D0",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "sync-async-disposal/B/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "typed-byte-view-inputs/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "typed-byte-view-inputs/B/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "typed-byte-view-inputs/B/D0",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "normalization-once-pipeline/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "function-receiver-wrapper/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "function-receiver-wrapper/B/D0",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "function-receiver-wrapper/B/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "iterable-stream-adapter/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "weighted-ballot-tabulation/B/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "batch-error-aggregation/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "binary-search-api-bounds/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "central-money-rounding/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "finite-state-transition-log/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "fragmented-message-decoder/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "metric-watermark-windows/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "observed-remove-set/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "positional-options-overload/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "range-set-canonicalization/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "readonly-collection-view/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "readonly-collection-view/B/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "recurrence-exclusion-calendar/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "regexp-filter-state/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "stable-sort-comparator/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "transport-injected-uploader/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "tree-selection-propagation/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "unicode-search-snippets/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "visitor-expression-printer/A/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "iterable-stream-adapter/B/final",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    },
+    {
+      "endpoint": "iterable-stream-adapter/B/D0",
+      "requiredBehaviorViolated": true,
+      "status": "confirmed explicit source-contract violation"
+    }
+  ],
+  "openFindings": [],
+  "resolvedFinding": "iterable-stream-adapter B invokes callable iterator method through its mutable .call property; both saved endpoints reclassified under original protocol requirement. Original blind reviews retained.",
+  "currentDescriptiveTable": {
+    "n": 100,
+    "both": 34,
+    "bOnly": 8,
+    "aOnly": 16,
+    "neither": 42,
+    "unassessedPairs": 0,
+    "status": "descriptive operational dispositions only; confirmatory comparison withheld after quota failure",
+    "difference": null,
+    "pExactTwoSided": null,
+    "confidenceInterval": null
+  },
+  "accounting": {
+    "slotsVerified": 200,
+    "endpointChecksVerified": 255,
+    "trustworthyFinalDeliveries": 184,
+    "D0Endpoints": 71,
+    "allFinalPacketTreesMatchSavedDelivery": true,
+    "allPacketTASKAndRubricsMatchFrozenFiles": true,
+    "allCombinedEndpointChecksMatchSavedBehaviorGrading": true,
+    "allEndpointBooleansRecomputed": true,
+    "allScheduleResultCompletedIdentityStopFinishedCleanupVerified": true,
+    "rawProviderAndNativeCrosscheckErrors": [],
+    "arms": {
+      "A": {
+        "runs": 100,
+        "elapsedMs": 7793977,
+        "medianElapsedMs": 77014.5,
+        "providerRequests": 1164,
+        "toolCalls": 1391,
+        "observedProviderTotalTokens": 8933144,
+        "inputTokens": 8698246,
+        "outputTokens": 234898,
+        "cachedInputSubset": 4976128,
+        "reasoningOutputSubset": 33986,
+        "unknownUsageRequests": 153,
+        "incompleteUsageRequests": 0,
+        "usageFieldCoverage": {
+          "input_tokens": 1011,
+          "output_tokens": 1011,
+          "total_tokens": 1011
+        }
+      },
+      "B": {
+        "runs": 100,
+        "elapsedMs": 11705550,
+        "medianElapsedMs": 108781,
+        "providerRequests": 1651,
+        "toolCalls": 1790,
+        "observedProviderTotalTokens": 16063749,
+        "inputTokens": 15675069,
+        "outputTokens": 388680,
+        "cachedInputSubset": 5373952,
+        "reasoningOutputSubset": 70050,
+        "unknownUsageRequests": 156,
+        "incompleteUsageRequests": 0,
+        "usageFieldCoverage": {
+          "input_tokens": 1495,
+          "output_tokens": 1495,
+          "total_tokens": 1495
+        }
+      }
+    },
+    "providerStatusCounts": {
+      "200": 2506,
+      "429": 309
+    },
+    "requestsTotal": 2815,
+    "observedUsageRequests": 2506,
+    "unknownUsageRequests": 309,
+    "partialUsageRequests": 0,
+    "firstQuotaAffectedSlot": 167,
+    "quotaAffectedSlots": 34,
+    "noModelToolsSlots": [
+      168,
+      169,
+      170,
+      171,
+      172,
+      173,
+      174,
+      175,
+      176,
+      177,
+      178,
+      179,
+      180,
+      181,
+      182,
+      183,
+      184,
+      185,
+      186,
+      187,
+      188,
+      189,
+      190,
+      191,
+      192,
+      193,
+      194,
+      195,
+      196,
+      197,
+      198,
+      199,
+      200
+    ],
+    "unavailableBSlots": [
+      169,
+      171,
+      174,
+      175,
+      177,
+      180,
+      181,
+      183,
+      186,
+      187,
+      189,
+      192,
+      194,
+      195,
+      197,
+      199
+    ],
+    "nativeStageMessageIDsDisjoint": true,
+    "nativeStagePlusWrapperPlusUnattributedPartitionVerified": true,
+    "cacheAndReasoningAreSubsetsNotAddedTwice": true
+  },
+  "workflowObservations": {
+    "BStatusCounts": {
+      "reviewed_delivery": 53,
+      "incomplete": 46,
+      "environment_error": 1
+    },
+    "repairStages": 0,
+    "evidenceCorrections": 1,
+    "sourceFilesChangedAfterAvailableD0": 0,
+    "qualification": "No post-D0 production repair established; missing D0 does not imply no implementation occurred. Test/docs changes and newly failing tests remain separate. Native status is not grader.",
+    "savedOrdinaryRegressions": [
+      "portable-path-core: D0 4/4, final4/5; erroneous added literal-backslash assertion",
+      "bigint-wire-boundary: D0 3/3, final3/4; added unsupported custom-prototype assertion",
+      "function-receiver-wrapper: D0 3/3, final3/4; new valid regression exposes existing source defect, not new production regression"
+    ]
+  },
+  "statistics": {
+    "status": "Frozen arithmetic checked only with planning/synthetic controls; confirmatory sample p/CI withheld",
+    "independentMethod": "Python exact binomial/multinomial enumeration for McNemar planning power; independently maximize constrained trinomial likelihood over nuisance probability and invert efficient score for 10 fixed controls.",
+    "planningPowerTwoSided": 0.8367351211564439,
+    "planningPowerPositive": 0.8367350635371915,
+    "scoreControlMaxAbsoluteDifferenceBelow": 2e-09,
+    "zeroDiscordance95": [
+      -0.03699349820698568,
+      0.03699349820698568
+    ],
+    "samplePValueComputed": false,
+    "sampleCIComputed": false,
+    "descriptivePartitionVerified": true,
+    "frozenStatisticsSHA256": "9be1674f10bdab20e235db1991ab75965f6a3356587c1fd6c787052d1f28478e"
+  },
+  "helperReviewConclusion": "No additional concrete issue found in bounded descriptive/unavailable/null/termination branches. Verified explicit unavailable records preserve null checks and manual flags; no baseline substitution. Completed/finished/cleanup and top-level-or-nested result stop evidence stay required. Native/provider costs remain separate.",
+  "limits": [
+    "Static semantic review plus read-only saved JSON/hash arithmetic. No candidate tests, model calls, account/model changes, provider continuations or scored reruns.",
+    "All original 25 discordant pairs retained in this artifact even though one was reclassified; review covered both arms and prior blind item-level assessments.",
+    "Source adjudication limitations remain explicit: ambiguous self-edge wording is not turned into new required behavior.",
+    "Standalone runtime primitive and Markdown evidence reviewed as retained observer evidence; not independently rerun in this turn.",
+    "D0 endpoint checks and recorded packet evidence verified; no independent re-execution or fresh D0 patch reconstruction in this final turn.",
+    "Detailed secondary narratives were read and reconciled with D0/final byte deltas and checks; not every raw native tool-event narrative was independently replayed.",
+    "Quota-interrupted operational dispositions do not establish a confirmatory 100-pair model-quality result or universal effectiveness.",
+    "No claim that static inspection proves absence of all unobserved candidate defects."
+  ],
+  "localFullReviewSHA256": "1957a0f2ba8f4c48a157774332d9e1da67b0e0b09a205fbdd9daf69026fbf1c4",
+  "evaluatedProviderRequestsDuringThisReview": 0
+}

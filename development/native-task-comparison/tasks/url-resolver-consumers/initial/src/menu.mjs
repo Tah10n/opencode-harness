@@ -1,0 +1,1 @@
+import {resolveLink} from './resolve.mjs';export function buildMenu(base,items){if(typeof base!=='string'||items.some(x=>typeof x.href!=='string'))throw new TypeError('strings');return items.map(item=>({label:item.label,href:resolveLink(base,item.href)}));}

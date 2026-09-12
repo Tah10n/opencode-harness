@@ -1,0 +1,16 @@
+{
+  "category": "compatibility",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert CRLF split across chunks and a final unterminated line.",
+    "Assert lone CR preservation, blank lines and finish/push lifecycle."
+  ],
+  "docDelivery": [
+    "Explain LF/CRLF grammar and bare CR preservation.",
+    "Describe incremental API, chunk-boundary invariance, final-line and closed-state rules."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Finite string chunks <=100000 UTF16 units, LF/CRLF only; lone CR data; closed-state push blocked, idempotent finish.",
+  "independence": "Support LF/CRLF streamed text chunks preserving split delimiter boundaries and final unterminated lines."
+}

@@ -1,0 +1,159 @@
+{
+  "passed": true,
+  "realProviderRequests": 0,
+  "results": [
+    {
+      "task": "editor-cancel",
+      "cases": [
+        {
+          "kind": "initial",
+          "ordinary": {
+            "exit": 0
+          },
+          "acceptance": {
+            "exit": 1
+          }
+        },
+        {
+          "kind": "reference",
+          "ordinary": {
+            "exit": 0
+          },
+          "acceptance": {
+            "exit": 0
+          }
+        },
+        {
+          "kind": "cancel-noop",
+          "acceptance": {
+            "exit": 1
+          }
+        },
+        {
+          "kind": "published-erased",
+          "acceptance": {
+            "exit": 1
+          }
+        },
+        {
+          "kind": "no-validation",
+          "acceptance": {
+            "exit": 1
+          }
+        },
+        {
+          "kind": "valid-alternative",
+          "acceptance": {
+            "exit": 0
+          }
+        }
+      ]
+    },
+    {
+      "task": "invite-single-use",
+      "cases": [
+        {
+          "kind": "initial",
+          "ordinary": {
+            "exit": 0
+          },
+          "acceptance": {
+            "exit": 1
+          }
+        },
+        {
+          "kind": "reference",
+          "ordinary": {
+            "exit": 0
+          },
+          "acceptance": {
+            "exit": 0
+          }
+        },
+        {
+          "kind": "reusable-token",
+          "acceptance": {
+            "exit": 1
+          }
+        },
+        {
+          "kind": "expiry-boundary",
+          "acceptance": {
+            "exit": 1
+          }
+        },
+        {
+          "kind": "expired-record-lost",
+          "acceptance": {
+            "exit": 1
+          }
+        },
+        {
+          "kind": "clock-read-twice",
+          "acceptance": {
+            "exit": 1
+          }
+        },
+        {
+          "kind": "valid-alternative",
+          "acceptance": {
+            "exit": 0
+          }
+        }
+      ]
+    },
+    {
+      "task": "queue-batch",
+      "cases": [
+        {
+          "kind": "initial",
+          "ordinary": {
+            "exit": 0
+          },
+          "acceptance": {
+            "exit": 1
+          }
+        },
+        {
+          "kind": "reference",
+          "ordinary": {
+            "exit": 0
+          },
+          "acceptance": {
+            "exit": 0
+          }
+        },
+        {
+          "kind": "failed-job-lost",
+          "acceptance": {
+            "exit": 1
+          }
+        },
+        {
+          "kind": "retry-processed-twice",
+          "acceptance": {
+            "exit": 1
+          }
+        },
+        {
+          "kind": "default-broken",
+          "acceptance": {
+            "exit": 1
+          }
+        },
+        {
+          "kind": "unsafe-integer-accepted",
+          "acceptance": {
+            "exit": 1
+          }
+        },
+        {
+          "kind": "valid-alternative",
+          "acceptance": {
+            "exit": 0
+          }
+        }
+      ]
+    }
+  ]
+}

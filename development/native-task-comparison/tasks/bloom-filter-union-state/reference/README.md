@@ -1,0 +1,3 @@
+# bloom-filter-union-state
+
+Bloom filter uses FNV-1a32 h1(2166136261,multiplier16777619), DJB2 h2(start5381,*33+byte) unsigned per UTF8 byte; force h2 odd. Positions (h1+i*h2)%bits without final uint32 wrap, LSB-first bits. TextEncoder string semantics,<=10000units; non-string TypeError. bits8..8192 multiple8, hashes1..8. add/union undefined return, has requires all bits. False positives valid; no exact-key side store/removal. Snapshot version1/bits/hashes/canonical padded base64, exact byte length; any valid bitvector accepted. Restore copies. Union validates snapshot and same dimensions/hash count before OR, failure atomic; commutative/idempotent and no false negatives. JSON continuation equivalent. Run npm test.

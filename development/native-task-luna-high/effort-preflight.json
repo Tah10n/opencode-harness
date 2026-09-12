@@ -1,0 +1,153 @@
+{
+  "status": "passed",
+  "realProviderCalls": 0,
+  "config": {
+    "model": "openai/gpt-5.6-luna",
+    "small_model": "openai/gpt-5.6-luna",
+    "provider": {
+      "openai": {
+        "options": {
+          "baseURL": "http://127.0.0.1:4099/v1",
+          "apiKey": "development-no-credential"
+        },
+        "models": {
+          "gpt-5.6-luna": {
+            "options": {
+              "reasoningEffort": "high"
+            },
+            "variants": {
+              "high": {
+                "reasoningEffort": "high"
+              }
+            }
+          }
+        }
+      }
+    },
+    "permission": {
+      "external_directory": "deny"
+    }
+  },
+  "requests": [
+    {
+      "arm": "P",
+      "stage": "title",
+      "path": "/v1/responses",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "arm": "P",
+      "stage": "plain",
+      "path": "/v1/responses",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "arm": "P",
+      "stage": "plain",
+      "path": "/v1/responses",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "arm": "P",
+      "stage": "plain",
+      "path": "/v1/responses",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "arm": "H",
+      "stage": "title",
+      "path": "/v1/responses",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "arm": "H",
+      "stage": "bootstrap",
+      "path": "/v1/responses",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "arm": "H",
+      "stage": "author",
+      "path": "/v1/responses",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "arm": "H",
+      "stage": "author",
+      "path": "/v1/responses",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "arm": "H",
+      "stage": "correction",
+      "path": "/v1/responses",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "arm": "H",
+      "stage": "correction",
+      "path": "/v1/responses",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "arm": "H",
+      "stage": "correction",
+      "path": "/v1/responses",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "arm": "H",
+      "stage": "bootstrap",
+      "path": "/v1/responses",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    }
+  ],
+  "summaries": [
+    {
+      "arm": "P",
+      "result": {
+        "exitCode": 0,
+        "termination": {
+          "terminationVerified": true,
+          "killed": []
+        },
+        "timedOut": false,
+        "elapsedMs": 2030,
+        "parseErrors": 0,
+        "phaseCount": 1,
+        "firstSessionID": "ses_f703ee3f5ffevXtFgPPANLJ6MD",
+        "continuationApplied": false
+      },
+      "repairs": 0
+    },
+    {
+      "arm": "H",
+      "result": {
+        "exitCode": 0,
+        "termination": {
+          "terminationVerified": true,
+          "killed": []
+        },
+        "timedOut": false,
+        "elapsedMs": 3550,
+        "parseErrors": 0,
+        "phaseCount": 1,
+        "firstSessionID": "ses_f703ed672ffe3sQpCcM2nGzs64",
+        "continuationApplied": false
+      },
+      "repairs": 1
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+[
+  {
+    "label": "F6",
+    "slot": 1,
+    "task": "legacy-runtime-reload",
+    "arm": "P",
+    "elapsedMs": 900107,
+    "exitCode": null,
+    "timedOut": true,
+    "toolCalls": 99,
+    "sessions": 2,
+    "termination": {
+      "terminationVerified": true,
+      "killed": []
+    },
+    "requests": 51,
+    "requestsWithoutUsage": 1,
+    "model": "gpt-5.6-luna",
+    "effort": "high",
+    "usage": {
+      "input_tokens": 4494812,
+      "output_tokens": 34160,
+      "total_tokens": 4528972,
+      "cached_tokens": 1521152,
+      "reasoning_tokens": 22755
+    },
+    "requestGroups": {
+      "work": {
+        "requests": 50,
+        "usage": {
+          "input_tokens": 4493703,
+          "output_tokens": 34084,
+          "total_tokens": 4527787,
+          "cached_tokens": 1521152,
+          "reasoning_tokens": 22693
+        }
+      },
+      "title": {
+        "requests": 1,
+        "usage": {
+          "input_tokens": 1109,
+          "output_tokens": 76,
+          "total_tokens": 1185,
+          "cached_tokens": 0,
+          "reasoning_tokens": 62
+        }
+      }
+    },
+    "workflowStatus": null,
+    "repairs": null,
+    "workflowStopReason": null,
+    "workflowLimits": null,
+    "stages": [],
+    "billedAmount": null,
+    "usageCompleteness": "lower-bound; one forwarded request has no terminal response or usage"
+  }
+]

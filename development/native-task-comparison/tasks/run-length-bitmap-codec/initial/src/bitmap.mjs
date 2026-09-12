@@ -1,0 +1,1 @@
+export function encode(width,height,bits){return {width,height,start:bits[0]??null,runs:bits.map(()=>1)};}export function decode(packet){const out=[];let bit=packet.start;for(const run of packet.runs){for(let i=0;i<run;i++)out.push(bit);bit=1-bit;}return out;}

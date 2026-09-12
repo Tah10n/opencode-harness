@@ -1,0 +1,1 @@
+export function createCommands(entries){return {run(name,...args){const entry=entries.find(e=>e.name===name);if(!entry)throw Object.assign(new Error('unknown'),{code:'UNKNOWN_COMMAND'});return Reflect.apply(entry.run,undefined,args);},help(){return entries.map(e=>({name:e.name,description:e.description??'',aliases:[]}));}};}

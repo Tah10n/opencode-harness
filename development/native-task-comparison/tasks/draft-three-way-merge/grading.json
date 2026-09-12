@@ -1,0 +1,16 @@
+{
+  "category": "state",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Independent field edits merge while a one-sided deletion is retained.",
+    "Delete versus explicit null conflict with presence-aware states."
+  ],
+  "docDelivery": [
+    "Top-level atomic three-way resolution and structural equality rules.",
+    "Conflicting field omitted, sorted conflict states and detached value ownership."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Base/local/remote ordinary Object.prototype records, fields contain acyclic ordinary JSON data/dense arrays, no undefined/getters/custom methods/symbols/nonfinite numbers/-0. Field keys arbitrary ASCII. Object key order irrelevant, arrays ordered. Top-level fields merge atomically.",
+  "independence": "Implement field-level three-way draft merge, deletion sentinels and conflict reporting relative to common base."
+}

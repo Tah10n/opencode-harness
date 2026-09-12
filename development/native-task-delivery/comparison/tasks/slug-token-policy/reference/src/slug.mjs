@@ -1,0 +1,1 @@
+import {tokens} from './tokens.mjs';export function slug(text,max=40){return tokens(text).join('-').slice(0,max).replace(/-+$/,'')||'untitled';}

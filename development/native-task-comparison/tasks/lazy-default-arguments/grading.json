@@ -1,0 +1,16 @@
+{
+  "category": "compatibility",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Prove missing lazy factory executes once per call while explicit undefined/null do not invoke it.",
+    "Prove ordinary function fallback is returned unchanged and getter/factory errors retain identity."
+  ],
+  "docDelivery": [
+    "Explain own-key presence versus value truthiness and inherited properties.",
+    "Document fourth-argument opt-in, factory receiver/key, no caching or awaiting and errors."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Ordinary settings stable own descriptors; string/symbol keys; default fallback any value, lazy callable; boolean option only.",
+  "independence": "Add lazy default factories to settings lookup preserving explicit undefined/null and call-count contracts."
+}

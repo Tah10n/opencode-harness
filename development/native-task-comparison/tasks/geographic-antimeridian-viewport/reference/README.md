@@ -1,0 +1,3 @@
+# geographic-antimeridian-viewport
+
+Bounds select smallest clockwise longitude arc, canonical[-180,180),180=-180; equal spans choose smallest west. East canonical west+width, crossing iff nonzero width/west>east; latitude extrema unchanged. createViewport preserves marker IDs/order, linear clockwise-x and north-down-y projection (not Mercator), collapsed axes centered. Integer lon[-180,180]/lat[-90,90],<=1000points, frozen accepted, invalid point RangeError. Positive finite pixels<=10000 validated even empty; empty bounds null/markers[]. ProjectPoint expects point inside supplied valid bounds. No input mutation. Run npm test.

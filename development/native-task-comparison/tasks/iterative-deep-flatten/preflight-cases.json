@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/flatten-core.mjs": "export function flattenValues(input,depth=Infinity){if(!Array.isArray(input)||!(depth===Infinity||Number.isSafeInteger(depth)&&depth>=0))throw new TypeError('flatten');const out=[],todo=[{array:input,index:0,depth}];while(todo.length){const current=todo.pop();if(current.index>=current.array.length)continue;const index=current.index;todo.push({...current,index:index+1});if(!Object.hasOwn(current.array,index))continue;const item=current.array[index];if(Array.isArray(item)&&current.depth>0)todo.push({array:item,index:0,depth:current.depth===Infinity?Infinity:current.depth-1});else out.push(item);}return out;}\n"
+  },
+  "mutants": [
+    {
+      "name": "holes-become-undefined",
+      "file": "src/flatten-core.mjs",
+      "replacement": "export function flattenValues(input,depth=Infinity){\n if(!Array.isArray(input)||!(depth===Infinity||Number.isSafeInteger(depth)&&depth>=0))throw new TypeError('flatten');\n const result=[],stack=[{array:input,index:0,depth}];\n while(stack.length){const top=stack.at(-1);if(top.index===top.array.length){stack.pop();continue;}const index=top.index++;const value=top.array[index];if(Array.isArray(value)&&top.depth>0)stack.push({array:value,index:0,depth:top.depth===Infinity?Infinity:top.depth-1});else result.push(value);}\n return result;\n}\n"
+    },
+    {
+      "name": "one-too-many-levels",
+      "file": "src/flatten-core.mjs",
+      "replacement": "export function flattenValues(input,depth=Infinity){\n if(!Array.isArray(input)||!(depth===Infinity||Number.isSafeInteger(depth)&&depth>=0))throw new TypeError('flatten');\n const result=[],stack=[{array:input,index:0,depth}];\n while(stack.length){const top=stack.at(-1);if(top.index===top.array.length){stack.pop();continue;}const index=top.index++;if(!Object.hasOwn(top.array,index))continue;const value=top.array[index];if(Array.isArray(value)&&top.depth>=0)stack.push({array:value,index:0,depth:top.depth===Infinity?Infinity:top.depth-1});else result.push(value);}\n return result;\n}\n"
+    }
+  ]
+}

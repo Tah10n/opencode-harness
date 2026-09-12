@@ -1,0 +1,19 @@
+{
+  "category": "refactoring",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert subview byte boundaries and copy isolation.",
+    "Assert serial awaiting, source snapshot before first await, exact metadata and stop on first failure."
+  ],
+  "docDelivery": [
+    "Document core byte-copy boundaries and domain.",
+    "Describe transport injection, eager snapshot, ordering and error/no-retry semantics."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Bounded non-shared Uint8Array byte views, pure copy chunks and serial injected async transport with exact errors.",
+  "manualBehavior": [
+    "upload delegates byte chunk formation to core; no duplicate chunk algorithm or ambient transport."
+  ],
+  "independence": "Separate chunk formation from upload transport preserving byte order, chunk bounds and first-failure behavior."
+}

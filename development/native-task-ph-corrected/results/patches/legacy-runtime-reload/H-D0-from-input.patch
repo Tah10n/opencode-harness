@@ -1,0 +1,96 @@
+diff --git a/packages/connector/lib/config.mjs b/packages/connector/lib/config.mjs
+index 779873c696f43cdbec130efa96b8120b75f88015..2f03b773b8e7a73546a1638f361dd298073a128a 100644
+--- a/packages/connector/lib/config.mjs
++++ b/packages/connector/lib/config.mjs
+@@ -214,6 +214,7 @@ async function inspectOwnedStateTree(path, paths = [stateDirectory], legacyPaths
+ 
+ async function recognizedLegacyRuntimePaths() {
+   const paths = new Set(["bin", "lib", "lib/adapters"]);
++  const files = new Set();
+   let entries;
+   try {
+     entries = await readdir(stateDirectory, { withFileTypes: true });
+@@ -233,14 +234,17 @@ async function recognizedLegacyRuntimePaths() {
+         return false;
+       if (info.isDirectory()) {
+         if (!(await visit(join(directory, entry.name), `${relativePath}/`))) return false;
+-      } else paths.add(relativePath);
++      } else {
++        paths.add(relativePath);
++        files.add(relativePath);
++      }
+     }
+     return true;
+   };
+   if (
+     !(await visit(join(stateDirectory, "bin"), "bin/")) ||
+     !(await visit(join(stateDirectory, "lib"), "lib/")) ||
+-    paths.size !== legacyRuntimeFiles.size + 3
++    [...legacyRuntimeFiles].some((path) => !files.has(path))
+   )
+     return new Set();
+   return paths;
+@@ -1329,7 +1333,11 @@ function installedRuntimeScript() {
+ async function verifyInstalledRuntime(directory) {
+   await access(join(directory, "bin", "viberacing.mjs"));
+   await Promise.all(installedRuntimeFiles.map((name) => access(join(directory, "lib", name))));
+-  await access(join(directory, "lib", "adapters", "codex.mjs"));
++  await Promise.all(
++    [...installedRuntimeAdapterFiles].map((name) =>
++      access(join(directory, "lib", "adapters", name)),
++    ),
++  );
+ }
+ 
+ async function installRuntime(sourceUrl) {
+diff --git a/packages/connector/test/config.test.mjs b/packages/connector/test/config.test.mjs
+index 20f2a6f98d1c565539340c4dc77c80c0fdd0a348..7e84c76aef72c57d1e7495f47ab14fe2abd9a833 100644
+--- a/packages/connector/test/config.test.mjs
++++ b/packages/connector/test/config.test.mjs
+@@ -370,6 +370,46 @@ test("rejects an incomplete runtime before pairing-compatible staging completes"
+   }
+ });
+ 
++test("migrates the exact flat runtime, preserves it, and reloads safely", async (context) => {
++  const home = await mkdtemp(join(tmpdir(), "viberacing-flat-runtime-"));
++  context.after(() => rm(home, { recursive: true, force: true }));
++  const restoreEnvironment = useModuleEnvironment(home);
++  try {
++    const state = join(home, ".viberacing");
++    const legacyFiles = [
++      "bin/viberacing.mjs",
++      "lib/browser.mjs", "lib/config.mjs", "lib/executables.mjs", "lib/readers.mjs",
++      "lib/registry.mjs", "lib/runtime.mjs",
++      ...["antigravity", "claude", "codex", "cursor", "gemini", "kimi", "opencode",
++        "qwen-settings", "qwen", "shared"].map((name) => `lib/adapters/${name}.mjs`),
++    ];
++    await mkdir(join(state, "lib", "adapters"), { recursive: true });
++    await mkdir(join(state, "bin"));
++    await writeFile(join(state, "installation.json"), JSON.stringify({
++      version: 1, id: "12345678-1234-4123-8123-123456789abc",
++      secret: "legacy_installation_secret_that_is_long_enough",
++    }) + "\n");
++    await writeFile(join(state, ".viberacing-state"), '{"format":1}\n');
++    const legacyLauncher = "// legacy launcher bytes\n";
++    for (const name of legacyFiles) {
++      const target = join(state, name);
++      if (name === "bin/viberacing.mjs") await writeFile(target, legacyLauncher);
++      else await writeFile(target, "// legacy module\n");
++    }
++    const module = await import(`../lib/config.mjs?flat=${encodeURIComponent(home)}`);
++    await module.installHooks(new URL("../bin/viberacing.mjs", import.meta.url), [source("codex")]);
++    assert.equal(await readFile(join(state, "bin/viberacing.mjs"), "utf8"), legacyLauncher);
++    assert.deepEqual(JSON.parse(await readFile(join(state, ".viberacing-state"), "utf8")), { format: 1 });
++    const installed = join(state, "runtime", connectorVersion, "lib", "adapters");
++    for (const name of ["shared.mjs", "qwen.mjs"]) await access(join(installed, name));
++    const reloaded = await import(`../lib/config.mjs?flat-reload=${encodeURIComponent(home)}`);
++    await reloaded.installHooks(new URL("../bin/viberacing.mjs", import.meta.url), [source("codex")]);
++    assert.equal(await readFile(join(state, "bin/viberacing.mjs"), "utf8"), legacyLauncher);
++  } finally {
++    restoreEnvironment();
++  }
++});
++
+ test("recovers a connection commit interrupted before the source registry is published", async () => {
+   const home = await mkdtemp(join(tmpdir(), "viberacing-connection-commit-"));
+   const restoreEnvironment = useModuleEnvironment(home);

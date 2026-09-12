@@ -1,0 +1,16 @@
+{
+  "category": "state",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Idle extension cannot exceed absolute deadline and equality is expired.",
+    "Snapshot timestamps round-trip unchanged; rejected/expired touch does not mutate source."
+  ],
+  "docDelivery": [
+    "Minimum idle/absolute deadline, pure timestamp-based evaluation and no system clock.",
+    "Snapshot shape/bounds, earlier-time rejection and distinct parse/state errors."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Pure state {created,lastSeen,idle,maxAge}; created integer0..1e12, ttl integer1..1e9, created<=lastSeen<created+maxAge; now safe integer>=lastSeen except rollback rejection. JSON snapshots ordinary unique keys, malformed syntax/shape included.",
+  "independence": "Implement idle plus absolute session expiry, touch semantics and serialized clock-independent state."
+}

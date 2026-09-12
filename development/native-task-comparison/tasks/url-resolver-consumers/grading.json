@@ -1,0 +1,16 @@
+{
+  "category": "compatibility",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert relative path/query/fragment behavior remains unchanged.",
+    "Assert URL objects through buildMenu and original URL/item immutability."
+  ],
+  "docDelivery": [
+    "Explain accepted URL/string forms and standard resolution/encoding behavior.",
+    "Document protocol validation, consumer output and no mutation/network operations."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Native WHATWG URL or strings; absolute http/https base and http/https result; frozen ordinary menu items; no network.",
+  "independence": "Preserve base-path resolution and query/fragment behavior when adding URL-object input to existing string API."
+}

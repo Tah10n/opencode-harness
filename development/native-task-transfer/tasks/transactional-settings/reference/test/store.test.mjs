@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import os from 'node:os';import path from 'node:path';
+import {read,transact} from '../src/store.mjs';test('legacy commit',()=>{const f=path.join(fs.mkdtempSync(path.join(os.tmpdir(),'settings-')),'s');fs.writeFileSync(f,JSON.stringify({revision:0,data:{x:1}}));assert.equal(transact(f,d=>{d.x=2;return 'ok'}).result,'ok');assert.deepEqual(read(f),{revision:1,data:{x:2}});});

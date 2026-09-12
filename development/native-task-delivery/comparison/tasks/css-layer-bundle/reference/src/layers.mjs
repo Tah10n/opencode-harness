@@ -1,0 +1,1 @@
+export function orderLayers(names,edges){const remaining=new Set(names),out=[];while(remaining.size){const ready=[...remaining].filter(n=>!edges.some(([a,b])=>b===n&&remaining.has(a))).sort();if(!ready.length)throw new RangeError('cycle');const n=ready[0];remaining.delete(n);out.push(n);}return out;}

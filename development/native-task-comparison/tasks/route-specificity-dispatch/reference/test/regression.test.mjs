@@ -1,0 +1,3 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {dispatch} from '../src/dispatch.mjs';test('specificity before registration',()=>assert.equal(dispatch([{pattern:'/u/:id',handle:()=>1},{pattern:'/u/new',handle:()=>2}],'/u/new'),2));test('decoded capture and empty wildcard',()=>{assert.equal(dispatch([{pattern:'/f/:id',handle:p=>p.id}],'/f/a%2Fb'),'a/b');assert.equal(dispatch([{pattern:'/f/*rest',handle:p=>p.rest}],'/f'),'');});
+test('only chosen handler executes',()=>{const calls=[];assert.equal(dispatch([{pattern:'/u/:id',handle:()=>{calls.push('parameter');return 1;}},{pattern:'/u/new',handle:()=>{calls.push('literal');return 2;}}],'/u/new'),2);assert.deepEqual(calls,['literal']);});

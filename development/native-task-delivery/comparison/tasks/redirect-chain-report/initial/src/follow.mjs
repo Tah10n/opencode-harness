@@ -1,0 +1,1 @@
+export function follow(start,links){return {chain:[start],terminal:start,cycle:false};}

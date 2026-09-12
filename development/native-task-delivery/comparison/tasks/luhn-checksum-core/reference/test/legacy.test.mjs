@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {describe} from '../src/describe.mjs';test('known digits',()=>assert.deepEqual(describe('79927398713'),{valid:true,masked:'*******8713'}));

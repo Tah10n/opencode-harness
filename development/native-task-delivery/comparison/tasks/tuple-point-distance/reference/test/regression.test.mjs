@@ -1,0 +1,5 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import path from 'node:path';import {fileURLToPath} from 'node:url';const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const m0=await import(path.join(root,"src/points.mjs"));
+test("mixed tuples through polyline length",()=>{assert.equal(m0.length([[0,0],{x:3,y:4},[3,8]]),9);assert.equal(m0.distance([3,4],{x:0,y:0}),5);});
+test("singleton validation and immutable inputs",()=>{assert.throws(()=>m0.length([[1,2,3]]),{name:'TypeError',message:'point'});assert.throws(()=>m0.distance([0,0],{x:'1',y:2}),TypeError);const x=Object.freeze([0,0]);assert.equal(m0.distance(x,Object.freeze([3,4])),5);assert.deepEqual(x,[0,0]);});
+test("empty singleton and negative coordinates",()=>{assert.equal(m0.length([]),0);assert.equal(m0.length([{x:2,y:3}]),0);assert.equal(m0.distance([-1,-2],[2,2]),5);});

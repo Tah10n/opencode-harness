@@ -1,0 +1,345 @@
+{
+  "slot": 5,
+  "task": "legacy-runtime-reload",
+  "arm": "C",
+  "exitCode": 0,
+  "timedOut": false,
+  "elapsedMs": 337727,
+  "phaseCount": 1,
+  "continuationApplied": false,
+  "requests": 30,
+  "requestsWithoutUsage": 0,
+  "workflowStatus": "incomplete",
+  "repairs": 0,
+  "toolCalls": 31,
+  "sessions": 5,
+  "usage": {
+    "input_tokens": 1365270,
+    "cached_tokens": 274432,
+    "output_tokens": 11276,
+    "reasoning_tokens": 2724,
+    "total_tokens": 1376546
+  },
+  "requestEfforts": {
+    "none": 1,
+    "low": 29
+  },
+  "httpStatuses": {
+    "200": 30
+  },
+  "terminationVerified": true,
+  "stages": [
+    {
+      "label": "implementation",
+      "role": "author",
+      "elapsedMs": 211255
+    },
+    {
+      "label": "review-0",
+      "role": "reviewer",
+      "elapsedMs": 22322
+    },
+    {
+      "label": "review-0-format",
+      "role": "reviewer",
+      "elapsedMs": 22140
+    },
+    {
+      "label": "reproduce-1",
+      "role": "author",
+      "elapsedMs": 25954
+    },
+    {
+      "label": "disposition-review-1",
+      "role": "reviewer",
+      "elapsedMs": 23952
+    },
+    {
+      "label": "disposition-review-1-format",
+      "role": "reviewer",
+      "elapsedMs": 23880
+    }
+  ],
+  "packet": "H8",
+  "delivery": {
+    "patchApplies": true,
+    "changedFiles": [
+      "packages/connector/README.md",
+      "packages/connector/lib/config.mjs",
+      "packages/connector/test/config.test.mjs"
+    ],
+    "patchSha256": "6b0186f6e4ff599afd0355205fa4fdd9e64cd9babf4d149bc1c31e5cdd37d378"
+  },
+  "sourceReview": {
+    "packet": "H8",
+    "sourceReview": {
+      "implementation": "Extends existing owned-path validation with explicit old library/adapter sets. Keeps file type, symlink, ownership, identity, migration and runtime installation logic. Existing flat-launcher executable handling is preserved. No whole-set completeness assumption is added.",
+      "tests": "Adds marked legacy-layout preparation and cache-busted reload while checking original bytes/current runtime presence; adds unknown-entry rejection. The positive test precreates the ownership marker and reloads within one process, so it is not by itself an unmarked fresh-process migration test. Independent historical and fresh-process tests cover that distinction. Existing assertions remain unchanged.",
+      "documentation": "README describes side-by-side current runtime and byte preservation. Wording lib/*.mjs is contextual shorthand followed by unknown-file rejection, while the implementation uses an explicit allowlist.",
+      "staticDefects": [],
+      "D0ToFinal": "No file bytes changed after D0; all delivered tests were already present before review."
+    },
+    "behaviorVerdict": "All executed independent checks passed",
+    "completenessVerdict": "requirements delivered within targeted scope"
+  },
+  "grading": {
+    "final": {
+      "packet": "H8",
+      "phase": "final",
+      "checks": {
+        "ordinary": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 24,
+            "pass": 23,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 4,
+            "pass": 4,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 24,
+            "pass": 23,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "preserved-consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 2,
+            "pass": 2,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "legacy-acceptance": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 9,
+            "pass": 9,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "acceptance": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      },
+      "passed": true,
+      "cleanup": 0
+    },
+    "D0": {
+      "packet": "H8",
+      "phase": "D0",
+      "checks": {
+        "ordinary": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 24,
+            "pass": 23,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 4,
+            "pass": 4,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 24,
+            "pass": 23,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "preserved-consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 2,
+            "pass": 2,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "legacy-acceptance": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 9,
+            "pass": 9,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "acceptance": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      },
+      "passed": true,
+      "cleanup": 0
+    }
+  },
+  "evidenceSelections": [
+    {
+      "review": "review-0-bindings.json",
+      "selections": [
+        {
+          "selected": "E26-6456786990b2-0",
+          "ref": "E26-6456786990b2-0",
+          "scope": "6456786990b2-0",
+          "eventIndex": 25,
+          "callID": "call_dRMtpupbiiLEvdZPIFJH5NXO",
+          "state": "completed",
+          "exit": 0,
+          "before": "7fbe949f86bec3fdb284811e46998c16d487d4833bbf4ca9540564a555c04004",
+          "after": "7fbe949f86bec3fdb284811e46998c16d487d4833bbf4ca9540564a555c04004",
+          "snapshotSha256": "7fbe949f86bec3fdb284811e46998c16d487d4833bbf4ca9540564a555c04004",
+          "current": true,
+          "resolved": true
+        },
+        {
+          "selected": "E27-6456786990b2-0",
+          "ref": "E27-6456786990b2-0",
+          "scope": "6456786990b2-0",
+          "eventIndex": 26,
+          "callID": "call_aQiuXjT1cra93MHXvxb7FQMb",
+          "state": "completed",
+          "exit": 1,
+          "before": "7fbe949f86bec3fdb284811e46998c16d487d4833bbf4ca9540564a555c04004",
+          "after": "7fbe949f86bec3fdb284811e46998c16d487d4833bbf4ca9540564a555c04004",
+          "snapshotSha256": "7fbe949f86bec3fdb284811e46998c16d487d4833bbf4ca9540564a555c04004",
+          "current": true,
+          "resolved": true
+        },
+        {
+          "selected": "E28-6456786990b2-0",
+          "ref": "E28-6456786990b2-0",
+          "scope": "6456786990b2-0",
+          "eventIndex": 27,
+          "callID": "call_TeORedKvIIt1yGF9Gxv3CrB0",
+          "state": "completed",
+          "exit": 0,
+          "before": "7fbe949f86bec3fdb284811e46998c16d487d4833bbf4ca9540564a555c04004",
+          "after": "7fbe949f86bec3fdb284811e46998c16d487d4833bbf4ca9540564a555c04004",
+          "snapshotSha256": "7fbe949f86bec3fdb284811e46998c16d487d4833bbf4ca9540564a555c04004",
+          "current": true,
+          "resolved": true
+        }
+      ]
+    },
+    {
+      "review": "disposition-review-1-bindings.json",
+      "selections": [
+        {
+          "selected": "E26-6456786990b2-1",
+          "ref": "E26-6456786990b2-1",
+          "scope": "6456786990b2-1",
+          "eventIndex": 25,
+          "callID": "call_dRMtpupbiiLEvdZPIFJH5NXO",
+          "state": "completed",
+          "exit": 0,
+          "before": "7fbe949f86bec3fdb284811e46998c16d487d4833bbf4ca9540564a555c04004",
+          "after": "7fbe949f86bec3fdb284811e46998c16d487d4833bbf4ca9540564a555c04004",
+          "snapshotSha256": "7fbe949f86bec3fdb284811e46998c16d487d4833bbf4ca9540564a555c04004",
+          "current": true,
+          "resolved": true
+        },
+        {
+          "selected": "E30-6456786990b2-1",
+          "ref": "E30-6456786990b2-1",
+          "scope": "6456786990b2-1",
+          "eventIndex": 29,
+          "callID": "call_vh6NW6CxKqQqTDbsCb9WwMa1",
+          "state": "completed",
+          "exit": 0,
+          "before": "7fbe949f86bec3fdb284811e46998c16d487d4833bbf4ca9540564a555c04004",
+          "after": "7fbe949f86bec3fdb284811e46998c16d487d4833bbf4ca9540564a555c04004",
+          "snapshotSha256": "7fbe949f86bec3fdb284811e46998c16d487d4833bbf4ca9540564a555c04004",
+          "current": true,
+          "resolved": true
+        },
+        {
+          "selected": "E27-6456786990b2-1",
+          "ref": "E27-6456786990b2-1",
+          "scope": "6456786990b2-1",
+          "eventIndex": 26,
+          "callID": "call_aQiuXjT1cra93MHXvxb7FQMb",
+          "state": "completed",
+          "exit": 1,
+          "before": "7fbe949f86bec3fdb284811e46998c16d487d4833bbf4ca9540564a555c04004",
+          "after": "7fbe949f86bec3fdb284811e46998c16d487d4833bbf4ca9540564a555c04004",
+          "snapshotSha256": "7fbe949f86bec3fdb284811e46998c16d487d4833bbf4ca9540564a555c04004",
+          "current": true,
+          "resolved": true
+        },
+        {
+          "selected": "E28-6456786990b2-1",
+          "ref": "E28-6456786990b2-1",
+          "scope": "6456786990b2-1",
+          "eventIndex": 27,
+          "callID": "call_TeORedKvIIt1yGF9Gxv3CrB0",
+          "state": "completed",
+          "exit": 0,
+          "before": "7fbe949f86bec3fdb284811e46998c16d487d4833bbf4ca9540564a555c04004",
+          "after": "7fbe949f86bec3fdb284811e46998c16d487d4833bbf4ca9540564a555c04004",
+          "snapshotSha256": "7fbe949f86bec3fdb284811e46998c16d487d4833bbf4ca9540564a555c04004",
+          "current": true,
+          "resolved": true
+        }
+      ]
+    }
+  ]
+}

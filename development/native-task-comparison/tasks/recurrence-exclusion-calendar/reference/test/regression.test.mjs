@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {calendar} from '../src/calendar.mjs';test('weekday exclusion before move',()=>assert.deepEqual(calendar({start:'2024-01-01',end:'2024-01-16',weekdays:[1,1],exclude:['2024-01-08'],replace:{'2024-01-08':'2024-01-09','2024-01-15':'2023-12-31'}}),[{original:'2024-01-15',date:'2023-12-31'},{original:'2024-01-01',date:'2024-01-01'}]));

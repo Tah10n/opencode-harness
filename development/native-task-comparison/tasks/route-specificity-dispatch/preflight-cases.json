@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/dispatch.mjs": "import {match} from './match.mjs';export function dispatch(routes,path){const candidates=routes.map((r,i)=>({r,i,m:match(r.pattern,path)})).filter(x=>x.m);candidates.sort((a,b)=>{const x=[...a.m.rank,3],y=[...b.m.rank,3];for(let i=0;i<Math.max(x.length,y.length);i++){const d=(y[i]??-1)-(x[i]??-1);if(d)return d;}return a.i-b.i;});const first=candidates[0];return first?first.r.handle(first.m.params):null;}\n"
+  },
+  "mutants": [
+    {
+      "name": "registration-before-specificity",
+      "file": "src/dispatch.mjs",
+      "replacement": "import {match} from './match.mjs';export function dispatch(routes,path){for(const r of routes){const m=match(r.pattern,path);if(m)return r.handle(m.params);}return null;}\n"
+    },
+    {
+      "name": "no-percent-decoding",
+      "file": "src/match.mjs",
+      "replacement": "export function match(pattern,path){const p=pattern==='/'?[]:pattern.slice(1).split('/'),s=path==='/'?[]:path.slice(1).split('/');const params={},rank=[];let i=0;for(const part of p){if(part.startsWith('*')){Object.defineProperty(params,part.slice(1),{value:s.slice(i).map(decodeURIComponent).join('/'),enumerable:true,writable:true,configurable:true});rank.push(0);i=s.length;break;}if(i>=s.length)return null;const value=s[i++];if(part.startsWith(':')){Object.defineProperty(params,part.slice(1),{value,enumerable:true,writable:true,configurable:true});rank.push(1);}else{if(part!==value)return null;rank.push(2);}}return i===s.length?{params,rank}:null;}\n"
+    }
+  ]
+}

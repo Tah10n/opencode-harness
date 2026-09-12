@@ -1,0 +1,16 @@
+{
+  "category": "integration",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Ordered rotate/crop/fit with rounding.",
+    "Crop rejection against dimensions after rotation."
+  ],
+  "docDelivery": [
+    "Metadata-only ordered transformations, crop bounds and RangeError.",
+    "Fit preserves aspect by a capped scale then floors/clamps dimensions; extra metadata preserved."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Image plain own-data record with positive integer width/height <=10000, arbitrary JSON extra fields (acyclic dense arrays/plain records, finite numbers, no custom methods). Operations valid rotate/crop/fit records as defined; crop may be out of bounds. No pixel data.",
+  "independence": "Integrate ordered crop/rotate/resize geometry operations with metadata dimensions and no-op preservation."
+}

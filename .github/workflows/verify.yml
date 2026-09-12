@@ -8,12 +8,69 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      mode:
+        description: Full merge checkpoint or targeted model-free diagnostic (not merge evidence)
+        type: choice
+        default: full
+        options: [full, targeted]
+
+concurrency:
+  group: verify-${{ github.workflow }}-${{ github.head_ref || github.ref }}-${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'ordinary' }}
+  cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' }}
 
 permissions:
   contents: read
 
 jobs:
+  scope:
+    name: CI scope and targeted checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      plan: ${{ steps.scope.outputs.plan }}
+      full: ${{ steps.scope.outputs.full }}
+      native: ${{ steps.scope.outputs.native }}
+      linux: ${{ steps.scope.outputs.linux }}
+      windows: ${{ steps.scope.outputs.windows }}
+      macos: ${{ steps.scope.outputs.macos }}
+      diagnostic: ${{ steps.scope.outputs.diagnostic }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: '24'
+      - id: scope
+        env:
+          CI_MODE: ${{ inputs.mode || 'fast' }}
+        run: node scripts/ci-scope.mjs
+      - run: node scripts/verify-ci-scope.mjs
+      - run: node scripts/verify-native-launcher.mjs
+      - run: node development/native-task-comparison/verify-results.mjs
+
+  required-status:
+    name: ${{ needs.scope.outputs.diagnostic == 'true' && 'Diagnostic scope only (not merge evidence)' || 'Harness verification' }}
+    if: ${{ always() && needs.scope.outputs.diagnostic != 'true' }}
+    needs: [scope, verify, linux-containment, windows-containment, macos-containment, milestone-2-status, native-review]
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: '24'
+      - env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: node scripts/ci-scope.mjs gate
+
   verify:
+    needs: scope
+    if: needs.scope.outputs.full == 'true'
     name: Harness verification (deterministic)
     runs-on: ubuntu-latest
     timeout-minutes: 360
@@ -27,12 +84,6 @@ jobs:
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: "24"
-
-      - name: Verify native template materialization
-        run: node scripts/verify-native-template.mjs
-
-      - name: Verify native review materialization and snapshot
-        run: node scripts/verify-native-review.mjs
 
       - name: Harden trusted Node distribution permissions
         shell: bash
@@ -172,6 +223,8 @@ jobs:
           exit "$cleanup_status"
 
   linux-containment:
+    needs: scope
+    if: needs.scope.outputs.linux == 'true'
     name: Linux cgroup-v2 operational evidence
     runs-on: ubuntu-latest
     steps:
@@ -370,6 +423,8 @@ jobs:
           exit "$cleanup_status"
 
   windows-containment:
+    needs: scope
+    if: needs.scope.outputs.windows == 'true'
     name: Windows Job Object operational evidence
     runs-on: windows-latest
     steps:
@@ -398,6 +453,8 @@ jobs:
           if-no-files-found: error
 
   macos-containment:
+    needs: scope
+    if: needs.scope.outputs.macos == 'true'
     name: macOS exclusive-UID operational evidence
     runs-on: macos-latest
     timeout-minutes: 360
@@ -705,8 +762,9 @@ jobs:
 
   milestone-2-status:
     name: Milestone 2 receipt aggregation
-    if: always()
+    if: ${{ always() && needs.scope.outputs.full == 'true' }}
     needs:
+      - scope
       - verify
       - linux-containment
       - windows-containment
@@ -764,7 +822,9 @@ jobs:
           if-no-files-found: error
 
   native-review:
-    name: Native review installed wiring (model-free)
+    needs: scope
+    if: needs.scope.outputs.native == 'true'
+    name: Native review and task installed wiring (model-free)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -774,6 +834,15 @@ jobs:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: "24"
+      - name: Verify native template materialization
+        run: node scripts/verify-native-template.mjs
+
+      - name: Verify native task controller regressions
+        run: node scripts/verify-native-task.mjs
+
+      - name: Verify native review materialization and snapshot
+        run: node scripts/verify-native-review.mjs
+
       - name: Install pinned native OpenCode without lifecycle scripts
         run: npm install --ignore-scripts --no-audit --no-fund --prefix "$RUNNER_TEMP/native-opencode" opencode-linux-x64@1.18.26
       - name: Verify installed config and local scripted fixture
@@ -782,3 +851,5 @@ jobs:
         run: |
           node scripts/verify-native-template-config.mjs --review
           node scripts/verify-native-review-fixture.mjs
+          node scripts/verify-native-task-format.mjs
+          node scripts/verify-native-task-fixture.mjs

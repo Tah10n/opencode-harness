@@ -7,6 +7,12 @@ OpenCode with only an instruction file and config. Its current revision has no
 model-backed effectiveness result; [six development outcomes and trace audit](docs/native-template/DEVELOPMENT.md) remain diagnostic.
 
 Optional native diagnostic review: see [the explicit review command](docs/native-template/NATIVE-REVIEW.md).
+
+For experimental delivery with factual checks and up to three corrective replies in one session, use the
+explicit [`/harness-task` workflow](docs/native-task/README.md). Install with
+`--native --task`; delivery stays in its own retained Git worktree so concurrent
+user changes in the original checkout are preserved. Its diagnostic pilot and
+limitations are reported separately from scripted workflow checks.
 `--native --review` adds `/harness-review` for a fresh native session without
 automatic repair, model/default changes or a plugin. Ordinary `--native` remains
 the original two-file mode. Quality lift remains unproven.

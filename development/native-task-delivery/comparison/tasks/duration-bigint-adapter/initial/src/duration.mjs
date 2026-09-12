@@ -1,0 +1,1 @@
+export function splitMillis(ms){return {seconds:Math.floor(ms/1000),millis:ms%1000};}export function display(ms){const r=splitMillis(ms);return String(r.seconds)+'.'+String(r.millis).padStart(3,'0')+'s';}

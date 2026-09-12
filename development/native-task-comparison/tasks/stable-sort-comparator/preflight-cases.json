@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/sort.mjs": "export function sorted(values,compare){\n const present=[];let undefinedCount=0;\n for(let i=0;i<values.length;i++)if(Object.hasOwn(values,i)){if(values[i]===undefined)undefinedCount++;else present.push({value:values[i],index:i});}\n const comparator=compare===undefined?((a,b)=>String(a)<String(b)?-1:String(a)>String(b)?1:0):compare;\n present.sort((a,b)=>{const c=comparator(a.value,b.value);return c<0?-1:c>0?1:a.index-b.index;});\n const result=new Array(values.length);let index=0;for(const item of present)result[index++]=item.value;while(undefinedCount--)result[index++]=undefined;return result;\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "ignores-comparator",
+      "file": "src/sort.mjs",
+      "replacement": "export function sorted(values,compare){return values.slice().sort();}\n"
+    },
+    {
+      "name": "fills-holes",
+      "file": "src/sort.mjs",
+      "replacement": "export function sorted(values,compare){return [...values].sort(compare);}\n"
+    }
+  ]
+}

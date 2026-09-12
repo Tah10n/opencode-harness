@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/reader.mjs": "export function createReader(readFile){\n return function(...args){\n  const [path,second,third]=args,callback=typeof second==='function'?second:third,signal=typeof second==='function'?undefined:second?.signal;\n  if(typeof callback!=='function')throw new TypeError('callback');\n  let active=true,remove=()=>{};\n  const deliver=(error,data)=>{if(!active)return;active=false;remove();callback(error,data);};\n  if(signal?.aborted){deliver(signal.reason,undefined);return;}\n  if(signal){const listener=()=>deliver(signal.reason,undefined);signal.addEventListener('abort',listener);let attached=true;remove=()=>{if(attached){attached=false;signal.removeEventListener('abort',listener);}};}\n  try{readFile(path,deliver);}catch(error){active=false;remove();throw error;}\n };\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "duplicate-callback-delivery",
+      "file": "src/reader.mjs",
+      "replacement": "export function createReader(readFile){\n return function read(path,options,callback){\n  if(typeof options==='function'){callback=options;options={};}\n  if(typeof callback!=='function')throw new TypeError('callback');\n  const signal=options?.signal;let settled=false,listening=false;\n  const cleanup=()=>{if(listening){listening=false;signal.removeEventListener('abort',abort);}};\n  const finish=(error,data)=>{settled=true;cleanup();Reflect.apply(callback,undefined,[error,data]);};\n  const abort=()=>finish(signal.reason,undefined);\n  if(signal?.aborted){abort();return undefined;}\n  if(signal){signal.addEventListener('abort',abort);listening=true;}\n  try{readFile(path,(error,data)=>finish(error,data));}catch(error){settled=true;cleanup();throw error;}\n  return undefined;\n };\n}\n"
+    },
+    {
+      "name": "preabort-starts-reader",
+      "file": "src/reader.mjs",
+      "replacement": "export function createReader(readFile){\n return function read(path,options,callback){\n  if(typeof options==='function'){callback=options;options={};}\n  if(typeof callback!=='function')throw new TypeError('callback');\n  const signal=options?.signal;let settled=false,listening=false;\n  const cleanup=()=>{if(listening){listening=false;signal.removeEventListener('abort',abort);}};\n  const finish=(error,data)=>{if(settled)return;settled=true;cleanup();Reflect.apply(callback,undefined,[error,data]);};\n  const abort=()=>finish(signal.reason,undefined);\n  if(signal?.aborted){abort();}\n  if(signal){signal.addEventListener('abort',abort);listening=true;}\n  try{readFile(path,(error,data)=>finish(error,data));}catch(error){settled=true;cleanup();throw error;}\n  return undefined;\n };\n}\n"
+    }
+  ]
+}

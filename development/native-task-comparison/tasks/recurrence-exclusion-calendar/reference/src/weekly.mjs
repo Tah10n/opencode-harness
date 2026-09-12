@@ -1,0 +1,1 @@
+const day=86400000;export function occurrences(start,end,weekdays){const out=[];for(let t=Date.parse(start+'T00:00:00Z');t<Date.parse(end+'T00:00:00Z');t+=day){const d=new Date(t);if(weekdays.includes(d.getUTCDay()))out.push(d.toISOString().slice(0,10));}return out;}

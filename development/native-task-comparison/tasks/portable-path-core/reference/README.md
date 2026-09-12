@@ -1,0 +1,3 @@
+# portable-path-core
+
+normalizePosix is a pure string core used by run and the Node CLI. Only '/' separates: repeated separators/dot segments collapse, absolute '..' clamps at root and leading relative '..' remains. Backslash/drive-looking text is literal. Empty relative output '.', root '/', and literal trailing slash retained (a/../ => ./). Non-string/NUL input throws TypeError. No cwd, filesystem existence or realpath; explicit POSIX routines are portable. Run node src/cli.mjs <value>: one normalized line/status0, wrong arity usage line/status2. No input mutation or duplicate CLI normalization. Run npm test.

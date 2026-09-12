@@ -23,6 +23,9 @@
   },
   "homepage": "https://github.com/Tah10n/opencode-harness#readme",
   "scripts": {
+    "verify:native-task": "node scripts/verify-native-task.mjs",
+    "verify:native-task:fixture": "node scripts/verify-native-task-fixture.mjs",
+    "verify:native-task:pilot": "node scripts/verify-native-task-pilot.mjs",
     "verify:native-template": "node scripts/verify-native-template.mjs",
     "verify:native-review": "node scripts/verify-native-review.mjs",
     "verify:native-review:config": "node scripts/verify-native-template-config.mjs --review",

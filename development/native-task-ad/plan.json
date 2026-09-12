@@ -1,0 +1,93 @@
+{
+  "kind": "four-reused-task-development-ad",
+  "tasks": [
+    {
+      "id": "protocol-error-api",
+      "category": "api-integration",
+      "repository": "https://github.com/Tah10n/viberacing",
+      "sourceCommit": "7b1909acb25e4ad764c00dc2211ae7f793c64f00",
+      "sourceTree": "03338b32f292540d5c2fef8d9c62aec2f38f6fdc",
+      "referenceCommit": null,
+      "independentEvaluation": "Behavior tests through public protocol/config and real CLI entry points; original regression preservation with only task-intended assertion adaptation; test/docs completeness and integration review; clean-baseline patch reapplication and installed runtime loading. Evaluator and reference files are provided only after all model processes terminate."
+    },
+    {
+      "id": "legacy-runtime-reload",
+      "category": "state-migration",
+      "repository": "https://github.com/Tah10n/viberacing",
+      "sourceCommit": "7b1909acb25e4ad764c00dc2211ae7f793c64f00",
+      "sourceTree": "03338b32f292540d5c2fef8d9c62aec2f38f6fdc",
+      "referenceCommit": "1f93461775fada13317ad0aea47d5c23b3a52491",
+      "independentEvaluation": "Behavior tests through public protocol/config and real CLI entry points; original regression preservation with only task-intended assertion adaptation; test/docs completeness and integration review; clean-baseline patch reapplication and installed runtime loading. Evaluator and reference files are provided only after all model processes terminate."
+    },
+    {
+      "id": "reconnect-revoked",
+      "category": "error-recovery",
+      "repository": "https://github.com/Tah10n/viberacing",
+      "sourceCommit": "f34568c65e9dc97b19fd06314f19c80de3759fce",
+      "sourceTree": "a6f30883d275f579995573b049d1a570ce7ec99e",
+      "referenceCommit": "9f1e6fea0100b65f1806400b2668e17cfbd88e82",
+      "independentEvaluation": "Behavior tests through public protocol/config and real CLI entry points; original regression preservation with only task-intended assertion adaptation; test/docs completeness and integration review; clean-baseline patch reapplication and installed runtime loading. Evaluator and reference files are provided only after all model processes terminate."
+    },
+    {
+      "id": "request-module-extraction",
+      "category": "refactoring",
+      "repository": "https://github.com/Tah10n/viberacing",
+      "sourceCommit": "7b1909acb25e4ad764c00dc2211ae7f793c64f00",
+      "sourceTree": "03338b32f292540d5c2fef8d9c62aec2f38f6fdc",
+      "referenceCommit": null,
+      "independentEvaluation": "Behavior tests through public protocol/config and real CLI entry points; original regression preservation with only task-intended assertion adaptation; test/docs completeness and integration review; clean-baseline patch reapplication and installed runtime loading. Evaluator and reference files are provided only after all model processes terminate."
+    }
+  ],
+  "schedule": [
+    {
+      "slot": 1,
+      "task": "protocol-error-api",
+      "arm": "A"
+    },
+    {
+      "slot": 2,
+      "task": "protocol-error-api",
+      "arm": "D"
+    },
+    {
+      "slot": 3,
+      "task": "legacy-runtime-reload",
+      "arm": "D"
+    },
+    {
+      "slot": 4,
+      "task": "legacy-runtime-reload",
+      "arm": "A"
+    },
+    {
+      "slot": 5,
+      "task": "reconnect-revoked",
+      "arm": "D"
+    },
+    {
+      "slot": 6,
+      "task": "reconnect-revoked",
+      "arm": "A"
+    },
+    {
+      "slot": 7,
+      "task": "request-module-extraction",
+      "arm": "A"
+    },
+    {
+      "slot": 8,
+      "task": "request-module-extraction",
+      "arm": "D"
+    }
+  ],
+  "model": "openai/gpt-5.6-luna",
+  "variant": "low",
+  "openCodeVersion": "1.18.26",
+  "budgetMs": 900000,
+  "attempts": 8,
+  "retries": 0,
+  "independentEvaluation": "Unchanged development/native-task-abc/evaluation-plan.json and retained grader inputs. Behavior and necessary delivered coverage assessed separately. No grader/reference files in model containers.",
+  "claimBoundary": "Reused development tasks, not an independent benchmark or general lift estimate. D0/final patches and all eight outcomes retained. Quota or common environment failure stops scheduling; ordinary task failures do not.",
+  "authorPasses": "D: one author session, initial completion then zero or one factual corrective pass, all within 900 seconds.",
+  "frozenBeforeResults": true
+}

@@ -1,0 +1,19 @@
+{
+  "category": "refactoring",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert row/column enumeration and distinct spanning placement.",
+    "Assert full-rectangle conflict avoidance, exhaustion, input preservation and rendered text."
+  ],
+  "docDelivery": [
+    "Document first-fit strategy order, span constraints and failure semantics.",
+    "Explain renderer format and no backtracking/rotation."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Deterministic first-fit matrix placement with rectangular spans and row/column enumeration strategies.",
+  "manualBehavior": [
+    "Layout uses shared coordinate strategy with one occupancy/placement policy, no parallel row/column algorithms."
+  ],
+  "independence": "Separate row/column layout strategies from a grid renderer preserving spans and occupied-cell conflict behavior."
+}

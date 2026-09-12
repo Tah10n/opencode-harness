@@ -1,0 +1,16 @@
+{
+  "category": "compatibility",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert method receiver, arguments and exact return identity.",
+    "Assert thrown identity and one timing event, plus Promise identity without waiting."
+  ],
+  "docDelivery": [
+    "Explain dynamic receiver/arguments and timing event fields.",
+    "State synchronous-only Promise handling, injection assumptions and excluded constructor/metadata behavior."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Synchronous call instrumentation of ordinary callables; injected nonthrowing monotonic finite clock and recorder; no constructors or wrapper metadata contract.",
+  "independence": "Add timing instrumentation wrappers preserving this, arguments, return identity and thrown errors."
+}

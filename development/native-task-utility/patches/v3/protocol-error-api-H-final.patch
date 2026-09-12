@@ -1,0 +1,181 @@
+diff --git a/packages/connector/README.md b/packages/connector/README.md
+index 5a1e8c684bc8007a1c7ce110cb2114691c06d0af..906048580659a9bd4dde6a7567328a20ee585aa4 100644
+--- a/packages/connector/README.md
++++ b/packages/connector/README.md
+@@ -4,6 +4,12 @@ The Node 24 LTS connector collects exact aggregate token counters from supported
+ sources and pairs them with Vibe Racing agent accounts. It never uploads raw sessions or local
+ paths.
+ 
++The connector protocol module validates bounded JSON responses before consumers use them. A valid
++non-success response rejects with an `Error` whose `status` is the HTTP status and whose `code` is
++the validated server error code. Invalid, oversized, malformed, non-JSON, or terminal-control-
++containing responses reject as `invalid_server_response`; they are never treated as trusted server
++errors. The CLI request path uses these fields to preserve cleanup, retry, and quarantine behavior.
++
+ ```bash
+ npx --yes --prefer-online --package https://viberacing.example/downloads/viberacing-connector.tgz -- \
+   viberacing connect --origin https://viberacing.example
+diff --git a/packages/connector/bin/viberacing.mjs b/packages/connector/bin/viberacing.mjs
+index 5fde3a9b656377e0266fbde7eda922c752933bdf..536732b30b196b30895986434df43bd8d5c0edfc 100755
+--- a/packages/connector/bin/viberacing.mjs
++++ b/packages/connector/bin/viberacing.mjs
+@@ -185,29 +185,16 @@ async function request(origin, path, options = {}, attempts = 1, responseContext
+         signal: AbortSignal.timeout(15_000),
+         redirect: "error",
+       });
+-      let payload;
+       try {
+-        payload = await parseProtocolResponse(response, responseContext);
++        return await parseProtocolResponse(response, responseContext);
+       } catch (error) {
+-        if (
+-          error?.code === "invalid_server_response" &&
+-          (response.status >= 500 || response.status === 429)
+-        ) {
++        const retryable = response.status >= 500 || response.status === 429;
++        if (error?.code === "invalid_server_response" && retryable)
+           error.status = response.status;
++        if (error?.status === response.status)
+           error.retryAfterMs = retryAfterMilliseconds(response);
+-        }
+         throw error;
+       }
+-      if (!response.ok) {
+-        const error = new Error(
+-          `Vibe Racing returned ${response.status}: ${payload.error ?? "request failed"}`,
+-        );
+-        error.status = response.status;
+-        error.code = payload.error;
+-        error.retryAfterMs = retryAfterMilliseconds(response);
+-        if (response.status < 500 && response.status !== 429) throw error;
+-        lastError = error;
+-      } else return payload;
+     } catch (error) {
+       lastError = error;
+       if (
+diff --git a/packages/connector/lib/protocol.mjs b/packages/connector/lib/protocol.mjs
+index f1ceba9e22799e19036840d8e4b68db7e747c869..87d91231f60fc163498ab4b964aaf491f077cbda 100644
+--- a/packages/connector/lib/protocol.mjs
++++ b/packages/connector/lib/protocol.mjs
+@@ -292,7 +292,10 @@ export async function parseProtocolResponse(response, context) {
+       !errorCodePattern.test(value.error)
+     )
+       throw invalid();
+-    return { error: value.error };
++    const error = new Error(`Vibe Racing returned ${response.status}: ${value.error}`);
++    error.status = response.status;
++    error.code = value.error;
++    throw error;
+   }
+   if (context.kind === "pairingStart") return parsePairingStart(value, context);
+   if (context.kind === "pairingPoll") return parsePairingPoll(value, context);
+diff --git a/packages/connector/test/config.test.mjs b/packages/connector/test/config.test.mjs
+index 20f2a6f98d1c565539340c4dc77c80c0fdd0a348..098dc5bf5050fd30dc5a87da5bdd09f636c1faa5 100644
+--- a/packages/connector/test/config.test.mjs
++++ b/packages/connector/test/config.test.mjs
+@@ -3433,7 +3433,7 @@ test("reconnect retires only an explicitly disconnected unavailable source befor
+ 
+   for (const failure of [
+     ["malformed", /invalid protocol response/],
+-    ["transient", /server_error/],
++    ["transient", /Vibe Racing returned 503: server_error/],
+     [
+       "unauthorized",
+       /Existing installation authorization cannot be reconciled; run `viberacing disconnect`/,
+@@ -4782,11 +4782,28 @@ test("quarantines a permanent 400 once without blocking the next corrected snaps
+   const home = await mkdtemp(join(tmpdir(), "viberacing-permanent-quarantine-"));
+   context.after(() => import("node:fs/promises").then(({ rm }) => rm(home, { recursive: true })));
+   const installation = await writeCaptureInstallation(home, `http://127.0.0.1:${address.port}`);
++  await access(installation.capture);
++  assert.equal(
++    JSON.parse(await readFile(join(installation.directory, "state.json"), "utf8")).sequences[
++      installation.sourceId
++    ],
++    "0",
++  );
++  assert.equal(
++    JSON.parse(await readFile(join(installation.directory, "config.json"), "utf8")).sources[0]
++      .sourceId,
++    installation.sourceId,
++  );
+ 
+   const rejected = await execFileAsync(process.execPath, [connectorPath, "sync"], {
+     env: connectorEnvironment(home),
+   });
+   assert.equal(requests, 1);
++  assert.equal(
++    JSON.parse(await readFile(join(installation.directory, "config.json"), "utf8")).sources[0]
++      .sourceId,
++    installation.sourceId,
++  );
+   assert.match(rejected.stderr, /payload quarantined/);
+   const quarantine = join(
+     installation.directory,
+diff --git a/packages/connector/test/protocol.test.mjs b/packages/connector/test/protocol.test.mjs
+index bfdb3e923820e683a2f30c3947dd2136dda6cb63..8424546ca91e47e402d6c7429e15c89d4ea1fab7 100644
+--- a/packages/connector/test/protocol.test.mjs
++++ b/packages/connector/test/protocol.test.mjs
+@@ -91,12 +91,18 @@ test("rejects server attempts to add local paths, executables, or unknown mappin
+ });
+ 
+ test("protocol errors are snake_case and terminal output strips control characters", async () => {
+-  assert.deepEqual(
+-    await parseProtocolResponse(json({ error: "source_disconnected" }, 400), {
++  await assert.rejects(
++    parseProtocolResponse(json({ error: "source_disconnected" }, 400), {
+       kind: "usage",
+       sourceIds: [sourceId],
+     }),
+-    { error: "source_disconnected" },
++    (error) => {
++      assert(error instanceof Error);
++      assert.equal(error.message, "Vibe Racing returned 400: source_disconnected");
++      assert.equal(error.status, 400);
++      assert.equal(error.code, "source_disconnected");
++      return true;
++    },
+   );
+   for (const error of ["InvalidRequest", "invalid-request", "invalid__request", "bad\ncode"]) {
+     await assert.rejects(
+@@ -104,7 +110,11 @@ test("protocol errors are snake_case and terminal output strips control characte
+         kind: "usage",
+         sourceIds: [sourceId],
+       }),
+-      /invalid protocol response/,
++      (actual) => {
++        assert.equal(actual.code, "invalid_server_response");
++        assert.match(actual.message, /invalid protocol response/);
++        return true;
++      },
+     );
+   }
+   assert.equal(sanitizeTerminalText("safe\u001b[2J\r\nnext"), "safe�[2J��next");
+@@ -169,8 +179,27 @@ test("rejects oversized, incomplete, and reconciliation responses without source
+       }),
+       { kind: "pairingPoll", localSources: [local] },
+     ),
+-    /too large/,
++    (error) => {
++      assert.equal(error.code, "invalid_server_response");
++      assert.match(error.message, /too large/);
++      return true;
++    },
+   );
++  for (const response of [
++    new Response("{", { status: 500, headers: { "content-type": "application/json" } }),
++    new Response("<html>temporary failure</html>", {
++      status: 500,
++      headers: { "content-type": "text/html" },
++    }),
++  ]) {
++    await assert.rejects(
++      parseProtocolResponse(response, { kind: "usage", sourceIds: [sourceId] }),
++      (error) => {
++        assert.equal(error.code, "invalid_server_response");
++        return true;
++      },
++    );
++  }
+   await assert.rejects(
+     parseProtocolResponse(json({ status: "active" }), {
+       kind: "pairingPoll",

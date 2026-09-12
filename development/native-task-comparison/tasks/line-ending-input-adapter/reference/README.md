@@ -1,0 +1,3 @@
+# line-ending-input-adapter
+
+splitLines and LineDecoder share LF/CRLF semantics: LF emits a line, stripping exactly one preceding CR; bare CR remains content. Blank lines are retained but a trailing separator adds no extra empty line. LineDecoder.push returns complete lines, preserving pending fragments across arbitrary UTF16 boundaries and empty chunks. finish returns a nonempty unterminated final line once, then []; later push throws code LINE_DECODER_CLOSED. Instances and returned arrays are independent. Inputs are strings with at most100000 total UTF16 units, not byte streams. Run npm test.

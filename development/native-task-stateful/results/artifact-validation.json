@@ -1,0 +1,307 @@
+{
+  "authorChecks": [
+    {
+      "task": "queue-batch",
+      "arm": "P",
+      "finalNpmTestAfterLastNativeEdit": true,
+      "mutationFile": "src/queue.mjs",
+      "before": "leased.delete(id);ready.push(job);return true;",
+      "after": "return true;",
+      "originalSha256": "9c472648518dc957c1fe295daf0bce3578152fa60c0fa6a439af0bdbc8b89ffa",
+      "diagnosticSha256": "0c743c9e2649e6b84801571acb66130e129c821908aa060fbfb8a5aef9ea7d2c",
+      "publishedPatchUnmodified": true
+    },
+    {
+      "task": "queue-batch",
+      "arm": "H0",
+      "finalNpmTestAfterLastNativeEdit": true,
+      "mutationFile": "src/queue.mjs",
+      "before": "leased.delete(id);ready.push(job);return true;",
+      "after": "return true;",
+      "originalSha256": "9c472648518dc957c1fe295daf0bce3578152fa60c0fa6a439af0bdbc8b89ffa",
+      "diagnosticSha256": "0c743c9e2649e6b84801571acb66130e129c821908aa060fbfb8a5aef9ea7d2c",
+      "publishedPatchUnmodified": true
+    },
+    {
+      "task": "queue-batch",
+      "arm": "H1",
+      "finalNpmTestAfterLastNativeEdit": true,
+      "mutationFile": "src/queue.mjs",
+      "before": "leased.delete(id);ready.push(job);return true;",
+      "after": "return true;",
+      "originalSha256": "9c472648518dc957c1fe295daf0bce3578152fa60c0fa6a439af0bdbc8b89ffa",
+      "diagnosticSha256": "0c743c9e2649e6b84801571acb66130e129c821908aa060fbfb8a5aef9ea7d2c",
+      "publishedPatchUnmodified": true
+    },
+    {
+      "task": "editor-cancel",
+      "arm": "H0",
+      "finalNpmTestAfterLastNativeEdit": true,
+      "mutationFile": "src/drafts.mjs",
+      "before": "cancel(id){return staged.delete(id);}",
+      "after": "cancel(id){return staged.has(id);}",
+      "originalSha256": "a6004483712e4307795ae33ee6e0051c75b69405f4ee5a3052de16cc6422b5e6",
+      "diagnosticSha256": "d26672b8de4208fe1ebbddebe619e4566f40785e0c174df8cf4fde6e124cc328",
+      "publishedPatchUnmodified": true
+    },
+    {
+      "task": "editor-cancel",
+      "arm": "H1",
+      "finalNpmTestAfterLastNativeEdit": true,
+      "mutationFile": "src/drafts.mjs",
+      "before": "cancel(id){return staged.delete(id);}",
+      "after": "cancel(id){return staged.has(id);}",
+      "originalSha256": "a6004483712e4307795ae33ee6e0051c75b69405f4ee5a3052de16cc6422b5e6",
+      "diagnosticSha256": "d26672b8de4208fe1ebbddebe619e4566f40785e0c174df8cf4fde6e124cc328",
+      "publishedPatchUnmodified": true
+    },
+    {
+      "task": "editor-cancel",
+      "arm": "P",
+      "finalNpmTestAfterLastNativeEdit": true,
+      "mutationFile": "src/drafts.mjs",
+      "before": "cancel(id){return staged.delete(id);}",
+      "after": "cancel(id){return staged.has(id);}",
+      "originalSha256": "a6004483712e4307795ae33ee6e0051c75b69405f4ee5a3052de16cc6422b5e6",
+      "diagnosticSha256": "d26672b8de4208fe1ebbddebe619e4566f40785e0c174df8cf4fde6e124cc328",
+      "publishedPatchUnmodified": true
+    },
+    {
+      "task": "invite-single-use",
+      "arm": "H1",
+      "finalNpmTestAfterLastNativeEdit": true,
+      "mutationFile": "src/ledger.mjs",
+      "before": "remove:t=>pending.delete(t)",
+      "after": "remove:t=>pending.has(t)",
+      "originalSha256": "413e6cbb834f032d30c6f25e68e1c663bcfac6f23149cc5147c5bcdb6ae6621f",
+      "diagnosticSha256": "4c743c7e48035d3bcc6702d0fbf1fc5db399657695a0d6b035046ff4ed135a4f",
+      "publishedPatchUnmodified": true
+    },
+    {
+      "task": "invite-single-use",
+      "arm": "P",
+      "finalNpmTestAfterLastNativeEdit": true,
+      "mutationFile": "src/ledger.mjs",
+      "before": "remove:t=>pending.delete(t)",
+      "after": "remove:t=>pending.has(t)",
+      "originalSha256": "413e6cbb834f032d30c6f25e68e1c663bcfac6f23149cc5147c5bcdb6ae6621f",
+      "diagnosticSha256": "4c743c7e48035d3bcc6702d0fbf1fc5db399657695a0d6b035046ff4ed135a4f",
+      "publishedPatchUnmodified": true
+    },
+    {
+      "task": "invite-single-use",
+      "arm": "H0",
+      "finalNpmTestAfterLastNativeEdit": true,
+      "mutationFile": "src/ledger.mjs",
+      "before": "remove:t=>pending.delete(t)",
+      "after": "remove:t=>pending.has(t)",
+      "originalSha256": "413e6cbb834f032d30c6f25e68e1c663bcfac6f23149cc5147c5bcdb6ae6621f",
+      "diagnosticSha256": "4c743c7e48035d3bcc6702d0fbf1fc5db399657695a0d6b035046ff4ed135a4f",
+      "publishedPatchUnmodified": true
+    }
+  ],
+  "patches": [
+    {
+      "patch": "patches/queue-batch-P/final.patch",
+      "appliesWithoutWhitespaceErrors": true,
+      "error": null
+    },
+    {
+      "patch": "patches/queue-batch-H0/D2.patch",
+      "appliesWithoutWhitespaceErrors": true,
+      "error": null
+    },
+    {
+      "patch": "patches/queue-batch-H0/D0.patch",
+      "appliesWithoutWhitespaceErrors": true,
+      "error": null
+    },
+    {
+      "patch": "patches/queue-batch-H0/final.patch",
+      "appliesWithoutWhitespaceErrors": true,
+      "error": null
+    },
+    {
+      "patch": "patches/queue-batch-H0/D1.patch",
+      "appliesWithoutWhitespaceErrors": true,
+      "error": null
+    },
+    {
+      "patch": "patches/queue-batch-H0/terminal.patch",
+      "appliesWithoutWhitespaceErrors": true,
+      "error": null
+    },
+    {
+      "patch": "patches/queue-batch-H0/D3.patch",
+      "appliesWithoutWhitespaceErrors": true,
+      "error": null
+    },
+    {
+      "patch": "patches/queue-batch-H1/D0.patch",
+      "appliesWithoutWhitespaceErrors": true,
+      "error": null
+    },
+    {
+      "patch": "patches/queue-batch-H1/final.patch",
+      "appliesWithoutWhitespaceErrors": true,
+      "error": null
+    },
+    {
+      "patch": "patches/queue-batch-H1/terminal.patch",
+      "appliesWithoutWhitespaceErrors": true,
+      "error": null
+    },
+    {
+      "patch": "patches/editor-cancel-H0/D0.patch",
+      "appliesWithoutWhitespaceErrors": true,
+      "error": null
+    },
+    {
+      "patch": "patches/editor-cancel-H0/final.patch",
+      "appliesWithoutWhitespaceErrors": true,
+      "error": null
+    },
+    {
+      "patch": "patches/editor-cancel-H0/terminal.patch",
+      "appliesWithoutWhitespaceErrors": true,
+      "error": null
+    },
+    {
+      "patch": "patches/editor-cancel-H1/D0.patch",
+      "appliesWithoutWhitespaceErrors": true,
+      "error": null
+    },
+    {
+      "patch": "patches/editor-cancel-H1/final.patch",
+      "appliesWithoutWhitespaceErrors": true,
+      "error": null
+    },
+    {
+      "patch": "patches/editor-cancel-H1/D1.patch",
+      "appliesWithoutWhitespaceErrors": true,
+      "error": null
+    },
+    {
+      "patch": "patches/editor-cancel-H1/terminal.patch",
+      "appliesWithoutWhitespaceErrors": true,
+      "error": null
+    },
+    {
+      "patch": "patches/editor-cancel-P/final.patch",
+      "appliesWithoutWhitespaceErrors": true,
+      "error": null
+    },
+    {
+      "patch": "patches/invite-single-use-H1/D2.patch",
+      "appliesWithoutWhitespaceErrors": true,
+      "error": null
+    },
+    {
+      "patch": "patches/invite-single-use-H1/D0.patch",
+      "appliesWithoutWhitespaceErrors": true,
+      "error": null
+    },
+    {
+      "patch": "patches/invite-single-use-H1/final.patch",
+      "appliesWithoutWhitespaceErrors": true,
+      "error": null
+    },
+    {
+      "patch": "patches/invite-single-use-H1/D1.patch",
+      "appliesWithoutWhitespaceErrors": true,
+      "error": null
+    },
+    {
+      "patch": "patches/invite-single-use-H1/terminal.patch",
+      "appliesWithoutWhitespaceErrors": true,
+      "error": null
+    },
+    {
+      "patch": "patches/invite-single-use-P/final.patch",
+      "appliesWithoutWhitespaceErrors": true,
+      "error": null
+    },
+    {
+      "patch": "patches/invite-single-use-H0/D2.patch",
+      "appliesWithoutWhitespaceErrors": true,
+      "error": null
+    },
+    {
+      "patch": "patches/invite-single-use-H0/D0.patch",
+      "appliesWithoutWhitespaceErrors": true,
+      "error": null
+    },
+    {
+      "patch": "patches/invite-single-use-H0/final.patch",
+      "appliesWithoutWhitespaceErrors": true,
+      "error": null
+    },
+    {
+      "patch": "patches/invite-single-use-H0/D1.patch",
+      "appliesWithoutWhitespaceErrors": true,
+      "error": null
+    },
+    {
+      "patch": "patches/invite-single-use-H0/terminal.patch",
+      "appliesWithoutWhitespaceErrors": true,
+      "error": null
+    },
+    {
+      "patch": "patches/invite-single-use-H0/D3.patch",
+      "appliesWithoutWhitespaceErrors": true,
+      "error": null
+    }
+  ],
+  "allFinalPatchesReapplyWithIdenticalBytesAndModes": true,
+  "directNativeReview": {
+    "passed": true,
+    "checks": [
+      "opt-in materialization",
+      "original role reused without legacy permissions",
+      "explicit base and task",
+      "tracked and new file diff",
+      "ignored files excluded",
+      "snapshot invalidated by edits",
+      "index/worktree unchanged",
+      "missing/oversized input incomplete",
+      "no model/default/plugin/repair",
+      "rename source/destination permissions",
+      "direct and symlink task permissions",
+      "README dirty suffix accepted; real dirty submodule refused"
+    ],
+    "providerRequests": 0
+  },
+  "supplementDoesNotModifyFrozenEvaluator": true,
+  "harnessOriginalCheckouts": [
+    {
+      "task": "queue-batch",
+      "arm": "H0",
+      "originalCheckoutBytesAndModesPreserved": true
+    },
+    {
+      "task": "queue-batch",
+      "arm": "H1",
+      "originalCheckoutBytesAndModesPreserved": true
+    },
+    {
+      "task": "editor-cancel",
+      "arm": "H0",
+      "originalCheckoutBytesAndModesPreserved": true
+    },
+    {
+      "task": "editor-cancel",
+      "arm": "H1",
+      "originalCheckoutBytesAndModesPreserved": true
+    },
+    {
+      "task": "invite-single-use",
+      "arm": "H1",
+      "originalCheckoutBytesAndModesPreserved": true
+    },
+    {
+      "task": "invite-single-use",
+      "arm": "H0",
+      "originalCheckoutBytesAndModesPreserved": true
+    }
+  ]
+}

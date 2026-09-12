@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/selection.mjs": "function valid(value){return typeof value==='string'&&value.length>0&&!value.includes('\\\\')&&!value.includes('\\0')&&value.split('/').every(part=>part!==''&&part!=='.'&&part!=='..');}\nexport function selectPaths(paths,exclude=[]){\n for(const value of [...paths,...exclude])if(!valid(value))throw new TypeError('path');\n const picked=new Set();for(const name of paths){const segments=name.split('/');let blocked=false;for(let n=1;n<=segments.length;n++)if(exclude.includes(segments.slice(0,n).join('/'))){blocked=true;break;}if(!blocked)picked.add(name);}return Array.from(picked).sort();\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "prefix-overexclusion",
+      "file": "src/selection.mjs",
+      "replacement": "function valid(value){return typeof value==='string'&&value.length>0&&!value.includes('\\\\')&&!value.includes('\\0')&&value.split('/').every(part=>part!==''&&part!=='.'&&part!=='..');}\nexport function selectPaths(paths,exclude=[]){\n if(!paths.every(valid)||!exclude.every(valid))throw new TypeError('path');\n return [...new Set(paths)].filter(name=>!exclude.some(prefix=>name.startsWith(prefix))).sort();\n}\n"
+    },
+    {
+      "name": "reads-directories",
+      "file": "src/manifest.mjs",
+      "replacement": "import * as nativeFs from 'node:fs/promises';import path from 'node:path';import {createHash} from 'node:crypto';import {selectPaths} from './selection.mjs';\nexport async function buildManifest(root,paths,{exclude=[],fs=nativeFs}={}){\n const selected=selectPaths(paths,exclude),out=[];\n for(const relative of selected){const file=path.join(root,relative),stat=await fs.stat(file);const bytes=await fs.readFile(file);out.push({path:relative,bytes:bytes.byteLength,sha256:createHash('sha256').update(bytes).digest('hex')});}\n return out;\n}\n"
+    }
+  ]
+}

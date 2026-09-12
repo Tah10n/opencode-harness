@@ -1,0 +1,3 @@
+# lexer-token-spans
+
+tokenize(source) exposes fresh {kind,value,start,end} tokens with half-open original UTF16 offsets plus eof/null at source.length. Decimal digit runs (leading zeros allowed), binary + - *, parentheses and ASCII space/tab/CR/LF only. evaluate consumes that lexer; multiplication precedes left-associative +/-; no unary/eval. Lexical validation is eager before parsing: Unexpected character at N wins even if an earlier token sequence is invalid. Parser reports Expected expression, Expected ), or Unexpected token at current token start. Non-string TypeError. Inputs<=2000 units, literals<=1000000, depth<=100, safe integer arithmetic. Run npm test.

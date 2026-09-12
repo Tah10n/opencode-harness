@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {append,replay} from '../src/journal.mjs';test('append chain and input preservation',()=>{const a=append([],'one'),before=JSON.stringify(a),b=append(a,'two');assert.deepEqual(replay(b).values,['one','two']);assert.equal(b[1].previous,b[0].checksum);b[0].value='changed';assert.equal(JSON.stringify(a),before);});test('corrupt tail rejected',()=>{const a=append(append([],'one'),'two');a[1].value='bad';assert.throws(()=>replay(a),TypeError);assert.throws(()=>append(a,'three'),TypeError);});

@@ -1,0 +1,152 @@
+{
+  "slot": 7,
+  "task": "request-module-extraction",
+  "arm": "A",
+  "exitCode": 0,
+  "timedOut": false,
+  "elapsedMs": 194000,
+  "requests": 17,
+  "requestsWithoutUsage": 0,
+  "workflowStatus": null,
+  "repairs": null,
+  "toolCalls": 26,
+  "sessions": 1,
+  "phaseCount": 1,
+  "execution": "completed",
+  "terminationVerified": true,
+  "cleanupVerified": true,
+  "observedUsage": {
+    "input_tokens": 575433,
+    "cached_tokens": 56320,
+    "output_tokens": 6418,
+    "reasoning_tokens": 591,
+    "total_tokens": 581851
+  },
+  "usageComplete": true,
+  "requestEfforts": {
+    "none": 1,
+    "low": 16
+  },
+  "httpStatuses": {
+    "200": 17
+  },
+  "packet": "W1",
+  "delivery": {
+    "patchApplies": true,
+    "changedFiles": [
+      "packages/connector/README.md",
+      "packages/connector/bin/viberacing.mjs",
+      "packages/connector/lib/config.mjs",
+      "packages/connector/lib/http.mjs",
+      "packages/connector/test/config.test.mjs",
+      "packages/connector/test/http.test.mjs"
+    ],
+    "patchSha256": "77149c7182914f5e0a9998bb033a036a43761af3b3ef4cfe10255b1250bb47e6"
+  },
+  "grading": {
+    "final": {
+      "packet": "W1",
+      "phase": "final",
+      "checks": {
+        "ordinary": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 26,
+            "pass": 25,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 15,
+            "pass": 15,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 24,
+            "pass": 23,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "preserved-consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 15,
+            "pass": 15,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "acceptance": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      },
+      "passed": true,
+      "cleanup": 0
+    }
+  },
+  "sourceReview": {
+    "packet": "W1",
+    "assessmentScope": "Final source and delivered tests/README inspection by the integrator who knows the schedule; independent frozen executable checks are reported separately.",
+    "phases": {
+      "final": {
+        "sourceConformsToTask": true,
+        "necessaryCoverageDelivered": true,
+        "oldCoveragePreserved": true,
+        "newRequiredCoverageDelivered": true,
+        "documentationDelivered": true,
+        "newRegressionFound": false,
+        "notes": [
+          "Both HTTP request/retry and Retry-After logic move from the CLI into one http.mjs module. Protocol validation stays in protocol.mjs; CLI callers import request without signature or flags changes.",
+          "The moved timeout, redirect denial, status/code/messages, retry eligibility, Retry-After cap/test control and exponential backoff retain the original logic.",
+          "The installed-runtime file list includes the new module, and the existing runnable installed CLI test explicitly expects it. Existing consumer and privacy/lifecycle assertions remain.",
+          "New transport tests check bounded/invalid Retry-After and permanent-error single-attempt status/code/message behavior. README describes the shared transport."
+        ],
+        "evidence": [
+          "packages/connector/lib/http.mjs",
+          "packages/connector/bin/viberacing.mjs request import and removed local implementation",
+          "packages/connector/lib/config.mjs installedRuntimeFiles",
+          "packages/connector/test/http.test.mjs",
+          "packages/connector/test/config.test.mjs installed module expectation"
+        ]
+      }
+    }
+  },
+  "publicPathNormalization": "Delivery-worktree runtime prefix normalized; raw local evidence is unchanged.",
+  "assessment": {
+    "final": {
+      "workingBehaviorObserved": true,
+      "deliveredChecksPassed": true,
+      "allFrozenChecksPassed": true,
+      "necessaryCoverageDelivered": true,
+      "oldCoveragePreserved": true,
+      "newRequiredCoverageDelivered": true,
+      "documentationDelivered": true,
+      "completePatchDelivery": true,
+      "newRegressionFound": false
+    }
+  }
+}

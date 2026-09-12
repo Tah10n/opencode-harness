@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/tlv.mjs": "export function encode(records){let size=0;for(const r of records){if(r.type===0||r.data.length>65535)throw new RangeError('record');size+=3+r.data.length;}const bytes=new Uint8Array(size);let at=0;for(const r of records){bytes[at++]=r.type;bytes[at++]=r.data.length>>>8;bytes[at++]=r.data.length&255;bytes.set(r.data,at);at+=r.data.length;}return bytes;}export function createDecoder(){let pending=new Uint8Array();return {push(chunk){const all=Uint8Array.from([...pending,...chunk]);const out=[];let at=0;while(all.length-at>=3){const type=all[at],size=all[at+1]*256+all[at+2];if(type===0)throw new RangeError('type zero');if(all.length-at<3+size)break;out.push({type,data:all.slice(at+3,at+3+size)});at+=3+size;}pending=all.slice(at);return out;},finish(){if(pending.length)throw new RangeError('truncated');return true;}};}\n"
+  },
+  "mutants": [
+    {
+      "name": "finish-accepts-truncation",
+      "file": "src/tlv.mjs",
+      "replacement": "export function encode(records){let size=0;for(const r of records){if(r.type===0||r.data.length>65535)throw new RangeError('record');size+=3+r.data.length;}const bytes=new Uint8Array(size);let at=0;for(const r of records){bytes[at++]=r.type;bytes[at++]=r.data.length>>>8;bytes[at++]=r.data.length&255;bytes.set(r.data,at);at+=r.data.length;}return bytes;}export function createDecoder(){let pending=new Uint8Array();return {push(chunk){const all=new Uint8Array(pending.length+chunk.length);all.set(pending);all.set(chunk,pending.length);const out=[];let at=0;while(all.length-at>=3){const type=all[at],size=all[at+1]*256+all[at+2];if(type===0)throw new RangeError('type zero');if(all.length-at<3+size)break;out.push({type,data:all.slice(at+3,at+3+size)});at+=3+size;}pending=all.slice(at);return out;},finish(){return true;}};}\n"
+    },
+    {
+      "name": "little-endian-length",
+      "file": "src/tlv.mjs",
+      "replacement": "export function encode(records){let size=0;for(const r of records){if(r.type===0||r.data.length>65535)throw new RangeError('record');size+=3+r.data.length;}const bytes=new Uint8Array(size);let at=0;for(const r of records){bytes[at++]=r.type;bytes[at++]=r.data.length>>>8;bytes[at++]=r.data.length&255;bytes.set(r.data,at);at+=r.data.length;}return bytes;}export function createDecoder(){let pending=new Uint8Array();return {push(chunk){const all=new Uint8Array(pending.length+chunk.length);all.set(pending);all.set(chunk,pending.length);const out=[];let at=0;while(all.length-at>=3){const type=all[at],size=all[at+1]+all[at+2]*256;if(type===0)throw new RangeError('type zero');if(all.length-at<3+size)break;out.push({type,data:all.slice(at+3,at+3+size)});at+=3+size;}pending=all.slice(at);return out;},finish(){if(pending.length)throw new RangeError('truncated');return true;}};}\n"
+    }
+  ]
+}

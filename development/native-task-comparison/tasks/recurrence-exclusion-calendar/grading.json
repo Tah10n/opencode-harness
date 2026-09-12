@@ -1,0 +1,16 @@
+{
+  "category": "integration",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Weekday selection with duplicate weekday and exclusion that also has a replacement.",
+    "Replacement outside bounds with deterministic output ordering."
+  ],
+  "docDelivery": [
+    "UTC, half-open date range and original-date exclusion precedence.",
+    "Distinct occurrences may share a replacement date; output sort and ignored unused replacement keys."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Valid Gregorian YYYY-MM-DD dates 2000..2099; start<=end; weekday integers 0(Sunday)..6, duplicate weekdays harmless; exclusion/replacement keys refer to dates, replacement values valid dates. Plain own-data objects.",
+  "independence": "Integrate UTC weekly recurrence enumeration, exclusion dates and event-specific replacement occurrences."
+}

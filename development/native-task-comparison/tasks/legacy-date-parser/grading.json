@@ -1,0 +1,16 @@
+{
+  "category": "compatibility",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert ISO week-year transitions and valid week53 dates.",
+    "Assert nonexistent week53 and invalid calendar dates reject while old calendar parsing stays intact."
+  ],
+  "docDelivery": [
+    "Explain both exact forms, Monday/January4 week rule and year bounds.",
+    "Document strict rejection and adjacent output years without timezone rollover."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Calendar years and ISO week-years2000..2099; strict Gregorian/ISO validity, possible adjacent calendar output year; no timezone.",
+  "independence": "Extend strict date parser to ISO week dates while retaining calendar-date validation and no timezone rollover."
+}

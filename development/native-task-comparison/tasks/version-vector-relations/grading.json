@@ -1,0 +1,16 @@
+{
+  "category": "state",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Causal order versus concurrency and explicit zero equivalence.",
+    "Observe does not reduce local counters, tick is actor-local and snapshots detached."
+  ],
+  "docDelivery": [
+    "Missing means zero, componentwise relation and max merge with zero omission.",
+    "Observe versus tick, special actor own properties and state snapshot ownership."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Plain own-data vector records mapping nonempty ASCII actor names (including special keys) to nonnegative safe integers; all increments within safe range. No getters/prototype data. Missing components=0; explicit zeros accepted but omitted from canonical merged snapshots.",
+  "independence": "Implement causal vector comparison, pointwise merge and zero-counter normalization without input mutation."
+}

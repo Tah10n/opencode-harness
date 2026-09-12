@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {createCounter} from '../src/controller.mjs';test('counter controller',()=>{const log=[],c=createCounter(0,{persist:x=>log.push(['persist',x]),notify:x=>log.push(['notify',x])});c.dispatch({type:'add',amount:3});c.dispatch({type:'save'});assert.deepEqual(c.getState(),{value:3,savedValue:3});assert.deepEqual(log,[['notify',{type:'changed',value:3}],['persist',3],['notify',{type:'saved',value:3}]]);});

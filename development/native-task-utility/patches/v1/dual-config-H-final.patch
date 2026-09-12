@@ -1,0 +1,111 @@
+diff --git a/README.md b/README.md
+index 8ddbdd568511ed67aa4eea8f0d80f7c874c7ac3b..29ad5d6a5f11fbfa0126b27fb759c850aed6f1fd 100644
+--- a/README.md
++++ b/README.md
+@@ -1,3 +1,20 @@
+ # dual-config
+ 
+ Run `npm test` with Node.js 24.
++
++## Configuration
++
++CommonJS and ESM support the same configuration forms:
++
++```js
++configure('compact');
++configure('pretty');
++configure({mode: 'pretty', indent: 4});
++```
++
++The string forms use indentation `0` for `compact` and `2` for `pretty`.
++Option objects require `mode` to be `compact` or `pretty`. The optional
++`indent` must be an integer from `0` through `8`; omitting it uses the same
++legacy default as the matching string form. An explicit `0` is valid for
++either mode. Invalid mode strings throw `RangeError`; null, arrays, missing or
++non-string modes, and invalid indentation values throw `TypeError`.
+diff --git a/index.cjs b/index.cjs
+index a6f39822b17647f5aaebbee88d580387c91d32ab..29e11f509ff1fcc13621f6bb4b43a52824b3d940 100644
+--- a/index.cjs
++++ b/index.cjs
+@@ -1 +1,25 @@
+-function configure(mode){if(!['compact','pretty'].includes(mode))throw new RangeError('Invalid mode');return {mode,indent:mode==='pretty'?2:0};}module.exports=configure;
++const defaults={compact:0,pretty:2};
++
++function configure(option){
++  let mode;
++  let indent;
++
++  if(typeof option==='string'){
++    mode=option;
++  }else{
++    if(option===null||typeof option!=='object'||Array.isArray(option)||!Object.prototype.hasOwnProperty.call(option,'mode')){
++      throw new TypeError('Options must include a mode');
++    }
++    if(typeof option.mode!=='string')throw new TypeError('Mode must be a string');
++    mode=option.mode;
++    if(Object.prototype.hasOwnProperty.call(option,'indent')){
++      indent=option.indent;
++      if(!Number.isInteger(indent)||indent<0||indent>8)throw new TypeError('Indent must be an integer from 0 through 8');
++    }
++  }
++
++  if(!Object.prototype.hasOwnProperty.call(defaults,mode))throw new RangeError('Invalid mode');
++  return {mode,indent:indent===undefined?defaults[mode]:indent};
++}
++
++module.exports=configure;
+diff --git a/test/consumer.test.mjs b/test/consumer.test.mjs
+index d80237c051886f13d8eb2ea338db6f9dc4fefcaf..a49ae38fe2c33a0f304e922dfedd97692f2f94ee 100644
+--- a/test/consumer.test.mjs
++++ b/test/consumer.test.mjs
+@@ -1,2 +1,48 @@
+-import {test} from 'node:test';import assert from 'node:assert/strict';import {createRequire} from 'node:module';import configure,{configure as named} from '../index.mjs';import {render} from '../consumer.mjs';const require=createRequire(import.meta.url);
+-test('legacy CJS and ESM entry points',()=>{assert.deepEqual(configure('pretty'),named('pretty'));assert.deepEqual(require('../index.cjs')('pretty'),{mode:'pretty',indent:2});assert.equal(render({x:1},'compact'),'\u007b"x":1}');assert.throws(()=>configure('wide'),RangeError);});
++import {test} from 'node:test';
++import assert from 'node:assert/strict';
++import {createRequire} from 'node:module';
++import configure,{configure as named} from '../index.mjs';
++import {render} from '../consumer.mjs';
++
++const require=createRequire(import.meta.url);
++const cjsConfigure=require('../index.cjs');
++const cjsRender=require('../consumer.cjs').render;
++
++test('legacy CJS and ESM entry points',()=>{
++  assert.deepEqual(configure('pretty'),{mode:'pretty',indent:2});
++  assert.deepEqual(named('compact'),{mode:'compact',indent:0});
++  assert.deepEqual(cjsConfigure('pretty'),{mode:'pretty',indent:2});
++  assert.equal(render({x:1},'compact'),'\u007b"x":1}');
++  assert.equal(cjsRender({x:1},'compact'),'\u007b"x":1}');
++  assert.throws(()=>configure('wide'),RangeError);
++  assert.throws(()=>cjsConfigure('wide'),RangeError);
++});
++
++test('object options configure and render in both module formats',()=>{
++  const cjsOptions={mode:'pretty',indent:0};
++  const esmOptions={mode:'pretty',indent:4};
++
++  assert.deepEqual(cjsConfigure(cjsOptions),{mode:'pretty',indent:0});
++  assert.deepEqual(configure(esmOptions),{mode:'pretty',indent:4});
++  assert.deepEqual(cjsOptions,{mode:'pretty',indent:0});
++  assert.deepEqual(esmOptions,{mode:'pretty',indent:4});
++  assert.equal(cjsRender({x:1},cjsOptions),'\u007b"x":1}');
++  assert.equal(render({x:1},esmOptions),'\u007b\n    "x": 1\n}');
++});
++
++test('object options derive defaults and validate shape',()=>{
++  for (const entry of [cjsConfigure,configure]) {
++    assert.deepEqual(entry({mode:'compact'}),{mode:'compact',indent:0});
++    assert.deepEqual(entry({mode:'pretty'}),{mode:'pretty',indent:2});
++    assert.deepEqual(entry({mode:'compact',indent:0}),{mode:'compact',indent:0});
++    assert.deepEqual(entry({mode:'pretty',indent:8}),{mode:'pretty',indent:8});
++
++    for (const option of [null,[],{}, {indent:2}, {mode:1}]) {
++      assert.throws(()=>entry(option),TypeError);
++    }
++    for (const indent of ['2',NaN,1.5,-1,9]) {
++      assert.throws(()=>entry({mode:'pretty',indent}),TypeError);
++    }
++    assert.throws(()=>entry({mode:'wide'}),RangeError);
++  }
++});

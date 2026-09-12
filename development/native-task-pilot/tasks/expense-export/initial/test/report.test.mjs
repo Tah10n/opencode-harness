@@ -1,0 +1,2 @@
+import {test} from 'node:test'; import assert from 'node:assert/strict'; import {buildReport} from '../src/report.mjs'; import {renderCsv} from '../src/csv.mjs';
+test('existing mixed report and CSV quotes',()=>{const xs=[{description:'a,"b',currency:'EUR',amountCents:125},{description:'c',currency:'USD',amountCents:200}]; const r=buildReport(xs);assert.equal(r.count,2);assert.equal(r.totalCents,325);assert.equal(renderCsv(r),'description,currency,amountCents\n"a,""b",EUR,125\n"c",USD,200\n');});

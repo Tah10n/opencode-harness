@@ -1,0 +1,19 @@
+{
+  "category": "refactoring",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert AND/OR short-circuit order, nested error identity, empty cases and first thrown value.",
+    "Assert legacy profile name precedence and either-contact success/failure messages."
+  ],
+  "docDelivery": [
+    "Document combinator result shape, ordering/copies and empty semantics.",
+    "Explain existing profile composition without expanding validation rules."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Synchronous ordered AND/OR rule composition, short-circuit and error identity, existing profile rule behavior preserved. Up to 200000 error values per result or combined final output.",
+  "manualBehavior": [
+    "Profile expresses name/contact logic through shared combinators rather than retaining duplicate control flow."
+  ],
+  "independence": "Extract reusable AND/OR validation combinators preserving short-circuiting, error order and old schema outcomes."
+}

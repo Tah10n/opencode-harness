@@ -1,0 +1,160 @@
+{
+  "candidate": "cac39a0050189f2ddf01d4b88888494457b578a7",
+  "stage": "development-v1",
+  "tasks": [
+    {
+      "id": "protocol-error-api",
+      "category": "consumer-integration",
+      "repository": "https://github.com/Tah10n/viberacing",
+      "sourceCommit": "7b1909acb25e4ad764c00dc2211ae7f793c64f00",
+      "sourceTree": "03338b32f292540d5c2fef8d9c62aec2f38f6fdc",
+      "referenceCommit": null,
+      "independentEvaluation": "Behavior tests through public protocol/config and real CLI entry points; original regression preservation with only task-intended assertion adaptation; test/docs completeness and integration review; clean-baseline patch reapplication and installed runtime loading. Evaluator and reference files are provided only after all model processes terminate.",
+      "sourceManifestSha256": "98ce1d87e5c29d545745e9aab7e39f6ca98909cb54cbbab919f94f262b2f6d79",
+      "sourceFiles": 219,
+      "requirements": "tasks/protocol-error-api/TASK.md"
+    },
+    {
+      "id": "catalog-cache",
+      "repository": "local development fixture",
+      "sourceCommit": "cac39a0050189f2ddf01d4b88888494457b578a7",
+      "category": "consumer-integration",
+      "sourceManifestSha256": "8ce5b7f3328e468ce09b8cd33ccf281e1fa9eff0751b63ebccc980095153e4a8",
+      "sourceFiles": 8,
+      "requirements": "tasks/catalog-cache/TASK.md"
+    },
+    {
+      "id": "legacy-runtime-reload",
+      "category": "state-migration-reload",
+      "repository": "https://github.com/Tah10n/viberacing",
+      "sourceCommit": "7b1909acb25e4ad764c00dc2211ae7f793c64f00",
+      "sourceTree": "03338b32f292540d5c2fef8d9c62aec2f38f6fdc",
+      "referenceCommit": "1f93461775fada13317ad0aea47d5c23b3a52491",
+      "independentEvaluation": "Behavior tests through public protocol/config and real CLI entry points; original regression preservation with only task-intended assertion adaptation; test/docs completeness and integration review; clean-baseline patch reapplication and installed runtime loading. Evaluator and reference files are provided only after all model processes terminate.",
+      "sourceManifestSha256": "8f98b0b1a3a7e7ad59b6713a70a66ed3510703324a0b139ced87ab55bbdb3d74",
+      "sourceFiles": 219,
+      "requirements": "tasks/legacy-runtime-reload/TASK.md"
+    },
+    {
+      "id": "reconnect-revoked",
+      "category": "state-recovery",
+      "repository": "https://github.com/Tah10n/viberacing",
+      "sourceCommit": "f34568c65e9dc97b19fd06314f19c80de3759fce",
+      "sourceTree": "a6f30883d275f579995573b049d1a570ce7ec99e",
+      "referenceCommit": "9f1e6fea0100b65f1806400b2668e17cfbd88e82",
+      "independentEvaluation": "Behavior tests through public protocol/config and real CLI entry points; original regression preservation with only task-intended assertion adaptation; test/docs completeness and integration review; clean-baseline patch reapplication and installed runtime loading. Evaluator and reference files are provided only after all model processes terminate.",
+      "sourceManifestSha256": "f6bec0cbf6a52ccd165513aee8a9b705ecf54c8b00872c5991c29590eeb50dff",
+      "sourceFiles": 223,
+      "requirements": "tasks/reconnect-revoked/TASK.md"
+    },
+    {
+      "id": "request-module-extraction",
+      "category": "behavior-preserving-refactor",
+      "repository": "https://github.com/Tah10n/viberacing",
+      "sourceCommit": "7b1909acb25e4ad764c00dc2211ae7f793c64f00",
+      "sourceTree": "03338b32f292540d5c2fef8d9c62aec2f38f6fdc",
+      "referenceCommit": null,
+      "independentEvaluation": "Behavior tests through public protocol/config and real CLI entry points; original regression preservation with only task-intended assertion adaptation; test/docs completeness and integration review; clean-baseline patch reapplication and installed runtime loading. Evaluator and reference files are provided only after all model processes terminate.",
+      "sourceManifestSha256": "556aa03f961c081477b376f67c89f990d65a45c5f4782938fc1a0d7a6afe18ec",
+      "sourceFiles": 219,
+      "requirements": "tasks/request-module-extraction/TASK.md"
+    },
+    {
+      "id": "dual-config",
+      "repository": "local development fixture",
+      "sourceCommit": "cac39a0050189f2ddf01d4b88888494457b578a7",
+      "category": "format-compatibility",
+      "sourceManifestSha256": "60a87b0aabb5d69f31c8c35133e854783ba809eda1dc9bd07a80cb60cd2425b0",
+      "sourceFiles": 9,
+      "requirements": "tasks/dual-config/TASK.md"
+    }
+  ],
+  "schedule": [
+    {
+      "slot": 1,
+      "task": "protocol-error-api",
+      "arm": "P"
+    },
+    {
+      "slot": 2,
+      "task": "protocol-error-api",
+      "arm": "H"
+    },
+    {
+      "slot": 3,
+      "task": "catalog-cache",
+      "arm": "H"
+    },
+    {
+      "slot": 4,
+      "task": "catalog-cache",
+      "arm": "P"
+    },
+    {
+      "slot": 5,
+      "task": "legacy-runtime-reload",
+      "arm": "P"
+    },
+    {
+      "slot": 6,
+      "task": "legacy-runtime-reload",
+      "arm": "H"
+    },
+    {
+      "slot": 7,
+      "task": "reconnect-revoked",
+      "arm": "H"
+    },
+    {
+      "slot": 8,
+      "task": "reconnect-revoked",
+      "arm": "P"
+    },
+    {
+      "slot": 9,
+      "task": "request-module-extraction",
+      "arm": "P"
+    },
+    {
+      "slot": 10,
+      "task": "request-module-extraction",
+      "arm": "H"
+    },
+    {
+      "slot": 11,
+      "task": "dual-config",
+      "arm": "H"
+    },
+    {
+      "slot": 12,
+      "task": "dual-config",
+      "arm": "P"
+    }
+  ],
+  "model": "openai/gpt-5.6-luna",
+  "effort": "high",
+  "openCode": "1.18.26",
+  "deadlineMs": 900000,
+  "newRuns": 12,
+  "retries": 0,
+  "selection": "Four known real VibeRacing tasks plus two known development fixtures chosen by distinct consumer/state/compatibility contracts before any new P or H run. Development only; historical outcomes not pooled. No selection using new P failures.",
+  "acceptance": [
+    "Full requested behavior through actual consumers",
+    "Preserved contracts and required original test scenarios",
+    "Necessary delivered regression tests and docs",
+    "Applicable patch independent of harness administrative directories"
+  ],
+  "autonomy": "Recorded separately from external full-patch acceptance; no manual intervention between workflow stages. H D0 and final separately assessed.",
+  "developmentGate": {
+    "completeHMinimum": 5,
+    "distinctWinsMinimum": 2,
+    "confirmedRegressionLossesMaximum": 0,
+    "autonomousInstalledPathRequired": true
+  },
+  "revisionLimit": 1,
+  "maximumDevelopmentRuns": 24,
+  "independentPairsOnlyAfterGate": 40,
+  "stopping": "Stop scheduling on auth/quota refusal or unknown live execution; own deadline terminates one slot without retry. Unknown usage stays null.",
+  "cost": "Equal wall deadline is not equal token budget; account provider requests, tools, usage, elapsed time for all H stages.",
+  "isolation": "Author containers mount only git-free public initial snapshots and materialized runtime/dependencies. No evaluator/reference, research directories, adjacent projects, source Git history or host auth store. Host relay uses existing OpenCode OAuth."
+}

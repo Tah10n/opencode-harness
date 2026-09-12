@@ -1,0 +1,1 @@
+export function windowStart(time,width){return Math.floor(time/width)*width;}export function summarize(key,start,width,values){return {key,start,end:start+width,count:values.length,sum:values.reduce((a,b)=>a+b,0)};}

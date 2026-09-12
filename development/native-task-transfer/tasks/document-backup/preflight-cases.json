@@ -1,0 +1,25 @@
+{
+  "alternative": {
+    "src/documents.mjs": "import fs from 'node:fs';\nfunction valid(value){if(!value||Array.isArray(value)||typeof value!=='object'||typeof value.text!=='string')throw new TypeError('Document requires text');return value;}\nfunction parse(file){return valid(JSON.parse(fs.readFileSync(file,'utf8')));}\nexport function load(file){try{return parse(file);}catch(first){try{return parse(file+'.bak');}catch{throw first;}}}\nexport function save(file,value){valid(value);const bytes=JSON.stringify(value,null,2);let old;try{old=fs.readFileSync(file);valid(JSON.parse(old));}catch(e){if(e.code!=='ENOENT')throw e;}const tmp=file+'.tmp';try{if(old!==undefined)fs.writeFileSync(file+'.bak',old);fs.writeFileSync(tmp,bytes);fs.renameSync(tmp,file);}finally{if(fs.existsSync(tmp))fs.unlinkSync(tmp);}}\n"
+  },
+  "mutants": [
+    {
+      "name": "rewrite-on-read",
+      "file": "src/documents.mjs",
+      "replacement": "import fs from 'node:fs';\nfunction valid(value){if(!value||Array.isArray(value)||typeof value!=='object'||typeof value.text!=='string')throw new TypeError('Document requires text');return value;}\nfunction parse(file){return valid(JSON.parse(fs.readFileSync(file,'utf8')));}\nexport function load(file){try{return parse(file);}catch(first){try{const v=parse(file+'.bak');fs.writeFileSync(file,JSON.stringify(v));return v;}catch{throw first;}}}\nexport function save(file,value){valid(value);const bytes=JSON.stringify(value);let old;try{old=fs.readFileSync(file);valid(JSON.parse(old));}catch(e){if(e.code!=='ENOENT')throw e;}const tmp=file+'.tmp';try{if(old!==undefined)fs.writeFileSync(file+'.bak',old);fs.writeFileSync(tmp,bytes);fs.renameSync(tmp,file);}finally{if(fs.existsSync(tmp))fs.unlinkSync(tmp);}}\n"
+    },
+    {
+      "name": "overwrite-backup-with-new",
+      "file": "src/documents.mjs",
+      "replacement": "import fs from 'node:fs';\nfunction valid(value){if(!value||Array.isArray(value)||typeof value!=='object'||typeof value.text!=='string')throw new TypeError('Document requires text');return value;}\nfunction parse(file){return valid(JSON.parse(fs.readFileSync(file,'utf8')));}\nexport function load(file){try{return parse(file);}catch(first){try{return parse(file+'.bak');}catch{throw first;}}}\nexport function save(file,value){valid(value);const bytes=JSON.stringify(value);let old;try{old=fs.readFileSync(file);valid(JSON.parse(old));}catch(e){if(e.code!=='ENOENT')throw e;}const tmp=file+'.tmp';try{if(old!==undefined)fs.writeFileSync(file+'.bak',bytes);fs.writeFileSync(tmp,bytes);fs.renameSync(tmp,file);}finally{if(fs.existsSync(tmp))fs.unlinkSync(tmp);}}\n"
+    }
+  ],
+  "manualMutants": [
+    {
+      "name": "non-atomic-direct-write",
+      "file": "src/documents.mjs",
+      "replacement": "import fs from 'node:fs';\nfunction valid(value){if(!value||Array.isArray(value)||typeof value!=='object'||typeof value.text!=='string')throw new TypeError('Document requires text');return value;}\nfunction parse(file){return valid(JSON.parse(fs.readFileSync(file,'utf8')));}\nexport function load(file){try{return parse(file);}catch(first){try{return parse(file+'.bak');}catch{throw first;}}}\nexport function save(file,value){valid(value);const bytes=JSON.stringify(value);let old;try{old=fs.readFileSync(file);valid(JSON.parse(old));}catch(e){if(e.code!=='ENOENT')throw e;}const tmp=file+'.tmp';try{if(old!==undefined)fs.writeFileSync(file+'.bak',old);fs.writeFileSync(file,bytes);}finally{if(fs.existsSync(tmp))fs.unlinkSync(tmp);}}\n",
+      "expected": "Behavior checks may pass, but task completion must fail manual atomicity review: directly truncates/writes primary instead of sibling temporary + rename."
+    }
+  ]
+}

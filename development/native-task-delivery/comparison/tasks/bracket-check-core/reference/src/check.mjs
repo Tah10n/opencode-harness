@@ -1,0 +1,1 @@
+import {inspect} from './brackets.mjs';export function check(text){const r=inspect(text);return r.ok?'ok':'unbalanced at '+r.index;}

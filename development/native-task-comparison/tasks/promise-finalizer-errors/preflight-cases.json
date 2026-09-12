@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/promise.mjs": "export function wrap(value){\n const promise=Promise.resolve(value);\n return {then(a,b){return wrap(promise.then(a,b));},catch(fn){return wrap(promise.then(undefined,fn));},\n finally(fn){\n  if(typeof fn!=='function')return wrap(promise.then());\n  return wrap(promise.then(value=>Promise.resolve(fn()).then(()=>value),error=>Promise.resolve(fn()).then(()=>{throw error;})));\n }};\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "finally-as-then",
+      "file": "src/promise.mjs",
+      "replacement": "export function wrap(value){\n const promise=Promise.resolve(value);\n return {then(onValue,onError){return wrap(promise.then(onValue,onError));},catch(onError){return wrap(promise.catch(onError));},finally(onFinally){return wrap(promise.then(onFinally,onFinally));}};\n}\n"
+    },
+    {
+      "name": "loses-fulfilled-value",
+      "file": "src/promise.mjs",
+      "replacement": "export function wrap(value){\n const promise=Promise.resolve(value);\n return {then(onValue,onError){return wrap(promise.then(onValue,onError));},catch(onError){return wrap(promise.catch(onError));},finally(onFinally){return wrap(promise.finally(onFinally).then(()=>undefined));}};\n}\n"
+    }
+  ]
+}

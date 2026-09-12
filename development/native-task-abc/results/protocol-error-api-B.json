@@ -1,0 +1,208 @@
+{
+  "slot": 2,
+  "task": "protocol-error-api",
+  "arm": "B",
+  "exitCode": 0,
+  "timedOut": false,
+  "elapsedMs": 160353,
+  "phaseCount": 2,
+  "continuationApplied": true,
+  "requests": 18,
+  "requestsWithoutUsage": 0,
+  "workflowStatus": null,
+  "repairs": null,
+  "toolCalls": 30,
+  "sessions": 1,
+  "usage": {
+    "input_tokens": 460509,
+    "cached_tokens": 79872,
+    "output_tokens": 4153,
+    "reasoning_tokens": 1089,
+    "total_tokens": 464662
+  },
+  "requestEfforts": {
+    "none": 1,
+    "low": 17
+  },
+  "httpStatuses": {
+    "200": 18
+  },
+  "terminationVerified": true,
+  "phases": {
+    "first": {
+      "exitCode": 0,
+      "signal": null,
+      "termination": {
+        "terminationVerified": true,
+        "killed": []
+      },
+      "timedOut": false,
+      "elapsedMs": 131608,
+      "parseErrors": 0
+    },
+    "continuation": {
+      "exitCode": 0,
+      "signal": null,
+      "termination": {
+        "terminationVerified": true,
+        "killed": []
+      },
+      "timedOut": false,
+      "elapsedMs": 28672,
+      "parseErrors": 0
+    }
+  },
+  "packet": "M2",
+  "delivery": {
+    "patchApplies": true,
+    "changedFiles": [
+      "packages/connector/README.md",
+      "packages/connector/bin/viberacing.mjs",
+      "packages/connector/lib/protocol.mjs",
+      "packages/connector/test/protocol.test.mjs"
+    ],
+    "patchSha256": "443794a48b2f211a1766c701664102470fd945593c18cc3386b904d3b2b03eb8"
+  },
+  "sourceReview": {
+    "packet": "M2",
+    "sourceReview": {
+      "implementation": "Protocol rejection and central CLI retry integration are cohesive and preserve validation/dispatch. Valid server errors retain status/code/message; retryable responses get Retry-After metadata.",
+      "tests": "Retains old malformed/terminal checks, adapts valid 400 to Error assertions and adds valid 503 rejection. Existing CLI consumer suites remain intact for independent validation.",
+      "documentation": "Connector README explains error/validation contract and affected consumers.",
+      "scope": "Four relevant connector files only.",
+      "staticDefects": [],
+      "D0ToFinal": "All delivered file bytes are identical. The extra pass did not change source, tests or documentation. The added 503 assertion was already in D0."
+    },
+    "behaviorVerdict": "All executed independent checks passed",
+    "completenessVerdict": "requirements delivered within targeted scope"
+  },
+  "grading": {
+    "final": {
+      "packet": "M2",
+      "phase": "final",
+      "checks": {
+        "ordinary": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 24,
+            "pass": 23,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 14,
+            "pass": 14,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 24,
+            "pass": 23,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "preserved-consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 14,
+            "pass": 14,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "acceptance": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 12,
+            "pass": 12,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      },
+      "passed": true,
+      "cleanup": 0
+    },
+    "D0": {
+      "packet": "M2",
+      "phase": "D0",
+      "checks": {
+        "ordinary": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 24,
+            "pass": 23,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 14,
+            "pass": 14,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 24,
+            "pass": 23,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "preserved-consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 14,
+            "pass": 14,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "acceptance": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 12,
+            "pass": 12,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      },
+      "passed": true,
+      "cleanup": 0
+    }
+  },
+  "evidenceSelections": []
+}

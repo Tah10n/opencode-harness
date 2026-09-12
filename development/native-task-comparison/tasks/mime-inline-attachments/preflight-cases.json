@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/attachments.mjs": "export function inlineIds(html){return [...new Set(Array.from(html.matchAll(/cid:([A-Za-z0-9_.-]+)/g),m=>m[1]))];}export function attachmentMap(as){const result=new Map();for(const a of as){if(a.type.includes('\\r')||a.type.includes('\\n'))throw new TypeError('header');const base64=Buffer.from([...a.bytes]).toString('base64'),old=result.get(a.cid);if(old&&(old.type!==a.type||old.base64!==base64))throw new TypeError('duplicate');result.set(a.cid,{cid:a.cid,type:a.type,base64});}return result;}\n"
+  },
+  "mutants": [
+    {
+      "name": "duplicate-references",
+      "file": "src/attachments.mjs",
+      "replacement": "export function inlineIds(html){const out=[];for(const m of html.matchAll(/cid:([A-Za-z0-9_.-]+)/g))out.push(m[1]);return out;}export function attachmentMap(attachments){const map=new Map();for(const a of attachments){if(/[\\r\\n]/.test(a.type))throw new TypeError('invalid type');const value={cid:a.cid,type:a.type,base64:Buffer.from(a.bytes).toString('base64')};if(map.has(a.cid)&&JSON.stringify(map.get(a.cid))!==JSON.stringify(value))throw new TypeError('conflicting cid');map.set(a.cid,value);}return map;}\n"
+    },
+    {
+      "name": "whole-backing-buffer",
+      "file": "src/attachments.mjs",
+      "replacement": "export function inlineIds(html){const out=[];for(const m of html.matchAll(/cid:([A-Za-z0-9_.-]+)/g))if(!out.includes(m[1]))out.push(m[1]);return out;}export function attachmentMap(attachments){const map=new Map();for(const a of attachments){if(/[\\r\\n]/.test(a.type))throw new TypeError('invalid type');const value={cid:a.cid,type:a.type,base64:Buffer.from(a.bytes.buffer).toString('base64')};if(map.has(a.cid)&&JSON.stringify(map.get(a.cid))!==JSON.stringify(value))throw new TypeError('conflicting cid');map.set(a.cid,value);}return map;}\n"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/color-core.mjs": "export function parseColor(text){\n if(typeof text!=='string'||!/^#(?:[a-f0-9]{3}|[a-f0-9]{4}|[a-f0-9]{6}|[a-f0-9]{8})$/i.test(text))throw new TypeError('color');\n const short=text.length===4||text.length===5,width=short?1:2,bytes=[];for(let i=1;i<text.length;i+=width)bytes.push(parseInt(text.slice(i,i+width),16)*(short?17:1));return Object.fromEntries(['r','g','b','a'].map((key,i)=>[key,bytes[i]??255]));\n}\nexport function shiftColor(color,amount){if(!Number.isFinite(amount)||Math.abs(amount)>1)throw new RangeError('amount');const out={...color};for(const key of ['r','g','b'])out[key]=Math.round(amount>=0?color[key]+(255-color[key])*amount:color[key]*(1+amount));return{r:out.r,g:out.g,b:out.b,a:color.a};}\nexport function formatColor({r,g,b,a}){return'#'+[r,g,b,...(a===255?[]:[a])].map(n=>(n+256).toString(16).slice(1)).join('');}\n"
+  },
+  "mutants": [
+    {
+      "name": "alpha-dropped",
+      "file": "src/color-core.mjs",
+      "replacement": "export function parseColor(text){\n if(typeof text!=='string'||!/^#(?:[0-9a-f]{3}|[0-9a-f]{4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(text))throw new TypeError('color');\n let hex=text.slice(1);if(hex.length<=4)hex=[...hex].map(c=>c+c).join('');if(hex.length===6)hex+='ff';const bytes=[0,2,4,6].map(i=>parseInt(hex.slice(i,i+2),16));return{r:bytes[0],g:bytes[1],b:bytes[2],a:bytes[3]};\n}\nexport function shiftColor(color,amount){\n if(!Number.isFinite(amount)||amount< -1||amount>1)throw new RangeError('amount');\n const shift=value=>Math.round(amount>=0?value+(255-value)*amount:value*(1+amount));return{r:shift(color.r),g:shift(color.g),b:shift(color.b),a:255};\n}\nexport function formatColor(color){const values=[color.r,color.g,color.b];if(color.a!==255)values.push(color.a);return'#'+values.map(n=>n.toString(16).padStart(2,'0')).join('');}\n"
+    },
+    {
+      "name": "floor-instead-of-round",
+      "file": "src/color-core.mjs",
+      "replacement": "export function parseColor(text){\n if(typeof text!=='string'||!/^#(?:[0-9a-f]{3}|[0-9a-f]{4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(text))throw new TypeError('color');\n let hex=text.slice(1);if(hex.length<=4)hex=[...hex].map(c=>c+c).join('');if(hex.length===6)hex+='ff';const bytes=[0,2,4,6].map(i=>parseInt(hex.slice(i,i+2),16));return{r:bytes[0],g:bytes[1],b:bytes[2],a:bytes[3]};\n}\nexport function shiftColor(color,amount){\n if(!Number.isFinite(amount)||amount< -1||amount>1)throw new RangeError('amount');\n const shift=value=>Math.floor(amount>=0?value+(255-value)*amount:value*(1+amount));return{r:shift(color.r),g:shift(color.g),b:shift(color.b),a:color.a};\n}\nexport function formatColor(color){const values=[color.r,color.g,color.b];if(color.a!==255)values.push(color.a);return'#'+values.map(n=>n.toString(16).padStart(2,'0')).join('');}\n"
+    }
+  ]
+}

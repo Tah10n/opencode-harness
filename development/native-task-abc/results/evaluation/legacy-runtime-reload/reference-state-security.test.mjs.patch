@@ -1,0 +1,105 @@
+--- a/packages/connector/test/state-security.test.mjs
++++ b/packages/connector/test/state-security.test.mjs
+@@ -25,6 +25,26 @@
+ const connectorPath = fileURLToPath(new URL("../bin/viberacing.mjs", import.meta.url));
+ const configUrl = new URL("../lib/config.mjs", import.meta.url).href;
+ const ensureStateScript = `import { ensurePrivateStateDirectory } from ${JSON.stringify(configUrl)}; await ensurePrivateStateDirectory();`;
++const flatLegacyRuntimeFiles = [
++  "browser.mjs",
++  "config.mjs",
++  "executables.mjs",
++  "readers.mjs",
++  "registry.mjs",
++  "runtime.mjs",
++];
++const flatLegacyRuntimeAdapterFiles = [
++  "antigravity.mjs",
++  "claude.mjs",
++  "codex.mjs",
++  "cursor.mjs",
++  "gemini.mjs",
++  "kimi.mjs",
++  "opencode.mjs",
++  "qwen-settings.mjs",
++  "qwen.mjs",
++  "shared.mjs",
++];
+ 
+ test(
+   "POSIX state security migrates only recognized legacy state and writes its marker",
+@@ -40,6 +60,8 @@
+     });
+     await mkdir(join(state, "pending"), { recursive: true, mode: 0o777 });
+     await mkdir(join(state, "runtime", "0.1.0", "bin"), { recursive: true });
++    await mkdir(join(state, "bin"), { recursive: true, mode: 0o777 });
++    await mkdir(join(state, "lib", "adapters"), { recursive: true, mode: 0o777 });
+     await writeFile(
+       join(state, "installation.json"),
+       `${JSON.stringify({
+@@ -52,6 +74,21 @@
+     await writeFile(join(state, "runtime", "0.1.0", "bin", "viberacing.mjs"), "", {
+       mode: 0o755,
+     });
++    await writeFile(join(state, "bin", "viberacing.mjs"), "// legacy connector\n", {
++      mode: 0o755,
++    });
++    await Promise.all(
++      flatLegacyRuntimeFiles.map((name) =>
++        writeFile(join(state, "lib", name), `// legacy ${name}\n`, { mode: 0o777 }),
++      ),
++    );
++    await Promise.all(
++      flatLegacyRuntimeAdapterFiles.map((name) =>
++        writeFile(join(state, "lib", "adapters", name), `// legacy ${name}\n`, {
++          mode: 0o777,
++        }),
++      ),
++    );
+     await chmod(state, 0o777);
+     const legacyEnvironment = { ...process.env, HOME: root };
+     delete legacyEnvironment.VIBERACING_STATE_DIR;
+@@ -70,6 +107,15 @@
+     assert.equal(
+       (await lstat(join(state, "runtime", "0.1.0", "bin", "viberacing.mjs"))).mode & 0o777,
+       0o700,
++    );
++    assert.equal((await lstat(join(state, "bin", "viberacing.mjs"))).mode & 0o777, 0o700);
++    for (const name of flatLegacyRuntimeFiles)
++      assert.equal((await lstat(join(state, "lib", name))).mode & 0o777, 0o600);
++    for (const name of flatLegacyRuntimeAdapterFiles)
++      assert.equal((await lstat(join(state, "lib", "adapters", name))).mode & 0o777, 0o600);
++    assert.equal(
++      await readFile(join(state, "lib", "config.mjs"), "utf8"),
++      "// legacy config.mjs\n",
+     );
+     assert.deepEqual(JSON.parse(await readFile(join(state, ".viberacing-state"), "utf8")), {
+       format: 1,
+@@ -151,6 +197,28 @@
+     assert.equal((await lstat(runtimeState)).mode & 0o777, 0o777);
+     assert.equal((await lstat(unexpectedRuntime)).mode & 0o777, 0o755);
+     await assert.rejects(access(join(runtimeState, ".viberacing-state")), { code: "ENOENT" });
++
++    const legacyRuntimeState = join(root, "legacy-runtime-state");
++    const unexpectedLegacyLibrary = join(legacyRuntimeState, "lib", "unrelated-tool.mjs");
++    await mkdir(join(legacyRuntimeState, "lib", "adapters"), { recursive: true });
++    await writeFile(join(legacyRuntimeState, "lib", "config.mjs"), "// legacy config\n");
++    await writeFile(
++      join(legacyRuntimeState, "lib", "adapters", "cursor.mjs"),
++      "// legacy adapter\n",
++    );
++    await writeFile(unexpectedLegacyLibrary, "// unrelated\n", { mode: 0o755 });
++    await chmod(legacyRuntimeState, 0o777);
++    await chmod(unexpectedLegacyLibrary, 0o755);
++    process.env.VIBERACING_STATE_DIR = legacyRuntimeState;
++    const legacyRuntimeConfig = await import(
++      `../lib/config.mjs?unrelated-legacy-runtime=${encodeURIComponent(root)}`
++    );
++    await assert.rejects(legacyRuntimeConfig.ensurePrivateStateDirectory(), /unrelated-tool\.mjs/);
++    assert.equal((await lstat(legacyRuntimeState)).mode & 0o777, 0o777);
++    assert.equal((await lstat(unexpectedLegacyLibrary)).mode & 0o777, 0o755);
++    await assert.rejects(access(join(legacyRuntimeState, ".viberacing-state")), {
++      code: "ENOENT",
++    });
+   },
+ );
+ 

@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/set.mjs": "export function createSet(){let state={adds:[],removed:[]};const clone=()=>({adds:state.adds.map(p=>[...p]),removed:[...state.removed]});const merge=incoming=>{const next=clone();for(const [v,t]of incoming.adds){const old=next.adds.find(p=>p[1]===t);if(old&&old[0]!==v)throw new TypeError('conflict');if(!old)next.adds.push([v,t]);}next.removed=[...new Set([...next.removed,...incoming.removed])].sort();next.adds.sort((a,b)=>a[0]<b[0]?-1:a[0]>b[0]?1:a[1]<b[1]?-1:a[1]>b[1]?1:0);state=next;};return {merge,add(v,t){merge({adds:[[v,t]],removed:[]});},remove(v){merge({adds:[],removed:state.adds.filter(p=>p[0]===v).map(p=>p[1])});},values(){return [...new Set(state.adds.filter(p=>!state.removed.includes(p[1])).map(p=>p[0]))].sort();},snapshot:clone};}\n"
+  },
+  "mutants": [
+    {
+      "name": "discard-incoming-tombstones",
+      "file": "src/set.mjs",
+      "replacement": "export function createSet(){let adds=new Map(),removed=new Set();const sorted=()=>[...adds].map(([tag,value])=>[value,tag]).sort((a,b)=>a[0]<b[0]?-1:a[0]>b[0]?1:a[1]<b[1]?-1:a[1]>b[1]?1:0);return {add(value,tag){if(adds.has(tag)&&adds.get(tag)!==value)throw new TypeError('tag conflict');adds.set(tag,value);},remove(value){for(const [tag,v]of adds)if(v===value)removed.add(tag);},merge(state){const incoming=new Map(adds);for(const [value,tag]of state.adds){if(incoming.has(tag)&&incoming.get(tag)!==value)throw new TypeError('tag conflict');incoming.set(tag,value);}adds=incoming;},values(){return [...new Set([...adds].filter(([tag])=>!removed.has(tag)).map(([,v])=>v))].sort();},snapshot(){return {adds:sorted(),removed:[...removed].sort()};}};}\n"
+    },
+    {
+      "name": "remove-all-tags-on-merge",
+      "file": "src/set.mjs",
+      "replacement": "export function createSet(){let adds=new Map(),removed=new Set();const sorted=()=>[...adds].map(([tag,value])=>[value,tag]).sort((a,b)=>a[0]<b[0]?-1:a[0]>b[0]?1:a[1]<b[1]?-1:a[1]>b[1]?1:0);return {add(value,tag){if(adds.has(tag)&&adds.get(tag)!==value)throw new TypeError('tag conflict');adds.set(tag,value);},remove(value){for(const [tag,v]of adds)if(v===value)removed.add(tag);},merge(state){const incoming=new Map(adds);for(const [value,tag]of state.adds){if(incoming.has(tag)&&incoming.get(tag)!==value)throw new TypeError('tag conflict');incoming.set(tag,value);}for(const [tag,value]of incoming)if([...removed].some(t=>adds.get(t)===value))removed.add(tag);adds=incoming;removed=new Set([...removed,...state.removed]);},values(){return [...new Set([...adds].filter(([tag])=>!removed.has(tag)).map(([,v])=>v))].sort();},snapshot(){return {adds:sorted(),removed:[...removed].sort()};}};}\n"
+    }
+  ]
+}

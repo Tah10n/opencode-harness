@@ -1,0 +1,16 @@
+{
+  "category": "compatibility",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert some(undefined) differs from none and explicit error retains thrown identity.",
+    "Assert default-mode packet lookalikes stay direct and malformed tagged packets reject."
+  ],
+  "docDelivery": [
+    "Explain opt-in versus legacy direct values and undefined fallback.",
+    "Document some/none/error own fields, extra fields, unchanged values and no eager fallback/awaiting."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Direct arbitrary values; explicit tagged own-data ordinary packets, malformed protocol rejection; options boolean tagged; no getters/proxies.",
+  "independence": "Add tagged optional results to a consumer while preserving legacy direct values and explicit failure tags."
+}

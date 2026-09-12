@@ -1,0 +1,1 @@
+export function createSelection(forest){const selected=new Set();return {toggle(id,checked){if(checked)selected.add(id);else selected.delete(id);},status(id){return {checked:selected.has(id),indeterminate:false};},snapshot(){return [...selected].sort();},restore(ids){selected.clear();for(const id of ids)selected.add(id);}};}

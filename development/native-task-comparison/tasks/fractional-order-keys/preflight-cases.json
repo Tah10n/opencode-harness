@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/positions.mjs": "const read=k=>{const [n,d]=k.split('/').map(BigInt);return [n,d];};const key=(n,d)=>{let a=n<0n?-n:n,b=d;while(b){[a,b]=[b,a%b];}return (n/a)+'/'+(d/a);};export function compare(a,b){const [an,ad]=read(a),[bn,bd]=read(b),x=an*bd-bn*ad;return x<0n?-1:x>0n?1:0;}export function between(left,right){if(left===null&&right===null)return '0/1';if(left===null){const [n,d]=read(right);return key(n-d,d);}if(right===null){const [n,d]=read(left);return key(n+d,d);}if(compare(left,right)>=0)throw new RangeError('order');const [a,b]=read(left),[c,d]=read(right);const common=b*d;const leftUnits=a*d,rightUnits=c*b;return key(leftUnits+rightUnits,common*2n);}export function rebalance(items){const sorted=[...items];sorted.sort((a,b)=>{const c=compare(a.key,b.key);return c||((a.id>b.id)-(a.id<b.id));});const out=[];for(let i=0;i<sorted.length;i++)out.push({id:sorted[i].id,key:i+'/1',label:sorted[i].label});return out;}\n"
+  },
+  "mutants": [
+    {
+      "name": "compare-through-number",
+      "file": "src/positions.mjs",
+      "replacement": "const read=k=>{const [n,d]=k.split('/').map(BigInt);return [n,d];};const key=(n,d)=>{let a=n<0n?-n:n,b=d;while(b){[a,b]=[b,a%b];}return (n/a)+'/'+(d/a);};export function compare(a,b){const [an,ad]=read(a),[bn,bd]=read(b),x=Number(an)/Number(ad)-Number(bn)/Number(bd);return x<0?-1:x>0?1:0;}export function between(left,right){if(left===null&&right===null)return '0/1';if(left===null){const [n,d]=read(right);return key(n-d,d);}if(right===null){const [n,d]=read(left);return key(n+d,d);}if(compare(left,right)>=0)throw new RangeError('order');const [a,b]=read(left),[c,d]=read(right);return key(a*d+c*b,2n*b*d);}export function rebalance(items){return [...items].sort((a,b)=>compare(a.key,b.key)||(a.id<b.id?-1:a.id>b.id?1:0)).map((item,i)=>({...item,key:i+'/1'}));}\n"
+    },
+    {
+      "name": "rebalance-input-order",
+      "file": "src/positions.mjs",
+      "replacement": "const read=k=>{const [n,d]=k.split('/').map(BigInt);return [n,d];};const key=(n,d)=>{let a=n<0n?-n:n,b=d;while(b){[a,b]=[b,a%b];}return (n/a)+'/'+(d/a);};export function compare(a,b){const [an,ad]=read(a),[bn,bd]=read(b),x=an*bd-bn*ad;return x<0n?-1:x>0n?1:0;}export function between(left,right){if(left===null&&right===null)return '0/1';if(left===null){const [n,d]=read(right);return key(n-d,d);}if(right===null){const [n,d]=read(left);return key(n+d,d);}if(compare(left,right)>=0)throw new RangeError('order');const [a,b]=read(left),[c,d]=read(right);return key(a*d+c*b,2n*b*d);}export function rebalance(items){return [...items].map((item,i)=>({...item,key:i+'/1'}));}\n"
+    }
+  ]
+}

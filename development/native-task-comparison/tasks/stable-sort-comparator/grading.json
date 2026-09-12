@@ -1,0 +1,16 @@
+{
+  "category": "compatibility",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert custom comparator stable object ties and original input/identity preservation.",
+    "Assert explicit undefined versus holes with comparator excluding undefined."
+  ],
+  "docDelivery": [
+    "Explain default lexicographic versus custom sign comparator and NaN ties.",
+    "Explain stable order, shallow fresh output, undefined/hole placement and errors."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Ordinary sparse/frozen bounded arrays, primitive values by default, custom pure consistent numeric comparator with optional plain objects.",
+  "independence": "Extend a sorting consumer to custom comparators while preserving ties, sparse input policy and input immutability."
+}

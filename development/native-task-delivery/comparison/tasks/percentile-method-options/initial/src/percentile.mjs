@@ -1,0 +1,1 @@
+export function percentile(values,p){if(!values.length)return null;const a=[...values].sort((a,b)=>a-b);return a[Math.max(0,Math.ceil(p*a.length)-1)];}

@@ -1,0 +1,13 @@
+{
+  "kind": "exact-helper path semantics probe; no Windows process or model",
+  "outcomes": [
+    {
+      "platform": "posix",
+      "accepted": true
+    },
+    {
+      "platform": "win32",
+      "accepted": false
+    }
+  ]
+}

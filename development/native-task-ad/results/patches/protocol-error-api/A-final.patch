@@ -1,0 +1,92 @@
+diff --git a/packages/connector/README.md b/packages/connector/README.md
+index 5a1e8c6..1eb3ad3 100644
+--- a/packages/connector/README.md
++++ b/packages/connector/README.md
+@@ -23,6 +23,12 @@ local `sources.json`, so later processes do not require the variable again. Wind
+ is reported as a detection warning and never hides other healthy sources. Discovery never scans the
+ whole home directory or disk.
+ 
++The connector protocol parser validates every response before exposing it to consumers. A valid
++server error rejects with an `Error` whose `status` is the HTTP status and whose `code` is the
++validated server error code; malformed, oversized, non-JSON, or unsafe responses reject with
++`code: "invalid_server_response"` instead. Request consumers use those distinctions for cleanup,
++retry, and terminal messages without trusting invalid server data.
++
+ The browser approval maps every detected local source to a new or existing account. Re-running
+ `connect` keeps the stable installation identity, rotates device authorization, refreshes the
+ installed connector copy, and updates only Vibe Racing-owned hooks. Hook reconciliation is
+diff --git a/packages/connector/bin/viberacing.mjs b/packages/connector/bin/viberacing.mjs
+index 5fde3a9..2fde848 100755
+--- a/packages/connector/bin/viberacing.mjs
++++ b/packages/connector/bin/viberacing.mjs
+@@ -189,25 +189,13 @@ async function request(origin, path, options = {}, attempts = 1, responseContext
+       try {
+         payload = await parseProtocolResponse(response, responseContext);
+       } catch (error) {
+-        if (
+-          error?.code === "invalid_server_response" &&
+-          (response.status >= 500 || response.status === 429)
+-        ) {
++        if (response.status >= 500 || response.status === 429) {
+           error.status = response.status;
+           error.retryAfterMs = retryAfterMilliseconds(response);
+         }
+         throw error;
+       }
+-      if (!response.ok) {
+-        const error = new Error(
+-          `Vibe Racing returned ${response.status}: ${payload.error ?? "request failed"}`,
+-        );
+-        error.status = response.status;
+-        error.code = payload.error;
+-        error.retryAfterMs = retryAfterMilliseconds(response);
+-        if (response.status < 500 && response.status !== 429) throw error;
+-        lastError = error;
+-      } else return payload;
++      return payload;
+     } catch (error) {
+       lastError = error;
+       if (
+diff --git a/packages/connector/lib/protocol.mjs b/packages/connector/lib/protocol.mjs
+index f1ceba9..87d9123 100644
+--- a/packages/connector/lib/protocol.mjs
++++ b/packages/connector/lib/protocol.mjs
+@@ -292,7 +292,10 @@ export async function parseProtocolResponse(response, context) {
+       !errorCodePattern.test(value.error)
+     )
+       throw invalid();
+-    return { error: value.error };
++    const error = new Error(`Vibe Racing returned ${response.status}: ${value.error}`);
++    error.status = response.status;
++    error.code = value.error;
++    throw error;
+   }
+   if (context.kind === "pairingStart") return parsePairingStart(value, context);
+   if (context.kind === "pairingPoll") return parsePairingPoll(value, context);
+diff --git a/packages/connector/test/protocol.test.mjs b/packages/connector/test/protocol.test.mjs
+index bfdb3e9..95dd233 100644
+--- a/packages/connector/test/protocol.test.mjs
++++ b/packages/connector/test/protocol.test.mjs
+@@ -90,13 +90,18 @@ test("rejects server attempts to add local paths, executables, or unknown mappin
+   );
+ });
+ 
+-test("protocol errors are snake_case and terminal output strips control characters", async () => {
+-  assert.deepEqual(
+-    await parseProtocolResponse(json({ error: "source_disconnected" }, 400), {
++test("protocol errors reject with validated status and code, and terminal output strips control characters", async () => {
++  await assert.rejects(
++    parseProtocolResponse(json({ error: "source_disconnected" }, 400), {
+       kind: "usage",
+       sourceIds: [sourceId],
+     }),
+-    { error: "source_disconnected" },
++    (error) => {
++      assert.equal(error.message, "Vibe Racing returned 400: source_disconnected");
++      assert.equal(error.status, 400);
++      assert.equal(error.code, "source_disconnected");
++      return true;
++    },
+   );
+   for (const error of ["InvalidRequest", "invalid-request", "invalid__request", "bad\ncode"]) {
+     await assert.rejects(

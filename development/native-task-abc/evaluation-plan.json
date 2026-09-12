@@ -1,0 +1,25 @@
+{
+  "patterns": {
+    "protocol-error-api": "retries transient|honors Retry-After|quarantines a permanent 400|doctor disables a revoked|revoked authorization removes|disconnected commands|pending pairing cancellation|hostile pairing|pairing",
+    "legacy-runtime-reload": "installs a runnable|rejects an incomplete runtime",
+    "reconnect-revoked": "reconnect preserves transient failures, retires disconnected sources, and recovers revoked authorization",
+    "request-module-extraction": "installs a runnable|rejects an incomplete runtime|retries transient|honors Retry-After|quarantines a permanent 400|doctor disables a revoked|disconnected commands|pending pairing cancellation|hostile pairing|pairing"
+  },
+  "ordinaryFiles": [
+    "protocol.test.mjs",
+    "config.test.mjs",
+    "state-security.test.mjs",
+    "executables.test.mjs"
+  ],
+  "preservation": "Restore the original protocol/config/state-security/executables tests in a separate copy. For protocol API adapt only the explicitly changed error-result assertion; for reconnect replace only the old revoked-authorization expectation with the task-required 401 and 403 recovery paths. Preserve every other assertion. New behavior tests are separate.",
+  "manualCriteria": [
+    "Every original requirement delivered",
+    "Actual CLI consumer integration",
+    "Test regression substance and preserved assertions",
+    "Required connector README update",
+    "Patch applies independently of harness and installed runtime runs",
+    "Refactoring removes request/retry implementation from CLI into a cohesive library without changing its observable contracts"
+  ],
+  "blinding": "Assessment packets use shuffled opaque codes without arm/workflow verdict; source review supplements behavior tests. Internal harness statuses are recorded separately.",
+  "claimBoundary": "Four diagnostic tasks; no statistical superiority claim and no next series automatically."
+}

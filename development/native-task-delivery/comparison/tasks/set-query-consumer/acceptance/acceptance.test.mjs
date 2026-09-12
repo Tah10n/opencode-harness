@@ -1,0 +1,5 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import path from 'node:path';const root=process.env.PILOT_SOURCE;
+const m0=await import(path.join(root,"src/query.mjs"));
+test("set AND selection through names",()=>{const rows=[{name:'one',tags:['x']},{name:'both',tags:['x','y']},{name:'none',tags:[]}];assert.deepEqual(m0.names(rows,new Set(['x','y'])),['both']);assert.deepEqual(m0.names(rows,new Set()),['one','both','none']);});
+test("identity and input preservation",()=>{const row=Object.freeze({name:'a',tags:Object.freeze([''])}),rows=Object.freeze([row]),need=new Set(['']);const out=m0.select(rows,need);assert.notEqual(out,rows);assert.equal(out[0],row);assert.deepEqual([...need],['']);assert.deepEqual(m0.names(rows,['','']),['a']);});
+test("unknown requirement",()=>{assert.deepEqual(m0.names([{name:'a',tags:['x']}],new Set(['z'])),[]);});

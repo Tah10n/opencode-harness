@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/vector.mjs": "export function compare(a,b){let lower=false,higher=false;for(const key of new Set([...Object.keys(a),...Object.keys(b)])){const x=Object.hasOwn(a,key)?a[key]:0,y=Object.hasOwn(b,key)?b[key]:0;if(x<y)lower=true;if(x>y)higher=true;}return lower&&higher?'concurrent':lower?'before':higher?'after':'equal';}export function merge(a,b){return Object.fromEntries([...new Set([...Object.keys(a),...Object.keys(b)])].sort().map(k=>[k,Math.max(Object.hasOwn(a,k)?a[k]:0,Object.hasOwn(b,k)?b[k]:0)]).filter(([,v])=>v!==0));}export function createClock(initial={}){let state=merge(initial,{});return {observe(other){state=merge(state,other);},tick(actor){const n=(Object.hasOwn(state,actor)?state[actor]:0)+1;state=merge(state,Object.fromEntries([[actor,n]]));return n;},snapshot(){return Object.assign(Object.create(null),state);}};}\n"
+  },
+  "mutants": [
+    {
+      "name": "last-writer-merge",
+      "file": "src/vector.mjs",
+      "replacement": "export function compare(a,b){let lower=false,higher=false;for(const key of new Set([...Object.keys(a),...Object.keys(b)])){const x=Object.hasOwn(a,key)?a[key]:0,y=Object.hasOwn(b,key)?b[key]:0;if(x<y)lower=true;if(x>y)higher=true;}return lower&&higher?'concurrent':lower?'before':higher?'after':'equal';}export function merge(a,b){return Object.fromEntries([...new Set([...Object.keys(a),...Object.keys(b)])].sort().map(k=>[k,Object.hasOwn(b,k)?b[k]:a[k]]).filter(([,v])=>v!==0));}export function createClock(initial={}){let state=merge(initial,{});return {observe(other){state=merge(state,other);},tick(actor){const n=(Object.hasOwn(state,actor)?state[actor]:0)+1;state=merge(state,Object.fromEntries([[actor,n]]));return n;},snapshot(){return {...state};}};}\n"
+    },
+    {
+      "name": "missing-components-ignored",
+      "file": "src/vector.mjs",
+      "replacement": "export function compare(a,b){let lower=false,higher=false;for(const key of new Set(Object.keys(a).filter(k=>Object.hasOwn(b,k)))){const x=Object.hasOwn(a,key)?a[key]:0,y=Object.hasOwn(b,key)?b[key]:0;if(x<y)lower=true;if(x>y)higher=true;}return lower&&higher?'concurrent':lower?'before':higher?'after':'equal';}export function merge(a,b){return Object.fromEntries([...new Set([...Object.keys(a),...Object.keys(b)])].sort().map(k=>[k,Math.max(Object.hasOwn(a,k)?a[k]:0,Object.hasOwn(b,k)?b[k]:0)]).filter(([,v])=>v!==0));}export function createClock(initial={}){let state=merge(initial,{});return {observe(other){state=merge(state,other);},tick(actor){const n=(Object.hasOwn(state,actor)?state[actor]:0)+1;state=merge(state,Object.fromEntries([[actor,n]]));return n;},snapshot(){return {...state};}};}\n"
+    }
+  ]
+}

@@ -1,0 +1,503 @@
+[
+  {
+    "slot": 1,
+    "task": "queue-batch",
+    "arm": "P",
+    "checks": {
+      "ordinary": {
+        "exit": 0,
+        "counts": {
+          "tests": 5,
+          "pass": 5,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "acceptance": {
+        "exit": 1,
+        "counts": {
+          "tests": 3,
+          "pass": 2,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": false
+      },
+      "task-contract-supplement": {
+        "exit": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "preservation": {
+        "exit": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "disabled-transition": {
+        "exit": 1,
+        "counts": {
+          "tests": 5,
+          "pass": 2,
+          "fail": 3,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": false
+      },
+      "cleanup": 0
+    }
+  },
+  {
+    "slot": 2,
+    "task": "queue-batch",
+    "arm": "H0",
+    "checks": {
+      "ordinary": {
+        "exit": 0,
+        "counts": {
+          "tests": 8,
+          "pass": 8,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "acceptance": {
+        "exit": 1,
+        "counts": {
+          "tests": 3,
+          "pass": 2,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": false
+      },
+      "task-contract-supplement": {
+        "exit": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "preservation": {
+        "exit": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "disabled-transition": {
+        "exit": 1,
+        "counts": {
+          "tests": 8,
+          "pass": 5,
+          "fail": 3,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": false
+      },
+      "cleanup": 0
+    }
+  },
+  {
+    "slot": 3,
+    "task": "queue-batch",
+    "arm": "H1",
+    "checks": {
+      "ordinary": {
+        "exit": 0,
+        "counts": {
+          "tests": 8,
+          "pass": 8,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "acceptance": {
+        "exit": 1,
+        "counts": {
+          "tests": 3,
+          "pass": 2,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": false
+      },
+      "task-contract-supplement": {
+        "exit": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "preservation": {
+        "exit": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "disabled-transition": {
+        "exit": 1,
+        "counts": {
+          "tests": 8,
+          "pass": 5,
+          "fail": 3,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": false
+      },
+      "cleanup": 0
+    }
+  },
+  {
+    "slot": 4,
+    "task": "editor-cancel",
+    "arm": "H0",
+    "checks": {
+      "ordinary": {
+        "exit": 0,
+        "counts": {
+          "tests": 6,
+          "pass": 6,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "acceptance": {
+        "exit": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "preservation": {
+        "exit": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "disabled-transition": {
+        "exit": 1,
+        "counts": {
+          "tests": 6,
+          "pass": 3,
+          "fail": 3,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": false
+      },
+      "cleanup": 0
+    }
+  },
+  {
+    "slot": 5,
+    "task": "editor-cancel",
+    "arm": "H1",
+    "checks": {
+      "ordinary": {
+        "exit": 0,
+        "counts": {
+          "tests": 7,
+          "pass": 7,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "acceptance": {
+        "exit": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "preservation": {
+        "exit": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "disabled-transition": {
+        "exit": 1,
+        "counts": {
+          "tests": 7,
+          "pass": 3,
+          "fail": 4,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": false
+      },
+      "cleanup": 0
+    }
+  },
+  {
+    "slot": 6,
+    "task": "editor-cancel",
+    "arm": "P",
+    "checks": {
+      "ordinary": {
+        "exit": 0,
+        "counts": {
+          "tests": 5,
+          "pass": 5,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "acceptance": {
+        "exit": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "preservation": {
+        "exit": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "disabled-transition": {
+        "exit": 1,
+        "counts": {
+          "tests": 5,
+          "pass": 2,
+          "fail": 3,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": false
+      },
+      "cleanup": 0
+    }
+  },
+  {
+    "slot": 7,
+    "task": "invite-single-use",
+    "arm": "H1",
+    "checks": {
+      "ordinary": {
+        "exit": 0,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "acceptance": {
+        "exit": 0,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "preservation": {
+        "exit": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "disabled-transition": {
+        "exit": 1,
+        "counts": {
+          "tests": 4,
+          "pass": 1,
+          "fail": 3,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": false
+      },
+      "cleanup": 0
+    }
+  },
+  {
+    "slot": 8,
+    "task": "invite-single-use",
+    "arm": "P",
+    "checks": {
+      "ordinary": {
+        "exit": 0,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "acceptance": {
+        "exit": 0,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "preservation": {
+        "exit": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "disabled-transition": {
+        "exit": 1,
+        "counts": {
+          "tests": 4,
+          "pass": 1,
+          "fail": 3,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": false
+      },
+      "cleanup": 0
+    }
+  },
+  {
+    "slot": 9,
+    "task": "invite-single-use",
+    "arm": "H0",
+    "checks": {
+      "ordinary": {
+        "exit": 0,
+        "counts": {
+          "tests": 6,
+          "pass": 6,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "acceptance": {
+        "exit": 0,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "preservation": {
+        "exit": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "disabled-transition": {
+        "exit": 1,
+        "counts": {
+          "tests": 6,
+          "pass": 3,
+          "fail": 3,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": false
+      },
+      "cleanup": 0
+    }
+  }
+]

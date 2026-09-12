@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/posix-path.mjs": "import path from 'node:path';\nexport function normalizePosix(text){if(typeof text!=='string'||text.includes('\\0'))throw new TypeError('path');return path.posix.normalize(text);}\n"
+  },
+  "mutants": [
+    {
+      "name": "absolute-parent-escapes-root",
+      "file": "src/posix-path.mjs",
+      "replacement": "export function normalizePosix(text){\n if(typeof text!=='string'||text.includes('\\0'))throw new TypeError('path');\n const absolute=text.startsWith('/'),parts=[];\n for(const segment of text.split('/')){\n  if(segment===''||segment==='.')continue;\n  if(segment==='..'){if(parts.length&&parts.at(-1)!=='..')parts.pop();else parts.push('..');}\n  else parts.push(segment);\n }\n let result=(absolute?'/':'')+parts.join('/');if(result==='')result='.';\n if(text.endsWith('/')&&result!=='/')result+='/';\n return result;\n}\n"
+    },
+    {
+      "name": "drops-trailing-slash",
+      "file": "src/posix-path.mjs",
+      "replacement": "export function normalizePosix(text){\n if(typeof text!=='string'||text.includes('\\0'))throw new TypeError('path');\n const absolute=text.startsWith('/'),parts=[];\n for(const segment of text.split('/')){\n  if(segment===''||segment==='.')continue;\n  if(segment==='..'){if(parts.length&&parts.at(-1)!=='..')parts.pop();else if(!absolute)parts.push('..');}\n  else parts.push(segment);\n }\n let result=(absolute?'/':'')+parts.join('/');if(result==='')result='.';\n \n return result;\n}\n"
+    }
+  ]
+}

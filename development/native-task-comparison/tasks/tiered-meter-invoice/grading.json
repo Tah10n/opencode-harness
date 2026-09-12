@@ -1,0 +1,16 @@
+{
+  "category": "integration",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "A multi-band invoice with distinct rates and exact line charges.",
+    "Credit applied once and capped at subtotal."
+  ],
+  "docDelivery": [
+    "Cumulative graduated thresholds, not one rate for all units.",
+    "Invoice-level capped credit and unchanged input ordering."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Nonnegative safe integer units and credits; ascending finite positive cumulative band limits followed by exactly one null unlimited limit; nonnegative integer rates. All sums/products fit safe integers. Unique nonempty entry IDs.",
+  "independence": "Integrate graduated usage bands, per-account credit and integer-cent invoice lines with stable band boundaries."
+}

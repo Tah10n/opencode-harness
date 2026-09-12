@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/history.mjs": "const copy=v=>JSON.parse(JSON.stringify(v));export function createHistory(initial,limit){let states=[copy(initial)],at=0;return {commit(v){states=states.slice(0,at+1);states.push(copy(v));if(states.length>limit+1)states.shift();at=states.length-1;return copy(states[at]);},undo(){const changed=at>0;if(changed)at--;return {changed,value:copy(states[at])};},redo(){const changed=at+1<states.length;if(changed)at++;return {changed,value:copy(states[at])};},snapshot(){return {value:copy(states[at]),undo:at,redo:states.length-at-1};}};}\n"
+  },
+  "mutants": [
+    {
+      "name": "redo-survives-branch",
+      "file": "src/history.mjs",
+      "replacement": "const copy=value=>structuredClone(value);export function createHistory(initial,limit){let value=copy(initial),past=[],future=[];return {commit(next){past.push(value);past=past.slice(-limit);value=copy(next);return copy(value);},undo(){if(!past.length)return {changed:false,value:copy(value)};future.push(value);value=past.pop();return {changed:true,value:copy(value)};},redo(){if(!future.length)return {changed:false,value:copy(value)};past.push(value);value=future.pop();return {changed:true,value:copy(value)};},snapshot(){return {value:copy(value),undo:past.length,redo:future.length};}};}\n"
+    },
+    {
+      "name": "unbounded-undo",
+      "file": "src/history.mjs",
+      "replacement": "const copy=value=>structuredClone(value);export function createHistory(initial,limit){let value=copy(initial),past=[],future=[];return {commit(next){past.push(value);value=copy(next);future=[];return copy(value);},undo(){if(!past.length)return {changed:false,value:copy(value)};future.push(value);value=past.pop();return {changed:true,value:copy(value)};},redo(){if(!future.length)return {changed:false,value:copy(value)};past.push(value);value=future.pop();return {changed:true,value:copy(value)};},snapshot(){return {value:copy(value),undo:past.length,redo:future.length};}};}\n"
+    }
+  ]
+}

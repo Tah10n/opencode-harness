@@ -1,0 +1,1 @@
+export function distance(a,b){return Math.hypot(b.x-a.x,b.y-a.y);}export function length(points){let n=0;for(let i=1;i<points.length;i++)n+=distance(points[i-1],points[i]);return n;}

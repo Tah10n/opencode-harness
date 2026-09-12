@@ -1,0 +1,1 @@
+import {billable,oversize} from './weight.mjs';export function quote(parcels,zone){return parcels.map(p=>oversize(p,zone.maxSide)?{id:p.id,status:'rejected',reason:'oversize'}:{id:p.id,status:'quoted',grams:billable(p,zone.divisor),cents:zone.base+Math.ceil(billable(p,zone.divisor)/zone.stepGrams)*zone.stepCents});}

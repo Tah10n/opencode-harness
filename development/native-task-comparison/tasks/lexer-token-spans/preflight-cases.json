@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/lexer.mjs": "export function tokenize(source){\n if(typeof source!=='string')throw new TypeError('source');\n const result=[];const pattern=/[ \\t\\r\\n]+|[0-9]+|[+*()\\-]/gy;let offset=0;\n while(offset<source.length){pattern.lastIndex=offset;const match=pattern.exec(source);if(!match)throw new SyntaxError('Unexpected character at '+offset);const text=match[0],start=offset;offset=pattern.lastIndex;if(/^[ \\t\\r\\n]/.test(text))continue;const numeric=/^[0-9]/.test(text);result.push({kind:numeric?'number':text,value:numeric?Number(text):text,start,end:offset});}\n result.push({kind:'eof',value:null,start:offset,end:offset});return result;\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "end-is-inclusive",
+      "file": "src/lexer.mjs",
+      "replacement": "export function tokenize(source){\n if(typeof source!=='string')throw new TypeError('source');\n const tokens=[];let i=0;\n while(i<source.length){\n  if(/[ \\t\\r\\n]/.test(source[i])){i++;continue;}\n  const start=i;\n  if(/[0-9]/.test(source[i])){while(i<source.length&&/[0-9]/.test(source[i]))i++;tokens.push({kind:'number',value:Number(source.slice(start,i)),start,end:i-1});}\n  else if('+-*()'.includes(source[i])){tokens.push({kind:source[i],value:source[i],start,end:++i});}\n  else throw new SyntaxError('Unexpected character at '+i);\n }\n tokens.push({kind:'eof',value:null,start:source.length,end:source.length});return tokens;\n}\n"
+    },
+    {
+      "name": "right-associative-subtraction",
+      "file": "src/evaluate.mjs",
+      "replacement": "import {tokenize} from './lexer.mjs';\nfunction parse(tokens){\n let i=0;const peek=()=>tokens[i],take=()=>tokens[i++];\n const error=()=>{throw new SyntaxError('Expected expression at '+peek().start);};\n function atom(){if(peek().kind==='number')return take().value;if(peek().kind==='('){take();const n=sum();if(peek().kind!==')')throw new SyntaxError('Expected ) at '+peek().start);take();return n;}return error();}\n function product(){let n=atom();while(peek().kind==='*'){take();n*=atom();}return n;}\n function sum(){let n=product();while(peek().kind==='+'||peek().kind==='-'){const op=take().kind;const rhs=sum();n=op==='+'?n+rhs:n-rhs;}return n;}\n const n=sum();if(peek().kind!=='eof')throw new SyntaxError('Unexpected token at '+peek().start);return n;\n}\nexport function evaluate(source){return parse(tokenize(source));}\n"
+    }
+  ]
+}

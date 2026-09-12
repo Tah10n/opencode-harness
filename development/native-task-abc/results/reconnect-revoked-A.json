@@ -1,0 +1,131 @@
+{
+  "slot": 8,
+  "task": "reconnect-revoked",
+  "arm": "A",
+  "exitCode": 0,
+  "timedOut": false,
+  "elapsedMs": 216773,
+  "phaseCount": 1,
+  "continuationApplied": false,
+  "requests": 25,
+  "requestsWithoutUsage": 0,
+  "workflowStatus": null,
+  "repairs": null,
+  "toolCalls": 40,
+  "sessions": 1,
+  "usage": {
+    "input_tokens": 1202374,
+    "cached_tokens": 385536,
+    "output_tokens": 5055,
+    "reasoning_tokens": 1587,
+    "total_tokens": 1207429
+  },
+  "requestEfforts": {
+    "none": 1,
+    "low": 24
+  },
+  "httpStatuses": {
+    "200": 25
+  },
+  "terminationVerified": true,
+  "packet": "J1",
+  "delivery": {
+    "patchApplies": true,
+    "changedFiles": [
+      "packages/connector/README.md",
+      "packages/connector/bin/viberacing.mjs",
+      "packages/connector/test/config.test.mjs"
+    ],
+    "patchSha256": "df6f45716e0c42cda7783107a926d768f501a0b252fcbdec0bbb2cafe630bb06"
+  },
+  "sourceReview": {
+    "packet": "J1",
+    "sourceReview": {
+      "implementation": "Uses the existing lifecycle lock for both 401/403 and preserves other errors. disableLocalConnection() retains queued pending payloads; whether these remain after successful pairing is reserved for independent behavioral evidence.",
+      "tests": "Adds a real 401 connect recovery before, and retains, the original authenticated remote-disconnected-source scenario. Malformed/transient assertions retained. No new explicit 403 case.",
+      "documentation": "Describes revoked recovery, identity retention and non-revoked errors.",
+      "staticDefects": [
+        "disableLocalConnection() omits clearPending=true. Confirmed by both frozen independent revoked-auth cases: CLI reports Connected, then fails initial sync with Invalid pending payload."
+      ]
+    },
+    "behaviorVerdict": "Independent real connect fails with exit 1 and Invalid pending payload for both 401 and 403 when stale queued state exists; ordinary and cancellation/ownership preservation tests pass.",
+    "completenessVerdict": "incomplete: stale pending payload survives cleanup and breaks post-pairing initial sync"
+  },
+  "grading": {
+    "final": {
+      "packet": "J1",
+      "phase": "final",
+      "checks": {
+        "ordinary": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 25,
+            "pass": 24,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 5,
+            "pass": 5,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 25,
+            "pass": 24,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "preserved-consumers": {
+          "code": 1,
+          "timedOut": false,
+          "counts": {
+            "tests": 1,
+            "pass": 0,
+            "fail": 1,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "lifecycle-preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 5,
+            "pass": 5,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "acceptance-403": {
+          "code": 1,
+          "timedOut": false,
+          "counts": {
+            "tests": 1,
+            "pass": 0,
+            "fail": 1,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      },
+      "passed": false,
+      "cleanup": 0
+    }
+  },
+  "evidenceSelections": []
+}

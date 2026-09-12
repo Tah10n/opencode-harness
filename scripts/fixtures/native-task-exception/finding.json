@@ -1,0 +1,11 @@
+{
+  "id": "F-001",
+  "classification": "concrete",
+  "kind": "behavior",
+  "basis": "The original task requires support for ordinary callable functions without restricting their own properties; invocation must preserve behavior for such functions.",
+  "affectedFiles": [
+    "src/timing.mjs:5"
+  ],
+  "verification": "Wrap a callable function whose own `apply` property is replaced with a non-callable value, then invoke the wrapper.",
+  "expected": "Use `Reflect.apply(fn, this, args)` so callable functions with an overridden `apply` property are still invoked correctly. Current `fn.apply(this,args)` throws instead."
+}

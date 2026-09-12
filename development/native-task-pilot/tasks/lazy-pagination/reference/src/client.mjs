@@ -1,0 +1,3 @@
+function check(signal){if(signal?.aborted)throw signal.reason??new DOMException('Aborted','AbortError');}
+export async function* iterateItems(fetchPage,{signal}={}){let cursor;const seen=new Set();while(true){check(signal);const page=await fetchPage(cursor,{signal});if(!page||typeof page!=='object'||!Array.isArray(page.items))throw new TypeError('Invalid page');const next=page.nextCursor;if(next!=null&&(typeof next!=='string'||!next||seen.has(next)))throw new TypeError('Invalid/repeated cursor');for(const item of page.items){check(signal);yield item;}if(next==null)return;seen.add(next);cursor=next;}}
+export async function listItems(fetchPage,options){const result=[];for await(const item of iterateItems(fetchPage,options))result.push(item);return result;}

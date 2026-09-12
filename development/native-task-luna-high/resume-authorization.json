@@ -1,0 +1,29 @@
+{
+  "kind": "authorization-amendment-to-existing-four-slot-series",
+  "publishedHead": "11f67536dd904ad29ef899f99cfcc980378d4e45",
+  "allowedFirstExecutions": [
+    2,
+    3,
+    4
+  ],
+  "order": [
+    "legacy-runtime-reload/H",
+    "reconnect-revoked/H",
+    "reconnect-revoked/P"
+  ],
+  "firstSlotImmutable": true,
+  "firstSlotServerStatusAndAdditionalUsage": "unknown and explicitly accepted by user",
+  "sourceAuthorization": "User request attachment 3119705b-ff7f-4b45-a325-3a2e0e3b8e11/pasted-text.txt",
+  "configurationUnchanged": {
+    "runtimeSourceCommit": "44f6a4b1a73ed8347b852247bbc533fa04497080",
+    "openCodeVersion": "1.18.26",
+    "model": "openai/gpt-5.6-luna",
+    "reasoningEffort": "high",
+    "taskDeadlineMs": 900000,
+    "maximumCorrections": 3
+  },
+  "deadlineRule": "Only cancellation caused by our own task deadline may allow the next unstarted slot, and only after verified tool termination, successful result capture, response forwarding closure and relay/container removal. Unknown local execution, unexplained interruption, authorization/quota refusal and isolation/capture failures stop scheduling.",
+  "oldPlanFreezeAndStopRecordsPreserved": true,
+  "requestsRetries": 0,
+  "newSeries": false
+}

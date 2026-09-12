@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {buildManifest} from '../src/manifest.mjs';test('manifest bytes',async()=>{const result=await buildManifest('/repo',['a'],{fs:{stat:()=>({isFile:()=>true}),readFile:()=>Buffer.from('abc')}});assert.equal(result[0].bytes,3);assert.equal(result[0].sha256,'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad');});

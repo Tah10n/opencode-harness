@@ -1,0 +1,363 @@
+{
+  "slot": 7,
+  "task": "reconnect-revoked",
+  "arm": "C",
+  "exitCode": 0,
+  "timedOut": false,
+  "elapsedMs": 276857,
+  "phaseCount": 1,
+  "continuationApplied": false,
+  "requests": 30,
+  "requestsWithoutUsage": 0,
+  "workflowStatus": "incomplete",
+  "repairs": 0,
+  "toolCalls": 32,
+  "sessions": 4,
+  "usage": {
+    "input_tokens": 948363,
+    "cached_tokens": 292864,
+    "output_tokens": 9011,
+    "reasoning_tokens": 1786,
+    "total_tokens": 957374
+  },
+  "requestEfforts": {
+    "none": 1,
+    "low": 29
+  },
+  "httpStatuses": {
+    "200": 30
+  },
+  "terminationVerified": true,
+  "stages": [
+    {
+      "label": "implementation",
+      "role": "author",
+      "elapsedMs": 164941
+    },
+    {
+      "label": "review-0",
+      "role": "reviewer",
+      "elapsedMs": 25742
+    },
+    {
+      "label": "review-0-format",
+      "role": "reviewer",
+      "elapsedMs": 23647
+    },
+    {
+      "label": "reproduce-1",
+      "role": "author",
+      "elapsedMs": 29313
+    },
+    {
+      "label": "disposition-review-1",
+      "role": "reviewer",
+      "elapsedMs": 23404
+    }
+  ],
+  "packet": "W6",
+  "delivery": {
+    "patchApplies": true,
+    "changedFiles": [
+      "packages/connector/README.md",
+      "packages/connector/bin/viberacing.mjs",
+      "packages/connector/test/config.test.mjs"
+    ],
+    "patchSha256": "111389ec6d86f3996a9ef86b0e68a2a40d44c4cfd1431e9a85c16b9abee12cdd"
+  },
+  "sourceReview": {
+    "packet": "W6",
+    "sourceReview": {
+      "implementation": "Uses the existing lifecycle lock and disableLocalConnection(true) for both 401 and 403, preserves transient/malformed error propagation and removes the abandoned-pairing prerequisite. Warning on partial auxiliary cleanup remains. No static production recovery defect found.",
+      "tests": "Adapts unauthorized from a rejected-connect expectation into successful recovery and checks installation/source identity. Adds a 403 recovery case after D0. However, the prior successful mode=disconnected scenario is replaced by mode=unauthorized rather than retained alongside it. The source has no remaining execution of that disconnected mode; other reconnect tests cover omission and in-flight replacement, not this explicit remote-disconnection-before-pairing branch.",
+      "documentation": "README explains automatic revoked-auth recovery and preserved transient failures.",
+      "staticDefects": [
+        "Necessary existing reconnect coverage was lost: explicit server-side disconnected source retirement with otherwise valid authorization is no longer exercised by the original test. This violates the task's preserved reconnect/server-side-source-change coverage requirement even if production behavior still passes an independent restored test."
+      ],
+      "D0ToFinal": "Only test/config.test.mjs changed: the follow-up adds the forbidden/403 server mode and a second actual connect invocation checking installation ID and fresh token. This is a real regression-test improvement after D0, but it does not restore the lost disconnected scenario. Production behavior was already implemented before review."
+    },
+    "behaviorVerdict": "All independent final and D0 behavior, 401/403 and lifecycle preservation checks passed",
+    "completenessVerdict": "incomplete: necessary original authenticated remote-disconnected-source test scenario removed",
+    "harnessObservation": {
+      "review0Selected": 4,
+      "review0Resolved": 0,
+      "dispositionSelected": 4,
+      "dispositionResolved": 0,
+      "note": "Reviewer manufactured long suffixes instead of selecting supplied exact refs; host correctly rejected them. Separate from task-code verdict."
+    }
+  },
+  "grading": {
+    "final": {
+      "packet": "W6",
+      "phase": "final",
+      "checks": {
+        "ordinary": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 25,
+            "pass": 24,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 5,
+            "pass": 5,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 25,
+            "pass": 24,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "preserved-consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "lifecycle-preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 5,
+            "pass": 5,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "acceptance-403": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      },
+      "passed": true,
+      "cleanup": 0
+    },
+    "D0": {
+      "packet": "W6",
+      "phase": "D0",
+      "checks": {
+        "ordinary": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 25,
+            "pass": 24,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 5,
+            "pass": 5,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 25,
+            "pass": 24,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "preserved-consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "lifecycle-preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 5,
+            "pass": 5,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "acceptance-403": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      },
+      "passed": true,
+      "cleanup": 0
+    }
+  },
+  "evidenceSelections": [
+    {
+      "review": "review-0-bindings.json",
+      "selections": [
+        {
+          "selected": "E21-61adbc35a747ce5e01de220d37f05ac925293f77",
+          "ref": null,
+          "scope": null,
+          "eventIndex": null,
+          "callID": null,
+          "state": null,
+          "exit": null,
+          "before": null,
+          "after": null,
+          "snapshotSha256": null,
+          "current": null,
+          "resolved": false
+        },
+        {
+          "selected": "E23-61adbc35a747ce5e01de220d37f05ac925293f77",
+          "ref": null,
+          "scope": null,
+          "eventIndex": null,
+          "callID": null,
+          "state": null,
+          "exit": null,
+          "before": null,
+          "after": null,
+          "snapshotSha256": null,
+          "current": null,
+          "resolved": false
+        },
+        {
+          "selected": "E27-61adbc35a747ce5e01de220d37f05ac925293f77",
+          "ref": null,
+          "scope": null,
+          "eventIndex": null,
+          "callID": null,
+          "state": null,
+          "exit": null,
+          "before": null,
+          "after": null,
+          "snapshotSha256": null,
+          "current": null,
+          "resolved": false
+        },
+        {
+          "selected": "E25-61adbc35a747ce5e01de220d37f05ac925293f77",
+          "ref": null,
+          "scope": null,
+          "eventIndex": null,
+          "callID": null,
+          "state": null,
+          "exit": null,
+          "before": null,
+          "after": null,
+          "snapshotSha256": null,
+          "current": null,
+          "resolved": false
+        }
+      ]
+    },
+    {
+      "review": "disposition-review-1-bindings.json",
+      "selections": [
+        {
+          "selected": "E30-61adbc35a747ce5e01de220d37f05ac925293f77",
+          "ref": null,
+          "scope": null,
+          "eventIndex": null,
+          "callID": null,
+          "state": null,
+          "exit": null,
+          "before": null,
+          "after": null,
+          "snapshotSha256": null,
+          "current": null,
+          "resolved": false
+        },
+        {
+          "selected": "E31-61adbc35a747ce5e01de220d37f05ac925293f77",
+          "ref": null,
+          "scope": null,
+          "eventIndex": null,
+          "callID": null,
+          "state": null,
+          "exit": null,
+          "before": null,
+          "after": null,
+          "snapshotSha256": null,
+          "current": null,
+          "resolved": false
+        },
+        {
+          "selected": "E23-61adbc35a747ce5e01de220d37f05ac925293f77",
+          "ref": null,
+          "scope": null,
+          "eventIndex": null,
+          "callID": null,
+          "state": null,
+          "exit": null,
+          "before": null,
+          "after": null,
+          "snapshotSha256": null,
+          "current": null,
+          "resolved": false
+        },
+        {
+          "selected": "E25-61adbc35a747ce5e01de220d37f05ac925293f77",
+          "ref": null,
+          "scope": null,
+          "eventIndex": null,
+          "callID": null,
+          "state": null,
+          "exit": null,
+          "before": null,
+          "after": null,
+          "snapshotSha256": null,
+          "current": null,
+          "resolved": false
+        }
+      ]
+    }
+  ]
+}

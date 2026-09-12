@@ -1,0 +1,12 @@
+{
+  "alternative": {
+    "src/cursor.mjs": "export function createLog(saved={next:1,acked:0,events:[]}){let next=saved.next,acked=saved.acked,events=structuredClone(saved.events);return {append(value){const id=next++;events.push({id,value:structuredClone(value)});return id;},ack(id){if(!Number.isInteger(id)||id<acked||id>=next)throw new RangeError('ack');acked=id;while(events.length&&events[0].id<=acked)events.shift();},snapshot(){return structuredClone({next,acked,events});}};}"
+  },
+  "mutants": [
+    {
+      "name": "restart-after-compaction",
+      "file": "src/cursor.mjs",
+      "replacement": "export function createLog(saved={next:1,acked:0,events:[]}){let next=saved.next,acked=saved.acked,events=structuredClone(saved.events);return {append(value){const id=next++;events.push({id,value:structuredClone(value)});return id;},ack(id){if(!Number.isInteger(id)||id<acked||id>=next)throw new RangeError('ack');acked=id;events=events.filter(e=>e.id>acked);if(!events.length)next=1;},snapshot(){return structuredClone({next,acked,events});}};}"
+    }
+  ]
+}

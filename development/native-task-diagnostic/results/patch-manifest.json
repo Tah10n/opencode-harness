@@ -1,0 +1,62 @@
+[
+  {
+    "slot": 1,
+    "task": "queue-lost-retry",
+    "arm": "H0",
+    "patchSha256": "3255cbfd85eebce79eb7d20d5917bc52235b76b035720ad220c6c32e35decea2",
+    "changedFiles": [
+      "README.md",
+      "test/worker.test.mjs"
+    ],
+    "reappliedBytesAndModesMatch": true
+  },
+  {
+    "slot": 2,
+    "task": "queue-lost-retry",
+    "arm": "H1",
+    "patchSha256": "8351d9afc3ba5a688a9a57b8e07893c1c2de5dba9a09fba3228497d3101033c9",
+    "changedFiles": [
+      "README.md",
+      "test/worker.test.mjs"
+    ],
+    "reappliedBytesAndModesMatch": true
+  },
+  {
+    "slot": 3,
+    "task": "editor-precompleted",
+    "arm": "H1",
+    "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "changedFiles": [],
+    "reappliedBytesAndModesMatch": true
+  },
+  {
+    "slot": 4,
+    "task": "editor-precompleted",
+    "arm": "H0",
+    "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "changedFiles": [],
+    "reappliedBytesAndModesMatch": true
+  },
+  {
+    "slot": 5,
+    "task": "queue-valid-empty",
+    "arm": "H0",
+    "patchSha256": "117e7ef44ce2ee90ca9cb851424e92afc666684ff4c2b15a6eec6c23cf8aeb29",
+    "changedFiles": [
+      "README.md",
+      "test/worker.test.mjs"
+    ],
+    "reappliedBytesAndModesMatch": true
+  },
+  {
+    "slot": 6,
+    "task": "queue-valid-empty",
+    "arm": "H1",
+    "patchSha256": "0253bb5441a4ad86287e80fef9ae670639b609c3147181ca9f38fe8d9ac40627",
+    "changedFiles": [
+      "README.md",
+      "test/worker.test.mjs"
+    ],
+    "reappliedBytesAndModesMatch": true
+  }
+]

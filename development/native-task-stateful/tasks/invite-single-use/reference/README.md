@@ -1,0 +1,3 @@
+# invite-single-use
+A small Node library. Run npm test.
+Make invitation acceptance through accept(book, request, clock) single-use and expiration-aware. An existing invitation with expiresAt <= clock() returns {status:expired}, retaining that pending record and adding no member. A valid invitation is removed from pending and joins exactly its team/email, returning {status:joined,team}. Subsequent use returns {status:missing} without another membership. Missing tokens remain no-ops. The route calls clock exactly once; keep the existing result shapes and public exports. Preserve unrelated invitations and old independent removal/missing scenarios. Deliver consumer regressions for valid use then replay, unrelated preservation and expiration equality/past boundaries.

@@ -1,0 +1,16 @@
+{
+  "category": "integration",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Literal route outranks an earlier parameter/wildcard and only one handler runs.",
+    "Percent-decoded capture and zero-segment wildcard."
+  ],
+  "docDelivery": [
+    "Segment decoding occurs after splitting and rank precedence includes exact end.",
+    "Registration-order tie handling and no-match null result."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Paths begin /; no query, fragment, trailing slash except /, or empty interior segment. Segments contain valid percent encodings. Patterns use literal decoded ASCII segments, :name or terminal *name, unique identifier names. Handlers synchronous.",
+  "independence": "Integrate literal/parameter/wildcard route precedence and decoded captures with handler invocation."
+}

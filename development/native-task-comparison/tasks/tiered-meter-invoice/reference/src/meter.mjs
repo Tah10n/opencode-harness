@@ -1,0 +1,1 @@
+export function charge(units,bands){let used=0,total=0;for(const band of bands){const take=Math.min(Math.max(0,units-used),band.upTo===null?Infinity:band.upTo-used);total+=take*band.cents;used+=take;if(used===units)break;}return total;}

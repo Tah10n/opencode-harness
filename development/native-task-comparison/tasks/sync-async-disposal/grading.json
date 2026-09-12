@@ -1,0 +1,16 @@
+{
+  "category": "compatibility",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert mixed legacy/symbol methods, precedence and awaited LIFO order.",
+    "Assert body error wins while all cleanups run, and first cleanup error wins after body success."
+  ],
+  "docDelivery": [
+    "Document method selection, occurrence semantics, receiver and serial awaiting.",
+    "Explain body/cleanup error precedence, no error mutation and helper-specific sync-return awaiting."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Static bounded resource occurrences with callable selected stable method, nullish entries ignored; awaited LIFO and explicit primary-error policy.",
+  "independence": "Bridge sync/async resource disposal while preserving nested LIFO cleanup and original body errors."
+}

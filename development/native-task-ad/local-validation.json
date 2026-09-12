@@ -1,0 +1,39 @@
+{
+  "revision": "D",
+  "directNativeChecks": [
+    "verify-native-template: passed",
+    "verify-native-review: passed",
+    "verify-native-task: passed"
+  ],
+  "installedScenarios": {
+    "correct": "checks_passed; no correction",
+    "defect": "checks_passed; one correction",
+    "coverage-loss": "required scenario restored; one correction",
+    "intentional": "new expectation preserved",
+    "relocation": "equivalent move not automatically rejected",
+    "late-check": "final check executed in one correction",
+    "final-stale": "incomplete after one correction",
+    "no-progress": "incomplete after one correction",
+    "permission": "incomplete before correction",
+    "cancel": "real child PID terminated",
+    "budget": "real child PID terminated",
+    "concurrent-save": "original user save retained",
+    "staged-work": "index and staged/unstaged bytes retained",
+    "external-save": "external delivery bytes retained; incomplete"
+  },
+  "containerPreflight": {
+    "status": "passed",
+    "requests": 8,
+    "realProviderCalls": 0,
+    "elapsedMs": 3133,
+    "terminationVerified": true
+  },
+  "realProviderRequests": 0,
+  "independentReview": {
+    "passes": 1,
+    "confirmedDefects": 4,
+    "remediation": "initial-route matching; all existing test changes assessed; Node root test filenames; final and terminal snapshot binding",
+    "counterexamplesChecked": true
+  },
+  "scope": "Mechanism evidence only; model effectiveness awaits eight frozen development outcomes."
+}

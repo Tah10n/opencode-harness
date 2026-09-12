@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {mergeDraft} from '../src/merge.mjs';test('independent edits and deletion',()=>assert.deepEqual(mergeDraft({a:1,b:2,c:3},{a:4,b:2},{a:1,b:5,c:3}),{merged:{a:4,b:5},conflicts:[]}));test('delete versus null conflict',()=>assert.deepEqual(mergeDraft({a:1},{},{a:null}),{merged:{},conflicts:[{key:'a',base:{present:true,value:1},local:{present:false},remote:{present:true,value:null}}]}));

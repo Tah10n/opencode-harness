@@ -1,0 +1,1 @@
+import {inlineIds,attachmentMap} from './attachments.mjs';export function composeMail(html,attachments){const map=attachmentMap(attachments);return {html,parts:inlineIds(html).map(id=>{if(!map.has(id))throw new TypeError('missing cid');return map.get(id);})};}

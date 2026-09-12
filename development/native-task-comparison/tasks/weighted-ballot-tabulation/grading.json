@@ -1,0 +1,16 @@
+{
+  "category": "integration",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert transfers change plurality winner and complete round/report output.",
+    "Assert exhaustion-adjusted majority, deterministic tie elimination, zero active weight, empty and invalid ballots."
+  ],
+  "docDelivery": [
+    "Document exact project majority/elimination/tie policy and exhaustion.",
+    "Explain round audit/report format, input domain and absence of legal/general-election claims."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Deterministic weighted ranked-choice rounds, exhaustion-sensitive majority and integrated ordered audit rendering.",
+  "independence": "Integrate weighted ranked-choice elimination rounds, exhausted ballots and deterministic audit report."
+}

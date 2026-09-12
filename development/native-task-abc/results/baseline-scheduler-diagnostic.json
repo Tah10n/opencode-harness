@@ -1,0 +1,12 @@
+{
+  "source": "7b1909acb25e4ad764c00dc2211ae7f793c64f00",
+  "pattern": "the detached scheduler child owns its lock and later launchers exit|a hook persists its event while another hook holds the scheduler launch gate",
+  "code": 1,
+  "note": "Post-score unmodified-baseline diagnostic; no model run or score replacement.",
+  "failures": [
+    "the detached scheduler child owns its lock and later launchers exit",
+    "a hook persists its event while another hook holds the scheduler launch gate"
+  ],
+  "error": "Timed out waiting for test condition",
+  "cleanup": 0
+}

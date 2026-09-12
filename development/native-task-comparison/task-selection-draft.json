@@ -1,0 +1,505 @@
+{
+  "status": "frozen-before-scored-runs",
+  "tasks": [
+    {
+      "id": "tiered-meter-invoice",
+      "category": "integration",
+      "contract": "Integrate graduated usage bands, per-account credit and integer-cent invoice lines with stable band boundaries."
+    },
+    {
+      "id": "geographic-antimeridian-viewport",
+      "category": "integration",
+      "contract": "Integrate minimal circular longitude bounds with point projection and viewport consumer across the antimeridian."
+    },
+    {
+      "id": "meeting-buffer-search",
+      "category": "integration",
+      "contract": "Integrate half-open room reservations and cleaning buffers into earliest common availability search."
+    },
+    {
+      "id": "unicode-search-snippets",
+      "category": "integration",
+      "contract": "Integrate Unicode code-point offsets, nonoverlapping search matches and bounded context snippets."
+    },
+    {
+      "id": "route-specificity-dispatch",
+      "category": "integration",
+      "contract": "Integrate literal/parameter/wildcard route precedence and decoded captures with handler invocation."
+    },
+    {
+      "id": "span-source-map-compose",
+      "category": "integration",
+      "contract": "Compose generated-to-intermediate and intermediate-to-source mapping anchors with unmapped segments and diagnostic consumers."
+    },
+    {
+      "id": "mime-inline-attachments",
+      "category": "integration",
+      "contract": "Integrate multipart body construction with inline content IDs, ordered attachment deduplication and safe headers."
+    },
+    {
+      "id": "markdown-heading-navigation",
+      "category": "integration",
+      "contract": "Integrate fenced-block-aware heading scanning, repeated anchor slugs and hierarchical table of contents."
+    },
+    {
+      "id": "feature-rollout-context",
+      "category": "integration",
+      "contract": "Integrate deterministic seeded user buckets, explicit targeting override and disabled-flag fallback."
+    },
+    {
+      "id": "token-bucket-admission",
+      "category": "integration",
+      "contract": "Integrate injected monotonic clock, token refill and retry-after computation into request admission."
+    },
+    {
+      "id": "recurrence-exclusion-calendar",
+      "category": "integration",
+      "contract": "Integrate UTC weekly recurrence enumeration, exclusion dates and event-specific replacement occurrences."
+    },
+    {
+      "id": "parcel-shipping-quote",
+      "category": "integration",
+      "contract": "Integrate dimensional weight rounding, per-zone tariffs and oversize rejection into parcel quote batches."
+    },
+    {
+      "id": "weighted-ballot-tabulation",
+      "category": "integration",
+      "contract": "Integrate weighted ranked-choice elimination rounds, exhausted ballots and deterministic audit report."
+    },
+    {
+      "id": "image-transform-pipeline",
+      "category": "integration",
+      "contract": "Integrate ordered crop/rotate/resize geometry operations with metadata dimensions and no-op preservation."
+    },
+    {
+      "id": "metric-watermark-windows",
+      "category": "integration",
+      "contract": "Integrate event-time windows, late-event policy and watermark flushing with grouped metric summaries."
+    },
+    {
+      "id": "conditional-form-errors",
+      "category": "integration",
+      "contract": "Integrate conditional required fields, nested validation paths and stable accessible error summaries."
+    },
+    {
+      "id": "scope-policy-composition",
+      "category": "integration",
+      "contract": "Integrate role grants, explicit resource denies and wildcard scope matching into authorization explanation."
+    },
+    {
+      "id": "plugin-hook-composition",
+      "category": "integration",
+      "contract": "Integrate hook dependency order, value transformations and early stop semantics into plugin execution."
+    },
+    {
+      "id": "responsive-image-candidates",
+      "category": "integration",
+      "contract": "Integrate density/width srcset parsing, candidate selection and duplicate-descriptor errors."
+    },
+    {
+      "id": "breadcrumb-visible-ancestors",
+      "category": "integration",
+      "contract": "Integrate tree traversal, hidden ancestors and current-node labels into accessible breadcrumb output."
+    },
+    {
+      "id": "trace-context-propagation",
+      "category": "integration",
+      "contract": "Integrate valid traceparent parsing, baggage allowlisting and child-span header construction."
+    },
+    {
+      "id": "record-projection-consumer",
+      "category": "integration",
+      "contract": "Integrate allowlisted nested field projection, renaming and absent/null distinctions in API response views."
+    },
+    {
+      "id": "fragmented-message-decoder",
+      "category": "integration",
+      "contract": "Integrate byte-fragment reassembly, UTF-8 decoding and interleaved control frames into message consumer."
+    },
+    {
+      "id": "ledger-settlement-reconcile",
+      "category": "integration",
+      "contract": "Integrate signed integer ledger entries, reversal references and per-currency settlement conservation."
+    },
+    {
+      "id": "subscription-proration-lines",
+      "category": "integration",
+      "contract": "Integrate day-count proration, plan-change boundaries and invoice adjustment line aggregation."
+    },
+    {
+      "id": "undo-redo-branching",
+      "category": "state",
+      "contract": "Implement isolated undo/redo history with branch truncation, capacity limits and no-op updates."
+    },
+    {
+      "id": "range-set-canonicalization",
+      "category": "state",
+      "contract": "Implement integer interval insertion/removal, canonical adjacency merging and membership round-trip."
+    },
+    {
+      "id": "version-vector-relations",
+      "category": "state",
+      "contract": "Implement causal vector comparison, pointwise merge and zero-counter normalization without input mutation."
+    },
+    {
+      "id": "observed-remove-set",
+      "category": "state",
+      "contract": "Implement tagged add/remove operations and replica merge retaining concurrent additions."
+    },
+    {
+      "id": "reservoir-sample-resume",
+      "category": "state",
+      "contract": "Persist and resume bounded online reservoir sampling with deterministic PRNG state and batch equivalence."
+    },
+    {
+      "id": "canonical-json-digest",
+      "category": "state",
+      "contract": "Implement deterministic plain-JSON canonicalization with sorted object keys, preserved arrays and finite-number domain."
+    },
+    {
+      "id": "binary-tlv-stream",
+      "category": "state",
+      "contract": "Implement length-prefixed binary field serialization with unknown byte-tag preservation and strict truncated-input errors."
+    },
+    {
+      "id": "draft-three-way-merge",
+      "category": "state",
+      "contract": "Implement field-level three-way draft merge, deletion sentinels and conflict reporting relative to common base."
+    },
+    {
+      "id": "sparse-grid-persistence",
+      "category": "state",
+      "contract": "Implement sparse matrix coordinate encoding, zero elision and rectangular dimensions through save/load."
+    },
+    {
+      "id": "radix-tree-edit-state",
+      "category": "state",
+      "contract": "Implement persistent prefix dictionary updates, deletion and sorted prefix queries with snapshot isolation."
+    },
+    {
+      "id": "rolling-checksum-journal",
+      "category": "state",
+      "contract": "Implement append-only checkpoint replay with verified checksum chain and explicit corrupt-tail rejection."
+    },
+    {
+      "id": "finite-state-transition-log",
+      "category": "state",
+      "contract": "Implement permitted state transitions, duplicate event-id handling and deterministic replay consistency."
+    },
+    {
+      "id": "bounded-lru-persistence",
+      "category": "state",
+      "contract": "Implement recency-order export/import with capacity eviction and side-effect-free inspection."
+    },
+    {
+      "id": "multi-value-query-state",
+      "category": "state",
+      "contract": "Implement query parameter multimap edit/serialize preserving duplicate value order and explicit empty values."
+    },
+    {
+      "id": "zoned-time-offset-records",
+      "category": "state",
+      "contract": "Implement timestamp/offset record normalization preserving instant and signed offset without host timezone dependence."
+    },
+    {
+      "id": "run-length-bitmap-codec",
+      "category": "state",
+      "contract": "Implement run-length bitmap encoding/decoding, empty dimensions and invalid-run rejection."
+    },
+    {
+      "id": "bloom-filter-union-state",
+      "category": "state",
+      "contract": "Persist probabilistic membership bits with fixed hash policy and compatible union preserving no-false-negative behavior."
+    },
+    {
+      "id": "tree-selection-propagation",
+      "category": "state",
+      "contract": "Implement hierarchical checkbox state propagation, indeterminate ancestors and snapshot restore."
+    },
+    {
+      "id": "incremental-line-index",
+      "category": "state",
+      "contract": "Implement text line-start index updates across insert/delete boundaries and CRLF normalization rules."
+    },
+    {
+      "id": "fractional-order-keys",
+      "category": "state",
+      "contract": "Implement sortable rational position keys and deterministic rebalancing preserving item order."
+    },
+    {
+      "id": "content-addressed-chunks",
+      "category": "state",
+      "contract": "Implement chunk store manifests, deduplication and reference-count-safe deletion."
+    },
+    {
+      "id": "sliding-session-expiry",
+      "category": "state",
+      "contract": "Implement idle plus absolute session expiry, touch semantics and serialized clock-independent state."
+    },
+    {
+      "id": "path-edit-transaction",
+      "category": "state",
+      "contract": "Implement atomic plain-JSON path operation lists with array index validation and rollback on invalid operation."
+    },
+    {
+      "id": "priority-inbox-state",
+      "category": "state",
+      "contract": "Implement priority/deferred item transitions and stable export/import without losing insertion sequence."
+    },
+    {
+      "id": "text-diff-patch-state",
+      "category": "state",
+      "contract": "Implement line-based patch application with context matching, conflict rejection and inverse restoration."
+    },
+    {
+      "id": "iterable-stream-adapter",
+      "category": "compatibility",
+      "contract": "Support sync and async iterables through one consumer with early-return cleanup and source error identity."
+    },
+    {
+      "id": "node-callback-abort",
+      "category": "compatibility",
+      "contract": "Add AbortSignal to a callback-only reader preserving callback-once behavior and existing call signatures."
+    },
+    {
+      "id": "header-multimap-api",
+      "category": "compatibility",
+      "contract": "Support repeated case-insensitive HTTP headers through legacy object and iterable input forms."
+    },
+    {
+      "id": "shell-word-tokenizer-api",
+      "category": "compatibility",
+      "contract": "Add quoted/escaped word tokenization to a legacy whitespace splitter under explicit literal grammar without command execution."
+    },
+    {
+      "id": "positional-options-overload",
+      "category": "compatibility",
+      "contract": "Add options-object overload to a range formatter while retaining positional arguments and default rules."
+    },
+    {
+      "id": "sync-async-disposal",
+      "category": "compatibility",
+      "contract": "Bridge sync/async resource disposal while preserving nested LIFO cleanup and original body errors."
+    },
+    {
+      "id": "binary-search-api-bounds",
+      "category": "compatibility",
+      "contract": "Extend binary-search API with comparator/key-extractor overloads and explicit first/last duplicate insertion bounds."
+    },
+    {
+      "id": "url-resolver-consumers",
+      "category": "compatibility",
+      "contract": "Preserve base-path resolution and query/fragment behavior when adding URL-object input to existing string API."
+    },
+    {
+      "id": "abortable-delay-consumer",
+      "category": "compatibility",
+      "contract": "Add cancellable delay promises with injected timers and listener cleanup without changing existing delay callers."
+    },
+    {
+      "id": "typed-byte-view-inputs",
+      "category": "compatibility",
+      "contract": "Accept ArrayBuffer and typed-array subviews in a checksum consumer without including unrelated backing bytes."
+    },
+    {
+      "id": "legacy-date-parser",
+      "category": "compatibility",
+      "contract": "Extend strict date parser to ISO week dates while retaining calendar-date validation and no timezone rollover."
+    },
+    {
+      "id": "readonly-collection-view",
+      "category": "compatibility",
+      "contract": "Introduce read-only Map-like views preserving iteration and live-source updates while denying mutator escape."
+    },
+    {
+      "id": "promise-finalizer-errors",
+      "category": "compatibility",
+      "contract": "Add Promise finally support to a minimal thenable adapter preserving fulfillment/rejection and finalizer errors."
+    },
+    {
+      "id": "media-type-parameter-api",
+      "category": "compatibility",
+      "contract": "Extend media-type consumer to quoted parameter values and escaped separators while retaining token-only parsing."
+    },
+    {
+      "id": "regexp-filter-state",
+      "category": "compatibility",
+      "contract": "Accept RegExp filters without leaking lastIndex across entries or mutating caller-owned patterns."
+    },
+    {
+      "id": "bigint-wire-boundary",
+      "category": "compatibility",
+      "contract": "Add explicit BigInt wire representation to a JSON API without confusing ordinary lookalike objects."
+    },
+    {
+      "id": "error-cause-chain-view",
+      "category": "compatibility",
+      "contract": "Expose cause chains in error presentation while preserving legacy messages and handling cycles safely."
+    },
+    {
+      "id": "lazy-default-arguments",
+      "category": "compatibility",
+      "contract": "Add lazy default factories to settings lookup preserving explicit undefined/null and call-count contracts."
+    },
+    {
+      "id": "symbol-property-copy",
+      "category": "compatibility",
+      "contract": "Extend shallow copy adapter to enumerable symbol properties preserving getters and descriptor-independent values."
+    },
+    {
+      "id": "array-like-slice-consumer",
+      "category": "compatibility",
+      "contract": "Accept bounded array-like collections in a batching consumer while retaining holes and index order semantics."
+    },
+    {
+      "id": "function-receiver-wrapper",
+      "category": "compatibility",
+      "contract": "Add timing instrumentation wrappers preserving this, arguments, return identity and thrown errors."
+    },
+    {
+      "id": "casefold-command-aliases",
+      "category": "compatibility",
+      "contract": "Add ASCII-insensitive aliases while preserving exact command precedence, help ordering and collision refusal."
+    },
+    {
+      "id": "line-ending-input-adapter",
+      "category": "compatibility",
+      "contract": "Support LF/CRLF streamed text chunks preserving split delimiter boundaries and final unterminated lines."
+    },
+    {
+      "id": "optional-result-unwrapping",
+      "category": "compatibility",
+      "contract": "Add tagged optional results to a consumer while preserving legacy direct values and explicit failure tags."
+    },
+    {
+      "id": "stable-sort-comparator",
+      "category": "compatibility",
+      "contract": "Extend a sorting consumer to custom comparators while preserving ties, sparse input policy and input immutability."
+    },
+    {
+      "id": "lexer-token-spans",
+      "category": "refactoring",
+      "contract": "Separate expression lexing from evaluation while preserving precedence, token spans and exact syntax failures."
+    },
+    {
+      "id": "pure-reducer-effects",
+      "category": "refactoring",
+      "contract": "Extract deterministic state reducer from an effectful counter controller and preserve effect order via returned actions."
+    },
+    {
+      "id": "clock-injected-reminders",
+      "category": "refactoring",
+      "contract": "Replace ambient time reads with injected clock in reminder selection while preserving inclusive due boundaries."
+    },
+    {
+      "id": "transport-injected-uploader",
+      "category": "refactoring",
+      "contract": "Separate chunk formation from upload transport preserving byte order, chunk bounds and first-failure behavior."
+    },
+    {
+      "id": "table-driven-http-status",
+      "category": "refactoring",
+      "contract": "Replace scattered status classifications with one reusable classifier preserving known and unknown status behavior."
+    },
+    {
+      "id": "normalization-once-pipeline",
+      "category": "refactoring",
+      "contract": "Remove repeated normalization across a validation pipeline while preserving public outputs and explicit normalization call counts."
+    },
+    {
+      "id": "parser-diagnostic-locations",
+      "category": "refactoring",
+      "contract": "Split configuration tokenization/parsing while preserving exact line/column error locations and accepted grammar."
+    },
+    {
+      "id": "immutable-board-moves",
+      "category": "refactoring",
+      "contract": "Refactor in-place board move logic into pure transitions with legacy mutating wrapper behavior preserved."
+    },
+    {
+      "id": "generator-tree-walk",
+      "category": "refactoring",
+      "contract": "Replace recursive materialized traversal with lazy generator preserving preorder, pruning and early-termination behavior."
+    },
+    {
+      "id": "iterative-deep-flatten",
+      "category": "refactoring",
+      "contract": "Replace recursive flattening with stack-based traversal preserving depth limits, ordering and sparse-array rules."
+    },
+    {
+      "id": "encoder-decoder-separation",
+      "category": "refactoring",
+      "contract": "Separate percent-encoding policy from query rendering preserving UTF-8 escapes and reserved-character behavior."
+    },
+    {
+      "id": "central-money-rounding",
+      "category": "refactoring",
+      "contract": "Unify duplicated integer-ratio rounding across billing helpers preserving negative tie policy and totals."
+    },
+    {
+      "id": "dependency-injected-id-source",
+      "category": "refactoring",
+      "contract": "Extract ID allocation dependency from record creation preserving uniqueness checks and no allocation on validation failure."
+    },
+    {
+      "id": "batch-error-aggregation",
+      "category": "refactoring",
+      "contract": "Refactor fail-fast validation into reusable collection helper with legacy fail-fast wrapper and new all-errors API."
+    },
+    {
+      "id": "lazy-file-manifest",
+      "category": "refactoring",
+      "contract": "Separate manifest path filtering from filesystem adapter preserving ordering, excluded paths and no unnecessary reads."
+    },
+    {
+      "id": "portable-path-core",
+      "category": "refactoring",
+      "contract": "Extract host-independent POSIX path normalization from CLI handling preserving root clamping and trailing slash contracts."
+    },
+    {
+      "id": "visitor-expression-printer",
+      "category": "refactoring",
+      "contract": "Refactor expression rendering to a visitor interface preserving minimal parentheses and literal escaping."
+    },
+    {
+      "id": "immutable-color-transform",
+      "category": "refactoring",
+      "contract": "Separate color parsing, transformation and output formatting preserving clamping, rounding and alpha behavior."
+    },
+    {
+      "id": "validation-rule-combinators",
+      "category": "refactoring",
+      "contract": "Extract reusable AND/OR validation combinators preserving short-circuiting, error order and old schema outcomes."
+    },
+    {
+      "id": "streaming-summary-fold",
+      "category": "refactoring",
+      "contract": "Replace array accumulation with incremental fold preserving empty input, numeric bounds and stable aggregate results."
+    },
+    {
+      "id": "matrix-layout-strategies",
+      "category": "refactoring",
+      "contract": "Separate row/column layout strategies from a grid renderer preserving spans and occupied-cell conflict behavior."
+    },
+    {
+      "id": "notification-channel-router",
+      "category": "refactoring",
+      "contract": "Refactor channel switches into injected handlers preserving fallback, message order and unknown-channel behavior."
+    },
+    {
+      "id": "structured-redaction-walk",
+      "category": "refactoring",
+      "contract": "Extract traversal from log redaction preserving nested arrays, cycles, key policy and non-mutation."
+    },
+    {
+      "id": "deterministic-shuffle-source",
+      "category": "refactoring",
+      "contract": "Inject random-number source into shuffle preserving permutation, bounds validation and legacy entry point."
+    },
+    {
+      "id": "unit-conversion-graph",
+      "category": "refactoring",
+      "contract": "Refactor direct conversions into reusable conversion graph preserving supported values and rejecting inconsistent paths."
+    }
+  ]
+}

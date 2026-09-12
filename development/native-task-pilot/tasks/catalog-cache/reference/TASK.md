@@ -1,0 +1,7 @@
+# Conditional catalog requests
+Our catalog consumer repeatedly downloads the same regional catalog. Add conditional requests through the handler and client.
+1. `handle(req, res, catalog)` serves GET /catalog?region=REGION. Omitted region selects all items. Filtering keeps array order and never mutates catalog. Other paths remain 404 and other methods remain 405.
+2. For a successful catalog representation return a quoted SHA-256 ETag of the exact JSON response bytes. Different selected representations must have different tags. Include `Cache-Control: private, max-age=0` on both 200 and 304.
+3. If req.headers['if-none-match'] exactly equals that representation's ETag, return 304, the same ETag, and an empty body; otherwise return 200 JSON. Do not broaden this to wildcard or weak tag semantics.
+4. Extend `loadCatalog(fetcher, {region, etag} = {})`: URL-encode region, send If-None-Match only when etag is provided, return `{status: 'not-modified', etag}` on 304 without invoking response.json(), otherwise `{status: 'ok', items, etag}` on 200. Non-200/304 throws. The legacy one-argument call continues fetching /catalog and returning an array of items.
+5. Add project handler and client tests, including actual header/body behavior, region escaping, 304 with json() that throws, and the legacy consumer. Preserve existing tests. Document new/legacy return shapes and exact ETag matching in README.md.

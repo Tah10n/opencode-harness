@@ -1,0 +1,3 @@
+# symbol-property-copy
+
+copyValues makes a fresh ordinary object with enumerable own string and symbol values, shallowly preserving identities. Reflect.ownKeys order applies: numeric string keys, other strings, then symbols. Inherited/nonenumerable keys are skipped. Included getters run once with source receiver; their errors propagate unchanged and stop later reads. Output properties are writable/configurable/enumerable data descriptors, including __proto__, so accessors and prototypes are not copied. Source is unchanged. Ordinary frozen/null/custom-prototype objects work; proxies, exotic objects and structure-mutating getters are outside the contract. Run npm test.

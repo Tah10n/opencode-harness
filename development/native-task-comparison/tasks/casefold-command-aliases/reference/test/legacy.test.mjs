@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {createCommands} from '../src/commands.mjs';test('canonical lookup and help',()=>{const c=createCommands([{name:'ping',description:'Ping',run:x=>x+1}]);assert.equal(c.run('ping',2),3);assert.deepEqual(c.help(),[{name:'ping',description:'Ping',aliases:[]}]);assert.throws(()=>c.run('unknown'),e=>e.code==='UNKNOWN_COMMAND');});

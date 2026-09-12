@@ -1,0 +1,22 @@
+[
+  {
+    "task": "legacy-runtime-reload",
+    "arm": "P",
+    "code": 0,
+    "stdout": "✔ exact complete legacy runtime survives fresh process reload and repeated prepare (115.777084ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 143.309751\n",
+    "stderr": "",
+    "testSha256": "a33b0fe3149c9f55583692674ea86e4c63acdc3d49f837818649e4a60c9c9f63",
+    "scope": "Supplemental task-contract check after discovering frozen historical reload fixture supplied only two legacy files. Frozen grading outputs and delivery rubric remain unchanged. Does not add a delivered regression to the author patch.",
+    "cleanup": 0
+  },
+  {
+    "task": "legacy-runtime-reload",
+    "arm": "H",
+    "code": 1,
+    "stdout": "✖ exact complete legacy runtime survives fresh process reload and repeated prepare (31.278916ms)\nℹ tests 1\nℹ suites 0\nℹ pass 0\nℹ fail 1\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 59.105375\n\n✖ failing tests:\n\ntest at ../exact-layout-reload.test.mjs:6:1\n✖ exact complete legacy runtime survives fresh process reload and repeated prepare (31.278916ms)\n  Error: Command failed: /usr/local/bin/node --input-type=module -e import {readOrCreateInstallation,prepareRuntime} from \"file:///work/repo/packages/connector/lib/config.mjs\";const i=await readOrCreateInstallation();const runtime=await prepareRuntime(new URL(\"file:///work/repo/packages/connector/bin/viberacing.mjs\"));console.log(JSON.stringify({i,runtime}));\n  file:///work/repo/packages/connector/lib/config.mjs:198\n        throw new Error(\n              ^\n  \n  Error: Vibe Racing state contains an unrelated entry: lib\n      at inspectOwnedStateTree (file:///work/repo/packages/connector/lib/config.mjs:198:13)\n      at async secureStateDirectory (file:///work/repo/packages/connector/lib/config.mjs:463:26)\n      at async withConnectionStateLock (file:///work/repo/packages/connector/lib/config.mjs:578:3)\n      at async file:///work/repo/[eval1]:1:117\n  \n  Node.js v24.19.0\n  \n      at genericNodeError (node:internal/errors:985:15)\n      at wrappedFn (node:internal/errors:539:14)\n      at ChildProcess.exithandler (node:child_process:417:12)\n      at ChildProcess.emit (node:events:509:28)\n      at maybeClose (node:internal/child_process:1141:16)\n      at ChildProcess._handle.onexit (node:internal/child_process:306:5) {\n    code: 1,\n    killed: false,\n    signal: null,\n    cmd: '/usr/local/bin/node --input-type=module -e import {readOrCreateInstallation,prepareRuntime} from \"file:///work/repo/packages/connector/lib/config.mjs\";const i=await readOrCreateInstallation();const runtime=await prepareRuntime(new URL(\"file:///work/repo/packages/connector/bin/viberacing.mjs\"));console.log(JSON.stringify({i,runtime}));',\n    stdout: '',\n    stderr: 'file:///work/repo/packages/connector/lib/config.mjs:198\\n      throw new Error(\\n            ^\\n\\nError: Vibe Racing state contains an unrelated entry: lib\\n    at inspectOwnedStateTree (file:///work/repo/packages/connector/lib/config.mjs:198:13)\\n    at async secureStateDirectory (file:///work/repo/packages/connector/lib/config.mjs:463:26)\\n    at async withConnectionStateLock (file:///work/repo/packages/connector/lib/config.mjs:578:3)\\n    at async file:///work/repo/[eval1]:1:117\\n\\nNode.js v24.19.0\\n'\n  }\n",
+    "stderr": "",
+    "testSha256": "a33b0fe3149c9f55583692674ea86e4c63acdc3d49f837818649e4a60c9c9f63",
+    "scope": "Supplemental task-contract check after discovering frozen historical reload fixture supplied only two legacy files. Frozen grading outputs and delivery rubric remain unchanged. Does not add a delivered regression to the author patch.",
+    "cleanup": 0
+  }
+]

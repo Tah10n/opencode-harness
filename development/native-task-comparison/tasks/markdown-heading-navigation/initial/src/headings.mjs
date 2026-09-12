@@ -1,0 +1,1 @@
+export function headings(text){return text.split('\n').filter(x=>x.startsWith('# ')).map(x=>({level:1,title:x.slice(2)}));}export function anchors(items){return items.map(x=>({...x,id:x.title.toLowerCase().replaceAll(' ','-')}));}

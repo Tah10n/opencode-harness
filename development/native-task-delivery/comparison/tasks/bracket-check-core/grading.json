@@ -1,0 +1,18 @@
+{
+  "category": "refactoring",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "mismatch offset through consumer",
+    "remaining earliest opener and ignored text"
+  ],
+  "docDelivery": [
+    "Explain pure inspection, ignored text, first closing mismatch vs earliest remaining opener and UTF16 offsets."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Extract inspect(text) to src/brackets.mjs and delegate check(text) in src/check.mjs to it. Preserve bracket stack rules for () [] {}, ignoring all other characters (quotes have no special meaning). First mismatching/unmatched closing bracket reports {ok:false,index:UTF16 offset}; if end reached with openers report earliest remaining opener index, otherwise {ok:true,index:null}. check returns \"ok\" or \"unbalanced at INDEX\". Domain arbitrary UTF16 text<=10000 units. No I/O, regex-only balancing or duplicated algorithm in consumer.",
+  "manualBehavior": [
+    "check delegates to inspect; no duplicated balancing loop"
+  ],
+  "independence": "Explicit synthetic library contract; alternatives judged by observable exports and required integration, not reference-source matching."
+}

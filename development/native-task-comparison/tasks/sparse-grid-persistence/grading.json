@@ -1,0 +1,16 @@
+{
+  "category": "state",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Sparse JSON round trip with numerical order and stored null versus absence.",
+    "Invalid duplicate restore is atomic."
+  ],
+  "docDelivery": [
+    "Coordinate domain, numerical ordering, deep-copy ownership and absent/null semantics.",
+    "Exact persisted cell shape, replacement restore, parse/validation errors and unchanged state on failure."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "row/column integers -1000..1000 (negative zero treated as zero); cell value JSON primitives/ordinary records/dense arrays excluding undefined/custom methods/getters/cycles/nonfinite numbers/-0 in values. Restore text JSON or malformed, valid snapshot cell objects exact row,column,value keys, duplicate coordinates rejected.",
+  "independence": "Implement sparse matrix coordinate encoding, zero elision and rectangular dimensions through save/load."
+}

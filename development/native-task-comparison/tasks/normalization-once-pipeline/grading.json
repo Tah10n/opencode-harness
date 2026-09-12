@@ -1,0 +1,19 @@
+{
+  "category": "refactoring",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert exactly one injected normalization for valid and invalid results and error identity.",
+    "Assert legacy wrapper/default outputs and normalized core does not transform strings again."
+  ],
+  "docDelivery": [
+    "Explain normalized core versus legacy raw wrappers and single pipeline call.",
+    "Document ASCII lowercasing, validation priority, display behavior and injection errors."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "String name pipeline, explicit normalize-once injection and unchanged raw wrappers/core validation priority.",
+  "manualBehavior": [
+    "Verify one normalization result flows to shared normalized validation/display core; no duplicate rules or hidden second normalization in pipeline/core. Legacy raw wrappers must use that same core."
+  ],
+  "independence": "Remove repeated normalization across a validation pipeline while preserving public outputs and explicit normalization call counts."
+}

@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/delay.mjs": "export function delay(ms,options={}){\n const schedule=options.setTimeout===undefined?globalThis.setTimeout:options.setTimeout,cancel=options.clearTimeout===undefined?globalThis.clearTimeout:options.clearTimeout,signal=options.signal;\n return new Promise((resolve,reject)=>{\n  if(!Number.isInteger(ms)||ms<0||ms>1000000)return reject(new RangeError('delay'));\n  if(signal&&signal.aborted)return reject(signal.reason);\n  let pending=true,handle;\n  function settle(aborted){if(!pending)return;pending=false;if(aborted)cancel(handle);if(signal)signal.removeEventListener('abort',onAbort);if(aborted)reject(signal.reason);else resolve();}\n  function onAbort(){settle(true);}\n  handle=schedule(()=>settle(false),ms);if(signal)signal.addEventListener('abort',onAbort);\n });\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "does-not-clear-aborted-timer",
+      "file": "src/delay.mjs",
+      "replacement": "export function delay(ms,{signal,setTimeout:schedule=globalThis.setTimeout,clearTimeout:cancel=globalThis.clearTimeout}={}){\n return new Promise((resolve,reject)=>{\n  if(!Number.isInteger(ms)||ms<0||ms>1000000){reject(new RangeError('delay'));return;}\n  if(signal?.aborted){reject(signal.reason);return;}\n  let settled=false,timer;\n  const remove=()=>signal?.removeEventListener('abort',abort);\n  const abort=()=>{if(settled)return;settled=true;remove();reject(signal.reason);};\n  const done=()=>{if(settled)return;settled=true;remove();resolve(undefined);};\n  timer=schedule(done,ms);signal?.addEventListener('abort',abort);\n });\n}\n"
+    },
+    {
+      "name": "leaks-success-listener",
+      "file": "src/delay.mjs",
+      "replacement": "export function delay(ms,{signal,setTimeout:schedule=globalThis.setTimeout,clearTimeout:cancel=globalThis.clearTimeout}={}){\n return new Promise((resolve,reject)=>{\n  if(!Number.isInteger(ms)||ms<0||ms>1000000){reject(new RangeError('delay'));return;}\n  if(signal?.aborted){reject(signal.reason);return;}\n  let settled=false,timer;\n  const remove=()=>signal?.removeEventListener('abort',abort);\n  const abort=()=>{if(settled)return;settled=true;cancel(timer);remove();reject(signal.reason);};\n  const done=()=>{if(settled)return;settled=true;resolve(undefined);};\n  timer=schedule(done,ms);signal?.addEventListener('abort',abort);\n });\n}\n"
+    }
+  ]
+}

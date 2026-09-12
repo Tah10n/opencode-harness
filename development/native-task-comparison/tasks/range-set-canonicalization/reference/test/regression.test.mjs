@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {createRanges} from '../src/ranges.mjs';test('touching merge and interior split',()=>{const r=createRanges([[5,8],[1,3]]);r.add(3,5);assert.deepEqual(r.snapshot(),[[1,8]]);r.remove(3,6);assert.deepEqual(r.snapshot(),[[1,3],[6,8]]);assert.equal(r.contains(3),false);assert.equal(r.contains(6),true);});test('empty range and snapshot ownership',()=>{const r=createRanges([[1,2]]);r.add(4,4);r.snapshot()[0][0]=9;assert.deepEqual(r.snapshot(),[[1,2]]);});

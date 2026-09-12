@@ -1,0 +1,230 @@
+{
+  "slot": 9,
+  "task": "reconnect-revoked",
+  "arm": "B",
+  "exitCode": 0,
+  "timedOut": false,
+  "elapsedMs": 324887,
+  "phaseCount": 2,
+  "continuationApplied": true,
+  "requests": 50,
+  "requestsWithoutUsage": 0,
+  "workflowStatus": null,
+  "repairs": null,
+  "toolCalls": 66,
+  "sessions": 1,
+  "usage": {
+    "input_tokens": 2284886,
+    "cached_tokens": 1077248,
+    "output_tokens": 9471,
+    "reasoning_tokens": 3400,
+    "total_tokens": 2294357
+  },
+  "requestEfforts": {
+    "none": 1,
+    "low": 49
+  },
+  "httpStatuses": {
+    "200": 50
+  },
+  "terminationVerified": true,
+  "phases": {
+    "first": {
+      "exitCode": 0,
+      "signal": null,
+      "termination": {
+        "terminationVerified": true,
+        "killed": []
+      },
+      "timedOut": false,
+      "elapsedMs": 297155,
+      "parseErrors": 0
+    },
+    "continuation": {
+      "exitCode": 0,
+      "signal": null,
+      "termination": {
+        "terminationVerified": true,
+        "killed": []
+      },
+      "timedOut": false,
+      "elapsedMs": 27651,
+      "parseErrors": 0
+    }
+  },
+  "packet": "R5",
+  "delivery": {
+    "patchApplies": true,
+    "changedFiles": [
+      "packages/connector/README.md",
+      "packages/connector/bin/viberacing.mjs",
+      "packages/connector/test/config.test.mjs"
+    ],
+    "patchSha256": "9b6c05603f9f5cfe96b7c0484d05e4c7303501a904a97bd05aa80d21ee249a4b"
+  },
+  "sourceReview": {
+    "packet": "R5",
+    "sourceReview": {
+      "implementation": "Both 401/403 use existing lifecycle cleanup including pending payload removal under existing lock. Other errors preserved.",
+      "tests": "Replaces the prior successful disconnected mode with unauthorized instead of retaining both. Explicit authenticated remote-disconnected-source retirement coverage is lost, same issue as W6.",
+      "documentation": "Describes revoked recovery and preserved transient failures.",
+      "staticDefects": [
+        "Necessary existing remote-disconnected-source reconnect coverage removed."
+      ],
+      "D0ToFinal": "Adds back the assertion that recovered config contains the active server source, omitted at D0; reorders assertions. Production unchanged. The lost authenticated disconnected mode remains absent."
+    },
+    "behaviorVerdict": "All independent final and D0 behavior, 401/403 and lifecycle preservation checks passed",
+    "completenessVerdict": "incomplete: necessary original authenticated remote-disconnected-source test scenario removed"
+  },
+  "grading": {
+    "final": {
+      "packet": "R5",
+      "phase": "final",
+      "checks": {
+        "ordinary": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 25,
+            "pass": 24,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 5,
+            "pass": 5,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 25,
+            "pass": 24,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "preserved-consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "lifecycle-preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 5,
+            "pass": 5,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "acceptance-403": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      },
+      "passed": true,
+      "cleanup": 0
+    },
+    "D0": {
+      "packet": "R5",
+      "phase": "D0",
+      "checks": {
+        "ordinary": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 25,
+            "pass": 24,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 5,
+            "pass": 5,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 25,
+            "pass": 24,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "preserved-consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "lifecycle-preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 5,
+            "pass": 5,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "acceptance-403": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      },
+      "passed": true,
+      "cleanup": 0
+    }
+  },
+  "evidenceSelections": []
+}

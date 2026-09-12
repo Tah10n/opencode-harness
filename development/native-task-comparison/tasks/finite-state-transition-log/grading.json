@@ -1,0 +1,16 @@
+{
+  "category": "state",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Duplicate event ID is idempotent after later transitions and changed-type reuse rejects.",
+    "Valid replay rebuilds state; invalid replay preserves previous state and history."
+  ],
+  "docDelivery": [
+    "Graph validation, frozen configuration, event-ID behavior and failed-ID reuse.",
+    "Detached history and full-chain atomic replay including duplicate rejection and empty reset."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "states array unique nonempty ASCII strings; start member; edges {from,type,to} ASCII strings with known states and unique from/type pair. Malformed graph membership/duplicate pairs included for rejection. Events {id,type} nonempty ASCII. Restore records exact id,type,from,to keys and valid string fields, may contain invalid chain or duplicate ids.",
+  "independence": "Implement permitted state transitions, duplicate event-id handling and deterministic replay consistency."
+}

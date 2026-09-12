@@ -1,0 +1,5 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import path from 'node:path';import {fileURLToPath} from 'node:url';const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const m0=await import(path.join(root,"src/luhn.mjs"));const m1=await import(path.join(root,"src/describe.mjs"));
+test("checksum parity and consumer mask",()=>{assert.equal(m0.validDigits('79927398713'),true);assert.equal(m0.validDigits('79927398714'),false);assert.deepEqual(m1.describe('123456'),{valid:false,masked:'**3456'});assert.equal(m0.validDigits('18'),true);});
+test("strict input and zero allowed",()=>{for(const s of ['', '18 ', '1-8','１８'])assert.equal(m0.validDigits(s),false);assert.equal(m0.validDigits('0'),true);assert.deepEqual(m1.describe('ab'),{valid:false,masked:'ab'});});
+test("repeat independence",()=>{assert.equal(m0.validDigits('18'),true);assert.equal(m0.validDigits('19'),false);assert.equal(m0.validDigits('18'),true);});

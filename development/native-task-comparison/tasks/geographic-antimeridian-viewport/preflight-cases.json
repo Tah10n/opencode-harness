@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/geo.mjs": "const normalize=x=>((x+180)%360+360)%360-180;\nfunction validate(points){for(const p of points)if(!Number.isInteger(p.lon)||p.lon< -180||p.lon>180||!Number.isInteger(p.lat)||p.lat< -90||p.lat>90)throw new RangeError('point');}\nexport function geographicBounds(points){\n validate(points);if(!points.length)return null;const xs=[...new Set(points.map(p=>normalize(p.lon)))];let best=null;for(const west of xs){const width=Math.max(...xs.map(x=>((x-west)%360+360)%360));if(!best||width<best.width||width===best.width&&west<best.west)best={west,width};}const east=normalize(best.west+best.width);return{...best,east,south:Math.min(...points.map(p=>p.lat)),north:Math.max(...points.map(p=>p.lat)),crossesAntimeridian:best.width>0&&best.west>east};\n}\nexport function projectPoint(point,bounds,{width,height}){\n const distance=((normalize(point.lon)-bounds.west)%360+360)%360;return{x:bounds.width===0?width/2:distance/bounds.width*width,y:bounds.north===bounds.south?height/2:(bounds.north-point.lat)/(bounds.north-bounds.south)*height};\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "naive-longitude-extrema",
+      "file": "src/geo.mjs",
+      "replacement": "const normalize=x=>((x+180)%360+360)%360-180;\nfunction validate(points){for(const p of points)if(!Number.isInteger(p.lon)||p.lon< -180||p.lon>180||!Number.isInteger(p.lat)||p.lat< -90||p.lat>90)throw new RangeError('point');}\nexport function geographicBounds(points){validate(points);if(!points.length)return null;const longitudes=points.map(p=>normalize(p.lon)),west=Math.min(...longitudes),east=Math.max(...longitudes);return{west,east,width:east-west,south:Math.min(...points.map(p=>p.lat)),north:Math.max(...points.map(p=>p.lat)),crossesAntimeridian:false};}\nexport function projectPoint(point,bounds,{width,height}){\n const distance=((normalize(point.lon)-bounds.west)%360+360)%360;return{x:bounds.width===0?width/2:distance/bounds.width*width,y:bounds.north===bounds.south?height/2:(bounds.north-point.lat)/(bounds.north-bounds.south)*height};\n}\n"
+    },
+    {
+      "name": "wrong-equal-arc-tie",
+      "file": "src/geo.mjs",
+      "replacement": "const normalize=x=>((x+180)%360+360)%360-180;\nfunction validate(points){for(const p of points)if(!Number.isInteger(p.lon)||p.lon< -180||p.lon>180||!Number.isInteger(p.lat)||p.lat< -90||p.lat>90)throw new RangeError('point');}\nexport function geographicBounds(points){\n validate(points);if(!points.length)return null;const longitudes=[...new Set(points.map(p=>normalize(p.lon)))].sort((a,b)=>a-b);let width=Infinity,west=0;\n for(let i=0;i<longitudes.length;i++){const next=longitudes[(i+1)%longitudes.length],gap=(i===longitudes.length-1?next+360:next)-longitudes[i],span=360-gap;if(span<width||span===width&&next>west){width=span;west=next;}}\n const east=normalize(west+width);return{west,east,width,south:Math.min(...points.map(p=>p.lat)),north:Math.max(...points.map(p=>p.lat)),crossesAntimeridian:width>0&&west>east};\n}\nexport function projectPoint(point,bounds,{width,height}){\n const distance=((normalize(point.lon)-bounds.west)%360+360)%360;return{x:bounds.width===0?width/2:distance/bounds.width*width,y:bounds.north===bounds.south?height/2:(bounds.north-point.lat)/(bounds.north-bounds.south)*height};\n}\n"
+    }
+  ]
+}

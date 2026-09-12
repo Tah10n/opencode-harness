@@ -1,0 +1,3 @@
+# binary-search-api-bounds
+
+bounds(values,target,{compare,key}?) returns lower (first not-before) and upper (first after), with n as end insertion position. Duplicate matches occupy [lower,upper); absence has equal bounds. locate forwards options and returns {found,index,count}. Defaults are numeric subtraction and identity; target is already a key and never extracted. Arrays must be dense, sorted consistently and <=100000 elements; callbacks pure, total-order and synchronous, with no NaN comparisons. Descending/custom orders are supported. Empty arrays avoid callbacks. Input is unchanged and errors propagate. Comparator work remains logarithmic under the published bound, without fixed call order. Run npm test.

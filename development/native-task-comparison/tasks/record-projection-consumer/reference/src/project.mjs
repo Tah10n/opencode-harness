@@ -1,0 +1,1 @@
+import {lookup,copyValue} from './lookup.mjs';export function project(record,fields){const out={};for(const f of fields){const r=lookup(record,f.path);if(r.found)Object.defineProperty(out,f.as,{value:copyValue(r.value),writable:true,enumerable:true,configurable:true});}return out;}export function responseRows(records,fields){return records.map(r=>project(r,fields));}

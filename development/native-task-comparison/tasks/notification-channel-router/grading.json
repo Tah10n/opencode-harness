@@ -1,0 +1,19 @@
+{
+  "category": "refactoring",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert ordered unknown fallback resolution, deduplication, special keys and absent fallback.",
+    "Assert handler snapshot, serial payload/result identity, plan-before-dispatch and no failover after error."
+  ],
+  "docDelivery": [
+    "Document requested/available/fallback policy and empty requests.",
+    "Explain handler snapshot/injection, sequential results and error behavior."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Pure channel selection and deduplication plus snapshot-injected sequential handlers with prevalidated dispatch and no failure retry.",
+  "manualBehavior": [
+    "Notifier delegates full routing plan to shared pure planner before dispatch, without duplicated fallback/dedup logic."
+  ],
+  "independence": "Refactor channel switches into injected handlers preserving fallback, message order and unknown-channel behavior."
+}
