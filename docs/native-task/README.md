@@ -129,15 +129,15 @@ independent evaluator separately assesses working behavior, necessary delivered
 coverage and regressions.
 
 The current [six-pair utility study](../../development/native-task-utility/README.md)
-retains both measured versions. The recovery baseline produced P 6/6 versus H 2/6
-complete patches; the admission-queue revision produced P 5/6 versus H 4/6, with
-zero H task wins and only two autonomous complete deliveries. All 24 originally allowed
-development runs are complete. Neither version qualifies for the independent
-benchmark; useful superiority remains unproven. The best tested implementation
-is `afa20bff3283fad5aeacf7b840f8e6affa7396f8`, retained as experimental.
-A subsequently authorized twelve-run follow-up corrects container orphan reaping
-for both arms; the native runtime and prompts remain unchanged. Its results will
-be reported separately from the original two series.
+retains all three measured versions: P/H complete patches are 6/2 for the recovery
+baseline, 5/4 for the admission queue and 4/4 for the separately authorized
+container-init follow-up. V3 has one H win, one reverse loss and no independently
+accepted autonomous completion. All 36 authorized development runs are complete;
+no version qualifies for the independent benchmark. Useful superiority remains
+unproven. The native implementation remains `afa20bff3283fad5aeacf7b840f8e6affa7396f8`;
+v3 execution revision `3a5699bf3c6f34ea94edbeff7f6b9a5be98cc00f` changes container
+process handling for both arms, with runtime and prompts unchanged. This remains
+an experimental tool, with applicable patches and explicit unresolved limits.
 
 The earlier C revision remains reproducible at
 `66b7b33fc6bd66201ee24ec84d6e6fcae9daaf28`; its A/B/C results, earlier 20 pairs and

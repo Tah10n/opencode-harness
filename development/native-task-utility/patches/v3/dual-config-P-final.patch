@@ -1,0 +1,124 @@
+diff --git a/README.md b/README.md
+index 8ddbdd5..5847f21 100644
+--- a/README.md
++++ b/README.md
+@@ -1,3 +1,22 @@
+ # dual-config
+ 
+ Run `npm test` with Node.js 24.
++
++## Configuration
++
++Both CommonJS (`require('./index.cjs')`) and ESM (the default or named
++`configure` export from `./index.mjs`) accept either a legacy mode string or an
++options object:
++
++```js
++configure('compact');
++configure({mode: 'pretty', indent: 4});
++```
++
++`compact` defaults to indent `0`, and `pretty` defaults to indent `2`. An
++explicit `indent` must be an integer from `0` through `8`, inclusive, so
++`{mode: 'pretty', indent: 0}` is valid. Options are not mutated.
++
++The mode is required for object options and must be `compact` or `pretty`.
++Invalid mode strings throw `RangeError`; null, arrays, missing or non-string
++modes, and invalid indents throw `TypeError`.
+diff --git a/index.cjs b/index.cjs
+index a6f3982..0f615d7 100644
+--- a/index.cjs
++++ b/index.cjs
+@@ -1 +1,34 @@
+-function configure(mode){if(!['compact','pretty'].includes(mode))throw new RangeError('Invalid mode');return {mode,indent:mode==='pretty'?2:0};}module.exports=configure;
++function configure(option) {
++  if (typeof option === 'string') {
++    if (!['compact', 'pretty'].includes(option)) {
++      throw new RangeError('Invalid mode');
++    }
++
++    return {mode: option, indent: option === 'pretty' ? 2 : 0};
++  }
++
++  if (option === null || typeof option !== 'object' || Array.isArray(option)) {
++    throw new TypeError('Options must be a mode string or object');
++  }
++
++  const {mode} = option;
++  if (typeof mode !== 'string') {
++    throw new TypeError('Options must include a mode string');
++  }
++  if (!['compact', 'pretty'].includes(mode)) {
++    throw new RangeError('Invalid mode');
++  }
++
++  if (!Object.prototype.hasOwnProperty.call(option, 'indent')) {
++    return {mode, indent: mode === 'pretty' ? 2 : 0};
++  }
++
++  const {indent} = option;
++  if (typeof indent !== 'number' || !Number.isInteger(indent) || indent < 0 || indent > 8) {
++    throw new TypeError('Indent must be an integer from 0 through 8');
++  }
++
++  return {mode, indent};
++}
++
++module.exports = configure;
+diff --git a/test/consumer.test.mjs b/test/consumer.test.mjs
+index d80237c..57f5abc 100644
+--- a/test/consumer.test.mjs
++++ b/test/consumer.test.mjs
+@@ -1,2 +1,50 @@
+-import {test} from 'node:test';import assert from 'node:assert/strict';import {createRequire} from 'node:module';import configure,{configure as named} from '../index.mjs';import {render} from '../consumer.mjs';const require=createRequire(import.meta.url);
+-test('legacy CJS and ESM entry points',()=>{assert.deepEqual(configure('pretty'),named('pretty'));assert.deepEqual(require('../index.cjs')('pretty'),{mode:'pretty',indent:2});assert.equal(render({x:1},'compact'),'\u007b"x":1}');assert.throws(()=>configure('wide'),RangeError);});
++import {test} from 'node:test';
++import assert from 'node:assert/strict';
++import {createRequire} from 'node:module';
++import configure, {configure as named} from '../index.mjs';
++import {render as renderEsm} from '../consumer.mjs';
++
++const require = createRequire(import.meta.url);
++const configureCjs = require('../index.cjs');
++const {render: renderCjs} = require('../consumer.cjs');
++
++test('legacy CJS and ESM entry points', () => {
++  assert.deepEqual(configure('compact'), {mode: 'compact', indent: 0});
++  assert.deepEqual(configure('pretty'), named('pretty'));
++  assert.deepEqual(configureCjs('pretty'), {mode: 'pretty', indent: 2});
++  assert.equal(renderEsm({x: 1}, 'compact'), '{"x":1}');
++  assert.equal(renderCjs({x: 1}, 'compact'), '{"x":1}');
++  assert.throws(() => configure('wide'), RangeError);
++  assert.throws(() => configureCjs('wide'), RangeError);
++});
++
++test('CJS and ESM entry points accept object options', () => {
++  const options = {mode: 'pretty', indent: 4};
++
++  assert.deepEqual(configure(options), options);
++  assert.deepEqual(named(options), options);
++  assert.deepEqual(configureCjs(options), options);
++  assert.deepEqual(options, {mode: 'pretty', indent: 4});
++  assert.deepEqual(configure({mode: 'compact'}), {mode: 'compact', indent: 0});
++  assert.deepEqual(configureCjs({mode: 'pretty'}), {mode: 'pretty', indent: 2});
++  assert.deepEqual(configure({mode: 'pretty', indent: 0}), {mode: 'pretty', indent: 0});
++  assert.deepEqual(configureCjs({mode: 'pretty', indent: 0}), {mode: 'pretty', indent: 0});
++
++  const value = {items: [1, 2]};
++  assert.equal(renderEsm(value, {mode: 'pretty', indent: 0}), '{"items":[1,2]}');
++  assert.equal(renderCjs(value, {mode: 'pretty', indent: 0}), '{"items":[1,2]}');
++  assert.equal(renderEsm(value, options), '{\n    "items": [\n        1,\n        2\n    ]\n}');
++  assert.equal(renderCjs(value, options), '{\n    "items": [\n        1,\n        2\n    ]\n}');
++});
++
++test('object option validation is shared by CJS and ESM', () => {
++  for (const entryPoint of [configure, configureCjs]) {
++    for (const indent of [null, '2', Number.NaN, 1.5, -1, 9]) {
++      assert.throws(() => entryPoint({mode: 'pretty', indent}), TypeError);
++    }
++    assert.throws(() => entryPoint(null), TypeError);
++    assert.throws(() => entryPoint([]), TypeError);
++    assert.throws(() => entryPoint({}), TypeError);
++    assert.throws(() => entryPoint({mode: 'wide'}), RangeError);
++  }
++});

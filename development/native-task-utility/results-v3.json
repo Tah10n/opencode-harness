@@ -1,0 +1,1343 @@
+{
+  "candidate": "3a5699bf3c6f34ea94edbeff7f6b9a5be98cc00f",
+  "nativeRuntimeCandidate": "afa20bff3283fad5aeacf7b840f8e6affa7396f8",
+  "kind": "development-v3-container-init",
+  "rows": [
+    {
+      "task": "protocol-error-api",
+      "arm": "P",
+      "phase": "final",
+      "frozenExecutableChecksPassed": true,
+      "supplementalContractChecksPassed": null,
+      "postExecutionSelectorPreservationPassed": null,
+      "deliveredRegressionChecksPassed": true,
+      "behaviorAccepted": true,
+      "necessaryTestsComplete": true,
+      "docsComplete": true,
+      "fullPatchAccepted": true,
+      "patchApplied": true,
+      "patchSha256": "402ae70699edac9b32cebd746e5594caa6a00577ce4fc09873b005bb53274fe1",
+      "patch": "patches/v3/protocol-error-api-P-final.patch",
+      "patchOrigin": "observer-captured-plain",
+      "reasons": [],
+      "limitations": []
+    },
+    {
+      "task": "protocol-error-api",
+      "arm": "H",
+      "phase": "final",
+      "frozenExecutableChecksPassed": true,
+      "supplementalContractChecksPassed": null,
+      "postExecutionSelectorPreservationPassed": null,
+      "deliveredRegressionChecksPassed": true,
+      "behaviorAccepted": true,
+      "necessaryTestsComplete": true,
+      "docsComplete": true,
+      "fullPatchAccepted": true,
+      "patchApplied": true,
+      "patchSha256": "200d0fe5c4001550aaba1ff556758a0e36c25f15cb7a2b119ca34178523904e2",
+      "patch": "patches/v3/protocol-error-api-H-final.patch",
+      "patchOrigin": "harness-terminal",
+      "reasons": [],
+      "limitations": []
+    },
+    {
+      "task": "protocol-error-api",
+      "arm": "H",
+      "phase": "D0",
+      "frozenExecutableChecksPassed": true,
+      "supplementalContractChecksPassed": null,
+      "postExecutionSelectorPreservationPassed": null,
+      "deliveredRegressionChecksPassed": true,
+      "behaviorAccepted": true,
+      "necessaryTestsComplete": true,
+      "docsComplete": true,
+      "fullPatchAccepted": true,
+      "patchApplied": true,
+      "patchSha256": "7521f9a0c0e856ae2c953564c909c9592e8ce1d530a053d93087e49b68cf5e7b",
+      "patch": "patches/v3/protocol-error-api-H-D0.patch",
+      "patchOrigin": "harness-D0",
+      "reasons": [],
+      "limitations": []
+    },
+    {
+      "task": "catalog-cache",
+      "arm": "H",
+      "phase": "final",
+      "frozenExecutableChecksPassed": true,
+      "supplementalContractChecksPassed": true,
+      "postExecutionSelectorPreservationPassed": false,
+      "deliveredRegressionChecksPassed": true,
+      "behaviorAccepted": false,
+      "necessaryTestsComplete": true,
+      "docsComplete": true,
+      "fullPatchAccepted": false,
+      "patchApplied": true,
+      "patchSha256": "82c11e80076389719d55cec19e77f74a33d2e2f218c054dc55276561c1a3f269",
+      "patch": "patches/v3/catalog-cache-H-final.patch",
+      "patchOrigin": "harness-terminal",
+      "reasons": [
+        "The existing exported selectCatalog(catalog) call filters out region-bearing items when its optional argument is omitted. Initial, reference, alternative and P preserve the all-items copy; both H endpoints fail the same preservation check."
+      ],
+      "limitations": []
+    },
+    {
+      "task": "catalog-cache",
+      "arm": "H",
+      "phase": "D0",
+      "frozenExecutableChecksPassed": true,
+      "supplementalContractChecksPassed": true,
+      "postExecutionSelectorPreservationPassed": false,
+      "deliveredRegressionChecksPassed": true,
+      "behaviorAccepted": false,
+      "necessaryTestsComplete": true,
+      "docsComplete": true,
+      "fullPatchAccepted": false,
+      "patchApplied": true,
+      "patchSha256": "82c11e80076389719d55cec19e77f74a33d2e2f218c054dc55276561c1a3f269",
+      "patch": "patches/v3/catalog-cache-H-D0.patch",
+      "patchOrigin": "harness-D0",
+      "reasons": [
+        "The existing exported selectCatalog(catalog) call filters out region-bearing items when its optional argument is omitted. Initial, reference, alternative and P preserve the all-items copy; both H endpoints fail the same preservation check."
+      ],
+      "limitations": []
+    },
+    {
+      "task": "catalog-cache",
+      "arm": "P",
+      "phase": "final",
+      "frozenExecutableChecksPassed": true,
+      "supplementalContractChecksPassed": true,
+      "postExecutionSelectorPreservationPassed": true,
+      "deliveredRegressionChecksPassed": true,
+      "behaviorAccepted": true,
+      "necessaryTestsComplete": true,
+      "docsComplete": true,
+      "fullPatchAccepted": true,
+      "patchApplied": true,
+      "patchSha256": "9b5b2a7395d0dfe68a3446c98e4f2589ba1e2d4fa7d0e9cd935f48ed2be703f1",
+      "patch": "patches/v3/catalog-cache-P-final.patch",
+      "patchOrigin": "observer-captured-plain",
+      "reasons": [],
+      "limitations": [
+        "The weak-tag test uses a wrong digest and does not independently protect rejection of a weak form of the actual ETag; strict equality is present in source. Separate representation/legacy-304 regressions are limited."
+      ]
+    },
+    {
+      "task": "legacy-runtime-reload",
+      "arm": "P",
+      "phase": "final",
+      "frozenExecutableChecksPassed": false,
+      "supplementalContractChecksPassed": false,
+      "postExecutionSelectorPreservationPassed": null,
+      "deliveredRegressionChecksPassed": true,
+      "behaviorAccepted": false,
+      "necessaryTestsComplete": false,
+      "docsComplete": true,
+      "fullPatchAccepted": false,
+      "patchApplied": true,
+      "patchSha256": "ffd899cc9fc9e2ae6344947916d58e91ca21400b02539bac15a1ff7b273b7ebf",
+      "patch": "patches/v3/legacy-runtime-reload-P-final.patch",
+      "patchOrigin": "observer-captured-plain",
+      "reasons": [
+        "prepareRuntime(retainedLegacyLauncherURL) still sources current libraries from the old tree and fails on absent connection-lifecycle.mjs.",
+        "Delivered migration tests use the current launcher URL; malformed-layout tests can fail at the unrelated custom-directory gate."
+      ],
+      "limitations": []
+    },
+    {
+      "task": "legacy-runtime-reload",
+      "arm": "H",
+      "phase": "final",
+      "frozenExecutableChecksPassed": true,
+      "supplementalContractChecksPassed": true,
+      "postExecutionSelectorPreservationPassed": null,
+      "deliveredRegressionChecksPassed": true,
+      "behaviorAccepted": true,
+      "necessaryTestsComplete": true,
+      "docsComplete": true,
+      "fullPatchAccepted": true,
+      "patchApplied": true,
+      "patchSha256": "e5b549e4a8c1be00a8c77d51042f7648808e1570493e7431ff14da5a5c615fb1",
+      "patch": "patches/v3/legacy-runtime-reload-H-final.patch",
+      "patchOrigin": "harness-terminal",
+      "reasons": [],
+      "limitations": []
+    },
+    {
+      "task": "legacy-runtime-reload",
+      "arm": "H",
+      "phase": "D0",
+      "frozenExecutableChecksPassed": true,
+      "supplementalContractChecksPassed": true,
+      "postExecutionSelectorPreservationPassed": null,
+      "deliveredRegressionChecksPassed": true,
+      "behaviorAccepted": true,
+      "necessaryTestsComplete": true,
+      "docsComplete": true,
+      "fullPatchAccepted": true,
+      "patchApplied": true,
+      "patchSha256": "e5b549e4a8c1be00a8c77d51042f7648808e1570493e7431ff14da5a5c615fb1",
+      "patch": "patches/v3/legacy-runtime-reload-H-D0.patch",
+      "patchOrigin": "harness-D0",
+      "reasons": [],
+      "limitations": []
+    },
+    {
+      "task": "reconnect-revoked",
+      "arm": "H",
+      "phase": "final",
+      "frozenExecutableChecksPassed": true,
+      "supplementalContractChecksPassed": null,
+      "postExecutionSelectorPreservationPassed": null,
+      "deliveredRegressionChecksPassed": true,
+      "behaviorAccepted": true,
+      "necessaryTestsComplete": true,
+      "docsComplete": true,
+      "fullPatchAccepted": true,
+      "patchApplied": true,
+      "patchSha256": "629d47a8d089934e26128a2466875ac530b7373dda2af50b3eaadb65fdb22b02",
+      "patch": "patches/v3/reconnect-revoked-H-final.patch",
+      "patchOrigin": "harness-terminal",
+      "reasons": [],
+      "limitations": []
+    },
+    {
+      "task": "reconnect-revoked",
+      "arm": "H",
+      "phase": "D0",
+      "frozenExecutableChecksPassed": true,
+      "supplementalContractChecksPassed": null,
+      "postExecutionSelectorPreservationPassed": null,
+      "deliveredRegressionChecksPassed": true,
+      "behaviorAccepted": true,
+      "necessaryTestsComplete": true,
+      "docsComplete": true,
+      "fullPatchAccepted": true,
+      "patchApplied": true,
+      "patchSha256": "629d47a8d089934e26128a2466875ac530b7373dda2af50b3eaadb65fdb22b02",
+      "patch": "patches/v3/reconnect-revoked-H-D0.patch",
+      "patchOrigin": "harness-D0",
+      "reasons": [],
+      "limitations": []
+    },
+    {
+      "task": "reconnect-revoked",
+      "arm": "P",
+      "phase": "final",
+      "frozenExecutableChecksPassed": true,
+      "supplementalContractChecksPassed": null,
+      "postExecutionSelectorPreservationPassed": null,
+      "deliveredRegressionChecksPassed": true,
+      "behaviorAccepted": true,
+      "necessaryTestsComplete": true,
+      "docsComplete": true,
+      "fullPatchAccepted": true,
+      "patchApplied": true,
+      "patchSha256": "c4381e6c20fe0cf3aac8c19d24e8874a907da24972ff8bc7cfb1998705b9f58a",
+      "patch": "patches/v3/reconnect-revoked-P-final.patch",
+      "patchOrigin": "observer-captured-plain",
+      "reasons": [],
+      "limitations": [
+        "Pending is checked only after full connect, not at pairing start. A dirty.json fixture field is checked later in state.json, so that particular assertion does not prove a pre-existing state-level disable reason was cleared. Required real 401/403 and error scenarios exist; these are coverage limitations, not a newly imposed test criterion."
+      ]
+    },
+    {
+      "task": "request-module-extraction",
+      "arm": "P",
+      "phase": "final",
+      "frozenExecutableChecksPassed": true,
+      "supplementalContractChecksPassed": null,
+      "postExecutionSelectorPreservationPassed": null,
+      "deliveredRegressionChecksPassed": true,
+      "behaviorAccepted": true,
+      "necessaryTestsComplete": true,
+      "docsComplete": true,
+      "fullPatchAccepted": true,
+      "patchApplied": true,
+      "patchSha256": "689a8842914942e92b478be31e8d4c6e687523ddf767a0f1317013eb7cfac0f2",
+      "patch": "patches/v3/request-module-extraction-P-final.patch",
+      "patchOrigin": "observer-captured-plain",
+      "reasons": [],
+      "limitations": [
+        "Fresh installed-runtime loading is scored; same-version cached-runtime replacement remains a conditional unverified concern outside the pre-v2 declared scope."
+      ]
+    },
+    {
+      "task": "request-module-extraction",
+      "arm": "H",
+      "phase": "final",
+      "frozenExecutableChecksPassed": true,
+      "supplementalContractChecksPassed": null,
+      "postExecutionSelectorPreservationPassed": null,
+      "deliveredRegressionChecksPassed": true,
+      "behaviorAccepted": true,
+      "necessaryTestsComplete": true,
+      "docsComplete": true,
+      "fullPatchAccepted": true,
+      "patchApplied": true,
+      "patchSha256": "a603de216742b906fa5337077453baeafe7f9f1088e4925e8227500780104779",
+      "patch": "patches/v3/request-module-extraction-H-final.patch",
+      "patchOrigin": "harness-terminal",
+      "reasons": [],
+      "limitations": [
+        "Fresh installed-runtime loading is scored; same-version cached-runtime replacement remains a conditional unverified concern outside the pre-v2 declared scope."
+      ]
+    },
+    {
+      "task": "request-module-extraction",
+      "arm": "H",
+      "phase": "D0",
+      "frozenExecutableChecksPassed": true,
+      "supplementalContractChecksPassed": null,
+      "postExecutionSelectorPreservationPassed": null,
+      "deliveredRegressionChecksPassed": true,
+      "behaviorAccepted": true,
+      "necessaryTestsComplete": true,
+      "docsComplete": true,
+      "fullPatchAccepted": true,
+      "patchApplied": true,
+      "patchSha256": "a603de216742b906fa5337077453baeafe7f9f1088e4925e8227500780104779",
+      "patch": "patches/v3/request-module-extraction-H-D0.patch",
+      "patchOrigin": "harness-D0",
+      "reasons": [],
+      "limitations": [
+        "Fresh installed-runtime loading is scored; same-version cached-runtime replacement remains a conditional unverified concern outside the pre-v2 declared scope."
+      ]
+    },
+    {
+      "task": "dual-config",
+      "arm": "H",
+      "phase": "final",
+      "frozenExecutableChecksPassed": true,
+      "supplementalContractChecksPassed": null,
+      "postExecutionSelectorPreservationPassed": null,
+      "deliveredRegressionChecksPassed": true,
+      "behaviorAccepted": true,
+      "necessaryTestsComplete": false,
+      "docsComplete": true,
+      "fullPatchAccepted": false,
+      "patchApplied": true,
+      "patchSha256": "817603704265e5c23c143d574002ce1b19bd5a3c76c15f7524a78e1a078285a9",
+      "patch": "patches/v3/dual-config-H-final.patch",
+      "patchOrigin": "harness-terminal",
+      "reasons": [
+        "The actual ESM consumer lacks the explicitly required pretty+indent:0 regression.",
+        "The previous ESM render compact-string assertion was removed despite the explicit requirement to keep old tests."
+      ],
+      "limitations": []
+    },
+    {
+      "task": "dual-config",
+      "arm": "H",
+      "phase": "D0",
+      "frozenExecutableChecksPassed": true,
+      "supplementalContractChecksPassed": null,
+      "postExecutionSelectorPreservationPassed": null,
+      "deliveredRegressionChecksPassed": true,
+      "behaviorAccepted": true,
+      "necessaryTestsComplete": false,
+      "docsComplete": true,
+      "fullPatchAccepted": false,
+      "patchApplied": true,
+      "patchSha256": "817603704265e5c23c143d574002ce1b19bd5a3c76c15f7524a78e1a078285a9",
+      "patch": "patches/v3/dual-config-H-D0.patch",
+      "patchOrigin": "harness-D0",
+      "reasons": [
+        "The actual ESM consumer lacks the explicitly required pretty+indent:0 regression.",
+        "The previous ESM render compact-string assertion was removed despite the explicit requirement to keep old tests."
+      ],
+      "limitations": []
+    },
+    {
+      "task": "dual-config",
+      "arm": "P",
+      "phase": "final",
+      "frozenExecutableChecksPassed": true,
+      "supplementalContractChecksPassed": null,
+      "postExecutionSelectorPreservationPassed": null,
+      "deliveredRegressionChecksPassed": true,
+      "behaviorAccepted": true,
+      "necessaryTestsComplete": false,
+      "docsComplete": true,
+      "fullPatchAccepted": false,
+      "patchApplied": true,
+      "patchSha256": "d9ac74b6cd8980c8dcd4477e154331c649d1aa3048418ed1dfeff288d62033d6",
+      "patch": "patches/v3/dual-config-P-final.patch",
+      "patchOrigin": "observer-captured-plain",
+      "reasons": [
+        "Negative tests exercise configure only, not both real render consumers as explicitly required."
+      ],
+      "limitations": []
+    }
+  ],
+  "metrics": [
+    {
+      "slot": 1,
+      "task": "protocol-error-api",
+      "arm": "P",
+      "state": "terminated",
+      "requests": 25,
+      "requestsWithUsage": 25,
+      "requestsWithoutUsage": 0,
+      "usage": {
+        "input_tokens": {
+          "observed": 1667332,
+          "records": 25,
+          "complete": true
+        },
+        "output_tokens": {
+          "observed": 12298,
+          "records": 25,
+          "complete": true
+        },
+        "total_tokens": {
+          "observed": 1679630,
+          "records": 25,
+          "complete": true
+        },
+        "cached_tokens": {
+          "observed": 531968,
+          "records": 25,
+          "complete": true
+        },
+        "reasoning_tokens": {
+          "observed": 6039,
+          "records": 25,
+          "complete": true
+        }
+      },
+      "elapsedMs": 343585,
+      "toolCalls": 63,
+      "sessions": 1,
+      "rawRunnerWorkflowStatus": null,
+      "workflowStatus": null,
+      "workflowStatusSource": "runner",
+      "repairs": null,
+      "exitCode": 0,
+      "timedOut": false,
+      "terminationVerified": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "refusals": [],
+      "error": null,
+      "modelEffortBoundary": true
+    },
+    {
+      "slot": 2,
+      "task": "protocol-error-api",
+      "arm": "H",
+      "state": "terminated",
+      "requests": 45,
+      "requestsWithUsage": 45,
+      "requestsWithoutUsage": 0,
+      "usage": {
+        "input_tokens": {
+          "observed": 3530278,
+          "records": 45,
+          "complete": true
+        },
+        "output_tokens": {
+          "observed": 21539,
+          "records": 45,
+          "complete": true
+        },
+        "total_tokens": {
+          "observed": 3551817,
+          "records": 45,
+          "complete": true
+        },
+        "cached_tokens": {
+          "observed": 1642496,
+          "records": 45,
+          "complete": true
+        },
+        "reasoning_tokens": {
+          "observed": 10498,
+          "records": 45,
+          "complete": true
+        }
+      },
+      "elapsedMs": 679263,
+      "toolCalls": 77,
+      "sessions": 2,
+      "rawRunnerWorkflowStatus": "incomplete",
+      "workflowStatus": "incomplete",
+      "workflowStatusSource": "retained-result.json",
+      "repairs": 2,
+      "exitCode": 0,
+      "timedOut": false,
+      "terminationVerified": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "refusals": [],
+      "error": null,
+      "modelEffortBoundary": true
+    },
+    {
+      "slot": 3,
+      "task": "catalog-cache",
+      "arm": "H",
+      "state": "terminated",
+      "requests": 16,
+      "requestsWithUsage": 16,
+      "requestsWithoutUsage": 0,
+      "usage": {
+        "input_tokens": {
+          "observed": 213769,
+          "records": 16,
+          "complete": true
+        },
+        "output_tokens": {
+          "observed": 10020,
+          "records": 16,
+          "complete": true
+        },
+        "total_tokens": {
+          "observed": 223789,
+          "records": 16,
+          "complete": true
+        },
+        "cached_tokens": {
+          "observed": 34816,
+          "records": 16,
+          "complete": true
+        },
+        "reasoning_tokens": {
+          "observed": 4860,
+          "records": 16,
+          "complete": true
+        }
+      },
+      "elapsedMs": 221066,
+      "toolCalls": 27,
+      "sessions": 2,
+      "rawRunnerWorkflowStatus": "checks_passed",
+      "workflowStatus": "checks_passed",
+      "workflowStatusSource": "retained-result.json",
+      "repairs": 0,
+      "exitCode": 0,
+      "timedOut": false,
+      "terminationVerified": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "refusals": [],
+      "error": null,
+      "modelEffortBoundary": true
+    },
+    {
+      "slot": 4,
+      "task": "catalog-cache",
+      "arm": "P",
+      "state": "terminated",
+      "requests": 11,
+      "requestsWithUsage": 11,
+      "requestsWithoutUsage": 0,
+      "usage": {
+        "input_tokens": {
+          "observed": 110342,
+          "records": 11,
+          "complete": true
+        },
+        "output_tokens": {
+          "observed": 6492,
+          "records": 11,
+          "complete": true
+        },
+        "total_tokens": {
+          "observed": 116834,
+          "records": 11,
+          "complete": true
+        },
+        "cached_tokens": {
+          "observed": 34816,
+          "records": 11,
+          "complete": true
+        },
+        "reasoning_tokens": {
+          "observed": 3341,
+          "records": 11,
+          "complete": true
+        }
+      },
+      "elapsedMs": 143501,
+      "toolCalls": 20,
+      "sessions": 1,
+      "rawRunnerWorkflowStatus": null,
+      "workflowStatus": null,
+      "workflowStatusSource": "runner",
+      "repairs": null,
+      "exitCode": 0,
+      "timedOut": false,
+      "terminationVerified": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "refusals": [],
+      "error": null,
+      "modelEffortBoundary": true
+    },
+    {
+      "slot": 5,
+      "task": "legacy-runtime-reload",
+      "arm": "P",
+      "state": "terminated",
+      "requests": 32,
+      "requestsWithUsage": 32,
+      "requestsWithoutUsage": 0,
+      "usage": {
+        "input_tokens": {
+          "observed": 3066203,
+          "records": 32,
+          "complete": true
+        },
+        "output_tokens": {
+          "observed": 23917,
+          "records": 32,
+          "complete": true
+        },
+        "total_tokens": {
+          "observed": 3090120,
+          "records": 32,
+          "complete": true
+        },
+        "cached_tokens": {
+          "observed": 1080832,
+          "records": 32,
+          "complete": true
+        },
+        "reasoning_tokens": {
+          "observed": 13169,
+          "records": 32,
+          "complete": true
+        }
+      },
+      "elapsedMs": 615316,
+      "toolCalls": 57,
+      "sessions": 1,
+      "rawRunnerWorkflowStatus": null,
+      "workflowStatus": null,
+      "workflowStatusSource": "runner",
+      "repairs": null,
+      "exitCode": 0,
+      "timedOut": false,
+      "terminationVerified": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "refusals": [],
+      "error": null,
+      "modelEffortBoundary": true
+    },
+    {
+      "slot": 6,
+      "task": "legacy-runtime-reload",
+      "arm": "H",
+      "state": "terminated",
+      "requests": 46,
+      "requestsWithUsage": 46,
+      "requestsWithoutUsage": 0,
+      "usage": {
+        "input_tokens": {
+          "observed": 4791988,
+          "records": 46,
+          "complete": true
+        },
+        "output_tokens": {
+          "observed": 30677,
+          "records": 46,
+          "complete": true
+        },
+        "total_tokens": {
+          "observed": 4822665,
+          "records": 46,
+          "complete": true
+        },
+        "cached_tokens": {
+          "observed": 2062336,
+          "records": 46,
+          "complete": true
+        },
+        "reasoning_tokens": {
+          "observed": 16422,
+          "records": 46,
+          "complete": true
+        }
+      },
+      "elapsedMs": 773018,
+      "toolCalls": 78,
+      "sessions": 2,
+      "rawRunnerWorkflowStatus": null,
+      "workflowStatus": "incomplete",
+      "workflowStatusSource": "retained-result.json",
+      "repairs": 0,
+      "exitCode": 0,
+      "timedOut": false,
+      "terminationVerified": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "refusals": [],
+      "error": null,
+      "modelEffortBoundary": true
+    },
+    {
+      "slot": 7,
+      "task": "reconnect-revoked",
+      "arm": "H",
+      "state": "terminated",
+      "requests": 39,
+      "requestsWithUsage": 39,
+      "requestsWithoutUsage": 0,
+      "usage": {
+        "input_tokens": {
+          "observed": 3049906,
+          "records": 39,
+          "complete": true
+        },
+        "output_tokens": {
+          "observed": 20799,
+          "records": 39,
+          "complete": true
+        },
+        "total_tokens": {
+          "observed": 3070705,
+          "records": 39,
+          "complete": true
+        },
+        "cached_tokens": {
+          "observed": 1519616,
+          "records": 39,
+          "complete": true
+        },
+        "reasoning_tokens": {
+          "observed": 10910,
+          "records": 39,
+          "complete": true
+        }
+      },
+      "elapsedMs": 532260,
+      "toolCalls": 70,
+      "sessions": 2,
+      "rawRunnerWorkflowStatus": null,
+      "workflowStatus": "incomplete",
+      "workflowStatusSource": "retained-result.json",
+      "repairs": 0,
+      "exitCode": 0,
+      "timedOut": false,
+      "terminationVerified": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "refusals": [],
+      "error": null,
+      "modelEffortBoundary": true
+    },
+    {
+      "slot": 8,
+      "task": "reconnect-revoked",
+      "arm": "P",
+      "state": "terminated",
+      "requests": 44,
+      "requestsWithUsage": 44,
+      "requestsWithoutUsage": 0,
+      "usage": {
+        "input_tokens": {
+          "observed": 3697900,
+          "records": 44,
+          "complete": true
+        },
+        "output_tokens": {
+          "observed": 17854,
+          "records": 44,
+          "complete": true
+        },
+        "total_tokens": {
+          "observed": 3715754,
+          "records": 44,
+          "complete": true
+        },
+        "cached_tokens": {
+          "observed": 1719296,
+          "records": 44,
+          "complete": true
+        },
+        "reasoning_tokens": {
+          "observed": 10250,
+          "records": 44,
+          "complete": true
+        }
+      },
+      "elapsedMs": 485718,
+      "toolCalls": 77,
+      "sessions": 1,
+      "rawRunnerWorkflowStatus": null,
+      "workflowStatus": null,
+      "workflowStatusSource": "runner",
+      "repairs": null,
+      "exitCode": 0,
+      "timedOut": false,
+      "terminationVerified": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "refusals": [],
+      "error": null,
+      "modelEffortBoundary": true
+    },
+    {
+      "slot": 9,
+      "task": "request-module-extraction",
+      "arm": "P",
+      "state": "terminated",
+      "requests": 17,
+      "requestsWithUsage": 17,
+      "requestsWithoutUsage": 0,
+      "usage": {
+        "input_tokens": {
+          "observed": 867041,
+          "records": 17,
+          "complete": true
+        },
+        "output_tokens": {
+          "observed": 11046,
+          "records": 17,
+          "complete": true
+        },
+        "total_tokens": {
+          "observed": 878087,
+          "records": 17,
+          "complete": true
+        },
+        "cached_tokens": {
+          "observed": 166912,
+          "records": 17,
+          "complete": true
+        },
+        "reasoning_tokens": {
+          "observed": 5075,
+          "records": 17,
+          "complete": true
+        }
+      },
+      "elapsedMs": 265856,
+      "toolCalls": 40,
+      "sessions": 1,
+      "rawRunnerWorkflowStatus": null,
+      "workflowStatus": null,
+      "workflowStatusSource": "runner",
+      "repairs": null,
+      "exitCode": 0,
+      "timedOut": false,
+      "terminationVerified": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "refusals": [],
+      "error": null,
+      "modelEffortBoundary": true
+    },
+    {
+      "slot": 10,
+      "task": "request-module-extraction",
+      "arm": "H",
+      "state": "terminated",
+      "requests": 22,
+      "requestsWithUsage": 22,
+      "requestsWithoutUsage": 0,
+      "usage": {
+        "input_tokens": {
+          "observed": 1156265,
+          "records": 22,
+          "complete": true
+        },
+        "output_tokens": {
+          "observed": 11510,
+          "records": 22,
+          "complete": true
+        },
+        "total_tokens": {
+          "observed": 1167775,
+          "records": 22,
+          "complete": true
+        },
+        "cached_tokens": {
+          "observed": 367616,
+          "records": 22,
+          "complete": true
+        },
+        "reasoning_tokens": {
+          "observed": 4610,
+          "records": 22,
+          "complete": true
+        }
+      },
+      "elapsedMs": 293879,
+      "toolCalls": 38,
+      "sessions": 2,
+      "rawRunnerWorkflowStatus": "incomplete",
+      "workflowStatus": "incomplete",
+      "workflowStatusSource": "retained-result.json",
+      "repairs": 0,
+      "exitCode": 0,
+      "timedOut": false,
+      "terminationVerified": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "refusals": [],
+      "error": null,
+      "modelEffortBoundary": true
+    },
+    {
+      "slot": 11,
+      "task": "dual-config",
+      "arm": "H",
+      "state": "terminated",
+      "requests": 14,
+      "requestsWithUsage": 14,
+      "requestsWithoutUsage": 0,
+      "usage": {
+        "input_tokens": {
+          "observed": 154105,
+          "records": 14,
+          "complete": true
+        },
+        "output_tokens": {
+          "observed": 7451,
+          "records": 14,
+          "complete": true
+        },
+        "total_tokens": {
+          "observed": 161556,
+          "records": 14,
+          "complete": true
+        },
+        "cached_tokens": {
+          "observed": 30720,
+          "records": 14,
+          "complete": true
+        },
+        "reasoning_tokens": {
+          "observed": 3602,
+          "records": 14,
+          "complete": true
+        }
+      },
+      "elapsedMs": 164792,
+      "toolCalls": 23,
+      "sessions": 2,
+      "rawRunnerWorkflowStatus": "checks_passed",
+      "workflowStatus": "checks_passed",
+      "workflowStatusSource": "retained-result.json",
+      "repairs": 0,
+      "exitCode": 0,
+      "timedOut": false,
+      "terminationVerified": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "refusals": [],
+      "error": null,
+      "modelEffortBoundary": true
+    },
+    {
+      "slot": 12,
+      "task": "dual-config",
+      "arm": "P",
+      "state": "terminated",
+      "requests": 11,
+      "requestsWithUsage": 11,
+      "requestsWithoutUsage": 0,
+      "usage": {
+        "input_tokens": {
+          "observed": 97547,
+          "records": 11,
+          "complete": true
+        },
+        "output_tokens": {
+          "observed": 4382,
+          "records": 11,
+          "complete": true
+        },
+        "total_tokens": {
+          "observed": 101929,
+          "records": 11,
+          "complete": true
+        },
+        "cached_tokens": {
+          "observed": 45056,
+          "records": 11,
+          "complete": true
+        },
+        "reasoning_tokens": {
+          "observed": 1686,
+          "records": 11,
+          "complete": true
+        }
+      },
+      "elapsedMs": 103870,
+      "toolCalls": 18,
+      "sessions": 1,
+      "rawRunnerWorkflowStatus": null,
+      "workflowStatus": null,
+      "workflowStatusSource": "runner",
+      "repairs": null,
+      "exitCode": 0,
+      "timedOut": false,
+      "terminationVerified": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "refusals": [],
+      "error": null,
+      "modelEffortBoundary": true
+    }
+  ],
+  "aggregate": {
+    "P": {
+      "requests": 140,
+      "toolCalls": 275,
+      "elapsedMs": 1957846,
+      "requestsWithUsage": 140,
+      "requestsWithoutUsage": 0,
+      "usage": {
+        "input_tokens": {
+          "observed": 9506365,
+          "complete": true
+        },
+        "output_tokens": {
+          "observed": 75989,
+          "complete": true
+        },
+        "total_tokens": {
+          "observed": 9582354,
+          "complete": true
+        },
+        "cached_tokens": {
+          "observed": 3578880,
+          "complete": true
+        },
+        "reasoning_tokens": {
+          "observed": 39560,
+          "complete": true
+        }
+      },
+      "monetaryCost": null
+    },
+    "H": {
+      "requests": 182,
+      "toolCalls": 313,
+      "elapsedMs": 2664278,
+      "requestsWithUsage": 182,
+      "requestsWithoutUsage": 0,
+      "usage": {
+        "input_tokens": {
+          "observed": 12896311,
+          "complete": true
+        },
+        "output_tokens": {
+          "observed": 101996,
+          "complete": true
+        },
+        "total_tokens": {
+          "observed": 12998307,
+          "complete": true
+        },
+        "cached_tokens": {
+          "observed": 5657600,
+          "complete": true
+        },
+        "reasoning_tokens": {
+          "observed": 50902,
+          "complete": true
+        }
+      },
+      "monetaryCost": null
+    }
+  },
+  "gate": {
+    "plainFull": 4,
+    "harnessFull": 4,
+    "wins": 1,
+    "losses": 1,
+    "ties": 4,
+    "patchCriteriaPassed": false,
+    "autonomousInstalledDeliveryDemonstrated": false,
+    "passed": false,
+    "independentPairsRun": 0,
+    "developmentRunsUsed": 36,
+    "maximumDevelopmentRuns": 36
+  },
+  "autonomy": {
+    "P": {
+      "nativeCompletions": 6,
+      "fullAcceptedNativeCompletions": 4,
+      "deadlineStops": 0
+    },
+    "H": {
+      "completedWithAcceptedPatch": 0,
+      "checksPassed": 2,
+      "incomplete": 4,
+      "terminalPatches": 6,
+      "observerReconstructedFinals": 0,
+      "deadlineStops": 0,
+      "permissionTerminations": 0,
+      "D0Available": 6,
+      "D0Accepted": 4,
+      "finalAccepted": 4
+    }
+  },
+  "workflow": [
+    {
+      "status": "incomplete",
+      "repairs": 2,
+      "remaining": [
+        "No successful project test/check on the current state."
+      ],
+      "limits": [
+        "Uninterpreted command failures are retained; their relevance and any baseline/environment exception remain unverified.",
+        "Two consecutive corrective replies left the same verified problem without substantive new diagnostic evidence."
+      ],
+      "task": "protocol-error-api",
+      "checksCurrent": false,
+      "terminalPatch": true,
+      "D0": true,
+      "stopReason": "Two consecutive corrective replies left the same verified problem without substantive new diagnostic evidence.",
+      "retainedUnclassifiedFailures": [
+        {
+          "command": "corepack pnpm --filter @viberacing/connector test",
+          "exit": 1,
+          "cause": "pnpm download unavailable in network-isolated container"
+        }
+      ],
+      "stages": [
+        {
+          "label": "implementation",
+          "role": "author",
+          "elapsedMs": 507797
+        },
+        {
+          "label": "correction",
+          "role": "author",
+          "elapsedMs": 146692
+        },
+        {
+          "label": "correction-2",
+          "role": "author",
+          "elapsedMs": 11778
+        }
+      ]
+    },
+    {
+      "status": "checks_passed",
+      "repairs": 0,
+      "remaining": [],
+      "limits": [],
+      "task": "catalog-cache",
+      "checksCurrent": true,
+      "terminalPatch": true,
+      "D0": true,
+      "retainedUnclassifiedFailures": [],
+      "stages": [
+        {
+          "label": "implementation",
+          "role": "author",
+          "elapsedMs": 208414
+        }
+      ]
+    },
+    {
+      "status": "incomplete",
+      "repairs": 0,
+      "remaining": [],
+      "limits": [
+        "Uninterpreted command failures are retained; their relevance and any baseline/environment exception remain unverified."
+      ],
+      "task": "legacy-runtime-reload",
+      "checksCurrent": true,
+      "terminalPatch": true,
+      "D0": true,
+      "retainedUnclassifiedFailures": [
+        {
+          "command": "corepack pnpm verify",
+          "exit": 1,
+          "cause": "pnpm download unavailable in network-isolated container"
+        }
+      ],
+      "stages": [
+        {
+          "label": "implementation",
+          "role": "author",
+          "elapsedMs": 762409
+        }
+      ]
+    },
+    {
+      "status": "incomplete",
+      "repairs": 0,
+      "remaining": [],
+      "limits": [
+        "Uninterpreted command failures are retained; their relevance and any baseline/environment exception remain unverified."
+      ],
+      "task": "reconnect-revoked",
+      "checksCurrent": true,
+      "terminalPatch": true,
+      "D0": true,
+      "retainedUnclassifiedFailures": [
+        {
+          "command": "corepack pnpm verify",
+          "exit": 1,
+          "cause": "pnpm download unavailable in network-isolated container"
+        }
+      ],
+      "stages": [
+        {
+          "label": "implementation",
+          "role": "author",
+          "elapsedMs": 520884
+        }
+      ]
+    },
+    {
+      "status": "incomplete",
+      "repairs": 0,
+      "remaining": [],
+      "limits": [
+        "Uninterpreted command failures are retained; their relevance and any baseline/environment exception remain unverified."
+      ],
+      "task": "request-module-extraction",
+      "checksCurrent": true,
+      "terminalPatch": true,
+      "D0": true,
+      "retainedUnclassifiedFailures": [
+        {
+          "command": "node --test packages/connector/test/http.test.mjs",
+          "exit": 1,
+          "cause": "test executed before its imported module existed"
+        },
+        {
+          "command": "corepack pnpm --filter @viberacing/connector test",
+          "exit": 1,
+          "cause": "pnpm download unavailable in network-isolated container"
+        }
+      ],
+      "stages": [
+        {
+          "label": "implementation",
+          "role": "author",
+          "elapsedMs": 280300
+        }
+      ]
+    },
+    {
+      "status": "checks_passed",
+      "repairs": 0,
+      "remaining": [],
+      "limits": [],
+      "task": "dual-config",
+      "checksCurrent": true,
+      "terminalPatch": true,
+      "D0": true,
+      "retainedUnclassifiedFailures": [],
+      "stages": [
+        {
+          "label": "implementation",
+          "role": "author",
+          "elapsedMs": 154147
+        }
+      ]
+    }
+  ],
+  "interpretationChanges": [
+    "The existing post-v1 supplemental contracts were frozen before v3 and applied to both arms and every H endpoint. Raw executable outcomes remain unchanged.",
+    "After author termination, source review found the omitted-argument selectCatalog export regression. An identical new preservation check passes initial/reference/alternative/P and rejects both H endpoints. This is recorded separately from the frozen evaluator, whose handler/client checks all pass. Excluding that exported-helper boundary yields P4/6 H5/6, one win and no loss; it still fails the two-win and autonomous-delivery gate.",
+    "Both dual-config coverage failures follow the explicit task requirement for actual CJS and ESM consumer tests, especially pretty+indent:0 and negative cases, plus keeping old tests. Passing executable behavior does not satisfy the missing delivered coverage.",
+    "Reconnect P coverage limitations retain the same interpretation as v2: required real revoked/error scenarios are present, and source plus independent checks confirm cleanup. No unstated per-boundary assertion requirement is added.",
+    "New private legacy calibration copies fixed the previously disclosed old-launcher/reference defect before v3 authors. Initial snapshots and acceptance contracts are unchanged, and previous series are not rescored."
+  ],
+  "limitations": [
+    "Six known development cases: four changes in one public project and two small fixtures. No independent statistical inference, pooling or causal attribution.",
+    "V3 changes only container process handling for both arms; native runtime, prompts and H1 are unchanged from v2.",
+    "All 322 usage records are present; monetary charges are unavailable. No deadline, auth/quota refusal, retries or unknown local live execution occurred.",
+    "Two internal checks_passed results have incomplete independently accepted deliveries; four acceptable H patches have incomplete workflow. Terminal patch availability alone does not prove the full autonomous goal.",
+    "Scoped Linux/Node checks, delivered regressions, preservation replay and independent source/test/doc review do not establish the full pnpm/web/platform suite. Container network isolation prevented pnpm downloads; no new exception or repair version was added after results.",
+    "All three reviewers used assigned anonymous packets only after all authors terminated. They retain prior review context but did not receive v3 arm mapping, outcomes, native logs or evaluator/reference material.",
+    "A local selector-check preparation failed on a missing output parent before any container/model execution; the directory was created and the same model-free check ran. This was not an author retry."
+  ]
+}

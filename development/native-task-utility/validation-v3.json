@@ -1,0 +1,55 @@
+{
+  "candidate": "3a5699bf3c6f34ea94edbeff7f6b9a5be98cc00f",
+  "freezeSha256": "0f1392bc1d8fa742a90a6f4123b34bd9c3d8013dbd51eec344e4cff83877edcc",
+  "frozenFileCount": 12756,
+  "frozenFilesUnchanged": true,
+  "originalHTreesUnchanged": true,
+  "authorContainersVerifiedAbsent": true,
+  "patchesApplied": 18,
+  "uniquePatches": 13,
+  "patchesWithoutHarnessAdministrativeDependency": true,
+  "deliveredRegressionFailures": 0,
+  "modelRetries": 0,
+  "providerRequests": 322,
+  "manualActions": 0,
+  "independentPairs": 0,
+  "postExecutionSelectorCheck": {
+    "contract": "Preserve existing exported selectCatalog(catalog) all-items copy behavior",
+    "postExecutionSourceReviewCheck": true,
+    "rows": [
+      {
+        "id": "initial",
+        "passed": true,
+        "code": 0
+      },
+      {
+        "id": "reference",
+        "passed": true,
+        "code": 0
+      },
+      {
+        "id": "alternative",
+        "passed": true,
+        "code": 0
+      },
+      {
+        "id": "H-final",
+        "passed": false,
+        "code": 1
+      },
+      {
+        "id": "H-D0",
+        "passed": false,
+        "code": 1
+      },
+      {
+        "id": "P-final",
+        "passed": true,
+        "code": 0
+      }
+    ]
+  },
+  "independentReviewUniquePackets": 13,
+  "allKnownTemporaryContainersVerifiedAbsent": true,
+  "knownTemporaryContainerCount": 87
+}
