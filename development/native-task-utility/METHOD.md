@@ -1,4 +1,4 @@
-# Six development pairs at the recovery baseline
+# Six development pairs per candidate
 
 Candidate: `cac39a0050189f2ddf01d4b88888494457b578a7`. The first candidate retains runtime and instruction bytes, including the closed H1 wording. This series measures development utility, not an independent benchmark. Historical results are not pooled.
 
@@ -30,3 +30,11 @@ The existing scheduler records and terminates each managed-deadline slot without
 Development selection requires H >= 5/6 full patches, >= 2 task wins over P, no confirmed regression loss, and autonomous installed delivery. At most one evidence-based revision and another complete fresh six-pair development series are allowed. Only a qualifying candidate may enter forty new independent pairs; development and prior versions are excluded from their statistics. No manual Actions, merge, release or default change is authorized here.
 
 Raw logs, source copies, private evaluator/reference material and detailed manifests are retained in `local/native-task-utility-20260911/`, not committed.
+
+## Sole revision and final adjudication
+
+V2 measures `afa20bff3283fad5aeacf7b840f8e6affa7396f8` with the same tasks, order, model, effort, permissions and 900-second deadline. Both arms restart from fresh initial copies. Only conflicting native tool admission changes; H1 and the complete native-task workflow instruction file remain byte-identical to the baseline. The rationale preceded the edit, and local checks, one review and actual installed scripted execution preceded freezing.
+
+The post-v1 catalog 304 and old-launcher supplemental checks were frozen before v2. All authors terminated before independent grading. Final assessment includes delivered test execution, preserved-suite replay, behavior checks, source review and required tests/docs. Source findings and coverage judgements remain separate from raw executable outcomes. See results-v2.json for the reconnect coverage disagreement and sensitivity; it does not change the gate outcome. Every available D0 and final is preserved, including incomplete but applicable patches. No failed author run was retried.
+
+Neither version passes the development gate. The independent sample is empty: no paired confidence interval or statistical superiority test is reported for a benchmark that did not run. All 24 development runs remain separate by version; the permitted development budget is exhausted.

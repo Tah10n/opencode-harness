@@ -129,10 +129,12 @@ independent evaluator separately assesses working behavior, necessary delivered
 coverage and regressions.
 
 The current [six-pair utility study](../../development/native-task-utility/README.md)
-starts from the recovery baseline and retains every measured version. The first
-series produced P 6/6 versus H 2/6 complete patches, so no independent benchmark
-was admitted. A single native-admission revision is undergoing the authorized
-fresh development comparison; no effectiveness claim is established.
+retains both measured versions. The recovery baseline produced P 6/6 versus H 2/6
+complete patches; the admission-queue revision produced P 5/6 versus H 4/6, with
+zero H task wins and only two autonomous complete deliveries. All 24 allowed
+development runs are complete. Neither version qualifies for the independent
+benchmark; useful superiority remains unproven. The best tested implementation
+is `afa20bff3283fad5aeacf7b840f8e6affa7396f8`, retained as experimental.
 
 The earlier C revision remains reproducible at
 `66b7b33fc6bd66201ee24ec84d6e6fcae9daaf28`; its A/B/C results, earlier 20 pairs and

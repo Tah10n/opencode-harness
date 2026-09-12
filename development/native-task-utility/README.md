@@ -1,22 +1,63 @@
 # Native task utility development
 
-The recovery baseline `cac39a0050189f2ddf01d4b88888494457b578a7` does not show the requested advantage: **P 6/6, H 2/6 complete patches; H wins 0, losses 4, ties 2**. All six H workflows report incomplete; five supply a terminal patch, while one reaches its managed deadline. Patch quality and autonomous completion are separate. The product remains experimental.
+The best tested implementation is **v2, `afa20bff3283fad5aeacf7b840f8e6affa7396f8`**: conflicting native tool calls wait in order instead of failing admission. It remains experimental. **The requested useful autonomous advantage was not achieved.** Both allowed development series are complete; neither qualifies for the independent benchmark.
+
+| Version | P full patches | H full patches | H wins / losses / ties | H autonomous complete delivery |
+| --- | --- | --- | --- | --- |
+| v1 recovery baseline `cac39a00` | 6/6 | 2/6 | 0 / 4 / 2 | 0/6 |
+| v2 admission queue `afa20bff` | 5/6 | 4/6 | 0 / 1 / 5 | 2/6 |
+
+The difference H minus P is −66.7 percentage points in v1 and −16.7 in v2. These are six-case development observations, not independent estimates or a causal attribution to the queue. All **24/24 development runs** were used, with no model retries. Independent pairs: **0**. H never reached five complete patches or two wins, and v2 still has a confirmed reverse loss on reconnect. No third version was created.
+
+[Install, invoke `/harness-task`, and apply its terminal patch](../../docs/native-task/README.md#install-and-use). The model and effort remain caller choices. The [revision rationale](REVISION.md) was recorded before editing; the runtime and H1 instruction bytes then remained frozen throughout v2. See [method and acceptance](METHOD.md), [v1 plan](plan.json), [v2 plan](plan-v2.json), [v1 results](results-v1.json), [v2 results and counters](results-v2.json), [revision checks](revision-validation.json), and [v2 preservation/application checks](validation-v2.json).
+
+## Patch results
+
+Every linked patch applies independently at its task's initial snapshot. `pass` includes required behavior, preserved contracts, necessary delivered tests and documentation; it does not imply autonomous workflow completion. D0 means the initially completed author solution. A missing D0 is not fabricated from an interrupted tree.
+
+### V2
+
+| Task | P final | H D0 | H final | H delivery outcome |
+| --- | --- | --- | --- | --- |
+| protocol-error-api | [pass](patches/v2/protocol-error-api-P-final.patch) | [pass](patches/v2/protocol-error-api-H-D0.patch) | [pass](patches/v2/protocol-error-api-H-final.patch) | Incomplete; unresolved broad config checks, three corrections, outer deadline; terminal patch retained |
+| catalog-cache | [pass](patches/v2/catalog-cache-P-final.patch) | [pass](patches/v2/catalog-cache-H-D0.patch) | [pass](patches/v2/catalog-cache-H-final.patch) | Checks passed; no correction |
+| legacy-runtime-reload | [fail](patches/v2/legacy-runtime-reload-P-final.patch) | [fail](patches/v2/legacy-runtime-reload-H-D0.patch) | [fail](patches/v2/legacy-runtime-reload-H-final.patch) | Migration source path fails; deadline; final reconstructed by observer |
+| reconnect-revoked | [pass](patches/v2/reconnect-revoked-P-final.patch) | [fail](patches/v2/reconnect-revoked-H-D0.patch) | [fail](patches/v2/reconnect-revoked-H-final.patch) | Pending survives revoked cleanup; unresolved scheduler checks; three corrections |
+| request-module-extraction | [pass](patches/v2/request-module-extraction-P-final.patch) | unavailable | [pass](patches/v2/request-module-extraction-H-final.patch) | Native permission denial during attempted external baseline check; terminal patch, no author completion |
+| dual-config | [pass](patches/v2/dual-config-P-final.patch) | [pass](patches/v2/dual-config-H-D0.patch) | [pass](patches/v2/dual-config-H-final.patch) | Checks passed; no correction |
+
+H has three accepted D0s among five available and four accepted finals. Corrections improve some delivered tests but do not turn a failed D0 into an accepted final on these tasks. Extraction supplies an acceptable terminal capture without ever completing D0. Only catalog and dual config finish the autonomous checked path. P has six native completions, five with accepted patches. No manual intervention occurred between author stages.
+
+Legacy fails for different reasons: H reads missing current libraries from the historical source when `prepareRuntime()` receives the retained old launcher, and permits partial historical layouts. P selects current libraries but copies the old executable; its delivered fixture masks this by using current launcher bytes. H reconnect calls `disableLocalConnection()` without `true`, leaving pending uploads before fresh pairing. Delivered tests miss these boundaries. Additional config/scheduler failures remain unresolved within H, even where independent scoped checks accept the patch. The extraction permission boundary was preserved; no new recovery exception was added.
+
+### V1
 
 | Task | P final | H D0 | H final | H delivery issue |
 | --- | --- | --- | --- | --- |
-| protocol-error-api | pass | pass | pass | Workflow retains check/diagnostic failures |
-| catalog-cache | pass | fail | fail | Legacy one-argument 304 changes return/error semantics |
-| legacy-runtime-reload | pass | fail | fail | Old executable copied into current runtime; final is observer capture after timeout |
-| reconnect-revoked | pass | fail | fail | Pending payloads survive revoked cleanup |
-| request-module-extraction | pass | pass | pass | Workflow cannot establish final supported check evidence |
-| dual-config | pass | fail | fail | Missing required negative tests through real consumers of both formats |
+| protocol-error-api | [pass](patches/v1/protocol-error-api-P-final.patch) | [pass](patches/v1/protocol-error-api-H-D0.patch) | [pass](patches/v1/protocol-error-api-H-final.patch) | Workflow retains check/diagnostic failures |
+| catalog-cache | [pass](patches/v1/catalog-cache-P-final.patch) | [fail](patches/v1/catalog-cache-H-D0.patch) | [fail](patches/v1/catalog-cache-H-final.patch) | Legacy one-argument 304 changes return/error semantics |
+| legacy-runtime-reload | [pass](patches/v1/legacy-runtime-reload-P-final.patch) | [fail](patches/v1/legacy-runtime-reload-H-D0.patch) | [fail](patches/v1/legacy-runtime-reload-H-final.patch) | Old executable copied into current runtime; observer capture after timeout |
+| reconnect-revoked | [pass](patches/v1/reconnect-revoked-P-final.patch) | [fail](patches/v1/reconnect-revoked-H-D0.patch) | [fail](patches/v1/reconnect-revoked-H-final.patch) | Pending payloads survive revoked cleanup |
+| request-module-extraction | [pass](patches/v1/request-module-extraction-P-final.patch) | [pass](patches/v1/request-module-extraction-H-D0.patch) | [pass](patches/v1/request-module-extraction-H-final.patch) | Workflow cannot establish final supported check evidence |
+| dual-config | [pass](patches/v1/dual-config-P-final.patch) | [fail](patches/v1/dual-config-H-D0.patch) | [fail](patches/v1/dual-config-H-final.patch) | Missing explicitly required negative tests through both real consumers |
 
-See [all v1 outcomes, patch links/hashes and resource counters](results-v1.json), [patches](patches/v1/), [fixed tasks/order](plan.json), [method](METHOD.md), and the [one permitted revision rationale](REVISION.md). No independent pairs have been run: the development gate fails. V2 will be a fresh six-pair development comparison, not a replacement or independent confirmation.
+All six H workflows were incomplete; five supplied terminal patches, one reached its managed deadline. D0 and final acceptance were identical.
 
-V1 totals: P 164 provider requests / 314 native tool calls / 2,372.20 seconds; H 257 requests / 392 tool calls / 3,325.14 seconds. This is 56.7% more requests and 40.2% more elapsed time. Observed input/output tokens: P 11,306,475 / 95,767; H at least 21,567,840 / 126,443. One H request at timeout has missing usage, retained as unknown. Equal 900-second deadlines were not equal token budgets.
+## Resources and evidence limits
 
-The frozen executable evaluator passed five H tasks, but full independent assessment accepted only two. Post-run checks exposed two uncovered contract boundaries: legacy preparation from the preserved old launcher, and legacy catalog 304. The old-launcher check also rejects the calibration reference and alternative, showing a real evaluator coverage gap. Original raw grades remain unchanged; the same interpretation/checks apply to both arms and H D0/final without model retries. The dual-config gap concerns expressly required delivered tests, not a proven runtime failure. Ambiguous combined-invalid error precedence is not scored.
+| Series / arm | Provider requests | Native tool calls | Total elapsed seconds | Observed input / output tokens |
+| --- | ---: | ---: | ---: | ---: |
+| v1 P | 164 | 314 | 2,372.20 | 11,306,475 / 95,767 |
+| v1 H | 257 | 392 | 3,325.14 | ≥21,567,840 / ≥126,443 |
+| v2 P | 150 | 296 | 2,218.41 | 11,266,500 / 88,879 |
+| v2 H | 235 | 349 | 3,251.96 | 21,412,389 / 126,779 |
 
-All eighteen endpoints (twelve finals and six H D0s) apply to separate ordinary copies with no harness administrative dependency. Six original H source trees and every frozen file remain unchanged. Four tasks use public VibeRacing snapshots and two are small known fixtures; this does not establish general performance. Scoped Linux/Node checks do not establish the full platform/web/pnpm matrix. Known `verify-native-task-format.mjs` baseline failure is retained separately. No full-suite-green claim, manual Actions, release or merge.
+V2 H uses 56.7% more provider requests, 17.9% more tools and 46.6% more elapsed time than its P. Usage includes repeated/cached input; cache and reasoning counters are in the results. Monetary charges are unavailable. V1 has one request with missing usage, retained as unknown; v2 has all 385 usage records, although the legacy timeout still leaves remote server completion uncertain. Equal 900-second deadlines are not equal token budgets. All managed timeouts have confirmed local termination/capture/cleanup; every author container is absent.
 
-[Install and run from checkout, then apply a terminal patch](../../docs/native-task/README.md#install-and-use). Raw logs, native sessions, evaluator/reference trees and complete source copies remain in ignored `local/native-task-utility-20260911/`. One state reviewer performed a bounded memory search before packet review; it exposed no arm mapping/outcomes/reference. Findings were independently verified.
+The frozen executable evaluator passed five H tasks in each series. Independent full acceptance was lower. Post-v1 checks exposed missed legacy old-launcher and legacy catalog-304 contracts; the old-launcher check also rejected the calibration reference and alternative. Raw outcomes remain unchanged. These supplemental contracts were frozen before v2 and applied equally to P/H and available D0/final, without model retries. This is a disclosed evaluator gap, not a hidden rescore.
+
+V2 P reconnect seeds pending but asserts its absence only after full connect. The reviewer proposed stricter coverage rejection; adjudication records the gap without adding an unstated per-boundary test requirement after results. Required real revoked/error scenarios are delivered, the source awaits cleanup before pairing, and the independent boundary check passes. Under that stricter reading P would be 4/6, H 4/6 and zero wins; the development gate still fails. Unspecified combined-invalid error precedence is not scored. Same-version cached-runtime replacement in extraction remains a conditional unverified concern outside the fresh-install scope declared before v2.
+
+All 35 endpoints apply to separate ordinary copies without harness administrative directories. Original H trees and frozen files remain unchanged in both series. Four tasks share public VibeRacing history and two are small known fixtures; no generalization or independent statistical claim is made. Scoped Linux/Node checks and delivered regression execution do not establish the full config/web/pnpm/platform matrix. Known `verify-native-task-format.mjs` baseline failure remains separate and unchanged. No full-suite-green claim, manual Actions, release, merge or default change.
+
+Raw logs, native sessions, evaluator/reference trees and complete source copies remain in ignored `local/native-task-utility-20260911/` and `local/native-task-utility-v2-20260912/`. One v1 state reviewer performed a bounded memory search without arm mapping/outcomes/reference; findings were independently verified. All three v2 reviewers used assigned packets only, after authors terminated, with no hints passed into the measured workflow.
