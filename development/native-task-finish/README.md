@@ -102,6 +102,24 @@ subdirectory paths when needed. It removes the redundant absolute root from
 the additional prompt; the standard native cwd and workspace context remain.
 No tool arguments are rewritten and no denied call is retried.
 
+The explicit dot-workdir revision was then checked on two fresh development
+pairs. Dual-config was complete for both arms. Legacy migration was complete for
+P, while H stopped on an out-of-range native read during implementation. H was
+1/2 and P 2/2: one loss and one tie. H used 364.779 seconds, 42 requests and
+89 tools; P used 767.399 seconds, 60 requests and 96 tools. Usage was known for
+all four attempts. Thirty-eight development runs are retained; no independent
+run has started.
+
+The legacy failure exposed a separate controller defect: the failed read had a
+matching before hook, terminal timestamps and an unchanged snapshot, but other
+admitted read/grep calls were still finishing. A local reproduction confirmed
+that the exclusive-error condition stopped this normal native interaction.
+The corrective change permits that completed read error only alongside identified
+admitted source reads on the same snapshot. Queued writers remain blocked until
+all reads finish; unknown live tools, missing timestamps, changed state and native
+permission denials still stop the workflow. The original failed run remains a
+loss, and this control-flow repair alone establishes no task-quality advantage.
+
 ## Current hypothesis: focused observation with native relative paths
 
 `HARNESS_TASK_STRATEGY=check-first` replaces the fresh finisher with regression

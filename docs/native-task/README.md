@@ -210,12 +210,16 @@ allowance. Another denial, an explicit reject (including a nearby reject event),
 cancellation, unknown execution state or an external edit prevents continuation.
 
 Ordinary native `read`, `edit` and `apply_patch` errors may return to the author
-when the matching before hook and native terminal timestamps confirm completion,
-the expected file state is unchanged, and no other tool remains pending/live.
-A missing file or unmatched edit context stays an error; it does not consume the
-permission allowance or create a `permissionContinuations` entry. The author may
-choose another permitted action. Missing completion evidence, unexpected file
-changes and process errors with uncertain execution still stop the workflow.
+when the matching before hook and native terminal timestamps confirm completion
+and the expected file state is unchanged. Edit and patch errors require exclusive
+execution. A completed read error may coexist with other identified, admitted
+read/glob/grep calls on the same snapshot; queued writers still wait for every
+pending read to finish. An untracked live tool is not covered by this rule.
+A missing file, out-of-range read offset or unmatched edit context stays an error;
+it does not consume the permission allowance or create a `permissionContinuations`
+entry. The author may choose another permitted action. Missing completion evidence,
+unexpected file changes and process errors with uncertain execution still stop
+the workflow.
 
 A fatal native permission denial records its primary `permission_denied` cause
 before requesting native session cancellation. It stops further author/correction

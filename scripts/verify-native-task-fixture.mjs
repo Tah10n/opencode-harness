@@ -72,6 +72,11 @@ const fixture=http.createServer(async(req,res)=>{
   if(stage==='regressions') {
    assert.ok(text.includes('ORIGINAL_TASK_FIXTURE'));
    const calls=[{name:'read',args:{filePath:'value.mjs'}},{name:'glob',args:{pattern:'*.test.mjs'}},{name:'grep',args:{pattern:'legacy',include:'value.mjs'}},{name:'edit',args:{filePath:'value.test.mjs',oldString:'value,1',newString:'value,2'}},bash('node --test')];
+   if(process.env.NATIVE_TASK_FIXTURE_PARALLEL==='read-error')calls.unshift([
+    {name:'read',args:{filePath:'value.mjs',offset:130,limit:10}},
+    {name:'read',args:{filePath:'value.test.mjs'}},
+    {name:'glob',args:{pattern:'**/*'}},
+   ]);
    response(res,calls[n]??null,'The requested value regression fails on initial value 1; legacy remains covered.');return;
   }
   let calls=[];
