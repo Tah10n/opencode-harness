@@ -46,7 +46,7 @@ for(const task of tasks){
  if(rows.length<4||rows.some(r=>!r.matched))throw Error('Incomplete rubric calibration');
  files[calibration]=hash(fs.readFileSync(calibration));
 }
-for(const name of ['installed-preflight.json','sources.json','preparation-incidents.json','evaluator-incidents.json','capture-preflight/result.json']){const file=path.join(root,name);files[file]=hash(fs.readFileSync(file));}
+for(const name of ['installed-preflight.json','sources.json','preparation-incidents.json','evaluator-incidents.json','capture-preflight/result.json','bundle-link-preparation.json']){const file=path.join(root,name);files[file]=hash(fs.readFileSync(file));}
 const toolchain=path.resolve('../verified-change-harness/local/template-toolchain-20260908');
 for(const directory of ['bundle','plain-dependencies']){
  const m=manifest(path.join(root,directory));
