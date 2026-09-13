@@ -81,7 +81,14 @@ const fixture=http.createServer(async(req,res)=>{
   }
   let calls=[];
   if(stage==='implementation') {
-   if(mode==='container-check-first') calls=[{name:'read',args:{filePath:'value.mjs'}},{name:'edit',args:{filePath:'value.mjs',oldString:'value = 1',newString:'value = 2'}},{name:'bash',args:{command:'node --test',workdir:'.',description:'Installed scripted fixture from relative project root'}}];
+   if(mode==='container-direct') {
+    assert.ok(text.includes('ORIGINAL_TASK_FIXTURE'));
+    assert.ok(text.includes('state the action will actually use immediately before'));
+    const check={name:'bash',args:{command:'node --test',workdir:'.',description:'Installed direct public observation'}};
+    calls=[{name:'read',args:{filePath:'value.mjs'}},{name:'glob',args:{pattern:'*.test.mjs'}},{name:'grep',args:{pattern:'legacy',include:'value.mjs'}},{name:'edit',args:{filePath:'value.test.mjs',oldString:'value,1',newString:'value,2'}},check,{name:'edit',args:{filePath:'value.mjs',oldString:'value = 1',newString:'value = 2'}},check];
+    if(process.env.NATIVE_TASK_FIXTURE_PARALLEL==='read-error')calls.unshift([{name:'read',args:{filePath:'value.mjs',offset:130,limit:10}},{name:'read',args:{filePath:'value.test.mjs'}},{name:'glob',args:{pattern:'**/*'}}]);
+   }
+   else if(mode==='container-check-first') calls=[{name:'read',args:{filePath:'value.mjs'}},{name:'edit',args:{filePath:'value.mjs',oldString:'value = 1',newString:'value = 2'}},{name:'bash',args:{command:'node --test',workdir:'.',description:'Installed scripted fixture from relative project root'}}];
    else if(mode==='stateful') {
     assert.ok(text.includes('state the action will actually use immediately before'));
     calls=[bash(writeFixture('example.test.mjs',guarded)),bash('node --test')];
@@ -154,8 +161,8 @@ const fixture=http.createServer(async(req,res)=>{
 await new Promise(r=>fixture.listen(0,'127.0.0.1',r));
 if(process.env.NATIVE_TASK_FIXTURE_PROVIDER_ONLY==='1'){
  mode=({'1':'container-parallel','read-error':'container-parallel-read-error','denial':'container-parallel-denial'})[process.env.NATIVE_TASK_FIXTURE_PARALLEL]??'container-preflight';
- if(process.env.NATIVE_TASK_FIXTURE_CHECK_FIRST==='1') {
-  mode='container-check-first';
+ if(process.env.NATIVE_TASK_FIXTURE_CHECK_FIRST==='1'||process.env.NATIVE_TASK_FIXTURE_DIRECT==='1') {
+  mode=process.env.NATIVE_TASK_FIXTURE_DIRECT==='1'?'container-direct':'container-check-first';
   fs.writeFileSync(path.join(project,'value.mjs'),source.replace('value = 2','value = 1'));
   fs.writeFileSync(path.join(project,'value.test.mjs'),originalTest.replace('value,2','value,1'));
  }

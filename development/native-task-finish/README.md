@@ -120,7 +120,7 @@ all reads finish; unknown live tools, missing timestamps, changed state and nati
 permission denials still stop the workflow. The original failed run remains a
 loss, and this control-flow repair alone establishes no task-quality advantage.
 
-## Current hypothesis: focused observation with native relative paths
+## Retired phase hypothesis: focused observation with native relative paths
 
 `HARNESS_TASK_STRATEGY=check-first` replaces the fresh finisher with regression
 preparation followed by implementation in the same author session. The original
@@ -151,3 +151,34 @@ Private inputs, captures, preparation incidents, grades and the complete account
 remain under `local/native-task-finish-20260912/`. They are excluded from installation.
 Runtime imports no development/evaluator code. Local/model-free validation, measured
 patch suitability, operational completion and independent evidence remain separate.
+
+## Current hypothesis: one complete author pass with conditional observations
+
+Candidate `c5b999b1db6241a6be11804b22f934653c9d2344` completed two pairs without
+native execution failure, but full delivery remained tied: H 1/2, P 1/2. Both
+legacy migration patches were complete. Both iterator patches passed the calibrated
+behavior observer and their delivered AVA/type checks, but omitted a meaningful
+regression for closure after `next()` resolves while its returned input value is
+still pending. Separate mutations removing only that guard passed each delivered
+suite and failed the same independent observer. The original task explicitly
+required late pulls/values coverage; neither scored patch nor evaluator changed.
+
+H used 1518.277 seconds and 120 requests versus P 1061.126 seconds and 70 requests.
+All usage is known for these four runs. H's mandatory preparation consumed244.006
+seconds and did not improve the full outcome. Forty-two development runs remain
+accounted for, and no independent run has started.
+
+The next opt-in `HARNESS_TASK_STRATEGY=direct` reuses the existing complete author
+prompt and its conditional technique for observing actual state before a transition.
+It removes both mandatory preliminary preparation and automatic corrective replies
+from this path. The author can implement and test while investigating; it need not
+finish an artificial phase before production work. This specifically tests whether
+that existing observation technique is more useful within normal implementation
+than as a fixed preliminary pass. The original full task, native tools, relative
+paths, selected model, shared deadline, worktree and terminal patch are preserved.
+D and check-first remain compatible; no default is changed.
+
+The six remaining development attempts are allocated to queue draining, revoked
+connector recovery and a same-version repeat of recovery. These choices are fixed
+before their outcomes. This revision still needs installed validation and actual
+full-delivery evidence; removing stages alone does not meet the goal.

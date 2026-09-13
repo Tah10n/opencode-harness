@@ -9,20 +9,26 @@ its development results do not establish a recommended production mode.
 
 ## Install and use
 
-The opt-in development candidate `HARNESS_TASK_STRATEGY=check-first` uses one native
-author session in two phases. It first obtains a focused regression observation
-through an affected public path, then implements the complete original task and
-finishes the remaining consumer coverage, project regressions and documentation.
-Preparation ends after that useful observation; it does not front-load the entire
-test suite. The first passing or failing test cannot certify the full task.
-The same model, permissions and total deadline apply to both phases. Generated test
-expectations remain hypotheses to check against the task and preserved contracts.
-The author receives guidance to use native repository-relative read/edit paths and
-an explicit `workdir: "."` for native Bash commands at the project root. Native
-glob/grep may omit their directory. The standard native context still supplies
-the exact root; paths and permissions are resolved by the existing native tools.
-This path omits the mandatory H1 prompt, fresh finisher and D correction loop.
-Omitting the variable retains D and does not change the user's default.
+The opt-in development candidate `HARNESS_TASK_STRATEGY=direct` uses one native
+author pass for the complete original task. Implementation, actual consumers,
+regressions and documentation stay in that pass. When changing stateful behavior,
+the author is guided to observe the state the real action will use immediately
+before that action, then check the transition and preserved invariants. Generated
+expectations remain hypotheses derived from the task and existing contracts.
+This is an execution technique within normal project work, not a mandatory
+preparation phase. It is experimental and has not established a quality advantage.
+
+The author uses native repository-relative read/edit paths and an explicit
+`workdir: "."` for Bash at the project root. Native glob/grep may omit their
+directory. Native tools resolve the paths and enforce the existing permissions.
+The path has no mandatory reviewer, selector, H1, fresh finisher, preliminary
+model stage or report-driven corrective reply. It retains actual check failures
+and safely captured partial patches when the original task is incomplete.
+
+The earlier `check-first` strategy remains available for reproduction. It used
+focused regression preparation followed by implementation and did not improve
+the full-delivery balance in the latest two development pairs. Omitting the
+variable retains D and does not change the user's default.
 
 The earlier fresh-finisher experiment remains reproducible at
 `db7f374f56f2828f6372bf72ae1841ca71ae54fd`. It did not justify its added stage;
@@ -33,7 +39,7 @@ node scripts/profile-materialize.mjs --native --profile core --task \
   --output /absolute/task-config
 
 HARNESS_TASK_FILE=/absolute/original-task.txt \
-HARNESS_TASK_STRATEGY=check-first \
+HARNESS_TASK_STRATEGY=direct \
 HARNESS_TASK_TIMEOUT_MS=900000 \
 OPENCODE_CONFIG_DIR=/absolute/task-config opencode
 ```

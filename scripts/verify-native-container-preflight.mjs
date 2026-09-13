@@ -7,7 +7,7 @@ const f=JSON.parse(fs.readFileSync(path.join(root,'freeze.json')));
 const {startContainer}=await import(f.containerAdapter);
 const {captureCandidate}=await import(f.captureAdapter);
 const {runOpenCode}=await import(f.nativeAdapter);
-const fixture=spawn(process.execPath,['scripts/verify-native-task-fixture.mjs'],{cwd:base,env:{PATH:process.env.PATH,NATIVE_TASK_FIXTURE_PROVIDER_ONLY:'1',...(f.strategy==='check-first'?{NATIVE_TASK_FIXTURE_CHECK_FIRST:'1'}:{}),...(process.env.NATIVE_TASK_FIXTURE_PARALLEL?{NATIVE_TASK_FIXTURE_PARALLEL:process.env.NATIVE_TASK_FIXTURE_PARALLEL}:{})},stdio:['ignore','pipe','pipe']});
+const fixture=spawn(process.execPath,['scripts/verify-native-task-fixture.mjs'],{cwd:base,env:{PATH:process.env.PATH,NATIVE_TASK_FIXTURE_PROVIDER_ONLY:'1',...(f.strategy==='check-first'?{NATIVE_TASK_FIXTURE_CHECK_FIRST:'1'}:{}),...(f.strategy==='direct'?{NATIVE_TASK_FIXTURE_DIRECT:'1'}:{}),...(process.env.NATIVE_TASK_FIXTURE_PARALLEL?{NATIVE_TASK_FIXTURE_PARALLEL:process.env.NATIVE_TASK_FIXTURE_PARALLEL}:{})},stdio:['ignore','pipe','pipe']});
 let stderr='';fixture.stderr.on('data',x=>stderr+=x);
 let session,requests=0;
 try{
@@ -29,7 +29,7 @@ try{
  for(const tool of ['read','glob','edit','bash'])assert.ok(saved.events.some(e=>e.tool===tool&&e.state==='completed'),tool);
  if(process.env.NATIVE_TASK_FIXTURE_PARALLEL){assert.equal(saved.events.filter(e=>e.state==='error').length,process.env.NATIVE_TASK_FIXTURE_PARALLEL==='1'?0:1);const edit=saved.events.find(e=>e.tool==='edit'),check=saved.events.find(e=>e.args?.command==='node --test');assert.ok(edit.completedAt<=check.startedAt);assert.equal(check.before,edit.after);}
  if(process.env.NATIVE_TASK_FIXTURE_PARALLEL==='denial')assert.equal(saved.report.permissionContinuations.length,1);
- if(f.strategy==='check-first'&&process.env.NATIVE_TASK_FIXTURE_PARALLEL==='read-error') {
+ if(['check-first','direct'].includes(f.strategy)&&process.env.NATIVE_TASK_FIXTURE_PARALLEL==='read-error') {
   const error=saved.events.find(e=>e.tool==='read'&&e.state==='error');
   assert.equal(error.args.offset,130);assert.equal(error.before,error.after);assert.equal(error.permissionDenied,false);
   assert.ok(Number.isFinite(error.nativeTime?.end));
@@ -38,12 +38,12 @@ try{
  }
 
  assert.ok(saved.events.some(e=>e.tool==='bash'&&e.exit===0));assert.ok(saved.report.stages.some(s=>s.role==='author'));assert.deepEqual([...new Set(saved.report.stages.map(s=>s.role))],['author']);assert.equal(saved.report.repairs,0);
- if(f.strategy==='check-first') {
-  assert.deepEqual(saved.report.stages.map(s=>s.label),['regressions','implementation']);
-  const checks=saved.events.filter(e=>e.args?.command==='node --test'); assert.equal(checks[0].exit,1); assert.equal(checks.at(-1).exit,0); assert.ok(saved.files.includes('regressions.patch'));
+ if(['check-first','direct'].includes(f.strategy)) {
+  assert.deepEqual(saved.report.stages.map(s=>s.label),f.strategy==='direct'?['implementation']:['regressions','implementation']);
+  const checks=saved.events.filter(e=>e.args?.command==='node --test'); assert.equal(checks[0].exit,1); assert.equal(checks.at(-1).exit,0); assert.equal(saved.files.includes('regressions.patch'),f.strategy==='check-first');
   for(const tool of ['read','edit'])assert.ok(saved.events.some(e=>e.tool===tool&&e.state==='completed'&&!path.isAbsolute(e.args.filePath)),tool+' relative path');
   for(const tool of ['glob','grep'])assert.ok(saved.events.some(e=>e.tool===tool&&e.state==='completed'&&e.args.path===undefined),tool+' default directory');
-  assert.equal(checks[0].args.workdir,undefined,'Preparation uses the native delivery directory default');
+  assert.equal(checks[0].args.workdir,f.strategy==='direct'?'.':undefined,'Initial observation uses the native delivery directory');
   assert.equal(checks.at(-1).args.workdir,'.','Implementation uses the native relative project root');
  }
  assert.equal(captureCandidate(session,root).status,0);
