@@ -29,6 +29,7 @@ const continuationModes=['external-path','external-argument','bash-denial','seco
 const forbiddenContent='UNREAD_NATIVE_DENIAL_SENTINEL';
 const denialText='The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules '+JSON.stringify([{permission:'bash',pattern:'*',action:'deny'}]);
 let mode='correct',requests=[],auxiliaryRequests=[],providerRequests=0,counts=new Map(),priorArtifacts=new Set();
+const componentFixtureErrors=[];
 const writeFixture=(file,bytes)=>`node -e 'require("fs").writeFileSync(${JSON.stringify(file)},Buffer.from(${JSON.stringify(Buffer.from(bytes).toString('base64'))},"base64"))'`;
 const response = (res, call, content = '') => {
   if (call?.name === 'StructuredOutput') { content = JSON.stringify(call.args); call = null; }
@@ -81,7 +82,20 @@ const fixture=http.createServer(async(req,res)=>{
   }
   let calls=[];
   if(stage==='implementation') {
-   if(mode==='container-direct') {
+   if(mode==='components') {
+    const flags=process.env.NATIVE_TASK_FIXTURE_COMPONENTS??'00',all=JSON.stringify(body.messages);
+    const check={name:'bash',args:{command:flags[1]==='1'?'harness-check value.mjs':'npm run test',workdir:'.',description:'Actual project check'}};
+    calls=[{name:'read',args:{filePath:'value.mjs'}},check,{name:'edit',args:{filePath:'value.mjs',oldString:'value = 2',newString:'value = 3'}},check,{name:'read',args:{filePath:'value.test.mjs'}},{name:'edit',args:{filePath:'value.test.mjs',oldString:'value,2',newString:'value,3'}},check,{name:'read',args:{filePath:'value.mjs'}},bash('node --test')];
+    if(n===1){assert.equal(all.includes('Computed code context A'),flags[0]==='1');if(flags[0]==='1')assert.ok(all.includes('typescript-module-resolution')&&all.includes('value.test.mjs'));}
+    if(n===2)assert.equal(all.includes('Project check B'),flags[1]==='1');
+    if(n===4)assert.ok(all.includes('AssertionError')||all.includes('ERR_ASSERTION'),'Real failing consumer observation must reach the next author call');
+    if(n===7&&flags[1]==='1')assert.ok(body.messages.some(m=>m.role==='tool'&&JSON.stringify(m.content).includes('passed')));
+   }
+   else if(mode==='component-denial') {
+    calls=[{name:'bash',args:{command:'harness-check value.mjs',workdir:'.',description:'Must check actual selected npm permission'}},bash('node --test')];
+    if(n===1)assert.ok(JSON.stringify(body.messages).includes('The user has specified a rule which prevents'));
+   }
+   else if(mode==='container-direct') {
     assert.ok(text.includes('ORIGINAL_TASK_FIXTURE'));
     assert.ok(text.includes('state the action will actually use immediately before'));
     const check={name:'bash',args:{command:'node --test',workdir:'.',description:'Installed direct public observation'}};
@@ -156,7 +170,7 @@ const fixture=http.createServer(async(req,res)=>{
    else assert.fail('Unexpected corrective stage '+mode);
   }
   response(res,calls[n]??null,stage==='correction'?'Investigated factual feedback; exact result is in the project and native events.':'Implementation finished.');
- }catch(e){res.writeHead(500);res.end(e.stack);console.error(e.stack);}
+ }catch(e){if(mode==='components')componentFixtureErrors.push(e.message);res.writeHead(500);res.end(e.stack);console.error(e.stack);}
 });
 await new Promise(r=>fixture.listen(0,'127.0.0.1',r));
 if(process.env.NATIVE_TASK_FIXTURE_PROVIDER_ONLY==='1'){
@@ -173,6 +187,11 @@ if(process.env.NATIVE_TASK_FIXTURE_PROVIDER_ONLY==='1'){
 const probe = http.createServer(); await new Promise(r => probe.listen(0, '127.0.0.1', r)); const port = probe.address().port; await new Promise(r => probe.close(r));
 const config = { model: 'local-fixture/fixture', small_model: 'local-fixture/fixture', provider: { 'local-fixture': { npm: '@ai-sdk/openai-compatible', name: 'Scripted fixture', options: { baseURL: `http://127.0.0.1:${fixture.address().port}/v1`, apiKey: 'not-a-credential' }, models: { fixture: { name: 'fixture', limit: { context: 200000, output: 10000 } } } } } };
 const env = { PATH: process.env.PATH, HOME: path.join(temp, 'home'), TMPDIR: os.tmpdir(), ...Object.fromEntries(['config', 'data', 'cache', 'state'].map(n => [`XDG_${n.toUpperCase()}_HOME`, path.join(temp, n)])), OPENCODE_DISABLE_MODELS_FETCH: 'true', OPENCODE_DISABLE_AUTOUPDATE: 'true', OPENCODE_CONFIG_DIR: bundle, OPENCODE_CONFIG_CONTENT: JSON.stringify(config), HARNESS_TASK_FILE: task, HARNESS_TASK_TIMEOUT_MS: '20000' };
+if(process.env.NATIVE_TASK_FIXTURE_COMPONENTS){
+ const flags=process.env.NATIVE_TASK_FIXTURE_COMPONENTS;
+ assert.match(flags,/^[01]{2}$/);
+ Object.assign(env,{HARNESS_TASK_STRATEGY:'direct',HARNESS_TASK_CONTEXT:flags[0],HARNESS_TASK_CHECKS:flags[1],HARNESS_TASK_TIMEOUT_MS:'60000'});
+}
 const child = spawn(process.env.OPENCODE_BIN ?? 'opencode', ['serve', '--hostname', '127.0.0.1', '--port', String(port)], { cwd: project, env, stdio: ['ignore', 'pipe', 'pipe'] });
 let stderr = ''; child.stderr.on('data', x => { stderr += x; fs.writeFileSync(path.join(temp, 'server.log'), stderr); }); child.stdout.resume();
 const api = async (method, route, body) => { const r = await fetch(`http://127.0.0.1:${port}${route}`, { method, headers: { 'content-type': 'application/json' }, ...(body ? { body: JSON.stringify(body) } : {}), signal: AbortSignal.timeout(60000) }); if (!r.ok) throw Error(await r.text()); return r.json(); };
@@ -190,8 +209,9 @@ try {
   if(['variant','both-required','narrow'].includes(mode))fs.appendFileSync(task,' Required: `node --test value.test.mjs`.'+(mode==='both-required'?' Also required: `node --test --test-concurrency=1 value.test.mjs`.':''));
   if(mode==='stateful'){fs.copyFileSync(path.join(root,'fixtures/native-stateful/example.mjs'),path.join(project,'example.mjs'));fs.writeFileSync(path.join(project,'example.test.mjs'),stale);fs.appendFileSync(task,' Preserve the clear scenario and test consumption of an existing item through consume plus empty idempotency.');}
   if(mode==='staged-work'){fs.writeFileSync(path.join(project,'value.mjs'),source+'// staged user bytes\n');git('add','value.mjs');fs.appendFileSync(path.join(project,'value.mjs'),'// unstaged user bytes\n');}
+  if(mode==='components')fs.writeFileSync(task,'ORIGINAL_TASK_FIXTURE: Change value from 2 to 3 and update its public test expectation, preserving the independent legacy() = 7 scenario. Run node --test after the last edit.');
   const userBytes=fs.readFileSync(path.join(project,'value.mjs'),'utf8'),index=git('ls-files','--stage','-z');
-  const session=await api('POST','/session',{permission:['permission','bash-denial'].includes(mode)?[{permission:'bash',pattern:'printf forbidden',action:mode==='permission'?'ask':'deny'}]:continuationModes.includes(mode)?[{permission:'external_directory',pattern:'*',action:'deny'}]:[]});
+  const session=await api('POST','/session',{permission:mode==='component-denial'?[{permission:'bash',pattern:'npm run test',action:'deny'}]:['permission','bash-denial'].includes(mode)?[{permission:'bash',pattern:'printf forbidden',action:mode==='permission'?'ask':'deny'}]:continuationModes.includes(mode)?[{permission:'external_directory',pattern:'*',action:'deny'}]:[]});
   const pending=api('POST',`/session/${session.id}/command`,{command:'harness-task',arguments:'',agent:'build',model:'local-fixture/fixture'});
   if(mode==='permission'){
    pending.catch(()=>{});let asks=[],denialDirectory;
@@ -252,6 +272,21 @@ try {
   if(mode==='external-save')assert.equal(fs.readFileSync(path.join(report.executionDirectory,'value.mjs'),'utf8'),source+'// external edit\n');
   assert.ok(fs.existsSync(path.join(report.artifacts,'D0.patch'))||['external-save','permission','second-denial','unknown-error'].includes(mode));
   const events=JSON.parse(fs.readFileSync(path.join(report.artifacts,'tool-events.json')));
+  if(mode==='components'){
+   assert.deepEqual(componentFixtureErrors,[],'Scripted provider assertions must not be hidden by a native retry');
+   const flags=process.env.NATIVE_TASK_FIXTURE_COMPONENTS;
+   assert.equal(report.termination.verified,true);assert.equal(report.repairs,0);
+   assert.equal(fs.existsSync(path.join(report.artifacts,'component-context.json')),flags[0]==='1');
+   assert.equal(fs.existsSync(path.join(report.artifacts,'component-checks.json')),flags[1]==='1');
+   assert.equal(fs.existsSync(path.join(report.artifacts,'component-events.json')),flags!=='00');
+   if(flags[1]==='1'){
+    const checks=JSON.parse(fs.readFileSync(path.join(report.artifacts,'component-checks.json')));
+    assert.deepEqual(checks.map(c=>c.exit),[0,1,0]);assert.ok(checks.every(c=>c.executed&&c.command==='npm run test'));
+    assert.ok(events.filter(e=>e.componentCheck).every(e=>e.executionAdmitted===true));
+   }
+   assert.equal(requests.filter(r=>r.mode===mode&&r.stage==='implementation').length,10);
+   git('apply','--check',report.terminalPatch);
+  }
   if(continuationModes.includes(mode)){
    assert.equal(fs.existsSync(path.join(report.artifacts,'forbidden.txt')),false);
    assert.equal(fs.existsSync(path.join(report.executionDirectory,'forbidden.txt')),false);
@@ -276,6 +311,13 @@ try {
     assert.equal(fs.readFileSync(path.join(report.executionDirectory,'value.test.mjs'),'utf8'),originalTest.replace('value,2','value,3'));
     const patch=path.join(report.artifacts,'final.patch');assert.match(fs.readFileSync(patch,'utf8'),/value = 3/);git('apply','--check',patch);
    }
+  }else if(mode==='component-denial'){
+   assert.equal(report.permissionContinuations.length,1);
+   assert.equal(events[0].state,'error');assert.equal(events[0].execution,'native-bash-permission-preflight');
+   assert.equal(events[0].args.command,'npm run test');
+   assert.equal(events[0].executionAdmitted,false);
+   assert.equal(events[1].args.command,'node --test');assert.equal(events[1].state,'completed');
+   assert.equal(fs.existsSync(path.join(report.artifacts,'component-checks.json')),false);
   }else assert.deepEqual(report.permissionContinuations,[]);
   if(ordinaryErrorModes.includes(mode)){
    const failureIndex=mode==='missing-read'?0:1,failed=events[failureIndex];

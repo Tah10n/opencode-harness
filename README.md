@@ -13,6 +13,9 @@ explicit [`/harness-task` workflow](docs/native-task/README.md). Install with
 `--native --task`; delivery stays in its own retained Git worktree so concurrent
 user changes in the original checkout are preserved. Its diagnostic pilot and
 limitations are reported separately from scripted workflow checks.
+The single-author `direct` strategy also has optional
+[computed JS/TS context and early project checks](docs/native-task/PROJECT-FEEDBACK.md).
+Both additions default off; their A/B development comparison is not yet a quality claim.
 `--native --review` adds `/harness-review` for a fresh native session without
 automatic repair, model/default changes or a plugin. Ordinary `--native` remains
 the original two-file mode. Quality lift remains unproven.
