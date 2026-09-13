@@ -90,8 +90,12 @@ workdir **before native Bash checks its permissions and starts the process**.
 The normal cancellation, shared task deadline and terminal tool evidence apply.
 B starts no detached process. Its result contains the command, basis, exit,
 bounded diagnostics, elapsed time and execution limitations in the same session.
-An unavailable command or module is labelled an environment-or-resolution error,
-not automatically a product regression. No command failure is silently retried.
+A zero exit is reported as passed even when test names contain diagnostic words.
+Timeout recognition uses the native tool's appended timeout footer separately
+from captured command output; a test named `timeout` is not timeout evidence.
+For unsuccessful commands, missing-command/module diagnostic text is an
+environment-or-resolution hint, not proof of a product regression. Unrecognized
+failures retain their exit and diagnostics. No command failure is silently retried.
 
 An explicit repeated request on unchanged observed files may return a labelled
 historical result instead of executing again. This is not a fresh environment

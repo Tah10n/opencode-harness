@@ -85,6 +85,19 @@ try {
   pkg.scripts.typecheck = 'nonexistent-feedback-tool'; put('package.json', JSON.stringify(pkg));
   const environment = observe(selectProjectCheck(projectScope(root, rules), 'harness-check value.mjs typecheck'));
   assert.equal(environment.status, 'environment-or-resolution-error');
+  const assertionOutput = '✔ timeout validation in constructor\n✖ public API assertion\nAssertionError: expected 2, received 1\n';
+  const assertionFailure = checkObservation(plan, assertionOutput, {exit: 1, output: assertionOutput}, 1);
+  assert.equal(assertionFailure.status, 'failed-or-unclassified');
+  assert.equal(assertionFailure.exit, 1);
+  assert.equal(assertionFailure.diagnostics, assertionOutput);
+  const successfulOutput = '✔ reports MODULE_NOT_FOUND to callers\n1 test passed\n';
+  assert.equal(checkObservation(plan, successfulOutput, {exit: 0, output: successfulOutput}, 1).status, 'passed');
+  // Exact footer and metadata split observed in the installed 1.18.26 fixture.
+  const commandOutput = '\n> test\n> node -e "setInterval(() => {}, 1000)"\n\n';
+  const timeoutFooter = '\n\n<shell_metadata>\nshell tool terminated command after exceeding timeout 1000 ms. If this command is expected to take longer and is not waiting for interactive input, retry with a larger timeout value in milliseconds.\n</shell_metadata>';
+  assert.equal(checkObservation(plan, commandOutput + timeoutFooter, {exit: null, output: commandOutput}, 1000).status, 'timeout-or-interruption');
+  assert.equal(checkObservation(plan, commandOutput + timeoutFooter, {exit: 1, output: commandOutput + timeoutFooter}, 1).status, 'failed-or-unclassified');
+  assert.equal(checkObservation(plan, 'operation aborted by a test', {exit: 1}, 1).status, 'failed-or-unclassified');
   assert.equal(selectProjectCheck(projectScope(root, rules), 'harness-check .').available.some(p => p.name === 'typecheck'), true);
 
   const saved = new Map(); let compilerLoads = 0;
