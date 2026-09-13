@@ -1,0 +1,117 @@
+diff --git a/index.d.ts b/index.d.ts
+index 3e8ac46..f69dc68 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -69,6 +69,7 @@ export default class QuickLRU<KeyType, ValueType> extends Map<KeyType, ValueType
+ 	@returns The stored item or `undefined`.
+ 	*/
+ 	get(key: KeyType): ValueType | undefined;
++	getOrInsertComputed(key: KeyType, factory: (key: KeyType) => ValueType): ValueType;
+ 
+ 	/**
+ 	Check if an item exists.
+diff --git a/index.js b/index.js
+index 7f87cf5..d26d876 100644
+--- a/index.js
++++ b/index.js
+@@ -102,6 +102,16 @@ export default class QuickLRU extends Map {
+ 		}
+ 	}
+ 
++	getOrInsertComputed(key, factory) {
++		if (this.has(key)) {
++			return this.get(key);
++		}
++
++		const value = factory(key);
++		this.set(key, value);
++		return value;
++	}
++
+ 	get(key) {
+ 		if (this.#cache.has(key)) {
+ 			const item = this.#cache.get(key);
+diff --git a/index.test-d.ts b/index.test-d.ts
+index bc4b63e..87e2f29 100644
+--- a/index.test-d.ts
++++ b/index.test-d.ts
+@@ -24,3 +24,7 @@ for (const key of lru.keys()) {
+ for (const value of lru.values()) {
+ 	expectType<number>(value);
+ }
++
++expectType<number>(lru.getOrInsertComputed('x', key => key.length));
++// @ts-expect-error invalid return value
++lru.getOrInsertComputed('x', () => 'bad');
+diff --git a/readme.md b/readme.md
+index bad09c3..0a7709b 100644
+--- a/readme.md
++++ b/readme.md
+@@ -234,3 +234,8 @@ Consider alternatives when:
+ ## Related
+ 
+ - [yocto-queue](https://github.com/sindresorhus/yocto-queue) - Tiny queue data structure
++
++
++## quick-lru-computed
++
++The API provides getOrInsertComputed(key, factory): ValueType. If a non-expired entry exists, return it without calling factory and refresh recency exactly as get does, including stored undefined. Otherwise synchronously call factory(key) once, insert its returned value with the cache default maxAge, and return it. If factory throws, propagate the same error and leave the absent key uninserted. Treat expired entries as misses and preserve their normal eviction notification. Support object keys and independent caches. Preserve existing get/set/peek/has, expiry, iteration, size and eviction contracts. Reentrant factory mutations are outside this addition's guaranteed behavior. Extend public declarations and type tests with key/value inference and invalid factory return type rejection.
+diff --git a/test.js b/test.js
+index 0904dc2..2a19346 100644
+--- a/test.js
++++ b/test.js
+@@ -1,4 +1,5 @@
+ import {setTimeout as delay} from 'node:timers/promises';
++import * as A from 'node:assert/strict';
+ import test from 'ava';
+ import QuickLRU from './index.js';
+ 
+@@ -1725,3 +1726,48 @@ test('.evict() with custom maxAge and global maxAge interaction', async t => {
+ 	t.is(lru.size, 1);
+ 	t.true(lru.has('noglobal')); // Most recent should remain
+ });
++test('new public contract', t => {
++	let now = 1000;
++	const clock = Date.now;
++	Date.now = () => now;
++	try {
++		const ev = [];
++		const q = new QuickLRU({
++			maxSize: 2, maxAge: 10, onEviction: (...x) => ev.push(x),
++		});
++		const key = {};
++		let calls = 0;
++		A.equal(q.getOrInsertComputed(key, k => {
++			A.equal(k, key);
++			calls++;
++			return undefined;
++		}), undefined);
++		A.equal(q.has(key), true);
++		q.set('b', 2);
++		A.equal(q.getOrInsertComputed(key, () => {
++			throw new Error('hit');
++		}), undefined);
++		A.equal(calls, 1);
++		q.set('c', 3);
++		q.set('d', 4);
++		A.equal(q.has(key), true);
++		now = 1010;
++		A.equal(q.getOrInsertComputed(key, () => 9), 9);
++		A.equal(ev.filter(x => x[0] === key).length, 1);
++		A.equal(q.expiresIn(key), 10);
++		const failure = {};
++		A.throws(() => q.getOrInsertComputed('missing', () => {
++			throw failure;
++		}), error => error === failure);
++		A.equal(q.has('missing'), false);
++		const other = new QuickLRU({
++			maxSize: 2,
++		});
++		A.equal(other.getOrInsertComputed(key, () => 7), 7);
++		A.equal(q.get(key), 9);
++	} finally {
++		Date.now = clock;
++	}
++
++	t.pass();
++});

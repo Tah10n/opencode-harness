@@ -1,0 +1,89 @@
+diff --git a/README.md b/README.md
+index e45aa10..00715f5 100644
+--- a/README.md
++++ b/README.md
+@@ -83,3 +83,8 @@ run an additional `npm i` in the benchmarks folder before `npm run benchmark`.
+ ## License
+ 
+ [MIT](LICENSE)
++
++
++## eventemitter-prepend
++
++The API provides prependListener(event, fn, context?) and prependOnceListener(event, fn, context?), returning this and preserving the event-specific generic listener argument types. Prepending places each new registration before every existing registration, including previous prepends. Preserve on/addListener/once append order, context normalization, invalid-listener validation, all emit argument arities, symbols, listener enumeration and removeListener/off filtering. A prepended once listener is removed before invocation, including recursive emits. Expose this through both CommonJS and ESM consumers and public declarations.
+diff --git a/index.d.ts b/index.d.ts
+index fab37fd..2dc03ca 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -7,6 +7,8 @@ declare class EventEmitter<
+   Context extends any = any
+ > {
+   static prefixed: string | boolean;
++  prependListener<T extends EventEmitter.EventNames<EventTypes>>(event: T, fn: EventEmitter.EventListener<EventTypes, T>, context?: Context): this;
++  prependOnceListener<T extends EventEmitter.EventNames<EventTypes>>(event: T, fn: EventEmitter.EventListener<EventTypes, T>, context?: Context): this;
+ 
+   /**
+    * Return an array listing the events for which the emitter has registered
+diff --git a/index.js b/index.js
+index 6ea485c..1d29d5d 100644
+--- a/index.js
++++ b/index.js
+@@ -55,7 +55,7 @@ function EE(fn, context, once) {
+  * @returns {EventEmitter}
+  * @private
+  */
+-function addListener(emitter, event, fn, context, once) {
++function addListener(emitter, event, fn, context, once, prepend) {
+   if (typeof fn !== 'function') {
+     throw new TypeError('The listener must be a function');
+   }
+@@ -64,8 +64,8 @@ function addListener(emitter, event, fn, context, once) {
+     , evt = prefix ? prefix + event : event;
+ 
+   if (!emitter._events[evt]) emitter._events[evt] = listener, emitter._eventsCount++;
+-  else if (!emitter._events[evt].fn) emitter._events[evt].push(listener);
+-  else emitter._events[evt] = [emitter._events[evt], listener];
++  else if (!emitter._events[evt].fn) emitter._events[evt][prepend ? 'unshift' : 'push'](listener);
++  else emitter._events[evt] = prepend ? [listener, emitter._events[evt]] : [emitter._events[evt], listener];
+ 
+   return emitter;
+ }
+@@ -334,3 +334,11 @@ EventEmitter.EventEmitter = EventEmitter;
+ if ('undefined' !== typeof module) {
+   module.exports = EventEmitter;
+ }
++
++EventEmitter.prototype.prependListener = function (event, fn, context) {
++  return addListener(this, event, fn, context, false, true);
++};
++
++EventEmitter.prototype.prependOnceListener = function (event, fn, context) {
++  return addListener(this, event, fn, context, true, true);
++};
+diff --git a/test/h00-types.ts b/test/h00-types.ts
+new file mode 100644
+index 0000000..788eb5b
+--- /dev/null
++++ b/test/h00-types.ts
+@@ -0,0 +1,5 @@
++import EventEmitter from '../index';
++const emitter = new EventEmitter<{change: [string, number]}>();
++const chained: typeof emitter = emitter.prependListener('change', (text, count) => {const value: string = text;const size: number = count;}).prependOnceListener('change', (text, count) => {});
++// @ts-expect-error invalid payload type
++emitter.prependListener('change', (wrong: number) => {});
+diff --git a/test/test.js b/test/test.js
+index e5f8aaa..e2a029a 100644
+--- a/test/test.js
++++ b/test/test.js
+@@ -640,3 +640,11 @@ describe('EventEmitter', function tests() {
+     });
+   });
+ });
++
++var A = require('assert').strict; var api = require('../');
++it('new public contract', async function () {
++
++const e=new api(),ctx={},seen=[],a=function(...xs){seen.push(['a',this,...xs]);},b=function(...xs){seen.push(['b',this,...xs]);};A.equal(e.on('x',a,ctx),e);A.equal(e.prependListener('x',b,ctx),e);A.equal(e.prependOnceListener('x',a,ctx),e);A.deepEqual(e.listeners('x'),[a,b,a]);e.emit('x',1,2,3,4,5,6);A.deepEqual(seen.map(x=>x[0]),['a','b','a']);A.ok(seen.every(x=>x[1]===ctx&&x.length===8));A.deepEqual(e.listeners('x'),[b,a]);e.off('x',b,ctx);A.deepEqual(e.listeners('x'),[a]);
++const r=new api();let once=0;r.prependOnceListener('r',()=>{once++;r.emit('r');});r.emit('r');A.equal(once,1);const sym=Symbol();let got;r.prependListener(sym,x=>got=x);r.emit(sym,9);A.equal(got,9);A.throws(()=>r.prependListener(sym,null));A.equal(r.listenerCount(sym),1);const esm=await import('../index.mjs');A.equal(typeof new esm.default().prependOnceListener,'function');
++
++});

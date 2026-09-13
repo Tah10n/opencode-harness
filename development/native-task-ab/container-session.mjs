@@ -49,5 +49,5 @@ export async function startContainer({source,toolchain,template,output,onRequest
   };
   try{await ready;}catch(error){close();throw error;}finally{clearTimeout(timer);}
   const exec=argv=>spawnSync('docker',['exec','--workdir','/work/repo',name,...argv],{encoding:'utf8',timeout:30000,maxBuffer:32*1024*1024});
-  return {name,relayPid,exec,close,output};
+  return {name,relayPid,exec,close,output,setTaskBudget(milliseconds){if(!Number.isFinite(milliseconds)||milliseconds<=0||milliseconds>900000)throw Error('Invalid relay task budget');send({type:'task-budget',milliseconds});}};
 }

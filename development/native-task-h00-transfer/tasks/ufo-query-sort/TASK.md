@@ -1,0 +1,8 @@
+Add an optional {sort?: boolean} options argument to stringifyQuery and a third options argument to withQuery. With sort:true, serialize query keys in ascending JavaScript string order; preserve the order of repeated array values. Without it or with false, retain existing key enumeration and all current encoding/filtering behavior. withQuery must apply sorting after merging existing URL query with the supplied object, while preserving path, protocol/host and fragment. Do not mutate the caller's object or arrays. Export the public options type and thread it through public exports and generated declarations. Cover ordinary values including zero/false/empty/null/undefined and escaped/unicode keys. Preserve parsing pollution defenses.
+
+Required delivered regression scenarios:
+- Default/false order stays unchanged while true sorts keys, including decoded existing URL keys after merge.
+- Repeated values keep their order; input arrays/objects stay unchanged and existing encoding/filtering is retained.
+- Absolute and relative URL fragments/path survive; public imports and TypeScript option shape work.
+
+Deliver implementation, ordinary project regression tests, applicable public TypeScript declarations/type tests, and README/API documentation. Preserve existing independent regression scenarios and all behavior not explicitly changed. Use the project test tools; run relevant checks after the last edit and report what actually ran and any limitations. A different valid implementation or test organization is acceptable. Do not commit, publish, or change dependencies merely to make a check pass. The supported evaluation platform is Linux arm64, Node 24.19; browser deployment and other Node versions are outside this task.

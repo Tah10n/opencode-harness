@@ -1,0 +1,780 @@
+{
+  "version": 1,
+  "experimentKind": "h00-transfer",
+  "createdAt": "2026-09-13T19:38:38.913Z",
+  "candidateCommit": "1cebebb082163250a0f78269acc164edfc3c6268",
+  "publicationBase": "e336b94b1511d232dac885960db9cda8cf5857d9",
+  "model": "openai/gpt-5.6-luna",
+  "variant": "high",
+  "budgetMs": 900000,
+  "connectionTimeoutMs": 30000,
+  "streamLimit": "remaining-task-budget",
+  "strategy": "direct",
+  "flags": {
+    "HARNESS_TASK_CONTEXT": 0,
+    "HARNESS_TASK_CHECKS": 0
+  },
+  "freezeSha256": "240802e6d4deecca8b7e22096c6f4bccdd41b8c161e380eb32a56b9a42dbd1d6",
+  "realSmokes": 0,
+  "plannedRuns": 48,
+  "sources": [
+    {
+      "id": "denque-rotate",
+      "project": "denque",
+      "kind": "deque state",
+      "sourceCommit": "539105bb57854e997dd469221cdc52a0ad80e0a2",
+      "remote": "https://github.com/invertase/denque.git",
+      "taskFile": "development/native-task-h00-transfer/tasks/denque-rotate/TASK.md",
+      "requiredTestDiscriminations": [
+        "Positive/negative/default/zero and counts larger than length produce the specified array order and return this.",
+        "Wrapped storage and capacity-bound queues rotate without dropping values; subsequent deque operations preserve capacity and order.",
+        "Invalid values throw atomically, object identity survives, and empty/singleton queues stay usable."
+      ],
+      "preservedContracts": "All unmodified public behavior and independent regression cases in the pinned source; detailed exceptions only in TASK.md.",
+      "platform": "Linux arm64 / Node 24.19",
+      "rubric": {
+        "Q": "1 iff behavior, preserved contracts, required tests with actual setup/action/assertions, applicable types/docs, and patch application all pass. Otherwise 0.",
+        "D": "Q=1 plus normal native terminal completion, verified local/forwarding stop, and normally delivered usable result without observer rescue. Internal incomplete alone is not decisive."
+      },
+      "files": 2561,
+      "inputManifestSha256": "ebca32cd13a4e46c684d19496bf38b60a340acbb0f003dd8616b5d6f40c3f2c7"
+    },
+    {
+      "id": "denque-remove-where",
+      "project": "denque",
+      "kind": "deque filtering",
+      "sourceCommit": "539105bb57854e997dd469221cdc52a0ad80e0a2",
+      "remote": "https://github.com/invertase/denque.git",
+      "taskFile": "development/native-task-h00-transfer/tasks/denque-remove-where/TASK.md",
+      "requiredTestDiscriminations": [
+        "Predicate sees original indexes and values in order; mixed/none/all matches give the correct count and survivor order.",
+        "Predicate throwing after an earlier match leaves every original entry intact; non-function is rejected on empty too.",
+        "Wrapped/capacity queues with duplicates/falsy values stay usable and preserve capacity after filtering."
+      ],
+      "preservedContracts": "All unmodified public behavior and independent regression cases in the pinned source; detailed exceptions only in TASK.md.",
+      "platform": "Linux arm64 / Node 24.19",
+      "rubric": {
+        "Q": "1 iff behavior, preserved contracts, required tests with actual setup/action/assertions, applicable types/docs, and patch application all pass. Otherwise 0.",
+        "D": "Q=1 plus normal native terminal completion, verified local/forwarding stop, and normally delivered usable result without observer rescue. Internal incomplete alone is not decisive."
+      },
+      "files": 2561,
+      "inputManifestSha256": "bcf355d961aace6f8a8cb6c60455502afcee875e6adccd9640aa9beb8afd8805"
+    },
+    {
+      "id": "eventemitter-prepend",
+      "project": "eventemitter3",
+      "kind": "event registration",
+      "sourceCommit": "b0144e940ace8add8f335a8adfbed9284eb419f3",
+      "remote": "https://github.com/primus/eventemitter3.git",
+      "taskFile": "development/native-task-h00-transfer/tasks/eventemitter-prepend/TASK.md",
+      "requiredTestDiscriminations": [
+        "Mixed prepend/append/once registrations execute in the correct order, with receivers and multiple arguments.",
+        "Recursive emit does not repeat prependOnceListener; regular prepended listeners persist and can be removed.",
+        "Symbol and ESM consumers see the API; invalid handler leaves existing registrations intact."
+      ],
+      "preservedContracts": "All unmodified public behavior and independent regression cases in the pinned source; detailed exceptions only in TASK.md.",
+      "platform": "Linux arm64 / Node 24.19",
+      "rubric": {
+        "Q": "1 iff behavior, preserved contracts, required tests with actual setup/action/assertions, applicable types/docs, and patch application all pass. Otherwise 0.",
+        "D": "Q=1 plus normal native terminal completion, verified local/forwarding stop, and normally delivered usable result without observer rescue. Internal incomplete alone is not decisive."
+      },
+      "files": 1732,
+      "inputManifestSha256": "e535690c8ae08afa229e1c69e38195ecd8f9167864945acd79c4d88354abeb25"
+    },
+    {
+      "id": "eventemitter-remove-context",
+      "project": "eventemitter3",
+      "kind": "state cleanup",
+      "sourceCommit": "b0144e940ace8add8f335a8adfbed9284eb419f3",
+      "remote": "https://github.com/primus/eventemitter3.git",
+      "taskFile": "development/native-task-h00-transfer/tasks/eventemitter-remove-context/TASK.md",
+      "requiredTestDiscriminations": [
+        "Two contexts sharing the same callback are distinguished across string and symbol events; duplicates and once registrations count separately.",
+        "Removing all matching listeners removes empty event names but keeps others ordered; repeated removal returns zero and reuse works.",
+        "Omitted/falsy registration context follows existing emitter normalization and is removable by passing the emitter."
+      ],
+      "preservedContracts": "All unmodified public behavior and independent regression cases in the pinned source; detailed exceptions only in TASK.md.",
+      "platform": "Linux arm64 / Node 24.19",
+      "rubric": {
+        "Q": "1 iff behavior, preserved contracts, required tests with actual setup/action/assertions, applicable types/docs, and patch application all pass. Otherwise 0.",
+        "D": "Q=1 plus normal native terminal completion, verified local/forwarding stop, and normally delivered usable result without observer rescue. Internal incomplete alone is not decisive."
+      },
+      "files": 1732,
+      "inputManifestSha256": "93a4927989346cddde1627f825a12b7911b63e83c5a4b9e92cf3ae353e1d0fe1"
+    },
+    {
+      "id": "fastq-running-tasks",
+      "project": "fastq",
+      "kind": "queue state",
+      "sourceCommit": "fe2d23196a005810dfcbc4103b3c746cc5542430",
+      "remote": "https://github.com/mcollina/fastq.git",
+      "taskFile": "development/native-task-h00-transfer/tasks/fastq-running-tasks/TASK.md",
+      "requiredTestDiscriminations": [
+        "Blocked workers and queued values distinguish runningTasks from getQueue; mutating a returned array does not change state.",
+        "Completion removes the right duplicate/undefined task before callback; queued promotion and pool reuse update subsequent snapshots.",
+        "Paused/resumed and changed concurrency paths, plus promise fulfillment and rejection, expose only active values."
+      ],
+      "preservedContracts": "All unmodified public behavior and independent regression cases in the pinned source; detailed exceptions only in TASK.md.",
+      "platform": "Linux arm64 / Node 24.19",
+      "rubric": {
+        "Q": "1 iff behavior, preserved contracts, required tests with actual setup/action/assertions, applicable types/docs, and patch application all pass. Otherwise 0.",
+        "D": "Q=1 plus normal native terminal completion, verified local/forwarding stop, and normally delivered usable result without observer rescue. Internal incomplete alone is not decisive."
+      },
+      "files": 12416,
+      "inputManifestSha256": "f4997c96aabc0e6655a901cc9b0682cbf9b1f5e89b93be0b6aa52ef6bb8b422c"
+    },
+    {
+      "id": "fastq-on-idle",
+      "project": "fastq",
+      "kind": "queue lifecycle",
+      "sourceCommit": "fe2d23196a005810dfcbc4103b3c746cc5542430",
+      "remote": "https://github.com/mcollina/fastq.git",
+      "taskFile": "development/native-task-h00-transfer/tasks/fastq-on-idle/TASK.md",
+      "requiredTestDiscriminations": [
+        "Multiple subscribers stay pending with active or paused queued work and all resolve when both sets empty.",
+        "User drain callback identity/calls remain intact, including reentrant enqueue that postpones idle.",
+        "Removing queued work through kill/killAndDrain/abort resolves if idle, but not while a worker remains; rejected promise work eventually reaches idle."
+      ],
+      "preservedContracts": "All unmodified public behavior and independent regression cases in the pinned source; detailed exceptions only in TASK.md.",
+      "platform": "Linux arm64 / Node 24.19",
+      "rubric": {
+        "Q": "1 iff behavior, preserved contracts, required tests with actual setup/action/assertions, applicable types/docs, and patch application all pass. Otherwise 0.",
+        "D": "Q=1 plus normal native terminal completion, verified local/forwarding stop, and normally delivered usable result without observer rescue. Internal incomplete alone is not decisive."
+      },
+      "files": 12416,
+      "inputManifestSha256": "6f27089293be21488b63193322fc19bf3dfefd62a2c06e643732b4aaa7c996e1"
+    },
+    {
+      "id": "quick-lru-computed",
+      "project": "quick-lru",
+      "kind": "cache consumer API",
+      "sourceCommit": "f2fe88e2932603c038c61ca29de6ad5286148e1b",
+      "remote": "https://github.com/sindresorhus/quick-lru.git",
+      "taskFile": "development/native-task-h00-transfer/tasks/quick-lru-computed/TASK.md",
+      "requiredTestDiscriminations": [
+        "A hit including undefined never calls factory; an old-generation hit refreshes recency as get.",
+        "Expired entry calls factory, notifies expiration once, and inserted value uses default TTL.",
+        "Throwing factory leaves no entry and preserves reason; object-key identity and separate caches remain independent."
+      ],
+      "preservedContracts": "All unmodified public behavior and independent regression cases in the pinned source; detailed exceptions only in TASK.md.",
+      "platform": "Linux arm64 / Node 24.19",
+      "rubric": {
+        "Q": "1 iff behavior, preserved contracts, required tests with actual setup/action/assertions, applicable types/docs, and patch application all pass. Otherwise 0.",
+        "D": "Q=1 plus normal native terminal completion, verified local/forwarding stop, and normally delivered usable result without observer rescue. Internal incomplete alone is not decisive."
+      },
+      "files": 18276,
+      "inputManifestSha256": "0d7bad8755569ea2020f194f064e9b7648e8841a9fec30107bcfb74b84766abb"
+    },
+    {
+      "id": "quick-lru-prune",
+      "project": "quick-lru",
+      "kind": "cache lifecycle",
+      "sourceCommit": "f2fe88e2932603c038c61ca29de6ad5286148e1b",
+      "remote": "https://github.com/sindresorhus/quick-lru.git",
+      "taskFile": "development/native-task-h00-transfer/tasks/quick-lru-prune/TASK.md",
+      "requiredTestDiscriminations": [
+        "Expired entries from both generations are pruned, counted once and notified once; live iteration order is unchanged.",
+        "A live current value shadowing expired old value survives with no false callback; an expired current value never reveals old value.",
+        "Exact expiry boundary, infinite TTL, undefined value, repeated prune and reuse after empty cache work."
+      ],
+      "preservedContracts": "All unmodified public behavior and independent regression cases in the pinned source; detailed exceptions only in TASK.md.",
+      "platform": "Linux arm64 / Node 24.19",
+      "rubric": {
+        "Q": "1 iff behavior, preserved contracts, required tests with actual setup/action/assertions, applicable types/docs, and patch application all pass. Otherwise 0.",
+        "D": "Q=1 plus normal native terminal completion, verified local/forwarding stop, and normally delivered usable result without observer rescue. Internal incomplete alone is not decisive."
+      },
+      "files": 18276,
+      "inputManifestSha256": "e94d4857c1c4e32db775dd5b65de73cdbd2022331db5e41ec5c336572522bf73"
+    },
+    {
+      "id": "ufo-query-sort",
+      "project": "ufo",
+      "kind": "URL consumer integration",
+      "sourceCommit": "f06c800d0c59f2a4a1b9ba65eb6cb61a84419be6",
+      "remote": "https://github.com/unjs/ufo.git",
+      "taskFile": "development/native-task-h00-transfer/tasks/ufo-query-sort/TASK.md",
+      "requiredTestDiscriminations": [
+        "Default/false order stays unchanged while true sorts keys, including decoded existing URL keys after merge.",
+        "Repeated values keep their order; input arrays/objects stay unchanged and existing encoding/filtering is retained.",
+        "Absolute and relative URL fragments/path survive; public imports and TypeScript option shape work."
+      ],
+      "preservedContracts": "All unmodified public behavior and independent regression cases in the pinned source; detailed exceptions only in TASK.md.",
+      "platform": "Linux arm64 / Node 24.19",
+      "rubric": {
+        "Q": "1 iff behavior, preserved contracts, required tests with actual setup/action/assertions, applicable types/docs, and patch application all pass. Otherwise 0.",
+        "D": "Q=1 plus normal native terminal completion, verified local/forwarding stop, and normally delivered usable result without observer rescue. Internal incomplete alone is not decisive."
+      },
+      "files": 10551,
+      "inputManifestSha256": "0d7a33bb45dead38cbd6647d2f28d44d9c1a161c871bd10e328d7bd1afa04637"
+    },
+    {
+      "id": "ufo-append-query",
+      "project": "ufo",
+      "kind": "URL consumer integration",
+      "sourceCommit": "f06c800d0c59f2a4a1b9ba65eb6cb61a84419be6",
+      "remote": "https://github.com/unjs/ufo.git",
+      "taskFile": "development/native-task-h00-transfer/tasks/ufo-append-query/TASK.md",
+      "requiredTestDiscriminations": [
+        "Existing repeated values and a new array append in order while withQuery still replaces.",
+        "Undefined and empty arrays do not erase existing data; empty/null/zero/false values serialize with existing semantics.",
+        "Encoded keys, fragments, relative/absolute inputs and null-prototype pollution-key inputs are handled without mutation."
+      ],
+      "preservedContracts": "All unmodified public behavior and independent regression cases in the pinned source; detailed exceptions only in TASK.md.",
+      "platform": "Linux arm64 / Node 24.19",
+      "rubric": {
+        "Q": "1 iff behavior, preserved contracts, required tests with actual setup/action/assertions, applicable types/docs, and patch application all pass. Otherwise 0.",
+        "D": "Q=1 plus normal native terminal completion, verified local/forwarding stop, and normally delivered usable result without observer rescue. Internal incomplete alone is not decisive."
+      },
+      "files": 10551,
+      "inputManifestSha256": "e97d2b697042058aefcd84669cf453df7961584bf210af07059588b825fb92f1"
+    },
+    {
+      "id": "ms-format-unit",
+      "project": "ms",
+      "kind": "duration formatting API",
+      "sourceCommit": "4ff48cec099f0514c3e9bbca18706c9c21122bfb",
+      "remote": "https://github.com/vercel/ms.git",
+      "taskFile": "development/native-task-h00-transfer/tasks/ms-format-unit/TASK.md",
+      "requiredTestDiscriminations": [
+        "A forced smaller/larger unit differs from automatic selection, including month/year constants and fractional milliseconds.",
+        "Negative rounding, zero and long singular/plural boundary preserve specified behavior.",
+        "Invalid runtime unit throws on formatting, existing parsing/default formatting remain compatible, and type tests reject invalid units."
+      ],
+      "preservedContracts": "All unmodified public behavior and independent regression cases in the pinned source; detailed exceptions only in TASK.md.",
+      "platform": "Linux arm64 / Node 24.19",
+      "rubric": {
+        "Q": "1 iff behavior, preserved contracts, required tests with actual setup/action/assertions, applicable types/docs, and patch application all pass. Otherwise 0.",
+        "D": "Q=1 plus normal native terminal completion, verified local/forwarding stop, and normally delivered usable result without observer rescue. Internal incomplete alone is not decisive."
+      },
+      "files": 11096,
+      "inputManifestSha256": "1f9e3f84869babcbada0223807eef81378e86066128b51ee4386c513a11ac9bf"
+    },
+    {
+      "id": "ms-parse-compound",
+      "project": "ms",
+      "kind": "duration parsing API",
+      "sourceCommit": "4ff48cec099f0514c3e9bbca18706c9c21122bfb",
+      "remote": "https://github.com/vercel/ms.git",
+      "taskFile": "development/native-task-h00-transfer/tasks/ms-parse-compound/TASK.md",
+      "requiredTestDiscriminations": [
+        "Multiple mixed-case/spelled units, decimals, repeated/reordered units and whole-expression negative sign sum correctly.",
+        "Missing units, signed later terms, partial garbage and whitespace/separator mistakes return NaN instead of partial totals.",
+        "Non-string/empty/oversized inputs throw; original parse/parseStrict/ms continue rejecting compound syntax."
+      ],
+      "preservedContracts": "All unmodified public behavior and independent regression cases in the pinned source; detailed exceptions only in TASK.md.",
+      "platform": "Linux arm64 / Node 24.19",
+      "rubric": {
+        "Q": "1 iff behavior, preserved contracts, required tests with actual setup/action/assertions, applicable types/docs, and patch application all pass. Otherwise 0.",
+        "D": "Q=1 plus normal native terminal completion, verified local/forwarding stop, and normally delivered usable result without observer rescue. Internal incomplete alone is not decisive."
+      },
+      "files": 11096,
+      "inputManifestSha256": "30fd1cd181963f5107e13d457dee16d5d95eb278d55b05dde216a961186b9602"
+    }
+  ],
+  "attempts": [
+    {
+      "slot": 1,
+      "task": "denque-rotate",
+      "project": "denque",
+      "repetition": 1,
+      "arm": "P",
+      "state": "not_started"
+    },
+    {
+      "slot": 2,
+      "task": "denque-rotate",
+      "project": "denque",
+      "repetition": 1,
+      "arm": "H00",
+      "state": "not_started"
+    },
+    {
+      "slot": 3,
+      "task": "denque-remove-where",
+      "project": "denque",
+      "repetition": 1,
+      "arm": "H00",
+      "state": "not_started"
+    },
+    {
+      "slot": 4,
+      "task": "denque-remove-where",
+      "project": "denque",
+      "repetition": 1,
+      "arm": "P",
+      "state": "not_started"
+    },
+    {
+      "slot": 5,
+      "task": "eventemitter-prepend",
+      "project": "eventemitter3",
+      "repetition": 1,
+      "arm": "P",
+      "state": "not_started"
+    },
+    {
+      "slot": 6,
+      "task": "eventemitter-prepend",
+      "project": "eventemitter3",
+      "repetition": 1,
+      "arm": "H00",
+      "state": "not_started"
+    },
+    {
+      "slot": 7,
+      "task": "eventemitter-remove-context",
+      "project": "eventemitter3",
+      "repetition": 1,
+      "arm": "H00",
+      "state": "not_started"
+    },
+    {
+      "slot": 8,
+      "task": "eventemitter-remove-context",
+      "project": "eventemitter3",
+      "repetition": 1,
+      "arm": "P",
+      "state": "not_started"
+    },
+    {
+      "slot": 9,
+      "task": "fastq-running-tasks",
+      "project": "fastq",
+      "repetition": 1,
+      "arm": "P",
+      "state": "not_started"
+    },
+    {
+      "slot": 10,
+      "task": "fastq-running-tasks",
+      "project": "fastq",
+      "repetition": 1,
+      "arm": "H00",
+      "state": "not_started"
+    },
+    {
+      "slot": 11,
+      "task": "fastq-on-idle",
+      "project": "fastq",
+      "repetition": 1,
+      "arm": "H00",
+      "state": "not_started"
+    },
+    {
+      "slot": 12,
+      "task": "fastq-on-idle",
+      "project": "fastq",
+      "repetition": 1,
+      "arm": "P",
+      "state": "not_started"
+    },
+    {
+      "slot": 13,
+      "task": "quick-lru-computed",
+      "project": "quick-lru",
+      "repetition": 1,
+      "arm": "P",
+      "state": "not_started"
+    },
+    {
+      "slot": 14,
+      "task": "quick-lru-computed",
+      "project": "quick-lru",
+      "repetition": 1,
+      "arm": "H00",
+      "state": "not_started"
+    },
+    {
+      "slot": 15,
+      "task": "quick-lru-prune",
+      "project": "quick-lru",
+      "repetition": 1,
+      "arm": "H00",
+      "state": "not_started"
+    },
+    {
+      "slot": 16,
+      "task": "quick-lru-prune",
+      "project": "quick-lru",
+      "repetition": 1,
+      "arm": "P",
+      "state": "not_started"
+    },
+    {
+      "slot": 17,
+      "task": "ufo-query-sort",
+      "project": "ufo",
+      "repetition": 1,
+      "arm": "P",
+      "state": "not_started"
+    },
+    {
+      "slot": 18,
+      "task": "ufo-query-sort",
+      "project": "ufo",
+      "repetition": 1,
+      "arm": "H00",
+      "state": "not_started"
+    },
+    {
+      "slot": 19,
+      "task": "ufo-append-query",
+      "project": "ufo",
+      "repetition": 1,
+      "arm": "H00",
+      "state": "not_started"
+    },
+    {
+      "slot": 20,
+      "task": "ufo-append-query",
+      "project": "ufo",
+      "repetition": 1,
+      "arm": "P",
+      "state": "not_started"
+    },
+    {
+      "slot": 21,
+      "task": "ms-format-unit",
+      "project": "ms",
+      "repetition": 1,
+      "arm": "P",
+      "state": "not_started"
+    },
+    {
+      "slot": 22,
+      "task": "ms-format-unit",
+      "project": "ms",
+      "repetition": 1,
+      "arm": "H00",
+      "state": "not_started"
+    },
+    {
+      "slot": 23,
+      "task": "ms-parse-compound",
+      "project": "ms",
+      "repetition": 1,
+      "arm": "H00",
+      "state": "not_started"
+    },
+    {
+      "slot": 24,
+      "task": "ms-parse-compound",
+      "project": "ms",
+      "repetition": 1,
+      "arm": "P",
+      "state": "not_started"
+    },
+    {
+      "slot": 25,
+      "task": "denque-rotate",
+      "project": "denque",
+      "repetition": 2,
+      "arm": "H00",
+      "state": "not_started"
+    },
+    {
+      "slot": 26,
+      "task": "denque-rotate",
+      "project": "denque",
+      "repetition": 2,
+      "arm": "P",
+      "state": "not_started"
+    },
+    {
+      "slot": 27,
+      "task": "denque-remove-where",
+      "project": "denque",
+      "repetition": 2,
+      "arm": "P",
+      "state": "not_started"
+    },
+    {
+      "slot": 28,
+      "task": "denque-remove-where",
+      "project": "denque",
+      "repetition": 2,
+      "arm": "H00",
+      "state": "not_started"
+    },
+    {
+      "slot": 29,
+      "task": "eventemitter-prepend",
+      "project": "eventemitter3",
+      "repetition": 2,
+      "arm": "H00",
+      "state": "not_started"
+    },
+    {
+      "slot": 30,
+      "task": "eventemitter-prepend",
+      "project": "eventemitter3",
+      "repetition": 2,
+      "arm": "P",
+      "state": "not_started"
+    },
+    {
+      "slot": 31,
+      "task": "eventemitter-remove-context",
+      "project": "eventemitter3",
+      "repetition": 2,
+      "arm": "P",
+      "state": "not_started"
+    },
+    {
+      "slot": 32,
+      "task": "eventemitter-remove-context",
+      "project": "eventemitter3",
+      "repetition": 2,
+      "arm": "H00",
+      "state": "not_started"
+    },
+    {
+      "slot": 33,
+      "task": "fastq-running-tasks",
+      "project": "fastq",
+      "repetition": 2,
+      "arm": "H00",
+      "state": "not_started"
+    },
+    {
+      "slot": 34,
+      "task": "fastq-running-tasks",
+      "project": "fastq",
+      "repetition": 2,
+      "arm": "P",
+      "state": "not_started"
+    },
+    {
+      "slot": 35,
+      "task": "fastq-on-idle",
+      "project": "fastq",
+      "repetition": 2,
+      "arm": "P",
+      "state": "not_started"
+    },
+    {
+      "slot": 36,
+      "task": "fastq-on-idle",
+      "project": "fastq",
+      "repetition": 2,
+      "arm": "H00",
+      "state": "not_started"
+    },
+    {
+      "slot": 37,
+      "task": "quick-lru-computed",
+      "project": "quick-lru",
+      "repetition": 2,
+      "arm": "H00",
+      "state": "not_started"
+    },
+    {
+      "slot": 38,
+      "task": "quick-lru-computed",
+      "project": "quick-lru",
+      "repetition": 2,
+      "arm": "P",
+      "state": "not_started"
+    },
+    {
+      "slot": 39,
+      "task": "quick-lru-prune",
+      "project": "quick-lru",
+      "repetition": 2,
+      "arm": "P",
+      "state": "not_started"
+    },
+    {
+      "slot": 40,
+      "task": "quick-lru-prune",
+      "project": "quick-lru",
+      "repetition": 2,
+      "arm": "H00",
+      "state": "not_started"
+    },
+    {
+      "slot": 41,
+      "task": "ufo-query-sort",
+      "project": "ufo",
+      "repetition": 2,
+      "arm": "H00",
+      "state": "not_started"
+    },
+    {
+      "slot": 42,
+      "task": "ufo-query-sort",
+      "project": "ufo",
+      "repetition": 2,
+      "arm": "P",
+      "state": "not_started"
+    },
+    {
+      "slot": 43,
+      "task": "ufo-append-query",
+      "project": "ufo",
+      "repetition": 2,
+      "arm": "P",
+      "state": "not_started"
+    },
+    {
+      "slot": 44,
+      "task": "ufo-append-query",
+      "project": "ufo",
+      "repetition": 2,
+      "arm": "H00",
+      "state": "not_started"
+    },
+    {
+      "slot": 45,
+      "task": "ms-format-unit",
+      "project": "ms",
+      "repetition": 2,
+      "arm": "H00",
+      "state": "not_started"
+    },
+    {
+      "slot": 46,
+      "task": "ms-format-unit",
+      "project": "ms",
+      "repetition": 2,
+      "arm": "P",
+      "state": "not_started"
+    },
+    {
+      "slot": 47,
+      "task": "ms-parse-compound",
+      "project": "ms",
+      "repetition": 2,
+      "arm": "P",
+      "state": "not_started"
+    },
+    {
+      "slot": 48,
+      "task": "ms-parse-compound",
+      "project": "ms",
+      "repetition": 2,
+      "arm": "H00",
+      "state": "not_started"
+    }
+  ],
+  "analysis": "paired project-block percentile bootstrap, all 46656 block draws; equal task weights",
+  "preflight": {
+    "scriptedOnly": true,
+    "realDelayPerArmMs": 190000,
+    "passed": true
+  },
+  "fileHashes": {
+    "development/native-task-utility/container/container-session.mjs": "335c39545825dff2ede242fb350c329bd5b34fb14426b982aca433b8181cc7c7",
+    "development/native-task-utility/container/verify-lifecycle.mjs": "f3ad839004afe0896715371a6bc00b675b63dd256409bb586a7185bebea0be64",
+    "development/native-task-utility/container/stop-workload.mjs": "b21c23f5a334dc54af340e2773e3e56427aa27a946231769d36df249ea54a69e",
+    "development/native-task-utility/container/container-relay.mjs": "25069751dac4de007b58e7e77456f8c40344623603ec60aa52c69c0420e305d1",
+    "development/native-task-utility/container/native-preflight.mjs": "bebaef9c61551fc6986a44292feb88bc989a09df417aa373330027de60d4509e",
+    "development/native-task-ab/PLAN.md": "c2b12042b6471843f3dfafb19bec1ccec5f61153ae39328408cf0b04f918b202",
+    "development/native-task-ab/RUBRIC.md": "bab4352b6104ea790a8091215e39f762db9970c9fff6d66bc856a7d3af61b592",
+    "development/native-task-ab/calibrate.mjs": "254054a484d45d8c2fd7848e7fdc0a34a3b54ef4c669d6760db011a134b367a9",
+    "development/native-task-ab/container-relay.mjs": "3f8a0d1064c96783d0bdc2f6032a220a51743912bb0550173fea55c5d9576cce",
+    "development/native-task-ab/container-session.mjs": "52727eafe2eddc1c66630b1e4c241895f1ddf953d9540a39ba077508c75607ee",
+    "development/native-task-ab/verify-scheduler.mjs": "6a3a8891af587a686792be13c2af5e94f3402e3cd456277e1d593c87f62f2e96",
+    "development/native-task-ab/project-check.mjs": "99617ebc0cb9e74a4df42278cf1cc192f43245c722336b9fbcf6fc66f9d6c427",
+    "development/native-task-ab/freeze.mjs": "3735dc18e3edb5487f70bbf2092345c59b5601538d9cdf840a89a8f402685fa3",
+    "development/native-task-ab/REVIEW.md": "254bf7079694e3c3964f436d7cec16c0cf4a61013278120fd049507e41cd062b",
+    "development/native-task-ab/tasks.json": "39ab9588c1237826cb07ce171b83a29fbb15dca0d738ff4d58542a80e764969a",
+    "development/native-task-ab/extract-candidate.py": "aa5244bd4a5cc394344b266f0107728d9b70e190bad55de47c46dd10f28603de",
+    "development/native-task-ab/capture-candidate.mjs": "d388246826eb92dd408b853c4fe8fc929c259a9d03b89d169b75b2143544c669",
+    "development/native-task-ab/full-controls.mjs": "df9e77c2c2bd2300b6be7e81afb7915d6c00ed62d82e1b6edbf71b6f314ce46a",
+    "development/native-task-ab/control-patches.mjs": "15831c721c3a7b8dc985e1139d7d764d6b1016e113b082162ab3cef61199aa65",
+    "development/native-task-h00-transfer/equality.json": "bfb17b0927d7534fba0fded1eb22ae11c9e15b08dcc3e148b0441432b1e31120",
+    "development/native-task-h00-transfer/evaluation-cases.mjs": "6d36221e6e672624eeae423ca30e70da2a754c4a245839d01791caebfa27e373",
+    "development/native-task-h00-transfer/INSTALL.md": "fdba68e625912919b13af4e0877d6e005f11fc51d59b5145b43a2f2afe95ff07",
+    "development/native-task-h00-transfer/restoration.json": "f113a327846baac8ebb71208ea0c0fa2bfa17bb9bd2072e3b08a4f688bcb9391",
+    "development/native-task-ab/native-run.mjs": "ca43c32e7ea69cfb93c49d410ab74acc6bb6f2e9c8b5dffd2cb3c5864280080f",
+    "development/native-task-ab/run-comparison.mjs": "52a171ebcc3d3c22e29dc7eb236a2fab65934e94488c30382a7db53a7f335925",
+    "development/native-task-ab/run.mjs": "4a4b0e127cfc8f8fa12f3c5136901a92e61eb8a3a6d895b49661a19e143c0ff7",
+    "development/native-task-ab/preflight.mjs": "8a8eb7a411dcca0fbc18bae70e3460d552d3774521292b8a0db1ff2574ff2bd8",
+    "development/native-task-ab/evaluation-cases.mjs": "158df328cec878b130811ef1b0a746223d508b88ed063b23e958390698dd3c00",
+    "development/native-task-h00-transfer/preparation.json": "9066d26ed6b783bbae7f8abd69b8dea2ae1a30a04ee046ebab67839f2c69ab6f",
+    "development/native-task-h00-transfer/statistics.mjs": "22a982983ea6ecd0128e3f5b05cee32a552eae7008637ef8a0907037aa665945",
+    "development/native-task-h00-transfer/calibration.json": "06137420d15d4959913bfc64f04745970433f77a7fa73cd0bedd2c943ee30ea6",
+    "development/native-task-h00-transfer/rg-source.json": "d96ce8093ada3450e7bd83f379d44f634bcdd5707b2094e94ab5a29ab94b826c",
+    "development/native-task-h00-transfer/schedule.json": "c94657c30385dfdf586f40388d83fa3ee3219a12f618be9ffd339bb22ff63106",
+    "development/native-task-h00-transfer/PLAN.md": "cec892e94e8819a5fa81ef70b69703f039f0d1b296e19949f9759197810763bd",
+    "development/native-task-h00-transfer/RUBRIC.md": "b796fefaa75bb54afbee46b752e1feea385bb8f5aa9e91c7c76a9a6a515a58f8",
+    "development/native-task-h00-transfer/calibrate.mjs": "a84e545dd3cfb4e4abf8e0c13d5464f5a4d39e471a993c873580e903179534e6",
+    "development/native-task-h00-transfer/dependencies/quick-lru-package-lock.json": "7498b64499a206f4cf8c1a069fcece1db08ba51a0537013af5b7a7254186917c",
+    "development/native-task-h00-transfer/dependencies/ms-pnpm-lock.yaml": "1bb5dc693d48bf1e067950d6048ae154503b42ecb2d82920f563cc1c255c411f",
+    "development/native-task-h00-transfer/dependencies/ufo-pnpm-lock.yaml": "330cbc5239289059a81a6e514c847207450c590e7f3e9ac29847657f5dd7f9b6",
+    "development/native-task-h00-transfer/dependencies/fastq-package-lock.json": "6971aae9a5527a4aa6e47385b9d98b17f1f20a9943cd575b7f7ceb303cd6dd9f",
+    "development/native-task-h00-transfer/dependencies/denque-package-lock.json": "56545669f34dc4108442b9eac0ae4164dee6eb674005e0ae31172cf935044179",
+    "development/native-task-h00-transfer/dependencies/eventemitter3-package-lock.json": "0e493defa27509bde7f54bb11ea282f64f35d6d7edd790ff285afba8fa4c8f81",
+    "development/native-task-h00-transfer/full-controls.mjs": "1c59ac4bc80a3ee57be1672b2aab41cb4a9c1600657d04442942ebb40260fb82",
+    "development/native-task-h00-transfer/control-patches.mjs": "fb17edb167404e820afc880ca624cdf553a430707fa327dc2951860752f9e9af",
+    "development/native-task-h00-transfer/tasks.json": "45c98830e78f8cb953d9c01530aea2625f6a7e1ebc1e29dd0ec964b191687ff4",
+    "development/native-task-h00-transfer/freeze.mjs": "716e825bbf4e3340d835c2b2fed071148ec8438502d6fd1c971eac4e6017381d",
+    "development/native-task-h00-transfer/controls/denque-remove-where-reference.patch": "f9152d5aced91478d6ac4db6cabc1ab41921fd99f1342648607d2b4e2627df64",
+    "development/native-task-h00-transfer/controls/denque-remove-where-alternative.patch": "903543cae68beebe5ca14680c2799eac64a8f8e37ccdf425684678c677a78aa5",
+    "development/native-task-h00-transfer/controls/ufo-query-sort-alternative.patch": "976a361c0c71a2e325858063c892af437ae7cd795dfa96fb0c94d4810950554f",
+    "development/native-task-h00-transfer/controls/denque-rotate-alternative.patch": "b338391f642a1a92995461997eb584d2d65265e680ecfb63a01c3f406deef46e",
+    "development/native-task-h00-transfer/controls/fastq-running-tasks-alternative.patch": "012b07ab592d0370ab02b8394a9e4168a54933126c591d306f9424dacf5be349",
+    "development/native-task-h00-transfer/controls/eventemitter-prepend-reference.patch": "6b7d210f02785f070b92cd35237adba4407b38e54037042cb05c9b1651065334",
+    "development/native-task-h00-transfer/controls/fastq-on-idle-reference.patch": "a2fadcdb2a0b05965cd59a8369d4c1714928bdd85bb1603188de4cd47cd0a18a",
+    "development/native-task-h00-transfer/controls/ms-parse-compound-reference.patch": "51d8fdc88279950bae828181298a7118609840a573cc84ebaf35d229e8821497",
+    "development/native-task-h00-transfer/controls/fastq-running-tasks-reference.patch": "c675c399611d0c9ef177770e63381c576e9e9cd939c8f555f41278c650bea83f",
+    "development/native-task-h00-transfer/controls/quick-lru-prune-alternative.patch": "1653abecb8f5d13502e03ff4da926ea06b6e1a9f46fc58eba5599413c5b09b1c",
+    "development/native-task-h00-transfer/controls/quick-lru-computed-alternative.patch": "a9401e8f0c82b63fae8bfc6582ca457cb5b0f56b30be0a3954357808c1ea2259",
+    "development/native-task-h00-transfer/controls/denque-rotate-reference.patch": "7f9ed4b0eb0e0ecbc9cf4f78685ffdb659665f1cd3e27ede29831cbd615b4989",
+    "development/native-task-h00-transfer/controls/ms-format-unit-reference.patch": "13e046fafe4f61ceefb961eff8cbf91324c304ff30b0de27e1cc5f8ede49c414",
+    "development/native-task-h00-transfer/controls/ufo-append-query-alternative.patch": "7154995007d4de02cf7eb13d7da8c8ec8e177aea737c2fbe3c7a0e3607c489b3",
+    "development/native-task-h00-transfer/controls/quick-lru-prune-reference.patch": "fb3c5433bc8a1da579721fd2c238c4a15bc7f4124eb1199d206516b60052fdbf",
+    "development/native-task-h00-transfer/controls/eventemitter-remove-context-reference.patch": "11195c3c77156f157d2a633dace36a8c25cc4a066b0c895d8fc5a836a0f545e8",
+    "development/native-task-h00-transfer/controls/eventemitter-prepend-alternative.patch": "ea72f81d8f373988e27480d861ec753c39a92c922a944a7650756a56b6476d3b",
+    "development/native-task-h00-transfer/controls/ms-parse-compound-alternative.patch": "999da3483aba0f8d865745ae026023df7c5f12bc22eb130fc789702f2b1ba007",
+    "development/native-task-h00-transfer/controls/quick-lru-computed-reference.patch": "de97f3cc834c39456b751dec51cd461a58d89adf1ec1835f258b8850e4df404e",
+    "development/native-task-h00-transfer/controls/ufo-query-sort-reference.patch": "bea21b6bf35ad42c33d0c2523996d3143d780e8bdcf9438e413a7849e59c8516",
+    "development/native-task-h00-transfer/controls/ufo-append-query-reference.patch": "6c1b578f24139eb550215bd048e32d4336e1d661cd7c5ef775d1a4bab1dd5331",
+    "development/native-task-h00-transfer/controls/ms-format-unit-alternative.patch": "d59e171c54e1bdda79f204dee587f52f91d816c179e47302ef19e8d0b2327f49",
+    "development/native-task-h00-transfer/controls/eventemitter-remove-context-alternative.patch": "fff24d54803591bd53485278fdddccd88a2ce18fcc707fbe2bbf5b569d82083d",
+    "development/native-task-h00-transfer/controls/fastq-on-idle-alternative.patch": "9fd945504322f721b3c29848a960b02bc7e3ed1e6ed8463b0618ff93215ddbad",
+    "development/native-task-ab/transfer/freeze.mjs": "59fd6b7c1935a757683f30c40c3aca9b402d90e3f92f62058851ecff6e5e45af",
+    "development/native-task-ab/transfer/full-controls.mjs": "cb67f7a8b6bd99bbfdf15a6ca0687bb9c6c29708a9a90ccc97d1b2544c2beb55",
+    "development/native-task-ab/transfer/control-patches.mjs": "5b3ba0e48c3e2c688018066d1959239ff38d4a386d6238147090dd27ab0a73df",
+    "development/native-task-ab/transfer/RUBRIC.md": "8b9269ec7ffc719af433e5c61b6d8f3adf66a5d2f99894b5e98eb609f5fc4eec",
+    "development/native-task-ab/transfer/calibrate.mjs": "0874524950645b38cc37a08b3e60d433e3efd788030cdfaf6591cf4149e1685a",
+    "development/native-task-ab/transfer/evaluation-cases.mjs": "e38d9e758db6bfcfd1525a0d2e4e74814dbc27eacae7d9ead98b8e22624423e4",
+    "development/native-task-h00-transfer/tasks/fastq-running-tasks/TASK.md": "32ea4b3f9282e21a444b799dc68f043d47c8031468019e33a599d31ff3aced45",
+    "development/native-task-h00-transfer/h00/native-project-context.mjs": "5f35a51aebc7cdc3e12edf3506c6b590ced57f819a02b09ed6254702f500f394",
+    "development/native-task-h00-transfer/h00/native-project-checks.mjs": "88510e0438a3d786ca5b082775b67f5d126d3a1d542c51be361b336287e3b308",
+    "development/native-task-h00-transfer/h00/installed-manifest.json": "36bb02efffa6a81980af77176e6c13ac1d5f1ee7d4113264a44c325a16ae84eb",
+    "development/native-task-h00-transfer/h00/native-task-observations.mjs": "1b76ace202f145c34fd708ff00cf4c5b5800e03f69cc2095766ca536103ef026",
+    "development/native-task-h00-transfer/h00/core.md": "9adcc862446ac6c0e5a407ec89e2f65fe4a249aedcc34ba36f143f3589edd4f7",
+    "development/native-task-h00-transfer/h00/opencode.json": "1516a8f34f2100a7f0e3bd4ee418d36952c544e245602d6fa31a0751e66b4680",
+    "development/native-task-h00-transfer/h00/native-task-workflow.mjs": "4e2239822795d134b0e5243eb2aab19230865d639baa058b1052f3a62c969980",
+    "development/native-task-h00-transfer/h00/native-review-context.mjs": "8775ae59ef3d3b5b432798f909f94869d43b7561b4b5f144f972e5bcce20e312",
+    "development/native-task-h00-transfer/h00/native-project-feedback.mjs": "c3ed707cc0e6dd4fc40e882dd2895ec631f95de8c30663c262f20b72efdf3cb7",
+    "development/native-task-h00-transfer/h00/native-project-scope.mjs": "aa3b7be7781be1f02a5a9fc364ba470f79c15cc5909b763492d72ad92bf7aa62",
+    "development/native-task-h00-transfer/h00/native-project-config.mjs": "c3d758632ab72f7a63c5fec8a13520987a7d1ddc75020a908bd448166fa0167e",
+    "development/native-task-h00-transfer/h00/native-task-plugin.mjs": "4a9ec1d991cfe7380ec7656bd510d436f527fd8cef838da57f0a64ba6b8cc3bb",
+    "development/native-task-ab/tasks/abortable-queue-waiters/TASK.md": "b0e19749c3b5b8f1d88d35e97459d69d258f19ef0c6bae3f751f16255f6d863e",
+    "development/native-task-ab/tasks/clear-queue-reason/TASK.md": "07c6451cbbc91c7dc3cf9b3486a7a85b5e8edfb2513ee34041e17a8917be0bd8",
+    "development/native-task-ab/tasks/listener-count-deduplicate/TASK.md": "0f2b28487219ad87189b5beb7673734dca5b158cfa374c359ac9fbb7f5acefde",
+    "development/native-task-ab/tasks/bind-methods-atomic/TASK.md": "d0ea2d45a96973c462ef98863cd8ba5a1a895edd6a55359b71a6457ffe44a7e3",
+    "development/native-task-h00-transfer/tasks/eventemitter-remove-context/TASK.md": "552fffa233e30866bc5cc837ab634a87ab65c7a271f92634ddc7a27627aa2bea",
+    "development/native-task-ab/tasks/clear-queue-count/TASK.md": "e7154654674cbc6b36bdd34444feabdec69960bf48e85cfbae51948caa9c38fa",
+    "development/native-task-h00-transfer/tasks/ufo-append-query/TASK.md": "166901326d9c86f6d0ebef65727c67677d6a3cd92a9cde84cb2e69c5142a4ff5",
+    "development/native-task-ab/transfer/tasks/throttle-callback-receivers/TASK.md": "019195f3299b9f35022c209d1577f60955fc5ed9cb5bca54c6438e4f86a7677d",
+    "development/native-task-h00-transfer/tasks/ufo-query-sort/TASK.md": "c850d0f98d392204d2f616273d960d05181c4b90bacc725305066fd761251e2e",
+    "development/native-task-ab/tasks/limit-function-controls/TASK.md": "3fd87de2b85d7c3eba915c3252c44797c6e9210f34ffc84508f6ec4ee7183a0f",
+    "development/native-task-h00-transfer/tasks/denque-rotate/TASK.md": "b8d0b145ff75b1850e524d36e55d0accfb9dbbde96fb5582d6ff4e33d8958854",
+    "development/native-task-h00-transfer/tasks/ms-format-unit/TASK.md": "f64dd81436f861d572fb7e99d9e6975de82d2046803c28661cf596c04bacce5d",
+    "development/native-task-h00-transfer/tasks/quick-lru-computed/TASK.md": "c32e5cb7b60c76833b9f6a46bc6fc444c78d8188f47a47faccfa94968375b11c",
+    "development/native-task-h00-transfer/tasks/denque-remove-where/TASK.md": "7b5881e597df9ca6bfb2200d462e093ddb46092861d43ea821a0741114ad77da",
+    "development/native-task-ab/transfer/tasks/promise-clear-queue/TASK.md": "895bc4e06f95662675290212b5383ac17da3e50557ac9c2b5cf9ca720b30bc33",
+    "development/native-task-h00-transfer/tasks/fastq-on-idle/TASK.md": "1389afb52ceeda29cc131ec303be627b1b6b98b89c3a8fdf814ea26c17d92592",
+    "development/native-task-h00-transfer/tasks/eventemitter-prepend/TASK.md": "f47e2748d534d382bce9a158285bbad4c4094e3588732d8d3e04bd4f48170c8f",
+    "development/native-task-h00-transfer/tasks/quick-lru-prune/TASK.md": "1b8ec61bfd015b0f895f13e7a07072097bb8039dbb367dd68660576810b43a72",
+    "development/native-task-h00-transfer/tasks/ms-parse-compound/TASK.md": "08eef8033ae56ecdb8b183d1296593175c26682f2984136337d3a638ccf05575",
+    "development/native-task-abc/native-run.mjs": "5d691871022fcf4f2117212c33b463849e791d7ebe120adc68e7ca419ee0d293",
+    "lib/benchmark/statistics.mjs": "59c3012b138b682245a894d9272a13f9cf2574611a40cd76cf93295420a6e11f",
+    "package.json": "f73810aab9a598f4082d306f41681cc85b8ba457cd3cf2fc3811fa107cc7c641",
+    "package-lock.json": "eb075f089c2a93020fc175813228df4d43a9a25ed0cd9e5b1d537f5b230687a6"
+  }
+}

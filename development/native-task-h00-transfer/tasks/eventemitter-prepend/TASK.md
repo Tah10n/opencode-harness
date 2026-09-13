@@ -1,0 +1,8 @@
+Add prependListener(event, fn, context?) and prependOnceListener(event, fn, context?), returning this and preserving the event-specific generic listener argument types. Prepending places each new registration before every existing registration, including previous prepends. Preserve on/addListener/once append order, context normalization, invalid-listener validation, all emit argument arities, symbols, listener enumeration and removeListener/off filtering. A prepended once listener is removed before invocation, including recursive emits. Expose this through both CommonJS and ESM consumers and public declarations.
+
+Required delivered regression scenarios:
+- Mixed prepend/append/once registrations execute in the correct order, with receivers and multiple arguments.
+- Recursive emit does not repeat prependOnceListener; regular prepended listeners persist and can be removed.
+- Symbol and ESM consumers see the API; invalid handler leaves existing registrations intact.
+
+Deliver implementation, ordinary project regression tests, applicable public TypeScript declarations/type tests, and README/API documentation. Preserve existing independent regression scenarios and all behavior not explicitly changed. Use the project test tools; run relevant checks after the last edit and report what actually ran and any limitations. A different valid implementation or test organization is acceptable. Do not commit, publish, or change dependencies merely to make a check pass. The supported evaluation platform is Linux arm64, Node 24.19; browser deployment and other Node versions are outside this task.

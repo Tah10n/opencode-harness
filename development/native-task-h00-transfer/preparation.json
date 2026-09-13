@@ -1,0 +1,51 @@
+{
+  "modelFreeRequestsOnly": true,
+  "ordinaryBaselinesPassed": [
+    "denque",
+    "eventemitter3",
+    "fastq",
+    "quick-lru",
+    "ufo",
+    "ms"
+  ],
+  "measuredRuntimeUnchanged": true,
+  "preparationIncidents": [
+    {
+      "project": "mitt",
+      "kind": "incompatible-unconstrained-transitive-types",
+      "action": "excluded before model execution; rejected dependency pin not executed"
+    },
+    {
+      "project": "nanoevents",
+      "kind": "size-gate-conflicts-with-api-additions",
+      "action": "not selected; no install/model runs"
+    },
+    {
+      "project": "ufo",
+      "kind": "npm-peer-resolution-conflict",
+      "action": "used project pnpm and frozen upstream lockfile"
+    },
+    {
+      "project": "ms",
+      "kind": "wrong-preparation-pnpm-version-and-unlocked-npm-build-dependencies",
+      "action": "used declared pnpm 10.33.0 and unchanged project lockfile"
+    },
+    {
+      "project": "ms",
+      "kind": "preparation-cache-in-input",
+      "action": "excluded generated .pnpm-store before freeze; kept actual installed dependencies"
+    },
+    {
+      "kind": "async-evaluator-vacuity",
+      "action": "added bounded pending-assertion watchdog before outcomes"
+    },
+    {
+      "kind": "recency-test-insensitive",
+      "action": "advanced rotation to actually distinguish retained-old-generation bug"
+    },
+    {
+      "kind": "portable-apply-inside-parent-repository",
+      "action": "standalone initialized copy plus actual post-apply byte checks; earlier checks not accepted"
+    }
+  ]
+}

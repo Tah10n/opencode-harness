@@ -1,0 +1,230 @@
+[
+  {
+    "id": "denque-rotate",
+    "project": "denque",
+    "kind": "deque state",
+    "sourceCommit": "539105bb57854e997dd469221cdc52a0ad80e0a2",
+    "remote": "https://github.com/invertase/denque.git",
+    "taskFile": "development/native-task-h00-transfer/tasks/denque-rotate/TASK.md",
+    "requiredTestDiscriminations": [
+      "Positive/negative/default/zero and counts larger than length produce the specified array order and return this.",
+      "Wrapped storage and capacity-bound queues rotate without dropping values; subsequent deque operations preserve capacity and order.",
+      "Invalid values throw atomically, object identity survives, and empty/singleton queues stay usable."
+    ],
+    "preservedContracts": "All unmodified public behavior and independent regression cases in the pinned source; detailed exceptions only in TASK.md.",
+    "platform": "Linux arm64 / Node 24.19",
+    "rubric": {
+      "Q": "1 iff behavior, preserved contracts, required tests with actual setup/action/assertions, applicable types/docs, and patch application all pass. Otherwise 0.",
+      "D": "Q=1 plus normal native terminal completion, verified local/forwarding stop, and normally delivered usable result without observer rescue. Internal incomplete alone is not decisive."
+    }
+  },
+  {
+    "id": "denque-remove-where",
+    "project": "denque",
+    "kind": "deque filtering",
+    "sourceCommit": "539105bb57854e997dd469221cdc52a0ad80e0a2",
+    "remote": "https://github.com/invertase/denque.git",
+    "taskFile": "development/native-task-h00-transfer/tasks/denque-remove-where/TASK.md",
+    "requiredTestDiscriminations": [
+      "Predicate sees original indexes and values in order; mixed/none/all matches give the correct count and survivor order.",
+      "Predicate throwing after an earlier match leaves every original entry intact; non-function is rejected on empty too.",
+      "Wrapped/capacity queues with duplicates/falsy values stay usable and preserve capacity after filtering."
+    ],
+    "preservedContracts": "All unmodified public behavior and independent regression cases in the pinned source; detailed exceptions only in TASK.md.",
+    "platform": "Linux arm64 / Node 24.19",
+    "rubric": {
+      "Q": "1 iff behavior, preserved contracts, required tests with actual setup/action/assertions, applicable types/docs, and patch application all pass. Otherwise 0.",
+      "D": "Q=1 plus normal native terminal completion, verified local/forwarding stop, and normally delivered usable result without observer rescue. Internal incomplete alone is not decisive."
+    }
+  },
+  {
+    "id": "eventemitter-prepend",
+    "project": "eventemitter3",
+    "kind": "event registration",
+    "sourceCommit": "b0144e940ace8add8f335a8adfbed9284eb419f3",
+    "remote": "https://github.com/primus/eventemitter3.git",
+    "taskFile": "development/native-task-h00-transfer/tasks/eventemitter-prepend/TASK.md",
+    "requiredTestDiscriminations": [
+      "Mixed prepend/append/once registrations execute in the correct order, with receivers and multiple arguments.",
+      "Recursive emit does not repeat prependOnceListener; regular prepended listeners persist and can be removed.",
+      "Symbol and ESM consumers see the API; invalid handler leaves existing registrations intact."
+    ],
+    "preservedContracts": "All unmodified public behavior and independent regression cases in the pinned source; detailed exceptions only in TASK.md.",
+    "platform": "Linux arm64 / Node 24.19",
+    "rubric": {
+      "Q": "1 iff behavior, preserved contracts, required tests with actual setup/action/assertions, applicable types/docs, and patch application all pass. Otherwise 0.",
+      "D": "Q=1 plus normal native terminal completion, verified local/forwarding stop, and normally delivered usable result without observer rescue. Internal incomplete alone is not decisive."
+    }
+  },
+  {
+    "id": "eventemitter-remove-context",
+    "project": "eventemitter3",
+    "kind": "state cleanup",
+    "sourceCommit": "b0144e940ace8add8f335a8adfbed9284eb419f3",
+    "remote": "https://github.com/primus/eventemitter3.git",
+    "taskFile": "development/native-task-h00-transfer/tasks/eventemitter-remove-context/TASK.md",
+    "requiredTestDiscriminations": [
+      "Two contexts sharing the same callback are distinguished across string and symbol events; duplicates and once registrations count separately.",
+      "Removing all matching listeners removes empty event names but keeps others ordered; repeated removal returns zero and reuse works.",
+      "Omitted/falsy registration context follows existing emitter normalization and is removable by passing the emitter."
+    ],
+    "preservedContracts": "All unmodified public behavior and independent regression cases in the pinned source; detailed exceptions only in TASK.md.",
+    "platform": "Linux arm64 / Node 24.19",
+    "rubric": {
+      "Q": "1 iff behavior, preserved contracts, required tests with actual setup/action/assertions, applicable types/docs, and patch application all pass. Otherwise 0.",
+      "D": "Q=1 plus normal native terminal completion, verified local/forwarding stop, and normally delivered usable result without observer rescue. Internal incomplete alone is not decisive."
+    }
+  },
+  {
+    "id": "fastq-running-tasks",
+    "project": "fastq",
+    "kind": "queue state",
+    "sourceCommit": "fe2d23196a005810dfcbc4103b3c746cc5542430",
+    "remote": "https://github.com/mcollina/fastq.git",
+    "taskFile": "development/native-task-h00-transfer/tasks/fastq-running-tasks/TASK.md",
+    "requiredTestDiscriminations": [
+      "Blocked workers and queued values distinguish runningTasks from getQueue; mutating a returned array does not change state.",
+      "Completion removes the right duplicate/undefined task before callback; queued promotion and pool reuse update subsequent snapshots.",
+      "Paused/resumed and changed concurrency paths, plus promise fulfillment and rejection, expose only active values."
+    ],
+    "preservedContracts": "All unmodified public behavior and independent regression cases in the pinned source; detailed exceptions only in TASK.md.",
+    "platform": "Linux arm64 / Node 24.19",
+    "rubric": {
+      "Q": "1 iff behavior, preserved contracts, required tests with actual setup/action/assertions, applicable types/docs, and patch application all pass. Otherwise 0.",
+      "D": "Q=1 plus normal native terminal completion, verified local/forwarding stop, and normally delivered usable result without observer rescue. Internal incomplete alone is not decisive."
+    }
+  },
+  {
+    "id": "fastq-on-idle",
+    "project": "fastq",
+    "kind": "queue lifecycle",
+    "sourceCommit": "fe2d23196a005810dfcbc4103b3c746cc5542430",
+    "remote": "https://github.com/mcollina/fastq.git",
+    "taskFile": "development/native-task-h00-transfer/tasks/fastq-on-idle/TASK.md",
+    "requiredTestDiscriminations": [
+      "Multiple subscribers stay pending with active or paused queued work and all resolve when both sets empty.",
+      "User drain callback identity/calls remain intact, including reentrant enqueue that postpones idle.",
+      "Removing queued work through kill/killAndDrain/abort resolves if idle, but not while a worker remains; rejected promise work eventually reaches idle."
+    ],
+    "preservedContracts": "All unmodified public behavior and independent regression cases in the pinned source; detailed exceptions only in TASK.md.",
+    "platform": "Linux arm64 / Node 24.19",
+    "rubric": {
+      "Q": "1 iff behavior, preserved contracts, required tests with actual setup/action/assertions, applicable types/docs, and patch application all pass. Otherwise 0.",
+      "D": "Q=1 plus normal native terminal completion, verified local/forwarding stop, and normally delivered usable result without observer rescue. Internal incomplete alone is not decisive."
+    }
+  },
+  {
+    "id": "quick-lru-computed",
+    "project": "quick-lru",
+    "kind": "cache consumer API",
+    "sourceCommit": "f2fe88e2932603c038c61ca29de6ad5286148e1b",
+    "remote": "https://github.com/sindresorhus/quick-lru.git",
+    "taskFile": "development/native-task-h00-transfer/tasks/quick-lru-computed/TASK.md",
+    "requiredTestDiscriminations": [
+      "A hit including undefined never calls factory; an old-generation hit refreshes recency as get.",
+      "Expired entry calls factory, notifies expiration once, and inserted value uses default TTL.",
+      "Throwing factory leaves no entry and preserves reason; object-key identity and separate caches remain independent."
+    ],
+    "preservedContracts": "All unmodified public behavior and independent regression cases in the pinned source; detailed exceptions only in TASK.md.",
+    "platform": "Linux arm64 / Node 24.19",
+    "rubric": {
+      "Q": "1 iff behavior, preserved contracts, required tests with actual setup/action/assertions, applicable types/docs, and patch application all pass. Otherwise 0.",
+      "D": "Q=1 plus normal native terminal completion, verified local/forwarding stop, and normally delivered usable result without observer rescue. Internal incomplete alone is not decisive."
+    }
+  },
+  {
+    "id": "quick-lru-prune",
+    "project": "quick-lru",
+    "kind": "cache lifecycle",
+    "sourceCommit": "f2fe88e2932603c038c61ca29de6ad5286148e1b",
+    "remote": "https://github.com/sindresorhus/quick-lru.git",
+    "taskFile": "development/native-task-h00-transfer/tasks/quick-lru-prune/TASK.md",
+    "requiredTestDiscriminations": [
+      "Expired entries from both generations are pruned, counted once and notified once; live iteration order is unchanged.",
+      "A live current value shadowing expired old value survives with no false callback; an expired current value never reveals old value.",
+      "Exact expiry boundary, infinite TTL, undefined value, repeated prune and reuse after empty cache work."
+    ],
+    "preservedContracts": "All unmodified public behavior and independent regression cases in the pinned source; detailed exceptions only in TASK.md.",
+    "platform": "Linux arm64 / Node 24.19",
+    "rubric": {
+      "Q": "1 iff behavior, preserved contracts, required tests with actual setup/action/assertions, applicable types/docs, and patch application all pass. Otherwise 0.",
+      "D": "Q=1 plus normal native terminal completion, verified local/forwarding stop, and normally delivered usable result without observer rescue. Internal incomplete alone is not decisive."
+    }
+  },
+  {
+    "id": "ufo-query-sort",
+    "project": "ufo",
+    "kind": "URL consumer integration",
+    "sourceCommit": "f06c800d0c59f2a4a1b9ba65eb6cb61a84419be6",
+    "remote": "https://github.com/unjs/ufo.git",
+    "taskFile": "development/native-task-h00-transfer/tasks/ufo-query-sort/TASK.md",
+    "requiredTestDiscriminations": [
+      "Default/false order stays unchanged while true sorts keys, including decoded existing URL keys after merge.",
+      "Repeated values keep their order; input arrays/objects stay unchanged and existing encoding/filtering is retained.",
+      "Absolute and relative URL fragments/path survive; public imports and TypeScript option shape work."
+    ],
+    "preservedContracts": "All unmodified public behavior and independent regression cases in the pinned source; detailed exceptions only in TASK.md.",
+    "platform": "Linux arm64 / Node 24.19",
+    "rubric": {
+      "Q": "1 iff behavior, preserved contracts, required tests with actual setup/action/assertions, applicable types/docs, and patch application all pass. Otherwise 0.",
+      "D": "Q=1 plus normal native terminal completion, verified local/forwarding stop, and normally delivered usable result without observer rescue. Internal incomplete alone is not decisive."
+    }
+  },
+  {
+    "id": "ufo-append-query",
+    "project": "ufo",
+    "kind": "URL consumer integration",
+    "sourceCommit": "f06c800d0c59f2a4a1b9ba65eb6cb61a84419be6",
+    "remote": "https://github.com/unjs/ufo.git",
+    "taskFile": "development/native-task-h00-transfer/tasks/ufo-append-query/TASK.md",
+    "requiredTestDiscriminations": [
+      "Existing repeated values and a new array append in order while withQuery still replaces.",
+      "Undefined and empty arrays do not erase existing data; empty/null/zero/false values serialize with existing semantics.",
+      "Encoded keys, fragments, relative/absolute inputs and null-prototype pollution-key inputs are handled without mutation."
+    ],
+    "preservedContracts": "All unmodified public behavior and independent regression cases in the pinned source; detailed exceptions only in TASK.md.",
+    "platform": "Linux arm64 / Node 24.19",
+    "rubric": {
+      "Q": "1 iff behavior, preserved contracts, required tests with actual setup/action/assertions, applicable types/docs, and patch application all pass. Otherwise 0.",
+      "D": "Q=1 plus normal native terminal completion, verified local/forwarding stop, and normally delivered usable result without observer rescue. Internal incomplete alone is not decisive."
+    }
+  },
+  {
+    "id": "ms-format-unit",
+    "project": "ms",
+    "kind": "duration formatting API",
+    "sourceCommit": "4ff48cec099f0514c3e9bbca18706c9c21122bfb",
+    "remote": "https://github.com/vercel/ms.git",
+    "taskFile": "development/native-task-h00-transfer/tasks/ms-format-unit/TASK.md",
+    "requiredTestDiscriminations": [
+      "A forced smaller/larger unit differs from automatic selection, including month/year constants and fractional milliseconds.",
+      "Negative rounding, zero and long singular/plural boundary preserve specified behavior.",
+      "Invalid runtime unit throws on formatting, existing parsing/default formatting remain compatible, and type tests reject invalid units."
+    ],
+    "preservedContracts": "All unmodified public behavior and independent regression cases in the pinned source; detailed exceptions only in TASK.md.",
+    "platform": "Linux arm64 / Node 24.19",
+    "rubric": {
+      "Q": "1 iff behavior, preserved contracts, required tests with actual setup/action/assertions, applicable types/docs, and patch application all pass. Otherwise 0.",
+      "D": "Q=1 plus normal native terminal completion, verified local/forwarding stop, and normally delivered usable result without observer rescue. Internal incomplete alone is not decisive."
+    }
+  },
+  {
+    "id": "ms-parse-compound",
+    "project": "ms",
+    "kind": "duration parsing API",
+    "sourceCommit": "4ff48cec099f0514c3e9bbca18706c9c21122bfb",
+    "remote": "https://github.com/vercel/ms.git",
+    "taskFile": "development/native-task-h00-transfer/tasks/ms-parse-compound/TASK.md",
+    "requiredTestDiscriminations": [
+      "Multiple mixed-case/spelled units, decimals, repeated/reordered units and whole-expression negative sign sum correctly.",
+      "Missing units, signed later terms, partial garbage and whitespace/separator mistakes return NaN instead of partial totals.",
+      "Non-string/empty/oversized inputs throw; original parse/parseStrict/ms continue rejecting compound syntax."
+    ],
+    "preservedContracts": "All unmodified public behavior and independent regression cases in the pinned source; detailed exceptions only in TASK.md.",
+    "platform": "Linux arm64 / Node 24.19",
+    "rubric": {
+      "Q": "1 iff behavior, preserved contracts, required tests with actual setup/action/assertions, applicable types/docs, and patch application all pass. Otherwise 0.",
+      "D": "Q=1 plus normal native terminal completion, verified local/forwarding stop, and normally delivered usable result without observer rescue. Internal incomplete alone is not decisive."
+    }
+  }
+]

@@ -19,7 +19,7 @@ if(fs.existsSync('/template/core.md')) {
   fs.copyFileSync('/template/core.md','/work/template/core.md');
   fs.writeFileSync('/work/template/opencode.json',JSON.stringify({$schema:'https://opencode.ai/config.json',instructions:['/work/template/core.md']}));
 }
-let nextId=0;
+let nextId=0,taskDeadline=null;
 const pending=new Map();
 const emit=value=>process.stdout.write(JSON.stringify(value)+'\n');
 const server=http.createServer(async(req,res)=>{
@@ -28,7 +28,7 @@ const server=http.createServer(async(req,res)=>{
   try {
     for await(const chunk of req){size+=chunk.length;if(size>16*1024*1024)throw Error('request too large');chunks.push(chunk);}
     const body=JSON.parse(Buffer.concat(chunks));
-    const timeout=setTimeout(()=>{res.destroy();pending.delete(id);emit({type:'cancel',id});},180000);
+    const timeout=setTimeout(()=>{res.destroy();pending.delete(id);emit({type:'cancel',id});},taskDeadline===null?180000:Math.max(1,taskDeadline-Date.now()));
     pending.set(id,{res,timeout,bytes:0});
     res.once('close',()=>{clearTimeout(timeout);pending.delete(id);if(!res.writableEnded)emit({type:'cancel',id});});
     emit({type:'request',id,path:req.url,body});
@@ -37,7 +37,7 @@ const server=http.createServer(async(req,res)=>{
 const input=readline.createInterface({input:process.stdin});
 input.on('line',line=>{
   try {
-    const frame=JSON.parse(line),item=pending.get(frame.id);if(!item)return;
+    const frame=JSON.parse(line);if(frame.type==='task-budget'){if(taskDeadline!==null||!Number.isFinite(frame.milliseconds)||frame.milliseconds<=0||frame.milliseconds>900000)throw Error('Invalid task budget');taskDeadline=Date.now()+frame.milliseconds;return;}const item=pending.get(frame.id);if(!item)return;
     if(frame.type==='headers')item.res.writeHead(frame.status,{'content-type':frame.contentType});
     else if(frame.type==='chunk'){
       const bytes=Buffer.from(frame.data,'base64');item.bytes+=bytes.length;

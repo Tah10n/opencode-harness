@@ -1,0 +1,71 @@
+diff --git a/README.md b/README.md
+index 3c645d3..fac6eaa 100644
+--- a/README.md
++++ b/README.md
+@@ -75,3 +75,8 @@ See the [API reference documentation](https://docs.page/invertase/denque/api) fo
+     Built and maintained by <a href="https://invertase.io/?utm_source=readme&utm_medium=footer&utm_campaign=denque">Invertase</a>.
+   </p>
+ </p>
++
++
++## denque-rotate
++
++The API provides rotate(steps = 1): this. Positive steps rotate values from back to front; negative steps rotate front to back. Normalize finite integer counts modulo current length, preserving value identity and order. Reject non-integer, non-finite and non-number counts with an Error before changing any state; zero and rotations of empty/singleton queues are no-ops returning this. Handle wrapped internal storage, capacity-limited queues and large integer counts without looping once per unnormalized step. Preserve length, configured capacity and subsequent push/unshift/pop/shift/peek/remove behavior. Document the public API and extend declarations and consumer type tests.
+diff --git a/index.d.ts b/index.d.ts
+index e125dd4..e60d547 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -38,6 +38,7 @@ declare class Denque<T = any> {
+   toString(): string;
+ 
+   toArray(): T[];
++  rotate(steps?: number): this;
+ }
+ 
+ interface IDenqueOptions {
+diff --git a/index.js b/index.js
+index 6b2e9d8..6566a52 100644
+--- a/index.js
++++ b/index.js
+@@ -479,3 +479,16 @@ Denque.prototype._nextPowerOf2 = function _nextPowerOf2(num) {
+ }
+ 
+ module.exports = Denque;
++
++Denque.prototype.rotate = function rotate(steps) {
++  if (steps === undefined) steps = 1;
++  if (typeof steps !== 'number' || !isFinite(steps) || Math.floor(steps) !== steps) throw new Error('Invalid rotation');
++  var n = this.size();
++  if (n < 2) return this;
++  var k = ((steps % n) + n) % n;
++  var values = this.toArray();
++  var rotated = []; for (var i = 0; i < n; i++) rotated.push(values[(i + n - k) % n]);
++  this._head = 0;
++  this._fromArray(rotated);
++  return this;
++};
+diff --git a/test/h00-contract.js b/test/h00-contract.js
+new file mode 100644
+index 0000000..51f6737
+--- /dev/null
++++ b/test/h00-contract.js
+@@ -0,0 +1,9 @@
++var A = require('assert').strict; var api = require('../');
++it('new public contract', async function () {
++
++const q = new api([1,2,3,4]); A.equal(q.rotate(),q);A.deepEqual(q.toArray(),[4,1,2,3]);q.rotate(-2);A.deepEqual(q.toArray(),[2,3,4,1]);q.rotate(4000000002);A.deepEqual(q.toArray(),[4,1,2,3]);q.rotate(0);A.deepEqual(q.toArray(),[4,1,2,3]);
++for(const v of [1.5,NaN,Infinity,-Infinity,'1',null]){A.throws(()=>q.rotate(v));A.deepEqual(q.toArray(),[4,1,2,3]);}
++const o={};const c=new api([o,2,3],{capacity:3});c.shift();c.push(4);c.rotate(-1);A.deepEqual(c.toArray(),[3,4,2]);c.push(5);A.deepEqual(c.toArray(),[4,2,5]);A.equal(c.length,3);A.equal(c.pop(),5);c.unshift(o);A.equal(c.peekFront(),o);A.equal(c.shift(),o);
++const e=new api();A.equal(e.rotate(),e);A.equal(e.length,0);e.push(o);e.rotate(-999);A.equal(e.peekBack(),o);A.equal(e.removeOne(0),o);
++
++});
+diff --git a/test/type/index.ts b/test/type/index.ts
+index 7ee6f37..fce3921 100644
+--- a/test/type/index.ts
++++ b/test/type/index.ts
+@@ -26,3 +26,5 @@ queue.splice(3, 3, "44", "55", "66");
+ 
+ queue.isEmpty();
+ queue.clear();
++
++const rotated: Denque<string> = queue.rotate(3).rotate();

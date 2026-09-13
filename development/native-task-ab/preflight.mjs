@@ -18,7 +18,7 @@ for(const [name,text]of Object.entries({
  '.gitignore':'node_modules\n',
 }))fs.writeFileSync(path.join(source,name),text);
 let seq=0;const results=[];
-for(const arm of ['P','H00','H10','H01','H11']){
+for(const arm of (process.env.PREFLIGHT_H00_ONLY==='1'?['P','H00']:['P','H00','H10','H01','H11'])){
  const enabled=arm!=='P',A=['H10','H11'].includes(arm),B=['H01','H11'].includes(arm),counts=new Map(),requests=[],failures=[];
  let session;
  try{
@@ -28,10 +28,10 @@ for(const arm of ['P','H00','H10','H01','H11']){
     const stage=!body.tools?.length?'title':content.includes('Implement the complete original task')?'author':enabled?'bootstrap':'author';
     requests.push({stage,model:body.model,effort:body.reasoning?.effort});
     assert.equal(body.model,'gpt-5.6-luna');assert.equal(body.reasoning?.effort,'high');assert.equal(frame.path,'/v1/responses');
-    const n=counts.get(stage)??0;counts.set(stage,n+1);let call=null;
+    const n=counts.get(stage)??0;counts.set(stage,n+1);if(stage==='author'&&n===0&&process.env.PREFLIGHT_DELAY_MS)await new Promise(resolve=>setTimeout(resolve,Number(process.env.PREFLIGHT_DELAY_MS)));let call=null;
     if(stage==='bootstrap'&&n===0)call={name:'harness_task',args:{}};
     if(stage==='author'){
-     const all=JSON.stringify(inputs),toolOutputs=inputs.filter(x=>x.type==='function_call_output').map(x=>x.output).join('\n');
+     const all=JSON.stringify(inputs);assert.ok(all.includes(fs.readFileSync(path.join(source,'TASK.md'),'utf8')),'Complete original task must reach author unchanged');fs.writeFileSync(path.join(root,runName+'-'+arm,'request-'+seq+'.json'),JSON.stringify(body),{mode:0o600});const toolOutputs=inputs.filter(x=>x.type==='function_call_output').map(x=>x.output).join('\n');
      const read=filePath=>({name:'read',args:{filePath}}),edit=(filePath,oldString,newString)=>{
        const before=fs.readFileSync(path.join(source,filePath),'utf8').trimEnd(),after=before.replace(oldString,newString);
        return {name:'apply_patch',args:{patchText:'*** Begin Patch\n*** Update File: '+filePath+'\n@@\n-'+before+'\n+'+after+'\n*** End Patch'}};
@@ -53,6 +53,7 @@ for(const arm of ['P','H00','H10','H01','H11']){
   }});
   const setup=session.exec(['node','-e',"const fs=require('fs');fs.mkdirSync('/work/bin');fs.copyFileSync('/template/rg','/work/bin/rg');fs.chmodSync('/work/bin/rg',0o755);fs.mkdirSync('/work/config/opencode',{recursive:true});for(const n of ['node_modules','package.json','package-lock.json'])fs.cpSync('/template/'+n,'/work/config/opencode/'+n,{recursive:true,verbatimSymlinks:true});"]);assert.equal(setup.status,0,setup.stderr);
   assert.equal(session.exec(['/opt/opencode','--version']).stdout.trim(),'1.18.26');
+  if(process.env.PREFLIGHT_H00_ONLY==='1')session.setTaskBudget(900000);
   const result=await runTask(session,{config,task:fs.readFileSync(path.join(source,'TASK.md'),'utf8'),enabled,arm,model:'openai/gpt-5.6-luna',variant:'high',limitMs:900000,stopWorkload});
   assert.deepEqual(failures,[]);assert.equal(result.nativeCompleted,true,JSON.stringify(result));assert.equal(result.termination.terminationVerified,true);
   const check=session.exec(['node','-e',`const fs=require('fs'),assert=require('assert/strict');let dir='/work/repo',artifacts;if(${enabled}){artifacts=dir+'/.git/harness-task/'+fs.readdirSync(dir+'/.git/harness-task')[0];const r=JSON.parse(fs.readFileSync(artifacts+'/result.json'));assert.equal(r.termination.verified,true);assert.equal(r.repairs,0);dir=artifacts+'/worktree';assert.equal(fs.existsSync(artifacts+'/component-context.json'),${A});assert.equal(fs.existsSync(artifacts+'/component-checks.json'),${B});assert.ok(fs.readFileSync('/work/repo/value.mjs','utf8').includes('value = 1'));}assert.ok(fs.readFileSync(dir+'/value.mjs','utf8').includes('value = 2'));assert.ok(fs.readFileSync(dir+'/consumer.test.mjs','utf8').includes('value,2'));console.log(JSON.stringify({verified:true,artifacts:artifacts??null}));`]);assert.equal(check.status,0,check.stderr);
