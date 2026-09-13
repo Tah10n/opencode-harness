@@ -1,0 +1,795 @@
+{
+  "preparationBeforePrimary": {
+    "goalStartedAt": "2026-09-13T11:45:39.000Z",
+    "frozenAt": "2026-09-13T12:48:41.096Z",
+    "elapsedUntilFreezeSeconds": 3782.096,
+    "codexGoalCounterObserved": {
+      "tokensUsed": 488055,
+      "timeUsedSeconds": 3981,
+      "scope": "App goal counter; not equivalent to executing Luna provider usage or a monetary charge"
+    },
+    "paidTechnicalSmokes": 0,
+    "preparationRealExecutingModelRequests": 0,
+    "monetaryCost": "not available from existing provider metadata",
+    "note": "Local npm/dependency preparation, model-free fixtures, control generation, evaluator calibration and project suites are preparation costs, not free runtime benefit."
+  },
+  "prePrimaryProjectProcesses": {
+    "count": 71,
+    "sumElapsedMs": 893222,
+    "nonzero": 50
+  },
+  "additionalModelFreeProjectProcesses": {
+    "count": 112,
+    "sumElapsedMs": 1600099,
+    "nonzero": 22,
+    "processes": [
+      {
+        "path": "grading/07a1805c5657/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 4134,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/07a1805c5657/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 7791,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/10d0536980f7/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 3778,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/10d0536980f7/ordinary-project/result.json",
+        "exit": 1,
+        "elapsedMs": 4973,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/15bcf4229dc5/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 4572,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/15bcf4229dc5/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 96841,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/1630e997ed31/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 3745,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/1630e997ed31/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 7651,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/16abc67ae164/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 3730,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/16abc67ae164/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 7951,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/1a72e3685206/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 4566,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/1a72e3685206/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 7894,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/2669d98dc938/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 4204,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/2669d98dc938/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 8345,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/27f89faef649/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 3919,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/27f89faef649/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 9291,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/2d50431da1d8/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 4022,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/2d50431da1d8/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 10249,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/2fe419a56684/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 3929,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/2fe419a56684/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 96698,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/327d0ecf1a65/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 3662,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/327d0ecf1a65/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 96509,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/330c5b620e55/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 4063,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/330c5b620e55/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 8858,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/3be68608106c/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 4232,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/3be68608106c/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 97533,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/4a6b76d27495/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 4319,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/4a6b76d27495/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 96901,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/557488ff10e8/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 4223,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/557488ff10e8/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 98478,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/6f7ab71c8093/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 3748,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/6f7ab71c8093/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 8713,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/7cb1c7ad5768/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 4235,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/7cb1c7ad5768/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 9221,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/862feb9f16f1/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 4365,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/862feb9f16f1/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 10009,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/931e71357c8b/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 3834,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/931e71357c8b/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 97526,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/94c81be0e2fc/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 4488,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/94c81be0e2fc/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 9465,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/9ce3aca8147a/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 3907,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/9ce3aca8147a/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 8061,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/9fe431c28a8b/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 3858,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/9fe431c28a8b/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 96980,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/a0fb6fe65bd4/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 4313,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/a0fb6fe65bd4/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 96076,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/a3727937ddef/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 4450,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/a3727937ddef/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 10117,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/a4c2f33b2788/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 3843,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/a4c2f33b2788/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 8007,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/b5821f78f41b/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 4034,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/b5821f78f41b/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 8281,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/c1480bfe32f3/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 3893,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/c1480bfe32f3/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 9750,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/e9f64e60ce17/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 3931,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/e9f64e60ce17/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 97130,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/ecf88ae50db1/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 3744,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/ecf88ae50db1/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 9641,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/fad911ec157c/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 4265,
+        "terminationVerified": true
+      },
+      {
+        "path": "grading/fad911ec157c/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 9328,
+        "terminationVerified": true
+      },
+      {
+        "path": "supplementary/onEmpty-931e71357c8b/result.json",
+        "exit": 0,
+        "elapsedMs": 3140,
+        "terminationVerified": true
+      },
+      {
+        "path": "supplementary/onEmpty-baseline/result.json",
+        "exit": 0,
+        "elapsedMs": 3102,
+        "terminationVerified": true
+      },
+      {
+        "path": "supplementary/wrapper-count-test/result.json",
+        "exit": 1,
+        "elapsedMs": 4151,
+        "terminationVerified": true
+      },
+      {
+        "path": "supplementary/wrong-receiver/result.json",
+        "exit": 1,
+        "elapsedMs": 4542,
+        "terminationVerified": true
+      },
+      {
+        "path": "supplementary/wrong-receiver-v2/result.json",
+        "exit": 0,
+        "elapsedMs": 4556,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/baseline-authorized/promise-clear-queue/result.json",
+        "exit": 0,
+        "elapsedMs": 12337,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/baseline-authorized/throttle-callback-receivers/result.json",
+        "exit": 0,
+        "elapsedMs": 25909,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/calibration-authorized/promise-clear-queue/alternative/result.json",
+        "exit": 0,
+        "elapsedMs": 2128,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/calibration-authorized/promise-clear-queue/reference/result.json",
+        "exit": 0,
+        "elapsedMs": 2686,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/calibration-authorized/promise-clear-queue/unchanged/result.json",
+        "exit": 1,
+        "elapsedMs": 2312,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/calibration-authorized/promise-clear-queue/wrong-active-reset/result.json",
+        "exit": 1,
+        "elapsedMs": 2163,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/calibration-authorized/promise-clear-queue/wrong-count/result.json",
+        "exit": 1,
+        "elapsedMs": 1958,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/calibration-authorized/promise-clear-queue/wrong-falsy/result.json",
+        "exit": 1,
+        "elapsedMs": 1941,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/calibration-authorized/promise-clear-queue/wrong-still-runs/result.json",
+        "exit": 1,
+        "elapsedMs": 2056,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/calibration-authorized/throttle-callback-receivers/alternative/result.json",
+        "exit": 0,
+        "elapsedMs": 3191,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/calibration-authorized/throttle-callback-receivers/reference/result.json",
+        "exit": 0,
+        "elapsedMs": 3393,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/calibration-authorized/throttle-callback-receivers/unchanged/result.json",
+        "exit": 1,
+        "elapsedMs": 3591,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/calibration-authorized/throttle-callback-receivers/wrong-delay/result.json",
+        "exit": 1,
+        "elapsedMs": 2942,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/calibration-authorized/throttle-callback-receivers/wrong-options/result.json",
+        "exit": 1,
+        "elapsedMs": 3434,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/calibration-authorized/throttle-callback-receivers/wrong-weight/result.json",
+        "exit": 1,
+        "elapsedMs": 3198,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/full-controls/promise-clear-queue/reference/result.json",
+        "exit": 1,
+        "elapsedMs": 2358,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/full-controls-v2/promise-clear-queue/alternative/result.json",
+        "exit": 0,
+        "elapsedMs": 14129,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/full-controls-v2/promise-clear-queue/reference/result.json",
+        "exit": 0,
+        "elapsedMs": 13551,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/full-controls-v2/throttle-callback-receivers/alternative/result.json",
+        "exit": 1,
+        "elapsedMs": 4766,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/full-controls-v2/throttle-callback-receivers/reference/result.json",
+        "exit": 0,
+        "elapsedMs": 26690,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/full-controls-v3/throttle-callback-receivers/alternative/result.json",
+        "exit": 1,
+        "elapsedMs": 25337,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/final-control-independent/promise-clear-queue/alternative/result.json",
+        "exit": 0,
+        "elapsedMs": 2095,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/final-control-independent/promise-clear-queue/reference/result.json",
+        "exit": 0,
+        "elapsedMs": 2803,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/final-control-independent/throttle-callback-receivers/alternative/result.json",
+        "exit": 0,
+        "elapsedMs": 3095,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/final-control-independent/throttle-callback-receivers/reference/result.json",
+        "exit": 0,
+        "elapsedMs": 3458,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/timing-diagnostic/alternative/result.json",
+        "exit": 0,
+        "elapsedMs": 4876,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/timing-diagnostic/baseline/result.json",
+        "exit": 0,
+        "elapsedMs": 4580,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/grading/0251e18a1cea/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 2672,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/grading/0251e18a1cea/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 12218,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/grading/1637e24ede3b/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 2149,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/grading/1637e24ede3b/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 12053,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/grading/5dc9b4dd5279/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 3527,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/grading/5dc9b4dd5279/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 25094,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/grading/ab9957f92a0b/independent/result.json",
+        "exit": 1,
+        "elapsedMs": 3326,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/grading/ab9957f92a0b/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 25704,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/grading/b62c8c4f27b5/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 2762,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/grading/b62c8c4f27b5/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 12606,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/grading/fe5d7556e6b2/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 2271,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/grading/fe5d7556e6b2/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 12282,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/supplementary/active-error-0251e18a1cea/delivered-tests/result.json",
+        "exit": 1,
+        "elapsedMs": 1868,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/supplementary/active-error-0251e18a1cea/independent/result.json",
+        "exit": 1,
+        "elapsedMs": 1904,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/supplementary/active-error-1637e24ede3b/delivered-tests/result.json",
+        "exit": 0,
+        "elapsedMs": 2271,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/supplementary/active-error-1637e24ede3b/independent/result.json",
+        "exit": 1,
+        "elapsedMs": 2471,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/supplementary/latest-reuse-0251e18a1cea/delivered-tests/result.json",
+        "exit": 1,
+        "elapsedMs": 2065,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/supplementary/latest-reuse-0251e18a1cea/independent/result.json",
+        "exit": 1,
+        "elapsedMs": 2124,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/supplementary/latest-reuse-b62c8c4f27b5/delivered-tests/result.json",
+        "exit": 0,
+        "elapsedMs": 1976,
+        "terminationVerified": true
+      },
+      {
+        "path": "transfer/supplementary/latest-reuse-b62c8c4f27b5/independent/result.json",
+        "exit": 1,
+        "elapsedMs": 2014,
+        "terminationVerified": true
+      }
+    ]
+  },
+  "recordedInstalledScriptedRuns": [
+    {
+      "artifact": "installed-preflight-before-link-normalization.json",
+      "arm": "P",
+      "elapsedMs": 3520,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "installed-preflight-before-link-normalization.json",
+      "arm": "H00",
+      "elapsedMs": 4530,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "installed-preflight-before-link-normalization.json",
+      "arm": "H10",
+      "elapsedMs": 4920,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "installed-preflight-before-link-normalization.json",
+      "arm": "H01",
+      "elapsedMs": 4522,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "installed-preflight-before-link-normalization.json",
+      "arm": "H11",
+      "elapsedMs": 4882,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "installed-preflight.json",
+      "arm": "P",
+      "elapsedMs": 2988,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "installed-preflight.json",
+      "arm": "H00",
+      "elapsedMs": 4555,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "installed-preflight.json",
+      "arm": "H10",
+      "elapsedMs": 4620,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "installed-preflight.json",
+      "arm": "H01",
+      "elapsedMs": 3992,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "installed-preflight.json",
+      "arm": "H11",
+      "elapsedMs": 4367,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "native-timeout-probe-result.json",
+      "arm": "H01",
+      "elapsedMs": 3635,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "native-timeout-corrected-v2-result.json",
+      "arm": "H01",
+      "elapsedMs": 4146,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "native-diagnostic-corrected-result.json",
+      "arm": "H01",
+      "elapsedMs": 2899,
+      "realProviderRequests": 0
+    }
+  ],
+  "installedNativeElapsedMs": 53576,
+  "transferPreparation": {
+    "checkoutCreationAt": "2026-09-13T16:54:48.477Z",
+    "frozenAt": "2026-09-13T17:11:40.902Z",
+    "elapsedFromFirstCheckoutMs": 1012424.5463867188,
+    "note": "Lower bound from retained checkout creation to freeze; excludes prior project selection, includes overlapping other assessment work. Npm install wall times reported 17 and 14 seconds; included in this interval, not added."
+  },
+  "limitations": [
+    "Summed process times include copy/setup/stop per check and can overlap; they are not elapsed campaign wall time or CPU seconds.",
+    "Negative controls and preparation failures are included, not discarded.",
+    "Docker denial attempts and preparation-only file errors have no project process elapsed measurement; their time belongs to orchestration wall time.",
+    "Some earlier native/scripted fixture invocations lack retained per-process elapsed summaries; no zero cost is imputed.",
+    "The Codex goal counter measures orchestration separately from author provider usage; actual dollar charges and CPU/electricity cost are unavailable."
+  ],
+  "realProviderRequestsForTheseChecks": 0
+}

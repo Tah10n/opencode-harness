@@ -4,8 +4,11 @@ A and B are independently enabled additions to the one-author `direct` task
 workflow. A adds compiler-derived context to ordinary source reads. B selects
 and executes an existing project check through native Bash while the author can
 still fix the code. Neither creates a reviewer, selector, repair phase or extra
-deadline. Quality improvement is **unproven** pending the
-[factorial development comparison](../../development/native-task-ab/PLAN.md).
+deadline. Quality improvement remains **unproven**: the primary matrix did not
+improve full delivery over direct without A/B, and transfer stopped at an unknown
+provider submission. Keep both flags off on the recommended path. The
+[measured results](../../development/native-task-ab/results/FINAL.md) separate
+implementation, actual use, complete patches, handoff and cost.
 
 ## Install and run
 

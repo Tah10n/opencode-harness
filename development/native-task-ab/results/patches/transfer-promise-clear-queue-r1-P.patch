@@ -1,0 +1,386 @@
+diff --git a/clear-queue.test.js b/clear-queue.test.js
+new file mode 100644
+index 0000000..0d92867
+--- /dev/null
++++ b/clear-queue.test.js
+@@ -0,0 +1,253 @@
++import {test} from 'node:test';
++import {strict as assert} from 'node:assert';
++import pDebounce from './index.js';
++
++for (const reason of [null, false, 0, {code: 'cleared'}]) {
++	test(`.promise() clearQueue preserves custom reason ${String(reason)}`, async () => {
++		let release;
++		const gate = new Promise(resolve => {
++			release = resolve;
++		});
++		const calls = [];
++		const debounced = pDebounce.promise(async value => {
++			calls.push(value);
++			if (value === 'active') {
++				await gate;
++			}
++
++			return value;
++		}, {after: true});
++
++		const active = debounced('active');
++		const discarded = [debounced('discarded-1'), debounced('discarded-2')];
++
++		assert.equal(debounced.clearQueue(reason), 2);
++		assert.equal(debounced.clearQueue(reason), 0);
++		release();
++
++		assert.equal(await active, 'active');
++		const results = await Promise.allSettled(discarded);
++		assert.equal(results[0].status, 'rejected');
++		assert.equal(results[0].reason, reason);
++		assert.equal(results[1].status, 'rejected');
++		assert.equal(results[1].reason, reason);
++		assert.deepEqual(calls, ['active']);
++	});
++}
++
++test('.promise() clearQueue uses AbortError for omitted and undefined reasons', async () => {
++	let release;
++	const gate = new Promise(resolve => {
++		release = resolve;
++	});
++	const calls = [];
++	const debounced = pDebounce.promise(async value => {
++		calls.push(value);
++		if (value === 'active') {
++			await gate;
++		}
++
++		return value;
++	}, {after: true});
++
++	const active = debounced('active');
++	const discarded1 = debounced('discarded-1');
++	assert.equal(debounced.clearQueue(), 1);
++	const discarded2 = debounced('discarded-2');
++	assert.equal(debounced.clearQueue(undefined), 1);
++	assert.equal(debounced.clearQueue(), 0);
++	release();
++
++	assert.equal(await active, 'active');
++	const results = await Promise.allSettled([discarded1, discarded2]);
++	assert.equal(results[0].status, 'rejected');
++	assert.equal(results[0].reason.name, 'AbortError');
++	assert.equal(results[1].status, 'rejected');
++	assert.equal(results[1].reason.name, 'AbortError');
++
++	assert.deepEqual(calls, ['active']);
++	assert.equal(await debounced('idle'), 'idle');
++});
++
++test('.promise() clearQueue allows a replacement queue with latest context and arguments', async () => {
++	let release;
++	const gate = new Promise(resolve => {
++		release = resolve;
++	});
++	const calls = [];
++	const firstContext = {name: 'first'};
++	const secondContext = {name: 'second'};
++	const thirdContext = {name: 'third'};
++	const debounced = pDebounce.promise(async function (value) {
++		calls.push({context: this, value});
++		if (value === 'active') {
++			await gate;
++		}
++
++		return `${this.name}-${value}`;
++	}, {after: true});
++
++	const active = debounced.call(firstContext, 'active');
++	const discarded = [
++		debounced.call(secondContext, 'discarded-1'),
++		debounced.call(secondContext, 'discarded-2'),
++	];
++	const reason = {code: 'replaced'};
++	assert.equal(debounced.clearQueue(reason), 2);
++
++	const replacement1 = debounced.call(secondContext, 'replacement-1');
++	const replacement2 = debounced.call(thirdContext, 'replacement-2');
++	release();
++
++	assert.equal(await active, 'first-active');
++	const discardedResults = await Promise.allSettled(discarded);
++	assert.equal(discardedResults[0].reason, reason);
++	assert.equal(discardedResults[1].reason, reason);
++	assert.deepEqual(await Promise.all([replacement1, replacement2]), [
++		'third-replacement-2',
++		'third-replacement-2',
++	]);
++	assert.deepEqual(calls, [
++		{context: firstContext, value: 'active'},
++		{context: thirdContext, value: 'replacement-2'},
++	]);
++	assert.equal(await debounced.call(secondContext, 'idle'), 'second-idle');
++});
++
++test('.promise() clearQueue preserves an active rejection', async () => {
++	let release;
++	const gate = new Promise(resolve => {
++		release = resolve;
++	});
++	const error = new Error('active failure');
++	let callCount = 0;
++	const debounced = pDebounce.promise(async value => {
++		callCount++;
++		if (value === 'active') {
++			await gate;
++			throw error;
++		}
++
++		return value;
++	}, {after: true});
++
++	const active = debounced('active');
++	const discarded = debounced('discarded');
++	const reason = {code: 'cancelled'};
++	assert.equal(debounced.clearQueue(reason), 1);
++	release();
++
++	const [activeResult, discardedResult] = await Promise.allSettled([active, discarded]);
++	assert.equal(activeResult.status, 'rejected');
++	assert.equal(activeResult.reason, error);
++	assert.equal(discardedResult.status, 'rejected');
++	assert.equal(discardedResult.reason, reason);
++	assert.equal(callCount, 1);
++});
++
++test('.promise() clearQueue does not discard a queued call after it starts', async () => {
++	let releaseFirst;
++	let releaseSecond;
++	let secondStarted;
++	const firstGate = new Promise(resolve => {
++		releaseFirst = resolve;
++	});
++	const secondGate = new Promise(resolve => {
++		releaseSecond = resolve;
++	});
++	const started = new Promise(resolve => {
++		secondStarted = resolve;
++	});
++	const calls = [];
++	const debounced = pDebounce.promise(async value => {
++		calls.push(value);
++		if (value === 'first') {
++			await firstGate;
++		}
++
++		if (value === 'second') {
++			secondStarted();
++			await secondGate;
++		}
++
++		return value;
++	}, {after: true});
++
++	const first = debounced('first');
++	const second = debounced('second');
++	releaseFirst();
++	await started;
++
++	assert.equal(debounced.clearQueue(), 0);
++	const discarded = debounced('discarded');
++	const reason = new Error('later queue cleared');
++	assert.equal(debounced.clearQueue(reason), 1);
++	releaseSecond();
++
++	const results = await Promise.allSettled([first, second, discarded]);
++	assert.deepEqual(results.slice(0, 2), [
++		{status: 'fulfilled', value: 'first'},
++		{status: 'fulfilled', value: 'second'},
++	]);
++	assert.equal(results[2].status, 'rejected');
++	assert.equal(results[2].reason, reason);
++	assert.deepEqual(calls, ['first', 'second']);
++});
++
++test('.promise() clearQueue is a no-op in default mode', async () => {
++	let release;
++	const gate = new Promise(resolve => {
++		release = resolve;
++	});
++	let callCount = 0;
++	const debounced = pDebounce.promise(async value => {
++		callCount++;
++		await gate;
++		return value;
++	});
++
++	const first = debounced('first');
++	const shared = debounced('second');
++	assert.equal(debounced.clearQueue({code: 'ignored'}), 0);
++	release();
++
++	assert.deepEqual(await Promise.all([first, shared]), ['first', 'first']);
++	assert.equal(callCount, 1);
++});
++
++test('.promise() clearQueue only affects its own wrapper', async () => {
++	const createDebounced = () => {
++		let release;
++		const gate = new Promise(resolve => {
++			release = resolve;
++		});
++		const debounced = pDebounce.promise(async value => {
++			await gate;
++			return value;
++		}, {after: true});
++
++		return {debounced, release};
++	};
++
++	const first = createDebounced();
++	const second = createDebounced();
++	const firstActive = first.debounced('first');
++	const firstQueued = first.debounced('discarded');
++	const secondActive = second.debounced('second');
++	const secondQueued = second.debounced('kept');
++	const reason = {code: 'first-only'};
++
++	assert.equal(first.debounced.clearQueue(reason), 1);
++	first.release();
++	second.release();
++
++	const results = await Promise.allSettled([firstActive, firstQueued, secondActive, secondQueued]);
++	assert.equal(results[0].status, 'fulfilled');
++	assert.equal(results[0].value, 'first');
++	assert.equal(results[1].status, 'rejected');
++	assert.equal(results[1].reason, reason);
++	assert.deepEqual(results.slice(2), [
++		{status: 'fulfilled', value: 'second'},
++		{status: 'fulfilled', value: 'kept'},
++	]);
++});
+diff --git a/index.d.ts b/index.d.ts
+index 9363291..2cd5e5b 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -45,6 +45,17 @@ export type PromiseOptions = {
+ 	readonly after?: boolean;
+ };
+ 
++export type PromiseDebounced<This, ArgumentsType extends unknown[], ReturnType> = {
++	(this: This, ...arguments: ArgumentsType): Promise<ReturnType>;
++	/**
++		Discard the invocation queued while the current call is executing.
++
++		@param reason - The rejection reason for discarded calls. If omitted or `undefined`, an error with name `AbortError` is used.
++		@returns The number of waiting calls discarded.
++	*/
++	clearQueue(reason?: unknown): number;
++};
++
+ declare const pDebounce: {
+ 	/**
+ 	[Debounce](https://css-tricks.com/debouncing-throttling-explained-examples/) promise-returning & async functions.
+@@ -107,7 +118,7 @@ declare const pDebounce: {
+ 	promise<This, ArgumentsType extends unknown[], ReturnType>(
+ 		function_: (this: This, ...arguments: ArgumentsType) => PromiseLike<ReturnType> | ReturnType,
+ 		options?: PromiseOptions
+-	): (this: This, ...arguments: ArgumentsType) => Promise<ReturnType>;
++	): PromiseDebounced<This, ArgumentsType, ReturnType>;
+ };
+ 
+ export default pDebounce;
+diff --git a/index.js b/index.js
+index a54db7d..b22371a 100644
+--- a/index.js
++++ b/index.js
+@@ -91,7 +91,27 @@ pDebounce.promise = (function_, options = {}) => {
+ 	let currentPromise;
+ 	let queuedCall;
+ 
+-	return async function (...arguments_) {
++	const clearQueue = reason => {
++		if (!queuedCall) {
++			return 0;
++		}
++
++		const {resolvers} = queuedCall;
++		queuedCall = undefined;
++
++		const rejectionReason = reason === undefined ? new Error('The queue was cleared') : reason;
++		if (reason === undefined) {
++			rejectionReason.name = 'AbortError';
++		}
++
++		for (const {reject} of resolvers) {
++			reject(rejectionReason);
++		}
++
++		return resolvers.length;
++	};
++
++	const debounced = async function (...arguments_) {
+ 		if (currentPromise) {
+ 			if (!options.after) {
+ 				return currentPromise;
+@@ -150,6 +170,10 @@ pDebounce.promise = (function_, options = {}) => {
+ 			currentPromise = undefined;
+ 		}
+ 	};
++
++	debounced.clearQueue = clearQueue;
++
++	return debounced;
+ };
+ 
+ export default pDebounce;
+diff --git a/index.test-d.ts b/index.test-d.ts
+index 2a285bc..253e3eb 100644
+--- a/index.test-d.ts
++++ b/index.test-d.ts
+@@ -1,4 +1,4 @@
+-import {expectType} from 'tsd';
++import {expectAssignable, expectType} from 'tsd';
+ import pDebounce from './index.js';
+ 
+ const expensiveCall = async (input: number) => input;
+@@ -14,4 +14,11 @@ expectType<(input: number) => Promise<number>>(pDebounce(expensiveCall, 200, {si
+ expectType<(input: number) => Promise<number>>(pDebounce(expensiveCall, 200, {before: true}));
+ 
+ // Test promise method
+-expectType<(input: number) => Promise<number>>(pDebounce.promise(expensiveCall));
++const debouncedPromise = pDebounce.promise(expensiveCall);
++expectAssignable<(input: number) => Promise<number>>(debouncedPromise);
++expectType<number>(debouncedPromise.clearQueue());
++expectType<number>(debouncedPromise.clearQueue(undefined));
++expectType<number>(debouncedPromise.clearQueue(null));
++expectType<number>(debouncedPromise.clearQueue(false));
++expectType<number>(debouncedPromise.clearQueue(0));
++expectType<(reason?: unknown) => number>(debouncedPromise.clearQueue);
+diff --git a/readme.md b/readme.md
+index 3153bd7..267b74a 100644
+--- a/readme.md
++++ b/readme.md
+@@ -127,6 +127,24 @@ debouncedSave('data2'); // This will run after the first save completes
+ //=> Saved: data2
+ ```
+ 
++#### clearQueue(reason?)
++
++Type: `Function`
++
++Only available on the function returned by `pDebounce.promise()`. With `after: true`, discards the invocation queued while the current invocation is running and rejects all promises waiting for it. The function returns the number of waiting calls discarded, not the number of function executions. A queued invocation that has started running is not affected.
++
++If `reason` is omitted or `undefined`, the discarded promises reject with an error whose name is `AbortError`. Other values, including `null`, `false`, and `0`, are used as the exact rejection reason.
++
++```js
++const pendingSave = debouncedSave('latest');
++
++if (shouldCancel) {
++	console.log(debouncedSave.clearQueue()); //=> 1
++}
++```
++
++With the default `after: false`, calls share the active promise rather than queueing another invocation, so `clearQueue()` returns `0` and does not cancel the active call.
++
+ ## Recipes
+ 
+ ### Autosave

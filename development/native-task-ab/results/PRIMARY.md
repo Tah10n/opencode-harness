@@ -5,7 +5,7 @@ under the rubric fixed before execution. H11 beats P on three tasks and loses on
 none, but **does not improve full delivery over H00**. The data supports a small
 conditional transfer check of H11; it does not establish an incremental quality
 benefit from A, B, or their combination. Both components remain experimental and
-default off. Transfer results will be reported separately.
+default off. The [final transfer result](FINAL.md) is incomplete after an unknown provider submission.
 
 | Task | P | H00 | H10 | H01 | H11 |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -161,8 +161,7 @@ pre-primary model-free project checks: 71 processes, 893.222 seconds summed proc
 time (overlap means this is not wall time), including expected negative controls
 and preparation failures. Final grading: 60 isolated project processes,
 1,266.274 seconds summed time. Supplementary checks and installed diagnostic
-probes are additional model-free work, retained locally; final stage accounting
-will include them and transfer preparation. The Codex goal counter belongs to
+probes and transfer preparation are included in [final stage accounting](stage-costs.json). The Codex goal counter belongs to
 this development/orchestration work and is separate from executing Luna usage.
 
 ## Post-freeze runtime correction
