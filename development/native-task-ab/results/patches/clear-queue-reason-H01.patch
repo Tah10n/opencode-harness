@@ -1,0 +1,257 @@
+diff --git a/index.d.ts b/index.d.ts
+index 1a20857..2c834c9 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -21,10 +21,15 @@ export type LimitFunction = {
+ 
+ 	Note: This does not cancel promises that are already running.
+ 
+-	When `rejectOnClear` is enabled, pending promises are rejected with an `AbortError`.
++	When `rejectOnClear` is enabled, pending promises are rejected with an `AbortError` by default. You can pass a custom rejection reason to `clearQueue(reason)`.
++
++	Calling `clearQueue()` with no argument or with `undefined` retains the default `AbortError`.
++
++	This only affects promises that have not started running. Active tasks are not cancelled, rejected, or otherwise altered.
++
+ 	This is recommended if you await the returned promises, for example with `Promise.all`, so pending tasks do not remain unresolved after `clearQueue()`.
+ 	*/
+-	clearQueue: () => void;
++	clearQueue: (reason?: unknown) => void;
+ 
+ 	/**
+ 	Process an iterable of inputs with limited concurrency.
+diff --git a/index.js b/index.js
+index b74d48a..097c850 100644
+--- a/index.js
++++ b/index.js
+@@ -75,16 +75,16 @@ export default function pLimit(concurrency) {
+ 			get: () => queue.size,
+ 		},
+ 		clearQueue: {
+-			value() {
++			value(reason) {
+ 				if (!rejectOnClear) {
+ 					queue.clear();
+ 					return;
+ 				}
+ 
+-				const abortError = AbortSignal.abort().reason;
++				const rejectionReason = reason === undefined ? AbortSignal.abort().reason : reason;
+ 
+ 				while (queue.size > 0) {
+-					queue.dequeue().reject(abortError);
++					queue.dequeue().reject(rejectionReason);
+ 				}
+ 			},
+ 		},
+diff --git a/index.test-d.ts b/index.test-d.ts
+index 457778a..1b38b2a 100644
+--- a/index.test-d.ts
++++ b/index.test-d.ts
+@@ -20,11 +20,20 @@ expectType<number>(limit.pendingCount);
+ 
+ expectType<void>(limit.clearQueue());
+ expectType<void>(limitWithRejectOnClear.clearQueue());
++expectType<void>(limit.clearQueue(undefined));
++expectType<void>(limit.clearQueue(null));
++expectType<void>(limit.clearQueue(false));
++expectType<void>(limit.clearQueue(0));
++expectType<void>(limit.clearQueue('reason'));
++expectType<void>(limit.clearQueue({reason: 'custom'}));
++expectType<(reason?: unknown) => void>(limit.clearQueue);
+ 
+ // LimitFunction should require a Promise-returning function
+ const lf = limitFunction(async (_a: string) => 'ok', {concurrency: 1});
+ expectType<Promise<string>>(lf('input'));
+ expectType<void>(lf.clearQueue());
++expectType<void>(lf.clearQueue('reason'));
++expectType<(reason?: unknown) => void>(lf.clearQueue);
+ 
+ expectError(limitFunction((_a: string) => 'x', {concurrency: 1}));
+ expectError(pLimit({concurrency: 1, rejectOnClear: 'nope'}));
+diff --git a/readme.md b/readme.md
+index 6434792..3fe5913 100644
+--- a/readme.md
++++ b/readme.md
+@@ -93,7 +93,7 @@ The number of promises that are currently running.
+ 
+ The number of promises that are waiting to run (i.e. their internal `fn` was not called yet).
+ 
+-### limit.clearQueue()
++### limit.clearQueue(reason?)
+ 
+ Discard pending promises that are waiting to run.
+ 
+@@ -101,9 +101,18 @@ This might be useful if you want to tear down the queue at the end of your progr
+ 
+ Note: This does not cancel promises that are already running.
+ 
+-When `rejectOnClear` is enabled, pending promises are rejected with an `AbortError`.
++When `rejectOnClear` is enabled, pending promises are rejected with an `AbortError` by default. Pass a custom `reason` to reject them with that exact value instead.
++
++Calling `clearQueue()` with no argument or with `undefined` retains the default `AbortError`. This only affects pending tasks; active tasks are not cancelled, rejected, or otherwise altered.
++
+ This is recommended if you await the returned promises, for example with `Promise.all`, so pending tasks do not remain unresolved after `clearQueue()`.
+ 
++#### reason
++
++Type: `unknown`
++
++The rejection reason for pending promises when `rejectOnClear` is enabled. Any value other than `undefined` is used as-is.
++
+ ### limit.concurrency
+ 
+ Get or set the concurrency limit.
+@@ -154,13 +163,13 @@ Default: `false`
+ Reject pending promises with an `AbortError` when `clearQueue()` is called.
+ This is recommended if you await the returned promises, for example with `Promise.all`, so pending tasks do not remain unresolved after `clearQueue()`.
+ 
+-### limitedFunction.clearQueue()
++### limitedFunction.clearQueue(reason?)
+ 
+ Discard pending calls that have not started yet.
+ 
+-When `rejectOnClear` is enabled, pending promises are rejected with an `AbortError`. Otherwise, their promises remain unresolved.
++When `rejectOnClear` is enabled, pending promises are rejected with an `AbortError` by default, or with the exact `reason` passed to `clearQueue(reason)`. Calling it with no argument or with `undefined` retains the default `AbortError`. Otherwise, their promises remain unresolved.
+ 
+-This does not cancel calls that are already running.
++This does not cancel, reject, or otherwise alter calls that are already running.
+ 
+ ## Recipes
+ 
+diff --git a/test.js b/test.js
+index 356c4d8..dd20dd5 100644
+--- a/test.js
++++ b/test.js
+@@ -206,7 +206,7 @@ testClearQueueRejects('clearQueue rejects pending promises when enabled', async
+ 	await Promise.resolve();
+ 	t.is(limit.pendingCount, 2);
+ 
+-	limit.clearQueue();
++	limit.clearQueue(undefined);
+ 	t.is(limit.pendingCount, 0);
+ 
+ 	await runningPromise;
+@@ -214,6 +214,75 @@ testClearQueueRejects('clearQueue rejects pending promises when enabled', async
+ 	await t.throwsAsync(pendingPromiseTwo, {name: 'AbortError'});
+ });
+ 
++test('clearQueue rejects pending promises with the exact custom reason', async t => {
++	const reasons = [null, false, 0, 'custom reason', {code: 'custom'}];
++
++	await Promise.all(reasons.map(async reason => {
++		const limit = pLimit({concurrency: 1, rejectOnClear: true});
++		let resolveRunning;
++		let queuedCalls = 0;
++		const runningPromise = limit(() => new Promise(resolve => {
++			resolveRunning = resolve;
++		}));
++		const pendingPromises = [
++			limit(() => {
++				queuedCalls++;
++			}),
++			limit(() => {
++				queuedCalls++;
++			}),
++		];
++
++		await Promise.resolve();
++		t.is(limit.activeCount, 1);
++		t.is(limit.pendingCount, 2);
++		limit.clearQueue(reason);
++		t.is(limit.activeCount, 1);
++		t.is(limit.pendingCount, 0);
++
++		const rejectionResults = await Promise.all(pendingPromises.map(async promise => {
++			try {
++				return await promise;
++			} catch (error) {
++				return error;
++			}
++		}));
++		t.is(rejectionResults[0], reason);
++		t.is(rejectionResults[1], reason);
++		t.is(queuedCalls, 0);
++
++		resolveRunning();
++		t.is(await runningPromise, undefined);
++		t.is(limit.activeCount, 0);
++		t.is(await limit(() => 'reused'), 'reused');
++	}));
++});
++
++test('clearQueue retains discarded pending promises when disabled', async t => {
++	const limit = pLimit({concurrency: 1, rejectOnClear: false});
++	let resolveRunning;
++	let queuedCalls = 0;
++	const runningPromise = limit(() => new Promise(resolve => {
++		resolveRunning = resolve;
++	}));
++	const pendingPromise = limit(() => {
++		queuedCalls++;
++	});
++
++	await Promise.resolve();
++	t.is(limit.activeCount, 1);
++	t.is(limit.pendingCount, 1);
++	limit.clearQueue('ignored');
++	t.is(limit.pendingCount, 0);
++	t.is(queuedCalls, 0);
++	t.is(await Promise.race([pendingPromise, delay(0, 'still pending')]), 'still pending');
++
++	resolveRunning();
++	await runningPromise;
++	t.is(limit.activeCount, 0);
++	t.is(await limit(() => 'reused'), 'reused');
++});
++
+ testClearQueueRejects('limitFunction exposes clearQueue', async t => {
+ 	const limitedFunction = limitFunction(() => delay(20), {concurrency: 1, rejectOnClear: true});
+ 
+@@ -226,6 +295,46 @@ testClearQueueRejects('limitFunction exposes clearQueue', async t => {
+ 	await t.throwsAsync(pendingPromise, {name: 'AbortError'});
+ });
+ 
++test('limitFunction clearQueue rejects pending promises with the exact custom reason', async t => {
++	const reasons = [null, false, 0, 'custom reason', {code: 'custom'}];
++
++	await Promise.all(reasons.map(async reason => {
++		let resolveRunning;
++		let callCount = 0;
++		const limitedFunction = limitFunction(async () => {
++			callCount++;
++			if (callCount === 1) {
++				await new Promise(resolve => {
++					resolveRunning = resolve;
++				});
++			}
++
++			return callCount;
++		}, {concurrency: 1, rejectOnClear: true});
++
++		const runningPromise = limitedFunction();
++		const pendingPromises = [limitedFunction(), limitedFunction()];
++		await Promise.resolve();
++		t.is(callCount, 1);
++		limitedFunction.clearQueue(reason);
++
++		const rejectionResults = await Promise.all(pendingPromises.map(async promise => {
++			try {
++				return await promise;
++			} catch (error) {
++				return error;
++			}
++		}));
++		t.is(rejectionResults[0], reason);
++		t.is(rejectionResults[1], reason);
++		t.is(callCount, 1);
++
++		resolveRunning();
++		t.is(await runningPromise, 1);
++		t.is(await limitedFunction(), 2);
++	}));
++});
++
+ test('map', async t => {
+ 	const limit = pLimit(1);
+ 	const results = await limit.map([1, 2, 3, 4, 5, 6, 7], input => input + 1);

@@ -1,0 +1,22 @@
+{
+  "focused": "scripts/verify-native-project-feedback.mjs passed after correction",
+  "installedDiagnostic": {
+    "results": [
+      {
+        "exit": 1,
+        "status": "failed-or-unclassified",
+        "diagnostics": "\n> test\n> node -e \"console.log('PASS timeout validation'); console.error('AssertionError: expected 2, received 1'); process.exitCode = 1\"\n\nPASS timeout validation\nAssertionError: expected 2, received 1\n"
+      },
+      {
+        "exit": 0,
+        "status": "passed",
+        "diagnostics": "\n> test\n> node -e \"console.log('PASS reports MODULE_NOT_FOUND to callers')\"\n\nPASS reports MODULE_NOT_FOUND to callers\n"
+      }
+    ],
+    "nextNativeRead": true,
+    "realProviderRequests": 0
+  },
+  "nativeTimeout": "Corrected installed 1.18.26 Bash timeout=1000, metadata.exit=null, status=timeout-or-interruption; next native read succeeded",
+  "realProviderRequests": 0,
+  "measuredPrimaryVersionUnchanged": true
+}

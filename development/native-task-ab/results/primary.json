@@ -1,0 +1,1929 @@
+{
+  "model": "openai/gpt-5.6-luna",
+  "effort": "high",
+  "deadlineMs": 900000,
+  "measuredCandidate": "1cebebb0",
+  "primaryFreezeSha256": "6af463711b4e8b5318417bc4944d95e44258c6afa590e6ed079c632931136dc9",
+  "rows": [
+    {
+      "id": "862feb9f16f1",
+      "task": "limit-function-controls",
+      "S": 1,
+      "rationale": "No material defect found in full diff. Readonly getters and concurrency setter forward to each existing private pLimit instance, preserving validation (including Infinity), scheduling, call arguments/results/rejections and unchanged clearQueue. Delivered regressions establish blocked active/queued work before the concurrency transition and admission without releasing the blocker, invalid setter, and independently active wrappers. Public type tests read all controls, assign concurrency and reject count writes; API documentation supplied. Existing regression scenarios preserved.",
+      "ordinaryProjectExit": 0,
+      "independentExit": 0,
+      "supplementaryEvidence": null,
+      "coverageGap": null,
+      "usableImplementationPatch": true,
+      "evaluationLimit": "Automated evaluator and project pass are necessary evidence, not sufficient full-delivery evidence.",
+      "reviewBlinding": "Full diffs reviewed without arm labels; final two clear-count slots inferable from timing. Mapping opened after written review notes; not strict fully blind grading.",
+      "slot": 1,
+      "arm": "P",
+      "project": "p-limit",
+      "patch": "patches/limit-function-controls-P.patch",
+      "nativeCompleted": true,
+      "slotWallMs": 214945,
+      "nativePhaseCount": 1,
+      "nativeSessionCount": 1,
+      "nativeToolCalls": 26,
+      "elapsedMs": 209797,
+      "timeout": false,
+      "workflowStatus": null,
+      "providerRequests": 20,
+      "requestsWithUsage": 20,
+      "requestsWithoutUsage": 0,
+      "knownUsage": {
+        "input_tokens": 352964,
+        "output_tokens": 7821,
+        "total_tokens": 360785,
+        "cached_tokens": 68096,
+        "reasoning_tokens": 4449
+      },
+      "usageIsComplete": true,
+      "components": {
+        "A": {
+          "deliveredEvents": 0,
+          "totalElapsedMs": 0
+        },
+        "B": {
+          "events": 0,
+          "executed": 0,
+          "totalElapsedMs": 0
+        }
+      },
+      "componentUsageIsNotQualityEvidence": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "claims": {
+        "finalPresent": true,
+        "authorFinal": "Implemented live controls for `limitFunction`:\n\n- Added forwarded `activeCount`, `pendingCount`, and writable `concurrency`.\n- Preserved `clearQueue` and `rejectOnClear`.\n- Extended TypeScript declarations and readonly assignment tests.\n- Added runtime regressions for queue admission, validation, and wrapper independence.\n- Documented the new API properties.\n\nValidation: `npm test` passed all 26 tests, `tsd`, and XO. One pre-existing TODO warning remains in `scripts/benchmarker.js`. No dependencies or commits changed.",
+        "commandClaims": "Final stated successful project commands are present in native traces with exit 0; no invented successful project command found. Two deadline runs have no final claim.",
+        "falseFullDeliveryClaim": false,
+        "limitation": null
+      }
+    },
+    {
+      "id": "27f89faef649",
+      "task": "limit-function-controls",
+      "S": 1,
+      "rationale": "No material defect found in full diff. Readonly getters and concurrency setter forward to each existing private pLimit instance, preserving validation (including Infinity), scheduling, call arguments/results/rejections and unchanged clearQueue. Delivered regressions establish blocked active/queued work before the concurrency transition and admission without releasing the blocker, invalid setter, and independently active wrappers. Public type tests read all controls, assign concurrency and reject count writes; API documentation supplied. Existing regression scenarios preserved.",
+      "ordinaryProjectExit": 0,
+      "independentExit": 0,
+      "supplementaryEvidence": null,
+      "coverageGap": null,
+      "usableImplementationPatch": true,
+      "evaluationLimit": "Automated evaluator and project pass are necessary evidence, not sufficient full-delivery evidence.",
+      "reviewBlinding": "Full diffs reviewed without arm labels; final two clear-count slots inferable from timing. Mapping opened after written review notes; not strict fully blind grading.",
+      "slot": 2,
+      "arm": "H00",
+      "project": "p-limit",
+      "patch": "patches/limit-function-controls-H00.patch",
+      "nativeCompleted": true,
+      "slotWallMs": 488504,
+      "nativePhaseCount": 1,
+      "nativeSessionCount": 2,
+      "nativeToolCalls": 62,
+      "elapsedMs": 483226,
+      "timeout": false,
+      "workflowStatus": "incomplete",
+      "providerRequests": 37,
+      "requestsWithUsage": 37,
+      "requestsWithoutUsage": 0,
+      "knownUsage": {
+        "input_tokens": 1045752,
+        "output_tokens": 13773,
+        "total_tokens": 1059525,
+        "cached_tokens": 411648,
+        "reasoning_tokens": 7945
+      },
+      "usageIsComplete": true,
+      "components": {
+        "A": {
+          "deliveredEvents": 0,
+          "totalElapsedMs": 0
+        },
+        "B": {
+          "events": 0,
+          "executed": 0,
+          "totalElapsedMs": 0
+        }
+      },
+      "componentUsageIsNotQualityEvidence": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "claims": {
+        "finalPresent": true,
+        "authorFinal": "Implemented live `limitFunction` controls:\n\n- Forwarding getters for `activeCount` and `pendingCount`\n- Read/write `concurrency` forwarding with existing validation and scheduling\n- Extended TypeScript declarations and type tests\n- Added runtime regressions for scheduling, validation, rejection, arguments, and wrapper independence\n- Documented the new API properties\n\nChecks passed:\n\n- Focused AVA regressions: 4 passed\n- `tsd`\n- Full `npm test`: 27 tests passed\n- Syntax and whitespace checks\n\nExisting XO warning remains for the unrelated benchmark TODO.",
+        "commandClaims": "Final stated successful project commands are present in native traces with exit 0; no invented successful project command found. Two deadline runs have no final claim.",
+        "falseFullDeliveryClaim": false,
+        "limitation": null
+      }
+    },
+    {
+      "id": "94c81be0e2fc",
+      "task": "limit-function-controls",
+      "S": 1,
+      "rationale": "No material defect found in full diff. Readonly getters and concurrency setter forward to each existing private pLimit instance, preserving validation (including Infinity), scheduling, call arguments/results/rejections and unchanged clearQueue. Delivered regressions establish blocked active/queued work before the concurrency transition and admission without releasing the blocker, invalid setter, and independently active wrappers. Public type tests read all controls, assign concurrency and reject count writes; API documentation supplied. Existing regression scenarios preserved.",
+      "ordinaryProjectExit": 0,
+      "independentExit": 0,
+      "supplementaryEvidence": null,
+      "coverageGap": null,
+      "usableImplementationPatch": true,
+      "evaluationLimit": "Automated evaluator and project pass are necessary evidence, not sufficient full-delivery evidence.",
+      "reviewBlinding": "Full diffs reviewed without arm labels; final two clear-count slots inferable from timing. Mapping opened after written review notes; not strict fully blind grading.",
+      "slot": 3,
+      "arm": "H10",
+      "project": "p-limit",
+      "patch": "patches/limit-function-controls-H10.patch",
+      "nativeCompleted": true,
+      "slotWallMs": 241870,
+      "nativePhaseCount": 1,
+      "nativeSessionCount": 2,
+      "nativeToolCalls": 37,
+      "elapsedMs": 235747,
+      "timeout": false,
+      "workflowStatus": "incomplete",
+      "providerRequests": 22,
+      "requestsWithUsage": 22,
+      "requestsWithoutUsage": 0,
+      "knownUsage": {
+        "input_tokens": 560699,
+        "output_tokens": 8788,
+        "total_tokens": 569487,
+        "cached_tokens": 157696,
+        "reasoning_tokens": 4706
+      },
+      "usageIsComplete": true,
+      "components": {
+        "A": {
+          "deliveredEvents": 9,
+          "totalElapsedMs": 665.5045839999693
+        },
+        "B": {
+          "events": 0,
+          "executed": 0,
+          "totalElapsedMs": 0
+        }
+      },
+      "componentUsageIsNotQualityEvidence": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "claims": {
+        "finalPresent": true,
+        "authorFinal": "Implemented live limiter controls for `limitFunction`:\n\n- Forwarded readonly `activeCount` and `pendingCount` getters.\n- Forwarded readable/writable `concurrency`.\n- Preserved `clearQueue` and rejection behavior.\n- Extended TypeScript declarations and type tests.\n- Added runtime regressions for queue admission, validation, and wrapper independence.\n- Documented the new properties in `readme.md`.\n\nChecks passed:\n\n- Focused AVA regressions: 3 tests.\n- `npm exec tsd`\n- `npm test`: 26 tests passed.\n\n`npm test` reports one pre-existing XO warning in `scripts/benchmarker.js`.",
+        "commandClaims": "Final stated successful project commands are present in native traces with exit 0; no invented successful project command found. Two deadline runs have no final claim.",
+        "falseFullDeliveryClaim": false,
+        "limitation": null
+      }
+    },
+    {
+      "id": "a3727937ddef",
+      "task": "limit-function-controls",
+      "S": 1,
+      "rationale": "No material defect found in full diff. Readonly getters and concurrency setter forward to each existing private pLimit instance, preserving validation (including Infinity), scheduling, call arguments/results/rejections and unchanged clearQueue. Delivered regressions establish blocked active/queued work before the concurrency transition and admission without releasing the blocker, invalid setter, and independently active wrappers. Public type tests read all controls, assign concurrency and reject count writes; API documentation supplied. Existing regression scenarios preserved.",
+      "ordinaryProjectExit": 0,
+      "independentExit": 0,
+      "supplementaryEvidence": null,
+      "coverageGap": null,
+      "usableImplementationPatch": true,
+      "evaluationLimit": "Automated evaluator and project pass are necessary evidence, not sufficient full-delivery evidence.",
+      "reviewBlinding": "Full diffs reviewed without arm labels; final two clear-count slots inferable from timing. Mapping opened after written review notes; not strict fully blind grading.",
+      "slot": 4,
+      "arm": "H01",
+      "project": "p-limit",
+      "patch": "patches/limit-function-controls-H01.patch",
+      "nativeCompleted": true,
+      "slotWallMs": 322742,
+      "nativePhaseCount": 1,
+      "nativeSessionCount": 2,
+      "nativeToolCalls": 52,
+      "elapsedMs": 316895,
+      "timeout": false,
+      "workflowStatus": "incomplete",
+      "providerRequests": 39,
+      "requestsWithUsage": 39,
+      "requestsWithoutUsage": 0,
+      "knownUsage": {
+        "input_tokens": 1154578,
+        "output_tokens": 10151,
+        "total_tokens": 1164729,
+        "cached_tokens": 497664,
+        "reasoning_tokens": 5047
+      },
+      "usageIsComplete": true,
+      "components": {
+        "A": {
+          "deliveredEvents": 0,
+          "totalElapsedMs": 0
+        },
+        "B": {
+          "events": 11,
+          "executed": 3,
+          "totalElapsedMs": 13272.217297000003
+        }
+      },
+      "componentUsageIsNotQualityEvidence": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "claims": {
+        "finalPresent": true,
+        "authorFinal": "Implemented live `limitFunction` controls:\n\n- Added forwarded `activeCount`, `pendingCount`, and writable `concurrency`.\n- Extended TypeScript declarations and readonly assignment tests.\n- Added runtime regressions for scheduling, validation, isolation, arguments, results, and rejection propagation.\n- Documented the new API properties.\n\nChecks passed:\n\n- Focused AVA regressions: 4 passed.\n- `npx tsd`\n- Full `npm run test`: 27 passed.\n- `git diff --check`\n\nOne pre-existing XO warning remains in `scripts/benchmarker.js`.",
+        "commandClaims": "Final stated successful project commands are present in native traces with exit 0; no invented successful project command found. Two deadline runs have no final claim.",
+        "falseFullDeliveryClaim": false,
+        "limitation": null
+      }
+    },
+    {
+      "id": "ecf88ae50db1",
+      "task": "limit-function-controls",
+      "S": 1,
+      "rationale": "No material defect found in full diff. Readonly getters and concurrency setter forward to each existing private pLimit instance, preserving validation (including Infinity), scheduling, call arguments/results/rejections and unchanged clearQueue. Delivered regressions establish blocked active/queued work before the concurrency transition and admission without releasing the blocker, invalid setter, and independently active wrappers. Public type tests read all controls, assign concurrency and reject count writes; API documentation supplied. Existing regression scenarios preserved.",
+      "ordinaryProjectExit": 0,
+      "independentExit": 0,
+      "supplementaryEvidence": null,
+      "coverageGap": null,
+      "usableImplementationPatch": true,
+      "evaluationLimit": "Automated evaluator and project pass are necessary evidence, not sufficient full-delivery evidence.",
+      "reviewBlinding": "Full diffs reviewed without arm labels; final two clear-count slots inferable from timing. Mapping opened after written review notes; not strict fully blind grading.",
+      "slot": 5,
+      "arm": "H11",
+      "project": "p-limit",
+      "patch": "patches/limit-function-controls-H11.patch",
+      "nativeCompleted": true,
+      "slotWallMs": 271543,
+      "nativePhaseCount": 1,
+      "nativeSessionCount": 2,
+      "nativeToolCalls": 34,
+      "elapsedMs": 265455,
+      "timeout": false,
+      "workflowStatus": "incomplete",
+      "providerRequests": 24,
+      "requestsWithUsage": 24,
+      "requestsWithoutUsage": 0,
+      "knownUsage": {
+        "input_tokens": 687013,
+        "output_tokens": 11036,
+        "total_tokens": 698049,
+        "cached_tokens": 220160,
+        "reasoning_tokens": 6960
+      },
+      "usageIsComplete": true,
+      "components": {
+        "A": {
+          "deliveredEvents": 8,
+          "totalElapsedMs": 561.0103340000023
+        },
+        "B": {
+          "events": 1,
+          "executed": 1,
+          "totalElapsedMs": 6336.812128000001
+        }
+      },
+      "componentUsageIsNotQualityEvidence": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "claims": {
+        "finalPresent": true,
+        "authorFinal": "Implemented live controls for `limitFunction` wrappers:\n\n- Forwarding readonly `activeCount` and `pendingCount` getters.\n- Forwarding readable/writable `concurrency`.\n- Public TypeScript declarations and readonly assignment checks.\n- Runtime regressions for queue admission, validation, results, and independent wrappers.\n- README API documentation.\n\nChecks passed:\n\n- Focused AVA regression.\n- `npx tsd`\n- `npm run test`: 24 tests passed.\n- `git diff --check`\n\nOne pre-existing non-fatal lint warning remains in `scripts/benchmarker.js`.",
+        "commandClaims": "Final stated successful project commands are present in native traces with exit 0; no invented successful project command found. Two deadline runs have no final claim.",
+        "falseFullDeliveryClaim": false,
+        "limitation": null
+      }
+    },
+    {
+      "id": "6f7ab71c8093",
+      "task": "bind-methods-atomic",
+      "S": 1,
+      "rationale": "No material implementation defect found. Validates names before deduplication; preflights inherited non-undefined, non-configurable own, and missing-on-nonextensible conflicts before installing any binding. Existing configurable descriptor behavior and subclass method/receiver lookup preserved. Delivered regressions cover later conflict and descriptor invariance, non-configurable undefined, inherited/nonextensible cases, duplicates, descriptors and nonempty event delivery through bound methods. Public type usage and documentation supplied; prior tests preserved.",
+      "ordinaryProjectExit": 0,
+      "independentExit": 0,
+      "supplementaryEvidence": null,
+      "coverageGap": null,
+      "usableImplementationPatch": true,
+      "evaluationLimit": "Automated evaluator and project pass are necessary evidence, not sufficient full-delivery evidence.",
+      "reviewBlinding": "Full diffs reviewed without arm labels; final two clear-count slots inferable from timing. Mapping opened after written review notes; not strict fully blind grading.",
+      "slot": 6,
+      "arm": "H00",
+      "project": "emittery",
+      "patch": "patches/bind-methods-atomic-H00.patch",
+      "nativeCompleted": true,
+      "slotWallMs": 421633,
+      "nativePhaseCount": 1,
+      "nativeSessionCount": 2,
+      "nativeToolCalls": 57,
+      "elapsedMs": 414512,
+      "timeout": false,
+      "workflowStatus": "incomplete",
+      "providerRequests": 37,
+      "requestsWithUsage": 37,
+      "requestsWithoutUsage": 0,
+      "knownUsage": {
+        "input_tokens": 1125048,
+        "output_tokens": 16370,
+        "total_tokens": 1141418,
+        "cached_tokens": 476672,
+        "reasoning_tokens": 7632
+      },
+      "usageIsComplete": true,
+      "components": {
+        "A": {
+          "deliveredEvents": 0,
+          "totalElapsedMs": 0
+        },
+        "B": {
+          "events": 0,
+          "executed": 0,
+          "totalElapsedMs": 0
+        }
+      },
+      "componentUsageIsNotQualityEvidence": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "claims": {
+        "finalPresent": true,
+        "authorFinal": "Implemented atomic `bindMethods` preflight behavior.\n\n- Deduplicates method names.\n- Rejects inherited/own conflicts and non-extensible targets before mutation.\n- Preserves descriptor flags and receiver binding.\n- Added runtime and TypeScript regressions.\n- Documented atomic behavior and duplicate handling.\n\nChecks passed:\n- `npx ava test/index.js --match='*bindMethods*'` (13)\n- `npx ava` (259)\n- `npx tsd`\n- `git diff --check`\n- `npx xo` passed with 3 existing warnings.",
+        "commandClaims": "Final stated successful project commands are present in native traces with exit 0; no invented successful project command found. Two deadline runs have no final claim.",
+        "falseFullDeliveryClaim": false,
+        "limitation": null
+      }
+    },
+    {
+      "id": "9ce3aca8147a",
+      "task": "bind-methods-atomic",
+      "S": 1,
+      "rationale": "No material implementation defect found. Validates names before deduplication; preflights inherited non-undefined, non-configurable own, and missing-on-nonextensible conflicts before installing any binding. Existing configurable descriptor behavior and subclass method/receiver lookup preserved. Delivered regressions cover later conflict and descriptor invariance, non-configurable undefined, inherited/nonextensible cases, duplicates, descriptors and nonempty event delivery through bound methods. Public type usage and documentation supplied; prior tests preserved.",
+      "ordinaryProjectExit": 0,
+      "independentExit": 0,
+      "supplementaryEvidence": null,
+      "coverageGap": null,
+      "usableImplementationPatch": true,
+      "evaluationLimit": "Automated evaluator and project pass are necessary evidence, not sufficient full-delivery evidence.",
+      "reviewBlinding": "Full diffs reviewed without arm labels; final two clear-count slots inferable from timing. Mapping opened after written review notes; not strict fully blind grading.",
+      "slot": 7,
+      "arm": "H10",
+      "project": "emittery",
+      "patch": "patches/bind-methods-atomic-H10.patch",
+      "nativeCompleted": true,
+      "slotWallMs": 514462,
+      "nativePhaseCount": 1,
+      "nativeSessionCount": 2,
+      "nativeToolCalls": 53,
+      "elapsedMs": 505877,
+      "timeout": false,
+      "workflowStatus": "incomplete",
+      "providerRequests": 31,
+      "requestsWithUsage": 31,
+      "requestsWithoutUsage": 0,
+      "knownUsage": {
+        "input_tokens": 1016247,
+        "output_tokens": 16927,
+        "total_tokens": 1033174,
+        "cached_tokens": 397824,
+        "reasoning_tokens": 8767
+      },
+      "usageIsComplete": true,
+      "components": {
+        "A": {
+          "deliveredEvents": 5,
+          "totalElapsedMs": 1099.1729589999977
+        },
+        "B": {
+          "events": 0,
+          "executed": 0,
+          "totalElapsedMs": 0
+        }
+      },
+      "componentUsageIsNotQualityEvidence": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "claims": {
+        "finalPresent": true,
+        "authorFinal": "Implemented atomic `bindMethods` preflight with duplicate-name deduplication, conflict checks, extensibility checks, and descriptor preservation.\n\nUpdated runtime tests, TypeScript declaration/type coverage, and README/API documentation.\n\nChecks passed:\n- `npm test`: 260 tests, including XO, AVA, and tsd\n- Focused new-behavior and preservation runtime checks\n- `git diff --check`\n\nOnly existing lint warnings remain.",
+        "commandClaims": "Final stated successful project commands are present in native traces with exit 0; no invented successful project command found. Two deadline runs have no final claim.",
+        "falseFullDeliveryClaim": false,
+        "limitation": null
+      }
+    },
+    {
+      "id": "2669d98dc938",
+      "task": "bind-methods-atomic",
+      "S": 1,
+      "rationale": "No material implementation defect found. Validates names before deduplication; preflights inherited non-undefined, non-configurable own, and missing-on-nonextensible conflicts before installing any binding. Existing configurable descriptor behavior and subclass method/receiver lookup preserved. Delivered regressions cover later conflict and descriptor invariance, non-configurable undefined, inherited/nonextensible cases, duplicates, descriptors and nonempty event delivery through bound methods. Public type usage and documentation supplied; prior tests preserved.",
+      "ordinaryProjectExit": 0,
+      "independentExit": 0,
+      "supplementaryEvidence": null,
+      "coverageGap": null,
+      "usableImplementationPatch": true,
+      "evaluationLimit": "Automated evaluator and project pass are necessary evidence, not sufficient full-delivery evidence.",
+      "reviewBlinding": "Full diffs reviewed without arm labels; final two clear-count slots inferable from timing. Mapping opened after written review notes; not strict fully blind grading.",
+      "slot": 8,
+      "arm": "H01",
+      "project": "emittery",
+      "patch": "patches/bind-methods-atomic-H01.patch",
+      "nativeCompleted": true,
+      "slotWallMs": 336686,
+      "nativePhaseCount": 1,
+      "nativeSessionCount": 2,
+      "nativeToolCalls": 61,
+      "elapsedMs": 329978,
+      "timeout": false,
+      "workflowStatus": "incomplete",
+      "providerRequests": 32,
+      "requestsWithUsage": 32,
+      "requestsWithoutUsage": 0,
+      "knownUsage": {
+        "input_tokens": 1669441,
+        "output_tokens": 11773,
+        "total_tokens": 1681214,
+        "cached_tokens": 442368,
+        "reasoning_tokens": 6396
+      },
+      "usageIsComplete": true,
+      "components": {
+        "A": {
+          "deliveredEvents": 0,
+          "totalElapsedMs": 0
+        },
+        "B": {
+          "events": 5,
+          "executed": 1,
+          "totalElapsedMs": 5387.9075440000015
+        }
+      },
+      "componentUsageIsNotQualityEvidence": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "claims": {
+        "finalPresent": true,
+        "authorFinal": "Implemented atomic `bindMethods` preflight with:\n\n- Conflict, descriptor, and extensibility checks before mutation\n- Duplicate method-name deduplication\n- Descriptor preservation for replaceable undefined properties\n- Receiver binding preservation\n- Runtime, TypeScript, README, and API documentation coverage\n\nChecks passed:\n\n- Focused bindMethods tests: 12 passed\n- Full suite: 258 passed, including lint and `tsd`\n- `git diff --check` passed\n\nExisting three lint warnings remain unchanged.",
+        "commandClaims": "Final stated successful project commands are present in native traces with exit 0; no invented successful project command found. Two deadline runs have no final claim.",
+        "falseFullDeliveryClaim": false,
+        "limitation": null
+      }
+    },
+    {
+      "id": "1630e997ed31",
+      "task": "bind-methods-atomic",
+      "S": 1,
+      "rationale": "No material implementation defect found. Validates names before deduplication; preflights inherited non-undefined, non-configurable own, and missing-on-nonextensible conflicts before installing any binding. Existing configurable descriptor behavior and subclass method/receiver lookup preserved. Delivered regressions cover later conflict and descriptor invariance, non-configurable undefined, inherited/nonextensible cases, duplicates, descriptors and nonempty event delivery through bound methods. Public type usage and documentation supplied; prior tests preserved.",
+      "ordinaryProjectExit": 0,
+      "independentExit": 0,
+      "supplementaryEvidence": null,
+      "coverageGap": null,
+      "usableImplementationPatch": true,
+      "evaluationLimit": "Automated evaluator and project pass are necessary evidence, not sufficient full-delivery evidence.",
+      "reviewBlinding": "Full diffs reviewed without arm labels; final two clear-count slots inferable from timing. Mapping opened after written review notes; not strict fully blind grading.",
+      "slot": 9,
+      "arm": "H11",
+      "project": "emittery",
+      "patch": "patches/bind-methods-atomic-H11.patch",
+      "nativeCompleted": true,
+      "slotWallMs": 346682,
+      "nativePhaseCount": 1,
+      "nativeSessionCount": 2,
+      "nativeToolCalls": 45,
+      "elapsedMs": 340705,
+      "timeout": false,
+      "workflowStatus": "incomplete",
+      "providerRequests": 34,
+      "requestsWithUsage": 34,
+      "requestsWithoutUsage": 0,
+      "knownUsage": {
+        "input_tokens": 1339241,
+        "output_tokens": 13437,
+        "total_tokens": 1352678,
+        "cached_tokens": 564736,
+        "reasoning_tokens": 6967
+      },
+      "usageIsComplete": true,
+      "components": {
+        "A": {
+          "deliveredEvents": 8,
+          "totalElapsedMs": 1635.2349590000122
+        },
+        "B": {
+          "events": 4,
+          "executed": 2,
+          "totalElapsedMs": 8081.720171000037
+        }
+      },
+      "componentUsageIsNotQualityEvidence": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "claims": {
+        "finalPresent": true,
+        "authorFinal": "Implemented atomic `bindMethods` preflight with duplicate-name handling and descriptor preservation.\n\nUpdated:\n- `index.js`\n- `test/index.js`\n- `index.d.ts`\n- `index.test-d.ts`\n- `readme.md`\n\nChecks:\n- Focused bindMethods tests: 13 passed\n- Full `npm run test`: 259 tests passed, `tsd` passed\n- Existing 3 XO warnings remain\n- `git diff --check` passed",
+        "commandClaims": "Final stated successful project commands are present in native traces with exit 0; no invented successful project command found. Two deadline runs have no final claim.",
+        "falseFullDeliveryClaim": false,
+        "limitation": null
+      }
+    },
+    {
+      "id": "a4c2f33b2788",
+      "task": "bind-methods-atomic",
+      "S": 0,
+      "rationale": "Implementation and main preflight regressions look correct, but the added receiver test emits with no listener and asserts that original emitter listenerCount remains zero; it does not establish any event reaches the originating emitter. Existing bindMethods tests only inspect zero counts and a subclass override flag, not nonempty source-emitter event delivery. Requested meaningful receiver regression remains unproven. Duplicate test includes a tautological self-equality but also checks property count and successful duplicate call. Docs/types supplied; no prior scenario removed.",
+      "ordinaryProjectExit": 0,
+      "independentExit": 0,
+      "supplementaryEvidence": "supplementary/wrong-receiver-v2: all bindMethods* tests pass with target methods invoking original prototype method on a new unrelated emitter. Initial invalid control touched constructor and recursed, retained separately; exact section correction and failed pre-execution uniqueness guard disclosed.",
+      "coverageGap": "Receiver identity/event effect not exercised by delivered tests despite explicit TASK requirement.",
+      "usableImplementationPatch": true,
+      "evaluationLimit": "Automated evaluator and project pass are necessary evidence, not sufficient full-delivery evidence.",
+      "reviewBlinding": "Full diffs reviewed without arm labels; final two clear-count slots inferable from timing. Mapping opened after written review notes; not strict fully blind grading.",
+      "slot": 10,
+      "arm": "P",
+      "project": "emittery",
+      "patch": "patches/bind-methods-atomic-P.patch",
+      "nativeCompleted": true,
+      "slotWallMs": 257981,
+      "nativePhaseCount": 1,
+      "nativeSessionCount": 1,
+      "nativeToolCalls": 46,
+      "elapsedMs": 250679,
+      "timeout": false,
+      "workflowStatus": null,
+      "providerRequests": 25,
+      "requestsWithUsage": 25,
+      "requestsWithoutUsage": 0,
+      "knownUsage": {
+        "input_tokens": 618021,
+        "output_tokens": 10260,
+        "total_tokens": 628281,
+        "cached_tokens": 235008,
+        "reasoning_tokens": 4636
+      },
+      "usageIsComplete": true,
+      "components": {
+        "A": {
+          "deliveredEvents": 0,
+          "totalElapsedMs": 0
+        },
+        "B": {
+          "events": 0,
+          "executed": 0,
+          "totalElapsedMs": 0
+        }
+      },
+      "componentUsageIsNotQualityEvidence": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "claims": {
+        "finalPresent": true,
+        "authorFinal": "Implemented `bindMethods` atomic preflight behavior and duplicate-name handling.\n\n- Added conflict, descriptor, extensibility, duplicate, receiver, and descriptor regression tests.\n- Updated TypeScript documentation/type coverage.\n- Updated README API documentation.\n- Ran `npm test`: 258 AVA tests passed, `tsd` passed, XO passed with 3 existing warnings.\n- `git diff --check` passed.\n- No dependencies changed or commits created.",
+        "commandClaims": "Final stated successful project commands are present in native traces with exit 0; no invented successful project command found. Two deadline runs have no final claim.",
+        "falseFullDeliveryClaim": true,
+        "limitation": "Receiver regression coverage overclaimed; delivered receiver test has no originating-emitter event effect."
+      }
+    },
+    {
+      "id": "4a6b76d27495",
+      "task": "abortable-queue-waiters",
+      "S": 1,
+      "rationale": "No material implementation defect found. Already-aborted reason is checked before satisfied fast paths. Shared native event helper adds independent signal rejection and cleanup while preserving queue conditions, event/filter consumers and no-signal behavior. Delivered blocked/queued task regressions distinguish empty/idle/pending-zero transitions, independent cancellation/completion, already-aborted and initially satisfied states, and queue/abort listener cleanup. All three public signatures have type-use tests and cancellation scope docs; old tests preserved. Some cleanup/state tests cover shared helper via onEmpty instead of duplicating every scenario across wrappers, which is not itself an unmet task requirement.",
+      "ordinaryProjectExit": 0,
+      "independentExit": 0,
+      "supplementaryEvidence": null,
+      "coverageGap": null,
+      "usableImplementationPatch": true,
+      "evaluationLimit": "Automated evaluator and project pass are necessary evidence, not sufficient full-delivery evidence.",
+      "reviewBlinding": "Full diffs reviewed without arm labels; final two clear-count slots inferable from timing. Mapping opened after written review notes; not strict fully blind grading.",
+      "slot": 11,
+      "arm": "H10",
+      "project": "p-queue",
+      "patch": "patches/abortable-queue-waiters-H10.patch",
+      "nativeCompleted": true,
+      "slotWallMs": 641006,
+      "nativePhaseCount": 1,
+      "nativeSessionCount": 2,
+      "nativeToolCalls": 60,
+      "elapsedMs": 635419,
+      "timeout": false,
+      "workflowStatus": "incomplete",
+      "providerRequests": 35,
+      "requestsWithUsage": 35,
+      "requestsWithoutUsage": 0,
+      "knownUsage": {
+        "input_tokens": 1600671,
+        "output_tokens": 16637,
+        "total_tokens": 1617308,
+        "cached_tokens": 657920,
+        "reasoning_tokens": 9631
+      },
+      "usageIsComplete": true,
+      "components": {
+        "A": {
+          "deliveredEvents": 9,
+          "totalElapsedMs": 1641.7518770000424
+        },
+        "B": {
+          "events": 0,
+          "executed": 0,
+          "totalElapsedMs": 0
+        }
+      },
+      "componentUsageIsNotQualityEvidence": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "claims": {
+        "finalPresent": true,
+        "authorFinal": "Implemented abortable `onEmpty`, `onIdle`, and `onPendingZero` waiters with:\n\n- Exact `signal.reason` rejection, including already-aborted signals.\n- Independent waiter cancellation and listener cleanup.\n- No changes to task execution or unrelated waiters/APIs.\n- Runtime regressions, TypeScript tests, source API docs, and README updates.\n\nChecks passed:\n\n- New waiter tests: 4/4.\n- Existing tests: 206/206.\n- Full `npm test`: 210/210, build, and `tsd`.\n- Only pre-existing lint warnings remain.",
+        "commandClaims": "Final stated successful project commands are present in native traces with exit 0; no invented successful project command found. Two deadline runs have no final claim.",
+        "falseFullDeliveryClaim": false,
+        "limitation": null
+      }
+    },
+    {
+      "id": "327d0ecf1a65",
+      "task": "abortable-queue-waiters",
+      "S": 1,
+      "rationale": "No material implementation defect found. Already-aborted reason is checked before satisfied fast paths. Shared native event helper adds independent signal rejection and cleanup while preserving queue conditions, event/filter consumers and no-signal behavior. Delivered blocked/queued task regressions distinguish empty/idle/pending-zero transitions, independent cancellation/completion, already-aborted and initially satisfied states, and queue/abort listener cleanup. All three public signatures have type-use tests and cancellation scope docs; old tests preserved. Some cleanup/state tests cover shared helper via onEmpty instead of duplicating every scenario across wrappers, which is not itself an unmet task requirement.",
+      "ordinaryProjectExit": 0,
+      "independentExit": 0,
+      "supplementaryEvidence": null,
+      "coverageGap": null,
+      "usableImplementationPatch": true,
+      "evaluationLimit": "Automated evaluator and project pass are necessary evidence, not sufficient full-delivery evidence.",
+      "reviewBlinding": "Full diffs reviewed without arm labels; final two clear-count slots inferable from timing. Mapping opened after written review notes; not strict fully blind grading.",
+      "slot": 12,
+      "arm": "H01",
+      "project": "p-queue",
+      "patch": "patches/abortable-queue-waiters-H01.patch",
+      "nativeCompleted": true,
+      "slotWallMs": 761327,
+      "nativePhaseCount": 1,
+      "nativeSessionCount": 2,
+      "nativeToolCalls": 54,
+      "elapsedMs": 754982,
+      "timeout": false,
+      "workflowStatus": "incomplete",
+      "providerRequests": 29,
+      "requestsWithUsage": 29,
+      "requestsWithoutUsage": 0,
+      "knownUsage": {
+        "input_tokens": 3023130,
+        "output_tokens": 14570,
+        "total_tokens": 3037700,
+        "cached_tokens": 1079296,
+        "reasoning_tokens": 7865
+      },
+      "usageIsComplete": true,
+      "components": {
+        "A": {
+          "deliveredEvents": 0,
+          "totalElapsedMs": 0
+        },
+        "B": {
+          "events": 10,
+          "executed": 2,
+          "totalElapsedMs": 185191.82166800002
+        }
+      },
+      "componentUsageIsNotQualityEvidence": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "claims": {
+        "finalPresent": true,
+        "authorFinal": "Implemented optional `{signal?: AbortSignal}` support for `onEmpty()`, `onIdle()`, and `onPendingZero()`.\n\n- Added abort-first semantics, independent waiters, and idempotent listener cleanup.\n- Added runtime regressions for queue-state distinctions, abort races, satisfied conditions, and cleanup.\n- Added TypeScript usage coverage for all three methods.\n- Documented cancellation scope in `readme.md`.\n- No dependencies or commits changed.\n\nChecks passed:\n- New regressions: 3/3\n- Preservation suite: 206/206\n- Full `npm run test`: 209/209, build and `tsd` passed\n- `tsc --noEmit`\n- `git diff --check`\n\nExisting three non-failing lint warnings remain unchanged.",
+        "commandClaims": "Final stated successful project commands are present in native traces with exit 0; no invented successful project command found. Two deadline runs have no final claim.",
+        "falseFullDeliveryClaim": false,
+        "limitation": null
+      }
+    },
+    {
+      "id": "557488ff10e8",
+      "task": "abortable-queue-waiters",
+      "S": 1,
+      "rationale": "No material implementation defect found. Already-aborted reason is checked before satisfied fast paths. Shared native event helper adds independent signal rejection and cleanup while preserving queue conditions, event/filter consumers and no-signal behavior. Delivered blocked/queued task regressions distinguish empty/idle/pending-zero transitions, independent cancellation/completion, already-aborted and initially satisfied states, and queue/abort listener cleanup. All three public signatures have type-use tests and cancellation scope docs; old tests preserved. Some cleanup/state tests cover shared helper via onEmpty instead of duplicating every scenario across wrappers, which is not itself an unmet task requirement.",
+      "ordinaryProjectExit": 0,
+      "independentExit": 0,
+      "supplementaryEvidence": null,
+      "coverageGap": null,
+      "usableImplementationPatch": true,
+      "evaluationLimit": "Automated evaluator and project pass are necessary evidence, not sufficient full-delivery evidence.",
+      "reviewBlinding": "Full diffs reviewed without arm labels; final two clear-count slots inferable from timing. Mapping opened after written review notes; not strict fully blind grading.",
+      "slot": 13,
+      "arm": "H11",
+      "project": "p-queue",
+      "patch": "patches/abortable-queue-waiters-H11.patch",
+      "nativeCompleted": true,
+      "slotWallMs": 724810,
+      "nativePhaseCount": 1,
+      "nativeSessionCount": 2,
+      "nativeToolCalls": 52,
+      "elapsedMs": 719709,
+      "timeout": false,
+      "workflowStatus": "incomplete",
+      "providerRequests": 30,
+      "requestsWithUsage": 30,
+      "requestsWithoutUsage": 0,
+      "knownUsage": {
+        "input_tokens": 1736873,
+        "output_tokens": 17661,
+        "total_tokens": 1754534,
+        "cached_tokens": 549888,
+        "reasoning_tokens": 10618
+      },
+      "usageIsComplete": true,
+      "components": {
+        "A": {
+          "deliveredEvents": 10,
+          "totalElapsedMs": 1391.9827919999188
+        },
+        "B": {
+          "events": 2,
+          "executed": 2,
+          "totalElapsedMs": 96296.74150099998
+        }
+      },
+      "componentUsageIsNotQualityEvidence": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "claims": {
+        "finalPresent": true,
+        "authorFinal": "Implemented signal cancellation for `onEmpty()`, `onIdle()`, and `onPendingZero()` with independent waiter cleanup and exact abort reasons.\n\nAdded:\n- Runtime regressions in `test/on-event.ts`\n- TypeScript type coverage in `test-d/index.test-d.ts`\n- README and API documentation\n\nChecks passed:\n- Focused new tests: 4/4\n- Full `npm run test`: 210/210\n- Build, lint, `tsd`, and diff validation\n\nOnly three pre-existing lint warnings remain.",
+        "commandClaims": "Final stated successful project commands are present in native traces with exit 0; no invented successful project command found. Two deadline runs have no final claim.",
+        "falseFullDeliveryClaim": false,
+        "limitation": null
+      }
+    },
+    {
+      "id": "931e71357c8b",
+      "task": "abortable-queue-waiters",
+      "S": 0,
+      "rationale": "Signal lifecycle, types, docs and nonempty delivery tests look substantive, but onEmpty now listens to active as well as empty and filters queue.size. This changes the explicitly preserved no-signal event timing: #next calls #tryToStartAnother only once, so final queued task start originally emits active without empty; candidate resolves onEmpty there while baseline waits for a later empty event. Candidate test relies on this changed behavior. Needs an observed baseline-versus-patch no-signal trace after scheduling stops; do not silently accept as incidental bug repair.",
+      "ordinaryProjectExit": 0,
+      "independentExit": 0,
+      "supplementaryEvidence": "supplementary/onEmpty-baseline and onEmpty-931e71357c8b: both size0,pending1 with last task blocked; no-signal waiter settled=false baseline versus true candidate; both finish at size0,pending0.",
+      "coverageGap": null,
+      "usableImplementationPatch": false,
+      "evaluationLimit": "Automated evaluator and project pass are necessary evidence, not sufficient full-delivery evidence.",
+      "reviewBlinding": "Full diffs reviewed without arm labels; final two clear-count slots inferable from timing. Mapping opened after written review notes; not strict fully blind grading.",
+      "slot": 14,
+      "arm": "P",
+      "project": "p-queue",
+      "patch": "patches/abortable-queue-waiters-P.patch",
+      "nativeCompleted": true,
+      "slotWallMs": 889458,
+      "nativePhaseCount": 1,
+      "nativeSessionCount": 1,
+      "nativeToolCalls": 70,
+      "elapsedMs": 884293,
+      "timeout": false,
+      "workflowStatus": null,
+      "providerRequests": 40,
+      "requestsWithUsage": 40,
+      "requestsWithoutUsage": 0,
+      "knownUsage": {
+        "input_tokens": 2065474,
+        "output_tokens": 23846,
+        "total_tokens": 2089320,
+        "cached_tokens": 804864,
+        "reasoning_tokens": 12282
+      },
+      "usageIsComplete": true,
+      "components": {
+        "A": {
+          "deliveredEvents": 0,
+          "totalElapsedMs": 0
+        },
+        "B": {
+          "events": 0,
+          "executed": 0,
+          "totalElapsedMs": 0
+        }
+      },
+      "componentUsageIsNotQualityEvidence": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "claims": {
+        "finalPresent": true,
+        "authorFinal": "Implemented optional cancellation for `onEmpty`, `onIdle`, and `onPendingZero`.\n\n- Abort rejects only the associated waiter with `signal.reason`.\n- Already-aborted signals reject before satisfied-condition checks.\n- Queue and abort listeners are cleaned up after settlement.\n- Concurrent waiters remain independent.\n- Added blocked-task regressions, cleanup checks, and TypeScript coverage.\n- Updated README and API documentation.\n\nChecks passed:\n\n- `npm test`: 208 tests passed\n- `npm run build`\n- `npx tsd`\n- `npx xo`\n- `git diff --check`\n\nExisting lint warnings remain for pre-existing TODO comments and `test/advanced.ts` line count.",
+        "commandClaims": "Final stated successful project commands are present in native traces with exit 0; no invented successful project command found. Two deadline runs have no final claim.",
+        "falseFullDeliveryClaim": true,
+        "limitation": "Completion omits unrequested no-signal onEmpty timing change."
+      }
+    },
+    {
+      "id": "3be68608106c",
+      "task": "abortable-queue-waiters",
+      "S": 1,
+      "rationale": "No material implementation defect found. Already-aborted reason is checked before satisfied fast paths. Shared native event helper adds independent signal rejection and cleanup while preserving queue conditions, event/filter consumers and no-signal behavior. Delivered blocked/queued task regressions distinguish empty/idle/pending-zero transitions, independent cancellation/completion, already-aborted and initially satisfied states, and queue/abort listener cleanup. All three public signatures have type-use tests and cancellation scope docs; old tests preserved. Some cleanup/state tests cover shared helper via onEmpty instead of duplicating every scenario across wrappers, which is not itself an unmet task requirement.",
+      "ordinaryProjectExit": 0,
+      "independentExit": 0,
+      "supplementaryEvidence": null,
+      "coverageGap": null,
+      "usableImplementationPatch": true,
+      "evaluationLimit": "Automated evaluator and project pass are necessary evidence, not sufficient full-delivery evidence.",
+      "reviewBlinding": "Full diffs reviewed without arm labels; final two clear-count slots inferable from timing. Mapping opened after written review notes; not strict fully blind grading.",
+      "slot": 15,
+      "arm": "H00",
+      "project": "p-queue",
+      "patch": "patches/abortable-queue-waiters-H00.patch",
+      "nativeCompleted": true,
+      "slotWallMs": 626582,
+      "nativePhaseCount": 1,
+      "nativeSessionCount": 2,
+      "nativeToolCalls": 55,
+      "elapsedMs": 621018,
+      "timeout": false,
+      "workflowStatus": "incomplete",
+      "providerRequests": 30,
+      "requestsWithUsage": 30,
+      "requestsWithoutUsage": 0,
+      "knownUsage": {
+        "input_tokens": 1142280,
+        "output_tokens": 18819,
+        "total_tokens": 1161099,
+        "cached_tokens": 374784,
+        "reasoning_tokens": 10824
+      },
+      "usageIsComplete": true,
+      "components": {
+        "A": {
+          "deliveredEvents": 0,
+          "totalElapsedMs": 0
+        },
+        "B": {
+          "events": 0,
+          "executed": 0,
+          "totalElapsedMs": 0
+        }
+      },
+      "componentUsageIsNotQualityEvidence": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "claims": {
+        "finalPresent": true,
+        "authorFinal": "Implemented optional `{signal?: AbortSignal}` support for `onEmpty()`, `onIdle()`, and `onPendingZero()` with independent cancellation and listener cleanup.\n\nAdded:\n- Behavioral regressions in `test/waiters.ts`\n- TypeScript coverage in `test-d/index.test-d.ts`\n- README API and cancellation documentation\n\nChecks passed:\n- 5 focused waiter tests\n- `npm run build`\n- `npx tsd`\n- Full `npm test`: 211 passed\n- `git diff --check`\n\nOnly existing lint warnings remain.",
+        "commandClaims": "Final stated successful project commands are present in native traces with exit 0; no invented successful project command found. Two deadline runs have no final claim.",
+        "falseFullDeliveryClaim": false,
+        "limitation": null
+      }
+    },
+    {
+      "id": "2d50431da1d8",
+      "task": "clear-queue-reason",
+      "S": 1,
+      "rationale": "Implementation uses reason === undefined, preserving null/false/0/object identity and original default. Existing clearQueue forwarding exposes the same callable on limitFunction; disabled discard path and running-work scheduler are unchanged. Public unknown types and requested docs supplied. Delivered tests cover custom reasons through both APIs, preserved default (no-argument or explicit undefined), non-settlement with disabled pLimit, active work and reuse. 7cb additionally tests disabled wrapper. Partial catch-return assertions are paired with non-invocation checks and exact nonundefined values, so ordinary successful queued execution cannot satisfy them. No material defect found; existing default cases changed only to equivalent explicit undefined in one API.",
+      "ordinaryProjectExit": 0,
+      "independentExit": 0,
+      "supplementaryEvidence": null,
+      "coverageGap": null,
+      "usableImplementationPatch": true,
+      "evaluationLimit": "Automated evaluator and project pass are necessary evidence, not sufficient full-delivery evidence.",
+      "reviewBlinding": "Full diffs reviewed without arm labels; final two clear-count slots inferable from timing. Mapping opened after written review notes; not strict fully blind grading.",
+      "slot": 16,
+      "arm": "H01",
+      "project": "p-limit",
+      "patch": "patches/clear-queue-reason-H01.patch",
+      "nativeCompleted": true,
+      "slotWallMs": 355352,
+      "nativePhaseCount": 1,
+      "nativeSessionCount": 2,
+      "nativeToolCalls": 47,
+      "elapsedMs": 350823,
+      "timeout": false,
+      "workflowStatus": "incomplete",
+      "providerRequests": 32,
+      "requestsWithUsage": 32,
+      "requestsWithoutUsage": 0,
+      "knownUsage": {
+        "input_tokens": 975036,
+        "output_tokens": 12660,
+        "total_tokens": 987696,
+        "cached_tokens": 317952,
+        "reasoning_tokens": 7200
+      },
+      "usageIsComplete": true,
+      "components": {
+        "A": {
+          "deliveredEvents": 0,
+          "totalElapsedMs": 0
+        },
+        "B": {
+          "events": 7,
+          "executed": 2,
+          "totalElapsedMs": 10957.771131000001
+        }
+      },
+      "componentUsageIsNotQualityEvidence": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "claims": {
+        "finalPresent": true,
+        "authorFinal": "Implemented optional `clearQueue(reason?)` support.\n\n- Custom reasons preserve exact values when `rejectOnClear: true`.\n- `undefined` and no argument retain `AbortError`.\n- Disabled rejection behavior, active tasks, counts, queueing, and reuse remain unchanged.\n- Updated TypeScript declarations, type tests, README, and regressions for both APIs.\n\nChecks passed:\n- Focused clear-queue tests: 6 passed\n- Full `npm run test`: 26 passed\n- `tsd` and `xo` passed\n\nExisting lint warning remains in `scripts/benchmarker.js`. No commit or dependency changes made.",
+        "commandClaims": "Final stated successful project commands are present in native traces with exit 0; no invented successful project command found. Two deadline runs have no final claim.",
+        "falseFullDeliveryClaim": false,
+        "limitation": null
+      }
+    },
+    {
+      "id": "fad911ec157c",
+      "task": "clear-queue-reason",
+      "S": 1,
+      "rationale": "Implementation uses reason === undefined, preserving null/false/0/object identity and original default. Existing clearQueue forwarding exposes the same callable on limitFunction; disabled discard path and running-work scheduler are unchanged. Public unknown types and requested docs supplied. Delivered tests cover custom reasons through both APIs, preserved default (no-argument or explicit undefined), non-settlement with disabled pLimit, active work and reuse. 7cb additionally tests disabled wrapper. Partial catch-return assertions are paired with non-invocation checks and exact nonundefined values, so ordinary successful queued execution cannot satisfy them. No material defect found; existing default cases changed only to equivalent explicit undefined in one API.",
+      "ordinaryProjectExit": 0,
+      "independentExit": 0,
+      "supplementaryEvidence": null,
+      "coverageGap": null,
+      "usableImplementationPatch": true,
+      "evaluationLimit": "Automated evaluator and project pass are necessary evidence, not sufficient full-delivery evidence.",
+      "reviewBlinding": "Full diffs reviewed without arm labels; final two clear-count slots inferable from timing. Mapping opened after written review notes; not strict fully blind grading.",
+      "slot": 17,
+      "arm": "H11",
+      "project": "p-limit",
+      "patch": "patches/clear-queue-reason-H11.patch",
+      "nativeCompleted": true,
+      "slotWallMs": 289019,
+      "nativePhaseCount": 1,
+      "nativeSessionCount": 2,
+      "nativeToolCalls": 36,
+      "elapsedMs": 284049,
+      "timeout": false,
+      "workflowStatus": "incomplete",
+      "providerRequests": 28,
+      "requestsWithUsage": 28,
+      "requestsWithoutUsage": 0,
+      "knownUsage": {
+        "input_tokens": 712133,
+        "output_tokens": 9639,
+        "total_tokens": 721772,
+        "cached_tokens": 263168,
+        "reasoning_tokens": 4202
+      },
+      "usageIsComplete": true,
+      "components": {
+        "A": {
+          "deliveredEvents": 6,
+          "totalElapsedMs": 511.95783300002586
+        },
+        "B": {
+          "events": 2,
+          "executed": 1,
+          "totalElapsedMs": 5962.275795000001
+        }
+      },
+      "componentUsageIsNotQualityEvidence": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "claims": {
+        "finalPresent": true,
+        "authorFinal": "Implemented optional `clearQueue(reason?)` support.\n\n- Custom reasons preserve exact values, including falsy values.\n- `undefined` retains the default `AbortError`.\n- Disabled rejection still discards unsettled promises.\n- Running tasks remain unaffected; reuse and counts are covered.\n- Updated TypeScript declarations, type tests, and README documentation.\n- Added coverage for both `pLimit` and `limitFunction`.\n\nChecks passed:\n- Focused clearQueue tests: 6 passed\n- `npm run test`: 26 runtime tests, lint, and `tsd`\n- Existing benchmark TODO warning remains.",
+        "commandClaims": "Final stated successful project commands are present in native traces with exit 0; no invented successful project command found. Two deadline runs have no final claim.",
+        "falseFullDeliveryClaim": false,
+        "limitation": null
+      }
+    },
+    {
+      "id": "c1480bfe32f3",
+      "task": "clear-queue-reason",
+      "S": 0,
+      "rationale": "Implementation uses reason === undefined, preserving null/false/0/object identity and original default. Existing clearQueue forwarding exposes the same callable on limitFunction; disabled discard path and running-work scheduler are unchanged. Public unknown types and requested docs supplied. Requested disabled-option regression does not retain/observe the queued promise; it only checks invocation and counts, so it cannot establish discard-without-settlement. Existing baseline clearQueue test likewise observes only counts. No disabled-wrapper test. Custom/default/active/reuse tests otherwise meaningful; implementation itself appears correct.",
+      "ordinaryProjectExit": 0,
+      "independentExit": 0,
+      "supplementaryEvidence": null,
+      "coverageGap": "No delivered assertion of non-settlement for disabled clearQueue(reason), an explicit task requirement.",
+      "usableImplementationPatch": true,
+      "evaluationLimit": "Automated evaluator and project pass are necessary evidence, not sufficient full-delivery evidence.",
+      "reviewBlinding": "Full diffs reviewed without arm labels; final two clear-count slots inferable from timing. Mapping opened after written review notes; not strict fully blind grading.",
+      "slot": 18,
+      "arm": "P",
+      "project": "p-limit",
+      "patch": "patches/clear-queue-reason-P.patch",
+      "nativeCompleted": true,
+      "slotWallMs": 328287,
+      "nativePhaseCount": 1,
+      "nativeSessionCount": 1,
+      "nativeToolCalls": 49,
+      "elapsedMs": 323367,
+      "timeout": false,
+      "workflowStatus": null,
+      "providerRequests": 25,
+      "requestsWithUsage": 25,
+      "requestsWithoutUsage": 0,
+      "knownUsage": {
+        "input_tokens": 619310,
+        "output_tokens": 11394,
+        "total_tokens": 630704,
+        "cached_tokens": 226304,
+        "reasoning_tokens": 6296
+      },
+      "usageIsComplete": true,
+      "components": {
+        "A": {
+          "deliveredEvents": 0,
+          "totalElapsedMs": 0
+        },
+        "B": {
+          "events": 0,
+          "executed": 0,
+          "totalElapsedMs": 0
+        }
+      },
+      "componentUsageIsNotQualityEvidence": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "claims": {
+        "finalPresent": true,
+        "authorFinal": "Implemented `clearQueue(reason?)` for both APIs.\n\n- Custom `unknown` reasons preserve exact values, including falsy values.\n- `undefined` or no argument uses the default `AbortError`.\n- Disabled rejection still discards without settlement.\n- Running tasks remain unaffected; reuse and counts are covered.\n- Updated runtime tests, tsd coverage, declarations, and README docs.\n\nVerification: `npm test` passed with 26 AVA tests and `tsd`; XO reports one pre-existing warning in `scripts/benchmarker.js`.",
+        "commandClaims": "Final stated successful project commands are present in native traces with exit 0; no invented successful project command found. Two deadline runs have no final claim.",
+        "falseFullDeliveryClaim": true,
+        "limitation": "Completion omits required non-settlement regression gap; implementation claim itself correct."
+      }
+    },
+    {
+      "id": "7cb1c7ad5768",
+      "task": "clear-queue-reason",
+      "S": 1,
+      "rationale": "Implementation uses reason === undefined, preserving null/false/0/object identity and original default. Existing clearQueue forwarding exposes the same callable on limitFunction; disabled discard path and running-work scheduler are unchanged. Public unknown types and requested docs supplied. Delivered tests cover custom reasons through both APIs, preserved default (no-argument or explicit undefined), non-settlement with disabled pLimit, active work and reuse. 7cb additionally tests disabled wrapper. Partial catch-return assertions are paired with non-invocation checks and exact nonundefined values, so ordinary successful queued execution cannot satisfy them. No material defect found; existing default cases changed only to equivalent explicit undefined in one API.",
+      "ordinaryProjectExit": 0,
+      "independentExit": 0,
+      "supplementaryEvidence": null,
+      "coverageGap": null,
+      "usableImplementationPatch": true,
+      "evaluationLimit": "Automated evaluator and project pass are necessary evidence, not sufficient full-delivery evidence.",
+      "reviewBlinding": "Full diffs reviewed without arm labels; final two clear-count slots inferable from timing. Mapping opened after written review notes; not strict fully blind grading.",
+      "slot": 19,
+      "arm": "H00",
+      "project": "p-limit",
+      "patch": "patches/clear-queue-reason-H00.patch",
+      "nativeCompleted": false,
+      "slotWallMs": 904927,
+      "nativePhaseCount": 1,
+      "nativeSessionCount": 2,
+      "nativeToolCalls": 64,
+      "elapsedMs": 900160,
+      "timeout": true,
+      "workflowStatus": "incomplete",
+      "providerRequests": 46,
+      "requestsWithUsage": 45,
+      "requestsWithoutUsage": 1,
+      "knownUsage": {
+        "input_tokens": 1396353,
+        "output_tokens": 16910,
+        "total_tokens": 1413263,
+        "cached_tokens": 696832,
+        "reasoning_tokens": 8687
+      },
+      "usageIsComplete": false,
+      "components": {
+        "A": {
+          "deliveredEvents": 0,
+          "totalElapsedMs": 0
+        },
+        "B": {
+          "events": 0,
+          "executed": 0,
+          "totalElapsedMs": 0
+        }
+      },
+      "componentUsageIsNotQualityEvidence": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": true,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": true
+      },
+      "claims": {
+        "finalPresent": false,
+        "authorFinal": "",
+        "commandClaims": "Final stated successful project commands are present in native traces with exit 0; no invented successful project command found. Two deadline runs have no final claim.",
+        "falseFullDeliveryClaim": false,
+        "limitation": null
+      }
+    },
+    {
+      "id": "10d0536980f7",
+      "task": "clear-queue-reason",
+      "S": 0,
+      "rationale": "Implementation uses reason === undefined, preserving null/false/0/object identity and original default. Existing clearQueue forwarding exposes the same callable on limitFunction; disabled discard path and running-work scheduler are unchanged. Public unknown types and requested docs supplied. Delivered wrapper tests assert limitedFunction.activeCount and pendingCount even though those controls do not exist in this task snapshot or patch. These assertions are expected to fail (undefined versus 1/2), so delivered project regressions are not usable as-is. Preserve raw outcome and await actual ordinary check evidence.",
+      "ordinaryProjectExit": 1,
+      "independentExit": 0,
+      "supplementaryEvidence": "supplementary/wrapper-count-test: actual AVA exit1 at test.js:289, undefined versus1. Ordinary npm test independently exits1 at16 lint errors; frozen independent behavior/types exits0.",
+      "coverageGap": null,
+      "usableImplementationPatch": true,
+      "evaluationLimit": "Automated evaluator and project pass are necessary evidence, not sufficient full-delivery evidence.",
+      "reviewBlinding": "Full diffs reviewed without arm labels; final two clear-count slots inferable from timing. Mapping opened after written review notes; not strict fully blind grading.",
+      "slot": 20,
+      "arm": "H10",
+      "project": "p-limit",
+      "patch": "patches/clear-queue-reason-H10.patch",
+      "nativeCompleted": false,
+      "slotWallMs": 905258,
+      "nativePhaseCount": 1,
+      "nativeSessionCount": 2,
+      "nativeToolCalls": 63,
+      "elapsedMs": 900136,
+      "timeout": true,
+      "workflowStatus": "incomplete",
+      "providerRequests": 34,
+      "requestsWithUsage": 33,
+      "requestsWithoutUsage": 1,
+      "knownUsage": {
+        "input_tokens": 1171430,
+        "output_tokens": 15816,
+        "total_tokens": 1187246,
+        "cached_tokens": 536064,
+        "reasoning_tokens": 6148
+      },
+      "usageIsComplete": false,
+      "components": {
+        "A": {
+          "deliveredEvents": 10,
+          "totalElapsedMs": 593.1404159999765
+        },
+        "B": {
+          "events": 0,
+          "executed": 0,
+          "totalElapsedMs": 0
+        }
+      },
+      "componentUsageIsNotQualityEvidence": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": true,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": true
+      },
+      "claims": {
+        "finalPresent": false,
+        "authorFinal": "",
+        "commandClaims": "Final stated successful project commands are present in native traces with exit 0; no invented successful project command found. Two deadline runs have no final claim.",
+        "falseFullDeliveryClaim": false,
+        "limitation": "No final answer; broken patch retained at task deadline."
+      }
+    },
+    {
+      "id": "1a72e3685206",
+      "task": "listener-count-deduplicate",
+      "S": 1,
+      "rationale": "No material defect found in full diff. Set preserves string/symbol identity and existing per-name counting/validation; distinct names remain additive, no subscription mutation. Delivered regressions establish named/any/iterator state immediately before duplicate queries, include distinct same-description symbols, empty input, invalid trailing entry, and preserved totals. Public array type-use tests and accurate API docs supplied; existing tests preserved.",
+      "ordinaryProjectExit": 0,
+      "independentExit": 0,
+      "supplementaryEvidence": null,
+      "coverageGap": null,
+      "usableImplementationPatch": true,
+      "evaluationLimit": "Automated evaluator and project pass are necessary evidence, not sufficient full-delivery evidence.",
+      "reviewBlinding": "Full diffs reviewed without arm labels; final two clear-count slots inferable from timing. Mapping opened after written review notes; not strict fully blind grading.",
+      "slot": 21,
+      "arm": "H11",
+      "project": "emittery",
+      "patch": "patches/listener-count-deduplicate-H11.patch",
+      "nativeCompleted": true,
+      "slotWallMs": 217529,
+      "nativePhaseCount": 1,
+      "nativeSessionCount": 2,
+      "nativeToolCalls": 39,
+      "elapsedMs": 212482,
+      "timeout": false,
+      "workflowStatus": "incomplete",
+      "providerRequests": 20,
+      "requestsWithUsage": 20,
+      "requestsWithoutUsage": 0,
+      "knownUsage": {
+        "input_tokens": 950787,
+        "output_tokens": 7694,
+        "total_tokens": 958481,
+        "cached_tokens": 180224,
+        "reasoning_tokens": 4540
+      },
+      "usageIsComplete": true,
+      "components": {
+        "A": {
+          "deliveredEvents": 5,
+          "totalElapsedMs": 933.232710000002
+        },
+        "B": {
+          "events": 8,
+          "executed": 2,
+          "totalElapsedMs": 9243.903380000012
+        }
+      },
+      "componentUsageIsNotQualityEvidence": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "claims": {
+        "finalPresent": true,
+        "authorFinal": "Implemented `listenerCount()` deduplication using value-preserving `Set` semantics.\n\nChanges:\n- Runtime counting for repeated strings/symbols.\n- Distinct same-description symbols remain separate.\n- Added listener, `onAny`, iterator, validation, cleanup, and state regressions.\n- Added TypeScript array usage regression.\n- Updated `index.d.ts` and README documentation.\n\nChecks:\n- Focused Ava tests: 6 passed.\n- Full `npm run test`: 254 passed.\n- `git diff --check`: passed.\n- Existing 3 lint warnings remain unchanged.",
+        "commandClaims": "Final stated successful project commands are present in native traces with exit 0; no invented successful project command found. Two deadline runs have no final claim.",
+        "falseFullDeliveryClaim": false,
+        "limitation": null
+      }
+    },
+    {
+      "id": "330c5b620e55",
+      "task": "listener-count-deduplicate",
+      "S": 1,
+      "rationale": "No material defect found in full diff. Set preserves string/symbol identity and existing per-name counting/validation; distinct names remain additive, no subscription mutation. Delivered regressions establish named/any/iterator state immediately before duplicate queries, include distinct same-description symbols, empty input, invalid trailing entry, and preserved totals. Public array type-use tests and accurate API docs supplied; existing tests preserved.",
+      "ordinaryProjectExit": 0,
+      "independentExit": 0,
+      "supplementaryEvidence": null,
+      "coverageGap": null,
+      "usableImplementationPatch": true,
+      "evaluationLimit": "Automated evaluator and project pass are necessary evidence, not sufficient full-delivery evidence.",
+      "reviewBlinding": "Full diffs reviewed without arm labels; final two clear-count slots inferable from timing. Mapping opened after written review notes; not strict fully blind grading.",
+      "slot": 22,
+      "arm": "P",
+      "project": "emittery",
+      "patch": "patches/listener-count-deduplicate-P.patch",
+      "nativeCompleted": true,
+      "slotWallMs": 190097,
+      "nativePhaseCount": 1,
+      "nativeSessionCount": 1,
+      "nativeToolCalls": 45,
+      "elapsedMs": 185043,
+      "timeout": false,
+      "workflowStatus": null,
+      "providerRequests": 18,
+      "requestsWithUsage": 18,
+      "requestsWithoutUsage": 0,
+      "knownUsage": {
+        "input_tokens": 589384,
+        "output_tokens": 6842,
+        "total_tokens": 596226,
+        "cached_tokens": 105984,
+        "reasoning_tokens": 3464
+      },
+      "usageIsComplete": true,
+      "components": {
+        "A": {
+          "deliveredEvents": 0,
+          "totalElapsedMs": 0
+        },
+        "B": {
+          "events": 0,
+          "executed": 0,
+          "totalElapsedMs": 0
+        }
+      },
+      "componentUsageIsNotQualityEvidence": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "claims": {
+        "finalPresent": true,
+        "authorFinal": "Implemented duplicate event-name deduplication in `listenerCount()` using `Set`, preserving symbol identity and existing counting behavior.\n\nAdded:\n- Runtime regressions for listeners, any-listeners, named/any iterators, symbols, empty arrays, and validation.\n- TypeScript array API regression.\n- README and declaration documentation.\n\nVerification:\n- `npm test`: passed, 255 tests.\n- `git diff --check`: passed.\n- Existing XO warnings remain unrelated.",
+        "commandClaims": "Final stated successful project commands are present in native traces with exit 0; no invented successful project command found. Two deadline runs have no final claim.",
+        "falseFullDeliveryClaim": false,
+        "limitation": null
+      }
+    },
+    {
+      "id": "07a1805c5657",
+      "task": "listener-count-deduplicate",
+      "S": 1,
+      "rationale": "No material defect found in full diff. Set preserves string/symbol identity and existing per-name counting/validation; distinct names remain additive, no subscription mutation. Delivered regressions establish named/any/iterator state immediately before duplicate queries, include distinct same-description symbols, empty input, invalid trailing entry, and preserved totals. Public array type-use tests and accurate API docs supplied; existing tests preserved.",
+      "ordinaryProjectExit": 0,
+      "independentExit": 0,
+      "supplementaryEvidence": null,
+      "coverageGap": null,
+      "usableImplementationPatch": true,
+      "evaluationLimit": "Automated evaluator and project pass are necessary evidence, not sufficient full-delivery evidence.",
+      "reviewBlinding": "Full diffs reviewed without arm labels; final two clear-count slots inferable from timing. Mapping opened after written review notes; not strict fully blind grading.",
+      "slot": 23,
+      "arm": "H00",
+      "project": "emittery",
+      "patch": "patches/listener-count-deduplicate-H00.patch",
+      "nativeCompleted": true,
+      "slotWallMs": 248429,
+      "nativePhaseCount": 1,
+      "nativeSessionCount": 2,
+      "nativeToolCalls": 50,
+      "elapsedMs": 243362,
+      "timeout": false,
+      "workflowStatus": "incomplete",
+      "providerRequests": 28,
+      "requestsWithUsage": 28,
+      "requestsWithoutUsage": 0,
+      "knownUsage": {
+        "input_tokens": 899909,
+        "output_tokens": 8566,
+        "total_tokens": 908475,
+        "cached_tokens": 278528,
+        "reasoning_tokens": 4790
+      },
+      "usageIsComplete": true,
+      "components": {
+        "A": {
+          "deliveredEvents": 0,
+          "totalElapsedMs": 0
+        },
+        "B": {
+          "events": 0,
+          "executed": 0,
+          "totalElapsedMs": 0
+        }
+      },
+      "componentUsageIsNotQualityEvidence": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "claims": {
+        "finalPresent": true,
+        "authorFinal": "Implemented `listenerCount` array deduplication using `Set`, preserving symbol identity and additive counts.\n\nAdded:\n- Runtime regressions for listeners, `onAny`, iterators, symbols, validation, and state preservation\n- TypeScript array API usage regression\n- README and declaration documentation\n\nChecks:\n- Focused AVA regression passed\n- `npm test` passed: 254 tests, XO, and tsd\n- `git diff --check` passed\n- Existing 3 lint warnings remain unchanged\n",
+        "commandClaims": "Final stated successful project commands are present in native traces with exit 0; no invented successful project command found. Two deadline runs have no final claim.",
+        "falseFullDeliveryClaim": false,
+        "limitation": null
+      }
+    },
+    {
+      "id": "16abc67ae164",
+      "task": "listener-count-deduplicate",
+      "S": 1,
+      "rationale": "No material defect found in full diff. Set preserves string/symbol identity and existing per-name counting/validation; distinct names remain additive, no subscription mutation. Delivered regressions establish named/any/iterator state immediately before duplicate queries, include distinct same-description symbols, empty input, invalid trailing entry, and preserved totals. Public array type-use tests and accurate API docs supplied; existing tests preserved.",
+      "ordinaryProjectExit": 0,
+      "independentExit": 0,
+      "supplementaryEvidence": null,
+      "coverageGap": null,
+      "usableImplementationPatch": true,
+      "evaluationLimit": "Automated evaluator and project pass are necessary evidence, not sufficient full-delivery evidence.",
+      "reviewBlinding": "Full diffs reviewed without arm labels; final two clear-count slots inferable from timing. Mapping opened after written review notes; not strict fully blind grading.",
+      "slot": 24,
+      "arm": "H10",
+      "project": "emittery",
+      "patch": "patches/listener-count-deduplicate-H10.patch",
+      "nativeCompleted": true,
+      "slotWallMs": 270768,
+      "nativePhaseCount": 1,
+      "nativeSessionCount": 2,
+      "nativeToolCalls": 42,
+      "elapsedMs": 265425,
+      "timeout": false,
+      "workflowStatus": "incomplete",
+      "providerRequests": 18,
+      "requestsWithUsage": 18,
+      "requestsWithoutUsage": 0,
+      "knownUsage": {
+        "input_tokens": 1181695,
+        "output_tokens": 11392,
+        "total_tokens": 1193087,
+        "cached_tokens": 320000,
+        "reasoning_tokens": 7596
+      },
+      "usageIsComplete": true,
+      "components": {
+        "A": {
+          "deliveredEvents": 9,
+          "totalElapsedMs": 1379.5890409999884
+        },
+        "B": {
+          "events": 0,
+          "executed": 0,
+          "totalElapsedMs": 0
+        }
+      },
+      "componentUsageIsNotQualityEvidence": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "claims": {
+        "finalPresent": true,
+        "authorFinal": "Implemented `listenerCount()` array deduplication using `Set`, preserving symbol identity and additive counts.\n\nAdded:\n- Runtime regressions for listeners, `onAny`, iterators, symbols, empty arrays, validation, and state preservation\n- TypeScript array usage regression\n- README and declaration documentation\n\nChecks passed:\n- `npm test`\n- Focused Ava regressions: 2 passed\n- `tsd`\n- Full Ava suite: 255 passed\n- `xo` with 3 existing warnings\n- `git diff --check`\n\nNo commit or dependency changes made.",
+        "commandClaims": "Final stated successful project commands are present in native traces with exit 0; no invented successful project command found. Two deadline runs have no final claim.",
+        "falseFullDeliveryClaim": false,
+        "limitation": null
+      }
+    },
+    {
+      "id": "b5821f78f41b",
+      "task": "listener-count-deduplicate",
+      "S": 1,
+      "rationale": "No material defect found in full diff. Set preserves string/symbol identity and existing per-name counting/validation; distinct names remain additive, no subscription mutation. Delivered regressions establish named/any/iterator state immediately before duplicate queries, include distinct same-description symbols, empty input, invalid trailing entry, and preserved totals. Public array type-use tests and accurate API docs supplied; existing tests preserved.",
+      "ordinaryProjectExit": 0,
+      "independentExit": 0,
+      "supplementaryEvidence": null,
+      "coverageGap": null,
+      "usableImplementationPatch": true,
+      "evaluationLimit": "Automated evaluator and project pass are necessary evidence, not sufficient full-delivery evidence.",
+      "reviewBlinding": "Full diffs reviewed without arm labels; final two clear-count slots inferable from timing. Mapping opened after written review notes; not strict fully blind grading.",
+      "slot": 25,
+      "arm": "H01",
+      "project": "emittery",
+      "patch": "patches/listener-count-deduplicate-H01.patch",
+      "nativeCompleted": true,
+      "slotWallMs": 267892,
+      "nativePhaseCount": 1,
+      "nativeSessionCount": 2,
+      "nativeToolCalls": 55,
+      "elapsedMs": 262495,
+      "timeout": false,
+      "workflowStatus": "incomplete",
+      "providerRequests": 33,
+      "requestsWithUsage": 33,
+      "requestsWithoutUsage": 0,
+      "knownUsage": {
+        "input_tokens": 1769834,
+        "output_tokens": 9153,
+        "total_tokens": 1778987,
+        "cached_tokens": 723968,
+        "reasoning_tokens": 5198
+      },
+      "usageIsComplete": true,
+      "components": {
+        "A": {
+          "deliveredEvents": 0,
+          "totalElapsedMs": 0
+        },
+        "B": {
+          "events": 7,
+          "executed": 3,
+          "totalElapsedMs": 10172.277379999992
+        }
+      },
+      "componentUsageIsNotQualityEvidence": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "claims": {
+        "finalPresent": true,
+        "authorFinal": "Implemented listener-count deduplication using `Set`, preserving symbol identity and validation.\n\nChanges:\n- Runtime behavior in `index.js`\n- Runtime regression covering listeners, any-listeners, iterators, symbols, validation, and state\n- TypeScript array usage regression\n- README and declaration documentation\n\nChecks:\n- Focused AVA regression: passed\n- Full AVA suite: 254 passed\n- `tsd`: passed\n- `npm run test`: passed\n- `git diff --check`: passed\n\nOnly existing XO warnings remain. No dependencies or commits changed.",
+        "commandClaims": "Final stated successful project commands are present in native traces with exit 0; no invented successful project command found. Two deadline runs have no final claim.",
+        "falseFullDeliveryClaim": false,
+        "limitation": null
+      }
+    },
+    {
+      "id": "15bcf4229dc5",
+      "task": "clear-queue-count",
+      "S": 1,
+      "rationale": "No material defect found. Reads queued size before original cleanup/replacement/events and returns saved count; active tracking/rate history/settlement semantics unchanged. Delivered regressions extend real paused and mixed active+queued tests with count assertions, empty/repeated clear, waiters/events and supported custom queue. Existing advanced abort-listener and unsettled-promise cases preserved (and some strengthened with returned counts). Public number return/type-use and docs supplied.",
+      "ordinaryProjectExit": 0,
+      "independentExit": 0,
+      "supplementaryEvidence": null,
+      "coverageGap": null,
+      "usableImplementationPatch": true,
+      "evaluationLimit": "Automated evaluator and project pass are necessary evidence, not sufficient full-delivery evidence.",
+      "reviewBlinding": "Full diffs reviewed without arm labels; final two clear-count slots inferable from timing. Mapping opened after written review notes; not strict fully blind grading.",
+      "slot": 26,
+      "arm": "H11",
+      "project": "p-queue",
+      "patch": "patches/clear-queue-count-H11.patch",
+      "nativeCompleted": true,
+      "slotWallMs": 563137,
+      "nativePhaseCount": 1,
+      "nativeSessionCount": 2,
+      "nativeToolCalls": 58,
+      "elapsedMs": 558886,
+      "timeout": false,
+      "workflowStatus": "incomplete",
+      "providerRequests": 30,
+      "requestsWithUsage": 30,
+      "requestsWithoutUsage": 0,
+      "knownUsage": {
+        "input_tokens": 1875307,
+        "output_tokens": 9850,
+        "total_tokens": 1885157,
+        "cached_tokens": 691200,
+        "reasoning_tokens": 5161
+      },
+      "usageIsComplete": true,
+      "components": {
+        "A": {
+          "deliveredEvents": 10,
+          "totalElapsedMs": 1203.7362109999776
+        },
+        "B": {
+          "events": 2,
+          "executed": 1,
+          "totalElapsedMs": 94758.09104300001
+        }
+      },
+      "componentUsageIsNotQualityEvidence": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "claims": {
+        "finalPresent": true,
+        "authorFinal": "Implemented `clear()` to return the number of queued tasks discarded, excluding active tasks.\n\nUpdated:\n- Runtime implementation and TypeScript declaration generation\n- Runtime regressions for paused, active/queued, empty/repeated, waiters/events, abort listeners, and custom queues\n- `tsd` type usage test\n- README and API JSDoc\n\nChecks:\n- Focused basic tests: 65 passed\n- Full `npm run test`: 208 passed\n- Build and `tsd`: passed\n- Existing 3 lint warnings remain; no errors\n- No commit or dependency changes made",
+        "commandClaims": "Final stated successful project commands are present in native traces with exit 0; no invented successful project command found. Two deadline runs have no final claim.",
+        "falseFullDeliveryClaim": false,
+        "limitation": null
+      }
+    },
+    {
+      "id": "a0fb6fe65bd4",
+      "task": "clear-queue-count",
+      "S": 1,
+      "rationale": "No material defect found. Reads queued size before original cleanup/replacement/events and returns saved count; active tracking/rate history/settlement semantics unchanged. Delivered regressions extend real paused and mixed active+queued tests with count assertions, empty/repeated clear, waiters/events and supported custom queue. Existing advanced abort-listener and unsettled-promise cases preserved (and some strengthened with returned counts). Public number return/type-use and docs supplied.",
+      "ordinaryProjectExit": 0,
+      "independentExit": 0,
+      "supplementaryEvidence": null,
+      "coverageGap": null,
+      "usableImplementationPatch": true,
+      "evaluationLimit": "Automated evaluator and project pass are necessary evidence, not sufficient full-delivery evidence.",
+      "reviewBlinding": "Full diffs reviewed without arm labels; final two clear-count slots inferable from timing. Mapping opened after written review notes; not strict fully blind grading.",
+      "slot": 27,
+      "arm": "H01",
+      "project": "p-queue",
+      "patch": "patches/clear-queue-count-H01.patch",
+      "nativeCompleted": true,
+      "slotWallMs": 620945,
+      "nativePhaseCount": 1,
+      "nativeSessionCount": 2,
+      "nativeToolCalls": 57,
+      "elapsedMs": 615591,
+      "timeout": false,
+      "workflowStatus": "incomplete",
+      "providerRequests": 34,
+      "requestsWithUsage": 34,
+      "requestsWithoutUsage": 0,
+      "knownUsage": {
+        "input_tokens": 2101279,
+        "output_tokens": 10343,
+        "total_tokens": 2111622,
+        "cached_tokens": 627712,
+        "reasoning_tokens": 5520
+      },
+      "usageIsComplete": true,
+      "components": {
+        "A": {
+          "deliveredEvents": 0,
+          "totalElapsedMs": 0
+        },
+        "B": {
+          "events": 8,
+          "executed": 2,
+          "totalElapsedMs": 183961.554459
+        }
+      },
+      "componentUsageIsNotQualityEvidence": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "claims": {
+        "finalPresent": true,
+        "authorFinal": "Implemented `clear(): number`.\n\n- Returns queued task count before clearing; active tasks excluded.\n- Preserves existing cleanup, replacement, notifications, rate-limit, and promise behavior.\n- Added regressions for paused/mixed queues, repeated clears, waiters/listeners, and custom queues.\n- Updated JSDoc, README, and `tsd` type coverage.\n\nChecks:\n- Focused clear tests: 7 passed.\n- Full `npm run test`: 208 passed, including `tsc` and `tsd`.\n- Existing 3 lint warnings remain.",
+        "commandClaims": "Final stated successful project commands are present in native traces with exit 0; no invented successful project command found. Two deadline runs have no final claim.",
+        "falseFullDeliveryClaim": false,
+        "limitation": null
+      }
+    },
+    {
+      "id": "9fe431c28a8b",
+      "task": "clear-queue-count",
+      "S": 1,
+      "rationale": "No material defect found. Reads queued size before original cleanup/replacement/events and returns saved count; active tracking/rate history/settlement semantics unchanged. Delivered regressions extend real paused and mixed active+queued tests with count assertions, empty/repeated clear, waiters/events and supported custom queue. Existing advanced abort-listener and unsettled-promise cases preserved (and some strengthened with returned counts). Public number return/type-use and docs supplied.",
+      "ordinaryProjectExit": 0,
+      "independentExit": 0,
+      "supplementaryEvidence": null,
+      "coverageGap": null,
+      "usableImplementationPatch": true,
+      "evaluationLimit": "Automated evaluator and project pass are necessary evidence, not sufficient full-delivery evidence.",
+      "reviewBlinding": "Full diffs reviewed without arm labels; final two clear-count slots inferable from timing. Mapping opened after written review notes; not strict fully blind grading.",
+      "slot": 28,
+      "arm": "H10",
+      "project": "p-queue",
+      "patch": "patches/clear-queue-count-H10.patch",
+      "nativeCompleted": true,
+      "slotWallMs": 407367,
+      "nativePhaseCount": 1,
+      "nativeSessionCount": 2,
+      "nativeToolCalls": 46,
+      "elapsedMs": 401942,
+      "timeout": false,
+      "workflowStatus": "incomplete",
+      "providerRequests": 19,
+      "requestsWithUsage": 19,
+      "requestsWithoutUsage": 0,
+      "knownUsage": {
+        "input_tokens": 1304457,
+        "output_tokens": 8314,
+        "total_tokens": 1312771,
+        "cached_tokens": 270848,
+        "reasoning_tokens": 4369
+      },
+      "usageIsComplete": true,
+      "components": {
+        "A": {
+          "deliveredEvents": 13,
+          "totalElapsedMs": 1511.6837520000117
+        },
+        "B": {
+          "events": 0,
+          "executed": 0,
+          "totalElapsedMs": 0
+        }
+      },
+      "componentUsageIsNotQualityEvidence": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "claims": {
+        "finalPresent": true,
+        "authorFinal": "Implemented `clear()` return counts.\n\n- Captures queued count before clearing; active tasks excluded.\n- Returns `0` for empty/repeated clears.\n- Preserves cleanup, notifications, rate-limit state, active work, and unsettled discarded promises.\n- Added regressions for paused, active-plus-queued, waiters/listeners, repeated clears, and custom queues.\n- Updated TypeScript type tests and README/API docs.\n\nChecks passed:\n- Targeted clear tests: 6/6\n- Full `npm test`: 209/209, build, and `tsd`\n- `git diff --check`\n\nOnly existing lint warnings remain.",
+        "commandClaims": "Final stated successful project commands are present in native traces with exit 0; no invented successful project command found. Two deadline runs have no final claim.",
+        "falseFullDeliveryClaim": false,
+        "limitation": null
+      }
+    },
+    {
+      "id": "e9f64e60ce17",
+      "task": "clear-queue-count",
+      "S": 1,
+      "rationale": "No material defect found. Captures queued count before all original clear side effects. Tests assert actual active/queued/running state, returned count, discarded promise nonsettlement, active completion, empty/repeated clearing, waiter event sequence, custom-class replacement/reuse, and add counts to existing abort/rate/strict preservation cases. Type-use and docs supplied. Temporal extraction means this newly available preview could be associated with H00, so blinding is partial rather than strict.",
+      "ordinaryProjectExit": 0,
+      "independentExit": 0,
+      "supplementaryEvidence": null,
+      "coverageGap": null,
+      "usableImplementationPatch": true,
+      "evaluationLimit": "Automated evaluator and project pass are necessary evidence, not sufficient full-delivery evidence.",
+      "reviewBlinding": "Full diffs reviewed without arm labels; final two clear-count slots inferable from timing. Mapping opened after written review notes; not strict fully blind grading.",
+      "slot": 29,
+      "arm": "H00",
+      "project": "p-queue",
+      "patch": "patches/clear-queue-count-H00.patch",
+      "nativeCompleted": true,
+      "slotWallMs": 374292,
+      "nativePhaseCount": 1,
+      "nativeSessionCount": 2,
+      "nativeToolCalls": 56,
+      "elapsedMs": 368805,
+      "timeout": false,
+      "workflowStatus": "incomplete",
+      "providerRequests": 27,
+      "requestsWithUsage": 27,
+      "requestsWithoutUsage": 0,
+      "knownUsage": {
+        "input_tokens": 2049598,
+        "output_tokens": 11134,
+        "total_tokens": 2060732,
+        "cached_tokens": 726528,
+        "reasoning_tokens": 6012
+      },
+      "usageIsComplete": true,
+      "components": {
+        "A": {
+          "deliveredEvents": 0,
+          "totalElapsedMs": 0
+        },
+        "B": {
+          "events": 0,
+          "executed": 0,
+          "totalElapsedMs": 0
+        }
+      },
+      "componentUsageIsNotQualityEvidence": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "claims": {
+        "finalPresent": true,
+        "authorFinal": "Implemented `clear(): number`.\n\n- Returns queued task count only; active tasks excluded.\n- Preserves cleanup, notifications, rate-limit state, tracking, and unsettled discarded promises.\n- Added regressions for paused, active-plus-queued, empty/repeated, waiters/listeners, abort cleanup, and custom queues.\n- Updated TypeScript tests and README API docs.\n\nChecks passed:\n- Focused regressions: 7 passed.\n- `npm test`: 209 passed, including build and `tsd`.\n- `git diff --check` passed.\n\nExisting lint warnings remain unchanged.",
+        "commandClaims": "Final stated successful project commands are present in native traces with exit 0; no invented successful project command found. Two deadline runs have no final claim.",
+        "falseFullDeliveryClaim": false,
+        "limitation": null
+      }
+    },
+    {
+      "id": "2fe419a56684",
+      "task": "clear-queue-count",
+      "S": 1,
+      "rationale": "No material defect found. Source captures queued size before original side effects and returns it. Delivered tests assert counts for paused, active/queued, repeated and supported custom queue; existing broader state/waiter/abort-listener/nonsettlement scenarios retained and some extended with counts. Public number return/type-use and docs supplied. This last preview is inferable as P from completion timing; blinding is partial.",
+      "ordinaryProjectExit": 0,
+      "independentExit": 0,
+      "supplementaryEvidence": null,
+      "coverageGap": null,
+      "usableImplementationPatch": true,
+      "evaluationLimit": "Automated evaluator and project pass are necessary evidence, not sufficient full-delivery evidence.",
+      "reviewBlinding": "Full diffs reviewed without arm labels; final two clear-count slots inferable from timing. Mapping opened after written review notes; not strict fully blind grading.",
+      "slot": 30,
+      "arm": "P",
+      "project": "p-queue",
+      "patch": "patches/clear-queue-count-P.patch",
+      "nativeCompleted": true,
+      "slotWallMs": 282745,
+      "nativePhaseCount": 1,
+      "nativeSessionCount": 1,
+      "nativeToolCalls": 48,
+      "elapsedMs": 277419,
+      "timeout": false,
+      "workflowStatus": null,
+      "providerRequests": 17,
+      "requestsWithUsage": 17,
+      "requestsWithoutUsage": 0,
+      "knownUsage": {
+        "input_tokens": 547554,
+        "output_tokens": 7441,
+        "total_tokens": 554995,
+        "cached_tokens": 201728,
+        "reasoning_tokens": 3074
+      },
+      "usageIsComplete": true,
+      "components": {
+        "A": {
+          "deliveredEvents": 0,
+          "totalElapsedMs": 0
+        },
+        "B": {
+          "events": 0,
+          "executed": 0,
+          "totalElapsedMs": 0
+        }
+      },
+      "componentUsageIsNotQualityEvidence": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "claims": {
+        "finalPresent": true,
+        "authorFinal": "Implemented `clear(): number`.\n\n- Returns only queued tasks discarded; active tasks are excluded.\n- Preserves cleanup, notifications, rate-limit state, running-task tracking, and unresolved discarded promises.\n- Added regressions for paused queues, active/queued mixes, repeated clears, waiters/listeners, and custom queue classes.\n- Updated TypeScript usage tests, generated declaration, and README API docs.\n\nValidation: `npm test` passed all 209 tests, including lint, TypeScript compilation, and `tsd`. Existing lint warnings remain unchanged.",
+        "commandClaims": "Final stated successful project commands are present in native traces with exit 0; no invented successful project command found. Two deadline runs have no final claim.",
+        "falseFullDeliveryClaim": false,
+        "limitation": null
+      }
+    }
+  ]
+}
