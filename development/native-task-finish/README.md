@@ -1,5 +1,9 @@
 # Native task development cycle
 
+The [final development result](RESULTS.md) records all 48 attempts, the installed
+candidate and why independent evaluation was not admitted. The chronology below
+preserves the decisions and outcomes of each revision.
+
 This new cycle starts at PR #25 head `97b384134b16c5e38fdbae6054fd938c74049d88`.
 Historical campaigns remain closed. The allowance is 48 development runs, including
 paid smokes, and conditionally one independent 40-pair evaluation. All scored stages
@@ -200,3 +204,13 @@ corrective revision includes grep in the same completed-source-operation handlin
 as read, preserving concurrency/snapshot checks and retaining the error without
 replay. The last two development slots compare this corrected revision; this is
 not a replacement for the failed operational outcome or independent evidence.
+
+
+Final corrected source `4203021dc7eb41172baa62a1932e46576fa21100` completed its
+one recovery pair: H 1/1 and P 1/1 full, with normal local completion for both.
+H used 383.453 seconds / 35 requests; P 504.314 seconds / 54 requests. No actual
+grep error occurred in that scored run; native preflight exercises the correction.
+All 48 development attempts are complete and 0 independent attempts started.
+The selected approach remains tied in full deliveries and lacks the required
+positive balance and repeat. The installed candidate is an experimental engineering
+delivery; the goal of improved Luna quality has not been achieved.
