@@ -29,9 +29,11 @@ try{
  for(const tool of ['read','glob','edit','bash'])assert.ok(saved.events.some(e=>e.tool===tool&&e.state==='completed'),tool);
  if(process.env.NATIVE_TASK_FIXTURE_PARALLEL){assert.equal(saved.events.filter(e=>e.state==='error').length,process.env.NATIVE_TASK_FIXTURE_PARALLEL==='1'?0:1);const edit=saved.events.find(e=>e.tool==='edit'),check=saved.events.find(e=>e.args?.command==='node --test');assert.ok(edit.completedAt<=check.startedAt);assert.equal(check.before,edit.after);}
  if(process.env.NATIVE_TASK_FIXTURE_PARALLEL==='denial')assert.equal(saved.report.permissionContinuations.length,1);
- if(['check-first','direct'].includes(f.strategy)&&process.env.NATIVE_TASK_FIXTURE_PARALLEL==='read-error') {
-  const error=saved.events.find(e=>e.tool==='read'&&e.state==='error');
-  assert.equal(error.args.offset,130);assert.equal(error.before,error.after);assert.equal(error.permissionDenied,false);
+ if(['check-first','direct'].includes(f.strategy)&&['read-error','grep-error'].includes(process.env.NATIVE_TASK_FIXTURE_PARALLEL)) {
+  const tool=process.env.NATIVE_TASK_FIXTURE_PARALLEL==='grep-error'?'grep':'read';
+  const error=saved.events.find(e=>e.tool===tool&&e.state==='error');
+  if(tool==='grep'){assert.equal(error.args.pattern,'{invalid-json');assert.match(error.output,/regex parse error/);}else assert.equal(error.args.offset,130);
+  assert.equal(error.before,error.after);assert.equal(error.permissionDenied,false);
   assert.ok(Number.isFinite(error.nativeTime?.end));
   assert.ok(saved.events.some(e=>['read','glob','grep'].includes(e.tool)&&e.state==='completed'&&e.startedAt<=error.completedAt&&e.completedAt>=error.completedAt),'A companion read overlaps the completed error');
   assert.equal(saved.report.permissionContinuations.length,0);

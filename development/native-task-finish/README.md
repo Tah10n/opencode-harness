@@ -182,3 +182,21 @@ The six remaining development attempts are allocated to queue draining, revoked
 connector recovery and a same-version repeat of recovery. These choices are fixed
 before their outcomes. This revision still needs installed validation and actual
 full-delivery evidence; removing stages alone does not meet the goal.
+
+Direct candidate `67f8e948da309d13d48822df9c5820e334ae6f2f` completed two pairs:
+H 2/2 full patches and P 2/2, with no win or loss. H used 574.299 seconds and 62
+requests versus P 502.167 seconds and 46 requests; usage is known. The queue H
+completed normally. The recovery H was stopped by the controller on a completed
+native grep regex error after its last test-fixture correction. Its saved code,
+regressions and docs were complete: independent recovery/lifecycle checks and the
+entire final connector suite of 167 tests (162 pass, 5 platform skips) passed after capture.
+That external verification does not turn the failed native handoff into normal
+completion. Forty-six development attempts are preserved.
+
+The planned same-SHA repeat was not started because this known serious normal-tool
+continuation defect must not be ignored. A bounded reproduction confirms the
+matching before hook, completed native timestamps and unchanged snapshot. The
+corrective revision includes grep in the same completed-source-operation handling
+as read, preserving concurrency/snapshot checks and retaining the error without
+replay. The last two development slots compare this corrected revision; this is
+not a replacement for the failed operational outcome or independent evidence.

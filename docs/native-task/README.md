@@ -215,14 +215,14 @@ delivery uncertainty remain. Duplicate events for one call do not spend another
 allowance. Another denial, an explicit reject (including a nearby reject event),
 cancellation, unknown execution state or an external edit prevents continuation.
 
-Ordinary native `read`, `edit` and `apply_patch` errors may return to the author
+Ordinary native `read`, `grep`, `edit` and `apply_patch` errors may return to the author
 when the matching before hook and native terminal timestamps confirm completion
 and the expected file state is unchanged. Edit and patch errors require exclusive
-execution. A completed read error may coexist with other identified, admitted
+execution. A completed read/grep error may coexist with other identified, admitted
 read/glob/grep calls on the same snapshot; queued writers still wait for every
 pending read to finish. An untracked live tool is not covered by this rule.
-A missing file, out-of-range read offset or unmatched edit context stays an error;
-it does not consume the permission allowance or create a `permissionContinuations`
+A missing file, out-of-range read offset, invalid grep regex or unmatched edit
+context stays an error; it does not consume the permission allowance or create a `permissionContinuations`
 entry. The author may choose another permitted action. Missing completion evidence,
 unexpected file changes and process errors with uncertain execution still stop
 the workflow.

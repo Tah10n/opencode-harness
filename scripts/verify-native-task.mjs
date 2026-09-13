@@ -210,7 +210,10 @@ try {
   const automatic='The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules '+JSON.stringify([{permission:'*',pattern:'*',action:'allow'},{permission:'external_directory',pattern:'*',action:'deny'}]);
   assert.equal(nativePermissionKind(automatic),'automatic');
   for(const text of ['permission denied','File not found: '+automatic,automatic+' trailing',automatic.replace('"deny"','"bogus"')])assert.equal(nativePermissionKind(text),'unknown');
+  // Recorded native grep output; parser execution is covered by the installed fixture.
+  const grepError='rg: regex parse error:\n    {invalid-json\n    ^\nerror: repetition quantifier expects a valid decimal';
   async function scenario(name,mode,barrier=async()=>{}) {
+   const readMode=mode.replace(/^grep-/,'read-'),fileErrorMode=mode.replace(/^parallel-grep-error/,'parallel-file-error');
    const parent='continuation-parent-'+name,childID='continuation-child-'+name,controller=new AbortController();
    let hooks,worktree,abortCalls=0,promptCalls=0;const parts=new Map();
    const input=(id,tool='bash')=>({sessionID:childID,callID:id,tool});
@@ -233,8 +236,9 @@ try {
      promptCalls++;
      if(promptCalls>1){assert.ok(['missing-check','real-failure'].includes(mode));if(mode==='real-failure')await execute('check-'+promptCalls,['--test']);return{data:{info:{finish:'stop'},parts:[]}};}
      await barrier();
-     if (mode.startsWith('parallel-file-error')) {
-      for (const [id,tool] of [['reading','read'],['searching','grep'],['failed','read']]) {
+     if (fileErrorMode.startsWith('parallel-file-error')) {
+      const failedTool=mode.startsWith('parallel-grep-error')?'grep':'read';
+      for (const [id,tool] of [['reading','read'],['searching','grep'],['failed',failedTool]]) {
        await hooks['tool.execute.before'](input(id,tool));
        await event(id,{status:'running',input:{}},tool);
       }
@@ -244,11 +248,11 @@ try {
       waiting.catch(()=>{});
       await new Promise(resolve=>setImmediate(resolve));
       assert.equal(checkAdmitted,false);
-      if(mode==='parallel-file-error-untracked')await event('untracked-read',{status:'running',input:{filePath:'value.test.mjs'}},'read');
-      if(mode==='parallel-file-error-changed')fs.writeFileSync(path.join(worktree,'outside.txt'),'external change');
-      await event('failed',{status:'error',input:{filePath:'value.test.mjs',offset:130},error:'Offset 130 is out of range for this file (1 lines)',time:{start,...(mode==='parallel-file-error-no-end'?{}:{end:Date.now()})}},'read');
+      if(fileErrorMode==='parallel-file-error-untracked')await event('untracked-read',{status:'running',input:{filePath:'value.test.mjs'}},'read');
+      if(fileErrorMode==='parallel-file-error-changed')fs.writeFileSync(path.join(worktree,'outside.txt'),'external change');
+      await event('failed',{status:'error',input:failedTool==='grep'?{pattern:'{invalid-json',path:'value.test.mjs'}:{filePath:'value.test.mjs',offset:130},error:failedTool==='grep'?grepError:'Offset 130 is out of range for this file (1 lines)',time:{start,...(fileErrorMode==='parallel-file-error-no-end'?{}:{end:Date.now()})}},failedTool);
       assert.equal(checkAdmitted,false,'Check must still wait for both admitted reads');
-      if(mode==='parallel-file-error-late-change')fs.writeFileSync(path.join(worktree,'outside.txt'),'external change after failed read');
+      if(fileErrorMode==='parallel-file-error-late-change')fs.writeFileSync(path.join(worktree,'outside.txt'),'external change after failed read');
       for (const [id,tool] of [['reading','read'],['searching','grep']]) {
        await hooks['tool.execute.after']({...input(id,tool),args:{filePath:'value.test.mjs'}},{output:fs.readFileSync(path.join(worktree,'value.test.mjs'),'utf8'),metadata:{}});
        await event(id,{status:'completed',input:{},output:'read complete'},tool);
@@ -301,18 +305,20 @@ try {
       await settled;return{data:{info:{finish:'stop'},parts:[]}};
      }
      if(mode==='no-denial'){await execute('check',['--test']);return{data:{info:{finish:'stop'},parts:[]}};}
-     if(mode.startsWith('read-')){
-      await hooks['tool.execute.before'](input('read-error','read'));
+     if(readMode.startsWith('read-')){
+      const failedTool=mode.startsWith('grep-')?'grep':'read';
+      await hooks['tool.execute.before'](input('read-error',failedTool));
       const start=Date.now();let message;
-      try{fs.readFileSync(path.join(worktree,'missing.mjs'));assert.fail('Missing file unexpectedly exists');}catch(e){assert.equal(e.code,'ENOENT');message=e.message;}
-      if(mode==='read-changed')fs.writeFileSync(path.join(worktree,'external.txt'),'user save');
-      if(mode==='read-live')await event('untracked',{status:'running',input:{}},'unknown');
-      await event('read-error',{status:'error',input:{filePath:'missing.mjs'},error:message,time:{start,...(mode==='read-no-end'?{}:{end:Date.now()})}},'read');
-      if(['read-no-end','read-changed','read-live'].includes(mode)){
+      if(failedTool==='grep')message=grepError;
+      else try{fs.readFileSync(path.join(worktree,'missing.mjs'));assert.fail('Missing file unexpectedly exists');}catch(e){assert.equal(e.code,'ENOENT');message=e.message;}
+      if(readMode==='read-changed')fs.writeFileSync(path.join(worktree,'external.txt'),'user save');
+      if(readMode==='read-live')await event('untracked',{status:'running',input:{}},'unknown');
+      await event('read-error',{status:'error',input:failedTool==='grep'?{pattern:'{invalid-json',path:'value.test.mjs'}:{filePath:'missing.mjs'},error:message,time:{start,...(readMode==='read-no-end'?{}:{end:Date.now()})}},failedTool);
+      if(['read-no-end','read-changed','read-live'].includes(readMode)){
        await assert.rejects(hooks['chat.params']({sessionID:childID}));return{data:{info:{finish:'stop'},parts:[]}};
       }
       await hooks['chat.params']({sessionID:childID});
-      if(mode==='read-terminal'){await execute('check',['--test']);return{data:{info:{finish:'stop'},parts:[]}};}
+      if(readMode==='read-terminal'){await execute('check',['--test']);return{data:{info:{finish:'stop'},parts:[]}};}
      }
      if(mode==='preserve-check')await execute('earlier-check',['--test']);
      if(mode!=='missing-before')await hooks['tool.execute.before'](input('denied',mode==='other-tool'?'read':'bash'));
@@ -330,7 +336,7 @@ try {
      if(mode==='cancel-after')controller.abort();
      if(mode==='conflicting-tool')await error('denied',automatic,'read');
      if(mode==='conflicting-duplicate')await error('denied','Different native error');
-     const admitted=['read-before-denial','continued','duplicate','second-denial','preserve-check','missing-check','real-failure'].includes(mode);
+     const admitted=['grep-before-denial','read-before-denial','continued','duplicate','second-denial','preserve-check','missing-check','real-failure'].includes(mode);
      if(!admitted){await assert.rejects(hooks['chat.params']({sessionID:childID}));return{data:{info:{finish:'stop'},parts:[]}};}
      await hooks['chat.params']({sessionID:childID});
      const system={system:[]};await hooks['experimental.chat.system.transform']({sessionID:childID},system);
@@ -357,23 +363,23 @@ try {
     await hooks['chat.message']({sessionID:parent},{message:{agent:'build',model:{providerID:'fixture',modelID:'fixture'}}});
     const result=JSON.parse(await hooks.tool.harness_task.execute({}, {sessionID:parent,abort:controller.signal,ask:async()=>{},metadata:async()=>{}}));
     const log=JSON.parse(fs.readFileSync(path.join(result.artifacts,'tool-events.json')));
-    const passing=['parallel-file-error','read-terminal','read-before-denial','continued','duplicate','preserve-check','no-denial','queued-tools','queued-read-error','queued-preflight'].includes(mode);
+    const passing=['grep-terminal','grep-before-denial','parallel-grep-error','parallel-file-error','read-terminal','read-before-denial','continued','duplicate','preserve-check','no-denial','queued-tools','queued-read-error','queued-preflight'].includes(mode);
     assert.equal(result.status,passing?'checks_passed':mode.startsWith('cancel-')?'cancelled':'incomplete',name);
-    const allowed=['read-before-denial','continued','duplicate','second-denial','reject-after','cancel-after','conflicting-duplicate','conflicting-tool','preserve-check','missing-check','real-failure','queued-preflight'].includes(mode);
+    const allowed=['grep-before-denial','read-before-denial','continued','duplicate','second-denial','reject-after','cancel-after','conflicting-duplicate','conflicting-tool','preserve-check','missing-check','real-failure','queued-preflight'].includes(mode);
     assert.equal(result.permissionContinuations.length,allowed?1:0,name);
     assert.equal(result.termination.verified,true,name);
     assert.equal(result.repairs,['missing-check','real-failure'].includes(mode)?2:0,name);
     if(passing||['missing-check','real-failure'].includes(mode))assert.equal(abortCalls,0,name);else assert.equal(abortCalls,1,name);
-    if(mode.startsWith('read-')){
+    if(readMode.startsWith('read-')){
      const failedRead=log.find(e=>e.callID==='read-error');
-     assert.equal(failedRead.state,'error');assert.equal(failedRead.permissionDenied,false);assert.equal(failedRead.args.filePath,'missing.mjs');
-     if(mode==='read-changed')assert.equal(result.terminalReason.kind,'scope_violation');
-     if(mode==='read-terminal')assert.deepEqual(result.permissionContinuations,[]);
+     assert.equal(failedRead.state,'error');assert.equal(failedRead.permissionDenied,false);if(mode.startsWith('grep-')){assert.equal(failedRead.tool,'grep');assert.equal(failedRead.args.pattern,'{invalid-json');assert.match(failedRead.output,/regex parse error/);}else assert.equal(failedRead.args.filePath,'missing.mjs');
+     if(readMode==='read-changed')assert.equal(result.terminalReason.kind,'scope_violation');
+     if(readMode==='read-terminal')assert.deepEqual(result.permissionContinuations,[]);
     }
-    if(mode==='parallel-file-error-late-change'){assert.equal(result.terminalReason.kind,'scope_violation');assert.ok(!log.some(e=>e.callID==='queued-check'&&e.state==='completed'));}
-    if(mode==='parallel-file-error') {
+    if(fileErrorMode==='parallel-file-error-late-change'){assert.equal(result.terminalReason.kind,'scope_violation');assert.ok(!log.some(e=>e.callID==='queued-check'&&e.state==='completed'));}
+    if(fileErrorMode==='parallel-file-error') {
      const failed=log.find(e=>e.callID==='failed');assert.equal(failed.state,'error');assert.equal(failed.permissionDenied,false);
-     assert.equal(failed.args.offset,130);assert.match(failed.output,/Offset 130 is out of range/);
+     if(mode.startsWith('parallel-grep-error')){assert.equal(failed.tool,'grep');assert.equal(failed.args.pattern,'{invalid-json');assert.match(failed.output,/regex parse error/);}else{assert.equal(failed.args.offset,130);assert.match(failed.output,/Offset 130 is out of range/);}
      assert.equal(log.filter(e=>e.callID==='failed').length,1);
      const checked=log.find(e=>e.callID==='queued-check');
      for(const id of ['reading','searching'])assert.ok(log.find(e=>e.callID===id).completedAt<=checked.startedAt);
@@ -391,7 +397,7 @@ try {
     return result;
    }finally{await hooks.event({event:{type:'command.executed',properties:{name:'harness-task',sessionID:parent}}});}
   }
-  for(const mode of ['parallel-file-error','parallel-file-error-untracked','parallel-file-error-changed','parallel-file-error-late-change','parallel-file-error-no-end','read-terminal','read-before-denial','read-no-end','read-changed','read-live','continued','duplicate','second-denial','reject-before','reject-after','cancel-before','cancel-after','unknown','after-start','outside-change','parallel-tool','missing-before','other-tool','conflicting-duplicate','conflicting-tool','preserve-check','missing-check','real-failure','no-denial','queued-tools','cancel-queued','queued-read-error','queued-preflight'])await scenario(mode,mode);
+  for(const mode of ['grep-terminal','grep-before-denial','grep-no-end','grep-changed','grep-live','parallel-grep-error','parallel-grep-error-untracked','parallel-grep-error-changed','parallel-grep-error-late-change','parallel-grep-error-no-end','parallel-file-error','parallel-file-error-untracked','parallel-file-error-changed','parallel-file-error-late-change','parallel-file-error-no-end','read-terminal','read-before-denial','read-no-end','read-changed','read-live','continued','duplicate','second-denial','reject-before','reject-after','cancel-before','cancel-after','unknown','after-start','outside-change','parallel-tool','missing-before','other-tool','conflicting-duplicate','conflicting-tool','preserve-check','missing-check','real-failure','no-denial','queued-tools','cancel-queued','queued-read-error','queued-preflight'])await scenario(mode,mode);
   // Both native workflows coexist before either emits its first denial; the
   // same callID in each must consume only that workflow's own allowance.
   let entered=0,release;const ready=new Promise(resolve=>{release=resolve;});
