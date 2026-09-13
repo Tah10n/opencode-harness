@@ -1,4 +1,4 @@
-// Frozen six-task five-arm factorial using the established managed-deadline scheduler.
+// Frozen primary or conditional transfer comparison using the same managed-deadline scheduler.
 // A/B do not add a phase or an intermediate model deadline.
 import fs from 'node:fs';import path from 'node:path';import {createHash} from 'node:crypto';
 import {runTask} from './native-run.mjs';
@@ -6,10 +6,15 @@ export async function runComparison({root,startContainer,captureCandidate,stopWo
 const f=JSON.parse(fs.readFileSync(path.join(root,'freeze.json')));
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 function verify(){
- if(f.attempts.length!==30||f.model!=='openai/gpt-5.6-luna'||f.variant!=='high'||f.budgetMs!==900000||!f.preflightPassed)throw Error('Invalid development configuration');
+ const transfer=f.experimentKind==='transfer';
+ if(f.attempts.length!==(transfer?8:30)||f.model!=='openai/gpt-5.6-luna'||f.variant!=='high'||f.budgetMs!==900000||!f.preflightPassed)throw Error('Invalid development configuration');
  for(const [file,digest] of Object.entries(f.files))if(sha(fs.readFileSync(file))!==digest)throw Error('Frozen file changed: '+file);
  const groups=new Map();for(const a of f.attempts){const group=groups.get(a.task)??[];group.push(a.arm);groups.set(a.task,group);}
- if(groups.size!==6||[...groups.values()].some(x=>x.slice().sort().join(',')!=='H00,H01,H10,H11,P'))throw Error('Invalid pair schedule');
+ if(transfer){
+  if(!['H10','H01','H11'].includes(f.selectedH)||f.transferGatePassed!==true||groups.size!==2)throw Error('Invalid transfer gate or candidate');
+  for(const task of groups.keys())for(const repetition of [1,2]){const pair=f.attempts.filter(a=>a.task===task&&a.repetition===repetition).map(a=>a.arm).sort();if(pair.join(',')!==[f.selectedH,'P'].sort().join(','))throw Error('Invalid transfer pair');}
+ }else if(groups.size!==6||[...groups.values()].some(x=>x.slice().sort().join(',')!=='H00,H01,H10,H11,P'))throw Error('Invalid pair schedule');
+ if(new Set(f.attempts.map(a=>a.slot)).size!==f.attempts.length||f.attempts.some((a,i)=>a.slot!==i+1))throw Error('Invalid slot identity');
 }
 
 verify();if(fs.existsSync(path.join(root,'scheduling-paused.json')))throw Error('Continuation paused; no automatic resume');
@@ -17,7 +22,7 @@ verify();if(fs.existsSync(path.join(root,'scheduling-paused.json')))throw Error(
 let pause=null;
 function pauseScheduling(kind,slot,details={}){if(pause)return;pause={kind,slot,...details};fs.writeFileSync(path.join(root,'scheduling-paused.json'),JSON.stringify(pause,null,2),{flag:'wx'});}
 for(const attempt of f.attempts){
- verify();if(pause)break;const out=path.join(root,'runs',attempt.task+'-'+attempt.arm);
+ verify();if(pause)break;const out=path.join(root,'runs',attempt.task+(f.experimentKind==='transfer'?'-r'+attempt.repetition:'')+'-'+attempt.arm);
  if(fs.existsSync(out))throw Error('Previously created slot must never be retried: '+out);
  fs.mkdirSync(out,{recursive:true,mode:0o700});fs.writeFileSync(path.join(out,'started.json'),JSON.stringify({...attempt,at:new Date().toISOString()},null,2),{flag:'wx'});
  const requests=[],active=new Set(),abort=new AbortController();let session,deadline=null,timer,result,terminationVerified=false,forwardingOpen=true,deadlineTriggered=false,captureSaved=false,relayRemoved=false;
