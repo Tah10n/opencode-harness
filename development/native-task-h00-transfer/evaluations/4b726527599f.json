@@ -1,0 +1,150 @@
+{
+  "id": "4b726527599f",
+  "task": "fastq-on-idle",
+  "project": "fastq",
+  "Q": 0,
+  "ordinaryProjectExit": 0,
+  "originalIndependentExit": 0,
+  "interpretedIndependentExit": 0,
+  "patchApplicable": true,
+  "sourcePatchSha256": "c434634eba396336d39829dbb67acebee865d145f169c4ae67798766bee561f9",
+  "decision": "Full delivery does not satisfy the frozen rubric.",
+  "findings": [
+    {
+      "category": "required-coverage-loss",
+      "reason": "Delivered tests pass when kill/killAndDrain prematurely resolve onIdle while workers remain active. Both control suites detect the same specified error."
+    }
+  ],
+  "contentReview": {
+    "id": "4b726527599f",
+    "task": "fastq-on-idle",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete",
+    "retainedTestsReview": "Existing regression cases remain unchanged.",
+    "behaviorReview": "Independent resolver list plus suppression during drain/abort callbacks; resolveIdle occurs after callbacks and uses actual idle state, without replacing user drain. Existing release/abort behavior retained apart from added notification. Runtime confirmation pending.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": "pending sensitivity",
+        "evidence": "Active-work subscriber flags are checked only synchronously; paused check uses process.nextTick, whose ordering versus Promise reactions must be verified before crediting it as a pending-state test."
+      },
+      {
+        "scenario": 2,
+        "covered": "pending sensitivity",
+        "evidence": "Drain reference/count and reentrant work are checked. Workers finish via nextTick and pending flag is asserted inside the drain callback; potential premature promise settlement may remain invisible before microtask reactions."
+      },
+      {
+        "scenario": 3,
+        "covered": "partial",
+        "evidence": "Idle kill/killAndDrain and active kill/killAndDrain have exact state assertions, but active subscriber flag is checked synchronously and workers are immediately completed. Promise abort test does await immediate while worker is blocked and therefore meaningfully distinguishes premature abort resolution."
+      }
+    ],
+    "typesReview": "Public Promise<void> signature and existing consumer calls/awaits onIdle.",
+    "docsReview": "README explains independent subscribers, both queue variants, idle definition and synchronous drain work.",
+    "contentFindings": [
+      {
+        "category": "required-coverage-loss",
+        "requirement": "Kill/killAndDrain waiters stay pending until running work finishes.",
+        "evidence": "Flag assertions occur before a Promise reaction can execute; both workers are finished before waiting for subscription reactions.",
+        "confirmationPending": "Run the same narrow early-kill-resolution mutation on independent copies of all onIdle patches and controls."
+      }
+    ],
+    "recordStage": "Pre-unblinding content review; final decision is top-level Q."
+  },
+  "applicability": {
+    "id": "4b726527599f",
+    "task": "fastq-on-idle",
+    "sourceCommit": "fe2d23196a005810dfcbc4103b3c746cc5542430",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "c434634eba396336d39829dbb67acebee865d145f169c4ae67798766bee561f9",
+    "excludedPreparationArtifacts": [
+      "package-lock.json"
+    ],
+    "types": null
+  },
+  "verificationNotes": {
+    "qualityAssignedBeforeArmMappingRead": true,
+    "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+  },
+  "slot": 11,
+  "arm": "H00",
+  "D": 0,
+  "native": {
+    "completed": true,
+    "exitCode": 0,
+    "signal": null,
+    "lastStepFinish": "stop",
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "normalHandoff": true,
+    "workflowStatus": "incomplete",
+    "terminalPatchVerification": {
+      "slot": 11,
+      "id": "4b726527599f",
+      "terminalPatchSha256": "0a34a225d6c88c7bec5de1c2d64642be2c201a584d568d89533e5960504ed22d",
+      "terminalPatchEqualsApplicableSourcePatch": false,
+      "ordinaryAppliedCopyReverseCheckExit": 0,
+      "diagnostic": "",
+      "nativeHandoffNamesDeliveryAndPatch": true,
+      "ordinaryCleanSourceForwardApplyExit": 0,
+      "terminalPatchDeliversAllAuthorBytesAndModes": true
+    },
+    "finalResponseSha256": "d72b9a75cfa05d8da5bdcb30937a96d0674982c2ffe947b03f388c82fbb1a77c",
+    "finalResponseExcerpt": "Native task workflow: incomplete.\nDelivery worktree: /work/repo/.git/harness-task/395aa48f-b6db-4395-846a-912dccee68e6/worktree.\nTerminal patch: /work/repo/.git/harness-task/395aa48f-b6db-4395-846a-912dccee68e6/terminal.patch.\nFull report and tool outputs: /work/repo/.git/harness-task/395aa48f-b6db-4395-846a-912dccee68e6.\nOriginal checkout unchanged by workflow transfer.",
+    "reportFindings": [
+      {
+        "category": "misleading-workflow-report",
+        "evidence": "Normal final response lists successful project commands but says No observed relevant project test/check and Executable project verification unavailable or not observed. Delivery worktree and terminal patch are correctly named and usable; this contradiction does not alone remove D."
+      }
+    ]
+  },
+  "verification": [
+    {
+      "artifact": "ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 4602,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "supplemental/early-kill-test-sensitivity/result.json",
+      "exit": 0,
+      "elapsedMs": 3317,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "",
+      "fullLocalOutputSha256": "ec0a91d5dfee82fe309bc84b88439a0f44fecdec37b17cbbea9b27f0e8ad9a32"
+    },
+    {
+      "artifact": "supplemental/idle-transition/result.json",
+      "exit": 0,
+      "elapsedMs": 3224,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "{\"idleTransitionObserved\":true,\"oldSubscriptionResolvedBeforeLaterWorkFinished\":true}",
+      "fullLocalOutputSha256": "2d4b4f14a7b2bb9b24bbdf32e4f9645dffc2953e3723f0407445286e0d3b4c6b"
+    },
+    {
+      "artifact": "independent/result.json",
+      "exit": 0,
+      "elapsedMs": 1843,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    }
+  ]
+}

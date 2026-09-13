@@ -1,0 +1,126 @@
+{
+  "id": "e01efb782e8c",
+  "task": "denque-rotate",
+  "project": "denque",
+  "Q": 1,
+  "ordinaryProjectExit": 0,
+  "originalIndependentExit": 0,
+  "interpretedIndependentExit": 0,
+  "patchApplicable": true,
+  "sourcePatchSha256": "ef746782f725c4977bdaf00a0de93d059a9849d1486f7b2526ece5f281d015a2",
+  "decision": "Full required delivery verified.",
+  "findings": [],
+  "contentReview": {
+    "id": "e01efb782e8c",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete",
+    "retainedTestsReview": "Existing independent regression cases are not removed or changed.",
+    "task": "denque-rotate",
+    "behaviorReview": "Validates first, normalizes modulo length, snapshots referenced values using wrapped indexes then writes same logical slots; storage/positions/capacity unchanged. Runtime confirmation pending.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": true,
+        "evidence": "Exact orders and this are asserted for default, zero, positive/negative steps, beyond-length counts, and MAX_VALUE without per-step looping."
+      },
+      {
+        "scenario": 2,
+        "covered": true,
+        "evidence": "Capacity-3 queue with three object values shifts then pushes to wrap; rotates, checks all peeks and storage/capacity, then shift/pop/push/unshift/remove reuse with exact order."
+      },
+      {
+        "scenario": 3,
+        "covered": true,
+        "evidence": "Invalid nonnumber/noninteger/nonfinite cases leave sequence and storage intact. Successful wrapped rotation checks reference identities using strict peek assertions. Empty/singleton queues are rotated and reused."
+      }
+    ],
+    "typesReview": "rotate(steps?: number): this plus existing consumer fixture invoking default/negative and assigning return to Denque<string>.",
+    "docsReview": "README and API docs cover direction, default, normalized counts, no-ops and atomic validation.",
+    "contentFindings": [],
+    "recordStage": "Pre-unblinding content review; final decision is top-level Q."
+  },
+  "applicability": {
+    "id": "e01efb782e8c",
+    "task": "denque-rotate",
+    "sourceCommit": "539105bb57854e997dd469221cdc52a0ad80e0a2",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "ef746782f725c4977bdaf00a0de93d059a9849d1486f7b2526ece5f281d015a2",
+    "excludedPreparationArtifacts": [],
+    "types": null
+  },
+  "verificationNotes": {
+    "qualityAssignedBeforeArmMappingRead": true,
+    "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+  },
+  "slot": 2,
+  "arm": "H00",
+  "D": 1,
+  "native": {
+    "completed": true,
+    "exitCode": 0,
+    "signal": null,
+    "lastStepFinish": "stop",
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "normalHandoff": true,
+    "workflowStatus": "incomplete",
+    "terminalPatchVerification": {
+      "slot": 2,
+      "id": "e01efb782e8c",
+      "terminalPatchSha256": "36304d95ace28f14ed3973166eabaa6fbd5c93016bf4cf9b1560732972cf242c",
+      "terminalPatchEqualsApplicableSourcePatch": false,
+      "ordinaryAppliedCopyReverseCheckExit": 0,
+      "diagnostic": "",
+      "nativeHandoffNamesDeliveryAndPatch": true,
+      "ordinaryCleanSourceForwardApplyExit": 0,
+      "terminalPatchDeliversAllAuthorBytesAndModes": true
+    },
+    "finalResponseSha256": "9b13a40b4ce1c7c562ce0f03c767bd3e3a0971e6a249488681b3425f25bb8f85",
+    "finalResponseExcerpt": "Native task workflow: incomplete.\nDelivery worktree: /work/repo/.git/harness-task/59f09af5-837d-44c0-a8ee-641279fd46f2/worktree.\nTerminal patch: /work/repo/.git/harness-task/59f09af5-837d-44c0-a8ee-641279fd46f2/terminal.patch.\nFull report and tool outputs: /work/repo/.git/harness-task/59f09af5-837d-44c0-a8ee-641279fd46f2.\nOriginal checkout unchanged by workflow transfer.",
+    "reportFindings": [
+      {
+        "category": "misleading-workflow-report",
+        "evidence": "Normal final response lists successful project commands but says No observed relevant project test/check and Executable project verification unavailable or not observed. Delivery worktree and terminal patch are correctly named and usable; this contradiction does not alone remove D."
+      }
+    ]
+  },
+  "verification": [
+    {
+      "artifact": "ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 1588,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "independent/result.json",
+      "exit": 0,
+      "elapsedMs": 637,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "test-sensitivity/result.json",
+      "exit": 2,
+      "elapsedMs": 1084,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "\n  54 passing (202ms)\n  2 failing\n\n  1) Denque.prototype.rotate should rotate wrapped capacity-bound storage without dropping values:\n\n      AssertionError [ERR_ASSERTION]: Values have same structure but are not reference-equal:\n\n{}\n\n  54 passing (202ms)\n  2 failing\n\n  1) Denque.prototype.rotate should rotate wrapped capacity-bound storage without dropping values:\n\n      AssertionError [ERR_ASSERTION]: Values have same structure but are not reference-equal:\n\n{}\n\n      + expected - actual\n\n      AssertionError [ERR_ASSERTION]: Values have same structure but are not reference-equal:\n\n{}\n\n      + expected - actual\n\n      \n      at Context.<anonymous> (test/denque.js:120:12)\n      at process.processImmediate (node:internal/timers:534:21)\n\n      AssertionError [ERR_ASSERTION]: Values have same structure but are not reference-equal:\n\n{}\n\n      + expected - actual\n\n      \n      at Context.<anonymous> (test/denque.js:154:12)\n      at process.processImmediate (node:internal/timers:534:21)",
+      "fullLocalOutputSha256": "e8f6552edd3de854db9895efdf9fffbe0030f98b8c9a9017f832c6daba5926e9"
+    }
+  ]
+}

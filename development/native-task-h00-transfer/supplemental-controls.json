@@ -1,0 +1,102 @@
+[
+  {
+    "artifact": "control-test-sensitivity/denque-remove-where/alternative/result.json",
+    "exit": 1,
+    "elapsedMs": 1061,
+    "terminationVerified": true,
+    "containerRemoved": true,
+    "realProviderRequests": 0,
+    "excerpt": "\n  52 passing (202ms)\n  1 failing\n\n  1)  new public contract:\n\n      AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n  52 passing (202ms)\n  1 failing\n\n  1)  new public contract:\n\n      AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   2,\n\n      AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   2,\n    4,\n    5,\n    6\n  ]",
+    "fullLocalOutputSha256": "9bd09ddc1bffb367022bf98c872cc3d1c2eaa84f2221c69c11c3987ed7fba7b2"
+  },
+  {
+    "artifact": "control-test-sensitivity/denque-remove-where/reference/result.json",
+    "exit": 1,
+    "elapsedMs": 1045,
+    "terminationVerified": true,
+    "containerRemoved": true,
+    "realProviderRequests": 0,
+    "excerpt": "\n  52 passing (202ms)\n  1 failing\n\n  1)  new public contract:\n\n      AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n  52 passing (202ms)\n  1 failing\n\n  1)  new public contract:\n\n      AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   2,\n\n      AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   2,\n    4,\n    5,\n    6\n  ]",
+    "fullLocalOutputSha256": "663ea1889495d825001c137557c6bf9aadf60a36b27110462d22d581541dfbc6"
+  },
+  {
+    "artifact": "control-test-sensitivity/denque-rotate/alternative/result.json",
+    "exit": 0,
+    "elapsedMs": 1568,
+    "terminationVerified": true,
+    "containerRemoved": true,
+    "realProviderRequests": 0,
+    "excerpt": "\n  53 passing (197ms)\n\n=============================================================================\nWriting coverage object [/work/repo/coverage/coverage.json]\nWriting coverage reports at [/work/repo/coverage]\n=============================================================================\n\n=============================== Coverage summary ===============================\nStatements   : 98.98% ( 292/295 )",
+    "fullLocalOutputSha256": "87be608cc3d8d81d6f0976bd8a259aaa13b8eba6d8831e4219362d6f0227724d"
+  },
+  {
+    "artifact": "control-test-sensitivity/denque-rotate/reference/result.json",
+    "exit": 0,
+    "elapsedMs": 1648,
+    "terminationVerified": true,
+    "containerRemoved": true,
+    "realProviderRequests": 0,
+    "excerpt": "\n  53 passing (195ms)\n\n=============================================================================\nWriting coverage object [/work/repo/coverage/coverage.json]\nWriting coverage reports at [/work/repo/coverage]\n=============================================================================\n\n=============================== Coverage summary ===============================\nStatements   : 98.98% ( 290/293 )",
+    "fullLocalOutputSha256": "859833942ad17edf16d6a8eadcc3a92327fe20d2b442293b148a1aad6c654326"
+  },
+  {
+    "artifact": "supplemental-controls/fastq-on-idle/alternative/early-kill-test-sensitivity/result.json",
+    "exit": 1,
+    "elapsedMs": 3422,
+    "terminationVerified": true,
+    "containerRemoved": true,
+    "realProviderRequests": 0,
+    "excerpt": "# new public contract\nnot ok 223 AssertionError [ERR_ASSERTION]: Expected values to be strictly equal: true !== false at /work/repo/test/test.js:816:388 at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n  ---\n    operator: fail\n    at: <anonymous> (/work/repo/test/test.js:818:59)\n    stack: |-\n      Error: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n      \n      true !== false\n      \n    stack: |-\n      Error: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n      \n      true !== false\n      \n          at /work/repo/test/test.js:816:388\n          at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n          at Test.assert [as _assert] (/work/repo/node_modules/tape/lib/test.js:548:48)\n          at Test.fail (/work/repo/node_modules/tape/lib/test.js:657:7)\n          at /work/repo/test/test.js:818:59",
+    "fullLocalOutputSha256": "5b92065c3ba90b047444c681068346e12a611f82f7b1e07d5859d8b3d143803d"
+  },
+  {
+    "artifact": "supplemental-controls/fastq-on-idle/alternative/idle-transition/result.json",
+    "exit": 0,
+    "elapsedMs": 3076,
+    "terminationVerified": true,
+    "containerRemoved": true,
+    "realProviderRequests": 0,
+    "excerpt": "{\"idleTransitionObserved\":true,\"oldSubscriptionResolvedBeforeLaterWorkFinished\":true}",
+    "fullLocalOutputSha256": "2d4b4f14a7b2bb9b24bbdf32e4f9645dffc2953e3723f0407445286e0d3b4c6b"
+  },
+  {
+    "artifact": "supplemental-controls/fastq-on-idle/reference/early-kill-test-sensitivity/result.json",
+    "exit": 1,
+    "elapsedMs": 4322,
+    "terminationVerified": true,
+    "containerRemoved": true,
+    "realProviderRequests": 0,
+    "excerpt": "# new public contract\nnot ok 223 AssertionError [ERR_ASSERTION]: Expected values to be strictly equal: true !== false at /work/repo/test/test.js:816:388 at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n  ---\n    operator: fail\n    at: <anonymous> (/work/repo/test/test.js:818:59)\n    stack: |-\n      Error: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n      \n      true !== false\n      \n    stack: |-\n      Error: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n      \n      true !== false\n      \n          at /work/repo/test/test.js:816:388\n          at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n          at Test.assert [as _assert] (/work/repo/node_modules/tape/lib/test.js:548:48)\n          at Test.fail (/work/repo/node_modules/tape/lib/test.js:657:7)\n          at /work/repo/test/test.js:818:59",
+    "fullLocalOutputSha256": "5b92065c3ba90b047444c681068346e12a611f82f7b1e07d5859d8b3d143803d"
+  },
+  {
+    "artifact": "supplemental-controls/fastq-on-idle/reference/idle-transition/result.json",
+    "exit": 0,
+    "elapsedMs": 4119,
+    "terminationVerified": true,
+    "containerRemoved": true,
+    "realProviderRequests": 0,
+    "excerpt": "{\"idleTransitionObserved\":true,\"oldSubscriptionResolvedBeforeLaterWorkFinished\":true}",
+    "fullLocalOutputSha256": "2d4b4f14a7b2bb9b24bbdf32e4f9645dffc2953e3723f0407445286e0d3b4c6b"
+  },
+  {
+    "artifact": "supplemental-controls/quick-lru-prune/alternative/callback-order-interpretation/result.json",
+    "exit": 0,
+    "elapsedMs": 4150,
+    "terminationVerified": true,
+    "containerRemoved": true,
+    "realProviderRequests": 0,
+    "excerpt": "Independent behavior passed",
+    "fullLocalOutputSha256": "f9c69e05a31a62e04881e10139c67883f681accefebbe3f3ff50d81e2a6a7a6e"
+  },
+  {
+    "artifact": "supplemental-controls/quick-lru-prune/reference/callback-order-interpretation/result.json",
+    "exit": 0,
+    "elapsedMs": 4437,
+    "terminationVerified": true,
+    "containerRemoved": true,
+    "realProviderRequests": 0,
+    "excerpt": "Independent behavior passed",
+    "fullLocalOutputSha256": "f9c69e05a31a62e04881e10139c67883f681accefebbe3f3ff50d81e2a6a7a6e"
+  }
+]

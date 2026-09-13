@@ -1,0 +1,123 @@
+{
+  "id": "80e5601c914d",
+  "task": "quick-lru-prune",
+  "project": "quick-lru",
+  "Q": 0,
+  "ordinaryProjectExit": 0,
+  "originalIndependentExit": 1,
+  "interpretedIndependentExit": 0,
+  "patchApplicable": true,
+  "sourcePatchSha256": "a3aeda324e57f1a9d191ea72343e30eb1ac196e4abdd328bae0b44ab6db6a9c6",
+  "decision": "Full delivery does not satisfy the frozen rubric.",
+  "findings": [
+    {
+      "category": "required-coverage-loss",
+      "reason": "Delivered prune tests retain a live key in every exercised cache and never exercise the required reuse after an emptied cache. The expired-current test also starts with an old value that expires at the same time, leaving live-old resurrection untested. Callback ordering is NOT counted as a behavior failure."
+    }
+  ],
+  "contentReview": {
+    "id": "80e5601c914d",
+    "task": "quick-lru-prune",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete",
+    "retainedTestsReview": "Existing regression cases remain unchanged.",
+    "behaviorReview": "Current-generation-first traversal removes visible expired keys through delete helper (including both shadow copies), then skips old keys still shadowed by live current. Callback order differs from frozen evaluator but is not specified by TASK.md; preserve raw outcome and use uniform documented interpretation.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": true,
+        "evidence": "Controlled exact clock, expired old/current entries and live shadow, exact count and callbacks plus unchanged live iteration order and repeated zero."
+      },
+      {
+        "scenario": 2,
+        "covered": "partial",
+        "evidence": "First scenario establishes live-current/expired-old shadow. Separate current-expiry test uses an old value that expires at the same time, so it does not directly establish that an expired current entry cannot reveal a still-live old entry."
+      },
+      {
+        "scenario": 3,
+        "covered": "partial",
+        "evidence": "Controlled exact-boundary expiry, infinite TTL and undefined/repeated prune are tested. Every cache retains a live other/infinite key after pruning; no transition to empty followed by reuse is exercised."
+      }
+    ],
+    "typesReview": "Public number return and tsd numeric-return test.",
+    "docsReview": "README describes logical keys, visible current shadow, callbacks and live iteration order.",
+    "contentFindings": [
+      {
+        "category": "required-coverage-loss",
+        "requirement": "Expired current entry must not reveal a live shadowed old entry; reuse after an empty cache.",
+        "evidence": "Shadowed old entry has maxAge10 at now1000 and current expiry checked at1010; both expired. No delivered prune scenario ever reaches empty cache before reuse.",
+        "confirmationPending": "Inspect corresponding source/test behavior mechanically; do not count unspecified callback order as a behavior defect."
+      }
+    ],
+    "recordStage": "Pre-unblinding content review; final decision is top-level Q."
+  },
+  "applicability": {
+    "id": "80e5601c914d",
+    "task": "quick-lru-prune",
+    "sourceCommit": "f2fe88e2932603c038c61ca29de6ad5286148e1b",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "a3aeda324e57f1a9d191ea72343e30eb1ac196e4abdd328bae0b44ab6db6a9c6",
+    "excludedPreparationArtifacts": [],
+    "types": null
+  },
+  "verificationNotes": {
+    "qualityAssignedBeforeArmMappingRead": true,
+    "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+  },
+  "slot": 16,
+  "arm": "P",
+  "D": 0,
+  "native": {
+    "completed": true,
+    "exitCode": 0,
+    "signal": null,
+    "lastStepFinish": "stop",
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "normalHandoff": true,
+    "workflowStatus": null,
+    "terminalPatchVerification": null,
+    "finalResponseSha256": "dec6685dd95df32a6dc162a381ddd0e23944ff172cd15883b64b6df188282356",
+    "finalResponseExcerpt": "Implemented `pruneExpired(): number`.\n\n- Safely prunes expired entries across both cache generations.\n- Preserves live iteration order and prevents shadow resurrection or duplicate callbacks.\n- Added declarations, tsd coverage, regression tests, and README API docs.\n- `npm test` passed: 118 tests, lint, coverage, and `tsd`.\n- `git diff --check` passed.",
+    "reportFindings": []
+  },
+  "verification": [
+    {
+      "artifact": "ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 8582,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "supplemental/callback-order-interpretation/result.json",
+      "exit": 0,
+      "elapsedMs": 4865,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "Independent behavior passed",
+      "fullLocalOutputSha256": "f9c69e05a31a62e04881e10139c67883f681accefebbe3f3ff50d81e2a6a7a6e"
+    },
+    {
+      "artifact": "independent/result.json",
+      "exit": 1,
+      "elapsedMs": 2910,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    }
+  ]
+}

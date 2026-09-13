@@ -1,0 +1,126 @@
+{
+  "id": "3ef12ae73600",
+  "task": "quick-lru-prune",
+  "project": "quick-lru",
+  "Q": 1,
+  "ordinaryProjectExit": 0,
+  "originalIndependentExit": 0,
+  "interpretedIndependentExit": 0,
+  "patchApplicable": true,
+  "sourcePatchSha256": "1921707c4a0839e865a41513187f07dbedc9937a9645bbb6790f65e6fb423206",
+  "decision": "Full required delivery verified.",
+  "findings": [],
+  "contentReview": {
+    "id": "3ef12ae73600",
+    "task": "quick-lru-prune",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete",
+    "retainedTestsReview": "Existing regression cases remain unchanged.",
+    "behaviorReview": "Iterates old entries only if not shadowed by current, then current entries; existing expiry helper deletes both copies and maintains size. No live promotion or reorder. Runtime confirmation pending.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": true,
+        "evidence": "Expired old/current entries are inspected without lazy deletion, then exact count, callbacks, unchanged live order, size and repeated zero are asserted."
+      },
+      {
+        "scenario": 2,
+        "covered": true,
+        "evidence": "Live current shadows already-expired old with zero callback; separate non-expiring old shadow is removed with expired current, asserting old storage absence and has false."
+      },
+      {
+        "scenario": 3,
+        "covered": true,
+        "evidence": "Zero per-entry maxAge exercises immediate-expiry case, infinite TTL survives, expired undefined notifies exact value, repeated prune returns zero; deleting final live entry empties cache before reuse with undefined. Boundary timing uses real Date.now rather than mocked time; retain as a timing sensitivity note, not a requirement for a particular test mechanism."
+      }
+    ],
+    "typesReview": "Public number return and tsd expectType<number>(pruneExpired()).",
+    "docsReview": "API docs define removal/count/live recency preservation and expiration callbacks.",
+    "contentFindings": [],
+    "recordStage": "Pre-unblinding content review; final decision is top-level Q."
+  },
+  "applicability": {
+    "id": "3ef12ae73600",
+    "task": "quick-lru-prune",
+    "sourceCommit": "f2fe88e2932603c038c61ca29de6ad5286148e1b",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "1921707c4a0839e865a41513187f07dbedc9937a9645bbb6790f65e6fb423206",
+    "excludedPreparationArtifacts": [],
+    "types": null
+  },
+  "verificationNotes": {
+    "qualityAssignedBeforeArmMappingRead": true,
+    "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+  },
+  "slot": 15,
+  "arm": "H00",
+  "D": 1,
+  "native": {
+    "completed": true,
+    "exitCode": 0,
+    "signal": null,
+    "lastStepFinish": "stop",
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "normalHandoff": true,
+    "workflowStatus": "incomplete",
+    "terminalPatchVerification": {
+      "slot": 15,
+      "id": "3ef12ae73600",
+      "terminalPatchSha256": "021ead69535de52c9b6a38f019a06c73059ababcad5c4904a59b1b39c9c0b6ea",
+      "terminalPatchEqualsApplicableSourcePatch": false,
+      "ordinaryAppliedCopyReverseCheckExit": 0,
+      "diagnostic": "",
+      "nativeHandoffNamesDeliveryAndPatch": true,
+      "ordinaryCleanSourceForwardApplyExit": 0,
+      "terminalPatchDeliversAllAuthorBytesAndModes": true
+    },
+    "finalResponseSha256": "1aaad54ba94b8e4bc129fae42a39d74ecec9c693022966ca35f890869cc6929d",
+    "finalResponseExcerpt": "Native task workflow: incomplete.\nDelivery worktree: /work/repo/.git/harness-task/9cd0ec54-3676-40dc-bfb0-01490b30c1e4/worktree.\nTerminal patch: /work/repo/.git/harness-task/9cd0ec54-3676-40dc-bfb0-01490b30c1e4/terminal.patch.\nFull report and tool outputs: /work/repo/.git/harness-task/9cd0ec54-3676-40dc-bfb0-01490b30c1e4.\nOriginal checkout unchanged by workflow transfer.",
+    "reportFindings": [
+      {
+        "category": "misleading-workflow-report",
+        "evidence": "Normal final response lists successful project commands but says No observed relevant project test/check and Executable project verification unavailable or not observed. Delivery worktree and terminal patch are correctly named and usable; this contradiction does not alone remove D."
+      }
+    ]
+  },
+  "verification": [
+    {
+      "artifact": "ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 7667,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "supplemental/callback-order-interpretation/result.json",
+      "exit": 0,
+      "elapsedMs": 4602,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "Independent behavior passed",
+      "fullLocalOutputSha256": "f9c69e05a31a62e04881e10139c67883f681accefebbe3f3ff50d81e2a6a7a6e"
+    },
+    {
+      "artifact": "independent/result.json",
+      "exit": 0,
+      "elapsedMs": 4027,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    }
+  ]
+}

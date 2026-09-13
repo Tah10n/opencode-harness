@@ -1,0 +1,107 @@
+{
+  "id": "2c3146b61f69",
+  "task": "eventemitter-prepend",
+  "project": "eventemitter3",
+  "Q": 1,
+  "ordinaryProjectExit": 0,
+  "originalIndependentExit": 0,
+  "interpretedIndependentExit": 0,
+  "patchApplicable": true,
+  "sourcePatchSha256": "4883a10142af5078d4d250afcf58d73de6dd1dfeb6d215f38ce3b9f4626e7206",
+  "decision": "Full required delivery verified.",
+  "findings": [],
+  "contentReview": {
+    "id": "2c3146b61f69",
+    "reviewBlindedToArmAndWorkflow": true,
+    "task": "eventemitter-prepend",
+    "contentReview": "complete",
+    "behaviorReview": "The existing addListener helper receives a prepend flag and preserves validation/context construction. Existing emit and removal paths are unchanged. Runtime confirmation pending.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": true,
+        "evidence": "test/test.js: five mixed registrations with distinct receivers are emitted with two arguments; exact call order/receiver/arguments asserted."
+      },
+      {
+        "scenario": 2,
+        "covered": true,
+        "evidence": "test/test.js: prependOnce recursively emits; exact call list proves once removed before recursion; regular prepend is subsequently removed and next emission excludes it."
+      },
+      {
+        "scenario": 3,
+        "covered": true,
+        "evidence": "Symbol registration/listener enumeration asserted; both ESM prepend APIs return emitter and register listeners; invalid normal and once prepend leave existing list intact."
+      }
+    ],
+    "typesReview": "index.d.ts preserves event-specific generic signatures. test/types.ts exercises tuple payload inference, symbol event, context, chaining, and an expected invalid numeric payload. Must compile standalone fixture with the same independent compiler used in calibration.",
+    "docsReview": "README removes obsolete unsupported-method claim and documents both methods, ordering, return and custom context with an example.",
+    "retainedTestsReview": "Patch adds scenarios without deleting or changing existing regression cases.",
+    "contentFindings": [],
+    "recordStage": "Pre-unblinding content review; final decision is top-level Q."
+  },
+  "applicability": {
+    "id": "2c3146b61f69",
+    "task": "eventemitter-prepend",
+    "sourceCommit": "b0144e940ace8add8f335a8adfbed9284eb419f3",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "4883a10142af5078d4d250afcf58d73de6dd1dfeb6d215f38ce3b9f4626e7206",
+    "excludedPreparationArtifacts": [],
+    "types": {
+      "compiler": "6.0.3",
+      "exit": 0,
+      "output": "",
+      "fixture": "test/types.ts",
+      "scope": "Delivered standalone consumer checked with the same host compiler as calibration; ordinary runtime checks run separately on Linux arm64."
+    }
+  },
+  "verificationNotes": {
+    "qualityAssignedBeforeArmMappingRead": true,
+    "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+  },
+  "slot": 5,
+  "arm": "P",
+  "D": 1,
+  "native": {
+    "completed": true,
+    "exitCode": 0,
+    "signal": null,
+    "lastStepFinish": "stop",
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "normalHandoff": true,
+    "workflowStatus": null,
+    "terminalPatchVerification": null,
+    "finalResponseSha256": "3e558a69273a0221e81e643629671a4fdb0380173f89dbe441f2f09e118caf2a",
+    "finalResponseExcerpt": "Implemented:\n\n- Added `prependListener` and `prependOnceListener` with newest-first ordering.\n- Preserved context handling, validation, emit arities, symbols, enumeration, removal, and recursive once behavior.\n- Updated CommonJS/ESM regression tests.\n- Added public TypeScript declarations and `test/types.ts`.\n- Updated README/API documentation.\n\nChecks run:\n\n- `npm test`: 44 passing\n- `npm run test-esm`: 3 passing\n- `npm run rollup`: passed\n- CommonJS/ESM package smoke checks: passed\n- `git diff --check`: passed\n\nThe TypeScript fixture was added but not compiled because no TypeScript compiler is installed and dependencies were not changed.",
+    "reportFindings": []
+  },
+  "verification": [
+    {
+      "artifact": "ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 1029,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "independent/result.json",
+      "exit": 0,
+      "elapsedMs": 527,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    }
+  ]
+}

@@ -1,0 +1,118 @@
+{
+  "id": "9e4f9df7cdda",
+  "task": "ufo-query-sort",
+  "project": "ufo",
+  "Q": 0,
+  "ordinaryProjectExit": 0,
+  "originalIndependentExit": 1,
+  "interpretedIndependentExit": 1,
+  "patchApplicable": true,
+  "sourcePatchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "decision": "Full delivery does not satisfy the frozen rubric.",
+  "findings": [
+    {
+      "category": "missing-delivery",
+      "reason": "Empty source patch; requested query sorting options and associated delivery are absent."
+    }
+  ],
+  "contentReview": {
+    "id": "9e4f9df7cdda",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete",
+    "retainedTestsReview": "Existing regression cases remain unchanged.",
+    "task": "ufo-query-sort",
+    "behaviorReview": "Retained source patch is empty. Requested option, API integration, tests/types/docs are absent.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": false,
+        "evidence": "No changed or added source files."
+      },
+      {
+        "scenario": 2,
+        "covered": false,
+        "evidence": "No changed or added source files."
+      },
+      {
+        "scenario": 3,
+        "covered": false,
+        "evidence": "No changed or added source files."
+      }
+    ],
+    "typesReview": "No requested options type or consumer changes.",
+    "docsReview": "No new API documentation.",
+    "contentFindings": [
+      {
+        "category": "missing-delivery",
+        "requirement": "Deliver sort options and associated tests/types/docs.",
+        "evidence": "delivery changed/deleted are empty and source.patch is zero bytes.",
+        "impact": "Requested behavior is not delivered."
+      }
+    ],
+    "recordStage": "Pre-unblinding content review; final decision is top-level Q."
+  },
+  "applicability": {
+    "id": "9e4f9df7cdda",
+    "task": "ufo-query-sort",
+    "sourceCommit": "f06c800d0c59f2a4a1b9ba65eb6cb61a84419be6",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "excludedPreparationArtifacts": [],
+    "types": null
+  },
+  "verificationNotes": {
+    "qualityAssignedBeforeArmMappingRead": true,
+    "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+  },
+  "slot": 18,
+  "arm": "H00",
+  "D": 0,
+  "native": {
+    "completed": false,
+    "exitCode": 137,
+    "signal": null,
+    "lastStepFinish": null,
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": true
+    },
+    "normalHandoff": false,
+    "workflowStatus": null,
+    "terminalPatchVerification": null,
+    "finalResponseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "finalResponseExcerpt": "",
+    "reportFindings": [
+      {
+        "category": "no-final-handoff",
+        "evidence": "No final response or terminal patch. Retained workflow records webfetch transport error as unconfirmed tool state; runner subsequently pauses on AbortError despite a known completed provider response. The initial transport-cancellation cause is not established."
+      }
+    ]
+  },
+  "verification": [
+    {
+      "artifact": "ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 8572,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "independent/result.json",
+      "exit": 1,
+      "elapsedMs": 4277,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    }
+  ]
+}

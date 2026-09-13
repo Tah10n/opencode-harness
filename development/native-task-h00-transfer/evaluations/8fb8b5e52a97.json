@@ -1,0 +1,124 @@
+{
+  "id": "8fb8b5e52a97",
+  "task": "denque-rotate",
+  "project": "denque",
+  "Q": 0,
+  "ordinaryProjectExit": 0,
+  "originalIndependentExit": 0,
+  "interpretedIndependentExit": 0,
+  "patchApplicable": true,
+  "sourcePatchSha256": "6952239353c00a3be16c77d3caa555a46578e4e5a013b88b3ddb1e8e0297cde0",
+  "decision": "Full delivery does not satisfy the frozen rubric.",
+  "findings": [
+    {
+      "category": "required-coverage-loss",
+      "reason": "Delivered suite passes with object cloning on nontrivial rotations; object assertions concern invalid/no-op rotations. The paired neutral alternative detects identity loss. Original reference and alternative controls also miss this case, a disclosed pre-start calibration gap."
+    }
+  ],
+  "contentReview": {
+    "id": "8fb8b5e52a97",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete",
+    "retainedTestsReview": "Existing independent regression cases are not removed or changed.",
+    "task": "denque-rotate",
+    "behaviorReview": "Validates before state changes, reduces modulo size, rebuilds the logical order with original references and preserves storage capacity/mask. Runtime confirmation pending.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": true,
+        "evidence": "test/denque.js explicitly asserts return identity and exact order for default, negative, zero, positive/negative counts larger than size and MAX_SAFE_INTEGER."
+      },
+      {
+        "scenario": 2,
+        "covered": true,
+        "evidence": "Capacity-5 queue is pushed ten times and asserts head > tail before rotate; verifies order, capacity fields, subsequent overflowing push/unshift, pop/shift/peek/remove and reuse to empty."
+      },
+      {
+        "scenario": 3,
+        "covered": "partial",
+        "evidence": "Invalid cases preserve object references and state. Empty/singleton reuse is tested. Actual nontrivial rotations use only numbers; object identity is checked only on failed rotations or singleton no-ops."
+      }
+    ],
+    "typesReview": "Optional numeric argument and polymorphic this declaration; ordinary type fixture adds no-argument/negative calls and assigns result to typeof queue.",
+    "docsReview": "README and API docs explain direction, default, modulo and finite integer requirement.",
+    "contentFindings": [
+      {
+        "category": "required-coverage-loss",
+        "requirement": "Required delivered regression: object identity survives rotation.",
+        "evidence": "Every successful rotation with size greater than one uses numeric values. Object cases are invalid requests or singleton no-ops.",
+        "impact": "Cloning object elements only during an actual nontrivial rotation would be invisible to the added regressions.",
+        "confirmationPending": "Run narrowly targeted test-sensitivity variant in an independent copy after scored execution; never change author patch."
+      }
+    ],
+    "recordStage": "Pre-unblinding content review; final decision is top-level Q."
+  },
+  "applicability": {
+    "id": "8fb8b5e52a97",
+    "task": "denque-rotate",
+    "sourceCommit": "539105bb57854e997dd469221cdc52a0ad80e0a2",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "6952239353c00a3be16c77d3caa555a46578e4e5a013b88b3ddb1e8e0297cde0",
+    "excludedPreparationArtifacts": [],
+    "types": null
+  },
+  "verificationNotes": {
+    "qualityAssignedBeforeArmMappingRead": true,
+    "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+  },
+  "slot": 1,
+  "arm": "P",
+  "D": 0,
+  "native": {
+    "completed": true,
+    "exitCode": 0,
+    "signal": null,
+    "lastStepFinish": "stop",
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "normalHandoff": true,
+    "workflowStatus": null,
+    "terminalPatchVerification": null,
+    "finalResponseSha256": "bf9538b5128006ad7da5cab00537e4f14e0ff0012c24e899f91f458deff54f7b",
+    "finalResponseExcerpt": "Implemented `rotate(steps = 1)` with validation, modulo normalization, identity preservation, and capacity-safe storage rebuilding.\n\nUpdated:\n- `index.js`\n- `index.d.ts`\n- Runtime and TypeScript tests\n- `README.md`\n- `docs/api.mdx`\n\nChecks passed:\n- `npm test`: 56 tests passed\n- TypeScript consumer checks passed\n- Rotation fuzz validation passed\n- `git diff --check` passed",
+    "reportFindings": []
+  },
+  "verification": [
+    {
+      "artifact": "ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 1717,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "independent/result.json",
+      "exit": 0,
+      "elapsedMs": 849,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "test-sensitivity/result.json",
+      "exit": 0,
+      "elapsedMs": 1566,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "\n  56 passing (208ms)\n\n=============================================================================\nWriting coverage object [/work/repo/coverage/coverage.json]\nWriting coverage reports at [/work/repo/coverage]\n=============================================================================\n\n=============================== Coverage summary ===============================\nStatements   : 99.02% ( 302/305 )",
+      "fullLocalOutputSha256": "9b6458c7843c8966edf855700142d5f070137ac4c5ce39c87ed626ab98b54c6a"
+    }
+  ]
+}

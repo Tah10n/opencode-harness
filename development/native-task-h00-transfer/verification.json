@@ -1,0 +1,30 @@
+{
+  "scope": "Report publication checks; separate from scored outcomes and remote CI",
+  "checkedAt": "2026-09-13T21:53:31.692307+00:00",
+  "frozenFileHashesUnchanged": 112,
+  "plannedSlotRows": 48,
+  "startedSourcePatchHashesVerified": 18,
+  "nativeTerminalPatchHashesVerified": 8,
+  "normalNativeTerminalPatchesDirectlyAppliedInOrdinaryCopies": 8,
+  "neutralQualityCheckpointSha256Verified": true,
+  "localReportLinksVerified": true,
+  "diagnosticsSyntax": "pass",
+  "emittedOriginalProgramsMatchFrozenEvaluator": 12,
+  "executedDenqueMutationProgramsMatchPublishedDiagnostics": 4,
+  "ciScopeVerifier": "pass",
+  "packageBoundaryVerifier": "pass",
+  "reportOnlyChange": true,
+  "rootCheckoutClean": true,
+  "measuredCheckoutClean": true,
+  "scoredAttemptStopsVerified": 18,
+  "postExecutionCheckContainerRemovalsVerified": 56,
+  "activeSeriesContainers": 0,
+  "manualActions": 0,
+  "fullPlatformMatrix": 0,
+  "remoteCI": "Inspect automatic checks on the final published head separately; local verification is not CI.",
+  "sourceDiffWhitespaceCheck": "pass excluding stored .patch artifacts",
+  "rawArtifactDiffWhitespaceCheck": {
+    "exit": 2,
+    "scope": "Only archived .patch files: unified-diff context prefixes and tab indentation are reported as outer-diff whitespace. Actual patches apply and reproduce author bytes. Patch payloads were not reformatted."
+  }
+}

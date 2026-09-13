@@ -1,0 +1,757 @@
+{
+  "provider": {
+    "all": {
+      "observedRequests": 405,
+      "forwarded": 405,
+      "notForwarded": 0,
+      "requestsWithSomeUsage": 404,
+      "requestsWithoutUsage": 1,
+      "usage": {
+        "input_tokens": {
+          "knownSum": 12944112,
+          "knownRequests": 404,
+          "unknownRequests": 1
+        },
+        "output_tokens": {
+          "knownSum": 212400,
+          "knownRequests": 404,
+          "unknownRequests": 1
+        },
+        "total_tokens": {
+          "knownSum": 13156512,
+          "knownRequests": 404,
+          "unknownRequests": 1
+        },
+        "cached_tokens": {
+          "knownSum": 4583424,
+          "knownRequests": 404,
+          "unknownRequests": 1
+        },
+        "reasoning_tokens": {
+          "knownSum": 119393,
+          "knownRequests": 404,
+          "unknownRequests": 1
+        }
+      },
+      "ownDeadlineCancellations": 1,
+      "unfinishedTransportStreams": 2,
+      "unknownServerCompletion": 1,
+      "terminalResponseDespiteTransportAbort": [
+        {
+          "slot": 18,
+          "requestIndex": 10,
+          "responseStatus": "completed",
+          "error": "AbortError"
+        }
+      ],
+      "refusals": [],
+      "modelEffortCombinations": [
+        "gpt-5.6-luna/high"
+      ]
+    },
+    "byArm": {
+      "P": {
+        "observedRequests": 201,
+        "forwarded": 201,
+        "notForwarded": 0,
+        "requestsWithSomeUsage": 200,
+        "requestsWithoutUsage": 1,
+        "usage": {
+          "input_tokens": {
+            "knownSum": 6225686,
+            "knownRequests": 200,
+            "unknownRequests": 1
+          },
+          "output_tokens": {
+            "knownSum": 104804,
+            "knownRequests": 200,
+            "unknownRequests": 1
+          },
+          "total_tokens": {
+            "knownSum": 6330490,
+            "knownRequests": 200,
+            "unknownRequests": 1
+          },
+          "cached_tokens": {
+            "knownSum": 2231808,
+            "knownRequests": 200,
+            "unknownRequests": 1
+          },
+          "reasoning_tokens": {
+            "knownSum": 56575,
+            "knownRequests": 200,
+            "unknownRequests": 1
+          }
+        },
+        "ownDeadlineCancellations": 1,
+        "unfinishedTransportStreams": 1,
+        "unknownServerCompletion": 1,
+        "terminalResponseDespiteTransportAbort": [],
+        "refusals": [],
+        "modelEffortCombinations": [
+          "gpt-5.6-luna/high"
+        ]
+      },
+      "H00": {
+        "observedRequests": 204,
+        "forwarded": 204,
+        "notForwarded": 0,
+        "requestsWithSomeUsage": 204,
+        "requestsWithoutUsage": 0,
+        "usage": {
+          "input_tokens": {
+            "knownSum": 6718426,
+            "knownRequests": 204,
+            "unknownRequests": 0
+          },
+          "output_tokens": {
+            "knownSum": 107596,
+            "knownRequests": 204,
+            "unknownRequests": 0
+          },
+          "total_tokens": {
+            "knownSum": 6826022,
+            "knownRequests": 204,
+            "unknownRequests": 0
+          },
+          "cached_tokens": {
+            "knownSum": 2351616,
+            "knownRequests": 204,
+            "unknownRequests": 0
+          },
+          "reasoning_tokens": {
+            "knownSum": 62818,
+            "knownRequests": 204,
+            "unknownRequests": 0
+          }
+        },
+        "ownDeadlineCancellations": 0,
+        "unfinishedTransportStreams": 1,
+        "unknownServerCompletion": 0,
+        "terminalResponseDespiteTransportAbort": [
+          {
+            "slot": 18,
+            "requestIndex": 10,
+            "responseStatus": "completed",
+            "error": "AbortError"
+          }
+        ],
+        "refusals": [],
+        "modelEffortCombinations": [
+          "gpt-5.6-luna/high"
+        ]
+      }
+    },
+    "byRequestKind": {
+      "work": {
+        "observedRequests": 387,
+        "forwarded": 387,
+        "notForwarded": 0,
+        "requestsWithSomeUsage": 386,
+        "requestsWithoutUsage": 1,
+        "usage": {
+          "input_tokens": {
+            "knownSum": 12931427,
+            "knownRequests": 386,
+            "unknownRequests": 1
+          },
+          "output_tokens": {
+            "knownSum": 211126,
+            "knownRequests": 386,
+            "unknownRequests": 1
+          },
+          "total_tokens": {
+            "knownSum": 13142553,
+            "knownRequests": 386,
+            "unknownRequests": 1
+          },
+          "cached_tokens": {
+            "knownSum": 4583424,
+            "knownRequests": 386,
+            "unknownRequests": 1
+          },
+          "reasoning_tokens": {
+            "knownSum": 118327,
+            "knownRequests": 386,
+            "unknownRequests": 1
+          }
+        },
+        "ownDeadlineCancellations": 1,
+        "unfinishedTransportStreams": 2,
+        "unknownServerCompletion": 1,
+        "terminalResponseDespiteTransportAbort": [
+          {
+            "slot": 18,
+            "requestIndex": 10,
+            "responseStatus": "completed",
+            "error": "AbortError"
+          }
+        ],
+        "refusals": [],
+        "modelEffortCombinations": [
+          "gpt-5.6-luna/high"
+        ]
+      },
+      "title": {
+        "observedRequests": 18,
+        "forwarded": 18,
+        "notForwarded": 0,
+        "requestsWithSomeUsage": 18,
+        "requestsWithoutUsage": 0,
+        "usage": {
+          "input_tokens": {
+            "knownSum": 12685,
+            "knownRequests": 18,
+            "unknownRequests": 0
+          },
+          "output_tokens": {
+            "knownSum": 1274,
+            "knownRequests": 18,
+            "unknownRequests": 0
+          },
+          "total_tokens": {
+            "knownSum": 13959,
+            "knownRequests": 18,
+            "unknownRequests": 0
+          },
+          "cached_tokens": {
+            "knownSum": 0,
+            "knownRequests": 18,
+            "unknownRequests": 0
+          },
+          "reasoning_tokens": {
+            "knownSum": 1066,
+            "knownRequests": 18,
+            "unknownRequests": 0
+          }
+        },
+        "ownDeadlineCancellations": 0,
+        "unfinishedTransportStreams": 0,
+        "unknownServerCompletion": 0,
+        "terminalResponseDespiteTransportAbort": [],
+        "refusals": [],
+        "modelEffortCombinations": [
+          "gpt-5.6-luna/high"
+        ]
+      }
+    }
+  },
+  "preparation": {
+    "modelFreeProjectChecks": 169,
+    "summedProjectCheckElapsedMs": 665326,
+    "installedScriptedSessions": [
+      {
+        "artifact": "installed-preflight-initial.json",
+        "arm": "P",
+        "elapsedMs": 2909,
+        "nativeCompleted": true
+      },
+      {
+        "artifact": "installed-preflight-initial.json",
+        "arm": "H00",
+        "elapsedMs": 4473,
+        "nativeCompleted": true
+      },
+      {
+        "artifact": "installed-preflight.json",
+        "arm": "P",
+        "elapsedMs": 193005,
+        "nativeCompleted": true
+      },
+      {
+        "artifact": "installed-preflight.json",
+        "arm": "H00",
+        "elapsedMs": 194974,
+        "nativeCompleted": true
+      }
+    ],
+    "installedSessionElapsedMs": 395361,
+    "realProviderRequests": 0,
+    "note": "Elapsed values include each projectCheck invocation and its preparation as defined by the existing checker. Summed durations overlap where preparation jobs ran concurrently; they are not total wall time. This is not Luna token usage. Dependency setup and Codex orchestrator accounting are separate; direct monetary charges unavailable. Nonzero exits include deliberately wrong calibration controls and baseline-without-new-API controls, not just preparation defects.",
+    "nonzeroExitChecks": 78
+  },
+  "postExecutionEvaluation": {
+    "modelFreeProjectCheckInvocations": 56,
+    "summedElapsedMs": 168332,
+    "nonzeroExits": 9,
+    "note": "Includes expected diagnostic/control failures; count is not a count of defects. Runs are after scored execution and do not overlap author resource use.",
+    "checks": [
+      {
+        "artifact": "reviews/65f9ded470ca/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 1142,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/65f9ded470ca/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 519,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/26ece8019a92/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 5114,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/26ece8019a92/supplemental/early-kill-test-sensitivity/result.json",
+        "exit": 0,
+        "elapsedMs": 2717,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/26ece8019a92/supplemental/idle-transition/result.json",
+        "exit": 1,
+        "elapsedMs": 2614,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/26ece8019a92/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 1791,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/4b726527599f/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 4602,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/4b726527599f/supplemental/early-kill-test-sensitivity/result.json",
+        "exit": 0,
+        "elapsedMs": 3317,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/4b726527599f/supplemental/idle-transition/result.json",
+        "exit": 0,
+        "elapsedMs": 3224,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/4b726527599f/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 1843,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/3ef12ae73600/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 7667,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/3ef12ae73600/supplemental/callback-order-interpretation/result.json",
+        "exit": 0,
+        "elapsedMs": 4602,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/3ef12ae73600/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 4027,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/2c3146b61f69/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 1029,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/2c3146b61f69/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 527,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/53a657cf6ab8/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 997,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/53a657cf6ab8/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 516,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/3375af3c39c5/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 4101,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/3375af3c39c5/independent/result.json",
+        "exit": 1,
+        "elapsedMs": 1725,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/6960a8f1de8a/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 1182,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/6960a8f1de8a/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 517,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/7379be605902/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 7765,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/7379be605902/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 3706,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/b60c3368673e/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 1539,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/b60c3368673e/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 630,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/b60c3368673e/test-sensitivity/result.json",
+        "exit": 0,
+        "elapsedMs": 1558,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/8fb8b5e52a97/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 1717,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/8fb8b5e52a97/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 849,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/8fb8b5e52a97/test-sensitivity/result.json",
+        "exit": 0,
+        "elapsedMs": 1566,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/cf57afd4f2c6/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 4632,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/cf57afd4f2c6/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 1863,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/9e4f9df7cdda/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 8572,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/9e4f9df7cdda/independent/result.json",
+        "exit": 1,
+        "elapsedMs": 4277,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/f4d825ced509/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 7774,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/f4d825ced509/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 3158,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/80e5601c914d/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 8582,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/80e5601c914d/supplemental/callback-order-interpretation/result.json",
+        "exit": 0,
+        "elapsedMs": 4865,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/80e5601c914d/independent/result.json",
+        "exit": 1,
+        "elapsedMs": 2910,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/e01efb782e8c/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 1588,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/e01efb782e8c/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 637,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/e01efb782e8c/test-sensitivity/result.json",
+        "exit": 2,
+        "elapsedMs": 1084,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/8113f808eacc/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 1906,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/8113f808eacc/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 661,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/8113f808eacc/test-sensitivity/result.json",
+        "exit": 0,
+        "elapsedMs": 1608,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/0d6ee00e6ab4/ordinary-project/result.json",
+        "exit": 0,
+        "elapsedMs": 8857,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "reviews/0d6ee00e6ab4/independent/result.json",
+        "exit": 0,
+        "elapsedMs": 3407,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "control-test-sensitivity/denque-remove-where/alternative/result.json",
+        "exit": 1,
+        "elapsedMs": 1061,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "control-test-sensitivity/denque-remove-where/reference/result.json",
+        "exit": 1,
+        "elapsedMs": 1045,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "control-test-sensitivity/denque-rotate/alternative/result.json",
+        "exit": 0,
+        "elapsedMs": 1568,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "control-test-sensitivity/denque-rotate/reference/result.json",
+        "exit": 0,
+        "elapsedMs": 1648,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "supplemental-controls/fastq-on-idle/alternative/early-kill-test-sensitivity/result.json",
+        "exit": 1,
+        "elapsedMs": 3422,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "supplemental-controls/fastq-on-idle/alternative/idle-transition/result.json",
+        "exit": 0,
+        "elapsedMs": 3076,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "supplemental-controls/fastq-on-idle/reference/early-kill-test-sensitivity/result.json",
+        "exit": 1,
+        "elapsedMs": 4322,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "supplemental-controls/fastq-on-idle/reference/idle-transition/result.json",
+        "exit": 0,
+        "elapsedMs": 4119,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "supplemental-controls/quick-lru-prune/alternative/callback-order-interpretation/result.json",
+        "exit": 0,
+        "elapsedMs": 4150,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      },
+      {
+        "artifact": "supplemental-controls/quick-lru-prune/reference/callback-order-interpretation/result.json",
+        "exit": 0,
+        "elapsedMs": 4437,
+        "terminationVerified": true,
+        "containerRemoved": true,
+        "realProviderRequests": 0
+      }
+    ]
+  },
+  "ordinaryPatchApplication": {
+    "sourcePatches": 18,
+    "actualNativeTerminalPatches": 8,
+    "cleanOrdinaryGitCopies": true,
+    "byteAndModeIdentityVerified": true,
+    "separatelyTimed": false
+  },
+  "orchestrator": {
+    "preFirstProviderRequest": {
+      "at": "2026-09-13T19:42:13Z",
+      "goalTrackerTokensReported": 320777,
+      "goalTrackerElapsedSeconds": 2603,
+      "scope": "Developing/orchestrating Codex agent tracker through preparation and start of scored execution; not Luna token usage, not a monetary charge.",
+      "paidSmokes": 0
+    },
+    "nearReportAssembly": {
+      "tokensUsed": 845117,
+      "timeUsedSeconds": 10124
+    },
+    "scope": "Codex goal tracker, separate from Luna request usage. This is a checkpoint lower bound, not final billing or a charge. Includes preparation, monitoring, evaluation and report work."
+  },
+  "caveats": [
+    "Cache tokens are a subset of input; reasoning tokens a subset of output. Do not add them again.",
+    "P has one unknown-usage request; known sums are incomplete and are not zero-filled.",
+    "Slot elapsed sums include deadline/early-stop imbalance; do not infer comparative speed from them.",
+    "No reliable monetary charge is available from OAuth metadata.",
+    "Dependency/image preparation and host compilation/applicability have no complete separate wall-time meter. The orchestrator tracker and recorded model-free elapsed sums do not establish a complete resource invoice."
+  ]
+}
