@@ -1,0 +1,34 @@
+{
+  "batch": {
+    "attempts": 8,
+    "authorSessions": 0,
+    "providerRequests": 0,
+    "toolCalls": 0,
+    "diagnosticCalls": 0,
+    "deliveredPatches": 0,
+    "executionMs": 5145,
+    "cleanupMs": 453,
+    "preparationAndCaptureMs": 26602,
+    "usage": {
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "cachedInputTokens": 0,
+      "reasoningTokens": 0,
+      "unknownRequests": 0
+    }
+  },
+  "retainedLocalObservations": {
+    "calls": 14,
+    "commands": 69,
+    "engineMs": 2193,
+    "preparationMs": 48162,
+    "totalMs": 75661,
+    "scope": "These retained local observations only. Earlier iterative checks, npm preparation and developer work were not completely timed; their aggregate cost is unknown, not zero."
+  },
+  "correctedInstalledFixture": {
+    "nativeElapsedMs": 5573,
+    "scriptedRequests": 15,
+    "realProviderRequests": 0
+  },
+  "monetaryCost": null
+}

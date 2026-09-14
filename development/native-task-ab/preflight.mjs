@@ -7,6 +7,7 @@ import {runTask} from './native-run.mjs';
 
 const root=path.resolve(process.argv[2]??'local/native-task-ab'),toolchain=path.resolve(process.argv[3]);
 const config=JSON.parse(fs.readFileSync(path.join(root,'experiment-config.json')));
+const sensitivity=process.env.PREFLIGHT_SENSITIVITY==='1';
 const runName=process.env.PREFLIGHT_DIRECTORY??'preflight';
 const source=path.join(root,'scripted-input-'+runName);fs.mkdirSync(source);
 for(const [name,text]of Object.entries({
@@ -17,8 +18,12 @@ for(const [name,text]of Object.entries({
  'package.json':JSON.stringify({private:true,scripts:{test:'node --test'}}),
  '.gitignore':'node_modules\n',
 }))fs.writeFileSync(path.join(source,name),text);
+if(sensitivity){
+ fs.writeFileSync(path.join(source,'value.mjs'),'export const value = 1; export const legacy = () => { return 7; };\n');
+ fs.writeFileSync(path.join(source,'consumer.test.mjs'),fs.readFileSync(path.join(source,'consumer.test.mjs'),'utf8').replace('assert.equal(legacy(),7)',''));
+}
 let seq=0;const results=[];
-for(const arm of (process.env.PREFLIGHT_H00_ONLY==='1'?['P','H00']:['P','H00','H10','H01','H11'])){
+for(const arm of (sensitivity?['H1']:process.env.PREFLIGHT_H00_ONLY==='1'?['P','H00']:['P','H00','H10','H01','H11'])){
  const enabled=arm!=='P',A=['H10','H11'].includes(arm),B=['H01','H11'].includes(arm),counts=new Map(),requests=[],failures=[];
  let session;
  try{
@@ -38,6 +43,14 @@ for(const arm of (process.env.PREFLIGHT_H00_ONLY==='1'?['P','H00']:['P','H00','H
      };
      const check={name:'bash',args:{command:B?'harness-check value.mjs':'npm run test',workdir:'.',description:'Real early project check'}};
      const calls=[read('value.mjs'),edit('value.mjs','value = 1','value = 2'),check,read('consumer.test.mjs'),edit('consumer.test.mjs','value,1','value,2'),check,read('value.mjs'),{name:'bash',args:{command:'node --test',workdir:'.',description:'Final ordinary native check'}}];
+     if(sensitivity){
+      const sense={name:'bash',args:{command:'harness-sense value.mjs',workdir:'.',timeout:30000,description:'Real sensitivity check in read-only installed profile'}};
+      const strengthened=fs.readFileSync(path.join(source,'consumer.test.mjs'),'utf8').trimEnd().replace('value,1','value,2').replace('assert.equal(value,2);','assert.equal(value,2);assert.equal(legacy(),7);');
+      const weak=strengthened.replace('assert.equal(legacy(),7);','');
+      calls.splice(6,2,sense,{name:'apply_patch',args:{patchText:'*** Begin Patch\n*** Update File: consumer.test.mjs\n@@\n-'+weak+'\n+'+strengthened+'\n*** End Patch'}},check,sense,{name:'bash',args:{command:'node --test',workdir:'.',description:'Final ordinary native check'}});
+      if(n===7)assert.ok(toolOutputs.includes('Tests still pass.'),'Real survivor reached same native author');
+      if(n===10)assert.ok(toolOutputs.includes('Variant rejected by command; cause requires inspection'),'Fresh stronger regression result reached author');
+     }
      if(n===1){assert.equal(toolOutputs.includes('Computed code context A'),A);if(A){assert.ok(toolOutputs.includes('6.0.3'));assert.ok(toolOutputs.includes('consumer.test.mjs'));}}
      if(n===3){assert.ok(toolOutputs.includes('ERR_ASSERTION')||toolOutputs.includes('AssertionError'));assert.equal(toolOutputs.includes('Project check B'),B);}
      if(n===6&&B)assert.ok(toolOutputs.includes('"status":"passed"'));
