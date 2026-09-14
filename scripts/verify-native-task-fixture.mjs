@@ -22,8 +22,15 @@ fs.writeFileSync(path.join(project,'value.mjs'),source);
 fs.writeFileSync(path.join(project,'value.test.mjs'),originalTest);
 fs.writeFileSync(path.join(project,'package.json'),JSON.stringify({private:true,scripts:{test:'node --test'}}));
 fs.writeFileSync(path.join(project,'opencode.json'),JSON.stringify({$schema:'https://opencode.ai/config.json',permission:{task:'allow',bash:'allow'}}));
+if(process.env.NATIVE_TASK_FIXTURE_SENSITIVITY==='1'){
+ fs.writeFileSync(path.join(project,'.gitignore'),'node_modules/\n');
+ const dependency=path.join(project,'node_modules/sensitivity-fixture-helper');fs.mkdirSync(dependency,{recursive:true});
+ fs.writeFileSync(path.join(dependency,'package.json'),JSON.stringify({name:'sensitivity-fixture-helper',type:'module',exports:'./index.mjs'}));
+ fs.writeFileSync(path.join(dependency,'index.mjs'),'export const loaded = true;\n');
+}
 git('add','.');git('-c','core.hooksPath=/dev/null','-c','user.name=Fixture','-c','user.email=fixture@localhost','commit','-qm','base');
 materializeNativeTemplate({repositoryRoot:root,outputDirectory:bundle,task:true,review:true});
+if(process.env.NATIVE_TASK_FIXTURE_SENSITIVITY==='1')fs.symlinkSync(path.join(root,'profiles/native/sensitivity/node_modules'),path.join(bundle,'sensitivity/node_modules'));
 const ordinaryErrorModes=['missing-read','edit-context'];
 const continuationModes=['external-path','external-argument','bash-denial','second-denial'];
 const forbiddenContent='UNREAD_NATIVE_DENIAL_SENTINEL';
@@ -82,7 +89,14 @@ const fixture=http.createServer(async(req,res)=>{
   }
   let calls=[];
   if(stage==='implementation') {
-   if(mode==='components') {
+   if(mode==='sensitivity') {
+    const all=JSON.stringify(body.messages);
+    const sense={name:'bash',args:{command:'harness-sense value.mjs',workdir:'.',timeout:30000,description:'Check public boundary sensitivity'}};
+    calls=[bash('npm test'),sense,{name:'edit',args:{filePath:'value.test.mjs',oldString:'assert.equal(accepts(3),true);',newString:'assert.equal(accepts(3),true);assert.equal(accepts(2),true);'}},sense,bash('npm test')];
+    if(n===2){assert.ok(all.includes('Tests still pass.'),'Actual survivor reaches author');assert.ok(all.includes('n > 2'),'Concrete behavior change reaches author');}
+    if(n===4)assert.ok(all.includes('Variant rejected by command; cause requires inspection'),'Fresh changed-test result reaches same author');
+   }
+   else if(mode==='components') {
     const flags=process.env.NATIVE_TASK_FIXTURE_COMPONENTS??'00',all=JSON.stringify(body.messages);
     const check={name:'bash',args:{command:flags[1]==='1'?'harness-check value.mjs':'npm run test',workdir:'.',description:'Actual project check'}};
     calls=[{name:'read',args:{filePath:'value.mjs'}},check,{name:'edit',args:{filePath:'value.mjs',oldString:'value = 2',newString:'value = 3'}},check,{name:'read',args:{filePath:'value.test.mjs'}},{name:'edit',args:{filePath:'value.test.mjs',oldString:'value,2',newString:'value,3'}},check,{name:'read',args:{filePath:'value.mjs'}},bash('node --test')];
@@ -192,6 +206,7 @@ if(process.env.NATIVE_TASK_FIXTURE_COMPONENTS){
  assert.match(flags,/^[01]{2}$/);
  Object.assign(env,{HARNESS_TASK_STRATEGY:'direct',HARNESS_TASK_CONTEXT:flags[0],HARNESS_TASK_CHECKS:flags[1],HARNESS_TASK_TIMEOUT_MS:'60000'});
 }
+if(process.env.NATIVE_TASK_FIXTURE_SENSITIVITY==='1')Object.assign(env,{HARNESS_TASK_STRATEGY:'direct',HARNESS_TASK_CONTEXT:'0',HARNESS_TASK_CHECKS:'0',HARNESS_TASK_SENSITIVITY:'1',HARNESS_TASK_TIMEOUT_MS:'60000'});
 const child = spawn(process.env.OPENCODE_BIN ?? 'opencode', ['serve', '--hostname', '127.0.0.1', '--port', String(port)], { cwd: project, env, stdio: ['ignore', 'pipe', 'pipe'] });
 let stderr = ''; child.stderr.on('data', x => { stderr += x; fs.writeFileSync(path.join(temp, 'server.log'), stderr); }); child.stdout.resume();
 const api = async (method, route, body) => { const r = await fetch(`http://127.0.0.1:${port}${route}`, { method, headers: { 'content-type': 'application/json' }, ...(body ? { body: JSON.stringify(body) } : {}), signal: AbortSignal.timeout(60000) }); if (!r.ok) throw Error(await r.text()); return r.json(); };
@@ -210,8 +225,13 @@ try {
   if(mode==='stateful'){fs.copyFileSync(path.join(root,'fixtures/native-stateful/example.mjs'),path.join(project,'example.mjs'));fs.writeFileSync(path.join(project,'example.test.mjs'),stale);fs.appendFileSync(task,' Preserve the clear scenario and test consumption of an existing item through consume plus empty idempotency.');}
   if(mode==='staged-work'){fs.writeFileSync(path.join(project,'value.mjs'),source+'// staged user bytes\n');git('add','value.mjs');fs.appendFileSync(path.join(project,'value.mjs'),'// unstaged user bytes\n');}
   if(mode==='components')fs.writeFileSync(task,'ORIGINAL_TASK_FIXTURE: Change value from 2 to 3 and update its public test expectation, preserving the independent legacy() = 7 scenario. Run node --test after the last edit.');
+  if(mode==='sensitivity'){
+   fs.appendFileSync(path.join(project,'value.mjs'),"import 'sensitivity-fixture-helper';\nexport function accepts(n) {\n return n >= 2;\n}\n");
+   fs.appendFileSync(path.join(project,'value.test.mjs'),"import {accepts} from './value.mjs'; test('accepts boundary',()=>{assert.equal(accepts(3),true);assert.equal(accepts(1),false);});\n");
+   fs.writeFileSync(task,'ORIGINAL_TASK_FIXTURE: Complete accepts(n), true for numbers >= 2, false below 2, including a meaningful boundary regression. Preserve value=2 and legacy()=7. Run npm test.');
+  }
   const userBytes=fs.readFileSync(path.join(project,'value.mjs'),'utf8'),index=git('ls-files','--stage','-z');
-  const session=await api('POST','/session',{permission:mode==='component-denial'?[{permission:'bash',pattern:'npm run test',action:'deny'}]:['permission','bash-denial'].includes(mode)?[{permission:'bash',pattern:'printf forbidden',action:mode==='permission'?'ask':'deny'}]:continuationModes.includes(mode)?[{permission:'external_directory',pattern:'*',action:'deny'}]:[]});
+  const session=await api('POST','/session',{permission:mode==='component-denial'?[{permission:'bash',pattern:'npm run test',action:'deny'}]:['permission','bash-denial'].includes(mode)?[{permission:'bash',pattern:'printf forbidden',action:mode==='permission'?'ask':'deny'}]:continuationModes.includes(mode)||mode==='sensitivity'?[{permission:'external_directory',pattern:'*',action:'deny'}]:[]});
   const pending=api('POST',`/session/${session.id}/command`,{command:'harness-task',arguments:'',agent:'build',model:'local-fixture/fixture'});
   if(mode==='permission'){
    pending.catch(()=>{});let asks=[],denialDirectory;
@@ -272,6 +292,21 @@ try {
   if(mode==='external-save')assert.equal(fs.readFileSync(path.join(report.executionDirectory,'value.mjs'),'utf8'),source+'// external edit\n');
   assert.ok(fs.existsSync(path.join(report.artifacts,'D0.patch'))||['external-save','permission','second-denial','unknown-error'].includes(mode));
   const events=JSON.parse(fs.readFileSync(path.join(report.artifacts,'tool-events.json')));
+  if(mode==='sensitivity'){
+   const observations=JSON.parse(fs.readFileSync(path.join(report.artifacts,'sensitivity-events.json')));
+   assert.equal(observations.length,2);assert.equal(observations[0].stale,true);assert.equal(observations[1].stale,false);
+   assert.notEqual(observations[0].snapshot,observations[1].snapshot);
+   assert.equal(fs.existsSync(path.join(report.artifacts,'component-events.json')),false);
+   const patch=fs.readFileSync(report.terminalPatch,'utf8');
+   assert.match(patch,/accepts\(2\),true/);assert.doesNotMatch(patch,/harness-sense-|native-sensitivity|stryker|node_modules/);
+   // Terminal patch includes original user changes relative to HEAD.
+   const copy=path.join(temp,'patch-check');fs.mkdirSync(copy);
+   const archive=spawnSync('git',['archive','HEAD'],{cwd:project});assert.equal(archive.status,0);
+   assert.equal(spawnSync('tar',['-x','-C',copy],{input:archive.stdout}).status,0);
+   assert.equal(spawnSync('git',['apply',report.terminalPatch],{cwd:copy}).status,0);
+   fs.cpSync(path.join(project,'node_modules'),path.join(copy,'node_modules'),{recursive:true});
+   assert.equal(spawnSync('npm',['test'],{cwd:copy}).status,0);
+  }
   if(mode==='components'){
    assert.deepEqual(componentFixtureErrors,[],'Scripted provider assertions must not be hidden by a native retry');
    const flags=process.env.NATIVE_TASK_FIXTURE_COMPONENTS;

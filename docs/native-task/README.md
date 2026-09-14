@@ -9,6 +9,9 @@ its development results do not establish a recommended production mode.
 
 ## Install and use
 
+Optional [test sensitivity](SENSITIVITY.md) adds bounded StrykerJS observations
+inside that same author session. It remains independently off by default.
+
 The opt-in development candidate `HARNESS_TASK_STRATEGY=direct` uses one native
 author pass for the complete original task. Implementation, actual consumers,
 regressions and documentation stay in that pass. When changing stateful behavior,

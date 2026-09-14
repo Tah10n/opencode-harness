@@ -47,12 +47,14 @@ if(amendment){
 }
 
 function verify(){
- const transfer=f.experimentKind==='transfer', h00=f.experimentKind==='h00-transfer';
- if(f.attempts.length!==(h00?48:transfer?8:30)||f.model!=='openai/gpt-5.6-luna'||f.variant!=='high'||f.budgetMs!==900000||!f.preflightPassed)throw Error('Invalid development configuration');
+ const transfer=f.experimentKind==='transfer', h00=f.experimentKind==='h00-transfer', sensitivity=f.experimentKind==='sensitivity';
+ if(f.attempts.length!==(h00?48:transfer||sensitivity?8:30)||f.model!=='openai/gpt-5.6-luna'||f.variant!=='high'||f.budgetMs!==900000||!f.preflightPassed)throw Error('Invalid development configuration');
  for(const [file,digest] of Object.entries(f.files))if(sha(fs.readFileSync(file))!==(amendment?.launcherFiles[file]?.after??digest))throw Error('Frozen file changed: '+file);
  for(const [directory,expected]of Object.entries(f.runtimeManifests??{})){const seen=new Set();const visit=(dir,prefix='')=>{for(const entry of fs.readdirSync(dir,{withFileTypes:true})){const file=path.join(dir,entry.name),name=prefix+entry.name,stat=fs.lstatSync(file);if(stat.isDirectory()){visit(file,name+'/');continue;}const got=stat.isSymbolicLink()?{symlink:fs.readlinkSync(file)}:{sha256:sha(fs.readFileSync(file)),executable:!!(stat.mode&0o111)};if(JSON.stringify(got)!==JSON.stringify(expected[name]))throw Error('Installed runtime changed: '+name);seen.add(name);}};visit(directory);if(seen.size!==Object.keys(expected).length)throw Error('Installed runtime missing files');}
  const groups=new Map();for(const a of f.attempts){const group=groups.get(a.task)??[];group.push(a.arm);groups.set(a.task,group);}
- if(h00){
+ if(sensitivity){
+  if(groups.size!==4||[...groups.values()].some(x=>x.slice().sort().join(',')!=='H0,H1')||f.streamLimit!=='remaining-task-budget'||f.connectionTimeoutMs!==30000)throw Error('Invalid sensitivity diagnostic schedule');
+ }else if(h00){
   if(groups.size!==12||f.streamLimit!=='remaining-task-budget'||f.connectionTimeoutMs!==30000)throw Error('Invalid H00 transfer settings');
   const projects=new Map();for(const task of groups.keys()){const rows=f.attempts.filter(a=>a.task===task),project=rows[0].project;if(!project||rows.some(a=>a.project!==project))throw Error('Invalid project group');projects.set(project,(projects.get(project)??0)+1);for(const repetition of [1,2])if(rows.filter(a=>a.repetition===repetition).map(a=>a.arm).sort().join(',')!=='H00,P')throw Error('Invalid H00 repeated pair');}
   if(projects.size<6||[...projects.values()].some(n=>n>2))throw Error('Invalid project diversity');
@@ -106,7 +108,7 @@ for(const attempt of f.attempts.filter(a=>!amendment||a.slot>=19)){
     const requestKind=frame.body?.tools?.length?'work':'title';
     let requestSignal;
     const record={requestIndex:requests.length+1,requestKind,at:new Date().toISOString(),path:frame.path,model:frame.body?.model,effort:frame.body?.reasoning?.effort??null,forwarded:false,usage:null};requests.push(record);save();
-    if(f.experimentKind==='h00-transfer')fs.writeFileSync(path.join(out,'request-'+requests.length+'.json'),JSON.stringify(frame.body),{mode:0o600,flag:'wx'});
+    if(['h00-transfer','sensitivity'].includes(f.experimentKind))fs.writeFileSync(path.join(out,'request-'+requests.length+'.json'),JSON.stringify(frame.body),{mode:0o600,flag:'wx'});
     if(pause||abort.signal.aborted||!deadline||Date.now()>=deadline){record.notForwardedReason='paused-or-deadline';save();send({type:'headers',status:408,contentType:'text/plain'});send({type:'end'});return;}
     if(frame.path!=='/v1/responses'||frame.body?.model!=='gpt-5.6-luna'||frame.body.stream!==true||frame.body?.reasoning?.effort!=='high'){pauseScheduling('boundary_refusal',attempt.slot);record.rejected=true;save();send({type:'headers',status:403,contentType:'text/plain'});send({type:'end'});return;}
     try{
@@ -125,7 +127,7 @@ for(const attempt of f.attempts.filter(a=>!amendment||a.slot>=19)){
      send({type:'headers',status:response.status,contentType:response.headers.get('content-type')??'text/event-stream'});
      const observer=responseObserver(record,save);
      for await(const chunk of response.body){
-      if(f.experimentKind==='h00-transfer')fs.appendFileSync(path.join(out,'response-'+record.requestIndex+'.sse'),chunk,{mode:0o600});
+      if(['h00-transfer','sensitivity'].includes(f.experimentKind))fs.appendFileSync(path.join(out,'response-'+record.requestIndex+'.sse'),chunk,{mode:0o600});
       // Observe/persist upstream facts before delivery can fail or be cancelled.
       observer.push(chunk);send({type:'chunk',data:Buffer.from(chunk).toString('base64')});
      }
