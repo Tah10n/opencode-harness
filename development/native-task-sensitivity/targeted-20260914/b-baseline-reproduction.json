@@ -1,0 +1,73 @@
+{
+  "ordinaryExit": 0,
+  "beforeDependencies": "/work/repo/node_modules",
+  "afterDependencies": "/work/repo/.git/harness-task/offline/worktree/node_modules",
+  "localDependencyFiles": [
+    ".cache/ava/failing-tests.json",
+    ".cache/xo-linter/tsconfig.2340015805.json",
+    ".cache/xo-linter/xo-cache.json"
+  ],
+  "report": {
+    "kind": "sensitivity",
+    "status": "baseline-not-passed",
+    "engineExecuted": false,
+    "snapshot": "030774e61dfad2627199d5d0acda747b34e619926620337e85e1867ab3abad1c",
+    "baseline": {
+      "exit": 127,
+      "signal": null,
+      "status": "command-rejected",
+      "elapsedMs": 53,
+      "output": "\n> quick-lru@7.3.0 test\n> xo && nyc ava && tsd\n\nsh: 1: xo: not found\n"
+    },
+    "variants": [],
+    "untested": [],
+    "cost": {
+      "commands": 1,
+      "engineMs": 0,
+      "preparationMs": 26,
+      "commandMs": 53,
+      "totalMs": 96
+    },
+    "limits": [
+      "Only changed production lines and one neighboring line; no cross-package or semantic requirement coverage inference.",
+      "Standard Stryker operators may miss identity loss or a specific state transition.",
+      "Ignored project files are excluded; installed node_modules is copied. Fresh baseline and variant commands; no result cache.",
+      "Nonzero command exits need inspection; no assertion classification or mutation score. Surviving variants may be equivalent or allowed."
+    ],
+    "command": "npm run test",
+    "argv": [
+      "npm",
+      "run",
+      "test"
+    ],
+    "tests": [
+      {
+        "name": "test.js",
+        "sha256": "7a2e5266c484a17ab15ec0bf1b5419fe4871ca98ff833fa4496ceb39dd8eb288"
+      }
+    ],
+    "selectedVariant": null,
+    "ranges": [
+      [
+        "index.js",
+        [
+          {
+            "start": 119,
+            "end": 139
+          }
+        ]
+      ]
+    ],
+    "dependencies": {
+      "files": 3,
+      "bytes": 1426,
+      "metadataSha256": "a0440278fb96dd37a23e279f666a06470515a9b445948ffff0496ee23378a573"
+    },
+    "terminationVerified": true
+  },
+  "termination": {
+    "terminationVerified": true,
+    "killed": []
+  },
+  "realProviderRequests": 0
+}

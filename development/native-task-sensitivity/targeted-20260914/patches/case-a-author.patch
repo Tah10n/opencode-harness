@@ -1,0 +1,43 @@
+diff --git a/test/denque.js b/test/denque.js
+index bc29177..b016fd5 100644
+--- a/test/denque.js
++++ b/test/denque.js
+@@ -449,6 +449,38 @@ describe('Denque.prototype.removeOne', function () {
+ });
+ 
+ describe('Denque.prototype.removeWhere', function () {
++  it('should not visit values in an empty queue', function () {
++    var queue = new Denque();
++    var calls = 0;
++
++    assert.strictEqual(queue.removeWhere(function () {
++      calls++;
++      return true;
++    }), 0);
++    assert.strictEqual(calls, 0);
++    assert.strictEqual(queue.length, 0);
++  });
++
++  it('should visit only the initially present values in a contiguous queue', function () {
++    var first = { id: 1 };
++    var second = false;
++    var third = { id: 3 };
++    var queue = new Denque([first, second, third]);
++    var seen = [];
++
++    assert.strictEqual(queue.removeWhere(function (value, index) {
++      seen.push([value, index]);
++      return value === second;
++    }), 1);
++    assert.strictEqual(seen.length, 3);
++    assert.strictEqual(seen[0][0], first);
++    assert.strictEqual(seen[1][0], second);
++    assert.strictEqual(seen[2][0], third);
++    assert.deepStrictEqual(seen.map(function (entry) { return entry[1]; }), [0, 1, 2]);
++    assert.strictEqual(queue.peekAt(0), first);
++    assert.strictEqual(queue.peekAt(1), third);
++  });
++
+   it('should visit original values and indexes and retain survivors in order', function () {
+     var seen = [];
+     var mixed = new Denque([1, 2, 3, 4, 5]);

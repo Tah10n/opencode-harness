@@ -1,0 +1,5 @@
+--- a/index.js
++++ b/index.js
+@@ 121:6 @@
+-this.#cache.has(key)
++false

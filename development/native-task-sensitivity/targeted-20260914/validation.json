@@ -1,0 +1,19 @@
+{
+  "at": "2026-09-14T20:06:33.099Z",
+  "passed": true,
+  "actualTaskRuns": 3,
+  "realSmokes": 0,
+  "replacements": 0,
+  "immutableInputChecks": true,
+  "runtimeUnchanged": true,
+  "terminalPatchesVerified": 3,
+  "ordinaryAndIndependentPassed": 3,
+  "strictS": 2,
+  "T": 3,
+  "correctCompleted": 2,
+  "knownProviderRequests": 73,
+  "unknownUsageRequests": 0,
+  "knownTokens": 2429181,
+  "fullVerifier": "Known PROCESS_CONTAINMENT_UNAVAILABLE, not rerun or bypassed",
+  "ci": "No manual Actions dispatched; automatic checks inspected after publication"
+}
