@@ -13,4 +13,4 @@ function readAuth(){
  return {access:auth.access,accountId:auth.accountId};
 }
 readAuth();
-await runComparison({root:path.resolve(process.argv[2]??'local/native-task-ab'),startContainer,stopWorkload,captureCandidate,readAuth});
+await runComparison({root:path.resolve(process.argv[2]??'local/native-task-ab'),startContainer,stopWorkload,captureCandidate,readAuth,continuationFile:process.argv[3]?path.resolve(process.argv[3]):null});

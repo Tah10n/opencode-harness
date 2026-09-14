@@ -2,13 +2,54 @@
 // A/B do not add a phase or an intermediate model deadline.
 import fs from 'node:fs';import path from 'node:path';import {createHash} from 'node:crypto';
 import {runTask} from './native-run.mjs';
-export async function runComparison({root,startContainer,captureCandidate,stopWorkload,readAuth,fetchImpl=fetch,runTaskImplementation=runTask}) {
+import {execFileSync} from 'node:child_process';
+// Per-request observer for the response lifecycle forms actually emitted by
+// the configured upstream. Transport/native completion remain separate facts.
+export function responseObserver(record, persist=()=>{}) {
+ const decoder=new TextDecoder('utf-8',{fatal:true});let buffer='';
+ const terminalTypes={'response.completed':'completed','response.failed':'failed','response.incomplete':'incomplete'};
+ const conflict=reason=>{record.responseBindingError??=reason;record.serverCompletion='unknown';persist();};
+ const usageOf=u=>{if(!u||typeof u!=='object')return null;const out={};for(const key of ['input_tokens','output_tokens','total_tokens'])if(Number.isFinite(u[key])&&u[key]>=0)out[key]=u[key];if(Number.isFinite(u.input_tokens_details?.cached_tokens))out.cached_tokens=u.input_tokens_details.cached_tokens;if(Number.isFinite(u.output_tokens_details?.reasoning_tokens))out.reasoning_tokens=u.output_tokens_details.reasoning_tokens;return Object.keys(out).length?out:null;};
+ const packet=text=>{
+  const lines=text.split(/\r?\n/),data=lines.filter(l=>l.startsWith('data:')).map(l=>l.slice(5).replace(/^ /,'')).join('\n');if(!data||data==='[DONE]')return;
+  let event;try{event=JSON.parse(data);}catch{conflict('Malformed upstream SSE JSON');return;}
+  const lifecycle=['response.created','response.in_progress',...Object.keys(terminalTypes)].includes(event?.type);if(!lifecycle)return;
+  const declared=lines.find(l=>l.startsWith('event:'))?.slice(6).trim();if(declared&&declared!==event.type){conflict('SSE event/type mismatch');return;}
+  const r=event.response,status=terminalTypes[event.type]??'in_progress';
+  if(!r||typeof r.id!=='string'||!r.id||r.status!==status){conflict('Unbound or inconsistent response lifecycle');return;}
+  if(record.responseId&&record.responseId!==r.id){conflict('Different response IDs in one request');return;}
+  if(!record.responseId){if(!['response.created','response.in_progress'].includes(event.type)){conflict('Terminal response without request-local lifecycle binding');return;}record.responseId=r.id;}
+  if(!terminalTypes[event.type]){if(record.terminalResponse)conflict('Nonterminal lifecycle after terminal response');else record.responseStatus=r.status;return;}
+  const usage=usageOf(r.usage),previous=record.terminalResponse;
+  if(previous&&(previous.id!==r.id||previous.status!==r.status||JSON.stringify(previous.usage)!==JSON.stringify(usage))){conflict('Conflicting terminal response events');return;}
+  if(!previous){record.terminalResponse={id:r.id,status:r.status,eventType:event.type,usage};record.responseStatus=r.status;record.usage=usage;record.terminalEvents=1;}
+  else record.duplicateTerminalEvents=(record.duplicateTerminalEvents??0)+1;
+  record.serverCompletion=record.responseBindingError?'unknown':r.status;persist();
+ };
+ const consume=text=>{buffer+=text;let match;while((match=/\r?\n\r?\n/.exec(buffer))){packet(buffer.slice(0,match.index));buffer=buffer.slice(match.index+match[0].length);}};
+ return {push(bytes){try{consume(decoder.decode(bytes,{stream:true}));}catch(error){conflict('Invalid upstream UTF-8');throw error;}},end(){try{consume(decoder.decode());}catch(error){conflict('Invalid upstream UTF-8 at EOF');throw error;}}};
+}
+export function knownResponseTerminal(record){return !!record.terminalResponse&&!record.responseBindingError;}
+
+export async function runComparison({root,startContainer,captureCandidate,stopWorkload,readAuth,fetchImpl=fetch,runTaskImplementation=runTask,continuationFile=null,verifyQuiescence=verifyHistoricalContainers}) {
 const f=JSON.parse(fs.readFileSync(path.join(root,'freeze.json')));
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
+const amendment=continuationFile?JSON.parse(fs.readFileSync(continuationFile)):null;
+const outputRoot=amendment?path.join(root,'continuation-19-48'):root;
+const allowedChanges=['run-comparison.mjs','run.mjs','verify-scheduler.mjs'].map(n=>path.resolve('development/native-task-ab',n));
+if(amendment){
+ if(amendment.version!==1||amendment.firstSlot!==19||amendment.lastSlot!==48||amendment.originalFreezeSha256!==sha(fs.readFileSync(path.join(root,'freeze.json')))||f.experimentKind!=='h00-transfer')throw Error('Invalid explicit continuation amendment');
+ const historicalPause=JSON.parse(fs.readFileSync(path.join(root,'scheduling-paused.json')));
+ if(historicalPause.kind!=='unknown_submission'||historicalPause.slot!==18)throw Error('Amendment does not authorize this pause');
+ if(amendment.originalPauseSha256!==sha(fs.readFileSync(path.join(root,'scheduling-paused.json'))))throw Error('Historical pause changed');
+ if(!amendment.launcherFiles||!Object.keys(amendment.launcherFiles).length||Object.keys(amendment.launcherFiles).some(file=>!allowedChanges.includes(file)))throw Error('Amendment exceeds launcher scope');
+ for(const [file,versions] of Object.entries(amendment.launcherFiles))if(versions.before!==f.files[file]||versions.after!==sha(fs.readFileSync(file)))throw Error('Amended launcher version mismatch');
+}
+
 function verify(){
  const transfer=f.experimentKind==='transfer', h00=f.experimentKind==='h00-transfer';
  if(f.attempts.length!==(h00?48:transfer?8:30)||f.model!=='openai/gpt-5.6-luna'||f.variant!=='high'||f.budgetMs!==900000||!f.preflightPassed)throw Error('Invalid development configuration');
- for(const [file,digest] of Object.entries(f.files))if(sha(fs.readFileSync(file))!==digest)throw Error('Frozen file changed: '+file);
+ for(const [file,digest] of Object.entries(f.files))if(sha(fs.readFileSync(file))!==(amendment?.launcherFiles[file]?.after??digest))throw Error('Frozen file changed: '+file);
  for(const [directory,expected]of Object.entries(f.runtimeManifests??{})){const seen=new Set();const visit=(dir,prefix='')=>{for(const entry of fs.readdirSync(dir,{withFileTypes:true})){const file=path.join(dir,entry.name),name=prefix+entry.name,stat=fs.lstatSync(file);if(stat.isDirectory()){visit(file,name+'/');continue;}const got=stat.isSymbolicLink()?{symlink:fs.readlinkSync(file)}:{sha256:sha(fs.readFileSync(file)),executable:!!(stat.mode&0o111)};if(JSON.stringify(got)!==JSON.stringify(expected[name]))throw Error('Installed runtime changed: '+name);seen.add(name);}};visit(directory);if(seen.size!==Object.keys(expected).length)throw Error('Installed runtime missing files');}
  const groups=new Map();for(const a of f.attempts){const group=groups.get(a.task)??[];group.push(a.arm);groups.set(a.task,group);}
  if(h00){
@@ -22,12 +63,36 @@ function verify(){
  if(new Set(f.attempts.map(a=>a.slot)).size!==f.attempts.length||f.attempts.some((a,i)=>a.slot!==i+1))throw Error('Invalid slot identity');
 }
 
-verify();if(fs.existsSync(path.join(root,'scheduling-paused.json')))throw Error('Continuation paused; no automatic resume');
+verify();
+if(amendment){
+ if(fs.existsSync(outputRoot))throw Error('Continuation directory already exists; never overwrite or automatically resume');
+ const identity=(got,wanted)=>['slot','task','project','repetition','arm','source'].every(key=>got[key]===wanted[key]);
+ const historical=[];
+ const expectedDirectories=new Set(f.attempts.filter(a=>a.slot<19).map(a=>a.task+'-r'+a.repetition+'-'+a.arm));
+ const actualDirectories=fs.readdirSync(path.join(root,'runs'));
+ if(actualDirectories.length!==18||actualDirectories.some(n=>!expectedDirectories.has(n)))throw Error('Unrecognized historical run directory');
+ for(const attempt of f.attempts){
+  const dir=path.join(root,'runs',attempt.task+'-r'+attempt.repetition+'-'+attempt.arm);
+  if(attempt.slot>=19){if(fs.existsSync(dir))throw Error('Unstarted slot has historical artifacts: '+attempt.slot);continue;}
+  const get=name=>JSON.parse(fs.readFileSync(path.join(dir,name)));
+  for(const name of ['started.json','completed.json','result.json'])if(!identity(get(name),attempt))throw Error('Historical attempt identity mismatch: '+attempt.slot);
+  const facts=get('stop-verification.json');
+  if(!facts.terminationVerified||!facts.captureSaved||!facts.forwardingClosed||!facts.relayRemoved||facts.activeProviderHandlers!==0||get('session/cleanup.json').status!==0)throw Error('Historical stop unverified: '+attempt.slot);
+  if(!fs.existsSync(path.join(dir,'candidate.tar'))||!Array.isArray(get('provider-metadata.json')))throw Error('Historical capture/accounting missing');
+  historical.push({slot:attempt.slot,container:get('session/container.json').name});
+ }
+ if(!amendment.historicalFiles||!Object.keys(amendment.historicalFiles).length)throw Error('Missing historical artifact preservation manifest');
+ for(const [relative,digest] of Object.entries(amendment.historicalFiles)){
+  const file=path.resolve(root,relative);if(!file.startsWith(path.resolve(root)+path.sep)||sha(fs.readFileSync(file))!==digest)throw Error('Historical artifact changed: '+relative);
+ }
+ await verifyQuiescence(historical);
+ fs.mkdirSync(outputRoot,{mode:0o700});fs.writeFileSync(path.join(outputRoot,'admission.json'),JSON.stringify({originalFreezeSha256:amendment.originalFreezeSha256,amendmentSha256:sha(fs.readFileSync(continuationFile)),firstSlot:19,lastSlot:48,historicalStopsVerified:18,at:new Date().toISOString()},null,2),{flag:'wx'});
+}else if(fs.existsSync(path.join(root,'scheduling-paused.json')))throw Error('Continuation paused; no automatic resume');
 
 let pause=null;
-function pauseScheduling(kind,slot,details={}){if(pause)return;pause={kind,slot,...details};fs.writeFileSync(path.join(root,'scheduling-paused.json'),JSON.stringify(pause,null,2),{flag:'wx'});}
-for(const attempt of f.attempts){
- verify();if(pause)break;const out=path.join(root,'runs',attempt.task+(attempt.repetition?'-r'+attempt.repetition:'')+'-'+attempt.arm);
+function pauseScheduling(kind,slot,details={}){if(pause)return;pause={kind,slot,...details};fs.writeFileSync(path.join(outputRoot,'scheduling-paused.json'),JSON.stringify(pause,null,2),{flag:'wx'});}
+for(const attempt of f.attempts.filter(a=>!amendment||a.slot>=19)){
+ verify();if(pause)break;const out=path.join(outputRoot,'runs',attempt.task+(attempt.repetition?'-r'+attempt.repetition:'')+'-'+attempt.arm);
  if(fs.existsSync(out))throw Error('Previously created slot must never be retried: '+out);
  fs.mkdirSync(out,{recursive:true,mode:0o700});fs.writeFileSync(path.join(out,'started.json'),JSON.stringify({...attempt,at:new Date().toISOString()},null,2),{flag:'wx'});
  const requests=[],active=new Set(),abort=new AbortController();let session,deadline=null,timer,result,terminationVerified=false,forwardingOpen=true,deadlineTriggered=false,captureSaved=false,relayRemoved=false;
@@ -58,13 +123,23 @@ for(const attempt of f.attempts){
       record.refusal={status:response.status,type,message,truncated};pauseScheduling(type==='usage_limit_reached'&&!truncated?'incomplete_quota':'provider_refusal',attempt.slot,record.refusal);save();stopWorkload(session);abort.abort();return;
      }
      send({type:'headers',status:response.status,contentType:response.headers.get('content-type')??'text/event-stream'});
-     const decoder=new TextDecoder();let buffer='';
-     for await(const chunk of response.body){if(f.experimentKind==='h00-transfer')fs.appendFileSync(path.join(out,'response-'+record.requestIndex+'.sse'),chunk,{mode:0o600});send({type:'chunk',data:Buffer.from(chunk).toString('base64')});buffer+=decoder.decode(chunk,{stream:true});let split;while((split=buffer.indexOf('\n\n'))>=0){const packet=buffer.slice(0,split);buffer=buffer.slice(split+2);for(const line of packet.split('\n'))if(line.startsWith('data: ')){try{const event=JSON.parse(line.slice(6));if(event.response?.usage){const u=event.response.usage;record.usage=Object.fromEntries(['input_tokens','output_tokens','total_tokens'].filter(k=>Number.isFinite(u[k])).map(k=>[k,u[k]]));if(Number.isFinite(u.input_tokens_details?.cached_tokens))record.usage.cached_tokens=u.input_tokens_details.cached_tokens;if(Number.isFinite(u.output_tokens_details?.reasoning_tokens))record.usage.reasoning_tokens=u.output_tokens_details.reasoning_tokens;}if(event.response?.status){record.responseStatus=event.response.status;record.responseId=event.response.id;}}catch{}}}}
-     record.streamEnded=true;if(response.status===200&&!['completed','failed','cancelled','incomplete'].includes(record.responseStatus)){pauseScheduling('unknown_submission',attempt.slot,{reason:'Stream ended without a terminal provider response'});stopWorkload(session);abort.abort();return;}send({type:'end'});
+     const observer=responseObserver(record,save);
+     for await(const chunk of response.body){
+      if(f.experimentKind==='h00-transfer')fs.appendFileSync(path.join(out,'response-'+record.requestIndex+'.sse'),chunk,{mode:0o600});
+      // Observe/persist upstream facts before delivery can fail or be cancelled.
+      observer.push(chunk);send({type:'chunk',data:Buffer.from(chunk).toString('base64')});
+     }
+     observer.end();record.streamEnded=true;
+     if(response.status===200&&!knownResponseTerminal(record)){pauseScheduling('unknown_submission',attempt.slot,{reason:'Stream ended without a bound terminal provider response'});stopWorkload(session);abort.abort();return;}
+     send({type:'end'});
     }catch(error){record.error=error.name;
      const ownDeadline=record.forwarded&&deadlineTriggered&&requestSignal?.reason===deadlineReason;
-     if(ownDeadline){record.cancelledByOwnTaskDeadline=true;record.serverCompletion='unknown';}
-     else pauseScheduling(record.forwarded?'unknown_submission':'authorization_unavailable',attempt.slot,{error:error.name});
+     record.transportError={name:error.name,clientOrRelayCancelled:signal.aborted,ownTaskDeadline:ownDeadline};
+     record.clientDelivery='unconfirmed-after-transport-error';
+     record.serverCompletion=knownResponseTerminal(record)?record.terminalResponse.status:'unknown';
+     if(ownDeadline)record.cancelledByOwnTaskDeadline=true;
+     if([401,403,429].includes(record.status)){record.refusal??={status:record.status,bodyInterrupted:true};pauseScheduling('provider_refusal',attempt.slot,record.refusal);}
+     else if(!ownDeadline&&(!record.forwarded||!knownResponseTerminal(record)))pauseScheduling(record.forwarded?'unknown_submission':'authorization_unavailable',attempt.slot,{error:error.name});
      forwardingOpen=false;if(session)stopWorkload(session);if(!abort.signal.aborted)abort.abort();throw error;}
     finally{record.finishedAt=new Date().toISOString();save();}
    })();active.add(pending);return pending.finally(()=>active.delete(pending));
@@ -88,12 +163,17 @@ for(const attempt of f.attempts){
   fs.writeFileSync(path.join(out,'result.json'),JSON.stringify(summary,null,2));console.log(JSON.stringify(summary));
  }catch(error){fs.writeFileSync(path.join(out,'error.json'),JSON.stringify({message:error.message},null,2));pauseScheduling('execution_or_capture_error',attempt.slot,{message:error.message});if(session&&!fs.existsSync(path.join(out,'candidate.tar'))){stopWorkload(session);captureCandidate(session,out);}}
  finally{clearTimeout(timer);forwardingOpen=false;abort.abort();try{await settleHandlers();}catch(error){pauseScheduling('provider_handlers_unsettled',attempt.slot,{message:error.message});}save();if(session){if(session.close()!==0){pauseScheduling('cleanup_unverified',attempt.slot);throw Error('Container cleanup failed');}relayRemoved=true;}}
- const stopFacts={ownTaskDeadlineTriggered:deadlineTriggered,terminationVerified,captureSaved,forwardingClosed:!forwardingOpen,relayRemoved,activeProviderHandlers:active.size,providerServerStateMayRemainUnknown:requests.some(r=>r.forwarded&&!r.streamEnded)};
+ const stopFacts={ownTaskDeadlineTriggered:deadlineTriggered,terminationVerified,captureSaved,forwardingClosed:!forwardingOpen,relayRemoved,activeProviderHandlers:active.size,providerServerStateMayRemainUnknown:requests.some(r=>r.forwarded&&!knownResponseTerminal(r))};
  fs.writeFileSync(path.join(out,'stop-verification.json'),JSON.stringify(stopFacts,null,2));
  if(!terminationVerified||!captureSaved||!relayRemoved||forwardingOpen||active.size)pauseScheduling('local_execution_unverified',attempt.slot,stopFacts);
  if(terminationVerified)fs.writeFileSync(path.join(out,'completed.json'),JSON.stringify({...attempt,terminationVerified,at:new Date().toISOString()},null,2),{flag:'wx'});
 }
-fs.writeFileSync(path.join(root,'outcome.json'),JSON.stringify({status:pause?'paused':'finished',pause},null,2));console.log(JSON.stringify({status:pause?'paused':'finished',pause}));
+fs.writeFileSync(path.join(outputRoot,'outcome.json'),JSON.stringify({status:pause?'paused':'finished',pause},null,2));console.log(JSON.stringify({status:pause?'paused':'finished',pause}));
 
 return {status:pause?'paused':'finished',pause};
+}
+
+function verifyHistoricalContainers(historical){
+ const names=new Set(execFileSync('docker',['ps','-a','--format','{{.Names}}'],{encoding:'utf8',timeout:30000}).trim().split('\n'));
+ if(historical.some(r=>typeof r.container!=='string'||!r.container||names.has(r.container)))throw Error('Historical container absent-state not verified');
 }

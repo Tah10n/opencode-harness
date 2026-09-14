@@ -1,0 +1,733 @@
+{
+  "passed": true,
+  "realProviderRequests": 0,
+  "slot18ReplaySha256": "4015a7cb12ffe4dd1ba5dcb8507c22d33945058417713b3d995c7a85dc6aa571",
+  "checks": [
+    {
+      "mode": "completed-abort",
+      "startedSlots": [
+        1,
+        2,
+        3
+      ],
+      "scriptedRequests": 7,
+      "realProviderRequests": 0,
+      "status": "paused",
+      "unknownToolObserved": false,
+      "firstResponseFacts": [
+        {
+          "responseStatus": "completed",
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 2,
+            "output_tokens": 3,
+            "total_tokens": 5,
+            "cached_tokens": 1,
+            "reasoning_tokens": 2
+          },
+          "error": "AbortError",
+          "terminalEvents": 1
+        }
+      ]
+    },
+    {
+      "mode": "in-progress-abort",
+      "startedSlots": [
+        1
+      ],
+      "scriptedRequests": 2,
+      "realProviderRequests": 0,
+      "status": "paused",
+      "unknownToolObserved": false,
+      "firstResponseFacts": [
+        {
+          "responseStatus": "in_progress",
+          "serverCompletion": "unknown",
+          "usage": null,
+          "error": "AbortError"
+        }
+      ]
+    },
+    {
+      "mode": "previous-completed-new-abort",
+      "startedSlots": [
+        1
+      ],
+      "scriptedRequests": 3,
+      "realProviderRequests": 0,
+      "status": "paused",
+      "unknownToolObserved": false,
+      "firstResponseFacts": [
+        {
+          "responseStatus": "completed",
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 2,
+            "output_tokens": 3,
+            "total_tokens": 5,
+            "cached_tokens": 1,
+            "reasoning_tokens": 2
+          },
+          "terminalEvents": 1
+        },
+        {
+          "responseStatus": "in_progress",
+          "serverCompletion": "unknown",
+          "usage": null,
+          "error": "AbortError"
+        }
+      ]
+    },
+    {
+      "mode": "late-native-completion",
+      "startedSlots": [
+        1,
+        2,
+        3
+      ],
+      "scriptedRequests": 7,
+      "realProviderRequests": 0,
+      "status": "paused",
+      "unknownToolObserved": false,
+      "firstResponseFacts": [
+        {
+          "responseStatus": "completed",
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 2,
+            "output_tokens": 3,
+            "total_tokens": 5,
+            "cached_tokens": 1,
+            "reasoning_tokens": 2
+          },
+          "terminalEvents": 1
+        }
+      ]
+    },
+    {
+      "mode": "active-tool-unverified",
+      "startedSlots": [
+        1
+      ],
+      "scriptedRequests": 2,
+      "realProviderRequests": 0,
+      "status": "paused",
+      "unknownToolObserved": true,
+      "firstResponseFacts": [
+        {
+          "responseStatus": "completed",
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 2,
+            "output_tokens": 3,
+            "total_tokens": 5,
+            "cached_tokens": 1,
+            "reasoning_tokens": 2
+          },
+          "terminalEvents": 1
+        }
+      ]
+    },
+    {
+      "mode": "duplicate-terminal",
+      "startedSlots": [
+        1,
+        2,
+        3
+      ],
+      "scriptedRequests": 7,
+      "realProviderRequests": 0,
+      "status": "paused",
+      "unknownToolObserved": false,
+      "firstResponseFacts": [
+        {
+          "responseStatus": "completed",
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 2,
+            "output_tokens": 3,
+            "total_tokens": 5,
+            "cached_tokens": 1,
+            "reasoning_tokens": 2
+          },
+          "terminalEvents": 1,
+          "duplicateTerminalEvents": 1
+        }
+      ]
+    },
+    {
+      "mode": "completed-no-usage",
+      "startedSlots": [
+        1,
+        2,
+        3
+      ],
+      "scriptedRequests": 7,
+      "realProviderRequests": 0,
+      "status": "paused",
+      "unknownToolObserved": false,
+      "firstResponseFacts": [
+        {
+          "responseStatus": "completed",
+          "serverCompletion": "completed",
+          "usage": null,
+          "error": "AbortError",
+          "terminalEvents": 1
+        }
+      ]
+    },
+    {
+      "mode": "authorization",
+      "startedSlots": [
+        1
+      ],
+      "scriptedRequests": 1,
+      "realProviderRequests": 0,
+      "status": "paused",
+      "unknownToolObserved": false,
+      "firstResponseFacts": []
+    },
+    {
+      "mode": "quota",
+      "startedSlots": [
+        1
+      ],
+      "scriptedRequests": 1,
+      "realProviderRequests": 0,
+      "status": "paused",
+      "unknownToolObserved": false,
+      "firstResponseFacts": []
+    },
+    {
+      "mode": "slot18-replay",
+      "startedSlots": [
+        1,
+        2,
+        3
+      ],
+      "scriptedRequests": 7,
+      "realProviderRequests": 0,
+      "status": "paused",
+      "unknownToolObserved": false,
+      "firstResponseFacts": [
+        {
+          "responseStatus": "completed",
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 28740,
+            "output_tokens": 70,
+            "total_tokens": 28810,
+            "cached_tokens": 4608,
+            "reasoning_tokens": 34
+          },
+          "error": "AbortError",
+          "terminalEvents": 1
+        }
+      ]
+    }
+  ],
+  "scheduler": {
+    "passed": true,
+    "scenarios": [
+      {
+        "mode": "long-stream",
+        "startedSlots": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48
+        ],
+        "scriptedProviderRequests": 1,
+        "realProviderRequests": 0,
+        "status": "finished",
+        "error": null,
+        "lateResponsesForwarded": 0,
+        "latePacketsAttempted": 0,
+        "closedSessions": 48
+      },
+      {
+        "mode": "connection-timeout",
+        "startedSlots": [
+          1
+        ],
+        "scriptedProviderRequests": 1,
+        "realProviderRequests": 0,
+        "status": "paused",
+        "error": null,
+        "lateResponsesForwarded": 0,
+        "latePacketsAttempted": 0,
+        "closedSessions": 1
+      },
+      {
+        "mode": "nonsettling-handler",
+        "startedSlots": [
+          1
+        ],
+        "scriptedProviderRequests": 1,
+        "realProviderRequests": 0,
+        "status": "paused",
+        "error": null,
+        "lateResponsesForwarded": 0,
+        "latePacketsAttempted": 0,
+        "closedSessions": 1
+      },
+      {
+        "mode": "terminal-own-deadline",
+        "startedSlots": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48
+        ],
+        "scriptedProviderRequests": 1,
+        "realProviderRequests": 0,
+        "status": "finished",
+        "error": null,
+        "lateResponsesForwarded": 0,
+        "latePacketsAttempted": 0,
+        "closedSessions": 48
+      },
+      {
+        "mode": "quota-body-deadline",
+        "startedSlots": [
+          1
+        ],
+        "scriptedProviderRequests": 1,
+        "realProviderRequests": 0,
+        "status": "paused",
+        "error": null,
+        "lateResponsesForwarded": 0,
+        "latePacketsAttempted": 0,
+        "closedSessions": 1
+      },
+      {
+        "mode": "auth-body-deadline",
+        "startedSlots": [
+          1
+        ],
+        "scriptedProviderRequests": 1,
+        "realProviderRequests": 0,
+        "status": "paused",
+        "error": null,
+        "lateResponsesForwarded": 0,
+        "latePacketsAttempted": 0,
+        "closedSessions": 1
+      },
+      {
+        "mode": "unattributed-timeout",
+        "startedSlots": [
+          1
+        ],
+        "scriptedProviderRequests": 0,
+        "realProviderRequests": 0,
+        "status": "paused",
+        "error": null,
+        "lateResponsesForwarded": 0,
+        "latePacketsAttempted": 0,
+        "closedSessions": 1
+      },
+      {
+        "mode": "managed-deadline",
+        "startedSlots": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48
+        ],
+        "scriptedProviderRequests": 1,
+        "realProviderRequests": 0,
+        "status": "finished",
+        "error": null,
+        "lateResponsesForwarded": 0,
+        "latePacketsAttempted": 0,
+        "closedSessions": 48
+      },
+      {
+        "mode": "late-response",
+        "startedSlots": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48
+        ],
+        "scriptedProviderRequests": 1,
+        "realProviderRequests": 0,
+        "status": "finished",
+        "error": null,
+        "lateResponsesForwarded": 0,
+        "latePacketsAttempted": 1,
+        "closedSessions": 48
+      },
+      {
+        "mode": "foreign-abort-near-deadline",
+        "startedSlots": [
+          1
+        ],
+        "scriptedProviderRequests": 1,
+        "realProviderRequests": 0,
+        "status": "paused",
+        "error": null,
+        "lateResponsesForwarded": 0,
+        "latePacketsAttempted": 0,
+        "closedSessions": 1
+      },
+      {
+        "mode": "unknown-execution",
+        "startedSlots": [
+          1
+        ],
+        "scriptedProviderRequests": 1,
+        "realProviderRequests": 0,
+        "status": "paused",
+        "error": null,
+        "lateResponsesForwarded": 0,
+        "latePacketsAttempted": 0,
+        "closedSessions": 1
+      },
+      {
+        "mode": "unexplained-disconnect",
+        "startedSlots": [
+          1
+        ],
+        "scriptedProviderRequests": 1,
+        "realProviderRequests": 0,
+        "status": "paused",
+        "error": null,
+        "lateResponsesForwarded": 0,
+        "latePacketsAttempted": 0,
+        "closedSessions": 1
+      },
+      {
+        "mode": "quota",
+        "startedSlots": [
+          1
+        ],
+        "scriptedProviderRequests": 1,
+        "realProviderRequests": 0,
+        "status": "paused",
+        "error": null,
+        "lateResponsesForwarded": 0,
+        "latePacketsAttempted": 0,
+        "closedSessions": 1
+      },
+      {
+        "mode": "authorization",
+        "startedSlots": [
+          1
+        ],
+        "scriptedProviderRequests": 1,
+        "realProviderRequests": 0,
+        "status": "paused",
+        "error": null,
+        "lateResponsesForwarded": 0,
+        "latePacketsAttempted": 0,
+        "closedSessions": 1
+      },
+      {
+        "mode": "capture-failure",
+        "startedSlots": [
+          1
+        ],
+        "scriptedProviderRequests": 0,
+        "realProviderRequests": 0,
+        "status": "paused",
+        "error": null,
+        "lateResponsesForwarded": 0,
+        "latePacketsAttempted": 0,
+        "closedSessions": 1
+      },
+      {
+        "mode": "cleanup-failure",
+        "startedSlots": [
+          1
+        ],
+        "scriptedProviderRequests": 0,
+        "realProviderRequests": 0,
+        "status": "thrown-stop",
+        "error": "Container cleanup failed",
+        "lateResponsesForwarded": 0,
+        "latePacketsAttempted": 0,
+        "closedSessions": 1
+      }
+    ]
+  },
+  "continuation": {
+    "passed": true,
+    "reports": [
+      {
+        "mode": "valid",
+        "started": 30,
+        "quiescence": true,
+        "error": null,
+        "realProviderRequests": 0
+      },
+      {
+        "mode": "mismatched-identity",
+        "started": 0,
+        "quiescence": false,
+        "error": "Historical attempt identity mismatch: 1",
+        "realProviderRequests": 0
+      },
+      {
+        "mode": "unverified-stop",
+        "started": 0,
+        "quiescence": false,
+        "error": "Historical stop unverified: 1",
+        "realProviderRequests": 0
+      },
+      {
+        "mode": "old-artifact-change",
+        "started": 0,
+        "quiescence": false,
+        "error": "Historical artifact changed: runs/task0-r1-P/candidate.tar",
+        "realProviderRequests": 0
+      },
+      {
+        "mode": "unstarted-run",
+        "started": 0,
+        "quiescence": false,
+        "error": "Unrecognized historical run directory",
+        "realProviderRequests": 0
+      },
+      {
+        "mode": "unknown-run",
+        "started": 0,
+        "quiescence": false,
+        "error": "Unrecognized historical run directory",
+        "realProviderRequests": 0
+      },
+      {
+        "mode": "prior-quota",
+        "started": 0,
+        "quiescence": false,
+        "error": "Amendment does not authorize this pause",
+        "realProviderRequests": 0
+      },
+      {
+        "mode": "existing-new-run",
+        "started": 0,
+        "quiescence": false,
+        "error": "Continuation directory already exists; never overwrite or automatically resume",
+        "realProviderRequests": 0
+      },
+      {
+        "mode": "wrong-launcher",
+        "started": 0,
+        "quiescence": false,
+        "error": "Amended launcher version mismatch",
+        "realProviderRequests": 0
+      },
+      {
+        "mode": "wrong-freeze",
+        "started": 0,
+        "quiescence": false,
+        "error": "Invalid explicit continuation amendment",
+        "realProviderRequests": 0
+      },
+      {
+        "mode": "live-old-container",
+        "started": 0,
+        "quiescence": true,
+        "error": "Container remains",
+        "realProviderRequests": 0
+      }
+    ]
+  },
+  "legacyPrimarySchedulerPassed": true,
+  "legacyTransferSchedulerPassed": true,
+  "ciScope": "passed",
+  "packageBoundary": "passed",
+  "sourceDiffWhitespace": "passed",
+  "review": {
+    "passes": 1,
+    "scope": "Changed launcher and direct checks only; no historical component audit.",
+    "remediation": "Keep observed auth/quota refusal blocking when its body is cancelled by own deadline; reject invalid UTF-8 EOF without erasing the previously observed event/usage."
+  },
+  "costs": {
+    "orchestratorCheckpoint": {
+      "tokensUsed": 76983,
+      "timeUsedSeconds": 800,
+      "scope": "Current amendment goal before new provider calls; separate from Luna usage."
+    },
+    "scriptedProcessFixturePasses": 2,
+    "scriptedProviderRequestsAcrossBothPasses": 88,
+    "realProviderRequests": 0,
+    "note": "Both process-fixture executions are preparation only. Initial run was followed by one review/remediation and final verification."
+  }
+}
