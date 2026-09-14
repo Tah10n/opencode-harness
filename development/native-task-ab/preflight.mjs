@@ -44,7 +44,8 @@ for(const arm of (sensitivity?['H1']:process.env.PREFLIGHT_H00_ONLY==='1'?['P','
      const check={name:'bash',args:{command:B?'harness-check value.mjs':'npm run test',workdir:'.',description:'Real early project check'}};
      const calls=[read('value.mjs'),edit('value.mjs','value = 1','value = 2'),check,read('consumer.test.mjs'),edit('consumer.test.mjs','value,1','value,2'),check,read('value.mjs'),{name:'bash',args:{command:'node --test',workdir:'.',description:'Final ordinary native check'}}];
      if(sensitivity){
-      const sense={name:'bash',args:{command:'harness-sense value.mjs',workdir:'.',timeout:30000,description:'Real sensitivity check in read-only installed profile'}};
+      assert.ok(body.tools.some(t=>t.name==='harness_sense'&&t.parameters?.properties?.check),'Native sensitivity schema must reach the author');
+      const sense={name:'harness_sense',args:{path:'value.mjs'}};
       const strengthened=fs.readFileSync(path.join(source,'consumer.test.mjs'),'utf8').trimEnd().replace('value,1','value,2').replace('assert.equal(value,2);','assert.equal(value,2);assert.equal(legacy(),7);');
       const weak=strengthened.replace('assert.equal(legacy(),7);','');
       calls.splice(6,2,sense,{name:'apply_patch',args:{patchText:'*** Begin Patch\n*** Update File: consumer.test.mjs\n@@\n-'+weak+'\n+'+strengthened+'\n*** End Patch'}},check,sense,{name:'bash',args:{command:'node --test',workdir:'.',description:'Final ordinary native check'}});

@@ -25,10 +25,10 @@ try {
   materializeNativeTemplate({repositoryRoot: root, outputDirectory: bundle, task: true});
   fs.symlinkSync(path.join(root, 'profiles/native/sensitivity/node_modules'), path.join(bundle, 'sensitivity/node_modules'));
   const {runSensitivity} = await import(pathToFileURL(path.join(bundle, 'native-sensitivity-runner.mjs')));
-  const run = async (label, budgetMs = 30000) => {
-    const plan = sensitivityPlan({directory: project, rules, command: 'harness-sense value.mjs'});
+  const run = async (label, budgetMs = 30000, signal) => {
+    const plan = sensitivityPlan({directory: project, rules, args: {path: 'value.mjs'}});
     const before = git('diff', 'HEAD');
-    const report = await runSensitivity({script: 'harness-sense value.mjs', base: 'HEAD', rules, snapshot: plan.snapshot, budgetMs}, {directory: project});
+    const report = await runSensitivity({args: {path: 'value.mjs'}, base: 'HEAD', rules, snapshot: plan.snapshot, budgetMs}, {directory: project, signal});
     assert.equal(git('diff', 'HEAD'), before, 'Diagnostic must not alter author sources/tests/config');
     assert.ok(report.variants.length <= 8); assert.equal(report.terminationVerified, true, JSON.stringify(report));
     results.push({label, report}); console.log(JSON.stringify({label, status: report.status, baseline: report.baseline?.status, variants: report.variants.map(m => [m.replacement, m.status]), cost: report.cost}));
@@ -49,8 +49,9 @@ try {
   put('test.mjs', 'setInterval(() => {}, 1000);\n');
   const timeout = await run('timeout', 1800); assert.equal(timeout.baseline.status, 'timeout');
   put('test.mjs', "console.log('SLEEP_PID=' + process.pid); setInterval(() => {}, 1000);\n");
-  const cancelTimer = setTimeout(() => process.emit('SIGTERM'), 600);
-  const cancelled = await run('cancelled', 5000); clearTimeout(cancelTimer);
+  const controller = new AbortController();
+  const cancelTimer = setTimeout(() => controller.abort(), 600);
+  const cancelled = await run('cancelled', 5000, controller.signal); clearTimeout(cancelTimer);
   assert.equal(cancelled.baseline.status, 'cancelled');
   const sleeper = Number(/SLEEP_PID=(\d+)/.exec(cancelled.baseline.output)?.[1]); assert.ok(sleeper > 1);
   assert.throws(() => process.kill(sleeper, 0), {code:'ESRCH'});
@@ -64,21 +65,57 @@ try {
   const equivalent = await run('equivalent-good-control');
   assert.equal(equivalent.variants.find(m => m.replacement === 'a <= b')?.status, 'passed');
   assert.equal(equivalent.status, 'observed'); assert.ok(!('score' in equivalent));
-  assert.throws(() => sensitivityPlan({directory: project, rules, command: 'harness-sense test.mjs'}), /production/);
-  assert.throws(() => sensitivityPlan({directory: project, rules: [...rules, {permission:'read', pattern:'*value.mjs', action:'deny'}], command:'harness-sense value.mjs'}), /Incomplete readable/);
-  assert.throws(() => sensitivityPlan({directory: project, rules: [...rules, {permission:'bash', pattern:'npm run test', action:'deny'}], command:'harness-sense value.mjs'}), /permission/);
-  assert.throws(() => sensitivityPlan({directory: project, rules, command:'harness-sense value.mjs "node --test /outside.test.mjs"'}), /relative project test/);
+  assert.throws(() => sensitivityPlan({directory: project, rules, args: {path: 'test.mjs'}}), /production/);
+  assert.throws(() => sensitivityPlan({directory: project, rules: [...rules, {permission:'read', pattern:'*value.mjs', action:'deny'}], args:{path:'value.mjs'}}), /Incomplete readable/);
+  assert.throws(() => sensitivityPlan({directory: project, rules: [...rules, {permission:'bash', pattern:'npm run test', action:'deny'}], args:{path:'value.mjs'}}), /permission/);
+  assert.throws(() => sensitivityPlan({directory: project, rules, args:{path:'value.mjs',check:'node --test /outside.test.mjs'}}), /relative project test/);
   assert.equal(sensitivityEnabled({}), false); assert.equal(sensitivityEnabled({HARNESS_TASK_SENSITIVITY:'1'}), true);
-  const saved = {}, sense = createSensitivity({directory: project, rules, base:'HEAD', save:(name,data)=>saved[name]=structuredClone(data), checkActive(){}, remainingMs:()=>500});
-  const output = {args:{command:'harness-sense changed',workdir:'.'}};
-  const pending = sense.before({tool:'bash'}, output, 'snapshot-1');
-  assert.equal(pending.plan.status,'not-run'); assert.match(output.args.command,/budget/);
-  const activeSense = createSensitivity({directory:project,rules,base:'HEAD',save:(name,data)=>saved[name]=structuredClone(data),checkActive(){},remainingMs:()=>30000});
-  const unknownOutput={args:{command:'harness-sense value.mjs',workdir:'.',timeout:2000}};
-  const admitted=activeSense.before({tool:'bash'},unknownOutput,'snapshot-1');
-  const spec=JSON.parse(Buffer.from(unknownOutput.args.command.split("'").at(-2),'base64').toString());assert.ok(spec.budgetMs<=1500);
+  put('package.json', JSON.stringify({scripts:{pretest:'node -e "console.log(123)"',test:'node test.mjs',posttest:'node -e "console.log(456)"','test:unit':'node test.mjs'}}));
+  for (const check of [undefined, 'test', 'npm test', 'npm run test', 'test:unit', 'npm run test:unit']) {
+    const plan = sensitivityPlan({directory:project,rules,args:{path:'value.mjs',...(check === undefined ? {} : {check})}});
+    assert.equal(plan.command, check?.includes(':unit') ? 'npm run test:unit' : 'npm run test');
+    assert.deepEqual(plan.argv, ['npm','run',check?.includes(':unit')?'test:unit':'test']);
+    assert.equal(plan.originalArguments.check,check);
+    if (!check?.includes(':unit')) assert.equal(plan.permissionCommands.length,4);
+  }
+  const context = {ask:async()=>{},abort:new AbortController().signal};
+  const saved = {}, options = {directory:project,rules,base:'HEAD',save:(name,data)=>saved[name]=structuredClone(data),checkActive(){},remainingMs:()=>30000};
+  const sense = createSensitivity({...options,remainingMs:()=>500});
+  const pending = sense.before({tool:'harness_sense'},{args:{path:'changed'}},'snapshot-1');
+  const exhausted = JSON.parse(await sense.execute(pending,context));
+  assert.equal(exhausted.engineExecuted,false);assert.equal(exhausted.cost.commands,0);assert.match(exhausted.limits.join(' '),/budget/);
+  const activeSense = createSensitivity(options);
+  for (const check of ['npm test --watch','npm run test -- --watch','npm run test extra','test > out','npm test && touch bad','npm test; true','$(npm test)','`npm test`','missing','test --unknown','npm run test | cat']) {
+    const prior=activeSense.before({tool:'harness_sense'},{args:{path:'value.mjs',check}},'snapshot-1');
+    const report=JSON.parse(await activeSense.execute(prior,context));
+    assert.equal(report.engineExecuted,false,check);assert.equal(report.cost.commands,0);assert.equal(report.baseline,null);
+    assert.ok(Number.isFinite(report.cost.totalMs));assert.equal(report.cost.totalMs,prior.elapsedMs);
+    assert.match(report.limits.join(' '),/Example: harness_sense/);assert.match(report.limits.join(' '),/Available test scripts: test, test:unit/);
+    assert.deepEqual(report.originalArguments,{path:'value.mjs',check});
+    activeSense.after({callID:check},{output:JSON.stringify(report)},{sensitivity:prior},'snapshot-1');
+  }
+  assert.equal(saved['sensitivity-events.json'].at(-1).taskDiagnosticMs,saved['sensitivity-events.json'].reduce((n,e)=>n+e.elapsedMs,0));
+  for (const hook of ['pretest','posttest']) {
+    const pkg=JSON.parse(fs.readFileSync(path.join(project,'package.json'),'utf8'));
+    assert.throws(()=>sensitivityPlan({directory:project,rules:[...rules,{permission:'bash',pattern:pkg.scripts[hook],action:'deny'}],args:{path:'value.mjs'}}),/permission/);
+  }
+  let release;
+  const waitingContext={...context,ask:()=>new Promise(resolve=>{release=resolve;})};
+  const admitted=activeSense.before({tool:'harness_sense'},{args:{path:'value.mjs'}},'snapshot-1');
+  const executing=activeSense.execute(admitted,waitingContext);
+  await assert.rejects(activeSense.execute(admitted,context),/already running/);
+  release();const finished=JSON.parse(await executing);assert.equal(finished.baseline.status,'passed');assert.equal(finished.engineExecuted,true);
+  assert.match(finished.baseline.output,/123/);assert.match(finished.baseline.output,/456/);
   assert.equal(activeSense.after({callID:'unknown'},{output:'truncated or killed runner'},{sensitivity:admitted},'snapshot-1').terminationVerified,false);
-  fs.mkdirSync(path.join(root,'local/native-sensitivity'), {recursive:true});
-  fs.writeFileSync(path.join(root,'local/native-sensitivity/targeted.json'), JSON.stringify({realProviderRequests:0, results},null,2)+'\n');
+  // An absolute runner path and shell aliases cannot provide another diagnostic
+  // entry point with a fresh budget. Its private engine-only mode runs no tests.
+  const runner=path.join(bundle,'native-sensitivity-runner.mjs');
+  for (const launch of [[process.execPath,[runner,'e30=']],['/bin/sh',['-c','runner="$1"; shift; node "$runner" e30=','fixture',runner]]]) {
+    const result=spawnSync(launch[0],launch[1],{cwd:project,encoding:'utf8'});assert.equal(result.status,1);
+    const report=JSON.parse(result.stdout);assert.equal(report.engineExecuted,false);assert.equal(report.cost.commands,0);
+  }
+  const output=path.join(root,'local/native-sensitivity-interface/targeted.json');
+  fs.mkdirSync(path.dirname(output), {recursive:true});
+  fs.writeFileSync(output, JSON.stringify({realProviderRequests:0, results,argumentEvents:saved['sensitivity-events.json']},null,2)+'\n');
   console.log('Sensitivity targeted installed-module checks passed; real provider requests: 0');
 } finally { fs.rmSync(temp, {recursive:true,force:true}); }

@@ -1,6 +1,6 @@
 # Test sensitivity in direct (experimental, off by default)
 
-After a behavior change and a passing suite, `harness-sense` shows a small set of
+After a behavior change and a passing suite, `harness_sense` shows a small set of
 standard code changes that the same tests still accept or reject. A surviving
 change is a question about a required observable property, not a bug verdict.
 Use it while writing ordinary project regressions in the native author session.
@@ -20,21 +20,33 @@ runtime never runs an installer. Enable with `HARNESS_TASK_STRATEGY=direct` and
 `HARNESS_TASK_SENSITIVITY=1`; A/B may both remain `0`. Without this flag the
 tool and its instruction are inactive, and the user's default is unchanged.
 
-In native Bash, with `workdir: "."`:
+In the author session, select the native **harness_sense** tool. Its description
+and `path` / `check` schema appear in the actual tool list only when enabled.
+For a changed production file, pass:
 
-```sh
-harness-sense src/value.ts
-harness-sense changed test:unit
-harness-sense index.js "node_modules/.bin/ava"
-harness-sense index.js "node_modules/.bin/mocha"
-harness-sense src/value.ts "node_modules/.bin/vitest run"
+```json
+{"path": "src/value.ts", "check": "npm test"}
 ```
 
-The default command is the existing `npm run test`. An optional existing
-`test:*` script or explicit local Node (`node --test`), AVA, Mocha or Vitest
-command avoids confusing a combined lint/build pipeline with runtime tests.
-Native Bash and selected-command permissions must allow execution; this adapter
-does not authorize a denied command. Native read restrictions apply to copying.
+`path` defaults to `changed`. Omitted `check`, `test`, `npm test`, and
+`npm run test` select the existing `npm run test` script. `test:unit` and
+`npm run test:unit` select an existing `test:unit` script. Execution stays with
+npm, including applicable pre/post lifecycle hooks. Original arguments and the
+normalized command are recorded separately. Flags, extra arguments, shell
+chains, substitutions and redirections are rejected with an example and the
+available test scripts; the response reports `engineExecuted=false`, zero checks
+and actual elapsed time. Correct the next tool call normally in the same session.
+
+The existing explicit local Node (`node --test`), AVA, Mocha and Vitest check
+forms remain supported; runner arguments must be readable relative test files.
+Prefer a declared `test:*` script for flags or a separate runtime suite.
+The native tool uses the task's read and Bash rules, checks both the selected
+npm command and lifecycle bodies, and asks through the native permission API.
+It copies only admitted files/dependencies into its own temporary directories;
+a denied command or unreadable snapshot never becomes diagnostic permission.
+Task tools serialize around it, and cancellation reaches diagnostic process
+groups before terminal capture. It has no standalone CLI: `command -v` is not
+a discovery mechanism, and invoking the runner file cannot start project checks.
 
 First scope: small single-package npm JS/TS projects with already installed,
 locally runnable tests. It handles a normal file path or `changed`, mutating only
@@ -73,7 +85,7 @@ variant or unspecified error-message change may survive even excellent tests.
 
 Inspect the concrete diff against the original task and public contract. If its
 changed property is required, add a regression through the ordinary public API,
-confirm the correct implementation still passes, and rerun `harness-sense`.
+confirm the correct implementation still passes, and rerun `harness_sense`.
 Never test source text, mutation names, tool paths or administrative environment
 state. For equivalent/allowed changes, explain why no new requirement follows.
 Do not change production code to satisfy an invented assertion.
@@ -96,3 +108,28 @@ uses a narrow command adapter; it does not implement a universal mutation engine
 or a universal test-reporter parser.
 
 See the [development plan and admission limits](../../development/native-task-sensitivity/PLAN.md).
+
+## Local interface verification
+
+With the pinned engine dependencies already installed, run:
+
+```sh
+node scripts/verify-native-sensitivity.mjs
+NATIVE_TASK_FIXTURE_SENSITIVITY=1 NATIVE_TASK_FIXTURE_MODES=sensitivity,sensitivity-parallel,sensitivity-command-denial,sensitivity-hook-denial,sensitivity-read-denial,sensitivity-cancel node scripts/verify-native-task-fixture.mjs
+NATIVE_TASK_FIXTURE_MODES=sensitivity-off node scripts/verify-native-task-fixture.mjs
+```
+
+The installed scripted provider checks the outgoing native tool schema and
+receives real tool outputs. The weak boundary suite accepts Stryker's `n > 2`
+replacement of `n >= 2`. The same author session adds `assert.equal(accepts(2),
+true)` to its project test; a fresh baseline passes and the exact replacement
+fails that assertion. Its terminal patch is applied and tested in an ordinary
+Git copy. Parallel calls share accounting, and the fixture checks denied script,
+lifecycle and dependency reads, cancellation, and the disabled tool list.
+
+Targeted checks retain the equivalent numeric `max` comparison case, red
+baseline, import failure, timeout, partial budget and unsupported scope.
+Evidence is written separately under `local/native-sensitivity-interface/`.
+These are installed-interface and program-behavior checks with a scripted
+author, not evidence of Luna quality improvement. Historical H0 4/4 and H1 3/4
+results are unchanged; this interface change does not authorize a new campaign.
