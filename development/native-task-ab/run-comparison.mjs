@@ -47,12 +47,14 @@ if(amendment){
 }
 
 function verify(){
- const transfer=f.experimentKind==='transfer', h00=f.experimentKind==='h00-transfer', sensitivity=f.experimentKind==='sensitivity', usage=f.experimentKind==='sensitivity-usage', replay=f.experimentKind==='sensitivity-replay', targeted=f.experimentKind==='sensitivity-targeted';
- if(f.attempts.length!==(targeted?3:replay?4:usage?2:h00?48:transfer||sensitivity?8:30)||f.model!=='openai/gpt-5.6-luna'||f.variant!=='high'||f.budgetMs!==900000||!f.preflightPassed)throw Error('Invalid development configuration');
+ const transfer=f.experimentKind==='transfer', h00=f.experimentKind==='h00-transfer', sensitivity=f.experimentKind==='sensitivity', usage=f.experimentKind==='sensitivity-usage', replay=f.experimentKind==='sensitivity-replay', targeted=f.experimentKind==='sensitivity-targeted', integration=f.experimentKind==='targeted-integration';
+ if(f.attempts.length!==(integration?9:targeted?3:replay?4:usage?2:h00?48:transfer||sensitivity?8:30)||f.model!=='openai/gpt-5.6-luna'||f.variant!=='high'||f.budgetMs!==900000||!f.preflightPassed)throw Error('Invalid development configuration');
  for(const [file,digest] of Object.entries(f.files))if(sha(fs.readFileSync(file))!==(amendment?.launcherFiles[file]?.after??digest))throw Error('Frozen file changed: '+file);
  for(const [directory,expected]of Object.entries(f.runtimeManifests??{})){const seen=new Set();const visit=(dir,prefix='')=>{for(const entry of fs.readdirSync(dir,{withFileTypes:true})){const file=path.join(dir,entry.name),name=prefix+entry.name,stat=fs.lstatSync(file);if(stat.isDirectory()){visit(file,name+'/');continue;}const got=stat.isSymbolicLink()?{symlink:fs.readlinkSync(file)}:{sha256:sha(fs.readFileSync(file)),executable:!!(stat.mode&0o111)};if(JSON.stringify(got)!==JSON.stringify(expected[name]))throw Error('Installed runtime changed: '+name);seen.add(name);}};visit(directory);if(seen.size!==Object.keys(expected).length)throw Error('Installed runtime missing files');}
  const groups=new Map();for(const a of f.attempts){const group=groups.get(a.task)??[];group.push(a.arm);groups.set(a.task,group);}
- if(targeted){
+ if(integration){
+  if(groups.size!==3||[...groups.values()].some(x=>x.slice().sort().join(',')!=='H,P,R')||f.attempts.map(a=>a.arm).join(',')!=='P,R,H,R,H,P,H,P,R'||new Set(f.attempts.map(a=>a.project)).size<2||f.strategy!=='direct'||f.streamLimit!=='remaining-task-budget'||f.connectionTimeoutMs!==30000)throw Error('Invalid frozen nine-run integration schedule');
+ }else if(targeted){
   if(groups.size!==3||f.attempts.some(a=>a.arm!=='H1')||new Set(f.attempts.map(a=>a.source)).size!==3||f.strategy!=='direct'||f.streamLimit!=='remaining-task-budget'||f.connectionTimeoutMs!==30000)throw Error('Invalid three-run targeted sensitivity schedule');
  }else if(replay){
   if(groups.size!==2||[...groups.values()].some(x=>x.slice().sort().join(',')!=='S0,S1')||f.attempts.map(a=>a.arm).join(',')!=='S0,S1,S1,S0'||f.strategy!=='direct'||f.streamLimit!=='remaining-task-budget'||f.connectionTimeoutMs!==30000||!f.baselineTemplate)throw Error('Invalid four-run sensitivity replay schedule');
@@ -114,7 +116,7 @@ for(const attempt of f.attempts.filter(a=>!amendment||a.slot>=19)){
     const requestKind=frame.body?.tools?.length?'work':'title';
     let requestSignal;
     const record={requestIndex:requests.length+1,relayRequestId:frame.id??null,requestKind,at:new Date().toISOString(),path:frame.path,model:frame.body?.model,effort:frame.body?.reasoning?.effort??null,forwarded:false,usage:null};requests.push(record);save();
-    if(['h00-transfer','sensitivity','sensitivity-usage','sensitivity-replay','sensitivity-targeted'].includes(f.experimentKind))fs.writeFileSync(path.join(out,'request-'+requests.length+'.json'),JSON.stringify(frame.body),{mode:0o600,flag:'wx'});
+    if(['h00-transfer','sensitivity','sensitivity-usage','sensitivity-replay','sensitivity-targeted','targeted-integration'].includes(f.experimentKind))fs.writeFileSync(path.join(out,'request-'+requests.length+'.json'),JSON.stringify(frame.body),{mode:0o600,flag:'wx'});
     const blocked=()=>{
      if(!pause&&!abort.signal.aborted&&!signal.aborted&&forwardingOpen&&deadline&&Date.now()<deadline)return false;
      record.notForwardedReason=pause?'series-paused':signal.aborted?'client-cancelled':'closed-or-deadline';record.blockedBy=pause;record.finishedAt=new Date().toISOString();save();
@@ -170,7 +172,7 @@ for(const attempt of f.attempts.filter(a=>!amendment||a.slot>=19)){
      send({type:'headers',status:response.status,contentType:response.headers.get('content-type')??'text/event-stream'});
      const observer=responseObserver(record,save);
      for await(const chunk of response.body){
-      if(['h00-transfer','sensitivity','sensitivity-usage','sensitivity-replay','sensitivity-targeted'].includes(f.experimentKind))fs.appendFileSync(path.join(out,'response-'+record.requestIndex+'.sse'),chunk,{mode:0o600});
+      if(['h00-transfer','sensitivity','sensitivity-usage','sensitivity-replay','sensitivity-targeted','targeted-integration'].includes(f.experimentKind))fs.appendFileSync(path.join(out,'response-'+record.requestIndex+'.sse'),chunk,{mode:0o600});
       // Observe/persist upstream facts before delivery can fail or be cancelled.
       observer.push(chunk);send({type:'chunk',data:Buffer.from(chunk).toString('base64')});
      }

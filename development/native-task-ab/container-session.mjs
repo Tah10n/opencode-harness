@@ -6,15 +6,16 @@ import { fileURLToPath } from 'node:url';
 import readline from 'node:readline';
 
 export const image='sha256:0ed6cee0b095ecf1e1e780418cb373d462f1b99643bb86db0a8de7dd58fc83a6';
-export async function startContainer({source,toolchain,template,output,onRequest}) {
+export async function startContainer({source,toolchain,template,output,onRequest,workMemoryMb=512,memoryMb=2048}) {
   for(const p of [source,toolchain,output,...(template?[template]:[])])if(!path.isAbsolute(p))throw Error('absolute paths required');
   fs.mkdirSync(output,{mode:0o700});
+  if (!Number.isSafeInteger(workMemoryMb) || workMemoryMb < 512 || workMemoryMb > 1536 || !Number.isSafeInteger(memoryMb) || memoryMb < 2048 || memoryMb > 3072) throw Error('Unsupported development container memory bound');
   const name=`template-dev-${randomUUID()}`;
   const relay=fileURLToPath(new URL('./container-relay.mjs',import.meta.url));
   // Reap orphaned test/CLI descendants; the relay itself is not an init process.
   const argv=['run','--init','-i','--name',name,'--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges',
-    '--pids-limit','512','--memory','2g','--cpus','2','--user','node',
-    '--tmpfs','/tmp:rw,noexec,nosuid,size=64m','--tmpfs','/work:rw,exec,nosuid,uid=1000,gid=1000,mode=0700,size=512m',
+    '--pids-limit','512','--memory',`${memoryMb}m`,'--cpus','2','--user','node',
+    '--tmpfs','/tmp:rw,noexec,nosuid,size=64m','--tmpfs',`/work:rw,exec,nosuid,uid=1000,gid=1000,mode=0700,size=${workMemoryMb}m`,
     '--mount',`type=bind,source=${source},target=/input,readonly`,
     '--mount',`type=bind,source=${path.join(toolchain,'package/bin/opencode')},target=/opt/opencode,readonly`,
     '--mount',`type=bind,source=${relay},target=/relay.mjs,readonly`,

@@ -9,6 +9,10 @@ its development results do not establish a recommended production mode.
 
 ## Install and use
 
+Optional [focused investigation](INVESTIGATION.md) lets the author request one
+test-producing subtask from the same model, then accept or decline its patch.
+It is experimental, independently opt-in, and shares the task deadline.
+
 Optional [test sensitivity](SENSITIVITY.md) adds bounded StrykerJS observations
 inside that same author session. It remains independently off by default.
 

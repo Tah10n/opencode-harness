@@ -85,8 +85,10 @@ generation consume this same budget.
 
 The snapshot includes readable tracked/untracked text files, excluding ignored
 files. Installed dependencies are copied afresh for every test command, including
-the original repository's ancestor dependencies used by nested native task
-worktrees. Symlinks outside that dependency tree, unreadable/binary/oversized
+each separate ancestor dependency level used by nested native task worktrees.
+A local cache directory does not hide ancestor packages, while real local packages
+keep their normal precedence. The copies preserve this npm/Node search layout;
+they do not merge package trees or silently replace local versions. Symlinks outside that dependency tree, unreadable/binary/oversized
 source data, workspaces and other package managers are unsupported. Source
 capture is bounded to 1,500 files/8 MiB, dependencies to 80,000 entries/300 MiB.
 Dependency applicability uses captured file size/mtime metadata, not a claim of
