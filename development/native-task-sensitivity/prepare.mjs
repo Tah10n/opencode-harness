@@ -6,7 +6,7 @@ import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {materializeNativeTemplate} from '../../lib/native-template.mjs';
 
-const repository = process.cwd(), local=path.resolve('local/native-sensitivity'), root=path.join(local,'diagnostic');
+const repository = process.cwd(), local=path.resolve('local/native-sensitivity'), root=path.resolve(process.argv[2]??path.join(local,'diagnostic'));
 const old=path.resolve('local/native-task-h00-transfer');
 if(fs.existsSync(root))throw Error('Do not replace an existing prepared campaign');
 const sha=b=>createHash('sha256').update(b).digest('hex');
@@ -76,6 +76,16 @@ for(const name of [
   'development/native-task-ab/native-run.mjs','development/native-task-ab/run-comparison.mjs','development/native-task-ab/container-session.mjs','development/native-task-ab/container-relay.mjs','development/native-task-ab/capture-candidate.mjs','development/native-task-ab/extract-candidate.py','development/native-task-abc/native-run.mjs','development/native-task-utility/container/stop-workload.mjs',
 ])files[path.resolve(name)]=sha(fs.readFileSync(name));
 const oldFreeze=read(path.join(old,'freeze.json'));
+// Validate this exact prepared bundle under the campaign's read-only mount.
+// This is scripted: it makes no request to the real provider.
+fs.writeFileSync(path.join(root,'experiment-config.json'),JSON.stringify(read(path.join(old,'experiment-config.json')),null,2)+'\n');
+const beforePreflight=manifest(bundle);
+execFileSync(process.execPath,['development/native-task-ab/preflight.mjs',root,oldFreeze.toolchain],{cwd:repository,env:{...process.env,PREFLIGHT_SENSITIVITY:'1'},stdio:'inherit'});
+const installed=read(path.join(root,'installed-preflight.json'));
+if(!installed.passed||installed.realProviderRequests!==0||!installed.results.every(r=>r.nativeCompleted&&r.termination?.terminationVerified))throw Error('Read-only installed preflight did not complete');
+if(JSON.stringify(beforePreflight)!==JSON.stringify(manifest(bundle)))throw Error('Prepared bundle changed during preflight');
+files[path.join(root,'installed-preflight.json')]=sha(fs.readFileSync(path.join(root,'installed-preflight.json')));
+files[path.resolve('development/native-task-sensitivity/REAUTHORIZED.md')]=sha(fs.readFileSync(path.resolve('development/native-task-sensitivity/REAUTHORIZED.md')));
 const preservation=Object.fromEntries(['scheduling-paused.json','outcome.json','continuation-19-48/scheduling-paused.json','continuation-19-48/outcome.json'].map(n=>[n,sha(fs.readFileSync(path.join(old,n)))]));
 const freeze={version:1,experimentKind:'sensitivity',createdAt:new Date().toISOString(),model:'openai/gpt-5.6-luna',variant:'high',budgetMs:900000,strategy:'direct',preflightPassed:true,streamLimit:'remaining-task-budget',connectionTimeoutMs:30000,toolchain:oldFreeze.toolchain,template:bundle,dependencies:bundle,config:read(path.join(old,'experiment-config.json')),attempts,inputManifests,files,runtimeManifests:{[bundle]:manifest(bundle)}};
 fs.writeFileSync(path.join(root,'freeze.json'),JSON.stringify(freeze),{flag:'wx'});
