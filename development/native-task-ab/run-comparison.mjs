@@ -109,22 +109,59 @@ for(const attempt of f.attempts.filter(a=>!amendment||a.slot>=19)){
    const pending=(async()=>{
     const requestKind=frame.body?.tools?.length?'work':'title';
     let requestSignal;
-    const record={requestIndex:requests.length+1,requestKind,at:new Date().toISOString(),path:frame.path,model:frame.body?.model,effort:frame.body?.reasoning?.effort??null,forwarded:false,usage:null};requests.push(record);save();
+    const record={requestIndex:requests.length+1,relayRequestId:frame.id??null,requestKind,at:new Date().toISOString(),path:frame.path,model:frame.body?.model,effort:frame.body?.reasoning?.effort??null,forwarded:false,usage:null};requests.push(record);save();
     if(['h00-transfer','sensitivity','sensitivity-usage'].includes(f.experimentKind))fs.writeFileSync(path.join(out,'request-'+requests.length+'.json'),JSON.stringify(frame.body),{mode:0o600,flag:'wx'});
-    if(pause||abort.signal.aborted||!deadline||Date.now()>=deadline){record.notForwardedReason='paused-or-deadline';save();send({type:'headers',status:408,contentType:'text/plain'});send({type:'end'});return;}
+    const blocked=()=>{
+     if(!pause&&!abort.signal.aborted&&!signal.aborted&&forwardingOpen&&deadline&&Date.now()<deadline)return false;
+     record.notForwardedReason=pause?'series-paused':signal.aborted?'client-cancelled':'closed-or-deadline';record.blockedBy=pause;record.finishedAt=new Date().toISOString();save();
+     send({type:'headers',status:409,contentType:'application/json'});send({type:'chunk',data:Buffer.from(JSON.stringify({error:{type:'experiment_admission_closed',message:'Experimental series admission is closed; no upstream request was sent.'}})).toString('base64')});send({type:'end'});return true;
+    };
+    if(blocked())return;
     if(frame.path!=='/v1/responses'||frame.body?.model!=='gpt-5.6-luna'||frame.body.stream!==true||frame.body?.reasoning?.effort!=='high'){pauseScheduling('boundary_refusal',attempt.slot);record.rejected=true;save();send({type:'headers',status:403,contentType:'text/plain'});send({type:'end'});return;}
     try{
-     const a=readAuth();record.forwarded=true;record.forwardedAt=new Date().toISOString();record.maxDurationMs=f.streamLimit==='remaining-task-budget'?Math.max(0,deadline-Date.now()):180000;record.connectionTimeoutMs=f.connectionTimeoutMs??null;save();
+     const a=readAuth();const body=JSON.stringify({...frame.body,store:false});record.maxDurationMs=f.streamLimit==='remaining-task-budget'?Math.max(0,deadline-Date.now()):180000;record.connectionTimeoutMs=f.connectionTimeoutMs??null;save();
      const connectionAbort=new AbortController();const connectionTimer=f.connectionTimeoutMs?setTimeout(()=>connectionAbort.abort(new Error('Connection timeout')),f.connectionTimeoutMs):null;
      requestSignal=AbortSignal.any([signal,abort.signal,...(f.streamLimit==='remaining-task-budget'?[connectionAbort.signal]:[AbortSignal.timeout(180000)])]);
      let response;try {
-     response=await fetchImpl('https://chatgpt.com/backend-api/codex/responses',{method:'POST',redirect:'error',headers:{'content-type':'application/json',authorization:`Bearer ${a.access}`,'ChatGPT-Account-Id':a.accountId},body:JSON.stringify({...frame.body,store:false}),signal:requestSignal});}finally{clearTimeout(connectionTimer);}
-     record.status=response.status;save();
-     if([401,403,429].includes(response.status)){
-
-      let bytes=Buffer.alloc(0),truncated=false;for await(const chunk of response.body){const b=Buffer.from(chunk);if(bytes.length+b.length>8192){bytes=Buffer.concat([bytes,b.subarray(0,8192-bytes.length)]);truncated=true;break;}bytes=Buffer.concat([bytes,b]);}
-      let type=null,message=null;try{const value=JSON.parse(bytes.toString());type=typeof value.error?.type==='string'?value.error.type.slice(0,128):null;message=typeof value.error?.message==='string'?value.error.message.slice(0,1024):null;}catch{}
-      record.refusal={status:response.status,type,message,truncated};pauseScheduling(type==='usage_limit_reached'&&!truncated?'incomplete_quota':'provider_refusal',attempt.slot,record.refusal);save();stopWorkload(session);abort.abort();return;
+     // Last synchronous gate, after auth/body preparation and immediately before dispatch.
+     if(blocked())return;
+     record.forwarded=true;record.forwardedAt=new Date().toISOString();save();
+     response=await fetchImpl('https://chatgpt.com/backend-api/codex/responses',{method:'POST',redirect:'error',headers:{'content-type':'application/json',authorization:`Bearer ${a.access}`,'ChatGPT-Account-Id':a.accountId},body,signal:requestSignal});}finally{clearTimeout(connectionTimer);}
+     record.status=response.status;record.upstreamRequestId=response.headers.get('x-request-id');save();
+     if(response.status!==200){
+      const refusal=[401,403,429].includes(response.status);
+      record.serverCompletion=refusal?'known_refusal':'unknown';
+      // Persist closure before any body await or retryable headers reach the client.
+      pauseScheduling(refusal?'provider_refusal':'unknown_submission',attempt.slot,{requestIndex:record.requestIndex,status:response.status,reason:refusal?'Provider refused request':'Non-200 response without an established provider result'});
+      save();
+      const iterator=response.body?.[Symbol.asyncIterator]();let bytes=Buffer.alloc(0),bodyTimer;
+      const expired=new Promise(resolve=>{bodyTimer=setTimeout(()=>resolve({boundedTimeout:true}),1000);});
+      try{
+       while(iterator){
+        const next=await Promise.race([iterator.next(),expired]);
+        if(next.boundedTimeout){record.errorBodyTimedOut=true;break;}
+        if(next.done)break;
+        const b=Buffer.from(next.value),remaining=8192-bytes.length;
+        bytes=Buffer.concat([bytes,b.subarray(0,remaining)]);
+        record.errorBody=bytes.toString('utf8');record.errorBodyBase64=bytes.toString('base64');save();
+        if(b.length>=remaining){record.errorBodyTruncated=true;break;}
+       }
+      }catch(error){record.errorBodyInterrupted=error.name;}
+      finally{clearTimeout(bodyTimer);void iterator?.return?.().catch(()=>{});}
+      record.errorBody=bytes.toString('utf8');record.errorBodyBase64=bytes.toString('base64');
+      if(refusal){
+       let type=null,message=null;try{const value=JSON.parse(record.errorBody);type=typeof value.error?.type==='string'?value.error.type.slice(0,128):null;message=typeof value.error?.message==='string'?value.error.message.slice(0,1024):null;}catch{}
+       record.refusal={status:response.status,type,message,truncated:!!record.errorBodyTruncated,bodyInterrupted:!!record.errorBodyInterrupted,bodyTimedOut:!!record.errorBodyTimedOut};
+       // Refine only this first known refusal; never replace another pause or reopen admission.
+       if(pause?.kind==='provider_refusal'&&pause.slot===attempt.slot&&pause.requestIndex===record.requestIndex){
+        Object.assign(pause,record.refusal);if(type==='usage_limit_reached'&&!record.errorBodyTruncated&&!record.errorBodyInterrupted&&!record.errorBodyTimedOut)pause.kind='incomplete_quota';
+        fs.writeFileSync(path.join(outputRoot,'scheduling-paused.json'),JSON.stringify(pause,null,2));
+       }
+      }
+      save();
+      try{send({type:'headers',status:response.status,contentType:response.headers.get('content-type')??'text/plain'});if(bytes.length)send({type:'chunk',data:bytes.toString('base64')});send({type:'end'});}
+      finally{stopWorkload(session);abort.abort();}
+      return;
      }
      send({type:'headers',status:response.status,contentType:response.headers.get('content-type')??'text/event-stream'});
      const observer=responseObserver(record,save);
@@ -134,16 +171,16 @@ for(const attempt of f.attempts.filter(a=>!amendment||a.slot>=19)){
       observer.push(chunk);send({type:'chunk',data:Buffer.from(chunk).toString('base64')});
      }
      observer.end();record.streamEnded=true;
-     if(response.status===200&&!knownResponseTerminal(record)){pauseScheduling('unknown_submission',attempt.slot,{reason:'Stream ended without a bound terminal provider response'});stopWorkload(session);abort.abort();return;}
+     if(!knownResponseTerminal(record)){record.serverCompletion='unknown';pauseScheduling('unknown_submission',attempt.slot,{reason:'Stream ended without a bound terminal provider response'});stopWorkload(session);abort.abort();return;}
      send({type:'end'});
     }catch(error){record.error=error.name;
      const ownDeadline=record.forwarded&&deadlineTriggered&&requestSignal?.reason===deadlineReason;
      record.transportError={name:error.name,clientOrRelayCancelled:signal.aborted,ownTaskDeadline:ownDeadline};
      record.clientDelivery='unconfirmed-after-transport-error';
-     record.serverCompletion=knownResponseTerminal(record)?record.terminalResponse.status:'unknown';
+     record.serverCompletion=knownResponseTerminal(record)?record.terminalResponse.status:[401,403,429].includes(record.status)?'known_refusal':'unknown';
      if(ownDeadline)record.cancelledByOwnTaskDeadline=true;
      if([401,403,429].includes(record.status)){record.refusal??={status:record.status,bodyInterrupted:true};pauseScheduling('provider_refusal',attempt.slot,record.refusal);}
-     else if(!ownDeadline&&(!record.forwarded||!knownResponseTerminal(record)))pauseScheduling(record.forwarded?'unknown_submission':'authorization_unavailable',attempt.slot,{error:error.name});
+     else if(!record.forwarded||!knownResponseTerminal(record))pauseScheduling(record.forwarded?'unknown_submission':'authorization_unavailable',attempt.slot,{error:error.name});
      forwardingOpen=false;if(session)stopWorkload(session);if(!abort.signal.aborted)abort.abort();throw error;}
     finally{record.finishedAt=new Date().toISOString();save();}
    })();active.add(pending);return pending.finally(()=>active.delete(pending));
@@ -167,7 +204,7 @@ for(const attempt of f.attempts.filter(a=>!amendment||a.slot>=19)){
   fs.writeFileSync(path.join(out,'result.json'),JSON.stringify(summary,null,2));console.log(JSON.stringify(summary));
  }catch(error){fs.writeFileSync(path.join(out,'error.json'),JSON.stringify({message:error.message},null,2));pauseScheduling('execution_or_capture_error',attempt.slot,{message:error.message});if(session&&!fs.existsSync(path.join(out,'candidate.tar'))){stopWorkload(session);captureCandidate(session,out);}}
  finally{clearTimeout(timer);forwardingOpen=false;abort.abort();try{await settleHandlers();}catch(error){pauseScheduling('provider_handlers_unsettled',attempt.slot,{message:error.message});}save();if(session){if(session.close()!==0){pauseScheduling('cleanup_unverified',attempt.slot);throw Error('Container cleanup failed');}relayRemoved=true;}}
- const stopFacts={ownTaskDeadlineTriggered:deadlineTriggered,terminationVerified,captureSaved,forwardingClosed:!forwardingOpen,relayRemoved,activeProviderHandlers:active.size,providerServerStateMayRemainUnknown:requests.some(r=>r.forwarded&&!knownResponseTerminal(r))};
+ const stopFacts={ownTaskDeadlineTriggered:deadlineTriggered,terminationVerified,captureSaved,forwardingClosed:!forwardingOpen,relayRemoved,activeProviderHandlers:active.size,providerServerStateMayRemainUnknown:requests.some(r=>r.forwarded&&!knownResponseTerminal(r)&&r.serverCompletion!=='known_refusal')};
  fs.writeFileSync(path.join(out,'stop-verification.json'),JSON.stringify(stopFacts,null,2));
  if(!terminationVerified||!captureSaved||!relayRemoved||forwardingOpen||active.size)pauseScheduling('local_execution_unverified',attempt.slot,stopFacts);
  if(terminationVerified)fs.writeFileSync(path.join(out,'completed.json'),JSON.stringify({...attempt,terminationVerified,at:new Date().toISOString()},null,2),{flag:'wx'});
