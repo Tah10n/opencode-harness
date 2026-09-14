@@ -21,14 +21,40 @@ runtime never runs an installer. Enable with `HARNESS_TASK_STRATEGY=direct` and
 tool and its instruction are inactive, and the user's default is unchanged.
 
 In the author session, select the native **harness_sense** tool. Its description
-and `path` / `check` schema appear in the actual tool list only when enabled.
+and `path` / `check` / `variant` schema appear in the actual tool list only when enabled.
 For a changed production file, pass:
 
 ```json
 {"path": "src/value.ts", "check": "npm test"}
 ```
 
-`path` defaults to `changed`. Omitted `check`, `test`, `npm test`, and
+A returned variant includes its concrete diff, a workflow-local `ref`, and a
+ready-to-copy `replay` object. For example, after inspecting a survivor:
+
+```json
+{"variant": "v-<returned-reference>", "check": "npm test"}
+```
+
+Copy the actual returned `replay` object; do not construct the reference. Add a
+small justified public API test to the project's normal suite, then issue that
+call. It runs a fresh baseline and **only the selected variant**, with exactly
+the same captured tests and command. It does not regenerate or run the other
+variants. This is a targeted reuse of the existing engine/test adapter, not an
+automatic counterexample finder. The ordinary full diagnostic already supports
+the same weak-test → stronger-test path.
+
+References exist only in the current workflow. `sensitivity-mutations.json`
+retains definitions (file, whole-file hash, original fragment, replacement and
+location) independently of observations in `sensitivity-events.json`. New tests
+make old observations stale but preserve the definition. Any change to the
+corresponding production file requires fresh diagnosis; old offsets are never
+relocated. Arbitrary model patches, foreign references and a mismatched `path`
+are rejected. A bad reference is a diagnostic error, not a task verdict or
+permission to retry automatically. A new reference or check alias never resets
+the shared budget. Insufficient time retains partial observations, without an
+equivalence conclusion.
+
+`path` defaults to `changed` for generation or the selected file for replay. Omitted `check`, `test`, `npm test`, and
 `npm run test` select the existing `npm run test` script. `test:unit` and
 `npm run test:unit` select an existing `test:unit` script. Execution stays with
 npm, including applicable pre/post lifecycle hooks. Original arguments and the
@@ -83,9 +109,18 @@ cause**. Import/build/lint errors do not become evidence of a behavioral asserti
 No mutation score or task-completeness verdict is produced. A valid equivalent
 variant or unspecified error-message change may survive even excellent tests.
 
+Before dismissing a meaningful survivor as equivalent, try a small distinguishing
+scenario through the public API, then check both implementations. A failure to
+find one is not proof of equivalence. Return values, exceptions, state after an
+action, callback order and object identity are examples, not a mandatory list.
+Control clocks, randomness and external state through ordinary project testing
+facilities. Temporary paths, timing and process identifiers alone do not show a
+contract difference. A passing baseline and failing variant do not independently
+justify the expected assertion: check it against the original task and contract.
+
 Inspect the concrete diff against the original task and public contract. If its
 changed property is required, add a regression through the ordinary public API,
-confirm the correct implementation still passes, and rerun `harness_sense`.
+confirm the current implementation still passes, and use the returned replay call.
 Never test source text, mutation names, tool paths or administrative environment
 state. For equivalent/allowed changes, explain why no new requirement follows.
 Do not change production code to satisfy an invented assertion.
@@ -96,7 +131,9 @@ has a snapshot identity; later author edits mark older observations stale in
 or unverified diagnostic termination stops the workflow's normal success path.
 Standard operators and eight local variants cannot cover every identity,
 state-transition or TTL requirement. Invocation without a useful observation,
-and availability without author use, are legitimate measured outcomes.
+and availability without author use, are legitimate measured outcomes. Replay results
+include current snapshot identity, test-file hashes, original arguments, executed
+argv and output from both sides; explicit output truncation remains a limitation.
 
 Upstream references checked for this implementation:
 [configuration](https://stryker-mutator.io/docs/stryker-js/configuration/),
@@ -122,7 +159,7 @@ NATIVE_TASK_FIXTURE_MODES=sensitivity-off node scripts/verify-native-task-fixtur
 The installed scripted provider checks the outgoing native tool schema and
 receives real tool outputs. The weak boundary suite accepts Stryker's `n > 2`
 replacement of `n >= 2`. The same author session adds `assert.equal(accepts(2),
-true)` to its project test; a fresh baseline passes and the exact replacement
+true)` to its project test; an addressed repeat runs only a fresh baseline and the exact replacement; it
 fails that assertion. Its terminal patch is applied and tested in an ordinary
 Git copy. Parallel calls share accounting, and the fixture checks denied script,
 lifecycle and dependency reads, cancellation, and the disabled tool list.
@@ -130,6 +167,8 @@ lifecycle and dependency reads, cancellation, and the disabled tool list.
 Targeted checks retain the equivalent numeric `max` comparison case, red
 baseline, import failure, timeout, partial budget and unsupported scope.
 Evidence is written separately under `local/native-sensitivity-interface/`.
-These are installed-interface and program-behavior checks with a scripted
+Additional targeted controls check a callback module, allowed message differences,
+foreign/stale references, fresh tests, independent writable files/dependencies,
+addressed cancellation and shared budget exhaustion. These are installed-interface and program-behavior checks with a scripted
 author, not evidence of Luna quality improvement. Historical H0 4/4 and H1 3/4
-results are unchanged; this interface change does not authorize a new campaign.
+results are unchanged; the separate [four-run development comparison](../../development/native-task-sensitivity/replay-20260914/PLAN.md) retains its own admission and outcome.

@@ -96,7 +96,7 @@ const fixture=http.createServer(async(req,res)=>{
     const enabled=process.env.NATIVE_TASK_FIXTURE_SENSITIVITY==='1';
     toolSchemas.set(mode,schema??null);
     assert.equal(Boolean(schema),enabled,'Actual outgoing author request must advertise precisely the enabled tool set');
-    if(enabled){assert.match(schema.function.description,/Stryker/);assert.deepEqual(Object.keys(schema.function.parameters.properties).sort(),['check','path']);}
+    if(enabled){assert.match(schema.function.description,/Stryker/);assert.deepEqual(Object.keys(schema.function.parameters.properties).sort(),['check','path','variant']);}
     else assert.ok(!all.includes('call native tool `harness_sense`'));
     const sense=check=>({name:'harness_sense',args:{path:'value.mjs',...(check===undefined?{}:{check})}});
     const actualReports=body.messages.filter(m=>m.role==='tool').flatMap(m=>{
@@ -108,7 +108,7 @@ const fixture=http.createServer(async(req,res)=>{
       calls=[bash('npm test'),sense('npm test --watch'),sense('test'),sense('npm test'),sense('npm run test'),
         {name:'read',args:{filePath:'value.test.mjs'}},
         {name:'edit',args:{filePath:'value.test.mjs',oldString:'assert.equal(accepts(3),true);',newString:'assert.equal(accepts(3),true);assert.equal(accepts(2),true);'}},
-        bash('npm test'),sense(),bash('node --test')];
+        bash('npm test'),{name:'harness_sense',args:actualReports.flatMap(r=>r.variants??[]).find(m=>m.replacement==='n > 2')?.replay??{}},bash('node --test')];
       if(n===2){const invalid=actualReports.at(-1);assert.equal(invalid.engineExecuted,false);assert.equal(invalid.cost.commands,0);assert.match(invalid.limits.join(' '),/Available test scripts: test, test:unit/);assert.match(invalid.limits.join(' '),/Example:/);}
       if(n===5){
         assert.equal(actualReports.length,4);
@@ -118,7 +118,7 @@ const fixture=http.createServer(async(req,res)=>{
           for(const result of [r.baseline,...r.variants]){assert.match(result.output,/PRE_HOOK_OK/);if(result.status==='passed')assert.match(result.output,/POST_HOOK_OK/);}
         }
       }
-      if(n===9){const r=actualReports.at(-1);assert.equal(r.baseline.status,'passed');const rejected=r.variants.find(m=>m.replacement==='n > 2');assert.equal(rejected.status,'command-rejected');assert.match(rejected.output,/AssertionError|ERR_ASSERTION/);assert.match(rejected.output,/false !== true/);}
+      if(n===9){const r=actualReports.at(-1);assert.equal(r.variants.length,1);assert.equal(r.cost.commands,2);assert.equal(r.engineExecuted,false);assert.equal(r.baseline.status,'passed');const rejected=r.variants.find(m=>m.replacement==='n > 2');assert.equal(rejected.status,'command-rejected');assert.match(rejected.output,/AssertionError|ERR_ASSERTION/);assert.match(rejected.output,/false !== true/);}
     }else if(mode==='sensitivity-parallel'){calls=[[sense('test:unit'),sense('npm run test:unit'),bash('node --test')]];if(n===1){assert.equal(actualReports.length,2);assert.ok(actualReports.every(r=>r.engineExecuted&&r.baseline.status==='passed'&&r.variants.length>0&&r.command==='npm run test:unit'));}}
     else if(mode==='sensitivity-off')calls=[bash('npm test')];
     else if(mode==='sensitivity-cancel')calls=[sense()];

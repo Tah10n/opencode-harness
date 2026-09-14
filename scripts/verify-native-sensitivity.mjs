@@ -42,6 +42,67 @@ try {
   assert.notEqual(first.snapshot, strong.snapshot);
   assert.equal(strong.variants.find(m => m.replacement === 'n > 2')?.status, 'command-rejected');
   assert.match(strong.variants.find(m => m.replacement === 'n > 2').output, /AssertionError/);
+  // Public adapter references outlive observations, never production bytes.
+  const {createSensitivity: installedSensitivity} = await import(pathToFileURL(path.join(bundle, 'native-sensitivity.mjs')));
+  const replaySaved = {}, replayContext = {ask: async()=>{}, abort:new AbortController().signal};
+  let remaining = 180000;
+  const replayOptions = {directory:project,rules,base:'HEAD',save:(n,v)=>replaySaved[n]=structuredClone(v),checkActive(){},remainingMs:()=>remaining};
+  const replaySense = installedSensitivity(replayOptions);
+  const invoke = async(args, adapter=replaySense, context=replayContext) => {
+    const state=sensitivityPlan({directory:project,rules,args:{path:'value.mjs'}}).snapshot;
+    const prior=adapter.before({tool:'harness_sense'},{args},state);
+    const report=JSON.parse(await adapter.execute(prior,context));
+    adapter.after({callID:'fixture-'+results.length},{output:JSON.stringify(report)},{sensitivity:prior},state);
+    results.push({label:'addressed',report});return report;
+  };
+  put('test.mjs', weak);
+  const generated=await invoke({path:'value.mjs',check:'npm test'});
+  const selected=generated.variants.find(m=>m.replacement==='n > 2');
+  assert.equal(selected.status,'passed');assert.ok(selected.ref);assert.equal(selected.replay.variant,selected.ref);
+  const definition=structuredClone(replaySaved['sensitivity-mutations.json'].find(m=>m.ref===selected.ref));
+  assert.ok(!('status' in definition));assert.equal(definition.original,'n >= 2');
+  // Every command must start with independent writable files and dependencies.
+  fs.mkdirSync(path.join(project,'node_modules'),{recursive:true});
+  put('.gitignore','node_modules/\n');
+  const isolated = "import fs from 'node:fs'; assert.equal(fs.existsSync('state'),false); fs.writeFileSync('state','created'); assert.equal(fs.existsSync('node_modules/state'),false);fs.writeFileSync('node_modules/state','created');\n";
+  put('test.mjs', weak + isolated + 'assert.equal(accepts(2), true);\n');
+  const replay=await invoke(selected.replay);
+  assert.equal(replay.baseline.status,'passed');assert.equal(replay.variants.length,1);assert.equal(replay.cost.commands,2);assert.equal(replay.engineExecuted,false);
+  assert.equal(replay.variants[0].status,'command-rejected');assert.match(replay.variants[0].output,/false !== true/);
+  assert.notEqual(replay.snapshot,generated.snapshot);assert.equal(replay.variants[0].ref,selected.ref);
+  assert.equal(replay.variants[0].diff,selected.diff);assert.notDeepEqual(replay.tests,generated.tests);
+  assert.deepEqual(replaySaved['sensitivity-mutations.json'].find(m=>m.ref===selected.ref),definition);
+  assert.equal(replaySaved['sensitivity-events.json'][0].stale,true);
+  assert.equal(fs.existsSync(path.join(project,'state')),false);assert.equal(fs.existsSync(path.join(project,'node_modules/state')),false);
+  const foreign=await invoke(selected.replay,installedSensitivity(replayOptions));assert.equal(foreign.cost.commands,0);assert.equal(foreign.terminationVerified,true);assert.match(foreign.limits.join(' '),/Unknown variant/);
+  put('value.mjs',source+'// production edited\n');
+  const stale=await invoke(selected.replay);assert.equal(stale.cost.commands,0);assert.match(stale.limits.join(' '),/Production file changed/);
+  put('value.mjs',source);
+  put('test.mjs',"import './absent.mjs';\n");const badSetup=await invoke(selected.replay);assert.equal(badSetup.status,'baseline-not-passed');assert.equal(badSetup.cost.commands,1);assert.match(badSetup.baseline.output,/ERR_MODULE_NOT_FOUND/);
+  remaining=500;const noBudget=await invoke({...selected.replay,check:'test'});assert.equal(noBudget.cost.commands,0);assert.match(noBudget.limits.join(' '),/budget/);remaining=180000;
+  put('test.mjs',weak+'await new Promise(resolve=>setTimeout(resolve,500));\n');
+  remaining=2400;const shortReplay=await invoke(selected.replay);assert.equal(shortReplay.baseline.status,'passed');assert.equal(shortReplay.status,'partial');assert.equal(shortReplay.variants.length,0);remaining=180000;
+  put('test.mjs',"console.log('REPLAY_PID='+process.pid);setInterval(()=>{},1000);\n");
+  const replayAbort=new AbortController(),replayTimer=setTimeout(()=>replayAbort.abort(),600);
+  const stoppedReplay=await invoke(selected.replay,replaySense,{...replayContext,abort:replayAbort.signal});clearTimeout(replayTimer);
+  assert.equal(stoppedReplay.baseline.status,'cancelled');assert.equal(stoppedReplay.terminationVerified,true);
+  assert.throws(()=>process.kill(Number(/REPLAY_PID=(\d+)/.exec(stoppedReplay.baseline.output)[1]),0),{code:'ESRCH'});
+  const budgetSense=installedSensitivity(replayOptions),budgetPrior=budgetSense.before({tool:'harness_sense'},{args:{path:'value.mjs'}},'state');
+  budgetPrior.startedAt-=180000;
+  const spent=JSON.parse(await budgetSense.execute(budgetPrior,replayContext));assert.equal(spent.cost.commands,0);
+  const alias=await invoke({check:'npm run test'},budgetSense);assert.equal(alias.cost.commands,0);assert.match(alias.limits.join(' '),/budget/);
+  // A different module uses the same standard operators and ordinary command.
+  put('value.mjs',"export function notify(values, callback) { for (const value of values) callback(value); }\n");
+  put('test.mjs',"import assert from 'node:assert/strict';import {notify} from './value.mjs';notify([],()=>assert.fail('empty callback'));\n");
+  const other=await invoke({path:'value.mjs'});const body=other.variants.find(m=>m.status==='passed'&&m.replacement==='{}');assert.ok(body);
+  put('test.mjs',"import assert from 'node:assert/strict';import {notify} from './value.mjs';notify([],()=>assert.fail('empty callback'));const value={};const seen=[];notify([value],v=>seen.push(v));assert.equal(seen.length,1);assert.equal(seen[0],value);\n");
+  const otherReplay=await invoke(body.replay);assert.equal(otherReplay.baseline.status,'passed');assert.equal(otherReplay.variants.length,1);assert.equal(otherReplay.variants[0].status,'command-rejected');assert.match(otherReplay.variants[0].output,/AssertionError/);
+  // The contract requires Error, but deliberately leaves its message unspecified.
+  put('value.mjs',"export function reject() { throw new Error('explanation'); }\n");
+  put('test.mjs',"import assert from 'node:assert/strict';import {reject} from './value.mjs';assert.throws(reject,Error);\n");
+  const allowed=await invoke({path:'value.mjs'});const message=allowed.variants.find(m=>m.mutatorName==='StringLiteral');assert.equal(message.status,'passed');
+  const allowedReplay=await invoke(message.replay);assert.equal(allowedReplay.variants[0].status,'passed');
+  put('value.mjs',source);
   put('test.mjs', weak + 'assert.equal(accepts(3), false);\n');
   const red = await run('red-baseline'); assert.equal(red.status, 'baseline-not-passed'); assert.equal(red.variants.length, 0);
   put('test.mjs', "import './missing-module.mjs';\n");
@@ -64,6 +125,7 @@ try {
   put('test.mjs', "import {max} from './value.mjs'; import assert from 'node:assert/strict'; for (const a of [1,2,3]) for (const b of [1,2,3]) assert.equal(max(a,b), Math.max(a,b));\n");
   const equivalent = await run('equivalent-good-control');
   assert.equal(equivalent.variants.find(m => m.replacement === 'a <= b')?.status, 'passed');
+  const equivGenerated=await invoke({path:'value.mjs'});const equivRef=equivGenerated.variants.find(m=>m.replacement==='a <= b');const equivReplay=await invoke(equivRef.replay);assert.equal(equivReplay.variants[0].status,'passed');assert.equal(equivReplay.cost.commands,2);
   assert.equal(equivalent.status, 'observed'); assert.ok(!('score' in equivalent));
   assert.throws(() => sensitivityPlan({directory: project, rules, args: {path: 'test.mjs'}}), /production/);
   assert.throws(() => sensitivityPlan({directory: project, rules: [...rules, {permission:'read', pattern:'*value.mjs', action:'deny'}], args:{path:'value.mjs'}}), /Incomplete readable/);
