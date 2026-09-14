@@ -1,0 +1,127 @@
+{
+  "id": "d6ba620c886f",
+  "task": "ms-format-unit",
+  "project": "ms",
+  "Q": 0,
+  "findings": [
+    {
+      "category": "missing-delivery",
+      "reason": "Zero changed/deleted files."
+    }
+  ],
+  "contentReview": {
+    "id": "d6ba620c886f",
+    "task": "ms-format-unit",
+    "project": "ms",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete-pending-mechanical-checks",
+    "Q": null,
+    "behaviorReview": "Empty source patch; requested API option, type and tests/docs not delivered.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": false,
+        "evidence": "No delivered edits."
+      },
+      {
+        "scenario": 2,
+        "covered": false,
+        "evidence": "No delivered edits."
+      },
+      {
+        "scenario": 3,
+        "covered": false,
+        "evidence": "No delivered edits."
+      }
+    ],
+    "typesReview": "No new Options export/unit type.",
+    "docsReview": "No new docs.",
+    "contentFindings": [
+      {
+        "category": "missing-delivery",
+        "evidence": "Zero changed/deleted files."
+      }
+    ],
+    "pending": [
+      "ordinary baseline checks",
+      "independent expected failure",
+      "empty applicability record"
+    ],
+    "recordStage": "Initial neutral review retained as history; final Q, findings and assessmentNotes supersede pending hypotheses."
+  },
+  "ordinaryExit": 0,
+  "originalIndependentExit": 1,
+  "interpretedIndependentExit": 1,
+  "applicability": {
+    "id": "d6ba620c886f",
+    "task": "ms-format-unit",
+    "sourceCommit": "4ff48cec099f0514c3e9bbca18706c9c21122bfb",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "excludedPreparationArtifacts": [],
+    "types": null
+  },
+  "sourcePatchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "sourcePatchBytes": 0,
+  "assessmentNotes": [],
+  "slot": 22,
+  "repetition": 1,
+  "arm": "H00",
+  "D": 0,
+  "verification": [
+    {
+      "artifact": "reviews/d6ba620c886f/independent/result.json",
+      "exit": 1,
+      "elapsedMs": 3308,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "ℹ 2 files, total: 5.85 kB\n✔ Build complete in 235ms\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n'1h' !== '60m'\n\n    at /work/repo/.h00-independent.cjs:2:269 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '1h',\n  expected: '60m',\n  operator: 'strictEqual',\n  diff: 'simple'\n}",
+      "fullLocalOutputSha256": "56d35d9ca451d18f282795012b7739f5b71dbc6ebcfe0723904e7989e6c48977",
+      "supersededDiagnostic": false
+    },
+    {
+      "artifact": "reviews/d6ba620c886f/ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 7213,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "> tsdown\n\nℹ tsdown v0.13.0 powered by rolldown v1.0.0-beta.30\nℹ Using tsdown config: /work/repo/tsdown.config.ts\nℹ entry: src/index.ts\nℹ target: node20.0.0\nℹ tsconfig: tsconfig.json\nℹ Build start\nℹ dist/index.js    3.92 kB │ gzip: 1.30 kB\nℹ dist/index.d.ts  1.93 kB │ gzip: 0.69 kB\nℹ 2 files, total: 5.85 kB\n✔ Build complete in 244ms",
+      "fullLocalOutputSha256": "b55e33a7c983cdc57b205b47ed82a34f6fef47943f4db58cc5cbc4a6da56f057",
+      "supersededDiagnostic": false
+    }
+  ],
+  "native": {
+    "completed": false,
+    "exitCode": 137,
+    "signal": null,
+    "lastStepFinish": null,
+    "normalHandoff": false,
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "workflowStatus": null,
+    "terminalPatchVerification": null,
+    "lastNativeTextSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "normalFinalResponse": false,
+    "finalResponseExcerpt": "",
+    "authorExplanationExcerpt": null,
+    "reportFindings": [
+      {
+        "category": "no-normal-final-handoff",
+        "evidence": "No normal terminal stop and usable final result. Any interim prose is not a final response. Empty patch stays Q=0/D=0."
+      }
+    ]
+  }
+}

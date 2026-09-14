@@ -1,0 +1,127 @@
+{
+  "id": "71b56c9173d2",
+  "task": "ms-parse-compound",
+  "project": "ms",
+  "Q": 1,
+  "findings": [],
+  "contentReview": {
+    "id": "71b56c9173d2",
+    "task": "ms-parse-compound",
+    "project": "ms",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete-pending-mechanical-checks",
+    "Q": null,
+    "retainedTestsReview": "Existing parse/format/ms/type cases retained; new test file added. Existing parser entry points unchanged.",
+    "behaviorReview": "Full regex validates before summing explicit units via original parse conversions, leading minus applied to whole sum. Suspected terminal-newline acceptance from dollar anchor needs direct compiled API verification.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": true,
+        "evidence": "One mixed expression covers spelled/mixed-case units, decimals, repeated and reordered hour/day units, months/years and negative sum."
+      },
+      {
+        "scenario": 2,
+        "covered": true,
+        "evidence": "Delivered assertions reject missing units, later signs, suffix garbage, leading/trailing ASCII spaces and non-space separators. Terminal-newline implementation hypothesis checked separately."
+      },
+      {
+        "scenario": 3,
+        "covered": true,
+        "evidence": "Non-string, empty, oversized inputs throw; all three original parsers reject compound syntax."
+      }
+    ],
+    "typesReview": "Exported TS function has string argument and number return; ts-expect-error runtime/type cases reject undefined and compound inputs to strict parsers. Normal project typecheck/build pending.",
+    "docsReview": "README API import/example, grammar, negative-sum and error-boundary documentation present.",
+    "contentFindings": [],
+    "pending": [
+      "ordinary project checks/build/types",
+      "independent runtime checks",
+      "ordinary patch applicability",
+      "direct contract probe for forbidden trailing newline on author patches and reference/alternative"
+    ],
+    "recordStage": "Initial neutral review retained as history; final Q, findings and assessmentNotes supersede pending hypotheses."
+  },
+  "ordinaryExit": 0,
+  "originalIndependentExit": 0,
+  "interpretedIndependentExit": 0,
+  "applicability": {
+    "id": "71b56c9173d2",
+    "task": "ms-parse-compound",
+    "sourceCommit": "4ff48cec099f0514c3e9bbca18706c9c21122bfb",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "3a5d6cf8cb91a8026ffaa61bcb8dbf87393e254bffca31105549cd9e8853b8bb",
+    "excludedPreparationArtifacts": [],
+    "types": null
+  },
+  "sourcePatchSha256": "3a5d6cf8cb91a8026ffaa61bcb8dbf87393e254bffca31105549cd9e8853b8bb",
+  "sourcePatchBytes": 4590,
+  "assessmentNotes": [
+    "Suspected trailing-line-terminator defect refuted: compiled public API returns NaN for LF, CR, U+2028 and U+2029; both controls pass same probe."
+  ],
+  "slot": 24,
+  "repetition": 1,
+  "arm": "P",
+  "D": 1,
+  "verification": [
+    {
+      "artifact": "reviews/71b56c9173d2/independent/result.json",
+      "exit": 0,
+      "elapsedMs": 3389,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "ℹ 2 files, total: 7.08 kB\n✔ Build complete in 225ms\nIndependent behavior passed",
+      "fullLocalOutputSha256": "a468503dc9ec005532b4bf9becc82ef767b2288fc09bd9603494ef7088e59b69",
+      "supersededDiagnostic": false
+    },
+    {
+      "artifact": "reviews/71b56c9173d2/ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 8611,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "> tsdown\n\nℹ tsdown v0.13.0 powered by rolldown v1.0.0-beta.30\nℹ Using tsdown config: /work/repo/tsdown.config.ts\nℹ entry: src/index.ts\nℹ target: node20.0.0\nℹ tsconfig: tsconfig.json\nℹ Build start\nℹ dist/index.js    4.88 kB │ gzip: 1.52 kB\nℹ dist/index.d.ts  2.20 kB │ gzip: 0.73 kB\nℹ 2 files, total: 7.08 kB\n✔ Build complete in 235ms",
+      "fullLocalOutputSha256": "bf7dce4c597587486fc63b3dfebebcb4ef21cbf6f93ec5ba7a24d228809418bb",
+      "supersededDiagnostic": false
+    },
+    {
+      "artifact": "reviews/71b56c9173d2/supplemental/trailing-whitespace-contract/result.json",
+      "exit": 0,
+      "elapsedMs": 5899,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "ℹ 2 files, total: 7.08 kB\n✔ Build complete in 282ms\n[{\"code\":10,\"input\":\"1h 30m\\n\",\"actual\":\"NaN\",\"pass\":true},{\"code\":13,\"input\":\"1h 30m\\r\",\"actual\":\"NaN\",\"pass\":true},{\"code\":8232,\"input\":\"1h 30m\n\",\"actual\":\"NaN\",\"pass\":true},{\"code\":8233,\"input\":\"1h 30m\n\",\"actual\":\"NaN\",\"pass\":true}]\n✔ Build complete in 282ms\n[{\"code\":10,\"input\":\"1h 30m\\n\",\"actual\":\"NaN\",\"pass\":true},{\"code\":13,\"input\":\"1h 30m\\r\",\"actual\":\"NaN\",\"pass\":true},{\"code\":8232,\"input\":\"1h 30m\n\",\"actual\":\"NaN\",\"pass\":true},{\"code\":8233,\"input\":\"1h 30m\n\",\"actual\":\"NaN\",\"pass\":true}]",
+      "fullLocalOutputSha256": "0ec2bdda75ab10704678c189756400440404890ed46bf9a679fc30ab592d6044",
+      "supersededDiagnostic": false
+    }
+  ],
+  "native": {
+    "completed": true,
+    "exitCode": 0,
+    "signal": null,
+    "lastStepFinish": "stop",
+    "normalHandoff": true,
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "workflowStatus": null,
+    "terminalPatchVerification": null,
+    "lastNativeTextSha256": "91d7378da3d7275cd74b89a2c7a6b6e46358430fb1cce1f915f07af7ce5a7253",
+    "normalFinalResponse": true,
+    "finalResponseExcerpt": "Implemented `parseCompound(str: string): number`.\n\n- Supports strict compound sums, units in any order, repeats, decimals, mixed case, months/years, and whole-expression negatives.\n- Rejects malformed syntax with `NaN`; preserves throw boundaries.\n- Added regression tests, README/API docs, and generated declaration export.\n- Existing `parse`, `parseStrict`, and `ms` behavior remains unchanged.\n\nChecks passed:\n- Node Jest: 173 tests, 100% coverage\n- Edge Jest: 173 tests\n- TypeScript, lint, source formatting, build, and built-package smoke checks\n\n`pnpm` was unavailable, so equivalent local binaries were run directly.",
+    "authorExplanationExcerpt": null,
+    "reportFindings": []
+  }
+}

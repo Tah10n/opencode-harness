@@ -1,0 +1,134 @@
+{
+  "id": "9362cee5515b",
+  "task": "ms-format-unit",
+  "project": "ms",
+  "Q": 1,
+  "findings": [],
+  "contentReview": {
+    "id": "9362cee5515b",
+    "task": "ms-format-unit",
+    "project": "ms",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete-pending-mechanical-checks",
+    "Q": null,
+    "retainedTestsReview": "Original format cases retained; only import extended and new scenario groups added. Original ms/parse/parseStrict source paths unchanged.",
+    "behaviorReview": "Forced-unit switch reuses original constants, Math.round and plural helper; ms unit retains fractional numeric value. Unknown runtime values hit Error default. Numeric ms still forwards options to format; string parsing ignores options as before.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": true,
+        "evidence": "All units exercised; forced smaller milliseconds and larger year differ from automatic format, explicit month/year constants and fractional ms."
+      },
+      {
+        "scenario": 2,
+        "covered": true,
+        "evidence": "Negative rounding at -2500 and -1500, zero long hour, 1499/1500 singular/plural boundary, fractional long ms."
+      },
+      {
+        "scenario": 3,
+        "covered": true,
+        "evidence": "Unknown runtime unit rejected by format and numeric ms; string ms parses normally with invalid formatting option. Existing default/parse/parseStrict tests retained. Type fixture rejects invalid unit via ts-expect-error."
+      }
+    ],
+    "typesReview": "Options exported with supported unit union; source type fixture checks format/ms string returns, parse numeric overload and invalid unit rejection; normal typecheck/build pending.",
+    "docsReview": "README forced-unit examples include short seconds, long minutes and month conversion; Options JSDoc documents forcing vs automatic.",
+    "contentFindings": [],
+    "pending": [
+      "ordinary project checks/build/types",
+      "independent runtime checks",
+      "ordinary patch applicability",
+      "classify 17 generated Husky files against pinned dependency output; preserve raw capture"
+    ],
+    "recordStage": "Initial neutral review retained as history; final Q, findings and assessmentNotes supersede pending hypotheses."
+  },
+  "ordinaryExit": 0,
+  "originalIndependentExit": 0,
+  "interpretedIndependentExit": 0,
+  "applicability": {
+    "id": "9362cee5515b",
+    "task": "ms-format-unit",
+    "sourceCommit": "4ff48cec099f0514c3e9bbca18706c9c21122bfb",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "02c361d7236e65072db769475b9728fa42c2da36cce467114ec75383ba264b75",
+    "excludedPreparationArtifacts": [
+      ".husky/_/.gitignore",
+      ".husky/_/applypatch-msg",
+      ".husky/_/commit-msg",
+      ".husky/_/h",
+      ".husky/_/husky.sh",
+      ".husky/_/post-applypatch",
+      ".husky/_/post-checkout",
+      ".husky/_/post-commit",
+      ".husky/_/post-merge",
+      ".husky/_/post-rewrite",
+      ".husky/_/pre-applypatch",
+      ".husky/_/pre-auto-gc",
+      ".husky/_/pre-commit",
+      ".husky/_/pre-merge-commit",
+      ".husky/_/pre-push",
+      ".husky/_/pre-rebase",
+      ".husky/_/prepare-commit-msg"
+    ],
+    "types": null
+  },
+  "sourcePatchSha256": "02c361d7236e65072db769475b9728fa42c2da36cce467114ec75383ba264b75",
+  "sourcePatchBytes": 6060,
+  "assessmentNotes": [
+    "17 ignored Husky files exactly match pinned generator bytes/modes and are absent upstream; omitted only from public-source projection, raw capture unchanged."
+  ],
+  "slot": 21,
+  "repetition": 1,
+  "arm": "P",
+  "D": 1,
+  "verification": [
+    {
+      "artifact": "reviews/9362cee5515b/independent/result.json",
+      "exit": 0,
+      "elapsedMs": 2758,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "ℹ 2 files, total: 7.02 kB\n✔ Build complete in 229ms\nIndependent behavior passed",
+      "fullLocalOutputSha256": "1001a0b0b04a194e14f683b255adcd74e72a4963fbc0447049d4e834a7d56825",
+      "supersededDiagnostic": false
+    },
+    {
+      "artifact": "reviews/9362cee5515b/ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 6846,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "> tsdown\n\nℹ tsdown v0.13.0 powered by rolldown v1.0.0-beta.30\nℹ Using tsdown config: /work/repo/tsdown.config.ts\nℹ entry: src/index.ts\nℹ target: node20.0.0\nℹ tsconfig: tsconfig.json\nℹ Build start\nℹ dist/index.js    4.91 kB │ gzip: 1.52 kB\nℹ dist/index.d.ts  2.11 kB │ gzip: 0.76 kB\nℹ 2 files, total: 7.02 kB\n✔ Build complete in 227ms",
+      "fullLocalOutputSha256": "fc7a05105a70cf986b245dbbb4219234b8be8922dbe8aa5b9f5aeb4aeae9891a",
+      "supersededDiagnostic": false
+    }
+  ],
+  "native": {
+    "completed": true,
+    "exitCode": 0,
+    "signal": null,
+    "lastStepFinish": "stop",
+    "normalHandoff": true,
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "workflowStatus": null,
+    "terminalPatchVerification": null,
+    "lastNativeTextSha256": "f86cc513c4b0568dbe23d4c72c40df2421bec798f71f8af2995a381b06e183a6",
+    "normalFinalResponse": true,
+    "finalResponseExcerpt": "Implemented forced formatting units `ms | s | m | h | d | w | mo | y`.\n\n- Exported `Options` with `unit`.\n- Preserved automatic formatting, parsing, overload return types, and fractional milliseconds.\n- Added runtime invalid-unit errors.\n- Added regression and type tests.\n- Documented short/long forced-unit examples.\n\nChecks passed:\n- Typecheck\n- Node Jest: 171 tests, 100% coverage\n- Edge Jest\n- Biome lint/check\n- Build and `attw` declaration validation\n\nNo dependencies or commits changed.",
+    "authorExplanationExcerpt": null,
+    "reportFindings": []
+  }
+}

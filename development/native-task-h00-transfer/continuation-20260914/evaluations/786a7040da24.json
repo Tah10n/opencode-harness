@@ -1,0 +1,137 @@
+{
+  "id": "786a7040da24",
+  "task": "quick-lru-prune",
+  "project": "quick-lru",
+  "Q": 0,
+  "findings": [
+    {
+      "category": "required-coverage-loss",
+      "reason": "Delivered shadow regression never uses a still-live old entry when current expires, leaving the required no-resurrection distinction untested."
+    }
+  ],
+  "contentReview": {
+    "id": "786a7040da24",
+    "task": "quick-lru-prune",
+    "project": "quick-lru",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete-pending-mechanical-checks",
+    "Q": null,
+    "behaviorReview": "Prunes current generation with original expiry helper, then old keys lacking current entries. Helper deletes both copies, so current expiration does not resurrect old value. Live entries are not promoted/reordered. Current-first callback order is allowed by task.",
+    "retainedTestsReview": "All original runtime and tsd cases retained; serial clock-controlled regressions added with teardown restoration.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": true,
+        "evidence": "Current and old expired entries counted and notified once, full live iteration order compared to pre-expiration snapshot."
+      },
+      {
+        "scenario": 2,
+        "covered": false,
+        "evidence": "Live current shadows expired old with no callback. When current then expires, old is already expired as well; later get() would lazily erase a mistakenly retained old entry, so this does not discriminate resurrection of a still-live old value. Same gap as the disclosed first-repetition prune assessment."
+      },
+      {
+        "scenario": 3,
+        "covered": true,
+        "evidence": "Exact fake-clock boundary, Infinity, stored undefined and repeat prune checked; live entry deleted to make size zero, then cache reused and pruned."
+      }
+    ],
+    "typesReview": "pruneExpired(): number declaration and tsd number assertion supplied.",
+    "docsReview": "README/declaration explain logical-key count, normal callbacks, current visibility, no reordering and no resurrection.",
+    "contentFindings": [
+      {
+        "category": "required-coverage-loss",
+        "reason": "Delivered shadow regression never uses a still-live old entry when current expires, leaving the required no-resurrection distinction untested."
+      }
+    ],
+    "pending": [
+      "ordinary project checks including tsd",
+      "original independent checks",
+      "uniform callback-order interpretation",
+      "ordinary patch applicability"
+    ],
+    "recordStage": "Initial neutral review retained as history; final Q, findings and assessmentNotes supersede pending hypotheses."
+  },
+  "ordinaryExit": 0,
+  "originalIndependentExit": 1,
+  "interpretedIndependentExit": 0,
+  "applicability": {
+    "id": "786a7040da24",
+    "task": "quick-lru-prune",
+    "sourceCommit": "f2fe88e2932603c038c61ca29de6ad5286148e1b",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "885ddc77172e118c654296a5e88abc01c52febf0f7025c61f2a4caf515f1c55d",
+    "excludedPreparationArtifacts": [],
+    "types": null
+  },
+  "sourcePatchSha256": "885ddc77172e118c654296a5e88abc01c52febf0f7025c61f2a4caf515f1c55d",
+  "sourcePatchBytes": 5912,
+  "assessmentNotes": [
+    "Original independent exit preserved; only unsupported cross-generation callback order interpreted uniformly as before amendment."
+  ],
+  "slot": 39,
+  "repetition": 2,
+  "arm": "P",
+  "D": 0,
+  "verification": [
+    {
+      "artifact": "reviews/786a7040da24/independent/result.json",
+      "exit": 1,
+      "elapsedMs": 3143,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    [\n+     'current-expired',\n+     undefined\n+   ],\n+   [\n      'old-expired',\n      1\n    ],",
+      "fullLocalOutputSha256": "12ad8c62df36b4c68ab3fcac108c23e149be2912d8574cf1d0a51c6759eb11ea",
+      "supersededDiagnostic": false
+    },
+    {
+      "artifact": "reviews/786a7040da24/ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 8729,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "  ✔ set(maxAge): items without expiration never expire (408ms)\n  ✔ set(maxAge): ignores non-numeric maxAge option (409ms)\n  ✔ set(maxAge): per-item maxAge overrides global maxAge (501ms)\n  ✔ maxAge: setting an item with a local expiration (505ms)\n  ─\n\n  118 tests passed\n----------|---------|----------|---------|---------|-------------------\nFile      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s \n----------|---------|----------|---------|---------|-------------------\nAll files |       0 |        0 |       0 |       0 |                   \n----------|---------|----------|---------|---------|-------------------",
+      "fullLocalOutputSha256": "e815cf2edf629e1b21a0080fb962311ddab5fd2f8a4f61374070e4cef06d5e47",
+      "supersededDiagnostic": false
+    },
+    {
+      "artifact": "reviews/786a7040da24/supplemental/callback-order-interpretation/result.json",
+      "exit": 0,
+      "elapsedMs": 6923,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "Independent behavior passed",
+      "fullLocalOutputSha256": "f9c69e05a31a62e04881e10139c67883f681accefebbe3f3ff50d81e2a6a7a6e",
+      "supersededDiagnostic": false
+    }
+  ],
+  "native": {
+    "completed": true,
+    "exitCode": 0,
+    "signal": null,
+    "lastStepFinish": "stop",
+    "normalHandoff": true,
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "workflowStatus": null,
+    "terminalPatchVerification": null,
+    "lastNativeTextSha256": "f8fa6bcf8c29d40b72a4c22938f82858f334a6747bb131bfbfb61d7679f33959",
+    "normalFinalResponse": true,
+    "finalResponseExcerpt": "Implemented `pruneExpired(): number` with correct dual-generation shadowing and eviction callback behavior.\n\nChanges:\n- Added runtime implementation in `index.js`\n- Added TypeScript declaration and type test\n- Added regression tests for generations, shadowing, boundaries, infinite TTL, undefined values, repeated pruning, and reuse\n- Documented API in `readme.md`\n\nChecks passed:\n- `npm test`\n- 118 tests passed\n- `git diff --check`",
+    "authorExplanationExcerpt": null,
+    "reportFindings": []
+  }
+}

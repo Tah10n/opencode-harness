@@ -1,0 +1,161 @@
+{
+  "id": "a53a7c1ad827",
+  "task": "quick-lru-computed",
+  "project": "quick-lru",
+  "Q": 0,
+  "findings": [
+    {
+      "category": "required-coverage-loss",
+      "reason": "Default TTL regression accepts an infinite expiry because its only post-insertion TTL assertion is >0"
+    }
+  ],
+  "contentReview": {
+    "id": "a53a7c1ad827",
+    "task": "quick-lru-computed",
+    "project": "quick-lru",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete-pending-mechanical-checks",
+    "Q": null,
+    "behaviorReview": "Uses current/old cache membership to preserve stored undefined, original expiry deletion/notification, moveToRecent on old hits, and normal set for default maxAge on computed misses. Thrown factory leaves absent key uninserted.",
+    "retainedTestsReview": "All original runtime and tsd regression cases retained.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": true,
+        "evidence": "Old-generation stored undefined hit never calls factory; several inserts force next generation, making missing recency promotion observable."
+      },
+      {
+        "scenario": 2,
+        "covered": false,
+        "evidence": "Expired entry is observed without deletion via expiresIn, factory count/key/returned value and one eviction checked. Reinserted TTL only checked as >0, which also accepts Infinity; no upper bound, finite check or later expiry proves default TTL. Same diagnostic of missing finite TTL prepared."
+      },
+      {
+        "scenario": 3,
+        "covered": true,
+        "evidence": "Same thrown Error returned and no insertion; object key is strictly passed to factory and two caches retain distinct object values."
+      }
+    ],
+    "typesReview": "Typed key inference and ValueType return via tsd, with invalid factory string return rejected for numeric cache.",
+    "docsReview": "README and declarations explain synchronous compute, hit recency, no factory on hits and default maxAge.",
+    "contentFindings": [
+      {
+        "category": "required-coverage-loss",
+        "reason": "Default TTL regression accepts an infinite expiry because its only post-insertion TTL assertion is >0; pending same loss-of-TTL sensitivity check for all affected patches and controls."
+      }
+    ],
+    "pending": [
+      "ordinary project checks including tsd",
+      "independent public API checks",
+      "ordinary patch applicability",
+      "missing-default-TTL test sensitivity"
+    ],
+    "recordStage": "Initial neutral review retained as history; final Q, findings and assessmentNotes supersede pending hypotheses."
+  },
+  "ordinaryExit": 0,
+  "originalIndependentExit": 0,
+  "interpretedIndependentExit": 0,
+  "applicability": {
+    "id": "a53a7c1ad827",
+    "task": "quick-lru-computed",
+    "sourceCommit": "f2fe88e2932603c038c61ca29de6ad5286148e1b",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "ef444325ed5d796e0761414388db7734a2dd5e8063a50c36b285e7b277cf4461",
+    "excludedPreparationArtifacts": [],
+    "types": null
+  },
+  "sourcePatchSha256": "ef444325ed5d796e0761414388db7734a2dd5e8063a50c36b285e7b277cf4461",
+  "sourcePatchBytes": 5151,
+  "assessmentNotes": [
+    "Delivered AVA suite accepts isolated removal of computed entry expiry. Initial set-based diagnostic retained separately because repeat set could also alter eviction; refined probe changes only stored expiry. Both historical suites and controls detect refined mutant."
+  ],
+  "slot": 37,
+  "repetition": 2,
+  "arm": "H00",
+  "D": 0,
+  "verification": [
+    {
+      "artifact": "reviews/a53a7c1ad827/default-ttl-sensitivity/result.json",
+      "exit": 0,
+      "elapsedMs": 9822,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "  ✔ maxAge: entriesAscending() returns only non-expired entries (201ms)\n  ✔ maxAge: entries() returns only non-expired entries (201ms)\n  ✔ maxAge: forEach() excludes expired entries (201ms)\n  ✔ maxAge: iterator excludes expired items (201ms)\n  ✔ maxAge: iterator excludes expired items from old cache (201ms)\n  ✔ set(maxAge): items without expiration never expire (400ms)\n  ✔ set(maxAge): ignores non-numeric maxAge option (400ms)\n  ✔ maxAge: setting an item with a local expiration (500ms)\n  ✔ set(maxAge): per-item maxAge overrides global maxAge (502ms)\n  ─\n\n  118 tests passed",
+      "fullLocalOutputSha256": "3ec305ff41611bee246486603cc2535c5741d9eec23e7b4bfb29c7b854b2ce41",
+      "supersededDiagnostic": true
+    },
+    {
+      "artifact": "reviews/a53a7c1ad827/independent/result.json",
+      "exit": 0,
+      "elapsedMs": 2804,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "Independent behavior passed",
+      "fullLocalOutputSha256": "f9c69e05a31a62e04881e10139c67883f681accefebbe3f3ff50d81e2a6a7a6e",
+      "supersededDiagnostic": false
+    },
+    {
+      "artifact": "reviews/a53a7c1ad827/isolated-default-ttl-sensitivity/result.json",
+      "exit": 0,
+      "elapsedMs": 5128,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "  ✔ maxAge: entries() returns only non-expired entries (201ms)\n  ✔ maxAge: forEach() excludes expired entries (201ms)\n  ✔ maxAge: iterator excludes expired items (202ms)\n  ✔ maxAge: iterator excludes expired items from old cache (202ms)\n  ✔ set(maxAge): setting the same key refreshes expiration (204ms)\n  ✔ set(maxAge): items without expiration never expire (407ms)\n  ✔ set(maxAge): ignores non-numeric maxAge option (407ms)\n  ✔ maxAge: setting an item with a local expiration (502ms)\n  ✔ set(maxAge): per-item maxAge overrides global maxAge (505ms)\n  ─\n\n  118 tests passed",
+      "fullLocalOutputSha256": "5dd9c73257e337553b5bb50324bebb08489b14d4971a8c577afcb15b7ba41db3",
+      "supersededDiagnostic": false
+    },
+    {
+      "artifact": "reviews/a53a7c1ad827/ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 8427,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "  ✔ set(maxAge): items without expiration never expire (403ms)\n  ✔ set(maxAge): ignores non-numeric maxAge option (403ms)\n  ✔ maxAge: setting an item with a local expiration (500ms)\n  ✔ set(maxAge): per-item maxAge overrides global maxAge (501ms)\n  ─\n\n  118 tests passed\n----------|---------|----------|---------|---------|-------------------\nFile      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s \n----------|---------|----------|---------|---------|-------------------\nAll files |       0 |        0 |       0 |       0 |                   \n----------|---------|----------|---------|---------|-------------------",
+      "fullLocalOutputSha256": "f78f2b3042452fdd4b8e5f90a2974da4367cde47cc47514b1bc5dab640d5e13e",
+      "supersededDiagnostic": false
+    }
+  ],
+  "native": {
+    "completed": true,
+    "exitCode": 0,
+    "signal": null,
+    "lastStepFinish": "stop",
+    "normalHandoff": true,
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "workflowStatus": "incomplete",
+    "terminalPatchVerification": {
+      "slot": 37,
+      "id": "a53a7c1ad827",
+      "terminalPatchSha256": "c185707901ed56b525c3d430f0b5a53b0c90a5b9c616c216d1771e0fdb247ddd",
+      "sourcePatchSha256": "ef444325ed5d796e0761414388db7734a2dd5e8063a50c36b285e7b277cf4461",
+      "ordinaryCleanSourceForwardApplyExit": 0,
+      "terminalPatchDeliversAllAuthorBytesAndModes": true,
+      "nativeHandoffNamesDeliveryAndPatch": true
+    },
+    "lastNativeTextSha256": "605873c776b474a60f8c060e13e5bc50c67ac150d83d04ae9739508ed8d6bf7f",
+    "normalFinalResponse": true,
+    "finalResponseExcerpt": "Native task workflow: incomplete.\nDelivery worktree: /work/repo/.git/harness-task/[task]/worktree.\nTerminal patch: /work/repo/.git/harness-task/[task]/terminal.patch.\nFull report and tool outputs: /work/repo/.git/harness-task/[task].\nOriginal checkout unchanged by workflow transfer.",
+    "authorExplanationExcerpt": "\nImplemented `getOrInsertComputed` with:\n\n- Cache hits, including stored `undefined`, without factory calls\n- LRU recency refresh\n- Expiry eviction notifications\n- Default TTL insertion\n- Error propagation without insertion\n- Object-key and independent-cache support\n\nUpdated declarations, type tests, README, and runtime regressions.\n\nChecks passed:\n\n- Focused AVA: 3 tests\n- Full `npm test`: 118 tests, XO, NYC, and tsd\n- `git diff --check`\n\nNo commit or dependency changes made.",
+    "reportFindings": [
+      {
+        "category": "misleading-workflow-report",
+        "evidence": "Final workflow lists successful relevant project commands but claims no relevant project check was observed. Real applicable delivery and terminal patch are named; conservative incomplete does not alone remove D."
+      }
+    ]
+  }
+}

@@ -1,0 +1,128 @@
+{
+  "id": "5bd7601b2ab2",
+  "task": "fastq-running-tasks",
+  "project": "fastq",
+  "Q": 1,
+  "findings": [],
+  "contentReview": {
+    "id": "5bd7601b2ab2",
+    "task": "fastq-running-tasks",
+    "project": "fastq",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete-pending-mechanical-checks",
+    "Q": null,
+    "behaviorReview": "Maintains separate doubly linked running list; every direct/promoted start adds before worker, Task.worked removes before error handler and completion callback. Snapshot copies values into a fresh array; pooled running links are cleared. Original _running/release scheduling and callback context flow remain unchanged.",
+    "retainedTestsReview": "All original callback/promise and type examples retained; new cases added.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": true,
+        "evidence": "Deferred workers distinguish active from queued values; fresh-array identity and mutation isolation asserted."
+      },
+      {
+        "scenario": 2,
+        "covered": true,
+        "evidence": "Two undefined values become concurrently active after distinct completion, callbacks assert their own absence, queued promotion and pooled-task reuse checked; retained snapshot still contains original values after reuse."
+      },
+      {
+        "scenario": 3,
+        "covered": true,
+        "evidence": "Paused queue with push/unshift, resume, concurrency increase and promotion asserts active snapshots; deferred promise fulfillment and rejection assert successive active lists and final emptiness."
+      }
+    ],
+    "typesReview": "runningTasks(): T[] added to shared queue declaration inherited by promise queues; both callback and promise public consumers added to ordinary example fixture.",
+    "docsReview": "README API link and method docs define fresh snapshot, active-only inclusion, start order, duplicates and undefined.",
+    "contentFindings": [],
+    "pending": [
+      "ordinary project checks and TypeScript",
+      "independent public API checks",
+      "ordinary patch applicability"
+    ],
+    "recordStage": "Initial neutral review retained as history; final Q, findings and assessmentNotes supersede pending hypotheses."
+  },
+  "ordinaryExit": 0,
+  "originalIndependentExit": 0,
+  "interpretedIndependentExit": 0,
+  "applicability": {
+    "id": "5bd7601b2ab2",
+    "task": "fastq-running-tasks",
+    "sourceCommit": "fe2d23196a005810dfcbc4103b3c746cc5542430",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "97734961552bde179602bae742a34b5fdf043c966970666f159723be2be84bf1",
+    "excludedPreparationArtifacts": [
+      "package-lock.json"
+    ],
+    "types": null
+  },
+  "sourcePatchSha256": "97734961552bde179602bae742a34b5fdf043c966970666f159723be2be84bf1",
+  "sourcePatchBytes": 10874,
+  "assessmentNotes": [],
+  "slot": 33,
+  "repetition": 2,
+  "arm": "H00",
+  "D": 1,
+  "verification": [
+    {
+      "artifact": "reviews/5bd7601b2ab2/independent/result.json",
+      "exit": 0,
+      "elapsedMs": 2841,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "Independent behavior passed",
+      "fullLocalOutputSha256": "f9c69e05a31a62e04881e10139c67883f681accefebbe3f3ff50d81e2a6a7a6e",
+      "supersededDiagnostic": false
+    },
+    {
+      "artifact": "reviews/5bd7601b2ab2/ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 4614,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "# ok\n\n----------|---------|----------|---------|---------|-------------------\nFile      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s \n----------|---------|----------|---------|---------|-------------------\nAll files |     100 |      100 |     100 |     100 |                   \n queue.js |     100 |      100 |     100 |     100 |                   \n----------|---------|----------|---------|---------|-------------------\n\n> fastq@1.20.3 typescript\n> tsc --project ./test/tsconfig.json\n",
+      "fullLocalOutputSha256": "299c878bd74a403ffa2814ffa952d9e58391e9d33dd5a1a4f488fa56c350c896",
+      "supersededDiagnostic": false
+    }
+  ],
+  "native": {
+    "completed": true,
+    "exitCode": 0,
+    "signal": null,
+    "lastStepFinish": "stop",
+    "normalHandoff": true,
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "workflowStatus": "incomplete",
+    "terminalPatchVerification": {
+      "slot": 33,
+      "id": "5bd7601b2ab2",
+      "terminalPatchSha256": "b91b12a2d2e217dd7cea32c0d904fbecd739569ea4c8b6d960cd5bbcfd156017",
+      "sourcePatchSha256": "97734961552bde179602bae742a34b5fdf043c966970666f159723be2be84bf1",
+      "ordinaryCleanSourceForwardApplyExit": 0,
+      "terminalPatchDeliversAllAuthorBytesAndModes": true,
+      "nativeHandoffNamesDeliveryAndPatch": true
+    },
+    "lastNativeTextSha256": "d156a6c092fcc159f20625eda630133803723c6ae66a445f71d51f0eadfe2efe",
+    "normalFinalResponse": true,
+    "finalResponseExcerpt": "Native task workflow: incomplete.\nDelivery worktree: /work/repo/.git/harness-task/[task]/worktree.\nTerminal patch: /work/repo/.git/harness-task/[task]/terminal.patch.\nFull report and tool outputs: /work/repo/.git/harness-task/[task].\nOriginal checkout unchanged by workflow transfer.",
+    "authorExplanationExcerpt": "\nImplemented `runningTasks()` for callback and promise queues.\n\n- Preserves start order, duplicates, and `undefined`.\n- Returns independent snapshots.\n- Removes tasks before completion callbacks.\n- Handles promotion, pause/resume, concurrency changes, rejection, and pooling.\n- Updated tests, TypeScript declarations/examples, and README.\n\nChecks passed:\n- `npm test`: 314 tests, 100% coverage\n- `npm run typescript`\n- `npx tape test/test.js test/promise.js`\n\nNo commit or dependency changes made.",
+    "reportFindings": [
+      {
+        "category": "misleading-workflow-report",
+        "evidence": "Final workflow lists successful relevant project commands but claims no relevant project check was observed. Real applicable delivery and terminal patch are named; conservative incomplete does not alone remove D."
+      }
+    ]
+  }
+}
