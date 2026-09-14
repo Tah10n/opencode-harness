@@ -1,0 +1,66 @@
+{
+  "modelSeriesByArm": {
+    "H0": {
+      "attempts": 4,
+      "Q": 4,
+      "D": 4,
+      "requests": 78,
+      "tools": 150,
+      "nativeElapsedMs": 970447,
+      "executionMs": 970225,
+      "cleanupMs": 222,
+      "preparationAndCaptureMs": 22543,
+      "diagnosticElapsedMs": 0,
+      "diagnosticCalls": 0,
+      "usage": {
+        "input_tokens": 2199862,
+        "output_tokens": 31047,
+        "total_tokens": 2230909,
+        "cached_tokens": 841216,
+        "reasoning_tokens": 18509,
+        "unknownRequests": 0
+      }
+    },
+    "H1": {
+      "attempts": 4,
+      "Q": 3,
+      "D": 3,
+      "requests": 80,
+      "tools": 147,
+      "nativeElapsedMs": 859276,
+      "executionMs": 859047,
+      "cleanupMs": 229,
+      "preparationAndCaptureMs": 15870,
+      "diagnosticElapsedMs": 445,
+      "diagnosticCalls": 7,
+      "usage": {
+        "input_tokens": 2334684,
+        "output_tokens": 31431,
+        "total_tokens": 2366115,
+        "cached_tokens": 709632,
+        "reasoning_tokens": 19645,
+        "unknownRequests": 0
+      }
+    }
+  },
+  "modelRequests": 158,
+  "knownTotalTokens": 4597024,
+  "unknownUsageRequests": 0,
+  "diagnosticInvocations": 7,
+  "diagnosticProjectCommands": 0,
+  "diagnosticEngineExecutions": 0,
+  "diagnosticElapsedMs": 445,
+  "exactBundleScriptedPreflight": {
+    "realProviderRequests": 0,
+    "scriptedRequests": 15,
+    "nativeElapsedMs": 6683
+  },
+  "independentVerification": {
+    "projectCommands": 24,
+    "elapsedMs": 69645,
+    "realProviderRequests": 0,
+    "scope": "Eight ordinary suites with types, eight independent behavior checks, eight required-regression discrimination checks; each in a fresh Linux arm64 copy. Patch application and review additional."
+  },
+  "accountingLimits": "Preparation/capture time per attempt is separated from native execution. Cache/reasoning fields are subsets, not extra tokens. Bundle copying, freeze hashing, Git verification, report/review and Codex orchestration are not completely timed; aggregate cost unknown. Original failed starts and original local observations remain in their separate retained report.",
+  "monetaryCost": null
+}

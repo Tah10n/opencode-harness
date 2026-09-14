@@ -1,5 +1,10 @@
 # Test-sensitivity prototype and failed diagnostic admission
 
+A later, separately authorized eight-attempt series completed on the corrected
+profile: [follow-up report](authorized-2/README.md). It found H0 Q/D 4/4 and H1
+3/4, with no substantive mutation observation. The original failures below
+remain unchanged and are not replaced by that series.
+
 The opt-in installed capability works in local fixtures. **The eight scheduled
 H0/H1 attempts all failed before any model request**, because the prepared
 read-only profile lacked `.gitignore` and OpenCode 1.18.26 tried to create it.

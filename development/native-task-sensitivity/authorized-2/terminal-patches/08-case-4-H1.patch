@@ -1,0 +1,232 @@
+diff --git a/README.md b/README.md
+index 3c645d39c5cd12c0482b2ce63ae0bdf9822d17e8..1203e5e0df43382bed71d48cfd8fc9543273d9bd 100644
+--- a/README.md
++++ b/README.md
+@@ -46,6 +46,19 @@ denque.pop(); // 4
+ 
+ See the [API reference documentation](https://docs.page/invertase/denque/api) for more examples.
+ 
++Remove matching items while preserving the order of the remaining items:
++
++```js
++const filtered = new Denque([1, 2, 3, 4]);
++const removed = filtered.removeWhere((value, index) => value % 2 === 0);
++// removed === 2
++```
++
++The predicate receives each initially present value and its zero-based index. All
++predicate calls finish before any matching items are removed. If the predicate
++throws, the error is propagated and the queue is left unchanged. Mutating the
++queue from the predicate is outside the method's contract.
++
+ ---
+ 
+ ## Who's using it?
+diff --git a/docs/api.mdx b/docs/api.mdx
+index 69d4ecf179ac388bfe4abeff7e438dc908b91a2d..0f1b8b0085ebd13b306529a33688e21194a55cef 100644
+--- a/docs/api.mdx
++++ b/docs/api.mdx
+@@ -204,6 +204,24 @@ denque1.removeOne(1); // 2
+ 
+ 
+ 
++### `removeWhere(function predicate)` -> `int`
++
++Remove every item for which `predicate(value, index)` returns a truthy value.
++The predicate receives values in logical front-to-back order and the zero-based
++index from before filtering. All predicate calls complete before the queue is
++changed. Returns the number of removed items. If the predicate throws, the error
++is propagated and the queue is left unchanged. A non-function predicate throws
++an `Error`, including when the queue is empty. Mutating the queue from the
++predicate is outside the method's contract.
++
++```js
++var denque = new Denque([1,2,3,4]);
++denque.removeWhere(function (value) { return value % 2 === 0; }); // 2
++denque.toArray(); // [1,3]
++```
++
++
++
+ ### `splice(int index, int count, item1, item2, ...)` -> `array`
+ 
+ Native splice implementation.
+diff --git a/index.d.ts b/index.d.ts
+index e125dd471cba71a1b2374333c68f24f0a0173377..887b07d514bbfc48c610f1155697737a48cf8e71 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -27,6 +27,8 @@ declare class Denque<T = any> {
+ 
+   removeOne(index: number): T | undefined;
+ 
++  removeWhere(predicate: (value: T, index: number) => unknown): number;
++
+   splice(index: number, count: number, ...item: T[]): T[] | undefined;
+ 
+   isEmpty(): boolean;
+diff --git a/index.js b/index.js
+index 6b2e9d8625b50857d917d3b11366a661744523aa..b827bebb0f67300f72dec546fa97dff936c7528c 100644
+--- a/index.js
++++ b/index.js
+@@ -200,6 +200,51 @@ Denque.prototype.removeOne = function removeOne(index) {
+   return item;
+ };
+ 
++/**
++ * Remove every item for which predicate returns a truthy value.
++ * The predicate is evaluated for all current items before the queue changes.
++ * @param {function} predicate
++ * @returns {number}
++ */
++Denque.prototype.removeWhere = function removeWhere(predicate) {
++  if (typeof predicate !== 'function') {
++    throw new Error('predicate must be a function');
++  }
++
++  var size = this.size();
++  if (size === 0) return 0;
++
++  var items = this._copyArray(false);
++  var matches = new Array(size);
++  var removed = 0;
++  var i;
++
++  for (i = 0; i < size; i++) {
++    matches[i] = predicate(items[i], i);
++    if (matches[i]) removed++;
++  }
++
++  if (removed === 0) return 0;
++
++  var head = this._head;
++  var survivors = size - removed;
++
++  for (i = 0; i < size; i++) {
++    this._list[(head + i) & this._capacityMask] = void 0;
++  }
++
++  var write = head;
++  for (i = 0; i < size; i++) {
++    if (!matches[i]) {
++      this._list[write] = items[i];
++      write = (write + 1) & this._capacityMask;
++    }
++  }
++
++  this._tail = (head + survivors) & this._capacityMask;
++  return removed;
++};
++
+ /**
+  * Remove number of items from the specified index from the list.
+  * Returns array of removed items.
+diff --git a/test/denque.js b/test/denque.js
+index 47fbd0f7ad23d958845e891e90ab5a6f80799d0c..02fdbe6c866162a3c40578110c6d083ac430bed3 100644
+--- a/test/denque.js
++++ b/test/denque.js
+@@ -448,6 +448,93 @@ describe('Denque.prototype.removeOne', function () {
+ 
+ });
+ 
++describe('Denque.prototype.removeWhere', function () {
++  it('should visit values in order with their original indexes', function () {
++    var queue = new Denque(['keep', 'remove', 'keep', 'remove']);
++    var seen = [];
++
++    assert.strictEqual(queue.removeWhere(function (value, index) {
++      seen.push([value, index]);
++      return value === 'remove';
++    }), 2);
++    assert.deepEqual(seen, [
++      ['keep', 0],
++      ['remove', 1],
++      ['keep', 2],
++      ['remove', 3]
++    ]);
++    assert.deepEqual(queue.toArray(), ['keep', 'keep']);
++
++    queue = new Denque([1, 2, 3]);
++    assert.strictEqual(queue.removeWhere(function () { return false; }), 0);
++    assert.deepEqual(queue.toArray(), [1, 2, 3]);
++
++    queue = new Denque([1, 2, 3]);
++    assert.strictEqual(queue.removeWhere(function () { return true; }), 3);
++    assert.deepEqual(queue.toArray(), []);
++  });
++
++  it('should leave the queue unchanged when the predicate throws', function () {
++    var first = { value: 1 };
++    var second = { value: 2 };
++    var third = { value: 3 };
++    var queue = new Denque([first, second, third]);
++    queue.shift();
++    queue.push(first);
++    var original = queue.toArray();
++    var error = new Error('stop');
++
++    assert.deepEqual(queue.toArray(), [second, third, first]);
++    assert.throws(function () {
++      queue.removeWhere(function (value, index) {
++        if (index === 0) return true;
++        throw error;
++      });
++    }, function (thrown) {
++      return thrown === error;
++    });
++    assert.strictEqual(queue.peekAt(0), original[0]);
++    assert.strictEqual(queue.peekAt(1), original[1]);
++    assert.strictEqual(queue.peekAt(2), original[2]);
++
++    assert.throws(function () {
++      new Denque().removeWhere(null);
++    }, Error);
++  });
++
++  it('should filter wrapped capacity queues without losing identity or capacity', function () {
++    var marker = { marker: true };
++    var queue = new Denque([0, marker, false, marker], { capacity: 4 });
++
++    queue.shift();
++    queue.push(0);
++    queue.shift();
++    queue.push(marker);
++    queue.shift();
++    queue.push(false);
++    queue.shift();
++    queue.push(marker);
++
++    assert.strictEqual(queue._head > queue._tail, true);
++    var internalCapacity = queue._list.length;
++    assert.deepEqual(queue.toArray(), [0, marker, false, marker]);
++    assert.strictEqual(queue.removeWhere(function (value) { return !value; }), 2);
++    assert.strictEqual(queue.peekAt(0), marker);
++    assert.strictEqual(queue.peekAt(1), marker);
++    assert.deepEqual(queue.toArray(), [marker, marker]);
++    assert.strictEqual(queue._list.length, internalCapacity);
++    assert.strictEqual(queue._capacity, 4);
++
++    queue.push('tail');
++    queue.unshift('head');
++    assert.deepEqual(queue.toArray(), ['head', marker, marker, 'tail']);
++    queue.push('overflow');
++    assert.deepEqual(queue.toArray(), [marker, marker, 'tail', 'overflow']);
++    assert.strictEqual(queue.length, 4);
++    assert.strictEqual(queue._list.length, internalCapacity);
++  });
++});
++
+ describe('Denque.prototype.remove', function () {
+   it('Should return undefined when empty denque', function () {
+     var a = new Denque();
+diff --git a/test/type/index.ts b/test/type/index.ts
+index 7ee6f37a8caff63356fbeca4cb3a90b09f7b433c..79218e812860364bbf9c65f3236021af784dee16 100644
+--- a/test/type/index.ts
++++ b/test/type/index.ts
+@@ -19,6 +19,7 @@ if (entry !== undefined) {
+ }
+ queue.remove(1, 1);
+ queue.removeOne(1);
++const removed: number = queue.removeWhere((value, index) => value.length);
+ queue.toString();
+ 
+ queue.splice(queue.length, 0, "8", "9", "10");

@@ -1,0 +1,205 @@
+{
+  "slot": 3,
+  "case": "case-2",
+  "task": "denque-remove-where",
+  "arm": "H1",
+  "seedSha256": "52f7a5afc7476758e50dafdbe59bff4710a6fea03f604ddc15d0704629619b9a",
+  "Q": 1,
+  "D": 1,
+  "assessment": {
+    "Q": 1,
+    "reason": "Closed configured-capacity discrimination through post-filter overflow and observable survivor order, while retaining wrapped storage, duplicate/falsy values, identity and atomic failure. The capacity-loss variant fails that public behavior assertion. No diagnostic mutation ran; this repair used ordinary tools.",
+    "ordinaryProjectAndTypesPassed": true,
+    "independentBehaviorPassed": true,
+    "requiredGapDiscriminated": true,
+    "newControlRegression": null,
+    "substantiveObservationUsed": false,
+    "assessmentMethod": "One assessor reviewed the complete delivered diffs, seed-to-final changes, ordinary/independent results and actual failing assertions. The assessor also monitored the runs; no independent blinding claim."
+  },
+  "patch": "patches/03-case-2-H1.patch",
+  "patchSha256": "de2063ff98b0979e13d530b8c351799bf26d13100b4a8b4464e9554373bc39f5",
+  "terminalPatch": "terminal-patches/03-case-2-H1.patch",
+  "terminalPatchSha256": "4262d16a3fd13c4cec4daf6ecda2ebce269c1f1af1fbd0fa4f095186c3301416",
+  "handoffNamesPatch": true,
+  "terminalPatchApplicable": true,
+  "changed": [
+    "README.md",
+    "docs/api.mdx",
+    "index.d.ts",
+    "index.js",
+    "test/denque.js",
+    "test/type/index.ts"
+  ],
+  "deleted": [],
+  "omittedPreparationFiles": [],
+  "nativeCompleted": true,
+  "nativeExit": 0,
+  "lastStepFinish": "stop",
+  "workflowStatus": "incomplete",
+  "requests": 32,
+  "toolCalls": 58,
+  "authorSessions": 1,
+  "preparationAndCaptureMs": 2629,
+  "diagnosticElapsedMs": 445,
+  "executionMs": 321464,
+  "cleanupMs": 64,
+  "elapsedMs": 321528,
+  "usage": {
+    "input_tokens": 1029256,
+    "output_tokens": 12468,
+    "total_tokens": 1041724,
+    "cached_tokens": 284672,
+    "reasoning_tokens": 7267,
+    "unknownRequests": 0
+  },
+  "terminationVerified": true,
+  "containerRemoved": true,
+  "originalDiagnosticCommands": [
+    {
+      "command": "harness-sense index.js \"npm test\"",
+      "callID": "call_POcnFaCLxvoARsdi7B1aeI4B"
+    },
+    {
+      "command": "harness-sense index.js \"npm test\"",
+      "callID": "call_Ch1gDRWleaoFwQOxubq9odyT"
+    },
+    {
+      "command": "harness-sense index.js \"npm test\"",
+      "callID": "call_RZYaTbIGbAQbfMBLgTd7jKoL"
+    },
+    {
+      "command": "harness-sense index.js \"npm test\"",
+      "callID": "call_qiIH1UmkVA8IGQhj1Sggwnxx"
+    },
+    {
+      "command": "harness-sense index.js \"npm test\"",
+      "callID": "call_Xs7RQRQRAHD3iN6nCLhfBwxK"
+    },
+    {
+      "command": "harness-sense index.js 'npm test'",
+      "callID": "call_PTWQiDmlWxRIhg6e7tuWxPnS"
+    },
+    {
+      "command": "command -v harness-sense || true",
+      "callID": "call_rdrPnmx8L9668ZpTpztS7D2Q"
+    },
+    {
+      "command": "harness-sense index.js 'npm test'",
+      "callID": "call_ZrZtQsFqqv57qlRCOJUShPpg"
+    }
+  ],
+  "sensitivityEvents": [
+    {
+      "status": "not-run",
+      "limitation": "Use an existing test script or an explicit local Node/AVA/Mocha/Vitest test command",
+      "callID": "call_POcnFaCLxvoARsdi7B1aeI4B",
+      "sourceState": "1a865872d67e3ae31c507dc627513939d86b7c339ba82f40525c4077c246d234",
+      "stale": false,
+      "elapsedMs": 60,
+      "taskDiagnosticMs": 60,
+      "output": "{\"sensitivity\":{\"status\":\"not-run\",\"limitation\":\"Use an existing test script or an explicit local Node/AVA/Mocha/Vitest test command\"}}"
+    },
+    {
+      "status": "not-run",
+      "limitation": "Use an existing test script or an explicit local Node/AVA/Mocha/Vitest test command",
+      "callID": "call_Ch1gDRWleaoFwQOxubq9odyT",
+      "sourceState": "1a865872d67e3ae31c507dc627513939d86b7c339ba82f40525c4077c246d234",
+      "stale": false,
+      "elapsedMs": 54,
+      "taskDiagnosticMs": 114,
+      "output": "{\"sensitivity\":{\"status\":\"not-run\",\"limitation\":\"Use an existing test script or an explicit local Node/AVA/Mocha/Vitest test command\"}}"
+    },
+    {
+      "status": "not-run",
+      "limitation": "Use an existing test script or an explicit local Node/AVA/Mocha/Vitest test command",
+      "callID": "call_RZYaTbIGbAQbfMBLgTd7jKoL",
+      "sourceState": "1a865872d67e3ae31c507dc627513939d86b7c339ba82f40525c4077c246d234",
+      "stale": false,
+      "elapsedMs": 58,
+      "taskDiagnosticMs": 172,
+      "output": "{\"sensitivity\":{\"status\":\"not-run\",\"limitation\":\"Use an existing test script or an explicit local Node/AVA/Mocha/Vitest test command\"}}"
+    },
+    {
+      "status": "not-run",
+      "limitation": "Use an existing test script or an explicit local Node/AVA/Mocha/Vitest test command",
+      "callID": "call_qiIH1UmkVA8IGQhj1Sggwnxx",
+      "sourceState": "1a865872d67e3ae31c507dc627513939d86b7c339ba82f40525c4077c246d234",
+      "stale": false,
+      "elapsedMs": 63,
+      "taskDiagnosticMs": 235,
+      "output": "{\"sensitivity\":{\"status\":\"not-run\",\"limitation\":\"Use an existing test script or an explicit local Node/AVA/Mocha/Vitest test command\"}}"
+    },
+    {
+      "status": "not-run",
+      "limitation": "Use an existing test script or an explicit local Node/AVA/Mocha/Vitest test command",
+      "callID": "call_Xs7RQRQRAHD3iN6nCLhfBwxK",
+      "sourceState": "1a865872d67e3ae31c507dc627513939d86b7c339ba82f40525c4077c246d234",
+      "stale": false,
+      "elapsedMs": 69,
+      "taskDiagnosticMs": 304,
+      "output": "{\"sensitivity\":{\"status\":\"not-run\",\"limitation\":\"Use an existing test script or an explicit local Node/AVA/Mocha/Vitest test command\"}}"
+    },
+    {
+      "status": "not-run",
+      "limitation": "Use an existing test script or an explicit local Node/AVA/Mocha/Vitest test command",
+      "callID": "call_PTWQiDmlWxRIhg6e7tuWxPnS",
+      "sourceState": "1a865872d67e3ae31c507dc627513939d86b7c339ba82f40525c4077c246d234",
+      "stale": false,
+      "elapsedMs": 67,
+      "taskDiagnosticMs": 371,
+      "output": "{\"sensitivity\":{\"status\":\"not-run\",\"limitation\":\"Use an existing test script or an explicit local Node/AVA/Mocha/Vitest test command\"}}"
+    },
+    {
+      "status": "not-run",
+      "limitation": "Use an existing test script or an explicit local Node/AVA/Mocha/Vitest test command",
+      "callID": "call_ZrZtQsFqqv57qlRCOJUShPpg",
+      "sourceState": "1a865872d67e3ae31c507dc627513939d86b7c339ba82f40525c4077c246d234",
+      "stale": false,
+      "elapsedMs": 74,
+      "taskDiagnosticMs": 445,
+      "output": "{\"sensitivity\":{\"status\":\"not-run\",\"limitation\":\"Use an existing test script or an explicit local Node/AVA/Mocha/Vitest test command\"}}"
+    }
+  ],
+  "checks": {
+    "ordinary": {
+      "exit": 0,
+      "elapsedMs": 1779,
+      "terminationVerified": true,
+      "command": [
+        "sh",
+        "-c",
+        "git apply --check .delivery.patch && git apply .delivery.patch && rm .delivery.patch && npm test"
+      ],
+      "outputSha256": "e49341ebca7a13dfc33b95650eb4b613b732f96811dbec5a8c128e07b2c91d05",
+      "outputExcerpt": "> denque@2.1.0 test\n> istanbul cover --report lcov _mocha && npm run typescript\n  55 passing (203ms)\n> denque@2.1.0 typescript\n> tsc --project ./test/type/tsconfig.json",
+      "realProviderRequests": 0
+    },
+    "independent": {
+      "exit": 0,
+      "elapsedMs": 699,
+      "terminationVerified": true,
+      "command": [
+        "sh",
+        "-c",
+        "git apply --check .delivery.patch && git apply .delivery.patch && rm .delivery.patch && timeout 10s node .independent.cjs"
+      ],
+      "outputSha256": "f9c69e05a31a62e04881e10139c67883f681accefebbe3f3ff50d81e2a6a7a6e",
+      "outputExcerpt": "Independent behavior passed",
+      "realProviderRequests": 0
+    },
+    "sensitivity": {
+      "exit": 1,
+      "elapsedMs": 697,
+      "terminationVerified": true,
+      "command": [
+        "sh",
+        "-c",
+        "git apply --check .delivery.patch && git apply .delivery.patch && rm .delivery.patch && node .diagnostic.cjs && node_modules/.bin/mocha"
+      ],
+      "outputSha256": "5f87825006529b75e908599b60f71593a1c9c6b81b7d3026fce5c40f6806bf0b",
+      "outputExcerpt": "ototype.remove\n    ✓ Should return undefined when empty denque\n    ✓ remove from the end of the queue if a negative index is provided\n    ✓ Should return undefined if index or count invalid\n    ✓ Should return the item at the front of the denque\n    ✓ Should return the item at the back of the denque\n    ✓ Should return the item somewhere in the middle of the denque\n    ✓ Should remove a number of items at the front of the denque\n    ✓ Should remove a number of items at the back of the denque\n    ✓ Should remove a number of items somewhere in the middle of the denque\n    ✓ Should clear denque\n\n  Denque.prototype.splice\n    ✓ Should remove and add items like native splice method at the front of denque\n    ✓ Should remove and add items like native splice method at the end of denque\n    ✓ Should remove and add items like native splice method somewhere in the middle of denque\n    ✓ Should return undefined when index or count is invalid\n    ✓ Should return undefined when the queue is empty\n    ✓ Should return undefined when trying to remove further than current size\n    ✓ Should remove and add items like native splice method to the empty denque\n    ✓ pop should shrink array when mostly empty\n\n\n  54 passing (32ms)\n  1 failing\n\n  1) Denque.prototype.removeWhere should filter wrapped bounded queues without changing capacity:\n\n      AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   {\n+     value: 'marker'\n+   },\n    false,\n    '',\n    null,\n    false,\n    1,\n\n      + expected - actual\n\n       [\n      -  {\n      -    \"value\": \"marker\"\n      -  }\n         false\n         \"\"\n         [null]\n         false\n      \n      at Context.<anonymous> (test/denque.js:518:12)\n      at process.processImmediate (node:internal/timers:534:21)\n\n\n\n",
+      "realProviderRequests": 0
+    }
+  },
+  "authorClaimExcerpt": "\nImplemented `removeWhere(predicate)` with:\n\n- Snapshot-based evaluation and original indexes\n- Atomic behavior when predicates throw\n- Non-function validation\n- Wrapped/capacity-safe filtering preserving identity and order\n- TypeScript declarations and type coverage\n- README and API documentation\n- Required regression scenarios\n\nChecks passed:\n\n- Focused `removeWhere` suite: 3 passing\n- Full `npm test`: 55 passing\n- TypeScript checks\n- Additional ring-buffer model checks across capacities 1–16\n\n`harness-sense` was unavailable in the environment. No commit or dependency changes were made."
+}
