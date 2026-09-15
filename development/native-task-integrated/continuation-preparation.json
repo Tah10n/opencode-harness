@@ -1,0 +1,51 @@
+{
+  "runtime": [
+    {
+      "directory": "bundle",
+      "files": 6250,
+      "matched": true
+    },
+    {
+      "directory": "plain-dependencies",
+      "files": 3797,
+      "matched": true
+    },
+    {
+      "directory": "inputs/visual-preferences",
+      "files": 9431,
+      "matched": true
+    },
+    {
+      "directory": "inputs/url-search-params",
+      "files": 10551,
+      "matched": true
+    }
+  ],
+  "oldStops": 10,
+  "oldContainersAbsent": true,
+  "newArtifactsAbsent": true,
+  "publicPreservation": {
+    "RESULTS.md": "48c8418c033bb9921b675758ad4f7498151ec10c827d6e9727ada005f313031e",
+    "results.json": "02a727705eeaba884c76501edbf613373f0cc0a8a94bd5bbc6ef754398924fb2",
+    "assigned.json": "e9ba2a9cd00a383d0019fe2bb250942fbea251e07de3af5c58e0d5cffa01ea4f",
+    "accounting-audit.json": "953c8e89b5317235d1821d19366ae805952b00e199e7da9a55836f9ddd36069a",
+    "final-integrity.json": "d1cca3f22e3139e43e8191e81a5ac65ff16206eebc44283e8894f7ca2b936cdb"
+  },
+  "amendmentSha256": "33752be6536a134db5563a971e422159eccbdeb80dde01e4d5208a2b8dde084c",
+  "launcherFiles": {
+    "/Users/tahion/dev/opencode-harness/.worktrees/native-task-workflow/development/native-task-ab/run-comparison.mjs": {
+      "before": "e344d5e9b51af30275ade0ec816aadd7d11464c58a30ff81410594565b996d66",
+      "after": "070ae2fd0d4dd90477562159dfd06b5ced6cccf84782a482b42925526c565175"
+    },
+    "/Users/tahion/dev/opencode-harness/.worktrees/native-task-workflow/development/native-task-integrated/run.mjs": {
+      "before": "dbb81bbef6e3cef6a558a2940ccc7cda45f48d050993050619dd82b6b1f53c03",
+      "after": "3bcc007b7f821c2efc1748dd357375606f076604fe142a05467b85942bc74b76"
+    }
+  },
+  "tests": {
+    "fixedPair": true,
+    "historicalContinuation": true,
+    "schedulerTargeted": true,
+    "realProviderRequests": 0
+  }
+}

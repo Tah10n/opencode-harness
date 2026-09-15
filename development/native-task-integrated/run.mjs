@@ -1,13 +1,14 @@
 // Frozen 2 tasks x 3 arms x 2 repeats. No availability call or retry path.
 import fs from 'node:fs';import path from 'node:path';import os from 'node:os';import {createHash} from 'node:crypto';import {fileURLToPath} from 'node:url';
-import {responseObserver,knownResponseTerminal} from '../native-task-ab/run-comparison.mjs';
+import {responseObserver,knownResponseTerminal,runComparison} from '../native-task-ab/run-comparison.mjs';
 import {startContainer as start} from './container-session.mjs';
 const startContainer=args=>start({...args,workMemoryMb:1536,memoryMb:3072});
 import {stopWorkload} from '../native-task-utility/container/stop-workload.mjs';
 import {captureCandidate} from '../native-task-ab/capture-candidate.mjs';
 import {runTask as runTaskImplementation} from './native-run.mjs';
 const readAuth=()=>{const a=JSON.parse(fs.readFileSync(path.join(os.homedir(),'.local/share/opencode/auth.json'))).openai;if(a?.type!=='oauth'||!a.access||!a.accountId||a.expires<=Date.now())throw Error('Existing authorization unavailable or expired');return{access:a.access,accountId:a.accountId};};
-export async function run(root){
+export async function run(root,continuationFile=null){
+if(continuationFile)return runComparison({root,continuationFile,startContainer,captureCandidate,stopWorkload,readAuth,runTaskImplementation});
 const f=JSON.parse(fs.readFileSync(root+'/freeze.json'));const outputRoot=root;const fetchImpl=fetch;
 function verify(){
  if(f.runtimeSha!=='797ce6f1b75af217e00224d1b38790346dee1d19'||f.budgetMs!==1800000||f.attempts.length!==12||f.model!=='openai/gpt-5.6-luna'||f.variant!=='high'||!f.preflightPassed)throw Error('Invalid frozen campaign');
@@ -146,4 +147,4 @@ return {status:pause?'paused':'finished',pause};
 }
 
 export function manifest(root){const out={};function walk(d,p=''){for(const n of fs.readdirSync(d).sort()){if(n==='.git')continue;const file=path.join(d,n),name=p+n,s=fs.lstatSync(file);if(s.isDirectory())walk(file,name+'/');else if(s.isSymbolicLink()){const target=fs.readlinkSync(file);if(path.isAbsolute(target)||!path.resolve(path.dirname(file),target).startsWith(root+path.sep))throw Error('External symlink: '+name);out[name]={symlink:target};}else if(s.isFile())out[name]={sha256:createHash('sha256').update(fs.readFileSync(file)).digest('hex'),executable:!!(s.mode&0o111)};else throw Error('Unsupported input');}}walk(root);return out;}
-if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url))await run(path.resolve(process.argv[2]));
+if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url))await run(path.resolve(process.argv[2]),process.argv[3]?path.resolve(process.argv[3]):null);

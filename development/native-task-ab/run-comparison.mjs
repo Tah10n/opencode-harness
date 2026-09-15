@@ -46,16 +46,19 @@ export async function runComparison({root,startContainer,captureCandidate,stopWo
 const f=JSON.parse(fs.readFileSync(path.join(root,'freeze.json')));
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 const amendment=continuationFile?JSON.parse(fs.readFileSync(continuationFile)):null;
+const repeatedContinuation=!!amendment&&f.experimentKind==='integrated-repeats';
 const integrationContinuation=!!amendment&&f.experimentKind==='targeted-integration';
 const availabilityContinuation=integrationContinuation&&amendment.firstSlot===3;
 const savedAvailabilityContinuation=availabilityContinuation&&typeof amendment.savedProbeReportSha256==='string';
-const firstSlot=integrationContinuation?(availabilityContinuation?3:2):19,lastSlot=integrationContinuation?9:48;
+const firstSlot=repeatedContinuation?11:integrationContinuation?(availabilityContinuation?3:2):19,lastSlot=repeatedContinuation?12:integrationContinuation?9:48;
 const outputRoot=amendment?path.join(root,savedAvailabilityContinuation?'continuation-3-9-rechecked':`continuation-${firstSlot}-${lastSlot}`):root;
-const allowedChanges=integrationContinuation
+const allowedChanges=repeatedContinuation
+ ?[path.resolve('development/native-task-ab/run-comparison.mjs'),path.resolve('development/native-task-integrated/run.mjs')]
+ :integrationContinuation
  ?[path.resolve('development/native-task-ab/run-comparison.mjs'),path.resolve('development/native-task-investigation/run.mjs')]
  :['run-comparison.mjs','run.mjs','verify-scheduler.mjs'].map(n=>path.resolve('development/native-task-ab',n));
 if(amendment){
- if(amendment.version!==1||amendment.firstSlot!==firstSlot||amendment.lastSlot!==lastSlot||amendment.originalFreezeSha256!==sha(fs.readFileSync(path.join(root,'freeze.json')))||(!integrationContinuation&&f.experimentKind!=='h00-transfer'))throw Error('Invalid explicit continuation amendment');
+ if(amendment.version!==1||amendment.firstSlot!==firstSlot||amendment.lastSlot!==lastSlot||amendment.originalFreezeSha256!==sha(fs.readFileSync(path.join(root,'freeze.json')))||(!repeatedContinuation&&!integrationContinuation&&f.experimentKind!=='h00-transfer'))throw Error('Invalid explicit continuation amendment');
  const historicalPause=JSON.parse(fs.readFileSync(path.join(root,'scheduling-paused.json')));
  if(historicalPause.kind!=='unknown_submission'||historicalPause.slot!==(availabilityContinuation?1:firstSlot-1))throw Error('Amendment does not authorize this pause');
  if(availabilityContinuation){
@@ -70,7 +73,7 @@ if(amendment){
   if(periods.some(n=>!['continuation-2-9','continuation-3-9'].includes(n)))throw Error('Unexpected or already-started continuation period');
   if(fs.existsSync(path.join(root,'continuation-3-9/runs'))||fs.readdirSync(path.join(root,'continuation-3-9')).some(n=>/^(started|request-|provider-metadata)/.test(n)))throw Error('Probe period has task artifacts');
  }
- if(integrationContinuation&&amendment.runtimeSha!==f.runtimeSha)throw Error('Product candidate identity changed');
+ if((integrationContinuation||repeatedContinuation)&&amendment.runtimeSha!==f.runtimeSha)throw Error('Product candidate identity changed');
  if(amendment.originalPauseSha256!==sha(fs.readFileSync(path.join(root,'scheduling-paused.json'))))throw Error('Historical pause changed');
  if(!amendment.launcherFiles||!Object.keys(amendment.launcherFiles).length||Object.keys(amendment.launcherFiles).some(file=>!allowedChanges.includes(file)))throw Error('Amendment exceeds launcher scope');
  for(const [file,versions] of Object.entries(amendment.launcherFiles))if(versions.before!==f.files[file]||versions.after!==sha(fs.readFileSync(file)))throw Error('Amended launcher version mismatch');
@@ -78,11 +81,13 @@ if(amendment){
 
 function verify(){
  const transfer=f.experimentKind==='transfer', h00=f.experimentKind==='h00-transfer', sensitivity=f.experimentKind==='sensitivity', usage=f.experimentKind==='sensitivity-usage', replay=f.experimentKind==='sensitivity-replay', targeted=f.experimentKind==='sensitivity-targeted', integration=f.experimentKind==='targeted-integration';
- if(f.attempts.length!==(integration?9:targeted?3:replay?4:usage?2:h00?48:transfer||sensitivity?8:30)||f.model!=='openai/gpt-5.6-luna'||f.variant!=='high'||f.budgetMs!==900000||!f.preflightPassed)throw Error('Invalid development configuration');
+ if(f.attempts.length!==(repeatedContinuation?12:integration?9:targeted?3:replay?4:usage?2:h00?48:transfer||sensitivity?8:30)||f.model!=='openai/gpt-5.6-luna'||f.variant!=='high'||f.budgetMs!==(repeatedContinuation?1800000:900000)||!f.preflightPassed)throw Error('Invalid development configuration');
  for(const [file,digest] of Object.entries(f.files))if(sha(fs.readFileSync(file))!==(amendment?.launcherFiles[file]?.after??digest))throw Error('Frozen file changed: '+file);
- for(const [directory,expected]of Object.entries(f.runtimeManifests??{})){const seen=new Set();const visit=(dir,prefix='')=>{for(const entry of fs.readdirSync(dir,{withFileTypes:true})){const file=path.join(dir,entry.name),name=prefix+entry.name,stat=fs.lstatSync(file);if(stat.isDirectory()){visit(file,name+'/');continue;}const got=stat.isSymbolicLink()?{symlink:fs.readlinkSync(file)}:{sha256:sha(fs.readFileSync(file)),executable:!!(stat.mode&0o111)};if(JSON.stringify(got)!==JSON.stringify(expected[name]))throw Error('Installed runtime changed: '+name);seen.add(name);}};visit(directory);if(seen.size!==Object.keys(expected).length)throw Error('Installed runtime missing files');}
+ for(const [directory,expected]of Object.entries(f.runtimeManifests??{})){const seen=new Set();const visit=(dir,prefix='')=>{for(const entry of fs.readdirSync(dir,{withFileTypes:true})){if(repeatedContinuation&&entry.name==='.git')continue;const file=path.join(dir,entry.name),name=prefix+entry.name,stat=fs.lstatSync(file);if(stat.isDirectory()){visit(file,name+'/');continue;}const got=stat.isSymbolicLink()?{symlink:fs.readlinkSync(file)}:{sha256:sha(fs.readFileSync(file)),executable:!!(stat.mode&0o111)};if(JSON.stringify(got)!==JSON.stringify(expected[name]))throw Error('Installed runtime changed: '+name);seen.add(name);}};visit(directory);if(seen.size!==Object.keys(expected).length)throw Error('Installed runtime missing files');}
  const groups=new Map();for(const a of f.attempts){const group=groups.get(a.task)??[];group.push(a.arm);groups.set(a.task,group);}
- if(integration){
+ if(repeatedContinuation){
+  if(f.runtimeSha!=='797ce6f1b75af217e00224d1b38790346dee1d19'||f.strategy!=='direct'||f.streamLimit!=='remaining-task-budget'||f.connectionTimeoutMs!==30000||f.attempts.slice(10).map(a=>[a.slot,a.task,a.repetition,a.arm].join(':')).join(',')!=='11:url-search-params:2:P,12:url-search-params:2:Hbase')throw Error('Invalid original final pair');
+ }else if(integration){
   if(groups.size!==3||[...groups.values()].some(x=>x.slice().sort().join(',')!=='H,P,R')||f.attempts.map(a=>a.arm).join(',')!=='P,R,H,R,H,P,H,P,R'||new Set(f.attempts.map(a=>a.project)).size<2||f.strategy!=='direct'||f.streamLimit!=='remaining-task-budget'||f.connectionTimeoutMs!==30000)throw Error('Invalid frozen nine-run integration schedule');
  }else if(targeted){
   if(groups.size!==3||f.attempts.some(a=>a.arm!=='H1')||new Set(f.attempts.map(a=>a.source)).size!==3||f.strategy!=='direct'||f.streamLimit!=='remaining-task-budget'||f.connectionTimeoutMs!==30000)throw Error('Invalid three-run targeted sensitivity schedule');
@@ -105,6 +110,7 @@ function verify(){
 
 verify();
 if(amendment){
+ if(repeatedContinuation&&fs.readdirSync(root,{withFileTypes:true}).some(e=>e.isDirectory()&&e.name.startsWith('continuation-')))throw Error('Continuation period already exists; no further continuation authorized');
  if(fs.existsSync(outputRoot))throw Error('Continuation directory already exists; never overwrite or automatically resume');
  const identity=(got,wanted)=>['slot','task','project','repetition','arm','source'].every(key=>got[key]===wanted[key]);
  const historical=[];
@@ -122,7 +128,7 @@ if(amendment){
   const facts=get('stop-verification.json');
   if(!facts.terminationVerified||!facts.captureSaved||!facts.forwardingClosed||!facts.relayRemoved||facts.activeProviderHandlers!==0||get('session/cleanup.json').status!==0)throw Error('Historical stop unverified: '+attempt.slot);
   if(!fs.existsSync(path.join(dir,'candidate.tar'))||!Array.isArray(get('provider-metadata.json')))throw Error('Historical capture/accounting missing');
-  if(integrationContinuation){
+  if(integrationContinuation||repeatedContinuation){
    for(const name of ['started.json','completed.json','result.json','stop-verification.json','provider-metadata.json','candidate.tar','session/cleanup.json','session/container.json']){
     if(!amendment.historicalFiles?.[periodFor(attempt)+'runs/'+runName(attempt)+'/'+name])throw Error('Missing historical artifact hash: '+name);
    }
@@ -144,7 +150,7 @@ if(availabilityContinuation){
 }
 let pause=null;
 function pauseScheduling(kind,slot,details={}){if(pause)return;pause={kind,slot,...details};fs.writeFileSync(path.join(outputRoot,'scheduling-paused.json'),JSON.stringify(pause,null,2),{flag:'wx'});}
-for(const attempt of f.attempts.filter(a=>!amendment||a.slot>=firstSlot)){
+for(const attempt of f.attempts.filter(a=>!amendment||(a.slot>=firstSlot&&a.slot<=lastSlot))){
  verify();if(pause)break;const out=path.join(outputRoot,'runs',attempt.task+(attempt.repetition?'-r'+attempt.repetition:'')+'-'+attempt.arm);
  if(fs.existsSync(out))throw Error('Previously created slot must never be retried: '+out);
  fs.mkdirSync(out,{recursive:true,mode:0o700});fs.writeFileSync(path.join(out,'started.json'),JSON.stringify({...attempt,at:new Date().toISOString()},null,2),{flag:'wx'});
@@ -159,7 +165,7 @@ for(const attempt of f.attempts.filter(a=>!amendment||a.slot>=firstSlot)){
     const requestKind=frame.body?.tools?.length?'work':'title';
     let requestSignal;
     const record={requestIndex:requests.length+1,relayRequestId:frame.id??null,requestKind,at:new Date().toISOString(),path:frame.path,model:frame.body?.model,effort:frame.body?.reasoning?.effort??null,forwarded:false,usage:null};requests.push(record);save();
-    if(['h00-transfer','sensitivity','sensitivity-usage','sensitivity-replay','sensitivity-targeted','targeted-integration'].includes(f.experimentKind))fs.writeFileSync(path.join(out,'request-'+requests.length+'.json'),JSON.stringify(frame.body),{mode:0o600,flag:'wx'});
+    if(['h00-transfer','sensitivity','sensitivity-usage','sensitivity-replay','sensitivity-targeted','targeted-integration','integrated-repeats'].includes(f.experimentKind))fs.writeFileSync(path.join(out,'request-'+requests.length+'.json'),JSON.stringify(frame.body),{mode:0o600,flag:'wx'});
     const blocked=()=>{
      if(!pause&&!abort.signal.aborted&&!signal.aborted&&forwardingOpen&&deadline&&Date.now()<deadline)return false;
      record.notForwardedReason=pause?'series-paused':signal.aborted?'client-cancelled':'closed-or-deadline';record.blockedBy=pause;record.finishedAt=new Date().toISOString();save();
@@ -215,7 +221,7 @@ for(const attempt of f.attempts.filter(a=>!amendment||a.slot>=firstSlot)){
      send({type:'headers',status:response.status,contentType:response.headers.get('content-type')??'text/event-stream'});
      const observer=responseObserver(record,save,details=>pauseScheduling(details.kind,attempt.slot,{requestIndex:record.requestIndex,...details}));
      for await(const chunk of response.body){
-      if(['h00-transfer','sensitivity','sensitivity-usage','sensitivity-replay','sensitivity-targeted','targeted-integration'].includes(f.experimentKind))fs.appendFileSync(path.join(out,'response-'+record.requestIndex+'.sse'),chunk,{mode:0o600});
+      if(['h00-transfer','sensitivity','sensitivity-usage','sensitivity-replay','sensitivity-targeted','targeted-integration','integrated-repeats'].includes(f.experimentKind))fs.appendFileSync(path.join(out,'response-'+record.requestIndex+'.sse'),chunk,{mode:0o600});
       // Observe/persist upstream facts before delivery can fail or be cancelled.
       observer.push(chunk);
       // The observer persists response facts AND the pause synchronously, before
