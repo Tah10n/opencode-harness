@@ -1,0 +1,18 @@
+{
+  "slot": 12,
+  "nativeExit": 1,
+  "timedOut": false,
+  "terminalReason": "permission_denied",
+  "tool": "grep",
+  "path": "/work/home/.npm",
+  "pattern": "typescript|vitest|prettier|eslint",
+  "normalParentStop": false,
+  "normalAuthorStop": false,
+  "terminalPatchExists": true,
+  "allProviderResponsesCompleted": true,
+  "providerKnownWorkTokens": 760895,
+  "nativeRetainedWorkTokens": 701489,
+  "difference": 59406,
+  "lastProviderWorkResponseTokens": 59406,
+  "interpretation": "Last known completed provider response is absent from retained native session token totals after message abortion; provider usage counted once, native usage is a cross-check only."
+}

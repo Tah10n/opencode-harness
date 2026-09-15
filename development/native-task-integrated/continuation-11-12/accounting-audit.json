@@ -1,0 +1,63 @@
+[
+  {
+    "slot": 11,
+    "receivedFullTask": true,
+    "requestCount": 45,
+    "models": [
+      "gpt-5.6-luna/high"
+    ],
+    "toolSchemas": [
+      [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "task",
+        "todowrite",
+        "webfetch"
+      ]
+    ],
+    "providerWorkTokens": 1990263,
+    "nativeWorkTokens": 1990263,
+    "nativeMatchesProvider": true,
+    "titleTokens": 1068
+  },
+  {
+    "slot": 12,
+    "receivedFullTask": true,
+    "requestCount": 20,
+    "models": [
+      "gpt-5.6-luna/high"
+    ],
+    "toolSchemas": [
+      [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "harness_task",
+        "read",
+        "skill",
+        "task",
+        "todowrite",
+        "webfetch"
+      ],
+      [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "todowrite",
+        "webfetch"
+      ]
+    ],
+    "providerWorkTokens": 760895,
+    "nativeWorkTokens": 701489,
+    "nativeMatchesProvider": false,
+    "titleTokens": 692
+  }
+]
