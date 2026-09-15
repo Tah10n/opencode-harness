@@ -1,0 +1,576 @@
+diff --git a/.prettierrc b/.prettierrc
+index 90d7516d1f8bf56107fc497d0b3d2654f2a8f43a..fbcd346b1c286e51cc80249c03ef9a0ec56d9b31 100644
+--- a/.prettierrc
++++ b/.prettierrc
+@@ -2,5 +2,6 @@
+   "printWidth": 100,
+   "trailingComma": "all",
+   "semi": true,
+-  "singleQuote": false
++  "singleQuote": false,
++  "endOfLine": "lf"
+ }
+diff --git a/README.md b/README.md
+index 0051482c422963fa51b0376d153e4a039780e754..473dce980a5b1b892aa6d9e239af7eaafb4757b7 100644
+--- a/README.md
++++ b/README.md
+@@ -21,7 +21,19 @@ npm run preview
+ 
+ - `npm run dev` starts Vite at `http://127.0.0.1:5173/Tahion_Personal_site/`.
+ - `npm run preview` serves the production build at `http://127.0.0.1:4173/Tahion_Personal_site/`.
+-- `npm run check` runs ESLint, Prettier check, TypeScript, and production build.
++- `npm test` runs the built-in Node test runner for visual preference persistence and synchronization.
++- `npm run check` runs ESLint, Prettier check, tests, TypeScript, and production build.
++
++## Visual Preferences
++
++The backdrop variant and color theme are stored together as version `1` JSON under
++`tahion.visual.preferences`. On first load, the site reads the legacy
++`tahion.backdrop.variant` and `tahion.backdrop.theme` strings independently and migrates
++any valid choices without changing or removing those old keys. Missing data uses the
++`signal` and `acid` defaults without a startup write; malformed or unsupported current
++records also use both defaults without overwriting the record. Valid changes are saved as
++one record, and valid changes or removal from another same-origin tab synchronize the
++controls and backdrop without writing back in response.
+ 
+ ## Content
+ 
+diff --git a/package.json b/package.json
+index d7c0527b66b87f5e48e4c035514945b1d547214a..eb00e03e480a2d0132106cccc0e6472cf75d1c6c 100644
+--- a/package.json
++++ b/package.json
+@@ -6,12 +6,13 @@
+   "scripts": {
+     "dev": "vite --host 127.0.0.1 --port 5173",
+     "build": "tsc --noEmit && vite build",
++    "test": "node --test --experimental-strip-types test/*.test.ts",
+     "preview": "vite preview --host 127.0.0.1 --port 4173",
+     "typecheck": "tsc --noEmit",
+     "lint": "eslint .",
+     "format": "prettier . --write",
+     "format:check": "prettier . --check",
+-    "check": "npm run lint && npm run format:check && npm run build"
++    "check": "npm run lint && npm run format:check && npm test && npm run build"
+   },
+   "engines": {
+     "node": ">=22.12.0",
+diff --git a/src/App.tsx b/src/App.tsx
+index a9d786f8a5696b2eb9b2f4bb691a0503227260b7..999fbfa67c80b098cca3c0240ff8c9660a34bd63 100644
+--- a/src/App.tsx
++++ b/src/App.tsx
+@@ -13,62 +13,90 @@ import {
+   TerminalSquare,
+   Zap,
+ } from "lucide-react";
+-import { useEffect, useState } from "react";
++import { useCallback, useEffect, useRef, useState } from "react";
+ import { PromptCockpit } from "./components/PromptCockpit";
+-import { BackdropTheme, BackdropVariant, ShaderBackdrop } from "./components/ShaderBackdrop";
++import { ShaderBackdrop } from "./components/ShaderBackdrop";
+ import { profile } from "./data/profile";
++import type { BackdropTheme, BackdropVariant, VisualPreferences } from "./visualPreferences";
++import {
++  defaultVisualPreferences,
++  getLocalStorage,
++  loadVisualPreferences,
++  mergeVisualPreferences,
++  readVisualPreferencesStorageEvent,
++  saveVisualPreferences,
++} from "./visualPreferences";
+ 
+ const iconMap = [BrainCircuit, Code2, Gauge, Cpu];
+ 
+-const backdropVariants: { id: BackdropVariant; label: string }[] = [
++const backdropVariantOptions: { id: BackdropVariant; label: string }[] = [
+   { id: "signal", label: "Signal" },
+   { id: "topography", label: "Topo" },
+   { id: "radar", label: "Radar" },
+ ];
+ 
+-const backdropThemes: { id: BackdropTheme; label: string }[] = [
++const backdropThemeOptions: { id: BackdropTheme; label: string }[] = [
+   { id: "acid", label: "Acid" },
+   { id: "plasma", label: "Plasma" },
+   { id: "ice", label: "Ice" },
+ ];
+ 
+-const variantStorageKey = "tahion.backdrop.variant";
+-const themeStorageKey = "tahion.backdrop.theme";
+-
+-function readStoredChoice<T extends string>(key: string, fallback: T, allowed: readonly T[]) {
+-  const stored = window.localStorage.getItem(key);
+-  return allowed.includes(stored as T) ? (stored as T) : fallback;
+-}
+-
+ function App() {
+-  const [backdropVariant, setBackdropVariant] = useState<BackdropVariant>(() =>
+-    readStoredChoice(
+-      variantStorageKey,
+-      "signal",
+-      backdropVariants.map((item) => item.id),
+-    ),
+-  );
+-  const [backdropTheme, setBackdropTheme] = useState<BackdropTheme>(() =>
+-    readStoredChoice(
+-      themeStorageKey,
+-      "acid",
+-      backdropThemes.map((item) => item.id),
+-    ),
++  const [visualPreferences, setVisualPreferences] = useState<VisualPreferences>(() =>
++    loadVisualPreferences(getLocalStorage()),
+   );
++  const visualPreferencesRef = useRef(visualPreferences);
++
++  const updateVisualPreferences = useCallback((next: VisualPreferences, persist: boolean) => {
++    visualPreferencesRef.current = next;
++    setVisualPreferences(next);
++    document.documentElement.dataset.siteTheme = next.theme;
++
++    if (persist) {
++      saveVisualPreferences(getLocalStorage(), next);
++    }
++  }, []);
+ 
+   useEffect(() => {
+-    window.localStorage.setItem(variantStorageKey, backdropVariant);
+-  }, [backdropVariant]);
++    document.documentElement.dataset.siteTheme = visualPreferences.theme;
++  }, [visualPreferences.theme]);
+ 
+   useEffect(() => {
+-    window.localStorage.setItem(themeStorageKey, backdropTheme);
+-    document.documentElement.dataset.siteTheme = backdropTheme;
+-  }, [backdropTheme]);
++    const storage = getLocalStorage();
++
++    const handleStorage = (event: StorageEvent) => {
++      const eventPreferences = readVisualPreferencesStorageEvent(event, storage);
++
++      if (eventPreferences === null) {
++        updateVisualPreferences({ ...defaultVisualPreferences }, false);
++      } else if (eventPreferences) {
++        updateVisualPreferences(eventPreferences, false);
++      }
++    };
++
++    window.addEventListener("storage", handleStorage);
++
++    return () => window.removeEventListener("storage", handleStorage);
++  }, [updateVisualPreferences]);
++
++  const setBackdropVariant = (variant: BackdropVariant) => {
++    updateVisualPreferences(
++      mergeVisualPreferences(visualPreferencesRef.current, { variant }),
++      true,
++    );
++  };
++
++  const setBackdropTheme = (theme: BackdropTheme) => {
++    updateVisualPreferences(mergeVisualPreferences(visualPreferencesRef.current, { theme }), true);
++  };
++
++  const backdropVariant = visualPreferences.variant;
++  const backdropTheme = visualPreferences.theme;
+ 
+   const activeVariantLabel =
+-    backdropVariants.find((item) => item.id === backdropVariant)?.label ?? "Signal";
++    backdropVariantOptions.find((item) => item.id === backdropVariant)?.label ?? "Signal";
+   const activeThemeLabel =
+-    backdropThemes.find((item) => item.id === backdropTheme)?.label ?? "Acid";
++    backdropThemeOptions.find((item) => item.id === backdropTheme)?.label ?? "Acid";
+ 
+   return (
+     <main>
+@@ -92,7 +120,7 @@ function App() {
+                   <span>
+                     <Layers3 size={14} aria-hidden="true" />
+                   </span>
+-                  {backdropVariants.map((item) => (
++                  {backdropVariantOptions.map((item) => (
+                     <button
+                       key={item.id}
+                       type="button"
+@@ -108,7 +136,7 @@ function App() {
+                   <span>
+                     <Palette size={14} aria-hidden="true" />
+                   </span>
+-                  {backdropThemes.map((item) => (
++                  {backdropThemeOptions.map((item) => (
+                     <button
+                       key={item.id}
+                       type="button"
+diff --git a/src/components/ShaderBackdrop.tsx b/src/components/ShaderBackdrop.tsx
+index e38075738c6de1646e099f252c77684b71cbd5d2..1ec04845dbfcf2439e444ffa89ed025e39bb78a3 100644
+--- a/src/components/ShaderBackdrop.tsx
++++ b/src/components/ShaderBackdrop.tsx
+@@ -1,7 +1,5 @@
+ import { useCallback, useEffect, useRef, useState } from "react";
+-
+-export type BackdropVariant = "signal" | "topography" | "radar";
+-export type BackdropTheme = "acid" | "plasma" | "ice";
++import type { BackdropTheme, BackdropVariant } from "../visualPreferences";
+ 
+ const variantIndex: Record<BackdropVariant, number> = {
+   signal: 0,
+diff --git a/src/visualPreferences.ts b/src/visualPreferences.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..3413afb9a716e257ba2e3b404abf075ac89bbddd
+--- /dev/null
++++ b/src/visualPreferences.ts
+@@ -0,0 +1,155 @@
++export type BackdropVariant = "signal" | "topography" | "radar";
++export type BackdropTheme = "acid" | "plasma" | "ice";
++
++export type VisualPreferences = {
++  version: 1;
++  variant: BackdropVariant;
++  theme: BackdropTheme;
++};
++
++export type VisualPreferencesStorage = Pick<Storage, "getItem" | "setItem">;
++
++export type VisualPreferencesStorageEvent = {
++  storageArea: VisualPreferencesStorage | null;
++  key: string | null;
++  newValue: string | null;
++};
++
++export const visualPreferencesStorageKey = "tahion.visual.preferences";
++export const legacyVariantStorageKey = "tahion.backdrop.variant";
++export const legacyThemeStorageKey = "tahion.backdrop.theme";
++
++export const backdropVariants: readonly BackdropVariant[] = ["signal", "topography", "radar"];
++
++export const backdropThemes: readonly BackdropTheme[] = ["acid", "plasma", "ice"];
++
++export const defaultVisualPreferences: VisualPreferences = {
++  version: 1,
++  variant: "signal",
++  theme: "acid",
++};
++
++export function mergeVisualPreferences(
++  preferences: VisualPreferences,
++  changes: Partial<Pick<VisualPreferences, "variant" | "theme">>,
++): VisualPreferences {
++  return { ...preferences, ...changes };
++}
++
++export function isBackdropVariant(value: unknown): value is BackdropVariant {
++  return typeof value === "string" && backdropVariants.includes(value as BackdropVariant);
++}
++
++export function isBackdropTheme(value: unknown): value is BackdropTheme {
++  return typeof value === "string" && backdropThemes.includes(value as BackdropTheme);
++}
++
++export function parseVisualPreferences(raw: string): VisualPreferences | null {
++  try {
++    const parsed: unknown = JSON.parse(raw);
++
++    if (
++      typeof parsed !== "object" ||
++      parsed === null ||
++      Array.isArray(parsed) ||
++      (parsed as { version?: unknown }).version !== 1
++    ) {
++      return null;
++    }
++
++    const record = parsed as { variant?: unknown; theme?: unknown };
++
++    if (!isBackdropVariant(record.variant) || !isBackdropTheme(record.theme)) {
++      return null;
++    }
++
++    return {
++      version: 1,
++      variant: record.variant,
++      theme: record.theme,
++    };
++  } catch {
++    return null;
++  }
++}
++
++export function serializeVisualPreferences(preferences: VisualPreferences) {
++  return JSON.stringify(preferences);
++}
++
++function readStorageValue(storage: VisualPreferencesStorage, key: string) {
++  try {
++    return { available: true, value: storage.getItem(key) };
++  } catch {
++    return { available: false, value: null };
++  }
++}
++
++export function saveVisualPreferences(
++  storage: VisualPreferencesStorage | null,
++  preferences: VisualPreferences,
++) {
++  if (!storage) {
++    return;
++  }
++
++  try {
++    storage.setItem(visualPreferencesStorageKey, serializeVisualPreferences(preferences));
++  } catch {
++    // Storage can be disabled or full; in-memory preferences still work.
++  }
++}
++
++export function loadVisualPreferences(storage: VisualPreferencesStorage | null): VisualPreferences {
++  if (!storage) {
++    return { ...defaultVisualPreferences };
++  }
++
++  const current = readStorageValue(storage, visualPreferencesStorageKey);
++
++  if (!current.available) {
++    return { ...defaultVisualPreferences };
++  }
++
++  if (current.value !== null) {
++    return parseVisualPreferences(current.value) ?? { ...defaultVisualPreferences };
++  }
++
++  const legacyVariant = readStorageValue(storage, legacyVariantStorageKey);
++  const legacyTheme = readStorageValue(storage, legacyThemeStorageKey);
++  const variant = isBackdropVariant(legacyVariant.value) ? legacyVariant.value : "signal";
++  const theme = isBackdropTheme(legacyTheme.value) ? legacyTheme.value : "acid";
++  const migrated = { version: 1 as const, variant, theme };
++
++  if (
++    (legacyVariant.available && isBackdropVariant(legacyVariant.value)) ||
++    (legacyTheme.available && isBackdropTheme(legacyTheme.value))
++  ) {
++    saveVisualPreferences(storage, migrated);
++  }
++
++  return migrated;
++}
++
++export function getLocalStorage(): VisualPreferencesStorage | null {
++  try {
++    return typeof window === "undefined" ? null : window.localStorage;
++  } catch {
++    return null;
++  }
++}
++
++export function readVisualPreferencesStorageEvent(
++  event: VisualPreferencesStorageEvent,
++  storage: VisualPreferencesStorage | null,
++): VisualPreferences | null | undefined {
++  if (!storage || event.storageArea !== storage || event.key !== visualPreferencesStorageKey) {
++    return undefined;
++  }
++
++  if (event.newValue === null) {
++    return null;
++  }
++
++  return parseVisualPreferences(event.newValue) ?? undefined;
++}
+diff --git a/test/visualPreferences.test.ts b/test/visualPreferences.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..2e546b831059b2f2e9896acdee2ca6af903eb0a2
+--- /dev/null
++++ b/test/visualPreferences.test.ts
+@@ -0,0 +1,195 @@
++import assert from "node:assert/strict";
++import test from "node:test";
++import {
++  defaultVisualPreferences,
++  legacyThemeStorageKey,
++  legacyVariantStorageKey,
++  loadVisualPreferences,
++  mergeVisualPreferences,
++  readVisualPreferencesStorageEvent,
++  saveVisualPreferences,
++  visualPreferencesStorageKey,
++} from "../src/visualPreferences.ts";
++import type { VisualPreferencesStorage } from "../src/visualPreferences.ts";
++
++class MemoryStorage implements VisualPreferencesStorage {
++  readonly values = new Map<string, string>();
++  writes: string[] = [];
++  throwOnGet = false;
++  throwOnSet = false;
++
++  getItem(key: string) {
++    if (this.throwOnGet) {
++      throw new Error("storage read blocked");
++    }
++
++    return this.values.get(key) ?? null;
++  }
++
++  setItem(key: string, value: string) {
++    this.writes.push(key);
++
++    if (this.throwOnSet) {
++      throw new Error("storage write blocked");
++    }
++
++    this.values.set(key, value);
++  }
++}
++
++const record = (variant: string, theme: string) => JSON.stringify({ version: 1, variant, theme });
++
++test("migrates valid legacy fields independently and leaves old keys untouched", () => {
++  const storage = new MemoryStorage();
++  storage.values.set(legacyVariantStorageKey, "radar");
++  storage.values.set(legacyThemeStorageKey, "unsupported");
++
++  assert.deepEqual(loadVisualPreferences(storage), {
++    version: 1,
++    variant: "radar",
++    theme: "acid",
++  });
++  assert.equal(storage.values.get(legacyVariantStorageKey), "radar");
++  assert.equal(storage.values.get(legacyThemeStorageKey), "unsupported");
++  assert.equal(storage.values.get(visualPreferencesStorageKey), record("radar", "acid"));
++
++  const writesAfterMigration = storage.writes.length;
++  assert.deepEqual(loadVisualPreferences(storage), {
++    version: 1,
++    variant: "radar",
++    theme: "acid",
++  });
++  assert.equal(storage.writes.length, writesAfterMigration);
++});
++
++test("current record takes precedence over legacy values", () => {
++  const storage = new MemoryStorage();
++  storage.values.set(visualPreferencesStorageKey, record("topography", "ice"));
++  storage.values.set(legacyVariantStorageKey, "radar");
++  storage.values.set(legacyThemeStorageKey, "plasma");
++
++  assert.deepEqual(loadVisualPreferences(storage), {
++    version: 1,
++    variant: "topography",
++    theme: "ice",
++  });
++  assert.equal(storage.writes.length, 0);
++});
++
++test("malformed, unknown-version, and unsupported records use defaults without overwriting", () => {
++  for (const value of [
++    "not json",
++    JSON.stringify({ version: 2, variant: "radar", theme: "ice" }),
++    JSON.stringify({ version: 1, variant: "unknown", theme: "ice" }),
++    JSON.stringify({ version: 1, variant: "radar" }),
++  ]) {
++    const storage = new MemoryStorage();
++    storage.values.set(visualPreferencesStorageKey, value);
++    storage.values.set(legacyVariantStorageKey, "radar");
++
++    assert.deepEqual(loadVisualPreferences(storage), defaultVisualPreferences);
++    assert.equal(storage.values.get(visualPreferencesStorageKey), value);
++    assert.equal(storage.writes.length, 0);
++  }
++});
++
++test("missing data returns defaults without a startup write", () => {
++  const storage = new MemoryStorage();
++
++  assert.deepEqual(loadVisualPreferences(storage), defaultVisualPreferences);
++  assert.equal(storage.writes.length, 0);
++});
++
++test("blocked storage does not prevent defaults or saving in memory", () => {
++  const blockedRead = new MemoryStorage();
++  blockedRead.throwOnGet = true;
++  assert.deepEqual(loadVisualPreferences(blockedRead), defaultVisualPreferences);
++  assert.doesNotThrow(() => saveVisualPreferences(blockedRead, defaultVisualPreferences));
++
++  const blockedWrite = new MemoryStorage();
++  blockedWrite.values.set(legacyThemeStorageKey, "plasma");
++  blockedWrite.throwOnSet = true;
++  assert.deepEqual(loadVisualPreferences(blockedWrite), {
++    version: 1,
++    variant: "signal",
++    theme: "plasma",
++  });
++});
++
++test("selection saves both fields and reload restores both consumer values", () => {
++  const storage = new MemoryStorage();
++  let preferences = loadVisualPreferences(storage);
++
++  preferences = mergeVisualPreferences(preferences, { variant: "radar" });
++  saveVisualPreferences(storage, preferences);
++  preferences = mergeVisualPreferences(preferences, { theme: "ice" });
++  saveVisualPreferences(storage, preferences);
++
++  assert.deepEqual(loadVisualPreferences(storage), {
++    version: 1,
++    variant: "radar",
++    theme: "ice",
++  });
++  assert.deepEqual(JSON.parse(storage.values.get(visualPreferencesStorageKey)!), {
++    version: 1,
++    variant: "radar",
++    theme: "ice",
++  });
++});
++
++test("only valid new-key localStorage events update consumers and never write back", () => {
++  const storage = new MemoryStorage();
++  const otherStorage = new MemoryStorage();
++  const validEvent = {
++    storageArea: storage,
++    key: visualPreferencesStorageKey,
++    newValue: record("topography", "plasma"),
++  };
++
++  assert.deepEqual(readVisualPreferencesStorageEvent(validEvent, storage), {
++    version: 1,
++    variant: "topography",
++    theme: "plasma",
++  });
++  assert.equal(
++    readVisualPreferencesStorageEvent({ ...validEvent, storageArea: otherStorage }, storage),
++    undefined,
++  );
++  assert.equal(
++    readVisualPreferencesStorageEvent({ ...validEvent, key: "unrelated" }, storage),
++    undefined,
++  );
++  assert.equal(
++    readVisualPreferencesStorageEvent(
++      { ...validEvent, newValue: record("bad", "plasma") },
++      storage,
++    ),
++    undefined,
++  );
++  assert.equal(readVisualPreferencesStorageEvent({ ...validEvent, newValue: null }, storage), null);
++  assert.equal(storage.writes.length, 0);
++});
++
++test("a local selection after a remote update preserves the remote counterpart", () => {
++  const storage = new MemoryStorage();
++  const remote = readVisualPreferencesStorageEvent(
++    {
++      storageArea: storage,
++      key: visualPreferencesStorageKey,
++      newValue: record("topography", "plasma"),
++    },
++    storage,
++  );
++
++  assert.ok(remote);
++  let preferences = remote;
++  preferences = mergeVisualPreferences(preferences, { variant: "radar" });
++  saveVisualPreferences(storage, preferences);
++
++  assert.deepEqual(loadVisualPreferences(storage), {
++    version: 1,
++    variant: "radar",
++    theme: "plasma",
++  });
++  assert.equal(storage.writes.length, 1);
++});

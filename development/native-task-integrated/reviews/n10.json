@@ -1,0 +1,21 @@
+{
+  "Q": true,
+  "reviewed": "Unchanged portable patch, static integration/tests/types/docs, project checks, independent behavior and delivered-regression sensitivity",
+  "delivery": "Public Query union; three consumers updated; duplicate/empty/escaped entries, no mutation, overlay/detached class regressions; types and docs; original object keys used for append removal before serialization",
+  "checks": {
+    "id": "n10",
+    "task": "url-search-params",
+    "apply": 0,
+    "projectStatus": 0,
+    "behaviorStatus": 0,
+    "cleanupStatus": 0
+  },
+  "regressionSensitivity": {
+    "detected": true,
+    "status": 1,
+    "property": "URLSearchParams public serialization retains entries"
+  },
+  "issues": [],
+  "finalClaims": "No false test-pass claim found; final verification statements match observed checks.",
+  "calibrationCaveat": "Frozen reference and alternative also miss undefined append removal. Follow-up checks enforce the task existing overlay contract, not a new requirement; artifacts are preserved unchanged."
+}

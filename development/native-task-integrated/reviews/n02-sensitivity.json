@@ -1,0 +1,15 @@
+{
+  "id": "n02",
+  "task": "visual-preferences",
+  "property": "legacy migration persists combined record",
+  "mutation": {
+    "file": "src/visualPreferences.ts",
+    "needle": "writeVisualPreferences(storage, { version: 1, variant, theme });",
+    "replacement": "/* evaluator: migration persistence disabled */",
+    "before": "79c78925d170d73c683dcdbe29598139fce5c81ab0c096abf7422480e76a6863",
+    "after": "40c9288466799ab9b2d12bd7669a85c7be4fb7d090e9144495ebb00a49539501"
+  },
+  "status": 1,
+  "detected": true,
+  "cleanupStatus": 0
+}

@@ -4,118 +4,107 @@
     "task": "visual-preferences",
     "repetition": 1,
     "arm": "P",
-    "project": "Tah10n/Tahion_Personal_site",
-    "status": "not_started",
-    "Q": null,
-    "T": null,
-    "D": null
+    "state": "completed",
+    "Q": true,
+    "T": true,
+    "D": true
   },
   {
     "slot": 2,
     "task": "visual-preferences",
     "repetition": 1,
     "arm": "Hbase",
-    "project": "Tah10n/Tahion_Personal_site",
-    "status": "not_started",
-    "Q": null,
-    "T": null,
-    "D": null
+    "state": "completed",
+    "Q": true,
+    "T": true,
+    "D": true
   },
   {
     "slot": 3,
     "task": "visual-preferences",
     "repetition": 1,
     "arm": "Htools",
-    "project": "Tah10n/Tahion_Personal_site",
-    "status": "not_started",
-    "Q": null,
-    "T": null,
-    "D": null
+    "state": "completed",
+    "Q": true,
+    "T": true,
+    "D": true
   },
   {
     "slot": 4,
     "task": "visual-preferences",
     "repetition": 2,
     "arm": "Htools",
-    "project": "Tah10n/Tahion_Personal_site",
-    "status": "not_started",
-    "Q": null,
-    "T": null,
-    "D": null
+    "state": "completed",
+    "Q": true,
+    "T": true,
+    "D": true
   },
   {
     "slot": 5,
     "task": "visual-preferences",
     "repetition": 2,
     "arm": "Hbase",
-    "project": "Tah10n/Tahion_Personal_site",
-    "status": "not_started",
-    "Q": null,
-    "T": null,
-    "D": null
+    "state": "completed",
+    "Q": true,
+    "T": true,
+    "D": true
   },
   {
     "slot": 6,
     "task": "visual-preferences",
     "repetition": 2,
     "arm": "P",
-    "project": "Tah10n/Tahion_Personal_site",
-    "status": "not_started",
-    "Q": null,
-    "T": null,
-    "D": null
+    "state": "completed",
+    "Q": true,
+    "T": true,
+    "D": true
   },
   {
     "slot": 7,
     "task": "url-search-params",
     "repetition": 1,
     "arm": "Hbase",
-    "project": "unjs/ufo",
-    "status": "not_started",
-    "Q": null,
-    "T": null,
-    "D": null
+    "state": "completed",
+    "Q": true,
+    "T": true,
+    "D": true
   },
   {
     "slot": 8,
     "task": "url-search-params",
     "repetition": 1,
     "arm": "P",
-    "project": "unjs/ufo",
-    "status": "not_started",
-    "Q": null,
-    "T": null,
-    "D": null
+    "state": "completed",
+    "Q": false,
+    "T": true,
+    "D": false
   },
   {
     "slot": 9,
     "task": "url-search-params",
     "repetition": 1,
     "arm": "Htools",
-    "project": "unjs/ufo",
-    "status": "not_started",
-    "Q": null,
-    "T": null,
-    "D": null
+    "state": "completed",
+    "Q": true,
+    "T": true,
+    "D": true
   },
   {
     "slot": 10,
     "task": "url-search-params",
     "repetition": 2,
     "arm": "Htools",
-    "project": "unjs/ufo",
-    "status": "not_started",
-    "Q": null,
-    "T": null,
-    "D": null
+    "state": "stopped",
+    "Q": false,
+    "T": false,
+    "D": false
   },
   {
     "slot": 11,
     "task": "url-search-params",
     "repetition": 2,
     "arm": "P",
-    "project": "unjs/ufo",
-    "status": "not_started",
+    "state": "not_started",
     "Q": null,
     "T": null,
     "D": null
@@ -125,8 +114,7 @@
     "task": "url-search-params",
     "repetition": 2,
     "arm": "Hbase",
-    "project": "unjs/ufo",
-    "status": "not_started",
+    "state": "not_started",
     "Q": null,
     "T": null,
     "D": null
