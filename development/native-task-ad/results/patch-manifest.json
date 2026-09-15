@@ -1,0 +1,79 @@
+[
+  {
+    "task": "protocol-error-api",
+    "arm": "A",
+    "phase": "final",
+    "file": "patches/protocol-error-api/A-final.patch",
+    "sha256": "c91fc661a9755b67640c8c423cd5ae6b54827197448c52649abe04a637c71b9b"
+  },
+  {
+    "task": "protocol-error-api",
+    "arm": "D",
+    "phase": "final",
+    "file": "patches/protocol-error-api/D-final.patch",
+    "sha256": "b02e25d620e4b5f9678bfd459f4c4a5d5a03f8fa1ee184befd1cc77a25e586d9"
+  },
+  {
+    "task": "legacy-runtime-reload",
+    "arm": "D",
+    "phase": "final",
+    "file": "patches/legacy-runtime-reload/D-final.patch",
+    "sha256": "89c7c137cb1e27ed175c10af24d89492b891eda2a07463cfa839a72d01f08748"
+  },
+  {
+    "task": "legacy-runtime-reload",
+    "arm": "D",
+    "phase": "D0",
+    "file": "patches/legacy-runtime-reload/D-D0.patch",
+    "sha256": "086448be038faa82b839d25e71a51b1b91de5705960767f0aabaea5bed46a9be"
+  },
+  {
+    "task": "legacy-runtime-reload",
+    "arm": "A",
+    "phase": "final",
+    "file": "patches/legacy-runtime-reload/A-final.patch",
+    "sha256": "627b6a3bf0950cae60ac4f34ee75e4f0f18f1e37de4bdd48569f5871427c57c2"
+  },
+  {
+    "task": "reconnect-revoked",
+    "arm": "D",
+    "phase": "final",
+    "file": "patches/reconnect-revoked/D-final.patch",
+    "sha256": "5578826a04112f1c92d826d171bd365f6c09d99f40f14f4a1140a62d09a5e01e"
+  },
+  {
+    "task": "reconnect-revoked",
+    "arm": "D",
+    "phase": "D0",
+    "file": "patches/reconnect-revoked/D-D0.patch",
+    "sha256": "bc59c31f78694fa37a0f6123254715f6ea5f6e5ed25728e9060f41ea68208532"
+  },
+  {
+    "task": "reconnect-revoked",
+    "arm": "A",
+    "phase": "final",
+    "file": "patches/reconnect-revoked/A-final.patch",
+    "sha256": "2c4821ffe43a73a2cc0c22e20ae81c2ee5705411c8c81f571989fdde4853efb6"
+  },
+  {
+    "task": "request-module-extraction",
+    "arm": "A",
+    "phase": "final",
+    "file": "patches/request-module-extraction/A-final.patch",
+    "sha256": "77149c7182914f5e0a9998bb033a036a43761af3b3ef4cfe10255b1250bb47e6"
+  },
+  {
+    "task": "request-module-extraction",
+    "arm": "D",
+    "phase": "final",
+    "file": "patches/request-module-extraction/D-final.patch",
+    "sha256": "620b77755fa6f3dc96726657953fd3ad63f23588ec4655a91e899d58800dc63d"
+  },
+  {
+    "task": "request-module-extraction",
+    "arm": "D",
+    "phase": "D0",
+    "file": "patches/request-module-extraction/D-D0.patch",
+    "sha256": "ababf3f5ace494811273d69acd1b6b6b2fbf57c72a85e5d141c469edc8d584a2"
+  }
+]

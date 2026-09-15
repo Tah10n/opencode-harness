@@ -1,0 +1,136 @@
+{
+  "id": "cb90bdf3b5ea",
+  "task": "eventemitter-prepend",
+  "project": "eventemitter3",
+  "Q": 0,
+  "findings": [
+    {
+      "category": "required-type-test-missing",
+      "reason": "No applicable delivered TypeScript consumer test for the newly declared generic API."
+    }
+  ],
+  "contentReview": {
+    "id": "cb90bdf3b5ea",
+    "task": "eventemitter-prepend",
+    "project": "eventemitter3",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete-pending-mechanical-checks",
+    "Q": null,
+    "behaviorReview": "Uses original addListener validation/context normalization and EE once flag; prepended arrays copied with concat to place new listener before all existing entries. Existing append path and emit/off code unchanged.",
+    "retainedTestsReview": "Original tests retained; new commonjs and esm cases appended.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": true,
+        "evidence": "Mixed append/once/prepend/prependOnce/latest-prepend order checks receiver labels and two arguments, then second emission checks once removal."
+      },
+      {
+        "scenario": 2,
+        "covered": true,
+        "evidence": "Recursive emit from prependOnce checks no recursive repeat; regular prepended listener persists and can be removed, listener enumeration asserted."
+      },
+      {
+        "scenario": 3,
+        "covered": true,
+        "evidence": "ESM default import uses symbol event and both APIs with correct execution order; CJS invalid handlers on existing symbol event retain registrations and eventNames."
+      }
+    ],
+    "typesReview": "Public declarations preserve event-specific generic listener argument type and context/this. No delivered .ts consumer fixture exists; adding declarations alone does not satisfy required type tests.",
+    "docsReview": "README removes stale unavailable-method claim and explains prepend order, context and examples.",
+    "contentFindings": [
+      {
+        "category": "required-type-test-missing",
+        "reason": "No applicable delivered TypeScript consumer test for the newly declared generic API."
+      }
+    ],
+    "pending": [
+      "ordinary project checks and ESM",
+      "independent public API checks",
+      "ordinary patch applicability"
+    ],
+    "recordStage": "Initial neutral review retained as history; final Q, findings and assessmentNotes supersede pending hypotheses."
+  },
+  "ordinaryExit": 0,
+  "originalIndependentExit": 0,
+  "interpretedIndependentExit": 0,
+  "applicability": {
+    "id": "cb90bdf3b5ea",
+    "task": "eventemitter-prepend",
+    "sourceCommit": "b0144e940ace8add8f335a8adfbed9284eb419f3",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "27b2133e16ce63b549817749a3d21dae8685ab6d210afe85b6c7c764dfc07249",
+    "excludedPreparationArtifacts": [],
+    "types": null
+  },
+  "sourcePatchSha256": "27b2133e16ce63b549817749a3d21dae8685ab6d210afe85b6c7c764dfc07249",
+  "sourcePatchBytes": 10670,
+  "assessmentNotes": [],
+  "slot": 29,
+  "repetition": 2,
+  "arm": "H00",
+  "D": 0,
+  "verification": [
+    {
+      "artifact": "reviews/cb90bdf3b5ea/independent/result.json",
+      "exit": 0,
+      "elapsedMs": 584,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "Independent behavior passed",
+      "fullLocalOutputSha256": "f9c69e05a31a62e04881e10139c67883f681accefebbe3f3ff50d81e2a6a7a6e",
+      "supersededDiagnostic": false
+    },
+    {
+      "artifact": "reviews/cb90bdf3b5ea/ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 990,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "\n> eventemitter3@5.0.4 test-esm\n> mocha test/test.mjs\n\n\n\n  ✔ exports `EventEmitter` as default export\n  ✔ exports `EventEmitter` as a named export\n  ✔ exports prepending APIs through the ESM consumer\n\n  3 passing (1ms)\n",
+      "fullLocalOutputSha256": "96c5302f53b37b462928cae0beeacb6355c2377fe61e522a1c5fc4f61d1b3e2e",
+      "supersededDiagnostic": false
+    }
+  ],
+  "native": {
+    "completed": true,
+    "exitCode": 0,
+    "signal": null,
+    "lastStepFinish": "stop",
+    "normalHandoff": true,
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "workflowStatus": "incomplete",
+    "terminalPatchVerification": {
+      "slot": 29,
+      "id": "cb90bdf3b5ea",
+      "terminalPatchSha256": "6343cd5b7e67a24c3ba4670ac4b22559ea5593aa53e1893da49747fe2f3e401f",
+      "sourcePatchSha256": "27b2133e16ce63b549817749a3d21dae8685ab6d210afe85b6c7c764dfc07249",
+      "ordinaryCleanSourceForwardApplyExit": 0,
+      "terminalPatchDeliversAllAuthorBytesAndModes": true,
+      "nativeHandoffNamesDeliveryAndPatch": true
+    },
+    "lastNativeTextSha256": "ba0903e62a2745ab966b3fea80903bd018d00f7ce1a809e4a4fb82c3f51a99a4",
+    "normalFinalResponse": true,
+    "finalResponseExcerpt": "Native task workflow: incomplete.\nDelivery worktree: /work/repo/.git/harness-task/[task]/worktree.\nTerminal patch: /work/repo/.git/harness-task/[task]/terminal.patch.\nFull report and tool outputs: /work/repo/.git/harness-task/[task].\nOriginal checkout unchanged by workflow transfer.",
+    "authorExplanationExcerpt": "\nImplemented:\n\n- Added `prependListener` and `prependOnceListener` with correct ordering, contexts, validation, symbols, removal, and recursive once behavior.\n- Updated CommonJS/ESM tests, TypeScript declarations, and README documentation.\n- Preserved append behavior and listener enumeration.\n\nChecks passed:\n\n- Focused CommonJS: 3 passing\n- Focused ESM: 1 passing\n- Full CommonJS: 43 passing\n- Full ESM: 3 passing\n- Rollup build\n- `git diff --check`\n\nTypeScript compiler validation was unavailable because `tsc` is not installed and the project has no type-test script.",
+    "reportFindings": [
+      {
+        "category": "misleading-workflow-report",
+        "evidence": "Final workflow lists successful relevant project commands but claims no relevant project check was observed. Real applicable delivery and terminal patch are named; conservative incomplete does not alone remove D."
+      }
+    ]
+  }
+}

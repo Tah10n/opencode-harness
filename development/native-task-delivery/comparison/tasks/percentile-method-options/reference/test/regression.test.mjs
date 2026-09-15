@@ -1,0 +1,5 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import path from 'node:path';import {fileURLToPath} from 'node:url';const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const m0=await import(path.join(root,"src/percentile.mjs"));
+test("linear interpolation and default remain distinct",()=>{const a=Object.freeze([40,10,30,20]);assert.equal(m0.percentile(a,.5),20);assert.equal(m0.percentile(a,.5,{method:'linear'}),25);assert.deepEqual(a,[40,10,30,20]);});
+test("validation precedes empty shortcut",()=>{assert.throws(()=>m0.percentile([],2,{method:'bad'}),{name:'TypeError',message:'method'});assert.throws(()=>m0.percentile([],NaN),{name:'RangeError',message:'p'});assert.equal(m0.percentile([],.5,{method:'linear'}),null);});
+test("endpoints and singleton",()=>{for(const method of ['nearest','linear']){assert.equal(m0.percentile([3,1],0,{method}),1);assert.equal(m0.percentile([3,1],1,{method}),3);assert.equal(m0.percentile([7],.2,{method}),7);}});

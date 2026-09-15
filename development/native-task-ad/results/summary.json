@@ -1,0 +1,88 @@
+{
+  "assignedRuns": 8,
+  "completedRuns": 8,
+  "quotaStop": false,
+  "retries": 0,
+  "modelRequestsDuringGrading": 0,
+  "gradedEndpoints": 11,
+  "claims": "Descriptive results on four reused development tasks; no independent benchmark, general lift or paid-price estimate. Complete patch delivery is external scoped task acceptance, separate from native workflow completion.",
+  "arms": {
+    "A": {
+      "workingBehaviorObserved": 3,
+      "deliveredChecksPassed": 4,
+      "allFrozenChecksPassed": 3,
+      "necessaryCoverageDelivered": 2,
+      "completePatchDelivery": 2,
+      "runs": 4,
+      "elapsedMs": 727600,
+      "requests": 89,
+      "toolCalls": 117,
+      "observedUsage": {
+        "input_tokens": 2652253,
+        "cached_tokens": 690688,
+        "output_tokens": 21986,
+        "reasoning_tokens": 6435,
+        "total_tokens": 2674239
+      },
+      "requestsWithoutUsage": 0
+    },
+    "D": {
+      "workingBehaviorObserved": 3,
+      "deliveredChecksPassed": 3,
+      "allFrozenChecksPassed": 2,
+      "necessaryCoverageDelivered": 2,
+      "completePatchDelivery": 2,
+      "runs": 4,
+      "elapsedMs": 1022205,
+      "requests": 131,
+      "toolCalls": 139,
+      "observedUsage": {
+        "input_tokens": 4635404,
+        "cached_tokens": 1674240,
+        "output_tokens": 30288,
+        "reasoning_tokens": 8487,
+        "total_tokens": 4665692
+      },
+      "requestsWithoutUsage": 0
+    }
+  },
+  "DTransitions": {
+    "protocol-error-api": {
+      "D0Available": false,
+      "corrections": 0,
+      "completeD0": null,
+      "completeFinal": true,
+      "changedPaths": null
+    },
+    "legacy-runtime-reload": {
+      "D0Available": true,
+      "corrections": 1,
+      "completeD0": false,
+      "completeFinal": false,
+      "changedPaths": [
+        "packages/connector/lib/config.mjs",
+        "packages/connector/test/state-security.test.mjs"
+      ]
+    },
+    "reconnect-revoked": {
+      "D0Available": true,
+      "corrections": 1,
+      "completeD0": false,
+      "completeFinal": false,
+      "changedPaths": [
+        "packages/connector/bin/viberacing.mjs",
+        "packages/connector/test/config.test.mjs"
+      ]
+    },
+    "request-module-extraction": {
+      "D0Available": true,
+      "corrections": 1,
+      "completeD0": true,
+      "completeFinal": true,
+      "changedPaths": [
+        "packages/connector/bin/viberacing.mjs",
+        "packages/connector/test/transport.test.mjs"
+      ]
+    }
+  }
+}

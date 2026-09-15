@@ -1,0 +1,3 @@
+# lazy-default-arguments
+
+getSetting uses own-key presence, not truthiness: explicit undefined, null, false, zero and empty string are present; inherited keys are absent. The legacy fallback is returned unchanged, including functions. Opt in with fourth argument {lazy:true}: a missing key invokes fallback once with undefined thisArg (normal JavaScript receiver rules apply) and the original key. Each call is independent, with no caching, mutation, awaiting or cloning. Own getters run once; getter and factory errors propagate unchanged without alternate fallback. Frozen/null-prototype objects and symbol keys work. Run npm test.

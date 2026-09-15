@@ -1,0 +1,137 @@
+{
+  "id": "c80764cf5b7c",
+  "task": "eventemitter-remove-context",
+  "project": "eventemitter3",
+  "Q": 0,
+  "findings": [
+    {
+      "category": "required-type-test-missing",
+      "reason": "No delivered TypeScript consumer fixture for the added public declaration."
+    }
+  ],
+  "contentReview": {
+    "id": "c80764cf5b7c",
+    "task": "eventemitter-remove-context",
+    "project": "eventemitter3",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete-pending-mechanical-checks",
+    "Q": null,
+    "behaviorReview": "Shared helper filters individual event registrations by strict stored context; outer method visits own strings and symbols. clearEvent tracks empty events; remaining arrays preserve order and existing emit snapshot semantics.",
+    "retainedTestsReview": "Original independent regressions retained; CJS and ESM tests added.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": true,
+        "evidence": "Same callback with two contexts across strings and symbols, duplicate and once registrations counted separately."
+      },
+      {
+        "scenario": 2,
+        "covered": true,
+        "evidence": "Two unrelated survivors in alpha retain order, empty names removed, repeat removal zero; separate emitter removes all registrations, then new listener emits successfully after empty state."
+      },
+      {
+        "scenario": 3,
+        "covered": true,
+        "evidence": "Omitted/zero/null/false registration contexts equal emitter; passing zero matches nothing and passing emitter removes all four."
+      }
+    ],
+    "typesReview": "Public method correctly accepts Context | this, representing normalized emitter context. No delivered .ts consumer fixture exists; declarations alone do not satisfy required type tests. Supplemental uniform consumer compile pending.",
+    "docsReview": "README adds count/strict context behavior, duplicate/once and emitter normalization explanation plus removal example.",
+    "contentFindings": [
+      {
+        "category": "required-type-test-missing",
+        "reason": "No delivered TypeScript consumer fixture for the added public declaration."
+      }
+    ],
+    "pending": [
+      "ordinary project checks and ESM",
+      "independent public API checks",
+      "ordinary patch applicability",
+      "supplemental typed normalized-emitter-context contract probe"
+    ],
+    "recordStage": "Initial neutral review retained as history; final Q, findings and assessmentNotes supersede pending hypotheses."
+  },
+  "ordinaryExit": 0,
+  "originalIndependentExit": 0,
+  "interpretedIndependentExit": 0,
+  "applicability": {
+    "id": "c80764cf5b7c",
+    "task": "eventemitter-remove-context",
+    "sourceCommit": "b0144e940ace8add8f335a8adfbed9284eb419f3",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "7295bff912376831d5d057a9c5cfdce9cdcb009549d352713ade6de9017200c0",
+    "excludedPreparationArtifacts": [],
+    "types": null
+  },
+  "sourcePatchSha256": "7295bff912376831d5d057a9c5cfdce9cdcb009549d352713ade6de9017200c0",
+  "sourcePatchBytes": 9268,
+  "assessmentNotes": [],
+  "slot": 32,
+  "repetition": 2,
+  "arm": "H00",
+  "D": 0,
+  "verification": [
+    {
+      "artifact": "reviews/c80764cf5b7c/independent/result.json",
+      "exit": 0,
+      "elapsedMs": 642,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "Independent behavior passed",
+      "fullLocalOutputSha256": "f9c69e05a31a62e04881e10139c67883f681accefebbe3f3ff50d81e2a6a7a6e",
+      "supersededDiagnostic": false
+    },
+    {
+      "artifact": "reviews/c80764cf5b7c/ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 1016,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "\n> eventemitter3@5.0.4 test-esm\n> mocha test/test.mjs\n\n\n\n  ✔ exports `EventEmitter` as default export\n  ✔ exports `EventEmitter` as a named export\n  ✔ exposes `removeListenersByContext` from the ESM entry point\n\n  3 passing (1ms)\n",
+      "fullLocalOutputSha256": "faf2d0e47a76afdbfa6ccffcba3df662b1f1ebd89fa8cf1fbc2bc5353bd02920",
+      "supersededDiagnostic": false
+    }
+  ],
+  "native": {
+    "completed": true,
+    "exitCode": 0,
+    "signal": null,
+    "lastStepFinish": "stop",
+    "normalHandoff": true,
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "workflowStatus": "incomplete",
+    "terminalPatchVerification": {
+      "slot": 32,
+      "id": "c80764cf5b7c",
+      "terminalPatchSha256": "dd770cb16f10db72629c45596835293d483e17ee19d936bca6d91e2fb91e8e6c",
+      "sourcePatchSha256": "7295bff912376831d5d057a9c5cfdce9cdcb009549d352713ade6de9017200c0",
+      "ordinaryCleanSourceForwardApplyExit": 0,
+      "terminalPatchDeliversAllAuthorBytesAndModes": true,
+      "nativeHandoffNamesDeliveryAndPatch": true
+    },
+    "lastNativeTextSha256": "ce64d563fe83b7f1c8e8ce63aeac264d98b228f285eefc7e0faac1ab43a35daa",
+    "normalFinalResponse": true,
+    "finalResponseExcerpt": "Native task workflow: incomplete.\nDelivery worktree: /work/repo/.git/harness-task/[task]/worktree.\nTerminal patch: /work/repo/.git/harness-task/[task]/terminal.patch.\nFull report and tool outputs: /work/repo/.git/harness-task/[task].\nOriginal checkout unchanged by workflow transfer.",
+    "authorExplanationExcerpt": "\nImplemented `removeListenersByContext(context)` with strict context matching, count returns, symbol support, ordering preservation, and emitter reuse.\n\nUpdated:\n- CommonJS runtime and ESM exposure\n- TypeScript declarations\n- README API documentation\n- CommonJS and ESM regressions\n\nChecks:\n- `npm test`: 43 passing\n- `npm run test-esm`: 3 passing\n- Direct new-behavior and preservation checks passed\n- Syntax and diff checks passed\n\nNo TypeScript compiler/type-test setup exists in the repository. `npm ci` encountered registry DNS failure, but existing tooling ran successfully.",
+    "reportFindings": [
+      {
+        "category": "misleading-workflow-report",
+        "evidence": "Final workflow lists successful relevant project commands but claims no relevant project check was observed. Real applicable delivery and terminal patch are named; conservative incomplete does not alone remove D."
+      }
+    ]
+  }
+}

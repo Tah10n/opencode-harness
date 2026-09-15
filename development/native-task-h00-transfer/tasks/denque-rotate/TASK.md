@@ -1,0 +1,8 @@
+Add rotate(steps = 1): this. Positive steps rotate values from back to front; negative steps rotate front to back. Normalize finite integer counts modulo current length, preserving value identity and order. Reject non-integer, non-finite and non-number counts with an Error before changing any state; zero and rotations of empty/singleton queues are no-ops returning this. Handle wrapped internal storage, capacity-limited queues and large integer counts without looping once per unnormalized step. Preserve length, configured capacity and subsequent push/unshift/pop/shift/peek/remove behavior. Document the public API and extend declarations and consumer type tests.
+
+Required delivered regression scenarios:
+- Positive/negative/default/zero and counts larger than length produce the specified array order and return this.
+- Wrapped storage and capacity-bound queues rotate without dropping values; subsequent deque operations preserve capacity and order.
+- Invalid values throw atomically, object identity survives, and empty/singleton queues stay usable.
+
+Deliver implementation, ordinary project regression tests, applicable public TypeScript declarations/type tests, and README/API documentation. Preserve existing independent regression scenarios and all behavior not explicitly changed. Use the project test tools; run relevant checks after the last edit and report what actually ran and any limitations. A different valid implementation or test organization is acceptable. Do not commit, publish, or change dependencies merely to make a check pass. The supported evaluation platform is Linux arm64, Node 24.19; browser deployment and other Node versions are outside this task.

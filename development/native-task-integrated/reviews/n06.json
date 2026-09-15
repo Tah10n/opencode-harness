@@ -1,0 +1,37 @@
+{
+  "Q": false,
+  "reviewed": "Unchanged patch applied in an ordinary Git copy; complete source/test/type/doc diff inspected before explanatory traces. Evaluator knew arm mapping; not fully blinded.",
+  "originalChecks": {
+    "id": "n06",
+    "task": "url-search-params",
+    "apply": 0,
+    "projectStatus": 1,
+    "lintStatus": 0,
+    "formatStatus": 1,
+    "independentProjectTestsStatus": 1,
+    "independentProjectBuildStatus": 0,
+    "behaviorStatus": 1,
+    "cleanupStatus": 0
+  },
+  "postHocAppendCompatibility": {
+    "status": 1,
+    "tests": 2,
+    "passed": 1,
+    "frozen": false,
+    "soleCauseOfNegativeQ": false
+  },
+  "manualCompleteness": {
+    "threePublicConsumers": true,
+    "publicInputUnionAndQueryObjectCompatibility": true,
+    "existingTestsAndDependenciesPreserved": true,
+    "regressionsAndDocsPresent": true,
+    "portableWithoutHarnessPaths": true
+  },
+  "issues": [
+    "Original npm test fails formatting in src/query.ts, src/utils.ts, test/url.test.ts.",
+    "Original vitest --typecheck and public check invocation exit 1 with three source TypeCheckErrors at src/utils.ts:383,389,397; passing assertions do not erase these errors.",
+    "Separate post-hoc append check fails removal of an incoming own undefined key from a params-backed receiver. This is not the sole reason for Q=false."
+  ],
+  "details": "Runtime assertions (498 project, 6 external) pass and build exits 0, but source type errors and formatting independently fail original acceptance. Nested tuple array is incorrectly asserted as a single tuple in withQuery.flatMap. Append selects replacement keys after stringifyQuery has omitted undefined, retaining the old receiving key. These are findings about the saved terminal artifact at permission stop, not a prediction of an unfinished author trajectory.",
+  "calibrationCaveat": "Unchanged post-hoc append check; both original reference and alternative also miss this already-declared compatibility case. Historical outcomes reused without recalculation."
+}

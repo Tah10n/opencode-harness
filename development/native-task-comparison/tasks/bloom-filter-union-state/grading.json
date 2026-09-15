@@ -1,0 +1,16 @@
+{
+  "category": "state",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert fixed bitmap vectors, no false negatives and resumed snapshot continuation.",
+    "Assert union commutativity/idempotence and membership preservation, legitimate false positives, malformed/mismatched state atomicity."
+  ],
+  "docDelivery": [
+    "Document exact hashes, position arithmetic, bit order and false-positive semantics.",
+    "Explain snapshot format/canonical validation, compatible union and copy ownership."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Fixed probabilistic Bloom membership, precise dual-hash/bit packing, canonical snapshot and compatible atomic union.",
+  "independence": "Persist probabilistic membership bits with fixed hash policy and compatible union preserving no-false-negative behavior."
+}

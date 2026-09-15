@@ -1,0 +1,262 @@
+diff --git a/README.md b/README.md
+index e45aa10..7c9301b 100644
+--- a/README.md
++++ b/README.md
+@@ -13,8 +13,9 @@ differences:
+   listening.
+ - The `newListener` and `removeListener` events have been removed as they
+   are useful only in some uncommon use-cases.
+-- The `setMaxListeners`, `getMaxListeners`, `prependListener` and
+-  `prependOnceListener` methods are not available.
++- The `setMaxListeners` and `getMaxListeners` methods are not available.
++- `prependListener` and `prependOnceListener` add listeners before existing
++  listeners for an event.
+ - Support for custom context for events so there is no need to use `fn.bind`.
+ - The `removeListener` method removes all matching listeners, not only the
+   first.
+@@ -53,7 +54,8 @@ http://nodejs.org/api/events.html
+ 
+ ### Contextual emits
+ 
+-We've upgraded the API of the `EventEmitter.on`, `EventEmitter.once` and
++We've upgraded the API of the `EventEmitter.on`, `EventEmitter.once`,
++`EventEmitter.prependListener`, `EventEmitter.prependOnceListener` and
+ `EventEmitter.removeListener` to accept an extra argument which is the `context`
+ or `this` value that should be set for the emitted events. This means you no
+ longer have the overhead of an event that required `fn.bind` in order to get a
+@@ -69,6 +71,8 @@ function emitted() {
+ 
+ EE.once('event-name', emitted, context);
+ EE.on('another-event', emitted, context);
++EE.prependListener('first-event', emitted, context);
++EE.prependOnceListener('first-event', emitted, context);
+ EE.removeListener('another-event', emitted, context);
+ ```
+ 
+diff --git a/index.d.ts b/index.d.ts
+index fab37fd..1763a98 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -57,6 +57,20 @@ declare class EventEmitter<
+     context?: Context
+   ): this;
+ 
++  /**
++   * Add a listener for a given event before existing listeners.
++   */
++  prependListener<T extends EventEmitter.EventNames<EventTypes>>(
++    event: T,
++    fn: EventEmitter.EventListener<EventTypes, T>,
++    context?: Context
++  ): this;
++  prependOnceListener<T extends EventEmitter.EventNames<EventTypes>>(
++    event: T,
++    fn: EventEmitter.EventListener<EventTypes, T>,
++    context?: Context
++  ): this;
++
+   /**
+    * Remove the listeners of a given event.
+    */
+diff --git a/index.js b/index.js
+index 6ea485c..9fab44f 100644
+--- a/index.js
++++ b/index.js
+@@ -52,10 +52,11 @@ function EE(fn, context, once) {
+  * @param {Function} fn The listener function.
+  * @param {*} context The context to invoke the listener with.
+  * @param {Boolean} once Specify if the listener is a one-time listener.
++ * @param {Boolean} prepend Specify if the listener should run before existing listeners.
+  * @returns {EventEmitter}
+  * @private
+  */
+-function addListener(emitter, event, fn, context, once) {
++function addListener(emitter, event, fn, context, once, prepend) {
+   if (typeof fn !== 'function') {
+     throw new TypeError('The listener must be a function');
+   }
+@@ -64,8 +65,12 @@ function addListener(emitter, event, fn, context, once) {
+     , evt = prefix ? prefix + event : event;
+ 
+   if (!emitter._events[evt]) emitter._events[evt] = listener, emitter._eventsCount++;
+-  else if (!emitter._events[evt].fn) emitter._events[evt].push(listener);
+-  else emitter._events[evt] = [emitter._events[evt], listener];
++  else if (!emitter._events[evt].fn) {
++    if (prepend) emitter._events[evt].unshift(listener);
++    else emitter._events[evt].push(listener);
++  } else emitter._events[evt] = prepend
++    ? [listener, emitter._events[evt]]
++    : [emitter._events[evt], listener];
+ 
+   return emitter;
+ }
+@@ -241,6 +246,32 @@ EventEmitter.prototype.once = function once(event, fn, context) {
+   return addListener(this, event, fn, context, true);
+ };
+ 
++/**
++ * Add a listener for a given event before existing listeners.
++ *
++ * @param {(String|Symbol)} event The event name.
++ * @param {Function} fn The listener function.
++ * @param {*} [context=this] The context to invoke the listener with.
++ * @returns {EventEmitter} `this`.
++ * @public
++ */
++EventEmitter.prototype.prependListener = function prependListener(event, fn, context) {
++  return addListener(this, event, fn, context, false, true);
++};
++
++/**
++ * Add a one-time listener for a given event before existing listeners.
++ *
++ * @param {(String|Symbol)} event The event name.
++ * @param {Function} fn The listener function.
++ * @param {*} [context=this] The context to invoke the listener with.
++ * @returns {EventEmitter} `this`.
++ * @public
++ */
++EventEmitter.prototype.prependOnceListener = function prependOnceListener(event, fn, context) {
++  return addListener(this, event, fn, context, true, true);
++};
++
+ /**
+  * Remove the listeners of a given event.
+  *
+diff --git a/test/test.js b/test/test.js
+index e5f8aaa..d857ed5 100644
+--- a/test/test.js
++++ b/test/test.js
+@@ -396,6 +396,106 @@ describe('EventEmitter', function tests() {
+     });
+   });
+ 
++  describe('EventEmitter#prependListener', function () {
++    it('prepends listeners and preserves contexts and arguments', function () {
++      var e = new EventEmitter()
++        , calls = []
++        , firstContext = { name: 'first' }
++        , secondContext = { name: 'second' }
++        , appendContext = { name: 'append' }
++        , onceContext = { name: 'once' };
++
++      function first(a, b) {
++        calls.push([this.name, a, b]);
++      }
++
++      function second(a, b) {
++        calls.push([this.name, a, b]);
++      }
++
++      function append(a, b) {
++        calls.push([this.name, a, b]);
++      }
++
++      function once(a, b) {
++        calls.push([this.name, a, b]);
++      }
++
++      assume(e.addListener('event', append, appendContext)).equals(e);
++      assume(e.once('event', once, onceContext)).equals(e);
++      assume(e.prependListener('event', first, firstContext)).equals(e);
++      assume(e.prependListener('event', second, secondContext)).equals(e);
++
++      assume(e.listeners('event')).deep.equals([second, first, append, once]);
++
++      e.emit('event', 'a', 'b');
++      e.emit('event', 'c', 'd');
++
++      assume(calls).deep.equals([
++        ['second', 'a', 'b'],
++        ['first', 'a', 'b'],
++        ['append', 'a', 'b'],
++        ['once', 'a', 'b'],
++        ['second', 'c', 'd'],
++        ['first', 'c', 'd'],
++        ['append', 'c', 'd']
++      ]);
++    });
++
++    it('removes a prepended once listener before recursive emits', function () {
++      var e = new EventEmitter()
++        , calls = [];
++
++      function regular() {
++        calls.push('regular');
++      }
++
++      function once() {
++        calls.push('once');
++        e.emit('event');
++      }
++
++      assume(e.prependListener('event', regular)).equals(e);
++      assume(e.prependOnceListener('event', once)).equals(e);
++
++      assume(e.listeners('event')).deep.equals([once, regular]);
++      assume(e.listenerCount('event')).equals(2);
++
++      e.emit('event');
++
++      assume(calls).deep.equals(['once', 'regular', 'regular']);
++      assume(e.listeners('event')).deep.equals([regular]);
++      assume(e.listenerCount('event')).equals(1);
++
++      assume(e.removeListener('event', regular)).equals(e);
++      assume(e.listeners('event')).deep.equals([]);
++      assume(e.emit('event')).equals(false);
++    });
++
++    if ('undefined' !== typeof Symbol) it('supports symbols and keeps registrations after invalid input', function () {
++      var e = new EventEmitter()
++        , event = Symbol('event');
++
++      function existing() {}
++      function prepended() {}
++
++      e.on(event, existing);
++      e.prependListener(event, prepended);
++
++      assume(e.listeners(event)).deep.equals([prepended, existing]);
++
++      try {
++        e.prependOnceListener(event, 'invalid');
++      } catch (ex) {
++        assume(ex).is.instanceOf(TypeError);
++        assume(e.listeners(event)).deep.equals([prepended, existing]);
++        return;
++      }
++
++      throw new Error('oops');
++    });
++  });
++
+   describe('EventEmitter#removeListener', function () {
+     it('removes all listeners when the listener is not specified', function () {
+       var e = new EventEmitter();
+diff --git a/test/test.mjs b/test/test.mjs
+index 7b50c82..50753cc 100644
+--- a/test/test.mjs
++++ b/test/test.mjs
+@@ -7,3 +7,21 @@ it('exports `EventEmitter` as default export', () => {
+ it('exports `EventEmitter` as a named export', () => {
+   new EventEmitter();
+ })
++
++it('exposes prepend listeners through ESM consumers', () => {
++  const emitter = new EventEmitterDefault();
++  const calls = [];
++
++  emitter.on('event', () => calls.push('append'));
++  emitter.prependListener('event', () => calls.push('prepend'));
++  emitter.prependOnceListener('event', () => calls.push('once'));
++
++  if (emitter.listeners('event').length !== 3) throw new Error('missing ESM listeners');
++
++  emitter.emit('event');
++  emitter.emit('event');
++
++  if (calls.join(',') !== 'once,prepend,append,prepend,append') {
++    throw new Error('incorrect ESM listener order');
++  }
++})

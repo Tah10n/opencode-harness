@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {diffCounts,applyCounts} from '../src/delta.mjs';test('no changes',()=>{assert.deepEqual(diffCounts({x:2},{x:2}),[]);assert.deepEqual(applyCounts({x:2},[]),{x:2});});

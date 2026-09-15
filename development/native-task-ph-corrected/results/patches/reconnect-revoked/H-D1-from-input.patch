@@ -1,0 +1,86 @@
+diff --git a/packages/connector/bin/viberacing.mjs b/packages/connector/bin/viberacing.mjs
+index e8d53d748b57f51dbc532608039f5f49008d2f21..27920d5ae3167ece783f26d0597e66ada257c31a 100755
+--- a/packages/connector/bin/viberacing.mjs
++++ b/packages/connector/bin/viberacing.mjs
+@@ -189,10 +189,7 @@ async function request(origin, path, options = {}, attempts = 1, responseContext
+       try {
+         payload = await parseProtocolResponse(response, responseContext);
+       } catch (error) {
+-        if (
+-          error?.code === "invalid_server_response" &&
+-          (response.status >= 500 || response.status === 429)
+-        ) {
++        if (!response.ok) {
+           error.status = response.status;
+           error.retryAfterMs = retryAfterMilliseconds(response);
+         }
+diff --git a/packages/connector/lib/connection-lifecycle.mjs b/packages/connector/lib/connection-lifecycle.mjs
+index 7016bb2ba6701f65144cc9339f25a19887d7f0a7..09286b503c1600870d051f863a3973af1877f5ab 100644
+--- a/packages/connector/lib/connection-lifecycle.mjs
++++ b/packages/connector/lib/connection-lifecycle.mjs
+@@ -2,10 +2,15 @@ import { removeConfig, removeHooks } from "./config.mjs";
+ import { clearAutomaticState, clearPendingPayloads } from "./runtime.mjs";
+ 
+ export async function disableLocalConnection(clearPending = false) {
+-  await removeConfig();
+-  const operations = [removeHooks(), clearAutomaticState()];
++  const operations = [removeConfig(), removeHooks(), clearAutomaticState()];
+   if (clearPending) operations.push(clearPendingPayloads());
+   const results = await Promise.allSettled(operations);
+-  const hookFailures = results[0].status === "fulfilled" ? results[0].value.failures.length : 1;
+-  return hookFailures + results.slice(1).filter((result) => result.status === "rejected").length;
++  const hookResult = results[1];
++  const hookFailures =
++    hookResult?.status === "fulfilled" ? hookResult.value.failures.length : 1;
++  return (
++    (results[0].status === "fulfilled" ? 0 : 1) +
++    hookFailures +
++    results.slice(2).filter((result) => result.status === "rejected").length
++  );
+ }
+diff --git a/packages/connector/test/config.test.mjs b/packages/connector/test/config.test.mjs
+index ef547406fa15767b1075e0cb9678e03758a378b4..034d85b658a9d7c700bd7f1401be5cee5c371204 100644
+--- a/packages/connector/test/config.test.mjs
++++ b/packages/connector/test/config.test.mjs
+@@ -3292,12 +3292,15 @@ test("reconnect rejects omission and retains a temporarily unavailable source",
+     VIBERACING_TEST_PAIRING_POLL_INTERVAL_MS: "10",
+   });
+ 
+-  await assert.rejects(
+-    execFileAsync(process.execPath, [connectorPath, "connect", "--origin", origin], {
++  let malformedError;
++  try {
++    await execFileAsync(process.execPath, [connectorPath, "connect", "--origin", origin], {
+       env: environment,
+-    }),
+-    /invalid protocol response/,
+-  );
++    });
++  } catch (error) {
++    malformedError = error;
++  }
++  assert.match(malformedError?.stderr ?? "", /invalid protocol response/);
+   assert.deepEqual(await readFile(join(directory, "config.json")), configBefore);
+   assert.deepEqual(await readFile(join(directory, "sources.json")), sourcesBefore);
+   assert.deepEqual(await readFile(hookPath), hookBefore);
+@@ -3547,12 +3550,15 @@ test("reconnect retires only an explicitly disconnected unavailable source befor
+     ["transient", /server_error/],
+   ]) {
+     mode = failure[0];
+-    await assert.rejects(
+-      execFileAsync(process.execPath, [connectorPath, "connect", "--origin", origin], {
++    let error;
++    try {
++      await execFileAsync(process.execPath, [connectorPath, "connect", "--origin", origin], {
+         env: environment,
+-      }),
+-      failure[1],
+-    );
++      });
++    } catch (caught) {
++      error = caught;
++    }
++    assert.match(error?.stderr ?? "", failure[1]);
+     assert.deepEqual(await readFile(join(directory, "config.json")), configBefore);
+     assert.deepEqual(await readFile(join(hookRoot, "settings.json")), hookBefore);
+     assert.equal(pairingStarts, 0);

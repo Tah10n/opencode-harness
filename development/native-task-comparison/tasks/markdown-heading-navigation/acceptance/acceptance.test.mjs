@@ -1,0 +1,5 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import path from 'node:path';const root=process.env.PILOT_SOURCE;
+const {toc}=await import(path.join(root,'src/toc.mjs'));const {anchors}=await import(path.join(root,'src/headings.mjs'));
+test('fences levels and repeated slugs',()=>{const t=toc('# Top\r\n```js\r\n## Hidden\r\n```\r\n### Child ###\r\n## Child\r\n# Top');assert.equal(t.length,2);assert.deepEqual(t[0].children.map(n=>[n.level,n.title,n.id]),[[3,'Child','child'],[2,'Child','child-1']]);assert.equal(t[1].id,'top-1');});
+test('slug and no mutation',()=>{const h=[{level:1,title:'A & B!'},{level:2,title:'!!!'},{level:2,title:'!!!'}],before=JSON.stringify(h);assert.deepEqual(anchors(h).map(x=>x.id),['a-b','section','section-1']);assert.equal(JSON.stringify(h),before);assert.deepEqual(toc('plain'),[]);});
+test('limited heading grammar',()=>{const t=toc(' # indented\n#\tTabbed\n# ###\n# title#\n# title #');assert.deepEqual(t.map(x=>[x.title,x.id]),[['title','title'],['title','title-1']]);});

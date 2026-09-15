@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/patch.mjs": "export function applyPatch(lines,hunks){let end=0,shift=0;const inverse=[];for(const h of hunks){if(!Number.isInteger(h.at)||h.at<end||h.at>lines.length||h.at+h.remove.length>lines.length)throw new RangeError('range');for(let i=0;i<h.remove.length;i++)if(h.remove[i]!==lines[h.at+i])throw new Error('conflict');inverse.push({at:h.at+shift,remove:h.insert.slice(),insert:h.remove.slice()});shift+=h.insert.length-h.remove.length;end=h.at+h.remove.length;}const out=lines.slice();for(let i=hunks.length-1;i>=0;i--){const h=hunks[i];out.splice(h.at,h.remove.length,...h.insert);}return {lines:out,inverse:[{at:0,remove:out.slice(),insert:lines.slice()}]};}\n"
+  },
+  "mutants": [
+    {
+      "name": "apply-original-indices-to-mutated-array",
+      "file": "src/patch.mjs",
+      "replacement": "export function applyPatch(lines,hunks){const out=[...lines];for(const h of hunks)out.splice(h.at,h.remove.length,...h.insert);return {lines:out,inverse:[]};}\n"
+    },
+    {
+      "name": "skip-context-check",
+      "file": "src/patch.mjs",
+      "replacement": "export function applyPatch(lines,hunks){let cursor=0;const out=[],inverse=[];for(const h of hunks){if(!Number.isInteger(h.at)||h.at<cursor||h.at>lines.length||h.at+h.remove.length>lines.length)throw new RangeError('hunk range');out.push(...lines.slice(cursor,h.at));inverse.push({at:out.length,remove:[...h.insert],insert:[...h.remove]});out.push(...h.insert);cursor=h.at+h.remove.length;}out.push(...lines.slice(cursor));return {lines:out,inverse};}\n"
+    }
+  ]
+}

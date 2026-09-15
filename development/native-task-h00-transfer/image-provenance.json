@@ -1,0 +1,18 @@
+{
+  "observedAt": "2026-09-13T21:18:41.412561+00:00",
+  "image": "sha256:0ed6cee0b095ecf1e1e780418cb373d462f1b99643bb86db0a8de7dd58fc83a6",
+  "platform": "linux/arm64",
+  "localTag": "opencode-harness-v2:node24",
+  "repoDigest": "opencode-harness-v2@sha256:0ed6cee0b095ecf1e1e780418cb373d462f1b99643bb86db0a8de7dd58fc83a6",
+  "nodeVersionFromImageHistory": "24.19.0",
+  "baseFromImageHistory": "Debian bookworm / full Node image",
+  "addedLayersFromImageHistory": [
+    "apt-get install acl ca-certificates gcc git make sudo",
+    "npm install --global opencode-ai@1.18.18",
+    "WORKDIR /work",
+    "CMD sleep infinity"
+  ],
+  "measuredOpenCode": "Read-only mounted /opt/opencode 1.18.26, version verified separately in every slot; the image-global 1.18.18 binary is not the launcher executable.",
+  "reproductionLimit": "This is a pre-existing local research image, not a verified public pull location. Image hash identifies exact retained environment; the unpinned apt layer recipe alone cannot reproduce identical bytes. H00 source/config/npm dependency reproduction is separately specified in INSTALL.md. No image rebuild or package change occurred during this series.",
+  "verificationOnly": true
+}

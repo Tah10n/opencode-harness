@@ -1,0 +1,677 @@
+{
+  "runtimeSha": "46572619e8a9d567f680667bdf6083a2e82be406",
+  "realProviderRequests": 0,
+  "provenance": {
+    "denque": {
+      "commit": "539105bb57854e997dd469221cdc52a0ad80e0a2",
+      "origin": "https://github.com/invertase/denque.git"
+    },
+    "quick-lru": {
+      "commit": "f2fe88e2932603c038c61ca29de6ad5286148e1b",
+      "origin": "https://github.com/sindresorhus/quick-lru.git"
+    }
+  },
+  "containerPreflight": {
+    "passed": true,
+    "nativeCompleted": true,
+    "elapsedMs": 5287,
+    "termination": {
+      "terminationVerified": true,
+      "killed": []
+    },
+    "ordinaryPatchPassed": true,
+    "diagnostics": [
+      {
+        "baseline": "passed",
+        "engineExecuted": true,
+        "variant": "passed",
+        "cost": {
+          "commands": 2,
+          "engineMs": 261,
+          "preparationMs": 20,
+          "commandMs": 216,
+          "totalMs": 527
+        },
+        "terminationVerified": true
+      },
+      {
+        "baseline": "passed",
+        "engineExecuted": false,
+        "variant": "command-rejected",
+        "cost": {
+          "commands": 2,
+          "engineMs": 0,
+          "preparationMs": 16,
+          "commandMs": 206,
+          "totalMs": 239
+        },
+        "terminationVerified": true
+      }
+    ]
+  },
+  "transportScenarios": [
+    {
+      "mode": "503-retry",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 2,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "unknown_submission",
+        "slot": 1,
+        "requestIndex": 1,
+        "status": 503,
+        "reason": "Non-200 response without an established provider result"
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "delayed-503",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 2,
+      "pausedBeforeDelayedBodyEnded": true,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "unknown_submission",
+        "slot": 1,
+        "requestIndex": 1,
+        "status": 503,
+        "reason": "Non-200 response without an established provider result"
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "oversized-503",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 2,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "unknown_submission",
+        "slot": 1,
+        "requestIndex": 1,
+        "status": 503,
+        "reason": "Non-200 response without an established provider result"
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "200-disconnect",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 0,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "unknown_submission",
+        "slot": 1,
+        "reason": "Stream ended without a bound terminal provider response"
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "completed-delivery-error",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1,
+        2
+      ],
+      "scriptedReportedTokens": 5,
+      "unknownUsageRequests": 0,
+      "blockedRequests": 0,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": null,
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "previous-completed-new-unknown",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "upstreamRequests": 2,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 5,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 0,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "unknown_submission",
+        "slot": 1,
+        "requestIndex": 2,
+        "status": 503,
+        "reason": "Non-200 response without an established provider result"
+      },
+      "realProviderRequests": 0,
+      "authCalls": 2
+    },
+    {
+      "mode": "401",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 0,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "provider_refusal",
+        "slot": 1,
+        "requestIndex": 1,
+        "status": 401,
+        "reason": "Provider refused request",
+        "type": "unauthorized",
+        "message": "Scripted refusal",
+        "truncated": false,
+        "bodyInterrupted": false,
+        "bodyTimedOut": false
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "403",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 0,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "provider_refusal",
+        "slot": 1,
+        "requestIndex": 1,
+        "status": 403,
+        "reason": "Provider refused request",
+        "type": "unauthorized",
+        "message": "Scripted refusal",
+        "truncated": false,
+        "bodyInterrupted": false,
+        "bodyTimedOut": false
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "429",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 0,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "incomplete_quota",
+        "slot": 1,
+        "requestIndex": 1,
+        "status": 429,
+        "reason": "Provider refused request",
+        "type": "usage_limit_reached",
+        "message": "Scripted refusal",
+        "truncated": false,
+        "bodyInterrupted": false,
+        "bodyTimedOut": false
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "queued-title",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 2,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "unknown_submission",
+        "slot": 1,
+        "requestIndex": 1,
+        "status": 503,
+        "reason": "Non-200 response without an established provider result"
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "already-forwarded",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "upstreamRequests": 2,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 2,
+      "blockedRequests": 0,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "unknown_submission",
+        "slot": 1,
+        "requestIndex": 1,
+        "status": 503,
+        "reason": "Non-200 response without an established provider result"
+      },
+      "realProviderRequests": 0,
+      "authCalls": 2
+    },
+    {
+      "mode": "late-completed-after-pause",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "upstreamRequests": 2,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 5,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 0,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "unknown_submission",
+        "slot": 1,
+        "requestIndex": 1,
+        "status": 503,
+        "reason": "Non-200 response without an established provider result"
+      },
+      "realProviderRequests": 0,
+      "authCalls": 2
+    },
+    {
+      "mode": "successful-duplicate",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "upstreamRequests": 2,
+      "startedSlots": [
+        1,
+        2
+      ],
+      "scriptedReportedTokens": 10,
+      "unknownUsageRequests": 0,
+      "blockedRequests": 0,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": null,
+      "realProviderRequests": 0,
+      "authCalls": 2
+    },
+    {
+      "mode": "cancelled-before-fetch",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "upstreamRequests": 0,
+      "startedSlots": [
+        1,
+        2
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 0,
+      "blockedRequests": 1,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": null,
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "pause-during-auth",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "upstreamRequests": 0,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 0,
+      "blockedRequests": 2,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "boundary_refusal",
+        "slot": 1
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "cancelled-in-flight",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 0,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "unknown_submission",
+        "slot": 1,
+        "error": "AbortError"
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "installed-503",
+      "nativeRetryAttempts": 1,
+      "passed": true,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 3,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": "1.18.26",
+      "pause": {
+        "kind": "unknown_submission",
+        "slot": 1,
+        "requestIndex": 1,
+        "status": 503,
+        "reason": "Non-200 response without an established provider result"
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "installed-delayed-503",
+      "nativeRetryAttempts": 1,
+      "passed": true,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 3,
+      "pausedBeforeDelayedBodyEnded": true,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": "1.18.26",
+      "pause": {
+        "kind": "unknown_submission",
+        "slot": 1,
+        "requestIndex": 1,
+        "status": 503,
+        "reason": "Non-200 response without an established provider result"
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "installed-success",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "upstreamRequests": 4,
+      "startedSlots": [
+        1,
+        2
+      ],
+      "scriptedReportedTokens": 20,
+      "unknownUsageRequests": 0,
+      "blockedRequests": 0,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": "1.18.26",
+      "pause": null,
+      "realProviderRequests": 0,
+      "authCalls": 4
+    },
+    {
+      "mode": "installed-cancel",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 0,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": "1.18.26",
+      "pause": {
+        "kind": "unknown_submission",
+        "slot": 1,
+        "error": "AbortError"
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "installed-hard-deadline",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 0,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": "1.18.26",
+      "pause": {
+        "kind": "unattributed_timeout",
+        "slot": 1
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    }
+  ],
+  "cases": [
+    {
+      "case": "case-a",
+      "baseline": "passed",
+      "engine": "StrykerJS instrumenter 10.0.0",
+      "engineExecuted": true,
+      "selected": {
+        "file": "index.js",
+        "operator": "BooleanLiteral",
+        "diff": "--- a/index.js\n+++ b/index.js\n@@ 214:31 @@\n-false\n+true",
+        "status": "passed"
+      },
+      "baselineProjectChecks": [
+        {
+          "command": "npm test",
+          "exit": 0
+        }
+      ],
+      "evaluatorBaselineExit": 0,
+      "evaluatorMutantExit": 1,
+      "evaluatorScenario": "import assert from 'node:assert/strict';import Denque from './index.js';let calls=0;const q=new Denque();const removed=q.removeWhere(()=>{calls++;return false;});assert.equal(calls,0,'predicate only visits initially present values');assert.equal(removed,0);assert.deepEqual(q.toArray(),[]);",
+      "evaluatorFailure": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: predicate only visits initially present values\n\n4 !== 0\n\n    at file:///work/repo/evaluator.mjs:1:170\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: 4,\n  expected: 0,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.19.0\n",
+      "cost": {
+        "commands": 9,
+        "engineMs": 364,
+        "preparationMs": 3256,
+        "commandMs": 5208,
+        "totalMs": 9285
+      },
+      "terminationVerified": true,
+      "sourceVersion": "2.1.0"
+    },
+    {
+      "case": "case-b",
+      "baseline": "passed",
+      "engine": "StrykerJS instrumenter 10.0.0",
+      "engineExecuted": true,
+      "selected": {
+        "file": "index.js",
+        "operator": "ConditionalExpression",
+        "diff": "--- a/index.js\n+++ b/index.js\n@@ 121:6 @@\n-this.#cache.has(key)\n+false",
+        "status": "passed"
+      },
+      "baselineProjectChecks": [
+        {
+          "command": "npm test",
+          "exit": 0
+        }
+      ],
+      "evaluatorBaselineExit": 0,
+      "evaluatorMutantExit": 1,
+      "evaluatorScenario": "import assert from 'node:assert/strict';import QuickLRU from './index.js';const cache=new QuickLRU({maxSize:4});const value={v:1};cache.set('key',value);let calls=0;const got=cache.getOrInsertComputed('key',()=>{calls++;return {v:2};});assert.equal(got,value,'unexpired hit retains object identity');assert.equal(calls,0,'unexpired hit must not invoke factory');",
+      "evaluatorFailure": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: unexpired hit retains object identity\n+ actual - expected\n\n  {\n+   v: 2\n-   v: 1\n  }\n\n    at file:///work/repo/evaluator.mjs:1:244\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: { v: 2 },\n  expected: { v: 1 },\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.19.0\n",
+      "cost": {
+        "commands": 9,
+        "engineMs": 265,
+        "preparationMs": 19867,
+        "commandMs": 6337,
+        "totalMs": 28513
+      },
+      "terminationVerified": true,
+      "sourceVersion": "7.3.0"
+    },
+    {
+      "case": "case-c",
+      "baseline": "passed",
+      "engine": "StrykerJS instrumenter 10.0.0",
+      "engineExecuted": true,
+      "selected": {
+        "file": "index.js",
+        "operator": "StringLiteral",
+        "diff": "--- a/index.js\n+++ b/index.js\n@@ 211:20 @@\n-'predicate must be a function'\n+\"\"",
+        "status": "passed"
+      },
+      "baselineProjectChecks": [
+        {
+          "command": "npm test",
+          "exit": 0
+        }
+      ],
+      "evaluatorBaselineExit": 0,
+      "evaluatorMutantExit": 0,
+      "evaluatorScenario": "import assert from 'node:assert/strict';import Denque from './index.js';const q=new Denque([1]);assert.throws(()=>q.removeWhere(null),Error);assert.deepEqual(q.toArray(),[1]);",
+      "evaluatorFailure": "",
+      "cost": {
+        "commands": 9,
+        "engineMs": 259,
+        "preparationMs": 2974,
+        "commandMs": 4268,
+        "totalMs": 7882
+      },
+      "terminationVerified": true,
+      "sourceVersion": "2.1.0"
+    }
+  ],
+  "rejectedPreparationCandidate": {
+    "project": "quick-lru",
+    "historicalPatch": 38,
+    "reason": "All eight first variants rejected by its supplemental tests",
+    "cost": {
+      "commands": 9,
+      "engineMs": 318,
+      "preparationMs": 19540,
+      "commandMs": 6510,
+      "totalMs": 28345
+    }
+  },
+  "limitations": [
+    "Full verifier PROCESS_CONTAINMENT_UNAVAILABLE remains separate; not rerun or bypassed",
+    "B deliberately omits historical added runtime tests while preserving the upstream suite"
+  ],
+  "preparationCorrections": [
+    "Corrected an initially mis-specified existing toolchain path before provider calls",
+    "Transport fixture required loopback permission and a fresh result directory"
+  ]
+}

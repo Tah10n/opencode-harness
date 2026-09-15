@@ -1,0 +1,517 @@
+{
+  "provider": {
+    "all": {
+      "observedRequests": 938,
+      "forwarded": 938,
+      "notForwarded": 0,
+      "requestsWithSomeUsage": 936,
+      "requestsWithoutUsage": 2,
+      "usage": {
+        "input_tokens": {
+          "knownSum": 30984489,
+          "knownRequests": 936,
+          "unknownRequests": 2
+        },
+        "output_tokens": {
+          "knownSum": 494754,
+          "knownRequests": 936,
+          "unknownRequests": 2
+        },
+        "total_tokens": {
+          "knownSum": 31479243,
+          "knownRequests": 936,
+          "unknownRequests": 2
+        },
+        "cached_tokens": {
+          "knownSum": 9928704,
+          "knownRequests": 936,
+          "unknownRequests": 2
+        },
+        "reasoning_tokens": {
+          "knownSum": 286864,
+          "knownRequests": 936,
+          "unknownRequests": 2
+        }
+      },
+      "ownDeadlineCancellations": 1,
+      "unfinishedTransportStreams": 4,
+      "unknownServerCompletion": 2,
+      "terminalResponseDespiteTransportAbort": [
+        {
+          "slot": 18,
+          "requestIndex": 10,
+          "responseStatus": "completed",
+          "error": "AbortError"
+        },
+        {
+          "slot": 22,
+          "requestIndex": 10,
+          "responseStatus": "completed",
+          "error": "AbortError"
+        }
+      ],
+      "refusals": [],
+      "modelEffortCombinations": [
+        "gpt-5.6-luna/high"
+      ]
+    },
+    "byPeriod": {
+      "before": {
+        "observedRequests": 405,
+        "forwarded": 405,
+        "notForwarded": 0,
+        "requestsWithSomeUsage": 404,
+        "requestsWithoutUsage": 1,
+        "usage": {
+          "input_tokens": {
+            "knownSum": 12944112,
+            "knownRequests": 404,
+            "unknownRequests": 1
+          },
+          "output_tokens": {
+            "knownSum": 212400,
+            "knownRequests": 404,
+            "unknownRequests": 1
+          },
+          "total_tokens": {
+            "knownSum": 13156512,
+            "knownRequests": 404,
+            "unknownRequests": 1
+          },
+          "cached_tokens": {
+            "knownSum": 4583424,
+            "knownRequests": 404,
+            "unknownRequests": 1
+          },
+          "reasoning_tokens": {
+            "knownSum": 119393,
+            "knownRequests": 404,
+            "unknownRequests": 1
+          }
+        },
+        "ownDeadlineCancellations": 1,
+        "unfinishedTransportStreams": 2,
+        "unknownServerCompletion": 1,
+        "terminalResponseDespiteTransportAbort": [
+          {
+            "slot": 18,
+            "requestIndex": 10,
+            "responseStatus": "completed",
+            "error": "AbortError"
+          }
+        ],
+        "refusals": [],
+        "modelEffortCombinations": [
+          "gpt-5.6-luna/high"
+        ]
+      },
+      "after": {
+        "observedRequests": 533,
+        "forwarded": 533,
+        "notForwarded": 0,
+        "requestsWithSomeUsage": 532,
+        "requestsWithoutUsage": 1,
+        "usage": {
+          "input_tokens": {
+            "knownSum": 18040377,
+            "knownRequests": 532,
+            "unknownRequests": 1
+          },
+          "output_tokens": {
+            "knownSum": 282354,
+            "knownRequests": 532,
+            "unknownRequests": 1
+          },
+          "total_tokens": {
+            "knownSum": 18322731,
+            "knownRequests": 532,
+            "unknownRequests": 1
+          },
+          "cached_tokens": {
+            "knownSum": 5345280,
+            "knownRequests": 532,
+            "unknownRequests": 1
+          },
+          "reasoning_tokens": {
+            "knownSum": 167471,
+            "knownRequests": 532,
+            "unknownRequests": 1
+          }
+        },
+        "ownDeadlineCancellations": 0,
+        "unfinishedTransportStreams": 2,
+        "unknownServerCompletion": 1,
+        "terminalResponseDespiteTransportAbort": [
+          {
+            "slot": 22,
+            "requestIndex": 10,
+            "responseStatus": "completed",
+            "error": "AbortError"
+          }
+        ],
+        "refusals": [],
+        "modelEffortCombinations": [
+          "gpt-5.6-luna/high"
+        ]
+      }
+    },
+    "byArm": {
+      "P": {
+        "observedRequests": 447,
+        "forwarded": 447,
+        "notForwarded": 0,
+        "requestsWithSomeUsage": 445,
+        "requestsWithoutUsage": 2,
+        "usage": {
+          "input_tokens": {
+            "knownSum": 14296301,
+            "knownRequests": 445,
+            "unknownRequests": 2
+          },
+          "output_tokens": {
+            "knownSum": 248420,
+            "knownRequests": 445,
+            "unknownRequests": 2
+          },
+          "total_tokens": {
+            "knownSum": 14544721,
+            "knownRequests": 445,
+            "unknownRequests": 2
+          },
+          "cached_tokens": {
+            "knownSum": 4506624,
+            "knownRequests": 445,
+            "unknownRequests": 2
+          },
+          "reasoning_tokens": {
+            "knownSum": 144114,
+            "knownRequests": 445,
+            "unknownRequests": 2
+          }
+        },
+        "ownDeadlineCancellations": 1,
+        "unfinishedTransportStreams": 2,
+        "unknownServerCompletion": 2,
+        "terminalResponseDespiteTransportAbort": [],
+        "refusals": [],
+        "modelEffortCombinations": [
+          "gpt-5.6-luna/high"
+        ]
+      },
+      "H00": {
+        "observedRequests": 491,
+        "forwarded": 491,
+        "notForwarded": 0,
+        "requestsWithSomeUsage": 491,
+        "requestsWithoutUsage": 0,
+        "usage": {
+          "input_tokens": {
+            "knownSum": 16688188,
+            "knownRequests": 491,
+            "unknownRequests": 0
+          },
+          "output_tokens": {
+            "knownSum": 246334,
+            "knownRequests": 491,
+            "unknownRequests": 0
+          },
+          "total_tokens": {
+            "knownSum": 16934522,
+            "knownRequests": 491,
+            "unknownRequests": 0
+          },
+          "cached_tokens": {
+            "knownSum": 5422080,
+            "knownRequests": 491,
+            "unknownRequests": 0
+          },
+          "reasoning_tokens": {
+            "knownSum": 142750,
+            "knownRequests": 491,
+            "unknownRequests": 0
+          }
+        },
+        "ownDeadlineCancellations": 0,
+        "unfinishedTransportStreams": 2,
+        "unknownServerCompletion": 0,
+        "terminalResponseDespiteTransportAbort": [
+          {
+            "slot": 18,
+            "requestIndex": 10,
+            "responseStatus": "completed",
+            "error": "AbortError"
+          },
+          {
+            "slot": 22,
+            "requestIndex": 10,
+            "responseStatus": "completed",
+            "error": "AbortError"
+          }
+        ],
+        "refusals": [],
+        "modelEffortCombinations": [
+          "gpt-5.6-luna/high"
+        ]
+      }
+    },
+    "byRequestKind": {
+      "work": {
+        "observedRequests": 896,
+        "forwarded": 896,
+        "notForwarded": 0,
+        "requestsWithSomeUsage": 894,
+        "requestsWithoutUsage": 2,
+        "usage": {
+          "input_tokens": {
+            "knownSum": 30954795,
+            "knownRequests": 894,
+            "unknownRequests": 2
+          },
+          "output_tokens": {
+            "knownSum": 491671,
+            "knownRequests": 894,
+            "unknownRequests": 2
+          },
+          "total_tokens": {
+            "knownSum": 31446466,
+            "knownRequests": 894,
+            "unknownRequests": 2
+          },
+          "cached_tokens": {
+            "knownSum": 9928704,
+            "knownRequests": 894,
+            "unknownRequests": 2
+          },
+          "reasoning_tokens": {
+            "knownSum": 284277,
+            "knownRequests": 894,
+            "unknownRequests": 2
+          }
+        },
+        "ownDeadlineCancellations": 1,
+        "unfinishedTransportStreams": 4,
+        "unknownServerCompletion": 2,
+        "terminalResponseDespiteTransportAbort": [
+          {
+            "slot": 18,
+            "requestIndex": 10,
+            "responseStatus": "completed",
+            "error": "AbortError"
+          },
+          {
+            "slot": 22,
+            "requestIndex": 10,
+            "responseStatus": "completed",
+            "error": "AbortError"
+          }
+        ],
+        "refusals": [],
+        "modelEffortCombinations": [
+          "gpt-5.6-luna/high"
+        ]
+      },
+      "title": {
+        "observedRequests": 42,
+        "forwarded": 42,
+        "notForwarded": 0,
+        "requestsWithSomeUsage": 42,
+        "requestsWithoutUsage": 0,
+        "usage": {
+          "input_tokens": {
+            "knownSum": 29694,
+            "knownRequests": 42,
+            "unknownRequests": 0
+          },
+          "output_tokens": {
+            "knownSum": 3083,
+            "knownRequests": 42,
+            "unknownRequests": 0
+          },
+          "total_tokens": {
+            "knownSum": 32777,
+            "knownRequests": 42,
+            "unknownRequests": 0
+          },
+          "cached_tokens": {
+            "knownSum": 0,
+            "knownRequests": 42,
+            "unknownRequests": 0
+          },
+          "reasoning_tokens": {
+            "knownSum": 2587,
+            "knownRequests": 42,
+            "unknownRequests": 0
+          }
+        },
+        "ownDeadlineCancellations": 0,
+        "unfinishedTransportStreams": 0,
+        "unknownServerCompletion": 0,
+        "terminalResponseDespiteTransportAbort": [],
+        "refusals": [],
+        "modelEffortCombinations": [
+          "gpt-5.6-luna/high"
+        ]
+      }
+    }
+  },
+  "usageByPeriod": {
+    "before": {
+      "requests": 405,
+      "requestsWithUsage": 404,
+      "unknownUsageRequests": 1,
+      "knownUsage": {
+        "input_tokens": 12944112,
+        "output_tokens": 212400,
+        "total_tokens": 13156512,
+        "cached_tokens": 4583424,
+        "reasoning_tokens": 119393
+      }
+    },
+    "after": {
+      "requests": 533,
+      "requestsWithUsage": 532,
+      "unknownUsageRequests": 1,
+      "knownUsage": {
+        "input_tokens": 18040377,
+        "output_tokens": 282354,
+        "total_tokens": 18322731,
+        "cached_tokens": 5345280,
+        "reasoning_tokens": 167471
+      }
+    }
+  },
+  "usageByArm": {
+    "P": {
+      "requests": 447,
+      "requestsWithUsage": 445,
+      "unknownUsageRequests": 2,
+      "knownUsage": {
+        "input_tokens": 14296301,
+        "output_tokens": 248420,
+        "total_tokens": 14544721,
+        "cached_tokens": 4506624,
+        "reasoning_tokens": 144114
+      }
+    },
+    "H00": {
+      "requests": 491,
+      "requestsWithUsage": 491,
+      "unknownUsageRequests": 0,
+      "knownUsage": {
+        "input_tokens": 16688188,
+        "output_tokens": 246334,
+        "total_tokens": 16934522,
+        "cached_tokens": 5422080,
+        "reasoning_tokens": 142750
+      }
+    }
+  },
+  "usageByPeriodAndArm": {
+    "before": {
+      "P": {
+        "requests": 201,
+        "requestsWithUsage": 200,
+        "unknownUsageRequests": 1,
+        "knownUsage": {
+          "input_tokens": 6225686,
+          "output_tokens": 104804,
+          "total_tokens": 6330490,
+          "cached_tokens": 2231808,
+          "reasoning_tokens": 56575
+        }
+      },
+      "H00": {
+        "requests": 204,
+        "requestsWithUsage": 204,
+        "unknownUsageRequests": 0,
+        "knownUsage": {
+          "input_tokens": 6718426,
+          "output_tokens": 107596,
+          "total_tokens": 6826022,
+          "cached_tokens": 2351616,
+          "reasoning_tokens": 62818
+        }
+      }
+    },
+    "after": {
+      "P": {
+        "requests": 246,
+        "requestsWithUsage": 245,
+        "unknownUsageRequests": 1,
+        "knownUsage": {
+          "input_tokens": 8070615,
+          "output_tokens": 143616,
+          "total_tokens": 8214231,
+          "cached_tokens": 2274816,
+          "reasoning_tokens": 87539
+        }
+      },
+      "H00": {
+        "requests": 287,
+        "requestsWithUsage": 287,
+        "unknownUsageRequests": 0,
+        "knownUsage": {
+          "input_tokens": 9969762,
+          "output_tokens": 138738,
+          "total_tokens": 10108500,
+          "cached_tokens": 3070464,
+          "reasoning_tokens": 79932
+        }
+      }
+    }
+  },
+  "perRequestAccounting": "provider-accounting.json",
+  "historicalCosts": "../costs.json",
+  "amendmentPreparation": {
+    "orchestratorCheckpoint": {
+      "tokensUsed": 76983,
+      "timeUsedSeconds": 800,
+      "scope": "Current amendment goal before new provider calls; separate from Luna usage."
+    },
+    "scriptedProcessFixturePasses": 2,
+    "scriptedProviderRequestsAcrossBothPasses": 88,
+    "realProviderRequests": 0,
+    "note": "Both process-fixture executions are preparation only. Initial run was followed by one review/remediation and final verification."
+  },
+  "postExecutionEvaluation": {
+    "modelFreeProjectCheckInvocations": 89,
+    "summedElapsedMs": 398414,
+    "nonzeroExits": 29,
+    "supersededDiagnosticInvocations": 6,
+    "allLocalTerminationsAndContainerRemovalVerified": true,
+    "realProviderRequests": 0,
+    "checks": "verification.json",
+    "scope": "Includes expected diagnostic failures and the retained superseded TTL mutation; nonzero exits are not a defect count. All run after author execution stopped."
+  },
+  "ordinaryPatchApplication": {
+    "sourcePatches": 24,
+    "actualNativeTerminalPatches": 9,
+    "authorBytesModesVerified": true,
+    "separatelyTimed": false
+  },
+  "hostTypeChecks": {
+    "deliveredConsumers": 2,
+    "normalizedContextConsumers": 6,
+    "compiler": "TypeScript 6.0.3",
+    "scope": "Same independent host compiler as calibration; separate from Linux runtime tests."
+  },
+  "orchestrator": {
+    "preFirstNewProviderRequest": {
+      "tokensUsed": 76983,
+      "timeUsedSeconds": 800,
+      "scope": "Current amendment goal before new provider calls; separate from Luna usage."
+    },
+    "nearReportAssembly": {
+      "tokensUsed": 739523,
+      "timeUsedSeconds": 9460
+    },
+    "scope": "Current amendment goal tracker checkpoint lower bound, distinct from Luna usage and prior-goal costs; not a monetary invoice."
+  },
+  "caveats": [
+    "Two unknown-usage requests remain unknown: historical slot9 and new slot42 request6. Known sums are lower bounds, never zero-filled totals.",
+    "Cached tokens are included in input; reasoning tokens in output. Do not add them again.",
+    "OAuth metadata provides no reliable monetary charge.",
+    "Slot time includes early stops and deadline imbalance; it does not identify comparative speed.",
+    "Preparation, host compilation and patch application have no complete separate timing; elapsed sums are not wall-clock or complete resource invoices."
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "alternative": {
+    "src/points.mjs": "function xy(p){const a=p instanceof Array?[...p]:[p.x,p.y];if(a.length!==2||!a.every(Number.isFinite))throw new TypeError('point');return a;}export function distance(a,b){const x=xy(a),y=xy(b);return Math.hypot(y[0]-x[0],y[1]-x[1]);}export function length(points){if(points.length===1)xy(points[0]);let n=0;for(let i=1;i<points.length;i++)n+=distance(points[i-1],points[i]);return n;}"
+  },
+  "mutants": [
+    {
+      "name": "skip-singleton-validation",
+      "file": "src/points.mjs",
+      "replacement": "function xy(p){const a=Array.isArray(p)?p:[p.x,p.y];if(a.length!==2||!a.every(Number.isFinite))throw new TypeError('point');return a;}export function distance(a,b){const x=xy(a),y=xy(b);return Math.hypot(y[0]-x[0],y[1]-x[1]);}export function length(points){let n=0;for(let i=1;i<points.length;i++)n+=distance(points[i-1],points[i]);return n;}"
+    }
+  ]
+}

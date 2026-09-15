@@ -1,0 +1,224 @@
+{
+  "modelRuns": {
+    "attempts": 4,
+    "providerRequests": 69,
+    "unknownUsageRequests": 0,
+    "inputTokens": 1802104,
+    "outputTokens": 25604,
+    "totalTokens": 1827708,
+    "cachedInputTokens": 778240,
+    "reasoningTokens": 15373,
+    "toolCalls": 141,
+    "diagnosticCalls": 4,
+    "executionElapsedMs": 678795,
+    "cleanupElapsedMs": 230,
+    "preparationAndCaptureElapsedMs": 13459
+  },
+  "authorDiagnostics": {
+    "commands": 36,
+    "engineMs": 1346,
+    "preparationMs": 21734,
+    "commandMs": 20169,
+    "totalMs": 44746
+  },
+  "offlineVerification": {
+    "ordinaryAndIndependentMs": 8596,
+    "sensitivity": [
+      {
+        "case": "case-1",
+        "arm": "S0",
+        "cost": {
+          "commands": 9,
+          "engineMs": 254,
+          "preparationMs": 3011,
+          "commandMs": 4659,
+          "totalMs": 8309
+        }
+      },
+      {
+        "case": "case-1",
+        "arm": "S1",
+        "cost": {
+          "commands": 9,
+          "engineMs": 240,
+          "preparationMs": 3010,
+          "commandMs": 4651,
+          "totalMs": 8283
+        }
+      },
+      {
+        "case": "case-2",
+        "arm": "S1",
+        "cost": {
+          "commands": 9,
+          "engineMs": 249,
+          "preparationMs": 2988,
+          "commandMs": 4149,
+          "totalMs": 7776
+        }
+      },
+      {
+        "case": "case-2",
+        "arm": "S0",
+        "cost": {
+          "commands": 9,
+          "engineMs": 262,
+          "preparationMs": 2937,
+          "commandMs": 4189,
+          "totalMs": 7758
+        }
+      }
+    ]
+  },
+  "preparationAdmission": [
+    {
+      "case": "case-1",
+      "cost": {
+        "commands": 9,
+        "engineMs": 389,
+        "preparationMs": 4366,
+        "commandMs": 5348,
+        "totalMs": 10617
+      }
+    },
+    {
+      "case": "case-2",
+      "cost": {
+        "commands": 9,
+        "engineMs": 331,
+        "preparationMs": 3714,
+        "commandMs": 4598,
+        "totalMs": 9108
+      }
+    }
+  ],
+  "scope": "Cache and reasoning are subsets, not added again. Diagnostic execution is inside native elapsed time. Offline checks are separate and not author actions.",
+  "installedPreflight": {
+    "runs": [
+      {
+        "name": "preflight-H1",
+        "exitCode": 0,
+        "signal": null,
+        "termination": {
+          "terminationVerified": true,
+          "killed": []
+        },
+        "timedOut": false,
+        "stopReason": null,
+        "researchBoundary": "not-reached",
+        "completedAt": 1789405436873,
+        "executionElapsedMs": 6034,
+        "cleanupElapsedMs": 54,
+        "elapsedMs": 6088,
+        "parseErrors": 0,
+        "fixturePassed": true
+      },
+      {
+        "name": "preflight-cancel-H1",
+        "exitCode": null,
+        "signal": "SIGKILL",
+        "termination": {
+          "terminationVerified": true,
+          "killed": [
+            1055,
+            1077,
+            1078,
+            1084,
+            43
+          ]
+        },
+        "timedOut": false,
+        "stopReason": {
+          "kind": "cancelled",
+          "name": "AbortError",
+          "message": "This operation was aborted"
+        },
+        "researchBoundary": "not-reached",
+        "completedAt": 1789405608480,
+        "executionElapsedMs": 3286,
+        "cleanupElapsedMs": 69,
+        "elapsedMs": 3355,
+        "parseErrors": 0,
+        "fixturePassed": true
+      },
+      {
+        "name": "preflight-denque-H1",
+        "exitCode": 0,
+        "signal": null,
+        "termination": {
+          "terminationVerified": true,
+          "killed": []
+        },
+        "timedOut": false,
+        "stopReason": null,
+        "researchBoundary": "not-reached",
+        "completedAt": 1789405563395,
+        "executionElapsedMs": 2538,
+        "cleanupElapsedMs": 53,
+        "elapsedMs": 2591,
+        "parseErrors": 0,
+        "fixturePassed": false
+      },
+      {
+        "name": "preflight-denque-final-H1",
+        "exitCode": 0,
+        "signal": null,
+        "termination": {
+          "terminationVerified": true,
+          "killed": []
+        },
+        "timedOut": false,
+        "stopReason": null,
+        "researchBoundary": "not-reached",
+        "completedAt": 1789405729699,
+        "executionElapsedMs": 22641,
+        "cleanupElapsedMs": 52,
+        "elapsedMs": 22693,
+        "parseErrors": 0,
+        "fixturePassed": true
+      },
+      {
+        "name": "preflight-denque-fixed-H1",
+        "exitCode": 0,
+        "signal": null,
+        "termination": {
+          "terminationVerified": true,
+          "killed": []
+        },
+        "timedOut": false,
+        "stopReason": null,
+        "researchBoundary": "not-reached",
+        "completedAt": 1789405648267,
+        "executionElapsedMs": 2944,
+        "cleanupElapsedMs": 54,
+        "elapsedMs": 2998,
+        "parseErrors": 0,
+        "fixturePassed": false
+      },
+      {
+        "name": "preflight-module-final-H1",
+        "exitCode": 0,
+        "signal": null,
+        "termination": {
+          "terminationVerified": true,
+          "killed": []
+        },
+        "timedOut": false,
+        "stopReason": null,
+        "researchBoundary": "not-reached",
+        "completedAt": 1789405829652,
+        "executionElapsedMs": 6292,
+        "cleanupElapsedMs": 55,
+        "elapsedMs": 6347,
+        "parseErrors": 0,
+        "fixturePassed": true
+      }
+    ],
+    "deliveryMs": 6347,
+    "knownExampleMs": 22693,
+    "cancellationMs": 3355,
+    "realProviderRequests": 0
+  },
+  "aggregateDeveloperPreparationMs": null,
+  "monetaryCost": null
+}

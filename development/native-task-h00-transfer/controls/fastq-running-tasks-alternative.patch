@@ -1,0 +1,84 @@
+diff --git a/README.md b/README.md
+index b44cce3..a76b966 100644
+--- a/README.md
++++ b/README.md
+@@ -308,3 +308,8 @@ ISC
+ [ci-url]: https://github.com/mcollina/fastq/workflows/ci/badge.svg
+ [npm-badge]: https://badge.fury.io/js/fastq.svg
+ [npm-url]: https://badge.fury.io/js/fastq
++
++
++## fastq-running-tasks
++
++The API provides runningTasks(): T[] to callback and promise queues, returning a fresh shallow snapshot of task values whose worker has started and has not called its completion callback (or settled its worker promise). Preserve start order within the snapshot and duplicates, including undefined values. At entry to a task completion callback its value must already be absent from runningTasks. Queued or paused work is excluded until actually started. Cover direct push/unshift, promotion from the queue, resume and concurrency changes. Task object pooling must not corrupt a previously returned snapshot or retain completed values. Keep running(), getQueue(), error/callback receivers, results, rejection, drain and existing scheduling behavior unchanged.
+diff --git a/index.d.ts b/index.d.ts
+index 262dd04..d30412b 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -16,6 +16,7 @@ declare namespace fastq {
+     pause(): any
+     /** Resume the processing of tasks. */
+     resume(): any
++    runningTasks(): T[]
+     running(): number
+     /** Returns `false` if there are tasks being processed or waiting to be processed. `true` otherwise. */
+     idle(): boolean
+diff --git a/queue.js b/queue.js
+index e1d56c5..b66cdaa 100644
+--- a/queue.js
++++ b/queue.js
+@@ -15,6 +15,17 @@ function fastqueue (context, worker, _concurrency) {
+     throw new Error('fastqueue concurrency must be equal to or greater than 1')
+   }
+ 
++  var active = new Map()
++  var originalWorker = worker
++  worker = function (value, done) {
++    var token = { value: value }
++    active.set(token, value)
++    originalWorker.call(this, value, function (err, result) {
++      active.delete(token)
++      done(err, result)
++    })
++  }
++
+   var cache = reusify(Task)
+   var queueHead = null
+   var queueTail = null
+@@ -44,6 +55,7 @@ function fastqueue (context, worker, _concurrency) {
+       }
+     },
+ 
++    runningTasks: function () { return Array.from(active.values()) },
+     running: running,
+     resume: resume,
+     idle: idle,
+diff --git a/test/example.ts b/test/example.ts
+index a47d441..caeb0ff 100644
+--- a/test/example.ts
++++ b/test/example.ts
+@@ -81,3 +81,6 @@ async function run () {
+ }
+ 
+ run()
++
++const addedQueue = fastq.promise(async (value: string) => value, 1);
++const snapshot: string[] = addedQueue.runningTasks();
+diff --git a/test/test.js b/test/test.js
+index c59e8c3..61fe031 100644
+--- a/test/test.js
++++ b/test/test.js
+@@ -806,3 +806,13 @@ test('abort with error handler', function (t) {
+     })
+   }
+ })
++
++var A = require('assert').strict
++var api = require('../')
++test('new public contract', function (t) {
++  ;(async function () {
++    const done = []; const q = api((v, cb) => done.push(cb), 2); const obj = {}; q.push(obj); q.unshift(undefined); q.push(obj); A.deepEqual(q.runningTasks(), [obj, undefined]); A.deepEqual(q.getQueue(), [obj]); const snap = q.runningTasks(); snap.length = 0; A.equal(q.runningTasks().length, 2); done[1](null); A.deepEqual(q.runningTasks(), [obj, obj]); done[0](new Error('expected')); A.deepEqual(q.runningTasks(), [obj]); done[2](null); A.deepEqual(q.runningTasks(), [])
++    q.pause(); q.push(1, () => A.deepEqual(q.runningTasks(), [2])); q.push(2); A.deepEqual(q.runningTasks(), []); q.resume(); A.deepEqual(q.runningTasks(), [1, 2]); done[3](null); done[4](null); q.concurrency = 1; q.push(3); q.push(4); q.concurrency = 2; A.deepEqual(q.runningTasks(), [3, 4]); done[5](null); done[6](null)
++    let resolveFirst, rejectSecond; const p = api.promise(v => new Promise((resolve, reject) => { if (v === 1)resolveFirst = resolve; else rejectSecond = reject }), 1); const one = p.push(1); const two = p.push(2); A.deepEqual(p.runningTasks(), [1]); resolveFirst(8); A.equal(await one, 8); A.deepEqual(p.runningTasks(), [2]); const failure = {}; rejectSecond(failure); await A.rejects(two, e => e === failure); A.deepEqual(p.runningTasks(), [])
++  })().then(function () { t.end() }, function (error) { t.fail(error.stack); t.end() })
++})

@@ -1,0 +1,120 @@
+{
+  "denominator": 6,
+  "contrasts": {
+    "H11-P": {
+      "deltas": [
+        0,
+        1,
+        1,
+        1,
+        0,
+        0
+      ],
+      "mean": 0.5,
+      "wins": 3,
+      "losses": 0,
+      "ties": 3
+    },
+    "H00-P": {
+      "deltas": [
+        0,
+        1,
+        1,
+        1,
+        0,
+        0
+      ],
+      "mean": 0.5,
+      "wins": 3,
+      "losses": 0,
+      "ties": 3
+    },
+    "H10-H00": {
+      "deltas": [
+        0,
+        0,
+        0,
+        -1,
+        0,
+        0
+      ],
+      "mean": -0.16666666666666666,
+      "wins": 0,
+      "losses": 1,
+      "ties": 5
+    },
+    "H01-H00": {
+      "deltas": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mean": 0,
+      "wins": 0,
+      "losses": 0,
+      "ties": 6
+    },
+    "H11-H01": {
+      "deltas": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mean": 0,
+      "wins": 0,
+      "losses": 0,
+      "ties": 6
+    },
+    "H11-H10": {
+      "deltas": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "mean": 0.16666666666666666,
+      "wins": 1,
+      "losses": 0,
+      "ties": 5
+    }
+  },
+  "interaction": {
+    "perTask": [
+      {
+        "task": "limit-function-controls",
+        "I": 0
+      },
+      {
+        "task": "bind-methods-atomic",
+        "I": 0
+      },
+      {
+        "task": "abortable-queue-waiters",
+        "I": 0
+      },
+      {
+        "task": "clear-queue-reason",
+        "I": 1
+      },
+      {
+        "task": "listener-count-deduplicate",
+        "I": 0
+      },
+      {
+        "task": "clear-queue-count",
+        "I": 0
+      }
+    ],
+    "mean": 0.16666666666666666
+  },
+  "descriptiveOnly": true,
+  "transferGate": "Manual frozen gate review still required; no automatic new runs"
+}

@@ -1,0 +1,38 @@
+[
+  {
+    "id": "b62c8c4f27b5",
+    "mutation": "After an actual clear, a newly queued batch retains first receiver/arguments instead of latest. Before-clear paths, rejection/count logic, active work and types remain unchanged.",
+    "deliveredTestExit": 0,
+    "independentExit": 1,
+    "realProviderRequests": 0,
+    "controlPatch": "sensitivity/transfer-latest-reuse-b62c8c4f27b5.patch",
+    "appliesAfterDeliveredPatch": true
+  },
+  {
+    "id": "0251e18a1cea",
+    "mutation": "After an actual clear, a newly queued batch retains first receiver/arguments instead of latest. Before-clear paths, rejection/count logic, active work and types remain unchanged.",
+    "deliveredTestExit": 1,
+    "independentExit": 1,
+    "realProviderRequests": 0,
+    "controlPatch": "sensitivity/transfer-latest-reuse-0251e18a1cea.patch",
+    "appliesAfterDeliveredPatch": true
+  },
+  {
+    "id": "1637e24ede3b",
+    "mutation": "After a real nonempty clear, errors from active initial or later queued execution are swallowed. Default/no-clear errors, queued rejection reasons/counts and successful results stay unchanged.",
+    "deliveredTestExit": 0,
+    "independentExit": 1,
+    "realProviderRequests": 0,
+    "controlPatch": "sensitivity/transfer-active-error-1637e24ede3b.patch",
+    "appliesAfterDeliveredPatch": true
+  },
+  {
+    "id": "0251e18a1cea",
+    "mutation": "After a real nonempty clear, errors from active initial or later queued execution are swallowed. Default/no-clear errors, queued rejection reasons/counts and successful results stay unchanged.",
+    "deliveredTestExit": 1,
+    "independentExit": 1,
+    "realProviderRequests": 0,
+    "controlPatch": "sensitivity/transfer-active-error-0251e18a1cea.patch",
+    "appliesAfterDeliveredPatch": true
+  }
+]

@@ -1,0 +1,3 @@
+# node-callback-abort
+
+createReader wraps error-first readFile. read(path,callback) remains valid; read(path,{signal},callback) adds native cancellation. It returns undefined and delivers exactly two callback arguments at most once with identities intact. Pre-abort notifies synchronously without I/O/listener; active abort delivers reason/undefined and ignores late callbacks. Underlying I/O itself is not cancelled or retried. Listener is removed before delivery; first underlying completion wins over later abort. Sync readFile/user callback throws retain identity with cleanup and no synthetic callback. Missing callback is TypeError before I/O. Calls are independent. Run npm test.

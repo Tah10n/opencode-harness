@@ -1,0 +1,1 @@
+export function createSession(created,idle,maxAge){return {created,lastSeen:created,idle,maxAge};}export function expires(s){return s.lastSeen+s.idle;}export function touch(s,now){return {active:true,state:{...s,lastSeen:now}};}export function serialize(s){return JSON.stringify(s);}export function restore(text){return JSON.parse(text);}

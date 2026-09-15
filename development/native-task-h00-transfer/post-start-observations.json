@@ -1,0 +1,59 @@
+[
+  {
+    "observedAt": "2026-09-13T20:21:00.485485+00:00",
+    "kind": "calibration-coverage-gap",
+    "task": "denque-rotate",
+    "frozenRequirement": "Required delivered regressions include object identity surviving rotation.",
+    "evidence": "The frozen runtime case shifts object o out of c before nontrivial c.rotate(-1), and checks object identity only after unshift or singleton no-op. full-controls.mjs embeds that case unchanged into reference/alternative ordinary regressions. Thus reference tests do not distinguish cloning object entries only during nontrivial rotations.",
+    "effect": "Pre-start calibration did not fully validate this required test discrimination. Candidate runtime and author instructions remain unchanged. Do not represent calibrated full controls as proof of complete regression coverage.",
+    "action": "Preserve original controls/evaluator/freeze. After scored execution, check this exact pre-existing requirement through neutral manual review and narrowly scoped test sensitivity on independent copies, applied to both arms and both control variants. Disclose limitation and preserve original outcomes; no request replay or task replacement.",
+    "acceptanceChange": false
+  },
+  {
+    "observedAt": "2026-09-13T20:54:24.726790+00:00",
+    "kind": "capture-to-source-projection",
+    "evidence": "Neutral cf57afd4f2c6 raw patch deletes package-lock.json. git ls-tree at frozen fastq fe2d23196a005810dfcbc4103b3c746cc5542430 proves it is absent; unchanged upstream .gitignore explicitly ignores package-lock.json. It is a prepared dependency artifact, not a pinned source file.",
+    "action": "Preserve raw patch.diff; portable-review-patches.mjs produces source.patch omitting only deletion of upstream-ignored generated package-lock absent from the frozen commit, uniformly across arms. Source code edits are unchanged. grade-checks uses source.patch so ordinary patch application does not depend on a preparation-only ignored file.",
+    "acceptanceChange": false,
+    "gradesBeforeCorrection": null
+  },
+  {
+    "observedAt": "2026-09-13T21:25:30.475748+00:00",
+    "kind": "evaluator-overconstraint",
+    "task": "quick-lru-prune",
+    "frozenRequirement": "Expired visible keys counted once/notified once; live iteration order retained. TASK.md does not specify relative callback order across cache generations.",
+    "evaluatorEvidence": "evaluation-cases.mjs requires ev === [[old-expired,1],[current-expired,undefined]] in that order.",
+    "observedAlternative": "Neutral source patch 80e5601c914d processes current generation before old generation, while preserving visible-key filtering and live order. This is not forbidden by the task.",
+    "action": "Do not edit frozen evaluator. Preserve original independent outcomes; after scored execution run a supplemental copy differing only in order-insensitive comparison of those two expected callback entries, uniformly for every quick-lru-prune attempt and both controls. Base quality on the frozen contract, not unsupported callback ordering. Document original and interpreted results.",
+    "acceptanceChange": false,
+    "gradesBeforeCorrection": null,
+    "confirmationLimit": "Post-outcome evaluator interpretation is disclosed; do not present the original calibrated evaluator as a complete specification."
+  },
+  {
+    "observedAt": "2026-09-13T21:31:53.051138+00:00",
+    "kind": "frozen-launcher-terminal-cancellation-misclassification",
+    "slot": 18,
+    "evidence": {
+      "lastRequest": 10,
+      "responseStatus": "completed",
+      "lastSseEvent": "response.completed",
+      "knownUsage": {
+        "input_tokens": 28740,
+        "output_tokens": 70,
+        "total_tokens": 28810,
+        "cached_tokens": 4608,
+        "reasoning_tokens": 34
+      },
+      "streamError": "AbortError",
+      "streamEnded": false,
+      "elapsedMs": 48947,
+      "ownDeadline": false,
+      "nativeExitCode": 137,
+      "localStopCaptureForwardingRemovalVerified": true
+    },
+    "diagnosis": "Frozen run-comparison catch unconditionally classifies forwarded non-own-deadline aborts as unknown_submission, even when a terminal completed response has already been parsed. It invokes stopWorkload, pauses scheduling and prevents subsequent slots. The exact cause of the client transport cancellation is not recorded; server completion for this request is known, not unknown. Native process later exited137; final stop verifier saw no remaining workload.",
+    "action": "Preserve measured launcher/candidate and original stop labels; no replay/resume or corrected mixed-version continuation. Thirty scheduled slots remain not_started. Evaluate all eighteen retained results and publish an incomplete-series report without superiority claim.",
+    "effectOnInference": "The launcher interrupted a slot and terminated the campaign early; no repetition2 exists and three tasks were never started. Full paired task/project interval is not estimable under the frozen plan.",
+    "runtimeChanged": false
+  }
+]

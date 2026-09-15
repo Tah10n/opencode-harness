@@ -1,0 +1,12 @@
+{
+  "alternative": {
+    "src/query.mjs": "export function select(tags,required){const need=Array.from(required);return tags.filter(row=>need.every(t=>row.tags.includes(t)));}export function names(tags,required){return select(tags,required).map(x=>x.name);}"
+  },
+  "mutants": [
+    {
+      "name": "OR-query",
+      "file": "src/query.mjs",
+      "replacement": "export function select(tags,required){const need=required instanceof Set?[...required]:required;return tags.filter(row=>need.some(t=>row.tags.includes(t)));}export function names(tags,required){return select(tags,required).map(x=>x.name);}"
+    }
+  ]
+}

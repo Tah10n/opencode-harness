@@ -1,0 +1,113 @@
+{
+  "id": "3375af3c39c5",
+  "task": "fastq-running-tasks",
+  "project": "fastq",
+  "Q": 0,
+  "ordinaryProjectExit": 0,
+  "originalIndependentExit": 1,
+  "interpretedIndependentExit": 1,
+  "patchApplicable": true,
+  "sourcePatchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "decision": "Full delivery does not satisfy the frozen rubric.",
+  "findings": [
+    {
+      "category": "missing-delivery",
+      "reason": "Empty source patch; requested runningTasks API and full delivery are absent."
+    }
+  ],
+  "contentReview": {
+    "id": "3375af3c39c5",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete",
+    "retainedTestsReview": "Existing regression cases remain unchanged.",
+    "task": "fastq-running-tasks",
+    "behaviorReview": "Captured source patch is empty; the requested API, regression scenarios, type API and docs are absent.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": false,
+        "evidence": "No changed or added source/test files."
+      },
+      {
+        "scenario": 2,
+        "covered": false,
+        "evidence": "No changed or added source/test files."
+      },
+      {
+        "scenario": 3,
+        "covered": false,
+        "evidence": "No changed or added source/test files."
+      }
+    ],
+    "typesReview": "No requested API or type consumer changes.",
+    "docsReview": "No requested API documentation.",
+    "contentFindings": [
+      {
+        "category": "missing-delivery",
+        "requirement": "Deliver runningTasks API and tests/types/docs.",
+        "evidence": "delivery.json changed/deleted lists are empty and source.patch has zero bytes.",
+        "impact": "The requested feature was not delivered."
+      }
+    ],
+    "recordStage": "Pre-unblinding content review; final decision is top-level Q."
+  },
+  "applicability": {
+    "id": "3375af3c39c5",
+    "task": "fastq-running-tasks",
+    "sourceCommit": "fe2d23196a005810dfcbc4103b3c746cc5542430",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "excludedPreparationArtifacts": [],
+    "types": null
+  },
+  "verificationNotes": {
+    "qualityAssignedBeforeArmMappingRead": true,
+    "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+  },
+  "slot": 9,
+  "arm": "P",
+  "D": 0,
+  "native": {
+    "completed": false,
+    "exitCode": null,
+    "signal": "SIGKILL",
+    "lastStepFinish": "tool-calls",
+    "stop": {
+      "ownTaskDeadlineTriggered": true,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": true
+    },
+    "normalHandoff": false,
+    "workflowStatus": null,
+    "terminalPatchVerification": null,
+    "finalResponseSha256": "7950243e731b47c251847128340663e1f808f3c8dd4c7be967468294cff3d9c9",
+    "finalResponseExcerpt": "I’ll trace queue state transitions, callback/promise wrappers, declarations, and existing tests first, then implement the smallest state-tracking change and add regression coverage for ordering, duplicates, pooling, pause/resume, and promise settlement.",
+    "reportFindings": []
+  },
+  "verification": [
+    {
+      "artifact": "ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 4101,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "independent/result.json",
+      "exit": 1,
+      "elapsedMs": 1725,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    }
+  ]
+}

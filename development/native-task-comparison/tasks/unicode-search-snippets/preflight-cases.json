@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/matches.mjs": "export function findMatches(text,query){if(query==='')throw new TypeError('empty');const result=[];let offset=0;while(true){const found=text.indexOf(query,offset);if(found<0)return result;const start=[...text.slice(0,found)].length;result.push({start,end:start+[...query].length});offset=found+query.length;}}\n"
+  },
+  "mutants": [
+    {
+      "name": "utf16-end",
+      "file": "src/matches.mjs",
+      "replacement": "export function findMatches(text,query){if(!query)throw new TypeError('empty query');const t=Array.from(text),q=Array.from(query),out=[];for(let i=0;i<=t.length-q.length;){if(q.every((c,j)=>c===t[i+j])){out.push({start:i,end:i+query.length});i+=q.length;}else i++;}return out;}\n"
+    },
+    {
+      "name": "utf16-context",
+      "file": "src/snippets.mjs",
+      "replacement": "import {findMatches} from './matches.mjs';export function snippets(text,query,context=0){const points=text;return findMatches(text,query).map(({start,end})=>({start,end,excerpt:points.slice(Math.max(0,start-context),end+context)}));}\n"
+    }
+  ]
+}

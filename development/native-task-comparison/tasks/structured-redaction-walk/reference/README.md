@@ -1,0 +1,3 @@
+# structured-redaction-walk
+
+redact delegates graph copying to copyRedacted, default case-insensitive password/token keys, custom keys/mask; never searches value strings. copyRedacted calls key predicate for own object properties only, array indices bypass; replaced subtree not traversed. Distinct objects visited once; cycles/shared aliases preserved in fresh containers, null/ordinary prototypes and own __proto__ safe. Scalars retained, frozen source untouched, output properties ordinary writable/enumerable/configurable. Predicate undefined thisArg; cross-object order unspecified, each object's Object.keys order retained. Data-only dense arrays/plain objects<=10000/depth100, no getters/symbols/exotic types; mask/replacement strings. Run npm test.

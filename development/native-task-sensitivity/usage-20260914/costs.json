@@ -1,0 +1,173 @@
+{
+  "modelRuns": {
+    "attempts": 2,
+    "providerRequests": 38,
+    "unknownUsageRequests": 2,
+    "inputTokens": 996645,
+    "outputTokens": 12006,
+    "totalTokens": 1008651,
+    "cachedInputTokens": 629248,
+    "reasoningTokens": 6980,
+    "toolCalls": 67,
+    "diagnosticCalls": 2,
+    "executionElapsedMs": 416026,
+    "cleanupElapsedMs": 130,
+    "preparationAndCaptureElapsedMs": 5358
+  },
+  "authorDiagnostics": {
+    "commands": 18,
+    "engineMs": 570,
+    "preparationMs": 9349,
+    "commandMs": 9713,
+    "totalMs": 20379
+  },
+  "offlineVerification": {
+    "ordinaryAndIndependentMs": 5294,
+    "sensitivity": [
+      {
+        "case": "case-1",
+        "cost": {
+          "commands": 9,
+          "engineMs": 284,
+          "preparationMs": 3073,
+          "commandMs": 4824,
+          "totalMs": 8561
+        }
+      },
+      {
+        "case": "case-2",
+        "cost": {
+          "commands": 9,
+          "engineMs": 258,
+          "preparationMs": 2974,
+          "commandMs": 4304,
+          "totalMs": 7935
+        }
+      }
+    ]
+  },
+  "preparationAdmission": [
+    {
+      "case": "case-1",
+      "cost": {
+        "commands": 9,
+        "engineMs": 271,
+        "preparationMs": 3096,
+        "commandMs": 5152,
+        "totalMs": 8980
+      }
+    },
+    {
+      "case": "case-2",
+      "cost": {
+        "commands": 9,
+        "engineMs": 336,
+        "preparationMs": 3063,
+        "commandMs": 4538,
+        "totalMs": 8382
+      }
+    }
+  ],
+  "scope": "Cache and reasoning are subsets, not added again. Diagnostic execution is inside native elapsed time. Offline checks are separate and not author actions.",
+  "counterexample": {
+    "exit": 0,
+    "signal": null,
+    "command": [
+      "node",
+      ".check.cjs"
+    ],
+    "elapsedMs": 642,
+    "termination": {
+      "terminationVerified": true,
+      "killed": []
+    },
+    "realProviderRequests": 0
+  },
+  "installedPreflight": {
+    "runs": [
+      {
+        "name": "preflight-H1",
+        "exitCode": 0,
+        "signal": null,
+        "termination": {
+          "terminationVerified": true,
+          "killed": []
+        },
+        "timedOut": false,
+        "stopReason": null,
+        "researchBoundary": "not-reached",
+        "completedAt": 1789397322522,
+        "executionElapsedMs": 7078,
+        "cleanupElapsedMs": 57,
+        "elapsedMs": 7135,
+        "parseErrors": 0
+      },
+      {
+        "name": "preflight-cancel-H1",
+        "exitCode": 0,
+        "signal": null,
+        "termination": {
+          "terminationVerified": true,
+          "killed": []
+        },
+        "timedOut": false,
+        "stopReason": null,
+        "researchBoundary": "not-reached",
+        "completedAt": 1789397555354,
+        "executionElapsedMs": 3805,
+        "cleanupElapsedMs": 66,
+        "elapsedMs": 3871,
+        "parseErrors": 0
+      },
+      {
+        "name": "preflight-cancel-esm-H1",
+        "exitCode": null,
+        "signal": "SIGKILL",
+        "termination": {
+          "terminationVerified": true,
+          "killed": [
+            1043,
+            1060,
+            1061,
+            1067,
+            44
+          ]
+        },
+        "timedOut": false,
+        "stopReason": {
+          "kind": "cancelled",
+          "name": "AbortError",
+          "message": "This operation was aborted"
+        },
+        "researchBoundary": "not-reached",
+        "completedAt": 1789397632773,
+        "executionElapsedMs": 3100,
+        "cleanupElapsedMs": 66,
+        "elapsedMs": 3166,
+        "parseErrors": 0
+      },
+      {
+        "name": "preflight-delivery-H1",
+        "exitCode": 0,
+        "signal": null,
+        "termination": {
+          "terminationVerified": true,
+          "killed": []
+        },
+        "timedOut": false,
+        "stopReason": null,
+        "researchBoundary": "not-reached",
+        "completedAt": 1789397640393,
+        "executionElapsedMs": 6002,
+        "cleanupElapsedMs": 51,
+        "elapsedMs": 6053,
+        "parseErrors": 0
+      }
+    ],
+    "deliveryMs": 6053,
+    "cancellationMs": 3166,
+    "realProviderRequests": 0
+  },
+  "aggregateDeveloperPreparationMs": null,
+  "monetaryCost": null
+}

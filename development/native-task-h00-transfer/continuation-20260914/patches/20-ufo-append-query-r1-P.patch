@@ -1,0 +1,202 @@
+diff --git a/README.md b/README.md
+index 4a26073..26e3d10 100644
+--- a/README.md
++++ b/README.md
+@@ -214,6 +214,19 @@ stringifyQuery({ foo: 'bar', baz: undefined })
+ 
+ ### `$URL()`
+ 
++### `appendQuery(input, query)`
++
++Appends values to the query section of the URL.
++
++Unlike `withQuery`, existing values are retained and new values are appended after them. Undefined values and empty arrays are ignored, while null and empty string values are encoded as empty query values. The `__proto__` and `constructor` keys are ignored to prevent prototype pollution.
++
++**Example:**
++
++```js
++appendQuery("/foo?tag=a&tag=b", { tag: ["c", "d"] });
++// "/foo?tag=a&tag=b&tag=c&tag=d"
++```
++
+ ### `cleanDoubleSlashes(input)`
+ 
+ Removes double slashes from the URL.
+diff --git a/src/utils.ts b/src/utils.ts
+index ea98aba..997d75a 100644
+--- a/src/utils.ts
++++ b/src/utils.ts
+@@ -1,5 +1,11 @@
+ import { parseURL, stringifyParsedURL } from "./parse";
+-import { QueryObject, parseQuery, stringifyQuery, ParsedQuery } from "./query";
++import {
++  QueryObject,
++  encodeQueryItem,
++  parseQuery,
++  stringifyQuery,
++  ParsedQuery,
++} from "./query";
+ import {
+   decode,
+   decodePath,
+@@ -352,6 +358,68 @@ export function withQuery(input: string, query: QueryObject): string {
+   return stringifyParsedURL(parsed);
+ }
+ 
++/**
++ * Appends values to the query section of the URL.
++ *
++ * Unlike `withQuery`, existing values are retained and new values are appended
++ * after them. Undefined values and empty arrays are ignored, while null and
++ * empty string values are encoded as empty query values. The `__proto__` and
++ * `constructor` keys are ignored to prevent prototype pollution.
++ *
++ * @example
++ *
++ * ```js
++ * appendQuery("/foo?tag=a&tag=b", { tag: ["c", "d"] });
++ * // "/foo?tag=a&tag=b&tag=c&tag=d"
++ * ```
++ *
++ * @group utils
++ */
++export function appendQuery(input: string, query: QueryObject): string {
++  const parsed = parseURL(input);
++  const existingQuery = parseQuery(parsed.search);
++  const queryParts: string[] = [];
++
++  const encodeNewValue = (key: string, value: QueryObject[string]) => {
++    if (Array.isArray(value)) {
++      const values = value.filter((value) => value !== undefined);
++      return values.length > 0 ? encodeQueryItem(key, values) : "";
++    }
++    return value === undefined ? "" : encodeQueryItem(key, value);
++  };
++
++  for (const key of Object.keys(existingQuery)) {
++    queryParts.push(encodeQueryItem(key, existingQuery[key]));
++    if (
++      Object.prototype.hasOwnProperty.call(query, key) &&
++      key !== "__proto__" &&
++      key !== "constructor"
++    ) {
++      const encoded = encodeNewValue(key, query[key]);
++      if (encoded) {
++        queryParts.push(encoded);
++      }
++    }
++  }
++
++  for (const key of Object.keys(query)) {
++    if (
++      key === "__proto__" ||
++      key === "constructor" ||
++      Object.prototype.hasOwnProperty.call(existingQuery, key)
++    ) {
++      continue;
++    }
++    const encoded = encodeNewValue(key, query[key]);
++    if (encoded) {
++      queryParts.push(encoded);
++    }
++  }
++
++  parsed.search = queryParts.join("&");
++  return stringifyParsedURL(parsed);
++}
++
+ /**
+  * Removes the query section of the URL.
+  *
+diff --git a/test/query.test.ts b/test/query.test.ts
+index 8ef15e4..4186003 100644
+--- a/test/query.test.ts
++++ b/test/query.test.ts
+@@ -1,5 +1,67 @@
+ import { describe, expect, test } from "vitest";
+-import { filterQuery, getQuery, withQuery } from "../src";
++import { appendQuery, filterQuery, getQuery, withQuery } from "../src";
++
++describe("appendQuery", () => {
++  test("appends repeated values without changing withQuery replacement", () => {
++    const input = "/items?tag=old-1&tag=old-2";
++    const query = { tag: ["new-1", "new-2"] };
++
++    expect(appendQuery(input, query)).toBe(
++      "/items?tag=old-1&tag=old-2&tag=new-1&tag=new-2",
++    );
++    expect(withQuery(input, query)).toBe("/items?tag=new-1&tag=new-2");
++  });
++
++  test("ignores undefined and empty arrays while retaining empty values", () => {
++    expect(
++      appendQuery("/?existing=one", {
++        existing: undefined,
++        emptyArray: [],
++        empty: "",
++        nil: null,
++        zero: 0,
++        no: false,
++      }),
++    ).toBe("/?existing=one&empty&nil&zero=0&no=false");
++  });
++
++  test("preserves URL parts, encoded keys, pollution policy, and inputs", () => {
++    const tags = ["new-1", "new-2"];
++    const query = Object.create(null) as {
++      "tag name": string[];
++      __proto__: string;
++      constructor: string;
++    };
++    query["tag name"] = tags;
++    query.__proto__ = "ignored";
++    query.constructor = "ignored";
++
++    expect(
++      appendQuery(
++        "https://example.com/items?tag%20name=old-1&tag+name=old-2&__proto__=old&constructor=old#fragment",
++        query,
++      ),
++    ).toBe(
++      "https://example.com/items?tag+name=old-1&tag+name=old-2&tag+name=new-1&tag+name=new-2#fragment",
++    );
++
++    expect(
++      appendQuery("../items?tag%20name=old-1&tag+name=old-2#fragment", {
++        "tag name": tags,
++        "added key": ["added-1", "added-2"],
++      }),
++    ).toBe(
++      "../items?tag+name=old-1&tag+name=old-2&tag+name=new-1&tag+name=new-2&added+key=added-1&added+key=added-2#fragment",
++    );
++    expect(tags).toEqual(["new-1", "new-2"]);
++    expect(query["tag name"]).toBe(tags);
++    expect(Object.keys(query)).toEqual([
++      "tag name",
++      "__proto__",
++      "constructor",
++    ]);
++  });
++});
+ 
+ describe("withQuery", () => {
+   const tests = [
+diff --git a/test/types.test-d.ts b/test/types.test-d.ts
+index e28c503..b4951c7 100644
+--- a/test/types.test-d.ts
++++ b/test/types.test-d.ts
+@@ -1,7 +1,13 @@
+ import { describe, expectTypeOf, test } from "vitest";
+-import { getQuery, parseQuery } from "../src";
++import { appendQuery, getQuery, parseQuery, QueryObject } from "../src";
+ 
+ describe("query", () => {
++  test("appendQuery public type", () => {
++    expectTypeOf(appendQuery).toEqualTypeOf<
++      (input: string, query: QueryObject) => string
++    >();
++  });
++
+   test("getQuery generic type support", () => {
+     const result = getQuery<{ foo: string }>("http://foo.com/?foo=bar");
+     expectTypeOf(result).toEqualTypeOf<{ foo: string }>();

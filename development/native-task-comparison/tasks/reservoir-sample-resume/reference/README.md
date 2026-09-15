@@ -1,0 +1,4 @@
+# reservoir-sample-resume
+
+Algorithm R fills first capacity slots without draws; later item n always advances xorshift32 (<<13,>>>17,<<5,unsigned), j=floor(rng/2^32*n), replaces slot if j<capacity. Count/RNG advance even when discarded, no sort/ambient randomness. capacity1..1000, nonzero uint32 seed, total<=1000000. Snapshot version1/capacity/count/rng/sample, sample length min(capacity,count), restore structural validation TypeError. JSON-data/depth50 domain, deep copies at every boundary, JSON round-trip resumes exactly. add/addAll undefined return; full batch count-limit checked before any mutation, RangeError count, unchanged state. No past-item replay or reseeding. Run npm test.
+ Numeric -0 normalizes recursively to positive0 at input/restore boundaries for JSON value round-trip semantics.

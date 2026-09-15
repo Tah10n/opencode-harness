@@ -1,0 +1,62 @@
+{
+  "kind": "sensitivity-replay",
+  "createdAt": "2026-09-14T17:11:14.617Z",
+  "runtimeSha": "e20892477df1c07dabc184798e3dc7131c5d5545",
+  "executionHarnessSha": "e20892477df1c07dabc184798e3dc7131c5d5545",
+  "freezeSha256": "d1961fbf98ed6115e027229bb8cd2d3103be9e4454ae588dbf643bf4107ff4d7",
+  "image": "sha256:0ed6cee0b095ecf1e1e780418cb373d462f1b99643bb86db0a8de7dd58fc83a6",
+  "model": "openai/gpt-5.6-luna",
+  "variant": "high",
+  "budgetMs": 900000,
+  "diagnosticBudgetMs": 180000,
+  "variants": 8,
+  "bundleManifestSha256": "f347e7615453d4b0877ad467eac5865551a0f3d70e6434329e0233a773da343e",
+  "baselineBundleManifestSha256": "e2384febbb749adce9dd63af53774d4f0db00badfcef2984b1bcfefb3e00266a",
+  "inputs": [
+    {
+      "slot": 1,
+      "case": "case-1",
+      "arm": "S0",
+      "fullTask": "An unfinished public patch is already present in this working tree. Verify it against the complete original request below and finish the delivery if necessary. Preserve correct existing work.\n\nAdd removeWhere(predicate): number. Visit the initially present values once in logical front-to-back order, calling predicate(value, index) with zero-based original indexes. Remove values for which the predicate returns truthy, retain all others in order, and return the count removed. Determine all matches before mutation: if predicate throws, propagate the same error and leave the deque unchanged. Reject non-function predicates with an Error even for an empty deque. Reentrant mutation from inside predicate is outside the guaranteed contract. Support wrapped/capacity-limited queues, duplicate and falsy values, preserve value identity and capacity, and leave all existing operations and APIs compatible. Supply types, regression tests and API docs.\n\nRequired delivered regression scenarios:\n- Predicate sees original indexes and values in order; mixed/none/all matches give the correct count and survivor order.\n- Predicate throwing after an earlier match leaves every original entry intact; non-function is rejected on empty too.\n- Wrapped/capacity queues with duplicates/falsy values stay usable and preserve capacity after filtering.\n\nDeliver implementation, ordinary project regression tests, applicable public TypeScript declarations/type tests, and README/API documentation. Preserve existing independent regression scenarios and all behavior not explicitly changed. Use the project test tools; run relevant checks after the last edit and report what actually ran and any limitations. A different valid implementation or test organization is acceptable. Do not commit, publish, or change dependencies merely to make a check pass. The supported evaluation platform is Linux arm64, Node 24.19; browser deployment and other Node versions are outside this task.\n",
+      "seedPatch": "development/native-task-h00-transfer/continuation-20260914/patches/27-denque-remove-where-r2-P.patch",
+      "seedSha256": "52f7a5afc7476758e50dafdbe59bff4710a6fea03f604ddc15d0704629619b9a",
+      "taskSha256": "4b7154b9894034483c1395e37742167d4d94cdebc1f6f15aa1a99e771c7fd272",
+      "baseTreeManifestSha256": "e20e9ecd65b09f7ea76fa4d163527eab21a55d08f01f1276a432863e981adccd",
+      "patchedTreeManifestSha256": "47824377929520735e91a12873ef8e7e7582a645a001b23f79c57cdbbe635a9c"
+    },
+    {
+      "slot": 2,
+      "case": "case-1",
+      "arm": "S1",
+      "fullTask": "An unfinished public patch is already present in this working tree. Verify it against the complete original request below and finish the delivery if necessary. Preserve correct existing work.\n\nAdd removeWhere(predicate): number. Visit the initially present values once in logical front-to-back order, calling predicate(value, index) with zero-based original indexes. Remove values for which the predicate returns truthy, retain all others in order, and return the count removed. Determine all matches before mutation: if predicate throws, propagate the same error and leave the deque unchanged. Reject non-function predicates with an Error even for an empty deque. Reentrant mutation from inside predicate is outside the guaranteed contract. Support wrapped/capacity-limited queues, duplicate and falsy values, preserve value identity and capacity, and leave all existing operations and APIs compatible. Supply types, regression tests and API docs.\n\nRequired delivered regression scenarios:\n- Predicate sees original indexes and values in order; mixed/none/all matches give the correct count and survivor order.\n- Predicate throwing after an earlier match leaves every original entry intact; non-function is rejected on empty too.\n- Wrapped/capacity queues with duplicates/falsy values stay usable and preserve capacity after filtering.\n\nDeliver implementation, ordinary project regression tests, applicable public TypeScript declarations/type tests, and README/API documentation. Preserve existing independent regression scenarios and all behavior not explicitly changed. Use the project test tools; run relevant checks after the last edit and report what actually ran and any limitations. A different valid implementation or test organization is acceptable. Do not commit, publish, or change dependencies merely to make a check pass. The supported evaluation platform is Linux arm64, Node 24.19; browser deployment and other Node versions are outside this task.\n",
+      "seedPatch": "development/native-task-h00-transfer/continuation-20260914/patches/27-denque-remove-where-r2-P.patch",
+      "seedSha256": "52f7a5afc7476758e50dafdbe59bff4710a6fea03f604ddc15d0704629619b9a",
+      "taskSha256": "4b7154b9894034483c1395e37742167d4d94cdebc1f6f15aa1a99e771c7fd272",
+      "baseTreeManifestSha256": "e20e9ecd65b09f7ea76fa4d163527eab21a55d08f01f1276a432863e981adccd",
+      "patchedTreeManifestSha256": "47824377929520735e91a12873ef8e7e7582a645a001b23f79c57cdbbe635a9c"
+    },
+    {
+      "slot": 3,
+      "case": "case-2",
+      "arm": "S1",
+      "fullTask": "An unfinished public patch is already present in this working tree. Verify it against the complete original request below and finish the delivery if necessary. Preserve correct existing work.\n\nAdd removeWhere(predicate): number. Visit the initially present values once in logical front-to-back order, calling predicate(value, index) with zero-based original indexes. Remove values for which the predicate returns truthy, retain all others in order, and return the count removed. Determine all matches before mutation: if predicate throws, propagate the same error and leave the deque unchanged. Reject non-function predicates with an Error even for an empty deque. Reentrant mutation from inside predicate is outside the guaranteed contract. Support wrapped/capacity-limited queues, duplicate and falsy values, preserve value identity and capacity, and leave all existing operations and APIs compatible. Supply types, regression tests and API docs.\n\nRequired delivered regression scenarios:\n- Predicate sees original indexes and values in order; mixed/none/all matches give the correct count and survivor order.\n- Predicate throwing after an earlier match leaves every original entry intact; non-function is rejected on empty too.\n- Wrapped/capacity queues with duplicates/falsy values stay usable and preserve capacity after filtering.\n\nDeliver implementation, ordinary project regression tests, applicable public TypeScript declarations/type tests, and README/API documentation. Preserve existing independent regression scenarios and all behavior not explicitly changed. Use the project test tools; run relevant checks after the last edit and report what actually ran and any limitations. A different valid implementation or test organization is acceptable. Do not commit, publish, or change dependencies merely to make a check pass. The supported evaluation platform is Linux arm64, Node 24.19; browser deployment and other Node versions are outside this task.\n",
+      "seedPatch": "development/native-task-h00-transfer/continuation-20260914/patches/28-denque-remove-where-r2-H00.patch",
+      "seedSha256": "d4179fbe5556e631a5c4b068e8adaa049d906c3603c209db25929b44bf82c3e0",
+      "taskSha256": "4b7154b9894034483c1395e37742167d4d94cdebc1f6f15aa1a99e771c7fd272",
+      "baseTreeManifestSha256": "e20e9ecd65b09f7ea76fa4d163527eab21a55d08f01f1276a432863e981adccd",
+      "patchedTreeManifestSha256": "328a58e45c59b413e151958badea53d3bfdf733b22b53c5d9e4e6522a6fce974"
+    },
+    {
+      "slot": 4,
+      "case": "case-2",
+      "arm": "S0",
+      "fullTask": "An unfinished public patch is already present in this working tree. Verify it against the complete original request below and finish the delivery if necessary. Preserve correct existing work.\n\nAdd removeWhere(predicate): number. Visit the initially present values once in logical front-to-back order, calling predicate(value, index) with zero-based original indexes. Remove values for which the predicate returns truthy, retain all others in order, and return the count removed. Determine all matches before mutation: if predicate throws, propagate the same error and leave the deque unchanged. Reject non-function predicates with an Error even for an empty deque. Reentrant mutation from inside predicate is outside the guaranteed contract. Support wrapped/capacity-limited queues, duplicate and falsy values, preserve value identity and capacity, and leave all existing operations and APIs compatible. Supply types, regression tests and API docs.\n\nRequired delivered regression scenarios:\n- Predicate sees original indexes and values in order; mixed/none/all matches give the correct count and survivor order.\n- Predicate throwing after an earlier match leaves every original entry intact; non-function is rejected on empty too.\n- Wrapped/capacity queues with duplicates/falsy values stay usable and preserve capacity after filtering.\n\nDeliver implementation, ordinary project regression tests, applicable public TypeScript declarations/type tests, and README/API documentation. Preserve existing independent regression scenarios and all behavior not explicitly changed. Use the project test tools; run relevant checks after the last edit and report what actually ran and any limitations. A different valid implementation or test organization is acceptable. Do not commit, publish, or change dependencies merely to make a check pass. The supported evaluation platform is Linux arm64, Node 24.19; browser deployment and other Node versions are outside this task.\n",
+      "seedPatch": "development/native-task-h00-transfer/continuation-20260914/patches/28-denque-remove-where-r2-H00.patch",
+      "seedSha256": "d4179fbe5556e631a5c4b068e8adaa049d906c3603c209db25929b44bf82c3e0",
+      "taskSha256": "4b7154b9894034483c1395e37742167d4d94cdebc1f6f15aa1a99e771c7fd272",
+      "baseTreeManifestSha256": "e20e9ecd65b09f7ea76fa4d163527eab21a55d08f01f1276a432863e981adccd",
+      "patchedTreeManifestSha256": "328a58e45c59b413e151958badea53d3bfdf733b22b53c5d9e4e6522a6fce974"
+    }
+  ],
+  "realProviderRequestsBeforeFreeze": 0
+}

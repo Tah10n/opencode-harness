@@ -1,0 +1,1 @@
+import {counts} from './counts.mjs';export function summary(values){return {entries:counts(values).sort((a,b)=>b.count-a.count||(a.value<b.value?-1:a.value>b.value?1:0)),total:values.length};}

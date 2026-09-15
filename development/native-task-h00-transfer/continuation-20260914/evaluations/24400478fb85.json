@@ -1,0 +1,157 @@
+{
+  "id": "24400478fb85",
+  "task": "fastq-on-idle",
+  "project": "fastq",
+  "Q": 0,
+  "findings": [
+    {
+      "category": "required-coverage-loss",
+      "reason": "No delivered regression for kill clearing queued-only work while no worker is active, an explicit required idle-transition path."
+    }
+  ],
+  "contentReview": {
+    "id": "24400478fb85",
+    "task": "fastq-on-idle",
+    "project": "fastq",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete-pending-mechanical-checks",
+    "Q": null,
+    "behaviorReview": "Resolver list is notified when release drains and after kill/abort. callDrain wraps invocation internally without replacing user drain property; depth delays notification until nested synchronous drain calls finish. onIdle during drain waits for final actual idle.",
+    "retainedTestsReview": "All original ordinary callback/promise tests and type example preserved; independent new suites added.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": true,
+        "evidence": "Two concurrent active workers plus paused queued task; multiple subscribers remain pending after workers finish while queue paused, then all resolve after resume and final completion."
+      },
+      {
+        "scenario": 2,
+        "covered": true,
+        "evidence": "Drain identity checked before/while/after wait; first drain subscribes and enqueues second async worker; subscription asserts idle after reentrant work and two drain calls."
+      },
+      {
+        "scenario": 3,
+        "covered": false,
+        "evidence": "For all three methods, active-worker tests wait an immediate turn and assert subscriber still pending before finishing worker. Queued-only killAndDrain and abort exercised; rejected worker promise covered. No queued-only kill case exists: its sole new kill call has an active worker, so a missing immediate-idle notification in kill could escape."
+      }
+    ],
+    "typesReview": "onIdle(): Promise<void> added to shared queue declaration inherited by promise queue; ordinary typed callback queue example invokes API.",
+    "docsReview": "README describes independent promises, actual idle condition, already-idle and paused queues, preserved drain property and both queue variants.",
+    "contentFindings": [
+      {
+        "category": "required-coverage-loss",
+        "reason": "No delivered regression for kill clearing queued-only work while no worker is active, an explicit required idle-transition path."
+      }
+    ],
+    "pending": [
+      "ordinary project checks and TypeScript",
+      "independent public API checks",
+      "ordinary patch applicability",
+      "existing idle-transition and early-kill sensitivity diagnostics"
+    ],
+    "recordStage": "Initial neutral review retained as history; final Q, findings and assessmentNotes supersede pending hypotheses."
+  },
+  "ordinaryExit": 0,
+  "originalIndependentExit": 0,
+  "interpretedIndependentExit": 0,
+  "applicability": {
+    "id": "24400478fb85",
+    "task": "fastq-on-idle",
+    "sourceCommit": "fe2d23196a005810dfcbc4103b3c746cc5542430",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "8ebaae8e4fadbafea7f8a81d33ba2bf308181c08f5e0926cdeb358100f6b7804",
+    "excludedPreparationArtifacts": [],
+    "types": null
+  },
+  "sourcePatchSha256": "8ebaae8e4fadbafea7f8a81d33ba2bf308181c08f5e0926cdeb358100f6b7804",
+  "sourcePatchBytes": 10577,
+  "assessmentNotes": [],
+  "slot": 35,
+  "repetition": 2,
+  "arm": "P",
+  "D": 0,
+  "verification": [
+    {
+      "artifact": "reviews/24400478fb85/independent/result.json",
+      "exit": 0,
+      "elapsedMs": 2295,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "Independent behavior passed",
+      "fullLocalOutputSha256": "f9c69e05a31a62e04881e10139c67883f681accefebbe3f3ff50d81e2a6a7a6e",
+      "supersededDiagnostic": false
+    },
+    {
+      "artifact": "reviews/24400478fb85/ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 4120,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "# ok\n\n----------|---------|----------|---------|---------|-------------------\nFile      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s \n----------|---------|----------|---------|---------|-------------------\nAll files |     100 |      100 |     100 |     100 |                   \n queue.js |     100 |      100 |     100 |     100 |                   \n----------|---------|----------|---------|---------|-------------------\n\n> fastq@1.20.3 typescript\n> tsc --project ./test/tsconfig.json\n",
+      "fullLocalOutputSha256": "a83bb541335b5317fba2cf2b417600da9be3fe814f57d3aed08816ce5c9a656d",
+      "supersededDiagnostic": false
+    },
+    {
+      "artifact": "reviews/24400478fb85/supplemental/early-kill-test-sensitivity/result.json",
+      "exit": 1,
+      "elapsedMs": 2406,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "ok 280 running returns to zero\n# onIdle waits through kill, killAndDrain, and abort\nnot ok 281 kill does not resolve while a worker remains\n  ---\n    operator: equal\n    expected: false\n    actual:   true\n    at: Test.<anonymous> (/work/repo/test/promise.js:341:5)\n    stack: |-\n      Error: kill does not resolve while a worker remains\n          at Test.assert [as _assert] (/work/repo/node_modules/tape/lib/test.js:548:48)\n          at Test.strictEqual (/work/repo/node_modules/tape/lib/test.js:734:7)\n          at Test.<anonymous> (/work/repo/test/promise.js:341:5)\n  ...\n  ...\nok 282 kill resolves after the worker finishes\nnot ok 283 killAndDrain waits for a running worker\n  ---\n    operator: equal\n    expected: false\n    actual:   true\n    at: Test.<anonymous> (/work/repo/test/promise.js:361:5)\n    stack: |-\n      Error: killAndDrain waits for a running worker\n          at Test.assert [as _assert] (/work/repo/node_modules/tape/lib/test.js:548:48)\n          at Test.strictEqual (/work/repo/node_modules/tape/lib/test.js:734:7)\n          at Test.<anonymous> (/work/repo/test/promise.js:361:5)\n  ...",
+      "fullLocalOutputSha256": "28fd8a48a15ff2c585a72e3ae2f457ff6cea98b12fe7f7b9f5766e4db93107d5",
+      "supersededDiagnostic": false
+    },
+    {
+      "artifact": "reviews/24400478fb85/supplemental/idle-transition/result.json",
+      "exit": 0,
+      "elapsedMs": 1993,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "{\"idleTransitionObserved\":true,\"oldSubscriptionResolvedBeforeLaterWorkFinished\":true}",
+      "fullLocalOutputSha256": "2d4b4f14a7b2bb9b24bbdf32e4f9645dffc2953e3723f0407445286e0d3b4c6b",
+      "supersededDiagnostic": false
+    },
+    {
+      "artifact": "reviews/24400478fb85/supplemental/subscription-inside-drain/result.json",
+      "exit": 0,
+      "elapsedMs": 3027,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "{\"subscriptionCreatedInsideDrain\":true,\"settledBeforeReentrantWorkerFinished\":false}",
+      "fullLocalOutputSha256": "5ef425ea27a9bd230116ee4d3b90cd0835b43ac0344124e89cf52e9e836a7491",
+      "supersededDiagnostic": false
+    }
+  ],
+  "native": {
+    "completed": true,
+    "exitCode": 0,
+    "signal": null,
+    "lastStepFinish": "stop",
+    "normalHandoff": true,
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "workflowStatus": null,
+    "terminalPatchVerification": null,
+    "lastNativeTextSha256": "784e21b093b8b03c43ca5c0270b25eeb93a03c7f494271cd27ca876355828ce6",
+    "normalFinalResponse": true,
+    "finalResponseExcerpt": "Implemented `onIdle(): Promise<void>` for callback and promise queues.\n\n- Independent idle subscribers with pause/resume, concurrency, errors, kill, killAndDrain, and abort support.\n- Preserves `drain` identity and reentrant behavior.\n- Added TypeScript declarations, tests, and README documentation.\n- `npm test`: 303 passing, 100% coverage.\n- `npm run typescript`: passed.\n- `git diff --check`: passed.\n\nNo legacy or browser checks were run, as they are outside the requested scope.",
+    "authorExplanationExcerpt": null,
+    "reportFindings": []
+  }
+}

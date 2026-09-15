@@ -1,0 +1,15 @@
+{
+  "category": "state",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "composed tombstones equal sequential overlay",
+    "replacement ownership and special keys"
+  ],
+  "docDelivery": [
+    "Document null tombstones, shallow replacement vs deep copying, composition order and safe own keys."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Implement shallow-key overlay(defaults,patch) and compose(first,second). Defaults is own JSON record with non-null values. Patch values null are tombstones removing entire key; every other JSON value replaces the entire prior value, including objects/arrays (no deep merge). compose returns a patch equivalent to applying first then second to any defaults; second own keys win, and tombstones must remain in composed patch. Both return deep independent JSON copies, never mutate arguments. Arbitrary own keys incl __proto__/constructor; returned ordinary object and no prototype mutation. JSON domain, no undefined/cycles/special objects, <=1000 keys.",
+  "independence": "Explicit synthetic library contract; alternatives judged by observable exports and required integration, not reference-source matching."
+}

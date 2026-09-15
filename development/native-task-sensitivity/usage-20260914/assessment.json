@@ -1,0 +1,24 @@
+{
+  "case-1": {
+    "productionBehaviorPassed": true,
+    "fullPatchAcceptance": false,
+    "normalNativeHandoff": true,
+    "usefulDiagnosticToTestChain": false,
+    "reason": "Required empty-deque callback regression remains missing. The ordinary BooleanLiteral false-to-true variant still passes the final suite but invokes the predicate four times on an empty deque. The public counterexample requires zero calls and rejects that variant by assertion.",
+    "chronology": "Only test/denque.js changed relative to the seed. Wrapped-capacity test edits at tool events 22 and 26 preceded harness_sense at event 30. No edits or repeated author diagnostics followed.",
+    "interpretation": "The author correctly accepted an unspecified error-message mutation but incorrectly called _copyArray(true) equivalent: the empty-deque case was overlooked.",
+    "retainedImprovement": "The wrapped bounded test now retains additional falsy values and checks backing-array length/mask preservation. This local improvement predates the diagnostic and is not attributed to it.",
+    "limitations": "Existing good production, types, docs and tests pass both ordinary and independent checks, but they do not establish requested regression completeness. A request 9 has unknown usage and remote execution state after HTTP 503. Internal incomplete status is retained."
+  },
+  "case-2": {
+    "productionBehaviorPassed": true,
+    "fullPatchAcceptance": true,
+    "normalNativeHandoff": false,
+    "controlPreserved": true,
+    "usefulDiagnosticToTestChain": false,
+    "reason": "Captured project bytes and modes exactly preserve the supplied correct control patch; no useful assertion was removed and no assertion was added for the allowed error-message variant.",
+    "chronology": "Native harness_sense at tool event 19; no source changes before or after. The full project suite passed before and after diagnosis. Direct runner and forwarded-grep commands failed due to command resolution/TypeScript arguments; a later direct API check passed.",
+    "interpretation": "The author correctly described the only surviving variant, an empty Error message, as allowed by the original contract. No 100 percent score was required.",
+    "limitations": "Safety stop during request 16 interrupted native completion. There is no terminal.patch or author final response. The published patch was reconstructed offline from the captured worktree against the frozen original base and applied in an ordinary copy; it is not autonomous handoff. Usage and remote execution state of that request remain unknown."
+  }
+}

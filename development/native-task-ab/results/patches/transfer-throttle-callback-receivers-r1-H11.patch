@@ -1,0 +1,342 @@
+diff --git a/index.d.ts b/index.d.ts
+index 766c494..bbd1cfd 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -85,7 +85,7 @@ export type Options = {
+ 	/**
+ 	Get notified when function calls are delayed due to exceeding the `limit` of allowed calls within the given `interval`.
+ 
+-	The delayed call arguments are passed to the `onDelay` callback. Can be useful for monitoring the throttling efficiency.
++	The delayed call arguments are passed to the `onDelay` callback, and its `this` value is the same receiver as the delayed call. Can be useful for monitoring the throttling efficiency.
+ 
+ 	@example
+ 	```
+@@ -112,7 +112,7 @@ export type Options = {
+ 	//=> Executing with 5 6...
+ 	```
+ 	*/
+-	readonly onDelay?: (...arguments_: readonly any[]) => void;
++	readonly onDelay?: (this: any, ...arguments_: readonly any[]) => void;
+ 
+ 	/**
+ 	Calculate the weight/cost of each function call based on its arguments.
+@@ -121,6 +121,8 @@ export type Options = {
+ 
+ 	By default, each call has a weight of `1`.
+ 
++	The callback receives the same `this` value and arguments as the throttled function call.
++
+ 	In the following example, queries with different numbers of tables consume different amounts of the rate limit:
+ 
+ 	@example
+@@ -144,7 +146,7 @@ export type Options = {
+ 	await fetchData(3); // Costs 4 points
+ 	```
+ 	*/
+-	readonly weight?: (...arguments_: readonly any[]) => number;
++	readonly weight?: (this: any, ...arguments_: readonly any[]) => number;
+ };
+ 
+ /**
+diff --git a/index.js b/index.js
+index 5175416..b43ce49 100644
+--- a/index.js
++++ b/index.js
+@@ -188,7 +188,7 @@ export default function pThrottle({limit, interval, strict, signal, onDelay, wei
+ 				let requestWeight = 1;
+ 				if (weight) {
+ 					try {
+-						requestWeight = weight(...arguments_);
++						requestWeight = weight.apply(this, arguments_);
+ 					} catch (error) {
+ 						reject(error);
+ 						return;
+@@ -251,7 +251,7 @@ export default function pThrottle({limit, interval, strict, signal, onDelay, wei
+ 					timeoutId = setTimeout(execute, delay);
+ 					state.queue.set(timeoutId, reject);
+ 					try {
+-						onDelay?.(...arguments_);
++						onDelay?.apply(this, arguments_);
+ 					} catch {}
+ 				} else {
+ 					execute();
+diff --git a/index.test-d.ts b/index.test-d.ts
+index 4d5bea6..1583bf7 100644
+--- a/index.test-d.ts
++++ b/index.test-d.ts
+@@ -33,6 +33,27 @@ taggedUnicornController.abort();
+ expectType<boolean>(throttledUnicorn.isEnabled);
+ expectType<number>(throttledUnicorn.queueSize);
+ 
++/* Callback context */
++type Context = {name: string};
++const context: Context = {name: 'context'};
++const throttledWithCallbacks = pThrottle({
++	limit: 1,
++	interval: 1000,
++	onDelay(this: Context, value: number, label: string) {
++		expectType<string>(this.name);
++		expectType<number>(value);
++		expectType<string>(label);
++	},
++	weight(this: Context, value: number, label: string) {
++		return this.name.length + value + label.length;
++	},
++})(function (this: Context, value: number, label: string) {
++	return `${this.name}:${value}:${label}`;
++});
++
++expectType<string>(throttledWithCallbacks.call(context, 1, 'one'));
++/* /Callback context */
++
+ /* Generic */
+ declare function genericFunction<T>(argument: T): Promise<T>;
+ 
+diff --git a/readme.md b/readme.md
+index fbb6591..385ab3d 100644
+--- a/readme.md
++++ b/readme.md
+@@ -113,7 +113,7 @@ await throttled();
+ 
+ Type: `Function`
+ 
+-Get notified when function calls are delayed due to exceeding the `limit` of allowed calls within the given `interval`. The delayed call arguments are passed to the `onDelay` callback.
++Get notified when function calls are delayed due to exceeding the `limit` of allowed calls within the given `interval`. The delayed call arguments are passed to the `onDelay` callback, and its `this` value is the same receiver as the delayed call.
+ 
+ Can be useful for monitoring the throttling efficiency.
+ 
+@@ -153,6 +153,8 @@ The weight determines how much of the `limit` is consumed by each call. This is
+ 
+ By default, each call has a weight of `1`.
+ 
++The callback receives the same `this` value and arguments as the throttled function call.
++
+ In the following example, queries with different numbers of tables consume different amounts of the rate limit:
+ 
+ ```js
+diff --git a/tests/weight-option.js b/tests/weight-option.js
+index 962fd74..d5f4759 100644
+--- a/tests/weight-option.js
++++ b/tests/weight-option.js
+@@ -1,6 +1,221 @@
+ import test from 'ava';
+ import pThrottle from '../index.js';
+ 
++test('weight and onDelay preserve each call context and arguments', async t => {
++	for (const strict of [false, true]) {
++		// eslint-disable-next-line no-await-in-loop
++		await withFakeTimers(async clock => {
++			const firstContext = {name: 'first'};
++			const secondContext = {name: 'second'};
++			const observations = [];
++			const throttled = pThrottle({
++				limit: 5,
++				interval: 100,
++				strict,
++				weight(value, label) {
++					observations.push({type: 'weight', context: this, arguments: [value, label]});
++					return value;
++				},
++				onDelay(value, label) {
++					observations.push({type: 'onDelay', context: this, arguments: [value, label]});
++				},
++			})(function (value, label) {
++				observations.push({type: 'execution', context: this, arguments: [value, label]});
++				return {context: this, arguments: [value, label]};
++			});
++
++			t.is(throttled.queueSize, 0);
++			const firstPromise = throttled.call(firstContext, 2, 'first');
++			t.is(throttled.queueSize, 0);
++			const secondPromise = throttled.call(secondContext, 4, 'second');
++			t.is(throttled.queueSize, 1);
++			t.deepEqual(observations, [
++				{type: 'weight', context: firstContext, arguments: [2, 'first']},
++				{type: 'execution', context: firstContext, arguments: [2, 'first']},
++				{type: 'weight', context: secondContext, arguments: [4, 'second']},
++				{type: 'onDelay', context: secondContext, arguments: [4, 'second']},
++			]);
++
++			clock.runNext();
++			const results = await Promise.all([firstPromise, secondPromise]);
++			t.deepEqual(results, [
++				{context: firstContext, arguments: [2, 'first']},
++				{context: secondContext, arguments: [4, 'second']},
++			]);
++			t.deepEqual(observations, [
++				{type: 'weight', context: firstContext, arguments: [2, 'first']},
++				{type: 'execution', context: firstContext, arguments: [2, 'first']},
++				{type: 'weight', context: secondContext, arguments: [4, 'second']},
++				{type: 'onDelay', context: secondContext, arguments: [4, 'second']},
++				{type: 'execution', context: secondContext, arguments: [4, 'second']},
++			]);
++		});
++	}
++});
++
++test('unbound calls preserve undefined context in callbacks and execution', async t => {
++	await withFakeTimers(async clock => {
++		const observations = [];
++		const throttled = pThrottle({
++			limit: 1,
++			interval: 100,
++			weight(value, label) {
++				observations.push({type: 'weight', context: this, arguments: [value, label]});
++				return 1;
++			},
++			onDelay(value, label) {
++				observations.push({type: 'onDelay', context: this, arguments: [value, label]});
++			},
++		})(function (value, label) {
++			observations.push({type: 'execution', context: this, arguments: [value, label]});
++			return {context: this, arguments: [value, label]};
++		});
++
++		t.is(throttled.queueSize, 0);
++		const firstPromise = throttled('first', 1);
++		t.is(throttled.queueSize, 0);
++		const secondPromise = throttled('second', 2);
++		t.is(throttled.queueSize, 1);
++		clock.runNext();
++
++		const results = await Promise.all([firstPromise, secondPromise]);
++		for (const observation of observations) {
++			t.is(observation.context, undefined);
++		}
++
++		t.deepEqual(results, [
++			{context: undefined, arguments: ['first', 1]},
++			{context: undefined, arguments: ['second', 2]},
++		]);
++		t.deepEqual(observations.map(observation => observation.arguments), [
++			['first', 1],
++			['first', 1],
++			['second', 2],
++			['second', 2],
++			['second', 2],
++		]);
++	});
++});
++
++test('weight errors reject before queueing and preserve the thrown value', async t => {
++	const thrown = new Error('weight failed');
++	let weightCalls = 0;
++	let onDelayCalls = 0;
++	let executions = 0;
++	const throttled = pThrottle({
++		limit: 1,
++		interval: 100,
++		weight(value) {
++			weightCalls++;
++			if (value === 'bad') {
++				throw thrown;
++			}
++
++			return 1;
++		},
++		onDelay() {
++			onDelayCalls++;
++		},
++	})(() => {
++		executions++;
++	});
++
++	const receiver = {name: 'receiver'};
++	t.is(throttled.queueSize, 0);
++	await throttled.call(receiver, 'good');
++	t.is(throttled.queueSize, 0);
++
++	const rejection = throttled.call(receiver, 'bad', 'argument');
++	t.is(throttled.queueSize, 0);
++	const error = await t.throwsAsync(rejection);
++	t.is(error, thrown);
++	t.is(weightCalls, 2);
++	t.is(onDelayCalls, 0);
++	t.is(executions, 1);
++});
++
++test('onDelay errors are ignored and delayed execution keeps its context', async t => {
++	await withFakeTimers(async clock => {
++		const firstContext = {name: 'first'};
++		const secondContext = {name: 'second'};
++		const onDelayError = new Error('onDelay failed');
++		const onDelayArguments = [];
++		let executionCount = 0;
++		const throttled = pThrottle({
++			limit: 1,
++			interval: 100,
++			weight: () => 1,
++			onDelay(value, label) {
++				onDelayArguments.push([this, value, label]);
++				throw onDelayError;
++			},
++		})(function (value, label) {
++			executionCount++;
++			return {context: this, arguments: [value, label]};
++		});
++
++		t.is(throttled.queueSize, 0);
++		await throttled.call(firstContext, 'first', 1);
++		t.is(throttled.queueSize, 0);
++		const delayed = throttled.call(secondContext, 'second', 2);
++		t.is(throttled.queueSize, 1);
++		clock.runNext();
++
++		t.deepEqual(await delayed, {
++			context: secondContext,
++			arguments: ['second', 2],
++		});
++		t.deepEqual(onDelayArguments, [[secondContext, 'second', 2]]);
++		t.is(executionCount, 2);
++	});
++});
++
++test('disabled calls bypass weight and onDelay while preserving context', async t => {
++	await withFakeTimers(async clock => {
++		const enabledContext = {name: 'enabled'};
++		const disabledContext = {name: 'disabled'};
++		const reenabledContext = {name: 'reenabled'};
++		const weightArguments = [];
++		const onDelayArguments = [];
++		const throttled = pThrottle({
++			limit: 1,
++			interval: 100,
++			weight(value, label) {
++				weightArguments.push([this, value, label]);
++				return 1;
++			},
++			onDelay(value, label) {
++				onDelayArguments.push([this, value, label]);
++			},
++		})(function (value, label) {
++			return {context: this, arguments: [value, label]};
++		});
++
++		t.is(throttled.queueSize, 0);
++		await throttled.call(enabledContext, 'enabled', 1);
++		t.is(throttled.queueSize, 0);
++
++		throttled.isEnabled = false;
++		t.is(throttled.queueSize, 0);
++		const bypassed = throttled.call(disabledContext, 'disabled', 2);
++		t.is(throttled.queueSize, 0);
++		t.deepEqual(await bypassed, {
++			context: disabledContext,
++			arguments: ['disabled', 2],
++		});
++		t.is(weightArguments.length, 1);
++		t.deepEqual(onDelayArguments, []);
++
++		throttled.isEnabled = true;
++		t.is(throttled.queueSize, 0);
++		const delayed = throttled.call(reenabledContext, 'reenabled', 3);
++		t.is(throttled.queueSize, 1);
++		t.deepEqual(onDelayArguments, [[reenabledContext, 'reenabled', 3]]);
++		clock.runNext();
++		await delayed;
++	});
++});
++
+ test('strict mode with weights - enforces sliding window constraint', async t => {
+ 	const limit = 100; // 100 points per interval
+ 	const interval = 100;

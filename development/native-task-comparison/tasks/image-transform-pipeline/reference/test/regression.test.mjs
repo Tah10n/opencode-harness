@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {transform} from '../src/pipeline.mjs';test('ordered geometry and bounded fit',()=>assert.deepEqual(transform({width:12,height:8},[{type:'rotate',turns:1},{type:'crop',x:1,y:2,width:7,height:10},{type:'fit',width:3,height:3}]),{width:2,height:3}));test('crop uses rotated bounds',()=>assert.throws(()=>transform({width:12,height:8},[{type:'rotate',turns:1},{type:'crop',x:0,y:0,width:9,height:1}]),RangeError));

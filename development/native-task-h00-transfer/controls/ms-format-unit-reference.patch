@@ -1,0 +1,68 @@
+diff --git a/README.md b/README.md
+index d752132..ed091fd 100644
+--- a/README.md
++++ b/README.md
+@@ -205,3 +205,8 @@ export const config = {
+ As always, you can run the tests using: `npm test`
+ 
+ [^1]: Internet Explorer is not supported
++
++
++## ms-format-unit
++
++The API provides a unit option to format and numeric ms calls: unit?: 'ms' | 's' | 'm' | 'h' | 'd' | 'w' | 'mo' | 'y'. When set, always format in that unit using the existing unit conversion constants, Math.round(value / unitSize), and the existing short/long style and pluralization threshold (absolute input >= 1.5 units). Milliseconds preserve the numeric value without rounding as before. The default automatic unit choice is unchanged. Validate unknown runtime unit values with an Error, without requiring any subtype or message. String parsing paths and parseStrict remain unchanged and do not apply formatting options. Export the options type, keep overload return types, and generate usable public declarations. Document forced units with short/long examples.
+diff --git a/src/h00-contract.test.ts b/src/h00-contract.test.ts
+new file mode 100644
+index 0000000..8e8e815
+--- /dev/null
++++ b/src/h00-contract.test.ts
+@@ -0,0 +1,9 @@
++// @ts-nocheck -- invalid runtime inputs are intentional; public types are tested separately.
++import * as A from "node:assert/strict";
++import {test} from "@jest/globals";
++import * as api from "./index";
++test("new public contract", async () => {
++
++const units={ms:1,s:1000,m:60000,h:3600000,d:86400000,w:604800000,mo:31557600000/12,y:31557600000};for(const [unit,size]of Object.entries(units)){A.equal(api.format(size*2,{unit}),unit==='ms'?'2ms':'2'+unit);A.equal(api.ms(size*2,{unit}),api.format(size*2,{unit}));}A.equal(api.format(3600000,{unit:'m'}),'60m');A.equal(api.format(1000,{unit:'h'}),'0h');A.equal(api.format(-1500,{unit:'s'}),'-1s');A.equal(api.format(1499,{unit:'s',long:true}),'1 second');A.equal(api.format(1500,{unit:'s',long:true}),'2 seconds');A.equal(api.format(-1500,{unit:'s',long:true}),'-1 seconds');A.equal(api.format(1.25,{unit:'ms'}),'1.25ms');A.equal(api.format(1.25,{unit:'ms',long:true}),'1.25 ms');A.equal(api.format(0,{unit:'y',long:true}),'0 year');for(const unit of ['bad',null,1])A.throws(()=>api.format(1,{unit}));A.equal(api.ms('1h',{unit:'bad'}),3600000);A.equal(api.format(3600000),'1h');A.equal(api.parseStrict('1h'),3600000);
++
++});
+diff --git a/src/h00-types.ts b/src/h00-types.ts
+new file mode 100644
+index 0000000..2f860a7
+--- /dev/null
++++ b/src/h00-types.ts
+@@ -0,0 +1,6 @@
++import * as api from "./index";
++const options: api.Options = {unit:"s",long:true};
++const text: string = api.ms(1000, options);
++const parsed: number = api.ms("1s");
++// @ts-expect-error unknown unit
++api.format(1000, {unit:"unknown"});
+diff --git a/src/index.ts b/src/index.ts
+index d50e3c7..6e037b4 100644
+--- a/src/index.ts
++++ b/src/index.ts
+@@ -31,7 +31,8 @@ export type StringValue =
+   | `${number}${UnitAnyCase}`
+   | `${number} ${UnitAnyCase}`;
+ 
+-interface Options {
++export interface Options {
++  unit?: 'ms' | 's' | 'm' | 'h' | 'd' | 'w' | 'mo' | 'y';
+   /**
+    * Set to `true` to use verbose formatting. Defaults to `false`.
+    */
+@@ -227,6 +228,13 @@ export function format(ms: number, options?: Options): string {
+     throw new Error('Value provided to ms.format() must be of type number.');
+   }
+ 
++  if (options?.unit !== undefined) {
++    const units = {ms: [1, 'millisecond'], s: [s, 'second'], m: [m, 'minute'], h: [h, 'hour'], d: [d, 'day'], w: [w, 'week'], mo: [mo, 'month'], y: [y, 'year']} as const;
++    if (!Object.prototype.hasOwnProperty.call(units, options.unit)) throw new Error('Unknown unit');
++    const [size, name] = units[options.unit];
++    if (options.unit === 'ms') return options.long ? `${ms} ms` : `${ms}ms`;
++    return options.long ? plural(ms, Math.abs(ms), size, name) : `${Math.round(ms / size)}${options.unit}`;
++  }
+   return options?.long ? fmtLong(ms) : fmtShort(ms);
+ }
+ 

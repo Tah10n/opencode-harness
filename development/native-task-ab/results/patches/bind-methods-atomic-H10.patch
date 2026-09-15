@@ -1,0 +1,198 @@
+diff --git a/index.d.ts b/index.d.ts
+index 449f402..a240e11 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -750,7 +750,7 @@ export default class Emittery<
+ 	logIfDebugEnabled<Name extends keyof EventData>(type: string, eventName?: Name, eventData?: EventData[Name]): void;
+ 
+ 	/**
+-	Bind the given `methodNames`, or all `Emittery` methods if `methodNames` is not defined, into the `target` object.
++	Bind the given `methodNames`, or all `Emittery` methods if `methodNames` is not defined, into the `target` object. All requested methods are preflighted before any are installed, so a conflict leaves the target unchanged. Duplicate method names are treated as one binding request.
+ 
+ 	@example
+ 	```
+diff --git a/index.js b/index.js
+index 67a4de3..a8f5054 100644
+--- a/index.js
++++ b/index.js
+@@ -985,12 +985,24 @@ export default class Emittery {
+ 		}
+ 
+ 		methodNames = defaultMethodNamesOrAssert(methodNames);
++		const uniqueMethodNames = [...new Set(methodNames)];
++
++		for (const methodName of uniqueMethodNames) {
++			const descriptor = Object.getOwnPropertyDescriptor(target, methodName);
++			if (descriptor && !descriptor.configurable) {
++				throw new Error(`The property \`${methodName}\` cannot be redefined on \`target\``);
++			}
+ 
+-		for (const methodName of methodNames) {
+ 			if (target[methodName] !== undefined) {
+ 				throw new Error(`The property \`${methodName}\` already exists on \`target\``);
+ 			}
+ 
++			if (!descriptor && !Object.isExtensible(target)) {
++				throw new Error('`target` is not extensible');
++			}
++		}
++
++		for (const methodName of uniqueMethodNames) {
+ 			Object.defineProperty(target, methodName, {
+ 				enumerable: false,
+ 				value: this[methodName].bind(this),
+diff --git a/index.test-d.ts b/index.test-d.ts
+index 6ec455e..cb121c8 100644
+--- a/index.test-d.ts
++++ b/index.test-d.ts
+@@ -18,6 +18,14 @@ type AnyListener = (event: unknown) => void | Promise<void>;
+ 	ee2.emit('anEvent', 'some data');
+ }
+ 
++// BindMethods
++{
++	const ee = new Emittery();
++	const target: Record<string, unknown> = {};
++	ee.bindMethods(target, ['emit', 'emit']);
++	ee.bindMethods({}, ['on']);
++}
++
+ // On
+ {
+ 	const ee = new Emittery();
+diff --git a/readme.md b/readme.md
+index 88805a2..281755e 100644
+--- a/readme.md
++++ b/readme.md
+@@ -659,6 +659,8 @@ emitter.listenerCount(); // 2
+ 
+ Bind the given `methodNames`, or all `Emittery` methods if `methodNames` is not defined, into the `target` object.
+ 
++All requested methods are preflighted before any are installed, so a conflict leaves the target unchanged. Duplicate method names are treated as one binding request.
++
+ ```js
+ import Emittery from 'emittery';
+ 
+diff --git a/test/index.js b/test/index.js
+index f73b0fc..60486c8 100644
+--- a/test/index.js
++++ b/test/index.js
+@@ -2292,11 +2292,118 @@ test('bindMethods()', t => {
+ 
+ 	for (const method of methodsToBind) {
+ 		t.is(typeof target[method], 'function');
++		const descriptor = Object.getOwnPropertyDescriptor(target, method);
++		t.false(descriptor.enumerable);
++		t.false(descriptor.writable);
++		t.false(descriptor.configurable);
+ 	}
+ 
+ 	t.is(target.listenerCount(), 0);
+ });
+ 
++test('bindMethods() - preflights later conflicts atomically', t => {
++	const emitter = new Emittery();
++	const target = {};
++	Object.defineProperty(target, 'off', {
++		value: true,
++		writable: true,
++		enumerable: true,
++		configurable: true,
++	});
++	const before = Object.getOwnPropertyDescriptors(target);
++
++	t.throws(() => {
++		emitter.bindMethods(target, ['on', 'off']);
++	});
++
++	t.deepEqual(Object.getOwnPropertyDescriptors(target), before);
++});
++
++test('bindMethods() - preflights non-configurable undefined properties atomically', t => {
++	const emitter = new Emittery();
++	const target = {};
++	Object.defineProperty(target, 'off', {
++		value: undefined,
++		writable: true,
++		enumerable: true,
++		configurable: false,
++	});
++	const before = Object.getOwnPropertyDescriptors(target);
++
++	t.throws(() => {
++		emitter.bindMethods(target, ['on', 'off']);
++	});
++
++	t.deepEqual(Object.getOwnPropertyDescriptors(target), before);
++});
++
++test('bindMethods() - rejects inherited conflicts atomically', t => {
++	const emitter = new Emittery();
++	const target = {};
++	Object.setPrototypeOf(target, {off: true});
++	const before = Object.getOwnPropertyDescriptors(target);
++
++	t.throws(() => {
++		emitter.bindMethods(target, ['on', 'off']);
++	});
++
++	t.deepEqual(Object.getOwnPropertyDescriptors(target), before);
++});
++
++test('bindMethods() - rejects non-extensible targets atomically', t => {
++	const emitter = new Emittery();
++	const target = {};
++	Object.preventExtensions(target);
++	const before = Object.getOwnPropertyDescriptors(target);
++
++	t.false(Object.isExtensible(target));
++	t.throws(() => {
++		emitter.bindMethods(target, ['on']);
++	});
++
++	t.deepEqual(Object.getOwnPropertyDescriptors(target), before);
++});
++
++test('bindMethods() - treats duplicate method names as one binding', t => {
++	const emitter = new Emittery();
++	const target = {};
++
++	emitter.bindMethods(target, ['on', 'on']);
++
++	t.deepEqual(Object.getOwnPropertyNames(target), ['on']);
++	t.is(typeof target.on, 'function');
++});
++
++test('bindMethods() - replaces configurable undefined properties while retaining flags', t => {
++	const emitter = new Emittery();
++	const target = {};
++	Object.defineProperty(target, 'on', {
++		value: undefined,
++		writable: true,
++		enumerable: true,
++		configurable: true,
++	});
++
++	emitter.bindMethods(target, ['on']);
++
++	const descriptor = Object.getOwnPropertyDescriptor(target, 'on');
++	t.is(typeof descriptor.value, 'function');
++	t.true(descriptor.writable);
++	t.false(descriptor.enumerable);
++	t.true(descriptor.configurable);
++});
++
++test('bindMethods() - bound methods operate on their originating emitter', async t => {
++	const emitter = new Emittery();
++	const target = {};
++	emitter.bindMethods(target, ['emit']);
++	const event = emitter.once('test');
++
++	target.emit('test', 42);
++	const result = await event;
++	t.is(result.data, 42);
++});
++
+ test('bindMethods() - methodNames must be array of strings or undefined', t => {
+ 	t.throws(() => {
+ 		new Emittery().bindMethods({}, null);

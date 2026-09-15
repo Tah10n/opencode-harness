@@ -1,0 +1,188 @@
+diff --git a/index.d.ts b/index.d.ts
+index 3e8ac46..c5f1c19 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -106,6 +106,15 @@ export default class QuickLRU<KeyType, ValueType> extends Map<KeyType, ValueType
+ 	*/
+ 	expiresIn(key: KeyType): number | undefined;
+ 
++	/**
++		Remove all currently visible items whose expiration time has passed.
++
++		Expired items are removed from both cache generations without changing the order of live items. A current item shadows an old item with the same key, so the old item is not removed or reported while the current item is live. If the current item expires, its shadowed old item is removed as well and is not reported separately.
++
++		@returns The number of logical keys removed.
++	*/
++	pruneExpired(): number;
++
+ 	/**
+ 	Update the `maxSize` in-place, discarding items as necessary. Insertion order is mostly preserved, though this is not a strong guarantee.
+ 
+diff --git a/index.js b/index.js
+index 7f87cf5..7d64d39 100644
+--- a/index.js
++++ b/index.js
+@@ -163,6 +163,24 @@ export default class QuickLRU extends Map {
+ 		}
+ 	}
+ 
++	pruneExpired() {
++		let count = 0;
++
++		for (const [key, item] of this.#cache) {
++			if (this.#deleteIfExpired(key, item)) {
++				count++;
++			}
++		}
++
++		for (const [key, item] of this.#oldCache) {
++			if (!this.#cache.has(key) && this.#deleteIfExpired(key, item)) {
++				count++;
++			}
++		}
++
++		return count;
++	}
++
+ 	delete(key) {
+ 		const deleted = this.#cache.delete(key);
+ 		if (deleted) {
+diff --git a/index.test-d.ts b/index.test-d.ts
+index bc4b63e..e841189 100644
+--- a/index.test-d.ts
++++ b/index.test-d.ts
+@@ -8,6 +8,7 @@ expectType<number | undefined>(lru.get('🦄'));
+ expectType<boolean>(lru.has('🦄'));
+ expectType<number | undefined>(lru.peek('🦄'));
+ expectType<number | undefined>(lru.expiresIn('🦄'));
++expectType<number>(lru.pruneExpired());
+ expectType<boolean>(lru.delete('🦄'));
+ expectType<number>(lru.size);
+ expectType<number>(lru.maxAge);
+diff --git a/readme.md b/readme.md
+index bad09c3..e6495b2 100644
+--- a/readme.md
++++ b/readme.md
+@@ -117,6 +117,12 @@ Get the remaining time to live (in milliseconds) for the given item, or `undefin
+ - Returns `Infinity` if the item has no expiration (`maxAge` not set for the item and no global `maxAge`).
+ - May return a negative number if the item has already expired but has not yet been lazily removed.
+ 
++#### .pruneExpired()
++
++Remove all currently visible items whose expiration time has passed, using the `onEviction` callback for each removed logical key.
++
++Returns the number of logical keys removed. It does not promote or reorder live entries. A current item shadows an old item with the same key, so an expired old value is ignored while the current value is live. If the current value expires, its shadowed old value is removed without a second callback and is not resurrected.
++
+ #### .resize(maxSize)
+ 
+ Update the `maxSize`, discarding items as necessary. Insertion order is mostly preserved, though this is not a strong guarantee.
+diff --git a/test.js b/test.js
+index 0904dc2..0e22865 100644
+--- a/test.js
++++ b/test.js
+@@ -115,6 +115,105 @@ test('expiresIn() returns <= 0 when expired and does not evict', async t => {
+ 	t.true(remainingMs <= 0);
+ });
+ 
++test.serial('pruneExpired() prunes both generations without changing live order', t => {
++	const originalDateNow = Date.now;
++	let now = 1000;
++	Date.now = () => now;
++	t.teardown(() => {
++		Date.now = originalDateNow;
++	});
++
++	const evicted = [];
++	const lru = new QuickLRU({
++		maxSize: 4,
++		onEviction(key, value) {
++			evicted.push([key, value]);
++		},
++	});
++
++	lru.set('old-expired', 'old-expired', {maxAge: 10});
++	lru.set('old-live', 'old-live');
++	lru.set('shadowed-old', 'shadowed-old');
++	lru.set('old-live-2', 'old-live-2');
++	lru.set('current-live-1', 'current-live-1');
++	lru.set('current-expired', 'current-expired', {maxAge: 10});
++	lru.set('current-live-2', 'current-live-2');
++
++	const liveOrder = [...lru];
++	now = 1010;
++
++	t.is(lru.pruneExpired(), 2);
++	t.deepEqual(evicted, [
++		['current-expired', 'current-expired'],
++		['old-expired', 'old-expired'],
++	]);
++	t.deepEqual([...lru], liveOrder.filter(([key]) => !['old-expired', 'current-expired'].includes(key)));
++});
++
++test.serial('pruneExpired() respects current entries that shadow old entries', t => {
++	const originalDateNow = Date.now;
++	let now = 2000;
++	Date.now = () => now;
++	t.teardown(() => {
++		Date.now = originalDateNow;
++	});
++
++	const evicted = [];
++	const lru = new QuickLRU({
++		maxSize: 2,
++		onEviction(key, value) {
++			evicted.push([key, value]);
++		},
++	});
++
++	lru.set('shadow', 'old', {maxAge: 1});
++	lru.set('other', 'other');
++	lru.set('shadow', 'current');
++
++	now = 2001;
++	t.is(lru.pruneExpired(), 0);
++	t.is(lru.get('shadow'), 'current');
++	t.deepEqual(evicted, []);
++
++	lru.set('shadow', 'current-expiring', {maxAge: 1});
++	now = 2002;
++	t.is(lru.pruneExpired(), 1);
++	t.is(lru.get('shadow'), undefined);
++	t.deepEqual(evicted, [['shadow', 'current-expiring']]);
++});
++
++test.serial('pruneExpired() handles boundaries, infinite TTL, undefined values, and reuse', t => {
++	const originalDateNow = Date.now;
++	let now = 3000;
++	Date.now = () => now;
++	t.teardown(() => {
++		Date.now = originalDateNow;
++	});
++
++	const evicted = [];
++	const lru = new QuickLRU({
++		maxSize: 2,
++		onEviction(key, value) {
++			evicted.push([key, value]);
++		},
++	});
++
++	lru.set('undefined', undefined, {maxAge: 5});
++	lru.set('infinite', 'infinite', {maxAge: Number.POSITIVE_INFINITY});
++
++	now = 3005;
++	t.is(lru.pruneExpired(), 1);
++	t.deepEqual(evicted, [['undefined', undefined]]);
++	t.is(lru.pruneExpired(), 0);
++	t.is(lru.get('infinite'), 'infinite');
++
++	lru.delete('infinite');
++	t.is(lru.size, 0);
++	lru.set('reused', 'value');
++	t.is(lru.get('reused'), 'value');
++	t.is(lru.pruneExpired(), 0);
++});
++
+ test('.delete()', t => {
+ 	const lru = new QuickLRU({maxSize: 100});
+ 	lru.set('foo', 1);

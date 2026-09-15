@@ -1,0 +1,135 @@
+{
+  "id": "634888ad4881",
+  "task": "denque-remove-where",
+  "project": "denque",
+  "Q": 0,
+  "findings": [
+    {
+      "category": "required-coverage-loss",
+      "reason": "Configured capacity after successful filtering is not discriminated by the delivered suite"
+    }
+  ],
+  "contentReview": {
+    "id": "634888ad4881",
+    "task": "denque-remove-where",
+    "project": "denque",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete-pending-mechanical-checks",
+    "Q": null,
+    "behaviorReview": "Snapshots original logical values then evaluates predicate completely before writing survivors in original head positions, clears removed tail slots and adjusts tail. Retains configured capacity and references; exception identity propagated naturally.",
+    "retainedTestsReview": "Existing independent regression cases preserved; one new suite inserted.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": true,
+        "evidence": "Records every original value/index exactly; mixed, none and all assert counts and order."
+      },
+      {
+        "scenario": 2,
+        "covered": true,
+        "evidence": "Predicate returns match at index 0 then throws original Error at index 1; all original reference identities and length retained. Null predicate on empty throws."
+      },
+      {
+        "scenario": 3,
+        "covered": false,
+        "evidence": "Actual wrapped bounded queue contains duplicate 0, false and object; filtering asserts survivors and object identity. Checks backing length/mask only, then pushes one value below configured capacity. Never asserts _capacity or overflows after filtering, so loss of configured capacity can escape; original capacity-loss mutation pending."
+      }
+    ],
+    "typesReview": "Predicate takes generic value and numeric index, unknown result supports truthy matching; ordinary consumer uses value.length and index.",
+    "docsReview": "README and API document original indexes, order, removed count and atomic throw behavior with valid example.",
+    "contentFindings": [
+      {
+        "category": "required-coverage-loss",
+        "reason": "Configured capacity after successful filtering is not discriminated by the delivered suite; pending same capacity-loss diagnostic used for first repetition."
+      }
+    ],
+    "pending": [
+      "ordinary project checks",
+      "independent behavior",
+      "ordinary patch applicability",
+      "configured-capacity test sensitivity"
+    ],
+    "recordStage": "Initial neutral review retained as history; final Q, findings and assessmentNotes supersede pending hypotheses."
+  },
+  "ordinaryExit": 0,
+  "originalIndependentExit": 0,
+  "interpretedIndependentExit": 0,
+  "applicability": {
+    "id": "634888ad4881",
+    "task": "denque-remove-where",
+    "sourceCommit": "539105bb57854e997dd469221cdc52a0ad80e0a2",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "52f7a5afc7476758e50dafdbe59bff4710a6fea03f604ddc15d0704629619b9a",
+    "excludedPreparationArtifacts": [],
+    "types": null
+  },
+  "sourcePatchSha256": "52f7a5afc7476758e50dafdbe59bff4710a6fea03f604ddc15d0704629619b9a",
+  "sourcePatchBytes": 6260,
+  "assessmentNotes": [],
+  "slot": 27,
+  "repetition": 2,
+  "arm": "P",
+  "D": 0,
+  "verification": [
+    {
+      "artifact": "reviews/634888ad4881/independent/result.json",
+      "exit": 0,
+      "elapsedMs": 693,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "Independent behavior passed",
+      "fullLocalOutputSha256": "f9c69e05a31a62e04881e10139c67883f681accefebbe3f3ff50d81e2a6a7a6e",
+      "supersededDiagnostic": false
+    },
+    {
+      "artifact": "reviews/634888ad4881/ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 1698,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "=============================================================================\n\n=============================== Coverage summary ===============================\nStatements   : 99.3% ( 285/287 )\nBranches     : 98.51% ( 132/134 )\nFunctions    : 100% ( 24/24 )\nLines        : 100% ( 255/255 )\n================================================================================\n\n> denque@2.1.0 typescript\n> tsc --project ./test/type/tsconfig.json\n",
+      "fullLocalOutputSha256": "9825ec17b4f14f7a9952ac6abbfda50ad5d65062bcc3aca9ca056d46f6498e3d",
+      "supersededDiagnostic": false
+    },
+    {
+      "artifact": "reviews/634888ad4881/test-sensitivity/result.json",
+      "exit": 0,
+      "elapsedMs": 2386,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "=============================================================================\n\n=============================== Coverage summary ===============================\nStatements   : 99.32% ( 292/294 )\nBranches     : 98.53% ( 134/136 )\nFunctions    : 100% ( 26/26 )\nLines        : 100% ( 261/261 )\n================================================================================\n\n> denque@2.1.0 typescript\n> tsc --project ./test/type/tsconfig.json\n",
+      "fullLocalOutputSha256": "a1c812a5ec25c3acb6e671214405996351eb7708ddc3ae988add36d25823e4d7",
+      "supersededDiagnostic": false
+    }
+  ],
+  "native": {
+    "completed": true,
+    "exitCode": 0,
+    "signal": null,
+    "lastStepFinish": "stop",
+    "normalHandoff": true,
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "workflowStatus": null,
+    "terminalPatchVerification": null,
+    "lastNativeTextSha256": "cc416377745544be2de18681634a04e8946a32104def9f31b1dbc66611d98f79",
+    "normalFinalResponse": true,
+    "finalResponseExcerpt": "Implemented `removeWhere(predicate): number`.\n\n- Exception-safe snapshot evaluation with original indexes/order\n- Preserves survivors, identity, wrapping, and capacity\n- Rejects non-functions, including on empty queues\n- Added JavaScript regression tests and TypeScript declaration coverage\n- Updated README and API docs\n\nChecks run:\n- `npm test`: 55 passing\n- TypeScript declarations compiled successfully\n- `git diff --check`\n- Manual rollback edge check passed",
+    "authorExplanationExcerpt": null,
+    "reportFindings": []
+  }
+}

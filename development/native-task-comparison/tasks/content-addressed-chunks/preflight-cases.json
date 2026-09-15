@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/store.mjs": "import {createHash} from 'node:crypto';export function createStore(chunkSize){const files=new Map();const digest=b=>createHash('sha256').update(b).digest('hex');return {put(name,bytes){files.set(name,Uint8Array.from(bytes));},get(name){return files.has(name)?Uint8Array.from(files.get(name)):null;},remove(name){return files.delete(name);},stats(){const entries=[],chunks=new Map();for(const [name,bytes]of [...files].sort(([a],[b])=>a<b?-1:a>b?1:0)){const ids=[];for(let i=0;i<bytes.length;i+=chunkSize){const part=bytes.subarray(i,i+chunkSize),hash=digest(part);ids.push(hash);const c=chunks.get(hash)??{hash,size:part.length,refs:0};c.refs++;chunks.set(hash,c);}entries.push({name,chunks:ids});}return {files:entries,chunks:[...chunks.values()].sort((a,b)=>a.hash<b.hash?-1:a.hash>b.hash?1:0)};}};}\n"
+  },
+  "mutants": [
+    {
+      "name": "count-distinct-files-not-occurrences",
+      "file": "src/store.mjs",
+      "replacement": "import {createHash} from 'node:crypto';export function createStore(chunkSize){const files=new Map(),chunks=new Map();const drop=ids=>{for(const id of ids){const c=chunks.get(id);if(--c.refs===0)chunks.delete(id);}};return {put(name,bytes){const ids=[];for(let at=0;at<bytes.length;at+=chunkSize){const data=Uint8Array.from(bytes.subarray(at,at+chunkSize)),hash=createHash('sha256').update(data).digest('hex');let c=chunks.get(hash);if(!c)chunks.set(hash,c={data,refs:0});if(!ids.includes(hash))c.refs++;ids.push(hash);}const old=files.get(name);files.set(name,ids);if(old)drop(old);},get(name){if(!files.has(name))return null;const ids=files.get(name),out=new Uint8Array(ids.reduce((n,id)=>n+chunks.get(id).data.length,0));let at=0;for(const id of ids){const data=chunks.get(id).data;out.set(data,at);at+=data.length;}return out;},remove(name){if(!files.has(name))return false;drop(files.get(name));files.delete(name);return true;},stats(){return {files:[...files].sort(([a],[b])=>a<b?-1:a>b?1:0).map(([name,ids])=>({name,chunks:[...ids]})),chunks:[...chunks].sort(([a],[b])=>a<b?-1:a>b?1:0).map(([hash,c])=>({hash,size:c.data.length,refs:c.refs}))};}};}\n"
+    },
+    {
+      "name": "replacement-leaks-old-references",
+      "file": "src/store.mjs",
+      "replacement": "import {createHash} from 'node:crypto';export function createStore(chunkSize){const files=new Map(),chunks=new Map();const drop=ids=>{for(const id of ids){const c=chunks.get(id);if(--c.refs===0)chunks.delete(id);}};return {put(name,bytes){const ids=[];for(let at=0;at<bytes.length;at+=chunkSize){const data=Uint8Array.from(bytes.subarray(at,at+chunkSize)),hash=createHash('sha256').update(data).digest('hex');let c=chunks.get(hash);if(!c)chunks.set(hash,c={data,refs:0});c.refs++;ids.push(hash);}const old=files.get(name);files.set(name,ids);},get(name){if(!files.has(name))return null;const ids=files.get(name),out=new Uint8Array(ids.reduce((n,id)=>n+chunks.get(id).data.length,0));let at=0;for(const id of ids){const data=chunks.get(id).data;out.set(data,at);at+=data.length;}return out;},remove(name){if(!files.has(name))return false;drop(files.get(name));files.delete(name);return true;},stats(){return {files:[...files].sort(([a],[b])=>a<b?-1:a>b?1:0).map(([name,ids])=>({name,chunks:[...ids]})),chunks:[...chunks].sort(([a],[b])=>a<b?-1:a>b?1:0).map(([hash,c])=>({hash,size:c.data.length,refs:c.refs}))};}};}\n"
+    }
+  ]
+}

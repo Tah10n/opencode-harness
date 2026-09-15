@@ -1,0 +1,562 @@
+[
+  {
+    "task": "bracket-check-core",
+    "variant": "initial",
+    "ordinaryExit": 0,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "bracket-check-core",
+    "variant": "reference",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "bracket-check-core",
+    "variant": "alternative",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "bracket-check-core",
+    "variant": "latest-opener",
+    "ordinaryExit": 1,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "calendar-week-summary",
+    "variant": "initial",
+    "ordinaryExit": 0,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "calendar-week-summary",
+    "variant": "reference",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "calendar-week-summary",
+    "variant": "alternative",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "calendar-week-summary",
+    "variant": "group-by-day",
+    "ordinaryExit": 1,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "css-layer-bundle",
+    "variant": "initial",
+    "ordinaryExit": 0,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "css-layer-bundle",
+    "variant": "reference",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "css-layer-bundle",
+    "variant": "alternative",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "css-layer-bundle",
+    "variant": "ignore-dependencies",
+    "ordinaryExit": 1,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "duration-bigint-adapter",
+    "variant": "initial",
+    "ordinaryExit": 0,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "duration-bigint-adapter",
+    "variant": "reference",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "duration-bigint-adapter",
+    "variant": "alternative",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "duration-bigint-adapter",
+    "variant": "bigint-number-rounding",
+    "ordinaryExit": 1,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "event-cursor-compaction",
+    "variant": "initial",
+    "ordinaryExit": 0,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "event-cursor-compaction",
+    "variant": "reference",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "event-cursor-compaction",
+    "variant": "alternative",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "event-cursor-compaction",
+    "variant": "restart-after-compaction",
+    "ordinaryExit": 1,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "histogram-pure-core",
+    "variant": "initial",
+    "ordinaryExit": 0,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "histogram-pure-core",
+    "variant": "reference",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "histogram-pure-core",
+    "variant": "alternative",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "histogram-pure-core",
+    "variant": "sort-core",
+    "ordinaryExit": 1,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "inventory-count-delta",
+    "variant": "initial",
+    "ordinaryExit": 0,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "inventory-count-delta",
+    "variant": "reference",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "inventory-count-delta",
+    "variant": "alternative",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "inventory-count-delta",
+    "variant": "zero-retained",
+    "ordinaryExit": 1,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "inventory-kit-availability",
+    "variant": "initial",
+    "ordinaryExit": 0,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "inventory-kit-availability",
+    "variant": "reference",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "inventory-kit-availability",
+    "variant": "alternative",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "inventory-kit-availability",
+    "variant": "duplicate-parts-not-summed",
+    "ordinaryExit": 1,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "luhn-checksum-core",
+    "variant": "initial",
+    "ordinaryExit": 0,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "luhn-checksum-core",
+    "variant": "reference",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "luhn-checksum-core",
+    "variant": "alternative",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "luhn-checksum-core",
+    "variant": "wrong-parity",
+    "ordinaryExit": 1,
+    "acceptanceExit": 1,
+    "preservationExit": 1
+  },
+  {
+    "task": "map-record-catalog",
+    "variant": "initial",
+    "ordinaryExit": 0,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "map-record-catalog",
+    "variant": "reference",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "map-record-catalog",
+    "variant": "alternative",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "map-record-catalog",
+    "variant": "sort-map",
+    "ordinaryExit": 1,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "percentile-method-options",
+    "variant": "initial",
+    "ordinaryExit": 0,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "percentile-method-options",
+    "variant": "reference",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "percentile-method-options",
+    "variant": "alternative",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "percentile-method-options",
+    "variant": "linear-default",
+    "ordinaryExit": 1,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "preference-tombstone-overlay",
+    "variant": "initial",
+    "ordinaryExit": 0,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "preference-tombstone-overlay",
+    "variant": "reference",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "preference-tombstone-overlay",
+    "variant": "alternative",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "preference-tombstone-overlay",
+    "variant": "drop-tombstone-during-compose",
+    "ordinaryExit": 1,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "quiz-progress-migration",
+    "variant": "initial",
+    "ordinaryExit": 0,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "quiz-progress-migration",
+    "variant": "reference",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "quiz-progress-migration",
+    "variant": "alternative",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "quiz-progress-migration",
+    "variant": "v2-drops-extras",
+    "ordinaryExit": 1,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "redirect-chain-report",
+    "variant": "initial",
+    "ordinaryExit": 0,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "redirect-chain-report",
+    "variant": "reference",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "redirect-chain-report",
+    "variant": "alternative",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "redirect-chain-report",
+    "variant": "empty-target-dropped",
+    "ordinaryExit": 1,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "roman-format-core",
+    "variant": "initial",
+    "ordinaryExit": 0,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "roman-format-core",
+    "variant": "reference",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "roman-format-core",
+    "variant": "alternative",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "roman-format-core",
+    "variant": "subtractives-missing",
+    "ordinaryExit": 1,
+    "acceptanceExit": 1,
+    "preservationExit": 1
+  },
+  {
+    "task": "seat-reservation-snapshot",
+    "variant": "initial",
+    "ordinaryExit": 0,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "seat-reservation-snapshot",
+    "variant": "reference",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "seat-reservation-snapshot",
+    "variant": "alternative",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "seat-reservation-snapshot",
+    "variant": "partial-conflict-write",
+    "ordinaryExit": 1,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "set-query-consumer",
+    "variant": "initial",
+    "ordinaryExit": 0,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "set-query-consumer",
+    "variant": "reference",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "set-query-consumer",
+    "variant": "alternative",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "set-query-consumer",
+    "variant": "OR-query",
+    "ordinaryExit": 1,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "slug-token-policy",
+    "variant": "initial",
+    "ordinaryExit": 0,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "slug-token-policy",
+    "variant": "reference",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "slug-token-policy",
+    "variant": "alternative",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "slug-token-policy",
+    "variant": "truncate-with-trailing-hyphen",
+    "ordinaryExit": 1,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "terminal-table-render",
+    "variant": "initial",
+    "ordinaryExit": 0,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "terminal-table-render",
+    "variant": "reference",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "terminal-table-render",
+    "variant": "alternative",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "terminal-table-render",
+    "variant": "utf16-width",
+    "ordinaryExit": 1,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "tuple-point-distance",
+    "variant": "initial",
+    "ordinaryExit": 0,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  },
+  {
+    "task": "tuple-point-distance",
+    "variant": "reference",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "tuple-point-distance",
+    "variant": "alternative",
+    "ordinaryExit": 0,
+    "acceptanceExit": 0,
+    "preservationExit": 0
+  },
+  {
+    "task": "tuple-point-distance",
+    "variant": "skip-singleton-validation",
+    "ordinaryExit": 1,
+    "acceptanceExit": 1,
+    "preservationExit": 0
+  }
+]

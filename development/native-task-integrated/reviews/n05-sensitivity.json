@@ -1,0 +1,15 @@
+{
+  "id": "n05",
+  "task": "url-search-params",
+  "property": "URLSearchParams public serialization retains entries",
+  "mutation": {
+    "file": "src/query.ts",
+    "needle": "if (query instanceof URLSearchParams) {",
+    "replacement": "if (query instanceof URLSearchParams) { return \"\";",
+    "before": "3e0bcea85742582ff62351e87805dab5897433ad6366a2fc4d518fd70bdf0ea8",
+    "after": "b2ba108bcfbcecac880ceed522c83a762fe6db0926c2f819169b389e97865971"
+  },
+  "status": 1,
+  "detected": true,
+  "cleanupStatus": 0
+}

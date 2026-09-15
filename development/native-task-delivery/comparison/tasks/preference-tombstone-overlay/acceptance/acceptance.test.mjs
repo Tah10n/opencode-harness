@@ -1,0 +1,5 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import path from 'node:path';const root=process.env.PILOT_SOURCE;
+const m0=await import(path.join(root,"src/preferences.mjs"));
+test("composed tombstones equal sequential overlay",()=>{const d={x:1,y:2},a={x:null,z:3},b={y:null,z:0};assert.deepEqual(m0.compose(a,b),{x:null,z:0,y:null});assert.deepEqual(m0.overlay(d,m0.compose(a,b)),m0.overlay(m0.overlay(d,a),b));assert.deepEqual(m0.overlay(d,m0.compose(a,b)),{z:0});});
+test("replacement ownership and special keys",()=>{const d={x:{a:1}},p={x:{b:2},['__proto__']:{safe:true}};const r=m0.overlay(d,p);assert.deepEqual(r.x,{b:2});assert.equal(Object.getPrototypeOf(r),Object.prototype);r.x.b=3;r.__proto__.safe=false;assert.equal(p.x.b,2);assert.equal(p.__proto__.safe,true);assert.deepEqual(d,{x:{a:1}});});
+test("false empty and array are values",()=>{assert.deepEqual(m0.overlay({a:1,b:2,c:3},{a:false,b:'',c:[]}),{a:false,b:'',c:[]});const p={x:[1]},r=m0.compose({},p);r.x.push(2);assert.deepEqual(p.x,[1]);});

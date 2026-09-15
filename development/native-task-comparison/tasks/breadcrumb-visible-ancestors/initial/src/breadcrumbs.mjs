@@ -1,0 +1,1 @@
+import {findTrail} from './tree.mjs';export function breadcrumbs(nodes,id){return (findTrail(nodes,id)??[]).map((n,i,a)=>({id:n.id,label:n.label,href:i===a.length-1?null:n.href,current:i===a.length-1}));}

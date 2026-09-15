@@ -1,0 +1,18 @@
+{
+  "category": "refactoring",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "checksum parity and consumer mask",
+    "strict input and zero allowed"
+  ],
+  "docDelivery": [
+    "Document strict ASCII input, Luhn parity, all-zero validity, masking even invalid strings and non-payment scope."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Extract validDigits(text) into src/luhn.mjs and delegate describe(text) in src/describe.mjs. validDigits accepts nonempty ASCII digits only, then standard Luhn checksum: from rightmost check digit leave first unchanged, double every second leftward and subtract9 if doubled>9; sum divisible10. No length/card-brand restrictions; all-zero strings are valid. Other strings return false, no stripping separators/whitespace or Unicode digit normalization. describe returns {valid,masked}, mask all but last4 UTF16 units with *, preserving input exactly in suffix; invalid input still masked same way. Domain strings<=10000. Pure stateless core, no I/O/payment/network, no duplicate checksum in consumer.",
+  "manualBehavior": [
+    "describe calls validDigits; no duplicate checksum"
+  ],
+  "independence": "Explicit synthetic library contract; alternatives judged by observable exports and required integration, not reference-source matching."
+}

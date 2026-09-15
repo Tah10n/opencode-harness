@@ -1,0 +1,179 @@
+diff --git a/index.d.ts b/index.d.ts
+index 3e8ac46f0bd2992c19e3bd2ca43d89f06a304e07..7ad6c89277f8089de71be38c46199623e923fc98 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -70,6 +70,16 @@ export default class QuickLRU<KeyType, ValueType> extends Map<KeyType, ValueType
+ 	*/
+ 	get(key: KeyType): ValueType | undefined;
+ 
++	/**
++	Get an item, or synchronously compute and insert it when it is missing or expired.
++
++		The factory is called with the key and the computed item uses the cache's default `maxAge`.
++
++		A cache hit is marked as recently used like `get()`.
++		If the factory throws, the error is propagated and no item is inserted.
++	*/
++	getOrInsertComputed(key: KeyType, factory: (key: KeyType) => ValueType): ValueType;
++
+ 	/**
+ 	Check if an item exists.
+ 	*/
+diff --git a/index.js b/index.js
+index 7f87cf591ada3e59e432a515791a4a4f7f05becb..c5181b29c3ff927b3600c6e507bc981561aa096b 100644
+--- a/index.js
++++ b/index.js
+@@ -117,6 +117,27 @@ export default class QuickLRU extends Map {
+ 		}
+ 	}
+ 
++	getOrInsertComputed(key, factory) {
++		if (this.#cache.has(key)) {
++			const item = this.#cache.get(key);
++			if (this.#deleteIfExpired(key, item) === false) {
++				return item.value;
++			}
++		}
++
++		if (this.#oldCache.has(key)) {
++			const item = this.#oldCache.get(key);
++			if (this.#deleteIfExpired(key, item) === false) {
++				this.#moveToRecent(key, item);
++				return item.value;
++			}
++		}
++
++		const value = factory(key);
++		this.set(key, value);
++		return value;
++	}
++
+ 	set(key, value, {maxAge = this.#maxAge} = {}) {
+ 		const expiry = typeof maxAge === 'number' && maxAge !== Number.POSITIVE_INFINITY
+ 			? (Date.now() + maxAge)
+diff --git a/index.test-d.ts b/index.test-d.ts
+index bc4b63e49a5ea669aea3c4bd4ed3f989750aaba2..7da897fe7371d2c0dcb5b615e364accc186087ab 100644
+--- a/index.test-d.ts
++++ b/index.test-d.ts
+@@ -1,10 +1,12 @@
+-import {expectType} from 'tsd';
++import {expectError, expectType} from 'tsd';
+ import QuickLRU from './index.js';
+ 
+ const lru = new QuickLRU<string, number>({maxSize: 1000, maxAge: 200});
+ 
+ expectType<QuickLRU<string, number>>(lru.set('🦄', 1).set('🌈', 2));
+ expectType<number | undefined>(lru.get('🦄'));
++expectType<number>(lru.getOrInsertComputed('length', key => key.length));
++expectError(lru.getOrInsertComputed('🦄', () => 'not a number'));
+ expectType<boolean>(lru.has('🦄'));
+ expectType<number | undefined>(lru.peek('🦄'));
+ expectType<number | undefined>(lru.expiresIn('🦄'));
+diff --git a/readme.md b/readme.md
+index bad09c35aa1bcd5af7d0c7b4de822eb8baeb607c..c3d86cb6169cd878956bdd68868404f2bdb98fb0 100644
+--- a/readme.md
++++ b/readme.md
+@@ -90,6 +90,13 @@ Individual expiration of an item can be specified with the `maxAge` option. If n
+ 
+ Get an item.
+ 
++#### .getOrInsertComputed(key, factory)
++
++Get an item, or synchronously compute and insert it when it is missing or expired.
++The `factory` is called with the key and its returned value uses the cache's default `maxAge`.
++When an item exists, the factory is not called and the item is marked as recently used like `.get()`.
++If the factory throws, the error is propagated and no item is inserted.
++
+ #### .has(key)
+ 
+ Check if an item exists.
+diff --git a/test.js b/test.js
+index 0904dc266d45e27d109d4296fdb5aabc011ea1c5..0cb587699d4568209331702997490fe8e4c7c199 100644
+--- a/test.js
++++ b/test.js
+@@ -31,6 +31,85 @@ test('.get() / .set()', t => {
+ 	t.is(lru.size, 2);
+ });
+ 
++test('.getOrInsertComputed() hits stored undefined and refreshes old-cache recency', t => {
++	const lru = new QuickLRU({maxSize: 3});
++	lru.set('undefined', undefined);
++	lru.set('a', 'a');
++	lru.set('b', 'b');
++
++	t.true(lru.__oldCache.has('undefined'));
++	t.is(lru.__oldCache.get('undefined').value, undefined);
++
++	let factoryCalls = 0;
++	t.is(lru.getOrInsertComputed('undefined', () => {
++		factoryCalls++;
++		return 'computed';
++	}), undefined);
++	t.is(factoryCalls, 0);
++
++	lru.set('c', 'c');
++	lru.set('d', 'd');
++	lru.set('e', 'e');
++	t.true(lru.has('undefined'));
++});
++
++test('.getOrInsertComputed() replaces expired entries with the default TTL', async t => {
++	const evictions = [];
++	const lru = new QuickLRU({
++		maxSize: 10,
++		maxAge: 100,
++		onEviction(key, value) {
++			evictions.push([key, value]);
++		},
++	});
++	lru.set('key', 'expired', {maxAge: 1});
++	await delay(10);
++
++	// Check the stored entry is expired without triggering its lazy eviction.
++	t.true(lru.expiresIn('key') <= 0);
++
++	let factoryCalls = 0;
++	t.is(lru.getOrInsertComputed('key', key => {
++		factoryCalls++;
++		t.is(key, 'key');
++		return 'computed';
++	}), 'computed');
++	t.is(factoryCalls, 1);
++	t.deepEqual(evictions, [['key', 'expired']]);
++	t.true(lru.has('key'));
++	const remaining = lru.expiresIn('key');
++	t.true(remaining > 0 && remaining <= lru.maxAge);
++});
++
++test('.getOrInsertComputed() preserves thrown errors and key/cache identity', t => {
++	const lru = new QuickLRU({maxSize: 10});
++	const key = {};
++	const error = new Error('factory failed');
++
++	t.false(lru.has(key));
++	const thrown = t.throws(() => lru.getOrInsertComputed(key, () => {
++		throw error;
++	}));
++	t.is(thrown, error);
++	t.false(lru.has(key));
++	t.is(lru.size, 0);
++
++	const otherLru = new QuickLRU({maxSize: 10});
++	const firstValue = {cache: 'first'};
++	const secondValue = {cache: 'second'};
++	t.is(otherLru.size, 0);
++	t.is(lru.getOrInsertComputed(key, currentKey => {
++		t.is(currentKey, key);
++		return firstValue;
++	}), firstValue);
++	t.is(otherLru.getOrInsertComputed(key, currentKey => {
++		t.is(currentKey, key);
++		return secondValue;
++	}), secondValue);
++	t.is(lru.get(key), firstValue);
++	t.is(otherLru.get(key), secondValue);
++});
++
+ test('.get() - limit', t => {
+ 	const lru = new QuickLRU({maxSize: 2});
+ 	lru.set('1', 1);

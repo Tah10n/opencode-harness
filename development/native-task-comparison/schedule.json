@@ -1,0 +1,1610 @@
+{
+  "seed": "f7d8534161f1adf50e304c9b3cad5f756ce39bc9eb551abd7db8ee6af2a72aad",
+  "method": "SHA256 seed-NUL-label-id sort; independent pair and first-arm labels; first-arm stratified13/12,13/12,12/13,12/13 across four classes",
+  "pairs": 100,
+  "slots": 200,
+  "abPairs": 50,
+  "baPairs": 50,
+  "attempts": [
+    {
+      "slot": 1,
+      "pair": 1,
+      "task": "span-source-map-compose",
+      "category": "integration",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/span-source-map-compose/initial"
+    },
+    {
+      "slot": 2,
+      "pair": 1,
+      "task": "span-source-map-compose",
+      "category": "integration",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/span-source-map-compose/initial"
+    },
+    {
+      "slot": 3,
+      "pair": 2,
+      "task": "immutable-board-moves",
+      "category": "refactoring",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/immutable-board-moves/initial"
+    },
+    {
+      "slot": 4,
+      "pair": 2,
+      "task": "immutable-board-moves",
+      "category": "refactoring",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/immutable-board-moves/initial"
+    },
+    {
+      "slot": 5,
+      "pair": 3,
+      "task": "conditional-form-errors",
+      "category": "integration",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/conditional-form-errors/initial"
+    },
+    {
+      "slot": 6,
+      "pair": 3,
+      "task": "conditional-form-errors",
+      "category": "integration",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/conditional-form-errors/initial"
+    },
+    {
+      "slot": 7,
+      "pair": 4,
+      "task": "reservoir-sample-resume",
+      "category": "state",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/reservoir-sample-resume/initial"
+    },
+    {
+      "slot": 8,
+      "pair": 4,
+      "task": "reservoir-sample-resume",
+      "category": "state",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/reservoir-sample-resume/initial"
+    },
+    {
+      "slot": 9,
+      "pair": 5,
+      "task": "unit-conversion-graph",
+      "category": "refactoring",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/unit-conversion-graph/initial"
+    },
+    {
+      "slot": 10,
+      "pair": 5,
+      "task": "unit-conversion-graph",
+      "category": "refactoring",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/unit-conversion-graph/initial"
+    },
+    {
+      "slot": 11,
+      "pair": 6,
+      "task": "abortable-delay-consumer",
+      "category": "compatibility",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/abortable-delay-consumer/initial"
+    },
+    {
+      "slot": 12,
+      "pair": 6,
+      "task": "abortable-delay-consumer",
+      "category": "compatibility",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/abortable-delay-consumer/initial"
+    },
+    {
+      "slot": 13,
+      "pair": 7,
+      "task": "path-edit-transaction",
+      "category": "state",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/path-edit-transaction/initial"
+    },
+    {
+      "slot": 14,
+      "pair": 7,
+      "task": "path-edit-transaction",
+      "category": "state",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/path-edit-transaction/initial"
+    },
+    {
+      "slot": 15,
+      "pair": 8,
+      "task": "symbol-property-copy",
+      "category": "compatibility",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/symbol-property-copy/initial"
+    },
+    {
+      "slot": 16,
+      "pair": 8,
+      "task": "symbol-property-copy",
+      "category": "compatibility",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/symbol-property-copy/initial"
+    },
+    {
+      "slot": 17,
+      "pair": 9,
+      "task": "feature-rollout-context",
+      "category": "integration",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/feature-rollout-context/initial"
+    },
+    {
+      "slot": 18,
+      "pair": 9,
+      "task": "feature-rollout-context",
+      "category": "integration",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/feature-rollout-context/initial"
+    },
+    {
+      "slot": 19,
+      "pair": 10,
+      "task": "sliding-session-expiry",
+      "category": "state",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/sliding-session-expiry/initial"
+    },
+    {
+      "slot": 20,
+      "pair": 10,
+      "task": "sliding-session-expiry",
+      "category": "state",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/sliding-session-expiry/initial"
+    },
+    {
+      "slot": 21,
+      "pair": 11,
+      "task": "header-multimap-api",
+      "category": "compatibility",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/header-multimap-api/initial"
+    },
+    {
+      "slot": 22,
+      "pair": 11,
+      "task": "header-multimap-api",
+      "category": "compatibility",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/header-multimap-api/initial"
+    },
+    {
+      "slot": 23,
+      "pair": 12,
+      "task": "bounded-lru-persistence",
+      "category": "state",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/bounded-lru-persistence/initial"
+    },
+    {
+      "slot": 24,
+      "pair": 12,
+      "task": "bounded-lru-persistence",
+      "category": "state",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/bounded-lru-persistence/initial"
+    },
+    {
+      "slot": 25,
+      "pair": 13,
+      "task": "clock-injected-reminders",
+      "category": "refactoring",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/clock-injected-reminders/initial"
+    },
+    {
+      "slot": 26,
+      "pair": 13,
+      "task": "clock-injected-reminders",
+      "category": "refactoring",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/clock-injected-reminders/initial"
+    },
+    {
+      "slot": 27,
+      "pair": 14,
+      "task": "version-vector-relations",
+      "category": "state",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/version-vector-relations/initial"
+    },
+    {
+      "slot": 28,
+      "pair": 14,
+      "task": "version-vector-relations",
+      "category": "state",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/version-vector-relations/initial"
+    },
+    {
+      "slot": 29,
+      "pair": 15,
+      "task": "lazy-default-arguments",
+      "category": "compatibility",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/lazy-default-arguments/initial"
+    },
+    {
+      "slot": 30,
+      "pair": 15,
+      "task": "lazy-default-arguments",
+      "category": "compatibility",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/lazy-default-arguments/initial"
+    },
+    {
+      "slot": 31,
+      "pair": 16,
+      "task": "encoder-decoder-separation",
+      "category": "refactoring",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/encoder-decoder-separation/initial"
+    },
+    {
+      "slot": 32,
+      "pair": 16,
+      "task": "encoder-decoder-separation",
+      "category": "refactoring",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/encoder-decoder-separation/initial"
+    },
+    {
+      "slot": 33,
+      "pair": 17,
+      "task": "multi-value-query-state",
+      "category": "state",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/multi-value-query-state/initial"
+    },
+    {
+      "slot": 34,
+      "pair": 17,
+      "task": "multi-value-query-state",
+      "category": "state",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/multi-value-query-state/initial"
+    },
+    {
+      "slot": 35,
+      "pair": 18,
+      "task": "array-like-slice-consumer",
+      "category": "compatibility",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/array-like-slice-consumer/initial"
+    },
+    {
+      "slot": 36,
+      "pair": 18,
+      "task": "array-like-slice-consumer",
+      "category": "compatibility",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/array-like-slice-consumer/initial"
+    },
+    {
+      "slot": 37,
+      "pair": 19,
+      "task": "immutable-color-transform",
+      "category": "refactoring",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/immutable-color-transform/initial"
+    },
+    {
+      "slot": 38,
+      "pair": 19,
+      "task": "immutable-color-transform",
+      "category": "refactoring",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/immutable-color-transform/initial"
+    },
+    {
+      "slot": 39,
+      "pair": 20,
+      "task": "parcel-shipping-quote",
+      "category": "integration",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/parcel-shipping-quote/initial"
+    },
+    {
+      "slot": 40,
+      "pair": 20,
+      "task": "parcel-shipping-quote",
+      "category": "integration",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/parcel-shipping-quote/initial"
+    },
+    {
+      "slot": 41,
+      "pair": 21,
+      "task": "image-transform-pipeline",
+      "category": "integration",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/image-transform-pipeline/initial"
+    },
+    {
+      "slot": 42,
+      "pair": 21,
+      "task": "image-transform-pipeline",
+      "category": "integration",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/image-transform-pipeline/initial"
+    },
+    {
+      "slot": 43,
+      "pair": 22,
+      "task": "url-resolver-consumers",
+      "category": "compatibility",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/url-resolver-consumers/initial"
+    },
+    {
+      "slot": 44,
+      "pair": 22,
+      "task": "url-resolver-consumers",
+      "category": "compatibility",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/url-resolver-consumers/initial"
+    },
+    {
+      "slot": 45,
+      "pair": 23,
+      "task": "zoned-time-offset-records",
+      "category": "state",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/zoned-time-offset-records/initial"
+    },
+    {
+      "slot": 46,
+      "pair": 23,
+      "task": "zoned-time-offset-records",
+      "category": "state",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/zoned-time-offset-records/initial"
+    },
+    {
+      "slot": 47,
+      "pair": 24,
+      "task": "incremental-line-index",
+      "category": "state",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/incremental-line-index/initial"
+    },
+    {
+      "slot": 48,
+      "pair": 24,
+      "task": "incremental-line-index",
+      "category": "state",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/incremental-line-index/initial"
+    },
+    {
+      "slot": 49,
+      "pair": 25,
+      "task": "casefold-command-aliases",
+      "category": "compatibility",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/casefold-command-aliases/initial"
+    },
+    {
+      "slot": 50,
+      "pair": 25,
+      "task": "casefold-command-aliases",
+      "category": "compatibility",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/casefold-command-aliases/initial"
+    },
+    {
+      "slot": 51,
+      "pair": 26,
+      "task": "breadcrumb-visible-ancestors",
+      "category": "integration",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/breadcrumb-visible-ancestors/initial"
+    },
+    {
+      "slot": 52,
+      "pair": 26,
+      "task": "breadcrumb-visible-ancestors",
+      "category": "integration",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/breadcrumb-visible-ancestors/initial"
+    },
+    {
+      "slot": 53,
+      "pair": 27,
+      "task": "markdown-heading-navigation",
+      "category": "integration",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/markdown-heading-navigation/initial"
+    },
+    {
+      "slot": 54,
+      "pair": 27,
+      "task": "markdown-heading-navigation",
+      "category": "integration",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/markdown-heading-navigation/initial"
+    },
+    {
+      "slot": 55,
+      "pair": 28,
+      "task": "binary-tlv-stream",
+      "category": "state",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/binary-tlv-stream/initial"
+    },
+    {
+      "slot": 56,
+      "pair": 28,
+      "task": "binary-tlv-stream",
+      "category": "state",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/binary-tlv-stream/initial"
+    },
+    {
+      "slot": 57,
+      "pair": 29,
+      "task": "optional-result-unwrapping",
+      "category": "compatibility",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/optional-result-unwrapping/initial"
+    },
+    {
+      "slot": 58,
+      "pair": 29,
+      "task": "optional-result-unwrapping",
+      "category": "compatibility",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/optional-result-unwrapping/initial"
+    },
+    {
+      "slot": 59,
+      "pair": 30,
+      "task": "ledger-settlement-reconcile",
+      "category": "integration",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/ledger-settlement-reconcile/initial"
+    },
+    {
+      "slot": 60,
+      "pair": 30,
+      "task": "ledger-settlement-reconcile",
+      "category": "integration",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/ledger-settlement-reconcile/initial"
+    },
+    {
+      "slot": 61,
+      "pair": 31,
+      "task": "parser-diagnostic-locations",
+      "category": "refactoring",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/parser-diagnostic-locations/initial"
+    },
+    {
+      "slot": 62,
+      "pair": 31,
+      "task": "parser-diagnostic-locations",
+      "category": "refactoring",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/parser-diagnostic-locations/initial"
+    },
+    {
+      "slot": 63,
+      "pair": 32,
+      "task": "geographic-antimeridian-viewport",
+      "category": "integration",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/geographic-antimeridian-viewport/initial"
+    },
+    {
+      "slot": 64,
+      "pair": 32,
+      "task": "geographic-antimeridian-viewport",
+      "category": "integration",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/geographic-antimeridian-viewport/initial"
+    },
+    {
+      "slot": 65,
+      "pair": 33,
+      "task": "rolling-checksum-journal",
+      "category": "state",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/rolling-checksum-journal/initial"
+    },
+    {
+      "slot": 66,
+      "pair": 33,
+      "task": "rolling-checksum-journal",
+      "category": "state",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/rolling-checksum-journal/initial"
+    },
+    {
+      "slot": 67,
+      "pair": 34,
+      "task": "text-diff-patch-state",
+      "category": "state",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/text-diff-patch-state/initial"
+    },
+    {
+      "slot": 68,
+      "pair": 34,
+      "task": "text-diff-patch-state",
+      "category": "state",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/text-diff-patch-state/initial"
+    },
+    {
+      "slot": 69,
+      "pair": 35,
+      "task": "error-cause-chain-view",
+      "category": "compatibility",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/error-cause-chain-view/initial"
+    },
+    {
+      "slot": 70,
+      "pair": 35,
+      "task": "error-cause-chain-view",
+      "category": "compatibility",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/error-cause-chain-view/initial"
+    },
+    {
+      "slot": 71,
+      "pair": 36,
+      "task": "token-bucket-admission",
+      "category": "integration",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/token-bucket-admission/initial"
+    },
+    {
+      "slot": 72,
+      "pair": 36,
+      "task": "token-bucket-admission",
+      "category": "integration",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/token-bucket-admission/initial"
+    },
+    {
+      "slot": 73,
+      "pair": 37,
+      "task": "notification-channel-router",
+      "category": "refactoring",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/notification-channel-router/initial"
+    },
+    {
+      "slot": 74,
+      "pair": 37,
+      "task": "notification-channel-router",
+      "category": "refactoring",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/notification-channel-router/initial"
+    },
+    {
+      "slot": 75,
+      "pair": 38,
+      "task": "responsive-image-candidates",
+      "category": "integration",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/responsive-image-candidates/initial"
+    },
+    {
+      "slot": 76,
+      "pair": 38,
+      "task": "responsive-image-candidates",
+      "category": "integration",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/responsive-image-candidates/initial"
+    },
+    {
+      "slot": 77,
+      "pair": 39,
+      "task": "content-addressed-chunks",
+      "category": "state",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/content-addressed-chunks/initial"
+    },
+    {
+      "slot": 78,
+      "pair": 39,
+      "task": "content-addressed-chunks",
+      "category": "state",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/content-addressed-chunks/initial"
+    },
+    {
+      "slot": 79,
+      "pair": 40,
+      "task": "structured-redaction-walk",
+      "category": "refactoring",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/structured-redaction-walk/initial"
+    },
+    {
+      "slot": 80,
+      "pair": 40,
+      "task": "structured-redaction-walk",
+      "category": "refactoring",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/structured-redaction-walk/initial"
+    },
+    {
+      "slot": 81,
+      "pair": 41,
+      "task": "trace-context-propagation",
+      "category": "integration",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/trace-context-propagation/initial"
+    },
+    {
+      "slot": 82,
+      "pair": 41,
+      "task": "trace-context-propagation",
+      "category": "integration",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/trace-context-propagation/initial"
+    },
+    {
+      "slot": 83,
+      "pair": 42,
+      "task": "deterministic-shuffle-source",
+      "category": "refactoring",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/deterministic-shuffle-source/initial"
+    },
+    {
+      "slot": 84,
+      "pair": 42,
+      "task": "deterministic-shuffle-source",
+      "category": "refactoring",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/deterministic-shuffle-source/initial"
+    },
+    {
+      "slot": 85,
+      "pair": 43,
+      "task": "subscription-proration-lines",
+      "category": "integration",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/subscription-proration-lines/initial"
+    },
+    {
+      "slot": 86,
+      "pair": 43,
+      "task": "subscription-proration-lines",
+      "category": "integration",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/subscription-proration-lines/initial"
+    },
+    {
+      "slot": 87,
+      "pair": 44,
+      "task": "scope-policy-composition",
+      "category": "integration",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/scope-policy-composition/initial"
+    },
+    {
+      "slot": 88,
+      "pair": 44,
+      "task": "scope-policy-composition",
+      "category": "integration",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/scope-policy-composition/initial"
+    },
+    {
+      "slot": 89,
+      "pair": 45,
+      "task": "portable-path-core",
+      "category": "refactoring",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/portable-path-core/initial"
+    },
+    {
+      "slot": 90,
+      "pair": 45,
+      "task": "portable-path-core",
+      "category": "refactoring",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/portable-path-core/initial"
+    },
+    {
+      "slot": 91,
+      "pair": 46,
+      "task": "line-ending-input-adapter",
+      "category": "compatibility",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/line-ending-input-adapter/initial"
+    },
+    {
+      "slot": 92,
+      "pair": 46,
+      "task": "line-ending-input-adapter",
+      "category": "compatibility",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/line-ending-input-adapter/initial"
+    },
+    {
+      "slot": 93,
+      "pair": 47,
+      "task": "shell-word-tokenizer-api",
+      "category": "compatibility",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/shell-word-tokenizer-api/initial"
+    },
+    {
+      "slot": 94,
+      "pair": 47,
+      "task": "shell-word-tokenizer-api",
+      "category": "compatibility",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/shell-word-tokenizer-api/initial"
+    },
+    {
+      "slot": 95,
+      "pair": 48,
+      "task": "table-driven-http-status",
+      "category": "refactoring",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/table-driven-http-status/initial"
+    },
+    {
+      "slot": 96,
+      "pair": 48,
+      "task": "table-driven-http-status",
+      "category": "refactoring",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/table-driven-http-status/initial"
+    },
+    {
+      "slot": 97,
+      "pair": 49,
+      "task": "sparse-grid-persistence",
+      "category": "state",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/sparse-grid-persistence/initial"
+    },
+    {
+      "slot": 98,
+      "pair": 49,
+      "task": "sparse-grid-persistence",
+      "category": "state",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/sparse-grid-persistence/initial"
+    },
+    {
+      "slot": 99,
+      "pair": 50,
+      "task": "route-specificity-dispatch",
+      "category": "integration",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/route-specificity-dispatch/initial"
+    },
+    {
+      "slot": 100,
+      "pair": 50,
+      "task": "route-specificity-dispatch",
+      "category": "integration",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/route-specificity-dispatch/initial"
+    },
+    {
+      "slot": 101,
+      "pair": 51,
+      "task": "lazy-file-manifest",
+      "category": "refactoring",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/lazy-file-manifest/initial"
+    },
+    {
+      "slot": 102,
+      "pair": 51,
+      "task": "lazy-file-manifest",
+      "category": "refactoring",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/lazy-file-manifest/initial"
+    },
+    {
+      "slot": 103,
+      "pair": 52,
+      "task": "run-length-bitmap-codec",
+      "category": "state",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/run-length-bitmap-codec/initial"
+    },
+    {
+      "slot": 104,
+      "pair": 52,
+      "task": "run-length-bitmap-codec",
+      "category": "state",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/run-length-bitmap-codec/initial"
+    },
+    {
+      "slot": 105,
+      "pair": 53,
+      "task": "dependency-injected-id-source",
+      "category": "refactoring",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/dependency-injected-id-source/initial"
+    },
+    {
+      "slot": 106,
+      "pair": 53,
+      "task": "dependency-injected-id-source",
+      "category": "refactoring",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/dependency-injected-id-source/initial"
+    },
+    {
+      "slot": 107,
+      "pair": 54,
+      "task": "iterative-deep-flatten",
+      "category": "refactoring",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/iterative-deep-flatten/initial"
+    },
+    {
+      "slot": 108,
+      "pair": 54,
+      "task": "iterative-deep-flatten",
+      "category": "refactoring",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/iterative-deep-flatten/initial"
+    },
+    {
+      "slot": 109,
+      "pair": 55,
+      "task": "meeting-buffer-search",
+      "category": "integration",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/meeting-buffer-search/initial"
+    },
+    {
+      "slot": 110,
+      "pair": 55,
+      "task": "meeting-buffer-search",
+      "category": "integration",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/meeting-buffer-search/initial"
+    },
+    {
+      "slot": 111,
+      "pair": 56,
+      "task": "bigint-wire-boundary",
+      "category": "compatibility",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/bigint-wire-boundary/initial"
+    },
+    {
+      "slot": 112,
+      "pair": 56,
+      "task": "bigint-wire-boundary",
+      "category": "compatibility",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/bigint-wire-boundary/initial"
+    },
+    {
+      "slot": 113,
+      "pair": 57,
+      "task": "draft-three-way-merge",
+      "category": "state",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/draft-three-way-merge/initial"
+    },
+    {
+      "slot": 114,
+      "pair": 57,
+      "task": "draft-three-way-merge",
+      "category": "state",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/draft-three-way-merge/initial"
+    },
+    {
+      "slot": 115,
+      "pair": 58,
+      "task": "radix-tree-edit-state",
+      "category": "state",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/radix-tree-edit-state/initial"
+    },
+    {
+      "slot": 116,
+      "pair": 58,
+      "task": "radix-tree-edit-state",
+      "category": "state",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/radix-tree-edit-state/initial"
+    },
+    {
+      "slot": 117,
+      "pair": 59,
+      "task": "plugin-hook-composition",
+      "category": "integration",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/plugin-hook-composition/initial"
+    },
+    {
+      "slot": 118,
+      "pair": 59,
+      "task": "plugin-hook-composition",
+      "category": "integration",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/plugin-hook-composition/initial"
+    },
+    {
+      "slot": 119,
+      "pair": 60,
+      "task": "priority-inbox-state",
+      "category": "state",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/priority-inbox-state/initial"
+    },
+    {
+      "slot": 120,
+      "pair": 60,
+      "task": "priority-inbox-state",
+      "category": "state",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/priority-inbox-state/initial"
+    },
+    {
+      "slot": 121,
+      "pair": 61,
+      "task": "canonical-json-digest",
+      "category": "state",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/canonical-json-digest/initial"
+    },
+    {
+      "slot": 122,
+      "pair": 61,
+      "task": "canonical-json-digest",
+      "category": "state",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/canonical-json-digest/initial"
+    },
+    {
+      "slot": 123,
+      "pair": 62,
+      "task": "legacy-date-parser",
+      "category": "compatibility",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/legacy-date-parser/initial"
+    },
+    {
+      "slot": 124,
+      "pair": 62,
+      "task": "legacy-date-parser",
+      "category": "compatibility",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/legacy-date-parser/initial"
+    },
+    {
+      "slot": 125,
+      "pair": 63,
+      "task": "validation-rule-combinators",
+      "category": "refactoring",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/validation-rule-combinators/initial"
+    },
+    {
+      "slot": 126,
+      "pair": 63,
+      "task": "validation-rule-combinators",
+      "category": "refactoring",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/validation-rule-combinators/initial"
+    },
+    {
+      "slot": 127,
+      "pair": 64,
+      "task": "lexer-token-spans",
+      "category": "refactoring",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/lexer-token-spans/initial"
+    },
+    {
+      "slot": 128,
+      "pair": 64,
+      "task": "lexer-token-spans",
+      "category": "refactoring",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/lexer-token-spans/initial"
+    },
+    {
+      "slot": 129,
+      "pair": 65,
+      "task": "sync-async-disposal",
+      "category": "compatibility",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/sync-async-disposal/initial"
+    },
+    {
+      "slot": 130,
+      "pair": 65,
+      "task": "sync-async-disposal",
+      "category": "compatibility",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/sync-async-disposal/initial"
+    },
+    {
+      "slot": 131,
+      "pair": 66,
+      "task": "bloom-filter-union-state",
+      "category": "state",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/bloom-filter-union-state/initial"
+    },
+    {
+      "slot": 132,
+      "pair": 66,
+      "task": "bloom-filter-union-state",
+      "category": "state",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/bloom-filter-union-state/initial"
+    },
+    {
+      "slot": 133,
+      "pair": 67,
+      "task": "undo-redo-branching",
+      "category": "state",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/undo-redo-branching/initial"
+    },
+    {
+      "slot": 134,
+      "pair": 67,
+      "task": "undo-redo-branching",
+      "category": "state",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/undo-redo-branching/initial"
+    },
+    {
+      "slot": 135,
+      "pair": 68,
+      "task": "streaming-summary-fold",
+      "category": "refactoring",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/streaming-summary-fold/initial"
+    },
+    {
+      "slot": 136,
+      "pair": 68,
+      "task": "streaming-summary-fold",
+      "category": "refactoring",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/streaming-summary-fold/initial"
+    },
+    {
+      "slot": 137,
+      "pair": 69,
+      "task": "typed-byte-view-inputs",
+      "category": "compatibility",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/typed-byte-view-inputs/initial"
+    },
+    {
+      "slot": 138,
+      "pair": 69,
+      "task": "typed-byte-view-inputs",
+      "category": "compatibility",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/typed-byte-view-inputs/initial"
+    },
+    {
+      "slot": 139,
+      "pair": 70,
+      "task": "pure-reducer-effects",
+      "category": "refactoring",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/pure-reducer-effects/initial"
+    },
+    {
+      "slot": 140,
+      "pair": 70,
+      "task": "pure-reducer-effects",
+      "category": "refactoring",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/pure-reducer-effects/initial"
+    },
+    {
+      "slot": 141,
+      "pair": 71,
+      "task": "matrix-layout-strategies",
+      "category": "refactoring",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/matrix-layout-strategies/initial"
+    },
+    {
+      "slot": 142,
+      "pair": 71,
+      "task": "matrix-layout-strategies",
+      "category": "refactoring",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/matrix-layout-strategies/initial"
+    },
+    {
+      "slot": 143,
+      "pair": 72,
+      "task": "normalization-once-pipeline",
+      "category": "refactoring",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/normalization-once-pipeline/initial"
+    },
+    {
+      "slot": 144,
+      "pair": 72,
+      "task": "normalization-once-pipeline",
+      "category": "refactoring",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/normalization-once-pipeline/initial"
+    },
+    {
+      "slot": 145,
+      "pair": 73,
+      "task": "promise-finalizer-errors",
+      "category": "compatibility",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/promise-finalizer-errors/initial"
+    },
+    {
+      "slot": 146,
+      "pair": 73,
+      "task": "promise-finalizer-errors",
+      "category": "compatibility",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/promise-finalizer-errors/initial"
+    },
+    {
+      "slot": 147,
+      "pair": 74,
+      "task": "media-type-parameter-api",
+      "category": "compatibility",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/media-type-parameter-api/initial"
+    },
+    {
+      "slot": 148,
+      "pair": 74,
+      "task": "media-type-parameter-api",
+      "category": "compatibility",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/media-type-parameter-api/initial"
+    },
+    {
+      "slot": 149,
+      "pair": 75,
+      "task": "record-projection-consumer",
+      "category": "integration",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/record-projection-consumer/initial"
+    },
+    {
+      "slot": 150,
+      "pair": 75,
+      "task": "record-projection-consumer",
+      "category": "integration",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/record-projection-consumer/initial"
+    },
+    {
+      "slot": 151,
+      "pair": 76,
+      "task": "mime-inline-attachments",
+      "category": "integration",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/mime-inline-attachments/initial"
+    },
+    {
+      "slot": 152,
+      "pair": 76,
+      "task": "mime-inline-attachments",
+      "category": "integration",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/mime-inline-attachments/initial"
+    },
+    {
+      "slot": 153,
+      "pair": 77,
+      "task": "node-callback-abort",
+      "category": "compatibility",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/node-callback-abort/initial"
+    },
+    {
+      "slot": 154,
+      "pair": 77,
+      "task": "node-callback-abort",
+      "category": "compatibility",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/node-callback-abort/initial"
+    },
+    {
+      "slot": 155,
+      "pair": 78,
+      "task": "function-receiver-wrapper",
+      "category": "compatibility",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/function-receiver-wrapper/initial"
+    },
+    {
+      "slot": 156,
+      "pair": 78,
+      "task": "function-receiver-wrapper",
+      "category": "compatibility",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/function-receiver-wrapper/initial"
+    },
+    {
+      "slot": 157,
+      "pair": 79,
+      "task": "tiered-meter-invoice",
+      "category": "integration",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/tiered-meter-invoice/initial"
+    },
+    {
+      "slot": 158,
+      "pair": 79,
+      "task": "tiered-meter-invoice",
+      "category": "integration",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/tiered-meter-invoice/initial"
+    },
+    {
+      "slot": 159,
+      "pair": 80,
+      "task": "fractional-order-keys",
+      "category": "state",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/fractional-order-keys/initial"
+    },
+    {
+      "slot": 160,
+      "pair": 80,
+      "task": "fractional-order-keys",
+      "category": "state",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/fractional-order-keys/initial"
+    },
+    {
+      "slot": 161,
+      "pair": 81,
+      "task": "iterable-stream-adapter",
+      "category": "compatibility",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/iterable-stream-adapter/initial"
+    },
+    {
+      "slot": 162,
+      "pair": 81,
+      "task": "iterable-stream-adapter",
+      "category": "compatibility",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/iterable-stream-adapter/initial"
+    },
+    {
+      "slot": 163,
+      "pair": 82,
+      "task": "generator-tree-walk",
+      "category": "refactoring",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/generator-tree-walk/initial"
+    },
+    {
+      "slot": 164,
+      "pair": 82,
+      "task": "generator-tree-walk",
+      "category": "refactoring",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/generator-tree-walk/initial"
+    },
+    {
+      "slot": 165,
+      "pair": 83,
+      "task": "weighted-ballot-tabulation",
+      "category": "integration",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/weighted-ballot-tabulation/initial"
+    },
+    {
+      "slot": 166,
+      "pair": 83,
+      "task": "weighted-ballot-tabulation",
+      "category": "integration",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/weighted-ballot-tabulation/initial"
+    },
+    {
+      "slot": 167,
+      "pair": 84,
+      "task": "readonly-collection-view",
+      "category": "compatibility",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/readonly-collection-view/initial"
+    },
+    {
+      "slot": 168,
+      "pair": 84,
+      "task": "readonly-collection-view",
+      "category": "compatibility",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/readonly-collection-view/initial"
+    },
+    {
+      "slot": 169,
+      "pair": 85,
+      "task": "observed-remove-set",
+      "category": "state",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/observed-remove-set/initial"
+    },
+    {
+      "slot": 170,
+      "pair": 85,
+      "task": "observed-remove-set",
+      "category": "state",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/observed-remove-set/initial"
+    },
+    {
+      "slot": 171,
+      "pair": 86,
+      "task": "range-set-canonicalization",
+      "category": "state",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/range-set-canonicalization/initial"
+    },
+    {
+      "slot": 172,
+      "pair": 86,
+      "task": "range-set-canonicalization",
+      "category": "state",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/range-set-canonicalization/initial"
+    },
+    {
+      "slot": 173,
+      "pair": 87,
+      "task": "recurrence-exclusion-calendar",
+      "category": "integration",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/recurrence-exclusion-calendar/initial"
+    },
+    {
+      "slot": 174,
+      "pair": 87,
+      "task": "recurrence-exclusion-calendar",
+      "category": "integration",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/recurrence-exclusion-calendar/initial"
+    },
+    {
+      "slot": 175,
+      "pair": 88,
+      "task": "binary-search-api-bounds",
+      "category": "compatibility",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/binary-search-api-bounds/initial"
+    },
+    {
+      "slot": 176,
+      "pair": 88,
+      "task": "binary-search-api-bounds",
+      "category": "compatibility",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/binary-search-api-bounds/initial"
+    },
+    {
+      "slot": 177,
+      "pair": 89,
+      "task": "fragmented-message-decoder",
+      "category": "integration",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/fragmented-message-decoder/initial"
+    },
+    {
+      "slot": 178,
+      "pair": 89,
+      "task": "fragmented-message-decoder",
+      "category": "integration",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/fragmented-message-decoder/initial"
+    },
+    {
+      "slot": 179,
+      "pair": 90,
+      "task": "finite-state-transition-log",
+      "category": "state",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/finite-state-transition-log/initial"
+    },
+    {
+      "slot": 180,
+      "pair": 90,
+      "task": "finite-state-transition-log",
+      "category": "state",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/finite-state-transition-log/initial"
+    },
+    {
+      "slot": 181,
+      "pair": 91,
+      "task": "central-money-rounding",
+      "category": "refactoring",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/central-money-rounding/initial"
+    },
+    {
+      "slot": 182,
+      "pair": 91,
+      "task": "central-money-rounding",
+      "category": "refactoring",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/central-money-rounding/initial"
+    },
+    {
+      "slot": 183,
+      "pair": 92,
+      "task": "batch-error-aggregation",
+      "category": "refactoring",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/batch-error-aggregation/initial"
+    },
+    {
+      "slot": 184,
+      "pair": 92,
+      "task": "batch-error-aggregation",
+      "category": "refactoring",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/batch-error-aggregation/initial"
+    },
+    {
+      "slot": 185,
+      "pair": 93,
+      "task": "stable-sort-comparator",
+      "category": "compatibility",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/stable-sort-comparator/initial"
+    },
+    {
+      "slot": 186,
+      "pair": 93,
+      "task": "stable-sort-comparator",
+      "category": "compatibility",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/stable-sort-comparator/initial"
+    },
+    {
+      "slot": 187,
+      "pair": 94,
+      "task": "regexp-filter-state",
+      "category": "compatibility",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/regexp-filter-state/initial"
+    },
+    {
+      "slot": 188,
+      "pair": 94,
+      "task": "regexp-filter-state",
+      "category": "compatibility",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/regexp-filter-state/initial"
+    },
+    {
+      "slot": 189,
+      "pair": 95,
+      "task": "positional-options-overload",
+      "category": "compatibility",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/positional-options-overload/initial"
+    },
+    {
+      "slot": 190,
+      "pair": 95,
+      "task": "positional-options-overload",
+      "category": "compatibility",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/positional-options-overload/initial"
+    },
+    {
+      "slot": 191,
+      "pair": 96,
+      "task": "visitor-expression-printer",
+      "category": "refactoring",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/visitor-expression-printer/initial"
+    },
+    {
+      "slot": 192,
+      "pair": 96,
+      "task": "visitor-expression-printer",
+      "category": "refactoring",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/visitor-expression-printer/initial"
+    },
+    {
+      "slot": 193,
+      "pair": 97,
+      "task": "transport-injected-uploader",
+      "category": "refactoring",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/transport-injected-uploader/initial"
+    },
+    {
+      "slot": 194,
+      "pair": 97,
+      "task": "transport-injected-uploader",
+      "category": "refactoring",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/transport-injected-uploader/initial"
+    },
+    {
+      "slot": 195,
+      "pair": 98,
+      "task": "tree-selection-propagation",
+      "category": "state",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/tree-selection-propagation/initial"
+    },
+    {
+      "slot": 196,
+      "pair": 98,
+      "task": "tree-selection-propagation",
+      "category": "state",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/tree-selection-propagation/initial"
+    },
+    {
+      "slot": 197,
+      "pair": 99,
+      "task": "unicode-search-snippets",
+      "category": "integration",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/unicode-search-snippets/initial"
+    },
+    {
+      "slot": 198,
+      "pair": 99,
+      "task": "unicode-search-snippets",
+      "category": "integration",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/unicode-search-snippets/initial"
+    },
+    {
+      "slot": 199,
+      "pair": 100,
+      "task": "metric-watermark-windows",
+      "category": "integration",
+      "arm": "B",
+      "source": "development/native-task-comparison/tasks/metric-watermark-windows/initial"
+    },
+    {
+      "slot": 200,
+      "pair": 100,
+      "task": "metric-watermark-windows",
+      "category": "integration",
+      "arm": "A",
+      "source": "development/native-task-comparison/tasks/metric-watermark-windows/initial"
+    }
+  ]
+}

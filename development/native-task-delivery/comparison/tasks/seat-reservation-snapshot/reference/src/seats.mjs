@@ -1,0 +1,1 @@
+export function createSeats(initial=[]){let used=new Set(initial);return {reserve(seats){const unique=new Set(seats);if(unique.size!==seats.length||seats.some(s=>used.has(s)))return false;for(const s of seats)used.add(s);return true;},release(seats){for(const s of seats)used.delete(s);},snapshot(){return [...used].sort((a,b)=>a-b);}};}

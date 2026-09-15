@@ -1,0 +1,470 @@
+[
+  {
+    "requestIndex": 1,
+    "requestKind": "title",
+    "forwarded": true,
+    "status": 200,
+    "forwardedAt": "2026-09-14T19:48:51.540Z",
+    "finishedAt": "2026-09-14T19:48:55.193Z",
+    "usage": {
+      "input_tokens": 577,
+      "output_tokens": 72,
+      "total_tokens": 649,
+      "cached_tokens": 0,
+      "reasoning_tokens": 62
+    },
+    "serverCompletion": "completed",
+    "error": null,
+    "requestSha256": "f5ea9a9860414a9736a0f8afb13542a53aca598442a1c0e4e9c22d232d080f7a"
+  },
+  {
+    "requestIndex": 2,
+    "requestKind": "work",
+    "forwarded": true,
+    "status": 200,
+    "forwardedAt": "2026-09-14T19:48:51.875Z",
+    "finishedAt": "2026-09-14T19:48:55.032Z",
+    "usage": {
+      "input_tokens": 6644,
+      "output_tokens": 37,
+      "total_tokens": 6681,
+      "cached_tokens": 0,
+      "reasoning_tokens": 20
+    },
+    "serverCompletion": "completed",
+    "error": null,
+    "requestSha256": "c2019f8a874e256b3cb1d6b92486eba2b14b7df5f6b4991a09baec4ab9a7dfd8"
+  },
+  {
+    "requestIndex": 3,
+    "requestKind": "work",
+    "forwarded": true,
+    "status": 200,
+    "forwardedAt": "2026-09-14T19:48:55.599Z",
+    "finishedAt": "2026-09-14T19:49:01.293Z",
+    "usage": {
+      "input_tokens": 7211,
+      "output_tokens": 239,
+      "total_tokens": 7450,
+      "cached_tokens": 0,
+      "reasoning_tokens": 32
+    },
+    "serverCompletion": "completed",
+    "error": null,
+    "requestSha256": "9da2eee5935ed444e6f725775ccd36f0b364e82d1ab67d38090d4aad48dd63fd"
+  },
+  {
+    "requestIndex": 4,
+    "requestKind": "work",
+    "forwarded": true,
+    "status": 200,
+    "forwardedAt": "2026-09-14T19:49:01.453Z",
+    "finishedAt": "2026-09-14T19:49:04.864Z",
+    "usage": {
+      "input_tokens": 7612,
+      "output_tokens": 115,
+      "total_tokens": 7727,
+      "cached_tokens": 6656,
+      "reasoning_tokens": 0
+    },
+    "serverCompletion": "completed",
+    "error": null,
+    "requestSha256": "c23789f110b7f68e954479fc187540d9bb8055467a23a97ef4765866325749ce"
+  },
+  {
+    "requestIndex": 5,
+    "requestKind": "work",
+    "forwarded": true,
+    "status": 200,
+    "forwardedAt": "2026-09-14T19:49:05.183Z",
+    "finishedAt": "2026-09-14T19:49:11.331Z",
+    "usage": {
+      "input_tokens": 9604,
+      "output_tokens": 200,
+      "total_tokens": 9804,
+      "cached_tokens": 0,
+      "reasoning_tokens": 18
+    },
+    "serverCompletion": "completed",
+    "error": null,
+    "requestSha256": "41de572b3a7a422764a347abba5f6834fb0eb3e3d97b612055dfb46ee0f656ef"
+  },
+  {
+    "requestIndex": 6,
+    "requestKind": "work",
+    "forwarded": true,
+    "status": 200,
+    "forwardedAt": "2026-09-14T19:49:11.917Z",
+    "finishedAt": "2026-09-14T19:49:18.632Z",
+    "usage": {
+      "input_tokens": 23101,
+      "output_tokens": 283,
+      "total_tokens": 23384,
+      "cached_tokens": 0,
+      "reasoning_tokens": 115
+    },
+    "serverCompletion": "completed",
+    "error": null,
+    "requestSha256": "5a0e0387f84323f5a257e68fea85ab7a7c2bc4ef2dcd2b45215d91764e93c559"
+  },
+  {
+    "requestIndex": 7,
+    "requestKind": "work",
+    "forwarded": true,
+    "status": 200,
+    "forwardedAt": "2026-09-14T19:49:19.059Z",
+    "finishedAt": "2026-09-14T19:49:36.834Z",
+    "usage": {
+      "input_tokens": 31543,
+      "output_tokens": 907,
+      "total_tokens": 32450,
+      "cached_tokens": 8704,
+      "reasoning_tokens": 626
+    },
+    "serverCompletion": "completed",
+    "error": null,
+    "requestSha256": "f9a759559f364a029b9c97ddf771eea68b504c8fccbce916a9da868bc472d580"
+  },
+  {
+    "requestIndex": 8,
+    "requestKind": "work",
+    "forwarded": true,
+    "status": 200,
+    "forwardedAt": "2026-09-14T19:49:38.010Z",
+    "finishedAt": "2026-09-14T19:49:50.656Z",
+    "usage": {
+      "input_tokens": 33442,
+      "output_tokens": 633,
+      "total_tokens": 34075,
+      "cached_tokens": 31232,
+      "reasoning_tokens": 501
+    },
+    "serverCompletion": "completed",
+    "error": null,
+    "requestSha256": "21b9f7c7c60b174f107c59709b10f418e9b0964523de25e3494ddb6444aae39f"
+  },
+  {
+    "requestIndex": 9,
+    "requestKind": "work",
+    "forwarded": true,
+    "status": 200,
+    "forwardedAt": "2026-09-14T19:50:01.104Z",
+    "finishedAt": "2026-09-14T19:50:53.885Z",
+    "usage": {
+      "input_tokens": 39409,
+      "output_tokens": 2854,
+      "total_tokens": 42263,
+      "cached_tokens": 33280,
+      "reasoning_tokens": 2403
+    },
+    "serverCompletion": "completed",
+    "error": null,
+    "requestSha256": "4ae85d0d39583fd5d289bf0375184cae73793ca440d61b0b467aff812a792653"
+  },
+  {
+    "requestIndex": 10,
+    "requestKind": "work",
+    "forwarded": true,
+    "status": 200,
+    "forwardedAt": "2026-09-14T19:50:54.045Z",
+    "finishedAt": "2026-09-14T19:50:58.928Z",
+    "usage": {
+      "input_tokens": 42287,
+      "output_tokens": 188,
+      "total_tokens": 42475,
+      "cached_tokens": 22016,
+      "reasoning_tokens": 140
+    },
+    "serverCompletion": "completed",
+    "error": null,
+    "requestSha256": "6707cb001a933e4902491116c9d89bb0f79b98bdc0f4ed6f703b9febb135ee16"
+  },
+  {
+    "requestIndex": 11,
+    "requestKind": "work",
+    "forwarded": true,
+    "status": 200,
+    "forwardedAt": "2026-09-14T19:50:58.988Z",
+    "finishedAt": "2026-09-14T19:51:05.007Z",
+    "usage": {
+      "input_tokens": 42509,
+      "output_tokens": 261,
+      "total_tokens": 42770,
+      "cached_tokens": 0,
+      "reasoning_tokens": 145
+    },
+    "serverCompletion": "completed",
+    "error": null,
+    "requestSha256": "78d4d6e2318ed041b5a7f3695857f08b7b0517d2b0dbcce450a3fd77bdb62915"
+  },
+  {
+    "requestIndex": 12,
+    "requestKind": "work",
+    "forwarded": true,
+    "status": 200,
+    "forwardedAt": "2026-09-14T19:51:05.651Z",
+    "finishedAt": "2026-09-14T19:51:13.383Z",
+    "usage": {
+      "input_tokens": 43795,
+      "output_tokens": 301,
+      "total_tokens": 44096,
+      "cached_tokens": 0,
+      "reasoning_tokens": 253
+    },
+    "serverCompletion": "completed",
+    "error": null,
+    "requestSha256": "5b94d6fddf78471cf3eed8d994ce3896b5274f039bf0d61360eadc2ae6535909"
+  },
+  {
+    "requestIndex": 13,
+    "requestKind": "work",
+    "forwarded": true,
+    "status": 200,
+    "forwardedAt": "2026-09-14T19:51:13.441Z",
+    "finishedAt": "2026-09-14T19:51:22.241Z",
+    "usage": {
+      "input_tokens": 44110,
+      "output_tokens": 397,
+      "total_tokens": 44507,
+      "cached_tokens": 43520,
+      "reasoning_tokens": 291
+    },
+    "serverCompletion": "completed",
+    "error": null,
+    "requestSha256": "6ca93c197e2840a70add9490e025c91f7deba3175cd5a37299afd383fcb717a7"
+  },
+  {
+    "requestIndex": 14,
+    "requestKind": "work",
+    "forwarded": true,
+    "status": 200,
+    "forwardedAt": "2026-09-14T19:51:22.874Z",
+    "finishedAt": "2026-09-14T19:51:28.000Z",
+    "usage": {
+      "input_tokens": 44586,
+      "output_tokens": 218,
+      "total_tokens": 44804,
+      "cached_tokens": 2560,
+      "reasoning_tokens": 88
+    },
+    "serverCompletion": "completed",
+    "error": null,
+    "requestSha256": "eded2826af8ebdcc3ab1171819d9c6e89554ef3bedd626f59e572a421f50ec68"
+  },
+  {
+    "requestIndex": 15,
+    "requestKind": "work",
+    "forwarded": true,
+    "status": 200,
+    "forwardedAt": "2026-09-14T19:51:28.228Z",
+    "finishedAt": "2026-09-14T19:51:30.433Z",
+    "usage": {
+      "input_tokens": 44882,
+      "output_tokens": 41,
+      "total_tokens": 44923,
+      "cached_tokens": 41472,
+      "reasoning_tokens": 10
+    },
+    "serverCompletion": "completed",
+    "error": null,
+    "requestSha256": "8201fa4091220864afee0e2dbc1d83ceeaecef3e293baa3bed6b5a5b2f13db1c"
+  },
+  {
+    "requestIndex": 16,
+    "requestKind": "work",
+    "forwarded": true,
+    "status": 200,
+    "forwardedAt": "2026-09-14T19:51:31.399Z",
+    "finishedAt": "2026-09-14T19:51:36.031Z",
+    "usage": {
+      "input_tokens": 45886,
+      "output_tokens": 161,
+      "total_tokens": 46047,
+      "cached_tokens": 41472,
+      "reasoning_tokens": 42
+    },
+    "serverCompletion": "completed",
+    "error": null,
+    "requestSha256": "7635c268ac87f3534b0350fec020a9c9cd1ea79e700348e3af4bec441cadc8d3"
+  },
+  {
+    "requestIndex": 17,
+    "requestKind": "work",
+    "forwarded": true,
+    "status": 200,
+    "forwardedAt": "2026-09-14T19:51:46.371Z",
+    "finishedAt": "2026-09-14T19:52:02.247Z",
+    "usage": {
+      "input_tokens": 51358,
+      "output_tokens": 778,
+      "total_tokens": 52136,
+      "cached_tokens": 43520,
+      "reasoning_tokens": 440
+    },
+    "serverCompletion": "completed",
+    "error": null,
+    "requestSha256": "ce5e067a4743d8dbc608b7a839d4545914da42903d9da11e3c30c90e026a2440"
+  },
+  {
+    "requestIndex": 18,
+    "requestKind": "work",
+    "forwarded": true,
+    "status": 200,
+    "forwardedAt": "2026-09-14T19:52:02.337Z",
+    "finishedAt": "2026-09-14T19:52:10.076Z",
+    "usage": {
+      "input_tokens": 52207,
+      "output_tokens": 293,
+      "total_tokens": 52500,
+      "cached_tokens": 43520,
+      "reasoning_tokens": 129
+    },
+    "serverCompletion": "completed",
+    "error": null,
+    "requestSha256": "7379597d916364843f0c26b1807a0fd9050c83d4309dfd2aaa5b78c3f3799cba"
+  },
+  {
+    "requestIndex": 19,
+    "requestKind": "work",
+    "forwarded": true,
+    "status": 200,
+    "forwardedAt": "2026-09-14T19:52:10.137Z",
+    "finishedAt": "2026-09-14T19:52:43.535Z",
+    "usage": {
+      "input_tokens": 52554,
+      "output_tokens": 633,
+      "total_tokens": 53187,
+      "cached_tokens": 0,
+      "reasoning_tokens": 355
+    },
+    "serverCompletion": "completed",
+    "error": null,
+    "requestSha256": "087b1171b72fb2d2ade1ba1b90de4ddba6cfb05281c62fc901ebff9ef840b12b"
+  },
+  {
+    "requestIndex": 20,
+    "requestKind": "work",
+    "forwarded": true,
+    "status": 200,
+    "forwardedAt": "2026-09-14T19:52:43.611Z",
+    "finishedAt": "2026-09-14T19:52:46.925Z",
+    "usage": {
+      "input_tokens": 53211,
+      "output_tokens": 56,
+      "total_tokens": 53267,
+      "cached_tokens": 50688,
+      "reasoning_tokens": 12
+    },
+    "serverCompletion": "completed",
+    "error": null,
+    "requestSha256": "92402fbd679d3cc5deed9d229392c78831b120e0b31e42741b14840658f4063b"
+  },
+  {
+    "requestIndex": 21,
+    "requestKind": "work",
+    "forwarded": true,
+    "status": 200,
+    "forwardedAt": "2026-09-14T19:52:47.057Z",
+    "finishedAt": "2026-09-14T19:52:49.417Z",
+    "usage": {
+      "input_tokens": 53356,
+      "output_tokens": 29,
+      "total_tokens": 53385,
+      "cached_tokens": 51712,
+      "reasoning_tokens": 0
+    },
+    "serverCompletion": "completed",
+    "error": null,
+    "requestSha256": "878e3063775f85789325813a60366f2f6f279e91dd580d616c326dea7145112b"
+  },
+  {
+    "requestIndex": 22,
+    "requestKind": "work",
+    "forwarded": true,
+    "status": 200,
+    "forwardedAt": "2026-09-14T19:52:50.419Z",
+    "finishedAt": "2026-09-14T19:52:55.972Z",
+    "usage": {
+      "input_tokens": 54359,
+      "output_tokens": 110,
+      "total_tokens": 54469,
+      "cached_tokens": 0,
+      "reasoning_tokens": 11
+    },
+    "serverCompletion": "completed",
+    "error": null,
+    "requestSha256": "b8e112a11486a70a7a9e9c2584238067bf08cb2b68d2f4d2d04ad61ef3277faf"
+  },
+  {
+    "requestIndex": 23,
+    "requestKind": "work",
+    "forwarded": true,
+    "status": 200,
+    "forwardedAt": "2026-09-14T19:53:05.736Z",
+    "finishedAt": "2026-09-14T19:53:13.228Z",
+    "usage": {
+      "input_tokens": 59809,
+      "output_tokens": 329,
+      "total_tokens": 60138,
+      "cached_tokens": 0,
+      "reasoning_tokens": 91
+    },
+    "serverCompletion": "completed",
+    "error": null,
+    "requestSha256": "0afb8773f860a010d78999364a6b2f47cacd2b517c59822ece144bcad9656dc7"
+  },
+  {
+    "requestIndex": 24,
+    "requestKind": "work",
+    "forwarded": true,
+    "status": 200,
+    "forwardedAt": "2026-09-14T19:53:13.571Z",
+    "finishedAt": "2026-09-14T19:53:28.201Z",
+    "usage": {
+      "input_tokens": 64229,
+      "output_tokens": 589,
+      "total_tokens": 64818,
+      "cached_tokens": 6656,
+      "reasoning_tokens": 473
+    },
+    "serverCompletion": "completed",
+    "error": null,
+    "requestSha256": "2ee29027b27caf399abad213c048d209244eed39aaa4a726201e09d2551884af"
+  },
+  {
+    "requestIndex": 25,
+    "requestKind": "work",
+    "forwarded": true,
+    "status": 200,
+    "forwardedAt": "2026-09-14T19:53:28.275Z",
+    "finishedAt": "2026-09-14T19:53:38.480Z",
+    "usage": {
+      "input_tokens": 64979,
+      "output_tokens": 420,
+      "total_tokens": 65399,
+      "cached_tokens": 51712,
+      "reasoning_tokens": 267
+    },
+    "serverCompletion": "completed",
+    "error": null,
+    "requestSha256": "33c8dac5fc792db4a81a94586d086df3b1faddbf3f5fe05d8ee4f9d20044068e"
+  },
+  {
+    "requestIndex": 26,
+    "requestKind": "work",
+    "forwarded": true,
+    "status": 200,
+    "forwardedAt": "2026-09-14T19:53:38.702Z",
+    "finishedAt": "2026-09-14T19:53:44.492Z",
+    "usage": {
+      "input_tokens": 7797,
+      "output_tokens": 212,
+      "total_tokens": 8009,
+      "cached_tokens": 0,
+      "reasoning_tokens": 106
+    },
+    "serverCompletion": "completed",
+    "error": null,
+    "requestSha256": "6a09aa7f0c50225e43299498b6d6bd385342178a95166f52e45a638d1395e43d"
+  }
+]

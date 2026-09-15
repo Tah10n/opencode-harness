@@ -1,0 +1,386 @@
+[
+  {
+    "slot": 1,
+    "task": "denque-rotate",
+    "project": "denque",
+    "repetition": 1,
+    "arm": "P",
+    "state": "not_started"
+  },
+  {
+    "slot": 2,
+    "task": "denque-rotate",
+    "project": "denque",
+    "repetition": 1,
+    "arm": "H00",
+    "state": "not_started"
+  },
+  {
+    "slot": 3,
+    "task": "denque-remove-where",
+    "project": "denque",
+    "repetition": 1,
+    "arm": "H00",
+    "state": "not_started"
+  },
+  {
+    "slot": 4,
+    "task": "denque-remove-where",
+    "project": "denque",
+    "repetition": 1,
+    "arm": "P",
+    "state": "not_started"
+  },
+  {
+    "slot": 5,
+    "task": "eventemitter-prepend",
+    "project": "eventemitter3",
+    "repetition": 1,
+    "arm": "P",
+    "state": "not_started"
+  },
+  {
+    "slot": 6,
+    "task": "eventemitter-prepend",
+    "project": "eventemitter3",
+    "repetition": 1,
+    "arm": "H00",
+    "state": "not_started"
+  },
+  {
+    "slot": 7,
+    "task": "eventemitter-remove-context",
+    "project": "eventemitter3",
+    "repetition": 1,
+    "arm": "H00",
+    "state": "not_started"
+  },
+  {
+    "slot": 8,
+    "task": "eventemitter-remove-context",
+    "project": "eventemitter3",
+    "repetition": 1,
+    "arm": "P",
+    "state": "not_started"
+  },
+  {
+    "slot": 9,
+    "task": "fastq-running-tasks",
+    "project": "fastq",
+    "repetition": 1,
+    "arm": "P",
+    "state": "not_started"
+  },
+  {
+    "slot": 10,
+    "task": "fastq-running-tasks",
+    "project": "fastq",
+    "repetition": 1,
+    "arm": "H00",
+    "state": "not_started"
+  },
+  {
+    "slot": 11,
+    "task": "fastq-on-idle",
+    "project": "fastq",
+    "repetition": 1,
+    "arm": "H00",
+    "state": "not_started"
+  },
+  {
+    "slot": 12,
+    "task": "fastq-on-idle",
+    "project": "fastq",
+    "repetition": 1,
+    "arm": "P",
+    "state": "not_started"
+  },
+  {
+    "slot": 13,
+    "task": "quick-lru-computed",
+    "project": "quick-lru",
+    "repetition": 1,
+    "arm": "P",
+    "state": "not_started"
+  },
+  {
+    "slot": 14,
+    "task": "quick-lru-computed",
+    "project": "quick-lru",
+    "repetition": 1,
+    "arm": "H00",
+    "state": "not_started"
+  },
+  {
+    "slot": 15,
+    "task": "quick-lru-prune",
+    "project": "quick-lru",
+    "repetition": 1,
+    "arm": "H00",
+    "state": "not_started"
+  },
+  {
+    "slot": 16,
+    "task": "quick-lru-prune",
+    "project": "quick-lru",
+    "repetition": 1,
+    "arm": "P",
+    "state": "not_started"
+  },
+  {
+    "slot": 17,
+    "task": "ufo-query-sort",
+    "project": "ufo",
+    "repetition": 1,
+    "arm": "P",
+    "state": "not_started"
+  },
+  {
+    "slot": 18,
+    "task": "ufo-query-sort",
+    "project": "ufo",
+    "repetition": 1,
+    "arm": "H00",
+    "state": "not_started"
+  },
+  {
+    "slot": 19,
+    "task": "ufo-append-query",
+    "project": "ufo",
+    "repetition": 1,
+    "arm": "H00",
+    "state": "not_started"
+  },
+  {
+    "slot": 20,
+    "task": "ufo-append-query",
+    "project": "ufo",
+    "repetition": 1,
+    "arm": "P",
+    "state": "not_started"
+  },
+  {
+    "slot": 21,
+    "task": "ms-format-unit",
+    "project": "ms",
+    "repetition": 1,
+    "arm": "P",
+    "state": "not_started"
+  },
+  {
+    "slot": 22,
+    "task": "ms-format-unit",
+    "project": "ms",
+    "repetition": 1,
+    "arm": "H00",
+    "state": "not_started"
+  },
+  {
+    "slot": 23,
+    "task": "ms-parse-compound",
+    "project": "ms",
+    "repetition": 1,
+    "arm": "H00",
+    "state": "not_started"
+  },
+  {
+    "slot": 24,
+    "task": "ms-parse-compound",
+    "project": "ms",
+    "repetition": 1,
+    "arm": "P",
+    "state": "not_started"
+  },
+  {
+    "slot": 25,
+    "task": "denque-rotate",
+    "project": "denque",
+    "repetition": 2,
+    "arm": "H00",
+    "state": "not_started"
+  },
+  {
+    "slot": 26,
+    "task": "denque-rotate",
+    "project": "denque",
+    "repetition": 2,
+    "arm": "P",
+    "state": "not_started"
+  },
+  {
+    "slot": 27,
+    "task": "denque-remove-where",
+    "project": "denque",
+    "repetition": 2,
+    "arm": "P",
+    "state": "not_started"
+  },
+  {
+    "slot": 28,
+    "task": "denque-remove-where",
+    "project": "denque",
+    "repetition": 2,
+    "arm": "H00",
+    "state": "not_started"
+  },
+  {
+    "slot": 29,
+    "task": "eventemitter-prepend",
+    "project": "eventemitter3",
+    "repetition": 2,
+    "arm": "H00",
+    "state": "not_started"
+  },
+  {
+    "slot": 30,
+    "task": "eventemitter-prepend",
+    "project": "eventemitter3",
+    "repetition": 2,
+    "arm": "P",
+    "state": "not_started"
+  },
+  {
+    "slot": 31,
+    "task": "eventemitter-remove-context",
+    "project": "eventemitter3",
+    "repetition": 2,
+    "arm": "P",
+    "state": "not_started"
+  },
+  {
+    "slot": 32,
+    "task": "eventemitter-remove-context",
+    "project": "eventemitter3",
+    "repetition": 2,
+    "arm": "H00",
+    "state": "not_started"
+  },
+  {
+    "slot": 33,
+    "task": "fastq-running-tasks",
+    "project": "fastq",
+    "repetition": 2,
+    "arm": "H00",
+    "state": "not_started"
+  },
+  {
+    "slot": 34,
+    "task": "fastq-running-tasks",
+    "project": "fastq",
+    "repetition": 2,
+    "arm": "P",
+    "state": "not_started"
+  },
+  {
+    "slot": 35,
+    "task": "fastq-on-idle",
+    "project": "fastq",
+    "repetition": 2,
+    "arm": "P",
+    "state": "not_started"
+  },
+  {
+    "slot": 36,
+    "task": "fastq-on-idle",
+    "project": "fastq",
+    "repetition": 2,
+    "arm": "H00",
+    "state": "not_started"
+  },
+  {
+    "slot": 37,
+    "task": "quick-lru-computed",
+    "project": "quick-lru",
+    "repetition": 2,
+    "arm": "H00",
+    "state": "not_started"
+  },
+  {
+    "slot": 38,
+    "task": "quick-lru-computed",
+    "project": "quick-lru",
+    "repetition": 2,
+    "arm": "P",
+    "state": "not_started"
+  },
+  {
+    "slot": 39,
+    "task": "quick-lru-prune",
+    "project": "quick-lru",
+    "repetition": 2,
+    "arm": "P",
+    "state": "not_started"
+  },
+  {
+    "slot": 40,
+    "task": "quick-lru-prune",
+    "project": "quick-lru",
+    "repetition": 2,
+    "arm": "H00",
+    "state": "not_started"
+  },
+  {
+    "slot": 41,
+    "task": "ufo-query-sort",
+    "project": "ufo",
+    "repetition": 2,
+    "arm": "H00",
+    "state": "not_started"
+  },
+  {
+    "slot": 42,
+    "task": "ufo-query-sort",
+    "project": "ufo",
+    "repetition": 2,
+    "arm": "P",
+    "state": "not_started"
+  },
+  {
+    "slot": 43,
+    "task": "ufo-append-query",
+    "project": "ufo",
+    "repetition": 2,
+    "arm": "P",
+    "state": "not_started"
+  },
+  {
+    "slot": 44,
+    "task": "ufo-append-query",
+    "project": "ufo",
+    "repetition": 2,
+    "arm": "H00",
+    "state": "not_started"
+  },
+  {
+    "slot": 45,
+    "task": "ms-format-unit",
+    "project": "ms",
+    "repetition": 2,
+    "arm": "H00",
+    "state": "not_started"
+  },
+  {
+    "slot": 46,
+    "task": "ms-format-unit",
+    "project": "ms",
+    "repetition": 2,
+    "arm": "P",
+    "state": "not_started"
+  },
+  {
+    "slot": 47,
+    "task": "ms-parse-compound",
+    "project": "ms",
+    "repetition": 2,
+    "arm": "P",
+    "state": "not_started"
+  },
+  {
+    "slot": 48,
+    "task": "ms-parse-compound",
+    "project": "ms",
+    "repetition": 2,
+    "arm": "H00",
+    "state": "not_started"
+  }
+]

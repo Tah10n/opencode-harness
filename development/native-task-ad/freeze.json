@@ -1,0 +1,60 @@
+{
+  "candidateCommit": "3b877f69782619f0ce6097d894bf0158cb365355",
+  "model": "openai/gpt-5.6-luna",
+  "variant": "low",
+  "openCodeVersion": "1.18.26",
+  "budgetMs": 900000,
+  "schedule": [
+    {
+      "slot": 1,
+      "task": "protocol-error-api",
+      "arm": "A"
+    },
+    {
+      "slot": 2,
+      "task": "protocol-error-api",
+      "arm": "D"
+    },
+    {
+      "slot": 3,
+      "task": "legacy-runtime-reload",
+      "arm": "D"
+    },
+    {
+      "slot": 4,
+      "task": "legacy-runtime-reload",
+      "arm": "A"
+    },
+    {
+      "slot": 5,
+      "task": "reconnect-revoked",
+      "arm": "D"
+    },
+    {
+      "slot": 6,
+      "task": "reconnect-revoked",
+      "arm": "A"
+    },
+    {
+      "slot": 7,
+      "task": "request-module-extraction",
+      "arm": "A"
+    },
+    {
+      "slot": 8,
+      "task": "request-module-extraction",
+      "arm": "D"
+    }
+  ],
+  "planSha256": "0526da72ac96646342b62552860364deaabb38540e8d8975510be073c4238aec",
+  "runtimeFiles": {
+    "native-task-plugin.mjs": "7c10909682860fcec202a37da82ce456c47f5cce25d05c71047d59c2b519689e",
+    "native-task-workflow.mjs": "de6f2c74ab2902574577d9d74c81940641f2d37e10d24b3b54243681de1447a0",
+    "native-task-observations.mjs": "b16050a9704872189f394d33860f4000570aaaa887e678941e02c2ec23d55926",
+    "native-review-context.mjs": "8775ae59ef3d3b5b432798f909f94869d43b7561b4b5f144f972e5bcce20e312"
+  },
+  "originalEvaluationPlanSha256": "eb0fb02b33edb8ad443d69828e791599f27207c75c408c53a394d32806ff6b44",
+  "sourceFilesVerified": 9099,
+  "preflightPassed": true,
+  "retries": 0
+}

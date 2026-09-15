@@ -1,0 +1,69 @@
+[
+  {
+    "observedAt": "2026-09-14T08:52:58.091266+00:00",
+    "kind": "possible-evaluator-overconstraint",
+    "task": "ufo-append-query",
+    "frozenRequirement": "Appending null adds an empty value; task does not explicitly distinguish key from key= for an existing key.",
+    "evidence": "Frozen evaluator expects /p?x=1&x= exactly; neutral patch emits /p?x=1&x. Both parse as x=[1,empty].",
+    "action": "Preserve original evaluator and raw results. Verify after scored execution; if confirmed, permit only these two equivalent empty-value serializations for this one assertion, uniformly for all affected attempts and reference/alternative controls. Do not change author inputs/runtime or use unsupported representation expectation for Q.",
+    "status": "resolved",
+    "newAcceptanceRequirement": false,
+    "resolution": "Confirmed equivalent empty-value serialization; original assertion preserved and uniform interpreted check passes both controls/nonempty author. Required empty-array test gap confirmed separately."
+  },
+  {
+    "observedAt": "2026-09-14T09:15:15.918064+00:00",
+    "kind": "existing-contract-diagnostic",
+    "task": "ms-parse-compound",
+    "frozenRequirement": "No leading/trailing whitespace; malformed nonempty inputs return NaN.",
+    "evidence": "Both first-repetition patches use a JavaScript dollar regex anchor for full-input validation, which may admit a final line terminator. Original evaluator lacks this exact case.",
+    "action": "After scored execution, test exact compiled public API against terminal newline, carriage return and Unicode line/paragraph separators in all affected patches and both controls. Preserve frozen evaluator and author patches.",
+    "status": "resolved",
+    "newAcceptanceRequirement": false,
+    "resolution": "Refuted by compiled API: all four forbidden trailing line terminators return NaN on both author patches and controls."
+  },
+  {
+    "observedAt": "2026-09-14T09:49:26.053828+00:00",
+    "kind": "existing-public-type-contract-diagnostic",
+    "task": "eventemitter-remove-context",
+    "frozenRequirement": "Omitted/falsy registration context uses the emitter and is removable by passing the emitter; expose API in public declarations.",
+    "evidence": "New neutral patch and both controls declare argument Context only. With an explicit Context interface, existing on(event, fn) permits omitted context while removeListenersByContext(emitter) may be rejected by those declarations.",
+    "action": "Compile the same minimal typed consumer against all affected new and historical author patches and both frozen controls in new independent copies after scored execution. Preserve all historical artifacts and Q/D; supplementary findings do not rewrite old records.",
+    "status": "resolved",
+    "newAcceptanceRequirement": false,
+    "resolution": "Confirmed type defect in ed67791a7735, both historical patches and both controls; c80764cf5b7c passes. Historical Q/D immutable; calibration gap disclosed."
+  },
+  {
+    "observedAt": "2026-09-14T10:21:01.907361+00:00",
+    "kind": "existing-callback-boundary-diagnostic",
+    "task": "fastq-on-idle",
+    "frozenRequirement": "Resolve subscriptions only when queue is actually idle after synchronous user drain callbacks, including callbacks that enqueue work.",
+    "evidence": "Neutral patch 9381115d1f3d suppresses notifyIdle during drain but onIdle() itself returns a resolved promise when called inside drain before its later enqueue. Neutral alternative has a drain-depth check in onIdle and a delivered inside-drain regression.",
+    "action": "After scored execution, run same public API probe on both new patches, both historical patches in new copies, and both controls. Preserve historical artifacts/Q/D, original evaluator and author patches.",
+    "status": "resolved",
+    "newAcceptanceRequirement": false,
+    "resolution": "Confirmed in 9381115d1f3d, both historical patches and both controls; 24400478fb85 passes. Historical Q/D immutable; calibration gap disclosed."
+  },
+  {
+    "observedAt": "2026-09-14T10:27:14.261668+00:00",
+    "kind": "existing-default-ttl-test-discrimination",
+    "task": "quick-lru-computed",
+    "frozenRequirement": "Inserted computed value uses default maxAge and delivered regression must cover default TTL.",
+    "evidence": "New neutral test checks only expiresIn(key)>0, accepting Infinity. Historical two tests include a finite upper bound.",
+    "action": "After scored execution, run delivered ordinary AVA suites on same concrete infinite-TTL wrong behavior for both new attempts, both old attempts in new copies and both controls. Inspect failures for relevant TTL assertion; preserve historical Q/D and all author patches.",
+    "status": "resolved",
+    "newAcceptanceRequirement": false,
+    "resolution": "Confirmed both new suites miss isolated expiry removal, both old suites and controls detect it. Initial repeat-set mutation retained but superseded because it may also affect eviction. Refined diagnostic touches only computed entry expiry."
+  },
+  {
+    "kind": "generated-file-projection",
+    "status": "verified",
+    "evidence": "generated-file-projection.json",
+    "interpretation": "Exact husky@9.1.7 bytes, executable modes and ordinary Git ignore state verified for all 17 artifacts; excluded from source projection only, never raw capture."
+  },
+  {
+    "kind": "external-block",
+    "status": "confirmed",
+    "evidence": "external-block.json",
+    "interpretation": "Slot42 request6 upstream server_error with no bound terminal lifecycle event, no usage and non-deadline transport AbortError. Stop verified;43-48 not started."
+  }
+]

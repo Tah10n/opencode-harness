@@ -1,0 +1,262 @@
+[
+  {
+    "task": "document-backup",
+    "variant": "initial",
+    "ordinary": 0,
+    "acceptance": 1,
+    "preservation": 0,
+    "assertionFailure": true
+  },
+  {
+    "task": "document-backup",
+    "variant": "reference",
+    "ordinary": 0,
+    "acceptance": 0,
+    "preservation": 0,
+    "assertionFailure": false
+  },
+  {
+    "task": "document-backup",
+    "variant": "alternative",
+    "ordinary": 0,
+    "acceptance": 0,
+    "preservation": 0,
+    "assertionFailure": false
+  },
+  {
+    "task": "document-backup",
+    "variant": "rewrite-on-read",
+    "ordinary": 1,
+    "acceptance": 1,
+    "preservation": 0,
+    "assertionFailure": true
+  },
+  {
+    "task": "document-backup",
+    "variant": "overwrite-backup-with-new",
+    "ordinary": 1,
+    "acceptance": 1,
+    "preservation": 0,
+    "assertionFailure": true
+  },
+  {
+    "task": "document-backup",
+    "variant": "non-atomic-direct-write",
+    "ordinary": 0,
+    "acceptance": 0,
+    "preservation": 0,
+    "assertionFailure": false,
+    "manualComplete": false,
+    "reason": "Direct primary write violates explicit temporary-and-rename requirement; source reviewed before freeze."
+  },
+  {
+    "task": "dual-lookup",
+    "variant": "initial",
+    "ordinary": 0,
+    "acceptance": 1,
+    "preservation": 0,
+    "assertionFailure": false
+  },
+  {
+    "task": "dual-lookup",
+    "variant": "reference",
+    "ordinary": 0,
+    "acceptance": 0,
+    "preservation": 0,
+    "assertionFailure": false
+  },
+  {
+    "task": "dual-lookup",
+    "variant": "alternative",
+    "ordinary": 0,
+    "acceptance": 0,
+    "preservation": 0,
+    "assertionFailure": false
+  },
+  {
+    "task": "dual-lookup",
+    "variant": "callback-multiple",
+    "ordinary": 1,
+    "acceptance": 1,
+    "preservation": 0,
+    "assertionFailure": true
+  },
+  {
+    "task": "dual-lookup",
+    "variant": "reverse-consumer",
+    "ordinary": 1,
+    "acceptance": 1,
+    "preservation": 0,
+    "assertionFailure": true
+  },
+  {
+    "task": "http-error-consumer",
+    "variant": "initial",
+    "ordinary": 0,
+    "acceptance": 1,
+    "preservation": 0,
+    "assertionFailure": true
+  },
+  {
+    "task": "http-error-consumer",
+    "variant": "reference",
+    "ordinary": 0,
+    "acceptance": 0,
+    "preservation": 0,
+    "assertionFailure": false
+  },
+  {
+    "task": "http-error-consumer",
+    "variant": "alternative",
+    "ordinary": 0,
+    "acceptance": 0,
+    "preservation": 0,
+    "assertionFailure": false
+  },
+  {
+    "task": "http-error-consumer",
+    "variant": "swallow-parse-on-success",
+    "ordinary": 1,
+    "acceptance": 1,
+    "preservation": 0,
+    "assertionFailure": true
+  },
+  {
+    "task": "http-error-consumer",
+    "variant": "broad-consumer-catch",
+    "ordinary": 1,
+    "acceptance": 1,
+    "preservation": 0,
+    "assertionFailure": true
+  },
+  {
+    "task": "partial-checkout",
+    "variant": "initial",
+    "ordinary": 0,
+    "acceptance": 1,
+    "preservation": 0,
+    "assertionFailure": true
+  },
+  {
+    "task": "partial-checkout",
+    "variant": "reference",
+    "ordinary": 0,
+    "acceptance": 0,
+    "preservation": 0,
+    "assertionFailure": false
+  },
+  {
+    "task": "partial-checkout",
+    "variant": "alternative",
+    "ordinary": 0,
+    "acceptance": 0,
+    "preservation": 0,
+    "assertionFailure": false
+  },
+  {
+    "task": "partial-checkout",
+    "variant": "charge-rejected",
+    "ordinary": 1,
+    "acceptance": 1,
+    "preservation": 0,
+    "assertionFailure": true
+  },
+  {
+    "task": "partial-checkout",
+    "variant": "skip-validation",
+    "ordinary": 1,
+    "acceptance": 1,
+    "preservation": 0,
+    "assertionFailure": true
+  },
+  {
+    "task": "quoted-contact-import",
+    "variant": "initial",
+    "ordinary": 0,
+    "acceptance": 1,
+    "preservation": 0,
+    "assertionFailure": true
+  },
+  {
+    "task": "quoted-contact-import",
+    "variant": "reference",
+    "ordinary": 0,
+    "acceptance": 0,
+    "preservation": 0,
+    "assertionFailure": false
+  },
+  {
+    "task": "quoted-contact-import",
+    "variant": "alternative",
+    "ordinary": 0,
+    "acceptance": 0,
+    "preservation": 0,
+    "assertionFailure": false
+  },
+  {
+    "task": "quoted-contact-import",
+    "variant": "naive-parser",
+    "ordinary": 1,
+    "acceptance": 1,
+    "preservation": 0,
+    "assertionFailure": true
+  },
+  {
+    "task": "quoted-contact-import",
+    "variant": "positional-consumer",
+    "ordinary": 1,
+    "acceptance": 1,
+    "preservation": 0,
+    "assertionFailure": true
+  },
+  {
+    "task": "transactional-settings",
+    "variant": "initial",
+    "ordinary": 0,
+    "acceptance": 1,
+    "preservation": 0,
+    "assertionFailure": true
+  },
+  {
+    "task": "transactional-settings",
+    "variant": "reference",
+    "ordinary": 0,
+    "acceptance": 0,
+    "preservation": 0,
+    "assertionFailure": false
+  },
+  {
+    "task": "transactional-settings",
+    "variant": "alternative",
+    "ordinary": 0,
+    "acceptance": 0,
+    "preservation": 0,
+    "assertionFailure": false
+  },
+  {
+    "task": "transactional-settings",
+    "variant": "ignore-revision",
+    "ordinary": 1,
+    "acceptance": 1,
+    "preservation": 0,
+    "assertionFailure": true
+  },
+  {
+    "task": "transactional-settings",
+    "variant": "accept-thenable",
+    "ordinary": 1,
+    "acceptance": 1,
+    "preservation": 0,
+    "assertionFailure": true
+  },
+  {
+    "task": "transactional-settings",
+    "variant": "non-atomic-direct-write",
+    "ordinary": 0,
+    "acceptance": 0,
+    "preservation": 0,
+    "assertionFailure": false,
+    "manualComplete": false,
+    "reason": "Direct primary write violates explicit temporary-and-rename requirement; source reviewed before freeze."
+  }
+]

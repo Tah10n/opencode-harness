@@ -1,0 +1,7 @@
+{
+  "task": "queue-batch",
+  "finding": "Frozen acceptance asserts TypeError for invalid limit, but frozen TASK.md specifies validation and no mutation, without constraining the exception subtype.",
+  "discovered": "After first P run while reading delivered source; before offline execution and before remaining results.",
+  "handling": "Retain raw frozen evaluator result and hashes. Do not retry models or edit tasks/evaluator/reference. Separately inspect and execute original validation/no-mutation requirement with no exception subtype constraint for all queue arms; report this as supplemental adjudication, never a retroactive frozen-evaluator pass.",
+  "impact": "Preflight did not cover every valid alternative. This weakens evaluator-readiness evidence and is an explicit limitation of the development comparison."
+}

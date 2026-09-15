@@ -1,0 +1,1 @@
+import {segments} from './segments.mjs';export function invoice(start,end,initial,changes,alreadyCharged){const days=end-start,lines=segments(start,end,initial,changes).map(s=>({plan:s.plan,start:s.start,end:s.end,cents:Math.floor(s.price*(s.end-s.start)/days)}));const total=lines.reduce((n,l)=>n+l.cents,0);return {lines,total,adjustment:total-alreadyCharged};}

@@ -1,0 +1,17 @@
+{
+  "Q": true,
+  "behavior": "Real browser public controls/backdrop/document theme, reload and two tabs passed",
+  "tests": "8 delivered Node regressions cover migration, precedence, invalid/missing/blocked storage, save/reload, events/no echo and latest other field",
+  "types": "TypeScript build passed; original exported backdrop types re-exported",
+  "docs": "README describes format, legacy compatibility and synchronization",
+  "preservation": "Original visual components and routing retained; editorconfig LF fixes observed original format failure",
+  "sensitivity": {
+    "mutation": "disable required legacy migration write",
+    "detected": true
+  },
+  "limitations": [
+    "Delivered state regressions use deterministic storage helpers; evaluator supplied the real-browser path"
+  ],
+  "falseFinalClaims": false,
+  "finalClaimEvidence": "Final stated npm run check pass and 8 tests; independent logs confirm both."
+}

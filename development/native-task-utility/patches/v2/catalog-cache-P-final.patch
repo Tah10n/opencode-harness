@@ -1,0 +1,243 @@
+diff --git a/README.md b/README.md
+index 499d9d0..2ee6c5e 100644
+--- a/README.md
++++ b/README.md
+@@ -1,3 +1,19 @@
+ # catalog-cache
+ 
+ Run `npm test` with Node.js 24.
++
++## Client API
++
++`loadCatalog(fetcher)` is the legacy call. It fetches `/catalog` and resolves
++to the array of catalog items.
++
++`loadCatalog(fetcher, {region, etag})` fetches the optionally selected region
++and resolves to `{status: 'ok', items, etag}` for a 200 response, or
++`{status: 'not-modified', etag}` for a 304 response. The region is URL-encoded
++and `If-None-Match` is sent only when `etag` is provided. Other response
++statuses throw an error.
++
++The handler's ETags are quoted SHA-256 hashes of the exact JSON response
++bytes. A request is treated as not modified only when
++`req.headers['if-none-match']` exactly equals the representation's ETag; weak
++and wildcard matching are not used.
+diff --git a/src/client.mjs b/src/client.mjs
+index 8d6764b..9671b4f 100644
+--- a/src/client.mjs
++++ b/src/client.mjs
+@@ -1 +1,29 @@
+-export async function loadCatalog(fetcher){const response=await fetcher('/catalog');if(response.status!==200)throw Error('Catalog unavailable');return response.json();}
++function getEtag(response) {
++  if (response.headers?.get) return response.headers.get('etag');
++  return response.headers?.etag ?? response.headers?.ETag;
++}
++
++export async function loadCatalog(fetcher, {region, etag} = {}) {
++  const legacy = arguments.length === 1;
++  const url = region === undefined
++    ? '/catalog'
++    : `/catalog?region=${encodeURIComponent(region)}`;
++  const response = etag === undefined
++    ? await fetcher(url)
++    : await fetcher(url, {headers: {'If-None-Match': etag}});
++
++  if (legacy) {
++    if (response.status !== 200) throw Error('Catalog unavailable');
++    return response.json();
++  }
++
++  if (response.status === 304) {
++    return {status: 'not-modified', etag: getEtag(response)};
++  }
++  if (response.status !== 200) throw Error('Catalog unavailable');
++  return {
++    status: 'ok',
++    items: await response.json(),
++    etag: getEtag(response),
++  };
++}
+diff --git a/src/handler.mjs b/src/handler.mjs
+index 264a567..43788fc 100644
+--- a/src/handler.mjs
++++ b/src/handler.mjs
+@@ -1,2 +1,42 @@
++import {createHash} from 'node:crypto';
+ import {selectCatalog} from './select.mjs';
+-export function handle(req,res,catalog){if(req.method!=='GET'){res.writeHead(405);res.end();return;}if(new URL(req.url,'http://localhost').pathname!=='/catalog'){res.writeHead(404);res.end();return;}res.writeHead(200,{'Content-Type':'application/json'});res.end(JSON.stringify(selectCatalog(catalog)));}
++
++export function handle(req, res, catalog) {
++  if (req.method !== 'GET') {
++    res.writeHead(405);
++    res.end();
++    return;
++  }
++
++  const url = new URL(req.url, 'http://localhost');
++  if (url.pathname !== '/catalog') {
++    res.writeHead(404);
++    res.end();
++    return;
++  }
++
++  const region = url.searchParams.has('region')
++    ? url.searchParams.get('region')
++    : undefined;
++  const selected = region === undefined
++    ? catalog
++    : catalog.filter(item => item.region === region);
++  const body = JSON.stringify(selectCatalog(selected));
++  const etag = `"${createHash('sha256').update(body).digest('hex')}"`;
++  const headers = {
++    'ETag': etag,
++    'Cache-Control': 'private, max-age=0',
++  };
++
++  if (req.headers?.['if-none-match'] === etag) {
++    res.writeHead(304, headers);
++    res.end('');
++    return;
++  }
++
++  res.writeHead(200, {
++    ...headers,
++    'Content-Type': 'application/json',
++  });
++  res.end(body);
++}
+diff --git a/test/catalog.test.mjs b/test/catalog.test.mjs
+index ae4be25..554e466 100644
+--- a/test/catalog.test.mjs
++++ b/test/catalog.test.mjs
+@@ -1,3 +1,128 @@
+-import {test} from 'node:test';import assert from 'node:assert/strict';import {handle} from '../src/handler.mjs';import {loadCatalog} from '../src/client.mjs';
+-test('legacy consumer returns items',async()=>{assert.deepEqual(await loadCatalog(async url=>{assert.equal(url,'/catalog');return {status:200,json:async()=>[{id:1}]};}),[{id:1}]);});
+-test('existing method and path errors',()=>{for(const [method,url,code]of [['POST','/catalog',405],['GET','/other',404]]){let actual;handle({method,url,headers:{}},{writeHead:s=>actual=s,end:()=>{}},[]);assert.equal(actual,code);}});
++import {createHash} from 'node:crypto';
++import {test} from 'node:test';
++import assert from 'node:assert/strict';
++import {handle} from '../src/handler.mjs';
++import {loadCatalog} from '../src/client.mjs';
++
++function responseFor(status, headers, body) {
++  return {
++    status,
++    headers: {get: name => headers[name.toLowerCase()]},
++    json: async () => JSON.parse(body),
++  };
++}
++
++function runHandler(req, catalog) {
++  let status;
++  let headers;
++  let body;
++  handle(req, {
++    writeHead: (nextStatus, nextHeaders) => {
++      status = nextStatus;
++      headers = nextHeaders;
++    },
++    end: nextBody => {
++      body = nextBody ?? '';
++    },
++  }, catalog);
++  return {status, headers, body};
++}
++
++test('legacy consumer returns items', async () => {
++  assert.deepEqual(await loadCatalog(async url => {
++    assert.equal(url, '/catalog');
++    return {status: 200, json: async () => [{id: 1}]};
++  }), [{id: 1}]);
++});
++
++test('catalog handler filters by region without mutating or reordering', () => {
++  const catalog = [
++    {id: 1, region: 'west'},
++    {id: 2, region: 'east'},
++    {id: 3, region: 'west'},
++  ];
++  const before = structuredClone(catalog);
++  const result = runHandler({method: 'GET', url: '/catalog?region=west', headers: {}}, catalog);
++  const body = JSON.stringify([catalog[0], catalog[2]]);
++
++  assert.equal(result.status, 200);
++  assert.equal(result.body, body);
++  assert.equal(result.headers['Content-Type'], 'application/json');
++  assert.equal(result.headers['Cache-Control'], 'private, max-age=0');
++  assert.equal(result.headers.ETag, `"${createHash('sha256').update(body).digest('hex')}"`);
++  assert.deepEqual(catalog, before);
++});
++
++test('catalog handler selects all items when region is omitted', () => {
++  const catalog = [{id: 1, region: 'west'}, {id: 2, region: 'east'}];
++  const all = runHandler({method: 'GET', url: '/catalog', headers: {}}, catalog);
++  const west = runHandler({method: 'GET', url: '/catalog?region=west', headers: {}}, catalog);
++
++  assert.equal(all.status, 200);
++  assert.notEqual(all.headers.ETag, west.headers.ETag);
++  assert.deepEqual(JSON.parse(all.body), catalog);
++});
++
++test('catalog handler returns 304 for an exact ETag match', () => {
++  const catalog = [{id: 1, region: 'west'}];
++  const first = runHandler({method: 'GET', url: '/catalog?region=west', headers: {}}, catalog);
++  const cached = runHandler({
++    method: 'GET',
++    url: '/catalog?region=west',
++    headers: {'if-none-match': first.headers.ETag},
++  }, catalog);
++
++  assert.equal(cached.status, 304);
++  assert.equal(cached.headers.ETag, first.headers.ETag);
++  assert.equal(cached.headers['Cache-Control'], 'private, max-age=0');
++  assert.equal(cached.body, '');
++  assert.equal(runHandler({
++    method: 'GET',
++    url: '/catalog?region=west',
++    headers: {'if-none-match': `W/${first.headers.ETag}`},
++  }, catalog).status, 200);
++});
++
++test('client URL-encodes region and returns the 200 representation', async () => {
++  let request;
++  const result = await loadCatalog(async (...args) => {
++    request = args;
++    return responseFor(200, {etag: '"catalog-tag"'}, '[{"id":1}]');
++  }, {region: 'north/west & coast'});
++
++  assert.deepEqual(request, ['/catalog?region=north%2Fwest%20%26%20coast']);
++  assert.deepEqual(result, {status: 'ok', items: [{id: 1}], etag: '"catalog-tag"'});
++});
++
++test('client sends If-None-Match and does not parse a 304 body', async () => {
++  let request;
++  const result = await loadCatalog(async (...args) => {
++    request = args;
++    return {
++      status: 304,
++      headers: {get: () => '"catalog-tag"'},
++      json: () => { throw new Error('json() must not be called'); },
++    };
++  }, {region: 'west', etag: '"catalog-tag"'});
++
++  assert.deepEqual(request, [
++    '/catalog?region=west',
++    {headers: {'If-None-Match': '"catalog-tag"'}},
++  ]);
++  assert.deepEqual(result, {status: 'not-modified', etag: '"catalog-tag"'});
++});
++
++test('client rejects statuses other than 200 and 304', async () => {
++  await assert.rejects(
++    loadCatalog(async () => ({status: 500}), {}),
++    /Catalog unavailable/,
++  );
++});
++
++test('existing method and path errors', () => {
++  for (const [method, url, code] of [['POST', '/catalog', 405], ['GET', '/other', 404]]) {
++    let actual;
++    handle({method, url, headers: {}}, {writeHead: status => actual = status, end: () => {}}, []);
++    assert.equal(actual, code);
++  }
++});

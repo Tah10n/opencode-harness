@@ -1,0 +1,5 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import path from 'node:path';const root=process.env.PILOT_SOURCE;
+const m0=await import(path.join(root,"src/duration.mjs"));
+test("bigint precision through display",()=>{assert.deepEqual(m0.splitMillis(9007199254740993123n),{seconds:9007199254740993n,millis:123});assert.equal(m0.display(9007199254740993123n),'9007199254740993.123s');});
+test("validation preserves type contract",()=>{for(const x of [-1,1.1,Infinity,Number.MAX_SAFE_INTEGER+1,-1n])assert.throws(()=>m0.splitMillis(x),RangeError);for(const x of ['2',null,{}])assert.throws(()=>m0.display(x),TypeError);assert.deepEqual(m0.splitMillis(0n),{seconds:0n,millis:0});});
+test("zero padding and numeric old output",()=>{assert.equal(m0.display(1001n),'1.001s');assert.equal(m0.display(0),'0.000s');assert.equal(typeof m0.splitMillis(1000).seconds,'number');});

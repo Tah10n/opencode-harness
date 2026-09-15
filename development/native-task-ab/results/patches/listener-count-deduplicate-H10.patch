@@ -1,0 +1,142 @@
+diff --git a/index.d.ts b/index.d.ts
+index 449f402..d3bf413 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -729,6 +729,8 @@ export default class Emittery<
+ 	/**
+ 	The number of listeners for the `eventName` or all events if not specified.
+ 
++	When an array is passed, each distinct event-name value is counted once. Repeated strings and the same symbol are deduplicated; different symbols remain distinct.
++
+ 	@example
+ 	```
+ 	import Emittery from 'emittery';
+diff --git a/index.js b/index.js
+index 67a4de3..e9d88eb 100644
+--- a/index.js
++++ b/index.js
+@@ -948,7 +948,7 @@ export default class Emittery {
+ 	}
+ 
+ 	listenerCount(eventNames) {
+-		eventNames = Array.isArray(eventNames) ? eventNames : [eventNames];
++		eventNames = Array.isArray(eventNames) ? new Set(eventNames) : [eventNames];
+ 		let count = 0;
+ 
+ 		for (const eventName of eventNames) {
+diff --git a/index.test-d.ts b/index.test-d.ts
+index 6ec455e..5e5c66c 100644
+--- a/index.test-d.ts
++++ b/index.test-d.ts
+@@ -286,6 +286,18 @@ type AnyListener = (event: unknown) => void | Promise<void>;
+ 	};
+ }
+ 
++// Strict typing for listenerCount event-name arrays
++{
++	const ee = new Emittery<{
++		value: string;
++		other: number;
++	}>();
++
++	expectType<number>(ee.listenerCount(['value', 'value']));
++	expectType<number>(ee.listenerCount(['value', 'other'] as const));
++	expectError(ee.listenerCount(['value', 'missing']));
++}
++
+ // Compatibility with p-event, without explicit types
+ {
+ 	const ee = new Emittery();
+diff --git a/readme.md b/readme.md
+index 88805a2..09866ad 100644
+--- a/readme.md
++++ b/readme.md
+@@ -643,6 +643,8 @@ const emitter = new Emittery();
+ 
+ The number of listeners for the `eventNames` or all events if not specified.
+ 
++When an array is passed, each distinct event-name value is counted once. Repeated strings and the same symbol are deduplicated; different symbols remain distinct. The count includes `onAny()` listeners and async iterator subscriptions for each distinct event name.
++
+ ```js
+ import Emittery from 'emittery';
+ 
+@@ -653,6 +655,7 @@ emitter.on('🐶', listener);
+ 
+ emitter.listenerCount('🦄'); // 1
+ emitter.listenerCount(); // 2
++emitter.listenerCount(['🦄', '🦄', '🐶']); // 2
+ ```
+ 
+ #### bindMethods(target, methodNames?)
+diff --git a/test/index.js b/test/index.js
+index f73b0fc..b6e66a1 100644
+--- a/test/index.js
++++ b/test/index.js
+@@ -2248,6 +2248,67 @@ test('listenerCount() - multiple event names', t => {
+ 	t.is(emitter.listenerCount(), 5);
+ });
+ 
++test.serial('listenerCount() - deduplicates event names without changing subscriptions', async t => {
++	const emitter = new Emittery();
++	const symbol = Symbol('same description');
++	const otherSymbol = Symbol('same description');
++	const calls = [];
++
++	emitter.on('🦄', () => calls.push('listener'));
++	emitter.on('🦄', () => calls.push('listener'));
++	emitter.on('🌈', () => calls.push('listener'));
++	emitter.on(symbol, () => calls.push('listener'));
++	emitter.on(otherSymbol, () => calls.push('listener'));
++	emitter.onAny(() => calls.push('any'));
++	emitter.onAny(() => calls.push('any'));
++	const unicornIterator = emitter.events('🦄');
++	const rainbowIterator = emitter.events('🌈');
++	const anyIterator = emitter.anyEvent();
++
++	// Check the state used by the array count immediately before calling it.
++	t.deepEqual([
++		emitter.listenerCount('🦄'),
++		emitter.listenerCount('🌈'),
++		emitter.listenerCount(symbol),
++		emitter.listenerCount(otherSymbol),
++	], [6, 5, 4, 4]);
++	t.is(emitter.listenerCount(), 10);
++
++	t.is(emitter.listenerCount(['🦄', '🦄', '🌈', '🌈', symbol, symbol, otherSymbol]), 19);
++	t.is(emitter.listenerCount([]), 0);
++	t.deepEqual([
++		emitter.listenerCount('🦄'),
++		emitter.listenerCount('🌈'),
++		emitter.listenerCount(symbol),
++		emitter.listenerCount(otherSymbol),
++	], [6, 5, 4, 4]);
++
++	await emitter.emit('🦄', '🌈');
++	t.is(calls.length, 4);
++	t.deepEqual(await unicornIterator.next(), {done: false, value: {name: '🦄', data: '🌈'}});
++	t.deepEqual(await anyIterator.next(), {done: false, value: {name: '🦄', data: '🌈'}});
++
++	await emitter.emit('🌈', '🍖');
++	t.is(calls.length, 7);
++	t.deepEqual(await rainbowIterator.next(), {done: false, value: {name: '🌈', data: '🍖'}});
++	t.deepEqual(await anyIterator.next(), {done: false, value: {name: '🌈', data: '🍖'}});
++
++	await unicornIterator.return();
++	await rainbowIterator.return();
++	await anyIterator.return();
++});
++
++test('listenerCount() - validates invalid entries after duplicate names', t => {
++	const emitter = new Emittery();
++	emitter.on('🦄', () => {});
++
++	t.throws(() => {
++		emitter.listenerCount(['🦄', '🦄', true]);
++	}, {instanceOf: TypeError});
++
++	t.is(emitter.listenerCount('🦄'), 1);
++});
++
+ test('listenerCount() - works with empty eventName strings', t => {
+ 	const emitter = new Emittery();
+ 	emitter.on('', () => {});

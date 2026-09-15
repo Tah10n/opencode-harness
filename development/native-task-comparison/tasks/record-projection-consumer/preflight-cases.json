@@ -1,0 +1,18 @@
+{
+  "alternative": {
+    "src/lookup.mjs": "export function lookup(record,path){let v=record;for(const key of path){if(v===null||typeof v!=='object'||!Object.hasOwn(v,key))return {found:false};v=v[key];}return {found:true,value:v};}export function copyValue(value){return structuredClone(value);}\n",
+    "src/project.mjs": "import {lookup,copyValue} from './lookup.mjs';export function project(record,fields){const out=Object.create(null);for(const f of fields){const r=lookup(record,f.path);if(r.found)Object.defineProperty(out,f.as,{value:copyValue(r.value),writable:true,enumerable:true,configurable:true});}return out;}export function responseRows(records,fields){return records.map(r=>project(r,fields));}\n"
+  },
+  "mutants": [
+    {
+      "name": "truthy-presence",
+      "file": "src/project.mjs",
+      "replacement": "import {lookup,copyValue} from './lookup.mjs';export function project(record,fields){const out={};for(const f of fields){const r=lookup(record,f.path);if(r.found&&r.value)Object.defineProperty(out,f.as,{value:copyValue(r.value),writable:true,enumerable:true,configurable:true});}return out;}export function responseRows(records,fields){return records.map(r=>project(r,fields));}\n"
+    },
+    {
+      "name": "shallow-copy",
+      "file": "src/lookup.mjs",
+      "replacement": "export function lookup(record,path){let value=record;for(const key of path){if(value===null||typeof value!=='object'||!Object.hasOwn(value,key))return {found:false};value=value[key];}return {found:true,value};}export function copyValue(value){return value;}\n"
+    }
+  ]
+}

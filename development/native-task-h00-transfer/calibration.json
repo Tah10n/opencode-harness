@@ -1,0 +1,727 @@
+{
+  "realProviderRequests": 0,
+  "cases": [
+    {
+      "task": "denque-rotate",
+      "variant": "baseline",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 902
+    },
+    {
+      "task": "denque-rotate",
+      "variant": "reference",
+      "expectedPass": true,
+      "exit": 0,
+      "matched": true,
+      "elapsedMs": 837
+    },
+    {
+      "task": "denque-rotate",
+      "variant": "alternative",
+      "expectedPass": true,
+      "exit": 0,
+      "matched": true,
+      "elapsedMs": 710
+    },
+    {
+      "task": "denque-rotate",
+      "variant": "wrong-direction",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 763
+    },
+    {
+      "task": "denque-rotate",
+      "variant": "no-validation",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 737
+    },
+    {
+      "task": "denque-rotate",
+      "variant": "lost-capacity",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 649
+    },
+    {
+      "task": "denque-remove-where",
+      "variant": "baseline",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 940
+    },
+    {
+      "task": "denque-remove-where",
+      "variant": "reference",
+      "expectedPass": true,
+      "exit": 0,
+      "matched": true,
+      "elapsedMs": 644
+    },
+    {
+      "task": "denque-remove-where",
+      "variant": "alternative",
+      "expectedPass": true,
+      "exit": 0,
+      "matched": true,
+      "elapsedMs": 774
+    },
+    {
+      "task": "denque-remove-where",
+      "variant": "wrong-index",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 758
+    },
+    {
+      "task": "denque-remove-where",
+      "variant": "reversed-survivors",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 648
+    },
+    {
+      "task": "denque-remove-where",
+      "variant": "eager-mutation",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 681
+    },
+    {
+      "task": "eventemitter-prepend",
+      "variant": "baseline",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 675
+    },
+    {
+      "task": "eventemitter-prepend",
+      "variant": "reference",
+      "expectedPass": true,
+      "exit": 0,
+      "matched": true,
+      "elapsedMs": 687
+    },
+    {
+      "task": "eventemitter-prepend",
+      "variant": "alternative",
+      "expectedPass": true,
+      "exit": 0,
+      "matched": true,
+      "elapsedMs": 530
+    },
+    {
+      "task": "eventemitter-prepend",
+      "variant": "appends",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 515
+    },
+    {
+      "task": "eventemitter-prepend",
+      "variant": "once-is-persistent",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 542
+    },
+    {
+      "task": "eventemitter-prepend",
+      "variant": "loses-context",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 550
+    },
+    {
+      "task": "eventemitter-remove-context",
+      "variant": "baseline",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 660
+    },
+    {
+      "task": "eventemitter-remove-context",
+      "variant": "reference",
+      "expectedPass": true,
+      "exit": 0,
+      "matched": true,
+      "elapsedMs": 595
+    },
+    {
+      "task": "eventemitter-remove-context",
+      "variant": "alternative",
+      "expectedPass": true,
+      "exit": 0,
+      "matched": true,
+      "elapsedMs": 542
+    },
+    {
+      "task": "eventemitter-remove-context",
+      "variant": "removes-other-context",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 501
+    },
+    {
+      "task": "eventemitter-remove-context",
+      "variant": "wrong-count",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 491
+    },
+    {
+      "task": "eventemitter-remove-context",
+      "variant": "misses-symbols",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 497
+    },
+    {
+      "task": "fastq-running-tasks",
+      "variant": "baseline",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 2495
+    },
+    {
+      "task": "fastq-running-tasks",
+      "variant": "reference",
+      "expectedPass": true,
+      "exit": 0,
+      "matched": true,
+      "elapsedMs": 1716
+    },
+    {
+      "task": "fastq-running-tasks",
+      "variant": "alternative",
+      "expectedPass": true,
+      "exit": 0,
+      "matched": true,
+      "elapsedMs": 2522
+    },
+    {
+      "task": "fastq-running-tasks",
+      "variant": "includes-queued",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 1813
+    },
+    {
+      "task": "fastq-running-tasks",
+      "variant": "retains-completed",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 1922
+    },
+    {
+      "task": "fastq-running-tasks",
+      "variant": "reverses-start-order",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 2050
+    },
+    {
+      "task": "fastq-on-idle",
+      "variant": "baseline",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 2893
+    },
+    {
+      "task": "fastq-on-idle",
+      "variant": "reference",
+      "expectedPass": true,
+      "exit": 0,
+      "matched": true,
+      "elapsedMs": 2090
+    },
+    {
+      "task": "fastq-on-idle",
+      "variant": "alternative",
+      "expectedPass": true,
+      "exit": 0,
+      "matched": true,
+      "elapsedMs": 2222
+    },
+    {
+      "task": "fastq-on-idle",
+      "variant": "ignores-pending",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 2693
+    },
+    {
+      "task": "fastq-on-idle",
+      "variant": "overwrites-drain",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 2577
+    },
+    {
+      "task": "fastq-on-idle",
+      "variant": "misses-kill-idle",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 10478
+    },
+    {
+      "task": "quick-lru-computed",
+      "variant": "baseline",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 3847
+    },
+    {
+      "task": "quick-lru-computed",
+      "variant": "reference",
+      "expectedPass": true,
+      "exit": 0,
+      "matched": true,
+      "elapsedMs": 3576
+    },
+    {
+      "task": "quick-lru-computed",
+      "variant": "alternative",
+      "expectedPass": true,
+      "exit": 0,
+      "matched": true,
+      "elapsedMs": 3957
+    },
+    {
+      "task": "quick-lru-computed",
+      "variant": "undefined-is-miss",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 3519
+    },
+    {
+      "task": "quick-lru-computed",
+      "variant": "no-recency",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 4432
+    },
+    {
+      "task": "quick-lru-computed",
+      "variant": "factory-error-swallowed",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 3012
+    },
+    {
+      "task": "quick-lru-prune",
+      "variant": "baseline",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 3812
+    },
+    {
+      "task": "quick-lru-prune",
+      "variant": "reference",
+      "expectedPass": true,
+      "exit": 0,
+      "matched": true,
+      "elapsedMs": 3540
+    },
+    {
+      "task": "quick-lru-prune",
+      "variant": "alternative",
+      "expectedPass": true,
+      "exit": 0,
+      "matched": true,
+      "elapsedMs": 3325
+    },
+    {
+      "task": "quick-lru-prune",
+      "variant": "shadow-deleted",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 3351
+    },
+    {
+      "task": "quick-lru-prune",
+      "variant": "no-old-expiration",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 3183
+    },
+    {
+      "task": "quick-lru-prune",
+      "variant": "wrong-count",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 3764
+    },
+    {
+      "task": "ufo-query-sort",
+      "variant": "baseline",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 4220
+    },
+    {
+      "task": "ufo-query-sort",
+      "variant": "reference",
+      "expectedPass": true,
+      "exit": 0,
+      "matched": true,
+      "elapsedMs": 3832
+    },
+    {
+      "task": "ufo-query-sort",
+      "variant": "alternative",
+      "expectedPass": true,
+      "exit": 0,
+      "matched": true,
+      "elapsedMs": 3637
+    },
+    {
+      "task": "ufo-query-sort",
+      "variant": "ignores-option",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 3694
+    },
+    {
+      "task": "ufo-query-sort",
+      "variant": "sorts-default",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 3267
+    },
+    {
+      "task": "ufo-query-sort",
+      "variant": "consumer-not-threaded",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 3399
+    },
+    {
+      "task": "ufo-append-query",
+      "variant": "baseline",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 4055
+    },
+    {
+      "task": "ufo-append-query",
+      "variant": "reference",
+      "expectedPass": true,
+      "exit": 0,
+      "matched": true,
+      "elapsedMs": 4033
+    },
+    {
+      "task": "ufo-append-query",
+      "variant": "alternative",
+      "expectedPass": true,
+      "exit": 0,
+      "matched": true,
+      "elapsedMs": 4264
+    },
+    {
+      "task": "ufo-append-query",
+      "variant": "replaces-values",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 3281
+    },
+    {
+      "task": "ufo-append-query",
+      "variant": "drops-falsy",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 3948
+    },
+    {
+      "task": "ufo-append-query",
+      "variant": "pollution-unfiltered",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 4566
+    },
+    {
+      "task": "ms-format-unit",
+      "variant": "baseline",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 3428
+    },
+    {
+      "task": "ms-format-unit",
+      "variant": "reference",
+      "expectedPass": true,
+      "exit": 0,
+      "matched": true,
+      "elapsedMs": 3660
+    },
+    {
+      "task": "ms-format-unit",
+      "variant": "alternative",
+      "expectedPass": true,
+      "exit": 0,
+      "matched": true,
+      "elapsedMs": 3518
+    },
+    {
+      "task": "ms-format-unit",
+      "variant": "ignores-forced-unit",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 2902
+    },
+    {
+      "task": "ms-format-unit",
+      "variant": "wrong-rounding",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 2679
+    },
+    {
+      "task": "ms-format-unit",
+      "variant": "invalid-unit-falls-back",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 3137
+    },
+    {
+      "task": "ms-parse-compound",
+      "variant": "baseline",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 3684
+    },
+    {
+      "task": "ms-parse-compound",
+      "variant": "reference",
+      "expectedPass": true,
+      "exit": 0,
+      "matched": true,
+      "elapsedMs": 2739
+    },
+    {
+      "task": "ms-parse-compound",
+      "variant": "alternative",
+      "expectedPass": true,
+      "exit": 0,
+      "matched": true,
+      "elapsedMs": 3054
+    },
+    {
+      "task": "ms-parse-compound",
+      "variant": "drops-global-sign",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 3299
+    },
+    {
+      "task": "ms-parse-compound",
+      "variant": "accepts-no-separator",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 2416
+    },
+    {
+      "task": "ms-parse-compound",
+      "variant": "accepts-trailing-garbage",
+      "expectedPass": false,
+      "exit": 1,
+      "matched": true,
+      "elapsedMs": 2811
+    }
+  ],
+  "completeControls": [
+    {
+      "task": "denque-rotate",
+      "variant": "reference",
+      "resultSha256": "58a781161fe791af89274bebca91339774577b840736678163410c301ecfef72",
+      "filesSha256": "026e2703b97657382ae2f25b31e26c85fbd8aa1393a2277b8a46ba524e848124"
+    },
+    {
+      "task": "denque-rotate",
+      "variant": "alternative",
+      "resultSha256": "86712c49b8fce567b3c958bf6f53ac08fcc7cb20f35b732ca06cf103b2e9b3f1",
+      "filesSha256": "d1f5a9cf8c7cca9bee4ea26cc7dc21af14be403275960f4725c39187082fdbec"
+    },
+    {
+      "task": "denque-remove-where",
+      "variant": "reference",
+      "resultSha256": "d6c4d766697777b47d500627a4977e417a36adfa1c00db5b5050184b80e3f002",
+      "filesSha256": "8f01faa85a6e926c13d40a3601c6f6448ebae14cef14123bd46e2181dc56c357"
+    },
+    {
+      "task": "denque-remove-where",
+      "variant": "alternative",
+      "resultSha256": "1471fc823ad0ca5686f684bc2c9afc75c942c2ee66694a1e78f1a6badafa745a",
+      "filesSha256": "51febedf94bd1249b8fa67303bed55d542a7c0112c6d4a2d9c974b55e20e56ed"
+    },
+    {
+      "task": "eventemitter-prepend",
+      "variant": "reference",
+      "resultSha256": "734327c30b5cc4d4d17b5fc6514e69fdce64e5409f071d8fbf4f98ea7e5bd3b3",
+      "filesSha256": "7213c7a103fd7d3275bc078527e8d887e2af80eceb14648a8c66effbfe10493d"
+    },
+    {
+      "task": "eventemitter-prepend",
+      "variant": "alternative",
+      "resultSha256": "3c3bc300f0edf102085491728bf754a7465220ba6227cff2cb12b99435b25f2a",
+      "filesSha256": "2da79fe87367933c8f3bc852780cd0d4519a30f9d859aed68c8502f3ac0b310c"
+    },
+    {
+      "task": "eventemitter-remove-context",
+      "variant": "reference",
+      "resultSha256": "a93dce2651e20c13ec868ebc88678d726144887a3a9c81aa72ddf327ab0ebc64",
+      "filesSha256": "0a0c4ab967b8e077c8ede2f2736a879bbe04038a4a942a4a55371e605a7f9b99"
+    },
+    {
+      "task": "eventemitter-remove-context",
+      "variant": "alternative",
+      "resultSha256": "774cfe3aa26795856abc6329c27b926de54599c65a81e4df94a3575ee7907200",
+      "filesSha256": "26285663e981605177e361550604b5a214dc6b487a8ae666fdc8341fffcfc152"
+    },
+    {
+      "task": "fastq-running-tasks",
+      "variant": "reference",
+      "resultSha256": "125078a15f34f41dbccb7cb6ae183fa484964dcd88e0f2a121e7e75cd7ff6f5f",
+      "filesSha256": "5166974c8e5ab15439d507055b5a313960802ee290753e475ed0f2dae0a366d6"
+    },
+    {
+      "task": "fastq-running-tasks",
+      "variant": "alternative",
+      "resultSha256": "3c15e53cf6de68b09cfc82bfa85179344d909716711034e1db9a3df67babaf2e",
+      "filesSha256": "3c76ff7068a61c130172412da49fe7a80c03fecbfd163d4b95f3943420ef02ad"
+    },
+    {
+      "task": "fastq-on-idle",
+      "variant": "reference",
+      "resultSha256": "a35bd6040631538344e9fced984bfd9b8cfa4eac20e257d467f2edec20a341b2",
+      "filesSha256": "92b23bc207c47cc7e93b592754ad7ac43f08b40c31e2554fe476b17dde597c9d"
+    },
+    {
+      "task": "fastq-on-idle",
+      "variant": "alternative",
+      "resultSha256": "8bef4ce397532a5bf80174e43caa9eb394de40901f628711eee182762b47b646",
+      "filesSha256": "b589a6b5c9d48530cc3abdd5282f8b2507a9c24f55574b890b3eb26edb8ef1f3"
+    },
+    {
+      "task": "quick-lru-computed",
+      "variant": "reference",
+      "resultSha256": "2862479f2c358eadd1147a6737c6e30b2ea4eadd5cfce1e8d779e3f872350202",
+      "filesSha256": "d3b3c79446295257899b4e1d44e0026d156f5c5b3b6fa059b9a75c5b41887864"
+    },
+    {
+      "task": "quick-lru-computed",
+      "variant": "alternative",
+      "resultSha256": "2862479f2c358eadd1147a6737c6e30b2ea4eadd5cfce1e8d779e3f872350202",
+      "filesSha256": "869af5b08527d0013d2a0562300a8a27ee1134fe97589f3335f1720568af425f"
+    },
+    {
+      "task": "quick-lru-prune",
+      "variant": "reference",
+      "resultSha256": "454bfe0a4f82b27d4b133ce92a2b2eb44bd8736a85104c67760b4cde2d63d3fe",
+      "filesSha256": "a8272dc32010780fd09b5fc1b67ced56f7c812bc1b59d4404d35fd4c91139490"
+    },
+    {
+      "task": "quick-lru-prune",
+      "variant": "alternative",
+      "resultSha256": "d691850ba0787ea2b6a73b1406869d38645e0569736d6e3861d84a13c20a8d80",
+      "filesSha256": "8b3a0413c3c3f995c4121ffb30197b1c89aa24ed0a2655effd18824033b12404"
+    },
+    {
+      "task": "ufo-query-sort",
+      "variant": "reference",
+      "resultSha256": "7f47ccf7a873fd0e3f432d4e646f82215eec871ac1dcb61bf10c1b47a0a869ba",
+      "filesSha256": "bef23180bc57589a8697b3bd83e36a55a759291565076e725d2cd43be18e2973"
+    },
+    {
+      "task": "ufo-query-sort",
+      "variant": "alternative",
+      "resultSha256": "5a05c6733771e33f3e316b50b05d1127f1fe1773658c9b63562335371ef4fb5e",
+      "filesSha256": "24478f8ab5ebf1089dfb3a2fd4010303e6a1c2b359dcc0105b4e77d28f3cbd73"
+    },
+    {
+      "task": "ufo-append-query",
+      "variant": "reference",
+      "resultSha256": "b5ac46c48582c345fb7938963eb116ff9020f9bdeaba67d8da88d9851e710a84",
+      "filesSha256": "13af1762051220d8f6d6c34992e5e4544cda123bdc8ce52f4d5eb1d5ee246c48"
+    },
+    {
+      "task": "ufo-append-query",
+      "variant": "alternative",
+      "resultSha256": "ea68f80b4d866b189a3079a601260c46d83f1eed0d4a814c017ba32163b22e70",
+      "filesSha256": "7b25779b247957a0a79ebb17200cf729f369d52e60084bc810a41dcf3b850961"
+    },
+    {
+      "task": "ms-format-unit",
+      "variant": "reference",
+      "resultSha256": "85df77bc8c20a5fc147f09d275693c2958a2e767ffbc3642405c5cc2c4d4c04b",
+      "filesSha256": "7822c34ef428b2788fe6f10c5c8ec4c79582af7a3246d51799c531dc1135d323"
+    },
+    {
+      "task": "ms-format-unit",
+      "variant": "alternative",
+      "resultSha256": "f2a6001442b9353932a0bf09a54aadac15b022cfb60e8655ec756840fa33814d",
+      "filesSha256": "0b461e4f2b0975a1136dd3df60f73f2e8e1fd1d35cd1470c83cd1dda09a87990"
+    },
+    {
+      "task": "ms-parse-compound",
+      "variant": "reference",
+      "resultSha256": "21c7577cc4e2dda27feaa08639a6a8301dd1fdeb21d0496776a9426788680632",
+      "filesSha256": "0621665239f58301ccfcca5a3ad3333783dd501e73e611166fdd049322e1777e"
+    },
+    {
+      "task": "ms-parse-compound",
+      "variant": "alternative",
+      "resultSha256": "4f4560733e5a6922794af7d56d72b18c54f297b10d5d921a74847d9cc20fb6d0",
+      "filesSha256": "3a0aefb4e5606b7260190e388e51a3933c5d929b96aafc0289265a9fdbc860d4"
+    }
+  ]
+}

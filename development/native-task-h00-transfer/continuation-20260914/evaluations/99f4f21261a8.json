@@ -1,0 +1,156 @@
+{
+  "id": "99f4f21261a8",
+  "task": "quick-lru-computed",
+  "project": "quick-lru",
+  "Q": 0,
+  "findings": [
+    {
+      "category": "required-coverage-loss",
+      "reason": "Recency assertion only observes absence from old generation and does not establish retention after promotion."
+    },
+    {
+      "category": "required-coverage-loss",
+      "reason": "Default TTL assertion admits Infinity"
+    }
+  ],
+  "contentReview": {
+    "id": "99f4f21261a8",
+    "task": "quick-lru-computed",
+    "project": "quick-lru",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete-pending-mechanical-checks",
+    "Q": null,
+    "behaviorReview": "Checks current then old generation, uses normal expiry deletion/notification and old-entry moveToRecent; default set computes finite cache maxAge. Synchronous factory errors propagate before insertion.",
+    "retainedTestsReview": "Original runtime and tsd cases retained; three runtime cases and consumer regressions added.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": false,
+        "evidence": "Stored undefined hit checks no factory and deletion from old cache only. No assertion that key survives in current cache or subsequent eviction proves refresh; a dropped old entry could pass. Historical corresponding test also asserted has(old), which this delivered test omits."
+      },
+      {
+        "scenario": 2,
+        "covered": false,
+        "evidence": "Expired entry, one factory call and one eviction are checked. Remaining TTL is only compared >10, accepting Infinity; no finite/default upper bound or later expiry. Same loss-of-default-TTL diagnostic prepared."
+      },
+      {
+        "scenario": 3,
+        "covered": true,
+        "evidence": "Original thrown Error and empty cache retained; object key strictly passed to factory, repeat hit avoids factory, separate cache and distinct object key use separate values."
+      }
+    ],
+    "typesReview": "tsd asserts key string inference and number result, rejects wrong factory return type.",
+    "docsReview": "README and public declaration explain synchronous miss computation, no computation on hit, recency and default maxAge.",
+    "contentFindings": [
+      {
+        "category": "required-coverage-loss",
+        "reason": "Recency assertion only observes absence from old generation and does not establish retention after promotion."
+      },
+      {
+        "category": "required-coverage-loss",
+        "reason": "Default TTL assertion admits Infinity; pending same concrete TTL-loss diagnostic used for both new and historical attempts and controls."
+      }
+    ],
+    "pending": [
+      "ordinary project checks including tsd",
+      "independent public API checks",
+      "ordinary patch applicability",
+      "missing-default-TTL test sensitivity"
+    ],
+    "recordStage": "Initial neutral review retained as history; final Q, findings and assessmentNotes supersede pending hypotheses."
+  },
+  "ordinaryExit": 0,
+  "originalIndependentExit": 0,
+  "interpretedIndependentExit": 0,
+  "applicability": {
+    "id": "99f4f21261a8",
+    "task": "quick-lru-computed",
+    "sourceCommit": "f2fe88e2932603c038c61ca29de6ad5286148e1b",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "64536230e290be1931d4ab52a3d86c5b4ac1de8ee2ff5c9446b24c64643e1131",
+    "excludedPreparationArtifacts": [],
+    "types": null
+  },
+  "sourcePatchSha256": "64536230e290be1931d4ab52a3d86c5b4ac1de8ee2ff5c9446b24c64643e1131",
+  "sourcePatchBytes": 4984,
+  "assessmentNotes": [
+    "Delivered AVA suite accepts isolated removal of computed entry expiry. Initial set-based diagnostic retained separately because repeat set could also alter eviction; refined probe changes only stored expiry. Both historical suites and controls detect refined mutant."
+  ],
+  "slot": 38,
+  "repetition": 2,
+  "arm": "P",
+  "D": 0,
+  "verification": [
+    {
+      "artifact": "reviews/99f4f21261a8/default-ttl-sensitivity/result.json",
+      "exit": 0,
+      "elapsedMs": 7981,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "  ✔ maxAge: entriesAscending() returns only non-expired entries (202ms)\n  ✔ maxAge: entries() returns only non-expired entries (202ms)\n  ✔ maxAge: forEach() excludes expired entries (202ms)\n  ✔ maxAge: iterator excludes expired items (202ms)\n  ✔ maxAge: iterator excludes expired items from old cache (202ms)\n  ✔ set(maxAge): items without expiration never expire (401ms)\n  ✔ set(maxAge): ignores non-numeric maxAge option (401ms)\n  ✔ maxAge: setting an item with a local expiration (500ms)\n  ✔ set(maxAge): per-item maxAge overrides global maxAge (501ms)\n  ─\n\n  118 tests passed",
+      "fullLocalOutputSha256": "091751e57a111d92ebeebf0498ab36f7b927457517daa6a9e17003886872d83e",
+      "supersededDiagnostic": true
+    },
+    {
+      "artifact": "reviews/99f4f21261a8/independent/result.json",
+      "exit": 0,
+      "elapsedMs": 4164,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "Independent behavior passed",
+      "fullLocalOutputSha256": "f9c69e05a31a62e04881e10139c67883f681accefebbe3f3ff50d81e2a6a7a6e",
+      "supersededDiagnostic": false
+    },
+    {
+      "artifact": "reviews/99f4f21261a8/isolated-default-ttl-sensitivity/result.json",
+      "exit": 0,
+      "elapsedMs": 6010,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "  ✔ maxAge: entries() returns only non-expired entries (205ms)\n  ✔ maxAge: forEach() excludes expired entries (205ms)\n  ✔ maxAge: iterator excludes expired items (205ms)\n  ✔ maxAge: iterator excludes expired items from old cache (205ms)\n  ✔ set(maxAge): setting the same key refreshes expiration (206ms)\n  ✔ set(maxAge): items without expiration never expire (406ms)\n  ✔ set(maxAge): ignores non-numeric maxAge option (406ms)\n  ✔ set(maxAge): per-item maxAge overrides global maxAge (506ms)\n  ✔ maxAge: setting an item with a local expiration (506ms)\n  ─\n\n  118 tests passed",
+      "fullLocalOutputSha256": "56ca2001af5e5ce3178e933b5305f9e43d039c26cedda0eaaa242011bd125490",
+      "supersededDiagnostic": false
+    },
+    {
+      "artifact": "reviews/99f4f21261a8/ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 18501,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "  ✔ set(maxAge): items without expiration never expire (408ms)\n  ✔ set(maxAge): ignores non-numeric maxAge option (408ms)\n  ✔ maxAge: setting an item with a local expiration (503ms)\n  ✔ set(maxAge): per-item maxAge overrides global maxAge (506ms)\n  ─\n\n  118 tests passed\n----------|---------|----------|---------|---------|-------------------\nFile      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s \n----------|---------|----------|---------|---------|-------------------\nAll files |       0 |        0 |       0 |       0 |                   \n----------|---------|----------|---------|---------|-------------------",
+      "fullLocalOutputSha256": "303eaca938d0381cf321feb95e8ed43e74bc2024d9403fe3cdfb1bcda545531f",
+      "supersededDiagnostic": false
+    }
+  ],
+  "native": {
+    "completed": true,
+    "exitCode": 0,
+    "signal": null,
+    "lastStepFinish": "stop",
+    "normalHandoff": true,
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "workflowStatus": null,
+    "terminalPatchVerification": null,
+    "lastNativeTextSha256": "6844363a422ebecd02f2ec28114bb060c6fd9588cb38100151de922832ee6244",
+    "normalFinalResponse": true,
+    "finalResponseExcerpt": "Implemented `getOrInsertComputed` with:\n\n- Cache-hit detection including stored `undefined`\n- Recency refresh matching `get()`\n- Expiration eviction notifications\n- Default TTL insertion\n- Synchronous factory execution and error propagation\n- Object-key and independent-cache support\n\nUpdated declarations, type tests, AVA regressions, and README documentation.\n\nChecks:\n- `npm test` passed: 118 tests, lint, coverage, and `tsd`\n- `git diff --check` passed\n- No dependencies changed or commit created",
+    "authorExplanationExcerpt": null,
+    "reportFindings": []
+  }
+}

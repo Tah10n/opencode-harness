@@ -1,0 +1,15 @@
+{
+  "category": "state",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "compaction and restore keep next id",
+    "invalid ack and deep ownership"
+  ],
+  "docDelivery": [
+    "Explain cumulative acknowledgement, compaction, valid ack interval, monotonic IDs after restore and JSON ownership."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Implement createLog(saved={next:1,acked:0,events:[]}) with append(value), ack(id), snapshot(). append assigns increasing integer next IDs and returns ID, copying JSON value. ack accepts integer acked<=id<next, advances cumulative cursor and removes every event ID<=id; same ack is valid. Otherwise RangeError(\"ack\"), state unchanged. snapshot/restore preserve next even after all events removed, so IDs never restart. saved is valid contiguous remaining event state, independent JSON copies required both in/out; values contain JSON data <=1MB, <=1000 events and safe IDs. Initial ack0 allowed. No external storage/background work.",
+  "independence": "Explicit synthetic library contract; alternatives judged by observable exports and required integration, not reference-source matching."
+}

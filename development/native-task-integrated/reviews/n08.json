@@ -1,0 +1,29 @@
+{
+  "Q": true,
+  "reviewed": "Unchanged patch applied in an ordinary Git copy; complete source/test/type/doc diff inspected before explanatory traces. Evaluator knew arm mapping; not fully blinded.",
+  "originalChecks": {
+    "id": "n08",
+    "task": "url-search-params",
+    "apply": 0,
+    "projectStatus": 0,
+    "behaviorStatus": 0,
+    "cleanupStatus": 0
+  },
+  "postHocAppendCompatibility": {
+    "status": 0,
+    "tests": 2,
+    "passed": 2,
+    "frozen": false,
+    "soleCauseOfNegativeQ": false
+  },
+  "manualCompleteness": {
+    "threePublicConsumers": true,
+    "publicInputUnionAndQueryObjectCompatibility": true,
+    "existingTestsAndDependenciesPreserved": true,
+    "regressionsAndDocsPresent": true,
+    "portableWithoutHarnessPaths": true
+  },
+  "issues": [],
+  "details": "All 501 project assertions and 6 frozen external assertions pass, with no source errors; npm test lint/format and build pass. Own incoming object keys are selected before value serialization, preserving undefined removal. Public regressions cover duplicate/interleaved/empty/escaped input, overlays, detached params and no mutation.",
+  "calibrationCaveat": "Unchanged post-hoc append check; both original reference and alternative also miss this already-declared compatibility case. Historical outcomes reused without recalculation."
+}

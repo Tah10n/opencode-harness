@@ -1,0 +1,16 @@
+{
+  "category": "state",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Fragmented header/payload, zero-length record and finish detecting truncation.",
+    "Reserved-tag error is transactional and a corrected chunk can complete prior pending data."
+  ],
+  "docDelivery": [
+    "Three-byte header with big-endian length, reserved tag and size limits.",
+    "Transactional push, non-clearing finish failure and detached byte-view ownership."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Records {type,data}: type integer 0..255 (0 rejected), Uint8Array data including subviews; lengths >65535 rejected. Chunk Uint8Array, finite total <=1MB. Raw stream may contain reserved zero tag or truncation.",
+  "independence": "Implement length-prefixed binary field serialization with unknown byte-tag preservation and strict truncated-input errors."
+}

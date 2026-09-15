@@ -1,0 +1,12 @@
+{
+  "alternative": {
+    "src/kits.mjs": "export function kitCapacity(stock,parts){const keys=[...new Set(parts.map(p=>p.sku))];return keys.length?keys.reduce((n,k)=>Math.min(n,Math.floor((Object.hasOwn(stock,k)?stock[k]:0)/parts.filter(p=>p.sku===k).reduce((s,p)=>s+p.qty,0))),Infinity):0;}"
+  },
+  "mutants": [
+    {
+      "name": "duplicate-parts-not-summed",
+      "file": "src/kits.mjs",
+      "replacement": "export function kitCapacity(stock,parts){return parts.length?Math.min(...parts.map(p=>Math.floor((stock[p.sku]??0)/p.qty))):0;}"
+    }
+  ]
+}

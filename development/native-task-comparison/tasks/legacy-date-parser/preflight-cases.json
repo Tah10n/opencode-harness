@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/date.mjs": "function calendar(text){\n const match=/^(\\d{4})-(\\d{2})-(\\d{2})$/.exec(text);if(!match)return null;\n const [year,month,day]=match.slice(1).map(Number),date=new Date(Date.UTC(year,month-1,day));\n if(year<2000||year>2099||date.getUTCFullYear()!==year||date.getUTCMonth()!==month-1||date.getUTCDate()!==day)throw new TypeError('date');return text;\n}\nfunction firstMonday(year){const date=new Date(Date.UTC(year,0,4));while(date.getUTCDay()!==1)date.setUTCDate(date.getUTCDate()-1);return date.getTime();}\nexport function parseDate(text){\n if(typeof text!=='string')throw new TypeError('date');\n const plain=calendar(text);if(plain!==null)return plain;\n const m=/^(\\d{4})-W(\\d{2})-([1-7])$/.exec(text);if(!m)throw new TypeError('week date');\n const y=Number(m[1]),w=Number(m[2]),d=Number(m[3]);if(y<2000||y>2099)throw new TypeError('year');\n const start=firstMonday(y),weeks=(firstMonday(y+1)-start)/604800000;\n if(w<1||w>weeks)throw new TypeError('week');\n return new Date(start+(w-1)*604800000+(d-1)*86400000).toISOString().slice(0,10);\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "accepts-nonexistent-week53",
+      "file": "src/date.mjs",
+      "replacement": "function calendar(text){\n const match=/^(\\d{4})-(\\d{2})-(\\d{2})$/.exec(text);if(!match)return null;\n const [year,month,day]=match.slice(1).map(Number),date=new Date(Date.UTC(year,month-1,day));\n if(year<2000||year>2099||date.getUTCFullYear()!==year||date.getUTCMonth()!==month-1||date.getUTCDate()!==day)throw new TypeError('date');return text;\n}\nexport function parseDate(text){\n if(typeof text!=='string')throw new TypeError('date');\n const plain=calendar(text);if(plain!==null)return plain;\n const match=/^(\\d{4})-W(\\d{2})-([1-7])$/.exec(text);if(!match)throw new TypeError('week date');\n const [year,week,day]=match.slice(1).map(Number);if(year<2000||year>2099||week<1||week>53)throw new TypeError('week date');\n const jan4=Date.UTC(year,0,4),weekday=(new Date(jan4).getUTCDay()+6)%7;\n const monday=jan4-weekday*86400000+(week-1)*7*86400000;\n \n return new Date(monday+(day-1)*86400000).toISOString().slice(0,10);\n}\n"
+    },
+    {
+      "name": "week-one-starts-jan1",
+      "file": "src/date.mjs",
+      "replacement": "function calendar(text){\n const match=/^(\\d{4})-(\\d{2})-(\\d{2})$/.exec(text);if(!match)return null;\n const [year,month,day]=match.slice(1).map(Number),date=new Date(Date.UTC(year,month-1,day));\n if(year<2000||year>2099||date.getUTCFullYear()!==year||date.getUTCMonth()!==month-1||date.getUTCDate()!==day)throw new TypeError('date');return text;\n}\nexport function parseDate(text){\n if(typeof text!=='string')throw new TypeError('date');\n const plain=calendar(text);if(plain!==null)return plain;\n const match=/^(\\d{4})-W(\\d{2})-([1-7])$/.exec(text);if(!match)throw new TypeError('week date');\n const [year,week,day]=match.slice(1).map(Number);if(year<2000||year>2099||week<1||week>53)throw new TypeError('week date');\n const jan4=Date.UTC(year,0,1),weekday=(new Date(jan4).getUTCDay()+6)%7;\n const monday=jan4-weekday*86400000+(week-1)*7*86400000;\n if(new Date(monday+3*86400000).getUTCFullYear()!==year)throw new TypeError('invalid week');\n return new Date(monday+(day-1)*86400000).toISOString().slice(0,10);\n}\n"
+    }
+  ]
+}

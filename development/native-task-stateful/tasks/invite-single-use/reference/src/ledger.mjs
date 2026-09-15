@@ -1,0 +1,1 @@
+export function ledger(records) {const pending=new Map(records.map(r=>[r.token,{...r}])),members=[];return {peek:t=>pending.get(t),list:()=>[...pending.values()].map(x=>({...x})),members:()=>members.map(x=>({...x})),remove:t=>pending.delete(t),join:(team,email)=>members.push({team,email})};}

@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/session.mjs": "export function createSession(created,idle,maxAge){return {created,lastSeen:created,idle,maxAge};}export function expires(state){const absolute=state.created+state.maxAge,sliding=state.lastSeen+state.idle;return absolute<sliding?absolute:sliding;}export function touch(state,now){if(now<state.lastSeen)throw new RangeError('time');if(now>=expires(state))return {active:false,state:structuredClone(state)};return {active:true,state:{...state,lastSeen:now}};}export function serialize(state){return JSON.stringify({created:state.created,lastSeen:state.lastSeen,idle:state.idle,maxAge:state.maxAge});}export function restore(text){const s=JSON.parse(text);if(s===null||typeof s!=='object'||Array.isArray(s)||Object.keys(s).sort().join(',')!=='created,idle,lastSeen,maxAge'||!Number.isSafeInteger(s.created)||s.created<0||s.created>1e12||!Number.isSafeInteger(s.lastSeen)||s.lastSeen<s.created||!Number.isInteger(s.idle)||s.idle<1||s.idle>1e9||!Number.isInteger(s.maxAge)||s.maxAge<1||s.maxAge>1e9||s.lastSeen>=s.created+s.maxAge)throw new TypeError('snapshot');return {created:s.created,lastSeen:s.lastSeen,idle:s.idle,maxAge:s.maxAge};}\n"
+  },
+  "mutants": [
+    {
+      "name": "idle-only-expiry",
+      "file": "src/session.mjs",
+      "replacement": "export function createSession(created,idle,maxAge){return {created,lastSeen:created,idle,maxAge};}export function expires(state){return state.lastSeen+state.idle;}export function touch(state,now){if(now<state.lastSeen)throw new RangeError('time');if(now>=expires(state))return {active:false,state:{...state}};return {active:true,state:{...state,lastSeen:now}};}export function serialize(state){return JSON.stringify({created:state.created,lastSeen:state.lastSeen,idle:state.idle,maxAge:state.maxAge});}export function restore(text){const s=JSON.parse(text);if(s===null||typeof s!=='object'||Array.isArray(s)||Object.keys(s).sort().join(',')!=='created,idle,lastSeen,maxAge'||!Number.isSafeInteger(s.created)||s.created<0||s.created>1e12||!Number.isSafeInteger(s.lastSeen)||s.lastSeen<s.created||!Number.isInteger(s.idle)||s.idle<1||s.idle>1e9||!Number.isInteger(s.maxAge)||s.maxAge<1||s.maxAge>1e9||s.lastSeen>=s.created+s.maxAge)throw new TypeError('snapshot');return {created:s.created,lastSeen:s.lastSeen,idle:s.idle,maxAge:s.maxAge};}\n"
+    },
+    {
+      "name": "expiry-boundary-inclusive",
+      "file": "src/session.mjs",
+      "replacement": "export function createSession(created,idle,maxAge){return {created,lastSeen:created,idle,maxAge};}export function expires(state){return Math.min(state.created+state.maxAge,state.lastSeen+state.idle);}export function touch(state,now){if(now<state.lastSeen)throw new RangeError('time');if(now>expires(state))return {active:false,state:{...state}};return {active:true,state:{...state,lastSeen:now}};}export function serialize(state){return JSON.stringify({created:state.created,lastSeen:state.lastSeen,idle:state.idle,maxAge:state.maxAge});}export function restore(text){const s=JSON.parse(text);if(s===null||typeof s!=='object'||Array.isArray(s)||Object.keys(s).sort().join(',')!=='created,idle,lastSeen,maxAge'||!Number.isSafeInteger(s.created)||s.created<0||s.created>1e12||!Number.isSafeInteger(s.lastSeen)||s.lastSeen<s.created||!Number.isInteger(s.idle)||s.idle<1||s.idle>1e9||!Number.isInteger(s.maxAge)||s.maxAge<1||s.maxAge>1e9||s.lastSeen>=s.created+s.maxAge)throw new TypeError('snapshot');return {created:s.created,lastSeen:s.lastSeen,idle:s.idle,maxAge:s.maxAge};}\n"
+    }
+  ]
+}

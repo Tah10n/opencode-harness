@@ -1,0 +1,119 @@
+{
+  "id": "cf57afd4f2c6",
+  "task": "fastq-running-tasks",
+  "project": "fastq",
+  "Q": 1,
+  "ordinaryProjectExit": 0,
+  "originalIndependentExit": 0,
+  "interpretedIndependentExit": 0,
+  "patchApplicable": true,
+  "sourcePatchSha256": "8a5b5d8984c03d40cb4d7d91f96ac92aec5366878385450d82b19092cbc20491",
+  "decision": "Full required delivery verified.",
+  "findings": [],
+  "contentReview": {
+    "id": "cf57afd4f2c6",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete",
+    "retainedTestsReview": "Existing regression cases remain unchanged.",
+    "task": "fastq-running-tasks",
+    "behaviorReview": "Maintains a doubly linked active list separate from pending/pool links. All direct push/unshift and queue promotion worker starts use start(). worked() removes active entry before clearing value and before error handler/user callback. Snapshots copy values to a fresh array. Existing abort calls queued callbacks directly and does not invoke the new active-list removal. Runtime confirmation pending.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": true,
+        "evidence": "Blocked callback workers, queued values and getQueue differ; returned array pop/push cannot affect active list."
+      },
+      {
+        "scenario": 2,
+        "covered": true,
+        "evidence": "Two undefined tasks, callbacks checking removal-before-callback, promoted queued work, reuse, and a preserved prior snapshot are asserted; separate concurrency test completes the middle worker first and checks exact survivors."
+      },
+      {
+        "scenario": 3,
+        "covered": true,
+        "evidence": "Paused queued unshift/push, resume, concurrency increases including while paused, and promise resolve/reject paths all assert actual running snapshots and results."
+      }
+    ],
+    "typesReview": "Public runningTasks(): T[] inherited by promise queue; existing callback consumer fixture calls method. Signature and consumer compilation require mechanical confirmation.",
+    "docsReview": "README API index and section define fresh values, start order, duplicate/undefined retention, exclusion of queued/paused work.",
+    "contentFindings": [],
+    "extractionNote": "Raw capture diff includes deletion of generated ignored package-lock.json absent from pinned upstream commit. Original raw diff preserved; source.patch excludes only this environment artifact deletion under an arm-independent rule. Not counted as an authored source change or dependency failure.",
+    "recordStage": "Pre-unblinding content review; final decision is top-level Q."
+  },
+  "applicability": {
+    "id": "cf57afd4f2c6",
+    "task": "fastq-running-tasks",
+    "sourceCommit": "fe2d23196a005810dfcbc4103b3c746cc5542430",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "8a5b5d8984c03d40cb4d7d91f96ac92aec5366878385450d82b19092cbc20491",
+    "excludedPreparationArtifacts": [
+      "package-lock.json"
+    ],
+    "types": null
+  },
+  "verificationNotes": {
+    "qualityAssignedBeforeArmMappingRead": true,
+    "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+  },
+  "slot": 10,
+  "arm": "H00",
+  "D": 1,
+  "native": {
+    "completed": true,
+    "exitCode": 0,
+    "signal": null,
+    "lastStepFinish": "stop",
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "normalHandoff": true,
+    "workflowStatus": "incomplete",
+    "terminalPatchVerification": {
+      "slot": 10,
+      "id": "cf57afd4f2c6",
+      "terminalPatchSha256": "32d3af504cf6d7090839587d44210e65e5135c490b528bc19f5dd0775eebd2ed",
+      "terminalPatchEqualsApplicableSourcePatch": false,
+      "ordinaryAppliedCopyReverseCheckExit": 0,
+      "diagnostic": "",
+      "nativeHandoffNamesDeliveryAndPatch": true,
+      "ordinaryCleanSourceForwardApplyExit": 0,
+      "terminalPatchDeliversAllAuthorBytesAndModes": true
+    },
+    "finalResponseSha256": "787b7876083274418e1808794f5bc237d2e1729165afe05e092cd286511fa7ff",
+    "finalResponseExcerpt": "Native task workflow: incomplete.\nDelivery worktree: /work/repo/.git/harness-task/00d8a743-4d59-4ba1-8696-9da1ca910f5e/worktree.\nTerminal patch: /work/repo/.git/harness-task/00d8a743-4d59-4ba1-8696-9da1ca910f5e/terminal.patch.\nFull report and tool outputs: /work/repo/.git/harness-task/00d8a743-4d59-4ba1-8696-9da1ca910f5e.\nOriginal checkout unchanged by workflow transfer.",
+    "reportFindings": [
+      {
+        "category": "misleading-workflow-report",
+        "evidence": "Normal final response lists successful project commands but says No observed relevant project test/check and Executable project verification unavailable or not observed. Delivery worktree and terminal patch are correctly named and usable; this contradiction does not alone remove D."
+      }
+    ]
+  },
+  "verification": [
+    {
+      "artifact": "ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 4632,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "independent/result.json",
+      "exit": 0,
+      "elapsedMs": 1863,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    }
+  ]
+}

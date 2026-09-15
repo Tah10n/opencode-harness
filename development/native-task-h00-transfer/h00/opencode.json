@@ -1,0 +1,16 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": [
+    "/template/core.md"
+  ],
+  "command": {
+    "harness-task": {
+      "description": "Experimental HARNESS_TASK_FILE delivery in an isolated worktree with native checks and a shared deadline; no arguments",
+      "subtask": false,
+      "template": "Invoke harness_task exactly once with no arguments. It executes the original task with factual feedback. Do not perform repository operations yourself. If the tool is unavailable or fails, report the workflow incomplete. After it returns, summarize its actual result and remaining obligations without additional actions."
+    }
+  },
+  "plugin": [
+    "file:///template/native-task-plugin.mjs"
+  ]
+}

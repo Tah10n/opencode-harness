@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/bitmap.mjs": "const area=(w,h)=>{if(!Number.isInteger(w)||!Number.isInteger(h)||w<0||h<0||w>1000||h>1000||w*h>100000)throw new RangeError('dimensions');return w*h;};export function encode(width,height,bits){const n=area(width,height);if(bits.length!==n)throw new RangeError('length');if(bits.some(b=>b!==0&&b!==1))throw new TypeError('bit');const runs=[];for(let i=0;i<bits.length;){let end=i+1;while(end<bits.length&&bits[end]===bits[i])end++;runs.push(end-i);i=end;}return {width,height,start:n?bits[0]:null,runs};}export function decode(packet){const n=area(packet.width,packet.height);if(!n){if(packet.start!==null||packet.runs.length)throw new TypeError('empty');return [];}if(packet.start!==0&&packet.start!==1)throw new TypeError('start');if(packet.runs.some(r=>!Number.isInteger(r)||r<=0))throw new TypeError('run');if(packet.runs.reduce((a,b)=>a+b,0)!==n)throw new RangeError('coverage');const out=[];let bit=packet.start;for(const run of packet.runs){for(let i=0;i<run;i++)out.push(bit);bit=1-bit;}return out;}\n"
+  },
+  "mutants": [
+    {
+      "name": "every-pixel-a-new-run",
+      "file": "src/bitmap.mjs",
+      "replacement": "const area=(w,h)=>{if(!Number.isInteger(w)||!Number.isInteger(h)||w<0||h<0||w>1000||h>1000||w*h>100000)throw new RangeError('dimensions');return w*h;};export function encode(width,height,bits){const n=area(width,height);if(bits.length!==n)throw new RangeError('length');if(bits.some(b=>b!==0&&b!==1))throw new TypeError('bit');const runs=[];let previous;for(const bit of bits){if(false)runs[runs.length-1]++;else{runs.push(1);previous=bit;}}return {width,height,start:n?bits[0]:null,runs};}export function decode(packet){const n=area(packet.width,packet.height);if(!n){if(packet.start!==null||packet.runs.length)throw new TypeError('empty');return [];}if(packet.start!==0&&packet.start!==1)throw new TypeError('start');if(packet.runs.some(r=>!Number.isInteger(r)||r<=0))throw new TypeError('run');if(packet.runs.reduce((a,b)=>a+b,0)!==n)throw new RangeError('coverage');const out=[];let bit=packet.start;for(const run of packet.runs){for(let i=0;i<run;i++)out.push(bit);bit=1-bit;}return out;}\n"
+    },
+    {
+      "name": "accept-incomplete-coverage",
+      "file": "src/bitmap.mjs",
+      "replacement": "const area=(w,h)=>{if(!Number.isInteger(w)||!Number.isInteger(h)||w<0||h<0||w>1000||h>1000||w*h>100000)throw new RangeError('dimensions');return w*h;};export function encode(width,height,bits){const n=area(width,height);if(bits.length!==n)throw new RangeError('length');if(bits.some(b=>b!==0&&b!==1))throw new TypeError('bit');const runs=[];let previous;for(const bit of bits){if(bit===previous)runs[runs.length-1]++;else{runs.push(1);previous=bit;}}return {width,height,start:n?bits[0]:null,runs};}export function decode(packet){const n=area(packet.width,packet.height);if(!n){if(packet.start!==null||packet.runs.length)throw new TypeError('empty');return [];}if(packet.start!==0&&packet.start!==1)throw new TypeError('start');if(packet.runs.some(r=>!Number.isInteger(r)||r<=0))throw new TypeError('run');const out=[];let bit=packet.start;for(const run of packet.runs){for(let i=0;i<run;i++)out.push(bit);bit=1-bit;}return out;}\n"
+    }
+  ]
+}

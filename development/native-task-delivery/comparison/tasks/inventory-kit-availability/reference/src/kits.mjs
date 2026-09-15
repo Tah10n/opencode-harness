@@ -1,0 +1,1 @@
+export function kitCapacity(stock,parts){if(!parts.length)return 0;const totals=new Map();for(const p of parts)totals.set(p.sku,(totals.get(p.sku)??0)+p.qty);return Math.min(...[...totals].map(([sku,qty])=>Math.floor((Object.hasOwn(stock,sku)?stock[sku]:0)/qty)));}

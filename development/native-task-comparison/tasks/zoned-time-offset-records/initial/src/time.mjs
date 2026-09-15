@@ -1,0 +1,1 @@
+export function parse(text){return {epochMs:Date.parse(text),offsetMinutes:0};}export function format(record){return new Date(record.epochMs).toISOString().replace('.000Z','Z');}export function withOffset(record,offsetMinutes){return {epochMs:record.epochMs,offsetMinutes};}

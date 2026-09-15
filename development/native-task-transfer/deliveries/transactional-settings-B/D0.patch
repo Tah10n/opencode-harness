@@ -1,0 +1,75 @@
+diff --git a/README.md b/README.md
+index 16193a3e7dceeabc9cd4b7b83619c66cdc0d04e6..c458cd1594cfc709cd67a57f8b023aa2008af5d7 100644
+--- a/README.md
++++ b/README.md
+@@ -1,3 +1,9 @@
+ # transactional-settings
+ 
+ Small local library. Run `npm test`.
++
++`transact(file, fn, expectedRevision?)` is synchronous: `fn` receives an
++isolated mutable copy of the data and must return a non-thenable value. A
++supplied revision that does not match throws `ConflictError` without invoking
++the callback. Successful transactions increment the revision and replace the
++file atomically via a sibling temporary file and rename.
+diff --git a/src/store.mjs b/src/store.mjs
+index 52c4626d3f3848f47842dcfad94739a5c0aa918f..9ac47a06527bbb6400746cd93157d2c4f5ec04b3 100644
+--- a/src/store.mjs
++++ b/src/store.mjs
+@@ -1 +1,42 @@
+-import fs from 'node:fs';export function read(file){return JSON.parse(fs.readFileSync(file,'utf8'));}export function transact(file,fn,expectedRevision){const current=read(file);const result=fn(current.data);current.revision++;fs.writeFileSync(file,JSON.stringify(current));return {state:current,result};}
++import fs from 'node:fs';
++import path from 'node:path';
++
++export class ConflictError extends Error {
++  constructor(message = 'Settings revision conflict') {
++    super(message);
++    this.name = 'ConflictError';
++  }
++}
++
++export function read(file) {
++  return JSON.parse(fs.readFileSync(file, 'utf8'));
++}
++
++export function transact(file, fn, expectedRevision) {
++  const current = read(file);
++  if (arguments.length >= 3 && expectedRevision !== current.revision) {
++    throw new ConflictError();
++  }
++
++  const draft = structuredClone(current.data);
++  const result = fn(draft);
++  if (result !== null && (typeof result === 'object' || typeof result === 'function') &&
++      typeof result.then === 'function') {
++    throw new TypeError('Transaction callback must be synchronous');
++  }
++
++  const state = {revision: current.revision + 1, data: draft};
++  const serialized = JSON.stringify(state);
++  const temporary = path.join(path.dirname(file), `.${path.basename(file)}.${process.pid}.${Date.now()}.${Math.random().toString(16).slice(2)}.tmp`);
++  try {
++    fs.writeFileSync(temporary, serialized);
++    fs.renameSync(temporary, file);
++  } finally {
++    try {
++      fs.unlinkSync(temporary);
++    } catch (error) {
++      if (error.code !== 'ENOENT') throw error;
++    }
++  }
++  return {state, result};
++}
+diff --git a/test/store.test.mjs b/test/store.test.mjs
+index b77a779064ef50eb641c8349d1d4e33b69d042da..58d0abefe801e4e566d71a63ee1d70f2930f4ba1 100644
+--- a/test/store.test.mjs
++++ b/test/store.test.mjs
+@@ -1,2 +1,7 @@
+ import {test} from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import os from 'node:os';import path from 'node:path';
+-import {read,transact} from '../src/store.mjs';test('legacy commit',()=>{const f=path.join(fs.mkdtempSync(path.join(os.tmpdir(),'settings-')),'s');fs.writeFileSync(f,JSON.stringify({revision:0,data:{x:1}}));assert.equal(transact(f,d=>{d.x=2;return 'ok'}).result,'ok');assert.deepEqual(read(f),{revision:1,data:{x:2}});});
++import {read,transact,ConflictError} from '../src/store.mjs';
++function file(state) { const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'settings-')); const f = path.join(dir, 's'); fs.writeFileSync(f, JSON.stringify(state)); return f; }
++test('legacy commit', () => { const f = file({revision: 0, data: {x: 1}}); assert.equal(transact(f, d => { d.x = 2; return 'ok'; }).result, 'ok'); assert.deepEqual(read(f), {revision: 1, data: {x: 2}}); });
++test('conflict does not invoke callback', () => { const f = file({revision: 2, data: {x: 1}}); let called = false; assert.throws(() => transact(f, () => { called = true; }, 1), ConflictError); assert.equal(called, false); assert.deepEqual(read(f), {revision: 2, data: {x: 1}}); });
++test('callback exception preserves exact bytes', () => { const f = file({revision: 0, data: {x: 1}}); const bytes = fs.readFileSync(f); const error = new Error('boom'); assert.throws(() => transact(f, d => { d.x = 2; throw error; }), error); assert.deepEqual(fs.readFileSync(f), bytes); });
++test('persists nested updates and deletions', () => { const f = file({revision: 4, data: {nested: {keep: true, remove: 1}, old: 2}}); const before = read(f); const result = transact(f, d => { d.nested.added = {value: 3}; delete d.nested.remove; delete d.old; return d.nested; }); assert.deepEqual(result.state, {revision: 5, data: {nested: {keep: true, added: {value: 3}}}}); assert.deepEqual(read(f), result.state); assert.deepEqual(before, {revision: 4, data: {nested: {keep: true, remove: 1}, old: 2}}); });

@@ -1,0 +1,12 @@
+{
+  "alternative": {
+    "src/duration.mjs": "export function splitMillis(ms){if(typeof ms==='number'){if(!Number.isSafeInteger(ms)||ms<0)throw new RangeError('duration');return {seconds:Math.floor(ms/1000),millis:ms%1000};}if(typeof ms==='bigint'){if(ms<0n)throw new RangeError('duration');return {seconds:(ms-ms%1000n)/1000n,millis:Number(ms%1000n)};}throw new TypeError('duration');}export function display(ms){const r=splitMillis(ms);return String(r.seconds)+'.'+String(r.millis).padStart(3,'0')+'s';}"
+  },
+  "mutants": [
+    {
+      "name": "bigint-number-rounding",
+      "file": "src/duration.mjs",
+      "replacement": "export function splitMillis(ms){if(typeof ms==='number'){if(!Number.isSafeInteger(ms)||ms<0)throw new RangeError('duration');return {seconds:Math.floor(ms/1000),millis:ms%1000};}if(typeof ms==='bigint'){if(ms<0n)throw new RangeError('duration');return {seconds:BigInt(Math.floor(Number(ms)/1000)),millis:Number(ms%1000n)};}throw new TypeError('duration');}export function display(ms){const r=splitMillis(ms);return String(r.seconds)+'.'+String(r.millis).padStart(3,'0')+'s';}"
+    }
+  ]
+}

@@ -1,0 +1,725 @@
+[
+  {
+    "label": "J3",
+    "slot": 2,
+    "task": "legacy-runtime-reload",
+    "arm": "H",
+    "checks": [
+      {
+        "command": "git diff --check",
+        "status": "error",
+        "exit": null,
+        "time": {
+          "start": 1789126222428,
+          "end": 1789126222434
+        },
+        "error": "Native permission boundary rejected a tool; no evidence correction admitted",
+        "counts": {
+          "tests": null,
+          "pass": null,
+          "fail": null,
+          "cancelled": null,
+          "skipped": null
+        },
+        "failures": []
+      },
+      {
+        "command": "node --test --test-concurrency=1 packages/connector/test/state-security.test.mjs packages/connector/test/executables.test.mjs packages/connector/test/protocol.test.mjs",
+        "status": "error",
+        "exit": null,
+        "time": {
+          "start": 1789126368244,
+          "end": 1789126368248
+        },
+        "error": "Native permission boundary rejected a tool; no evidence correction admitted",
+        "counts": {
+          "tests": null,
+          "pass": null,
+          "fail": null,
+          "cancelled": null,
+          "skipped": null
+        },
+        "failures": []
+      }
+    ]
+  },
+  {
+    "label": "N8",
+    "slot": 3,
+    "task": "reconnect-revoked",
+    "arm": "H",
+    "checks": [
+      {
+        "command": "node --test --test-concurrency=1 --test-name-pattern=reconnect packages/connector/test/config.test.mjs",
+        "status": "completed",
+        "exit": 1,
+        "time": {
+          "start": 1789126766388,
+          "end": 1789126767552
+        },
+        "error": null,
+        "counts": {
+          "tests": 5,
+          "pass": 4,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "failures": [
+          "reconnect retires only an explicitly disconnected unavailable source before pairing (134.069834ms)",
+          "failing tests:"
+        ]
+      },
+      {
+        "command": "node --test --test-concurrency=1 --test-name-pattern=reconnect packages/connector/test/config.test.mjs",
+        "status": "completed",
+        "exit": 0,
+        "time": {
+          "start": 1789126800521,
+          "end": 1789126802034
+        },
+        "error": null,
+        "counts": {
+          "tests": 5,
+          "pass": 5,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "failures": []
+      },
+      {
+        "command": "node --test --test-concurrency=1 packages/connector/test/state-security.test.mjs packages/connector/test/executables.test.mjs packages/connector/test/protocol.test.mjs",
+        "status": "completed",
+        "exit": 0,
+        "time": {
+          "start": 1789126827295,
+          "end": 1789126828101
+        },
+        "error": null,
+        "counts": {
+          "tests": 25,
+          "pass": 24,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 1
+        },
+        "failures": []
+      },
+      {
+        "command": "git diff --check",
+        "status": "completed",
+        "exit": 0,
+        "time": {
+          "start": 1789126865137,
+          "end": 1789126865196
+        },
+        "error": null,
+        "counts": {
+          "tests": null,
+          "pass": null,
+          "fail": null,
+          "cancelled": null,
+          "skipped": null
+        },
+        "failures": []
+      },
+      {
+        "command": "node --test --test-concurrency=1 --test-name-pattern=reconnect packages/connector/test/config.test.mjs",
+        "status": "completed",
+        "exit": 0,
+        "time": {
+          "start": 1789126892562,
+          "end": 1789126894145
+        },
+        "error": null,
+        "counts": {
+          "tests": 5,
+          "pass": 5,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "failures": []
+      },
+      {
+        "command": "node --test --test-concurrency=1 packages/connector/test/state-security.test.mjs packages/connector/test/executables.test.mjs packages/connector/test/protocol.test.mjs",
+        "status": "completed",
+        "exit": 0,
+        "time": {
+          "start": 1789126901386,
+          "end": 1789126902170
+        },
+        "error": null,
+        "counts": {
+          "tests": 25,
+          "pass": 24,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 1
+        },
+        "failures": []
+      },
+      {
+        "command": "git diff --check",
+        "status": "completed",
+        "exit": 0,
+        "time": {
+          "start": 1789126906373,
+          "end": 1789126906432
+        },
+        "error": null,
+        "counts": {
+          "tests": null,
+          "pass": null,
+          "fail": null,
+          "cancelled": null,
+          "skipped": null
+        },
+        "failures": []
+      },
+      {
+        "command": "corepack pnpm verify",
+        "status": "completed",
+        "exit": 1,
+        "time": {
+          "start": 1789126939939,
+          "end": 1789126940050
+        },
+        "error": null,
+        "counts": {
+          "tests": null,
+          "pass": null,
+          "fail": null,
+          "cancelled": null,
+          "skipped": null
+        },
+        "failures": []
+      },
+      {
+        "command": "node --test --test-name-pattern=reconnect packages/connector/test/config.test.mjs",
+        "status": "completed",
+        "exit": 0,
+        "time": {
+          "start": 1789127073132,
+          "end": 1789127074653
+        },
+        "error": null,
+        "counts": {
+          "tests": 5,
+          "pass": 5,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "failures": []
+      },
+      {
+        "command": "node --test --test-name-pattern=account-deleted packages/connector/test/config.test.mjs",
+        "status": "completed",
+        "exit": 1,
+        "time": {
+          "start": 1789127081835,
+          "end": 1789127082036
+        },
+        "error": null,
+        "counts": {
+          "tests": 1,
+          "pass": 0,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "failures": [
+          "connect recovers an account-deleted installation without an abandoned pairing (80.828542ms)",
+          "failing tests:"
+        ]
+      },
+      {
+        "command": "node --test --test-name-pattern=account-deleted packages/connector/test/config.test.mjs",
+        "status": "completed",
+        "exit": 1,
+        "time": {
+          "start": 1789127100377,
+          "end": 1789127100580
+        },
+        "error": null,
+        "counts": {
+          "tests": 1,
+          "pass": 0,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "failures": [
+          "connect recovers an account-deleted installation without an abandoned pairing (83.412875ms)",
+          "failing tests:"
+        ]
+      },
+      {
+        "command": "node --test --test-name-pattern=account-deleted packages/connector/test/config.test.mjs",
+        "status": "completed",
+        "exit": 1,
+        "time": {
+          "start": 1789127152566,
+          "end": 1789127152774
+        },
+        "error": null,
+        "counts": {
+          "tests": 1,
+          "pass": 0,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "failures": [
+          "connect recovers an account-deleted installation without an abandoned pairing (81.306875ms)",
+          "failing tests:"
+        ]
+      },
+      {
+        "command": "node --test --test-name-pattern=account-deleted packages/connector/test/config.test.mjs",
+        "status": "completed",
+        "exit": 1,
+        "time": {
+          "start": 1789127177822,
+          "end": 1789127178024
+        },
+        "error": null,
+        "counts": {
+          "tests": 1,
+          "pass": 0,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "failures": [
+          "connect recovers an account-deleted installation without an abandoned pairing (84.302625ms)",
+          "failing tests:"
+        ]
+      },
+      {
+        "command": "node --test --test-name-pattern=account-deleted packages/connector/test/config.test.mjs",
+        "status": "completed",
+        "exit": 1,
+        "time": {
+          "start": 1789127228572,
+          "end": 1789127228785
+        },
+        "error": null,
+        "counts": {
+          "tests": 1,
+          "pass": 0,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "failures": [
+          "connect recovers an account-deleted installation without an abandoned pairing (84.987334ms)",
+          "failing tests:"
+        ]
+      },
+      {
+        "command": "node --test --test-name-pattern=account-deleted packages/connector/test/config.test.mjs",
+        "status": "completed",
+        "exit": 1,
+        "time": {
+          "start": 1789127247811,
+          "end": 1789127248071
+        },
+        "error": null,
+        "counts": {
+          "tests": 1,
+          "pass": 0,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "failures": [
+          "connect recovers an account-deleted installation without an abandoned pairing (132.531042ms)",
+          "failing tests:"
+        ]
+      },
+      {
+        "command": "node --test --test-name-pattern=account-deleted packages/connector/test/config.test.mjs",
+        "status": "completed",
+        "exit": 0,
+        "time": {
+          "start": 1789127269254,
+          "end": 1789127269508
+        },
+        "error": null,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "failures": []
+      },
+      {
+        "command": "node --test --test-name-pattern=reconnect packages/connector/test/config.test.mjs",
+        "status": "completed",
+        "exit": 0,
+        "time": {
+          "start": 1789127278835,
+          "end": 1789127280325
+        },
+        "error": null,
+        "counts": {
+          "tests": 5,
+          "pass": 5,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "failures": []
+      },
+      {
+        "command": "node --test --test-concurrency=1 packages/connector/test/state-security.test.mjs packages/connector/test/executables.test.mjs packages/connector/test/protocol.test.mjs",
+        "status": "completed",
+        "exit": 0,
+        "time": {
+          "start": 1789127285002,
+          "end": 1789127285793
+        },
+        "error": null,
+        "counts": {
+          "tests": 25,
+          "pass": 24,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 1
+        },
+        "failures": []
+      },
+      {
+        "command": "git diff --check",
+        "status": "completed",
+        "exit": 0,
+        "time": {
+          "start": 1789127289464,
+          "end": 1789127289522
+        },
+        "error": null,
+        "counts": {
+          "tests": null,
+          "pass": null,
+          "fail": null,
+          "cancelled": null,
+          "skipped": null
+        },
+        "failures": []
+      },
+      {
+        "command": "node --test --test-name-pattern=account-deleted packages/connector/test/config.test.mjs",
+        "status": "completed",
+        "exit": 0,
+        "time": {
+          "start": 1789127323824,
+          "end": 1789127324105
+        },
+        "error": null,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "failures": []
+      },
+      {
+        "command": "node --test --test-name-pattern=reconnect packages/connector/test/config.test.mjs",
+        "status": "completed",
+        "exit": 0,
+        "time": {
+          "start": 1789127329110,
+          "end": 1789127330611
+        },
+        "error": null,
+        "counts": {
+          "tests": 5,
+          "pass": 5,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "failures": []
+      },
+      {
+        "command": "node --test --test-concurrency=1 packages/connector/test/state-security.test.mjs packages/connector/test/executables.test.mjs packages/connector/test/protocol.test.mjs",
+        "status": "completed",
+        "exit": 0,
+        "time": {
+          "start": 1789127334708,
+          "end": 1789127335482
+        },
+        "error": null,
+        "counts": {
+          "tests": 25,
+          "pass": 24,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 1
+        },
+        "failures": []
+      },
+      {
+        "command": "git diff --check",
+        "status": "completed",
+        "exit": 0,
+        "time": {
+          "start": 1789127339496,
+          "end": 1789127339559
+        },
+        "error": null,
+        "counts": {
+          "tests": null,
+          "pass": null,
+          "fail": null,
+          "cancelled": null,
+          "skipped": null
+        },
+        "failures": []
+      }
+    ]
+  },
+  {
+    "label": "T2",
+    "slot": 4,
+    "task": "reconnect-revoked",
+    "arm": "P",
+    "checks": [
+      {
+        "command": "node --test --test-name-pattern='reconnect retires only an explicitly disconnected unavailable source before pairing' packages/connector/test/config.test.mjs",
+        "status": "completed",
+        "exit": 1,
+        "time": {
+          "start": 1789127444239,
+          "end": 1789127444613
+        },
+        "error": null,
+        "counts": {
+          "tests": 1,
+          "pass": 0,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "failures": [
+          "reconnect retires only an explicitly disconnected unavailable source before pairing (292.646167ms)",
+          "failing tests:"
+        ]
+      },
+      {
+        "command": "VIBERACING_DEBUG_REQUESTS=1 node --test --test-name-pattern='reconnect retires only an explicitly disconnected unavailable source before pairing' packages/connector/test/config.test.mjs",
+        "status": "completed",
+        "exit": 1,
+        "time": {
+          "start": 1789127479601,
+          "end": 1789127479766
+        },
+        "error": null,
+        "counts": {
+          "tests": 1,
+          "pass": 0,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "failures": [
+          "reconnect retires only an explicitly disconnected unavailable source before pairing (77.748625ms)",
+          "failing tests:"
+        ]
+      },
+      {
+        "command": "VIBERACING_DEBUG_REQUESTS=1 node --test --test-name-pattern='reconnect retires only an explicitly disconnected unavailable source before pairing' packages/connector/test/config.test.mjs",
+        "status": "completed",
+        "exit": 1,
+        "time": {
+          "start": 1789127489189,
+          "end": 1789127489559
+        },
+        "error": null,
+        "counts": {
+          "tests": 1,
+          "pass": 0,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "failures": [
+          "reconnect retires only an explicitly disconnected unavailable source before pairing (294.470541ms)",
+          "failing tests:"
+        ]
+      },
+      {
+        "command": "node --test --test-name-pattern='reconnect' packages/connector/test/config.test.mjs",
+        "status": "completed",
+        "exit": 1,
+        "time": {
+          "start": 1789127627797,
+          "end": 1789127629336
+        },
+        "error": null,
+        "counts": {
+          "tests": 5,
+          "pass": 4,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "failures": [
+          "reconnect retires only an explicitly disconnected unavailable source before pairing (522.296834ms)",
+          "failing tests:"
+        ]
+      },
+      {
+        "command": "node --test --test-name-pattern='reconnect' packages/connector/test/config.test.mjs",
+        "status": "completed",
+        "exit": 0,
+        "time": {
+          "start": 1789127683662,
+          "end": 1789127685088
+        },
+        "error": null,
+        "counts": {
+          "tests": 5,
+          "pass": 5,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "failures": []
+      },
+      {
+        "command": "node --test --test-concurrency=1 packages/connector/test/state-security.test.mjs packages/connector/test/executables.test.mjs packages/connector/test/protocol.test.mjs",
+        "status": "completed",
+        "exit": 0,
+        "time": {
+          "start": 1789127748023,
+          "end": 1789127748769
+        },
+        "error": null,
+        "counts": {
+          "tests": 25,
+          "pass": 24,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 1
+        },
+        "failures": []
+      },
+      {
+        "command": "node --test --test-name-pattern=reconnect packages/connector/test/config.test.mjs",
+        "status": "completed",
+        "exit": 0,
+        "time": {
+          "start": 1789127748321,
+          "end": 1789127749865
+        },
+        "error": null,
+        "counts": {
+          "tests": 5,
+          "pass": 5,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "failures": []
+      },
+      {
+        "command": "git diff --check",
+        "status": "completed",
+        "exit": 0,
+        "time": {
+          "start": 1789127748325,
+          "end": 1789127748334
+        },
+        "error": null,
+        "counts": {
+          "tests": null,
+          "pass": null,
+          "fail": null,
+          "cancelled": null,
+          "skipped": null
+        },
+        "failures": []
+      },
+      {
+        "command": "node --test --test-concurrency=1 packages/connector/test/state-security.test.mjs packages/connector/test/executables.test.mjs packages/connector/test/protocol.test.mjs",
+        "status": "completed",
+        "exit": 0,
+        "time": {
+          "start": 1789127769421,
+          "end": 1789127770339
+        },
+        "error": null,
+        "counts": {
+          "tests": 25,
+          "pass": 24,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 1
+        },
+        "failures": []
+      },
+      {
+        "command": "node --test --test-name-pattern=reconnect packages/connector/test/config.test.mjs",
+        "status": "completed",
+        "exit": 0,
+        "time": {
+          "start": 1789127769429,
+          "end": 1789127771026
+        },
+        "error": null,
+        "counts": {
+          "tests": 5,
+          "pass": 5,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "failures": []
+      },
+      {
+        "command": "git diff --check",
+        "status": "completed",
+        "exit": 0,
+        "time": {
+          "start": 1789127769435,
+          "end": 1789127769461
+        },
+        "error": null,
+        "counts": {
+          "tests": null,
+          "pass": null,
+          "fail": null,
+          "cancelled": null,
+          "skipped": null
+        },
+        "failures": []
+      },
+      {
+        "command": "git diff --check",
+        "status": "completed",
+        "exit": 0,
+        "time": {
+          "start": 1789127784303,
+          "end": 1789127784320
+        },
+        "error": null,
+        "counts": {
+          "tests": null,
+          "pass": null,
+          "fail": null,
+          "cancelled": null,
+          "skipped": null
+        },
+        "failures": []
+      }
+    ]
+  }
+]

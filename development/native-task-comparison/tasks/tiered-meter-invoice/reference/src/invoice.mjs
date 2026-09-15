@@ -1,0 +1,1 @@
+import {charge} from './meter.mjs';export function invoice(entries,bands,credit=0){const lines=entries.map(e=>({id:e.id,cents:charge(e.units,bands)}));const subtotal=lines.reduce((s,e)=>s+e.cents,0);const appliedCredit=Math.min(credit,subtotal);return {lines,subtotal,appliedCredit,due:subtotal-appliedCredit};}

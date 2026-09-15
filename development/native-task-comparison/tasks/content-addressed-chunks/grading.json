@@ -1,0 +1,16 @@
+{
+  "category": "state",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Repeated chunks within one file and across files count occurrences; removal preserves shared readback.",
+    "Replacing a file with empty content releases chunks and retains empty-file existence."
+  ],
+  "docDelivery": [
+    "Fixed chunk boundaries, SHA-256 IDs and logical occurrence-count deduplication.",
+    "Replacement/removal cleanup, empty versus absent and detached byte/view ownership."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "chunkSize integer1..64, byte arrays Uint8Array including subviews length<=65536, <=100 named files, arbitrary nonempty ASCII names. SHA-256 collisions outside evaluated domain. No filesystem access.",
+  "independence": "Implement chunk store manifests, deduplication and reference-count-safe deletion."
+}

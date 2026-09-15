@@ -1,0 +1,160 @@
+{
+  "slot": 6,
+  "task": "reconnect-revoked",
+  "arm": "A",
+  "exitCode": 0,
+  "timedOut": false,
+  "elapsedMs": 248264,
+  "requests": 36,
+  "requestsWithoutUsage": 0,
+  "workflowStatus": null,
+  "repairs": null,
+  "toolCalls": 40,
+  "sessions": 1,
+  "phaseCount": 1,
+  "execution": "completed",
+  "terminationVerified": true,
+  "cleanupVerified": true,
+  "observedUsage": {
+    "input_tokens": 982390,
+    "cached_tokens": 435200,
+    "output_tokens": 7892,
+    "reasoning_tokens": 3842,
+    "total_tokens": 990282
+  },
+  "usageComplete": true,
+  "requestEfforts": {
+    "none": 1,
+    "low": 35
+  },
+  "httpStatuses": {
+    "200": 36
+  },
+  "packet": "R9",
+  "delivery": {
+    "patchApplies": true,
+    "changedFiles": [
+      "packages/connector/README.md",
+      "packages/connector/bin/viberacing.mjs",
+      "packages/connector/test/config.test.mjs"
+    ],
+    "patchSha256": "2c4821ffe43a73a2cc0c22e20ae81c2ee5705411c8c81f571989fdde4853efb6"
+  },
+  "grading": {
+    "final": {
+      "packet": "R9",
+      "phase": "final",
+      "checks": {
+        "ordinary": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 25,
+            "pass": 24,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 5,
+            "pass": 5,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 25,
+            "pass": 24,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "preserved-consumers": {
+          "code": 1,
+          "timedOut": false,
+          "counts": {
+            "tests": 1,
+            "pass": 0,
+            "fail": 1,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "lifecycle-preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 5,
+            "pass": 5,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "acceptance-403": {
+          "code": 1,
+          "timedOut": false,
+          "counts": {
+            "tests": 1,
+            "pass": 0,
+            "fail": 1,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      },
+      "passed": false,
+      "cleanup": 0
+    }
+  },
+  "sourceReview": {
+    "packet": "R9",
+    "assessmentScope": "Final source and delivered tests/README inspection by the integrator who knows the schedule; independent frozen executable checks are reported separately.",
+    "phases": {
+      "final": {
+        "sourceConformsToTask": false,
+        "necessaryCoverageDelivered": false,
+        "oldCoveragePreserved": true,
+        "newRequiredCoverageDelivered": false,
+        "documentationDelivered": true,
+        "newRegressionFound": false,
+        "notes": [
+          "401/403 now removes authorization and proceeds to pairing under existing lifecycle ownership; nonrevoked errors and cancelled-connect invalidation remain.",
+          "Recovery calls disableLocalConnection() with its default clearPending=false. connection-lifecycle.mjs therefore skips clearPendingPayloads; clearAutomaticState removes dirty/scheduler state, not queued payloads. Required stale pending cleanup before new pairing is missing.",
+          "The test change removes the intentionally obsolete 401 rejection and preserves the old disconnected-source scenario and malformed/transient assertions. It adds no positive connect recovery test for 401 or 403, nor a pending cleanup assertion.",
+          "README describes automatic recovery and cleanup, but delivered code/tests do not completely establish that contract.",
+          "The frozen 401 and 403 recovery checks both fail with Invalid pending payload after pairing because stale pending data survives. The delivered reconnect suite remains green, and scoped pre-existing lifecycle checks pass. This is an unimplemented task requirement, not a newly demonstrated failure of previously supported revoked recovery."
+        ],
+        "evidence": [
+          "packages/connector/bin/viberacing.mjs reconcilePreviousConnectionBeforePairing",
+          "packages/connector/lib/connection-lifecycle.mjs disableLocalConnection clearPending default",
+          "packages/connector/lib/runtime.mjs clearAutomaticState and clearPendingPayloads",
+          "packages/connector/test/config.test.mjs original reconnect case"
+        ]
+      }
+    }
+  },
+  "publicPathNormalization": "Delivery-worktree runtime prefix normalized; raw local evidence is unchanged.",
+  "assessment": {
+    "final": {
+      "workingBehaviorObserved": false,
+      "deliveredChecksPassed": true,
+      "allFrozenChecksPassed": false,
+      "necessaryCoverageDelivered": false,
+      "oldCoveragePreserved": true,
+      "newRequiredCoverageDelivered": false,
+      "documentationDelivered": true,
+      "completePatchDelivery": false,
+      "newRegressionFound": false
+    }
+  }
+}

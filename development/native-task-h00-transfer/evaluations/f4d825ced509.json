@@ -1,0 +1,116 @@
+{
+  "id": "f4d825ced509",
+  "task": "quick-lru-computed",
+  "project": "quick-lru",
+  "Q": 1,
+  "ordinaryProjectExit": 0,
+  "originalIndependentExit": 0,
+  "interpretedIndependentExit": 0,
+  "patchApplicable": true,
+  "sourcePatchSha256": "bb4805eb1ff89ae2e1fa0a0ab2bdd9d24c34b92df122513d530f00fd5958914d",
+  "decision": "Full required delivery verified.",
+  "findings": [],
+  "contentReview": {
+    "id": "f4d825ced509",
+    "task": "quick-lru-computed",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete",
+    "retainedTestsReview": "Existing test scenarios remain unchanged.",
+    "contentFindings": [],
+    "behaviorReview": "Checks current entries, otherwise old entries, preserves undefined hits, uses existing expiry and promotion helpers, and set supplies default TTL. Runtime confirmation pending.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": true,
+        "evidence": "Undefined old-generation hit records zero factory calls, proves key removed from old generation and still present via has. Existing public test getter used; no demand for reference test structure."
+      },
+      {
+        "scenario": 2,
+        "covered": true,
+        "evidence": "Old-generation entry with short explicit TTL expires, factory called once with key, exactly one eviction, refreshed entry has default TTL >500 and <=1000 and reads fresh value."
+      },
+      {
+        "scenario": 3,
+        "covered": true,
+        "evidence": "Exact thrown reason/one factory call/absent key/empty size; original and distinct object keys in same cache plus same key in separate cache retain independent values."
+      }
+    ],
+    "typesReview": "tsd checks generic key/value inference, invalid factory return rejection and object key/value inference.",
+    "docsReview": "README and declarations explain sync computation on miss/expiry, one call when needed and default maxAge.",
+    "recordStage": "Pre-unblinding content review; final decision is top-level Q."
+  },
+  "applicability": {
+    "id": "f4d825ced509",
+    "task": "quick-lru-computed",
+    "sourceCommit": "f2fe88e2932603c038c61ca29de6ad5286148e1b",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "bb4805eb1ff89ae2e1fa0a0ab2bdd9d24c34b92df122513d530f00fd5958914d",
+    "excludedPreparationArtifacts": [],
+    "types": null
+  },
+  "verificationNotes": {
+    "qualityAssignedBeforeArmMappingRead": true,
+    "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+  },
+  "slot": 14,
+  "arm": "H00",
+  "D": 1,
+  "native": {
+    "completed": true,
+    "exitCode": 0,
+    "signal": null,
+    "lastStepFinish": "stop",
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "normalHandoff": true,
+    "workflowStatus": "incomplete",
+    "terminalPatchVerification": {
+      "slot": 14,
+      "id": "f4d825ced509",
+      "terminalPatchSha256": "0dc3df3d458712725f6d08199987e2e65aad1c1c2cae0fa7bd46c83508e1209d",
+      "terminalPatchEqualsApplicableSourcePatch": false,
+      "ordinaryAppliedCopyReverseCheckExit": 0,
+      "diagnostic": "",
+      "nativeHandoffNamesDeliveryAndPatch": true,
+      "ordinaryCleanSourceForwardApplyExit": 0,
+      "terminalPatchDeliversAllAuthorBytesAndModes": true
+    },
+    "finalResponseSha256": "8a183eb1f44aad7f2cfec8e779723eed526b0c7d9885844ccd0d19482a25ec06",
+    "finalResponseExcerpt": "Native task workflow: incomplete.\nDelivery worktree: /work/repo/.git/harness-task/a8cca1b6-5b1d-41a8-82cc-c0b3b986ebf5/worktree.\nTerminal patch: /work/repo/.git/harness-task/a8cca1b6-5b1d-41a8-82cc-c0b3b986ebf5/terminal.patch.\nFull report and tool outputs: /work/repo/.git/harness-task/a8cca1b6-5b1d-41a8-82cc-c0b3b986ebf5.\nOriginal checkout unchanged by workflow transfer.",
+    "reportFindings": [
+      {
+        "category": "misleading-workflow-report",
+        "evidence": "Normal final response lists successful project commands but says No observed relevant project test/check and Executable project verification unavailable or not observed. Delivery worktree and terminal patch are correctly named and usable; this contradiction does not alone remove D."
+      }
+    ]
+  },
+  "verification": [
+    {
+      "artifact": "ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 7774,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "independent/result.json",
+      "exit": 0,
+      "elapsedMs": 3158,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    }
+  ]
+}

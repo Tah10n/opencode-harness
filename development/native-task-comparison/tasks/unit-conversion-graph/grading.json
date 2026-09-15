@@ -1,0 +1,19 @@
+{
+  "category": "refactoring",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert multihop/reverse round-trip, disconnected/unknown distinctions and snapshot/frozen inputs.",
+    "Assert consistent rational duplicates, inconsistent cycles in any component and input/value errors."
+  ],
+  "docDelivery": [
+    "Document edge direction/reversal and exact consistency checks.",
+    "Explain converter numeric tolerance, snapshot and unknown/disconnected/error behavior."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Bounded multiplicative rational unit graph, exact consistency and stable numeric conversions across connected paths.",
+  "manualBehavior": [
+    "Factory delegates to graph core; exact rational consistency cannot be replaced by floating epsilon checks."
+  ],
+  "independence": "Refactor direct conversions into reusable conversion graph preserving supported values and rejecting inconsistent paths."
+}

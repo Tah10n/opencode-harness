@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/weekly.mjs": "export function occurrences(start,end,weekdays){const date=new Date(start+'T00:00:00Z'),stop=new Date(end+'T00:00:00Z'),set=new Set(weekdays),result=[];while(date<stop){if(set.has(date.getUTCDay()))result.push(date.toISOString().substring(0,10));date.setUTCDate(date.getUTCDate()+1);}return result;}\n"
+  },
+  "mutants": [
+    {
+      "name": "ignore-weekday",
+      "file": "src/weekly.mjs",
+      "replacement": "const day=86400000;export function occurrences(start,end,weekdays){const out=[];for(let t=Date.parse(start+'T00:00:00Z');t<Date.parse(end+'T00:00:00Z');t+=day){const d=new Date(t);out.push(d.toISOString().slice(0,10));}return out;}\n"
+    },
+    {
+      "name": "exclude-after-replacement",
+      "file": "src/calendar.mjs",
+      "replacement": "import {occurrences} from './weekly.mjs';export function calendar(rule){const excluded=new Set(rule.exclude),out=[];for(const date of occurrences(rule.start,rule.end,rule.weekdays)){const at=Object.hasOwn(rule.replace,date)?rule.replace[date]:date;if(!excluded.has(at))out.push({original:date,date:at});}return out.sort((a,b)=>a.date.localeCompare(b.date)||a.original.localeCompare(b.original));}\n"
+    }
+  ]
+}

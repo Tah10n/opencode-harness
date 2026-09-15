@@ -1,0 +1,16 @@
+{
+  "category": "state",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Exact midpoint between large adjacent values remains strictly between endpoints.",
+    "Rebalance sorts by rational value and deterministic ID ties while retaining labels."
+  ],
+  "docDelivery": [
+    "Exact rational representation, reduction and unbounded-endpoint behavior.",
+    "Invalid endpoint order and numeric/ID ordering preserved by rebalance."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Keys signed integer numerator / positive integer denominator as decimal strings, finite-length components, no plus/whitespace/leading zeros except zero itself; -0 excluded. Unreduced keys allowed. Items {id,key,label}, unique nonempty ASCII ids, string labels. null only unbounded between endpoints.",
+  "independence": "Implement sortable rational position keys and deterministic rebalancing preserving item order."
+}

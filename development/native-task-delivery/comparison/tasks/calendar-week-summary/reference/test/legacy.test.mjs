@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {summarize} from '../src/summary.mjs';test('Monday',()=>assert.deepEqual(summarize([{day:'2024-01-01',minutes:3}]),[{week:'2024-01-01',minutes:3}]));

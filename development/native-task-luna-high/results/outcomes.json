@@ -1,0 +1,198 @@
+{
+  "seriesStatus": {
+    "status": "paused",
+    "pause": {
+      "kind": "unknown_submission",
+      "slot": 1,
+      "error": "AbortError"
+    }
+  },
+  "slots": [
+    {
+      "slot": 1,
+      "task": "legacy-runtime-reload",
+      "arm": "P",
+      "execution": "timeout-and-unknown-submission",
+      "metrics": {
+        "label": "F6",
+        "slot": 1,
+        "task": "legacy-runtime-reload",
+        "arm": "P",
+        "elapsedMs": 900107,
+        "exitCode": null,
+        "timedOut": true,
+        "toolCalls": 99,
+        "sessions": 2,
+        "termination": {
+          "terminationVerified": true,
+          "killed": []
+        },
+        "requests": 51,
+        "requestsWithoutUsage": 1,
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "usage": {
+          "input_tokens": 4494812,
+          "output_tokens": 34160,
+          "total_tokens": 4528972,
+          "cached_tokens": 1521152,
+          "reasoning_tokens": 22755
+        },
+        "requestGroups": {
+          "work": {
+            "requests": 50,
+            "usage": {
+              "input_tokens": 4493703,
+              "output_tokens": 34084,
+              "total_tokens": 4527787,
+              "cached_tokens": 1521152,
+              "reasoning_tokens": 22693
+            }
+          },
+          "title": {
+            "requests": 1,
+            "usage": {
+              "input_tokens": 1109,
+              "output_tokens": 76,
+              "total_tokens": 1185,
+              "cached_tokens": 0,
+              "reasoning_tokens": 62
+            }
+          }
+        },
+        "workflowStatus": null,
+        "repairs": null,
+        "workflowStopReason": null,
+        "workflowLimits": null,
+        "stages": [],
+        "billedAmount": null,
+        "usageCompleteness": "lower-bound; one forwarded request has no terminal response or usage"
+      },
+      "frozenEvaluation": [
+        {
+          "label": "F6",
+          "slot": 1,
+          "task": "legacy-runtime-reload",
+          "arm": "P",
+          "phase": "final",
+          "passed": true,
+          "checks": {
+            "ordinary": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 25,
+                "pass": 24,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 1
+              }
+            },
+            "consumers": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 3,
+                "pass": 3,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 0
+              }
+            },
+            "preservation": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 24,
+                "pass": 23,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 1
+              }
+            },
+            "preserved-consumers": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 2,
+                "pass": 2,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 0
+              }
+            },
+            "fresh-process-migration": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 1,
+                "pass": 1,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 0
+              }
+            },
+            "legacy-preservation": {
+              "code": 0,
+              "timedOut": false,
+              "counts": {
+                "tests": 9,
+                "pass": 9,
+                "fail": 0,
+                "cancelled": 0,
+                "skipped": 0
+              }
+            },
+            "cleanup": 0
+          }
+        }
+      ],
+      "completeDelivery": false,
+      "assessment": {
+        "fixed": [
+          "Directory link counts no longer reject the full historical layout.",
+          "Added migration/repeat-loading regression with a fresh child process; ordinary relevant tests pass."
+        ],
+        "remaining": [
+          "When prepareRuntime receives the retained old launcher URL, current libraries are selected but the old launcher bytes are copied into the versioned runtime. Separate post-run CLI diagnosis fails."
+        ],
+        "coverageLimitations": [
+          "Authored migration fixture copies the current launcher into its historical tree, masking the old-launcher/current-library mismatch.",
+          "Authored invalid-layout cases all use nonempty custom state directories, which have an independent fail-closed rule; they lack a valid positive control in that same starting location."
+        ],
+        "harnessEffect": null
+      }
+    },
+    {
+      "slot": 2,
+      "task": "legacy-runtime-reload",
+      "arm": "H",
+      "execution": "not-started-after-stop",
+      "metrics": null,
+      "frozenEvaluation": null,
+      "completeDelivery": null,
+      "assessment": null
+    },
+    {
+      "slot": 3,
+      "task": "reconnect-revoked",
+      "arm": "H",
+      "execution": "not-started-after-stop",
+      "metrics": null,
+      "frozenEvaluation": null,
+      "completeDelivery": null,
+      "assessment": null
+    },
+    {
+      "slot": 4,
+      "task": "reconnect-revoked",
+      "arm": "P",
+      "execution": "not-started-after-stop",
+      "metrics": null,
+      "frozenEvaluation": null,
+      "completeDelivery": null,
+      "assessment": null
+    }
+  ],
+  "claim": "One stopped P run only; no P/H comparison and no conclusion on harness effect."
+}

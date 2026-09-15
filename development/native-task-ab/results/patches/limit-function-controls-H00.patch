@@ -1,0 +1,192 @@
+diff --git a/index.d.ts b/index.d.ts
+index 1a20857..28a9493 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -133,4 +133,4 @@ await Promise.all(input);
+ export function limitFunction<Arguments extends unknown[], ReturnType>(
+ 	function_: (...arguments_: Arguments) => PromiseLike<ReturnType>,
+ 	options: Options
+-): ((...arguments_: Arguments) => Promise<ReturnType>) & Pick<LimitFunction, 'clearQueue'>;
++): ((...arguments_: Arguments) => Promise<ReturnType>) & Pick<LimitFunction, 'activeCount' | 'pendingCount' | 'concurrency' | 'clearQueue'>;
+diff --git a/index.js b/index.js
+index b74d48a..fca10a2 100644
+--- a/index.js
++++ b/index.js
+@@ -118,8 +118,22 @@ export function limitFunction(function_, options) {
+ 	const limit = pLimit(options);
+ 
+ 	const limitedFunction = (...arguments_) => limit(() => function_(...arguments_));
+-	Object.defineProperty(limitedFunction, 'clearQueue', {
+-		value: limit.clearQueue,
++	Object.defineProperties(limitedFunction, {
++		activeCount: {
++			get: () => limit.activeCount,
++		},
++		pendingCount: {
++			get: () => limit.pendingCount,
++		},
++		concurrency: {
++			get: () => limit.concurrency,
++			set(newConcurrency) {
++				limit.concurrency = newConcurrency;
++			},
++		},
++		clearQueue: {
++			value: limit.clearQueue,
++		},
+ 	});
+ 
+ 	return limitedFunction;
+diff --git a/index.test-d.ts b/index.test-d.ts
+index 457778a..bbe70bf 100644
+--- a/index.test-d.ts
++++ b/index.test-d.ts
+@@ -24,7 +24,14 @@ expectType<void>(limitWithRejectOnClear.clearQueue());
+ // LimitFunction should require a Promise-returning function
+ const lf = limitFunction(async (_a: string) => 'ok', {concurrency: 1});
+ expectType<Promise<string>>(lf('input'));
++expectType<number>(lf.activeCount);
++expectType<number>(lf.pendingCount);
++expectType<number>(lf.concurrency);
++lf.concurrency = 2;
++expectType<number>(lf.concurrency);
+ expectType<void>(lf.clearQueue());
++expectError(lf.activeCount = 1);
++expectError(lf.pendingCount = 1);
+ 
+ expectError(limitFunction((_a: string) => 'x', {concurrency: 1}));
+ expectError(pLimit({concurrency: 1, rejectOnClear: 'nope'}));
+diff --git a/readme.md b/readme.md
+index 6434792..9370c92 100644
+--- a/readme.md
++++ b/readme.md
+@@ -162,6 +162,18 @@ When `rejectOnClear` is enabled, pending promises are rejected with an `AbortErr
+ 
+ This does not cancel calls that are already running.
+ 
++### limitedFunction.activeCount
++
++The number of calls that are currently running.
++
++### limitedFunction.pendingCount
++
++The number of calls that are waiting to run.
++
++### limitedFunction.concurrency
++
++Get or set the concurrency limit for this limited function. Increasing the limit admits pending calls without waiting for a running call to finish.
++
+ ## Recipes
+ 
+ See [recipes.md](recipes.md) for common use cases and patterns.
+diff --git a/test.js b/test.js
+index 356c4d8..1c82cbb 100644
+--- a/test.js
++++ b/test.js
+@@ -226,6 +226,106 @@ testClearQueueRejects('limitFunction exposes clearQueue', async t => {
+ 	await t.throwsAsync(pendingPromise, {name: 'AbortError'});
+ });
+ 
++test('limitFunction exposes live limiter controls', async t => {
++	let releaseFirst;
++	const firstGate = new Promise(resolve => {
++		releaseFirst = resolve;
++	});
++	let releaseQueued;
++	const queuedGate = new Promise(resolve => {
++		releaseQueued = resolve;
++	});
++	const started = [];
++	const limitedFunction = limitFunction(async (value, suffix) => {
++		started.push(value);
++		await (value === 1 ? firstGate : queuedGate);
++		return `${value}-${suffix}`;
++	}, {concurrency: 1});
++
++	t.is(limitedFunction.activeCount, 0);
++	t.is(limitedFunction.pendingCount, 0);
++
++	const firstPromise = limitedFunction(1, 'first');
++	const queuedPromises = [
++		limitedFunction(2, 'second'),
++		limitedFunction(3, 'third'),
++	];
++
++	await Promise.resolve();
++	t.deepEqual(started, [1]);
++	// Check the actual limiter state immediately before changing its concurrency.
++	t.is(limitedFunction.activeCount, 1);
++	t.is(limitedFunction.pendingCount, 2);
++
++	limitedFunction.concurrency = 3;
++	t.is(limitedFunction.concurrency, 3);
++	await Promise.resolve();
++	await Promise.resolve();
++
++	t.deepEqual(started, [1, 2, 3]);
++	t.is(limitedFunction.activeCount, 3);
++	t.is(limitedFunction.pendingCount, 0);
++
++	releaseQueued();
++	releaseFirst();
++	t.deepEqual(await Promise.all([firstPromise, ...queuedPromises]), ['1-first', '2-second', '3-third']);
++	t.is(limitedFunction.activeCount, 0);
++	t.is(limitedFunction.pendingCount, 0);
++});
++
++test('limitFunction preserves arguments and rejection propagation', async t => {
++	const error = new Error('test');
++	const limitedFunction = limitFunction(async (first, second) => {
++		t.deepEqual([first, second], ['first', 'second']);
++		throw error;
++	}, {concurrency: 1});
++
++	await t.throwsAsync(limitedFunction('first', 'second'), {is: error});
++});
++
++test('limitFunction validates concurrency changes', t => {
++	const limitedFunction = limitFunction(async () => {}, {concurrency: 1});
++
++	t.throws(() => {
++		limitedFunction.concurrency = 0;
++	}, {instanceOf: TypeError});
++	t.is(limitedFunction.concurrency, 1);
++});
++
++test('limitFunction wrappers have independent controls', async t => {
++	let releaseA;
++	const gateA = new Promise(resolve => {
++		releaseA = resolve;
++	});
++	let releaseB;
++	const gateB = new Promise(resolve => {
++		releaseB = resolve;
++	});
++	const limitedA = limitFunction(async () => gateA, {concurrency: 1});
++	const limitedB = limitFunction(async () => gateB, {concurrency: 1});
++
++	const promisesA = [limitedA(), limitedA()];
++	const promisesB = [limitedB(), limitedB()];
++	await Promise.resolve();
++
++	t.is(limitedA.activeCount, 1);
++	t.is(limitedA.pendingCount, 1);
++	t.is(limitedB.activeCount, 1);
++	t.is(limitedB.pendingCount, 1);
++
++	limitedB.concurrency = 2;
++	await Promise.resolve();
++
++	t.is(limitedA.activeCount, 1);
++	t.is(limitedA.pendingCount, 1);
++	t.is(limitedB.activeCount, 2);
++	t.is(limitedB.pendingCount, 0);
++
++	releaseA();
++	releaseB();
++	await Promise.all([...promisesA, ...promisesB]);
++});
++
+ test('map', async t => {
+ 	const limit = pLimit(1);
+ 	const results = await limit.map([1, 2, 3, 4, 5, 6, 7], input => input + 1);

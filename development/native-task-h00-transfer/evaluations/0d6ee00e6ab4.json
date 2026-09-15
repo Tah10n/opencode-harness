@@ -1,0 +1,101 @@
+{
+  "id": "0d6ee00e6ab4",
+  "task": "quick-lru-computed",
+  "project": "quick-lru",
+  "Q": 1,
+  "ordinaryProjectExit": 0,
+  "originalIndependentExit": 0,
+  "interpretedIndependentExit": 0,
+  "patchApplicable": true,
+  "sourcePatchSha256": "7ce01ea9f0bfdfc98a11d7cf031d0273a4fc2957820dc7b4e95a1575a2cfd784",
+  "decision": "Full required delivery verified.",
+  "findings": [],
+  "contentReview": {
+    "id": "0d6ee00e6ab4",
+    "task": "quick-lru-computed",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete",
+    "retainedTestsReview": "Existing test scenarios remain unchanged.",
+    "contentFindings": [],
+    "behaviorReview": "Checks current/old entry expiry without conflating stored undefined with absence; promotes old hits through existing moveToRecent and inserts computed value via ordinary set default TTL. Expiry delete removes both copies, so subsequent old-cache check does not resurrect stale value. Runtime confirmation pending.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": true,
+        "evidence": "Undefined hit does not call factory. After hitting an old-generation undefined key, explicit evict(1) must remove the other oldest entry and retain the hit; this distinguishes missing recency promotion without requiring the reference test arrangement."
+      },
+      {
+        "scenario": 2,
+        "covered": true,
+        "evidence": "Expired current entry is awaited past TTL, factory called exactly once, exact single eviction recorded, positive remaining TTL bounded by cache default."
+      },
+      {
+        "scenario": 3,
+        "covered": true,
+        "evidence": "Factory throws exact reason with absent key and single call; successful factory receives same object key, repeat hit does not invoke factory, second cache computes independently."
+      }
+    ],
+    "typesReview": "tsd checks string key inference, numeric return and invalid string factory result rejection.",
+    "docsReview": "Declaration and README document sync factory/misses, default TTL, stored undefined hit and recency.",
+    "recordStage": "Pre-unblinding content review; final decision is top-level Q."
+  },
+  "applicability": {
+    "id": "0d6ee00e6ab4",
+    "task": "quick-lru-computed",
+    "sourceCommit": "f2fe88e2932603c038c61ca29de6ad5286148e1b",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "7ce01ea9f0bfdfc98a11d7cf031d0273a4fc2957820dc7b4e95a1575a2cfd784",
+    "excludedPreparationArtifacts": [],
+    "types": null
+  },
+  "verificationNotes": {
+    "qualityAssignedBeforeArmMappingRead": true,
+    "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+  },
+  "slot": 13,
+  "arm": "P",
+  "D": 1,
+  "native": {
+    "completed": true,
+    "exitCode": 0,
+    "signal": null,
+    "lastStepFinish": "stop",
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "normalHandoff": true,
+    "workflowStatus": null,
+    "terminalPatchVerification": null,
+    "finalResponseSha256": "fe765a62ef147ef0586b54bb568a166b18861938358d93936df813daf03cc536",
+    "finalResponseExcerpt": "Implemented `getOrInsertComputed` with:\n\n- Cache hits, including stored `undefined`, without factory calls\n- Old-generation recency refresh matching `get`\n- Expiration eviction notifications\n- Default TTL insertion\n- Error propagation without insertion\n- Object-key and independent-cache support\n\nUpdated:\n\n- `index.js`\n- `index.d.ts`\n- `index.test-d.ts`\n- `test.js`\n- `readme.md`\n\nVerification: `npm test` passed, including 118 tests, lint, coverage run, and TypeScript tests.",
+    "reportFindings": []
+  },
+  "verification": [
+    {
+      "artifact": "ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 8857,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "independent/result.json",
+      "exit": 0,
+      "elapsedMs": 3407,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    }
+  ]
+}

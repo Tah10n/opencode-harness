@@ -1,0 +1,16 @@
+{
+  "category": "compatibility",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert active and pre-abort reason identity with timer/listener cleanup.",
+    "Assert successful completion cleans listener and legacy no-signal promise behavior."
+  ],
+  "docDelivery": [
+    "Document duration validation, optional signal and injected timer defaults.",
+    "Explain cancellation reason identity, zero handles, cleanup, independent calls and no retries."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Bounded durations, native AbortSignal and nonthrowing deferred injected timers; opaque handle0 allowed, no synchronous/reentrant scheduler.",
+  "independence": "Add cancellable delay promises with injected timers and listener cleanup without changing existing delay callers."
+}

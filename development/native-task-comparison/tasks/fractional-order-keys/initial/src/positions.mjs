@@ -1,0 +1,1 @@
+const value=k=>{const [n,d]=k.split('/').map(Number);return n/d;};export function compare(a,b){return Math.sign(value(a)-value(b));}export function between(left,right){return left??right??'0/1';}export function rebalance(items){return items.map((x,i)=>({...x,key:i+'/1'}));}

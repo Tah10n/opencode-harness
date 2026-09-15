@@ -1,0 +1,1 @@
+import {findTrail} from './tree.mjs';export function breadcrumbs(nodes,id){const trail=findTrail(nodes,id);if(!trail)return [];const current=trail.at(-1);return trail.filter(n=>n===current||!n.hidden).map(n=>({id:n.id,label:n.label,href:n===current?null:n.href,current:n===current}));}

@@ -1,0 +1,8 @@
+Add pruneExpired(): number, removing all logically visible expired entries from both cache generations without promoting or reordering live entries. Return the number of logical keys removed. Use the existing expiry boundary (expiry <= Date.now()) and normal expiration eviction callback. When a current entry shadows an old entry for the same key, the current entry determines visibility: an expired shadowed old value must not delete a live current value or trigger a duplicate callback. Expiring the visible current value must not resurrect a shadowed old value. Preserve finite/infinite lifetimes, stored undefined, resize/size/iteration behavior and subsequent cache reuse. Include declarations, regression tests and API documentation.
+
+Required delivered regression scenarios:
+- Expired entries from both generations are pruned, counted once and notified once; live iteration order is unchanged.
+- A live current value shadowing expired old value survives with no false callback; an expired current value never reveals old value.
+- Exact expiry boundary, infinite TTL, undefined value, repeated prune and reuse after empty cache work.
+
+Deliver implementation, ordinary project regression tests, applicable public TypeScript declarations/type tests, and README/API documentation. Preserve existing independent regression scenarios and all behavior not explicitly changed. Use the project test tools; run relevant checks after the last edit and report what actually ran and any limitations. A different valid implementation or test organization is acceptable. Do not commit, publish, or change dependencies merely to make a check pass. The supported evaluation platform is Linux arm64, Node 24.19; browser deployment and other Node versions are outside this task.

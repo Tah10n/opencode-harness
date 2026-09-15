@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/timing.mjs": "export function timed(fn,{now,record}){\n return function(...args){\n  const start=now();let result;\n  try{result=Reflect.apply(fn,this,args);}catch(error){record({duration:now()-start,outcome:'throw'});throw error;}\n  record({duration:now()-start,outcome:'return'});return result;\n };\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "loses-receiver",
+      "file": "src/timing.mjs",
+      "replacement": "export function timed(fn,{now,record}){\n return function(...args){\n  const start=now();let outcome='throw';\n  try{const result=Reflect.apply(fn,undefined,args);outcome='return';return result;}\n  finally{record({duration:now()-start,outcome});}\n };\n}\n"
+    },
+    {
+      "name": "missing-throw-event",
+      "file": "src/timing.mjs",
+      "replacement": "export function timed(fn,{now,record}){\n return function(...args){\n  const start=now();let outcome='throw';\n  try{const result=Reflect.apply(fn,this,args);outcome='return';return result;}\n  finally{if(outcome==='return')record({duration:now()-start,outcome});}\n };\n}\n"
+    }
+  ]
+}

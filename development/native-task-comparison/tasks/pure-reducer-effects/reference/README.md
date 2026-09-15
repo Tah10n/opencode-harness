@@ -1,0 +1,3 @@
+# pure-reducer-effects
+
+reduceCounter is a pure transition returning new state and ordered effect descriptions. Controller delegates to it, commits state before effects, then executes persist/notify in order. add clamps to[-100,100]; reset targets0; only changes notify, and unchanged values retain signed zero. save always updates savedValue, persists then notifies, even unchanged. Invalid event/amount throws TypeError before state/effects. First adapter error propagates and stops later effects with committed state retained: no rollback is promised. Snapshots/inputs are not mutated. Synchronous adapters must not reenter dispatch. Run npm test.

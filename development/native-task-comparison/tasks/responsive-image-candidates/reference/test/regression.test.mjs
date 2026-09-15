@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {selectImage} from '../src/image.mjs';import {parseCandidates} from '../src/srcset.mjs';test('unsorted widths and density selection',()=>{assert.equal(selectImage('large 900w, small 300w, mid 600w',250,2,'none'),'mid');assert.equal(selectImage('a 1x, b 1.5x, c 3x',999,1.5,'none'),'b');});test('mixed and duplicate descriptors',()=>{assert.throws(()=>parseCandidates('a 1x,b 1.0x'),TypeError);assert.throws(()=>parseCandidates('a 100w,b 2x'),TypeError);});

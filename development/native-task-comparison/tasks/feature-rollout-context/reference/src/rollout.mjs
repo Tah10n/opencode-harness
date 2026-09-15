@@ -1,0 +1,1 @@
+export function bucket(text){let h=2166136261;for(const c of text){h^=c.charCodeAt(0);h=Math.imul(h,16777619)>>>0;}return h%10000;}export function evaluate(flag,user){if(!flag.enabled)return false;if(Object.hasOwn(flag.overrides,user))return flag.overrides[user];return bucket(flag.seed+':'+user)<flag.basisPoints;}

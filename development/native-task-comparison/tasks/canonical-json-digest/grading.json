@@ -1,0 +1,16 @@
+{
+  "category": "state",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Nested and integer-looking object keys canonicalize independently of insertion order.",
+    "Cycle and accessor rejection without invoking the accessor."
+  ],
+  "docDelivery": [
+    "UTF-16 sorted object keys, array ordering, JSON primitive spelling and UTF-8 SHA-256.",
+    "Exact supported container domain, shared references, rejection rules and no toJSON/accessor execution."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Supported JSON-like values: null/boolean/string/finite number (negative zero normalizes to zero), dense arrays with only indices/length, plain Object.prototype/null-prototype own enumerable data records. Shared references allowed, cycles/getters/nonenumerable/symbol keys/unsupported values rejected. Proxies excluded.",
+  "independence": "Implement deterministic plain-JSON canonicalization with sorted object keys, preserved arrays and finite-number domain."
+}

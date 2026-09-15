@@ -1,0 +1,140 @@
+{
+  "id": "e37d900f2b06",
+  "task": "ufo-append-query",
+  "project": "ufo",
+  "Q": 0,
+  "findings": [
+    {
+      "category": "missing-delivery",
+      "reason": "Zero changed or deleted source files."
+    }
+  ],
+  "contentReview": {
+    "id": "e37d900f2b06",
+    "task": "ufo-append-query",
+    "project": "ufo",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete-pending-mechanical-checks",
+    "Q": null,
+    "behaviorReview": "Empty captured source patch; new public API is absent.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": false,
+        "evidence": "No delivered source or test edits."
+      },
+      {
+        "scenario": 2,
+        "covered": false,
+        "evidence": "No delivered source or test edits."
+      },
+      {
+        "scenario": 3,
+        "covered": false,
+        "evidence": "No delivered source or test edits."
+      }
+    ],
+    "typesReview": "No new public API/types.",
+    "docsReview": "No new docs.",
+    "contentFindings": [
+      {
+        "category": "missing-delivery",
+        "evidence": "Zero changed or deleted source files."
+      }
+    ],
+    "pending": [
+      "ordinary baseline checks",
+      "independent expected failure",
+      "empty patch applicability record"
+    ],
+    "recordStage": "Initial neutral review retained as history; final Q, findings and assessmentNotes supersede pending hypotheses."
+  },
+  "ordinaryExit": 0,
+  "originalIndependentExit": 1,
+  "interpretedIndependentExit": 1,
+  "applicability": {
+    "id": "e37d900f2b06",
+    "task": "ufo-append-query",
+    "sourceCommit": "f06c800d0c59f2a4a1b9ba65eb6cb61a84419be6",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "excludedPreparationArtifacts": [],
+    "types": null
+  },
+  "sourcePatchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "sourcePatchBytes": 0,
+  "assessmentNotes": [
+    "Original empty-value serialization assertion accepts either key or key= for appended empty value. Both controls pass; nonempty author patch passes, empty patch still fails. Q=0 remains due separate required test gap or empty delivery."
+  ],
+  "slot": 19,
+  "repetition": 1,
+  "arm": "H00",
+  "D": 0,
+  "verification": [
+    {
+      "artifact": "reviews/e37d900f2b06/independent/result.json",
+      "exit": 1,
+      "elapsedMs": 3854,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "ℹ Automatically detected entries: src/index [esm] [cjs] [dts]\nℹ Building ufo\nℹ Cleaning dist directory: ./dist\n✔ Build succeeded for ufo\n  dist/index.cjs (total size: 21.1 kB, chunk size: 21.1 kB, exports: $URL, cleanDoubleSlashes, createURL, decode, decodePath, decodeQueryKey, decodeQueryValue, encode, encodeHash, encodeHost, encodeParam, encodePath, encodeQueryItem, encodeQueryKey, encodeQueryValue, filterQuery, getQuery, hasLeadingSlash, hasProtocol, hasTrailingSlash, isEmptyURL, isEqual, isNonEmptyURL, isRelative, isSamePath, isScriptProtocol, joinRelativeURL, joinURL, normalizeURL, parseAuth, parseFilename, parseHost, parsePath, parseQuery, parseURL, resolveURL, stringifyParsedURL, stringifyQuery, withBase, withFragment, withHttp, withHttps, withLeadingSlash, withProtocol, withQuery, withTrailingSlash, withoutBase, withoutFragment, withoutHost, withoutLeadingSlash, withoutProtocol, withoutTrailingSlash)\n\n  dist/index.mjs (total size: 19.9 kB, chunk size: 19.9 kB, exports: $URL, cleanDoubleSlashes, createURL, decode, decodePath, decodeQueryKey, decodeQueryValue, encode, encodeHash, encodeHost, encodeParam, encodePath, encodeQueryItem, encodeQueryKey, encodeQueryValue, filterQuery, getQuery, hasLeadingSlash, hasProtocol, hasTrailingSlash, isEmptyURL, isEqual, isNonEmptyURL, isRelative, isSamePath, isScriptProtocol, joinRelativeURL, joinURL, normalizeURL, parseAuth, parseFilename, parseHost, parsePath, parseQuery, parseURL, resolveURL, stringifyParsedURL, stringifyQuery, withBase, withFragment, withHttp, withHttps, withLeadingSlash, withProtocol, withQuery, withTrailingSlash, withoutBase, withoutFragment, withoutHost, withoutLeadingSlash, withoutProtocol, withoutTrailingSlash)\n\nΣ Total dist size (byte size): 97.3 kB\n\nTypeError: api.appendQuery is not a function\n    at",
+      "fullLocalOutputSha256": "46f27b55d17ec04dec25bebc73a39442e11705847f4229cf64749d2a8387f29b",
+      "supersededDiagnostic": false
+    },
+    {
+      "artifact": "reviews/e37d900f2b06/ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 8237,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "  ─    README.md already up-to-date (177.22ms)\n\nℹ Automatically detected entries: src/index [esm] [cjs] [dts]\nℹ Building ufo\nℹ Cleaning dist directory: ./dist\n✔ Build succeeded for ufo\n  dist/index.cjs (total size: 21.1 kB, chunk size: 21.1 kB, exports: $URL, cleanDoubleSlashes, createURL, decode, decodePath, decodeQueryKey, decodeQueryValue, encode, encodeHash, encodeHost, encodeParam, encodePath, encodeQueryItem, encodeQueryKey, encodeQueryValue, filterQuery, getQuery, hasLeadingSlash, hasProtocol, hasTrailingSlash, isEmptyURL, isEqual, isNonEmptyURL, isRelative, isSamePath, isScriptProtocol, joinRelativeURL, joinURL, normalizeURL, parseAuth, parseFilename, parseHost, parsePath, parseQuery, parseURL, resolveURL, stringifyParsedURL, stringifyQuery, withBase, withFragment, withHttp, withHttps, withLeadingSlash, withProtocol, withQuery, withTrailingSlash, withoutBase, withoutFragment, withoutHost, withoutLeadingSlash, withoutProtocol, withoutTrailingSlash)\n\n  dist/index.mjs (total size: 19.9 kB, chunk size: 19.9 kB, exports: $URL, cleanDoubleSlashes, createURL, decode, decodePath, decodeQueryKey, decodeQueryValue, encode, encodeHash, encodeHost, encodeParam, encodePath, encodeQueryItem, encodeQueryKey, encodeQueryValue, filterQuery, getQuery, hasLeadingSlash, hasProtocol, hasTrailingSlash, isEmptyURL, isEqual, isNonEmptyURL, isRelative, isSamePath, isScriptProtocol, joinRelativeURL, joinURL, normalizeURL, parseAuth, parseFilename, parseHost, parsePath, parseQuery, parseURL, resolveURL, stringifyParsedURL, stringifyQuery, withBase, withFragment, withHttp, withHttps, withLeadingSlash, withProtocol, withQuery, withTrailingSlash, withoutBase, withoutFragment, withoutHost, withoutLeadingSlash, withoutProtocol, withoutTrailingSlash)\n\nΣ Total dist size (byte size): 97.3 kB\n",
+      "fullLocalOutputSha256": "7553bd9bbf16e21875f543ca5251228baa3e3169978bc0e2cdc5542f4c6331d4",
+      "supersededDiagnostic": false
+    },
+    {
+      "artifact": "reviews/e37d900f2b06/supplemental/empty-value-interpretation/result.json",
+      "exit": 1,
+      "elapsedMs": 6963,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "ℹ Automatically detected entries: src/index [esm] [cjs] [dts]\nℹ Building ufo\nℹ Cleaning dist directory: ./dist\n✔ Build succeeded for ufo\n  dist/index.cjs (total size: 21.1 kB, chunk size: 21.1 kB, exports: $URL, cleanDoubleSlashes, createURL, decode, decodePath, decodeQueryKey, decodeQueryValue, encode, encodeHash, encodeHost, encodeParam, encodePath, encodeQueryItem, encodeQueryKey, encodeQueryValue, filterQuery, getQuery, hasLeadingSlash, hasProtocol, hasTrailingSlash, isEmptyURL, isEqual, isNonEmptyURL, isRelative, isSamePath, isScriptProtocol, joinRelativeURL, joinURL, normalizeURL, parseAuth, parseFilename, parseHost, parsePath, parseQuery, parseURL, resolveURL, stringifyParsedURL, stringifyQuery, withBase, withFragment, withHttp, withHttps, withLeadingSlash, withProtocol, withQuery, withTrailingSlash, withoutBase, withoutFragment, withoutHost, withoutLeadingSlash, withoutProtocol, withoutTrailingSlash)\n\n  dist/index.mjs (total size: 19.9 kB, chunk size: 19.9 kB, exports: $URL, cleanDoubleSlashes, createURL, decode, decodePath, decodeQueryKey, decodeQueryValue, encode, encodeHash, encodeHost, encodeParam, encodePath, encodeQueryItem, encodeQueryKey, encodeQueryValue, filterQuery, getQuery, hasLeadingSlash, hasProtocol, hasTrailingSlash, isEmptyURL, isEqual, isNonEmptyURL, isRelative, isSamePath, isScriptProtocol, joinRelativeURL, joinURL, normalizeURL, parseAuth, parseFilename, parseHost, parsePath, parseQuery, parseURL, resolveURL, stringifyParsedURL, stringifyQuery, withBase, withFragment, withHttp, withHttps, withLeadingSlash, withProtocol, withQuery, withTrailingSlash, withoutBase, withoutFragment, withoutHost, withoutLeadingSlash, withoutProtocol, withoutTrailingSlash)\n\nΣ Total dist size (byte size): 97.3 kB\n\nTypeError: api.appendQuery is not a function\n    at",
+      "fullLocalOutputSha256": "2132ab99c5ac74b9c4ffc9f74967e356863738586d2f4ee41a08e86ba0ac6c59",
+      "supersededDiagnostic": false
+    }
+  ],
+  "native": {
+    "completed": false,
+    "exitCode": 1,
+    "signal": null,
+    "lastStepFinish": "tool-calls",
+    "normalHandoff": false,
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "workflowStatus": "incomplete",
+    "terminalPatchVerification": null,
+    "lastNativeTextSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "normalFinalResponse": false,
+    "finalResponseExcerpt": "",
+    "authorExplanationExcerpt": null,
+    "reportFindings": [
+      {
+        "category": "no-normal-final-handoff",
+        "evidence": "No normal terminal stop and usable final result. Any interim prose is not a final response. Empty patch stays Q=0/D=0."
+      }
+    ]
+  }
+}

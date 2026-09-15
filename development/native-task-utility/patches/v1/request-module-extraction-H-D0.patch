@@ -1,0 +1,384 @@
+diff --git a/packages/connector/README.md b/packages/connector/README.md
+index 5a1e8c684bc8007a1c7ce110cb2114691c06d0af..f435a609ad8f5a6dab823379a285832e85902cc5 100644
+--- a/packages/connector/README.md
++++ b/packages/connector/README.md
+@@ -4,6 +4,11 @@ The Node 24 LTS connector collects exact aggregate token counters from supported
+ sources and pairs them with Vibe Racing agent accounts. It never uploads raw sessions or local
+ paths.
+ 
++The CLI's shared HTTP transport is implemented in `lib/transport.mjs`. It owns request timeouts,
++redirect refusal, retry eligibility, exponential backoff, and bounded `Retry-After` delays for all
++pairing, reconciliation, usage, and lifecycle calls. Response-size and protocol validation remain
++in `lib/protocol.mjs`; the installed runtime includes both modules.
++
+ ```bash
+ npx --yes --prefer-online --package https://viberacing.example/downloads/viberacing-connector.tgz -- \
+   viberacing connect --origin https://viberacing.example
+diff --git a/packages/connector/bin/viberacing.mjs b/packages/connector/bin/viberacing.mjs
+index 5fde3a9b656377e0266fbde7eda922c752933bdf..f025bc1b222e9ddd085904e354182e82cdb862e5 100755
+--- a/packages/connector/bin/viberacing.mjs
++++ b/packages/connector/bin/viberacing.mjs
+@@ -7,7 +7,7 @@ import { createInterface } from "node:readline";
+ import { setTimeout as delay } from "node:timers/promises";
+ import { fileURLToPath } from "node:url";
+ import { connectorVersion } from "../lib/version.mjs";
+-import { parseProtocolResponse } from "../lib/protocol.mjs";
++import { request } from "../lib/transport.mjs";
+ import { normalizeOrigin } from "../lib/origin.mjs";
+ import {
+   adapters,
+@@ -158,74 +158,6 @@ async function readConnectedConfig() {
+   }
+ }
+ 
+-function retryAfterMilliseconds(response) {
+-  const value = response.headers.get("retry-after")?.trim();
+-  if (!value) return null;
+-  let milliseconds;
+-  if (/^\d+$/.test(value)) milliseconds = Number(value) * 1_000;
+-  else {
+-    const date = Date.parse(value);
+-    if (Number.isNaN(date)) return null;
+-    milliseconds = Math.max(0, date - Date.now());
+-  }
+-  const maximum =
+-    process.env.NODE_ENV === "test" &&
+-    /^\d+$/.test(process.env.VIBERACING_TEST_MAX_RETRY_AFTER_MS ?? "")
+-      ? Number(process.env.VIBERACING_TEST_MAX_RETRY_AFTER_MS)
+-      : 300_000;
+-  return Math.min(maximum, milliseconds);
+-}
+-
+-async function request(origin, path, options = {}, attempts = 1, responseContext) {
+-  let lastError;
+-  for (let attempt = 0; attempt < attempts; attempt += 1) {
+-    try {
+-      const response = await fetch(`${origin}${path}`, {
+-        ...options,
+-        signal: AbortSignal.timeout(15_000),
+-        redirect: "error",
+-      });
+-      let payload;
+-      try {
+-        payload = await parseProtocolResponse(response, responseContext);
+-      } catch (error) {
+-        if (
+-          error?.code === "invalid_server_response" &&
+-          (response.status >= 500 || response.status === 429)
+-        ) {
+-          error.status = response.status;
+-          error.retryAfterMs = retryAfterMilliseconds(response);
+-        }
+-        throw error;
+-      }
+-      if (!response.ok) {
+-        const error = new Error(
+-          `Vibe Racing returned ${response.status}: ${payload.error ?? "request failed"}`,
+-        );
+-        error.status = response.status;
+-        error.code = payload.error;
+-        error.retryAfterMs = retryAfterMilliseconds(response);
+-        if (response.status < 500 && response.status !== 429) throw error;
+-        lastError = error;
+-      } else return payload;
+-    } catch (error) {
+-      lastError = error;
+-      if (
+-        error?.code === "invalid_server_response" &&
+-        !(error?.status >= 500 || error?.status === 429)
+-      )
+-        throw error;
+-      if (error?.status && error.status < 500 && error.status !== 429) throw error;
+-    }
+-    if (attempt + 1 < attempts) {
+-      const retryAfter = Number.isFinite(lastError?.retryAfterMs) ? lastError.retryAfterMs : 0;
+-      const backoff = Math.min(8_000, 500 * 2 ** attempt) + Math.floor(Math.random() * 250);
+-      await delay(Math.max(retryAfter, backoff));
+-    }
+-  }
+-  throw lastError;
+-}
+-
+ async function cancelPairingAttempt(attempt) {
+   if (
+     attempt === null ||
+diff --git a/packages/connector/lib/config.mjs b/packages/connector/lib/config.mjs
+index bf11763987281875d4086fdf96132da14e39f080..4563957df3f24813f4afef86e488eebe3e8ccad5 100644
+--- a/packages/connector/lib/config.mjs
++++ b/packages/connector/lib/config.mjs
+@@ -1244,6 +1244,7 @@ const installedRuntimeFiles = [
+   "registry.mjs",
+   "runtime.mjs",
+   "protocol.mjs",
++  "transport.mjs",
+   "terminal.mjs",
+   "version.mjs",
+   "windows-security.mjs",
+diff --git a/packages/connector/test/config.test.mjs b/packages/connector/test/config.test.mjs
+index 20f2a6f98d1c565539340c4dc77c80c0fdd0a348..eaaa7877a6fe5e9092be22683ca26b121b74e810 100644
+--- a/packages/connector/test/config.test.mjs
++++ b/packages/connector/test/config.test.mjs
+@@ -267,6 +267,7 @@ test("installs a runnable connector copy and additive, owned hooks", async () =>
+       "readers.mjs",
+       "registry.mjs",
+       "runtime.mjs",
++      "transport.mjs",
+     ])
+       await access(join(installedLibrary, name));
+     await access(join(installedLibrary, "adapters", "codex.mjs"));
+diff --git a/scripts/check-connector-package.mjs b/scripts/check-connector-package.mjs
+index 31a5cf91a1eeb514c2e0dd0f20f28e3b33997a97..d066c93820179c8b1644787886bb3b76b3d06f74 100644
+--- a/scripts/check-connector-package.mjs
++++ b/scripts/check-connector-package.mjs
+@@ -62,6 +62,7 @@ const requiredFiles = [
+   "package.json",
+   "bin/viberacing.mjs",
+   "lib/protocol.mjs",
++  "lib/transport.mjs",
+   "lib/terminal.mjs",
+   "lib/version.mjs",
+   "scripts/generate-version.mjs",
+diff --git a/packages/connector/lib/transport.mjs b/packages/connector/lib/transport.mjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..daf3171be6473d1e7b1ae5b789f91454a96748f3
+--- /dev/null
++++ b/packages/connector/lib/transport.mjs
+@@ -0,0 +1,70 @@
++import { setTimeout as delay } from "node:timers/promises";
++import { parseProtocolResponse } from "./protocol.mjs";
++
++export function retryAfterMilliseconds(response) {
++  const value = response.headers.get("retry-after")?.trim();
++  if (!value) return null;
++  let milliseconds;
++  if (/^\d+$/.test(value)) milliseconds = Number(value) * 1_000;
++  else {
++    const date = Date.parse(value);
++    if (Number.isNaN(date)) return null;
++    milliseconds = Math.max(0, date - Date.now());
++  }
++  const maximum =
++    process.env.NODE_ENV === "test" &&
++    /^\d+$/.test(process.env.VIBERACING_TEST_MAX_RETRY_AFTER_MS ?? "")
++      ? Number(process.env.VIBERACING_TEST_MAX_RETRY_AFTER_MS)
++      : 300_000;
++  return Math.min(maximum, milliseconds);
++}
++
++export async function request(origin, path, options = {}, attempts = 1, responseContext) {
++  let lastError;
++  for (let attempt = 0; attempt < attempts; attempt += 1) {
++    try {
++      const response = await fetch(`${origin}${path}`, {
++        ...options,
++        signal: AbortSignal.timeout(15_000),
++        redirect: "error",
++      });
++      let payload;
++      try {
++        payload = await parseProtocolResponse(response, responseContext);
++      } catch (error) {
++        if (
++          error?.code === "invalid_server_response" &&
++          (response.status >= 500 || response.status === 429)
++        ) {
++          error.status = response.status;
++          error.retryAfterMs = retryAfterMilliseconds(response);
++        }
++        throw error;
++      }
++      if (!response.ok) {
++        const error = new Error(
++          `Vibe Racing returned ${response.status}: ${payload.error ?? "request failed"}`,
++        );
++        error.status = response.status;
++        error.code = payload.error;
++        error.retryAfterMs = retryAfterMilliseconds(response);
++        if (response.status < 500 && response.status !== 429) throw error;
++        lastError = error;
++      } else return payload;
++    } catch (error) {
++      lastError = error;
++      if (
++        error?.code === "invalid_server_response" &&
++        !(error?.status >= 500 || error?.status === 429)
++      )
++        throw error;
++      if (error?.status && error.status < 500 && error.status !== 429) throw error;
++    }
++    if (attempt + 1 < attempts) {
++      const retryAfter = Number.isFinite(lastError?.retryAfterMs) ? lastError.retryAfterMs : 0;
++      const backoff = Math.min(8_000, 500 * 2 ** attempt) + Math.floor(Math.random() * 250);
++      await delay(Math.max(retryAfter, backoff));
++    }
++  }
++  throw lastError;
++}
+diff --git a/packages/connector/test/transport.test.mjs b/packages/connector/test/transport.test.mjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..f83228b942b32d1c855f3d6ff327da2d2adb9db7
+--- /dev/null
++++ b/packages/connector/test/transport.test.mjs
+@@ -0,0 +1,162 @@
++import test from "node:test";
++import assert from "node:assert/strict";
++import { once } from "node:events";
++import { createServer } from "node:http";
++import { request } from "../lib/transport.mjs";
++
++const sourceId = "22222222-2222-4222-8222-222222222222";
++
++function usageResponse() {
++  return {
++    acceptedEntries: 0,
++    acceptedSnapshots: 1,
++    acceptedSourceErrors: 0,
++    staleSnapshots: 0,
++    sourceSequences: [{ sourceId, lastAcceptedSyncSequence: "1", accepted: true }],
++  };
++}
++
++async function listening(server) {
++  server.listen(0, "127.0.0.1");
++  await once(server, "listening");
++  const address = server.address();
++  assert.equal(typeof address, "object");
++  return `http://127.0.0.1:${address.port}`;
++}
++
++function close(server) {
++  return new Promise((resolve, reject) => server.close((error) => (error ? reject(error) : resolve())));
++}
++
++test("transport preserves request details and delegates valid response parsing", async (context) => {
++  let received;
++  const server = createServer((incoming, response) => {
++    const chunks = [];
++    incoming.on("data", (chunk) => chunks.push(chunk));
++    incoming.on("end", () => {
++      received = {
++        method: incoming.method,
++        authorization: incoming.headers.authorization,
++        contentType: incoming.headers["content-type"],
++        body: Buffer.concat(chunks).toString("utf8"),
++      };
++      response.writeHead(200, { "content-type": "application/json" });
++      response.end(JSON.stringify(usageResponse()));
++    });
++  });
++  const origin = await listening(server);
++  context.after(() => close(server));
++
++  const result = await request(
++    origin,
++    "/api/usage",
++    {
++      method: "POST",
++      headers: {
++        Authorization: "Bearer synthetic-device-token",
++        "Content-Type": "application/json",
++      },
++      body: JSON.stringify({ sourceId, totalTokens: "3" }),
++    },
++    1,
++    { kind: "usage", sourceIds: [sourceId] },
++  );
++
++  assert.deepEqual(received, {
++    method: "POST",
++    authorization: "Bearer synthetic-device-token",
++    contentType: "application/json",
++    body: JSON.stringify({ sourceId, totalTokens: "3" }),
++  });
++  assert.deepEqual(result, usageResponse());
++});
++
++test("transport retries transient malformed responses and preserves permanent error status and code", async (context) => {
++  let requests = 0;
++  const server = createServer((_incoming, response) => {
++    requests += 1;
++    if (requests === 1) {
++      response.writeHead(503, { "content-type": "text/html" });
++      response.end("temporary proxy failure");
++      return;
++    }
++    response.writeHead(200, { "content-type": "application/json" });
++    response.end(JSON.stringify(usageResponse()));
++  });
++  const origin = await listening(server);
++  context.after(() => close(server));
++
++  assert.deepEqual(
++    await request(origin, "/api/usage", {}, 2, { kind: "usage", sourceIds: [sourceId] }),
++    usageResponse(),
++  );
++  assert.equal(requests, 2);
++
++  const permanent = createServer((_incoming, response) => {
++    response.writeHead(400, { "content-type": "application/json" });
++    response.end(JSON.stringify({ error: "invalid_payload" }));
++  });
++  const permanentOrigin = await listening(permanent);
++  context.after(() => close(permanent));
++  await assert.rejects(
++    request(permanentOrigin, "/api/usage", {}, 3, { kind: "usage", sourceIds: [sourceId] }),
++    (error) =>
++      error instanceof Error &&
++      error.message === "Vibe Racing returned 400: invalid_payload" &&
++      error.status === 400 &&
++      error.code === "invalid_payload",
++  );
++});
++
++test("transport bounds Retry-After before applying exponential backoff", async (context) => {
++  const previousNodeEnvironment = process.env.NODE_ENV;
++  const previousMaximum = process.env.VIBERACING_TEST_MAX_RETRY_AFTER_MS;
++  process.env.NODE_ENV = "test";
++  process.env.VIBERACING_TEST_MAX_RETRY_AFTER_MS = "10";
++  context.after(() => {
++    if (previousNodeEnvironment === undefined) delete process.env.NODE_ENV;
++    else process.env.NODE_ENV = previousNodeEnvironment;
++    if (previousMaximum === undefined) delete process.env.VIBERACING_TEST_MAX_RETRY_AFTER_MS;
++    else process.env.VIBERACING_TEST_MAX_RETRY_AFTER_MS = previousMaximum;
++  });
++
++  const requestTimes = [];
++  const server = createServer((_incoming, response) => {
++    requestTimes.push(Date.now());
++    response.writeHead(requestTimes.length === 1 ? 429 : 200, {
++      "content-type": "application/json",
++      ...(requestTimes.length === 1 ? { "retry-after": "2" } : {}),
++    });
++    response.end(
++      JSON.stringify(requestTimes.length === 1 ? { error: "rate_limited" } : usageResponse()),
++    );
++  });
++  const origin = await listening(server);
++  context.after(() => close(server));
++
++  await request(origin, "/api/usage", {}, 2, { kind: "usage", sourceIds: [sourceId] });
++  assert.equal(requestTimes.length, 2);
++  assert.ok(requestTimes[1] - requestTimes[0] >= 450);
++  assert.ok(requestTimes[1] - requestTimes[0] < 1_500);
++});
++
++test("transport refuses redirects instead of following them", async (context) => {
++  let redirectedRequests = 0;
++  const server = createServer((incoming, response) => {
++    if (incoming.url === "/redirect") {
++      response.writeHead(302, { location: "/target" });
++      response.end();
++      return;
++    }
++    redirectedRequests += 1;
++    response.writeHead(200, { "content-type": "application/json" });
++    response.end(JSON.stringify(usageResponse()));
++  });
++  const origin = await listening(server);
++  context.after(() => close(server));
++
++  await assert.rejects(
++    request(origin, "/redirect", {}, 1, { kind: "usage", sourceIds: [sourceId] }),
++  );
++  assert.equal(redirectedRequests, 0);
++});

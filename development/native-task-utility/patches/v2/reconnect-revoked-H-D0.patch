@@ -1,0 +1,207 @@
+diff --git a/packages/connector/README.md b/packages/connector/README.md
+index 7b955428fbb95f0d66bdbd52d910c6588366c295..bf2449a8e7015a4e5af9075a261b27c1971494a9 100644
+--- a/packages/connector/README.md
++++ b/packages/connector/README.md
+@@ -32,6 +32,14 @@ best-effort per source: one damaged settings file is reported without blocking h
+ initial sync. The final token/config swap is serialized behind any active sync, so an older request
+ cannot restore superseded authorization.
+ 
++If a previous installation has lost server authorization, including after its account is deleted,
++`connect` reconciles that 401 or 403, removes the stale local authorization and automatic state, and
++starts fresh pairing without requiring `disconnect`. The installation identity and local source
++registry remain stable so discovery and source history can be reused. Other reconciliation failures,
++such as transient server or network errors, retain the existing connection and do not start pairing.
++If auxiliary cleanup cannot finish, the revoked authorization is still removed and the connector
++prints a warning for the remaining local cleanup.
++
+ ## Commands
+ 
+ ```text
+diff --git a/packages/connector/bin/viberacing.mjs b/packages/connector/bin/viberacing.mjs
+index 5fde3a9b656377e0266fbde7eda922c752933bdf..08e14f329f9ef611d06c5fd3b29642b75b838dfe 100755
+--- a/packages/connector/bin/viberacing.mjs
++++ b/packages/connector/bin/viberacing.mjs
+@@ -288,7 +288,7 @@ async function exactPairingSources(sources) {
+   return result;
+ }
+ 
+-async function reconcilePreviousConnectionBeforePairing(origin, installationId, options = {}) {
++async function reconcilePreviousConnectionBeforePairing(origin, installationId) {
+   return withLifecycleMutation(async () => {
+     let previousConfig;
+     try {
+@@ -304,14 +304,12 @@ async function reconcilePreviousConnectionBeforePairing(origin, installationId,
+       remote = await requestReconciliation(previousConfig);
+     } catch (error) {
+       if (error?.status === 401 || error?.status === 403) {
+-        if (options.clearAfterCancelledAttempt) {
+-          await disableLocalConnection();
+-          return null;
+-        }
+-        throw new Error(
+-          "Existing installation authorization cannot be reconciled; run `viberacing disconnect` before reconnecting",
+-          { cause: error },
+-        );
++        const cleanupWarnings = await disableLocalConnection();
++        if (cleanupWarnings)
++          warning(
++            "Vibe Racing warning: local authorization was removed, but one or more auxiliary cleanup steps need manual inspection.",
++          );
++        return null;
+       }
+       throw error;
+     }
+@@ -341,10 +339,8 @@ async function connect() {
+     );
+   const installedRuntime = await prepareRuntime(import.meta.url);
+   const installation = await readOrCreateInstallation();
+-  const abandonedAttempt = await invalidateAndCancelConnectAttempt();
+-  const previousConfig = await reconcilePreviousConnectionBeforePairing(origin, installation.id, {
+-    clearAfterCancelledAttempt: abandonedAttempt.cancellation.status === "confirmed",
+-  });
++  await invalidateAndCancelConnectAttempt();
++  const previousConfig = await reconcilePreviousConnectionBeforePairing(origin, installation.id);
+   const pairingLocalSources = new Map(sources);
+   if (previousConfig !== null) {
+     const localById = new Map(localSources.map((source) => [source.clientSourceId, source]));
+diff --git a/packages/connector/test/config.test.mjs b/packages/connector/test/config.test.mjs
+index 666b936b47ed6dedebb6ce595fc33695f2aef03e..70229b4d749480497d7fc72263c0ae4e68e548cb 100644
+--- a/packages/connector/test/config.test.mjs
++++ b/packages/connector/test/config.test.mjs
+@@ -3360,8 +3360,9 @@ test("reconnect rejects omission and retains a temporarily unavailable source",
+   assert.match(await readFile(hookPath, "utf8"), /viberacing-hook-v3/);
+ });
+ 
+-test("reconnect retires only an explicitly disconnected unavailable source before pairing", async (context) => {
++test("reconnect reconciles disconnected sources and revoked authorization before pairing", async (context) => {
+   let mode = "malformed";
++  let revokedStatus = 401;
+   let pairingStarts = 0;
+   let pairingBody;
+   const installationId = "74747474-7474-4474-8474-747474747474";
+@@ -3404,8 +3405,10 @@ test("reconnect retires only an explicitly disconnected unavailable source befor
+           return;
+         }
+         if (mode === "unauthorized") {
+-          response.statusCode = 401;
+-          response.end(JSON.stringify({ error: "unauthorized" }));
++          response.statusCode = revokedStatus;
++          response.end(
++            JSON.stringify({ error: revokedStatus === 403 ? "forbidden" : "unauthorized" }),
++          );
+           return;
+         }
+         response.end(
+@@ -3540,10 +3543,6 @@ test("reconnect retires only an explicitly disconnected unavailable source befor
+   for (const failure of [
+     ["malformed", /invalid protocol response/],
+     ["transient", /server_error/],
+-    [
+-      "unauthorized",
+-      /Existing installation authorization cannot be reconciled; run `viberacing disconnect`/,
+-    ],
+   ]) {
+     mode = failure[0];
+     await assert.rejects(
+@@ -3575,6 +3574,101 @@ test("reconnect retires only an explicitly disconnected unavailable source befor
+   const hook = await readFile(join(hookRoot, "settings.json"), "utf8");
+   assert.match(hook, /keep-foreign/);
+   assert.doesNotMatch(hook, new RegExp(retiredClientSourceId));
++
++  const restorePreviousConnection = async (deviceToken) => {
++    await writeFile(
++      join(directory, "config.json"),
++      `${JSON.stringify({
++        version: 2,
++        origin,
++        installationId,
++        deviceToken,
++        sources: [retiredMapping, activeMapping],
++        protocol: { version: 2, snapshotDays: 31, maximumSources: 32, maximumEntries: 1_024 },
++      })}\n`,
++    );
++    await writeFile(
++      join(directory, "state.json"),
++      `${JSON.stringify({
++        version: 1,
++        sequences: { [retiredSourceId]: "2", [activeSourceId]: "3" },
++        automaticDisabledReason: "unsupported_connector",
++      })}\n`,
++    );
++    await writeFile(
++      join(hookRoot, "settings.json"),
++      `${JSON.stringify({
++        hooks: {
++          Stop: [
++            { hooks: [{ command: "keep-foreign" }] },
++            {
++              hooks: [
++                {
++                  command: `node hook --viberacing-hook-id=viberacing-hook-v3:${retiredClientSourceId}`,
++                },
++              ],
++            },
++          ],
++        },
++      })}\n`,
++    );
++  };
++
++  for (const status of [401, 403]) {
++    revokedStatus = status;
++    mode = "unauthorized";
++    const previousToken = `revoked_device_token_${status}_that_is_long_enough`;
++    await restorePreviousConnection(previousToken);
++    await writeFile(
++      join(directory, "dirty.json"),
++      `${JSON.stringify({
++        version: 2,
++        sources: {
++          [activeClientSourceId]: {
++            dirtySince: new Date().toISOString(),
++            lastEventAt: new Date().toISOString(),
++            generation: randomUUID(),
++          },
++        },
++      })}\n`,
++    );
++    if (status === 403) await writeFile(join(hookRoot, "settings.json"), "{invalid-json");
++
++    // Check the actual state that connect will reconcile immediately before invoking it.
++    const beforeRecovery = JSON.parse(await readFile(join(directory, "config.json"), "utf8"));
++    assert.equal(beforeRecovery.deviceToken, previousToken);
++    assert.equal(beforeRecovery.installationId, installationId);
++    assert.deepEqual(
++      (await readLocalSources(directory)).map((source) => source.clientSourceId).sort(),
++      [activeClientSourceId, retiredClientSourceId].sort(),
++    );
++
++    const recoveredResult = await execFileAsync(
++      process.execPath,
++      [connectorPath, "connect", "--origin", origin],
++      { env: environment },
++    );
++    if (status === 403)
++      assert.match(
++        recoveredResult.stderr,
++        /local authorization was removed, but one or more auxiliary cleanup steps need manual inspection/i,
++      );
++
++    const recovered = JSON.parse(await readFile(join(directory, "config.json"), "utf8"));
++    assert.equal(recovered.deviceToken, "dashboard_disconnect_device_token_long_enough");
++    assert.equal(recovered.installationId, installationId);
++    assert.deepEqual(
++      (await readLocalSources(directory)).map((source) => source.clientSourceId).sort(),
++      [activeClientSourceId, retiredClientSourceId].sort(),
++    );
++    assert.deepEqual(recovered.sources.map((source) => source.sourceId), [activeSourceId]);
++    assert.equal(
++      JSON.parse(await readFile(join(directory, "state.json"), "utf8")).automaticDisabledReason,
++      undefined,
++    );
++    await assert.rejects(access(join(directory, "dirty.json")));
++  }
++  assert.equal(pairingStarts, 3);
+ });
+ 
+ test("hostile pairing response cannot change config, hooks, or local paths", async (context) => {

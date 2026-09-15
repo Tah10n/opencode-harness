@@ -1,0 +1,431 @@
+{
+  "status": "stopped_by_frozen_policy",
+  "runtimeSha": "797ce6f1b75af217e00224d1b38790346dee1d19",
+  "freezeSha256": "7bbd0d7c72f99a06d2a2a5ed4ae429efa261f23b0a7ad2659c44a3ce93891b6a",
+  "pause": {
+    "kind": "unknown_submission",
+    "slot": 10,
+    "error": "AbortError"
+  },
+  "money": null,
+  "rows": [
+    {
+      "slot": 1,
+      "task": "visual-preferences",
+      "repetition": 1,
+      "arm": "P",
+      "neutral": "n07",
+      "state": "completed",
+      "Q": true,
+      "T": true,
+      "D": true,
+      "elapsedMs": 380237,
+      "workflowStatus": null,
+      "finishes": [
+        {
+          "root": true,
+          "finish": "stop"
+        }
+      ],
+      "usage": {
+        "requests": 26,
+        "unknown": 0,
+        "input_tokens": 776351,
+        "output_tokens": 14559,
+        "total_tokens": 790910,
+        "cached_tokens": 326656,
+        "reasoning_tokens": 7555,
+        "titleRequests": 1
+      },
+      "sense": 0,
+      "investigate": 0,
+      "patch": "patches/n07.patch",
+      "patchSha256": "f2558d0b2b88ebd95bbd731a70e8446ba53c9cdf4df9df4c47d9be65e97a4e44",
+      "patchKind": "plain-complete-tree"
+    },
+    {
+      "slot": 2,
+      "task": "visual-preferences",
+      "repetition": 1,
+      "arm": "Hbase",
+      "neutral": "n02",
+      "state": "completed",
+      "Q": true,
+      "T": true,
+      "D": true,
+      "elapsedMs": 487273,
+      "workflowStatus": "incomplete",
+      "finishes": [
+        {
+          "root": true,
+          "finish": "stop"
+        },
+        {
+          "root": false,
+          "finish": "stop"
+        }
+      ],
+      "usage": {
+        "requests": 40,
+        "unknown": 0,
+        "input_tokens": 1327715,
+        "output_tokens": 19885,
+        "total_tokens": 1347600,
+        "cached_tokens": 854528,
+        "reasoning_tokens": 9140,
+        "titleRequests": 1
+      },
+      "sense": 0,
+      "investigate": 0,
+      "patch": "patches/n02.patch",
+      "patchSha256": "d0c6ba1edd15a7877030dd8fed1db19abd73b74346258c3fdb849fc8132fc41a",
+      "patchKind": "native-terminal-patch"
+    },
+    {
+      "slot": 3,
+      "task": "visual-preferences",
+      "repetition": 1,
+      "arm": "Htools",
+      "neutral": "n11",
+      "state": "completed",
+      "Q": true,
+      "T": true,
+      "D": true,
+      "elapsedMs": 439731,
+      "workflowStatus": "incomplete",
+      "finishes": [
+        {
+          "root": true,
+          "finish": "stop"
+        },
+        {
+          "root": false,
+          "finish": "stop"
+        }
+      ],
+      "usage": {
+        "requests": 40,
+        "unknown": 0,
+        "input_tokens": 1419456,
+        "output_tokens": 18148,
+        "total_tokens": 1437604,
+        "cached_tokens": 126464,
+        "reasoning_tokens": 9171,
+        "titleRequests": 1
+      },
+      "sense": 2,
+      "investigate": 0,
+      "patch": "patches/n11.patch",
+      "patchSha256": "3f242ffbe7396130bd2ee4f018c861e256e66536b958eeab3f4bd7bd07bc7d87",
+      "patchKind": "native-terminal-patch"
+    },
+    {
+      "slot": 4,
+      "task": "visual-preferences",
+      "repetition": 2,
+      "arm": "Htools",
+      "neutral": "n04",
+      "state": "completed",
+      "Q": true,
+      "T": true,
+      "D": true,
+      "elapsedMs": 491850,
+      "workflowStatus": "incomplete",
+      "finishes": [
+        {
+          "root": true,
+          "finish": "stop"
+        },
+        {
+          "root": false,
+          "finish": "stop"
+        }
+      ],
+      "usage": {
+        "requests": 45,
+        "unknown": 0,
+        "input_tokens": 1625954,
+        "output_tokens": 19411,
+        "total_tokens": 1645365,
+        "cached_tokens": 186368,
+        "reasoning_tokens": 10555,
+        "titleRequests": 1
+      },
+      "sense": 2,
+      "investigate": 0,
+      "patch": "patches/n04.patch",
+      "patchSha256": "2a56d4e899deab5ab939bc3c16b7976bdc61e5db3209fe3a5e9222800c3bf74b",
+      "patchKind": "native-terminal-patch"
+    },
+    {
+      "slot": 5,
+      "task": "visual-preferences",
+      "repetition": 2,
+      "arm": "Hbase",
+      "neutral": "n09",
+      "state": "completed",
+      "Q": true,
+      "T": true,
+      "D": true,
+      "elapsedMs": 590900,
+      "workflowStatus": "incomplete",
+      "finishes": [
+        {
+          "root": true,
+          "finish": "stop"
+        },
+        {
+          "root": false,
+          "finish": "stop"
+        }
+      ],
+      "usage": {
+        "requests": 42,
+        "unknown": 0,
+        "input_tokens": 1800968,
+        "output_tokens": 21621,
+        "total_tokens": 1822589,
+        "cached_tokens": 972288,
+        "reasoning_tokens": 12213,
+        "titleRequests": 1
+      },
+      "sense": 0,
+      "investigate": 0,
+      "patch": "patches/n09.patch",
+      "patchSha256": "b7e260091e41c7bdf9d652f1f75264e1b4eb30bded463abfdae803c4f4f8c4f2",
+      "patchKind": "native-terminal-patch"
+    },
+    {
+      "slot": 6,
+      "task": "visual-preferences",
+      "repetition": 2,
+      "arm": "P",
+      "neutral": "n01",
+      "state": "completed",
+      "Q": true,
+      "T": true,
+      "D": true,
+      "elapsedMs": 513774,
+      "workflowStatus": null,
+      "finishes": [
+        {
+          "root": true,
+          "finish": "stop"
+        }
+      ],
+      "usage": {
+        "requests": 40,
+        "unknown": 0,
+        "input_tokens": 1558752,
+        "output_tokens": 20657,
+        "total_tokens": 1579409,
+        "cached_tokens": 890368,
+        "reasoning_tokens": 10473,
+        "titleRequests": 1
+      },
+      "sense": 0,
+      "investigate": 0,
+      "patch": "patches/n01.patch",
+      "patchSha256": "5384452b51a93ae3b7101602c3f473a955325cc06125aa23fffff8b3105f9038",
+      "patchKind": "plain-complete-tree"
+    },
+    {
+      "slot": 7,
+      "task": "url-search-params",
+      "repetition": 1,
+      "arm": "Hbase",
+      "neutral": "n12",
+      "state": "completed",
+      "Q": true,
+      "T": true,
+      "D": true,
+      "elapsedMs": 567227,
+      "workflowStatus": "incomplete",
+      "finishes": [
+        {
+          "root": true,
+          "finish": "stop"
+        },
+        {
+          "root": false,
+          "finish": "stop"
+        }
+      ],
+      "usage": {
+        "requests": 55,
+        "unknown": 0,
+        "input_tokens": 2364839,
+        "output_tokens": 21226,
+        "total_tokens": 2386065,
+        "cached_tokens": 1803264,
+        "reasoning_tokens": 13544,
+        "titleRequests": 1
+      },
+      "sense": 0,
+      "investigate": 0,
+      "patch": "patches/n12.patch",
+      "patchSha256": "08b8e68d430c190ab169a673c5d5a1721770c1b8e9470a7d1f63659848497eb0",
+      "patchKind": "native-terminal-patch"
+    },
+    {
+      "slot": 8,
+      "task": "url-search-params",
+      "repetition": 1,
+      "arm": "P",
+      "neutral": "n05",
+      "state": "completed",
+      "Q": false,
+      "T": true,
+      "D": false,
+      "elapsedMs": 671759,
+      "workflowStatus": null,
+      "finishes": [
+        {
+          "root": true,
+          "finish": "stop"
+        }
+      ],
+      "usage": {
+        "requests": 53,
+        "unknown": 0,
+        "input_tokens": 2577493,
+        "output_tokens": 25424,
+        "total_tokens": 2602917,
+        "cached_tokens": 2028032,
+        "reasoning_tokens": 16950,
+        "titleRequests": 1
+      },
+      "sense": 0,
+      "investigate": 0,
+      "patch": "patches/n05.patch",
+      "patchSha256": "09d9175fd4eb6c991b12b8efc149417b750b050809780ec566169969989e2697",
+      "patchKind": "plain-complete-tree"
+    },
+    {
+      "slot": 9,
+      "task": "url-search-params",
+      "repetition": 1,
+      "arm": "Htools",
+      "neutral": "n10",
+      "state": "completed",
+      "Q": true,
+      "T": true,
+      "D": true,
+      "elapsedMs": 761662,
+      "workflowStatus": "incomplete",
+      "finishes": [
+        {
+          "root": true,
+          "finish": "stop"
+        },
+        {
+          "root": false,
+          "finish": "stop"
+        }
+      ],
+      "usage": {
+        "requests": 47,
+        "unknown": 0,
+        "input_tokens": 2538900,
+        "output_tokens": 23784,
+        "total_tokens": 2562684,
+        "cached_tokens": 187904,
+        "reasoning_tokens": 14199,
+        "titleRequests": 1
+      },
+      "sense": 2,
+      "investigate": 0,
+      "patch": "patches/n10.patch",
+      "patchSha256": "dc2bc555348311615612d30c3cbe39866aedb6fc247bd6689b5b509888dc8fc6",
+      "patchKind": "native-terminal-patch"
+    },
+    {
+      "slot": 10,
+      "task": "url-search-params",
+      "repetition": 2,
+      "arm": "Htools",
+      "neutral": "n03",
+      "state": "stopped",
+      "Q": false,
+      "T": false,
+      "D": false,
+      "elapsedMs": 470541,
+      "workflowStatus": null,
+      "finishes": [
+        {
+          "root": true,
+          "finish": null
+        },
+        {
+          "root": false,
+          "finish": null
+        }
+      ],
+      "usage": {
+        "requests": 21,
+        "unknown": 1,
+        "input_tokens": 568421,
+        "output_tokens": 14361,
+        "total_tokens": 582782,
+        "cached_tokens": 80384,
+        "reasoning_tokens": 9006,
+        "titleRequests": 1
+      },
+      "sense": 0,
+      "investigate": 0,
+      "patch": "patches/n03.patch",
+      "patchSha256": "e60e6fee6e1d09197104249599e2f68d92c543a0d5011b0aa9a7b21b7633b400",
+      "patchKind": "retained-worktree-fallback"
+    },
+    {
+      "slot": 11,
+      "task": "url-search-params",
+      "repetition": 2,
+      "arm": "P",
+      "state": "not_started",
+      "Q": null,
+      "T": null,
+      "D": null,
+      "elapsedMs": null,
+      "workflowStatus": null,
+      "finishes": [],
+      "usage": {
+        "requests": 0,
+        "unknown": 0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "total_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "titleRequests": 0
+      },
+      "sense": 0,
+      "investigate": 0
+    },
+    {
+      "slot": 12,
+      "task": "url-search-params",
+      "repetition": 2,
+      "arm": "Hbase",
+      "state": "not_started",
+      "Q": null,
+      "T": null,
+      "D": null,
+      "elapsedMs": null,
+      "workflowStatus": null,
+      "finishes": [],
+      "usage": {
+        "requests": 0,
+        "unknown": 0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "total_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "titleRequests": 0
+      },
+      "sense": 0,
+      "investigate": 0
+    }
+  ]
+}

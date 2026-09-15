@@ -1,0 +1,200 @@
+[
+  {
+    "artifact": "historical-supplement/0d6ee00e6ab4/default-ttl-sensitivity/result.json",
+    "exit": 1,
+    "elapsedMs": 10137,
+    "terminationVerified": true,
+    "containerRemoved": true,
+    "realProviderRequests": 0,
+    "diagnosticExcerpt": "   75: });                                   \n\n  Value is not `true`:\n\n  false\n\n  › file://test.js:74:8\n\n  ─\n\n  1 test failed\n  ─\n\n  1 test failed",
+    "fullLocalOutputSha256": "c0737de0b0da76a44ec4f9992696720a810c5dff99e6f4c9d4a9ff0c57e99f3c",
+    "supersededDiagnostic": true
+  },
+  {
+    "artifact": "historical-supplement/0d6ee00e6ab4/isolated-default-ttl-sensitivity/result.json",
+    "exit": 1,
+    "elapsedMs": 4070,
+    "terminationVerified": true,
+    "containerRemoved": true,
+    "realProviderRequests": 0,
+    "diagnosticExcerpt": "   75: });                                   \n\n  Value is not `true`:\n\n  false\n\n  › file://test.js:74:8\n\n  ─\n\n  1 test failed\n  ─\n\n  1 test failed",
+    "fullLocalOutputSha256": "7d88af98f498c9ce9140182e54e9c7a32444bda16d63a83f0bd5a64895d38019",
+    "supersededDiagnostic": false
+  },
+  {
+    "artifact": "historical-supplement/26ece8019a92/subscription-inside-drain/result.json",
+    "exit": 1,
+    "elapsedMs": 3317,
+    "terminationVerified": true,
+    "containerRemoved": true,
+    "realProviderRequests": 0,
+    "diagnosticExcerpt": "{\"subscriptionCreatedInsideDrain\":true,\"settledBeforeReentrantWorkerFinished\":true}\nAssertionError [ERR_ASSERTION]: A subscription inside drain must wait until synchronous callbacks and their reentrant work leave the queue idle\n\ntrue !== false\n\n    at /work/repo/.supplemental.cjs:1:656 {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: true,\n  expected: false,\n  operator: 'strictEqual',\n  diff: 'simple'\n{\"subscriptionCreatedInsideDrain\":true,\"settledBeforeReentrantWorkerFinished\":true}\nAssertionError [ERR_ASSERTION]: A subscription inside drain must wait until synchronous callbacks and their reentrant work leave the queue idle\n\ntrue !== false\n\n    at /work/repo/.supplemental.cjs:1:656 {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: true,\n  expected: false,\n  operator: 'strictEqual',\n  diff: 'simple'\n}",
+    "fullLocalOutputSha256": "5708e6c1bbff45abf5dc8489dadfbbda565de628924037c8f4628aef967749fc",
+    "supersededDiagnostic": false
+  },
+  {
+    "artifact": "historical-supplement/4b726527599f/subscription-inside-drain/result.json",
+    "exit": 1,
+    "elapsedMs": 3451,
+    "terminationVerified": true,
+    "containerRemoved": true,
+    "realProviderRequests": 0,
+    "diagnosticExcerpt": "{\"subscriptionCreatedInsideDrain\":true,\"settledBeforeReentrantWorkerFinished\":true}\nAssertionError [ERR_ASSERTION]: A subscription inside drain must wait until synchronous callbacks and their reentrant work leave the queue idle\n\ntrue !== false\n\n    at /work/repo/.supplemental.cjs:1:656 {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: true,\n  expected: false,\n  operator: 'strictEqual',\n  diff: 'simple'\n{\"subscriptionCreatedInsideDrain\":true,\"settledBeforeReentrantWorkerFinished\":true}\nAssertionError [ERR_ASSERTION]: A subscription inside drain must wait until synchronous callbacks and their reentrant work leave the queue idle\n\ntrue !== false\n\n    at /work/repo/.supplemental.cjs:1:656 {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: true,\n  expected: false,\n  operator: 'strictEqual',\n  diff: 'simple'\n}",
+    "fullLocalOutputSha256": "5708e6c1bbff45abf5dc8489dadfbbda565de628924037c8f4628aef967749fc",
+    "supersededDiagnostic": false
+  },
+  {
+    "artifact": "historical-supplement/f4d825ced509/default-ttl-sensitivity/result.json",
+    "exit": 1,
+    "elapsedMs": 10209,
+    "terminationVerified": true,
+    "containerRemoved": true,
+    "realProviderRequests": 0,
+    "diagnosticExcerpt": "   73:   const remaining = lru.expiresIn('key');      \n\n  Difference (- actual, + expected):\n\n    [\n      [\n        'key',\n        'expired',\n      ],\n  -   [\n  -     'key',\n  -     'fresh',\n  -   ],\n    ]\n  ─\n\n  1 test failed",
+    "fullLocalOutputSha256": "dd8bbacc3a2bade0f874cb5b498cdd226039a85653ef82253580027bc43ac4d9",
+    "supersededDiagnostic": true
+  },
+  {
+    "artifact": "historical-supplement/f4d825ced509/isolated-default-ttl-sensitivity/result.json",
+    "exit": 1,
+    "elapsedMs": 4286,
+    "terminationVerified": true,
+    "containerRemoved": true,
+    "realProviderRequests": 0,
+    "diagnosticExcerpt": "   75:   t.is(lru.get('key'), 'fresh');               \n\n  Value is not `true`:\n\n  false\n\n  › file://test.js:74:8\n\n  ─\n\n  1 test failed\n  ─\n\n  1 test failed",
+    "fullLocalOutputSha256": "fe3bbc8278486976e2775dcae66e7ad2107ad37533422f81e64332cb98cb78f7",
+    "supersededDiagnostic": false
+  },
+  {
+    "artifact": "supplemental-controls/fastq-on-idle/alternative/subscription-inside-drain/result.json",
+    "exit": 1,
+    "elapsedMs": 3742,
+    "terminationVerified": true,
+    "containerRemoved": true,
+    "realProviderRequests": 0,
+    "diagnosticExcerpt": "{\"subscriptionCreatedInsideDrain\":true,\"settledBeforeReentrantWorkerFinished\":true}\nAssertionError [ERR_ASSERTION]: A subscription inside drain must wait until synchronous callbacks and their reentrant work leave the queue idle\n\ntrue !== false\n\n    at /work/repo/.supplemental.cjs:1:656 {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: true,\n  expected: false,\n  operator: 'strictEqual',\n  diff: 'simple'\n{\"subscriptionCreatedInsideDrain\":true,\"settledBeforeReentrantWorkerFinished\":true}\nAssertionError [ERR_ASSERTION]: A subscription inside drain must wait until synchronous callbacks and their reentrant work leave the queue idle\n\ntrue !== false\n\n    at /work/repo/.supplemental.cjs:1:656 {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: true,\n  expected: false,\n  operator: 'strictEqual',\n  diff: 'simple'\n}",
+    "fullLocalOutputSha256": "5708e6c1bbff45abf5dc8489dadfbbda565de628924037c8f4628aef967749fc",
+    "supersededDiagnostic": false
+  },
+  {
+    "artifact": "supplemental-controls/fastq-on-idle/reference/subscription-inside-drain/result.json",
+    "exit": 1,
+    "elapsedMs": 3691,
+    "terminationVerified": true,
+    "containerRemoved": true,
+    "realProviderRequests": 0,
+    "diagnosticExcerpt": "{\"subscriptionCreatedInsideDrain\":true,\"settledBeforeReentrantWorkerFinished\":true}\nAssertionError [ERR_ASSERTION]: A subscription inside drain must wait until synchronous callbacks and their reentrant work leave the queue idle\n\ntrue !== false\n\n    at /work/repo/.supplemental.cjs:1:656 {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: true,\n  expected: false,\n  operator: 'strictEqual',\n  diff: 'simple'\n{\"subscriptionCreatedInsideDrain\":true,\"settledBeforeReentrantWorkerFinished\":true}\nAssertionError [ERR_ASSERTION]: A subscription inside drain must wait until synchronous callbacks and their reentrant work leave the queue idle\n\ntrue !== false\n\n    at /work/repo/.supplemental.cjs:1:656 {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: true,\n  expected: false,\n  operator: 'strictEqual',\n  diff: 'simple'\n}",
+    "fullLocalOutputSha256": "5708e6c1bbff45abf5dc8489dadfbbda565de628924037c8f4628aef967749fc",
+    "supersededDiagnostic": false
+  },
+  {
+    "artifact": "supplemental-controls/ms-parse-compound/alternative/trailing-whitespace-contract/result.json",
+    "exit": 0,
+    "elapsedMs": 4371,
+    "terminationVerified": true,
+    "containerRemoved": true,
+    "realProviderRequests": 0,
+    "diagnosticExcerpt": "ℹ 2 files, total: 6.71 kB\n✔ Build complete in 220ms\n[{\"code\":10,\"input\":\"1h 30m\\n\",\"actual\":\"NaN\",\"pass\":true},{\"code\":13,\"input\":\"1h 30m\\r\",\"actual\":\"NaN\",\"pass\":true},{\"code\":8232,\"input\":\"1h 30m\n\",\"actual\":\"NaN\",\"pass\":true},{\"code\":8233,\"input\":\"1h 30m\n\",\"actual\":\"NaN\",\"pass\":true}]\n✔ Build complete in 220ms\n[{\"code\":10,\"input\":\"1h 30m\\n\",\"actual\":\"NaN\",\"pass\":true},{\"code\":13,\"input\":\"1h 30m\\r\",\"actual\":\"NaN\",\"pass\":true},{\"code\":8232,\"input\":\"1h 30m\n\",\"actual\":\"NaN\",\"pass\":true},{\"code\":8233,\"input\":\"1h 30m\n\",\"actual\":\"NaN\",\"pass\":true}]",
+    "fullLocalOutputSha256": "25615c22860ca2de02b83178878f998b953787e695853e39067d71cc39b1918b",
+    "supersededDiagnostic": false
+  },
+  {
+    "artifact": "supplemental-controls/ms-parse-compound/reference/trailing-whitespace-contract/result.json",
+    "exit": 0,
+    "elapsedMs": 3782,
+    "terminationVerified": true,
+    "containerRemoved": true,
+    "realProviderRequests": 0,
+    "diagnosticExcerpt": "ℹ 2 files, total: 6.73 kB\n✔ Build complete in 230ms\n[{\"code\":10,\"input\":\"1h 30m\\n\",\"actual\":\"NaN\",\"pass\":true},{\"code\":13,\"input\":\"1h 30m\\r\",\"actual\":\"NaN\",\"pass\":true},{\"code\":8232,\"input\":\"1h 30m\n\",\"actual\":\"NaN\",\"pass\":true},{\"code\":8233,\"input\":\"1h 30m\n\",\"actual\":\"NaN\",\"pass\":true}]\n✔ Build complete in 230ms\n[{\"code\":10,\"input\":\"1h 30m\\n\",\"actual\":\"NaN\",\"pass\":true},{\"code\":13,\"input\":\"1h 30m\\r\",\"actual\":\"NaN\",\"pass\":true},{\"code\":8232,\"input\":\"1h 30m\n\",\"actual\":\"NaN\",\"pass\":true},{\"code\":8233,\"input\":\"1h 30m\n\",\"actual\":\"NaN\",\"pass\":true}]",
+    "fullLocalOutputSha256": "20eb694789f4d50e4602546cc90a70c5cae6e8b1802c58e44994cbfe0dfdac23",
+    "supersededDiagnostic": false
+  },
+  {
+    "artifact": "supplemental-controls/quick-lru-computed/alternative/default-ttl-sensitivity/result.json",
+    "exit": 1,
+    "elapsedMs": 9287,
+    "terminationVerified": true,
+    "containerRemoved": true,
+    "realProviderRequests": 0,
+    "diagnosticExcerpt": "  ─\n\n  1 test failed",
+    "fullLocalOutputSha256": "068c7833a3278e1466f65b69cf9eb2b68e6ae163dd13d586cca2304e67de2b92",
+    "supersededDiagnostic": true
+  },
+  {
+    "artifact": "supplemental-controls/quick-lru-computed/alternative/isolated-default-ttl-sensitivity/result.json",
+    "exit": 1,
+    "elapsedMs": 4354,
+    "terminationVerified": true,
+    "containerRemoved": true,
+    "realProviderRequests": 0,
+    "diagnosticExcerpt": "  ─\n\n  1 test failed",
+    "fullLocalOutputSha256": "09519c4b6e312750154f0c05458436b7514db7cea3a73dcd76afb5ca5ac37ecf",
+    "supersededDiagnostic": false
+  },
+  {
+    "artifact": "supplemental-controls/quick-lru-computed/reference/default-ttl-sensitivity/result.json",
+    "exit": 1,
+    "elapsedMs": 8612,
+    "terminationVerified": true,
+    "containerRemoved": true,
+    "realProviderRequests": 0,
+    "diagnosticExcerpt": "   341: });                     \n\n  Value is not `false`:\n\n  true\n\n  › file://test.js:340:9\n\n  ─\n\n  2 tests failed\n  ─\n\n  2 tests failed",
+    "fullLocalOutputSha256": "397940d0a67c9a78e6f5a1eb8ccd0196e2831f93c66dc300668b01a6b1412bbc",
+    "supersededDiagnostic": true
+  },
+  {
+    "artifact": "supplemental-controls/quick-lru-computed/reference/isolated-default-ttl-sensitivity/result.json",
+    "exit": 1,
+    "elapsedMs": 4274,
+    "terminationVerified": true,
+    "containerRemoved": true,
+    "realProviderRequests": 0,
+    "diagnosticExcerpt": "  ─\n\n  1 test failed",
+    "fullLocalOutputSha256": "527f951a8c458594f69550da63b8cdd8ed6537d6cd006776e8122e4cd251d4b3",
+    "supersededDiagnostic": false
+  },
+  {
+    "artifact": "supplemental-controls/ufo-append-query/alternative/empty-array-sensitivity/result.json",
+    "exit": 1,
+    "elapsedMs": 4897,
+    "terminationVerified": true,
+    "containerRemoved": true,
+    "realProviderRequests": 0,
+    "diagnosticExcerpt": "\n FAIL  test/h00-contract.test.ts > new public contract\nAssertionError: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'https://x.test/p?a=1&a=2&a=3&a=4&zero=0&no=false&nil&blank#f'\n- 'https://x.test/p?a=1&a=2&a=3&a=4&empty=x&zero=0&no=false&nil&blank#f'\n\n\nExpected: \"https://x.test/p?a=1&a=2&a=3&a=4&empty=x&zero=0&no=false&nil&blank#f\"\nReceived: \"https://x.test/p?a=1&a=2&a=3&a=4&zero=0&no=false&nil&blank#f\"\n\n ❯ test/h00-contract.test.ts:17:5\n     15|     before = JSON.stringify(q);",
+    "fullLocalOutputSha256": "d94f0e70b5c1ab86cf708d04a6c5b82da7f1d2472923c84a68fa5975229a3908",
+    "supersededDiagnostic": false
+  },
+  {
+    "artifact": "supplemental-controls/ufo-append-query/alternative/empty-value-interpretation/result.json",
+    "exit": 0,
+    "elapsedMs": 3705,
+    "terminationVerified": true,
+    "containerRemoved": true,
+    "realProviderRequests": 0,
+    "diagnosticExcerpt": "Σ Total dist size (byte size): 99.2 kB\n\nIndependent behavior passed",
+    "fullLocalOutputSha256": "5ec5ae69d38fbf313ccbb3818529f0deb14fbfef06e7548671b0efcdb1af9807",
+    "supersededDiagnostic": false
+  },
+  {
+    "artifact": "supplemental-controls/ufo-append-query/reference/empty-array-sensitivity/result.json",
+    "exit": 1,
+    "elapsedMs": 6157,
+    "terminationVerified": true,
+    "containerRemoved": true,
+    "realProviderRequests": 0,
+    "diagnosticExcerpt": "\n FAIL  test/h00-contract.test.ts > new public contract\nAssertionError: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'https://x.test/p?a=1&a=2&a=3&a=4&zero=0&no=false&nil&blank#f'\n- 'https://x.test/p?a=1&a=2&a=3&a=4&empty=x&zero=0&no=false&nil&blank#f'\n\n\nExpected: \"https://x.test/p?a=1&a=2&a=3&a=4&empty=x&zero=0&no=false&nil&blank#f\"\nReceived: \"https://x.test/p?a=1&a=2&a=3&a=4&zero=0&no=false&nil&blank#f\"\n\n ❯ test/h00-contract.test.ts:17:5\n     15|     before = JSON.stringify(q);",
+    "fullLocalOutputSha256": "6597a143eada3d80abddc9e53145d812f5b11385ed5fc9611d9f7c0825d6641c",
+    "supersededDiagnostic": false
+  },
+  {
+    "artifact": "supplemental-controls/ufo-append-query/reference/empty-value-interpretation/result.json",
+    "exit": 0,
+    "elapsedMs": 4293,
+    "terminationVerified": true,
+    "containerRemoved": true,
+    "realProviderRequests": 0,
+    "diagnosticExcerpt": "Σ Total dist size (byte size): 99.1 kB\n\nIndependent behavior passed",
+    "fullLocalOutputSha256": "3f7e105d4ab1f92cb5ebdcc301b18c1e501aa1e4594b8f854483e6588eaad1a1",
+    "supersededDiagnostic": false
+  }
+]

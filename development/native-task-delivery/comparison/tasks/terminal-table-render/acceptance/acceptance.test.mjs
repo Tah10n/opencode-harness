@@ -1,0 +1,5 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import path from 'node:path';const root=process.env.PILOT_SOURCE;
+const m0=await import(path.join(root,"src/width.mjs"));const m1=await import(path.join(root,"src/table.mjs"));
+test("color and code points align consumer",()=>{assert.equal(m1.render([['[31mR[0m','😀'],['long','x']]),'[31mR[0m    | 😀\nlong | x');});
+test("width contract and source preservation",()=>{assert.equal(m0.visibleWidth('😀é'),3);assert.equal(m0.visibleWidth('[mx'),1);const r=Object.freeze([Object.freeze(['x','yy']),Object.freeze(['zz','a'])]);assert.equal(m1.render(r),'x  | yy\nzz | a ');assert.equal(r[0][0],'x');});
+test("empty shapes",()=>{assert.equal(m1.render([]),'');assert.equal(m1.render([[],[]]),'\n');});

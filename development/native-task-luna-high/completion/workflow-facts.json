@@ -1,0 +1,296 @@
+[
+  {
+    "label": "J3",
+    "slot": 2,
+    "task": "legacy-runtime-reload",
+    "arm": "H",
+    "status": "incomplete",
+    "repairsAdmitted": 0,
+    "stages": [
+      {
+        "label": "implementation",
+        "role": "author",
+        "elapsedMs": 332521
+      }
+    ],
+    "snapshots": [
+      {
+        "label": "initial",
+        "snapshotSha256": "0d9d8d1f865ff2d57262ff4c63d4395b071613a758658a76c3741ce79d00f33b"
+      }
+    ],
+    "limits": [
+      "Native permission boundary rejected a tool; no evidence correction admitted",
+      "Terminal state or processes differ from the observed delivery"
+    ],
+    "correctionReasons": null,
+    "observations": [],
+    "nativeToolErrors": [
+      {
+        "tool": "bash",
+        "error": "Mutation/check tools must execute sequentially; source reads may run together",
+        "command": "git status --short && git diff --stat && git log --oneline -5"
+      },
+      {
+        "tool": "bash",
+        "error": "The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules [{\"permission\":\"*\",\"action\":\"allow\",\"pattern\":\"*\"},{\"permission\":\"external_directory\",\"pattern\":\"*\",\"action\":\"ask\"},{\"permission\":\"external_directory\",\"pattern\":\"/work/data/opencode/tool-output/*\",\"action\":\"allow\"},{\"permission\":\"external_directory\",\"pattern\":\"/work/tmp/opencode/*\",\"action\":\"allow\"},{\"permission\":\"external_directory\",\"action\":\"deny\",\"pattern\":\"*\"},{\"permission\":\"external_directory\",\"pattern\":\"/work/data/opencode/tool-output/*\",\"action\":\"allow\"}]",
+        "command": "git status --short; git diff --stat; git log --oneline -5"
+      },
+      {
+        "tool": "bash",
+        "error": "Native permission boundary rejected a tool; no evidence correction admitted",
+        "command": "git diff --check"
+      },
+      {
+        "tool": "grep",
+        "error": "Native permission boundary rejected a tool; no evidence correction admitted",
+        "command": ""
+      },
+      {
+        "tool": "grep",
+        "error": "Native permission boundary rejected a tool; no evidence correction admitted",
+        "command": ""
+      },
+      {
+        "tool": "grep",
+        "error": "Native permission boundary rejected a tool; no evidence correction admitted",
+        "command": ""
+      },
+      {
+        "tool": "grep",
+        "error": "Native permission boundary rejected a tool; no evidence correction admitted",
+        "command": ""
+      },
+      {
+        "tool": "glob",
+        "error": "Native permission boundary rejected a tool; no evidence correction admitted",
+        "command": ""
+      },
+      {
+        "tool": "read",
+        "error": "Native permission boundary rejected a tool; no evidence correction admitted",
+        "command": ""
+      },
+      {
+        "tool": "apply_patch",
+        "error": "Native permission boundary rejected a tool; no evidence correction admitted",
+        "command": ""
+      },
+      {
+        "tool": "read",
+        "error": "Native permission boundary rejected a tool; no evidence correction admitted",
+        "command": ""
+      },
+      {
+        "tool": "bash",
+        "error": "Native permission boundary rejected a tool; no evidence correction admitted",
+        "command": "pwd"
+      },
+      {
+        "tool": "todowrite",
+        "error": "Native permission boundary rejected a tool; no evidence correction admitted",
+        "command": ""
+      },
+      {
+        "tool": "glob",
+        "error": "Native permission boundary rejected a tool; no evidence correction admitted",
+        "command": ""
+      },
+      {
+        "tool": "read",
+        "error": "Native permission boundary rejected a tool; no evidence correction admitted",
+        "command": ""
+      },
+      {
+        "tool": "read",
+        "error": "Native permission boundary rejected a tool; no evidence correction admitted",
+        "command": ""
+      },
+      {
+        "tool": "apply_patch",
+        "error": "Native permission boundary rejected a tool; no evidence correction admitted",
+        "command": ""
+      },
+      {
+        "tool": "apply_patch",
+        "error": "Native permission boundary rejected a tool; no evidence correction admitted",
+        "command": ""
+      },
+      {
+        "tool": "glob",
+        "error": "Native permission boundary rejected a tool; no evidence correction admitted",
+        "command": ""
+      },
+      {
+        "tool": "bash",
+        "error": "Native permission boundary rejected a tool; no evidence correction admitted",
+        "command": "ls"
+      },
+      {
+        "tool": "bash",
+        "error": "Native permission boundary rejected a tool; no evidence correction admitted",
+        "command": "node --test --test-concurrency=1 packages/connector/test/state-security.test.mjs packages/connector/test/executables.test.mjs packages/connector/test/protocol.test.mjs"
+      },
+      {
+        "tool": "read",
+        "error": "Native permission boundary rejected a tool; no evidence correction admitted",
+        "command": ""
+      },
+      {
+        "tool": "read",
+        "error": "Native permission boundary rejected a tool; no evidence correction admitted",
+        "command": ""
+      },
+      {
+        "tool": "webfetch",
+        "error": "Native permission boundary rejected a tool; no evidence correction admitted",
+        "command": ""
+      },
+      {
+        "tool": "read",
+        "error": "Native permission boundary rejected a tool; no evidence correction admitted",
+        "command": ""
+      },
+      {
+        "tool": "apply_patch",
+        "error": "Native permission boundary rejected a tool; no evidence correction admitted",
+        "command": ""
+      },
+      {
+        "tool": "bash",
+        "error": "Native permission boundary rejected a tool; no evidence correction admitted",
+        "command": "pwd"
+      }
+    ]
+  },
+  {
+    "label": "N8",
+    "slot": 3,
+    "task": "reconnect-revoked",
+    "arm": "H",
+    "status": "incomplete",
+    "repairsAdmitted": 3,
+    "stages": [
+      {
+        "label": "implementation",
+        "role": "author",
+        "elapsedMs": 462868
+      },
+      {
+        "label": "correction",
+        "role": "author",
+        "elapsedMs": 407435
+      },
+      {
+        "label": "correction-2",
+        "role": "author",
+        "elapsedMs": 20023
+      }
+    ],
+    "snapshots": [
+      {
+        "label": "initial",
+        "snapshotSha256": "7fb83f51abbc845d7025ab1eab855b706c7573315c5e1e03f16c0ff32dbbdf0b"
+      },
+      {
+        "label": "D0",
+        "snapshotSha256": "f5b918792ce109d2e67c44d7fe807472fab8aa98de519cb2519c8f3e293c09c6"
+      },
+      {
+        "label": "D1",
+        "snapshotSha256": "0554bbe2a9f7a1489d091eac993cc935c66af343ad16fa6e66b6bb827b24fec1"
+      },
+      {
+        "label": "D2",
+        "snapshotSha256": "0554bbe2a9f7a1489d091eac993cc935c66af343ad16fa6e66b6bb827b24fec1"
+      }
+    ],
+    "limits": [],
+    "correctionReasons": [
+      "Missing final verification after the last mutation: node --test --test-concurrency=1 --test-name-pattern=reconnect packages/connector/test/config.test.mjs"
+    ],
+    "observations": [
+      {
+        "phase": "D0",
+        "snapshotSha256": "f5b918792ce109d2e67c44d7fe807472fab8aa98de519cb2519c8f3e293c09c6",
+        "reasons": [
+          "Explicit project/task check not observed: node --test --test-name-pattern=reconnect packages/connector/test/config.test.mjs"
+        ],
+        "limits": [
+          "Uninterpreted command failures are retained; their relevance and any baseline/environment exception remain unverified.",
+          "Literal check from original task unavailable or not observed: node --test --test-name-pattern=reconnect packages/connector/test/config.test.mjs"
+        ],
+        "checksCurrent": false,
+        "coverageWarnings": [
+          "Assess changed test scenarios against the original task; changed bytes alone do not require another author turn."
+        ],
+        "deliveryLimitations": [
+          "Check results do not establish delivery of every original obligation or semantic equivalence of stateful scenarios; inspect the delivered patch and author explanation."
+        ]
+      },
+      {
+        "phase": "D1",
+        "snapshotSha256": "0554bbe2a9f7a1489d091eac993cc935c66af343ad16fa6e66b6bb827b24fec1",
+        "reasons": [
+          "Missing final verification after the last mutation: node --test --test-concurrency=1 --test-name-pattern=reconnect packages/connector/test/config.test.mjs"
+        ],
+        "limits": [
+          "Uninterpreted command failures are retained; their relevance and any baseline/environment exception remain unverified.",
+          "Required or unresolved project checks failed, lacked test results or were not repeated after the last mutation."
+        ],
+        "checksCurrent": false,
+        "coverageWarnings": [
+          "Assess changed test scenarios against the original task; changed bytes alone do not require another author turn."
+        ],
+        "deliveryLimitations": [
+          "Check results do not establish delivery of every original obligation or semantic equivalence of stateful scenarios; inspect the delivered patch and author explanation."
+        ]
+      },
+      {
+        "phase": "D2",
+        "snapshotSha256": "0554bbe2a9f7a1489d091eac993cc935c66af343ad16fa6e66b6bb827b24fec1",
+        "reasons": [
+          "Missing final verification after the last mutation: node --test --test-concurrency=1 --test-name-pattern=reconnect packages/connector/test/config.test.mjs"
+        ],
+        "limits": [
+          "Uninterpreted command failures are retained; their relevance and any baseline/environment exception remain unverified.",
+          "Required or unresolved project checks failed, lacked test results or were not repeated after the last mutation."
+        ],
+        "checksCurrent": false,
+        "coverageWarnings": [
+          "Assess changed test scenarios against the original task; changed bytes alone do not require another author turn."
+        ],
+        "deliveryLimitations": [
+          "Check results do not establish delivery of every original obligation or semantic equivalence of stateful scenarios; inspect the delivered patch and author explanation."
+        ]
+      }
+    ],
+    "nativeToolErrors": [
+      {
+        "tool": "bash",
+        "error": "Mutation/check tools must execute sequentially; source reads may run together",
+        "command": "git status --short && git diff -- packages/connector/bin/viberacing.mjs packages/connector/lib/connection-lifecycle.mjs packages/connector/test/config.test.mjs packages/connector/README.md"
+      },
+      {
+        "tool": "grep",
+        "error": "Mutation/check tools must execute sequentially; source reads may run together",
+        "command": ""
+      },
+      {
+        "tool": "grep",
+        "error": "Mutation/check tools must execute sequentially; source reads may run together",
+        "command": ""
+      },
+      {
+        "tool": "bash",
+        "error": "Mutation/check tools must execute sequentially; source reads may run together",
+        "command": "git diff --stat"
+      },
+      {
+        "tool": "grep",
+        "error": "Mutation/check tools must execute sequentially; source reads may run together",
+        "command": ""
+      }
+    ]
+  }
+]

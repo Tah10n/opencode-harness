@@ -1,0 +1,138 @@
+{
+  "id": "7c3df8a293a7",
+  "task": "denque-remove-where",
+  "project": "denque",
+  "Q": 1,
+  "findings": [],
+  "contentReview": {
+    "id": "7c3df8a293a7",
+    "task": "denque-remove-where",
+    "project": "denque",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete-pending-mechanical-checks",
+    "Q": null,
+    "behaviorReview": "Snapshot and match evaluation finish before clearing/writing slots; original references retained, _capacity unchanged, tail normalized. Non-function validated before empty early return.",
+    "retainedTestsReview": "All original regression cases retained; separate suite inserted.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": true,
+        "evidence": "Exact original order/index trace, mixed survivors and none/all counts."
+      },
+      {
+        "scenario": 2,
+        "covered": true,
+        "evidence": "Returns a match before throwing original Error; strict identity assertions retain every original entry. Null on empty throws."
+      },
+      {
+        "scenario": 3,
+        "covered": true,
+        "evidence": "Wrapped capacity-4 queue with duplicate marker object and falsy values filters, checks both marker identities and configured _capacity, then push/unshift plus overflow proves cap and order preserved."
+      }
+    ],
+    "typesReview": "Generic predicate value/index and unknown return; consumer value.length truthy result and numeric removed assignment supplied.",
+    "docsReview": "README and API cover order, original indexes, truthy filtering, removed count, invalid predicate and atomic thrown error with valid examples.",
+    "contentFindings": [],
+    "pending": [
+      "ordinary project checks",
+      "independent behavior",
+      "ordinary patch applicability",
+      "configured-capacity test sensitivity"
+    ],
+    "recordStage": "Initial neutral review retained as history; final Q, findings and assessmentNotes supersede pending hypotheses."
+  },
+  "ordinaryExit": 0,
+  "originalIndependentExit": 0,
+  "interpretedIndependentExit": 0,
+  "applicability": {
+    "id": "7c3df8a293a7",
+    "task": "denque-remove-where",
+    "sourceCommit": "539105bb57854e997dd469221cdc52a0ad80e0a2",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "d4179fbe5556e631a5c4b068e8adaa049d906c3603c209db25929b44bf82c3e0",
+    "excludedPreparationArtifacts": [],
+    "types": null
+  },
+  "sourcePatchSha256": "d4179fbe5556e631a5c4b068e8adaa049d906c3603c209db25929b44bf82c3e0",
+  "sourcePatchBytes": 7184,
+  "assessmentNotes": [],
+  "slot": 28,
+  "repetition": 2,
+  "arm": "H00",
+  "D": 1,
+  "verification": [
+    {
+      "artifact": "reviews/7c3df8a293a7/independent/result.json",
+      "exit": 0,
+      "elapsedMs": 708,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "Independent behavior passed",
+      "fullLocalOutputSha256": "f9c69e05a31a62e04881e10139c67883f681accefebbe3f3ff50d81e2a6a7a6e",
+      "supersededDiagnostic": false
+    },
+    {
+      "artifact": "reviews/7c3df8a293a7/ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 1832,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "=============================================================================\n\n=============================== Coverage summary ===============================\nStatements   : 98.98% ( 291/294 )\nBranches     : 97.83% ( 135/138 )\nFunctions    : 100% ( 24/24 )\nLines        : 100% ( 261/261 )\n================================================================================\n\n> denque@2.1.0 typescript\n> tsc --project ./test/type/tsconfig.json\n",
+      "fullLocalOutputSha256": "eec29e1aa8f9d6491ce59875e80331ec44faccd3a2da1ec06325b168331ed4e4",
+      "supersededDiagnostic": false
+    },
+    {
+      "artifact": "reviews/7c3df8a293a7/test-sensitivity/result.json",
+      "exit": 1,
+      "elapsedMs": 1892,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "\n  54 passing (220ms)\n  1 failing\n\n  1) Denque.prototype.removeWhere should filter wrapped capacity queues without losing identity or capacity:\n     AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\nundefined !== 4\n\n      at Context.<anonymous> (test/denque.js:526:12)\n      at process.processImmediate (node:internal/timers:534:21)\n\n\n\n\n  1) Denque.prototype.removeWhere should filter wrapped capacity queues without losing identity or capacity:\n     AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\nundefined !== 4\n\n      at Context.<anonymous> (test/denque.js:526:12)\n      at process.processImmediate (node:internal/timers:534:21)\n\n\n\n=============================================================================\nWriting coverage object [/work/repo/coverage/coverage.json]\nWriting coverage reports at [/work/repo/coverage]",
+      "fullLocalOutputSha256": "37ec65f84aca78067402b13bf160cdcc49a40d093a324c63eb12095da9b9d3bd",
+      "supersededDiagnostic": false
+    }
+  ],
+  "native": {
+    "completed": true,
+    "exitCode": 0,
+    "signal": null,
+    "lastStepFinish": "stop",
+    "normalHandoff": true,
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "workflowStatus": "incomplete",
+    "terminalPatchVerification": {
+      "slot": 28,
+      "id": "7c3df8a293a7",
+      "terminalPatchSha256": "4f8cdafadbd9c6a0619e5d26287026e66bbaccea2ae743e97c2460720ccf78ba",
+      "sourcePatchSha256": "d4179fbe5556e631a5c4b068e8adaa049d906c3603c209db25929b44bf82c3e0",
+      "ordinaryCleanSourceForwardApplyExit": 0,
+      "terminalPatchDeliversAllAuthorBytesAndModes": true,
+      "nativeHandoffNamesDeliveryAndPatch": true
+    },
+    "lastNativeTextSha256": "ea233aa36b5fd49082bd0d27e205ffa345df20cbc02af7ea58a72f5c9f7839cc",
+    "normalFinalResponse": true,
+    "finalResponseExcerpt": "Native task workflow: incomplete.\nDelivery worktree: /work/repo/.git/harness-task/[task]/worktree.\nTerminal patch: /work/repo/.git/harness-task/[task]/terminal.patch.\nFull report and tool outputs: /work/repo/.git/harness-task/[task].\nOriginal checkout unchanged by workflow transfer.",
+    "authorExplanationExcerpt": "\nImplemented `removeWhere(predicate)` with atomic predicate evaluation, original indexes, truthy matching, wrapped queue support, capacity preservation, and identity retention.\n\nUpdated:\n- `index.js`\n- `index.d.ts`\n- Mocha and TypeScript regression tests\n- `README.md`\n- `docs/api.mdx`\n\nChecks passed:\n- New-behavior Node regression\n- `npm test`: 55 passing\n- TypeScript declarations\n- `git diff --check`\n\nNo commit or dependency changes made.",
+    "reportFindings": [
+      {
+        "category": "misleading-workflow-report",
+        "evidence": "Final workflow lists successful relevant project commands but claims no relevant project check was observed. Real applicable delivery and terminal patch are named; conservative incomplete does not alone remove D."
+      }
+    ]
+  }
+}

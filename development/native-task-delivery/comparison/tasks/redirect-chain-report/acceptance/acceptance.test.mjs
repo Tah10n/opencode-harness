@@ -1,0 +1,5 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import path from 'node:path';const root=process.env.PILOT_SOURCE;
+const m0=await import(path.join(root,"src/follow.mjs"));const m1=await import(path.join(root,"src/report.mjs"));
+test("chains and cycles reach report",()=>{assert.equal(m1.report(['a','x'],{a:'b',b:'c',x:'y',y:'x'}),'a -> b -> c\nx -> y -> [cycle:x]');});
+test("own keys and empty target",()=>{assert.deepEqual(m0.follow('a',{a:''}),{chain:['a',''],terminal:'',cycle:false});assert.deepEqual(m0.follow('__proto__',{}),{chain:['__proto__'],terminal:'__proto__',cycle:false});const l=Object.freeze({a:'a'});assert.equal(m1.report(['a'],l),'a -> [cycle:a]');assert.equal(l.a,'a');});
+test("repeat entry is not duplicated",()=>{assert.deepEqual(m0.follow('a',{a:'b',b:'c',c:'b'}),{chain:['a','b','c'],terminal:'b',cycle:true});assert.equal(m1.report([],{}),'');});

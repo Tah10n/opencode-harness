@@ -1,0 +1,16 @@
+{
+  "candidate": "afa20bff3283fad5aeacf7b840f8e6affa7396f8",
+  "freezeSha256": "422186857321662c112b79f14c86f4335d31bcc9f1c71a4a55e19f2cf3fb44aa",
+  "frozenFileCount": 12750,
+  "supplementalContractsSha256": "6e94f534f0fadf15944a5921f87c87acb6a925ac98279584b55d12eb5da98890",
+  "frozenFilesUnchanged": true,
+  "originalHTreesUnchanged": true,
+  "authorContainersVerifiedAbsent": true,
+  "patchesApplied": 17,
+  "patchesWithoutHarnessAdministrativeDependency": true,
+  "deliveredRegressionFailures": 0,
+  "modelRetries": 0,
+  "providerRequests": 385,
+  "manualActions": 0,
+  "independentPairs": 0
+}

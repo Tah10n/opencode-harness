@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {invoice} from '../src/invoice.mjs';test('unordered changes and credit',()=>assert.deepEqual(invoice(0,10,{id:'a',price:100},[{day:7,plan:{id:'c',price:30}},{day:3,plan:{id:'b',price:50}}],100),{lines:[{plan:'a',start:0,end:3,cents:30},{plan:'b',start:3,end:7,cents:20},{plan:'c',start:7,end:10,cents:9}],total:59,adjustment:-41}));test('merge redundant plans before rounding',()=>assert.equal(invoice(0,3,{id:'a',price:2},[{day:1,plan:{id:'a',price:2}},{day:2,plan:{id:'a',price:2}}],0).total,2));

@@ -1,0 +1,1 @@
+export function compare(a,b){return JSON.stringify(a)===JSON.stringify(b)?'equal':'concurrent';}export function merge(a,b){return {...a,...b};}export function createClock(initial={}){let state={...initial};return {observe(other){state={...state,...other};},tick(actor){state[actor]=(state[actor]??0)+1;return state[actor];},snapshot(){return {...state};}};}

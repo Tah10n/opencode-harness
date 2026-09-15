@@ -1,0 +1,122 @@
+diff --git a/index.d.ts b/index.d.ts
+index 3e8ac46..6863484 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -69,6 +69,7 @@ export default class QuickLRU<KeyType, ValueType> extends Map<KeyType, ValueType
+ 	@returns The stored item or `undefined`.
+ 	*/
+ 	get(key: KeyType): ValueType | undefined;
++	pruneExpired(): number;
+ 
+ 	/**
+ 	Check if an item exists.
+diff --git a/index.js b/index.js
+index 7f87cf5..f68d311 100644
+--- a/index.js
++++ b/index.js
+@@ -102,6 +102,18 @@ export default class QuickLRU extends Map {
+ 		}
+ 	}
+ 
++	pruneExpired() {
++		let count = 0;
++		const visible = new Map([...this.#oldCache, ...this.#cache]);
++		for (const [key, item] of visible) {
++			if (this.#deleteIfExpired(key, item)) {
++				count++;
++			}
++		}
++
++		return count;
++	}
++
+ 	get(key) {
+ 		if (this.#cache.has(key)) {
+ 			const item = this.#cache.get(key);
+diff --git a/index.test-d.ts b/index.test-d.ts
+index bc4b63e..b111d35 100644
+--- a/index.test-d.ts
++++ b/index.test-d.ts
+@@ -24,3 +24,5 @@ for (const key of lru.keys()) {
+ for (const value of lru.values()) {
+ 	expectType<number>(value);
+ }
++
++expectType<number>(lru.pruneExpired());
+diff --git a/readme.md b/readme.md
+index bad09c3..c7b87f6 100644
+--- a/readme.md
++++ b/readme.md
+@@ -234,3 +234,8 @@ Consider alternatives when:
+ ## Related
+ 
+ - [yocto-queue](https://github.com/sindresorhus/yocto-queue) - Tiny queue data structure
++
++
++## quick-lru-prune
++
++The API provides pruneExpired(): number, removing all logically visible expired entries from both cache generations without promoting or reordering live entries. Return the number of logical keys removed. Use the existing expiry boundary (expiry <= Date.now()) and normal expiration eviction callback. When a current entry shadows an old entry for the same key, the current entry determines visibility: an expired shadowed old value must not delete a live current value or trigger a duplicate callback. Expiring the visible current value must not resurrect a shadowed old value. Preserve finite/infinite lifetimes, stored undefined, resize/size/iteration behavior and subsequent cache reuse. Include declarations, regression tests and API documentation.
+diff --git a/test.js b/test.js
+index 0904dc2..d82d3d7 100644
+--- a/test.js
++++ b/test.js
+@@ -1,4 +1,5 @@
+ import {setTimeout as delay} from 'node:timers/promises';
++import * as A from 'node:assert/strict';
+ import test from 'ava';
+ import QuickLRU from './index.js';
+ 
+@@ -1725,3 +1726,53 @@ test('.evict() with custom maxAge and global maxAge interaction', async t => {
+ 	t.is(lru.size, 1);
+ 	t.true(lru.has('noglobal')); // Most recent should remain
+ });
++test('new public contract', t => {
++	let now = 1000;
++	const clock = Date.now;
++	Date.now = () => now;
++	try {
++		const ev = [];
++		const q = new QuickLRU({
++			maxSize: 3, onEviction: (...x) => ev.push(x),
++		});
++		q.set('old-expired', 1, {
++			maxAge: 1,
++		});
++		q.set('shadow', 2, {
++			maxAge: 1,
++		});
++		q.set('old-live', 3);
++		q.set('shadow', 4);
++		q.set('current-expired', undefined, {
++			maxAge: 1,
++		});
++		now = 1001;
++		A.equal(q.pruneExpired(), 2);
++		A.deepEqual([...q.entriesAscending()], [['old-live', 3], ['shadow', 4]]);
++		A.deepEqual(ev, [['old-expired', 1], ['current-expired', undefined]]);
++		A.equal(q.pruneExpired(), 0);
++		A.equal(q.size, 2);
++		const r = new QuickLRU({
++			maxSize: 2,
++		});
++		r.set('x', 'old');
++		r.set('y', 'live');
++		r.set('x', 'new', {
++			maxAge: 1,
++		});
++		now++;
++		A.equal(r.pruneExpired(), 1);
++		A.equal(r.has('x'), false);
++		A.equal(r.get('x'), undefined);
++		A.equal(r.get('y'), 'live');
++		r.resize(1);
++		r.clear();
++		A.equal(r.pruneExpired(), 0);
++		r.set('z', 9);
++		A.equal(r.get('z'), 9);
++	} finally {
++		Date.now = clock;
++	}
++
++	t.pass();
++});

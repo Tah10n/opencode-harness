@@ -1,0 +1,183 @@
+diff --git a/README.md b/README.md
+index 3c645d39c5cd12c0482b2ce63ae0bdf9822d17e8..6ca639dfc38385f484dbc65754375d6820494f70 100644
+--- a/README.md
++++ b/README.md
+@@ -43,6 +43,14 @@ denque.shift(); // 1
+ denque.pop(); // 4
+ ```
+ 
++Remove items from the front in FIFO order with `drain()`. Omit the count to remove everything, or provide a finite nonnegative integer to remove up to that many items:
++
++```js
++const denque = new Denque([1,2,3,4]);
++denque.drain(2); // [1, 2]
++denque.toArray(); // [3, 4]
++```
++
+ 
+ See the [API reference documentation](https://docs.page/invertase/denque/api) for more examples.
+ 
+diff --git a/index.d.ts b/index.d.ts
+index e125dd471cba71a1b2374333c68f24f0a0173377..5dab55b3caf2e94a39bc2ee222631670ccd9e558 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -15,6 +15,8 @@ declare class Denque<T = any> {
+ 
+   shift(): T | undefined;
+ 
++  drain(count?: number): T[];
++
+   peekBack(): T | undefined;
+ 
+   peekFront(): T | undefined;
+diff --git a/index.js b/index.js
+index 6b2e9d8625b50857d917d3b11366a661744523aa..a2350397642fbd523145f54defc42370d352ddc5 100644
+--- a/index.js
++++ b/index.js
+@@ -129,6 +129,24 @@ Denque.prototype.shift = function shift() {
+   return item;
+ };
+ 
++/**
++ * Remove and return items from the front of the list in FIFO order.
++ * Returns all items when count is omitted or undefined.
++ * @param count
++ * @returns {Array}
++ */
++Denque.prototype.drain = function drain(count) {
++  if (count !== undefined && (typeof count !== 'number' || !isFinite(count) || count < 0 || Math.floor(count) !== count)) {
++    throw new RangeError('count must be a finite nonnegative integer');
++  }
++
++  var length = this.size();
++  var drainLength = count === undefined ? length : Math.min(count, length);
++  var drained = new Array(drainLength);
++  for (var i = 0; i < drainLength; i++) drained[i] = this.shift();
++  return drained;
++};
++
+ /**
+  * Add an item to the bottom of the list.
+  * @param item
+diff --git a/test/denque.js b/test/denque.js
+index 47fbd0f7ad23d958845e891e90ab5a6f80799d0c..f191047f3783bc45a416188cfecb734f8dc1af39 100644
+--- a/test/denque.js
++++ b/test/denque.js
+@@ -326,6 +326,103 @@ describe('Deque.prototype.shift', function () {
+   });
+ });
+ 
++describe('Denque.prototype.drain', function () {
++  it('should drain a bounded number of items and then the remainder', function () {
++    var a = new Denque([1, 2, 3, 4]);
++
++    assert.deepEqual(a.drain(2), [1, 2]);
++    assert.equal(a.length, 2);
++    assert.deepEqual(a.toArray(), [3, 4]);
++    assert.deepEqual(a.drain(), [3, 4]);
++    assert.equal(a.length, 0);
++  });
++
++  it('should drain available items for a count larger than the length', function () {
++    var a = new Denque([1, 2]);
++
++    assert.deepEqual(a.drain(10), [1, 2]);
++    assert.deepEqual(a.drain(), []);
++    assert.equal(a.length, 0);
++  });
++
++  it('should treat an explicit undefined count like an omitted count', function () {
++    var a = new Denque([1, 2]);
++
++    assert.deepEqual(a.drain(undefined), [1, 2]);
++    assert.equal(a.length, 0);
++  });
++
++  it('should reject invalid counts without modifying the queue', function () {
++    var a = new Denque([1, 2, 3]);
++    var invalidCounts = [-1, 1.5, NaN, Infinity, -Infinity, '1', null, {}];
++
++    invalidCounts.forEach(function (count) {
++      assert.throws(function () {
++        a.drain(count);
++      }, RangeError);
++      assert.deepEqual(a.toArray(), [1, 2, 3]);
++    });
++  });
++
++  it('should return fresh empty arrays for zero and empty queues', function () {
++    var a = new Denque([1, 2]);
++    var zero = a.drain(0);
++    var negativeZero = a.drain(-0);
++
++    assert.deepEqual(zero, []);
++    assert.deepEqual(negativeZero, []);
++    assert.notStrictEqual(zero, negativeZero);
++    assert.deepEqual(a.toArray(), [1, 2]);
++    assert.deepEqual(new Denque().drain(), []);
++  });
++
++  it('should preserve special values and object identity', function () {
++    var object = {};
++    var a = new Denque([undefined, null, NaN, object]);
++    var drained = a.drain();
++
++    assert.equal(drained.length, 4);
++    assert.strictEqual(drained[0], undefined);
++    assert.strictEqual(drained[1], null);
++    assert(drained[2] !== drained[2]);
++    assert.strictEqual(drained[3], object);
++    assert.equal(a.length, 0);
++  });
++
++  it('should drain wrapped storage after growth', function () {
++    var a = new Denque();
++    var i;
++
++    for (i = 0; i < 8; i++) a.push(i);
++    for (i = 0; i < 5; i++) a.shift();
++    for (i = 8; i < 16; i++) a.push(i);
++
++    assert(a._head > a._tail);
++    assert.deepEqual(a.drain(6), [5, 6, 7, 8, 9, 10]);
++    assert.deepEqual(a.toArray(), [11, 12, 13, 14, 15]);
++    assert.deepEqual(a.drain(), [11, 12, 13, 14, 15]);
++  });
++
++  it('should allow drained queues to be reused, including with capacity', function () {
++    var a = new Denque([1, 2, 3], { capacity: 3 });
++
++    assert.deepEqual(a.drain(), [1, 2, 3]);
++    a.push(2);
++    a.unshift(1);
++    assert.strictEqual(a.peek(), 1);
++    assert.strictEqual(a.peekBack(), 2);
++    assert.deepEqual(a.toArray(), [1, 2]);
++    assert.strictEqual(a.pop(), 2);
++    assert.strictEqual(a.shift(), 1);
++    assert.equal(a.size(), 0);
++    a.push(3);
++    a.push(4);
++    a.push(5);
++    a.push(6);
++    assert.deepEqual(a.toArray(), [4, 5, 6]);
++  });
++});
++
+ describe('Denque.prototype.get', function () {
+   it('should return undefined on nonsensical argument', function () {
+     var a = new Denque([1, 2, 3, 4]);
+diff --git a/test/type/index.ts b/test/type/index.ts
+index 7ee6f37a8caff63356fbeca4cb3a90b09f7b433c..a8c3ab86162106638f46066a76fc16e0f13c01b9 100644
+--- a/test/type/index.ts
++++ b/test/type/index.ts
+@@ -10,6 +10,9 @@ queue.unshift("typescript");
+ queue.pop();
+ queue.shift();
+ queue.toArray();
++const drained: string[] = queue.drain();
++const boundedDrain: string[] = queue.drain(1);
++const undefinedCountDrain: string[] = queue.drain(undefined);
+ queue.peekBack();
+ queue.peekFront();
+ queue.get(1);

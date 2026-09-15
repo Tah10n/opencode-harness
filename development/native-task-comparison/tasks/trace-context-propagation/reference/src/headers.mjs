@@ -1,0 +1,1 @@
+import {parseParent,filterBaggage} from './context.mjs';export function childHeaders(incoming,allowed,newTraceId,newSpanId){const p=parseParent(incoming.traceparent??'');const baggage=filterBaggage(incoming.baggage??'',allowed);const out={traceparent:'00-'+(p?.traceId??newTraceId)+'-'+newSpanId+'-'+(p?.flags??'00')};if(baggage)out.baggage=baggage;return out;}

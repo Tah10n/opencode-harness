@@ -12,7 +12,8 @@ function parseArguments(values) {
   const result = { profile: null, output: null, dryRun: false, force: false, allowDirty: false, native: false, review: false };
   for (let index = 0; index < values.length; index += 1) {
     const value = values[index];
-    if (value === "--review") result.review = true;
+    if (value === "--task") result.task = true;
+    else if (value === "--review") result.review = true;
     else if (value === "--native") result.native = true;
     else if (value === "--dry-run") result.dryRun = true;
     else if (value === "--force") result.force = true;
@@ -37,6 +38,7 @@ function parseArguments(values) {
 try {
   const options = parseArguments(process.argv.slice(2));
   if (options.review && !options.native) throw argumentError('--review requires --native');
+  if (options.task && !options.native) throw argumentError('--task requires --native');
   if (options.native && (options.profile !== 'core' || options.force || options.allowDirty)) {
     throw argumentError('--native supports core only, without --force or --allow-dirty');
   }
@@ -45,6 +47,7 @@ try {
     outputDirectory: options.output,
     dryRun: options.dryRun,
     review: options.review,
+    task: options.task,
   }) : (await import("../lib/profile-v3.mjs")).materializeProfileBundleV3({
     repositoryRoot: root,
     bundleId: options.profile,

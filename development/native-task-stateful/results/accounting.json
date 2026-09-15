@@ -1,0 +1,60 @@
+{
+  "totals": {
+    "P": {
+      "taskRuns": 3,
+      "elapsedMs": 290123,
+      "requests": 33,
+      "requestsWithoutUsage": 0,
+      "toolCalls": 55,
+      "usage": {
+        "input_tokens": 286579,
+        "output_tokens": 12403,
+        "total_tokens": 298982,
+        "cached_tokens": 69120,
+        "reasoning_tokens": 4967
+      }
+    },
+    "H0": {
+      "taskRuns": 3,
+      "elapsedMs": 738871,
+      "requests": 83,
+      "requestsWithoutUsage": 0,
+      "toolCalls": 101,
+      "usage": {
+        "input_tokens": 1946876,
+        "output_tokens": 30266,
+        "total_tokens": 1977142,
+        "cached_tokens": 350208,
+        "reasoning_tokens": 14834
+      }
+    },
+    "H1": {
+      "taskRuns": 3,
+      "elapsedMs": 784254,
+      "requests": 90,
+      "requestsWithoutUsage": 0,
+      "toolCalls": 106,
+      "usage": {
+        "input_tokens": 1925243,
+        "output_tokens": 32734,
+        "total_tokens": 1957977,
+        "cached_tokens": 463872,
+        "reasoning_tokens": 15662
+      }
+    }
+  },
+  "frozenFilesUnchanged": true,
+  "frozenFiles": 11127,
+  "completedTaskRuns": 9,
+  "retries": 0,
+  "model": "openai/gpt-5.6-luna",
+  "variant": "high",
+  "budgetMs": 900000,
+  "usageMeaning": "Observed provider tokens include cached input and repeated context. Missing usage is unknown. Monetary cost not exposed; no paid quota probes.",
+  "extraCompute": {
+    "H1minusH0Ms": 45383,
+    "H1minusPms": 494131,
+    "H1minusH0Requests": 7,
+    "H1minusPRequests": 57
+  }
+}

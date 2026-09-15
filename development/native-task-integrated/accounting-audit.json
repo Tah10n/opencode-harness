@@ -1,0 +1,345 @@
+[
+  {
+    "slot": 1,
+    "receivedFullTask": true,
+    "requestCount": 26,
+    "models": [
+      "gpt-5.6-luna/high"
+    ],
+    "toolSchemas": [
+      [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "task",
+        "todowrite",
+        "webfetch"
+      ]
+    ],
+    "providerWorkTokens": 789668,
+    "nativeWorkTokens": 789668,
+    "nativeMatchesProvider": true,
+    "titleTokens": 1242
+  },
+  {
+    "slot": 2,
+    "receivedFullTask": true,
+    "requestCount": 40,
+    "models": [
+      "gpt-5.6-luna/high"
+    ],
+    "toolSchemas": [
+      [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "harness_task",
+        "read",
+        "skill",
+        "task",
+        "todowrite",
+        "webfetch"
+      ],
+      [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "todowrite",
+        "webfetch"
+      ]
+    ],
+    "providerWorkTokens": 1346937,
+    "nativeWorkTokens": 1346937,
+    "nativeMatchesProvider": true,
+    "titleTokens": 663
+  },
+  {
+    "slot": 3,
+    "receivedFullTask": true,
+    "requestCount": 40,
+    "models": [
+      "gpt-5.6-luna/high"
+    ],
+    "toolSchemas": [
+      [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "harness_investigate",
+        "harness_sense",
+        "harness_task",
+        "read",
+        "skill",
+        "task",
+        "todowrite",
+        "webfetch"
+      ],
+      [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "harness_investigate",
+        "harness_sense",
+        "read",
+        "skill",
+        "todowrite",
+        "webfetch"
+      ]
+    ],
+    "providerWorkTokens": 1436961,
+    "nativeWorkTokens": 1436961,
+    "nativeMatchesProvider": true,
+    "titleTokens": 643
+  },
+  {
+    "slot": 4,
+    "receivedFullTask": true,
+    "requestCount": 45,
+    "models": [
+      "gpt-5.6-luna/high"
+    ],
+    "toolSchemas": [
+      [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "harness_investigate",
+        "harness_sense",
+        "harness_task",
+        "read",
+        "skill",
+        "task",
+        "todowrite",
+        "webfetch"
+      ],
+      [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "harness_investigate",
+        "harness_sense",
+        "read",
+        "skill",
+        "todowrite",
+        "webfetch"
+      ]
+    ],
+    "providerWorkTokens": 1644661,
+    "nativeWorkTokens": 1644661,
+    "nativeMatchesProvider": true,
+    "titleTokens": 704
+  },
+  {
+    "slot": 5,
+    "receivedFullTask": true,
+    "requestCount": 42,
+    "models": [
+      "gpt-5.6-luna/high"
+    ],
+    "toolSchemas": [
+      [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "harness_task",
+        "read",
+        "skill",
+        "task",
+        "todowrite",
+        "webfetch"
+      ],
+      [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "todowrite",
+        "webfetch"
+      ]
+    ],
+    "providerWorkTokens": 1821960,
+    "nativeWorkTokens": 1821960,
+    "nativeMatchesProvider": true,
+    "titleTokens": 629
+  },
+  {
+    "slot": 6,
+    "receivedFullTask": true,
+    "requestCount": 40,
+    "models": [
+      "gpt-5.6-luna/high"
+    ],
+    "toolSchemas": [
+      [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "task",
+        "todowrite",
+        "webfetch"
+      ]
+    ],
+    "providerWorkTokens": 1578192,
+    "nativeWorkTokens": 1578192,
+    "nativeMatchesProvider": true,
+    "titleTokens": 1217
+  },
+  {
+    "slot": 7,
+    "receivedFullTask": true,
+    "requestCount": 55,
+    "models": [
+      "gpt-5.6-luna/high"
+    ],
+    "toolSchemas": [
+      [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "harness_task",
+        "read",
+        "skill",
+        "task",
+        "todowrite",
+        "webfetch"
+      ],
+      [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "todowrite",
+        "webfetch"
+      ]
+    ],
+    "providerWorkTokens": 2385416,
+    "nativeWorkTokens": 2385416,
+    "nativeMatchesProvider": true,
+    "titleTokens": 649
+  },
+  {
+    "slot": 8,
+    "receivedFullTask": true,
+    "requestCount": 53,
+    "models": [
+      "gpt-5.6-luna/high"
+    ],
+    "toolSchemas": [
+      [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "task",
+        "todowrite",
+        "webfetch"
+      ]
+    ],
+    "providerWorkTokens": 2601820,
+    "nativeWorkTokens": 2601820,
+    "nativeMatchesProvider": true,
+    "titleTokens": 1097
+  },
+  {
+    "slot": 9,
+    "receivedFullTask": true,
+    "requestCount": 47,
+    "models": [
+      "gpt-5.6-luna/high"
+    ],
+    "toolSchemas": [
+      [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "harness_investigate",
+        "harness_sense",
+        "harness_task",
+        "read",
+        "skill",
+        "task",
+        "todowrite",
+        "webfetch"
+      ],
+      [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "harness_investigate",
+        "harness_sense",
+        "read",
+        "skill",
+        "todowrite",
+        "webfetch"
+      ]
+    ],
+    "providerWorkTokens": 2562044,
+    "nativeWorkTokens": 2562044,
+    "nativeMatchesProvider": true,
+    "titleTokens": 640
+  },
+  {
+    "slot": 10,
+    "receivedFullTask": true,
+    "requestCount": 21,
+    "models": [
+      "gpt-5.6-luna/high"
+    ],
+    "toolSchemas": [
+      [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "harness_investigate",
+        "harness_sense",
+        "harness_task",
+        "read",
+        "skill",
+        "task",
+        "todowrite",
+        "webfetch"
+      ],
+      [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "harness_investigate",
+        "harness_sense",
+        "read",
+        "skill",
+        "todowrite",
+        "webfetch"
+      ]
+    ],
+    "providerWorkTokens": null,
+    "nativeWorkTokens": 575343,
+    "nativeMatchesProvider": null,
+    "titleTokens": 662
+  }
+]

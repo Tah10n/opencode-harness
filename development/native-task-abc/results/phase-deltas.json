@@ -1,0 +1,64 @@
+[
+  {
+    "label": "M2",
+    "slot": 2,
+    "task": "protocol-error-api",
+    "arm": "B",
+    "changedAfterD0": []
+  },
+  {
+    "label": "Q9",
+    "slot": 3,
+    "task": "protocol-error-api",
+    "arm": "C",
+    "changedAfterD0": []
+  },
+  {
+    "label": "D4",
+    "slot": 4,
+    "task": "legacy-runtime-reload",
+    "arm": "B",
+    "changedAfterD0": [
+      "packages/connector/lib/config.mjs"
+    ]
+  },
+  {
+    "label": "H8",
+    "slot": 5,
+    "task": "legacy-runtime-reload",
+    "arm": "C",
+    "changedAfterD0": []
+  },
+  {
+    "label": "W6",
+    "slot": 7,
+    "task": "reconnect-revoked",
+    "arm": "C",
+    "changedAfterD0": [
+      "packages/connector/test/config.test.mjs"
+    ]
+  },
+  {
+    "label": "R5",
+    "slot": 9,
+    "task": "reconnect-revoked",
+    "arm": "B",
+    "changedAfterD0": [
+      "packages/connector/test/config.test.mjs"
+    ]
+  },
+  {
+    "label": "F2",
+    "slot": 11,
+    "task": "request-module-extraction",
+    "arm": "C",
+    "changedAfterD0": []
+  },
+  {
+    "label": "N4",
+    "slot": 12,
+    "task": "request-module-extraction",
+    "arm": "B",
+    "changedAfterD0": []
+  }
+]

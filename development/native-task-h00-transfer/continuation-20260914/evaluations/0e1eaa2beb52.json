@@ -1,0 +1,152 @@
+{
+  "id": "0e1eaa2beb52",
+  "task": "denque-rotate",
+  "project": "denque",
+  "Q": 0,
+  "findings": [
+    {
+      "category": "documentation-error",
+      "reason": "README sequential rotate()/rotate(-2) example claims [1,2,3,4] instead of [2,3,4,1]."
+    }
+  ],
+  "contentReview": {
+    "id": "0e1eaa2beb52",
+    "task": "denque-rotate",
+    "project": "denque",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete-pending-mechanical-checks",
+    "Q": null,
+    "behaviorReview": "Validates before mutation; nonfinite infinity produces NaN remainder and is rejected. Modulo normalization rebuilds same-sized storage with original references; capacity remains untouched.",
+    "retainedTestsReview": "All pre-existing cases retained, new describe inserted between existing suites.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": true,
+        "evidence": "Default, positive/negative, zero, beyond-length counts and MAX_SAFE_INTEGER assert exact order and this."
+      },
+      {
+        "scenario": 2,
+        "covered": true,
+        "evidence": "Wrapped state explicitly asserted before rotating; subsequent peek/shift/pop/unshift/push/remove assert correct order. Capacity queue rotates and overflows both ends while asserting configured capacity and expected order."
+      },
+      {
+        "scenario": 3,
+        "covered": true,
+        "evidence": "Three objects are actually rotated, strict peekFront/peekBack equality checked against original references; invalid rotations preserve backing list/head/tail and values. Empty/singleton reuse covered."
+      }
+    ],
+    "typesReview": "rotate optional number returns this; default/negative/typed consumer cases supplied.",
+    "docsReview": "README explains directions, modulo, no-op and invalid-input errors. Its sequential example incorrectly claims [1,2,3,4] after rotate() then rotate(-2); task semantics and delivered test give [2,3,4,1].",
+    "contentFindings": [
+      {
+        "category": "documentation-error",
+        "reason": "README sequential rotate()/rotate(-2) example claims [1,2,3,4] instead of [2,3,4,1]."
+      }
+    ],
+    "pending": [
+      "ordinary project checks",
+      "independent checks",
+      "ordinary patch applicability",
+      "object-identity sensitivity diagnostic",
+      "confirm README example mismatch using public API in an independent copy"
+    ],
+    "recordStage": "Initial neutral review retained as history; final Q, findings and assessmentNotes supersede pending hypotheses."
+  },
+  "ordinaryExit": 0,
+  "originalIndependentExit": 0,
+  "interpretedIndependentExit": 0,
+  "applicability": {
+    "id": "0e1eaa2beb52",
+    "task": "denque-rotate",
+    "sourceCommit": "539105bb57854e997dd469221cdc52a0ad80e0a2",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "84a444e3fa7c798d90bacaa71e9db31cac5263c935f4193d9008474148a83498",
+    "excludedPreparationArtifacts": [],
+    "types": null
+  },
+  "sourcePatchSha256": "84a444e3fa7c798d90bacaa71e9db31cac5263c935f4193d9008474148a83498",
+  "sourcePatchBytes": 6678,
+  "assessmentNotes": [],
+  "slot": 26,
+  "repetition": 2,
+  "arm": "P",
+  "D": 0,
+  "verification": [
+    {
+      "artifact": "reviews/0e1eaa2beb52/independent/result.json",
+      "exit": 0,
+      "elapsedMs": 635,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "Independent behavior passed",
+      "fullLocalOutputSha256": "f9c69e05a31a62e04881e10139c67883f681accefebbe3f3ff50d81e2a6a7a6e",
+      "supersededDiagnostic": false
+    },
+    {
+      "artifact": "reviews/0e1eaa2beb52/ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 1867,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "=============================================================================\n\n=============================== Coverage summary ===============================\nStatements   : 99.31% ( 289/291 )\nBranches     : 98.6% ( 141/143 )\nFunctions    : 100% ( 24/24 )\nLines        : 100% ( 256/256 )\n================================================================================\n\n> denque@2.1.0 typescript\n> tsc --project ./test/type/tsconfig.json\n",
+      "fullLocalOutputSha256": "13c46b4316bc220c3f2cfb05419993450e1e21a023093c23225857ed0b6fa321",
+      "supersededDiagnostic": false
+    },
+    {
+      "artifact": "reviews/0e1eaa2beb52/supplemental/readme-example-claim/result.json",
+      "exit": 1,
+      "elapsedMs": 842,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "{\"actual\":[2,3,4,1],\"readmeClaim\":[1,2,3,4]}\nnode:assert:152\n  throw new AssertionError(obj);\n  ^\n\nAssertionError [ERR_ASSERTION]: README claims this result after the sequential rotations\n+ actual - expected\n\n  [\n-   1,\n    2,\n    3,\n{\"actual\":[2,3,4,1],\"readmeClaim\":[1,2,3,4]}\nnode:assert:152\n  throw new AssertionError(obj);\n  ^\n\nAssertionError [ERR_ASSERTION]: README claims this result after the sequential rotations\n+ actual - expected\n\n  [\n-   1,\n    2,\n    3,\n    4,\n+   1\n  ^\n\nAssertionError [ERR_ASSERTION]: README claims this result after the sequential rotations\n+ actual - expected\n\n  [\n-   1,\n    2,\n    3,\n    4,\n+   1\n  ]\n\n    at Object.<anonymous> (/work/repo/.supplemental.cjs:1:196)",
+      "fullLocalOutputSha256": "0e40dad4e4236d4ae567e55df5ccc744f7c66edbb4b2cbd1ee351d88828a93cf",
+      "supersededDiagnostic": false
+    },
+    {
+      "artifact": "reviews/0e1eaa2beb52/test-sensitivity/result.json",
+      "exit": 1,
+      "elapsedMs": 1283,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "\n  56 passing (218ms)\n  1 failing\n\n  1) Denque.prototype.rotate should reject invalid counts without changing state:\n\n      AssertionError [ERR_ASSERTION]: Values have same structure but are not reference-equal:\n\n{\n  id: 4\n}\n\n      + expected - actual\n\n  1) Denque.prototype.rotate should reject invalid counts without changing state:\n\n      AssertionError [ERR_ASSERTION]: Values have same structure but are not reference-equal:\n\n{\n  id: 4\n}\n\n      + expected - actual\n\n      \n      at Context.<anonymous> (test/denque.js:394:12)\n      at process.processImmediate (node:internal/timers:534:21)\n",
+      "fullLocalOutputSha256": "9a42a4027c264cfc699afbd94aa902961c051acc2b84500e7bb289ce97cd68ba",
+      "supersededDiagnostic": false
+    }
+  ],
+  "native": {
+    "completed": true,
+    "exitCode": 0,
+    "signal": null,
+    "lastStepFinish": "stop",
+    "normalHandoff": true,
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "workflowStatus": null,
+    "terminalPatchVerification": null,
+    "lastNativeTextSha256": "0a3392ab4cc6b1236c46e2b23ac4302423772653dcc4f9924ad71ee35306708d",
+    "normalFinalResponse": true,
+    "finalResponseExcerpt": "Implemented `rotate(steps = 1)` with:\n\n- Positive/negative/default rotations and modulo normalization\n- Atomic validation for invalid counts\n- Wrapped and capacity-limited storage support\n- Identity/order preservation and fluent `this` return\n- TypeScript declaration and consumer type coverage\n- README API documentation\n- Regression tests covering required scenarios\n\nChecks run:\n\n- `npm test`: 57 passing\n- `git diff --check`: passed\n\nNo dependencies or commits changed.",
+    "authorExplanationExcerpt": null,
+    "reportFindings": [
+      {
+        "category": "overstated-documentation-or-coverage",
+        "evidence": "Author reports documentation and required regressions delivered; README sequential rotation example is wrong. Slot25 also lacks nontrivial object identity discrimination."
+      }
+    ]
+  }
+}

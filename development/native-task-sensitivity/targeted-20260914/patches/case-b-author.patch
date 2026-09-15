@@ -1,0 +1,100 @@
+diff --git a/test.js b/test.js
+index 0904dc2..d81c78b 100644
+--- a/test.js
++++ b/test.js
+@@ -31,6 +31,95 @@ test('.get() / .set()', t => {
+ 	t.is(lru.size, 2);
+ });
+ 
++test('.getOrInsertComputed() returns hits without computing and refreshes recency', t => {
++	const lru = new QuickLRU({maxSize: 3});
++	let calls = 0;
++	const factory = () => {
++		calls++;
++		return 'computed';
++	};
++
++	lru.set('current', undefined);
++	t.is(lru.getOrInsertComputed('current', factory), undefined);
++	t.is(calls, 0);
++
++	lru.set('other', 2);
++	lru.set('recent', 3);
++	t.true(lru.__oldCache.has('current'));
++
++	t.is(lru.getOrInsertComputed('current', factory), undefined);
++	t.is(calls, 0);
++	t.deepEqual([...lru.entriesAscending()], [['other', 2], ['recent', 3], ['current', undefined]]);
++});
++
++test('.getOrInsertComputed() replaces expired entries and uses the default maxAge', async t => {
++	const evictions = [];
++	const lru = new QuickLRU({
++		maxSize: 2,
++		maxAge: 100,
++		onEviction(key, value) {
++			evictions.push([key, value]);
++		},
++	});
++
++	lru.set('stale', 'old', {maxAge: 1});
++	lru.set('live', 'live');
++	await delay(10);
++
++	t.true(lru.__oldCache.has('stale'));
++	t.true(lru.expiresIn('stale') <= 0);
++
++	let calls = 0;
++	t.is(lru.getOrInsertComputed('stale', key => {
++		calls++;
++		t.is(key, 'stale');
++		return 'new';
++	}), 'new');
++
++	t.is(calls, 1);
++	t.deepEqual(evictions, [['stale', 'old']]);
++	t.true(lru.has('stale'));
++	t.true(lru.expiresIn('stale') > 0 && lru.expiresIn('stale') <= 100);
++	t.is(lru.getOrInsertComputed('stale', () => {
++		calls++;
++		return 'unexpected';
++	}), 'new');
++	t.is(calls, 1);
++});
++
++test('.getOrInsertComputed() preserves factory errors and key/cache identity', t => {
++	const key = {};
++	const otherKey = {};
++	const error = new Error('factory failed');
++	const lru = new QuickLRU({maxSize: 10});
++
++	t.is(lru.size, 0);
++	t.false(lru.has(key));
++	const thrown = t.throws(() => lru.getOrInsertComputed(key, receivedKey => {
++		t.is(receivedKey, key);
++		throw error;
++	}));
++	t.is(thrown, error);
++	t.is(lru.size, 0);
++	t.false(lru.has(key));
++
++	const firstValue = {};
++	t.is(lru.getOrInsertComputed(key, receivedKey => {
++		t.is(receivedKey, key);
++		return firstValue;
++	}), firstValue);
++	t.is(lru.get(otherKey), undefined);
++
++	const otherLru = new QuickLRU({maxSize: 10});
++	const secondValue = {};
++	t.is(otherLru.getOrInsertComputed(key, receivedKey => {
++		t.is(receivedKey, key);
++		return secondValue;
++	}), secondValue);
++	t.is(lru.get(key), firstValue);
++	t.is(otherLru.get(key), secondValue);
++});
++
+ test('.get() - limit', t => {
+ 	const lru = new QuickLRU({maxSize: 2});
+ 	lru.set('1', 1);

@@ -1,0 +1,16 @@
+{
+  "category": "state",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Multiple original-coordinate hunks with length changes and inverse restoring original lines.",
+    "Later context conflict does not mutate input lines/hunks."
+  ],
+  "docDelivery": [
+    "Original coordinate and nonoverlap rules, same-position insertions and exact context checks.",
+    "Inverse addresses resulting lines; adjacent deletion handling and failure/ownership guarantees."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Dense arrays of up to10000 lines; each line string excludes CR/LF but may be empty/Unicode. Hunks exact {at,remove,insert}; line arrays valid, invalid at/order/content included. Positions refer original input. Both source and final result <=10000 lines; larger-result calls outside domain.",
+  "independence": "Implement line-based patch application with context matching, conflict rejection and inverse restoration."
+}

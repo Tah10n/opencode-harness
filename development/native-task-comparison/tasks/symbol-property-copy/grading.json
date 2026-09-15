@@ -1,0 +1,16 @@
+{
+  "category": "compatibility",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert symbol identity and exclusion of inherited/nonenumerable properties.",
+    "Assert getter value copying once and own __proto__ data safety."
+  ],
+  "docDelivery": [
+    "Describe shallow enumerable-own string/symbol copy, key order and ordinary result.",
+    "Explain getter invocation/error propagation, data descriptors and input preservation."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Ordinary objects including null/custom prototype/frozen; no structure-mutating getters, primitives, arrays, proxies or exotica.",
+  "independence": "Extend shallow copy adapter to enumerable symbol properties preserving getters and descriptor-independent values."
+}

@@ -1,0 +1,16 @@
+{
+  "category": "state",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "An unseen concurrent addition survives an observed removal and replicas converge.",
+    "Tombstone arriving before addition prevents resurrection."
+  ],
+  "docDelivery": [
+    "Addition tags identify values and remove only observes local tags.",
+    "Union merge, retained tombstones, atomic conflict rejection and detached sorted snapshots."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "String values/tags arbitrary ASCII including empty/prototype-like names; tag identifies exactly one value globally, conflicts rejected. Snapshot {adds:[[value,tag]],removed:[tag]} finite dense arrays, duplicates permitted. Tombstones may arrive before associated adds.",
+  "independence": "Implement tagged add/remove operations and replica merge retaining concurrent additions."
+}

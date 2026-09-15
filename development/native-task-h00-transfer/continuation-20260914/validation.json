@@ -1,0 +1,50 @@
+{
+  "at": "2026-09-14T11:06:21.710170+00:00",
+  "reportConsistency": {
+    "passed": true,
+    "historicalRows": 18,
+    "newRows": 24,
+    "unstartedRows": 6,
+    "requests": 938,
+    "unknownUsageRequests": 2,
+    "completeSeriesStatisticsRejected": true,
+    "patchAndTerminalFingerprintsVerified": true,
+    "localLinksVerified": true,
+    "privateMaterialMarkersAbsent": true
+  },
+  "preservation": "preservation-check.json",
+  "targetedChecks": {
+    "ciRoutingAndFailClosedGate": "passed",
+    "existingComparisonReportVerification": "passed",
+    "packageBoundary": "passed",
+    "supplementalDiagnosticsSyntax": "passed"
+  },
+  "authorProjectChecks": {
+    "ordinaryPassed": 24,
+    "originalIndependentPassed": 17,
+    "interpretedIndependentPassed": 20,
+    "total": 24,
+    "fullQualityPassed": 8
+  },
+  "postExecutionProjectChecks": {
+    "total": 89,
+    "allStoppedAndRemoved": true,
+    "realProviderRequests": 0
+  },
+  "unavailableOrNotRun": {
+    "fullSeriesStatistics": "six original slots never started",
+    "remoteCI": "no checks reported at pre-publication head; local results are not remote CI",
+    "manualActions": 0,
+    "fullPlatformMatrix": 0,
+    "productionVerification": 0,
+    "paidRetriesOrSmokes": 0
+  },
+  "scope": "Final report/evaluation checks only. The amended launcher and all measured author inputs were unchanged after pre-call publication; pre-call lifecycle tests remain in amendment-20260914/preflight.json.",
+  "whitespace": {
+    "reportSourceExit": 0,
+    "rawArchivedPatchDiffExit": 2,
+    "allWarningsConfinedToArchivedPatchPayloads": true,
+    "warningLocations": 401,
+    "interpretation": "Preserved unified diff context prefixes/tab indentation generate outer diff warnings; actual source and terminal patch application/bytes/modes are verified."
+  }
+}

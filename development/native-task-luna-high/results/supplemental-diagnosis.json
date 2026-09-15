@@ -1,0 +1,9 @@
+{
+  "phase": "post-run; separate from frozen evaluation",
+  "result": "failed",
+  "scenario": "prepareRuntime receives retained legacy launcher URL; installed help executes retained old bytes",
+  "expected": "current usable CLI help containing connect",
+  "observed": "RETAINED_OLD_LAUNCHER",
+  "code": 1,
+  "measuredPatchModified": false
+}

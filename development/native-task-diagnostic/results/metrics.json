@@ -1,0 +1,884 @@
+[
+  {
+    "slot": 1,
+    "task": "queue-lost-retry",
+    "arm": "H0",
+    "elapsedMs": 121362,
+    "exitCode": 0,
+    "timedOut": false,
+    "terminationVerified": true,
+    "requests": 14,
+    "requestsWithoutUsage": 0,
+    "toolCalls": 20,
+    "sessions": 2,
+    "workflowStatus": "incomplete",
+    "savedWorkflowStatus": "incomplete",
+    "corrections": 0,
+    "stages": [
+      {
+        "label": "implementation",
+        "elapsedMs": 113059
+      }
+    ],
+    "usage": {
+      "input_tokens": 129256,
+      "output_tokens": 5342,
+      "total_tokens": 134598,
+      "cached_tokens": 9216,
+      "reasoning_tokens": 2409
+    },
+    "observedPartialUsage": {
+      "input_tokens": 129256,
+      "output_tokens": 5342,
+      "total_tokens": 134598,
+      "cached_tokens": 9216,
+      "reasoning_tokens": 2409
+    },
+    "missingUsageFields": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "total_tokens": 0,
+      "cached_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "providerStatuses": [
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      }
+    ],
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    }
+  },
+  {
+    "slot": 2,
+    "task": "queue-lost-retry",
+    "arm": "H1",
+    "elapsedMs": 144304,
+    "exitCode": 0,
+    "timedOut": false,
+    "terminationVerified": true,
+    "requests": 19,
+    "requestsWithoutUsage": 0,
+    "toolCalls": 27,
+    "sessions": 2,
+    "workflowStatus": "incomplete",
+    "savedWorkflowStatus": "incomplete",
+    "corrections": 0,
+    "stages": [
+      {
+        "label": "implementation",
+        "elapsedMs": 132086
+      }
+    ],
+    "usage": {
+      "input_tokens": 202124,
+      "output_tokens": 5674,
+      "total_tokens": 207798,
+      "cached_tokens": 42496,
+      "reasoning_tokens": 1650
+    },
+    "observedPartialUsage": {
+      "input_tokens": 202124,
+      "output_tokens": 5674,
+      "total_tokens": 207798,
+      "cached_tokens": 42496,
+      "reasoning_tokens": 1650
+    },
+    "missingUsageFields": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "total_tokens": 0,
+      "cached_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "providerStatuses": [
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      }
+    ],
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    }
+  },
+  {
+    "slot": 3,
+    "task": "editor-precompleted",
+    "arm": "H1",
+    "elapsedMs": 45028,
+    "exitCode": 1,
+    "timedOut": false,
+    "terminationVerified": true,
+    "requests": 6,
+    "requestsWithoutUsage": 0,
+    "toolCalls": 13,
+    "sessions": 2,
+    "workflowStatus": "incomplete",
+    "savedWorkflowStatus": "incomplete",
+    "corrections": 0,
+    "stages": [
+      {
+        "label": "implementation",
+        "elapsedMs": 39647
+      }
+    ],
+    "usage": {
+      "input_tokens": 37583,
+      "output_tokens": 1585,
+      "total_tokens": 39168,
+      "cached_tokens": 15360,
+      "reasoning_tokens": 686
+    },
+    "observedPartialUsage": {
+      "input_tokens": 37583,
+      "output_tokens": 1585,
+      "total_tokens": 39168,
+      "cached_tokens": 15360,
+      "reasoning_tokens": 686
+    },
+    "missingUsageFields": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "total_tokens": 0,
+      "cached_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "providerStatuses": [
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      }
+    ],
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    }
+  },
+  {
+    "slot": 4,
+    "task": "editor-precompleted",
+    "arm": "H0",
+    "elapsedMs": 49351,
+    "exitCode": 1,
+    "timedOut": false,
+    "terminationVerified": true,
+    "requests": 7,
+    "requestsWithoutUsage": 0,
+    "toolCalls": 13,
+    "sessions": 2,
+    "workflowStatus": "incomplete",
+    "savedWorkflowStatus": "incomplete",
+    "corrections": 0,
+    "stages": [
+      {
+        "label": "implementation",
+        "elapsedMs": 41626
+      }
+    ],
+    "usage": {
+      "input_tokens": 44485,
+      "output_tokens": 1728,
+      "total_tokens": 46213,
+      "cached_tokens": 7680,
+      "reasoning_tokens": 722
+    },
+    "observedPartialUsage": {
+      "input_tokens": 44485,
+      "output_tokens": 1728,
+      "total_tokens": 46213,
+      "cached_tokens": 7680,
+      "reasoning_tokens": 722
+    },
+    "missingUsageFields": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "total_tokens": 0,
+      "cached_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "providerStatuses": [
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      }
+    ],
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    }
+  },
+  {
+    "slot": 5,
+    "task": "queue-valid-empty",
+    "arm": "H0",
+    "elapsedMs": 146898,
+    "exitCode": 0,
+    "timedOut": false,
+    "terminationVerified": true,
+    "requests": 20,
+    "requestsWithoutUsage": 0,
+    "toolCalls": 24,
+    "sessions": 2,
+    "workflowStatus": "incomplete",
+    "savedWorkflowStatus": "incomplete",
+    "corrections": 0,
+    "stages": [
+      {
+        "label": "implementation",
+        "elapsedMs": 138169
+      }
+    ],
+    "usage": {
+      "input_tokens": 209544,
+      "output_tokens": 6058,
+      "total_tokens": 215602,
+      "cached_tokens": 65024,
+      "reasoning_tokens": 2137
+    },
+    "observedPartialUsage": {
+      "input_tokens": 209544,
+      "output_tokens": 6058,
+      "total_tokens": 215602,
+      "cached_tokens": 65024,
+      "reasoning_tokens": 2137
+    },
+    "missingUsageFields": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "total_tokens": 0,
+      "cached_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "providerStatuses": [
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      }
+    ],
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    }
+  },
+  {
+    "slot": 6,
+    "task": "queue-valid-empty",
+    "arm": "H1",
+    "elapsedMs": 191462,
+    "exitCode": 0,
+    "timedOut": false,
+    "terminationVerified": true,
+    "requests": 27,
+    "requestsWithoutUsage": 0,
+    "toolCalls": 33,
+    "sessions": 2,
+    "workflowStatus": "incomplete",
+    "savedWorkflowStatus": "incomplete",
+    "corrections": 0,
+    "stages": [
+      {
+        "label": "implementation",
+        "elapsedMs": 181455
+      }
+    ],
+    "usage": {
+      "input_tokens": 344059,
+      "output_tokens": 8055,
+      "total_tokens": 352114,
+      "cached_tokens": 112128,
+      "reasoning_tokens": 3144
+    },
+    "observedPartialUsage": {
+      "input_tokens": 344059,
+      "output_tokens": 8055,
+      "total_tokens": 352114,
+      "cached_tokens": 112128,
+      "reasoning_tokens": 3144
+    },
+    "missingUsageFields": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "total_tokens": 0,
+      "cached_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "providerStatuses": [
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      },
+      {
+        "status": 200,
+        "effort": "high",
+        "responseStatus": "completed",
+        "hasUsage": true
+      }
+    ],
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    }
+  }
+]

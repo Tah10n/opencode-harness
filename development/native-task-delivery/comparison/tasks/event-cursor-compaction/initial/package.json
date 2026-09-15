@@ -1,0 +1,8 @@
+{
+  "name": "event-cursor-compaction",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "createdAt": "2026-09-14T08:40:18.630Z",
+  "firstSlot": 19,
+  "lastSlot": 48,
+  "originalFreezeSha256": "240802e6d4deecca8b7e22096c6f4bccdd41b8c161e380eb32a56b9a42dbd1d6",
+  "originalPauseSha256": "69385be23d2edc8776accef8cd2b91cdbdf496a026e37bff9698862e8d29c6bd",
+  "launcherFiles": {
+    "development/native-task-ab/verify-scheduler.mjs": {
+      "before": "6a3a8891af587a686792be13c2af5e94f3402e3cd456277e1d593c87f62f2e96",
+      "after": "52a3556180ad1501f34f24c1bddc2ecfb3f5210cc86019d442a7b3649df5e846"
+    },
+    "development/native-task-ab/run-comparison.mjs": {
+      "before": "52a171ebcc3d3c22e29dc7eb236a2fab65934e94488c30382a7db53a7f335925",
+      "after": "fcd855bc57abcc77c049a4188d472a5337970e616804bf221fc5cff54a42b32a"
+    },
+    "development/native-task-ab/run.mjs": {
+      "before": "4a4b0e127cfc8f8fa12f3c5136901a92e61eb8a3a6d895b49661a19e143c0ff7",
+      "after": "f5fec13f3a504fa1f61bbb5b6a793f12279494b76acf78d695a5f497d15766b8"
+    }
+  },
+  "preservedHistoricalFileCount": 1444,
+  "preservedHistoricalManifestSha256": "4e9e3c9961467fbc4cb526b1542644153ca84b0c623bba332e0378d8aa16d6ce",
+  "privateAmendmentSha256": "4c6bed9e147bde971f1ef30d395ea3828c36f26913b852b79f2d7d28ba7d46c6",
+  "newVerificationFiles": {
+    "development/native-task-ab/verify-provider-lifecycle.mjs": "bd325aed9ff0d0cf2f50b45ac54dcf36ac551f527d5417d541ce633fd5d38db8",
+    "development/native-task-ab/verify-continuation.mjs": "29aada88b0ef350da999b656d2ccc7937c4a4b4dec942f5f4f2d97136603fd41"
+  },
+  "measuredSource": "1cebebb082163250a0f78269acc164edfc3c6268",
+  "publicationBase": "2a3fc3098998f6eef7ad648ded0b09a55b760233",
+  "image": "sha256:0ed6cee0b095ecf1e1e780418cb373d462f1b99643bb86db0a8de7dd58fc83a6 linux/arm64",
+  "sourceChecks": [
+    {
+      "task": "denque-rotate",
+      "files": 2561,
+      "matchedBothArms": true
+    },
+    {
+      "task": "denque-remove-where",
+      "files": 2561,
+      "matchedBothArms": true
+    },
+    {
+      "task": "eventemitter-prepend",
+      "files": 1732,
+      "matchedBothArms": true
+    },
+    {
+      "task": "eventemitter-remove-context",
+      "files": 1732,
+      "matchedBothArms": true
+    },
+    {
+      "task": "fastq-running-tasks",
+      "files": 12416,
+      "matchedBothArms": true
+    },
+    {
+      "task": "fastq-on-idle",
+      "files": 12416,
+      "matchedBothArms": true
+    },
+    {
+      "task": "quick-lru-computed",
+      "files": 18276,
+      "matchedBothArms": true
+    },
+    {
+      "task": "quick-lru-prune",
+      "files": 18276,
+      "matchedBothArms": true
+    },
+    {
+      "task": "ufo-query-sort",
+      "files": 10551,
+      "matchedBothArms": true
+    },
+    {
+      "task": "ufo-append-query",
+      "files": 10551,
+      "matchedBothArms": true
+    },
+    {
+      "task": "ms-format-unit",
+      "files": 11096,
+      "matchedBothArms": true
+    },
+    {
+      "task": "ms-parse-compound",
+      "files": 11096,
+      "matchedBothArms": true
+    }
+  ],
+  "runtimeChecks": [
+    {
+      "bundle": "bundle",
+      "files": 3809,
+      "matched": true
+    },
+    {
+      "bundle": "plain-dependencies",
+      "files": 3797,
+      "matched": true
+    }
+  ],
+  "realNewProviderCallsBeforeAmendment": 0
+}

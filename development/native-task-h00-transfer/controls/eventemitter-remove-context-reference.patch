@@ -1,0 +1,72 @@
+diff --git a/README.md b/README.md
+index e45aa10..3bff524 100644
+--- a/README.md
++++ b/README.md
+@@ -83,3 +83,8 @@ run an additional `npm i` in the benchmarks folder before `npm run benchmark`.
+ ## License
+ 
+ [MIT](LICENSE)
++
++
++## eventemitter-remove-context
++
++The API provides removeListenersByContext(context): number, removing every registration whose stored invocation context is strictly equal to the argument, across all event names. Return the count of registrations removed, including duplicate functions and once registrations. Respect existing context normalization: listeners registered with omitted or falsy context use the emitter itself; do not redefine on/once behavior. Preserve unrelated listeners and their order, symbol events, eventNames/listenerCount consistency and emitter reuse after becoming empty. Match stored context exactly rather than function identity or truthiness. Expose the API in CommonJS, ESM and declarations. Existing mutation-during-emit behavior is unchanged.
+diff --git a/index.d.ts b/index.d.ts
+index fab37fd..59369cf 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -7,6 +7,7 @@ declare class EventEmitter<
+   Context extends any = any
+ > {
+   static prefixed: string | boolean;
++  removeListenersByContext(context: Context): number;
+ 
+   /**
+    * Return an array listing the events for which the emitter has registered
+diff --git a/index.js b/index.js
+index 6ea485c..93ddbb9 100644
+--- a/index.js
++++ b/index.js
+@@ -334,3 +334,18 @@ EventEmitter.EventEmitter = EventEmitter;
+ if ('undefined' !== typeof module) {
+   module.exports = EventEmitter;
+ }
++
++EventEmitter.prototype.removeListenersByContext = function (context) {
++  var names = this.eventNames(), removed = 0;
++  for (var n = 0; n < names.length; n++) {
++    var evt = prefix ? prefix + names[n] : names[n], entry = this._events[evt];
++    var listeners = entry.fn ? [entry] : entry;
++    var keep = [];
++    for (var i = 0; i < listeners.length; i++) {
++      if (listeners[i].context === context) removed++; else keep.push(listeners[i]);
++    }
++    if (!keep.length) clearEvent(this, evt);
++    else this._events[evt] = keep.length === 1 ? keep[0] : keep;
++  }
++  return removed;
++};
+diff --git a/test/h00-types.ts b/test/h00-types.ts
+new file mode 100644
+index 0000000..75e1f5e
+--- /dev/null
++++ b/test/h00-types.ts
+@@ -0,0 +1,3 @@
++import EventEmitter from '../index';
++const emitter = new EventEmitter<{change: [string, number]}>();
++const removed: number = emitter.removeListenersByContext({});
+diff --git a/test/test.js b/test/test.js
+index e5f8aaa..61256b5 100644
+--- a/test/test.js
++++ b/test/test.js
+@@ -640,3 +640,10 @@ describe('EventEmitter', function tests() {
+     });
+   });
+ });
++
++var A = require('assert').strict; var api = require('../');
++it('new public contract', async function () {
++
++const e=new api(),a={},b={},s=Symbol(),calls=[];function fn(v){calls.push([this,v]);}e.on('x',fn,a).once('x',fn,a).on('x',fn,b).on(s,fn,a).on(s,fn,b);A.equal(e.removeListenersByContext(a),3);A.equal(e.listenerCount('x'),1);A.equal(e.listenerCount(s),1);e.emit('x',1);e.emit(s,2);A.deepEqual(calls,[[b,1],[b,2]]);A.equal(e.removeListenersByContext(a),0);A.equal(e.removeListenersByContext(b),2);A.deepEqual(e.eventNames(),[]);e.on('f',fn,0).once('g',fn);A.equal(e.removeListenersByContext(0),0);A.equal(e.removeListenersByContext(e),2);A.deepEqual(e.eventNames(),[]);e.on('again',fn,a);A.equal(e.emit('again',3),true);A.equal(e.removeListenersByContext(a),1);const esm=await import('../index.mjs');A.equal(typeof new esm.default().removeListenersByContext,'function');
++
++});
