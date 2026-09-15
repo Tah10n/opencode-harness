@@ -1,0 +1,227 @@
+{
+  "version": 1,
+  "status": "stopped-unknown-submission",
+  "runtimeSha": "9cd8ffb4dfcfd32f1a7a65ac9c3eaca44728d2e7",
+  "freezeSha256": "198d694521294c5f1eb0255a67f92ad61b8595f4a1b89d74cc4f94911afdd384",
+  "approvalBlockResolved": true,
+  "admittedTaskRuns": 1,
+  "unstartedTaskRuns": 8,
+  "completedAutonomousDeliveries": 0,
+  "taskRunRetries": 0,
+  "realSmokes": 0,
+  "automaticAuxiliaryRequestRetries": 1,
+  "protocolDeviation": "OpenCode repeated identical title request after HTTP 200 response.failed/server_is_overloaded. Existing transport recognized failed terminal as known and did not close admission at that point. Frozen runtime is unchanged; this run does not establish compliance with the full no-retry requirement.",
+  "pause": {
+    "kind": "unknown_submission",
+    "slot": 1,
+    "error": "AbortError"
+  },
+  "slots": [
+    {
+      "slot": 1,
+      "task": "quick-lru-take",
+      "arm": "P",
+      "status": "stopped-with-partial-capture",
+      "Q": false,
+      "T": false,
+      "D": false,
+      "reason": "No source changes; take is absent. Native exit 137 without normal stop.",
+      "patch": "patches/quick-lru-take-P.patch",
+      "patchBytes": 0,
+      "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "ordinarySuitePassed": true,
+      "independentContractPassed": false,
+      "terminationVerified": true,
+      "workflowStatus": null
+    },
+    {
+      "slot": 2,
+      "task": "quick-lru-take",
+      "arm": "R",
+      "status": "not-started",
+      "Q": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 3,
+      "task": "quick-lru-take",
+      "arm": "H",
+      "status": "not-started",
+      "Q": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 4,
+      "task": "denque-drain",
+      "arm": "R",
+      "status": "not-started",
+      "Q": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 5,
+      "task": "denque-drain",
+      "arm": "H",
+      "status": "not-started",
+      "Q": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 6,
+      "task": "denque-drain",
+      "arm": "P",
+      "status": "not-started",
+      "Q": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 7,
+      "task": "eventemitter-collect",
+      "arm": "H",
+      "status": "not-started",
+      "Q": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 8,
+      "task": "eventemitter-collect",
+      "arm": "P",
+      "status": "not-started",
+      "Q": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 9,
+      "task": "eventemitter-collect",
+      "arm": "R",
+      "status": "not-started",
+      "Q": null,
+      "T": null,
+      "D": null
+    }
+  ],
+  "requests": [
+    {
+      "index": 1,
+      "kind": "title",
+      "model": "gpt-5.6-luna",
+      "effort": "high",
+      "forwarded": true,
+      "httpStatus": 200,
+      "serverCompletion": "failed",
+      "usage": null,
+      "elapsedMs": 1712,
+      "providerError": "server_is_overloaded"
+    },
+    {
+      "index": 2,
+      "kind": "work",
+      "model": "gpt-5.6-luna",
+      "effort": "high",
+      "forwarded": true,
+      "httpStatus": 200,
+      "serverCompletion": "completed",
+      "usage": {
+        "input_tokens": 6242,
+        "output_tokens": 176,
+        "total_tokens": 6418,
+        "cached_tokens": 0,
+        "reasoning_tokens": 24
+      },
+      "elapsedMs": 5031
+    },
+    {
+      "index": 3,
+      "kind": "title",
+      "model": "gpt-5.6-luna",
+      "effort": "high",
+      "forwarded": true,
+      "httpStatus": 200,
+      "serverCompletion": "unknown",
+      "usage": null,
+      "elapsedMs": 3401,
+      "identicalPayloadRetryOf": 1,
+      "error": "AbortError",
+      "transportError": {
+        "name": "AbortError",
+        "clientOrRelayCancelled": false,
+        "ownTaskDeadline": false
+      }
+    },
+    {
+      "index": 4,
+      "kind": "work",
+      "model": "gpt-5.6-luna",
+      "effort": "high",
+      "forwarded": true,
+      "httpStatus": 200,
+      "serverCompletion": "unknown",
+      "usage": null,
+      "elapsedMs": 1566,
+      "error": "AbortError",
+      "transportError": {
+        "name": "AbortError",
+        "clientOrRelayCancelled": true,
+        "ownTaskDeadline": false
+      }
+    }
+  ],
+  "accounting": {
+    "forwardedRequests": 4,
+    "requestsWithKnownUsage": 1,
+    "requestsWithUnknownUsage": 3,
+    "knownInputTokens": 6242,
+    "knownOutputTokens": 176,
+    "knownTotalTokens": 6418,
+    "cachedTokensSubset": 0,
+    "reasoningTokensSubset": 24,
+    "totalUsageComplete": false,
+    "nativeExecutionMs": 8490,
+    "nativeCleanupMs": 55,
+    "nativeElapsedMs": 8545,
+    "summedRequestElapsedMs": 11710,
+    "requestIntervalsOverlap": true,
+    "preNativePreparationMs": 5219,
+    "diagnosticCalls": 0,
+    "investigatorCalls": 0,
+    "extraAttentionPasses": 0,
+    "preparationDevelopmentAndEvaluator": {
+      "aggregateWallTimeMs": null,
+      "reason": "No reliable cumulative stopwatch across preparation, scripted fixtures, developer work and offline grading; these are not included in measured native task time.",
+      "offlineGradingProviderRequests": 0
+    },
+    "monetaryCost": null
+  },
+  "stopVerification": {
+    "ownTaskDeadlineTriggered": false,
+    "terminationVerified": true,
+    "captureSaved": true,
+    "forwardingClosed": true,
+    "relayRemoved": true,
+    "activeProviderHandlers": 0,
+    "providerServerStateMayRemainUnknown": true
+  },
+  "grading": [
+    {
+      "name": "patch-application",
+      "exit": 0
+    },
+    {
+      "name": "npm test",
+      "exit": 0
+    },
+    {
+      "name": "independent-contract",
+      "exit": 1,
+      "reason": "TypeError: c.take is not a function"
+    }
+  ],
+  "conclusion": "No H or R task ran; no integration attribution, comparative quality balance or lift can be inferred. The provider interruption and auxiliary retry limitation remain distinct from the passing local implementation checks."
+}

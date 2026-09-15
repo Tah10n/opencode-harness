@@ -30,23 +30,65 @@ The full verifier remains failed with `PROCESS_CONTAINMENT_UNAVAILABLE`; its
 mandatory stages are unavailable. The separately verified container path does not
 turn that aggregate verifier green.
 
-## Model comparison: not started
+## Model comparison: stopped after first admission
 
 On 2026-09-14, execution approval was rejected before process creation, including
 a second review supplied with the exact task permission and destination evidence.
 The approval service required trusted direct user confirmation for sending the
 public source/task/test material, variant instructions, each attempt's own patches
 and actual tool results to `https://chatgpt.com/backend-api/codex/responses`.
-This is an execution-approval blocker, not an observed provider/auth/quota failure.
-No rejection was bypassed.
+No rejection was bypassed. The user supplied direct confirmation on 2026-09-15,
+resolving execution and publication approval. The frozen launcher then admitted
+only slot 1, QuickLRU/P. [Machine-readable results](results.json).
 
-Completed task-runs: **0/9**. Real provider requests: **0**. No slot was consumed,
-no model result exists, and no model quality, Q/T/D or integration contribution can
-be assigned. Model token usage is zero because no request began; developer,
-scripted-fixture and evaluator work are separate and are not model-campaign costs.
-No monetary cost is inferred. No historical campaign was resumed.
+| Task | P | R | H |
+| --- | --- | --- | --- |
+| QuickLRU take | Q=false, T=false, D=false; interrupted | Not started | Not started |
+| Denque drain | Not started | Not started | Not started |
+| EventEmitter3 emitCollect | Not started | Not started | Not started |
 
-The prepared candidate remains experimental. The intended full-task comparison and
-its final patches, attribution and resource report remain outstanding, pending
-execution approval. The frozen inputs and order must be preserved on continuation;
-there are still no retries, replacement tasks or additional real smokes authorized.
+Four requests reached the provider. The first title request returned HTTP 200 with
+`response.failed` / `server_is_overloaded`; one author request completed and only
+created a todo list. Two later requests have unknown server completion. The
+existing scheduler persisted `unknown_submission`, closed admission and stopped
+the native process. The local process exited 137 after 8.490 seconds, without a
+normal native stop. Termination, capture, closed forwarding, zero active provider
+handlers and container removal are verified. The server outcomes remain unknown;
+local termination does not prove remote cancellation. Eight slots never started.
+
+There is also a concrete protocol deviation: OpenCode automatically retried the
+identical title payload after the first `response.failed`. The frozen transport
+treated this as a known terminal response and allowed that auxiliary retry. There
+were zero repeated task-runs, but **one auxiliary request retry**, so the full
+no-retry requirement is not demonstrated. This limitation was not covered by the
+passing non-200 transport fixtures. Runtime, prompts and rubric were not changed
+after the first outcome, and neither the paused series nor the failed slot was
+resumed. No further model request is authorized by this report.
+
+The [captured patch](patches/quick-lru-take-P.patch) is intentionally empty: source,
+tests, types and documentation remained unchanged. Offline grading applies that
+empty diff, passes the ordinary suite and fails the fixed public-API contract
+because `take` does not exist. Thus Q=false; absence of autonomous completion gives
+T=false and D=false. This interrupted P observation cannot support an inference
+about model quality or a P/R/H balance. No H investigator ran, so there is no chosen
+question, intermediate investigator patch, acceptance decision or integration
+benefit to attribute. No such artifact is fabricated for unstarted slots.
+
+## Resources and conclusion
+
+Known usage is 6,242 input + 176 output = **6,418 tokens** for one request. Output
+already includes 24 reasoning tokens; cache tokens are zero. Usage for three
+requests is unknown, so the campaign total is unknown. The four overlapping request
+intervals sum to 11.710 seconds; native execution was 8.490 seconds plus 0.055 seconds
+cleanup. Preparation before native execution was 5.219 seconds. Diagnostics,
+investigator calls and R attention passes were all zero in the measured slot.
+
+Preparation, developer work, scripted checks and offline evaluator work are
+separate from native execution. Their cumulative time was not reliably measured
+and is reported as unavailable, not zero. Offline grading made zero provider calls.
+No monetary cost is inferred. Historical outcomes and pauses are unchanged.
+
+The dependency fix and installed optional investigator have local evidence. The
+intended full comparison remains incomplete due to unknown provider execution;
+there is no evidence of a complete-delivery advantage and no basis to promote the
+extra mechanism. It remains experimental. No follow-on series is scheduled.
