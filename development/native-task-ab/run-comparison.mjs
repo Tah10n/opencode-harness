@@ -2,10 +2,11 @@
 // A/B do not add a phase or an intermediate model deadline.
 import fs from 'node:fs';import path from 'node:path';import {createHash} from 'node:crypto';
 import {runTask} from './native-run.mjs';
+import {recheckSavedAvailability} from '../native-task-investigation/availability-probe.mjs';
 import {execFileSync} from 'node:child_process';
 // Per-request observer for the response lifecycle forms actually emitted by
 // the configured upstream. Transport/native completion remain separate facts.
-export function responseObserver(record, persist=()=>{}, closeAdmission=()=>{}) {
+export function responseObserver(record, persist=()=>{}, closeAdmission=()=>{}, observeEvent=()=>{}) {
  const decoder=new TextDecoder('utf-8',{fatal:true});let buffer='';
  const terminalTypes={'response.completed':'completed','response.failed':'failed','response.incomplete':'incomplete'};
  const stop=(kind,details={})=>{record.admissionStop??={kind,...details};persist();closeAdmission(record.admissionStop);};
@@ -14,6 +15,7 @@ export function responseObserver(record, persist=()=>{}, closeAdmission=()=>{}) 
  const packet=text=>{
   const lines=text.split(/\r?\n/),data=lines.filter(l=>l.startsWith('data:')).map(l=>l.slice(5).replace(/^ /,'')).join('\n');if(!data||data==='[DONE]')return;
   let event;try{event=JSON.parse(data);}catch{conflict('Malformed upstream SSE JSON');return;}
+  observeEvent(event,lines.find(l=>l.startsWith('event:'))?.slice(6).trim());
   if(event?.type==='error'||event?.type==='response.error'){
    record.protocolError=event.error??{code:event.code??null,message:event.message??null};
    record.serverCompletion=knownResponseTerminal(record)?record.terminalResponse.status:'unknown';
@@ -46,8 +48,9 @@ const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 const amendment=continuationFile?JSON.parse(fs.readFileSync(continuationFile)):null;
 const integrationContinuation=!!amendment&&f.experimentKind==='targeted-integration';
 const availabilityContinuation=integrationContinuation&&amendment.firstSlot===3;
+const savedAvailabilityContinuation=availabilityContinuation&&typeof amendment.savedProbeReportSha256==='string';
 const firstSlot=integrationContinuation?(availabilityContinuation?3:2):19,lastSlot=integrationContinuation?9:48;
-const outputRoot=amendment?path.join(root,`continuation-${firstSlot}-${lastSlot}`):root;
+const outputRoot=amendment?path.join(root,savedAvailabilityContinuation?'continuation-3-9-rechecked':`continuation-${firstSlot}-${lastSlot}`):root;
 const allowedChanges=integrationContinuation
  ?[path.resolve('development/native-task-ab/run-comparison.mjs'),path.resolve('development/native-task-investigation/run.mjs')]
  :['run-comparison.mjs','run.mjs','verify-scheduler.mjs'].map(n=>path.resolve('development/native-task-ab',n));
@@ -57,8 +60,15 @@ if(amendment){
  if(historicalPause.kind!=='unknown_submission'||historicalPause.slot!==(availabilityContinuation?1:firstSlot-1))throw Error('Amendment does not authorize this pause');
  if(availabilityContinuation){
   const previous=path.join(root,'continuation-2-9/scheduling-paused.json');
-  for(const name of ['availability-probe.mjs','prepare-availability.mjs'])if(amendment.additionalLauncherFiles?.[name]!==sha(fs.readFileSync(path.resolve('development/native-task-investigation',name))))throw Error('Availability launcher version mismatch');
-  if(amendment.previousPauseSha256!==sha(fs.readFileSync(previous))||JSON.parse(fs.readFileSync(previous)).slot!==2||amendment.availabilityRequests!==1||typeof beforeTasks!=='function')throw Error('Missing second pause or availability gate');
+  for(const name of ['availability-probe.mjs','prepare-availability.mjs',...(savedAvailabilityContinuation?['prepare-probe-recheck.mjs']:[])])if(amendment.additionalLauncherFiles?.[name]!==sha(fs.readFileSync(path.resolve('development/native-task-investigation',name))))throw Error('Availability launcher version mismatch');
+  if(amendment.previousPauseSha256!==sha(fs.readFileSync(previous))||JSON.parse(fs.readFileSync(previous)).slot!==2||amendment.availabilityRequests!==(savedAvailabilityContinuation?0:1)||(!savedAvailabilityContinuation&&typeof beforeTasks!=='function'))throw Error('Missing second pause or availability gate');
+ }
+ if(savedAvailabilityContinuation){
+  const saved=recheckSavedAvailability(root,amendment.savedProbeReportSha256);
+  if(!saved.success||amendment.savedProbePauseSha256!==saved.sourceHashes.pause)throw Error('Saved probe does not authorize continuation');
+  const periods=fs.readdirSync(root,{withFileTypes:true}).filter(e=>e.isDirectory()&&e.name.startsWith('continuation-')).map(e=>e.name);
+  if(periods.some(n=>!['continuation-2-9','continuation-3-9'].includes(n)))throw Error('Unexpected or already-started continuation period');
+  if(fs.existsSync(path.join(root,'continuation-3-9/runs'))||fs.readdirSync(path.join(root,'continuation-3-9')).some(n=>/^(started|request-|provider-metadata)/.test(n)))throw Error('Probe period has task artifacts');
  }
  if(integrationContinuation&&amendment.runtimeSha!==f.runtimeSha)throw Error('Product candidate identity changed');
  if(amendment.originalPauseSha256!==sha(fs.readFileSync(path.join(root,'scheduling-paused.json'))))throw Error('Historical pause changed');
@@ -128,7 +138,8 @@ if(amendment){
 }else if(fs.existsSync(path.join(root,'scheduling-paused.json')))throw Error('Continuation paused; no automatic resume');
 
 if(availabilityContinuation){
- const probe=await beforeTasks(outputRoot);
+ const probe=savedAvailabilityContinuation?recheckSavedAvailability(root,amendment.savedProbeReportSha256):await beforeTasks(outputRoot);
+ if(savedAvailabilityContinuation)fs.writeFileSync(path.join(outputRoot,'saved-probe-recheck.json'),JSON.stringify(probe,null,2),{flag:'wx'});
  if(probe?.success!==true){fs.writeFileSync(path.join(outputRoot,'scheduling-paused.json'),JSON.stringify({kind:'availability_not_confirmed',probe:probe??null},null,2),{flag:'wx'});return {status:'paused',pause:{kind:'availability_not_confirmed'}};}
 }
 let pause=null;
