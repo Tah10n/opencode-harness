@@ -1,0 +1,222 @@
+{
+  "version": 1,
+  "status": "stopped-provider-protocol-error",
+  "productCandidate": "9cd8ffb4dfcfd32f1a7a65ac9c3eaca44728d2e7",
+  "launcherCommit": "2a3eb14ccc5d625b5b3b36ae491075ba7737fd69",
+  "amendmentSha256": "9b24a80675683d291f04383f5f3e7990fcd1923cd2b44b43675cd5863282a997",
+  "originalPeriodUnchanged": true,
+  "periods": [
+    {
+      "name": "original",
+      "admittedSlots": [
+        1
+      ],
+      "forwardedRequests": 4,
+      "knownTokens": 6418,
+      "unknownUsageRequests": 3,
+      "auxiliaryRetries": 1
+    },
+    {
+      "name": "amended",
+      "admittedSlots": [
+        2
+      ],
+      "forwardedRequests": 2,
+      "knownTokens": null,
+      "unknownUsageRequests": 2,
+      "auxiliaryRetries": 0,
+      "taskRetries": 0,
+      "realSmokes": 0,
+      "nativeExecutionMs": 2491,
+      "nativeCleanupMs": 57,
+      "preNativePreparationMs": 4803,
+      "summedRequestElapsedMs": 2038,
+      "overlappingRequestIntervals": true
+    }
+  ],
+  "combined": {
+    "assignedSlots": 9,
+    "admittedSlots": 2,
+    "unstartedSlots": 7,
+    "autonomousDeliveries": 0,
+    "forwardedRequests": 6,
+    "knownTokenSubtotal": 6418,
+    "unknownUsageRequests": 5,
+    "totalTokens": null,
+    "monetaryCost": null
+  },
+  "slots": [
+    {
+      "slot": 1,
+      "task": "quick-lru-take",
+      "arm": "P",
+      "period": "original",
+      "status": "interrupted-before-implementation",
+      "Q": false,
+      "T": false,
+      "D": false,
+      "patch": "patches/quick-lru-take-P.patch",
+      "patchBytes": 0,
+      "reason": "Provider/transport interruption; required take API absent; no normal native stop."
+    },
+    {
+      "slot": 2,
+      "task": "quick-lru-take",
+      "arm": "R",
+      "period": "amended",
+      "status": "interrupted-before-implementation",
+      "Q": false,
+      "T": false,
+      "D": false,
+      "patch": "patches/quick-lru-take-R.patch",
+      "patchBytes": 0,
+      "reason": "Provider/transport interruption; required take API absent; no normal native stop."
+    },
+    {
+      "slot": 3,
+      "task": "quick-lru-take",
+      "arm": "H",
+      "period": "amended",
+      "status": "not-started",
+      "Q": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 4,
+      "task": "denque-drain",
+      "arm": "R",
+      "period": "amended",
+      "status": "not-started",
+      "Q": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 5,
+      "task": "denque-drain",
+      "arm": "H",
+      "period": "amended",
+      "status": "not-started",
+      "Q": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 6,
+      "task": "denque-drain",
+      "arm": "P",
+      "period": "amended",
+      "status": "not-started",
+      "Q": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 7,
+      "task": "eventemitter-collect",
+      "arm": "H",
+      "period": "amended",
+      "status": "not-started",
+      "Q": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 8,
+      "task": "eventemitter-collect",
+      "arm": "P",
+      "period": "amended",
+      "status": "not-started",
+      "Q": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 9,
+      "task": "eventemitter-collect",
+      "arm": "R",
+      "period": "amended",
+      "status": "not-started",
+      "Q": null,
+      "T": null,
+      "D": null
+    }
+  ],
+  "newRequests": [
+    {
+      "index": 1,
+      "kind": "title",
+      "forwarded": true,
+      "httpStatus": 200,
+      "serverCompletion": "unknown",
+      "protocolError": {
+        "type": "service_unavailable_error",
+        "code": "server_is_overloaded",
+        "message": "Our servers are currently overloaded. Please try again later.",
+        "param": null
+      },
+      "terminalResponse": null,
+      "clientDelivery": "stop-event-forwarded",
+      "usage": null,
+      "elapsedMs": 1188
+    },
+    {
+      "index": 2,
+      "kind": "work",
+      "forwarded": true,
+      "httpStatus": null,
+      "serverCompletion": "unknown",
+      "protocolError": null,
+      "terminalResponse": null,
+      "clientDelivery": "unconfirmed-after-transport-error",
+      "usage": null,
+      "elapsedMs": 850
+    }
+  ],
+  "newPause": {
+    "kind": "provider_protocol_error",
+    "slot": 2,
+    "requestIndex": 1,
+    "error": {
+      "type": "service_unavailable_error",
+      "code": "server_is_overloaded",
+      "message": "Our servers are currently overloaded. Please try again later.",
+      "param": null
+    }
+  },
+  "newStopVerification": {
+    "ownTaskDeadlineTriggered": false,
+    "terminationVerified": true,
+    "captureSaved": true,
+    "forwardingClosed": true,
+    "relayRemoved": true,
+    "activeProviderHandlers": 0,
+    "providerServerStateMayRemainUnknown": true
+  },
+  "newNative": {
+    "exitCode": 137,
+    "nativeCompleted": false,
+    "workflowStatus": null,
+    "toolCalls": 0,
+    "investigatorInvocations": 0,
+    "extraAttentionPasses": 0
+  },
+  "attribution": "No H run started. No investigator question, test patch or integration exists. Both P/R QuickLRU failures occurred before implementation; they do not demonstrate Luna weakness or H benefit.",
+  "measurement": "Development comparison with a launcher amendment between execution periods, not one unchanged confirmatory environment.",
+  "preparationAndEvaluation": {
+    "realProviderRequests": 0,
+    "cumulativeDeveloperAndFixtureWallTimeMs": null,
+    "note": "Preparation, local fixtures/review and offline grading are separate; cumulative wall time unavailable, not zero."
+  },
+  "nextAction": "No automatic continuation, retries, replacement tasks or new campaign. Preserve both pauses and all original records.",
+  "offlineGrading": {
+    "sourceAndCandidateIdentical": true,
+    "comparedFiles": 16,
+    "patchBytes": 0,
+    "ordinarySuiteExit": 0,
+    "independentContractExit": 1,
+    "reason": "take is not a function",
+    "realProviderRequests": 0
+  }
+}

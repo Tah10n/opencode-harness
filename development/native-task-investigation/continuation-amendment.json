@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "createdAt": "2026-09-15T08:33:13.403Z",
+  "firstSlot": 2,
+  "lastSlot": 9,
+  "runtimeSha": "9cd8ffb4dfcfd32f1a7a65ac9c3eaca44728d2e7",
+  "launcherCommit": "2a3eb14ccc5d625b5b3b36ae491075ba7737fd69",
+  "originalFreezeSha256": "198d694521294c5f1eb0255a67f92ad61b8595f4a1b89d74cc4f94911afdd384",
+  "originalPauseSha256": "12dc97cc581de95af5d565163ab46fc84dbd4cef4b1964af3f41452692eb2811",
+  "launcherFiles": {
+    "development/native-task-ab/run-comparison.mjs": {
+      "before": "6f253e70249b2b2fb1e1008498f1af9806b8fa451192f05a41563e235cd39a8d",
+      "after": "97b066b383373184313d1858c3b1cdde72c80eaf1c58fec7c029ff3088d9c4c9"
+    },
+    "development/native-task-investigation/run.mjs": {
+      "before": "007da0a642cc7665a9bbb2f1c1a5c06f6db7c14882fa9f23764ba70547e7239e",
+      "after": "b5786f67a711106c51f80029ae7be1288c72d24eaef138dac9080765bb9db215"
+    }
+  },
+  "policy": "Stop further sends before client delivery of failed, incomplete or protocol error. Bound failed/incomplete remain known. Unknown/auth/quota/local execution failures remain fail-closed. No task retries.",
+  "historical": {
+    "slot": 1,
+    "Q": false,
+    "T": false,
+    "D": false,
+    "requests": 4,
+    "knownTokens": 6418,
+    "unknownUsageRequests": 3
+  },
+  "order": [
+    {
+      "slot": 2,
+      "task": "quick-lru-take",
+      "arm": "R"
+    },
+    {
+      "slot": 3,
+      "task": "quick-lru-take",
+      "arm": "H"
+    },
+    {
+      "slot": 4,
+      "task": "denque-drain",
+      "arm": "R"
+    },
+    {
+      "slot": 5,
+      "task": "denque-drain",
+      "arm": "H"
+    },
+    {
+      "slot": 6,
+      "task": "denque-drain",
+      "arm": "P"
+    },
+    {
+      "slot": 7,
+      "task": "eventemitter-collect",
+      "arm": "H"
+    },
+    {
+      "slot": 8,
+      "task": "eventemitter-collect",
+      "arm": "P"
+    },
+    {
+      "slot": 9,
+      "task": "eventemitter-collect",
+      "arm": "R"
+    }
+  ],
+  "historicalEvidenceFiles": 23,
+  "amendmentSha256": "9b24a80675683d291f04383f5f3e7990fcd1923cd2b44b43675cd5863282a997"
+}

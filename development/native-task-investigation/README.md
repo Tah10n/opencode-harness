@@ -1,4 +1,8 @@
-# Optional test investigation: implementation and admission status
+# Optional test investigation: initial execution period
+
+For the subsequently authorized launcher fix and slots 2–9, see
+[continuation results](CONTINUATION-RESULTS.md). The historical results below
+remain unchanged.
 
 The runtime candidate is frozen at `9cd8ffb4dfcfd32f1a7a65ac9c3eaca44728d2e7`.
 The [frozen manifest](frozen-inputs.json) records the three new tasks, nine slots,
