@@ -31,7 +31,7 @@ if(process.env.NATIVE_TASK_FIXTURE_SENSITIVITY==='1'){
 git('add','.');git('-c','core.hooksPath=/dev/null','-c','user.name=Fixture','-c','user.email=fixture@localhost','commit','-qm','base');
 materializeNativeTemplate({repositoryRoot:root,outputDirectory:bundle,task:true,review:true});
 if(process.env.NATIVE_TASK_FIXTURE_SENSITIVITY==='1')fs.symlinkSync(path.join(root,'profiles/native/sensitivity/node_modules'),path.join(bundle,'sensitivity/node_modules'));
-const ordinaryErrorModes=['missing-read','edit-context'];
+const ordinaryErrorModes=['missing-read','edit-context','glob-error','glob-parallel','glob-after-check'];
 const continuationModes=['external-path','external-argument','bash-denial','second-denial'];
 const forbiddenContent='UNREAD_NATIVE_DENIAL_SENTINEL';
 const denialText='The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules '+JSON.stringify([{permission:'bash',pattern:'*',action:'deny'}]);
@@ -183,9 +183,12 @@ const fixture=http.createServer(async(req,res)=>{
     const read=filePath=>({name:'read',args:{filePath}});
     const edit=(filePath,oldString,newString)=>({name:'edit',args:{filePath,oldString,newString}});
     calls=[read('value.mjs'),edit('value.mjs','value = 2','value = 3'),read('value.test.mjs'),edit('value.test.mjs','value,2','value,3'),bash('npm test'),bash('git diff --check')];
-    if(mode==='missing-read')calls.unshift(read('missing-source.mjs'));
+    if(mode.startsWith('glob-'))calls.unshift({name:'glob',args:{pattern:'**/*',path:'src'}});
+    else if(mode==='missing-read')calls.unshift(read('missing-source.mjs'));
     else calls.splice(1,0,edit('value.mjs','value = 999','value = 3'),read('value.mjs'));
-    if(n===(mode==='missing-read'?1:2))assert.ok(body.messages.some(m=>m.role==='tool'&&JSON.stringify(m.content).includes(mode==='missing-read'?'File not found:':'Could not find oldString')), 'Author must receive the native error before choosing the next action');
+    if(mode==='glob-parallel')calls[0]=[calls[0],read('value.mjs'),read('value.test.mjs')];
+    if(mode==='glob-after-check'){calls.shift();calls.push({name:'glob',args:{pattern:'**/*',path:'src'}});}
+    if(n===(mode==='glob-after-check'?7:mode==='edit-context'?2:1))assert.ok(body.messages.some(m=>m.role==='tool'&&JSON.stringify(m.content).includes(mode.startsWith('glob-')?'ripgrep execution failed':mode==='missing-read'?'File not found:':'Could not find oldString')), 'Author must receive the native error before choosing the next action');
    }
    else if(mode==='permission')calls=[bash('printf forbidden')];
    else if(mode==='unknown-error')calls=[{name:'bash',args:{command:writeFixture('forbidden.txt','bad'),timeout:-1,description:'Native validation error'}}];
@@ -237,6 +240,7 @@ if(process.env.NATIVE_TASK_FIXTURE_COMPONENTS){
  assert.match(flags,/^[01]{2}$/);
  Object.assign(env,{HARNESS_TASK_STRATEGY:'direct',HARNESS_TASK_CONTEXT:flags[0],HARNESS_TASK_CHECKS:flags[1],HARNESS_TASK_TIMEOUT_MS:'60000'});
 }
+if(process.env.NATIVE_TASK_FIXTURE_DIRECT==='1')Object.assign(env,{HARNESS_TASK_STRATEGY:'direct'});
 if(process.env.NATIVE_TASK_FIXTURE_MODES==='sensitivity-off')Object.assign(env,{HARNESS_TASK_STRATEGY:'direct',HARNESS_TASK_CONTEXT:'0',HARNESS_TASK_CHECKS:'0'});
 if(process.env.NATIVE_TASK_FIXTURE_SENSITIVITY==='1')Object.assign(env,{HARNESS_TASK_STRATEGY:'direct',HARNESS_TASK_CONTEXT:'0',HARNESS_TASK_CHECKS:'0',HARNESS_TASK_SENSITIVITY:'1',HARNESS_TASK_TIMEOUT_MS:'60000'});
 const version = spawnSync(process.env.OPENCODE_BIN ?? 'opencode', ['--version'], {env, encoding:'utf8'});
@@ -267,6 +271,7 @@ try {
    if(mode==='sensitivity-cancel')fs.writeFileSync(path.join(project,'value.test.mjs'),"import fs from 'node:fs';fs.writeFileSync('sleeper.pid',String(process.pid));setInterval(()=>{},1000);\n");
 
   }
+  const userStatus=git('status','--porcelain=v1','--untracked-files=all');
   const userBytes=fs.readFileSync(path.join(project,'value.mjs'),'utf8'),index=git('ls-files','--stage','-z');
   const session=await api('POST','/session',{permission:mode==='sensitivity-command-denial'?[{permission:'bash',pattern:'npm run test',action:'deny'}]:mode==='sensitivity-hook-denial'?[{permission:'bash',pattern:'*PRE_HOOK_OK*',action:'deny'}]:mode==='sensitivity-read-denial'?[{permission:'read',pattern:'*node_modules*',action:'deny'}]:mode==='component-denial'?[{permission:'bash',pattern:'npm run test',action:'deny'}]:['permission','bash-denial'].includes(mode)?[{permission:'bash',pattern:'printf forbidden',action:mode==='permission'?'ask':'deny'}]:continuationModes.includes(mode)||mode.startsWith('sensitivity')?[{permission:'external_directory',pattern:'*',action:'deny'}]:[]});
   const pending=api('POST',`/session/${session.id}/command`,{command:'harness-task',arguments:'',agent:'build',model:'local-fixture/fixture'});
@@ -421,30 +426,42 @@ try {
    assert.equal(fs.existsSync(path.join(report.artifacts,'component-checks.json')),false);
   }else assert.deepEqual(report.permissionContinuations,[]);
   if(ordinaryErrorModes.includes(mode)){
-   const failureIndex=mode==='missing-read'?0:1,failed=events[failureIndex];
-   assert.equal(failed.state,'error');assert.equal(failed.tool,mode==='missing-read'?'read':'edit');
+   const failureIndex=events.findIndex(e=>e.state==='error'),failed=events[failureIndex];
+   assert.equal(failed.state,'error');assert.equal(failed.tool,mode.startsWith('glob-')?'glob':mode==='missing-read'?'read':'edit');
    assert.equal(failed.permissionDenied,false);assert.equal(failed.before,failed.after);
    assert.ok(failed.nativeTime.end>=failed.nativeTime.start);
-   assert.equal(git('status','--porcelain=v1','--untracked-files=all'),'');
+   assert.equal(git('status','--porcelain=v1','--untracked-files=all'),userStatus);
    assert.ok(failed.output.length>0);assert.equal(failed.execution,undefined);
-   if(mode==='missing-read')assert.equal(failed.args.filePath,'missing-source.mjs');
+   if(mode.startsWith('glob-'))assert.deepEqual(failed.args,{pattern:'**/*',path:'src'});
+   else if(mode==='missing-read')assert.equal(failed.args.filePath,'missing-source.mjs');
    else assert.equal(failed.args.oldString,'value = 999');
    const native=await api('GET',`/session/${report.sessions.author}/message?directory=${encodeURIComponent(report.executionDirectory)}`);
    const nativeTools=native.flatMap(m=>m.parts).filter(p=>p.type==='tool');
-   assert.equal(nativeTools.length,mode==='missing-read'?7:8);
+   assert.equal(nativeTools.length,mode==='glob-parallel'?9:mode==='edit-context'?8:7);
    assert.equal(new Set(nativeTools.map(p=>p.callID)).size,nativeTools.length);
    const nativeFailed=nativeTools.filter(p=>p.callID===failed.callID);assert.equal(nativeFailed.length,1);
    assert.equal(nativeFailed[0].state.status,'error');assert.equal(nativeFailed[0].state.error,failed.output);
    assert.deepEqual(nativeFailed[0].state.input,failed.args);
    assert.equal(events.filter(e=>e.state==='error').length,1);
-   assert.equal(events[failureIndex+1].tool,'read');assert.equal(events[failureIndex+1].state,'completed');
+   if(mode!=='glob-after-check'){assert.equal(events[failureIndex+1].tool,'read');assert.equal(events[failureIndex+1].state,'completed');}
    assert.equal(report.termination.abortRequests,0);assert.equal(report.termination.verified,true);
    assert.equal(fs.existsSync(path.join(report.artifacts,'permission-continuations.json')),false);
-   assert.equal(requests.filter(r=>r.mode===mode&&r.stage==='implementation').length,nativeTools.length+1);
+   assert.equal(requests.filter(r=>r.mode===mode&&r.stage==='implementation').length,nativeTools.length+1-(mode==='glob-parallel'?2:0));
    assert.equal(requests.filter(r=>r.mode===mode&&r.stage==='correction').length,0);
    assert.equal(fs.readFileSync(path.join(report.executionDirectory,'value.mjs'),'utf8'),source.replace('value = 2','value = 3'));
    assert.equal(fs.readFileSync(path.join(report.executionDirectory,'value.test.mjs'),'utf8'),originalTest.replace('value,2','value,3'));
-   assert.ok(report.observations.checks.some(c=>c.command==='npm test'&&c.successful&&c.current));
+   const npmCheck=report.observations.checks.find(c=>c.command==='npm test');
+   assert.ok(npmCheck.current);
+   assert.equal(npmCheck.successful,true);
+   if(mode.startsWith('glob-')){
+    const portable=path.join(temp,'portable-'+mode);fs.cpSync(project,portable,{recursive:true,filter:name=>!name.startsWith(path.join(project,'.git'))});
+    const command=(program,args)=>{const r=spawnSync(program,args,{cwd:portable,encoding:'utf8'});assert.equal(r.status,mode.endsWith('failure')&&program==='npm'?7:0,r.stdout+r.stderr);};
+    command('git',['init','-q']);command('git',['add','.']);command('git',['-c','user.name=Fixture','-c','user.email=fixture@local','commit','-qm','base']);
+    const patchBytes=fs.readFileSync(report.terminalPatch,'utf8');assert.ok(!/^diff --git .*?(?:harness|diagnostic|\.git)/m.test(patchBytes));
+    assert.deepEqual([...patchBytes.matchAll(/^diff --git a\/(.+) b\//gm)].map(m=>m[1]).sort(),['value.mjs','value.test.mjs']);
+    command('git',['apply',report.terminalPatch]);command('npm',['test']);command('git',['diff','--check']);
+    assert.equal(fs.readFileSync(path.join(portable,'value.mjs'),'utf8'),source.replace('value = 2','value = 3'));
+   }
    const patch=path.join(report.artifacts,'final.patch');assert.match(fs.readFileSync(patch,'utf8'),/value = 3/);git('apply','--check',patch);
   }
   if(mode==='unknown-error'){assert.equal(report.terminalReason.kind,'tool_error');assert.equal(report.termination.verified,true);assert.equal(events[0].execution,undefined);}
