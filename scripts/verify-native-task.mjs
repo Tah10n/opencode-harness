@@ -8,6 +8,7 @@ import {prepareObservations,commandWords} from '../lib/native-task-observations.
 import {runWorkflow,nativePermissionDenial,nativePermissionKind,stateTransition} from '../lib/native-task-workflow.mjs';
 import {reviewContext} from '../lib/native-review-context.mjs';
 import {materializeNativeTemplate} from '../lib/native-template.mjs';
+import './verify-native-task-command-observations.mjs';
 import {verifyCheckFirst} from './verify-native-task-check-first.mjs';
 const temp=fs.mkdtempSync(path.join(os.tmpdir(),'native-d-check-'));
 const rules=[{permission:'read',pattern:'*',action:'allow'}];
@@ -138,7 +139,7 @@ try {
   assert.equal(result.repairs,mode==='variant'?0:mode==='diagnostic-failure'?3:mode==='environment'?2:1,mode);
   assert.equal(result.status,['diagnostic-failure','environment'].includes(mode)?'incomplete':'checks_passed',mode);
   if(mode==='variant'){assert.equal(first.checks[0].requirement,'diagnostic');assert.equal(first.checks[0].current,false);assert.equal(first.checks[1].requirement,'required');}
-  if(mode==='environment'){assert.ok(result.remaining.some(r=>r.includes('CHECK_MODE=required')));assert.ok(result.observations.checks.every(c=>!c.command.startsWith('CHECK_MODE=')));}
+  if(mode==='environment'){assert.ok(result.remaining.some(r=>r.includes('CHECK_MODE=required')));assert.ok(result.observations.checks.filter(c=>c.command.startsWith('CHECK_MODE=')).every(c=>c.execution.observed&&!c.successful&&c.interpretation.status==='unsupported'));}
   if(mode==='both-required')assert.ok(first.latestChecks.every(c=>c.requirement==='required'));
   // Re-executing the stale failure gives current evidence once; two subsequent identical failures stop.
   if(mode==='diagnostic-failure'){assert.equal(result.observations.unresolvedFailures.length,4);assert.equal(result.remaining.length,1);assert.equal(result.observations.unresolvedFailures[0].current,false);assert.match(result.remaining.join(' '),/additional project check failure/);}
@@ -399,9 +400,9 @@ try {
     if(mode==='duplicate')assert.equal(log.filter(e=>e.callID==='denied').length,1);
     if(mode==='after-start'){assert.equal(fs.readFileSync(path.join(worktree,'executed.txt'),'utf8'),'ran');assert.equal(log[0].execution,undefined);}
     if(mode==='outside-change'){assert.equal(result.terminalReason.kind,'scope_violation');assert.equal(fs.readFileSync(path.join(worktree,'external.txt'),'utf8'),'user save');}
-    if(mode==='preserve-check'){assert.equal(result.observations.checks[0].current,true);assert.equal(result.observations.checks.length,1);assert.equal(result.permissionContinuations[0].continuedWith,undefined);}
+    if(mode==='preserve-check'){assert.equal(result.observations.checks[0].current,true);assert.equal(result.observations.checks.filter(c=>c.execution.observed).length,1);assert.ok(result.observations.checks.some(c=>c.execution.status==='denied_before_execution'));assert.equal(result.permissionContinuations[0].continuedWith,undefined);}
     if(mode==='real-failure')assert.ok(result.observations.unresolvedFailures.some(e=>e.exit===1));
-    if(result.observations)assert.ok(!result.observations.checks.some(e=>e.callID==='denied'));
+    if(result.observations)assert.ok(result.observations.checks.filter(e=>e.callID==='denied').every(e=>!e.execution.observed&&!e.successful));
     return result;
    }finally{await hooks.event({event:{type:'command.executed',properties:{name:'harness-task',sessionID:parent}}});}
   }
