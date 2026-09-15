@@ -1,0 +1,145 @@
+diff --git a/index.d.ts b/index.d.ts
+index 3e8ac46f0bd2992c19e3bd2ca43d89f06a304e07..90a5c281c80440ecfc25b87444cdd0e229af94a4 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -70,6 +70,15 @@ export default class QuickLRU<KeyType, ValueType> extends Map<KeyType, ValueType
+ 	*/
+ 	get(key: KeyType): ValueType | undefined;
+ 
++	/**
++		Get and delete an item.
++
++		The returned object distinguishes a stored `undefined` value from a missing item.
++
++		@returns An object containing the stored item, or `undefined` if the item is missing or expired.
++	*/
++	take(key: KeyType): {value: ValueType} | undefined;
++
+ 	/**
+ 	Check if an item exists.
+ 	*/
+diff --git a/index.js b/index.js
+index 7f87cf591ada3e59e432a515791a4a4f7f05becb..08ec56607c5f2392c0400dfdba19679798408ed0 100644
+--- a/index.js
++++ b/index.js
+@@ -117,6 +117,20 @@ export default class QuickLRU extends Map {
+ 		}
+ 	}
+ 
++	take(key) {
++		const item = this.#cache.get(key) ?? this.#oldCache.get(key);
++		if (!item) {
++			return;
++		}
++
++		if (this.#deleteIfExpired(key, item)) {
++			return;
++		}
++
++		this.delete(key);
++		return {value: item.value};
++	}
++
+ 	set(key, value, {maxAge = this.#maxAge} = {}) {
+ 		const expiry = typeof maxAge === 'number' && maxAge !== Number.POSITIVE_INFINITY
+ 			? (Date.now() + maxAge)
+diff --git a/index.test-d.ts b/index.test-d.ts
+index bc4b63e49a5ea669aea3c4bd4ed3f989750aaba2..73d9bd8e94be2811da65cdb3fddd94c239698d8a 100644
+--- a/index.test-d.ts
++++ b/index.test-d.ts
+@@ -5,6 +5,7 @@ const lru = new QuickLRU<string, number>({maxSize: 1000, maxAge: 200});
+ 
+ expectType<QuickLRU<string, number>>(lru.set('🦄', 1).set('🌈', 2));
+ expectType<number | undefined>(lru.get('🦄'));
++expectType<{value: number} | undefined>(lru.take('🦄'));
+ expectType<boolean>(lru.has('🦄'));
+ expectType<number | undefined>(lru.peek('🦄'));
+ expectType<number | undefined>(lru.expiresIn('🦄'));
+diff --git a/readme.md b/readme.md
+index bad09c35aa1bcd5af7d0c7b4de822eb8baeb607c..0d64b443ed956f473ec89507a47aea99b08ccc18 100644
+--- a/readme.md
++++ b/readme.md
+@@ -90,6 +90,17 @@ Individual expiration of an item can be specified with the `maxAge` option. If n
+ 
+ Get an item.
+ 
++#### .take(key)
++
++Get and delete an item. The result is wrapped in an object so a stored `undefined` value can be distinguished from a missing item.
++
++```js
++const result = lru.take('🦄');
++if (result) {
++	console.log(result.value);
++}
++```
++
+ #### .has(key)
+ 
+ Check if an item exists.
+diff --git a/test.js b/test.js
+index 0904dc266d45e27d109d4296fdb5aabc011ea1c5..7009e619c2e388900645e885b5e5a3ed8f1c58c5 100644
+--- a/test.js
++++ b/test.js
+@@ -31,6 +31,61 @@ test('.get() / .set()', t => {
+ 	t.is(lru.size, 2);
+ });
+ 
++test('.take() consumes live entries from both cache generations', t => {
++	const evictions = [];
++	const lru = new QuickLRU({
++		maxSize: 2,
++		onEviction: (...args) => evictions.push(args),
++	});
++	const oldKey = {};
++	const oldValue = {};
++	const recentKey = {};
++	const recentValue = {};
++
++	lru.set(oldKey, oldValue);
++	lru.set('retained', 'old');
++	lru.set(recentKey, recentValue);
++
++	t.true(lru.__oldCache.has(oldKey));
++	const oldResult = lru.take(oldKey);
++	t.deepEqual(oldResult, {value: oldValue});
++	t.not(oldResult, oldValue);
++	const recentResult = lru.take(recentKey);
++	t.deepEqual(recentResult, {value: recentValue});
++	t.not(recentResult, recentValue);
++	t.deepEqual([...lru], [['retained', 'old']]);
++	t.deepEqual(evictions, []);
++	t.is(lru.take(oldKey), undefined);
++	t.is(lru.take('missing'), undefined);
++
++	lru.set('undefined', undefined);
++	const result = lru.take('undefined');
++	t.not(result, undefined);
++	t.is(result.value, undefined);
++	t.is(lru.take('undefined'), undefined);
++});
++
++test('.take() evicts expired entries and retains unrelated entries', async t => {
++	const evictions = [];
++	const lru = new QuickLRU({
++		maxSize: 2,
++		onEviction: (...args) => evictions.push(args),
++	});
++	const expiredValue = {};
++
++	lru.set('expired', expiredValue, {maxAge: 1});
++	lru.set('retained', 'old');
++	lru.set('recent', 'new');
++	await delay(10);
++
++	t.true(lru.__oldCache.has('expired'));
++	t.is(lru.take('expired'), undefined);
++	t.deepEqual(evictions, [['expired', expiredValue]]);
++	t.deepEqual([...lru], [['recent', 'new'], ['retained', 'old']]);
++	t.is(lru.take('expired'), undefined);
++	t.deepEqual(evictions, [['expired', expiredValue]]);
++});
++
+ test('.get() - limit', t => {
+ 	const lru = new QuickLRU({maxSize: 2});
+ 	lru.set('1', 1);
