@@ -40,12 +40,13 @@ export function responseObserver(record, persist=()=>{}, closeAdmission=()=>{}) 
 }
 export function knownResponseTerminal(record){return !!record.terminalResponse&&!record.responseBindingError;}
 
-export async function runComparison({root,startContainer,captureCandidate,stopWorkload,readAuth,fetchImpl=fetch,runTaskImplementation=runTask,continuationFile=null,verifyQuiescence=verifyHistoricalContainers}) {
+export async function runComparison({root,startContainer,captureCandidate,stopWorkload,readAuth,fetchImpl=fetch,runTaskImplementation=runTask,continuationFile=null,verifyQuiescence=verifyHistoricalContainers,beforeTasks=null}) {
 const f=JSON.parse(fs.readFileSync(path.join(root,'freeze.json')));
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 const amendment=continuationFile?JSON.parse(fs.readFileSync(continuationFile)):null;
 const integrationContinuation=!!amendment&&f.experimentKind==='targeted-integration';
-const firstSlot=integrationContinuation?2:19,lastSlot=integrationContinuation?9:48;
+const availabilityContinuation=integrationContinuation&&amendment.firstSlot===3;
+const firstSlot=integrationContinuation?(availabilityContinuation?3:2):19,lastSlot=integrationContinuation?9:48;
 const outputRoot=amendment?path.join(root,`continuation-${firstSlot}-${lastSlot}`):root;
 const allowedChanges=integrationContinuation
  ?[path.resolve('development/native-task-ab/run-comparison.mjs'),path.resolve('development/native-task-investigation/run.mjs')]
@@ -53,7 +54,12 @@ const allowedChanges=integrationContinuation
 if(amendment){
  if(amendment.version!==1||amendment.firstSlot!==firstSlot||amendment.lastSlot!==lastSlot||amendment.originalFreezeSha256!==sha(fs.readFileSync(path.join(root,'freeze.json')))||(!integrationContinuation&&f.experimentKind!=='h00-transfer'))throw Error('Invalid explicit continuation amendment');
  const historicalPause=JSON.parse(fs.readFileSync(path.join(root,'scheduling-paused.json')));
- if(historicalPause.kind!=='unknown_submission'||historicalPause.slot!==firstSlot-1)throw Error('Amendment does not authorize this pause');
+ if(historicalPause.kind!=='unknown_submission'||historicalPause.slot!==(availabilityContinuation?1:firstSlot-1))throw Error('Amendment does not authorize this pause');
+ if(availabilityContinuation){
+  const previous=path.join(root,'continuation-2-9/scheduling-paused.json');
+  for(const name of ['availability-probe.mjs','prepare-availability.mjs'])if(amendment.additionalLauncherFiles?.[name]!==sha(fs.readFileSync(path.resolve('development/native-task-investigation',name))))throw Error('Availability launcher version mismatch');
+  if(amendment.previousPauseSha256!==sha(fs.readFileSync(previous))||JSON.parse(fs.readFileSync(previous)).slot!==2||amendment.availabilityRequests!==1||typeof beforeTasks!=='function')throw Error('Missing second pause or availability gate');
+ }
  if(integrationContinuation&&amendment.runtimeSha!==f.runtimeSha)throw Error('Product candidate identity changed');
  if(amendment.originalPauseSha256!==sha(fs.readFileSync(path.join(root,'scheduling-paused.json'))))throw Error('Historical pause changed');
  if(!amendment.launcherFiles||!Object.keys(amendment.launcherFiles).length||Object.keys(amendment.launcherFiles).some(file=>!allowedChanges.includes(file)))throw Error('Amendment exceeds launcher scope');
@@ -94,11 +100,13 @@ if(amendment){
  const historical=[];
  const runName=a=>a.task+(a.repetition?'-r'+a.repetition:'')+'-'+a.arm;
  const expectedDirectories=new Set(f.attempts.filter(a=>a.slot<firstSlot).map(runName));
+ const periodFor=a=>availabilityContinuation&&a.slot===2?'continuation-2-9/':'';
  const actualDirectories=fs.readdirSync(path.join(root,'runs'));
+ if(availabilityContinuation)actualDirectories.push(...fs.readdirSync(path.join(root,'continuation-2-9/runs')));
  if(actualDirectories.length!==firstSlot-1||actualDirectories.some(n=>!expectedDirectories.has(n)))throw Error('Unrecognized historical run directory');
  for(const attempt of f.attempts){
-  const dir=path.join(root,'runs',runName(attempt));
-  if(attempt.slot>=firstSlot){if(fs.existsSync(dir))throw Error('Unstarted slot has historical artifacts: '+attempt.slot);continue;}
+  const dir=path.join(root,periodFor(attempt),'runs',runName(attempt));
+  if(attempt.slot>=firstSlot){if(fs.existsSync(dir)||(availabilityContinuation&&fs.existsSync(path.join(root,'continuation-2-9/runs',runName(attempt)))))throw Error('Unstarted slot has historical artifacts: '+attempt.slot);continue;}
   const get=name=>JSON.parse(fs.readFileSync(path.join(dir,name)));
   for(const name of ['started.json','completed.json','result.json'])if(!identity(get(name),attempt))throw Error('Historical attempt identity mismatch: '+attempt.slot);
   const facts=get('stop-verification.json');
@@ -106,7 +114,7 @@ if(amendment){
   if(!fs.existsSync(path.join(dir,'candidate.tar'))||!Array.isArray(get('provider-metadata.json')))throw Error('Historical capture/accounting missing');
   if(integrationContinuation){
    for(const name of ['started.json','completed.json','result.json','stop-verification.json','provider-metadata.json','candidate.tar','session/cleanup.json','session/container.json']){
-    if(!amendment.historicalFiles?.['runs/'+runName(attempt)+'/'+name])throw Error('Missing historical artifact hash: '+name);
+    if(!amendment.historicalFiles?.[periodFor(attempt)+'runs/'+runName(attempt)+'/'+name])throw Error('Missing historical artifact hash: '+name);
    }
   }
   historical.push({slot:attempt.slot,container:get('session/container.json').name});
@@ -119,6 +127,10 @@ if(amendment){
  fs.mkdirSync(outputRoot,{mode:0o700});fs.writeFileSync(path.join(outputRoot,'admission.json'),JSON.stringify({originalFreezeSha256:amendment.originalFreezeSha256,amendmentSha256:sha(fs.readFileSync(continuationFile)),firstSlot,lastSlot,historicalStopsVerified:firstSlot-1,at:new Date().toISOString()},null,2),{flag:'wx'});
 }else if(fs.existsSync(path.join(root,'scheduling-paused.json')))throw Error('Continuation paused; no automatic resume');
 
+if(availabilityContinuation){
+ const probe=await beforeTasks(outputRoot);
+ if(probe?.success!==true){fs.writeFileSync(path.join(outputRoot,'scheduling-paused.json'),JSON.stringify({kind:'availability_not_confirmed',probe:probe??null},null,2),{flag:'wx'});return {status:'paused',pause:{kind:'availability_not_confirmed'}};}
+}
 let pause=null;
 function pauseScheduling(kind,slot,details={}){if(pause)return;pause={kind,slot,...details};fs.writeFileSync(path.join(outputRoot,'scheduling-paused.json'),JSON.stringify(pause,null,2),{flag:'wx'});}
 for(const attempt of f.attempts.filter(a=>!amendment||a.slot>=firstSlot)){
