@@ -14,8 +14,8 @@ const root=path.resolve(process.env.SCHEDULER_TRANSPORT_OUTPUT??'local/native-ta
 if(fs.existsSync(root))throw Error('Keep previous transport evidence; choose a fresh output directory');
 fs.mkdirSync(root,{recursive:true});
 let runComparison=currentRunComparison;
-if(process.env.SCHEDULER_VERIFY_BASELINE==='1'){
- const old=execFileSync('git',['show','65143259aedbc58c064a6b8b0db7ce34c5f671d8:development/native-task-ab/run-comparison.mjs'],{encoding:'utf8'}).replace("'./native-run.mjs'",JSON.stringify(new URL('./native-run.mjs',import.meta.url).href));
+if(process.env.SCHEDULER_VERIFY_BASELINE==='1'||process.env.SCHEDULER_VERIFY_SSE_BASELINE==='1'){
+ const old=execFileSync('git',['show',(process.env.SCHEDULER_VERIFY_SSE_BASELINE==='1'?'55369dd7ca42f82574f099ca6aae48861a5f8dc1':'65143259aedbc58c064a6b8b0db7ce34c5f671d8')+':development/native-task-ab/run-comparison.mjs'],{encoding:'utf8'}).replace("'./native-run.mjs'",JSON.stringify(new URL('./native-run.mjs',import.meta.url).href));
  fs.writeFileSync(root+'/baseline.mjs',old);runComparison=(await import(new URL('file://'+root+'/baseline.mjs'))).runComparison;
 }
 const fixtureRoot=path.resolve('local/native-sensitivity/usage-20260914');
@@ -35,24 +35,41 @@ function nativeResponse(index,call){
  events.push({type:'response.output_item.done',output_index:0,item},{type:'response.completed',response:{...base,status:'completed',output:[item],usage:{input_tokens:2,output_tokens:3,total_tokens:5}}});return events.map(e=>'data: '+JSON.stringify(e)+'\n\n').join('');
 }
 const all=[];
-const modes=process.env.SCHEDULER_VERIFY_BASELINE==='1'?['baseline-replay']:process.env.SCHEDULER_INSTALLED_ONLY==='1'?['installed-503','installed-delayed-503','installed-success','installed-cancel','installed-hard-deadline']:[
- '503-retry','delayed-503','oversized-503','200-disconnect','completed-delivery-error','previous-completed-new-unknown',
+const sseModes=['failed-retry','historical-failed','failed-queued-title','failed-chunks','failed-hanging','failed-usage','incomplete','protocol-error','wrong-id','malformed-event','normal-failed-text','installed-failed','installed-failed-hanging'];
+const modes=process.env.SCHEDULER_VERIFY_SSE_BASELINE==='1'?['failed-retry']:process.env.SCHEDULER_SSE_ONLY==='1'?sseModes:process.env.SCHEDULER_VERIFY_BASELINE==='1'?['baseline-replay']:process.env.SCHEDULER_INSTALLED_ONLY==='1'?['installed-503','installed-delayed-503','installed-success','installed-cancel','installed-hard-deadline']:[
+ ...sseModes,'503-retry','delayed-503','oversized-503','200-disconnect','completed-delivery-error','completed-delivery-abort','previous-completed-new-unknown',
  '401','403','429','queued-title','already-forwarded','late-completed-after-pause','successful-duplicate','cancelled-before-fetch','pause-during-auth','cancelled-in-flight',
  ...(process.env.SCHEDULER_SKIP_INSTALLED==='1'?[]:['installed-503','installed-delayed-503','installed-success','installed-cancel','installed-hard-deadline'])];
-for(const mode of modes){
+for(const mode of modes.filter(x=>!process.env.SCHEDULER_MODES||process.env.SCHEDULER_MODES.split(',').includes(x))){
  const dir=root+'/'+mode;fs.mkdirSync(dir);const installed=mode.startsWith('installed-'),delayed=mode.includes('delayed');
  const source=dir+'/input';fs.mkdirSync(source);fs.writeFileSync(source+'/TASK.md','Inspect the unfinished change and finish the task.');fs.writeFileSync(source+'/value.mjs','export const value = 1;\n');
  const manifest=Object.fromEntries(['TASK.md','value.mjs'].map(n=>[n,{sha256:createHash('sha256').update(fs.readFileSync(source+'/'+n)).digest('hex'),executable:false}]));
  const attempts=[1,2].map(slot=>({slot,task:'case-'+slot,arm:'H1',source:slot===1?source:dir+'/input-2'}));fs.cpSync(source,attempts[1].source,{recursive:true});
  const f={experimentKind:'sensitivity-usage',model:'openai/gpt-5.6-luna',variant:'high',strategy:'direct',budgetMs:900000,streamLimit:'remaining-task-budget',connectionTimeoutMs:30000,preflightPassed:true,files:{},attempts,inputManifests:{'case-1-H1':manifest,'case-2-H1':manifest},toolchain:frozen.toolchain,template:frozen.template,config:frozen.config};
  fs.writeFileSync(dir+'/freeze.json',JSON.stringify(f));
+ let gateBeforeClientEvent=false,stoppedBeforeEOF=false;
  let hits=0,started=[],stops=0,handler,installedSession,upstreamHeaders=false,pausedBeforeEnd=false,lateAttempt=null,requestID=0,authCalls=0,delayedStop;const nativeCancel=new AbortController();
  const pending=new Set(),controllers=new Set(),seen=[];
  const upstream=http.createServer(async(req,res)=>{
   let text='';for await(const c of req)text+=c;const upstreamIndex=++hits;seen.push({index:upstreamIndex,sha256:createHash('sha256').update(text).digest('hex')});
+  if(sseModes.includes(mode)){
+   res.writeHead(200,{'content-type':'text/event-stream'});
+   if(mode==='normal-failed-text'){res.end(nativeResponse(upstreamIndex,false).replace('Scripted local task completed.','response.failed server_is_overloaded is ordinary output text'));return;}
+   if(mode==='historical-failed'){res.end(fs.readFileSync('local/native-investigation-comparison/runs/quick-lru-take-P/response-1.sse'));return;}
+   const id='resp_sse_'+upstreamIndex;
+   res.write(event('response.created',id,'in_progress')+event('response.in_progress',id,'in_progress'));
+   const terminal=mode==='incomplete'?event('response.incomplete',id,'incomplete',{incomplete_details:{reason:'max_output_tokens'},usage:{input_tokens:2,output_tokens:3,total_tokens:5}})
+    :mode==='protocol-error'?'event: error\ndata: '+JSON.stringify({type:'error',code:'server_error',message:'Scripted protocol error'})+'\n\n'
+    :mode==='malformed-event'?'data: {broken\n\n'
+    :event('response.failed',mode==='wrong-id'?'resp_other':id,'failed',{error:{code:'server_is_overloaded',message:'Scripted overload'},...(mode==='failed-usage'?{usage:{input_tokens:2,output_tokens:3,total_tokens:5}}:{})});
+   if(mode==='failed-chunks'){const mid=terminal.indexOf('failed')+3;res.write(terminal.slice(0,mid));await sleep(40);res.write(terminal.slice(mid));}
+   else res.write(terminal);
+   if(mode.includes('hanging')){stoppedBeforeEOF=true;return;}
+   res.end();return;
+  }
   if(mode==='installed-success'){res.writeHead(200,{'content-type':'text/event-stream'});res.end(nativeResponse(hits,hits%2===1));return;}
   if(['installed-cancel','installed-hard-deadline'].includes(mode)){res.writeHead(200,{'content-type':'text/event-stream'});res.write(event('response.created','resp_native_wait','in_progress'));if(mode==='installed-cancel')setTimeout(()=>nativeCancel.abort(),100);return;}
-  if(mode==='successful-duplicate'||mode==='completed-delivery-error'||mode==='previous-completed-new-unknown'&&hits===1){res.writeHead(200,{'content-type':'text/event-stream'});res.end(completed('resp_'+hits));return;}
+  if(mode==='successful-duplicate'||['completed-delivery-error','completed-delivery-abort'].includes(mode)||mode==='previous-completed-new-unknown'&&hits===1){res.writeHead(200,{'content-type':'text/event-stream'});res.end(completed('resp_'+hits));return;}
   if(mode==='200-disconnect'||mode==='cancelled-in-flight'||mode==='already-forwarded'&&hits===2){res.writeHead(200,{'content-type':'text/event-stream'});res.write(event('response.created','resp_unknown','in_progress'));if(mode==='200-disconnect')res.end();return;}
   if(mode==='late-completed-after-pause'&&hits===2){await until(()=>fs.existsSync(dir+'/scheduling-paused.json'));res.writeHead(200,{'content-type':'text/event-stream'});res.end(completed('resp_late'));return;}
   if(['already-forwarded','late-completed-after-pause'].includes(mode)&&hits===1)await until(()=>hits===2);
@@ -65,11 +82,13 @@ for(const mode of modes){
  const upstreamURL=await listen(upstream);
  const downstream=http.createServer(async(req,res)=>{
   let text='';for await(const c of req)text+=c;
+  if(mode==='failed-queued-title'&&JSON.parse(text).tools?.length===0)await until(()=>fs.existsSync(dir+'/scheduling-paused.json'));
   const controller=new AbortController();controllers.add(controller);
   res.once('close',()=>{if(!res.writableEnded)controller.abort();});
   const work=Promise.resolve().then(()=>handler({id:'probe-'+(++requestID),path:'/v1/responses',body:JSON.parse(text)},frame=>{
-   if(mode==='completed-delivery-error'&&frame.type==='chunk')throw new Error('Scripted client delivery failure after observed terminal');
+   if(['completed-delivery-error','completed-delivery-abort'].includes(mode)&&frame.type==='chunk')throw Object.assign(new Error('Scripted client delivery failure after observed terminal'),{name:mode==='completed-delivery-abort'?'AbortError':'Error'});
    if(frame.type==='headers')res.writeHead(frame.status,{'content-type':frame.contentType});
+   if(frame.type==='chunk'&&Buffer.from(frame.data,'base64').toString().includes('response.failed'))gateBeforeClientEvent=fs.existsSync(dir+'/scheduling-paused.json');
    if(frame.type==='chunk')res.write(Buffer.from(frame.data,'base64'));
    if(frame.type==='end')res.end();
   },controller.signal)).catch(()=>res.destroy()).finally(()=>{pending.delete(work);controllers.delete(controller);});pending.add(work);
@@ -82,7 +101,7 @@ for(const mode of modes){
   // A fresh HTTP client deliberately retries and submits helper work despite the pause.
   const before=hits;lateAttempt=await request();await request({...body,tools:[]});assert.equal(hits,before);
  };
- const late=['503-retry','delayed-503','oversized-503','queued-title','installed-503','installed-delayed-503'].includes(mode)?makeLate():null;
+ const late=process.env.SCHEDULER_VERIFY_SSE_BASELINE==='1'?null:[...sseModes.filter(x=>x!=='normal-failed-text'),'503-retry','delayed-503','oversized-503','queued-title','installed-503','installed-delayed-503'].includes(mode)?makeLate():null;
  let outcome;
  try{
   outcome=await runComparison({root:dir,readAuth:()=>{authCalls++;if(mode==='pause-during-auth')void handler({path:'/v1/responses',body:{...body,model:'forbidden',tools:[]}},()=>{},new AbortController().signal);if(mode==='cancelled-before-fetch')for(const c of controllers)c.abort();return {access:'scripted-not-a-credential',accountId:'fixture'};},
@@ -91,7 +110,7 @@ for(const mode of modes){
     handler=options.onRequest;started.push(started.length+1);
     if(installed){installedSession=await installedContainer(options);return installedSession;}
     return {setTaskBudget(){},close(){return 0;},exec(argv){if(argv[0]==='/opt/opencode')return {status:0,stdout:'1.18.26'};return {status:0,stdout:argv[2].includes('DatabaseSync')?JSON.stringify({sessions:[],messages:[],tools:[]}):argv[2].includes("visit('/work/repo')")?JSON.stringify(manifest):''};}};} ,
-   stopWorkload:s=>{stops++;if(installed&&mode.includes('503')){
+   stopWorkload:s=>{stops++;if(installed&&(mode.includes('503')||mode.includes('failed'))){
     // Delay fixture process cleanup to expose the native client's own retry.
     // Admission must hold even when native process shutdown is slow.
     delayedStop??=setTimeout(()=>installedStop(s),5000);return {terminationVerified:false,fixtureDelayedCleanup:true};
@@ -101,34 +120,43 @@ for(const mode of modes){
     if(installed){
      assert.equal(s.exec(['node','-e',"require('fs').writeFileSync('value.mjs','export const value = 2;\\n')"]).status,0);
      const result=await runNativePhase(s,{...options,enabled:false,signal:nativeCancel.signal,limitMs:mode==='installed-hard-deadline'?2500:10000,deadline:Date.now()+(mode==='installed-hard-deadline'?2500:10000),stopWorkload:installedStop},{spawnProcess:(command,args,settings)=>{
-      const at=args.indexOf('--format');args.splice(at,0,'--title','Local transport fixture');return spawn(command,args,settings);
+      const at=args.indexOf('--format');if(!mode.includes('failed'))args.splice(at,0,'--title','Local transport fixture');return spawn(command,args,settings);
      }});
      clearTimeout(delayedStop);return {...result,nativeCompleted:result.exitCode===0&&result.events.some(e=>e.type==='step_finish'&&e.part?.reason==='stop')};
     }
     if(started.length===1){
-     if(mode==='baseline-replay'){await request();await request();}
+     if(mode==='failed-queued-title'){await Promise.all([request({...body,tools:[]}),request()]);}
+     else if(mode==='baseline-replay'){await request();await request();}
      else if(mode==='previous-completed-new-unknown'){assert.equal((await request()).status,200);await request();}
-     else if(mode==='successful-duplicate'){assert.equal((await request()).status,200);assert.equal((await request()).status,200);}
+     else if(mode==='successful-duplicate'||mode==='normal-failed-text'){assert.equal((await request()).status,200);assert.equal((await request()).status,200);}
      else if(['already-forwarded','late-completed-after-pause'].includes(mode)){await Promise.all([request(),request({...body,tools:[]})]);}
      else if(mode==='cancelled-in-flight'){const r=request();await until(()=>hits===1);for(const c of controllers)c.abort();await r;}
      else await request();
+     if(process.env.SCHEDULER_VERIFY_SSE_BASELINE==='1'){await request();await request({...body,tools:[]});fs.writeFileSync(dir+'/actual-upstream.json',JSON.stringify({hits,seen,started}));}
      if(late)await late;
     }
     return {exitCode:0,nativeCompleted:mode==='successful-duplicate',termination:{terminationVerified:true},elapsedMs:1};
    }});
   if(late)await late;
   const run=dir+'/runs/case-1-H1',records=JSON.parse(fs.readFileSync(run+'/provider-metadata.json')),stop=JSON.parse(fs.readFileSync(run+'/stop-verification.json'));
-  const expected=['cancelled-before-fetch','pause-during-auth'].includes(mode)?0:mode==='installed-success'?4:['successful-duplicate','previous-completed-new-unknown','already-forwarded','late-completed-after-pause'].includes(mode)?2:1;
+  const expected=['cancelled-before-fetch','pause-during-auth'].includes(mode)?0:mode==='installed-success'?4:mode==='normal-failed-text'?2:['successful-duplicate','previous-completed-new-unknown','already-forwarded','late-completed-after-pause'].includes(mode)?2:1;
   assert.equal(hits,expected,'Actual upstream HTTP request count');
-  const success=['successful-duplicate','completed-delivery-error','cancelled-before-fetch','installed-success'].includes(mode);
+  const success=['successful-duplicate','completed-delivery-error','completed-delivery-abort','cancelled-before-fetch','installed-success','normal-failed-text'].includes(mode);
   assert.deepEqual(started,success?[1,2]:[1]);
   assert.equal(outcome.status,success?'finished':'paused');
   assert.ok(stop.terminationVerified&&stop.captureSaved&&stop.relayRemoved&&stop.activeProviderHandlers===0);
   if(late){assert.equal(lateAttempt.status,409);assert.ok(records.some(r=>!r.forwarded&&r.notForwardedReason==='series-paused'));}
   if(records[0]?.status===503){assert.equal(records[0].upstreamRequestId,'local-1');assert.equal(Buffer.from(records[0].errorBodyBase64,'base64').toString(),records[0].errorBody);assert.equal(records[0].usage,null);assert.equal(stop.providerServerStateMayRemainUnknown,true);}
+  if(sseModes.includes(mode)&&mode!=='normal-failed-text'){
+   assert.equal(outcome.pause.kind,mode==='incomplete'?'provider_incomplete':['historical-failed','protocol-error','wrong-id','malformed-event'].includes(mode)?'provider_protocol_error':'provider_failed');
+   assert.equal(records[0].serverCompletion,mode==='incomplete'?'incomplete':['protocol-error','wrong-id','malformed-event'].includes(mode)?'unknown':'failed');
+   if(mode==='failed-usage'||mode==='incomplete')assert.equal(records[0].usage.total_tokens,5);else assert.equal(records[0].usage,null);
+   if(!['incomplete','protocol-error','wrong-id','malformed-event','failed-chunks'].includes(mode)&&!installed)assert.equal(gateBeforeClientEvent,true);
+   if(mode.includes('hanging'))assert.equal(stoppedBeforeEOF,true);
+  }
   if(delayed){assert.ok(pausedBeforeEnd);assert.ok(records[0].errorBodyTimedOut);assert.match(records[0].errorBody,/partial body/);}
   if(mode==='oversized-503'){assert.ok(records[0].errorBodyTruncated);assert.equal(Buffer.byteLength(records[0].errorBody),8192);}
-  if(mode==='completed-delivery-error'){assert.equal(records[0].usage.total_tokens,5);assert.equal(records[0].serverCompletion,'completed');assert.ok(records[0].transportError);}
+  if(['completed-delivery-error','completed-delivery-abort'].includes(mode)){assert.equal(records[0].usage.total_tokens,5);assert.equal(records[0].serverCompletion,'completed');assert.ok(records[0].transportError);}
   if(mode==='baseline-replay'){await request();await request();}
      else if(mode==='previous-completed-new-unknown'){assert.equal(records[0].usage.total_tokens,5);assert.equal(records[1].usage,null);assert.equal(records[1].serverCompletion,'unknown');}
   if(['401','403','429'].includes(mode)){assert.equal(outcome.pause.kind,mode==='429'?'incomplete_quota':'provider_refusal');assert.equal(records[0].status,Number(mode));assert.equal(records[0].serverCompletion,'known_refusal');assert.equal(stop.providerServerStateMayRemainUnknown,false);}
@@ -139,7 +167,7 @@ for(const mode of modes){
   const allRecords=fs.readdirSync(dir+'/runs').flatMap(n=>JSON.parse(fs.readFileSync(dir+'/runs/'+n+'/provider-metadata.json')));
   const nativeRetries=records.filter(r=>!r.forwarded&&typeof r.relayRequestId==='string'&&/^\d+$/.test(r.relayRequestId));
   if(installed&&mode.includes('503'))for(const r of nativeRetries)assert.equal(fs.readFileSync(run+'/request-'+r.requestIndex+'.json','utf8'),fs.readFileSync(run+'/request-1.json','utf8'),'Native replay body retained unchanged');
-  const summary={mode,nativeRetryAttempts:nativeRetries.length,passed:true,upstreamRequests:hits,startedSlots:started,scriptedReportedTokens:allRecords.reduce((n,r)=>n+(r.usage?.total_tokens??0),0),unknownUsageRequests:allRecords.filter(r=>r.forwarded&&!r.usage).length,blockedRequests:records.filter(r=>!r.forwarded).length,pausedBeforeDelayedBodyEnded:pausedBeforeEnd,partialOutputPreserved:stop.captureSaved,localTerminationVerified:stop.terminationVerified,installedOpenCode:installed?'1.18.26':null,pause:outcome.pause,realProviderRequests:0,authCalls,requestIdentities:seen};
+  const summary={mode,nativeBlockedRequests:nativeRetries.length,nativeRetryAttempts:nativeRetries.filter(r=>fs.readFileSync(run+'/request-'+r.requestIndex+'.json','utf8')===fs.readFileSync(run+'/request-1.json','utf8')).length,passed:true,gateBeforeClientEvent,stoppedBeforeEOF,upstreamRequests:hits,startedSlots:started,scriptedReportedTokens:allRecords.reduce((n,r)=>n+(r.usage?.total_tokens??0),0),unknownUsageRequests:allRecords.filter(r=>r.forwarded&&!r.usage).length,blockedRequests:records.filter(r=>!r.forwarded).length,pausedBeforeDelayedBodyEnded:pausedBeforeEnd,partialOutputPreserved:stop.captureSaved,localTerminationVerified:stop.terminationVerified,installedOpenCode:installed?'1.18.26':null,pause:outcome.pause,realProviderRequests:0,authCalls,requestIdentities:seen};
   all.push(summary);console.log(JSON.stringify(summary));
  }finally{clearTimeout(delayedStop);await close(downstream);await close(upstream);await Promise.allSettled([...pending]);}
 }

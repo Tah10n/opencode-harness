@@ -5,14 +5,20 @@ import {runTask} from './native-run.mjs';
 import {execFileSync} from 'node:child_process';
 // Per-request observer for the response lifecycle forms actually emitted by
 // the configured upstream. Transport/native completion remain separate facts.
-export function responseObserver(record, persist=()=>{}) {
+export function responseObserver(record, persist=()=>{}, closeAdmission=()=>{}) {
  const decoder=new TextDecoder('utf-8',{fatal:true});let buffer='';
  const terminalTypes={'response.completed':'completed','response.failed':'failed','response.incomplete':'incomplete'};
- const conflict=reason=>{record.responseBindingError??=reason;record.serverCompletion='unknown';persist();};
+ const stop=(kind,details={})=>{record.admissionStop??={kind,...details};persist();closeAdmission(record.admissionStop);};
+ const conflict=reason=>{record.responseBindingError??=reason;record.serverCompletion='unknown';stop('provider_protocol_error',{reason});};
  const usageOf=u=>{if(!u||typeof u!=='object')return null;const out={};for(const key of ['input_tokens','output_tokens','total_tokens'])if(Number.isFinite(u[key])&&u[key]>=0)out[key]=u[key];if(Number.isFinite(u.input_tokens_details?.cached_tokens))out.cached_tokens=u.input_tokens_details.cached_tokens;if(Number.isFinite(u.output_tokens_details?.reasoning_tokens))out.reasoning_tokens=u.output_tokens_details.reasoning_tokens;return Object.keys(out).length?out:null;};
  const packet=text=>{
   const lines=text.split(/\r?\n/),data=lines.filter(l=>l.startsWith('data:')).map(l=>l.slice(5).replace(/^ /,'')).join('\n');if(!data||data==='[DONE]')return;
   let event;try{event=JSON.parse(data);}catch{conflict('Malformed upstream SSE JSON');return;}
+  if(event?.type==='error'||event?.type==='response.error'){
+   record.protocolError=event.error??{code:event.code??null,message:event.message??null};
+   record.serverCompletion=knownResponseTerminal(record)?record.terminalResponse.status:'unknown';
+   stop('provider_protocol_error',{error:record.protocolError});return;
+  }
   const lifecycle=['response.created','response.in_progress',...Object.keys(terminalTypes)].includes(event?.type);if(!lifecycle)return;
   const declared=lines.find(l=>l.startsWith('event:'))?.slice(6).trim();if(declared&&declared!==event.type){conflict('SSE event/type mismatch');return;}
   const r=event.response,status=terminalTypes[event.type]??'in_progress';
@@ -22,12 +28,15 @@ export function responseObserver(record, persist=()=>{}) {
   if(!terminalTypes[event.type]){if(record.terminalResponse)conflict('Nonterminal lifecycle after terminal response');else record.responseStatus=r.status;return;}
   const usage=usageOf(r.usage),previous=record.terminalResponse;
   if(previous&&(previous.id!==r.id||previous.status!==r.status||JSON.stringify(previous.usage)!==JSON.stringify(usage))){conflict('Conflicting terminal response events');return;}
-  if(!previous){record.terminalResponse={id:r.id,status:r.status,eventType:event.type,usage};record.responseStatus=r.status;record.usage=usage;record.terminalEvents=1;}
+  if(!previous){record.terminalResponse={id:r.id,status:r.status,eventType:event.type,usage,...(r.error?{error:r.error}:{}),...(r.incomplete_details?{incompleteDetails:r.incomplete_details}:{})};record.responseStatus=r.status;record.usage=usage;record.terminalEvents=1;}
   else record.duplicateTerminalEvents=(record.duplicateTerminalEvents??0)+1;
   record.serverCompletion=record.responseBindingError?'unknown':r.status;persist();
+  // This development-series admission rule does not alter provider knowledge or
+  // the user's native OpenCode retry policy. Both statuses forbid another send.
+  if(r.status==='failed'||r.status==='incomplete')stop('provider_'+r.status,{error:r.error??null,incompleteDetails:r.incomplete_details??null});
  };
  const consume=text=>{buffer+=text;let match;while((match=/\r?\n\r?\n/.exec(buffer))){packet(buffer.slice(0,match.index));buffer=buffer.slice(match.index+match[0].length);}};
- return {push(bytes){try{consume(decoder.decode(bytes,{stream:true}));}catch(error){conflict('Invalid upstream UTF-8');throw error;}},end(){try{consume(decoder.decode());}catch(error){conflict('Invalid upstream UTF-8 at EOF');throw error;}}};
+ return {push(bytes){try{consume(decoder.decode(bytes,{stream:true}));}catch(error){conflict('Invalid upstream UTF-8');throw error;}},end(){try{consume(decoder.decode());if(buffer.trim())conflict('Unterminated upstream SSE event at EOF');}catch(error){conflict('Invalid upstream UTF-8 at EOF');throw error;}}};
 }
 export function knownResponseTerminal(record){return !!record.terminalResponse&&!record.responseBindingError;}
 
@@ -35,12 +44,17 @@ export async function runComparison({root,startContainer,captureCandidate,stopWo
 const f=JSON.parse(fs.readFileSync(path.join(root,'freeze.json')));
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 const amendment=continuationFile?JSON.parse(fs.readFileSync(continuationFile)):null;
-const outputRoot=amendment?path.join(root,'continuation-19-48'):root;
-const allowedChanges=['run-comparison.mjs','run.mjs','verify-scheduler.mjs'].map(n=>path.resolve('development/native-task-ab',n));
+const integrationContinuation=!!amendment&&f.experimentKind==='targeted-integration';
+const firstSlot=integrationContinuation?2:19,lastSlot=integrationContinuation?9:48;
+const outputRoot=amendment?path.join(root,`continuation-${firstSlot}-${lastSlot}`):root;
+const allowedChanges=integrationContinuation
+ ?[path.resolve('development/native-task-ab/run-comparison.mjs'),path.resolve('development/native-task-investigation/run.mjs')]
+ :['run-comparison.mjs','run.mjs','verify-scheduler.mjs'].map(n=>path.resolve('development/native-task-ab',n));
 if(amendment){
- if(amendment.version!==1||amendment.firstSlot!==19||amendment.lastSlot!==48||amendment.originalFreezeSha256!==sha(fs.readFileSync(path.join(root,'freeze.json')))||f.experimentKind!=='h00-transfer')throw Error('Invalid explicit continuation amendment');
+ if(amendment.version!==1||amendment.firstSlot!==firstSlot||amendment.lastSlot!==lastSlot||amendment.originalFreezeSha256!==sha(fs.readFileSync(path.join(root,'freeze.json')))||(!integrationContinuation&&f.experimentKind!=='h00-transfer'))throw Error('Invalid explicit continuation amendment');
  const historicalPause=JSON.parse(fs.readFileSync(path.join(root,'scheduling-paused.json')));
- if(historicalPause.kind!=='unknown_submission'||historicalPause.slot!==18)throw Error('Amendment does not authorize this pause');
+ if(historicalPause.kind!=='unknown_submission'||historicalPause.slot!==firstSlot-1)throw Error('Amendment does not authorize this pause');
+ if(integrationContinuation&&amendment.runtimeSha!==f.runtimeSha)throw Error('Product candidate identity changed');
  if(amendment.originalPauseSha256!==sha(fs.readFileSync(path.join(root,'scheduling-paused.json'))))throw Error('Historical pause changed');
  if(!amendment.launcherFiles||!Object.keys(amendment.launcherFiles).length||Object.keys(amendment.launcherFiles).some(file=>!allowedChanges.includes(file)))throw Error('Amendment exceeds launcher scope');
  for(const [file,versions] of Object.entries(amendment.launcherFiles))if(versions.before!==f.files[file]||versions.after!==sha(fs.readFileSync(file)))throw Error('Amended launcher version mismatch');
@@ -78,17 +92,23 @@ if(amendment){
  if(fs.existsSync(outputRoot))throw Error('Continuation directory already exists; never overwrite or automatically resume');
  const identity=(got,wanted)=>['slot','task','project','repetition','arm','source'].every(key=>got[key]===wanted[key]);
  const historical=[];
- const expectedDirectories=new Set(f.attempts.filter(a=>a.slot<19).map(a=>a.task+'-r'+a.repetition+'-'+a.arm));
+ const runName=a=>a.task+(a.repetition?'-r'+a.repetition:'')+'-'+a.arm;
+ const expectedDirectories=new Set(f.attempts.filter(a=>a.slot<firstSlot).map(runName));
  const actualDirectories=fs.readdirSync(path.join(root,'runs'));
- if(actualDirectories.length!==18||actualDirectories.some(n=>!expectedDirectories.has(n)))throw Error('Unrecognized historical run directory');
+ if(actualDirectories.length!==firstSlot-1||actualDirectories.some(n=>!expectedDirectories.has(n)))throw Error('Unrecognized historical run directory');
  for(const attempt of f.attempts){
-  const dir=path.join(root,'runs',attempt.task+'-r'+attempt.repetition+'-'+attempt.arm);
-  if(attempt.slot>=19){if(fs.existsSync(dir))throw Error('Unstarted slot has historical artifacts: '+attempt.slot);continue;}
+  const dir=path.join(root,'runs',runName(attempt));
+  if(attempt.slot>=firstSlot){if(fs.existsSync(dir))throw Error('Unstarted slot has historical artifacts: '+attempt.slot);continue;}
   const get=name=>JSON.parse(fs.readFileSync(path.join(dir,name)));
   for(const name of ['started.json','completed.json','result.json'])if(!identity(get(name),attempt))throw Error('Historical attempt identity mismatch: '+attempt.slot);
   const facts=get('stop-verification.json');
   if(!facts.terminationVerified||!facts.captureSaved||!facts.forwardingClosed||!facts.relayRemoved||facts.activeProviderHandlers!==0||get('session/cleanup.json').status!==0)throw Error('Historical stop unverified: '+attempt.slot);
   if(!fs.existsSync(path.join(dir,'candidate.tar'))||!Array.isArray(get('provider-metadata.json')))throw Error('Historical capture/accounting missing');
+  if(integrationContinuation){
+   for(const name of ['started.json','completed.json','result.json','stop-verification.json','provider-metadata.json','candidate.tar','session/cleanup.json','session/container.json']){
+    if(!amendment.historicalFiles?.['runs/'+runName(attempt)+'/'+name])throw Error('Missing historical artifact hash: '+name);
+   }
+  }
   historical.push({slot:attempt.slot,container:get('session/container.json').name});
  }
  if(!amendment.historicalFiles||!Object.keys(amendment.historicalFiles).length)throw Error('Missing historical artifact preservation manifest');
@@ -96,12 +116,12 @@ if(amendment){
   const file=path.resolve(root,relative);if(!file.startsWith(path.resolve(root)+path.sep)||sha(fs.readFileSync(file))!==digest)throw Error('Historical artifact changed: '+relative);
  }
  await verifyQuiescence(historical);
- fs.mkdirSync(outputRoot,{mode:0o700});fs.writeFileSync(path.join(outputRoot,'admission.json'),JSON.stringify({originalFreezeSha256:amendment.originalFreezeSha256,amendmentSha256:sha(fs.readFileSync(continuationFile)),firstSlot:19,lastSlot:48,historicalStopsVerified:18,at:new Date().toISOString()},null,2),{flag:'wx'});
+ fs.mkdirSync(outputRoot,{mode:0o700});fs.writeFileSync(path.join(outputRoot,'admission.json'),JSON.stringify({originalFreezeSha256:amendment.originalFreezeSha256,amendmentSha256:sha(fs.readFileSync(continuationFile)),firstSlot,lastSlot,historicalStopsVerified:firstSlot-1,at:new Date().toISOString()},null,2),{flag:'wx'});
 }else if(fs.existsSync(path.join(root,'scheduling-paused.json')))throw Error('Continuation paused; no automatic resume');
 
 let pause=null;
 function pauseScheduling(kind,slot,details={}){if(pause)return;pause={kind,slot,...details};fs.writeFileSync(path.join(outputRoot,'scheduling-paused.json'),JSON.stringify(pause,null,2),{flag:'wx'});}
-for(const attempt of f.attempts.filter(a=>!amendment||a.slot>=19)){
+for(const attempt of f.attempts.filter(a=>!amendment||a.slot>=firstSlot)){
  verify();if(pause)break;const out=path.join(outputRoot,'runs',attempt.task+(attempt.repetition?'-r'+attempt.repetition:'')+'-'+attempt.arm);
  if(fs.existsSync(out))throw Error('Previously created slot must never be retried: '+out);
  fs.mkdirSync(out,{recursive:true,mode:0o700});fs.writeFileSync(path.join(out,'started.json'),JSON.stringify({...attempt,at:new Date().toISOString()},null,2),{flag:'wx'});
@@ -170,16 +190,25 @@ for(const attempt of f.attempts.filter(a=>!amendment||a.slot>=19)){
       return;
      }
      send({type:'headers',status:response.status,contentType:response.headers.get('content-type')??'text/event-stream'});
-     const observer=responseObserver(record,save);
+     const observer=responseObserver(record,save,details=>pauseScheduling(details.kind,attempt.slot,{requestIndex:record.requestIndex,...details}));
      for await(const chunk of response.body){
       if(['h00-transfer','sensitivity','sensitivity-usage','sensitivity-replay','sensitivity-targeted','targeted-integration'].includes(f.experimentKind))fs.appendFileSync(path.join(out,'response-'+record.requestIndex+'.sse'),chunk,{mode:0o600});
       // Observe/persist upstream facts before delivery can fail or be cancelled.
-      observer.push(chunk);send({type:'chunk',data:Buffer.from(chunk).toString('base64')});
+      observer.push(chunk);
+      // The observer persists response facts AND the pause synchronously, before
+      // a retryable packet can reach any client (including title/helper clients).
+      send({type:'chunk',data:Buffer.from(chunk).toString('base64')});
+      if(record.admissionStop){
+       send({type:'end'});record.clientDelivery='stop-event-forwarded';save();
+       stopWorkload(session);abort.abort();return;
+      }
      }
-     observer.end();record.streamEnded=true;
+     observer.end();record.streamEnded=true;if(record.admissionStop){send({type:'end'});stopWorkload(session);abort.abort();return;}
      if(!knownResponseTerminal(record)){record.serverCompletion='unknown';pauseScheduling('unknown_submission',attempt.slot,{reason:'Stream ended without a bound terminal provider response'});stopWorkload(session);abort.abort();return;}
-     send({type:'end'});
-    }catch(error){record.error=error.name;
+     send({type:'end'});record.clientDelivery='stream-forwarded';save();
+    }catch(error){
+     if(record.admissionStop&&record.clientDelivery==='stop-event-forwarded'&&abort.signal.aborted){record.localStreamStop=error.name;return;}
+     record.error=error.name;
      const ownDeadline=record.forwarded&&deadlineTriggered&&requestSignal?.reason===deadlineReason;
      record.transportError={name:error.name,clientOrRelayCancelled:signal.aborted,ownTaskDeadline:ownDeadline};
      record.clientDelivery='unconfirmed-after-transport-error';
