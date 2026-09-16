@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/Tah10n/opencode-harness#readme",
   "scripts": {
+    "verify:native-command-hints": "node scripts/verify-native-command-hints.mjs",
     "verify:native-task": "node scripts/verify-native-task.mjs",
     "verify:native-task:fixture": "node scripts/verify-native-task-fixture.mjs",
     "verify:native-task:pilot": "node scripts/verify-native-task-pilot.mjs",
