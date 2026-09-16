@@ -1,0 +1,141 @@
+{
+  "candidate": "e18db1fe10223db52dcc05b3e769bca140367c2b",
+  "publicationStart": "b8e43b84a8d892bb67a6947c7179605700d9d14e",
+  "branch": "feat/native-task-workflow",
+  "base": "feat/native-template-regression-workflow",
+  "pr": 25,
+  "stage": "bounded-admission-only",
+  "successfulFreeze": false,
+  "model": "openai/gpt-5.6-luna",
+  "effort": "high",
+  "budgetMs": 1800000,
+  "opencode": "1.18.26",
+  "node": "v24.19.0",
+  "typescript": "6.0.3",
+  "image": "sha256:0ed6cee0b095ecf1e1e780418cb373d462f1b99643bb86db0a8de7dd58fc83a6",
+  "order": [
+    {
+      "slot": 1,
+      "task": "A",
+      "repetition": 1,
+      "arm": "P",
+      "project": null
+    },
+    {
+      "slot": 2,
+      "task": "A",
+      "repetition": 1,
+      "arm": "H0",
+      "project": null
+    },
+    {
+      "slot": 3,
+      "task": "A",
+      "repetition": 1,
+      "arm": "H1",
+      "project": null
+    },
+    {
+      "slot": 4,
+      "task": "B",
+      "repetition": 1,
+      "arm": "H1",
+      "project": null
+    },
+    {
+      "slot": 5,
+      "task": "B",
+      "repetition": 1,
+      "arm": "P",
+      "project": null
+    },
+    {
+      "slot": 6,
+      "task": "B",
+      "repetition": 1,
+      "arm": "H0",
+      "project": null
+    },
+    {
+      "slot": 7,
+      "task": "A",
+      "repetition": 2,
+      "arm": "H0",
+      "project": null
+    },
+    {
+      "slot": 8,
+      "task": "A",
+      "repetition": 2,
+      "arm": "H1",
+      "project": null
+    },
+    {
+      "slot": 9,
+      "task": "A",
+      "repetition": 2,
+      "arm": "P",
+      "project": null
+    },
+    {
+      "slot": 10,
+      "task": "B",
+      "repetition": 2,
+      "arm": "P",
+      "project": null
+    },
+    {
+      "slot": 11,
+      "task": "B",
+      "repetition": 2,
+      "arm": "H0",
+      "project": null
+    },
+    {
+      "slot": 12,
+      "task": "B",
+      "repetition": 2,
+      "arm": "H1",
+      "project": null
+    }
+  ],
+  "sources": [
+    {
+      "name": "quick-lru",
+      "commit": "f2fe88e2932603c038c61ca29de6ad5286148e1b",
+      "remote": "https://github.com/sindresorhus/quick-lru.git",
+      "archiveSha256": "5264a90e047bccde14f6b5705630d7aaf5ade2fa2987f985d517aee1dd5cfc6a"
+    },
+    {
+      "name": "denque",
+      "commit": "539105bb57854e997dd469221cdc52a0ad80e0a2",
+      "remote": "https://github.com/invertase/denque.git",
+      "archiveSha256": "14fa9752d9c01f312f26c8c234b99fd47a32a5583d9fcb230861f2457dc5d1a9"
+    },
+    {
+      "name": "async-mutex",
+      "commit": "b0bb4c5aa0e42eb5ffc8d9342e56bb6de1b95554",
+      "remote": "https://github.com/DirtyHairy/async-mutex.git",
+      "archiveSha256": "9bafaa723582e5ba716be47f76bde544a2d4679a8489cfd7be7f91ad48ac0fec"
+    },
+    {
+      "name": "emittery",
+      "commit": "147a8591045e00d0fe8088e2393e3eefea3aa4a5",
+      "remote": "https://github.com/sindresorhus/emittery.git",
+      "archiveSha256": "b650e76fc6fb9b6dc3ed45c5456b3226f1c05e3cf06e376f47d8b647a92ae138"
+    },
+    {
+      "name": "eventemitter2",
+      "commit": "39313aa1399e8c477aa7cc324676384c3757bbee",
+      "remote": "https://github.com/EventEmitter2/EventEmitter2.git",
+      "archiveSha256": "8c3be94d7431c748c20c4928cada2acb3ffdc78384dab8d4d043598658610e91"
+    },
+    {
+      "name": "zen-observable",
+      "commit": "8406a7e3a3a3faa080ec228b9a743f48021fba8b",
+      "remote": "https://github.com/zenparsing/zen-observable.git",
+      "archiveSha256": "a673a22963bbeae3241c164ca5bc6f4f5704402bc053441cf6db90245dc059c2"
+    }
+  ],
+  "researchProviderRequests": 0
+}
