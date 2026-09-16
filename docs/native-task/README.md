@@ -9,6 +9,11 @@ its development results do not establish a recommended production mode.
 
 ## Install and use
 
+Optional [old TypeScript call observations](TYPE-COMPATIBILITY.md), enabled with
+`HARNESS_TASK_TYPE_COMPAT=1` in direct mode, append real compiler evidence after
+a project check. They use a frozen task baseline and an explicitly selected
+compiler/profile, with no new tool or model stage. Default is off.
+
 Optional [command hints](COMMAND-HINTS.md), enabled with
 `HARNESS_TASK_COMMAND_HINTS=1`, add one host-derived context block after a confirmed
 missing npm/pnpm command. They are off by default and never install, retry or

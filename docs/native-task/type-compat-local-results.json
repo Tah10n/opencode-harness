@@ -1,0 +1,169 @@
+{
+  "platform": "macOS",
+  "controls": {
+    "passed": true,
+    "controls": [
+      {
+        "name": "different method and object return",
+        "status": "reproduced-incompatibility",
+        "cost": {
+          "elapsedMs": 2279,
+          "transferredInputBytes": 12240554,
+          "outputBytes": 2389,
+          "compilations": 7
+        }
+      },
+      {
+        "name": "additive API",
+        "status": "no-difference-in-checked-scope",
+        "cost": {
+          "elapsedMs": 2311,
+          "transferredInputBytes": 12240550,
+          "outputBytes": 2021,
+          "compilations": 7
+        }
+      },
+      {
+        "name": "alias refactor",
+        "status": "no-difference-in-checked-scope",
+        "cost": {
+          "elapsedMs": 2272,
+          "transferredInputBytes": 12240561,
+          "outputBytes": 2046,
+          "compilations": 7
+        }
+      },
+      {
+        "name": "receiver already required",
+        "status": "unsupported",
+        "cost": {
+          "elapsedMs": 2292,
+          "transferredInputBytes": 12240577,
+          "outputBytes": 2832,
+          "compilations": 7
+        }
+      },
+      {
+        "name": "private identity separated",
+        "status": "no-difference-in-checked-scope",
+        "cost": {
+          "elapsedMs": 2289,
+          "transferredInputBytes": 12240577,
+          "outputBytes": 2047,
+          "compilations": 7
+        }
+      },
+      {
+        "name": "overloaded and generic callbacks",
+        "status": "unsupported",
+        "cost": {
+          "elapsedMs": 1768,
+          "transferredInputBytes": 12240573,
+          "outputBytes": 1364,
+          "compilations": 5
+        }
+      },
+      {
+        "name": "no consumers",
+        "status": "unsupported",
+        "cost": {
+          "elapsedMs": 1796,
+          "transferredInputBytes": 12240419,
+          "outputBytes": 1212,
+          "compilations": 5
+        }
+      },
+      {
+        "name": "malformed declarations",
+        "status": "preparation-error",
+        "cost": {
+          "elapsedMs": 1023,
+          "transferredInputBytes": 12240468,
+          "outputBytes": 665,
+          "compilations": 2
+        }
+      },
+      {
+        "name": "missing import",
+        "status": "preparation-error",
+        "cost": {
+          "elapsedMs": 1060,
+          "transferredInputBytes": 12240568,
+          "outputBytes": 719,
+          "compilations": 2
+        }
+      },
+      {
+        "name": "missing compiler",
+        "rejected": true
+      },
+      {
+        "name": "unselected config",
+        "rejected": true
+      },
+      {
+        "name": "denied import",
+        "rejected": true
+      },
+      {
+        "name": "symlink import",
+        "rejected": true
+      },
+      {
+        "name": "extends is not read",
+        "rejected": true
+      },
+      {
+        "name": "ambiguous exports",
+        "rejected": true
+      },
+      {
+        "name": "imported public declaration change",
+        "status": "reproduced-incompatibility"
+      },
+      {
+        "name": "relative dependency is not public source",
+        "rejected": true
+      }
+    ],
+    "lifecycle": [
+      "unchanged",
+      "duplicate",
+      "two-run-limit",
+      "baseline-frozen",
+      "stale",
+      "config-change",
+      "rename",
+      "isolated",
+      "external-write",
+      "cancelled"
+    ],
+    "realProviderCalls": 0
+  },
+  "nativeHooks": {
+    "passed": true,
+    "results": [
+      {
+        "mode": "queued-write",
+        "terminationVerified": true,
+        "rawPreserved": true
+      },
+      {
+        "mode": "denial",
+        "terminationVerified": true,
+        "rawPreserved": true
+      },
+      {
+        "mode": "denial-before",
+        "terminationVerified": true,
+        "rawPreserved": true
+      },
+      {
+        "mode": "off",
+        "terminationVerified": true,
+        "rawPreserved": true
+      }
+    ],
+    "realProviderCalls": 0
+  }
+}
