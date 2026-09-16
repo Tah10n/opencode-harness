@@ -1,4 +1,12 @@
-# Command-hint comparison: eligibility blocked before model execution
+# Command-hint comparison
+
+The user subsequently approved identical `external_directory: allow` inside the
+isolated OFF/ON containers. The new batch is prepared and frozen in
+[PLAN.md](PLAN.md) and [frozen-inputs.json](frozen-inputs.json). The following
+section preserves the original pre-authorization eligibility failure. It is not
+the status or result of the newly authorized batch.
+
+## Historical eligibility block before permission approval
 
 The requested four-run development comparison has **not started**. Its purpose
 is to measure additional complete autonomous deliveries with command hints,
