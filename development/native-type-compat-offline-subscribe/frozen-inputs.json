@@ -1,0 +1,931 @@
+{
+  "createdAt": "2026-09-16T18:03:16.530Z",
+  "runtimeSha": "e18db1fe10223db52dcc05b3e769bca140367c2b",
+  "freezeSha256": "82fe6a4dce6b37f2520170f4e4f72940db946c0dd2dc5c842ddd7e6499ee6456",
+  "model": "openai/gpt-5.6-luna",
+  "effort": "high",
+  "budgetMs": 1800000,
+  "node": "v24.19.0",
+  "typescript": "6.0.3",
+  "image": "sha256:0ed6cee0b095ecf1e1e780418cb373d462f1b99643bb86db0a8de7dd58fc83a6",
+  "config": {
+    "model": "openai/gpt-5.6-luna",
+    "small_model": "openai/gpt-5.6-luna",
+    "provider": {
+      "openai": {
+        "options": {
+          "baseURL": "http://127.0.0.1:4099/v1",
+          "apiKey": "development-no-credential"
+        },
+        "models": {
+          "gpt-5.6-luna": {
+            "options": {
+              "reasoningEffort": "high"
+            },
+            "variants": {
+              "high": {
+                "reasoningEffort": "high"
+              }
+            }
+          }
+        }
+      }
+    },
+    "permission": {
+      "external_directory": {
+        "*": "deny",
+        "/template/node_modules/typescript/lib/*": "allow",
+        "/usr/local/bin/*": "allow"
+      }
+    }
+  },
+  "offlineOverride": {
+    "permission": {
+      "webfetch": "deny"
+    },
+    "agent": {
+      "build": {
+        "permission": {
+          "webfetch": "deny"
+        }
+      }
+    }
+  },
+  "order": [
+    {
+      "slot": 1,
+      "task": "A",
+      "arm": "OFF",
+      "project": "primus/eventemitter3"
+    },
+    {
+      "slot": 2,
+      "task": "A",
+      "arm": "ON",
+      "project": "primus/eventemitter3"
+    }
+  ],
+  "sourceCommit": "b0144e940ace8add8f335a8adfbed9284eb419f3",
+  "originalTaskSha256": "ef1ed2db8a7e7b24248250b887cf642f7209df99bf7e0f00d7456e034a7f940f",
+  "actualPromptSha256": "b3a1006440f99943e294f0c6272723bacb0e00a66f069028faad5210e396fc56",
+  "environmentBlock": "\nEnvironment (same for both runs):\nExternal network is unavailable to tools. Dependencies are already prepared. From the author project worktree, ordinary TypeScript 6.0.3 semantic checking is available with `/usr/local/bin/node /template/node_modules/typescript/lib/tsc.js --ignoreConfig --noEmit --strict --target es2020 --module commonjs --moduleResolution node --ignoreDeprecations 6.0 <project-relative consumer files>`. Use paths relative to that worktree for your consumer files.\n",
+  "inputManifestSha256": "83ef562381f023e38b4f3917c77091cbded64803eb9a4324c2efcdac6c00814a",
+  "preflight": {
+    "passed": true,
+    "checks": [
+      {
+        "task": "A",
+        "arm": "OFF",
+        "requests": 16,
+        "portablePatch": true,
+        "sourcePreserved": true,
+        "capture": true,
+        "termination": true
+      },
+      {
+        "task": "A",
+        "arm": "ON",
+        "requests": 16,
+        "portablePatch": true,
+        "sourcePreserved": true,
+        "capture": true,
+        "termination": true,
+        "compat": [
+          {
+            "status": "reproduced-incompatibility",
+            "snapshot": "a10e3e7059184e249e724ad7649f42f603246be998a5225b51f0de0254425843"
+          },
+          {
+            "status": "no-difference-in-checked-scope",
+            "snapshot": "385afcb087d9b1d43758010ee95a480e440cff2cc753d6a6cac0570c1e88fed4"
+          }
+        ]
+      }
+    ],
+    "realProviderRequests": 0
+  },
+  "audit": {
+    "passed": true,
+    "rows": [
+      {
+        "key": "A-OFF",
+        "ordinaryCommands": true,
+        "noEvaluatorMount": true,
+        "removed": true,
+        "checks": []
+      },
+      {
+        "key": "A-ON",
+        "ordinaryCommands": true,
+        "noEvaluatorMount": true,
+        "removed": true,
+        "checks": [
+          {
+            "snapshot": "a10e3e7059184e249e724ad7649f42f603246be998a5225b51f0de0254425843",
+            "baselineSnapshot": "548ce6c385295a249f0b086fc5b8d61fe5111865968db5151791d0ea13a4ee9b",
+            "status": "reproduced-incompatibility",
+            "callID": "call_28",
+            "request": "request-13.json",
+            "requestHash": "dc91ea967c8187e853a3d5de38e7a3faff100a661ae6afb5f69d956cc2dcbe1b"
+          },
+          {
+            "snapshot": "385afcb087d9b1d43758010ee95a480e440cff2cc753d6a6cac0570c1e88fed4",
+            "baselineSnapshot": "548ce6c385295a249f0b086fc5b8d61fe5111865968db5151791d0ea13a4ee9b",
+            "status": "no-difference-in-checked-scope",
+            "callID": "call_30",
+            "request": "request-15.json",
+            "requestHash": "caa703b88fc6ed405ae99f056166e57a5774dc3a9f0e9a2634b1e1f1de507522"
+          }
+        ]
+      }
+    ],
+    "realProviderRequests": 0
+  },
+  "calibration": {
+    "passed": true,
+    "results": [
+      {
+        "task": "A",
+        "label": "baseline",
+        "accepted": false,
+        "commands": [
+          {
+            "name": "project-0",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-1",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-2",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "new-runtime",
+            "status": 1,
+            "error": null
+          },
+          {
+            "name": "acceptance-types",
+            "status": 2,
+            "error": null
+          },
+          {
+            "name": "legacy-types",
+            "status": 0,
+            "error": null
+          }
+        ]
+      },
+      {
+        "task": "A",
+        "label": "reference",
+        "accepted": true,
+        "commands": [
+          {
+            "name": "project-0",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-1",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-2",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "new-runtime",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "acceptance-types",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "legacy-types",
+            "status": 0,
+            "error": null
+          }
+        ]
+      },
+      {
+        "task": "A",
+        "label": "alternative",
+        "accepted": true,
+        "commands": [
+          {
+            "name": "project-0",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-1",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-2",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "new-runtime",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "acceptance-types",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "legacy-types",
+            "status": 0,
+            "error": null
+          }
+        ]
+      },
+      {
+        "task": "A",
+        "label": "missing",
+        "accepted": false,
+        "commands": [
+          {
+            "name": "new-runtime",
+            "status": 1,
+            "error": null
+          },
+          {
+            "name": "acceptance-types",
+            "status": 2,
+            "error": null
+          },
+          {
+            "name": "legacy-types",
+            "status": 0,
+            "error": null
+          }
+        ]
+      },
+      {
+        "task": "A",
+        "label": "erased-types",
+        "accepted": false,
+        "commands": [
+          {
+            "name": "new-runtime",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "acceptance-types",
+            "status": 2,
+            "error": null
+          },
+          {
+            "name": "legacy-types",
+            "status": 0,
+            "error": null
+          }
+        ]
+      },
+      {
+        "task": "A",
+        "label": "legacy-break",
+        "accepted": false,
+        "commands": [
+          {
+            "name": "new-runtime",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "acceptance-types",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "legacy-types",
+            "status": 2,
+            "error": null
+          }
+        ]
+      },
+      {
+        "task": "A",
+        "label": "runtime-break",
+        "accepted": false,
+        "commands": [
+          {
+            "name": "new-runtime",
+            "status": 1,
+            "error": null
+          },
+          {
+            "name": "acceptance-types",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "legacy-types",
+            "status": 0,
+            "error": null
+          }
+        ]
+      }
+    ],
+    "providerRequests": 0
+  },
+  "inventories": [
+    {
+      "arm": "OFF",
+      "request": "request-10.json",
+      "role": "author",
+      "tools": [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "todowrite"
+      ],
+      "toolResults": 7,
+      "sha256": "ade0389efaafe595df9dc5f4ce190d89e052abded873d716bdc9d912382a6cd7"
+    },
+    {
+      "arm": "OFF",
+      "request": "request-11.json",
+      "role": "author",
+      "tools": [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "todowrite"
+      ],
+      "toolResults": 8,
+      "sha256": "354c0b09ddc1627a2ec41f8f643cb3bb11a37890eac912f663386a31d0f3483a"
+    },
+    {
+      "arm": "OFF",
+      "request": "request-12.json",
+      "role": "author",
+      "tools": [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "todowrite"
+      ],
+      "toolResults": 9,
+      "sha256": "9d7e87ea6d6e0202554d1a2082a437b3882ce2ab41c988f5ba92c5ea6d917024"
+    },
+    {
+      "arm": "OFF",
+      "request": "request-13.json",
+      "role": "author",
+      "tools": [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "todowrite"
+      ],
+      "toolResults": 10,
+      "sha256": "873f47f50a4f4610f5e48ebe8f9d5c6c0cb759edceba5ea1f5237198639e9b99"
+    },
+    {
+      "arm": "OFF",
+      "request": "request-14.json",
+      "role": "author",
+      "tools": [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "todowrite"
+      ],
+      "toolResults": 11,
+      "sha256": "553ac67f87cc7536efabf164be5fd36334c733739eedf3a79610bdd86d21ba6a"
+    },
+    {
+      "arm": "OFF",
+      "request": "request-15.json",
+      "role": "author",
+      "tools": [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "todowrite"
+      ],
+      "toolResults": 12,
+      "sha256": "b9a9b4f4376911ad4207e838f4722897612f40be52b1804464af69dd6c8cee95"
+    },
+    {
+      "arm": "OFF",
+      "request": "request-16.json",
+      "role": "parent",
+      "tools": [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "harness_task",
+        "read",
+        "skill",
+        "task",
+        "todowrite"
+      ],
+      "toolResults": 1,
+      "sha256": "7bd44e836807b6b565c626b2e6476533f62b4c0af76db5d4d52f3f3a17098ca4"
+    },
+    {
+      "arm": "OFF",
+      "request": "request-2.json",
+      "role": "parent",
+      "tools": [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "harness_task",
+        "read",
+        "skill",
+        "task",
+        "todowrite"
+      ],
+      "toolResults": 0,
+      "sha256": "f884758d35f34d43f15e1b3c4c8c35de15ee501f04aa03e5a59effa8292c61ce"
+    },
+    {
+      "arm": "OFF",
+      "request": "request-3.json",
+      "role": "author",
+      "tools": [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "todowrite"
+      ],
+      "toolResults": 0,
+      "sha256": "b4fc8b831c625d0b0af8803e4d71d4889682c6b03caf4fdcbdd9f2c2d96a633d"
+    },
+    {
+      "arm": "OFF",
+      "request": "request-4.json",
+      "role": "author",
+      "tools": [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "todowrite"
+      ],
+      "toolResults": 1,
+      "sha256": "fa646987c87628f32bc6f975ac1b8c4c7b8922549ac16f8ff4a6393d95ad6ce1"
+    },
+    {
+      "arm": "OFF",
+      "request": "request-5.json",
+      "role": "author",
+      "tools": [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "todowrite"
+      ],
+      "toolResults": 2,
+      "sha256": "e94989c9bd7f8f9e814e2deaee9ab445bcde97d6e306b8ce2fe0e8083541ec00"
+    },
+    {
+      "arm": "OFF",
+      "request": "request-6.json",
+      "role": "author",
+      "tools": [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "todowrite"
+      ],
+      "toolResults": 3,
+      "sha256": "f1382fe7b366a66f0d961ba1b7d574afd1451783d9a078f7ecf3d4ac6b5ecba4"
+    },
+    {
+      "arm": "OFF",
+      "request": "request-7.json",
+      "role": "author",
+      "tools": [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "todowrite"
+      ],
+      "toolResults": 4,
+      "sha256": "ab973783ec179ba09edd3113a34deea85c053636f01e654971b07d0808a84f2c"
+    },
+    {
+      "arm": "OFF",
+      "request": "request-8.json",
+      "role": "author",
+      "tools": [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "todowrite"
+      ],
+      "toolResults": 5,
+      "sha256": "8eea1b46a19be5d97ab759609dbe0bc73ef28cd69ffcb82aa912d11fb6b5d95c"
+    },
+    {
+      "arm": "OFF",
+      "request": "request-9.json",
+      "role": "author",
+      "tools": [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "todowrite"
+      ],
+      "toolResults": 6,
+      "sha256": "3a1aa377f390c9e0b076b3aeede48daa2b450a635f043adfcd958ab195bdb46e"
+    },
+    {
+      "arm": "ON",
+      "request": "request-10.json",
+      "role": "author",
+      "tools": [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "todowrite"
+      ],
+      "toolResults": 7,
+      "sha256": "65b9ac5fc88e569d41f9650c2e10202770227d44f411a8ee8aebc654352217dd"
+    },
+    {
+      "arm": "ON",
+      "request": "request-11.json",
+      "role": "author",
+      "tools": [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "todowrite"
+      ],
+      "toolResults": 8,
+      "sha256": "7931011692e7acbb4fa94be9b7558ec04ac971c50a3f0e6b5e3bfbc90b8cfdd0"
+    },
+    {
+      "arm": "ON",
+      "request": "request-12.json",
+      "role": "author",
+      "tools": [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "todowrite"
+      ],
+      "toolResults": 9,
+      "sha256": "2ffcce459d36378e6f9befad9d57613c64104b4b071e81e4349ca7ed9addfc2d"
+    },
+    {
+      "arm": "ON",
+      "request": "request-13.json",
+      "role": "author",
+      "tools": [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "todowrite"
+      ],
+      "toolResults": 10,
+      "sha256": "dc91ea967c8187e853a3d5de38e7a3faff100a661ae6afb5f69d956cc2dcbe1b"
+    },
+    {
+      "arm": "ON",
+      "request": "request-14.json",
+      "role": "author",
+      "tools": [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "todowrite"
+      ],
+      "toolResults": 11,
+      "sha256": "9f2c5b1e731814593b97bb499e408457944b741fcd00bff747d2a9a41458f25e"
+    },
+    {
+      "arm": "ON",
+      "request": "request-15.json",
+      "role": "author",
+      "tools": [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "todowrite"
+      ],
+      "toolResults": 12,
+      "sha256": "caa703b88fc6ed405ae99f056166e57a5774dc3a9f0e9a2634b1e1f1de507522"
+    },
+    {
+      "arm": "ON",
+      "request": "request-16.json",
+      "role": "parent",
+      "tools": [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "harness_task",
+        "read",
+        "skill",
+        "task",
+        "todowrite"
+      ],
+      "toolResults": 1,
+      "sha256": "9992e3bca29e22907623025c80f855a7555746a85b004c55e5b95fd8fa9df7be"
+    },
+    {
+      "arm": "ON",
+      "request": "request-2.json",
+      "role": "parent",
+      "tools": [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "harness_task",
+        "read",
+        "skill",
+        "task",
+        "todowrite"
+      ],
+      "toolResults": 0,
+      "sha256": "ae74488c05e8426035d9c754295cc297b0266205387d8c6f7fbf1b89e87967f9"
+    },
+    {
+      "arm": "ON",
+      "request": "request-3.json",
+      "role": "author",
+      "tools": [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "todowrite"
+      ],
+      "toolResults": 0,
+      "sha256": "40f6fc9923960f97be9b0496e25acd5453fd1acffca2a17fbdac254b57ad0ea3"
+    },
+    {
+      "arm": "ON",
+      "request": "request-4.json",
+      "role": "author",
+      "tools": [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "todowrite"
+      ],
+      "toolResults": 1,
+      "sha256": "984e0756d6bd25673124d5ef6dd727ec8c054bc5b7a213da01687897cb2490d6"
+    },
+    {
+      "arm": "ON",
+      "request": "request-5.json",
+      "role": "author",
+      "tools": [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "todowrite"
+      ],
+      "toolResults": 2,
+      "sha256": "0daf0f603bb1ce38a78d2b8eb5675b8ba5665d8081c38a6a3acaf75e439a7739"
+    },
+    {
+      "arm": "ON",
+      "request": "request-6.json",
+      "role": "author",
+      "tools": [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "todowrite"
+      ],
+      "toolResults": 3,
+      "sha256": "d60ae22b11e4ff7cb85779fb2ea72c7be2485b8c942557326f2f1b28bb118324"
+    },
+    {
+      "arm": "ON",
+      "request": "request-7.json",
+      "role": "author",
+      "tools": [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "todowrite"
+      ],
+      "toolResults": 4,
+      "sha256": "8a0ad55b173014f3066e3817ded243a62ce4d3e224cff369307cc057d2672af5"
+    },
+    {
+      "arm": "ON",
+      "request": "request-8.json",
+      "role": "author",
+      "tools": [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "todowrite"
+      ],
+      "toolResults": 5,
+      "sha256": "4e5f61c681f11f6deefb82c00595ff6eceff48fad441504076992579b6fd4546"
+    },
+    {
+      "arm": "ON",
+      "request": "request-9.json",
+      "role": "author",
+      "tools": [
+        "apply_patch",
+        "bash",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "todowrite"
+      ],
+      "toolResults": 6,
+      "sha256": "5744dbbdb23484feb52808bdbd09c32f219da00524cab268453b89e9a09d3633"
+    }
+  ],
+  "coverageControl": {
+    "reference": "required project regression clauses and documentation reviewed",
+    "withoutAddedRegressions": "rejected: missing explicitly requested author regression coverage"
+  },
+  "realProviderRequestsBeforeFreeze": 0,
+  "hashes": {
+    "local/native-type-compat-offline-subscribe/batch/bundle/native-command-hints.mjs": "4ba8f87a18157dfcf794c030d836ce4ca22260eb7a9c1472255b628b19f490bc",
+    "local/native-type-compat-offline-subscribe/batch/bundle/native-project-checks.mjs": "ae20921040df6aa27718853028cb11e81875e0fad7adc34004bcb744585606ac",
+    "local/native-type-compat-offline-subscribe/batch/bundle/native-project-config.mjs": "c3d758632ab72f7a63c5fec8a13520987a7d1ddc75020a908bd448166fa0167e",
+    "local/native-type-compat-offline-subscribe/batch/bundle/native-project-context.mjs": "5f35a51aebc7cdc3e12edf3506c6b590ced57f819a02b09ed6254702f500f394",
+    "local/native-type-compat-offline-subscribe/batch/bundle/native-project-feedback.mjs": "c3ed707cc0e6dd4fc40e882dd2895ec631f95de8c30663c262f20b72efdf3cb7",
+    "local/native-type-compat-offline-subscribe/batch/bundle/native-project-scope.mjs": "f5dcd760610c97a3fbf49229ea5c4723dce6d3aa0fe160228f908c62d29e8be4",
+    "local/native-type-compat-offline-subscribe/batch/bundle/native-review-context.mjs": "8775ae59ef3d3b5b432798f909f94869d43b7561b4b5f144f972e5bcce20e312",
+    "local/native-type-compat-offline-subscribe/batch/bundle/native-sensitivity-runner.mjs": "59056d6661c099b4e48b89874bbd7991a3af6b09199cc5bee74b719491f7b1de",
+    "local/native-type-compat-offline-subscribe/batch/bundle/native-sensitivity.mjs": "91a918585e5889bba4d0c7299a469da4c0e637ee3b82bf1b6044934ff8827c73",
+    "local/native-type-compat-offline-subscribe/batch/bundle/native-task-investigation.mjs": "37185994a4758628eb52f965d9a6327974d925523c73620bfe9b7c83821167cd",
+    "local/native-type-compat-offline-subscribe/batch/bundle/native-task-observations.mjs": "126a3e695c2dd2ec930a44fca4aa033f0f21e8ae364aae15db39e7f343189de8",
+    "local/native-type-compat-offline-subscribe/batch/bundle/native-task-plugin.mjs": "9a1f4fcd8b99a87402e6116fb287e2e9d32e03b8b4d396f59bb5449370bbb8e8",
+    "local/native-type-compat-offline-subscribe/batch/bundle/native-task-workflow.mjs": "10688211fce75592ce22a669b10d49aa067b89aa0dee05da6a2d35b9ceca7ed8",
+    "local/native-type-compat-offline-subscribe/batch/bundle/native-type-compat-generator.mjs": "321eff1892c9a5327e7f6e38f23a986c1be3fbaf26da5662b99cd27cac50cc68",
+    "local/native-type-compat-offline-subscribe/batch/bundle/native-type-compat-worker.mjs": "c9cc1ff4922488ba1058d11af9f609a3fc5cef4a98aed7941ef5e8fe2f3eafc2",
+    "local/native-type-compat-offline-subscribe/batch/bundle/native-type-compat.mjs": "96f85cbc7ee01f3aeedc31cea51c0dd5c452afe220b4683df1b2d5fd987d9007",
+    "local/native-type-compat-offline-subscribe/batch/bundle/core.md": "9adcc862446ac6c0e5a407ec89e2f65fe4a249aedcc34ba36f143f3589edd4f7",
+    "local/native-type-compat-offline-subscribe/batch/bundle/opencode.json": "24ba3acaf5624fd47447c12a4236ad24481181951100e1df4a0106d94b6f8264",
+    "local/native-type-compat-offline-subscribe/batch/bundle/node_modules/typescript/lib/typescript.js": "569177652966bd528c319171c7dd22860dbf72bde116cbc4f644f1d02bb12e39",
+    "local/native-type-compat-offline-subscribe/batch/bundle/node_modules/typescript/lib/tsc.js": "2cffde0b8c6760dfb0b5b0382bbb7e00ba6a8b2d981b9205b256a700a481d983",
+    "local/native-type-compat-offline-subscribe/batch/bundle/node_modules/typescript/lib/_tsc.js": "1c59e77a54b186ec43fa7f3e0d3c4bb15ca5eb5ba43e96b1d3a267139eddd3e3",
+    "development/native-type-compat-offline-subscribe/PLAN.md": "75c7fe7c3d57cbf9983ff2a18eb095e85f28c82f12ffb4c9e03623082f4d2bfb",
+    "development/native-type-compat-offline-subscribe/account.mjs": "3e53bedf8fd372ee420e5d49d7f897448a1b00f1ed4765c3c0f2ee39198fd302",
+    "development/native-type-compat-offline-subscribe/audit-preflight.mjs": "097828e84a256850df1f467a522de9dc6059da4452c898aa1af2faeee4d2ab9b",
+    "development/native-type-compat-offline-subscribe/calibrate.mjs": "835bdca859ce12d50db21f227d468441f770fe0e6f11031e9a1687425ffd343c",
+    "development/native-type-compat-offline-subscribe/freeze.mjs": "27f85e98d3a7a3eea308ec7d2d729ed890e103b8c8e776c11dab103cb358ef79",
+    "development/native-type-compat-offline-subscribe/grade.mjs": "550988957a13cc6a24cae7b3e0ac84e54dc009a2534a9ed737858e8890d100fb",
+    "development/native-type-compat-offline-subscribe/neutralize.mjs": "7627a711f1e3c270eee4430eb53a4ea990bfc96ee63db34dde483dee768d1ec4",
+    "development/native-type-compat-offline-subscribe/preflight.mjs": "3891d21a7d6c900f67795fbbc45b0064c359780ceb4d0104bee84277829ccc96",
+    "development/native-type-compat-offline-subscribe/prepare.mjs": "6ee95e8f814ce353d59354ce0e6e3040e86553ca07a80eadc0b25889892fb27d",
+    "development/native-type-compat-offline-subscribe/run.mjs": "1472690302a55d1d58e2998dde5a634fc36dc7e86fd8af4895ef7377129a0cac",
+    "development/native-type-compat-comparison/tasks/A.md": "ef1ed2db8a7e7b24248250b887cf642f7209df99bf7e0f00d7456e034a7f940f",
+    "development/native-type-compat-comparison/evaluation/A.cjs": "62576b21c4ba4de98f5aa2e71584784d07c83dd617fb056fa7e0387718434f48",
+    "development/native-type-compat-comparison/evaluation/A.types.ts": "396a6e3616fc8393399822771c3ef2d1e5bcdb228576f35e7a5b6d14bca889a3",
+    "development/native-type-compat-comparison/evaluation/legacy.types.ts": "a233441ca27ff4ecc576d2bf0e88072be548fe91bea920518b26344d163b6424",
+    "local/native-type-compat-comparison/batch/calibration/A/reference/index.js": "fb61b92e4a862daa4654e3b70f46cdf220603a9e6056b4e184d9d4c4c65ca614",
+    "local/native-type-compat-comparison/batch/calibration/A/reference/index.d.ts": "1ec78c4828eb97c1439a9c0b9d261befd1d1b1e1ea20f0fe687d2d58b589e96a",
+    "local/native-type-compat-comparison/batch/calibration/A/reference/test/test.js": "e8f4e8794a992890478b1bda8870ff19ac0784e0e89a106ec027c676951e0918",
+    "local/native-type-compat-comparison/batch/calibration/A/reference/test/test.mjs": "42f516255759ed17b40bc824e40211ce690e809f04f6c89ca1aa2939501e0ff1",
+    "local/native-type-compat-comparison/batch/calibration/A/reference/api.types.ts": "396a6e3616fc8393399822771c3ef2d1e5bcdb228576f35e7a5b6d14bca889a3",
+    "local/native-type-compat-comparison/batch/calibration/A/reference/README.md": "c35171c25f0ef1e9cf42b73b663e9e2ec96e8ebbab79a69670b3e2b54d1ea25a",
+    "local/native-type-compat-comparison/batch/calibration/A/alternative/index.js": "2ec6072f0133129782ce4a9e2c3f3581d47baaf573e0e75187ced7000be9d9b1",
+    "local/native-type-compat-comparison/batch/calibration/A/alternative/index.d.ts": "9ca67fb5d1ff1778e2ea12ef17b7acd7bc2e4b9b4aba79ba8ba1dee8a09f1b2a",
+    "local/native-type-compat-comparison/batch/calibration/A/alternative/test/test.js": "e8f4e8794a992890478b1bda8870ff19ac0784e0e89a106ec027c676951e0918",
+    "local/native-type-compat-comparison/batch/calibration/A/alternative/test/test.mjs": "42f516255759ed17b40bc824e40211ce690e809f04f6c89ca1aa2939501e0ff1",
+    "local/native-type-compat-comparison/batch/calibration/A/alternative/api.types.ts": "396a6e3616fc8393399822771c3ef2d1e5bcdb228576f35e7a5b6d14bca889a3",
+    "local/native-type-compat-comparison/batch/calibration/A/alternative/README.md": "c35171c25f0ef1e9cf42b73b663e9e2ec96e8ebbab79a69670b3e2b54d1ea25a",
+    "local/native-type-compat-comparison/batch/calibration/A/missing/index.js": "1560f251de5d28d2c15ff070215d2c5c0fa06f1a92e8d6522bbee37e06d2a6b5",
+    "local/native-type-compat-comparison/batch/calibration/A/missing/index.d.ts": "27679e96d1bd38c5938178aaf4abe8627493090b63d6bae2ce8436e6a87ebe4d",
+    "local/native-type-compat-comparison/batch/calibration/A/missing/test/test.js": "e8f4e8794a992890478b1bda8870ff19ac0784e0e89a106ec027c676951e0918",
+    "local/native-type-compat-comparison/batch/calibration/A/missing/test/test.mjs": "42f516255759ed17b40bc824e40211ce690e809f04f6c89ca1aa2939501e0ff1",
+    "local/native-type-compat-comparison/batch/calibration/A/missing/api.types.ts": "396a6e3616fc8393399822771c3ef2d1e5bcdb228576f35e7a5b6d14bca889a3",
+    "local/native-type-compat-comparison/batch/calibration/A/missing/README.md": "c35171c25f0ef1e9cf42b73b663e9e2ec96e8ebbab79a69670b3e2b54d1ea25a",
+    "local/native-type-compat-comparison/batch/calibration/A/erased-types/index.js": "fb61b92e4a862daa4654e3b70f46cdf220603a9e6056b4e184d9d4c4c65ca614",
+    "local/native-type-compat-comparison/batch/calibration/A/erased-types/index.d.ts": "b6b1ea42a6de181a8e151ae2a04c268a02b57d83d5b3c84db52f0d776b5e9225",
+    "local/native-type-compat-comparison/batch/calibration/A/erased-types/test/test.js": "e8f4e8794a992890478b1bda8870ff19ac0784e0e89a106ec027c676951e0918",
+    "local/native-type-compat-comparison/batch/calibration/A/erased-types/test/test.mjs": "42f516255759ed17b40bc824e40211ce690e809f04f6c89ca1aa2939501e0ff1",
+    "local/native-type-compat-comparison/batch/calibration/A/erased-types/api.types.ts": "396a6e3616fc8393399822771c3ef2d1e5bcdb228576f35e7a5b6d14bca889a3",
+    "local/native-type-compat-comparison/batch/calibration/A/erased-types/README.md": "c35171c25f0ef1e9cf42b73b663e9e2ec96e8ebbab79a69670b3e2b54d1ea25a",
+    "local/native-type-compat-comparison/batch/calibration/A/legacy-break/index.js": "fb61b92e4a862daa4654e3b70f46cdf220603a9e6056b4e184d9d4c4c65ca614",
+    "local/native-type-compat-comparison/batch/calibration/A/legacy-break/index.d.ts": "da0028afcb6b5d03a01a917a87a0d75f9bcff7295354443d5194f10fcbd741c2",
+    "local/native-type-compat-comparison/batch/calibration/A/legacy-break/test/test.js": "e8f4e8794a992890478b1bda8870ff19ac0784e0e89a106ec027c676951e0918",
+    "local/native-type-compat-comparison/batch/calibration/A/legacy-break/test/test.mjs": "42f516255759ed17b40bc824e40211ce690e809f04f6c89ca1aa2939501e0ff1",
+    "local/native-type-compat-comparison/batch/calibration/A/legacy-break/api.types.ts": "396a6e3616fc8393399822771c3ef2d1e5bcdb228576f35e7a5b6d14bca889a3",
+    "local/native-type-compat-comparison/batch/calibration/A/legacy-break/README.md": "c35171c25f0ef1e9cf42b73b663e9e2ec96e8ebbab79a69670b3e2b54d1ea25a",
+    "local/native-type-compat-comparison/batch/calibration/A/runtime-break/index.js": "bc035b6b4ea88009ec8f7a35398b977e27fc9c1b8a753bb768df303e21879c70",
+    "local/native-type-compat-comparison/batch/calibration/A/runtime-break/index.d.ts": "1ec78c4828eb97c1439a9c0b9d261befd1d1b1e1ea20f0fe687d2d58b589e96a",
+    "local/native-type-compat-comparison/batch/calibration/A/runtime-break/test/test.js": "e8f4e8794a992890478b1bda8870ff19ac0784e0e89a106ec027c676951e0918",
+    "local/native-type-compat-comparison/batch/calibration/A/runtime-break/test/test.mjs": "42f516255759ed17b40bc824e40211ce690e809f04f6c89ca1aa2939501e0ff1",
+    "local/native-type-compat-comparison/batch/calibration/A/runtime-break/api.types.ts": "396a6e3616fc8393399822771c3ef2d1e5bcdb228576f35e7a5b6d14bca889a3",
+    "local/native-type-compat-comparison/batch/calibration/A/runtime-break/README.md": "c35171c25f0ef1e9cf42b73b663e9e2ec96e8ebbab79a69670b3e2b54d1ea25a",
+    "development/native-task-ab/run-comparison.mjs": "12a98c9f3ad3abd46378d98cb0a1c582daa492a81f80993fb20e34249c2713c8",
+    "development/native-task-abc/native-run.mjs": "5d691871022fcf4f2117212c33b463849e791d7ebe120adc68e7ca419ee0d293",
+    "development/native-task-integrated/container-session.mjs": "d469b04975c1e9441b1dc5fb5c2a1f6beef451a390e5f020c1b1a6b211cdcd1b",
+    "development/native-task-integrated/container-relay.mjs": "db186a20946348867504c48d7faca8f40a93fdfa122e1102f581e8cf5377f1b3",
+    "development/native-task-ab/capture-candidate.mjs": "d388246826eb92dd408b853c4fe8fc929c259a9d03b89d169b75b2143544c669",
+    "development/native-task-ab/extract-candidate.py": "aa5244bd4a5cc394344b266f0107728d9b70e190bad55de47c46dd10f28603de",
+    "development/native-task-utility/container/stop-workload.mjs": "b21c23f5a334dc54af340e2773e3e56427aa27a946231769d36df249ea54a69e",
+    "development/native-task-offline/build.json": "16c5621afb56082001998a0f17f385ac90e4bdd31a19eeb215926de2e748ee61",
+    "local/native-type-compat-offline-subscribe/batch/experiment-config.json": "2d5290a809ff6e4d2c27639324dd4ef5c161cc799e480365f27a0df79d0202d1",
+    "local/native-type-compat-offline-subscribe/batch/sources.json": "5fc5cdccaae7d383abf16459877e455c2dafd58e1f9b9075360b76cabf3eb5de",
+    "local/native-type-compat-offline-subscribe/batch/verified-calibration.json": "40ecbb9a7c3ce303ebe61320218c658422ebba441c4bee5a8ed0b506a906c156",
+    "local/native-type-compat-offline-subscribe/batch/preflight.json": "9aa8c40a14d702c94ccd086370d132cabaafa988831f1bb15ede00cb246d62b9",
+    "local/native-type-compat-offline-subscribe/batch/preflight-audit.json": "fc29245d051a4bf45f1f59720745ec30fbd9cb8657b5d1656377c97b048b254e",
+    "../verified-change-harness/local/template-toolchain-20260908/package/bin/opencode": "096d32aa9778f98981390a0602c1f8af55ee5f1d6d5c58206f8fb2743c90eafe"
+  }
+}
