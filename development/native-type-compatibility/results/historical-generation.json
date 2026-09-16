@@ -1,0 +1,410 @@
+{
+  "limits": {
+    "genericParameters": 2,
+    "rootSeeds": 18,
+    "methods": 60,
+    "depth": 3,
+    "nodes": 160,
+    "consumers": 24
+  },
+  "specimens": [
+    "string",
+    "{ sample: [string] }",
+    "{ marker: string }"
+  ],
+  "exports": [
+    "EventEmitter",
+    "default"
+  ],
+  "roots": [
+    {
+      "id": 0,
+      "export": "EventEmitter",
+      "typeArguments": "<string, string>",
+      "import": "import { EventEmitter as API0 } from './index';",
+      "declaration": "declare const subject0: API0<string, string>;",
+      "accepted": true
+    },
+    {
+      "id": 1,
+      "export": "EventEmitter",
+      "typeArguments": "<string, { sample: [string] }>",
+      "import": "import { EventEmitter as API1 } from './index';",
+      "declaration": "declare const subject1: API1<string, { sample: [string] }>;",
+      "accepted": true
+    },
+    {
+      "id": 2,
+      "export": "EventEmitter",
+      "typeArguments": "<string, { marker: string }>",
+      "import": "import { EventEmitter as API2 } from './index';",
+      "declaration": "declare const subject2: API2<string, { marker: string }>;",
+      "accepted": true
+    },
+    {
+      "id": 3,
+      "export": "EventEmitter",
+      "typeArguments": "<{ sample: [string] }, string>",
+      "import": "import { EventEmitter as API3 } from './index';",
+      "declaration": "declare const subject3: API3<{ sample: [string] }, string>;",
+      "accepted": true
+    },
+    {
+      "id": 4,
+      "export": "EventEmitter",
+      "typeArguments": "<{ sample: [string] }, { sample: [string] }>",
+      "import": "import { EventEmitter as API4 } from './index';",
+      "declaration": "declare const subject4: API4<{ sample: [string] }, { sample: [string] }>;",
+      "accepted": true
+    },
+    {
+      "id": 5,
+      "export": "EventEmitter",
+      "typeArguments": "<{ sample: [string] }, { marker: string }>",
+      "import": "import { EventEmitter as API5 } from './index';",
+      "declaration": "declare const subject5: API5<{ sample: [string] }, { marker: string }>;",
+      "accepted": true
+    },
+    {
+      "id": 6,
+      "export": "EventEmitter",
+      "typeArguments": "<{ marker: string }, string>",
+      "import": "import { EventEmitter as API6 } from './index';",
+      "declaration": "declare const subject6: API6<{ marker: string }, string>;",
+      "accepted": true
+    },
+    {
+      "id": 7,
+      "export": "EventEmitter",
+      "typeArguments": "<{ marker: string }, { sample: [string] }>",
+      "import": "import { EventEmitter as API7 } from './index';",
+      "declaration": "declare const subject7: API7<{ marker: string }, { sample: [string] }>;",
+      "accepted": true
+    },
+    {
+      "id": 8,
+      "export": "EventEmitter",
+      "typeArguments": "<{ marker: string }, { marker: string }>",
+      "import": "import { EventEmitter as API8 } from './index';",
+      "declaration": "declare const subject8: API8<{ marker: string }, { marker: string }>;",
+      "accepted": true
+    }
+  ],
+  "consumers": [
+    {
+      "id": 0,
+      "provenance": "generated from baseline only",
+      "export": "EventEmitter",
+      "typeArguments": "<{ sample: [string] }, string>",
+      "method": "listeners",
+      "route": "EventEmitter<{ sample: [string] }, string>.listeners() -> returned[0]",
+      "arguments": "\"sample\"",
+      "callbackArguments": "\"sample\"",
+      "baselineThis": null,
+      "text": "import { EventEmitter as API3 } from './index';\ndeclare const subject3: API3<{ sample: [string] }, string>;\nconst returned = subject3[\"listeners\"](\"sample\");\nconst callable = returned[0];\ncallable(\"sample\");\n"
+    },
+    {
+      "id": 1,
+      "provenance": "generated from baseline only",
+      "export": "EventEmitter",
+      "typeArguments": "<{ sample: [string] }, { sample: [string] }>",
+      "method": "listeners",
+      "route": "EventEmitter<{ sample: [string] }, { sample: [string] }>.listeners() -> returned[0]",
+      "arguments": "\"sample\"",
+      "callbackArguments": "\"sample\"",
+      "baselineThis": null,
+      "text": "import { EventEmitter as API4 } from './index';\ndeclare const subject4: API4<{ sample: [string] }, { sample: [string] }>;\nconst returned = subject4[\"listeners\"](\"sample\");\nconst callable = returned[0];\ncallable(\"sample\");\n"
+    },
+    {
+      "id": 2,
+      "provenance": "generated from baseline only",
+      "export": "EventEmitter",
+      "typeArguments": "<{ sample: [string] }, { marker: string }>",
+      "method": "listeners",
+      "route": "EventEmitter<{ sample: [string] }, { marker: string }>.listeners() -> returned[0]",
+      "arguments": "\"sample\"",
+      "callbackArguments": "\"sample\"",
+      "baselineThis": null,
+      "text": "import { EventEmitter as API5 } from './index';\ndeclare const subject5: API5<{ sample: [string] }, { marker: string }>;\nconst returned = subject5[\"listeners\"](\"sample\");\nconst callable = returned[0];\ncallable(\"sample\");\n"
+    }
+  ],
+  "skipped": [
+    {
+      "path": "EventEmitter<string, string>.emit",
+      "reason": "non-concrete rest tuple"
+    },
+    {
+      "path": "EventEmitter<string, string>.on",
+      "reason": "unsupported argument shape"
+    },
+    {
+      "path": "EventEmitter<string, string>.addListener",
+      "reason": "unsupported argument shape"
+    },
+    {
+      "path": "EventEmitter<string, string>.once",
+      "reason": "unsupported argument shape"
+    },
+    {
+      "path": "EventEmitter<string, { sample: [string] }>.emit",
+      "reason": "non-concrete rest tuple"
+    },
+    {
+      "path": "EventEmitter<string, { sample: [string] }>.on",
+      "reason": "unsupported argument shape"
+    },
+    {
+      "path": "EventEmitter<string, { sample: [string] }>.addListener",
+      "reason": "unsupported argument shape"
+    },
+    {
+      "path": "EventEmitter<string, { sample: [string] }>.once",
+      "reason": "unsupported argument shape"
+    },
+    {
+      "path": "EventEmitter<string, { marker: string }>.emit",
+      "reason": "non-concrete rest tuple"
+    },
+    {
+      "path": "EventEmitter<string, { marker: string }>.on",
+      "reason": "unsupported argument shape"
+    },
+    {
+      "path": "EventEmitter<string, { marker: string }>.addListener",
+      "reason": "unsupported argument shape"
+    },
+    {
+      "path": "EventEmitter<string, { marker: string }>.once",
+      "reason": "unsupported argument shape"
+    },
+    {
+      "path": "EventEmitter<{ sample: [string] }, string>.emit",
+      "reason": "non-concrete rest tuple"
+    },
+    {
+      "path": "EventEmitter<{ sample: [string] }, string>.on",
+      "reason": "unsupported argument shape"
+    },
+    {
+      "path": "EventEmitter<{ sample: [string] }, string>.addListener",
+      "reason": "unsupported argument shape"
+    },
+    {
+      "path": "EventEmitter<{ sample: [string] }, string>.once",
+      "reason": "unsupported argument shape"
+    },
+    {
+      "path": "EventEmitter<{ sample: [string] }, { sample: [string] }>.emit",
+      "reason": "non-concrete rest tuple"
+    },
+    {
+      "path": "EventEmitter<{ sample: [string] }, { sample: [string] }>.on",
+      "reason": "unsupported argument shape"
+    },
+    {
+      "path": "EventEmitter<{ sample: [string] }, { sample: [string] }>.addListener",
+      "reason": "unsupported argument shape"
+    },
+    {
+      "path": "EventEmitter<{ sample: [string] }, { sample: [string] }>.once",
+      "reason": "unsupported argument shape"
+    },
+    {
+      "path": "EventEmitter<{ sample: [string] }, { marker: string }>.emit",
+      "reason": "non-concrete rest tuple"
+    },
+    {
+      "path": "EventEmitter<{ sample: [string] }, { marker: string }>.on",
+      "reason": "unsupported argument shape"
+    },
+    {
+      "path": "EventEmitter<{ sample: [string] }, { marker: string }>.addListener",
+      "reason": "unsupported argument shape"
+    },
+    {
+      "path": "EventEmitter<{ sample: [string] }, { marker: string }>.once",
+      "reason": "unsupported argument shape"
+    },
+    {
+      "path": "EventEmitter<{ marker: string }, string>.emit",
+      "reason": "non-concrete rest tuple"
+    },
+    {
+      "path": "EventEmitter<{ marker: string }, string>.on",
+      "reason": "unsupported argument shape"
+    },
+    {
+      "path": "EventEmitter<{ marker: string }, string>.addListener",
+      "reason": "unsupported argument shape"
+    },
+    {
+      "path": "EventEmitter<{ marker: string }, string>.once",
+      "reason": "unsupported argument shape"
+    },
+    {
+      "path": "EventEmitter<{ marker: string }, { sample: [string] }>.emit",
+      "reason": "non-concrete rest tuple"
+    },
+    {
+      "path": "EventEmitter<{ marker: string }, { sample: [string] }>.on",
+      "reason": "unsupported argument shape"
+    },
+    {
+      "path": "EventEmitter<{ marker: string }, { sample: [string] }>.addListener",
+      "reason": "unsupported argument shape"
+    },
+    {
+      "path": "EventEmitter<{ marker: string }, { sample: [string] }>.once",
+      "reason": "unsupported argument shape"
+    },
+    {
+      "path": "EventEmitter<{ marker: string }, { marker: string }>.emit",
+      "reason": "non-concrete rest tuple"
+    },
+    {
+      "path": "EventEmitter<{ marker: string }, { marker: string }>.on",
+      "reason": "unsupported argument shape"
+    },
+    {
+      "path": "EventEmitter<{ marker: string }, { marker: string }>.addListener",
+      "reason": "unsupported argument shape"
+    },
+    {
+      "path": "EventEmitter<{ marker: string }, { marker: string }>.once",
+      "reason": "unsupported argument shape"
+    },
+    {
+      "path": "EventEmitter<string, string>.listenersreturned[0]",
+      "reason": "non-concrete rest tuple"
+    },
+    {
+      "path": "EventEmitter<string, string>.removeListener",
+      "reason": "class-return recursion not traversed"
+    },
+    {
+      "path": "EventEmitter<string, string>.off",
+      "reason": "class-return recursion not traversed"
+    },
+    {
+      "path": "EventEmitter<string, string>.removeAllListeners",
+      "reason": "class-return recursion not traversed"
+    },
+    {
+      "path": "EventEmitter<string, { sample: [string] }>.listenersreturned[0]",
+      "reason": "non-concrete rest tuple"
+    },
+    {
+      "path": "EventEmitter<string, { sample: [string] }>.removeListener",
+      "reason": "class-return recursion not traversed"
+    },
+    {
+      "path": "EventEmitter<string, { sample: [string] }>.off",
+      "reason": "class-return recursion not traversed"
+    },
+    {
+      "path": "EventEmitter<string, { sample: [string] }>.removeAllListeners",
+      "reason": "class-return recursion not traversed"
+    },
+    {
+      "path": "EventEmitter<string, { marker: string }>.listenersreturned[0]",
+      "reason": "non-concrete rest tuple"
+    },
+    {
+      "path": "EventEmitter<string, { marker: string }>.removeListener",
+      "reason": "class-return recursion not traversed"
+    },
+    {
+      "path": "EventEmitter<string, { marker: string }>.off",
+      "reason": "class-return recursion not traversed"
+    },
+    {
+      "path": "EventEmitter<string, { marker: string }>.removeAllListeners",
+      "reason": "class-return recursion not traversed"
+    },
+    {
+      "path": "EventEmitter<{ sample: [string] }, string>.removeListener",
+      "reason": "class-return recursion not traversed"
+    },
+    {
+      "path": "EventEmitter<{ sample: [string] }, string>.off",
+      "reason": "class-return recursion not traversed"
+    },
+    {
+      "path": "EventEmitter<{ sample: [string] }, string>.removeAllListeners",
+      "reason": "class-return recursion not traversed"
+    },
+    {
+      "path": "EventEmitter<{ sample: [string] }, { sample: [string] }>.removeListener",
+      "reason": "class-return recursion not traversed"
+    },
+    {
+      "path": "EventEmitter<{ sample: [string] }, { sample: [string] }>.off",
+      "reason": "class-return recursion not traversed"
+    },
+    {
+      "path": "EventEmitter<{ sample: [string] }, { sample: [string] }>.removeAllListeners",
+      "reason": "class-return recursion not traversed"
+    },
+    {
+      "path": "EventEmitter<{ sample: [string] }, { marker: string }>.removeListener",
+      "reason": "class-return recursion not traversed"
+    },
+    {
+      "path": "EventEmitter<{ sample: [string] }, { marker: string }>.off",
+      "reason": "class-return recursion not traversed"
+    },
+    {
+      "path": "EventEmitter<{ sample: [string] }, { marker: string }>.removeAllListeners",
+      "reason": "class-return recursion not traversed"
+    },
+    {
+      "path": "EventEmitter<{ marker: string }, string>.listenersreturned[0]",
+      "reason": "non-concrete rest tuple"
+    },
+    {
+      "path": "EventEmitter<{ marker: string }, string>.removeListener",
+      "reason": "class-return recursion not traversed"
+    },
+    {
+      "path": "EventEmitter<{ marker: string }, string>.off",
+      "reason": "class-return recursion not traversed"
+    },
+    {
+      "path": "EventEmitter<{ marker: string }, string>.removeAllListeners",
+      "reason": "class-return recursion not traversed"
+    },
+    {
+      "path": "EventEmitter<{ marker: string }, { sample: [string] }>.listenersreturned[0]",
+      "reason": "non-concrete rest tuple"
+    },
+    {
+      "path": "EventEmitter<{ marker: string }, { sample: [string] }>.removeListener",
+      "reason": "class-return recursion not traversed"
+    },
+    {
+      "path": "EventEmitter<{ marker: string }, { sample: [string] }>.off",
+      "reason": "class-return recursion not traversed"
+    },
+    {
+      "path": "EventEmitter<{ marker: string }, { sample: [string] }>.removeAllListeners",
+      "reason": "class-return recursion not traversed"
+    },
+    {
+      "path": "EventEmitter<{ marker: string }, { marker: string }>.listenersreturned[0]",
+      "reason": "non-concrete rest tuple"
+    },
+    {
+      "path": "EventEmitter<{ marker: string }, { marker: string }>.removeListener",
+      "reason": "class-return recursion not traversed"
+    },
+    {
+      "path": "EventEmitter<{ marker: string }, { marker: string }>.off",
+      "reason": "class-return recursion not traversed"
+    },
+    {
+      "path": "EventEmitter<{ marker: string }, { marker: string }>.removeAllListeners",
+      "reason": "class-return recursion not traversed"
+    }
+  ],
+  "nodes": 72
+}

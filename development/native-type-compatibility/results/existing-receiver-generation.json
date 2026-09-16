@@ -1,0 +1,44 @@
+{
+  "limits": {
+    "genericParameters": 2,
+    "rootSeeds": 18,
+    "methods": 60,
+    "depth": 3,
+    "nodes": 160,
+    "consumers": 24
+  },
+  "specimens": [
+    "string",
+    "{ sample: [string] }",
+    "{ marker: string }"
+  ],
+  "exports": [
+    "default"
+  ],
+  "roots": [
+    {
+      "id": 0,
+      "export": "default",
+      "typeArguments": "",
+      "import": "import { default as API0 } from './index';",
+      "declaration": "declare const subject0: API0;",
+      "accepted": true
+    }
+  ],
+  "consumers": [
+    {
+      "id": 0,
+      "provenance": "generated from baseline only",
+      "export": "default",
+      "typeArguments": "",
+      "method": "take",
+      "route": "default.take() -> returned[0]",
+      "arguments": "",
+      "callbackArguments": "1",
+      "baselineThis": "{ marker: string; }",
+      "text": "import { default as API0 } from './index';\ndeclare const subject0: API0;\nconst returned = subject0[\"take\"]();\nconst callable = returned[0];\ncallable(1);\n"
+    }
+  ],
+  "skipped": [],
+  "nodes": 2
+}
