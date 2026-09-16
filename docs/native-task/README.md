@@ -9,6 +9,10 @@ its development results do not establish a recommended production mode.
 
 ## Install and use
 
+For fully local tasks, [explicit offline configuration](OFFLINE.md) removes
+webfetch from the selected native build session before author work. This is
+per-run configuration, with OS network isolation still required.
+
 Optional [old TypeScript call observations](TYPE-COMPATIBILITY.md), enabled with
 `HARNESS_TASK_TYPE_COMPAT=1` in direct mode, append real compiler evidence after
 a project check. They use a frozen task baseline and an explicitly selected
