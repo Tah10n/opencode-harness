@@ -1,0 +1,138 @@
+{
+  "candidate": "c90fc7c78bcdd4d8288550b887f52990bafb11a6",
+  "prerequisite": "failed: existing direct permissions suppress command hints",
+  "developerElapsedMs": 15291,
+  "realProviderRequests": 0,
+  "modelTaskRuns": 0,
+  "image": "sha256:0ed6cee0b095ecf1e1e780418cb373d462f1b99643bb86db0a8de7dd58fc83a6",
+  "containerRemoved": true,
+  "fixtureSourceSha256": "052788a6d4cc6ddb47d7cd5ef7c4004f4e788b522fa356c8f95d0a39293bb4bf",
+  "generatedFixtureSha256": "df2720bcfc228b568d9f422a391e00731590c0d9674ac818428e360d6b804c57",
+  "evidence": {
+    "installed": "1.18.26",
+    "network": "Docker --network none; only loopback scripted HTTP",
+    "results": [
+      {
+        "layout": "ancestor",
+        "installedHash": "4ba8f87a18157dfcf794c030d836ce4ca22260eb7a9c1472255b628b19f490bc",
+        "requests": 5,
+        "authorSteps": 2,
+        "rawExit": 127,
+        "originalUnchanged": true,
+        "commandHintsEnabled": true,
+        "externalDirectory": "deny",
+        "hintReceived": false,
+        "hintArtifact": false,
+        "terminationVerified": true,
+        "rawEvent": {
+          "tool": "bash",
+          "callID": "fixture-3",
+          "before": "8f5a01b02ebbdd13f7100c3d37e6d234380b9c99cbdd64d41145b5a3b82a1c0a",
+          "startedAt": 1789555506178,
+          "admittedArgs": {
+            "command": "pnpm test",
+            "description": "Offline installed command hint control",
+            "timeout": 90000
+          },
+          "executionAdmitted": true,
+          "after": "8f5a01b02ebbdd13f7100c3d37e6d234380b9c99cbdd64d41145b5a3b82a1c0a",
+          "completedAt": 1789555506279,
+          "args": {
+            "command": "pnpm test",
+            "description": "Offline installed command hint control",
+            "timeout": 90000
+          },
+          "output": "/bin/bash: line 1: pnpm: command not found\n",
+          "exit": 127,
+          "signal": null,
+          "timeout": null,
+          "state": "completed"
+        }
+      }
+    ]
+  },
+  "baselineSuitePassed": true,
+  "baselineEvidence": "permission-fixture.log:1; actual pnpm test assertion completed before scripted session",
+  "eligibilityOnly": true,
+  "fullTaskPreflightPassed": false,
+  "tasksAndRubricFrozen": false,
+  "slots": [
+    {
+      "slot": 1,
+      "task": "A",
+      "arm": "OFF",
+      "status": "not_started",
+      "Q": null,
+      "T": null,
+      "D": null,
+      "durationMs": null,
+      "providerRequests": 0,
+      "nativeTools": 0,
+      "knownUsage": null,
+      "unknownUsage": "not applicable: no submission",
+      "hintCost": null
+    },
+    {
+      "slot": 2,
+      "task": "A",
+      "arm": "ON",
+      "status": "not_started",
+      "Q": null,
+      "T": null,
+      "D": null,
+      "durationMs": null,
+      "providerRequests": 0,
+      "nativeTools": 0,
+      "knownUsage": null,
+      "unknownUsage": "not applicable: no submission",
+      "hintCost": null
+    },
+    {
+      "slot": 3,
+      "task": "B",
+      "arm": "ON",
+      "status": "not_started",
+      "Q": null,
+      "T": null,
+      "D": null,
+      "durationMs": null,
+      "providerRequests": 0,
+      "nativeTools": 0,
+      "knownUsage": null,
+      "unknownUsage": "not applicable: no submission",
+      "hintCost": null
+    },
+    {
+      "slot": 4,
+      "task": "B",
+      "arm": "OFF",
+      "status": "not_started",
+      "Q": null,
+      "T": null,
+      "D": null,
+      "durationMs": null,
+      "providerRequests": 0,
+      "nativeTools": 0,
+      "knownUsage": null,
+      "unknownUsage": "not applicable: no submission",
+      "hintCost": null
+    }
+  ],
+  "comparisonTotals": {
+    "taskRuns": 0,
+    "providerRequests": 0,
+    "nativeTools": 0,
+    "knownUsage": null,
+    "requestsWithUnknownUsage": 0,
+    "outcomes": "all unknown; no measured outcomes"
+  },
+  "developerChecks": {
+    "installedRuns": 1,
+    "scriptedRequestsIncludingAuxiliary": 5,
+    "authorNativeBashCalls": 1,
+    "hintLocalCost": "not emitted by runtime when before hook returns null; not measured, not zero",
+    "syntheticUsageExcluded": true,
+    "evaluatorRuns": 0
+  },
+  "configSha256": "c2ec1b308ae3ce825cfb3f7803444a2a8c95ae30630287591f7415eeedb8af31"
+}
