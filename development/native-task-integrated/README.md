@@ -2,6 +2,8 @@
 
 The separately authorized final pair is complete: [continuation results and all 12 slots](CONTINUATION-RESULTS.md). The original RESULTS.md remains the first-period historical record.
 
+The four P/Hbase UFO trajectories now have a [mechanism analysis](trajectory-analysis/REPORT.md), with event/snapshot evidence and one bounded next-change hypothesis. It adds no model runs, runtime changes or revised historical grades.
+
 This directory records a fixed development comparison of ordinary OpenCode, stock direct harness, and direct plus optional sensitivity/investigation. The task is complete when an unchanged portable patch satisfies its public contract, compatibility and required tests/types/docs and is delivered autonomously with verified termination.
 
 **The campaign is closed to further execution:** the frozen policy stopped at slot 10 with unknown submission. Do not resume the launcher or fill the two not_started slots. Read [results and product decision](RESULTS.md), [frozen plan](PLAN.md), [all assigned outcomes](results.json), and [configuration/accounting audit](accounting-audit.json).
