@@ -1,10 +1,15 @@
 # Command-hint comparison
 
-The user subsequently approved identical `external_directory: allow` inside the
-isolated OFF/ON containers. The new batch is prepared and frozen in
-[PLAN.md](PLAN.md) and [frozen-inputs.json](frozen-inputs.json). The following
-section preserves the original pre-authorization eligibility failure. It is not
-the status or result of the newly authorized batch.
+The authorized four-run comparison is complete. **ON supplied no additional full
+autonomous delivery. Keep command hints experimental/default-off, with no further
+campaign.** See [REPORT.md](REPORT.md), [comparison-results.json](comparison-results.json),
+and the unchanged [patches](patches/). Product candidate and defaults are unchanged.
+
+The user approved identical `external_directory: allow` inside isolated author
+containers. [PLAN.md](PLAN.md) and [frozen-inputs.json](frozen-inputs.json) record
+the preparation frozen before all four calls. The remainder below is historical:
+its blocked/not-started statements describe the earlier pre-authorization check,
+not the completed batch. Historical RESULTS.json and assigned.json are retained.
 
 ## Historical eligibility block before permission approval
 

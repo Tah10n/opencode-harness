@@ -1,0 +1,178 @@
+[
+  {
+    "id": "n01",
+    "task": "A",
+    "applicable": true,
+    "changed": "M\tREADME.md\nM\tsrc/utils.ts\nM\ttest/query.test.ts\nM\ttest/types.test-d.ts\n",
+    "checksPassed": true,
+    "commands": [
+      {
+        "name": "apply",
+        "status": 0,
+        "error": null
+      },
+      {
+        "name": "changed",
+        "status": 0,
+        "error": null
+      },
+      {
+        "name": "project-0",
+        "status": 0,
+        "error": null
+      },
+      {
+        "name": "project-1",
+        "status": 0,
+        "error": null
+      },
+      {
+        "name": "independent-behavior",
+        "status": 0,
+        "error": null
+      },
+      {
+        "name": "independent-types",
+        "status": 0,
+        "error": null
+      },
+      {
+        "name": "package-consumer",
+        "status": 0,
+        "error": null
+      }
+    ]
+  },
+  {
+    "id": "n02",
+    "task": "A",
+    "applicable": true,
+    "changed": "M\tREADME.md\nM\tsrc/utils.ts\nM\ttest/query.test.ts\nM\ttest/types.test-d.ts\n",
+    "checksPassed": false,
+    "commands": [
+      {
+        "name": "apply",
+        "status": 0,
+        "error": null
+      },
+      {
+        "name": "changed",
+        "status": 0,
+        "error": null
+      },
+      {
+        "name": "project-0",
+        "status": 1,
+        "error": null
+      },
+      {
+        "name": "project-1",
+        "status": 0,
+        "error": null
+      },
+      {
+        "name": "independent-behavior",
+        "status": 0,
+        "error": null
+      },
+      {
+        "name": "independent-types",
+        "status": 0,
+        "error": null
+      },
+      {
+        "name": "package-consumer",
+        "status": 0,
+        "error": null
+      }
+    ]
+  },
+  {
+    "id": "n03",
+    "task": "B",
+    "applicable": true,
+    "changed": "M\tREADME.md\nM\tindex.d.ts\nM\tindex.js\nM\ttest/test.js\nM\ttest/test.mjs\nA\ttest/types.ts\n",
+    "checksPassed": true,
+    "commands": [
+      {
+        "name": "apply",
+        "status": 0,
+        "error": null
+      },
+      {
+        "name": "changed",
+        "status": 0,
+        "error": null
+      },
+      {
+        "name": "project-0",
+        "status": 0,
+        "error": null
+      },
+      {
+        "name": "project-1",
+        "status": 0,
+        "error": null
+      },
+      {
+        "name": "project-2",
+        "status": 0,
+        "error": null
+      },
+      {
+        "name": "independent-behavior",
+        "status": 0,
+        "error": null
+      },
+      {
+        "name": "independent-types",
+        "status": 0,
+        "error": null
+      }
+    ]
+  },
+  {
+    "id": "n04",
+    "task": "B",
+    "applicable": true,
+    "changed": "M\tREADME.md\nM\tindex.d.ts\nM\tindex.js\nM\ttest/test.js\nM\ttest/test.mjs\nA\ttest/types.ts\n",
+    "checksPassed": true,
+    "commands": [
+      {
+        "name": "apply",
+        "status": 0,
+        "error": null
+      },
+      {
+        "name": "changed",
+        "status": 0,
+        "error": null
+      },
+      {
+        "name": "project-0",
+        "status": 0,
+        "error": null
+      },
+      {
+        "name": "project-1",
+        "status": 0,
+        "error": null
+      },
+      {
+        "name": "project-2",
+        "status": 0,
+        "error": null
+      },
+      {
+        "name": "independent-behavior",
+        "status": 0,
+        "error": null
+      },
+      {
+        "name": "independent-types",
+        "status": 0,
+        "error": null
+      }
+    ]
+  }
+]

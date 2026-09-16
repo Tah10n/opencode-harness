@@ -1,0 +1,1073 @@
+[
+  {
+    "task": "A",
+    "arm": "OFF",
+    "hint": null,
+    "receipt": {
+      "wireRequestArchived": false,
+      "nativeToolMessage": null,
+      "limitation": "Real raw HTTP payload/stream capture omitted for this experiment kind; native persisted output is not wire receipt proof."
+    },
+    "commands": [
+      {
+        "index": 16,
+        "callID": "call_TDuGZNVTN3SZ3D1qutGaZyQc",
+        "tool": "bash",
+        "command": "git status --short && git log --oneline -5",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 24,
+        "callID": "call_Vb8LteI8Emyu4Ir0WfqcpAcS",
+        "tool": "bash",
+        "command": "ls -la",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 31,
+        "callID": "call_7zg8SM3GrZtbPe9sQB28aWLT",
+        "tool": "apply_patch",
+        "command": null,
+        "exit": null,
+        "changed": true
+      },
+      {
+        "index": 32,
+        "callID": "call_8AyQyRDmW89aYXZn9Kr9RAry",
+        "tool": "bash",
+        "command": "pnpm vitest run test/query.test.ts --typecheck",
+        "exit": 127,
+        "changed": false
+      },
+      {
+        "index": 33,
+        "callID": "call_ZpriqmDd3SIUjyLyEFlmu36v",
+        "tool": "bash",
+        "command": "node --version",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 34,
+        "callID": "call_SiWNAqa5gC8c52e8XSrQdGBp",
+        "tool": "bash",
+        "command": "npm --version",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 35,
+        "callID": "call_8duxw4VxpizDolgdzQwpFcaD",
+        "tool": "bash",
+        "command": "corepack --version",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 36,
+        "callID": "call_7VOFOUyGRL5t7FhpzePJkEWG",
+        "tool": "bash",
+        "command": "git diff -- test/query.test.ts test/types.test-d.ts",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 37,
+        "callID": "call_ltNXhBaHxShHMrGBndmJw7KU",
+        "tool": "apply_patch",
+        "command": null,
+        "exit": null,
+        "changed": true
+      },
+      {
+        "index": 38,
+        "callID": "call_0mKIJaiNcrmhuzob3Rd7dvEk",
+        "tool": "bash",
+        "command": "corepack pnpm --version",
+        "exit": 1,
+        "changed": false
+      },
+      {
+        "index": 39,
+        "callID": "call_VBQWV4Qb4SINeVhp7YT2a1H3",
+        "tool": "bash",
+        "command": "tsc --version",
+        "exit": 127,
+        "changed": false
+      },
+      {
+        "index": 40,
+        "callID": "call_rMStQn8rqzGGTjYsANxa3SM0",
+        "tool": "bash",
+        "command": "eslint --version",
+        "exit": 127,
+        "changed": false
+      },
+      {
+        "index": 41,
+        "callID": "call_4eigMrRQyfwHE0XNFF09pxFG",
+        "tool": "bash",
+        "command": "prettier --version",
+        "exit": 127,
+        "changed": false
+      },
+      {
+        "index": 42,
+        "callID": "call_MsGZiLfK9qh5gVIIkVxRIMru",
+        "tool": "bash",
+        "command": "git diff --check",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 43,
+        "callID": "call_kuWX8xsCKx4ERQaY3ReAq7xx",
+        "tool": "apply_patch",
+        "command": null,
+        "exit": null,
+        "changed": true
+      },
+      {
+        "index": 44,
+        "callID": "call_iIEgOW2WBZirOvCDlx8xYZO8",
+        "tool": "bash",
+        "command": "node --experimental-strip-types --experimental-default-type=module --experimental-specifier-resolution=node --input-type=module -e 'import { withoutQuery } from \"./src/utils.ts\"; const cases = [[\"/p?x=1&&y=2#f\", \"x\", \"/p?&y=2#f\"], [\"/p?a+b=1&keep=%2a\", \"a b\", \"/p?keep=%2a\"], [\"/p?bad%ZZ=1&keep=3\", \"bad%ZZ\", \"/p?keep=3\"], [\"/p#frag?x=1\", undefined, \"/p#frag?x=1\"]]; for (const [input, keys, expected] of cases) { const actual = withoutQuery(input, keys); if (actual !== expected) throw new Error(`${input}: ${actual} !== ${expected}`); }'",
+        "exit": 9,
+        "changed": false
+      },
+      {
+        "index": 45,
+        "callID": "call_gWRSQBSbAfFWxxYj7QQiWUDO",
+        "tool": "bash",
+        "command": "node --experimental-strip-types --experimental-specifier-resolution=node --input-type=module -e 'import { withoutQuery } from \"./src/utils.ts\"; console.log(withoutQuery(\"/p?x=1&&y=2#f\", \"x\"));'",
+        "exit": 1,
+        "changed": false
+      },
+      {
+        "index": 50,
+        "callID": "call_EkjsvIdwxg5JgI8ECSWcx0PJ",
+        "tool": "bash",
+        "command": "git diff --stat && git diff --check && git status --short",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 51,
+        "callID": "call_8Ofsha6pP7GLN7UHNrsczVFn",
+        "tool": "bash",
+        "command": "node --experimental-strip-types -e 'const { withoutQuery } = require(\"./src/utils.ts\"); console.log(withoutQuery(\"/p?x=1&&y=2#f\", \"x\"));'",
+        "exit": 1,
+        "changed": false
+      },
+      {
+        "index": 52,
+        "callID": "call_woKskVfqVXekKr5u3upX9kbP",
+        "tool": "apply_patch",
+        "command": null,
+        "exit": null,
+        "changed": true
+      },
+      {
+        "index": 53,
+        "callID": "call_mlpsvZQ8OZfWsEcHBOy4NyZW",
+        "tool": "bash",
+        "command": "node --experimental-strip-types --experimental-loader='data:text/javascript,export async function resolve(specifier,context,nextResolve){if(specifier.startsWith(\".\")&&!specifier.match(/\\.[^/]+$/)){return nextResolve(specifier+\".ts\",context)}return nextResolve(specifier,context)}' --input-type=module -e 'import { withoutQuery } from \"./src/utils.ts\"; const cases = [[\"/foo?bar=1&baz=2#frag\", undefined, \"/foo#frag\"], [\"/foo#frag?bar=1\", undefined, \"/foo#frag?bar=1\"], [\"/p?x=1&&y=2#f\", \"x\", \"/p?&y=2#f\"], [\"/p?x=1#f\", \"x\", \"/p#f\"], [\"/p?a+b=1&space%20key=2&caf%C3%A9=3&keep=%2a\", [\"a b\", \"space key\", \"caf\u00e9\"], \"/p?keep=%2a\"], [\"/p?bad+%ZZ=1&bad%2=2&keep=3\", [\"bad %ZZ\", \"bad%2\"], \"/p?keep=3\"], [\"/p?Keep=%2A&&x=1#Frag?z=2\", \"missing\", \"/p?Keep=%2A&&x=1#Frag?z=2\"]]; for (const [input, keys, expected] of cases) { const actual = withoutQuery(input, keys); if (actual !== expected) throw new Error(`${input}: ${actual} !== ${expected}`); }'",
+        "exit": 1,
+        "changed": false
+      },
+      {
+        "index": 55,
+        "callID": "call_dDHIZDEjsKvVLRXQ593xz2fq",
+        "tool": "bash",
+        "command": "pnpm vitest run test/query.test.ts --typecheck",
+        "exit": 127,
+        "changed": false
+      },
+      {
+        "index": 56,
+        "callID": "call_fHVhPRYfOlr7tlwRXtaM53Kp",
+        "tool": "bash",
+        "command": "pnpm vitest run --typecheck",
+        "exit": 127,
+        "changed": false
+      },
+      {
+        "index": 57,
+        "callID": "call_PalxQjrEuT4FkSfTXfnU9jVj",
+        "tool": "bash",
+        "command": "npm run lint",
+        "exit": 1,
+        "changed": false
+      },
+      {
+        "index": 58,
+        "callID": "call_Hq5auRTDmyAMoyb3SD2AiP3j",
+        "tool": "bash",
+        "command": "ls -la node_modules/.bin",
+        "exit": 2,
+        "changed": false
+      },
+      {
+        "index": 59,
+        "callID": "call_8LpDMsGqzQimPBgl0Eboixmm",
+        "tool": "bash",
+        "command": "npm exec --offline prettier -- --write test/query.test.ts",
+        "exit": 0,
+        "changed": true
+      },
+      {
+        "index": 61,
+        "callID": "call_FWF4NYT6NU6xVXIQvcmwu96O",
+        "tool": "bash",
+        "command": "git diff --check && git status --short",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 62,
+        "callID": "call_WqZswdFI1GZbHnIVqfT4FW0z",
+        "tool": "bash",
+        "command": "npm run build",
+        "exit": 0,
+        "changed": true
+      },
+      {
+        "index": 63,
+        "callID": "call_s2xCjJ0kcoJCwWju1TZ7C97N",
+        "tool": "bash",
+        "command": "node --input-type=module -e 'import { withoutQuery } from \"./dist/index.mjs\"; const cases = [[\"/foo?bar=1&baz=2#frag\", undefined, \"/foo#frag\"], [\"/foo?bar=1\", undefined, \"/foo\"], [\"/foo#frag?bar=1\", undefined, \"/foo#frag?bar=1\"], [\"/foo?bar=1#frag?baz=2\", undefined, \"/foo#frag?baz=2\"], [\"/p?x=1&&y=2#f\", \"x\", \"/p?&y=2#f\"], [\"/p?x=1#f\", \"x\", \"/p#f\"], [\"/p?x=1&x=2&y=3\", [\"x\", \"x\"], \"/p?y=3\"], [\"/p?flag&x=1\", \"x\", \"/p?flag\"], [\"/p?a=b=c&x=1\", \"a\", \"/p?x=1\"], [\"/p?Foo=1&foo=2\", \"foo\", \"/p?Foo=1\"], [\"/p?a+b=1&space%20key=2&caf%C3%A9=3&keep=%2a\", [\"a b\", \"space key\", \"caf\u00e9\"], \"/p?keep=%2a\"], [\"/p?bad+%ZZ=1&bad%2=2&keep=3\", [\"bad %ZZ\", \"bad%2\"], \"/p?keep=3\"], [\"/p?__proto__=1&__proto__=2&keep=3\", \"__proto__\", \"/p?keep=3\"], [\"/p?=1&&empty&x=2\", \"\", \"/p?empty&x=2\"], [\"/p?x=1\", \"missing\", \"/p?x=1\"], [\"/p?Keep=%2A&&x=1#Frag?z=2\", \"missing\", \"/p?Keep=%2A&&x=1#Frag?z=2\"]]; for (const [input, keys, expected] of cases) { const actual = withoutQuery(input, keys); if (actual !== expected) throw new Error(`${input}: ${actual} !== ${expected}`); } const keys = [\"x\", \"x\"]; const input = \"/raw%2f?x=1&y=%2a#Frag?z=2\"; const output = withoutQuery(input, keys); if (output !== \"/raw%2f?y=%2a#Frag?z=2\" || keys.join(\",\") !== \"x,x\") throw new Error(\"array mutation or raw preservation failure\");'",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 64,
+        "callID": "call_OLHPgF75nClW2cFtJhxEpfq5",
+        "tool": "bash",
+        "command": "npm exec --offline vitest -- run --typecheck",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 65,
+        "callID": "call_xm8vs470oqnDXdJ7vdTRrCBG",
+        "tool": "bash",
+        "command": "npm run lint",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 70,
+        "callID": "call_C83WdEYDSz3HWv4AHE3QUQFU",
+        "tool": "bash",
+        "command": "git diff --stat && git diff --check && git status --short",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 71,
+        "callID": "call_HppqqxdKpID81VirvIF5sy2T",
+        "tool": "bash",
+        "command": "git diff -- README.md src/utils.ts test/query.test.ts test/types.test-d.ts",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 72,
+        "callID": "call_JjnSJEYnoHUKKyWRAo0k0DAQ",
+        "tool": "bash",
+        "command": "git status --short --ignored",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 75,
+        "callID": "call_32yoc9BAghcRVMMJkzoChvq7",
+        "tool": "bash",
+        "command": "npm exec --offline vitest -- run test/query.test.ts --typecheck",
+        "exit": 0,
+        "changed": false
+      }
+    ],
+    "finalAuthor": "Implemented `withoutQuery(input, keys?)` with raw-preserving selective removal, decoded key matching, fragment handling, empty-field support, and readonly-array support.\n\nAdded:\n- Runtime and type regressions\n- Public generated declarations via build\n- README/API documentation\n\nChecks passed:\n- Focused tests: 52 passed, no type errors\n- Full suite: 510 tests passed, no type errors\n- `npm run lint`\n- `npm run build`\n- Built public-entry runtime probe\n\nThe pinned `pnpm` command could not run because Corepack lacked network access; equivalent Vitest checks ran successfully via offline npm execution.",
+    "lastMutation": 62
+  },
+  {
+    "task": "A",
+    "arm": "ON",
+    "hint": {
+      "kind": "project-command-hint",
+      "callID": "call_juT2E21PLwJ5ckOeuRre3AQN",
+      "status": "path-found",
+      "missing": "pnpm",
+      "cwd": "/work/repo/.git/harness-task/faf2d6f0-7fe9-47a7-98e4-dd2630796d7c/worktree",
+      "script": "lint",
+      "packageManager": "pnpm@10.33.2",
+      "installed": {
+        "name": "pnpm",
+        "version": "10.33.2",
+        "versionBasis": "package metadata, not --version",
+        "executable": "/work/repo/node_modules/.bin/pnpm"
+      },
+      "scope": "original-script",
+      "routes": [
+        "'/work/repo/node_modules/.bin/pnpm' 'lint'"
+      ],
+      "reason": null,
+      "notice": "Host-derived context only. Original command failed. Executable path/metadata were read; proposed command has not run. Suite readiness, check success and task correctness are unverified. Native permissions still apply.",
+      "cost": {
+        "paths": 96,
+        "reads": 4,
+        "bytes": 14750,
+        "elapsedMs": 4.456957999966107,
+        "executions": 0
+      }
+    },
+    "receipt": {
+      "wireRequestArchived": false,
+      "nativeToolMessage": {
+        "type": "tool",
+        "tool": "bash",
+        "callID": "call_juT2E21PLwJ5ckOeuRre3AQN",
+        "state": {
+          "status": "completed",
+          "input": {
+            "command": "pnpm lint",
+            "workdir": ".",
+            "timeout": 120000
+          },
+          "output": "/usr/bin/bash: line 1: pnpm: command not found\n\nHost-derived project command context:\n{\"kind\":\"project-command-hint\",\"callID\":\"call_juT2E21PLwJ5ckOeuRre3AQN\",\"status\":\"path-found\",\"missing\":\"pnpm\",\"cwd\":\"/work/repo/.git/harness-task/faf2d6f0-7fe9-47a7-98e4-dd2630796d7c/worktree\",\"script\":\"lint\",\"packageManager\":\"pnpm@10.33.2\",\"installed\":{\"name\":\"pnpm\",\"version\":\"10.33.2\",\"versionBasis\":\"package metadata, not --version\",\"executable\":\"/work/repo/node_modules/.bin/pnpm\"},\"scope\":\"original-script\",\"routes\":[\"'/work/repo/node_modules/.bin/pnpm' 'lint'\"],\"reason\":null,\"notice\":\"Host-derived context only. Original command failed. Executable path/metadata were read; proposed command has not run. Suite readiness, check success and task correctness are unverified. Native permissions still apply.\",\"cost\":{\"paths\":96,\"reads\":4,\"bytes\":14750,\"elapsedMs\":4.456957999966107,\"executions\":0}}",
+          "metadata": {
+            "output": "/usr/bin/bash: line 1: pnpm: command not found\n",
+            "exit": 127,
+            "truncated": false
+          },
+          "title": "pnpm lint",
+          "time": {
+            "start": 1789557882882,
+            "end": 1789557882935
+          }
+        },
+        "metadata": {
+          "openai": {
+            "itemId": "fc_09812c6d0b13ffae016aaa7c7a59d487d2b72d8ffc21b01da6"
+          }
+        }
+      },
+      "limitation": "Real raw HTTP payload/stream capture omitted for this experiment kind; native persisted output is not wire receipt proof."
+    },
+    "commands": [
+      {
+        "index": 16,
+        "callID": "call_kWNmoroBqK0UB8TXIbKHlQeg",
+        "tool": "bash",
+        "command": "git status --short && git log --oneline -5",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 26,
+        "callID": "call_zd5Ha9yMCQhmgK8ewrBVBwWb",
+        "tool": "bash",
+        "command": "ls -ld node_modules pnpm-lock.yaml 2>/dev/null || true",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 27,
+        "callID": "call_wudqxHGqXFBQWoGKOR5HgxeN",
+        "tool": "bash",
+        "command": "pnpm --version",
+        "exit": 127,
+        "changed": false
+      },
+      {
+        "index": 29,
+        "callID": "call_J5DXTPpxI9dsqoMb4UFRmOgj",
+        "tool": "apply_patch",
+        "command": null,
+        "exit": null,
+        "changed": true
+      },
+      {
+        "index": 30,
+        "callID": "call_HPGgYxAK1WiW6sqnLTPEWpd8",
+        "tool": "apply_patch",
+        "command": null,
+        "exit": null,
+        "changed": true
+      },
+      {
+        "index": 34,
+        "callID": "call_DprX8rxdgtmv9UMUEMq5blKp",
+        "tool": "bash",
+        "command": "git diff --check && git diff --stat && git diff",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 35,
+        "callID": "call_6j6mBBtDx3gfUZn5j5fvgxyK",
+        "tool": "bash",
+        "command": "npm --version && corepack --version 2>/dev/null || true",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 36,
+        "callID": "call_SfbPA4G5AukDVsevo6Do6EXE",
+        "tool": "bash",
+        "command": "corepack pnpm --version",
+        "exit": 1,
+        "changed": false
+      },
+      {
+        "index": 37,
+        "callID": "call_AK3Ms5N7UuQD81P0Rqucdvou",
+        "tool": "bash",
+        "command": "command -v prettier || true; command -v eslint || true; command -v tsc || true; command -v vitest || true; command -v unbuild || true; command -v automd || true",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 38,
+        "callID": "call_5RAsDBam2WfJF6RLLZYojY1h",
+        "tool": "bash",
+        "command": "git status --short",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 39,
+        "callID": "call_misW7SQaZMd0CHIC7DrAwlRj",
+        "tool": "apply_patch",
+        "command": null,
+        "exit": null,
+        "changed": true
+      },
+      {
+        "index": 43,
+        "callID": "call_iFhCwJc9YZloKzDJmnkIiC9M",
+        "tool": "bash",
+        "command": "git diff --check",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 44,
+        "callID": "call_hzOlga6P99w6b76nMYYwTneP",
+        "tool": "apply_patch",
+        "command": null,
+        "exit": null,
+        "changed": true
+      },
+      {
+        "index": 46,
+        "callID": "call_lKcireqYSlMOigJjmtA1R3wm",
+        "tool": "bash",
+        "command": "pnpm exec vitest run test/query.test.ts --typecheck",
+        "exit": 127,
+        "changed": false
+      },
+      {
+        "index": 47,
+        "callID": "call_JIiNg3HwINk5tUv9VWYlELvy",
+        "tool": "bash",
+        "command": "pnpm exec vitest run --typecheck",
+        "exit": 127,
+        "changed": false
+      },
+      {
+        "index": 48,
+        "callID": "call_juT2E21PLwJ5ckOeuRre3AQN",
+        "tool": "bash",
+        "command": "pnpm lint",
+        "exit": 127,
+        "changed": false
+      },
+      {
+        "index": 49,
+        "callID": "call_t7bIZXID7d9jZaPnYVjyYrY8",
+        "tool": "bash",
+        "command": "/work/repo/node_modules/.bin/pnpm exec vitest run test/query.test.ts --typecheck",
+        "exit": 254,
+        "changed": false
+      },
+      {
+        "index": 50,
+        "callID": "call_a3zkDN339uY1Z8MOmFwylEJU",
+        "tool": "bash",
+        "command": "/work/repo/node_modules/.bin/pnpm exec vitest run --typecheck",
+        "exit": 254,
+        "changed": false
+      },
+      {
+        "index": 51,
+        "callID": "call_0FeIYBlBgtfn1CQl5KCfXBnQ",
+        "tool": "bash",
+        "command": "/work/repo/node_modules/.bin/pnpm lint",
+        "exit": 1,
+        "changed": false
+      },
+      {
+        "index": 52,
+        "callID": "call_sqYAgYSFuGpNMxGaEstLHQgA",
+        "tool": "bash",
+        "command": "/work/repo/node_modules/.bin/pnpm build",
+        "exit": 1,
+        "changed": false
+      },
+      {
+        "index": 53,
+        "callID": "call_5mfdjcAUHNGS4l0eSzABy8Uf",
+        "tool": "bash",
+        "command": "git diff --check",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 54,
+        "callID": "call_oCNgK5ZDyj38l2rcggcZVhu2",
+        "tool": "bash",
+        "command": "git status --short && git diff --stat",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 55,
+        "callID": "call_EVtOorJYYH4cFDC4kneln4Zq",
+        "tool": "bash",
+        "command": "git diff -- src/utils.ts test/query.test.ts test/types.test-d.ts README.md",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 57,
+        "callID": "call_8YmSwUJJxl9jU0WoWVpo1wm2",
+        "tool": "bash",
+        "command": "node --experimental-strip-types --experimental-default-type=module -e 'import(\"./src/utils.ts\").then(({ withoutQuery }) => { const checks = [[withoutQuery(\"/p?x=1&&y=2#f\", \"x\"), \"/p?&y=2#f\"], [withoutQuery(\"/p?hello+world=1&other=2\", \"hello world\"), \"/p?other=2\"], [withoutQuery(\"/p#fragment?x=1\"), \"/p#fragment?x=1\"]]; for (const [actual, expected] of checks) { if (actual !== expected) throw new Error(`${actual} !== ${expected}`); } console.log(\"withoutQuery smoke checks passed\"); }).catch((error) => { console.error(error); process.exitCode = 1; })'",
+        "exit": 9,
+        "changed": false
+      },
+      {
+        "index": 58,
+        "callID": "call_BMUSTWCYcHZuXs0gV8VZaODt",
+        "tool": "bash",
+        "command": "node --experimental-strip-types --input-type=module -e 'import(\"./src/utils.ts\").then(({ withoutQuery }) => { const checks = [[withoutQuery(\"/p?x=1&&y=2#f\", \"x\"), \"/p?&y=2#f\"], [withoutQuery(\"/p?hello+world=1&other=2\", \"hello world\"), \"/p?other=2\"], [withoutQuery(\"/p#fragment?x=1\"), \"/p#fragment?x=1\"]]; for (const [actual, expected] of checks) { if (actual !== expected) throw new Error(`${actual} !== ${expected}`); } console.log(\"withoutQuery smoke checks passed\"); }).catch((error) => { console.error(error); process.exitCode = 1; })'",
+        "exit": 1,
+        "changed": false
+      },
+      {
+        "index": 59,
+        "callID": "call_siF2xfMj4AAcVyz7Yj4lFStp",
+        "tool": "bash",
+        "command": "git status --short && git diff --check",
+        "exit": 0,
+        "changed": false
+      }
+    ],
+    "finalAuthor": "Implemented `withoutQuery` with:\n\n- Full and selective query removal\n- Decoded key matching, including pluses, malformed escapes, Unicode, duplicates, and `__proto__`\n- Exact raw preservation of retained URL/query content\n- Fragment and empty-field handling\n- Public export, README documentation, runtime regressions, and readonly-array type coverage\n\nChecks:\n- `git diff --check` passed.\n- Runtime/type, lint, and build checks were unavailable because dependencies are absent; pnpm could not run `vitest`, `eslint`, `automd`, or `unbuild` without installation.",
+    "lastMutation": 44
+  },
+  {
+    "task": "B",
+    "arm": "ON",
+    "hint": null,
+    "receipt": {
+      "wireRequestArchived": false,
+      "nativeToolMessage": null,
+      "limitation": "Real raw HTTP payload/stream capture omitted for this experiment kind; native persisted output is not wire receipt proof."
+    },
+    "commands": [
+      {
+        "index": 18,
+        "callID": "call_EpIAiLfkL3en3cq7Qvo18WiL",
+        "tool": "bash",
+        "command": "git status --short && git log --oneline -5",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 22,
+        "callID": "call_GNnu7LZLqAIV98MAS4X99mSB",
+        "tool": "bash",
+        "command": "test -d node_modules && printf 'node_modules present\\n' || printf 'node_modules absent\\n'; test -x node_modules/.bin/mocha && printf 'mocha present\\n' || true; test -x node_modules/.bin/rollup && printf 'rollup present\\n' || true; test -x node_modules/.bin/tsc && printf 'tsc present\\n' || true",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 24,
+        "callID": "call_awr6jEWfzzk3Lbp7j9EfbmHW",
+        "tool": "bash",
+        "command": "git ls-files",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 25,
+        "callID": "call_6XIGbj7xVliC0ZvWtaaRN61J",
+        "tool": "bash",
+        "command": "npm --version && node --version",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 26,
+        "callID": "call_siBr9n21bTHyuehwM9NIz0CV",
+        "tool": "apply_patch",
+        "command": null,
+        "exit": null,
+        "changed": true
+      },
+      {
+        "index": 28,
+        "callID": "call_G5YUvJAXF0g8MozU9Ch7qX5I",
+        "tool": "apply_patch",
+        "command": null,
+        "exit": null,
+        "changed": true
+      },
+      {
+        "index": 29,
+        "callID": "call_HudS55yTjLFf3mhCmrNsgNHv",
+        "tool": "apply_patch",
+        "command": null,
+        "exit": null,
+        "changed": true
+      },
+      {
+        "index": 30,
+        "callID": "call_MbjiGDeAyLCRp1wEmXZHaYT2",
+        "tool": "apply_patch",
+        "command": null,
+        "exit": null,
+        "changed": true
+      },
+      {
+        "index": 31,
+        "callID": "call_ca2WiizUhWEbLPVYpISC3tRk",
+        "tool": "apply_patch",
+        "command": null,
+        "exit": null,
+        "changed": true
+      },
+      {
+        "index": 32,
+        "callID": "call_SZVPjtq3W2jbFbVNabmrl4jL",
+        "tool": "apply_patch",
+        "command": null,
+        "exit": null,
+        "changed": true
+      },
+      {
+        "index": 38,
+        "callID": "call_kImB4WGh6giXnu8MRqgGA1ce",
+        "tool": "bash",
+        "command": "git diff --check && git diff --stat",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 39,
+        "callID": "call_mwQ4OWVy8M4uq9BZXq2WoZKU",
+        "tool": "apply_patch",
+        "command": null,
+        "exit": null,
+        "changed": true
+      },
+      {
+        "index": 42,
+        "callID": "call_tLfG8mBzhP9QbyrJQCv62s9U",
+        "tool": "bash",
+        "command": "node <<'NODE'\n'use strict';\nconst assert = require('node:assert/strict');\nconst EventEmitter = require('./');\n\nconst emitter = new EventEmitter();\nconst context = {};\nlet calls = 0;\nfunction duplicate() { calls++; }\nemitter.on('event', duplicate, context);\nemitter.once('event', duplicate, context);\nconst unsubscribe = emitter.subscribe('event', duplicate, context);\nassert.deepEqual(emitter.listeners('event'), [duplicate, duplicate, duplicate]);\nassert.equal(emitter.listenerCount('event'), 3);\nunsubscribe();\nassert.equal(emitter.listenerCount('event'), 2);\nemitter.emit('event');\nassert.equal(calls, 2);\nunsubscribe();\n\nconst stale = emitter.subscribe('stale', duplicate, context);\nassert.equal(emitter.listenerCount('stale'), 1);\nemitter.off('stale', duplicate, context);\nemitter.on('stale', duplicate, context);\nstale();\nassert.equal(emitter.listenerCount('stale'), 1);\n\nlet recursiveCalls = 0;\nlet cancelSelf;\ncancelSelf = emitter.subscribe('recursive', function () {\n  recursiveCalls++;\n  cancelSelf();\n  emitter.emit('recursive');\n});\nassert.equal(emitter.listenerCount('recursive'), 1);\nemitter.emit('recursive');\nassert.equal(recursiveCalls, 1);\nassert.equal(emitter.listenerCount('recursive'), 0);\n\nconst dispatch = [];\nlet cancelSecond;\nemitter.subscribe('dispatch', function () {\n  dispatch.push('first');\n  cancelSecond();\n});\ncancelSecond = emitter.subscribe('dispatch', function () { dispatch.push('second'); });\nassert.equal(emitter.listenerCount('dispatch'), 2);\nemitter.emit('dispatch');\nassert.deepEqual(dispatch, ['first', 'second']);\nassert.equal(emitter.listenerCount('dispatch'), 1);\n\nconst symbol = Symbol('event');\nconst symbolContext = {};\nlet received;\nconst cancelSymbol = emitter.subscribe(symbol, function () {\n  received = [this, Array.from(arguments)];\n}, symbolContext);\nassert.deepEqual(emitter.listeners(symbol), [emitter.listeners(symbol)[0]]);\nassert.equal(emitter.listenerCount(symbol), 1);\nemitter.emit(symbol, 0, 1, 2, 3, 4, 5, 6);\nassert.deepEqual(received, [symbolContext, [0, 1, 2, 3, 4, 5, 6]]);\ncancelSymbol();\nassert.equal(emitter.listenerCount(symbol), 0);\nassert.deepEqual(emitter.eventNames().filter(name => name === symbol), []);\n\nconst before = emitter.listenerCount('invalid');\nassert.throws(() => emitter.subscribe('invalid', null), Error);\nassert.equal(emitter.listenerCount('invalid'), before);\n\nconst cancelCleanup = emitter.subscribe('cleanup', function () {});\nassert.deepEqual(emitter.eventNames().filter(name => name === 'cleanup'), ['cleanup']);\ncancelCleanup();\ncancelCleanup();\nassert.equal(emitter.listenerCount('cleanup'), 0);\nassert.deepEqual(emitter.eventNames().filter(name => name === 'cleanup'), []);\n\nconsole.log('new subscribe behavior: ok');\nNODE",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 43,
+        "callID": "call_2P5rXAwtKgKuPthCJV63ngal",
+        "tool": "bash",
+        "command": "npm test",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 44,
+        "callID": "call_zvIbQICb0NlHSqJIi8JXpvj2",
+        "tool": "bash",
+        "command": "npm run test-esm",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 45,
+        "callID": "call_qe1eq42DIcOIZHtPYIbxRDPb",
+        "tool": "bash",
+        "command": "npm run rollup",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 46,
+        "callID": "call_UHOu5WmmdcwrGxxiPv39S4mR",
+        "tool": "bash",
+        "command": "if command -v tsc >/dev/null 2>&1; then tsc --noEmit --strict --skipLibCheck test/types.ts; elif test -x node_modules/.bin/tsc; then node_modules/.bin/tsc --noEmit --strict --skipLibCheck test/types.ts; else printf 'TypeScript compiler unavailable\\n'; exit 127; fi",
+        "exit": 127,
+        "changed": false
+      },
+      {
+        "index": 47,
+        "callID": "call_4KUCUzRbZmTUFCuHigFELFBb",
+        "tool": "bash",
+        "command": "git status --short && git diff --check && git diff --stat",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 48,
+        "callID": "call_vg006mRILgy0d04UuEnYEfZ7",
+        "tool": "bash",
+        "command": "git diff -- index.js index.d.ts README.md test/test.js test/test.mjs test/types.ts",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 49,
+        "callID": "call_Fhz7bi5i6QBhFzH97QGaLVC2",
+        "tool": "bash",
+        "command": "node --check index.js && node --check test/test.js && node --check test/test.mjs",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 51,
+        "callID": "call_97Lzdkugdf9uPUtSS6mJL1ZP",
+        "tool": "bash",
+        "command": "git diff --no-index -- /dev/null test/types.ts || true",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 52,
+        "callID": "call_ESuHzfHW1wyA6elVHh4Dxc1P",
+        "tool": "apply_patch",
+        "command": null,
+        "exit": null,
+        "changed": true
+      },
+      {
+        "index": 53,
+        "callID": "call_bSYNmF6yJd7BAUdTkRkFQ9fS",
+        "tool": "bash",
+        "command": "node <<'NODE'\n'use strict';\nconst assert = require('node:assert/strict');\nconst EventEmitter = require('./');\n\nconst emitter = new EventEmitter();\nconst context = {};\nlet calls = 0;\nfunction listener() { calls++; }\nemitter.on('event', listener, context);\nemitter.once('event', listener, context);\nconst unsubscribe = emitter.subscribe('event', listener, context);\nassert.equal(emitter.listenerCount('event'), 3);\nassert.deepEqual(emitter.listeners('event'), [listener, listener, listener]);\nunsubscribe();\nassert.equal(emitter.listenerCount('event'), 2);\nemitter.emit('event');\nassert.equal(calls, 2);\nunsubscribe();\n\nconst stale = emitter.subscribe('stale', listener, context);\nassert.equal(emitter.listenerCount('stale'), 1);\nemitter.off('stale', listener, context);\nemitter.on('stale', listener, context);\nstale();\nassert.equal(emitter.listenerCount('stale'), 1);\n\nlet recursiveCalls = 0;\nlet cancelSelf;\ncancelSelf = emitter.subscribe('recursive', function () {\n  recursiveCalls++;\n  cancelSelf();\n  emitter.emit('recursive');\n});\nassert.equal(emitter.listenerCount('recursive'), 1);\nemitter.emit('recursive');\nassert.equal(recursiveCalls, 1);\nassert.equal(emitter.listenerCount('recursive'), 0);\n\nconst dispatch = [];\nlet cancelSecond;\nemitter.subscribe('dispatch', function () {\n  dispatch.push('first');\n  cancelSecond();\n});\ncancelSecond = emitter.subscribe('dispatch', function () { dispatch.push('second'); });\nassert.equal(emitter.listenerCount('dispatch'), 2);\nemitter.emit('dispatch');\nassert.deepEqual(dispatch, ['first', 'second']);\nassert.equal(emitter.listenerCount('dispatch'), 1);\n\nconst symbol = Symbol('event');\nconst symbolContext = {};\nlet received;\nconst cancelSymbol = emitter.subscribe(symbol, function () {\n  received = [this, Array.from(arguments)];\n}, symbolContext);\nassert.equal(emitter.listenerCount(symbol), 1);\nemitter.emit(symbol, 0, 1, 2, 3, 4, 5, 6);\nassert.deepEqual(received, [symbolContext, [0, 1, 2, 3, 4, 5, 6]]);\ncancelSymbol();\nassert.equal(emitter.listenerCount(symbol), 0);\nassert.deepEqual(emitter.eventNames().filter(name => name === symbol), []);\n\nassert.throws(() => emitter.subscribe('invalid', null), Error);\nassert.equal(emitter.listenerCount('invalid'), 0);\nconst cancelCleanup = emitter.subscribe('cleanup', function () {});\nassert.equal(emitter.listenerCount('cleanup'), 1);\ncancelCleanup();\ncancelCleanup();\nassert.equal(emitter.listenerCount('cleanup'), 0);\nassert.deepEqual(emitter.eventNames().filter(name => name === 'cleanup'), []);\n\nconsole.log('new subscribe behavior: ok');\nNODE",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 54,
+        "callID": "call_16GJSWKbagvawNZI5xFfEwAO",
+        "tool": "bash",
+        "command": "npm test",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 55,
+        "callID": "call_psmJVrmzUPcucJlGFP0OM4qh",
+        "tool": "bash",
+        "command": "npm run test-esm",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 56,
+        "callID": "call_i89y82oCMJyzbiOAVWrl2P8G",
+        "tool": "bash",
+        "command": "npm run rollup",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 57,
+        "callID": "call_u033leQgv9E3llMeJlJDfvLV",
+        "tool": "bash",
+        "command": "git diff --check && node --check index.js && node --check test/test.js && node --check test/test.mjs",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 58,
+        "callID": "call_fRXYK8B0dmEgB1hpI6bcXexP",
+        "tool": "bash",
+        "command": "git status --short && git diff --check && git diff --stat",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 59,
+        "callID": "call_3tRCQT2wSR6GhgiGFRsfOWs0",
+        "tool": "bash",
+        "command": "git diff --numstat && git diff --name-only",
+        "exit": 0,
+        "changed": false
+      }
+    ],
+    "finalAuthor": "Implemented `subscribe(event, fn, context?)` with exact, idempotent cancellation and preserved emit/removal semantics.\n\nIncluded:\n- CommonJS and ESM coverage\n- Runtime regressions for duplicate listeners, re-registration, cleanup, symbols, arguments, contexts, validation, dispatch, and recursion\n- TypeScript `Unsubscribe` type and context-aware event listeners\n- Positive/negative TypeScript fixture\n- README lifecycle and `off` distinction\n\nChecks passed:\n- `npm test`: 48 passing\n- `npm run test-esm`: 3 passing\n- `npm run rollup`\n- New-behavior checks, syntax checks, and `git diff --check`\n\nTypeScript checking was unavailable because `tsc` is not installed; no packages were installed or replaced.",
+    "lastMutation": 52
+  },
+  {
+    "task": "B",
+    "arm": "OFF",
+    "hint": null,
+    "receipt": {
+      "wireRequestArchived": false,
+      "nativeToolMessage": null,
+      "limitation": "Real raw HTTP payload/stream capture omitted for this experiment kind; native persisted output is not wire receipt proof."
+    },
+    "commands": [
+      {
+        "index": 21,
+        "callID": "call_zjUOKffZUkPqGf6bB3tH5Jpj",
+        "tool": "bash",
+        "command": "git status --short",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 22,
+        "callID": "call_ZFt9YQPtzHQ87HKkPyLRErZu",
+        "tool": "bash",
+        "command": "git log --oneline -5",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 23,
+        "callID": "call_qlS0x90lRHGi2Qw7x0erulo7",
+        "tool": "apply_patch",
+        "command": null,
+        "exit": null,
+        "changed": true
+      },
+      {
+        "index": 26,
+        "callID": "call_YTtGj9wSYVO9hlPdIgwAyOgl",
+        "tool": "apply_patch",
+        "command": null,
+        "exit": null,
+        "changed": true
+      },
+      {
+        "index": 27,
+        "callID": "call_5dFQQEoB1BBAZBrO6zqfxcgM",
+        "tool": "bash",
+        "command": "if test -x node_modules/.bin/mocha; then node_modules/.bin/mocha --version; else printf '%s\\n' 'local mocha unavailable'; fi",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 28,
+        "callID": "call_ksHHLMeTUeTGvzFUnKDG717J",
+        "tool": "bash",
+        "command": "if command -v tsc >/dev/null 2>&1; then tsc --version; else printf '%s\\n' 'tsc unavailable'; fi",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 29,
+        "callID": "call_wUBzwwjnLOmkOgoZgsVDeecM",
+        "tool": "bash",
+        "command": "node --version && npm --version",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 30,
+        "callID": "call_Roxm9AJUYr3LXR5yvbKHgwpW",
+        "tool": "bash",
+        "command": "node <<'NODE'\n'use strict';\nconst assert = require('assert');\nconst EventEmitter = require('./');\n\n{\n  const emitter = new EventEmitter();\n  const context = { value: 1 };\n  const calls = [];\n  function listener() { calls.push([this, ...arguments]); }\n  emitter.on('event', listener, context);\n  const unsubscribe = emitter.subscribe('event', listener, context);\n  emitter.once('event', listener, context);\n  assert.deepStrictEqual(emitter.listeners('event'), [listener, listener, listener]);\n  assert.strictEqual(emitter.listenerCount('event'), 3);\n  unsubscribe();\n  assert.deepStrictEqual(emitter.listeners('event'), [listener, listener]);\n  emitter.emit('event', 1, 2, 3, 4, 5, 6, 7);\n  assert.strictEqual(calls.length, 2);\n  assert.strictEqual(calls[0][0], context);\n  assert.strictEqual(calls[0].length, 8);\n}\n\nfor (const remove of [\n  (emitter, listener, context) => emitter.off('event', listener, context),\n  (emitter, listener, context) => emitter.removeListener('event', listener, context),\n  (emitter, listener) => emitter.removeAllListeners('event')\n]) {\n  const emitter = new EventEmitter();\n  const listener = function () {};\n  const context = {};\n  const unsubscribe = emitter.subscribe('event', listener, context);\n  assert.strictEqual(emitter.listenerCount('event'), 1);\n  remove(emitter, listener, context);\n  emitter.on('event', listener, context);\n  unsubscribe();\n  assert.strictEqual(emitter.listenerCount('event'), 1);\n}\n\n{\n  const emitter = new EventEmitter();\n  let secondCalls = 0;\n  let unsubscribeSecond;\n  emitter.subscribe('event', () => unsubscribeSecond());\n  unsubscribeSecond = emitter.subscribe('event', () => secondCalls++);\n  emitter.emit('event');\n  assert.strictEqual(secondCalls, 1);\n  emitter.emit('event');\n  assert.strictEqual(secondCalls, 1);\n}\n\n{\n  const emitter = new EventEmitter();\n  let calls = 0;\n  let unsubscribe;\n  unsubscribe = emitter.subscribe('event', () => {\n    calls++;\n    unsubscribe();\n    emitter.emit('event');\n  });\n  emitter.emit('event');\n  assert.strictEqual(calls, 1);\n  assert.strictEqual(emitter.emit('event'), false);\n}\n\n{\n  const emitter = new EventEmitter();\n  const event = Symbol('event');\n  const unsubscribe = emitter.subscribe(event, () => {});\n  assert.deepStrictEqual(emitter.eventNames(), [event]);\n  unsubscribe();\n  unsubscribe();\n  assert.deepStrictEqual(emitter.eventNames(), []);\n  assert.throws(() => emitter.subscribe('event', null), Error);\n  assert.strictEqual(emitter.listenerCount('event'), 0);\n}\n\nconsole.log('direct subscribe regression passed');\nNODE",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 31,
+        "callID": "call_2Ek8yNrFB1duprzbHlG9lrXx",
+        "tool": "bash",
+        "command": "npm test",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 32,
+        "callID": "call_KJtAZ4wtCO5Y3CpZLfLLues5",
+        "tool": "bash",
+        "command": "npm run test-esm",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 33,
+        "callID": "call_Er0zqaLaDBNCoGleWUq5sCqT",
+        "tool": "bash",
+        "command": "npm run rollup",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 34,
+        "callID": "call_e7sH9hxUC8CLAlAjOH6VoUTO",
+        "tool": "bash",
+        "command": "git status --short",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 35,
+        "callID": "call_qGbw9mUsvHg2vvHEuYhIi4eH",
+        "tool": "bash",
+        "command": "git diff --check",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 36,
+        "callID": "call_C3ZouIV56lRI4pfalsgTMSup",
+        "tool": "bash",
+        "command": "git diff --stat && git diff -- index.js index.d.ts README.md test/test.js test/test.mjs test/types.ts",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 39,
+        "callID": "call_mZzcWraBUsjbh9IDlkDbqWoh",
+        "tool": "apply_patch",
+        "command": null,
+        "exit": null,
+        "changed": true
+      },
+      {
+        "index": 40,
+        "callID": "call_orQIfnWO2bLMNHVzcuSWVs68",
+        "tool": "bash",
+        "command": "node <<'NODE'\n'use strict';\nconst assert = require('assert');\nconst EventEmitter = require('./');\n\nconst event = Symbol('value');\nconst context = { name: 'context' };\nconst calls = [];\nfunction listener() { calls.push([this, Array.from(arguments)]); }\nconst emitter = new EventEmitter();\nemitter.on(event, listener, context);\nconst unsubscribe = emitter.subscribe(event, listener, context);\nemitter.once(event, listener, context);\nassert.deepStrictEqual(emitter.listeners(event), [listener, listener, listener]);\nassert.strictEqual(emitter.listenerCount(event), 3);\nunsubscribe();\nassert.strictEqual(emitter.listenerCount(event), 2);\nemitter.emit(event, 1, 2, 3, 4, 5, 6, 7);\nassert.strictEqual(calls.length, 2);\nassert.strictEqual(calls[0][0], context);\nassert.deepStrictEqual(calls[0][1], [1, 2, 3, 4, 5, 6, 7]);\n\nfor (const remove of [\n  (e, fn, ctx) => e.off('event', fn, ctx),\n  (e, fn, ctx) => e.removeListener('event', fn, ctx),\n  e => e.removeAllListeners('event')\n]) {\n  const e = new EventEmitter();\n  const fn = function () {};\n  const ctx = {};\n  const cancel = e.subscribe('event', fn, ctx);\n  assert.strictEqual(e.listenerCount('event'), 1);\n  remove(e, fn, ctx);\n  e.subscribe('event', fn, ctx);\n  assert.strictEqual(e.listenerCount('event'), 1);\n  cancel();\n  assert.strictEqual(e.listenerCount('event'), 1);\n}\n\n{\n  const e = new EventEmitter();\n  let second = 0;\n  let cancelSecond;\n  e.subscribe('event', () => cancelSecond());\n  cancelSecond = e.subscribe('event', () => second++);\n  e.emit('event');\n  assert.strictEqual(second, 1);\n  e.emit('event');\n  assert.strictEqual(second, 1);\n}\n\n{\n  const e = new EventEmitter();\n  let self = 0;\n  let cancel;\n  cancel = e.subscribe('event', () => {\n    self++;\n    cancel();\n    e.emit('event');\n  });\n  e.emit('event');\n  assert.strictEqual(self, 1);\n  assert.strictEqual(e.listenerCount('event'), 0);\n  cancel();\n}\n\nconst invalid = new EventEmitter();\nassert.throws(() => invalid.subscribe('event', 'invalid'), Error);\nassert.deepStrictEqual(invalid.eventNames(), []);\nassert.strictEqual(invalid.listenerCount('event'), 0);\nconsole.log('direct subscribe regression passed');\nNODE",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 41,
+        "callID": "call_9WjAPYyXDXL7WcQM93agwCU7",
+        "tool": "bash",
+        "command": "npm test",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 42,
+        "callID": "call_h5dXSbXQo0vFS8int74cY7se",
+        "tool": "bash",
+        "command": "npm run test-esm",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 43,
+        "callID": "call_U9nfb5f3aCJ4ckwTncQTPgK1",
+        "tool": "bash",
+        "command": "npm run rollup",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 44,
+        "callID": "call_JppC9It96dc6VHlmh6lrsG0k",
+        "tool": "bash",
+        "command": "npm exec --no -- tsc --noEmit --strict --moduleResolution node test/types.ts",
+        "exit": 1,
+        "changed": false
+      },
+      {
+        "index": 45,
+        "callID": "call_RgKXONaMZbeOteJMRlA3vNvQ",
+        "tool": "apply_patch",
+        "command": null,
+        "exit": null,
+        "changed": true
+      },
+      {
+        "index": 46,
+        "callID": "call_zdlWlqpTF6lXClYdVrEXGwUX",
+        "tool": "bash",
+        "command": "mocha test/test.js --grep 'EventEmitter#subscribe'",
+        "exit": 127,
+        "changed": false
+      },
+      {
+        "index": 47,
+        "callID": "call_vPU1yX67OHbWhN6E7Ut20GE7",
+        "tool": "bash",
+        "command": "npm test -- --grep 'EventEmitter#subscribe'",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 48,
+        "callID": "call_oVvBZbKgohye68hxf1vuSWtS",
+        "tool": "bash",
+        "command": "npm test",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 49,
+        "callID": "call_aQrYkBqQ0BbafRLFVW65wcb7",
+        "tool": "bash",
+        "command": "npm run test-esm",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 50,
+        "callID": "call_bXV4aMeRe2VAVYPkpxuPKHJv",
+        "tool": "bash",
+        "command": "npm run rollup",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 51,
+        "callID": "call_Xho1Vqm6VODxFxGjDq5S5R3U",
+        "tool": "bash",
+        "command": "git status --short",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 52,
+        "callID": "call_uwovA8wt7aEKjjhho31CgrVy",
+        "tool": "bash",
+        "command": "git diff --check",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 53,
+        "callID": "call_0ecGn1NDldGoXAq3ANs76xH0",
+        "tool": "bash",
+        "command": "git diff --stat",
+        "exit": 0,
+        "changed": false
+      },
+      {
+        "index": 54,
+        "callID": "call_m7Hescn5eTobphzTUm4gpScW",
+        "tool": "bash",
+        "command": "git diff --name-only",
+        "exit": 0,
+        "changed": false
+      }
+    ],
+    "finalAuthor": "Implemented `subscribe(event, fn, context?)` with exact, idempotent registration cancellation.\n\n- Added runtime behavior, duplicate/re-registration safety, dispatch semantics, symbols, cleanup, and validation.\n- Added CommonJS/ESM regressions and TypeScript consumer fixtures.\n- Extended declarations with contextual event listeners and `Unsubscribe`.\n- Documented lifecycle and distinction from `off`.\n\nChecks passed:\n- Focused subscribe tests: 8 passing\n- `npm test`: 48 passing\n- `npm run test-esm`: 3 passing\n- `npm run rollup`: all bundles built\n- `git diff --check`\n\nTypeScript checking was unavailable because no compiler was prepared; the no-install check was not allowed to fetch packages.",
+    "lastMutation": 45
+  }
+]
