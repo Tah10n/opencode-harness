@@ -1,0 +1,187 @@
+[
+  {
+    "slot": "A-OFF",
+    "sourceEvidenceSha256": "113da4ec48e5d08c3069245923f328e5e2534d5c8920a5398cd55d80337150ba",
+    "sessionID": "ses_f5532bc61ffepuUngsj0mNd1e0",
+    "callID": "call_C5WmAiwNPlT0BnGoFpaEAOwA",
+    "nativeState": {
+      "status": "error",
+      "input": {
+        "url": "https://raw.githubusercontent.com/primus/eventemitter3/master/index.d.ts",
+        "format": "text",
+        "timeout": 20
+      },
+      "error": "Transport error (GET https://raw.githubusercontent.com/primus/eventemitter3/master/index.d.ts)",
+      "time": {
+        "start": 1789572017123,
+        "end": 1789572017126
+      }
+    },
+    "admissionAndObservation": {
+      "scopeViolation": false,
+      "tool": "webfetch",
+      "callID": "call_C5WmAiwNPlT0BnGoFpaEAOwA",
+      "before": "db0e2575135cd13744c1c8201b200564ed795788928b1502f262ffd6db307955",
+      "startedAt": 1789572017121,
+      "admittedArgs": {
+        "url": "https://raw.githubusercontent.com/primus/eventemitter3/master/index.d.ts",
+        "format": "text",
+        "timeout": 20
+      },
+      "permissionDenied": false,
+      "denialKind": "unknown",
+      "after": "db0e2575135cd13744c1c8201b200564ed795788928b1502f262ffd6db307955",
+      "completedAt": 1789572017160,
+      "args": {
+        "url": "https://raw.githubusercontent.com/primus/eventemitter3/master/index.d.ts",
+        "format": "text",
+        "timeout": 20
+      },
+      "output": "Transport error (GET https://raw.githubusercontent.com/primus/eventemitter3/master/index.d.ts)",
+      "nativeTime": {
+        "start": 1789572017123,
+        "end": 1789572017126
+      },
+      "state": "error"
+    },
+    "lastOtherEvent": {
+      "tool": "bash",
+      "callID": "call_JjgLBbYfXNFjngedxPyD9GV0",
+      "before": "db0e2575135cd13744c1c8201b200564ed795788928b1502f262ffd6db307955",
+      "startedAt": 1789572008689,
+      "after": "db0e2575135cd13744c1c8201b200564ed795788928b1502f262ffd6db307955",
+      "completedAt": 1789572008734,
+      "state": "completed"
+    },
+    "otherTerminalEvents": 21,
+    "otherNonterminalNativeTools": [],
+    "terminalReason": {
+      "kind": "tool_error",
+      "message": "Native tool error has unconfirmed execution or state",
+      "facts": {
+        "callID": "call_C5WmAiwNPlT0BnGoFpaEAOwA",
+        "tool": "webfetch",
+        "args": {
+          "url": "https://raw.githubusercontent.com/primus/eventemitter3/master/index.d.ts",
+          "format": "text",
+          "timeout": 20
+        },
+        "error": "Transport error (GET https://raw.githubusercontent.com/primus/eventemitter3/master/index.d.ts)"
+      }
+    },
+    "subsequentErrors": [
+      {
+        "sessionID": "ses_f5532bc61ffepuUngsj0mNd1e0",
+        "time": {
+          "created": 1789572008746,
+          "completed": 1789572017168
+        },
+        "error": {
+          "name": "MessageAbortedError",
+          "data": {
+            "message": "Aborted"
+          }
+        }
+      },
+      {
+        "sessionID": "ses_f5532cedaffeOjr8ox7378dNrY",
+        "time": {
+          "created": 1789572017242,
+          "completed": 1789572017273
+        },
+        "error": {
+          "name": "UnknownError",
+          "data": {
+            "message": "Native tool error has unconfirmed execution or state"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "slot": "A-ON",
+    "sourceEvidenceSha256": "69b50ea799a90a1c5ff147df9bda3b1488040af401e4c1488fe33ae4418b2375",
+    "sessionID": "ses_f5531fabeffeSVrMZ9uBACFKQj",
+    "callID": "call_p5JLTxM4Iqeq76KijBrLQ8GI",
+    "nativeState": {
+      "status": "error",
+      "input": {
+        "url": "https://raw.githubusercontent.com/primus/eventemitter3/master/index.d.ts",
+        "format": "text",
+        "timeout": 20
+      },
+      "error": "Transport error (GET https://raw.githubusercontent.com/primus/eventemitter3/master/index.d.ts)",
+      "time": {
+        "start": 1789572164579,
+        "end": 1789572164582
+      }
+    },
+    "admissionAndObservation": {
+      "scopeViolation": false,
+      "tool": "webfetch",
+      "callID": "call_p5JLTxM4Iqeq76KijBrLQ8GI",
+      "before": "6ffe664e6139e67503f8c46cffaafa3999fcbd526cf9ba5a527c211de9bf1e9b",
+      "startedAt": 1789572164577,
+      "admittedArgs": {
+        "url": "https://raw.githubusercontent.com/primus/eventemitter3/master/index.d.ts",
+        "format": "text",
+        "timeout": 20
+      },
+      "permissionDenied": false,
+      "denialKind": "unknown",
+      "after": "6ffe664e6139e67503f8c46cffaafa3999fcbd526cf9ba5a527c211de9bf1e9b",
+      "completedAt": 1789572164622,
+      "args": {
+        "url": "https://raw.githubusercontent.com/primus/eventemitter3/master/index.d.ts",
+        "format": "text",
+        "timeout": 20
+      },
+      "output": "Transport error (GET https://raw.githubusercontent.com/primus/eventemitter3/master/index.d.ts)",
+      "nativeTime": {
+        "start": 1789572164579,
+        "end": 1789572164582
+      },
+      "state": "error"
+    },
+    "lastOtherEvent": {
+      "tool": "apply_patch",
+      "callID": "call_Hx4Gqi4ho7XAAopTcHdYlfdl",
+      "before": "b4caa29ffb0cc85155aaed74eed5d70b563dd80291cda5d8128013f2f35a9f29",
+      "startedAt": 1789572150186,
+      "after": "6ffe664e6139e67503f8c46cffaafa3999fcbd526cf9ba5a527c211de9bf1e9b",
+      "completedAt": 1789572150233,
+      "state": "completed"
+    },
+    "otherTerminalEvents": 32,
+    "otherNonterminalNativeTools": [],
+    "terminalReason": {
+      "kind": "tool_error",
+      "message": "Native tool error has unconfirmed execution or state",
+      "facts": {
+        "callID": "call_p5JLTxM4Iqeq76KijBrLQ8GI",
+        "tool": "webfetch",
+        "args": {
+          "url": "https://raw.githubusercontent.com/primus/eventemitter3/master/index.d.ts",
+          "format": "text",
+          "timeout": 20
+        },
+        "error": "Transport error (GET https://raw.githubusercontent.com/primus/eventemitter3/master/index.d.ts)"
+      }
+    },
+    "subsequentErrors": [
+      {
+        "sessionID": "ses_f5531fabeffeSVrMZ9uBACFKQj",
+        "time": {
+          "created": 1789572150280,
+          "completed": 1789572164655
+        },
+        "error": {
+          "name": "MessageAbortedError",
+          "data": {
+            "message": "Aborted"
+          }
+        }
+      }
+    ]
+  }
+]

@@ -1,0 +1,539 @@
+{
+  "outcome": "blocked-native-settlement-contract; no runtime continuation added",
+  "binarySha256": "096d32aa9778f98981390a0602c1f8af55ee5f1d6d5c58206f8fb2743c90eafe",
+  "version": "1.18.26",
+  "runtimePluginSha256": "9a1f4fcd8b99a87402e6116fb287e2e9d32e03b8b4d396f59bb5449370bbb8e8",
+  "publishedFixtureScriptSha256": "c0cd7c6be27c983ebc927a8f9dce1f7616a533a3ee328687288818a0651b331b",
+  "realResearchProviderCalls": 0,
+  "scriptedRequestsInRetainedCompletedFixtures": 26,
+  "scope": "Development agent work and earlier fixture setup failures are separate; no model-quality evaluation. All runtime bundles match the unchanged plugin. Final boundary tests follow the fixture review; retained transport/baseline admissions are also validated offline.",
+  "strictRerun": {
+    "httpStream": "observed; six successful writes after receipt",
+    "challengeTransport": "failed still-open-at-240-ms assertion; no further challenge retry; not counted as a settlement pass"
+  },
+  "preparationOutcomes": [
+    "Observer not initially registered: missing admission log; corrected explicit plugin registration.",
+    "Missing initial project schema: OpenCode modified fixture config; corrected before clean-checkout control.",
+    "Blanket webfetch deny removes tool from inventory; not a native call denial test.",
+    "URL pattern in file permission config rejected by native schema; moved to documented session PermissionRuleset API."
+  ],
+  "strictRerunLogSha256": "8487fe0f373995d7acd0d05dd2588d048f3674cfcc89918475fa0359e9c50e23",
+  "results": [
+    {
+      "mode": "transport",
+      "scriptedRequests": 3,
+      "httpRequests": 1,
+      "sessionID": "ses_f54fcb26cffeWTL5HS7RbyRF31",
+      "callID": "fixture-2",
+      "admission": {
+        "at": 1789575516332,
+        "input": {
+          "tool": "webfetch",
+          "sessionID": "ses_f54fcb26cffeWTL5HS7RbyRF31",
+          "callID": "fixture-2"
+        },
+        "args": {
+          "url": "http://127.0.0.1:45159/resource",
+          "format": "text",
+          "timeout": 2
+        }
+      },
+      "nativeEvents": [
+        {
+          "at": 1789575516326,
+          "status": "pending",
+          "time": null
+        },
+        {
+          "at": 1789575516340,
+          "status": "running",
+          "time": {
+            "start": 1789575516338
+          }
+        },
+        {
+          "at": 1789575516346,
+          "status": "error",
+          "time": {
+            "start": 1789575516338,
+            "end": 1789575516344
+          }
+        }
+      ],
+      "terminalError": "Transport error (GET http://127.0.0.1:45159/resource)",
+      "actualNextToolReceipt": {
+        "role": "tool",
+        "tool_call_id": "fixture-2",
+        "content": "Transport error (GET http://127.0.0.1:45159/resource)"
+      },
+      "serverEvents": [
+        {
+          "kind": "request",
+          "at": 1789575516337,
+          "url": "/resource",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+        }
+      ],
+      "bodyWriteCallbacksAfterErrorReceipt": 0,
+      "callbackErrorsChecked": null,
+      "initialObserverActiveBodyAtSample": false,
+      "counterexample": null,
+      "activeAtReceipt": null,
+      "activeAfterObservation": null,
+      "writeErrorsAfterReceipt": null
+    },
+    {
+      "mode": "challenge-transport",
+      "scriptedRequests": 3,
+      "httpRequests": 2,
+      "sessionID": "ses_f54f9d9c2ffeAWIcdWBy3c6a21",
+      "callID": "fixture-2",
+      "admission": {
+        "at": 1789575702859,
+        "input": {
+          "tool": "webfetch",
+          "sessionID": "ses_f54f9d9c2ffeAWIcdWBy3c6a21",
+          "callID": "fixture-2"
+        },
+        "args": {
+          "url": "http://127.0.0.1:35455/resource",
+          "format": "text",
+          "timeout": 2
+        }
+      },
+      "nativeEvents": [
+        {
+          "at": 1789575702853,
+          "status": "pending",
+          "time": null
+        },
+        {
+          "at": 1789575702867,
+          "status": "running",
+          "time": {
+            "start": 1789575702865
+          }
+        },
+        {
+          "at": 1789575702877,
+          "status": "error",
+          "time": {
+            "start": 1789575702865,
+            "end": 1789575702874
+          }
+        }
+      ],
+      "terminalError": "Transport error (GET http://127.0.0.1:35455/resource)",
+      "actualNextToolReceipt": {
+        "role": "tool",
+        "tool_call_id": "fixture-2",
+        "content": "Transport error (GET http://127.0.0.1:35455/resource)"
+      },
+      "serverEvents": [
+        {
+          "kind": "request",
+          "at": 1789575702863,
+          "url": "/resource",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+        },
+        {
+          "kind": "request",
+          "at": 1789575702871,
+          "url": "/resource",
+          "userAgent": "opencode"
+        },
+        {
+          "kind": "response-close",
+          "at": 1789575703250,
+          "finished": false
+        }
+      ],
+      "bodyWriteCallbacksAfterErrorReceipt": 7,
+      "callbackErrorsChecked": false,
+      "initialObserverActiveBodyAtSample": true,
+      "counterexample": null,
+      "activeAtReceipt": null,
+      "activeAfterObservation": null,
+      "writeErrorsAfterReceipt": null
+    },
+    {
+      "mode": "baseline-transport",
+      "scriptedRequests": 3,
+      "httpRequests": 1,
+      "sessionID": "ses_f54f5fe09ffe2M2YMJQG7hlUgA",
+      "callID": "fixture-3",
+      "admission": {
+        "at": 1789575955407,
+        "input": {
+          "tool": "webfetch",
+          "sessionID": "ses_f54f5fe09ffe2M2YMJQG7hlUgA",
+          "callID": "fixture-3"
+        },
+        "args": {
+          "url": "http://127.0.0.1:40651/resource",
+          "format": "text",
+          "timeout": 2
+        }
+      },
+      "nativeEvents": [
+        {
+          "at": 1789575955375,
+          "status": "pending",
+          "time": null
+        },
+        {
+          "at": 1789575955411,
+          "status": "running",
+          "time": {
+            "start": 1789575955410
+          }
+        },
+        {
+          "at": 1789575955444,
+          "status": "error",
+          "time": {
+            "start": 1789575955410,
+            "end": 1789575955412
+          }
+        }
+      ],
+      "terminalError": "Transport error (GET http://127.0.0.1:40651/resource)",
+      "actualNextToolReceipt": null,
+      "serverEvents": [
+        {
+          "kind": "request",
+          "at": 1789575955409,
+          "url": "/resource",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+        }
+      ],
+      "bodyWriteCallbacksAfterErrorReceipt": 0,
+      "callbackErrorsChecked": null,
+      "initialObserverActiveBodyAtSample": false,
+      "counterexample": null,
+      "activeAtReceipt": null,
+      "activeAfterObservation": null,
+      "writeErrorsAfterReceipt": null,
+      "hostTerminalReason": {
+        "kind": "tool_error",
+        "message": "Native tool error has unconfirmed execution or state",
+        "facts": {
+          "callID": "fixture-3",
+          "tool": "webfetch",
+          "args": {
+            "url": "http://127.0.0.1:40651/resource",
+            "format": "text",
+            "timeout": 2
+          },
+          "error": "Transport error (GET http://127.0.0.1:40651/resource)"
+        }
+      },
+      "hostStatus": "incomplete",
+      "originalCheckoutAndIndexAssertion": "passed",
+      "hostEvents": [
+        {
+          "tool": "webfetch",
+          "callID": "fixture-3",
+          "before": "ad564f15cccd1a24aca23b925f534c9e75d1cdc746888de19b26377bd2a85f7a",
+          "startedAt": 1789575955406,
+          "permissionDenied": false,
+          "after": "ad564f15cccd1a24aca23b925f534c9e75d1cdc746888de19b26377bd2a85f7a",
+          "completedAt": 1789575955444,
+          "args": {
+            "url": "http://127.0.0.1:40651/resource",
+            "format": "text",
+            "timeout": 2
+          },
+          "nativeTime": {
+            "start": 1789575955410,
+            "end": 1789575955412
+          },
+          "state": "error"
+        }
+      ]
+    },
+    {
+      "mode": "baseline-success",
+      "scriptedRequests": 11,
+      "httpRequests": 1,
+      "sessionID": "ses_f54f49001ffe2q1WkiiGNQU5KE",
+      "callID": "fixture-3",
+      "admission": {
+        "at": 1789576049090,
+        "input": {
+          "tool": "webfetch",
+          "sessionID": "ses_f54f49001ffe2q1WkiiGNQU5KE",
+          "callID": "fixture-3"
+        },
+        "args": {
+          "url": "http://127.0.0.1:42223/resource",
+          "format": "text",
+          "timeout": 2
+        }
+      },
+      "nativeEvents": [
+        {
+          "at": 1789576049057,
+          "status": "pending",
+          "time": null
+        },
+        {
+          "at": 1789576049094,
+          "status": "running",
+          "time": {
+            "start": 1789576049093
+          }
+        },
+        {
+          "at": 1789576049128,
+          "status": "completed",
+          "time": {
+            "start": 1789576049093,
+            "end": 1789576049128
+          }
+        }
+      ],
+      "terminalError": null,
+      "actualNextToolReceipt": {
+        "role": "tool",
+        "tool_call_id": "fixture-3",
+        "content": "permission denied / fetch failed: successful page content"
+      },
+      "serverEvents": [
+        {
+          "kind": "request",
+          "at": 1789576049093,
+          "url": "/resource",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+        }
+      ],
+      "bodyWriteCallbacksAfterErrorReceipt": 0,
+      "callbackErrorsChecked": null,
+      "initialObserverActiveBodyAtSample": false,
+      "counterexample": null,
+      "activeAtReceipt": null,
+      "activeAfterObservation": null,
+      "writeErrorsAfterReceipt": null,
+      "hostTerminalReason": null,
+      "hostStatus": "checks_passed",
+      "originalCheckoutAndIndexAssertion": "passed",
+      "hostEvents": [
+        {
+          "tool": "webfetch",
+          "callID": "fixture-3",
+          "before": "254924089577efcc7cba34a723af1b3b121110168042ce296d1053663d76f62b",
+          "startedAt": 1789576049089,
+          "after": "254924089577efcc7cba34a723af1b3b121110168042ce296d1053663d76f62b",
+          "completedAt": 1789576049126,
+          "args": {
+            "url": "http://127.0.0.1:42223/resource",
+            "format": "text",
+            "timeout": 2
+          },
+          "state": "completed"
+        },
+        {
+          "tool": "read",
+          "callID": "fixture-4",
+          "before": "254924089577efcc7cba34a723af1b3b121110168042ce296d1053663d76f62b",
+          "startedAt": 1789576049230,
+          "after": "254924089577efcc7cba34a723af1b3b121110168042ce296d1053663d76f62b",
+          "completedAt": 1789576049277,
+          "args": {
+            "filePath": "value.mjs"
+          },
+          "state": "completed"
+        },
+        {
+          "tool": "edit",
+          "callID": "fixture-5",
+          "before": "254924089577efcc7cba34a723af1b3b121110168042ce296d1053663d76f62b",
+          "startedAt": 1789576049372,
+          "after": "d10f401d71d59de30b5390a5bb66ee85e62b22337c4c4af25b9fdb1c7c3c9e54",
+          "completedAt": 1789576049427,
+          "args": {
+            "filePath": "value.mjs",
+            "oldString": "value = 2",
+            "newString": "value = 3"
+          },
+          "state": "completed"
+        },
+        {
+          "tool": "read",
+          "callID": "fixture-6",
+          "before": "d10f401d71d59de30b5390a5bb66ee85e62b22337c4c4af25b9fdb1c7c3c9e54",
+          "startedAt": 1789576049541,
+          "after": "d10f401d71d59de30b5390a5bb66ee85e62b22337c4c4af25b9fdb1c7c3c9e54",
+          "completedAt": 1789576049607,
+          "args": {
+            "filePath": "value.test.mjs"
+          },
+          "state": "completed"
+        },
+        {
+          "tool": "edit",
+          "callID": "fixture-7",
+          "before": "d10f401d71d59de30b5390a5bb66ee85e62b22337c4c4af25b9fdb1c7c3c9e54",
+          "startedAt": 1789576049710,
+          "after": "6cb1d594dcfafaadd70529d0c72494b3363e358f71041a12024a7b03db6028f9",
+          "completedAt": 1789576049757,
+          "args": {
+            "filePath": "value.test.mjs",
+            "oldString": "value,2",
+            "newString": "value,3"
+          },
+          "state": "completed"
+        },
+        {
+          "tool": "bash",
+          "callID": "fixture-8",
+          "before": "6cb1d594dcfafaadd70529d0c72494b3363e358f71041a12024a7b03db6028f9",
+          "startedAt": 1789576049860,
+          "after": "6cb1d594dcfafaadd70529d0c72494b3363e358f71041a12024a7b03db6028f9",
+          "completedAt": 1789576050133,
+          "args": {
+            "command": "npm test",
+            "description": "Actual local project check"
+          },
+          "exit": 0,
+          "state": "completed"
+        },
+        {
+          "tool": "bash",
+          "callID": "fixture-9",
+          "before": "6cb1d594dcfafaadd70529d0c72494b3363e358f71041a12024a7b03db6028f9",
+          "startedAt": 1789576050219,
+          "after": "6cb1d594dcfafaadd70529d0c72494b3363e358f71041a12024a7b03db6028f9",
+          "completedAt": 1789576050270,
+          "args": {
+            "command": "git diff --check",
+            "description": "Actual local project check"
+          },
+          "exit": 0,
+          "state": "completed"
+        }
+      ],
+      "portableChecks": "passed (successful webfetch control only)",
+      "normalAuthorStopAndZeroAbortAssertion": "passed"
+    },
+    {
+      "mode": "http-stream",
+      "scriptedRequests": 3,
+      "httpRequests": 1,
+      "sessionID": "ses_f54ec956effeDx3oFQchb78X0y",
+      "callID": "fixture-2",
+      "admission": {
+        "at": 1789576572231,
+        "input": {
+          "tool": "webfetch",
+          "sessionID": "ses_f54ec956effeDx3oFQchb78X0y",
+          "callID": "fixture-2"
+        },
+        "args": {
+          "url": "http://127.0.0.1:35999/resource",
+          "format": "text",
+          "timeout": 2
+        }
+      },
+      "nativeEvents": [
+        {
+          "at": 1789576572226,
+          "status": "pending",
+          "time": null
+        },
+        {
+          "at": 1789576572238,
+          "status": "running",
+          "time": {
+            "start": 1789576572236
+          }
+        },
+        {
+          "at": 1789576572242,
+          "status": "error",
+          "time": {
+            "start": 1789576572236,
+            "end": 1789576572241
+          }
+        }
+      ],
+      "terminalError": "StatusCode: non 2xx status code (503 GET http://127.0.0.1:35999/resource)",
+      "actualNextToolReceipt": {
+        "role": "tool",
+        "tool_call_id": "fixture-2",
+        "content": "StatusCode: non 2xx status code (503 GET http://127.0.0.1:35999/resource)"
+      },
+      "serverEvents": [
+        {
+          "kind": "request",
+          "at": 1789576572235,
+          "url": "/resource",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+        }
+      ],
+      "bodyWriteCallbacksAfterErrorReceipt": 6,
+      "callbackErrorsChecked": true,
+      "initialObserverActiveBodyAtSample": null,
+      "counterexample": "observed",
+      "activeAtReceipt": true,
+      "activeAfterObservation": true,
+      "writeErrorsAfterReceipt": 0
+    },
+    {
+      "mode": "deny",
+      "scriptedRequests": 3,
+      "httpRequests": 0,
+      "sessionID": "ses_f54e8dc2dffefwwdDYaJ15Lxqd",
+      "callID": "fixture-2",
+      "admission": {
+        "at": 1789576816188,
+        "input": {
+          "tool": "webfetch",
+          "sessionID": "ses_f54e8dc2dffefwwdDYaJ15Lxqd",
+          "callID": "fixture-2"
+        },
+        "args": {
+          "url": "http://127.0.0.1:41517/resource",
+          "format": "text",
+          "timeout": 2
+        }
+      },
+      "nativeEvents": [
+        {
+          "at": 1789576816186,
+          "status": "pending",
+          "time": null
+        },
+        {
+          "at": 1789576816190,
+          "status": "running",
+          "time": {
+            "start": 1789576816190
+          }
+        },
+        {
+          "at": 1789576816192,
+          "status": "error",
+          "time": {
+            "start": 1789576816190,
+            "end": 1789576816192
+          }
+        }
+      ],
+      "terminalError": "The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules [{\"permission\":\"*\",\"action\":\"allow\",\"pattern\":\"*\"},{\"permission\":\"webfetch\",\"action\":\"allow\",\"pattern\":\"*\"},{\"permission\":\"webfetch\",\"pattern\":\"http://127.0.0.1:41517/resource\",\"action\":\"deny\"}]",
+      "actualNextToolReceipt": {
+        "role": "tool",
+        "tool_call_id": "fixture-2",
+        "content": "The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules [{\"permission\":\"*\",\"action\":\"allow\",\"pattern\":\"*\"},{\"permission\":\"webfetch\",\"action\":\"allow\",\"pattern\":\"*\"},{\"permission\":\"webfetch\",\"pattern\":\"http://127.0.0.1:41517/resource\",\"action\":\"deny\"}]"
+      },
+      "serverEvents": [],
+      "bodyWriteCallbacksAfterErrorReceipt": 0,
+      "callbackErrorsChecked": null,
+      "initialObserverActiveBodyAtSample": null,
+      "counterexample": "not-applicable",
+      "activeAtReceipt": false,
+      "activeAfterObservation": false,
+      "writeErrorsAfterReceipt": 0
+    }
+  ]
+}

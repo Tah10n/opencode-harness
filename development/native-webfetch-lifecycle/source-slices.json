@@ -1,0 +1,42 @@
+{
+  "binarySha256": "096d32aa9778f98981390a0602c1f8af55ee5f1d6d5c58206f8fb2743c90eafe",
+  "version": "1.18.26",
+  "slices": [
+    {
+      "name": "legacy-webfetch",
+      "byteOffset": 96970903,
+      "byteLength": 2310,
+      "sha256": "5b939794b54e1a4e2f2ad37707950c75132345b1fe6d2db085d7081b634b1c03"
+    },
+    {
+      "name": "http-client-lifecycle",
+      "byteOffset": 104463955,
+      "byteLength": 1243,
+      "sha256": "114e3f79a55a0a6d1469ab22a1b48ac4713448e4a2990e95d85abd710db6c1c1"
+    },
+    {
+      "name": "response-cleanup",
+      "byteOffset": 104468921,
+      "byteLength": 1372,
+      "sha256": "c1d2684a87280c51477ed3a3da3fca057681b6e5d1bdbdd5d23e96f5ef734a40"
+    },
+    {
+      "name": "fetch-client",
+      "byteOffset": 104486462,
+      "byteLength": 702,
+      "sha256": "6d1adfb7f4b44c11ba3f6141b3fc0748a4a1828da7d5017d8de0f4e54663e4ab"
+    },
+    {
+      "name": "terminal-tool-error",
+      "byteOffset": 96821208,
+      "byteLength": 406,
+      "sha256": "df40ee0b4fc301e20bbe0f09b69d9314b171fcc4a7769c50e163d07f3e7dddcd"
+    },
+    {
+      "name": "native-tool-hooks",
+      "byteOffset": 96852475,
+      "byteLength": 434,
+      "sha256": "a5b47275ae15fe1164ff05eced1c860563a22e5bee0a7618f0d4c362a9135efa"
+    }
+  ]
+}
