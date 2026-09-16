@@ -1,0 +1,647 @@
+{
+  "createdAt": "2026-09-16T15:18:38.986Z",
+  "runtimeSha": "8264ce42ef198580af834dcb09df996ac1274f1d",
+  "freezeSha256": "14e51db3f3f1feb49191222073428c8d7d21d6f448a698d88cb3b3051052b644",
+  "model": "openai/gpt-5.6-luna",
+  "effort": "high",
+  "budgetMs": 1800000,
+  "config": {
+    "model": "openai/gpt-5.6-luna",
+    "small_model": "openai/gpt-5.6-luna",
+    "provider": {
+      "openai": {
+        "options": {
+          "baseURL": "http://127.0.0.1:4099/v1",
+          "apiKey": "development-no-credential"
+        },
+        "models": {
+          "gpt-5.6-luna": {
+            "options": {
+              "reasoningEffort": "high"
+            },
+            "variants": {
+              "high": {
+                "reasoningEffort": "high"
+              }
+            }
+          }
+        }
+      }
+    },
+    "permission": {
+      "external_directory": {
+        "*": "deny",
+        "/template/node_modules/typescript/lib/*": "allow",
+        "/usr/local/bin/*": "allow"
+      }
+    }
+  },
+  "order": [
+    {
+      "slot": 1,
+      "task": "A",
+      "arm": "OFF",
+      "project": "primus/eventemitter3"
+    },
+    {
+      "slot": 2,
+      "task": "A",
+      "arm": "ON",
+      "project": "primus/eventemitter3"
+    },
+    {
+      "slot": 3,
+      "task": "B",
+      "arm": "ON",
+      "project": "primus/eventemitter3"
+    },
+    {
+      "slot": 4,
+      "task": "B",
+      "arm": "OFF",
+      "project": "primus/eventemitter3"
+    }
+  ],
+  "inputs": [
+    {
+      "task": "A",
+      "project": "primus/eventemitter3",
+      "sourceCommit": "b0144e940ace8add8f335a8adfbed9284eb419f3",
+      "promptSha256": "ef1ed2db8a7e7b24248250b887cf642f7209df99bf7e0f00d7456e034a7f940f",
+      "inputManifestSha256": "52be3be9d41ec35798c8315fb04674c7c57b39d6bcc301b9c482f442837d5580"
+    },
+    {
+      "task": "B",
+      "project": "primus/eventemitter3",
+      "sourceCommit": "b0144e940ace8add8f335a8adfbed9284eb419f3",
+      "promptSha256": "ae1e8ab6778af4defe52057baabccb10d656357078a86ecb73523271ee5d8492",
+      "inputManifestSha256": "bb8d1d6985c92ccdc2d61b6ffc8ab7f2fba1f42fb2453f41bc16971bc00ef0ee"
+    }
+  ],
+  "calibration": {
+    "passed": true,
+    "results": [
+      {
+        "task": "A",
+        "label": "baseline",
+        "accepted": false,
+        "commands": [
+          {
+            "name": "project-0",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-1",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-2",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "new-runtime",
+            "status": 1,
+            "error": null
+          },
+          {
+            "name": "acceptance-types",
+            "status": 2,
+            "error": null
+          },
+          {
+            "name": "legacy-types",
+            "status": 0,
+            "error": null
+          }
+        ]
+      },
+      {
+        "task": "A",
+        "label": "reference",
+        "accepted": true,
+        "commands": [
+          {
+            "name": "project-0",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-1",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-2",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "new-runtime",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "acceptance-types",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "legacy-types",
+            "status": 0,
+            "error": null
+          }
+        ]
+      },
+      {
+        "task": "A",
+        "label": "alternative",
+        "accepted": true,
+        "commands": [
+          {
+            "name": "project-0",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-1",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-2",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "new-runtime",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "acceptance-types",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "legacy-types",
+            "status": 0,
+            "error": null
+          }
+        ]
+      },
+      {
+        "task": "A",
+        "label": "missing",
+        "accepted": false,
+        "commands": [
+          {
+            "name": "new-runtime",
+            "status": 1,
+            "error": null
+          },
+          {
+            "name": "acceptance-types",
+            "status": 2,
+            "error": null
+          },
+          {
+            "name": "legacy-types",
+            "status": 0,
+            "error": null
+          }
+        ]
+      },
+      {
+        "task": "A",
+        "label": "erased-types",
+        "accepted": false,
+        "commands": [
+          {
+            "name": "new-runtime",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "acceptance-types",
+            "status": 2,
+            "error": null
+          },
+          {
+            "name": "legacy-types",
+            "status": 0,
+            "error": null
+          }
+        ]
+      },
+      {
+        "task": "A",
+        "label": "legacy-break",
+        "accepted": false,
+        "commands": [
+          {
+            "name": "new-runtime",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "acceptance-types",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "legacy-types",
+            "status": 2,
+            "error": null
+          }
+        ]
+      },
+      {
+        "task": "A",
+        "label": "runtime-break",
+        "accepted": false,
+        "commands": [
+          {
+            "name": "new-runtime",
+            "status": 1,
+            "error": null
+          },
+          {
+            "name": "acceptance-types",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "legacy-types",
+            "status": 0,
+            "error": null
+          }
+        ]
+      },
+      {
+        "task": "B",
+        "label": "baseline",
+        "accepted": false,
+        "commands": [
+          {
+            "name": "project-0",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-1",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-2",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "new-runtime",
+            "status": 1,
+            "error": null
+          },
+          {
+            "name": "acceptance-types",
+            "status": 2,
+            "error": null
+          },
+          {
+            "name": "legacy-types",
+            "status": 0,
+            "error": null
+          }
+        ]
+      },
+      {
+        "task": "B",
+        "label": "reference",
+        "accepted": true,
+        "commands": [
+          {
+            "name": "project-0",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-1",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-2",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "new-runtime",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "acceptance-types",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "legacy-types",
+            "status": 0,
+            "error": null
+          }
+        ]
+      },
+      {
+        "task": "B",
+        "label": "alternative",
+        "accepted": true,
+        "commands": [
+          {
+            "name": "project-0",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-1",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-2",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "new-runtime",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "acceptance-types",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "legacy-types",
+            "status": 0,
+            "error": null
+          }
+        ]
+      },
+      {
+        "task": "B",
+        "label": "missing",
+        "accepted": false,
+        "commands": [
+          {
+            "name": "new-runtime",
+            "status": 1,
+            "error": null
+          },
+          {
+            "name": "acceptance-types",
+            "status": 2,
+            "error": null
+          },
+          {
+            "name": "legacy-types",
+            "status": 0,
+            "error": null
+          }
+        ]
+      },
+      {
+        "task": "B",
+        "label": "erased-types",
+        "accepted": false,
+        "commands": [
+          {
+            "name": "new-runtime",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "acceptance-types",
+            "status": 2,
+            "error": null
+          },
+          {
+            "name": "legacy-types",
+            "status": 0,
+            "error": null
+          }
+        ],
+        "finalTypeControl": {
+          "status": 2,
+          "compiler": "6.0.3",
+          "node": "v24.19.0",
+          "platform": "darwin",
+          "reason": "Unrestricted any accepts invalid calls; unused expect-error directives reject control"
+        }
+      },
+      {
+        "task": "B",
+        "label": "legacy-break",
+        "accepted": false,
+        "commands": [
+          {
+            "name": "new-runtime",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "acceptance-types",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "legacy-types",
+            "status": 2,
+            "error": null
+          }
+        ]
+      },
+      {
+        "task": "B",
+        "label": "runtime-break",
+        "accepted": false,
+        "commands": [
+          {
+            "name": "new-runtime",
+            "status": 1,
+            "error": null
+          },
+          {
+            "name": "acceptance-types",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "legacy-types",
+            "status": 0,
+            "error": null
+          }
+        ]
+      }
+    ],
+    "providerRequests": 0
+  },
+  "preflight": {
+    "passed": true,
+    "checks": [
+      {
+        "task": "A",
+        "arm": "OFF",
+        "requests": 12,
+        "portablePatch": true,
+        "sourcePreserved": true,
+        "capture": true,
+        "termination": true
+      },
+      {
+        "task": "A",
+        "arm": "ON",
+        "requests": 12,
+        "portablePatch": true,
+        "sourcePreserved": true,
+        "capture": true,
+        "termination": true,
+        "compat": [
+          {
+            "status": "reproduced-incompatibility",
+            "snapshot": "52ce8e824c2a22a9dd5f86f1221d9c805db2083a3d15c11cf02f302c98ea5922"
+          },
+          {
+            "status": "no-difference-in-checked-scope",
+            "snapshot": "d39bed03a3538e9858b3d47e46ddc232c4cb21542df7e2514695d7fca6deba81"
+          }
+        ]
+      },
+      {
+        "task": "B",
+        "arm": "ON",
+        "requests": 12,
+        "portablePatch": true,
+        "sourcePreserved": true,
+        "capture": true,
+        "termination": true,
+        "compat": [
+          {
+            "status": "reproduced-incompatibility",
+            "snapshot": "316b90a4d5e3d1de8f838868290eda4d7acd3e9a5adf1d04d605514af545086e"
+          },
+          {
+            "status": "no-difference-in-checked-scope",
+            "snapshot": "50b3a507210be3cc09cb120838723348518a306bd282deaf864b2e22b3c05126"
+          }
+        ]
+      },
+      {
+        "task": "B",
+        "arm": "OFF",
+        "requests": 12,
+        "portablePatch": true,
+        "sourcePreserved": true,
+        "capture": true,
+        "termination": true
+      }
+    ],
+    "realProviderRequests": 0
+  },
+  "audit": {
+    "passed": true,
+    "rows": [
+      {
+        "key": "A-OFF",
+        "ordinaryCommands": true,
+        "noEvaluatorMount": true,
+        "removed": true,
+        "checks": []
+      },
+      {
+        "key": "A-ON",
+        "ordinaryCommands": true,
+        "noEvaluatorMount": true,
+        "removed": true,
+        "checks": [
+          {
+            "snapshot": "52ce8e824c2a22a9dd5f86f1221d9c805db2083a3d15c11cf02f302c98ea5922",
+            "baselineSnapshot": "af36a2446ae2fd0c0475175165da517b4ee8a1e2faefb5b3c4615a1c35d16cef",
+            "status": "reproduced-incompatibility",
+            "callID": "call_20",
+            "request": "request-10.json",
+            "requestHash": "a23d3c128a93aaddd62ba4370867e33e9fa835dca56fb689c625636f183d9d8b"
+          },
+          {
+            "snapshot": "d39bed03a3538e9858b3d47e46ddc232c4cb21542df7e2514695d7fca6deba81",
+            "baselineSnapshot": "af36a2446ae2fd0c0475175165da517b4ee8a1e2faefb5b3c4615a1c35d16cef",
+            "status": "no-difference-in-checked-scope",
+            "callID": "call_22",
+            "request": "request-11.json",
+            "requestHash": "0d15e7ba29c724d26e426fc1fed8846a5721c268a3c6c48e3659c8cb28b52e77"
+          }
+        ]
+      },
+      {
+        "key": "B-ON",
+        "ordinaryCommands": true,
+        "noEvaluatorMount": true,
+        "removed": true,
+        "checks": [
+          {
+            "snapshot": "316b90a4d5e3d1de8f838868290eda4d7acd3e9a5adf1d04d605514af545086e",
+            "baselineSnapshot": "59499dfa129c472dc0d3147be033be862e9b8a71f9c1b2ac4fc4b2cf568d1329",
+            "status": "reproduced-incompatibility",
+            "callID": "call_32",
+            "request": "request-10.json",
+            "requestHash": "7959a69c0de89972d143da939d8762ddec5d5ca95282bf67dc6a63ecb6d0fbd1"
+          },
+          {
+            "snapshot": "50b3a507210be3cc09cb120838723348518a306bd282deaf864b2e22b3c05126",
+            "baselineSnapshot": "59499dfa129c472dc0d3147be033be862e9b8a71f9c1b2ac4fc4b2cf568d1329",
+            "status": "no-difference-in-checked-scope",
+            "callID": "call_34",
+            "request": "request-11.json",
+            "requestHash": "a916227427db01d787325176b9353fbbae6aa68815696925dda1d33a13134402"
+          }
+        ]
+      },
+      {
+        "key": "B-OFF",
+        "ordinaryCommands": true,
+        "noEvaluatorMount": true,
+        "removed": true,
+        "checks": []
+      }
+    ],
+    "realProviderRequests": 0
+  },
+  "realProviderRequestsBeforeFreeze": 0,
+  "files": {
+    "development/native-type-compat-comparison/PLAN.md": "84cd11fa611baf921a23536c645fe00e6591856556c33dcee7a4db6ec2e3717a",
+    "development/native-type-compat-comparison/audit-preflight.mjs": "fe6ecd85d9b908cdc2959601444bc5078608fc96af503de6221ffa1f91f631fb",
+    "development/native-type-compat-comparison/calibrate.mjs": "609e80664f5b3be19c63ea66a819c0ce6e75035cb26b5313a1bb4d632402a8d6",
+    "development/native-type-compat-comparison/evaluation/A.cjs": "62576b21c4ba4de98f5aa2e71584784d07c83dd617fb056fa7e0387718434f48",
+    "development/native-type-compat-comparison/evaluation/A.types.ts": "396a6e3616fc8393399822771c3ef2d1e5bcdb228576f35e7a5b6d14bca889a3",
+    "development/native-type-compat-comparison/evaluation/B.cjs": "557fb28c91d5f46c5ac3eef163570b037b9523833567fc914e1735b8334a7865",
+    "development/native-type-compat-comparison/evaluation/B.types.ts": "a673f7fe7a1860bd4963e5db0ce7a3b6b1d0a14998944030f25e426f85d1d27a",
+    "development/native-type-compat-comparison/evaluation/legacy.types.ts": "a233441ca27ff4ecc576d2bf0e88072be548fe91bea920518b26344d163b6424",
+    "development/native-type-compat-comparison/freeze.mjs": "ea3535469ed21385658f06617e558c3e8b8d8fad45d1b92e90f19b803dfb4cfa",
+    "development/native-type-compat-comparison/make-calibration.mjs": "59a9ef93b02b7a7611a188b52f648d4f5fa440de1fdff2495204c87fe1c5e584",
+    "development/native-type-compat-comparison/preflight.mjs": "8b1fb5f15cb536b02bbdc29d48d2451ca4e1136a7a25a9bfa9dbaba222171220",
+    "development/native-type-compat-comparison/prepare.mjs": "e43e694b2bfe96f2b80943f0e1db5f8245665a588791e3dfa07e13eca850b173",
+    "development/native-type-compat-comparison/run.mjs": "73f2eca5af7150cca1e0457318e9c8138ff26bc649a8ea7c069c87c2b4db55e8",
+    "development/native-type-compat-comparison/tasks/A.md": "ef1ed2db8a7e7b24248250b887cf642f7209df99bf7e0f00d7456e034a7f940f",
+    "development/native-type-compat-comparison/tasks/B.md": "ae1e8ab6778af4defe52057baabccb10d656357078a86ecb73523271ee5d8492",
+    "development/native-task-ab/run-comparison.mjs": "2dc0aa0803666d91a30c6453aa83e7c2712a640f769b03f668510edf37952399",
+    "development/native-task-abc/native-run.mjs": "5d691871022fcf4f2117212c33b463849e791d7ebe120adc68e7ca419ee0d293",
+    "development/native-task-integrated/container-session.mjs": "d469b04975c1e9441b1dc5fb5c2a1f6beef451a390e5f020c1b1a6b211cdcd1b",
+    "development/native-task-integrated/container-relay.mjs": "db186a20946348867504c48d7faca8f40a93fdfa122e1102f581e8cf5377f1b3",
+    "development/native-task-ab/capture-candidate.mjs": "d388246826eb92dd408b853c4fe8fc929c259a9d03b89d169b75b2143544c669",
+    "development/native-task-ab/extract-candidate.py": "aa5244bd4a5cc394344b266f0107728d9b70e190bad55de47c46dd10f28603de",
+    "development/native-task-utility/container/stop-workload.mjs": "b21c23f5a334dc54af340e2773e3e56427aa27a946231769d36df249ea54a69e"
+  }
+}

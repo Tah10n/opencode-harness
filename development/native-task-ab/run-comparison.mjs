@@ -80,12 +80,14 @@ if(amendment){
 }
 
 function verify(){
- const commandHints=f.experimentKind==='command-hints', transfer=f.experimentKind==='transfer', h00=f.experimentKind==='h00-transfer', sensitivity=f.experimentKind==='sensitivity', usage=f.experimentKind==='sensitivity-usage', replay=f.experimentKind==='sensitivity-replay', targeted=f.experimentKind==='sensitivity-targeted', integration=f.experimentKind==='targeted-integration';
- if(f.attempts.length!==(commandHints?4:repeatedContinuation?12:integration?9:targeted?3:replay?4:usage?2:h00?48:transfer||sensitivity?8:30)||f.model!=='openai/gpt-5.6-luna'||f.variant!=='high'||f.budgetMs!==((commandHints||repeatedContinuation)?1800000:900000)||!f.preflightPassed)throw Error('Invalid development configuration');
+ const typeCompat=f.experimentKind==='type-compat', commandHints=f.experimentKind==='command-hints', transfer=f.experimentKind==='transfer', h00=f.experimentKind==='h00-transfer', sensitivity=f.experimentKind==='sensitivity', usage=f.experimentKind==='sensitivity-usage', replay=f.experimentKind==='sensitivity-replay', targeted=f.experimentKind==='sensitivity-targeted', integration=f.experimentKind==='targeted-integration';
+ if(f.attempts.length!==((commandHints||typeCompat)?4:repeatedContinuation?12:integration?9:targeted?3:replay?4:usage?2:h00?48:transfer||sensitivity?8:30)||f.model!=='openai/gpt-5.6-luna'||f.variant!=='high'||f.budgetMs!==((commandHints||typeCompat||repeatedContinuation)?1800000:900000)||!f.preflightPassed)throw Error('Invalid development configuration');
  for(const [file,digest] of Object.entries(f.files))if(sha(fs.readFileSync(file))!==(amendment?.launcherFiles[file]?.after??digest))throw Error('Frozen file changed: '+file);
  for(const [directory,expected]of Object.entries(f.runtimeManifests??{})){const seen=new Set();const visit=(dir,prefix='')=>{for(const entry of fs.readdirSync(dir,{withFileTypes:true})){if(repeatedContinuation&&entry.name==='.git')continue;const file=path.join(dir,entry.name),name=prefix+entry.name,stat=fs.lstatSync(file);if(stat.isDirectory()){visit(file,name+'/');continue;}const got=stat.isSymbolicLink()?{symlink:fs.readlinkSync(file)}:{sha256:sha(fs.readFileSync(file)),executable:!!(stat.mode&0o111)};if(JSON.stringify(got)!==JSON.stringify(expected[name]))throw Error('Installed runtime changed: '+name);seen.add(name);}};visit(directory);if(seen.size!==Object.keys(expected).length)throw Error('Installed runtime missing files');}
  const groups=new Map();for(const a of f.attempts){const group=groups.get(a.task)??[];group.push(a.arm);groups.set(a.task,group);}
- if(commandHints){
+ if(typeCompat){
+  if(amendment||f.runtimeSha!=='8264ce42ef198580af834dcb09df996ac1274f1d'||f.strategy!=='direct'||f.streamLimit!=='remaining-task-budget'||f.connectionTimeoutMs!==30000||f.attempts.map(a=>a.task+':'+a.arm).join(',')!=='A:OFF,A:ON,B:ON,B:OFF'||groups.size!==2)throw Error('Invalid frozen type-compat comparison');
+ }else if(commandHints){
   if(amendment||f.runtimeSha!=='c90fc7c78bcdd4d8288550b887f52990bafb11a6'||f.strategy!=='direct'||f.streamLimit!=='remaining-task-budget'||f.connectionTimeoutMs!==30000||f.config.permission.external_directory!=='allow'||f.attempts.map(a=>a.task+':'+a.arm).join(',')!=='A:OFF,A:ON,B:ON,B:OFF'||groups.size!==2||[...groups.values()].some(x=>x.slice().sort().join(',')!=='OFF,ON'))throw Error('Invalid frozen command-hints comparison');
  }else if(repeatedContinuation){
   if(f.runtimeSha!=='797ce6f1b75af217e00224d1b38790346dee1d19'||f.strategy!=='direct'||f.streamLimit!=='remaining-task-budget'||f.connectionTimeoutMs!==30000||f.attempts.slice(10).map(a=>[a.slot,a.task,a.repetition,a.arm].join(':')).join(',')!=='11:url-search-params:2:P,12:url-search-params:2:Hbase')throw Error('Invalid original final pair');
@@ -167,7 +169,7 @@ for(const attempt of f.attempts.filter(a=>!amendment||(a.slot>=firstSlot&&a.slot
     const requestKind=frame.body?.tools?.length?'work':'title';
     let requestSignal;
     const record={requestIndex:requests.length+1,relayRequestId:frame.id??null,requestKind,at:new Date().toISOString(),path:frame.path,model:frame.body?.model,effort:frame.body?.reasoning?.effort??null,forwarded:false,usage:null};requests.push(record);save();
-    if(['h00-transfer','sensitivity','sensitivity-usage','sensitivity-replay','sensitivity-targeted','targeted-integration','integrated-repeats'].includes(f.experimentKind))fs.writeFileSync(path.join(out,'request-'+requests.length+'.json'),JSON.stringify(frame.body),{mode:0o600,flag:'wx'});
+    if(['type-compat','h00-transfer','sensitivity','sensitivity-usage','sensitivity-replay','sensitivity-targeted','targeted-integration','integrated-repeats'].includes(f.experimentKind))fs.writeFileSync(path.join(out,'request-'+requests.length+'.json'),JSON.stringify(frame.body),{mode:0o600,flag:'wx'});
     const blocked=()=>{
      if(!pause&&!abort.signal.aborted&&!signal.aborted&&forwardingOpen&&deadline&&Date.now()<deadline)return false;
      record.notForwardedReason=pause?'series-paused':signal.aborted?'client-cancelled':'closed-or-deadline';record.blockedBy=pause;record.finishedAt=new Date().toISOString();save();
@@ -223,7 +225,7 @@ for(const attempt of f.attempts.filter(a=>!amendment||(a.slot>=firstSlot&&a.slot
      send({type:'headers',status:response.status,contentType:response.headers.get('content-type')??'text/event-stream'});
      const observer=responseObserver(record,save,details=>pauseScheduling(details.kind,attempt.slot,{requestIndex:record.requestIndex,...details}));
      for await(const chunk of response.body){
-      if(['h00-transfer','sensitivity','sensitivity-usage','sensitivity-replay','sensitivity-targeted','targeted-integration','integrated-repeats'].includes(f.experimentKind))fs.appendFileSync(path.join(out,'response-'+record.requestIndex+'.sse'),chunk,{mode:0o600});
+      if(['type-compat','h00-transfer','sensitivity','sensitivity-usage','sensitivity-replay','sensitivity-targeted','targeted-integration','integrated-repeats'].includes(f.experimentKind))fs.appendFileSync(path.join(out,'response-'+record.requestIndex+'.sse'),chunk,{mode:0o600});
       // Observe/persist upstream facts before delivery can fail or be cancelled.
       observer.push(chunk);
       // The observer persists response facts AND the pause synchronously, before
