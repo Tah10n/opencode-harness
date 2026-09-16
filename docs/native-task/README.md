@@ -9,6 +9,11 @@ its development results do not establish a recommended production mode.
 
 ## Install and use
 
+Optional [command hints](COMMAND-HINTS.md), enabled with
+`HARNESS_TASK_COMMAND_HINTS=1`, add one host-derived context block after a confirmed
+missing npm/pnpm command. They are off by default and never install, retry or
+execute the suggested command automatically.
+
 Optional [focused investigation](INVESTIGATION.md) lets the author request one
 test-producing subtask from the same model, then accept or decline its patch.
 It is experimental, independently opt-in, and shares the task deadline.
