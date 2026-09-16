@@ -1,0 +1,485 @@
+diff --git a/README.md b/README.md
+index e45aa101e2de2e403423cefd05f1d5d16796a61a..2dc4a75134961ec44336e68d94a41946ff68257c 100644
+--- a/README.md
++++ b/README.md
+@@ -72,6 +72,24 @@ EE.on('another-event', emitted, context);
+ EE.removeListener('another-event', emitted, context);
+ ```
+ 
++### Subscriptions
++
++`EventEmitter.subscribe` adds a persistent listener like `on`, but returns an
++`unsubscribe` function for that specific registration:
++
++```js
++var unsubscribe = EE.subscribe('event-name', emitted, context);
++
++unsubscribe(); // removes only this registration
++unsubscribe(); // safe to call again
++```
++
++Unlike `off` and `removeListener`, which remove all matching listeners,
++`unsubscribe` never removes another registration that uses the same function
++and context. It is synchronous and follows the emitter's normal dispatch
++rules: listeners already captured by an emit still run, while later emits do
++not see a cancelled registration.
++
+ ### Tests and benchmarks
+ 
+ To run tests run `npm test`. To run the benchmarks run `npm run benchmark`.
+diff --git a/index.d.ts b/index.d.ts
+index fab37fd606a62cd2dc81ff0b8007a26447916438..cd877e9fbddf3721b10c00eba17000dffe777e22 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -39,21 +39,31 @@ declare class EventEmitter<
+    */
+   on<T extends EventEmitter.EventNames<EventTypes>>(
+     event: T,
+-    fn: EventEmitter.EventListener<EventTypes, T>,
++    fn: EventEmitter.EventListener<EventTypes, T, Context>,
+     context?: Context
+   ): this;
+   addListener<T extends EventEmitter.EventNames<EventTypes>>(
+     event: T,
+-    fn: EventEmitter.EventListener<EventTypes, T>,
++    fn: EventEmitter.EventListener<EventTypes, T, Context>,
+     context?: Context
+   ): this;
+ 
++  /**
++   * Add a persistent listener and return a function that removes this exact
++   * registration.
++   */
++  subscribe<T extends EventEmitter.EventNames<EventTypes>>(
++    event: T,
++    fn: EventEmitter.EventListener<EventTypes, T, Context>,
++    context?: Context
++  ): EventEmitter.Unsubscribe;
++
+   /**
+    * Add a one-time listener for a given event.
+    */
+   once<T extends EventEmitter.EventNames<EventTypes>>(
+     event: T,
+-    fn: EventEmitter.EventListener<EventTypes, T>,
++    fn: EventEmitter.EventListener<EventTypes, T, Context>,
+     context?: Context
+   ): this;
+ 
+@@ -62,13 +72,13 @@ declare class EventEmitter<
+    */
+   removeListener<T extends EventEmitter.EventNames<EventTypes>>(
+     event: T,
+-    fn?: EventEmitter.EventListener<EventTypes, T>,
++    fn?: EventEmitter.EventListener<EventTypes, T, Context>,
+     context?: Context,
+     once?: boolean
+   ): this;
+   off<T extends EventEmitter.EventNames<EventTypes>>(
+     event: T,
+-    fn?: EventEmitter.EventListener<EventTypes, T>,
++    fn?: EventEmitter.EventListener<EventTypes, T, Context>,
+     context?: Context,
+     once?: boolean
+   ): this;
+@@ -84,6 +94,8 @@ declare namespace EventEmitter {
+     (...args: Args): void;
+   }
+ 
++  export type Unsubscribe = () => void;
++
+   export interface EventEmitterStatic {
+     new <
+       EventTypes extends ValidEventTypes = string | symbol,
+@@ -116,10 +128,12 @@ declare namespace EventEmitter {
+ 
+   export type EventListener<
+     T extends ValidEventTypes,
+-    K extends EventNames<T>
++    K extends EventNames<T>,
++    C = any
+   > = T extends string | symbol
+-    ? (...args: any[]) => void
++    ? (this: C, ...args: any[]) => void
+     : (
++        this: C,
+         ...args: ArgumentMap<Exclude<T, string | symbol>>[Extract<K, keyof T>]
+       ) => void;
+ 
+diff --git a/index.js b/index.js
+index 6ea485c40a694deb72801fcd0048a3c44de95403..5265d2b647b4cef33409e1e10ffa3c8ef86b2c22 100644
+--- a/index.js
++++ b/index.js
+@@ -52,7 +52,7 @@ function EE(fn, context, once) {
+  * @param {Function} fn The listener function.
+  * @param {*} context The context to invoke the listener with.
+  * @param {Boolean} once Specify if the listener is a one-time listener.
+- * @returns {EventEmitter}
++ * @returns {EE}
+  * @private
+  */
+ function addListener(emitter, event, fn, context, once) {
+@@ -67,7 +67,7 @@ function addListener(emitter, event, fn, context, once) {
+   else if (!emitter._events[evt].fn) emitter._events[evt].push(listener);
+   else emitter._events[evt] = [emitter._events[evt], listener];
+ 
+-  return emitter;
++  return listener;
+ }
+ 
+ /**
+@@ -82,6 +82,46 @@ function clearEvent(emitter, evt) {
+   else delete emitter._events[evt];
+ }
+ 
++/**
++ * Remove one exact listener registration.
++ *
++ * @param {EventEmitter} emitter Reference to the `EventEmitter` instance.
++ * @param {(String|Symbol)} event The event name.
++ * @param {EE} listener The registration to remove.
++ * @private
++ */
++function removeRegistration(emitter, event, listener) {
++  var evt = prefix ? prefix + event : event
++    , listeners = emitter._events[evt]
++    , events
++    , index = -1;
++
++  if (!listeners) return;
++  if (listeners === listener) {
++    clearEvent(emitter, evt);
++    return;
++  }
++
++  if (listeners.fn) return;
++
++  for (var i = 0, length = listeners.length; i < length; i++) {
++    if (listeners[i] === listener) {
++      index = i;
++      break;
++    }
++  }
++
++  if (index === -1) return;
++
++  events = [];
++  for (i = 0; i < length; i++) {
++    if (i !== index) events.push(listeners[i]);
++  }
++
++  if (events.length) emitter._events[evt] = events.length === 1 ? events[0] : events;
++  else clearEvent(emitter, evt);
++}
++
+ /**
+  * Minimal `EventEmitter` interface that is molded against the Node.js
+  * `EventEmitter` interface.
+@@ -225,7 +265,29 @@ EventEmitter.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
+  * @public
+  */
+ EventEmitter.prototype.on = function on(event, fn, context) {
+-  return addListener(this, event, fn, context, false);
++  addListener(this, event, fn, context, false);
++  return this;
++};
++
++/**
++ * Add a persistent listener for a given event and return its cancellation function.
++ *
++ * @param {(String|Symbol)} event The event name.
++ * @param {Function} fn The listener function.
++ * @param {*} [context=this] The context to invoke the listener with.
++ * @returns {Function} A function that removes this registration.
++ * @public
++ */
++EventEmitter.prototype.subscribe = function subscribe(event, fn, context) {
++  var listener = addListener(this, event, fn, context, false)
++    , emitter = this
++    , active = true;
++
++  return function unsubscribe() {
++    if (!active) return;
++    active = false;
++    removeRegistration(emitter, event, listener);
++  };
+ };
+ 
+ /**
+@@ -238,7 +300,8 @@ EventEmitter.prototype.on = function on(event, fn, context) {
+  * @public
+  */
+ EventEmitter.prototype.once = function once(event, fn, context) {
+-  return addListener(this, event, fn, context, true);
++  addListener(this, event, fn, context, true);
++  return this;
+ };
+ 
+ /**
+diff --git a/test/test.js b/test/test.js
+index e5f8aaad6a7fd7f706a807882b7a4a80d076120c..b3b1fe8ff0947fdca5b4df5b4f372677aa34b90d 100644
+--- a/test/test.js
++++ b/test/test.js
+@@ -320,6 +320,196 @@ describe('EventEmitter', function tests() {
+     });
+   });
+ 
++  describe('EventEmitter#subscribe', function () {
++    it('cancels only its own duplicate registration', function () {
++      var e = new EventEmitter()
++        , context = {}
++        , calls = 0;
++
++      function listener() {
++        assume(this).equals(context);
++        calls++;
++      }
++
++      e.on('foo', listener, context);
++      e.once('foo', listener, context);
++      var first = e.subscribe('foo', listener, context)
++        , second = e.subscribe('foo', listener, context);
++
++      assume(e.listenerCount('foo')).equals(4);
++      assume(e.listeners('foo')).eql([listener, listener, listener, listener]);
++
++      first();
++      assume(e.listenerCount('foo')).equals(3);
++      assume(e.listeners('foo')).eql([listener, listener, listener]);
++
++      e.emit('foo');
++      assume(calls).equals(3);
++      assume(e.listenerCount('foo')).equals(2);
++
++      second();
++      assume(e.listenerCount('foo')).equals(1);
++      e.emit('foo');
++      assume(calls).equals(4);
++    });
++
++    it('preserves registration order', function () {
++      var e = new EventEmitter()
++        , order = [];
++
++      e.on('foo', function () { order.push('on'); });
++      e.subscribe('foo', function () { order.push('subscribe'); });
++      e.once('foo', function () { order.push('once'); });
++      e.subscribe('foo', function () { order.push('last'); });
++
++      assume(e.listenerCount('foo')).equals(4);
++      e.emit('foo');
++      assume(order).eql(['on', 'subscribe', 'once', 'last']);
++    });
++
++    it('does not cancel a later registration after ordinary removal', function () {
++      var e = new EventEmitter()
++        , calls = 0;
++
++      function listener() {
++        calls++;
++      }
++
++      var unsubscribe = e.subscribe('foo', listener);
++      assume(e.listenerCount('foo')).equals(1);
++      e.off('foo', listener);
++      assume(e.listenerCount('foo')).equals(0);
++
++      e.on('foo', listener);
++      assume(e.listeners('foo')).eql([listener]);
++      unsubscribe();
++      e.on('foo', function () {});
++      assume(e.listenerCount('foo')).equals(2);
++      unsubscribe();
++      assume(e.listenerCount('foo')).equals(2);
++      e.emit('foo');
++      assume(calls).equals(1);
++
++      var removed = e.subscribe('bar', listener);
++      assume(e.listenerCount('bar')).equals(1);
++      e.removeListener('bar', listener);
++      e.on('bar', listener);
++      removed();
++      assume(e.listenerCount('bar')).equals(1);
++
++      var cleared = e.subscribe('baz', listener);
++      assume(e.listenerCount('baz')).equals(1);
++      e.removeAllListeners('baz');
++      e.on('baz', listener);
++      cleared();
++      assume(e.listenerCount('baz')).equals(1);
++    });
++
++    it('is idempotent and cleans up its event', function () {
++      var e = new EventEmitter()
++        , unsubscribe = e.subscribe('foo', function () {});
++
++      assume(e.listenerCount('foo')).equals(1);
++      assume(e.eventNames()).eql(['foo']);
++      assume(unsubscribe()).equals(undefined);
++      assume(e.listenerCount('foo')).equals(0);
++      assume(e.eventNames()).eql([]);
++      unsubscribe();
++      assume(e.listenerCount('foo')).equals(0);
++      assume(e.emit('foo')).equals(false);
++    });
++
++    it('forwards context, no arguments and more than five arguments', function () {
++      var e = new EventEmitter()
++        , context = { value: 7 }
++        , calls = 0;
++
++      function listener() {
++        assume(this).equals(context);
++        if (calls++ === 0) assume(arguments.length).equals(0);
++        else assume(Array.prototype.slice.call(arguments)).eql([1, 2, 3, 4, 5, 6, 7]);
++      }
++
++      e.subscribe('args', listener, context);
++      assume(e.listenerCount('args')).equals(1);
++      e.emit('args');
++      e.emit('args', 1, 2, 3, 4, 5, 6, 7);
++      assume(calls).equals(2);
++    });
++
++    it('rejects invalid listeners without changing state', function () {
++      var e = new EventEmitter()
++        , listener = function () {};
++
++      e.on('existing', listener);
++      var names = e.eventNames();
++
++      try {
++        e.subscribe('new', 'not a listener');
++      } catch (ex) {
++        assume(ex).is.instanceOf(Error);
++        assume(e.eventNames()).eql(names);
++        assume(e.listenerCount('new')).equals(0);
++        return;
++      }
++
++      throw new Error('oops');
++    });
++
++    it('supports symbols', function () {
++      if ('undefined' === typeof Symbol) return;
++
++      var e = new EventEmitter()
++        , event = Symbol('event')
++        , listener = function () {}
++        , unsubscribe;
++
++      e.on('existing', listener);
++      unsubscribe = e.subscribe(event, listener);
++      assume(e.listeners(event)).eql([listener]);
++      assume(e.eventNames()).eql(['existing', event]);
++      unsubscribe();
++      assume(e.eventNames()).eql(['existing']);
++    });
++
++    it('removes during dispatch without changing the current snapshot', function () {
++      var e = new EventEmitter()
++        , lateCalls = 0
++        , cancel;
++
++      cancel = e.subscribe('foo', function () {
++        cancel();
++      });
++      e.subscribe('foo', function () {
++        lateCalls++;
++      });
++
++      assume(e.listenerCount('foo')).equals(2);
++      e.emit('foo');
++      assume(lateCalls).equals(1);
++      assume(e.listenerCount('foo')).equals(1);
++      e.emit('foo');
++      assume(lateCalls).equals(2);
++    });
++
++    it('does not run a self-cancelled listener in a recursive emit', function () {
++      var e = new EventEmitter()
++        , calls = 0
++        , unsubscribe;
++
++      unsubscribe = e.subscribe('foo', function () {
++        calls++;
++        unsubscribe();
++        e.emit('foo');
++      });
++
++      assume(e.listenerCount('foo')).equals(1);
++      e.emit('foo');
++      assume(calls).equals(1);
++      assume(e.listenerCount('foo')).equals(0);
++    });
++  });
++
+   describe('EventEmitter#once', function () {
+     it('only emits it once', function () {
+       var e = new EventEmitter()
+diff --git a/test/test.mjs b/test/test.mjs
+index 7b50c82d131d027f65a0b7568f670a38cbb92ae6..61d2e8b6d629ff3c7cd191d6990d39b8d89637d2 100644
+--- a/test/test.mjs
++++ b/test/test.mjs
+@@ -7,3 +7,18 @@ it('exports `EventEmitter` as default export', () => {
+ it('exports `EventEmitter` as a named export', () => {
+   new EventEmitter();
+ })
++
++it('supports subscriptions from ESM consumers', () => {
++  var emitter = new EventEmitter()
++    , calls = 0
++    , unsubscribe = emitter.subscribe('event', function (value) {
++      calls += value;
++    });
++
++  emitter.emit('event', 2);
++  unsubscribe();
++  unsubscribe();
++  emitter.emit('event', 2);
++
++  if (calls !== 2) throw new Error('subscription was not cancelled');
++})
+diff --git a/test/types/subscribe.ts b/test/types/subscribe.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..b94c73f48173f336fd1b7bcc1438829e17c630f7
+--- /dev/null
++++ b/test/types/subscribe.ts
+@@ -0,0 +1,37 @@
++import EventEmitter from '../..';
++
++interface Events {
++  data: [value: number, label: string];
++  empty: [];
++}
++
++interface Context {
++  multiplier: number;
++}
++
++const emitter = new EventEmitter<Events, Context>();
++const unsubscribe: EventEmitter.Unsubscribe = emitter.subscribe(
++  'data',
++  function (value, label) {
++    const scaled: number = value * this.multiplier;
++    const name: string = label;
++    void scaled;
++    void name;
++  },
++  { multiplier: 2 }
++);
++
++emitter.subscribe('empty', function () {});
++emitter.emit('data', 1, 'one');
++const result: void = unsubscribe();
++void result;
++
++// @ts-expect-error event arguments are event-specific
++emitter.subscribe('data', (value: string, label: string) => {}, { multiplier: 2 });
++// @ts-expect-error unknown event names are rejected
++emitter.subscribe('missing', () => {});
++// @ts-expect-error context is checked against the emitter context type
++emitter.subscribe('data', () => {}, { name: 'wrong' });
++// @ts-expect-error subscribe returns a cancellation function, not the emitter
++const notAnEmitter: EventEmitter<Events, Context> = emitter.subscribe('data', () => {});
++void notAnEmitter;
