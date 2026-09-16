@@ -1,0 +1,1566 @@
+{
+  "candidate": "8264ce42ef198580af834dcb09df996ac1274f1d",
+  "freezeSha256": "14e51db3f3f1feb49191222073428c8d7d21d6f448a698d88cb3b3051052b644",
+  "outcome": {
+    "status": "paused",
+    "pause": {
+      "kind": "provider_protocol_error",
+      "slot": 4,
+      "requestIndex": 16,
+      "error": {
+        "type": "service_unavailable_error",
+        "code": "server_is_overloaded",
+        "message": "Our servers are currently overloaded. Please try again later.",
+        "param": null
+      }
+    }
+  },
+  "rows": [
+    {
+      "slot": 1,
+      "task": "A",
+      "arm": "OFF",
+      "status": "executed",
+      "executionElapsedMs": 48764,
+      "cleanupElapsedMs": 60,
+      "requests": 8,
+      "workRequests": 7,
+      "titleRequests": 1,
+      "nativeTools": 23,
+      "knownUsage": {
+        "input_tokens": 99898,
+        "output_tokens": 1914,
+        "total_tokens": 101812,
+        "cached_tokens": 8704,
+        "reasoning_tokens": 1038
+      },
+      "requestsWithoutUsage": 0,
+      "unknownServerOutcomes": 0,
+      "internalStatus": "incomplete",
+      "nativeCompleted": false,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "compiler": null,
+      "requestsEvidence": [
+        {
+          "index": 1,
+          "kind": "title",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 577,
+            "output_tokens": 54,
+            "total_tokens": 631,
+            "cached_tokens": 0,
+            "reasoning_tokens": 42
+          },
+          "responseId": "resp_0d85381ce449a6f3016aaab38319e487d28a5e02ccd0b3b1dd",
+          "requestSha256": "f5ea9a9860414a9736a0f8afb13542a53aca598442a1c0e4e9c22d232d080f7a",
+          "responseSha256": "c3af6f51f14805ae461388522876e99bf8779326219727416f8b40d9c43058e2"
+        },
+        {
+          "index": 2,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 6432,
+            "output_tokens": 37,
+            "total_tokens": 6469,
+            "cached_tokens": 0,
+            "reasoning_tokens": 20
+          },
+          "responseId": "resp_0d3d033426826294016aaab3833e7087d291d85d9b2f1ba321",
+          "requestSha256": "34c97aea11e654005293ac58e4b4ca2d4e474311dccf1633a03b476ca43487ee",
+          "responseSha256": "20979e922aefa8ab8d334e155fbc21487956d0db1991c4e5da45d74a2e1a4a6e"
+        },
+        {
+          "index": 3,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 6537,
+            "output_tokens": 234,
+            "total_tokens": 6771,
+            "cached_tokens": 0,
+            "reasoning_tokens": 30
+          },
+          "responseId": "resp_0c147a1cf983b540016aaab386fae887d2a6d6782cf6ca7675",
+          "requestSha256": "b5e537e61754e6f804363c4df21c574009122bc817982fd0e8f824af0a600288",
+          "responseSha256": "3c5608754f692b17552f9a20ccb162f368ea26655a8402ea97fbbf40081a6cef"
+        },
+        {
+          "index": 4,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 6973,
+            "output_tokens": 139,
+            "total_tokens": 7112,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "responseId": "resp_0cd6021e31268452016aaab38c6b8887d2a71dc152833779bd",
+          "requestSha256": "717daec78f38d87adea5880aa65429e57219a9e59fe4154301db863f61aeeb6e",
+          "responseSha256": "dc2b2a183abedb53afccb4fa0eefe60e62f96e96c87acf22346f8c53b6383273"
+        },
+        {
+          "index": 5,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 9033,
+            "output_tokens": 160,
+            "total_tokens": 9193,
+            "cached_tokens": 0,
+            "reasoning_tokens": 13
+          },
+          "responseId": "resp_0e2ed1a9e5f33f62016aaab3908ea087d28a7e872f10e9a658",
+          "requestSha256": "84998b7db367f1b051ed0304f94313d5e7923cd9a1d9c894f71604ede60f6f06",
+          "responseSha256": "b322c23092eb3dde9a72c25045949e51817da4a493f93e9510bbe1add78dab4c"
+        },
+        {
+          "index": 6,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 21847,
+            "output_tokens": 712,
+            "total_tokens": 22559,
+            "cached_tokens": 0,
+            "reasoning_tokens": 492
+          },
+          "responseId": "resp_0acfa582100486f9016aaab395364c87d294814c1b4dee40d9",
+          "requestSha256": "ad2413d495bb5fd018061dcd8e482cfd2e7bafb3d572bfb367d23f5a0fc1e049",
+          "responseSha256": "b63a874e49583090b2d9181c2667b48248e933d89db758b011906494fd27b187"
+        },
+        {
+          "index": 7,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 23872,
+            "output_tokens": 202,
+            "total_tokens": 24074,
+            "cached_tokens": 0,
+            "reasoning_tokens": 108
+          },
+          "responseId": "resp_06ce509bbc936d8a016aaab3a414e887d285004b28a76ceec7",
+          "requestSha256": "437ffe352dddf66a4da15af322f38c620fbc37a66120cefe4c9fd27a4d125f4f",
+          "responseSha256": "3bcf5cccd4d830623a51481d01440e9ac386409eaefeeea3653f781c40d567c4"
+        },
+        {
+          "index": 8,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 24627,
+            "output_tokens": 376,
+            "total_tokens": 25003,
+            "cached_tokens": 8704,
+            "reasoning_tokens": 333
+          },
+          "responseId": "resp_0020bbcd4771839e016aaab3a91cf887d2a91ca3c2e3110fa3",
+          "requestSha256": "bf645f2d33363de1d7a81729b569119e8894030d84223e0f9eee5c6e71e05596",
+          "responseSha256": "bc056e42de26b467ddda17724ca1f60dae14a10bbb59fa4b2f60137ebe2c89a8"
+        }
+      ],
+      "neutralId": "n02",
+      "patchKind": "terminal",
+      "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "patchBytes": 0,
+      "Q": false,
+      "T": false,
+      "D": false,
+      "grading": {
+        "id": "n02",
+        "task": "A",
+        "applicable": true,
+        "changed": "",
+        "checksPassed": false,
+        "commands": [
+          {
+            "name": "changed",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-0",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-1",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-2",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "new-runtime",
+            "status": 1,
+            "error": null
+          },
+          {
+            "name": "evaluation-types",
+            "status": 2,
+            "error": null
+          },
+          {
+            "name": "legacy-types",
+            "status": 0,
+            "error": null
+          }
+        ]
+      },
+      "authorTypeChecks": null
+    },
+    {
+      "slot": 2,
+      "task": "A",
+      "arm": "ON",
+      "status": "executed",
+      "executionElapsedMs": 145162,
+      "cleanupElapsedMs": 53,
+      "requests": 12,
+      "workRequests": 11,
+      "titleRequests": 1,
+      "nativeTools": 34,
+      "knownUsage": {
+        "input_tokens": 212820,
+        "output_tokens": 6753,
+        "total_tokens": 219573,
+        "cached_tokens": 61440,
+        "reasoning_tokens": 2628
+      },
+      "requestsWithoutUsage": 0,
+      "unknownServerOutcomes": 0,
+      "internalStatus": null,
+      "nativeCompleted": false,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "compiler": {
+        "status": "NOT RUN",
+        "reason": "No eligible command after declaration change",
+        "spentMs": 0,
+        "baselinePreparationMs": 109,
+        "captureCost": {
+          "readBytes": 23893236,
+          "files": 108,
+          "captures": 2
+        },
+        "runs": []
+      },
+      "requestsEvidence": [
+        {
+          "index": 1,
+          "kind": "title",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 577,
+            "output_tokens": 95,
+            "total_tokens": 672,
+            "cached_tokens": 0,
+            "reasoning_tokens": 84
+          },
+          "responseId": "resp_09b2c3341de94ebc016aaab3b51cb087d2a008d4f95767f83e",
+          "requestSha256": "f5ea9a9860414a9736a0f8afb13542a53aca598442a1c0e4e9c22d232d080f7a",
+          "responseSha256": "e76da0e374cb51c39a4c96b701d20e9aa912825ca707fe5c78924f81cee61876"
+        },
+        {
+          "index": 2,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 6432,
+            "output_tokens": 38,
+            "total_tokens": 6470,
+            "cached_tokens": 5632,
+            "reasoning_tokens": 21
+          },
+          "responseId": "resp_00a49fe64f202e68016aaab3b5724087d29d1b8de0857d5cdc",
+          "requestSha256": "2b90512a5544a8c7b6041f0a1216884a3c23bd6501678c992a7ec0de5ec92765",
+          "responseSha256": "fad905e0a70ff7a5469f3255f5168cbcae32d184133afa5056a0ef5ba0f66e6c"
+        },
+        {
+          "index": 3,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 6545,
+            "output_tokens": 232,
+            "total_tokens": 6777,
+            "cached_tokens": 4608,
+            "reasoning_tokens": 32
+          },
+          "responseId": "resp_0a52b58ea1faa767016aaab3b87efc87d2bd03c050f18c8939",
+          "requestSha256": "468e8a74023a9488c7cbaa8088ab50200c0c721dc55c96de39f8cd105624755c",
+          "responseSha256": "bc7729acdc6581e4b850b09ff9bf990c7b539e879ba343da5da929e3f88fcc39"
+        },
+        {
+          "index": 4,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 6975,
+            "output_tokens": 118,
+            "total_tokens": 7093,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "responseId": "resp_03f78d215102d660016aaab3be95f087d2b105b0f715289c10",
+          "requestSha256": "fc0c843342c5891b3654be1c6ea4f2aec05b9fcb37f4da08c019c2ad181f9908",
+          "responseSha256": "48cf2652da5a9c545a4e1507b548d128b67f9b691b5c74cee31235ce0a22aed7"
+        },
+        {
+          "index": 5,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 8600,
+            "output_tokens": 177,
+            "total_tokens": 8777,
+            "cached_tokens": 4608,
+            "reasoning_tokens": 12
+          },
+          "responseId": "resp_0132fbcfa91efa61016aaab3c299bc87d2b71be5f4c7ae11f6",
+          "requestSha256": "f5675d3bc2c6ce7b3b62766266791c0d1c56206a14dccbd2549b3eed35351464",
+          "responseSha256": "cbe8ba24807deffdabba5985f51518c2d15b724cacf49cc8cdda47338ed64ab3"
+        },
+        {
+          "index": 6,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 21859,
+            "output_tokens": 1560,
+            "total_tokens": 23419,
+            "cached_tokens": 5632,
+            "reasoning_tokens": 1353
+          },
+          "responseId": "resp_0b864376bd173ed1016aaab3c8bc6487d28a2b2a8c2f04e4de",
+          "requestSha256": "42d3dd824b737964761c3fe1cce074e1c2d6e9c89b98a4f536ab9a4b78b1d0fe",
+          "responseSha256": "a7247d06c29c6fbdaee9ce84379536f1ef617bb7778dfbb58c1f0e3af3db1523"
+        },
+        {
+          "index": 7,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 23745,
+            "output_tokens": 237,
+            "total_tokens": 23982,
+            "cached_tokens": 0,
+            "reasoning_tokens": 147
+          },
+          "responseId": "resp_0e695c3de854e0fc016aaab3e7932c87d28cccd63994ddf76f",
+          "requestSha256": "c695145dba66c35f741cc1c4860b6e9902c66949dd31839f596a61e3c5f91a1b",
+          "responseSha256": "590f8e1910a6683a5e7b389afa1c275341ce031e9a996ee13d1c44d4e723aeee"
+        },
+        {
+          "index": 8,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 24028,
+            "output_tokens": 1637,
+            "total_tokens": 25665,
+            "cached_tokens": 6656,
+            "reasoning_tokens": 189
+          },
+          "responseId": "resp_08ebd8520989be4b016aaab3edfd3487d28410f84fba1bc08c",
+          "requestSha256": "fe08d4368f04a404bd3feaba06d6bdd285a52de8d55faaab158e2747515097c7",
+          "responseSha256": "9a803e8aa36acad78bff701472c4cec2f5f652ea7578444b7112915efc856e72"
+        },
+        {
+          "index": 9,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 25765,
+            "output_tokens": 1341,
+            "total_tokens": 27106,
+            "cached_tokens": 0,
+            "reasoning_tokens": 27
+          },
+          "responseId": "resp_0e6d779ec5e880e2016aaab40dc8f487d29acbddabc964b8dd",
+          "requestSha256": "2517f53bcccd1598c00d5c4c4011da7bbbb0d9c571874c24d69442d0415af708",
+          "responseSha256": "a97e9f6ffecd065212a4b77349f92082b33a5579ea5cba76b1a36c1712e6151a"
+        },
+        {
+          "index": 10,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 27146,
+            "output_tokens": 129,
+            "total_tokens": 27275,
+            "cached_tokens": 4608,
+            "reasoning_tokens": 14
+          },
+          "responseId": "resp_090b9d6c6d3d379c016aaab4276e7487d28554902e5dea7c56",
+          "requestSha256": "bb28f4ba842d1d07b82cca6895ceeba3b6da8b4dc92817d6e3473a1441032cba",
+          "responseSha256": "da3313c494f6cf0eed7c5a3f5e22c1ea969345323876b978b7238a1ee522ecfc"
+        },
+        {
+          "index": 11,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 30300,
+            "output_tokens": 527,
+            "total_tokens": 30827,
+            "cached_tokens": 25088,
+            "reasoning_tokens": 130
+          },
+          "responseId": "resp_0102297ca546126c016aaab42b9cb487d2917d7b2034ece3e6",
+          "requestSha256": "43906f51bf9393c45efd6c2d98a4b575210ef3667bb7fb38a46266472111abff",
+          "responseSha256": "06ac9201bc2a757775d0d6ed25d58f3bba2d243281ed20706ae7726005165770"
+        },
+        {
+          "index": 12,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 30848,
+            "output_tokens": 662,
+            "total_tokens": 31510,
+            "cached_tokens": 4608,
+            "reasoning_tokens": 619
+          },
+          "responseId": "resp_0582a4aa365bdf50016aaab437126487d2916b40a60c722eb5",
+          "requestSha256": "fcb4626dbbb087cf59f4c27d1730452efb91acf225892f6aaaf8e876e7d689f6",
+          "responseSha256": "6de2279253e1106dd03720aecda2eef77d9e5bccb2854d269576b17ae2b66b69"
+        }
+      ],
+      "neutralId": "n04",
+      "patchKind": "recovered-after-interruption",
+      "patchSha256": "e58c63af42d75a111575fe582248c8302a2c82c326409ea1cd7048a7159a982f",
+      "patchBytes": 4701,
+      "Q": false,
+      "T": false,
+      "D": false,
+      "grading": {
+        "id": "n04",
+        "task": "A",
+        "applicable": true,
+        "changed": "M\tREADME.md\nM\tindex.d.ts\nM\tindex.js\nM\ttest/test.mjs\n",
+        "checksPassed": false,
+        "commands": [
+          {
+            "name": "apply",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "changed",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-0",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-1",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-2",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "new-runtime",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "evaluation-types",
+            "status": 2,
+            "error": null
+          },
+          {
+            "name": "legacy-types",
+            "status": 0,
+            "error": null
+          }
+        ]
+      },
+      "authorTypeChecks": null
+    },
+    {
+      "slot": 3,
+      "task": "B",
+      "arm": "ON",
+      "status": "executed",
+      "executionElapsedMs": 463935,
+      "cleanupElapsedMs": 58,
+      "requests": 25,
+      "workRequests": 24,
+      "titleRequests": 1,
+      "nativeTools": 46,
+      "knownUsage": {
+        "input_tokens": 830897,
+        "output_tokens": 17920,
+        "total_tokens": 848817,
+        "cached_tokens": 561664,
+        "reasoning_tokens": 9953
+      },
+      "requestsWithoutUsage": 0,
+      "unknownServerOutcomes": 0,
+      "internalStatus": "incomplete",
+      "nativeCompleted": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "compiler": {
+        "status": "no-difference-in-checked-scope",
+        "current": true,
+        "spentMs": 3929,
+        "baselinePreparationMs": 105,
+        "captureCost": {
+          "readBytes": 71680884,
+          "files": 324,
+          "captures": 6
+        },
+        "runs": [
+          {
+            "status": "no-difference-in-checked-scope",
+            "callID": "call_2BsEZ9yJHT8BVbKZxK202EvE",
+            "snapshot": "e0471362dcce75300a9782eb5a5d7bd31237a2bd80cb3045d2c2932b6cedf8dc",
+            "baselineSnapshot": "aaa206fc4b20ebeef4bd44d01980520fb344247692a5fbf7c8cbb7bfa8c170de",
+            "surfaceHash": "a0a559dcc72df65809e46a9fe4cd14ffc62953d4ed5f84be20f8a0ce3c4d195b",
+            "delivered": true,
+            "receipt": {
+              "file": "request-15.json",
+              "sha256": "3169880b861f54e48e7a34623fedd8ceda0df9bdb41cadf502a8c466ca50047a"
+            },
+            "cost": {
+              "elapsedMs": 3765,
+              "transferredInputBytes": 12247953,
+              "outputBytes": 11701,
+              "compilations": 11,
+              "inputBytes": 11946912,
+              "files": 54,
+              "preparationMs": 95,
+              "totalMs": 3929,
+              "readBytes": 35840736,
+              "fileReads": 162
+            },
+            "process": {
+              "exit": 0,
+              "signal": null,
+              "terminationVerified": true
+            },
+            "consumers": [
+              {
+                "id": 0,
+                "status": "no-difference-in-checked-scope",
+                "route": "EventEmitter<{ sample: [string] }, string>.listeners() -> returned[0]",
+                "text": "import { EventEmitter as API3 } from \"./index\";\ndeclare const subject3: API3<{ sample: [string] }, string>;\nconst returned = subject3[\"listeners\"](\"sample\");\nconst callable = returned[0];\ncallable(\"sample\");\n"
+              },
+              {
+                "id": 1,
+                "status": "no-difference-in-checked-scope",
+                "route": "EventEmitter<{ sample: [string] }, { sample: [string] }>.listeners() -> returned[0]",
+                "text": "import { EventEmitter as API4 } from \"./index\";\ndeclare const subject4: API4<{ sample: [string] }, { sample: [string] }>;\nconst returned = subject4[\"listeners\"](\"sample\");\nconst callable = returned[0];\ncallable(\"sample\");\n"
+              },
+              {
+                "id": 2,
+                "status": "no-difference-in-checked-scope",
+                "route": "EventEmitter<{ sample: [string] }, { marker: string }>.listeners() -> returned[0]",
+                "text": "import { EventEmitter as API5 } from \"./index\";\ndeclare const subject5: API5<{ sample: [string] }, { marker: string }>;\nconst returned = subject5[\"listeners\"](\"sample\");\nconst callable = returned[0];\ncallable(\"sample\");\n"
+              }
+            ]
+          }
+        ]
+      },
+      "requestsEvidence": [
+        {
+          "index": 1,
+          "kind": "title",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 577,
+            "output_tokens": 135,
+            "total_tokens": 712,
+            "cached_tokens": 0,
+            "reasoning_tokens": 124
+          },
+          "responseId": "resp_0dbbbc5ced10978b016aaab448a25887d286df66c90b4c3c59",
+          "requestSha256": "f5ea9a9860414a9736a0f8afb13542a53aca598442a1c0e4e9c22d232d080f7a",
+          "responseSha256": "11480fb2184c59e7e90291268b8be6904573805458a220ec3fb04698f848b518"
+        },
+        {
+          "index": 2,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 6432,
+            "output_tokens": 37,
+            "total_tokens": 6469,
+            "cached_tokens": 0,
+            "reasoning_tokens": 20
+          },
+          "responseId": "resp_0a284589770bdbbf016aaab449100c87d298d1a849d03a53d3",
+          "requestSha256": "37c1662e513e9d44098226ddd0509a2e997a664a96ca460afbc674c468c651d9",
+          "responseSha256": "3d513dc8007a7c40a3ac029639f94542a31fbd2967c9bdfece0d420db4150c68"
+        },
+        {
+          "index": 3,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 6553,
+            "output_tokens": 240,
+            "total_tokens": 6793,
+            "cached_tokens": 4608,
+            "reasoning_tokens": 52
+          },
+          "responseId": "resp_0496f713839974ab016aaab44c3cd087d2aeb9cab92db5cd34",
+          "requestSha256": "be9795fa5497064230a09f46672940519b0dad6cccc215867e3302818ac0d908",
+          "responseSha256": "0ec7620c414017343ba696d84c8f1e752e18bd2913b1fe245f427be3c4498e95"
+        },
+        {
+          "index": 4,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 6963,
+            "output_tokens": 149,
+            "total_tokens": 7112,
+            "cached_tokens": 4608,
+            "reasoning_tokens": 0
+          },
+          "responseId": "resp_00998205e67eeeaa016aaab455192487d2a982590d59d1c317",
+          "requestSha256": "5427d6f01d42581aba0de93dc21241efc7cd0800dcca2ae2eba94c42da4ad47f",
+          "responseSha256": "5ff1174614a890b8f5de0dc060756d3ed440ba246a2e16f6745abf20b19d9c72"
+        },
+        {
+          "index": 5,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 11792,
+            "output_tokens": 155,
+            "total_tokens": 11947,
+            "cached_tokens": 6656,
+            "reasoning_tokens": 8
+          },
+          "responseId": "resp_06b73a5081eef176016aaab45bc06487d285c81aec836270c1",
+          "requestSha256": "8b0c21056f5402c11ba18d89df5bf069f00ce8a4fe39a9ca603616716c645b11",
+          "responseSha256": "4d433971ad73dda04a4c918a5a6a5fc22cc19488e0e2c075ec5c23e9bb0d9655"
+        },
+        {
+          "index": 6,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 24618,
+            "output_tokens": 1549,
+            "total_tokens": 26167,
+            "cached_tokens": 0,
+            "reasoning_tokens": 1316
+          },
+          "responseId": "resp_0a9dcf789e64f26b016aaab460502c87d2ab1d18c26f34184a",
+          "requestSha256": "a6a3c3e3f24fc3244d1fa86bb2e9715c68d79ed8a4d87933eb64e828a2c2c33f",
+          "responseSha256": "304648ec6af33d21ae05aa7dd36a3e5a756df16171aeee2dcea352b72f6fcc91"
+        },
+        {
+          "index": 7,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 27207,
+            "output_tokens": 3710,
+            "total_tokens": 30917,
+            "cached_tokens": 24064,
+            "reasoning_tokens": 2746
+          },
+          "responseId": "resp_034e3fb10aff4833016aaab47e543487d28c1bcf8a4fe1675e",
+          "requestSha256": "aafb7f364be9a902f2c6d8e541291898464bd0f7915c3e9fa0cb180e86a813b1",
+          "responseSha256": "b02209e757cb6eb1835fe1a00041087ee0586bad274279d7beb5cfb9f71c960b"
+        },
+        {
+          "index": 8,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 30947,
+            "output_tokens": 3585,
+            "total_tokens": 34532,
+            "cached_tokens": 4608,
+            "reasoning_tokens": 1122
+          },
+          "responseId": "resp_02c3658024be81a9016aaab4c385a087d294c65e973dfee2f6",
+          "requestSha256": "da93f48e97dba305cc08b63d00c0c096728f1a325b4235138c8ddcad407acdb2",
+          "responseSha256": "ef6088569b5974d2b7734350df619bf76fb976c0cc579e44519a3ee6a7d0ffad"
+        },
+        {
+          "index": 9,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 34565,
+            "output_tokens": 302,
+            "total_tokens": 34867,
+            "cached_tokens": 0,
+            "reasoning_tokens": 177
+          },
+          "responseId": "resp_0b2a7e784a86fa79016aaab50581a087d29aba5d3a0376b28a",
+          "requestSha256": "e69148de236c0c804edf4026281353082ad3497f641ee3b552c53a8984e3e0df",
+          "responseSha256": "2537d2b7c1fef9ef8a3792ec709fd840bb12b347fe8b68d4f39a92ea031151f4"
+        },
+        {
+          "index": 10,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 35037,
+            "output_tokens": 218,
+            "total_tokens": 35255,
+            "cached_tokens": 4608,
+            "reasoning_tokens": 15
+          },
+          "responseId": "resp_029e5f9925519233016aaab50d854087d2a72db772d4fa4fe6",
+          "requestSha256": "c005021b3493d6a27973d74e9b30e2cb8b9cf5a345f6505585d934400822dcf4",
+          "responseSha256": "9735a9ff78188006b687db88fd7e51f388c43afa4da2706554e544214cbb36a5"
+        },
+        {
+          "index": 11,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 38061,
+            "output_tokens": 1278,
+            "total_tokens": 39339,
+            "cached_tokens": 0,
+            "reasoning_tokens": 388
+          },
+          "responseId": "resp_0147e5c8e1e53653016aaab5144ff087d2a9f180ce656846ff",
+          "requestSha256": "583c2e4514569b2be9fce68ace68cbc1fa7176dbb25f828df25bf288ce0e1908",
+          "responseSha256": "bdd059c22ad590a68f65b732e8412e9a46108bccccfc0f9adeca95792a5dc4b5"
+        },
+        {
+          "index": 12,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 39356,
+            "output_tokens": 1606,
+            "total_tokens": 40962,
+            "cached_tokens": 34304,
+            "reasoning_tokens": 602
+          },
+          "responseId": "resp_07af6b99019d2e4f016aaab52f0e5c87d28ac3c04d418af8f5",
+          "requestSha256": "3ed41e434c98066aa32e6703f4b933db30ed891caf259fedd414605fbefda855",
+          "responseSha256": "62a49b5ba737d153dc8768e1f624cb66db3f999ed62681a83ff605232e1c09f8"
+        },
+        {
+          "index": 13,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 40985,
+            "output_tokens": 512,
+            "total_tokens": 41497,
+            "cached_tokens": 38400,
+            "reasoning_tokens": 93
+          },
+          "responseId": "resp_0e0cf3c9ab462168016aaab551bdbc87d2a5fc6657730cbf51",
+          "requestSha256": "9d2b767cada27c343bc44ede4f091f1de4ade24fe0f7434bc2ab1ed4d4f3f69f",
+          "responseSha256": "efd942f55a2db5e401a78551e069244b956be7648866234ac09101dc6357bef5"
+        },
+        {
+          "index": 14,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 41516,
+            "output_tokens": 214,
+            "total_tokens": 41730,
+            "cached_tokens": 30208,
+            "reasoning_tokens": 120
+          },
+          "responseId": "resp_037a4e95dcf38564016aaab55e26c087d29853396476189128",
+          "requestSha256": "cd1ee6a4bf8ccc7638254587f7d70483cf0af3a6d57c23ec3953c078a5f80588",
+          "responseSha256": "f99b6e4ba326e85e3bd0012784d34e58a84fcd8751444c3346bd8a6e95eabd4d"
+        },
+        {
+          "index": 15,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 42732,
+            "output_tokens": 71,
+            "total_tokens": 42803,
+            "cached_tokens": 37376,
+            "reasoning_tokens": 37
+          },
+          "responseId": "resp_0bc0fca3453b6f52016aaab568214c87d2bf984a05dc60ba6d",
+          "requestSha256": "3169880b861f54e48e7a34623fedd8ceda0df9bdb41cadf502a8c466ca50047a",
+          "responseSha256": "a1fd948ddd7c0da12fad4e6ea0050ef7ea8287e7a864d223ad7bb306cf54f587"
+        },
+        {
+          "index": 16,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 42907,
+            "output_tokens": 41,
+            "total_tokens": 42948,
+            "cached_tokens": 42496,
+            "reasoning_tokens": 8
+          },
+          "responseId": "resp_05a109d2774dd867016aaab56d189c87d2a22a1d46837c8a32",
+          "requestSha256": "ed0272b5f6db1b2af5402da711f4035affb4c4a8675b852e4558f22042409414",
+          "responseSha256": "ba62cd88e41b20d220b15587ad88e31eb4347c9359a48fea747be93b31156008"
+        },
+        {
+          "index": 17,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 43307,
+            "output_tokens": 340,
+            "total_tokens": 43647,
+            "cached_tokens": 34304,
+            "reasoning_tokens": 200
+          },
+          "responseId": "resp_086c6a1776d6e63e016aaab570309c87d2b9ef0c0de2de0117",
+          "requestSha256": "335a25563bb586a4c831133cbe80de2224b50fde0b18947c9305df3681c0b010",
+          "responseSha256": "063eab1f723e534e9343856011a53ca9f9a470e24735f30e693b19036739503f"
+        },
+        {
+          "index": 18,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 43753,
+            "output_tokens": 851,
+            "total_tokens": 44604,
+            "cached_tokens": 26112,
+            "reasoning_tokens": 725
+          },
+          "responseId": "resp_0c8b5e95b2520af1016aaab5be38ec87d29c335ddf7fc7bd8d",
+          "requestSha256": "8a3714e587d51b574cb4b0bcd19808704b3f9d2b0787040e4cdaa4fb23745928",
+          "responseSha256": "13b07634f3a634d9843f837d0c5e8e7fdc0a6899a7a51e30a9688afc3d62739e"
+        },
+        {
+          "index": 19,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 46822,
+            "output_tokens": 1060,
+            "total_tokens": 47882,
+            "cached_tokens": 42496,
+            "reasoning_tokens": 947
+          },
+          "responseId": "resp_003409814ff21950016aaab5d0aa4487d2a769e6e47073c447",
+          "requestSha256": "fe49fb02e72a0d57e5c806ea6c7790971d8a19e6cec9d6268b704d8e08f105dc",
+          "responseSha256": "a171c7c17a27b796c0ecf60f778bfed382cc35f6632b5d1ae7756562bb43864b"
+        },
+        {
+          "index": 20,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 48689,
+            "output_tokens": 32,
+            "total_tokens": 48721,
+            "cached_tokens": 40448,
+            "reasoning_tokens": 0
+          },
+          "responseId": "resp_097484293be41ce3016aaab5e6dc8087d2b0c65e69503e71e7",
+          "requestSha256": "fd1b37886ba38f9eabec8e3b5287476b5187dc530e26340eb40c49fe9812882f",
+          "responseSha256": "276b0d27c03c287113adf53126d4468d26479f626612c080d911baec4a340913"
+        },
+        {
+          "index": 21,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 48825,
+            "output_tokens": 206,
+            "total_tokens": 49031,
+            "cached_tokens": 42496,
+            "reasoning_tokens": 79
+          },
+          "responseId": "resp_00c734edce88260b016aaab5ea2b7887d2801848d33f799760",
+          "requestSha256": "419527c13441a10a81a8a0b27d314873d7fbc19f0859f8d2f8e714c7ee54ca93",
+          "responseSha256": "5c8637343e7d5de3c3ef64c0b3460812a98688822d3daa67462257ee5d2853ea"
+        },
+        {
+          "index": 22,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 53287,
+            "output_tokens": 623,
+            "total_tokens": 53910,
+            "cached_tokens": 43520,
+            "reasoning_tokens": 590
+          },
+          "responseId": "resp_0ec8ef5dab5f4b17016aaab5f0ac3487d2bcbd7af5da69dba5",
+          "requestSha256": "d8576fcc13bd80d7d337fcae95f49816ae3daee12976d22968b601bf51df1d84",
+          "responseSha256": "ecbcaa64fac5a0dc1f6b820618a19705df79ae20e6a4192a485394fdfcbe17d9"
+        },
+        {
+          "index": 23,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 54269,
+            "output_tokens": 550,
+            "total_tokens": 54819,
+            "cached_tokens": 47616,
+            "reasoning_tokens": 361
+          },
+          "responseId": "resp_0d393bf0b4b78f91016aaab5fe25a087d29170fb783d5f016e",
+          "requestSha256": "e71b36b960f7d6eb85e007c194e95ba5cf5f30a35d189df91e2ad658b5966b98",
+          "responseSha256": "c975ec2d69e89edaa7e8b63fc16eed6398ab6f03c950a3a08d60d7cddca8f067"
+        },
+        {
+          "index": 24,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 54988,
+            "output_tokens": 288,
+            "total_tokens": 55276,
+            "cached_tokens": 52736,
+            "reasoning_tokens": 146
+          },
+          "responseId": "resp_0407383f41f313dc016aaab60a389087d2bf48b2f453378416",
+          "requestSha256": "a26ddd263776a925d5937a8f92f336bdf9d0c8371b69f6d1a7df9d4c4c19c0ba",
+          "responseSha256": "e78c0b6d5da982a29fdb7601724a33134e3561e194d501cb0d143192d2a20b79"
+        },
+        {
+          "index": 25,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 6709,
+            "output_tokens": 168,
+            "total_tokens": 6877,
+            "cached_tokens": 0,
+            "reasoning_tokens": 77
+          },
+          "responseId": "resp_0856c175179feffd016aaab6124bd087d2935f456edb4fd631",
+          "requestSha256": "fdeed1fe8d1e492d154a857fbe6388376a0800c9a713632ab4415cc232dff7d6",
+          "responseSha256": "c5021fd37540e9778e75fe120f74b925a5bf649602e79a74dfabf09af34c64d0"
+        }
+      ],
+      "neutralId": "n01",
+      "patchKind": "terminal",
+      "patchSha256": "fdcb28cec10a62016df0747331214bf0370ebd977fa4a6d9c848c1e7acb1f2e4",
+      "patchBytes": 16116,
+      "Q": true,
+      "T": true,
+      "D": true,
+      "grading": {
+        "id": "n01",
+        "task": "B",
+        "applicable": true,
+        "changed": "M\tREADME.md\nM\tindex.d.ts\nM\tindex.js\nM\ttest/test.js\nM\ttest/test.mjs\nA\ttest/types-negative.ts\nA\ttest/types.ts\n",
+        "checksPassed": true,
+        "commands": [
+          {
+            "name": "apply",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "changed",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-0",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-1",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-2",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "new-runtime",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "evaluation-types",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "legacy-types",
+            "status": 0,
+            "error": null
+          }
+        ]
+      },
+      "authorTypeChecks": {
+        "id": "n01",
+        "files": [
+          "test/types-negative.ts",
+          "test/types.ts"
+        ],
+        "status": 0
+      }
+    },
+    {
+      "slot": 4,
+      "task": "B",
+      "arm": "OFF",
+      "status": "executed",
+      "executionElapsedMs": 311938,
+      "cleanupElapsedMs": 54,
+      "requests": 16,
+      "workRequests": 15,
+      "titleRequests": 1,
+      "nativeTools": 38,
+      "knownUsage": {
+        "input_tokens": 349539,
+        "output_tokens": 14992,
+        "total_tokens": 364531,
+        "cached_tokens": 189440,
+        "reasoning_tokens": 7907
+      },
+      "requestsWithoutUsage": 1,
+      "unknownServerOutcomes": 1,
+      "internalStatus": null,
+      "nativeCompleted": false,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": true
+      },
+      "compiler": null,
+      "requestsEvidence": [
+        {
+          "index": 1,
+          "kind": "title",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 577,
+            "output_tokens": 89,
+            "total_tokens": 666,
+            "cached_tokens": 0,
+            "reasoning_tokens": 77
+          },
+          "responseId": "resp_06b3ec7c3395e92b016aaab61ace4887d284f159e3140b8b3b",
+          "requestSha256": "f5ea9a9860414a9736a0f8afb13542a53aca598442a1c0e4e9c22d232d080f7a",
+          "responseSha256": "d6db70a80394315941160f76d57910d69006b6e121a8810fb99dd00e23d92eb4"
+        },
+        {
+          "index": 2,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 6432,
+            "output_tokens": 38,
+            "total_tokens": 6470,
+            "cached_tokens": 0,
+            "reasoning_tokens": 21
+          },
+          "responseId": "resp_0f470db51cf98a7d016aaab61b39b087d2bd0ee60a2d43b147",
+          "requestSha256": "f1cddc293bfd6645051db1477d5b4579d9833386624ac9b9269698e3c8d847fb",
+          "responseSha256": "d7ecd6693eaf9bab109562011023e3652ec55c4343a327819d5b7981095127f3"
+        },
+        {
+          "index": 3,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 6555,
+            "output_tokens": 222,
+            "total_tokens": 6777,
+            "cached_tokens": 4608,
+            "reasoning_tokens": 27
+          },
+          "responseId": "resp_06fff31744a8e6d1016aaab61e62a487d29bd2a89e05277fe8",
+          "requestSha256": "2c9fe867a5de7ab39c43711ad5f19666cb143bbcd3a58ea6137f17e770a8fe31",
+          "responseSha256": "c3443e921b0269272eaa4f744e0034bd7852ff03dd6be21f832392dd9114ff26"
+        },
+        {
+          "index": 4,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 6981,
+            "output_tokens": 116,
+            "total_tokens": 7097,
+            "cached_tokens": 5632,
+            "reasoning_tokens": 0
+          },
+          "responseId": "resp_0bb6810c32a2e35d016aaab623be0887d28409afb3bdd0248e",
+          "requestSha256": "38a64fb7d259e6e61f6c7f7d65d153be5a4a64c9f34812ce302a9b7f1d209b19",
+          "responseSha256": "1ccdda1d129035e12db54743db7d28b9285a2a41c1172753cfcb0b7f7dcc8f87"
+        },
+        {
+          "index": 5,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 9072,
+            "output_tokens": 162,
+            "total_tokens": 9234,
+            "cached_tokens": 4608,
+            "reasoning_tokens": 15
+          },
+          "responseId": "resp_0b85a75594e85f1f016aaab62a1acc87d29bb6dff12ac9c82e",
+          "requestSha256": "d9fd1c24470bc187c8f08eee0b3f4f421e2c6b0a9ac14e51917866a7c47fb54f",
+          "responseSha256": "240f6fd913b609e9161cd6a00fefd130ed8f3c26f3a363c93b5be13c4ed04b3c"
+        },
+        {
+          "index": 6,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 21913,
+            "output_tokens": 1364,
+            "total_tokens": 23277,
+            "cached_tokens": 4608,
+            "reasoning_tokens": 1145
+          },
+          "responseId": "resp_00930d59176ce381016aaab6307f6887d29e54585f5437099d",
+          "requestSha256": "2d0faa00ae84de3e7adc705ff40cd2d407d3c8eaf91950aa6eb461c34240772c",
+          "responseSha256": "26ce8eb57b969b9e9dc441c65699029d3bbc94c7f049ad606c65df5ee9cb2c1c"
+        },
+        {
+          "index": 7,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 23706,
+            "output_tokens": 833,
+            "total_tokens": 24539,
+            "cached_tokens": 4608,
+            "reasoning_tokens": 705
+          },
+          "responseId": "resp_0be65086386503ca016aaab64b120887d28ee2bcf3067cdb7e",
+          "requestSha256": "e0cbbfb8d47b5cbf44437dfe3edc119fbcbcbb06bdffaac6d2541e45b766fabe",
+          "responseSha256": "ab4be2d860bc08a9de4f0a4dbc64526219c7e20f3301eeb5eb4596df72ad7a8d"
+        },
+        {
+          "index": 8,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 25329,
+            "output_tokens": 5478,
+            "total_tokens": 30807,
+            "cached_tokens": 4608,
+            "reasoning_tokens": 1827
+          },
+          "responseId": "resp_01b73f9e46ebd875016aaab65c55e887d2b9d1aa365a00cd71",
+          "requestSha256": "fb40aaaa6f7b58b11e2dfb0e7402151b506a79a093a33b5b5470b359f5f22902",
+          "responseSha256": "95219ed1b7c2fb3569cfc091d6592470058769e6d5f0ff765015d46858d1d132"
+        },
+        {
+          "index": 9,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 30853,
+            "output_tokens": 351,
+            "total_tokens": 31204,
+            "cached_tokens": 6656,
+            "reasoning_tokens": 132
+          },
+          "responseId": "resp_0420b43f84fb47d6016aaab6c3b48087d2896e05baec2d6a2e",
+          "requestSha256": "15b23bbe01d319e523b76a70852dc84773c306829603dd13c207d98ccb20e910",
+          "responseSha256": "191be38e18e9a91efc238674f2435f7b896e09c893990f85dcb162f519feee45"
+        },
+        {
+          "index": 10,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 31232,
+            "output_tokens": 777,
+            "total_tokens": 32009,
+            "cached_tokens": 23040,
+            "reasoning_tokens": 578
+          },
+          "responseId": "resp_0eff97b5cab3c75b016aaab6cbbf3087d29f9155b14b153502",
+          "requestSha256": "d26e5d1e55e85c3d3aa6028f58d16a852e41a65460017a99f9660c9738ab204f",
+          "responseSha256": "150087e691a22c6960e54417927268c981cedde07d03fe224a5761419ba4feec"
+        },
+        {
+          "index": 11,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 35036,
+            "output_tokens": 733,
+            "total_tokens": 35769,
+            "cached_tokens": 0,
+            "reasoning_tokens": 626
+          },
+          "responseId": "resp_0a273acd43df1543016aaab6db87d087d2a2c26b3ef3439ff7",
+          "requestSha256": "02987c2dcfd0445ac2b33dbedacdb72a3700c29d4d6dfd5beaa4aab606d0fc0f",
+          "responseSha256": "13ce198e3904fa842ae4052437f108876d57f198c306be883573b8d85d44f6a2"
+        },
+        {
+          "index": 12,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 35791,
+            "output_tokens": 1399,
+            "total_tokens": 37190,
+            "cached_tokens": 30208,
+            "reasoning_tokens": 247
+          },
+          "responseId": "resp_05b8ab2cd156d97b016aaab6ea462887d29c49c56daefe5890",
+          "requestSha256": "97ca4ba9d503d104844bcb8b12ca7a9f79b4816d0d6a69c8dd2dabadcce43a61",
+          "responseSha256": "e6e1807e7fd0638a53f97460916951da34fc2fa6c972d573ad0598dc780e88de"
+        },
+        {
+          "index": 13,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 37208,
+            "output_tokens": 542,
+            "total_tokens": 37750,
+            "cached_tokens": 30208,
+            "reasoning_tokens": 360
+          },
+          "responseId": "resp_076fc22a25704694016aaab70710ac87d29d15a254799f4450",
+          "requestSha256": "5fff123a76ad8b50adbade727425d11e0482358276e4a4f186f1655546867cfd",
+          "responseSha256": "bcb60485a6f11674098a4b8dc43588479272efc28e5272865e3b3e5a9fac064d"
+        },
+        {
+          "index": 14,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 39023,
+            "output_tokens": 528,
+            "total_tokens": 39551,
+            "cached_tokens": 36352,
+            "reasoning_tokens": 292
+          },
+          "responseId": "resp_00d01c8e2a168a67016aaab71582a087d2bca4f42c1c3c1667",
+          "requestSha256": "49bd6853d2e1d81a9442e01e45b1e6c72c7c75765b22a4844ee3d60c55bd6439",
+          "responseSha256": "6b2b6a8deb7d2fee876da9327597f21aa3898e0264ea781e48fbf1aca96c29f3"
+        },
+        {
+          "index": 15,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 39831,
+            "output_tokens": 2360,
+            "total_tokens": 42191,
+            "cached_tokens": 34304,
+            "reasoning_tokens": 1855
+          },
+          "responseId": "resp_011db236d400a0a4016aaab722b24c87d2abd89cf991d47234",
+          "requestSha256": "769e1adae37839e37486126fb7c9696656289768fff8fa2e6b71311f0fdb3e3f",
+          "responseSha256": "d2f0304301ac5792262cd9d780c6162093c00fb78fc818b874a6918e952b2c4c"
+        },
+        {
+          "index": 16,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "unknown",
+          "usage": null,
+          "responseId": "resp_0baf8ff981e42758016aaab74ef53887d2b5ee55f2d8dfa0ab",
+          "requestSha256": "c41431c568ce9c84e22e8d49b5024045224935ee495e473d5a674dff211f6f5c",
+          "responseSha256": "31addbf1fc682796ed1b4471ec7af04fe830dc05c66520e03e554563bda4184d"
+        }
+      ],
+      "neutralId": "n03",
+      "patchKind": "recovered-after-interruption",
+      "patchSha256": "5a0db99a9fca73e4f92c53c34f4e77595d07b075fdca335f7ff827ac7204736d",
+      "patchBytes": 13475,
+      "Q": true,
+      "T": false,
+      "D": false,
+      "grading": {
+        "id": "n03",
+        "task": "B",
+        "applicable": true,
+        "changed": "M\tREADME.md\nM\tindex.d.ts\nM\tindex.js\nM\ttest/test.js\nM\ttest/test.mjs\nA\ttest/types.ts\n",
+        "checksPassed": true,
+        "commands": [
+          {
+            "name": "apply",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "changed",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-0",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-1",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-2",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "new-runtime",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "evaluation-types",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "legacy-types",
+            "status": 0,
+            "error": null
+          }
+        ]
+      },
+      "authorTypeChecks": {
+        "id": "n03",
+        "files": [
+          "test/types.ts"
+        ],
+        "status": 0
+      }
+    }
+  ],
+  "tokenAccounting": "cache/reasoning are included subsets, not additional totals; null/missing usage is unknown",
+  "monetaryCost": null,
+  "decision": "Keep experimental, default off; no new campaign. No evidence-to-repair chain or attributable additional complete delivery.",
+  "plainOpenCodeMeasured": false,
+  "aggregateVerifier": "PROCESS_CONTAINMENT_UNAVAILABLE remains a separate historical limitation; no full CI claim",
+  "scope": "two tasks in one public project; A is a known development example"
+}

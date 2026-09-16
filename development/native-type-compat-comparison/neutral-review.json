@@ -1,0 +1,59 @@
+{
+  "phase": "Recorded before reading neutral mapping and explanatory traces",
+  "rubric": "Frozen PLAN.md; no additional criteria",
+  "rows": [
+    {
+      "id": "n01",
+      "task": "B",
+      "sourceReview": "waitFor registers unique once callback synchronously, cleans event/abort paths, preserves legacy code, declares event tuple and AbortSignal options; runtime/ESM regressions and positive/negative type consumers and lifecycle docs supplied; no administrative dependency",
+      "mechanicalPass": true,
+      "QProvisional": true,
+      "pending": "Compile supplied type consumers; inspect author-check provenance separately"
+    },
+    {
+      "id": "n02",
+      "task": "A",
+      "sourceReview": "Empty patch: subscribe and all required delivery absent",
+      "mechanicalPass": false,
+      "Q": false
+    },
+    {
+      "id": "n03",
+      "task": "B",
+      "sourceReview": "waitFor unique on callback with settled guard, removes own callback and abort handler; prior APIs preserved; tuple declarations, runtime/ESM regressions, positive/negative type consumers and lifecycle docs supplied; no administrative dependency",
+      "mechanicalPass": true,
+      "QProvisional": true,
+      "pending": "Compile supplied type consumers; inspect author-check provenance separately"
+    },
+    {
+      "id": "n04",
+      "task": "A",
+      "sourceReview": "Registration identity cancellation preserves runtime contract and original API. New declaration reuses EventListener without contextual receiver; independent new-types check fails. Only one ESM smoke added; required runtime regression suite and meaningful type consumers absent.",
+      "mechanicalPass": false,
+      "Q": false
+    }
+  ],
+  "authorTypes": [
+    {
+      "id": "n01",
+      "files": [
+        "test/types-negative.ts",
+        "test/types.ts"
+      ],
+      "status": 0
+    },
+    {
+      "id": "n03",
+      "files": [
+        "test/types.ts"
+      ],
+      "status": 0
+    }
+  ],
+  "finalQuality": {
+    "n01": true,
+    "n02": false,
+    "n03": true,
+    "n04": false
+  }
+}
